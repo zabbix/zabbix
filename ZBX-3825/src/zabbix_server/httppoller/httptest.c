@@ -82,7 +82,8 @@ static int	process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		dc_add_history(itemid, (unsigned char)atoi(row[0]), value, time(NULL), 0, NULL, 0, 0, 0, 0);
+		dc_add_history(itemid, (unsigned char)atoi(row[0]), value, time(NULL),
+				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 		ret = SUCCEED;
 	}
 	else

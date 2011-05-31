@@ -35,7 +35,6 @@ typedef struct
 ZBX_PERF_STAT_DATA;
 
 PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, int interval);
-int			add_perf_counter_from_config(const char *line);
 void			remove_perf_counter(PERF_COUNTER_DATA *counter);
 
 double	compute_average_value(const char *function, PERF_COUNTER_DATA *counter, int interval);

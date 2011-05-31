@@ -144,7 +144,7 @@ char	*CONFIG_TMPDIR			= NULL;
 char	*CONFIG_FPING_LOCATION		= NULL;
 #ifdef HAVE_IPV6
 char	*CONFIG_FPING6_LOCATION		= NULL;
-#endif /* HAVE_IPV6 */
+#endif
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
@@ -185,7 +185,7 @@ ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
  *                                                                            *
- * Function: init_config                                                      *
+ * Function: zbx_load_config                                                  *
  *                                                                            *
  * Purpose: parse config file and update configuration parameters             *
  *                                                                            *
@@ -198,118 +198,118 @@ ZBX_MUTEX	node_sync_access;
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-static void	init_config()
+static void	zbx_load_config()
 {
 	static struct cfg_line	cfg[] =
 	{
-		/* PARAMETER,			VAR,					FUNC,
-			TYPE,		MANDATORY,	MIN,			MAX */
-		{"StartDBSyncers",		&CONFIG_HISTSYNCER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			100},
-		{"StartDiscoverers",		&CONFIG_DISCOVERER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			250},
-		{"StartHTTPPollers",		&CONFIG_HTTPPOLLER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1000},
-		{"StartPingers",		&CONFIG_PINGER_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1000},
-		{"StartPollers",		&CONFIG_POLLER_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1000},
-		{"StartPollersUnreachable",	&CONFIG_UNREACHABLE_POLLER_FORKS,	NULL,
-			TYPE_INT,	PARM_OPT,	0,			1000},
-		{"StartIPMIPollers",		&CONFIG_IPMIPOLLER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1000},
-		{"StartTrappers",		&CONFIG_TRAPPER_FORKS,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1000},
-		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		NULL,
-			TYPE_INT,	PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
-		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		NULL,
-			TYPE_INT,	PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
-		{"TrendCacheSize",		&CONFIG_TRENDS_CACHE_SIZE,		NULL,
-			TYPE_INT,	PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
-		{"HistoryTextCacheSize",	&CONFIG_TEXT_CACHE_SIZE,		NULL,
-			TYPE_INT,	PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
-		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			SEC_PER_HOUR},
-		{"HousekeepingFrequency",	&CONFIG_HOUSEKEEPING_FREQUENCY,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			24},
-		{"MaxHousekeeperDelete",	&CONFIG_MAX_HOUSEKEEPER_DELETE,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1000000},
-		{"SenderFrequency",		&CONFIG_SENDER_FREQUENCY,		NULL,
-			TYPE_INT,	PARM_OPT,	5,			SEC_PER_HOUR},
-		{"TmpDir",			&CONFIG_TMPDIR,				NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"FpingLocation",		&CONFIG_FPING_LOCATION,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
+		/* PARAMETER,			VAR,					TYPE,
+			MANDATORY,	MIN,			MAX */
+		{"StartDBSyncers",		&CONFIG_HISTSYNCER_FORKS,		TYPE_INT,
+			PARM_OPT,	1,			100},
+		{"StartDiscoverers",		&CONFIG_DISCOVERER_FORKS,		TYPE_INT,
+			PARM_OPT,	0,			250},
+		{"StartHTTPPollers",		&CONFIG_HTTPPOLLER_FORKS,		TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartPingers",		&CONFIG_PINGER_FORKS,			TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartPollers",		&CONFIG_POLLER_FORKS,			TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartPollersUnreachable",	&CONFIG_UNREACHABLE_POLLER_FORKS,	TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartIPMIPollers",		&CONFIG_IPMIPOLLER_FORKS,		TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartTrappers",		&CONFIG_TRAPPER_FORKS,			TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		TYPE_INT,
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
+		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_INT,
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
+		{"TrendCacheSize",		&CONFIG_TRENDS_CACHE_SIZE,		TYPE_INT,
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
+		{"HistoryTextCacheSize",	&CONFIG_TEXT_CACHE_SIZE,		TYPE_INT,
+			PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
+		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
+			PARM_OPT,	1,			SEC_PER_HOUR},
+		{"HousekeepingFrequency",	&CONFIG_HOUSEKEEPING_FREQUENCY,		TYPE_INT,
+			PARM_OPT,	1,			24},
+		{"MaxHousekeeperDelete",	&CONFIG_MAX_HOUSEKEEPER_DELETE,		TYPE_INT,
+			PARM_OPT,	0,			1000000},
+		{"SenderFrequency",		&CONFIG_SENDER_FREQUENCY,		TYPE_INT,
+			PARM_OPT,	5,			SEC_PER_HOUR},
+		{"TmpDir",			&CONFIG_TMPDIR,				TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"FpingLocation",		&CONFIG_FPING_LOCATION,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 #ifdef HAVE_IPV6
-		{"Fping6Location",		&CONFIG_FPING6_LOCATION,		NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-#endif	/* HAVE_IPV6 */
-		{"Timeout",			&CONFIG_TIMEOUT,			NULL,
-			TYPE_INT,	PARM_OPT,	1,			30},
-		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			300},
-		{"UnreachablePeriod",		&CONFIG_UNREACHABLE_PERIOD,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			SEC_PER_HOUR},
-		{"UnreachableDelay",		&CONFIG_UNREACHABLE_DELAY,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			SEC_PER_HOUR},
-		{"UnavailableDelay",		&CONFIG_UNAVAILABLE_DELAY,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			SEC_PER_HOUR},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"ListenPort",			&CONFIG_LISTEN_PORT,			NULL,
-			TYPE_INT,	PARM_OPT,	1024,			32767},
-		{"SourceIP",			&CONFIG_SOURCE_IP,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"DisableHousekeeping",		&CONFIG_DISABLE_HOUSEKEEPING,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"DebugLevel",			&CONFIG_LOG_LEVEL,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			4},
-		{"PidFile",			&CONFIG_PID_FILE,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"LogFile",			&CONFIG_LOG_FILE,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"LogFileSize",			&CONFIG_LOG_FILE_SIZE,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1024},
-		{"AlertScriptsPath",		&CONFIG_ALERT_SCRIPTS_PATH,		NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"ExternalScripts",		&CONFIG_EXTERNALSCRIPTS,		NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"DBHost",			&CONFIG_DBHOST,				NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"DBName",			&CONFIG_DBNAME,				NULL,
-			TYPE_STRING,	PARM_MAND,	0,			0},
-		{"DBSchema",			&CONFIG_DBSCHEMA,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"DBUser",			&CONFIG_DBUSER,				NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"DBPassword",			&CONFIG_DBPASSWORD,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"DBSocket",			&CONFIG_DBSOCKET,			NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"DBPort",			&CONFIG_DBPORT,				NULL,
-			TYPE_INT,	PARM_OPT,	1024,			65535},
-		{"NodeID",			&CONFIG_NODEID,				NULL,
-			TYPE_INT,	PARM_OPT,	0,			999},
-		{"NodeNoEvents",		&CONFIG_NODE_NOEVENTS,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"NodeNoHistory",		&CONFIG_NODE_NOHISTORY,			NULL,
-			TYPE_INT,	PARM_OPT,	0,			1},
-		{"SSHKeyLocation",		&CONFIG_SSH_KEY_LOCATION,		NULL,
-			TYPE_STRING,	PARM_OPT,	0,			0},
-		{"LogSlowQueries",		&CONFIG_LOG_SLOW_QUERIES,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			3600000},
-		{"StartProxyPollers",		&CONFIG_PROXYPOLLER_FORKS,		NULL,
-			TYPE_INT,	PARM_OPT,	0,			250},
-		{"ProxyConfigFrequency",	&CONFIG_PROXYCONFIG_FREQUENCY,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			SEC_PER_WEEK},
-		{"ProxyDataFrequency",		&CONFIG_PROXYDATA_FREQUENCY,		NULL,
-			TYPE_INT,	PARM_OPT,	1,			SEC_PER_HOUR},
+		{"Fping6Location",		&CONFIG_FPING6_LOCATION,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+#endif
+		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
+			PARM_OPT,	1,			30},
+		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
+			PARM_OPT,	1,			300},
+		{"UnreachablePeriod",		&CONFIG_UNREACHABLE_PERIOD,		TYPE_INT,
+			PARM_OPT,	1,			SEC_PER_HOUR},
+		{"UnreachableDelay",		&CONFIG_UNREACHABLE_DELAY,		TYPE_INT,
+			PARM_OPT,	1,			SEC_PER_HOUR},
+		{"UnavailableDelay",		&CONFIG_UNAVAILABLE_DELAY,		TYPE_INT,
+			PARM_OPT,	1,			SEC_PER_HOUR},
+		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
+			PARM_OPT,	1024,			32767},
+		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"DisableHousekeeping",		&CONFIG_DISABLE_HOUSEKEEPING,		TYPE_INT,
+			PARM_OPT,	0,			1},
+		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
+			PARM_OPT,	0,			4},
+		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"LogFile",			&CONFIG_LOG_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"LogFileSize",			&CONFIG_LOG_FILE_SIZE,			TYPE_INT,
+			PARM_OPT,	0,			1024},
+		{"AlertScriptsPath",		&CONFIG_ALERT_SCRIPTS_PATH,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"ExternalScripts",		&CONFIG_EXTERNALSCRIPTS,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"DBHost",			&CONFIG_DBHOST,				TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"DBName",			&CONFIG_DBNAME,				TYPE_STRING,
+			PARM_MAND,	0,			0},
+		{"DBSchema",			&CONFIG_DBSCHEMA,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"DBUser",			&CONFIG_DBUSER,				TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"DBPassword",			&CONFIG_DBPASSWORD,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"DBSocket",			&CONFIG_DBSOCKET,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"DBPort",			&CONFIG_DBPORT,				TYPE_INT,
+			PARM_OPT,	1024,			65535},
+		{"NodeID",			&CONFIG_NODEID,				TYPE_INT,
+			PARM_OPT,	0,			999},
+		{"NodeNoEvents",		&CONFIG_NODE_NOEVENTS,			TYPE_INT,
+			PARM_OPT,	0,			1},
+		{"NodeNoHistory",		&CONFIG_NODE_NOHISTORY,			TYPE_INT,
+			PARM_OPT,	0,			1},
+		{"SSHKeyLocation",		&CONFIG_SSH_KEY_LOCATION,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"LogSlowQueries",		&CONFIG_LOG_SLOW_QUERIES,		TYPE_INT,
+			PARM_OPT,	0,			3600000},
+		{"StartProxyPollers",		&CONFIG_PROXYPOLLER_FORKS,		TYPE_INT,
+			PARM_OPT,	0,			250},
+		{"ProxyConfigFrequency",	&CONFIG_PROXYCONFIG_FREQUENCY,		TYPE_INT,
+			PARM_OPT,	1,			SEC_PER_WEEK},
+		{"ProxyDataFrequency",		&CONFIG_PROXYDATA_FREQUENCY,		TYPE_INT,
+			PARM_OPT,	1,			SEC_PER_HOUR},
 		{NULL}
 	};
 
 	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
-	parse_cfg_file(CONFIG_FILE, cfg);
+	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
 
 	if (NULL == CONFIG_DBNAME)
 	{
@@ -341,7 +341,7 @@ static void	init_config()
 	{
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 	}
-#endif /* HAVE_IPV6 */
+#endif
 
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 	{
@@ -418,7 +418,7 @@ int	main(int argc, char **argv)
 	/* Required for simple checks */
 	init_metrics();
 
-	init_config();
+	zbx_load_config();
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
@@ -455,39 +455,39 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 
 #ifdef	HAVE_SNMP
-#	define SNMP_FEATURE_STATUS "YES"
+#	define SNMP_FEATURE_STATUS	"YES"
 #else
-#	define SNMP_FEATURE_STATUS " NO"
+#	define SNMP_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_OPENIPMI
-#	define IPMI_FEATURE_STATUS "YES"
+#	define IPMI_FEATURE_STATUS	"YES"
 #else
-#	define IPMI_FEATURE_STATUS " NO"
+#	define IPMI_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_LIBCURL
-#	define LIBCURL_FEATURE_STATUS "YES"
+#	define LIBCURL_FEATURE_STATUS	"YES"
 #else
-#	define LIBCURL_FEATURE_STATUS " NO"
+#	define LIBCURL_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_JABBER
-#	define JABBER_FEATURE_STATUS "YES"
+#	define JABBER_FEATURE_STATUS	"YES"
 #else
-#	define JABBER_FEATURE_STATUS " NO"
+#	define JABBER_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_ODBC
-#	define ODBC_FEATURE_STATUS "YES"
+#	define ODBC_FEATURE_STATUS	"YES"
 #else
-#	define ODBC_FEATURE_STATUS " NO"
+#	define ODBC_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_SSH2
-#	define SSH2_FEATURE_STATUS "YES"
+#	define SSH2_FEATURE_STATUS	"YES"
 #else
-#	define SSH2_FEATURE_STATUS " NO"
+#	define SSH2_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_IPV6
-#	define IPV6_FEATURE_STATUS "YES"
+#	define IPV6_FEATURE_STATUS	"YES"
 #else
-#	define IPV6_FEATURE_STATUS " NO"
+#	define IPV6_FEATURE_STATUS	" NO"
 #endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Server. Zabbix %s (revision %s).",
@@ -512,7 +512,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 #ifdef	HAVE_SQLITE3
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
-#endif /* HAVE_SQLITE3 */
+#endif
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
@@ -607,7 +607,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_POLLER;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS;
@@ -622,7 +622,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_POLLER_FORKS;
@@ -746,7 +746,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_DISCOVERER;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_POLLER_FORKS
@@ -878,9 +878,15 @@ void	zbx_on_exit()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
-	if (threads != NULL)
+	if (NULL != threads)
 	{
-		int	i;
+		int		i;
+		sigset_t	set;
+
+		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
+		sigemptyset(&set);
+		sigaddset(&set, SIGCHLD);
+		sigprocmask(SIG_BLOCK, &set, NULL);
 
 		for (i = 1; i <= CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
 				+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
@@ -902,10 +908,8 @@ void	zbx_on_exit()
 	}
 
 #ifdef USE_PID_FILE
-
 	daemon_stop();
-
-#endif /* USE_PID_FILE */
+#endif
 
 	free_metrics();
 
@@ -924,7 +928,7 @@ void	zbx_on_exit()
 
 #ifdef HAVE_SQLITE3
 	php_sem_remove(&sqlite_access);
-#endif	/* HAVE_SQLITE3 */
+#endif
 
 	free_selfmon_collector();
 
