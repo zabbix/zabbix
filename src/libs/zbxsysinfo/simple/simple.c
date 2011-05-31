@@ -240,7 +240,7 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 			port = ZBX_DEFAULT_SSH_PORT;
 		ret = check_ssh(ip, port, CONFIG_TIMEOUT, &value_int);
 	}
-	else if (0 == strcmp(service, "ntp") || 0 == strcmp(service, "service.ntp" /* obsolete */))
+	else if (0 == strcmp(service, "ntp") || 0 == strcmp(service, "service.ntp" /* deprecated */))
 	{
 		if ('\0' == *str_port)
 			port = ZBX_DEFAULT_NTP_PORT;
