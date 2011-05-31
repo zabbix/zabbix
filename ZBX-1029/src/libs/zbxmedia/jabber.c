@@ -90,7 +90,7 @@ static int	zbx_io_connect(iksparser *prs, void **socketptr, const char *server, 
 	if (-1 == (zbx_j_sock = socket(host->h_addrtype, SOCK_STREAM, 0)))
 		return IKS_NET_NOSOCK;
 
-	tmp = connect(zbx_j_sock, (struct sockaddr *)&sin, sizeof(struct sockaddr_in));
+	tmp = connect(zbx_j_sock, (struct sockaddr *)&sin, sizeof(sin));
 #endif
 	if (0 != tmp)
 	{
@@ -136,13 +136,9 @@ static int	zbx_io_recv(void *socket, char *buffer, size_t buf_len, int timeout)
 		len = recv(*sock, buffer, buf_len, 0);
 
 		if (0 < len)
-		{
 			return len;
-		}
 		else if (0 >= len)
-		{
 			return -1;
-		}
 	}
 
 	return 0;
@@ -203,25 +199,17 @@ static int	on_result(jabber_session_p sess, ikspak *pak)
  *                                                                            *
  * Purpose: lookup Jabber SRV record                                          *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Aleksandrs Saveljevs, based on code by Edward Rudd                 *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	lookup_jabber(const char *server, int port, char *real_server, size_t real_server_len, int *real_port)
 {
 	const char	*__function_name = "lookup_jabber";
-
 	char		buffer[MAX_STRING_LEN], command[MAX_STRING_LEN];
 	AGENT_RESULT	result;
 	int		ret = SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s() server:'%s' port:%d",
-			__module_name, __function_name, server, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s() server:'%s' port:%d", __module_name, __function_name, server, port);
 
 	init_result(&result);
 
@@ -280,13 +268,9 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
  *                                                                            *
  * Purpose: disconnect from Jabber server                                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: always return SUCCEED                                        *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	disconnect_jabber()
@@ -432,14 +416,10 @@ static void	on_log(jabber_session_p sess, const char *data, size_t size, int is_
  *                                                                            *
  * Purpose: connect to Jabber server                                          *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCEED on successful connection                             *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	connect_jabber(const char *jabber_id, const char *password, int use_sasl, int port)
@@ -561,14 +541,10 @@ lbl_fail:
  *                                                                            *
  * Purpose: send Jabber message                                               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCEED if message sent                                      *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	send_jabber(const char *username, const char *password, const char *sendto,
@@ -612,7 +588,6 @@ int	send_jabber(const char *username, const char *password, const char *sendto,
 	}
 	else
 		zbx_snprintf(error, max_error_len, "cannot create message");
-
 lbl_fail:
 	if (NULL != jsess && JABBER_DISCONNECTED != jsess->status)
 		disconnect_jabber();
