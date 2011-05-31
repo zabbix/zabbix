@@ -545,7 +545,7 @@
 	'S_CANNOT_DELETE_GRAPHS'=>		_('Cannot delete graphs'),
 	'S_CANNOT_ADD_GRAPH'=>			_('Cannot add graph'),
 	'S_ANOTHER_ITEM_SUM'=>			_('Cannot add more than one item with type "Graph sum"'),
-	'S_ID'=>				_('Id'),
+	'S_ID'=>				_('ID'),
 	'S_NO_GRAPHS_DEFINED'=>			_('No graphs defined'),
 	'S_NO_GRAPH_DEFINED'=>			_('No graph defined'),
 	'S_DELETE_GRAPH_Q'=>			_('Delete graph?'),

@@ -335,7 +335,7 @@ class CImage extends CZBXAPI{
 							' returning image into :imgdata';
 						$stmt = oci_parse($DB['DB'], $sql);
 						if(!$stmt){
-							$e = oci_error($stmt);
+							$e = oci_error($DB['DB']);
 							self::exception(ZBX_API_ERROR_PARAMETERS, S_PARSE_SQL_ERROR.' ['.$e['message'].'] '._('in').' ['.$e['sqltext'].']');
 						}
 
@@ -444,12 +444,12 @@ class CImage extends CZBXAPI{
 						$sql = 'SELECT image FROM images WHERE imageid = '.$image['imageid'].' FOR UPDATE';
 
 						if(!$stmt = oci_parse($DB['DB'], $sql)){
-							$e = oci_error();
+							$e = oci_error($DB['DB']);
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 						}
 
 						if(!oci_execute($stmt, OCI_DEFAULT)){
-							$e = oci_error();
+							$e = oci_error($stmt);
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 						}
 

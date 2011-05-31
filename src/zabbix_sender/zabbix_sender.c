@@ -119,16 +119,16 @@ static char	shortopts[] = "c:I:z:p:s:k:o:Ti:rvhV";
 
 static int	CONFIG_LOG_LEVEL = LOG_LEVEL_CRIT;
 
-static char*	INPUT_FILE = NULL;
+static char	*INPUT_FILE = NULL;
 static int	WITH_TIMESTAMPS = 0;
 static int	REAL_TIME = 0;
 
-static char*	CONFIG_SOURCE_IP = NULL;
-static char*	ZABBIX_SERVER = NULL;
+static char	*CONFIG_SOURCE_IP = NULL;
+static char	*ZABBIX_SERVER = NULL;
 unsigned short	ZABBIX_SERVER_PORT = 0;
-static char*	ZABBIX_HOSTNAME = NULL;
-static char*	ZABBIX_KEY = NULL;
-static char*	ZABBIX_KEY_VALUE = NULL;
+static char	*ZABBIX_HOSTNAME = NULL;
+static char	*ZABBIX_KEY = NULL;
+static char	*ZABBIX_KEY_VALUE = NULL;
 
 #if !defined(_WINDOWS)
 static void	send_signal_handler(int sig)
@@ -227,69 +227,74 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	zbx_thread_exit(ret);
 }
 
-static void    init_config(const char *config_file)
+static void    zbx_load_config(const char *config_file)
 {
-	char	*config_source_ip_from_conf = NULL;
-	char	*zabbix_server_from_conf = NULL;
-	int	zabbix_server_port_from_conf = 0;
-	char	*zabbix_hostname_from_conf = NULL;
-	char	*c = NULL;
+	char	*cfg_source_ip = NULL, *cfg_server = NULL, *cfg_hostname = NULL, *c = NULL;
+	int	cfg_server_port = 0;
 
-	struct cfg_line	cfg[]=
+	struct cfg_line	cfg[] =
 	{
-		/* PARAMETER	,VAR				,FUNC	,TYPE(0i,1s)	,MANDATORY	,MIN			,MAX		*/
-		{"SourceIP"	,&config_source_ip_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
-		{"Server"	,&zabbix_server_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
-		{"ServerPort"	,&zabbix_server_port_from_conf	,0	,TYPE_INT	,PARM_OPT	,MIN_ZABBIX_PORT	,MAX_ZABBIX_PORT},
-		{"Hostname"	,&zabbix_hostname_from_conf	,0	,TYPE_STRING	,PARM_OPT	,0			,0		},
-		{0}
+		/* PARAMETER,			VAR,					TYPE,
+			MANDATORY,	MIN,			MAX */
+		{"SourceIP",			&cfg_source_ip,				TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"Server",			&cfg_server,				TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"ServerPort",			&cfg_server_port,			TYPE_INT,
+			PARM_OPT,	MIN_ZABBIX_PORT,	MAX_ZABBIX_PORT},
+		{"Hostname",			&cfg_hostname,				TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{NULL}
 	};
 
 	if (NULL != config_file)
 	{
-		parse_cfg_file(config_file, cfg);
+		/* do not complain about unknown parameters */
+		parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT);
 
-		if (NULL != config_source_ip_from_conf)
+		if (NULL != cfg_source_ip)
 		{
 			if (NULL == CONFIG_SOURCE_IP)
-				CONFIG_SOURCE_IP = strdup(config_source_ip_from_conf);
-
-			zbx_free(config_source_ip_from_conf);
+			{
+				CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, cfg_source_ip);
+			}
+			zbx_free(cfg_source_ip);
 		}
 
-		if (NULL != zabbix_server_from_conf)
+		if (NULL != cfg_server)
 		{
 			if (NULL == ZABBIX_SERVER)
 			{
-				if (NULL != (c = strchr(zabbix_server_from_conf, ',')))
-					*c = '\0';	/* get only first server */
-
-				ZABBIX_SERVER = strdup(zabbix_server_from_conf);
+				/* get only first server */
+				if (NULL != (c = strchr(cfg_server, ',')))
+				{
+					*c = '\0';
+				}
+				ZABBIX_SERVER = zbx_strdup(ZABBIX_SERVER, cfg_server);
 			}
-
-			zbx_free(zabbix_server_from_conf);
+			zbx_free(cfg_server);
 		}
 
-		if (0 != zabbix_server_port_from_conf)
+		if (0 == ZABBIX_SERVER_PORT && 0 != cfg_server_port)
 		{
-			if (0 == ZABBIX_SERVER_PORT)
-				ZABBIX_SERVER_PORT = zabbix_server_port_from_conf;
+			ZABBIX_SERVER_PORT = cfg_server_port;
 		}
 
-		if (NULL != zabbix_hostname_from_conf)
+		if (NULL != cfg_hostname)
 		{
 			if (NULL == ZABBIX_HOSTNAME)
-				ZABBIX_HOSTNAME = strdup(zabbix_hostname_from_conf);
-
-			zbx_free(zabbix_hostname_from_conf);
+			{
+				ZABBIX_HOSTNAME = zbx_strdup(ZABBIX_HOSTNAME, cfg_hostname);
+			}
+			zbx_free(cfg_hostname);
 		}
 	}
 }
 
-static zbx_task_t parse_commandline(int argc, char **argv)
+static zbx_task_t	parse_commandline(int argc, char **argv)
 {
-	zbx_task_t      task = ZBX_TASK_START;
-	char    	ch = '\0';
+	zbx_task_t	task = ZBX_TASK_START;
+	char		ch = '\0';
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
@@ -297,7 +302,7 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 		switch (ch)
 		{
 			case 'c':
-				CONFIG_FILE = strdup(zbx_optarg);
+				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
 			case 'h':
 				help();
@@ -308,25 +313,25 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				exit(-1);
 				break;
 			case 'I':
-				CONFIG_SOURCE_IP = strdup(zbx_optarg);
+				CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, zbx_optarg);
 				break;
 			case 'z':
-				ZABBIX_SERVER = strdup(zbx_optarg);
+				ZABBIX_SERVER = zbx_strdup(ZABBIX_SERVER, zbx_optarg);
 				break;
 			case 'p':
 				ZABBIX_SERVER_PORT = (unsigned short)atoi(zbx_optarg);
 				break;
 			case 's':
-				ZABBIX_HOSTNAME = strdup(zbx_optarg);
+				ZABBIX_HOSTNAME = zbx_strdup(ZABBIX_HOSTNAME, zbx_optarg);
 				break;
 			case 'k':
-				ZABBIX_KEY = strdup(zbx_optarg);
+				ZABBIX_KEY = zbx_strdup(ZABBIX_KEY, zbx_optarg);
 				break;
 			case 'o':
-				ZABBIX_KEY_VALUE = strdup(zbx_optarg);
+				ZABBIX_KEY_VALUE = zbx_strdup(ZABBIX_KEY_VALUE, zbx_optarg);
 				break;
 			case 'i':
-				INPUT_FILE = strdup(zbx_optarg);
+				INPUT_FILE = zbx_strdup(INPUT_FILE, zbx_optarg);
 				break;
 			case 'T':
 				WITH_TIMESTAMPS = 1;
@@ -362,25 +367,13 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-	FILE	*in;
-
-	char	in_line[MAX_BUFFER_LEN],
-		hostname[MAX_STRING_LEN],
-		key[MAX_STRING_LEN],
-		key_value[MAX_BUFFER_LEN],
-		clock[32];
-
-	int	task = ZBX_TASK_START,
-		total_count = 0,
-		succeed_count = 0,
-		buffer_count = 0,
-		read_more = 0,
-		ret = SUCCEED;
-
-	double	last_send = 0;
-
-	const char	*p;
-
+	FILE			*in;
+	char			in_line[MAX_BUFFER_LEN], hostname[MAX_STRING_LEN], key[MAX_STRING_LEN],
+				key_value[MAX_BUFFER_LEN], clock[32];
+	int			task = ZBX_TASK_START, total_count = 0, succeed_count = 0, buffer_count = 0,
+				read_more = 0, ret = SUCCEED;
+	double			last_send = 0;
+	const char		*p;
 	zbx_thread_args_t	thread_args;
 	ZBX_THREAD_SENDVAL_ARGS sentdval_args;
 
@@ -388,7 +381,7 @@ int main(int argc, char **argv)
 
 	task = parse_commandline(argc, argv);
 
-	init_config(CONFIG_FILE);
+	zbx_load_config(CONFIG_FILE);
 
 	zabbix_open_log(LOG_TYPE_UNDEFINED, CONFIG_LOG_LEVEL, NULL);
 
