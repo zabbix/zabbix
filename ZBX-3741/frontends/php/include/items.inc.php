@@ -1757,7 +1757,7 @@
  * Function: httpitemExists
  *
  * Description:
- *     Function returns true if http items exists in the $items array.
+ *     Function returns true if http item exists in the $items array.
  *     The array should contain a field 'type'
  *
  * Author:

@@ -28,8 +28,7 @@
 ZBX_DC_NEXTCHECK
 {
 	zbx_uint64_t	itemid;
-	time_t		now;/*, nextcheck;*/
-	/* for not supported items */
+	time_t		now;
 	char		*error_msg;
 };
 
@@ -84,10 +83,7 @@ static void	DCrelease_nextchecks()
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCrelease_nextchecks()");
 
 	for (i = 0; i < nextcheck_num; i++)
-	{
-		if (nextchecks[i].error_msg != NULL)
-			zbx_free(nextchecks[i].error_msg);
-	}
+		zbx_free(nextchecks[i].error_msg);
 }
 
 /******************************************************************************
@@ -143,18 +139,12 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 
 	nextchecks[i].itemid = itemid;
 	nextchecks[i].now = now;
-	nextchecks[i].error_msg = (NULL != error_msg) ? strdup(error_msg) : NULL;
+	nextchecks[i].error_msg = zbx_strdup(NULL, error_msg);
 
 	nextcheck_num++;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-
-struct event_objectid_clock
-{
-	zbx_uint64_t	objectid;/*triggerid*/
-	time_t		clock;/*`now' from items*/
-};/*the structure is for local use only in `DCflush_nextchecks' function*/
 
 /******************************************************************************
  *                                                                            *
@@ -173,72 +163,48 @@ struct event_objectid_clock
  ******************************************************************************/
 void	DCflush_nextchecks()
 {
-	const char	*__function_name = "DCflush_nextchecks";
+	typedef struct
+	{
+		zbx_uint64_t	objectid;
+		time_t		clock;
+	}
+	t_oid_clock;
 
-	int		i, sql_offset = 0, sql_allocated = 4096;
-	char		*sql = NULL;
+	const char	*__function_name = "DCflush_nextchecks";
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	triggerid;
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	events_maxid = 0;
+	zbx_uint64_t	triggerid, itemid, events_maxid = 0;
 	char		*error_msg_esc = NULL;
-
-	char		*sql_select = NULL;
-	int		sql_select_offset = 0, sql_select_allocated = 512;
-
-	/* a crutch for the function `DBadd_condition_alloc' */
 	zbx_uint64_t	*ids = NULL;
-	int		ids_allocated = 0, ids_num = 0;
-
-	zbx_uint64_t	*triggerids = NULL;
-	int		triggerids_allocated = 0, triggerids_num = 0;
-
-	struct event_objectid_clock 	*events = NULL;
-	int		events_num = 0, events_allocated = 32;
+	int		ids_alloc = 0, ids_num = 0;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (nextcheck_num == 0)
 		return;
 
-	sql = zbx_malloc(sql, sql_allocated);
-
-	DBbegin();
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
-#endif
-
 	/* dealing with items */
 	for (i = 0; i < nextcheck_num; i++)
-	{
-		if (NULL == nextchecks[i].error_msg)
-			continue;
-
-		uint64_array_add(&ids, &ids_allocated, &ids_num, nextchecks[i].itemid, 64);
-
-		error_msg_esc = DBdyn_escape_string_len(nextchecks[i].error_msg, ITEM_ERROR_LEN);
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128 + strlen(error_msg_esc),
-				"update items set status=%d,lastclock=%d,error='%s' where itemid=" ZBX_FS_UI64 ";\n",
-				ITEM_STATUS_NOTSUPPORTED,
-				(int)nextchecks[i].now,
-				error_msg_esc,
-				nextchecks[i].itemid);
-		zbx_free(error_msg_esc);
-
-		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
-	}
+		uint64_array_add(&ids, &ids_alloc, &ids_num, nextchecks[i].itemid, 64);
 
 	/* dealing with notsupported items */
 	if (ids_num > 0)
 	{
-		sql_select = zbx_malloc(sql_select, sql_select_allocated);
-		events = zbx_malloc(events, events_allocated * sizeof(struct event_objectid_clock));
+		char		*sql = NULL;
+		int		sql_alloc = 4096, sql_offset = 0;
+		t_oid_clock 	*events = NULL;
+		int		events_alloc = 32, events_num = 0;
+
+		sql = zbx_malloc(sql, sql_alloc);
+
+		DBbegin();
+
+		events = zbx_malloc(events, events_alloc * sizeof(t_oid_clock));
 
 		/* preparing triggers */
-		zbx_snprintf_alloc(&sql_select, &sql_select_allocated, &sql_select_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 				"select t.triggerid,i.itemid"
 				" from triggers t,functions f,items i"
 				" where t.triggerid=f.triggerid"
@@ -248,11 +214,15 @@ void	DCflush_nextchecks()
 					" and",
 				TRIGGER_STATUS_ENABLED,
 				TRIGGER_VALUE_UNKNOWN);
-		DBadd_condition_alloc(&sql_select, &sql_select_allocated, &sql_select_offset,
-				"i.itemid", ids, ids_num);
-		result = DBselect("%s", sql_select);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", ids, ids_num);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 22, " order by t.triggerid");
+		result = DBselect("%s", sql);
 
-		zbx_free(sql_select);
+		ids_num = 0;
+		sql_offset = 0;
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+#endif
 
 		/* processing triggers */
 		while (NULL != (row = DBfetch(result)))
@@ -261,10 +231,10 @@ void	DCflush_nextchecks()
 			ZBX_STR2UINT64(itemid, row[1]);
 
 			/* do not generate multiple unknown events for a trigger */
-			if (SUCCEED == uint64_array_exists(triggerids, triggerids_num, triggerid))
+			if (SUCCEED == uint64_array_exists(ids, ids_num, triggerid))
 				continue;
 
-			uint64_array_add(&triggerids, &triggerids_allocated, &triggerids_num, triggerid, 64);
+			uint64_array_add(&ids, &ids_alloc, &ids_num, triggerid, 64);
 
 			/* index `i' will surely contain necessary itemid */
 			i = get_nearestindex(nextchecks, sizeof(ZBX_DC_NEXTCHECK), nextcheck_num, itemid);
@@ -276,7 +246,7 @@ void	DCflush_nextchecks()
 			}
 
 			error_msg_esc = DBdyn_escape_string_len(nextchecks[i].error_msg, TRIGGER_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128 + strlen(error_msg_esc),
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128 + strlen(error_msg_esc),
 					"update triggers set value=%d,lastchange=%d,error='%s' where triggerid=" ZBX_FS_UI64";\n",
 							TRIGGER_VALUE_UNKNOWN,
 							nextchecks[i].now,
@@ -284,16 +254,16 @@ void	DCflush_nextchecks()
 							triggerid);
 			zbx_free(error_msg_esc);
 
-			if (events_num == events_allocated)
+			if (events_num == events_alloc)
 			{
-				events_allocated += 32;
-				events = zbx_realloc(events, events_allocated * sizeof(struct event_objectid_clock));
+				events_alloc *= 2;
+				events = zbx_realloc(events, events_alloc * sizeof(t_oid_clock));
 			}
 			events[events_num].objectid = triggerid;
 			events[events_num].clock = nextchecks[i].now;
 			events_num++;
 
-			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 		DBfree_result(result);
 
@@ -302,7 +272,7 @@ void	DCflush_nextchecks()
 		{
 			events_maxid = DBget_maxid("events");
 
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 					"insert into events (eventid,source,object,objectid,clock,value) "
 					"values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d);\n",
 					events_maxid,
@@ -312,26 +282,26 @@ void	DCflush_nextchecks()
 					events[i].clock,
 					TRIGGER_VALUE_UNKNOWN);
 
-			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 		zbx_free(events);
-	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
+		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+			DBexecute("%s", sql);
 
-	zbx_free(sql);
+		DBcommit();
+
+		zbx_free(sql);
+	}
+
 	zbx_free(ids);
-	zbx_free(triggerids);
 
 	DCrelease_nextchecks();
-
-	DBcommit();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
