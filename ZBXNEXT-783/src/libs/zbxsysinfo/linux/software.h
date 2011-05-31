@@ -17,18 +17,20 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_SYSINFO_COMMON_H
-#define ZABBIX_SYSINFO_COMMON_H
+#ifndef ZABBIX_SOFTWARE_H
+#define ZABBIX_SOFTWARE_H
 
-#include "sysinfo.h"
+#define SW_OS_FULL	"/proc/version"
+#define SW_OS_SHORT	"/proc/version_signature"
+#define SW_OS_NAME	"/etc/issue.net"
 
-extern ZBX_METRIC	parameters_common[];
+typedef struct
+{
+	const char	*name;
+	const char	*test_cmd;	/* if this shell command has stdout output, package manager is present */
+	const char	*list_cmd;	/* this command lists the installed packages */
+	int		(*parser)();	/* for non-standard list (package per line), add a parser function */
+}
+ZBX_PACKAGE_MANAGER;
 
-int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *result);
-
-int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	EXECUTE_DBL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	EXECUTE_INT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-#endif /* ZABBIX_SYSINFO_COMMON_H */
+#endif	/* ZABBIX_SOFTWARE_H */

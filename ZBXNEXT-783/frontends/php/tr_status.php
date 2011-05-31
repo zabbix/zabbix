@@ -223,7 +223,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$severity_select->addItems($cb_items);
 	$filterForm->addRow(S_MIN_SEVERITY, $severity_select);
 
-	$action = 'javascrip: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()';
+	$action = 'javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()';
 	$sts_change_days_cb = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4);
 	if(!$_REQUEST['status_change']) $sts_change_days_cb->setAttribute('disabled', 'disabled');
     $sts_change_days_cb->addStyle('vertical-align: middle;');

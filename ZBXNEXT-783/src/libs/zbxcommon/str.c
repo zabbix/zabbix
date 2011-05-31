@@ -412,9 +412,9 @@ void	del_zeroes(char *s)
  * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
  *                                                                            *
- * Return value: length of stripped string                                    *
+ * Return value: number of trimmed characters                                 *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -422,14 +422,18 @@ void	del_zeroes(char *s)
 int	zbx_rtrim(char *str, const char *charlist)
 {
 	char	*p;
+	int	count = 0;
 
 	if (NULL == str || '\0' == *str)
-		return 0;
+		return count;
 
 	for (p = str + strlen(str) - 1; p >= str && NULL != strchr(charlist, *p); p--)
+	{
 		*p = '\0';
+		count++;
+	}
 
-	return (int)(p - str);
+	return count;
 }
 
 /******************************************************************************
@@ -2394,10 +2398,10 @@ char	*zbx_age2str(int age)
 	int		days, hours, minutes, offset;
 	static char	buffer[32];
 
-	days	= (int)((double)age / 86400);
-	hours	= (int)((double)(age - days * 86400) / 3600);
-	minutes	= (int)((double)(age - days * 86400 - hours * 3600) / 60);
-	offset	= 0;
+	days = (int)((double)age / SEC_PER_DAY);
+	hours = (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
+	minutes	= (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
+	offset = 0;
 
 	if (days)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
@@ -2413,7 +2417,7 @@ char	*zbx_date2str(time_t date)
 	static char	buffer[11];
 	struct tm	*tm;
 
-	tm	= localtime(&date);
+	tm = localtime(&date);
 	zbx_snprintf(buffer, sizeof(buffer), "%.4d.%.2d.%.2d",
 			tm->tm_year + 1900,
 			tm->tm_mon + 1,
@@ -2427,7 +2431,7 @@ char	*zbx_time2str(time_t time)
 	static char	buffer[9];
 	struct tm	*tm;
 
-	tm	= localtime(&time);
+	tm = localtime(&time);
 	zbx_snprintf(buffer, sizeof(buffer), "%.2d:%.2d:%.2d",
 			tm->tm_hour,
 			tm->tm_min,
@@ -2446,7 +2450,7 @@ static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 	if (NULL == s2)
 		return -1;
 
-	while (n && '\0' != *s1 && '\0' != *s2 &&
+	while (0 != n && '\0' != *s1 && '\0' != *s2 &&
 			tolower((unsigned char)*s1) == tolower((unsigned char)*s2))
 	{
 		s1++;
@@ -2454,7 +2458,7 @@ static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 		n--;
 	}
 
-	return n == 0 ? 0 : tolower((unsigned char)*s1) - tolower((unsigned char)*s2);
+	return 0 == n ? 0 : tolower((unsigned char)*s1) - tolower((unsigned char)*s2);
 }
 
 char	*zbx_strcasestr(const char *haystack, const char *needle)
@@ -2837,13 +2841,13 @@ LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string)
 }
 
 /* convert from unicode to utf8 */
-int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size)
+LPSTR	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size)
 {
 	/* convert from wide_string to utf8_string */
 	if (0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, -1, utf8_string, utf8_size, NULL, NULL))
-		return FAIL;
+		*utf8_string = '\0';
 
-	return SUCCEED;
+	return utf8_string;
 }
 #endif
 
@@ -3194,12 +3198,20 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 	const char	*p_src;	/* working pointer to input */
 	char		*p_dst;	/* working pointer to output */
 
+	/* check input */
+	assert(NULL != src);
+	assert(0 < maxline);
+
+	/* default delimiter */
 	if (NULL == delim)
 		delim = "\n";
 
 	src_size = strlen(src);
 	delim_size = strlen(delim);
-	feeds = src_size / maxline - (0 != src_size % maxline ? 0 : 1);	/* we don't want to feed the last line */
+
+	/* make sure we don't feed the last line */
+	feeds = src_size / maxline - (0 != src_size % maxline || 0 == src_size ? 0 : 1);
+
 	left = src_size - feeds * maxline;
 	dst_size = src_size + feeds * delim_size + 1;
 
@@ -3223,7 +3235,6 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 	if (0 < left)
 	{
 		/* copy what's left */
-
 		memcpy(p_dst, p_src, left);
 		p_dst += left;
 	}
@@ -3231,4 +3242,80 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 	*p_dst = '\0';
 
 	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strarr_init                                                  *
+ *                                                                            *
+ * Purpose: initialize dynamic string array                                   *
+ *                                                                            *
+ * Parameters: arr - a pointer to array of strings                            *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: allocates memory, calls assert() if that fails                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strarr_init(char ***arr)
+{
+	*arr = zbx_malloc(*arr, sizeof(char **));
+	**arr = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strarr_add                                                   *
+ *                                                                            *
+ * Purpose: add a string to dynamic string array                              *
+ *                                                                            *
+ * Parameters: arr - a pointer to array of strings                            *
+ *             entry - string to add                                          *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: allocates memory, calls assert() if that fails                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strarr_add(char ***arr, const char *entry)
+{
+	int	i;
+
+	assert(entry);
+
+	for (i = 0; NULL != (*arr)[i]; i++)
+		;
+
+	*arr = zbx_realloc(*arr, sizeof(char **) * (i + 2));
+
+	(*arr)[i] = zbx_strdup((*arr)[i], entry);
+	(*arr)[++i] = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strarr_free                                                  *
+ *                                                                            *
+ * Purpose: free dynamic string array memory                                  *
+ *                                                                            *
+ * Parameters: arr - array of strings                                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_strarr_free(char **arr)
+{
+	char	**p;
+
+	for (p = arr; NULL != *p; p++)
+		zbx_free(*p);
+	zbx_free(arr);
 }

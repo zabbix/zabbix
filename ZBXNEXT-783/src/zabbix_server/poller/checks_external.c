@@ -83,12 +83,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 
-		if ('\0' == *buf)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Script returned nothing"));
-			ret = NOTSUPPORTED;
-		}
-		else if (SUCCEED != set_result_type(result, item->value_type, item->data_type, buf))
+		if (SUCCEED != set_result_type(result, item->value_type, item->data_type, buf))
 			ret = NOTSUPPORTED;
 	}
 	else
