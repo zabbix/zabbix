@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-20 18:14+0300\n"
+"POT-Creation-Date: 2011-05-31 20:50+0300\n"
 "PO-Revision-Date: 2011-04-28 22:14+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -39,11 +39,11 @@ msgstr[2] "%d пристроїв"
 msgid "&"
 msgstr "&"
 
-#: include/locales/en_gb.inc.php:1688
+#: include/locales/en_gb.inc.php:1691
 msgid "'"
 msgstr "'"
 
-#: include/locales/en_gb.inc.php:1845
+#: include/locales/en_gb.inc.php:1848
 msgid "' does not accept parameters."
 msgstr "' не приймає параметри."
 
@@ -75,7 +75,7 @@ msgstr "- інше -"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[ВВЕДЕНО ЯК МАСОВЕ ПІДТВЕРДЖЕННЯ]----"
 
-#: include/locales/en_gb.inc.php:1840
+#: include/locales/en_gb.inc.php:1843
 msgid "0 or 1"
 msgstr "0 або 1"
 
@@ -236,7 +236,7 @@ msgstr "Операції дії"
 msgid "Action updated"
 msgstr "Дію оновлено"
 
-#: include/locales/en_gb.inc.php:268 include/menu.inc.php:177
+#: include/locales/en_gb.inc.php:268 include/menu.inc.php:178
 msgid "Actions"
 msgstr "Дії"
 
@@ -244,7 +244,7 @@ msgstr "Дії"
 msgid "Activate selected"
 msgstr "Активувати вибране"
 
-#: include/locales/en_gb.inc.php:1721
+#: include/locales/en_gb.inc.php:1724
 msgid "Activate selected applications?"
 msgstr "Активувати обрані групи елементів даних?"
 
@@ -286,7 +286,7 @@ msgstr "Активно до"
 msgid "Add"
 msgstr "Додати"
 
-#: include/locales/en_gb.inc.php:2015
+#: include/locales/en_gb.inc.php:2018
 msgid "Add Service"
 msgstr "Додати ІТ послугу"
 
@@ -334,7 +334,7 @@ msgstr "Додано"
 msgid "Added new media type"
 msgstr "Додано новий метод повідомлень"
 
-#: include/locales/en_gb.inc.php:1836
+#: include/locales/en_gb.inc.php:1839
 msgid "Added trigger"
 msgstr "Додано тригер"
 
@@ -346,7 +346,7 @@ msgstr "Додаткові параметри"
 msgid "Admin"
 msgstr "Адміністратор"
 
-#: include/menu.inc.php:200
+#: include/menu.inc.php:201
 msgid "Administration"
 msgstr "Адміністрування"
 
@@ -375,7 +375,7 @@ msgstr "Агрегований"
 msgid "Aggregated periods count"
 msgstr "Кількість агрегованих періодів"
 
-#: include/hosts.inc.php:64 include/locales/en_gb.inc.php:1544
+#: include/hosts.inc.php:65 include/locales/en_gb.inc.php:1544
 msgid "Alias"
 msgstr "Аліас"
 
@@ -474,7 +474,11 @@ msgstr "Кві"
 msgid "April"
 msgstr "Квітень"
 
-#: include/locales/en_gb.inc.php:1694
+#: include/classes/class.cbuttonqmessage.php:49
+msgid "Are you sure you want perform this action?"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1697
 msgid "Are you sure you want to delete"
 msgstr "Ви дійсно хочете видалити"
 
@@ -486,7 +490,7 @@ msgstr "Як є"
 msgid "As plain text"
 msgstr "Як простий текст"
 
-#: include/hosts.inc.php:99
+#: include/hosts.inc.php:100
 msgid "Asset tag"
 msgstr "Етикетка власника"
 
@@ -498,11 +502,11 @@ msgstr "В"
 msgid "At least one host or group should be selected"
 msgstr "Потрібно вибрати як мінімум один вузел мережі або групу вузлів мережі"
 
-#: include/locales/en_gb.inc.php:1841
+#: include/locales/en_gb.inc.php:1844
 msgid "At least one item must be present in the trigger expression."
 msgstr "Як мінімум один елемент даних має бути присутнім у виразі тригера."
 
-#: include/locales/en_gb.inc.php:1601 include/menu.inc.php:229
+#: include/locales/en_gb.inc.php:1601 include/menu.inc.php:230
 msgid "Audit"
 msgstr "Аудит"
 
@@ -514,7 +518,7 @@ msgstr "Сер"
 msgid "August"
 msgstr "Серпень"
 
-#: include/locales/en_gb.inc.php:474 include/menu.inc.php:216
+#: include/locales/en_gb.inc.php:474 include/menu.inc.php:217
 msgid "Authentication"
 msgstr "Аутентиф."
 
@@ -548,7 +552,7 @@ msgstr ""
 msgid "Availability"
 msgstr "Доступність"
 
-#: include/locales/en_gb.inc.php:1157 include/menu.inc.php:119
+#: include/locales/en_gb.inc.php:1157 include/menu.inc.php:120
 msgid "Availability report"
 msgstr "Звіт про доступність"
 
@@ -569,7 +573,7 @@ msgstr "Середнє по"
 msgid "Axis side"
 msgstr "Розміщення вісі X"
 
-#: include/locales/en_gb.inc.php:1750
+#: include/locales/en_gb.inc.php:1753
 msgid "B"
 msgstr "Б"
 
@@ -585,7 +589,7 @@ msgstr "Фонове зображення"
 msgid "Background image"
 msgstr "Фонове зображення"
 
-#: include/locales/en_gb.inc.php:1229 include/menu.inc.php:127
+#: include/locales/en_gb.inc.php:1229 include/menu.inc.php:128
 msgid "Bar reports"
 msgstr "Гістограмні звіти"
 
@@ -742,11 +746,11 @@ msgstr "Вираховується автоматично"
 msgid "Callback"
 msgstr "Зворотній виклик"
 
-#: include/locales/en_gb.inc.php:2022
+#: include/locales/en_gb.inc.php:2025
 msgid "Can not create new element"
 msgstr "Не вдалося створити новий елемент"
 
-#: include/locales/en_gb.inc.php:2021
+#: include/locales/en_gb.inc.php:2024
 msgid "Can not find objects with name"
 msgstr "Не вдалося знайти об'єкт з іменем"
 
@@ -754,15 +758,15 @@ msgstr "Не вдалося знайти об'єкт з іменем"
 msgid "Can't add group"
 msgstr "Не вдалося додати групу"
 
-#: include/locales/en_gb.inc.php:1949
+#: include/locales/en_gb.inc.php:1952
 msgid "Can't delete user medias"
 msgstr "Не вдалось видалити метод повідомлення у користувача"
 
-#: include/locales/en_gb.inc.php:1991
+#: include/locales/en_gb.inc.php:1994
 msgid "Can't format Tree"
 msgstr "Не вдалося побудувати дерево"
 
-#: include/locales/en_gb.inc.php:1951
+#: include/locales/en_gb.inc.php:1954
 msgid "Can't insert user medias"
 msgstr "Не вдалось додати метод повідомлення у користувача"
 
@@ -798,7 +802,7 @@ msgstr "Не вдалося від'єднати групи"
 msgid "Can't unlink template"
 msgstr "Не вдалося від'єднати шаблон"
 
-#: include/locales/en_gb.inc.php:1950
+#: include/locales/en_gb.inc.php:1953
 msgid "Can't update user medias"
 msgstr "Не вдалось оновити метод повідомлення у користувача"
 
@@ -837,7 +841,7 @@ msgstr "Не вдалося додати правило виявлення"
 msgid "Cannot add graph"
 msgstr "Не вдалося додати графік"
 
-#: api/classes/class.chost.php:1809 include/locales/en_gb.inc.php:1517
+#: api/classes/class.chost.php:1824 include/locales/en_gb.inc.php:1517
 msgid "Cannot add group"
 msgstr "Не вдалося додати групу"
 
@@ -853,7 +857,7 @@ msgstr "Не вдалося додати картинку"
 msgid "Cannot add item"
 msgstr "Не вдалося додати елемент даних"
 
-#: api/classes/class.chost.php:1930 api/classes/class.ctemplate.php:1587
+#: api/classes/class.chost.php:1945 api/classes/class.ctemplate.php:1587
 msgid "Cannot add macro"
 msgstr "Не вдалося додати макрос"
 
@@ -869,7 +873,7 @@ msgstr "Не вдалося додати більше ніж один елеме
 msgid "Cannot add network map"
 msgstr "Не вдалося додати карту мережі"
 
-#: include/locales/en_gb.inc.php:1792
+#: include/locales/en_gb.inc.php:1795
 msgid "Cannot add new application"
 msgstr "Не вдалося додати нову групу елементів даних"
 
@@ -1016,7 +1020,7 @@ msgstr "Не вдалося видалити карту мережі"
 msgid "Cannot delete node"
 msgstr "Не вдалося видалити ноду"
 
-#: api/classes/class.chost.php:1943
+#: api/classes/class.chost.php:1958
 msgid "Cannot delete profile"
 msgstr "Не вдалося видалити профіль"
 
@@ -1159,11 +1163,11 @@ msgstr "Не вдалося розкрити вираз \"%s\"."
 msgid "Cannot include view file \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1882
+#: include/locales/en_gb.inc.php:1885
 msgid "Cannot link hardlinked service."
 msgstr "Не вдалося приєднати жорстко приєднану послугу."
 
-#: include/locales/en_gb.inc.php:1883
+#: include/locales/en_gb.inc.php:1886
 msgid "Cannot link service to itself."
 msgstr "Не вдалося приєднати послугу до самої себе."
 
@@ -1175,7 +1179,7 @@ msgstr "Не вдалося приєднати шаблон"
 msgid "Cannot logout."
 msgstr "Не вдалося виконати вихід."
 
-#: api/classes/class.chost.php:1717
+#: api/classes/class.chost.php:1732
 msgid "Cannot mass update host name"
 msgstr "Не вдалося масове оновлення імені вузла мережі"
 
@@ -1183,7 +1187,7 @@ msgstr "Не вдалося масове оновлення імені вузл�
 msgid "Cannot mass update template name"
 msgstr "Не вдалося масове оновлення імені шаблона"
 
-#: api/classes/class.chost.php:1707
+#: api/classes/class.chost.php:1722
 msgid "Cannot mass update visible host name"
 msgstr "Не вдалося масове оновлення видимого імені вузла мережі"
 
@@ -1211,15 +1215,15 @@ msgstr ""
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
-#: api/classes/class.chost.php:1818
+#: api/classes/class.chost.php:1833
 msgid "Cannot remove group"
 msgstr "Не вдалося видалити групу"
 
-#: api/classes/class.chost.php:1914 config.php:555
+#: api/classes/class.chost.php:1929 config.php:555
 msgid "Cannot remove macro"
 msgstr "Не вдалося видалити макрос"
 
-#: include/locales/en_gb.inc.php:1952
+#: include/locales/en_gb.inc.php:1955
 msgid "Cannot rename guest user"
 msgstr "Не вдалося перейменувати користувача guest"
 
@@ -1327,7 +1331,7 @@ msgstr "Не вдалося оновити картинку"
 msgid "Cannot update item"
 msgstr "Не вдалося оновити елемент даних"
 
-#: api/classes/class.chost.php:1921 api/classes/class.ctemplate.php:1578
+#: api/classes/class.chost.php:1936 api/classes/class.ctemplate.php:1578
 #: config.php:560
 msgid "Cannot update macro"
 msgstr "Не вдалося оновити макрос"
@@ -1409,7 +1413,7 @@ msgstr "Не вдалося оновити стан користувача"
 msgid "Cannot update value map"
 msgstr "Не вдалося оновити перетворення значення"
 
-#: include/locales/en_gb.inc.php:1666
+#: include/locales/en_gb.inc.php:1669
 msgid "Caption"
 msgstr "Заголовок"
 
@@ -1441,7 +1445,7 @@ msgstr "Містить рядок символів"
 msgid "Character string not included"
 msgstr "Не містить рядок символів"
 
-#: include/hosts.inc.php:184
+#: include/hosts.inc.php:185
 msgid "Chassis"
 msgstr "Шассі"
 
@@ -1449,7 +1453,7 @@ msgstr "Шассі"
 msgid "Check already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1687
+#: include/locales/en_gb.inc.php:1690
 msgid "Check expression part starting from '"
 msgstr "Перевірте частину виразу, починаючи з '"
 
@@ -1540,7 +1544,7 @@ msgstr "Об'єднати стовпчики"
 msgid "Columns"
 msgstr "Стовпчиків"
 
-#: include/locales/en_gb.inc.php:1717
+#: include/locales/en_gb.inc.php:1720
 msgid "Combined result"
 msgstr "Комбінований результат"
 
@@ -1591,7 +1595,7 @@ msgstr "Умова"
 msgid "Conditions"
 msgstr "Умови"
 
-#: include/menu.inc.php:135
+#: include/menu.inc.php:136
 msgid "Configuration"
 msgstr "Налаштування"
 
@@ -1674,11 +1678,11 @@ msgstr "В системі як '%1$s' із '%2$s'"
 msgid "Connectors"
 msgstr "ЛІНКИ"
 
-#: include/hosts.inc.php:159
+#: include/hosts.inc.php:160
 msgid "Contact"
 msgstr "Контактна інформація"
 
-#: include/hosts.inc.php:204
+#: include/hosts.inc.php:205
 msgid "Contract number"
 msgstr "Контактний номер"
 
@@ -1711,7 +1715,7 @@ msgstr "Скопіювати вибрані тригери?"
 msgid "Correct login [%s]"
 msgstr "Правильне ім'я користувача [%s]"
 
-#: include/locales/en_gb.inc.php:1892
+#: include/locales/en_gb.inc.php:1895
 msgid "Could not save image!"
 msgstr "Не вдалося зберегти картинку!"
 
@@ -1799,7 +1803,7 @@ msgstr "Створити сценарій"
 msgid "Create script"
 msgstr "Створити скрипт"
 
-#: include/locales/en_gb.inc.php:2013
+#: include/locales/en_gb.inc.php:2016
 msgid "Create trigger"
 msgstr "Створити тригер"
 
@@ -1807,11 +1811,11 @@ msgstr "Створити тригер"
 msgid "Create value map"
 msgstr "Створити перетворення значення"
 
-#: include/locales/en_gb.inc.php:1808
+#: include/locales/en_gb.inc.php:1811
 msgid "Critical error"
 msgstr "Критична помилка"
 
-#: include/validate.inc.php:551
+#: include/validate.inc.php:549
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Критична помилка. Некоректне значення \"%1$s\" для поля \"%2$s\"."
@@ -1890,15 +1894,15 @@ msgstr "ВИЯВЛЕНО"
 msgid "DISCOVERY"
 msgstr "ВИЯВЛЕННЯ"
 
-#: include/locales/en_gb.inc.php:1671
+#: include/locales/en_gb.inc.php:1674
 msgid "DISCOVERY CHECKS"
 msgstr "ПЕРЕВІРКИ ВИЯВЛЕННЯ"
 
-#: include/locales/en_gb.inc.php:1670
+#: include/locales/en_gb.inc.php:1673
 msgid "DISCOVERY RULES"
 msgstr "ПРАВИЛА ВИЯВЛЕННЯ"
 
-#: include/menu.inc.php:212
+#: include/menu.inc.php:213
 msgid "DM"
 msgstr "РМ"
 
@@ -2005,19 +2009,19 @@ msgstr "Користувач бази даних"
 msgid "Date"
 msgstr "Дата"
 
-#: include/hosts.inc.php:269
+#: include/hosts.inc.php:270
 msgid "Date HW installed"
 msgstr "Дата встановлення HW"
 
-#: include/hosts.inc.php:274
+#: include/hosts.inc.php:275
 msgid "Date HW maintenance expires"
 msgstr "Дата закінчення гарантії HW"
 
-#: include/hosts.inc.php:264
+#: include/hosts.inc.php:265
 msgid "Date HW purchased"
 msgstr "Дата покупки HW"
 
-#: include/hosts.inc.php:279
+#: include/hosts.inc.php:280
 msgid "Date hw decommissioned"
 msgstr ""
 
@@ -2112,7 +2116,7 @@ msgstr "Видалити"
 msgid "Delete Links between selected elements?"
 msgstr "Видалити лінк між двома елементами?"
 
-#: include/locales/en_gb.inc.php:2017
+#: include/locales/en_gb.inc.php:2020
 msgid "Delete Service"
 msgstr "Видалити ІТ послугу"
 
@@ -2136,7 +2140,7 @@ msgstr "Видалити поточну дію?"
 msgid "Delete discovery rule?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1706
+#: include/locales/en_gb.inc.php:1709
 msgid "Delete expression?"
 msgstr "Видалити вираз?"
 
@@ -2156,11 +2160,11 @@ msgstr "Видалити історію вибраних ВЕБ сценарії
 msgid "Delete history of selected items?"
 msgstr "Видалити історію вибраних елементів даних?"
 
-#: include/locales/en_gb.inc.php:1856
+#: include/locales/en_gb.inc.php:1859
 msgid "Delete it?"
 msgstr "Видалити?"
 
-#: include/locales/en_gb.inc.php:1707
+#: include/locales/en_gb.inc.php:1710
 msgid "Delete keyword?"
 msgstr "Видалити ключове слово?"
 
@@ -2203,7 +2207,7 @@ msgstr "Видалити вибрані ВЕБ сценарії?"
 msgid "Delete selected actions?"
 msgstr "Видалити вибрані дії?"
 
-#: include/locales/en_gb.inc.php:1723
+#: include/locales/en_gb.inc.php:1726
 msgid "Delete selected applications?"
 msgstr "Видалити обрані групи елементів даних?"
 
@@ -2243,7 +2247,7 @@ msgstr "Видалити вибрані вузли мережі?"
 msgid "Delete selected image?"
 msgstr "Видалити обрані картинки?"
 
-#: include/locales/en_gb.inc.php:1780
+#: include/locales/en_gb.inc.php:1783
 msgid "Delete selected item?"
 msgstr "Видалити вибраний елемент даних?"
 
@@ -2291,7 +2295,7 @@ msgstr "Видалити вибрані комплексні екрани?"
 msgid "Delete selected scripts?"
 msgstr "Видалити вибрані скрипти?"
 
-#: include/locales/en_gb.inc.php:2018
+#: include/locales/en_gb.inc.php:2021
 msgid "Delete selected services?"
 msgstr "Видалити вибрані ІТ послуги?"
 
@@ -2307,7 +2311,7 @@ msgstr "Видалити вибрані шаблони?"
 msgid "Delete selected triggers?"
 msgstr "Видалити вибрані тригери?"
 
-#: include/locales/en_gb.inc.php:1776
+#: include/locales/en_gb.inc.php:1779
 msgid "Delete selected user?"
 msgstr "Видалити обраного користувача?"
 
@@ -2343,11 +2347,11 @@ msgstr "Видалити карту мережі?"
 msgid "Delete template?"
 msgstr "Видалити шаблон?"
 
-#: include/locales/en_gb.inc.php:1720
+#: include/locales/en_gb.inc.php:1723
 msgid "Delete this application?"
 msgstr "Видалити цю групу елементів даних?"
 
-#: include/locales/en_gb.inc.php:1783
+#: include/locales/en_gb.inc.php:1786
 msgid "Delete trigger?"
 msgstr "Видалити тригер?"
 
@@ -2379,7 +2383,7 @@ msgstr "Залежність"
 msgid "Depends on"
 msgstr "Залежить від"
 
-#: include/hosts.inc.php:214
+#: include/hosts.inc.php:215
 msgid "Deployment status"
 msgstr "Статус розгортання"
 
@@ -2456,7 +2460,7 @@ msgstr "Дезактивувати вибрані ВЕБ сценарії?"
 msgid "Disable selected actions?"
 msgstr "Дезактивувати вибрані дії?"
 
-#: include/locales/en_gb.inc.php:1722
+#: include/locales/en_gb.inc.php:1725
 msgid "Disable selected applications?"
 msgstr "Дезактивувати обрані групи елементів даних?"
 
@@ -2506,7 +2510,7 @@ msgstr "Виявлений пристрій"
 
 #: actionconf.php:401 hosts.php:765 hosts.php:850
 #: include/locales/en_gb.inc.php:93 include/menu.inc.php:82
-#: include/menu.inc.php:191
+#: include/menu.inc.php:192
 msgid "Discovery"
 msgstr "Виявлення"
 
@@ -2586,7 +2590,7 @@ msgstr ""
 msgid "Discovery status"
 msgstr "Стан виявлення"
 
-#: include/locales/en_gb.inc.php:1662
+#: include/locales/en_gb.inc.php:1665
 msgid "Displaying"
 msgstr "Відображено"
 
@@ -2598,7 +2602,7 @@ msgstr "Розподіл значень для кількох елементів
 msgid "Distribution of values for multiple periods"
 msgstr "Розподіл значень для кількох періодів"
 
-#: include/locales/en_gb.inc.php:1781
+#: include/locales/en_gb.inc.php:1784
 msgid "Do"
 msgstr "Виконати"
 
@@ -2622,7 +2626,7 @@ msgstr "Не зберігати історію старіше ніж (в дня�
 msgid "Do not keep trends older than (in days)"
 msgstr "Не зберігати тенденції старіше ніж (в днях)"
 
-#: include/locales/en_gb.inc.php:2014
+#: include/locales/en_gb.inc.php:2017
 msgid "Do you wish to replace the conditional expression?"
 msgstr "Ви дійсно хочете замінити умовний вираз?"
 
@@ -2657,12 +2661,12 @@ msgstr "Стиль креслення"
 msgid "Dropdown first entry"
 msgstr "Перший запис у списку"
 
-#: api/classes/class.chost.php:1349
+#: api/classes/class.chost.php:1364
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data"
 msgstr "Дублікат вузла мережі. Вузел мережі з таким самим іменем \"%s\" вже існує в конфігурації"
 
-#: api/classes/class.chost.php:1380
+#: api/classes/class.chost.php:1395
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data"
 msgstr "Дублікат вузла мережі. Вузел мережі з таким самим видимим іменем \"%s\" вже існує в конфігурації"
@@ -2699,15 +2703,15 @@ msgstr "Голландська (NL)"
 msgid "Dynamic item"
 msgstr "Динамічний елемент"
 
-#: include/locales/en_gb.inc.php:1767
+#: include/locales/en_gb.inc.php:1770
 msgid "E"
 msgstr "E"
 
-#: include/locales/en_gb.inc.php:1970
+#: include/locales/en_gb.inc.php:1973
 msgid "ERROR"
 msgstr "ПОМИЛКА"
 
-#: include/locales/en_gb.inc.php:1981
+#: include/locales/en_gb.inc.php:1984
 msgid "EVENTS"
 msgstr "ПОДІЇ"
 
@@ -2721,7 +2725,7 @@ msgstr "Кожнен URL-запит повинен мати унікальне �
 msgid "Edit"
 msgstr "Змінити"
 
-#: include/locales/en_gb.inc.php:2016
+#: include/locales/en_gb.inc.php:2019
 msgid "Edit Service"
 msgstr "Редагувати ІТ послугу"
 
@@ -2729,11 +2733,11 @@ msgstr "Редагувати ІТ послугу"
 msgid "Edit Trigger"
 msgstr "Редагувати тригер"
 
-#: include/locales/en_gb.inc.php:1699
+#: include/locales/en_gb.inc.php:1702
 msgid "Edit connector"
 msgstr "Змінити з'єднання"
 
-#: include/locales/en_gb.inc.php:1658
+#: include/locales/en_gb.inc.php:1661
 msgid "Edit hosts"
 msgstr "Редагувати вузли"
 
@@ -2758,7 +2762,7 @@ msgstr "Назва елемента"
 msgid "Email"
 msgstr "Email"
 
-#: include/locales/en_gb.inc.php:1667
+#: include/locales/en_gb.inc.php:1670
 msgid "Empty"
 msgstr "Пусто"
 
@@ -2766,7 +2770,7 @@ msgstr "Пусто"
 #: api/classes/class.cdiscoveryrule.php:685 api/classes/class.cgraph.php:979
 #: api/classes/class.cgraphprototype.php:973
 #: api/classes/class.chostgroup.php:702
-#: api/classes/class.chostinterface.php:672 api/classes/class.chost.php:2102
+#: api/classes/class.chostinterface.php:672 api/classes/class.chost.php:2117
 #: api/classes/class.citem.php:1017 api/classes/class.citemprototype.php:704
 #: api/classes/class.cproxy.php:474 api/classes/class.ctemplate.php:1138
 #: api/classes/class.ctrigger.php:1341 api/classes/class.cusergroup.php:640
@@ -2854,7 +2858,7 @@ msgstr "Активувати вибрані тригери?"
 msgid "Enabled"
 msgstr "Активовано"
 
-#: include/locales/en_gb.inc.php:1744
+#: include/locales/en_gb.inc.php:1747
 msgid "End of"
 msgstr "Кінець"
 
@@ -2862,7 +2866,7 @@ msgstr "Кінець"
 msgid "English (GB)"
 msgstr "Англійська (GB)"
 
-#: include/locales/en_gb.inc.php:302 include/locales/en_gb.inc.php:1683
+#: include/locales/en_gb.inc.php:302 include/locales/en_gb.inc.php:1686
 msgid "Error"
 msgstr "Помилка"
 
@@ -2870,7 +2874,7 @@ msgstr "Помилка"
 msgid "Error Description"
 msgstr "Опис помилки"
 
-#: include/locales/en_gb.inc.php:1846
+#: include/locales/en_gb.inc.php:1849
 msgid "Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates."
 msgstr "Невірне додавання залежностей. Наступні залежності не дозволяються: 1) від тригера вузла до тригера з шаблону; 2) від тригера з шаблону до тригера вузла; 3) між тригерами з шаблонів, коли шаблони приєднані до інших шаблонів."
 
@@ -2915,7 +2919,7 @@ msgstr "Генерація події"
 msgid "Event source"
 msgstr "Джерело події"
 
-#: include/locales/en_gb.inc.php:1980 include/menu.inc.php:62
+#: include/locales/en_gb.inc.php:1983 include/menu.inc.php:62
 msgid "Events"
 msgstr "Події"
 
@@ -2927,11 +2931,11 @@ msgstr "Щодня"
 msgid "Every week(s)"
 msgstr "Щотижня"
 
-#: include/locales/en_gb.inc.php:1768
+#: include/locales/en_gb.inc.php:1771
 msgid "Exa"
 msgstr "Екса"
 
-#: include/locales/en_gb.inc.php:1703
+#: include/locales/en_gb.inc.php:1706
 msgid "Exclude"
 msgstr "Виключено"
 
@@ -2940,7 +2944,7 @@ msgstr "Виключено"
 msgid "Execute"
 msgstr "Виконати"
 
-#: include/locales/en_gb.inc.php:1893
+#: include/locales/en_gb.inc.php:1896
 msgid "Execute SQL error"
 msgstr "Помилка виконання SQL"
 
@@ -2997,15 +3001,15 @@ msgstr "Експортувати в CSV"
 msgid "Expression"
 msgstr "Вираз"
 
-#: include/locales/en_gb.inc.php:1685
+#: include/locales/en_gb.inc.php:1688
 msgid "Expression Syntax Error"
 msgstr "Помилка в синтаксисі виразу"
 
-#: include/locales/en_gb.inc.php:1711
+#: include/locales/en_gb.inc.php:1714
 msgid "Expression Variable Elements"
 msgstr "Значення елементів Виразу"
 
-#: include/locales/en_gb.inc.php:1826
+#: include/locales/en_gb.inc.php:1829
 msgid "Expression cannot be empty"
 msgstr "Вираз не може бути пустим"
 
@@ -3025,7 +3029,7 @@ msgstr "Зовнішня перевірка"
 msgid "Ez Texting"
 msgstr "Ez Texting"
 
-#: include/locales/en_gb.inc.php:2002
+#: include/locales/en_gb.inc.php:2005
 msgid "F"
 msgstr "П"
 
@@ -3088,7 +3092,7 @@ msgstr "Лют"
 msgid "February"
 msgstr "Лютий"
 
-#: include/locales/en_gb.inc.php:1809
+#: hostprofilesoverview.php:86 include/locales/en_gb.inc.php:1812
 msgid "Field"
 msgstr "Поле"
 
@@ -3102,6 +3106,10 @@ msgstr "Поле \"вузел мережі\" є обов'язковим"
 
 #: api/classes/class.cdrule.php:541
 msgid "Field \"name\" is required."
+msgstr ""
+
+#: hostprofiles.php:126
+msgid "Field:"
 msgstr ""
 
 #: include/classes/class.cview.php:63
@@ -3129,7 +3137,7 @@ msgstr "Фільтр по імені"
 msgid "Finish"
 msgstr "Завершити"
 
-#: include/locales/en_gb.inc.php:649 include/locales/en_gb.inc.php:2029
+#: include/locales/en_gb.inc.php:649 include/locales/en_gb.inc.php:2032
 msgid "First"
 msgstr "Перший"
 
@@ -3183,15 +3191,15 @@ msgstr "На весь екран"
 msgid "Function"
 msgstr "Функція"
 
-#: include/locales/en_gb.inc.php:1844
+#: include/locales/en_gb.inc.php:1847
 msgid "Function '"
 msgstr "Функція '"
 
-#: include/locales/en_gb.inc.php:1761
+#: include/locales/en_gb.inc.php:1764
 msgid "G"
 msgstr "G"
 
-#: include/locales/en_gb.inc.php:1932
+#: include/locales/en_gb.inc.php:1935
 msgid "GD PNG Support"
 msgstr "GD PNG Support"
 
@@ -3227,7 +3235,7 @@ msgstr "Доступ до  GUI відключено."
 msgid "GUI access updated"
 msgstr "Доступ до GUI оновлено"
 
-#: include/menu.inc.php:208
+#: include/menu.inc.php:209
 msgid "General"
 msgstr "Загальні парам."
 
@@ -3252,11 +3260,11 @@ msgstr "НЕ вдалось отримати вибрані елементи."
 msgid "Get support"
 msgstr "Підтримка"
 
-#: include/locales/en_gb.inc.php:1762
+#: include/locales/en_gb.inc.php:1765
 msgid "Giga"
 msgstr "Гіга"
 
-#: include/locales/en_gb.inc.php:1715
+#: include/locales/en_gb.inc.php:1718
 msgid "Given expression is not a macro"
 msgstr "Наданий вираз це не макрос"
 
@@ -3268,7 +3276,7 @@ msgstr "Глобальний скрипт"
 msgid "Global scripts"
 msgstr "Глобальні скрипти"
 
-#: actionconf.php:497 hosts.php:1016 include/locales/en_gb.inc.php:1660
+#: actionconf.php:497 hosts.php:1016 include/locales/en_gb.inc.php:1663
 #: include/views/administration.script.list.php:108
 msgid "Go"
 msgstr "Виконати"
@@ -3407,8 +3415,8 @@ msgstr "Графіки видалено"
 msgid "Grid"
 msgstr "Сітка"
 
-#: hostprofiles.php:73 hostprofiles.php:84 hosts.php:717
-#: include/locales/en_gb.inc.php:278
+#: hostprofilesoverview.php:79 hostprofiles.php:93 hostprofiles.php:160
+#: hosts.php:717 include/locales/en_gb.inc.php:278
 msgid "Group"
 msgstr "Група"
 
@@ -3442,6 +3450,10 @@ msgstr "Назва групи"
 msgid "Group updated"
 msgstr "Групу оновлено"
 
+#: hostprofilesoverview.php:80
+msgid "Grouping by"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:735
 #: include/views/configuration.host.edit.php:173
 msgid "Groups"
@@ -3459,7 +3471,7 @@ msgstr "H.i"
 msgid "H:i"
 msgstr "H:i"
 
-#: include/locales/en_gb.inc.php:1679
+#: include/locales/en_gb.inc.php:1682
 msgid "H:i:s"
 msgstr "H:i:s"
 
@@ -3471,12 +3483,16 @@ msgstr "ІСТОРІЯ ПОДІЙ"
 msgid "HOST GROUPS"
 msgstr "ГРУПИ ВУЗЛІВ МЕРЕЖІ"
 
-#: hostprofiles.php:65
+#: hostprofilesoverview.php:61
+msgid "HOST PROFILE OVERVIEW"
+msgstr ""
+
+#: hostprofiles.php:84
 msgid "HOST PROFILES"
 msgstr "ПРОФІЛІ ВУЗЛІВ МЕРЕЖІ"
 
-#: hostprofiles.php:74 hosts_mon.php:120 hosts.php:722
-#: include/locales/en_gb.inc.php:724
+#: hostprofilesoverview.php:81 hostprofiles.php:94 hosts_mon.php:120
+#: hosts.php:722 include/locales/en_gb.inc.php:724
 msgid "HOSTS"
 msgstr "ВУЗЛИ МЕРЕЖІ"
 
@@ -3494,15 +3510,15 @@ msgstr "HTTP аутентифікація"
 msgid "HTTPS"
 msgstr ""
 
-#: include/hosts.inc.php:194
+#: include/hosts.inc.php:195
 msgid "HW architecture"
 msgstr ""
 
-#: include/hosts.inc.php:114
+#: include/hosts.inc.php:115
 msgid "Hardware"
 msgstr "Апаратна конфігурація"
 
-#: include/hosts.inc.php:119
+#: include/hosts.inc.php:120
 msgid "Hardware (Full details)"
 msgstr ""
 
@@ -3580,8 +3596,8 @@ msgstr "Горизонтальний"
 msgid "Horizontal align"
 msgstr "Вирівнювання по горизонталі"
 
-#: hostprofiles.php:83 include/actions.inc.php:42
-#: include/locales/en_gb.inc.php:725 include/locales/en_gb.inc.php:1803
+#: hostprofiles.php:159 include/actions.inc.php:42
+#: include/locales/en_gb.inc.php:725 include/locales/en_gb.inc.php:1806
 #: include/views/configuration.host.edit.php:58
 #: include/views/configuration.host.edit.php:408
 #: include/views/js/configuration.action.edit.js.php:86
@@ -3594,7 +3610,7 @@ msgstr "Вузел мережі"
 msgid "Host \"%s\" already exists."
 msgstr "Вузел мережі \"%s\" вже існує."
 
-#: api/classes/class.chost.php:2225
+#: api/classes/class.chost.php:2240
 #, php-format
 msgid "Host \"%s\" deleted."
 msgstr ""
@@ -3624,7 +3640,7 @@ msgstr "Доступ до вузла мережі"
 msgid "Host added"
 msgstr "Вузел мережі додано"
 
-#: include/locales/en_gb.inc.php:466
+#: hostprofilesoverview.php:87 include/locales/en_gb.inc.php:466
 msgid "Host count"
 msgstr "Кількість вузлів мережі"
 
@@ -3632,7 +3648,7 @@ msgstr "Кількість вузлів мережі"
 msgid "Host deleted"
 msgstr "Вузел мережі видалено"
 
-#: include/locales/en_gb.inc.php:1842
+#: include/locales/en_gb.inc.php:1845
 msgid "Host does not exist."
 msgstr "Вузел мережі не існує."
 
@@ -3643,7 +3659,7 @@ msgstr "Вузел мережі не існує."
 msgid "Host group"
 msgstr "Група вузлів мережі"
 
-#: include/locales/en_gb.inc.php:762 include/menu.inc.php:143
+#: include/locales/en_gb.inc.php:762 include/menu.inc.php:144
 #: include/views/administration.script.edit.php:89
 msgid "Host groups"
 msgstr "Групи вузлів мережі"
@@ -3652,7 +3668,7 @@ msgstr "Групи вузлів мережі"
 msgid "Host interface"
 msgstr "Інтерфейс вузла мережі"
 
-#: include/locales/en_gb.inc.php:1843
+#: include/locales/en_gb.inc.php:1846
 msgid "Host key does not exist."
 msgstr "Ключ вузла мережі не існує."
 
@@ -3668,7 +3684,7 @@ msgstr "Масове оновлення вузла мережі"
 msgid "Host name"
 msgstr "Ім'я вузла мережі"
 
-#: include/hosts.inc.php:234
+#: include/hosts.inc.php:235
 msgid "Host networks"
 msgstr ""
 
@@ -3676,11 +3692,15 @@ msgstr ""
 msgid "Host profile"
 msgstr "Профіль вузла мережі"
 
+#: include/locales/en_gb.inc.php:1658
+msgid "Host profile overview"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1655
 msgid "Host profiles"
 msgstr "Профіль вузлів мережі"
 
-#: include/hosts.inc.php:244
+#: include/hosts.inc.php:245
 msgid "Host router"
 msgstr ""
 
@@ -3696,7 +3716,7 @@ msgstr "Стан вузла мережі"
 msgid "Host status updated"
 msgstr "Статус вузла мережі оновлено"
 
-#: include/hosts.inc.php:239
+#: include/hosts.inc.php:240
 msgid "Host subnet mask"
 msgstr ""
 
@@ -3708,8 +3728,8 @@ msgstr "Шаблон вузла мережі"
 msgid "Host time"
 msgstr "Час вузла мережі"
 
-#: api/classes/class.chost.php:1562 api/classes/class.chost.php:1567
-#: api/classes/class.chost.php:1572 api/classes/class.chost.php:1581
+#: api/classes/class.chost.php:1577 api/classes/class.chost.php:1582
+#: api/classes/class.chost.php:1587 api/classes/class.chost.php:1596
 msgid "Host update failed"
 msgstr "Оновлення вузла мережі невдале"
 
@@ -3717,19 +3737,19 @@ msgstr "Оновлення вузла мережі невдале"
 msgid "Host updated"
 msgstr "Вузел мережі оновлено"
 
-#: api/classes/class.chost.php:1408 api/classes/class.ctemplate.php:1395
+#: api/classes/class.chost.php:1423 api/classes/class.ctemplate.php:1395
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr ""
 
-#: api/classes/class.chost.php:1414 api/classes/class.ctemplate.php:1051
+#: api/classes/class.chost.php:1429 api/classes/class.ctemplate.php:1051
 #: api/classes/class.ctemplate.php:1368
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:709 include/menu.inc.php:52
-#: include/menu.inc.php:103 include/menu.inc.php:151
+#: include/menu.inc.php:104 include/menu.inc.php:152
 msgid "Hosts"
 msgstr "Вузли мережі"
 
@@ -3737,7 +3757,7 @@ msgstr "Вузли мережі"
 msgid "Hosts (m/n/t)"
 msgstr "Вузли мережі (Пс/Бс/ш)"
 
-#: include/locales/en_gb.inc.php:1672
+#: include/locales/en_gb.inc.php:1675
 msgid "Hosts and templates"
 msgstr "Вузли мережі та шаблони"
 
@@ -3864,7 +3884,7 @@ msgstr "ПОСЛУГИ ІТ"
 msgid "IT SERVICES AVAILABILITY REPORT"
 msgstr "ЗВІТ ПРО ДОСТУПНІСТЬ IT ПОСЛУГ"
 
-#: include/menu.inc.php:86 include/menu.inc.php:194
+#: include/menu.inc.php:86 include/menu.inc.php:195
 msgid "IT Services"
 msgstr ""
 
@@ -3932,7 +3952,7 @@ msgstr "Тип ярлика у іконці"
 msgid "Idle till"
 msgstr "Простоює до"
 
-#: include/locales/en_gb.inc.php:1968
+#: include/locales/en_gb.inc.php:1971
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Якщо Ви вважаєте це повідомлення помилковим, то зверніться до Вашого адміністратора для отримання необхідних прав доступу."
 
@@ -3952,7 +3972,7 @@ msgstr "Картинку видалено"
 msgid "Image label type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1895
+#: include/locales/en_gb.inc.php:1898
 msgid "Image size must be less than 1MB"
 msgstr "Розмір картинки має бути менше 1MB"
 
@@ -3992,6 +4012,11 @@ msgstr "Імпорт комплексного екрану"
 msgid "Imported successfully"
 msgstr ""
 
+#: hostprofiles.php:184
+#, php-format
+msgid "Impossible to filter by profile field \"%s\", which does not exist."
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1331
 msgid "Impossible to remove last row and column"
 msgstr "Не вдалося видалити останній рядок або стовпчик"
@@ -4017,7 +4042,7 @@ msgstr "В періоді сервісу"
 msgid "In progress"
 msgstr "В роботі"
 
-#: include/locales/en_gb.inc.php:1702
+#: include/locales/en_gb.inc.php:1705
 msgid "Include"
 msgstr "Включено"
 
@@ -4037,7 +4062,7 @@ msgstr ""
 msgid "Incorrect IP range \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1897
+#: include/locales/en_gb.inc.php:1900
 msgid "Incorrect Image"
 msgstr "Некоректна картинка"
 
@@ -4147,7 +4172,7 @@ msgstr ""
 msgid "Incorrect action operationid"
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1786
+#: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1789
 msgid "Incorrect arguments passed to function"
 msgstr "Функції передано некоректні параметри"
 
@@ -4155,12 +4180,12 @@ msgstr "Функції передано некоректні параметри"
 msgid "Incorrect arguments passed to method."
 msgstr "Некоректні параметри передано методу."
 
-#: api/classes/class.chost.php:1345
+#: api/classes/class.chost.php:1360
 #, php-format
 msgid "Incorrect characters used for Host name \"%s\""
 msgstr ""
 
-#: api/classes/class.chost.php:1713
+#: api/classes/class.chost.php:1728
 #, php-format
 msgid "Incorrect characters used for Hostname \"%s\""
 msgstr ""
@@ -4170,7 +4195,7 @@ msgstr ""
 msgid "Incorrect characters used for Hostname [ %s ]"
 msgstr "Використано некоректні символи в імені вузла мережі [ %s ]"
 
-#: include/locales/en_gb.inc.php:1900
+#: include/locales/en_gb.inc.php:1903
 msgid "Incorrect characters used for Node name"
 msgstr "В імені ноди використано некоректні символи"
 
@@ -4221,7 +4246,7 @@ msgstr ""
 msgid "Incorrect fields for trigger"
 msgstr "Некоректні поля для триге"
 
-#: include/locales/en_gb.inc.php:1839
+#: include/locales/en_gb.inc.php:1842
 msgid "Incorrect function is used"
 msgstr "Використано некоректну функцію"
 
@@ -4290,7 +4315,7 @@ msgstr ""
 msgid "Incorrect key: %s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1782
+#: include/locales/en_gb.inc.php:1785
 msgid "Incorrect list of items."
 msgstr "Некоректний список елементів даних."
 
@@ -4333,7 +4358,7 @@ msgstr ""
 msgid "Incorrect map width value for map \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1902
+#: include/locales/en_gb.inc.php:1905
 msgid "Incorrect node type"
 msgstr "Некоректний тип ноди"
 
@@ -4399,11 +4424,11 @@ msgstr ""
 msgid "Incorrect template."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1726 include/locales/en_gb.inc.php:1953
+#: include/locales/en_gb.inc.php:1729 include/locales/en_gb.inc.php:1956
 msgid "Incorrect time period"
 msgstr "Некоректний період часу"
 
-#: include/locales/en_gb.inc.php:1834
+#: include/locales/en_gb.inc.php:1837
 msgid "Incorrect trigger expression"
 msgstr "Некоректний вираз тригера"
 
@@ -4416,15 +4441,15 @@ msgstr "Некоректний вираз тригера. Вузел мереж�
 msgid "Incorrect trigger."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1748
+#: include/locales/en_gb.inc.php:1751
 msgid "Incorrect type of asort_by_key"
 msgstr "Некоректний тип asort_by_key"
 
-#: include/locales/en_gb.inc.php:1825
+#: include/locales/en_gb.inc.php:1828
 msgid "Incorrect usage of quotes"
 msgstr "Не коректне використання лапок"
 
-#: include/locales/en_gb.inc.php:1889
+#: include/locales/en_gb.inc.php:1892
 msgid "Incorrect user data in"
 msgstr "Некоректні дані користувача в"
 
@@ -4448,7 +4473,12 @@ msgstr "Значення \"%1$s\" є некоректним для поля чи
 msgid "Incorrect value \"NULL\" for NOT NULL field \"%s\"."
 msgstr "Значення \"NULL\" є некоректним для NOT NULL поля \"%s\"."
 
-#: include/locales/en_gb.inc.php:1828
+#: include/classes/class.cbuttonqmessage.php:52
+#, php-format
+msgid "Incorrect value for setMessage(): \"%s\"."
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1831
 msgid "Incorrect value type"
 msgstr "Некоректний Тип інформації"
 
@@ -4473,7 +4503,7 @@ msgstr "Вставити"
 msgid "Insert macro"
 msgstr "Вставити макрос"
 
-#: include/locales/en_gb.inc.php:212 include/menu.inc.php:239
+#: include/locales/en_gb.inc.php:212 include/menu.inc.php:240
 msgid "Installation"
 msgstr "Інсталяція"
 
@@ -4481,7 +4511,7 @@ msgstr "Інсталяція"
 msgid "Installation/Update"
 msgstr "Інсталяція/Оновлення"
 
-#: include/hosts.inc.php:209
+#: include/hosts.inc.php:210
 msgid "Installer name"
 msgstr ""
 
@@ -4794,7 +4824,7 @@ msgstr "Чер"
 msgid "June"
 msgstr "Червень"
 
-#: include/locales/en_gb.inc.php:1757
+#: include/locales/en_gb.inc.php:1760
 msgid "K"
 msgstr "K"
 
@@ -4819,11 +4849,11 @@ msgstr ""
 msgid "Key does not match <grpmax|grpmin|grpsum|grpavg>[\"group\",\"key\",\"<last|min|max|avg|sum|count>\",\"numeric param\"]."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1704
+#: include/locales/en_gb.inc.php:1707
 msgid "Keyword"
 msgstr "Ключове слово"
 
-#: include/locales/en_gb.inc.php:1758
+#: include/locales/en_gb.inc.php:1761
 msgid "Kilo"
 msgstr "Кіло"
 
@@ -4884,7 +4914,7 @@ msgstr "Розміщення ярлика"
 msgid "Language"
 msgstr "Мова"
 
-#: include/locales/en_gb.inc.php:1226 include/locales/en_gb.inc.php:2028
+#: include/locales/en_gb.inc.php:1226 include/locales/en_gb.inc.php:2031
 msgid "Last"
 msgstr "Останній"
 
@@ -4940,7 +4970,7 @@ msgstr "Останнє значення"
 msgid "Last week graph"
 msgstr "Графік за останній тиждень"
 
-#: include/locales/en_gb.inc.php:1987 include/menu.inc.php:47
+#: include/locales/en_gb.inc.php:1990 include/menu.inc.php:47
 msgid "Latest data"
 msgstr "Останні дані"
 
@@ -5054,15 +5084,15 @@ msgstr "Локальний"
 msgid "Local time"
 msgstr "Локальний (дійсний) час"
 
-#: include/hosts.inc.php:164
+#: include/hosts.inc.php:165
 msgid "Location"
 msgstr "Місцезнаходження"
 
-#: include/hosts.inc.php:169
+#: include/hosts.inc.php:170
 msgid "Location latitude"
 msgstr ""
 
-#: include/hosts.inc.php:174
+#: include/hosts.inc.php:175
 msgid "Location longitude"
 msgstr ""
 
@@ -5078,7 +5108,7 @@ msgstr "Формат часу в журналі"
 msgid "Logged in as"
 msgstr "Підключено до системи як"
 
-#: include/locales/en_gb.inc.php:1985 include/menu.inc.php:245
+#: include/locales/en_gb.inc.php:1988 include/menu.inc.php:246
 #: include/page_header.php:245
 msgid "Login"
 msgstr "Вхід в систему"
@@ -5097,7 +5127,7 @@ msgstr ""
 msgid "Login name or password is incorrect"
 msgstr "Ім'я для входу або пароль некоректні"
 
-#: include/locales/en_gb.inc.php:1986 include/page_header.php:242
+#: include/locales/en_gb.inc.php:1989 include/page_header.php:242
 msgid "Logout"
 msgstr "Вихід із системи"
 
@@ -5109,7 +5139,7 @@ msgstr "Журнали"
 msgid "Lost"
 msgstr "Втрачено"
 
-#: include/locales/en_gb.inc.php:1759 include/locales/en_gb.inc.php:1998
+#: include/locales/en_gb.inc.php:1762 include/locales/en_gb.inc.php:2001
 msgid "M"
 msgstr "M"
 
@@ -5117,11 +5147,11 @@ msgstr "M"
 msgid "M Y"
 msgstr "M Y"
 
-#: hostprofiles.php:90 include/hosts.inc.php:104
+#: hostprofiles.php:166 include/hosts.inc.php:105
 msgid "MAC address A"
 msgstr ""
 
-#: include/hosts.inc.php:109
+#: include/hosts.inc.php:110
 msgid "MAC address B"
 msgstr ""
 
@@ -5149,7 +5179,7 @@ msgstr "MD5"
 msgid "MEDIA TYPES"
 msgstr "МЕТОДИ ПОВІДОМЛЕНЬ"
 
-#: include/locales/en_gb.inc.php:1745
+#: include/locales/en_gb.inc.php:1748
 msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
 msgstr "ДОСЯГНУТО ЛІМІТ ПАМ'ЯТІ! Профілювання зупинено для збереження пам'яті обробки скриптів."
 
@@ -5178,7 +5208,7 @@ msgstr "Макроси"
 msgid "Macros updated"
 msgstr "Макроси оновлено"
 
-#: include/locales/en_gb.inc.php:603 include/menu.inc.php:169
+#: include/locales/en_gb.inc.php:603 include/menu.inc.php:170
 msgid "Maintenance"
 msgstr "Сервіс"
 
@@ -5227,7 +5257,7 @@ msgstr "Карта мережі"
 
 #: include/export.inc.php:821
 #, php-format
-msgid "Map \"%s\" create."
+msgid "Map \"%s\" created."
 msgstr ""
 
 #: include/export.inc.php:812
@@ -5260,8 +5290,8 @@ msgstr ""
 msgid "Mapping"
 msgstr "Перетворення"
 
-#: include/locales/en_gb.inc.php:1982 include/menu.inc.php:77
-#: include/menu.inc.php:187
+#: include/locales/en_gb.inc.php:1985 include/menu.inc.php:77
+#: include/menu.inc.php:188
 msgid "Maps"
 msgstr "Карти мереж"
 
@@ -5305,7 +5335,7 @@ msgstr "Майстер"
 msgid "Master node"
 msgstr "Майстер нода"
 
-#: include/locales/en_gb.inc.php:1901
+#: include/locales/en_gb.inc.php:1904
 msgid "Master node already exists"
 msgstr "Майстер нода вже існує"
 
@@ -5329,7 +5359,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: api/classes/class.chost.php:1335
+#: api/classes/class.chost.php:1350
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
@@ -5337,7 +5367,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: api/classes/class.chost.php:1370
+#: api/classes/class.chost.php:1385
 #, php-format
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
@@ -5374,19 +5404,19 @@ msgstr "Метод повідомлень не видалено"
 msgid "Media type was not updated"
 msgstr "Метод повідомлень не оновлено"
 
-#: include/locales/en_gb.inc.php:383 include/menu.inc.php:223
+#: include/locales/en_gb.inc.php:383 include/menu.inc.php:224
 msgid "Media types"
 msgstr "Методи повідомлень"
 
-#: include/locales/en_gb.inc.php:1960
+#: include/locales/en_gb.inc.php:1963
 msgid "Mediatype already exists:"
 msgstr "Метод повідомлень вже існує:"
 
-#: include/locales/en_gb.inc.php:1961
+#: include/locales/en_gb.inc.php:1964
 msgid "Mediatypes used by action:"
 msgstr "Метод повідомлень використовується в дії:"
 
-#: include/locales/en_gb.inc.php:1760
+#: include/locales/en_gb.inc.php:1763
 msgid "Mega"
 msgstr "Мега"
 
@@ -5394,11 +5424,11 @@ msgstr "Мега"
 msgid "Members"
 msgstr "Члени групи"
 
-#: include/locales/en_gb.inc.php:1738
+#: include/locales/en_gb.inc.php:1741
 msgid "Memory limit"
 msgstr "Ліміт пам'яті"
 
-#: include/locales/en_gb.inc.php:1739
+#: include/locales/en_gb.inc.php:1742
 msgid "Memory usage"
 msgstr "Використано пам'яті"
 
@@ -5434,7 +5464,7 @@ msgstr "Повідомлення"
 msgid "Method not found."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1754
+#: include/locales/en_gb.inc.php:1757
 msgid "Micro"
 msgstr "Мікро"
 
@@ -5442,7 +5472,7 @@ msgstr "Мікро"
 msgid "Middle"
 msgstr "Посередині"
 
-#: include/locales/en_gb.inc.php:1756
+#: include/locales/en_gb.inc.php:1759
 msgid "Milli"
 msgstr "Мілі"
 
@@ -5450,7 +5480,7 @@ msgstr "Мілі"
 msgid "Min severity"
 msgstr "Мінімальна важливість"
 
-#: include/locales/en_gb.inc.php:1909
+#: include/locales/en_gb.inc.php:1912
 msgid "Minimal version of PHP is"
 msgstr "Мінімальна версія для PHP це"
 
@@ -5470,15 +5500,15 @@ msgstr "Хвилин"
 msgid "Missing"
 msgstr "відсутнє"
 
-#: include/locales/en_gb.inc.php:1864
+#: include/locales/en_gb.inc.php:1867
 msgid "Missing items for graph"
 msgstr "Вісутні елементи даних для графіка"
 
-#: include/locales/en_gb.inc.php:1838
+#: include/locales/en_gb.inc.php:1841
 msgid "Missing key"
 msgstr "Відсутній ключ"
 
-#: include/locales/en_gb.inc.php:1831
+#: include/locales/en_gb.inc.php:1834
 msgid "Missing mandatory parameter for function"
 msgstr "Відсутній обов'язковий параметр для функції"
 
@@ -5486,7 +5516,7 @@ msgstr "Відсутній обов'язковий параметр для фу�
 msgid "Mode"
 msgstr "Режим"
 
-#: include/hosts.inc.php:189
+#: include/hosts.inc.php:190
 msgid "Model"
 msgstr ""
 
@@ -5578,9 +5608,9 @@ msgid "NTLM authentication"
 msgstr "NTLM аутентифікація"
 
 #: actionconf.php:164 actionconf.php:418 discoveryconf.php:246
-#: disc_prototypes.php:376 host_discovery.php:451 hostprofiles.php:85
+#: disc_prototypes.php:376 host_discovery.php:451 hostprofiles.php:161
 #: hosts.php:760 include/forms.inc.php:1014 include/forms.inc.php:1736
-#: include/hosts.inc.php:59 include/locales/en_gb.inc.php:1545
+#: include/hosts.inc.php:60 include/locales/en_gb.inc.php:1545
 #: include/views/administration.script.edit.php:43
 #: include/views/administration.script.list.php:40
 #: include/views/configuration.action.edit.php:47
@@ -5593,7 +5623,7 @@ msgstr "NTLM аутентифікація"
 msgid "Name"
 msgstr "Ім'я"
 
-#: include/locales/en_gb.inc.php:1752
+#: include/locales/en_gb.inc.php:1755
 msgid "Nano"
 msgstr "Нано"
 
@@ -5659,7 +5689,7 @@ msgstr "Нова група"
 msgid "New host"
 msgstr "Новий вузел мережі"
 
-#: include/locales/en_gb.inc.php:1698
+#: include/locales/en_gb.inc.php:1701
 msgid "New indicators"
 msgstr "Нові індикатори"
 
@@ -5711,7 +5741,7 @@ msgstr "Новий шаблон"
 msgid "New template added"
 msgstr "Новий шаблон додано"
 
-#: include/locales/en_gb.inc.php:207 include/locales/en_gb.inc.php:2031
+#: include/locales/en_gb.inc.php:207 include/locales/en_gb.inc.php:2034
 msgid "Next"
 msgstr "Далі"
 
@@ -5749,7 +5779,7 @@ msgstr "Дій не визначено"
 msgid "No actions found"
 msgstr "Дій не виявлено"
 
-#: include/locales/en_gb.inc.php:1799
+#: include/locales/en_gb.inc.php:1802
 msgid "No application with"
 msgstr "Не має груп елементів даних з"
 
@@ -5805,11 +5835,11 @@ msgstr "Перевірок для виявлення не визначено"
 msgid "No discovery rules defined"
 msgstr "Правил для виявлення не визначено"
 
-#: include/locales/en_gb.inc.php:1729
+#: include/locales/en_gb.inc.php:1732
 msgid "No elements selected!"
 msgstr "Не обрано жодного елементу!"
 
-#: include/locales/en_gb.inc.php:1684
+#: include/locales/en_gb.inc.php:1687
 msgid "No errors found"
 msgstr "Помилок не виявлено"
 
@@ -5834,7 +5864,7 @@ msgstr "Не має гнучких інтервалів"
 msgid "No graph defined"
 msgstr "Графік не визначено"
 
-#: include/locales/en_gb.inc.php:1863
+#: include/locales/en_gb.inc.php:1866
 msgid "No graph item with"
 msgstr "Не має графіка елемента даних з"
 
@@ -5846,12 +5876,12 @@ msgstr "Графіки не визначено"
 msgid "No groups defined"
 msgstr "Не має визначених груп"
 
-#: api/classes/class.chost.php:1305 api/classes/class.chost.php:1315
+#: api/classes/class.chost.php:1320 api/classes/class.chost.php:1330
 #, php-format
 msgid "No groups for host \"%s\""
 msgstr ""
 
-#: api/classes/class.chost.php:1699
+#: api/classes/class.chost.php:1714
 msgid "No groups for hosts"
 msgstr "Не має груп у вулза мережі"
 
@@ -5873,16 +5903,16 @@ msgstr "Групи вузлів мережі не визначено"
 msgid "No host groups with groupid \"%s\""
 msgstr ""
 
-#: include/hosts.inc.php:502
+#: include/hosts.inc.php:512
 #, php-format
 msgid "No host groups with groupid \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1797
+#: include/locales/en_gb.inc.php:1800
 msgid "No host with"
 msgstr "Не має вузла мережі з"
 
-#: include/hosts.inc.php:545
+#: include/hosts.inc.php:555
 #, php-format
 msgid "No host with hostid \"%s\"."
 msgstr ""
@@ -5908,7 +5938,7 @@ msgstr "Картинок не визначено"
 msgid "No interface for item."
 msgstr ""
 
-#: api/classes/class.chost.php:1308 api/classes/class.chost.php:1326
+#: api/classes/class.chost.php:1323 api/classes/class.chost.php:1341
 #, php-format
 msgid "No interfaces for host \"%s\""
 msgstr ""
@@ -5932,11 +5962,11 @@ msgstr "Не надано інтерфейсів для проксі \"%s\"."
 msgid "No item defined"
 msgstr "Елемент даних не визначено"
 
-#: include/locales/en_gb.inc.php:1789
+#: include/locales/en_gb.inc.php:1792
 msgid "No item with"
 msgstr "Не має елемента з"
 
-#: include/locales/en_gb.inc.php:1669
+#: include/locales/en_gb.inc.php:1672
 msgid "No items"
 msgstr "Не має елементів"
 
@@ -5985,11 +6015,11 @@ msgstr "Не має визначених операцій"
 msgid "No permission for trigger \"%s\""
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1994
+#: include/locales/en_gb.inc.php:1997
 msgid "No permissions for map"
 msgstr "Не має прав доступу до карти мережі"
 
-#: include/locales/en_gb.inc.php:1993
+#: include/locales/en_gb.inc.php:1996
 msgid "No permissions for screen"
 msgstr "Не має прав доступу до комплексного екрану"
 
@@ -6031,7 +6061,7 @@ msgstr "Не має встановлених ресурсів"
 msgid "No rights defined"
 msgstr "Не визначено прав"
 
-#: include/locales/en_gb.inc.php:1855
+#: include/locales/en_gb.inc.php:1858
 msgid "No rows in screen"
 msgstr "Не має рядків в комплексному екрані"
 
@@ -6047,11 +6077,11 @@ msgstr ""
 msgid "No scripts defined"
 msgstr "Не має позначених скриптів"
 
-#: include/locales/en_gb.inc.php:1885
+#: include/locales/en_gb.inc.php:1888
 msgid "No service linkage with"
 msgstr "Послуга не приєднана до"
 
-#: include/locales/en_gb.inc.php:1884
+#: include/locales/en_gb.inc.php:1887
 msgid "No service with"
 msgstr "Не має послуги з"
 
@@ -6083,7 +6113,7 @@ msgstr "Тригерів не має"
 msgid "No trigger defined"
 msgstr "Тригер не визначено"
 
-#: include/locales/en_gb.inc.php:1824
+#: include/locales/en_gb.inc.php:1827
 msgid "No trigger with"
 msgstr "Не має тригера з"
 
@@ -6099,7 +6129,7 @@ msgstr "Не визначено груп користувачів"
 msgid "No users defined"
 msgstr "Не визначено користувачів"
 
-#: hostprofiles.php:82 include/actions.inc.php:48
+#: hostprofiles.php:158 include/actions.inc.php:48
 #: include/locales/en_gb.inc.php:452 include/page_header.php:320 queue.php:248
 msgid "Node"
 msgstr "Нода"
@@ -6116,7 +6146,7 @@ msgstr "Ноду видалено"
 msgid "Node updated"
 msgstr "Ноду оновлено"
 
-#: include/locales/en_gb.inc.php:1903
+#: include/locales/en_gb.inc.php:1906
 msgid "Node with same ID already exists"
 msgstr "Нода з таким самим ID вже існує"
 
@@ -6149,15 +6179,15 @@ msgstr "Не підтверджено"
 msgid "Not Templated items"
 msgstr "Не має елементів даних з шаблону"
 
-#: include/locales/en_gb.inc.php:1692
+#: include/locales/en_gb.inc.php:1695
 msgid "Not allowed symbols detected after element"
 msgstr "Після елемента виявлено недозволені символи"
 
-#: include/locales/en_gb.inc.php:1693
+#: include/locales/en_gb.inc.php:1696
 msgid "Not allowed symbols detected before element"
 msgstr "Перед елементом виявлено недозволені символи"
 
-#: include/locales/en_gb.inc.php:1689
+#: include/locales/en_gb.inc.php:1692
 msgid "Not allowed symbols or sequence of symbols in expression element detected"
 msgstr "В елементі виразу виявлено недозволений символ або послідовність символів"
 
@@ -6165,7 +6195,7 @@ msgstr "В елементі виразу виявлено недозволени
 msgid "Not allowed to set password for user \"guest\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1690
+#: include/locales/en_gb.inc.php:1693
 msgid "Not allowed value detected in element"
 msgstr "В елементі виявлено недозволене значення"
 
@@ -6199,7 +6229,7 @@ msgstr "Не підтримується"
 msgid "Note"
 msgstr "Примітка"
 
-#: include/hosts.inc.php:179
+#: include/hosts.inc.php:180
 msgid "Notes"
 msgstr "Примітки"
 
@@ -6215,7 +6245,7 @@ msgstr "Нічого не зроблено"
 msgid "Notification report"
 msgstr "Звіт про повідомлення"
 
-#: include/menu.inc.php:236
+#: include/menu.inc.php:237
 msgid "Notifications"
 msgstr "Повідомлення"
 
@@ -6275,15 +6305,15 @@ msgstr "OK"
 msgid "ON"
 msgstr "УВІМК"
 
-#: include/hosts.inc.php:249
+#: include/hosts.inc.php:250
 msgid "OOB IP address"
 msgstr ""
 
-#: include/hosts.inc.php:259
+#: include/hosts.inc.php:260
 msgid "OOB router"
 msgstr ""
 
-#: include/hosts.inc.php:254
+#: include/hosts.inc.php:255
 msgid "OOB subnet mask"
 msgstr ""
 
@@ -6293,15 +6323,15 @@ msgstr ""
 msgid "OR"
 msgstr "АБО"
 
-#: hostprofiles.php:87 include/hosts.inc.php:69
+#: hostprofiles.php:163 include/hosts.inc.php:70
 msgid "OS"
 msgstr "ОС"
 
-#: include/hosts.inc.php:74
+#: include/hosts.inc.php:75
 msgid "OS (Full details)"
 msgstr ""
 
-#: include/hosts.inc.php:79
+#: include/hosts.inc.php:80
 msgid "OS (Short)"
 msgstr "ОС (Короткий опис)"
 
@@ -6345,7 +6375,7 @@ msgstr "Одноразово"
 msgid "One-time downtime"
 msgstr "Однократна недоступність"
 
-#: include/locales/en_gb.inc.php:1962
+#: include/locales/en_gb.inc.php:1965
 msgid "Only Super Admins can create media types"
 msgstr "Тільки Zabbix Супер-адміністратор може створювати методи повідомлень"
 
@@ -6354,19 +6384,19 @@ msgstr "Тільки Zabbix Супер-адміністратор може ст�
 msgid "Only Super Admins can delete User Groups."
 msgstr "Тільки Супер Адміністратор може видаляти Групи Користувачів."
 
-#: include/locales/en_gb.inc.php:1963
+#: include/locales/en_gb.inc.php:1966
 msgid "Only Super Admins can delete media types"
 msgstr "Тільки Zabbix Супер-адміністратор може видаляти методи повідомлень"
 
-#: include/locales/en_gb.inc.php:1946
+#: include/locales/en_gb.inc.php:1949
 msgid "Only Zabbix Admins can add user Medias"
 msgstr "Тільки Zabbix Адміністратор може додавати методи повідомлення"
 
-#: include/locales/en_gb.inc.php:1948
+#: include/locales/en_gb.inc.php:1951
 msgid "Only Zabbix Admins can change user Medias"
 msgstr "Тільки Zabbix Адміністратор може змінювати методи повідомлення"
 
-#: include/locales/en_gb.inc.php:1947
+#: include/locales/en_gb.inc.php:1950
 msgid "Only Zabbix Admins can remove user Medias"
 msgstr "Тільки Zabbix Адміністратор може видаляти методи повідомлення"
 
@@ -6391,7 +6421,7 @@ msgstr "Підраховуються тригери тільки у вузлів
 msgid "Operation \"%s\" already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1821
+#: include/locales/en_gb.inc.php:1824
 msgid "Operation cannot be performed due to unauthorized request"
 msgstr "Операція не може бути здійснена для неавторизованого запиту"
 
@@ -6448,7 +6478,8 @@ msgstr "Інші групи"
 msgid "Other parameters"
 msgstr "Інші параметри"
 
-#: include/locales/en_gb.inc.php:1116 include/menu.inc.php:38 queue.php:48
+#: include/locales/en_gb.inc.php:1116 include/menu.inc.php:38
+#: include/menu.inc.php:103 queue.php:48
 msgid "Overview"
 msgstr "Огляд"
 
@@ -6456,7 +6487,7 @@ msgstr "Огляд"
 msgid "Overview by proxy"
 msgstr "Огляд по проксі"
 
-#: include/locales/en_gb.inc.php:1765
+#: include/locales/en_gb.inc.php:1768
 msgid "P"
 msgstr "P"
 
@@ -6464,47 +6495,47 @@ msgstr "P"
 msgid "PERSONAL DASHBOARD"
 msgstr "ПЕРСОНАЛЬНА ПАНЕЛЬ"
 
-#: include/locales/en_gb.inc.php:1940
+#: include/locales/en_gb.inc.php:1943
 msgid "PHP Session"
 msgstr "PHP Session"
 
-#: include/locales/en_gb.inc.php:1929
+#: include/locales/en_gb.inc.php:1932
 msgid "PHP Sockets"
 msgstr "PHP Sockets"
 
-#: include/locales/en_gb.inc.php:1924
+#: include/locales/en_gb.inc.php:1927
 msgid "PHP databases support"
 msgstr "Підтримка баз даних PHP"
 
-#: include/locales/en_gb.inc.php:1942
+#: include/locales/en_gb.inc.php:1945
 msgid "PHP gettext"
 msgstr "PHP gettext"
 
-#: include/locales/en_gb.inc.php:1914
+#: include/locales/en_gb.inc.php:1917
 msgid "PHP max execution time"
 msgstr "PHP max execution time"
 
-#: include/locales/en_gb.inc.php:1915
+#: include/locales/en_gb.inc.php:1918
 msgid "PHP max input time"
 msgstr "PHP max input time"
 
-#: include/locales/en_gb.inc.php:1910
+#: include/locales/en_gb.inc.php:1913
 msgid "PHP memory limit"
 msgstr "PHP memory limit"
 
-#: include/locales/en_gb.inc.php:1912
+#: include/locales/en_gb.inc.php:1915
 msgid "PHP post max size"
 msgstr "PHP post max size"
 
-#: include/locales/en_gb.inc.php:1918
+#: include/locales/en_gb.inc.php:1921
 msgid "PHP timezone"
 msgstr "PHP часовий пояс"
 
-#: include/locales/en_gb.inc.php:1938
+#: include/locales/en_gb.inc.php:1941
 msgid "PHP upload max filesize"
 msgstr "максимум для PHP upload filesize"
 
-#: include/locales/en_gb.inc.php:1908
+#: include/locales/en_gb.inc.php:1911
 msgid "PHP version"
 msgstr "Версія PHP"
 
@@ -6529,7 +6560,7 @@ msgstr "ПРОБЛЕМА"
 msgid "PROXIES"
 msgstr "ПРОКСІ"
 
-#: include/locales/en_gb.inc.php:1733
+#: include/locales/en_gb.inc.php:1736
 msgid "Page received incorrect data"
 msgstr "Сторінка відіслала некоректні дані"
 
@@ -6545,7 +6576,7 @@ msgstr "Параметр"
 msgid "Parent service"
 msgstr "Батьківська ІТ послуга"
 
-#: include/locales/en_gb.inc.php:1894
+#: include/locales/en_gb.inc.php:1897
 msgid "Parse SQL error"
 msgstr "Помилка обробки SQL"
 
@@ -6569,7 +6600,7 @@ msgstr "Пароль"
 msgid "Password (once again)"
 msgstr "Пароль (підтвердження)"
 
-#: include/locales/en_gb.inc.php:1959
+#: include/locales/en_gb.inc.php:1962
 msgid "Password required for mediatype"
 msgstr "Потрібен пароль для метода повідомлень"
 
@@ -6602,7 +6633,7 @@ msgstr ""
 msgid "Period type"
 msgstr "Тип періоду"
 
-#: include/locales/en_gb.inc.php:1766
+#: include/locales/en_gb.inc.php:1769
 msgid "Peta"
 msgstr "Пета"
 
@@ -6622,7 +6653,7 @@ msgstr "Грати"
 msgid "Play sound"
 msgstr "Програвати звуковий сигнал"
 
-#: include/locales/en_gb.inc.php:1905
+#: include/locales/en_gb.inc.php:1908
 msgid "Please be aware that database still contains data related to the deleted Node"
 msgstr "Будь ласка будьте уважні, бо в базі даних залишаться дані від видаленої ноди"
 
@@ -6634,7 +6665,7 @@ msgstr "Будь-ласка введіть текст підтвердження
 msgid "Please select two elements"
 msgstr "Будь-ласка, оберіть два елементи"
 
-#: include/locales/en_gb.inc.php:1922
+#: include/locales/en_gb.inc.php:1925
 msgid "Please set"
 msgstr "Будь-ласка встановіть"
 
@@ -6656,7 +6687,7 @@ msgstr ""
 msgid "Portuguese (PT)"
 msgstr "Португальська (PT)"
 
-#: include/locales/en_gb.inc.php:1705
+#: include/locales/en_gb.inc.php:1708
 msgid "Position"
 msgstr "Позиція"
 
@@ -6668,36 +6699,36 @@ msgstr "Змінні і дані для HTTP Post"
 msgid "Preview"
 msgstr "Попередній перегляд"
 
-#: include/locales/en_gb.inc.php:206 include/locales/en_gb.inc.php:2030
-#: include/locales/en_gb.inc.php:2032
+#: include/locales/en_gb.inc.php:206 include/locales/en_gb.inc.php:2033
+#: include/locales/en_gb.inc.php:2035
 msgid "Previous"
 msgstr "Назад"
 
-#: include/hosts.inc.php:349
+#: include/hosts.inc.php:350
 msgid "Primary POC cell"
 msgstr ""
 
-#: include/hosts.inc.php:334
+#: include/hosts.inc.php:335
 msgid "Primary POC email"
 msgstr ""
 
-#: include/hosts.inc.php:329
+#: include/hosts.inc.php:330
 msgid "Primary POC name"
 msgstr ""
 
-#: include/hosts.inc.php:359
+#: include/hosts.inc.php:360
 msgid "Primary POC notes"
 msgstr ""
 
-#: include/hosts.inc.php:339
+#: include/hosts.inc.php:340
 msgid "Primary POC phone A"
 msgstr ""
 
-#: include/hosts.inc.php:344
+#: include/hosts.inc.php:345
 msgid "Primary POC phone B"
 msgstr ""
 
-#: include/hosts.inc.php:354
+#: include/hosts.inc.php:355
 msgid "Primary POC screen name"
 msgstr ""
 
@@ -6743,7 +6774,7 @@ msgstr "Проблема, якщо хоча б у одного із підлег
 msgid "Problems"
 msgstr "Проблеми"
 
-#: include/locales/en_gb.inc.php:1978 include/page_header.php:226
+#: include/locales/en_gb.inc.php:1981 include/page_header.php:226
 msgid "Profile"
 msgstr "Профіль"
 
@@ -6793,7 +6824,7 @@ msgstr "Файл публічного ключа"
 msgid "QUEUE OF ITEMS TO BE UPDATED"
 msgstr "ЧЕРГА ЕЛЕМЕНТІВ ДАНИХ, ЯКІ ОЧІКУЮТЬ ОНОВЛЕННЯ"
 
-#: include/locales/en_gb.inc.php:1979 include/menu.inc.php:233
+#: include/locales/en_gb.inc.php:1982 include/menu.inc.php:234
 msgid "Queue"
 msgstr "Черга"
 
@@ -6955,11 +6986,11 @@ msgstr "Замінити"
 msgid "Replace linked templates"
 msgstr "Замінити приєднані шаблони на:"
 
-#: include/locales/en_gb.inc.php:1983
+#: include/locales/en_gb.inc.php:1986
 msgid "Report"
 msgstr "Звіт"
 
-#: include/locales/en_gb.inc.php:1984 include/menu.inc.php:107
+#: include/locales/en_gb.inc.php:1987 include/menu.inc.php:108
 msgid "Reports"
 msgstr "Звіти"
 
@@ -6967,15 +6998,15 @@ msgstr "Звіти"
 msgid "Required"
 msgstr "Вимагається текст-відповідь"
 
-#: include/locales/en_gb.inc.php:1941
+#: include/locales/en_gb.inc.php:1944
 msgid "Required Session module"
 msgstr "Необхідно модуль Session"
 
-#: include/locales/en_gb.inc.php:1930
+#: include/locales/en_gb.inc.php:1933
 msgid "Required Sockets module"
 msgstr "Необхідно модуль Sockets"
 
-#: include/locales/en_gb.inc.php:1943
+#: include/locales/en_gb.inc.php:1946
 msgid "Required gettext module"
 msgstr "Необхідно модуль Gettext"
 
@@ -6991,23 +7022,23 @@ msgstr "Необхідна продуктивність (знач/сек)"
 msgid "Required server performance, new values per second"
 msgstr "Необхідна потужність сервера, нових значень в секунду"
 
-#: include/locales/en_gb.inc.php:1925
+#: include/locales/en_gb.inc.php:1928
 msgid "Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
 msgstr "Необхідно підтримку будь-якої бази даних [MySQL або PostgreSQL або Oracle або SQLite3]"
 
-#: include/locales/en_gb.inc.php:1926
+#: include/locales/en_gb.inc.php:1929
 msgid "Requires bcmath module"
 msgstr "Необхідно модуль bcmath"
 
-#: include/locales/en_gb.inc.php:1937
+#: include/locales/en_gb.inc.php:1940
 msgid "Requires ctype module"
 msgstr "Необхідно модуль ctype"
 
-#: include/locales/en_gb.inc.php:1933
+#: include/locales/en_gb.inc.php:1936
 msgid "Requires images generation support"
 msgstr "Необхідно images generation support"
 
-#: include/locales/en_gb.inc.php:1928
+#: include/locales/en_gb.inc.php:1931
 msgid "Requires mb string module"
 msgstr "Необхідно модуль mb string"
 
@@ -7066,7 +7097,7 @@ msgstr "Результат БРЕХНЯ"
 msgid "Result is TRUE"
 msgstr "Результат ПРАВДА"
 
-#: include/locales/en_gb.inc.php:1716
+#: include/locales/en_gb.inc.php:1719
 msgid "Result type"
 msgstr "Тип результату"
 
@@ -7155,7 +7186,7 @@ msgstr ""
 msgid "Russian (RU)"
 msgstr "Російська (RU)"
 
-#: include/locales/en_gb.inc.php:2003 include/locales/en_gb.inc.php:2004
+#: include/locales/en_gb.inc.php:2006 include/locales/en_gb.inc.php:2007
 msgid "S"
 msgstr "С"
 
@@ -7175,7 +7206,7 @@ msgstr "ПОМИЛКА СКРИПТА"
 msgid "SCRIPTS"
 msgstr "СКРИПТИ"
 
-#: include/locales/en_gb.inc.php:1659
+#: include/locales/en_gb.inc.php:1662
 msgid "SEARCH"
 msgstr "ПОШУК"
 
@@ -7278,15 +7309,15 @@ msgstr "SNMPv3 security level"
 msgid "SNMPv3 security name"
 msgstr "SNMPv3 security name"
 
-#: include/locales/en_gb.inc.php:1741
+#: include/locales/en_gb.inc.php:1744
 msgid "SQL executes count"
 msgstr "Кількість SQL executes"
 
-#: include/locales/en_gb.inc.php:1742
+#: include/locales/en_gb.inc.php:1745
 msgid "SQL requests count"
 msgstr "Кількість SQL requests"
 
-#: include/locales/en_gb.inc.php:1740
+#: include/locales/en_gb.inc.php:1743
 msgid "SQL selects count"
 msgstr "Кількість SQL selects"
 
@@ -7305,7 +7336,7 @@ msgstr "SSH"
 msgid "SSH agent"
 msgstr "SSH агент"
 
-#: include/locales/en_gb.inc.php:1668
+#: include/locales/en_gb.inc.php:1671
 msgid "STANDARD ITEMS"
 msgstr "СТАНДАРТНІ ЕЛЕМЕНТИ"
 
@@ -7437,7 +7468,7 @@ msgid "Screen with name \"%s\" does not exist"
 msgstr "Комплексний екран з іменем \"%s\" не існує"
 
 #: include/locales/en_gb.inc.php:1246 include/menu.inc.php:72
-#: include/menu.inc.php:180
+#: include/menu.inc.php:181
 msgid "Screens"
 msgstr "Комплексні екрани"
 
@@ -7476,7 +7507,7 @@ msgid "Script with scriptid \"%s\" does not exist."
 msgstr ""
 
 #: include/blocks.inc.php:892 include/locales/en_gb.inc.php:1587
-#: include/maps.inc.php:147 include/menu.inc.php:226 report5.php:137
+#: include/maps.inc.php:147 include/menu.inc.php:227 report5.php:137
 #: tr_status.php:554
 msgid "Scripts"
 msgstr "Скрипти"
@@ -7490,7 +7521,7 @@ msgstr "Пошук"
 msgid "Search attribute"
 msgstr "Атрибут пошуку"
 
-#: include/locales/en_gb.inc.php:1663
+#: include/locales/en_gb.inc.php:1666
 msgid "Search pattern is empty"
 msgstr "Шаблон пошуку пустий"
 
@@ -7502,31 +7533,31 @@ msgstr "Ліміт елементів в пошуку/фільтрі"
 msgid "Second"
 msgstr "Другий"
 
-#: include/hosts.inc.php:384
+#: include/hosts.inc.php:385
 msgid "Secondary POC cell"
 msgstr ""
 
-#: include/hosts.inc.php:369
+#: include/hosts.inc.php:370
 msgid "Secondary POC email"
 msgstr ""
 
-#: include/hosts.inc.php:364
+#: include/hosts.inc.php:365
 msgid "Secondary POC name"
 msgstr ""
 
-#: include/hosts.inc.php:394
+#: include/hosts.inc.php:395
 msgid "Secondary POC notes"
 msgstr ""
 
-#: include/hosts.inc.php:374
+#: include/hosts.inc.php:375
 msgid "Secondary POC phone A"
 msgstr ""
 
-#: include/hosts.inc.php:379
+#: include/hosts.inc.php:380
 msgid "Secondary POC phone B"
 msgstr ""
 
-#: include/hosts.inc.php:389
+#: include/hosts.inc.php:390
 msgid "Secondary POC screen name"
 msgstr ""
 
@@ -7552,7 +7583,7 @@ msgstr "Вибрати"
 msgid "Select Nodes"
 msgstr "Вибрати ноди"
 
-#: include/locales/en_gb.inc.php:1896
+#: include/locales/en_gb.inc.php:1899
 msgid "Select image to download"
 msgstr "Оберіть картинку для завантаження"
 
@@ -7621,11 +7652,11 @@ msgstr "Непідтверджені окремо"
 msgid "September"
 msgstr "Вересень"
 
-#: hostprofiles.php:88 include/hosts.inc.php:84
+#: hostprofiles.php:164 include/hosts.inc.php:85
 msgid "Serial number A"
 msgstr ""
 
-#: include/hosts.inc.php:89
+#: include/hosts.inc.php:90
 msgid "Serial number B"
 msgstr ""
 
@@ -7650,7 +7681,7 @@ msgstr "Послуга"
 msgid "Service added"
 msgstr "Послугу додано"
 
-#: include/locales/en_gb.inc.php:1881
+#: include/locales/en_gb.inc.php:1884
 msgid "Service cannot be parent and child at the same time."
 msgstr "Послуга не може бути батьківською та підлеглою одночасно."
 
@@ -7806,43 +7837,43 @@ msgstr "Простий графік"
 msgid "Simple graphs"
 msgstr "Прості графіки"
 
-#: include/hosts.inc.php:314
+#: include/hosts.inc.php:315
 msgid "Site ZIP / postal"
 msgstr ""
 
-#: include/hosts.inc.php:284
+#: include/hosts.inc.php:285
 msgid "Site address A"
 msgstr ""
 
-#: include/hosts.inc.php:289
+#: include/hosts.inc.php:290
 msgid "Site address B"
 msgstr ""
 
-#: include/hosts.inc.php:294
+#: include/hosts.inc.php:295
 msgid "Site address C"
 msgstr ""
 
-#: include/hosts.inc.php:299
+#: include/hosts.inc.php:300
 msgid "Site city"
 msgstr ""
 
-#: include/hosts.inc.php:309
+#: include/hosts.inc.php:310
 msgid "Site country"
 msgstr ""
 
-#: include/hosts.inc.php:324
+#: include/hosts.inc.php:325
 msgid "Site notes"
 msgstr ""
 
-#: include/hosts.inc.php:319
+#: include/hosts.inc.php:320
 msgid "Site rack location"
 msgstr ""
 
-#: include/hosts.inc.php:304
+#: include/hosts.inc.php:305
 msgid "Site state / province"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1866
+#: include/locales/en_gb.inc.php:1869
 msgid "Skipped copying of graph"
 msgstr "Пропущено копіювання графіків"
 
@@ -7854,7 +7885,7 @@ msgstr "Слайдшоу"
 msgid "Slide shows"
 msgstr "Слайдшоу"
 
-#: include/locales/en_gb.inc.php:1288 include/menu.inc.php:184
+#: include/locales/en_gb.inc.php:1288 include/menu.inc.php:185
 msgid "Slides"
 msgstr "Слайди"
 
@@ -7886,31 +7917,31 @@ msgstr "Подрімати"
 msgid "Soft"
 msgstr "Не жорстка"
 
-#: include/hosts.inc.php:124
+#: include/hosts.inc.php:125
 msgid "Software"
 msgstr "Програмне забезпечення"
 
-#: include/hosts.inc.php:129
+#: include/hosts.inc.php:130
 msgid "Software (Full details)"
 msgstr ""
 
-#: include/hosts.inc.php:134
+#: include/hosts.inc.php:135
 msgid "Software application A"
 msgstr ""
 
-#: include/hosts.inc.php:139
+#: include/hosts.inc.php:140
 msgid "Software application B"
 msgstr ""
 
-#: include/hosts.inc.php:144
+#: include/hosts.inc.php:145
 msgid "Software application C"
 msgstr ""
 
-#: include/hosts.inc.php:149
+#: include/hosts.inc.php:150
 msgid "Software application D"
 msgstr ""
 
-#: include/hosts.inc.php:154
+#: include/hosts.inc.php:155
 msgid "Software application E"
 msgstr ""
 
@@ -7954,7 +7985,7 @@ msgstr "Накладається шарами в стек"
 msgid "State"
 msgstr "Статус"
 
-#: include/locales/en_gb.inc.php:1736
+#: include/locales/en_gb.inc.php:1739
 msgid "Stats for"
 msgstr "Статистика для"
 
@@ -7981,7 +8012,7 @@ msgstr "Перев. HTTP-кодів статусу"
 msgid "Status of Web monitoring"
 msgstr "Стан Веб моніторингу"
 
-#: include/locales/en_gb.inc.php:1134 include/menu.inc.php:114
+#: include/locales/en_gb.inc.php:1134 include/menu.inc.php:115
 msgid "Status of Zabbix"
 msgstr "Стан Zabbix"
 
@@ -8044,7 +8075,7 @@ msgstr "Straight"
 msgid "Style"
 msgstr "Спосіб"
 
-#: include/locales/en_gb.inc.php:1777
+#: include/locales/en_gb.inc.php:1780
 msgid "Subfilter"
 msgstr "Субфільтр"
 
@@ -8054,7 +8085,7 @@ msgstr "Субфільтр"
 msgid "Subject"
 msgstr "Тема"
 
-#: include/locales/en_gb.inc.php:1852
+#: include/locales/en_gb.inc.php:1855
 msgid "Submap"
 msgstr "Суб-карта"
 
@@ -8102,8 +8133,8 @@ msgstr ""
 msgid "System status"
 msgstr "Стан системи"
 
-#: include/locales/en_gb.inc.php:1763 include/locales/en_gb.inc.php:1999
-#: include/locales/en_gb.inc.php:2001
+#: include/locales/en_gb.inc.php:1766 include/locales/en_gb.inc.php:2002
+#: include/locales/en_gb.inc.php:2004
 msgid "T"
 msgstr "T"
 
@@ -8145,7 +8176,7 @@ msgstr "ПРАВДА"
 msgid "Table \"%s\" does not exist."
 msgstr "Таблиця \"%s\" не існує."
 
-#: hostprofiles.php:89 include/hosts.inc.php:94
+#: hostprofiles.php:165 include/hosts.inc.php:95
 msgid "Tag"
 msgstr "Тег"
 
@@ -8207,20 +8238,20 @@ msgstr ""
 msgid "Template updated"
 msgstr "Шаблон оновлено"
 
-#: include/locales/en_gb.inc.php:1801
+#: include/locales/en_gb.inc.php:1804
 msgid "Template with application"
 msgstr "Шаблон з групою елементів даних"
 
-#: include/locales/en_gb.inc.php:1800
+#: include/locales/en_gb.inc.php:1803
 msgid "Template with item key"
 msgstr "Шаблон з ключем елементом даних"
 
-#: api/classes/class.chost.php:1424 api/classes/class.ctemplate.php:1390
+#: api/classes/class.chost.php:1439 api/classes/class.ctemplate.php:1390
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr ""
 
-#: api/classes/class.chost.php:1430 api/classes/class.ctemplate.php:1047
+#: api/classes/class.chost.php:1445 api/classes/class.ctemplate.php:1047
 #: api/classes/class.ctemplate.php:1363
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
@@ -8234,7 +8265,7 @@ msgstr "Елемент з шаблону"
 msgid "Templated items"
 msgstr "Елементи даних з шаблону"
 
-#: hosts.php:767 include/locales/en_gb.inc.php:798 include/menu.inc.php:147
+#: hosts.php:767 include/locales/en_gb.inc.php:798 include/menu.inc.php:148
 #: include/views/configuration.host.edit.php:430
 msgid "Templates"
 msgstr "Шаблони"
@@ -8248,7 +8279,7 @@ msgstr "Шаблони [%1$s] від'єднано від вузлів мереж
 msgid "Templates list"
 msgstr "Список шаблонів"
 
-#: include/locales/en_gb.inc.php:1764
+#: include/locales/en_gb.inc.php:1767
 msgid "Tera"
 msgstr "Тера"
 
@@ -8260,7 +8291,7 @@ msgstr "Тест"
 msgid "Test confirmation"
 msgstr "Тест підтвердження"
 
-#: include/locales/en_gb.inc.php:1710
+#: include/locales/en_gb.inc.php:1713
 msgid "Test data"
 msgstr "Тестові дані"
 
@@ -8272,7 +8303,7 @@ msgstr "Тестовий рядок"
 msgid "Text"
 msgstr "Текст (одне поле)"
 
-#: include/locales/en_gb.inc.php:1931
+#: include/locales/en_gb.inc.php:1934
 msgid "The GD extension is not loaded."
 msgstr "GD extension не завантажено."
 
@@ -8317,11 +8348,11 @@ msgstr ""
 msgid "This month"
 msgstr "Цей місяць"
 
-#: include/locales/en_gb.inc.php:1858
+#: include/locales/en_gb.inc.php:1861
 msgid "This screen-column is not empty"
 msgstr "Цей стовпчик не порожній"
 
-#: include/locales/en_gb.inc.php:1857
+#: include/locales/en_gb.inc.php:1860
 msgid "This screen-row is not empty"
 msgstr "Цей рядок не порожній"
 
@@ -8373,7 +8404,7 @@ msgstr "Час очікування"
 msgid "Timestamp"
 msgstr "Час виникнення (штамп)"
 
-#: include/locales/en_gb.inc.php:1921
+#: include/locales/en_gb.inc.php:1924
 msgid "Timezone for PHP is not set"
 msgstr "Часовий пояс для PHP не встановлено"
 
@@ -8407,15 +8438,15 @@ msgstr "По верхньому краю"
 msgid "Total"
 msgstr "Всього"
 
-#: include/locales/en_gb.inc.php:1737
+#: include/locales/en_gb.inc.php:1740
 msgid "Total time"
 msgstr "Загальний час"
 
-#: include/locales/en_gb.inc.php:1743
+#: include/locales/en_gb.inc.php:1746
 msgid "Total time spent on SQL"
 msgstr "Загальний час витрачений у SQL"
 
-#: include/locales/en_gb.inc.php:1849
+#: include/locales/en_gb.inc.php:1852
 msgid "Transaction has not been closed. Aborting.."
 msgstr "Транзакцію не завершено. Скасування.."
 
@@ -8595,7 +8626,7 @@ msgstr "Огляд тригерів"
 msgid "Triggers status"
 msgstr "Статус тригерів"
 
-#: include/menu.inc.php:123
+#: include/menu.inc.php:124
 msgid "Triggers top 100"
 msgstr ""
 
@@ -8615,10 +8646,6 @@ msgstr "Вів"
 msgid "Tuesday"
 msgstr "Вівторок"
 
-#: include/locales.inc.php:76
-msgid "Turkish (TR)"
-msgstr ""
-
 #: include/locales/en_gb.inc.php:1024
 msgid "Two elements should be selected"
 msgstr "Має бути обрано два елементи"
@@ -8628,7 +8655,7 @@ msgstr "Має бути обрано два елементи"
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host profile field \"%3$s\", this would lead to a conflict."
 msgstr ""
 
-#: hostprofiles.php:86 include/hosts.inc.php:49
+#: hostprofiles.php:162 include/hosts.inc.php:50
 #: include/locales/en_gb.inc.php:299
 #: include/views/administration.script.edit.php:49
 #: include/views/administration.script.list.php:41
@@ -8637,7 +8664,7 @@ msgstr ""
 msgid "Type"
 msgstr "Тип"
 
-#: include/hosts.inc.php:54
+#: include/hosts.inc.php:55
 msgid "Type (Full details)"
 msgstr ""
 
@@ -8683,15 +8710,15 @@ msgstr "URL-запит"
 msgid "URL (after login)"
 msgstr "URL (після входу в систему)"
 
-#: include/hosts.inc.php:219
+#: include/hosts.inc.php:220
 msgid "URL A"
 msgstr ""
 
-#: include/hosts.inc.php:224
+#: include/hosts.inc.php:225
 msgid "URL B"
 msgstr ""
 
-#: include/hosts.inc.php:229
+#: include/hosts.inc.php:230
 msgid "URL C"
 msgstr ""
 
@@ -8719,11 +8746,11 @@ msgstr "UTF-8"
 msgid "Ukrainian (UA)"
 msgstr "Українська (UA)"
 
-#: include/locales/en_gb.inc.php:1904
+#: include/locales/en_gb.inc.php:1907
 msgid "Unable to remove local node"
 msgstr "Не вдалося видалити локальну ноду"
 
-#: include/locales/en_gb.inc.php:1869
+#: include/locales/en_gb.inc.php:1872
 msgid "Unable to select configuration"
 msgstr "Не вдалося обрати конфігурацію"
 
@@ -8744,7 +8771,7 @@ msgstr "Розблокувати вибране"
 msgid "Unblock selected users?"
 msgstr "Розблокувати вибраних користувачів?"
 
-#: include/locales/en_gb.inc.php:1686
+#: include/locales/en_gb.inc.php:1689
 msgid "Unexpected end of element"
 msgstr "Неочікувание закінчення елемента"
 
@@ -8763,15 +8790,15 @@ msgstr "Невідомо"
 msgid "Unknown action"
 msgstr "Невідома дія"
 
-#: include/locales/en_gb.inc.php:1886
+#: include/locales/en_gb.inc.php:1889
 msgid "Unknown calculation algorithm of service status"
 msgstr "Невідомий алгоритм розрахунку статусу послуги"
 
-#: include/locales/en_gb.inc.php:1714
+#: include/locales/en_gb.inc.php:1717
 msgid "Unknown host item, no such item in selected host"
 msgstr "Невідомий елемент даних вузла мережі, не має цього елемента в обраному вузлі"
 
-#: include/locales/en_gb.inc.php:1713
+#: include/locales/en_gb.inc.php:1716
 msgid "Unknown host, no such host present in system"
 msgstr "Невідомий вузел мережі, його не представлено в системі"
 
@@ -8783,7 +8810,7 @@ msgstr "Невідомий ресурс"
 msgid "Unknown value type"
 msgstr "Невідомий тип"
 
-#: include/locales/en_gb.inc.php:1712
+#: include/locales/en_gb.inc.php:1715
 msgid "Unknown variable type, testing not available"
 msgstr "Невідомий тип значення, тому тестування не доступне"
 
@@ -8813,7 +8840,7 @@ msgstr ""
 msgid "Unmute"
 msgstr "УВІМК звук"
 
-#: include/locales/en_gb.inc.php:1691
+#: include/locales/en_gb.inc.php:1694
 msgid "Unnecessary symbols detected"
 msgstr "Виявлено зайві символи"
 
@@ -8982,7 +9009,7 @@ msgstr ""
 msgid "Username"
 msgstr "Ім'я користувача"
 
-#: include/locales/en_gb.inc.php:1505 include/menu.inc.php:219
+#: include/locales/en_gb.inc.php:1505 include/menu.inc.php:220
 msgid "Users"
 msgstr "Користувачі"
 
@@ -9075,7 +9102,7 @@ msgstr "Збережених значень історії"
 msgid "Variables"
 msgstr "Змінні"
 
-#: include/hosts.inc.php:199
+#: include/hosts.inc.php:200
 msgid "Vendor"
 msgstr ""
 
@@ -9100,11 +9127,11 @@ msgstr ""
 msgid "Visible name"
 msgstr ""
 
-#: api/classes/class.chost.php:1359
+#: api/classes/class.chost.php:1374
 msgid "Visible name cannot be empty if missing host name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2000
+#: include/locales/en_gb.inc.php:2003
 msgid "W"
 msgstr "С"
 
@@ -9117,16 +9144,16 @@ msgstr "ВЕБ ПЕРЕВІРКИ"
 msgid "Warning"
 msgstr "Попередження"
 
-#: include/validate.inc.php:555
+#: include/validate.inc.php:553
 #, php-format
 msgid "Warning. Incorrect value for field \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2026
+#: include/locales/en_gb.inc.php:2029
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Вибачте, але досягнуто максимум для запам'ятовування елементів."
 
-#: include/menu.inc.php:42 include/menu.inc.php:173
+#: include/menu.inc.php:42 include/menu.inc.php:174
 msgid "Web"
 msgstr "Веб"
 
@@ -9227,7 +9254,7 @@ msgstr ""
 msgid "Wrong fields for graph"
 msgstr "Помилкові поля для графіка"
 
-#: api/classes/class.chost.php:1289
+#: api/classes/class.chost.php:1304
 #, php-format
 msgid "Wrong fields for host \"%s\""
 msgstr ""
@@ -9253,7 +9280,7 @@ msgstr ""
 msgid "Wrong fields for map link"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1958
+#: include/locales/en_gb.inc.php:1961
 msgid "Wrong fields for media type"
 msgstr "Помилкові поля для метода повідомлень"
 
@@ -9290,7 +9317,7 @@ msgstr ""
 msgid "Wrong macro"
 msgstr "Невірний макрос"
 
-#: include/locales/en_gb.inc.php:1954
+#: include/locales/en_gb.inc.php:1957
 msgid "Wrong period ["
 msgstr "Невірний період ["
 
@@ -9302,12 +9329,12 @@ msgstr "Функції передано помилковий тип параме
 msgid "X"
 msgstr "X"
 
-#: include/locales/en_gb.inc.php:1995
+#: include/locales/en_gb.inc.php:1998
 msgid "XML file contains errors"
 msgstr "XML файл містить помилки"
 
 #: include/locales/en_gb.inc.php:1196 include/locales/en_gb.inc.php:1216
-#: include/locales/en_gb.inc.php:1771
+#: include/locales/en_gb.inc.php:1774
 msgid "Y"
 msgstr "Y"
 
@@ -9340,7 +9367,7 @@ msgstr "d.m.Y"
 msgid "Y.m.d H:i"
 msgstr "d.m.Y H:i"
 
-#: include/locales/en_gb.inc.php:1064 include/locales/en_gb.inc.php:1773
+#: include/locales/en_gb.inc.php:1064 include/locales/en_gb.inc.php:1776
 msgid "Y.m.d H:i:s"
 msgstr "d.m.Y H:i:s"
 
@@ -9356,7 +9383,7 @@ msgstr "Щороку"
 msgid "Yes"
 msgstr "Так"
 
-#: include/locales/en_gb.inc.php:1772
+#: include/locales/en_gb.inc.php:1775
 msgid "Yotta"
 msgstr "Йота"
 
@@ -9369,19 +9396,19 @@ msgstr "Ви не можете вибрати деякі з мов, тому щ�
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1969
+#: include/locales/en_gb.inc.php:1972
 msgid "You are not logged in."
 msgstr "Ви не увійшли в систему."
 
-#: include/locales/en_gb.inc.php:1673
+#: include/locales/en_gb.inc.php:1676
 msgid "You can not switch hosts for current selection"
 msgstr "Ви не можете переключатись між вузлами мережі для пототного вибору"
 
-#: include/locales/en_gb.inc.php:1835
+#: include/locales/en_gb.inc.php:1838
 msgid "You can not use template hosts in mixed expressions."
 msgstr "Ви не можете використовувати шаблон вузла в змішаному виразі."
 
-#: include/locales/en_gb.inc.php:1966
+#: include/locales/en_gb.inc.php:1969
 msgid "You cannot view this URL as a"
 msgstr "Ви не можете переглядати це посилання як"
 
@@ -9403,11 +9430,11 @@ msgstr ""
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr ""
 
-#: api/classes/class.chost.php:1608
+#: api/classes/class.chost.php:1623
 msgid "You do not have enough rights for operation"
 msgstr "Ви не маєте достатніх прав для операції"
 
-#: include/locales/en_gb.inc.php:1992
+#: include/locales/en_gb.inc.php:1995
 msgid "You do not have permission to perform this operation"
 msgstr "У вас не має повноважень для виконання цієї операції"
 
@@ -9447,7 +9474,7 @@ msgstr ""
 msgid "You do not have permissions to update user or user does not exist."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1967
+#: include/locales/en_gb.inc.php:1970
 msgid "You must login to view this page."
 msgstr "Ви маєте увійти в систему для перегляду цієї сторінки."
 
@@ -9455,7 +9482,7 @@ msgstr "Ви маєте увійти в систему для перегляду
 msgid "Your setup is not configured for distributed monitoring"
 msgstr "Ваша інсталяція не налаштована для розподіленого моніторингу"
 
-#: include/locales/en_gb.inc.php:1769
+#: include/locales/en_gb.inc.php:1772
 msgid "Z"
 msgstr "Z"
 
@@ -9543,23 +9570,23 @@ msgstr "Порт Zabbix сервера"
 msgid "Zabbix trapper"
 msgstr "Zabbix трапер"
 
-#: include/locales/en_gb.inc.php:1770
+#: include/locales/en_gb.inc.php:1773
 msgid "Zetta"
 msgstr "Зетта"
 
-#: include/locales/en_gb.inc.php:2007
+#: include/locales/en_gb.inc.php:2010
 msgid "Zoom"
 msgstr "Період"
 
-#: include/locales/en_gb.inc.php:1860
+#: include/locales/en_gb.inc.php:1863
 msgid "[H:i:s]"
 msgstr "[H:i:s]"
 
-#: include/locales/en_gb.inc.php:1973
+#: include/locales/en_gb.inc.php:1976
 msgid "[Wrong value for day of week:"
 msgstr "[Невірне значення для дня тижня:"
 
-#: include/locales/en_gb.inc.php:1971
+#: include/locales/en_gb.inc.php:1974
 msgid "[Wrong value for month:"
 msgstr "[Невірне значення для місяця:"
 
@@ -9567,8 +9594,8 @@ msgstr "[Невірне значення для місяця:"
 msgid "[Y.M.d H:i:s]"
 msgstr "[d.m.Y H:i:s]"
 
-#: include/locales/en_gb.inc.php:1955 include/locales/en_gb.inc.php:1972
-#: include/locales/en_gb.inc.php:1974
+#: include/locales/en_gb.inc.php:1958 include/locales/en_gb.inc.php:1975
+#: include/locales/en_gb.inc.php:1977
 msgid "]"
 msgstr "]"
 
@@ -9580,11 +9607,11 @@ msgstr "додати"
 msgid "add graph items first"
 msgstr "спочатку додайте елементи до графіку"
 
-#: include/locales/en_gb.inc.php:1793
+#: include/locales/en_gb.inc.php:1796
 msgid "added"
 msgstr "додано"
 
-#: include/locales/en_gb.inc.php:1778
+#: include/locales/en_gb.inc.php:1781
 msgid "affects only filtered data!"
 msgstr "впливає тільки на відфільтровані дані!"
 
@@ -9596,11 +9623,11 @@ msgstr "всі"
 msgid "already exists"
 msgstr "вже існує"
 
-#: include/locales/en_gb.inc.php:1787
+#: include/locales/en_gb.inc.php:1790
 msgid "already exists for host"
 msgstr "вже існує для вузла мережі"
 
-#: include/locales/en_gb.inc.php:1802
+#: include/locales/en_gb.inc.php:1805
 msgid "already linked to host"
 msgstr "вже приєднано до вузла мережі"
 
@@ -9611,7 +9638,7 @@ msgstr "вже приєднано до вузла мережі"
 msgid "and"
 msgstr "та"
 
-#: include/locales/en_gb.inc.php:1805
+#: include/locales/en_gb.inc.php:1808
 msgid "and can't be deleted"
 msgstr "та не може бути видалено"
 
@@ -9627,7 +9654,7 @@ msgstr "зеленим"
 msgid "as Red"
 msgstr "червоним"
 
-#: include/locales/en_gb.inc.php:1830
+#: include/locales/en_gb.inc.php:1833
 msgid "available only for items with value types"
 msgstr "доступна тільки для елемента даних з Типом інформації"
 
@@ -9635,11 +9662,11 @@ msgstr "доступна тільки для елемента даних з Ти
 msgid "avg"
 msgstr "сер."
 
-#: include/locales/en_gb.inc.php:1927
+#: include/locales/en_gb.inc.php:1930
 msgid "configure PHP with"
 msgstr "налаштуйте PHP з"
 
-#: include/locales/en_gb.inc.php:1816
+#: include/locales/en_gb.inc.php:1819
 msgid "contains Multibyte chars"
 msgstr "містить багато-байтні символи"
 
@@ -9647,7 +9674,7 @@ msgstr "містить багато-байтні символи"
 msgid "created"
 msgstr "створено"
 
-#: include/locales/en_gb.inc.php:1936
+#: include/locales/en_gb.inc.php:1939
 msgid "ctype module"
 msgstr "модуль ctype"
 
@@ -9656,7 +9683,7 @@ msgid "d"
 msgstr "д"
 
 #: include/locales/en_gb.inc.php:1198 include/locales/en_gb.inc.php:1218
-#: include/locales/en_gb.inc.php:1878
+#: include/locales/en_gb.inc.php:1881
 msgid "d M Y"
 msgstr "d.m.Y"
 
@@ -9674,8 +9701,8 @@ msgstr "d.m.Y H:i"
 #: include/locales/en_gb.inc.php:965 include/locales/en_gb.inc.php:966
 #: include/locales/en_gb.inc.php:967 include/locales/en_gb.inc.php:968
 #: include/locales/en_gb.inc.php:973 include/locales/en_gb.inc.php:1130
-#: include/locales/en_gb.inc.php:1243 include/locales/en_gb.inc.php:1676
-#: include/locales/en_gb.inc.php:1680 include/locales/en_gb.inc.php:1859
+#: include/locales/en_gb.inc.php:1243 include/locales/en_gb.inc.php:1679
+#: include/locales/en_gb.inc.php:1683 include/locales/en_gb.inc.php:1862
 msgid "d M Y H:i:s"
 msgstr "d.m.Y H:i:s"
 
@@ -9700,11 +9727,11 @@ msgstr "d.m.Y H:i"
 msgid "d.m.y"
 msgstr "d.m.y"
 
-#: include/locales/en_gb.inc.php:1874
+#: include/locales/en_gb.inc.php:1877
 msgid "day"
 msgstr "день"
 
-#: include/locales/en_gb.inc.php:1749
+#: include/locales/en_gb.inc.php:1752
 msgid "days"
 msgstr "днів"
 
@@ -9712,11 +9739,11 @@ msgstr "днів"
 msgid "default"
 msgstr "по замовчуванню"
 
-#: include/locales/en_gb.inc.php:1990
+#: include/locales/en_gb.inc.php:1993
 msgid "does not exist"
 msgstr "не існує"
 
-#: include/locales/en_gb.inc.php:2009
+#: include/locales/en_gb.inc.php:2012
 msgid "dynamic"
 msgstr "динаміч."
 
@@ -9728,27 +9755,31 @@ msgstr "копіювати елементи в ..."
 msgid "esc_step_from and esc_step_to must be set together."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1873
+#: include/locales/en_gb.inc.php:1876
 msgid "every"
 msgstr "кожен"
+
+#: hostprofiles.php:123
+msgid "exactly"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:304
 msgid "executed"
 msgstr "виконано"
 
-#: include/locales/en_gb.inc.php:2008
+#: include/locales/en_gb.inc.php:2011
 msgid "fixed"
 msgstr "фіксов."
 
-#: include/locales/en_gb.inc.php:1829
+#: include/locales/en_gb.inc.php:1832
 msgid "for function"
 msgstr "для функції"
 
-#: include/locales/en_gb.inc.php:1827
+#: include/locales/en_gb.inc.php:1830
 msgid "for host"
 msgstr "для вузла мережі"
 
-#: include/locales/en_gb.inc.php:1661
+#: include/locales/en_gb.inc.php:1664
 msgid "found"
 msgstr "знайдених"
 
@@ -9756,7 +9787,7 @@ msgstr "знайдених"
 msgid "h"
 msgstr "г"
 
-#: include/locales/en_gb.inc.php:1804
+#: include/locales/en_gb.inc.php:1807
 msgid "has been deleted from the system"
 msgstr "було видалено з системи"
 
@@ -9801,15 +9832,15 @@ msgstr "некоректний синтаксис біля '%1$s' в позиц�
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
 msgstr "некоркетне використання символа дужки. '%s' знайдено після останньої дужки."
 
-#: include/locales/en_gb.inc.php:1911
+#: include/locales/en_gb.inc.php:1914
 msgid "is a minimal PHP memory limitation"
 msgstr "це мінімельне значення для обмеження PHP пам'яті"
 
-#: include/locales/en_gb.inc.php:1916
+#: include/locales/en_gb.inc.php:1919
 msgid "is a minimal limitation on execution time of PHP scripts"
 msgstr "це мінімальне значення для обмеження часу виконання PHP скриптів"
 
-#: include/locales/en_gb.inc.php:1917
+#: include/locales/en_gb.inc.php:1920
 msgid "is a minimal limitation on input parse time for PHP scripts"
 msgstr "це мінімальне значення для обмеження часу обробки вводу PHP скриптів"
 
@@ -9817,55 +9848,55 @@ msgstr "це мінімальне значення для обмеження ч�
 msgid "is a wrong time format. Should be from 00:00 to 24:00."
 msgstr "це невірний формат часу. Має бути від 00:00 до 24:00."
 
-#: include/locales/en_gb.inc.php:1796
+#: include/locales/en_gb.inc.php:1799
 msgid "is internal and can not be deleted"
 msgstr "це внутрішнє і тому не може бути видалено"
 
-#: include/locales/en_gb.inc.php:1819
+#: include/locales/en_gb.inc.php:1822
 msgid "is mandatory"
 msgstr "є обов'язковим"
 
-#: include/locales/en_gb.inc.php:1939
+#: include/locales/en_gb.inc.php:1942
 msgid "is minimum for PHP upload filesize"
 msgstr "це мінімум для PHP upload filesize"
 
-#: include/locales/en_gb.inc.php:1913
+#: include/locales/en_gb.inc.php:1916
 msgid "is minimum size of PHP post"
 msgstr "це мінімальне значення для PHP post"
 
-#: include/locales/en_gb.inc.php:1810
+#: include/locales/en_gb.inc.php:1813
 msgid "is not IP range"
 msgstr "це не IP діапазон"
 
-#: include/locales/en_gb.inc.php:1811
+#: include/locales/en_gb.inc.php:1814
 msgid "is not PORT range"
 msgstr "це не діапазон портів"
 
-#: include/locales/en_gb.inc.php:1818
+#: include/locales/en_gb.inc.php:1821
 msgid "is not a colour"
 msgstr "це не колір"
 
-#: include/locales/en_gb.inc.php:1833
+#: include/locales/en_gb.inc.php:1836
 msgid "is not a float or counter or macro for function"
 msgstr "це не число (з плаваючою крапкою) або лічильник або маркос для функції"
 
-#: include/locales/en_gb.inc.php:1832
+#: include/locales/en_gb.inc.php:1835
 msgid "is not a float or macro for function"
 msgstr "це не число (з плаваючою крапкою) або маркос для функції"
 
-#: include/locales/en_gb.inc.php:1814
+#: include/locales/en_gb.inc.php:1817
 msgid "is not double"
 msgstr "це не дробове число"
 
-#: include/locales/en_gb.inc.php:1813
+#: include/locales/en_gb.inc.php:1816
 msgid "is not integer"
 msgstr "це не число (ціле)"
 
-#: include/locales/en_gb.inc.php:1812
+#: include/locales/en_gb.inc.php:1815
 msgid "is not integer range"
 msgstr "це не діапазон чисел (цілих)"
 
-#: include/locales/en_gb.inc.php:1815
+#: include/locales/en_gb.inc.php:1818
 msgid "is not string"
 msgstr "це не текст"
 
@@ -9877,20 +9908,21 @@ msgstr "l H:i"
 msgid "last"
 msgstr "ост."
 
-#: include/locales/en_gb.inc.php:1934
+#: include/locales/en_gb.inc.php:1937
 msgid "libxml module"
 msgstr "модуль libxml"
 
-#: include/actions.inc.php:25 include/locales/en_gb.inc.php:286
+#: hostprofiles.php:122 include/actions.inc.php:25
+#: include/locales/en_gb.inc.php:286
 msgid "like"
 msgstr "містить"
 
 #: include/locales/en_gb.inc.php:30 include/locales/en_gb.inc.php:34
-#: include/locales/en_gb.inc.php:1755
+#: include/locales/en_gb.inc.php:1758
 msgid "m"
 msgstr "м"
 
-#: include/locales/en_gb.inc.php:1695
+#: include/locales/en_gb.inc.php:1698
 msgid "macro(s)"
 msgstr "макрос(и)"
 
@@ -9922,11 +9954,11 @@ msgstr "мін. значення"
 msgid "ms"
 msgstr "мс"
 
-#: include/locales/en_gb.inc.php:1817
+#: include/locales/en_gb.inc.php:1820
 msgid "multibyte chars are restricted"
 msgstr "багато-байтні символи заборонено"
 
-#: include/locales/en_gb.inc.php:1820
+#: include/locales/en_gb.inc.php:1823
 msgid "must be missing"
 msgstr "має бути відсутнім"
 
@@ -9934,11 +9966,11 @@ msgstr "має бути відсутнім"
 msgid "must be valid"
 msgstr "має бути дійсний"
 
-#: include/locales/en_gb.inc.php:1751
+#: include/locales/en_gb.inc.php:1754
 msgid "n"
 msgstr "n"
 
-#: include/locales/en_gb.inc.php:1919
+#: include/locales/en_gb.inc.php:1922
 msgid "no"
 msgstr "ні"
 
@@ -9958,7 +9990,7 @@ msgstr "не містить"
 msgid "not running"
 msgstr "не запущено"
 
-#: include/locales/en_gb.inc.php:494
+#: hostprofilesoverview.php:66 include/locales/en_gb.inc.php:494
 msgid "not selected"
 msgstr "не обрано"
 
@@ -9967,7 +9999,7 @@ msgstr "не обрано"
 msgid "not sent"
 msgstr "не надіслано"
 
-#: include/locales/en_gb.inc.php:2010
+#: include/locales/en_gb.inc.php:2013
 msgid "now"
 msgstr "зараз"
 
@@ -9975,15 +10007,15 @@ msgstr "зараз"
 msgid "of"
 msgstr "із"
 
-#: include/locales/en_gb.inc.php:1875
+#: include/locales/en_gb.inc.php:1878
 msgid "of every"
 msgstr "в кожен(ні)"
 
-#: include/locales/en_gb.inc.php:1872
+#: include/locales/en_gb.inc.php:1875
 msgid "on"
 msgstr "в"
 
-#: include/locales/en_gb.inc.php:1923
+#: include/locales/en_gb.inc.php:1926
 msgid "option in"
 msgstr "параметри в"
 
@@ -9995,11 +10027,11 @@ msgstr "параметри в"
 msgid "or"
 msgstr "або"
 
-#: include/locales/en_gb.inc.php:2023
+#: include/locales/en_gb.inc.php:2026
 msgid "other"
 msgstr "інший"
 
-#: include/locales/en_gb.inc.php:1935
+#: include/locales/en_gb.inc.php:1938
 msgid "php-xml module is not installed"
 msgstr "модуль php-xml не встановлено"
 
@@ -10011,7 +10043,7 @@ msgstr "r"
 msgid "refresh now"
 msgstr "оновити зараз"
 
-#: include/locales/en_gb.inc.php:1732
+#: include/locales/en_gb.inc.php:1735
 msgid "refreshed every"
 msgstr "оновлення кожні"
 
@@ -10044,7 +10076,7 @@ msgstr "секунд"
 msgid "sent"
 msgstr "надіслано"
 
-#: include/locales/en_gb.inc.php:1779
+#: include/locales/en_gb.inc.php:1782
 msgid "show value mappings"
 msgstr "перетворення значень"
 
@@ -10057,7 +10089,7 @@ msgstr ""
 msgid "to"
 msgstr "до"
 
-#: include/locales/en_gb.inc.php:1837
+#: include/locales/en_gb.inc.php:1840
 msgid "to host"
 msgstr "до вузла"
 
@@ -10065,11 +10097,11 @@ msgstr "до вузла"
 msgid "trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1788
+#: include/locales/en_gb.inc.php:1791
 msgid "updated"
 msgstr "оновлено"
 
-#: include/locales/en_gb.inc.php:1798
+#: include/locales/en_gb.inc.php:1801
 msgid "used by scenario"
 msgstr "використовується сценарієм"
 
@@ -10085,15 +10117,15 @@ msgstr "використовується в експортованих комп�
 msgid "w"
 msgstr "т"
 
-#: include/locales/en_gb.inc.php:1877
+#: include/locales/en_gb.inc.php:1880
 msgid "week"
 msgstr "тиждень"
 
-#: include/locales/en_gb.inc.php:1876
+#: include/locales/en_gb.inc.php:1879
 msgid "weeks"
 msgstr "тижнів"
 
-#: include/locales/en_gb.inc.php:1865
+#: include/locales/en_gb.inc.php:1868
 msgid "with template host cannot contain items from other hosts."
 msgstr ""
 
@@ -10101,11 +10133,11 @@ msgstr ""
 msgid "y"
 msgstr "р"
 
-#: include/locales/en_gb.inc.php:1920
+#: include/locales/en_gb.inc.php:1923
 msgid "yes"
 msgstr "так"
 
-#: include/locales/en_gb.inc.php:1753
+#: include/locales/en_gb.inc.php:1756
 msgid "µ"
 msgstr "µ"
 
