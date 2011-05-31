@@ -20,11 +20,19 @@
 #ifndef ZABBIX_CFG_H
 #define ZABBIX_CFG_H
 
-#define	TYPE_INT	0
-#define	TYPE_STRING	1
+#define	TYPE_INT		0
+#define	TYPE_STRING		1
+#define	TYPE_MULTISTRING	2
 
 #define	PARM_OPT	0
 #define	PARM_MAND	1
+
+/* config file parsing options */
+#define	ZBX_CFG_FILE_REQUIRED	0
+#define	ZBX_CFG_FILE_OPTIONAL	1
+
+#define	ZBX_CFG_NOT_STRICT	0
+#define	ZBX_CFG_STRICT		1
 
 extern int	CONFIG_ZABBIX_FORKS;	/* contains the number of listeners for processing passive checks */
 extern char	*CONFIG_FILE;
@@ -36,14 +44,12 @@ struct cfg_line
 {
 	char	*parameter;
 	void	*variable;
-	int	(*function)();
 	int	type;
 	int	mandatory;
 	int	min;
 	int	max;
 };
 
-int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg);
-int	parse_opt_cfg_file(const char *cfg_file, struct cfg_line *cfg);
+int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict);
 
 #endif
