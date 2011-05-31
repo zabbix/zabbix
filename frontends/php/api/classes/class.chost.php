@@ -53,7 +53,7 @@ class CHost extends CZBXAPI{
  * @param boolean $options['selectApplications'] select Applications
  * @param boolean $options['selectMacros'] select Macros
  * @param boolean|array $options['selectProfile'] select Profile
- * @param boolean $options['withProfiles'] select only hosts wth profiles
+ * @param boolean $options['withProfile'] select only hosts wth profiles
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
  * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
@@ -108,7 +108,7 @@ class CHost extends CZBXAPI{
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
-			'withProfiles'				=> null,
+			'withProfile'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 
@@ -486,8 +486,8 @@ class CHost extends CZBXAPI{
 						' AND i.itemid=gi.itemid)';
 		}
 
-// withProfiles
-		if(!is_null($options['withProfiles']) && $options['withProfiles']){
+// withProfile
+		if(!is_null($options['withProfile']) && $options['withProfile']){
 			$sql_parts['where'][] = ' h.hostid IN ( '.
 					' SELECT hp.hostid '.
 					' FROM host_profile hp )';

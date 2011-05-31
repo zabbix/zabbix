@@ -176,40 +176,44 @@ else{
 			'tag',
 			'macaddress_a'
 		);
-		// if we are filtering by field, this field is also required
-		if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value'])){
-			$requiredProfileFields[] = $_REQUEST['filter_field'];
+
+		// checking if correct profile field is specified for filter
+		$possibleProfileFields = getHostProfiles();
+		$possibleProfileFields = zbx_toHash($possibleProfileFields, 'db_field');
+		if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value']) && !isset($possibleProfileFields[$_REQUEST['filter_field']])){
+			error(_s('Impossible to filter by profile field "%s", which does not exist.', $_REQUEST['filter_field']));
+			$hosts = array();
+			$paging = getPagingLine($hosts);
 		}
-
-		$options = array(
-			'output' => array('hostid', 'name'),
-			'selectProfile' => $requiredProfileFields,
-			'withProfiles' => true,
-			'selectGroups' => API_OUTPUT_EXTEND,
-			'limit' => ($config['search_limit'] + 1)
-		);
-		if($pageFilter->groupid > 0)
-			$options['groupids'] = $pageFilter->groupid;
-
-		$hosts = API::Host()->get($options);
-
-		// copy some profile fields to the uppers array level for sorting
-		// and filter out hosts if we are using filter
-		foreach($hosts as $num => $host){
-			$hosts[$num]['pr_name'] = $host['profile']['name'];
-			$hosts[$num]['pr_type'] = $host['profile']['type'];
-			$hosts[$num]['pr_os'] = $host['profile']['os'];
-			$hosts[$num]['pr_serialno_a'] = $host['profile']['serialno_a'];
-			$hosts[$num]['pr_tag'] = $host['profile']['tag'];
-			$hosts[$num]['pr_macaddress_a'] = $host['profile']['macaddress_a'];
-			// if we are filtering by profile field
+		else{
+			// if we are filtering by field, this field is also required
 			if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value'])){
-				if(!isset($hosts[$num]['profile'][$_REQUEST['filter_field']])){
-					error(_s('Impossible to filter by profile field "%s", which does not exist.', $_REQUEST['filter_field']));
-					$hosts = array();
-					break;
-				}
-				else{
+				$requiredProfileFields[] = $_REQUEST['filter_field'];
+			}
+
+			$options = array(
+				'output' => array('hostid', 'name'),
+				'selectProfile' => $requiredProfileFields,
+				'withProfile' => true,
+				'selectGroups' => API_OUTPUT_EXTEND,
+				'limit' => ($config['search_limit'] + 1)
+			);
+			if($pageFilter->groupid > 0)
+				$options['groupids'] = $pageFilter->groupid;
+
+			$hosts = API::Host()->get($options);
+
+			// copy some profile fields to the uppers array level for sorting
+			// and filter out hosts if we are using filter
+			foreach($hosts as $num => $host){
+				$hosts[$num]['pr_name'] = $host['profile']['name'];
+				$hosts[$num]['pr_type'] = $host['profile']['type'];
+				$hosts[$num]['pr_os'] = $host['profile']['os'];
+				$hosts[$num]['pr_serialno_a'] = $host['profile']['serialno_a'];
+				$hosts[$num]['pr_tag'] = $host['profile']['tag'];
+				$hosts[$num]['pr_macaddress_a'] = $host['profile']['macaddress_a'];
+				// if we are filtering by profile field
+				if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value'])){
 					// must we filter exactly or using a substring (both are case insensitive)
 					$match = $_REQUEST['filter_exact']
 							? zbx_strtolower($hosts[$num]['profile'][$_REQUEST['filter_field']]) === zbx_strtolower($_REQUEST['filter_field_value'])
@@ -222,32 +226,32 @@ else{
 					}
 				}
 			}
-		}
 
-		order_result($hosts, getPageSortField('name'), getPageSortOrder());
-		$paging = getPagingLine($hosts);
+			order_result($hosts, getPageSortField('name'), getPageSortOrder());
+			$paging = getPagingLine($hosts);
 
-		foreach($hosts as $host){
-			$host_groups = array();
-			foreach($host['groups'] as $group){
-				$host_groups[] = $group['name'];
+			foreach($hosts as $host){
+				$host_groups = array();
+				foreach($host['groups'] as $group){
+					$host_groups[] = $group['name'];
+				}
+				natsort($host_groups);
+				$host_groups = implode(', ', $host_groups);
+
+				$row = array(
+					get_node_name_by_elid($host['hostid']),
+					new CLink($host['name'],'?hostid='.$host['hostid'].url_param('groupid')),
+					$host_groups,
+					zbx_str2links($host['profile']['name']),
+					zbx_str2links($host['profile']['type']),
+					zbx_str2links($host['profile']['os']),
+					zbx_str2links($host['profile']['serialno_a']),
+					zbx_str2links($host['profile']['tag']),
+					zbx_str2links($host['profile']['macaddress_a']),
+				);
+
+				$table->addRow($row);
 			}
-			natsort($host_groups);
-			$host_groups = implode(', ', $host_groups);
-
-			$row = array(
-				get_node_name_by_elid($host['hostid']),
-				new CLink($host['name'],'?hostid='.$host['hostid'].url_param('groupid')),
-				$host_groups,
-				zbx_str2links($host['profile']['name']),
-				zbx_str2links($host['profile']['type']),
-				zbx_str2links($host['profile']['os']),
-				zbx_str2links($host['profile']['serialno_a']),
-				zbx_str2links($host['profile']['tag']),
-				zbx_str2links($host['profile']['macaddress_a']),
-			);
-
-			$table->addRow($row);
 		}
 	}
 
@@ -255,9 +259,7 @@ else{
 	$hostprof_wdgt->addItem($table);
 }
 
-
 $hostprof_wdgt->show();
-
 
 include_once('include/page_footer.php');
 ?>
