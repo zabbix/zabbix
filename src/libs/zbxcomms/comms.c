@@ -378,7 +378,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		goto out;
 	}
 
-#if !defined(_WINDOWS) && defined(HAVE_FCNTL_H) && !SOCK_CLOEXEC
+#if !defined(_WINDOWS) && !SOCK_CLOEXEC
 	fcntl(s->socket, F_SETFD, FD_CLOEXEC);
 #endif
 
@@ -445,7 +445,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		return FAIL;
 	}
 
-#if !defined(_WINDOWS) && defined(HAVE_FCNTL_H) && !SOCK_CLOEXEC
+#if !defined(_WINDOWS) && !SOCK_CLOEXEC
 	fcntl(s->socket, F_SETFD, FD_CLOEXEC);
 #endif
 
@@ -702,7 +702,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 					goto out;
 			}
 
-#if !defined(_WINDOWS) && defined(HAVE_FCNTL_H) && !SOCK_CLOEXEC
+#if !defined(_WINDOWS) && !SOCK_CLOEXEC
 			fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
 #endif
 
@@ -822,7 +822,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			goto out;
 		}
 
-#if !defined(_WINDOWS) && defined(HAVE_FCNTL_H) && !SOCK_CLOEXEC
+#if !defined(_WINDOWS) && !SOCK_CLOEXEC
 		fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
 #endif
 
