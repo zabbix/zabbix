@@ -174,7 +174,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
-	int		res, type, retrans, retry, i, offset = 0;
+	int		res, type, retrans, retry, i, offset = 0, ret = SYSINFO_RET_FAIL;
 	char		ip[MAX_STRING_LEN], zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	struct in_addr	inaddr;
 
@@ -292,15 +292,9 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	if (1 == short_answer)
 	{
-		if (DNS_RCODE_NOERROR != res)
-		{
-			SET_UI64_RESULT(result, 0);
-			DnsRecordListFree(pQueryResults, DnsFreeRecordList);
-		}
-		else
-			SET_UI64_RESULT(result, 1);
-
-		return SYSINFO_RET_OK;
+		SET_UI64_RESULT(result, DNS_RCODE_NOERROR == res ? 1 : 0);
+		ret = SYSINFO_RET_OK;
+		goto clean;
 	}
 
 	if (DNS_RCODE_NOERROR != res)
@@ -317,7 +311,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		}
 
 		if (NULL == pDnsRecord->pName)
-			return SYSINFO_RET_FAIL;
+			goto clean;
 
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s",
 				zbx_unicode_to_utf8_static(pDnsRecord->pName, tmp, sizeof(tmp)));
@@ -421,11 +415,10 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		pDnsRecord = pDnsRecord->pNext;
 	}
 
-	DnsRecordListFree(pQueryResults, DnsFreeRecordList);
 #else	/* not _WINDOWS */
 	res_init();	/* initialize always, settings might have changed */
 
-	if (FAIL == (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
+	if (-1 == (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
 		return SYSINFO_RET_FAIL;
 
 	if ('\0' != *ip)
@@ -661,8 +654,14 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	zbx_rtrim(buffer + MAX(offset - 1, 0), "\n");
 
 	SET_TEXT_RESULT(result, strdup(buffer));
+	ret = SYSINFO_RET_OK;
 
-	return SYSINFO_RET_OK;
+#ifdef _WINDOWS
+clean:
+	if (DNS_RCODE_NOERROR == res)
+		DnsRecordListFree(pQueryResults, DnsFreeRecordList);
+#endif
+	return ret;
 
 #else	/* both HAVE_RES_QUERY and _WINDOWS not defined */
 
