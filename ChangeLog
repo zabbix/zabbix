@@ -159,14 +159,15 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
- - [ZBXNEXT-782] added support of not supported items in the history cache (Sasha)
+ - [ZBX-3825] fixed errors with single quotes in javascript messages (KB)
+ - [ZBXNEXT-782] added support of not-supported items in the history cache (Sasha)
  - [ZBX-3072] fixed mysql error when shutting down server (dimir)
  - [ZBX-3105] added processing of garbage in configuration files (dimir)
  - [ZBX-2083] fixed audit.details field cutting (Vedmak)
  - [ZBX-3824] fixed unnecessary synchronization of "profiles" table in DM setup (asaveljevs)
  - [ZBX-3821] removed warning messages about failed evaluation of trigger expressions (asaveljevs)
  - [ZBX-3826] fixed recovering unsupported icmpping* items when a key has been entered incorrectly (Sasha)
- - [ZBX-3417] fixed "Do" button in item form (KB)
+ - [ZBX-3766] fixed "Do" button in item form (KB)
  - [ZBX-3417] removed trailing and leading space from phrase " - all groups - " (Alexei)
  - [ZBX-3806] fixed HTTP pollers being started on Zabbix proxy (asaveljevs)
  - [ZBX-3808] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Alexei)

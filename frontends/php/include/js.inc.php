@@ -1,39 +1,51 @@
 <?php
 
-/* function:
- *     zbx_jsvalue
- *
- * description:
- *	convert PHP variable to string version
- *      of JavaScrip style
- *
- * author: Eugene Grigorjev
+/**
+ * Convert PHP variable to string version of JavaScript style
+ * @author Eugene Grigorjev
+ * @param mixed $value
+ * @param bool $asObject return string containing javascript object
+ * @param bool $addQuotes whether quotes should be added at the beginning and at the end of string
+ * @return string
  */
-function zbx_jsvalue($value, $object = null){
+function zbx_jsvalue($value, $asObject=false, $addQuotes=true){
 	if(!is_array($value)) {
-		if(is_object($value)) return unpack_object($value);
-		if(is_string($value)) return '\''.str_replace('\'','\\\'',			/*  '	=> \'	*/
-							str_replace("\n", '\n', 		/*  LF	=> \n	*/
-								str_replace('"', '\"', 	/*  "	=> \" */
-									str_replace("\\", "\\\\", 	/*  \	=> \\	*/
-										str_replace("\r", '', 	/*  CR	=> remove */
-										($value)))))).'\'';
-		if(is_null($value)) return 'null';
-	return strval($value);
+		if(is_object($value)){
+			return unpack_object($value);
+		}
+		elseif(is_string($value)){
+			$escaped = str_replace("\r", '', $value); // removing caret returns
+			$escaped = str_replace("\\", "\\\\", $escaped); // escaping slashes: \ => \\
+			$escaped = str_replace('"', '\"', $escaped); // escaping quotes: " => \"
+			$escaped = str_replace("\n", '\n', $escaped); // changing LF to '\n' string
+			$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
+			if($addQuotes){
+				$escaped = "'".$escaped."'";
+			}
+			return $escaped;
+		}
+		elseif(is_null($value)){
+			return 'null';
+		}
+		else{
+			return strval($value);
+		}
 	}
-
-	if(count($value) == 0) return ($object)?'{}':'[]';
-
+	elseif(count($value) == 0){
+		return $asObject ? '{}' : '[]';
+	}
 
 	foreach($value as $id => $v){
-		if((!isset($is_object) && is_string($id)) || $object) $is_object = true;
-		$value[$id] = (isset($is_object) ? '\''.str_replace('\'','\\\'', $id).'\' : ' : '').zbx_jsvalue($v, $object);
+		if((!isset($is_object) && is_string($id)) || $asObject) $is_object = true;
+		$value[$id] = (isset($is_object) ? '\''.str_replace('\'','\\\'', $id).'\' : ' : '').zbx_jsvalue($v, $asObject, $addQuotes);
 	}
 
-	if(isset($is_object))
+	if(isset($is_object)){
 		return '{'.implode(',',$value).'}';
-	else
+	}
+	else{
 		return '['.implode(',',$value).']';
+	}
 }
 
 function encodeValues(&$value, $encodeTwice=true){
@@ -60,7 +72,7 @@ function encodeValues(&$value, $encodeTwice=true){
  *     zbx_add_post_js
  *
  * description:
- *	add JavaScript for calling after page loaging.
+ *	add JavaScript for calling after page loading.
  *
  * author: Eugene Grigorjev
  */
