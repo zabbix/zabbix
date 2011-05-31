@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-31 20:50+0300\n"
+"POT-Creation-Date: 2011-05-31 21:01+0300\n"
 "PO-Revision-Date: 2011-05-20 12:36+0300\n"
 "Last-Translator: Murat Koç\n"
 "Language-Team: Zabbix translation team\n"
@@ -17,9 +17,7 @@ msgstr ""
 
 #: include/page_header.php:463
 msgid " failed login attempts logged. Last failed attempt was from "
-msgstr ""
-"başarısız giriş denemeleri kayıt altına alındı. Son başarısız girişin "
-"yapıldığı"
+msgstr "başarısız giriş denemeleri kayıt altına alındı. Son başarısız girişin yapıldığı"
 
 #: include/page_header.php:465
 msgid " on "
@@ -214,10 +212,8 @@ msgstr "\"%s\" eylemi zaten var"
 
 #: api/classes/class.caction.php:793 api/classes/class.caction.php:893
 #, php-format
-msgid ""
-"Action \"%s\" has incorrect value for \"esc_period\" (minimum 60 seconds)."
-msgstr ""
-"\"esc_period\"  için \"%s\" eylemi yanlış değere sahip (minimum 60 saniye)"
+msgid "Action \"%s\" has incorrect value for \"esc_period\" (minimum 60 seconds)."
+msgstr "\"esc_period\"  için \"%s\" eylemi yanlış değere sahip (minimum 60 saniye)"
 
 #: api/classes/class.caction.php:948
 #, php-format
@@ -961,9 +957,7 @@ msgstr "\"%s\" haritası oluşturulamadı."
 #: api/classes/class.cusermedia.php:425 api/classes/class.cuser.php:405
 #, php-format
 msgid "Cannot delete %1$s internal user \"%2$s\", try disabling that user."
-msgstr ""
-"%1$s'in iç kullanıcısı \"%2$s\" silinemedi, bu kullanıcıyı etkisizleştirmeye "
-"çalışın."
+msgstr "%1$s'in iç kullanıcısı \"%2$s\" silinemedi, bu kullanıcıyı etkisizleştirmeye çalışın."
 
 #: actionconf.php:175
 msgid "Cannot delete action"
@@ -1048,11 +1042,8 @@ msgstr "Betik silienemedi"
 
 #: api/classes/class.cscript.php:530
 #, php-format
-msgid ""
-"Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr ""
-"Betikler silinemedi. \"%1$s\"  betiği \"%2$s\" eylem işleminde "
-"kullanılıyor."
+msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
+msgstr "Betikler silinemedi. \"%1$s\"  betiği \"%2$s\" eylem işleminde kullanılıyor."
 
 #: api/classes/class.cscript.php:519
 #, php-format
@@ -1124,8 +1115,7 @@ msgstr "Konak bulunamadı"
 #: api/classes/class.cdiscoveryrule.php:882 api/classes/class.citem.php:1233
 #, php-format
 msgid "Cannot find host interface on host \"%1$s\" for item key \"%2$s\"."
-msgstr ""
-"\"%1$s\" konağı üstünde \"%2$s\".öğe anahtarı için konak arabirimi bulunamadı."
+msgstr "\"%1$s\" konağı üstünde \"%2$s\".öğe anahtarı için konak arabirimi bulunamadı."
 
 #: include/locales/en_gb.inc.php:1045
 msgid "Cannot find hostgroup"
@@ -1153,8 +1143,7 @@ msgstr "Tetik bulunamadı"
 
 #: include/locales/en_gb.inc.php:1412
 msgid "Cannot format Tree. Check logic structure in service links"
-msgstr ""
-"Ağaç biçimlendirilemedi. Servis bağlantısındaki mantık yapısını kontrol edin"
+msgstr "Ağaç biçimlendirilemedi. Servis bağlantısındaki mantık yapısını kontrol edin"
 
 #: api/classes/class.ctemplate.php:1415
 msgid "Cannot have empty visible template name"
@@ -1213,10 +1202,8 @@ msgstr ""
 
 #: include/db.inc.php:1314
 #, php-format
-msgid ""
-"Cannot perform delete statement on table \"%s\" without where condition."
-msgstr ""
-"where koşulu olmaksızın \"%s\" tablosunda delete komutu gerçekleştirilemez."
+msgid "Cannot perform delete statement on table \"%s\" without where condition."
+msgstr "where koşulu olmaksızın \"%s\" tablosunda delete komutu gerçekleştirilemez."
 
 #: include/db.inc.php:1269
 #, php-format
@@ -1225,10 +1212,8 @@ msgstr "Değerler olmadan \"%s\" tablosunda update komutu gerçekleştirilemez."
 
 #: include/db.inc.php:1278
 #, php-format
-msgid ""
-"Cannot perform update statement on table \"%s\" without where condition."
-msgstr ""
-"where koşulu olmadan \"%s\" tablosunda update komutu gerçekleştirilemez."
+msgid "Cannot perform update statement on table \"%s\" without where condition."
+msgstr "where koşulu olmadan \"%s\" tablosunda update komutu gerçekleştirilemez."
 
 #: api/classes/class.chost.php:1833
 msgid "Cannot remove group"
@@ -1854,10 +1839,8 @@ msgstr "Özel etiketler"
 
 #: api/classes/class.cmap.php:600
 #, php-format
-msgid ""
-"Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
-msgstr ""
-"\"%2$s\" haritası için özel etiket \"%1$s\" tipi elemanları boş olamaz."
+msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
+msgstr "\"%2$s\" haritası için özel etiket \"%1$s\" tipi elemanları boş olamaz."
 
 #: include/locales/en_gb.inc.php:891
 msgid "Custom multiplier"
@@ -1876,10 +1859,8 @@ msgid "Custom severity"
 msgstr "Özel önem derecesi"
 
 #: include/views/administration.general.triggerSeverity.edit.php:82
-msgid ""
-"Custom severity names affect all locales and require manual translation!"
-msgstr ""
-"Özel önem derecesi isimleri bütün yerelleri etkiler ve elle çeviri gerektirir!"
+msgid "Custom severity names affect all locales and require manual translation!"
+msgstr "Özel önem derecesi isimleri bütün yerelleri etkiler ve elle çeviri gerektirir!"
 
 #: include/locales/en_gb.inc.php:1351
 msgid "Custom slides"
@@ -2107,20 +2088,12 @@ msgid "Default theme"
 msgstr "Öntanımlı tema"
 
 #: include/locales/en_gb.inc.php:1597
-msgid ""
-"Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read "
-"bytes limit is reached. You can try to increase this value"
-msgstr ""
-"\"include/defines.inc.php\" içinde tanımlanan ZBX_SCRIPT_BYTES_LIMIT "
-"sabitinin okuma bayt sınırına ulaşıldı. Bu değeri arttırmayı deneyebilirsiniz"
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
+msgstr "\"include/defines.inc.php\" içinde tanımlanan ZBX_SCRIPT_BYTES_LIMIT sabitinin okuma bayt sınırına ulaşıldı. Bu değeri arttırmayı deneyebilirsiniz"
 
 #: include/locales/en_gb.inc.php:1596
-msgid ""
-"Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is "
-"reached. You can try to increase this value"
-msgstr ""
-"\"include/defines.inc.php\" içinde tanımlanan ZBX_SCRIPT_TIMEOUT sabitinin "
-"zamanaşımına ulaşıldı. Bu değeri arttırmayı deneyebilirsiniz"
+msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
+msgstr "\"include/defines.inc.php\" içinde tanımlanan ZBX_SCRIPT_TIMEOUT sabitinin zamanaşımına ulaşıldı. Bu değeri arttırmayı deneyebilirsiniz"
 
 #: discoveryconf.php:248 include/locales/en_gb.inc.php:273
 #: include/views/configuration.action.edit.php:329
@@ -2152,18 +2125,12 @@ msgid "Delete and clear"
 msgstr "Sil ve temizle"
 
 #: include/locales/en_gb.inc.php:792
-msgid ""
-"Delete and clear selected templates? (Warning: all linked hosts will be "
-"cleared!)"
-msgstr ""
-"Seçilen şablonlar silinsin ve temizlensin mi? (Uyarı: bütün bağlantılı "
-"konaklar temizlenecektir!)"
+msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
+msgstr "Seçilen şablonlar silinsin ve temizlensin mi? (Uyarı: bütün bağlantılı konaklar temizlenecektir!)"
 
 #: include/locales/en_gb.inc.php:794
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr ""
-"Seçilen şablon silinsin ve temizlensin mi? (Uyarı: bütün bağlantılı konaklar "
-"temizlenecektir!)"
+msgstr "Seçilen şablon silinsin ve temizlensin mi? (Uyarı: bütün bağlantılı konaklar temizlenecektir!)"
 
 #: include/views/configuration.action.edit.php:930
 msgid "Delete current action?"
@@ -2695,16 +2662,13 @@ msgstr "İlk girdiyi açılır listele"
 
 #: api/classes/class.chost.php:1364
 #, php-format
-msgid ""
-"Duplicate host. Host with the same host name \"%s\" already exists in data"
+msgid "Duplicate host. Host with the same host name \"%s\" already exists in data"
 msgstr "Çift kopya konak. \"%s\" aynı isme sahip bir konak veride zaten var."
 
 #: api/classes/class.chost.php:1395
 #, php-format
-msgid ""
-"Duplicate host. Host with the same visible name \"%s\" already exists in data"
-msgstr ""
-"Çift kopya konak. \"%s\" aynı görünen isme sahip bir konak veride zaten var."
+msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data"
+msgstr "Çift kopya konak. \"%s\" aynı görünen isme sahip bir konak veride zaten var."
 
 #: api/classes/class.cmap.php:568
 #, php-format
@@ -2751,12 +2715,8 @@ msgid "EVENTS"
 msgstr "OLAYLAR"
 
 #: include/locales/en_gb.inc.php:1051
-msgid ""
-"Each URL should have a unique name. Please make sure there is only one URL "
-"named"
-msgstr ""
-"Her URL tekil bir isme sahip olmalıdır. Lütfen URL'in yalnızca bir isme sahip "
-"olduğundan emin olun."
+msgid "Each URL should have a unique name. Please make sure there is only one URL named"
+msgstr "Her URL tekil bir isme sahip olmalıdır. Lütfen URL'in yalnızca bir isme sahip olduğundan emin olun."
 
 #: include/forms.inc.php:452 include/locales/en_gb.inc.php:1274
 #: include/views/configuration.action.edit.php:367
@@ -2914,16 +2874,8 @@ msgid "Error Description"
 msgstr "Hata Açıklaması"
 
 #: include/locales/en_gb.inc.php:1849
-msgid ""
-"Error adding dependencies. Following dependencies are not allowed: 1) from a "
-"host trigger to a template trigger; 2) from a template trigger to a host "
-"trigger; 3) between template triggers, where templates have links to other "
-"templates."
-msgstr ""
-"Bağımlılıkları eklerken hata oluştu. Şu bağımlılıklara izin verilmez: 1) Bir "
-"konak tetiğinden bir şablon tetiğine; 2) Bir şablon tetiğinden bir konak "
-"tetiğine; 3) Şablonların diğer şablonlarla bağlantılı olduğu şablon tetikleri "
-"arasında"
+msgid "Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates."
+msgstr "Bağımlılıkları eklerken hata oluştu. Şu bağımlılıklara izin verilmez: 1) Bir konak tetiğinden bir şablon tetiğine; 2) Bir şablon tetiğinden bir konak tetiğine; 3) Şablonların diğer şablonlarla bağlantılı olduğu şablon tetikleri arasında"
 
 #: include/locales/en_gb.inc.php:1206
 msgid "Error adding service time"
@@ -3347,11 +3299,8 @@ msgstr " [ %1$s ] grafiği:  [ %2$s ]'de zaten var"
 
 #: api/classes/class.cgraph.php:863 api/classes/class.cgraphprototype.php:856
 #, php-format
-msgid ""
-"Graph [ %1$s ]: already exists on [ %2$s ] (inherited from another template)"
-msgstr ""
-"Grafik [ %1$s ]: zaten [ %2$s ] üzerinde var (başka bir şablondan kalıt "
-"alınmış)"
+msgid "Graph [ %1$s ]: already exists on [ %2$s ] (inherited from another template)"
+msgstr "Grafik [ %1$s ]: zaten [ %2$s ] üzerinde var (başka bir şablondan kalıt alınmış)"
 
 #: api/classes/class.cgraph.php:885 api/classes/class.cgraph.php:892
 #: api/classes/class.cgraphprototype.php:878
@@ -3363,26 +3312,17 @@ msgstr " [ %1$s ] grafiği:  [ %2$s ]'de zaten var (öğeler özdeş değil)"
 #: api/classes/class.cgraph.php:815 api/classes/class.cgraphprototype.php:808
 #, php-format
 msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ]"
-msgstr ""
-"[ %1$s ] grafiği: kalıtlanamaz. [ %2$s ] üzerinde gereken öğeler bulunmuyor"
+msgstr "[ %1$s ] grafiği: kalıtlanamaz. [ %2$s ] üzerinde gereken öğeler bulunmuyor"
 
 #: api/classes/class.cgraph.php:819 api/classes/class.cgraphprototype.php:812
 #, php-format
-msgid ""
-"Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymax value "
-"item)"
-msgstr ""
-"[ %1$s ] grafiği: kalıtlanamaz. [ %2$s ] üzerinde gereken öğeler bulunmuyor "
-"(Ymaks değer öğesi)"
+msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymax value item)"
+msgstr "[ %1$s ] grafiği: kalıtlanamaz. [ %2$s ] üzerinde gereken öğeler bulunmuyor (Ymaks değer öğesi)"
 
 #: api/classes/class.cgraph.php:825 api/classes/class.cgraphprototype.php:818
 #, php-format
-msgid ""
-"Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymin value "
-"item)"
-msgstr ""
-"[ %1$s ] grafiği: kalıtlanamaz. [ %2$s ] üzerinde gereken öğeler bulunmuyor "
-"(Ymin değer öğesi)"
+msgid "Graph [ %1$s ]: cannot inherit. No required items on [ %2$s ] (Ymin value item)"
+msgstr "[ %1$s ] grafiği: kalıtlanamaz. [ %2$s ] üzerinde gereken öğeler bulunmuyor (Ymin değer öğesi)"
 
 #: api/classes/class.ctemplate.php:2075
 #, php-format
@@ -3676,13 +3616,8 @@ msgstr " \"%s\" konağı silindi."
 
 #: include/export.inc.php:895
 #, php-format
-msgid ""
-"Host \"%s\" has \"use_ipmi\" parameter checked, but has no \"ipmi_ip\" "
-"parameter! Using host IP address as an address for IPMI interface."
-msgstr ""
-"\"%s\"  konağında \"use_ipmi\" parametresi işaretlenmiş fakat \"ipmi_ip\" "
-"paramteresi kullanılmamış. Konağın IP adresi IPMI arabirim adresi olarak "
-"kullanılıyor."
+msgid "Host \"%s\" has \"use_ipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
+msgstr "\"%s\"  konağında \"use_ipmi\" parametresi işaretlenmiş fakat \"ipmi_ip\" paramteresi kullanılmamış. Konağın IP adresi IPMI arabirim adresi olarak kullanılıyor."
 
 #: include/views/configuration.sysmap.edit.php:86
 msgid "Host Group label type"
@@ -3873,6 +3808,10 @@ msgstr "ICMP Ping"
 msgid "ICMP ping"
 msgstr "ICMP ping"
 
+#: include/locales/en_gb.inc.php:548
+msgid "ID"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:386
 msgid "IMAGES"
 msgstr "RESİMLER"
@@ -4008,21 +3947,13 @@ msgstr "simge etiket konumu"
 msgid "Icon label type"
 msgstr "Simge etiket tipi"
 
-#: include/locales/en_gb.inc.php:548
-msgid "Id"
-msgstr "Id"
-
 #: include/locales/en_gb.inc.php:136
 msgid "Idle till"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1971
-msgid ""
-"If you think this message is wrong, please consult your administrators about "
-"getting the necessary permissions."
-msgstr ""
-"Eğer bu mesajın yanlış olduğunu düşünüyorsanız gerekli izinlerin alınması "
-"için lütfen yöneticilerinize danışın."
+msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
+msgstr "Eğer bu mesajın yanlış olduğunu düşünüyorsanız gerekli izinlerin alınması için lütfen yöneticilerinize danışın."
 
 #: include/locales/en_gb.inc.php:385
 msgid "Image"
@@ -4153,20 +4084,12 @@ msgid "Incorrect action condition discovery status."
 msgstr "Geçersiz eylem koşul keşif durumu."
 
 #: api/classes/class.caction.php:1698
-msgid ""
-"Incorrect action condition host group. Host group does not exist or you have "
-"no access to this host group."
-msgstr ""
-"Geçersiz eylem koşul konak grubu. Konak grubu mevcut değil ya da sizin bu "
-"konak grubuna erişiminiz yok."
+msgid "Incorrect action condition host group. Host group does not exist or you have no access to this host group."
+msgstr "Geçersiz eylem koşul konak grubu. Konak grubu mevcut değil ya da sizin bu konak grubuna erişiminiz yok."
 
 #: api/classes/class.caction.php:1700
-msgid ""
-"Incorrect action condition host. Host does not exist or you have no access to "
-"this host."
-msgstr ""
-"Geçersiz eylem koşul konak.Konak mevcut değil ya da sizin bu konağa "
-"erişiminiz yok."
+msgid "Incorrect action condition host. Host does not exist or you have no access to this host."
+msgstr "Geçersiz eylem koşul konak.Konak mevcut değil ya da sizin bu konağa erişiminiz yok."
 
 #: api/classes/class.caction.php:1660
 #, php-format
@@ -4184,20 +4107,12 @@ msgid "Incorrect action condition port \"%s\"."
 msgstr "geçersiz eylem koşul portu \"%s\"."
 
 #: api/classes/class.caction.php:1702
-msgid ""
-"Incorrect action condition template. Template does not exist or you have no "
-"access to this template."
-msgstr ""
-"Geçersiz eylem koşul şablonu. Şablon mevcut değil veya sizin bu şablona "
-"erişim için yetkiniz yok."
+msgid "Incorrect action condition template. Template does not exist or you have no access to this template."
+msgstr "Geçersiz eylem koşul şablonu. Şablon mevcut değil veya sizin bu şablona erişim için yetkiniz yok."
 
 #: api/classes/class.caction.php:1704
-msgid ""
-"Incorrect action condition trigger. Trigger does not exist or you have no "
-"access to this trigger."
-msgstr ""
-"Geçersiz eylem koşul tetiği.tetik mevcut değil veya sizin bu tetiğe "
-"erişiminiz yok."
+msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to this trigger."
+msgstr "Geçersiz eylem koşul tetiği.tetik mevcut değil veya sizin bu tetiğe erişiminiz yok."
 
 #: api/classes/class.caction.php:1693
 msgid "Incorrect action condition type"
@@ -4228,20 +4143,12 @@ msgid "Incorrect action operation escalation step values."
 msgstr "Geçersiz eylem işlem eskalasyon adım değerleri."
 
 #: api/classes/class.caction.php:1617
-msgid ""
-"Incorrect action operation group. Host group does not exist or you have no "
-"access to this host group."
-msgstr ""
-"Geçersiz eylem işlem grubu. Konak grubu mevcut değil veya sizin bu konak "
-"grubuna erişiminiz yok."
+msgid "Incorrect action operation group. Host group does not exist or you have no access to this host group."
+msgstr "Geçersiz eylem işlem grubu. Konak grubu mevcut değil veya sizin bu konak grubuna erişiminiz yok."
 
 #: api/classes/class.caction.php:1619
-msgid ""
-"Incorrect action operation host. Host does not exist or you have no access to "
-"this host."
-msgstr ""
-"Geçersiz eylem işlem knağı. Konak mevcut değil veya sizin bu konağa "
-"erişiminiz yok."
+msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
+msgstr "Geçersiz eylem işlem knağı. Konak mevcut değil veya sizin bu konağa erişiminiz yok."
 
 #: api/classes/class.caction.php:1551 api/classes/class.caction.php:1554
 #, php-format
@@ -4253,20 +4160,12 @@ msgid "Incorrect action operation type."
 msgstr "Geçersiz eylem işlem tipi"
 
 #: api/classes/class.caction.php:1623
-msgid ""
-"Incorrect action operation user group. User group does not exist or you have "
-"no access to this user group."
-msgstr ""
-"Geçersiz eylem işlem kullanıcı grubu. Kullanıcı grubu mevcut değil veya sizin "
-"bu kullanıcı grubuna erişiminiz yok."
+msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
+msgstr "Geçersiz eylem işlem kullanıcı grubu. Kullanıcı grubu mevcut değil veya sizin bu kullanıcı grubuna erişiminiz yok."
 
 #: api/classes/class.caction.php:1621
-msgid ""
-"Incorrect action operation user. User does not exist or you have no access to "
-"this user."
-msgstr ""
-"Geçersiz eylem işlem kullanıcısı. Kullanıcı mevcut değil veta sizin bu "
-"kullanıcıya erişiminiz yok."
+msgid "Incorrect action operation user. User does not exist or you have no access to this user."
+msgstr "Geçersiz eylem işlem kullanıcısı. Kullanıcı mevcut değil veta sizin bu kullanıcıya erişiminiz yok."
 
 #: api/classes/class.caction.php:965
 msgid "Incorrect action operationid"
@@ -4335,11 +4234,8 @@ msgstr "Geçersiz ifade"
 
 #: include/db.inc.php:1284 include/db.inc.php:1321
 #, php-format
-msgid ""
-"Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
-msgstr ""
-"\"%2$s\" tablosu için where komutunda geçersiz  alan ismi \"%1$s\" veya "
-"değeri."
+msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
+msgstr "\"%2$s\" tablosu için where komutunda geçersiz  alan ismi \"%1$s\" veya değeri."
 
 #: api/classes/class.cmap.php:553
 msgid "Incorrect fields for sysmap"
@@ -4482,8 +4378,7 @@ msgstr "\"%s\" eylemi için geçersiz parametre kullanılmış."
 #: api/classes/class.caction.php:884
 #, php-format
 msgid "Incorrect parameters are used for action update method \"%s\"."
-msgstr ""
-"Eylem güncelleme yöntemi \"%s\" için geçersiz parametreler kullanılmış."
+msgstr "Eylem güncelleme yöntemi \"%s\" için geçersiz parametreler kullanılmış."
 
 #: api/classes/class.caction.php:1005
 msgid "Incorrect parameters for condition."
@@ -4538,12 +4433,8 @@ msgstr "Geçersiz tetik ifadesi"
 
 #: api/classes/class.ctrigger.php:1271
 #, php-format
-msgid ""
-"Incorrect trigger expression. Host \"%s\" does not exist or you have no "
-"access to this host."
-msgstr ""
-"Geçersiz tetik ifadesi. \"%s\" konağı mevcut değil veya sizin bu konağa "
-"erişiminiz yok."
+msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
+msgstr "Geçersiz tetik ifadesi. \"%s\" konağı mevcut değil veya sizin bu konağa erişiminiz yok."
 
 #: include/actions.inc.php:639
 msgid "Incorrect trigger."
@@ -4639,12 +4530,8 @@ msgstr "\" %1$s \" DNS'ine sahip arabirim boş IP adresine sahip olamaz."
 
 #: api/classes/class.chostinterface.php:521
 #, php-format
-msgid ""
-"Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use "
-"DNS\" property on host \"%2$s\"."
-msgstr ""
-"\"%2$s\"  konağında \"Use DNS\" özelliği kullanılırken \"%1$s\" IP'li "
-"arabirim boş DNS ismine sahip olamaz."
+msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on host \"%2$s\"."
+msgstr "\"%2$s\"  konağında \"Use DNS\" özelliği kullanılırken \"%1$s\" IP'li arabirim boş DNS ismine sahip olamaz."
 
 #: include/locales/en_gb.inc.php:776
 #: include/views/configuration.host.edit.php:212
@@ -4668,10 +4555,8 @@ msgid "Interval"
 msgstr "Zaman aralığı"
 
 #: api/rpc/class.cjsonrpc.php:166
-msgid ""
-"Invalid JSON. An error occurred on the server while parsing the JSON text."
-msgstr ""
-"Geçersiz JSON. JSON metni çözümlenirken sunucuda bir hata meydana geldi."
+msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
+msgstr "Geçersiz JSON. JSON metni çözümlenirken sunucuda bir hata meydana geldi."
 
 #: api/rpc/class.cjsonrpc.php:169
 msgid "Invalid Request."
@@ -4692,9 +4577,7 @@ msgstr "Geçersiz params."
 #: include/classes/class.cview.php:57
 #, php-format
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\""
-msgstr ""
-"Geçersiz görünüm ismi \"%s\" ismi verilmiş. İzin verilen karakterler: \"a-z\" "
-"ve \".\""
+msgstr "Geçersiz görünüm ismi \"%s\" ismi verilmiş. İzin verilen karakterler: \"a-z\" ve \".\""
 
 #: include/menu.inc.php:98
 msgid "Inventory"
@@ -4726,9 +4609,7 @@ msgstr "Öğe"
 
 #: api/classes/class.citem.php:1387
 #, php-format
-msgid ""
-"Item \"%1$s\" cannot populate a missing host profile field number \"%2$d\". "
-"Choices are: from 0 (do not populate) to %3$d."
+msgid "Item \"%1$s\" cannot populate a missing host profile field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr ""
 
 #: api/classes/class.cdiscoveryrule.php:872 api/classes/class.citem.php:1222
@@ -4815,43 +4696,28 @@ msgstr ""
 
 #: api/classes/class.citemgeneral.php:240
 #, php-format
-msgid ""
-"Item with key \"%1$s\" already exists on host \"%2$s\" as a discovery rule."
-msgstr ""
-"\"%1$s\" anahtarlı öğe zaten \"%2$s\" konağı üzerinde keşif kuralı olarak "
-"bulunuyor."
+msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as a discovery rule."
+msgstr "\"%1$s\" anahtarlı öğe zaten \"%2$s\" konağı üzerinde keşif kuralı olarak bulunuyor."
 
 #: api/classes/class.citemgeneral.php:246
 #, php-format
-msgid ""
-"Item with key \"%1$s\" already exists on host \"%2$s\" as an item created "
-"from item prototype."
-msgstr ""
-"\"%1$s\" anahtarlı öğe zaten \"%2$s\" konağı üzerinde öğe prototipinden "
-"oluşturulmuş öğe olarak bulunuyor."
+msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as an item created from item prototype."
+msgstr "\"%1$s\" anahtarlı öğe zaten \"%2$s\" konağı üzerinde öğe prototipinden oluşturulmuş öğe olarak bulunuyor."
 
 #: api/classes/class.citemgeneral.php:243
 #, php-format
-msgid ""
-"Item with key \"%1$s\" already exists on host \"%2$s\" as an item prototype."
-msgstr ""
-"\"%1$s\" anahtarlı öğe zaten \"%2$s\" konağı üzerinde öğe prototipi olaak "
-"bulunuyor."
+msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as an item prototype."
+msgstr "\"%1$s\" anahtarlı öğe zaten \"%2$s\" konağı üzerinde öğe prototipi olaak bulunuyor."
 
 #: api/classes/class.citemgeneral.php:237
 #, php-format
 msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as an item."
-msgstr ""
-"\"%1$s\" anahtarlı öğe zaten \"%2$s\" konağı üzerinde öğe olarak bulunuyor."
+msgstr "\"%1$s\" anahtarlı öğe zaten \"%2$s\" konağı üzerinde öğe olarak bulunuyor."
 
 #: api/classes/class.citemgeneral.php:249
 #, php-format
-msgid ""
-"Item with key \"%1$s\" already exists on host \"%2$s\" as unknown item "
-"element."
-msgstr ""
-"\"%1$s\" anahtarlı öğe zaten \"%2$s\" konağı üzerinde bilinmeyen öğe elemanı "
-"olarak bulunuyor."
+msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as unknown item element."
+msgstr "\"%1$s\" anahtarlı öğe zaten \"%2$s\" konağı üzerinde bilinmeyen öğe elemanı olarak bulunuyor."
 
 #: api/classes/class.cwebcheck.php:549
 #, php-format
@@ -4979,9 +4845,7 @@ msgid "Key cannot be empty."
 msgstr "Anahtar boş olamaz"
 
 #: api/classes/class.citemgeneral.php:217
-msgid ""
-"Key does not match <grpmax|grpmin|grpsum|grpavg>[\"group\",\"key\",\"<"
-"last|min|max|avg|sum|count>\",\"numeric param\"]."
+msgid "Key does not match <grpmax|grpmin|grpsum|grpavg>[\"group\",\"key\",\"<last|min|max|avg|sum|count>\",\"numeric param\"]."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1707
@@ -5149,28 +5013,18 @@ msgstr "\"%s\" haritası için bağlantı adı tekil olmalıdır."
 
 #: api/classes/class.cmap.php:651
 #, php-format
-msgid ""
-"Link selementid1 field is pointing to non existant map selement ID \"%1$s\" "
-"for map \"%2$s\" ."
-msgstr ""
-"Bağlantı selementid1 alanı \"%2$s\" haritası için mevcut olmayan harita "
-"selement ID \"%1$s\"''a işaret ediyor."
+msgid "Link selementid1 field is pointing to non existant map selement ID \"%1$s\" for map \"%2$s\" ."
+msgstr "Bağlantı selementid1 alanı \"%2$s\" haritası için mevcut olmayan harita selement ID \"%1$s\"''a işaret ediyor."
 
 #: api/classes/class.cmap.php:654
 #, php-format
-msgid ""
-"Link selementid2 field is pointing to non existant map selement ID \"%1$s\" "
-"for map \"%2$s\" ."
-msgstr ""
-"Bağlantı selementid2 alanı \"%2$s\" haritası için mevcut olmayan harita "
-"selement ID \"%1$s\"''a işaret ediyor."
+msgid "Link selementid2 field is pointing to non existant map selement ID \"%1$s\" for map \"%2$s\" ."
+msgstr "Bağlantı selementid2 alanı \"%2$s\" haritası için mevcut olmayan harita selement ID \"%1$s\"''a işaret ediyor."
 
 #: api/classes/class.cmap.php:636
 #, php-format
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
-msgstr ""
-"\"%s\" haritası için bağlantı \"name\" ve \"url\" alanlarının ikisine de "
-"sahip olmalıdır."
+msgstr "\"%s\" haritası için bağlantı \"name\" ve \"url\" alanlarının ikisine de sahip olmalıdır."
 
 #: include/locales/en_gb.inc.php:991
 msgid "Link status indicator"
@@ -5325,12 +5179,8 @@ msgid "MEDIA TYPES"
 msgstr "İLETİŞİM ARACI TİPLERİ"
 
 #: include/locales/en_gb.inc.php:1748
-msgid ""
-"MEMORY LIMIT REACHED! Profiling was stopped to save memory for script "
-"processing."
-msgstr ""
-"HAFIZA SINIRINA ULAŞILDI! Ayrımlama, betik işleml için hafıza saklamak için "
-"durduruldu."
+msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
+msgstr "HAFIZA SINIRINA ULAŞILDI! Ayrımlama, betik işleml için hafıza saklamak için durduruldu."
 
 #: include/locales/en_gb.inc.php:1223
 msgid "MOST BUSY TRIGGERS TOP 100"
@@ -5503,38 +5353,23 @@ msgstr "Ekranı kapla"
 #: api/classes/class.cuser.php:428
 #, php-format
 msgid "Maximum alias length is %2$d characters, \"%3$s\" is %1$d character."
-msgid_plural ""
-"Maximum alias length is %2$d characters, \"%3$s\" is %1$d characters."
-msgstr[0] ""
-"Maksimum rumuz uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
-msgstr[1] ""
-"Maksimum rumuz uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
+msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characters."
+msgstr[0] "Maksimum rumuz uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
+msgstr[1] "Maksimum rumuz uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
 
 #: api/classes/class.chost.php:1350
 #, php-format
-msgid ""
-"Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
-msgid_plural ""
-"Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
-msgstr[0] ""
-"Maksimum konak ismi uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
-msgstr[1] ""
-"Maksimum konak ismi uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
+msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
+msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
+msgstr[0] "Maksimum konak ismi uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
+msgstr[1] "Maksimum konak ismi uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
 
 #: api/classes/class.chost.php:1385
 #, php-format
-msgid ""
-"Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d "
-"character."
-msgid_plural ""
-"Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d "
-"characters."
-msgstr[0] ""
-"Maksimum görünür konak ismi uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d "
-"karakter."
-msgstr[1] ""
-"Maksimum görünür konak ismi uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d "
-"karakter."
+msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
+msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
+msgstr[0] "Maksimum görünür konak ismi uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
+msgstr[1] "Maksimum görünür konak ismi uzunluğu %2$d karakterdir, \"%3$s\" ise %1$d karakter."
 
 #: include/locales/en_gb.inc.php:58 include/locales/en_gb.inc.php:71
 #: include/locales/en_gb.inc.php:660
@@ -5951,16 +5786,12 @@ msgstr "Hiçbir uygulama tanımlanmamış"
 #: api/classes/class.caction.php:1512
 #, php-format
 msgid "No authentication type specified for action operation command \"%s\"."
-msgstr ""
-"Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama tipi belirtilmemiş."
+msgstr "Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama tipi belirtilmemiş."
 
 #: api/classes/class.caction.php:1515 api/classes/class.caction.php:1528
 #, php-format
-msgid ""
-"No authentication user name specified for action operation command \"%s\"."
-msgstr ""
-"Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama kullanıcı ismi "
-"belirtilmemiş."
+msgid "No authentication user name specified for action operation command \"%s\"."
+msgstr "Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama kullanıcı ismi belirtilmemiş."
 
 #: api/classes/class.caction.php:1499
 msgid "No command specified for action operation."
@@ -6199,8 +6030,7 @@ msgstr "Refere edilen obje için izin yk veya mevcut değil!"
 #: api/classes/class.caction.php:1522
 #, php-format
 msgid "No private key file specified for action operation command \"%s\"."
-msgstr ""
-"Eylem işlem komutu \"%s\" için hiçbir özel anahtar dosyası belirtilmemiş."
+msgstr "Eylem işlem komutu \"%s\" için hiçbir özel anahtar dosyası belirtilmemiş."
 
 #: include/locales/en_gb.inc.php:723
 msgid "No proxies defined"
@@ -6213,8 +6043,7 @@ msgstr "Vekil yok"
 #: api/classes/class.caction.php:1519
 #, php-format
 msgid "No public key file specified for action operation command \"%s\"."
-msgstr ""
-"Eylem işlem komutu \"%s\" için hiçbir genel anahtar dosyası belirtilmemiş."
+msgstr "Eylem işlem komutu \"%s\" için hiçbir genel anahtar dosyası belirtilmemiş."
 
 #: api/classes/class.caction.php:1487
 msgid "No recipients for action operation message."
@@ -6355,10 +6184,8 @@ msgid "Not allowed symbols detected before element"
 msgstr "Elemandan sonra izin verilen hiçbir sembol belirlenmedi"
 
 #: include/locales/en_gb.inc.php:1692
-msgid ""
-"Not allowed symbols or sequence of symbols in expression element detected"
-msgstr ""
-"İfade elemanında izin verilen hiçbir sembol veya sembol dizgisi belirlenmedi"
+msgid "Not allowed symbols or sequence of symbols in expression element detected"
+msgstr "İfade elemanında izin verilen hiçbir sembol veya sembol dizgisi belirlenmedi"
 
 #: api/classes/class.cuser.php:474
 msgid "Not allowed to set password for user \"guest\"."
@@ -6563,13 +6390,11 @@ msgstr "Yalnızca Zabbix Yöneticileri kullanıcı İletişim Araçlarını ekle
 
 #: include/locales/en_gb.inc.php:1951
 msgid "Only Zabbix Admins can change user Medias"
-msgstr ""
-"Yalnızca Zabbix Yöneticileri kullanıcı İletişim Araçlarını değiştirebilir"
+msgstr "Yalnızca Zabbix Yöneticileri kullanıcı İletişim Araçlarını değiştirebilir"
 
 #: include/locales/en_gb.inc.php:1950
 msgid "Only Zabbix Admins can remove user Medias"
-msgstr ""
-"Yalnızca Zabbix Yöneticileri kullanıcı İletişim Araçlarını kaldırabilir"
+msgstr "Yalnızca Zabbix Yöneticileri kullanıcı İletişim Araçlarını kaldırabilir"
 
 #: api/classes/class.cwebcheck.php:316 api/classes/class.cwebcheck.php:370
 msgid "Only characters are allowed"
@@ -6584,12 +6409,8 @@ msgid "Only one check can be unique."
 msgstr "Yalnızca bir kontrol tekil olabilir."
 
 #: include/locales/en_gb.inc.php:1142
-msgid ""
-"Only triggers assigned to enabled hosts and depending on enabled items are "
-"counted"
-msgstr ""
-"Yalnızca etkinleştirilmiş konaklara atanmış ve etkinleştirilmiş öğeler "
-"bağımlılığı olan tetikler sayıldı"
+msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
+msgstr "Yalnızca etkinleştirilmiş konaklara atanmış ve etkinleştirilmiş öğeler bağımlılığı olan tetikler sayıldı"
 
 #: actionconf.php:255
 #, php-format
@@ -6829,11 +6650,8 @@ msgid "Play sound"
 msgstr "Ses Oynat"
 
 #: include/locales/en_gb.inc.php:1908
-msgid ""
-"Please be aware that database still contains data related to the deleted Node"
-msgstr ""
-"Veritabanının hala silinen düğüm ile ilişkili veriye sahip olduğunun "
-"dikkatinde olun lütfen"
+msgid "Please be aware that database still contains data related to the deleted Node"
+msgstr "Veritabanının hala silinen düğüm ile ilişkili veriye sahip olduğunun dikkatinde olun lütfen"
 
 #: scripts.php:86
 msgid "Please enter confirmation text."
@@ -7201,11 +7019,8 @@ msgid "Required server performance, new values per second"
 msgstr "Gereki sunucu performansı, saniye başına yeni değerler"
 
 #: include/locales/en_gb.inc.php:1928
-msgid ""
-"Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
-msgstr ""
-"Herhangi bir veritabanı desteği gerekli [MySQL veya PostgreSQL veya Oracle "
-"veya SQLite3]"
+msgid "Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
+msgstr "Herhangi bir veritabanı desteği gerekli [MySQL veya PostgreSQL veya Oracle veya SQLite3]"
 
 #: include/locales/en_gb.inc.php:1929
 msgid "Requires bcmath module"
@@ -7903,10 +7718,8 @@ msgid "Severity"
 msgstr "Önem Derecesi"
 
 #: include/profiles.inc.php:239
-msgid ""
-"Severity colour is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
-"Önem derecesi rengi doğru değil: onaltılık renk kodu bekleniyor (6 sembol)"
+msgid "Severity colour is not correct: expecting hexadecimal colour code (6 symbols)."
+msgstr "Önem derecesi rengi doğru değil: onaltılık renk kodu bekleniyor (6 sembol)"
 
 #: include/profiles.inc.php:256
 msgid "Severity name cannot be empty."
@@ -8153,12 +7966,8 @@ msgid "Spanish (ES)"
 msgstr ""
 
 #: api/classes/class.caction.php:1542
-msgid ""
-"Specified script does not exist or you do not have rights on it for action "
-"operation command."
-msgstr ""
-"Belirtilen betik mevcut değil veya eylem işlem komutu için üzerinde hakkınız "
-"yok."
+msgid "Specified script does not exist or you do not have rights on it for action operation command."
+msgstr "Belirtilen betik mevcut değil veya eylem işlem komutu için üzerinde hakkınız yok."
 
 #: include/locales/en_gb.inc.php:128
 msgid "Speed"
@@ -8301,18 +8110,12 @@ msgid "Swedish (SE)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:485
-msgid ""
-"Switching HTTP authentication will reset all current sessions! Continue?"
-msgstr ""
-"HTTP kimlik doğrulamasına geçmek geçerli bütüm oturumları sıfırlayacak! Devam "
-"edilsin mi?"
+msgid "Switching HTTP authentication will reset all current sessions! Continue?"
+msgstr "HTTP kimlik doğrulamasına geçmek geçerli bütüm oturumları sıfırlayacak! Devam edilsin mi?"
 
 #: include/locales/en_gb.inc.php:486
-msgid ""
-"Switching LDAP authentication will reset all current sessions! Continue?"
-msgstr ""
-"LDAP kimlik doğrulamasına geçmek geçerli bütüm oturumları sıfırlayacak! Devam "
-"edilsin mi?"
+msgid "Switching LDAP authentication will reset all current sessions! Continue?"
+msgstr "LDAP kimlik doğrulamasına geçmek geçerli bütüm oturumları sıfırlayacak! Devam edilsin mi?"
 
 #: include/locales/en_gb.inc.php:343
 msgid "System default"
@@ -8729,10 +8532,8 @@ msgstr "tetik biçimi"
 
 #: api/classes/class.ctemplate.php:1733
 #, php-format
-msgid ""
-"Trigger in template [ %1$s ] has dependency with trigger in template [ %2$s ]"
-msgstr ""
-"[ %1$s ] şablonundaki tetik  [ %2$s ] şablonundaki tetik ile bağımlılığa sahip"
+msgid "Trigger in template [ %1$s ] has dependency with trigger in template [ %2$s ]"
+msgstr "[ %1$s ] şablonundaki tetik  [ %2$s ] şablonundaki tetik ile bağımlılığa sahip"
 
 #: api/classes/class.ctriggerprototype.php:1095
 msgid "Trigger just added. No status update so far."
@@ -8846,12 +8647,8 @@ msgstr "İki eleman seçilmeli"
 
 #: api/classes/class.citem.php:1451
 #, php-format
-msgid ""
-"Two items (\"%1$s\" and \"%2$s\") cannot populate one host profile field \"%"
-"3$s\", this would lead to a conflict."
-msgstr ""
-"İki öğe (\"%1$s\" ve \"%2$s\") birden \"%3$s\" konak profil alanını "
-"dolduramaz , bu ikileme yol açar."
+msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host profile field \"%3$s\", this would lead to a conflict."
+msgstr "İki öğe (\"%1$s\" ve \"%2$s\") birden \"%3$s\" konak profil alanını dolduramaz , bu ikileme yol açar."
 
 #: hostprofiles.php:162 include/hosts.inc.php:50
 #: include/locales/en_gb.inc.php:299
@@ -9167,21 +8964,13 @@ msgstr "Kullanıcının kendini silmesine izin verilmez"
 
 #: api/classes/class.cuser.php:451
 #, php-format
-msgid ""
-"User may not modify GUI access for himself by becoming a member of user group "
-"\"%s\"."
-msgstr ""
-"\"%s\" kullanıcı grubunun üyesi olarak kullanıcı kendisi için GUI erişimini "
-"düzenleyemeyebilir."
+msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
+msgstr "\"%s\" kullanıcı grubunun üyesi olarak kullanıcı kendisi için GUI erişimini düzenleyemeyebilir."
 
 #: api/classes/class.cuser.php:454
 #, php-format
-msgid ""
-"User may not modify system status for himself by becoming a member of user "
-"group \"%s\"."
-msgstr ""
-"\"%s\" kullanıcı grubunun üyesi olarak kullanıcı kendisi için sistem durumunu "
-"düzenleyemeyebilir."
+msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
+msgstr "\"%s\" kullanıcı grubunun üyesi olarak kullanıcı kendisi için sistem durumunu düzenleyemeyebilir."
 
 #: include/locales/en_gb.inc.php:913
 #: include/views/configuration.action.edit.php:671
@@ -9245,47 +9034,28 @@ msgstr "Değer"
 
 #: api/classes/class.cmap.php:623
 #, php-format
-msgid ""
-"Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" "
-"and \"%3$s\""
-msgstr ""
-"\"grid_align\" parametresi için \"%1$s\" değeri geçersiz. Seçenekler: \"%"
-"2$s\" "
-"ve \"%3$s\""
+msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
+msgstr "\"grid_align\" parametresi için \"%1$s\" değeri geçersiz. Seçenekler: \"%2$s\" ve \"%3$s\""
 
 #: api/classes/class.cmap.php:619
 #, php-format
-msgid ""
-"Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\""
-msgstr ""
-"\"grid_show\" parametresi için \"%1$s\" değeri geçersiz. Seçenekler: \"%2$s\""
+msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\""
+msgstr "\"grid_show\" parametresi için \"%1$s\" değeri geçersiz. Seçenekler: \"%2$s\""
 
 #: api/classes/class.cmap.php:627
 #, php-format
-msgid ""
-"Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" "
-"and \"%3$s\""
-msgstr ""
-"\"grid_show\" parametresi için \"%1$s\" değeri geçersiz. Seçenekler: \"%2$s\" "
-"ve \"%3$s\""
+msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
+msgstr "\"grid_show\" parametresi için \"%1$s\" değeri geçersiz. Seçenekler: \"%2$s\" ve \"%3$s\""
 
 #: include/db.inc.php:1179
 #, php-format
-msgid ""
-"Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed "
-"length is %4$d characters."
-msgstr ""
-"\"%1$s\" değeri %3$d karakter ve \"%2$s\" alanı için çok uzun . İzin verilen "
-"uzunluk %4$d karakter."
+msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
+msgstr "\"%1$s\" değeri %3$d karakter ve \"%2$s\" alanı için çok uzun . İzin verilen uzunluk %4$d karakter."
 
 #: include/db.inc.php:1205
 #, php-format
-msgid ""
-"Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed "
-"length is 2048 characters."
-msgstr ""
-"\"%1$s\" değeri %3$d karakter ve \"%2$s\" alanı için çok uzun . İzin verilen "
-"uzunluk 2048 karakter."
+msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
+msgstr "\"%1$s\" değeri %3$d karakter ve \"%2$s\" alanı için çok uzun . İzin verilen uzunluk 2048 karakter."
 
 #: include/locales/en_gb.inc.php:360
 msgid "Value map"
@@ -9308,12 +9078,8 @@ msgid "Value mapping"
 msgstr "Değer eşlemesi"
 
 #: include/locales/en_gb.inc.php:443
-msgid ""
-"Value maps are used to create a mapping between numeric values and string "
-"representations"
-msgstr ""
-"Değer haritaları sayısal değerler ve karakter dizisi temsilleri arasında "
-"eşleştirme yapmak için kullanılır"
+msgid "Value maps are used to create a mapping between numeric values and string representations"
+msgstr "Değer haritaları sayısal değerler ve karakter dizisi temsilleri arasında eşleştirme yapmak için kullanılır"
 
 #: api/classes/class.citemgeneral.php:226
 msgid "Value type must be Float for aggregate items."
@@ -9379,9 +9145,7 @@ msgid "Warning. Incorrect value for field \"%s\"."
 msgstr "Uyarı:  \"%s\" alanı için geçersiz değer."
 
 #: include/locales/en_gb.inc.php:2029
-msgid ""
-"We are sorry, the maximum possible number of elements to remember has been "
-"reached."
+msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Özür dileriz, hatırlamak için olası maksimum eleman sayısına ulaşıldı."
 
 #: include/menu.inc.php:42 include/menu.inc.php:174
@@ -9619,12 +9383,8 @@ msgid "Yotta"
 msgstr "Yotta"
 
 #: include/forms.inc.php:391
-msgid ""
-"You are not able to choose some of the languages, because locales for them "
-"are not installed on the web server."
-msgstr ""
-"Web sunucu üzerinde yerelleştirme ayarları yapılmamış olan bazı diller "
-"seçilemeyecektir."
+msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
+msgstr "Web sunucu üzerinde yerelleştirme ayarları yapılmamış olan bazı diller seçilemeyecektir."
 
 #: api/classes/class.cuser.php:460
 #, php-format
@@ -9698,11 +9458,8 @@ msgid "You do not have permissions to update other users."
 msgstr "Diğer kullanıcıları güncellemek için izniniz yok."
 
 #: api/classes/class.cusermedia.php:403
-msgid ""
-"You do not have permissions to update user media or user media does not exist."
-msgstr ""
-"Kullanıcı iletişim aracını güncellemek için izniniz yok veya kullanıcı "
-"iletişim aracı mevcut değil."
+msgid "You do not have permissions to update user media or user media does not exist."
+msgstr "Kullanıcı iletişim aracını güncellemek için izniniz yok veya kullanıcı iletişim aracı mevcut değil."
 
 #: api/classes/class.cusermedia.php:413
 msgid "You do not have permissions to update user medias."
@@ -10068,9 +9825,7 @@ msgstr "'%1$s' yanında %2$d konumunda geçersiz sözdizimi"
 #: api/classes/class.citemkey.php:298
 #, php-format
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
-msgstr ""
-"köşeli ayraç sembolü için yanlış kullanım. Son köşeli ayraçtan sonra '%s' "
-"bulundu."
+msgstr "köşeli ayraç sembolü için yanlış kullanım. Son köşeli ayraçtan sonra '%s' bulundu."
 
 #: include/locales/en_gb.inc.php:1914
 msgid "is a minimal PHP memory limitation"
@@ -10381,4 +10136,5 @@ msgstr "evet"
 msgid "µ"
 msgstr "µ"
 
-
+#~ msgid "Id"
+#~ msgstr "Id"
