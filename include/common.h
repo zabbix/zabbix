@@ -953,7 +953,7 @@ LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
 int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);
 LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string);
 LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);
-int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
+LPSTR	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
 int	_wis_uint(LPCTSTR wide_string);
 #endif
 void	zbx_strlower(char *str);
