@@ -292,7 +292,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	if (1 == short_answer)
 	{
-		SET_UI64_RESULT(result, DNS_RCODE_NOERROR == res ? 1 : 0);
+		SET_UI64_RESULT(result, DNS_RCODE_NOERROR != res ? 0 : 1);
 		ret = SYSINFO_RET_OK;
 		goto clean;
 	}
@@ -304,7 +304,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	while (NULL != pDnsRecord)
 	{
-		if (pDnsRecord->Flags.S.Section != DnsSectionAnswer)
+		if (DnsSectionAnswer != pDnsRecord->Flags.S.Section)
 		{
 			pDnsRecord = pDnsRecord->pNext;
 			continue;
@@ -414,7 +414,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		pDnsRecord = pDnsRecord->pNext;
 	}
-
 #else	/* not _WINDOWS */
 	res_init();	/* initialize always, settings might have changed */
 
@@ -434,6 +433,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	_res.retrans = retrans;
 	_res.retry = retry;
+
 	res = res_send(buf, res, answer.buffer, sizeof(answer.buffer));
 
 	hp = (HEADER *)answer.buffer;
@@ -653,7 +653,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	zbx_rtrim(buffer + MAX(offset - 1, 0), "\n");
 
-	SET_TEXT_RESULT(result, strdup(buffer));
+	SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	ret = SYSINFO_RET_OK;
 
 #ifdef _WINDOWS
