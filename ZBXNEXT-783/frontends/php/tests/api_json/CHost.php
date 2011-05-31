@@ -163,7 +163,7 @@ class API_JSON_Host extends CZabbixTest
 			array(
 				// request
 				array(
-					'withProfiles' => true,
+					'withProfile' => true,
 					'selectProfile'=> array('type'),
 					'hostids' => 10017
 				),
@@ -176,7 +176,7 @@ class API_JSON_Host extends CZabbixTest
 			array(
 				// request
 				array(
-					'withProfiles' => true,
+					'withProfile' => true,
 					'selectProfile'=> array('os', 'tag'),
 					'hostids' => 10017
 				),
@@ -190,8 +190,8 @@ class API_JSON_Host extends CZabbixTest
 			array(
 				// request
 				array(
-					'withProfiles' => true,
-					'selectProfile'=> array('blabla'), // non existant field
+					'withProfile' => true,
+					'selectProfile'=> array('blabla'), // non existent field
 					'hostids' => 10017
 				),
 				// expected result

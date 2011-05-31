@@ -94,7 +94,7 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 	$options = array(
 		'output' => array('hostid', 'name'),
 		'selectProfile' => array($_REQUEST['groupby']), // only one field is required
-		'withProfiles' => true
+		'withProfile' => true
 	);
 	if($pageFilter->groupid > 0)
 		$options['groupids'] = $pageFilter->groupid;
