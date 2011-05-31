@@ -303,16 +303,16 @@ ActionProcessor.prototype = {
 
 	actionShow: function(value){
 		jQuery(value)
-				.toggle(true)
-				.find(':input')
-				.prop('disabled', false);
+			.toggle(true)
+			.find(':input')
+			.prop('disabled', false);
 	},
 
 	actionHide: function(value){
 		jQuery(value)
-				.toggle(false)
-				.find(':input')
-				.prop('disabled', true);
+			.toggle(false)
+			.find(':input')
+			.prop('disabled', true);
 	},
 
 	actionEnable: function(value){

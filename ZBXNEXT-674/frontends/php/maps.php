@@ -95,10 +95,10 @@ require_once('include/views/js/general.script.confirm.js.php');
 		'nodeids' => get_current_nodeid(),
 		'expandUrls' => true,
 		'selectSelements' => API_OUTPUT_EXTEND,
+		'selectLinks' => API_OUTPUT_EXTEND,
 		'preservekeys' => true,
 	);
 	$maps = API::Map()->get($options);
-	$maps = zbx_toHash($maps, 'sysmapid');
 
 	if($name = get_request(GET_PARAM_NAME)){
 		unset($_REQUEST['sysmapid']);

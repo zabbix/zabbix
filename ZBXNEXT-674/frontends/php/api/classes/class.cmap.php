@@ -20,7 +20,6 @@
 ?>
 <?php
 /**
- * File containing CMap class for API.
  * @package API
  */
 /**
@@ -30,7 +29,7 @@ class CMap extends CMapElement{
 /**
  * Get Map data
  *
- * @param _array $options
+ * @param array $options
  * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] HostGroup IDs
  * @param array $options['hostids'] Host IDs
