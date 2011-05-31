@@ -21,16 +21,13 @@
 #include "pid.h"
 #include "log.h"
 #include "threads.h"
-
 static FILE	*fpid = NULL;
 static int	fdpid = -1;
 
 int	create_pid_file(const char *pidfile)
 {
-	struct stat	buf;
 	int		fd;
-
-#ifdef HAVE_FCNTL_H
+	struct stat	buf;
 	struct flock	fl;
 
 	fl.l_type = F_WRLCK;
@@ -38,26 +35,18 @@ int	create_pid_file(const char *pidfile)
 	fl.l_start = 0;
 	fl.l_len = 0;
 	fl.l_pid = zbx_get_thread_id();
-#endif /* HAVE_FCNTL_H */
 
 	/* check if pid file already exists */
 	if (0 == stat(pidfile, &buf))
 	{
-#ifdef HAVE_FCNTL_H
 		if (-1 == (fd = open(pidfile, O_WRONLY | O_APPEND)))
-#else
-		if (-1 == (fd = open(pidfile, O_APPEND)))
-#endif
 		{
 			zbx_error("cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
 			zabbix_log(LOG_LEVEL_CRIT, "cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
 			return FAIL;
 		}
-#ifdef HAVE_FCNTL_H
+
 		if (-1 == fcntl(fd, F_SETLK, &fl) && EAGAIN == errno)
-#else
-		if (-1 == flock(fd, LOCK_EX | LOCK_NB) && EWOULDBLOCK == errno)
-#endif
 		{
 			close(fd);
 			zbx_error("File [%s] exists and is locked. Is this process already running?", pidfile);
@@ -78,16 +67,12 @@ int	create_pid_file(const char *pidfile)
 
 	/* lock file */
 	fdpid = fileno(fpid);
-#ifdef HAVE_FCNTL_H
+
 	if (-1 != fdpid)
 	{
 		fcntl(fdpid, F_SETLK, &fl);
 		fcntl(fdpid, F_SETFD, FD_CLOEXEC);
 	}
-#else
-	if (-1 != fdpid)
-		flock(fdpid, LOCK_EX);
-#endif
 
 	/* write pid to file */
 	fprintf(fpid, "%li", zbx_get_thread_id());
@@ -98,7 +83,6 @@ int	create_pid_file(const char *pidfile)
 
 void	drop_pid_file(const char *pidfile)
 {
-#ifdef HAVE_FCNTL_H
 	struct flock	fl;
 
 	fl.l_type = F_UNLCK;
@@ -106,16 +90,10 @@ void	drop_pid_file(const char *pidfile)
 	fl.l_start = 0;
 	fl.l_len = 0;
 	fl.l_pid = zbx_get_thread_id();
-#endif
 
 	/* unlock file */
-#ifdef HAVE_FCNTL_H
 	if (-1 != fdpid)
 		fcntl(fdpid, F_SETLK, &fl);
-#else
-	if (-1 != fdpid)
-		flock(fdpid, LOCK_UN);
-#endif
 
 	/* close pid file */
 	zbx_fclose(fpid);

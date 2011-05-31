@@ -22,8 +22,13 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#ifdef HAVE_STDIO_H
+#	include <stdio.h>
+#endif
+
+#ifdef HAVE_STDLIB_H
+#	include <stdlib.h>
+#endif
 
 #ifdef HAVE_ASSERT_H
 #	include <assert.h>
@@ -418,10 +423,6 @@
 
 #ifdef HAVE_IO_H
 #	include <io.h>
-#endif
-
-#ifdef HAVE_FCNTL_H
-#	include <fcntl.h>
 #endif
 
 #ifdef HAVE_SYS_MNTTAB_H
