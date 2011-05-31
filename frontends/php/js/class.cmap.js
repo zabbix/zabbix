@@ -54,27 +54,27 @@ function createMap(containerid, mapdata){
 		this.bindActions();
 
 		// initialize SELECTABLE
-		this.container.selectable({
-			start: jQuery.proxy(function(event){
-				if(!event.ctrlKey){
-					this.clearSelection();
-				}
-			}, this),
-			stop: jQuery.proxy(function(event){
-				var selected = jQuery('.ui-selected', this.container),
-					ids = [],
-					i,
-					ln;
-
-				for(i = 0, ln = selected.length; i < ln; i++){
-					ids.push(jQuery(selected[i]).data('id'));
-
-					// remove ui-selected class, to not confuse next selection
-					selected.removeClass('ui-selected');
-				}
-				this.selectElements(ids, event.ctrlKey);
-			}, this)
-		});
+//		this.container.selectable({
+//			start: jQuery.proxy(function(event){
+//				if(!event.ctrlKey){
+//					this.clearSelection();
+//				}
+//			}, this),
+//			stop: jQuery.proxy(function(event){
+//				var selected = jQuery('.ui-selected', this.container),
+//					ids = [],
+//					i,
+//					ln;
+//
+//				for(i = 0, ln = selected.length; i < ln; i++){
+//					ids.push(jQuery(selected[i]).data('id'));
+//
+//					// remove ui-selected class, to not confuse next selection
+//					selected.removeClass('ui-selected');
+//				}
+//				this.selectElements(ids, event.ctrlKey);
+//			}, this)
+//		});
 
 
 		this.bind = function(event, callback){

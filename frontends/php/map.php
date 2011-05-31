@@ -55,26 +55,196 @@ $options = array(
 	'output' => API_OUTPUT_EXTEND
 );
 $maps = API::Map()->get($options);
+$map = reset($maps);
 
-if(empty($maps)){
+if(!$map){
 	access_deny();
 }
-else{
-	$map = reset($maps);
+
+
+class CCanvas{
+
+	protected $canvas;
+	protected $width;
+	protected $height;
+	protected $colors = array();
+
+	public function __construct($w, $h){
+		$this->width = $w;
+		$this->height = $h;
+
+		if(function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)){
+			$this->canvas = imagecreatetruecolor($this->width, $this->height);
+		}
+		else{
+			$this->canvas = imagecreate($this->width, $this->height);
+		}
+
+		$this->allocateColors();
+	}
+
+	public function getWidth(){
+		return $this->width;
+	}
+
+	public function getHeight(){
+		return $this->height;
+	}
+
+	public function fill($color){
+		imagefilledrectangle($this->canvas, 0, 0, $this->width, $this->height, $this->getColor($color));
+	}
+
+	public function setBgImage($image){
+		$bg = imagecreatefromstring($image);
+		imagecopy($this->canvas, $bg, 0, 0, 0, 0, imagesx($bg), imagesy($bg));
+	}
+
+	public function drawTitle($text, $color){
+		$x = $this->width / 2 - imagefontwidth(4) * zbx_strlen($text) / 2;
+		imagetext($this->canvas, 10, 0, $x, 25, $this->getColor($color), $text);
+	}
+
+	public function drawBorder($color){
+		imagerectangle($this->canvas, 0, 0, $this->width - 1, $this->height - 1, $this->getColor($color));
+	}
+
+	public function getCanvas(){
+		$date = zbx_date2str(S_MAPS_DATE_FORMAT);
+		imagestring($this->canvas, 0, $this->width - 120, $this->height - 12, $date, $this->getColor('gray'));
+		imagestringup($this->canvas, 0, $this->width - 10, $this->height - 50, S_ZABBIX_URL, $this->getColor('gray'));
+
+		return $this->canvas;
+	}
+
+	public function drawLine($x1, $y1, $x2, $y2, $color, $drawtype){
+		MyDrawLine($this->canvas, $x1, $y1, $x2, $y2, $this->getColor($color), $drawtype);
+	}
+
+	public function drawText($fontsize, $angle, $x, $y, $color, $string){
+		imageText($this->canvas, $fontsize, $angle, $x, $y, $this->getColor($color), $string);
+	}
+
+
+	protected function getColor($color){
+		if(!isset($this->colors[$color])){
+			throw new Exception('Color "'.$color.'" is not allocated.');
+		}
+		return $this->colors[$color];
+	}
+
+	protected function allocateColors(){
+		$this->colors['red'] = imagecolorallocate($this->canvas, 255, 0, 0);
+		$this->colors['darkred'] = imagecolorallocate($this->canvas, 150, 0, 0);
+		$this->colors['green'] = imagecolorallocate($this->canvas, 0, 255, 0);
+		$this->colors['darkgreen'] = imagecolorallocate($this->canvas, 0, 150, 0);
+		$this->colors['blue'] = imagecolorallocate($this->canvas, 0, 0, 255);
+		$this->colors['darkblue'] = imagecolorallocate($this->canvas, 0, 0, 150);
+		$this->colors['yellow'] = imagecolorallocate($this->canvas, 255, 255, 0);
+		$this->colors['darkyellow'] = imagecolorallocate($this->canvas, 150, 150, 0);
+		$this->colors['cyan'] = imagecolorallocate($this->canvas, 0, 255, 255);
+		$this->colors['black'] = imagecolorallocate($this->canvas, 0, 0, 0);
+		$this->colors['gray'] = imagecolorallocate($this->canvas, 150, 150, 150);
+		$this->colors['white'] = imagecolorallocate($this->canvas, 255, 255, 255);
+		$this->colors['orange'] = imagecolorallocate($this->canvas, 238, 96, 0);
+	}
+
 }
 
-$name = $map['name'];
-$width = $map['width'];
-$height = $map['height'];
-$backgroundid = $map['backgroundid'];
-$status_view = 0; // $map['status_view'];
+class CMapPainter{
 
-if(function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)){
-	$im = imagecreatetruecolor($width, $height);
+	protected $canvas;
+	protected $mapData;
+	protected $options;
+
+	public function __construct(array $mapData, array $options = array()){
+		$this->options = array(
+			'map' => array(
+				'bgColor' => 'white',
+				'titleColor' => 'darkred',
+				'border' => true
+			),
+			'grid' => array(
+				'size' => 50,
+				'color' => 'black',
+				'labels' => false,
+			)
+		);
+		foreach($options as $key => $option){
+			$this->options[$key] = array_merge($this->options[$key], $option);
+		}
+
+		$this->canvas = new CCanvas($mapData['width'], $mapData['height']);
+
+		$this->mapData = $mapData;
+	}
+
+	public function paint(){
+
+		$this->paintBackground();
+		$this->paintTitle();
+		$this->paintGrid();
+
+
+		return $this->canvas->getCanvas();
+	}
+
+	protected function paintBackground(){
+		if($this->mapData['backgroundid'] && ($bgImage = get_image_by_imageid($this->mapData['backgroundid']))){
+			$this->canvas->setBgImage($bgImage);
+		}
+		else{
+			$this->canvas->fill($this->options['map']['bgColor']);
+		}
+	}
+
+	protected function paintTitle(){
+		$this->canvas->drawTitle($this->mapData['name'], $this->options['map']['titleColor']);
+	}
+
+	protected function paintGrid(){
+		$size = $this->options['grid']['size'];
+		if(!$size) return;
+
+		$width = $this->canvas->getWidth();
+		$height = $this->canvas->getHeight();
+		$maxSize = max($width, $height);
+
+		if($this->options['grid']['labels']){
+			$dims = imageTextSize(8, 0, '00');
+		}
+		for($xy = $size; $xy < $maxSize; $xy += $size){
+			if($xy < $width){
+				$this->canvas->drawLine($xy, 0, $xy, $height, $this->options['grid']['color'], MAP_LINK_DRAWTYPE_DASHED_LINE);
+				if($this->options['grid']['labels']){
+					$this->canvas->drawText(8, 0, $xy + 3, $dims['height'] + 3, $this->options['grid']['color'], $xy);
+				}
+
+			}
+			if($xy < $height){
+				$this->canvas->drawLine(0, $xy, $width, $xy, $this->options['grid']['color'], MAP_LINK_DRAWTYPE_DASHED_LINE);
+				if($this->options['grid']['labels']){
+					$this->canvas->drawText(8, 0, 3, $xy + $dims['height'] + 3, $this->options['grid']['color'], $xy);
+				}
+			}
+		}
+
+		//		if($this->options['grid']['labels']){
+		//			$this->canvas->drawText(8, 0, 2, $dims['height'] + 3, 'black', 'Y X:');
+		//		}
+
+	}
 }
-else{
-	$im = imagecreate($width, $height);
-}
+
+$mapOptions = array(
+	'grid' => array(
+		'size' => get_request('grid', 0),
+	),
+);
+$mapPainter = new CMapPainter($map, $mapOptions);
+
+$im = $mapPainter->paint();
+
 
 $colors['Red'] = imagecolorallocate($im, 255, 0, 0);
 $colors['Dark Red'] = imagecolorallocate($im, 150, 0, 0);
@@ -91,42 +261,10 @@ $colors['White'] = imagecolorallocate($im, 255, 255, 255);
 $colors['Orange'] = imagecolorallocate($im, 238, 96, 0);
 
 
+
 $x = imagesx($im);
 $y = imagesy($im);
 
-imagefilledrectangle($im, 0, 0, $width, $height, $colors['White']);
-
-if(($db_image = get_image_by_imageid($backgroundid))){
-	$back = imagecreatefromstring($db_image['image']);
-	imagecopy($im, $back, 0, 0, 0, 0, imagesx($back), imagesy($back));
-}
-unset($db_image);
-
-$x = imagesx($im) / 2 - ImageFontWidth(4) * zbx_strlen($name) / 2;
-imagetext($im, 10, 0, $x, 25, $colors['Dark Red'], $name);
-
-
-$str = zbx_date2str(S_MAPS_DATE_FORMAT);
-imagestring($im, 0, imagesx($im) - 120, imagesy($im) - 12, $str, $colors['Gray']);
-
-if(isset($_REQUEST['grid'])){
-	$grid = get_request('grid', 50);
-	if(!is_numeric($grid)) {
-		$grid = 50;
-	}
-
-	$dims = imageTextSize(8, 0, '11');
-	for($x = $grid; $x < $width; $x += $grid){
-		MyDrawLine($im, $x, 0, $x, $height, $colors['Black'], MAP_LINK_DRAWTYPE_DASHED_LINE);
-		imageText($im, 8, 0, $x + 3, $dims['height'] + 3, $colors['Black'], $x);
-	}
-	for($y = $grid; $y < $height; $y += $grid){
-		MyDrawLine($im, 0, $y, $width, $y, $colors['Black'], MAP_LINK_DRAWTYPE_DASHED_LINE);
-		imageText($im, 8, 0, 3, $y + $dims['height'] + 3, $colors['Black'], $y);
-	}
-
-	imageText($im, 8, 0, 2, $dims['height'] + 3, $colors['Black'], 'Y X:');
-}
 // ACTION /////////////////////////////////////////////////////////////////////////////
 
 $json = new CJSON();
@@ -157,7 +295,9 @@ if(get_request('nocalculations', false)){
 	}
 }
 else{
+	$areas = processMapAreas($map);
 	$map_info = getSelementsInfo($map);
+	recalculateAreas($map, $areas, $map_info);
 }
 
 // Draw MAP
@@ -176,11 +316,6 @@ if(!isset($_REQUEST['noselements']) && ($map['markelements'] == 1)){
 }
 //--
 
-imagestringup($im, 0, imagesx($im) - 10, imagesy($im) - 50, S_ZABBIX_URL, $colors['Gray']);
-
-if(!isset($_REQUEST['border'])){
-	imagerectangle($im, 0, 0, $width - 1, $height - 1, $colors['Black']);
-}
 
 show_messages();
 
