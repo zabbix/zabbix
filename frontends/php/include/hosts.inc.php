@@ -35,9 +35,10 @@
 	 *      echo $profiles[1]['title']; // Host networks
 	 *      echo $profiles[1]['nr']; // 1
 	 * @author Konstantin Buravcov
+	 * @param bool $orderedByTitle whether an array should be ordered by field title, not by number
 	 * @return array
 	 */
-	function getHostProfiles(){
+	function getHostProfiles($orderedByTitle=false){
 		/**
 		 * WARNING! Before modifying this array, make sure changes are synced with C
 		 * C analog is located in function DBget_profile_field() in src/libs/zbxdbhigh/db.c
@@ -394,6 +395,15 @@
 				'title' => _('Secondary POC notes'),
 			)
 		);
+
+		// array is ordered by number by default, should we change that and order by title?
+		if($orderedByTitle){
+			function sortProfilesByTitle($a, $b){
+				return strcmp($a['title'], $b['title']);
+			}
+			uasort($profileFields, 'sortProfilesByTitle');
+		}
+
 		return $profileFields;
 
 		/*
