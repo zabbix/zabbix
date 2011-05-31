@@ -2,9 +2,10 @@
 Changes for 1.9.5
 
 New features:
+ - [ZBX-1357] updated Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-783] Added Inventory -> Overview report and filter to Inventory -> Hosts (KB)
  - [ZBXNEXT-467] Renamed net.tcp.dns(.query)[] to net.dns(.record)[], added Windows support, retrans and timeout parameters and IP parameter support for UNIX (rudolfs)
- - [ZBX-3828] added partial Turkish translation; thanks to Murat Koç (Richlv)
+ - [ZBX-3828] added Turkish translation; thanks to Murat Koç (Richlv)
  - [ZBXNEXT-677] added system.hw.* and system.sw.* items for Linux (rudolfs)
  - [ZBXNEXT-780] all items (including user parameters and external checks) can also return only whitespace (rudolfs)
 

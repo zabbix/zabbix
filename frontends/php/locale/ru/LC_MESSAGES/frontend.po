@@ -3,14 +3,15 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-05-31 20:50+0300\n"
-"PO-Revision-Date: 2011-05-17 16:06+0200\n"
+"PO-Revision-Date: 2011-05-29 19:42+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -65,7 +66,7 @@ msgstr "(сначала выберите узел сети)"
 
 #: include/screens.inc.php:801 popup.php:1691 popup.php:1694
 msgid "- all groups -"
-msgstr ""
+msgstr "- все группы -"
 
 #: include/locales/en_gb.inc.php:493
 msgid "- other -"
@@ -218,7 +219,7 @@ msgstr "В действии \"%s\" некорректное значение д�
 #: api/classes/class.caction.php:948
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr ""
+msgstr "Действие \"%s\" не имеет настроенных операций."
 
 #: actionconf.php:157
 msgid "Action added"
@@ -254,7 +255,7 @@ msgstr "Активировать выбранные узлы сети"
 
 #: hosts.php:1004
 msgid "Activate selected hosts?"
-msgstr ""
+msgstr "Активировать выбранные узлы сети?"
 
 #: include/discovery.inc.php:119 include/locales/en_gb.inc.php:471
 #: include/locales/en_gb.inc.php:851
@@ -546,7 +547,7 @@ msgstr "Авто-выход (мин 90 секунд)"
 #: include/views/configuration.host.edit.php:534
 #: include/views/configuration.host.massupdate.php:218
 msgid "Automatic"
-msgstr ""
+msgstr "Автоматически"
 
 #: hosts.php:769 include/locales/en_gb.inc.php:764
 msgid "Availability"
@@ -947,12 +948,12 @@ msgstr "Не удалось создать другое подключение �
 
 #: discoveryconf.php:125
 msgid "Cannot create discovery rule."
-msgstr ""
+msgstr "Не удалось создать правило обнаружения."
 
 #: include/export.inc.php:818
 #, php-format
 msgid "Cannot create map \"%s\"."
-msgstr ""
+msgstr "Не удалось создать карту сети \"%s\"."
 
 #: api/classes/class.cusermedia.php:425 api/classes/class.cuser.php:405
 #, php-format
@@ -974,7 +975,7 @@ msgstr "Не удалось удалить правило обнаружения
 
 #: discoveryconf.php:140
 msgid "Cannot delete discovery rule."
-msgstr ""
+msgstr "Не удалось удалить правило обнаружения."
 
 #: api/classes/class.citem.php:1070 include/locales/en_gb.inc.php:543
 msgid "Cannot delete graph"
@@ -1044,11 +1045,13 @@ msgstr "Не удалось удалить скрипт"
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr ""
+"Не удалось удалить скрипты. Скрипт \"%1$s\" используется в операции действия \""
+"%2$s\"."
 
 #: api/classes/class.cscript.php:519
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
-msgstr ""
+msgstr "Не удалось удалить скрипты. Скрипт с scriptid \"%s\" не существует."
 
 #: actionconf.php:324
 msgid "Cannot delete selected actions"
@@ -1116,6 +1119,8 @@ msgstr "Не удалось найти узел сети"
 #, php-format
 msgid "Cannot find host interface on host \"%1$s\" for item key \"%2$s\"."
 msgstr ""
+"Не удалось найти интерфейс у узла сети \"%1$s\" для ключа элемента данных \"%"
+"2$s\"."
 
 #: include/locales/en_gb.inc.php:1045
 msgid "Cannot find hostgroup"
@@ -3103,7 +3108,7 @@ msgstr ""
 
 #: api/classes/class.ctemplate.php:1028
 msgid "Field \"host\" is mandatory"
-msgstr "Поле \"имя узла сети\" обязательно"
+msgstr "Поле \"host\" обязательно"
 
 #: api/classes/class.cdrule.php:541
 msgid "Field \"name\" is required."
@@ -4122,7 +4127,7 @@ msgstr "Некорректный тип условия действия."
 
 #: api/classes/class.caction.php:940
 msgid "Incorrect action conditionid"
-msgstr "Некорретный id условия действия"
+msgstr "Некорректный id условия действия"
 
 #: api/classes/class.caction.php:1545
 msgid "Incorrect action operation command type."
@@ -4130,7 +4135,7 @@ msgstr ""
 
 #: api/classes/class.caction.php:1721
 msgid "Incorrect action operation condition acknowledge type."
-msgstr "Некорректный тип подтверждения для условия действия операции."
+msgstr "Некорректный тип подтверждения для условия операции действия."
 
 #: api/classes/class.caction.php:1725
 msgid "Incorrect action operation condition type"
@@ -4184,7 +4189,7 @@ msgstr "Для метода предоставлены некорректные 
 #: api/classes/class.chost.php:1360
 #, php-format
 msgid "Incorrect characters used for Host name \"%s\""
-msgstr "Использованы недопустимые символы в имени хоста \"%s\""
+msgstr "Использованы недопустимые символы в имени узла сети \"%s\""
 
 #: api/classes/class.chost.php:1728
 #, php-format
@@ -5277,7 +5282,7 @@ msgstr "Карта сети сохранена! Завершить редакт�
 
 #: include/views/configuration.sysmap.edit.php:104
 msgid "Map label type"
-msgstr "Тип подписи карты"
+msgstr "Тип подписи карты сети"
 
 #: sysmap.php:183
 msgid "Map save operation failed."
