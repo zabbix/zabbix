@@ -141,6 +141,20 @@ int	zbx_vector_ ## __id ## _lsearch(zbx_vector_ ## __id ## _t *vector, __type va
 	return FAIL;												\
 }														\
 														\
+int	zbx_vector_ ## __id ## _search(zbx_vector_ ## __id ## _t *vector, __type value,				\
+									zbx_compare_func_t compare_func)	\
+{														\
+	int	index;												\
+														\
+	for (index = 0; index < vector->values_num; index++)							\
+	{													\
+		if (0 == compare_func(&vector->values[index], &value))						\
+			return index;										\
+	}													\
+														\
+	return FAIL;												\
+}														\
+														\
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size)				\
 {														\
 	if (size > vector->values_alloc)									\
@@ -162,3 +176,4 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 }
 
 ZBX_VECTOR_IMPL(uint64, zbx_uint64_t);
+ZBX_VECTOR_IMPL(str, char *);
