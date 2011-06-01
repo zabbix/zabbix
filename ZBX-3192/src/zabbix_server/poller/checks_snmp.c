@@ -37,7 +37,7 @@ static int		snmpidx_count = 0, snmpidx_alloc = 16;
 
 /******************************************************************************
  *                                                                            *
- * Function: snmpidx_cmp                                                      *
+ * Function: zbx_snmp_index_compare                                           *
  *                                                                            *
  * Purpose: compare index against snmpidx entry                               *
  *                                                                            *
@@ -54,22 +54,17 @@ static int		snmpidx_count = 0, snmpidx_alloc = 16;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	snmpidx_cmp(DC_ITEM *item, const char *oid, const char *value, int pos)
+static int	zbx_snmp_index_compare(zbx_snmp_index_t *s1, zbx_snmp_index_t *s2)
 {
-	int	hres, pres, ores, vres;
+	int	rc;
 
-	hres = snmpidx[pos].hostid == item->host.hostid ? 0 : snmpidx[pos].hostid < item->host.hostid ? -1 : 1;
-	pres = snmpidx[pos].port   == item->snmp_port   ? 0 : snmpidx[pos].port   < item->snmp_port   ? -1 : 1;
-	ores = strcmp(snmpidx[pos].oid, oid);
-	vres = strcmp(snmpidx[pos].value, value);
-
-	if (hres == 0 && pres == 0 && ores == 0 && vres == 0)
-		return 0; /* match */
-
-	if (0 > hres || 0 > pres || 0 > ores || 0 > vres)
-		return -1;
-
-	return 1;
+	if (s1->hostid < s2->hostid) return -1;
+	if (s1->hostid > s2->hostid) return +1;
+	if (s1->port < s2->port) return -1;
+	if (s1->port > s2->port) return +1;
+	if (0 != (rc = strcmp(s1->oid, s2->oid)))
+		return rc;
+	return strcmp(s1->value, s2->value);
 }
 
 /******************************************************************************
@@ -87,12 +82,13 @@ static int	snmpidx_cmp(DC_ITEM *item, const char *oid, const char *value, int po
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_snmpidx_nearestindex(DC_ITEM *item, const char *oid, const char *value)
+static int	get_snmpidx_nearestindex(zbx_snmp_index_t *s)
 {
 	const char	*__function_name = "get_snmpidx_nearestindex";
 	int		first_index, last_index, index = 0, cmp_res;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(oid:%s,value:%s)", __function_name, oid, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " port:%hu oid:'%s' value:'%s'",
+			__function_name, s->hostid, s->port, s->oid, s->value);
 
 	if (snmpidx_count == 0)
 		goto end;
@@ -103,19 +99,17 @@ static int	get_snmpidx_nearestindex(DC_ITEM *item, const char *oid, const char *
 	{
 		index = first_index + (last_index - first_index) / 2;
 
-		cmp_res = snmpidx_cmp(item, oid, value, index);
-
-		if (0 == cmp_res)
-		{
+		if (0 == (cmp_res = zbx_snmp_index_compare(s, &snmpidx[index])))
 			break;
-		}
-		else if (last_index == first_index)
+
+		if (last_index == first_index)
 		{
-			if (0 > cmp_res)
+			if (0 < cmp_res)
 				index++;
 			break;
 		}
-		else if (0 > cmp_res)
+
+		if (0 < cmp_res)
 			first_index = index + 1;
 		else
 			last_index = index;
@@ -126,10 +120,11 @@ end:
 	return index;
 }
 
-static int	cache_get_snmp_index(DC_ITEM *item, const char *oid, const char *value, int *index)
+static int	cache_get_snmp_index(DC_ITEM *item, char *oid, char *value, int *index)
 {
-	const char	*__function_name = "cache_get_snmp_index";
-	int		i, res = FAIL;
+	const char		*__function_name = "cache_get_snmp_index";
+	int			i, res = FAIL;
+	zbx_snmp_index_t	s;
 
 	assert(index);
 
@@ -140,8 +135,12 @@ static int	cache_get_snmp_index(DC_ITEM *item, const char *oid, const char *valu
 	if (NULL == snmpidx)
 		goto end;
 
-	i = get_snmpidx_nearestindex(item, oid, value);
-	if (i < snmpidx_count && 0 == snmpidx_cmp(item, oid, value, i))
+	s.oid = oid;
+	s.value = value;
+	s.hostid = item->host.hostid;
+	s.port = item->snmp_port;
+
+	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)) && 0 == zbx_snmp_index_compare(&s, &snmpidx[i]))
 	{
 		*index = snmpidx[i].index;
 		res = SUCCEED;
@@ -152,18 +151,23 @@ end:
 	return res;
 }
 
-static void	cache_put_snmp_index(DC_ITEM *item, const char *oid, const char *value, int index)
+static void	cache_put_snmp_index(DC_ITEM *item, char *oid, char *value, int index)
 {
-	const char	*__function_name = "cache_put_snmp_index";
-	int		i;
+	const char		*__function_name = "cache_put_snmp_index";
+	int			i;
+	zbx_snmp_index_t	s;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(oid:%s,value:%s,index:%d)", __function_name, oid, value, index);
 
 	if (NULL == snmpidx)
 		snmpidx = zbx_malloc(snmpidx, snmpidx_alloc * sizeof(zbx_snmp_index_t));
 
-	i = get_snmpidx_nearestindex(item, oid, value);
-	if (i < snmpidx_count && 0 == snmpidx_cmp(item, oid, value, i))
+	s.oid = oid;
+	s.value = value;
+	s.hostid = item->host.hostid;
+	s.port = item->snmp_port;
+
+	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)) && 0 == zbx_snmp_index_compare(&s, &snmpidx[i]))
 	{
 		snmpidx[i].index = index;
 		goto end;
@@ -187,18 +191,23 @@ end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	cache_del_snmp_index(DC_ITEM *item, const char *oid, const char *value)
+static void	cache_del_snmp_index(DC_ITEM *item, char *oid, char *value)
 {
-	const char	*__function_name = "cache_del_snmp_index";
-	int		i;
+	const char		*__function_name = "cache_del_snmp_index";
+	int			i;
+	zbx_snmp_index_t	s;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(oid:%s,value:%s)", __function_name, oid, value);
 
 	if (NULL == snmpidx)
 		goto end;
 
-	i = get_snmpidx_nearestindex(item, oid, value);
-	if (i < snmpidx_count && 0 == snmpidx_cmp(item, oid, value, i))
+	s.oid = oid;
+	s.value = value;
+	s.hostid = item->host.hostid;
+	s.port = item->snmp_port;
+
+	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)) && 0 == zbx_snmp_index_compare(&s, &snmpidx[i]))
 	{
 		zbx_free(snmpidx[i].oid);
 		zbx_free(snmpidx[i].value);
