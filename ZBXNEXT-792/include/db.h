@@ -93,13 +93,13 @@ typedef enum {
 #define TRIGGER_ERROR_LEN		128
 #define TRIGGER_ERROR_LEN_MAX		TRIGGER_ERROR_LEN+1
 
-#define HOST_HOST_LEN			64
+#define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		HOST_HOST_LEN+1
 #define HOST_DNS_LEN			64
 #define HOST_DNS_LEN_MAX		HOST_DNS_LEN+1
 #define HOST_IP_LEN			39
 #define HOST_IP_LEN_MAX			HOST_IP_LEN+1
-#define HOST_ADDR_LEN			64 /* MAX(HOST_DNS_LEN,HOST_IP_LEN) */
+#define HOST_ADDR_LEN			64	/* MAX(HOST_DNS_LEN,HOST_IP_LEN) */
 #define HOST_ADDR_LEN_MAX		HOST_ADDR_LEN+1
 #define HOST_ERROR_LEN			128
 #define HOST_ERROR_LEN_MAX		HOST_ERROR_LEN+1
@@ -353,6 +353,8 @@ typedef struct
 	int	mtime;
 
 	zbx_uint64_t	valuemapid;
+
+	char	*error;
 }
 DB_ITEM;
 
