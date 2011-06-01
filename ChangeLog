@@ -162,6 +162,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBXNEXT-792] added type parameter for system.hostname[] on Windows to support both NetBIOS and host names (rudolfs)
  - [ZBXNEXT-791] added HostnameItem to Agent and Proxy configuration for setting the default Hostname (rudolfs)
  - [ZBX-3825] fixed errors with single quotes in javascript messages (KB)
  - [ZBXNEXT-782] added support of not-supported items in the history cache (Sasha)

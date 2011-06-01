@@ -19,8 +19,8 @@
 
 #include "common.h"
 #include "sysinfo.h"
-
 #include "system.h"
+#include "log.h"
 
 #ifdef _WINDOWS
 #	include "perfmon.h"
@@ -223,17 +223,48 @@ int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 #if defined(_WINDOWS)
 	DWORD	dwSize = 256;
 	TCHAR	computerName[256]; 
+	char	buffer[256];
+	int	netbios, ret;
+	WSADATA sockInfo;
 
-	/* Buffer size is chosen large enough to contain any DNS name, not just MAX_COMPUTERNAME_LENGTH + 1 */
-	/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
-	/* cannot use the constant in a precompiled Windows agent, which is expected to work on any system. */
-	if (0 == GetComputerName(computerName, &dwSize))
-		*computerName = '\0';
+	if (1 < num_param(param))
+		return SYSINFO_RET_FAIL;
 
-	SET_STR_RESULT(result, zbx_unicode_to_utf8(computerName));
+	if (0 != get_param(param, 1, buffer, sizeof(buffer)))
+		*buffer = '\0';
 
-	return SYSINFO_RET_OK;
+	if ('\0' == *buffer || 0 == strcmp(buffer, "netbios"))
+		netbios = 1;
+	else if (0 == strcmp(buffer, "host"))
+		netbios = 0;
+	else
+		return SYSINFO_RET_FAIL;
+
+	if (1 == netbios)
+	{
+		/* Buffer size is chosen large enough to contain any DNS name, not just MAX_COMPUTERNAME_LENGTH + 1 */
+		/* characters. MAX_COMPUTERNAME_LENGTH is usually less than 32, but it varies among systems, so we  */
+		/* cannot use the constant in a precompiled Windows agent, which is expected to work on any system. */
+		if (0 == GetComputerName(computerName, &dwSize))
+			zabbix_log(LOG_LEVEL_ERR, "GetComputerName() failed: %s", strerror_from_system(GetLastError()));
+		else
+			SET_STR_RESULT(result, zbx_unicode_to_utf8(computerName));
+	}
+	else
+	{
+		if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+			zabbix_log(LOG_LEVEL_ERR, "WSAStartup() failed: %s", strerror_from_system(ret));
+		else if (SUCCEED != gethostname(buffer, sizeof(buffer)))
+			zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", strerror_from_system(WSAGetLastError()));
+		else
+			SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
+	}
+
+	if (ISSET_STR(result))
+		return SYSINFO_RET_OK;
+	else
+		return SYSINFO_RET_FAIL;
 #else
 	return EXECUTE_STR(cmd, "hostname", flags, result);
-#endif
+#endif	/* _WINDOWS */
 }
