@@ -187,7 +187,7 @@ int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	}
 	else
 	{
-		if (SUCCEED != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
+		if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
 			zabbix_log(LOG_LEVEL_ERR, "WSAStartup() failed: %s", strerror_from_system(ret));
 		else if (SUCCEED != gethostname(buffer, sizeof(buffer)))
 			zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", strerror_from_system(WSAGetLastError()));
