@@ -249,7 +249,7 @@ include_once('include/page_header.php');
 	// allow CSV export button
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
-	if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid']);
+	if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
 	if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid']);
 	if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source']);
 	if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);

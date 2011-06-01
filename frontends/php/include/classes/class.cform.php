@@ -59,10 +59,10 @@ class CForm extends CTag{
 	return $this->setAttribute('enctype',$value);
 	}
 
-	public function addVar($name, $value){
+	public function addVar($name, $value, $id=null){
 		if(empty($value) && $value != 0)	return $value;
 
-	return $this->addItem(new CVar($name, $value));
+		return $this->addItem(new CVar($name, $value, $id));
 	}
 }
 ?>
