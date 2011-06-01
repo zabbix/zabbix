@@ -1396,22 +1396,22 @@
 	 * @param bool $useHousekeeper schedule deletion for housekeeper instead of deleting now
 	 * @return bool
 	 */
-	function delete_trends_by_itemid($itemIds, $useHousekeeper=false){
+	function delete_trends_by_itemid($itemIds, $useHousekeeper = false){
 		zbx_value2array($itemIds);
 
 		if($useHousekeeper){
 			foreach($itemIds as $itemId){
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
 				DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
-					" VALUES ($housekeeperid, 'trends','itemid',$itemId)");
+					" VALUES ($housekeeperid,'trends','itemid',$itemId)");
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
 				DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
-					" VALUES ($housekeeperid, 'trends_uint','itemid',$itemId)");
+					" VALUES ($housekeeperid,'trends_uint','itemid',$itemId)");
 			}
 			return true;
 		}
-		$r1 = DBexecute('DELETE FROM trends WHERE '.DBcondition('itemid',$itemIds));
-		$r2 = DBexecute('DELETE FROM trends_uint WHERE '.DBcondition('itemid',$itemIds));
+		$r1 = DBexecute('DELETE FROM trends WHERE '.DBcondition('itemid', $itemIds));
+		$r2 = DBexecute('DELETE FROM trends_uint WHERE '.DBcondition('itemid', $itemIds));
 		return $r1 && $r2;
 	}
 
