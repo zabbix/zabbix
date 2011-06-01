@@ -463,6 +463,7 @@ function get_accessible_hosts_by_rights(&$rights,$user_type,$perm,$perm_res=null
 	$host_perm = array();
 
 	$where = array();
+	array_push($where, 'h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
 	if(!is_null($nodeid))	array_push($where, DBin_node('h.hostid', $nodeid));
 	$where = count($where)?$where = ' WHERE '.implode(' AND ',$where):'';
 
