@@ -22,7 +22,7 @@ $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_H)
 	$(MT) /outputresource:"$(PROGNAME);#1" /manifest zabbix_sender.exe.manifest /nologo
 
 $(MESSAGES_H): messages.mc
-	$(MC) -U -s -h ".\\" -r ".\\" messages.mc
+	$(MC) -U -h ".\\" -r ".\\" messages.mc
 
 ..\..\..\src\libs\zbxcommon\alias.o: ..\..\..\src\libs\zbxcommon\alias.c
 	$(CC) ..\..\..\src\libs\zbxcommon\alias.c /Fo"..\..\..\src\libs\zbxcommon\alias.o" $(CFLAGS)

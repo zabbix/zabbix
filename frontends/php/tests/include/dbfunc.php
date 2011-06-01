@@ -56,31 +56,43 @@ function DBdata($query)
  * For example: DBget_tables('users')
  * Result: array(users,alerts,acknowledges,auditlog,auditlog_details,opmessage_usr,media,profiles,sessions,users_groups)
  */
-function DBget_tables($topTable)
+function DBget_tables(&$tables, $topTable)
 {
-	$referencedTables = array($topTable);
+	if(in_array($topTable, $tables))
+		return;
 
 	$schema = include(dirname(__FILE__).'/../../include/schema.inc.php');
+
+	$tableData = $schema[$topTable];
+
+	$fields = $tableData['fields'];
+	foreach($fields as $field => $fieldData){
+		if(isset($fieldData['ref_table'])){
+			$refTable = $fieldData['ref_table'];
+			if($refTable != $topTable)
+				DBget_tables($tables, $refTable);
+		}
+	}
+
+	if(!in_array($topTable, $tables))
+		$tables[] = $topTable;
+
 	foreach($schema as $table => $tableData)
 	{
 		$fields = $schema[$table]['fields'];
+		$referenced = false;
 		foreach($fields as $field => $fieldData){
 			if(isset($fieldData['ref_table'])){
 				$refTable = $fieldData['ref_table'];
 				if($refTable == $topTable && $topTable != $table){
-					$referencedTables[] = $table;
-					$deeperTables=DBget_tables($table);
-					if(!empty($deeperTables)){
-						$referencedTables = array_merge($referencedTables, $deeperTables);
-					}
+					DBget_tables($tables, $table);
 				}
 			}
 		}
 	}
-	return array_unique($referencedTables);
 }
 
-/**
+/*
  * Saves data of the specified table and all dependent tables in temporary storage.
  * For example: DBsave_tables('users')
  */
@@ -88,7 +100,9 @@ function DBsave_tables($topTable)
 {
 	global $DB;
 
-	$tables=DBget_tables($topTable);
+	$tables = array();
+
+	DBget_tables($tables, $topTable);
 
 	foreach($tables as $table)
 	{
@@ -117,7 +131,9 @@ function DBrestore_tables($topTable)
 {
 	global $DB;
 
-	$tables=DBget_tables($topTable);
+	$tables = array();
+
+	DBget_tables($tables, $topTable);
 
 	$tables_reversed = array_reverse($tables);
 

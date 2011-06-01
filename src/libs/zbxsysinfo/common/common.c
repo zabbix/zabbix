@@ -35,7 +35,7 @@
 #else
 #	define VFS_TEST_FILE "c:\\windows\\win.ini"
 #	define VFS_TEST_REGEXP "fonts"
-#endif /* _WINDOWS */
+#endif
 
 extern int	CONFIG_TIMEOUT;
 
@@ -66,11 +66,13 @@ ZBX_METRIC	parameters_common[] =
 	{"vfs.file.md5sum",	CF_USEUPARAM,	VFS_FILE_MD5SUM,	0,	VFS_TEST_FILE},
 	{"vfs.file.cksum",	CF_USEUPARAM,	VFS_FILE_CKSUM,		0,	VFS_TEST_FILE},
 
-	{"net.tcp.dns",		CF_USEUPARAM,	NET_TCP_DNS,		0,	",zabbix.com"},
-	{"net.tcp.dns.query",	CF_USEUPARAM,	NET_TCP_DNS_QUERY,	0,	",zabbix.com"},
+	{"net.dns",		CF_USEUPARAM,	NET_DNS,		0,	",zabbix.com"},
+	{"net.dns.record",	CF_USEUPARAM,	NET_DNS_RECORD,		0,	",zabbix.com"},
+	{"net.tcp.dns",		CF_USEUPARAM,	NET_DNS,		0,	",zabbix.com"}, /* deprecated */
+	{"net.tcp.dns.query",	CF_USEUPARAM,	NET_DNS_RECORD,		0,	",zabbix.com"}, /* deprecated */
 	{"net.tcp.port",	CF_USEUPARAM,	NET_TCP_PORT,		0,	",80"},
 
-	{"system.hostname",	0,		SYSTEM_HOSTNAME,	0,	0},
+	{"system.hostname",	CF_USEUPARAM,	SYSTEM_HOSTNAME,	0,	0},
 	{"system.uname",	0,		SYSTEM_UNAME,		0,	0},
 
 	{"system.users.num",	0,		SYSTEM_USERS_NUM,	0,	0},
@@ -93,15 +95,12 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 {
 #ifdef	HAVE_PROC
 	FILE	*f;
-	char	*t;
-	char	c[MAX_STRING_LEN];
+	char	*t, c[MAX_STRING_LEN];
 	int	i;
 	double	value = 0;
 
-	if(NULL == (f = fopen(file,"r")))
-	{
+	if (NULL == (f = fopen(file,"r")))
 		return SYSINFO_RET_FAIL;
-	}
 
 	for(i=1; i<=lineno; i++)
 	{
@@ -126,7 +125,7 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
-#endif /* HAVE_PROC */
+#endif	/* HAVE_PROC */
 }
 
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -143,6 +142,23 @@ static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGE
 	return SYSINFO_RET_OK;
 }
 
+int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	int	ret;
+
+	ret = EXECUTE_STR(cmd, param, flags, result);
+
+	if (SYSINFO_RET_FAIL == ret && 0 == result->type)
+	{
+		/* only whitespace */
+
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
+		ret = SYSINFO_RET_OK;
+	}
+
+	return ret;
+}
+
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
@@ -152,37 +168,23 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	init_result(result);
 
-	switch (zbx_execute(param, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
+	if (SUCCEED != zbx_execute(param, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
 	{
-		case SUCCEED:
-			ret = SYSINFO_RET_OK;
-			break;
-		default:
-			SET_MSG_RESULT(result, zbx_strdup(NULL, error));
-			ret = SYSINFO_RET_FAIL;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+		goto lbl_exit;
 	}
 
-	if (SYSINFO_RET_OK == ret)
-	{
-		zbx_rtrim(cmd_result, ZBX_WHITESPACE);
+	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
-		/* we got whitespace only */
-		if ('\0' == *cmd_result)
-		{
-			ret = SYSINFO_RET_FAIL;
-			goto lbl_exit;
-		}
-	}
-	else
+	if ('\0' == *cmd_result)	/* we got whitespace only */
 		goto lbl_exit;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...",
-				param, strlen(cmd_result), cmd_result);
+			param, strlen(cmd_result), cmd_result);
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
 
 	ret = SYSINFO_RET_OK;
-
 lbl_exit:
 	zbx_free(cmd_result);
 
@@ -225,23 +227,20 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 {
 	char	command[MAX_STRING_LEN], flag[9];
 
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 	STARTUPINFO		si;
 	PROCESS_INFORMATION	pi;
 	char			full_command[MAX_STRING_LEN];
 	LPTSTR			wcommand;
 	int			ret = SYSINFO_RET_FAIL;
-#else /* not _WINDOWS */
+#else
 	pid_t			pid;
 #endif
 
-	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_NOTSUPPORTED"));
+	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if (num_param(param) > 2)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, command, sizeof(command)))
@@ -263,7 +262,7 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 	else if (0 != strcmp(flag, "nowait"))
 		return SYSINFO_RET_FAIL;
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 
 	zbx_snprintf(full_command, sizeof(full_command), "cmd /C \"%s\"", command);
 
@@ -274,16 +273,16 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 	wcommand = zbx_utf8_to_unicode(full_command);
 
 	if (!CreateProcess(
-		NULL,	/* No module name (use command line) */
-		wcommand,/* Name of app to launch */
-		NULL,	/* Default process security attributes */
-		NULL,	/* Default thread security attributes */
-		FALSE,	/* Don't inherit handles from the parent */
-		0,	/* Normal priority */
-		NULL,	/* Use the same environment as the parent */
-		NULL,	/* Launch in the current directory */
-		&si,	/* Startup information */
-		&pi))	/* Process information stored upon return */
+		NULL,		/* no module name (use command line) */
+		wcommand,	/* name of app to launch */
+		NULL,		/* default process security attributes */
+		NULL,		/* default thread security attributes */
+		FALSE,		/* do not inherit handles from the parent */
+		0,		/* normal priority */
+		NULL,		/* use the same environment as the parent */
+		NULL,		/* launch in the current directory */
+		&si,		/* startup information */
+		&pi))		/* process information stored upon return */
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Creation of the process failed");
 		goto lbl_exit;
@@ -297,51 +296,50 @@ lbl_exit:
 
 	return ret;
 
-#else /* not _WINDOWS */
+#else	/* not _WINDOWS */
 
-	pid = zbx_fork(); /* run new thread 1 */
+	pid = zbx_fork();	/* run new thread 1 */
 	switch(pid)
 	{
-	case -1:
-		zabbix_log(LOG_LEVEL_WARNING, "fork failed for command '%s'",command);
-		return SYSINFO_RET_FAIL;
-	case 0:
-		pid = zbx_fork(); /* run new thread 2 to replace by command */
-		switch(pid)
-		{
 		case -1:
-			zabbix_log(LOG_LEVEL_WARNING, "fork2 failed for '%s'",command);
+			zabbix_log(LOG_LEVEL_WARNING, "fork failed for command '%s'", command);
 			return SYSINFO_RET_FAIL;
 		case 0:
-			/*
-			 * DON'T REMOVE SLEEP
-			 * sleep needed to return server result as "1"
-			 * then we can run "execl"
-			 * otherwise command print result into socket with STDOUT id
-			 */
-			sleep(3);
-			/**/
-
-			/* replace thread 2 by the execution of command */
-			if(execl("/bin/sh", "sh", "-c", command, (char *)0))
+			pid = zbx_fork();	/* run new thread 2 to replace by command */
+			switch(pid)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "execl failed for command '%s'",command);
+				case -1:
+					zabbix_log(LOG_LEVEL_WARNING, "fork2 failed for '%s'", command);
+					return SYSINFO_RET_FAIL;
+				case 0:
+					/*
+					 * DON'T REMOVE SLEEP
+					 * sleep needed to return server result as "1"
+					 * then we can run "execl"
+					 * otherwise command print result into socket with STDOUT id
+					 */
+					sleep(3);
+					/**/
+
+					/* replace thread 2 by the execution of command */
+					if (execl("/bin/sh", "sh", "-c", command, (char *)0))
+						zabbix_log(LOG_LEVEL_WARNING, "execl failed for command '%s'", command);
+
+					/* in a normal case the program will never reach this point */
+					exit(0);
+				default:
+					waitpid(pid, NULL, WNOHANG);	/* NO WAIT can be used for thread 2 closing */
+					exit(0);	/* close thread 1 and transmit thread 2 to system (solve zombie state) */
+					break;
 			}
-			/* In normal case the program will never reach this point */
-			exit(0);
 		default:
-			waitpid(pid, NULL, WNOHANG); /* NO WAIT can be used for thread 2 closing */
-			exit(0); /* close thread 1 and transmit thread 2 to system (solve zombie state) */
+			waitpid(pid, NULL, 0);	/* wait thread 1 closing */
 			break;
-		}
-	default:
-		waitpid(pid, NULL, 0); /* wait thread 1 closing */
-		break;
 	}
 
 	SET_UI64_RESULT(result, 1);
 
 	return SYSINFO_RET_OK;
 
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 }

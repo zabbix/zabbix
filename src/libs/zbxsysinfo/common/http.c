@@ -46,7 +46,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, request)))
 		{
-			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &recv_buffer, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
+			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &recv_buffer, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
 			{
 				if (NULL != buffer)
 					zbx_strlcpy(buffer, recv_buffer, max_buffer_len);

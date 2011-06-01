@@ -37,6 +37,8 @@ class testPageInventory extends CWebTest{
 
 		$this->login('hostprofiles.php');
 
+		$this->dropdown_select_wait('groupid','all');
+
 		$this->assertTitle('Host profiles');
 		$this->ok('HOST PROFILES');
 		$this->ok('Displaying');
