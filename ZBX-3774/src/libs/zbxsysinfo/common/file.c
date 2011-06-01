@@ -445,6 +445,8 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		if (CONFIG_TIMEOUT < zbx_time() - ts)
 			goto err;
 
+		flen += nr;
+
 		for (i = 0; i < nr; i++)
 			crc = (crc << 8) ^ crctab[((crc >> 24) ^ buf[i]) & 0xff];
 	}

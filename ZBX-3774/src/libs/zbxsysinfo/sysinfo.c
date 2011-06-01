@@ -67,14 +67,14 @@ int	add_user_parameter(const char *key, char *command)
 
 	if (0 == (i = parse_command(key, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Can't add user specified key \"%s\". Can't parse key!", key);
+		zabbix_log(LOG_LEVEL_WARNING, "failed to add UserParameter \"%s\": parsing error", key);
 		return FAIL;
 	}
 	else if (2 == i)				/* with specified parameters */
 	{
 		if (0 != strcmp(usr_param, "*"))	/* must be '*' parameters */
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Can't add user specified key \"%s\". Incorrect key!", key);
+			zabbix_log(LOG_LEVEL_WARNING, "failed to add UserParameter \"%s\": invalid key", key);
 			return FAIL;
 		}
 		flag |= CF_USEUPARAM;
@@ -87,7 +87,7 @@ int	add_user_parameter(const char *key, char *command)
 		{
 			commands[i].key = zbx_strdup(NULL, usr_cmd);
 			commands[i].flags = flag;
-			commands[i].function = &EXECUTE_STR;
+			commands[i].function = &EXECUTE_USER_PARAMETER;
 			commands[i].main_param = zbx_strdup(NULL, command);
 			commands[i].test_param = 0;
 
@@ -99,7 +99,7 @@ int	add_user_parameter(const char *key, char *command)
 		/* treat duplicate UserParameters as error */
 		if (0 == strcmp(commands[i].key, usr_cmd))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Failed to add UserParameter \"%s\": duplicate key", key);
+			zabbix_log(LOG_LEVEL_CRIT, "failed to add UserParameter \"%s\": duplicate key", key);
 			exit(FAIL);
 		}
 	}
@@ -117,17 +117,17 @@ void	init_metrics()
 #if defined(WITH_COMMON_METRICS)
 	for (i = 0; NULL != parameters_common[i].key; i++)
 		add_metric(&parameters_common[i]);
-#endif /* USE_COMMON_METRICS */
+#endif
 
 #if defined(WITH_SPECIFIC_METRICS)
 	for (i = 0; NULL != parameters_specific[i].key; i++)
 		add_metric(&parameters_specific[i]);
-#endif /* USE_SPECIFIC_METRICS */
+#endif
 
 #if defined(WITH_SIMPLE_METRICS)
 	for (i = 0; NULL != parameters_simple[i].key; i++)
 		add_metric(&parameters_simple[i]);
-#endif /* USE_SIMPLE_METRICS */
+#endif
 }
 
 void	free_metrics()
@@ -332,7 +332,7 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 		}
 		else if ('$' == pr[1])
 		{
-			pr++; /* remove second '$' symbol */
+			pr++;	/* remove second '$' symbol */
 		}
 
 		pl = pr + 1;
@@ -430,7 +430,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		{
 			err = NOTSUPPORTED;
 			if ('\0' != *error)
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s", in_command, error);
+				zabbix_log(LOG_LEVEL_WARNING, "item [%s] error: %s", in_command, error);
 		}
 	}
 	else
@@ -450,10 +450,10 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 		i += (int)strlen(usr_cmd);
 
-#define COLUMN_2_X 45 /* max space count */
+#define COLUMN_2_X 45	/* max space count */
 		i = (i > COLUMN_2_X ? 1 : COLUMN_2_X - i);
 
-		printf("%-*.*s", i, i, " "); /* print spaces */
+		printf("%-*.*s", i, i, " ");	/* print spaces */
 	}
 
 	if (NOTSUPPORTED == err)

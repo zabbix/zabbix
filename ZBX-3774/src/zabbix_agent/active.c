@@ -380,7 +380,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Before read");
 
-			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
+			if (SUCCEED == (ret = SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0))))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Got [%s]", buf);
 				parse_list_of_checks(buf);
@@ -623,13 +623,13 @@ static int	process_value(
 
 	if (0 != persistent && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Buffer is full, can't store persistent value.");
+		zabbix_log(LOG_LEVEL_WARNING, "buffer is full, cannot store persistent value");
 		goto ret;
 	}
 
 	if (CONFIG_BUFFER_SIZE > buffer.count)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Buffer: new element %d", buffer.count);
+		zabbix_log(LOG_LEVEL_DEBUG, "buffer: new element %d", buffer.count);
 		el = &buffer.data[buffer.count];
 		buffer.count++;
 	}
@@ -655,7 +655,7 @@ static int	process_value(
 			}
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Remove element [%d] Key:'%s:%s'", i, el->host, el->key);
+		zabbix_log(LOG_LEVEL_DEBUG, "remove element [%d] Key:'%s:%s'", i, el->host, el->key);
 
 		zbx_free(el->host);
 		zbx_free(el->key);
@@ -665,27 +665,28 @@ static int	process_value(
 		sz = (CONFIG_BUFFER_SIZE - i - 1) * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
 		memmove(&buffer.data[i], &buffer.data[i + 1], sz);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Buffer full: new element %d", buffer.count - 1);
+		zabbix_log(LOG_LEVEL_DEBUG, "buffer full: new element %d", buffer.count - 1);
 
 		el = &buffer.data[CONFIG_BUFFER_SIZE - 1];
 	}
 
 	memset(el, 0, sizeof(ZBX_ACTIVE_BUFFER_ELEMENT));
-	el->host	= strdup(host);
-	el->key		= strdup(key);
-	el->value	= strdup(value);
-	if (source)
-		el->source	= strdup(source);
-	if (severity)
-		el->severity	= *severity;
-	if (lastlogsize)
-		el->lastlogsize	= *lastlogsize;
-	if (mtime) /* will be null for "eventlog" and "log" and the value will be 0, only "logrt" matters */
-		el->mtime	= *mtime;
-	if (timestamp)
-		el->timestamp	= *timestamp;
-	if (logeventid)
-		el->logeventid	= (int)*logeventid;
+	el->host = strdup(host);
+	el->key = strdup(key);
+	el->value = strdup(value);
+	if (NULL != source)
+		el->source = strdup(source);
+	if (NULL != severity)
+		el->severity = *severity;
+	if (NULL != lastlogsize)
+		el->lastlogsize = *lastlogsize;
+	if (NULL != mtime) /* will be null for "eventlog" and "log" and the value will be 0, only "logrt" matters */
+		el->mtime = *mtime;
+	if (NULL != timestamp)
+		el->timestamp = *timestamp;
+	if (NULL != logeventid)
+		el->logeventid = (int)*logeventid;
+
 	zbx_timespec(&el->ts);
 	el->persistent	= persistent;
 
@@ -1158,7 +1159,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			zbx_setproctitle("poller [processing active checks]");
 
 			process_active_checks(activechk_args.host, activechk_args.port);
-			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount) /* failed to complete processing active checks */
+			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)	/* failed to complete processing active checks */
 				continue;
 
 			nextcheck = get_min_nextcheck();
