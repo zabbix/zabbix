@@ -601,7 +601,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_POLLER;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS;
@@ -616,7 +616,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
@@ -693,7 +693,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-#endif	/* HAVE_SNMP */
+#endif
 
 		process_type = ZBX_PROCESS_TYPE_DISCOVERER;
 		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
@@ -773,7 +773,13 @@ void	zbx_on_exit()
 
 	if (NULL != threads)
 	{
-		int	i;
+		int		i;
+		sigset_t	set;
+
+		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
+		sigemptyset(&set);
+		sigaddset(&set, SIGCHLD);
+		sigprocmask(SIG_BLOCK, &set, NULL);
 
 		for (i = 1; i <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 				+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
@@ -793,10 +799,8 @@ void	zbx_on_exit()
 	}
 
 #ifdef USE_PID_FILE
-
 	daemon_stop();
-
-#endif /* USE_PID_FILE */
+#endif
 
 	free_metrics();
 
@@ -813,7 +817,7 @@ void	zbx_on_exit()
 
 #ifdef HAVE_SQLITE3
 	php_sem_remove(&sqlite_access);
-#endif	/* HAVE_SQLITE3 */
+#endif
 
 	free_selfmon_collector();
 

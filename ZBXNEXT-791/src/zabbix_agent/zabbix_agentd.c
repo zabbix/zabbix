@@ -393,28 +393,28 @@ static void	zbx_free_config()
 #ifdef _WINDOWS
 static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 {
-	int	r;
+	int	ret;
 
 	switch (t->task)
 	{
 		case ZBX_TASK_INSTALL_SERVICE:
-			r = ZabbixCreateService(name, t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS);
+			ret = ZabbixCreateService(name, t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS);
 			break;
 		case ZBX_TASK_UNINSTALL_SERVICE:
-			r = ZabbixRemoveService();
+			ret = ZabbixRemoveService();
 			break;
 		case ZBX_TASK_START_SERVICE:
-			r = ZabbixStartService();
+			ret = ZabbixStartService();
 			break;
 		case ZBX_TASK_STOP_SERVICE:
-			r = ZabbixStopService();
+			ret = ZabbixStopService();
 			break;
 		default:
 			/* there can not be other choice */
 			assert(0);
 	}
 
-	return r;
+	return ret;
 }
 #endif	/* _WINDOWS */
 
@@ -520,7 +520,15 @@ void	zbx_on_exit()
 
 	if (NULL != threads)
 	{
-		int	i;
+		int		i;
+#ifndef _WINDOWS
+		sigset_t	set;
+
+		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
+		sigemptyset(&set);
+		sigaddset(&set, SIGCHLD);
+		sigprocmask(SIG_BLOCK, &set, NULL);
+#endif
 
 		for (i = 0; i < 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0); i++)
 		{
@@ -556,7 +564,7 @@ int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t;
 #ifdef _WINDOWS
-	int		r;
+	int		ret;
 
 	/* Provide, so our process handles errors instead of the system itself. */
 	/* Attention!!! */
@@ -599,9 +607,9 @@ int	main(int argc, char **argv)
 						APPLICATION_NAME, CONFIG_HOSTNAME);
 			}
 
-			r = zbx_exec_service_task(argv[0], &t);
+			ret = zbx_exec_service_task(argv[0], &t);
 			free_metrics();
-			exit(r);
+			exit(ret);
 			break;
 #endif
 		case ZBX_TASK_TEST_METRIC:

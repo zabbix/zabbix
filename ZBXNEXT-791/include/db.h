@@ -353,6 +353,8 @@ typedef struct
 	int	mtime;
 
 	zbx_uint64_t	valuemapid;
+
+	char	*error;
 }
 DB_ITEM;
 

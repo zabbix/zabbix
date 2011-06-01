@@ -151,6 +151,8 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 			{
 				if (FAIL == (result = parse_cfg_object(value, cfg, level, strict)))
 					break;
+
+				continue;
 			}
 
 			for (i = 0; '\0' != value[i]; i++)
