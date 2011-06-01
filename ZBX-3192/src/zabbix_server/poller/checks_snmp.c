@@ -135,10 +135,10 @@ static int	cache_get_snmp_index(DC_ITEM *item, char *oid, char *value, int *inde
 	if (NULL == snmpidx)
 		goto end;
 
-	s.oid = oid;
-	s.value = value;
 	s.hostid = item->host.hostid;
 	s.port = item->snmp_port;
+	s.oid = oid;
+	s.value = value;
 
 	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)) && 0 == zbx_snmp_index_compare(&s, &snmpidx[i]))
 	{
@@ -162,10 +162,10 @@ static void	cache_put_snmp_index(DC_ITEM *item, char *oid, char *value, int inde
 	if (NULL == snmpidx)
 		snmpidx = zbx_malloc(snmpidx, snmpidx_alloc * sizeof(zbx_snmp_index_t));
 
-	s.oid = oid;
-	s.value = value;
 	s.hostid = item->host.hostid;
 	s.port = item->snmp_port;
+	s.oid = oid;
+	s.value = value;
 
 	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)) && 0 == zbx_snmp_index_compare(&s, &snmpidx[i]))
 	{
@@ -181,11 +181,11 @@ static void	cache_put_snmp_index(DC_ITEM *item, char *oid, char *value, int inde
 
 	memmove(&snmpidx[i + 1], &snmpidx[i], sizeof(zbx_snmp_index_t) * (snmpidx_count - i));
 
-	snmpidx[i].oid    = strdup(oid);
-	snmpidx[i].value  = strdup(value);
 	snmpidx[i].hostid = item->host.hostid;
-	snmpidx[i].port   = item->snmp_port;
-	snmpidx[i].index  = index;
+	snmpidx[i].port = item->snmp_port;
+	snmpidx[i].oid = strdup(oid);
+	snmpidx[i].value = strdup(value);
+	snmpidx[i].index = index;
 	snmpidx_count++;
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -202,10 +202,10 @@ static void	cache_del_snmp_index(DC_ITEM *item, char *oid, char *value)
 	if (NULL == snmpidx)
 		goto end;
 
-	s.oid = oid;
-	s.value = value;
 	s.hostid = item->host.hostid;
 	s.port = item->snmp_port;
+	s.oid = oid;
+	s.value = value;
 
 	if (snmpidx_count > (i = get_snmpidx_nearestindex(&s)) && 0 == zbx_snmp_index_compare(&s, &snmpidx[i]))
 	{
