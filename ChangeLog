@@ -11,7 +11,7 @@ New features:
 
 Bug fixes:
  - [ZBX-3846] fixed typo in map creation info message during export (Vedmak)
-  
+
 --------------------------------------------------------------------------------
 Changes for 1.9.4
 
@@ -162,6 +162,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3192] fixed snmp index cache to support snmp target for each entry; thanks to Ilia Sotnikov (dimir)
  - [ZBXNEXT-792] added type parameter for system.hostname[] on Windows to support both NetBIOS and host names (rudolfs)
  - [ZBXNEXT-791] added HostnameItem to Agent and Proxy configuration for setting the default Hostname (rudolfs)
  - [ZBX-3825] fixed errors with single quotes in javascript messages (KB)
