@@ -72,9 +72,13 @@ static int	zbx_io_connect(iksparser *prs, void **socketptr, const char *server, 
 	}
 
 	if (-1 == zbx_j_sock)
+	{
+		freeaddrinfo(addr_res);
 		return IKS_NET_NOSOCK;
+	}
 
 	tmp = connect(zbx_j_sock, addr_ptr->ai_addr, addr_ptr->ai_addrlen);
+
 	freeaddrinfo(addr_res);
 #else
 	struct hostent		*host;
