@@ -127,15 +127,12 @@
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
-#define	ZBX_SERVICE_NAME_LEN	64
+#	define	ZBX_SERVICE_NAME_LEN	64
 extern char ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN];
 extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
-#endif /* _WINDOWS */
 
-#if defined(_WINDOWS)
-/*#	pragma warning (disable: 4100)*/
-#	pragma warning (disable: 4996) /* warning C4996: <function> was declared deprecated */
-#endif /* _WINDOWS */
+#	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
+#endif
 
 #ifndef HAVE_GETOPT_LONG
 	struct option
@@ -146,22 +143,23 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 		int val;
 	};
 #	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
-#endif /* ndef HAVE_GETOPT_LONG */
+#endif
 
 #define	SUCCEED		0
-#define	FAIL		(-1)
-#define	NOTSUPPORTED	(-2)
-#define	NETWORK_ERROR	(-3)
-#define	TIMEOUT_ERROR	(-4)
-#define	AGENT_ERROR	(-5)
-#define	PROXY_ERROR	(-6)
+#define	FAIL		-1
+#define	NOTSUPPORTED	-2
+#define	NETWORK_ERROR	-3
+#define	TIMEOUT_ERROR	-4
+#define	AGENT_ERROR	-5
+#define	PROXY_ERROR	-6
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_result_string(int result);
 
-#define MAX_ID_LEN	21
-#define MAX_STRING_LEN	2048
-#define MAX_BUFFER_LEN	65536
+#define MAX_ID_LEN		21
+#define MAX_STRING_LEN		2048
+#define MAX_BUFFER_LEN		65536
+#define MAX_ZBX_HOSTNAME_LEN	64
 
 #define ZBX_DM_DELIMITER	'\255'
 
