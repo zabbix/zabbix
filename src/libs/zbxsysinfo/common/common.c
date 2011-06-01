@@ -72,7 +72,7 @@ ZBX_METRIC	parameters_common[] =
 	{"net.tcp.dns.query",	CF_USEUPARAM,	NET_DNS_RECORD,		0,	",zabbix.com"}, /* deprecated */
 	{"net.tcp.port",	CF_USEUPARAM,	NET_TCP_PORT,		0,	",80"},
 
-	{"system.hostname",	0,		SYSTEM_HOSTNAME,	0,	0},
+	{"system.hostname",	CF_USEUPARAM,	SYSTEM_HOSTNAME,	0,	0},
 	{"system.uname",	0,		SYSTEM_UNAME,		0,	0},
 
 	{"system.users.num",	0,		SYSTEM_USERS_NUM,	0,	0},

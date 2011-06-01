@@ -12305,7 +12305,7 @@ insert into help_items values(0,'system.cpu.load[&lt;cpu&gt; &lt;,mode&gt;]','CP
 insert into help_items values(0,'system.cpu.switches','Context switches.');
 insert into help_items values(0,'system.cpu.util[&lt;cpu&gt; &lt;,type&gt; &lt;,mode&gt;]','CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used.');
 insert into help_items values(0,'system.cpu.num','Number of available proccessors.');
-insert into help_items values(0,'system.hostname','Return host name. String value. Example of returned value: www.zabbix.com');
+insert into help_items values(0,'system.hostname[&lt;type&gt;]','Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com');
 insert into help_items values(0,'system.hw.chassis[&lt;info&gt;]','Chassis info - returns full info by default');
 insert into help_items values(0,'system.hw.cpu[&lt;cpu&gt;,&lt;info&gt;]','CPU info - lists full info for all CPUs by default');
 insert into help_items values(0,'system.hw.devices[&lt;type&gt;]','Device list - lists PCI devices by default');
@@ -12367,7 +12367,7 @@ insert into help_items values(7,'system.cpu.load[&lt;cpu&gt; &lt;,mode&gt;]','CP
 insert into help_items values(7,'system.cpu.switches','Context switches.');
 insert into help_items values(7,'system.cpu.util[&lt;cpu&gt; &lt;,type&gt; &lt;,mode&gt;]','CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used.');
 insert into help_items values(7,'system.cpu.num','Number of available proccessors.');
-insert into help_items values(7,'system.hostname','Return host name. String value. Example of returned value: www.zabbix.com');
+insert into help_items values(7,'system.hostname[&lt;type&gt;]','Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com');
 insert into help_items values(7,'system.hw.chassis[&lt;info&gt;]','Chassis info - returns full info by default');
 insert into help_items values(7,'system.hw.cpu[&lt;cpu&gt;,&lt;info&gt;]','CPU info - lists full info for all CPUs by default');
 insert into help_items values(7,'system.hw.devices[&lt;type&gt;]','Device list - lists PCI devices by default');
