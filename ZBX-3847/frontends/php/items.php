@@ -442,9 +442,6 @@ switch($itemType) {
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
 			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
 
-// sdii($item['applications']);
-// sdii($db_item['applications']);
-
 			foreach($item as $field => $value){
 				if($item[$field] == $db_item[$field]) $item[$field] = null;
 			}
@@ -500,7 +497,7 @@ switch($itemType) {
 		}
 
 		if($result){
-			DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null '.
+			DBexecute('UPDATE items SET lastvalue=null, lastclock=null, prevvalue=null '.
 				' WHERE itemid='.$_REQUEST['itemid']);
 
 			$host = get_host_by_hostid($item['hostid']);
@@ -719,6 +716,9 @@ switch($itemType) {
 			$go_result |= $cur_result;
 
 			if($cur_result){
+				DBexecute('UPDATE items SET lastvalue=null, lastclock=null, prevvalue=null '.
+					' WHERE itemid='.$id);
+
 				$host = get_host_by_hostid($item['hostid']);
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
 					S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEARED);
