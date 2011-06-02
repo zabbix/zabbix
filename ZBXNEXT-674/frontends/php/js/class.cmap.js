@@ -54,27 +54,29 @@ function createMap(containerid, mapdata){
 		this.bindActions();
 
 		// initialize SELECTABLE
-//		this.container.selectable({
-//			start: jQuery.proxy(function(event){
-//				if(!event.ctrlKey){
-//					this.clearSelection();
-//				}
-//			}, this),
-//			stop: jQuery.proxy(function(event){
-//				var selected = jQuery('.ui-selected', this.container),
-//					ids = [],
-//					i,
-//					ln;
-//
-//				for(i = 0, ln = selected.length; i < ln; i++){
-//					ids.push(jQuery(selected[i]).data('id'));
-//
-//					// remove ui-selected class, to not confuse next selection
-//					selected.removeClass('ui-selected');
-//				}
-//				this.selectElements(ids, event.ctrlKey);
-//			}, this)
-//		});
+/*
+		this.container.selectable({
+			start: jQuery.proxy(function(event){
+				if(!event.ctrlKey){
+					this.clearSelection();
+				}
+			}, this),
+			stop: jQuery.proxy(function(event){
+				var selected = jQuery('.ui-selected', this.container),
+					ids = [],
+					i,
+					ln;
+
+				for(i = 0, ln = selected.length; i < ln; i++){
+					ids.push(jQuery(selected[i]).data('id'));
+
+					// remove ui-selected class, to not confuse next selection
+					selected.removeClass('ui-selected');
+				}
+				this.selectElements(ids, event.ctrlKey);
+			}, this)
+		});
+*/
 
 
 		this.bind = function(event, callback){
@@ -821,9 +823,9 @@ function createMap(containerid, mapdata){
 
 			if((this.data.elementtype === '3') && (this.data.elementsubtype === '1')){
 				this.domNode.css({
-					width: this.data.width + 'px',
-					height: this.data.height + 'px',
-					border: '1px dotted blue'
+					width: (this.data.width - 2) + 'px',
+					height: (this.data.height - 2) + 'px',
+					border: '2px solid gray'
 				});
 			}
 		}

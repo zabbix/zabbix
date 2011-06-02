@@ -125,6 +125,10 @@ class CCanvas{
 		imageText($this->canvas, $fontsize, $angle, $x, $y, $this->getColor($color), $string);
 	}
 
+	public function drawRectangle($x1, $y1, $x2, $y2, $color){
+		imagerectangle($this->canvas, $x1, $y1, $x2, $y2, $this->getColor($color));
+	}
+
 
 	protected function getColor($color){
 		if(!isset($this->colors[$color])){
@@ -184,6 +188,7 @@ class CMapPainter{
 		$this->paintBackground();
 		$this->paintTitle();
 		$this->paintGrid();
+		$this->paintAreas();
 
 
 		return $this->canvas->getCanvas();
@@ -233,6 +238,14 @@ class CMapPainter{
 		//			$this->canvas->drawText(8, 0, 2, $dims['height'] + 3, 'black', 'Y X:');
 		//		}
 
+	}
+
+	protected function paintAreas(){
+		foreach($this->mapData['selements'] as $selement){
+			if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
+				$this->canvas->drawRectangle($selement['x'], $selement['y'], $selement['x'] + $selement['width'], $selement['y'] + $selement['height'], 'gray');
+			}
+		}
 	}
 }
 
@@ -295,9 +308,8 @@ if(get_request('nocalculations', false)){
 	}
 }
 else{
-	$areas = processMapAreas($map);
+	processMapAreas($map);
 	$map_info = getSelementsInfo($map);
-	recalculateAreas($map, $areas, $map_info);
 }
 
 // Draw MAP

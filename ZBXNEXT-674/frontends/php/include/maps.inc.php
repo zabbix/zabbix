@@ -116,7 +116,6 @@ function getActionMapBySysmap($sysmap){
 
 	$areas = processMapAreas($sysmap);
 	$map_info = getSelementsInfo($sysmap);
-	recalculateAreas($sysmap, $areas, $map_info);
 
 	$hostids = array();
 	foreach($sysmap['selements'] as $selement){
@@ -223,7 +222,7 @@ function get_icon_center_by_selement($element, $info = null){
 	$y = $element['y'];
 	$w = $h = 0;
 
-	if($element['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
+	if(isset($element['elementsubtype']) && $element['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
 		if($element['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
 			$w = $element['width'];
 			$h = $element['height'];
@@ -1439,15 +1438,64 @@ function drawMapConnectors(&$im, $map, $map_info){
 	$selements = $map['selements'];
 
 	foreach($map['links'] as $link){
-		if(empty($link)){
-			continue;
+
+		$selement1 = $selements[$link['selementid1']];
+		list($x1, $y1) = get_icon_center_by_selement($selement1, $map_info[$link['selementid1']]);
+
+		$selement2 = $selements[$link['selementid2']];
+		list($x2, $y2) = get_icon_center_by_selement($selement2, $map_info[$link['selementid2']]);
+
+		if(isset($selement1['elementsubtype']) && $selement1['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+			$b = abs($y2 - $y1);
+			$d = abs($x2 - $x1);
+
+			$a = $selement1['height'] / 2;
+			$koef = $a / $b;
+
+			$c = $d * $koef;
+
+			// if point as further than area diagonal, we should use calculations with width instead of height
+			if(($a / $c) > ($a / ($selement1['width'] / 2))){
+				$y1 = ($y2 > $y1) ? $y1 + $a : $y1 - $a;
+				$x1 = ($x2 < $x1) ? $x1 - $c : $x1 + $c;
+			}
+			else{
+				$a = $selement1['width'] / 2;
+				$koef = $a / $d;
+
+				$c = $b * $koef;
+
+				$y1 = ($y2 > $y1) ? $y1 + $c : $y1 - $c;
+				$x1 = ($x2 < $x1) ? $x1 - $a : $x1 + $a;
+			}
 		}
 
-		$selement = $selements[$link['selementid1']];
-		list($x1, $y1) = get_icon_center_by_selement($selement, $map_info[$link['selementid1']]);
 
-		$selement = $selements[$link['selementid2']];
-		list($x2, $y2) = get_icon_center_by_selement($selement, $map_info[$link['selementid2']]);
+		if(isset($selement2['elementsubtype']) && $selement2['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+			$b = abs($y2 - $y1);
+			$d = abs($x2 - $x1);
+
+			$a = $selement2['height'] / 2;
+			$koef = $a / $b;
+
+			$c = $d * $koef;
+
+			// if point as further than area diagonal, we should use calculations with width instead of height
+			if(($a / $c) > ($a / ($selement2['width'] / 2))){
+				$y2 = ($y1 > $y2) ? $y2 + $a : $y2 - $a;
+				$x2 = ($x1 < $x2) ? $x2 - $c : $x2 + $c;
+			}
+			else{
+				$a = $selement2['width'] / 2;
+				$koef = $a / $d;
+
+				$c = $b * $koef;
+
+				$y2 = ($y1 > $y2) ? $y2 + $c : $y2 - $c;
+				$x2 = ($x1 < $x2) ? $x2 - $a : $x2 + $a;
+			}
+		}
+
 
 		$drawtype = $link['drawtype'];
 		$color = convertColor($im, $link['color']);
@@ -1485,7 +1533,7 @@ function drawMapSelements(&$im, $map, $map_info){
 	$selements = $map['selements'];
 
 	foreach($selements as $selementid => $selement){
-		if(empty($selement)){
+		if(isset($selement['elementsubtype']) && $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
 			continue;
 		}
 
@@ -1732,7 +1780,7 @@ function drawMapLinkLabels(&$im, &$map, &$map_info){
 			$max_severity = 0;
 
 			$triggers = array();
-			foreach($linktriggers as $lt_num => $link_trigger){
+			foreach($linktriggers as $link_trigger){
 				if($link_trigger['triggerid'] == 0){
 					continue;
 				}
@@ -1817,6 +1865,10 @@ function drawMapLabels(&$im, $map, $map_info){
 
 	// set label type and custom label text for all selements
 	foreach($selements as $selementid => $selement){
+		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
+			continue;
+		}
+
 		$selements[$selementid]['label_type'] = $map['label_type'];
 
 		if($map['label_format'] == SYSMAP_LABEL_ADVANCED_OFF){
@@ -1858,6 +1910,10 @@ function drawMapLabels(&$im, $map, $map_info){
 	}
 
 	foreach($selements as $selementid => $selement){
+		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
+			continue;
+		}
+
 		if(!isset($label_lines[$selementid])){
 			$label_lines[$selementid] = array();
 		}
@@ -1895,7 +1951,11 @@ function drawMapLabels(&$im, $map, $map_info){
 
 
 	$elementsHostids = array();
-	foreach($selements as $selementid => $selement){
+	foreach($selements as $selement){
+		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
+			continue;
+		}
+
 		if($selement['label_type'] != MAP_LABEL_TYPE_IP){
 			continue;
 		}
@@ -1916,6 +1976,9 @@ function drawMapLabels(&$im, $map, $map_info){
 
 	// DRAW
 	foreach($selements as $selementid => $selement){
+		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
+			continue;
+		}
 		if(empty($selement) || (($selement['label_type'] == MAP_LABEL_TYPE_NOTHING))){
 			continue;
 		}
@@ -1983,7 +2046,7 @@ function drawMapLabels(&$im, $map, $map_info){
 		$y = $selement['y'];
 		$iconX = $iconY = 0;
 
-		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
+		if(isset($selement['elementsubtype']) && ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)){
 			if($selement['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
 				$iconX = $selement['width'];
 				$iconY = $selement['height'];
@@ -2074,9 +2137,9 @@ function drawMapLabels(&$im, $map, $map_info){
  * @return array
  */
 function processMapAreas(array &$map){
-	$areas = array();
-	//	sdii($map);
-	foreach($map['selements'] as $selementid => $selement){
+	// TODO: if links are between areas omg?!
+
+	foreach($map['selements'] as $selement){
 		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
 			$hosts = API::host()->get(array(
 				'groupids' => $selement['elementid'],
@@ -2084,16 +2147,25 @@ function processMapAreas(array &$map){
 				'nopermissions' => true,
 				'preservekeys' => true,
 			));
+			$hostsCount = count($hosts);
 
-			$originalSelement = $selement;
-			$area = array(
-				'x' => $selement['x'],
-				'y' => $selement['y'],
-				'width' => $selement['width'],
-				'height' => $selement['height'],
-				'selementids' => array(),
-			);
+			if($hostsCount == 0){
+				continue;
+			}
 
+
+			$originalX = $selement['x'];
+			$originalY = $selement['y'];
+
+
+			$rowPlaceCount = floor(sqrt($hostsCount)) + 1;
+			$xOffset = floor($selement['width'] / $rowPlaceCount);
+			$yOffset = floor($selement['height'] / $rowPlaceCount);
+
+
+			$colNum = 0;
+			$rowNum = 0;
+			$newSelementIds = array();
 			foreach($hosts as $host){
 				$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_HOST;
 				$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
@@ -2101,98 +2173,25 @@ function processMapAreas(array &$map){
 				do{
 					$newSelementid = rand(1, 9999999);
 				}while(isset($map['selements'][$newSelementid]));
+				$newSelementIds[] = $newSelementid;
 
 				$selement['selementid'] = $newSelementid;
 				$selement['elementid'] = $host['hostid'];
 				$map['selements'][$newSelementid] = $selement;
 				$area['selementids'][$newSelementid] = $newSelementid;
-			}
 
 
-			foreach($map['links'] as $link){
-				$originalLink = $link;
-				if($link['selementid1'] == $originalSelement['selementid']){
-					foreach($area['selementids'] as $newselid){
-						do{
-							$newLinkid = rand(1, 9999999);
-						}while(isset($map['links'][$newLinkid]));
-						$link['linkid'] = $newLinkid;
-						$link['selementid1'] = $newselid;
-						$map['links'][$newLinkid] = $link;
-					}
-					unset($map['links'][$originalLink['linkid']]);
-				}
-				if($link['selementid2'] == $originalSelement['selementid']){
-					foreach($area['selementids'] as $newselid){
-						do{
-							$newLinkid = rand(1, 9999999);
-						}while(isset($map['links'][$newLinkid]));
-						$link['linkid'] = $newLinkid;
-						$link['selementid2'] = $newselid;
-						$map['links'][$newLinkid] = $link;
-					}
-					unset($map['links'][$originalLink['linkid']]);
+				$selement['x'] = $originalX + ($colNum * $xOffset);
+				$selement['y'] = $originalY + ($rowNum * $yOffset);
+
+				$colNum++;
+				if($colNum == $rowPlaceCount){
+					$colNum = 0;
+					$rowNum++;
 				}
 			}
-
-			unset($map['selements'][$selementid]);
-
-			$areas[] = $area;
 		}
 	}
-	return $areas;
-}
-
-function recalculateAreas(&$map, $areas, $mapInfo){
-
-	$grid = array();
-
-	foreach($areas as $area){
-
-		$w = 0;
-		$row = array();
-
-		foreach($area['selementids'] as $selementid){
-
-			$selement = $map['selements'][$selementid];
-			$selInfo = $mapInfo[$selementid];
-
-			$img = get_png_by_selement($selement, $selInfo);
-			$iconX = imagesx($img);
-			$iconY = imagesy($img);
-
-
-			if($area['width'] >= ($w + $iconX + (4 * count($row)))){
-
-				$w += $iconX;
-				$row[$selementid] = array(
-					'w' => $iconX,
-					'h' => $iconY,
-				);
-			}
-		}
-
-		$prevOffset = 0;
-		$offSep = ($area['width'] - $w) / (count($row)+1);
-
-		foreach($row as &$el){
-			$el['x'] = $area['x'] + 4 + $prevOffset + $offSep;
-			$prevOffset = 4 + $prevOffset + $offSep + $el['w'];
-		}
-		unset($el);
-
-		$grid[] = $row;
-		$w = 0;
-		$row = array();
-
-		foreach($grid as $row){
-			foreach($row as $selementid => $c){
-				$map['selements'][$selementid]['x'] = $c['x'];
-			}
-		}
-
-	}
-
 
 }
 
