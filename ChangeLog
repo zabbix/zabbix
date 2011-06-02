@@ -163,7 +163,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
- - [ZBX-3847] fixed item hestory clearing not deleting data in trends_uint table (KB)
+ - [ZBX-3847] fixed item history clearing not deleting data in trends_uint table (KB)
  - [ZBX-3797] fixed processing of vfs.dev.* checks under FreeBSD (Sasha)
  - [ZBXNEXT-799] added support of SRV records to net.tcp.dns.query[]; thanks to Edward Rudd (asaveljevs)
  - [ZBX-1029] added lookup of Jabber SRV records to Jabber notifications; thanks to Edward Rudd (asaveljevs)
