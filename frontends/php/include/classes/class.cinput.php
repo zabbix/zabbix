@@ -21,14 +21,21 @@
 <?php
 class CInput extends CTag{
 	protected $jQuery;
-	public function __construct($type='text',$name='textbox',$value='',$class=null){
+	public function __construct($type='text', $name='textbox', $value='', $class=null, $id=null){
 		parent::__construct('input','no');
 
 		$this->jQuery = false;
 
 		$this->setType($type);
 
-		$this->attr('id', zbx_formatDomId($name));
+		// if id is not passed, it will be the same as element name
+		if(is_null($id)){
+			$this->attr('id', zbx_formatDomId($name));
+		}
+		else{
+			$this->attr('id', zbx_formatDomId($id));
+		}
+
 		$this->attr('name', $name);
 
 		$this->attr('value', $value);
