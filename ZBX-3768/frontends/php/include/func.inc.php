@@ -416,21 +416,108 @@ function mem2str($size){
 	return round($size, 6).$prefix;
 }
 
+function convert_units_uptime($value){
+	if(0 > ($secs = round($value)))
+		return $value;
+
+	$value = '';
+
+	$days = floor($secs / SEC_PER_DAY);
+	$secs -= $days * SEC_PER_DAY;
+
+	$hours = floor($secs / SEC_PER_HOUR);
+	$secs -= $hours * SEC_PER_HOUR;
+
+	$mins = floor($secs / SEC_PER_MIN);
+	$secs -= $mins * SEC_PER_MIN;
+
+	if(0 != $days)
+		$value = $days.' days, ';
+	$value .= sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
+
+	return $value;
+}
+
+function convert_units_s($value){
+	if (0 > ($secs = $value))
+		return $value;
+
+	$n_unit = 0;
+	$value = '';
+
+	if(0 != ($n = floor($secs / SEC_PER_YEAR)))
+	{
+		$value .= $n.'y';
+		$secs -= $n * SEC_PER_YEAR;
+		if (0 == $n_unit)
+			$n_unit = 4;
+	}
+
+	if(0 != ($n = floor($secs / SEC_PER_MONTH)))
+	{
+		$value .= $n.'m';
+		$secs -= $n * SEC_PER_MONTH;
+		if (0 == $n_unit)
+			$n_unit = 3;
+	}
+
+	if(0 != ($n = floor($secs / SEC_PER_DAY)))
+	{
+		$value .= $n.'d';
+		$secs -= $n * SEC_PER_DAY;
+		if (0 == $n_unit)
+			$n_unit = 2;
+	}
+
+	if (4 > $n_unit && 0 != ($n = floor($secs / SEC_PER_HOUR)))
+	{
+		$value .= $n.'h';
+		$secs -= $n * SEC_PER_HOUR;
+		if (0 == $n_unit)
+			$n_unit = 1;
+	}
+
+	if (3 > $n_unit && 0 != ($n = floor($secs / SEC_PER_MIN)))
+	{
+		$value .= $n.'m';
+		$secs -= $n * SEC_PER_MIN;
+	}
+
+	if (2 > $n_unit && 0 != ($n = floor($secs)))
+	{
+		$value .= $n.'s';
+		$secs -= $n;
+	}
+
+	if (1 > $n_unit)
+	{
+		if (0 < $secs && $secs < 0.001)
+		{
+			if (empty($value))
+				$value = '< 1ms';
+		}
+		else if (0 != ($n = floor($secs * 1000)))
+			$value = $n.'ms';
+	}
+
+	return $value;
+}
+
 // convert:
 function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 
 // Special processing for unix timestamps
-	if($units=='unixtime'){
+	if($units == 'unixtime'){
 		$ret=zbx_date2str(S_FUNCT_UNIXTIMESTAMP_DATE_FORMAT,$value);
 		return $ret;
 	}
 //Special processing of uptime
-	if($units=='uptime'){
-		return zbx_date2age(time() - $value);
+	if($units == 'uptime'){
+		return convert_units_uptime($value);
 	}
 // Special processing for seconds
-	if($units=='s'){
-		return zbx_date2age(0,$value,true);
+	if($units == 's'){
+		return convert_units_s($value);
 	}
 
 	$u='';
