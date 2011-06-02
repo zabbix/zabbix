@@ -173,6 +173,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 #endif /*HAVE_IPV6*/
 #endif /* _WINDOWS */
 
+#if !defined(HAVE_IPV6)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_gethost                                                      *
@@ -203,10 +204,15 @@ struct hostent	*zbx_gethost(const char *hostname)
 	if (NULL != (host = gethostbyaddr((char *)&addr, 4, AF_INET)))
 		return host;
 
-	zbx_set_tcp_strerror("gethost() failed for address '%s': [%s]", hostname, strerror_from_system(zbx_sock_last_error()));
+#ifdef _WINDOWS
+	zbx_set_tcp_strerror("gethost() failed for address '%s': %s", hostname, strerror_from_system(WSAGetLastError()));
+#else
+	zbx_set_tcp_strerror("gethost() failed for address '%s': [%d] %s", hostname, h_errno, hstrerror(h_errno));
+#endif
 
 	return (struct hostent *)NULL;
 }
+#endif /*HAVE_IPV6*/
 
 /******************************************************************************
  *                                                                            *
