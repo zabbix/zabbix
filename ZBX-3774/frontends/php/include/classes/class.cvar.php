@@ -20,13 +20,14 @@
 ?>
 <?php
 class CVar{
- public $var_container;
- public $var_name;
+	public $var_container;
+	public $var_name;
+	public $element_id;
 
-	public function __construct($name,$value=null){
+	public function __construct($name, $value=null, $id=null){
 		$this->var_container = array();
 		$this->var_name = $name;
-
+		$this->element_id = $id;
 		$this->setValue($value);
 	}
 
@@ -48,7 +49,7 @@ class CVar{
 		}
 
 		if(strpos($value, "\n") === false){
-			$hiddenVar = new CInput('hidden', $name, zbx_htmlstr($value));
+			$hiddenVar = new CInput('hidden', $name, zbx_htmlstr($value), null, $this->element_id);
 			$hiddenVar->removeAttribute('class');
 		}
 		else{

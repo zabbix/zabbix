@@ -249,12 +249,12 @@ include_once('include/page_header.php');
 	// allow CSV export button
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
-	if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid']);
-	if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid']);
-	if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source']);
-	if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);
-	if(isset($_REQUEST['stime'])) $frmForm->addVar('stime', $_REQUEST['stime']);
-	if(isset($_REQUEST['period'])) $frmForm->addVar('period', $_REQUEST['period']);
+	if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
+	if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
+	if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
+	if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start'], 'start_csv');
+	if(isset($_REQUEST['stime'])) $frmForm->addVar('stime', $_REQUEST['stime'], 'stime_csv');
+	if(isset($_REQUEST['period'])) $frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
 	$buttons = new CDiv(array(
 		new CSubmit('csv_export', _('Export to CSV')),
 	));
@@ -277,8 +277,6 @@ include_once('include/page_header.php');
 		$filterForm->setAttribute('id', 'zbx_filter');
 
 		$filterForm->addVar('triggerid', get_request('triggerid'));
-		$filterForm->addVar('stime', get_request('stime'));
-		$filterForm->addVar('period', get_request('period'));
 		$filterForm->addVar('stime', get_request('stime'));
 		$filterForm->addVar('period', get_request('period'));
 
