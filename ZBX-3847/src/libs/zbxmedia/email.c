@@ -81,7 +81,7 @@ int	send_email(const char *smtp_server, const char *smtp_helo, const char *smtp_
 	const char	*OK_251 = "251";
 	const char	*OK_354 = "354";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() smtp_server:'%s'", smtp_server);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() smtp_server:'%s'", __function_name, smtp_server);
 
 	assert(error);
 	*error = '\0';
