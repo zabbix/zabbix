@@ -41,27 +41,28 @@ static int		log_level = LOG_LEVEL_WARNING;
 #if !defined(_WINDOWS)
 void redirect_std(const char *filename)
 {
-	int fd;
-	const char default_file[] = "/dev/null";
-	const char *out_file = default_file;
-	int open_flags = O_WRONLY;
+	int		fd;
+	const char	default_file[] = "/dev/null";
+	const char	*out_file = default_file;
+	int		open_flags = O_WRONLY;
 
-	close(fileno(stdin));
-	open(default_file, O_RDONLY);    /* stdin, normally fd==0 */
+	close(STDIN_FILENO);
+	open(default_file, O_RDONLY);	/* stdin, normally fd==0 */
 
-	if ( filename && *filename)
+	if (filename && *filename)
 	{
 		out_file = filename;
 		open_flags |= O_CREAT | O_APPEND;
 	}
 
-	if ( -1 != (fd = open(out_file, open_flags, 0666)) )
+	if (-1 != (fd = open(out_file, open_flags, 0666)))
 	{
-		if (-1 == dup2(fd, fileno(stderr)))
+		if (-1 == dup2(fd, STDERR_FILENO))
 			zbx_error("cannot redirect stderr to [%s]", filename);
 
-		if (-1 == dup2(fd, fileno(stdout)))
+		if (-1 == dup2(fd, STDOUT_FILENO))
 			zbx_error("cannot redirect stdout to [%s]", filename);
+
 		close(fd);
 	}
 	else
@@ -82,14 +83,10 @@ int zabbix_open_log(int type, int level, const char *filename)
 	log_level = level;
 
 	if (LOG_LEVEL_EMPTY == level)
-	{
 		return SUCCEED;
-	}
 
 	if (LOG_TYPE_FILE == type && NULL == filename)
-	{
 		type = LOG_TYPE_SYSLOG;
-	}
 
 	if (LOG_TYPE_SYSLOG == type)
 	{
