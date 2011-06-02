@@ -217,10 +217,9 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
 
 	init_result(&result);
 
-	zbx_snprintf(buffer, sizeof(buffer), ",_xmpp-client._tcp.%s,SRV", server);
-	zbx_snprintf(command, sizeof(command), "net.dns.record[%s]", buffer);
+	zbx_snprintf(command, sizeof(command), "net.dns.record[,_xmpp-client._tcp.%s,SRV]", server);
 
-	if (SYSINFO_RET_OK == NET_DNS_RECORD(command, buffer, 0, &result))
+	if (SUCCEED == process(command, 0, &result))
 	{
 		int		max_priority = 65536, max_weight = -1;
 		int		cur_priority, cur_weight, cur_port;
