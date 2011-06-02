@@ -132,7 +132,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 		return -1;
 	}
 
-	if (*pid > 0)	/* parent process */
+	if (0 != *pid)	/* parent process */
 	{
 		close(fd[1]);
 
@@ -149,7 +149,9 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() executing script", __function_name);
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot execute script [%s]: %s", __function_name, command, zbx_strerror(errno));
+
+	/* execl() returns only when an error occurs */
+	zabbix_log(LOG_LEVEL_WARNING, "%s(): execl() failed for [%s]: %s", __function_name, command, zbx_strerror(errno));
 	exit(FAIL);
 }
 
@@ -484,10 +486,25 @@ int	zbx_execute_nowait(const char *command, int timeout)
 			execl("/bin/sh", "sh", "-c", command, NULL);
 
 			/* execl() returns only when an error occurs */
-			zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): execl() failed for [%s]: %s", __function_name, command, zbx_strerror(errno));
 			break;
 		default:
-			waitpid(pid, NULL, WNOHANG);	/* NO WAIT can be used for thread 2 closing */
+			/* this parent process */
+
+			alarm(timeout);
+			if (-1 == zbx_waitpid(pid))
+			{
+
+				if (EINTR == errno)
+					zabbix_log(LOG_LEVEL_WARNING, "%s(): execution timed out for [%s]", __function_name, command);
+				else
+					zabbix_log(LOG_LEVEL_ERR, "%s(): zbx_waitpid() failed: %s", __function_name, zbx_strerror(errno));
+
+				kill(pid, SIGTERM);
+				zbx_waitpid(pid);
+			}
+			alarm(0);
+
 			break;
 	}
 

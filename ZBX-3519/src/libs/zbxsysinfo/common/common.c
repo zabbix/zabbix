@@ -242,7 +242,7 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if ('\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
 		return EXECUTE_STR(cmd, command, flags, result);
-	else if (0 != strcmp(flag, "nowait") || FAIL == zbx_execute_nowait(command))
+	else if (0 != strcmp(flag, "nowait") || FAIL == zbx_execute_nowait(command, CONFIG_TIMEOUT))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, 1);
