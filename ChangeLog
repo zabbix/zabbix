@@ -1,5 +1,7 @@
 Changes for 1.8.6rc1
 
+ - [ZBXNEXT-799] added support of SRV records to net.tcp.dns.query[]; thanks to Edward Rudd (asaveljevs)
+ - [ZBX-1029] added lookup of Jabber SRV records to Jabber notifications; thanks to Edward Rudd (asaveljevs)
  - [ZBXNEXT-792] added type parameter for system.hostname[] on Windows to support both NetBIOS and host names (rudolfs)
  - [ZBXNEXT-791] added HostnameItem to Agent and Proxy configuration for setting the default Hostname (rudolfs)
  - [ZBX-3192] fixed snmp index cache to support snmp target for each entry; thanks to Ilia Sotnikov (dimir)
