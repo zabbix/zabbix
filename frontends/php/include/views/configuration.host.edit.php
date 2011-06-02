@@ -129,7 +129,7 @@
 
 		$templates = array();
 		foreach($original_templates as $tnum => $tpl){
-			$templates[$tpl['templateid']] = $tpl['host'];
+			$templates[$tpl['templateid']] = $tpl['name'];
 		}
 	}
 
