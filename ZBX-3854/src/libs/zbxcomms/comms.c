@@ -195,17 +195,15 @@ struct hostent	*zbx_gethost(const char *hostname)
 
 	assert(hostname);
 
-	host = gethostbyname(hostname);
-	if(host)	return host;
+	if (NULL != (host = gethostbyname(hostname)))
+		return host;
 
 	addr = inet_addr(hostname);
 
-	host = gethostbyaddr((char *)&addr, 4, AF_INET);
+	if (NULL != (host = gethostbyaddr((char *)&addr, 4, AF_INET)))
+		return host;
 
-	if(host)	return host;
-
-
-	zbx_set_tcp_strerror("gethost() failed for address '%s' [%s]", hostname, strerror_from_system(zbx_sock_last_error()));
+	zbx_set_tcp_strerror("gethost() failed for address '%s': [%s]", hostname, strerror_from_system(zbx_sock_last_error()));
 
 	return (struct hostent *)NULL;
 }
@@ -229,29 +227,17 @@ struct hostent	*zbx_gethost(const char *hostname)
 
 #define ZBX_TCP_START() { if( FAIL == tcp_started ) tcp_started = zbx_tcp_start(); }
 
-/* static (winXX threads require OFF) */ int	tcp_started = FAIL;
+int	tcp_started = FAIL;	/* winXX threads require tcp_started not to be static */
 
 static int	zbx_tcp_start()
 {
-	WSADATA sockInfo;
+	WSADATA	sockInfo;
+	int	ret;
 
-	switch (WSAStartup(MAKEWORD(2, 2), &sockInfo))
+	if (0 != (ret = WSAStartup(MAKEWORD(2, 2), &sockInfo)))
 	{
-		case WSASYSNOTREADY:
-			zbx_set_tcp_strerror("Underlying network subsystem is not ready for network communication.");
-			return FAIL;
-		case WSAVERNOTSUPPORTED:
-			zbx_set_tcp_strerror("The version of Windows Sockets support requested is not provided.");
-			return FAIL;
-		case WSAEINPROGRESS:
-			zbx_set_tcp_strerror("A blocking Windows Sockets 1.1 operation is in progress.");
-			return FAIL;
-		case WSAEPROCLIM:
-			zbx_set_tcp_strerror("Limit on the number of tasks supported by the Windows Sockets implementation has been reached.");
-			return FAIL;
-		case WSAEFAULT:
-			zbx_set_tcp_strerror("The lpWSAData is not a valid pointer.");
-			return FAIL;
+		zbx_set_tcp_strerror("WSAStartup() failed: %s", strerror_from_system(ret));
+		return FAIL;
 	}
 
 	return SUCCEED;
@@ -492,7 +478,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 		source_addr.sin_addr.s_addr	= inet_addr(source_ip);
 		source_addr.sin_port		= 0;
 
-		if (ZBX_TCP_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(ZBX_SOCKADDR)))
+		if (ZBX_TCP_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(source_addr)))
 		{
 			zbx_set_tcp_strerror("bind() failed with error %d: %s\n",
 					zbx_sock_last_error(),
@@ -504,7 +490,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
 
-	if (ZBX_TCP_ERROR == connect(s->socket, (struct sockaddr *)&servaddr_in, sizeof(ZBX_SOCKADDR)))
+	if (ZBX_TCP_ERROR == connect(s->socket, (struct sockaddr *)&servaddr_in, sizeof(servaddr_in)))
 	{
 		zbx_set_tcp_strerror("Cannot connect to [%s:%d] [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
@@ -876,13 +862,13 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 					ip ? ip : "-", listen_port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 		}
 
-		memset(&serv_addr, 0, sizeof(ZBX_SOCKADDR));
+		memset(&serv_addr, 0, sizeof(serv_addr));
 
 		serv_addr.sin_family		= AF_INET;
 		serv_addr.sin_addr.s_addr	= NULL != ip ? inet_addr(ip) : htonl(INADDR_ANY);
 		serv_addr.sin_port		= htons((unsigned short)listen_port);
 
-		if (ZBX_TCP_ERROR == bind(s->sockets[s->num_socks], (struct sockaddr *)&serv_addr, sizeof(ZBX_SOCKADDR)))
+		if (ZBX_TCP_ERROR == bind(s->sockets[s->num_socks], (struct sockaddr *)&serv_addr, sizeof(serv_addr)))
 		{
 			zbx_set_tcp_strerror("bind() for [[%s]:%hu] failed with error %d: %s",
 					ip ? ip : "-", listen_port, zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
