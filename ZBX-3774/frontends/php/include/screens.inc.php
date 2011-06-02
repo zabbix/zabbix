@@ -489,7 +489,7 @@ require_once('include/js.inc.php');
 // User-defined graph
 			$options = array(
 				'graphids' => $resourceid,
-				'selectHosts' => array('hostid', 'host', 'name', 'status'),
+				'selectHosts' => array('hostid', 'name', 'status'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$graphs = API::Graph()->get($options);
@@ -538,7 +538,7 @@ require_once('include/js.inc.php');
 // Simple graph
 			$options = array(
 				'itemids' => $resourceid,
-				'selectHosts' => array('hostid', 'host', 'name', 'status'),
+				'selectHosts' => array('hostid', 'name', 'status'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$items = API::Item()->get($options);
