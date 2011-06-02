@@ -608,7 +608,7 @@ include_once('include/page_header.php');
 
 			$i = 0;
 			$linked_templates_output = array();
-			order_result($template['parentTemplates'], 'host');
+			order_result($template['parentTemplates'], 'name');
 			foreach($template['parentTemplates'] as $snum => $linked_template){
 				$i++;
 				if($i > $config['max_in_table']){
@@ -618,7 +618,7 @@ include_once('include/page_header.php');
 				}
 
 				$url = 'templates.php?form=update&templateid='.$linked_template['templateid'].url_param('groupid');
-				$linked_templates_output[] = new CLink($linked_template['host'], $url, 'unknown');
+				$linked_templates_output[] = new CLink($linked_template['name'], $url, 'unknown');
 				$linked_templates_output[] = ', ';
 			}
 			array_pop($linked_templates_output);
@@ -636,7 +636,7 @@ include_once('include/page_header.php');
 				$linked_to_objects[] = $h;
 			}
 
-			order_result($linked_to_objects, 'host');
+			order_result($linked_to_objects, 'name');
 			foreach($linked_to_objects as $linked_to_host){
 				if(++$i > $config['max_in_table']){
 					$linked_to_output[] = '...';

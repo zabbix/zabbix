@@ -624,7 +624,7 @@
 		foreach($selements as $snum => $selement){
 			switch($selement['elementtype']){
 				case SYSMAP_ELEMENT_TYPE_HOST:
-					$selements[$snum]['elementName'] = $hosts[$selement['elementid']]['host'];
+					$selements[$snum]['elementName'] = $hosts[$selement['elementid']]['name'];
 					break;
 				case SYSMAP_ELEMENT_TYPE_MAP:
 					$selements[$snum]['elementName'] = $maps[$selement['elementid']]['name'];
