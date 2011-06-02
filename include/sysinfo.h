@@ -245,8 +245,6 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_DNS_RECORD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
