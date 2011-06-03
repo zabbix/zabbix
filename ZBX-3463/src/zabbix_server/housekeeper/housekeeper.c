@@ -81,21 +81,19 @@ static int	housekeeping_process_log()
 		}
 		else
 		{
-#if defined(HAVE_IBM_DB2)
-			deleted = 0;
-#elif defined(HAVE_MYSQL)
-			deleted = DBexecute(
-					"delete from %s"
-					" where %s=" ZBX_FS_UI64 " limit %d",
-					housekeeper.tablename,
-					housekeeper.field,
-					housekeeper.value,
-					CONFIG_MAX_HOUSEKEEPER_DELETE);
-#elif defined(HAVE_ORACLE)
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
 			deleted = DBexecute(
 					"delete from %s"
 					" where %s=" ZBX_FS_UI64
 						" and rownum<=%d",
+					housekeeper.tablename,
+					housekeeper.field,
+					housekeeper.value,
+					CONFIG_MAX_HOUSEKEEPER_DELETE);
+#elif defined(HAVE_MYSQL)
+			deleted = DBexecute(
+					"delete from %s"
+					" where %s=" ZBX_FS_UI64 " limit %d",
 					housekeeper.tablename,
 					housekeeper.field,
 					housekeeper.value,
@@ -121,7 +119,7 @@ static int	housekeeping_process_log()
 		if (0 == deleted || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > deleted)
 			uint64_array_add(&ids, &ids_alloc, &ids_num, housekeeper.housekeeperid, 64);
 
-		if (deleted > 0)
+		if (0 < deleted)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table '%s'",
 					deleted, housekeeper.tablename);
@@ -131,7 +129,7 @@ static int	housekeeping_process_log()
 
 	if (NULL != ids)
 	{
-		sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+		sql = zbx_malloc(sql, sql_alloc);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32, "delete from housekeeper where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "housekeeperid", ids, ids_num);
@@ -378,6 +376,6 @@ void	main_housekeeper_loop()
 
 		DBclose();
 
-		zbx_sleep_loop(SEC_PER_HOUR * CONFIG_HOUSEKEEPING_FREQUENCY);
+		zbx_sleep_loop(CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
 	}
 }
