@@ -173,7 +173,7 @@ static void	update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 	zbx_free(items);
 }
 
-static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char *reason)
+static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, int now, char *reason)
 {
 	const char	*__function_name = "update_triggers_status_to_unknown";
 	DB_RESULT	result;
@@ -181,9 +181,29 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 	zbx_uint64_t	triggerid;
 	int		trigger_type, trigger_value;
 	const char	*trigger_error;
+	static char	type_cond_buf[MAX_STRING_LEN];	/* item type condition buffer */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64,
-			__function_name, hostid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
+
+	/* build item type sql condition */
+	switch (type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			zbx_snprintf(type_cond_buf, sizeof(type_cond_buf), "%d", ITEM_TYPE_ZABBIX);
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			zbx_snprintf(type_cond_buf, sizeof(type_cond_buf), "%d,%d,%d",
+					ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3);
+			break;
+		case ITEM_TYPE_IPMI:
+			zbx_snprintf(type_cond_buf, sizeof(type_cond_buf), "%d", ITEM_TYPE_IPMI);
+			break;
+		default:
+			/* we should never end up here */
+			assert(0);
+	}
 
 	result = DBselect(
 			"select distinct t.triggerid,t.type,t.value,t.error"
@@ -195,11 +215,13 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 				" and i.status=%d"
 				" and not i.key_ like '%s'"
 				" and not i.key_ like '%s%%'"
+				" and i.type in (%s)"
 				" and h.hostid=" ZBX_FS_UI64,
 			TRIGGER_STATUS_ENABLED,
 			ITEM_STATUS_ACTIVE,
 			SERVER_STATUS_KEY,
 			SERVER_ICMPPING_KEY,
+			type_cond_buf,
 			hostid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -396,7 +418,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 				if (available == &item->host.available)
 					update_key_status(item->host.hostid, HOST_AVAILABLE_FALSE, now); /* 2 */
 
-				update_triggers_status_to_unknown(item->host.hostid, now, "Host is unavailable.");
+				update_triggers_status_to_unknown(item->host.hostid, item->type, now, "Agent is unavailable.");
 			}
 
 			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
@@ -681,8 +703,8 @@ static int	get_values(unsigned char poller_type)
 
 void	main_poller_loop(unsigned char p, unsigned char poller_type)
 {
-	int		nextcheck, sleeptime, processed;
-	double		sec;
+	int	nextcheck, sleeptime, processed;
+	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() process_type:'%s' process_num:%d",
 			get_process_type_string(process_type), process_num);
