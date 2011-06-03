@@ -2122,17 +2122,18 @@ static void	add_value_suffix_uptime(char *value, size_t max_len)
 	if (0 > (secs = (int)round(atof(value))))
 		goto clean;
 
-	days = (int)(secs / SEC_PER_DAY);
+	days = secs / SEC_PER_DAY;
 	secs -= days * SEC_PER_DAY;
 
-	hours = (int)(secs / SEC_PER_HOUR);
+	hours = secs / SEC_PER_HOUR;
 	secs -= hours * SEC_PER_HOUR;
 
-	mins = (int)(secs / SEC_PER_MIN);
+	mins = secs / SEC_PER_MIN;
 	secs -= mins * SEC_PER_MIN;
 
 	if (0 != days)
 		offset = zbx_snprintf(value, max_len, "%d days, ", days);
+
 	zbx_snprintf(value + offset, max_len - offset, "%02d:%02d:%02d", hours, mins, secs);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name, value);
@@ -2220,7 +2221,9 @@ static void	add_value_suffix_s(char *value, size_t max_len)
 				offset += zbx_snprintf(value + offset, max_len - offset, "< 1ms");
 		}
 		else if (0 != (n = (int)round(secs * 1000)))
-			offset += zbx_snprintf(value + offset, max_len - offset, "%dms", n);
+		{
+			offset += zbx_snprintf(value + offset, max_len - offset, "%dms", MIN(n, 999));
+		}
 	}
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name, value);
