@@ -430,7 +430,7 @@ static int	connect_jabber(const char *jabber_id, const char *password, int use_s
 	const char	*__function_name = "connect_jabber";
 	char		*buf = NULL;
 	char		real_server[MAX_STRING_LEN];
-	int		real_port, iks_error, timeout, ret = FAIL;
+	int		real_port = 0, iks_error, timeout, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s() jabber_id:'%s'", __module_name, __function_name, jabber_id);
 
