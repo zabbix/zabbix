@@ -179,7 +179,6 @@ addSBox: function(e, objid){
 
 addScroll: function(e, objid){
 	this.debug('addScroll', objid);
-	console.log(this.fixedperiod);
 	var obj = this.objectList[objid];
 //SDJ(this.objectList);
 	var g_img = $(obj.domid);
