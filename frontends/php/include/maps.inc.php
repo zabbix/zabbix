@@ -1446,39 +1446,49 @@ function drawMapConnectors(&$im, $map, $map_info){
 		list($x2, $y2) = get_icon_center_by_selement($selement2, $map_info[$link['selementid2']]);
 
 		if(isset($selement1['elementsubtype']) && $selement1['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
-			$b = abs($y2 - $y1);
-			$d = abs($x2 - $x1);
+			$dY = abs($y2 - $y1);
+			$dX = abs($x2 - $x1);
+			$halfHeight = $selement1['height'] / 2;
+			$halfWidth = $selement1['width'] / 2;
 
-			$a = $selement1['height'] / 2;
-			$koef = $a / $b;
-
-			$c = $d * $koef;
-
-			// if point as further than area diagonal, we should use calculations with width instead of height
-			if(($a / $c) > ($a / ($selement1['width'] / 2))){
-				$y1 = ($y2 > $y1) ? $y1 + $a : $y1 - $a;
-				$x1 = ($x2 < $x1) ? $x1 - $c : $x1 + $c;
+			if($dY == 0){
+				$y1 = $y2;
+				$x1 = ($x2 < $x1) ? $x2 - $halfWidth : $x2 + $halfWidth;
+			}
+			elseif($dX == 0){
+				$y1 = ($y2 > $y1) ? $y1 + $halfHeight : $y1 - $halfHeight;
+				$x1 = $x2;
 			}
 			else{
-				$a = $selement1['width'] / 2;
-				$koef = $a / $d;
+				$koef = $halfHeight / $dY;
 
-				$c = $b * $koef;
+				$c = $dX * $koef;
 
-				$y1 = ($y2 > $y1) ? $y1 + $c : $y1 - $c;
-				$x1 = ($x2 < $x1) ? $x1 - $a : $x1 + $a;
+				// if point as further than area diagonal, we should use calculations with width instead of height
+				if(($halfHeight / $c) > ($halfHeight / $halfWidth)){
+					$y1 = ($y2 > $y1) ? $y1 + $halfHeight : $y1 - $halfHeight;
+					$x1 = ($x2 < $x1) ? $x1 - $c : $x1 + $c;
+				}
+				else{
+					$koef = $halfWidth / $dX;
+
+					$c = $dY * $koef;
+
+					$y1 = ($y2 > $y1) ? $y1 + $c : $y1 - $c;
+					$x1 = ($x2 < $x1) ? $x1 - $halfWidth : $x1 + $halfWidth;
+				}
 			}
 		}
 
 
 		if(isset($selement2['elementsubtype']) && $selement2['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
-			$b = abs($y2 - $y1);
-			$d = abs($x2 - $x1);
+			$dY = abs($y2 - $y1);
+			$dX = abs($x2 - $x1);
 
 			$a = $selement2['height'] / 2;
-			$koef = $a / $b;
+			$koef = $a / $dY;
 
-			$c = $d * $koef;
+			$c = $dX * $koef;
 
 			// if point as further than area diagonal, we should use calculations with width instead of height
 			if(($a / $c) > ($a / ($selement2['width'] / 2))){
@@ -1487,9 +1497,9 @@ function drawMapConnectors(&$im, $map, $map_info){
 			}
 			else{
 				$a = $selement2['width'] / 2;
-				$koef = $a / $d;
+				$koef = $a / $dX;
 
-				$c = $b * $koef;
+				$c = $dY * $koef;
 
 				$y2 = ($y1 > $y2) ? $y2 + $c : $y2 - $c;
 				$x2 = ($x1 < $x2) ? $x2 - $a : $x2 + $a;
