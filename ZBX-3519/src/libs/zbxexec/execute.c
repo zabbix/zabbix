@@ -20,6 +20,7 @@
 #include "common.h"
 #include "threads.h"
 #include "log.h"
+#include "zbxexec.h"
 
 #ifdef _WINDOWS
 
@@ -398,25 +399,31 @@ lbl_exit:
 }
 
 #ifdef _WINDOWS
-ZBX_THREAD_ENTRY(executer_thread, command)
+/******************************************************************************
+ *                                                                            *
+ * Function: executer_thread                                                  *
+ *                                                                            *
+ * Purpose: background thread executing the passed command,                   *
+ *                  exits after completion                                    *
+ *                                                                            *
+ * Author: Rudolfs Kreicbergs                                                 *
+ *                                                                            *
+ ******************************************************************************/
+ZBX_THREAD_ENTRY(executer_thread, args)
 {
 	const char		*__function_name = "executer_thread";
 	STARTUPINFO		si;
 	PROCESS_INFORMATION	pi;
-	char			full_command[MAX_STRING_LEN];
 	LPTSTR			wcommand;
-	int			ret = FAIL;
+	char			*command;
+	int			timeout;
 
-	int			timeout = 3 * 1000;
+	command = ((ZBX_THREAD_EXECUTER_ARGS *)args)->command;
+	timeout = ((ZBX_THREAD_EXECUTER_ARGS *)args)->timeout * 1000;	/* convert to miliseconds */
 
-
-	zbx_snprintf(full_command, sizeof(full_command), "cmd /C \"%s\"", (char *)command);
-
-	wcommand = zbx_utf8_to_unicode(full_command);
+	wcommand = zbx_utf8_to_unicode(command);
 
 	GetStartupInfo(&si);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing [%s]", __function_name, full_command);
 
 	if (0 == CreateProcess(
 		NULL,		/* no module name (use command line) */
@@ -431,7 +438,7 @@ ZBX_THREAD_ENTRY(executer_thread, command)
 		&pi))		/* process information stored upon return */
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): CreateProcess() failed for [%s]: %s",
-				__function_name, full_command, strerror_from_system(GetLastError()));
+				__function_name, command, strerror_from_system(GetLastError()));
 	}
 	else
 	{
@@ -444,10 +451,8 @@ ZBX_THREAD_ENTRY(executer_thread, command)
 	}
 
 	zbx_free(wcommand);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "zabbix_agentd listener stopped");
-
-	ZBX_DO_EXIT();
+	zbx_free(command);
+	zbx_free(args);
 
 	zbx_thread_exit(0);
 }
@@ -458,24 +463,32 @@ ZBX_THREAD_ENTRY(executer_thread, command)
  * Function: zbx_execute_nowait                                               *
  *                                                                            *
  * Purpose: this function executes a script in the background and             *
- *          suppresses the output                                             *
+ *          suppresses the std output                                         *
  *                                                                            *
  * Parameters: command - [IN] command for execution                           *
  *                                                                            *
- * Author: Rudofls Kreicbergs                                                 *
+ * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 int	zbx_execute_nowait(const char *command, int timeout)
 {
-#ifdef _WINDOWS
+	const char	*__function_name = "zbx_execute_nowait";
 
-	if (0 == zbx_thread_start(executer_thread, command))
+#ifdef _WINDOWS
+	ZBX_THREAD_EXECUTER_ARGS	*executer_args;
+
+	executer_args = (ZBX_THREAD_EXECUTER_ARGS *)zbx_malloc(NULL, sizeof(ZBX_THREAD_EXECUTER_ARGS));
+	executer_args->timeout = timeout;
+	executer_args->command = zbx_dsprintf(NULL, "cmd /C \"%s\"", command);
+
+	zabbix_log(LOG_LEVEL_ERR, "%s(): executing [%s]", __function_name, executer_args->command);
+
+	if (0 == zbx_thread_start(executer_thread, (void *)executer_args))
 		return FAIL;
-	else
-		return SUCCESS;
+
+	return SUCCEED;
 
 #else	/* _WINDOWS */
-	const char	*__function_name = "zbx_execute_nowait";
 	pid_t		pid;
 
 	/* create a child process and return */
