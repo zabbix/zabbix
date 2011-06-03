@@ -89,7 +89,7 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['sysmapid'])){
 		$options = array(
 			'sysmapids' => $_REQUEST['sysmapid'],
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 		);
 		$maps = API::Map()->get($options);

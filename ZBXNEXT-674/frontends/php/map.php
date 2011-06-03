@@ -166,13 +166,14 @@ class CMapPainter{
 			'map' => array(
 				'bgColor' => 'white',
 				'titleColor' => 'darkred',
-				'border' => true
+				'border' => true,
+				'drawAreas' => true,
 			),
 			'grid' => array(
 				'size' => 50,
 				'color' => 'black',
 				'labels' => false,
-			)
+			),
 		);
 		foreach($options as $key => $option){
 			$this->options[$key] = array_merge($this->options[$key], $option);
@@ -188,8 +189,10 @@ class CMapPainter{
 		$this->paintBackground();
 		$this->paintTitle();
 		$this->paintGrid();
-		$this->paintAreas();
 
+		if($this->options['map']['drawAreas']){
+			$this->paintAreas();
+		}
 
 		return $this->canvas->getCanvas();
 	}
@@ -250,6 +253,9 @@ class CMapPainter{
 }
 
 $mapOptions = array(
+	'map' => array(
+		'drawAreas' => (!isset($_REQUEST['selements']) && !isset($_REQUEST['noselements'])),
+	),
 	'grid' => array(
 		'size' => get_request('grid', 0),
 	),
