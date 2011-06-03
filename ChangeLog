@@ -2,15 +2,18 @@
 Changes for 1.9.5
 
 New features:
+ - [ZBX-1357] updated Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-783] Added Inventory -> Overview report and filter to Inventory -> Hosts (KB)
  - [ZBXNEXT-467] Renamed net.tcp.dns(.query)[] to net.dns(.record)[], added Windows support, retrans and timeout parameters and IP parameter support for UNIX (rudolfs)
- - [ZBX-3828] added partial Turkish translation; thanks to Murat Koç (Richlv)
+ - [ZBX-3828] added Turkish translation; thanks to Murat Koç (Richlv)
  - [ZBXNEXT-677] added system.hw.* and system.sw.* items for Linux (rudolfs)
  - [ZBXNEXT-780] all items (including user parameters and external checks) can also return only whitespace (rudolfs)
 
 Bug fixes:
+ - [ZBX-3858] fixed host selection in action condition popup (Vedmak)
+ - [ZBX-3852] fixed duplicate HTML IDs in events.php (KB)
  - [ZBX-3846] fixed typo in map creation info message during export (Vedmak)
-  
+
 --------------------------------------------------------------------------------
 Changes for 1.9.4
 
@@ -24,6 +27,7 @@ New features:
  - [ZBXNEXT-511] renamed item description to name, for description introduced a new field (asaveljevs, Vedmak)
 
 Bug fixes:
+ - [ZBX-3774] fixed displaying of visible host and template name in several screens (Alexei)
  - [ZBX-3730] fixed bug with javascript translations - now js strings actually get translated (KB)
  - [ZBX-3752] fixed error in slides with system status (Vedmak)
  - [ZBX-3724] fixed broken images when importing and exporting maps with PostgreSQL (Alexei, Vedmak, Sasha)
@@ -161,6 +165,13 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3847] fixed item history clearing not deleting data in trends_uint table (KB)
+ - [ZBX-3797] fixed processing of vfs.dev.* checks under FreeBSD (Sasha)
+ - [ZBXNEXT-799] added support of SRV records to net.tcp.dns.query[]; thanks to Edward Rudd (asaveljevs)
+ - [ZBX-1029] added lookup of Jabber SRV records to Jabber notifications; thanks to Edward Rudd (asaveljevs)
+ - [ZBXNEXT-792] added type parameter for system.hostname[] on Windows to support both NetBIOS and host names (rudolfs)
+ - [ZBXNEXT-791] added HostnameItem to Agent and Proxy configuration for setting the default Hostname (rudolfs)
+ - [ZBX-3192] fixed snmp index cache to support snmp target for each entry; thanks to Ilia Sotnikov (dimir)
  - [ZBX-3825] fixed errors with single quotes in javascript messages (KB)
  - [ZBXNEXT-782] added support of not-supported items in the history cache (Sasha)
  - [ZBX-3072] fixed mysql error when shutting down server (dimir)

@@ -368,7 +368,7 @@
 		}
 
 
-// prepaitring the list of possible interface languages
+// preparing the list of possible interface languages
 		$cmbLang = new CComboBox('lang',$lang);
 		$languages_unable_set = 0;
 		foreach($ZBX_LOCALES as $loc_id => $loc_name){
@@ -419,7 +419,7 @@
 		$frmUser->addRow(S_ROWS_PER_PAGE,	new CNumericBox('rows_per_page',$rows_per_page,6));
 		$frmUser->addRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 
-//view Media Settings for users above "User" +++
+// view Media Settings for users above "User" +++
 		if(uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
 			$frmUser->addVar('user_medias', $user_medias);
 

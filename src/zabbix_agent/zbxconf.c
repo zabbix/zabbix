@@ -29,10 +29,11 @@
 
 #if defined(ZABBIX_DAEMON)
 #	include "daemon.h"
-#endif	/* ZABBIX_DAEMON */
+#endif
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
+char	*CONFIG_HOSTNAME_ITEM		= NULL;
 
 int	CONFIG_DISABLE_ACTIVE		= 0;
 int	CONFIG_DISABLE_PASSIVE		= 0;

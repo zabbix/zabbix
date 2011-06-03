@@ -323,7 +323,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'hostids' => $hosts,
 			'templated_hosts' => 1,
-			'sortfield' => 'host',
+			'sortfield' => 'name',
 			'output' => API_OUTPUT_EXTEND
 		);
 		$r_hosts = API::Host()->get($params);
@@ -339,9 +339,9 @@ include_once('include/page_header.php');
 		$rw_hosts = zbx_toHash($rw_hosts, 'hostid');
 		foreach($r_hosts as $num => $host){
 			if(isset($rw_hosts[$host['hostid']]))
-				$cmbHosts->addItem($host['hostid'], $host['host']);
+				$cmbHosts->addItem($host['hostid'], $host['name']);
 			else
-				$cmbHosts->addItem($host['hostid'], $host['host'], true, false);
+				$cmbHosts->addItem($host['hostid'], $host['name'], true, false);
 		}
 
 		$frmHostG->addRow(S_HOSTS, $cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));

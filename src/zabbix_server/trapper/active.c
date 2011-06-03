@@ -31,7 +31,7 @@
  *                                                                            *
  * Purpose: check for host name and return hostid                             *
  *                                                                            *
- * Parameters: host - host name                                               *
+ * Parameters: host - [IN] require size 'HOST_HOST_LEN_MAX'                   *
  *                                                                            *
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
@@ -53,7 +53,7 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 
 	if (FAIL == zbx_check_hostname(host))
 	{
-		zbx_snprintf(error, MAX_STRING_LEN, "host name [%s] contains invalid characters", host);
+		zbx_snprintf(error, MAX_STRING_LEN, "invalid host name [%s]", host);
 		return res;
 	}
 
@@ -156,7 +156,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, unsigned char zb
 	}
 	else
 	{
-		zbx_snprintf(error, MAX_STRING_LEN, "host is null");
+		zbx_snprintf(error, sizeof(error), "host is null");
 		goto out;
 	}
 
@@ -176,12 +176,15 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, unsigned char zb
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			hostid);
 
-	if (0 != CONFIG_REFRESH_UNSUPPORTED) {
+	if (0 != CONFIG_REFRESH_UNSUPPORTED)
+	{
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 256,
 				" and (i.status=%d or (i.status=%d and i.lastclock+%d<=%d))",
 				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 				CONFIG_REFRESH_UNSUPPORTED, time(NULL));
-	} else {
+	}
+	else
+	{
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 256,
 				" and i.status=%d",
 				ITEM_STATUS_ACTIVE);
