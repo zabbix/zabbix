@@ -438,7 +438,7 @@ include_once('include/page_header.php');
 
 	if($srctbl == 'hosts'){
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
-		$table->setHeader(array(S_HOST,S_DNS,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
+		$table->setHeader(array(_('Name'), _('DNS'), _('IP'), _('Port'), _('Status'), _('Availability')));
 
 		$options = array(
 			'nodeids' => $nodeid,
