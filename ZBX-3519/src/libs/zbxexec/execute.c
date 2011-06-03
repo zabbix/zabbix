@@ -147,7 +147,14 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	dup2(fd[1], STDOUT_FILENO);
 	close(fd[1]);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() executing script", __function_name);
+	/* set the child as the process group leader, otherwise orphans may be left after timeout */
+	if (-1 == setpgid(0, 0))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): failed to create a process group: %s", __function_name, zbx_strerror(errno));
+		exit(FAIL);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing script", __function_name);
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
 
@@ -411,7 +418,8 @@ close:
 			else
 				zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
 
-			kill(pid, SIGTERM);
+			/* kill the whole process group, pid must be the leader */
+			kill(-pid, SIGTERM);
 			zbx_waitpid(pid);
 		}
 		else
