@@ -242,9 +242,9 @@
 				</tr>
 				<tr class="footer">
 					<td colspan="2" class="form_row_last">
-						<input id="linkApply" type="button" value="Apply">
-						<input id="linkRemove" type="button" value="Remove">
-						<input id="linkClose" type="button" value="Close">
+						<input id="formLinkApply" type="button" value="Apply">
+						<input id="formLinkRemove" type="button" value="Remove">
+						<input id="formLinkClose" type="button" value="Close">
 					</td>
 				</tr>
 				</tbody>

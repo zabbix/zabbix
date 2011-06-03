@@ -145,18 +145,18 @@ echo SBR;
 
 // ELEMENTS
 $el_add = new CIcon(_('Add element'), 'iconplus');
-$el_add->setAttribute('id', 'selement_add');
+$el_add->setAttribute('id', 'selementAdd');
 
 $el_rmv = new CIcon(_('Remove element'), 'iconminus');
-$el_rmv->setAttribute('id', 'selement_remove');
+$el_rmv->setAttribute('id', 'selementRemove');
 //-----------------
 
 // CONNECTORS
 $cn_add = new CIcon(_('Add link'), 'iconplus');
-$cn_add->setAttribute('id', 'link_add');
+$cn_add->setAttribute('id', 'linkAdd');
 
 $cn_rmv = new CIcon(_('Remove link'), 'iconminus');
-$cn_rmv->setAttribute('id', 'link_remove');
+$cn_rmv->setAttribute('id', 'linkRemove');
 //------------------------
 
 
@@ -212,7 +212,7 @@ show_table_header($elcn_tab);
 
 
 $sysmap_img = new CImg('images/general/tree/zero.gif', 'Sysmap');
-$sysmap_img->setAttribute('id', 'sysmap_img');
+$sysmap_img->setAttribute('id', 'sysmap_img', $sysmap['width'], $sysmap['height']);
 
 $table = new CTable();
 $table->addRow($sysmap_img);

@@ -1873,12 +1873,15 @@ function drawMapLabels(&$im, $map, $map_info){
 	$label_lines = array();
 	$status_lines = array();
 
+	foreach($selements as $sid => $selement){
+		if(isset($selement['elementsubtype']) && $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
+			unset($selements[$sid]);
+		}
+	}
+
+
 	// set label type and custom label text for all selements
 	foreach($selements as $selementid => $selement){
-		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
-			continue;
-		}
-
 		$selements[$selementid]['label_type'] = $map['label_type'];
 
 		if($map['label_format'] == SYSMAP_LABEL_ADVANCED_OFF){
@@ -1920,10 +1923,6 @@ function drawMapLabels(&$im, $map, $map_info){
 	}
 
 	foreach($selements as $selementid => $selement){
-		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
-			continue;
-		}
-
 		if(!isset($label_lines[$selementid])){
 			$label_lines[$selementid] = array();
 		}
@@ -1962,10 +1961,6 @@ function drawMapLabels(&$im, $map, $map_info){
 
 	$elementsHostids = array();
 	foreach($selements as $selement){
-		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
-			continue;
-		}
-
 		if($selement['label_type'] != MAP_LABEL_TYPE_IP){
 			continue;
 		}
@@ -1986,9 +1981,6 @@ function drawMapLabels(&$im, $map, $map_info){
 
 	// DRAW
 	foreach($selements as $selementid => $selement){
-		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
-			continue;
-		}
 		if(empty($selement) || (($selement['label_type'] == MAP_LABEL_TYPE_NOTHING))){
 			continue;
 		}
@@ -2147,8 +2139,6 @@ function drawMapLabels(&$im, $map, $map_info){
  * @return array
  */
 function processMapAreas(array &$map){
-	// TODO: if links are between areas omg?!
-
 	foreach($map['selements'] as $selement){
 		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
 			$hosts = API::host()->get(array(
@@ -2162,7 +2152,6 @@ function processMapAreas(array &$map){
 			if($hostsCount == 0){
 				continue;
 			}
-
 
 			$originalX = $selement['x'];
 			$originalY = $selement['y'];

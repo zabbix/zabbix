@@ -54,7 +54,6 @@ function createMap(containerid, mapdata){
 		this.bindActions();
 
 		// initialize SELECTABLE
-/*
 		this.container.selectable({
 			start: jQuery.proxy(function(event){
 				if(!event.ctrlKey){
@@ -76,7 +75,6 @@ function createMap(containerid, mapdata){
 				this.selectElements(ids, event.ctrlKey);
 			}, this)
 		});
-*/
 
 
 		this.bind = function(event, callback){
@@ -143,7 +141,7 @@ function createMap(containerid, mapdata){
 					favobj: "sysmap",
 					action: "save",
 					sysmapid: this.sysmapid,
-					sysmap: Object.toJSON(this.data) //TODO: remove prototype method
+					sysmap: Object.toJSON(this.data) // TODO: remove prototype method
 				},
 				error: function(){
 					throw new Error('Cannot save map.');
@@ -217,13 +215,10 @@ function createMap(containerid, mapdata){
 			var selementid1 = null,
 				selementid2 = null,
 				selementid,
-				linkids = this.getLinksBySelementIds(selementid1, selementid2),
+				linkids,
 				i,
 				ln;
 
-			if(linkids.length === 0){
-				return false;
-			}
 			if(this.selection.count !== 2){
 				alert(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
 				return false;
@@ -236,6 +231,11 @@ function createMap(containerid, mapdata){
 				else{
 					selementid2 = selementid;
 				}
+			}
+
+			linkids = this.getLinksBySelementIds(selementid1, selementid2);
+			if(linkids.length === 0){
+				return false;
 			}
 
 
@@ -337,19 +337,19 @@ function createMap(containerid, mapdata){
 			});
 
 			// add element
-			jQuery('#selement_add').click(function(){
+			jQuery('#selementAdd').click(function(){
 				var selement = new Selement(that);
 				that.selements[selement.id] = selement;
 				that.updateImage();
 			});
 
 			// remove element
-			jQuery('#selement_remove').click(function(){
-				that.removeLinks();
+			jQuery('#selementRemove').click(function(){
+				that.deleteSelectedElements();
 			});
 
 			// add link
-			jQuery('#link_add').click(function(){
+			jQuery('#linkAdd').click(function(){
 				var link;
 
 				if(that.selection.count !== 2){
@@ -362,7 +362,7 @@ function createMap(containerid, mapdata){
 			});
 
 			// remove link
-			jQuery('#link_remove').click(function(){
+			jQuery('#linkRemove').click(function(){
 				that.removeLinks();
 			});
 
@@ -425,16 +425,19 @@ function createMap(containerid, mapdata){
 			});
 
 			// link form
-			jQuery('#linkRemove').click(function(){
+			jQuery('#formLinkRemove').click(function(){
 				that.links[that.currentLinkId].remove();
+				for(var selementid in that.selection.selements){
+					that.form.updateList(selementid);
+				}
 				that.linkForm.hide();
 				that.updateImage();
 			});
-			jQuery('#linkApply').click(function(){
+			jQuery('#formLinkApply').click(function(){
 				var linkData = that.linkForm.getValues();
 				that.links[that.currentLinkId].update(linkData)
 			});
-			jQuery('#linkClose').click(function(){
+			jQuery('#formLinkClose').click(function(){
 				that.linkForm.hide();
 			});
 
@@ -650,9 +653,9 @@ function createMap(containerid, mapdata){
 
 		// create dom
 		this.domNode = jQuery('<div></div>')
-				.appendTo(this.sysmap.container)
-				.addClass('pointer sysmap_element')
-				.data('id', this.id);
+			.appendTo(this.sysmap.container)
+			.addClass('pointer sysmap_element')
+			.data('id', this.id);
 
 
 		this.domNode.draggable({
@@ -669,11 +672,6 @@ function createMap(containerid, mapdata){
 
 		this.updateIcon();
 		this.align();
-
-		// TODO: grid snap
-		//	if(this.sysmap.auto_align){
-		//		jQuery(this.domNode).draggable('option', 'grid', [this.sysmap.grid_size, this.sysmap.grid_size]);
-		//	}
 	}
 	Selement.prototype = {
 
@@ -1284,7 +1282,7 @@ function createMap(containerid, mapdata){
 
 
 		// apply jQuery UI elements
-		jQuery('#linkApply, #linkRemove, #linkClose').button();
+		jQuery('#formLinkApply, #formLinkRemove, #formLinkClose').button();
 	}
 	LinkForm.prototype = {
 		sysmap: null, // reference to CMap object
