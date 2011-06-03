@@ -23,15 +23,8 @@
 #include "threads.h"
 
 int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout);
-int	zbx_execute_nowait(const char *command, int timeout);
+int	zbx_execute_nowait(const char *command);
 
-typedef struct
-{
-	char	*command;
-	int	timeout;
-}
-ZBX_THREAD_EXECUTER_ARGS;
-
-ZBX_THREAD_ENTRY(executer_thread, args);
+ZBX_THREAD_ENTRY(executer_thread, command);
 
 #endif

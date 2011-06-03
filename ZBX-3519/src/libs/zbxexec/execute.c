@@ -239,8 +239,8 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	size_t			buf_size = MAX_BUFFER_LEN;
 	int			ret = SUCCEED;
 #ifdef _WINDOWS
-	STARTUPINFO		si = {0};
-	PROCESS_INFORMATION	pi = {0};
+	STARTUPINFO		si;
+	PROCESS_INFORMATION	pi;
 	SECURITY_ATTRIBUTES	sa;
 	HANDLE			hWrite = NULL, hRead = NULL;
 	char			*cmd = NULL;
@@ -409,7 +409,7 @@ lbl_exit:
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(executer_thread, args)
+ZBX_THREAD_ENTRY(executer_thread, command)
 {
 	const char		*__function_name = "executer_thread";
 	STARTUPINFO		si;
@@ -418,11 +418,11 @@ ZBX_THREAD_ENTRY(executer_thread, args)
 	char			*command;
 	int			timeout;
 
-	command = ((ZBX_THREAD_EXECUTER_ARGS *)args)->command;
-	timeout = ((ZBX_THREAD_EXECUTER_ARGS *)args)->timeout * 1000;	/* convert to miliseconds */
+	wcommand = zbx_utf8_to_unicode((char *)command);
 
-	wcommand = zbx_utf8_to_unicode(command);
-
+	/* fill in process startup info structure */
+	memset(&si, 0, sizeof(si));
+	si.cb = sizeof(si);
 	GetStartupInfo(&si);
 
 	if (0 == CreateProcess(
@@ -438,12 +438,11 @@ ZBX_THREAD_ENTRY(executer_thread, args)
 		&pi))		/* process information stored upon return */
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): CreateProcess() failed for [%s]: %s",
-				__function_name, command, strerror_from_system(GetLastError()));
+				__function_name, (char *)command, strerror_from_system(GetLastError()));
 	}
 	else
 	{
-		if (WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout))
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): execution timed out for [%s]", __function_name, command);
+		WaitForSingleObject(pi.hProcess, INFINITE);
 
 		TerminateProcess(pi.hProcess, 0);
 		CloseHandle(pi.hProcess);
@@ -452,7 +451,6 @@ ZBX_THREAD_ENTRY(executer_thread, args)
 
 	zbx_free(wcommand);
 	zbx_free(command);
-	zbx_free(args);
 
 	zbx_thread_exit(0);
 }
@@ -470,20 +468,18 @@ ZBX_THREAD_ENTRY(executer_thread, args)
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_execute_nowait(const char *command, int timeout)
+int	zbx_execute_nowait(const char *command)
 {
 	const char	*__function_name = "zbx_execute_nowait";
 
 #ifdef _WINDOWS
-	ZBX_THREAD_EXECUTER_ARGS	*executer_args;
+	char		*full_command;
 
-	executer_args = (ZBX_THREAD_EXECUTER_ARGS *)zbx_malloc(NULL, sizeof(ZBX_THREAD_EXECUTER_ARGS));
-	executer_args->timeout = timeout;
-	executer_args->command = zbx_dsprintf(NULL, "cmd /C \"%s\"", command);
+	full_command = zbx_dsprintf(NULL, "cmd /C \"%s\"", command);
 
-	zabbix_log(LOG_LEVEL_ERR, "%s(): executing [%s]", __function_name, executer_args->command);
+	zabbix_log(LOG_LEVEL_ERR, "%s(): executing [%s]", __function_name, full_command);
 
-	if (0 == zbx_thread_start(executer_thread, (void *)executer_args))
+	if (0 == zbx_thread_start(executer_thread, full_command))
 		return FAIL;
 
 	return SUCCEED;
@@ -494,7 +490,8 @@ int	zbx_execute_nowait(const char *command, int timeout)
 	/* create a child process and return */
 	if (-1 == (pid = zbx_fork()))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): (1) fork() failed for [%s]: %s", __function_name, command, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): (1) fork() failed for [%s]: %s",
+				__function_name, command, zbx_strerror(errno));
 		return FAIL;
 	}
 	else if (0 != pid)
@@ -524,27 +521,13 @@ int	zbx_execute_nowait(const char *command, int timeout)
 			execl("/bin/sh", "sh", "-c", command, NULL);
 
 			/* execl() returns only when an error occurs */
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): execl() failed for [%s]: %s", __function_name, command, zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): execl() failed for [%s]: %s",
+					__function_name, command, zbx_strerror(errno));
 			break;
 		default:
 			/* this is the parent process */
 
-			alarm(timeout);
-
-			if (-1 == zbx_waitpid(pid))
-			{
-
-				if (EINTR == errno)
-					zabbix_log(LOG_LEVEL_WARNING, "%s(): execution timed out for [%s]", __function_name, command);
-				else
-					zabbix_log(LOG_LEVEL_ERR, "%s(): zbx_waitpid() failed: %s", __function_name, zbx_strerror(errno));
-
-				kill(pid, SIGTERM);
-				zbx_waitpid(pid);
-			}
-
-			alarm(0);
-
+			waitpid(pid, NULL, WNOHANG);
 			break;
 	}
 
