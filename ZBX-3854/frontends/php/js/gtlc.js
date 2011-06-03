@@ -81,9 +81,6 @@ addObject: function(domid, time, objData){
 									  parseInt(time.starttime), 
 									  parseInt(time.usertime), 
 									  parseInt(time.endtime));
-	// is the time line fixed or dynamic
-	this.fixedperiod = this.objectList[domid].periodFixed == 1 ? 1 : 0;
-
 },
 
 processObjects: function(){
@@ -194,7 +191,7 @@ addScroll: function(e, objid){
 		if(!is_number(g_width)) g_width = 900;
 	}
 
-	var scrl = scrollCreate(obj.domid, g_width, obj.timeline.timelineid, this.fixedperiod);
+	var scrl = scrollCreate(obj.domid, g_width, obj.timeline.timelineid, this.objectList[objid].periodFixed);
 	scrl.onchange = this.objectUpdate.bind(this);
 
 	if(obj.dynamic && !is_null($(g_img))){
@@ -1277,7 +1274,7 @@ switchPeriodState: function(){
 	// sending fixed/dynamic setting to server to save in a profile
 	var params = {
 		favobj:	'timelinefixedperiod',
-		fixedperiod: this.fixedperiod
+		favid: this.fixedperiod
 	};
 	send_params(params);
 

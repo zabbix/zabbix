@@ -48,7 +48,6 @@ include_once('include/page_header.php');
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		null),
 		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
-		'fixedperiod'=> array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		null),
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),null)
@@ -71,8 +70,8 @@ include_once('include/page_header.php');
 		}
 		// saving fixed/dynamic setting to profile
 		if('timelinefixedperiod' == $_REQUEST['favobj']){
-			if(isset($_REQUEST['fixedperiod'])){
-				CProfile::update('web.charts.timelinefixed', $_REQUEST['fixedperiod'], PROFILE_TYPE_INT);
+			if(isset($_REQUEST['favid'])){
+				CProfile::update('web.charts.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
 			}
 		}
 
