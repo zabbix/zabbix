@@ -397,30 +397,20 @@ lbl_exit:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_execute_nowait                                               *
- *                                                                            *
- * Purpose: this function executes a script in the background and             *
- *          suppresses the output                                             *
- *                                                                            *
- * Parameters: command - [IN] command for execution                           *
- *                                                                            *
- * Author: Rudofls Kreicbergs                                                 *
- *                                                                            *
- ******************************************************************************/
-int	zbx_execute_nowait(const char *command, int timeout)
-{
-	const char		*__function_name = "zbx_execute_nowait";
-
 #ifdef _WINDOWS
+ZBX_THREAD_ENTRY(executer_thread, command)
+{
+	const char		*__function_name = "executer_thread";
 	STARTUPINFO		si;
 	PROCESS_INFORMATION	pi;
 	char			full_command[MAX_STRING_LEN];
 	LPTSTR			wcommand;
 	int			ret = FAIL;
 
-	zbx_snprintf(full_command, sizeof(full_command), "cmd /C \"%s\"", command);
+	int			timeout = 3 * 1000;
+
+
+	zbx_snprintf(full_command, sizeof(full_command), "cmd /C \"%s\"", (char *)command);
 
 	wcommand = zbx_utf8_to_unicode(full_command);
 
@@ -444,14 +434,49 @@ int	zbx_execute_nowait(const char *command, int timeout)
 				__function_name, full_command, strerror_from_system(GetLastError()));
 	}
 	else
-		ret = SUCCEED;
+	{
+		if (WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout))
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): execution timed out for [%s]", __function_name, command);
+
+		TerminateProcess(pi.hProcess, 0);
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
 
 	zbx_free(wcommand);
 
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "zabbix_agentd listener stopped");
+
+	ZBX_DO_EXIT();
+
+	zbx_thread_exit(0);
+}
+#endif	/* _WINDOWS */
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_execute_nowait                                               *
+ *                                                                            *
+ * Purpose: this function executes a script in the background and             *
+ *          suppresses the output                                             *
+ *                                                                            *
+ * Parameters: command - [IN] command for execution                           *
+ *                                                                            *
+ * Author: Rudofls Kreicbergs                                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_execute_nowait(const char *command, int timeout)
+{
+#ifdef _WINDOWS
+
+	if (0 == zbx_thread_start(executer_thread, command))
+		return FAIL;
+	else
+		return SUCCESS;
 
 #else	/* _WINDOWS */
-	pid_t			pid;
+	const char	*__function_name = "zbx_execute_nowait";
+	pid_t		pid;
 
 	/* create a child process and return */
 	if (-1 == (pid = zbx_fork()))
@@ -478,7 +503,7 @@ int	zbx_execute_nowait(const char *command, int timeout)
 		case 0:
 			/* this is the new child process */
 
-			/* surpress the output of the executed script, otherwise */
+			/* suppress the output of the executed script, otherwise */
 			/* the output might get written to a logfile or elsewhere */
 			redirect_std(NULL);
 
@@ -489,9 +514,10 @@ int	zbx_execute_nowait(const char *command, int timeout)
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): execl() failed for [%s]: %s", __function_name, command, zbx_strerror(errno));
 			break;
 		default:
-			/* this parent process */
+			/* this is the parent process */
 
 			alarm(timeout);
+
 			if (-1 == zbx_waitpid(pid))
 			{
 
@@ -503,6 +529,7 @@ int	zbx_execute_nowait(const char *command, int timeout)
 				kill(pid, SIGTERM);
 				zbx_waitpid(pid);
 			}
+
 			alarm(0);
 
 			break;
