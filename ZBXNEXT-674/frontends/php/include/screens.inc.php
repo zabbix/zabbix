@@ -489,7 +489,7 @@ require_once('include/js.inc.php');
 // User-defined graph
 			$options = array(
 				'graphids' => $resourceid,
-				'selectHosts' => array('hostid', 'host', 'status'),
+				'selectHosts' => array('hostid', 'name', 'status'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$graphs = API::Graph()->get($options);
@@ -501,11 +501,11 @@ require_once('include/js.inc.php');
 				$id = $resourceid;
 				$graph = reset($graphs);
 
-				order_result($graph['hosts'], 'host');
+				order_result($graph['hosts'], 'name');
 				$graph['host'] = reset($graph['hosts']);
 
 				if($graph['host']['status'] != HOST_STATUS_TEMPLATE)
-					$caption = $graph['host']['host'].':'.$graph['name'];
+					$caption = $graph['host']['name'].':'.$graph['name'];
 				else
 					$caption = $graph['name'];
 
@@ -538,7 +538,7 @@ require_once('include/js.inc.php');
 // Simple graph
 			$options = array(
 				'itemids' => $resourceid,
-				'selectHosts' => array('hostid', 'host', 'status'),
+				'selectHosts' => array('hostid', 'name', 'status'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$items = API::Item()->get($options);
@@ -553,7 +553,7 @@ require_once('include/js.inc.php');
 				$item['host'] = reset($item['hosts']);
 
 				if($item['host']['status'] != HOST_STATUS_TEMPLATE)
-					$caption = $item['host']['host'].':'.itemName($item);
+					$caption = $item['host']['name'].':'.itemName($item);
 				else
 					$caption = itemName($item);
 
@@ -692,7 +692,7 @@ require_once('include/js.inc.php');
 
 					$hosts = API::Host()->get($options);
 					foreach($hosts as $hnum => $host){
-						$caption = get_node_name_by_elid($host['hostid'], true, ':').$host['host'];
+						$caption = get_node_name_by_elid($host['hostid'], true, ':').$host['name'];
 						$id = $resourceid;
 					}
 				}
