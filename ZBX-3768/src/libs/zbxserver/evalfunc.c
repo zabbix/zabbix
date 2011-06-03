@@ -2115,26 +2115,27 @@ static void	add_value_suffix_uptime(char *value, size_t max_len)
 {
 	const char	*__function_name = "add_value_suffix_uptime";
 
-	int	days, hours, mins, secs, offset = 0;
+	double	secs;
+	int	days, hours, mins, offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s'", __function_name, value);
 
-	if (0 > (secs = (int)round(atof(value))))
+	if (0 > (secs = round(atof(value))) || (double)0x7fffffff * SEC_PER_DAY < secs)
 		goto clean;
 
-	days = secs / SEC_PER_DAY;
-	secs -= days * SEC_PER_DAY;
+	days = (int)(secs / SEC_PER_DAY);
+	secs -= (double)days * SEC_PER_DAY;
 
-	hours = secs / SEC_PER_HOUR;
-	secs -= hours * SEC_PER_HOUR;
+	hours = (int)(secs / SEC_PER_HOUR);
+	secs -= (double)hours * SEC_PER_HOUR;
 
-	mins = secs / SEC_PER_MIN;
-	secs -= mins * SEC_PER_MIN;
+	mins = (int)(secs / SEC_PER_MIN);
+	secs -= (double)mins * SEC_PER_MIN;
 
 	if (0 != days)
 		offset = zbx_snprintf(value, max_len, "%d days, ", days);
 
-	zbx_snprintf(value + offset, max_len - offset, "%02d:%02d:%02d", hours, mins, secs);
+	zbx_snprintf(value + offset, max_len - offset, "%02d:%02d:%02d", hours, mins, (int)secs);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name, value);
 }
@@ -2159,72 +2160,75 @@ static void	add_value_suffix_s(char *value, size_t max_len)
 {
 	const char	*__function_name = "add_value_suffix_s";
 
-	double	secs;
-	int	n, n_unit = 0, offset = 0;
+	double	secs, secs_orig;
+	int	n, n_unit = 0, offset = 0, less_than_ms;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s'", __function_name, value);
 
-	if (0 > (secs = atof(value)))
+	if (0 > (secs_orig = atof(value)) || (double)0x7fffffff * SEC_PER_YEAR < secs_orig)
 		goto clean;
+
+	less_than_ms = (0.001 > secs_orig - floor(secs));
+	secs = round(secs_orig * 1000) / 1000;
 
 	*value = '\0';
 
 	if (0 != (n = (int)(secs / SEC_PER_YEAR)))
 	{
-		offset += zbx_snprintf(value + offset, max_len - offset, "%dy", n);
-		secs -= n * SEC_PER_YEAR;
+		offset += zbx_snprintf(value + offset, max_len - offset, "%dy ", n);
+		secs -= (double)n * SEC_PER_YEAR;
 		if (0 == n_unit)
 			n_unit = 4;
 	}
 
 	if (0 != (n = (int)(secs / SEC_PER_MONTH)))
 	{
-		offset += zbx_snprintf(value + offset, max_len - offset, "%dm", n);
-		secs -= n * SEC_PER_MONTH;
+		offset += zbx_snprintf(value + offset, max_len - offset, "%dm ", n);
+		secs -= (double)n * SEC_PER_MONTH;
 		if (0 == n_unit)
 			n_unit = 3;
 	}
 
 	if (0 != (n = (int)(secs / SEC_PER_DAY)))
 	{
-		offset += zbx_snprintf(value + offset, max_len - offset, "%dd", n);
-		secs -= n * SEC_PER_DAY;
+		offset += zbx_snprintf(value + offset, max_len - offset, "%dd ", n);
+		secs -= (double)n * SEC_PER_DAY;
 		if (0 == n_unit)
 			n_unit = 2;
 	}
 
 	if (4 > n_unit && 0 != (n = (int)(secs / SEC_PER_HOUR)))
 	{
-		offset += zbx_snprintf(value + offset, max_len - offset, "%dh", n);
-		secs -= n * SEC_PER_HOUR;
+		offset += zbx_snprintf(value + offset, max_len - offset, "%dh ", n);
+		secs -= (double)n * SEC_PER_HOUR;
 		if (0 == n_unit)
 			n_unit = 1;
 	}
 
 	if (3 > n_unit && 0 != (n = (int)(secs / SEC_PER_MIN)))
 	{
-		offset += zbx_snprintf(value + offset, max_len - offset, "%dm", n);
-		secs -= n * SEC_PER_MIN;
+		offset += zbx_snprintf(value + offset, max_len - offset, "%dm ", n);
+		secs -= (double)n * SEC_PER_MIN;
 	}
 
-	if (2 > n_unit && 0 != (n = (int)secs))
+	if (2 > n_unit && (0 != (n = (int)secs)))
 	{
-		offset += zbx_snprintf(value + offset, max_len - offset, "%ds", n);
-		secs -= n;
+		offset += zbx_snprintf(value + offset, max_len - offset, "%ds ", n);
+		secs -= (double)n;
 	}
 
 	if (1 > n_unit)
 	{
-		if (0 < secs && secs < 0.001)
-		{
-			if (0 == offset)
-				offset += zbx_snprintf(value + offset, max_len - offset, "< 1ms");
-		}
+		if (0 == secs_orig)
+			offset += zbx_snprintf(value + offset, max_len - offset, "0s");
+		else if (0 != less_than_ms)
+			offset += zbx_snprintf(value + offset, max_len - offset, "< 1ms");
 		else if (0 != (n = (int)round(secs * 1000)))
-		{
-			offset += zbx_snprintf(value + offset, max_len - offset, "%dms", MIN(n, 999));
-		}
+			offset += zbx_snprintf(value + offset, max_len - offset, "%dms", n);
 	}
+
+	if (0 != offset && ' ' == value[--offset])
+		value[offset] = '\0';
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name, value);
 }
