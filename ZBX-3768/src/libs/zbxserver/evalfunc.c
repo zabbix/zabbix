@@ -2168,10 +2168,13 @@ static void	add_value_suffix_s(char *value, size_t max_len)
 	if (0 > (secs_orig = atof(value)) || (double)0x7fffffff * SEC_PER_YEAR < secs_orig)
 		goto clean;
 
-	less_than_ms = (0.001 > secs_orig - floor(secs));
-	secs = round(secs_orig * 1000) / 1000;
-
 	*value = '\0';
+
+	secs = secs_orig - floor(secs_orig);
+	less_than_ms = (0 < secs && secs < 0.001);
+
+	secs = round(secs_orig * 1000) / 1000;
+	less_than_ms &= (secs == 0);
 
 	if (0 != (n = (int)(secs / SEC_PER_YEAR)))
 	{
