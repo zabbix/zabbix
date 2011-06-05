@@ -10,7 +10,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -377,7 +378,7 @@ msgstr "Количество агрегированных периодов"
 
 #: include/hosts.inc.php:65 include/locales/en_gb.inc.php:1543
 msgid "Alias"
-msgstr "Имя"
+msgstr "Псевдоним"
 
 #: include/locales/en_gb.inc.php:977
 msgid "Align icons"
@@ -623,7 +624,7 @@ msgstr "Жирная линия"
 
 #: include/locales/en_gb.inc.php:869
 msgid "Boolean"
-msgstr ""
+msgstr "Boolean"
 
 #: include/locales/en_gb.inc.php:1032
 #: include/views/configuration.sysmap.edit.php:117
@@ -1147,7 +1148,7 @@ msgstr "Не удалось сформировать дерево. Провер�
 
 #: api/classes/class.ctemplate.php:1415
 msgid "Cannot have empty visible template name"
-msgstr ""
+msgstr "Невозможно иметь пустое видимое имя шаблона"
 
 #: api/classes/class.ctrigger.php:1468 api/classes/class.ctrigger.php:1559
 #: api/classes/class.ctriggerprototype.php:1339
@@ -1158,7 +1159,7 @@ msgstr "Не удалось раскрыть выражение \"%s\"."
 #: include/classes/class.cview.php:108
 #, php-format
 msgid "Cannot include view file \"%s\"."
-msgstr ""
+msgstr "Не удалось включить файл вида \"%s\"."
 
 #: include/locales/en_gb.inc.php:1884
 msgid "Cannot link hardlinked service."
@@ -1186,16 +1187,16 @@ msgstr "Не удалось произвести массовое обновле
 
 #: api/classes/class.chost.php:1722
 msgid "Cannot mass update visible host name"
-msgstr ""
+msgstr "Не удалось массово обновить видимое имя узла сети"
 
 #: api/classes/class.ctemplate.php:1347
 msgid "Cannot mass update visible template name"
-msgstr ""
+msgstr "Не удалось массово обновить видимое имя шаблона"
 
 #: api/classes/class.ctemplate.php:1671
 #, php-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr ""
+msgstr "Невозможно передать одинаковые ID шаблонов для присоединения: %s."
 
 #: include/db.inc.php:1314
 #, php-format
@@ -1226,7 +1227,7 @@ msgstr "Невозможно переименовать гостевого по�
 
 #: api/classes/class.cdrule.php:452
 msgid "Cannot save discovery rule without checks."
-msgstr ""
+msgstr "Невозможно сохранить правило обнаружения без проверок."
 
 #: api/classes/class.chostinterface.php:485
 msgid "Cannot switch host for interface"
@@ -1298,7 +1299,7 @@ msgstr "Не удалось обновить правило обнаружени
 
 #: discoveryconf.php:119
 msgid "Cannot update discovery rule."
-msgstr ""
+msgstr "Не удалось массово обновить правило обнаружения."
 
 #: include/locales/en_gb.inc.php:541
 msgid "Cannot update graph"
@@ -1318,7 +1319,7 @@ msgstr "Не удалось обновить статус узла сети"
 
 #: hosts.php:435
 msgid "Cannot update hosts"
-msgstr ""
+msgstr "Не удалось обновить узлы сети"
 
 #: include/locales/en_gb.inc.php:396
 msgid "Cannot update image"
@@ -1344,7 +1345,7 @@ msgstr "Не удалось обновить обслуживание"
 #: include/export.inc.php:809
 #, php-format
 msgid "Cannot update map \"%s\"."
-msgstr ""
+msgstr "Не удалось обновить карту сети \"%s\"."
 
 #: include/locales/en_gb.inc.php:1021
 msgid "Cannot update network map"
@@ -1444,11 +1445,11 @@ msgstr "Строка символов не включена"
 
 #: include/hosts.inc.php:185
 msgid "Chassis"
-msgstr ""
+msgstr "Шасси"
 
 #: include/views/js/configuration.discovery.js.php:295
 msgid "Check already exists."
-msgstr ""
+msgstr "Проверка уже существует."
 
 #: include/locales/en_gb.inc.php:1689
 msgid "Check expression part starting from '"
@@ -1456,11 +1457,11 @@ msgstr "Проверьте часть выражения начиная с '"
 
 #: api/classes/class.citemgeneral.php:203
 msgid "Check the key, please. Default example was passed."
-msgstr ""
+msgstr "Пожалуйста, проверьте ключ. Пример по умолчанию показан."
 
 #: include/views/js/configuration.discovery.js.php:26
 msgid "Check type"
-msgstr ""
+msgstr "Тип проверки"
 
 #: discoveryconf.php:249 include/views/configuration.discovery.edit.php:84
 msgid "Checks"
@@ -1468,7 +1469,7 @@ msgstr "Проверки"
 
 #: api/classes/class.cdrule.php:564
 msgid "Checks should be unique."
-msgstr ""
+msgstr "Проверки должны быть уникальными."
 
 #: include/locales/en_gb.inc.php:229
 msgid "Child"
@@ -1481,7 +1482,7 @@ msgstr "Chinese (CN)"
 #: api/classes/class.cmapelement.php:552
 #, php-format
 msgid "Circular link can not be created for map element \"%s\""
-msgstr ""
+msgstr "Закольцовывающая ссылка не может быть создана для элемента карты сети \"%s\""
 
 #: api/classes/class.ctemplate.php:1801
 msgid "Circular link cannot be created"
@@ -1556,7 +1557,7 @@ msgstr "Команды действий"
 
 #: scripts.php:90
 msgid "Command cannot be empty."
-msgstr ""
+msgstr "Команда не может быть пустой."
 
 #: include/views/administration.script.edit.php:61
 #: include/views/administration.script.list.php:43
@@ -1564,7 +1565,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:688 popup.php:1783
 #: popup.php:1789
 msgid "Commands"
-msgstr ""
+msgstr "Команды"
 
 #: include/locales/en_gb.inc.php:1472
 msgid "Comment updated"
@@ -1664,12 +1665,12 @@ msgstr "Подключаться по"
 #: include/page_footer.php:103
 #, php-format
 msgid "Connected as '%1$s'"
-msgstr ""
+msgstr "Подключен как '%1$s'"
 
 #: include/page_footer.php:100
 #, php-format
 msgid "Connected as '%1$s' from '%2$s'"
-msgstr ""
+msgstr "Подключен как '%1$s' с '%2$s'"
 
 #: include/locales/en_gb.inc.php:999
 msgid "Connectors"
@@ -1681,7 +1682,7 @@ msgstr "Контактная информация"
 
 #: include/hosts.inc.php:205
 msgid "Contract number"
-msgstr ""
+msgstr "Номер контракта"
 
 #: include/locales/en_gb.inc.php:996
 msgid "Coordinate X"
@@ -1837,7 +1838,7 @@ msgstr "Пользовательская подпись"
 #: api/classes/class.cmap.php:600
 #, php-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
-msgstr ""
+msgstr "Пользовательская подпись для карты сети \"%2$s\" у элементов с типом \"%1$s\" не может быть пустой."
 
 #: include/locales/en_gb.inc.php:890
 msgid "Custom multiplier"
@@ -1849,7 +1850,7 @@ msgstr "Пользовательские комплексные экраны"
 
 #: include/views/configuration.action.edit.php:642
 msgid "Custom script"
-msgstr ""
+msgstr "Пользовательский скрипт"
 
 #: include/views/administration.general.triggerSeverity.edit.php:39
 msgid "Custom severity"
@@ -2008,19 +2009,19 @@ msgstr "Дата"
 
 #: include/hosts.inc.php:270
 msgid "Date HW installed"
-msgstr ""
+msgstr "Дата установки HW"
 
 #: include/hosts.inc.php:275
 msgid "Date HW maintenance expires"
-msgstr ""
+msgstr "Дата окончания обслуживания HW"
 
 #: include/hosts.inc.php:265
 msgid "Date HW purchased"
-msgstr ""
+msgstr "Дата покупки HW"
 
 #: include/hosts.inc.php:280
 msgid "Date hw decommissioned"
-msgstr ""
+msgstr "Дата списания HW"
 
 #: include/locales/en_gb.inc.php:1187
 msgid "Day"
@@ -2135,7 +2136,7 @@ msgstr "Удалить текущее действие?"
 
 #: include/views/configuration.discovery.edit.php:109
 msgid "Delete discovery rule?"
-msgstr ""
+msgstr "Удалить правило обнаружения?"
 
 #: include/locales/en_gb.inc.php:1708
 msgid "Delete expression?"
@@ -2202,7 +2203,7 @@ msgstr "Удалить выбранные Веб сценарии?"
 
 #: actionconf.php:494
 msgid "Delete selected actions?"
-msgstr ""
+msgstr "Удалить выбранные действия?"
 
 #: include/locales/en_gb.inc.php:1725
 msgid "Delete selected applications?"
@@ -2382,7 +2383,7 @@ msgstr "Зависит от"
 
 #: include/hosts.inc.php:215
 msgid "Deployment status"
-msgstr ""
+msgstr "Состояние развертывания"
 
 #: host_discovery.php:639 include/forms.inc.php:2176
 #: include/forms.inc.php:2485 include/locales/en_gb.inc.php:828
@@ -2410,7 +2411,7 @@ msgstr "Критерий уникальности устройства"
 
 #: discoveryconf.php:44
 msgid "Device uniqueness criteria."
-msgstr ""
+msgstr "Критерий уникальности устройства."
 
 #: include/locales/en_gb.inc.php:1275
 msgid "Dimension (cols x rows)"
@@ -2690,7 +2691,7 @@ msgstr "Дублированное имя важности \"%s\"."
 #: api/classes/class.cuser.php:421
 #, php-format
 msgid "Duplicate user alias \"%s\"."
-msgstr "Дублировенное имя пользователя \"%s\"."
+msgstr "Дубликат псевдонима пользователя \"%s\"."
 
 #: include/locales/en_gb.inc.php:293
 msgid "Duration"
@@ -5043,11 +5044,11 @@ msgstr "Индикаторы состояния соединителя"
 
 #: include/actions.inc.php:480
 msgid "Link to template"
-msgstr "Присоединить шаблон"
+msgstr "Присоединить к шаблону"
 
 #: include/actions.inc.php:313
 msgid "Link to templates: "
-msgstr "Присоединить шаблоны: "
+msgstr "Присоединить к шаблонам: "
 
 #: include/locales/en_gb.inc.php:1375
 msgid "Link to trigger?"
@@ -5369,17 +5370,17 @@ msgstr[2] ""
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
-msgstr[0] "Максимальная длина имени узла сети %2$d символов, \"%3$s\" это %1$d символ."
-msgstr[1] "Максимальная длина имени узла сети %2$d символов, \"%3$s\" это %1$d символа."
-msgstr[2] "Максимальная длина имени узла сети %2$d символов, \"%3$s\" это %1$d символов."
+msgstr[0] "Максимальная длина имени узла сети %2$d символа, \"%3$s\" содержит %1$d символ."
+msgstr[1] "Максимальная длина имени узла сети %2$d символа, \"%3$s\" содержит %1$d символа."
+msgstr[2] "Максимальная длина имени узла сети %2$d символа, \"%3$s\" содержит %1$d символов."
 
 #: api/classes/class.chost.php:1385
 #, php-format
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Максимальная длина видимого имени узла сети %2$d символа, \"%3$s\" содержит %1$d символ."
+msgstr[1] "Максимальная длина видимого имени узла сети %2$d символа, \"%3$s\" содержит %1$d символа."
+msgstr[2] "Максимальная длина видимого имени узла сети %2$d символа, \"%3$s\" содержит %1$d символов."
 
 #: include/locales/en_gb.inc.php:58 include/locales/en_gb.inc.php:71
 #: include/locales/en_gb.inc.php:660
@@ -5978,7 +5979,7 @@ msgstr "Нет элемента данных с"
 
 #: include/locales/en_gb.inc.php:1671
 msgid "No items"
-msgstr "Элементы не заданы"
+msgstr "Элементы данных не заданы"
 
 #: include/locales/en_gb.inc.php:811
 msgid "No items defined"
@@ -9023,7 +9024,7 @@ msgstr "Данные пользователя обновлены"
 #: api/classes/class.cuser.php:489
 #, php-format
 msgid "User with alias \"%s\" already exists."
-msgstr "Пользователь с именем \"%s\" уже существует."
+msgstr "Пользователь с псевдонимом \"%s\" уже существует."
 
 #: include/locales/en_gb.inc.php:858
 #: include/views/configuration.host.edit.php:458
@@ -9436,11 +9437,11 @@ msgstr "Вы не можете просмотреть этот URL как"
 
 #: include/views/js/configuration.action.edit.js.php:266
 msgid "You did not specify host for operation."
-msgstr "Вы не указали команду в операции для группы узлов сети."
+msgstr "Вы не указали узел сети для операции."
 
 #: include/views/js/configuration.action.edit.js.php:253
 msgid "You did not specify host group for operation."
-msgstr "Вы не указали команду в операции для узла сети."
+msgstr "Вы не указали группу узлов сети для операции."
 
 #: api/classes/class.caction.php:1578
 #, php-format
@@ -10163,210 +10164,3 @@ msgstr "да"
 #: include/locales/en_gb.inc.php:1755
 msgid "µ"
 msgstr "µ"
-
-#~ msgid "Cannot implode expression"
-#~ msgstr "Не удалось раскрыть выражение"
-
-#~ msgid " - all groups - "
-#~ msgstr " - все группы - "
-
-#~ msgid "Circular link can not be created"
-#~ msgstr "Закольцовывающая ссылка не может быть создана"
-
-#~ msgid "Delete rule?"
-#~ msgstr "Удалить правило?"
-
-#~ msgid "Disable extended profile"
-#~ msgstr "Отключить расширенный профиль"
-
-#~ msgid "Disable profile"
-#~ msgstr "Отключить профиль"
-
-#~ msgid "Enable extended profile"
-#~ msgstr "Включить расширенный профиль"
-
-#~ msgid "Enable profile"
-#~ msgstr "Включить профиль"
-
-#~ msgid "Extended profile"
-#~ msgstr "Расширенный профиль"
-
-#~ msgid "Image is used in Zabbix map"
-#~ msgstr "Фоновое изображение используется на карте сети Zabbix"
-
-#~ msgid "New check"
-#~ msgstr "Новая проверка"
-
-#~ msgid "Use profile"
-#~ msgstr "Использовать профиль"
-
-#~ msgid "ports"
-#~ msgstr "порты"
-
-#~ msgid "CONFIGURATION OF DISCOVERY"
-#~ msgstr "НАСТРОЙКА ОБНАРУЖЕНИЯ"
-
-#~ msgid "CONFIGURATION OF HOSTS"
-#~ msgstr "НАСТРОЙКА УЗЛОВ СЕТИ"
-
-#~ msgid "CONFIGURATION OF TEMPLATES"
-#~ msgstr "НАСТРОЙКА ШАБЛОНОВ"
-
-#~ msgid "Cannot be empty %1$s element custom label for map \"%2$s\"."
-#~ msgstr "Пользовательская подпись элемента %1$s не может быть пустой для карты сети \"%2$s\"."
-
-#~ msgid "Discovery rule added"
-#~ msgstr "Правило обнаружения добавлено"
-
-#~ msgid "Discovery rules deleted"
-#~ msgstr "Правила обнаружения удалены"
-
-#~ msgid "Discovery rules updated"
-#~ msgstr "Правила обнаружения обновлены"
-
-#~ msgid "Incorrect Graph identity \"%s\" provided for Screens item resource"
-#~ msgstr "Предоставлен некорректный идентификатор \"%s\" графика для ресурсного элемента комплексных экранов"
-
-#~ msgid "Incorrect Host group identity \"%s\" provided for Screens item resource"
-#~ msgstr "Предоставлен некорректный идентификатор \"%s\" группы узлов сети для ресурсного элемента комплексных экранов"
-
-#~ msgid "Incorrect Host identity \"%s\" provided for Screens item resource"
-#~ msgstr "Предоставлен некорректный идентификатор \"%s\" узла сети для ресурсного элемента комплексных экранов"
-
-#~ msgid "Incorrect IP range."
-#~ msgstr "Некорректный диапазон IP адресов."
-
-#~ msgid "Incorrect Item identity \"%s\" provided for Screens item resource"
-#~ msgstr "Предоставлен некорректный идентификатор \"%s\" элемента данных для ресурсного элемента комплексных экранов"
-
-#~ msgid "Incorrect Map identity \"%s\" provided for Screens item resource"
-#~ msgstr "Предоставлен некорректный идентификатор \"%s\" карты сети для ресурсного элемента комплексных экранов"
-
-#~ msgid "Incorrect Screen identity \"%s\" provided for Screens item resource"
-#~ msgstr "Предоставлен некорректный идентификатор \"%s\" комплексного экрана для ресурсного элемента комплексных экранов"
-
-#~ msgid "Incorrect parameter is used for action \"%s\""
-#~ msgstr "Использован некорректный параметр для действия \"%s\""
-
-#~ msgid "Incorrect parameters are used for action update method \"%s\""
-#~ msgstr "Использованы некорректные параметры для метода обновления действия \"%s\""
-
-#~ msgid "User is disallowed to alter GUI access to him self by linking to user group \"%s\"."
-#~ msgstr "Пользователю запрещено изменять доступ к GUI самому себе путем присоединения к группе пользователей \"%s\"."
-
-#~ msgid "User is disallowed to alter system status to him self by linking to user group \"%s\"."
-#~ msgstr "Пользователю запрещено изменять системный статус самому себе путем присоединения к группе пользователей \"%s\"."
-
-#~ msgid "Imported"
-#~ msgstr "Импортировано"
-
-#~ msgid "failed"
-#~ msgstr "ошибочно"
-
-#~ msgid "successfully"
-#~ msgstr "успешно"
-
-#~ msgid "API access"
-#~ msgstr "Доступ к API"
-
-#~ msgid "API access updated"
-#~ msgstr "Доступ к API обновлен"
-
-#~ msgid "Auto-login"
-#~ msgstr "Авто-вход"
-
-#~ msgid "Cannot update API access"
-#~ msgstr "Не удалось обновить доступ к API"
-
-#~ msgid "Copyright 2001-2011 by"
-#~ msgstr "Все права защищены 2001-2011"
-
-#~ msgid "Create Image"
-#~ msgstr "Создать изображение"
-
-#~ msgid "Disable API"
-#~ msgstr "Отключить API"
-
-#~ msgid "Disable API access in selected groups?"
-#~ msgstr "Отключить доступ к API для выбранных групп?"
-
-#~ msgid "Discovered object"
-#~ msgstr "Обнаруженный объект"
-
-#~ msgid "Enable API"
-#~ msgstr "Включить API"
-
-#~ msgid "Enable API access in selected groups?"
-#~ msgstr "Включить доступ к API выбранным группам?"
-
-#~ msgid "Extended"
-#~ msgstr "Расширенный"
-
-#~ msgid "Incorrect value for"
-#~ msgstr "Некорректное значение для"
-
-#~ msgid "Login name"
-#~ msgstr "Имя пользователя"
-
-#~ msgid "No host groups with"
-#~ msgstr "Нет групп узлов сети с"
-
-#~ msgid "No system map with"
-#~ msgstr "Нет системной карты с"
-
-#~ msgid "Only Super Admins can delete Users"
-#~ msgstr "Только Супер-Администраторы могут удалять пользователей"
-
-#~ msgid "Only Super Admins can update Users"
-#~ msgstr "Только Супер-Администраторы могут обновлять пользователей"
-
-#~ msgid "Profile for this host is missing"
-#~ msgstr "Для этого узла сети профиль не найден"
-
-#~ msgid "Session terminated, please re-login!"
-#~ msgstr "Сессия завершена, пожалуйста, повторно зайдите систему!"
-
-#~ msgid "Table users is empty. Possible database corruption."
-#~ msgstr "Таблица пользователей пустая. Возможно повреждена база данных."
-
-#~ msgid "Themes"
-#~ msgstr "Темы"
-
-#~ msgid "Trigger description"
-#~ msgstr "Описание триггера"
-
-#~ msgid "User ["
-#~ msgstr "Пользователь ["
-
-#~ msgid "User cannot delete himself"
-#~ msgstr "Пользователь не может удалить себя"
-
-#~ msgid "User cannot disable himself. Group \""
-#~ msgstr "Пользователь не может отключить себя. Группа \""
-
-#~ msgid "User cannot restrict access to GUI for himself. Group \""
-#~ msgstr "Пользователь не может себе ограничить доступ к GUI. Группа \""
-
-#~ msgid "Welcome to Zabbix! You are connected as"
-#~ msgstr "Добро пожаловать в Zabbix! Вы подключены как"
-
-#~ msgid "Wrong fields for user"
-#~ msgstr "Ошибочные поля для пользователя"
-
-#~ msgid "] already exists"
-#~ msgstr "] уже существует"
-
-#~ msgid "can not be deleted, due to inner hosts can not be unlinked"
-#~ msgstr "не удалось удалить, из-за не отсоединенных внутренних узлов сети"
-
-#~ msgid "from"
-#~ msgstr "от"
-
-#~ msgid "successful"
-#~ msgstr "успешно"
-
-#~ msgid "was not"
-#~ msgstr "не был"
-
-#~ msgid "No recipients for operation message."
-#~ msgstr "Получатели сообщения для операции не заданы."

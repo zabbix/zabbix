@@ -1,11 +1,10 @@
-# Murat Koç <murat@profelis.com.tr>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-06-05 12:14+0300\n"
 "PO-Revision-Date: 2011-05-20 12:36+0300\n"
-"Last-Translator: Murat Koç\n"
+"Last-Translator: Murat Koç <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -3810,10 +3809,6 @@ msgstr "ICMP Ping"
 msgid "ICMP ping"
 msgstr "ICMP ping"
 
-#: include/locales/en_gb.inc.php:548
-msgid "ID"
-msgstr ""
-
 #: include/locales/en_gb.inc.php:386
 msgid "IMAGES"
 msgstr "RESİMLER"
@@ -3948,6 +3943,10 @@ msgstr "simge etiket konumu"
 #: include/views/configuration.sysmap.edit.php:114
 msgid "Icon label type"
 msgstr "Simge etiket tipi"
+
+#: include/locales/en_gb.inc.php:548
+msgid "ID"
+msgstr "ID"
 
 #: include/locales/en_gb.inc.php:136
 msgid "Idle till"
@@ -10154,9 +10153,3 @@ msgstr "evet"
 #: include/locales/en_gb.inc.php:1755
 msgid "µ"
 msgstr "µ"
-
-#~ msgid "Cannot implode expression"
-#~ msgstr "İfade genişletilemedi"
-
-#~ msgid "Id"
-#~ msgstr "Id"

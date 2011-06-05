@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-06-05 12:14+0300\n"
-"PO-Revision-Date: 2011-05-31 18:15+0200\n"
+"PO-Revision-Date: 2011-06-04 20:32+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -1147,7 +1147,7 @@ msgstr "Не вдалося сформувати дерево. Перевірт�
 
 #: api/classes/class.ctemplate.php:1415
 msgid "Cannot have empty visible template name"
-msgstr "Не вдалося мати пустим видиме ім'я шаблону"
+msgstr "Неможливо мати пустим видиме ім'я шаблону"
 
 #: api/classes/class.ctrigger.php:1468 api/classes/class.ctrigger.php:1559
 #: api/classes/class.ctriggerprototype.php:1339
@@ -1456,7 +1456,7 @@ msgstr "Перевірте частину виразу, починаючи з '"
 
 #: api/classes/class.citemgeneral.php:203
 msgid "Check the key, please. Default example was passed."
-msgstr "Будь ласка, перевірте ключ. Приклад по замовчуванню було прийнято."
+msgstr "Будь ласка, перевірте ключ. Приклад по замовчуванню показано."
 
 #: include/views/js/configuration.discovery.js.php:26
 msgid "Check type"
@@ -1468,7 +1468,7 @@ msgstr "Перевірки"
 
 #: api/classes/class.cdrule.php:564
 msgid "Checks should be unique."
-msgstr "Перевірка має бути унікальною."
+msgstr "Перевірки повинні бути унікальними."
 
 #: include/locales/en_gb.inc.php:229
 msgid "Child"
@@ -1681,7 +1681,7 @@ msgstr "Контактна інформація"
 
 #: include/hosts.inc.php:205
 msgid "Contract number"
-msgstr "Контактний номер"
+msgstr "Номер контракту"
 
 #: include/locales/en_gb.inc.php:996
 msgid "Coordinate X"
@@ -1849,7 +1849,7 @@ msgstr "Комплексні екрани користувачів"
 
 #: include/views/configuration.action.edit.php:642
 msgid "Custom script"
-msgstr "Довільний скрипт"
+msgstr "Користувацький скрипт"
 
 #: include/views/administration.general.triggerSeverity.edit.php:39
 msgid "Custom severity"
@@ -2016,7 +2016,7 @@ msgstr "Дата закінчення гарантії HW"
 
 #: include/hosts.inc.php:265
 msgid "Date HW purchased"
-msgstr "Дата покупки HW"
+msgstr "Дата придбання HW"
 
 #: include/hosts.inc.php:280
 msgid "Date hw decommissioned"
@@ -5829,7 +5829,7 @@ msgstr "Немає призначених залежностей"
 #: api/rpc/class.cjsonrpc.php:186 api/rpc/class.cjsonrpc.php:190
 #: api/rpc/class.cjsonrpc.php:194
 msgid "No details"
-msgstr "Подробиці відсутні."
+msgstr "Подробиці відсутні"
 
 #: popup.php:1732
 msgid "No discovery checks defined"
@@ -5928,7 +5928,7 @@ msgstr "Вузли мережі не визначено"
 #: api/classes/class.cmapelement.php:548
 #, php-format
 msgid "No icon for map element \"%s\""
-msgstr "Немає іконки для елемента \"%s\" карти мережі."
+msgstr "Немає іконки для елемента \"%s\" карти мережі"
 
 #: include/views/configuration.sysmap.edit.php:53
 msgid "No image"
@@ -5984,7 +5984,7 @@ msgstr "Елементи даних не визначено"
 
 #: api/classes/class.citemkey.php:92
 msgid "No key id provided."
-msgstr "Не надано id ключа"
+msgstr "Не надано id ключа."
 
 #: include/locales/en_gb.inc.php:1027
 msgid "No links"
@@ -6055,7 +6055,7 @@ msgstr "Немає проксі"
 #: api/classes/class.caction.php:1519
 #, php-format
 msgid "No public key file specified for action operation command \"%s\"."
-msgstr "Не вказано файл публічного ключа для команди \"%s\" в операції дії"
+msgstr "Не вказано файл публічного ключа для команди \"%s\" в операції дії."
 
 #: api/classes/class.caction.php:1487
 msgid "No recipients for action operation message."
@@ -6734,7 +6734,7 @@ msgstr "Головний телефон А для контакту"
 
 #: include/hosts.inc.php:345
 msgid "Primary POC phone B"
-msgstr "Головний телефон Б для контакту"
+msgstr "Головний телефон B для контакту"
 
 #: include/hosts.inc.php:355
 msgid "Primary POC screen name"
@@ -7567,7 +7567,7 @@ msgstr "Другорядний телефон А для контакту"
 
 #: include/hosts.inc.php:380
 msgid "Secondary POC phone B"
-msgstr "Другорядний телефон Б для контакту"
+msgstr "Другорядний телефон B для контакту"
 
 #: include/hosts.inc.php:390
 msgid "Secondary POC screen name"
@@ -8267,13 +8267,13 @@ msgstr "Шаблон з ключем елементом даних"
 #: api/classes/class.chost.php:1439 api/classes/class.ctemplate.php:1390
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
-msgstr ""
+msgstr "Шаблон із цим самим ім'ям \"%s\" вже існує."
 
 #: api/classes/class.chost.php:1445 api/classes/class.ctemplate.php:1047
 #: api/classes/class.ctemplate.php:1363
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
-msgstr ""
+msgstr "Шаблон із цим самим видимим ім'ям \"%s\" вже існує."
 
 #: include/locales/en_gb.inc.php:909
 msgid "Templated item"
@@ -8329,9 +8329,9 @@ msgstr "GD extension не завантажено."
 #, php-format
 msgid "The image is used in map %2$s"
 msgid_plural "The image is used in maps %2$s"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Картинка наразі використовується в карті мережі %2$s"
+msgstr[1] "Картинка наразі використовується в картах мережі %2$s"
+msgstr[2] "Картинка наразі використовується в картах мережі %2$s"
 
 #: queue.php:121
 msgid "The queue is empty"
@@ -8339,11 +8339,11 @@ msgstr "Черга пуста"
 
 #: api/rpc/class.cjsonrpc.php:170
 msgid "The received JSON is not a valid JSON-RPC Request."
-msgstr ""
+msgstr "Отриманий JSON не являється правильним запитом JSON-RPC."
 
 #: api/rpc/class.cjsonrpc.php:174
 msgid "The requested remote-procedure does not exist / is not available"
-msgstr ""
+msgstr "Запитувана віддалена процедура не існує / недоступна"
 
 #: include/locales/en_gb.inc.php:1447
 msgid "The trigger depends on"
@@ -8360,7 +8360,7 @@ msgstr "Третій"
 #: include/views/configuration.host.edit.php:564
 #, php-format
 msgid "This field is automatically populated by item \"%s\"."
-msgstr ""
+msgstr "Це поле автоматично заповнюється елементом даних \"%s\"."
 
 #: include/locales/en_gb.inc.php:1406
 msgid "This month"
@@ -8470,7 +8470,7 @@ msgstr "Транзакцію не завершено. Скасування.."
 
 #: api/rpc/class.cjsonrpc.php:193
 msgid "Transport error."
-msgstr ""
+msgstr "Помилка транспорту."
 
 #: include/locales/en_gb.inc.php:832
 msgid "Trends"
@@ -8487,7 +8487,7 @@ msgstr "Тригер"
 #: api/classes/class.ctrigger.php:1550
 #, php-format
 msgid "Trigger \"%s\" already exists."
-msgstr ""
+msgstr "Тригер \"%s\" вже існує."
 
 #: api/classes/class.ctrigger.php:1284
 #: api/classes/class.ctriggerprototype.php:1113
@@ -8564,11 +8564,11 @@ msgstr "Трігер щойно було додано. Статус поки щ�
 
 #: include/views/configuration.sysmap.edit.php:98
 msgid "Trigger label type"
-msgstr ""
+msgstr "Тип ярлика до тригера"
 
 #: include/actions.inc.php:43
 msgid "Trigger name"
-msgstr ""
+msgstr "Ім'я тригера"
 
 #: api/classes/class.ctriggerprototype.php:1314
 #, php-format
@@ -8593,7 +8593,7 @@ msgstr "Прототипи тригерів"
 #: config.php:637
 #: include/views/administration.general.triggerSeverity.edit.php:85
 msgid "Trigger severities"
-msgstr ""
+msgstr "Важливість тригера"
 
 #: include/actions.inc.php:45 include/locales/en_gb.inc.php:259
 msgid "Trigger severity"
@@ -8646,7 +8646,7 @@ msgstr "Статус тригерів"
 
 #: include/menu.inc.php:124
 msgid "Triggers top 100"
-msgstr ""
+msgstr "Найбільш активні 100 тригерів"
 
 #: include/locales/en_gb.inc.php:1104
 msgid "Triggers with severity"
@@ -8671,7 +8671,7 @@ msgstr "Має бути обрано два елементи"
 #: api/classes/class.citem.php:1451
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host profile field \"%3$s\", this would lead to a conflict."
-msgstr ""
+msgstr "Два елемента даних (\"%1$s\" та \"%2$s\") не можуть заповнити одне поле в профілі вузла мережі \"%3$s\", це призведе до конфлікту."
 
 #: hostprofiles.php:162 include/hosts.inc.php:50
 #: include/locales/en_gb.inc.php:299
@@ -8685,7 +8685,7 @@ msgstr "Тип"
 
 #: include/hosts.inc.php:55
 msgid "Type (Full details)"
-msgstr ""
+msgstr "Тип (повні деталі)"
 
 #: include/locales/en_gb.inc.php:1014
 msgid "Type (OK)"
@@ -8702,7 +8702,7 @@ msgstr "Тип інформації"
 
 #: api/classes/class.citemgeneral.php:222
 msgid "Type of information must be Log for log key."
-msgstr ""
+msgstr "Тип інформації має бути Лог (багато полів) для ключів логів."
 
 #: include/locales/en_gb.inc.php:810
 msgid "Types"
@@ -8731,15 +8731,15 @@ msgstr "URL (після входу в систему)"
 
 #: include/hosts.inc.php:220
 msgid "URL A"
-msgstr ""
+msgstr "URL A"
 
 #: include/hosts.inc.php:225
 msgid "URL B"
-msgstr ""
+msgstr "URL B"
 
 #: include/hosts.inc.php:230
 msgid "URL C"
-msgstr ""
+msgstr "URL C"
 
 #: include/locales/en_gb.inc.php:405
 msgid "USA (160 characters)"
@@ -8849,11 +8849,11 @@ msgstr "Від'єднати від шаблону"
 
 #: include/views/configuration.action.edit.php:767
 msgid "Unlink from templates"
-msgstr ""
+msgstr "Від'єднати від шаблонів"
 
 #: include/actions.inc.php:315
 msgid "Unlink from templates: "
-msgstr ""
+msgstr "Від'єднати від шаблонів: "
 
 #: include/locales/en_gb.inc.php:1617
 msgid "Unmute"
@@ -8903,7 +8903,7 @@ msgstr "Оновлено статус вузла мережі"
 #: include/screens.inc.php:1494
 #, php-format
 msgid "Updated: %s"
-msgstr ""
+msgstr "Оновлено: %s"
 
 #: include/locales/en_gb.inc.php:390
 msgid "Upload"
@@ -8945,7 +8945,7 @@ msgstr "Користувач"
 #: api/classes/class.cuser.php:439
 #, php-format
 msgid "User \"%s\" cannot be without user group."
-msgstr ""
+msgstr "Користувач \"%s\" не може існувати без групи користувачів."
 
 #: include/locales/en_gb.inc.php:1505
 msgid "User added"
@@ -8971,7 +8971,7 @@ msgstr "Групі користувачів"
 #: api/classes/class.cusergroup.php:657
 #, php-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
-msgstr ""
+msgstr "Група користувачів \"%1$s\" використовується в скрипті \"%2$s\"."
 
 #: include/locales/en_gb.inc.php:402
 msgid "User group for database down message"
@@ -8984,17 +8984,17 @@ msgstr "Групи користувачів"
 
 #: api/classes/class.cusermedia.php:422 api/classes/class.cuser.php:402
 msgid "User is not allowed to delete himself."
-msgstr ""
+msgstr "Користувачу не дозволено видалити самого себе."
 
 #: api/classes/class.cuser.php:451
 #, php-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
-msgstr ""
+msgstr "Користувач не може модифікувати доступ до GUI для самого себе шляхом введення в групу користувачів \"%s\"."
 
 #: api/classes/class.cuser.php:454
 #, php-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
-msgstr ""
+msgstr "Користувач не може модифікувати системний статус для самого себе шляхом введення в групу користувачів \"%s\"."
 
 #: include/locales/en_gb.inc.php:912
 #: include/views/configuration.action.edit.php:671
@@ -9020,7 +9020,7 @@ msgstr "Дані користувача оновлено"
 #: api/classes/class.cuser.php:489
 #, php-format
 msgid "User with alias \"%s\" already exists."
-msgstr ""
+msgstr "Користувач з псевдонімом \"%s\" вже існує."
 
 #: include/locales/en_gb.inc.php:858
 #: include/views/configuration.host.edit.php:458
@@ -9059,27 +9059,27 @@ msgstr "Значення"
 #: api/classes/class.cmap.php:623
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
-msgstr ""
+msgstr "Значення \"%1$s\" являється недопустимим для параметра \"grid_align\". Варіанти: \"%2$s\" та \"%3$s\""
 
 #: api/classes/class.cmap.php:619
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\""
-msgstr ""
+msgstr "Значення \"%1$s\" являється недопустимим для параметра \"grid_show\". Варіанти: \"%2$s\""
 
 #: api/classes/class.cmap.php:627
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
-msgstr ""
+msgstr "Значення \"%1$s\" являється недопустимим для параметра \"grid_show\". Варіанти: \"%2$s\" та \"%3$s\""
 
 #: include/db.inc.php:1179
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
-msgstr ""
+msgstr "Значення \"%1$s\" являється занадто довгим для поля \"%2$s\" - %3$d символів. Допустима довжина %4$d символів."
 
 #: include/db.inc.php:1205
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
-msgstr ""
+msgstr "Значення \"%1$s\" являється занадто довгим для поля \"%2$s\" - %3$d символів. Допустима довжина 2048 символів."
 
 #: include/locales/en_gb.inc.php:360
 msgid "Value map"
@@ -9107,7 +9107,7 @@ msgstr "Перетворення значень використовуються
 
 #: api/classes/class.citemgeneral.php:226
 msgid "Value type must be Float for aggregate items."
-msgstr ""
+msgstr "Тип інформації повинен бути Числовий (дробове) для агрегованих елементів даних."
 
 #: include/locales/en_gb.inc.php:1121
 msgid "Values"
@@ -9123,7 +9123,7 @@ msgstr "Змінні"
 
 #: include/hosts.inc.php:200
 msgid "Vendor"
-msgstr ""
+msgstr "Виробник"
 
 #: include/locales/en_gb.inc.php:1320
 msgid "Vertical"
@@ -9139,16 +9139,16 @@ msgstr "Вигляд"
 
 #: include/classes/class.cview.php:124
 msgid "View is not rendered."
-msgstr ""
+msgstr "Перегляд не відтворено."
 
 #: include/views/configuration.host.edit.php:161
 #: include/views/configuration.template.edit.php:122
 msgid "Visible name"
-msgstr ""
+msgstr "Видиме ім'я"
 
 #: api/classes/class.chost.php:1374
 msgid "Visible name cannot be empty if missing host name"
-msgstr ""
+msgstr "Видиме ім'я не може бути пустим, якщо ім'я вузла мережі відсутнє"
 
 #: include/locales/en_gb.inc.php:2002
 msgid "W"
@@ -9166,7 +9166,7 @@ msgstr "Попередження"
 #: include/validate.inc.php:553
 #, php-format
 msgid "Warning. Incorrect value for field \"%s\"."
-msgstr ""
+msgstr "Увага. Некоректне значення для поля \"%s\"."
 
 #: include/locales/en_gb.inc.php:2028
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -9266,7 +9266,7 @@ msgstr "Запис"
 
 #: api/classes/class.cmapelement.php:534
 msgid "Wrong fields for element"
-msgstr ""
+msgstr "Помилкові поля для елемента"
 
 #: api/classes/class.cgraph.php:1042
 #: api/classes/class.cgraphprototype.php:1048
@@ -9276,7 +9276,7 @@ msgstr "Помилкові поля для графіка"
 #: api/classes/class.chost.php:1304
 #, php-format
 msgid "Wrong fields for host \"%s\""
-msgstr ""
+msgstr "Помилкові поля для вузла мережі \"%s\""
 
 #: api/classes/class.cgraph.php:1056
 #: api/classes/class.cgraphprototype.php:1062
@@ -9285,19 +9285,19 @@ msgstr "Помилкові поля для елемента даних"
 
 #: api/classes/class.cmapelement.php:809
 msgid "Wrong fields for linktrigger"
-msgstr ""
+msgstr "Помилкові поля для linktrigger"
 
 #: api/classes/class.cmapelement.php:852
 msgid "Wrong fields for linktrigger delete"
-msgstr ""
+msgstr "Помилкові поля для видалення linktrigger"
 
 #: api/classes/class.cmapelement.php:829
 msgid "Wrong fields for linktrigger update"
-msgstr ""
+msgstr "Помилкові поля для оновлення linktrigger"
 
 #: api/classes/class.cmapelement.php:589
 msgid "Wrong fields for map link"
-msgstr ""
+msgstr "Помилкові поля для зв'язку на карті мережі"
 
 #: include/locales/en_gb.inc.php:1960
 msgid "Wrong fields for media type"
@@ -9325,12 +9325,12 @@ msgstr "Помилкові поля для тригера"
 #: api/classes/class.cuser.php:372
 #, php-format
 msgid "Wrong fields for user \"%s\"."
-msgstr ""
+msgstr "Помилкові поля для користувача \"%s\"."
 
 #: api/classes/class.cusermedia.php:391
 #, php-format
 msgid "Wrong fields for user media \"%s\"."
-msgstr ""
+msgstr "Помилкові поля для метода повідомлень \"%s\" користувача."
 
 #: include/locales/en_gb.inc.php:690
 msgid "Wrong macro"
@@ -9413,7 +9413,7 @@ msgstr "Ви не можете вибрати деякі з мов, тому щ�
 #: api/classes/class.cuser.php:460
 #, php-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
-msgstr ""
+msgstr "Вам не дозволено змінювати привілеї користувача \"%s\"."
 
 #: include/locales/en_gb.inc.php:1971
 msgid "You are not logged in."
@@ -9433,21 +9433,21 @@ msgstr "Ви не можете переглядати це посилання я
 
 #: include/views/js/configuration.action.edit.js.php:266
 msgid "You did not specify host for operation."
-msgstr ""
+msgstr "Ви не вказали вузел мережі для операції."
 
 #: include/views/js/configuration.action.edit.js.php:253
 msgid "You did not specify host group for operation."
-msgstr ""
+msgstr "Ви не вказали групу вузлів мережі для операції."
 
 #: api/classes/class.caction.php:1578
 #, php-format
 msgid "You did not specify targets for action operation command \"%s\"."
-msgstr ""
+msgstr "Ви не вказали цілі для команди \"%s\" в операції дії."
 
 #: api/classes/class.caction.php:1576
 #, php-format
 msgid "You did not specify targets for action operation global script \"%s\"."
-msgstr ""
+msgstr "Ви не вказали цілі глобального скрипта \"%s\" в операції дії."
 
 #: api/classes/class.chost.php:1623
 msgid "You do not have enough rights for operation"
@@ -9459,39 +9459,39 @@ msgstr "У вас немає повноважень для виконання ц
 
 #: api/classes/class.cusermedia.php:419
 msgid "You do not have permissions or user media does not exist."
-msgstr ""
+msgstr "У вас немає повноважень або метод повідомлень користувача не існує."
 
 #: api/classes/class.cusermedia.php:397
 msgid "You do not have permissions to create user medias."
-msgstr ""
+msgstr "У вас немає повноважень для створення методу повідомлень користувача."
 
 #: api/classes/class.cuser.php:378
 msgid "You do not have permissions to create users."
-msgstr ""
+msgstr "У вас немає повноважень для створення користувачів."
 
 #: api/classes/class.cuser.php:399
 msgid "You do not have permissions to delete user or user does not exist."
-msgstr ""
+msgstr "У вас немає повноважень для видалення користувача або користувач не існує."
 
 #: api/classes/class.cuser.php:396
 msgid "You do not have permissions to delete users."
-msgstr ""
+msgstr "У вас немає повноважень для видалення користувачів."
 
 #: api/classes/class.cusermedia.php:409 api/classes/class.cuser.php:388
 msgid "You do not have permissions to update other users."
-msgstr ""
+msgstr "У вас немає повноважень для оновлення інших користувачів."
 
 #: api/classes/class.cusermedia.php:403
 msgid "You do not have permissions to update user media or user media does not exist."
-msgstr ""
+msgstr "У вас немає повноважень для оновлення методів повідомлень користувача або він не існує."
 
 #: api/classes/class.cusermedia.php:413
 msgid "You do not have permissions to update user medias."
-msgstr ""
+msgstr "У вас немає повноважень для оновлення методів повідомлень користувача."
 
 #: api/classes/class.cuser.php:384
 msgid "You do not have permissions to update user or user does not exist."
-msgstr ""
+msgstr "У вас немає повноважень для оновлення користувача або користувач не існує."
 
 #: include/locales/en_gb.inc.php:1969
 msgid "You must login to view this page."
@@ -9516,7 +9516,7 @@ msgstr "Zabbix"
 #: include/page_footer.php:109 include/views/general.login.php:50
 #, php-format
 msgid "Zabbix %s Copyright 2001-2011 by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %s Авторські права 2001-2011 Zabbix SIA"
 
 #: include/locales/en_gb.inc.php:1501
 msgid "Zabbix Admin"
@@ -9772,7 +9772,7 @@ msgstr "копіювати елементи в ..."
 
 #: api/classes/class.caction.php:1457
 msgid "esc_step_from and esc_step_to must be set together."
-msgstr ""
+msgstr "esc_step_from та esc_step_to повинні встановлюватись одночасно."
 
 #: include/locales/en_gb.inc.php:1875
 msgid "every"
@@ -9812,11 +9812,11 @@ msgstr "було видалено з системи"
 
 #: api/classes/class.cmap.php:583
 msgid "host"
-msgstr ""
+msgstr "вузел мережі"
 
 #: api/classes/class.cmap.php:582
 msgid "host group"
-msgstr ""
+msgstr "група вузлів мережі"
 
 #: include/locales/en_gb.inc.php:1055
 msgid "http://www.zabbix.com"
@@ -9824,11 +9824,11 @@ msgstr "http://www.zabbix.com"
 
 #: api/classes/class.cmap.php:580
 msgid "icon"
-msgstr ""
+msgstr "іконка"
 
 #: api/classes/class.cmap.php:586
 msgid "image"
-msgstr ""
+msgstr "картинка"
 
 #: api/classes/class.cimage.php:339 api/classes/class.cimage.php:345
 #: include/actions.inc.php:27
@@ -9838,7 +9838,7 @@ msgstr "в"
 #: api/classes/class.citemkey.php:202
 #, php-format
 msgid "incorrect syntax near '%1$s'"
-msgstr ""
+msgstr "некоректний синтаксис біля '%1$s'"
 
 #: api/classes/class.citemkey.php:261
 #, php-format
@@ -9951,7 +9951,7 @@ msgstr "сервіс"
 
 #: api/classes/class.cmap.php:585
 msgid "map"
-msgstr ""
+msgstr "карта мережі"
 
 #: include/locales/en_gb.inc.php:521
 msgid "max"
@@ -10102,7 +10102,7 @@ msgstr "перетворення значень"
 #: api/classes/class.ctemplate.php:1667
 #, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
-msgstr ""
+msgstr "шаблон з ID \"%1$s\" передано %2$s разів"
 
 #: include/locales/en_gb.inc.php:134
 msgid "to"
@@ -10114,7 +10114,7 @@ msgstr "до вузла"
 
 #: api/classes/class.cmap.php:584
 msgid "trigger"
-msgstr ""
+msgstr "тригер"
 
 #: include/locales/en_gb.inc.php:1790
 msgid "updated"
@@ -10146,7 +10146,7 @@ msgstr "тижнів"
 
 #: include/locales/en_gb.inc.php:1867
 msgid "with template host cannot contain items from other hosts."
-msgstr ""
+msgstr "з елементами даних з шаблону не може містити елементи даних з іншого вузла мережі."
 
 #: include/locales/en_gb.inc.php:29
 msgid "y"
@@ -10159,681 +10159,3 @@ msgstr "так"
 #: include/locales/en_gb.inc.php:1755
 msgid "µ"
 msgstr "µ"
-
-#~ msgid "Cannot implode expression"
-#~ msgstr "Не вдалося розкрити вираз"
-
-#~ msgid " - all groups - "
-#~ msgstr " - всі групи - "
-
-#~ msgid "Circular link can not be created"
-#~ msgstr "Зациклене посилання не може бути створене"
-
-#~ msgid "Delete rule?"
-#~ msgstr "Видалити правило?"
-
-#~ msgid "Disable extended profile"
-#~ msgstr "Дезактивувати розширений профіль"
-
-#~ msgid "Disable profile"
-#~ msgstr "Дезактивувати профіль"
-
-#~ msgid "Enable extended profile"
-#~ msgstr "Активувати розширений профіль"
-
-#~ msgid "Enable profile"
-#~ msgstr "Активувати профіль"
-
-#~ msgid "Extended profile"
-#~ msgstr "Розширений профіль"
-
-#~ msgid "Image is used in Zabbix map"
-#~ msgstr "Фонове зображення використовується в ZABBIX в карті мережі"
-
-#~ msgid "New check"
-#~ msgstr "Нова перевірка"
-
-#~ msgid "Use profile"
-#~ msgstr "Використовувати профіль"
-
-#~ msgid "ports"
-#~ msgstr "порти"
-
-#~ msgid "Action \"%s\" has no operations defined."
-#~ msgstr "Дія \"%s\" не містить визначених операцій."
-
-#~ msgid "CONFIGURATION OF DISCOVERY"
-#~ msgstr "НАЛАШТУВАННЯ ВИЯВЛЕННЯ"
-
-#~ msgid "CONFIGURATION OF HOSTS"
-#~ msgstr "НАЛАШТУВАННЯ ВУЗЛІВ"
-
-#~ msgid "CONFIGURATION OF TEMPLATES"
-#~ msgstr "НАЛАШТУВАННЯ ШАБЛОНІВ"
-
-#~ msgid "Cannot be empty %1$s element custom label for map \"%2$s\"."
-#~ msgstr "Користувацький ярлик елемента %1$s не може бути пустим для карти мережі \"%2$s\"."
-
-#~ msgid "Discovery rule added"
-#~ msgstr "Правило виявлення додано"
-
-#~ msgid "Discovery rules deleted"
-#~ msgstr "Правила виявлення видалено"
-
-#~ msgid "Discovery rules updated"
-#~ msgstr "Правила виявлення оновлено"
-
-#~ msgid "Incorrect Graph identity \"%s\" provided for Screens item resource"
-#~ msgstr "Некоректний ідентифікатор Графіка \"%s\" надано для ресурсу Комплексного екрану"
-
-#~ msgid "Incorrect Host group identity \"%s\" provided for Screens item resource"
-#~ msgstr "Некоректний ідентифікатор Групи вузлів мережі \"%s\" надано для ресурсу Комплексного екрану"
-
-#~ msgid "Incorrect Host identity \"%s\" provided for Screens item resource"
-#~ msgstr "Некоректний ідентифікатор Вузла мережі \"%s\" надано для ресурсу Комплексного екрану"
-
-#~ msgid "Incorrect IP range."
-#~ msgstr "Некоректний діапазон IP."
-
-#~ msgid "Incorrect Item identity \"%s\" provided for Screens item resource"
-#~ msgstr "Некоректний ідентифікатор Елемента даних \"%s\" надано для ресурсу Комплексного екрану"
-
-#~ msgid "Incorrect Map identity \"%s\" provided for Screens item resource"
-#~ msgstr "Некоректний ідентифікатор Карти мережі \"%s\" надано для ресурсу Комплексного екрану"
-
-#~ msgid "Incorrect Screen identity \"%s\" provided for Screens item resource"
-#~ msgstr "Некоректний ідентифікатор Комплексного екрану \"%s\" надано для ресурсу Комплексного екрану"
-
-#~ msgid "Imported"
-#~ msgstr "Імпортовано"
-
-#~ msgid "failed"
-#~ msgstr "помилка"
-
-#~ msgid "successfully"
-#~ msgstr "успішно"
-
-#~ msgid "API access"
-#~ msgstr "Доступ до API"
-
-#~ msgid "API access updated"
-#~ msgstr "Доступ до API оновлено"
-
-#~ msgid "Auto-login"
-#~ msgstr "Авто-вхід"
-
-#~ msgid "Cannot update API access"
-#~ msgstr "Не вдалося оновити доступ до GUI"
-
-#~ msgid "Copyright 2001-2011 by"
-#~ msgstr "Авторські права 2001-2011"
-
-#~ msgid "Create Image"
-#~ msgstr "Створити картинку"
-
-#~ msgid "Disable API"
-#~ msgstr "Дезактивувати API"
-
-#~ msgid "Disable API access in selected groups?"
-#~ msgstr "Дезактивувати доступ до API для вибраних груп?"
-
-#~ msgid "Discovered object"
-#~ msgstr "Виявлений об'єкт"
-
-#~ msgid "Enable API"
-#~ msgstr "Активувати API"
-
-#~ msgid "Enable API access in selected groups?"
-#~ msgstr "Активувати доступ до API для вибраних груп?"
-
-#~ msgid "Extended"
-#~ msgstr "Розширений"
-
-#~ msgid "Incorrect value for"
-#~ msgstr "Не коректне значення для"
-
-#~ msgid "Login name"
-#~ msgstr "Ім'я для входу"
-
-#~ msgid "No host groups with"
-#~ msgstr "Не має груп вузлів з"
-
-#~ msgid "No system map with"
-#~ msgstr "Не має карти мережі з"
-
-#~ msgid "Only Super Admins can delete Users"
-#~ msgstr "Тільки Zabbix Супер-адміністратор може видаляти користувачів"
-
-#~ msgid "Only Super Admins can update Users"
-#~ msgstr "Тільки Zabbix Супер-адміністратор може оновлювати користувачів"
-
-#~ msgid "Profile for this host is missing"
-#~ msgstr "Профіль для цього вузла відсутній"
-
-#~ msgid "Session terminated, please re-login!"
-#~ msgstr "Сеанс щавершено, будь-ласка увійдіть в систему повторно!"
-
-#~ msgid "Table users is empty. Possible database corruption."
-#~ msgstr "Таблиця користувачів пуста. Можливо причина в пошкодженні бази даних."
-
-#~ msgid "Themes"
-#~ msgstr "Теми інтерфейсу"
-
-#~ msgid "Trigger description"
-#~ msgstr "Опис тригера"
-
-#~ msgid "User ["
-#~ msgstr "Користувач ["
-
-#~ msgid "User cannot delete himself"
-#~ msgstr "Користувач не може видалити себе"
-
-#~ msgid "User cannot disable himself. Group \""
-#~ msgstr "Користувач не може дезактивувати себе самого. Група \""
-
-#~ msgid "User cannot restrict access to GUI for himself. Group \""
-#~ msgstr "Користувач не може обмежити доступ до GUI для самого себе. Група \""
-
-#~ msgid "Welcome to Zabbix! You are connected as"
-#~ msgstr "Ласкаво просимо в Zabbix! Ви увійшли в систему як"
-
-#~ msgid "Wrong fields for user"
-#~ msgstr "Помилкові поля для користувача"
-
-#~ msgid "] already exists"
-#~ msgstr "] вже існує"
-
-#~ msgid "can not be deleted, due to inner hosts can not be unlinked"
-#~ msgstr "не може бути видалено, відповідно як внутрішній вузел не може бути від'єднано"
-
-#~ msgid "from"
-#~ msgstr "з"
-
-#~ msgid "successful"
-#~ msgstr "успішний"
-
-#~ msgid "was not"
-#~ msgstr "не був"
-
-#~ msgid "Incorrect IP"
-#~ msgstr "Некоректний IP"
-
-#~ msgid "Incorrect discovery check"
-#~ msgstr "Некоректна перевірка виявлення"
-
-#~ msgid "Incorrect discovery status"
-#~ msgstr "Некоректний стан виявлення"
-
-#~ msgid "Incorrect host"
-#~ msgstr "Некоректний вузел мережі"
-
-#~ msgid "Incorrect parameter used for Action"
-#~ msgstr "Некоректний параметр використано в Дії"
-
-#~ msgid "Incorrect period"
-#~ msgstr "Некоректний період"
-
-#~ msgid "Incorrect port"
-#~ msgstr "Некоректний порт"
-
-#~ msgid "Incorrect trigger"
-#~ msgstr "Некоректний тригер"
-
-#~ msgid "Invalid key format"
-#~ msgstr "Недопустимий формат ключа"
-
-#~ msgid "Key cannot be empty"
-#~ msgstr "Ключ не може бути пустим"
-
-#~ msgid "Key is too large: maximum %d characters"
-#~ msgstr "Ключ занадто великий: максимум %d символів"
-
-#~ msgid "Key is valid"
-#~ msgstr "Ключ дійсний"
-
-#~ msgid "Remote commands"
-#~ msgstr "Віддалені команди"
-
-#~ msgid "Script with scriptid [%s] does not exist."
-#~ msgstr "Скрипт зі scriptid [%s] не існує."
-
-#~ msgid "Send message to"
-#~ msgstr "Надіслати повідомлення"
-
-#~ msgid "Show items with description like"
-#~ msgstr "Відобразити елементи, які в назві містять"
-
-#~ msgid "Tools"
-#~ msgstr "Інструменти"
-
-#~ msgid "User group [%1$s] is used in script [%2$s]."
-#~ msgstr "Група користувачів [%1$s] використовується в скрипті [%2$s]."
-
-#~ msgid "invalid character '%1$s' at position %2$d"
-#~ msgstr "недопустимий символ '%1$s' в позиції %2$d"
-
-#~ msgid "selected actions?"
-#~ msgstr "вибрані дії?"
-
-#~ msgid "An item with the Key"
-#~ msgstr "Елемент даних з Ключем"
-
-#~ msgid "Asset Tag"
-#~ msgstr "Інфо про власника"
-
-#~ msgid "Cannot create extended profile"
-#~ msgstr "Не вдалося створити розширений профіль"
-
-#~ msgid "Cannot delete extended profile"
-#~ msgstr "Не вдалося видалити розширений профіль"
-
-#~ msgid "Cannot sync Triggers"
-#~ msgstr "Не вдалося синхронізувати тригери"
-
-#~ msgid "Cannot sync Triggers prototypes"
-#~ msgstr "Не вдалося синхронізувати прототипи тригерів"
-
-#~ msgid "Cannot sync applications"
-#~ msgstr "Не вдалося синхронізувати групи елементів даних"
-
-#~ msgid "Cannot sync discovery rules"
-#~ msgstr "Не вдалося синхронізувати правила виявлення"
-
-#~ msgid "Cannot sync graph prototypes"
-#~ msgstr "Не вдалося синхронізувати прототипи графіків"
-
-#~ msgid "Cannot sync graphs"
-#~ msgstr "Не вдалося синхронізувати графіки"
-
-#~ msgid "Cannot sync item prototypes"
-#~ msgstr "Не вдалося синхронізувати прототипи елементів даних"
-
-#~ msgid "Cannot sync items"
-#~ msgstr "Не вдалося синхронізувати елементи даних"
-
-#~ msgid "Cannot update extended profile"
-#~ msgstr "Не вдалося оновити розширений профіль"
-
-#~ msgid "Cannot update profile"
-#~ msgstr "Не вдалося оновити профіль"
-
-#~ msgid "Check the key, please. Default example was passed"
-#~ msgstr "Перевірте будь-ласка ключ. Приклад по замовчуванню відображено"
-
-#~ msgid "Date HW Decommissioned"
-#~ msgstr "Дата списання HW"
-
-#~ msgid "Date HW Installed"
-#~ msgstr "Дата встановлення HW"
-
-#~ msgid "Date HW Maintenance Expires"
-#~ msgstr "Дата закінчення гарантії HW"
-
-#~ msgid "Date HW Purchased"
-#~ msgstr "Дата покупки HW"
-
-#~ msgid "Device Chassis"
-#~ msgstr "Шасі пристрою"
-
-#~ msgid "Device Contract Number"
-#~ msgstr "Номер контракту виробника"
-
-#~ msgid "Device Deployment Status"
-#~ msgstr "Стан розгортання пристрою"
-
-#~ msgid "Device Hardware"
-#~ msgstr "Апаратні засоби пристрою"
-
-#~ msgid "Device Notes"
-#~ msgstr "Коментарі до пристрою"
-
-#~ msgid "Device Port Connections"
-#~ msgstr "Порти пристрою для підключень"
-
-#~ msgid "Device Software"
-#~ msgstr "Програмні засоби пристрою"
-
-#~ msgid "Device Vendor"
-#~ msgstr "Виробник"
-
-#~ msgid "Device type"
-#~ msgstr "Тип пристрою"
-
-#~ msgid "Discovery rule [%1$s:%2$s] has no interface."
-#~ msgstr "Правило виявлення [%1$s:%2$s] не має інтерфейсу."
-
-#~ msgid "Enable selected hosts?"
-#~ msgstr "Активувати вибрані вузли мережі?"
-
-#~ msgid "Extended host profile"
-#~ msgstr "Розширений профіль вузла мережі"
-
-#~ msgid "Group function"
-#~ msgstr "Групова функція"
-
-#~ msgid "HW Architecture"
-#~ msgstr "Апаратна архітектура"
-
-#~ msgid "Host MAC Address"
-#~ msgstr "MAC-адрес вузла мережі"
-
-#~ msgid "Host Router"
-#~ msgstr "Роутер вузла мережі"
-
-#~ msgid "Host Subnet Mask"
-#~ msgstr "Маска підмережі вузла мережі"
-
-#~ msgid "Incorrect key format"
-#~ msgstr "Некоректний формат ключа"
-
-#~ msgid "Installer Name"
-#~ msgstr "Ім'я інсталятора"
-
-#~ msgid "Item [%1$s:%2$s] deleted."
-#~ msgstr "Елемент даних [%1$s:%2$s] видалено."
-
-#~ msgid "Item [%1$s:%2$s] has invalid port: \"%3$s\"."
-#~ msgstr "Елемент даних [%1$s:%2$s] має недійсний порт: \"%3$s\"."
-
-#~ msgid "Item function"
-#~ msgstr "Функція елемента даних"
-
-#~ msgid "Key does not match"
-#~ msgstr "Ключ не співпадає"
-
-#~ msgid "MAC Address"
-#~ msgstr "MAC-адреса"
-
-#~ msgid "Model Number"
-#~ msgstr "Модель"
-
-#~ msgid "No icon for map element"
-#~ msgstr "Не має іконки для елементу карти мережі"
-
-#~ msgid "OOB IP Address"
-#~ msgstr "Резервна IP-адреса"
-
-#~ msgid "OOB Router"
-#~ msgstr "Резервний роутер"
-
-#~ msgid "OOB Subnet Mask"
-#~ msgstr "Резервна маска підмережі"
-
-#~ msgid "OS (Full Details)"
-#~ msgstr "ОС (Повний опис)"
-
-#~ msgid "Primary POC Cell"
-#~ msgstr "Головний сотовий для контакту"
-
-#~ msgid "Primary POC Comments"
-#~ msgstr "Головні нотатки для контакту"
-
-#~ msgid "Primary POC Email"
-#~ msgstr "Головний email для контакту"
-
-#~ msgid "Primary POC Name"
-#~ msgstr "Головне ім'я для контакту"
-
-#~ msgid "Primary POC Phone 1"
-#~ msgstr "Головний телефон 1 для контакту"
-
-#~ msgid "Primary POC Phone 2"
-#~ msgstr "Головний телефон 2 для контакту"
-
-#~ msgid "Primary POC Screen Name"
-#~ msgstr "Головне нік-ім'я для контакту"
-
-#~ msgid "Secondary POC Cell"
-#~ msgstr "Другорядний сотовий для контакту"
-
-#~ msgid "Secondary POC Comments"
-#~ msgstr "Другорядні нотатки для контакту"
-
-#~ msgid "Secondary POC Email"
-#~ msgstr "Другорядний email для контакту"
-
-#~ msgid "Secondary POC Name"
-#~ msgstr "Другорядне ім'я для контакту"
-
-#~ msgid "Secondary POC Phone 1"
-#~ msgstr "Другорядний телефон 1 для контакту"
-
-#~ msgid "Secondary POC Phone 2"
-#~ msgstr "Другорядний телефон 2 для контакту"
-
-#~ msgid "Secondary POC Screen Name"
-#~ msgstr "Другорядне нік-ім'я для контакту"
-
-#~ msgid "Serial Number"
-#~ msgstr "Серійний номер"
-
-#~ msgid "SerialNo"
-#~ msgstr "Серійний номер"
-
-#~ msgid "Site Address 1"
-#~ msgstr "Адреса 1"
-
-#~ msgid "Site Address 2"
-#~ msgstr "Адреса 2"
-
-#~ msgid "Site Address 3"
-#~ msgstr "Адреса 3"
-
-#~ msgid "Site City"
-#~ msgstr "Місто"
-
-#~ msgid "Site Country"
-#~ msgstr "Країна"
-
-#~ msgid "Site Notes"
-#~ msgstr "Примітки"
-
-#~ msgid "Site Rack Location"
-#~ msgstr "Місцезнаходження стійки"
-
-#~ msgid "Site State / Province"
-#~ msgstr "Область / Район"
-
-#~ msgid "Site Zip / Postal"
-#~ msgstr "Поштовий індекс"
-
-#~ msgid "Software Application #1"
-#~ msgstr "Програмне забезпечення #1"
-
-#~ msgid "Software Application #2"
-#~ msgstr "Програмне забезпечення #2"
-
-#~ msgid "Software Application #3"
-#~ msgstr "Програмне забезпечення #3"
-
-#~ msgid "Software Application #4"
-#~ msgstr "Програмне забезпечення #4"
-
-#~ msgid "Software Application #5"
-#~ msgstr "Програмне забезпечення #5"
-
-#~ msgid "The key must be unique."
-#~ msgstr "Ключ має бути унікальним."
-
-#~ msgid "Type of information must be Log for log key"
-#~ msgstr "Тип інформації має бути Лог для ключа журналів"
-
-#~ msgid "URL #1"
-#~ msgstr "URL-посилання #1"
-
-#~ msgid "URL #2"
-#~ msgstr "URL-посилання #2"
-
-#~ msgid "URL #3"
-#~ msgstr "URL-посилання #3"
-
-#~ msgid "Use extended profile"
-#~ msgstr "Використовувати розширений профіль"
-
-#~ msgid "Value type must be Float for aggregate items"
-#~ msgstr "Тип значення має бути Числовий (із плаваючою крапкою) для агрегованих елементів даних"
-
-#~ msgid "is not one of"
-#~ msgstr "не один із"
-
-#~ msgid "Can not delete %1$s internal user \" %2$s \", try disabling that user."
-#~ msgstr "Не вдалося видалити %1$s внутрішнього користувача \" %2$s \", спробуйте дезактивувати цього користувача."
-
-#~ msgid "Connected as"
-#~ msgstr "Підключено до системи як"
-
-#~ msgid "IP and DNS can not be empty for host interface."
-#~ msgstr "IP та DNS не можуть бути пустими для інтерфейса вузла мережі."
-
-#~ msgid "Interface with DNS \" %1$s \" can not have empty IP address."
-#~ msgstr "Інтерфейс із DNS \" %1$s \" не може мати пусту IP адресу."
-
-#~ msgid "PORT can not be empty for host interface"
-#~ msgstr "ПОРТ не може бути пустим для інтерфейса вузла мережі"
-
-#~ msgid "Script [%s] already exists."
-#~ msgstr "Скрипт [%s] вже існує."
-
-#~ msgid "Zabbix SIA"
-#~ msgstr "Zabbix SIA"
-
-#~ msgid "with template host can not contain items from other hosts."
-#~ msgstr "вузел мережі з шаблоном не може містити елементи даних з інших вузлів мережі."
-
-#~ msgid "- all -"
-#~ msgstr "- все -"
-
-#~ msgid "Account is blocked for"
-#~ msgstr "Обліковий запис заблоковано на"
-
-#~ msgid "Action conditions"
-#~ msgstr "Умови дії"
-
-#~ msgid "An item key must be used in trigger expression"
-#~ msgstr "Ключ елемента даних має бути використано в виразі тригера"
-
-#~ msgid "Average problem"
-#~ msgstr "Середня проблема"
-
-#~ msgid "Delete selected action?"
-#~ msgstr "Видалити обрану дію?"
-
-#~ msgid "Edit operation"
-#~ msgstr "Змінити операцію"
-
-#~ msgid "Enable escalations"
-#~ msgstr "Задіяти ескалації"
-
-#~ msgid "Escalation rules"
-#~ msgstr "Правила ескалації"
-
-#~ msgid "Icon highlighting"
-#~ msgstr "Підсвітка іконки"
-
-#~ msgid "Incorrect command"
-#~ msgstr "Некоректна команда"
-
-#~ msgid "Incorrect escalation period"
-#~ msgstr "Некоректний період ескалації"
-
-#~ msgid "Incorrect object type"
-#~ msgstr "Некоректний тип об'єкта"
-
-#~ msgid "Incorrect operation type"
-#~ msgstr "Некоректний тип операції"
-
-#~ msgid "Incorrect parameter used for Conditions"
-#~ msgstr "Некоректний параметр використано в Умовах"
-
-#~ msgid "Incorrect steps"
-#~ msgstr "Некоректні кроки"
-
-#~ msgid "Incorrect user"
-#~ msgstr "Некоректний користувач"
-
-#~ msgid "Infinity"
-#~ msgstr "Безкінечно"
-
-#~ msgid "Last failed attempt was from"
-#~ msgstr "Остання невдала спроба була з адреси"
-
-#~ msgid "Mark elements on triggers status change"
-#~ msgstr "Позначити елементи при зміні статусу тригера"
-
-#~ msgid "Minor problem"
-#~ msgstr "Незначна проблема"
-
-#~ msgid "No such host"
-#~ msgstr "Не має вузла мережі"
-
-#~ msgid "No such monitored parameter"
-#~ msgstr "Не має параметрів для спостереження"
-
-#~ msgid "Run remote commands"
-#~ msgstr "Виконання віддалених команд"
-
-#~ msgid "Serious problem"
-#~ msgstr "Серйозна проблема"
-
-#~ msgid "Single user"
-#~ msgstr "Одному користувачу"
-
-#~ msgid "Too many hosts"
-#~ msgstr "Занадто багато вузлів мережі"
-
-#~ msgid "Unknown function"
-#~ msgstr "Невідома функція"
-
-#~ msgid "Unknown group name"
-#~ msgstr "Невідоме ім'я групи"
-
-#~ msgid "Unknown host name"
-#~ msgstr "Невідоме ім'я вузла"
-
-#~ msgid "User medias"
-#~ msgstr "Методи повідомлень користувача"
-
-#~ msgid "failed login attempts logged."
-#~ msgstr "невдалих спроб входу в систему зафіксовано."
-
-#~ msgid "in command"
-#~ msgstr "в команді"
-
-#~ msgid "of key"
-#~ msgstr "ключа"
-
-#~ msgid "Cannot delete selected actions."
-#~ msgstr "Не вдалося видалити вибрані дії."
-
-#~ msgid "Graph with name [ %1$s ] already exists"
-#~ msgstr "Графік з іменем [ %1$s ] вже існує"
-
-#~ msgid "Host [%1$s] deleted."
-#~ msgstr "Вузел мережі [%1$s] видалено."
-
-#~ msgid "Incorrect characters used for Host name [ %s ]"
-#~ msgstr "Використано некоректні символи в імені вузла мережі [ %s ]"
-
-#~ msgid "Link name should be unique."
-#~ msgstr "Ім'я лінка повинно бути унікальним."
-
-#~ msgid "Link should have both \"name\" and \"url\" fields."
-#~ msgstr "Лінк повинен мати обидва поля \"Ім'я\" та \"URL-запит\"."
-
-#~ msgid "No groups for host [ %s ]"
-#~ msgstr "Не має груп у вулза мережі [ %s ]"
-
-#~ msgid "No interfaces for host [ %s ]"
-#~ msgstr "Не має інтерфейсів у вузла мережі [ %s ]"
-
-#~ msgid "No permissions or map does not exist."
-#~ msgstr "Не має прав на карту мережі або вона не існує."
-
-#~ msgid "Selected actions deleted."
-#~ msgstr "Обрані дії видалено."
-
-#~ msgid "Wrong fields for host [ %s ]"
-#~ msgstr "Невірні поля для вузла мережі [ %s ]"
-
-#~ msgid "m.d.Y H:i:s"
-#~ msgstr "d.m.Y H:i:s"
