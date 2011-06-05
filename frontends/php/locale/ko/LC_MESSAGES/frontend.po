@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-31 20:50+0300\n"
+"POT-Creation-Date: 2011-06-05 12:14+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -36,11 +36,11 @@ msgstr[0] ""
 msgid "&"
 msgstr "&"
 
-#: include/locales/en_gb.inc.php:1691
+#: include/locales/en_gb.inc.php:1690
 msgid "'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1848
+#: include/locales/en_gb.inc.php:1847
 msgid "' does not accept parameters."
 msgstr ""
 
@@ -72,7 +72,7 @@ msgstr "- 기타 -"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1843
+#: include/locales/en_gb.inc.php:1842
 msgid "0 or 1"
 msgstr ""
 
@@ -84,7 +84,7 @@ msgstr "1분"
 msgid "10 seconds"
 msgstr "10초"
 
-#: include/locales/en_gb.inc.php:1124
+#: include/locales/en_gb.inc.php:1123
 msgid "15 min"
 msgstr "15분"
 
@@ -96,11 +96,11 @@ msgstr "30초"
 msgid "3D view"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1123
+#: include/locales/en_gb.inc.php:1122
 msgid "5 min"
 msgstr "5분"
 
-#: include/locales/en_gb.inc.php:1129 queue.php:163 queue.php:226
+#: include/locales/en_gb.inc.php:1128 queue.php:163 queue.php:226
 msgid "5 minutes"
 msgstr "5분"
 
@@ -135,19 +135,19 @@ msgstr "AND / OR"
 msgid "APPLICATIONS"
 msgstr "애플리케이션"
 
-#: include/locales/en_gb.inc.php:1603
+#: include/locales/en_gb.inc.php:1602
 msgid "AUDIT ACTIONS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1602
+#: include/locales/en_gb.inc.php:1601
 msgid "AUDIT LOGS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1158
+#: include/locales/en_gb.inc.php:1157
 msgid "AVAILABILITY REPORT"
 msgstr "가동 보고서"
 
-#: include/locales/en_gb.inc.php:1375
+#: include/locales/en_gb.inc.php:1374
 msgid "Acceptable SLA (in %)"
 msgstr "SLA 허용 값(%)"
 
@@ -160,7 +160,7 @@ msgstr ""
 msgid "Account is blocked for %s seconds"
 msgstr ""
 
-#: include/actions.inc.php:180 include/locales/en_gb.inc.php:1490
+#: include/actions.inc.php:180 include/locales/en_gb.inc.php:1489
 #: include/views/configuration.action.edit.php:904
 msgid "Ack"
 msgstr "인지"
@@ -177,11 +177,11 @@ msgstr "인지를 추가하였습니다"
 msgid "Acknowledge alarm by"
 msgstr "인지 사용자:"
 
-#: include/locales/en_gb.inc.php:1492
+#: include/locales/en_gb.inc.php:1491
 msgid "Acknowledge status"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1489
+#: include/locales/en_gb.inc.php:1488
 msgid "Acknowledged"
 msgstr "인지 완료"
 
@@ -193,7 +193,7 @@ msgstr "인지"
 msgid "Acknowledging disabled"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1604
+#: include/locales/en_gb.inc.php:1603
 #: include/views/configuration.action.edit.php:74
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:332
@@ -241,7 +241,7 @@ msgstr "액션"
 msgid "Activate selected"
 msgstr "선택 항목 활성화"
 
-#: include/locales/en_gb.inc.php:1724
+#: include/locales/en_gb.inc.php:1723
 msgid "Activate selected applications?"
 msgstr ""
 
@@ -254,7 +254,7 @@ msgid "Activate selected hosts?"
 msgstr ""
 
 #: include/discovery.inc.php:119 include/locales/en_gb.inc.php:471
-#: include/locales/en_gb.inc.php:851
+#: include/locales/en_gb.inc.php:850
 msgid "Active"
 msgstr "활성"
 
@@ -266,7 +266,7 @@ msgstr ""
 msgid "Active till"
 msgstr ""
 
-#: include/forms.inc.php:459 include/locales/en_gb.inc.php:1475
+#: include/forms.inc.php:459 include/locales/en_gb.inc.php:1474
 #: include/views/configuration.action.edit.php:313
 #: include/views/configuration.action.edit.php:475
 #: include/views/configuration.action.edit.php:490
@@ -283,7 +283,7 @@ msgstr ""
 msgid "Add"
 msgstr "추가"
 
-#: include/locales/en_gb.inc.php:2018
+#: include/locales/en_gb.inc.php:2017
 msgid "Add Service"
 msgstr ""
 
@@ -291,7 +291,7 @@ msgstr ""
 msgid "Add comment by"
 msgstr "주석 추가"
 
-#: include/locales/en_gb.inc.php:996
+#: include/locales/en_gb.inc.php:995
 msgid "Add element"
 msgstr "표시 구성요소 추가"
 
@@ -299,15 +299,15 @@ msgstr "표시 구성요소 추가"
 msgid "Add host"
 msgstr "호스트 추가"
 
-#: include/locales/en_gb.inc.php:1038
+#: include/locales/en_gb.inc.php:1037
 msgid "Add link"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:935
+#: include/locales/en_gb.inc.php:934
 msgid "Add prototype"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1568
+#: include/locales/en_gb.inc.php:1567
 msgid "Add to"
 msgstr ""
 
@@ -323,7 +323,7 @@ msgstr ""
 msgid "Add to host groups: "
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1607
+#: include/locales/en_gb.inc.php:1606
 msgid "Added"
 msgstr "추가"
 
@@ -331,15 +331,15 @@ msgstr "추가"
 msgid "Added new media type"
 msgstr "연락 방법을 추가하였습니다"
 
-#: include/locales/en_gb.inc.php:1839
+#: include/locales/en_gb.inc.php:1838
 msgid "Added trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:907
+#: include/locales/en_gb.inc.php:906
 msgid "Additional parameters"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:754
+#: include/locales/en_gb.inc.php:753
 msgid "Admin"
 msgstr ""
 
@@ -351,11 +351,11 @@ msgstr "관리"
 msgid "Advanced labels"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1083
+#: include/locales/en_gb.inc.php:1082
 msgid "Age"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1497
+#: include/locales/en_gb.inc.php:1496
 msgid "Age less than"
 msgstr ""
 
@@ -372,15 +372,15 @@ msgstr "누계"
 msgid "Aggregated periods count"
 msgstr "누계 주기 횟수"
 
-#: include/hosts.inc.php:65 include/locales/en_gb.inc.php:1544
+#: include/hosts.inc.php:65 include/locales/en_gb.inc.php:1543
 msgid "Alias"
 msgstr "로그인 이름"
 
-#: include/locales/en_gb.inc.php:978
+#: include/locales/en_gb.inc.php:977
 msgid "Align icons"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:491 include/locales/en_gb.inc.php:1110
+#: include/locales/en_gb.inc.php:491 include/locales/en_gb.inc.php:1109
 #: include/nodes.inc.php:163 include/page_header.php:303
 #: include/views/administration.script.edit.php:75
 #: include/views/administration.script.edit.php:84
@@ -391,11 +391,11 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:736
+#: include/locales/en_gb.inc.php:735
 msgid "All groups"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1050
+#: include/locales/en_gb.inc.php:1049
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr ""
 
@@ -403,11 +403,11 @@ msgstr ""
 msgid "All nodes"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:886
+#: include/locales/en_gb.inc.php:885
 msgid "Allowed hosts"
 msgstr "허가된 호스트"
 
-#: include/locales/en_gb.inc.php:1493
+#: include/locales/en_gb.inc.php:1492
 msgid "Any"
 msgstr ""
 
@@ -451,11 +451,11 @@ msgstr ""
 msgid "Application updated"
 msgstr "애플리케이션을 갱신하였습니다"
 
-#: hosts.php:761 hosts.php:842 include/locales/en_gb.inc.php:699
+#: hosts.php:761 hosts.php:842 include/locales/en_gb.inc.php:699 popup.php:53
 msgid "Applications"
 msgstr "애플리케이션"
 
-#: include/locales/en_gb.inc.php:1006
+#: include/locales/en_gb.inc.php:1005
 msgid "Apply"
 msgstr ""
 
@@ -475,15 +475,15 @@ msgstr ""
 msgid "Are you sure you want perform this action?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1697
+#: include/locales/en_gb.inc.php:1696
 msgid "Are you sure you want to delete"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:880
+#: include/locales/en_gb.inc.php:879
 msgid "As is"
 msgstr "하지 않음"
 
-#: include/locales/en_gb.inc.php:1300
+#: include/locales/en_gb.inc.php:1299
 msgid "As plain text"
 msgstr "일반 텍스트로 보기"
 
@@ -499,11 +499,11 @@ msgstr ""
 msgid "At least one host or group should be selected"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1844
+#: include/locales/en_gb.inc.php:1843
 msgid "At least one item must be present in the trigger expression."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1601 include/menu.inc.php:230
+#: include/locales/en_gb.inc.php:1600 include/menu.inc.php:230
 msgid "Audit"
 msgstr "감사"
 
@@ -523,7 +523,7 @@ msgstr ""
 msgid "Authentication algorithm"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:917
+#: include/locales/en_gb.inc.php:916
 #: include/views/configuration.action.edit.php:669
 msgid "Authentication method"
 msgstr ""
@@ -536,7 +536,7 @@ msgstr ""
 msgid "Auto registration"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1563
+#: include/locales/en_gb.inc.php:1562
 msgid "Auto-logout (min 90 seconds)"
 msgstr ""
 
@@ -545,15 +545,15 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: hosts.php:769 include/locales/en_gb.inc.php:764
+#: hosts.php:769 include/locales/en_gb.inc.php:763 popup.php:441
 msgid "Availability"
 msgstr "상태"
 
-#: include/locales/en_gb.inc.php:1157 include/menu.inc.php:120
+#: include/locales/en_gb.inc.php:1156 include/menu.inc.php:120
 msgid "Availability report"
 msgstr "가동 보고서"
 
-#: include/locales/en_gb.inc.php:765
+#: include/locales/en_gb.inc.php:764
 msgid "Available"
 msgstr "감시 중"
 
@@ -562,7 +562,7 @@ msgstr "감시 중"
 msgid "Average"
 msgstr "가벼운 장애"
 
-#: include/locales/en_gb.inc.php:1237
+#: include/locales/en_gb.inc.php:1236
 msgid "Average by"
 msgstr ""
 
@@ -570,7 +570,7 @@ msgstr ""
 msgid "Axis side"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1753
+#: include/locales/en_gb.inc.php:1752
 msgid "B"
 msgstr ""
 
@@ -586,7 +586,7 @@ msgstr "배경"
 msgid "Background image"
 msgstr "배경 이미지"
 
-#: include/locales/en_gb.inc.php:1229 include/menu.inc.php:128
+#: include/locales/en_gb.inc.php:1228 include/menu.inc.php:128
 msgid "Bar reports"
 msgstr ""
 
@@ -610,7 +610,7 @@ msgstr ""
 msgid "Black & Blue"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1574
+#: include/locales/en_gb.inc.php:1573
 msgid "Blocked"
 msgstr ""
 
@@ -618,16 +618,16 @@ msgstr ""
 msgid "Bold line"
 msgstr "굵은 선"
 
-#: include/locales/en_gb.inc.php:870
+#: include/locales/en_gb.inc.php:869
 msgid "Boolean"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1033
+#: include/locales/en_gb.inc.php:1032
 #: include/views/configuration.sysmap.edit.php:117
 msgid "Bottom"
 msgstr "아래쪽"
 
-#: include/locales/en_gb.inc.php:1240
+#: include/locales/en_gb.inc.php:1239
 msgid "Brighten"
 msgstr ""
 
@@ -635,11 +635,11 @@ msgstr ""
 msgid "Bulk acknowledge"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1160
+#: include/locales/en_gb.inc.php:1159
 msgid "By host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1161
+#: include/locales/en_gb.inc.php:1160
 msgid "By trigger template"
 msgstr ""
 
@@ -651,11 +651,11 @@ msgstr "액션 설정"
 msgid "CONFIGURATION OF APPLICATIONS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:929
+#: include/locales/en_gb.inc.php:928
 msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:940
+#: include/locales/en_gb.inc.php:939
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr ""
 
@@ -667,11 +667,11 @@ msgstr "그래프 설정"
 msgid "CONFIGURATION OF HOST GROUPS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:933
+#: include/locales/en_gb.inc.php:932
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:819
+#: include/locales/en_gb.inc.php:818
 msgid "CONFIGURATION OF ITEMS"
 msgstr "아이템 설정"
 
@@ -679,11 +679,11 @@ msgstr "아이템 설정"
 msgid "CONFIGURATION OF MAINTENANCE PERIODS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1067
+#: include/locales/en_gb.inc.php:1066
 msgid "CONFIGURATION OF MEDIA TYPES"
 msgstr "연락 방법 설정"
 
-#: include/locales/en_gb.inc.php:993
+#: include/locales/en_gb.inc.php:992
 msgid "CONFIGURATION OF NETWORK MAPS"
 msgstr "네트워크 맵 설정"
 
@@ -695,11 +695,11 @@ msgstr ""
 msgid "CONFIGURATION OF PROXIES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1260
+#: include/locales/en_gb.inc.php:1259
 msgid "CONFIGURATION OF SCREEN"
 msgstr "스크린 설정"
 
-#: include/locales/en_gb.inc.php:1248
+#: include/locales/en_gb.inc.php:1247
 msgid "CONFIGURATION OF SCREENS"
 msgstr "스크린 설정"
 
@@ -707,19 +707,19 @@ msgstr "스크린 설정"
 msgid "CONFIGURATION OF SCRIPTS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1282
+#: include/locales/en_gb.inc.php:1281
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr "슬라이드쇼 설정"
 
-#: include/locales/en_gb.inc.php:943
+#: include/locales/en_gb.inc.php:942
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1419
+#: include/locales/en_gb.inc.php:1418
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "트리거 설정"
 
-#: include/locales/en_gb.inc.php:1538
+#: include/locales/en_gb.inc.php:1537
 msgid "CONFIGURATION OF USERS AND USER GROUPS"
 msgstr "사용자 및 사용자 그룹 설정"
 
@@ -731,7 +731,7 @@ msgstr "웹 감시 설정"
 msgid "CONFIGURATION OF ZABBIX"
 msgstr "ZABBIX 설정"
 
-#: include/locales/en_gb.inc.php:1374
+#: include/locales/en_gb.inc.php:1373
 msgid "Calculate SLA"
 msgstr ""
 
@@ -739,15 +739,15 @@ msgstr ""
 msgid "Calculated"
 msgstr "자동 계산"
 
-#: include/locales/en_gb.inc.php:751
+#: include/locales/en_gb.inc.php:750
 msgid "Callback"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2025
+#: include/locales/en_gb.inc.php:2024
 msgid "Can not create new element"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2024
+#: include/locales/en_gb.inc.php:2023
 msgid "Can not find objects with name"
 msgstr ""
 
@@ -755,15 +755,15 @@ msgstr ""
 msgid "Can't add group"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1952
+#: include/locales/en_gb.inc.php:1951
 msgid "Can't delete user medias"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1994
+#: include/locales/en_gb.inc.php:1993
 msgid "Can't format Tree"
 msgstr "트리를 표시할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1954
+#: include/locales/en_gb.inc.php:1953
 msgid "Can't insert user medias"
 msgstr ""
 
@@ -771,7 +771,7 @@ msgstr ""
 msgid "Can't link template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1595
+#: include/locales/en_gb.inc.php:1594
 msgid "Can't read script response, check connection"
 msgstr ""
 
@@ -787,7 +787,7 @@ msgstr ""
 msgid "Can't remove macros"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1594
+#: include/locales/en_gb.inc.php:1593
 msgid "Can't send command, check connection"
 msgstr ""
 
@@ -799,7 +799,7 @@ msgstr ""
 msgid "Can't unlink template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1953
+#: include/locales/en_gb.inc.php:1952
 msgid "Can't update user medias"
 msgstr ""
 
@@ -807,7 +807,7 @@ msgstr ""
 msgid "Canada (136 characters)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1076
+#: include/locales/en_gb.inc.php:1075
 #: include/views/configuration.action.edit.php:865
 #: include/views/configuration.action.edit.php:913
 #: include/views/js/administration.general.triggerSeverity.js.php:38
@@ -838,7 +838,7 @@ msgstr "디스커버리 규칙을 추가할 수 없습니다"
 msgid "Cannot add graph"
 msgstr "그래프를 추가할 수 없습니다"
 
-#: api/classes/class.chost.php:1824 include/locales/en_gb.inc.php:1517
+#: api/classes/class.chost.php:1824 include/locales/en_gb.inc.php:1516
 msgid "Cannot add group"
 msgstr "그룹을 추가할 수 없습니다"
 
@@ -850,7 +850,7 @@ msgstr "호스트를 추가할 수 없습니다"
 msgid "Cannot add image"
 msgstr "이미지를 추가할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:821
+#: include/locales/en_gb.inc.php:820
 msgid "Cannot add item"
 msgstr "아이템을 추가할 수 없습니다"
 
@@ -866,11 +866,11 @@ msgstr ""
 msgid "Cannot add more than one item with type \"Graph sum\""
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1020
+#: include/locales/en_gb.inc.php:1019
 msgid "Cannot add network map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1795
+#: include/locales/en_gb.inc.php:1794
 msgid "Cannot add new application"
 msgstr ""
 
@@ -878,7 +878,7 @@ msgstr ""
 msgid "Cannot add node"
 msgstr "노드를 추가할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1523
+#: include/locales/en_gb.inc.php:1522
 msgid "Cannot add proxy"
 msgstr ""
 
@@ -890,7 +890,7 @@ msgstr ""
 msgid "Cannot add scenario"
 msgstr "시나리오를 추가할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1251
+#: include/locales/en_gb.inc.php:1250
 msgid "Cannot add screen"
 msgstr "스크린을 추가할 수 없습니다"
 
@@ -898,27 +898,27 @@ msgstr "스크린을 추가할 수 없습니다"
 msgid "Cannot add script"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1363
+#: include/locales/en_gb.inc.php:1362
 msgid "Cannot add service"
 msgstr "서비스를 추가할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1342
+#: include/locales/en_gb.inc.php:1341
 msgid "Cannot add slideshow"
 msgstr "슬라이드쇼를 추가할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:783
+#: include/locales/en_gb.inc.php:782
 msgid "Cannot add template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1425
+#: include/locales/en_gb.inc.php:1424
 msgid "Cannot add trigger"
 msgstr "트리거를 추가할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1507
+#: include/locales/en_gb.inc.php:1506
 msgid "Cannot add user"
 msgstr "사용자를 추가할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1508
+#: include/locales/en_gb.inc.php:1507
 msgid "Cannot add user. Both passwords must be equal."
 msgstr "사용자를 추가할 수 없습니다. 암호가 일치하지 않습니다."
 
@@ -926,7 +926,7 @@ msgstr "사용자를 추가할 수 없습니다. 암호가 일치하지 않습�
 msgid "Cannot add value map"
 msgstr "값 매핑을 추가할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:817
+#: include/locales/en_gb.inc.php:816
 msgid "Cannot clear history"
 msgstr "이력을 삭제할 수 없습니다"
 
@@ -985,7 +985,7 @@ msgstr ""
 msgid "Cannot delete graphs"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1521
+#: include/locales/en_gb.inc.php:1520
 msgid "Cannot delete group"
 msgstr "그룹을 삭제할 수 없습니다"
 
@@ -997,11 +997,11 @@ msgstr "호스트를 삭제할 수 없습니다"
 msgid "Cannot delete image"
 msgstr "이미지를 삭제할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:823
+#: include/locales/en_gb.inc.php:822
 msgid "Cannot delete item"
 msgstr "아이템을 삭제할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:825
+#: include/locales/en_gb.inc.php:824
 msgid "Cannot delete items"
 msgstr "아이템을 삭제할 수 없습니다"
 
@@ -1009,7 +1009,7 @@ msgstr "아이템을 삭제할 수 없습니다"
 msgid "Cannot delete maintenance"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1009
+#: include/locales/en_gb.inc.php:1008
 msgid "Cannot delete network map"
 msgstr ""
 
@@ -1021,7 +1021,7 @@ msgstr "노드를 삭제할 수 없습니다"
 msgid "Cannot delete profile"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1527
+#: include/locales/en_gb.inc.php:1526
 msgid "Cannot delete proxy"
 msgstr ""
 
@@ -1051,15 +1051,15 @@ msgstr ""
 msgid "Cannot delete selected actions"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1365
+#: include/locales/en_gb.inc.php:1364
 msgid "Cannot delete service"
 msgstr "서비스를 삭제할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1344
+#: include/locales/en_gb.inc.php:1343
 msgid "Cannot delete slideshow"
 msgstr "슬라이드쇼를 삭제할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:789
+#: include/locales/en_gb.inc.php:788
 msgid "Cannot delete template"
 msgstr ""
 
@@ -1077,15 +1077,15 @@ msgstr ""
 msgid "Cannot delete templated trigger [%1$s:%2$s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1423
+#: include/locales/en_gb.inc.php:1422
 msgid "Cannot delete trigger"
 msgstr "트리거를 삭제할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1421
+#: include/locales/en_gb.inc.php:1420
 msgid "Cannot delete triggers"
 msgstr "트리거를 삭제할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1510
+#: include/locales/en_gb.inc.php:1509
 msgid "Cannot delete user"
 msgstr "사용자를 삭제할 수 없습니다"
 
@@ -1093,19 +1093,19 @@ msgstr "사용자를 삭제할 수 없습니다"
 msgid "Cannot delete value map"
 msgstr "값 매핑을 삭제할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1255
+#: include/locales/en_gb.inc.php:1254
 msgid "Cannot deleted screen"
 msgstr "스크린을 삭제할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1042
+#: include/locales/en_gb.inc.php:1041
 msgid "Cannot find background image"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1294
+#: include/locales/en_gb.inc.php:1293
 msgid "Cannot find graph"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1044
+#: include/locales/en_gb.inc.php:1043
 msgid "Cannot find host"
 msgstr ""
 
@@ -1114,31 +1114,31 @@ msgstr ""
 msgid "Cannot find host interface on host \"%1$s\" for item key \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1045
+#: include/locales/en_gb.inc.php:1044
 msgid "Cannot find hostgroup"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1041
+#: include/locales/en_gb.inc.php:1040
 msgid "Cannot find image"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1295
+#: include/locales/en_gb.inc.php:1294
 msgid "Cannot find item"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1046
+#: include/locales/en_gb.inc.php:1045
 msgid "Cannot find map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1047
+#: include/locales/en_gb.inc.php:1046
 msgid "Cannot find screen"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1043
+#: include/locales/en_gb.inc.php:1042
 msgid "Cannot find trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1412
+#: include/locales/en_gb.inc.php:1411
 msgid "Cannot format Tree. Check logic structure in service links"
 msgstr ""
 
@@ -1146,11 +1146,8 @@ msgstr ""
 msgid "Cannot have empty visible template name"
 msgstr ""
 
-#: api/classes/class.ctriggerprototype.php:1339
-msgid "Cannot implode expression"
-msgstr ""
-
 #: api/classes/class.ctrigger.php:1468 api/classes/class.ctrigger.php:1559
+#: api/classes/class.ctriggerprototype.php:1339
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr ""
@@ -1160,15 +1157,15 @@ msgstr ""
 msgid "Cannot include view file \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1885
+#: include/locales/en_gb.inc.php:1884
 msgid "Cannot link hardlinked service."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1886
+#: include/locales/en_gb.inc.php:1885
 msgid "Cannot link service to itself."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:802
+#: include/locales/en_gb.inc.php:801
 msgid "Cannot link template"
 msgstr ""
 
@@ -1220,7 +1217,7 @@ msgstr ""
 msgid "Cannot remove macro"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1955
+#: include/locales/en_gb.inc.php:1954
 msgid "Cannot rename guest user"
 msgstr ""
 
@@ -1232,7 +1229,7 @@ msgstr ""
 msgid "Cannot switch host for interface"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1531
+#: include/locales/en_gb.inc.php:1530
 msgid "Cannot unblock users"
 msgstr ""
 
@@ -1264,7 +1261,7 @@ msgstr ""
 msgid "Cannot unlink and clear triggers"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:801
+#: include/locales/en_gb.inc.php:800
 msgid "Cannot unlink template"
 msgstr ""
 
@@ -1272,7 +1269,7 @@ msgstr ""
 msgid "Cannot update"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1533
+#: include/locales/en_gb.inc.php:1532
 msgid "Cannot update GUI access"
 msgstr ""
 
@@ -1284,11 +1281,11 @@ msgstr "액션을 갱신할 수 없습니다"
 msgid "Cannot update application"
 msgstr "애플리케이션을 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1474
+#: include/locales/en_gb.inc.php:1473
 msgid "Cannot update comment"
 msgstr "주석을 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1535
+#: include/locales/en_gb.inc.php:1534
 msgid "Cannot update debug mode"
 msgstr ""
 
@@ -1304,7 +1301,7 @@ msgstr ""
 msgid "Cannot update graph"
 msgstr "그래프를 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1519
+#: include/locales/en_gb.inc.php:1518
 msgid "Cannot update group"
 msgstr "그룹을 갱신할 수 없습니다"
 
@@ -1324,7 +1321,7 @@ msgstr ""
 msgid "Cannot update image"
 msgstr "이미지를 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:820
+#: include/locales/en_gb.inc.php:819
 msgid "Cannot update item"
 msgstr "아이템을 갱신할 수 없습니다"
 
@@ -1346,7 +1343,7 @@ msgstr ""
 msgid "Cannot update map \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1022
+#: include/locales/en_gb.inc.php:1021
 msgid "Cannot update network map"
 msgstr ""
 
@@ -1354,7 +1351,7 @@ msgstr ""
 msgid "Cannot update node"
 msgstr "노드를 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1525
+#: include/locales/en_gb.inc.php:1524
 msgid "Cannot update proxy"
 msgstr ""
 
@@ -1366,7 +1363,7 @@ msgstr ""
 msgid "Cannot update scenario"
 msgstr "시나리오를 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1253
+#: include/locales/en_gb.inc.php:1252
 msgid "Cannot update screen"
 msgstr "스크린을 갱신할 수 없습니다"
 
@@ -1374,11 +1371,11 @@ msgstr "스크린을 갱신할 수 없습니다"
 msgid "Cannot update script"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1361
+#: include/locales/en_gb.inc.php:1360
 msgid "Cannot update service"
 msgstr "서비스를 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1340
+#: include/locales/en_gb.inc.php:1339
 msgid "Cannot update slideshow"
 msgstr ""
 
@@ -1386,23 +1383,23 @@ msgstr ""
 msgid "Cannot update status"
 msgstr "상태를 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:785
+#: include/locales/en_gb.inc.php:784
 msgid "Cannot update template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1435
+#: include/locales/en_gb.inc.php:1434
 msgid "Cannot update trigger"
 msgstr "트리거를 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1514
+#: include/locales/en_gb.inc.php:1513
 msgid "Cannot update user"
 msgstr "사용자를 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1515
+#: include/locales/en_gb.inc.php:1514
 msgid "Cannot update user. Both passwords must be equal."
 msgstr "사용자를 갱신할 수 없습니다. 암호가 일치하지 않습니다."
 
-#: include/locales/en_gb.inc.php:1529
+#: include/locales/en_gb.inc.php:1528
 msgid "Cannot update users status"
 msgstr ""
 
@@ -1410,7 +1407,7 @@ msgstr ""
 msgid "Cannot update value map"
 msgstr "값 매핑을 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1669
+#: include/locales/en_gb.inc.php:1668
 msgid "Caption"
 msgstr ""
 
@@ -1418,19 +1415,19 @@ msgstr ""
 msgid "Case sensitive"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1325
+#: include/locales/en_gb.inc.php:1324
 msgid "Centre"
 msgstr "가운데"
 
-#: include/locales/en_gb.inc.php:1433
+#: include/locales/en_gb.inc.php:1432
 msgid "Change"
 msgstr "변경"
 
-#: include/locales/en_gb.inc.php:1560
+#: include/locales/en_gb.inc.php:1559
 msgid "Change password"
 msgstr "암호변경"
 
-#: include/locales/en_gb.inc.php:876
+#: include/locales/en_gb.inc.php:875
 msgid "Character"
 msgstr "문자"
 
@@ -1450,7 +1447,7 @@ msgstr ""
 msgid "Check already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1690
+#: include/locales/en_gb.inc.php:1689
 msgid "Check expression part starting from '"
 msgstr ""
 
@@ -1474,7 +1471,7 @@ msgstr ""
 msgid "Child"
 msgstr "리모트"
 
-#: include/locales/en_gb.inc.php:1644
+#: include/locales/en_gb.inc.php:1643
 msgid "Chinese (CN)"
 msgstr "중국어 (CN)"
 
@@ -1487,27 +1484,27 @@ msgstr ""
 msgid "Circular link cannot be created"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1615
+#: include/locales/en_gb.inc.php:1614
 msgid "Clear"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:816
+#: include/locales/en_gb.inc.php:815
 msgid "Clear history"
 msgstr "이력 삭제"
 
-#: include/locales/en_gb.inc.php:815
+#: include/locales/en_gb.inc.php:814
 msgid "Clear history for selected"
 msgstr "선택 아이템 이력 삭제"
 
-#: include/locales/en_gb.inc.php:774
+#: include/locales/en_gb.inc.php:773
 msgid "Clear when unlinking"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1309
+#: include/locales/en_gb.inc.php:1308
 msgid "Clock"
 msgstr "시각"
 
-#: include/locales/en_gb.inc.php:1380
+#: include/locales/en_gb.inc.php:1379
 #: include/views/administration.script.edit.php:119
 #: include/views/configuration.action.edit.php:929
 #: include/views/configuration.discovery.edit.php:108
@@ -1516,7 +1513,7 @@ msgstr "시각"
 msgid "Clone"
 msgstr "복제"
 
-#: include/locales/en_gb.inc.php:1590
+#: include/locales/en_gb.inc.php:1589
 msgid "Close"
 msgstr ""
 
@@ -1529,23 +1526,23 @@ msgstr ""
 msgid "Colour"
 msgstr "색"
 
-#: include/locales/en_gb.inc.php:1016
+#: include/locales/en_gb.inc.php:1015
 msgid "Colour (OK)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1303
+#: include/locales/en_gb.inc.php:1302
 msgid "Column span"
 msgstr "열 합치기"
 
-#: include/locales/en_gb.inc.php:1256
+#: include/locales/en_gb.inc.php:1255
 msgid "Columns"
 msgstr "열"
 
-#: include/locales/en_gb.inc.php:1720
+#: include/locales/en_gb.inc.php:1719
 msgid "Combined result"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1588
+#: include/locales/en_gb.inc.php:1587
 #: include/views/administration.script.edit.php:66
 msgid "Command"
 msgstr ""
@@ -1566,11 +1563,11 @@ msgstr ""
 msgid "Commands"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1473
+#: include/locales/en_gb.inc.php:1472
 msgid "Comment updated"
 msgstr "주석을 갱신하였습니다"
 
-#: include/locales/en_gb.inc.php:1488
+#: include/locales/en_gb.inc.php:1487
 msgid "Comments"
 msgstr "주석"
 
@@ -1578,7 +1575,7 @@ msgstr "주석"
 msgid "Commercial"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1232
+#: include/locales/en_gb.inc.php:1231
 msgid "Compare values for multiple periods"
 msgstr ""
 
@@ -1596,7 +1593,7 @@ msgstr "조건"
 msgid "Configuration"
 msgstr "설정"
 
-#: include/locales/en_gb.inc.php:1358
+#: include/locales/en_gb.inc.php:1357
 msgid "Configuration of IT services"
 msgstr ""
 
@@ -1620,23 +1617,23 @@ msgstr "디스커버리 설정"
 msgid "Configuration of graphs"
 msgstr "그래프 설정"
 
-#: include/locales/en_gb.inc.php:818
+#: include/locales/en_gb.inc.php:817
 msgid "Configuration of items"
 msgstr "아이템 설정"
 
-#: include/locales/en_gb.inc.php:992
+#: include/locales/en_gb.inc.php:991
 msgid "Configuration of network maps"
 msgstr "네트워크 맵 설정"
 
-#: include/locales/en_gb.inc.php:1249
+#: include/locales/en_gb.inc.php:1248
 msgid "Configuration of screens"
 msgstr "스크린 설정"
 
-#: include/locales/en_gb.inc.php:1283
+#: include/locales/en_gb.inc.php:1282
 msgid "Configuration of slideshows"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1418
+#: include/locales/en_gb.inc.php:1417
 msgid "Configuration of triggers"
 msgstr "트리거 설정"
 
@@ -1648,7 +1645,7 @@ msgstr "설정을 갱신하였습니다"
 msgid "Configuration was not updated"
 msgstr "설정을 갱신할 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1102
+#: include/locales/en_gb.inc.php:1101
 msgid "Configure"
 msgstr ""
 
@@ -1656,7 +1653,7 @@ msgstr ""
 msgid "Confirmation text"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:726
+#: include/locales/en_gb.inc.php:725
 #: include/views/configuration.host.edit.php:192
 msgid "Connect to"
 msgstr "접속 방법"
@@ -1671,7 +1668,7 @@ msgstr ""
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1000
+#: include/locales/en_gb.inc.php:999
 msgid "Connectors"
 msgstr "연결"
 
@@ -1683,19 +1680,19 @@ msgstr "연락처"
 msgid "Contract number"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:997
+#: include/locales/en_gb.inc.php:996
 msgid "Coordinate X"
 msgstr "X좌표"
 
-#: include/locales/en_gb.inc.php:998
+#: include/locales/en_gb.inc.php:997
 msgid "Coordinate Y"
 msgstr "Y좌표"
 
-#: include/locales/en_gb.inc.php:899
+#: include/locales/en_gb.inc.php:898
 msgid "Copy"
 msgstr "복사"
 
-#: include/locales/en_gb.inc.php:922
+#: include/locales/en_gb.inc.php:921
 msgid "Copy selected items?"
 msgstr ""
 
@@ -1703,7 +1700,7 @@ msgstr ""
 msgid "Copy selected to ..."
 msgstr "선택 항목 복사..."
 
-#: include/locales/en_gb.inc.php:1465
+#: include/locales/en_gb.inc.php:1464
 msgid "Copy selected triggers?"
 msgstr ""
 
@@ -1712,19 +1709,19 @@ msgstr ""
 msgid "Correct login [%s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1895
+#: include/locales/en_gb.inc.php:1894
 msgid "Could not save image!"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1128
+#: include/locales/en_gb.inc.php:1127
 msgid "Count"
 msgstr "회"
 
-#: include/locales/en_gb.inc.php:1286
+#: include/locales/en_gb.inc.php:1285
 msgid "Count of slides"
 msgstr "슬라이드 수"
 
-#: include/locales/en_gb.inc.php:1210
+#: include/locales/en_gb.inc.php:1209
 msgid "Create"
 msgstr ""
 
@@ -1736,15 +1733,15 @@ msgstr "액션 작성"
 msgid "Create Graph"
 msgstr "그래프 작성"
 
-#: include/locales/en_gb.inc.php:1566
+#: include/locales/en_gb.inc.php:1565
 msgid "Create Group"
 msgstr "그룹 작성"
 
-#: include/locales/en_gb.inc.php:894
+#: include/locales/en_gb.inc.php:893
 msgid "Create Item"
 msgstr "아이템 작성"
 
-#: include/locales/en_gb.inc.php:1012
+#: include/locales/en_gb.inc.php:1011
 msgid "Create Map"
 msgstr "맵 작성"
 
@@ -1752,23 +1749,23 @@ msgstr "맵 작성"
 msgid "Create Media Type"
 msgstr "연락 방법 작성"
 
-#: include/locales/en_gb.inc.php:770
+#: include/locales/en_gb.inc.php:769
 msgid "Create Proxy"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1272
+#: include/locales/en_gb.inc.php:1271
 msgid "Create Screen"
 msgstr "스크린 작성"
 
-#: include/locales/en_gb.inc.php:1273
+#: include/locales/en_gb.inc.php:1272
 msgid "Create Slide Show"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1440
+#: include/locales/en_gb.inc.php:1439
 msgid "Create Trigger"
 msgstr "트리거 작성"
 
-#: include/locales/en_gb.inc.php:1565
+#: include/locales/en_gb.inc.php:1564
 msgid "Create User"
 msgstr "사용자 작성"
 
@@ -1784,7 +1781,7 @@ msgstr ""
 msgid "Create maintenance period"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:937
+#: include/locales/en_gb.inc.php:936
 msgid "Create prototype"
 msgstr ""
 
@@ -1800,7 +1797,7 @@ msgstr "시나리오 작성"
 msgid "Create script"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2016
+#: include/locales/en_gb.inc.php:2015
 msgid "Create trigger"
 msgstr ""
 
@@ -1808,7 +1805,7 @@ msgstr ""
 msgid "Create value map"
 msgstr "값 매핑 작성"
 
-#: include/locales/en_gb.inc.php:1811
+#: include/locales/en_gb.inc.php:1810
 msgid "Critical error"
 msgstr ""
 
@@ -1839,11 +1836,11 @@ msgstr ""
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:891
+#: include/locales/en_gb.inc.php:890
 msgid "Custom multiplier"
 msgstr "승수"
 
-#: include/locales/en_gb.inc.php:1335
+#: include/locales/en_gb.inc.php:1334
 msgid "Custom screens"
 msgstr "커스텀 스크린"
 
@@ -1859,11 +1856,11 @@ msgstr ""
 msgid "Custom severity names affect all locales and require manual translation!"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1351
+#: include/locales/en_gb.inc.php:1350
 msgid "Custom slides"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1649
+#: include/locales/en_gb.inc.php:1648
 msgid "Czech (CZ)"
 msgstr ""
 
@@ -1871,7 +1868,7 @@ msgstr ""
 msgid "D"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1101
+#: include/locales/en_gb.inc.php:1100
 msgid "DASHBOARD CONFIGURATION"
 msgstr ""
 
@@ -1879,11 +1876,11 @@ msgstr ""
 msgid "DETAILS OF SCENARIO"
 msgstr "시나리오 이름"
 
-#: include/locales/en_gb.inc.php:1429
+#: include/locales/en_gb.inc.php:1428
 msgid "DISABLED"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:961
+#: include/locales/en_gb.inc.php:960
 msgid "DISCOVERED"
 msgstr ""
 
@@ -1891,11 +1888,11 @@ msgstr ""
 msgid "DISCOVERY"
 msgstr "디스커버리"
 
-#: include/locales/en_gb.inc.php:1674
+#: include/locales/en_gb.inc.php:1673
 msgid "DISCOVERY CHECKS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1673
+#: include/locales/en_gb.inc.php:1672
 msgid "DISCOVERY RULES"
 msgstr ""
 
@@ -1903,20 +1900,20 @@ msgstr ""
 msgid "DM"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:727
+#: include/locales/en_gb.inc.php:726 popup.php:441
 msgid "DNS"
 msgstr "DNS"
 
-#: include/locales/en_gb.inc.php:738
+#: include/locales/en_gb.inc.php:737
 #: include/views/configuration.host.edit.php:192
 msgid "DNS name"
 msgstr "DNS 이름"
 
-#: include/locales/en_gb.inc.php:960
+#: include/locales/en_gb.inc.php:959
 msgid "DOWN"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1192
+#: include/locales/en_gb.inc.php:1191
 msgid "Daily"
 msgstr "일간"
 
@@ -1924,19 +1921,19 @@ msgstr "일간"
 msgid "Dark orange"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1239
+#: include/locales/en_gb.inc.php:1238
 msgid "Darken"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1081 include/menu.inc.php:33
+#: include/locales/en_gb.inc.php:1080 include/menu.inc.php:33
 msgid "Dashboard"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1100
+#: include/locales/en_gb.inc.php:1099
 msgid "Dashboard configuration"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1106
+#: include/locales/en_gb.inc.php:1105
 msgid "Dashboard filter"
 msgstr ""
 
@@ -1944,7 +1941,7 @@ msgstr ""
 msgid "Dashed line"
 msgstr "파선"
 
-#: include/locales/en_gb.inc.php:1119
+#: include/locales/en_gb.inc.php:1118
 msgid "Data"
 msgstr "데이터"
 
@@ -1953,11 +1950,11 @@ msgstr "데이터"
 msgid "Data from %1$s. Generated in %2$s sec"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1311
+#: include/locales/en_gb.inc.php:1310
 msgid "Data overview"
 msgstr "데이터 개요"
 
-#: include/locales/en_gb.inc.php:866
+#: include/locales/en_gb.inc.php:865
 msgid "Data type"
 msgstr ""
 
@@ -1969,7 +1966,7 @@ msgstr ""
 msgid "Database host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:842
+#: include/locales/en_gb.inc.php:841
 msgid "Database monitor"
 msgstr ""
 
@@ -2022,7 +2019,7 @@ msgstr ""
 msgid "Date hw decommissioned"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1188
+#: include/locales/en_gb.inc.php:1187
 msgid "Day"
 msgstr "일"
 
@@ -2038,15 +2035,15 @@ msgstr ""
 msgid "Days"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1551
+#: include/locales/en_gb.inc.php:1550
 msgid "Debug"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1552
+#: include/locales/en_gb.inc.php:1551
 msgid "Debug mode"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1534
+#: include/locales/en_gb.inc.php:1533
 msgid "Debug mode updated"
 msgstr ""
 
@@ -2058,11 +2055,11 @@ msgstr ""
 msgid "December"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:867
+#: include/locales/en_gb.inc.php:866
 msgid "Decimal"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:384 include/locales/en_gb.inc.php:743
+#: include/locales/en_gb.inc.php:384 include/locales/en_gb.inc.php:742
 #: include/views/configuration.action.edit.php:357
 msgid "Default"
 msgstr "Default"
@@ -2084,11 +2081,11 @@ msgstr ""
 msgid "Default theme"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1597
+#: include/locales/en_gb.inc.php:1596
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1596
+#: include/locales/en_gb.inc.php:1595
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
 msgstr ""
 
@@ -2105,27 +2102,27 @@ msgstr ""
 msgid "Delayed by"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1379
+#: include/locales/en_gb.inc.php:1378
 msgid "Delete"
 msgstr "삭제"
 
-#: include/locales/en_gb.inc.php:1027
+#: include/locales/en_gb.inc.php:1026
 msgid "Delete Links between selected elements?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2020
+#: include/locales/en_gb.inc.php:2019
 msgid "Delete Service"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:790
+#: include/locales/en_gb.inc.php:789
 msgid "Delete and clear"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:792
+#: include/locales/en_gb.inc.php:791
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:794
+#: include/locales/en_gb.inc.php:793
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr ""
 
@@ -2137,7 +2134,7 @@ msgstr ""
 msgid "Delete discovery rule?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1709
+#: include/locales/en_gb.inc.php:1708
 msgid "Delete expression?"
 msgstr ""
 
@@ -2153,15 +2150,15 @@ msgstr "그래프를 삭제하시겠습니까?"
 msgid "Delete history of selected WEB scenarios?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:923
+#: include/locales/en_gb.inc.php:922
 msgid "Delete history of selected items?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1859
+#: include/locales/en_gb.inc.php:1858
 msgid "Delete it?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1710
+#: include/locales/en_gb.inc.php:1709
 msgid "Delete keyword?"
 msgstr ""
 
@@ -2177,7 +2174,7 @@ msgstr ""
 msgid "Delete scenario?"
 msgstr "시나리오를 삭제하시겠습니까?"
 
-#: include/locales/en_gb.inc.php:1259
+#: include/locales/en_gb.inc.php:1258
 msgid "Delete screen?"
 msgstr "스크린을 삭제하시겠습니까?"
 
@@ -2204,7 +2201,7 @@ msgstr ""
 msgid "Delete selected actions?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1726
+#: include/locales/en_gb.inc.php:1725
 msgid "Delete selected applications?"
 msgstr ""
 
@@ -2212,7 +2209,7 @@ msgstr ""
 msgid "Delete selected discovery rules?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1025
+#: include/locales/en_gb.inc.php:1024
 msgid "Delete selected elements?"
 msgstr ""
 
@@ -2228,11 +2225,11 @@ msgstr ""
 msgid "Delete selected groups"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1584
+#: include/locales/en_gb.inc.php:1583
 msgid "Delete selected groups?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:758
+#: include/locales/en_gb.inc.php:757
 msgid "Delete selected host?"
 msgstr "선택한 호스트를 삭제하시겠습니까?"
 
@@ -2244,11 +2241,11 @@ msgstr "선택한 호스트를 삭제하시겠습니까?"
 msgid "Delete selected image?"
 msgstr "선택한 이미지를 삭제하시겠습니까?"
 
-#: include/locales/en_gb.inc.php:1783
+#: include/locales/en_gb.inc.php:1782
 msgid "Delete selected item?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:924
+#: include/locales/en_gb.inc.php:923
 msgid "Delete selected items?"
 msgstr ""
 
@@ -2256,7 +2253,7 @@ msgstr ""
 msgid "Delete selected maintenance periods?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1018
+#: include/locales/en_gb.inc.php:1017
 msgid "Delete selected maps?"
 msgstr ""
 
@@ -2292,27 +2289,27 @@ msgstr ""
 msgid "Delete selected scripts?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2021
+#: include/locales/en_gb.inc.php:2020
 msgid "Delete selected services?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1277
+#: include/locales/en_gb.inc.php:1276
 msgid "Delete selected slideshows?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:791
+#: include/locales/en_gb.inc.php:790
 msgid "Delete selected templates?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1466
+#: include/locales/en_gb.inc.php:1465
 msgid "Delete selected triggers?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1779
+#: include/locales/en_gb.inc.php:1778
 msgid "Delete selected user?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1577
+#: include/locales/en_gb.inc.php:1576
 msgid "Delete selected users?"
 msgstr "선택한 사용자를 삭제하시겠습니까?"
 
@@ -2326,11 +2323,11 @@ msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] ""
 
-#: include/locales/en_gb.inc.php:759
+#: include/locales/en_gb.inc.php:758
 msgid "Delete selected with linked elements"
 msgstr "선택 항목 및 연결된 구성요소 삭제"
 
-#: include/locales/en_gb.inc.php:1345
+#: include/locales/en_gb.inc.php:1344
 msgid "Delete slideshow?"
 msgstr "슬라이드쇼를 삭제하시겠습니까?"
 
@@ -2338,19 +2335,19 @@ msgstr "슬라이드쇼를 삭제하시겠습니까?"
 msgid "Delete system map?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:793
+#: include/locales/en_gb.inc.php:792
 msgid "Delete template?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1723
+#: include/locales/en_gb.inc.php:1722
 msgid "Delete this application?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1786
+#: include/locales/en_gb.inc.php:1785
 msgid "Delete trigger?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:733
+#: include/locales/en_gb.inc.php:732
 msgid "Deleted"
 msgstr "삭제"
 
@@ -2358,23 +2355,23 @@ msgstr "삭제"
 msgid "Delimiter"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:882
+#: include/locales/en_gb.inc.php:881
 msgid "Delta (simple change)"
 msgstr "델타"
 
-#: include/locales/en_gb.inc.php:881
+#: include/locales/en_gb.inc.php:880
 msgid "Delta (speed per second)"
 msgstr "델타(변경 값/초)"
 
-#: include/locales/en_gb.inc.php:1557
+#: include/locales/en_gb.inc.php:1556
 msgid "Deny"
 msgstr "거부"
 
-#: include/locales/en_gb.inc.php:1437
+#: include/locales/en_gb.inc.php:1436
 msgid "Dependent"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1436
+#: include/locales/en_gb.inc.php:1435
 msgid "Depends on"
 msgstr "의존 대상"
 
@@ -2383,12 +2380,12 @@ msgid "Deployment status"
 msgstr ""
 
 #: host_discovery.php:639 include/forms.inc.php:2176
-#: include/forms.inc.php:2485 include/locales/en_gb.inc.php:829
+#: include/forms.inc.php:2485 include/locales/en_gb.inc.php:828
 #: include/views/administration.script.edit.php:71 media_types.php:260
 msgid "Description"
 msgstr "이름"
 
-#: include/locales/en_gb.inc.php:1605
+#: include/locales/en_gb.inc.php:1604
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:332 queue.php:50
 msgid "Details"
@@ -2410,19 +2407,19 @@ msgstr ""
 msgid "Device uniqueness criteria."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1276
+#: include/locales/en_gb.inc.php:1275
 msgid "Dimension (cols x rows)"
 msgstr "크기(열x행)"
 
-#: include/locales/en_gb.inc.php:1431
+#: include/locales/en_gb.inc.php:1430
 msgid "Disable"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1573
+#: include/locales/en_gb.inc.php:1572
 msgid "Disable DEBUG"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1583
+#: include/locales/en_gb.inc.php:1582
 msgid "Disable debug mode in selected groups?"
 msgstr ""
 
@@ -2455,7 +2452,7 @@ msgstr ""
 msgid "Disable selected actions?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1725
+#: include/locales/en_gb.inc.php:1724
 msgid "Disable selected applications?"
 msgstr ""
 
@@ -2463,7 +2460,7 @@ msgstr ""
 msgid "Disable selected discovery rules?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1581
+#: include/locales/en_gb.inc.php:1580
 msgid "Disable selected groups?"
 msgstr ""
 
@@ -2475,16 +2472,16 @@ msgstr ""
 msgid "Disable selected hosts?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:920
+#: include/locales/en_gb.inc.php:919
 msgid "Disable selected items?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1463
+#: include/locales/en_gb.inc.php:1462
 msgid "Disable selected triggers?"
 msgstr ""
 
 #: actionconf.php:464 include/discovery.inc.php:120
-#: include/locales/en_gb.inc.php:1428
+#: include/locales/en_gb.inc.php:1427
 #: include/views/configuration.host.edit.php:516
 #: include/views/configuration.host.massupdate.php:216
 msgid "Disabled"
@@ -2515,6 +2512,10 @@ msgstr ""
 
 #: include/actions.inc.php:50
 msgid "Discovery check"
+msgstr ""
+
+#: popup.php:131
+msgid "Discovery checks"
 msgstr ""
 
 #: include/actions.inc.php:51
@@ -2561,7 +2562,7 @@ msgid "Discovery rule updated."
 msgstr ""
 
 #: include/views/configuration.host.edit.php:337
-#: include/views/configuration.template.edit.php:268
+#: include/views/configuration.template.edit.php:268 popup.php:127
 msgid "Discovery rules"
 msgstr ""
 
@@ -2585,23 +2586,23 @@ msgstr ""
 msgid "Discovery status"
 msgstr "디스커버리 상태"
 
-#: include/locales/en_gb.inc.php:1665
+#: include/locales/en_gb.inc.php:1664
 msgid "Displaying"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1231
+#: include/locales/en_gb.inc.php:1230
 msgid "Distribution of values for multiple items"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1230
+#: include/locales/en_gb.inc.php:1229
 msgid "Distribution of values for multiple periods"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1784
+#: include/locales/en_gb.inc.php:1783
 msgid "Do"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1373
+#: include/locales/en_gb.inc.php:1372
 msgid "Do not calculate"
 msgstr "계산 안함"
 
@@ -2621,7 +2622,7 @@ msgstr "이력 보존 기간(일)"
 msgid "Do not keep trends older than (in days)"
 msgstr "트렌드 보존 기간(일)"
 
-#: include/locales/en_gb.inc.php:2017
+#: include/locales/en_gb.inc.php:2016
 msgid "Do you wish to replace the conditional expression?"
 msgstr ""
 
@@ -2644,7 +2645,7 @@ msgstr ""
 msgid "Download speed for step '%1$s' of scenario '%2$s'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:115 include/locales/en_gb.inc.php:1383
+#: include/locales/en_gb.inc.php:115 include/locales/en_gb.inc.php:1382
 msgid "Downtime"
 msgstr "정지 시간"
 
@@ -2690,49 +2691,49 @@ msgstr ""
 msgid "Duration"
 msgstr "기간"
 
-#: include/locales/en_gb.inc.php:1645
+#: include/locales/en_gb.inc.php:1644
 msgid "Dutch (NL)"
 msgstr "네덜란드어 (NL)"
 
-#: include/locales/en_gb.inc.php:1275
+#: include/locales/en_gb.inc.php:1274
 msgid "Dynamic item"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1770
+#: include/locales/en_gb.inc.php:1769
 msgid "E"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1973
+#: include/locales/en_gb.inc.php:1972
 msgid "ERROR"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1984
+#: include/locales/en_gb.inc.php:1983
 msgid "EVENTS"
 msgstr "이벤트"
 
-#: include/locales/en_gb.inc.php:1051
+#: include/locales/en_gb.inc.php:1050
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
-#: include/forms.inc.php:452 include/locales/en_gb.inc.php:1274
+#: include/forms.inc.php:452 include/locales/en_gb.inc.php:1273
 #: include/views/configuration.action.edit.php:367
 #: include/views/configuration.action.edit.php:373
 msgid "Edit"
 msgstr "편집"
 
-#: include/locales/en_gb.inc.php:2019
+#: include/locales/en_gb.inc.php:2018
 msgid "Edit Service"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:918
+#: include/locales/en_gb.inc.php:917
 msgid "Edit Trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1702
+#: include/locales/en_gb.inc.php:1701
 msgid "Edit connector"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1661
+#: include/locales/en_gb.inc.php:1660
 msgid "Edit hosts"
 msgstr ""
 
@@ -2740,7 +2741,7 @@ msgstr ""
 msgid "Edit maintenance period"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1004
+#: include/locales/en_gb.inc.php:1003
 msgid "Edit map element"
 msgstr ""
 
@@ -2753,11 +2754,11 @@ msgstr "항목"
 msgid "Element name"
 msgstr "구성요소 이름"
 
-#: include/locales/en_gb.inc.php:853
+#: include/locales/en_gb.inc.php:852
 msgid "Email"
 msgstr "전자우편"
 
-#: include/locales/en_gb.inc.php:1670
+#: include/locales/en_gb.inc.php:1669
 msgid "Empty"
 msgstr "닫기"
 
@@ -2784,15 +2785,15 @@ msgstr ""
 msgid "Empty parameters"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1598
+#: include/locales/en_gb.inc.php:1597
 msgid "Empty response received"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1432
+#: include/locales/en_gb.inc.php:1431
 msgid "Enable"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1572
+#: include/locales/en_gb.inc.php:1571
 msgid "Enable DEBUG"
 msgstr ""
 
@@ -2800,7 +2801,7 @@ msgstr ""
 msgid "Enable confirmation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1582
+#: include/locales/en_gb.inc.php:1581
 msgid "Enable debug mode in selected groups?"
 msgstr ""
 
@@ -2836,44 +2837,45 @@ msgstr ""
 msgid "Enable selected discovery rules?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1580
+#: include/locales/en_gb.inc.php:1579
 msgid "Enable selected groups?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:919
+#: include/locales/en_gb.inc.php:918
 msgid "Enable selected items?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1462
+#: include/locales/en_gb.inc.php:1461
 msgid "Enable selected triggers?"
 msgstr ""
 
-#: actionconf.php:469 include/locales/en_gb.inc.php:1430
+#: actionconf.php:469 include/locales/en_gb.inc.php:1429
 #: include/views/configuration.action.edit.php:72
 msgid "Enabled"
 msgstr "활성"
 
-#: include/locales/en_gb.inc.php:1747
+#: include/locales/en_gb.inc.php:1746
 msgid "End of"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1633
+#: include/locales/en_gb.inc.php:1632
 msgid "English (GB)"
 msgstr "영어 (GB)"
 
-#: include/locales/en_gb.inc.php:302 include/locales/en_gb.inc.php:1686
+#: include/locales/en_gb.inc.php:302 include/locales/en_gb.inc.php:1685
+#: popup.php:139
 msgid "Error"
 msgstr "에러"
 
-#: include/locales/en_gb.inc.php:1593
+#: include/locales/en_gb.inc.php:1592
 msgid "Error Description"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1849
+#: include/locales/en_gb.inc.php:1848
 msgid "Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1206
+#: include/locales/en_gb.inc.php:1205
 msgid "Error adding service time"
 msgstr ""
 
@@ -2882,7 +2884,7 @@ msgstr ""
 msgid "Error in item key: %s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:950
+#: include/locales/en_gb.inc.php:949
 msgid "Event"
 msgstr ""
 
@@ -2898,15 +2900,15 @@ msgstr ""
 msgid "Event acknowledges"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1058
+#: include/locales/en_gb.inc.php:1057
 msgid "Event acknowledging disabled"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:951
+#: include/locales/en_gb.inc.php:950
 msgid "Event details"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1452
+#: include/locales/en_gb.inc.php:1451
 msgid "Event generation"
 msgstr ""
 
@@ -2914,7 +2916,7 @@ msgstr ""
 msgid "Event source"
 msgstr "이벤트 소스"
 
-#: include/locales/en_gb.inc.php:1983 include/menu.inc.php:62
+#: include/locales/en_gb.inc.php:1982 include/menu.inc.php:62
 msgid "Events"
 msgstr "이벤트"
 
@@ -2926,11 +2928,11 @@ msgstr ""
 msgid "Every week(s)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1771
+#: include/locales/en_gb.inc.php:1770
 msgid "Exa"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1706
+#: include/locales/en_gb.inc.php:1705
 msgid "Exclude"
 msgstr ""
 
@@ -2939,7 +2941,7 @@ msgstr ""
 msgid "Execute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1896
+#: include/locales/en_gb.inc.php:1895
 msgid "Execute SQL error"
 msgstr ""
 
@@ -2951,7 +2953,7 @@ msgstr ""
 msgid "Execute on"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:912
+#: include/locales/en_gb.inc.php:911
 msgid "Executed script"
 msgstr ""
 
@@ -2996,15 +2998,15 @@ msgstr ""
 msgid "Expression"
 msgstr "조건식"
 
-#: include/locales/en_gb.inc.php:1688
+#: include/locales/en_gb.inc.php:1687
 msgid "Expression Syntax Error"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1714
+#: include/locales/en_gb.inc.php:1713
 msgid "Expression Variable Elements"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1829
+#: include/locales/en_gb.inc.php:1828
 msgid "Expression cannot be empty"
 msgstr ""
 
@@ -3016,15 +3018,15 @@ msgstr ""
 msgid "Expressions"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:848
+#: include/locales/en_gb.inc.php:847
 msgid "External check"
 msgstr "외부 검사"
 
-#: include/locales/en_gb.inc.php:858
+#: include/locales/en_gb.inc.php:857
 msgid "Ez Texting"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2005
+#: include/locales/en_gb.inc.php:2004
 msgid "F"
 msgstr ""
 
@@ -3063,19 +3065,19 @@ msgstr ""
 msgid "Failure Audit"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1107
+#: include/locales/en_gb.inc.php:1106
 msgid "Favourite graphs"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1108
+#: include/locales/en_gb.inc.php:1107
 msgid "Favourite maps"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1109
+#: include/locales/en_gb.inc.php:1108
 msgid "Favourite screens"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1090
+#: include/locales/en_gb.inc.php:1089
 msgid "Favourites"
 msgstr ""
 
@@ -3087,7 +3089,7 @@ msgstr ""
 msgid "February"
 msgstr ""
 
-#: hostprofilesoverview.php:86 include/locales/en_gb.inc.php:1812
+#: hostprofilesoverview.php:86 include/locales/en_gb.inc.php:1811
 msgid "Field"
 msgstr ""
 
@@ -3124,7 +3126,7 @@ msgstr "필터"
 msgid "Filter by host group"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1485
+#: include/locales/en_gb.inc.php:1484
 msgid "Filter by name"
 msgstr ""
 
@@ -3132,7 +3134,7 @@ msgstr ""
 msgid "Finish"
 msgstr "종료"
 
-#: include/locales/en_gb.inc.php:649 include/locales/en_gb.inc.php:2032
+#: include/locales/en_gb.inc.php:649 include/locales/en_gb.inc.php:2031
 msgid "First"
 msgstr ""
 
@@ -3140,15 +3142,15 @@ msgstr ""
 msgid "Fixed"
 msgstr "고정"
 
-#: include/locales/en_gb.inc.php:905
+#: include/locales/en_gb.inc.php:904
 msgid "Flexible intervals (sec)"
 msgstr "유동적인 갱신 간격(초)"
 
-#: include/locales/en_gb.inc.php:1512
+#: include/locales/en_gb.inc.php:1511
 msgid "For guest, password must be empty"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:925
+#: include/locales/en_gb.inc.php:924
 msgid "Formula"
 msgstr ""
 
@@ -3156,7 +3158,7 @@ msgstr ""
 msgid "Fourth"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1634
+#: include/locales/en_gb.inc.php:1633
 msgid "French (FR)"
 msgstr "프랑스어 (FR)"
 
@@ -3164,16 +3166,16 @@ msgstr "프랑스어 (FR)"
 msgid "Fri"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:51 include/locales/en_gb.inc.php:1396
+#: include/locales/en_gb.inc.php:51 include/locales/en_gb.inc.php:1395
 msgid "Friday"
 msgstr "금"
 
-#: include/locales/en_gb.inc.php:1176
+#: include/locales/en_gb.inc.php:1175
 #: include/views/configuration.action.edit.php:429
 msgid "From"
 msgstr "개시"
 
-#: include/locales/en_gb.inc.php:1381
+#: include/locales/en_gb.inc.php:1380
 #: include/views/configuration.host.edit.php:602
 msgid "Full clone"
 msgstr ""
@@ -3186,19 +3188,19 @@ msgstr ""
 msgid "Function"
 msgstr "기능"
 
-#: include/locales/en_gb.inc.php:1847
+#: include/locales/en_gb.inc.php:1846
 msgid "Function '"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1764
+#: include/locales/en_gb.inc.php:1763
 msgid "G"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1935
+#: include/locales/en_gb.inc.php:1934
 msgid "GD PNG Support"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:947
+#: include/locales/en_gb.inc.php:946
 msgid "GRAPH PROTOTYPES OF"
 msgstr ""
 
@@ -3206,7 +3208,7 @@ msgstr ""
 msgid "GRAPHS"
 msgstr "그래프"
 
-#: include/locales/en_gb.inc.php:860
+#: include/locales/en_gb.inc.php:859
 msgid "GSM modem"
 msgstr "GSM 모뎀"
 
@@ -3214,11 +3216,11 @@ msgstr "GSM 모뎀"
 msgid "GUI"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1624
+#: include/locales/en_gb.inc.php:1623
 msgid "GUI Messaging"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1550
+#: include/locales/en_gb.inc.php:1549
 msgid "GUI access"
 msgstr ""
 
@@ -3226,7 +3228,7 @@ msgstr ""
 msgid "GUI access disabled."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1532
+#: include/locales/en_gb.inc.php:1531
 msgid "GUI access updated"
 msgstr ""
 
@@ -3239,15 +3241,15 @@ msgstr "일반"
 msgid "Generated in %s sec"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1635
+#: include/locales/en_gb.inc.php:1634
 msgid "German (DE)"
 msgstr "독일어 (DE)"
 
-#: include/locales/en_gb.inc.php:994
+#: include/locales/en_gb.inc.php:993
 msgid "Get Img: Element data not found!"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1023
+#: include/locales/en_gb.inc.php:1022
 msgid "Get selected elements FAILED."
 msgstr ""
 
@@ -3255,11 +3257,11 @@ msgstr ""
 msgid "Get support"
 msgstr "서포트"
 
-#: include/locales/en_gb.inc.php:1765
+#: include/locales/en_gb.inc.php:1764
 msgid "Giga"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1718
+#: include/locales/en_gb.inc.php:1717
 msgid "Given expression is not a macro"
 msgstr ""
 
@@ -3271,12 +3273,12 @@ msgstr ""
 msgid "Global scripts"
 msgstr ""
 
-#: actionconf.php:497 hosts.php:1016 include/locales/en_gb.inc.php:1663
+#: actionconf.php:497 hosts.php:1016 include/locales/en_gb.inc.php:1662
 #: include/views/administration.script.list.php:108
 msgid "Go"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:984
+#: include/locales/en_gb.inc.php:983
 msgid "Go to"
 msgstr ""
 
@@ -3338,7 +3340,7 @@ msgstr "그래프를 추가하였습니다"
 msgid "Graph deleted"
 msgstr "그래프를 삭제하였습니다"
 
-#: include/locales/en_gb.inc.php:1610
+#: include/locales/en_gb.inc.php:1609
 msgid "Graph element"
 msgstr "그래프 구성요소"
 
@@ -3346,7 +3348,7 @@ msgstr "그래프 구성요소"
 msgid "Graph item"
 msgstr "그래프 아이템"
 
-#: include/locales/en_gb.inc.php:1269
+#: include/locales/en_gb.inc.php:1268
 msgid "Graph name"
 msgstr "그래프 이름"
 
@@ -3394,7 +3396,7 @@ msgstr ""
 
 #: hosts.php:764 hosts.php:848 include/locales/en_gb.inc.php:713
 #: include/menu.inc.php:67 include/views/configuration.host.edit.php:314
-#: include/views/configuration.template.edit.php:247
+#: include/views/configuration.template.edit.php:247 popup.php:93
 msgid "Graphs"
 msgstr "그래프"
 
@@ -3406,7 +3408,7 @@ msgstr ""
 msgid "Graphs deleted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:983
+#: include/locales/en_gb.inc.php:982
 msgid "Grid"
 msgstr ""
 
@@ -3425,11 +3427,11 @@ msgstr ""
 msgid "Group \"%s\" cannot be deleted, because some hosts depend on it."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1516
+#: include/locales/en_gb.inc.php:1515
 msgid "Group added"
 msgstr "그룹을 추가하였습니다"
 
-#: include/locales/en_gb.inc.php:1520
+#: include/locales/en_gb.inc.php:1519
 msgid "Group deleted"
 msgstr "그룹을 삭제하였습니다"
 
@@ -3437,11 +3439,11 @@ msgstr "그룹을 삭제하였습니다"
 msgid "Group for discovered hosts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:760
+#: include/locales/en_gb.inc.php:759
 msgid "Group name"
 msgstr "그룹 이름"
 
-#: include/locales/en_gb.inc.php:1518
+#: include/locales/en_gb.inc.php:1517
 msgid "Group updated"
 msgstr "그룹을 갱신하였습니다"
 
@@ -3449,7 +3451,7 @@ msgstr "그룹을 갱신하였습니다"
 msgid "Grouping by"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:735
+#: include/locales/en_gb.inc.php:734
 #: include/views/configuration.host.edit.php:173
 msgid "Groups"
 msgstr "그룹"
@@ -3466,11 +3468,11 @@ msgstr ""
 msgid "H:i"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1682
+#: include/locales/en_gb.inc.php:1681
 msgid "H:i:s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:954
+#: include/locales/en_gb.inc.php:953
 msgid "HISTORY OF EVENTS"
 msgstr "이벤트 이력"
 
@@ -3487,7 +3489,7 @@ msgid "HOST PROFILES"
 msgstr "호스트 프로파일"
 
 #: hostprofilesoverview.php:81 hostprofiles.php:94 hosts_mon.php:120
-#: hosts.php:722 include/locales/en_gb.inc.php:724
+#: hosts_mon.php:125 hosts.php:722
 msgid "HOSTS"
 msgstr "호스트"
 
@@ -3517,7 +3519,7 @@ msgstr "하드웨어"
 msgid "Hardware (Full details)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1271
+#: include/locales/en_gb.inc.php:1270
 #: include/views/configuration.sysmap.edit.php:50
 msgid "Height"
 msgstr "높이"
@@ -3526,19 +3528,19 @@ msgstr "높이"
 msgid "Help"
 msgstr "도움말"
 
-#: include/locales/en_gb.inc.php:869
+#: include/locales/en_gb.inc.php:868
 msgid "Hexadecimal"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:976
+#: include/locales/en_gb.inc.php:975
 msgid "Hidden"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1558
+#: include/locales/en_gb.inc.php:1557
 msgid "Hide"
 msgstr "감추기"
 
-#: include/locales/en_gb.inc.php:1482
+#: include/locales/en_gb.inc.php:1481
 msgid "Hide all"
 msgstr ""
 
@@ -3546,7 +3548,7 @@ msgstr ""
 msgid "Hide disabled scenarios"
 msgstr "비활성 시나리오 감추기"
 
-#: include/locales/en_gb.inc.php:1447
+#: include/locales/en_gb.inc.php:1446
 msgid "Hide disabled triggers"
 msgstr "비활성 트리거 감추기"
 
@@ -3559,40 +3561,40 @@ msgstr "선택 항목 감추기"
 msgid "High"
 msgstr "중증 장애"
 
-#: include/locales/en_gb.inc.php:832
+#: include/locales/en_gb.inc.php:831
 msgid "History"
 msgstr "이력"
 
-#: include/locales/en_gb.inc.php:1267
+#: include/locales/en_gb.inc.php:1266
 msgid "History and simple graphs"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:814
+#: include/locales/en_gb.inc.php:813
 msgid "History cleared"
 msgstr "이력이 삭제되었습니다"
 
-#: include/locales/en_gb.inc.php:900
+#: include/locales/en_gb.inc.php:899
 msgid "History clearing can take a long time. Continue?"
 msgstr "이력 삭제에 시간이 걸릴 수도 있습니다. 계속하시겠습니까?"
 
-#: include/locales/en_gb.inc.php:1312
+#: include/locales/en_gb.inc.php:1311
 msgid "History of actions"
 msgstr "액션 이력"
 
-#: include/locales/en_gb.inc.php:1313
+#: include/locales/en_gb.inc.php:1312
 msgid "History of events"
 msgstr "이벤트 이력"
 
-#: include/locales/en_gb.inc.php:1322
+#: include/locales/en_gb.inc.php:1321
 msgid "Horizontal"
 msgstr "가로"
 
-#: include/locales/en_gb.inc.php:1324
+#: include/locales/en_gb.inc.php:1323
 msgid "Horizontal align"
 msgstr "가로 위치"
 
 #: hostprofiles.php:159 include/actions.inc.php:42
-#: include/locales/en_gb.inc.php:725 include/locales/en_gb.inc.php:1806
+#: include/locales/en_gb.inc.php:724 include/locales/en_gb.inc.php:1805
 #: include/views/configuration.host.edit.php:58
 #: include/views/configuration.host.edit.php:408
 #: include/views/js/configuration.action.edit.js.php:86
@@ -3643,19 +3645,19 @@ msgstr ""
 msgid "Host deleted"
 msgstr "호스트를 삭제하였습니다"
 
-#: include/locales/en_gb.inc.php:1845
+#: include/locales/en_gb.inc.php:1844
 msgid "Host does not exist."
 msgstr ""
 
-#: include/actions.inc.php:39 include/locales/en_gb.inc.php:761
+#: include/actions.inc.php:39 include/locales/en_gb.inc.php:760
 #: include/views/administration.script.list.php:45
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:168
 msgid "Host group"
 msgstr "호스트 그룹"
 
-#: include/locales/en_gb.inc.php:762 include/menu.inc.php:144
-#: include/views/administration.script.edit.php:89
+#: include/locales/en_gb.inc.php:761 include/menu.inc.php:144
+#: include/views/administration.script.edit.php:89 popup.php:57 popup.php:117
 msgid "Host groups"
 msgstr "호스트 그룹"
 
@@ -3663,7 +3665,7 @@ msgstr "호스트 그룹"
 msgid "Host interface"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1846
+#: include/locales/en_gb.inc.php:1845
 msgid "Host key does not exist."
 msgstr ""
 
@@ -3687,11 +3689,11 @@ msgstr ""
 msgid "Host profile"
 msgstr "호스트 프로파일"
 
-#: include/locales/en_gb.inc.php:1658
+#: include/locales/en_gb.inc.php:1657
 msgid "Host profile overview"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1655
+#: include/locales/en_gb.inc.php:1654
 msgid "Host profiles"
 msgstr "호스트 프로파일"
 
@@ -3699,11 +3701,11 @@ msgstr "호스트 프로파일"
 msgid "Host router"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1337
+#: include/locales/en_gb.inc.php:1336
 msgid "Host screens"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1086
+#: include/locales/en_gb.inc.php:1085
 msgid "Host status"
 msgstr ""
 
@@ -3719,7 +3721,7 @@ msgstr ""
 msgid "Host template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1318
+#: include/locales/en_gb.inc.php:1317
 msgid "Host time"
 msgstr ""
 
@@ -3744,15 +3746,15 @@ msgid "Host with the same visible name \"%s\" already exists."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:709 include/menu.inc.php:52
-#: include/menu.inc.php:104 include/menu.inc.php:152
+#: include/menu.inc.php:104 include/menu.inc.php:152 popup.php:45
 msgid "Hosts"
 msgstr "호스트"
 
-#: include/locales/en_gb.inc.php:1149
+#: include/locales/en_gb.inc.php:1148
 msgid "Hosts (m/n/t)"
 msgstr "호스트 수 (감시/미감시/템플릿)"
 
-#: include/locales/en_gb.inc.php:1675
+#: include/locales/en_gb.inc.php:1674 popup.php:41
 msgid "Hosts and templates"
 msgstr ""
 
@@ -3760,7 +3762,7 @@ msgstr ""
 msgid "Hosts in maintenance"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1306
+#: include/locales/en_gb.inc.php:1305
 msgid "Hosts info"
 msgstr "호스트 정보"
 
@@ -3768,7 +3770,7 @@ msgstr "호스트 정보"
 msgid "Hosts list"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1118
+#: include/locales/en_gb.inc.php:1117
 msgid "Hosts location"
 msgstr ""
 
@@ -3776,15 +3778,15 @@ msgstr ""
 msgid "Hosts updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1184
+#: include/locales/en_gb.inc.php:1183
 msgid "Hour"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1191
+#: include/locales/en_gb.inc.php:1190
 msgid "Hourly"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1185
+#: include/locales/en_gb.inc.php:1184
 msgid "Hours"
 msgstr ""
 
@@ -3792,7 +3794,7 @@ msgstr ""
 msgid "Housekeeper"
 msgstr "데이터 보존 기간"
 
-#: include/locales/en_gb.inc.php:1646
+#: include/locales/en_gb.inc.php:1645
 msgid "Hungarian (HU)"
 msgstr "헝가리어 (HU)"
 
@@ -3817,11 +3819,11 @@ msgstr "이미지"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: include/locales/en_gb.inc.php:728
+#: include/locales/en_gb.inc.php:727 popup.php:441
 msgid "IP"
 msgstr "IP 주소"
 
-#: include/locales/en_gb.inc.php:739 include/maps.inc.php:63
+#: include/locales/en_gb.inc.php:738 include/maps.inc.php:63
 #: include/views/configuration.discovery.edit.php:89
 #: include/views/configuration.host.edit.php:192
 msgid "IP address"
@@ -3847,35 +3849,35 @@ msgstr ""
 msgid "IPMI"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:843
+#: include/locales/en_gb.inc.php:842
 msgid "IPMI agent"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:742
+#: include/locales/en_gb.inc.php:741
 msgid "IPMI authentication algorithm"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:757
+#: include/locales/en_gb.inc.php:756
 msgid "IPMI password"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:750
+#: include/locales/en_gb.inc.php:749
 msgid "IPMI privilege level"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:909
+#: include/locales/en_gb.inc.php:908
 msgid "IPMI sensor"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:756
+#: include/locales/en_gb.inc.php:755
 msgid "IPMI username"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1400
+#: include/locales/en_gb.inc.php:1399
 msgid "IT SERVICES"
 msgstr "IT 서비스"
 
-#: include/locales/en_gb.inc.php:1175
+#: include/locales/en_gb.inc.php:1174
 msgid "IT SERVICES AVAILABILITY REPORT"
 msgstr "IT 서비스 가동 보고서"
 
@@ -3883,19 +3885,19 @@ msgstr "IT 서비스 가동 보고서"
 msgid "IT Services"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1356
+#: include/locales/en_gb.inc.php:1355
 msgid "IT service"
 msgstr "IT 서비스"
 
-#: include/locales/en_gb.inc.php:1357
+#: include/locales/en_gb.inc.php:1356
 msgid "IT services"
 msgstr "IT 서비스"
 
-#: include/locales/en_gb.inc.php:1174
+#: include/locales/en_gb.inc.php:1173
 msgid "IT services availability report"
 msgstr "IT 서비스 가동 보고서"
 
-#: include/locales/en_gb.inc.php:934
+#: include/locales/en_gb.inc.php:933
 msgid "ITEM PROTOTYPES OF"
 msgstr ""
 
@@ -3907,27 +3909,27 @@ msgstr "아이템"
 msgid "Icon"
 msgstr "아이콘"
 
-#: include/locales/en_gb.inc.php:987
+#: include/locales/en_gb.inc.php:986
 msgid "Icon (OK)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1005
+#: include/locales/en_gb.inc.php:1004
 msgid "Icon (default)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:990
+#: include/locales/en_gb.inc.php:989
 msgid "Icon (disabled)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:989
+#: include/locales/en_gb.inc.php:988
 msgid "Icon (maintenance)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:986
+#: include/locales/en_gb.inc.php:985
 msgid "Icon (problem)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:988
+#: include/locales/en_gb.inc.php:987
 msgid "Icon (unknown)"
 msgstr "아이콘(알 수 없음)"
 
@@ -3947,7 +3949,7 @@ msgstr "아이콘 라벨 종류"
 msgid "Idle till"
 msgstr "유휴 한계"
 
-#: include/locales/en_gb.inc.php:1971
+#: include/locales/en_gb.inc.php:1970
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr ""
 
@@ -3967,7 +3969,7 @@ msgstr "이미지를 삭제하였습니다"
 msgid "Image label type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1898
+#: include/locales/en_gb.inc.php:1897
 msgid "Image size must be less than 1MB"
 msgstr ""
 
@@ -3987,7 +3989,7 @@ msgstr ""
 msgid "Import"
 msgstr "가져오기"
 
-#: include/locales/en_gb.inc.php:1013
+#: include/locales/en_gb.inc.php:1012
 msgid "Import Map"
 msgstr ""
 
@@ -3999,7 +4001,7 @@ msgstr ""
 msgid "Import file"
 msgstr "파일 가져오기"
 
-#: include/locales/en_gb.inc.php:1292
+#: include/locales/en_gb.inc.php:1291
 msgid "Import screen"
 msgstr ""
 
@@ -4012,7 +4014,7 @@ msgstr ""
 msgid "Impossible to filter by profile field \"%s\", which does not exist."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1331
+#: include/locales/en_gb.inc.php:1330
 msgid "Impossible to remove last row and column"
 msgstr ""
 
@@ -4037,7 +4039,7 @@ msgstr ""
 msgid "In progress"
 msgstr "진행 중"
 
-#: include/locales/en_gb.inc.php:1705
+#: include/locales/en_gb.inc.php:1704
 msgid "Include"
 msgstr ""
 
@@ -4057,7 +4059,7 @@ msgstr ""
 msgid "Incorrect IP range \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1900
+#: include/locales/en_gb.inc.php:1899
 msgid "Incorrect Image"
 msgstr ""
 
@@ -4167,7 +4169,7 @@ msgstr ""
 msgid "Incorrect action operationid"
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1789
+#: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1788
 msgid "Incorrect arguments passed to function"
 msgstr ""
 
@@ -4190,7 +4192,7 @@ msgstr ""
 msgid "Incorrect characters used for Hostname [ %s ]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1903
+#: include/locales/en_gb.inc.php:1902
 msgid "Incorrect characters used for Node name"
 msgstr ""
 
@@ -4212,7 +4214,7 @@ msgstr "부적절한 조건"
 msgid "Incorrect delay."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1456
+#: include/locales/en_gb.inc.php:1455
 msgid "Incorrect dependency"
 msgstr ""
 
@@ -4241,7 +4243,7 @@ msgstr ""
 msgid "Incorrect fields for trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1842
+#: include/locales/en_gb.inc.php:1841
 msgid "Incorrect function is used"
 msgstr ""
 
@@ -4310,7 +4312,7 @@ msgstr ""
 msgid "Incorrect key: %s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1785
+#: include/locales/en_gb.inc.php:1784
 msgid "Incorrect list of items."
 msgstr ""
 
@@ -4353,7 +4355,7 @@ msgstr ""
 msgid "Incorrect map width value for map \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1905
+#: include/locales/en_gb.inc.php:1904
 msgid "Incorrect node type"
 msgstr ""
 
@@ -4419,11 +4421,11 @@ msgstr ""
 msgid "Incorrect template."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1729 include/locales/en_gb.inc.php:1956
+#: include/locales/en_gb.inc.php:1728 include/locales/en_gb.inc.php:1955
 msgid "Incorrect time period"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1837
+#: include/locales/en_gb.inc.php:1836
 msgid "Incorrect trigger expression"
 msgstr ""
 
@@ -4436,15 +4438,15 @@ msgstr ""
 msgid "Incorrect trigger."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1751
+#: include/locales/en_gb.inc.php:1750
 msgid "Incorrect type of asort_by_key"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1828
+#: include/locales/en_gb.inc.php:1827
 msgid "Incorrect usage of quotes"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1892
+#: include/locales/en_gb.inc.php:1891
 msgid "Incorrect user data in"
 msgstr ""
 
@@ -4473,7 +4475,7 @@ msgstr ""
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1831
+#: include/locales/en_gb.inc.php:1830
 msgid "Incorrect value type"
 msgstr ""
 
@@ -4490,11 +4492,11 @@ msgstr ""
 msgid "Information"
 msgstr "정보"
 
-#: include/locales/en_gb.inc.php:1441
+#: include/locales/en_gb.inc.php:1440
 msgid "Insert"
 msgstr "삽입"
 
-#: include/locales/en_gb.inc.php:1459
+#: include/locales/en_gb.inc.php:1458
 msgid "Insert macro"
 msgstr ""
 
@@ -4510,7 +4512,7 @@ msgstr "설치/갱신"
 msgid "Installer name"
 msgstr ""
 
-#: hosts.php:766 include/locales/en_gb.inc.php:777
+#: hosts.php:766 include/locales/en_gb.inc.php:776
 msgid "Interface"
 msgstr ""
 
@@ -4529,12 +4531,12 @@ msgstr ""
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on host \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:776
+#: include/locales/en_gb.inc.php:775
 #: include/views/configuration.host.edit.php:212
 msgid "Interfaces"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1570
+#: include/locales/en_gb.inc.php:1569
 msgid "Internal"
 msgstr ""
 
@@ -4546,7 +4548,7 @@ msgstr ""
 msgid "Internal error."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:831
+#: include/locales/en_gb.inc.php:830
 msgid "Interval"
 msgstr ""
 
@@ -4579,11 +4581,11 @@ msgstr ""
 msgid "Inventory"
 msgstr "목록"
 
-#: include/locales/en_gb.inc.php:1547
+#: include/locales/en_gb.inc.php:1546
 msgid "Is online?"
 msgstr "로그인 상태"
 
-#: include/locales/en_gb.inc.php:1084
+#: include/locales/en_gb.inc.php:1083
 msgid "Issue"
 msgstr ""
 
@@ -4595,11 +4597,11 @@ msgstr ""
 msgid "It is not possible to search by user password"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1636
+#: include/locales/en_gb.inc.php:1635
 msgid "Italian (IT)"
 msgstr "이탈리아어 (IT)"
 
-#: include/locales/en_gb.inc.php:883
+#: include/locales/en_gb.inc.php:882
 msgid "Item"
 msgstr "아이템"
 
@@ -4647,7 +4649,7 @@ msgstr "아이템을 추가하였습니다"
 msgid "Item count"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:822
+#: include/locales/en_gb.inc.php:821
 msgid "Item deleted"
 msgstr "아이템을 삭제하였습니다"
 
@@ -4655,7 +4657,7 @@ msgstr "아이템을 삭제하였습니다"
 msgid "Item does not exist"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:938
+#: include/locales/en_gb.inc.php:937
 msgid "Item prototype"
 msgstr ""
 
@@ -4722,15 +4724,16 @@ msgstr ""
 
 #: hosts.php:762 hosts.php:844 include/locales/en_gb.inc.php:710
 #: include/views/configuration.host.edit.php:254
-#: include/views/configuration.template.edit.php:204 queue.php:158
+#: include/views/configuration.template.edit.php:204 popup.php:73
+#: queue.php:158
 msgid "Items"
 msgstr "아이템"
 
-#: include/locales/en_gb.inc.php:1144
+#: include/locales/en_gb.inc.php:1143
 msgid "Items (m/d/n)"
 msgstr "아이템 수(감시/미감시/취득불가)"
 
-#: include/locales/en_gb.inc.php:826
+#: include/locales/en_gb.inc.php:825
 msgid "Items activated"
 msgstr "아이템을 활성화하였습니다"
 
@@ -4738,11 +4741,11 @@ msgstr "아이템을 활성화하였습니다"
 msgid "Items copied"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:824
+#: include/locales/en_gb.inc.php:823
 msgid "Items deleted"
 msgstr "아이템을 삭제하였습니다"
 
-#: include/locales/en_gb.inc.php:827
+#: include/locales/en_gb.inc.php:826
 msgid "Items disabled"
 msgstr "아이템을 비활성화하였습니다"
 
@@ -4758,11 +4761,11 @@ msgstr "그래프에 필요한 아이템"
 msgid "Items updated"
 msgstr "아이템을 갱신하였습니다"
 
-#: include/locales/en_gb.inc.php:778
+#: include/locales/en_gb.inc.php:777
 msgid "JMX"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:846
+#: include/locales/en_gb.inc.php:845
 msgid "JMX agent"
 msgstr ""
 
@@ -4783,11 +4786,11 @@ msgstr ""
 msgid "JSON-rpc version is not specified."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:854
+#: include/locales/en_gb.inc.php:853
 msgid "Jabber"
 msgstr "Jabber"
 
-#: include/locales/en_gb.inc.php:855
+#: include/locales/en_gb.inc.php:854
 msgid "Jabber identifier"
 msgstr "JabberID"
 
@@ -4799,7 +4802,7 @@ msgstr ""
 msgid "January"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1643
+#: include/locales/en_gb.inc.php:1642
 msgid "Japanese (JP)"
 msgstr "일본어 (JP)"
 
@@ -4819,20 +4822,21 @@ msgstr ""
 msgid "June"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1760
+#: include/locales/en_gb.inc.php:1759
 msgid "K"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:863
+#: include/locales/en_gb.inc.php:862
 msgid "Keep history (in days)"
 msgstr "이력 보존 기간(일)"
 
-#: include/locales/en_gb.inc.php:864
+#: include/locales/en_gb.inc.php:863
 msgid "Keep trends (in days)"
 msgstr "경향 보존 기간(일)"
 
-#: include/locales/en_gb.inc.php:828
-#: include/views/js/configuration.discovery.js.php:249
+#: include/locales/en_gb.inc.php:827
+#: include/views/js/configuration.discovery.js.php:249 popup.php:1057
+#: popup.php:1065
 msgid "Key"
 msgstr "키"
 
@@ -4844,15 +4848,15 @@ msgstr ""
 msgid "Key does not match <grpmax|grpmin|grpsum|grpavg>[\"group\",\"key\",\"<last|min|max|avg|sum|count>\",\"numeric param\"]."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1707
+#: include/locales/en_gb.inc.php:1706
 msgid "Keyword"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1761
+#: include/locales/en_gb.inc.php:1760
 msgid "Kilo"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1637
+#: include/locales/en_gb.inc.php:1636
 msgid "Korean (KO)"
 msgstr ""
 
@@ -4893,51 +4897,51 @@ msgstr ""
 msgid "LOGS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:962
+#: include/locales/en_gb.inc.php:961
 msgid "LOST"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:982 include/maps.inc.php:62
+#: include/locales/en_gb.inc.php:981 include/maps.inc.php:62
 msgid "Label"
 msgstr "라벨"
 
-#: include/locales/en_gb.inc.php:1063
+#: include/locales/en_gb.inc.php:1062
 msgid "Label location"
 msgstr "라벨 위치"
 
-#: include/locales/en_gb.inc.php:1631
+#: include/locales/en_gb.inc.php:1630
 msgid "Language"
 msgstr "언어"
 
-#: include/locales/en_gb.inc.php:1226 include/locales/en_gb.inc.php:2031
+#: include/locales/en_gb.inc.php:1225 include/locales/en_gb.inc.php:2030
 msgid "Last"
 msgstr "최근"
 
-#: include/locales/en_gb.inc.php:1089
+#: include/locales/en_gb.inc.php:1088
 msgid "Last 20 issues"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1408
+#: include/locales/en_gb.inc.php:1407
 msgid "Last 24 hours"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1410
+#: include/locales/en_gb.inc.php:1409
 msgid "Last 30 days"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1411
+#: include/locales/en_gb.inc.php:1410
 msgid "Last 365 days"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1409
+#: include/locales/en_gb.inc.php:1408
 msgid "Last 7 days"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1487
+#: include/locales/en_gb.inc.php:1486
 msgid "Last change"
 msgstr "최근 갱신"
 
-#: include/locales/en_gb.inc.php:971
+#: include/locales/en_gb.inc.php:970
 msgid "Last check"
 msgstr "최근 검사"
 
@@ -4949,15 +4953,15 @@ msgstr "최근 1시간의 그래프"
 msgid "Last month graph"
 msgstr "최근 1개월의 그래프"
 
-#: include/locales/en_gb.inc.php:1443
+#: include/locales/en_gb.inc.php:1442
 msgid "Last of"
 msgstr "최근"
 
-#: include/locales/en_gb.inc.php:772
+#: include/locales/en_gb.inc.php:771
 msgid "Last seen (age)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:972
+#: include/locales/en_gb.inc.php:971
 msgid "Last value"
 msgstr "최근 값"
 
@@ -4965,15 +4969,15 @@ msgstr "최근 값"
 msgid "Last week graph"
 msgstr "최근 1주일의 그래프"
 
-#: include/locales/en_gb.inc.php:1990 include/menu.inc.php:47
+#: include/locales/en_gb.inc.php:1989 include/menu.inc.php:47
 msgid "Latest data"
 msgstr "최근 데이터"
 
-#: include/locales/en_gb.inc.php:953
+#: include/locales/en_gb.inc.php:952
 msgid "Latest events"
 msgstr "최근 이벤트"
 
-#: include/locales/en_gb.inc.php:1638
+#: include/locales/en_gb.inc.php:1637
 msgid "Latvian (LV)"
 msgstr "라트비아어 (LV)"
 
@@ -4990,15 +4994,15 @@ msgstr ""
 msgid "Line"
 msgstr "선"
 
-#: include/locales/en_gb.inc.php:981
+#: include/locales/en_gb.inc.php:980
 msgid "Link"
 msgstr "연결"
 
-#: include/locales/en_gb.inc.php:740
+#: include/locales/en_gb.inc.php:739
 msgid "Link additional templates"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1014
+#: include/locales/en_gb.inc.php:1013
 msgid "Link indicators"
 msgstr ""
 
@@ -5022,11 +5026,11 @@ msgstr ""
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:991
+#: include/locales/en_gb.inc.php:990
 msgid "Link status indicator"
 msgstr "연결 상태 표시기"
 
-#: include/locales/en_gb.inc.php:1035
+#: include/locales/en_gb.inc.php:1034
 msgid "Link status indicators"
 msgstr ""
 
@@ -5038,7 +5042,7 @@ msgstr "템플릿과의 링크 작성"
 msgid "Link to templates: "
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1376
+#: include/locales/en_gb.inc.php:1375
 msgid "Link to trigger?"
 msgstr "트리거와 연결"
 
@@ -5046,20 +5050,20 @@ msgstr "트리거와 연결"
 msgid "Link with templates"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:786
+#: include/locales/en_gb.inc.php:785
 msgid "Linked templates"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:787
+#: include/locales/en_gb.inc.php:786
 msgid "Linked to"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:980
+#: include/locales/en_gb.inc.php:979
 #: include/views/configuration.sysmap.edit.php:179
 msgid "Links"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:952
+#: include/locales/en_gb.inc.php:951
 msgid "List"
 msgstr ""
 
@@ -5067,7 +5071,7 @@ msgstr ""
 msgid "List is empty"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1095
+#: include/locales/en_gb.inc.php:1094
 msgid "Loading..."
 msgstr ""
 
@@ -5075,7 +5079,7 @@ msgstr ""
 msgid "Local"
 msgstr "로컬"
 
-#: include/locales/en_gb.inc.php:1317
+#: include/locales/en_gb.inc.php:1316
 msgid "Local time"
 msgstr "로컬 시간"
 
@@ -5091,11 +5095,11 @@ msgstr ""
 msgid "Location longitude"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:878
+#: include/locales/en_gb.inc.php:877
 msgid "Log"
 msgstr "로그"
 
-#: include/locales/en_gb.inc.php:893
+#: include/locales/en_gb.inc.php:892
 msgid "Log time format"
 msgstr "로그 시간 형식"
 
@@ -5103,7 +5107,7 @@ msgstr "로그 시간 형식"
 msgid "Logged in as"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1988 include/menu.inc.php:246
+#: include/locales/en_gb.inc.php:1987 include/menu.inc.php:246
 #: include/page_header.php:245
 msgid "Login"
 msgstr "로그인"
@@ -5122,7 +5126,7 @@ msgstr ""
 msgid "Login name or password is incorrect"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1989 include/page_header.php:242
+#: include/locales/en_gb.inc.php:1988 include/page_header.php:242
 msgid "Logout"
 msgstr "로그아웃"
 
@@ -5134,11 +5138,11 @@ msgstr ""
 msgid "Lost"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1762 include/locales/en_gb.inc.php:2001
+#: include/locales/en_gb.inc.php:1761 include/locales/en_gb.inc.php:2000
 msgid "M"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1197 include/locales/en_gb.inc.php:1217
+#: include/locales/en_gb.inc.php:1196 include/locales/en_gb.inc.php:1216
 msgid "M Y"
 msgstr ""
 
@@ -5150,7 +5154,7 @@ msgstr ""
 msgid "MAC address B"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1001
+#: include/locales/en_gb.inc.php:1000
 msgid "MAINTENANCE"
 msgstr ""
 
@@ -5158,27 +5162,27 @@ msgstr ""
 msgid "MAINTENANCE PERIODS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1010
+#: include/locales/en_gb.inc.php:1009
 msgid "MAPS"
 msgstr "맵"
 
-#: include/locales/en_gb.inc.php:745
+#: include/locales/en_gb.inc.php:744
 msgid "MD2"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:746
+#: include/locales/en_gb.inc.php:745
 msgid "MD5"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1068
+#: include/locales/en_gb.inc.php:1067
 msgid "MEDIA TYPES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1748
+#: include/locales/en_gb.inc.php:1747
 msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1223
+#: include/locales/en_gb.inc.php:1222
 msgid "MOST BUSY TRIGGERS TOP 100"
 msgstr "실행 트리거 최상위 100항목"
 
@@ -5245,7 +5249,7 @@ msgstr ""
 msgid "Manual Logout"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1299
+#: include/locales/en_gb.inc.php:1298
 #: include/views/configuration.sysmap.edit.php:181
 msgid "Map"
 msgstr "맵"
@@ -5260,7 +5264,7 @@ msgstr ""
 msgid "Map \"%s\" updated."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1007
+#: include/locales/en_gb.inc.php:1006
 msgid "Map elements"
 msgstr ""
 
@@ -5285,8 +5289,8 @@ msgstr ""
 msgid "Mapping"
 msgstr "매핑"
 
-#: include/locales/en_gb.inc.php:1985 include/menu.inc.php:77
-#: include/menu.inc.php:188
+#: include/locales/en_gb.inc.php:1984 include/menu.inc.php:77
+#: include/menu.inc.php:188 popup.php:101
 msgid "Maps"
 msgstr "맵"
 
@@ -5310,15 +5314,15 @@ msgstr "선택 이외 항목 색 지정"
 msgid "Mark selected"
 msgstr "선택 항목 색 지정"
 
-#: hosts.php:1001 include/locales/en_gb.inc.php:901
+#: hosts.php:1001 include/locales/en_gb.inc.php:900
 msgid "Mass update"
 msgstr "일괄갱신"
 
-#: include/locales/en_gb.inc.php:921
+#: include/locales/en_gb.inc.php:920
 msgid "Mass update selected items?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1464
+#: include/locales/en_gb.inc.php:1463
 msgid "Mass update selected triggers?"
 msgstr ""
 
@@ -5330,7 +5334,7 @@ msgstr "마스터"
 msgid "Master node"
 msgstr "마스터 노드"
 
-#: include/locales/en_gb.inc.php:1904
+#: include/locales/en_gb.inc.php:1903
 msgid "Master node already exists"
 msgstr ""
 
@@ -5342,7 +5346,7 @@ msgstr ""
 msgid "Max count of events per trigger to show"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1093
+#: include/locales/en_gb.inc.php:1092
 msgid "Maximize"
 msgstr ""
 
@@ -5369,11 +5373,11 @@ msgstr[0] ""
 msgid "May"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1069
+#: include/locales/en_gb.inc.php:1068
 msgid "Media"
 msgstr "연락 방법"
 
-#: include/locales/en_gb.inc.php:1609
+#: include/locales/en_gb.inc.php:1608
 msgid "Media type"
 msgstr "연락 방법"
 
@@ -5397,31 +5401,31 @@ msgstr "연락 방법을 갱신할 수 없습니다"
 msgid "Media types"
 msgstr "연락 방법"
 
-#: include/locales/en_gb.inc.php:1963
+#: include/locales/en_gb.inc.php:1962
 msgid "Mediatype already exists:"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1964
+#: include/locales/en_gb.inc.php:1963
 msgid "Mediatypes used by action:"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1763
+#: include/locales/en_gb.inc.php:1762
 msgid "Mega"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1542
+#: include/locales/en_gb.inc.php:1541
 msgid "Members"
 msgstr "구성원"
 
-#: include/locales/en_gb.inc.php:1741
+#: include/locales/en_gb.inc.php:1740
 msgid "Memory limit"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1742
+#: include/locales/en_gb.inc.php:1741
 msgid "Memory usage"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1091
+#: include/locales/en_gb.inc.php:1090
 msgid "Menu"
 msgstr ""
 
@@ -5441,11 +5445,11 @@ msgstr ""
 msgid "Message text limit"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1626
+#: include/locales/en_gb.inc.php:1625
 msgid "Message timeout"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1621
+#: include/locales/en_gb.inc.php:1620
 msgid "Messages"
 msgstr ""
 
@@ -5453,35 +5457,35 @@ msgstr ""
 msgid "Method not found."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1757
+#: include/locales/en_gb.inc.php:1756
 msgid "Micro"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1329
+#: include/locales/en_gb.inc.php:1328
 msgid "Middle"
 msgstr "가운데"
 
-#: include/locales/en_gb.inc.php:1759
+#: include/locales/en_gb.inc.php:1758
 msgid "Milli"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1427
+#: include/locales/en_gb.inc.php:1426
 msgid "Min severity"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1912
+#: include/locales/en_gb.inc.php:1911
 msgid "Minimal version of PHP is"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1094
+#: include/locales/en_gb.inc.php:1093
 msgid "Minimize"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1186
+#: include/locales/en_gb.inc.php:1185
 msgid "Minute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1187
+#: include/locales/en_gb.inc.php:1186
 msgid "Minutes"
 msgstr ""
 
@@ -5489,19 +5493,19 @@ msgstr ""
 msgid "Missing"
 msgstr "존재하지 않는 경우"
 
-#: include/locales/en_gb.inc.php:1867
+#: include/locales/en_gb.inc.php:1866
 msgid "Missing items for graph"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1841
+#: include/locales/en_gb.inc.php:1840
 msgid "Missing key"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1834
+#: include/locales/en_gb.inc.php:1833
 msgid "Missing mandatory parameter for function"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:896
+#: include/locales/en_gb.inc.php:895
 msgid "Mode"
 msgstr "모드"
 
@@ -5513,16 +5517,16 @@ msgstr ""
 msgid "Mon"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:47 include/locales/en_gb.inc.php:1392
+#: include/locales/en_gb.inc.php:47 include/locales/en_gb.inc.php:1391
 msgid "Monday"
 msgstr "월"
 
-#: hosts.php:876 include/locales/en_gb.inc.php:730
+#: hosts.php:876 include/locales/en_gb.inc.php:729
 #: include/views/configuration.host.edit.php:230
 msgid "Monitored"
 msgstr "감시 중"
 
-#: include/locales/en_gb.inc.php:804
+#: include/locales/en_gb.inc.php:803
 #: include/views/configuration.host.edit.php:226
 msgid "Monitored by proxy"
 msgstr ""
@@ -5535,11 +5539,11 @@ msgstr ""
 msgid "Monitoring"
 msgstr "모니터링"
 
-#: include/locales/en_gb.inc.php:1189
+#: include/locales/en_gb.inc.php:1188
 msgid "Month"
 msgstr "월"
 
-#: include/locales/en_gb.inc.php:1194
+#: include/locales/en_gb.inc.php:1193
 msgid "Monthly"
 msgstr "월간"
 
@@ -5547,11 +5551,11 @@ msgstr "월간"
 msgid "More than 10 minutes"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1222
+#: include/locales/en_gb.inc.php:1221
 msgid "Most busy triggers top 100"
 msgstr "실행 트리거 최상위 100항목"
 
-#: include/locales/en_gb.inc.php:1617
+#: include/locales/en_gb.inc.php:1616
 msgid "Move"
 msgstr ""
 
@@ -5559,15 +5563,15 @@ msgstr ""
 msgid "Multibyte String module required to run FrontEnd"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1445
+#: include/locales/en_gb.inc.php:1444
 msgid "Multiple PROBLEM events"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1619
+#: include/locales/en_gb.inc.php:1618
 msgid "Mute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1062
+#: include/locales/en_gb.inc.php:1061
 msgid "NETWORK MAPS"
 msgstr "네트워크 맵"
 
@@ -5588,7 +5592,7 @@ msgstr ""
 msgid "NODES"
 msgstr "노드"
 
-#: include/locales/en_gb.inc.php:1214
+#: include/locales/en_gb.inc.php:1213
 msgid "NOTIFICATIONS"
 msgstr "통지"
 
@@ -5599,40 +5603,40 @@ msgstr ""
 #: actionconf.php:164 actionconf.php:418 discoveryconf.php:246
 #: disc_prototypes.php:376 host_discovery.php:451 hostprofiles.php:161
 #: hosts.php:760 include/forms.inc.php:1014 include/forms.inc.php:1736
-#: include/hosts.inc.php:60 include/locales/en_gb.inc.php:1545
+#: include/hosts.inc.php:60 include/locales/en_gb.inc.php:1544
 #: include/views/administration.script.edit.php:43
 #: include/views/administration.script.list.php:40
 #: include/views/configuration.action.edit.php:47
 #: include/views/configuration.discovery.edit.php:42
 #: include/views/configuration.sysmap.edit.php:48
-#: include/views/configuration.sysmap.edit.php:134 items.php:915
-#: latest.php:209 popup.php:824 popup.php:955 popup.php:1056 popup.php:1064
-#: popup.php:1281 popup.php:1289 popup.php:1438 popup.php:1781 popup.php:1787
-#: queue.php:250 trigger_prototypes.php:45 triggers.php:46
+#: include/views/configuration.sysmap.edit.php:134 items.php:914
+#: latest.php:209 popup.php:441 popup.php:824 popup.php:955 popup.php:1056
+#: popup.php:1064 popup.php:1281 popup.php:1289 popup.php:1438 popup.php:1781
+#: popup.php:1787 queue.php:250 trigger_prototypes.php:45 triggers.php:46
 msgid "Name"
 msgstr "이름"
 
-#: include/locales/en_gb.inc.php:1755
+#: include/locales/en_gb.inc.php:1754
 msgid "Nano"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1019
+#: include/locales/en_gb.inc.php:1018
 msgid "Network map added"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1008
+#: include/locales/en_gb.inc.php:1007
 msgid "Network map deleted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1021
+#: include/locales/en_gb.inc.php:1020
 msgid "Network map updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1061
+#: include/locales/en_gb.inc.php:1060
 msgid "Network maps"
 msgstr "네트워크 맵"
 
-#: include/locales/en_gb.inc.php:1491
+#: include/locales/en_gb.inc.php:1490
 msgid "Never"
 msgstr "Never"
 
@@ -5644,7 +5648,7 @@ msgstr "Never"
 msgid "New"
 msgstr "새로 만들기"
 
-#: include/locales/en_gb.inc.php:908
+#: include/locales/en_gb.inc.php:907
 msgid "New application"
 msgstr ""
 
@@ -5652,11 +5656,11 @@ msgstr ""
 msgid "New condition"
 msgstr "새 조건"
 
-#: include/locales/en_gb.inc.php:1450
+#: include/locales/en_gb.inc.php:1449
 msgid "New dependency"
 msgstr "의존 관계 작성"
 
-#: include/locales/en_gb.inc.php:1030
+#: include/locales/en_gb.inc.php:1029
 msgid "New element"
 msgstr ""
 
@@ -5664,7 +5668,7 @@ msgstr ""
 msgid "New expression"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:904
+#: include/locales/en_gb.inc.php:903
 msgid "New flexible interval"
 msgstr "새로운 유동적인 갱신 간격"
 
@@ -5678,7 +5682,7 @@ msgstr "새 그룹"
 msgid "New host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1701
+#: include/locales/en_gb.inc.php:1700
 msgid "New indicators"
 msgstr ""
 
@@ -5698,7 +5702,7 @@ msgstr ""
 msgid "New mapping"
 msgstr "새 매핑"
 
-#: include/locales/en_gb.inc.php:1073
+#: include/locales/en_gb.inc.php:1072
 msgid "New media"
 msgstr "새 연락 방법"
 
@@ -5714,11 +5718,11 @@ msgstr "새 노드"
 msgid "New regular expression"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1387
+#: include/locales/en_gb.inc.php:1386
 msgid "New service time"
 msgstr "새 서비스 시간"
 
-#: include/locales/en_gb.inc.php:1289
+#: include/locales/en_gb.inc.php:1288
 msgid "New slide"
 msgstr "새 슬라이드"
 
@@ -5726,11 +5730,11 @@ msgstr "새 슬라이드"
 msgid "New template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:782
+#: include/locales/en_gb.inc.php:781
 msgid "New template added"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:207 include/locales/en_gb.inc.php:2034
+#: include/locales/en_gb.inc.php:207 include/locales/en_gb.inc.php:2033
 msgid "Next"
 msgstr "다음"
 
@@ -5738,7 +5742,7 @@ msgstr "다음"
 msgid "Next check"
 msgstr "다음 검사"
 
-#: include/locales/en_gb.inc.php:1152
+#: include/locales/en_gb.inc.php:1151
 msgid "No"
 msgstr "아니오"
 
@@ -5752,11 +5756,11 @@ msgstr ""
 msgid "No \"ymin_type\" field for graph \"%s\""
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1360
+#: include/locales/en_gb.inc.php:1359
 msgid "No IT service defined"
 msgstr "IT 서비스가 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1567
+#: include/locales/en_gb.inc.php:1566
 msgid "No accessible resources"
 msgstr "사용할 수 있는 리소스가 없습니다"
 
@@ -5768,7 +5772,7 @@ msgstr "액션이 정의되어 있지 않습니다"
 msgid "No actions found"
 msgstr "액션을 찾을 수 없습니다"
 
-#: include/locales/en_gb.inc.php:1802
+#: include/locales/en_gb.inc.php:1801
 msgid "No application with"
 msgstr ""
 
@@ -5807,7 +5811,7 @@ msgstr ""
 msgid "No data maintenance"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1449
+#: include/locales/en_gb.inc.php:1448
 msgid "No dependencies defined"
 msgstr "의존 트리거가 없습니다"
 
@@ -5824,15 +5828,15 @@ msgstr ""
 msgid "No discovery rules defined"
 msgstr "디스커버리 규칙이 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1732
+#: include/locales/en_gb.inc.php:1731
 msgid "No elements selected!"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1687
+#: include/locales/en_gb.inc.php:1686
 msgid "No errors found"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:955
+#: include/locales/en_gb.inc.php:954
 msgid "No events found"
 msgstr "이벤트를 찾을 수 없습니다"
 
@@ -5845,7 +5849,7 @@ msgstr ""
 msgid "No execution target specified for action operation command \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:906
+#: include/locales/en_gb.inc.php:905
 msgid "No flexible intervals"
 msgstr "유동적인 갱신 간격이 정의되어 있지 않습니다"
 
@@ -5853,7 +5857,7 @@ msgstr "유동적인 갱신 간격이 정의되어 있지 않습니다"
 msgid "No graph defined"
 msgstr "그래프가 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1866
+#: include/locales/en_gb.inc.php:1865
 msgid "No graph item with"
 msgstr ""
 
@@ -5861,7 +5865,7 @@ msgstr ""
 msgid "No graphs defined"
 msgstr "그래프가 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:737
+#: include/locales/en_gb.inc.php:736
 msgid "No groups defined"
 msgstr "그룹이 정의되어 있지 않습니다"
 
@@ -5897,7 +5901,7 @@ msgstr ""
 msgid "No host groups with groupid \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1800
+#: include/locales/en_gb.inc.php:1799
 msgid "No host with"
 msgstr ""
 
@@ -5947,19 +5951,23 @@ msgstr ""
 msgid "No interfaces provided for proxy \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:813
+#: include/locales/en_gb.inc.php:812
 msgid "No item defined"
 msgstr "아이템이 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1792
+#: popup.php:1052
+msgid "No item prototypes defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1791
 msgid "No item with"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1672
+#: include/locales/en_gb.inc.php:1671
 msgid "No items"
 msgstr "아이템 없음"
 
-#: include/locales/en_gb.inc.php:812
+#: include/locales/en_gb.inc.php:811
 msgid "No items defined"
 msgstr "아이템이 정의되어 있지 않습니다"
 
@@ -5967,7 +5975,7 @@ msgstr "아이템이 정의되어 있지 않습니다"
 msgid "No key id provided."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1028
+#: include/locales/en_gb.inc.php:1027
 msgid "No links"
 msgstr ""
 
@@ -5975,11 +5983,11 @@ msgstr ""
 msgid "No mapping defined"
 msgstr "매핑이 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1011
+#: include/locales/en_gb.inc.php:1010
 msgid "No maps defined"
 msgstr "맵이 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1072
+#: include/locales/en_gb.inc.php:1071
 msgid "No media defined"
 msgstr "연락 방법이 정의되어 있지 않습니다"
 
@@ -6004,11 +6012,11 @@ msgstr "오퍼레이션이 정의되어 있지 않습니다"
 msgid "No permission for trigger \"%s\""
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1997
+#: include/locales/en_gb.inc.php:1996
 msgid "No permissions for map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1996
+#: include/locales/en_gb.inc.php:1995
 msgid "No permissions for screen"
 msgstr ""
 
@@ -6042,19 +6050,19 @@ msgstr ""
 msgid "No recipients for action operation message."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1264
+#: include/locales/en_gb.inc.php:1263
 msgid "No resources defined"
 msgstr "리소스가 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1554
+#: include/locales/en_gb.inc.php:1553
 msgid "No rights defined"
 msgstr "권한이 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1858
+#: include/locales/en_gb.inc.php:1857
 msgid "No rows in screen"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1258
+#: include/locales/en_gb.inc.php:1257
 msgid "No screens defined"
 msgstr "스크린이 정의되어 있지 않습니다"
 
@@ -6066,19 +6074,19 @@ msgstr ""
 msgid "No scripts defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1888
+#: include/locales/en_gb.inc.php:1887
 msgid "No service linkage with"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1887
+#: include/locales/en_gb.inc.php:1886
 msgid "No service with"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1285
+#: include/locales/en_gb.inc.php:1284
 msgid "No slide shows defined"
 msgstr "슬라이드쇼가 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1287
+#: include/locales/en_gb.inc.php:1286
 msgid "No slides defined"
 msgstr "슬라이드가 정의되어 있지 않습니다"
 
@@ -6090,31 +6098,31 @@ msgstr ""
 msgid "No templates defined"
 msgstr "템플릿이 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1385
+#: include/locales/en_gb.inc.php:1384
 msgid "No times defined"
 msgstr "시간이 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1415
+#: include/locales/en_gb.inc.php:1414
 msgid "No trigger"
 msgstr "트리거가 없습니다"
 
-#: include/locales/en_gb.inc.php:1417
+#: include/locales/en_gb.inc.php:1416
 msgid "No trigger defined"
 msgstr "트리거가 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1827
+#: include/locales/en_gb.inc.php:1826
 msgid "No trigger with"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1416
+#: include/locales/en_gb.inc.php:1415
 msgid "No triggers defined"
 msgstr "트리거가 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1543
+#: include/locales/en_gb.inc.php:1542
 msgid "No user groups defined"
 msgstr "사용자 그룹이 정의되어 있지 않습니다"
 
-#: include/locales/en_gb.inc.php:1548
+#: include/locales/en_gb.inc.php:1547
 msgid "No users defined"
 msgstr "사용자가 정의되어 있지 않습니다"
 
@@ -6135,16 +6143,16 @@ msgstr "노드를 삭제하였습니다"
 msgid "Node updated"
 msgstr "노드를 갱신하였습니다"
 
-#: include/locales/en_gb.inc.php:1906
+#: include/locales/en_gb.inc.php:1905
 msgid "Node with same ID already exists"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:453
+#: include/locales/en_gb.inc.php:453 popup.php:122
 msgid "Nodes"
 msgstr "노드"
 
-#: include/forms.inc.php:2141 include/locales/en_gb.inc.php:744
-#: include/locales/en_gb.inc.php:1369
+#: include/forms.inc.php:2141 include/locales/en_gb.inc.php:743
+#: include/locales/en_gb.inc.php:1368
 msgid "None"
 msgstr "없음"
 
@@ -6164,19 +6172,19 @@ msgstr ""
 msgid "Not Ack"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:808
+#: include/locales/en_gb.inc.php:807
 msgid "Not Templated items"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1695
+#: include/locales/en_gb.inc.php:1694
 msgid "Not allowed symbols detected after element"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1696
+#: include/locales/en_gb.inc.php:1695
 msgid "Not allowed symbols detected before element"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1692
+#: include/locales/en_gb.inc.php:1691
 msgid "Not allowed symbols or sequence of symbols in expression element detected"
 msgstr ""
 
@@ -6184,7 +6192,7 @@ msgstr ""
 msgid "Not allowed to set password for user \"guest\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1693
+#: include/locales/en_gb.inc.php:1692
 msgid "Not allowed value detected in element"
 msgstr ""
 
@@ -6192,7 +6200,7 @@ msgstr ""
 msgid "Not authorized"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:766
+#: include/locales/en_gb.inc.php:765
 msgid "Not available"
 msgstr "미감시"
 
@@ -6205,16 +6213,16 @@ msgstr "미분류"
 msgid "Not connected"
 msgstr ""
 
-#: hosts.php:884 include/locales/en_gb.inc.php:731
+#: hosts.php:884 include/locales/en_gb.inc.php:730
 #: include/views/configuration.host.edit.php:231
 msgid "Not monitored"
 msgstr "미감시"
 
-#: include/locales/en_gb.inc.php:852
+#: include/locales/en_gb.inc.php:851
 msgid "Not supported"
 msgstr "취득 불가"
 
-#: include/locales/en_gb.inc.php:1388
+#: include/locales/en_gb.inc.php:1387
 msgid "Note"
 msgstr "설명"
 
@@ -6230,7 +6238,7 @@ msgstr "없음"
 msgid "Nothing to do"
 msgstr "실행할 것이 없습니다"
 
-#: include/locales/en_gb.inc.php:1215
+#: include/locales/en_gb.inc.php:1214
 msgid "Notification report"
 msgstr "통지 보고서"
 
@@ -6246,15 +6254,15 @@ msgstr ""
 msgid "November"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1148
+#: include/locales/en_gb.inc.php:1147
 msgid "Number of hosts (monitored/not monitored/templates)"
 msgstr "호스트 수 (감시/미감시/템플릿)"
 
-#: include/locales/en_gb.inc.php:1143
+#: include/locales/en_gb.inc.php:1142
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "아이템 수(감시/미감시/취득불가)"
 
-#: include/locales/en_gb.inc.php:1224
+#: include/locales/en_gb.inc.php:1223
 msgid "Number of status changes"
 msgstr "상태 변경 횟수"
 
@@ -6262,31 +6270,31 @@ msgstr "상태 변경 횟수"
 msgid "Number of steps"
 msgstr "스텝 수"
 
-#: include/locales/en_gb.inc.php:1140
+#: include/locales/en_gb.inc.php:1139
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
 msgstr "트리거 수(활성/비활성)[장애/알 수 없음/ok]"
 
-#: include/locales/en_gb.inc.php:1146
+#: include/locales/en_gb.inc.php:1145
 msgid "Number of users (online)"
 msgstr "사용자 수 (온라인)"
 
-#: include/locales/en_gb.inc.php:875
+#: include/locales/en_gb.inc.php:874
 msgid "Numeric (float)"
 msgstr "숫자(float)"
 
-#: include/locales/en_gb.inc.php:873
+#: include/locales/en_gb.inc.php:872
 msgid "Numeric (integer 64bit)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:874
+#: include/locales/en_gb.inc.php:873
 msgid "Numeric (unsigned)"
 msgstr "숫자(integer 64bit)"
 
-#: include/locales/en_gb.inc.php:748 include/locales/en_gb.inc.php:755
+#: include/locales/en_gb.inc.php:747 include/locales/en_gb.inc.php:754
 msgid "OEM"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1054
+#: include/locales/en_gb.inc.php:1053
 msgid "OK"
 msgstr "정상"
 
@@ -6324,7 +6332,7 @@ msgstr ""
 msgid "OS (Short)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1117
+#: include/locales/en_gb.inc.php:1116
 msgid "OVERVIEW"
 msgstr "개요"
 
@@ -6332,7 +6340,7 @@ msgstr "개요"
 msgid "Oct"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:868
+#: include/locales/en_gb.inc.php:867
 msgid "Octal"
 msgstr ""
 
@@ -6344,7 +6352,7 @@ msgstr ""
 msgid "Off"
 msgstr "OFF"
 
-#: include/locales/en_gb.inc.php:1178
+#: include/locales/en_gb.inc.php:1177
 msgid "Ok"
 msgstr "OK"
 
@@ -6352,7 +6360,7 @@ msgstr "OK"
 msgid "On"
 msgstr "ON"
 
-#: include/locales/en_gb.inc.php:1616
+#: include/locales/en_gb.inc.php:1615
 msgid "Once"
 msgstr ""
 
@@ -6360,11 +6368,11 @@ msgstr ""
 msgid "One time only"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1384
+#: include/locales/en_gb.inc.php:1383
 msgid "One-time downtime"
 msgstr "일시적인 정지 시간"
 
-#: include/locales/en_gb.inc.php:1965
+#: include/locales/en_gb.inc.php:1964
 msgid "Only Super Admins can create media types"
 msgstr ""
 
@@ -6373,19 +6381,19 @@ msgstr ""
 msgid "Only Super Admins can delete User Groups."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1966
+#: include/locales/en_gb.inc.php:1965
 msgid "Only Super Admins can delete media types"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1949
+#: include/locales/en_gb.inc.php:1948
 msgid "Only Zabbix Admins can add user Medias"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1951
+#: include/locales/en_gb.inc.php:1950
 msgid "Only Zabbix Admins can change user Medias"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1950
+#: include/locales/en_gb.inc.php:1949
 msgid "Only Zabbix Admins can remove user Medias"
 msgstr ""
 
@@ -6393,7 +6401,7 @@ msgstr ""
 msgid "Only characters are allowed"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1145
+#: include/locales/en_gb.inc.php:1144
 msgid "Only items assigned to enabled hosts are counted"
 msgstr ""
 
@@ -6401,7 +6409,7 @@ msgstr ""
 msgid "Only one check can be unique."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1142
+#: include/locales/en_gb.inc.php:1141
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr ""
 
@@ -6410,7 +6418,7 @@ msgstr ""
 msgid "Operation \"%s\" already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1824
+#: include/locales/en_gb.inc.php:1823
 msgid "Operation cannot be performed due to unauthorized request"
 msgstr ""
 
@@ -6438,11 +6446,11 @@ msgstr "오퍼레이션 종류"
 msgid "Operations"
 msgstr "오퍼레이션"
 
-#: include/locales/en_gb.inc.php:753
+#: include/locales/en_gb.inc.php:752
 msgid "Operator"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:903
+#: include/locales/en_gb.inc.php:902
 #: include/views/configuration.host.massupdate.php:61
 #: include/views/configuration.host.massupdate.php:68
 #: include/views/configuration.host.massupdate.php:84
@@ -6467,8 +6475,8 @@ msgstr ""
 msgid "Other parameters"
 msgstr "기타 파라미터"
 
-#: include/locales/en_gb.inc.php:1116 include/menu.inc.php:38
-#: include/menu.inc.php:103 queue.php:48
+#: include/locales/en_gb.inc.php:1115 include/menu.inc.php:38
+#: include/menu.inc.php:103 popup.php:113 queue.php:48
 msgid "Overview"
 msgstr "개요"
 
@@ -6476,59 +6484,59 @@ msgstr "개요"
 msgid "Overview by proxy"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1768
+#: include/locales/en_gb.inc.php:1767
 msgid "P"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1082
+#: include/locales/en_gb.inc.php:1081
 msgid "PERSONAL DASHBOARD"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1943
+#: include/locales/en_gb.inc.php:1942
 msgid "PHP Session"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1932
+#: include/locales/en_gb.inc.php:1931
 msgid "PHP Sockets"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1927
+#: include/locales/en_gb.inc.php:1926
 msgid "PHP databases support"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1945
+#: include/locales/en_gb.inc.php:1944
 msgid "PHP gettext"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1917
+#: include/locales/en_gb.inc.php:1916
 msgid "PHP max execution time"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1918
+#: include/locales/en_gb.inc.php:1917
 msgid "PHP max input time"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1913
+#: include/locales/en_gb.inc.php:1912
 msgid "PHP memory limit"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1915
+#: include/locales/en_gb.inc.php:1914
 msgid "PHP post max size"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1921
+#: include/locales/en_gb.inc.php:1920
 msgid "PHP timezone"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1941
+#: include/locales/en_gb.inc.php:1940
 msgid "PHP upload max filesize"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1911
+#: include/locales/en_gb.inc.php:1910
 msgid "PHP version"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1302
+#: include/locales/en_gb.inc.php:1301
 msgid "PLAIN TEXT"
 msgstr ""
 
@@ -6541,19 +6549,19 @@ msgstr "POP"
 msgid "PORT cannot be empty for host interface"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1055
+#: include/locales/en_gb.inc.php:1054
 msgid "PROBLEM"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:768
+#: include/locales/en_gb.inc.php:767
 msgid "PROXIES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1736
+#: include/locales/en_gb.inc.php:1735
 msgid "Page received incorrect data"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1238
+#: include/locales/en_gb.inc.php:1237
 msgid "Palette"
 msgstr ""
 
@@ -6561,11 +6569,11 @@ msgstr ""
 msgid "Parameter"
 msgstr "파라미터"
 
-#: include/locales/en_gb.inc.php:1366
+#: include/locales/en_gb.inc.php:1365
 msgid "Parent service"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1897
+#: include/locales/en_gb.inc.php:1896
 msgid "Parse SQL error"
 msgstr ""
 
@@ -6577,7 +6585,7 @@ msgstr ""
 msgid "Passive"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1559 include/setup.inc.php:249
+#: include/locales/en_gb.inc.php:1558 include/setup.inc.php:249
 #: include/views/configuration.action.edit.php:666
 #: include/views/configuration.action.edit.php:674
 #: include/views/configuration.host.edit.php:459
@@ -6585,19 +6593,19 @@ msgstr ""
 msgid "Password"
 msgstr "암호"
 
-#: include/locales/en_gb.inc.php:1561
+#: include/locales/en_gb.inc.php:1560
 msgid "Password (once again)"
 msgstr "암호 확인"
 
-#: include/locales/en_gb.inc.php:1962
+#: include/locales/en_gb.inc.php:1961
 msgid "Password required for mediatype"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1511
+#: include/locales/en_gb.inc.php:1510
 msgid "Password should not be empty"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1182
+#: include/locales/en_gb.inc.php:1181
 msgid "Percentage"
 msgstr "퍼센트"
 
@@ -6622,7 +6630,7 @@ msgstr ""
 msgid "Period type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1769
+#: include/locales/en_gb.inc.php:1768
 msgid "Peta"
 msgstr ""
 
@@ -6630,19 +6638,19 @@ msgstr ""
 msgid "Pie"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1301
+#: include/locales/en_gb.inc.php:1300 popup.php:105
 msgid "Plain text"
 msgstr "일반 텍스트"
 
-#: include/locales/en_gb.inc.php:1627
+#: include/locales/en_gb.inc.php:1626
 msgid "Play"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1625
+#: include/locales/en_gb.inc.php:1624
 msgid "Play sound"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1908
+#: include/locales/en_gb.inc.php:1907
 msgid "Please be aware that database still contains data related to the deleted Node"
 msgstr ""
 
@@ -6650,21 +6658,21 @@ msgstr ""
 msgid "Please enter confirmation text."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1026
+#: include/locales/en_gb.inc.php:1025
 msgid "Please select two elements"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1925
+#: include/locales/en_gb.inc.php:1924
 msgid "Please set"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1647
+#: include/locales/en_gb.inc.php:1646
 msgid "Polish (PL)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:729
+#: include/locales/en_gb.inc.php:728
 #: include/views/configuration.action.edit.php:678
-#: include/views/configuration.host.edit.php:192
+#: include/views/configuration.host.edit.php:192 popup.php:441
 msgid "Port"
 msgstr "포트"
 
@@ -6672,11 +6680,11 @@ msgstr "포트"
 msgid "Port range"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1640
+#: include/locales/en_gb.inc.php:1639
 msgid "Portuguese (PT)"
 msgstr "포르투갈어 (PT)"
 
-#: include/locales/en_gb.inc.php:1708
+#: include/locales/en_gb.inc.php:1707
 msgid "Position"
 msgstr ""
 
@@ -6688,8 +6696,8 @@ msgstr "POST"
 msgid "Preview"
 msgstr "미리보기"
 
-#: include/locales/en_gb.inc.php:206 include/locales/en_gb.inc.php:2033
-#: include/locales/en_gb.inc.php:2035
+#: include/locales/en_gb.inc.php:206 include/locales/en_gb.inc.php:2032
+#: include/locales/en_gb.inc.php:2034
 msgid "Previous"
 msgstr "이전"
 
@@ -6725,7 +6733,7 @@ msgstr ""
 msgid "Print"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:915
+#: include/locales/en_gb.inc.php:914
 #: include/views/configuration.action.edit.php:673
 msgid "Private key file"
 msgstr ""
@@ -6738,32 +6746,32 @@ msgstr ""
 msgid "Probably php-ldap module is missing"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1180
+#: include/locales/en_gb.inc.php:1179
 msgid "Problem"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1113
+#: include/locales/en_gb.inc.php:1112
 #: include/views/configuration.sysmap.edit.php:131
 msgid "Problem display"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1622
+#: include/locales/en_gb.inc.php:1621
 msgid "Problem on"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1371
+#: include/locales/en_gb.inc.php:1370
 msgid "Problem, if all children have problems"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1370
+#: include/locales/en_gb.inc.php:1369
 msgid "Problem, if at least one child has a problem"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1181
+#: include/locales/en_gb.inc.php:1180
 msgid "Problems"
 msgstr "장애"
 
-#: include/locales/en_gb.inc.php:1981 include/page_header.php:226
+#: include/locales/en_gb.inc.php:1980 include/page_header.php:226
 msgid "Profile"
 msgstr "프로파일"
 
@@ -6771,19 +6779,23 @@ msgstr "프로파일"
 msgid "Profile mode"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:767
+#: popup.php:77
+msgid "Prototypes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:766 popup.php:49
 msgid "Proxies"
 msgstr ""
 
-#: include/actions.inc.php:60 include/locales/en_gb.inc.php:769 queue.php:221
+#: include/actions.inc.php:60 include/locales/en_gb.inc.php:768 queue.php:221
 msgid "Proxy"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1522
+#: include/locales/en_gb.inc.php:1521
 msgid "Proxy added"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1526
+#: include/locales/en_gb.inc.php:1525
 msgid "Proxy deleted"
 msgstr ""
 
@@ -6791,20 +6803,20 @@ msgstr ""
 msgid "Proxy mode"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:771
+#: include/locales/en_gb.inc.php:770
 msgid "Proxy name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1524
+#: include/locales/en_gb.inc.php:1523
 msgid "Proxy updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:916
+#: include/locales/en_gb.inc.php:915
 #: include/views/configuration.action.edit.php:667
 msgid "Public key"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:914
+#: include/locales/en_gb.inc.php:913
 #: include/views/configuration.action.edit.php:672
 msgid "Public key file"
 msgstr ""
@@ -6813,15 +6825,15 @@ msgstr ""
 msgid "QUEUE OF ITEMS TO BE UPDATED"
 msgstr "갱신 아이템 큐"
 
-#: include/locales/en_gb.inc.php:1982 include/menu.inc.php:234
+#: include/locales/en_gb.inc.php:1981 include/menu.inc.php:234
 msgid "Queue"
 msgstr "큐"
 
-#: include/locales/en_gb.inc.php:1133
+#: include/locales/en_gb.inc.php:1132
 msgid "REPORT"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:749
+#: include/locales/en_gb.inc.php:748
 msgid "RMCP+"
 msgstr ""
 
@@ -6830,15 +6842,15 @@ msgstr ""
 msgid "Read"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1555
+#: include/locales/en_gb.inc.php:1554
 msgid "Read only"
 msgstr "읽기 전용"
 
-#: include/locales/en_gb.inc.php:1556
+#: include/locales/en_gb.inc.php:1555
 msgid "Read-write"
 msgstr "쓰기 가능"
 
-#: include/locales/en_gb.inc.php:1403
+#: include/locales/en_gb.inc.php:1402
 msgid "Reason"
 msgstr "이유"
 
@@ -6854,7 +6866,7 @@ msgstr ""
 msgid "Recipient(s)"
 msgstr "수신처"
 
-#: include/locales/en_gb.inc.php:1623
+#: include/locales/en_gb.inc.php:1622
 msgid "Recovery"
 msgstr ""
 
@@ -6867,7 +6879,7 @@ msgstr ""
 msgid "Recovery subject"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1564
+#: include/locales/en_gb.inc.php:1563
 msgid "Refresh (in seconds)"
 msgstr "새로 고침(초)"
 
@@ -6888,7 +6900,7 @@ msgstr "취득불가 아이템 갱신 간격(초)"
 msgid "Refreshed every: %s sec "
 msgstr ""
 
-#: include/locales/en_gb.inc.php:930
+#: include/locales/en_gb.inc.php:929
 msgid "Regexp"
 msgstr ""
 
@@ -6920,7 +6932,7 @@ msgstr ""
 msgid "Remote command"
 msgstr "원격 명령"
 
-#: include/locales/en_gb.inc.php:1389
+#: include/locales/en_gb.inc.php:1388
 #: include/views/configuration.sysmap.edit.php:146
 #: include/views/configuration.sysmap.edit.php:164
 #: include/views/js/configuration.action.edit.js.php:9
@@ -6933,11 +6945,11 @@ msgstr "원격 명령"
 msgid "Remove"
 msgstr "삭제"
 
-#: include/locales/en_gb.inc.php:1037
+#: include/locales/en_gb.inc.php:1036
 msgid "Remove element"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1569
+#: include/locales/en_gb.inc.php:1568
 msgid "Remove from"
 msgstr ""
 
@@ -6957,7 +6969,7 @@ msgstr ""
 msgid "Remove host"
 msgstr "호스트 삭제"
 
-#: include/locales/en_gb.inc.php:1039
+#: include/locales/en_gb.inc.php:1038
 msgid "Remove link"
 msgstr ""
 
@@ -6967,19 +6979,19 @@ msgstr ""
 msgid "Remove selected"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1460
+#: include/locales/en_gb.inc.php:1459
 msgid "Replace"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:741
+#: include/locales/en_gb.inc.php:740
 msgid "Replace linked templates"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1986
+#: include/locales/en_gb.inc.php:1985
 msgid "Report"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1987 include/menu.inc.php:108
+#: include/locales/en_gb.inc.php:1986 include/menu.inc.php:108
 msgid "Reports"
 msgstr "보고서"
 
@@ -6987,15 +6999,15 @@ msgstr "보고서"
 msgid "Required"
 msgstr "요구 문자열"
 
-#: include/locales/en_gb.inc.php:1944
+#: include/locales/en_gb.inc.php:1943
 msgid "Required Session module"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1933
+#: include/locales/en_gb.inc.php:1932
 msgid "Required Sockets module"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1946
+#: include/locales/en_gb.inc.php:1945
 msgid "Required gettext module"
 msgstr ""
 
@@ -7007,31 +7019,31 @@ msgstr ""
 msgid "Required performance (vps)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1150
+#: include/locales/en_gb.inc.php:1149
 msgid "Required server performance, new values per second"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1928
+#: include/locales/en_gb.inc.php:1927
 msgid "Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1929
+#: include/locales/en_gb.inc.php:1928
 msgid "Requires bcmath module"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1940
+#: include/locales/en_gb.inc.php:1939
 msgid "Requires ctype module"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1936
+#: include/locales/en_gb.inc.php:1935
 msgid "Requires images generation support"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1931
+#: include/locales/en_gb.inc.php:1930
 msgid "Requires mb string module"
 msgstr ""
 
-#: hosts.php:734 include/locales/en_gb.inc.php:1092
+#: hosts.php:734 include/locales/en_gb.inc.php:1091
 msgid "Reset"
 msgstr ""
 
@@ -7048,11 +7060,11 @@ msgstr ""
 msgid "Reset defaults"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1179
+#: include/locales/en_gb.inc.php:1178
 msgid "Resolved"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1262
+#: include/locales/en_gb.inc.php:1261
 msgid "Resource"
 msgstr "리소스"
 
@@ -7074,7 +7086,7 @@ msgstr "응답 시간"
 msgid "Response time for step '%1$s' of scenario '%2$s'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1589
+#: include/locales/en_gb.inc.php:1588
 msgid "Result"
 msgstr ""
 
@@ -7086,7 +7098,7 @@ msgstr ""
 msgid "Result is TRUE"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1719
+#: include/locales/en_gb.inc.php:1718
 msgid "Result type"
 msgstr ""
 
@@ -7102,28 +7114,28 @@ msgstr "재실행"
 msgid "Return"
 msgstr "뒤로"
 
-#: include/locales/en_gb.inc.php:1326
+#: include/locales/en_gb.inc.php:1325
 #: include/views/configuration.sysmap.edit.php:117
 msgid "Right"
 msgstr "오른쪽"
 
-#: include/locales/en_gb.inc.php:1549
+#: include/locales/en_gb.inc.php:1548
 msgid "Rights"
 msgstr "권한"
 
-#: include/locales/en_gb.inc.php:1304
+#: include/locales/en_gb.inc.php:1303
 msgid "Row span"
 msgstr "행 합치기"
 
-#: include/locales/en_gb.inc.php:1257
+#: include/locales/en_gb.inc.php:1256
 msgid "Rows"
 msgstr "행"
 
-#: include/locales/en_gb.inc.php:1571
+#: include/locales/en_gb.inc.php:1570
 msgid "Rows per page"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:926
+#: include/locales/en_gb.inc.php:925
 msgid "Rule"
 msgstr ""
 
@@ -7171,11 +7183,11 @@ msgstr ""
 msgid "Run remote commands on hosts: "
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1639
+#: include/locales/en_gb.inc.php:1638
 msgid "Russian (RU)"
 msgstr "러시아어 (RU)"
 
-#: include/locales/en_gb.inc.php:2006 include/locales/en_gb.inc.php:2007
+#: include/locales/en_gb.inc.php:2005 include/locales/en_gb.inc.php:2006
 msgid "S"
 msgstr ""
 
@@ -7183,11 +7195,11 @@ msgstr ""
 msgid "SCENARIOS"
 msgstr "시나리오"
 
-#: include/locales/en_gb.inc.php:1336 screens.php:172 screens.php:212
+#: include/locales/en_gb.inc.php:1335 screens.php:172 screens.php:212
 msgid "SCREENS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1592
+#: include/locales/en_gb.inc.php:1591
 msgid "SCRIPT ERROR"
 msgstr ""
 
@@ -7195,7 +7207,7 @@ msgstr ""
 msgid "SCRIPTS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1662
+#: include/locales/en_gb.inc.php:1661
 msgid "SEARCH"
 msgstr ""
 
@@ -7203,19 +7215,19 @@ msgstr ""
 msgid "SERVER"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1268
+#: include/locales/en_gb.inc.php:1267
 msgid "SIMPLE GRAPH"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1183
+#: include/locales/en_gb.inc.php:1182
 msgid "SLA"
 msgstr "SLA"
 
-#: include/locales/en_gb.inc.php:1284
+#: include/locales/en_gb.inc.php:1283
 msgid "SLIDE SHOWS"
 msgstr "슬라이드쇼"
 
-#: include/locales/en_gb.inc.php:856
+#: include/locales/en_gb.inc.php:855
 msgid "SMS"
 msgstr "SMS"
 
@@ -7236,7 +7248,7 @@ msgstr "SMTP helo"
 msgid "SMTP server"
 msgstr "SMTP 서버"
 
-#: include/locales/en_gb.inc.php:775
+#: include/locales/en_gb.inc.php:774
 msgid "SNMP"
 msgstr ""
 
@@ -7248,21 +7260,21 @@ msgstr ""
 msgid "SNMP Key"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:885
+#: include/locales/en_gb.inc.php:884
 #: include/views/js/configuration.discovery.js.php:249
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
-#: include/locales/en_gb.inc.php:884
+#: include/locales/en_gb.inc.php:883
 msgid "SNMP community"
 msgstr "SNMP community"
 
-#: include/locales/en_gb.inc.php:836
+#: include/locales/en_gb.inc.php:835
 #: include/views/js/configuration.discovery.js.php:140
 msgid "SNMPv1 agent"
 msgstr "SNMPv1 에이전트"
 
-#: include/locales/en_gb.inc.php:839
+#: include/locales/en_gb.inc.php:838
 #: include/views/js/configuration.discovery.js.php:141
 msgid "SNMPv2 agent"
 msgstr "SNMPv2 에이전트"
@@ -7275,38 +7287,38 @@ msgstr ""
 msgid "SNMPv3 Security name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:840
+#: include/locales/en_gb.inc.php:839
 #: include/views/js/configuration.discovery.js.php:142
 msgid "SNMPv3 agent"
 msgstr "SNMPv3 에이전트"
 
-#: include/locales/en_gb.inc.php:889
+#: include/locales/en_gb.inc.php:888
 #: include/views/js/configuration.discovery.js.php:63
 msgid "SNMPv3 auth passphrase"
 msgstr "SNMPv3 auth passphrase"
 
-#: include/locales/en_gb.inc.php:890
+#: include/locales/en_gb.inc.php:889
 #: include/views/js/configuration.discovery.js.php:68
 msgid "SNMPv3 priv passphrase"
 msgstr "SNMPv3 priv passphrase"
 
-#: include/locales/en_gb.inc.php:888
+#: include/locales/en_gb.inc.php:887
 msgid "SNMPv3 security level"
 msgstr "SNMPv3 security level"
 
-#: include/locales/en_gb.inc.php:887
+#: include/locales/en_gb.inc.php:886
 msgid "SNMPv3 security name"
 msgstr "SNMPv3 security name"
 
-#: include/locales/en_gb.inc.php:1744
+#: include/locales/en_gb.inc.php:1743
 msgid "SQL executes count"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1745
+#: include/locales/en_gb.inc.php:1744
 msgid "SQL requests count"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1743
+#: include/locales/en_gb.inc.php:1742
 msgid "SQL selects count"
 msgstr ""
 
@@ -7321,11 +7333,11 @@ msgstr ""
 msgid "SSH"
 msgstr "SSH"
 
-#: include/locales/en_gb.inc.php:844
+#: include/locales/en_gb.inc.php:843
 msgid "SSH agent"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1671
+#: include/locales/en_gb.inc.php:1670
 msgid "STANDARD ITEMS"
 msgstr "표준 아이템"
 
@@ -7333,7 +7345,7 @@ msgstr "표준 아이템"
 msgid "STATUS OF DISCOVERY"
 msgstr "디스커버리 상태"
 
-#: include/locales/en_gb.inc.php:1479
+#: include/locales/en_gb.inc.php:1478
 msgid "STATUS OF TRIGGERS"
 msgstr "트리거 상태"
 
@@ -7341,7 +7353,7 @@ msgstr "트리거 상태"
 msgid "STATUS OF WEB MONITORING"
 msgstr "웹 감시 상태"
 
-#: include/locales/en_gb.inc.php:1135
+#: include/locales/en_gb.inc.php:1134
 msgid "STATUS OF ZABBIX"
 msgstr "ZABBIX 서버 상태"
 
@@ -7349,11 +7361,11 @@ msgstr "ZABBIX 서버 상태"
 msgid "Sat"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:52 include/locales/en_gb.inc.php:1397
+#: include/locales/en_gb.inc.php:52 include/locales/en_gb.inc.php:1396
 msgid "Saturday"
 msgstr "토"
 
-#: include/locales/en_gb.inc.php:1075
+#: include/locales/en_gb.inc.php:1074
 #: include/views/administration.general.triggerSeverity.edit.php:90
 #: include/views/administration.script.edit.php:116
 #: include/views/configuration.action.edit.php:926
@@ -7363,7 +7375,7 @@ msgstr "토"
 msgid "Save"
 msgstr "저장"
 
-#: include/locales/en_gb.inc.php:1236
+#: include/locales/en_gb.inc.php:1235
 msgid "Scale"
 msgstr ""
 
@@ -7422,46 +7434,46 @@ msgstr "시나리오"
 msgid "Schedule"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1247
+#: include/locales/en_gb.inc.php:1246
 msgid "Screen"
 msgstr "스크린"
 
-#: include/locales/en_gb.inc.php:1250
+#: include/locales/en_gb.inc.php:1249
 msgid "Screen added"
 msgstr "스크린을 추가하였습니다"
 
-#: include/locales/en_gb.inc.php:1261
+#: include/locales/en_gb.inc.php:1260
 msgid "Screen cell configuration"
 msgstr "스크린 셀 설정"
 
-#: include/locales/en_gb.inc.php:1254
+#: include/locales/en_gb.inc.php:1253
 msgid "Screen deleted"
 msgstr "스크린을 삭제하였습니다"
 
-#: include/locales/en_gb.inc.php:1332
+#: include/locales/en_gb.inc.php:1331
 msgid "Screen should contain at least one row and column"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1252
+#: include/locales/en_gb.inc.php:1251
 msgid "Screen updated"
 msgstr "스크린을 갱신하였습니다"
 
-#: include/locales/en_gb.inc.php:1348
+#: include/locales/en_gb.inc.php:1347
 #, php-format
 msgid "Screen with id \"%d\" does not exist"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1347
+#: include/locales/en_gb.inc.php:1346
 #, php-format
 msgid "Screen with name \"%s\" does not exist"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1246 include/menu.inc.php:72
-#: include/menu.inc.php:181
+#: include/locales/en_gb.inc.php:1245 include/menu.inc.php:72
+#: include/menu.inc.php:181 popup.php:85 popup.php:109
 msgid "Screens"
 msgstr "스크린"
 
-#: include/locales/en_gb.inc.php:857
+#: include/locales/en_gb.inc.php:856
 #: include/views/administration.script.edit.php:48
 #: include/views/administration.script.edit.php:112
 #: include/views/administration.script.list.php:63 scripts.php:139
@@ -7495,13 +7507,13 @@ msgstr ""
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr ""
 
-#: include/blocks.inc.php:892 include/locales/en_gb.inc.php:1587
+#: include/blocks.inc.php:892 include/locales/en_gb.inc.php:1586
 #: include/maps.inc.php:147 include/menu.inc.php:227 report5.php:137
 #: tr_status.php:554
 msgid "Scripts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:902 include/views/general.search.php:36
+#: include/locales/en_gb.inc.php:901 include/views/general.search.php:36
 #: include/views/js/general.search.js.php:4
 msgid "Search"
 msgstr "찾기"
@@ -7510,7 +7522,7 @@ msgstr "찾기"
 msgid "Search attribute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1666
+#: include/locales/en_gb.inc.php:1665
 msgid "Search pattern is empty"
 msgstr ""
 
@@ -7550,11 +7562,11 @@ msgstr ""
 msgid "Secondary POC screen name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1442
+#: include/locales/en_gb.inc.php:1441
 msgid "Seconds"
 msgstr "초"
 
-#: include/locales/en_gb.inc.php:1498 include/page_header.php:328
+#: include/locales/en_gb.inc.php:1497 include/page_header.php:328
 #: include/views/configuration.action.edit.php:173
 #: include/views/configuration.action.edit.php:183
 #: include/views/configuration.action.edit.php:193
@@ -7564,7 +7576,8 @@ msgstr "초"
 #: include/views/configuration.action.edit.php:255
 #: include/views/configuration.action.edit.php:265
 #: include/views/configuration.action.edit.php:649
-#: include/views/js/configuration.action.edit.js.php:94 popup.php:1850
+#: include/views/js/configuration.action.edit.js.php:94 popup.php:1116
+#: popup.php:1850
 msgid "Select"
 msgstr "선택"
 
@@ -7572,11 +7585,11 @@ msgstr "선택"
 msgid "Select Nodes"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1899
+#: include/locales/en_gb.inc.php:1898
 msgid "Select image to download"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:936
+#: include/locales/en_gb.inc.php:935
 msgid "Select prototype"
 msgstr ""
 
@@ -7584,7 +7597,7 @@ msgstr ""
 msgid "Select rows with value like"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1103
+#: include/locales/en_gb.inc.php:1102
 msgid "Selected"
 msgstr ""
 
@@ -7592,11 +7605,11 @@ msgstr ""
 msgid "Selected actions deleted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1235
+#: include/locales/en_gb.inc.php:1234
 msgid "Selected groups"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1234
+#: include/locales/en_gb.inc.php:1233
 msgid "Selected hosts"
 msgstr ""
 
@@ -7616,7 +7629,7 @@ msgstr ""
 msgid "Send only to"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1070
+#: include/locales/en_gb.inc.php:1069
 msgid "Send to"
 msgstr "수신처"
 
@@ -7632,7 +7645,7 @@ msgstr ""
 msgid "Sep"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1112
+#: include/locales/en_gb.inc.php:1111
 #: include/views/configuration.sysmap.edit.php:124
 msgid "Separated"
 msgstr ""
@@ -7654,27 +7667,27 @@ msgstr ""
 msgid "Server"
 msgstr "서버"
 
-#: include/locales/en_gb.inc.php:1308
+#: include/locales/en_gb.inc.php:1307
 msgid "Server info"
 msgstr "서버 정보"
 
-#: include/locales/en_gb.inc.php:1316
+#: include/locales/en_gb.inc.php:1315
 msgid "Server time"
 msgstr "서버 시간"
 
-#: include/actions.inc.php:71 include/locales/en_gb.inc.php:1401
+#: include/actions.inc.php:71 include/locales/en_gb.inc.php:1400
 msgid "Service"
 msgstr "서비스"
 
-#: include/locales/en_gb.inc.php:1362
+#: include/locales/en_gb.inc.php:1361
 msgid "Service added"
 msgstr "서비스를 추가하였습니다"
 
-#: include/locales/en_gb.inc.php:1884
+#: include/locales/en_gb.inc.php:1883
 msgid "Service cannot be parent and child at the same time."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1364
+#: include/locales/en_gb.inc.php:1363
 msgid "Service deleted"
 msgstr "서비스를 삭제하였습니다"
 
@@ -7682,7 +7695,7 @@ msgstr "서비스를 삭제하였습니다"
 msgid "Service port"
 msgstr "서비스 포트"
 
-#: include/locales/en_gb.inc.php:1386
+#: include/locales/en_gb.inc.php:1385
 msgid "Service times"
 msgstr "서비스 시간"
 
@@ -7690,11 +7703,11 @@ msgstr "서비스 시간"
 msgid "Service type"
 msgstr "서비스 종류"
 
-#: include/locales/en_gb.inc.php:1359
+#: include/locales/en_gb.inc.php:1358
 msgid "Service updated"
 msgstr "서비스를 갱신하였습니다"
 
-#: include/locales/en_gb.inc.php:1402
+#: include/locales/en_gb.inc.php:1401
 msgid "Services"
 msgstr "서비스"
 
@@ -7702,11 +7715,11 @@ msgstr "서비스"
 msgid "Session terminated, re-login, please."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1031
+#: include/locales/en_gb.inc.php:1030
 msgid "Set trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1426
+#: include/locales/en_gb.inc.php:1425
 msgid "Severity"
 msgstr "심각도"
 
@@ -7718,7 +7731,7 @@ msgstr ""
 msgid "Severity name cannot be empty."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1159
+#: include/locales/en_gb.inc.php:1158
 msgid "Show"
 msgstr "표시"
 
@@ -7726,7 +7739,7 @@ msgstr "표시"
 msgid "Show all"
 msgstr "모두 보이기"
 
-#: include/locales/en_gb.inc.php:1484
+#: include/locales/en_gb.inc.php:1483
 msgid "Show details"
 msgstr "상세 보이기"
 
@@ -7734,7 +7747,7 @@ msgstr "상세 보이기"
 msgid "Show disabled scenarios"
 msgstr "비활성 시나리오 보이기"
 
-#: include/locales/en_gb.inc.php:1446
+#: include/locales/en_gb.inc.php:1445
 msgid "Show disabled triggers"
 msgstr "비활성 트리거 보이기"
 
@@ -7746,11 +7759,11 @@ msgstr ""
 msgid "Show events not older"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1120
+#: include/locales/en_gb.inc.php:1119
 msgid "Show graph of item"
 msgstr "아이템의 그래프 표시"
 
-#: include/locales/en_gb.inc.php:1104
+#: include/locales/en_gb.inc.php:1103
 msgid "Show hosts in maintenance"
 msgstr ""
 
@@ -7762,7 +7775,7 @@ msgstr ""
 msgid "Show legend"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1305
+#: include/locales/en_gb.inc.php:1304
 msgid "Show lines"
 msgstr "표시할 행 수"
 
@@ -7770,7 +7783,7 @@ msgstr "표시할 행 수"
 msgid "Show selected"
 msgstr "선택 항목 보이기"
 
-#: include/locales/en_gb.inc.php:1290
+#: include/locales/en_gb.inc.php:1289
 msgid "Show text as HTML"
 msgstr ""
 
@@ -7778,7 +7791,7 @@ msgstr ""
 msgid "Show triggers"
 msgstr "트리거 표시"
 
-#: include/locales/en_gb.inc.php:1483
+#: include/locales/en_gb.inc.php:1482
 msgid "Show unacknowledged"
 msgstr ""
 
@@ -7786,11 +7799,11 @@ msgstr ""
 msgid "Show unknown events"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:872
+#: include/locales/en_gb.inc.php:871
 msgid "Show value"
 msgstr "값 매핑 사용"
 
-#: include/locales/en_gb.inc.php:1121
+#: include/locales/en_gb.inc.php:1120
 msgid "Show values of item"
 msgstr "아이템의 값 표시"
 
@@ -7798,7 +7811,7 @@ msgstr "아이템의 값 표시"
 msgid "Show working time"
 msgstr "Woring time 표시"
 
-#: include/locales/en_gb.inc.php:977
+#: include/locales/en_gb.inc.php:976
 msgid "Shown"
 msgstr ""
 
@@ -7810,7 +7823,7 @@ msgstr ""
 msgid "Simple"
 msgstr "표준"
 
-#: include/locales/en_gb.inc.php:838
+#: include/locales/en_gb.inc.php:837
 msgid "Simple check"
 msgstr "간단 검사"
 
@@ -7818,11 +7831,11 @@ msgstr "간단 검사"
 msgid "Simple check key cannot have parameters in []."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1265
+#: include/locales/en_gb.inc.php:1264 popup.php:97
 msgid "Simple graph"
 msgstr "단순 그래프"
 
-#: include/locales/en_gb.inc.php:1266
+#: include/locales/en_gb.inc.php:1265
 msgid "Simple graphs"
 msgstr ""
 
@@ -7862,35 +7875,35 @@ msgstr ""
 msgid "Site state / province"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1869
+#: include/locales/en_gb.inc.php:1868
 msgid "Skipped copying of graph"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1281
+#: include/locales/en_gb.inc.php:1280
 msgid "Slide show"
 msgstr "슬라이드쇼"
 
-#: include/locales/en_gb.inc.php:1280
+#: include/locales/en_gb.inc.php:1279 popup.php:89
 msgid "Slide shows"
 msgstr "슬라이드쇼"
 
-#: include/locales/en_gb.inc.php:1288 include/menu.inc.php:185
+#: include/locales/en_gb.inc.php:1287 include/menu.inc.php:185
 msgid "Slides"
 msgstr "슬라이드"
 
-#: include/locales/en_gb.inc.php:1341
+#: include/locales/en_gb.inc.php:1340
 msgid "Slideshow added"
 msgstr "슬라이드쇼를 추가하였습니다"
 
-#: include/locales/en_gb.inc.php:1343
+#: include/locales/en_gb.inc.php:1342
 msgid "Slideshow deleted"
 msgstr "슬라이드쇼를 삭제하였습니다"
 
-#: include/locales/en_gb.inc.php:1279
+#: include/locales/en_gb.inc.php:1278
 msgid "Slideshow must contain slides"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1339
+#: include/locales/en_gb.inc.php:1338
 msgid "Slideshow updated"
 msgstr "슬라이드쇼를 갱신하였습니다"
 
@@ -7898,11 +7911,11 @@ msgstr "슬라이드쇼를 갱신하였습니다"
 msgid "Slovak (SK)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1620
+#: include/locales/en_gb.inc.php:1619
 msgid "Snooze"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1372
+#: include/locales/en_gb.inc.php:1371
 msgid "Soft"
 msgstr "Soft"
 
@@ -7946,7 +7959,7 @@ msgstr ""
 msgid "Sort order (0->100)"
 msgstr "정렬 순서(0->100)"
 
-#: include/locales/en_gb.inc.php:1377
+#: include/locales/en_gb.inc.php:1376
 msgid "Sort order (0->999)"
 msgstr "정렬 순서(0->999)"
 
@@ -7954,7 +7967,7 @@ msgstr "정렬 순서(0->999)"
 msgid "Source"
 msgstr "소스"
 
-#: include/locales/en_gb.inc.php:1641
+#: include/locales/en_gb.inc.php:1640
 msgid "Spanish (ES)"
 msgstr "스페인어 (ES)"
 
@@ -7970,26 +7983,31 @@ msgstr "속도"
 msgid "Stacked"
 msgstr "누적 그래프"
 
+#: popup.php:81
+msgid "Standard items"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:143
 msgid "State"
 msgstr "상태"
 
-#: include/locales/en_gb.inc.php:1739
+#: include/locales/en_gb.inc.php:1738
 msgid "Stats for"
 msgstr ""
 
 #: actionconf.php:421 discoveryconf.php:250 hosts.php:768
 #: include/locales/en_gb.inc.php:292
 #: include/views/configuration.discovery.edit.php:98
-#: include/views/configuration.host.edit.php:233
+#: include/views/configuration.host.edit.php:233 popup.php:441 popup.php:1060
+#: popup.php:1068
 msgid "Status"
 msgstr "상태"
 
-#: include/locales/en_gb.inc.php:1367
+#: include/locales/en_gb.inc.php:1366
 msgid "Status calculation"
 msgstr "상태 계산"
 
-#: include/locales/en_gb.inc.php:1368
+#: include/locales/en_gb.inc.php:1367
 msgid "Status calculation algorithm"
 msgstr "상태 계산 알고리즘"
 
@@ -8001,7 +8019,7 @@ msgstr "상태 코드"
 msgid "Status of Web monitoring"
 msgstr "웹 감시 상태"
 
-#: include/locales/en_gb.inc.php:1134 include/menu.inc.php:115
+#: include/locales/en_gb.inc.php:1133 include/menu.inc.php:115
 msgid "Status of Zabbix"
 msgstr "ZABBIX 서버 상태"
 
@@ -8009,15 +8027,15 @@ msgstr "ZABBIX 서버 상태"
 msgid "Status of discovery"
 msgstr "디스커버리 상태"
 
-#: include/locales/en_gb.inc.php:1481
+#: include/locales/en_gb.inc.php:1480
 msgid "Status of host triggers"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1480
+#: include/locales/en_gb.inc.php:1479
 msgid "Status of hostgroup triggers"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1478
+#: include/locales/en_gb.inc.php:1477
 msgid "Status of triggers"
 msgstr "트리거 상태"
 
@@ -8048,23 +8066,23 @@ msgstr "시나리오 스텝"
 msgid "Steps"
 msgstr "스텝"
 
-#: include/locales/en_gb.inc.php:1628
+#: include/locales/en_gb.inc.php:1627
 msgid "Stop"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:871
+#: include/locales/en_gb.inc.php:870
 msgid "Store value"
 msgstr "보존 시 계산"
 
-#: include/locales/en_gb.inc.php:747
+#: include/locales/en_gb.inc.php:746
 msgid "Straight"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1320
+#: include/locales/en_gb.inc.php:1319
 msgid "Style"
 msgstr "표시 형식"
 
-#: include/locales/en_gb.inc.php:1780
+#: include/locales/en_gb.inc.php:1779
 msgid "Subfilter"
 msgstr ""
 
@@ -8074,7 +8092,7 @@ msgstr ""
 msgid "Subject"
 msgstr "제목"
 
-#: include/locales/en_gb.inc.php:1855
+#: include/locales/en_gb.inc.php:1854
 msgid "Submap"
 msgstr ""
 
@@ -8086,7 +8104,7 @@ msgstr ""
 msgid "Sun"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:46 include/locales/en_gb.inc.php:1391
+#: include/locales/en_gb.inc.php:46 include/locales/en_gb.inc.php:1390
 msgid "Sunday"
 msgstr "일"
 
@@ -8094,11 +8112,11 @@ msgstr "일"
 msgid "Support"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1546
+#: include/locales/en_gb.inc.php:1545
 msgid "Surname"
 msgstr "성"
 
-#: include/locales/en_gb.inc.php:1642
+#: include/locales/en_gb.inc.php:1641
 msgid "Swedish (SE)"
 msgstr "스웨덴어 (SE)"
 
@@ -8118,12 +8136,12 @@ msgstr ""
 msgid "System error."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1085
+#: include/locales/en_gb.inc.php:1084
 msgid "System status"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1766 include/locales/en_gb.inc.php:2002
-#: include/locales/en_gb.inc.php:2004
+#: include/locales/en_gb.inc.php:1765 include/locales/en_gb.inc.php:2001
+#: include/locales/en_gb.inc.php:2003
 msgid "T"
 msgstr ""
 
@@ -8132,11 +8150,11 @@ msgstr ""
 msgid "TCP"
 msgstr "TCP"
 
-#: include/locales/en_gb.inc.php:845
+#: include/locales/en_gb.inc.php:844
 msgid "TELNET agent"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:799 templates.php:520
+#: include/locales/en_gb.inc.php:798 templates.php:520
 msgid "TEMPLATES"
 msgstr "템플릿"
 
@@ -8144,15 +8162,15 @@ msgstr "템플릿"
 msgid "TOTAL"
 msgstr "합계"
 
-#: include/locales/en_gb.inc.php:1472
+#: include/locales/en_gb.inc.php:1471
 msgid "TRIGGER COMMENTS"
 msgstr "트리거 주석"
 
-#: include/locales/en_gb.inc.php:944
+#: include/locales/en_gb.inc.php:943
 msgid "TRIGGER PROTOTYPES OF"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1486
+#: include/locales/en_gb.inc.php:1485
 msgid "TRIGGERS"
 msgstr "트리거"
 
@@ -8169,7 +8187,7 @@ msgstr ""
 msgid "Tag"
 msgstr "태그"
 
-#: include/locales/en_gb.inc.php:897
+#: include/locales/en_gb.inc.php:896
 #: include/views/configuration.action.edit.php:586
 #: include/views/js/configuration.action.edit.js.php:82
 msgid "Target"
@@ -8179,7 +8197,7 @@ msgstr "대상"
 msgid "Target list"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:898
+#: include/locales/en_gb.inc.php:897
 msgid "Target type"
 msgstr "대상 종류"
 
@@ -8189,7 +8207,7 @@ msgstr "대상 종류"
 msgid "Telnet"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:732 include/reports.inc.php:48
+#: include/locales/en_gb.inc.php:731 include/reports.inc.php:48
 msgid "Template"
 msgstr "템플릿"
 
@@ -8203,7 +8221,7 @@ msgstr ""
 msgid "Template [%1$s] deleted."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:788
+#: include/locales/en_gb.inc.php:787
 msgid "Template deleted"
 msgstr ""
 
@@ -8211,7 +8229,7 @@ msgstr ""
 msgid "Template group"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:797
+#: include/locales/en_gb.inc.php:796
 msgid "Template linkage"
 msgstr "템플릿 링크"
 
@@ -8223,15 +8241,15 @@ msgstr ""
 msgid "Template trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:784
+#: include/locales/en_gb.inc.php:783
 msgid "Template updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1804
+#: include/locales/en_gb.inc.php:1803
 msgid "Template with application"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1803
+#: include/locales/en_gb.inc.php:1802
 msgid "Template with item key"
 msgstr ""
 
@@ -8246,16 +8264,16 @@ msgstr ""
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:910
+#: include/locales/en_gb.inc.php:909
 msgid "Templated item"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:807
+#: include/locales/en_gb.inc.php:806
 msgid "Templated items"
 msgstr ""
 
-#: hosts.php:767 include/locales/en_gb.inc.php:798 include/menu.inc.php:148
-#: include/views/configuration.host.edit.php:430
+#: hosts.php:767 include/locales/en_gb.inc.php:797 include/menu.inc.php:148
+#: include/views/configuration.host.edit.php:430 popup.php:36
 msgid "Templates"
 msgstr "템플릿"
 
@@ -8264,11 +8282,11 @@ msgstr "템플릿"
 msgid "Templates [%1$s] unlinked from hosts [%2$s]."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:781
+#: include/locales/en_gb.inc.php:780
 msgid "Templates list"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1767
+#: include/locales/en_gb.inc.php:1766
 msgid "Tera"
 msgstr ""
 
@@ -8280,7 +8298,7 @@ msgstr ""
 msgid "Test confirmation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1713
+#: include/locales/en_gb.inc.php:1712
 msgid "Test data"
 msgstr ""
 
@@ -8288,11 +8306,11 @@ msgstr ""
 msgid "Test string"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:879
+#: include/locales/en_gb.inc.php:878
 msgid "Text"
 msgstr "텍스트"
 
-#: include/locales/en_gb.inc.php:1934
+#: include/locales/en_gb.inc.php:1933
 msgid "The GD extension is not loaded."
 msgstr ""
 
@@ -8314,11 +8332,11 @@ msgstr ""
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1448
+#: include/locales/en_gb.inc.php:1447
 msgid "The trigger depends on"
 msgstr "다음 트리거에 의존"
 
-#: include/locales/en_gb.inc.php:1632
+#: include/locales/en_gb.inc.php:1631
 msgid "Theme"
 msgstr ""
 
@@ -8331,23 +8349,23 @@ msgstr ""
 msgid "This field is automatically populated by item \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1407
+#: include/locales/en_gb.inc.php:1406
 msgid "This month"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1861
+#: include/locales/en_gb.inc.php:1860
 msgid "This screen-column is not empty"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1860
+#: include/locales/en_gb.inc.php:1859
 msgid "This screen-row is not empty"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1405
+#: include/locales/en_gb.inc.php:1404
 msgid "This week"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1406
+#: include/locales/en_gb.inc.php:1405
 msgid "This year"
 msgstr ""
 
@@ -8355,11 +8373,11 @@ msgstr ""
 msgid "Thu"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1395
+#: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1394
 msgid "Thursday"
 msgstr "목"
 
-#: include/locales/en_gb.inc.php:1177
+#: include/locales/en_gb.inc.php:1176
 msgid "Till"
 msgstr "종료"
 
@@ -8371,11 +8389,11 @@ msgstr "시각"
 msgid "Time period"
 msgstr "기간"
 
-#: include/locales/en_gb.inc.php:1444
+#: include/locales/en_gb.inc.php:1443
 msgid "Time shift"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1315
+#: include/locales/en_gb.inc.php:1314
 msgid "Time type"
 msgstr "사용할 시간"
 
@@ -8391,7 +8409,7 @@ msgstr "타임아웃"
 msgid "Timestamp"
 msgstr "타임 스탬프"
 
-#: include/locales/en_gb.inc.php:1924
+#: include/locales/en_gb.inc.php:1923
 msgid "Timezone for PHP is not set"
 msgstr ""
 
@@ -8403,11 +8421,11 @@ msgstr ""
 msgid "To"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1404
+#: include/locales/en_gb.inc.php:1403
 msgid "Today"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1458
+#: include/locales/en_gb.inc.php:1457
 msgid "Toggle input method"
 msgstr ""
 
@@ -8416,24 +8434,24 @@ msgstr ""
 msgid "Too many interfaces provided for proxy \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1034
+#: include/locales/en_gb.inc.php:1033
 #: include/views/configuration.sysmap.edit.php:117
 msgid "Top"
 msgstr "위쪽"
 
-#: include/locales/en_gb.inc.php:1127 queue.php:289
+#: include/locales/en_gb.inc.php:1126 queue.php:289
 msgid "Total"
 msgstr "합계"
 
-#: include/locales/en_gb.inc.php:1740
+#: include/locales/en_gb.inc.php:1739
 msgid "Total time"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1746
+#: include/locales/en_gb.inc.php:1745
 msgid "Total time spent on SQL"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1852
+#: include/locales/en_gb.inc.php:1851
 msgid "Transaction has not been closed. Aborting.."
 msgstr ""
 
@@ -8441,15 +8459,15 @@ msgstr ""
 msgid "Transport error."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:833
+#: include/locales/en_gb.inc.php:832
 msgid "Trends"
 msgstr "트렌드"
 
-#: include/locales/en_gb.inc.php:1139
+#: include/locales/en_gb.inc.php:1138
 msgid "Trends stored"
 msgstr "Trends stored"
 
-#: include/actions.inc.php:41 include/locales/en_gb.inc.php:1378
+#: include/actions.inc.php:41 include/locales/en_gb.inc.php:1377
 msgid "Trigger"
 msgstr "트리거"
 
@@ -8502,23 +8520,23 @@ msgstr ""
 msgid "Trigger [%1$s] does not have item prototype."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1424
+#: include/locales/en_gb.inc.php:1423
 msgid "Trigger added"
 msgstr "트리거를 추가하였습니다"
 
-#: include/locales/en_gb.inc.php:1471
+#: include/locales/en_gb.inc.php:1470
 msgid "Trigger comments"
 msgstr "트리거 주석"
 
-#: include/locales/en_gb.inc.php:1422
+#: include/locales/en_gb.inc.php:1421
 msgid "Trigger deleted"
 msgstr "트리거를 삭제하였습니다"
 
-#: include/locales/en_gb.inc.php:1455
+#: include/locales/en_gb.inc.php:1454
 msgid "Trigger dependencies"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1468
+#: include/locales/en_gb.inc.php:1467
 msgid "Trigger form"
 msgstr ""
 
@@ -8568,7 +8586,7 @@ msgstr ""
 msgid "Trigger severity"
 msgstr "트리거 심각도"
 
-#: include/locales/en_gb.inc.php:1434
+#: include/locales/en_gb.inc.php:1433
 msgid "Trigger updated"
 msgstr "트리거를 갱신하였습니다"
 
@@ -8585,31 +8603,31 @@ msgstr ""
 #: actionconf.php:400 hosts.php:763 hosts.php:846
 #: include/locales/en_gb.inc.php:712 include/menu.inc.php:57
 #: include/views/configuration.host.edit.php:284
-#: include/views/configuration.template.edit.php:226
+#: include/views/configuration.template.edit.php:226 popup.php:61
 msgid "Triggers"
 msgstr "트리거"
 
-#: include/locales/en_gb.inc.php:1141
+#: include/locales/en_gb.inc.php:1140
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "트리거 수(활성/비활성)[장애/알 수 없음/ok]"
 
-#: include/locales/en_gb.inc.php:1420
+#: include/locales/en_gb.inc.php:1419
 msgid "Triggers deleted"
 msgstr "트리거를 삭제하였습니다"
 
-#: include/locales/en_gb.inc.php:1307
+#: include/locales/en_gb.inc.php:1306
 msgid "Triggers info"
 msgstr "트리거 정보"
 
-#: include/locales/en_gb.inc.php:1454
+#: include/locales/en_gb.inc.php:1453
 msgid "Triggers massupdate"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1310
+#: include/locales/en_gb.inc.php:1309
 msgid "Triggers overview"
 msgstr "트리거 개요"
 
-#: include/locales/en_gb.inc.php:1496
+#: include/locales/en_gb.inc.php:1495
 msgid "Triggers status"
 msgstr ""
 
@@ -8617,7 +8635,7 @@ msgstr ""
 msgid "Triggers top 100"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1105
+#: include/locales/en_gb.inc.php:1104
 msgid "Triggers with severity"
 msgstr ""
 
@@ -8629,11 +8647,11 @@ msgstr ""
 msgid "Tue"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1393
+#: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1392
 msgid "Tuesday"
 msgstr "화"
 
-#: include/locales/en_gb.inc.php:1024
+#: include/locales/en_gb.inc.php:1023
 msgid "Two elements should be selected"
 msgstr ""
 
@@ -8648,6 +8666,7 @@ msgstr ""
 #: include/views/administration.script.list.php:41
 #: include/views/configuration.action.edit.php:653
 #: include/views/configuration.host.edit.php:192 media_types.php:261
+#: popup.php:1058 popup.php:1066
 msgid "Type"
 msgstr "종류"
 
@@ -8655,7 +8674,7 @@ msgstr "종류"
 msgid "Type (Full details)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1015
+#: include/locales/en_gb.inc.php:1014
 msgid "Type (OK)"
 msgstr ""
 
@@ -8664,7 +8683,7 @@ msgstr ""
 msgid "Type of calculation"
 msgstr "계산 종류"
 
-#: include/locales/en_gb.inc.php:865
+#: include/locales/en_gb.inc.php:864 popup.php:1059 popup.php:1067
 msgid "Type of information"
 msgstr "데이터형"
 
@@ -8672,7 +8691,7 @@ msgstr "데이터형"
 msgid "Type of information must be Log for log key."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:811
+#: include/locales/en_gb.inc.php:810
 msgid "Types"
 msgstr ""
 
@@ -8680,7 +8699,7 @@ msgstr ""
 msgid "UNKNOWN"
 msgstr "알 수 없음"
 
-#: include/locales/en_gb.inc.php:959
+#: include/locales/en_gb.inc.php:958
 msgid "UP"
 msgstr ""
 
@@ -8688,12 +8707,12 @@ msgstr ""
 msgid "UPDATE"
 msgstr "갱신"
 
-#: include/locales/en_gb.inc.php:1438
+#: include/locales/en_gb.inc.php:1437
 #: include/views/configuration.sysmap.edit.php:134
 msgid "URL"
 msgstr "URL"
 
-#: include/locales/en_gb.inc.php:1562
+#: include/locales/en_gb.inc.php:1561
 msgid "URL (after login)"
 msgstr "로그인 후 URL"
 
@@ -8713,15 +8732,15 @@ msgstr ""
 msgid "USA (160 characters)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1539
+#: include/locales/en_gb.inc.php:1538
 msgid "USER GROUPS"
 msgstr "사용자 그룹"
 
-#: include/locales/en_gb.inc.php:1629
+#: include/locales/en_gb.inc.php:1628
 msgid "USER PROFILE"
 msgstr "사용자 프로파일"
 
-#: include/locales/en_gb.inc.php:1540
+#: include/locales/en_gb.inc.php:1539
 msgid "USERS"
 msgstr "사용자"
 
@@ -8729,84 +8748,84 @@ msgstr "사용자"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales/en_gb.inc.php:1648
+#: include/locales/en_gb.inc.php:1647
 msgid "Ukrainian (UA)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1907
+#: include/locales/en_gb.inc.php:1906
 msgid "Unable to remove local node"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1872
+#: include/locales/en_gb.inc.php:1871
 msgid "Unable to select configuration"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1057
+#: include/locales/en_gb.inc.php:1056
 msgid "Unacknowledged"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1111
+#: include/locales/en_gb.inc.php:1110
 #: include/views/configuration.sysmap.edit.php:125
 msgid "Unacknowledged only"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1575
+#: include/locales/en_gb.inc.php:1574
 msgid "Unblock selected"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1576
+#: include/locales/en_gb.inc.php:1575
 msgid "Unblock selected users?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1689
+#: include/locales/en_gb.inc.php:1688
 msgid "Unexpected end of element"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:861
+#: include/locales/en_gb.inc.php:860
 msgid "Units"
 msgstr "단위"
 
 #: hosts.php:890 include/actions.inc.php:35 include/actions.inc.php:66
 #: include/actions.inc.php:76 include/actions.inc.php:186
 #: include/actions.inc.php:488 include/discovery.inc.php:129
-#: include/locales/en_gb.inc.php:734 include/triggers.inc.php:286
+#: include/locales/en_gb.inc.php:733 include/triggers.inc.php:286
 msgid "Unknown"
 msgstr "알 수 없음"
 
-#: include/locales/en_gb.inc.php:1606
+#: include/locales/en_gb.inc.php:1605
 msgid "Unknown action"
 msgstr "알 수 없는 액션"
 
-#: include/locales/en_gb.inc.php:1889
+#: include/locales/en_gb.inc.php:1888
 msgid "Unknown calculation algorithm of service status"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1717
+#: include/locales/en_gb.inc.php:1716
 msgid "Unknown host item, no such item in selected host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1716
+#: include/locales/en_gb.inc.php:1715
 msgid "Unknown host, no such host present in system"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1611
+#: include/locales/en_gb.inc.php:1610
 msgid "Unknown resource"
 msgstr "알 수 없는 리소스"
 
-#: include/items.inc.php:937
+#: include/items.inc.php:941
 msgid "Unknown value type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1715
+#: include/locales/en_gb.inc.php:1714
 msgid "Unknown variable type, testing not available"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:800
+#: include/locales/en_gb.inc.php:799
 #: include/views/configuration.host.edit.php:417
 msgid "Unlink"
 msgstr "링크 삭제"
 
-#: include/locales/en_gb.inc.php:803
+#: include/locales/en_gb.inc.php:802
 #: include/views/configuration.host.edit.php:419
 msgid "Unlink and clear"
 msgstr "링크와 보존 데이터 삭제"
@@ -8823,11 +8842,11 @@ msgstr ""
 msgid "Unlink from templates: "
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1618
+#: include/locales/en_gb.inc.php:1617
 msgid "Unmute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1694
+#: include/locales/en_gb.inc.php:1693
 msgid "Unnecessary symbols detected"
 msgstr ""
 
@@ -8835,20 +8854,20 @@ msgstr ""
 msgid "Up"
 msgstr "UP"
 
-#: include/locales/en_gb.inc.php:763
+#: include/locales/en_gb.inc.php:762
 #: include/views/configuration.action.edit.php:863
 msgid "Update"
 msgstr "갱신"
 
-#: include/locales/en_gb.inc.php:796
+#: include/locales/en_gb.inc.php:795
 msgid "Update in group"
 msgstr "그룹 갱신"
 
-#: include/locales/en_gb.inc.php:830
+#: include/locales/en_gb.inc.php:829
 msgid "Update interval"
 msgstr "갱신 간격"
 
-#: include/locales/en_gb.inc.php:862
+#: include/locales/en_gb.inc.php:861
 msgid "Update interval (in sec)"
 msgstr "갱신 간격(초)"
 
@@ -8857,11 +8876,11 @@ msgid "Update item for the graph"
 msgstr ""
 
 #. GETTEXT: r is date format string as described in http://php.net/date
-#: include/classes/class.cserverinfo.php:40 include/locales/en_gb.inc.php:1608
+#: include/classes/class.cserverinfo.php:40 include/locales/en_gb.inc.php:1607
 msgid "Updated"
 msgstr "갱신"
 
-#: include/locales/en_gb.inc.php:773
+#: include/locales/en_gb.inc.php:772
 msgid "Updated status of host"
 msgstr ""
 
@@ -8877,11 +8896,11 @@ msgstr ""
 msgid "Upload"
 msgstr "업로드"
 
-#: include/locales/en_gb.inc.php:979
+#: include/locales/en_gb.inc.php:978
 msgid "Upper level maps"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:114 include/locales/en_gb.inc.php:1382
+#: include/locales/en_gb.inc.php:114 include/locales/en_gb.inc.php:1381
 msgid "Uptime"
 msgstr "가동 시간"
 
@@ -8889,15 +8908,15 @@ msgstr "가동 시간"
 msgid "Uptime/Downtime"
 msgstr "업타임/다운타임"
 
-#: include/locales/en_gb.inc.php:1017
+#: include/locales/en_gb.inc.php:1016
 msgid "Use advanced icons"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:892
+#: include/locales/en_gb.inc.php:891
 msgid "Use custom multiplier"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1074
+#: include/locales/en_gb.inc.php:1073
 msgid "Use if severity"
 msgstr "심각도 선택"
 
@@ -8905,7 +8924,7 @@ msgstr "심각도 선택"
 msgid "Used in actions"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:279 include/locales/en_gb.inc.php:752
+#: include/locales/en_gb.inc.php:279 include/locales/en_gb.inc.php:751
 #: include/setup.inc.php:248
 msgid "User"
 msgstr "사용자"
@@ -8915,19 +8934,19 @@ msgstr "사용자"
 msgid "User \"%s\" cannot be without user group."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1506
+#: include/locales/en_gb.inc.php:1505
 msgid "User added"
 msgstr "사용자를 추가하였습니다"
 
-#: include/locales/en_gb.inc.php:1537
+#: include/locales/en_gb.inc.php:1536
 msgid "User cannot change GUI access for himself"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1536
+#: include/locales/en_gb.inc.php:1535
 msgid "User cannot change status of himself"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1509
+#: include/locales/en_gb.inc.php:1508
 msgid "User deleted"
 msgstr "사용자를 삭제하였습니다"
 
@@ -8945,8 +8964,8 @@ msgstr ""
 msgid "User group for database down message"
 msgstr "데이터베이스 정지 메시지 송신 대상 사용자 그룹"
 
-#: include/locales/en_gb.inc.php:1541
-#: include/views/administration.script.edit.php:80
+#: include/locales/en_gb.inc.php:1540
+#: include/views/administration.script.edit.php:80 popup.php:65
 msgid "User groups"
 msgstr "사용자 그룹"
 
@@ -8964,24 +8983,24 @@ msgstr ""
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:913
+#: include/locales/en_gb.inc.php:912
 #: include/views/configuration.action.edit.php:671
 msgid "User name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1630
+#: include/locales/en_gb.inc.php:1629
 msgid "User profile"
 msgstr "사용자 프로파일"
 
-#: include/locales/en_gb.inc.php:1263
+#: include/locales/en_gb.inc.php:1262
 msgid "User rights"
 msgstr "사용자 권한"
 
-#: include/locales/en_gb.inc.php:1504
+#: include/locales/en_gb.inc.php:1503
 msgid "User type"
 msgstr "사용자 종류"
 
-#: include/locales/en_gb.inc.php:1513
+#: include/locales/en_gb.inc.php:1512
 msgid "User updated"
 msgstr "사용자를 갱신하였습니다"
 
@@ -8990,29 +9009,29 @@ msgstr "사용자를 갱신하였습니다"
 msgid "User with alias \"%s\" already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:859
+#: include/locales/en_gb.inc.php:858
 #: include/views/configuration.host.edit.php:458
 #: include/views/general.login.php:64 index.php:34
 msgid "Username"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1505 include/menu.inc.php:220
+#: include/locales/en_gb.inc.php:1504 include/menu.inc.php:220 popup.php:69
 msgid "Users"
 msgstr "사용자"
 
-#: include/locales/en_gb.inc.php:1147
+#: include/locales/en_gb.inc.php:1146
 msgid "Users (online)"
 msgstr "사용자 (온라인)"
 
-#: include/locales/en_gb.inc.php:1553
+#: include/locales/en_gb.inc.php:1552
 msgid "Users status"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1528
+#: include/locales/en_gb.inc.php:1527
 msgid "Users status updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1530
+#: include/locales/en_gb.inc.php:1529
 msgid "Users unblocked"
 msgstr ""
 
@@ -9020,7 +9039,7 @@ msgstr ""
 msgid "VALUE MAPPING"
 msgstr "값 매핑"
 
-#: include/locales/en_gb.inc.php:1136
+#: include/locales/en_gb.inc.php:1135
 msgid "Value"
 msgstr "값"
 
@@ -9077,11 +9096,11 @@ msgstr ""
 msgid "Value type must be Float for aggregate items."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1122
+#: include/locales/en_gb.inc.php:1121
 msgid "Values"
 msgstr "값"
 
-#: include/locales/en_gb.inc.php:1138
+#: include/locales/en_gb.inc.php:1137
 msgid "Values stored"
 msgstr "Values stored"
 
@@ -9093,11 +9112,11 @@ msgstr "변수"
 msgid "Vendor"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1321
+#: include/locales/en_gb.inc.php:1320
 msgid "Vertical"
 msgstr "세로"
 
-#: include/locales/en_gb.inc.php:1328
+#: include/locales/en_gb.inc.php:1327
 msgid "Vertical align"
 msgstr "세로 위치"
 
@@ -9118,11 +9137,11 @@ msgstr ""
 msgid "Visible name cannot be empty if missing host name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2003
+#: include/locales/en_gb.inc.php:2002
 msgid "W"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:850
+#: include/locales/en_gb.inc.php:849
 msgid "WEB CHECKS"
 msgstr ""
 
@@ -9136,7 +9155,7 @@ msgstr "경고"
 msgid "Warning. Incorrect value for field \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2029
+#: include/locales/en_gb.inc.php:2028
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr ""
 
@@ -9144,7 +9163,7 @@ msgstr ""
 msgid "Web"
 msgstr "웹"
 
-#: include/locales/en_gb.inc.php:911
+#: include/locales/en_gb.inc.php:910
 msgid "Web item"
 msgstr ""
 
@@ -9158,7 +9177,7 @@ msgstr ""
 msgid "Web item with key [%s] already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:849
+#: include/locales/en_gb.inc.php:848
 msgid "Web monitoring"
 msgstr "웹 감시"
 
@@ -9170,23 +9189,23 @@ msgstr ""
 msgid "Wed"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:49 include/locales/en_gb.inc.php:1394
+#: include/locales/en_gb.inc.php:49 include/locales/en_gb.inc.php:1393
 msgid "Wednesday"
 msgstr "수"
 
-#: include/locales/en_gb.inc.php:1225
+#: include/locales/en_gb.inc.php:1224
 msgid "Week"
 msgstr "주"
 
-#: include/locales/en_gb.inc.php:1193
+#: include/locales/en_gb.inc.php:1192
 msgid "Weekly"
 msgstr "주간"
 
-#: include/locales/en_gb.inc.php:1071
+#: include/locales/en_gb.inc.php:1070
 msgid "When active"
 msgstr "연락 허용 시간대"
 
-#: include/locales/en_gb.inc.php:1270
+#: include/locales/en_gb.inc.php:1269
 #: include/views/configuration.sysmap.edit.php:49
 msgid "Width"
 msgstr "너비"
@@ -9195,31 +9214,31 @@ msgstr "너비"
 msgid "With data collection"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1495
+#: include/locales/en_gb.inc.php:1494
 msgid "With last event unacknowledged"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1088
+#: include/locales/en_gb.inc.php:1087
 msgid "With problems"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:809
+#: include/locales/en_gb.inc.php:808
 msgid "With triggers"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1494
+#: include/locales/en_gb.inc.php:1493
 msgid "With unacknowledged events"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1087
+#: include/locales/en_gb.inc.php:1086
 msgid "Without problems"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:810
+#: include/locales/en_gb.inc.php:809
 msgid "Without triggers"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:877
+#: include/locales/en_gb.inc.php:876
 msgid "Wizard"
 msgstr ""
 
@@ -9267,7 +9286,7 @@ msgstr ""
 msgid "Wrong fields for map link"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1961
+#: include/locales/en_gb.inc.php:1960
 msgid "Wrong fields for media type"
 msgstr ""
 
@@ -9304,24 +9323,24 @@ msgstr ""
 msgid "Wrong macro"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1957
+#: include/locales/en_gb.inc.php:1956
 msgid "Wrong period ["
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1029
+#: include/locales/en_gb.inc.php:1028
 msgid "Wrong type of arguments passed to function"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:985
+#: include/locales/en_gb.inc.php:984
 msgid "X"
 msgstr "X"
 
-#: include/locales/en_gb.inc.php:1998
+#: include/locales/en_gb.inc.php:1997
 msgid "XML file contains errors"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1196 include/locales/en_gb.inc.php:1216
-#: include/locales/en_gb.inc.php:1774
+#: include/locales/en_gb.inc.php:1195 include/locales/en_gb.inc.php:1215
+#: include/locales/en_gb.inc.php:1773
 msgid "Y"
 msgstr "Y"
 
@@ -9346,31 +9365,31 @@ msgstr ""
 msgid "Y.M.d H:i:s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1171
+#: include/locales/en_gb.inc.php:1170
 msgid "Y.m.d"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1170
+#: include/locales/en_gb.inc.php:1169
 msgid "Y.m.d H:i"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1064 include/locales/en_gb.inc.php:1776
+#: include/locales/en_gb.inc.php:1063 include/locales/en_gb.inc.php:1775
 msgid "Y.m.d H:i:s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1190
+#: include/locales/en_gb.inc.php:1189
 msgid "Year"
 msgstr "년"
 
-#: include/locales/en_gb.inc.php:1195
+#: include/locales/en_gb.inc.php:1194
 msgid "Yearly"
 msgstr "연간"
 
-#: include/locales/en_gb.inc.php:1151
+#: include/locales/en_gb.inc.php:1150
 msgid "Yes"
 msgstr "예"
 
-#: include/locales/en_gb.inc.php:1775
+#: include/locales/en_gb.inc.php:1774
 msgid "Yotta"
 msgstr ""
 
@@ -9383,19 +9402,19 @@ msgstr ""
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1972
+#: include/locales/en_gb.inc.php:1971
 msgid "You are not logged in."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1676
+#: include/locales/en_gb.inc.php:1675
 msgid "You can not switch hosts for current selection"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1838
+#: include/locales/en_gb.inc.php:1837
 msgid "You can not use template hosts in mixed expressions."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1969
+#: include/locales/en_gb.inc.php:1968
 msgid "You cannot view this URL as a"
 msgstr ""
 
@@ -9421,7 +9440,7 @@ msgstr ""
 msgid "You do not have enough rights for operation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1995
+#: include/locales/en_gb.inc.php:1994
 msgid "You do not have permission to perform this operation"
 msgstr ""
 
@@ -9461,7 +9480,7 @@ msgstr ""
 msgid "You do not have permissions to update user or user does not exist."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1970
+#: include/locales/en_gb.inc.php:1969
 msgid "You must login to view this page."
 msgstr ""
 
@@ -9469,11 +9488,11 @@ msgstr ""
 msgid "Your setup is not configured for distributed monitoring"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1772
+#: include/locales/en_gb.inc.php:1771
 msgid "Z"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1652
+#: include/locales/en_gb.inc.php:1651
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
@@ -9486,7 +9505,7 @@ msgstr ""
 msgid "Zabbix %s Copyright 2001-2011 by Zabbix SIA"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1502
+#: include/locales/en_gb.inc.php:1501
 msgid "Zabbix Admin"
 msgstr "ZABBIX 관리자"
 
@@ -9494,15 +9513,15 @@ msgstr "ZABBIX 관리자"
 msgid "Zabbix Internal authentication"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1503
+#: include/locales/en_gb.inc.php:1502
 msgid "Zabbix Super Admin"
 msgstr "ZABBIX 최고 관리자"
 
-#: include/locales/en_gb.inc.php:1501
+#: include/locales/en_gb.inc.php:1500
 msgid "Zabbix User"
 msgstr "ZABBIX 사용자"
 
-#: include/locales/en_gb.inc.php:834
+#: include/locales/en_gb.inc.php:833
 #: include/views/administration.script.edit.php:54
 #: include/views/configuration.action.edit.php:659
 #: include/views/js/configuration.action.edit.js.php:118
@@ -9510,19 +9529,19 @@ msgstr "ZABBIX 사용자"
 msgid "Zabbix agent"
 msgstr "ZABBIX 에이전트"
 
-#: include/locales/en_gb.inc.php:835
+#: include/locales/en_gb.inc.php:834
 msgid "Zabbix agent (active)"
 msgstr "ZABBIX 에이전트(활성)"
 
-#: include/locales/en_gb.inc.php:847
+#: include/locales/en_gb.inc.php:846
 msgid "Zabbix aggregate"
 msgstr "ZABBIX 집합"
 
-#: include/locales/en_gb.inc.php:1439
+#: include/locales/en_gb.inc.php:1438
 msgid "Zabbix has received an incorrect request"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:841
+#: include/locales/en_gb.inc.php:840
 msgid "Zabbix internal"
 msgstr "ZABBIX 내장"
 
@@ -9537,11 +9556,11 @@ msgstr ""
 msgid "Zabbix server"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1097
+#: include/locales/en_gb.inc.php:1096
 msgid "Zabbix server ip or port is not set!"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1137
+#: include/locales/en_gb.inc.php:1136
 msgid "Zabbix server is running"
 msgstr "ZABBIX 서버 가동 중"
 
@@ -9553,27 +9572,27 @@ msgstr ""
 msgid "Zabbix server port"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:837
+#: include/locales/en_gb.inc.php:836
 msgid "Zabbix trapper"
 msgstr "ZABBIX trapper"
 
-#: include/locales/en_gb.inc.php:1773
+#: include/locales/en_gb.inc.php:1772
 msgid "Zetta"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2010
+#: include/locales/en_gb.inc.php:2009
 msgid "Zoom"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1863
+#: include/locales/en_gb.inc.php:1862
 msgid "[H:i:s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1976
+#: include/locales/en_gb.inc.php:1975
 msgid "[Wrong value for day of week:"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1974
+#: include/locales/en_gb.inc.php:1973
 msgid "[Wrong value for month:"
 msgstr ""
 
@@ -9581,12 +9600,12 @@ msgstr ""
 msgid "[Y.M.d H:i:s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1958 include/locales/en_gb.inc.php:1975
-#: include/locales/en_gb.inc.php:1977
+#: include/locales/en_gb.inc.php:1957 include/locales/en_gb.inc.php:1974
+#: include/locales/en_gb.inc.php:1976
 msgid "]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1205
+#: include/locales/en_gb.inc.php:1204
 msgid "add"
 msgstr ""
 
@@ -9594,11 +9613,11 @@ msgstr ""
 msgid "add graph items first"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1796
+#: include/locales/en_gb.inc.php:1795
 msgid "added"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1781
+#: include/locales/en_gb.inc.php:1780
 msgid "affects only filtered data!"
 msgstr ""
 
@@ -9606,15 +9625,15 @@ msgstr ""
 msgid "all"
 msgstr "전체"
 
-#: include/locales/en_gb.inc.php:1612
+#: include/locales/en_gb.inc.php:1611
 msgid "already exists"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1790
+#: include/locales/en_gb.inc.php:1789
 msgid "already exists for host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1805
+#: include/locales/en_gb.inc.php:1804
 msgid "already linked to host"
 msgstr ""
 
@@ -9625,7 +9644,7 @@ msgstr ""
 msgid "and"
 msgstr "and"
 
-#: include/locales/en_gb.inc.php:1808
+#: include/locales/en_gb.inc.php:1807
 msgid "and can't be deleted"
 msgstr ""
 
@@ -9641,7 +9660,7 @@ msgstr "녹색"
 msgid "as Red"
 msgstr "빨강"
 
-#: include/locales/en_gb.inc.php:1833
+#: include/locales/en_gb.inc.php:1832
 msgid "available only for items with value types"
 msgstr ""
 
@@ -9649,11 +9668,11 @@ msgstr ""
 msgid "avg"
 msgstr "평균"
 
-#: include/locales/en_gb.inc.php:1930
+#: include/locales/en_gb.inc.php:1929
 msgid "configure PHP with"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1819
+#: include/locales/en_gb.inc.php:1818
 msgid "contains Multibyte chars"
 msgstr ""
 
@@ -9661,7 +9680,7 @@ msgstr ""
 msgid "created"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1939
+#: include/locales/en_gb.inc.php:1938
 msgid "ctype module"
 msgstr ""
 
@@ -9669,13 +9688,13 @@ msgstr ""
 msgid "d"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1198 include/locales/en_gb.inc.php:1218
-#: include/locales/en_gb.inc.php:1881
+#: include/locales/en_gb.inc.php:1197 include/locales/en_gb.inc.php:1217
+#: include/locales/en_gb.inc.php:1880
 msgid "d M Y"
 msgstr "d M Y"
 
-#: include/locales/en_gb.inc.php:1199 include/locales/en_gb.inc.php:1204
-#: include/locales/en_gb.inc.php:1219
+#: include/locales/en_gb.inc.php:1198 include/locales/en_gb.inc.php:1203
+#: include/locales/en_gb.inc.php:1218
 msgid "d M Y H:i"
 msgstr ""
 
@@ -9683,17 +9702,17 @@ msgstr ""
 #: include/locales/en_gb.inc.php:123 include/locales/en_gb.inc.php:144
 #: include/locales/en_gb.inc.php:145 include/locales/en_gb.inc.php:220
 #: include/locales/en_gb.inc.php:221 include/locales/en_gb.inc.php:251
-#: include/locales/en_gb.inc.php:254 include/locales/en_gb.inc.php:956
-#: include/locales/en_gb.inc.php:957 include/locales/en_gb.inc.php:958
-#: include/locales/en_gb.inc.php:965 include/locales/en_gb.inc.php:966
-#: include/locales/en_gb.inc.php:967 include/locales/en_gb.inc.php:968
-#: include/locales/en_gb.inc.php:973 include/locales/en_gb.inc.php:1130
-#: include/locales/en_gb.inc.php:1243 include/locales/en_gb.inc.php:1679
-#: include/locales/en_gb.inc.php:1683 include/locales/en_gb.inc.php:1862
+#: include/locales/en_gb.inc.php:254 include/locales/en_gb.inc.php:955
+#: include/locales/en_gb.inc.php:956 include/locales/en_gb.inc.php:957
+#: include/locales/en_gb.inc.php:964 include/locales/en_gb.inc.php:965
+#: include/locales/en_gb.inc.php:966 include/locales/en_gb.inc.php:967
+#: include/locales/en_gb.inc.php:972 include/locales/en_gb.inc.php:1129
+#: include/locales/en_gb.inc.php:1242 include/locales/en_gb.inc.php:1678
+#: include/locales/en_gb.inc.php:1682 include/locales/en_gb.inc.php:1861
 msgid "d M Y H:i:s"
 msgstr "d M H:i:s"
 
-#: include/locales/en_gb.inc.php:1164 include/locales/en_gb.inc.php:1167
+#: include/locales/en_gb.inc.php:1163 include/locales/en_gb.inc.php:1166
 msgid "d.M"
 msgstr ""
 
@@ -9714,11 +9733,11 @@ msgstr ""
 msgid "d.m.y"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1877
+#: include/locales/en_gb.inc.php:1876
 msgid "day"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1752
+#: include/locales/en_gb.inc.php:1751
 msgid "days"
 msgstr ""
 
@@ -9726,15 +9745,15 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1993
+#: include/locales/en_gb.inc.php:1992
 msgid "does not exist"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2012
+#: include/locales/en_gb.inc.php:2011
 msgid "dynamic"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:895
+#: include/locales/en_gb.inc.php:894
 msgid "elements copy to ..."
 msgstr "아이템 복사 대상..."
 
@@ -9742,7 +9761,7 @@ msgstr "아이템 복사 대상..."
 msgid "esc_step_from and esc_step_to must be set together."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1876
+#: include/locales/en_gb.inc.php:1875
 msgid "every"
 msgstr ""
 
@@ -9754,19 +9773,19 @@ msgstr ""
 msgid "executed"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2011
+#: include/locales/en_gb.inc.php:2010
 msgid "fixed"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1832
+#: include/locales/en_gb.inc.php:1831
 msgid "for function"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1830
+#: include/locales/en_gb.inc.php:1829
 msgid "for host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1664
+#: include/locales/en_gb.inc.php:1663
 msgid "found"
 msgstr ""
 
@@ -9774,7 +9793,7 @@ msgstr ""
 msgid "h"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1807
+#: include/locales/en_gb.inc.php:1806
 msgid "has been deleted from the system"
 msgstr ""
 
@@ -9786,7 +9805,7 @@ msgstr ""
 msgid "host group"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1056
+#: include/locales/en_gb.inc.php:1055
 msgid "http://www.zabbix.com"
 msgstr "http://www.zabbix.com"
 
@@ -9819,75 +9838,75 @@ msgstr ""
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1914
+#: include/locales/en_gb.inc.php:1913
 msgid "is a minimal PHP memory limitation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1919
+#: include/locales/en_gb.inc.php:1918
 msgid "is a minimal limitation on execution time of PHP scripts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1920
+#: include/locales/en_gb.inc.php:1919
 msgid "is a minimal limitation on input parse time for PHP scripts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1207
+#: include/locales/en_gb.inc.php:1206
 msgid "is a wrong time format. Should be from 00:00 to 24:00."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1799
+#: include/locales/en_gb.inc.php:1798
 msgid "is internal and can not be deleted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1822
+#: include/locales/en_gb.inc.php:1821
 msgid "is mandatory"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1942
+#: include/locales/en_gb.inc.php:1941
 msgid "is minimum for PHP upload filesize"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1916
+#: include/locales/en_gb.inc.php:1915
 msgid "is minimum size of PHP post"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1813
+#: include/locales/en_gb.inc.php:1812
 msgid "is not IP range"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1814
+#: include/locales/en_gb.inc.php:1813
 msgid "is not PORT range"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1821
+#: include/locales/en_gb.inc.php:1820
 msgid "is not a colour"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1836
+#: include/locales/en_gb.inc.php:1835
 msgid "is not a float or counter or macro for function"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1835
+#: include/locales/en_gb.inc.php:1834
 msgid "is not a float or macro for function"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1817
+#: include/locales/en_gb.inc.php:1816
 msgid "is not double"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1816
+#: include/locales/en_gb.inc.php:1815
 msgid "is not integer"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1815
+#: include/locales/en_gb.inc.php:1814
 msgid "is not integer range"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1818
+#: include/locales/en_gb.inc.php:1817
 msgid "is not string"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1202 include/locales/en_gb.inc.php:1203
+#: include/locales/en_gb.inc.php:1201 include/locales/en_gb.inc.php:1202
 msgid "l H:i"
 msgstr ""
 
@@ -9895,7 +9914,7 @@ msgstr ""
 msgid "last"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1937
+#: include/locales/en_gb.inc.php:1936
 msgid "libxml module"
 msgstr ""
 
@@ -9905,11 +9924,11 @@ msgid "like"
 msgstr "포함"
 
 #: include/locales/en_gb.inc.php:30 include/locales/en_gb.inc.php:34
-#: include/locales/en_gb.inc.php:1758
+#: include/locales/en_gb.inc.php:1757
 msgid "m"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1698
+#: include/locales/en_gb.inc.php:1697
 msgid "macro(s)"
 msgstr ""
 
@@ -9941,11 +9960,11 @@ msgstr ""
 msgid "ms"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1820
+#: include/locales/en_gb.inc.php:1819
 msgid "multibyte chars are restricted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1823
+#: include/locales/en_gb.inc.php:1822
 msgid "must be missing"
 msgstr ""
 
@@ -9953,11 +9972,11 @@ msgstr ""
 msgid "must be valid"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1754
+#: include/locales/en_gb.inc.php:1753
 msgid "n"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1922
+#: include/locales/en_gb.inc.php:1921
 msgid "no"
 msgstr ""
 
@@ -9973,7 +9992,7 @@ msgstr "범위 밖"
 msgid "not like"
 msgstr "포함 안함"
 
-#: include/locales/en_gb.inc.php:1154
+#: include/locales/en_gb.inc.php:1153
 msgid "not running"
 msgstr "정지 중"
 
@@ -9986,23 +10005,23 @@ msgstr ""
 msgid "not sent"
 msgstr "미송신"
 
-#: include/locales/en_gb.inc.php:2013
+#: include/locales/en_gb.inc.php:2012
 msgid "now"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:133 include/locales/en_gb.inc.php:1096
+#: include/locales/en_gb.inc.php:133 include/locales/en_gb.inc.php:1095
 msgid "of"
 msgstr "of"
 
-#: include/locales/en_gb.inc.php:1878
+#: include/locales/en_gb.inc.php:1877
 msgid "of every"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1875
+#: include/locales/en_gb.inc.php:1874
 msgid "on"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1926
+#: include/locales/en_gb.inc.php:1925
 msgid "option in"
 msgstr ""
 
@@ -10014,11 +10033,11 @@ msgstr ""
 msgid "or"
 msgstr "or"
 
-#: include/locales/en_gb.inc.php:2026
+#: include/locales/en_gb.inc.php:2025
 msgid "other"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1938
+#: include/locales/en_gb.inc.php:1937
 msgid "php-xml module is not installed"
 msgstr ""
 
@@ -10030,7 +10049,7 @@ msgstr ""
 msgid "refresh now"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1735
+#: include/locales/en_gb.inc.php:1734
 msgid "refreshed every"
 msgstr ""
 
@@ -10038,11 +10057,11 @@ msgstr ""
 msgid "remember selected"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1355
+#: include/locales/en_gb.inc.php:1354
 msgid "root"
 msgstr "root"
 
-#: include/locales/en_gb.inc.php:1153
+#: include/locales/en_gb.inc.php:1152
 msgid "running"
 msgstr "가동 중"
 
@@ -10063,7 +10082,7 @@ msgstr ""
 msgid "sent"
 msgstr "송신 완료"
 
-#: include/locales/en_gb.inc.php:1782
+#: include/locales/en_gb.inc.php:1781
 msgid "show value mappings"
 msgstr ""
 
@@ -10076,7 +10095,7 @@ msgstr ""
 msgid "to"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1840
+#: include/locales/en_gb.inc.php:1839
 msgid "to host"
 msgstr ""
 
@@ -10084,19 +10103,19 @@ msgstr ""
 msgid "trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1791
+#: include/locales/en_gb.inc.php:1790
 msgid "updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1801
+#: include/locales/en_gb.inc.php:1800
 msgid "used by scenario"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1048
+#: include/locales/en_gb.inc.php:1047
 msgid "used in exported map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1296
+#: include/locales/en_gb.inc.php:1295
 msgid "used in exported screen"
 msgstr ""
 
@@ -10104,15 +10123,15 @@ msgstr ""
 msgid "w"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1880
+#: include/locales/en_gb.inc.php:1879
 msgid "week"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1879
+#: include/locales/en_gb.inc.php:1878
 msgid "weeks"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1868
+#: include/locales/en_gb.inc.php:1867
 msgid "with template host cannot contain items from other hosts."
 msgstr ""
 
@@ -10120,11 +10139,11 @@ msgstr ""
 msgid "y"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1923
+#: include/locales/en_gb.inc.php:1922
 msgid "yes"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1756
+#: include/locales/en_gb.inc.php:1755
 msgid "µ"
 msgstr ""
 
