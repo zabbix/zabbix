@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-31 20:50+0300\n"
+"POT-Creation-Date: 2011-06-05 12:14+0300\n"
 "PO-Revision-Date: 2011-03-17 12:59+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -39,11 +39,11 @@ msgstr[2] "%d iekārtu"
 msgid "&"
 msgstr "un"
 
-#: include/locales/en_gb.inc.php:1691
+#: include/locales/en_gb.inc.php:1690
 msgid "'"
 msgstr "'"
 
-#: include/locales/en_gb.inc.php:1848
+#: include/locales/en_gb.inc.php:1847
 msgid "' does not accept parameters."
 msgstr "' nepieņem parametrus"
 
@@ -75,7 +75,7 @@ msgstr "- citi -"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[MASVEIDA APSTIPRINĀJUMS]----"
 
-#: include/locales/en_gb.inc.php:1843
+#: include/locales/en_gb.inc.php:1842
 msgid "0 or 1"
 msgstr "0 vai 1"
 
@@ -87,7 +87,7 @@ msgstr "1 minūte"
 msgid "10 seconds"
 msgstr "10 sekundes"
 
-#: include/locales/en_gb.inc.php:1124
+#: include/locales/en_gb.inc.php:1123
 msgid "15 min"
 msgstr "15 min"
 
@@ -99,11 +99,11 @@ msgstr "30 sekundes"
 msgid "3D view"
 msgstr "3D skats"
 
-#: include/locales/en_gb.inc.php:1123
+#: include/locales/en_gb.inc.php:1122
 msgid "5 min"
 msgstr "5 min"
 
-#: include/locales/en_gb.inc.php:1129 queue.php:163 queue.php:226
+#: include/locales/en_gb.inc.php:1128 queue.php:163 queue.php:226
 msgid "5 minutes"
 msgstr "5 minūtes"
 
@@ -138,19 +138,19 @@ msgstr "UN / VAI"
 msgid "APPLICATIONS"
 msgstr "RĀDĪTĀJU GRUPAS"
 
-#: include/locales/en_gb.inc.php:1603
+#: include/locales/en_gb.inc.php:1602
 msgid "AUDIT ACTIONS"
 msgstr "DARBĪBU AUDITS"
 
-#: include/locales/en_gb.inc.php:1602
+#: include/locales/en_gb.inc.php:1601
 msgid "AUDIT LOGS"
 msgstr "AUDITA ŽURNĀLS"
 
-#: include/locales/en_gb.inc.php:1158
+#: include/locales/en_gb.inc.php:1157
 msgid "AVAILABILITY REPORT"
 msgstr "PIEEJAMĪBAS ATSKAITE"
 
-#: include/locales/en_gb.inc.php:1375
+#: include/locales/en_gb.inc.php:1374
 msgid "Acceptable SLA (in %)"
 msgstr "Pieņemams PLV (%)"
 
@@ -163,7 +163,7 @@ msgstr ""
 msgid "Account is blocked for %s seconds"
 msgstr ""
 
-#: include/actions.inc.php:180 include/locales/en_gb.inc.php:1490
+#: include/actions.inc.php:180 include/locales/en_gb.inc.php:1489
 #: include/views/configuration.action.edit.php:904
 msgid "Ack"
 msgstr "Apst"
@@ -180,11 +180,11 @@ msgstr "Apstiprinājums pievienots"
 msgid "Acknowledge alarm by"
 msgstr "Apstiprināt trauksmi kā"
 
-#: include/locales/en_gb.inc.php:1492
+#: include/locales/en_gb.inc.php:1491
 msgid "Acknowledge status"
 msgstr "Apstiprinājuma stāvoklis"
 
-#: include/locales/en_gb.inc.php:1489
+#: include/locales/en_gb.inc.php:1488
 msgid "Acknowledged"
 msgstr "Apstiprināts"
 
@@ -196,7 +196,7 @@ msgstr "Apstiprinājumi"
 msgid "Acknowledging disabled"
 msgstr "Apstiprināšana atspējota"
 
-#: include/locales/en_gb.inc.php:1604
+#: include/locales/en_gb.inc.php:1603
 #: include/views/configuration.action.edit.php:74
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:332
@@ -244,7 +244,7 @@ msgstr "Darbības"
 msgid "Activate selected"
 msgstr "Aktivizēt atlasītos"
 
-#: include/locales/en_gb.inc.php:1724
+#: include/locales/en_gb.inc.php:1723
 msgid "Activate selected applications?"
 msgstr "Aktivizēt atlasītās rādītāju grupas?"
 
@@ -257,7 +257,7 @@ msgid "Activate selected hosts?"
 msgstr ""
 
 #: include/discovery.inc.php:119 include/locales/en_gb.inc.php:471
-#: include/locales/en_gb.inc.php:851
+#: include/locales/en_gb.inc.php:850
 msgid "Active"
 msgstr "Aktīvs"
 
@@ -269,7 +269,7 @@ msgstr "Aktīvs no"
 msgid "Active till"
 msgstr "Aktīvs līdz"
 
-#: include/forms.inc.php:459 include/locales/en_gb.inc.php:1475
+#: include/forms.inc.php:459 include/locales/en_gb.inc.php:1474
 #: include/views/configuration.action.edit.php:313
 #: include/views/configuration.action.edit.php:475
 #: include/views/configuration.action.edit.php:490
@@ -286,7 +286,7 @@ msgstr "Aktīvs līdz"
 msgid "Add"
 msgstr "Pievienot"
 
-#: include/locales/en_gb.inc.php:2018
+#: include/locales/en_gb.inc.php:2017
 msgid "Add Service"
 msgstr "Pievienot servisu"
 
@@ -294,7 +294,7 @@ msgstr "Pievienot servisu"
 msgid "Add comment by"
 msgstr "Pievienot komentāru kā"
 
-#: include/locales/en_gb.inc.php:996
+#: include/locales/en_gb.inc.php:995
 msgid "Add element"
 msgstr "Pievienot elementu"
 
@@ -302,15 +302,15 @@ msgstr "Pievienot elementu"
 msgid "Add host"
 msgstr "Pievienot mezglu"
 
-#: include/locales/en_gb.inc.php:1038
+#: include/locales/en_gb.inc.php:1037
 msgid "Add link"
 msgstr "Pievienot saiti"
 
-#: include/locales/en_gb.inc.php:935
+#: include/locales/en_gb.inc.php:934
 msgid "Add prototype"
 msgstr "Pievienot prototipu"
 
-#: include/locales/en_gb.inc.php:1568
+#: include/locales/en_gb.inc.php:1567
 msgid "Add to"
 msgstr "Pievienot"
 
@@ -326,7 +326,7 @@ msgstr "Pievienot mezglu grupām"
 msgid "Add to host groups: "
 msgstr "Pievienot mezglu grupām: "
 
-#: include/locales/en_gb.inc.php:1607
+#: include/locales/en_gb.inc.php:1606
 msgid "Added"
 msgstr "Pievienots"
 
@@ -334,15 +334,15 @@ msgstr "Pievienots"
 msgid "Added new media type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1839
+#: include/locales/en_gb.inc.php:1838
 msgid "Added trigger"
 msgstr "Pievienoja trigeri"
 
-#: include/locales/en_gb.inc.php:907
+#: include/locales/en_gb.inc.php:906
 msgid "Additional parameters"
 msgstr "Papildus parametri"
 
-#: include/locales/en_gb.inc.php:754
+#: include/locales/en_gb.inc.php:753
 msgid "Admin"
 msgstr ""
 
@@ -354,11 +354,11 @@ msgstr "Administrācija"
 msgid "Advanced labels"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1083
+#: include/locales/en_gb.inc.php:1082
 msgid "Age"
 msgstr "Vecums"
 
-#: include/locales/en_gb.inc.php:1497
+#: include/locales/en_gb.inc.php:1496
 msgid "Age less than"
 msgstr "Vecums mazāks par"
 
@@ -375,15 +375,15 @@ msgstr ""
 msgid "Aggregated periods count"
 msgstr ""
 
-#: include/hosts.inc.php:65 include/locales/en_gb.inc.php:1544
+#: include/hosts.inc.php:65 include/locales/en_gb.inc.php:1543
 msgid "Alias"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:978
+#: include/locales/en_gb.inc.php:977
 msgid "Align icons"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:491 include/locales/en_gb.inc.php:1110
+#: include/locales/en_gb.inc.php:491 include/locales/en_gb.inc.php:1109
 #: include/nodes.inc.php:163 include/page_header.php:303
 #: include/views/administration.script.edit.php:75
 #: include/views/administration.script.edit.php:84
@@ -394,11 +394,11 @@ msgstr ""
 msgid "All"
 msgstr "Viss"
 
-#: include/locales/en_gb.inc.php:736
+#: include/locales/en_gb.inc.php:735
 msgid "All groups"
 msgstr "Visas grupas"
 
-#: include/locales/en_gb.inc.php:1050
+#: include/locales/en_gb.inc.php:1049
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr ""
 
@@ -406,11 +406,11 @@ msgstr ""
 msgid "All nodes"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:886
+#: include/locales/en_gb.inc.php:885
 msgid "Allowed hosts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1493
+#: include/locales/en_gb.inc.php:1492
 msgid "Any"
 msgstr ""
 
@@ -454,11 +454,11 @@ msgstr ""
 msgid "Application updated"
 msgstr "Rādītāju grupa atjaunota"
 
-#: hosts.php:761 hosts.php:842 include/locales/en_gb.inc.php:699
+#: hosts.php:761 hosts.php:842 include/locales/en_gb.inc.php:699 popup.php:53
 msgid "Applications"
 msgstr "Rādītāju grupas"
 
-#: include/locales/en_gb.inc.php:1006
+#: include/locales/en_gb.inc.php:1005
 msgid "Apply"
 msgstr "Pielietot"
 
@@ -478,15 +478,15 @@ msgstr "Aprīlis"
 msgid "Are you sure you want perform this action?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1697
+#: include/locales/en_gb.inc.php:1696
 msgid "Are you sure you want to delete"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:880
+#: include/locales/en_gb.inc.php:879
 msgid "As is"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1300
+#: include/locales/en_gb.inc.php:1299
 msgid "As plain text"
 msgstr ""
 
@@ -502,11 +502,11 @@ msgstr ""
 msgid "At least one host or group should be selected"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1844
+#: include/locales/en_gb.inc.php:1843
 msgid "At least one item must be present in the trigger expression."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1601 include/menu.inc.php:230
+#: include/locales/en_gb.inc.php:1600 include/menu.inc.php:230
 msgid "Audit"
 msgstr ""
 
@@ -526,7 +526,7 @@ msgstr "Autentifikācija"
 msgid "Authentication algorithm"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:917
+#: include/locales/en_gb.inc.php:916
 #: include/views/configuration.action.edit.php:669
 msgid "Authentication method"
 msgstr "Autentifikācijas metode"
@@ -539,7 +539,7 @@ msgstr ""
 msgid "Auto registration"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1563
+#: include/locales/en_gb.inc.php:1562
 msgid "Auto-logout (min 90 seconds)"
 msgstr ""
 
@@ -548,15 +548,15 @@ msgstr ""
 msgid "Automatic"
 msgstr ""
 
-#: hosts.php:769 include/locales/en_gb.inc.php:764
+#: hosts.php:769 include/locales/en_gb.inc.php:763 popup.php:441
 msgid "Availability"
 msgstr "Pieejamība"
 
-#: include/locales/en_gb.inc.php:1157 include/menu.inc.php:120
+#: include/locales/en_gb.inc.php:1156 include/menu.inc.php:120
 msgid "Availability report"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:765
+#: include/locales/en_gb.inc.php:764
 msgid "Available"
 msgstr "Pieejams"
 
@@ -565,7 +565,7 @@ msgstr "Pieejams"
 msgid "Average"
 msgstr "Vidējs"
 
-#: include/locales/en_gb.inc.php:1237
+#: include/locales/en_gb.inc.php:1236
 msgid "Average by"
 msgstr ""
 
@@ -573,7 +573,7 @@ msgstr ""
 msgid "Axis side"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1753
+#: include/locales/en_gb.inc.php:1752
 msgid "B"
 msgstr ""
 
@@ -589,7 +589,7 @@ msgstr "Fons"
 msgid "Background image"
 msgstr "Fona attēls"
 
-#: include/locales/en_gb.inc.php:1229 include/menu.inc.php:128
+#: include/locales/en_gb.inc.php:1228 include/menu.inc.php:128
 msgid "Bar reports"
 msgstr ""
 
@@ -613,7 +613,7 @@ msgstr ""
 msgid "Black & Blue"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1574
+#: include/locales/en_gb.inc.php:1573
 msgid "Blocked"
 msgstr "Bloķēts"
 
@@ -621,16 +621,16 @@ msgstr "Bloķēts"
 msgid "Bold line"
 msgstr "Paresnināta līnija"
 
-#: include/locales/en_gb.inc.php:870
+#: include/locales/en_gb.inc.php:869
 msgid "Boolean"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1033
+#: include/locales/en_gb.inc.php:1032
 #: include/views/configuration.sysmap.edit.php:117
 msgid "Bottom"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1240
+#: include/locales/en_gb.inc.php:1239
 msgid "Brighten"
 msgstr ""
 
@@ -638,11 +638,11 @@ msgstr ""
 msgid "Bulk acknowledge"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1160
+#: include/locales/en_gb.inc.php:1159
 msgid "By host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1161
+#: include/locales/en_gb.inc.php:1160
 msgid "By trigger template"
 msgstr "Pēc trigera šablona"
 
@@ -654,11 +654,11 @@ msgstr ""
 msgid "CONFIGURATION OF APPLICATIONS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:929
+#: include/locales/en_gb.inc.php:928
 msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:940
+#: include/locales/en_gb.inc.php:939
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr "GRAFIKU PROTOTIPU KONFIGURĀCIJA"
 
@@ -670,11 +670,11 @@ msgstr "GRAFIKU KONFIGURĀCIJA"
 msgid "CONFIGURATION OF HOST GROUPS"
 msgstr "MEZGLU GRUPU KONFIGURĀCIJA"
 
-#: include/locales/en_gb.inc.php:933
+#: include/locales/en_gb.inc.php:932
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:819
+#: include/locales/en_gb.inc.php:818
 msgid "CONFIGURATION OF ITEMS"
 msgstr ""
 
@@ -682,11 +682,11 @@ msgstr ""
 msgid "CONFIGURATION OF MAINTENANCE PERIODS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1067
+#: include/locales/en_gb.inc.php:1066
 msgid "CONFIGURATION OF MEDIA TYPES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:993
+#: include/locales/en_gb.inc.php:992
 msgid "CONFIGURATION OF NETWORK MAPS"
 msgstr ""
 
@@ -698,11 +698,11 @@ msgstr ""
 msgid "CONFIGURATION OF PROXIES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1260
+#: include/locales/en_gb.inc.php:1259
 msgid "CONFIGURATION OF SCREEN"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1248
+#: include/locales/en_gb.inc.php:1247
 msgid "CONFIGURATION OF SCREENS"
 msgstr ""
 
@@ -710,19 +710,19 @@ msgstr ""
 msgid "CONFIGURATION OF SCRIPTS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1282
+#: include/locales/en_gb.inc.php:1281
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:943
+#: include/locales/en_gb.inc.php:942
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
 msgstr "TRIGERU PROTOTIPU KONFIGURĀCIJA"
 
-#: include/locales/en_gb.inc.php:1419
+#: include/locales/en_gb.inc.php:1418
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "TRIGERU KONFIGURĀCIJA"
 
-#: include/locales/en_gb.inc.php:1538
+#: include/locales/en_gb.inc.php:1537
 msgid "CONFIGURATION OF USERS AND USER GROUPS"
 msgstr "LIETOTĀJU UN LIETOTĀJU GRUPU KONFIGURĀCIJA"
 
@@ -734,7 +734,7 @@ msgstr "TĪMEKĻA UZRAUDZĪBAS KONFIGURĀCIJA"
 msgid "CONFIGURATION OF ZABBIX"
 msgstr "ZABBIX KONFIGURĀCIJA"
 
-#: include/locales/en_gb.inc.php:1374
+#: include/locales/en_gb.inc.php:1373
 msgid "Calculate SLA"
 msgstr ""
 
@@ -742,15 +742,15 @@ msgstr ""
 msgid "Calculated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:751
+#: include/locales/en_gb.inc.php:750
 msgid "Callback"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2025
+#: include/locales/en_gb.inc.php:2024
 msgid "Can not create new element"
 msgstr "Nav iespējams izveidot jaunu elementu"
 
-#: include/locales/en_gb.inc.php:2024
+#: include/locales/en_gb.inc.php:2023
 msgid "Can not find objects with name"
 msgstr ""
 
@@ -758,15 +758,15 @@ msgstr ""
 msgid "Can't add group"
 msgstr "Grupu nav iespējams pievienot"
 
-#: include/locales/en_gb.inc.php:1952
+#: include/locales/en_gb.inc.php:1951
 msgid "Can't delete user medias"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1994
+#: include/locales/en_gb.inc.php:1993
 msgid "Can't format Tree"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1954
+#: include/locales/en_gb.inc.php:1953
 msgid "Can't insert user medias"
 msgstr ""
 
@@ -774,7 +774,7 @@ msgstr ""
 msgid "Can't link template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1595
+#: include/locales/en_gb.inc.php:1594
 msgid "Can't read script response, check connection"
 msgstr "Nav iespējams saņemt skripta rezultātus, pārbaudiet savienojumu"
 
@@ -790,7 +790,7 @@ msgstr ""
 msgid "Can't remove macros"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1594
+#: include/locales/en_gb.inc.php:1593
 msgid "Can't send command, check connection"
 msgstr "Nav iespējams nosūtīt komandu, pārbaudiet savienojumu"
 
@@ -802,7 +802,7 @@ msgstr ""
 msgid "Can't unlink template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1953
+#: include/locales/en_gb.inc.php:1952
 msgid "Can't update user medias"
 msgstr ""
 
@@ -810,7 +810,7 @@ msgstr ""
 msgid "Canada (136 characters)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1076
+#: include/locales/en_gb.inc.php:1075
 #: include/views/configuration.action.edit.php:865
 #: include/views/configuration.action.edit.php:913
 #: include/views/js/administration.general.triggerSeverity.js.php:38
@@ -841,7 +841,7 @@ msgstr ""
 msgid "Cannot add graph"
 msgstr "Grafiku nav iespējams pievienot"
 
-#: api/classes/class.chost.php:1824 include/locales/en_gb.inc.php:1517
+#: api/classes/class.chost.php:1824 include/locales/en_gb.inc.php:1516
 msgid "Cannot add group"
 msgstr "Grupu nav iespējams pievienot"
 
@@ -853,7 +853,7 @@ msgstr ""
 msgid "Cannot add image"
 msgstr "Attēlu nav iespējams pievienot"
 
-#: include/locales/en_gb.inc.php:821
+#: include/locales/en_gb.inc.php:820
 msgid "Cannot add item"
 msgstr ""
 
@@ -869,11 +869,11 @@ msgstr ""
 msgid "Cannot add more than one item with type \"Graph sum\""
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1020
+#: include/locales/en_gb.inc.php:1019
 msgid "Cannot add network map"
 msgstr "Nav iespējams pievienot tīkla karti"
 
-#: include/locales/en_gb.inc.php:1795
+#: include/locales/en_gb.inc.php:1794
 msgid "Cannot add new application"
 msgstr ""
 
@@ -881,7 +881,7 @@ msgstr ""
 msgid "Cannot add node"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1523
+#: include/locales/en_gb.inc.php:1522
 msgid "Cannot add proxy"
 msgstr ""
 
@@ -893,7 +893,7 @@ msgstr ""
 msgid "Cannot add scenario"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1251
+#: include/locales/en_gb.inc.php:1250
 msgid "Cannot add screen"
 msgstr ""
 
@@ -901,27 +901,27 @@ msgstr ""
 msgid "Cannot add script"
 msgstr "Skriptu nav iespējams pievienot"
 
-#: include/locales/en_gb.inc.php:1363
+#: include/locales/en_gb.inc.php:1362
 msgid "Cannot add service"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1342
+#: include/locales/en_gb.inc.php:1341
 msgid "Cannot add slideshow"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:783
+#: include/locales/en_gb.inc.php:782
 msgid "Cannot add template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1425
+#: include/locales/en_gb.inc.php:1424
 msgid "Cannot add trigger"
 msgstr "Trigeri nav iespējams pievienot"
 
-#: include/locales/en_gb.inc.php:1507
+#: include/locales/en_gb.inc.php:1506
 msgid "Cannot add user"
 msgstr "Lietotāju nav iespējams pievienot"
 
-#: include/locales/en_gb.inc.php:1508
+#: include/locales/en_gb.inc.php:1507
 msgid "Cannot add user. Both passwords must be equal."
 msgstr "Lietotāju nav iespējams pievienot. Abām parolēm jāsakrīt."
 
@@ -929,7 +929,7 @@ msgstr "Lietotāju nav iespējams pievienot. Abām parolēm jāsakrīt."
 msgid "Cannot add value map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:817
+#: include/locales/en_gb.inc.php:816
 msgid "Cannot clear history"
 msgstr ""
 
@@ -988,7 +988,7 @@ msgstr "Grafika prototipu nav iespējams izdzēst"
 msgid "Cannot delete graphs"
 msgstr "Grafikus nav iespējams izdzēst"
 
-#: include/locales/en_gb.inc.php:1521
+#: include/locales/en_gb.inc.php:1520
 msgid "Cannot delete group"
 msgstr "Grupu nav iespējams dzēst"
 
@@ -1000,11 +1000,11 @@ msgstr ""
 msgid "Cannot delete image"
 msgstr "Attēlu nav iespējams izdzēst"
 
-#: include/locales/en_gb.inc.php:823
+#: include/locales/en_gb.inc.php:822
 msgid "Cannot delete item"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:825
+#: include/locales/en_gb.inc.php:824
 msgid "Cannot delete items"
 msgstr ""
 
@@ -1012,7 +1012,7 @@ msgstr ""
 msgid "Cannot delete maintenance"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1009
+#: include/locales/en_gb.inc.php:1008
 msgid "Cannot delete network map"
 msgstr "Tīkla karti nav iespējams izdzēst"
 
@@ -1024,7 +1024,7 @@ msgstr ""
 msgid "Cannot delete profile"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1527
+#: include/locales/en_gb.inc.php:1526
 msgid "Cannot delete proxy"
 msgstr ""
 
@@ -1054,15 +1054,15 @@ msgstr ""
 msgid "Cannot delete selected actions"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1365
+#: include/locales/en_gb.inc.php:1364
 msgid "Cannot delete service"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1344
+#: include/locales/en_gb.inc.php:1343
 msgid "Cannot delete slideshow"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:789
+#: include/locales/en_gb.inc.php:788
 msgid "Cannot delete template"
 msgstr ""
 
@@ -1080,15 +1080,15 @@ msgstr ""
 msgid "Cannot delete templated trigger [%1$s:%2$s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1423
+#: include/locales/en_gb.inc.php:1422
 msgid "Cannot delete trigger"
 msgstr "Trigeri nav iespējams izdzēst"
 
-#: include/locales/en_gb.inc.php:1421
+#: include/locales/en_gb.inc.php:1420
 msgid "Cannot delete triggers"
 msgstr "Trigerus nav iespējams izdzēst"
 
-#: include/locales/en_gb.inc.php:1510
+#: include/locales/en_gb.inc.php:1509
 msgid "Cannot delete user"
 msgstr "Lietotāju nav iespējams izdzēst"
 
@@ -1096,19 +1096,19 @@ msgstr "Lietotāju nav iespējams izdzēst"
 msgid "Cannot delete value map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1255
+#: include/locales/en_gb.inc.php:1254
 msgid "Cannot deleted screen"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1042
+#: include/locales/en_gb.inc.php:1041
 msgid "Cannot find background image"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1294
+#: include/locales/en_gb.inc.php:1293
 msgid "Cannot find graph"
 msgstr "Grafiku nav iespējams atrast"
 
-#: include/locales/en_gb.inc.php:1044
+#: include/locales/en_gb.inc.php:1043
 msgid "Cannot find host"
 msgstr ""
 
@@ -1117,31 +1117,31 @@ msgstr ""
 msgid "Cannot find host interface on host \"%1$s\" for item key \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1045
+#: include/locales/en_gb.inc.php:1044
 msgid "Cannot find hostgroup"
 msgstr "Mezglu grupu nav iespējams atrast"
 
-#: include/locales/en_gb.inc.php:1041
+#: include/locales/en_gb.inc.php:1040
 msgid "Cannot find image"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1295
+#: include/locales/en_gb.inc.php:1294
 msgid "Cannot find item"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1046
+#: include/locales/en_gb.inc.php:1045
 msgid "Cannot find map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1047
+#: include/locales/en_gb.inc.php:1046
 msgid "Cannot find screen"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1043
+#: include/locales/en_gb.inc.php:1042
 msgid "Cannot find trigger"
 msgstr "Trigeri nav iespējams atrast"
 
-#: include/locales/en_gb.inc.php:1412
+#: include/locales/en_gb.inc.php:1411
 msgid "Cannot format Tree. Check logic structure in service links"
 msgstr ""
 
@@ -1149,11 +1149,8 @@ msgstr ""
 msgid "Cannot have empty visible template name"
 msgstr ""
 
-#: api/classes/class.ctriggerprototype.php:1339
-msgid "Cannot implode expression"
-msgstr ""
-
 #: api/classes/class.ctrigger.php:1468 api/classes/class.ctrigger.php:1559
+#: api/classes/class.ctriggerprototype.php:1339
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr ""
@@ -1163,15 +1160,15 @@ msgstr ""
 msgid "Cannot include view file \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1885
+#: include/locales/en_gb.inc.php:1884
 msgid "Cannot link hardlinked service."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1886
+#: include/locales/en_gb.inc.php:1885
 msgid "Cannot link service to itself."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:802
+#: include/locales/en_gb.inc.php:801
 msgid "Cannot link template"
 msgstr ""
 
@@ -1223,7 +1220,7 @@ msgstr ""
 msgid "Cannot remove macro"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1955
+#: include/locales/en_gb.inc.php:1954
 msgid "Cannot rename guest user"
 msgstr "Lietotāju \"guest\" nav iespējams pārdēvēt"
 
@@ -1235,7 +1232,7 @@ msgstr ""
 msgid "Cannot switch host for interface"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1531
+#: include/locales/en_gb.inc.php:1530
 msgid "Cannot unblock users"
 msgstr "Lietotājus nav iespējams atbloķēt"
 
@@ -1267,7 +1264,7 @@ msgstr ""
 msgid "Cannot unlink and clear triggers"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:801
+#: include/locales/en_gb.inc.php:800
 msgid "Cannot unlink template"
 msgstr ""
 
@@ -1275,7 +1272,7 @@ msgstr ""
 msgid "Cannot update"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1533
+#: include/locales/en_gb.inc.php:1532
 msgid "Cannot update GUI access"
 msgstr ""
 
@@ -1287,11 +1284,11 @@ msgstr ""
 msgid "Cannot update application"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1474
+#: include/locales/en_gb.inc.php:1473
 msgid "Cannot update comment"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1535
+#: include/locales/en_gb.inc.php:1534
 msgid "Cannot update debug mode"
 msgstr "Atkļūdošanas režīmu nav iespējams atjaunot"
 
@@ -1307,7 +1304,7 @@ msgstr ""
 msgid "Cannot update graph"
 msgstr "Grafiku nav iespējams atjaunot"
 
-#: include/locales/en_gb.inc.php:1519
+#: include/locales/en_gb.inc.php:1518
 msgid "Cannot update group"
 msgstr ""
 
@@ -1327,7 +1324,7 @@ msgstr ""
 msgid "Cannot update image"
 msgstr "Attēlu nav iespējams atjaunot"
 
-#: include/locales/en_gb.inc.php:820
+#: include/locales/en_gb.inc.php:819
 msgid "Cannot update item"
 msgstr ""
 
@@ -1349,7 +1346,7 @@ msgstr ""
 msgid "Cannot update map \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1022
+#: include/locales/en_gb.inc.php:1021
 msgid "Cannot update network map"
 msgstr ""
 
@@ -1357,7 +1354,7 @@ msgstr ""
 msgid "Cannot update node"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1525
+#: include/locales/en_gb.inc.php:1524
 msgid "Cannot update proxy"
 msgstr ""
 
@@ -1369,7 +1366,7 @@ msgstr ""
 msgid "Cannot update scenario"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1253
+#: include/locales/en_gb.inc.php:1252
 msgid "Cannot update screen"
 msgstr ""
 
@@ -1377,11 +1374,11 @@ msgstr ""
 msgid "Cannot update script"
 msgstr "Nevar modificēt skriptu"
 
-#: include/locales/en_gb.inc.php:1361
+#: include/locales/en_gb.inc.php:1360
 msgid "Cannot update service"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1340
+#: include/locales/en_gb.inc.php:1339
 msgid "Cannot update slideshow"
 msgstr ""
 
@@ -1389,23 +1386,23 @@ msgstr ""
 msgid "Cannot update status"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:785
+#: include/locales/en_gb.inc.php:784
 msgid "Cannot update template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1435
+#: include/locales/en_gb.inc.php:1434
 msgid "Cannot update trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1514
+#: include/locales/en_gb.inc.php:1513
 msgid "Cannot update user"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1515
+#: include/locales/en_gb.inc.php:1514
 msgid "Cannot update user. Both passwords must be equal."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1529
+#: include/locales/en_gb.inc.php:1528
 msgid "Cannot update users status"
 msgstr ""
 
@@ -1413,7 +1410,7 @@ msgstr ""
 msgid "Cannot update value map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1669
+#: include/locales/en_gb.inc.php:1668
 msgid "Caption"
 msgstr ""
 
@@ -1421,19 +1418,19 @@ msgstr ""
 msgid "Case sensitive"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1325
+#: include/locales/en_gb.inc.php:1324
 msgid "Centre"
 msgstr "Centrēt"
 
-#: include/locales/en_gb.inc.php:1433
+#: include/locales/en_gb.inc.php:1432
 msgid "Change"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1560
+#: include/locales/en_gb.inc.php:1559
 msgid "Change password"
 msgstr "Mainīt paroli"
 
-#: include/locales/en_gb.inc.php:876
+#: include/locales/en_gb.inc.php:875
 msgid "Character"
 msgstr ""
 
@@ -1453,7 +1450,7 @@ msgstr ""
 msgid "Check already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1690
+#: include/locales/en_gb.inc.php:1689
 msgid "Check expression part starting from '"
 msgstr "Pārbaudiet izteiksmi, sākot ar '"
 
@@ -1477,7 +1474,7 @@ msgstr ""
 msgid "Child"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1644
+#: include/locales/en_gb.inc.php:1643
 msgid "Chinese (CN)"
 msgstr "Ķīniešu (CN)"
 
@@ -1490,27 +1487,27 @@ msgstr ""
 msgid "Circular link cannot be created"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1615
+#: include/locales/en_gb.inc.php:1614
 msgid "Clear"
 msgstr "Iztīrīt"
 
-#: include/locales/en_gb.inc.php:816
+#: include/locales/en_gb.inc.php:815
 msgid "Clear history"
 msgstr "Izdzēst vēsturi"
 
-#: include/locales/en_gb.inc.php:815
+#: include/locales/en_gb.inc.php:814
 msgid "Clear history for selected"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:774
+#: include/locales/en_gb.inc.php:773
 msgid "Clear when unlinking"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1309
+#: include/locales/en_gb.inc.php:1308
 msgid "Clock"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1380
+#: include/locales/en_gb.inc.php:1379
 #: include/views/administration.script.edit.php:119
 #: include/views/configuration.action.edit.php:929
 #: include/views/configuration.discovery.edit.php:108
@@ -1519,7 +1516,7 @@ msgstr ""
 msgid "Clone"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1590
+#: include/locales/en_gb.inc.php:1589
 msgid "Close"
 msgstr "Aizvērt"
 
@@ -1532,23 +1529,23 @@ msgstr ""
 msgid "Colour"
 msgstr "Krāsa"
 
-#: include/locales/en_gb.inc.php:1016
+#: include/locales/en_gb.inc.php:1015
 msgid "Colour (OK)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1303
+#: include/locales/en_gb.inc.php:1302
 msgid "Column span"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1256
+#: include/locales/en_gb.inc.php:1255
 msgid "Columns"
 msgstr "Stabiņi"
 
-#: include/locales/en_gb.inc.php:1720
+#: include/locales/en_gb.inc.php:1719
 msgid "Combined result"
 msgstr "Gala rezultāts"
 
-#: include/locales/en_gb.inc.php:1588
+#: include/locales/en_gb.inc.php:1587
 #: include/views/administration.script.edit.php:66
 msgid "Command"
 msgstr ""
@@ -1569,11 +1566,11 @@ msgstr ""
 msgid "Commands"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1473
+#: include/locales/en_gb.inc.php:1472
 msgid "Comment updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1488
+#: include/locales/en_gb.inc.php:1487
 msgid "Comments"
 msgstr "Komentāri"
 
@@ -1581,7 +1578,7 @@ msgstr "Komentāri"
 msgid "Commercial"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1232
+#: include/locales/en_gb.inc.php:1231
 msgid "Compare values for multiple periods"
 msgstr ""
 
@@ -1599,7 +1596,7 @@ msgstr "Nosacījumi"
 msgid "Configuration"
 msgstr "Konfigurācija"
 
-#: include/locales/en_gb.inc.php:1358
+#: include/locales/en_gb.inc.php:1357
 msgid "Configuration of IT services"
 msgstr ""
 
@@ -1623,23 +1620,23 @@ msgstr ""
 msgid "Configuration of graphs"
 msgstr "Grafiku konfigurācija"
 
-#: include/locales/en_gb.inc.php:818
+#: include/locales/en_gb.inc.php:817
 msgid "Configuration of items"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:992
+#: include/locales/en_gb.inc.php:991
 msgid "Configuration of network maps"
 msgstr "Tīkla karšu konfigurācija"
 
-#: include/locales/en_gb.inc.php:1249
+#: include/locales/en_gb.inc.php:1248
 msgid "Configuration of screens"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1283
+#: include/locales/en_gb.inc.php:1282
 msgid "Configuration of slideshows"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1418
+#: include/locales/en_gb.inc.php:1417
 msgid "Configuration of triggers"
 msgstr ""
 
@@ -1651,7 +1648,7 @@ msgstr "Konfigurācija saglabāta"
 msgid "Configuration was not updated"
 msgstr "Konfigurācija netika saglabāta"
 
-#: include/locales/en_gb.inc.php:1102
+#: include/locales/en_gb.inc.php:1101
 msgid "Configure"
 msgstr ""
 
@@ -1659,7 +1656,7 @@ msgstr ""
 msgid "Confirmation text"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:726
+#: include/locales/en_gb.inc.php:725
 #: include/views/configuration.host.edit.php:192
 msgid "Connect to"
 msgstr ""
@@ -1674,7 +1671,7 @@ msgstr ""
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1000
+#: include/locales/en_gb.inc.php:999
 msgid "Connectors"
 msgstr ""
 
@@ -1686,19 +1683,19 @@ msgstr "Kontaktinformācija"
 msgid "Contract number"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:997
+#: include/locales/en_gb.inc.php:996
 msgid "Coordinate X"
 msgstr "X koordināta"
 
-#: include/locales/en_gb.inc.php:998
+#: include/locales/en_gb.inc.php:997
 msgid "Coordinate Y"
 msgstr "Y koordināta"
 
-#: include/locales/en_gb.inc.php:899
+#: include/locales/en_gb.inc.php:898
 msgid "Copy"
 msgstr "Kopēt"
 
-#: include/locales/en_gb.inc.php:922
+#: include/locales/en_gb.inc.php:921
 msgid "Copy selected items?"
 msgstr ""
 
@@ -1706,7 +1703,7 @@ msgstr ""
 msgid "Copy selected to ..."
 msgstr "Kopēt iezīmētos uz..."
 
-#: include/locales/en_gb.inc.php:1465
+#: include/locales/en_gb.inc.php:1464
 msgid "Copy selected triggers?"
 msgstr ""
 
@@ -1715,19 +1712,19 @@ msgstr ""
 msgid "Correct login [%s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1895
+#: include/locales/en_gb.inc.php:1894
 msgid "Could not save image!"
 msgstr "Nevar saglabāt attēlu"
 
-#: include/locales/en_gb.inc.php:1128
+#: include/locales/en_gb.inc.php:1127
 msgid "Count"
 msgstr "Skaits"
 
-#: include/locales/en_gb.inc.php:1286
+#: include/locales/en_gb.inc.php:1285
 msgid "Count of slides"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1210
+#: include/locales/en_gb.inc.php:1209
 msgid "Create"
 msgstr "Izveidot"
 
@@ -1739,15 +1736,15 @@ msgstr ""
 msgid "Create Graph"
 msgstr "Izveidot grafiku"
 
-#: include/locales/en_gb.inc.php:1566
+#: include/locales/en_gb.inc.php:1565
 msgid "Create Group"
 msgstr "Izveidot grupu"
 
-#: include/locales/en_gb.inc.php:894
+#: include/locales/en_gb.inc.php:893
 msgid "Create Item"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1012
+#: include/locales/en_gb.inc.php:1011
 msgid "Create Map"
 msgstr "Izveidot karti"
 
@@ -1755,23 +1752,23 @@ msgstr "Izveidot karti"
 msgid "Create Media Type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:770
+#: include/locales/en_gb.inc.php:769
 msgid "Create Proxy"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1272
+#: include/locales/en_gb.inc.php:1271
 msgid "Create Screen"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1273
+#: include/locales/en_gb.inc.php:1272
 msgid "Create Slide Show"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1440
+#: include/locales/en_gb.inc.php:1439
 msgid "Create Trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1565
+#: include/locales/en_gb.inc.php:1564
 msgid "Create User"
 msgstr "Izveidot lietotāju"
 
@@ -1787,7 +1784,7 @@ msgstr ""
 msgid "Create maintenance period"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:937
+#: include/locales/en_gb.inc.php:936
 msgid "Create prototype"
 msgstr ""
 
@@ -1803,7 +1800,7 @@ msgstr ""
 msgid "Create script"
 msgstr "Izveidot skriptu"
 
-#: include/locales/en_gb.inc.php:2016
+#: include/locales/en_gb.inc.php:2015
 msgid "Create trigger"
 msgstr ""
 
@@ -1811,7 +1808,7 @@ msgstr ""
 msgid "Create value map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1811
+#: include/locales/en_gb.inc.php:1810
 msgid "Critical error"
 msgstr "Kritiska kļūda"
 
@@ -1842,11 +1839,11 @@ msgstr ""
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:891
+#: include/locales/en_gb.inc.php:890
 msgid "Custom multiplier"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1335
+#: include/locales/en_gb.inc.php:1334
 msgid "Custom screens"
 msgstr ""
 
@@ -1862,11 +1859,11 @@ msgstr ""
 msgid "Custom severity names affect all locales and require manual translation!"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1351
+#: include/locales/en_gb.inc.php:1350
 msgid "Custom slides"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1649
+#: include/locales/en_gb.inc.php:1648
 msgid "Czech (CZ)"
 msgstr "Čehu (CZ)"
 
@@ -1874,7 +1871,7 @@ msgstr "Čehu (CZ)"
 msgid "D"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1101
+#: include/locales/en_gb.inc.php:1100
 msgid "DASHBOARD CONFIGURATION"
 msgstr "INFOPANEĻA KONFIGURĀCIJA"
 
@@ -1882,11 +1879,11 @@ msgstr "INFOPANEĻA KONFIGURĀCIJA"
 msgid "DETAILS OF SCENARIO"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1429
+#: include/locales/en_gb.inc.php:1428
 msgid "DISABLED"
 msgstr "ATSPĒJOTS"
 
-#: include/locales/en_gb.inc.php:961
+#: include/locales/en_gb.inc.php:960
 msgid "DISCOVERED"
 msgstr ""
 
@@ -1894,11 +1891,11 @@ msgstr ""
 msgid "DISCOVERY"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1674
+#: include/locales/en_gb.inc.php:1673
 msgid "DISCOVERY CHECKS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1673
+#: include/locales/en_gb.inc.php:1672
 msgid "DISCOVERY RULES"
 msgstr ""
 
@@ -1906,20 +1903,20 @@ msgstr ""
 msgid "DM"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:727
+#: include/locales/en_gb.inc.php:726 popup.php:441
 msgid "DNS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:738
+#: include/locales/en_gb.inc.php:737
 #: include/views/configuration.host.edit.php:192
 msgid "DNS name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:960
+#: include/locales/en_gb.inc.php:959
 msgid "DOWN"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1192
+#: include/locales/en_gb.inc.php:1191
 msgid "Daily"
 msgstr ""
 
@@ -1927,19 +1924,19 @@ msgstr ""
 msgid "Dark orange"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1239
+#: include/locales/en_gb.inc.php:1238
 msgid "Darken"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1081 include/menu.inc.php:33
+#: include/locales/en_gb.inc.php:1080 include/menu.inc.php:33
 msgid "Dashboard"
 msgstr "Infopanelis"
 
-#: include/locales/en_gb.inc.php:1100
+#: include/locales/en_gb.inc.php:1099
 msgid "Dashboard configuration"
 msgstr "Infopaneļa konfigurācija"
 
-#: include/locales/en_gb.inc.php:1106
+#: include/locales/en_gb.inc.php:1105
 msgid "Dashboard filter"
 msgstr "Infopaneļa filtrs"
 
@@ -1947,7 +1944,7 @@ msgstr "Infopaneļa filtrs"
 msgid "Dashed line"
 msgstr "Pārtraukta līnija"
 
-#: include/locales/en_gb.inc.php:1119
+#: include/locales/en_gb.inc.php:1118
 msgid "Data"
 msgstr ""
 
@@ -1956,11 +1953,11 @@ msgstr ""
 msgid "Data from %1$s. Generated in %2$s sec"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1311
+#: include/locales/en_gb.inc.php:1310
 msgid "Data overview"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:866
+#: include/locales/en_gb.inc.php:865
 msgid "Data type"
 msgstr "Datu tips"
 
@@ -1972,7 +1969,7 @@ msgstr ""
 msgid "Database host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:842
+#: include/locales/en_gb.inc.php:841
 msgid "Database monitor"
 msgstr ""
 
@@ -2025,7 +2022,7 @@ msgstr ""
 msgid "Date hw decommissioned"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1188
+#: include/locales/en_gb.inc.php:1187
 msgid "Day"
 msgstr "Diena"
 
@@ -2041,15 +2038,15 @@ msgstr "Nedēļas diena"
 msgid "Days"
 msgstr "Dienas"
 
-#: include/locales/en_gb.inc.php:1551
+#: include/locales/en_gb.inc.php:1550
 msgid "Debug"
 msgstr "Atkļūdošana"
 
-#: include/locales/en_gb.inc.php:1552
+#: include/locales/en_gb.inc.php:1551
 msgid "Debug mode"
 msgstr "Atkļūdošanas režīms"
 
-#: include/locales/en_gb.inc.php:1534
+#: include/locales/en_gb.inc.php:1533
 msgid "Debug mode updated"
 msgstr "Atkļūdošanas režīms atjaunots"
 
@@ -2061,11 +2058,11 @@ msgstr ""
 msgid "December"
 msgstr "Decembris"
 
-#: include/locales/en_gb.inc.php:867
+#: include/locales/en_gb.inc.php:866
 msgid "Decimal"
 msgstr "Decimāls"
 
-#: include/locales/en_gb.inc.php:384 include/locales/en_gb.inc.php:743
+#: include/locales/en_gb.inc.php:384 include/locales/en_gb.inc.php:742
 #: include/views/configuration.action.edit.php:357
 msgid "Default"
 msgstr "Noklusētais"
@@ -2087,11 +2084,11 @@ msgstr "Noklusētā tēma"
 msgid "Default theme"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1597
+#: include/locales/en_gb.inc.php:1596
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1596
+#: include/locales/en_gb.inc.php:1595
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
 msgstr ""
 
@@ -2108,27 +2105,27 @@ msgstr ""
 msgid "Delayed by"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1379
+#: include/locales/en_gb.inc.php:1378
 msgid "Delete"
 msgstr "Dzēst"
 
-#: include/locales/en_gb.inc.php:1027
+#: include/locales/en_gb.inc.php:1026
 msgid "Delete Links between selected elements?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2020
+#: include/locales/en_gb.inc.php:2019
 msgid "Delete Service"
 msgstr "Dzēst servisu"
 
-#: include/locales/en_gb.inc.php:790
+#: include/locales/en_gb.inc.php:789
 msgid "Delete and clear"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:792
+#: include/locales/en_gb.inc.php:791
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:794
+#: include/locales/en_gb.inc.php:793
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
 msgstr ""
 
@@ -2140,7 +2137,7 @@ msgstr ""
 msgid "Delete discovery rule?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1709
+#: include/locales/en_gb.inc.php:1708
 msgid "Delete expression?"
 msgstr "Dzēst izteiksmi?"
 
@@ -2156,15 +2153,15 @@ msgstr ""
 msgid "Delete history of selected WEB scenarios?"
 msgstr "Dzēst iezīmēto Tīmekļa scenāriju vēsturi?"
 
-#: include/locales/en_gb.inc.php:923
+#: include/locales/en_gb.inc.php:922
 msgid "Delete history of selected items?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1859
+#: include/locales/en_gb.inc.php:1858
 msgid "Delete it?"
 msgstr "Izdzēst?"
 
-#: include/locales/en_gb.inc.php:1710
+#: include/locales/en_gb.inc.php:1709
 msgid "Delete keyword?"
 msgstr "Dzēst atslēgas vārdu?"
 
@@ -2180,7 +2177,7 @@ msgstr ""
 msgid "Delete scenario?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1259
+#: include/locales/en_gb.inc.php:1258
 msgid "Delete screen?"
 msgstr ""
 
@@ -2207,7 +2204,7 @@ msgstr "Dzēst iezīmētos Tīmekļa scenārijus?"
 msgid "Delete selected actions?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1726
+#: include/locales/en_gb.inc.php:1725
 msgid "Delete selected applications?"
 msgstr ""
 
@@ -2215,7 +2212,7 @@ msgstr ""
 msgid "Delete selected discovery rules?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1025
+#: include/locales/en_gb.inc.php:1024
 msgid "Delete selected elements?"
 msgstr "Dzēst iezīmētos elementus?"
 
@@ -2231,11 +2228,11 @@ msgstr "Vai dzēst izvēlēto grupu?"
 msgid "Delete selected groups"
 msgstr "Dzēst izvēlētās grupas"
 
-#: include/locales/en_gb.inc.php:1584
+#: include/locales/en_gb.inc.php:1583
 msgid "Delete selected groups?"
 msgstr "Vai dzēst iezīmētās grupas?"
 
-#: include/locales/en_gb.inc.php:758
+#: include/locales/en_gb.inc.php:757
 msgid "Delete selected host?"
 msgstr ""
 
@@ -2247,11 +2244,11 @@ msgstr ""
 msgid "Delete selected image?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1783
+#: include/locales/en_gb.inc.php:1782
 msgid "Delete selected item?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:924
+#: include/locales/en_gb.inc.php:923
 msgid "Delete selected items?"
 msgstr ""
 
@@ -2259,7 +2256,7 @@ msgstr ""
 msgid "Delete selected maintenance periods?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1018
+#: include/locales/en_gb.inc.php:1017
 msgid "Delete selected maps?"
 msgstr "Dzēst iezīmētās kartes?"
 
@@ -2295,27 +2292,27 @@ msgstr ""
 msgid "Delete selected scripts?"
 msgstr "Vai dzēst iezīmētos skriptus?"
 
-#: include/locales/en_gb.inc.php:2021
+#: include/locales/en_gb.inc.php:2020
 msgid "Delete selected services?"
 msgstr "Dzēst izvēlēto servisu?"
 
-#: include/locales/en_gb.inc.php:1277
+#: include/locales/en_gb.inc.php:1276
 msgid "Delete selected slideshows?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:791
+#: include/locales/en_gb.inc.php:790
 msgid "Delete selected templates?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1466
+#: include/locales/en_gb.inc.php:1465
 msgid "Delete selected triggers?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1779
+#: include/locales/en_gb.inc.php:1778
 msgid "Delete selected user?"
 msgstr "Izdzēst izvēlēto lietotāju?"
 
-#: include/locales/en_gb.inc.php:1577
+#: include/locales/en_gb.inc.php:1576
 msgid "Delete selected users?"
 msgstr "Vai dzēst iezīmētos lietotājus?"
 
@@ -2331,11 +2328,11 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/locales/en_gb.inc.php:759
+#: include/locales/en_gb.inc.php:758
 msgid "Delete selected with linked elements"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1345
+#: include/locales/en_gb.inc.php:1344
 msgid "Delete slideshow?"
 msgstr ""
 
@@ -2343,19 +2340,19 @@ msgstr ""
 msgid "Delete system map?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:793
+#: include/locales/en_gb.inc.php:792
 msgid "Delete template?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1723
+#: include/locales/en_gb.inc.php:1722
 msgid "Delete this application?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1786
+#: include/locales/en_gb.inc.php:1785
 msgid "Delete trigger?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:733
+#: include/locales/en_gb.inc.php:732
 msgid "Deleted"
 msgstr ""
 
@@ -2363,23 +2360,23 @@ msgstr ""
 msgid "Delimiter"
 msgstr "Atdalītājs"
 
-#: include/locales/en_gb.inc.php:882
+#: include/locales/en_gb.inc.php:881
 msgid "Delta (simple change)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:881
+#: include/locales/en_gb.inc.php:880
 msgid "Delta (speed per second)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1557
+#: include/locales/en_gb.inc.php:1556
 msgid "Deny"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1437
+#: include/locales/en_gb.inc.php:1436
 msgid "Dependent"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1436
+#: include/locales/en_gb.inc.php:1435
 msgid "Depends on"
 msgstr ""
 
@@ -2388,12 +2385,12 @@ msgid "Deployment status"
 msgstr ""
 
 #: host_discovery.php:639 include/forms.inc.php:2176
-#: include/forms.inc.php:2485 include/locales/en_gb.inc.php:829
+#: include/forms.inc.php:2485 include/locales/en_gb.inc.php:828
 #: include/views/administration.script.edit.php:71 media_types.php:260
 msgid "Description"
 msgstr "Apraksts"
 
-#: include/locales/en_gb.inc.php:1605
+#: include/locales/en_gb.inc.php:1604
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:332 queue.php:50
 msgid "Details"
@@ -2415,19 +2412,19 @@ msgstr ""
 msgid "Device uniqueness criteria."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1276
+#: include/locales/en_gb.inc.php:1275
 msgid "Dimension (cols x rows)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1431
+#: include/locales/en_gb.inc.php:1430
 msgid "Disable"
 msgstr "Atspējot"
 
-#: include/locales/en_gb.inc.php:1573
+#: include/locales/en_gb.inc.php:1572
 msgid "Disable DEBUG"
 msgstr "Atspējot ATKĻŪDOŠANU"
 
-#: include/locales/en_gb.inc.php:1583
+#: include/locales/en_gb.inc.php:1582
 msgid "Disable debug mode in selected groups?"
 msgstr "Atspējot atkļūdošanas režīmu iezīmētajās grupās?"
 
@@ -2460,7 +2457,7 @@ msgstr "Atspējot iezīmētos Tīmekļa scenārijus?"
 msgid "Disable selected actions?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1725
+#: include/locales/en_gb.inc.php:1724
 msgid "Disable selected applications?"
 msgstr ""
 
@@ -2468,7 +2465,7 @@ msgstr ""
 msgid "Disable selected discovery rules?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1581
+#: include/locales/en_gb.inc.php:1580
 msgid "Disable selected groups?"
 msgstr ""
 
@@ -2480,16 +2477,16 @@ msgstr ""
 msgid "Disable selected hosts?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:920
+#: include/locales/en_gb.inc.php:919
 msgid "Disable selected items?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1463
+#: include/locales/en_gb.inc.php:1462
 msgid "Disable selected triggers?"
 msgstr ""
 
 #: actionconf.php:464 include/discovery.inc.php:120
-#: include/locales/en_gb.inc.php:1428
+#: include/locales/en_gb.inc.php:1427
 #: include/views/configuration.host.edit.php:516
 #: include/views/configuration.host.massupdate.php:216
 msgid "Disabled"
@@ -2520,6 +2517,10 @@ msgstr ""
 
 #: include/actions.inc.php:50
 msgid "Discovery check"
+msgstr ""
+
+#: popup.php:131
+msgid "Discovery checks"
 msgstr ""
 
 #: include/actions.inc.php:51
@@ -2566,7 +2567,7 @@ msgid "Discovery rule updated."
 msgstr ""
 
 #: include/views/configuration.host.edit.php:337
-#: include/views/configuration.template.edit.php:268
+#: include/views/configuration.template.edit.php:268 popup.php:127
 msgid "Discovery rules"
 msgstr ""
 
@@ -2590,23 +2591,23 @@ msgstr ""
 msgid "Discovery status"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1665
+#: include/locales/en_gb.inc.php:1664
 msgid "Displaying"
 msgstr "Attēlo"
 
-#: include/locales/en_gb.inc.php:1231
+#: include/locales/en_gb.inc.php:1230
 msgid "Distribution of values for multiple items"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1230
+#: include/locales/en_gb.inc.php:1229
 msgid "Distribution of values for multiple periods"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1784
+#: include/locales/en_gb.inc.php:1783
 msgid "Do"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1373
+#: include/locales/en_gb.inc.php:1372
 msgid "Do not calculate"
 msgstr ""
 
@@ -2626,7 +2627,7 @@ msgstr "Neuzglabāt vēsturi ilgāk kā (dienās)"
 msgid "Do not keep trends older than (in days)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2017
+#: include/locales/en_gb.inc.php:2016
 msgid "Do you wish to replace the conditional expression?"
 msgstr ""
 
@@ -2649,7 +2650,7 @@ msgstr ""
 msgid "Download speed for step '%1$s' of scenario '%2$s'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:115 include/locales/en_gb.inc.php:1383
+#: include/locales/en_gb.inc.php:115 include/locales/en_gb.inc.php:1382
 msgid "Downtime"
 msgstr ""
 
@@ -2695,49 +2696,49 @@ msgstr ""
 msgid "Duration"
 msgstr "Ilgums"
 
-#: include/locales/en_gb.inc.php:1645
+#: include/locales/en_gb.inc.php:1644
 msgid "Dutch (NL)"
 msgstr "Holandiešu (NL)"
 
-#: include/locales/en_gb.inc.php:1275
+#: include/locales/en_gb.inc.php:1274
 msgid "Dynamic item"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1770
+#: include/locales/en_gb.inc.php:1769
 msgid "E"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1973
+#: include/locales/en_gb.inc.php:1972
 msgid "ERROR"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1984
+#: include/locales/en_gb.inc.php:1983
 msgid "EVENTS"
 msgstr "NOTIKUMI"
 
-#: include/locales/en_gb.inc.php:1051
+#: include/locales/en_gb.inc.php:1050
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
-#: include/forms.inc.php:452 include/locales/en_gb.inc.php:1274
+#: include/forms.inc.php:452 include/locales/en_gb.inc.php:1273
 #: include/views/configuration.action.edit.php:367
 #: include/views/configuration.action.edit.php:373
 msgid "Edit"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2019
+#: include/locales/en_gb.inc.php:2018
 msgid "Edit Service"
 msgstr "Rediģēt servisu"
 
-#: include/locales/en_gb.inc.php:918
+#: include/locales/en_gb.inc.php:917
 msgid "Edit Trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1702
+#: include/locales/en_gb.inc.php:1701
 msgid "Edit connector"
 msgstr "Rediģēt savienotāju"
 
-#: include/locales/en_gb.inc.php:1661
+#: include/locales/en_gb.inc.php:1660
 msgid "Edit hosts"
 msgstr ""
 
@@ -2745,7 +2746,7 @@ msgstr ""
 msgid "Edit maintenance period"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1004
+#: include/locales/en_gb.inc.php:1003
 msgid "Edit map element"
 msgstr "Rediģēt kartes elementu"
 
@@ -2758,11 +2759,11 @@ msgstr "Elements"
 msgid "Element name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:853
+#: include/locales/en_gb.inc.php:852
 msgid "Email"
 msgstr "E-pasts"
 
-#: include/locales/en_gb.inc.php:1670
+#: include/locales/en_gb.inc.php:1669
 msgid "Empty"
 msgstr "Tukšs"
 
@@ -2789,15 +2790,15 @@ msgstr ""
 msgid "Empty parameters"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1598
+#: include/locales/en_gb.inc.php:1597
 msgid "Empty response received"
 msgstr "Saņemta tukša atbilde"
 
-#: include/locales/en_gb.inc.php:1432
+#: include/locales/en_gb.inc.php:1431
 msgid "Enable"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1572
+#: include/locales/en_gb.inc.php:1571
 msgid "Enable DEBUG"
 msgstr "Iespējot ATKĻŪDOŠANU"
 
@@ -2805,7 +2806,7 @@ msgstr "Iespējot ATKĻŪDOŠANU"
 msgid "Enable confirmation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1582
+#: include/locales/en_gb.inc.php:1581
 msgid "Enable debug mode in selected groups?"
 msgstr "Iespējot atkļūdošanas režīmu iezīmētajās grupās?"
 
@@ -2841,44 +2842,45 @@ msgstr ""
 msgid "Enable selected discovery rules?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1580
+#: include/locales/en_gb.inc.php:1579
 msgid "Enable selected groups?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:919
+#: include/locales/en_gb.inc.php:918
 msgid "Enable selected items?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1462
+#: include/locales/en_gb.inc.php:1461
 msgid "Enable selected triggers?"
 msgstr ""
 
-#: actionconf.php:469 include/locales/en_gb.inc.php:1430
+#: actionconf.php:469 include/locales/en_gb.inc.php:1429
 #: include/views/configuration.action.edit.php:72
 msgid "Enabled"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1747
+#: include/locales/en_gb.inc.php:1746
 msgid "End of"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1633
+#: include/locales/en_gb.inc.php:1632
 msgid "English (GB)"
 msgstr "Angļu (GB)"
 
-#: include/locales/en_gb.inc.php:302 include/locales/en_gb.inc.php:1686
+#: include/locales/en_gb.inc.php:302 include/locales/en_gb.inc.php:1685
+#: popup.php:139
 msgid "Error"
 msgstr "Kļūda"
 
-#: include/locales/en_gb.inc.php:1593
+#: include/locales/en_gb.inc.php:1592
 msgid "Error Description"
 msgstr "Kļūdas apraksts"
 
-#: include/locales/en_gb.inc.php:1849
+#: include/locales/en_gb.inc.php:1848
 msgid "Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1206
+#: include/locales/en_gb.inc.php:1205
 msgid "Error adding service time"
 msgstr ""
 
@@ -2887,7 +2889,7 @@ msgstr ""
 msgid "Error in item key: %s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:950
+#: include/locales/en_gb.inc.php:949
 msgid "Event"
 msgstr "Notikums"
 
@@ -2903,15 +2905,15 @@ msgstr "Notikums apstiprināts"
 msgid "Event acknowledges"
 msgstr "Notikumu apstiprināšana"
 
-#: include/locales/en_gb.inc.php:1058
+#: include/locales/en_gb.inc.php:1057
 msgid "Event acknowledging disabled"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:951
+#: include/locales/en_gb.inc.php:950
 msgid "Event details"
 msgstr "Notikuma detaļas"
 
-#: include/locales/en_gb.inc.php:1452
+#: include/locales/en_gb.inc.php:1451
 msgid "Event generation"
 msgstr ""
 
@@ -2919,7 +2921,7 @@ msgstr ""
 msgid "Event source"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1983 include/menu.inc.php:62
+#: include/locales/en_gb.inc.php:1982 include/menu.inc.php:62
 msgid "Events"
 msgstr "Notikumi"
 
@@ -2931,11 +2933,11 @@ msgstr ""
 msgid "Every week(s)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1771
+#: include/locales/en_gb.inc.php:1770
 msgid "Exa"
 msgstr "Eksa"
 
-#: include/locales/en_gb.inc.php:1706
+#: include/locales/en_gb.inc.php:1705
 msgid "Exclude"
 msgstr "Neiekļaut"
 
@@ -2944,7 +2946,7 @@ msgstr "Neiekļaut"
 msgid "Execute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1896
+#: include/locales/en_gb.inc.php:1895
 msgid "Execute SQL error"
 msgstr ""
 
@@ -2956,7 +2958,7 @@ msgstr ""
 msgid "Execute on"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:912
+#: include/locales/en_gb.inc.php:911
 msgid "Executed script"
 msgstr ""
 
@@ -3001,15 +3003,15 @@ msgstr ""
 msgid "Expression"
 msgstr "Izteiksme"
 
-#: include/locales/en_gb.inc.php:1688
+#: include/locales/en_gb.inc.php:1687
 msgid "Expression Syntax Error"
 msgstr "Sintakses kļūda izteiksmē"
 
-#: include/locales/en_gb.inc.php:1714
+#: include/locales/en_gb.inc.php:1713
 msgid "Expression Variable Elements"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1829
+#: include/locales/en_gb.inc.php:1828
 msgid "Expression cannot be empty"
 msgstr "Izteiksme nedrīkst būt tukša"
 
@@ -3021,15 +3023,15 @@ msgstr "Izteiksmes tips"
 msgid "Expressions"
 msgstr "Izteiksmes"
 
-#: include/locales/en_gb.inc.php:848
+#: include/locales/en_gb.inc.php:847
 msgid "External check"
 msgstr "Ārēja pārbaude"
 
-#: include/locales/en_gb.inc.php:858
+#: include/locales/en_gb.inc.php:857
 msgid "Ez Texting"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2005
+#: include/locales/en_gb.inc.php:2004
 msgid "F"
 msgstr "P"
 
@@ -3068,19 +3070,19 @@ msgstr ""
 msgid "Failure Audit"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1107
+#: include/locales/en_gb.inc.php:1106
 msgid "Favourite graphs"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1108
+#: include/locales/en_gb.inc.php:1107
 msgid "Favourite maps"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1109
+#: include/locales/en_gb.inc.php:1108
 msgid "Favourite screens"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1090
+#: include/locales/en_gb.inc.php:1089
 msgid "Favourites"
 msgstr ""
 
@@ -3092,7 +3094,7 @@ msgstr ""
 msgid "February"
 msgstr "Februāris"
 
-#: hostprofilesoverview.php:86 include/locales/en_gb.inc.php:1812
+#: hostprofilesoverview.php:86 include/locales/en_gb.inc.php:1811
 msgid "Field"
 msgstr "Lauks"
 
@@ -3129,7 +3131,7 @@ msgstr "Filtrs"
 msgid "Filter by host group"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1485
+#: include/locales/en_gb.inc.php:1484
 msgid "Filter by name"
 msgstr ""
 
@@ -3137,7 +3139,7 @@ msgstr ""
 msgid "Finish"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:649 include/locales/en_gb.inc.php:2032
+#: include/locales/en_gb.inc.php:649 include/locales/en_gb.inc.php:2031
 msgid "First"
 msgstr ""
 
@@ -3145,15 +3147,15 @@ msgstr ""
 msgid "Fixed"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:905
+#: include/locales/en_gb.inc.php:904
 msgid "Flexible intervals (sec)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1512
+#: include/locales/en_gb.inc.php:1511
 msgid "For guest, password must be empty"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:925
+#: include/locales/en_gb.inc.php:924
 msgid "Formula"
 msgstr "Formula"
 
@@ -3161,7 +3163,7 @@ msgstr "Formula"
 msgid "Fourth"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1634
+#: include/locales/en_gb.inc.php:1633
 msgid "French (FR)"
 msgstr "Franču (FR)"
 
@@ -3169,16 +3171,16 @@ msgstr "Franču (FR)"
 msgid "Fri"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:51 include/locales/en_gb.inc.php:1396
+#: include/locales/en_gb.inc.php:51 include/locales/en_gb.inc.php:1395
 msgid "Friday"
 msgstr "Piektdiena"
 
-#: include/locales/en_gb.inc.php:1176
+#: include/locales/en_gb.inc.php:1175
 #: include/views/configuration.action.edit.php:429
 msgid "From"
 msgstr "No"
 
-#: include/locales/en_gb.inc.php:1381
+#: include/locales/en_gb.inc.php:1380
 #: include/views/configuration.host.edit.php:602
 msgid "Full clone"
 msgstr ""
@@ -3191,19 +3193,19 @@ msgstr ""
 msgid "Function"
 msgstr "Funkcija"
 
-#: include/locales/en_gb.inc.php:1847
+#: include/locales/en_gb.inc.php:1846
 msgid "Function '"
 msgstr "Funkcija '"
 
-#: include/locales/en_gb.inc.php:1764
+#: include/locales/en_gb.inc.php:1763
 msgid "G"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1935
+#: include/locales/en_gb.inc.php:1934
 msgid "GD PNG Support"
 msgstr "GD PNG atbalsts"
 
-#: include/locales/en_gb.inc.php:947
+#: include/locales/en_gb.inc.php:946
 msgid "GRAPH PROTOTYPES OF"
 msgstr ""
 
@@ -3211,7 +3213,7 @@ msgstr ""
 msgid "GRAPHS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:860
+#: include/locales/en_gb.inc.php:859
 msgid "GSM modem"
 msgstr "GSM modems"
 
@@ -3219,11 +3221,11 @@ msgstr "GSM modems"
 msgid "GUI"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1624
+#: include/locales/en_gb.inc.php:1623
 msgid "GUI Messaging"
 msgstr "Grafiskās saskarnes ziņojumi"
 
-#: include/locales/en_gb.inc.php:1550
+#: include/locales/en_gb.inc.php:1549
 msgid "GUI access"
 msgstr ""
 
@@ -3231,7 +3233,7 @@ msgstr ""
 msgid "GUI access disabled."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1532
+#: include/locales/en_gb.inc.php:1531
 msgid "GUI access updated"
 msgstr ""
 
@@ -3244,15 +3246,15 @@ msgstr ""
 msgid "Generated in %s sec"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1635
+#: include/locales/en_gb.inc.php:1634
 msgid "German (DE)"
 msgstr "Vācu (DE)"
 
-#: include/locales/en_gb.inc.php:994
+#: include/locales/en_gb.inc.php:993
 msgid "Get Img: Element data not found!"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1023
+#: include/locales/en_gb.inc.php:1022
 msgid "Get selected elements FAILED."
 msgstr ""
 
@@ -3260,11 +3262,11 @@ msgstr ""
 msgid "Get support"
 msgstr "Atbalsts"
 
-#: include/locales/en_gb.inc.php:1765
+#: include/locales/en_gb.inc.php:1764
 msgid "Giga"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1718
+#: include/locales/en_gb.inc.php:1717
 msgid "Given expression is not a macro"
 msgstr ""
 
@@ -3276,12 +3278,12 @@ msgstr ""
 msgid "Global scripts"
 msgstr ""
 
-#: actionconf.php:497 hosts.php:1016 include/locales/en_gb.inc.php:1663
+#: actionconf.php:497 hosts.php:1016 include/locales/en_gb.inc.php:1662
 #: include/views/administration.script.list.php:108
 msgid "Go"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:984
+#: include/locales/en_gb.inc.php:983
 msgid "Go to"
 msgstr ""
 
@@ -3343,7 +3345,7 @@ msgstr ""
 msgid "Graph deleted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1610
+#: include/locales/en_gb.inc.php:1609
 msgid "Graph element"
 msgstr "Grafika elements"
 
@@ -3351,7 +3353,7 @@ msgstr "Grafika elements"
 msgid "Graph item"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1269
+#: include/locales/en_gb.inc.php:1268
 msgid "Graph name"
 msgstr ""
 
@@ -3399,7 +3401,7 @@ msgstr ""
 
 #: hosts.php:764 hosts.php:848 include/locales/en_gb.inc.php:713
 #: include/menu.inc.php:67 include/views/configuration.host.edit.php:314
-#: include/views/configuration.template.edit.php:247
+#: include/views/configuration.template.edit.php:247 popup.php:93
 msgid "Graphs"
 msgstr "Grafiki"
 
@@ -3411,7 +3413,7 @@ msgstr "Grafiki pārkopēti"
 msgid "Graphs deleted"
 msgstr "Grafiki izdzēsti"
 
-#: include/locales/en_gb.inc.php:983
+#: include/locales/en_gb.inc.php:982
 msgid "Grid"
 msgstr "Režģis"
 
@@ -3430,11 +3432,11 @@ msgstr ""
 msgid "Group \"%s\" cannot be deleted, because some hosts depend on it."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1516
+#: include/locales/en_gb.inc.php:1515
 msgid "Group added"
 msgstr "Grupa pievienota"
 
-#: include/locales/en_gb.inc.php:1520
+#: include/locales/en_gb.inc.php:1519
 msgid "Group deleted"
 msgstr "Grupa izdzēsta"
 
@@ -3442,11 +3444,11 @@ msgstr "Grupa izdzēsta"
 msgid "Group for discovered hosts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:760
+#: include/locales/en_gb.inc.php:759
 msgid "Group name"
 msgstr "Grupas nosaukums"
 
-#: include/locales/en_gb.inc.php:1518
+#: include/locales/en_gb.inc.php:1517
 msgid "Group updated"
 msgstr ""
 
@@ -3454,7 +3456,7 @@ msgstr ""
 msgid "Grouping by"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:735
+#: include/locales/en_gb.inc.php:734
 #: include/views/configuration.host.edit.php:173
 msgid "Groups"
 msgstr "Grupas"
@@ -3471,11 +3473,11 @@ msgstr ""
 msgid "H:i"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1682
+#: include/locales/en_gb.inc.php:1681
 msgid "H:i:s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:954
+#: include/locales/en_gb.inc.php:953
 msgid "HISTORY OF EVENTS"
 msgstr "NOTIKUMU VĒSTURE"
 
@@ -3492,7 +3494,7 @@ msgid "HOST PROFILES"
 msgstr "MEZGLU PROFILI"
 
 #: hostprofilesoverview.php:81 hostprofiles.php:94 hosts_mon.php:120
-#: hosts.php:722 include/locales/en_gb.inc.php:724
+#: hosts_mon.php:125 hosts.php:722
 msgid "HOSTS"
 msgstr "MEZGLI"
 
@@ -3522,7 +3524,7 @@ msgstr "Aparatūra"
 msgid "Hardware (Full details)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1271
+#: include/locales/en_gb.inc.php:1270
 #: include/views/configuration.sysmap.edit.php:50
 msgid "Height"
 msgstr "Augstums"
@@ -3531,19 +3533,19 @@ msgstr "Augstums"
 msgid "Help"
 msgstr "Palīdzība"
 
-#: include/locales/en_gb.inc.php:869
+#: include/locales/en_gb.inc.php:868
 msgid "Hexadecimal"
 msgstr "Heksadecimāls"
 
-#: include/locales/en_gb.inc.php:976
+#: include/locales/en_gb.inc.php:975
 msgid "Hidden"
 msgstr "Slēpts"
 
-#: include/locales/en_gb.inc.php:1558
+#: include/locales/en_gb.inc.php:1557
 msgid "Hide"
 msgstr "Slēpt"
 
-#: include/locales/en_gb.inc.php:1482
+#: include/locales/en_gb.inc.php:1481
 msgid "Hide all"
 msgstr ""
 
@@ -3551,7 +3553,7 @@ msgstr ""
 msgid "Hide disabled scenarios"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1447
+#: include/locales/en_gb.inc.php:1446
 msgid "Hide disabled triggers"
 msgstr ""
 
@@ -3564,40 +3566,40 @@ msgstr ""
 msgid "High"
 msgstr "Augsts"
 
-#: include/locales/en_gb.inc.php:832
+#: include/locales/en_gb.inc.php:831
 msgid "History"
 msgstr "Vēsture"
 
-#: include/locales/en_gb.inc.php:1267
+#: include/locales/en_gb.inc.php:1266
 msgid "History and simple graphs"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:814
+#: include/locales/en_gb.inc.php:813
 msgid "History cleared"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:900
+#: include/locales/en_gb.inc.php:899
 msgid "History clearing can take a long time. Continue?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1312
+#: include/locales/en_gb.inc.php:1311
 msgid "History of actions"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1313
+#: include/locales/en_gb.inc.php:1312
 msgid "History of events"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1322
+#: include/locales/en_gb.inc.php:1321
 msgid "Horizontal"
 msgstr "Horizontāli"
 
-#: include/locales/en_gb.inc.php:1324
+#: include/locales/en_gb.inc.php:1323
 msgid "Horizontal align"
 msgstr ""
 
 #: hostprofiles.php:159 include/actions.inc.php:42
-#: include/locales/en_gb.inc.php:725 include/locales/en_gb.inc.php:1806
+#: include/locales/en_gb.inc.php:724 include/locales/en_gb.inc.php:1805
 #: include/views/configuration.host.edit.php:58
 #: include/views/configuration.host.edit.php:408
 #: include/views/js/configuration.action.edit.js.php:86
@@ -3648,19 +3650,19 @@ msgstr ""
 msgid "Host deleted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1845
+#: include/locales/en_gb.inc.php:1844
 msgid "Host does not exist."
 msgstr ""
 
-#: include/actions.inc.php:39 include/locales/en_gb.inc.php:761
+#: include/actions.inc.php:39 include/locales/en_gb.inc.php:760
 #: include/views/administration.script.list.php:45
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:168
 msgid "Host group"
 msgstr "Mezglu grupa"
 
-#: include/locales/en_gb.inc.php:762 include/menu.inc.php:144
-#: include/views/administration.script.edit.php:89
+#: include/locales/en_gb.inc.php:761 include/menu.inc.php:144
+#: include/views/administration.script.edit.php:89 popup.php:57 popup.php:117
 msgid "Host groups"
 msgstr "Mezglu grupas"
 
@@ -3668,7 +3670,7 @@ msgstr "Mezglu grupas"
 msgid "Host interface"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1846
+#: include/locales/en_gb.inc.php:1845
 msgid "Host key does not exist."
 msgstr ""
 
@@ -3692,11 +3694,11 @@ msgstr ""
 msgid "Host profile"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1658
+#: include/locales/en_gb.inc.php:1657
 msgid "Host profile overview"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1655
+#: include/locales/en_gb.inc.php:1654
 msgid "Host profiles"
 msgstr ""
 
@@ -3704,11 +3706,11 @@ msgstr ""
 msgid "Host router"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1337
+#: include/locales/en_gb.inc.php:1336
 msgid "Host screens"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1086
+#: include/locales/en_gb.inc.php:1085
 msgid "Host status"
 msgstr "Mezglu stāvoklis"
 
@@ -3724,7 +3726,7 @@ msgstr ""
 msgid "Host template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1318
+#: include/locales/en_gb.inc.php:1317
 msgid "Host time"
 msgstr ""
 
@@ -3749,15 +3751,15 @@ msgid "Host with the same visible name \"%s\" already exists."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:709 include/menu.inc.php:52
-#: include/menu.inc.php:104 include/menu.inc.php:152
+#: include/menu.inc.php:104 include/menu.inc.php:152 popup.php:45
 msgid "Hosts"
 msgstr "Mezgli"
 
-#: include/locales/en_gb.inc.php:1149
+#: include/locales/en_gb.inc.php:1148
 msgid "Hosts (m/n/t)"
 msgstr "Mezgli (u/n/š)"
 
-#: include/locales/en_gb.inc.php:1675
+#: include/locales/en_gb.inc.php:1674 popup.php:41
 msgid "Hosts and templates"
 msgstr "Mezgli un šabloni"
 
@@ -3765,7 +3767,7 @@ msgstr "Mezgli un šabloni"
 msgid "Hosts in maintenance"
 msgstr "Mezgli uzturēšanā"
 
-#: include/locales/en_gb.inc.php:1306
+#: include/locales/en_gb.inc.php:1305
 msgid "Hosts info"
 msgstr ""
 
@@ -3773,7 +3775,7 @@ msgstr ""
 msgid "Hosts list"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1118
+#: include/locales/en_gb.inc.php:1117
 msgid "Hosts location"
 msgstr ""
 
@@ -3781,15 +3783,15 @@ msgstr ""
 msgid "Hosts updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1184
+#: include/locales/en_gb.inc.php:1183
 msgid "Hour"
 msgstr "Stunda"
 
-#: include/locales/en_gb.inc.php:1191
+#: include/locales/en_gb.inc.php:1190
 msgid "Hourly"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1185
+#: include/locales/en_gb.inc.php:1184
 msgid "Hours"
 msgstr "Stundas"
 
@@ -3797,7 +3799,7 @@ msgstr "Stundas"
 msgid "Housekeeper"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1646
+#: include/locales/en_gb.inc.php:1645
 msgid "Hungarian (HU)"
 msgstr "Ungāru (HU)"
 
@@ -3822,11 +3824,11 @@ msgstr "ATTĒLI"
 msgid "IMAP"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:728
+#: include/locales/en_gb.inc.php:727 popup.php:441
 msgid "IP"
 msgstr "IP"
 
-#: include/locales/en_gb.inc.php:739 include/maps.inc.php:63
+#: include/locales/en_gb.inc.php:738 include/maps.inc.php:63
 #: include/views/configuration.discovery.edit.php:89
 #: include/views/configuration.host.edit.php:192
 msgid "IP address"
@@ -3852,35 +3854,35 @@ msgstr ""
 msgid "IPMI"
 msgstr "IPMI"
 
-#: include/locales/en_gb.inc.php:843
+#: include/locales/en_gb.inc.php:842
 msgid "IPMI agent"
 msgstr "IPMI aģents"
 
-#: include/locales/en_gb.inc.php:742
+#: include/locales/en_gb.inc.php:741
 msgid "IPMI authentication algorithm"
 msgstr "IPMI autentifikācijas algoritms"
 
-#: include/locales/en_gb.inc.php:757
+#: include/locales/en_gb.inc.php:756
 msgid "IPMI password"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:750
+#: include/locales/en_gb.inc.php:749
 msgid "IPMI privilege level"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:909
+#: include/locales/en_gb.inc.php:908
 msgid "IPMI sensor"
 msgstr "IPMI sensors"
 
-#: include/locales/en_gb.inc.php:756
+#: include/locales/en_gb.inc.php:755
 msgid "IPMI username"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1400
+#: include/locales/en_gb.inc.php:1399
 msgid "IT SERVICES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1175
+#: include/locales/en_gb.inc.php:1174
 msgid "IT SERVICES AVAILABILITY REPORT"
 msgstr ""
 
@@ -3888,19 +3890,19 @@ msgstr ""
 msgid "IT Services"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1356
+#: include/locales/en_gb.inc.php:1355
 msgid "IT service"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1357
+#: include/locales/en_gb.inc.php:1356
 msgid "IT services"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1174
+#: include/locales/en_gb.inc.php:1173
 msgid "IT services availability report"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:934
+#: include/locales/en_gb.inc.php:933
 msgid "ITEM PROTOTYPES OF"
 msgstr "RĀDĪTĀJU PROTOTIPI NO"
 
@@ -3912,27 +3914,27 @@ msgstr "RĀDĪTĀJI"
 msgid "Icon"
 msgstr "Ikona"
 
-#: include/locales/en_gb.inc.php:987
+#: include/locales/en_gb.inc.php:986
 msgid "Icon (OK)"
 msgstr "Ikona (OK)"
 
-#: include/locales/en_gb.inc.php:1005
+#: include/locales/en_gb.inc.php:1004
 msgid "Icon (default)"
 msgstr "Ikona (noklusējuma)"
 
-#: include/locales/en_gb.inc.php:990
+#: include/locales/en_gb.inc.php:989
 msgid "Icon (disabled)"
 msgstr "Ikona (atspējots)"
 
-#: include/locales/en_gb.inc.php:989
+#: include/locales/en_gb.inc.php:988
 msgid "Icon (maintenance)"
 msgstr "Ikona (uzturēšana)"
 
-#: include/locales/en_gb.inc.php:986
+#: include/locales/en_gb.inc.php:985
 msgid "Icon (problem)"
 msgstr "Ikona (problēma)"
 
-#: include/locales/en_gb.inc.php:988
+#: include/locales/en_gb.inc.php:987
 msgid "Icon (unknown)"
 msgstr "Ikona (nav zināms)"
 
@@ -3952,7 +3954,7 @@ msgstr ""
 msgid "Idle till"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1971
+#: include/locales/en_gb.inc.php:1970
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr ""
 
@@ -3972,7 +3974,7 @@ msgstr "Attēls izdzēsts"
 msgid "Image label type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1898
+#: include/locales/en_gb.inc.php:1897
 msgid "Image size must be less than 1MB"
 msgstr "Attēlam jābūt mazākam par 1MB"
 
@@ -3992,7 +3994,7 @@ msgstr "Nekavējoties"
 msgid "Import"
 msgstr "Importēt"
 
-#: include/locales/en_gb.inc.php:1013
+#: include/locales/en_gb.inc.php:1012
 msgid "Import Map"
 msgstr ""
 
@@ -4004,7 +4006,7 @@ msgstr ""
 msgid "Import file"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1292
+#: include/locales/en_gb.inc.php:1291
 msgid "Import screen"
 msgstr ""
 
@@ -4017,7 +4019,7 @@ msgstr ""
 msgid "Impossible to filter by profile field \"%s\", which does not exist."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1331
+#: include/locales/en_gb.inc.php:1330
 msgid "Impossible to remove last row and column"
 msgstr ""
 
@@ -4042,7 +4044,7 @@ msgstr ""
 msgid "In progress"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1705
+#: include/locales/en_gb.inc.php:1704
 msgid "Include"
 msgstr "Iekļaut"
 
@@ -4062,7 +4064,7 @@ msgstr ""
 msgid "Incorrect IP range \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1900
+#: include/locales/en_gb.inc.php:1899
 msgid "Incorrect Image"
 msgstr "Nepareizs attēls"
 
@@ -4172,7 +4174,7 @@ msgstr ""
 msgid "Incorrect action operationid"
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1789
+#: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1788
 msgid "Incorrect arguments passed to function"
 msgstr ""
 
@@ -4195,7 +4197,7 @@ msgstr ""
 msgid "Incorrect characters used for Hostname [ %s ]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1903
+#: include/locales/en_gb.inc.php:1902
 msgid "Incorrect characters used for Node name"
 msgstr ""
 
@@ -4217,7 +4219,7 @@ msgstr ""
 msgid "Incorrect delay."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1456
+#: include/locales/en_gb.inc.php:1455
 msgid "Incorrect dependency"
 msgstr ""
 
@@ -4246,7 +4248,7 @@ msgstr ""
 msgid "Incorrect fields for trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1842
+#: include/locales/en_gb.inc.php:1841
 msgid "Incorrect function is used"
 msgstr "Tiek izmantota nepareiza funkcija"
 
@@ -4315,7 +4317,7 @@ msgstr ""
 msgid "Incorrect key: %s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1785
+#: include/locales/en_gb.inc.php:1784
 msgid "Incorrect list of items."
 msgstr ""
 
@@ -4358,7 +4360,7 @@ msgstr ""
 msgid "Incorrect map width value for map \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1905
+#: include/locales/en_gb.inc.php:1904
 msgid "Incorrect node type"
 msgstr ""
 
@@ -4424,11 +4426,11 @@ msgstr ""
 msgid "Incorrect template."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1729 include/locales/en_gb.inc.php:1956
+#: include/locales/en_gb.inc.php:1728 include/locales/en_gb.inc.php:1955
 msgid "Incorrect time period"
 msgstr "Nepareizs laika periods"
 
-#: include/locales/en_gb.inc.php:1837
+#: include/locales/en_gb.inc.php:1836
 msgid "Incorrect trigger expression"
 msgstr ""
 
@@ -4441,15 +4443,15 @@ msgstr ""
 msgid "Incorrect trigger."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1751
+#: include/locales/en_gb.inc.php:1750
 msgid "Incorrect type of asort_by_key"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1828
+#: include/locales/en_gb.inc.php:1827
 msgid "Incorrect usage of quotes"
 msgstr "Nepareizs pēdiņu pielietojums"
 
-#: include/locales/en_gb.inc.php:1892
+#: include/locales/en_gb.inc.php:1891
 msgid "Incorrect user data in"
 msgstr ""
 
@@ -4478,7 +4480,7 @@ msgstr ""
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1831
+#: include/locales/en_gb.inc.php:1830
 msgid "Incorrect value type"
 msgstr ""
 
@@ -4495,11 +4497,11 @@ msgstr ""
 msgid "Information"
 msgstr "Informācija"
 
-#: include/locales/en_gb.inc.php:1441
+#: include/locales/en_gb.inc.php:1440
 msgid "Insert"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1459
+#: include/locales/en_gb.inc.php:1458
 msgid "Insert macro"
 msgstr ""
 
@@ -4515,7 +4517,7 @@ msgstr ""
 msgid "Installer name"
 msgstr ""
 
-#: hosts.php:766 include/locales/en_gb.inc.php:777
+#: hosts.php:766 include/locales/en_gb.inc.php:776
 msgid "Interface"
 msgstr ""
 
@@ -4534,12 +4536,12 @@ msgstr ""
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on host \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:776
+#: include/locales/en_gb.inc.php:775
 #: include/views/configuration.host.edit.php:212
 msgid "Interfaces"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1570
+#: include/locales/en_gb.inc.php:1569
 msgid "Internal"
 msgstr ""
 
@@ -4551,7 +4553,7 @@ msgstr ""
 msgid "Internal error."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:831
+#: include/locales/en_gb.inc.php:830
 msgid "Interval"
 msgstr ""
 
@@ -4584,11 +4586,11 @@ msgstr ""
 msgid "Inventory"
 msgstr "Uzskaite"
 
-#: include/locales/en_gb.inc.php:1547
+#: include/locales/en_gb.inc.php:1546
 msgid "Is online?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1084
+#: include/locales/en_gb.inc.php:1083
 msgid "Issue"
 msgstr ""
 
@@ -4600,11 +4602,11 @@ msgstr ""
 msgid "It is not possible to search by user password"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1636
+#: include/locales/en_gb.inc.php:1635
 msgid "Italian (IT)"
 msgstr "Itāļu (IT)"
 
-#: include/locales/en_gb.inc.php:883
+#: include/locales/en_gb.inc.php:882
 msgid "Item"
 msgstr "Rādītājs"
 
@@ -4652,7 +4654,7 @@ msgstr "Rādītājs pievienots"
 msgid "Item count"
 msgstr "Rādītāju skaits"
 
-#: include/locales/en_gb.inc.php:822
+#: include/locales/en_gb.inc.php:821
 msgid "Item deleted"
 msgstr "Rādītājs izdzēsts"
 
@@ -4660,7 +4662,7 @@ msgstr "Rādītājs izdzēsts"
 msgid "Item does not exist"
 msgstr "Rādītājs neeksistē"
 
-#: include/locales/en_gb.inc.php:938
+#: include/locales/en_gb.inc.php:937
 msgid "Item prototype"
 msgstr "Rādītāja prototips"
 
@@ -4727,15 +4729,16 @@ msgstr ""
 
 #: hosts.php:762 hosts.php:844 include/locales/en_gb.inc.php:710
 #: include/views/configuration.host.edit.php:254
-#: include/views/configuration.template.edit.php:204 queue.php:158
+#: include/views/configuration.template.edit.php:204 popup.php:73
+#: queue.php:158
 msgid "Items"
 msgstr "Rādītāji"
 
-#: include/locales/en_gb.inc.php:1144
+#: include/locales/en_gb.inc.php:1143
 msgid "Items (m/d/n)"
 msgstr "Rādītāji (u/a/n)"
 
-#: include/locales/en_gb.inc.php:826
+#: include/locales/en_gb.inc.php:825
 msgid "Items activated"
 msgstr "Rādītāji aktivizēti"
 
@@ -4743,11 +4746,11 @@ msgstr "Rādītāji aktivizēti"
 msgid "Items copied"
 msgstr "Rādītāji pārkopēti"
 
-#: include/locales/en_gb.inc.php:824
+#: include/locales/en_gb.inc.php:823
 msgid "Items deleted"
 msgstr "Rādītāji izdzēsti"
 
-#: include/locales/en_gb.inc.php:827
+#: include/locales/en_gb.inc.php:826
 msgid "Items disabled"
 msgstr "Rādītāji atspējoti"
 
@@ -4763,11 +4766,11 @@ msgstr ""
 msgid "Items updated"
 msgstr "Rādītāji atjaunoti"
 
-#: include/locales/en_gb.inc.php:778
+#: include/locales/en_gb.inc.php:777
 msgid "JMX"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:846
+#: include/locales/en_gb.inc.php:845
 msgid "JMX agent"
 msgstr ""
 
@@ -4788,11 +4791,11 @@ msgstr ""
 msgid "JSON-rpc version is not specified."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:854
+#: include/locales/en_gb.inc.php:853
 msgid "Jabber"
 msgstr "Jabber"
 
-#: include/locales/en_gb.inc.php:855
+#: include/locales/en_gb.inc.php:854
 msgid "Jabber identifier"
 msgstr "Jabber identifikators"
 
@@ -4804,7 +4807,7 @@ msgstr "Jan"
 msgid "January"
 msgstr "Janvāris"
 
-#: include/locales/en_gb.inc.php:1643
+#: include/locales/en_gb.inc.php:1642
 msgid "Japanese (JP)"
 msgstr "Japāņu (JP)"
 
@@ -4824,20 +4827,21 @@ msgstr "Jūn"
 msgid "June"
 msgstr "Jūnijs"
 
-#: include/locales/en_gb.inc.php:1760
+#: include/locales/en_gb.inc.php:1759
 msgid "K"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:863
+#: include/locales/en_gb.inc.php:862
 msgid "Keep history (in days)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:864
+#: include/locales/en_gb.inc.php:863
 msgid "Keep trends (in days)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:828
-#: include/views/js/configuration.discovery.js.php:249
+#: include/locales/en_gb.inc.php:827
+#: include/views/js/configuration.discovery.js.php:249 popup.php:1057
+#: popup.php:1065
 msgid "Key"
 msgstr "Atslēga"
 
@@ -4849,15 +4853,15 @@ msgstr ""
 msgid "Key does not match <grpmax|grpmin|grpsum|grpavg>[\"group\",\"key\",\"<last|min|max|avg|sum|count>\",\"numeric param\"]."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1707
+#: include/locales/en_gb.inc.php:1706
 msgid "Keyword"
 msgstr "Atslēgas vārds"
 
-#: include/locales/en_gb.inc.php:1761
+#: include/locales/en_gb.inc.php:1760
 msgid "Kilo"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1637
+#: include/locales/en_gb.inc.php:1636
 msgid "Korean (KO)"
 msgstr "Korejiešu (KO)"
 
@@ -4898,51 +4902,51 @@ msgstr ""
 msgid "LOGS"
 msgstr "ŽURNĀLI"
 
-#: include/locales/en_gb.inc.php:962
+#: include/locales/en_gb.inc.php:961
 msgid "LOST"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:982 include/maps.inc.php:62
+#: include/locales/en_gb.inc.php:981 include/maps.inc.php:62
 msgid "Label"
 msgstr "Iezīme"
 
-#: include/locales/en_gb.inc.php:1063
+#: include/locales/en_gb.inc.php:1062
 msgid "Label location"
 msgstr "Iezīmes izvietojums"
 
-#: include/locales/en_gb.inc.php:1631
+#: include/locales/en_gb.inc.php:1630
 msgid "Language"
 msgstr "Valoda"
 
-#: include/locales/en_gb.inc.php:1226 include/locales/en_gb.inc.php:2031
+#: include/locales/en_gb.inc.php:1225 include/locales/en_gb.inc.php:2030
 msgid "Last"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1089
+#: include/locales/en_gb.inc.php:1088
 msgid "Last 20 issues"
 msgstr "Pēdējās 20 problēmas"
 
-#: include/locales/en_gb.inc.php:1408
+#: include/locales/en_gb.inc.php:1407
 msgid "Last 24 hours"
 msgstr "Pēdējās 24 stundas"
 
-#: include/locales/en_gb.inc.php:1410
+#: include/locales/en_gb.inc.php:1409
 msgid "Last 30 days"
 msgstr "Pēdējās 30 dienas"
 
-#: include/locales/en_gb.inc.php:1411
+#: include/locales/en_gb.inc.php:1410
 msgid "Last 365 days"
 msgstr "Pēdējās 365 dienas"
 
-#: include/locales/en_gb.inc.php:1409
+#: include/locales/en_gb.inc.php:1408
 msgid "Last 7 days"
 msgstr "Pēdējās 7 dienas"
 
-#: include/locales/en_gb.inc.php:1487
+#: include/locales/en_gb.inc.php:1486
 msgid "Last change"
 msgstr "Pēdējā izmaiņa"
 
-#: include/locales/en_gb.inc.php:971
+#: include/locales/en_gb.inc.php:970
 msgid "Last check"
 msgstr "Pēdējā pārbaude"
 
@@ -4954,15 +4958,15 @@ msgstr ""
 msgid "Last month graph"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1443
+#: include/locales/en_gb.inc.php:1442
 msgid "Last of"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:772
+#: include/locales/en_gb.inc.php:771
 msgid "Last seen (age)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:972
+#: include/locales/en_gb.inc.php:971
 msgid "Last value"
 msgstr "Pēdējā vērtība"
 
@@ -4970,15 +4974,15 @@ msgstr "Pēdējā vērtība"
 msgid "Last week graph"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1990 include/menu.inc.php:47
+#: include/locales/en_gb.inc.php:1989 include/menu.inc.php:47
 msgid "Latest data"
 msgstr "Jaunākā informācija"
 
-#: include/locales/en_gb.inc.php:953
+#: include/locales/en_gb.inc.php:952
 msgid "Latest events"
 msgstr "Pēdējie notikumi"
 
-#: include/locales/en_gb.inc.php:1638
+#: include/locales/en_gb.inc.php:1637
 msgid "Latvian (LV)"
 msgstr "Latviešu (LV)"
 
@@ -4995,15 +4999,15 @@ msgstr ""
 msgid "Line"
 msgstr "Līnija"
 
-#: include/locales/en_gb.inc.php:981
+#: include/locales/en_gb.inc.php:980
 msgid "Link"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:740
+#: include/locales/en_gb.inc.php:739
 msgid "Link additional templates"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1014
+#: include/locales/en_gb.inc.php:1013
 msgid "Link indicators"
 msgstr ""
 
@@ -5027,11 +5031,11 @@ msgstr ""
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:991
+#: include/locales/en_gb.inc.php:990
 msgid "Link status indicator"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1035
+#: include/locales/en_gb.inc.php:1034
 msgid "Link status indicators"
 msgstr ""
 
@@ -5043,7 +5047,7 @@ msgstr ""
 msgid "Link to templates: "
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1376
+#: include/locales/en_gb.inc.php:1375
 msgid "Link to trigger?"
 msgstr ""
 
@@ -5051,20 +5055,20 @@ msgstr ""
 msgid "Link with templates"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:786
+#: include/locales/en_gb.inc.php:785
 msgid "Linked templates"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:787
+#: include/locales/en_gb.inc.php:786
 msgid "Linked to"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:980
+#: include/locales/en_gb.inc.php:979
 #: include/views/configuration.sysmap.edit.php:179
 msgid "Links"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:952
+#: include/locales/en_gb.inc.php:951
 msgid "List"
 msgstr ""
 
@@ -5072,7 +5076,7 @@ msgstr ""
 msgid "List is empty"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1095
+#: include/locales/en_gb.inc.php:1094
 msgid "Loading..."
 msgstr ""
 
@@ -5080,7 +5084,7 @@ msgstr ""
 msgid "Local"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1317
+#: include/locales/en_gb.inc.php:1316
 msgid "Local time"
 msgstr ""
 
@@ -5096,11 +5100,11 @@ msgstr ""
 msgid "Location longitude"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:878
+#: include/locales/en_gb.inc.php:877
 msgid "Log"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:893
+#: include/locales/en_gb.inc.php:892
 msgid "Log time format"
 msgstr ""
 
@@ -5108,7 +5112,7 @@ msgstr ""
 msgid "Logged in as"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1988 include/menu.inc.php:246
+#: include/locales/en_gb.inc.php:1987 include/menu.inc.php:246
 #: include/page_header.php:245
 msgid "Login"
 msgstr "Pieslēgties"
@@ -5127,7 +5131,7 @@ msgstr ""
 msgid "Login name or password is incorrect"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1989 include/page_header.php:242
+#: include/locales/en_gb.inc.php:1988 include/page_header.php:242
 msgid "Logout"
 msgstr "Atslēgties"
 
@@ -5139,11 +5143,11 @@ msgstr ""
 msgid "Lost"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1762 include/locales/en_gb.inc.php:2001
+#: include/locales/en_gb.inc.php:1761 include/locales/en_gb.inc.php:2000
 msgid "M"
 msgstr "P"
 
-#: include/locales/en_gb.inc.php:1197 include/locales/en_gb.inc.php:1217
+#: include/locales/en_gb.inc.php:1196 include/locales/en_gb.inc.php:1216
 msgid "M Y"
 msgstr ""
 
@@ -5155,7 +5159,7 @@ msgstr ""
 msgid "MAC address B"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1001
+#: include/locales/en_gb.inc.php:1000
 msgid "MAINTENANCE"
 msgstr ""
 
@@ -5163,27 +5167,27 @@ msgstr ""
 msgid "MAINTENANCE PERIODS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1010
+#: include/locales/en_gb.inc.php:1009
 msgid "MAPS"
 msgstr "KATRES"
 
-#: include/locales/en_gb.inc.php:745
+#: include/locales/en_gb.inc.php:744
 msgid "MD2"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:746
+#: include/locales/en_gb.inc.php:745
 msgid "MD5"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1068
+#: include/locales/en_gb.inc.php:1067
 msgid "MEDIA TYPES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1748
+#: include/locales/en_gb.inc.php:1747
 msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1223
+#: include/locales/en_gb.inc.php:1222
 msgid "MOST BUSY TRIGGERS TOP 100"
 msgstr ""
 
@@ -5250,7 +5254,7 @@ msgstr ""
 msgid "Manual Logout"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1299
+#: include/locales/en_gb.inc.php:1298
 #: include/views/configuration.sysmap.edit.php:181
 msgid "Map"
 msgstr "Karte"
@@ -5265,7 +5269,7 @@ msgstr ""
 msgid "Map \"%s\" updated."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1007
+#: include/locales/en_gb.inc.php:1006
 msgid "Map elements"
 msgstr "Kartes elementi"
 
@@ -5290,8 +5294,8 @@ msgstr ""
 msgid "Mapping"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1985 include/menu.inc.php:77
-#: include/menu.inc.php:188
+#: include/locales/en_gb.inc.php:1984 include/menu.inc.php:77
+#: include/menu.inc.php:188 popup.php:101
 msgid "Maps"
 msgstr "Kartes"
 
@@ -5315,15 +5319,15 @@ msgstr ""
 msgid "Mark selected"
 msgstr ""
 
-#: hosts.php:1001 include/locales/en_gb.inc.php:901
+#: hosts.php:1001 include/locales/en_gb.inc.php:900
 msgid "Mass update"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:921
+#: include/locales/en_gb.inc.php:920
 msgid "Mass update selected items?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1464
+#: include/locales/en_gb.inc.php:1463
 msgid "Mass update selected triggers?"
 msgstr ""
 
@@ -5335,7 +5339,7 @@ msgstr ""
 msgid "Master node"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1904
+#: include/locales/en_gb.inc.php:1903
 msgid "Master node already exists"
 msgstr ""
 
@@ -5347,7 +5351,7 @@ msgstr "Maksimālais elementu skaits, ko rādīt tabulas šūnā"
 msgid "Max count of events per trigger to show"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1093
+#: include/locales/en_gb.inc.php:1092
 msgid "Maximize"
 msgstr ""
 
@@ -5380,11 +5384,11 @@ msgstr[2] ""
 msgid "May"
 msgstr "Mai"
 
-#: include/locales/en_gb.inc.php:1069
+#: include/locales/en_gb.inc.php:1068
 msgid "Media"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1609
+#: include/locales/en_gb.inc.php:1608
 msgid "Media type"
 msgstr ""
 
@@ -5408,31 +5412,31 @@ msgstr ""
 msgid "Media types"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1963
+#: include/locales/en_gb.inc.php:1962
 msgid "Mediatype already exists:"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1964
+#: include/locales/en_gb.inc.php:1963
 msgid "Mediatypes used by action:"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1763
+#: include/locales/en_gb.inc.php:1762
 msgid "Mega"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1542
+#: include/locales/en_gb.inc.php:1541
 msgid "Members"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1741
+#: include/locales/en_gb.inc.php:1740
 msgid "Memory limit"
 msgstr "Atmiņas ierobežojums"
 
-#: include/locales/en_gb.inc.php:1742
+#: include/locales/en_gb.inc.php:1741
 msgid "Memory usage"
 msgstr "Izmantotā atmiņa"
 
-#: include/locales/en_gb.inc.php:1091
+#: include/locales/en_gb.inc.php:1090
 msgid "Menu"
 msgstr ""
 
@@ -5452,11 +5456,11 @@ msgstr ""
 msgid "Message text limit"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1626
+#: include/locales/en_gb.inc.php:1625
 msgid "Message timeout"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1621
+#: include/locales/en_gb.inc.php:1620
 msgid "Messages"
 msgstr "Ziņojumi"
 
@@ -5464,35 +5468,35 @@ msgstr "Ziņojumi"
 msgid "Method not found."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1757
+#: include/locales/en_gb.inc.php:1756
 msgid "Micro"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1329
+#: include/locales/en_gb.inc.php:1328
 msgid "Middle"
 msgstr "Pa vidu"
 
-#: include/locales/en_gb.inc.php:1759
+#: include/locales/en_gb.inc.php:1758
 msgid "Milli"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1427
+#: include/locales/en_gb.inc.php:1426
 msgid "Min severity"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1912
+#: include/locales/en_gb.inc.php:1911
 msgid "Minimal version of PHP is"
 msgstr "Minimālā PHP versija ir"
 
-#: include/locales/en_gb.inc.php:1094
+#: include/locales/en_gb.inc.php:1093
 msgid "Minimize"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1186
+#: include/locales/en_gb.inc.php:1185
 msgid "Minute"
 msgstr "Minūte"
 
-#: include/locales/en_gb.inc.php:1187
+#: include/locales/en_gb.inc.php:1186
 msgid "Minutes"
 msgstr "Minūtes"
 
@@ -5500,19 +5504,19 @@ msgstr "Minūtes"
 msgid "Missing"
 msgstr "Trūkstošs"
 
-#: include/locales/en_gb.inc.php:1867
+#: include/locales/en_gb.inc.php:1866
 msgid "Missing items for graph"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1841
+#: include/locales/en_gb.inc.php:1840
 msgid "Missing key"
 msgstr "Trūkst atslēga"
 
-#: include/locales/en_gb.inc.php:1834
+#: include/locales/en_gb.inc.php:1833
 msgid "Missing mandatory parameter for function"
 msgstr "Trūks obligāts funkcijas parametrs"
 
-#: include/locales/en_gb.inc.php:896
+#: include/locales/en_gb.inc.php:895
 msgid "Mode"
 msgstr ""
 
@@ -5524,16 +5528,16 @@ msgstr ""
 msgid "Mon"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:47 include/locales/en_gb.inc.php:1392
+#: include/locales/en_gb.inc.php:47 include/locales/en_gb.inc.php:1391
 msgid "Monday"
 msgstr "Pirmdiena"
 
-#: hosts.php:876 include/locales/en_gb.inc.php:730
+#: hosts.php:876 include/locales/en_gb.inc.php:729
 #: include/views/configuration.host.edit.php:230
 msgid "Monitored"
 msgstr "Uzraudzīts"
 
-#: include/locales/en_gb.inc.php:804
+#: include/locales/en_gb.inc.php:803
 #: include/views/configuration.host.edit.php:226
 msgid "Monitored by proxy"
 msgstr ""
@@ -5546,11 +5550,11 @@ msgstr ""
 msgid "Monitoring"
 msgstr "Uzraudzība"
 
-#: include/locales/en_gb.inc.php:1189
+#: include/locales/en_gb.inc.php:1188
 msgid "Month"
 msgstr "Mēnesis"
 
-#: include/locales/en_gb.inc.php:1194
+#: include/locales/en_gb.inc.php:1193
 msgid "Monthly"
 msgstr ""
 
@@ -5558,11 +5562,11 @@ msgstr ""
 msgid "More than 10 minutes"
 msgstr "Vairāk nekā 10 minūtes"
 
-#: include/locales/en_gb.inc.php:1222
+#: include/locales/en_gb.inc.php:1221
 msgid "Most busy triggers top 100"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1617
+#: include/locales/en_gb.inc.php:1616
 msgid "Move"
 msgstr "Pārvietot"
 
@@ -5570,15 +5574,15 @@ msgstr "Pārvietot"
 msgid "Multibyte String module required to run FrontEnd"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1445
+#: include/locales/en_gb.inc.php:1444
 msgid "Multiple PROBLEM events"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1619
+#: include/locales/en_gb.inc.php:1618
 msgid "Mute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1062
+#: include/locales/en_gb.inc.php:1061
 msgid "NETWORK MAPS"
 msgstr "TĪKLA KARTES"
 
@@ -5599,7 +5603,7 @@ msgstr ""
 msgid "NODES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1214
+#: include/locales/en_gb.inc.php:1213
 msgid "NOTIFICATIONS"
 msgstr ""
 
@@ -5610,40 +5614,40 @@ msgstr ""
 #: actionconf.php:164 actionconf.php:418 discoveryconf.php:246
 #: disc_prototypes.php:376 host_discovery.php:451 hostprofiles.php:161
 #: hosts.php:760 include/forms.inc.php:1014 include/forms.inc.php:1736
-#: include/hosts.inc.php:60 include/locales/en_gb.inc.php:1545
+#: include/hosts.inc.php:60 include/locales/en_gb.inc.php:1544
 #: include/views/administration.script.edit.php:43
 #: include/views/administration.script.list.php:40
 #: include/views/configuration.action.edit.php:47
 #: include/views/configuration.discovery.edit.php:42
 #: include/views/configuration.sysmap.edit.php:48
-#: include/views/configuration.sysmap.edit.php:134 items.php:915
-#: latest.php:209 popup.php:824 popup.php:955 popup.php:1056 popup.php:1064
-#: popup.php:1281 popup.php:1289 popup.php:1438 popup.php:1781 popup.php:1787
-#: queue.php:250 trigger_prototypes.php:45 triggers.php:46
+#: include/views/configuration.sysmap.edit.php:134 items.php:914
+#: latest.php:209 popup.php:441 popup.php:824 popup.php:955 popup.php:1056
+#: popup.php:1064 popup.php:1281 popup.php:1289 popup.php:1438 popup.php:1781
+#: popup.php:1787 queue.php:250 trigger_prototypes.php:45 triggers.php:46
 msgid "Name"
 msgstr "Nosaukums"
 
-#: include/locales/en_gb.inc.php:1755
+#: include/locales/en_gb.inc.php:1754
 msgid "Nano"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1019
+#: include/locales/en_gb.inc.php:1018
 msgid "Network map added"
 msgstr "Tīkla karte pievienota"
 
-#: include/locales/en_gb.inc.php:1008
+#: include/locales/en_gb.inc.php:1007
 msgid "Network map deleted"
 msgstr "Tīkla karte izdzēsta"
 
-#: include/locales/en_gb.inc.php:1021
+#: include/locales/en_gb.inc.php:1020
 msgid "Network map updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1061
+#: include/locales/en_gb.inc.php:1060
 msgid "Network maps"
 msgstr "Tīkla kartes"
 
-#: include/locales/en_gb.inc.php:1491
+#: include/locales/en_gb.inc.php:1490
 msgid "Never"
 msgstr ""
 
@@ -5655,7 +5659,7 @@ msgstr ""
 msgid "New"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:908
+#: include/locales/en_gb.inc.php:907
 msgid "New application"
 msgstr ""
 
@@ -5663,11 +5667,11 @@ msgstr ""
 msgid "New condition"
 msgstr "Izveidot jaunu nosacījumu"
 
-#: include/locales/en_gb.inc.php:1450
+#: include/locales/en_gb.inc.php:1449
 msgid "New dependency"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1030
+#: include/locales/en_gb.inc.php:1029
 msgid "New element"
 msgstr ""
 
@@ -5675,7 +5679,7 @@ msgstr ""
 msgid "New expression"
 msgstr "Jauna izteiksme"
 
-#: include/locales/en_gb.inc.php:904
+#: include/locales/en_gb.inc.php:903
 msgid "New flexible interval"
 msgstr ""
 
@@ -5689,7 +5693,7 @@ msgstr "Jauna grupa"
 msgid "New host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1701
+#: include/locales/en_gb.inc.php:1700
 msgid "New indicators"
 msgstr ""
 
@@ -5709,7 +5713,7 @@ msgstr ""
 msgid "New mapping"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1073
+#: include/locales/en_gb.inc.php:1072
 msgid "New media"
 msgstr ""
 
@@ -5725,11 +5729,11 @@ msgstr ""
 msgid "New regular expression"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1387
+#: include/locales/en_gb.inc.php:1386
 msgid "New service time"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1289
+#: include/locales/en_gb.inc.php:1288
 msgid "New slide"
 msgstr ""
 
@@ -5737,11 +5741,11 @@ msgstr ""
 msgid "New template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:782
+#: include/locales/en_gb.inc.php:781
 msgid "New template added"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:207 include/locales/en_gb.inc.php:2034
+#: include/locales/en_gb.inc.php:207 include/locales/en_gb.inc.php:2033
 msgid "Next"
 msgstr "Nākamais"
 
@@ -5749,7 +5753,7 @@ msgstr "Nākamais"
 msgid "Next check"
 msgstr "Nākamā pārbaude"
 
-#: include/locales/en_gb.inc.php:1152
+#: include/locales/en_gb.inc.php:1151
 msgid "No"
 msgstr "Nē"
 
@@ -5763,11 +5767,11 @@ msgstr ""
 msgid "No \"ymin_type\" field for graph \"%s\""
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1360
+#: include/locales/en_gb.inc.php:1359
 msgid "No IT service defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1567
+#: include/locales/en_gb.inc.php:1566
 msgid "No accessible resources"
 msgstr ""
 
@@ -5779,7 +5783,7 @@ msgstr ""
 msgid "No actions found"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1802
+#: include/locales/en_gb.inc.php:1801
 msgid "No application with"
 msgstr ""
 
@@ -5818,7 +5822,7 @@ msgstr ""
 msgid "No data maintenance"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1449
+#: include/locales/en_gb.inc.php:1448
 msgid "No dependencies defined"
 msgstr ""
 
@@ -5835,15 +5839,15 @@ msgstr ""
 msgid "No discovery rules defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1732
+#: include/locales/en_gb.inc.php:1731
 msgid "No elements selected!"
 msgstr "Elementi netika iezīmēti"
 
-#: include/locales/en_gb.inc.php:1687
+#: include/locales/en_gb.inc.php:1686
 msgid "No errors found"
 msgstr "Kļūdu nav"
 
-#: include/locales/en_gb.inc.php:955
+#: include/locales/en_gb.inc.php:954
 msgid "No events found"
 msgstr "Notikumi nabv atrasti"
 
@@ -5856,7 +5860,7 @@ msgstr ""
 msgid "No execution target specified for action operation command \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:906
+#: include/locales/en_gb.inc.php:905
 msgid "No flexible intervals"
 msgstr ""
 
@@ -5864,7 +5868,7 @@ msgstr ""
 msgid "No graph defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1866
+#: include/locales/en_gb.inc.php:1865
 msgid "No graph item with"
 msgstr ""
 
@@ -5872,7 +5876,7 @@ msgstr ""
 msgid "No graphs defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:737
+#: include/locales/en_gb.inc.php:736
 msgid "No groups defined"
 msgstr ""
 
@@ -5908,7 +5912,7 @@ msgstr ""
 msgid "No host groups with groupid \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1800
+#: include/locales/en_gb.inc.php:1799
 msgid "No host with"
 msgstr ""
 
@@ -5958,19 +5962,23 @@ msgstr ""
 msgid "No interfaces provided for proxy \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:813
+#: include/locales/en_gb.inc.php:812
 msgid "No item defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1792
+#: popup.php:1052
+msgid "No item prototypes defined"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1791
 msgid "No item with"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1672
+#: include/locales/en_gb.inc.php:1671
 msgid "No items"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:812
+#: include/locales/en_gb.inc.php:811
 msgid "No items defined"
 msgstr ""
 
@@ -5978,7 +5986,7 @@ msgstr ""
 msgid "No key id provided."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1028
+#: include/locales/en_gb.inc.php:1027
 msgid "No links"
 msgstr ""
 
@@ -5986,11 +5994,11 @@ msgstr ""
 msgid "No mapping defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1011
+#: include/locales/en_gb.inc.php:1010
 msgid "No maps defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1072
+#: include/locales/en_gb.inc.php:1071
 msgid "No media defined"
 msgstr ""
 
@@ -6015,11 +6023,11 @@ msgstr ""
 msgid "No permission for trigger \"%s\""
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1997
+#: include/locales/en_gb.inc.php:1996
 msgid "No permissions for map"
 msgstr "Nav tiesību aplūkot karti"
 
-#: include/locales/en_gb.inc.php:1996
+#: include/locales/en_gb.inc.php:1995
 msgid "No permissions for screen"
 msgstr ""
 
@@ -6053,19 +6061,19 @@ msgstr ""
 msgid "No recipients for action operation message."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1264
+#: include/locales/en_gb.inc.php:1263
 msgid "No resources defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1554
+#: include/locales/en_gb.inc.php:1553
 msgid "No rights defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1858
+#: include/locales/en_gb.inc.php:1857
 msgid "No rows in screen"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1258
+#: include/locales/en_gb.inc.php:1257
 msgid "No screens defined"
 msgstr ""
 
@@ -6077,19 +6085,19 @@ msgstr ""
 msgid "No scripts defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1888
+#: include/locales/en_gb.inc.php:1887
 msgid "No service linkage with"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1887
+#: include/locales/en_gb.inc.php:1886
 msgid "No service with"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1285
+#: include/locales/en_gb.inc.php:1284
 msgid "No slide shows defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1287
+#: include/locales/en_gb.inc.php:1286
 msgid "No slides defined"
 msgstr ""
 
@@ -6101,31 +6109,31 @@ msgstr ""
 msgid "No templates defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1385
+#: include/locales/en_gb.inc.php:1384
 msgid "No times defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1415
+#: include/locales/en_gb.inc.php:1414
 msgid "No trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1417
+#: include/locales/en_gb.inc.php:1416
 msgid "No trigger defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1827
+#: include/locales/en_gb.inc.php:1826
 msgid "No trigger with"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1416
+#: include/locales/en_gb.inc.php:1415
 msgid "No triggers defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1543
+#: include/locales/en_gb.inc.php:1542
 msgid "No user groups defined"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1548
+#: include/locales/en_gb.inc.php:1547
 msgid "No users defined"
 msgstr ""
 
@@ -6146,16 +6154,16 @@ msgstr ""
 msgid "Node updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1906
+#: include/locales/en_gb.inc.php:1905
 msgid "Node with same ID already exists"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:453
+#: include/locales/en_gb.inc.php:453 popup.php:122
 msgid "Nodes"
 msgstr ""
 
-#: include/forms.inc.php:2141 include/locales/en_gb.inc.php:744
-#: include/locales/en_gb.inc.php:1369
+#: include/forms.inc.php:2141 include/locales/en_gb.inc.php:743
+#: include/locales/en_gb.inc.php:1368
 msgid "None"
 msgstr ""
 
@@ -6175,19 +6183,19 @@ msgstr ""
 msgid "Not Ack"
 msgstr "Nav Apst"
 
-#: include/locales/en_gb.inc.php:808
+#: include/locales/en_gb.inc.php:807
 msgid "Not Templated items"
 msgstr "Nav šablona rādītāji"
 
-#: include/locales/en_gb.inc.php:1695
+#: include/locales/en_gb.inc.php:1694
 msgid "Not allowed symbols detected after element"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1696
+#: include/locales/en_gb.inc.php:1695
 msgid "Not allowed symbols detected before element"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1692
+#: include/locales/en_gb.inc.php:1691
 msgid "Not allowed symbols or sequence of symbols in expression element detected"
 msgstr "Izteiksmē atrasti neatļauti simboli vai to secība"
 
@@ -6195,7 +6203,7 @@ msgstr "Izteiksmē atrasti neatļauti simboli vai to secība"
 msgid "Not allowed to set password for user \"guest\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1693
+#: include/locales/en_gb.inc.php:1692
 msgid "Not allowed value detected in element"
 msgstr ""
 
@@ -6203,7 +6211,7 @@ msgstr ""
 msgid "Not authorized"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:766
+#: include/locales/en_gb.inc.php:765
 msgid "Not available"
 msgstr "Nav pieejams"
 
@@ -6216,16 +6224,16 @@ msgstr ""
 msgid "Not connected"
 msgstr ""
 
-#: hosts.php:884 include/locales/en_gb.inc.php:731
+#: hosts.php:884 include/locales/en_gb.inc.php:730
 #: include/views/configuration.host.edit.php:231
 msgid "Not monitored"
 msgstr "Netiek uzraudzīts"
 
-#: include/locales/en_gb.inc.php:852
+#: include/locales/en_gb.inc.php:851
 msgid "Not supported"
 msgstr "Netiek atbalstīts"
 
-#: include/locales/en_gb.inc.php:1388
+#: include/locales/en_gb.inc.php:1387
 msgid "Note"
 msgstr "Piezīme"
 
@@ -6241,7 +6249,7 @@ msgstr ""
 msgid "Nothing to do"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1215
+#: include/locales/en_gb.inc.php:1214
 msgid "Notification report"
 msgstr ""
 
@@ -6257,15 +6265,15 @@ msgstr "Nov"
 msgid "November"
 msgstr "Novembris"
 
-#: include/locales/en_gb.inc.php:1148
+#: include/locales/en_gb.inc.php:1147
 msgid "Number of hosts (monitored/not monitored/templates)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1143
+#: include/locales/en_gb.inc.php:1142
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1224
+#: include/locales/en_gb.inc.php:1223
 msgid "Number of status changes"
 msgstr ""
 
@@ -6273,31 +6281,31 @@ msgstr ""
 msgid "Number of steps"
 msgstr "Soļu skaits"
 
-#: include/locales/en_gb.inc.php:1140
+#: include/locales/en_gb.inc.php:1139
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1146
+#: include/locales/en_gb.inc.php:1145
 msgid "Number of users (online)"
 msgstr "Lietotāju skaits"
 
-#: include/locales/en_gb.inc.php:875
+#: include/locales/en_gb.inc.php:874
 msgid "Numeric (float)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:873
+#: include/locales/en_gb.inc.php:872
 msgid "Numeric (integer 64bit)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:874
+#: include/locales/en_gb.inc.php:873
 msgid "Numeric (unsigned)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:748 include/locales/en_gb.inc.php:755
+#: include/locales/en_gb.inc.php:747 include/locales/en_gb.inc.php:754
 msgid "OEM"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1054
+#: include/locales/en_gb.inc.php:1053
 msgid "OK"
 msgstr "OK"
 
@@ -6335,7 +6343,7 @@ msgstr ""
 msgid "OS (Short)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1117
+#: include/locales/en_gb.inc.php:1116
 msgid "OVERVIEW"
 msgstr "PĀRSKATS"
 
@@ -6343,7 +6351,7 @@ msgstr "PĀRSKATS"
 msgid "Oct"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:868
+#: include/locales/en_gb.inc.php:867
 msgid "Octal"
 msgstr "Oktāls"
 
@@ -6355,7 +6363,7 @@ msgstr "Oktobris"
 msgid "Off"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1178
+#: include/locales/en_gb.inc.php:1177
 msgid "Ok"
 msgstr ""
 
@@ -6363,7 +6371,7 @@ msgstr ""
 msgid "On"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1616
+#: include/locales/en_gb.inc.php:1615
 msgid "Once"
 msgstr "Vienreiz"
 
@@ -6371,11 +6379,11 @@ msgstr "Vienreiz"
 msgid "One time only"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1384
+#: include/locales/en_gb.inc.php:1383
 msgid "One-time downtime"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1965
+#: include/locales/en_gb.inc.php:1964
 msgid "Only Super Admins can create media types"
 msgstr ""
 
@@ -6384,19 +6392,19 @@ msgstr ""
 msgid "Only Super Admins can delete User Groups."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1966
+#: include/locales/en_gb.inc.php:1965
 msgid "Only Super Admins can delete media types"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1949
+#: include/locales/en_gb.inc.php:1948
 msgid "Only Zabbix Admins can add user Medias"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1951
+#: include/locales/en_gb.inc.php:1950
 msgid "Only Zabbix Admins can change user Medias"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1950
+#: include/locales/en_gb.inc.php:1949
 msgid "Only Zabbix Admins can remove user Medias"
 msgstr ""
 
@@ -6404,7 +6412,7 @@ msgstr ""
 msgid "Only characters are allowed"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1145
+#: include/locales/en_gb.inc.php:1144
 msgid "Only items assigned to enabled hosts are counted"
 msgstr ""
 
@@ -6412,7 +6420,7 @@ msgstr ""
 msgid "Only one check can be unique."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1142
+#: include/locales/en_gb.inc.php:1141
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr ""
 
@@ -6421,7 +6429,7 @@ msgstr ""
 msgid "Operation \"%s\" already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1824
+#: include/locales/en_gb.inc.php:1823
 msgid "Operation cannot be performed due to unauthorized request"
 msgstr ""
 
@@ -6449,11 +6457,11 @@ msgstr ""
 msgid "Operations"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:753
+#: include/locales/en_gb.inc.php:752
 msgid "Operator"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:903
+#: include/locales/en_gb.inc.php:902
 #: include/views/configuration.host.massupdate.php:61
 #: include/views/configuration.host.massupdate.php:68
 #: include/views/configuration.host.massupdate.php:84
@@ -6478,8 +6486,8 @@ msgstr ""
 msgid "Other parameters"
 msgstr "Citi parametri"
 
-#: include/locales/en_gb.inc.php:1116 include/menu.inc.php:38
-#: include/menu.inc.php:103 queue.php:48
+#: include/locales/en_gb.inc.php:1115 include/menu.inc.php:38
+#: include/menu.inc.php:103 popup.php:113 queue.php:48
 msgid "Overview"
 msgstr "Pārskats"
 
@@ -6487,59 +6495,59 @@ msgstr "Pārskats"
 msgid "Overview by proxy"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1768
+#: include/locales/en_gb.inc.php:1767
 msgid "P"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1082
+#: include/locales/en_gb.inc.php:1081
 msgid "PERSONAL DASHBOARD"
 msgstr "PERSONĀLAIS INFOPANELIS"
 
-#: include/locales/en_gb.inc.php:1943
+#: include/locales/en_gb.inc.php:1942
 msgid "PHP Session"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1932
+#: include/locales/en_gb.inc.php:1931
 msgid "PHP Sockets"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1927
+#: include/locales/en_gb.inc.php:1926
 msgid "PHP databases support"
 msgstr "PHP datubāzu atbalsts"
 
-#: include/locales/en_gb.inc.php:1945
+#: include/locales/en_gb.inc.php:1944
 msgid "PHP gettext"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1917
+#: include/locales/en_gb.inc.php:1916
 msgid "PHP max execution time"
 msgstr "PHP maksimālais izpildes laiks"
 
-#: include/locales/en_gb.inc.php:1918
+#: include/locales/en_gb.inc.php:1917
 msgid "PHP max input time"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1913
+#: include/locales/en_gb.inc.php:1912
 msgid "PHP memory limit"
 msgstr "PHP atmiņas ierobežojums"
 
-#: include/locales/en_gb.inc.php:1915
+#: include/locales/en_gb.inc.php:1914
 msgid "PHP post max size"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1921
+#: include/locales/en_gb.inc.php:1920
 msgid "PHP timezone"
 msgstr "PHP laika zona"
 
-#: include/locales/en_gb.inc.php:1941
+#: include/locales/en_gb.inc.php:1940
 msgid "PHP upload max filesize"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1911
+#: include/locales/en_gb.inc.php:1910
 msgid "PHP version"
 msgstr "PHP versija"
 
-#: include/locales/en_gb.inc.php:1302
+#: include/locales/en_gb.inc.php:1301
 msgid "PLAIN TEXT"
 msgstr ""
 
@@ -6552,19 +6560,19 @@ msgstr "POP"
 msgid "PORT cannot be empty for host interface"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1055
+#: include/locales/en_gb.inc.php:1054
 msgid "PROBLEM"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:768
+#: include/locales/en_gb.inc.php:767
 msgid "PROXIES"
 msgstr "STARPNIEKMEZGLI"
 
-#: include/locales/en_gb.inc.php:1736
+#: include/locales/en_gb.inc.php:1735
 msgid "Page received incorrect data"
 msgstr "Lapa saņēma nepareizu informāciju"
 
-#: include/locales/en_gb.inc.php:1238
+#: include/locales/en_gb.inc.php:1237
 msgid "Palette"
 msgstr ""
 
@@ -6572,11 +6580,11 @@ msgstr ""
 msgid "Parameter"
 msgstr "Parametrs"
 
-#: include/locales/en_gb.inc.php:1366
+#: include/locales/en_gb.inc.php:1365
 msgid "Parent service"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1897
+#: include/locales/en_gb.inc.php:1896
 msgid "Parse SQL error"
 msgstr ""
 
@@ -6588,7 +6596,7 @@ msgstr ""
 msgid "Passive"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1559 include/setup.inc.php:249
+#: include/locales/en_gb.inc.php:1558 include/setup.inc.php:249
 #: include/views/configuration.action.edit.php:666
 #: include/views/configuration.action.edit.php:674
 #: include/views/configuration.host.edit.php:459
@@ -6596,19 +6604,19 @@ msgstr ""
 msgid "Password"
 msgstr "Parole"
 
-#: include/locales/en_gb.inc.php:1561
+#: include/locales/en_gb.inc.php:1560
 msgid "Password (once again)"
 msgstr "Parole (vēlreiz)"
 
-#: include/locales/en_gb.inc.php:1962
+#: include/locales/en_gb.inc.php:1961
 msgid "Password required for mediatype"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1511
+#: include/locales/en_gb.inc.php:1510
 msgid "Password should not be empty"
 msgstr "Parole nedrīkst būt tukša"
 
-#: include/locales/en_gb.inc.php:1182
+#: include/locales/en_gb.inc.php:1181
 msgid "Percentage"
 msgstr ""
 
@@ -6633,7 +6641,7 @@ msgstr ""
 msgid "Period type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1769
+#: include/locales/en_gb.inc.php:1768
 msgid "Peta"
 msgstr ""
 
@@ -6641,19 +6649,19 @@ msgstr ""
 msgid "Pie"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1301
+#: include/locales/en_gb.inc.php:1300 popup.php:105
 msgid "Plain text"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1627
+#: include/locales/en_gb.inc.php:1626
 msgid "Play"
 msgstr "Atskaņot"
 
-#: include/locales/en_gb.inc.php:1625
+#: include/locales/en_gb.inc.php:1624
 msgid "Play sound"
 msgstr "Atskaņot skaņu"
 
-#: include/locales/en_gb.inc.php:1908
+#: include/locales/en_gb.inc.php:1907
 msgid "Please be aware that database still contains data related to the deleted Node"
 msgstr ""
 
@@ -6661,21 +6669,21 @@ msgstr ""
 msgid "Please enter confirmation text."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1026
+#: include/locales/en_gb.inc.php:1025
 msgid "Please select two elements"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1925
+#: include/locales/en_gb.inc.php:1924
 msgid "Please set"
 msgstr "Lūdzu, norādiet"
 
-#: include/locales/en_gb.inc.php:1647
+#: include/locales/en_gb.inc.php:1646
 msgid "Polish (PL)"
 msgstr "Poļu (PL)"
 
-#: include/locales/en_gb.inc.php:729
+#: include/locales/en_gb.inc.php:728
 #: include/views/configuration.action.edit.php:678
-#: include/views/configuration.host.edit.php:192
+#: include/views/configuration.host.edit.php:192 popup.php:441
 msgid "Port"
 msgstr ""
 
@@ -6683,11 +6691,11 @@ msgstr ""
 msgid "Port range"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1640
+#: include/locales/en_gb.inc.php:1639
 msgid "Portuguese (PT)"
 msgstr "Protugāļu (PT)"
 
-#: include/locales/en_gb.inc.php:1708
+#: include/locales/en_gb.inc.php:1707
 msgid "Position"
 msgstr ""
 
@@ -6699,8 +6707,8 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:206 include/locales/en_gb.inc.php:2033
-#: include/locales/en_gb.inc.php:2035
+#: include/locales/en_gb.inc.php:206 include/locales/en_gb.inc.php:2032
+#: include/locales/en_gb.inc.php:2034
 msgid "Previous"
 msgstr "Iepriekšējais"
 
@@ -6736,7 +6744,7 @@ msgstr ""
 msgid "Print"
 msgstr "Drukāt"
 
-#: include/locales/en_gb.inc.php:915
+#: include/locales/en_gb.inc.php:914
 #: include/views/configuration.action.edit.php:673
 msgid "Private key file"
 msgstr "Privātās atslēgas fails"
@@ -6749,32 +6757,32 @@ msgstr ""
 msgid "Probably php-ldap module is missing"
 msgstr "Iespējams, trūkst \"php-ldap\" modulis"
 
-#: include/locales/en_gb.inc.php:1180
+#: include/locales/en_gb.inc.php:1179
 msgid "Problem"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1113
+#: include/locales/en_gb.inc.php:1112
 #: include/views/configuration.sysmap.edit.php:131
 msgid "Problem display"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1622
+#: include/locales/en_gb.inc.php:1621
 msgid "Problem on"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1371
+#: include/locales/en_gb.inc.php:1370
 msgid "Problem, if all children have problems"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1370
+#: include/locales/en_gb.inc.php:1369
 msgid "Problem, if at least one child has a problem"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1181
+#: include/locales/en_gb.inc.php:1180
 msgid "Problems"
 msgstr "Problēmas"
 
-#: include/locales/en_gb.inc.php:1981 include/page_header.php:226
+#: include/locales/en_gb.inc.php:1980 include/page_header.php:226
 msgid "Profile"
 msgstr "Profils"
 
@@ -6782,19 +6790,23 @@ msgstr "Profils"
 msgid "Profile mode"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:767
+#: popup.php:77
+msgid "Prototypes"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:766 popup.php:49
 msgid "Proxies"
 msgstr ""
 
-#: include/actions.inc.php:60 include/locales/en_gb.inc.php:769 queue.php:221
+#: include/actions.inc.php:60 include/locales/en_gb.inc.php:768 queue.php:221
 msgid "Proxy"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1522
+#: include/locales/en_gb.inc.php:1521
 msgid "Proxy added"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1526
+#: include/locales/en_gb.inc.php:1525
 msgid "Proxy deleted"
 msgstr ""
 
@@ -6802,20 +6814,20 @@ msgstr ""
 msgid "Proxy mode"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:771
+#: include/locales/en_gb.inc.php:770
 msgid "Proxy name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1524
+#: include/locales/en_gb.inc.php:1523
 msgid "Proxy updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:916
+#: include/locales/en_gb.inc.php:915
 #: include/views/configuration.action.edit.php:667
 msgid "Public key"
 msgstr "Publiskā atslēga"
 
-#: include/locales/en_gb.inc.php:914
+#: include/locales/en_gb.inc.php:913
 #: include/views/configuration.action.edit.php:672
 msgid "Public key file"
 msgstr "Publiskās atslēgas fails"
@@ -6824,15 +6836,15 @@ msgstr "Publiskās atslēgas fails"
 msgid "QUEUE OF ITEMS TO BE UPDATED"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1982 include/menu.inc.php:234
+#: include/locales/en_gb.inc.php:1981 include/menu.inc.php:234
 msgid "Queue"
 msgstr "Rinda"
 
-#: include/locales/en_gb.inc.php:1133
+#: include/locales/en_gb.inc.php:1132
 msgid "REPORT"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:749
+#: include/locales/en_gb.inc.php:748
 msgid "RMCP+"
 msgstr ""
 
@@ -6841,15 +6853,15 @@ msgstr ""
 msgid "Read"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1555
+#: include/locales/en_gb.inc.php:1554
 msgid "Read only"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1556
+#: include/locales/en_gb.inc.php:1555
 msgid "Read-write"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1403
+#: include/locales/en_gb.inc.php:1402
 msgid "Reason"
 msgstr ""
 
@@ -6865,7 +6877,7 @@ msgstr "Saņēmējs"
 msgid "Recipient(s)"
 msgstr "Saņemējs/i"
 
-#: include/locales/en_gb.inc.php:1623
+#: include/locales/en_gb.inc.php:1622
 msgid "Recovery"
 msgstr ""
 
@@ -6878,7 +6890,7 @@ msgstr ""
 msgid "Recovery subject"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1564
+#: include/locales/en_gb.inc.php:1563
 msgid "Refresh (in seconds)"
 msgstr ""
 
@@ -6899,7 +6911,7 @@ msgstr ""
 msgid "Refreshed every: %s sec "
 msgstr ""
 
-#: include/locales/en_gb.inc.php:930
+#: include/locales/en_gb.inc.php:929
 msgid "Regexp"
 msgstr ""
 
@@ -6931,7 +6943,7 @@ msgstr ""
 msgid "Remote command"
 msgstr "Attālināta komanda"
 
-#: include/locales/en_gb.inc.php:1389
+#: include/locales/en_gb.inc.php:1388
 #: include/views/configuration.sysmap.edit.php:146
 #: include/views/configuration.sysmap.edit.php:164
 #: include/views/js/configuration.action.edit.js.php:9
@@ -6944,11 +6956,11 @@ msgstr "Attālināta komanda"
 msgid "Remove"
 msgstr "Dzēst"
 
-#: include/locales/en_gb.inc.php:1037
+#: include/locales/en_gb.inc.php:1036
 msgid "Remove element"
 msgstr "Dzēst elementu"
 
-#: include/locales/en_gb.inc.php:1569
+#: include/locales/en_gb.inc.php:1568
 msgid "Remove from"
 msgstr "Dzēst no"
 
@@ -6968,7 +6980,7 @@ msgstr "Dzēst no mezglu grupām: "
 msgid "Remove host"
 msgstr "Dzēst mezglu"
 
-#: include/locales/en_gb.inc.php:1039
+#: include/locales/en_gb.inc.php:1038
 msgid "Remove link"
 msgstr "Dzēst saiti"
 
@@ -6978,19 +6990,19 @@ msgstr "Dzēst saiti"
 msgid "Remove selected"
 msgstr "Dzēst iezīmētos"
 
-#: include/locales/en_gb.inc.php:1460
+#: include/locales/en_gb.inc.php:1459
 msgid "Replace"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:741
+#: include/locales/en_gb.inc.php:740
 msgid "Replace linked templates"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1986
+#: include/locales/en_gb.inc.php:1985
 msgid "Report"
 msgstr "Atskaite"
 
-#: include/locales/en_gb.inc.php:1987 include/menu.inc.php:108
+#: include/locales/en_gb.inc.php:1986 include/menu.inc.php:108
 msgid "Reports"
 msgstr "Atskaites"
 
@@ -6998,15 +7010,15 @@ msgstr "Atskaites"
 msgid "Required"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1944
+#: include/locales/en_gb.inc.php:1943
 msgid "Required Session module"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1933
+#: include/locales/en_gb.inc.php:1932
 msgid "Required Sockets module"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1946
+#: include/locales/en_gb.inc.php:1945
 msgid "Required gettext module"
 msgstr ""
 
@@ -7018,31 +7030,31 @@ msgstr ""
 msgid "Required performance (vps)"
 msgstr "Nepieciešamā veikstpēja (vs)"
 
-#: include/locales/en_gb.inc.php:1150
+#: include/locales/en_gb.inc.php:1149
 msgid "Required server performance, new values per second"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1928
+#: include/locales/en_gb.inc.php:1927
 msgid "Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1929
+#: include/locales/en_gb.inc.php:1928
 msgid "Requires bcmath module"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1940
+#: include/locales/en_gb.inc.php:1939
 msgid "Requires ctype module"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1936
+#: include/locales/en_gb.inc.php:1935
 msgid "Requires images generation support"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1931
+#: include/locales/en_gb.inc.php:1930
 msgid "Requires mb string module"
 msgstr ""
 
-#: hosts.php:734 include/locales/en_gb.inc.php:1092
+#: hosts.php:734 include/locales/en_gb.inc.php:1091
 msgid "Reset"
 msgstr ""
 
@@ -7059,11 +7071,11 @@ msgstr ""
 msgid "Reset defaults"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1179
+#: include/locales/en_gb.inc.php:1178
 msgid "Resolved"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1262
+#: include/locales/en_gb.inc.php:1261
 msgid "Resource"
 msgstr ""
 
@@ -7085,7 +7097,7 @@ msgstr "Atbildes laiks"
 msgid "Response time for step '%1$s' of scenario '%2$s'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1589
+#: include/locales/en_gb.inc.php:1588
 msgid "Result"
 msgstr "Rezultāts"
 
@@ -7097,7 +7109,7 @@ msgstr ""
 msgid "Result is TRUE"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1719
+#: include/locales/en_gb.inc.php:1718
 msgid "Result type"
 msgstr "Rezultāta tips"
 
@@ -7113,28 +7125,28 @@ msgstr ""
 msgid "Return"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1326
+#: include/locales/en_gb.inc.php:1325
 #: include/views/configuration.sysmap.edit.php:117
 msgid "Right"
 msgstr "Pa labi"
 
-#: include/locales/en_gb.inc.php:1549
+#: include/locales/en_gb.inc.php:1548
 msgid "Rights"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1304
+#: include/locales/en_gb.inc.php:1303
 msgid "Row span"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1257
+#: include/locales/en_gb.inc.php:1256
 msgid "Rows"
 msgstr "Rindas"
 
-#: include/locales/en_gb.inc.php:1571
+#: include/locales/en_gb.inc.php:1570
 msgid "Rows per page"
 msgstr "Ieriaksti lapā"
 
-#: include/locales/en_gb.inc.php:926
+#: include/locales/en_gb.inc.php:925
 msgid "Rule"
 msgstr ""
 
@@ -7182,11 +7194,11 @@ msgstr ""
 msgid "Run remote commands on hosts: "
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1639
+#: include/locales/en_gb.inc.php:1638
 msgid "Russian (RU)"
 msgstr "Krievu (RU)"
 
-#: include/locales/en_gb.inc.php:2006 include/locales/en_gb.inc.php:2007
+#: include/locales/en_gb.inc.php:2005 include/locales/en_gb.inc.php:2006
 msgid "S"
 msgstr "S"
 
@@ -7194,11 +7206,11 @@ msgstr "S"
 msgid "SCENARIOS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1336 screens.php:172 screens.php:212
+#: include/locales/en_gb.inc.php:1335 screens.php:172 screens.php:212
 msgid "SCREENS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1592
+#: include/locales/en_gb.inc.php:1591
 msgid "SCRIPT ERROR"
 msgstr "SKRIPTA KĻŪDA"
 
@@ -7206,7 +7218,7 @@ msgstr "SKRIPTA KĻŪDA"
 msgid "SCRIPTS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1662
+#: include/locales/en_gb.inc.php:1661
 msgid "SEARCH"
 msgstr "MEKLĒT"
 
@@ -7214,19 +7226,19 @@ msgstr "MEKLĒT"
 msgid "SERVER"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1268
+#: include/locales/en_gb.inc.php:1267
 msgid "SIMPLE GRAPH"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1183
+#: include/locales/en_gb.inc.php:1182
 msgid "SLA"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1284
+#: include/locales/en_gb.inc.php:1283
 msgid "SLIDE SHOWS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:856
+#: include/locales/en_gb.inc.php:855
 msgid "SMS"
 msgstr "SMS"
 
@@ -7247,7 +7259,7 @@ msgstr ""
 msgid "SMTP server"
 msgstr "SMTP serveris"
 
-#: include/locales/en_gb.inc.php:775
+#: include/locales/en_gb.inc.php:774
 msgid "SNMP"
 msgstr ""
 
@@ -7259,21 +7271,21 @@ msgstr ""
 msgid "SNMP Key"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:885
+#: include/locales/en_gb.inc.php:884
 #: include/views/js/configuration.discovery.js.php:249
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
-#: include/locales/en_gb.inc.php:884
+#: include/locales/en_gb.inc.php:883
 msgid "SNMP community"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:836
+#: include/locales/en_gb.inc.php:835
 #: include/views/js/configuration.discovery.js.php:140
 msgid "SNMPv1 agent"
 msgstr "SNMPv1 aģents"
 
-#: include/locales/en_gb.inc.php:839
+#: include/locales/en_gb.inc.php:838
 #: include/views/js/configuration.discovery.js.php:141
 msgid "SNMPv2 agent"
 msgstr "SNMPv2 aģents"
@@ -7286,38 +7298,38 @@ msgstr ""
 msgid "SNMPv3 Security name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:840
+#: include/locales/en_gb.inc.php:839
 #: include/views/js/configuration.discovery.js.php:142
 msgid "SNMPv3 agent"
 msgstr "SNMPv3 aģents"
 
-#: include/locales/en_gb.inc.php:889
+#: include/locales/en_gb.inc.php:888
 #: include/views/js/configuration.discovery.js.php:63
 msgid "SNMPv3 auth passphrase"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:890
+#: include/locales/en_gb.inc.php:889
 #: include/views/js/configuration.discovery.js.php:68
 msgid "SNMPv3 priv passphrase"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:888
+#: include/locales/en_gb.inc.php:887
 msgid "SNMPv3 security level"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:887
+#: include/locales/en_gb.inc.php:886
 msgid "SNMPv3 security name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1744
+#: include/locales/en_gb.inc.php:1743
 msgid "SQL executes count"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1745
+#: include/locales/en_gb.inc.php:1744
 msgid "SQL requests count"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1743
+#: include/locales/en_gb.inc.php:1742
 msgid "SQL selects count"
 msgstr ""
 
@@ -7332,11 +7344,11 @@ msgstr ""
 msgid "SSH"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:844
+#: include/locales/en_gb.inc.php:843
 msgid "SSH agent"
 msgstr "SSH aģents"
 
-#: include/locales/en_gb.inc.php:1671
+#: include/locales/en_gb.inc.php:1670
 msgid "STANDARD ITEMS"
 msgstr ""
 
@@ -7344,7 +7356,7 @@ msgstr ""
 msgid "STATUS OF DISCOVERY"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1479
+#: include/locales/en_gb.inc.php:1478
 msgid "STATUS OF TRIGGERS"
 msgstr ""
 
@@ -7352,7 +7364,7 @@ msgstr ""
 msgid "STATUS OF WEB MONITORING"
 msgstr "TĪMEKĻA UZRAUDZĪBAS STĀVOKLIS"
 
-#: include/locales/en_gb.inc.php:1135
+#: include/locales/en_gb.inc.php:1134
 msgid "STATUS OF ZABBIX"
 msgstr "ZABBIX STĀVOKLIS"
 
@@ -7360,11 +7372,11 @@ msgstr "ZABBIX STĀVOKLIS"
 msgid "Sat"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:52 include/locales/en_gb.inc.php:1397
+#: include/locales/en_gb.inc.php:52 include/locales/en_gb.inc.php:1396
 msgid "Saturday"
 msgstr "Sestdiena"
 
-#: include/locales/en_gb.inc.php:1075
+#: include/locales/en_gb.inc.php:1074
 #: include/views/administration.general.triggerSeverity.edit.php:90
 #: include/views/administration.script.edit.php:116
 #: include/views/configuration.action.edit.php:926
@@ -7374,7 +7386,7 @@ msgstr "Sestdiena"
 msgid "Save"
 msgstr "Saglabāt"
 
-#: include/locales/en_gb.inc.php:1236
+#: include/locales/en_gb.inc.php:1235
 msgid "Scale"
 msgstr ""
 
@@ -7433,46 +7445,46 @@ msgstr ""
 msgid "Schedule"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1247
+#: include/locales/en_gb.inc.php:1246
 msgid "Screen"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1250
+#: include/locales/en_gb.inc.php:1249
 msgid "Screen added"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1261
+#: include/locales/en_gb.inc.php:1260
 msgid "Screen cell configuration"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1254
+#: include/locales/en_gb.inc.php:1253
 msgid "Screen deleted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1332
+#: include/locales/en_gb.inc.php:1331
 msgid "Screen should contain at least one row and column"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1252
+#: include/locales/en_gb.inc.php:1251
 msgid "Screen updated"
-msgstr ""
-
-#: include/locales/en_gb.inc.php:1348
-#, php-format
-msgid "Screen with id \"%d\" does not exist"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1347
 #, php-format
+msgid "Screen with id \"%d\" does not exist"
+msgstr ""
+
+#: include/locales/en_gb.inc.php:1346
+#, php-format
 msgid "Screen with name \"%s\" does not exist"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1246 include/menu.inc.php:72
-#: include/menu.inc.php:181
+#: include/locales/en_gb.inc.php:1245 include/menu.inc.php:72
+#: include/menu.inc.php:181 popup.php:85 popup.php:109
 msgid "Screens"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:857
+#: include/locales/en_gb.inc.php:856
 #: include/views/administration.script.edit.php:48
 #: include/views/administration.script.edit.php:112
 #: include/views/administration.script.list.php:63 scripts.php:139
@@ -7506,13 +7518,13 @@ msgstr "Skripts modificēts"
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr ""
 
-#: include/blocks.inc.php:892 include/locales/en_gb.inc.php:1587
+#: include/blocks.inc.php:892 include/locales/en_gb.inc.php:1586
 #: include/maps.inc.php:147 include/menu.inc.php:227 report5.php:137
 #: tr_status.php:554
 msgid "Scripts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:902 include/views/general.search.php:36
+#: include/locales/en_gb.inc.php:901 include/views/general.search.php:36
 #: include/views/js/general.search.js.php:4
 msgid "Search"
 msgstr "Meklēt"
@@ -7521,7 +7533,7 @@ msgstr "Meklēt"
 msgid "Search attribute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1666
+#: include/locales/en_gb.inc.php:1665
 msgid "Search pattern is empty"
 msgstr ""
 
@@ -7561,11 +7573,11 @@ msgstr ""
 msgid "Secondary POC screen name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1442
+#: include/locales/en_gb.inc.php:1441
 msgid "Seconds"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1498 include/page_header.php:328
+#: include/locales/en_gb.inc.php:1497 include/page_header.php:328
 #: include/views/configuration.action.edit.php:173
 #: include/views/configuration.action.edit.php:183
 #: include/views/configuration.action.edit.php:193
@@ -7575,7 +7587,8 @@ msgstr ""
 #: include/views/configuration.action.edit.php:255
 #: include/views/configuration.action.edit.php:265
 #: include/views/configuration.action.edit.php:649
-#: include/views/js/configuration.action.edit.js.php:94 popup.php:1850
+#: include/views/js/configuration.action.edit.js.php:94 popup.php:1116
+#: popup.php:1850
 msgid "Select"
 msgstr ""
 
@@ -7583,11 +7596,11 @@ msgstr ""
 msgid "Select Nodes"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1899
+#: include/locales/en_gb.inc.php:1898
 msgid "Select image to download"
 msgstr "Izvēlieties attelu lejuplādēšanai"
 
-#: include/locales/en_gb.inc.php:936
+#: include/locales/en_gb.inc.php:935
 msgid "Select prototype"
 msgstr ""
 
@@ -7595,7 +7608,7 @@ msgstr ""
 msgid "Select rows with value like"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1103
+#: include/locales/en_gb.inc.php:1102
 msgid "Selected"
 msgstr ""
 
@@ -7603,11 +7616,11 @@ msgstr ""
 msgid "Selected actions deleted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1235
+#: include/locales/en_gb.inc.php:1234
 msgid "Selected groups"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1234
+#: include/locales/en_gb.inc.php:1233
 msgid "Selected hosts"
 msgstr ""
 
@@ -7627,7 +7640,7 @@ msgstr ""
 msgid "Send only to"
 msgstr "Sūtīt tikai"
 
-#: include/locales/en_gb.inc.php:1070
+#: include/locales/en_gb.inc.php:1069
 msgid "Send to"
 msgstr ""
 
@@ -7643,7 +7656,7 @@ msgstr ""
 msgid "Sep"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1112
+#: include/locales/en_gb.inc.php:1111
 #: include/views/configuration.sysmap.edit.php:124
 msgid "Separated"
 msgstr ""
@@ -7665,27 +7678,27 @@ msgstr ""
 msgid "Server"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1308
+#: include/locales/en_gb.inc.php:1307
 msgid "Server info"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1316
+#: include/locales/en_gb.inc.php:1315
 msgid "Server time"
 msgstr ""
 
-#: include/actions.inc.php:71 include/locales/en_gb.inc.php:1401
+#: include/actions.inc.php:71 include/locales/en_gb.inc.php:1400
 msgid "Service"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1362
+#: include/locales/en_gb.inc.php:1361
 msgid "Service added"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1884
+#: include/locales/en_gb.inc.php:1883
 msgid "Service cannot be parent and child at the same time."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1364
+#: include/locales/en_gb.inc.php:1363
 msgid "Service deleted"
 msgstr ""
 
@@ -7693,7 +7706,7 @@ msgstr ""
 msgid "Service port"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1386
+#: include/locales/en_gb.inc.php:1385
 msgid "Service times"
 msgstr ""
 
@@ -7701,11 +7714,11 @@ msgstr ""
 msgid "Service type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1359
+#: include/locales/en_gb.inc.php:1358
 msgid "Service updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1402
+#: include/locales/en_gb.inc.php:1401
 msgid "Services"
 msgstr ""
 
@@ -7713,11 +7726,11 @@ msgstr ""
 msgid "Session terminated, re-login, please."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1031
+#: include/locales/en_gb.inc.php:1030
 msgid "Set trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1426
+#: include/locales/en_gb.inc.php:1425
 msgid "Severity"
 msgstr ""
 
@@ -7729,7 +7742,7 @@ msgstr ""
 msgid "Severity name cannot be empty."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1159
+#: include/locales/en_gb.inc.php:1158
 msgid "Show"
 msgstr ""
 
@@ -7737,7 +7750,7 @@ msgstr ""
 msgid "Show all"
 msgstr "Attēlot visu"
 
-#: include/locales/en_gb.inc.php:1484
+#: include/locales/en_gb.inc.php:1483
 msgid "Show details"
 msgstr ""
 
@@ -7745,7 +7758,7 @@ msgstr ""
 msgid "Show disabled scenarios"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1446
+#: include/locales/en_gb.inc.php:1445
 msgid "Show disabled triggers"
 msgstr ""
 
@@ -7757,11 +7770,11 @@ msgstr "Maksimālais attēlojamo notikumu skaits"
 msgid "Show events not older"
 msgstr "Rādīt notikumus, kas jaunāki par"
 
-#: include/locales/en_gb.inc.php:1120
+#: include/locales/en_gb.inc.php:1119
 msgid "Show graph of item"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1104
+#: include/locales/en_gb.inc.php:1103
 msgid "Show hosts in maintenance"
 msgstr ""
 
@@ -7773,7 +7786,7 @@ msgstr ""
 msgid "Show legend"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1305
+#: include/locales/en_gb.inc.php:1304
 msgid "Show lines"
 msgstr ""
 
@@ -7781,7 +7794,7 @@ msgstr ""
 msgid "Show selected"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1290
+#: include/locales/en_gb.inc.php:1289
 msgid "Show text as HTML"
 msgstr "Rādīt tekstu kā HTML"
 
@@ -7789,7 +7802,7 @@ msgstr "Rādīt tekstu kā HTML"
 msgid "Show triggers"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1483
+#: include/locales/en_gb.inc.php:1482
 msgid "Show unacknowledged"
 msgstr ""
 
@@ -7797,11 +7810,11 @@ msgstr ""
 msgid "Show unknown events"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:872
+#: include/locales/en_gb.inc.php:871
 msgid "Show value"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1121
+#: include/locales/en_gb.inc.php:1120
 msgid "Show values of item"
 msgstr ""
 
@@ -7809,7 +7822,7 @@ msgstr ""
 msgid "Show working time"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:977
+#: include/locales/en_gb.inc.php:976
 msgid "Shown"
 msgstr "Parādīts"
 
@@ -7821,7 +7834,7 @@ msgstr ""
 msgid "Simple"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:838
+#: include/locales/en_gb.inc.php:837
 msgid "Simple check"
 msgstr "Vienkārša pārbaude"
 
@@ -7829,11 +7842,11 @@ msgstr "Vienkārša pārbaude"
 msgid "Simple check key cannot have parameters in []."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1265
+#: include/locales/en_gb.inc.php:1264 popup.php:97
 msgid "Simple graph"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1266
+#: include/locales/en_gb.inc.php:1265
 msgid "Simple graphs"
 msgstr ""
 
@@ -7873,35 +7886,35 @@ msgstr ""
 msgid "Site state / province"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1869
+#: include/locales/en_gb.inc.php:1868
 msgid "Skipped copying of graph"
 msgstr "Grafika kopēšana izlaista"
 
-#: include/locales/en_gb.inc.php:1281
+#: include/locales/en_gb.inc.php:1280
 msgid "Slide show"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1280
+#: include/locales/en_gb.inc.php:1279 popup.php:89
 msgid "Slide shows"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1288 include/menu.inc.php:185
+#: include/locales/en_gb.inc.php:1287 include/menu.inc.php:185
 msgid "Slides"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1341
+#: include/locales/en_gb.inc.php:1340
 msgid "Slideshow added"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1343
+#: include/locales/en_gb.inc.php:1342
 msgid "Slideshow deleted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1279
+#: include/locales/en_gb.inc.php:1278
 msgid "Slideshow must contain slides"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1339
+#: include/locales/en_gb.inc.php:1338
 msgid "Slideshow updated"
 msgstr ""
 
@@ -7909,11 +7922,11 @@ msgstr ""
 msgid "Slovak (SK)"
 msgstr "Slovāku (SK)"
 
-#: include/locales/en_gb.inc.php:1620
+#: include/locales/en_gb.inc.php:1619
 msgid "Snooze"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1372
+#: include/locales/en_gb.inc.php:1371
 msgid "Soft"
 msgstr ""
 
@@ -7957,7 +7970,7 @@ msgstr "Kārtot pēc"
 msgid "Sort order (0->100)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1377
+#: include/locales/en_gb.inc.php:1376
 msgid "Sort order (0->999)"
 msgstr ""
 
@@ -7965,7 +7978,7 @@ msgstr ""
 msgid "Source"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1641
+#: include/locales/en_gb.inc.php:1640
 msgid "Spanish (ES)"
 msgstr "Spāņu (ES)"
 
@@ -7981,26 +7994,31 @@ msgstr "Ātrums"
 msgid "Stacked"
 msgstr ""
 
+#: popup.php:81
+msgid "Standard items"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:143
 msgid "State"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1739
+#: include/locales/en_gb.inc.php:1738
 msgid "Stats for"
 msgstr ""
 
 #: actionconf.php:421 discoveryconf.php:250 hosts.php:768
 #: include/locales/en_gb.inc.php:292
 #: include/views/configuration.discovery.edit.php:98
-#: include/views/configuration.host.edit.php:233
+#: include/views/configuration.host.edit.php:233 popup.php:441 popup.php:1060
+#: popup.php:1068
 msgid "Status"
 msgstr "Stāvoklis"
 
-#: include/locales/en_gb.inc.php:1367
+#: include/locales/en_gb.inc.php:1366
 msgid "Status calculation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1368
+#: include/locales/en_gb.inc.php:1367
 msgid "Status calculation algorithm"
 msgstr ""
 
@@ -8012,7 +8030,7 @@ msgstr ""
 msgid "Status of Web monitoring"
 msgstr "Tīmekļa uzraudzības stāvoklis"
 
-#: include/locales/en_gb.inc.php:1134 include/menu.inc.php:115
+#: include/locales/en_gb.inc.php:1133 include/menu.inc.php:115
 msgid "Status of Zabbix"
 msgstr "Zabbix stāvoklis"
 
@@ -8020,15 +8038,15 @@ msgstr "Zabbix stāvoklis"
 msgid "Status of discovery"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1481
+#: include/locales/en_gb.inc.php:1480
 msgid "Status of host triggers"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1480
+#: include/locales/en_gb.inc.php:1479
 msgid "Status of hostgroup triggers"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1478
+#: include/locales/en_gb.inc.php:1477
 msgid "Status of triggers"
 msgstr ""
 
@@ -8059,23 +8077,23 @@ msgstr ""
 msgid "Steps"
 msgstr "Soļi"
 
-#: include/locales/en_gb.inc.php:1628
+#: include/locales/en_gb.inc.php:1627
 msgid "Stop"
 msgstr "Stop"
 
-#: include/locales/en_gb.inc.php:871
+#: include/locales/en_gb.inc.php:870
 msgid "Store value"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:747
+#: include/locales/en_gb.inc.php:746
 msgid "Straight"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1320
+#: include/locales/en_gb.inc.php:1319
 msgid "Style"
 msgstr "Stils"
 
-#: include/locales/en_gb.inc.php:1780
+#: include/locales/en_gb.inc.php:1779
 msgid "Subfilter"
 msgstr "Apakšfiltrs"
 
@@ -8085,7 +8103,7 @@ msgstr "Apakšfiltrs"
 msgid "Subject"
 msgstr "Tēma"
 
-#: include/locales/en_gb.inc.php:1855
+#: include/locales/en_gb.inc.php:1854
 msgid "Submap"
 msgstr ""
 
@@ -8097,7 +8115,7 @@ msgstr ""
 msgid "Sun"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:46 include/locales/en_gb.inc.php:1391
+#: include/locales/en_gb.inc.php:46 include/locales/en_gb.inc.php:1390
 msgid "Sunday"
 msgstr "Svētdiena"
 
@@ -8105,11 +8123,11 @@ msgstr "Svētdiena"
 msgid "Support"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1546
+#: include/locales/en_gb.inc.php:1545
 msgid "Surname"
 msgstr "Uzvārds"
 
-#: include/locales/en_gb.inc.php:1642
+#: include/locales/en_gb.inc.php:1641
 msgid "Swedish (SE)"
 msgstr "Zviedru (SE)"
 
@@ -8129,12 +8147,12 @@ msgstr ""
 msgid "System error."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1085
+#: include/locales/en_gb.inc.php:1084
 msgid "System status"
 msgstr "Sistēmas stāvoklis"
 
-#: include/locales/en_gb.inc.php:1766 include/locales/en_gb.inc.php:2002
-#: include/locales/en_gb.inc.php:2004
+#: include/locales/en_gb.inc.php:1765 include/locales/en_gb.inc.php:2001
+#: include/locales/en_gb.inc.php:2003
 msgid "T"
 msgstr "O"
 
@@ -8143,11 +8161,11 @@ msgstr "O"
 msgid "TCP"
 msgstr "TCP"
 
-#: include/locales/en_gb.inc.php:845
+#: include/locales/en_gb.inc.php:844
 msgid "TELNET agent"
 msgstr "TELNET aģents"
 
-#: include/locales/en_gb.inc.php:799 templates.php:520
+#: include/locales/en_gb.inc.php:798 templates.php:520
 msgid "TEMPLATES"
 msgstr ""
 
@@ -8155,15 +8173,15 @@ msgstr ""
 msgid "TOTAL"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1472
+#: include/locales/en_gb.inc.php:1471
 msgid "TRIGGER COMMENTS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:944
+#: include/locales/en_gb.inc.php:943
 msgid "TRIGGER PROTOTYPES OF"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1486
+#: include/locales/en_gb.inc.php:1485
 msgid "TRIGGERS"
 msgstr ""
 
@@ -8180,7 +8198,7 @@ msgstr ""
 msgid "Tag"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:897
+#: include/locales/en_gb.inc.php:896
 #: include/views/configuration.action.edit.php:586
 #: include/views/js/configuration.action.edit.js.php:82
 msgid "Target"
@@ -8190,7 +8208,7 @@ msgstr ""
 msgid "Target list"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:898
+#: include/locales/en_gb.inc.php:897
 msgid "Target type"
 msgstr ""
 
@@ -8200,7 +8218,7 @@ msgstr ""
 msgid "Telnet"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:732 include/reports.inc.php:48
+#: include/locales/en_gb.inc.php:731 include/reports.inc.php:48
 msgid "Template"
 msgstr "Šablons"
 
@@ -8214,7 +8232,7 @@ msgstr ""
 msgid "Template [%1$s] deleted."
 msgstr "Šablons [%1$s] izdzēsts."
 
-#: include/locales/en_gb.inc.php:788
+#: include/locales/en_gb.inc.php:787
 msgid "Template deleted"
 msgstr "Šablons izdzēsts"
 
@@ -8222,7 +8240,7 @@ msgstr "Šablons izdzēsts"
 msgid "Template group"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:797
+#: include/locales/en_gb.inc.php:796
 msgid "Template linkage"
 msgstr "Šablonu saistīšana"
 
@@ -8234,15 +8252,15 @@ msgstr ""
 msgid "Template trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:784
+#: include/locales/en_gb.inc.php:783
 msgid "Template updated"
 msgstr "Šablons atjaunots"
 
-#: include/locales/en_gb.inc.php:1804
+#: include/locales/en_gb.inc.php:1803
 msgid "Template with application"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1803
+#: include/locales/en_gb.inc.php:1802
 msgid "Template with item key"
 msgstr ""
 
@@ -8257,16 +8275,16 @@ msgstr ""
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:910
+#: include/locales/en_gb.inc.php:909
 msgid "Templated item"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:807
+#: include/locales/en_gb.inc.php:806
 msgid "Templated items"
 msgstr ""
 
-#: hosts.php:767 include/locales/en_gb.inc.php:798 include/menu.inc.php:148
-#: include/views/configuration.host.edit.php:430
+#: hosts.php:767 include/locales/en_gb.inc.php:797 include/menu.inc.php:148
+#: include/views/configuration.host.edit.php:430 popup.php:36
 msgid "Templates"
 msgstr "Šabloni"
 
@@ -8275,11 +8293,11 @@ msgstr "Šabloni"
 msgid "Templates [%1$s] unlinked from hosts [%2$s]."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:781
+#: include/locales/en_gb.inc.php:780
 msgid "Templates list"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1767
+#: include/locales/en_gb.inc.php:1766
 msgid "Tera"
 msgstr ""
 
@@ -8291,7 +8309,7 @@ msgstr ""
 msgid "Test confirmation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1713
+#: include/locales/en_gb.inc.php:1712
 msgid "Test data"
 msgstr "Pārbaudāmie dati"
 
@@ -8299,11 +8317,11 @@ msgstr "Pārbaudāmie dati"
 msgid "Test string"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:879
+#: include/locales/en_gb.inc.php:878
 msgid "Text"
 msgstr "Teksts"
 
-#: include/locales/en_gb.inc.php:1934
+#: include/locales/en_gb.inc.php:1933
 msgid "The GD extension is not loaded."
 msgstr "GD paplašinājums nav pieejams."
 
@@ -8327,11 +8345,11 @@ msgstr ""
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1448
+#: include/locales/en_gb.inc.php:1447
 msgid "The trigger depends on"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1632
+#: include/locales/en_gb.inc.php:1631
 msgid "Theme"
 msgstr ""
 
@@ -8344,23 +8362,23 @@ msgstr ""
 msgid "This field is automatically populated by item \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1407
+#: include/locales/en_gb.inc.php:1406
 msgid "This month"
 msgstr "Šis mēnesis"
 
-#: include/locales/en_gb.inc.php:1861
+#: include/locales/en_gb.inc.php:1860
 msgid "This screen-column is not empty"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1860
+#: include/locales/en_gb.inc.php:1859
 msgid "This screen-row is not empty"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1405
+#: include/locales/en_gb.inc.php:1404
 msgid "This week"
 msgstr "Šī nedēļa"
 
-#: include/locales/en_gb.inc.php:1406
+#: include/locales/en_gb.inc.php:1405
 msgid "This year"
 msgstr "Šis gads"
 
@@ -8368,11 +8386,11 @@ msgstr "Šis gads"
 msgid "Thu"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1395
+#: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1394
 msgid "Thursday"
 msgstr "Ceturtdiena"
 
-#: include/locales/en_gb.inc.php:1177
+#: include/locales/en_gb.inc.php:1176
 msgid "Till"
 msgstr "Līdz"
 
@@ -8384,11 +8402,11 @@ msgstr "Laiks"
 msgid "Time period"
 msgstr "Laika periods"
 
-#: include/locales/en_gb.inc.php:1444
+#: include/locales/en_gb.inc.php:1443
 msgid "Time shift"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1315
+#: include/locales/en_gb.inc.php:1314
 msgid "Time type"
 msgstr ""
 
@@ -8404,7 +8422,7 @@ msgstr ""
 msgid "Timestamp"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1924
+#: include/locales/en_gb.inc.php:1923
 msgid "Timezone for PHP is not set"
 msgstr "PHP laika zona nav norādīta"
 
@@ -8416,11 +8434,11 @@ msgstr ""
 msgid "To"
 msgstr "Līdz"
 
-#: include/locales/en_gb.inc.php:1404
+#: include/locales/en_gb.inc.php:1403
 msgid "Today"
 msgstr "Šodiena"
 
-#: include/locales/en_gb.inc.php:1458
+#: include/locales/en_gb.inc.php:1457
 msgid "Toggle input method"
 msgstr "Pārslēgt ievada metodi"
 
@@ -8429,24 +8447,24 @@ msgstr "Pārslēgt ievada metodi"
 msgid "Too many interfaces provided for proxy \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1034
+#: include/locales/en_gb.inc.php:1033
 #: include/views/configuration.sysmap.edit.php:117
 msgid "Top"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1127 queue.php:289
+#: include/locales/en_gb.inc.php:1126 queue.php:289
 msgid "Total"
 msgstr "Kopā"
 
-#: include/locales/en_gb.inc.php:1740
+#: include/locales/en_gb.inc.php:1739
 msgid "Total time"
 msgstr "Kopējais laiks"
 
-#: include/locales/en_gb.inc.php:1746
+#: include/locales/en_gb.inc.php:1745
 msgid "Total time spent on SQL"
 msgstr "Kopā SQL pieprasījumos pavadītais laiks"
 
-#: include/locales/en_gb.inc.php:1852
+#: include/locales/en_gb.inc.php:1851
 msgid "Transaction has not been closed. Aborting.."
 msgstr ""
 
@@ -8454,15 +8472,15 @@ msgstr ""
 msgid "Transport error."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:833
+#: include/locales/en_gb.inc.php:832
 msgid "Trends"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1139
+#: include/locales/en_gb.inc.php:1138
 msgid "Trends stored"
 msgstr ""
 
-#: include/actions.inc.php:41 include/locales/en_gb.inc.php:1378
+#: include/actions.inc.php:41 include/locales/en_gb.inc.php:1377
 msgid "Trigger"
 msgstr "Trigeris"
 
@@ -8515,23 +8533,23 @@ msgstr "Trigeris [%1$s] jau eksistē uz [%2$s]"
 msgid "Trigger [%1$s] does not have item prototype."
 msgstr "Trigerim [%1$s] nav rādītāja prototipa."
 
-#: include/locales/en_gb.inc.php:1424
+#: include/locales/en_gb.inc.php:1423
 msgid "Trigger added"
 msgstr "Trigeris pievienots"
 
-#: include/locales/en_gb.inc.php:1471
+#: include/locales/en_gb.inc.php:1470
 msgid "Trigger comments"
 msgstr "Trigera piezīmes"
 
-#: include/locales/en_gb.inc.php:1422
+#: include/locales/en_gb.inc.php:1421
 msgid "Trigger deleted"
 msgstr "Trigeris izdzēsts"
 
-#: include/locales/en_gb.inc.php:1455
+#: include/locales/en_gb.inc.php:1454
 msgid "Trigger dependencies"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1468
+#: include/locales/en_gb.inc.php:1467
 msgid "Trigger form"
 msgstr ""
 
@@ -8581,7 +8599,7 @@ msgstr ""
 msgid "Trigger severity"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1434
+#: include/locales/en_gb.inc.php:1433
 msgid "Trigger updated"
 msgstr ""
 
@@ -8598,31 +8616,31 @@ msgstr ""
 #: actionconf.php:400 hosts.php:763 hosts.php:846
 #: include/locales/en_gb.inc.php:712 include/menu.inc.php:57
 #: include/views/configuration.host.edit.php:284
-#: include/views/configuration.template.edit.php:226
+#: include/views/configuration.template.edit.php:226 popup.php:61
 msgid "Triggers"
 msgstr "Trigeri"
 
-#: include/locales/en_gb.inc.php:1141
+#: include/locales/en_gb.inc.php:1140
 msgid "Triggers (e/d)[p/u/o]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1420
+#: include/locales/en_gb.inc.php:1419
 msgid "Triggers deleted"
 msgstr "Trigeri izdzēsti"
 
-#: include/locales/en_gb.inc.php:1307
+#: include/locales/en_gb.inc.php:1306
 msgid "Triggers info"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1454
+#: include/locales/en_gb.inc.php:1453
 msgid "Triggers massupdate"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1310
+#: include/locales/en_gb.inc.php:1309
 msgid "Triggers overview"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1496
+#: include/locales/en_gb.inc.php:1495
 msgid "Triggers status"
 msgstr ""
 
@@ -8630,7 +8648,7 @@ msgstr ""
 msgid "Triggers top 100"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1105
+#: include/locales/en_gb.inc.php:1104
 msgid "Triggers with severity"
 msgstr ""
 
@@ -8642,11 +8660,11 @@ msgstr ""
 msgid "Tue"
 msgstr "Otr"
 
-#: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1393
+#: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1392
 msgid "Tuesday"
 msgstr "Otrdiena"
 
-#: include/locales/en_gb.inc.php:1024
+#: include/locales/en_gb.inc.php:1023
 msgid "Two elements should be selected"
 msgstr "Jāiezīmē divi elementi"
 
@@ -8661,6 +8679,7 @@ msgstr ""
 #: include/views/administration.script.list.php:41
 #: include/views/configuration.action.edit.php:653
 #: include/views/configuration.host.edit.php:192 media_types.php:261
+#: popup.php:1058 popup.php:1066
 msgid "Type"
 msgstr "Tips"
 
@@ -8668,7 +8687,7 @@ msgstr "Tips"
 msgid "Type (Full details)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1015
+#: include/locales/en_gb.inc.php:1014
 msgid "Type (OK)"
 msgstr "Tips (OK)"
 
@@ -8677,7 +8696,7 @@ msgstr "Tips (OK)"
 msgid "Type of calculation"
 msgstr "Aprēķina tips"
 
-#: include/locales/en_gb.inc.php:865
+#: include/locales/en_gb.inc.php:864 popup.php:1059 popup.php:1067
 msgid "Type of information"
 msgstr "Informācijas tips"
 
@@ -8685,7 +8704,7 @@ msgstr "Informācijas tips"
 msgid "Type of information must be Log for log key."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:811
+#: include/locales/en_gb.inc.php:810
 msgid "Types"
 msgstr ""
 
@@ -8693,7 +8712,7 @@ msgstr ""
 msgid "UNKNOWN"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:959
+#: include/locales/en_gb.inc.php:958
 msgid "UP"
 msgstr ""
 
@@ -8701,12 +8720,12 @@ msgstr ""
 msgid "UPDATE"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1438
+#: include/locales/en_gb.inc.php:1437
 #: include/views/configuration.sysmap.edit.php:134
 msgid "URL"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1562
+#: include/locales/en_gb.inc.php:1561
 msgid "URL (after login)"
 msgstr ""
 
@@ -8726,15 +8745,15 @@ msgstr ""
 msgid "USA (160 characters)"
 msgstr "ASV (160 rakstzīmes)"
 
-#: include/locales/en_gb.inc.php:1539
+#: include/locales/en_gb.inc.php:1538
 msgid "USER GROUPS"
 msgstr "LIETOTĀJU GRUPAS"
 
-#: include/locales/en_gb.inc.php:1629
+#: include/locales/en_gb.inc.php:1628
 msgid "USER PROFILE"
 msgstr "LIETOTĀJA PROFILA"
 
-#: include/locales/en_gb.inc.php:1540
+#: include/locales/en_gb.inc.php:1539
 msgid "USERS"
 msgstr "LIETOTĀJI"
 
@@ -8742,84 +8761,84 @@ msgstr "LIETOTĀJI"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales/en_gb.inc.php:1648
+#: include/locales/en_gb.inc.php:1647
 msgid "Ukrainian (UA)"
 msgstr "Ukraiņu (UA)"
 
-#: include/locales/en_gb.inc.php:1907
+#: include/locales/en_gb.inc.php:1906
 msgid "Unable to remove local node"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1872
+#: include/locales/en_gb.inc.php:1871
 msgid "Unable to select configuration"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1057
+#: include/locales/en_gb.inc.php:1056
 msgid "Unacknowledged"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1111
+#: include/locales/en_gb.inc.php:1110
 #: include/views/configuration.sysmap.edit.php:125
 msgid "Unacknowledged only"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1575
+#: include/locales/en_gb.inc.php:1574
 msgid "Unblock selected"
 msgstr "Atbloķēt iezīmētos"
 
-#: include/locales/en_gb.inc.php:1576
+#: include/locales/en_gb.inc.php:1575
 msgid "Unblock selected users?"
 msgstr "Vai atbloķēt iezīmētos lietotājus?"
 
-#: include/locales/en_gb.inc.php:1689
+#: include/locales/en_gb.inc.php:1688
 msgid "Unexpected end of element"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:861
+#: include/locales/en_gb.inc.php:860
 msgid "Units"
 msgstr "Vienības"
 
 #: hosts.php:890 include/actions.inc.php:35 include/actions.inc.php:66
 #: include/actions.inc.php:76 include/actions.inc.php:186
 #: include/actions.inc.php:488 include/discovery.inc.php:129
-#: include/locales/en_gb.inc.php:734 include/triggers.inc.php:286
+#: include/locales/en_gb.inc.php:733 include/triggers.inc.php:286
 msgid "Unknown"
 msgstr "Nav zināms"
 
-#: include/locales/en_gb.inc.php:1606
+#: include/locales/en_gb.inc.php:1605
 msgid "Unknown action"
 msgstr "Nezināma darbība"
 
-#: include/locales/en_gb.inc.php:1889
+#: include/locales/en_gb.inc.php:1888
 msgid "Unknown calculation algorithm of service status"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1717
+#: include/locales/en_gb.inc.php:1716
 msgid "Unknown host item, no such item in selected host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1716
+#: include/locales/en_gb.inc.php:1715
 msgid "Unknown host, no such host present in system"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1611
+#: include/locales/en_gb.inc.php:1610
 msgid "Unknown resource"
 msgstr "Nezināms resurss"
 
-#: include/items.inc.php:937
+#: include/items.inc.php:941
 msgid "Unknown value type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1715
+#: include/locales/en_gb.inc.php:1714
 msgid "Unknown variable type, testing not available"
 msgstr "Nezināms mainīgā tips, pārbaude nav pieejama"
 
-#: include/locales/en_gb.inc.php:800
+#: include/locales/en_gb.inc.php:799
 #: include/views/configuration.host.edit.php:417
 msgid "Unlink"
 msgstr "Atvienot"
 
-#: include/locales/en_gb.inc.php:803
+#: include/locales/en_gb.inc.php:802
 #: include/views/configuration.host.edit.php:419
 msgid "Unlink and clear"
 msgstr "Atvienot un iztīrīt"
@@ -8836,11 +8855,11 @@ msgstr "Atvienot no šabloniem"
 msgid "Unlink from templates: "
 msgstr "Atvienot no šabloniem: "
 
-#: include/locales/en_gb.inc.php:1618
+#: include/locales/en_gb.inc.php:1617
 msgid "Unmute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1694
+#: include/locales/en_gb.inc.php:1693
 msgid "Unnecessary symbols detected"
 msgstr ""
 
@@ -8848,20 +8867,20 @@ msgstr ""
 msgid "Up"
 msgstr "Augšup"
 
-#: include/locales/en_gb.inc.php:763
+#: include/locales/en_gb.inc.php:762
 #: include/views/configuration.action.edit.php:863
 msgid "Update"
 msgstr "Atjaunot"
 
-#: include/locales/en_gb.inc.php:796
+#: include/locales/en_gb.inc.php:795
 msgid "Update in group"
 msgstr "Atjaunot grupā"
 
-#: include/locales/en_gb.inc.php:830
+#: include/locales/en_gb.inc.php:829
 msgid "Update interval"
 msgstr "Atjaunošanas intervāls"
 
-#: include/locales/en_gb.inc.php:862
+#: include/locales/en_gb.inc.php:861
 msgid "Update interval (in sec)"
 msgstr "Atjaunošanas intervāls (sekundēs)"
 
@@ -8870,11 +8889,11 @@ msgid "Update item for the graph"
 msgstr ""
 
 #. GETTEXT: r is date format string as described in http://php.net/date
-#: include/classes/class.cserverinfo.php:40 include/locales/en_gb.inc.php:1608
+#: include/classes/class.cserverinfo.php:40 include/locales/en_gb.inc.php:1607
 msgid "Updated"
 msgstr "Saglabāts"
 
-#: include/locales/en_gb.inc.php:773
+#: include/locales/en_gb.inc.php:772
 msgid "Updated status of host"
 msgstr ""
 
@@ -8890,11 +8909,11 @@ msgstr "Atjaunots: %s"
 msgid "Upload"
 msgstr "Augšupielādēt"
 
-#: include/locales/en_gb.inc.php:979
+#: include/locales/en_gb.inc.php:978
 msgid "Upper level maps"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:114 include/locales/en_gb.inc.php:1382
+#: include/locales/en_gb.inc.php:114 include/locales/en_gb.inc.php:1381
 msgid "Uptime"
 msgstr "Darbspējas laiks"
 
@@ -8902,15 +8921,15 @@ msgstr "Darbspējas laiks"
 msgid "Uptime/Downtime"
 msgstr "Darbspējas laiks/Zaudlaiks"
 
-#: include/locales/en_gb.inc.php:1017
+#: include/locales/en_gb.inc.php:1016
 msgid "Use advanced icons"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:892
+#: include/locales/en_gb.inc.php:891
 msgid "Use custom multiplier"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1074
+#: include/locales/en_gb.inc.php:1073
 msgid "Use if severity"
 msgstr ""
 
@@ -8918,7 +8937,7 @@ msgstr ""
 msgid "Used in actions"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:279 include/locales/en_gb.inc.php:752
+#: include/locales/en_gb.inc.php:279 include/locales/en_gb.inc.php:751
 #: include/setup.inc.php:248
 msgid "User"
 msgstr "Lietotājs"
@@ -8928,19 +8947,19 @@ msgstr "Lietotājs"
 msgid "User \"%s\" cannot be without user group."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1506
+#: include/locales/en_gb.inc.php:1505
 msgid "User added"
 msgstr "Lietotājs pievienots"
 
-#: include/locales/en_gb.inc.php:1537
+#: include/locales/en_gb.inc.php:1536
 msgid "User cannot change GUI access for himself"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1536
+#: include/locales/en_gb.inc.php:1535
 msgid "User cannot change status of himself"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1509
+#: include/locales/en_gb.inc.php:1508
 msgid "User deleted"
 msgstr "Lietotājs izdzēsts"
 
@@ -8958,8 +8977,8 @@ msgstr ""
 msgid "User group for database down message"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1541
-#: include/views/administration.script.edit.php:80
+#: include/locales/en_gb.inc.php:1540
+#: include/views/administration.script.edit.php:80 popup.php:65
 msgid "User groups"
 msgstr "Lietotāju grupas"
 
@@ -8977,24 +8996,24 @@ msgstr ""
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:913
+#: include/locales/en_gb.inc.php:912
 #: include/views/configuration.action.edit.php:671
 msgid "User name"
 msgstr "Lietotāja vārds"
 
-#: include/locales/en_gb.inc.php:1630
+#: include/locales/en_gb.inc.php:1629
 msgid "User profile"
 msgstr "Lietotāja profils"
 
-#: include/locales/en_gb.inc.php:1263
+#: include/locales/en_gb.inc.php:1262
 msgid "User rights"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1504
+#: include/locales/en_gb.inc.php:1503
 msgid "User type"
 msgstr "Lietotāja tips"
 
-#: include/locales/en_gb.inc.php:1513
+#: include/locales/en_gb.inc.php:1512
 msgid "User updated"
 msgstr ""
 
@@ -9003,29 +9022,29 @@ msgstr ""
 msgid "User with alias \"%s\" already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:859
+#: include/locales/en_gb.inc.php:858
 #: include/views/configuration.host.edit.php:458
 #: include/views/general.login.php:64 index.php:34
 msgid "Username"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1505 include/menu.inc.php:220
+#: include/locales/en_gb.inc.php:1504 include/menu.inc.php:220 popup.php:69
 msgid "Users"
 msgstr "Lietotāji"
 
-#: include/locales/en_gb.inc.php:1147
+#: include/locales/en_gb.inc.php:1146
 msgid "Users (online)"
 msgstr "Lietotāji (pieslēgušies)"
 
-#: include/locales/en_gb.inc.php:1553
+#: include/locales/en_gb.inc.php:1552
 msgid "Users status"
 msgstr "Lietotāja stāvoklis"
 
-#: include/locales/en_gb.inc.php:1528
+#: include/locales/en_gb.inc.php:1527
 msgid "Users status updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1530
+#: include/locales/en_gb.inc.php:1529
 msgid "Users unblocked"
 msgstr "Lietotāji atbloķēti"
 
@@ -9033,7 +9052,7 @@ msgstr "Lietotāji atbloķēti"
 msgid "VALUE MAPPING"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1136
+#: include/locales/en_gb.inc.php:1135
 msgid "Value"
 msgstr "Vērtība"
 
@@ -9090,11 +9109,11 @@ msgstr ""
 msgid "Value type must be Float for aggregate items."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1122
+#: include/locales/en_gb.inc.php:1121
 msgid "Values"
 msgstr "Vērtības"
 
-#: include/locales/en_gb.inc.php:1138
+#: include/locales/en_gb.inc.php:1137
 msgid "Values stored"
 msgstr ""
 
@@ -9106,11 +9125,11 @@ msgstr "Mainīgie"
 msgid "Vendor"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1321
+#: include/locales/en_gb.inc.php:1320
 msgid "Vertical"
 msgstr "Vertikāli"
 
-#: include/locales/en_gb.inc.php:1328
+#: include/locales/en_gb.inc.php:1327
 msgid "Vertical align"
 msgstr ""
 
@@ -9131,11 +9150,11 @@ msgstr ""
 msgid "Visible name cannot be empty if missing host name"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2003
+#: include/locales/en_gb.inc.php:2002
 msgid "W"
 msgstr "T"
 
-#: include/locales/en_gb.inc.php:850
+#: include/locales/en_gb.inc.php:849
 msgid "WEB CHECKS"
 msgstr "TĪMEKĻA PĀRBAUDES"
 
@@ -9149,7 +9168,7 @@ msgstr "Brīdinājums"
 msgid "Warning. Incorrect value for field \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2029
+#: include/locales/en_gb.inc.php:2028
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr ""
 
@@ -9157,7 +9176,7 @@ msgstr ""
 msgid "Web"
 msgstr "Tīmeklis"
 
-#: include/locales/en_gb.inc.php:911
+#: include/locales/en_gb.inc.php:910
 msgid "Web item"
 msgstr "Tīmekļa rādītājs"
 
@@ -9171,7 +9190,7 @@ msgstr "Tīmekļa rādītājs [%s] izveidots."
 msgid "Web item with key [%s] already exists."
 msgstr "Tīmekļa rādītājs ar atslēgu [%s] jau eksistē."
 
-#: include/locales/en_gb.inc.php:849
+#: include/locales/en_gb.inc.php:848
 msgid "Web monitoring"
 msgstr "Tīmekļa uzraudzība"
 
@@ -9183,23 +9202,23 @@ msgstr "Tīmekļa pārbaudei ir jābūt vismaz vienam solim."
 msgid "Wed"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:49 include/locales/en_gb.inc.php:1394
+#: include/locales/en_gb.inc.php:49 include/locales/en_gb.inc.php:1393
 msgid "Wednesday"
 msgstr "Trešdiena"
 
-#: include/locales/en_gb.inc.php:1225
+#: include/locales/en_gb.inc.php:1224
 msgid "Week"
 msgstr "Nedēļa"
 
-#: include/locales/en_gb.inc.php:1193
+#: include/locales/en_gb.inc.php:1192
 msgid "Weekly"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1071
+#: include/locales/en_gb.inc.php:1070
 msgid "When active"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1270
+#: include/locales/en_gb.inc.php:1269
 #: include/views/configuration.sysmap.edit.php:49
 msgid "Width"
 msgstr "Platums"
@@ -9208,31 +9227,31 @@ msgstr "Platums"
 msgid "With data collection"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1495
+#: include/locales/en_gb.inc.php:1494
 msgid "With last event unacknowledged"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1088
+#: include/locales/en_gb.inc.php:1087
 msgid "With problems"
 msgstr "Ar problēmām"
 
-#: include/locales/en_gb.inc.php:809
+#: include/locales/en_gb.inc.php:808
 msgid "With triggers"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1494
+#: include/locales/en_gb.inc.php:1493
 msgid "With unacknowledged events"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1087
+#: include/locales/en_gb.inc.php:1086
 msgid "Without problems"
 msgstr "Bez problēmām"
 
-#: include/locales/en_gb.inc.php:810
+#: include/locales/en_gb.inc.php:809
 msgid "Without triggers"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:877
+#: include/locales/en_gb.inc.php:876
 msgid "Wizard"
 msgstr ""
 
@@ -9280,7 +9299,7 @@ msgstr ""
 msgid "Wrong fields for map link"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1961
+#: include/locales/en_gb.inc.php:1960
 msgid "Wrong fields for media type"
 msgstr ""
 
@@ -9317,24 +9336,24 @@ msgstr ""
 msgid "Wrong macro"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1957
+#: include/locales/en_gb.inc.php:1956
 msgid "Wrong period ["
 msgstr "Nepareizs periods ["
 
-#: include/locales/en_gb.inc.php:1029
+#: include/locales/en_gb.inc.php:1028
 msgid "Wrong type of arguments passed to function"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:985
+#: include/locales/en_gb.inc.php:984
 msgid "X"
 msgstr "X"
 
-#: include/locales/en_gb.inc.php:1998
+#: include/locales/en_gb.inc.php:1997
 msgid "XML file contains errors"
 msgstr "XML fails satur kļūdas"
 
-#: include/locales/en_gb.inc.php:1196 include/locales/en_gb.inc.php:1216
-#: include/locales/en_gb.inc.php:1774
+#: include/locales/en_gb.inc.php:1195 include/locales/en_gb.inc.php:1215
+#: include/locales/en_gb.inc.php:1773
 msgid "Y"
 msgstr ""
 
@@ -9359,31 +9378,31 @@ msgstr ""
 msgid "Y.M.d H:i:s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1171
+#: include/locales/en_gb.inc.php:1170
 msgid "Y.m.d"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1170
+#: include/locales/en_gb.inc.php:1169
 msgid "Y.m.d H:i"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1064 include/locales/en_gb.inc.php:1776
+#: include/locales/en_gb.inc.php:1063 include/locales/en_gb.inc.php:1775
 msgid "Y.m.d H:i:s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1190
+#: include/locales/en_gb.inc.php:1189
 msgid "Year"
 msgstr "Gads"
 
-#: include/locales/en_gb.inc.php:1195
+#: include/locales/en_gb.inc.php:1194
 msgid "Yearly"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1151
+#: include/locales/en_gb.inc.php:1150
 msgid "Yes"
 msgstr "Jā"
 
-#: include/locales/en_gb.inc.php:1775
+#: include/locales/en_gb.inc.php:1774
 msgid "Yotta"
 msgstr "Jota"
 
@@ -9396,19 +9415,19 @@ msgstr ""
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1972
+#: include/locales/en_gb.inc.php:1971
 msgid "You are not logged in."
 msgstr "Jūs neesat pieslēdzies."
 
-#: include/locales/en_gb.inc.php:1676
+#: include/locales/en_gb.inc.php:1675
 msgid "You can not switch hosts for current selection"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1838
+#: include/locales/en_gb.inc.php:1837
 msgid "You can not use template hosts in mixed expressions."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1969
+#: include/locales/en_gb.inc.php:1968
 msgid "You cannot view this URL as a"
 msgstr ""
 
@@ -9434,7 +9453,7 @@ msgstr ""
 msgid "You do not have enough rights for operation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1995
+#: include/locales/en_gb.inc.php:1994
 msgid "You do not have permission to perform this operation"
 msgstr "Jums nav tiesību veikt šo darbību"
 
@@ -9474,7 +9493,7 @@ msgstr ""
 msgid "You do not have permissions to update user or user does not exist."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1970
+#: include/locales/en_gb.inc.php:1969
 msgid "You must login to view this page."
 msgstr "Jums jāpieslēdzas, lai aplūkotu šo lapu."
 
@@ -9482,11 +9501,11 @@ msgstr "Jums jāpieslēdzas, lai aplūkotu šo lapu."
 msgid "Your setup is not configured for distributed monitoring"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1772
+#: include/locales/en_gb.inc.php:1771
 msgid "Z"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1652
+#: include/locales/en_gb.inc.php:1651
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
@@ -9499,7 +9518,7 @@ msgstr ""
 msgid "Zabbix %s Copyright 2001-2011 by Zabbix SIA"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1502
+#: include/locales/en_gb.inc.php:1501
 msgid "Zabbix Admin"
 msgstr "Zabbix administrators"
 
@@ -9507,15 +9526,15 @@ msgstr "Zabbix administrators"
 msgid "Zabbix Internal authentication"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1503
+#: include/locales/en_gb.inc.php:1502
 msgid "Zabbix Super Admin"
 msgstr "Zabbix superadministrators"
 
-#: include/locales/en_gb.inc.php:1501
+#: include/locales/en_gb.inc.php:1500
 msgid "Zabbix User"
 msgstr "Zabbix lietotājs"
 
-#: include/locales/en_gb.inc.php:834
+#: include/locales/en_gb.inc.php:833
 #: include/views/administration.script.edit.php:54
 #: include/views/configuration.action.edit.php:659
 #: include/views/js/configuration.action.edit.js.php:118
@@ -9523,19 +9542,19 @@ msgstr "Zabbix lietotājs"
 msgid "Zabbix agent"
 msgstr "Zabbix aģents"
 
-#: include/locales/en_gb.inc.php:835
+#: include/locales/en_gb.inc.php:834
 msgid "Zabbix agent (active)"
 msgstr "Zabbix aģents (aktīvs)"
 
-#: include/locales/en_gb.inc.php:847
+#: include/locales/en_gb.inc.php:846
 msgid "Zabbix aggregate"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1439
+#: include/locales/en_gb.inc.php:1438
 msgid "Zabbix has received an incorrect request"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:841
+#: include/locales/en_gb.inc.php:840
 msgid "Zabbix internal"
 msgstr ""
 
@@ -9550,11 +9569,11 @@ msgstr "Zabbix šobrīd nav pieejams"
 msgid "Zabbix server"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1097
+#: include/locales/en_gb.inc.php:1096
 msgid "Zabbix server ip or port is not set!"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1137
+#: include/locales/en_gb.inc.php:1136
 msgid "Zabbix server is running"
 msgstr "Zabbix serveris darbojas"
 
@@ -9566,27 +9585,27 @@ msgstr ""
 msgid "Zabbix server port"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:837
+#: include/locales/en_gb.inc.php:836
 msgid "Zabbix trapper"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1773
+#: include/locales/en_gb.inc.php:1772
 msgid "Zetta"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2010
+#: include/locales/en_gb.inc.php:2009
 msgid "Zoom"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1863
+#: include/locales/en_gb.inc.php:1862
 msgid "[H:i:s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1976
+#: include/locales/en_gb.inc.php:1975
 msgid "[Wrong value for day of week:"
 msgstr "[Nepareiza nedēļas diena:"
 
-#: include/locales/en_gb.inc.php:1974
+#: include/locales/en_gb.inc.php:1973
 msgid "[Wrong value for month:"
 msgstr "[Nepareizs mēnesis:"
 
@@ -9594,12 +9613,12 @@ msgstr "[Nepareizs mēnesis:"
 msgid "[Y.M.d H:i:s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1958 include/locales/en_gb.inc.php:1975
-#: include/locales/en_gb.inc.php:1977
+#: include/locales/en_gb.inc.php:1957 include/locales/en_gb.inc.php:1974
+#: include/locales/en_gb.inc.php:1976
 msgid "]"
 msgstr "]"
 
-#: include/locales/en_gb.inc.php:1205
+#: include/locales/en_gb.inc.php:1204
 msgid "add"
 msgstr "pievienot"
 
@@ -9607,11 +9626,11 @@ msgstr "pievienot"
 msgid "add graph items first"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1796
+#: include/locales/en_gb.inc.php:1795
 msgid "added"
 msgstr "pievienots"
 
-#: include/locales/en_gb.inc.php:1781
+#: include/locales/en_gb.inc.php:1780
 msgid "affects only filtered data!"
 msgstr "ietekmē tikai atlasīto informāciju!"
 
@@ -9619,15 +9638,15 @@ msgstr "ietekmē tikai atlasīto informāciju!"
 msgid "all"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1612
+#: include/locales/en_gb.inc.php:1611
 msgid "already exists"
 msgstr "jau eksistē"
 
-#: include/locales/en_gb.inc.php:1790
+#: include/locales/en_gb.inc.php:1789
 msgid "already exists for host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1805
+#: include/locales/en_gb.inc.php:1804
 msgid "already linked to host"
 msgstr ""
 
@@ -9638,7 +9657,7 @@ msgstr ""
 msgid "and"
 msgstr "un"
 
-#: include/locales/en_gb.inc.php:1808
+#: include/locales/en_gb.inc.php:1807
 msgid "and can't be deleted"
 msgstr ""
 
@@ -9654,7 +9673,7 @@ msgstr ""
 msgid "as Red"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1833
+#: include/locales/en_gb.inc.php:1832
 msgid "available only for items with value types"
 msgstr ""
 
@@ -9662,11 +9681,11 @@ msgstr ""
 msgid "avg"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1930
+#: include/locales/en_gb.inc.php:1929
 msgid "configure PHP with"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1819
+#: include/locales/en_gb.inc.php:1818
 msgid "contains Multibyte chars"
 msgstr ""
 
@@ -9674,7 +9693,7 @@ msgstr ""
 msgid "created"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1939
+#: include/locales/en_gb.inc.php:1938
 msgid "ctype module"
 msgstr ""
 
@@ -9682,13 +9701,13 @@ msgstr ""
 msgid "d"
 msgstr "d"
 
-#: include/locales/en_gb.inc.php:1198 include/locales/en_gb.inc.php:1218
-#: include/locales/en_gb.inc.php:1881
+#: include/locales/en_gb.inc.php:1197 include/locales/en_gb.inc.php:1217
+#: include/locales/en_gb.inc.php:1880
 msgid "d M Y"
 msgstr "d M Y"
 
-#: include/locales/en_gb.inc.php:1199 include/locales/en_gb.inc.php:1204
-#: include/locales/en_gb.inc.php:1219
+#: include/locales/en_gb.inc.php:1198 include/locales/en_gb.inc.php:1203
+#: include/locales/en_gb.inc.php:1218
 msgid "d M Y H:i"
 msgstr ""
 
@@ -9696,17 +9715,17 @@ msgstr ""
 #: include/locales/en_gb.inc.php:123 include/locales/en_gb.inc.php:144
 #: include/locales/en_gb.inc.php:145 include/locales/en_gb.inc.php:220
 #: include/locales/en_gb.inc.php:221 include/locales/en_gb.inc.php:251
-#: include/locales/en_gb.inc.php:254 include/locales/en_gb.inc.php:956
-#: include/locales/en_gb.inc.php:957 include/locales/en_gb.inc.php:958
-#: include/locales/en_gb.inc.php:965 include/locales/en_gb.inc.php:966
-#: include/locales/en_gb.inc.php:967 include/locales/en_gb.inc.php:968
-#: include/locales/en_gb.inc.php:973 include/locales/en_gb.inc.php:1130
-#: include/locales/en_gb.inc.php:1243 include/locales/en_gb.inc.php:1679
-#: include/locales/en_gb.inc.php:1683 include/locales/en_gb.inc.php:1862
+#: include/locales/en_gb.inc.php:254 include/locales/en_gb.inc.php:955
+#: include/locales/en_gb.inc.php:956 include/locales/en_gb.inc.php:957
+#: include/locales/en_gb.inc.php:964 include/locales/en_gb.inc.php:965
+#: include/locales/en_gb.inc.php:966 include/locales/en_gb.inc.php:967
+#: include/locales/en_gb.inc.php:972 include/locales/en_gb.inc.php:1129
+#: include/locales/en_gb.inc.php:1242 include/locales/en_gb.inc.php:1678
+#: include/locales/en_gb.inc.php:1682 include/locales/en_gb.inc.php:1861
 msgid "d M Y H:i:s"
 msgstr "d M H:i:s"
 
-#: include/locales/en_gb.inc.php:1164 include/locales/en_gb.inc.php:1167
+#: include/locales/en_gb.inc.php:1163 include/locales/en_gb.inc.php:1166
 msgid "d.M"
 msgstr ""
 
@@ -9727,11 +9746,11 @@ msgstr ""
 msgid "d.m.y"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1877
+#: include/locales/en_gb.inc.php:1876
 msgid "day"
 msgstr "diena"
 
-#: include/locales/en_gb.inc.php:1752
+#: include/locales/en_gb.inc.php:1751
 msgid "days"
 msgstr "dienas"
 
@@ -9739,15 +9758,15 @@ msgstr "dienas"
 msgid "default"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1993
+#: include/locales/en_gb.inc.php:1992
 msgid "does not exist"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2012
+#: include/locales/en_gb.inc.php:2011
 msgid "dynamic"
 msgstr "dinamisks"
 
-#: include/locales/en_gb.inc.php:895
+#: include/locales/en_gb.inc.php:894
 msgid "elements copy to ..."
 msgstr ""
 
@@ -9755,7 +9774,7 @@ msgstr ""
 msgid "esc_step_from and esc_step_to must be set together."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1876
+#: include/locales/en_gb.inc.php:1875
 msgid "every"
 msgstr "katru"
 
@@ -9767,19 +9786,19 @@ msgstr ""
 msgid "executed"
 msgstr "izpildīts"
 
-#: include/locales/en_gb.inc.php:2011
+#: include/locales/en_gb.inc.php:2010
 msgid "fixed"
 msgstr "fiksēts"
 
-#: include/locales/en_gb.inc.php:1832
+#: include/locales/en_gb.inc.php:1831
 msgid "for function"
 msgstr "funkcijai"
 
-#: include/locales/en_gb.inc.php:1830
+#: include/locales/en_gb.inc.php:1829
 msgid "for host"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1664
+#: include/locales/en_gb.inc.php:1663
 msgid "found"
 msgstr "atrastiem"
 
@@ -9787,7 +9806,7 @@ msgstr "atrastiem"
 msgid "h"
 msgstr "st."
 
-#: include/locales/en_gb.inc.php:1807
+#: include/locales/en_gb.inc.php:1806
 msgid "has been deleted from the system"
 msgstr ""
 
@@ -9799,7 +9818,7 @@ msgstr ""
 msgid "host group"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1056
+#: include/locales/en_gb.inc.php:1055
 msgid "http://www.zabbix.com"
 msgstr "http://www.zabbix.com"
 
@@ -9832,75 +9851,75 @@ msgstr ""
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1914
+#: include/locales/en_gb.inc.php:1913
 msgid "is a minimal PHP memory limitation"
 msgstr "ir minimālais PHP atmiņas ierobežojums"
 
-#: include/locales/en_gb.inc.php:1919
+#: include/locales/en_gb.inc.php:1918
 msgid "is a minimal limitation on execution time of PHP scripts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1920
+#: include/locales/en_gb.inc.php:1919
 msgid "is a minimal limitation on input parse time for PHP scripts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1207
+#: include/locales/en_gb.inc.php:1206
 msgid "is a wrong time format. Should be from 00:00 to 24:00."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1799
+#: include/locales/en_gb.inc.php:1798
 msgid "is internal and can not be deleted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1822
+#: include/locales/en_gb.inc.php:1821
 msgid "is mandatory"
 msgstr "ir obligāts"
 
-#: include/locales/en_gb.inc.php:1942
+#: include/locales/en_gb.inc.php:1941
 msgid "is minimum for PHP upload filesize"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1916
+#: include/locales/en_gb.inc.php:1915
 msgid "is minimum size of PHP post"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1813
+#: include/locales/en_gb.inc.php:1812
 msgid "is not IP range"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1814
+#: include/locales/en_gb.inc.php:1813
 msgid "is not PORT range"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1821
+#: include/locales/en_gb.inc.php:1820
 msgid "is not a colour"
 msgstr "nav krāsa"
 
-#: include/locales/en_gb.inc.php:1836
+#: include/locales/en_gb.inc.php:1835
 msgid "is not a float or counter or macro for function"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1835
+#: include/locales/en_gb.inc.php:1834
 msgid "is not a float or macro for function"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1817
+#: include/locales/en_gb.inc.php:1816
 msgid "is not double"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1816
+#: include/locales/en_gb.inc.php:1815
 msgid "is not integer"
 msgstr "nav vesels skaitlis"
 
-#: include/locales/en_gb.inc.php:1815
+#: include/locales/en_gb.inc.php:1814
 msgid "is not integer range"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1818
+#: include/locales/en_gb.inc.php:1817
 msgid "is not string"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1202 include/locales/en_gb.inc.php:1203
+#: include/locales/en_gb.inc.php:1201 include/locales/en_gb.inc.php:1202
 msgid "l H:i"
 msgstr ""
 
@@ -9908,7 +9927,7 @@ msgstr ""
 msgid "last"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1937
+#: include/locales/en_gb.inc.php:1936
 msgid "libxml module"
 msgstr ""
 
@@ -9918,11 +9937,11 @@ msgid "like"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:30 include/locales/en_gb.inc.php:34
-#: include/locales/en_gb.inc.php:1758
+#: include/locales/en_gb.inc.php:1757
 msgid "m"
 msgstr "mēn."
 
-#: include/locales/en_gb.inc.php:1698
+#: include/locales/en_gb.inc.php:1697
 msgid "macro(s)"
 msgstr ""
 
@@ -9954,11 +9973,11 @@ msgstr ""
 msgid "ms"
 msgstr "ms"
 
-#: include/locales/en_gb.inc.php:1820
+#: include/locales/en_gb.inc.php:1819
 msgid "multibyte chars are restricted"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1823
+#: include/locales/en_gb.inc.php:1822
 msgid "must be missing"
 msgstr ""
 
@@ -9966,11 +9985,11 @@ msgstr ""
 msgid "must be valid"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1754
+#: include/locales/en_gb.inc.php:1753
 msgid "n"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1922
+#: include/locales/en_gb.inc.php:1921
 msgid "no"
 msgstr "nē"
 
@@ -9986,7 +10005,7 @@ msgstr ""
 msgid "not like"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1154
+#: include/locales/en_gb.inc.php:1153
 msgid "not running"
 msgstr ""
 
@@ -9999,23 +10018,23 @@ msgstr ""
 msgid "not sent"
 msgstr "netika nosūtīts"
 
-#: include/locales/en_gb.inc.php:2013
+#: include/locales/en_gb.inc.php:2012
 msgid "now"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:133 include/locales/en_gb.inc.php:1096
+#: include/locales/en_gb.inc.php:133 include/locales/en_gb.inc.php:1095
 msgid "of"
 msgstr "no"
 
-#: include/locales/en_gb.inc.php:1878
+#: include/locales/en_gb.inc.php:1877
 msgid "of every"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1875
+#: include/locales/en_gb.inc.php:1874
 msgid "on"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1926
+#: include/locales/en_gb.inc.php:1925
 msgid "option in"
 msgstr "parametru"
 
@@ -10027,11 +10046,11 @@ msgstr "parametru"
 msgid "or"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:2026
+#: include/locales/en_gb.inc.php:2025
 msgid "other"
 msgstr "cits"
 
-#: include/locales/en_gb.inc.php:1938
+#: include/locales/en_gb.inc.php:1937
 msgid "php-xml module is not installed"
 msgstr ""
 
@@ -10043,7 +10062,7 @@ msgstr ""
 msgid "refresh now"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1735
+#: include/locales/en_gb.inc.php:1734
 msgid "refreshed every"
 msgstr "atjaunots katras"
 
@@ -10051,11 +10070,11 @@ msgstr "atjaunots katras"
 msgid "remember selected"
 msgstr "atcerēties izvēlēto"
 
-#: include/locales/en_gb.inc.php:1355
+#: include/locales/en_gb.inc.php:1354
 msgid "root"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1153
+#: include/locales/en_gb.inc.php:1152
 msgid "running"
 msgstr ""
 
@@ -10076,7 +10095,7 @@ msgstr "sekundes"
 msgid "sent"
 msgstr "nosūtīts"
 
-#: include/locales/en_gb.inc.php:1782
+#: include/locales/en_gb.inc.php:1781
 msgid "show value mappings"
 msgstr ""
 
@@ -10089,7 +10108,7 @@ msgstr ""
 msgid "to"
 msgstr "līdz"
 
-#: include/locales/en_gb.inc.php:1840
+#: include/locales/en_gb.inc.php:1839
 msgid "to host"
 msgstr ""
 
@@ -10097,19 +10116,19 @@ msgstr ""
 msgid "trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1791
+#: include/locales/en_gb.inc.php:1790
 msgid "updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1801
+#: include/locales/en_gb.inc.php:1800
 msgid "used by scenario"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1048
+#: include/locales/en_gb.inc.php:1047
 msgid "used in exported map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1296
+#: include/locales/en_gb.inc.php:1295
 msgid "used in exported screen"
 msgstr ""
 
@@ -10117,15 +10136,15 @@ msgstr ""
 msgid "w"
 msgstr "ned."
 
-#: include/locales/en_gb.inc.php:1880
+#: include/locales/en_gb.inc.php:1879
 msgid "week"
 msgstr "nedēļa"
 
-#: include/locales/en_gb.inc.php:1879
+#: include/locales/en_gb.inc.php:1878
 msgid "weeks"
 msgstr "nedēļas"
 
-#: include/locales/en_gb.inc.php:1868
+#: include/locales/en_gb.inc.php:1867
 msgid "with template host cannot contain items from other hosts."
 msgstr ""
 
@@ -10133,11 +10152,11 @@ msgstr ""
 msgid "y"
 msgstr "g"
 
-#: include/locales/en_gb.inc.php:1923
+#: include/locales/en_gb.inc.php:1922
 msgid "yes"
 msgstr "jā"
 
-#: include/locales/en_gb.inc.php:1756
+#: include/locales/en_gb.inc.php:1755
 msgid "µ"
 msgstr "µ"
 
