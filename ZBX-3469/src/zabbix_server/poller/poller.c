@@ -181,7 +181,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	zbx_uint64_t	triggerid;
 	int		trigger_type, trigger_value;
 	const char	*trigger_error;
-	static char	type_cond_buf[MAX_STRING_LEN];	/* item type condition buffer */
+	char		type_cond_buf[8];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
