@@ -2160,21 +2160,22 @@ static void	add_value_suffix_s(char *value, size_t max_len)
 {
 	const char	*__function_name = "add_value_suffix_s";
 
-	double	secs, secs_orig;
-	int	n, n_unit = 0, offset = 0, less_than_ms;
+	double	secs;
+	int	n, n_unit = 0, offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s'", __function_name, value);
 
-	if (0 > (secs_orig = atof(value)) || (double)0x7fffffff * SEC_PER_YEAR < secs_orig)
+	if (0 > (secs = atof(value)) || (double)0x7fffffff * SEC_PER_YEAR < secs)
 		goto clean;
 
+	if (0 == floor(secs * 1000))
+	{
+		zbx_snprintf(value, max_len, "%s", (0 == secs ? "0s" : "< 1ms"));
+		goto clean;
+	}
+
+	secs = round(secs * 1000) / 1000;
 	*value = '\0';
-
-	secs = secs_orig - floor(secs_orig);
-	less_than_ms = (0 < secs && secs < 0.001);
-
-	secs = round(secs_orig * 1000) / 1000;
-	less_than_ms &= (secs == 0);
 
 	if (0 != (n = (int)(secs / SEC_PER_YEAR)))
 	{
@@ -2214,21 +2215,14 @@ static void	add_value_suffix_s(char *value, size_t max_len)
 		secs -= (double)n * SEC_PER_MIN;
 	}
 
-	if (2 > n_unit && (0 != (n = (int)secs)))
+	if (2 > n_unit && 0 != (n = (int)secs))
 	{
 		offset += zbx_snprintf(value + offset, max_len - offset, "%ds ", n);
 		secs -= (double)n;
 	}
 
-	if (1 > n_unit)
-	{
-		if (0 == secs_orig)
-			offset += zbx_snprintf(value + offset, max_len - offset, "0s");
-		else if (0 != less_than_ms)
-			offset += zbx_snprintf(value + offset, max_len - offset, "< 1ms");
-		else if (0 != (n = (int)round(secs * 1000)))
-			offset += zbx_snprintf(value + offset, max_len - offset, "%dms", n);
-	}
+	if (1 > n_unit && 0 != (n = (int)round(secs * 1000)))
+		offset += zbx_snprintf(value + offset, max_len - offset, "%dms", n);
 
 	if (0 != offset && ' ' == value[--offset])
 		value[offset] = '\0';
