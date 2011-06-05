@@ -3,14 +3,15 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-06-05 12:14+0300\n"
-"PO-Revision-Date: 2011-03-17 12:59+0200\n"
+"PO-Revision-Date: 2011-06-02 17:02+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -156,7 +157,7 @@ msgstr "Pieņemams PLV (%)"
 
 #: sysmap.php:167
 msgid "Access denied!"
-msgstr ""
+msgstr "Piekļuve liegta!"
 
 #: api/classes/class.cuser.php:923
 #, php-format
@@ -512,7 +513,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:61
 msgid "Aug"
-msgstr ""
+msgstr "Aug"
 
 #: include/locales/en_gb.inc.php:74 include/locales/en_gb.inc.php:663
 msgid "August"
@@ -1396,7 +1397,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1513
 msgid "Cannot update user"
-msgstr ""
+msgstr "Lietotāju nav iespējams modificēt"
 
 #: include/locales/en_gb.inc.php:1514
 msgid "Cannot update user. Both passwords must be equal."
@@ -1424,7 +1425,7 @@ msgstr "Centrēt"
 
 #: include/locales/en_gb.inc.php:1432
 msgid "Change"
-msgstr ""
+msgstr "Mainīt"
 
 #: include/locales/en_gb.inc.php:1559
 msgid "Change password"
@@ -10159,192 +10160,3 @@ msgstr "jā"
 #: include/locales/en_gb.inc.php:1755
 msgid "µ"
 msgstr "µ"
-
-#~ msgid " - all groups - "
-#~ msgstr "- visas grupas -"
-
-#~ msgid "successfully"
-#~ msgstr "veiksmīgi"
-
-#~ msgid "API access"
-#~ msgstr "API pieeja"
-
-#~ msgid "API access updated"
-#~ msgstr "API pieeja atjaunota"
-
-#~ msgid "Copyright 2001-2011 by"
-#~ msgstr "Autortiesības 2001-2011"
-
-#~ msgid "Create Image"
-#~ msgstr "Izveidot attēlu"
-
-#~ msgid "Disable API"
-#~ msgstr "Atspējot API"
-
-#~ msgid "Disable API access in selected groups?"
-#~ msgstr "Vai atslēgt piekļuvi API izvēlētajām grupām?"
-
-#~ msgid "Enable API access in selected groups?"
-#~ msgstr "Vai atļaut API piekļuvi izvēlētajām grupām?"
-
-#~ msgid "Extended"
-#~ msgstr "Paplašināts"
-
-#~ msgid "Incorrect value for"
-#~ msgstr "Nepareiza vērtība"
-
-#~ msgid "Only Super Admins can delete Users"
-#~ msgstr "Tikai superadministratori var dzēst lietotājus"
-
-#~ msgid "Table users is empty. Possible database corruption."
-#~ msgstr "Tabula \"users\" ir tukša. Iespējams datubāzes bojājums."
-
-#~ msgid "User ["
-#~ msgstr "Lietotājs ["
-
-#~ msgid "Welcome to Zabbix! You are connected as"
-#~ msgstr "Laipni lūgti Zabbix! Jūs esat pieslēdzies kā"
-
-#~ msgid "] already exists"
-#~ msgstr "] jau eksistē"
-
-#~ msgid "successful"
-#~ msgstr "veiksmīgs"
-
-#~ msgid "was not"
-#~ msgstr "netika"
-
-#~ msgid "Host \"%1$s\": "
-#~ msgstr "Mezgls \"%1$s\": "
-
-#~ msgid "Host group \"%1$s\": "
-#~ msgstr "Mezglu grupa \"%1$s\": "
-
-#~ msgid "Key cannot be empty"
-#~ msgstr "Atslēga nedrīkst būt tukša"
-
-#~ msgid "Remote commands"
-#~ msgstr "Attālinātas komandas"
-
-#~ msgid "Tools"
-#~ msgstr "Rīki"
-
-#~ msgid "Device type"
-#~ msgstr "Iekārtas tips"
-
-#~ msgid "Host MAC Address"
-#~ msgstr "Mezgla MAC Adrese"
-
-#~ msgid "Incorrect key format"
-#~ msgstr "Nepareizs atslēgas formāts"
-
-#~ msgid "Item [%1$s:%2$s] deleted."
-#~ msgstr "Rādītājs [%1$s:%2$s] izdzēsts."
-
-#~ msgid "Item [%1$s:%2$s] has invalid port: \"%3$s\"."
-#~ msgstr "Rādītājam [%1$s:%2$s] ir nepareizs ports: \"%3$s\"."
-
-#~ msgid "Item function"
-#~ msgstr "Rādītāja funkcija"
-
-#~ msgid "Key does not match"
-#~ msgstr "Atslēga nesakrīt"
-
-#~ msgid "Type of information must be Log for log key"
-#~ msgstr "Atslēgas \"log\" tipam jābūt \"Log\""
-
-#~ msgid "is not one of"
-#~ msgstr "nav viens no"
-
-#~ msgid "Connected as"
-#~ msgstr "Pievienojies kā"
-
-#~ msgid "Zabbix SIA"
-#~ msgstr "Zabbix SIA"
-
-#~ msgid "Last failed attempt was from"
-#~ msgstr "Pēdējais kļūdainais mēģinājums bija no"
-
-#~ msgid "No such monitored parameter"
-#~ msgstr "Nav tāda uzraugāmā parametra"
-
-#~ msgid "Unknown function"
-#~ msgstr "Nezināma funkcija"
-
-#~ msgid "failed login attempts logged."
-#~ msgstr "reģistrēti kļūdaini pieslēgšanās mēģinājumi."
-
-#~ msgid "Cannot connect to Zabbix server"
-#~ msgstr "Nevar pieslēgties Zabbix serverim"
-
-#~ msgid "Do not add"
-#~ msgstr "Nepievienot"
-
-#~ msgid "Elements"
-#~ msgstr "Elementi"
-
-#~ msgid "Events since"
-#~ msgstr "Notikumi kopš"
-
-#~ msgid "Fill with default value"
-#~ msgstr "Izmantot noklusēto vērtību"
-
-#~ msgid "Graph \""
-#~ msgstr "Grafiks \""
-
-#~ msgid "Incorrect characters used for DNS"
-#~ msgstr "DNS vārdā lietoti neatļauti simboli"
-
-#~ msgid "Incorrect description"
-#~ msgstr "Nepareizs apraksts"
-
-#~ msgid "Invalid SNMP port"
-#~ msgstr "Nepareizs SNMP ports"
-
-#~ msgid "Leave empty"
-#~ msgstr "Atstāt tukšu"
-
-#~ msgid "Loop"
-#~ msgstr "Atkārtot"
-
-#~ msgid "No function with"
-#~ msgstr "Nav funkcijas ar"
-
-#~ msgid "Only Super Admins can create Users"
-#~ msgstr "Tikai superadministratori var izveidot lietotājus"
-
-#~ msgid "Passphrase"
-#~ msgstr "Parole"
-
-#~ msgid "Pause"
-#~ msgstr "Pauze"
-
-#~ msgid "Refresh"
-#~ msgstr "Atjaunot"
-
-#~ msgid "SNMP port"
-#~ msgstr "SNMP ports"
-
-#~ msgid "Select graph..."
-#~ msgstr "Izvēlēties grafiku..."
-
-#~ msgid "Timezone for PHP is not set. Please set \"date.timezone\" option in php.ini."
-#~ msgstr "PHP laika zona nav uzstādīta. Lūdzu, norādiet \"date.timezone\" failā \"php.ini\"."
-
-#~ msgid "Unknown error happened reading script answer, please report to the developers"
-#~ msgstr "Nezināma kļūda saņemot skripta rezultātus, lūdzu ziņojiet izstrādātājiem"
-
-#~ msgid "Wrong type"
-#~ msgstr "Nepareizs tips"
-
-#~ msgid "deleted"
-#~ msgstr "izdzēsts"
-
-#~ msgid "year"
-#~ msgstr "gads"
-
-#~ msgid "IPMI IP address"
-#~ msgstr "IPMI IP adrese"
-
-#~ msgid "IPMI port"
-#~ msgstr "IPMI ports"
