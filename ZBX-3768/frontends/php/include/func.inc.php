@@ -416,8 +416,8 @@ function mem2str($size){
 	return round($size, 6).$prefix;
 }
 
-function convert_units_uptime($value){
-	if(0 > ($secs = round($value)))
+function convertUnitsUptime($value){
+	if(($secs = round($value)) < 0)
 		return $value;
 
 	$value = '';
@@ -431,76 +431,75 @@ function convert_units_uptime($value){
 	$mins = floor($secs / SEC_PER_MIN);
 	$secs -= $mins * SEC_PER_MIN;
 
-	if(0 != $days)
-		$value = $days.' days, ';
+	if($days != 0)
+		$value = $days.' '.S_DAYS_SMALL.', ';
 	$value .= sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
 
 	return $value;
 }
 
-function convert_units_s($value){
-	if (0 > ($secs = $value))
+function convertUnitsS($value){
+	if ($value < 0)
 		return $value;
 
+	if (0 == floor($value * 1000))
+	{
+		$value = (0 == $value ? '0s' : '< 1ms');
+		return $value;
+	}
+
+	$secs = round($value * 1000) / 1000;
 	$n_unit = 0;
 	$value = '';
 
-	if(0 != ($n = floor($secs / SEC_PER_YEAR)))
+	if(($n = floor($secs / SEC_PER_YEAR)) != 0)
 	{
-		$value .= $n.'y';
+		$value .= $n.S_YEAR_SHORT.' ';
 		$secs -= $n * SEC_PER_YEAR;
 		if (0 == $n_unit)
 			$n_unit = 4;
 	}
 
-	if(0 != ($n = floor($secs / SEC_PER_MONTH)))
+	if(($n = floor($secs / SEC_PER_MONTH)) != 0)
 	{
-		$value .= $n.'m';
+		$value .= $n.S_MONTH_SHORT.' ';
 		$secs -= $n * SEC_PER_MONTH;
 		if (0 == $n_unit)
 			$n_unit = 3;
 	}
 
-	if(0 != ($n = floor($secs / SEC_PER_DAY)))
+	if(($n = floor($secs / SEC_PER_DAY)) != 0)
 	{
-		$value .= $n.'d';
+		$value .= $n.S_DAY_SHORT.' ';
 		$secs -= $n * SEC_PER_DAY;
 		if (0 == $n_unit)
 			$n_unit = 2;
 	}
 
-	if (4 > $n_unit && 0 != ($n = floor($secs / SEC_PER_HOUR)))
+	if($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0)
 	{
-		$value .= $n.'h';
+		$value .= $n.S_HOUR_SHORT.' ';
 		$secs -= $n * SEC_PER_HOUR;
 		if (0 == $n_unit)
 			$n_unit = 1;
 	}
 
-	if (3 > $n_unit && 0 != ($n = floor($secs / SEC_PER_MIN)))
+	if($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0)
 	{
-		$value .= $n.'m';
+		$value .= $n.S_MINUTE_SHORT.' ';
 		$secs -= $n * SEC_PER_MIN;
 	}
 
-	if (2 > $n_unit && 0 != ($n = floor($secs)))
+	if($n_unit < 2 && ($n = floor($secs)) != 0)
 	{
-		$value .= $n.'s';
+		$value .= $n.S_SECOND_SHORT.' ';
 		$secs -= $n;
 	}
 
-	if (1 > $n_unit)
-	{
-		if (0 < $secs && $secs < 0.001)
-		{
-			if (empty($value))
-				$value = '< 1ms';
-		}
-		else if (0 != ($n = floor($secs * 1000)))
-			$value = $n.'ms';
-	}
+	if($n_unit < 1 && ($n = round($secs * 1000)) != 0)
+		$value .= $n.S_MILLISECOND_SHORT;
 
-	return $value;
+	return rtrim($value);
 }
 
 // convert:
@@ -513,11 +512,11 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	}
 //Special processing of uptime
 	if($units == 'uptime'){
-		return convert_units_uptime($value);
+		return convertUnitsUptime($value);
 	}
 // Special processing for seconds
 	if($units == 's'){
-		return convert_units_s($value);
+		return convertUnitsS($value);
 	}
 
 	$u='';
