@@ -1138,7 +1138,8 @@ require_once('include/js.inc.php');
 						'loadSBox' => 0,
 						'loadImage' => 1,
 						'loadScroll' => 0,
-						'dynamic' => 0
+						'dynamic' => 0,
+						'periodFixed' => CProfile::get('web.screens.timelinefixed', 1)
 					);
 
 					$default = false;
@@ -1220,7 +1221,8 @@ require_once('include/js.inc.php');
 						'loadSBox' => 0,
 						'loadImage' => 1,
 						'loadScroll' => 0,
-						'dynamic' => 0
+						'dynamic' => 0,
+						'periodFixed' => CProfile::get('web.screens.timelinefixed', 1)
 					);
 
 // Host feature
