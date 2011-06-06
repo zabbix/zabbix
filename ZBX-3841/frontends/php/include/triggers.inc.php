@@ -1315,14 +1315,14 @@ function utf8RawUrlDecode($source){
 				}
 			}
 
-			// Processing of macros {HOSTNAME1..9}
+			// Processing of deprecated macros {HOSTNAME1..9}
 			for($i=0; $i<10; $i++){
 				$macro = '{HOSTNAME'.($i ? $i : '').'}';
 				if(zbx_strstr($description, $macro)) {
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if(isset($functionid)) {
-						$sql = 'SELECT DISTINCT h.name'.
+						$sql = 'SELECT DISTINCT h.host'.
 								' FROM functions f,items i,hosts h'.
 								' WHERE f.itemid=i.itemid'.
 									' AND i.hostid=h.hostid'.
