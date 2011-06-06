@@ -59,7 +59,7 @@ class cItemKey{
 		// checking if key is empty
 		if($this->keyByteCnt == 0){
 			$this->isValid = false;
-			$this->error = _("Key cannot be empty.");
+			$this->error = S_KEY_CANNOT_BE_EMPTY;
 		}
 		else{
 			// getting key id out of the key
@@ -89,7 +89,7 @@ class cItemKey{
 		}
 		if($this->currentByte == 0){ // no key id
 			$this->isValid = false;
-			$this->error = _("No key id provided.");
+			$this->error = S_NO_KEY_ID_PROVIDED;
 		}
 		else{
 			$this->keyId = substr($this->key, 0, $this->currentByte);
@@ -111,14 +111,14 @@ class cItemKey{
 		// invalid symbol instead of '[', which would be the beginning of params
 		if($this->key[$this->currentByte] != '['){
 			$this->isValid = false;
-			$this->error = _('Invalid item key format.');
+			$this->error = S_NO_ITEM_KEY_PROVIDED;
 			return;
 		}
 
 		// simple check key with [] parameters is invalid
 		if($this->keyIdHasComma){
 			$this->isValid = false;
-			$this->error = _('Simple check key cannot have parameters in [].');
+			$this->error = S_SIMPLE_CHECK_KEY_CANNOT_CONTAIN;
 			return;
 		}
 
@@ -199,7 +199,7 @@ class cItemKey{
 							&& $this->key[$this->currentByte+2] != '['
 						){
 							$this->isValid = false;
-							$this->error = sprintf(_('incorrect syntax near \'%1$s\''), $this->key[$this->currentByte]);
+							$this->error = sprintf(S_INCORRECT_SYNTAX_NEAR, $this->key[$this->currentByte]);
 							return;
 						}
 					}
@@ -211,7 +211,7 @@ class cItemKey{
 
 						// nothing else is allowed after final ']'
 						$this->isValid = false;
-						$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte+1]);
+						$this->error = sprintf(S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS, $this->key[$this->currentByte+1]);
 						return;
 					}
 					else if($this->key[$this->currentByte] != ' ') {
@@ -249,7 +249,7 @@ class cItemKey{
 						else if($this->nestLevel == 0 && $this->key[$this->currentByte+1] == ']' && isset($this->key[$this->currentByte+2])){
 							// nothing else is allowed after final ']'
 							$this->isValid = false;
-							$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte+1]);
+							$this->error = sprintf(S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS, $this->key[$this->currentByte+1]);
 							return;
 						}
 
@@ -258,7 +258,7 @@ class cItemKey{
 						{
 							// nothing else is allowed after final ']'
 							$this->isValid = false;
-							$this->error = sprintf(_('incorrect syntax near \'%1$s\' at position %2$d'), $this->key[$this->currentByte], $this->currentByte);
+							$this->error = sprintf(S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS, $this->key[$this->currentByte], $this->currentByte);
 							return;
 						}
 
@@ -295,7 +295,7 @@ class cItemKey{
 						if (isset($this->key[$this->currentByte+1])){
 							// nothing else is allowed after final ']'
 							$this->isValid = false;
-							$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte+1]);
+							$this->error = sprintf(S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS, $this->key[$this->currentByte+1]);
 							return;
 						}
 						else {
@@ -309,7 +309,7 @@ class cItemKey{
 			}
 		}
 		$this->isValid = false;
-		$this->error = _('Invalid item key format.');
+		$this->error = S_INVALID_KEY_FORMAT;
 	}
 
 
