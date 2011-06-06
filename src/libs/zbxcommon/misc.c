@@ -757,3 +757,25 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
 
 	return ret;
 }
+
+#ifdef _WINDOWS
+int     _wis_uint(const wchar_t *wide_string)
+{
+	const wchar_t   *wide_char = wide_string;
+
+	if (L'\0' == *wide_char)
+		return FAIL;
+
+	while (L'\0' != *wide_char)
+	{
+		if (0 != iswdigit(*wide_char))
+		{
+			wide_char++;
+			continue;
+		}
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+#endif

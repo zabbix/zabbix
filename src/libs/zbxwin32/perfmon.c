@@ -23,6 +23,27 @@
 #include "log.h"
 
 PERFCOUNTER *PerfCounterList = NULL;
+PERF_COUNTER_ID *PerfCounterIdList = NULL;
+
+PDH_STATUS      zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS_W *cpe, char *counterpath)
+{
+	DWORD		dwSize = PDH_MAX_COUNTER_PATH;
+	LPWSTR		wcounterPath = NULL;
+	PDH_STATUS	pdh_status;
+
+	wcounterPath = zbx_realloc(wcounterPath, dwSize * sizeof(WCHAR));
+
+	if (ERROR_SUCCESS != (pdh_status = PdhMakeCounterPathW(cpe, wcounterPath, &dwSize, 0)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "%s(): cannot make counterpath '%s': %s",
+				function, counterpath, strerror_from_module(pdh_status, "PDH.DLL"));
+	}
+
+	zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
+	zbx_free(wcounterPath);
+
+	return pdh_status;
+}
 
 /*
  * Get performance counter name by index
@@ -71,33 +92,75 @@ char *GetCounterName(DWORD index)
 	return counterName->name;
 }
 
+LPWSTR  get_counter_name(DWORD pdhIndex)
+{
+	const char	*__function_name = "get_counter_name";
+	PERF_COUNTER_ID	*counterName;
+	DWORD		dwSize;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pdhIndex:%u", __function_name, pdhIndex);
+
+	counterName = PerfCounterIdList;
+	while (NULL != counterName)
+	{
+		if (counterName->pdhIndex == pdhIndex)
+			break;
+		counterName = counterName->next;
+	}
+
+	if (NULL == counterName)
+	{
+		counterName = (PERF_COUNTER_ID *)zbx_malloc(counterName, sizeof(PERF_COUNTER_ID));
+
+		memset(counterName, 0, sizeof(PERF_COUNTER_ID));
+		counterName->pdhIndex = pdhIndex;
+		counterName->next = PerfCounterIdList;
+
+		dwSize = PDH_MAX_COUNTER_NAME;
+		if (ERROR_SUCCESS == PdhLookupPerfNameByIndexW(NULL, pdhIndex, counterName->name, &dwSize))
+			PerfCounterIdList = counterName;
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, "PdhLookupPerfNameByIndex failed: %s",
+					strerror_from_system(GetLastError()));
+			zbx_free(counterName);
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():FAIL", __function_name);
+			return L"UnknownPerformanceCounter";
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED", __function_name);
+
+	return counterName->name;
+}
+
 int	check_counter_path(char *counterPath)
 {
 	const char			*__function_name = "check_counter_path";
-	PDH_COUNTER_PATH_ELEMENTS	*cpe = NULL;
+	PDH_COUNTER_PATH_ELEMENTS_W	*cpe = NULL;
 	PDH_STATUS			status;
 	int				is_numeric, ret = FAIL;
 	DWORD				dwSize = 0;
-	LPTSTR				wcounterPath;
+	LPWSTR				wcounterPath;
 
 	wcounterPath = zbx_utf8_to_unicode(counterPath);
 
-	status = PdhParseCounterPath(wcounterPath, NULL, &dwSize, 0);
+	status = PdhParseCounterPathW(wcounterPath, NULL, &dwSize, 0);
 	if (PDH_MORE_DATA == status || ERROR_SUCCESS == status)
 	{
-		cpe = (PDH_COUNTER_PATH_ELEMENTS *)zbx_malloc(cpe, dwSize);
+		cpe = (PDH_COUNTER_PATH_ELEMENTS_W *)zbx_malloc(cpe, dwSize);
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot get required buffer size for counter path \"%s\": %s",
-				counterPath, strerror_from_module(status, L"PDH.DLL"));
+				counterPath, strerror_from_module(status, "PDH.DLL"));
 		goto clean;
 	}
 
-	if (ERROR_SUCCESS != (status = PdhParseCounterPath(wcounterPath, cpe, &dwSize, 0)))
+	if (ERROR_SUCCESS != (status = PdhParseCounterPathW(wcounterPath, cpe, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot parse counter path \"%s\": %s",
-				counterPath, strerror_from_module(status, L"PDH.DLL"));
+				counterPath, strerror_from_module(status, "PDH.DLL"));
 		goto clean;
 	}
 

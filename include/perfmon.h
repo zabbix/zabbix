@@ -40,6 +40,14 @@
 
 #define MAX_PERFCOUNTER_NAME_LEN      (108)	/* old naming <MAX_COUNTER_NAME> */
 
+typedef struct perf_counter_id
+{
+        struct perf_counter_id  *next;
+        unsigned long           pdhIndex;
+        WCHAR                   name[PDH_MAX_COUNTER_NAME];
+}
+PERF_COUNTER_ID;
+
 struct perfcounter
 {
 	struct perfcounter *next;
@@ -55,5 +63,6 @@ typedef struct perfcounter PERFCOUNTER;
 extern PERFCOUNTER *PerfCounterList;
 
 char *GetCounterName(unsigned long index);
+int	check_counter_path(char *counterPath);
 
 #endif /* ZABBIX_PERFMON_H */
