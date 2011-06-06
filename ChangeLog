@@ -165,6 +165,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3463] fixed MaxHousekeeperDelete configuration parameter being ignored for IBM DB2 (asaveljevs)
  - [ZBX-3854] added saving of state of dynamic/fixed setting for time lines on all pages (KB)
  - [ZBX-3847] fixed item history clearing not deleting data in trends_uint table (KB)
  - [ZBX-3797] fixed processing of vfs.dev.* checks under FreeBSD (Sasha)
