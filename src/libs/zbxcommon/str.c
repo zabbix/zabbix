@@ -1669,3 +1669,24 @@ ZBX_ENCODING e[]=
 	return res;
 }
 
+#ifdef _WINDOWS
+/* convert from UTF-8 to unicode */
+LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string)
+{
+	return zbx_to_unicode(CP_UTF8, utf8_string);
+}
+
+static LPTSTR	zbx_to_unicode(unsigned int codepage, LPCSTR cp_string)
+{
+	LPTSTR	wide_string = NULL;
+	int	wide_size;
+
+	wide_size = MultiByteToWideChar(codepage, 0, cp_string, -1, NULL, 0);
+	wide_string = (LPTSTR)zbx_malloc(wide_string, (size_t)wide_size * sizeof(TCHAR));
+
+	/* convert from cp_string to wide_string */
+	MultiByteToWideChar(codepage, 0, cp_string, -1, wide_string, wide_size);
+
+	return wide_string;
+}
+#endif	/* _WINDOWS */
