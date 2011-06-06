@@ -238,11 +238,11 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 				milliseconds
 				);
 
-			va_start(args,fmt);
-			vfprintf(log_file,fmt, args);
+			va_start(args, fmt);
+			vfprintf(log_file, fmt, args);
 			va_end(args);
 
-			fprintf(log_file,"\n");
+			fprintf(log_file, "\n");
 			zbx_fclose(log_file);
 
 			if (0 != CONFIG_LOG_FILE_SIZE && 0 == stat(log_filename, &buf))
@@ -293,8 +293,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 				break;
 		}
 
-		zbx_wsnprintf(thread_id, sizeof(thread_id)/sizeof(wchar_t), TEXT("[%li]: "),
-				zbx_get_thread_id());
+		zbx_wsnprintf(thread_id, sizeof(thread_id)/sizeof(wchar_t), TEXT("[%li]: "), zbx_get_thread_id());
 		strings[0] = thread_id;
 		strings[1] = zbx_utf8_to_unicode(message);
 

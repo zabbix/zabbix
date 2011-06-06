@@ -91,7 +91,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int tim
 		if (zbx_get_timediff_ms(&start_time, &current_time) >= timeout_ms)
 			return TIMEOUT_ERROR;
 
-		Sleep(20);
+		Sleep(20);	/* milliseconds */
 	}
 
 	return SUCCEED;
@@ -150,8 +150,9 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	/* set the child as the process group leader, otherwise orphans may be left after timeout */
 	if (-1 == setpgid(0, 0))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): failed to create a process group: %s", __function_name, zbx_strerror(errno));
-		exit(FAIL);
+		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s",
+				__function_name, zbx_strerror(errno));
+		exit(0);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing script", __function_name);
@@ -160,7 +161,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 
 	/* execl() returns only when an error occurs */
 	zabbix_log(LOG_LEVEL_WARNING, "%s(): execl() failed for [%s]: %s", __function_name, command, zbx_strerror(errno));
-	exit(FAIL);
+	exit(0);
 }
 
 /******************************************************************************
@@ -250,7 +251,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	PROCESS_INFORMATION			pi;
 	SECURITY_ATTRIBUTES			sa;
 	JOBOBJECT_EXTENDED_LIMIT_INFORMATION	limits;
-	HANDLE					job, hWrite = NULL, hRead = NULL;
+	HANDLE					job = NULL, hWrite = NULL, hRead = NULL;
 	char					*cmd = NULL;
 	LPTSTR					wcmd = NULL;
 	struct _timeb				start_time, current_time;
@@ -258,6 +259,8 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	pid_t					pid;
 	int					fd;
 #endif
+
+	*error = '\0';
 
 	if (NULL != buffer)
 	{
@@ -276,7 +279,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	/* create a pipe for the child process's STDOUT */
 	if (0 == CreatePipe(&hRead, &hWrite, &sa, 0))
 	{
-		zbx_snprintf(error, max_error_len, "unable to create pipe: %s", strerror_from_system(GetLastError()));
+		zbx_snprintf(error, max_error_len, "unable to create a pipe: %s", strerror_from_system(GetLastError()));
 		goto close;
 	}
 
@@ -295,7 +298,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 		goto close;
 	}
 
-	/* set job limits to kill all process when terminating the job */
+	/* set job limits to kill all child processes when terminating the job */
 	limits.BasicLimitInformation.LimitFlags &= ~(JOB_OBJECT_LIMIT_BREAKAWAY_OK);
 	limits.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 	if (0 == SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits)))
@@ -319,7 +322,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	/* create the new process */
 	if (0 == CreateProcess(NULL, wcmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
 	{
-		zbx_snprintf(error, max_error_len, "unable to create process: '%s': %s",
+		zbx_snprintf(error, max_error_len, "unable to create process [%s]: %s",
 				cmd, strerror_from_system(GetLastError()));
 		goto close;
 	}
@@ -327,14 +330,23 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	/* assign the new process to the created job */
 	if (0 == AssignProcessToJobObject(job, pi.hProcess))
 	{
-		zbx_snprintf(error, max_error_len, "unable to assign process: %s", strerror_from_system(GetLastError()));
+		zbx_snprintf(error, max_error_len, "unable to assign process [%s] to a job: %s",
+				cmd, strerror_from_system(GetLastError()));
+
+		if (0 == TerminateProcess(pi.hProcess, 0))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to terminate [%s]: %s",
+					cmd, strerror_from_system(GetLastError()));
+		}
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
 		goto close;
 	}
 
-	ret = SUCCEED;
-
 	CloseHandle(hWrite);
 	hWrite = NULL;
+
+	ret = SUCCEED;
 
 	_ftime(&start_time);
 	timeout *= 1000;
@@ -348,43 +360,29 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 		if (0 < (timeout -= zbx_get_timediff_ms(&start_time, &current_time)) &&
 				WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout))
 		{
-				ret = TIMEOUT_ERROR;
+			ret = TIMEOUT_ERROR;
 		}
 	}
 
 	/* wait for child process to exit */
 	if (TIMEOUT_ERROR == ret)
-	{
-		zbx_strlcpy(error, "Timeout while executing a shell script", max_error_len);
-		zabbix_log(LOG_LEVEL_ERR, "Timeout while executing a shell script");
-	}
+		zbx_snprintf(error, max_error_len, "timeout while executing shell script [%s]", cmd);
 
-	/* terminate child process */
-	if (0 ==TerminateJobObject(job, 0))
-		zabbix_log(LOG_LEVEL_ERR, "failed to terminate job: %s", strerror_from_system(GetLastError()));
-	else
-		zabbix_log(LOG_LEVEL_ERR, "job terminated");
+	/* terminate the child process and it's childs */
+	if (0 == TerminateJobObject(job, 0))
+		zabbix_log(LOG_LEVEL_ERR, "failed to terminate job [%s]: %s", cmd, strerror_from_system(GetLastError()));
 
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
-	CloseHandle(job);
 close:
 	if (NULL != job)
-	{
 		CloseHandle(job);
-		job = NULL;
-	}
+
 	if (NULL != hWrite)
-	{
 		CloseHandle(hWrite);
-		hWrite = NULL;
-	}
 
 	if (NULL != hRead)
-	{
 		CloseHandle(hRead);
-		hRead = NULL;
-	}
 
 	zbx_free(cmd);
 	zbx_free(wcmd);
@@ -414,12 +412,14 @@ close:
 		if (-1 == rc || -1 == zbx_waitpid(pid))
 		{
 			if (EINTR == errno)
-				zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
+				zbx_snprintf(error, max_error_len, "timeout while executing shell script [%s]", command);
 			else
-				zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
+				zbx_snprintf(error, max_error_len, "zbx_waitpid() failed: %s", zbx_strerror(errno));
 
 			/* kill the whole process group, pid must be the leader */
-			kill(-pid, SIGTERM);
+			if (-1 == kill(-pid, SIGTERM))
+				zabbix_log(LOG_LEVEL_ERR, "failed to kill [%s]: %s", command, zbx_strerror(errno));
+
 			zbx_waitpid(pid);
 		}
 		else
@@ -431,6 +431,9 @@ close:
 	alarm(0);
 
 #endif	/* _WINDOWS */
+
+	if ('\0' != *error)
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 
 	if (SUCCEED != ret && NULL != buffer)
 		zbx_free(*buffer);
