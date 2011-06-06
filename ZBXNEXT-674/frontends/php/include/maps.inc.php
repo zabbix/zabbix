@@ -1445,15 +1445,16 @@ function drawMapConnectors(&$im, $map, $map_info){
 		$selement2 = $selements[$link['selementid2']];
 		list($x2, $y2) = get_icon_center_by_selement($selement2, $map_info[$link['selementid2']]);
 
+
 		if(isset($selement1['elementsubtype']) && $selement1['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
 			$dY = abs($y2 - $y1);
 			$dX = abs($x2 - $x1);
+
 			$halfHeight = $selement1['height'] / 2;
 			$halfWidth = $selement1['width'] / 2;
-
 			if($dY == 0){
 				$y1 = $y2;
-				$x1 = ($x2 < $x1) ? $x2 - $halfWidth : $x2 + $halfWidth;
+				$x1 = ($x2 < $x1) ? $x1 - $halfWidth : $x1 + $halfWidth;
 			}
 			elseif($dX == 0){
 				$y1 = ($y2 > $y1) ? $y1 + $halfHeight : $y1 - $halfHeight;
@@ -1480,29 +1481,39 @@ function drawMapConnectors(&$im, $map, $map_info){
 			}
 		}
 
-
 		if(isset($selement2['elementsubtype']) && $selement2['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
 			$dY = abs($y2 - $y1);
 			$dX = abs($x2 - $x1);
 
-			$a = $selement2['height'] / 2;
-			$koef = $a / $dY;
+			$halfHeight = $selement2['height'] / 2;
+			$halfWidth = $selement2['width'] / 2;
 
-			$c = $dX * $koef;
-
-			// if point as further than area diagonal, we should use calculations with width instead of height
-			if(($a / $c) > ($a / ($selement2['width'] / 2))){
-				$y2 = ($y1 > $y2) ? $y2 + $a : $y2 - $a;
-				$x2 = ($x1 < $x2) ? $x2 - $c : $x2 + $c;
+			if($dY == 0){
+				$y2 = $y1;
+				$x2 = ($x1 < $x2) ? $x2 - $halfWidth : $x2 + $halfWidth;
+			}
+			elseif($dX == 0){
+				$y2 = ($y1 > $y2) ? $y2 + $halfHeight : $y2 - $halfHeight;
+				$x2 = $x1;
 			}
 			else{
-				$a = $selement2['width'] / 2;
-				$koef = $a / $dX;
+				$koef = $halfHeight / $dY;
 
-				$c = $dY * $koef;
+				$c = $dX * $koef;
 
-				$y2 = ($y1 > $y2) ? $y2 + $c : $y2 - $c;
-				$x2 = ($x1 < $x2) ? $x2 - $a : $x2 + $a;
+				// if point as further than area diagonal, we should use calculations with width instead of height
+				if(($halfHeight / $c) > ($halfHeight / $halfWidth)){
+					$y2 = ($y1 > $y2) ? $y2 + $halfHeight : $y2 - $halfHeight;
+					$x2 = ($x1 < $x2) ? $x2 - $c : $x2 + $c;
+				}
+				else{
+					$koef = $halfWidth / $dX;
+
+					$c = $dY * $koef;
+
+					$y2 = ($y1 > $y2) ? $y2 + $c : $y2 - $c;
+					$x2 = ($x1 < $x2) ? $x2 - $halfWidth : $x2 + $halfWidth;
+				}
 			}
 		}
 
