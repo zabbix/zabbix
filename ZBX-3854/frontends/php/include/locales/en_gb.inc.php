@@ -2141,13 +2141,6 @@
 	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
 	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check the key, please. Default example was passed',
 	'S_ERROR_IN_ITEM_KEY' => 'Error in item key:',
-	'S_KEY_IS_VALID' => 'Key is valid',
-	'S_INCORRECT_SYNTAX_NEAR' => 'incorrect syntax near \'%1$s\' at position %2$d',
-	'S_INCORRECT_USAGE_OF_BRACKETS' => 'incorrect usage of bracket symbols. \'%s\' found after final bracket.',
-	'S_INVALID_CHARACTER_AT_POSITION' => 'invalid character \'%1$s\' at position %2$d',
-	'S_INVALID_KEY_FORMAT' => 'Invalid key format',
-	'S_KEY_CANNOT_BE_EMPTY' => 'Key cannot be empty',
-	'S_KEY_TOO_LARGE' => 'Key is too large: maximum %d characters',
 	'S_ITEM_UNLINKED' => 'Item "%s" unlinked',
 
 //	httptest.inc.php

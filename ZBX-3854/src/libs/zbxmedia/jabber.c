@@ -217,10 +217,9 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
 
 	init_result(&result);
 
-	zbx_snprintf(buffer, sizeof(buffer), ",_xmpp-client._tcp.%s,SRV", server);
-	zbx_snprintf(command, sizeof(command), "net.tcp.dns.query[%s]", buffer);
+	zbx_snprintf(command, sizeof(command), "net.tcp.dns.query[,_xmpp-client._tcp.%s,SRV]", server);
 
-	if (SYSINFO_RET_OK == NET_TCP_DNS_QUERY(command, buffer, 0, &result))
+	if (SUCCEED == process(command, 0, &result))
 	{
 		int		max_priority = 65536, max_weight = -1;
 		int		cur_priority, cur_weight, cur_port;
@@ -431,7 +430,7 @@ static int	connect_jabber(const char *jabber_id, const char *password, int use_s
 	const char	*__function_name = "connect_jabber";
 	char		*buf = NULL;
 	char		real_server[MAX_STRING_LEN];
-	int		real_port, iks_error, timeout, ret = FAIL;
+	int		real_port = 0, iks_error, timeout, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s() jabber_id:'%s'", __module_name, __function_name, jabber_id);
 
