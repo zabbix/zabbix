@@ -235,7 +235,8 @@ exit:
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
  *                                                                            *
- * Return value: SUCCEED if processed successfully, FAIL - otherwise          *
+ * Return value: SUCCEED if processed successfully, TIMEOUT_ERROR if          *
+ *               timeout occurred or FAIL otherwise                           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -368,10 +369,6 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 			ret = TIMEOUT_ERROR;
 		}
 	}
-
-	/* wait for child process to exit */
-	if (TIMEOUT_ERROR == ret)
-		zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
 close:
 	if (NULL != job)
 	{
@@ -415,7 +412,7 @@ close:
 		if (-1 == rc || -1 == zbx_waitpid(pid))
 		{
 			if (EINTR == errno)
-				zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
+				ret = TIMEOUT_ERROR;
 			else
 				zbx_snprintf(error, max_error_len, "zbx_waitpid() failed: %s", zbx_strerror(errno));
 
@@ -435,7 +432,9 @@ close:
 
 #endif	/* _WINDOWS */
 
-	if ('\0' != *error)
+	if (TIMEOUT_ERROR == ret)
+		zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
+	else if ('\0' != *error)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 
 	if (SUCCEED != ret && NULL != buffer)
