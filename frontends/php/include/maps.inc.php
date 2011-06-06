@@ -217,15 +217,19 @@ function getActionMapBySysmap($sysmap){
 	return $action_map;
 }
 
-function get_icon_center_by_selement($element, $info = null){
+function get_icon_center_by_selement($element, $info, $map){
 	$x = $element['x'];
 	$y = $element['y'];
 	$w = $h = 0;
 
 	if(isset($element['elementsubtype']) && $element['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
-		if($element['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+		if($element['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
 			$w = $element['width'];
 			$h = $element['height'];
+		}
+		else{
+			$w = $map['width'];
+			$h = $map['height'];
 		}
 	}
 	else{
@@ -1014,7 +1018,7 @@ function getSelementsInfo($sysmap){
 	if(!empty($hosts_map)){
 		$options = array(
 			'hostids' => array_keys($hosts_map),
-			'output' => array('status', 'maintenance_status'),
+			'output' => array('name', 'status', 'maintenance_status'),
 			'nopermissions' => 1,
 			'nodeids' => get_current_nodeid(true),
 		);
@@ -1030,7 +1034,7 @@ function getSelementsInfo($sysmap){
 	if(!empty($hostgroups_map)){
 		$options = array(
 			'groupids' => array_keys($hostgroups_map),
-			'output' => array('status', 'maintenance_status'),
+			'output' => array('name', 'status', 'maintenance_status'),
 			'nopermissions' => 1,
 			'nodeids' => get_current_nodeid(true),
 		);
@@ -1440,18 +1444,34 @@ function drawMapConnectors(&$im, $map, $map_info){
 	foreach($map['links'] as $link){
 
 		$selement1 = $selements[$link['selementid1']];
-		list($x1, $y1) = get_icon_center_by_selement($selement1, $map_info[$link['selementid1']]);
+		list($x1, $y1) = get_icon_center_by_selement($selement1, $map_info[$link['selementid1']], $map);
 
 		$selement2 = $selements[$link['selementid2']];
-		list($x2, $y2) = get_icon_center_by_selement($selement2, $map_info[$link['selementid2']]);
+		list($x2, $y2) = get_icon_center_by_selement($selement2, $map_info[$link['selementid2']], $map);
 
 
 		if(isset($selement1['elementsubtype']) && $selement1['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
-			list($x1, $y1) = calculateMapAreaLinkCoord($x1, $y1, $selement1['width'], $selement1['height'], $x2, $y2);
+			if($selement1['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+				$w = $selement1['width'];
+				$h = $selement1['height'];
+			}
+			else{
+				$w = $map['width'];
+				$h = $map['height'];
+			}
+			list($x1, $y1) = calculateMapAreaLinkCoord($x1, $y1, $w, $h, $x2, $y2);
 		}
 
 		if(isset($selement2['elementsubtype']) && $selement2['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
-			list($x2, $y2) = calculateMapAreaLinkCoord($x2, $y2, $selement2['width'], $selement2['height'], $x1, $y1);
+			if($selement2['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+				$w = $selement2['width'];
+				$h = $selement2['height'];
+			}
+			else{
+				$w = $map['width'];
+				$h = $map['height'];
+			}
+			list($x2, $y2) = calculateMapAreaLinkCoord($x2, $y2, $w,$h, $x1, $y1);
 		}
 
 
@@ -1708,32 +1728,45 @@ function drawMapSelementsMarks(&$im, &$map, &$map_info){
 	}
 }
 
-function drawMapLinkLabels(&$im, &$map, &$map_info){
+function drawMapLinkLabels(&$im, $map, $map_info){
 	global $colors;
 
 	$links = $map['links'];
 	$selements = $map['selements'];
 
 	foreach($links as $link){
-		if(empty($link)){
-			continue;
-		}
 		if(empty($link['label'])){
 			continue;
 		}
 
 		$selement1 = $selements[$link['selementid1']];
-		list($x1, $y1) = get_icon_center_by_selement($selement1, $map_info[$link['selementid1']]);
+		list($x1, $y1) = get_icon_center_by_selement($selement1, $map_info[$link['selementid1']], $map);
 
 		$selement2 = $selements[$link['selementid2']];
-		list($x2, $y2) = get_icon_center_by_selement($selement2, $map_info[$link['selementid2']]);
+		list($x2, $y2) = get_icon_center_by_selement($selement2, $map_info[$link['selementid2']], $map);
 
 		if(isset($selement1['elementsubtype']) && $selement1['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
-			list($x1, $y1) = calculateMapAreaLinkCoord($x1, $y1, $selement1['width'], $selement1['height'], $x2, $y2);
+			if($selement1['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+				$w = $selement1['width'];
+				$h = $selement1['height'];
+			}
+			else{
+				$w = $map['width'];
+				$h = $map['height'];
+			}
+			list($x1, $y1) = calculateMapAreaLinkCoord($x1, $y1, $w, $h, $x2, $y2);
 		}
 
 		if(isset($selement2['elementsubtype']) && $selement2['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
-			list($x2, $y2) = calculateMapAreaLinkCoord($x2, $y2, $selement2['width'], $selement2['height'], $x1, $y1);
+			if($selement2['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+				$w = $selement2['width'];
+				$h = $selement2['height'];
+			}
+			else{
+				$w = $map['width'];
+				$h = $map['height'];
+			}
+			list($x2, $y2) = calculateMapAreaLinkCoord($x2, $y2, $w, $h, $x1, $y1);
 		}
 
 		$drawtype = $link['drawtype'];
@@ -2101,13 +2134,22 @@ function processMapAreas(array &$map){
 				continue;
 			}
 
-			$originalX = $selement['x'];
-			$originalY = $selement['y'];
-
-
 			$rowPlaceCount = floor(sqrt($hostsCount)) + 1;
-			$xOffset = floor($selement['width'] / $rowPlaceCount);
-			$yOffset = floor($selement['height'] / $rowPlaceCount);
+
+			if($selement['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+				$w = $selement['width'];
+				$h = $selement['height'];
+				$originalX = $selement['x'];
+				$originalY = $selement['y'];
+			}
+			else{
+				$w = $map['width'];
+				$h = $map['height'];
+				$originalX = 0;
+				$originalY = 0;
+			}
+			$xOffset = floor($w / $rowPlaceCount);
+			$yOffset = floor($h / $rowPlaceCount);
 
 
 			$colNum = 0;
@@ -2124,18 +2166,18 @@ function processMapAreas(array &$map){
 
 				$selement['selementid'] = $newSelementid;
 				$selement['elementid'] = $host['hostid'];
-				$map['selements'][$newSelementid] = $selement;
-				$area['selementids'][$newSelementid] = $newSelementid;
-
 
 				$selement['x'] = $originalX + ($colNum * $xOffset);
 				$selement['y'] = $originalY + ($rowNum * $yOffset);
+
+				$map['selements'][$newSelementid] = $selement;
 
 				$colNum++;
 				if($colNum == $rowPlaceCount){
 					$colNum = 0;
 					$rowNum++;
 				}
+
 			}
 		}
 	}
