@@ -1447,74 +1447,11 @@ function drawMapConnectors(&$im, $map, $map_info){
 
 
 		if(isset($selement1['elementsubtype']) && $selement1['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
-			$dY = abs($y2 - $y1);
-			$dX = abs($x2 - $x1);
-
-			$halfHeight = $selement1['height'] / 2;
-			$halfWidth = $selement1['width'] / 2;
-			if($dY == 0){
-				$y1 = $y2;
-				$x1 = ($x2 < $x1) ? $x1 - $halfWidth : $x1 + $halfWidth;
-			}
-			elseif($dX == 0){
-				$y1 = ($y2 > $y1) ? $y1 + $halfHeight : $y1 - $halfHeight;
-				$x1 = $x2;
-			}
-			else{
-				$koef = $halfHeight / $dY;
-
-				$c = $dX * $koef;
-
-				// if point as further than area diagonal, we should use calculations with width instead of height
-				if(($halfHeight / $c) > ($halfHeight / $halfWidth)){
-					$y1 = ($y2 > $y1) ? $y1 + $halfHeight : $y1 - $halfHeight;
-					$x1 = ($x2 < $x1) ? $x1 - $c : $x1 + $c;
-				}
-				else{
-					$koef = $halfWidth / $dX;
-
-					$c = $dY * $koef;
-
-					$y1 = ($y2 > $y1) ? $y1 + $c : $y1 - $c;
-					$x1 = ($x2 < $x1) ? $x1 - $halfWidth : $x1 + $halfWidth;
-				}
-			}
+			list($x1, $y1) = calculateMapAreaLinkCoord($x1, $y1, $selement1['width'], $selement1['height'], $x2, $y2);
 		}
 
 		if(isset($selement2['elementsubtype']) && $selement2['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
-			$dY = abs($y2 - $y1);
-			$dX = abs($x2 - $x1);
-
-			$halfHeight = $selement2['height'] / 2;
-			$halfWidth = $selement2['width'] / 2;
-
-			if($dY == 0){
-				$y2 = $y1;
-				$x2 = ($x1 < $x2) ? $x2 - $halfWidth : $x2 + $halfWidth;
-			}
-			elseif($dX == 0){
-				$y2 = ($y1 > $y2) ? $y2 + $halfHeight : $y2 - $halfHeight;
-				$x2 = $x1;
-			}
-			else{
-				$koef = $halfHeight / $dY;
-
-				$c = $dX * $koef;
-
-				// if point as further than area diagonal, we should use calculations with width instead of height
-				if(($halfHeight / $c) > ($halfHeight / $halfWidth)){
-					$y2 = ($y1 > $y2) ? $y2 + $halfHeight : $y2 - $halfHeight;
-					$x2 = ($x1 < $x2) ? $x2 - $c : $x2 + $c;
-				}
-				else{
-					$koef = $halfWidth / $dX;
-
-					$c = $dY * $koef;
-
-					$y2 = ($y1 > $y2) ? $y2 + $c : $y2 - $c;
-					$x2 = ($x1 < $x2) ? $x2 - $halfWidth : $x2 + $halfWidth;
-				}
-			}
+			list($x2, $y2) = calculateMapAreaLinkCoord($x2, $y2, $selement2['width'], $selement2['height'], $x1, $y1);
 		}
 
 
@@ -1785,11 +1722,19 @@ function drawMapLinkLabels(&$im, &$map, &$map_info){
 			continue;
 		}
 
-		$selement = $selements[$link['selementid1']];
-		list($x1, $y1) = get_icon_center_by_selement($selement, $map_info[$link['selementid1']]);
+		$selement1 = $selements[$link['selementid1']];
+		list($x1, $y1) = get_icon_center_by_selement($selement1, $map_info[$link['selementid1']]);
 
-		$selement = $selements[$link['selementid2']];
-		list($x2, $y2) = get_icon_center_by_selement($selement, $map_info[$link['selementid2']]);
+		$selement2 = $selements[$link['selementid2']];
+		list($x2, $y2) = get_icon_center_by_selement($selement2, $map_info[$link['selementid2']]);
+
+		if(isset($selement1['elementsubtype']) && $selement1['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+			list($x1, $y1) = calculateMapAreaLinkCoord($x1, $y1, $selement1['width'], $selement1['height'], $x2, $y2);
+		}
+
+		if(isset($selement2['elementsubtype']) && $selement2['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+			list($x2, $y2) = calculateMapAreaLinkCoord($x2, $y2, $selement2['width'], $selement2['height'], $x1, $y1);
+		}
 
 		$drawtype = $link['drawtype'];
 		$color = convertColor($im, $link['color']);
@@ -2059,18 +2004,10 @@ function drawMapLabels(&$im, $map, $map_info){
 		$y = $selement['y'];
 		$iconX = $iconY = 0;
 
-		if(isset($selement['elementsubtype']) && ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)){
-			if($selement['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
-				$iconX = $selement['width'];
-				$iconY = $selement['height'];
-			}
-		}
-		else{
-			$image = get_png_by_selement($selement, $el_info);
-			if($image){
-				$iconX = imagesx($image);
-				$iconY = imagesy($image);
-			}
+		$image = get_png_by_selement($selement, $el_info);
+		if($image){
+			$iconX = imagesx($image);
+			$iconY = imagesy($image);
 		}
 
 
@@ -2202,7 +2139,57 @@ function processMapAreas(array &$map){
 			}
 		}
 	}
-
 }
+
+/**
+ * Calculates area connector point on area perimeter
+ *
+ * @param int $ax x area coordinate
+ * @param  $ay y area coordinate
+ * @param  $aWidth area width
+ * @param  $aHeight area height
+ * @param  $x2 x coordinate of connector second element
+ * @param  $y2 y coordinate of connector second element
+ * @return array contains two values, x and y coordinates of new area connector point
+ */
+function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2){
+	$dY = abs($y2 - $ay);
+	$dX = abs($x2 - $ax);
+
+	$halfHeight = $aHeight / 2;
+	$halfWidth = $aWidth / 2;
+
+	if($dY == 0){
+		$ay = $y2;
+		$ax = ($x2 < $ax) ? $ax - $halfWidth : $ax + $halfWidth;
+	}
+	elseif($dX == 0){
+		$ay = ($y2 > $ay) ? $ay + $halfHeight : $ay - $halfHeight;
+		$ax = $x2;
+	}
+	else{
+		$koef = $halfHeight / $dY;
+
+		$c = $dX * $koef;
+
+		// if point as further than area diagonal, we should use calculations with width instead of height
+		if(($halfHeight / $c) > ($halfHeight / $halfWidth)){
+			$ay = ($y2 > $ay) ? $ay + $halfHeight : $ay - $halfHeight;
+			$ax = ($x2 < $ax) ? $ax - $c : $ax + $c;
+		}
+		else{
+			$koef = $halfWidth / $dX;
+
+			$c = $dY * $koef;
+
+			$ay = ($y2 > $ay) ? $ay + $c : $ay - $c;
+			$ax = ($x2 < $ax) ? $ax - $halfWidth : $ax + $halfWidth;
+		}
+	}
+
+	return array($ax, $ay);
+}
+
+
 
 ?>

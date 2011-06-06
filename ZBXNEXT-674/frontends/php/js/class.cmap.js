@@ -826,6 +826,13 @@ function createMap(containerid, mapdata){
 					border: '2px solid gray'
 				});
 			}
+			else{
+				this.domNode.css({
+					width: '',
+					height: '',
+					border: '0'
+				});
+			}
 		}
 	};
 
