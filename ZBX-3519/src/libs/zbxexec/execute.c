@@ -366,7 +366,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 
 	/* wait for child process to exit */
 	if (TIMEOUT_ERROR == ret)
-		zbx_snprintf(error, max_error_len, "timeout while executing shell script [%s]", cmd);
+		zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
 
 	/* terminate the child process and it's childs */
 	if (0 == TerminateJobObject(job, 0))
@@ -412,7 +412,7 @@ close:
 		if (-1 == rc || -1 == zbx_waitpid(pid))
 		{
 			if (EINTR == errno)
-				zbx_snprintf(error, max_error_len, "timeout while executing shell script [%s]", command);
+				zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
 			else
 				zbx_snprintf(error, max_error_len, "zbx_waitpid() failed: %s", zbx_strerror(errno));
 
@@ -441,59 +441,6 @@ close:
 	return ret;
 }
 
-#ifdef _WINDOWS
-/******************************************************************************
- *                                                                            *
- * Function: executer_thread                                                  *
- *                                                                            *
- * Purpose: background thread executing the passed command,                   *
- *                  exits after completion                                    *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
- *                                                                            *
- ******************************************************************************/
-ZBX_THREAD_ENTRY(executer_thread, command)
-{
-	const char		*__function_name = "executer_thread";
-	STARTUPINFO		si;
-	PROCESS_INFORMATION	pi;
-	LPTSTR			wcommand;
-
-	wcommand = zbx_utf8_to_unicode((char *)command);
-
-	/* fill in process startup info structure */
-	memset(&si, 0, sizeof(si));
-	si.cb = sizeof(si);
-	GetStartupInfo(&si);
-
-	if (0 == CreateProcess(
-		NULL,		/* no module name (use command line) */
-		wcommand,	/* name of app to launch */
-		NULL,		/* default process security attributes */
-		NULL,		/* default thread security attributes */
-		FALSE,		/* do not inherit handles from the parent */
-		0,		/* normal priority */
-		NULL,		/* use the same environment as the parent */
-		NULL,		/* launch in the current directory */
-		&si,		/* startup information */
-		&pi))		/* process information stored upon return */
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): CreateProcess() failed for [%s]: %s",
-				__function_name, (char *)command, strerror_from_system(GetLastError()));
-	}
-	else
-	{
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-	}
-
-	zbx_free(wcommand);
-	zbx_free(command);
-
-	zbx_thread_exit(0);
-}
-#endif	/* _WINDOWS */
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_execute_nowait                                               *
@@ -511,14 +458,43 @@ int	zbx_execute_nowait(const char *command)
 	const char	*__function_name = "zbx_execute_nowait";
 
 #ifdef _WINDOWS
-	char		*full_command;
+	char			*full_command;
+	STARTUPINFO		si;
+	PROCESS_INFORMATION	pi;
+	LPTSTR			wcommand;
 
 	full_command = zbx_dsprintf(NULL, "cmd /C \"%s\"", command);
+	wcommand = zbx_utf8_to_unicode(full_command);
 
-	zabbix_log(LOG_LEVEL_ERR, "%s(): executing [%s]", __function_name, full_command);
+	/* fill in process startup info structure */
+	memset(&si, 0, sizeof(si));
+	si.cb = sizeof(si);
+	GetStartupInfo(&si);
 
-	if (0 == zbx_thread_start(executer_thread, (void *)full_command))
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing [%s]", __function_name, full_command);
+
+	if (0 == CreateProcess(
+		NULL,		/* no module name (use command line) */
+		wcommand,	/* name of app to launch */
+		NULL,		/* default process security attributes */
+		NULL,		/* default thread security attributes */
+		FALSE,		/* do not inherit handles from the parent */
+		0,		/* normal priority */
+		NULL,		/* use the same environment as the parent */
+		NULL,		/* launch in the current directory */
+		&si,		/* startup information */
+		&pi))		/* process information stored upon return */
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): CreateProcess() failed for [%s]: %s",
+				__function_name, full_command, strerror_from_system(GetLastError()));
 		return FAIL;
+	}
+
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+
+	zbx_free(wcommand);
+	zbx_free(full_command);
 
 	return SUCCEED;
 
