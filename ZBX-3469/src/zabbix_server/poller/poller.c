@@ -215,6 +215,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				" and i.status=%d"
 				" and not i.key_ like '%s'"
 				" and not i.key_ like '%s%%'"
+				" and not f.function in ('nodata','date','dayofmonth','dayofweek','time','now')"
 				" and i.type in (%s)"
 				" and h.hostid=" ZBX_FS_UI64,
 			TRIGGER_STATUS_ENABLED,
