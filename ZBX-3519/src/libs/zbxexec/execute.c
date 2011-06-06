@@ -283,7 +283,6 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	}
 
 	/* create a new job where the script will be executed */
-	sa.bInheritHandle = FALSE;
 	if (0 == (job = CreateJobObject(&sa, NULL)))
 	{
 		zbx_snprintf(error, max_error_len, "unable to create a job: %s", strerror_from_system(GetLastError()));
@@ -298,7 +297,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	}
 
 	/* set job limits to kill all child processes when terminating the job */
-	limits.BasicLimitInformation.LimitFlags &= ~(JOB_OBJECT_LIMIT_BREAKAWAY_OK);
+	limits.BasicLimitInformation.LimitFlags &= ~JOB_OBJECT_LIMIT_BREAKAWAY_OK;
 	limits.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 	if (0 == SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits)))
 	{
@@ -319,33 +318,40 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	wcmd = zbx_utf8_to_unicode(cmd);
 
 	/* create the new process */
-	if (0 == CreateProcess(NULL, wcmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi))
+	if (0 == CreateProcess(NULL, wcmd, NULL, NULL, TRUE, CREATE_SUSPENDED, NULL, NULL, &si, &pi))
 	{
 		zbx_snprintf(error, max_error_len, "unable to create process [%s]: %s",
 				cmd, strerror_from_system(GetLastError()));
 		goto close;
 	}
 
+	CloseHandle(hWrite);
+	hWrite = NULL;
+
 	/* assign the new process to the created job */
 	if (0 == AssignProcessToJobObject(job, pi.hProcess))
 	{
 		zbx_snprintf(error, max_error_len, "unable to assign process [%s] to a job: %s",
 				cmd, strerror_from_system(GetLastError()));
-
 		if (0 == TerminateProcess(pi.hProcess, 0))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to terminate [%s]: %s",
 					cmd, strerror_from_system(GetLastError()));
 		}
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-		goto close;
 	}
+	else if (-1 == ResumeThread(pi.hThread))
+	{
+		zbx_snprintf(error, max_error_len, "unable to assign process [%s] to a job: %s",
+				cmd, strerror_from_system(GetLastError()));
+	}
+	else
+		ret = SUCCEED;
 
-	CloseHandle(hWrite);
-	hWrite = NULL;
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
 
-	ret = SUCCEED;
+	if (FAIL == ret)
+		goto close;
 
 	_ftime(&start_time);
 	timeout *= 1000;
@@ -366,16 +372,14 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	/* wait for child process to exit */
 	if (TIMEOUT_ERROR == ret)
 		zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
-
-	/* terminate the child process and it's childs */
-	if (0 == TerminateJobObject(job, 0))
-		zabbix_log(LOG_LEVEL_ERR, "failed to terminate job [%s]: %s", cmd, strerror_from_system(GetLastError()));
-
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
 close:
 	if (NULL != job)
+	{
+		/* terminate the child process and it's childs */
+		if (0 == TerminateJobObject(job, 0))
+			zabbix_log(LOG_LEVEL_ERR, "failed to terminate job [%s]: %s", cmd, strerror_from_system(GetLastError()));
 		CloseHandle(job);
+	}
 
 	if (NULL != hWrite)
 		CloseHandle(hWrite);
