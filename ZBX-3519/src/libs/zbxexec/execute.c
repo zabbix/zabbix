@@ -20,7 +20,6 @@
 #include "common.h"
 #include "threads.h"
 #include "log.h"
-#include "zbxexec.h"
 
 #ifdef _WINDOWS
 
@@ -501,19 +500,20 @@ int	zbx_execute_nowait(const char *command)
 #else	/* _WINDOWS */
 	pid_t		pid;
 
-	/* create a child process and return */
+	/* use a double fork for running the command in background */
 	if (-1 == (pid = zbx_fork()))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): (1) fork() failed for [%s]: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): parent failed to fork() for [%s]: %s",
 				__function_name, command, zbx_strerror(errno));
 		return FAIL;
 	}
 	else if (0 != pid)
 	{
+		waitpid(pid, NULL, 0);
 		return SUCCEED;
 	}
 
-	/* This is the child process. Now create a new child process which */
+	/* This is the child process. Now create a grand child process which */
 	/* will be replaced by execl() with the actual command to be executed. */
 
 	pid = zbx_fork();
@@ -521,11 +521,11 @@ int	zbx_execute_nowait(const char *command)
 	switch(pid)
 	{
 		case -1:
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): (2) fork() failed for [%s]: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): child failed to fork() for [%s]: %s",
 					__function_name, command, zbx_strerror(errno));
 			break;
 		case 0:
-			/* this is the new child process */
+			/* this is the grand child process */
 
 			/* suppress the output of the executed script, otherwise */
 			/* the output might get written to a logfile or elsewhere */
@@ -539,13 +539,13 @@ int	zbx_execute_nowait(const char *command)
 					__function_name, command, zbx_strerror(errno));
 			break;
 		default:
-			/* this is the parent process */
+			/* this is the child process, exit to complete the double fork */
 
 			waitpid(pid, NULL, WNOHANG);
 			break;
 	}
 
-	/* always exit, these are only the child processes */
+	/* always exit, parent has already returned */
 	exit(0);
 #endif
 }

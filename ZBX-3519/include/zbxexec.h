@@ -20,8 +20,6 @@
 #ifndef ZABBIX_ZBXEXEC_H
 #define ZABBIX_ZBXEXEC_H
 
-#include "threads.h"
-
 int	zbx_execute(const char *command, char **buffer, char *error, size_t max_error_len, int timeout);
 int	zbx_execute_nowait(const char *command);
 

@@ -57,7 +57,7 @@ const char	*help_message[] = {
 	"  -c <file>       absolute path to the configuration file",
 	"  -h              give this help",
 	"  -V              display version number",
-	0 /* end of text */
+	0	/* end of text */
 };
 #else
 const char	*help_message[] = {
