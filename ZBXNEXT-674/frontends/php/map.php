@@ -245,7 +245,7 @@ class CMapPainter{
 
 	protected function paintAreas(){
 		foreach($this->mapData['selements'] as $selement){
-			if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
+			if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS && $selement['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
 				$this->canvas->drawRectangle($selement['x'], $selement['y'], $selement['x'] + $selement['width'], $selement['y'] + $selement['height'], 'gray');
 			}
 		}
@@ -310,6 +310,7 @@ if(get_request('nocalculations', false)){
 		$map_info[$selement['selementid']] = array(
 			'iconid' => $selement['iconid_off'],
 			'icon_type' => SYSMAP_ELEMENT_ICON_OFF,
+			'name' => $selement['label']
 		);
 	}
 }

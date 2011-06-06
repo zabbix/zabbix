@@ -820,11 +820,21 @@ function createMap(containerid, mapdata){
 			this.domNode.addClass('sysmap_iconid_'+this.data.iconid_off);
 
 			if((this.data.elementtype === '3') && (this.data.elementsubtype === '1')){
-				this.domNode.css({
-					width: (this.data.width - 2) + 'px',
-					height: (this.data.height - 2) + 'px',
-					border: '2px solid gray'
-				});
+				if(this.data.areatype === '1'){
+					this.domNode.css({
+						width: (this.data.width - 2) + 'px',
+						height: (this.data.height - 2) + 'px',
+						border: '2px solid gray'
+					});
+				}
+				else{
+					this.domNode.css({
+						width: (this.sysmap.data.width - 2) + 'px',
+						height: (this.sysmap.data.height - 2) + 'px',
+						border: '2px solid gray'
+					});
+				}
+
 			}
 			else{
 				this.domNode.css({
