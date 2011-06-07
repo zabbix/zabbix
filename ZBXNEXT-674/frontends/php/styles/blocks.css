@@ -13,14 +13,18 @@
 	position: absolute;
 	z-index: 10;
 }
+
+#sysmap_cnt .selementArea{
+	background-color: rgba(204, 204, 204, 0.5);
+}
+
 #sysmap_cnt .selected{
-	border: 1px #3333FF solid;
-	background-color: #00AAAA;
+	outline: 3px #FFCC00 solid;
 }
 #sysmap_cnt .ui-selecting{
-	border: 1px #3333FF solid;
-	background-color: #00AAAA;
+	outline: 3px #FFCC00 solid;
 }
+
 
 .floatWindow{
 	box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5);
