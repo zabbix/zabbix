@@ -762,7 +762,7 @@ function createMap(containerid, mapdata){
 				shiftY = Math.round(dims.height / 2),
 				newX,
 				newY,
-				gridSize;
+				gridSize = parseInt(this.sysmap.data.grid_size, 10);
 
 			force = force || false;
 
@@ -776,29 +776,29 @@ function createMap(containerid, mapdata){
 				}
 			}
 			else{
-				newX = parseInt(this.data.x, 10) + shiftX;
-				newY = parseInt(this.data.y, 10) + shiftY;
-
-				gridSize = parseInt(this.sysmap.data.grid_size, 10);
+				newX = x + shiftX;
+				newY = y + shiftY;
 
 				newX = Math.floor(newX / gridSize) * gridSize;
 				newY = Math.floor(newY / gridSize) * gridSize;
 
-				// centrillize
 				newX += Math.round(gridSize / 2) - shiftX;
 				newY += Math.round(gridSize / 2) - shiftY;
 
-				// limits
-				if(newX < shiftX)
-					newX = 0;
-				else if((newX + dims.width) > this.sysmap.data.width)
-					newX = this.sysmap.data.width - dims.width;
+				while((newX + dims.width) > this.sysmap.data.width){
+					newX -= gridSize;
+				}
+				while((newY + dims.height) > this.sysmap.data.height){
+					newY -= gridSize;
+				}
 
-				if(newY < shiftY)
-					newY = 0;
-				else if((newY + dims.height) > this.sysmap.data.height)
-					newY = this.sysmap.data.height - dims.height;
-				//--
+				while(newX < shiftX){
+					newX += gridSize;
+				}
+				while(newY < shiftY){
+					newY += gridSize;
+				}
+
 
 				this.data.y = newY;
 				this.data.x = newX;
@@ -821,27 +821,30 @@ function createMap(containerid, mapdata){
 
 			if((this.data.elementtype === '3') && (this.data.elementsubtype === '1')){
 				if(this.data.areatype === '1'){
-					this.domNode.css({
-						width: (this.data.width - 2) + 'px',
-						height: (this.data.height - 2) + 'px',
-						border: '2px solid gray'
-					});
+					this.domNode
+						.css({
+							width: this.data.width + 'px',
+							height: this.data.height + 'px'
+						})
+						.addClass('selementArea');
 				}
 				else{
-					this.domNode.css({
-						width: (this.sysmap.data.width - 2) + 'px',
-						height: (this.sysmap.data.height - 2) + 'px',
-						border: '2px solid gray'
-					});
+					this.domNode
+						.css({
+							width: this.sysmap.data.width + 'px',
+							height: this.sysmap.data.height + 'px'
+						})
+						.addClass('selementArea');
 				}
 
 			}
 			else{
-				this.domNode.css({
-					width: '',
-					height: '',
-					border: '0'
-				});
+				this.domNode
+					.css({
+						width: '',
+						height: ''
+					})
+					.removeClass('selementArea');
 			}
 		}
 	};
