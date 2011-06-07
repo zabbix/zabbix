@@ -177,18 +177,18 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
  ******************************************************************************/
 struct hostent	*zbx_gethost(const char *hostname)
 {
-	unsigned int	addr;
+	unsigned long	addr;
 	struct hostent	*host;
 
-	assert(hostname);
-
-	if (NULL != (host = gethostbyname(hostname)))
+	if (INADDR_NONE == (addr = inet_addr(hostname)))
+	{
+		if (NULL != (host = gethostbyname(hostname)))
+			return host;
+	}
+	else if (NULL != (host = gethostbyaddr((char *)&addr, 4, AF_INET)))
+	{
 		return host;
-
-	addr = inet_addr(hostname);
-
-	if (NULL != (host = gethostbyaddr((char *)&addr, 4, AF_INET)))
-		return host;
+	}
 
 #ifdef _WINDOWS
 	zbx_set_tcp_strerror("gethost() failed for address '%s': %s", hostname, strerror_from_system(WSAGetLastError()));
