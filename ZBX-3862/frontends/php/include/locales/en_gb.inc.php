@@ -2473,5 +2473,14 @@
 // class.cbuttonqmessage.php
 	'S_ARE_YOU_SURE_YOU_WANT_TO_PERFORM_THIS_ACTION' => 'Are you sure you want perform this action?',
 	'S_INCORRECT_VALUE_FOR_SETMESSAGE' => 'Incorrect value for setMessage(): "%s".',
+
+// class.citemkey.php
+	'S_KEY_CANNOT_BE_EMPTY' => 'Key cannot be empty.',
+	'S_NO_KEY_ID_PROVIDED' => 'No key id provided.',
+	'S_NO_ITEM_KEY_PROVIDED' => 'Invalid item key format.',
+	'S_SIMPLE_CHECK_KEY_CANNOT_CONTAIN' => 'Simple check key cannot have parameters in [].',
+	'S_INCORRECT_SYNTAX_NEAR' => 'Incorrect syntax near \'%1$s\'',
+	'S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS' => 'Incorrect usage of bracket symbols. \'%s\' found after final bracket.',
+	'S_INVALID_KEY_FORMAT' => 'Invalid item key format.',
 );
 ?>
