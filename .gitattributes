@@ -255,6 +255,7 @@ frontends/php/locale/sv/LC_MESSAGES/frontend.po -text
 frontends/php/locale/tr/LC_MESSAGES/frontend.po -text
 frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
+frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
 frontends/php/styles/darkblue/images/ui-bg_flat_0_aaaaaa_40x100.png -text svneol=unset#image/png
 frontends/php/styles/darkblue/images/ui-bg_flat_100_1d92cd_40x100.png -text svneol=unset#image/png
 frontends/php/styles/darkblue/images/ui-bg_flat_10_aaaaaa_40x100.png -text svneol=unset#image/png

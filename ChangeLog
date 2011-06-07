@@ -2,7 +2,7 @@
 Changes for 1.9.5
 
 New features:
- - [ZBX-1357] updated Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+ - [ZBX-1357] updated Latvian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-783] Added Inventory -> Overview report and filter to Inventory -> Hosts (KB)
  - [ZBXNEXT-467] Renamed net.tcp.dns(.query)[] to net.dns(.record)[], added Windows support, retrans and timeout parameters and IP parameter support for UNIX (rudolfs)
  - [ZBX-3828] added Turkish translation; thanks to Murat Koç (Richlv)
@@ -165,6 +165,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3463] fixed MaxHousekeeperDelete configuration parameter being ignored for IBM DB2 (asaveljevs)
+ - [ZBX-3854] added saving of state of dynamic/fixed setting for time lines on all pages (KB)
  - [ZBX-3847] fixed item history clearing not deleting data in trends_uint table (KB)
  - [ZBX-3797] fixed processing of vfs.dev.* checks under FreeBSD (Sasha)
  - [ZBXNEXT-799] added support of SRV records to net.tcp.dns.query[]; thanks to Edward Rudd (asaveljevs)

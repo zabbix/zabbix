@@ -49,8 +49,9 @@ include_once('include/page_header.php');
 		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 	);
 
 	check_fields($fields);
@@ -60,6 +61,12 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
 			CProfile::update('web.auditacts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
+		// saving fixed/dynamic setting to profile
+		if('timelinefixedperiod' == $_REQUEST['favobj']){
+			if(isset($_REQUEST['favid'])){
+				CProfile::update('web.auditacts.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
+			}
 		}
 	}
 
@@ -246,7 +253,8 @@ include_once('include/page_header.php');
 		'loadImage' => 0,
 		'loadScroll' => 1,
 		'dynamic' => 0,
-		'mainObject' => 1
+		'mainObject' => 1,
+		'periodFixed' => CProfile::get('web.auditacts.timelinefixed', 1)
 	);
 
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
