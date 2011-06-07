@@ -103,6 +103,12 @@ include_once('include/page_header.php');
 				print('switchElementsClass("addrm_fav","iconminus","iconplus");');
 			}
 		}
+		// saving fixed/dynamic setting to profile
+		if('timelinefixedperiod' == $_REQUEST['favobj']){
+			if(isset($_REQUEST['favid'])){
+				CProfile::update('web.history.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
+			}
+		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
@@ -468,7 +474,9 @@ include_once('include/page_header.php');
 			'usertime' => date('YmdHis', $utime + $period)
 		);
 
-		$objData = array();
+		$objData = array(
+			'periodFixed' => CProfile::get('web.history.timelinefixed', 1)
+		);
 
 		if(isset($dom_graph_id)){
 			$objData['id'] = $_REQUEST['itemid'];
