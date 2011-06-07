@@ -402,7 +402,7 @@ function convertUnitsS($value){
 
 	if (0 == floor($value * 1000))
 	{
-		$value = (0 == $value ? '0s' : '< 1ms');
+		$value = (0 == $value ? '0'.S_SECOND_SHORT : '< 1'.S_MILLISECOND_SHORT);
 		return $value;
 	}
 
