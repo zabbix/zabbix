@@ -1668,4 +1668,3 @@ ZBX_ENCODING e[]=
 
 	return res;
 }
-
