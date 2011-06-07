@@ -375,10 +375,12 @@ function mem2str($size){
 }
 
 function convertUnitsUptime($value){
-	if(($secs = round($value)) < 0)
-		return $value;
-
-	$value = '';
+	if(($secs = round($value)) < 0){
+		$value = '-';
+		$secs = -$secs;
+	}
+	else
+		$value = '';
 
 	$days = floor($secs / SEC_PER_DAY);
 	$secs -= $days * SEC_PER_DAY;
@@ -390,66 +392,60 @@ function convertUnitsUptime($value){
 	$secs -= $mins * SEC_PER_MIN;
 
 	if($days != 0)
-		$value = $days.' '.S_DAYS_SMALL.', ';
+		$value .= $days.' '.S_DAYS_SMALL.', ';
 	$value .= sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
 
 	return $value;
 }
 
 function convertUnitsS($value){
-	if ($value < 0)
-		return $value;
-
-	if (0 == floor($value * 1000))
-	{
+	if(floor($value * 1000) == 0){
 		$value = (0 == $value ? '0'.S_SECOND_SHORT : '< 1'.S_MILLISECOND_SHORT);
 		return $value;
 	}
 
-	$secs = round($value * 1000) / 1000;
+	if(($secs = round($value * 1000) / 1000) < 0){
+		$value = '-';
+		$secs = -$secs;
+	}
+	else
+		$value = '';
 	$n_unit = 0;
-	$value = '';
 
-	if(($n = floor($secs / SEC_PER_YEAR)) != 0)
-	{
+	if(($n = floor($secs / SEC_PER_YEAR)) != 0){
 		$value .= $n.S_YEAR_SHORT.' ';
 		$secs -= $n * SEC_PER_YEAR;
 		if (0 == $n_unit)
 			$n_unit = 4;
 	}
 
-	if(($n = floor($secs / SEC_PER_MONTH)) != 0)
-	{
+	if(($n = floor($secs / SEC_PER_MONTH)) != 0){
 		$value .= $n.S_MONTH_SHORT.' ';
 		$secs -= $n * SEC_PER_MONTH;
 		if (0 == $n_unit)
 			$n_unit = 3;
 	}
 
-	if(($n = floor($secs / SEC_PER_DAY)) != 0)
-	{
+	if(($n = floor($secs / SEC_PER_DAY)) != 0){
 		$value .= $n.S_DAY_SHORT.' ';
 		$secs -= $n * SEC_PER_DAY;
 		if (0 == $n_unit)
 			$n_unit = 2;
 	}
 
-	if($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0)
-	{
+	if($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0){
 		$value .= $n.S_HOUR_SHORT.' ';
 		$secs -= $n * SEC_PER_HOUR;
 		if (0 == $n_unit)
 			$n_unit = 1;
 	}
 
-	if($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0)
-	{
+	if($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0){
 		$value .= $n.S_MINUTE_SHORT.' ';
 		$secs -= $n * SEC_PER_MIN;
 	}
 
-	if($n_unit < 2 && ($n = floor($secs)) != 0)
-	{
+	if($n_unit < 2 && ($n = floor($secs)) != 0){
 		$value .= $n.S_SECOND_SHORT.' ';
 		$secs -= $n;
 	}
