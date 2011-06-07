@@ -2105,15 +2105,9 @@ static void	get_trigger_function_value(DB_TRIGGER *trigger, char **replace_to, c
 
 	p = bl + 1;
 
-	sz = sizeof(MVAR_HOSTNAME) - 2;
-	if (0 == strncmp(p, MVAR_HOSTNAME, sz))
+	if (0 == strncmp(p, MVAR_HOSTNAME, sz = sizeof(MVAR_HOSTNAME) - 2) ||
+			0 == strncmp(p, MVAR_HOST_HOST, sz = sizeof(MVAR_HOST_HOST) - 2))
 		res = SUCCEED;
-	else
-	{
-		sz = sizeof(MVAR_HOST_HOST) - 2;
-		if (0 == strncmp(p, MVAR_HOST_HOST, sz))
-			res = SUCCEED;
-	}
 
 	if (SUCCEED == res && ('}' == p[sz] || ('}' == p[sz + 1] && '1' <= p[sz] && p[sz] <= '9')))
 	{

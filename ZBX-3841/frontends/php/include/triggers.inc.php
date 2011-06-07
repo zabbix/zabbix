@@ -1328,9 +1328,9 @@ function utf8RawUrlDecode($source){
 									' AND i.hostid=h.hostid'.
 									' AND f.functionid='.$functionid;
 						$host = DBfetch(DBselect($sql));
-						if(is_null($host['name']))
-							$host['name'] = $macro;
-						$description = str_replace($macro, $host['name'], $description);
+						if(is_null($host['host']))
+							$host['host'] = $macro;
+						$description = str_replace($macro, $host['host'], $description);
 					}
 				}
 			}

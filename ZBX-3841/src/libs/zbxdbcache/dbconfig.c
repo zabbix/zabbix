@@ -1275,6 +1275,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		}
 
 		zbx_strpool_release(host->host);
+		zbx_strpool_release(host->name);
 
 		zbx_hashset_iter_remove(&iter);
 	}
