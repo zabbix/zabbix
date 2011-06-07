@@ -22,41 +22,73 @@
 #include "stats.h"
 #include "diskdevices.h"
 
+#define ZBX_DEV_PFX	"/dev/"
+#define ZBX_DEV_READ	0
+#define ZBX_DEV_WRITE	1
+
 #if defined(KERNEL_2_4)
 #	define INFO_FILE_NAME	"/proc/partitions"
-#	define PARSE(line)	if (sscanf(line, "%*d %*d %*d %s " \
-					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
-					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
-				name, 		\
-				&ds[ZBX_DSTAT_R_OPER], 	\
-				&ds[ZBX_DSTAT_R_SECT],	\
-				&ds[ZBX_DSTAT_W_OPER], 	\
-				&ds[ZBX_DSTAT_W_SECT]	\
-				) != 5) continue
+#	define PARSE(line)	if (sscanf(line, ZBX_FS_UI64 ZBX_FS_UI64 " %*d %s " 		\
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d "			\
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d",	\
+				&rdev_major,							\
+				&rdev_minor,							\
+				name,								\
+				&ds[ZBX_DSTAT_R_OPER],						\
+				&ds[ZBX_DSTAT_R_SECT],						\
+				&ds[ZBX_DSTAT_W_OPER],						\
+				&ds[ZBX_DSTAT_W_SECT]						\
+				) != 7) continue
 #else
 #	define INFO_FILE_NAME	"/proc/diskstats"
-#	define PARSE(line)	if (sscanf(line, "%*d %*d %s " \
-					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
-					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
-				name,		\
-				&ds[ZBX_DSTAT_R_OPER], 	\
-				&ds[ZBX_DSTAT_R_SECT],	\
-				&ds[ZBX_DSTAT_W_OPER], 	\
-				&ds[ZBX_DSTAT_W_SECT]	\
-				) != 5) continue
+#	define PARSE(line)	if (sscanf(line, ZBX_FS_UI64 ZBX_FS_UI64 " %s "			\
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d "			\
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d",	\
+				&rdev_major,							\
+				&rdev_minor,							\
+				name,								\
+				&ds[ZBX_DSTAT_R_OPER],						\
+				&ds[ZBX_DSTAT_R_SECT],						\
+				&ds[ZBX_DSTAT_W_OPER],						\
+				&ds[ZBX_DSTAT_W_SECT]						\
+				) != 7								\
+				&&								\
+				/* some disk partitions */					\
+				sscanf(line, ZBX_FS_UI64 ZBX_FS_UI64 " %s "			\
+					ZBX_FS_UI64 ZBX_FS_UI64					\
+					ZBX_FS_UI64 ZBX_FS_UI64,				\
+				&rdev_major,							\
+				&rdev_minor,							\
+				name,								\
+				&ds[ZBX_DSTAT_R_OPER],						\
+				&ds[ZBX_DSTAT_R_SECT],						\
+				&ds[ZBX_DSTAT_W_OPER],						\
+				&ds[ZBX_DSTAT_W_SECT]						\
+				) != 7								\
+				) continue
 #endif
 
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	FILE		*f;
-	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN];
-	int		i, ret = FAIL;
-	zbx_uint64_t	ds[ZBX_DSTAT_MAX];
+	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN], dev_path[MAX_STRING_LEN];
+	int		i, ret = FAIL, dev_exists = FAIL;
+	zbx_uint64_t	ds[ZBX_DSTAT_MAX], rdev_major, rdev_minor;
+	struct stat 	dev_st;
 
 	assert(devname);
 
 	for (i = 0; i < ZBX_DSTAT_MAX; i++)
 		dstat[i] = (zbx_uint64_t)__UINT64_C(0);
+
+	if ('\0' != *devname)
+	{
+		zbx_strlcpy(dev_path, ZBX_DEV_PFX, MAX_STRING_LEN);
+		zbx_strlcat(dev_path, devname, MAX_STRING_LEN);
+
+		if (zbx_stat(dev_path, &dev_st) == 0)
+			dev_exists = SUCCEED;
+	}
 
 	if (NULL == (f = fopen(INFO_FILE_NAME, "r")))
 		return ret;
@@ -65,7 +97,8 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	{
 		PARSE(tmp);
 		if ('\0' != *devname && 0 != strcmp(name, devname))
-			continue;
+			if (FAIL == dev_exists || major(dev_st.st_rdev) != rdev_major || minor(dev_st.st_rdev) != rdev_minor)
+				continue;
 
 		dstat[ZBX_DSTAT_R_OPER] += ds[ZBX_DSTAT_R_OPER];
 		dstat[ZBX_DSTAT_R_SECT] += ds[ZBX_DSTAT_R_SECT];
@@ -79,12 +112,54 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	return ret;
 }
 
-int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+/******************************************************************************
+ *                                                                            *
+ * Comments: Translate device name to the one used internally by kernel. The  *
+ *           translation is done based on minor and major device numbers      *
+ *           listed in INFO_FILE_NAME . If the names differ it is usually an  *
+ *           LVM device which is listed in kernel device mapper.              *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_kernel_devname(const char *devname, char *kernel_devname)
 {
-	ZBX_SINGLE_DISKDEVICE_DATA *device;
-	char		devname[32], tmp[16];
-	int		type, mode, nparam;
-	zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
+	FILE		*f;
+	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN], dev_path[MAX_STRING_LEN];
+	int		ret = FAIL;
+	zbx_uint64_t	ds[ZBX_DSTAT_MAX], rdev_major, rdev_minor;
+	struct stat	dev_st;
+
+	assert(devname);
+
+	if ('\0' == *devname)
+		return ret;
+
+	zbx_strlcpy(dev_path, ZBX_DEV_PFX, MAX_STRING_LEN);
+	zbx_strlcat(dev_path, devname, MAX_STRING_LEN);
+
+	if (zbx_stat(dev_path, &dev_st) < 0 || NULL == (f = fopen(INFO_FILE_NAME, "r")))
+		return ret;
+
+	while (NULL != fgets(tmp, sizeof(tmp), f))
+	{
+		PARSE(tmp);
+		if (major(dev_st.st_rdev) != rdev_major || minor(dev_st.st_rdev) != rdev_minor)
+			continue;
+
+		zbx_strlcpy(kernel_devname, name, MAX_STRING_LEN);
+		ret = SUCCEED;
+		break;
+	}
+	zbx_fclose(f);
+
+	return ret;
+}
+
+static int	vfs_dev_rw(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, int rw)
+{
+	ZBX_SINGLE_DISKDEVICE_DATA	*device;
+	char				devname[MAX_STRING_LEN], tmp[16], kernel_devname[MAX_STRING_LEN];
+	int				type, mode, nparam;
+	zbx_uint64_t			dstats[ZBX_DSTAT_MAX];
 
 	nparam = num_param(param);
 	if (nparam > 3)
@@ -119,9 +194,9 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 			return SYSINFO_RET_FAIL;
 
 		if (type == ZBX_DSTAT_TYPE_SECT)
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_W_SECT]);
+			SET_UI64_RESULT(result, (ZBX_DEV_READ == rw ? dstats[ZBX_DSTAT_R_SECT] : dstats[ZBX_DSTAT_W_SECT]));
 		else	/* ZBX_DSTAT_TYPE_OPER */
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_W_OPER]);
+			SET_UI64_RESULT(result, (ZBX_DEV_READ == rw ? dstats[ZBX_DSTAT_R_OPER] : dstats[ZBX_DSTAT_W_OPER]));
 
 		return SYSINFO_RET_OK;
 	}
@@ -144,101 +219,33 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == (device = collector_diskdevice_get(devname)))
+	if ('\0' == *devname)
+		*kernel_devname = '\0';
+	else if (FAIL == get_kernel_devname(devname, kernel_devname))
+		return SYSINFO_RET_FAIL;
+
+	if (NULL == (device = collector_diskdevice_get(kernel_devname)))
 	{
-		if (FAIL == get_diskstat(devname, dstats))	/* validate device name */
+		if (FAIL == get_diskstat(kernel_devname, dstats))
 			return SYSINFO_RET_FAIL;
 
-		if (NULL == (device = collector_diskdevice_add(devname)))
+		if (NULL == (device = collector_diskdevice_add(kernel_devname)))
 			return SYSINFO_RET_FAIL;
 	}
 
 	if (type == ZBX_DSTAT_TYPE_SPS)	/* default parameter */
-		SET_DBL_RESULT(result, device->w_sps[mode]);
+		SET_DBL_RESULT(result, (ZBX_DEV_READ == rw ? device->r_sps[mode] : device->w_sps[mode]));
 	else if (type == ZBX_DSTAT_TYPE_OPS)
-		SET_DBL_RESULT(result, device->w_ops[mode]);
+		SET_DBL_RESULT(result, (ZBX_DEV_READ == rw ? device->r_ops[mode] : device->w_ops[mode]));
 
 	return SYSINFO_RET_OK;
 }
 
 int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	ZBX_SINGLE_DISKDEVICE_DATA *device;
-	char		devname[32], tmp[16];
-	int		type, mode, nparam;
-	zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
-
-	nparam = num_param(param);
-	if (nparam > 3)
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 1, devname, sizeof(devname)))
-		return SYSINFO_RET_FAIL;
-
-	if (0 == strcmp(devname, "all"))
-		*devname = '\0';
-
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "sps"))	/* default parameter */
-		type = ZBX_DSTAT_TYPE_SPS;
-	else if (0 == strcmp(tmp, "ops"))
-		type = ZBX_DSTAT_TYPE_OPS;
-	else if (0 == strcmp(tmp, "sectors"))
-		type = ZBX_DSTAT_TYPE_SECT;
-	else if (0 == strcmp(tmp, "operations"))
-		type = ZBX_DSTAT_TYPE_OPER;
-	else
-		return SYSINFO_RET_FAIL;
-
-	if (type == ZBX_DSTAT_TYPE_SECT || type == ZBX_DSTAT_TYPE_OPER)
-	{
-		if (nparam > 2)
-			return SYSINFO_RET_FAIL;
-
-		if (FAIL == get_diskstat(devname, dstats))
-			return SYSINFO_RET_FAIL;
-
-		if (type == ZBX_DSTAT_TYPE_SECT)
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_R_SECT]);
-		else	/* ZBX_DSTAT_TYPE_OPER */
-			SET_UI64_RESULT(result, dstats[ZBX_DSTAT_R_OPER]);
-
-		return SYSINFO_RET_OK;
-	}
-
-	if (!DISKDEVICE_COLLECTOR_STARTED(collector))
-	{
-		SET_MSG_RESULT(result, strdup("Collector is not started!"));
-		return SYSINFO_RET_OK;
-	}
-
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
-		mode = ZBX_AVG1;
-	else if (0 == strcmp(tmp, "avg5"))
-		mode = ZBX_AVG5;
-	else if (0 == strcmp(tmp, "avg15"))
-		mode = ZBX_AVG15;
-	else
-		return SYSINFO_RET_FAIL;
-
-	if (NULL == (device = collector_diskdevice_get(devname)))
-	{
-		if (FAIL == get_diskstat(devname, dstats))	/* validate device name */
-			return SYSINFO_RET_FAIL;
-
-		if (NULL == (device = collector_diskdevice_add(devname)))
-			return SYSINFO_RET_FAIL;
-	}
-
-	if (type == ZBX_DSTAT_TYPE_SPS)	/* default parameter */
-		SET_DBL_RESULT(result, device->r_sps[mode]);
-	else if (type == ZBX_DSTAT_TYPE_OPS)
-		SET_DBL_RESULT(result, device->r_ops[mode]);
-
-	return SYSINFO_RET_OK;
+	return vfs_dev_rw(cmd, param, flags, result, ZBX_DEV_READ);
+}
+int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return vfs_dev_rw(cmd, param, flags, result, ZBX_DEV_WRITE);
 }
