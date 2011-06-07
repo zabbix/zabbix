@@ -738,10 +738,4 @@ zbx_uint64_t	zbx_letoh_uint64(
 zbx_uint64_t	zbx_htole_uint64(
 		zbx_uint64_t	data
 	);
-
-#ifdef _WINDOWS
-LPWSTR	zbx_utf8_to_unicode(LPCSTR utf8_string);
-int     zbx_unicode_to_utf8_static(LPCWSTR wide_string, LPSTR utf8_string, int utf8_size);
-int     _wis_uint(const wchar_t *wide_string);
-#endif
 #endif
