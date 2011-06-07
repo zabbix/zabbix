@@ -556,15 +556,27 @@ function insert_js_function($fnct_name){
 					var parentDocument = window.opener.document;
 					if(!parentDocument) return close_window();
 
-					var parentDocumentForm = $(parentDocument.body).select("form[name="+frame+"]");
+					if(IE){
+						// in internet explorer prototype filters by form name does not work
+						var pForms = parentDocument.body.getElementsByTagName("form");
+						for(i=0; i < pForms.length; i++){
+							if(pForms[i].id === frame){
+								parentDocumentForms = [pForms[i]];
+								break;
+							}
+						}
+					}
+					else{
+						var parentDocumentForms = $(parentDocument.body).select("form[name="+frame+"]");
+					}
 					var submitParent = submitParent || false;
 
 					var frmStorage = null;
 					for(var key in values){
 						if(is_null(values[key])) continue;
 
-						if(parentDocumentForm.length > 0)
-							frmStorage = jQuery(parentDocumentForm[0]).find("#"+key).get(0);
+						if(parentDocumentForms.length > 0)
+							frmStorage = jQuery(parentDocumentForms[0]).find("#"+key).get(0);
 
 						if(typeof(frmStorage) == "undefined" || is_null(frmStorage))
 							frmStorage = parentDocument.getElementById(key);
