@@ -400,7 +400,7 @@ function convertUnitsUptime($value){
 
 function convertUnitsS($value){
 	if(floor(abs($value) * 1000) == 0){
-		$value = (0 == $value ? '0'.S_SECOND_SHORT : '< 1'.S_MILLISECOND_SHORT);
+		$value = ($value == 0 ? '0'.S_SECOND_SHORT : '< 1'.S_MILLISECOND_SHORT);
 		return $value;
 	}
 
