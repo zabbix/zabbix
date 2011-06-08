@@ -315,12 +315,13 @@ if(get_request('nocalculations', false)){
 	}
 }
 else{
-	processMapAreas($map);
+	$areas = populateFromMapAreas($map);
 	$map_info = getSelementsInfo($map);
+	processAreasCoordinates($map, $areas, $map_info);
 }
 
 // Draw MAP
-drawMapConnectors($im, $map, $map_info);
+drawMapConnectors($im, $map, $map_info, true);
 
 if(!isset($_REQUEST['noselements'])){
 	drawMapHighligts($im, $map, $map_info);

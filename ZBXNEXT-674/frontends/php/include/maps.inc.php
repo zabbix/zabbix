@@ -114,8 +114,9 @@ function map_link_drawtype2str($drawtype){
 function getActionMapBySysmap($sysmap){
 	$action_map = new CAreaMap('links' . $sysmap['sysmapid']);
 
-	$areas = processMapAreas($sysmap);
+	$areas = populateFromMapAreas($sysmap);
 	$map_info = getSelementsInfo($sysmap);
+	processAreasCoordinates($sysmap, $areas, $map_info);
 
 	$hostids = array();
 	foreach($sysmap['selements'] as $selement){
@@ -1437,20 +1438,23 @@ function prepareImageExport($images){
 	return $formatted;
 }
 
-function drawMapConnectors(&$im, $map, $map_info){
+function drawMapConnectors(&$im, $map, $map_info, $drawAll = false){
 
 	$selements = $map['selements'];
 
 	foreach($map['links'] as $link){
-
 		$selement1 = $selements[$link['selementid1']];
-		list($x1, $y1) = get_icon_center_by_selement($selement1, $map_info[$link['selementid1']], $map);
-
 		$selement2 = $selements[$link['selementid2']];
+
+		list($x1, $y1) = get_icon_center_by_selement($selement1, $map_info[$link['selementid1']], $map);
 		list($x2, $y2) = get_icon_center_by_selement($selement2, $map_info[$link['selementid2']], $map);
 
 
 		if(isset($selement1['elementsubtype']) && $selement1['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+			if(!$drawAll && ($selement2['elementsubtype'] != SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)){
+				continue;
+			}
+
 			if($selement1['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
 				$w = $selement1['width'];
 				$h = $selement1['height'];
@@ -1463,6 +1467,10 @@ function drawMapConnectors(&$im, $map, $map_info){
 		}
 
 		if(isset($selement2['elementsubtype']) && $selement2['elementsubtype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
+			if(!$drawAll && ($selement1['elementsubtype'] != SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)){
+				continue;
+			}
+
 			if($selement2['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
 				$w = $selement2['width'];
 				$h = $selement2['height'];
@@ -2117,11 +2125,19 @@ function drawMapLabels(&$im, $map, $map_info){
  * For each host group which is area for hosts virtaul elements as hosts from that host group are created
  *
  * @param array $map
- * @return array
+ * @return array areas with area coordiates and selementids
  */
-function processMapAreas(array &$map){
+function populateFromMapAreas(array &$map){
+	$areas = array();
+
 	foreach($map['selements'] as $selement){
 		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
+			$area = array(
+				'selementids' => array(),
+			);
+
+			$origSelement = $selement;
+
 			$hosts = API::host()->get(array(
 				'groupids' => $selement['elementid'],
 				'output' => API_OUTPUT_SHORTEN,
@@ -2134,50 +2150,94 @@ function processMapAreas(array &$map){
 				continue;
 			}
 
-			$rowPlaceCount = floor(sqrt($hostsCount)) + 1;
-
 			if($selement['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
-				$w = $selement['width'];
-				$h = $selement['height'];
-				$originalX = $selement['x'];
-				$originalY = $selement['y'];
+				$area['width'] = $selement['width'];
+				$area['height'] = $selement['height'];
+				$area['x'] = $selement['x'];
+				$area['y'] = $selement['y'];
 			}
 			else{
-				$w = $map['width'];
-				$h = $map['height'];
-				$originalX = 0;
-				$originalY = 0;
+				$area['width'] = $map['width'];
+				$area['height'] = $map['height'];
+				$area['x'] = 0;
+				$area['y'] = 0;
 			}
-			$xOffset = floor($w / $rowPlaceCount);
-			$yOffset = floor($h / $rowPlaceCount);
 
-
-			$colNum = 0;
-			$rowNum = 0;
-			$newSelementIds = array();
 			foreach($hosts as $host){
 				$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_HOST;
 				$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
+				$selement['elementid'] = $host['hostid'];
 
 				do{
 					$newSelementid = rand(1, 9999999);
 				}while(isset($map['selements'][$newSelementid]));
-				$newSelementIds[] = $newSelementid;
-
 				$selement['selementid'] = $newSelementid;
-				$selement['elementid'] = $host['hostid'];
 
-				$selement['x'] = $originalX + ($colNum * $xOffset);
-				$selement['y'] = $originalY + ($rowNum * $yOffset);
-
+				$area['selementids'][$newSelementid] = $newSelementid;
 				$map['selements'][$newSelementid] = $selement;
+			}
 
-				$colNum++;
-				if($colNum == $rowPlaceCount){
-					$colNum = 0;
-					$rowNum++;
+			$areas[] = $area;
+
+
+			foreach($map['links'] as $link){
+				// don not multiply links between two areas
+				if(($map['selements'][$link['selementid1']]['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
+						&& ($map['selements'][$link['selementid2']]['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
+				){
+					continue;
 				}
 
+				$idNumber = null;
+				if($link['selementid1'] == $origSelement['selementid']){
+					$idNumber = 'selementid1';
+				}
+				elseif($link['selementid2'] == $origSelement['selementid']){
+					$idNumber = 'selementid2';
+				}
+
+				if($idNumber){
+					foreach($area['selementids'] as $newSelementid){
+						do{
+							$newLinkid = rand(1, 9999999);
+						}while(isset($map['links'][$newLinkid]));
+
+						$link['linkid'] = $newLinkid;
+						$link[$idNumber] = $newSelementid;
+						$map['links'][$newLinkid] = $link;
+					}
+				}
+			}
+		}
+	}
+
+	return $areas;
+}
+
+function processAreasCoordinates(array &$map, array $areas, array $map_info){
+	foreach($areas as $area){
+		$rowPlaceCount = floor(sqrt(count($area['selementids']))) + 1;
+
+		// offset from area borders
+		$area['x'] += 5;
+		$area['y'] += 5;
+		$area['width'] -= 5;
+		$area['height'] -= 5;
+
+		$xOffset = floor($area['width'] / $rowPlaceCount);
+		$yOffset = floor($area['height'] / $rowPlaceCount);
+
+		$colNum = 0;
+		$rowNum = 0;
+		foreach($area['selementids'] as $selementid){
+
+			$map['selements'][$selementid]['x'] = $area['x'] + ($colNum * $xOffset);
+			$map['selements'][$selementid]['y'] = $area['y'] + ($rowNum * $yOffset);
+
+			$colNum++;
+			if($colNum == $rowPlaceCount){
+				$colNum = 0;
+				$rowNum++;
 			}
 		}
 	}
