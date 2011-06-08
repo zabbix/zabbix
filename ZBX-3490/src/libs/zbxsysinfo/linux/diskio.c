@@ -227,8 +227,6 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 	else if (SUCCEED != get_kernel_devname(devname, kernel_devname, sizeof(kernel_devname)))
 		return SYSINFO_RET_FAIL;
 
-	fprintf(stderr, "devname:'%s' kernel_devname:'%s'\n", devname, kernel_devname);
-
 	if (NULL == (device = collector_diskdevice_get(kernel_devname)))
 	{
 		if (SUCCEED != get_diskstat(kernel_devname, dstats))
