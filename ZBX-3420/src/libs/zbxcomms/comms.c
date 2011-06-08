@@ -1121,7 +1121,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 
 	char		tmp[MAX_STRING_LEN], sname[MAX_STRING_LEN], *start = NULL, *end = NULL;
 
-	if (1 == allow_if_empty && (NULL == ip_list || '\0' == !*ip_list))
+	if (1 == allow_if_empty && (NULL == ip_list || '\0' == *ip_list))
 		return SUCCEED;
 
 	nlen = sizeof(name);
