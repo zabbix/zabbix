@@ -163,43 +163,6 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 #endif	/* HAVE_IPV6 */
 #endif	/* _WINDOWS */
 
-#if !defined(HAVE_IPV6)
-/******************************************************************************
- *                                                                            *
- * Function: zbx_gethost                                                      *
- *                                                                            *
- * Purpose: retrieve 'hostent' by host name and IP                            *
- *                                                                            *
- * Return value: hostent or NULL - an error occurred                          *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- ******************************************************************************/
-struct hostent	*zbx_gethost(const char *hostname)
-{
-	unsigned long	addr;
-	struct hostent	*host;
-
-	if (INADDR_NONE == (addr = inet_addr(hostname)))
-	{
-		if (NULL != (host = gethostbyname(hostname)))
-			return host;
-	}
-	else if (NULL != (host = gethostbyaddr((char *)&addr, 4, AF_INET)))
-	{
-		return host;
-	}
-
-#ifdef _WINDOWS
-	zbx_set_tcp_strerror("gethost() failed for address '%s': %s", hostname, strerror_from_system(WSAGetLastError()));
-#else
-	zbx_set_tcp_strerror("gethost() failed for address '%s': [%d] %s", hostname, h_errno, hstrerror(h_errno));
-#endif
-
-	return (struct hostent *)NULL;
-}
-#endif	/* HAVE_IPV6 */
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_start                                                    *
@@ -419,8 +382,15 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	zbx_tcp_clean(s);
 
-	if (NULL == (hp = zbx_gethost(ip)))
+	if (NULL == (hp = gethostbyname(ip)))
+	{
+#ifdef _WINDOWS
+		zbx_set_tcp_strerror("gethostbyname() failed for '%s': %s", ip, strerror_from_system(WSAGetLastError()));
+#else
+		zbx_set_tcp_strerror("gethostbyname() failed for '%s': [%d] %s", ip, h_errno, hstrerror(h_errno));
+#endif
 		return FAIL;
+	}
 
 	servaddr_in.sin_family		= AF_INET;
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
@@ -1150,17 +1120,14 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
 
-	char	tmp[MAX_STRING_LEN],
-		sname[MAX_STRING_LEN],
-		*start = NULL,
-		*end = NULL;
+	char	tmp[MAX_STRING_LEN], sname[MAX_STRING_LEN], *start = NULL, *end = NULL;
 
-	if( (1 == allow_if_empty) && ( !ip_list || !*ip_list ) )
-	{
+	if (1 == allow_if_empty && (NULL == ip_list || '\0' == !*ip_list))
 		return SUCCEED;
-	}
+
 	nlen = sizeof(name);
-	if( ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&name, &nlen))
+
+	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&name, &nlen))
 	{
 		zbx_set_tcp_strerror("Connection rejected. Getpeername failed [%s]", strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
@@ -1170,14 +1137,12 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #if !defined(HAVE_IPV6)
 		zbx_strlcpy(sname, inet_ntoa(name.sin_addr), sizeof(sname));
 
-		if(sscanf(sname, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]) != 4)
-		{
+		if (4 != sscanf(sname, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]))
 			return FAIL;
-		}
 #endif
 		strscpy(tmp,ip_list);
 
-		for (start = tmp; *start != '\0';)
+		for (start = tmp; '\0' != *start;)
 		{
 			if (NULL != (end = strchr(start, ',')))
 				*end = '\0';
@@ -1186,21 +1151,21 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #if defined(HAVE_IPV6)
 			memset(&hints, 0, sizeof(hints));
 			hints.ai_family = PF_UNSPEC;
-			if(0 == getaddrinfo(start, NULL, &hints, &ai))
+			if (0 == getaddrinfo(start, NULL, &hints, &ai))
 			{
-				if(ai->ai_family == name.ss_family)
+				if (ai->ai_family == name.ss_family)
 				{
-					switch(ai->ai_family)
+					switch (ai->ai_family)
 					{
 						case AF_INET  :
-							if(((struct sockaddr_in*)&name)->sin_addr.s_addr == ((struct sockaddr_in*)ai->ai_addr)->sin_addr.s_addr)
+							if (((struct sockaddr_in*)&name)->sin_addr.s_addr == ((struct sockaddr_in*)ai->ai_addr)->sin_addr.s_addr)
 							{
 								freeaddrinfo(ai);
 								return SUCCEED;
 							}
 							break;
 						case AF_INET6 :
-							if(0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr,
+							if (0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr,
 									((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr,
 									sizeof(struct in6_addr)))
 							{
@@ -1212,7 +1177,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 				}
 				else
 				{
-					switch(ai->ai_family)
+					switch (ai->ai_family)
 					{
 						case AF_INET  :
 							/* incoming AF_INET6, must see whether it is comp or mapped */
@@ -1241,15 +1206,14 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 				freeaddrinfo(ai);
 			}
 #else
-			if (0 != (hp = zbx_gethost(start)))
+			if (NULL != (hp = gethostbyname(start)))
 			{
 				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
-				if(sscanf(sip, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) == 4)
+
+				if (4 == sscanf(sip, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) &&
+						i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3])
 				{
-					if(i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3])
-					{
-						return SUCCEED;
-					}
+					return SUCCEED;
 				}
 			}
 #endif	/* HAVE_IPV6 */
@@ -1267,13 +1231,9 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	}
 #if defined(HAVE_IPV6)
 	if (0 == getnameinfo((struct sockaddr*)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
-	{
 		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s] ", sname, ip_list);
-	}
 	else
-	{
 		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s] ", ip_list);
-	}
 #else
 	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s] ", sname, ip_list);
 #endif

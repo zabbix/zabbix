@@ -60,10 +60,6 @@ zbx_sock_t;
 
 const char	*zbx_tcp_strerror();
 
-#if !defined(HAVE_IPV6)
-struct hostent	*zbx_gethost(const char *hostname);
-#endif
-
 #if !defined(_WINDOWS)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 #endif
