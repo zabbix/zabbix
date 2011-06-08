@@ -265,6 +265,16 @@
 					</td>
 				</tr>
 				<tr>
+					<td colspan="2">
+						<?php echo _('Selected elements'); ?>:
+						<div style="border: 1px dotted black; margin-bottom: 5px; height: 128px; overflow-y: scroll;">
+							<table class="tableinfo">
+								<tbody id="massList"></tbody>
+							</table>
+						</div>
+					</td>
+				</tr>
+				<tr>
 					<td>
 						<input type="checkbox" name="chkbox_label" id="chkboxLabel" class="checkbox" style="display: inline; ">
 						<label for="chkboxLabel"><?php echo _('Label'); ?></label>
@@ -324,11 +334,6 @@
 				</tbody>
 			</table>
 		</form>
-		<div style="max-height: 128px; overflow-y: auto;">
-			<table class="tableinfo">
-			<tbody id="massList"></tbody>
-			</table>
-		</div>
 	</div>
 </script>
 

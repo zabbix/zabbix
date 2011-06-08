@@ -619,6 +619,7 @@ function createMap(containerid, mapdata){
 		if(!selementData){
 			selementData = {
 				elementtype: '4', // image
+				elementid: 0,
 				iconid_off: this.sysmap.iconList[0].imageid, // first imageid
 				label: locale['S_NEW_ELEMENT'],
 				label_location: this.sysmap.data.label_location, // set default map label location
@@ -680,6 +681,7 @@ function createMap(containerid, mapdata){
 		},
 
 		update: function(data, unsetUndefined){
+
 			var	fieldName,
 				dataFelds = [
 					'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
@@ -767,7 +769,7 @@ function createMap(containerid, mapdata){
 			force = force || false;
 
 
-			if(!force && (this.sysmap.data.grid_align == '0')){
+			if((!force && (this.sysmap.data.grid_align == '0')) || ((this.data.elementsubtype === '1') && (this.data.areatype === '0'))){
 				if((x + dims.width) > this.sysmap.data.width){
 					this.data.x = this.sysmap.data.width - dims.width;
 				}
@@ -792,10 +794,10 @@ function createMap(containerid, mapdata){
 					newY -= gridSize;
 				}
 
-				while(newX < shiftX){
+				while(newX < 0){
 					newX += gridSize;
 				}
-				while(newY < shiftY){
+				while(newY < 0){
 					newY += gridSize;
 				}
 
