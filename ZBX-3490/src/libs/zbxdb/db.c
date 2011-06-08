@@ -46,13 +46,22 @@ static int	txn_init = 0;
  */
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
-	int	ret = ZBX_DB_OK;
+	int		ret = ZBX_DB_OK;
+#if defined(HAVE_IBM_DB2)
+	char		*connect = NULL;
+#elif defined(HAVE_ORACLE)
+	char		*connect = NULL;
+	sword		err = OCI_SUCCESS;
+#elif defined(HAVE_POSTGRESQL)
+	char		*cport = NULL;
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		sversion;
+#endif
 
 	txn_init = 1;
 
 #if defined(HAVE_IBM_DB2)
-	char	*connect = NULL;
-
 	connect = strdup("PROTOCOL=TCPIP;");
 	if (NULL != dbname && '\0' != *dbname)
 		connect = zbx_strdcatf(connect, "DATABASE=%s;", dbname);
@@ -80,7 +89,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 
 	/* connect to the database */
-	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLDriverConnect(ibm_db2.hdbc, NULL, connect, SQL_NTS,
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLDriverConnect(ibm_db2.hdbc, NULL, (SQLCHAR *)connect, SQL_NTS,
 								NULL, 0, NULL, SQL_DRIVER_NOPROMPT)))
 		ret = ZBX_DB_FAIL;
 
@@ -140,31 +149,28 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_FAIL == ret)
 	{
-		switch (mysql_errno(conn)) {
-		case CR_CONN_HOST_ERROR:
-		case CR_SERVER_GONE_ERROR:
-		case CR_CONNECTION_ERROR:
-		case CR_SERVER_LOST:
-		case ER_SERVER_SHUTDOWN:
-		case ER_ACCESS_DENIED_ERROR: /* wrong user or password */
-		case ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
-		case ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
-		case ER_UNKNOWN_ERROR:
-			ret = ZBX_DB_DOWN;
-			break;
-		default:
-			break;
+		switch (mysql_errno(conn))
+		{
+			case CR_CONN_HOST_ERROR:
+			case CR_SERVER_GONE_ERROR:
+			case CR_CONNECTION_ERROR:
+			case CR_SERVER_LOST:
+			case ER_SERVER_SHUTDOWN:
+			case ER_ACCESS_DENIED_ERROR:		/* wrong user or password */
+			case ER_ILLEGAL_GRANT_FOR_TABLE:	/* user without any privileges */
+			case ER_TABLEACCESS_DENIED_ERROR:	/* user without some privilege */
+			case ER_UNKNOWN_ERROR:
+				ret = ZBX_DB_DOWN;
+				break;
+			default:
+				break;
 		}
 	}
 #elif defined(HAVE_ORACLE)
-	char	*connect = NULL;
-	sword	err = OCI_SUCCESS;
-
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV)
 	if (NULL == getenv("NLS_LANG"))
 		putenv("NLS_LANG=.UTF8");
-#endif /* defined(HAVE_GETENV) && defined(HAVE_PUTENV) */
-
+#endif
 	memset(&oracle, 0, sizeof(oracle));
 
 	/* connection string format: [//]host[:port][/service name] */
@@ -232,20 +238,15 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK != ret)
 		zbx_db_close();
 #elif defined(HAVE_POSTGRESQL)
-	char		*cport = NULL;
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		sversion;
-
 	if (0 != port)
-		cport = zbx_dsprintf(cport, "%i", port);
+		cport = zbx_dsprintf(cport, "%d", port);
 
 	conn = PQsetdbLogin(host, cport, NULL, NULL, dbname, user, password);
 
 	zbx_free(cport);
 
 	/* check to see that the backend connection was successfully made */
-	if (PQstatus(conn) != CONNECTION_OK)
+	if (CONNECTION_OK != PQstatus(conn))
 	{
 		zabbix_errlog(ERR_Z3001, dbname, 0, PQerrorMessage(conn));
 		ret = ZBX_DB_DOWN;
@@ -265,7 +266,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", sversion);
 #else
 	sversion = 0;
-#endif	/* HAVE_FUNCTION_PQSERVERVERSION */
+#endif
 
 	if (sversion >= 80100)
 	{
@@ -277,7 +278,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (SQLITE_OK != (ret = sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL)))
 #else
 	if (SQLITE_OK != (ret = sqlite3_open(dbname, &conn)))
-#endif	/* HAVE_FUNCTION_SQLITE3_OPEN_V2 */
+#endif
 	{
 		zabbix_errlog(ERR_Z3001, dbname, 0, sqlite3_errmsg(conn));
 		sqlite3_close(conn);
@@ -287,8 +288,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		char	*p, *path;
 
-		/* Do not return SQLITE_BUSY immediately, wait for N ms */
-		sqlite3_busy_timeout(conn, 60 * 1000);
+		/* do not return SQLITE_BUSY immediately, wait for N ms */
+		sqlite3_busy_timeout(conn, SEC_PER_MIN * 1000);
 
 		path = strdup(dbname);
 		if (NULL != (p = strrchr(path, '/')))
@@ -303,6 +304,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zbx_free(path);
 	}
 #endif	/* HAVE_SQLITE3 */
+
 	txn_init = 0;
 
 	return ret;
@@ -608,6 +610,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	int		status;
 #elif defined(HAVE_ORACLE)
 	OCIStmt		*stmthp = NULL;
+	sword		err = OCI_SUCCESS;
 #elif defined(HAVE_POSTGRESQL)
 	PGresult	*result;
 	char		*error = NULL;
@@ -716,8 +719,6 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		}
 	}
 #elif defined(HAVE_ORACLE)
-	sword err = OCI_SUCCESS;
-
 	err = OCIHandleAlloc( (dvoid *) oracle.envhp, (dvoid **) &stmthp,
 		OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0);
 
