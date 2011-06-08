@@ -2214,7 +2214,15 @@ function populateFromMapAreas(array &$map){
 	return $areas;
 }
 
-function processAreasCoordinates(array &$map, array $areas, array $map_info){
+/**
+ * Calculates coordinates from elements inside areas
+ *
+ * @param array $map
+ * @param array $areas
+ * @param array $mapInfo
+ * @return void
+ */
+function processAreasCoordinates(array &$map, array $areas, array $mapInfo){
 	foreach($areas as $area){
 		$rowPlaceCount = floor(sqrt(count($area['selementids']))) + 1;
 
@@ -2230,9 +2238,35 @@ function processAreasCoordinates(array &$map, array $areas, array $map_info){
 		$colNum = 0;
 		$rowNum = 0;
 		foreach($area['selementids'] as $selementid){
+			$selement = $map['selements'][$selementid];
 
-			$map['selements'][$selementid]['x'] = $area['x'] + ($colNum * $xOffset);
-			$map['selements'][$selementid]['y'] = $area['y'] + ($rowNum * $yOffset);
+			$image = get_png_by_selement($selement, $mapInfo[$selementid]);
+			$iconX = imagesx($image);
+			$iconY = imagesy($image);
+
+			$label_location = (is_null($selement['label_location']) || ($selement['label_location'] < 0))
+					? $map['label_location'] : $selement['label_location'];
+			switch($label_location){
+				case MAP_LABEL_LOC_TOP:
+					$newX = $area['x'] + ($xOffset / 2) - ($iconX / 2);
+					$newY = $area['y'] + $yOffset - $iconY;
+					break;
+				case MAP_LABEL_LOC_LEFT:
+					$newX = $area['x'] + $xOffset - $iconX;
+					$newY = $area['y'] + ($yOffset / 2) - ($iconY / 2);
+					break;
+				case MAP_LABEL_LOC_RIGHT:
+					$newX = $area['x'];
+					$newY = $area['y'] + ($yOffset / 2) - ($iconY / 2);
+					break;
+				case MAP_LABEL_LOC_BOTTOM:
+					$newX = $area['x'] + ($xOffset / 2) - ($iconX / 2);
+					$newY = $area['y'];
+					break;
+			}
+
+			$map['selements'][$selementid]['x'] = $newX + ($colNum * $xOffset);
+			$map['selements'][$selementid]['y'] = $newY + ($rowNum * $yOffset);
 
 			$colNum++;
 			if($colNum == $rowPlaceCount){

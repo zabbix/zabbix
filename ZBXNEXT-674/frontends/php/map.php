@@ -198,11 +198,9 @@ class CMapPainter{
 	}
 
 	protected function paintBackground(){
+		$this->canvas->fill($this->options['map']['bgColor']);
 		if($this->mapData['backgroundid'] && ($bgImage = get_image_by_imageid($this->mapData['backgroundid']))){
-			$this->canvas->setBgImage($bgImage);
-		}
-		else{
-			$this->canvas->fill($this->options['map']['bgColor']);
+			$this->canvas->setBgImage($bgImage['image']);
 		}
 	}
 
@@ -313,15 +311,17 @@ if(get_request('nocalculations', false)){
 			'name' => $selement['label']
 		);
 	}
+	$allLinks = true;
 }
 else{
 	$areas = populateFromMapAreas($map);
 	$map_info = getSelementsInfo($map);
 	processAreasCoordinates($map, $areas, $map_info);
+	$allLinks = false;
 }
 
 // Draw MAP
-drawMapConnectors($im, $map, $map_info, true);
+drawMapConnectors($im, $map, $map_info, $allLinks);
 
 if(!isset($_REQUEST['noselements'])){
 	drawMapHighligts($im, $map, $map_info);
