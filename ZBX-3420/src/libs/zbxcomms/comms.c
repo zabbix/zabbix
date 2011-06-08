@@ -380,10 +380,12 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (NULL == (hp = gethostbyname(ip)))
 	{
-#ifdef _WINDOWS
+#if defined(_WINDOWS)
 		zbx_set_tcp_strerror("gethostbyname() failed for '%s': %s", ip, strerror_from_system(WSAGetLastError()));
-#else
+#elif defined(HAVE_HSTRERROR)
 		zbx_set_tcp_strerror("gethostbyname() failed for '%s': [%d] %s", ip, h_errno, hstrerror(h_errno));
+#else
+		zbx_set_tcp_strerror("gethostbyname() failed for '%s': [%d]", ip, h_errno);
 #endif
 		return FAIL;
 	}
