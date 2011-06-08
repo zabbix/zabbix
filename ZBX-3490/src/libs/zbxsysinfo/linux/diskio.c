@@ -83,8 +83,10 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 
 	if ('\0' != *devname)
 	{
-		zbx_strlcpy(dev_path, ZBX_DEV_PFX, MAX_STRING_LEN);
-		zbx_strlcat(dev_path, devname, MAX_STRING_LEN);
+		*dev_path = '\0';
+		if (0 != strncmp(devname, ZBX_DEV_PFX, sizeof(ZBX_DEV_PFX) - 1))
+			strscpy(dev_path, ZBX_DEV_PFX);
+		strscat(dev_path, devname);
 
 		if (zbx_stat(dev_path, &dev_st) == 0)
 			dev_exists = SUCCEED;
@@ -120,7 +122,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
  *           LVM device which is listed in kernel device mapper.              *
  *                                                                            *
  ******************************************************************************/
-static int	get_kernel_devname(const char *devname, char *kernel_devname)
+static int	get_kernel_devname(const char *devname, char *kernel_devname, size_t max_kernel_devname_len)
 {
 	FILE		*f;
 	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN], dev_path[MAX_STRING_LEN];
@@ -133,8 +135,10 @@ static int	get_kernel_devname(const char *devname, char *kernel_devname)
 	if ('\0' == *devname)
 		return ret;
 
-	zbx_strlcpy(dev_path, ZBX_DEV_PFX, MAX_STRING_LEN);
-	zbx_strlcat(dev_path, devname, MAX_STRING_LEN);
+	*dev_path = '\0';
+	if (0 != strncmp(devname, ZBX_DEV_PFX, sizeof(ZBX_DEV_PFX) - 1))
+		strscpy(dev_path, ZBX_DEV_PFX);
+	strscat(dev_path, devname);
 
 	if (zbx_stat(dev_path, &dev_st) < 0 || NULL == (f = fopen(INFO_FILE_NAME, "r")))
 		return ret;
@@ -145,7 +149,7 @@ static int	get_kernel_devname(const char *devname, char *kernel_devname)
 		if (major(dev_st.st_rdev) != rdev_major || minor(dev_st.st_rdev) != rdev_minor)
 			continue;
 
-		zbx_strlcpy(kernel_devname, name, MAX_STRING_LEN);
+		zbx_strlcpy(kernel_devname, name, max_kernel_devname_len);
 		ret = SUCCEED;
 		break;
 	}
@@ -220,8 +224,10 @@ static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 
 	if ('\0' == *devname)
 		*kernel_devname = '\0';
-	else if (SUCCEED != get_kernel_devname(devname, kernel_devname))
+	else if (SUCCEED != get_kernel_devname(devname, kernel_devname, sizeof(kernel_devname)))
 		return SYSINFO_RET_FAIL;
+
+	fprintf(stderr, "devname:'%s' kernel_devname:'%s'\n", devname, kernel_devname);
 
 	if (NULL == (device = collector_diskdevice_get(kernel_devname)))
 	{
