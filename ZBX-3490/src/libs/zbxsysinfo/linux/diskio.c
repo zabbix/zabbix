@@ -97,7 +97,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	{
 		PARSE(tmp);
 		if ('\0' != *devname && 0 != strcmp(name, devname))
-			if (FAIL == dev_exists || major(dev_st.st_rdev) != rdev_major || minor(dev_st.st_rdev) != rdev_minor)
+			if (SUCCEED != dev_exists || major(dev_st.st_rdev) != rdev_major || minor(dev_st.st_rdev) != rdev_minor)
 				continue;
 
 		dstat[ZBX_DSTAT_R_OPER] += ds[ZBX_DSTAT_R_OPER];
@@ -154,15 +154,14 @@ static int	get_kernel_devname(const char *devname, char *kernel_devname)
 	return ret;
 }
 
-static int	vfs_dev_rw(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, int rw)
+static int	vfs_dev_rw(const char *param, AGENT_RESULT *result, int rw)
 {
 	ZBX_SINGLE_DISKDEVICE_DATA	*device;
 	char				devname[MAX_STRING_LEN], tmp[16], kernel_devname[MAX_STRING_LEN];
 	int				type, mode, nparam;
 	zbx_uint64_t			dstats[ZBX_DSTAT_MAX];
 
-	nparam = num_param(param);
-	if (nparam > 3)
+	if (3 < (nparam = num_param(param)))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, devname, sizeof(devname)))
@@ -190,13 +189,13 @@ static int	vfs_dev_rw(const char *cmd, const char *param, unsigned flags, AGENT_
 		if (nparam > 2)
 			return SYSINFO_RET_FAIL;
 
-		if (FAIL == get_diskstat(devname, dstats))
+		if (SUCCEED != get_diskstat(devname, dstats))
 			return SYSINFO_RET_FAIL;
 
-		if (type == ZBX_DSTAT_TYPE_SECT)
-			SET_UI64_RESULT(result, (ZBX_DEV_READ == rw ? dstats[ZBX_DSTAT_R_SECT] : dstats[ZBX_DSTAT_W_SECT]));
-		else	/* ZBX_DSTAT_TYPE_OPER */
-			SET_UI64_RESULT(result, (ZBX_DEV_READ == rw ? dstats[ZBX_DSTAT_R_OPER] : dstats[ZBX_DSTAT_W_OPER]));
+		if (ZBX_DSTAT_TYPE_SECT == type)
+			SET_UI64_RESULT(result, dstats[(ZBX_DEV_READ == rw ? ZBX_DSTAT_R_SECT : ZBX_DSTAT_W_SECT)]);
+		else
+			SET_UI64_RESULT(result, dstats[(ZBX_DEV_READ == rw ? ZBX_DSTAT_R_OPER : ZBX_DSTAT_W_OPER)]);
 
 		return SYSINFO_RET_OK;
 	}
@@ -221,21 +220,21 @@ static int	vfs_dev_rw(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if ('\0' == *devname)
 		*kernel_devname = '\0';
-	else if (FAIL == get_kernel_devname(devname, kernel_devname))
+	else if (SUCCEED != get_kernel_devname(devname, kernel_devname))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == (device = collector_diskdevice_get(kernel_devname)))
 	{
-		if (FAIL == get_diskstat(kernel_devname, dstats))
+		if (SUCCEED != get_diskstat(kernel_devname, dstats))
 			return SYSINFO_RET_FAIL;
 
 		if (NULL == (device = collector_diskdevice_add(kernel_devname)))
 			return SYSINFO_RET_FAIL;
 	}
 
-	if (type == ZBX_DSTAT_TYPE_SPS)	/* default parameter */
+	if (ZBX_DSTAT_TYPE_SPS == type)
 		SET_DBL_RESULT(result, (ZBX_DEV_READ == rw ? device->r_sps[mode] : device->w_sps[mode]));
-	else if (type == ZBX_DSTAT_TYPE_OPS)
+	else
 		SET_DBL_RESULT(result, (ZBX_DEV_READ == rw ? device->r_ops[mode] : device->w_ops[mode]));
 
 	return SYSINFO_RET_OK;
@@ -243,9 +242,10 @@ static int	vfs_dev_rw(const char *cmd, const char *param, unsigned flags, AGENT_
 
 int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return vfs_dev_rw(cmd, param, flags, result, ZBX_DEV_READ);
+	return vfs_dev_rw(param, result, ZBX_DEV_READ);
 }
+
 int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return vfs_dev_rw(cmd, param, flags, result, ZBX_DEV_WRITE);
+	return vfs_dev_rw(param, result, ZBX_DEV_WRITE);
 }
