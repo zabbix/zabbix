@@ -165,6 +165,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3490] added support for LVM devices and full path to devices to vfs.dev.read and vfs.dev.write; thanks to Takanori Suzuki (dimir, sasha)
  - [ZBX-3862] fixed broken popups in frontend in Internet Explorer 7 (KB)
  - [ZBX-3463] fixed MaxHousekeeperDelete configuration parameter being ignored for IBM DB2 (asaveljevs)
  - [ZBX-3854] added saving of state of dynamic/fixed setting for time lines on all pages (KB)
