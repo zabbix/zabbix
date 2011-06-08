@@ -1313,10 +1313,12 @@ function createMap(containerid, mapdata){
 
 		show: function(){
 			this.domNode.toggle(true);
+			jQuery('#elementApply, #elementRemove, #elementClose').button('disable');
 		},
 
 		hide: function(){
 			this.domNode.toggle(false);
+			jQuery('#elementApply, #elementRemove, #elementClose').button('enable');
 		},
 
 		getValues: function(){
