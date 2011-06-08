@@ -58,27 +58,28 @@ require_once('include/js.inc.php');
 			return S_UNKNOW;
 	}
 
-	function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
+	function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$sort_triggers,$valign,$halign,$style,$url,$dynamic){
 		$sql='DELETE FROM screens_items WHERE screenid='.$screenid.' and x='.$x.' and y='.$y;
 		DBexecute($sql);
 
 		$screenitemid=get_dbid("screens_items","screenitemid");
 		$result=DBexecute('INSERT INTO screens_items '.
 							'(screenitemid,resourcetype,screenid,x,y,resourceid,width,height,'.
-							' colspan,rowspan,elements,valign,halign,style,url,dynamic) '.
+							' colspan,rowspan,elements,valign,halign,style,url,dynamic,sort_triggers) '.
 						' VALUES '.
 							"($screenitemid,$resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,".
-							"$rowspan,$elements,$valign,$halign,$style,".zbx_dbstr($url).",$dynamic)");
+							"$rowspan,$elements,$valign,$halign,$style,".zbx_dbstr($url).",$dynamic,$sort_triggers)");
 
 		if(!$result) return $result;
 	return $screenitemid;
 	}
 
-	function update_screen_item($screenitemid,$resourcetype,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
+	function update_screen_item($screenitemid,$resourcetype,$resourceid,$width,$height,$colspan,$rowspan,$elements,$sort_triggers,$valign,$halign,$style,$url,$dynamic){
 		return  DBexecute("UPDATE screens_items SET ".
 							"resourcetype=$resourcetype,"."resourceid=$resourceid,"."width=$width,".
 							"height=$height,colspan=$colspan,rowspan=$rowspan,elements=$elements,".
-							"valign=$valign,halign=$halign,style=$style,url=".zbx_dbstr($url).",dynamic=$dynamic".
+							"valign=$valign,halign=$halign,style=$style,url=".zbx_dbstr($url).",".
+							"dynamic=$dynamic,sort_triggers=$sort_triggers".
 						" WHERE screenitemid=$screenitemid");
 	}
 
@@ -454,6 +455,7 @@ require_once('include/js.inc.php');
 			$style		= $screenItem['style'];
 			$url		= $screenItem['url'];
 			$dynamic	= $screenItem['dynamic'];
+			$sort_triggers  = $screenItem['sort_triggers'];
 		}
 		else{
 			$resourcetype	= get_request('resourcetype',	0);
@@ -468,6 +470,7 @@ require_once('include/js.inc.php');
 			$style		= get_request('style',		0);
 			$url		= get_request('url',		'');
 			$dynamic	= get_request('dynamic',	SCREEN_SIMPLE_ITEM);
+			$sort_triggers  = get_request('sort_triggers',  SCREEN_SORT_TRIGGERS_DATE_DESC);
 		}
 
 		$form->addVar('screenid',$_REQUEST['screenid']);
@@ -656,7 +659,7 @@ require_once('include/js.inc.php');
 			$form->addRow(S_SHOW_TEXT_AS_HTML, new CCheckBox('style', $style, null, 1));
 		}
 		else if(in_array($resourcetype, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,SCREEN_RESOURCE_HOST_TRIGGERS))){
-// Status of triggers
+			// Status of triggers
 			$caption = '';
 			$id=0;
 
@@ -705,7 +708,22 @@ require_once('include/js.inc.php');
 				$form->addRow(S_HOST,array($textfield,SPACE,$selectbtn));
 			}
 
+			// text box to choose number of lines shown
 			$form->addRow(S_SHOW_LINES, new CNumericBox('elements', $elements, 2));
+			// combobox to choose trigger sort order
+			$form->addRow(
+				_('Sort triggers by'),
+				new CComboBox(
+					'sort_triggers',
+					$sort_triggers,
+					null,
+					array(
+						SCREEN_SORT_TRIGGERS_DATE_DESC => _('date (descending)'),
+						SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('severity (descending)'),
+						SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('host name (ascending)')
+					)
+				)
+			);
 		}
 		else if(in_array($resourcetype, array(SCREEN_RESOURCE_EVENTS, SCREEN_RESOURCE_ACTIONS))){
 // History of actions
@@ -1398,7 +1416,7 @@ require_once('include/js.inc.php');
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 ///-----------------------
 				}
-				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOST_TRIGGERS)){
+				else if($screenitemid!=0 && $resourcetype==SCREEN_RESOURCE_HOST_TRIGGERS){
 					$params = array(
 						'groupids' => null,
 						'hostids' => null,
