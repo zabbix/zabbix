@@ -250,10 +250,10 @@ static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
 #if defined(_WINDOWS)
 	timeout *= 1000;
 
-	if (setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+	if (ZBX_TCP_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)))
 		zbx_set_tcp_strerror("setsockopt() failed: %s", strerror_from_system(zbx_sock_last_error()));
 
-	if (setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+	if (ZBX_TCP_ERROR == setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)))
 		zbx_set_tcp_strerror("setsockopt() failed: %s", strerror_from_system(zbx_sock_last_error()));
 #else
 	alarm(timeout);
@@ -1230,11 +1230,11 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	}
 #if defined(HAVE_IPV6)
 	if (0 == getnameinfo((struct sockaddr*)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
-		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s] ", sname, ip_list);
+		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s]", sname, ip_list);
 	else
-		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s] ", ip_list);
+		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s]", ip_list);
 #else
-	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s] ", sname, ip_list);
+	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s]", sname, ip_list);
 #endif
 	return	FAIL;
 }
