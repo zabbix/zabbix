@@ -38,7 +38,7 @@
  *          Use this function instead of system fork function!                *
  *                                                                            *
  ******************************************************************************/
-#ifndef _WINDOWS
+#if !defined(_WINDOWS)
 int	zbx_fork()
 {
 	fflush(stdout);

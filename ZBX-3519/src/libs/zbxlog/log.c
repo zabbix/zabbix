@@ -38,7 +38,7 @@ static int		log_level = LOG_LEVEL_WARNING;
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS)
 void	redirect_std(const char *filename)
 {
 	int		fd;
