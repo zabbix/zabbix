@@ -19,6 +19,17 @@
 **/
 ?>
 <?php
+header('Access-Control-Allow-Origin: *');
+if($_SERVER['REQUEST_METHOD'] == "OPTIONS"){
+	header('Access-Control-Allow-Methods: POST, OPTIONS');
+	header('Access-Control-Allow-Headers: Content-Type');
+	header('Access-Control-Allow-Credentials: false');
+	header('Access-Control-Max-Age: 1728000'); // 20 days
+	header('Content-Length: 0');
+	header('Content-Type: text/plain');
+	exit();
+}
+
 define('ZBX_RPC_REQUEST', 1);
 require_once('include/config.inc.php');
 
