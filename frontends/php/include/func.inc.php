@@ -257,57 +257,16 @@ return $output;
  *
  * author: Aly
  */
-function zbx_date2age($start_date,$end_date=0,$utime = false){
-
+function zbx_date2age($start_date, $end_date = 0, $utime = false){
 	if(!$utime){
-		$start_date=date('U',$start_date);
+		$start_date = date('U', $start_date);
 		if($end_date)
-			$end_date=date('U',$end_date);
+			$end_date = date('U', $end_date);
 		else
 			$end_date = time();
 	}
 
-	$original_time = $time = abs($end_date-$start_date);
-
-	$years = (int) ($time / (365*86400));
-	$time -= $years*365*86400;
-
-	$months = 0;
-	$months = (int ) ($time / (30*86400));
-	$time -= $months*30*86400;
-
-	$weeks = (int ) ($time / (7*86400));
-	$time -= $weeks*7*86400;
-
-	$days = (int) ($time / 86400);
-	$time -= $days*86400;
-
-	$hours = (int) ($time / 3600);
-	$time -= $hours*3600;
-
-	$minutes = (int) ($time / 60);
-	$time -= $minutes*60;
-
-	if($time >= 1){
-		$seconds = round($time,2);
-		$ms = 0;
-	}
-	else{
-		$seconds = 0;
-		$ms = round($time,3) * 1000;
-	}
-
-	$str =  (($years)?$years.S_YEAR_SHORT.' ':'').
-			(($months)?$months.S_MONTH_SHORT.' ':'').
-			(($weeks)?$weeks.S_WEEK_SHORT.' ':'').
-			(($days && !$years)?$days.S_DAY_SHORT.' ':'').
-			(($hours && !$years && !$months)?$hours.S_HOUR_SHORT.' ':'').
-			(($minutes && !$years && !$months && !$weeks)?$minutes.S_MINUTE_SHORT.' ':'').
-			((!$years && !$months && !$weeks && !$days && ($ms || $seconds))?$seconds.S_SECOND_SHORT.' ':'').
-			((($ms && !$years && !$months && !$weeks && !$days && !$hours) || $original_time == 0) ?$ms.S_MILLISECOND_SHORT:'').
-			((!$ms && ($original_time > 0) && ($original_time < 0.001)) ? '< 1'.S_MILLISECOND_SHORT:'');
-
-return trim($str,' ');
+	return convertUnitsS(abs($end_date - $start_date));
 }
 
 function getmicrotime(){
@@ -411,21 +370,103 @@ function mem2str($size){
 	return round($size, 6).$prefix;
 }
 
+function convertUnitsUptime($value){
+	if(($secs = round($value)) < 0){
+		$value = '-';
+		$secs = -$secs;
+	}
+	else
+		$value = '';
+
+	$days = floor($secs / SEC_PER_DAY);
+	$secs -= $days * SEC_PER_DAY;
+
+	$hours = floor($secs / SEC_PER_HOUR);
+	$secs -= $hours * SEC_PER_HOUR;
+
+	$mins = floor($secs / SEC_PER_MIN);
+	$secs -= $mins * SEC_PER_MIN;
+
+	if($days != 0)
+		$value .= _n('%1$d day, ', '%1$d days, ', $days);
+	$value .= sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
+
+	return $value;
+}
+
+function convertUnitsS($value){
+	if(floor(abs($value) * 1000) == 0){
+		$value = ($value == 0 ? '0'._('s') : '< 1'._('ms'));
+		return $value;
+	}
+
+	if(($secs = round($value * 1000) / 1000) < 0){
+		$value = '-';
+		$secs = -$secs;
+	}
+	else
+		$value = '';
+	$n_unit = 0;
+
+	if(($n = floor($secs / SEC_PER_YEAR)) != 0){
+		$value .= $n._('y').' ';
+		$secs -= $n * SEC_PER_YEAR;
+		if (0 == $n_unit)
+			$n_unit = 4;
+	}
+
+	if(($n = floor($secs / SEC_PER_MONTH)) != 0){
+		$value .= $n._('m').' ';
+		$secs -= $n * SEC_PER_MONTH;
+		if (0 == $n_unit)
+			$n_unit = 3;
+	}
+
+	if(($n = floor($secs / SEC_PER_DAY)) != 0){
+		$value .= $n._('d').' ';
+		$secs -= $n * SEC_PER_DAY;
+		if (0 == $n_unit)
+			$n_unit = 2;
+	}
+
+	if($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0){
+		$value .= $n._('h').' ';
+		$secs -= $n * SEC_PER_HOUR;
+		if (0 == $n_unit)
+			$n_unit = 1;
+	}
+
+	if($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0){
+		$value .= $n._('m').' ';
+		$secs -= $n * SEC_PER_MIN;
+	}
+
+	if($n_unit < 2 && ($n = floor($secs)) != 0){
+		$value .= $n._('s').' ';
+		$secs -= $n;
+	}
+
+	if($n_unit < 1 && ($n = round($secs * 1000)) != 0)
+		$value .= $n._('ms');
+
+	return rtrim($value);
+}
+
 // convert:
 function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 
 // Special processing for unix timestamps
-	if($units=='unixtime'){
+	if($units == 'unixtime'){
 		$ret=zbx_date2str(S_FUNCT_UNIXTIMESTAMP_DATE_FORMAT,$value);
 		return $ret;
 	}
 //Special processing of uptime
-	if($units=='uptime'){
-		return zbx_date2age(time() - $value);
+	if($units == 'uptime'){
+		return convertUnitsUptime($value);
 	}
 // Special processing for seconds
-	if($units=='s'){
-		return zbx_date2age(0,$value,true);
+	if($units == 's'){
+		return convertUnitsS($value);
 	}
 
 // Any other unit
