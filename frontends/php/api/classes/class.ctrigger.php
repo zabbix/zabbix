@@ -49,8 +49,11 @@ class CTrigger extends CZBXAPI{
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('triggerid', 'description', 'status', 'priority', 'lastchange'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('triggerid', 'description', 'status', 'priority', 'lastchange', 'hostname');
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+
 		$fields_to_unset = array();
 
 		$sql_parts = array(
@@ -566,17 +569,33 @@ class CTrigger extends CZBXAPI{
 			}
 		}
 
-// order
+// orderhosts
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
 		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+			$sortorder = $options['sortorder'] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
-			$sql_parts['order'][] = 't.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('t.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 't.'.$options['sortfield'];
+			// sorting by host name is a special case
+			if($options['sortfield'] == 'hostname'){
+				// the only way to sort by host name is to get it like this:
+				// triggers -> functions -> items -> hosts
+				$sql_parts['from']['functions'] = 'functions f';
+				$sql_parts['from']['items'] = 'items i';
+				$sql_parts['from']['hosts'] = 'hosts h';
+				$sql_parts['where'][] = 'f.triggerid = t.triggerid';
+				$sql_parts['where'][] = 'f.itemid = i.itemid';
+				$sql_parts['where'][] = 'i.hostid = h.hostid';
+				$order = 'h.name '.$sortorder;
 			}
+			else{
+				$order = 't.'.$options['sortfield'].' '.$sortorder;
+
+				if(!str_in_array('t.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])){
+					$sql_parts['select'][] = 't.'.$options['sortfield'];
+				}
+			}
+			// if lastchange is not used for ordering, it should be the second order criteria
+			$sql_parts['order'][] = $options['sortfield'] == 'lastchange' ? $order : $order.', lastchange DESC';
 		}
 
 // limit
@@ -611,7 +630,7 @@ class CTrigger extends CZBXAPI{
 					$sql_where.
 				$sql_group.
 				$sql_order;
-//SDI($sql);
+
 		$db_res = DBselect($sql, $sql_limit);
 		while($trigger = DBfetch($db_res)){
 			if(!is_null($options['countOutput'])){
