@@ -38,8 +38,8 @@ static int		log_level = LOG_LEVEL_WARNING;
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
-#if !defined(_WINDOWS)
-void redirect_std(const char *filename)
+#ifndef _WINDOWS
+void	redirect_std(const char *filename)
 {
 	int		fd;
 	const char	default_file[] = "/dev/null";
@@ -49,7 +49,7 @@ void redirect_std(const char *filename)
 	close(STDIN_FILENO);
 	open(default_file, O_RDONLY);	/* stdin, normally fd==0 */
 
-	if (filename && *filename)
+	if (NULL != filename && '\0' != *filename)
 	{
 		out_file = filename;
 		open_flags |= O_CREAT | O_APPEND;
@@ -293,7 +293,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 				break;
 		}
 
-		zbx_wsnprintf(thread_id, sizeof(thread_id)/sizeof(wchar_t), TEXT("[%li]: "), zbx_get_thread_id());
+		zbx_wsnprintf(thread_id, sizeof(thread_id) / sizeof(wchar_t), TEXT("[%li]: "), zbx_get_thread_id());
 		strings[0] = thread_id;
 		strings[1] = zbx_utf8_to_unicode(message);
 

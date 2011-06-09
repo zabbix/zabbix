@@ -21,7 +21,6 @@
 #include "sysinfo.h"
 
 #include "log.h"
-#include "threads.h"
 
 #include "file.h"
 #include "http.h"
@@ -156,11 +155,11 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
-	if ('\0' == *cmd_result)	/* we got whitespace only */
-		goto lbl_exit;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...",
 			param, strlen(cmd_result), cmd_result);
+
+	if ('\0' == *cmd_result)	/* we got whitespace only */
+		goto lbl_exit;
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
 
