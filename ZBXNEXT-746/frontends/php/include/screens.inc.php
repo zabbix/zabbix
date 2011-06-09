@@ -718,7 +718,7 @@ require_once('include/js.inc.php');
 					$sort_triggers,
 					null,
 					array(
-						SCREEN_SORT_TRIGGERS_DATE_DESC => _('date (descending)'),
+						SCREEN_SORT_TRIGGERS_DATE_DESC => _('last change (descending)'),
 						SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('severity (descending)'),
 						SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('host name (ascending)')
 					)
@@ -1007,6 +1007,7 @@ require_once('include/js.inc.php');
 					$style		= $screenItem['style'];
 					$url		= $screenItem['url'];
 					$dynamic	= $screenItem['dynamic'];
+					$sort_triggers = $screenItem['sort_triggers'];
 				}
 				else{
 					$screenitemid	= 0;
@@ -1022,6 +1023,7 @@ require_once('include/js.inc.php');
 					$style		= 0;
 					$url		= '';
 					$dynamic	= 0;
+					$sort_triggers = SCREEN_SORT_TRIGGERS_DATE_DESC;
 				}
 
 				if($screenitemid>0){
@@ -1334,6 +1336,7 @@ require_once('include/js.inc.php');
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOSTGROUP_TRIGGERS)){
+
 					$params = array(
 						'groupids' => null,
 						'hostids' => null,
@@ -1341,6 +1344,20 @@ require_once('include/js.inc.php');
 						'severity' => null,
 						'limit' => $elements
 					);
+
+					// by default triggers are sorted by date desc, do we need to override this?
+					switch($sort_triggers){
+						case SCREEN_SORT_TRIGGERS_SEVERITY_DESC:
+							$params['sortfield'] = 'priority';
+							$params['sortorder'] = ZBX_SORT_DOWN;
+						break;
+						case SCREEN_SORT_TRIGGERS_HOST_NAME_ASC:
+							// a little black magic here - there is no such field 'hostname' in 'triggers',
+							// but API has a special case for sorting by hostname
+							$params['sortfield'] = 'hostname';
+							$params['sortorder'] = ZBX_SORT_UP;
+						break;
+					}
 
 					$tr_form = S_ALL_S;
 					if($resourceid > 0){
@@ -1424,6 +1441,21 @@ require_once('include/js.inc.php');
 						'severity' => null,
 						'limit' => $elements
 					);
+
+					// by default triggers are sorted by date desc, do we need to override this?
+					switch($sort_triggers){
+						case SCREEN_SORT_TRIGGERS_SEVERITY_DESC:
+							$params['sortfield'] = 'priority';
+							$params['sortorder'] = ZBX_SORT_DOWN;
+						break;
+						case SCREEN_SORT_TRIGGERS_HOST_NAME_ASC:
+							// a little black magic here - there is no such field 'hostname' in 'triggers',
+							// but API has a special case for sorting by hostname
+							$params['sortfield'] = 'hostname';
+							$params['sortorder'] = ZBX_SORT_UP;
+						break;
+					}
+
 					$tr_form = S_ALL_S;
 
 					if($resourceid > 0){
