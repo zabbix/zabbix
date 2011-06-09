@@ -582,7 +582,7 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['from']['functions'] = 'functions f';
 				$sql_parts['from']['items'] = 'items i';
 				$sql_parts['from']['hosts'] = 'hosts h';
-				$sql_parts['where'][] = 'f.triggerid = t.triggerid';
+				$sql_parts['where'][] = 't.triggerid = f.triggerid';
 				$sql_parts['where'][] = 'f.itemid = i.itemid';
 				$sql_parts['where'][] = 'i.hostid = h.hostid';
 				$order = 'h.name '.$sortorder;
