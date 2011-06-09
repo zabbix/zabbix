@@ -977,7 +977,7 @@ Copt::memoryPick();
 			}
 
 			if(!empty($functionids)){
-				$sql = 'SELECT DISTINCT f.triggerid, f.functionid, h.host, host.name, i.lastvalue'.
+				$sql = 'SELECT DISTINCT f.triggerid, f.functionid, h.host, h.name, i.lastvalue'.
 						' FROM functions f,items i,hosts h'.
 						' WHERE f.itemid=i.itemid'.
 							' AND i.hostid=h.hostid'.
