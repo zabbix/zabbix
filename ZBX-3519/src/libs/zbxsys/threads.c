@@ -66,7 +66,6 @@ int	zbx_fork()
  ******************************************************************************/
 ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args)
 {
-	const char		*__function_name = "zbx_thread_start";
 	ZBX_THREAD_HANDLE	thread = ZBX_THREAD_HANDLE_NULL;
 
 #ifdef _WINDOWS
@@ -75,7 +74,7 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 	/* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
 	if (0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, handler, thread_args, 0, &thrdaddr)))
 	{
-		zbx_error("%s(): failed to create a thread: %s", __function_name, strerror_from_system(GetLastError()));
+		zbx_error("failed to create a thread: %s", strerror_from_system(GetLastError()));
 		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
 
@@ -92,7 +91,7 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 	}
 	else if (-1 == thread)
 	{
-		zbx_error("%s(): failed to fork: %s", __function_name, zbx_strerror(errno));
+		zbx_error("failed to fork: %s", zbx_strerror(errno));
 		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
 #endif

@@ -159,7 +159,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	execl("/bin/sh", "sh", "-c", command, NULL);
 
 	/* execl() returns only when an error occurs */
-	zabbix_log(LOG_LEVEL_WARNING, "%s(): execl() failed for [%s]: %s", __function_name, command, zbx_strerror(errno));
+	zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
 	exit(0);
 }
 
@@ -487,8 +487,8 @@ int	zbx_execute_nowait(const char *command)
 		&si,		/* startup information */
 		&pi))		/* process information stored upon return */
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): CreateProcess() failed for [%s]: %s",
-				__function_name, full_command, strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_WARNING, "failed to create process for [%s]: %s",
+				full_command, strerror_from_system(GetLastError()));
 		return FAIL;
 	}
 
@@ -500,14 +500,14 @@ int	zbx_execute_nowait(const char *command)
 
 	return SUCCEED;
 
-#else	/* _WINDOWS */
+#else	/* not _WINDOWS */
 	pid_t		pid;
 
 	/* use a double fork for running the command in background */
 	if (-1 == (pid = zbx_fork()))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): parent failed to fork() for [%s]: %s",
-				__function_name, command, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "first fork() failed for executing [%s]: %s",
+				command, zbx_strerror(errno));
 		return FAIL;
 	}
 	else if (0 != pid)
@@ -521,11 +521,11 @@ int	zbx_execute_nowait(const char *command)
 
 	pid = zbx_fork();
 
-	switch(pid)
+	switch (pid)
 	{
 		case -1:
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): child failed to fork() for [%s]: %s",
-					__function_name, command, zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "second fork() failed for executing [%s]: %s",
+					command, zbx_strerror(errno));
 			break;
 		case 0:
 			/* this is the grand child process */
@@ -538,8 +538,7 @@ int	zbx_execute_nowait(const char *command)
 			execl("/bin/sh", "sh", "-c", command, NULL);
 
 			/* execl() returns only when an error occurs */
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): execl() failed for [%s]: %s",
-					__function_name, command, zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
 			break;
 		default:
 			/* this is the child process, exit to complete the double fork */
