@@ -1040,12 +1040,12 @@ Copt::memoryPick();
 						$fnum = $triggers_to_expand_hosts[$func['triggerid']][$func['functionid']];
 						if($fnum == 1)
 						{
-							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['name'], $result[$func['triggerid']]['description']);
+							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['host'], $result[$func['triggerid']]['description']);
 							$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME}', $func['name'], $result[$func['triggerid']]['description']);
 							$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST}', $func['host'], $result[$func['triggerid']]['description']);
 						}
 
-						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
 						$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
 						$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
 					}
