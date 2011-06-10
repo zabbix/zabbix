@@ -457,9 +457,9 @@ close:
  ******************************************************************************/
 int	zbx_execute_nowait(const char *command)
 {
+#ifdef _WINDOWS
 	const char	*__function_name = "zbx_execute_nowait";
 
-#ifdef _WINDOWS
 	char			*full_command;
 	STARTUPINFO		si;
 	PROCESS_INFORMATION	pi;
