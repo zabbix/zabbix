@@ -977,7 +977,7 @@ Copt::memoryPick();
 			}
 
 			if(!empty($functionids)){
-				$sql = 'SELECT DISTINCT f.triggerid, f.functionid, h.host, host.name, i.lastvalue'.
+				$sql = 'SELECT DISTINCT f.triggerid, f.functionid, h.host, h.name, i.lastvalue'.
 						' FROM functions f,items i,hosts h'.
 						' WHERE f.itemid=i.itemid'.
 							' AND i.hostid=h.hostid'.
@@ -990,12 +990,12 @@ Copt::memoryPick();
 						$fnum = $triggers_to_expand_hosts[$func['triggerid']][$func['functionid']];
 						if($fnum == 1)
 						{
-							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['name'], $result[$func['triggerid']]['description']);
+							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['host'], $result[$func['triggerid']]['description']);
 							$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME}', $func['name'], $result[$func['triggerid']]['description']);
 							$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST}', $func['host'], $result[$func['triggerid']]['description']);
 						}
 
-						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
 						$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
 						$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
 					}

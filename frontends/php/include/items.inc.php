@@ -551,7 +551,7 @@
 						$key = str_replace('{HOST.NAME}', $host['name'], $key);
 						break;
 					case '{HOSTNAME}':	/* deprecated */
-						$key = str_replace('{HOSTNAME}', $host['name'], $key);
+						$key = str_replace('{HOSTNAME}', $host['host'], $key);
 						break;
 					case '{HOST.HOST}':
 						$key = str_replace('{HOST.HOST}', $host['host'], $key);

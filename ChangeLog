@@ -10,6 +10,8 @@ New features:
  - [ZBXNEXT-780] all items (including user parameters and external checks) can also return only whitespace (rudolfs)
 
 Bug fixes:
+ - [ZBX-3841] returned functionality of a macro {HOSTNAME} as in the version 1.8.x (Sasha)
+ - [ZBX-3841] fixed processing of {HOST.NAME} macro in item keys (Sasha)
  - [ZBX-3858] fixed host selection in action condition popup (Vedmak)
  - [ZBX-3852] fixed duplicate HTML IDs in events.php (KB)
  - [ZBX-3846] fixed typo in map creation info message during export (Vedmak)
