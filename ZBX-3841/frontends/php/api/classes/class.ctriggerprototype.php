@@ -1336,7 +1336,7 @@ COpt::memoryPick();
 
 			$expression = implode_exp($trigger['expression'], $triggerid);
 			if(is_null($expression)){
-				self::exception(_('Cannot implode expression'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
 			DB::update('triggers', array(
 				'values' => array('expression' => $expression),

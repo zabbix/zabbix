@@ -818,7 +818,7 @@ class zbxXML{
 						throw new Exception(_s('Cannot create map "%s".', $importMap['name']));
 					}
 					else{
-						info(_s('Map "%s" create.', $importMap['name']));
+						info(_s('Map "%s" created.', $importMap['name']));
 					}
 				}
 			}

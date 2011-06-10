@@ -59,14 +59,14 @@
 		$pos = zbx_stripos($haystack,$needle);
 		if($pos !== FALSE){
 			$start = zbx_substring($haystack, 0, $pos);
-			$middle = $needle;
-			$end = mb_substr($haystack, $pos+zbx_strlen($needle));
+			$end = zbx_substring($haystack, $pos + zbx_strlen($needle));
+			$found = zbx_substring($haystack, $pos, $pos + zbx_strlen($needle));
 
 			if(is_null($class)){
-				$result = array($start, bold($middle), $end);
+				$result = array($start, bold($found), $end);
 			}
 			else{
-				$result = array($start, new CSpan($middle, $class), $end);
+				$result = array($start, new CSpan($found, $class), $end);
 			}
 		}
 

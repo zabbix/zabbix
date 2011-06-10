@@ -75,7 +75,8 @@ static void	process_time_functions()
 				" and i.status=%d"
 				" and h.status=%d"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
-				DB_NODE,
+				DB_NODE
+				" order by t.triggerid",
 			TRIGGER_STATUS_ENABLED,
 			ITEM_STATUS_ACTIVE,
 			HOST_STATUS_MONITORED,

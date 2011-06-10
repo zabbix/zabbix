@@ -480,21 +480,20 @@ switch($itemType) {
 		}
 	}
 	else if(isset($_REQUEST['del_history'])&&isset($_REQUEST['itemid'])){
+		// cleaning history for one item
 		$result = false;
+		DBstart();
 		if($item = get_item_by_itemid($_REQUEST['itemid'])){
-			DBstart();
-				$result = delete_history_by_itemid($_REQUEST['itemid']);
-			$result = DBend($result);
+			$result = delete_history_by_itemid($_REQUEST['itemid']);
 		}
-
 		if($result){
-			DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null '.
+			DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null'.
 				' WHERE itemid='.$_REQUEST['itemid']);
-
 			$host = get_host_by_hostid($item['hostid']);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
 				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['name'].'] '.S_HISTORY_CLEARED);
 		}
+		$result = DBend($result);
 		show_messages($result, S_HISTORY_CLEARED, S_CANNOT_CLEAR_HISTORY);
 
 	}
@@ -704,21 +703,21 @@ switch($itemType) {
 		show_messages();
 	}
 	else if(($_REQUEST['go'] == 'clean_history') && isset($_REQUEST['group_itemid'])){
-		$go_result = false;
-		$group_itemid = $_REQUEST['group_itemid'];
-
+		// clean history for selected items
 		DBstart();
-		foreach($group_itemid as $id){
-			if(!$item = get_item_by_itemid($id))	continue;
-
-			$cur_result = delete_history_by_itemid($id);
-			$go_result |= $cur_result;
-
-			if($cur_result){
-				$host = get_host_by_hostid($item['hostid']);
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-					S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['name'].'] '.S_HISTORY_CLEARED);
+		$go_result = delete_history_by_itemid($_REQUEST['group_itemid']);
+		DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null'.
+					' WHERE '.DBcondition('itemid', $_REQUEST['group_itemid']));
+		foreach($_REQUEST['group_itemid'] as $id){
+			if(!$item = get_item_by_itemid($id)){
+				continue;
 			}
+			$host = get_host_by_hostid($item['hostid']);
+			add_audit(
+				AUDIT_ACTION_UPDATE,
+				AUDIT_RESOURCE_ITEM,
+				S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEARED
+			);
 		}
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_HISTORY_CLEARED, $go_result);

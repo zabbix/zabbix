@@ -100,7 +100,8 @@ $ZBX_MENU = array(
 			'node_perm'		=> PERM_READ_LIST,
 			'default_page_id'	=> 0,
 			'pages'=>array(
-				array('url'=>'hostprofiles.php'	,'label'=>_('Hosts')	)
+				array('url'=>'hostprofilesoverview.php', 'label'=>_('Overview')),
+				array('url'=>'hostprofiles.php', 'label'=>_('Hosts'))
 			)
 	),
 	'reports'=>array(

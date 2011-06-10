@@ -123,19 +123,16 @@
 
 #define	APPLICATION_NAME	"Zabbix Agent"
 #define	ZABBIX_REVDATE		"18 May 2011"
-#define	ZABBIX_VERSION		"1.9.4"
+#define	ZABBIX_VERSION		"1.9.5"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
-#define	ZBX_SERVICE_NAME_LEN	64
+#	define	ZBX_SERVICE_NAME_LEN	64
 extern char ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN];
 extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
-#endif /* _WINDOWS */
 
-#if defined(_WINDOWS)
-/*#	pragma warning (disable: 4100)*/
-#	pragma warning (disable: 4996) /* warning C4996: <function> was declared deprecated */
-#endif /* _WINDOWS */
+#	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
+#endif
 
 #ifndef HAVE_GETOPT_LONG
 	struct option
@@ -146,22 +143,23 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 		int val;
 	};
 #	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
-#endif /* ndef HAVE_GETOPT_LONG */
+#endif
 
 #define	SUCCEED		0
-#define	FAIL		(-1)
-#define	NOTSUPPORTED	(-2)
-#define	NETWORK_ERROR	(-3)
-#define	TIMEOUT_ERROR	(-4)
-#define	AGENT_ERROR	(-5)
-#define	PROXY_ERROR	(-6)
+#define	FAIL		-1
+#define	NOTSUPPORTED	-2
+#define	NETWORK_ERROR	-3
+#define	TIMEOUT_ERROR	-4
+#define	AGENT_ERROR	-5
+#define	PROXY_ERROR	-6
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_result_string(int result);
 
-#define MAX_ID_LEN	21
-#define MAX_STRING_LEN	2048
-#define MAX_BUFFER_LEN	65536
+#define MAX_ID_LEN		21
+#define MAX_STRING_LEN		2048
+#define MAX_BUFFER_LEN		65536
+#define MAX_ZBX_HOSTNAME_LEN	64
 
 #define ZBX_DM_DELIMITER	'\255'
 
@@ -867,6 +865,7 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
+#define strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 
@@ -953,7 +952,7 @@ LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
 int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);
 LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string);
 LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);
-int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
+LPSTR	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
 int	_wis_uint(LPCTSTR wide_string);
 #endif
 void	zbx_strlower(char *str);

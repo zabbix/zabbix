@@ -721,7 +721,6 @@
 	'S_NO_HOSTS_DEFINED'=>				_('No hosts defined'),
 	'S_NO_TEMPLATES_DEFINED'=>			_('No templates defined'),
 	'S_NO_PROXIES_DEFINED'=>			_('No proxies defined'),
-	'S_HOSTS_BIG'=>					_('HOSTS'),
 	'S_HOST'=>					_('Host'),
 	'S_CONNECT_TO'=>				_('Connect to'),
 	'S_DNS'=>					_('DNS'),
@@ -796,7 +795,6 @@
 	'S_UPDATE_IN_GROUP'=>			_('Update in group'),
 	'S_TEMPLATE_LINKAGE'=>			_('Template linkage'),
 	'S_TEMPLATES'=>				_('Templates'),
-	'S_TEMPLATES_BIG'=>			_('TEMPLATES'),
 	'S_UNLINK'=>				_('Unlink'),
 	'S_CANNOT_UNLINK_TEMPLATE'=>	_('Cannot unlink template'),
 	'S_CANNOT_LINK_TEMPLATE'=>	_('Cannot link template'),
@@ -1265,7 +1263,6 @@
 	'S_SIMPLE_GRAPH'=>				_('Simple graph'),
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
-	'S_SIMPLE_GRAPH_BIG'=>			_('SIMPLE GRAPH'),
 	'S_GRAPH_NAME'=>				_('Graph name'),
 	'S_WIDTH'=>						_('Width'),
 	'S_HEIGHT'=>					_('Height'),
@@ -1299,7 +1296,6 @@
 	'S_MAP'=>					_('Map'),
 	'S_AS_PLAIN_TEXT'=>			_('As plain text'),
 	'S_PLAIN_TEXT'=>			_('Plain text'),
-	'S_PLAIN_TEXT_BIG'=>			_('PLAIN TEXT'),
 	'S_COLUMN_SPAN'=>			_('Column span'),
 	'S_ROW_SPAN'=>				_('Row span'),
 	'S_SHOW_LINES'=>			_('Show lines'),
@@ -1654,6 +1650,9 @@
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			_('Host profiles'),
 
+//	hostprofilesoverview.php
+	'S_HOST_PROFILE_OVERVIEW'=>			_('Host profile overview'),
+
 //	search.php
 	'S_EDIT_HOSTS' => _('Edit hosts'),
 	'S_SEARCH_BIG'=>			_('SEARCH'),
@@ -1665,11 +1664,8 @@
 //	popup.php
 	'S_CAPTION'=>				_('Caption'),
 	'S_EMPTY'=>				_('Empty'),
-	'S_STANDARD_ITEMS_BIG'=>		_('STANDARD ITEMS'),
 	'S_NO_ITEMS'=>				_('No items'),
 	'S_DISCOVERY_RULES_BIG'=>		_('DISCOVERY RULES'),
-	'S_DISCOVERY_CHECKS_BIG'=>		_('DISCOVERY CHECKS'),
-	'S_HOSTS_AND_TEMPLATES_BIG'=>		_('Hosts and templates'),
 	'S_CANNOT_SWITCH_HOSTS'=>		_('You can not switch hosts for current selection'),
 
 //	popup_period.php

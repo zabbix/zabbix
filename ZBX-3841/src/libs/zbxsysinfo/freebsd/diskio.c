@@ -29,6 +29,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	int		i;
 	struct devstat	*ds = NULL;
 	int		ret = FAIL;
+	char		dev[DEVSTAT_NAME_LEN + 10];
 
 	assert(devname);
 
@@ -52,8 +53,13 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	for (i = 0; i < si->dinfo->numdevs; i++)
 	{
 		ds = &si->dinfo->devices[i];
-		if ('\0' != *devname && 0 != strcmp(ds->device_name, devname))
-			continue;
+
+		if ('\0' != *devname)
+		{
+			zbx_snprintf(dev, sizeof(dev), "%s%d", ds->device_name, ds->unit_number);
+			if (0 != strcmp(dev, devname))
+				continue;
+		}
 
 #if DEVSTAT_USER_API_VER >= 5
 		dstat[ZBX_DSTAT_R_OPER] += (zbx_uint64_t)ds->operations[DEVSTAT_READ];
@@ -66,7 +72,6 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 		dstat[ZBX_DSTAT_R_BYTE] += (zbx_uint64_t)ds->bytes_read;
 		dstat[ZBX_DSTAT_W_BYTE] += (zbx_uint64_t)ds->bytes_written;
 #endif
-
 		ret = SUCCEED;
 	}
 
