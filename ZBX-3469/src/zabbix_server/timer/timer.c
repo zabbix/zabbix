@@ -70,14 +70,13 @@ static void	process_time_functions()
 				" and f.itemid=i.itemid"
 				" and i.hostid=h.hostid"
 				" and t.status=%d"
-				" and f.function in (%s)"
+				" and f.function in (" ZBX_SQL_TIME_FUNCTIONS ")"
 				" and i.status=%d"
 				" and h.status=%d"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
 				DB_NODE
 				" order by t.triggerid",
 			TRIGGER_STATUS_ENABLED,
-			ZBX_SQL_TIME_FUNCTIONS,
 			ITEM_STATUS_ACTIVE,
 			HOST_STATUS_MONITORED,
 			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
