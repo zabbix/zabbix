@@ -153,6 +153,7 @@ typedef struct
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
 	const char	*host;
+	const char	*name;
 	int		maintenance_from;
 	int		errors_from;
 	int		disable_until;
@@ -506,13 +507,13 @@ static ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key)
 		return item_hk->item_ptr;
 }
 
-static ZBX_DC_HOST	*DCfind_host(zbx_uint64_t proxy_hostid, const char *hostname)
+static ZBX_DC_HOST	*DCfind_host(zbx_uint64_t proxy_hostid, const char *host)
 {
 	ZBX_DC_HOST_PH	*host_ph, host_ph_local;
 
 	host_ph_local.proxy_hostid = proxy_hostid;
 	host_ph_local.status = HOST_STATUS_MONITORED;
-	host_ph_local.host = hostname;
+	host_ph_local.host = host;
 
 	if (NULL == (host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local)))
 		return NULL;
@@ -1137,6 +1138,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
+		DCstrpool_replace(found, &host->name, row[23]);
 		host->maintenance_status = (unsigned char)atoi(row[7]);
 		host->maintenance_type = (unsigned char)atoi(row[8]);
 		host->maintenance_from = atoi(row[9]);
@@ -1273,6 +1275,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		}
 
 		zbx_strpool_release(host->host);
+		zbx_strpool_release(host->name);
 
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -1741,7 +1744,7 @@ void	DCsync_configuration()
 				"errors_from,available,disable_until,snmp_errors_from,"
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
-				"status"
+				"status,name"
 			" from hosts"
 			" where status in (%d,%d,%d)"
 				DB_NODE,
@@ -2237,6 +2240,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxy_hostid = src_host->proxy_hostid;
 	strscpy(dst_host->host, src_host->host);
+	strscpy(dst_host->name, src_host->name);
 	dst_host->maintenance_status = src_host->maintenance_status;
 	dst_host->maintenance_type = src_host->maintenance_type;
 	dst_host->maintenance_from = src_host->maintenance_from;
@@ -2469,7 +2473,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
  *                                                                            *
  * Parameters: item - [OUT] pointer to DC_ITEM structure                      *
  *             proxy_hostid - [IN] proxy host ID                              *
- *             hostname - [IN] hostname                                       *
+ *             host - [IN] host.host                                          *
  *             key - [IN] item key                                            *
  *                                                                            *
  * Return value: SUCCEED if record located and FAIL otherwise                 *
@@ -2479,7 +2483,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *hostname, const char *key)
+int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key)
 {
 	int			res = FAIL;
 	const ZBX_DC_ITEM	*dc_item;
@@ -2487,7 +2491,7 @@ int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const cha
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_host = DCfind_host(proxy_hostid, hostname)))
+	if (NULL == (dc_host = DCfind_host(proxy_hostid, host)))
 		goto unlock;
 
 	if (NULL == (dc_item = DCfind_item(dc_host->hostid, key)))
