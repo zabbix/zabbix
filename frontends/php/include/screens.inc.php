@@ -718,9 +718,9 @@ require_once('include/js.inc.php');
 					$sort_triggers,
 					null,
 					array(
-						SCREEN_SORT_TRIGGERS_DATE_DESC => _('last change (descending)'),
-						SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('severity (descending)'),
-						SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('host name (ascending)')
+						SCREEN_SORT_TRIGGERS_DATE_DESC => _('Last change (descending)'),
+						SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity (descending)'),
+						SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host (ascending)')
 					)
 				)
 			);
