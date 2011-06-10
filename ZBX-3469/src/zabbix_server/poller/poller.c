@@ -205,23 +205,50 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			assert(0);
 	}
 
+	/* do not set trigger status to UNKNOWN if there is at least */
+	/* one non-timebased function related to it */
 	result = DBselect(
 			"select distinct t.triggerid,t.type,t.value,t.error"
-			" from hosts h,items i,functions f,triggers t"
-			" where h.hostid=i.hostid"
-				" and i.itemid=f.itemid"
+			" from items i,functions f,triggers t"
+			" where i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
 				" and t.status=%d"
 				" and i.status=%d"
+				" and t.value<>%d"
 				" and not i.key_ like '%s'"
 				" and not i.key_ like '%s%%'"
-				" and not f.function in ('nodata','date','dayofmonth','dayofweek','time','now')"
+				" and f.function not in (%s)"
 				" and i.type in (%s)"
-				" and h.hostid=" ZBX_FS_UI64,
+				" and i.hostid=" ZBX_FS_UI64
+			" and t.triggerid not in"
+			" ("
+				"select distinct t.triggerid"
+				" from items i,functions f,triggers t"
+				" where i.itemid=f.itemid"
+					" and f.triggerid=t.triggerid"
+					" and t.status=%d"
+					" and i.status=%d"
+					" and t.value<>%d"
+					" and not i.key_ like '%s'"
+					" and not i.key_ like '%s%%'"
+					" and f.function in (%s)"
+					" and i.type in (%s)"
+				" and i.hostid=" ZBX_FS_UI64
+			")",
 			TRIGGER_STATUS_ENABLED,
 			ITEM_STATUS_ACTIVE,
+			TRIGGER_VALUE_UNKNOWN,
 			SERVER_STATUS_KEY,
 			SERVER_ICMPPING_KEY,
+			ZBX_SQL_TIME_FUNCTIONS,
+			type_cond_buf,
+			hostid,
+			TRIGGER_STATUS_ENABLED,
+			ITEM_STATUS_ACTIVE,
+			TRIGGER_VALUE_UNKNOWN,
+			SERVER_STATUS_KEY,
+			SERVER_ICMPPING_KEY,
+			ZBX_SQL_TIME_FUNCTIONS,
 			type_cond_buf,
 			hostid);
 
@@ -231,6 +258,9 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		trigger_type = atoi(row[1]);
 		trigger_value = atoi(row[2]);
 		trigger_error = row[3];
+
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() setting trigger (id:%d) status to UNKNOWN",
+				__function_name, triggerid);
 
 		DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
 				trigger_error, TRIGGER_VALUE_UNKNOWN, now, reason);

@@ -207,6 +207,7 @@ typedef enum {
 				"i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.formula,i.status,"	\
 				"i.valuemapid,h.dns,i.trends,i.lastlogsize,i.data_type,i.mtime"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
+#define ZBX_SQL_TIME_FUNCTIONS	"'nodata','date','dayofmonth','dayofweek','time','now'"
 #define ZBX_SQL_ITEM_FIELDS_NUM	27
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
