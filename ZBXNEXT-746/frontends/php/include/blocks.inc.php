@@ -1029,13 +1029,18 @@ function make_latest_issues($filter = array()){
 
 	$script = new CJSScript(get_js("jQuery('#hat_lastiss_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
-	return new CDiv(
+	$infoDiv = new CDiv(
+		_n('%2$d of %1$d issue is shown', '%2$d of %1$d issues are shown', $triggersTotalCount, count($triggers))
+	);
+	$infoDiv->addStyle('text-align: right; padding-right: 3px;');
+	$widgetDiv = new CDiv(
 		array(
-			_n('%2$d of %1$d issue is shown', '%2$d of %1$d issues are shown', $triggersTotalCount, count($triggers)),
 			$table,
+			$infoDiv,
 			$script
 		)
 	);
+	return $widgetDiv;
 }
 
 // author Aly
