@@ -595,7 +595,15 @@ class CTrigger extends CZBXAPI{
 				}
 			}
 			// if lastchange is not used for ordering, it should be the second order criteria
-			$sql_parts['order'][] = $options['sortfield'] == 'lastchange' ? $order : $order.', lastchange DESC';
+			if($options['sortfield'] == 'lastchange'){
+				$sql_parts['order'][] = $order;
+			}
+			else{
+				if(!str_in_array('t.lastchange', $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])){
+					$sql_parts['select'][] = 't.lastchange';
+				}
+				$sql_parts['order'][] = $order.', lastchange DESC';
+			}
 		}
 
 // limit
