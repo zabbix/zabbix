@@ -597,7 +597,7 @@ Copt::memoryPick();
 			$received_maintenaces = API::Maintenance()->get(array(
 				'filter' => array('name'=>$maintenance['name'])
 			));
-// now going though a result, to find records with different id, then our object
+// now going though a result, to find records with different id than our object
 			foreach($received_maintenaces as $r_maintenace){
 				if(bccomp($r_maintenace['maintenanceid'],$maintenance['maintenanceid']) != 0){
 //error! Maintenance with this name already exists
@@ -696,7 +696,7 @@ Copt::memoryPick();
 
 			// if time periods have changed
 			if($timePeriodsChanged){
-				// wiping the out to insert new ones
+				// wiping them out to insert new ones
 				DB::delete('timeperiods', array('timeperiodid'=>$timeperiodids));
 				DB::delete('maintenances_windows', array('maintenanceid'=>$maintenance['maintenanceid']));
 
