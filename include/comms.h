@@ -60,11 +60,9 @@ zbx_sock_t;
 
 const char	*zbx_tcp_strerror();
 
-struct hostent	*zbx_gethost(const char *hostname);
-
 #if !defined(_WINDOWS)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
-#endif /* WINDOWS */
+#endif
 
 void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o);
 int     zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
