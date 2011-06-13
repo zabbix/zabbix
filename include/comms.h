@@ -85,8 +85,6 @@ zbx_sock_t;
 
 const char	*zbx_tcp_strerror();
 
-struct hostent	*zbx_gethost(const char *hostname);
-
 #if !defined(_WINDOWS)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 #endif
