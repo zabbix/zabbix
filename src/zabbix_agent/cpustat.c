@@ -23,7 +23,7 @@
 #include "mutexs.h"
 #include "log.h"
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS)
 #	define LOCK_CPUSTATS	zbx_mutex_lock(&cpustats_lock)
 #	define UNLOCK_CPUSTATS	zbx_mutex_unlock(&cpustats_lock)
 static ZBX_MUTEX	cpustats_lock;
@@ -33,7 +33,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 	const char			*__function_name = "init_cpu_collector";
 	int				ret = FAIL;
-#ifdef	_WINDOWS
+#ifdef _WINDOWS
 	TCHAR				cpu[8];
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
@@ -107,14 +107,14 @@ void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		remove_perf_counter(pcpus->cpu_counter[i]);
 		pcpus->cpu_counter[i] = NULL;
 	}
-#else	/* not _WINDOWS */
+#else
 	zbx_mutex_destroy(&cpustats_lock);
-#endif	/* _WINDOWS */
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS)
 
 static void	update_cpu_counters(ZBX_SINGLE_CPU_STAT_DATA *cpu, zbx_uint64_t *counter)
 {

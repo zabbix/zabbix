@@ -100,7 +100,7 @@ static int	get_cpuload(double *load1, double *load5, double *load15)
 {
 #if defined(HAVE_LIBPERFSTAT)
 	perfstat_cpu_total_t	ps_cpu_total;
-#ifndef SBITS
+#if !defined(SBITS)
 #	define SBITS 16
 #endif
 

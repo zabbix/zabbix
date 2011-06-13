@@ -279,7 +279,7 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 #endif
 	}
 
-#ifndef HAVE_MULTIROW_INSERT
+#if !defined(HAVE_MULTIROW_INSERT)
 	begin_history_sql(sql, sql_allocated, sql_offset, table);
 #endif
 
