@@ -55,14 +55,14 @@ const char	*progname = NULL;
 const char	title_message[] = "Zabbix Server";
 const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
 
-#ifndef HAVE_GETOPT_LONG
+#if !defined(HAVE_GETOPT_LONG)
 const char	*help_message[] = {
 	"Options:",
 	"  -c <file>       absolute path to the configuration file",
 	"  -h              give this help",
 	"  -n <nodeid>     convert database data to new nodeid",
 	"  -V              display version number",
-	0 /* end of text */
+	NULL	/* end of text */
 };
 #else
 const char	*help_message[] = {
@@ -71,7 +71,7 @@ const char	*help_message[] = {
 	"  -h --help                give this help",
 	"  -n --new-nodeid <nodeid> convert database data to new nodeid",
 	"  -V --version             display version number",
-	0 /* end of text */
+	NULL	/* end of text */
 };
 #endif
 

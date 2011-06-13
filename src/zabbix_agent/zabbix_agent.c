@@ -29,7 +29,7 @@
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Agent";
 const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
-#ifndef HAVE_GETOPT_LONG
+#if !defined(HAVE_GETOPT_LONG)
 const char	*help_message[] = {
 	"Options:",
 	"  -c <file>     absolute path to the configuration file",
@@ -37,7 +37,7 @@ const char	*help_message[] = {
 	"  -V            display version number",
 	"  -p            print supported items and exit",
 	"  -t <item>     test specified item and exit",
-	0 /* end of text */
+	NULL	/* end of text */
 };
 #else
 const char	*help_message[] = {
@@ -47,7 +47,7 @@ const char	*help_message[] = {
 	"  -V --version        display version number",
 	"  -p --print          print supported items and exit",
 	"  -t --test <item>    test specified item and exit",
-	0 /* end of text */
+	NULL	/* end of text */
 };
 #endif
 
