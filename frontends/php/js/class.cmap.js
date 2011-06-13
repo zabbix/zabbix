@@ -104,6 +104,9 @@ ZABBIX.apps.map = (function(){
 			};
 			this.currentLinkId = '0'; // linkid of currently edited link
 
+			this.allLinkTriggerIds = {};
+
+
 			this.mapimg = jQuery('#sysmap_img');
 			this.sysmapid = mapdata.sysmap.sysmapid;
 			this.data = mapdata.sysmap;
@@ -475,6 +478,11 @@ ZABBIX.apps.map = (function(){
 					that.linkForm.hide();
 				});
 
+				this.linkForm.domNode.delegate('.triggerRemove', 'click', function(){
+					var tid = jQuery(this).data('linktriggerid');
+					jQuery('#linktrigger_'+tid).remove();
+				});
+
 				// changes for color inputs
 				this.linkForm.domNode.delegate('.colorpicker', 'change', function(){
 					var id = jQuery(this).attr('id');
@@ -557,7 +565,8 @@ ZABBIX.apps.map = (function(){
 		 */
 		function Link(sysmap, linkData){
 			var linkid,
-				selementid;
+				selementid,
+				lnktrigger;
 
 			this.sysmap = sysmap;
 
@@ -593,6 +602,10 @@ ZABBIX.apps.map = (function(){
 
 			this.data = linkData;
 			this.id = this.data.linkid;
+
+			for(lnktrigger in this.data.linktriggers){
+				this.sysmap.allLinkTriggerIds[lnktrigger.triggerid] = true;
+			}
 
 			// assign by reference
 			this.sysmap.data.links[this.id] = this.data;
@@ -1331,9 +1344,9 @@ ZABBIX.apps.map = (function(){
 		function LinkForm(formContainer, sysmap){
 			this.sysmap = sysmap;
 			this.formContainer = formContainer;
+			this.triggerids = {};
 
 			this.domNode = jQuery('#linkForm');
-
 
 			// apply jQuery UI elements
 			jQuery('#formLinkApply, #formLinkRemove, #formLinkClose').button();
@@ -1437,6 +1450,7 @@ ZABBIX.apps.map = (function(){
 				}
 
 				// clear triggers
+				this.triggerids = {};
 				jQuery('#linkTriggerscontainer tr').remove();
 				this.addTriggers(link.linktriggers);
 			},
@@ -1446,6 +1460,8 @@ ZABBIX.apps.map = (function(){
 					linkTrigger;
 
 				for(linkTrigger in triggers){
+					this.triggerids[triggers[linkTrigger].triggerid] = true;
+
 					jQuery(tpl.evaluate(triggers[linkTrigger])).appendTo('#linkTriggerscontainer');
 
 					jQuery('#linktrigger_'+triggers[linkTrigger].linktriggerid+'_drawtype').val(triggers[linkTrigger].drawtype);
@@ -1455,22 +1471,32 @@ ZABBIX.apps.map = (function(){
 
 			addNewTriggers: function(triggers){
 				var tpl = new Template(jQuery('#linkTriggerRow').html()),
-					linkTrigger = {},
+					linkTrigger = {
+						color: 'DD0000'
+					},
 					linktriggerid,
 					i,
 					ln;
 
+
 				for(i = 0, ln = triggers.length; i < ln; i++){
+					if(typeof this.triggerids[triggers[i].triggerid] !== 'undefined'){
+						continue;
+					}
+
 					do{
 						linktriggerid = Math.floor(Math.random() * 10000000).toString();
-					}while(false);
-					// TODO: make id unique
+					}while(typeof this.sysmap.allLinkTriggerIds[linktriggerid] !== 'undefined');
+
+					// store linktriggerid to generate every time unique one
+					this.sysmap.allLinkTriggerIds[linktriggerid] = true;
+
+					// store triggerid to forbid selecting same trigger twice
+					this.triggerids[triggers[i].triggerid] = true;
 
 					linkTrigger.linktriggerid = linktriggerid;
-
 					linkTrigger.desc_exp = triggers[i].description;
 					linkTrigger.triggerid = triggers[i].triggerid;
-					linkTrigger.color = 'DD0000';
 
 					jQuery(tpl.evaluate(linkTrigger)).appendTo('#linkTriggerscontainer');
 				}
@@ -1487,7 +1513,9 @@ ZABBIX.apps.map = (function(){
 			}
 		});
 
-		Link.prototype.bind('afterUpdate', sysmap.updateImage);
+		Link.prototype.bind('afterUpdate', function(){
+			sysmap.updateImage();
+		});
 
 		Link.prototype.bind('afterRemove', function(){
 			if(sysmap.form.active){

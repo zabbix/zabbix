@@ -129,6 +129,21 @@ class CCanvas{
 		imagerectangle($this->canvas, $x1, $y1, $x2, $y2, $this->getColor($color));
 	}
 
+	public function drawRoundedRectangle($x1, $y1, $x2, $y2, $radius, $color){
+		$color = $this->getColor($color);
+		$arcRadius = $radius * 2;
+		imagearc($this->canvas, $x1 + $radius, $y1 + $radius, $arcRadius, $arcRadius, 180, 270, $color);
+		imagearc($this->canvas, $x1 + $radius, $y2 - $radius, $arcRadius, $arcRadius, 90, 180, $color);
+		imagearc($this->canvas, $x2 - $radius, $y1 + $radius, $arcRadius, $arcRadius, 270, 0, $color);
+		imagearc($this->canvas, $x2 - $radius, $y2 - $radius, $arcRadius, $arcRadius, 0, 90, $color);
+
+		imageline($this->canvas, $x1 + $radius, $y1, $x2 - $radius, $y1, $color);
+		imageline($this->canvas, $x1 + $radius, $y2, $x2 - $radius, $y2, $color);
+		imageline($this->canvas, $x1, $y1 + $radius, $x1, $y2 - $radius, $color);
+		imageline($this->canvas, $x2, $y1 + $radius, $x2, $y2 - $radius, $color);
+
+//		imagerectangle($this->canvas, $x1, $y1, $x2, $y2, $this->getColor($color));
+	}
 
 	protected function getColor($color){
 		if(!isset($this->colors[$color])){
@@ -149,6 +164,8 @@ class CCanvas{
 		$this->colors['cyan'] = imagecolorallocate($this->canvas, 0, 255, 255);
 		$this->colors['black'] = imagecolorallocate($this->canvas, 0, 0, 0);
 		$this->colors['gray'] = imagecolorallocate($this->canvas, 150, 150, 150);
+		$this->colors['gray2'] = imagecolorallocate($this->canvas, 180, 180, 180);
+		$this->colors['gray3'] = imagecolorallocate($this->canvas, 210, 210, 210);
 		$this->colors['white'] = imagecolorallocate($this->canvas, 255, 255, 255);
 		$this->colors['orange'] = imagecolorallocate($this->canvas, 238, 96, 0);
 	}
@@ -243,8 +260,33 @@ class CMapPainter{
 
 	protected function paintAreas(){
 		foreach($this->mapData['selements'] as $selement){
-			if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS && $selement['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM){
-				$this->canvas->drawRectangle($selement['x'], $selement['y'], $selement['x'] + $selement['width'], $selement['y'] + $selement['height'], 'gray');
+			if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
+					&& $selement['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM)
+			{
+				$this->canvas->drawRoundedRectangle(
+					$selement['x'] + 1,
+					$selement['y'] + 1,
+					$selement['x'] + $selement['width'] - 1,
+					$selement['y'] + $selement['height'] - 1,
+					10,
+					'gray'
+				);
+				$this->canvas->drawRoundedRectangle(
+					$selement['x'],
+						$selement['y'],
+						$selement['x'] + $selement['width'],
+						$selement['y'] + $selement['height'],
+					10,
+					'gray2'
+				);
+				$this->canvas->drawRoundedRectangle(
+					$selement['x'] - 1,
+					$selement['y'] - 1,
+						$selement['x'] + $selement['width'] + 1,
+						$selement['y'] + $selement['height'] + 1,
+					10,
+					'gray3'
+				);
 			}
 		}
 	}

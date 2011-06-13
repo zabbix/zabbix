@@ -354,12 +354,12 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="linkTriggerRow">
-	<tr id="linktrigger_#{linktriggerid}" >
+	<tr id="linktrigger_#{linktriggerid}">
 		<td>#{desc_exp}</td>
 		<td>
-			<input type="hidden" name="linktrigger_#{linktriggerid}_desc_exp" value="#{desc_exp}">
-			<input type="hidden" name="linktrigger_#{linktriggerid}_triggerid" value="#{triggerid}">
-			<input type="hidden" name="linktrigger_#{linktriggerid}_linktriggerid" value="#{linktriggerid}">
+			<input type="hidden" name="linktrigger_#{linktriggerid}_desc_exp" value="#{desc_exp}" />
+			<input type="hidden" name="linktrigger_#{linktriggerid}_triggerid" value="#{triggerid}" />
+			<input type="hidden" name="linktrigger_#{linktriggerid}_linktriggerid" value="#{linktriggerid}" />
 			<select id="linktrigger_#{linktriggerid}_drawtype" name="linktrigger_#{linktriggerid}_drawtype" class="input">
 				<option value="0"><?php echo _('Line'); ?></option>
 				<option value="2"><?php echo _('Bold line'); ?></option>
@@ -372,7 +372,7 @@
 			<div id="lbl_linktrigger_#{linktriggerid}_color" class="pointer colorpickerLabel">&nbsp;</div>
 		</td>
 		<td>
-			<span class="link_menu" onclick="jQuery('#linktrigger_#{linktriggerid}').remove();"><?php echo _('Remove'); ?></span>
+			<span class="link_menu triggerRemove" data-linktriggerid="#{linktriggerid}""><?php echo _('Remove'); ?></span>
 		</td>
 	</tr>
 </script>
