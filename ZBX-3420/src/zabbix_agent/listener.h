@@ -24,4 +24,4 @@
 
 ZBX_THREAD_ENTRY(listener_thread, pSock);
 
-#endif /* ZABBIX_LISTENER_H */
+#endif

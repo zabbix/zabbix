@@ -39,29 +39,30 @@ static int		log_level = LOG_LEVEL_WARNING;
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
 #if !defined(_WINDOWS)
-void redirect_std(const char *filename)
+void	redirect_std(const char *filename)
 {
-	int fd;
-	const char default_file[] = "/dev/null";
-	const char *out_file = default_file;
-	int open_flags = O_WRONLY;
+	int		fd;
+	const char	default_file[] = "/dev/null";
+	const char	*out_file = default_file;
+	int		open_flags = O_WRONLY;
 
-	close(fileno(stdin));
-	open(default_file, O_RDONLY);    /* stdin, normally fd==0 */
+	close(STDIN_FILENO);
+	open(default_file, O_RDONLY);	/* stdin, normally fd==0 */
 
-	if ( filename && *filename)
+	if (NULL != filename && '\0' != *filename)
 	{
 		out_file = filename;
 		open_flags |= O_CREAT | O_APPEND;
 	}
 
-	if ( -1 != (fd = open(out_file, open_flags, 0666)) )
+	if (-1 != (fd = open(out_file, open_flags, 0666)))
 	{
-		if (-1 == dup2(fd, fileno(stderr)))
+		if (-1 == dup2(fd, STDERR_FILENO))
 			zbx_error("cannot redirect stderr to [%s]", filename);
 
-		if (-1 == dup2(fd, fileno(stdout)))
+		if (-1 == dup2(fd, STDOUT_FILENO))
 			zbx_error("cannot redirect stdout to [%s]", filename);
+
 		close(fd);
 	}
 	else
@@ -82,14 +83,10 @@ int zabbix_open_log(int type, int level, const char *filename)
 	log_level = level;
 
 	if (LOG_LEVEL_EMPTY == level)
-	{
 		return SUCCEED;
-	}
 
 	if (LOG_TYPE_FILE == type && NULL == filename)
-	{
 		type = LOG_TYPE_SYSLOG;
-	}
 
 	if (LOG_TYPE_SYSLOG == type)
 	{
@@ -241,11 +238,11 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 				milliseconds
 				);
 
-			va_start(args,fmt);
-			vfprintf(log_file,fmt, args);
+			va_start(args, fmt);
+			vfprintf(log_file, fmt, args);
 			va_end(args);
 
-			fprintf(log_file,"\n");
+			fprintf(log_file, "\n");
 			zbx_fclose(log_file);
 
 			if (0 != CONFIG_LOG_FILE_SIZE && 0 == stat(log_filename, &buf))
@@ -296,8 +293,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 				break;
 		}
 
-		zbx_wsnprintf(thread_id, sizeof(thread_id)/sizeof(wchar_t), TEXT("[%li]: "),
-				zbx_get_thread_id());
+		zbx_wsnprintf(thread_id, sizeof(thread_id) / sizeof(wchar_t), TEXT("[%li]: "), zbx_get_thread_id());
 		strings[0] = thread_id;
 		strings[1] = zbx_utf8_to_unicode(message);
 
