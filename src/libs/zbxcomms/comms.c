@@ -41,13 +41,9 @@
  *                                                                            *
  * Purpose: return string describing tcp error                                *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: pointer to the null terminated string                        *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 
@@ -57,7 +53,7 @@ static char	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR];
 
 const char	*zbx_tcp_strerror()
 {
-	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR - 1] = '\0'; /* force terminate string */
+	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR - 1] = '\0';	/* force terminate string */
 	return (&zbx_tcp_strerror_message[0]);
 }
 
@@ -84,13 +80,7 @@ static void	__zbx_zbx_set_tcp_strerror(const char *fmt, ...)
  *                                                                            *
  * Purpose: retrieve 'hostent' by IP address                                  *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
@@ -140,43 +130,8 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 
 	zbx_strlcpy(host, hst->h_name, hostlen);
 }
-#endif /*HAVE_IPV6*/
-#endif /* _WINDOWS */
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_gethost                                                      *
- *                                                                            *
- * Purpose: retrieve 'hostent' by host name and IP                            *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: hostent or NULL - an error occurred                          *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-struct hostent	*zbx_gethost(const char *hostname)
-{
-	unsigned int	addr;
-	struct hostent	*host;
-
-	assert(hostname);
-
-	if (NULL != (host = gethostbyname(hostname)))
-		return host;
-
-	addr = inet_addr(hostname);
-
-	if (NULL != (host = gethostbyaddr((char *)&addr, 4, AF_INET)))
-		return host;
-
-	zbx_set_tcp_strerror("gethost() failed for address '%s': %s", hostname, strerror_from_system(zbx_sock_last_error()));
-
-	return (struct hostent *)NULL;
-}
+#endif	/* HAVE_IPV6 */
+#endif	/* _WINDOWS */
 
 /******************************************************************************
  *                                                                            *
@@ -184,13 +139,9 @@ struct hostent	*zbx_gethost(const char *hostname)
  *                                                                            *
  * Purpose: Initialize Windows Sockets APIs                                   *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCEED or FAIL - an error occurred                          *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 #if defined(_WINDOWS)
@@ -215,7 +166,7 @@ static int	zbx_tcp_start()
 
 #else
 #	define ZBX_TCP_START() {}
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 
 /******************************************************************************
  *                                                                            *
@@ -223,13 +174,7 @@ static int	zbx_tcp_start()
  *                                                                            *
  * Purpose: initialize socket                                                 *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_tcp_clean(zbx_sock_t *s)
@@ -245,13 +190,7 @@ static void	zbx_tcp_clean(zbx_sock_t *s)
  *                                                                            *
  * Purpose: initialize structure of zabbix socket with specified socket       *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
@@ -270,11 +209,7 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
  * Parameters: s       - [IN] socket descriptor                               *
  *             timeout - [IN] timeout, in seconds                             *
  *                                                                            *
- * Return value: none                                                         *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
@@ -301,11 +236,7 @@ static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
  *                                                                            *
  * Parameters: s       - [IN] socket descriptor                               *
  *                                                                            *
- * Return value: none                                                         *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_tcp_timeout_cleanup(zbx_sock_t *s)
@@ -325,14 +256,10 @@ static void	zbx_tcp_timeout_cleanup(zbx_sock_t *s)
  *                                                                            *
  * Purpose: connect to external host                                          *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: sockfd - open socket                                         *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
@@ -418,8 +345,17 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	zbx_tcp_clean(s);
 
-	if (NULL == (hp = zbx_gethost(ip)))
+	if (NULL == (hp = gethostbyname(ip)))
+	{
+#if defined(_WINDOWS)
+		zbx_set_tcp_strerror("gethostbyname() failed for '%s': %s", ip, strerror_from_system(WSAGetLastError()));
+#elif defined(HAVE_HSTRERROR)
+		zbx_set_tcp_strerror("gethostbyname() failed for '%s': [%d] %s", ip, h_errno, hstrerror(h_errno));
+#else
+		zbx_set_tcp_strerror("gethostbyname() failed for '%s': [%d]", ip, h_errno);
+#endif
 		return FAIL;
+	}
 
 	servaddr_in.sin_family		= AF_INET;
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
@@ -460,7 +396,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	return SUCCEED;
 }
-#endif /*HAVE_IPV6*/
+#endif	/* HAVE_IPV6 */
 
 /******************************************************************************
  *                                                                            *
@@ -468,14 +404,10 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
  *                                                                            *
  * Purpose: send data                                                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 
@@ -540,13 +472,7 @@ cleanup:
  *                                                                            *
  * Purpose: close open socket                                                 *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tcp_close(zbx_sock_t *s)
@@ -575,8 +501,6 @@ void	zbx_tcp_close(zbx_sock_t *s)
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 #ifdef HAVE_IPV6
@@ -611,7 +535,7 @@ out:
 
 	return res;
 }
-#endif /* HAVE_IPV6 */
+#endif	/* HAVE_IPV6 */
 
 /******************************************************************************
  *                                                                            *
@@ -619,14 +543,10 @@ out:
  *                                                                            *
  * Purpose: create socket for listening                                       *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
@@ -648,7 +568,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 	ip = ips = (NULL == listen_ip ? NULL : strdup(listen_ip));
 
-	do
+	while (1)
 	{
 		delim = (NULL == ip ? NULL : strchr(ip, ','));
 		if (NULL != delim)
@@ -745,14 +665,14 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 		if (NULL == ip || NULL == delim)
 			break;
+
 		*delim = ',';
 		ip = delim + 1;
 	}
-	while (1);
 
 	if (0 == s->num_socks)
 	{
-		zbx_set_tcp_strerror("zbx_tcp_listen() Fatal error: unable to serve on any address. [[%s]:%hu]",
+		zbx_set_tcp_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
 				listen_ip ? listen_ip : "-", listen_port);
 		goto out;
 	}
@@ -761,11 +681,15 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 out:
 	if (NULL != ips)
 		zbx_free(ips);
+
 	if (NULL != ai)
 		freeaddrinfo(ai);
+
 	if (SUCCEED != ret)
+	{
 		for (i = 0; i < s->num_socks; i++)
 			zbx_sock_close(s->sockets[i]);
+	}
 
 	return ret;
 }
@@ -782,7 +706,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 
 	ip = ips = (NULL == listen_ip ? NULL : strdup(listen_ip));
 
-	do
+	while (1)
 	{
 		delim = (NULL == ip ? NULL : strchr(ip, ','));
 		if (NULL != delim)
@@ -851,11 +775,10 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 		*delim = ',';
 		ip = delim + 1;
 	}
-	while (1);
 
 	if (0 == s->num_socks)
 	{
-		zbx_set_tcp_strerror("zbx_tcp_listen() Fatal error: unable to serve on any address. [[%s]:%hu]",
+		zbx_set_tcp_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
 				listen_ip ? listen_ip : "-", listen_port);
 		goto out;
 	}
@@ -864,13 +787,16 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 out:
 	if (NULL != ips)
 		zbx_free(ips);
+
 	if (SUCCEED != ret)
+	{
 		for (i = 0; i < s->num_socks; i++)
 			zbx_sock_close(s->sockets[i]);
+	}
 
 	return ret;
 }
-#endif /*HAVE_IPV6*/
+#endif	/* HAVE_IPV6 */
 
 /******************************************************************************
  *                                                                            *
@@ -878,14 +804,10 @@ out:
  *                                                                            *
  * Purpose: permits an incoming connection attempt on a socket                *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Eugene Grigorjev, Aleksandrs Saveljevs                             *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tcp_accept(zbx_sock_t *s)
@@ -916,8 +838,10 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 	}
 
 	for (i = 0; i < s->num_socks; i++)
+	{
 		if (FD_ISSET(s->sockets[i], &sock_set))
 			break;
+	}
 
 	/* Since this socket was returned by select(), we know we have */
 	/* a connection waiting and that this accept() will not block. */
@@ -941,13 +865,7 @@ int	zbx_tcp_accept(zbx_sock_t *s)
  *                                                                            *
  * Purpose: close accepted connection                                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tcp_unaccept(zbx_sock_t *s)
@@ -969,13 +887,7 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
  *                                                                            *
  * Purpose: close open socket                                                 *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tcp_free(zbx_sock_t *s)
@@ -989,14 +901,10 @@ void	zbx_tcp_free(zbx_sock_t *s)
  *                                                                            *
  * Purpose: receive data                                                      *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: number of bytes received - success,                          *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
@@ -1193,17 +1101,14 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	ZBX_SOCKADDR	name;
 	ZBX_SOCKLEN_T	nlen;
 
-	char	tmp[MAX_STRING_LEN],
-		sname[MAX_STRING_LEN],
-		*start = NULL,
-		*end = NULL;
+	char		tmp[MAX_STRING_LEN], sname[MAX_STRING_LEN], *start = NULL, *end = NULL;
 
-	if( (1 == allow_if_empty) && ( !ip_list || !*ip_list ) )
-	{
+	if (1 == allow_if_empty && (NULL == ip_list || '\0' == *ip_list))
 		return SUCCEED;
-	}
+
 	nlen = sizeof(name);
-	if( ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&name, &nlen))
+
+	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&name, &nlen))
 	{
 		zbx_set_tcp_strerror("connection rejected, getpeername() failed: %s", strerror_from_system(zbx_sock_last_error()));
 		return FAIL;
@@ -1213,37 +1118,35 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 #if !defined(HAVE_IPV6)
 		zbx_strlcpy(sname, inet_ntoa(name.sin_addr), sizeof(sname));
 
-		if(sscanf(sname, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]) != 4)
-		{
+		if (4 != sscanf(sname, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]))
 			return FAIL;
-		}
 #endif
 		strscpy(tmp,ip_list);
 
-		for (start = tmp; *start != '\0';)
+		for (start = tmp; '\0' != *start;)
 		{
 			if (NULL != (end = strchr(start, ',')))
 				*end = '\0';
 
-			/* Allow IP addresses or DNS names for authorization */
+			/* allow IP addresses or DNS names for authorization */
 #if defined(HAVE_IPV6)
 			memset(&hints, 0, sizeof(hints));
 			hints.ai_family = PF_UNSPEC;
-			if(0 == getaddrinfo(start, NULL, &hints, &ai))
+			if (0 == getaddrinfo(start, NULL, &hints, &ai))
 			{
-				if(ai->ai_family == name.ss_family)
+				if (ai->ai_family == name.ss_family)
 				{
-					switch(ai->ai_family)
+					switch (ai->ai_family)
 					{
 						case AF_INET  :
-							if(((struct sockaddr_in*)&name)->sin_addr.s_addr == ((struct sockaddr_in*)ai->ai_addr)->sin_addr.s_addr)
+							if (((struct sockaddr_in*)&name)->sin_addr.s_addr == ((struct sockaddr_in*)ai->ai_addr)->sin_addr.s_addr)
 							{
 								freeaddrinfo(ai);
 								return SUCCEED;
 							}
 							break;
 						case AF_INET6 :
-							if(0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr,
+							if (0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr,
 									((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr,
 									sizeof(struct in6_addr)))
 							{
@@ -1255,7 +1158,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 				}
 				else
 				{
-					switch(ai->ai_family)
+					switch (ai->ai_family)
 					{
 						case AF_INET  :
 							/* incoming AF_INET6, must see whether it is comp or mapped */
@@ -1284,18 +1187,17 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 				freeaddrinfo(ai);
 			}
 #else
-			if (0 != (hp = zbx_gethost(start)))
+			if (NULL != (hp = gethostbyname(start)))
 			{
 				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
-				if(sscanf(sip, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) == 4)
+
+				if (4 == sscanf(sip, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) &&
+						i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3])
 				{
-					if(i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3])
-					{
-						return SUCCEED;
-					}
+					return SUCCEED;
 				}
 			}
-#endif /*HAVE_IPV6*/
+#endif	/* HAVE_IPV6 */
 			if (NULL != end)
 			{
 				*end = ',';
@@ -1310,13 +1212,9 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 	}
 #if defined(HAVE_IPV6)
 	if (0 == getnameinfo((struct sockaddr *)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
-	{
 		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
-	}
 	else
-	{
 		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s].", ip_list);
-	}
 #else
 	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
 #endif
