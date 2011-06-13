@@ -21,7 +21,6 @@
 #include "sysinfo.h"
 
 #include "log.h"
-#include "threads.h"
 
 #include "file.h"
 #include "http.h"
@@ -176,11 +175,11 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
-	if ('\0' == *cmd_result)	/* we got whitespace only */
-		goto lbl_exit;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...",
 			param, strlen(cmd_result), cmd_result);
+
+	if ('\0' == *cmd_result)	/* we got whitespace only */
+		goto lbl_exit;
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, cmd_result));
 
@@ -227,16 +226,6 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 {
 	char	command[MAX_STRING_LEN], flag[9];
 
-#ifdef _WINDOWS
-	STARTUPINFO		si;
-	PROCESS_INFORMATION	pi;
-	char			full_command[MAX_STRING_LEN];
-	LPTSTR			wcommand;
-	int			ret = SYSINFO_RET_FAIL;
-#else
-	pid_t			pid;
-#endif
-
 	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND))
 		return SYSINFO_RET_FAIL;
 
@@ -259,87 +248,10 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if ('\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
 		return EXECUTE_STR(cmd, command, flags, result);
-	else if (0 != strcmp(flag, "nowait"))
+	else if (0 != strcmp(flag, "nowait") || SUCCEED != zbx_execute_nowait(command))
 		return SYSINFO_RET_FAIL;
-
-#ifdef _WINDOWS
-
-	zbx_snprintf(full_command, sizeof(full_command), "cmd /C \"%s\"", command);
-
-	GetStartupInfo(&si);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Executing full command '%s'", full_command);
-
-	wcommand = zbx_utf8_to_unicode(full_command);
-
-	if (!CreateProcess(
-		NULL,		/* no module name (use command line) */
-		wcommand,	/* name of app to launch */
-		NULL,		/* default process security attributes */
-		NULL,		/* default thread security attributes */
-		FALSE,		/* do not inherit handles from the parent */
-		0,		/* normal priority */
-		NULL,		/* use the same environment as the parent */
-		NULL,		/* launch in the current directory */
-		&si,		/* startup information */
-		&pi))		/* process information stored upon return */
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Creation of the process failed");
-		goto lbl_exit;
-	}
-
-	ret = SYSINFO_RET_OK;
-
-	SET_UI64_RESULT(result, 1);
-lbl_exit:
-	zbx_free(wcommand);
-
-	return ret;
-
-#else	/* not _WINDOWS */
-
-	pid = zbx_fork();	/* run new thread 1 */
-	switch(pid)
-	{
-		case -1:
-			zabbix_log(LOG_LEVEL_WARNING, "fork failed for command '%s'", command);
-			return SYSINFO_RET_FAIL;
-		case 0:
-			pid = zbx_fork();	/* run new thread 2 to replace by command */
-			switch(pid)
-			{
-				case -1:
-					zabbix_log(LOG_LEVEL_WARNING, "fork2 failed for '%s'", command);
-					return SYSINFO_RET_FAIL;
-				case 0:
-					/*
-					 * DON'T REMOVE SLEEP
-					 * sleep needed to return server result as "1"
-					 * then we can run "execl"
-					 * otherwise command print result into socket with STDOUT id
-					 */
-					sleep(3);
-					/**/
-
-					/* replace thread 2 by the execution of command */
-					if (execl("/bin/sh", "sh", "-c", command, (char *)0))
-						zabbix_log(LOG_LEVEL_WARNING, "execl failed for command '%s'", command);
-
-					/* in a normal case the program will never reach this point */
-					exit(0);
-				default:
-					waitpid(pid, NULL, WNOHANG);	/* NO WAIT can be used for thread 2 closing */
-					exit(0);	/* close thread 1 and transmit thread 2 to system (solve zombie state) */
-					break;
-			}
-		default:
-			waitpid(pid, NULL, 0);	/* wait thread 1 closing */
-			break;
-	}
 
 	SET_UI64_RESULT(result, 1);
 
 	return SYSINFO_RET_OK;
-
-#endif	/* _WINDOWS */
 }
