@@ -29,9 +29,9 @@
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
-#elif defined(ZABBIX_DAEMON)	/* ZABBIX_SERVICE */
+#elif defined(ZABBIX_DAEMON)
 #	include "daemon.h"
-#endif	/* ZABBIX_DAEMON */
+#endif
 
 static void	process_listener(zbx_sock_t *s)
 {

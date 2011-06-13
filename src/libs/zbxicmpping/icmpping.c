@@ -27,7 +27,7 @@ extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_FPING_LOCATION;
 #ifdef HAVE_IPV6
 extern char	*CONFIG_FPING6_LOCATION;
-#endif	/* HAVE_IPV6 */
+#endif
 extern char	*CONFIG_TMPDIR;
 
 /* official fping does not support source IP address */
@@ -38,7 +38,7 @@ static const char	*source_ip_option = NULL;
 #ifdef HAVE_IPV6
 static unsigned char	source_ip6_checked = 0;
 static const char	*source_ip6_option = NULL;
-#endif	/* HAVE_IPV6 */
+#endif
 
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
 {
@@ -101,10 +101,10 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	if (-1 == access(CONFIG_FPING_LOCATION, F_OK | X_OK))
 	{
-#ifndef HAVE_IPV6
+#if !defined(HAVE_IPV6)
 		zbx_snprintf(error, max_error_len, "%s: %s", CONFIG_FPING_LOCATION, zbx_strerror(errno));
 		return ret;
-#endif	/* HAVE_IPV6 */
+#endif
 	}
 	else
 	{
@@ -120,7 +120,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				return ret;
 			}
 		}
-#endif	/* HAVE_IPV6 */
+#endif
 	}
 
 #ifdef HAVE_IPV6
