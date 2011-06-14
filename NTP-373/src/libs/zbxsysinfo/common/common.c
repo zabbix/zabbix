@@ -27,6 +27,7 @@
 #include "http.h"
 #include "net.h"
 #include "system.h"
+#include "zbxexec.h"
 
 #if !defined(_WINDOWS)
 #	define VFS_TEST_FILE "/etc/passwd"
@@ -35,6 +36,8 @@
 #	define VFS_TEST_FILE "c:\\windows\\win.ini"
 #	define VFS_TEST_REGEXP "fonts"
 #endif /* _WINDOWS */
+
+extern int	CONFIG_TIMEOUT;
 
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
@@ -154,160 +157,31 @@ static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGE
 
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#if defined(_WINDOWS)
-
-	STARTUPINFO si = {0};
-	PROCESS_INFORMATION pi = {0};
-	SECURITY_ATTRIBUTES sa;
-	HANDLE hWrite=NULL, hRead=NULL;
-
-#else /* not _WINDOWS */
-
-	FILE	*hRead = NULL;
-
-#endif /* _WINDOWS */
-
 	int	ret = SYSINFO_RET_FAIL;
+	char	*cmd_result = NULL, error[MAX_STRING_LEN];
 
-	char	stat_buf[128];
-	char	*cmd_result=NULL;
-	char	*command=NULL;
-	int	len;
+	assert(result);
 
-        assert(result);
+	init_result(result);
 
-        init_result(result);
-
-	cmd_result = zbx_dsprintf(cmd_result,"");
-	memset(stat_buf, 0, sizeof(stat_buf));
-
-#if defined(_WINDOWS)
-
-	/* Set the bInheritHandle flag so pipe handles are inherited */
-	sa.nLength = sizeof(SECURITY_ATTRIBUTES); 
-	sa.bInheritHandle = TRUE; 
-	sa.lpSecurityDescriptor = NULL; 
-
-	/* Create a pipe for the child process's STDOUT */
-	if (! CreatePipe(&hRead, &hWrite, &sa, sizeof(cmd_result))) 
+	if (SUCCEED != zbx_execute(param, &cmd_result, error, sizeof(error), CONFIG_TIMEOUT))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create pipe [%s]", strerror_from_system(GetLastError()));
-		ret = SYSINFO_RET_FAIL;
+		SET_MSG_RESULT(result, strdup(error));
 		goto lbl_exit;
 	}
 
-	/* Fill in process startup info structure */
-	memset(&si,0,sizeof(STARTUPINFO));
-	si.cb		= sizeof(STARTUPINFO);
-	si.dwFlags	= STARTF_USESTDHANDLES;
-	si.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
-	si.hStdOutput	= hWrite;
-	si.hStdError	= hWrite;
+	zbx_rtrim(cmd_result, ZBX_WHITESPACE);
 
-	command = zbx_dsprintf(command, "cmd /C \"%s\"", param);
+	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...",
+			param, strlen(cmd_result), cmd_result);
 
-	/* Create new process */
-	if (!CreateProcess(NULL,command,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create process: '%s' [%s]", command, strerror_from_system(GetLastError()));
-
-		ret = SYSINFO_RET_FAIL;
+	if ('\0' == *cmd_result)	/* we got whitespace only */
 		goto lbl_exit;
-	}
-	CloseHandle(hWrite);	hWrite = NULL;
-
-	/* Read process output */
-	while( ReadFile(hRead, stat_buf, sizeof(stat_buf)-1, &len, NULL) && len > 0 )
-	{
-		cmd_result = zbx_strdcat(cmd_result, stat_buf);
-		memset(stat_buf, 0, sizeof(stat_buf));
-	}
-
-	/* Don't wait child process exiting. */
-	/* WaitForSingleObject( pi.hProcess, INFINITE ); */
-
-	/* Terminate child process */
-	/* TerminateProcess(pi.hProcess, 0); */
-
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
-
-	CloseHandle(hRead);	hRead = NULL;
-		
-
-#else /* not _WINDOWS */
-	command = zbx_dsprintf(command, "%s", param);
-
-	if(0 == (hRead = popen(command,"r")))
-	{
-		switch (errno)
-		{
-			case	EINTR:	ret = SYSINFO_RET_TIMEOUT;
-			default:	ret = SYSINFO_RET_FAIL;
-		}
-		goto lbl_exit;
-	}
-
-	;
-	/* Read process output */
-	while( (len = fread(stat_buf, 1, sizeof(stat_buf)-1, hRead)) > 0 )
-	{
-		cmd_result = zbx_strdcat(cmd_result, stat_buf);
-		memset(stat_buf, 0, sizeof(stat_buf));
-	}
-
-	if(0 != ferror(hRead))
-	{
-		switch (errno)
-		{
-			case	EINTR:	ret = SYSINFO_RET_TIMEOUT;
-			default:	ret = SYSINFO_RET_FAIL;
-		}
-		goto lbl_exit;
-	}
-
-	if(pclose(hRead) == -1)
-	{
-		switch (errno)
-		{
-			case	EINTR:	ret = SYSINFO_RET_TIMEOUT;
-			default:	ret = SYSINFO_RET_FAIL;
-		}
-		goto lbl_exit;
-	}
-
-	hRead = NULL;
-
-#endif /* _WINDOWS */
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Before");
-
-	zbx_rtrim(cmd_result,"\n\r\0");
-
-	/* We got EOL only */
-	if(cmd_result[0] == '\0')
-	{
-		ret = SYSINFO_RET_FAIL;
-		goto lbl_exit;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...", command, strlen(cmd_result), cmd_result);
 
 	SET_TEXT_RESULT(result, strdup(cmd_result));
 
 	ret = SYSINFO_RET_OK;
-
 lbl_exit:
-
-#if defined(_WINDOWS)
-	if ( hWrite )	{ CloseHandle(hWrite);	hWrite = NULL; }
-	if ( hRead)	{ CloseHandle(hRead);	hRead = NULL; }
-#else /* not _WINDOWS */
-	if ( hRead )	{ pclose(hRead);	hRead = NULL; }
-#endif /* _WINDOWS */
-
-	zbx_free(command)
 	zbx_free(cmd_result);
 
 	return ret;
@@ -334,137 +208,31 @@ int	EXECUTE_INT(const char *cmd, const char *command, unsigned flags, AGENT_RESU
 
 int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define MAX_FLAG_LEN 10
+	char	command[MAX_STRING_LEN], flag[9];
 
-	char	command[MAX_STRING_LEN];
-	char	flag[MAX_FLAG_LEN];
-
-#if defined (_WINDOWS)
-	STARTUPINFO    si;
-	PROCESS_INFORMATION  pi;
-
-	char	full_command[MAX_STRING_LEN];
-#else /* not _WINDOWS */
-	pid_t	pid;
-#endif
-
-	
-        assert(result);
-
-	init_result(result);
-	
-
-	if(CONFIG_ENABLE_REMOTE_COMMANDS != 1)
-	{
-		SET_MSG_RESULT(result, strdup("ZBX_NOTSUPPORTED"));
-		return  SYSINFO_RET_FAIL;
-	}
-	
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-        
-	if(get_param(param, 1, command, sizeof(command)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-	if(command[0] == '\0')
-	{
+	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS)
 		return SYSINFO_RET_FAIL;
-	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Run command '%s'",command);
-	
-	if(get_param(param, 2, flag, sizeof(flag)) != 0)
-        {
-                flag[0] = '\0';
-        }
-
-	if(flag[0] == '\0')
-	{
-		zbx_snprintf(flag,sizeof(flag),"wait");
-	}
-
-	if(strcmp(flag,"wait") == 0)
-	{
-		return EXECUTE_STR(cmd,command,flags,result);
-	}
-	else if(strcmp(flag,"nowait") != 0)
-	{
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
-	}
-	
-#if defined(_WINDOWS)
 
-	zbx_snprintf(full_command, sizeof(full_command), "cmd /C \"%s\"", command);
-
-	GetStartupInfo(&si);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Execute command '%s'",full_command);
-
-	if(!CreateProcess(
-		NULL,	/* No module name (use command line) */
-		full_command,/* Name of app to launch */
-		NULL,	/* Default process security attributes */
-		NULL,	/* Default thread security attributes */
-		FALSE,	/* Don't inherit handles from the parent */
-		0,	/* Normal priority */
-		NULL,	/* Use the same environment as the parent */
-		NULL,	/* Launch in the current directory */
-		&si,	/* Startup Information */
-		&pi))	/* Process information stored upon return */
-	{
+	if (0 != get_param(param, 1, command, sizeof(command)))
 		return SYSINFO_RET_FAIL;
-	}
 
-
-#else /* not _WINDOWS */
-
-	pid = zbx_fork(); /* run new thread 1 */
-	switch(pid)
-	{
-	case -1:
-		zabbix_log(LOG_LEVEL_WARNING, "fork failed for command '%s'",command);
+	if ('\0' == *command)
 		return SYSINFO_RET_FAIL;
-	case 0:
-		pid = zbx_fork(); /* run new tread 2 to replace by command */
-		switch(pid)
-		{
-		case -1:
-			zabbix_log(LOG_LEVEL_WARNING, "fork2 failed for '%s'",command);
-			return SYSINFO_RET_FAIL;
-		case 0:
-			/* 
-			 * DON'T REMOVE SLEEP
-			 * sleep needed to return server result as "1"
-			 * then we can run "execl"
-			 * otherwise command print result into socket with STDOUT id
-			 */
-			sleep(3); 
-			/**/
-			
-			/* replace thread 2 by the execution of command */
-			if(execl("/bin/sh", "sh", "-c", command, (char *)0))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "execl failed for command '%s'",command);
-			}
-			/* In normal case the program will never reach this point */
-			exit(0);
-		default:
-			waitpid(pid, NULL, WNOHANG); /* NO WAIT can be used for thread 2 closing */
-			exit(0); /* close thread 1 and transmit thread 2 to system (solve zombie state) */
-			break;
-		}
-	default:
-		waitpid(pid, NULL, 0); /* wait thread 1 closing */
-		break;
-	}
 
-#endif /* _WINDOWS */
+	zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", command);
+
+	if (0 != get_param(param, 2, flag, sizeof(flag)))
+		*flag = '\0';
+
+	if ('\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
+		return EXECUTE_STR(cmd, command, flags, result);
+	else if (0 != strcmp(flag, "nowait") || SUCCEED != zbx_execute_nowait(command))
+		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, 1);
-	
-	return	SYSINFO_RET_OK;
+
+	return SYSINFO_RET_OK;
 }

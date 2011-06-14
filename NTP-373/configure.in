@@ -973,6 +973,7 @@ AC_OUTPUT([
 	src/libs/zbxjabber/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxjson/Makefile
+	src/libs/zbxexec/Makefile
 	src/libs/zbxdbcache/Makefile
 	src/libs/zbxsysinfo/common/Makefile
 	src/libs/zbxsysinfo/simple/Makefile
