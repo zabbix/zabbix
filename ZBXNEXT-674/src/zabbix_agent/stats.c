@@ -33,7 +33,7 @@
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS)
 static int	shm_id;
 #endif
 
@@ -143,7 +143,7 @@ void	init_collector_data()
 {
 	int	cpu_count;
 	size_t	sz, sz_cpu;
-#ifndef _WINDOWS
+#if !defined(_WINDOWS)
 	key_t	shm_key;
 #endif
 
