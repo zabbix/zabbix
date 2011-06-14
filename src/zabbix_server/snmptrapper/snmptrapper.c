@@ -31,16 +31,134 @@ static ino_t	trap_ino = 0;
 
 /******************************************************************************
  *                                                                            *
+ * Function: parse_traps                                                      *
+ *                                                                            *
+ * Purpose: process the traps from tmp_trap_file                              *
+ *                                                                            *
+ * Author: Rudolfs Kreicbergs                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void process_trap(char *ip, char *trap)
+{
+	DB_RESULT	tresult;
+	DB_ROW		trow;
+	zbx_timespec_t	ts;
+	char		*res = NULL, *key, regex[MAX_STRING_LEN], params[MAX_STRING_LEN];
+
+	zbx_timespec(&ts);
+
+	tresult = DBselect("select i.key_, i.itemid"
+			" from items i, interface n"
+			" where n.hostid=i.hostid and n.ip='%s' and i.type=%d",
+			ip, ITEM_TYPE_SNMPTRAP);
+
+	while (NULL != (trow = DBfetch(tresult)))
+	{
+		key = trow[0];
+
+		if (2 != parse_command(key, NULL, 0, params, MAX_STRING_LEN))
+			continue;
+
+		if (0 != get_param(params, 1, regex, sizeof(regex)))
+			continue;
+
+		if (NULL != (res = zbx_regexp_match(trap, regex, NULL)))
+		{
+			DC_ITEM		item;
+			AGENT_RESULT	value;
+			zbx_uint64_t	itemid;
+
+			SET_STR_RESULT(&value, strdup(trap));
+
+			ZBX_STR2UINT64(itemid, trow[1]);
+
+			if (SUCCEED != DCconfig_get_item_by_itemid(&item, itemid))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "failed to get item [%lu]", itemid);
+				return;
+			}
+
+			dc_add_history(item.itemid, item.value_type, item.flags, &value, &ts, 0, NULL, 0, 0, 0, 0);
+
+			zabbix_log(LOG_LEVEL_ERR, "trap: %s", trap);
+			break;
+
+		}
+	}
+	DBfree_result(tresult);
+
+	if (NULL == res)
+		zabbix_log(LOG_LEVEL_ERR, "trap for unknown host [%s]: %s", ip, trap);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_traps                                                      *
+ *                                                                            *
+ * Purpose: process the traps from tmp_trap_file                              *
+ *                                                                            *
+ * Author: Rudolfs Kreicbergs                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void parse_traps(char *buffer)
+{
+	char	*c, *line, *begin = NULL, *end = NULL, *ip, trap[MAX_STRING_LEN];
+
+	c = buffer;
+	line = buffer;
+
+	for (; '\0' != *c; c++)
+	{
+		if ('\n' == *c)
+			line = c + 1;
+
+		if (0 != strncmp(c, "ZBXTRAP ", 8))
+			continue;
+
+		*c = '\0';
+		c += 8;	/* c now points to the IP address */
+
+		/* process the previos trap */
+		if (NULL != begin)
+		{
+			*(line - 1) = '\0';
+			zbx_snprintf(trap, sizeof(trap), "%s%s", begin, end);
+			process_trap(ip, trap);
+		}
+
+		/* parse the current trap */
+		begin = line;
+
+		ip = c;
+
+		if (NULL == (c = strchr(c, ' ')))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "invalid trap format");
+			return;
+		}
+
+		*c++ = '\0';
+		end = c;	/* the rest of the trap */
+	}
+
+	/* process the last trap */
+	if (NULL != end)
+	{
+		zbx_snprintf(trap, sizeof(trap), "%s%s", begin, end);
+		process_trap(ip, trap);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_traps                                                    *
  *                                                                            *
  * Purpose: process the traps from tmp_trap_file                              *
  *                                                                            *
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-static void process_traps()
+static void read_traps()
 {
 	const char	*__function_name = "process_traps";
 	int		nbytes;
@@ -57,13 +175,12 @@ static void process_traps()
 		goto exit;
 	}
 
-	trap_lastsize += (off_t)nbytes;
-
 	buffer[nbytes] = '\0';
 	zbx_rtrim(buffer + MAX(nbytes - 3, 0), " \r\n");
 
-	if ('\0' != *buffer)
-		zabbix_log(LOG_LEVEL_ERR, "trap: %s", buffer);
+	trap_lastsize += (off_t)nbytes;
+
+	parse_traps(buffer);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -111,13 +228,13 @@ static int	get_latest_data()
 				zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot stat [%s]: %s",
 						__function_name, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 			}
-			process_traps();
+			read_traps();
 			close(trap_fd);
 			trap_fd = -1;
 		}
 		else if (file_buf.st_ino != trap_ino || file_buf.st_size < trap_lastsize)
 		{
-			process_traps();
+			read_traps();
 			close(trap_fd);
 			trap_fd = -1;
 		}
@@ -148,8 +265,8 @@ void	main_snmptrapper_loop(int server_num)
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		while (SUCCEED == get_latest_data())	/* there are unprocessed traps */
-			process_traps();
+		while (SUCCEED == get_latest_data())	/* there are new traps */
+			read_traps();
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		zbx_setproctitle("snmptrapper [sleeping for 1 second]");

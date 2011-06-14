@@ -166,8 +166,11 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		zbx_free(arg1_esc);
 
 		while (NULL != (row = DBfetch(result)))
+		{
 			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
 					row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+		}
+
 		DBfree_result(result);
 	}
 
@@ -180,9 +183,7 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 
 	result = DBselectN(sql, 1);
 
-	if (NULL == (row = DBfetch(result)))
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGEVENTID is empty");
-	else
+	if (NULL != (row = DBfetch(result)))
 	{
 		if (SUCCEED == regexp_match_ex(regexps, regexps_num, row[0], arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
@@ -190,6 +191,9 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 		res = SUCCEED;
 	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGEVENTID is empty");
+
 	DBfree_result(result);
 	if ('@' == *arg1)
 		zbx_free(regexps);
