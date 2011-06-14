@@ -2,6 +2,7 @@
 Changes for 1.9.5
 
 New features:
+ - [ZBXNEXT-746] Added trigger sorting by severity and host name (KB)
  - [ZBX-1357] updated Latvian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-783] Added Inventory -> Overview report and filter to Inventory -> Hosts (KB)
  - [ZBXNEXT-467] Renamed net.tcp.dns(.query)[] to net.dns(.record)[], added Windows support, retrans and timeout parameters and IP parameter support for UNIX (rudolfs)
