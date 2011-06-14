@@ -96,6 +96,8 @@ ZABBIX.apps.map = (function(){
 			var selementid,
 				linkid;
 
+			this.reupdateImage = false; // if image should be updated again after last update is finished
+			this.imageUpdating = false; // if ajax request for image updating is processing
 			this.selements = {}; // element objects
 			this.links = {}; // map links array
 			this.selection = {
@@ -188,14 +190,22 @@ ZABBIX.apps.map = (function(){
 
 			updateImage: function(){
 				var url = new Curl(),
-					urlText = 'map.php' + '?sid=' + url.getArgument('sid');
+					urlText = 'map.php' + '?sid=' + url.getArgument('sid'),
+					ajaxRequest;
+
+				// is image is updating, set reupdate flag and exit
+				if(this.imageUpdating === true){
+					this.reupdateImage = true;
+					return;
+				}
 
 				// grid
 				if(this.data.grid_show === '1'){
 					urlText += '&grid=' + this.data.grid_size;
 				}
 
-				jQuery.ajax({
+				this.imageUpdating = true;
+				ajaxRequest = jQuery.ajax({
 					url: urlText,
 					type: 'post',
 					data: {
@@ -209,11 +219,20 @@ ZABBIX.apps.map = (function(){
 					},
 					success: jQuery.proxy(function(data){
 						this.mapimg.attr('src', 'imgstore.php?imageid=' + data.result);
+						this.imageUpdating = false;
 					}, this),
 					error: function(){
 						alert('Map image update failed');
 					}
 				});
+
+
+				jQuery.when(ajaxRequest).always(function(){
+					if(this.reupdateImage === true){
+						this.reupdateImage = false;
+						this.updateImage();
+					}
+				})
 			},
 
 			setContainer: function(){
@@ -479,8 +498,16 @@ ZABBIX.apps.map = (function(){
 				});
 
 				this.linkForm.domNode.delegate('.triggerRemove', 'click', function(){
-					var tid = jQuery(this).data('linktriggerid');
+					var triggerid,
+						tid = jQuery(this).data('linktriggerid').toString();
+
 					jQuery('#linktrigger_'+tid).remove();
+					for(triggerid in that.linkForm.triggerids){
+
+						if(that.linkForm.triggerids[triggerid] === tid){
+							delete that.linkForm.triggerids[triggerid];
+						}
+					}
 				});
 
 				// changes for color inputs
@@ -1354,12 +1381,12 @@ ZABBIX.apps.map = (function(){
 		LinkForm.prototype = {
 			show: function(){
 				this.domNode.toggle(true);
-				jQuery('#elementApply, #elementRemove, #elementClose').button('disable');
+				jQuery('#elementApply, #elementRemove').button('disable');
 			},
 
 			hide: function(){
 				this.domNode.toggle(false);
-				jQuery('#elementApply, #elementRemove, #elementClose').button('enable');
+				jQuery('#elementApply, #elementRemove').button('enable');
 			},
 
 			getValues: function(){
@@ -1460,7 +1487,7 @@ ZABBIX.apps.map = (function(){
 					linkTrigger;
 
 				for(linkTrigger in triggers){
-					this.triggerids[triggers[linkTrigger].triggerid] = true;
+					this.triggerids[triggers[linkTrigger].triggerid] = linkTrigger;
 
 					jQuery(tpl.evaluate(triggers[linkTrigger])).appendTo('#linkTriggerscontainer');
 
@@ -1492,7 +1519,7 @@ ZABBIX.apps.map = (function(){
 					this.sysmap.allLinkTriggerIds[linktriggerid] = true;
 
 					// store triggerid to forbid selecting same trigger twice
-					this.triggerids[triggers[i].triggerid] = true;
+					this.triggerids[triggers[i].triggerid] = linktriggerid;
 
 					linkTrigger.linktriggerid = linktriggerid;
 					linkTrigger.desc_exp = triggers[i].description;
