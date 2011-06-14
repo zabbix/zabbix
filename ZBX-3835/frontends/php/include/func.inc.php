@@ -31,6 +31,10 @@ function redirect($url){
 function jsRedirect($url,$timeout=null){
 	zbx_flush_post_cookies();
 
+	if(!preg_match('/^[a-z_]+\.php\??([a-z]+=\d+&?)*$/', $url)){
+		$url = 'dashboard.php';
+	}
+
 	$script = '';
 	if( is_numeric($timeout) ) {
 		$script.='setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';

@@ -52,6 +52,8 @@ include_once('include/page_header.php');
 	);
 	check_fields($fields);
 
+	$_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
+
 	if(isset($_REQUEST['cancel'])){
 		$url = new CUrl(urldecode($_REQUEST['backurl']));
 		jsRedirect($url->getUrl());
@@ -64,7 +66,6 @@ include_once('include/page_header.php');
 	}
 
 	$bulk = !isset($_REQUEST['eventid']);
-	$_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
 ?>
 <?php
 	if(!$bulk){
