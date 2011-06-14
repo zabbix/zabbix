@@ -38,7 +38,7 @@ ZBX_METRIC	parameters_simple[]=
 
 #ifdef HAVE_LDAP
 
-static int    check_ldap(char *hostname, short port, int *value_int)
+static int    check_ldap(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	LDAP		*ldap	= NULL;
 	LDAPMessage	*res	= NULL;
@@ -46,57 +46,55 @@ static int    check_ldap(char *hostname, short port, int *value_int)
 	BerElement	*ber	= NULL;
 
 	char	*attrs[2] = { "namingContexts", NULL };
-
 	char	*attr	 = NULL;
 	char	**valRes = NULL;
-
 	int	ldapErr = 0;
-
-        assert(value_int);
 
 	*value_int = 0;
 
-	if(NULL == (ldap = ldap_init(hostname, port)) )
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "LDAP - initialization failed [%s:%u]",hostname, port);
-		return	SYSINFO_RET_OK;
-	}
+	alarm(timeout);
 
-	if( LDAP_SUCCESS != (ldapErr = ldap_search_s(
-		ldap, 
-		"", 
-		LDAP_SCOPE_BASE, 
-		"(objectClass=*)", 
-		attrs, 
-		0, 
-		&res)) )
+	if (NULL == (ldap = ldap_init(host, port)))
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "LDAP - serching failed [%s] [%s]",hostname, ldap_err2string(ldapErr));
+		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - initialization failed [%s:%u]", host, port);
 		goto lbl_ret;
 	}
 
-	if(NULL == (msg = ldap_first_entry(ldap, res)) )
+	if (LDAP_SUCCESS != (ldapErr = ldap_search_s(ldap, "", LDAP_SCOPE_BASE, "(objectClass=*)", attrs, 0, &res)))
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, " LDAP - empty sort result. [%s] [%s]", hostname, ldap_err2string(ldapErr));
+		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - serching failed [%s] [%s]", host, ldap_err2string(ldapErr));
+		goto lbl_ret;
+	}
+
+	if (NULL == (msg = ldap_first_entry(ldap, res)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - empty sort result. [%s] [%s]", host, ldap_err2string(ldapErr));
 		goto lbl_ret;
 	}
        
-	attr	= ldap_first_attribute (ldap, msg, &ber);
-
+	attr = ldap_first_attribute (ldap, msg, &ber);
 	valRes	= ldap_get_values( ldap, msg, attr );
 
 	*value_int = 1;
 
 lbl_ret:
-	if(valRes)	ldap_value_free(valRes);
-	if(attr)	ldap_memfree(attr);
-	if(ber) 	ber_free(ber, 0);
-	if(res)		ldap_msgfree(res);
-	if(ldap)	ldap_unbind(ldap);
+	alarm(0);
+
+	if (NULL != valRes)
+		ldap_value_free(valRes);
+	if (NULL != attr)
+		ldap_memfree(attr);
+	if (NULL != ber)
+		ber_free(ber, 0);
+	if (NULL != res)
+		ldap_msgfree(res);
+	if (NULL != ldap)
+		ldap_unbind(ldap);
        
-	return	SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
-#endif
+
+#endif	/* HAVE_LDAP */
 
 
 /* 
@@ -220,39 +218,39 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT
 	else if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
-		ret=tcp_expect(ip,port,NULL,"220","QUIT\n",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\n", &value_int);
 	}
 	else if(strcmp(service,"ftp") == 0)
 	{
 		if(port == 0)	port=21;
-		ret=tcp_expect(ip,port,NULL,"220","",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\n", &value_int);
 	}
 	else if(strcmp(service,"http") == 0)
 	{
 		if(port == 0)	port=80;
-		ret=tcp_expect(ip,port,NULL,NULL,"",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}
 	else if(strcmp(service,"pop") == 0)
 	{
 		if(port == 0)	port=110;
-		ret=tcp_expect(ip,port,NULL,"+OK","",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "+OK", "QUIT\n", &value_int);
 	}
 	else if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
 /* 220 is incorrect */
 /*		ret=tcp_expect(ip,port,"220","");*/
-		ret=tcp_expect(ip,port,NULL,"200","",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "200", "QUIT\n", &value_int);
 	}
 	else if(strcmp(service,"imap") == 0)
 	{
 		if(port == 0)	port=143;
-		ret=tcp_expect(ip,port,NULL,"* OK","a1 LOGOUT\n",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "* OK", "a1 LOGOUT\n", &value_int);
 	}
 	else if(strcmp(service,"tcp") == 0)
 	{
 		if(port == 0)	port=80;
-		ret=tcp_expect(ip,port,NULL,NULL,"",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}
 	else
 	{
@@ -349,39 +347,39 @@ int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	else if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
-		ret=tcp_expect(ip,port,NULL,"220","QUIT\n",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\n", &value_int);
 	}
 	else if(strcmp(service,"ftp") == 0)
 	{
 		if(port == 0)	port=21;
-		ret=tcp_expect(ip,port,NULL,"220","",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "220", "QUIT\n", &value_int);
 	}
 	else if(strcmp(service,"http") == 0)
 	{
 		if(port == 0)	port=80;
-		ret=tcp_expect(ip,port,NULL,NULL,"",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}
 	else if(strcmp(service,"pop") == 0)
 	{
 		if(port == 0)	port=110;
-		ret=tcp_expect(ip,port,NULL,"+OK","",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "+OK", "QUIT\n", &value_int);
 	}
 	else if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
 /* 220 is incorrect */
 /*		ret=tcp_expect(ip,port,"220","");*/
-		ret=tcp_expect(ip,port,NULL,"200","",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "200", "QUIT\n", &value_int);
 	}
 	else if(strcmp(service,"imap") == 0)
 	{
 		if(port == 0)	port=143;
-		ret=tcp_expect(ip,port,NULL,"* OK","a1 LOGOUT\n",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, "* OK", "a1 LOGOUT\n", &value_int);
 	}
 	else if(strcmp(service,"tcp") == 0)
 	{
 		if(port == 0)	port=80;
-		ret=tcp_expect(ip,port,NULL,NULL,"",&value_int);
+		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}
 	else
 	{
