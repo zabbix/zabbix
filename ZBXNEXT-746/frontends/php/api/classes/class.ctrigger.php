@@ -594,14 +594,20 @@ class CTrigger extends CZBXAPI{
 					$sql_parts['select'][] = 't.'.$options['sortfield'];
 				}
 			}
-			// if lastchange is not used for ordering, it should be the second order criteria
+
+			// for postgreSQL column which is present in ORDER BY should also be present in SELECT
+			if(!str_in_array('t.lastchange', $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])){
+				$sql_parts['select'][] = 't.lastchange';
+			}
+
 			if($options['sortfield'] == 'lastchange'){
 				$sql_parts['order'][] = $order;
 			}
 			else{
-				if(!str_in_array('t.lastchange', $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])){
-					$sql_parts['select'][] = 't.lastchange';
+				if(!str_in_array('t.'.$order, $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])){
+					$sql_parts['select'][] = 't.'.$order;
 				}
+				// if lastchange is not used for ordering, it should be the second order criteria
 				$sql_parts['order'][] = $order.', lastchange DESC';
 			}
 		}
