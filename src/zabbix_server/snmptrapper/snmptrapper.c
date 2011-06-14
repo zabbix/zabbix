@@ -26,35 +26,54 @@
 #include "snmptrapper.h"
 
 static int	trap_fd = -1;
-static off_t	trap_lastsize = 0;
+static int	trap_lastsize;
 static ino_t	trap_ino = 0;
+
+static void	DBget_lastsize()
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	result = DBselect("select snmp_lastsize from globalvars");
+
+	if (NULL != (row = DBfetch(result)))
+		trap_lastsize = atoi(row[0]);
+	else
+		trap_lastsize = 0;
+
+	DBfree_result(result);
+}
+
+static void	DBupdate_lastsize()
+{
+	DBexecute("update globalvars set snmp_lastsize=%d", trap_lastsize);
+}
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_traps                                                      *
+ * Function: process_trap                                                     *
  *                                                                            *
- * Purpose: process the traps from tmp_trap_file                              *
+ * Purpose: process a single trap                                             *
  *                                                                            *
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 static void process_trap(char *ip, char *trap)
 {
-	DB_RESULT	tresult;
-	DB_ROW		trow;
+	DB_RESULT	result;
+	DB_ROW		row;
 	zbx_timespec_t	ts;
 	char		*res = NULL, *key, regex[MAX_STRING_LEN], params[MAX_STRING_LEN];
 
 	zbx_timespec(&ts);
 
-	tresult = DBselect("select i.key_, i.itemid"
+	result = DBselect("select i.key_, i.itemid"
 			" from items i, interface n"
 			" where n.hostid=i.hostid and n.ip='%s' and i.type=%d",
 			ip, ITEM_TYPE_SNMPTRAP);
 
-	while (NULL != (trow = DBfetch(tresult)))
+	while (NULL != (row = DBfetch(result)))
 	{
-		key = trow[0];
+		key = row[0];
 
 		if (2 != parse_command(key, NULL, 0, params, MAX_STRING_LEN))
 			continue;
@@ -70,7 +89,7 @@ static void process_trap(char *ip, char *trap)
 
 			SET_STR_RESULT(&value, strdup(trap));
 
-			ZBX_STR2UINT64(itemid, trow[1]);
+			ZBX_STR2UINT64(itemid, row[1]);
 
 			if (SUCCEED != DCconfig_get_item_by_itemid(&item, itemid))
 			{
@@ -85,7 +104,7 @@ static void process_trap(char *ip, char *trap)
 
 		}
 	}
-	DBfree_result(tresult);
+	DBfree_result(result);
 
 	if (NULL == res)
 		zabbix_log(LOG_LEVEL_ERR, "trap for unknown host [%s]: %s", ip, trap);
@@ -95,7 +114,7 @@ static void process_trap(char *ip, char *trap)
  *                                                                            *
  * Function: parse_traps                                                      *
  *                                                                            *
- * Purpose: process the traps from tmp_trap_file                              *
+ * Purpose: split traps and process them with process_trap()                  *
  *                                                                            *
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
@@ -151,9 +170,9 @@ static void parse_traps(char *buffer)
 
 /******************************************************************************
  *                                                                            *
- * Function: process_traps                                                    *
+ * Function: read_traps                                                       *
  *                                                                            *
- * Purpose: process the traps from tmp_trap_file                              *
+ * Purpose: read the traps and then parse them with parse_traps()             *
  *                                                                            *
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
@@ -168,6 +187,14 @@ static void read_traps()
 
 	*buffer = 0;
 
+
+	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot set position to [%li]: %s",
+				__function_name, trap_lastsize, zbx_strerror(errno));
+		goto exit;
+	}
+
 	if (FAIL == (nbytes = read(trap_fd, buffer, sizeof(buffer))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot read from [%s]: %s",
@@ -179,10 +206,20 @@ static void read_traps()
 	zbx_rtrim(buffer + MAX(nbytes - 3, 0), " \r\n");
 
 	trap_lastsize += (off_t)nbytes;
+	DBupdate_lastsize();
 
 	parse_traps(buffer);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static void	close_trap_file()
+{
+	if (-1 != trap_fd)
+		close(trap_fd);
+	trap_fd = -1;
+	trap_lastsize = 0;
+	DBupdate_lastsize();
 }
 
 static int	open_trap_file()
@@ -202,14 +239,10 @@ static int	open_trap_file()
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot stat [%s]: %s",
 				__function_name, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
-		close(trap_fd);
-		trap_fd = -1;
+		close_trap_file();
 	}
 	else
-	{
-		trap_ino = file_buf.st_ino;
-		trap_lastsize = 0;
-	}
+		trap_ino = file_buf.st_ino;	/* a new file was opened */
 
 	return trap_fd;
 }
@@ -229,14 +262,12 @@ static int	get_latest_data()
 						__function_name, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 			}
 			read_traps();
-			close(trap_fd);
-			trap_fd = -1;
+			close_trap_file();
 		}
-		else if (file_buf.st_ino != trap_ino || file_buf.st_size < trap_lastsize)
+		else if (file_buf.st_ino != trap_ino || file_buf.st_size < trap_lastsize)	/* file rotation */
 		{
 			read_traps();
-			close(trap_fd);
-			trap_fd = -1;
+			close_trap_file();
 		}
 		else if (file_buf.st_size == trap_lastsize)
 			return FAIL;	/* no new traps */
@@ -259,6 +290,8 @@ void	main_snmptrapper_loop(int server_num)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	DBget_lastsize();
 
 	while (ZBX_IS_RUNNING())
 	{
