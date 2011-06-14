@@ -573,42 +573,39 @@ class CTrigger extends CZBXAPI{
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
 		if(!zbx_empty($options['sortfield'])){
+			// DESC or ASC
 			$sortorder = $options['sortorder'] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
-			// sorting by host name is a special case
-			if($options['sortfield'] == 'hostname'){
-				// the only way to sort by host name is to get it like this:
-				// triggers -> functions -> items -> hosts
-				$sql_parts['from']['functions'] = 'functions f';
-				$sql_parts['from']['items'] = 'items i';
-				$sql_parts['from']['hosts'] = 'hosts h';
-				$sql_parts['where'][] = 't.triggerid = f.triggerid';
-				$sql_parts['where'][] = 'f.itemid = i.itemid';
-				$sql_parts['where'][] = 'i.hostid = h.hostid';
-				$order = 'h.name '.$sortorder;
-			}
-			else{
-				$order = 't.'.$options['sortfield'].' '.$sortorder;
-
-				if(!str_in_array('t.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])){
-					$sql_parts['select'][] = 't.'.$options['sortfield'];
-				}
-			}
-
 			// for postgreSQL column which is present in ORDER BY should also be present in SELECT
+			// we will be using lastchange for ordering in any case
 			if(!str_in_array('t.lastchange', $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 't.lastchange';
+				$sql_parts['select']['lastchange'] = 't.lastchange';
 			}
 
-			if($options['sortfield'] == 'lastchange'){
-				$sql_parts['order'][] = $order;
-			}
-			else{
-				if(!str_in_array('t.'.$order, $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])){
-					$sql_parts['select'][] = 't.'.$order;
-				}
-				// if lastchange is not used for ordering, it should be the second order criteria
-				$sql_parts['order'][] = $order.', lastchange DESC';
+			switch($options['sortfield']){
+				case 'hostname':
+					// the only way to sort by host name is to get it like this:
+					// triggers -> functions -> items -> hosts
+					$sql_parts['select']['hostname'] = 'h.name';
+					$sql_parts['from']['functions'] = 'functions f';
+					$sql_parts['from']['items'] = 'items i';
+					$sql_parts['from']['hosts'] = 'hosts h';
+					$sql_parts['where'][] = 't.triggerid = f.triggerid';
+					$sql_parts['where'][] = 'f.itemid = i.itemid';
+					$sql_parts['where'][] = 'i.hostid = h.hostid';
+					$sql_parts['order'][] = 'h.name '.$sortorder.', t.lastchange DESC';
+				break;
+				case 'lastchange':
+					$sql_parts['order'][] = $options['sortfield'].' '.$sortorder;
+				break;
+				default:
+					// adding sort field to SELECT part if it is not already there
+					if(!str_in_array('t.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])){
+						$sql_parts['select'][] = 't.'.$options['sortfield'];
+					}
+					// if lastchange is not used for ordering, it should be the second order criteria
+					$sql_parts['order'][] = 't.'.$options['sortfield'].' '.$sortorder.', t.lastchange DESC';
+				break;
 			}
 		}
 
