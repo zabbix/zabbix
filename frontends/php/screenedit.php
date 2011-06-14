@@ -30,8 +30,7 @@
 	$page['scripts'] = array('class.cscreen.js', 'class.calendar.js', 'gtlc.js');
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once('include/page_header.php');
-
+	include_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -48,6 +47,7 @@ include_once('include/page_header.php');
 		'colspan'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
 		'rowspan'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
 		'elements'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,65535),	null),
+		'sort_triggers'=>   array(T_ZBX_INT, O_OPT,  null,  IN(array(SCREEN_SORT_TRIGGERS_DATE_DESC, SCREEN_SORT_TRIGGERS_SEVERITY_DESC, SCREEN_SORT_TRIGGERS_HOST_NAME_ASC)),	null),
 		'valign'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(VALIGN_MIDDLE,VALIGN_BOTTOM),		null),
 		'halign'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(HALIGN_CENTER,HALIGN_RIGHT),		null),
 		'style'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,2),	'isset({save})'),
@@ -170,7 +170,7 @@ include_once('include/page_header.php');
 				$result = update_screen_item($_REQUEST['screenitemid'],
 					$_REQUEST['resourcetype'],$_REQUEST['resourceid'],$_REQUEST['width'],
 					$_REQUEST['height'],$_REQUEST['colspan'],$_REQUEST['rowspan'],
-					$_REQUEST['elements'],$_REQUEST['valign'],
+					$_REQUEST['elements'],$_REQUEST['sort_triggers'],$_REQUEST['valign'],
 					$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
 
 				if(!$result) throw new Exception();
@@ -180,7 +180,7 @@ include_once('include/page_header.php');
 					$_REQUEST['resourcetype'],$_REQUEST['screenid'],
 					$_REQUEST['x'],$_REQUEST['y'],$_REQUEST['resourceid'],
 					$_REQUEST['width'],$_REQUEST['height'],$_REQUEST['colspan'],
-					$_REQUEST['rowspan'],$_REQUEST['elements'],$_REQUEST['valign'],
+					$_REQUEST['rowspan'],$_REQUEST['elements'],$_REQUEST['sort_triggers'],$_REQUEST['valign'],
 					$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
 
 				if(!$result) throw new Exception();
@@ -270,7 +270,7 @@ include_once('include/page_header.php');
 	$screen = reset($screens);
 
 
-	$table = get_screen($screen, 1);
+	$table = get_screen($screen, 1); // 1 - edit mode
 	$screen_wdgt->addItem($table);
 	zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');
 	zbx_add_post_js('timeControl.processObjects();');
