@@ -377,7 +377,7 @@ function resolveMapLabelMacrosAll(array $selement){
 	if($resolveHostMacros){
 		$replace = array(
 			'{HOST.NAME}' => $db_host['name'],
-			'{HOSTNAME}' => $db_host['name'],
+			'{HOSTNAME}' => $db_host['host'],
 			'{HOST.HOST}' => $db_host['host'],
 			'{HOST.DNS}' => $db_host['dns'],
 			'{HOST.IP}' => $db_host['ip'],
@@ -433,7 +433,7 @@ function resolveMapLabelMacros($label, $replaceHost = null){
 		$pattern = "/{" . ZBX_PREG_HOST_FORMAT . ":.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
 	}
 	else{
-		$pattern = "/{(" . ZBX_PREG_HOST_FORMAT . "|{HOST.NAME}|{HOSTNAME}|{HOST.HOST}):.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
+		$pattern = "/{(".ZBX_PREG_HOST_FORMAT."|{HOSTNAME}|{HOST.HOST}):.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
 	}
 
 	preg_match_all($pattern, $label, $matches);
@@ -441,10 +441,7 @@ function resolveMapLabelMacros($label, $replaceHost = null){
 	foreach($matches[0] as $expr){
 		$macro = $expr;
 		if($replaceHost !== null){
-			if(zbx_strpos($macro, '{HOST.NAME}') == 1){
-				$macro = substr_replace($macro, $replaceHost, 1, 11);
-			}
-			elseif(zbx_strpos($macro, '{HOSTNAME}') == 1)
+			if(zbx_strpos($macro, '{HOSTNAME}') == 1)
 			{
 				$macro = substr_replace($macro, $replaceHost, 1, 10);
 			}
