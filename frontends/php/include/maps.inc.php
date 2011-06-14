@@ -1114,7 +1114,7 @@ function getSelementsInfo($sysmap){
 	if(!empty($monitored_hostids)){
 		$options = array(
 			'hostids' => $monitored_hostids,
-			'output' => array('status', 'value', 'priority', 'lastchange'),
+			'output' => array('status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'nopermissions' => 1,
 			'filter' => array(
 //					'value' => TRIGGER_VALUE_TRUE,
@@ -2137,6 +2137,7 @@ function populateFromMapAreas(array &$map){
 
 			$hosts = API::host()->get(array(
 				'groupids' => $selement['elementid'],
+				'sortfield' => 'name',
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
 				'preservekeys' => true,

@@ -141,8 +141,6 @@ class CCanvas{
 		imageline($this->canvas, $x1 + $radius, $y2, $x2 - $radius, $y2, $color);
 		imageline($this->canvas, $x1, $y1 + $radius, $x1, $y2 - $radius, $color);
 		imageline($this->canvas, $x2, $y1 + $radius, $x2, $y2 - $radius, $color);
-
-//		imagerectangle($this->canvas, $x1, $y1, $x2, $y2, $this->getColor($color));
 	}
 
 	protected function getColor($color){
@@ -163,13 +161,12 @@ class CCanvas{
 		$this->colors['darkyellow'] = imagecolorallocate($this->canvas, 150, 150, 0);
 		$this->colors['cyan'] = imagecolorallocate($this->canvas, 0, 255, 255);
 		$this->colors['black'] = imagecolorallocate($this->canvas, 0, 0, 0);
-		$this->colors['gray'] = imagecolorallocate($this->canvas, 150, 150, 150);
-		$this->colors['gray2'] = imagecolorallocate($this->canvas, 180, 180, 180);
-		$this->colors['gray3'] = imagecolorallocate($this->canvas, 210, 210, 210);
+		$this->colors['gray'] = imagecolorallocate($this->canvas, 180, 180, 180);
+		$this->colors['gray2'] = imagecolorallocate($this->canvas, 210, 210, 210);
+		$this->colors['gray3'] = imagecolorallocate($this->canvas, 240, 240, 240);
 		$this->colors['white'] = imagecolorallocate($this->canvas, 255, 255, 255);
 		$this->colors['orange'] = imagecolorallocate($this->canvas, 238, 96, 0);
 	}
-
 }
 
 class CMapPainter{
@@ -263,28 +260,25 @@ class CMapPainter{
 			if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS
 					&& $selement['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM)
 			{
-				$this->canvas->drawRoundedRectangle(
+				$this->canvas->drawRectangle(
 					$selement['x'] + 1,
 					$selement['y'] + 1,
 					$selement['x'] + $selement['width'] - 1,
 					$selement['y'] + $selement['height'] - 1,
-					10,
 					'gray'
 				);
-				$this->canvas->drawRoundedRectangle(
+				$this->canvas->drawRectangle(
 					$selement['x'],
 						$selement['y'],
 						$selement['x'] + $selement['width'],
 						$selement['y'] + $selement['height'],
-					10,
 					'gray2'
 				);
-				$this->canvas->drawRoundedRectangle(
+				$this->canvas->drawRectangle(
 					$selement['x'] - 1,
 					$selement['y'] - 1,
 						$selement['x'] + $selement['width'] + 1,
 						$selement['y'] + $selement['height'] + 1,
-					10,
 					'gray3'
 				);
 			}
