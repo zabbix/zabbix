@@ -509,6 +509,10 @@ FIELD		|severity_name_3|t_varchar(32)	|'Average'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_4|t_varchar(32)	|'High'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_5|t_varchar(32)	|'Disaster'|NOT NULL	|ZBX_SYNC
 
+TABLE|globalvars|globalvarid|0
+FIELD		|globalvarid	|t_id		|	|NOT NULL	|0
+FIELD		|snmp_lastsize	|t_integer	|'0'	|NOT NULL	|0
+
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|items
