@@ -4,3 +4,4 @@ CREATE TABLE globalvars (
 	PRIMARY KEY (globalvarid)
 ) with OIDS;
 
+INSERT INTO globalvars VALUES (1,0);

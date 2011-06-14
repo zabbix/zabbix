@@ -4,3 +4,4 @@ CREATE TABLE globalvars (
 	PRIMARY KEY (globalvarid)
 );
 
+INSERT INTO globalvars VALUES (1,0);
