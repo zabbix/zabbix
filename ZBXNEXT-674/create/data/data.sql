@@ -12224,11 +12224,11 @@ INSERT INTO screens VALUES (2,'Zabbix server',2,3,NULL);
 -- Dumping data for table `screens_items`
 --
 
-INSERT INTO screens_items VALUES (2,2,2,2,0,0,0,0,2,0,0,0,0,0,'',0);
-INSERT INTO screens_items VALUES (4,2,0,2,400,100,0,1,0,0,0,0,0,0,'',0);
-INSERT INTO screens_items VALUES (5,2,0,3,400,100,1,1,0,0,0,0,0,0,'',0);
-INSERT INTO screens_items VALUES (6,2,0,4,400,100,0,2,0,0,0,0,0,0,'',0);
-INSERT INTO screens_items VALUES (7,2,0,5,400,100,1,2,0,0,0,0,0,0,'',0);
+INSERT INTO screens_items VALUES (2,2,2,2,0,0,0,0,2,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items VALUES (4,2,0,2,400,100,0,1,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items VALUES (5,2,0,3,400,100,1,1,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items VALUES (6,2,0,4,400,100,0,2,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items VALUES (7,2,0,5,400,100,1,2,0,0,0,0,0,0,'',0,0);
 
 --
 -- Dumping data for table `help_items`
