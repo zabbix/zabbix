@@ -41,7 +41,8 @@ $fields=array(
 
 	'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3"),	NULL),
 	'grid'=>			array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,500),	NULL),
-	'border'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),		NULL)
+	'border'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),		NULL),
+	'base64image'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),		NULL),
 );
 
 check_fields($fields);
@@ -375,8 +376,17 @@ if(!isset($_REQUEST['noselements']) && ($map['markelements'] == 1)){
 
 show_messages();
 
-imageOut($im);
-imagedestroy($im);
+if(get_request('base64image')){
+	ob_start();
+	imagepng($im);
+	$imageSource = ob_get_contents();
+	ob_end_clean();
+	echo zbx_jsvalue(array('result' => base64_encode($imageSource)));
+	imagedestroy($im);
+}
+else{
+	imageOut($im);
+}
 
 include_once('include/page_footer.php');
 

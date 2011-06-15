@@ -94,7 +94,8 @@ ZABBIX.apps.map = (function(){
 
 		var CMap = function(containerid, mapdata){
 			var selementid,
-				linkid;
+				linkid,
+				setContainer;
 
 			this.reupdateImage = false; // if image should be updated again after last update is finished
 			this.imageUpdating = false; // if ajax request for image updating is processing
@@ -109,7 +110,6 @@ ZABBIX.apps.map = (function(){
 			this.allLinkTriggerIds = {};
 
 
-			this.mapimg = jQuery('#sysmap_img');
 			this.sysmapid = mapdata.sysmap.sysmapid;
 			this.data = mapdata.sysmap;
 			this.iconList = mapdata.iconList;
@@ -117,6 +117,40 @@ ZABBIX.apps.map = (function(){
 			this.container = jQuery('#' + containerid);
 			if(this.container.length === 0){
 				this.container = jQuery(document.body);
+			}
+			this.container.css({
+				width: this.data.width + 'px',
+				height: this.data.height + 'px'
+			});
+
+			if(IE || GK){
+				this.base64image = false;
+				this.mapimg = jQuery('#sysmap_img');
+
+				// resize div on window resize
+				setContainer = function(){
+					var sysmap_pn = this.mapimg.position(),
+						sysmapHeight = this.mapimg.height(),
+						sysmapWidth = this.mapimg.width(),
+						container_pn = this.container.position();
+
+					if((container_pn.top !== sysmap_pn.top) || (container_pn.left !== sysmap_pn.left) || (this.container.height() !== sysmapHeight) || (this.container.width() !== sysmapWidth)){
+						this.container.css({
+							top: sysmap_pn.top + 'px',
+							left: sysmap_pn.left + 'px',
+							height: sysmapHeight + 'px',
+							width: sysmapWidth + 'px'
+						});
+					}
+				};
+
+				jQuery(window).resize(jQuery.proxy(setContainer, this));
+				// resize div on image change
+				this.mapimg.load(jQuery.proxy(setContainer, this));
+			}
+			else{
+				this.base64image = true;
+				jQuery('#sysmap_img').remove();
 			}
 
 
@@ -209,19 +243,31 @@ ZABBIX.apps.map = (function(){
 					url: urlText,
 					type: 'post',
 					data: {
-						'output': 'json',
-						'sysmapid': this.sysmapid,
-						'noselements': 1,
-						'nolinks': 1,
-						'nocalculations': 1,
-						'selements': Object.toJSON(this.data.selements),
-						'links': Object.toJSON(this.data.links)
+						output: 'json',
+						sysmapid: this.sysmapid,
+						noselements: 1,
+						nolinks: 1,
+						nocalculations: 1,
+						selements: Object.toJSON(this.data.selements),
+						links: Object.toJSON(this.data.links),
+						base64image: (this.base64image ? 1 : 0)
 					},
 					success: jQuery.proxy(function(data){
-						this.mapimg.attr('src', 'imgstore.php?imageid=' + data.result);
+						if(this.base64image){
+							this.container.css({
+								'background-image': 'url("data:image/png;base64,'+data.result+'")',
+								width: this.data.width + 'px',
+								height: this.data.height + 'px'
+							});
+						}
+						else{
+							this.mapimg.attr('src', 'imgstore.php?imageid=' + data.result);
+						}
+
 						this.imageUpdating = false;
 					}, this),
-					error: function(){
+					error: function(jqXHR, textStatus, errorThrown){
+						window.console && window.console.log && window.console.log(jqXHR, textStatus, errorThrown);
 						alert('Map image update failed');
 					}
 				});
@@ -233,22 +279,6 @@ ZABBIX.apps.map = (function(){
 						this.updateImage();
 					}
 				})
-			},
-
-			setContainer: function(){
-				var sysmap_pn = this.mapimg.position(),
-					sysmapHeight = this.mapimg.height(),
-					sysmapWidth = this.mapimg.width(),
-					container_pn = this.container.position();
-
-				if((container_pn.top !== sysmap_pn.top) || (container_pn.left !== sysmap_pn.left) || (this.container.height() !== sysmapHeight) || (this.container.width() !== sysmapWidth)){
-					this.container.css({
-						top: sysmap_pn.top + 'px',
-						left: sysmap_pn.left + 'px',
-						height: sysmapHeight + 'px',
-						width: sysmapWidth + 'px'
-					});
-				}
 			},
 
 			// ---------- ELEMENTS ------------------------------------------------------------------------------------
@@ -347,13 +377,6 @@ ZABBIX.apps.map = (function(){
 
 			bindActions: function(){
 				var that = this;
-
-				// MAP IMAGE EVENTS
-				// resize div on window resize
-				jQuery(window).resize(jQuery.proxy(this.setContainer, this));
-				// resize div on image change
-				this.mapimg.load(jQuery.proxy(this.setContainer, this));
-
 
 				// MAP PANEL EVENTS
 				// change grid size
