@@ -521,7 +521,7 @@ void	zbx_on_exit()
 	if (NULL != threads)
 	{
 		int		i;
-#ifndef _WINDOWS
+#if !defined(_WINDOWS)
 		sigset_t	set;
 
 		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
