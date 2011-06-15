@@ -2,6 +2,7 @@
 Changes for 1.9.5
 
 New features:
+ - [ZBXNEXT-746] Added trigger sorting by severity and host name (KB)
  - [ZBX-1357] updated Latvian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-783] Added Inventory -> Overview report and filter to Inventory -> Hosts (KB)
  - [ZBXNEXT-467] Renamed net.tcp.dns(.query)[] to net.dns(.record)[], added Windows support, retrans and timeout parameters and IP parameter support for UNIX (rudolfs)
@@ -10,6 +11,8 @@ New features:
  - [ZBXNEXT-780] all items (including user parameters and external checks) can also return only whitespace (rudolfs)
 
 Bug fixes:
+ - [ZBX-3841] returned functionality of a macro {HOSTNAME} as in the version 1.8.x (Sasha)
+ - [ZBX-3841] fixed processing of {HOST.NAME} macro in item keys (Sasha)
  - [ZBX-3858] fixed host selection in action condition popup (Vedmak)
  - [ZBX-3852] fixed duplicate HTML IDs in events.php (KB)
  - [ZBX-3846] fixed typo in map creation info message during export (Vedmak)
@@ -165,6 +168,10 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3420] fixed wrong error message being logged in case of DNS resolution errors (asaveljevs,rudolfs)
+ - [ZBX-3519] fixed unterminated processes when system.run[,wait] times out and added proper output handling for system.run[,nowait] on UNIX (rudolfs) 
+ - [ZBX-3768] fixed 'uptime' and 's' units as according to the documentation (Sasha)
+ - [ZBX-3490] added support for LVM devices and full path to devices to vfs.dev.read and vfs.dev.write; thanks to Takanori Suzuki (dimir, sasha)
  - [ZBX-3862] fixed broken popups in frontend in Internet Explorer 7 (KB)
  - [ZBX-3463] fixed MaxHousekeeperDelete configuration parameter being ignored for IBM DB2 (asaveljevs)
  - [ZBX-3854] added saving of state of dynamic/fixed setting for time lines on all pages (KB)
