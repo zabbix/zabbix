@@ -1428,7 +1428,7 @@ require_once('include/js.inc.php');
 					}
 
 					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT)), $tr_form));
-					$item[] = make_latest_issues($params);
+					$item[] = make_latest_issues($params, true); // true means 'show status'
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 ///-----------------------
@@ -1527,7 +1527,7 @@ require_once('include/js.inc.php');
 ///-----------------------
 
 					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT)), $tr_form));
-					$item[] = make_latest_issues($params);
+					$item[] = make_latest_issues($params, true); // true means 'show status'
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}

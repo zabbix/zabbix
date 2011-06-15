@@ -812,9 +812,10 @@ return new CDiv(array($table, $script));
  * Create and return a DIV with latest problem triggers
  * @author Aly
  * @param array $filter
+ * @param bool $showStatus
  * @return CDiv
  */
-function make_latest_issues($filter = array()){
+function make_latest_issues($filter = array(), $showStatus=false){
 	$config = select_config();
 
 	$options = array(
@@ -881,6 +882,7 @@ function make_latest_issues($filter = array()){
 			$options['sortfield'] === 'priority'
 				? array($issueHeaderDiv, $sortDiv)
 				: S_ISSUE,
+			$showStatus ? _('Status') : null,
 			$options['sortfield'] === 'lastchange'
 				? array($lastChangeHeaderDiv, $sortDiv)
 				: S_LAST_CHANGE,
@@ -996,7 +998,6 @@ function make_latest_issues($filter = array()){
 
 			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])),ZBX_FLAG_EVENT);
 
-
 //actions
 			$actions = get_event_actions_stat_hints($event['eventid']);
 
@@ -1013,10 +1014,24 @@ function make_latest_issues($filter = array()){
 			$description = new CCol($description,getSeverityStyle($trigger['priority']));
 			$description->setHint(make_popup_eventlist($event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
 
+			if($showStatus){
+				$statusSpan = new CSpan(trigger_value2str($trigger['value']));
+				// add colors and blinking to span depending on configuration and trigger parameters
+				addTriggerValueStyle(
+					$statusSpan,
+					$trigger['value'],
+					$trigger['lastchange'],
+					$event['acknowledged']
+				);
+			}
+
+			zbx_add_post_js('blink.init();');
+
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
 				$host,
 				$description,
+				$showStatus ? $statusSpan : null,
 				$clock,
 				zbx_date2age($event['clock']),
 				$unknown,
