@@ -808,11 +808,15 @@ return new CDiv(array($table, $script));
 }
 
 
-// author Aly
+/**
+ * Create and return a DIV with latest problem triggers
+ * @author Aly
+ * @param array $filter
+ * @return CDiv
+ */
 function make_latest_issues($filter = array()){
 	$config = select_config();
 
-	$limit = isset($filter['limit']) ? $filter['limit'] : 20;
 	$options = array(
 		'groupids' => $filter['groupids'],
 		'monitored' => 1,
@@ -824,14 +828,20 @@ function make_latest_issues($filter = array()){
 		),
 		'selectGroups' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
-		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => 'lastchange',
-		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => $limit
+		'output' => API_OUTPUT_EXTEND
 	);
+
+	$options['sortfield'] = isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange';
+	$options['sortorder'] = isset($filter['sortorder']) ? $filter['sortorder'] : ZBX_SORT_DOWN;
+	$options['limit'] = isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT;
 
 	if(isset($filter['hostids'])) $options['hostids'] = $filter['hostids'];
 	$triggers = API::Trigger()->get($options);
+
+	// how many issues are there at all with given parameters
+	$options['countOutput'] = true;
+	unset($options['limit']);
+	$triggersTotalCount = API::Trigger()->get($options);
 
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{
 	$triggers_hosts = array();
@@ -851,17 +861,35 @@ function make_latest_issues($filter = array()){
 
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($triggers_hostids);
 
+	// indicator of sort field
+	$sortDiv = new CDiv(
+		SPACE,
+		$options['sortorder'] === ZBX_SORT_DOWN ? 'icon_sortdown' : 'icon_sortup'
+	);
+	$sortDiv->addStyle('float: left');
+	$hostHeaderDiv = new CDiv(array(S_HOST, SPACE)); $hostHeaderDiv->addStyle('float: left');
+	$issueHeaderDiv = new CDiv(array(S_ISSUE, SPACE)); $issueHeaderDiv->addStyle('float: left');
+	$lastChangeHeaderDiv = new CDiv(array(S_LAST_CHANGE, SPACE)); $lastChangeHeaderDiv->addStyle('float: left');
+
 	$table  = new CTableInfo();
-	$table->setHeader(array(
-		is_show_all_nodes() ? S_NODE : null,
-		S_HOST,
-		S_ISSUE,
-		S_LAST_CHANGE,
-		S_AGE,
-		S_INFO,
-		($config['event_ack_enable'])? S_ACK : NULL,
-		S_ACTIONS
-	));
+	$table->setHeader(
+		array(
+			is_show_all_nodes() ? S_NODE : null,
+			$options['sortfield'] === 'hostname'
+				? array($hostHeaderDiv, $sortDiv)
+				: S_HOST,
+			$options['sortfield'] === 'priority'
+				? array($issueHeaderDiv, $sortDiv)
+				: S_ISSUE,
+			$options['sortfield'] === 'lastchange'
+				? array($lastChangeHeaderDiv, $sortDiv)
+				: S_LAST_CHANGE,
+			S_AGE,
+			S_INFO,
+			($config['event_ack_enable'])? S_ACK : NULL,
+			S_ACTIONS
+		)
+	);
 
 	$thosts_cache = array();
 	foreach($triggers as $tnum => $trigger){
@@ -1001,7 +1029,18 @@ function make_latest_issues($filter = array()){
 
 	$script = new CJSScript(get_js("jQuery('#hat_lastiss_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
-return new CDiv(array($table, $script));
+	$infoDiv = new CDiv(
+		_n('%2$d of %1$d issue is shown', '%2$d of %1$d issues are shown', $triggersTotalCount, count($triggers))
+	);
+	$infoDiv->addStyle('text-align: right; padding-right: 3px;');
+	$widgetDiv = new CDiv(
+		array(
+			$table,
+			$infoDiv,
+			$script
+		)
+	);
+	return $widgetDiv;
 }
 
 // author Aly
