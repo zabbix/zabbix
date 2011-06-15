@@ -20,7 +20,7 @@ function zbx_jsvalue($value, $asObject=false, $addQuotes=true){
 			$escaped = str_replace("\n", '\n', $escaped); // changing LF to '\n' string
 			$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
 			if($addQuotes){
-				$escaped = '"'.$escaped.'"';
+				$escaped = '\''.$escaped.'\'';
 			}
 			return $escaped;
 		}
