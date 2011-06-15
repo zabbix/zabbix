@@ -353,13 +353,51 @@ function getSeverityCell($severity, $text=null, $force_normal=false){
 	function get_trigger_value_style($value){
 		$str_val[TRIGGER_VALUE_FALSE]	= 'off';
 		$str_val[TRIGGER_VALUE_TRUE]	= 'on';
-// keep it for events
+		// keep it for events
 		$str_val[TRIGGER_VALUE_UNKNOWN]	= 'unknown';
 
 		if(isset($str_val[$value]))
 			return $str_val[$value];
 
 		return '';
+	}
+
+	/**
+	 * Add color style and blinking to an object like CSpan or CDiv depending on trigger status
+	 * Settings and colors are kept in 'config' database table
+	 *
+	 * @param mixed $object object like CSpan, CDiv, etc.
+	 * @param int $triggerValue TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE or TRIGGER_VALUE_UNKNOWN
+	 * @param int $triggerLastChange
+	 * @param bool $isAcknowledged
+	 * @return void
+	 */
+	function addTriggerValueStyle($object, $triggerValue, $triggerLastChange, $isAcknowledged){
+		$config = select_config();
+
+		// color of text and blinking depends on trigger value and whether event is acknowledged
+		if($triggerValue == TRIGGER_VALUE_TRUE && !$isAcknowledged){
+			$color = $config['problem_unack_color'];
+			$blinks = $config['problem_unack_style'];
+		}
+		elseif($triggerValue == TRIGGER_VALUE_TRUE && $isAcknowledged){
+			$color = $config['problem_ack_color'];
+			$blinks = $config['problem_ack_style'];
+		}
+		elseif($triggerValue == TRIGGER_VALUE_FALSE && !$isAcknowledged){
+			$color = $config['ok_unack_color'];
+			$blinks = $config['ok_unack_style'];
+		}
+		elseif($triggerValue == TRIGGER_VALUE_FALSE && $isAcknowledged){
+			$color = $config['ok_ack_color'];
+			$blinks = $config['ok_ack_style'];
+		}
+		// color
+		$object->addStyle('color: #'.$color);
+		// blinking
+		if($blinks && time() - $triggerLastChange < $config['blink_period']){
+			$object->setAttribute('name', 'blink');
+		}
 	}
 
 	function trigger_value2str($value){
