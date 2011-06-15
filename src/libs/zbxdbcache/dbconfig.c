@@ -1085,8 +1085,10 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_binary_heap_remove_direct(&config->queues[item->poller_type], item->itemid);
 
 		zbx_vector_ptr_destroy(&item->triggerptrs);
+
 		zbx_strpool_release(item->key);
 		zbx_strpool_release(item->port);
+
 		zbx_hashset_iter_remove(&iter);
 	}
 
@@ -1211,7 +1213,7 @@ static void	DCsync_functions(DB_RESULT result)
 
 		/* update trigger information */
 
-		if (SUCCEED == str_in_list("nodata,date,dayofmonth,dayofweek,time,now", function->function, ','))
+		if (SUCCEED == is_time_function(function->function))
 		{
 			if (0 == trigger->time_based)
 			{
@@ -2744,6 +2746,26 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	}
 }
 
+static void	DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src_function)
+{
+	dst_function->functionid = src_function->functionid;
+	dst_function->itemid = src_function->itemid;
+	dst_function->function = zbx_strdup(NULL, src_function->function);
+	dst_function->parameter = zbx_strdup(NULL, src_function->parameter);
+}
+
+static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_trigger)
+{
+	dst_trigger->triggerid = src_trigger->triggerid;
+	dst_trigger->expression = zbx_strdup(NULL, src_trigger->expression);
+	dst_trigger->error = zbx_strdup(NULL, src_trigger->error);
+	dst_trigger->timespec.sec = 0;
+	dst_trigger->timespec.ns = 0;
+	dst_trigger->type = src_trigger->type;
+	dst_trigger->value = src_trigger->value;
+	dst_trigger->value_flags = src_trigger->value_flags;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCconfig_get_item_by_key                                         *
@@ -2852,10 +2874,7 @@ int	DCconfig_get_function_by_functionid(DC_FUNCTION *function, zbx_uint64_t func
 	if (NULL == (dc_function = zbx_hashset_search(&config->functions, &functionid)))
 		goto unlock;
 
-	function->functionid = dc_function->functionid;
-	function->itemid = dc_function->itemid;
-	function->function = zbx_strdup(NULL, dc_function->function);
-	function->parameter = zbx_strdup(NULL, dc_function->parameter);
+	DCget_function(function, dc_function);
 
 	res = SUCCEED;
 unlock:
@@ -2901,14 +2920,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 
 				if (!found)
 				{
-					trigger->expression = zbx_strdup(NULL, dc_trigger->expression);
-					trigger->error = zbx_strdup(NULL, dc_trigger->error);
-					trigger->timespec.sec = 0;
-					trigger->timespec.ns = 0;
-					trigger->type = dc_trigger->type;
-					trigger->value = dc_trigger->value;
-					trigger->value_flags = dc_trigger->value_flags;
-
+					DCget_trigger(trigger, dc_trigger);
 					zbx_vector_ptr_append(trigger_order, trigger);
 				}
 
@@ -2923,6 +2935,89 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 					}
 				}
 			}
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_time_based_triggers                                 *
+ *                                                                            *
+ * Purpose: get triggers that have time-based functions                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments: a trigger should have at least one function that is time-based   *
+ *           and which does not have its host in no-data maintenance          *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order)
+{
+	int			i, found;
+	zbx_uint64_t		functionid;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_FUNCTION	*dc_function;
+	const ZBX_DC_TRIGGER	*dc_trigger;
+	const ZBX_DC_HOST	*dc_host;
+	DC_TRIGGER		*trigger;
+	const char		*p, *q;
+
+	*trigger_info = zbx_malloc(*trigger_info, config->time_triggers.values_num * sizeof(DC_TRIGGER));
+
+	LOCK_CACHE;
+
+	for (i = 0; i < config->time_triggers.values_num; i++)
+	{
+		dc_trigger = (const ZBX_DC_TRIGGER *)config->time_triggers.values[i];
+
+		found = 0;
+
+		for (p = dc_trigger->expression; '\0' != *p; p++)
+		{
+			if ('{' == *p)
+			{
+				for (q = p + 1; '}' != *q && '\0' != *q; q++)
+				{
+					if ('0' > *q || '9' < *q)
+						break;
+				}
+
+				if ('}' == *q)
+				{
+					ZBX_STR2UINT64(functionid, p + 1);
+
+					if (NULL != (dc_function = zbx_hashset_search(&config->functions, &functionid)) &&
+							SUCCEED == is_time_function(dc_function->function) &&
+							NULL != (dc_item = zbx_hashset_search(&config->items, &dc_function->itemid)) &&
+							NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)) &&
+							!(HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
+							MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type))
+					{
+						found = 1;
+						break;
+					}
+
+					p = q;
+				}
+			}
+		}
+
+		if (1 == found)
+		{
+			trigger = &(*trigger_info)[trigger_order->values_num];
+
+			DCget_trigger(trigger, dc_trigger);
+			zbx_timespec(&trigger->timespec);
+
+			zbx_vector_ptr_append(trigger_order, trigger);
 		}
 	}
 
