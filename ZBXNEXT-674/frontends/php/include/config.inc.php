@@ -765,7 +765,8 @@ function __autoload($class_name){
 				print($imageSource);
 				break;
 			case PAGE_TYPE_JSON:
-				print(zbx_jsvalue(array('result' => $imageId)));
+				$json = new CJSON();
+				print($json->encode(array('result' => $imageId)));
 				break;
 			case PAGE_TYPE_TEXT:
 			default:
