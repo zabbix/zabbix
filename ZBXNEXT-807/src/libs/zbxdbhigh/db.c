@@ -482,9 +482,9 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 	/**************************************************************************************************/
 
 	generate_event = (!(trigger_value == new_value && trigger_flags == new_flags) ||
-			(TRIGGER_TYPE_MULTIPLE_TRUE == trigger_type
-			&& TRIGGER_VALUE_TRUE == new_value
-			&& TRIGGER_VALUE_FLAG_NORMAL == new_flags)) &&
+			(TRIGGER_TYPE_MULTIPLE_TRUE == trigger_type &&
+			TRIGGER_VALUE_TRUE == new_value &&
+			TRIGGER_VALUE_FLAG_NORMAL == new_flags)) &&
 			FAIL == trigger_dependent(triggerid);
 
 	if (generate_event) /* initial test passed */
@@ -516,6 +516,8 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 
 			if (NULL == reason)
 			{
+				DCconfig_set_trigger_value(triggerid, new_value, new_flags, "");
+
 				DBexecute("update triggers"
 						" set value=%d,"
 							"value_flags=%d,"
@@ -526,6 +528,8 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 			}
 			else
 			{
+				DCconfig_set_trigger_value(triggerid, new_value, new_flags, reason);
+
 				reason_esc = DBdyn_escape_string_len(reason, TRIGGER_ERROR_LEN);
 				DBexecute("update triggers"
 						" set value=%d,"
@@ -549,12 +553,14 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 			event.value_changed = value_changed;
 
 			if (FAIL == (ret = process_event(&event, 0)))
-				zabbix_log(LOG_LEVEL_DEBUG, "Event not added for triggerid " ZBX_FS_UI64, triggerid);
+				zabbix_log(LOG_LEVEL_DEBUG, "event not added for triggerid " ZBX_FS_UI64, triggerid);
 		}
 		
 	}
 	else if (TRIGGER_VALUE_FLAG_UNKNOWN == new_flags && 0 != strcmp(trigger_error, reason))
 	{
+		DCconfig_set_trigger_value(triggerid, new_value, new_flags, reason);
+
 		reason_esc = DBdyn_escape_string_len(reason, TRIGGER_ERROR_LEN);
 		DBexecute("update triggers"
 				" set value_flags=%d,error='%s'"

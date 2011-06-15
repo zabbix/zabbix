@@ -117,7 +117,7 @@ static void	process_time_functions()
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-typedef struct zbx_host_maintenance_s
+typedef struct
 {
 	zbx_uint64_t	hostid;
 	time_t		maintenance_from;

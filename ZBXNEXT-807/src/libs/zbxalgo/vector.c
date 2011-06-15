@@ -99,7 +99,7 @@ void	zbx_vector_ ## __id ## _remove_noorder(zbx_vector_ ## __id ## _t *vector, i
 														\
 void	zbx_vector_ ## __id ## _sort(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
 {														\
-	if (0 != vector->values_num)										\
+	if (2 <= vector->values_num)										\
 	{													\
 		qsort(vector->values, vector->values_num, sizeof(__type), compare_func);			\
 	}													\
@@ -177,3 +177,4 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 
 ZBX_VECTOR_IMPL(uint64, zbx_uint64_t);
 ZBX_VECTOR_IMPL(str, char *);
+ZBX_VECTOR_IMPL(ptr, void *);

@@ -2809,15 +2809,14 @@ error:
 int	evaluate_expression(int *result, char **expression, time_t now,
 		zbx_uint64_t triggerid, int trigger_value, char *error, int maxerrlen)
 {
-	const char		*__function_name = "evaluate_expression";
-	/* Required for substitution of macros */
-	DB_EVENT		event;
-	int			ret = FAIL;
-	double			value;
+	const char	*__function_name = "evaluate_expression";
+
+	DB_EVENT	event;
+	int		ret = FAIL;
+	double		value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
-	/* Substitute macros first */
 	memset(&event, 0, sizeof(DB_EVENT));
 	event.source = EVENT_SOURCE_TRIGGERS;
 	event.object = EVENT_OBJECT_TRIGGER;
@@ -2825,10 +2824,10 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 	event.value = trigger_value;
 
 	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION,
-			error, maxerrlen))
+				error, maxerrlen))
 	{
-		/* Evaluate expression */
 		zbx_remove_spaces(*expression);
+
 		if (SUCCEED == substitute_functions(expression, now, error, maxerrlen))
 		{
 			if (SUCCEED == evaluate(&value, *expression, error, maxerrlen))
