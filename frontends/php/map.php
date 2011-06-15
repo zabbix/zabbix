@@ -381,7 +381,8 @@ if(get_request('base64image')){
 	imagepng($im);
 	$imageSource = ob_get_contents();
 	ob_end_clean();
-	echo zbx_jsvalue(array('result' => base64_encode($imageSource)));
+	$json = new CJSON();
+	echo $json->encode(array('result' => base64_encode($imageSource)));
 	imagedestroy($im);
 }
 else{

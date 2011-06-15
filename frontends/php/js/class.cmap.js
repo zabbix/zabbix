@@ -123,6 +123,13 @@ ZABBIX.apps.map = (function(){
 				height: this.data.height + 'px'
 			});
 
+			if(IE){
+				this.container.css({
+					'background-color': 'blue',
+					filter: 'alpha(opacity=0)'
+				});
+			}
+
 			if(IE || GK){
 				this.base64image = false;
 				this.mapimg = jQuery('#sysmap_img');
