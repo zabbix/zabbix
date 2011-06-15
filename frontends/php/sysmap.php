@@ -220,7 +220,6 @@ $table->Show();
 
 $container = new CDiv();
 $container->setAttribute('id', 'sysmap_cnt');
-$container->setAttribute('style', 'position: absolute;');
 $container->Show();
 
 

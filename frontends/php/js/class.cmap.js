@@ -134,6 +134,8 @@ ZABBIX.apps.map = (function(){
 				this.base64image = false;
 				this.mapimg = jQuery('#sysmap_img');
 
+				this.container.css('position', 'absolute');
+
 				// resize div on window resize
 				setContainer = function(){
 					var sysmap_pn = this.mapimg.position(),
@@ -150,12 +152,11 @@ ZABBIX.apps.map = (function(){
 						});
 					}
 				};
-
 				jQuery(window).resize(jQuery.proxy(setContainer, this));
-				// resize div on image change
 				this.mapimg.load(jQuery.proxy(setContainer, this));
 			}
 			else{
+				this.container.css('position', 'relative');
 				this.base64image = true;
 				jQuery('#sysmap_img').remove();
 			}
