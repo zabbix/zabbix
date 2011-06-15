@@ -196,7 +196,7 @@ class CProfile{
 
 /************ CONFIG **************/
 
-function select_config($cache = true, $nodeid=null){
+function select_config($cache=true, $nodeid=null){
 	global $page, $ZBX_LOCALNODEID;
 	static $config;
 
