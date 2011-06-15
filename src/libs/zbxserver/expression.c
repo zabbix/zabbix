@@ -2661,7 +2661,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
  *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
- * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)              *
+ * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)"             *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_functions(char **exp, time_t now, char *error, int maxerrlen)
@@ -2676,22 +2676,23 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *exp);
 
-	if (**exp == '\0')
+	if ('\0' == **exp)
 		goto empty;
 
 	*error = '\0';
 
 	out = zbx_malloc(out, out_alloc);
 
-	for (e = *exp; *e != '\0';)
+	for (e = *exp; '\0' != *e;)
 	{
-		if (*e == '{')
+		if ('{' == *e)
 		{
 			e++;	/* '{' */
 			f = functionid;
-			while (*e != '}' && *e != '\0')
+
+			while ('}' != *e && '\0' != *e)
 			{
-				if (functionid - f == MAX_ID_LEN)
+				if (MAX_ID_LEN == functionid - f)
 					break;
 				if (*e < '0' || *e > '9')
 					break;
@@ -2699,9 +2700,9 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 				*f++ = *e++;
 			}
 
-			if (*e != '}')
+			if ('}' != *e || f == functionid)
 			{
-				zbx_snprintf(error, maxerrlen, "Invalid expression [%s]", *exp);
+				zbx_snprintf(error, maxerrlen, "invalid expression [%s]", *exp);
 				goto error;
 			}
 
@@ -2717,7 +2718,7 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 
 			if (NULL == (row = DBfetch(result)))
 			{
-				zbx_snprintf(error, maxerrlen, "Could not obtain function and item for functionid: %s",
+				zbx_snprintf(error, maxerrlen, "cannot obtain function and item for functionid: %s",
 						functionid);
 			}
 			else

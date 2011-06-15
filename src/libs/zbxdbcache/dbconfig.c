@@ -1173,6 +1173,9 @@ static void	DCsync_functions(DB_RESULT result)
 
 	config->time_triggers.values_num = 0;
 
+	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->functions.num_data + 32);
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
@@ -2815,6 +2818,44 @@ int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid)
 
 	DCget_host(&item->host, dc_host);
 	DCget_item(item, dc_item);
+
+	res = SUCCEED;
+unlock:
+	UNLOCK_CACHE;
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_function_by_functionid                              *
+ *                                                                            *
+ * Purpose: Get function with specified ID                                    *
+ *                                                                            *
+ * Parameters: function - [OUT] pointer to DC_FUNCTION structure              *
+ *             functionid - [IN] item ID                                      *
+ *                                                                            *
+ * Return value: SUCCEED if function found, otherwise FAIL                    *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_get_function_by_functionid(DC_FUNCTION *function, zbx_uint64_t functionid)
+{
+	int			res = FAIL;
+	const ZBX_DC_FUNCTION	*dc_function;
+
+	LOCK_CACHE;
+
+	if (NULL == (dc_function = zbx_hashset_search(&config->functions, &functionid)))
+		goto unlock;
+
+	function->functionid = dc_function->functionid;
+	function->itemid = dc_function->itemid;
+	function->function = zbx_strdup(NULL, dc_function->function);
+	function->parameter = zbx_strdup(NULL, dc_function->parameter);
 
 	res = SUCCEED;
 unlock:

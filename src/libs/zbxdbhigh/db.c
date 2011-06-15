@@ -1347,67 +1347,79 @@ char	*DBdyn_escape_like_pattern(const char *src)
 void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 {
 	ZBX_STR2UINT64(item->itemid, row[0]);
-	item->key			= row[1];
-	item->host_name			= row[2];
-	item->type			= atoi(row[3]);
-	item->history			= atoi(row[4]);
-	item->trends			= atoi(row[17]);
-	item->value_type		= atoi(row[8]);
+	item->key = row[1];
+	item->host_name = row[2];
+	item->type = atoi(row[3]);
+	item->history = atoi(row[4]);
+	item->trends = atoi(row[17]);
+	item->value_type = atoi(row[8]);
 
 	if (SUCCEED == DBis_null(row[5]))
+	{
 		item->lastvalue_null = 1;
+	}
 	else
 	{
 		item->lastvalue_null = 0;
-		switch (item->value_type) {
-		case ITEM_VALUE_TYPE_FLOAT:
-			item->lastvalue_dbl = atof(row[5]);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(item->lastvalue_uint64, row[5]);
-			break;
-		default:
-			item->lastvalue_str = row[5];
-			break;
+
+		switch (item->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				item->lastvalue_dbl = atof(row[5]);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UINT64(item->lastvalue_uint64, row[5]);
+				break;
+			default:
+				item->lastvalue_str = row[5];
+				break;
 		}
 	}
 
 	if (SUCCEED == DBis_null(row[6]))
+	{
 		item->prevvalue_null = 1;
+	}
 	else
 	{
 		item->prevvalue_null = 0;
-		switch (item->value_type) {
-		case ITEM_VALUE_TYPE_FLOAT:
-			item->prevvalue_dbl = atof(row[6]);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(item->prevvalue_uint64, row[6]);
-			break;
-		default:
-			item->prevvalue_str = row[6];
-			break;
+
+		switch (item->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				item->prevvalue_dbl = atof(row[6]);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UINT64(item->prevvalue_uint64, row[6]);
+				break;
+			default:
+				item->prevvalue_str = row[6];
+				break;
 		}
 	}
 
 	ZBX_STR2UINT64(item->hostid, row[7]);
-	item->delta			= atoi(row[9]);
+	item->delta = atoi(row[9]);
 
 	if (SUCCEED == DBis_null(row[10]))
+	{
 		item->prevorgvalue_null = 1;
+	}
 	else
 	{
 		item->prevorgvalue_null = 0;
-		switch (item->value_type) {
-		case ITEM_VALUE_TYPE_FLOAT:
-			item->prevorgvalue_dbl = atof(row[10]);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(item->prevorgvalue_uint64, row[10]);
-			break;
-		default:
-			item->prevorgvalue_str = row[10];
-			break;
+
+		switch (item->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				item->prevorgvalue_dbl = atof(row[10]);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UINT64(item->prevorgvalue_uint64, row[10]);
+				break;
+			default:
+				item->prevorgvalue_str = row[10];
+				break;
 		}
 	}
 
@@ -1416,13 +1428,13 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	else
 		item->lastclock = atoi(row[11]);
 
-	item->units			= row[12];
-	item->multiplier		= atoi(row[13]);
-	item->formula			= row[14];
-	item->status			= atoi(row[15]);
+	item->units = row[12];
+	item->multiplier = atoi(row[13]);
+	item->formula = row[14];
+	item->status = atoi(row[15]);
 	ZBX_DBROW2UINT64(item->valuemapid, row[16]);
 
-	item->data_type			= atoi(row[18]);
+	item->data_type = atoi(row[18]);
 }
 
 const ZBX_TABLE *DBget_table(const char *tablename)

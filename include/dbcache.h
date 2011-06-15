@@ -130,6 +130,15 @@ DC_ITEM;
 
 typedef struct
 {
+	zbx_uint64_t	functionid;
+	zbx_uint64_t	itemid;
+	char		*function;
+	char		*parameter;
+}
+DC_FUNCTION;
+
+typedef struct
+{
 	zbx_uint64_t	triggerid;
 	char		*expression;
 	char		*error;
@@ -197,6 +206,7 @@ void	free_configuration_cache();
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key);
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
+int	DCconfig_get_function_by_functionid(DC_FUNCTION *function, zbx_uint64_t functionid);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int item_num);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
