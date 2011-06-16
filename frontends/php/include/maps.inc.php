@@ -119,9 +119,12 @@ function getActionMapBySysmap($sysmap){
 	processAreasCoordinates($sysmap, $areas, $map_info);
 
 	$hostids = array();
-	foreach($sysmap['selements'] as $selement){
+	foreach($sysmap['selements'] as $sid => $selement){
 		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
 			$hostids[$selement['elementid']] = $selement['elementid'];
+		}
+		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
+			unset($sysmap['selements'][$sid]);
 		}
 	}
 
