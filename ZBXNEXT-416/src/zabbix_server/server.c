@@ -55,16 +55,7 @@ const char	*progname = NULL;
 const char	title_message[] = "Zabbix Server";
 const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
 
-#if !defined(HAVE_GETOPT_LONG)
-const char	*help_message[] = {
-	"Options:",
-	"  -c <file>       absolute path to the configuration file",
-	"  -h              give this help",
-	"  -n <nodeid>     convert database data to new nodeid",
-	"  -V              display version number",
-	NULL	/* end of text */
-};
-#else
+#ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>       absolute path to the configuration file",
@@ -73,23 +64,30 @@ const char	*help_message[] = {
 	"  -V --version             display version number",
 	NULL	/* end of text */
 };
+#else
+const char	*help_message[] = {
+	"Options:",
+	"  -c <file>       absolute path to the configuration file",
+	"  -h              give this help",
+	"  -n <nodeid>     convert database data to new nodeid",
+	"  -V              display version number",
+	NULL	/* end of text */
+};
 #endif
 
 /* COMMAND LINE OPTIONS */
 
 /* long options */
-
-static struct zbx_option longopts[] =
+static struct zbx_option	longopts[] =
 {
-	{"config",	1,	0,	'c'},
-	{"help",	0,	0,	'h'},
-	{"new-nodeid",	1,	0,	'n'},
-	{"version",	0,	0,	'V'},
-	{0,0,0,0}
+	{"config",	1,	NULL,	'c'},
+	{"help",	0,	NULL,	'h'},
+	{"new-nodeid",	1,	NULL,	'n'},
+	{"version",	0,	NULL,	'V'},
+	{NULL}
 };
 
 /* short options */
-
 static char	shortopts[] = "c:n:hV";
 
 /* end of COMMAND LINE OPTIONS */

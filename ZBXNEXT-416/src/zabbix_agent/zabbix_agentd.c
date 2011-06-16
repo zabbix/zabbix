@@ -83,10 +83,7 @@ const char	*help_message[] = {
 	"  -V --version          display version number",
 	"  -p --print            print supported items and exit",
 	"  -t --test <item>      test specified item and exit",
-/*	"  -u --usage <item>     test specified item and exit",	*/ /* !!! TODO - print item usage !!! */
-
 #ifdef _WINDOWS
-
 	"",
 	"Functions:",
 	"",
@@ -97,35 +94,29 @@ const char	*help_message[] = {
 	"  -x --stop             stop Zabbix agent service",
 
 	"  -m --multiple-agents  service name will include hostname",
-
 #endif
-
-	0	/* end of text */
+	NULL	/* end of text */
 };
 /* end of application HELP message */
 
 /* COMMAND LINE OPTIONS */
-static struct zbx_option longopts[] =
+static struct zbx_option	longopts[] =
 {
-	{"config",		1,	0,	'c'},
-	{"help",		0,	0,	'h'},
-	{"version",		0,	0,	'V'},
-	{"print",		0,	0,	'p'},
-	{"test",		1,	0,	't'},
-
+	{"config",		1,	NULL,	'c'},
+	{"help",		0,	NULL,	'h'},
+	{"version",		0,	NULL,	'V'},
+	{"print",		0,	NULL,	'p'},
+	{"test",		1,	NULL,	't'},
 #ifdef _WINDOWS
+	{"install",		0,	NULL,	'i'},
+	{"uninstall",		0,	NULL,	'd'},
 
-	{"install",		0,	0,	'i'},
-	{"uninstall",		0,	0,	'd'},
+	{"start",		0,	NULL,	's'},
+	{"stop",		0,	NULL,	'x'},
 
-	{"start",		0,	0,	's'},
-	{"stop",		0,	0,	'x'},
-
-	{"multiple-agents",	0,	0,	'm'},
-
+	{"multiple-agents",	0,	NULL,	'm'},
 #endif
-
-	{0,0,0,0}
+	{NULL}
 };
 
 static char	shortopts[] =

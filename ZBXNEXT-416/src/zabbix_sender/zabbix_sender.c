@@ -57,7 +57,7 @@ const char	*help_message[] = {
 	" Other options:",
 	"  -h --help                            Give this help",
 	"  -V --version                         Display version number",
-	0 /* end of text */
+	NULL	/* end of text */
 };
 #else
 const char	*help_message[] = {
@@ -85,15 +85,14 @@ const char	*help_message[] = {
 	" Other options:",
 	"  -h                           Give this help",
 	"  -V                           Display version number",
-	0 /* end of text */
+	NULL	/* end of text */
 };
 #endif
 
 /* COMMAND LINE OPTIONS */
 
 /* long options */
-
-static struct zbx_option longopts[] =
+static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
 	{"zabbix-server",	1,	NULL,	'z'},
@@ -108,11 +107,10 @@ static struct zbx_option longopts[] =
 	{"verbose",		0,	NULL,	'v'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
-	{0,0,0,0}
+	{NULL}
 };
 
 /* short options */
-
 static char	shortopts[] = "c:I:z:p:s:k:o:Ti:rvhV";
 
 /* end of COMMAND LINE OPTIONS */
