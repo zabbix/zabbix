@@ -168,6 +168,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3880] fixed repeated processing of log-files through proxy when disabling a host or item (Sasha)
  - [ZBX-3420] fixed wrong error message being logged in case of DNS resolution errors (asaveljevs,rudolfs)
  - [ZBX-3519] fixed unterminated processes when system.run[,wait] times out and added proper output handling for system.run[,nowait] on UNIX (rudolfs) 
  - [ZBX-3768] fixed 'uptime' and 's' units as according to the documentation (Sasha)

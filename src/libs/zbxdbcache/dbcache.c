@@ -2186,6 +2186,8 @@ int	DCsync_history(int sync_type)
 					f += num;
 					continue;
 				}
+				else if (1 < num && 0 == skipped_clock)
+					skipped_clock = cache->history[ZBX_HISTORY_SIZE == f + 1 ? 0 : f + 1].clock;
 
 				uint64_array_add(&cache->itemids, &cache->itemids_alloc,
 						&cache->itemids_num, cache->history[f].itemid, 0);
