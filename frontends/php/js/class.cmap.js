@@ -425,6 +425,10 @@ ZABBIX.apps.map = (function(){
 
 				// add element
 				jQuery('#selementAdd').click(function(){
+					if(this.iconList.length === 0){
+						alert(locale['S_NO_IMAGES']);
+						return;
+					}
 					var selement = new Selement(that);
 					that.selements[selement.id] = selement;
 					that.updateImage();
