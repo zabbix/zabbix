@@ -128,11 +128,12 @@
 ?>
 <!doctype html>
 <html>
-  <head>
-    <title><?php echo $page_title; ?></title>
-	<meta name="Author" content="ZABBIX SIA" />
-	<link rel="shortcut icon" href="images/general/zabbix.ico" />
-	<link rel="stylesheet" type="text/css" href="css.css" />
+	<head>
+		<title><?php echo $page_title; ?></title>
+		<meta name="Author" content="ZABBIX SIA" />
+		<meta charset="utf-8" />
+		<link rel="shortcut icon" href="images/general/zabbix.ico" />
+		<link rel="stylesheet" type="text/css" href="css.css" />
 <?php
 	$css = 'css_ob.css';
 	$bodyCSS = 'originalblue';
@@ -160,7 +161,7 @@
 	print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
 
 	if($page['file'] == 'sysmap.php'){
-		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />');
+		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&amp;output=css" />');
 	}
 
 
@@ -171,12 +172,12 @@
 <![endif]-->
 <script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
-	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&lang='.CWebUser::$data['lang'];
+	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'];
 	print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
 
 	if(isset($page['scripts']) && is_array($page['scripts']) && !empty($page['scripts'])){
 		foreach($page['scripts'] as $id => $script){
-			$path .= '&files[]='.$script;
+			$path .= '&amp;files[]='.$script;
 		}
 		print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
 	}
