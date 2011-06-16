@@ -607,7 +607,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	SQLLEN		row1;
 	SQLLEN		rows = 0;
 #elif defined(HAVE_MYSQL)
-	int		status;
+	int		status, attempts = 10, i = 0;
 #elif defined(HAVE_ORACLE)
 	OCIStmt		*stmthp = NULL;
 	sword		err = OCI_SUCCESS;
@@ -676,19 +676,31 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	else
 	{
+retry:
 		if (0 != (status = mysql_query(conn, sql)))
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 			switch (mysql_errno(conn))
 			{
+				/* It is known that in case of InnoDB and many connections a deadlock or duplicate */
+				/* PRIMARY KEY error may occur. In this case repeat operation for @attempts times. */
+				/* In case it still fails return ZBX_DB_DOWN . */
+				case ER_LOCK_DEADLOCK:
+				case ER_LOCK_WAIT_TIMEOUT:
+				case ER_DUP_ENTRY:			/* duplicate PRIMARY KEY error */
+					if (++i < attempts)
+					{
+						zbx_sleep(1);
+						goto retry;
+					}
 				case CR_CONN_HOST_ERROR:
 				case CR_SERVER_GONE_ERROR:
 				case CR_CONNECTION_ERROR:
 				case CR_SERVER_LOST:
 				case ER_SERVER_SHUTDOWN:
-				case ER_ACCESS_DENIED_ERROR: /* wrong user or password */
-				case ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
-				case ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
+				case ER_ACCESS_DENIED_ERROR:		/* wrong user or password */
+				case ER_ILLEGAL_GRANT_FOR_TABLE:	/* user without any privileges */
+				case ER_TABLEACCESS_DENIED_ERROR:	/* user without some privilege */
 				case ER_UNKNOWN_ERROR:
 					ret = ZBX_DB_DOWN;
 					break;
@@ -845,6 +857,8 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 #if defined(HAVE_IBM_DB2)
 	int		i;
 	SQLRETURN	ret = SQL_SUCCESS;
+#elif defined(HAVE_MYSQL)
+	int		attempts = 10, i = 0;
 #elif defined(HAVE_ORACLE)
 	sword		err = OCI_SUCCESS;
 	ub4		counter;
@@ -922,11 +936,22 @@ error:
 	}
 	else
 	{
+retry:
 		if (0 != mysql_query(conn, sql))
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 			switch (mysql_errno(conn))
 			{
+				/* It is known that in case of InnoDB and many connections a deadlock may occur. */
+				/* In this case repeat operation for @attempts times. In case it still fails return */
+				/* ZBX_DB_DOWN . */
+				case ER_LOCK_DEADLOCK:
+				case ER_LOCK_WAIT_TIMEOUT:
+					if (++i < attempts)
+					{
+						zbx_sleep(1);
+						goto retry;
+					}
 				case CR_CONN_HOST_ERROR:
 				case CR_SERVER_GONE_ERROR:
 				case CR_CONNECTION_ERROR:
