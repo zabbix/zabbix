@@ -293,7 +293,7 @@ ZABBIX.apps.map = (function(){
 			deleteSelectedElements: function(){
 				var selementid;
 
-				if(confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])){
+				if(this.selection.count && confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])){
 					for(selementid in this.selection.selements){
 						this.selements[selementid].remove();
 						this.removeLinksBySelementId(selementid);
@@ -302,6 +302,7 @@ ZABBIX.apps.map = (function(){
 					this.toggleForm();
 					this.updateImage();
 				}
+
 			},
 
 			// CONNECTORS
@@ -425,7 +426,7 @@ ZABBIX.apps.map = (function(){
 
 				// add element
 				jQuery('#selementAdd').click(function(){
-					if(that.iconList.length === 0){
+					if(typeof that.iconList[0] === 'undefined'){
 						alert(locale['S_NO_IMAGES']);
 						return;
 					}
