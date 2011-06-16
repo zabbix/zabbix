@@ -555,7 +555,6 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 			if (FAIL == (ret = process_event(&event, 0)))
 				zabbix_log(LOG_LEVEL_DEBUG, "event not added for triggerid " ZBX_FS_UI64, triggerid);
 		}
-		
 	}
 	else if (TRIGGER_VALUE_FLAG_UNKNOWN == new_flags && 0 != strcmp(trigger_error, reason))
 	{

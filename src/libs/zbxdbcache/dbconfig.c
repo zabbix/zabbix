@@ -2758,7 +2758,8 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 {
 	dst_trigger->triggerid = src_trigger->triggerid;
 	dst_trigger->expression = zbx_strdup(NULL, src_trigger->expression);
-	dst_trigger->error = zbx_strdup(NULL, src_trigger->error);
+	dst_trigger->old_error = zbx_strdup(NULL, src_trigger->error);
+	dst_trigger->new_error = NULL;
 	dst_trigger->timespec.sec = 0;
 	dst_trigger->timespec.ns = 0;
 	dst_trigger->type = src_trigger->type;
@@ -2899,7 +2900,7 @@ unlock:
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int item_num)
+		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, const char **errors, int item_num)
 {
 	int			i, j, found;
 	const ZBX_DC_ITEM	*dc_item;
@@ -2932,7 +2933,14 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 					{
 						trigger->timespec.sec = timespecs[i].sec;
 						trigger->timespec.ns = timespecs[i].ns;
+
+						if (NULL != errors)
+							trigger->new_error = errors[i];
 					}
+				}
+				else if (NULL != errors)
+				{
+					trigger->new_error = errors[i];
 				}
 			}
 		}

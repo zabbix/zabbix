@@ -67,31 +67,35 @@ static void	process_time_functions()
 
 	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order);
 
-	DBbegin();
-
-	for (i = 0; i < trigger_order.values_num; i++)
+	if (0 != trigger_order.values_num)
 	{
-		trigger = (DC_TRIGGER *)trigger_order.values[i];
+		DBbegin();
 
-		if (SUCCEED != evaluate_expression(&value, &trigger->expression, trigger->timespec.sec,
-					trigger->triggerid, trigger->value, error, sizeof(error)))
+		for (i = 0; i < trigger_order.values_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s",
-					trigger->expression, error);
+			trigger = (DC_TRIGGER *)trigger_order.values[i];
 
-			DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value, trigger->value_flags,
-					trigger->error, trigger->value, TRIGGER_VALUE_FLAG_UNKNOWN, &trigger->timespec,
-					error);
+			if (SUCCEED != evaluate_expression(&value, &trigger->expression, trigger->timespec.sec,
+						trigger->triggerid, trigger->value, error, sizeof(error)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s",
+						trigger->expression, error);
+
+				DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value,
+						trigger->value_flags, trigger->old_error, trigger->value,
+						TRIGGER_VALUE_FLAG_UNKNOWN, &trigger->timespec, error);
+			}
+			else
+				DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value,
+						trigger->value_flags, trigger->old_error, value,
+						TRIGGER_VALUE_FLAG_NORMAL, &trigger->timespec, NULL);
+
+			zbx_free(trigger->expression);
+			zbx_free(trigger->old_error);
 		}
-		else
-			DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value, trigger->value_flags,
-					trigger->error, value, TRIGGER_VALUE_FLAG_NORMAL, &trigger->timespec, NULL);
 
-		zbx_free(trigger->expression);
-		zbx_free(trigger->error);
+		DBcommit();
 	}
-
-	DBcommit();
 
 	zbx_free(trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);

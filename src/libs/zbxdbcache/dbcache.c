@@ -868,7 +868,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	zbx_vector_ptr_create(&trigger_order);
 	zbx_vector_ptr_reserve(&trigger_order, item_num);
 
-	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, item_num);
+	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num);
 
 	zbx_free(itemids);
 	zbx_free(timespecs);
@@ -884,15 +884,15 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 					trigger->expression, error);
 
 			DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value, trigger->value_flags,
-					trigger->error, trigger->value, TRIGGER_VALUE_FLAG_UNKNOWN, &trigger->timespec,
+					trigger->old_error, trigger->value, TRIGGER_VALUE_FLAG_UNKNOWN, &trigger->timespec,
 					error);
 		}
 		else
 			DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value, trigger->value_flags,
-					trigger->error, value, TRIGGER_VALUE_FLAG_NORMAL, &trigger->timespec, NULL);
+					trigger->old_error, value, TRIGGER_VALUE_FLAG_NORMAL, &trigger->timespec, NULL);
 
 		zbx_free(trigger->expression);
-		zbx_free(trigger->error);
+		zbx_free(trigger->old_error);
 	}
 
 	zbx_hashset_destroy(&trigger_info);
