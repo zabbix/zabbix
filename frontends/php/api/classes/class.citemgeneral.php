@@ -255,6 +255,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
 			case ITEM_TYPE_SNMPV3:
+			case ITEM_TYPE_SNMPTRAP:
 				return INTERFACE_TYPE_SNMP;
 			case ITEM_TYPE_IPMI:
 				return INTERFACE_TYPE_IPMI;
