@@ -31,7 +31,7 @@ const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-I <IP add
 
 #ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
-        "Options:",
+	"Options:",
 	"  -s --host <host name or IP>          Specify host name or IP address of a host.",
 	"  -p --port <port number>              Specify port number of agent running on the host. Default is 10050.",
 	"  -I --source-address <IP address>     Specify source IP address",
@@ -42,11 +42,11 @@ const char	*help_message[] = {
 	"  -V --version                         Display version number",
 	"",
 	"Example: zabbix_get -s 127.0.0.1 -p 10050 -k \"system.cpu.load[all,avg1]\"",
-        0 /* end of text */
+	NULL	/* end of text */
 };
 #else
 const char	*help_message[] = {
-        "Options:",
+	"Options:",
 	"  -s <host name or IP>         Specify host name or IP address of a host.",
 	"  -p <port number>             Specify port number of agent running on the host. Default is 10050.",
 	"  -I <IP address>              Specify source IP address",
@@ -57,26 +57,25 @@ const char	*help_message[] = {
 	"  -V                           Display version number",
 	"",
 	"Example: zabbix_get -s 127.0.0.1 -p 10050 -k \"system.cpu.load[all,avg1]\"",
-        0 /* end of text */
+	NULL	/* end of text */
 };
 #endif
 
 /* COMMAND LINE OPTIONS */
 
 /* long options */
-struct zbx_option longopts[] =
+struct zbx_option	longopts[] =
 {
-	{"host",		1,	0,	's'},
-	{"port",		1,	0,	'p'},
-	{"key",			1,	0,	'k'},
-	{"source-address",	1,	0,	'I'},
-	{"help",		0,	0,	'h'},
-	{"version",		0,	0,	'V'},
-	{0,0,0,0}
+	{"host",		1,	NULL,	's'},
+	{"port",		1,	NULL,	'p'},
+	{"key",			1,	NULL,	'k'},
+	{"source-address",	1,	NULL,	'I'},
+	{"help",		0,	NULL,	'h'},
+	{"version",		0,	NULL,	'V'},
+	{NULL}
 };
 
 /* short options */
-
 static char     shortopts[] = "s:p:k:I:hV";
 
 /* end of COMMAND LINE OPTIONS */
