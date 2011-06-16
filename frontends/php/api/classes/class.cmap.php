@@ -388,7 +388,7 @@ COpt::memoryPick();
 			}
 
 			if(!is_null($options['expandUrls'])){
-				$sql = 'SELECT sysmapid, name, url, elementtype'.
+				$sql = 'SELECT sysmapurlid, sysmapid, name, url, elementtype'.
 						' FROM sysmap_url'.
 						' WHERE '.DBcondition('sysmapid', $sysmapids);
 				$db_map_urls = DBselect($sql);
