@@ -83,7 +83,7 @@
 					<td><?php echo _('Host'); ?></td>
 					<td>
 						<input readonly="readonly" size="56" id="elementNameHost" name="elementName" class="input">
-						<span class="link" onclick="PopUp('popup.php?writeonly=1&real_hosts=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHost&srctbl=hosts&srcfld1=hostid&srcfld2=host',450,450)"><?php echo _('Select'); ?></span>
+						<span class="link" onclick="PopUp('popup.php?writeonly=1&real_hosts=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHost&srctbl=hosts&srcfld1=hostid&srcfld2=name',450,450)"><?php echo _('Select'); ?></span>
 					</td>
 				</tr>
 				<tr id="triggerSelectRow">
