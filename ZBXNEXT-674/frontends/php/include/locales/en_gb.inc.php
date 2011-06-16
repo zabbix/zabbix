@@ -990,6 +990,7 @@
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	_('Configuration of network maps'),
 	'S_CONFIGURATION_OF_NETWORK_MAPS_BIG'=>	_('CONFIGURATION OF NETWORK MAPS'),
 	'S_GET_IMG_ELEMENT_DATA_NOT_FOUND'=>	_('Get Img: Element data not found!'),
+	'S_NO_IMAGES' => 'No image! Upload images first.',
 
 	'S_ADD_ELEMENT'=>			_('Add element'),
 	'S_COORDINATE_X'=>			_('Coordinate X'),
