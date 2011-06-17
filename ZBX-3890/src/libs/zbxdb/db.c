@@ -48,6 +48,7 @@ static const char	*zbx_oci_error(sword status)
 	sb4		errcode = 0;
 
 	errbuf[0] = '\0';
+
 	switch (status)
 	{
 		case OCI_SUCCESS_WITH_INFO:
@@ -235,6 +236,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 				(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
 				(dvoid * (*)(dvoid *, dvoid *, size_t))0,
 				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
+
 		if (OCI_SUCCESS != err)
 		{
 			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));

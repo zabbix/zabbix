@@ -86,7 +86,7 @@
 		OCIServer	*srvhp;
 	}
 	zbx_oracle_db_handle_t;
-	
+
 	extern zbx_oracle_db_handle_t	oracle;
 
 #	define DB_ROW		char **
@@ -101,8 +101,8 @@
 	}
 	ZBX_OCI_DB_RESULT;
 
-	void		OCI_DBfree_result(DB_RESULT result);
-	ub4		OCI_DBserver_status();
+	void	OCI_DBfree_result(DB_RESULT result);
+	ub4	OCI_DBserver_status();
 
 #elif defined(HAVE_POSTGRESQL)
 
