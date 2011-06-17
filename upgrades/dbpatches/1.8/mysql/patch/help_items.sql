@@ -48,7 +48,7 @@ insert into help_items values (5,'zabbix[trends_uint]','Number of values stored 
 insert into help_items values (5,'zabbix[triggers]','Number of triggers in Zabbix database.');
 insert into help_items values (5,'zabbix[uptime]','Uptime of Zabbix server process in seconds.');
 insert into help_items values (5,'zabbix[wcache,&lt;cache&gt;,&lt;mode&gt;]','Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free).');
-insert into help_items values (5,'zabbix[process,&lt;type&gt;,&lt;num&gt;,&lt;state&gt;]','Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage.');
+insert into help_items values (5,'zabbix[process,&lt;type&gt;,&lt;num&gt;,&lt;state&gt;]','Time a particular Zabbix process or a group of processes (identified by &lt;type&gt; and &lt;num&gt;) spent in &lt;state&gt; in percentage.');
 
 insert into help_items values (8,'grpfunc[&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;]','Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual.');
 
