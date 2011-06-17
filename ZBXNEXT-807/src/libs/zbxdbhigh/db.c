@@ -340,98 +340,6 @@ DB_RESULT	DBselectN(const char *query, int n)
 	return rc;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: trigger_dependent_rec                                            *
- *                                                                            *
- * Purpose: check if status depends on triggers having status TRUE            *
- *                                                                            *
- * Parameters: triggerid - trigger ID                                         *
- *                                                                            *
- * Return value: SUCCEED - it does depend, FAIL - otherwise                   *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: Recursive function!                                              *
- *                                                                            *
- ******************************************************************************/
-static int	trigger_dependent_rec(zbx_uint64_t triggerid, int level)
-{
-	const char	*__function_name = "trigger_dependent_rec";
-
-	int		ret = FAIL;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zbx_uint64_t	triggerid_tmp;
-	int		value_tmp;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " level:%d",
-			__function_name, triggerid, level);
-
-	if (level > 32)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Recursive trigger dependency detected! Please fix. Triggerid:" ZBX_FS_UI64, triggerid);
-		return ret;
-	}
-
-	result = DBselect(
-			"select t.triggerid,t.value"
-			" from trigger_depends d,triggers t"
-			" where d.triggerid_down=" ZBX_FS_UI64
-				" and d.triggerid_up=t.triggerid",
-			triggerid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(triggerid_tmp, row[0]);
-		value_tmp = atoi(row[1]);
-
-		if (TRIGGER_VALUE_TRUE == value_tmp || SUCCEED == trigger_dependent_rec(triggerid_tmp, level + 1))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "This trigger depends on " ZBX_FS_UI64 ". Will not apply actions", triggerid_tmp);
-			ret = SUCCEED;
-			break;
-		}
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: trigger_dependent                                                *
- *                                                                            *
- * Purpose: check if status depends on triggers having status TRUE            *
- *                                                                            *
- * Parameters: triggerid - trigger ID                                         *
- *                                                                            *
- * Return value: SUCCEED - it does depend, FAIL - not such triggers           *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	trigger_dependent(zbx_uint64_t triggerid)
-{
-	const char	*__function_name = "trigger_dependent";
-
-	int	ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 "", __function_name, triggerid);
-
-	ret = trigger_dependent_rec(triggerid, 0);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
 int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger_value, int trigger_flags,
 		const char *trigger_error, int new_value, int new_flags, const zbx_timespec_t *ts, const char *reason)
 {
@@ -485,7 +393,7 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 			(TRIGGER_TYPE_MULTIPLE_TRUE == trigger_type &&
 			TRIGGER_VALUE_TRUE == new_value &&
 			TRIGGER_VALUE_FLAG_NORMAL == new_flags)) &&
-			FAIL == trigger_dependent(triggerid);
+			SUCCEED == DCconfig_check_trigger_dependencies(triggerid);
 
 	if (generate_event) /* initial test passed */
 	{

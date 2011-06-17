@@ -142,7 +142,7 @@ typedef struct
 	zbx_uint64_t	triggerid;
 	char		*expression;
 	char		*old_error;
-	char		*new_error;
+	const char	*new_error;
 	zbx_timespec_t	timespec;
 	unsigned char	type;
 	unsigned char	value;
@@ -220,6 +220,8 @@ void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now
 void	DCrequeue_unreachable_item(zbx_uint64_t itemid);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
+
+int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
 void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
 		unsigned char value_flags, const char *error);
