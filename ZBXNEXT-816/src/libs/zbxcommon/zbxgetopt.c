@@ -599,6 +599,7 @@ int zbx_getopt(int argc, char **argv, const char *optstring)
 int zbx_getopt_long(int argc, char **argv, const char *options,
                     const struct zbx_option *long_options, int *opt_index)
 {
+printf("sdfdsfsfsd\n");
   return zbx_getopt_internal (argc, argv, options, long_options, opt_index, 0);
 }
 

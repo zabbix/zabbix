@@ -51,7 +51,6 @@ const char	*progname = NULL;
 const char	title_message[] = "Zabbix Proxy";
 const char	usage_message[] = "[-hV] [-c <file>]";
 
-#ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>       absolute path to the configuration file",
@@ -59,15 +58,6 @@ const char	*help_message[] = {
 	"  -V --version             display version number",
 	NULL	/* end of text */
 };
-#else
-const char	*help_message[] = {
-	"Options:",
-	"  -c <file>       absolute path to the configuration file",
-	"  -h              give this help",
-	"  -V              display version number",
-	NULL	/* end of text */
-};
-#endif
 
 /* COMMAND LINE OPTIONS */
 

@@ -29,7 +29,6 @@ const char	*progname = NULL;
 const char	title_message[] = "Zabbix Get";
 const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-I <IP address>] -k <key>";
 
-#ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
 	"  -s --host <host name or IP>          Specify host name or IP address of a host.",
@@ -44,22 +43,6 @@ const char	*help_message[] = {
 	"Example: zabbix_get -s 127.0.0.1 -p 10050 -k \"system.cpu.load[all,avg1]\"",
 	NULL	/* end of text */
 };
-#else
-const char	*help_message[] = {
-	"Options:",
-	"  -s <host name or IP>         Specify host name or IP address of a host.",
-	"  -p <port number>             Specify port number of agent running on the host. Default is 10050.",
-	"  -I <IP address>              Specify source IP address",
-	"",
-	"  -k <key of metric>           Specify item key to retrieve.",
-	"",
-	"  -h                           Give this help",
-	"  -V                           Display version number",
-	"",
-	"Example: zabbix_get -s 127.0.0.1 -p 10050 -k \"system.cpu.load[all,avg1]\"",
-	NULL	/* end of text */
-};
-#endif
 
 /* COMMAND LINE OPTIONS */
 

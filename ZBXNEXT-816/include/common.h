@@ -134,17 +134,6 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
 #endif
 
-#ifndef HAVE_GETOPT_LONG
-	struct option
-	{
-		const char *name;
-		int has_arg;
-		int *flag;
-		int val;
-	};
-#	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
-#endif
-
 #define	SUCCEED		0
 #define	FAIL		-1
 #define	NOTSUPPORTED	-2

@@ -30,7 +30,6 @@ const char	*progname = NULL;
 const char	title_message[] = "Zabbix Agent";
 const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
 
-#ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>  absolute path to the configuration file",
@@ -40,17 +39,6 @@ const char	*help_message[] = {
 	"  -t --test <item>    test specified item and exit",
 	NULL	/* end of text */
 };
-#else
-const char	*help_message[] = {
-	"Options:",
-	"  -c <file>     absolute path to the configuration file",
-	"  -h            give this help",
-	"  -V            display version number",
-	"  -p            print supported items and exit",
-	"  -t <item>     test specified item and exit",
-	NULL	/* end of text */
-};
-#endif
 
 static struct zbx_option	longopts[] =
 {
