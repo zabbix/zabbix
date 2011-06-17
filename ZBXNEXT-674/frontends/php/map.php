@@ -339,7 +339,8 @@ else{
 	$map['links'] = zbx_toHash($map['links'],'linkid');
 }
 
-if(get_request('nocalculations', false)){
+$nocalculations = get_request('nocalculations', false);
+if($nocalculations){
 	$map_info = array();
 	foreach($map['selements'] as $selement){
 		$map_info[$selement['selementid']] = array(
@@ -365,8 +366,8 @@ if(!isset($_REQUEST['noselements'])){
 	drawMapSelements($im, $map, $map_info);
 }
 
-drawMapLabels($im, $map, $map_info);
-drawMapLinkLabels($im, $map, $map_info);
+drawMapLabels($im, $map, $map_info, !$nocalculations);
+drawMapLinkLabels($im, $map, $map_info, !$nocalculations);
 
 if(!isset($_REQUEST['noselements']) && ($map['markelements'] == 1)){
 	drawMapSelementsMarks($im, $map, $map_info);

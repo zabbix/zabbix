@@ -380,7 +380,7 @@ function resolveMapLabelMacrosAll(array $selement){
 	if($resolveHostMacros){
 		$replace = array(
 			'{HOST.NAME}' => $db_host['name'],
-			'{HOSTNAME}' => $db_host['host'],
+			'{HOSTNAME}' => $db_host['name'],
 			'{HOST.HOST}' => $db_host['host'],
 			'{HOST.DNS}' => $db_host['dns'],
 			'{HOST.IP}' => $db_host['ip'],
@@ -1736,7 +1736,7 @@ function drawMapSelementsMarks(&$im, &$map, &$map_info){
 	}
 }
 
-function drawMapLinkLabels(&$im, $map, $map_info){
+function drawMapLinkLabels(&$im, $map, $map_info, $resolveMacros=true){
 	global $colors;
 
 	$links = $map['links'];
@@ -1813,7 +1813,7 @@ function drawMapLinkLabels(&$im, $map, $map_info){
 		$box_height = 0;
 
 		foreach($strings as $snum => $str){
-			$strings[$snum] = resolveMapLabelMacros($str);
+			$strings[$snum] = $resolveMacros ? resolveMapLabelMacros($str) : $str;
 		}
 
 		foreach($strings as $str){
@@ -1858,7 +1858,7 @@ function drawMapLinkLabels(&$im, $map, $map_info){
 	}
 }
 
-function drawMapLabels(&$im, $map, $map_info){
+function drawMapLabels(&$im, $map, $map_info, $resolveMacros=true){
 	global $colors;
 
 	if(($map['label_type'] == MAP_LABEL_TYPE_NOTHING) && ($map['label_format'] == SYSMAP_LABEL_ADVANCED_OFF)){
@@ -1927,7 +1927,8 @@ function drawMapLabels(&$im, $map, $map_info){
 			$status_lines[$selementid] = array();
 		}
 
-		$msg = resolveMapLabelMacrosAll($selement);
+		$msg = $resolveMacros ? resolveMapLabelMacrosAll($selement) : $selement['label'];
+
 		$all_strings .= $msg;
 		$msgs = explode("\n", $msg);
 		foreach($msgs as $msg){
