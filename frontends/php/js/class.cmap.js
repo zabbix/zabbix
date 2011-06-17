@@ -492,6 +492,14 @@ ZABBIX.apps.map = (function(){
 					this.form.addUrls();
 				}, this));
 
+				jQuery('#x, #y', this.form.domNode).change(function(){
+					var value = parseInt(this.value, 10);
+					this.value = isNaN(value) || (value < 0) ? 0 : value;
+				});
+				jQuery('#areaSizeWidth, #areaSizeHeight', this.form.domNode).change(function(){
+					var value = parseInt(this.value, 10);
+					this.value = isNaN(value) || (value < 10) ? 10 : value;
+				});
 
 				// mass update form
 				jQuery('#massClose').click(function(){
@@ -792,7 +800,6 @@ ZABBIX.apps.map = (function(){
 			},
 
 			update: function(data, unsetUndefined){
-
 				var	fieldName,
 					dataFelds = [
 						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
@@ -809,6 +816,7 @@ ZABBIX.apps.map = (function(){
 					this.elementName = data.elementName;
 				}
 
+				// update elements fields, if not massupdate, remove fields that are not in new values
 				for(i = 0, ln = dataFelds.length; i < ln; i++){
 					fieldName = dataFelds[i];
 					if(typeof data[fieldName] !== 'undefined'){
@@ -866,26 +874,44 @@ ZABBIX.apps.map = (function(){
 
 			align: function(force){
 				var dims = {
-					height: this.domNode.height(),
-					width: this.domNode.width()
-				},
+						height: this.domNode.height(),
+						width: this.domNode.width()
+					},
 					x = parseInt(this.data.x, 10),
 					y = parseInt(this.data.y, 10),
 					shiftX = Math.round(dims.width / 2),
 					shiftY = Math.round(dims.height / 2),
-					newX,
-					newY,
-					gridSize = parseInt(this.sysmap.data.grid_size, 10);
+					newX = x,
+					newY = y,
+					newWidth = dims.width,
+					newHeight = dims.height,
+					gridSize = parseInt(this.sysmap.data.grid_size, 10),
+					realign = false;
 
 				force = force || false;
 
 
-				if((!force && (this.sysmap.data.grid_align == '0')) || ((this.data.elementsubtype === '1') && (this.data.areatype === '0'))){
+				// if 'fit to map' area coords are 0 always
+				if((this.data.elementsubtype === '1') && (this.data.areatype === '0')){
+					newX = 0;
+					newY = 0;
+				}
+				// if autoalign is off
+				else if(!force && (this.sysmap.data.grid_align == '0')){
 					if((x + dims.width) > this.sysmap.data.width){
-						this.data.x = this.sysmap.data.width - dims.width;
+						newX = this.sysmap.data.width - dims.width;
 					}
 					if((y + dims.height) > this.sysmap.data.height){
-						this.data.y = this.sysmap.data.height - dims.height;
+						newY = this.sysmap.data.height - dims.height;
+					}
+
+					if(newX < 0){
+						newX = 0;
+						newWidth = this.sysmap.data.width;
+					}
+					if(newY < 0){
+						newY = 0;
+						newHeight = this.sysmap.data.height;
 					}
 				}
 				else{
@@ -912,15 +938,33 @@ ZABBIX.apps.map = (function(){
 						newY += gridSize;
 					}
 
+					if((newX + dims.width) > this.sysmap.data.width){
+						newWidth = this.sysmap.data.width - newX * 2;
+						realign = true;
+					}
+					if((newY + dims.height) > this.sysmap.data.height){
+						newHeight = this.sysmap.data.height - newY * 2;
+						realign = true;
+					}
+				}
 
-					this.data.y = newY;
-					this.data.x = newX;
+				this.data.y = newY;
+				this.data.x = newX;
+				if(this.data.elementsubtype === '1'){
+					this.data.width = newWidth;
+					this.data.height = newHeight;
 				}
 
 				this.domNode.css({
 					top: this.data.y + 'px',
-					left: this.data.x + 'px'
+					left: this.data.x + 'px',
+					width: newWidth,
+					height: newHeight
 				});
+
+				if(realign){
+					this.align(force);
+				}
 			},
 
 			updateIcon: function(){
@@ -936,17 +980,17 @@ ZABBIX.apps.map = (function(){
 					if(this.data.areatype === '1'){
 						this.domNode
 							.css({
-							width: this.data.width + 'px',
-							height: this.data.height + 'px'
-						})
+								width: this.data.width + 'px',
+								height: this.data.height + 'px'
+							})
 							.addClass('selementArea');
 					}
 					else{
 						this.domNode
 							.css({
-							width: this.sysmap.data.width + 'px',
-							height: this.sysmap.data.height + 'px'
-						})
+								width: this.sysmap.data.width + 'px',
+								height: this.sysmap.data.height + 'px'
+							})
 							.addClass('selementArea');
 					}
 
@@ -954,9 +998,9 @@ ZABBIX.apps.map = (function(){
 				else{
 					this.domNode
 						.css({
-						width: '',
-						height: ''
-					})
+							width: '',
+							height: ''
+						})
 						.removeClass('selementArea');
 				}
 			}
@@ -1120,6 +1164,7 @@ ZABBIX.apps.map = (function(){
 					url,
 					urlNames = {};
 
+
 				for(i = 0; i < values.length; i++){
 					url = urlPattern.exec(values[i].name);
 					if(url !== null){
@@ -1165,9 +1210,6 @@ ZABBIX.apps.map = (function(){
 							return false;
 					}
 				}
-
-				data.x = Math.abs(parseInt(data.x, 10));
-				data.y = Math.abs(parseInt(data.y, 10));
 
 				return data;
 			},
@@ -1569,10 +1611,17 @@ ZABBIX.apps.map = (function(){
 
 		var sysmap = new CMap(containerid, mapdata);
 
-		Selement.prototype.bind('afterMove', function(event, data){
-			if((sysmap.selection.count === 1) && (sysmap.selection.selements[data.id]) !== void(0)){
-				jQuery('#x').val(data.data.x);
-				jQuery('#y').val(data.data.y);
+		Selement.prototype.bind('afterMove', function(event, element){
+			if((sysmap.selection.count === 1) && (sysmap.selection.selements[element.id]) !== void(0)){
+				jQuery('#x').val(element.data.x);
+				jQuery('#y').val(element.data.y);
+
+				if(typeof element.data.width !== 'undefined'){
+					jQuery('#areaSizeWidth').val(element.data.width);
+				}
+				if(typeof element.data.height !== 'undefined'){
+					jQuery('#areaSizeHeight').val(element.data.height);
+				}
 			}
 		});
 
