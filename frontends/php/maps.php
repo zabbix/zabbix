@@ -112,8 +112,9 @@ require_once('include/views/js/general.script.confirm.js.php');
 	else if(!isset($_REQUEST['sysmapid'])){
 		$_REQUEST['sysmapid'] = CProfile::get('web.maps.sysmapid');
 		if(is_null($_REQUEST['sysmapid']) || !isset($maps[$_REQUEST['sysmapid']])){
-			$first_map = reset($maps);
-			$_REQUEST['sysmapid'] = $first_map['sysmapid'];
+			if($first_map = reset($maps)){
+				$_REQUEST['sysmapid'] = $first_map['sysmapid'];
+			}
 		}
 	}
 
