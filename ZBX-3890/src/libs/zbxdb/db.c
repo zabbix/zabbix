@@ -255,16 +255,13 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 				(text *)connect, (ub4)strlen(connect),
 				OCI_DEFAULT);
 
-		if (OCI_SUCCESS != err && OCI_SUCCESS_WITH_INFO != err)
+		if (OCI_SUCCESS != err)
 		{
 			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
 			ret = ZBX_DB_DOWN;
 		}
 		else
 		{
-			if (OCI_SUCCESS_WITH_INFO == err)
-				zabbix_log(LOG_LEVEL_WARNING, "%s", zbx_oci_error(err));
-
 			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX,
 						(void *)&oracle.srvhp, (ub4 *)0,
 						OCI_ATTR_SERVER, oracle.errhp);
