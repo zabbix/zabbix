@@ -827,6 +827,11 @@ ZABBIX.apps.map = (function(){
 					}
 				}
 
+				// if elementsubtype is not set, it should be 0
+				if(unsetUndefined && typeof this.data.elementsubtype === 'undefined'){
+					this.data.elementsubtype = '0';
+				}
+
 				// if we update all data and advanced_icons turned off or element is image, reset advanced iconids
 				if((unsetUndefined && (typeof data.advanced_icons === 'undefined')) || this.data.elementtype === '4'){
 					this.data.iconid_on = '0';
