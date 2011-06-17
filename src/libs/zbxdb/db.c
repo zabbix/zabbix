@@ -41,6 +41,47 @@ static int	txn_init = 0;
 	PHP_MUTEX	sqlite_access;
 #endif
 
+#if defined(HAVE_ORACLE)
+static const char	*zbx_oci_error(sword status)
+{
+	static char	errbuf[512];
+	sb4		errcode = 0;
+
+	errbuf[0] = '\0';
+
+	switch (status)
+	{
+		case OCI_SUCCESS_WITH_INFO:
+			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, &errcode,
+					(text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR);
+			break;
+		case OCI_NEED_DATA:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NEED_DATA");
+			break;
+		case OCI_NO_DATA:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NODATA");
+			break;
+		case OCI_ERROR:
+			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, &errcode,
+					(text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR);
+			break;
+		case OCI_INVALID_HANDLE:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_INVALID_HANDLE");
+			break;
+		case OCI_STILL_EXECUTING:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_STILL_EXECUTING");
+			break;
+		case OCI_CONTINUE:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_CONTINUE");
+			break;
+	}
+
+	zbx_rtrim(errbuf, ZBX_WHITESPACE);
+
+	return errbuf;
+}
+#endif	/* HAVE_ORACLE */
+
 /*
  * Connect to the database.
  */
@@ -195,6 +236,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 				(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
 				(dvoid * (*)(dvoid *, dvoid *, size_t))0,
 				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
+
 		if (OCI_SUCCESS != err)
 		{
 			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
@@ -225,6 +267,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX,
 						(void *)&oracle.srvhp, (ub4 *)0,
 						OCI_ATTR_SERVER, oracle.errhp);
+
 			if (OCI_SUCCESS != err)
 			{
 				zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
@@ -1396,7 +1439,7 @@ void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl)
 ub4	OCI_DBserver_status()
 {
 	sword	err;
-	ub4	server_status = OCI_SERVER_NOT_CONNECTED; 
+	ub4	server_status = OCI_SERVER_NOT_CONNECTED;
 
 	err = OCIAttrGet((void *)oracle.srvhp, OCI_HTYPE_SERVER, (void *)&server_status,
 			(ub4 *)0, OCI_ATTR_SERVER_STATUS, (OCIError *)oracle.errhp);
@@ -1407,40 +1450,5 @@ ub4	OCI_DBserver_status()
 	}
 
 	return server_status;
-}
-
-const char	*zbx_oci_error(sword status)
-{
-	static char	errbuf[512];
-	sb4		errcode = 0;
-
-	errbuf[0] = '\0';
-	switch (status)
-	{
-		case OCI_SUCCESS_WITH_INFO:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_SUCCESS_WITH_INFO");
-			break;
-		case OCI_NEED_DATA:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NEED_DATA");
-			break;
-		case OCI_NO_DATA:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NODATA");
-			break;
-		case OCI_ERROR:
-			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, &errcode,
-				(text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR);
-			break;
-		case OCI_INVALID_HANDLE:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_INVALID_HANDLE");
-			break;
-		case OCI_STILL_EXECUTING:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_STILL_EXECUTING");
-			break;
-		case OCI_CONTINUE:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_CONTINUE");
-			break;
-	}
-
-	return errbuf;
 }
 #endif	/* HAVE_ORACLE */
