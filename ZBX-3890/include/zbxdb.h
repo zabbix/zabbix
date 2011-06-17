@@ -103,7 +103,6 @@
 
 	void		OCI_DBfree_result(DB_RESULT result);
 	ub4		OCI_DBserver_status();
-	const char	*zbx_oci_error(sword status);
 
 #elif defined(HAVE_POSTGRESQL)
 
