@@ -131,11 +131,11 @@
 				</tr>
 				<tr>
 					<td><label for="x"><?php echo _('Coordinate X'); ?></label></td>
-					<td><input id="x" onchange="if(isNaN(parseInt(this.value,10))) this.value = 0;" style="text-align: right;" maxlength="5" value="0" size="5" name="x" class="input"></td>
+					<td><input id="x" maxlength="5" value="0" size="5" name="x" class="input"></td>
 				</tr>
 				<tr>
 					<td><label for="y"><?php echo _('Coordinate Y'); ?></label></td>
-					<td><input onchange="if(isNaN(parseInt(this.value,10))) this.value = 0;" style="text-align: right;" maxlength="5" value="0" size="5" id="y" name="y" class="input"></td>
+					<td><input maxlength="5" value="0" size="5" id="y" name="y" class="input"></td>
 				</tr>
 				<tr>
 					<td colspan="2">
