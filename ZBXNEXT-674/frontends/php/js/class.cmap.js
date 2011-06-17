@@ -436,9 +436,7 @@ ZABBIX.apps.map = (function(){
 				});
 
 				// remove element
-				jQuery('#selementRemove').click(function(){
-					that.deleteSelectedElements();
-				});
+				jQuery('#selementRemove').click(jQuery.proxy(this.deleteSelectedElements, this));
 
 				// add link
 				jQuery('#linkAdd').click(function(){
@@ -1642,7 +1640,6 @@ ZABBIX.apps.map = (function(){
 			}
 
 			sysmap.linkForm.hide();
-			sysmap.updateImage();
 		});
 
 		return sysmap;
