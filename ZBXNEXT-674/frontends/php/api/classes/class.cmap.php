@@ -306,7 +306,7 @@ class CMap extends CMapElement{
 						'sysmapids' => $maps_to_check,
 						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
-						'preservekeys' => 1,
+						'preservekeys' => true,
 						'output' => API_OUTPUT_SHORTEN,
 					);
 					$allowed_maps = $this->get($map_options);
@@ -367,24 +367,24 @@ class CMap extends CMapElement{
 			}
 		}
 
-COpt::memoryPick();
+		COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
 			return $result;
 		}
 
 // Adding Elements
 		if(!is_null($options['selectSelements']) && str_in_array($options['selectSelements'], $subselects_allowed_outputs)){
-			if(!isset($selements)){
-				$selements = array();
+			$sysmapids = zbx_objectValues($result, 'sysmapid');
 
-				$sql = 'SELECT se.* '.
-						' FROM sysmaps_elements se '.
-						' WHERE '.DBcondition('se.sysmapid', $sysmapids);
-				$db_selements = DBselect($sql);
-				while($selement = DBfetch($db_selements)){
-					$selement['urls'] = array();
-					$selements[$selement['selementid']] = $selement;
-				}
+			$selements = array();
+
+			$sql = 'SELECT se.* '.
+					' FROM sysmaps_elements se '.
+					' WHERE '.DBcondition('se.sysmapid', $sysmapids);
+			$db_selements = DBselect($sql);
+			while($selement = DBfetch($db_selements)){
+				$selement['urls'] = array();
+				$selements[$selement['selementid']] = $selement;
 			}
 
 			if(!is_null($options['expandUrls'])){
