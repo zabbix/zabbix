@@ -25,6 +25,7 @@
 #endif /* _WINDOWS */
 
 int	create_pid_file(const char *pidfile);
+int	read_pid_file(const char *pidfile, pid_t *pid);
 void	drop_pid_file(const char *pidfile);
 
 #endif

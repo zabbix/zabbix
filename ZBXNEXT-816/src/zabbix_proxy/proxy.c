@@ -54,6 +54,7 @@ const char	usage_message[] = "[-hV] [-c <file>]";
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>       absolute path to the configuration file",
+	"  -C --reload-cache        forced reload the configuration cache",
 	"  -h --help                give this help",
 	"  -V --version             display version number",
 	NULL	/* end of text */
@@ -64,14 +65,15 @@ const char	*help_message[] = {
 /* long options */
 static struct zbx_option	longopts[] =
 {
-	{"config",	1,	NULL,	'c'},
-	{"help",	0,	NULL,	'h'},
-	{"version",	0,	NULL,	'V'},
+	{"config",		1,	NULL,	'c'},
+	{"reload-cache",	0,	NULL,	'C'},
+	{"help",		0,	NULL,	'h'},
+	{"version",		0,	NULL,	'V'},
 	{NULL}
 };
 
 /* short options */
-static char	shortopts[] = "c:n:hV";
+static char	shortopts[] = "c:Cn:hV";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -400,6 +402,22 @@ static void	zbx_load_config()
 	zbx_validate_config();
 }
 
+void	zbx_sigusr_handler(zbx_task_t task)
+{
+	switch (task)
+	{
+		case ZBX_TASK_RELOAD_CONFIG:
+			if (ZBX_PROCESS_TYPE_CONFSYNCER == process_type)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
+				zbx_wakeup();
+			}
+			break;
+		default:
+			break;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: main                                                             *
@@ -411,17 +429,21 @@ static void	zbx_load_config()
  ******************************************************************************/
 int	main(int argc, char **argv)
 {
-	char	ch;
+	zbx_task_t	task = ZBX_TASK_START;
+	char		ch;
 
 	progname = get_program_name(argv[0]);
 
 	/* Parse the command-line. */
-	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts,NULL)) != (char)EOF)
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
 		switch (ch)
 		{
 			case 'c':
 				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+				break;
+			case 'C':
+				task = ZBX_TASK_RELOAD_CONFIG;
 				break;
 			case 'h':
 				help();
@@ -445,6 +467,12 @@ int	main(int argc, char **argv)
 	init_metrics();
 
 	zbx_load_config();
+
+	if (ZBX_TASK_RELOAD_CONFIG == task)
+	{
+		zbx_sigusr_send(ZBX_TASK_RELOAD_CONFIG);
+		exit(-1);
+	}
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
@@ -566,6 +594,7 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 	else if (server_num <= CONFIG_CONFSYNCER_FORKS)
 	{
+		/* the configuration syncer should be created first - variable threads[1] is used in daemon.c unit */
 		process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		process_num = server_num;
 
