@@ -31,15 +31,24 @@ const char	*DBnode(const char *fieldid, int nodeid)
 {
 	static char	dbnode[128];
 
-	if (nodeid == -1)
+	if (-1 == nodeid)
 		*dbnode = '\0';
 	else
 		zbx_snprintf(dbnode, sizeof(dbnode), " and %s between %d00000000000000 and %d99999999999999",
-				fieldid,
-				nodeid,
-				nodeid);
+				fieldid, nodeid, nodeid);
 
 	return dbnode;
+}
+
+int	DBis_node_id(zbx_uint64_t id, int nodeid)
+{
+	zbx_uint64_t	min, max;
+
+	min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid +
+		(zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid;
+	max = min + (zbx_uint64_t)__UINT64_C(99999999999);
+
+	return min <= id && id <= max ? SUCCEED : FAIL;
 }
 
 void	DBclose()
@@ -1399,15 +1408,16 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	table = DBget_table(tablename);
 	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
 
-	if (table->flags & ZBX_SYNC)
+	if (0 != (table->flags & ZBX_SYNC))
 	{
-		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)nodeid;
-		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(99999999999);
+		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid +
+			(zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid;
+		max = min + (zbx_uint64_t)__UINT64_C(99999999999);
 	}
 	else
 	{
-		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid;
-		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(99999999999999);
+		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
+		max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
 	}
 
 	do

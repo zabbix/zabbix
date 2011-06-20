@@ -27,6 +27,64 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: add_trigger_info                                                 *
+ *                                                                            *
+ * Purpose: add trigger info to event if required                             *
+ *                                                                            *
+ * Parameters: event - [IN] event data                                        *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	add_trigger_info(DB_EVENT *event)
+{
+	const char	*__function_name = "add_trigger_info";
+	int		ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (EVENT_OBJECT_TRIGGER == event->object && 0 != event->objectid)
+	{
+		if (SUCCEED == DBis_node_local_id(event->objectid))
+		{
+			ret = DCconfig_get_trigger_for_event(&event->trigger, event->objectid);
+		}
+		else
+		{
+			DB_RESULT	result;
+			DB_ROW		row;
+
+			result = DBselect(
+					"select description,expression,priority,type"
+					" from triggers"
+					" where triggerid=" ZBX_FS_UI64,
+					event->objectid);
+
+			if (NULL != (row = DBfetch(result)))
+			{
+				event->trigger.triggerid = event->objectid;
+				strscpy(event->trigger.description, row[0]);
+				strscpy(event->trigger.expression, row[1]);
+				event->trigger.priority = (unsigned char)atoi(row[2]);
+				event->trigger.type = (unsigned char)atoi(row[3]);
+			}
+			else
+				ret = FAIL;
+			DBfree_result(result);
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_event                                                    *
  *                                                                            *
  * Purpose: process new event                                                 *
@@ -52,13 +110,8 @@ int	process_event(DB_EVENT *event, int force_actions)
 			event->objectid, event->value, event->value_changed);
 
 	if (TRIGGER_VALUE_CHANGED_YES == event->value_changed || 1 == force_actions)
-	{
-		if (EVENT_OBJECT_TRIGGER == event->object && 0 != event->objectid)
-		{
-			if (SUCCEED != DCconfig_get_trigger_for_event(&event->trigger, event->objectid))
-				goto fail;
-		}
-	}
+		if (SUCCEED != add_trigger_info(event))
+			goto fail;
 
 	if (0 == event->eventid)
 		event->eventid = DBget_maxid("events");
