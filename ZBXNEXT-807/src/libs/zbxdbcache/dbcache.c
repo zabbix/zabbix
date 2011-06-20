@@ -74,7 +74,7 @@ typedef struct
 }
 ZBX_DC_IDS;
 
-ZBX_DC_IDS		*ids = NULL;
+static ZBX_DC_IDS	*ids = NULL;
 
 typedef union
 {
@@ -149,7 +149,7 @@ typedef struct
 }
 ZBX_DC_CACHE;
 
-ZBX_DC_CACHE		*cache = NULL;
+static ZBX_DC_CACHE	*cache = NULL;
 
 /******************************************************************************
  *                                                                            *
