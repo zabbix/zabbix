@@ -8,7 +8,7 @@
 
 // Author: Aly
 
-var ZBX_SCREENS = new Array();			// screens obj reference
+var ZBX_SCREENS = [];			// screens obj reference
 Position.includeScrollOffsets = true;
 
 // screenid ALWAYS must be a STRING (js doesn't support uint64) !!!!

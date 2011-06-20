@@ -8,7 +8,7 @@
 
 // Author: Aly
 var cookie ={
-cookies: new Array(),
+cookies: [],
 
 init: function(){
 	var path = new Curl();
@@ -90,7 +90,7 @@ createArray: function(name,value,days){
 },
 
 createJSON: function(name,value,days){
-	var value_array = new Array();
+	var value_array = [];
 	for(var key in value){
 		if(!empty(value[key])) value_array.push(value[key]);
 	}

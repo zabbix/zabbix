@@ -124,7 +124,7 @@ showHide : function(e){
 storeCookie : function(){
 //	cookie.erase(this.switcherName);
 
-	var storeArray = new Array();
+	var storeArray = [];
 
 	for(var i in this.switchers){
 		if(this.switchers[i]['state'] == 1){

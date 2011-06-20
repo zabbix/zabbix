@@ -6,7 +6,7 @@
  * http://www.zabbix.com/licence.php
  */
 
-var ZBX_MESSAGES = new Array();				// obj instances
+var ZBX_MESSAGES = [];				// obj instances
 function initMessages(args){					// use this function to initialize Messaging system
 	var messagesListId = ZBX_MESSAGES.length;
 	ZBX_MESSAGES[messagesListId] = new CMessageList(messagesListId, args);
@@ -31,7 +31,7 @@ msgcounter:				0,				// how many messages have been added
 pipeLength:				15,				// how many messages to show
 
 messageList:			{},				// list of received messages
-messagePipe:			new Array(),	// messageid pipe line
+messagePipe:			[],	// messageid pipe line
 messageLast:			{},				// last message's sourceid by caption
 
 effectTimeout:			1000,			// effect time out
@@ -507,7 +507,7 @@ createMessage: function(){
 	this.dom.title.className = 'title';
 
 // body
-	if(!is_array(this.body)) this.body = new Array(this.body);
+	if(!is_array(this.body)) this.body = [this.body];
 
 //	this.dom.message.style.height = (24+14*this.body.length)+'px';
 	for(var i=0; i < this.body.length; i++){
@@ -547,7 +547,7 @@ setClass: function(className){
 
 
 var CList = Class.create(CNode,{
-items:		new Array(),	// items list
+items:		[],	// items list
 initialize: function($super, className){
 	className = className || '';
 
@@ -570,7 +570,7 @@ addItem: function($super, item, className){
 });
 
 var CListItem = Class.create(CNode,{
-items:		new Array(),	// items list
+items:		[],	// items list
 initialize: function($super, item, className){
 	className = className || '';
 	item = item || null;

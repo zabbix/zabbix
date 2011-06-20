@@ -24,7 +24,7 @@ Parse: function(post){
 	this.crlf2br = false;
 	this.noparse = false;
 	this.urlstart = -1;
-	this.opentags = new Array();
+	this.opentags = [];
 
 	var result = post.replace(this.RE.format, this.toHtml.bind(this));
 

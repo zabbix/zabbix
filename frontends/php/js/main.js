@@ -126,7 +126,7 @@ init: function(){
 implement: function(obj){
 	var obj_name = obj.name.split('[')[0];
 
-	if(typeof(this.chkboxes[obj_name]) == 'undefined') this.chkboxes[obj_name] = new Array();
+	if(typeof(this.chkboxes[obj_name]) == 'undefined') this.chkboxes[obj_name] = [];
 	this.chkboxes[obj_name].push(obj);
 
 	addListener(obj, 'click', this.check.bindAsEventListener(this), false);
@@ -540,7 +540,7 @@ remove: function(audiofile){
 
 /*						Replace Standart Blink functionality						*/
 var blink = {
-	blinkobjs: new Array(),
+	blinkobjs: [],
 
 	init: function(){
 

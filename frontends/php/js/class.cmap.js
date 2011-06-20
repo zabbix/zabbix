@@ -1236,7 +1236,7 @@ ZABBIX.apps.map = (function(){
 
 					rowTpl = new Template(jQuery('#mapLinksRow').html());
 
-					list = new Array();
+					list = [];
 					for(i = 0, ln = links.length; i < ln; i++){
 						link = this.sysmap.links[links[i]].data;
 
