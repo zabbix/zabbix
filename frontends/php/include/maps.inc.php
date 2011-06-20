@@ -1325,7 +1325,7 @@ function prepareMapExport(&$exportMaps){
 	$triggers = array();
 	$images = array();
 
-	foreach($exportMaps as $mnum => $sysmap){
+	foreach($exportMaps as $sysmap){
 		$selements = separateMapElements($sysmap);
 
 		$sysmaps += zbx_objectValues($selements['sysmaps'], 'elementid');
@@ -1334,7 +1334,7 @@ function prepareMapExport(&$exportMaps){
 		$triggers += zbx_objectValues($selements['triggers'], 'elementid');
 		$images += zbx_objectValues($selements['images'], 'elementid');
 
-		foreach($sysmap['selements'] as $snum => $selement){
+		foreach($sysmap['selements'] as $selement){
 			if($selement['iconid_off'] > 0){
 				$images[$selement['iconid_off']] = $selement['iconid_off'];
 			}
@@ -1365,7 +1365,7 @@ function prepareMapExport(&$exportMaps){
 	$images = imageIdents($images);
 
 	try{
-		foreach($exportMaps as $mnum => &$sysmap){
+		foreach($exportMaps as &$sysmap){
 			unset($sysmap['sysmapid']);
 			foreach($sysmap['urls'] as $unum => $url){
 				unset($sysmap['urls'][$unum]['sysmapurlid']);
@@ -2170,9 +2170,10 @@ function populateFromMapAreas(array &$map){
 				$selement['elementsubtype'] = SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP;
 				$selement['elementid'] = $host['hostid'];
 
-				do{
-					$newSelementid = rand(1, 9999999);
-				}while(isset($map['selements'][$newSelementid]));
+				$newSelementid = rand(1, 9999999);
+				while(isset($map['selements'][$newSelementid])){
+					$newSelementid += 1;
+				};
 				$selement['selementid'] = $newSelementid;
 
 				$area['selementids'][$newSelementid] = $newSelementid;
@@ -2200,9 +2201,10 @@ function populateFromMapAreas(array &$map){
 
 				if($idNumber){
 					foreach($area['selementids'] as $newSelementid){
-						do{
-							$newLinkid = rand(1, 9999999);
-						}while(isset($map['links'][$newLinkid]));
+						$newLinkid = rand(1, 9999999);
+						while(isset($map['links'][$newLinkid])){
+							$newLinkid += 1;
+						};
 
 						$link['linkid'] = $newLinkid;
 						$link[$idNumber] = $newSelementid;
