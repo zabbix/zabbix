@@ -152,7 +152,7 @@
 								<tbody id="urlContainer"></tbody>
 								<tfoot>
 								<tr>
-									<td colspan="3"><span id="newSelementUrl" class="link_menu" title="Add"><?php echo _('Add'); ?></span></td>
+									<td colspan="3"><span id="newSelementUrl" class="link_menu"><?php echo _('Add'); ?></span></td>
 								</tr>
 								</tfoot>
 							</table>
@@ -161,9 +161,9 @@
 				</tr>
 				<tr class="footer">
 					<td colspan="2" class="form_row_last">
-						<input id="elementApply" type="button" name="apply" value="Apply">
-						<input id="elementRemove" type="button" name="remove" value="Remove">
-						<input id="elementClose" type="button" name="close" value="Close">
+						<input id="elementApply" type="button" name="apply" value="<?php echo _('Apply'); ?>">
+						<input id="elementRemove" type="button" name="remove" value="<?php echo _('Remove'); ?>">
+						<input id="elementClose" type="button" name="close" value="<?php echo _('Close'); ?>">
 					</td>
 				</tr>
 				</tbody>
@@ -232,7 +232,7 @@
 								<tfoot>
 								<tr>
 									<td colspan="4">
-										<input type="button" name="Add" value="Add" class="input button link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1');">
+										<input type="button" name="Add" value="<?php echo _('Add'); ?>" class="input button link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1');">
 									</td>
 								</tr>
 								</tfoot>
@@ -242,9 +242,9 @@
 				</tr>
 				<tr class="footer">
 					<td colspan="2" class="form_row_last">
-						<input id="formLinkApply" type="button" value="Apply">
-						<input id="formLinkRemove" type="button" value="Remove">
-						<input id="formLinkClose" type="button" value="Close">
+						<input id="formLinkApply" type="button" value="<?php echo _('Apply'); ?>">
+						<input id="formLinkRemove" type="button" value="<?php echo _('Remove'); ?>">
+						<input id="formLinkClose" type="button" value="<?php echo _('Close'); ?>">
 					</td>
 				</tr>
 				</tbody>
@@ -326,9 +326,9 @@
 				</tr>
 				<tr class="footer">
 					<td colspan="2" class="form_row_last">
-						<input id="massApply" type="button" name="apply" value="Apply">
-						<input id="massRemove" type="button" name="remove" value="Remove">
-						<input id="massClose" type="button" name="close" value="Close">
+						<input id="massApply" type="button" name="apply" value="<?php echo _('Apply'); ?>">
+						<input id="massRemove" type="button" name="remove" value="<?php echo _('Remove'); ?>">
+						<input id="massClose" type="button" name="close" value="<?php echo _('Close'); ?>">
 					</td>
 				</tr>
 				</tbody>
@@ -346,7 +346,7 @@
 
 <script type="text/x-jquery-tmpl" id="mapLinksRow">
 	<tr>
-		<td><span class="link_menu openlink" data-linkid="#{linkid}">Edit</span></td>
+		<td><span class="link_menu openlink" data-linkid="#{linkid}"><?php echo _('Edit'); ?></span></td>
 		<td>#{elementType}</td>
 		<td>#{elementName}</td>
 		<td class="pre">#{linktriggers}</td>
