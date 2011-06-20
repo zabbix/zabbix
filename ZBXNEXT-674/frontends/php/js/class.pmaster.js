@@ -6,7 +6,7 @@
  * http://www.zabbix.com/licence.php
  */
 
-var PMasters = new Array();				// obj instances
+var PMasters = [];				// obj instances
 function initPMaster(pmid, args){		// use this function to initialize PMaster
 	if(typeof(PMasters[pmid]) == 'undefined'){
 		PMasters[pmid] = new CPMaster(pmid,args);
@@ -17,14 +17,14 @@ return pmid;
 // Author: Aly
 var CPMaster = Class.create(CDebug,{
 pmasterid:			0,				// PMasters reference id
-dolls:				new Array(),	// list of updated objects
+dolls:				[],	// list of updated objects
 
 initialize: function($super, pmid, obj4upd){
 	this.pmasterid = pmid;
 	$super('CPMaster['+pmid+']');
 //--
 
-	var doll = new Array();
+	var doll = [];
 	for(var id in obj4upd){
 		if((typeof(obj4upd[id]) != 'undefined') && (!is_null(obj4upd[id]))){
 			doll = obj4upd[id];
@@ -33,7 +33,7 @@ initialize: function($super, pmid, obj4upd){
 			if(typeof(doll['url']) == 'undefined') 			doll['url'] = location.href;
 			if(typeof(doll['counter']) == 'undefined') 		doll['counter'] = 0;
 			if(typeof(doll['darken']) == 'undefined') 		doll['darken'] = 0;
-			if(typeof(doll['params']) == 'undefined') 		doll['params'] = new Array();
+			if(typeof(doll['params']) == 'undefined') 		doll['params'] = [];
 
 			this.addStartDoll(id, doll.frequency, doll.url, doll.counter, doll.darken, doll.params);
 		}
@@ -113,7 +113,7 @@ clear: function(){
 	for(var domid in this.dolls){
 		this.rmvDoll(domid);
 	}
-	this.dolls = new Array();
+	this.dolls = [];
 }
 });
 

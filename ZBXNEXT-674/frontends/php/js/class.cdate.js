@@ -57,7 +57,7 @@ calcTZdiff: function(time){
 getZBXDate: function(){
 //	this.debug('getZBXDate');
 //--
-	var thedate = new Array();
+	var thedate = [];
 	thedate[0] = this.serverDate.getDate();
 	thedate[1] = this.serverDate.getMonth()+1;
 	thedate[2] = this.serverDate.getFullYear();

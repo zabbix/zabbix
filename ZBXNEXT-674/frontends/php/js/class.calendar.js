@@ -7,7 +7,7 @@
  */
 
 // Author: Aly
-var CLNDR = new Array();			// calendar obj reference
+var CLNDR = [];			// calendar obj reference
 
 function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid){
 	id = id || CLNDR.length;
@@ -53,16 +53,16 @@ clndr_yeardown: null,			//html bttn obj
 
 clndr_utime_field: null,		//html obj where unix date representation is saved
 
-timeobjects: new Array(),		// object list where will be saved date
+timeobjects: [],		// object list where will be saved date
 status: false,					// status of timeobjects
 
 visible: 0,				//GMenu style state
 
-monthname:  new Array(locale['S_JANUARY'],locale['S_FEBRUARY'],locale['S_MARCH'],locale['S_APRIL'],locale['S_MAY'],locale['S_JUNE'],locale['S_JULY'],locale['S_AUGUST'],locale['S_SEPTEMBER'],locale['S_OCTOBER'],locale['S_NOVEMBER'],locale['S_DECEMBER']), // months
+monthname: [locale['S_JANUARY'],locale['S_FEBRUARY'],locale['S_MARCH'],locale['S_APRIL'],locale['S_MAY'],locale['S_JUNE'],locale['S_JULY'],locale['S_AUGUST'],locale['S_SEPTEMBER'],locale['S_OCTOBER'],locale['S_NOVEMBER'],locale['S_DECEMBER']], // months
 
 initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid){
 	this.id = id;
-	this.timeobjects = new Array();
+	this.timeobjects = [];
 
 	if(!(this.status=this.checkOuterObj(timeobjects))){
 		throw 'Calendar: constructor expects second parameter to be list of DOM nodes [d,M,Y,H,i].';
@@ -187,8 +187,8 @@ setSDateFromOuterObj: function(){
 				var datetime = val.split(' ');
 
 				var date = datetime[0].split('.');
-				var time = new Array();
-				if(datetime.length > 1)	var time = datetime[1].split(':');
+				var time = [];
+				if(datetime.length > 1)	time = datetime[1].split(':');
 
 
 				if(date.length == 3){
@@ -212,7 +212,7 @@ setSDateFromOuterObj: function(){
 			break;
 		case 3:
 		case 5:
-			var val = new Array();
+			var val = [];
 			var result = true;
 
 			for(var i=0; i < this.timeobjects.length; i++){

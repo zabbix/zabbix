@@ -300,7 +300,7 @@ updateProfile: function(id, stime, period){
 		throw("Prototype.js lib is required!");
 	}
 
-	var params = new Array();
+	var params = [];
 	params['favobj'] = 'timeline';
 	params['favid'] = id;
 	params['graphid'] = id;
@@ -332,7 +332,7 @@ function datetoarray(unixtime){
 
 	var date = new CDate(unixtime*1000);
 
-	var thedate = new Array();
+	var thedate = [];
 	thedate[0] = date.getDate();
 	thedate[1] = date.getMonth()+1;
 	thedate[2] = date.getFullYear();
@@ -538,7 +538,7 @@ dom:{
 	'zoom': null,				// dom object
 	'text': null,				// dom object
 	'links': null,				// dom object
-	'linklist': new Array(),	// dom object
+	'linklist': [],	// dom object
 
 	'timeline': null,			// dom object
 	'info_left': null,			// dom object
@@ -561,7 +561,7 @@ dom:{
 
 	'subline': null,				// dom object
 	'nav_links': null,				// dom object
-	'nav_linklist': new Array(),	// dom object
+	'nav_linklist': [],	// dom object
 	'period_state': null,			// dom object
 	'info_period': null				// dom object period info
 },
@@ -1437,8 +1437,8 @@ appendNavLinks: function(){
 
 	var links = 0;
 
-	var left = new Array();
-	var right = new Array();
+	var left = [];
+	var right = [];
 
 	var tmp_laquo = document.createElement('span');
 	this.dom.nav_links.appendChild(tmp_laquo);

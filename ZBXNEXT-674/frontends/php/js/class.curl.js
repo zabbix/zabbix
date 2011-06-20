@@ -112,7 +112,7 @@ addSID: function(){
 formatQuery: function(){
 	if(this.args.lenght < 1) return;
 
-	var query = new Array();
+	var query = [];
 	for(var key in this.args){
 		if((typeof(this.args[key]) != 'undefined') && !is_null(this.args[key])){
 			query.push(key+'='+encodeURIComponent(this.args[key]));

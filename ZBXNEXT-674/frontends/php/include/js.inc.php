@@ -280,7 +280,7 @@ function insert_javascript_for_visibilitybox(){
 			var obj = document.getElementsByName(obj_name);
 
 			if(obj.length <= 0){
-				obj = new Array(document.getElementById(obj_name));
+				obj = [document.getElementById(obj_name)];
 			}
 
 			if((obj.length <= 0) || is_null(obj[0])) throw "'.S_CANNOT_FIND_OBJECTS_WITH_NAME.' [" + obj_name +"]";
@@ -544,7 +544,7 @@ function insert_js_function($fnct_name){
 					else
 						value[object] = singleValue;
 
-					var items = { object: object, values: new Array(value) };
+					var items = { object: object, values: [value] };
 
 					parent.addPopupValues(items);
 					close_window();

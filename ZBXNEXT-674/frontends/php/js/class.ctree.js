@@ -10,7 +10,7 @@
 var CTree = Class.create();
 CTree.prototype = {
 tree_name: null,
-treenode: new Array(),
+treenode: [],
 
 initialize : function(tree_name, treenode){
 	this.tree_name = tree_name;
