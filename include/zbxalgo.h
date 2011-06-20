@@ -74,6 +74,15 @@ void	zbx_default_mem_free_func(void *ptr);
 int	is_prime(int n);
 int	next_prime(int n);
 
+/* pair */
+
+typedef struct
+{
+	void	*first;
+	void	*second;
+}
+zbx_ptr_pair_t;
+
 /* hashset */
 
 #define ZBX_HASHSET_ENTRY_T	struct zbx_hashset_entry_s
@@ -261,5 +270,6 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t);
 ZBX_VECTOR_DECL(str, char *);
 ZBX_VECTOR_DECL(ptr, void *);
+ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t);
 
 #endif
