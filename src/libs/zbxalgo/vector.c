@@ -105,6 +105,22 @@ void	zbx_vector_ ## __id ## _sort(zbx_vector_ ## __id ## _t *vector, zbx_compare
 	}													\
 }														\
 														\
+void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
+{														\
+	if (2 <= vector->values_num)										\
+	{													\
+		int	i, j = 1;										\
+														\
+		for (i = 1; i < vector->values_num; i++)							\
+		{												\
+			if (0 != compare_func(&vector->values[i - 1], &vector->values[i]))			\
+				vector->values[j++] = vector->values[i];					\
+		}												\
+														\
+		vector->values_num = j;										\
+	}													\
+}														\
+														\
 int	zbx_vector_ ## __id ## _bsearch(zbx_vector_ ## __id ## _t *vector, __type value,			\
 									zbx_compare_func_t compare_func)	\
 {														\
@@ -125,16 +141,16 @@ int	zbx_vector_ ## __id ## _lsearch(zbx_vector_ ## __id ## _t *vector, __type va
 	{													\
 		int	c = compare_func(&vector->values[*index], &value);					\
 														\
-		if (c < 0)											\
+		if (0 > c)											\
 		{												\
 			(*index)++;										\
 			continue;										\
 		}												\
 														\
-		if (c == 0)											\
+		if (0 == c)											\
 			return SUCCEED;										\
 														\
-		if (c > 0)											\
+		if (0 < c)											\
 			break;											\
 	}													\
 														\
