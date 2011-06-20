@@ -201,6 +201,8 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 			event.clock = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "value"))
 			event.value = atoi(buffer);
+		else if (0 == strcmp(table->fields[f].name, "value_changed"))
+			event.value_changed = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "acknowledged"))
 			event.acknowledged = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "ns"))
