@@ -40,13 +40,14 @@
 typedef struct zbx_dc_trigger_s
 {
 	zbx_uint64_t			triggerid;
+	const char			*description;
 	const char			*expression;
 	const char			*error;
 	const struct zbx_dc_trigger_s	**dependencies;
+	unsigned char			priority;
 	unsigned char			type;
 	unsigned char			value;
 	unsigned char			value_flags;
-	unsigned char			time_based;
 }
 ZBX_DC_TRIGGER;
 
@@ -1133,12 +1134,13 @@ static void	DCsync_triggers(DB_RESULT trig_result, DB_RESULT dpnd_result)
 
 		/* store new information in trigger structure */
 
-		DCstrpool_replace(found, &trigger->expression, row[1]);
-		DCstrpool_replace(found, &trigger->error, row[2]);
-		trigger->type = (unsigned char)atoi(row[3]);
-		trigger->value = (unsigned char)atoi(row[4]);
-		trigger->value_flags = (unsigned char)atoi(row[5]);
-		trigger->time_based = 0;
+		DCstrpool_replace(found, &trigger->description, row[1]);
+		DCstrpool_replace(found, &trigger->expression, row[2]);
+		DCstrpool_replace(found, &trigger->error, row[3]);
+		trigger->priority = (unsigned char)atoi(row[4]);
+		trigger->type = (unsigned char)atoi(row[5]);
+		trigger->value = (unsigned char)atoi(row[6]);
+		trigger->value_flags = (unsigned char)atoi(row[7]);
 
 		if (!found)
 			trigger->dependencies = NULL;
@@ -1216,6 +1218,7 @@ static void	DCsync_triggers(DB_RESULT trig_result, DB_RESULT dpnd_result)
 			continue;
 		}
 
+		zbx_strpool_release(trigger->description);
 		zbx_strpool_release(trigger->expression);
 		zbx_strpool_release(trigger->error);
 
@@ -1295,16 +1298,11 @@ static void	DCsync_functions(DB_RESULT result)
 		/* process trigger information */
 
 		if (SUCCEED == is_time_function(function->function))
-		{
-			if (0 == trigger->time_based)
-			{
-				trigger->time_based = 1;
-				zbx_vector_ptr_append(&config->time_triggers, trigger);
-			}
-		}
+			zbx_vector_ptr_append(&config->time_triggers, trigger);
 	}
 
 	zbx_vector_ptr_sort(&config->time_triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_uniq(&config->time_triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	/* update links from items to triggers */
 
@@ -2037,7 +2035,8 @@ void	DCsync_configuration()
 
 	sec = zbx_time();
 	trig_result = DBselect(
-			"select distinct t.triggerid,t.expression,t.error,t.type,t.value,t.value_flags"
+			"select distinct t.triggerid,t.description,t.expression,t.error,"
+				"t.priority,t.type,t.value,t.value_flags"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -3067,6 +3066,44 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 	UNLOCK_CACHE;
 
 	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_trigger_for_event                                   *
+ *                                                                            *
+ * Purpose: get trigger by triggerid to be used in event processing           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid)
+{
+	int			ret = SUCCEED;
+	const ZBX_DC_TRIGGER	*dc_trigger;
+
+	LOCK_CACHE;
+
+	if (NULL != (dc_trigger = zbx_hashset_search(&config->triggers, &triggerid)))
+	{
+		trigger->triggerid = dc_trigger->triggerid;
+		strscpy(trigger->description, dc_trigger->description);
+		strscpy(trigger->expression, dc_trigger->expression);
+		trigger->priority = dc_trigger->priority;
+		trigger->type = dc_trigger->type;
+	}
+	else
+		ret = FAIL;
+
+	UNLOCK_CACHE;
+
+	return ret;
 }
 
 /******************************************************************************
