@@ -48,7 +48,7 @@ insert into help_items values (5,'zabbix[trends_uint]','Number of values stored 
 insert into help_items values (5,'zabbix[triggers]','Number of triggers in Zabbix database.');
 insert into help_items values (5,'zabbix[uptime]','Uptime of Zabbix server process in seconds.');
 insert into help_items values (5,'zabbix[wcache,&lt;cache&gt;,&lt;mode&gt;]','Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free).');
-insert into help_items values (5,'zabbix[process,&lt;type&gt;,&lt;num&gt;,&lt;state&gt;]','Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage.');
+insert into help_items values (5,'zabbix[process,&lt;type&gt;,&lt;num&gt;,&lt;state&gt;]','Time a particular Zabbix process or a group of processes (identified by &lt;type&gt; and &lt;num&gt;) spent in &lt;state&gt; in percentage.');
 
 insert into help_items values (8,'grpfunc[&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;]','Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual.');
 
@@ -56,8 +56,8 @@ insert into help_items values(0,'agent.ping','Check the agent usability. Always 
 insert into help_items values(0,'agent.version','Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1');
 insert into help_items values(0,'kernel.maxfiles','Maximum number of opened files supported by OS.');
 insert into help_items values(0,'kernel.maxproc','Maximum number of processes supported by OS.');
-insert into help_items values(0,'net.dns[<ip>,<zone>,<type>,<timeout>,<count>]','Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.');
-insert into help_items values(0,'net.dns.record[<ip>,<zone>,<type>,<timeout>,<count>]','Performs a DNS query. On success returns a character string with the required type of information.');
+insert into help_items values(0,'net.dns[&lt;ip&gt;,&lt;zone&gt;,&lt;type&gt;,&lt;timeout&gt;,&lt;count&gt;]','Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.');
+insert into help_items values(0,'net.dns.record[&lt;ip&gt;,&lt;zone&gt;,&lt;type&gt;,&lt;timeout&gt;,&lt;count&gt;]','Performs a DNS query. On success returns a character string with the required type of information.');
 insert into help_items values(0,'net.if.collisions[if]','Out-of-window collision. Collisions count.');
 insert into help_items values(0,'net.if.in[if &lt;,mode&gt;]','Network interface input statistic. Integer value. If mode is missing bytes is used.');
 insert into help_items values(0,'net.if.out[if &lt;,mode&gt;]','Network interface output statistic. Integer value. If mode is missing bytes is used.');
@@ -78,7 +78,7 @@ insert into help_items values(0,'system.cpu.load[&lt;cpu&gt; &lt;,mode&gt;]','CP
 insert into help_items values(0,'system.cpu.switches','Context switches.');
 insert into help_items values(0,'system.cpu.util[&lt;cpu&gt; &lt;,type&gt; &lt;,mode&gt;]','CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used.');
 insert into help_items values(0,'system.cpu.num','Number of available proccessors.');
-insert into help_items values(0,'system.hostname','Return host name. String value. Example of returned value: www.zabbix.com');
+insert into help_items values(0,'system.hostname[&lt;type&gt;]','Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com');
 insert into help_items values(0,'system.hw.chassis[&lt;info&gt;]','Chassis info - returns full info by default');
 insert into help_items values(0,'system.hw.cpu[&lt;cpu&gt;,&lt;info&gt;]','CPU info - lists full info for all CPUs by default');
 insert into help_items values(0,'system.hw.devices[&lt;type&gt;]','Device list - lists PCI devices by default');
@@ -118,8 +118,8 @@ insert into help_items values(7,'kernel.maxfiles','Maximum number of opened file
 insert into help_items values(7,'kernel.maxproc','Maximum number of processes supported by OS.');
 insert into help_items values(7,'log[file,&lt;pattern&gt;,&lt;encoding&gt;,&lt;maxlines&gt;,&lt;mode&gt;]','Monitoring of log file. pattern - regular expression');
 insert into help_items values(7,'logrt[file_format,&lt;pattern&gt;,&lt;encoding&gt;,&lt;maxlines&gt;,&lt;mode&gt;]', 'Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression');
-insert into help_items values(7,'net.dns[<ip>,<zone>,<type>,<timeout>,<count>]','Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.');
-insert into help_items values(7,'net.dns.record[<ip>,<zone>,<type>,<timeout>,<count>]','Performs a DNS query. On success returns a character string with the required type of information.');
+insert into help_items values(7,'net.dns[&lt;ip&gt;,&lt;zone&gt;,&lt;type&gt;,&lt;timeout&gt;,&lt;count&gt;]','Checks if DNS service is up. 0 - DNS is down (server did not respond or DNS resolution failed), 1 - DNS is up.');
+insert into help_items values(7,'net.dns.record[&lt;ip&gt;,&lt;zone&gt;,&lt;type&gt;,&lt;timeout&gt;,&lt;count&gt;]','Performs a DNS query. On success returns a character string with the required type of information.');
 insert into help_items values(7,'net.if.collisions[if]','Out-of-window collision. Collisions count.');
 insert into help_items values(7,'net.if.in[if &lt;,mode&gt;]','Network interface input statistic. Integer value. If mode is missing bytes is used.');
 insert into help_items values(7,'net.if.out[if &lt;,mode&gt;]','Network interface output statistic. Integer value. If mode is missing bytes is used.');
@@ -140,7 +140,7 @@ insert into help_items values(7,'system.cpu.load[&lt;cpu&gt; &lt;,mode&gt;]','CP
 insert into help_items values(7,'system.cpu.switches','Context switches.');
 insert into help_items values(7,'system.cpu.util[&lt;cpu&gt; &lt;,type&gt; &lt;,mode&gt;]','CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used.');
 insert into help_items values(7,'system.cpu.num','Number of available proccessors.');
-insert into help_items values(7,'system.hostname','Return host name. String value. Example of returned value: www.zabbix.com');
+insert into help_items values(7,'system.hostname[&lt;type&gt;]','Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com');
 insert into help_items values(7,'system.hw.chassis[&lt;info&gt;]','Chassis info - returns full info by default');
 insert into help_items values(7,'system.hw.cpu[&lt;cpu&gt;,&lt;info&gt;]','CPU info - lists full info for all CPUs by default');
 insert into help_items values(7,'system.hw.devices[&lt;type&gt;]','Device list - lists PCI devices by default');
