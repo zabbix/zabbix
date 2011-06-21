@@ -24,9 +24,18 @@
 
 int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char counter_path[MAX_COUNTER_PATH];
+	char	counter_path[64];
 
-	zbx_snprintf(counter_path, sizeof(counter_path), "\\%s\\%s",GetCounterName(PCI_SYSTEM),GetCounterName(PCI_SYSTEM_UP_TIME));
+	zbx_snprintf(counter_path, sizeof(counter_path), "\\%d\\%d", PCI_SYSTEM, PCI_SYSTEM_UP_TIME);
 
-	return PERF_MONITOR(cmd, counter_path, flags, result);
+	if (SYSINFO_RET_FAIL == PERF_MONITOR(cmd, counter_path, flags, result))
+		return SYSINFO_RET_FAIL;
+
+	/* result must be integer to correctly interpret it in frontend (uptime) */
+	if (!GET_UI64_RESULT(result))
+		return SYSINFO_RET_FAIL;
+
+	UNSET_RESULT_EXCLUDING(result, AR_UINT64);
+
+	return SYSINFO_RET_OK;
 }
