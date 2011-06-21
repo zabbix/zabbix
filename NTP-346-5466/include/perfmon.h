@@ -38,13 +38,11 @@
 // Performance Countername structure
 //
 
-#define MAX_PERFCOUNTER_NAME_LEN      (108)	/* old naming <MAX_COUNTER_NAME> */
-
 struct perfcounter
 {
 	struct perfcounter *next;
 	unsigned long	pdhIndex;
-	char		name[MAX_PERFCOUNTER_NAME_LEN];	
+	char		name[PDH_MAX_COUNTER_NAME];	
 	/* must be caracter array! if you want to rewrite */
 	/* to dinacal memory allocation CHECK for usage   */
 	/* of sizeof function                             */
@@ -55,5 +53,6 @@ typedef struct perfcounter PERFCOUNTER;
 extern PERFCOUNTER *PerfCounterList;
 
 char *GetCounterName(unsigned long index);
+int	check_counter_path(char *counterPath);
 
 #endif /* ZABBIX_PERFMON_H */
