@@ -1,0 +1,2 @@
+gcc snmp.c -I/usr/include/net-snmp -I/usr/include/mysql -lsnmp -lmysqlclient
+#gcc poller_epoll.c -o poller_epoll
