@@ -37,19 +37,26 @@
 #define ZBX_LOC_QUEUE	1
 #define ZBX_LOC_POLLER	2
 
-typedef struct zbx_dc_trigger_s
+typedef struct
 {
-	zbx_uint64_t			triggerid;
-	const char			*description;
-	const char			*expression;
-	const char			*error;
-	const struct zbx_dc_trigger_s	**dependencies;
-	unsigned char			priority;
-	unsigned char			type;
-	unsigned char			value;
-	unsigned char			value_flags;
+	zbx_uint64_t	triggerid;
+	const char	*description;
+	const char	*expression;
+	const char	*error;
+	unsigned char	priority;
+	unsigned char	type;
+	unsigned char	value;
+	unsigned char	value_flags;
 }
 ZBX_DC_TRIGGER;
+
+typedef struct zbx_dc_trigger_deplist_s
+{
+	zbx_uint64_t				triggerid;
+	const ZBX_DC_TRIGGER			*trigger;
+	const struct zbx_dc_trigger_deplist_s	**dependencies;
+}
+ZBX_DC_TRIGGER_DEPLIST;
 
 typedef struct
 {
@@ -305,6 +312,7 @@ typedef struct
 	zbx_hashset_t		calcitems;
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
+	zbx_hashset_t		trigdeps;
 	zbx_vector_ptr_t	time_triggers;
 	zbx_hashset_t		hosts;
 	zbx_hashset_t		hosts_ph;	/* proxy_hostid, host */
@@ -1102,7 +1110,7 @@ static void	DCsync_items(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DCsync_triggers(DB_RESULT trig_result, DB_RESULT dpnd_result)
+static void	DCsync_triggers(DB_RESULT trig_result)
 {
 	const char		*__function_name = "DCsync_triggers";
 
@@ -1114,9 +1122,6 @@ static void	DCsync_triggers(DB_RESULT trig_result, DB_RESULT dpnd_result)
 	zbx_uint64_t		triggerid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
-
-	zbx_uint64_t		triggerid_down, triggerid_up;
-	zbx_vector_ptr_t	dependencies;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1141,94 +1146,144 @@ static void	DCsync_triggers(DB_RESULT trig_result, DB_RESULT dpnd_result)
 		trigger->type = (unsigned char)atoi(row[5]);
 		trigger->value = (unsigned char)atoi(row[6]);
 		trigger->value_flags = (unsigned char)atoi(row[7]);
-
-		if (!found)
-			trigger->dependencies = NULL;
-		else if (NULL != trigger->dependencies)
-			trigger->dependencies[0] = NULL;
 	}
-
-	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	/* update trigger dependencies */
-
-	zbx_vector_ptr_create(&dependencies);
-
-	triggerid = 0;
-	trigger = NULL;
-
-	while (NULL != (row = DBfetch(dpnd_result)))
-	{
-		ZBX_STR2UINT64(triggerid_down, row[0]);
-
-		if (triggerid_down != triggerid)
-		{
-			if (NULL != trigger)
-			{
-				trigger->dependencies = config->triggers.mem_realloc_func(trigger->dependencies,
-						(dependencies.values_num + 1) * sizeof(const ZBX_DC_TRIGGER *));
-				memcpy(trigger->dependencies, dependencies.values,
-						dependencies.values_num * sizeof(const ZBX_DC_TRIGGER *));
-				trigger->dependencies[dependencies.values_num] = NULL;
-			}
-
-			triggerid = triggerid_down;
-			dependencies.values_num = 0;
-
-			if (FAIL != zbx_vector_uint64_bsearch(&ids, triggerid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-				trigger = zbx_hashset_search(&config->triggers, &triggerid);
-			else
-				trigger = NULL;
-		}
-
-		if (NULL == trigger)
-			continue;
-
-		ZBX_STR2UINT64(triggerid_up, row[1]);
-
-		if (FAIL != zbx_vector_uint64_bsearch(&ids, triggerid_up, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			zbx_vector_ptr_append(&dependencies, zbx_hashset_search(&config->triggers, &triggerid_up));
-	}
-
-	if (NULL != trigger)
-	{
-		trigger->dependencies = config->triggers.mem_realloc_func(trigger->dependencies,
-				(dependencies.values_num + 1) * sizeof(const ZBX_DC_TRIGGER *));
-		memcpy(trigger->dependencies, dependencies.values,
-				dependencies.values_num * sizeof(const ZBX_DC_TRIGGER *));
-		trigger->dependencies[dependencies.values_num] = NULL;
-	}
-
-	zbx_vector_ptr_destroy(&dependencies);
 
 	/* remove deleted or disabled triggers from buffer */
+
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 
 	while (NULL != (trigger = zbx_hashset_iter_next(&iter)))
 	{
 		if (FAIL != zbx_vector_uint64_bsearch(&ids, trigger->triggerid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-		{
-			if (NULL != trigger->dependencies && NULL == trigger->dependencies[0])
-			{
-				config->triggers.mem_free_func(trigger->dependencies);
-				trigger->dependencies = NULL;
-			}
-
 			continue;
-		}
 
 		zbx_strpool_release(trigger->description);
 		zbx_strpool_release(trigger->expression);
 		zbx_strpool_release(trigger->error);
 
-		if (NULL != trigger->dependencies)
-			config->triggers.mem_free_func(trigger->dependencies);
-
 		zbx_hashset_iter_remove(&iter);
 	}
 
 	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static void	DCsync_trigdeps(DB_RESULT tdep_result)
+{
+	const char		*__function_name = "DCsync_trigdeps";
+
+	DB_ROW			row;
+
+	ZBX_DC_TRIGGER_DEPLIST	*trigdep, *trigdep_down, *trigdep_up;
+
+	int			found;
+	zbx_uint64_t		triggerid, triggerid_down, triggerid_up;
+	zbx_vector_ptr_t	dependencies;
+	zbx_vector_uint64_t	ids_down;
+	zbx_vector_uint64_t	ids_up;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&dependencies);
+
+	zbx_vector_uint64_create(&ids_down);
+	zbx_vector_uint64_create(&ids_up);
+
+	triggerid = 0;
+	trigdep_down = NULL;
+
+	while (NULL != (row = DBfetch(tdep_result)))
+	{
+		/* find trigdep_down pointer */
+
+		ZBX_STR2UINT64(triggerid_down, row[0]);
+
+		if (triggerid != triggerid_down)
+		{
+			if (NULL != trigdep_down)
+			{
+				trigdep_down->dependencies = config->trigdeps.mem_realloc_func(trigdep_down->dependencies,
+						(dependencies.values_num + 1) * sizeof(const ZBX_DC_TRIGGER_DEPLIST *));
+				memcpy(trigdep_down->dependencies, dependencies.values,
+						dependencies.values_num * sizeof(const ZBX_DC_TRIGGER_DEPLIST *));
+				trigdep_down->dependencies[dependencies.values_num] = NULL;
+
+				dependencies.values_num = 0;
+			}
+
+			triggerid = triggerid_down;
+
+			trigdep_down = DCfind_id(&config->trigdeps, triggerid_down, sizeof(ZBX_DC_TRIGGER_DEPLIST), &found);
+
+			trigdep_down->trigger = zbx_hashset_search(&config->triggers, &triggerid_down);
+
+			if (!found)
+				trigdep_down->dependencies = NULL;
+
+			zbx_vector_uint64_append(&ids_down, triggerid_down);
+		}
+
+		/* find trigdep_up pointer */
+
+		ZBX_STR2UINT64(triggerid_up, row[1]);
+
+		trigdep_up = DCfind_id(&config->trigdeps, triggerid_up, sizeof(ZBX_DC_TRIGGER_DEPLIST), &found);
+
+		if (!found)
+			trigdep_up->dependencies = NULL;
+
+		zbx_vector_uint64_append(&ids_up, triggerid_up);
+
+		zbx_vector_ptr_append(&dependencies, trigdep_up);
+	}
+
+	if (NULL != trigdep_down)
+	{
+		trigdep_down->dependencies = config->trigdeps.mem_realloc_func(trigdep_down->dependencies,
+				(dependencies.values_num + 1) * sizeof(const ZBX_DC_TRIGGER_DEPLIST *));
+		memcpy(trigdep_down->dependencies, dependencies.values,
+				dependencies.values_num * sizeof(const ZBX_DC_TRIGGER_DEPLIST *));
+		trigdep_down->dependencies[dependencies.values_num] = NULL;
+	}
+
+	zbx_vector_ptr_destroy(&dependencies);
+
+	/* remove deleted trigger dependencies from buffer */
+
+	zbx_vector_uint64_sort(&ids_up, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&config->trigdeps, &iter);
+
+	while (NULL != (trigdep = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&ids_down, trigdep->triggerid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		if (FAIL != zbx_vector_uint64_bsearch(&ids_up, trigdep->triggerid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			trigdep->trigger = zbx_hashset_search(&config->triggers, &trigdep->triggerid);
+
+			if (NULL != trigdep->dependencies)
+			{
+				config->trigdeps.mem_free_func(trigdep->dependencies);
+				trigdep->dependencies = NULL;
+			}
+
+			continue;
+		}
+
+		if (NULL != trigdep->dependencies)
+			config->trigdeps.mem_free_func(trigdep->dependencies);
+
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&ids_down);
+	zbx_vector_uint64_destroy(&ids_up);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1999,7 +2054,7 @@ void	DCsync_configuration()
 
 	DB_RESULT		item_result;
 	DB_RESULT		trig_result;
-	DB_RESULT		dpnd_result;
+	DB_RESULT		tdep_result;
 	DB_RESULT		func_result;
 	DB_RESULT		host_result;
 	DB_RESULT		htmpl_result;
@@ -2054,7 +2109,7 @@ void	DCsync_configuration()
 	tsec = zbx_time() - sec;
 
 	sec = zbx_time();
-	dpnd_result = DBselect(
+	tdep_result = DBselect(
 			"select d.triggerid_down,d.triggerid_up"
 			" from trigger_depends d"
 			" where 1=1" DB_NODE
@@ -2137,7 +2192,8 @@ void	DCsync_configuration()
 
 	sec = zbx_time();
 	DCsync_items(item_result);
-	DCsync_triggers(trig_result, dpnd_result);
+	DCsync_triggers(trig_result);
+	DCsync_trigdeps(tdep_result);
 	DCsync_functions(func_result);
 	DCsync_hosts(host_result);
 	DCsync_htmpls(htmpl_result);
@@ -2153,7 +2209,7 @@ void	DCsync_configuration()
 			isec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() trig sql   : " ZBX_FS_DBL " sec.", __function_name,
 			tsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() dpnd sql   : " ZBX_FS_DBL " sec.", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() tdep sql   : " ZBX_FS_DBL " sec.", __function_name,
 			dsec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() func sql   : " ZBX_FS_DBL " sec.", __function_name,
 			fsec);
@@ -2247,7 +2303,7 @@ void	DCsync_configuration()
 
 	DBfree_result(item_result);
 	DBfree_result(trig_result);
-	DBfree_result(dpnd_result);
+	DBfree_result(tdep_result);
 	DBfree_result(func_result);
 	DBfree_result(host_result);
 	DBfree_result(htmpl_result);
@@ -2539,6 +2595,7 @@ void	init_configuration_cache()
 	CREATE_HASHSET(config->calcitems);
 	CREATE_HASHSET(config->functions);
 	CREATE_HASHSET(config->triggers);
+	CREATE_HASHSET(config->trigdeps);
 	CREATE_HASHSET(config->hosts);
 	CREATE_HASHSET(config->proxies);
 	CREATE_HASHSET(config->ipmihosts);
@@ -3694,25 +3751,32 @@ unlock:
  * Comments: helper function for DCconfig_check_trigger_dependencies()        *
  *                                                                            *
  ******************************************************************************/
-static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER *trigger, int level)
+static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level)
 {
-	int			i, ret = SUCCEED;
-	const ZBX_DC_TRIGGER	*next_trigger;
+	int				i, ret = SUCCEED;
+	const ZBX_DC_TRIGGER		*next_trigger;
+	const ZBX_DC_TRIGGER_DEPLIST	*next_trigdep;
 
 	if (level > 32)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Recursive trigger dependency detected "
-				"(triggerid:" ZBX_FS_UI64 ")!", trigger->triggerid);
+				"(triggerid:" ZBX_FS_UI64 ")!", trigdep->triggerid);
 		return ret;
 	}
 
-	if (NULL != trigger->dependencies)
+	if (NULL != trigdep->dependencies)
 	{
-		for (i = 0; NULL != (next_trigger = trigger->dependencies[i]); i++)
+		for (i = 0; NULL != (next_trigdep = trigdep->dependencies[i]); i++)
 		{
-			if ((TRIGGER_VALUE_TRUE == next_trigger->value &&
-						TRIGGER_VALUE_FLAG_NORMAL == next_trigger->value_flags) ||
-					FAIL == DCconfig_check_trigger_dependencies_rec(next_trigger, level + 1))
+			if (NULL != (next_trigger = next_trigdep->trigger) &&
+					TRIGGER_VALUE_TRUE == next_trigger->value &&
+					TRIGGER_VALUE_FLAG_NORMAL == next_trigger->value_flags)
+			{
+				ret = FAIL;
+				break;
+			}
+
+			if (FAIL == DCconfig_check_trigger_dependencies_rec(next_trigdep, level + 1))
 			{
 				ret = FAIL;
 				break;
@@ -3741,13 +3805,13 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER *trigger
  ******************************************************************************/
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
 {
-	int			ret = SUCCEED;
-	const ZBX_DC_TRIGGER	*trigger;
+	int				ret = SUCCEED;
+	const ZBX_DC_TRIGGER_DEPLIST	*trigdep;
 
 	LOCK_CACHE;
 
-	if (NULL != (trigger = zbx_hashset_search(&config->triggers, &triggerid)))
-		ret = DCconfig_check_trigger_dependencies_rec(trigger, 0);
+	if (NULL != (trigdep = zbx_hashset_search(&config->trigdeps, &triggerid)))
+		ret = DCconfig_check_trigger_dependencies_rec(trigdep, 0);
 
 	UNLOCK_CACHE;
 
