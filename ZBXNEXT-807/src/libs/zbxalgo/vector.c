@@ -38,7 +38,7 @@ static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *v
 	}													\
 	else if (vector->values_num == vector->values_alloc)							\
 	{													\
-		vector->values_alloc = vector->values_alloc * ARRAY_GROWTH_FACTOR;				\
+		vector->values_alloc = MAX(vector->values_alloc + 1, vector->values_alloc * ARRAY_GROWTH_FACTOR); \
 		vector->values = vector->mem_realloc_func(vector->values, vector->values_alloc * sizeof(__type)); \
 	}													\
 }														\
