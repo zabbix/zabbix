@@ -214,9 +214,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				" and f.triggerid=t.triggerid"
 				" and t.status=%d"
 				" and i.status=%d"
-				" and t.value<>%d"
 				" and not i.key_ like '%s'"
-				" and not i.key_ like '%s%%'"
 				" and f.function not in (" ZBX_SQL_TIME_FUNCTIONS ")"
 				" and i.type in (%s)"
 				" and i.hostid=" ZBX_FS_UI64
@@ -230,23 +228,19 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 					" and i.status=%d"
 					" and t.value<>%d"
 					" and not i.key_ like '%s'"
-					" and not i.key_ like '%s%%'"
 					" and f.function in (" ZBX_SQL_TIME_FUNCTIONS ")"
 					" and i.type in (%s)"
-				" and i.hostid=" ZBX_FS_UI64
+					" and i.hostid=" ZBX_FS_UI64
 			")",
 			TRIGGER_STATUS_ENABLED,
 			ITEM_STATUS_ACTIVE,
-			TRIGGER_VALUE_UNKNOWN,
 			SERVER_STATUS_KEY,
-			SERVER_ICMPPING_KEY,
 			type_cond_buf,
 			hostid,
 			TRIGGER_STATUS_ENABLED,
 			ITEM_STATUS_ACTIVE,
 			TRIGGER_VALUE_UNKNOWN,
 			SERVER_STATUS_KEY,
-			SERVER_ICMPPING_KEY,
 			type_cond_buf,
 			hostid);
 
