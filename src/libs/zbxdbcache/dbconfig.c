@@ -723,8 +723,10 @@ static void	DCsync_items(DB_RESULT result)
 			config->items.mem_free_func(item->triggers);
 			item->triggers = NULL;
 		}
-		else
+		else if (NULL != item->triggers)
+		{
 			item->triggers[0] = NULL;
+		}
 
 		/* update items_hk index using new data, if not done already */
 
@@ -3087,7 +3089,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 
 	for (i = 0; i < item_num; i++)
 	{
-		if (NULL != (dc_item = zbx_hashset_search(&config->items, &itemids[i])))
+		if (NULL != (dc_item = zbx_hashset_search(&config->items, &itemids[i])) && NULL != dc_item->triggers)
 		{
 			for (j = 0; NULL != (dc_trigger = dc_item->triggers[j]); j++)
 			{
