@@ -863,15 +863,16 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		item_num++;
 	}
 
-	zbx_hashset_create(&trigger_info, 2 * item_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	if (0 == item_num)
+		goto clean;
+
+	zbx_hashset_create(&trigger_info, MAX(100, 2 * item_num),
+			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&trigger_order);
 	zbx_vector_ptr_reserve(&trigger_order, item_num);
 
 	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num);
-
-	zbx_free(itemids);
-	zbx_free(timespecs);
 
 	for (i = 0; i < trigger_order.values_num; i++)
 	{
@@ -897,6 +898,9 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_hashset_destroy(&trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);
+clean:
+	zbx_free(itemids);
+	zbx_free(timespecs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

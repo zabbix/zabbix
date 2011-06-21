@@ -209,7 +209,8 @@ void	DCflush_nextchecks()
 		errors[i] = nextchecks[i].error_msg;
 	}
 
-	zbx_hashset_create(&trigger_info, 2 * nextcheck_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&trigger_info, MAX(100, 2 * nextcheck_num),
+			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&trigger_order);
 	zbx_vector_ptr_reserve(&trigger_order, nextcheck_num);
