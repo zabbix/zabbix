@@ -119,4 +119,7 @@
 	background-repeat:no-repeat;
 	cursor: pointer;
 }
+.default_cursor{
+	cursor: default !important;
+}
 /********* DIV IMG END *********/

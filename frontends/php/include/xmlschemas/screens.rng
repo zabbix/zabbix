@@ -109,6 +109,11 @@
 												<text/>
 											</element>
 										</optional>
+										<optional>
+											<element name="sort_triggers">
+												<data type="integer"/>
+											</element>
+										</optional>
 									</interleave>
 								</element>
 							</zeroOrMore>
@@ -123,6 +128,11 @@
 						</optional>
 						<optional>
 							<element name="vsize">
+								<data type="integer"/>
+							</element>
+						</optional>
+						<optional>
+							<element name="templateid">
 								<data type="integer"/>
 							</element>
 						</optional>
