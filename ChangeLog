@@ -12,6 +12,7 @@ New features:
  - [ZBXNEXT-780] all items (including user parameters and external checks) can also return only whitespace (rudolfs)
 
 Bug fixes:
+ - [ZBXNEXT-828] remove outdated spec files (Richlv)
  - [ZBX-3841] returned functionality of a macro {HOSTNAME} as in the version 1.8.x (Sasha)
  - [ZBX-3841] fixed processing of {HOST.NAME} macro in item keys (Sasha)
  - [ZBX-3858] fixed host selection in action condition popup (Vedmak)
