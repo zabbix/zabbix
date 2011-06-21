@@ -248,14 +248,14 @@ int	__zbx_DBexecute(const char *fmt, ...)
 
 	rc = zbx_db_vexecute(fmt, args);
 
-	while (rc == ZBX_DB_DOWN)
+	while (ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 		rc = zbx_db_vexecute(fmt, args);
 
-		if (rc == ZBX_DB_DOWN)
+		if (ZBX_DB_DOWN == rc)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
 					" Retrying in 10 seconds");

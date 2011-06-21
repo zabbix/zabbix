@@ -278,7 +278,8 @@ out:
  *                                                                            *
  * Parameters: event - event data (event.eventid - new event)                 *
  *                                                                            *
- * Return value: SUCCESS - event added                                        *
+ * Return value: SUCCEED - event added                                        *
+ *               FAIL    - event not added                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -299,14 +300,15 @@ int	process_event(DB_EVENT *event, int force_actions)
 	if (0 == event->eventid)
 		event->eventid = DBget_maxid("events");
 
-	DBexecute("insert into events (eventid,source,object,objectid,clock,value)"
+	if (ZBX_DB_OK > DBexecute("insert into events (eventid,source,object,objectid,clock,value)"
 			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d)",
 			event->eventid,
 			event->source,
 			event->object,
 			event->objectid,
 			event->clock,
-			event->value);
+			event->value))
+		goto fail;
 
 	if (0 != event->ack_eventid)
 		copy_acknowledges(event->ack_eventid, event->eventid);
