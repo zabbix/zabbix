@@ -119,10 +119,10 @@ include_once('include/page_header.php');
 		'problem_ack_color' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 		'ok_unack_color' =>		    array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 		'ok_ack_color' =>		    array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
-		'problem_unack_style' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	 null),
-		'problem_ack_style' =>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	 null),
-		'ok_unack_style' =>		    array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	 null),
-		'ok_ack_style' =>		    array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	 null),
+		'problem_unack_style' =>	array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
+		'problem_ack_style' =>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
+		'ok_unack_style' =>		    array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
+		'ok_ack_style' =>		    array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
 		'ok_period' =>		        array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 		'blink_period' =>		    array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 
@@ -619,7 +619,7 @@ include_once('include/page_header.php');
 
 	}
 	// Trigger severities
-	else if(($_REQUEST['config'] == 12) && (isset($_REQUEST['save']) || isset($_REQUEST['resetDefaults']))){
+	else if(($_REQUEST['config'] == 12) && (isset($_REQUEST['save']))){
 		$configs = array(
 			'severity_name_0' => get_request('severity_name_0', _('Not classified')),
 			'severity_color_0' => get_request('severity_color_0', ''),
@@ -640,7 +640,7 @@ include_once('include/page_header.php');
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 	}
 	// Trigger displaying options
-	else if(($_REQUEST['config'] == 13) && (isset($_REQUEST['save']) || isset($_REQUEST['resetDefaults']))){
+	else if(($_REQUEST['config'] == 13) && (isset($_REQUEST['save']))){
 		$configs = array(
 			'ok_period' => get_request('ok_period'),
 			'blink_period' => get_request('blink_period'),
