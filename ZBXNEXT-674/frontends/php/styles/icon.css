@@ -119,4 +119,7 @@
 	background: url('../images/general/sort_down.gif') no-repeat;
 	cursor: pointer;
 }
+.default_cursor{
+	cursor: default !important;
+}
 /********* DIV IMG END *********/

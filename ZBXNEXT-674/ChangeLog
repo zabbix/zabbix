@@ -2,6 +2,7 @@
 Changes for 1.9.5
 
 New features:
+ - [ZBXNEXT-827] move misc/conf to the top level source directory (Richlv)
  - [ZBXNEXT-746] Added trigger sorting by severity and host name (KB)
  - [ZBX-1357] updated Latvian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-783] Added Inventory -> Overview report and filter to Inventory -> Hosts (KB)
@@ -11,6 +12,7 @@ New features:
  - [ZBXNEXT-780] all items (including user parameters and external checks) can also return only whitespace (rudolfs)
 
 Bug fixes:
+ - [ZBXNEXT-828] remove outdated spec files (Richlv)
  - [ZBX-3841] returned functionality of a macro {HOSTNAME} as in the version 1.8.x (Sasha)
  - [ZBX-3841] fixed processing of {HOST.NAME} macro in item keys (Sasha)
  - [ZBX-3858] fixed host selection in action condition popup (Vedmak)
@@ -183,10 +185,10 @@ Changes for 1.8.6rc1
  - [ZBX-1029] added lookup of Jabber SRV records to Jabber notifications; thanks to Edward Rudd (asaveljevs)
  - [ZBXNEXT-792] added type parameter for system.hostname[] on Windows to support both NetBIOS and host names (rudolfs)
  - [ZBXNEXT-791] added HostnameItem to Agent and Proxy configuration for setting the default Hostname (rudolfs)
- - [ZBX-3192] fixed snmp index cache to support snmp target for each entry; thanks to Ilia Sotnikov (dimir)
+ - [ZBX-3192] fixed SNMP index cache to support SNMP target for each entry; thanks to Ilia Sotnikov (dimir)
  - [ZBX-3825] fixed errors with single quotes in javascript messages (KB)
  - [ZBXNEXT-782] added support of not-supported items in the history cache (Sasha)
- - [ZBX-3072] fixed mysql error when shutting down server (dimir)
+ - [ZBX-3072] fixed MySQL error when shutting down server (dimir)
  - [ZBX-3105] added processing of garbage in configuration files (dimir)
  - [ZBX-2083] fixed audit.details field cutting (Vedmak)
  - [ZBX-3824] fixed unnecessary synchronization of "profiles" table in DM setup (asaveljevs)

@@ -154,6 +154,7 @@
 
 	if(isset($_REQUEST['save'])){
 		if(!isset($_REQUEST['elements'])) $_REQUEST['elements'] = 0;
+		if(!isset($_REQUEST['sort_triggers'])) $_REQUEST['sort_triggers'] = SCREEN_SORT_TRIGGERS_DATE_DESC;
 
 		try{
 			DBstart();
