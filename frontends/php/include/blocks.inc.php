@@ -864,7 +864,7 @@ function make_latest_issues($filter = array()){
 	// indicator of sort field
 	$sortDiv = new CDiv(
 		SPACE,
-		$options['sortorder'] === ZBX_SORT_DOWN ? 'icon_sortdown' : 'icon_sortup'
+		$options['sortorder'] === ZBX_SORT_DOWN ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor'
 	);
 	$sortDiv->addStyle('float: left');
 	$hostHeaderDiv = new CDiv(array(S_HOST, SPACE)); $hostHeaderDiv->addStyle('float: left');
