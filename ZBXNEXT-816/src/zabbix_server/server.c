@@ -53,15 +53,16 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Server";
-const char	usage_message[] = "[-hV] [-C] [-c <file>] [-n <nodeid>]";
+const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>] [--reload-cache]";
 
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>       absolute path to the configuration file",
-	"  -C --reload-cache        reload the configuration cache",
 	"  -h --help                give this help",
 	"  -n --new-nodeid <nodeid> convert database data to new nodeid",
 	"  -V --version             display version number",
+	"Runtime options:",
+	"  --reload-cache           reload the configuration cache",
 	NULL	/* end of text */
 };
 
@@ -71,7 +72,7 @@ const char	*help_message[] = {
 static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
-	{"reload-cache",	0,	NULL,	'C'},
+	{"reload-cache",	0,	NULL,	'\1'},
 	{"help",		0,	NULL,	'h'},
 	{"new-nodeid",		1,	NULL,	'n'},
 	{"version",		0,	NULL,	'V'},
@@ -79,7 +80,7 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:Cn:hV";
+static char	shortopts[] = "c:n:hV";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -391,7 +392,7 @@ int	main(int argc, char **argv)
 			case 'c':
 				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
-			case 'C':
+			case '\1':
 				task = ZBX_TASK_RELOAD_CONFIG;
 				break;
 			case 'h':

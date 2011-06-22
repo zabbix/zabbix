@@ -317,7 +317,7 @@ int	zbx_sigusr_send(zbx_task_t task)
 
 		if (-1 != sigqueue(pid, SIGUSR1, s))
 		{
-			printf("command successfully sent\n");
+			printf("command sent successfully\n");
 			ret = SUCCEED;
 		}
 		else
