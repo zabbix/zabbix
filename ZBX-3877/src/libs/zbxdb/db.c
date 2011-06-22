@@ -36,6 +36,7 @@ static int	txn_init = 0;
 #elif defined(HAVE_POSTGRESQL)
 	PGconn		*conn = NULL;
 	static int	ZBX_PG_BYTEAOID = 0;
+	int		ZBX_PG_SVERSION = 0;
 #elif defined(HAVE_SQLITE3)
 	sqlite3		*conn = NULL;
 	PHP_MUTEX	sqlite_access;
@@ -97,7 +98,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	char		*cport = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		sversion;
 #endif
 
 	txn_init = 1;
@@ -305,13 +305,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 
 #ifdef	HAVE_FUNCTION_PQSERVERVERSION
-	sversion = PQserverVersion(conn);
-	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", sversion);
-#else
-	sversion = 0;
+	ZBX_PG_SVERSION = PQserverVersion(conn);
+	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
 #endif
 
-	if (sversion >= 80100)
+	if (ZBX_PG_SVERSION >= 80100)
 	{
 		/* disable "nonstandard use of \' in a string literal" warning */
 		DBexecute("set escape_string_warning to off");

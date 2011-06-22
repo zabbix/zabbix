@@ -26,6 +26,7 @@
 #include "housekeeper.h"
 
 extern unsigned char	process_type;
+extern int		ZBX_PG_SVERSION;
 
 /******************************************************************************
  *                                                                            *
@@ -99,18 +100,34 @@ static int	housekeeping_process_log()
 					housekeeper.value,
 					CONFIG_MAX_HOUSEKEEPER_DELETE);
 #elif defined(HAVE_POSTGRESQL)
-			deleted = DBexecute(
-					"delete from %s"
-					" where %s=" ZBX_FS_UI64
-						" and oid in (select oid from %s"
-							" where %s=" ZBX_FS_UI64 " limit %d)",
-					housekeeper.tablename,
-					housekeeper.field,
-					housekeeper.value,
-					housekeeper.tablename,
-					housekeeper.field,
-					housekeeper.value,
-					CONFIG_MAX_HOUSEKEEPER_DELETE);
+			/* PostgreSQL array constructors are available since version 7.4 */
+			if (70400 > ZBX_PG_SVERSION)
+			{
+				deleted = DBexecute(
+						"delete from %s"
+						" where %s=" ZBX_FS_UI64
+							" and clock in (select clock from %s"
+								" where %s=" ZBX_FS_UI64 " limit %d)",
+						housekeeper.tablename,
+						housekeeper.field,
+						housekeeper.value,
+						housekeeper.tablename,
+						housekeeper.field,
+						housekeeper.value,
+						CONFIG_MAX_HOUSEKEEPER_DELETE);
+			}
+			else
+			{
+				deleted = DBexecute(
+						"delete from %s"
+						" where CTID = any (array(select CTID from %s"
+							" where %s=" ZBX_FS_UI64 " limit %d))",
+						housekeeper.tablename,
+						housekeeper.tablename,
+						housekeeper.field,
+						housekeeper.value,
+						CONFIG_MAX_HOUSEKEEPER_DELETE);
+			}
 #elif defined(HAVE_SQLITE3)
 			deleted = 0;
 #endif
