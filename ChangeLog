@@ -12,6 +12,7 @@ New features:
  - [ZBXNEXT-780] all items (including user parameters and external checks) can also return only whitespace (rudolfs)
 
 Bug fixes:
+ - [ZBX-3901] fixed configure errors under RHEL with --enable-java option (Sasha)
  - [ZBXNEXT-828] remove outdated spec files (Richlv)
  - [ZBX-3841] returned functionality of a macro {HOSTNAME} as in the version 1.8.x (Sasha)
  - [ZBX-3841] fixed processing of {HOST.NAME} macro in item keys (Sasha)
