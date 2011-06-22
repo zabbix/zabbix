@@ -303,19 +303,30 @@ void	set_child_signal_handler()
 	sigaction(SIGALRM, &phan, NULL);
 }
 
-void	zbx_sigusr_send(zbx_task_t task)
+int	zbx_sigusr_send(zbx_task_t task)
 {
+	int	ret = FAIL;
+	char	error[256];
 	pid_t	pid;
 
-	if (SUCCEED == read_pid_file(CONFIG_PID_FILE, &pid))
+	if (SUCCEED == read_pid_file(CONFIG_PID_FILE, &pid, error, sizeof(error)))
 	{
 		union sigval	s;
 
 		s.sival_int = task;
 
 		if (-1 != sigqueue(pid, SIGUSR1, s))
+		{
 			printf("command successfully sent\n");
+			ret = SUCCEED;
+		}
 		else
-			printf("cannot send command: %s\n", zbx_strerror(errno));
+			zbx_snprintf(error, sizeof(error), "cannot send command to PID [%d]: %s",
+					(int)pid, zbx_strerror(errno));
 	}
+
+	if (SUCCEED != ret)
+		printf("%s\n", error);
+
+	return ret;
 }

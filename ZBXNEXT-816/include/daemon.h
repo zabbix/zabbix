@@ -36,7 +36,7 @@ void	daemon_stop();
 void	set_parent_signal_handler();
 void	set_child_signal_handler();
 
-void	zbx_sigusr_send(zbx_task_t task);
+int	zbx_sigusr_send(zbx_task_t task);
 
 #define ZBX_IS_RUNNING()	1
 #define ZBX_DO_EXIT()

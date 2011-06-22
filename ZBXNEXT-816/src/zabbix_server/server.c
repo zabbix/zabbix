@@ -424,10 +424,7 @@ int	main(int argc, char **argv)
 	zbx_load_config();
 
 	if (ZBX_TASK_RELOAD_CONFIG == task)
-	{
-		zbx_sigusr_send(ZBX_TASK_RELOAD_CONFIG);
-		exit(-1);
-	}
+		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_RELOAD_CONFIG) ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();

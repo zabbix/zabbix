@@ -80,14 +80,14 @@ int	create_pid_file(const char *pidfile)
 	return SUCCEED;
 }
 
-int	read_pid_file(const char *pidfile, pid_t *pid)
+int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len)
 {
 	int	fd, ret = FAIL;
 	char	buf[MAX_ID_LEN];
 
 	if (-1 == (fd = open(pidfile, O_RDONLY)))
 	{
-		zbx_error("cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
+		zbx_snprintf(error, max_error_len, "cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
 		return ret;
 	}
 
