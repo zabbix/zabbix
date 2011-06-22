@@ -74,12 +74,12 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 			if (1 == parent)
 			{
-				if (ZBX_TASK_RELOAD_CONFIG == CHECKED_FIELD(siginfo, si_int))
+				if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_int))
 				{
 					union sigval	s;
 					extern pid_t	*threads;
 
-					s.sival_int = ZBX_TASK_RELOAD_CONFIG;
+					s.sival_int = ZBX_TASK_CONFIG_CACHE_RELOAD;
 
 					if (-1 != sigqueue(threads[1], SIGUSR1, s))
 						zabbix_log(LOG_LEVEL_DEBUG,

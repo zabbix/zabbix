@@ -49,15 +49,19 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Proxy";
-const char	usage_message[] = "[-hV] [-c <file>] [--reload-cache]";
+const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
 
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>       absolute path to the configuration file",
-	"  -h --help                give this help",
-	"  -V --version             display version number",
-	"Runtime options:",
-	"  --reload-cache           reload the configuration cache",
+	"  -c --config <file>              absolute path to the configuration file",
+	"  -R --runtime-control <option>   perform administrative functions",
+	"",
+	"Runtime control options:",
+	"  " ZBX_CONFIG_CACHE_RELOAD "             reload configuration cache",
+	"",
+	"Other options:",
+	"  -h --help                       give this help",
+	"  -V --version                    display version number",
 	NULL	/* end of text */
 };
 
@@ -67,14 +71,14 @@ const char	*help_message[] = {
 static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
-	{"reload-cache",	0,	NULL,	'\1'},
+	{"runtime-control",	1,	NULL,	'R'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
 	{NULL}
 };
 
 /* short options */
-static char	shortopts[] = "c:n:hV";
+static char	shortopts[] = "c:n:hVR:";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -407,7 +411,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
 {
 	switch (task)
 	{
-		case ZBX_TASK_RELOAD_CONFIG:
+		case ZBX_TASK_CONFIG_CACHE_RELOAD:
 			if (ZBX_PROCESS_TYPE_CONFSYNCER == process_type)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
@@ -443,8 +447,14 @@ int	main(int argc, char **argv)
 			case 'c':
 				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
-			case '\1':
-				task = ZBX_TASK_RELOAD_CONFIG;
+			case 'R':
+				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
+					task = ZBX_TASK_CONFIG_CACHE_RELOAD;
+				else
+				{
+					printf("invalid runtime control option: %s\n", zbx_optarg);
+					exit(EXIT_FAILURE);
+				}
 				break;
 			case 'h':
 				help();
@@ -469,8 +479,8 @@ int	main(int argc, char **argv)
 
 	zbx_load_config();
 
-	if (ZBX_TASK_RELOAD_CONFIG == task)
-		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_RELOAD_CONFIG) ? EXIT_SUCCESS : EXIT_FAILURE);
+	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
+		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();

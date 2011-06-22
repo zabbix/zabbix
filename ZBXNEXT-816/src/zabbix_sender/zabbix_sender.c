@@ -53,7 +53,7 @@ const char	*help_message[] = {
 	"",
 	"  -v --verbose                         Verbose mode, -vv for more details",
 	"",
-	" Other options:",
+	"Other options:",
 	"  -h --help                            Give this help",
 	"  -V --version                         Display version number",
 	NULL	/* end of text */
