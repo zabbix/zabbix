@@ -32,11 +32,11 @@ int	create_pid_file(const char *pidfile)
 	struct stat	buf;
 	struct flock	fl;
 
-	fl.l_type = F_WRLCK;		/* F_RDLCK, F_WRLCK, F_UNLCK */
-	fl.l_whence = SEEK_SET;		/* SEEK_SET, SEEK_CUR, SEEK_END */
-	fl.l_start = 0;			/* offset from l_whence */
-	fl.l_len = 0;			/* length, 0 = to EOF */
-	fl.l_pid = zbx_get_thread_id();	/* our PID */
+	fl.l_type = F_WRLCK;	/* F_RDLCK, F_WRLCK, F_UNLCK */
+	fl.l_whence = SEEK_SET;	/* SEEK_SET, SEEK_CUR, SEEK_END */
+	fl.l_start = 0;		/* offset from l_whence */
+	fl.l_len = 0;		/* length, 0 = to EOF */
+	fl.l_pid = getpid();	/* our PID */
 
 	/* check if pid file already exists */
 	if (0 == stat(pidfile, &buf))
@@ -74,7 +74,7 @@ int	create_pid_file(const char *pidfile)
 	}
 
 	/* write pid to file */
-	fprintf(fpid, "%ld", zbx_get_thread_id());
+	fprintf(fpid, "%d", (int)getpid());
 	fflush(fpid);
 
 	return SUCCEED;
@@ -93,7 +93,7 @@ int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error
 
 	if (-1 != read(fd, buf, sizeof(buf)))
 	{
-		if (1 == sscanf(buf, "%ld", (long int *)pid))
+		if (1 == sscanf(buf, "%d", (int *)pid))
 			ret = SUCCEED;
 	}
 	close(fd);
