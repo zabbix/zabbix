@@ -43,7 +43,7 @@ $triggerDOFormList->addRow(
 		),
 		new CCheckBox(
 			'problem_unack_style',
-			$data['problem_unack_style'] == 1 ? 'yes' : 'no',
+			$data['problem_unack_style'] == 1,
 			null,
 			1
 		)
@@ -60,7 +60,7 @@ $triggerDOFormList->addRow(
 		),
 		new CCheckBox(
 			'problem_ack_style',
-			$data['problem_ack_style'] == 1 ? 'yes' : 'no',
+			$data['problem_ack_style'] == 1,
 			null,
 			1
 		)
@@ -77,7 +77,7 @@ $triggerDOFormList->addRow(
 		),
 		new CCheckBox(
 			'ok_unack_style',
-			$data['ok_unack_style'] == 1 ? 'yes' : 'no',
+			$data['ok_unack_style'] == 1,
 			null,
 			1
 		)
@@ -94,7 +94,7 @@ $triggerDOFormList->addRow(
 		),
 		new CCheckBox(
 			'ok_ack_style',
-			$data['ok_ack_style'] == 1 ? 'yes' : 'no',
+			$data['ok_ack_style'] == 1,
 			null,
 			1
 		)

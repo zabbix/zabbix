@@ -1023,9 +1023,9 @@ function make_latest_issues($filter = array(), $showStatus=false){
 					$trigger['lastchange'],
 					$event['acknowledged']
 				);
+				// activating blinking
+				zbx_add_post_js('blink.init();');
 			}
-
-			zbx_add_post_js('blink.init();');
 
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
