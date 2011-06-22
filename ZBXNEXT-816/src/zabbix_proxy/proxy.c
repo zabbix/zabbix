@@ -49,7 +49,7 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Proxy";
-const char	usage_message[] = "[-hV] [-c <file>]";
+const char	usage_message[] = "[-hV] [-C] [-c <file>]";
 
 const char	*help_message[] = {
 	"Options:",
