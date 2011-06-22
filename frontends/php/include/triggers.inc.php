@@ -392,11 +392,13 @@ function getSeverityCell($severity, $text=null, $force_normal=false){
 			$color = $config['ok_ack_color'];
 			$blinks = $config['ok_ack_style'];
 		}
-		// color
-		$object->addStyle('color: #'.$color);
-		// blinking
-		if($blinks && time() - $triggerLastChange < $config['blink_period']){
-			$object->setAttribute('name', 'blink');
+		if(isset($color) && isset($blinks)){
+			// color
+			$object->addStyle('color: #'.$color);
+			// blinking
+			if($blinks && time() - $triggerLastChange < $config['blink_period']){
+				$object->setAttribute('name', 'blink');
+			}
 		}
 	}
 
