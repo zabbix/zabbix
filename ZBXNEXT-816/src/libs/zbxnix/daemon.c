@@ -67,7 +67,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			exit(FAIL);
 			break;
 		case SIGUSR1:
-			zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_int:%d,sender_pid:%d].",
+			zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),value_int:%d,sender_pid:%d].",
 					sig, get_signal_name(sig),
 					CHECKED_FIELD(siginfo, si_int),
 					CHECKED_FIELD(siginfo, si_pid));
@@ -95,6 +95,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 				zbx_sigusr_handler(CHECKED_FIELD(siginfo, si_int));
 			}
+
 			break;
 		case SIGQUIT:
 		case SIGINT:
@@ -313,7 +314,7 @@ void	zbx_sigusr_send(zbx_task_t task)
 		s.sival_int = task;
 
 		if (-1 != sigqueue(pid, SIGUSR1, s))
-			printf("command successfully sended\n");
+			printf("command successfully sent\n");
 		else
 			printf("cannot send command: %s\n", zbx_strerror(errno));
 	}

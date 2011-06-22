@@ -54,7 +54,7 @@ const char	usage_message[] = "[-hV] [-c <file>]";
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>       absolute path to the configuration file",
-	"  -C --reload-cache        forced reload the configuration cache",
+	"  -C --reload-cache        reload the configuration cache",
 	"  -h --help                give this help",
 	"  -V --version             display version number",
 	NULL	/* end of text */
@@ -422,7 +422,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
  *                                                                            *
  * Function: main                                                             *
  *                                                                            *
- * Purpose: executes server processes                                         *
+ * Purpose: executes proxy processes                                          *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *

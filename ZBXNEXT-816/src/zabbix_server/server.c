@@ -58,7 +58,7 @@ const char	usage_message[] = "[-hV] [-C] [-c <file>] [-n <nodeid>]";
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>       absolute path to the configuration file",
-	"  -C --reload-cache        forced reload the configuration cache",
+	"  -C --reload-cache        reload the configuration cache",
 	"  -h --help                give this help",
 	"  -n --new-nodeid <nodeid> convert database data to new nodeid",
 	"  -V --version             display version number",
@@ -372,13 +372,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
  *                                                                            *
  * Purpose: executes server processes                                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	main(int argc, char **argv)
