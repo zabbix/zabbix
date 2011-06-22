@@ -556,7 +556,7 @@ void	zbx_on_exit()
 #ifdef ZABBIX_DAEMON
 void	zbx_sigusr_handler(zbx_task_t task)
 {
-	/* TODO */
+	/* nothing to do */
 }
 #endif
 
