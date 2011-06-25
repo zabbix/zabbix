@@ -356,9 +356,7 @@ src/libs/zbxsysinfo/linux/hardware.h -text
 src/libs/zbxsysinfo/linux/software.c -text
 src/libs/zbxsysinfo/linux/software.h -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
-src/zabbix_java/lib/logback-console.xml -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
-src/zabbix_java/lib/logback.xml -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 src/zabbix_java/tests/junit-4.8.2.jar -text
