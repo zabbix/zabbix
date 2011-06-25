@@ -37,7 +37,7 @@ class CFlashClock extends CFlash{
 		$this->timeType = null;
 		$this->timeZone = null;
 		$this->timeOffset = null;
-		
+
 		parent::__construct($this->src,$width,$height);
 	}
 
@@ -52,7 +52,7 @@ class CFlashClock extends CFlash{
 	public function setTimeOffset($value){
 		$this->timeOffset = $value;
 	}
-	
+
 	public function setTimeError($value){
 		$this->timeError = $value;
 	}
