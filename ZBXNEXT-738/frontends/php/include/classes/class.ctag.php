@@ -156,16 +156,19 @@ class CTag extends CObject{
 		$this->setAttribute($name, $value);
 	}
 
-	public function setHint($text, $width='', $class='', $byclick=true){
+	public function setHint($text, $width='', $class='', $byClick=true, $updateBlinking=false){
 		if(empty($text)) return false;
 
 		encodeValues($text);
 		$text = unpack_object($text);
 
-		$this->addAction('onmouseover',	"javascript: hintBox.showOver(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');");
+		// in case there are  OK/PROBLEM statuses in hint, we might want them to blink
+		$blinkUpdate = $updateBlinking ? ' jqBlink.findObjects();' : '';
+
+		$this->addAction('onmouseover',	"javascript: hintBox.showOver(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');".$blinkUpdate);
 		$this->addAction('onmouseout',	"javascript: hintBox.hideOut(event,this);");
-		if($byclick){
-			$this->addAction('onclick',	"javascript: hintBox.onClick(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');");
+		if($byClick){
+			$this->addAction('onclick',	"javascript: hintBox.onClick(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');".$blinkUpdate);
 		}
 	}
 

@@ -101,20 +101,25 @@ $triggerDOFormList->addRow(
 	)
 );
 
+
+// some air between the sections
+$triggerDOFormList->addRow(BR());
+
 // Display OK triggers
 $okPeriodTextBox = new CTextBox('ok_period', $data['ok_period']);
 $okPeriodTextBox->addStyle('width: 4em;');
+$okPeriodTextBox->setAttribute('maxlength', '6');
 $triggerDOFormList->addRow(_('Display OK triggers'), array($okPeriodTextBox, SPACE, _('seconds')));
 
 // Triggers blink on status change
 $okPeriodTextBox = new CTextBox('blink_period', $data['blink_period']);
 $okPeriodTextBox->addStyle('width: 4em;');
+$okPeriodTextBox->setAttribute('maxlength', '6');
 $triggerDOFormList->addRow(_('Triggers blink on status change'), array($okPeriodTextBox, SPACE, _('seconds')));
 
 $severityView = new CTabView();
 $severityView->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList);
 $severityForm->addItem($severityView);
-
 
 // Footer
 $footer = makeFormFooter(array(new CSubmit('save', _('Save'))),	new CButton('resetDefaults', _('Reset defaults')));

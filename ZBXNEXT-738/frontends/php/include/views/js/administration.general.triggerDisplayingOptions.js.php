@@ -18,38 +18,34 @@ $schema = DB::getSchema('config');
 						// Unacknowledged problem events
 						jQuery('#problem_unack_color').val("<?php echo $schema['fields']['problem_unack_color']['default']; ?>");
 						jQuery('#problem_unack_color').change();
-						<?php if($schema['fields']['problem_unack_style']['default'] == 0){ ?>
-							jQuery('#problem_unack_style').removeAttr('checked');
-						<?php }else{ ?>
-							jQuery('#problem_unack_style').attr('checked', 'checked');
-						<?php } ?>
+						jQuery('#problem_unack_style').prop(
+								'checked',
+								<?php echo $schema['fields']['problem_unack_style']['default'] == 0 ? 'false' : 'true'; ?>
+						);
 
 						// Acknowledged problem events
 						jQuery('#problem_ack_color').val("<?php echo $schema['fields']['problem_ack_color']['default']; ?>");
 						jQuery('#problem_ack_color').change();
-						<?php if($schema['fields']['problem_ack_style']['default'] == 0){ ?>
-							jQuery('#problem_ack_style').removeAttr('checked');
-						<?php }else{ ?>
-							jQuery('#problem_ack_style').attr('checked', 'checked');
-						<?php } ?>
+						jQuery('#problem_ack_style').prop(
+								'checked',
+								<?php echo $schema['fields']['problem_ack_style']['default'] == 0 ? 'false' : 'true'; ?>
+						);
 
 						// Unacknowledged ok events
 						jQuery('#ok_unack_color').val("<?php echo $schema['fields']['ok_unack_color']['default']; ?>");
 						jQuery('#ok_unack_color').change();
-						<?php if($schema['fields']['ok_unack_style']['default'] == 0){ ?>
-							jQuery('#ok_unack_style').removeAttr('checked');
-						<?php }else{ ?>
-							jQuery('#ok_unack_style').attr('checked', 'checked');
-						<?php } ?>
+						jQuery('#ok_unack_style').prop(
+								'checked',
+								<?php echo $schema['fields']['ok_unack_style']['default'] == 0 ? 'false' : 'true'; ?>
+						);
 
 						// Acknowledged ok events
 						jQuery('#ok_ack_color').val("<?php echo $schema['fields']['ok_ack_color']['default']; ?>");
 						jQuery('#ok_ack_color').change();
-						<?php if($schema['fields']['ok_ack_style']['default'] == 0){ ?>
-							jQuery('#ok_ack_style').removeAttr('checked');
-						<?php }else{ ?>
-							jQuery('#ok_ack_style').attr('checked', 'checked');
-						<?php } ?>
+						jQuery('#ok_ack_style').prop(
+								'checked',
+								<?php echo $schema['fields']['ok_ack_style']['default'] == 0 ? 'false' : 'true'; ?>
+						);
 
 						jQuery('#ok_period').val("<?php echo $schema['fields']['ok_period']['default']; ?>");
 						jQuery('#blink_period').val("<?php echo $schema['fields']['blink_period']['default']; ?>");

@@ -664,7 +664,16 @@ require_once('include/views/js/general.script.confirm.js.php');
 			foreach($trigger['events'] as $enum => $row_event){
 				$i++;
 
-				$statusSpan = new CCol(new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value'])));
+				$eventStatusSpan = new CSpan(trigger_value2str($row_event['value']));
+				// add colors and blinking to span depending on configuration and trigger parameters
+				addTriggerValueStyle(
+					$eventStatusSpan,
+					$row_event['value'],
+					$row_event['clock'],
+					$row_event['acknowledged']
+				);
+
+				$statusSpan = new CCol($eventStatusSpan);
 				$statusSpan->setColSpan(2);
 
 				$ack = getEventAckState($row_event);
@@ -726,7 +735,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$trigg_wdgt->addItem($m_form);
 	$trigg_wdgt->show();
 
-	zbx_add_post_js('blink.init();');
+	zbx_add_post_js('jqBlink.init();');
 	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
 
 	$jsmenu = new CPUMenu(null, 170);

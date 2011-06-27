@@ -1012,19 +1012,23 @@ function make_latest_issues($filter = array(), $showStatus=false){
 				$description = new CSpan($description,'pointer');
 
 			$description = new CCol($description,getSeverityStyle($trigger['priority']));
-			$description->setHint(make_popup_eventlist($event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
+			$description->setHint(
+				make_popup_eventlist($event['eventid'], $trigger['type'], $trigger['triggerid']),
+				'',
+				'',
+				false,
+				true // update blinking
+			);
 
 			if($showStatus){
-				$statusSpan = new CSpan(trigger_value2str($trigger['value']));
+				$statusSpan = new CSpan(trigger_value2str($event['value']));
 				// add colors and blinking to span depending on configuration and trigger parameters
 				addTriggerValueStyle(
 					$statusSpan,
-					$trigger['value'],
-					$trigger['lastchange'],
+					$event['value'],
+					$event['clock'],
 					$event['acknowledged']
 				);
-				// activating blinking
-				zbx_add_post_js('blink.init();');
 			}
 
 			$table->addRow(array(
