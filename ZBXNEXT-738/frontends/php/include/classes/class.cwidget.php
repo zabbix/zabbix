@@ -164,7 +164,7 @@ private $flicker;
 		if(isset($_REQUEST['print'])){
 			hide_form_items($col1);
 			hide_form_items($col2);
-//if empty header than do not show it
+// if empty header, do not show it
 			if(($col1 == SPACE) && ($col2 == SPACE)) return new CJSscript('');
 		}
 
@@ -249,7 +249,7 @@ private $flicker;
 		if(isset($_REQUEST['print'])){
 			hide_form_items($col1);
 			hide_form_items($col2);
-//if empty header than do not show it
+// if empty header, do not show it
 			if(($col1 === SPACE) && ($col2 === SPACE)) return new CJSscript('');
 		}
 
