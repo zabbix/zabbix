@@ -162,7 +162,8 @@ class CCanvas{
 		$this->colors['darkyellow'] = imagecolorallocate($this->canvas, 150, 150, 0);
 		$this->colors['cyan'] = imagecolorallocate($this->canvas, 0, 255, 255);
 		$this->colors['black'] = imagecolorallocate($this->canvas, 0, 0, 0);
-		$this->colors['gray'] = imagecolorallocate($this->canvas, 180, 180, 180);
+		$this->colors['gray'] = imagecolorallocate($this->canvas, 150, 150, 150);
+		$this->colors['gray1'] = imagecolorallocate($this->canvas, 180, 180, 180);
 		$this->colors['gray2'] = imagecolorallocate($this->canvas, 210, 210, 210);
 		$this->colors['gray3'] = imagecolorallocate($this->canvas, 240, 240, 240);
 		$this->colors['white'] = imagecolorallocate($this->canvas, 255, 255, 255);
@@ -187,7 +188,6 @@ class CMapPainter{
 			'grid' => array(
 				'size' => 50,
 				'color' => 'black',
-				'labels' => false,
 			),
 		);
 		foreach($options as $key => $option){
@@ -231,28 +231,19 @@ class CMapPainter{
 		$height = $this->canvas->getHeight();
 		$maxSize = max($width, $height);
 
-		if($this->options['grid']['labels']){
-			$dims = imageTextSize(8, 0, '00');
-		}
+		$dims = imageTextSize(8, 0, '00');
 		for($xy = $size; $xy < $maxSize; $xy += $size){
 			if($xy < $width){
 				$this->canvas->drawLine($xy, 0, $xy, $height, $this->options['grid']['color'], MAP_LINK_DRAWTYPE_DASHED_LINE);
-				if($this->options['grid']['labels']){
-					$this->canvas->drawText(8, 0, $xy + 3, $dims['height'] + 3, $this->options['grid']['color'], $xy);
-				}
-
+				$this->canvas->drawText(8, 0, $xy + 3, $dims['height'] + 3, $this->options['grid']['color'], $xy);
 			}
 			if($xy < $height){
 				$this->canvas->drawLine(0, $xy, $width, $xy, $this->options['grid']['color'], MAP_LINK_DRAWTYPE_DASHED_LINE);
-				if($this->options['grid']['labels']){
-					$this->canvas->drawText(8, 0, 3, $xy + $dims['height'] + 3, $this->options['grid']['color'], $xy);
-				}
+				$this->canvas->drawText(8, 0, 3, $xy + $dims['height'] + 3, $this->options['grid']['color'], $xy);
 			}
 		}
 
-		//		if($this->options['grid']['labels']){
-		//			$this->canvas->drawText(8, 0, 2, $dims['height'] + 3, 'black', 'Y X:');
-		//		}
+		$this->canvas->drawText(8, 0, 2, $dims['height'] + 3, 'black', 'Y X:');
 
 	}
 
@@ -266,7 +257,7 @@ class CMapPainter{
 					$selement['y'] + 1,
 					$selement['x'] + $selement['width'] - 1,
 					$selement['y'] + $selement['height'] - 1,
-					'gray'
+					'gray1'
 				);
 				$this->canvas->drawRectangle(
 					$selement['x'],
