@@ -1,5 +1,5 @@
 /*!
- * This file is part of Zabbix software
+ * This file is part of Zabbix software.
  *
  * Copyright 2000-2011, Zabbix SIA
  * Licensed under the GPL Version 2 license.
