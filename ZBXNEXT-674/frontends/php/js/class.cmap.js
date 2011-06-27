@@ -282,7 +282,6 @@ ZABBIX.apps.map = (function(){
 
 
 				jQuery.when(ajaxRequest).always(jQuery.proxy(function(){
-					console.log(this.reupdateImage);
 					if(this.reupdateImage === true){
 						this.reupdateImage = false;
 						this.updateImage();
