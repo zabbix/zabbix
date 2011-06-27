@@ -696,7 +696,7 @@ include_once('include/page_header.php');
 		'periodFixed' => CProfile::get('web.events.timelinefixed', 1)
 	);
 
-	zbx_add_post_js('blink.init();');
+	zbx_add_post_js('jqBlink.init();');
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 	zbx_add_post_js('timeControl.processObjects();');
 

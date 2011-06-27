@@ -397,8 +397,11 @@ function getSeverityCell($severity, $text=null, $force_normal=false){
 			$object->addStyle('color: #'.$color);
 			// blinking
 			if($blinks && ((time() - $triggerLastChange) < $config['blink_period'])){
-				$object->setAttribute('name', 'blink');
+				$object->addClass('blink');
 			}
+		}
+		else{
+			$object->addClass('unknown');
 		}
 	}
 

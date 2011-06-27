@@ -570,33 +570,49 @@ remove: function(audiofile){
 /************************************************************************************/
 /*						Replace Standart Blink functionality						*/
 /************************************************************************************/
-// Author: Aly
-var blink = {
-	blinkobjs: new Array(),
 
+/**
+ * Sets HTML elements with class 'blink' to blink
+ * @author Konstantin Buravcov
+ */
+var jqBlink = {
+
+	objects: [], // those objects will blink
+	shown: false, // are objects currently shown or hidden?
+	blinkInterval: 1000, // how fast will they blink (ms)
+
+	/**
+	 * Initialize blinking
+	 */
 	init: function(){
-
-		if(IE)
-			this.blinkobjs = $$('*[name=blink]');
-		else
-			this.blinkobjs = document.getElementsByName("blink");
-
-		if(this.blinkobjs.length > 0) this.view();
-	},
-	hide: function(){
-		for(var id=0; id<this.blinkobjs.length; id++){
-			this.blinkobjs[id].style.visibility = 'hidden';
+		if(this.objects.length == 0){
+			this.findObjects();
 		}
-		setTimeout('blink.view()',500);
+		this.blink();
 	},
-	view: function(){
-		for(var id=0; id<this.blinkobjs.length; id++){
-			this.blinkobjs[id].style.visibility = 'visible'
-		}
-		setTimeout('blink.hide()',1000);
+
+	/**
+	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
+	 */
+	blink: function(){
+		// changing visibility state
+		this.objects.css(
+			'visibility',
+			this.shown ? 'hidden' : 'visible'
+		);
+		// reversing the value of indicator attribute
+		this.shown = !this.shown;
+		// repeating this function with delay
+		setTimeout('jqBlink.blink()', this.blinkInterval);
+	},
+
+	/**
+	 * Find all elements with class 'blink' and store them in this.objects
+	 */
+	findObjects: function(){
+		this.objects = jQuery('.blink');
 	}
-}
-
+};
 
 /************************************************************************************/
 /*								ZABBIX HintBoxes 									*/
