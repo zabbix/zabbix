@@ -1142,7 +1142,6 @@ ZABBIX.apps.map = (function(){
 				var elementName;
 
 				for(elementName in selement){
-//				jQuery('[name='+elementName+']', this.domNode).val(selement[elementName]);
 					jQuery('[name='+elementName+']', this.domNode).val([selement[elementName]]);
 				}
 
