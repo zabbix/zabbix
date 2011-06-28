@@ -1535,7 +1535,7 @@ ZABBIX.apps.map = (function(){
 
 					optgroupDom = jQuery('<optgroup label="'+optgroupLabel+'"></optgroup>');
 					for(i = 0, ln = optgroups[optgroupType].length; i < ln; i++){
-						optgroupDom.append('<option value="' + optgroups[optgroupType][i].id + '">' + optgroups[optgroupType][i].elementName + '</option>')
+						optgroupDom.append('<option value="' + optgroups[optgroupType][i].id + '">' + optgroups[optgroupType][i].data.elementName + '</option>')
 					}
 
 					jQuery('#selementid2').append(optgroupDom);
