@@ -337,8 +337,13 @@ if($nocalculations){
 		$map_info[$selement['selementid']] = array(
 			'iconid' => $selement['iconid_off'],
 			'icon_type' => SYSMAP_ELEMENT_ICON_OFF,
-			'name' => $selement['label']
 		);
+		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE){
+			$map_info[$selement['selementid']]['name'] = _('Image');
+		}
+		else{
+			$map_info[$selement['selementid']]['name'] = $selement['elementName'];
+		}
 	}
 	$allLinks = true;
 }

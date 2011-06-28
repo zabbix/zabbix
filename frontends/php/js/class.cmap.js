@@ -720,7 +720,6 @@ ZABBIX.apps.map = (function(){
 		 * @property {Object} sysmap reference to Map object
 		 * @property {Object} data selement db values
 		 * @property {Boolean} selected if element is now selected by user
-		 * @property {String} elementName name of related element (for example trigger description)
 		 * @property {String} id elementid
 		 * @property {Object} domNode reference to related DOM element
 		 *
@@ -760,9 +759,6 @@ ZABBIX.apps.map = (function(){
 				}
 			}
 
-			this.elementName = selementData.elementName;
-			delete selementData.elementName;
-
 			this.data = selementData;
 
 			this.id = this.data.selementid;
@@ -794,7 +790,7 @@ ZABBIX.apps.map = (function(){
 		}
 		Selement.prototype = {
 			getData: function(){
-				return jQuery.extend({}, this.data, { elementName: this.elementName });
+				return this.data;
 			},
 
 			update: function(data, unsetUndefined){
@@ -802,17 +798,12 @@ ZABBIX.apps.map = (function(){
 					dataFelds = [
 						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-						'height', 'viewtype', 'urls'
+						'height', 'viewtype', 'urls', 'elementName'
 					],
 					i,
 					ln;
 
 				unsetUndefined = unsetUndefined || false;
-
-				// elementName
-				if(typeof data.elementName !== 'undefined'){
-					this.elementName = data.elementName;
-				}
 
 				// update elements fields, if not massupdate, remove fields that are not in new values
 				for(i = 0, ln = dataFelds.length; i < ln; i++){
@@ -841,7 +832,7 @@ ZABBIX.apps.map = (function(){
 				if(this.data.elementtype === '4'){
 					for(i = 0, ln = this.sysmap.iconList.length; i < ln; i++){
 						if(this.sysmap.iconList[i].imageid === this.data.iconid_off){
-							this.elementName = this.sysmap.iconList[i].name;
+							this.data.elementName = this.sysmap.iconList[i].name;
 						}
 					}
 				}
@@ -1258,7 +1249,7 @@ ZABBIX.apps.map = (function(){
 
 						list.push({
 							elementType: elementTypeText,
-							elementName: element.elementName,
+							elementName: element.data.elementName,
 							linkid: link.linkid,
 							linktriggers: linktriggers.join('\n')
 						});
@@ -1418,7 +1409,7 @@ ZABBIX.apps.map = (function(){
 					}
 					list.push({
 						elementType: elementTypeText,
-						elementName: element.elementName
+						elementName: element.data.elementName
 					});
 				}
 
