@@ -1019,7 +1019,7 @@ function getSelementsInfo($sysmap){
 	if(!empty($hosts_map)){
 		$options = array(
 			'hostids' => array_keys($hosts_map),
-			'output' => array('name', 'status', 'maintenance_status'),
+			'output' => array('name', 'status', 'maintenance_status', 'maintenanceid'),
 			'nopermissions' => 1,
 			'nodeids' => get_current_nodeid(true),
 		);
@@ -1035,7 +1035,7 @@ function getSelementsInfo($sysmap){
 	if(!empty($hostgroups_map)){
 		$options = array(
 			'groupids' => array_keys($hostgroups_map),
-			'output' => array('name', 'status', 'maintenance_status'),
+			'output' => array('name', 'status', 'maintenance_status', 'maintenanceid'),
 			'nopermissions' => 1,
 			'nodeids' => get_current_nodeid(true),
 		);
