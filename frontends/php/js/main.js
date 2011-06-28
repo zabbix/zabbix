@@ -568,11 +568,22 @@ remove: function(audiofile){
 }
 
 /************************************************************************************/
-/*						Replace Standart Blink functionality						*/
+/*						Replace Standard Blink functionality						*/
 /************************************************************************************/
 
 /**
- * Sets HTML elements with class 'blink' to blink
+ * Sets HTML elements to blink.
+ * Example of usage:
+ *      <span class="blink" data-seconds-to-blink="60">test 1</span>
+ *      <span class="blink" data-seconds-to-blink="30">test 2</span>
+ *      <span class="blink">test 3</span>
+ *      <script type="text/javascript">
+ *          jQuery(document).ready(function(
+ *              jqBlink.init();
+ *          ));
+ *      </script>
+ * Elements with class 'blink' will blink for 'data-seconds-to-blink' seconds
+ * If 'data-seconds-to-blink' is omitted, element will blink forever.
  * @author Konstantin Buravcov
  */
 var jqBlink = {
@@ -580,6 +591,7 @@ var jqBlink = {
 	objects: [], // those objects will blink
 	shown: false, // are objects currently shown or hidden?
 	blinkInterval: 1000, // how fast will they blink (ms)
+	secondsSinceInit: 0,
 
 	/**
 	 * Initialize blinking
@@ -595,6 +607,8 @@ var jqBlink = {
 	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
 	 */
 	blink: function(){
+		// maybe some of the objects should not blink any more?
+		this.filterOutNonBlinking();
 		// changing visibility state
 		this.objects.css(
 			'visibility',
@@ -602,6 +616,8 @@ var jqBlink = {
 		);
 		// reversing the value of indicator attribute
 		this.shown = !this.shown;
+		// I close my eyes only for a moment, and a moment's gone
+		this.secondsSinceInit += this.blinkInterval / 1000;
 		// repeating this function with delay
 		setTimeout('jqBlink.blink()', this.blinkInterval);
 	},
@@ -611,6 +627,27 @@ var jqBlink = {
 	 */
 	findObjects: function(){
 		this.objects = jQuery('.blink');
+	},
+
+	/**
+	 * Check all currently found objects and exclude ones that should stop blinking by now
+	 */
+	filterOutNonBlinking: function(){
+		var secondsSinceInit = this.secondsSinceInit;
+		this.objects = this.objects.filter(function() {
+			if(jQuery(this).data('time-to-blink') !== undefined){
+				var shouldBlink =  parseInt(jQuery(this).data('time-to-blink')) > secondsSinceInit;
+				// if object stops blinking, it should be left visible
+				if(!shouldBlink && !this.shown){
+					jQuery(this).css('visibility', 'visible');
+				}
+				return shouldBlink;
+			}
+			else{
+				// no time-to-blink attribute, should blink forever
+				return true;
+			}
+		});
 	}
 };
 
