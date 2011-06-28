@@ -1537,7 +1537,7 @@ function drawMapHighligts(&$im, $map, $map_info){
 	$selements = $map['selements'];
 
 	foreach($selements as $selementid => $selement){
-		if(empty($selement)){
+		if(isset($selement['elementsubtype']) && $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
 			continue;
 		}
 
