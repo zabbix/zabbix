@@ -2228,7 +2228,7 @@ function populateFromMapAreas(array &$map){
  */
 function processAreasCoordinates(array &$map, array $areas, array $mapInfo){
 	foreach($areas as $area){
-		$rowPlaceCount = floor(sqrt(count($area['selementids']))) + 1;
+		$rowPlaceCount = ceil(sqrt(count($area['selementids'])));
 
 		// offset from area borders
 		$area['x'] += 5;
