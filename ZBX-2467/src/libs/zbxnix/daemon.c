@@ -111,7 +111,7 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					int		i, found = 0;
 					extern int	threads_num;
 					extern pid_t	*threads;
-				
+
 					for (i = 1; i < threads_num && !found; i++)
 						found = (threads[i] == CHECKED_FIELD(siginfo, si_pid));
 
