@@ -1686,14 +1686,18 @@ require_once('include/js.inc.php');
 							));
 
 					$events = getLastEvents($options);
-					foreach($events as $enum => $event){
+					foreach($events as $event){
 						$trigger = $event['trigger'];
 						$host = $event['host'];
 
-						$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
-
-//						$row = zbx_array_merge($triggers[$row['triggerid']],$row);
-//						if((1 == $showUnknown) && (!event_initial_time($row,$showUnknown))) continue;
+						$statusSpan = new CSpan(trigger_value2str($event['value']));
+						// add colors and blinking to span depending on configuration and trigger parameters
+						addTriggerValueStyle(
+							$statusSpan,
+							$event['value'],
+							$event['clock'],
+							$event['acknowledged']
+						);
 
 						$item->addRow(array(
 							zbx_date2str(S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT,$event['clock']),
@@ -1703,10 +1707,12 @@ require_once('include/js.inc.php');
 								$trigger['description'],
 								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 							),
-							$value,
+							$statusSpan,
 							getSeverityCell($trigger['priority']),
 						));
 					}
+
+					zbx_add_post_js('jqBlink.init();');
 
 					$item = array($item);
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));

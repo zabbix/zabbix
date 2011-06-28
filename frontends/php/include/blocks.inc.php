@@ -1046,6 +1046,8 @@ function make_latest_issues($filter = array(), $showStatus=false){
 		unset($trigger,$description,$actions);
 	}
 
+	// initialize blinking
+	zbx_add_post_js('jqBlink.init();');
 	$script = new CJSScript(get_js("jQuery('#hat_lastiss_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
 	$infoDiv = new CDiv(
