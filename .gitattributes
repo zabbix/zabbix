@@ -361,8 +361,6 @@ src/zabbix_server/selfmon/Makefile.am -text
 src/zabbix_server/snmptrapper/Makefile.am -text
 src/zabbix_server/snmptrapper/snmptrapper.c -text
 src/zabbix_server/snmptrapper/snmptrapper.h -text
-src/zabbix_snmphandler/Makefile.am -text
-src/zabbix_snmphandler/zabbix_snmphandler.c -text
 tests/data/README -text
 tests/data/data_test.sql -text
 tests/templates/sqlite3.init -text

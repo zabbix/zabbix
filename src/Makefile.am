@@ -7,8 +7,7 @@ DIST_SUBDIRS = \
 	zabbix_sender \
 	zabbix_proxy \
 	zabbix_server \
-	zabbix_java \
-	zabbix_snmphandler
+	zabbix_java
 
 if AGENT
 AGENT_SUBDIRS = \
@@ -18,9 +17,7 @@ AGENT_SUBDIRS = \
 endif
 
 if SERVER
-SERVER_SUBDIRS = \
-	zabbix_server \
-	zabbix_snmphandler
+SERVER_SUBDIRS = zabbix_server
 endif
 
 if PROXY
