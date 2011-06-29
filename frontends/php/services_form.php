@@ -361,7 +361,7 @@ if(isset($_REQUEST['sform'])){
 		}
 		elseif(!str_in_array($_REQUEST['service_times'], $new_service_time)){
 			//if this time is not already there, adding it for insertation
-			array_push($_REQUEST['service_times'],$new_service_time);		
+			array_push($_REQUEST['service_times'],$new_service_time);
 		}
 
 	}
