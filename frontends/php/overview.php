@@ -136,7 +136,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
 
-// 2nd heder
+// 2nd header
 	$form_l = new CForm('get');
 	$form_l->addVar('groupid',$_REQUEST['groupid']);
 
