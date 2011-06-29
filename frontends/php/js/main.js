@@ -568,35 +568,90 @@ remove: function(audiofile){
 }
 
 /************************************************************************************/
-/*						Replace Standart Blink functionality						*/
+/*						Replace Standard Blink functionality						*/
 /************************************************************************************/
-// Author: Aly
-var blink = {
-	blinkobjs: new Array(),
 
+/**
+ * Sets HTML elements to blink.
+ * Example of usage:
+ *      <span class="blink" data-seconds-to-blink="60">test 1</span>
+ *      <span class="blink" data-seconds-to-blink="30">test 2</span>
+ *      <span class="blink">test 3</span>
+ *      <script type="text/javascript">
+ *          jQuery(document).ready(function(
+ *              jqBlink.init();
+ *          ));
+ *      </script>
+ * Elements with class 'blink' will blink for 'data-seconds-to-blink' seconds
+ * If 'data-seconds-to-blink' is omitted, element will blink forever.
+ * @author Konstantin Buravcov
+ */
+var jqBlink = {
+
+	objects: [], // those objects will blink
+	shown: false, // are objects currently shown or hidden?
+	blinkInterval: 1000, // how fast will they blink (ms)
+	secondsSinceInit: 0,
+
+	/**
+	 * Initialize blinking
+	 */
 	init: function(){
-
-		if(IE)
-			this.blinkobjs = $$('*[name=blink]');
-		else
-			this.blinkobjs = document.getElementsByName("blink");
-
-		if(this.blinkobjs.length > 0) this.view();
-	},
-	hide: function(){
-		for(var id=0; id<this.blinkobjs.length; id++){
-			this.blinkobjs[id].style.visibility = 'hidden';
+		if(this.objects.length === 0){
+			this.findObjects();
 		}
-		setTimeout('blink.view()',500);
+		this.blink();
 	},
-	view: function(){
-		for(var id=0; id<this.blinkobjs.length; id++){
-			this.blinkobjs[id].style.visibility = 'visible'
-		}
-		setTimeout('blink.hide()',1000);
+
+	/**
+	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
+	 */
+	blink: function(){
+		// maybe some of the objects should not blink any more?
+		this.filterOutNonBlinking();
+		// changing visibility state
+		this.objects.css(
+			'visibility',
+			this.shown ? 'hidden' : 'visible'
+		);
+		// reversing the value of indicator attribute
+		this.shown = !this.shown;
+		// I close my eyes only for a moment, and a moment's gone
+		this.secondsSinceInit += this.blinkInterval / 1000;
+		// repeating this function with delay
+		setTimeout(jQuery.proxy(this.blink, this), this.blinkInterval);
+	},
+
+	/**
+	 * Find all elements with class 'blink' and store them in this.objects
+	 */
+	findObjects: function(){
+		this.objects = jQuery('.blink');
+	},
+
+	/**
+	 * Check all currently found objects and exclude ones that should stop blinking by now
+	 */
+	filterOutNonBlinking: function(){
+		var that = this;
+
+		this.objects = this.objects.filter(function(){
+			var obj = jQuery(this);
+			if(typeof obj.data('timeToBlink') !== 'undefined'){
+				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
+				// if object stops blinking, it should be left visible
+				if(!shouldBlink && !that.shown){
+					obj.css('visibility', 'visible');
+				}
+				return shouldBlink;
+			}
+			else{
+				// no time-to-blink attribute, should blink forever
+				return true;
+			}
+		});
 	}
-}
-
+};
 
 /************************************************************************************/
 /*								ZABBIX HintBoxes 									*/
