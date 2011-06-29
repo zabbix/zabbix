@@ -561,7 +561,7 @@ function item_type2str($type = null){
 						$key = str_replace('{HOST.NAME}', $host['name'], $key);
 						break;
 					case '{HOSTNAME}':	/* deprecated */
-						$key = str_replace('{HOSTNAME}', $host['name'], $key);
+						$key = str_replace('{HOSTNAME}', $host['host'], $key);
 						break;
 					case '{HOST.HOST}':
 						$key = str_replace('{HOST.HOST}', $host['host'], $key);
@@ -722,7 +722,7 @@ function item_type2str($type = null){
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_ITEMS,'center'));
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname.'&theme='.$css)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -738,7 +738,7 @@ function item_type2str($type = null){
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($items as $descr => $ithosts){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$descr.'&theme='.$css)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -902,26 +902,30 @@ function item_type2str($type = null){
 	return TRUE;
 	}
 
-/******************************************************************************
- *                                                                            *
- * Comments: !!! Don't forget sync code with C !!!                            *
- *                                                                            *
- ******************************************************************************/
-	function delete_trends_by_itemid($itemids, $use_housekeeper=0){
-		zbx_value2array($itemids);
+	/**
+	 * Clear trends history for provided itemIDs or schedule this work for housekeeper
+	 *
+	 * @param mixed $itemIds IDs of items for which history should be cleared
+	 * @param bool $useHousekeeper schedule deletion for housekeeper instead of deleting now
+	 * @return bool
+	 */
+	function delete_trends_by_itemid($itemIds, $useHousekeeper = false){
+		zbx_value2array($itemIds);
 
-		if($use_housekeeper){
-			foreach($itemids as $id => $itemid){
+		if($useHousekeeper){
+			foreach($itemIds as $itemId){
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
 				DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
-					" VALUES ($housekeeperid, 'trends','itemid',$itemid)");
+					" VALUES ($housekeeperid,'trends','itemid',$itemId)");
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
 				DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
-					" VALUES ($housekeeperid, 'trends_uint','itemid',$itemid)");
+					" VALUES ($housekeeperid,'trends_uint','itemid',$itemId)");
 			}
-			return TRUE;
+			return true;
 		}
-	return	DBexecute('DELETE FROM trends WHERE '.DBcondition('itemid',$itemids));
+		$r1 = DBexecute('DELETE FROM trends WHERE '.DBcondition('itemid', $itemIds));
+		$r2 = DBexecute('DELETE FROM trends_uint WHERE '.DBcondition('itemid', $itemIds));
+		return $r1 && $r2;
 	}
 
 	function format_lastvalue($db_item){

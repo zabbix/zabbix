@@ -49,7 +49,7 @@ static int	housekeeping_process_log()
 	DB_HOUSEKEEPER	housekeeper;
 	DB_RESULT	result;
 	DB_ROW		row;
-	long		deleted;
+	int		deleted;
 	char		*sql = NULL;
 	int		sql_alloc = 512, sql_offset = 0;
 	zbx_uint64_t	*ids = NULL;
@@ -81,11 +81,19 @@ static int	housekeeping_process_log()
 		}
 		else
 		{
-#ifdef HAVE_ORACLE
+#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
 			deleted = DBexecute(
 					"delete from %s"
 					" where %s=" ZBX_FS_UI64
 						" and rownum<=%d",
+					housekeeper.tablename,
+					housekeeper.field,
+					housekeeper.value,
+					CONFIG_MAX_HOUSEKEEPER_DELETE);
+#elif defined(HAVE_MYSQL)
+			deleted = DBexecute(
+					"delete from %s"
+					" where %s=" ZBX_FS_UI64 " limit %d",
 					housekeeper.tablename,
 					housekeeper.field,
 					housekeeper.value,
@@ -103,26 +111,17 @@ static int	housekeeping_process_log()
 					housekeeper.field,
 					housekeeper.value,
 					CONFIG_MAX_HOUSEKEEPER_DELETE);
-#elif defined(HAVE_MYSQL)
-			deleted = DBexecute(
-					"delete from %s"
-					" where %s=" ZBX_FS_UI64 " limit %d",
-					housekeeper.tablename,
-					housekeeper.field,
-					housekeeper.value,
-					CONFIG_MAX_HOUSEKEEPER_DELETE);
-#else	/* HAVE_SQLITE3 */
+#elif defined(HAVE_SQLITE3)
 			deleted = 0;
 #endif
 		}
 
-		if (0 == deleted || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE ||
-				CONFIG_MAX_HOUSEKEEPER_DELETE > deleted)
+		if (0 == deleted || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > deleted)
 			uint64_array_add(&ids, &ids_alloc, &ids_num, housekeeper.housekeeperid, 64);
 
-		if (deleted > 0)
+		if (0 < deleted)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [%s]",
+			zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table '%s'",
 					deleted, housekeeper.tablename);
 		}
 	}
@@ -130,12 +129,10 @@ static int	housekeeping_process_log()
 
 	if (NULL != ids)
 	{
-		sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+		sql = zbx_malloc(sql, sql_alloc);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
-				"delete from housekeeper where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"housekeeperid", ids, ids_num);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32, "delete from housekeeper where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "housekeeperid", ids, ids_num);
 
 		DBexecute("%s", sql);
 
@@ -143,62 +140,63 @@ static int	housekeeping_process_log()
 		zbx_free(ids);
 	}
 
-	return SUCCEED;
-}
-
-
-static int housekeeping_sessions(int now)
-{
-	int deleted;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_sessions(%d)",
-		now);
-
-	deleted = DBexecute("delete from sessions where lastaccess<%d",
-		now-365*86400);
-
-	zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [sessions]",
-		deleted);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED", __function_name);
 
 	return SUCCEED;
 }
 
-static int housekeeping_alerts(int now)
+static int	housekeeping_sessions(int now)
 {
-	int	alert_history;
+	const char	*__function_name = "housekeeping_sessions";
+	int		deleted;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
+
+	deleted = DBexecute("delete from sessions where lastaccess<%d", now - SEC_PER_YEAR);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table 'sessions'", deleted);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED", __function_name);
+
+	return SUCCEED;
+}
+
+static int	housekeeping_alerts(int now)
+{
+	const char	*__function_name = "housekeeping_alerts";
+	int		alert_history;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		res = SUCCEED;
 	int		deleted;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_alerts(%d)",
-		now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
 	result = DBselect("select alert_history from config");
 
-	row=DBfetch(result);
-
-	if(!row || DBis_null(row[0])==SUCCEED)
+	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
 	{
-		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
+		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
 		res = FAIL;
 	}
 	else
 	{
-		alert_history=atoi(row[0]);
+		alert_history = atoi(row[0]);
 
-		deleted = DBexecute("delete from alerts where clock<%d",
-			now-24*3600*alert_history);
-		zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alerts]",
-			deleted);
+		deleted = DBexecute("delete from alerts where clock<%d", now - alert_history * SEC_PER_DAY);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table 'alerts'", deleted);
 	}
-
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
 	return res;
 }
 
-static int housekeeping_events(int now)
+static int	housekeeping_events(int now)
 {
+	const char	*__function_name = "housekeeping_events";
 	int		event_history;
 	DB_RESULT	result;
 	DB_RESULT	result2;
@@ -207,39 +205,34 @@ static int housekeeping_events(int now)
 	zbx_uint64_t	eventid;
 	int		res = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_events(%d)",
-		now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
 	result = DBselect("select event_history from config");
 
-	row1=DBfetch(result);
-
-	if(!row1 || DBis_null(row1[0])==SUCCEED)
+	if (NULL == (row1 = DBfetch(result)) || SUCCEED == DBis_null(row1[0]))
 	{
-		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
+		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
 		res = FAIL;
 	}
 	else
 	{
-		event_history=atoi(row1[0]);
+		event_history = atoi(row1[0]);
 
-		result2 = DBselect("select eventid from events where clock<%d",
-			now-24*3600*event_history);
-		while((row2=DBfetch(result2)))
+		result2 = DBselect("select eventid from events where clock<%d", now - event_history * SEC_PER_DAY);
+
+		while (NULL != (row2 = DBfetch(result2)))
 		{
-			ZBX_STR2UINT64(eventid,row2[0]);
+			ZBX_STR2UINT64(eventid, row2[0]);
 
-			DBexecute("delete from acknowledges where eventid=" ZBX_FS_UI64,
-				eventid);
-
-			DBexecute("delete from events where eventid=" ZBX_FS_UI64,
-				eventid);
+			DBexecute("delete from acknowledges where eventid=" ZBX_FS_UI64, eventid);
+			DBexecute("delete from events where eventid=" ZBX_FS_UI64, eventid);
 		}
 		DBfree_result(result2);
-
 	}
-
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
 	return res;
 }
 
@@ -260,43 +253,31 @@ static int housekeeping_events(int now)
  ******************************************************************************/
 static int	delete_history(const char *table, zbx_uint64_t itemid, int keep_history, int now)
 {
+	const char	*__function_name = "delete_history";
 	DB_RESULT       result;
 	DB_ROW          row;
-	int             min_clock;
+	int             min_clock, deleted;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In delete_history(%s," ZBX_FS_UI64 ",%d,%d)",
-		table,
-		itemid,
-		keep_history,
-		now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' itemid:" ZBX_FS_UI64 " keep_history:%d now:%d",
+		__function_name, table, itemid, keep_history, now);
 
-	result = DBselect("select min(clock) from %s where itemid=" ZBX_FS_UI64,
-		table,
-		itemid);
+	result = DBselect("select min(clock) from %s where itemid=" ZBX_FS_UI64, table, itemid);
 
-	row=DBfetch(result);
-
-	if(!row || DBis_null(row[0]) == SUCCEED)
+	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
 	{
 		DBfree_result(result);
 		return 0;
 	}
 
 	min_clock = atoi(row[0]);
+	min_clock = MIN(now - keep_history * SEC_PER_DAY, min_clock + 4 * CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
 	DBfree_result(result);
 
-/*	zabbix_log( LOG_LEVEL_DEBUG, "Now %d keep_history %d Itemid " ZBX_FS_UI64 " min %d new min %d",
-		now,
-		keep_history,
-		itemid,
-		min_clock,
-		MIN(now-24*3600*keep_history, min_clock+4*3600*CONFIG_HOUSEKEEPING_FREQUENCY));*/
+	deleted = DBexecute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d", table, itemid, min_clock);
 
-	return DBexecute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
-		table,
-		itemid,
-		MIN(now-24*3600*keep_history, min_clock+4*3600*CONFIG_HOUSEKEEPING_FREQUENCY)
-	);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+
+	return deleted;
 }
 
 /******************************************************************************
@@ -307,8 +288,7 @@ static int	delete_history(const char *table, zbx_uint64_t itemid, int keep_histo
  *                                                                            *
  * Parameters: now - current timestamp                                        *
  *                                                                            *
- * Return value: SUCCEED - information removed successfully                   *
- *               FAIL - otherwise                                             *
+ * Return value: number of rows deleted                                       *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -317,12 +297,13 @@ static int	delete_history(const char *table, zbx_uint64_t itemid, int keep_histo
  ******************************************************************************/
 static int	housekeeping_history_and_trends(int now)
 {
+	const char	*__function_name = "housekeeping_history_and_trends";
 	DB_ITEM         item;
 	DB_RESULT       result;
 	DB_ROW          row;
 	int             deleted = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In housekeeping_history_and_trends() now:%d", now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
 	result = DBselect("select itemid,history,trends from items");
 
@@ -341,6 +322,8 @@ static int	housekeeping_history_and_trends(int now)
 		deleted += delete_history("trends_uint", item.itemid, item.trends, now);
 	}
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
 	return deleted;
 }
@@ -389,6 +372,6 @@ void	main_housekeeper_loop()
 
 		DBclose();
 
-		zbx_sleep_loop(SEC_PER_HOUR * CONFIG_HOUSEKEEPING_FREQUENCY);
+		zbx_sleep_loop(CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
 	}
 }

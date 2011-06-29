@@ -140,8 +140,8 @@ typedef struct
 }
 DC_PROXY;
 
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags,
-		AGENT_RESULT *value, zbx_timespec_t *ts, int timestamp, char *source,
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
+		zbx_timespec_t *ts, unsigned char status, const char *error, int timestamp, const char *source,
 		int severity, int logeventid, int lastlogsize, int mtime);
 int	DCsync_history(int sync_type);
 void	init_database_cache(unsigned char p);
@@ -157,18 +157,19 @@ void	DCflush_nextchecks();
 #define ZBX_STATS_HISTORY_STR_COUNTER	3
 #define ZBX_STATS_HISTORY_LOG_COUNTER	4
 #define ZBX_STATS_HISTORY_TEXT_COUNTER	5
-#define ZBX_STATS_HISTORY_TOTAL		6
-#define ZBX_STATS_HISTORY_USED		7
-#define ZBX_STATS_HISTORY_FREE		8
-#define ZBX_STATS_HISTORY_PFREE		9
-#define ZBX_STATS_TREND_TOTAL		10
-#define ZBX_STATS_TREND_USED		11
-#define ZBX_STATS_TREND_FREE		12
-#define ZBX_STATS_TREND_PFREE		13
-#define ZBX_STATS_TEXT_TOTAL		14
-#define ZBX_STATS_TEXT_USED		15
-#define ZBX_STATS_TEXT_FREE		16
-#define ZBX_STATS_TEXT_PFREE		17
+#define ZBX_STATS_NOTSUPPORTED_COUNTER	6
+#define ZBX_STATS_HISTORY_TOTAL		7
+#define ZBX_STATS_HISTORY_USED		8
+#define ZBX_STATS_HISTORY_FREE		9
+#define ZBX_STATS_HISTORY_PFREE		10
+#define ZBX_STATS_TREND_TOTAL		11
+#define ZBX_STATS_TREND_USED		12
+#define ZBX_STATS_TREND_FREE		13
+#define ZBX_STATS_TREND_PFREE		14
+#define ZBX_STATS_TEXT_TOTAL		15
+#define ZBX_STATS_TEXT_USED		16
+#define ZBX_STATS_TEXT_FREE		17
+#define ZBX_STATS_TEXT_PFREE		18
 void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
@@ -181,7 +182,7 @@ void	init_configuration_cache();
 void	free_configuration_cache();
 
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
-int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *hostname, const char *key);
+int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key);
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);

@@ -50,12 +50,13 @@ addObject: function(domid, time, objData){
 		'objDims': {},
 		'src': location.href,
 		'dynamic': 1,
+		'periodFixed': 1,
 		'loadSBox': 0,
 		'loadImage': 0,
 		'loadScroll': 1,
 		'scrollWidthByImage': 0,
 		'mainObject': 0			// object on changing will reflect on all others
-	}
+	};
 
 	for(var key in this.objectList[domid]){
 		if(isset(key, objData)) this.objectList[domid][key] = objData[key];
@@ -80,7 +81,6 @@ addObject: function(domid, time, objData){
 									  parseInt(time.starttime),
 									  parseInt(time.usertime),
 									  parseInt(time.endtime));
-
 },
 
 processObjects: function(){
@@ -177,7 +177,6 @@ addSBox: function(e, objid){
 
 addScroll: function(e, objid){
 	this.debug('addScroll', objid);
-
 	var obj = this.objectList[objid];
 //SDJ(this.objectList);
 	var g_img = $(obj.domid);
@@ -189,7 +188,7 @@ addScroll: function(e, objid){
 		if(!is_number(g_width)) g_width = 900;
 	}
 
-	var scrl = scrollCreate(obj.domid, g_width, obj.timeline.timelineid);
+	var scrl = scrollCreate(obj.domid, g_width, obj.timeline.timelineid, this.objectList[objid].periodFixed);
 	scrl.onchange = this.objectUpdate.bind(this);
 
 	if(obj.dynamic && !is_null($(g_img))){
@@ -208,9 +207,9 @@ objectUpdate: function(domid, timelineid){
 
 	var usertime = ZBX_TIMELINES[timelineid].usertime();
 	var period = ZBX_TIMELINES[timelineid].period();
-	var now = ZBX_TIMELINES[timelineid].now()
+	var now = ZBX_TIMELINES[timelineid].now();
 
-	if(now) usertime += 86400*356;
+	if(now) usertime += 86400*365;
 
 //	var date = datetoarray(usertime - period);
 //	var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
@@ -527,7 +526,7 @@ debug: function(fnc_name, id){
 /************************************************************************************/
 var ZBX_SCROLLBARS = {};
 
-function scrollCreate(sbid, w, timelineid){
+function scrollCreate(sbid, w, timelineid, fixedperiod){
 	if(is_null(sbid)){
 		var sbid = ZBX_SCROLLBARS.length;
 	}
@@ -543,7 +542,7 @@ function scrollCreate(sbid, w, timelineid){
 
 	if(w < 600) w = 600;
 
-	ZBX_SCROLLBARS[sbid] = new CScrollBar(sbid, timelineid, w);
+	ZBX_SCROLLBARS[sbid] = new CScrollBar(sbid, timelineid, w, fixedperiod);
 
 return ZBX_SCROLLBARS[sbid];
 }
@@ -621,11 +620,12 @@ changed: 0,					// switches to 1, when scrollbar been moved or period changed
 fixedperiod: 1,				// fixes period on bar changes
 disabled: 1,				// activates/disables scrollbars
 
-initialize: function($super,sbid, timelineid, width){ // where to put bar on start(time on graph)
+initialize: function($super,sbid, timelineid, width, fixedperiod){ // where to put bar on start(time on graph)
 	this.scrollbarid = sbid;
 	$super('CScrollBar['+sbid+']');
 
 try{
+		this.fixedperiod = fixedperiod == 1 ? 1 : 0;
 // Checks
 		if(!isset(timelineid,ZBX_TIMELINES)) throw('Failed to initialize ScrollBar with given TimeLine');
 		if(empty(this.dom.scrollbar)) this.scrollcreate(width);
@@ -1203,8 +1203,13 @@ switchPeriodState: function(){
 	this.debug('switchPeriodState');
 	if(this.disabled) return false;
 //----
-
-	this.fixedperiod = (this.fixedperiod == 1)?0:1;
+	this.fixedperiod = (this.fixedperiod == 1) ? 0 : 1;
+	// sending fixed/dynamic setting to server to save in a profile
+	var params = {
+		favobj:	'timelinefixedperiod',
+		favid: this.fixedperiod
+	};
+	send_params(params);
 
 	if(this.fixedperiod){
 		this.dom.period_state.innerHTML = locale['S_FIXED_SMALL'];
@@ -1676,7 +1681,7 @@ scrollcreate: function(w){
 	this.dom.subline.className = 'subline';
 	$(this.dom.subline).setStyle({width: w+'px'});
 
-// Additional postitioning links
+// Additional positioning links
 	this.dom.nav_links = document.createElement('div');
 	this.dom.subline.appendChild(this.dom.nav_links);
 	this.dom.nav_links.className = 'nav_links';
@@ -1697,7 +1702,7 @@ scrollcreate: function(w){
 	this.dom.period_state = document.createElement('span');
 	this.dom.period.appendChild(this.dom.period_state);
 	this.dom.period_state.className = 'period_state link';
-	this.dom.period_state.appendChild(document.createTextNode(locale['S_FIXED_SMALL']));
+	this.dom.period_state.appendChild(document.createTextNode(this.fixedperiod == 1 ? locale['S_FIXED_SMALL'] : locale['S_DYNAMIC_SMALL']));
 	addListener(this.dom.period_state, 'click', this.switchPeriodState.bindAsEventListener(this));
 
 // State )

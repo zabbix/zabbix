@@ -1,4 +1,27 @@
 --------------------------------------------------------------------------------
+Changes for 1.9.5
+
+New features:
+ - [ZBXNEXT-738] Added configurable colors and blinking for alarm states OK/PROBLEM (KB)
+ - [ZBXNEXT-827] Move misc/conf to the top level source directory (Richlv)
+ - [ZBXNEXT-746] Added trigger sorting by severity and host name (KB)
+ - [ZBX-1357] updated Latvian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+ - [ZBXNEXT-783] Added Inventory -> Overview report and filter to Inventory -> Hosts (KB)
+ - [ZBXNEXT-467] Renamed net.tcp.dns(.query)[] to net.dns(.record)[], added Windows support, retrans and timeout parameters and IP parameter support for UNIX (rudolfs)
+ - [ZBX-3828] added Turkish translation; thanks to Murat Koç (Richlv)
+ - [ZBXNEXT-677] added system.hw.* and system.sw.* items for Linux (rudolfs)
+ - [ZBXNEXT-780] all items (including user parameters and external checks) can also return only whitespace (rudolfs)
+
+Bug fixes:
+ - [ZBX-3901] fixed make errors due to "cp -n" under RHEL with --enable-java option (Sasha)
+ - [ZBXNEXT-828] remove outdated spec files (Richlv)
+ - [ZBX-3841] returned functionality of a macro {HOSTNAME} as in the version 1.8.x (Sasha)
+ - [ZBX-3841] fixed processing of {HOST.NAME} macro in item keys (Sasha)
+ - [ZBX-3858] fixed host selection in action condition popup (Vedmak)
+ - [ZBX-3852] fixed duplicate HTML IDs in events.php (KB)
+ - [ZBX-3846] fixed typo in map creation info message during export (Vedmak)
+
+--------------------------------------------------------------------------------
 Changes for 1.9.4
 
 New features:
@@ -11,6 +34,10 @@ New features:
  - [ZBXNEXT-511] renamed item description to name, for description introduced a new field (asaveljevs, Vedmak)
 
 Bug fixes:
+ - [ZBX-3774] fixed displaying of visible host and template name in several screens (Alexei)
+ - [ZBX-3730] fixed bug with javascript translations - now js strings actually get translated (KB)
+ - [ZBX-3752] fixed error in slides with system status (Vedmak)
+ - [ZBX-3724] fixed broken images when importing and exporting maps with PostgreSQL (Alexei, Vedmak, Sasha)
  - [ZBX-3794] added timeout support to vfs.file.contents[] command (dimir)
  - [ZBX-3809] fixed overwriting of existing elements and links when importing a map (Alexei)
  - [ZBX-954] typo in constant name, cause error when try to clear item history (Vedmak)
@@ -145,6 +172,37 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3890] added logging of ORACLE warning messages while connecting to the database (Sasha)
+ - [ZBX-3880] fixed repeated processing of log-files through proxy when disabling a host or item (Sasha)
+ - [ZBX-3420] fixed wrong error message being logged in case of DNS resolution errors (asaveljevs,rudolfs)
+ - [ZBX-3519] fixed unterminated processes when system.run[,wait] times out and added proper output handling for system.run[,nowait] on UNIX (rudolfs) 
+ - [ZBX-3768] fixed 'uptime' and 's' units as according to the documentation (Sasha)
+ - [ZBX-3490] added support for LVM devices and full path to devices to vfs.dev.read and vfs.dev.write; thanks to Takanori Suzuki (dimir, sasha)
+ - [ZBX-3862] fixed broken popups in frontend in Internet Explorer 7 (KB)
+ - [ZBX-3463] fixed MaxHousekeeperDelete configuration parameter being ignored for IBM DB2 (asaveljevs)
+ - [ZBX-3854] added saving of state of dynamic/fixed setting for time lines on all pages (KB)
+ - [ZBX-3847] fixed item history clearing not deleting data in trends_uint table (KB)
+ - [ZBX-3797] fixed processing of vfs.dev.* checks under FreeBSD (Sasha)
+ - [ZBXNEXT-799] added support of SRV records to net.tcp.dns.query[]; thanks to Edward Rudd (asaveljevs)
+ - [ZBX-1029] added lookup of Jabber SRV records to Jabber notifications; thanks to Edward Rudd (asaveljevs)
+ - [ZBXNEXT-792] added type parameter for system.hostname[] on Windows to support both NetBIOS and host names (rudolfs)
+ - [ZBXNEXT-791] added HostnameItem to Agent and Proxy configuration for setting the default Hostname (rudolfs)
+ - [ZBX-3192] fixed SNMP index cache to support SNMP target for each entry; thanks to Ilia Sotnikov (dimir)
+ - [ZBX-3825] fixed errors with single quotes in javascript messages (KB)
+ - [ZBXNEXT-782] added support of not-supported items in the history cache (Sasha)
+ - [ZBX-3072] fixed MySQL error when shutting down server (dimir)
+ - [ZBX-3105] added processing of garbage in configuration files (dimir)
+ - [ZBX-2083] fixed audit.details field cutting (Vedmak)
+ - [ZBX-3824] fixed unnecessary synchronization of "profiles" table in DM setup (asaveljevs)
+ - [ZBX-3821] removed warning messages about failed evaluation of trigger expressions (asaveljevs)
+ - [ZBX-3826] fixed recovering unsupported icmpping* items when a key has been entered incorrectly (Sasha)
+ - [ZBX-3766] fixed "Do" button in item form (KB)
+ - [ZBX-3417] removed trailing and leading space from phrase " - all groups - " (Alexei)
+ - [ZBX-3806] fixed HTTP pollers being started on Zabbix proxy (asaveljevs)
+ - [ZBX-3808] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Alexei)
+ - [ZBX-3682] fixed import of map elements having empty label; thanks to Takanori Suzuki (Alexei)
+ - [ZBX-3679] fixed incorrect "No nodes defined" when screen selection popup has no elements (Alexei)
+ - [ZBX-3638] fixed displaying of vertical text in case of special HTML characters (Alexei)
  - [ZBX-3801] added check for duplicate template IDs when creating host through API (KB)
  - [ZBX-3802] fixed error when try to open custom screen from history link (Vedmak)
  - [ZBX-3794] added timeout support to vfs.file.* commands (dimir)

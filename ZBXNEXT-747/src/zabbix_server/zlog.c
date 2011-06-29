@@ -67,7 +67,8 @@ void	__zbx_zabbix_syslog(const char *fmt, ...)
 	for (i = 0; i < num; i++)
 	{
 		zbx_timespec(&ts);
-		dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent, &ts, 0, NULL, 0, 0, 0, 0);
+		dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent, &ts,
+				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 	}
 
 	zbx_free(items);

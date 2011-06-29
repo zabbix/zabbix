@@ -78,7 +78,7 @@ static void	set_item_value(DC_ITEM *item, char *trap, zbx_timespec_t *ts)
 		if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			calc_timestamp(trap, &timestamp, item->logtimefmt);
 
-		dc_add_history(item->itemid, item->value_type, item->flags, &value, ts, timestamp, NULL, 0, 0, 0, 0);
+		dc_add_history(item->itemid, item->value_type, item->flags, &value, ts, ITEM_STATUS_ACTIVE, NULL, timestamp, NULL, 0, 0, 0, 0);
 	}
 	else
 		DCadd_nextcheck(item->itemid, ts->sec, value.msg);

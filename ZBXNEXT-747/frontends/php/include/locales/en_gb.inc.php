@@ -545,7 +545,7 @@
 	'S_CANNOT_DELETE_GRAPHS'=>		_('Cannot delete graphs'),
 	'S_CANNOT_ADD_GRAPH'=>			_('Cannot add graph'),
 	'S_ANOTHER_ITEM_SUM'=>			_('Cannot add more than one item with type "Graph sum"'),
-	'S_ID'=>				_('Id'),
+	'S_ID'=>				_('ID'),
 	'S_NO_GRAPHS_DEFINED'=>			_('No graphs defined'),
 	'S_NO_GRAPH_DEFINED'=>			_('No graph defined'),
 	'S_DELETE_GRAPH_Q'=>			_('Delete graph?'),
@@ -721,7 +721,6 @@
 	'S_NO_HOSTS_DEFINED'=>				_('No hosts defined'),
 	'S_NO_TEMPLATES_DEFINED'=>			_('No templates defined'),
 	'S_NO_PROXIES_DEFINED'=>			_('No proxies defined'),
-	'S_HOSTS_BIG'=>					_('HOSTS'),
 	'S_HOST'=>					_('Host'),
 	'S_CONNECT_TO'=>				_('Connect to'),
 	'S_DNS'=>					_('DNS'),
@@ -733,7 +732,6 @@
 	'S_DELETED'=>					_('Deleted'),
 	'S_UNKNOWN'=>					_('Unknown'),
 	'S_GROUPS'=>					_('Groups'),
-	'S_MINUS_ALL_GROUPS_MINUS'=>			_(' - all groups - '),
 	'S_ALL_GROUPS'=>				_('All groups'),
 	'S_NO_GROUPS_DEFINED'=>				_('No groups defined'),
 	'S_DNS_NAME'=>					_('DNS name'),
@@ -797,7 +795,6 @@
 	'S_UPDATE_IN_GROUP'=>			_('Update in group'),
 	'S_TEMPLATE_LINKAGE'=>			_('Template linkage'),
 	'S_TEMPLATES'=>				_('Templates'),
-	'S_TEMPLATES_BIG'=>			_('TEMPLATES'),
 	'S_UNLINK'=>				_('Unlink'),
 	'S_CANNOT_UNLINK_TEMPLATE'=>	_('Cannot unlink template'),
 	'S_CANNOT_LINK_TEMPLATE'=>	_('Cannot link template'),
@@ -987,7 +984,6 @@
 	'S_MAINTENANCE_BIG'=>			_('MAINTENANCE'),
 
 //	sysmaps.php
-	'S_IMAGE_IS_USED_IN_ZABBIX_MAP' => _('Image is used in Zabbix map'),
 	'S_EDIT_MAP_ELEMENT'=>			_('Edit map element'),
 	'S_ICON_DEFAULT'=>			_('Icon (default)'),
 	'S_APPLY'=>					_('Apply'),
@@ -1252,7 +1248,6 @@
 	'S_SIMPLE_GRAPH'=>				_('Simple graph'),
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
-	'S_SIMPLE_GRAPH_BIG'=>			_('SIMPLE GRAPH'),
 	'S_GRAPH_NAME'=>				_('Graph name'),
 	'S_WIDTH'=>						_('Width'),
 	'S_HEIGHT'=>					_('Height'),
@@ -1286,7 +1281,6 @@
 	'S_MAP'=>					_('Map'),
 	'S_AS_PLAIN_TEXT'=>			_('As plain text'),
 	'S_PLAIN_TEXT'=>			_('Plain text'),
-	'S_PLAIN_TEXT_BIG'=>			_('PLAIN TEXT'),
 	'S_COLUMN_SPAN'=>			_('Column span'),
 	'S_ROW_SPAN'=>				_('Row span'),
 	'S_SHOW_LINES'=>			_('Show lines'),
@@ -1641,6 +1635,9 @@
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			_('Host profiles'),
 
+//	hostprofilesoverview.php
+	'S_HOST_PROFILE_OVERVIEW'=>			_('Host profile overview'),
+
 //	search.php
 	'S_EDIT_HOSTS' => _('Edit hosts'),
 	'S_SEARCH_BIG'=>			_('SEARCH'),
@@ -1652,11 +1649,8 @@
 //	popup.php
 	'S_CAPTION'=>				_('Caption'),
 	'S_EMPTY'=>				_('Empty'),
-	'S_STANDARD_ITEMS_BIG'=>		_('STANDARD ITEMS'),
 	'S_NO_ITEMS'=>				_('No items'),
 	'S_DISCOVERY_RULES_BIG'=>		_('DISCOVERY RULES'),
-	'S_DISCOVERY_CHECKS_BIG'=>		_('DISCOVERY CHECKS'),
-	'S_HOSTS_AND_TEMPLATES_BIG'=>		_('Hosts and templates'),
 	'S_CANNOT_SWITCH_HOSTS'=>		_('You can not switch hosts for current selection'),
 
 //	popup_period.php
