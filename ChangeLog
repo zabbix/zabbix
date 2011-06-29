@@ -2,7 +2,7 @@
 Changes for 1.9.5
 
 New features:
- - [ZBXNEXT-746] Added configurable colors and blinking for alarm states OK/PROBLEM (KB)
+ - [ZBXNEXT-738] Added configurable colors and blinking for alarm states OK/PROBLEM (KB)
  - [ZBXNEXT-827] Move misc/conf to the top level source directory (Richlv)
  - [ZBXNEXT-746] Added trigger sorting by severity and host name (KB)
  - [ZBX-1357] updated Latvian, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
