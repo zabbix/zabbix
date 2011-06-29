@@ -928,10 +928,11 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_remove(&config->jmxitems, &itemid);
 		}
 
-		/* SNMP trap items */
+		/* SNMP trap items for current server/proxy */
 
-		if (ITEM_TYPE_SNMPTRAP == item->type)
+		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == proxy_hostid)
 		{
+
 			interface_snmpitem = DCfind_id(&config->interface_snmpitems, item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found);
 
 			if (0 == found)

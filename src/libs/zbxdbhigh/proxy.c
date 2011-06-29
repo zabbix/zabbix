@@ -388,7 +388,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 						" and r.proxy_hostid=" ZBX_FS_UI64
 						" and r.status=%d"
 						" and t.status in (%d,%d)"
-						" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+						" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 					proxy_hostid,
 					HOST_STATUS_MONITORED,
 					ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
@@ -396,7 +396,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 					ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 					ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-					ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX);
+					ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP);
 		}
 		else if (0 == strcmp(pt[i].table, "hosts_templates"))
 		{

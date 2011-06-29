@@ -12398,9 +12398,3 @@ INSERT INTO graph_theme VALUES (2,'Black & Blue','css_bb.css','333333','0A0A0A',
 --
 
 INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00',7,1,7,100,'css_ob.css',0,'',389,'','','','',1,1,5,50,1000,1,'DBDBDB', 'D6F6FF', 'FFF6A5', 'FFB689', 'FF9999', 'FF3838', 'Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster');
-
---
--- Dumping data for table `globalvars`
---
-
-INSERT INTO globalvars VALUES (1,0);

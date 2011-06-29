@@ -3,5 +3,3 @@ CREATE TABLE globalvars (
 	snmp_lastsize            integer         DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (globalvarid)
 ) ENGINE=InnoDB;
-
-INSERT INTO globalvars VALUES (1,0);

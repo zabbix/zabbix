@@ -27,7 +27,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	time_t		now;
-	char		*error_msg; /* for not supported items */
+	char		*error_msg;	/* for not supported items */
 }
 ZBX_DC_NEXTCHECK;
 
@@ -41,13 +41,7 @@ static int		nextcheck_num;
  *                                                                            *
  * Purpose: initialize nextchecks array                                       *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCinit_nextchecks()
@@ -70,13 +64,7 @@ void	DCinit_nextchecks()
  *                                                                            *
  * Purpose: free memory allocated for `error_msg'es                           *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Dmitry Borovikov                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DCrelease_nextchecks()
@@ -102,13 +90,7 @@ static void	DCrelease_nextchecks()
  *                                                                            *
  * Purpose: add item nextcheck to the array                                   *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
@@ -132,7 +114,7 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 		{
 			/* delete item */
 			memmove(&nextchecks[i], &nextchecks[i + 1], sz * (nextcheck_num - (i + 1)));
-			nextcheck_num --;
+			nextcheck_num--;
 		}
 		else
 			return;
@@ -149,7 +131,7 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 
 	nextchecks[i].itemid = itemid;
 	nextchecks[i].now = now;
-	nextchecks[i].error_msg = (NULL != error_msg ? strdup(error_msg) : NULL);
+	nextchecks[i].error_msg = (NULL != error_msg ? zbx_strdup(NULL, error_msg) : NULL);
 
 	nextcheck_num++;
 
@@ -162,13 +144,7 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
  *                                                                            *
  * Purpose: add item nextcheck to the array                                   *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev, Dmitry Borovikov                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCflush_nextchecks()
