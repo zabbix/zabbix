@@ -603,9 +603,11 @@ COpt::memoryPick();
 
 		if(bccomp($sysmapid, $elementid) == 0) return true;
 
-		$dbElements = DBselect('SELECT elementid, elementtype '.
-						' FROM sysmaps_elements '.
-						' WHERE sysmapid='.$elementid);
+		$sql = 'SELECT elementid, elementtype '.
+				' FROM sysmaps_elements '.
+				' WHERE sysmapid='.$elementid .
+					' AND elementtype='.SYSMAP_ELEMENT_TYPE_MAP;
+		$dbElements = DBselect($sql);
 
 		while($element = DBfetch($dbElements)){
 			if($this->checkCircleSelementsLink($sysmapid, $element['elementid'], $element['elementtype']))
