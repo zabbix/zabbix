@@ -82,9 +82,10 @@ include_once('include/page_header.php');
 
 		'showUnknown'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 //ajax
-		'favobj'=>			array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 	);
 
 	check_fields($fields);
@@ -93,6 +94,12 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
 			CProfile::update('web.events.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
+		// saving fixed/dynamic setting to profile
+		if('timelinefixedperiod' == $_REQUEST['favobj']){
+			if(isset($_REQUEST['favid'])){
+				CProfile::update('web.events.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
+			}
 		}
 	}
 
@@ -151,12 +158,12 @@ include_once('include/page_header.php');
 				$found = false;
 				foreach($newTrigger['functions'] as $fnum => $function){
 					foreach($oldTrigger['functions'] as $ofnum => $oldFunction){;
-// compare functions
+						// compare functions
 						if(($function['function'] != $oldFunction['function']) || ($function['parameter'] != $oldFunction['parameter'])) continue;
-// compare that functions uses same item keys
+						// compare that functions uses same item keys
 						if($newTrigger['items'][$function['itemid']]['key_'] != $oldTrigger['items'][$oldFunction['itemid']]['key_']) continue;
-// rewrite itemid so we could compare expressions
-// of two triggers form different hosts
+						// rewrite itemid so we could compare expressions
+						// of two triggers form different hosts
 						$newTrigger['functions'][$fnum]['itemid'] = $oldFunction['itemid'];
 						$found = true;
 
@@ -167,7 +174,7 @@ include_once('include/page_header.php');
 				}
 				if(!$found) continue;
 
-// if we found same trigger we overwriting it's hosts and items for expression compare
+				// if we found same trigger we overwriting it's hosts and items for expression compare
 				$newTrigger['hosts'] = $oldTrigger['hosts'];
 				$newTrigger['items'] = $oldTrigger['items'];
 
@@ -249,12 +256,12 @@ include_once('include/page_header.php');
 	// allow CSV export button
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
-	if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid']);
-	if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid']);
-	if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source']);
-	if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start']);
-	if(isset($_REQUEST['stime'])) $frmForm->addVar('stime', $_REQUEST['stime']);
-	if(isset($_REQUEST['period'])) $frmForm->addVar('period', $_REQUEST['period']);
+	if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
+	if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
+	if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
+	if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start'], 'start_csv');
+	if(isset($_REQUEST['stime'])) $frmForm->addVar('stime', $_REQUEST['stime'], 'stime_csv');
+	if(isset($_REQUEST['period'])) $frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
 	$buttons = new CDiv(array(
 		new CSubmit('csv_export', _('Export to CSV')),
 	));
@@ -277,8 +284,6 @@ include_once('include/page_header.php');
 		$filterForm->setAttribute('id', 'zbx_filter');
 
 		$filterForm->addVar('triggerid', get_request('triggerid'));
-		$filterForm->addVar('stime', get_request('stime'));
-		$filterForm->addVar('period', get_request('period'));
 		$filterForm->addVar('stime', get_request('stime'));
 		$filterForm->addVar('period', get_request('period'));
 
@@ -620,6 +625,15 @@ include_once('include/page_header.php');
 				else
 					$event['duration'] = zbx_date2age($event['clock']);
 
+				$statusSpan = new CSpan(trigger_value2str($event['value']));
+				// add colors and blinking to span depending on configuration and trigger parameters
+				addTriggerValueStyle(
+					$statusSpan,
+					$event['value'],
+					$event['clock'],
+					$event['acknowledged']
+				);
+
 				$table->addRow(array(
 					new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
@@ -628,7 +642,7 @@ include_once('include/page_header.php');
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 					$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 					new CSpan($tr_desc, 'link_menu'),
-					new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value'])),
+					$statusSpan,
 					getSeverityCell($trigger['priority'], null, !$event['value']),
 					$event['duration'],
 					($config['event_ack_enable'])?$ack:NULL,
@@ -678,9 +692,11 @@ include_once('include/page_header.php');
 		'loadImage' => 0,
 		'loadScroll' => 1,
 		'dynamic' => 0,
-		'mainObject' => 1
+		'mainObject' => 1,
+		'periodFixed' => CProfile::get('web.events.timelinefixed', 1)
 	);
 
+	zbx_add_post_js('jqBlink.init();');
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 	zbx_add_post_js('timeControl.processObjects();');
 

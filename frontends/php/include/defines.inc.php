@@ -19,15 +19,12 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.9.4');
+	define('ZABBIX_VERSION','1.9.5');
 	define('ZABBIX_API_VERSION','1.2');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
 	define('ZBX_LOGIN_BLOCK',				30); // sec
-
-	define('TRIGGER_FALSE_PERIOD',			1800);	// 30min, 0 - disable
-	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
 
 	define('ZBX_MIN_PERIOD',				3600);			// 1 hour
 	define('ZBX_MAX_PERIOD',				2*365*86400);	// ~2 years
@@ -477,6 +474,12 @@
 
 	define('SCREEN_TYPE_NORMAL', 0);
 	define('SCREEN_TYPE_TEMPLATED', 1);
+
+	define('DEFAULT_LATEST_ISSUES_CNT', 20);
+
+	define('SCREEN_SORT_TRIGGERS_DATE_DESC', 0);
+	define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC', 1);
+	define('SCREEN_SORT_TRIGGERS_HOST_NAME_ASC', 2);
 
 /* alignes */
 	define('HALIGN_DEFAULT',0);

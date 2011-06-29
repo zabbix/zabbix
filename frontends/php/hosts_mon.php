@@ -122,7 +122,7 @@ include_once('include/page_header.php');
 
 	$frmForm = new CForm();
 	$frmForm->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
-	$hosts_wdgt->addHeader(S_HOSTS_BIG, $frmForm);
+	$hosts_wdgt->addHeader(_('HOSTS'), $frmForm);
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');

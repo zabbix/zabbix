@@ -58,27 +58,28 @@ require_once('include/js.inc.php');
 			return S_UNKNOW;
 	}
 
-	function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
+	function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$sort_triggers,$valign,$halign,$style,$url,$dynamic){
 		$sql='DELETE FROM screens_items WHERE screenid='.$screenid.' and x='.$x.' and y='.$y;
 		DBexecute($sql);
 
 		$screenitemid=get_dbid("screens_items","screenitemid");
 		$result=DBexecute('INSERT INTO screens_items '.
 							'(screenitemid,resourcetype,screenid,x,y,resourceid,width,height,'.
-							' colspan,rowspan,elements,valign,halign,style,url,dynamic) '.
+							' colspan,rowspan,elements,valign,halign,style,url,dynamic,sort_triggers) '.
 						' VALUES '.
 							"($screenitemid,$resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,".
-							"$rowspan,$elements,$valign,$halign,$style,".zbx_dbstr($url).",$dynamic)");
+							"$rowspan,$elements,$valign,$halign,$style,".zbx_dbstr($url).",$dynamic,$sort_triggers)");
 
 		if(!$result) return $result;
 	return $screenitemid;
 	}
 
-	function update_screen_item($screenitemid,$resourcetype,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url,$dynamic){
+	function update_screen_item($screenitemid,$resourcetype,$resourceid,$width,$height,$colspan,$rowspan,$elements,$sort_triggers,$valign,$halign,$style,$url,$dynamic){
 		return  DBexecute("UPDATE screens_items SET ".
 							"resourcetype=$resourcetype,"."resourceid=$resourceid,"."width=$width,".
 							"height=$height,colspan=$colspan,rowspan=$rowspan,elements=$elements,".
-							"valign=$valign,halign=$halign,style=$style,url=".zbx_dbstr($url).",dynamic=$dynamic".
+							"valign=$valign,halign=$halign,style=$style,url=".zbx_dbstr($url).",".
+							"dynamic=$dynamic,sort_triggers=$sort_triggers".
 						" WHERE screenitemid=$screenitemid");
 	}
 
@@ -454,6 +455,7 @@ require_once('include/js.inc.php');
 			$style		= $screenItem['style'];
 			$url		= $screenItem['url'];
 			$dynamic	= $screenItem['dynamic'];
+			$sort_triggers  = $screenItem['sort_triggers'];
 		}
 		else{
 			$resourcetype	= get_request('resourcetype',	0);
@@ -468,6 +470,7 @@ require_once('include/js.inc.php');
 			$style		= get_request('style',		0);
 			$url		= get_request('url',		'');
 			$dynamic	= get_request('dynamic',	SCREEN_SIMPLE_ITEM);
+			$sort_triggers  = get_request('sort_triggers',  SCREEN_SORT_TRIGGERS_DATE_DESC);
 		}
 
 		$form->addVar('screenid',$_REQUEST['screenid']);
@@ -489,7 +492,7 @@ require_once('include/js.inc.php');
 // User-defined graph
 			$options = array(
 				'graphids' => $resourceid,
-				'selectHosts' => array('hostid', 'host', 'status'),
+				'selectHosts' => array('hostid', 'name', 'status'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$graphs = API::Graph()->get($options);
@@ -501,11 +504,11 @@ require_once('include/js.inc.php');
 				$id = $resourceid;
 				$graph = reset($graphs);
 
-				order_result($graph['hosts'], 'host');
+				order_result($graph['hosts'], 'name');
 				$graph['host'] = reset($graph['hosts']);
 
 				if($graph['host']['status'] != HOST_STATUS_TEMPLATE)
-					$caption = $graph['host']['host'].':'.$graph['name'];
+					$caption = $graph['host']['name'].':'.$graph['name'];
 				else
 					$caption = $graph['name'];
 
@@ -538,7 +541,7 @@ require_once('include/js.inc.php');
 // Simple graph
 			$options = array(
 				'itemids' => $resourceid,
-				'selectHosts' => array('hostid', 'host', 'status'),
+				'selectHosts' => array('hostid', 'name', 'status'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$items = API::Item()->get($options);
@@ -553,7 +556,7 @@ require_once('include/js.inc.php');
 				$item['host'] = reset($item['hosts']);
 
 				if($item['host']['status'] != HOST_STATUS_TEMPLATE)
-					$caption = $item['host']['host'].':'.itemName($item);
+					$caption = $item['host']['name'].':'.itemName($item);
 				else
 					$caption = itemName($item);
 
@@ -656,7 +659,7 @@ require_once('include/js.inc.php');
 			$form->addRow(S_SHOW_TEXT_AS_HTML, new CCheckBox('style', $style, null, 1));
 		}
 		else if(in_array($resourcetype, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,SCREEN_RESOURCE_HOST_TRIGGERS))){
-// Status of triggers
+			// Status of triggers
 			$caption = '';
 			$id=0;
 
@@ -692,7 +695,7 @@ require_once('include/js.inc.php');
 
 					$hosts = API::Host()->get($options);
 					foreach($hosts as $hnum => $host){
-						$caption = get_node_name_by_elid($host['hostid'], true, ':').$host['host'];
+						$caption = get_node_name_by_elid($host['hostid'], true, ':').$host['name'];
 						$id = $resourceid;
 					}
 				}
@@ -705,7 +708,22 @@ require_once('include/js.inc.php');
 				$form->addRow(S_HOST,array($textfield,SPACE,$selectbtn));
 			}
 
+			// text box to choose number of lines shown
 			$form->addRow(S_SHOW_LINES, new CNumericBox('elements', $elements, 2));
+			// combobox to choose trigger sort order
+			$form->addRow(
+				_('Sort triggers by'),
+				new CComboBox(
+					'sort_triggers',
+					$sort_triggers,
+					null,
+					array(
+						SCREEN_SORT_TRIGGERS_DATE_DESC => _('Last change (descending)'),
+						SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity (descending)'),
+						SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host (ascending)')
+					)
+				)
+			);
 		}
 		else if(in_array($resourcetype, array(SCREEN_RESOURCE_EVENTS, SCREEN_RESOURCE_ACTIONS))){
 // History of actions
@@ -798,7 +816,7 @@ require_once('include/js.inc.php');
 
 				while($row=DBfetch($result)){
 					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].S_MINUS_ALL_GROUPS_MINUS;
+					$caption = $row['node_name']._('- all groups -');
 					$id = $resourceid;
 				}
 			}
@@ -989,6 +1007,7 @@ require_once('include/js.inc.php');
 					$style		= $screenItem['style'];
 					$url		= $screenItem['url'];
 					$dynamic	= $screenItem['dynamic'];
+					$sort_triggers = $screenItem['sort_triggers'];
 				}
 				else{
 					$screenitemid	= 0;
@@ -1004,6 +1023,7 @@ require_once('include/js.inc.php');
 					$style		= 0;
 					$url		= '';
 					$dynamic	= 0;
+					$sort_triggers = SCREEN_SORT_TRIGGERS_DATE_DESC;
 				}
 
 				if($screenitemid>0){
@@ -1138,7 +1158,8 @@ require_once('include/js.inc.php');
 						'loadSBox' => 0,
 						'loadImage' => 1,
 						'loadScroll' => 0,
-						'dynamic' => 0
+						'dynamic' => 0,
+						'periodFixed' => CProfile::get('web.screens.timelinefixed', 1)
 					);
 
 					$default = false;
@@ -1220,7 +1241,8 @@ require_once('include/js.inc.php');
 						'loadSBox' => 0,
 						'loadImage' => 1,
 						'loadScroll' => 0,
-						'dynamic' => 0
+						'dynamic' => 0,
+						'periodFixed' => CProfile::get('web.screens.timelinefixed', 1)
 					);
 
 // Host feature
@@ -1314,6 +1336,7 @@ require_once('include/js.inc.php');
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOSTGROUP_TRIGGERS)){
+
 					$params = array(
 						'groupids' => null,
 						'hostids' => null,
@@ -1321,6 +1344,20 @@ require_once('include/js.inc.php');
 						'severity' => null,
 						'limit' => $elements
 					);
+
+					// by default triggers are sorted by date desc, do we need to override this?
+					switch($sort_triggers){
+						case SCREEN_SORT_TRIGGERS_SEVERITY_DESC:
+							$params['sortfield'] = 'priority';
+							$params['sortorder'] = ZBX_SORT_DOWN;
+						break;
+						case SCREEN_SORT_TRIGGERS_HOST_NAME_ASC:
+							// a little black magic here - there is no such field 'hostname' in 'triggers',
+							// but API has a special case for sorting by hostname
+							$params['sortfield'] = 'hostname';
+							$params['sortorder'] = ZBX_SORT_UP;
+						break;
+					}
 
 					$tr_form = S_ALL_S;
 					if($resourceid > 0){
@@ -1390,13 +1427,16 @@ require_once('include/js.inc.php');
 						if($hostid > 0) $params['hostids'] = $hostid;
 					}
 
-					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT)), $tr_form));
-					$item[] = make_latest_issues($params);
+					$item = new CUIWidget('hat_htstatus',make_latest_issues($params, true));
+					$item->setHeader(
+						array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE, $tr_form)
+					);
+					$item = array($item);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 ///-----------------------
 				}
-				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOST_TRIGGERS)){
+				else if($screenitemid!=0 && $resourcetype==SCREEN_RESOURCE_HOST_TRIGGERS){
 					$params = array(
 						'groupids' => null,
 						'hostids' => null,
@@ -1404,6 +1444,21 @@ require_once('include/js.inc.php');
 						'severity' => null,
 						'limit' => $elements
 					);
+
+					// by default triggers are sorted by date desc, do we need to override this?
+					switch($sort_triggers){
+						case SCREEN_SORT_TRIGGERS_SEVERITY_DESC:
+							$params['sortfield'] = 'priority';
+							$params['sortorder'] = ZBX_SORT_DOWN;
+						break;
+						case SCREEN_SORT_TRIGGERS_HOST_NAME_ASC:
+							// a little black magic here - there is no such field 'hostname' in 'triggers',
+							// but API has a special case for sorting by hostname
+							$params['sortfield'] = 'hostname';
+							$params['sortorder'] = ZBX_SORT_UP;
+						break;
+					}
+
 					$tr_form = S_ALL_S;
 
 					if($resourceid > 0){
@@ -1474,8 +1529,11 @@ require_once('include/js.inc.php');
 					}
 ///-----------------------
 
-					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT)), $tr_form));
-					$item[] = make_latest_issues($params);
+					$item = new CUIWidget('hat_trstatus',make_latest_issues($params, true));
+					$item->setHeader(
+						array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE, $tr_form)
+					);
+					$item = array($item);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
@@ -1624,7 +1682,7 @@ require_once('include/js.inc.php');
 					}
 
 					$item = new CTableInfo(S_NO_EVENTS_FOUND);
-					$item->SetHeader(array(
+					$item->setHeader(array(
 							S_TIME,
 							is_show_all_nodes() ? S_NODE : null,
 							S_HOST,
@@ -1634,14 +1692,18 @@ require_once('include/js.inc.php');
 							));
 
 					$events = getLastEvents($options);
-					foreach($events as $enum => $event){
+					foreach($events as $event){
 						$trigger = $event['trigger'];
 						$host = $event['host'];
 
-						$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
-
-//						$row = zbx_array_merge($triggers[$row['triggerid']],$row);
-//						if((1 == $showUnknown) && (!event_initial_time($row,$showUnknown))) continue;
+						$statusSpan = new CSpan(trigger_value2str($event['value']));
+						// add colors and blinking to span depending on configuration and trigger parameters
+						addTriggerValueStyle(
+							$statusSpan,
+							$event['value'],
+							$event['clock'],
+							$event['acknowledged']
+						);
 
 						$item->addRow(array(
 							zbx_date2str(S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT,$event['clock']),
@@ -1651,10 +1713,12 @@ require_once('include/js.inc.php');
 								$trigger['description'],
 								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']
 							),
-							$value,
+							$statusSpan,
 							getSeverityCell($trigger['priority']),
 						));
 					}
+
+					zbx_add_post_js('jqBlink.init();');
 
 					$item = array($item);
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));

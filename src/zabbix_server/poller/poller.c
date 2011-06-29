@@ -70,7 +70,8 @@ static void	update_key_status(zbx_uint64_t hostid, int host_status, zbx_timespec
 		init_result(&agent);
 		SET_UI64_RESULT(&agent, host_status);
 
-		dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent, ts, 0, NULL, 0, 0, 0, 0);
+		dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent, ts,
+				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 
 		free_result(&agent);
 	}
@@ -399,7 +400,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in"));
 			res = NOTSUPPORTED;
-#endif	/* HAVE_SSH2 */
+#endif
 			break;
 		case ITEM_TYPE_TELNET:
 			alarm(CONFIG_TIMEOUT);
@@ -471,10 +472,7 @@ static int	get_values(unsigned char poller_type)
 	if (0 == num)
 		goto exit;
 
-	DCinit_nextchecks();
-
 	/* prepare items */
-
 	for (i = 0; i < num; i++)
 	{
 		init_result(&results[i]);
@@ -586,7 +584,6 @@ static int	get_values(unsigned char poller_type)
 	}
 
 	/* retrieve item values */
-
 	if (SUCCEED == errcodes[0])
 	{
 		if (SUCCEED != is_bunch_poller(poller_type))
@@ -603,7 +600,6 @@ static int	get_values(unsigned char poller_type)
 	}
 
 	/* process item values */
-
 	for (i = 0; i < num; i++)
 	{
 		switch (errcodes[i])
@@ -624,22 +620,16 @@ static int	get_values(unsigned char poller_type)
 
 		if (SUCCEED == errcodes[i])
 		{
-			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
-					&timespecs[i], 0, NULL, 0, 0, 0, 0);
+			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespecs[i],
+					ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, timespecs[i].sec);
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i])
 		{
-			if (ITEM_STATUS_NOTSUPPORTED != items[i].status)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] is not supported",
-						items[i].host.host, items[i].key_orig);
-				zabbix_syslog("Item [%s:%s] is not supported",
-						items[i].host.host, items[i].key_orig);
-			}
+			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespecs[i],
+					ITEM_STATUS_NOTSUPPORTED, results[i].msg, 0, NULL, 0, 0, 0, 0);
 
-			DCadd_nextcheck(items[i].itemid, timespecs[i].sec, results[i].msg);
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, timespecs[i].sec);
 		}
 		else if (NETWORK_ERROR == errcodes[i] || PROXY_ERROR == errcodes[i])
@@ -684,8 +674,6 @@ static int	get_values(unsigned char poller_type)
 
 		free_result(&results[i]);
 	}
-
-	DCflush_nextchecks();
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
 

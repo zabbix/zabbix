@@ -51,20 +51,20 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	init_result(result);
 
 	if (0 != strncmp(item->key, "zabbix[", 7))
-		goto not_supported;
+		goto notsupported;
 
 	if (parse_command(item->key, NULL, 0, params, sizeof(params)) != 2)
-		goto not_supported;
+		goto notsupported;
 
 	if (get_param(params, 1, tmp, sizeof(tmp)) != 0)
-		goto not_supported;
+		goto notsupported;
 
 	nparams = num_param(params);
 
 	if (0 == strcmp(tmp, "triggers"))		/* zabbix["triggers"] */
 	{
 		if (1 != nparams)
-			goto not_supported;
+			goto notsupported;
 
 		i = DBget_row_count("triggers");
 		SET_UI64_RESULT(result, i);
@@ -72,7 +72,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "items"))		/* zabbix["items"] */
 	{
 		if (1 != nparams)
-			goto not_supported;
+			goto notsupported;
 
 		i = DBget_row_count("items");
 		SET_UI64_RESULT(result, i);
@@ -80,7 +80,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix["items_unsupported"] */
 	{
 		if (1 != nparams)
-			goto not_supported;
+			goto notsupported;
 
 		i = DBget_items_unsupported_count();
 		SET_UI64_RESULT(result, i);
@@ -92,7 +92,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			0 == strcmp(tmp, "history_uint"))	/* zabbix["history_uint"] */
 	{
 		if (1 != nparams)
-			goto not_supported;
+			goto notsupported;
 
 		i = DBget_row_count(tmp);
 		SET_UI64_RESULT(result, i);
@@ -101,7 +101,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			0 == strcmp(tmp, "trends_uint"))	/* zabbix["trends_uint"] */
 	{
 		if (1 != nparams)
-			goto not_supported;
+			goto notsupported;
 
 		i = DBget_row_count(tmp);
 		SET_UI64_RESULT(result, i);
@@ -111,16 +111,16 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		int	from = 6, to = (-1);
 
 		if (nparams > 3)
-			goto not_supported;
+			goto notsupported;
 
 		if (nparams >= 2)
 		{
 			if (get_param(params, 2, tmp, sizeof(tmp)) != 0)
-				goto not_supported;
+				goto notsupported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
 			{
 				error = zbx_strdup(error, "Second parameter is badly formatted");
-				goto not_supported;
+				goto notsupported;
 			}
 			else
 				from = (*tmp != '\0' ? str2uint(tmp) : 6);
@@ -129,11 +129,11 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (nparams >= 3)
 		{
 			if (get_param(params, 3, tmp, sizeof(tmp)) != 0)
-				goto not_supported;
+				goto notsupported;
 			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
 			{
 				error = zbx_strdup(error, "Third parameter is badly formatted");
-				goto not_supported;
+				goto notsupported;
 			}
 			else
 				to = (*tmp != '\0' ? str2uint(tmp) : -1);
@@ -142,7 +142,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (from > to && -1 != to)
 		{
 			error = zbx_strdup(error, "Parameters represent an invalid interval");
-			goto not_supported;
+			goto notsupported;
 		}
 
 		i = DBget_queue_count(from, to);
@@ -151,14 +151,14 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix["requiredperformance"] */
 	{
 		if (1 != nparams)
-			goto not_supported;
+			goto notsupported;
 
 		SET_DBL_RESULT(result, DBget_requiredperformance());
 	}
 	else if (0 == strcmp(tmp, "uptime"))		/* zabbix["uptime"] */
 	{
 		if (1 != nparams)
-			goto not_supported;
+			goto notsupported;
 
 		i = time(NULL) - CONFIG_SERVER_STARTUP_TIME;
 		SET_UI64_RESULT(result, i);
@@ -166,7 +166,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "boottime"))		/* zabbix["boottime"] */
 	{
 		if (1 != nparams)
-			goto not_supported;
+			goto notsupported;
 
 		i = CONFIG_SERVER_STARTUP_TIME;
 		SET_UI64_RESULT(result, i);
@@ -174,21 +174,21 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "proxy"))		/* zabbix["proxy",<hostname>,"lastaccess"] */
 	{
 		if (3 != nparams)
-			goto not_supported;
+			goto notsupported;
 
 		if (get_param(params, 2, tmp1, sizeof(tmp1)) != 0)
-			goto not_supported;
+			goto notsupported;
 
 		if (get_param(params, 3, tmp, sizeof(tmp)) != 0)
-			goto not_supported;
+			goto notsupported;
 
 		if (0 == strcmp(tmp, "lastaccess"))
 		{
 			if (FAIL == DBget_proxy_lastaccess(tmp1, &lastaccess, &error))
-				goto not_supported;
+				goto notsupported;
 		}
 		else
-			goto not_supported;
+			goto notsupported;
 
 		SET_UI64_RESULT(result, lastaccess);
 	}
@@ -201,7 +201,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		alarm(0);
 
 		if (SUCCEED != res)
-			goto not_supported;
+			goto notsupported;
 	}
 	else if (0 == strcmp(tmp, "process"))		/* zabbix["process",<type>,<mode>,<state>] */
 	{
@@ -212,13 +212,13 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (nparams > 4)
 		{
 			error = zbx_strdup(error, "Too many parameters");
-			goto not_supported;
+			goto notsupported;
 		}
 
 		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
 		{
 			error = zbx_strdup(error, "Required second parameter missing");
-			goto not_supported;
+			goto notsupported;
 		}
 
 		for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
@@ -228,7 +228,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (ZBX_PROCESS_TYPE_COUNT == process_type)
 		{
 			error = zbx_strdup(error, "Invalid second parameter");
-			goto not_supported;
+			goto notsupported;
 		}
 
 		process_forks = get_process_type_forks(process_type);
@@ -241,7 +241,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			if (nparams > 3)
 			{
 				error = zbx_strdup(error, "Too many parameters");
-				goto not_supported;
+				goto notsupported;
 			}
 
 			SET_UI64_RESULT(result, process_forks);
@@ -262,20 +262,20 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			else
 			{
 				error = zbx_strdup(error, "Invalid third parameter");
-				goto not_supported;
+				goto notsupported;
 			}
 
 			if (0 == process_forks)
 			{
 				error = zbx_dsprintf(error, "No \"%s\" processes started",
 						get_process_type_string(process_type));
-				goto not_supported;
+				goto notsupported;
 			}
 			else if (process_num > process_forks)
 			{
 				error = zbx_dsprintf(error, "\"%s\" #%d is not started",
 						get_process_type_string(process_type), process_num);
-				goto not_supported;
+				goto notsupported;
 			}
 
 			if (0 != get_param(params, 4, tmp, sizeof(tmp)))
@@ -288,7 +288,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			else
 			{
 				error = zbx_strdup(error, "Invalid fourth parameter");
-				goto not_supported;
+				goto notsupported;
 			}
 
 			get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
@@ -299,10 +299,10 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	else if (0 == strcmp(tmp, "wcache"))
 	{
 		if (nparams > 3)
-			goto not_supported;
+			goto notsupported;
 
 		if (get_param(params, 2, tmp, sizeof(tmp)) != 0)
-			goto not_supported;
+			goto notsupported;
 
 		if (get_param(params, 3, tmp1, sizeof(tmp1)) != 0)
 			*tmp1 = '\0';
@@ -321,8 +321,10 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_LOG_COUNTER));
 			else if (0 == strcmp(tmp1, "text"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_TEXT_COUNTER));
+			else if (0 == strcmp(tmp1, "not supported"))
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_NOTSUPPORTED_COUNTER));
 			else
-				goto not_supported;
+				goto notsupported;
 		}
 		else if (0 == strcmp(tmp, "history"))
 		{
@@ -335,7 +337,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			else if (0 == strcmp(tmp1, "free"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_FREE));
 			else
-				goto not_supported;
+				goto notsupported;
 		}
 		else if (0 == strcmp(tmp, "trend"))
 		{
@@ -348,7 +350,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			else if (0 == strcmp(tmp1, "free"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_TREND_FREE));
 			else
-				goto not_supported;
+				goto notsupported;
 		}
 		else if (0 == strcmp(tmp, "text"))
 		{
@@ -361,18 +363,18 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			else if (0 == strcmp(tmp1, "free"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_TEXT_FREE));
 			else
-				goto not_supported;
+				goto notsupported;
 		}
 		else
-			goto not_supported;
+			goto notsupported;
 	}
 	else if (0 == strcmp(tmp, "rcache"))
 	{
 		if (nparams > 3)
-			goto not_supported;
+			goto notsupported;
 
 		if (get_param(params, 2, tmp, sizeof(tmp)) != 0)
-			goto not_supported;
+			goto notsupported;
 
 		if (get_param(params, 3, tmp1, sizeof(tmp1)) != 0)
 			*tmp1 = '\0';
@@ -388,17 +390,16 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			else if (0 == strcmp(tmp1, "free"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_FREE));
 			else
-				goto not_supported;
+				goto notsupported;
 		}
 		else
-			goto not_supported;
+			goto notsupported;
 	}
 	else
-		goto not_supported;
+		goto notsupported;
 
 	return SUCCEED;
-
-not_supported:
+notsupported:
 	if (!ISSET_MSG(result))
 	{
 		if (NULL == error)

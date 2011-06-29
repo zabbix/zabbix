@@ -192,8 +192,8 @@ require_once('include/views/js/configuration.action.edit.js.php');
 				new CTextBox('hostname','',40,'yes'),
 				new CButton('btn1',_('Select'),
 					"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-					"&dstfld1=new_condition_value&dstfld2=host&srctbl=hosts".
-					"&srcfld1=hostid&srcfld2=host',450,450);",
+					"&dstfld1=new_condition_value&dstfld2=hostname&srctbl=hosts".
+					"&srcfld1=hostid&srcfld2=name',450,450);",
 					'link_menu'));
 			break;
 		case CONDITION_TYPE_TRIGGER:
