@@ -2184,7 +2184,6 @@ function populateFromMapAreas(array &$map){
 
 			$areas[] = $area;
 
-
 			foreach($map['links'] as $link){
 				// don not multiply links between two areas
 				if(($map['selements'][$link['selementid1']]['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
