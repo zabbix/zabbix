@@ -38,7 +38,7 @@ static void	DBget_lastsize()
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		DBexecute("insert into globalvars (globalvarid, snmp_lastsize) values (1,0)");
+		DBexecute("insert into globalvars (globalvarid,snmp_lastsize) values (1,0)");
 		trap_lastsize = 0;
 	}
 	else
