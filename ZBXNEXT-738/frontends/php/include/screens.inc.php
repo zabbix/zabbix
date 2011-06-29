@@ -1427,8 +1427,11 @@ require_once('include/js.inc.php');
 						if($hostid > 0) $params['hostids'] = $hostid;
 					}
 
-					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT)), $tr_form));
-					$item[] = make_latest_issues($params, true); // true means 'show status'
+					$item = new CUIWidget('hat_htstatus',make_latest_issues($params, true));
+					$item->setHeader(
+						array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE, $tr_form)
+					);
+					$item = array($item);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 ///-----------------------
@@ -1526,8 +1529,11 @@ require_once('include/js.inc.php');
 					}
 ///-----------------------
 
-					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT)), $tr_form));
-					$item[] = make_latest_issues($params, true); // true means 'show status'
+					$item = new CUIWidget('hat_trstatus',make_latest_issues($params, true));
+					$item->setHeader(
+						array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE, $tr_form)
+					);
+					$item = array($item);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
@@ -1676,7 +1682,7 @@ require_once('include/js.inc.php');
 					}
 
 					$item = new CTableInfo(S_NO_EVENTS_FOUND);
-					$item->SetHeader(array(
+					$item->setHeader(array(
 							S_TIME,
 							is_show_all_nodes() ? S_NODE : null,
 							S_HOST,
