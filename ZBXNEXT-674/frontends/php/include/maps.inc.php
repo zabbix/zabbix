@@ -609,6 +609,7 @@ function add_elementNames(&$selements){
 	$triggers = API::Trigger()->get(array(
 			'triggerids' => $triggerids,
 			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('name'),
 			'nopermissions' => 1,
 			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true,
@@ -639,7 +640,8 @@ function add_elementNames(&$selements){
 				$selements[$snum]['elementName'] = $maps[$selement['elementid']]['name'];
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$selements[$snum]['elementName'] = expand_trigger_description_by_data($triggers[$selement['elementid']]);
+				$hostname = reset($triggers[$selement['elementid']]['hosts']);
+				$selements[$snum]['elementName'] = $hostname['name'] . ':' . expand_trigger_description_by_data($triggers[$selement['elementid']]);
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 				$selements[$snum]['elementName'] = $hostgroups[$selement['elementid']]['name'];
