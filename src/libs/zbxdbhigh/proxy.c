@@ -1273,7 +1273,7 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	return proxy_get_history_data(j, &areg, lastid);
 }
 
-static void	calc_timestamp(char *line, int *timestamp, char *format)
+void	calc_timestamp(char *line, int *timestamp, char *format)
 {
 
 	const char	*__function_name = "calc_timestamp";

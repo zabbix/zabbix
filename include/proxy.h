@@ -62,6 +62,8 @@ void	proxy_set_hist_lastid(const zbx_uint64_t lastid);
 void	proxy_set_dhis_lastid(const zbx_uint64_t lastid);
 void	proxy_set_areg_lastid(const zbx_uint64_t lastid);
 
+void	calc_timestamp(char *line, int *timestamp, char *format);
+
 void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		AGENT_VALUE *values, int value_num, int *processed);
 int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
