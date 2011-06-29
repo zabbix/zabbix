@@ -73,8 +73,12 @@ sub zabbix_receiver
 		$hostname = $1 || 'unknown';
 	}
 
-	# print trap header - the format is "ZBXTRAP [IP] [TIMESTAMP]"
-	printf OUTPUT_FILE "ZBXTRAP %s %s\n", $hostname, strftime($DateTimeFormat, localtime);
+	# print trap header
+	#       timestamp must be placed at the beggining of the first line (can be omitted)
+	#       the first line must include the header "ZBXTRAP [IP] "
+	#              * IP is the used to find the corresponding SNMP trap items
+	#              * this header will be cut during processing (will not appear in the item value)
+	printf OUTPUT_FILE "%s ZBXTRAP %s\n", strftime($DateTimeFormat, localtime), $hostname;
 
 	# print the PDU info
 	print OUTPUT_FILE "PDU INFO:\n";
