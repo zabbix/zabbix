@@ -3,5 +3,3 @@ CREATE TABLE globalvars (
 	snmp_lastsize            integer         DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (globalvarid)
 ) with OIDS;
-
-INSERT INTO globalvars VALUES (1,0);

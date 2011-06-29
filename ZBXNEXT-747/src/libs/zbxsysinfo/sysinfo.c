@@ -450,10 +450,10 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 		i += (int)strlen(usr_cmd);
 
-#define COLUMN_2_X 45 /* max space count */
+#define COLUMN_2_X 45	/* max space count */
 		i = (i > COLUMN_2_X ? 1 : COLUMN_2_X - i);
 
-		printf("%-*.*s", i, i, " "); /* print spaces */
+		printf("%-*.*s", i, i, " ");	/* print spaces */
 	}
 
 	if (NOTSUPPORTED == err)
