@@ -70,6 +70,46 @@ ALTER TABLE config ADD severity_name_5 varchar(32) WITH DEFAULT 'Disaster' NOT N
 /
 REORG TABLE config
 /
+ALTER TABLE config ADD ok_period integer WITH DEFAULT '1800' NOT NULL
+/
+REORG TABLE config
+/
+ALTER TABLE config ADD blink_period integer WITH DEFAULT '1800' NOT NULL
+/
+REORG TABLE config
+/
+ALTER TABLE config ADD problem_unack_color varchar(6) WITH DEFAULT 'DC0000' NOT NULL
+/
+REORG TABLE config
+/
+ALTER TABLE config ADD problem_ack_color varchar(6) WITH DEFAULT 'DC0000' NOT NULL
+/
+REORG TABLE config
+/
+ALTER TABLE config ADD ok_unack_color varchar(6) WITH DEFAULT '00AA00' NOT NULL
+/
+REORG TABLE config
+/
+ALTER TABLE config ADD ok_ack_color varchar(6) WITH DEFAULT '00AA00' NOT NULL
+/
+REORG TABLE config
+/
+ALTER TABLE config ADD problem_unack_style integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE config
+/
+ALTER TABLE config ADD problem_ack_style integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE config
+/
+ALTER TABLE config ADD ok_unack_style integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE config
+/
+ALTER TABLE config ADD ok_ack_style integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE config
+/
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT alert_usrgrpid IN (SELECT usrgrpid FROM usrgrp)
 /
 UPDATE config SET discovery_groupid=NULL WHERE NOT discovery_groupid IN (SELECT groupid FROM groups)

@@ -79,7 +79,13 @@ function encodeValues(&$value, $encodeTwice=true){
 function zbx_add_post_js($script){
 	global $ZBX_PAGE_POST_JS;
 
-	$ZBX_PAGE_POST_JS[] = $script;
+	if(!isset($ZBX_PAGE_POST_JS)){
+		$ZBX_PAGE_POST_JS = array();
+	}
+
+	if(!in_array($script, $ZBX_PAGE_POST_JS)){
+		$ZBX_PAGE_POST_JS[] = $script;
+	}
 }
 
 function zbx_addJSLocale($to_translate){
