@@ -37,9 +37,6 @@
 
 include_once('include/page_header.php');
 
-// js templates
-require_once('include/views/js/general.script.confirm.js.php');
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -89,6 +86,9 @@ require_once('include/views/js/general.script.confirm.js.php');
 		include_once('include/page_footer.php');
 		exit();
 	}
+
+// js templates
+	require_once('include/views/js/general.script.confirm.js.php');
 
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
