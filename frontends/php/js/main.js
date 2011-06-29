@@ -597,7 +597,7 @@ var jqBlink = {
 	 * Initialize blinking
 	 */
 	init: function(){
-		if(this.objects.length == 0){
+		if(this.objects.length === 0){
 			this.findObjects();
 		}
 		this.blink();
@@ -619,7 +619,7 @@ var jqBlink = {
 		// I close my eyes only for a moment, and a moment's gone
 		this.secondsSinceInit += this.blinkInterval / 1000;
 		// repeating this function with delay
-		setTimeout('jqBlink.blink()', this.blinkInterval);
+		setTimeout(jQuery.proxy(this.blink, this), this.blinkInterval);
 	},
 
 	/**
@@ -633,13 +633,15 @@ var jqBlink = {
 	 * Check all currently found objects and exclude ones that should stop blinking by now
 	 */
 	filterOutNonBlinking: function(){
-		var secondsSinceInit = this.secondsSinceInit;
-		this.objects = this.objects.filter(function() {
-			if(jQuery(this).data('time-to-blink') !== undefined){
-				var shouldBlink =  parseInt(jQuery(this).data('time-to-blink')) > secondsSinceInit;
+		var that = this;
+
+		this.objects = this.objects.filter(function(){
+			var obj = jQuery(this);
+			if(typeof obj.data('timeToBlink') !== 'undefined'){
+				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
 				// if object stops blinking, it should be left visible
-				if(!shouldBlink && !this.shown){
-					jQuery(this).css('visibility', 'visible');
+				if(!shouldBlink && !that.shown){
+					obj.css('visibility', 'visible');
 				}
 				return shouldBlink;
 			}
