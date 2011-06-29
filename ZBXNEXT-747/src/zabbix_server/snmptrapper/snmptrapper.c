@@ -22,6 +22,7 @@
 #include "zbxself.h"
 #include "daemon.h"
 #include "log.h"
+#include "proxy.h"
 #include "snmptrapper.h"
 
 static int	trap_fd = -1;
@@ -65,18 +66,20 @@ static zbx_uint64_t	get_fallback_interface()
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	set_item_value(DC_ITEM *item, char *trap, zbx_timespec_t *ts, int timestamp)
+static void	set_item_value(DC_ITEM *item, char *trap, zbx_timespec_t *ts)
 {
 	AGENT_RESULT	value;
-	char		*c;
+	int		timestamp = 0;
 
 	init_result(&value);
 
-	if (ITEM_VALUE_TYPE_LOG == item->value_type && 0 != timestamp && NULL != (c = strchr(trap, ' ')))
-		trap = ++c;
-
 	if (SUCCEED == set_result_type(&value, item->value_type, item->data_type, trap))
+	{
+		if (ITEM_VALUE_TYPE_LOG == item->value_type)
+			calc_timestamp(trap, &timestamp, item->logtimefmt);
+
 		dc_add_history(item->itemid, item->value_type, item->flags, &value, ts, timestamp, NULL, 0, 0, 0, 0);
+	}
 	else
 		DCadd_nextcheck(item->itemid, ts->sec, value.msg);
 
@@ -95,7 +98,7 @@ static void	set_item_value(DC_ITEM *item, char *trap, zbx_timespec_t *ts, int ti
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts, int timestamp)
+static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_timespec_t *ts)
 {
 	DC_ITEM		*items = NULL;
 	char		cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], regex[MAX_STRING_LEN];
@@ -121,13 +124,13 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			continue;
 
 		ret = SUCCEED;
-		set_item_value(&items[i], trap, ts, timestamp);
+		set_item_value(&items[i], trap, ts);
 	}
 
 	if (FAIL == ret && -1 != fallback)
 	{
 		ret = SUCCEED;
-		set_item_value(&items[fallback], trap, ts, timestamp);
+		set_item_value(&items[fallback], trap, ts);
 	}
 
 	zbx_free(items);
@@ -152,25 +155,24 @@ static void	process_trap(char *ip, char *begin, char *end)
 {
 	zbx_timespec_t	ts;
 	zbx_uint64_t	*interfaceids = NULL, fallback_interfaceid;
-	int		count, i, ret = FAIL, timestamp;
+	int		count, i, ret = FAIL;
 	char		*trap = NULL;
 
 	zbx_timespec(&ts);
 	trap = zbx_dsprintf(trap, "%s%s", begin, end);
-	timestamp = atoi(trap);
 
 	count = DCconfig_get_snmp_interfaceids(ip, &interfaceids);
 
 	for (i = 0; i < count; i++)
 	{
-		if (SUCCEED == process_trap_for_interface(interfaceids[i], trap, &ts, timestamp))
+		if (SUCCEED == process_trap_for_interface(interfaceids[i], trap, &ts))
 			ret = SUCCEED;
 	}
 
 	if (FAIL == ret && FAIL != (fallback_interfaceid = get_fallback_interface()))
 	{
 		trap = zbx_dsprintf(trap, "%s: %s%s", ip, begin, end);	/* print the IP for the global fallback */
-		process_trap_for_interface(fallback_interfaceid, trap, &ts, timestamp);
+		process_trap_for_interface(fallback_interfaceid, trap, &ts);
 	}
 
 	zbx_free(interfaceids);
