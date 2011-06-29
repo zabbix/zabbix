@@ -549,7 +549,7 @@ COpt::memoryPick();
 			}
 
 			if($this->checkCircleSelementsLink($dbSelement['sysmapid'], $dbSelement['elementid'], $dbSelement['elementtype'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Circular link can not be created for map element "%s"', $dbSelement['label']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Circular link cannot be created for map element "%s".', $dbSelement['label']));
 			}
 		}
 		unset($selement);
