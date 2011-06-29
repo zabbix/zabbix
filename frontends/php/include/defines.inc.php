@@ -26,9 +26,6 @@
 	define('ZBX_LOGIN_ATTEMPTS',			5);
 	define('ZBX_LOGIN_BLOCK',				30); // sec
 
-	define('TRIGGER_FALSE_PERIOD',			1800);	// 30min, 0 - disable
-	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
-
 	define('ZBX_MIN_PERIOD',				3600);			// 1 hour
 	define('ZBX_MAX_PERIOD',				2*365*86400);	// ~2 years
 	define('ZBX_PERIOD_DEFAULT',			3600);			// 1 hour

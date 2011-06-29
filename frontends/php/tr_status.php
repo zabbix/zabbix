@@ -23,7 +23,6 @@ require_once('include/config.inc.php');
 
 $page['file'] = 'tr_status.php';
 $page['title'] = 'S_STATUS_OF_TRIGGERS';
-$page['scripts'] = array('effects.js');
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.cswitcher.js');
 
@@ -592,11 +591,15 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$host->addStyle('white-space: normal;');
 // }}} host JS menu
 
+		$statusSpan = new CSpan(trigger_value2str($trigger['value']));
+		// add colors and blinking to span depending on configuration and trigger parameters
+		addTriggerValueStyle(
+			$statusSpan,
+			$trigger['value'],
+			$trigger['lastchange'],
+			$trigger['event_count'] == 0
+		);
 
-		$status = new CSpan(trigger_value2str($trigger['value']), get_trigger_value_style($trigger['value']));
-		if((time() - $trigger['lastchange']) < TRIGGER_BLINK_PERIOD){
-			$status->setAttribute('name', 'blink');
-		}
 		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
 		//.'&stime='.date('YmdHis', $trigger['lastchange']
 
@@ -642,7 +645,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 			$config['event_ack_enable'] ?
 				($show_event_col ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', null, $trigger['triggerid'])) : null,
 			$severity_col,
-			$status,
+			$statusSpan,
 			$unknown,
 			$lastchange,
 			zbx_date2age($trigger['lastchange']),
@@ -661,8 +664,17 @@ require_once('include/views/js/general.script.confirm.js.php');
 			foreach($trigger['events'] as $enum => $row_event){
 				$i++;
 
-				$status = new CCol(new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value'])));
-				$status->setColSpan(2);
+				$eventStatusSpan = new CSpan(trigger_value2str($row_event['value']));
+				// add colors and blinking to span depending on configuration and trigger parameters
+				addTriggerValueStyle(
+					$eventStatusSpan,
+					$row_event['value'],
+					$row_event['clock'],
+					$row_event['acknowledged']
+				);
+
+				$statusSpan = new CCol($eventStatusSpan);
+				$statusSpan->setColSpan(2);
 
 				$ack = getEventAckState($row_event);
 
@@ -684,7 +696,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 				$row = new CRow(array(
 					SPACE,
 					$config['event_ack_enable'] ? $ack_cb_col : null,
-					$status,
+					$statusSpan,
 					$clock,
 					zbx_date2age($row_event['clock']),
 					zbx_date2age($next_clock, $row_event['clock']),
@@ -723,7 +735,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$trigg_wdgt->addItem($m_form);
 	$trigg_wdgt->show();
 
-	zbx_add_post_js('blink.init();');
+	zbx_add_post_js('jqBlink.init();');
 	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
 
 	$jsmenu = new CPUMenu(null, 170);

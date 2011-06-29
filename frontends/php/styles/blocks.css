@@ -606,3 +606,11 @@ div.calendar input.calendar_textbox{
 
 .zbx_search{padding-top: 1px; font-weight:bold; float:right; height: 18px; min-width: 228px;}
 .zbx_search input[type=text] {margin-right: 0; vertical-align:top; padding: 0 2px; height: 16px; width: 160px; border-right: 0; border-color: #9DB2CD;}
+
+/**************** TRIGGER DISPLAYING FORM ***************/
+div.trigger_displaying_form_col {
+	width: 12em;
+	zoom:1;
+	*display: inline;
+}
+/**************** END TRIGGER DISPLAYING FORM ***************/
