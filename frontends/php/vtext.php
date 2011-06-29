@@ -62,17 +62,17 @@ require_once('include/page_header.php');
 
 	$width = imagesx($im);
 	$height = imagesy($im);
-	
+
 	$white = imagecolorallocate($im, $shadow['red'], $shadow['green'], $shadow['blue']);
-	imagefilledrectangle($im, 0 ,0, $width-1, $height-1, $white);	
+	imagefilledrectangle($im, 0 ,0, $width-1, $height-1, $white);
 
 	$text_color = imagecolorallocate($im, $color['red'], $color['green'], $color['blue']);
 	imageText($im, $font, 0, 0, $size['height'], $text_color, $text);
-	
-	
-	$newImage = imagecreatetruecolor($height, $width);	
+
+
+	$newImage = imagecreatetruecolor($height, $width);
 	$white = imagecolorallocate($newImage, $shadow['red'], $shadow['green'], $shadow['blue']);
-	
+
 	// imagealphablending($newImage, false);
 	// imagesavealpha($newImage, true);
 	for($w=0; $w<$width; $w++){
@@ -82,7 +82,7 @@ require_once('include/page_header.php');
 		}
 	}
 	imagecolortransparent($newImage, $white);
-	
+
 	imageOut($newImage);
 	imagedestroy($newImage);
 	imagedestroy($im);
