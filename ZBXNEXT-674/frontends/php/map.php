@@ -52,7 +52,8 @@ $options = array(
 	'sysmapids' => $_REQUEST['sysmapid'],
 	'selectSelements' => API_OUTPUT_EXTEND,
 	'selectLinks' => API_OUTPUT_EXTEND,
-	'output' => API_OUTPUT_EXTEND
+	'output' => API_OUTPUT_EXTEND,
+	'preservekeys' => true,
 );
 $maps = API::Map()->get($options);
 $map = reset($maps);
@@ -317,16 +318,10 @@ if(isset($_REQUEST['selements']) || isset($_REQUEST['noselements'])){
 	$map['selements'] = get_request('selements', '[]');
 	$map['selements'] = $json->decode($map['selements'], true);
 }
-else{
-	$map['selements'] = zbx_toHash($map['selements'], 'selementid');
-}
 
 if(isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])){
 	$map['links'] = get_request('links', '[]');
 	$map['links'] = $json->decode($map['links'], true);
-}
-else{
-	$map['links'] = zbx_toHash($map['links'],'linkid');
 }
 
 $nocalculations = get_request('nocalculations', false);
