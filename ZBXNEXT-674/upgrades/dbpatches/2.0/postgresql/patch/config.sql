@@ -16,7 +16,17 @@ ALTER TABLE ONLY config
 	ADD severity_name_2 varchar(32) DEFAULT 'Warning' NOT NULL,
 	ADD severity_name_3 varchar(32) DEFAULT 'Average' NOT NULL,
 	ADD severity_name_4 varchar(32) DEFAULT 'High' NOT NULL,
-	ADD severity_name_5 varchar(32) DEFAULT 'Disaster' NOT NULL;
+	ADD severity_name_5 varchar(32) DEFAULT 'Disaster' NOT NULL,
+	ADD ok_period integer DEFAULT '1800' NOT NULL,
+	ADD blink_period integer DEFAULT '1800' NOT NULL,
+	ADD problem_unack_color varchar(6) DEFAULT 'DC0000' NOT NULL,
+	ADD problem_ack_color varchar(6) DEFAULT 'DC0000' NOT NULL,
+	ADD ok_unack_color varchar(6) DEFAULT '00AA00' NOT NULL,
+	ADD ok_ack_color varchar(6) DEFAULT '00AA00' NOT NULL,
+	ADD problem_unack_style integer DEFAULT '0' NOT NULL,
+	ADD problem_ack_style integer DEFAULT '0' NOT NULL,
+	ADD ok_unack_style integer DEFAULT '0' NOT NULL,
+	ADD ok_ack_style integer DEFAULT '0' NOT NULL;
 
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT EXISTS (SELECT 1 FROM usrgrp WHERE usrgrp.usrgrpid=config.alert_usrgrpid);
 UPDATE config SET discovery_groupid=NULL WHERE NOT EXISTS (SELECT 1 FROM groups WHERE groups.groupid=config.discovery_groupid);

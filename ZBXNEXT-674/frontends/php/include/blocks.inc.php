@@ -812,9 +812,10 @@ return new CDiv(array($table, $script));
  * Create and return a DIV with latest problem triggers
  * @author Aly
  * @param array $filter
+ * @param bool $showStatus
  * @return CDiv
  */
-function make_latest_issues($filter = array()){
+function make_latest_issues($filter = array(), $showStatus=false){
 	$config = select_config();
 
 	$options = array(
@@ -872,6 +873,7 @@ function make_latest_issues($filter = array()){
 	$lastChangeHeaderDiv = new CDiv(array(S_LAST_CHANGE, SPACE)); $lastChangeHeaderDiv->addStyle('float: left');
 
 	$table  = new CTableInfo();
+
 	$table->setHeader(
 		array(
 			is_show_all_nodes() ? S_NODE : null,
@@ -996,7 +998,6 @@ function make_latest_issues($filter = array()){
 
 			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])),ZBX_FLAG_EVENT);
 
-
 //actions
 			$actions = get_event_actions_stat_hints($event['eventid']);
 
@@ -1011,12 +1012,30 @@ function make_latest_issues($filter = array()){
 				$description = new CSpan($description,'pointer');
 
 			$description = new CCol($description,getSeverityStyle($trigger['priority']));
-			$description->setHint(make_popup_eventlist($event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
+			$description->setHint(
+				make_popup_eventlist($event['eventid'], $trigger['type'], $trigger['triggerid']),
+				'',
+				'',
+				false,
+				true // update blinking
+			);
+
+			if($showStatus){
+				$statusSpan = new CSpan(trigger_value2str($event['value']));
+				// add colors and blinking to span depending on configuration and trigger parameters
+				addTriggerValueStyle(
+					$statusSpan,
+					$event['value'],
+					$event['clock'],
+					$event['acknowledged']
+				);
+			}
 
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
 				$host,
 				$description,
+				$showStatus ? $statusSpan : null,
 				$clock,
 				zbx_date2age($event['clock']),
 				$unknown,
@@ -1027,6 +1046,8 @@ function make_latest_issues($filter = array()){
 		unset($trigger,$description,$actions);
 	}
 
+	// initialize blinking
+	zbx_add_post_js('jqBlink.init();');
 	$script = new CJSScript(get_js("jQuery('#hat_lastiss_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
 	$infoDiv = new CDiv(

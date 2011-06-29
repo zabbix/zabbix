@@ -1204,7 +1204,8 @@ function getSelementsInfo($sysmap){
 					$i['problem_unack']++;
 				}
 
-				$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < TRIGGER_BLINK_PERIOD);
+					$config = select_config();
+					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
 			}
 		}
 
