@@ -29,13 +29,11 @@ private $allowed;
 			if(($startSymbol != '(') && ($startSymbol != '{') && ($startSymbol != '-') && !zbx_ctype_digit($startSymbol))
 				throw new Exception('Incorrect trigger expression.');
 
-
 			for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
 				$symbol = zbx_substr($expression, $symbolNum, 1);
-// SDI($symbol);
 				$this->parseOpenParts($this->previous['last']);
 				$this->parseCloseParts($symbol);
-// SDII($this->currExpr);
+
 				if($this->inParameter($symbol)){
 					$this->setPreviousSymbol($symbol);
 					continue;
@@ -43,7 +41,6 @@ private $allowed;
 
 				$this->checkSymbolSequence($symbol);
 				$this->setPreviousSymbol($symbol);
-// SDII($this->symbols);
 			}
 
 			$symbolNum = 0;
@@ -417,6 +414,7 @@ private $allowed;
 					else if(($symbol == ')') && $this->currExpr['part']['functionParam']){
 						$this->symbols['close'][$symbol]++;
 						$this->symbols['params'][$symbol]++;
+						$this->currExpr['params']['count']++;
 					}
 					else if($symbol == ','){
 						$this->currExpr['params']['count']++;
