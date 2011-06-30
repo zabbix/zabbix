@@ -517,6 +517,8 @@ ZABBIX.apps.map = (function(){
 				// open link form
 				jQuery('#linksList').delegate('.openlink', 'click', function(){
 					that.currentLinkId = jQuery(this).data('linkid');
+					jQuery('#linksList tr').removeClass('selected');
+					jQuery(this).parent().parent().addClass('selected');
 					var linkData = that.links[that.currentLinkId].getData();
 					that.linkForm.setValues(linkData);
 					that.linkForm.show();
@@ -1456,6 +1458,7 @@ ZABBIX.apps.map = (function(){
 			},
 
 			hide: function(){
+				jQuery('#linksList tr').removeClass('selected');
 				this.domNode.toggle(false);
 				jQuery('#elementApply, #elementRemove').button('enable');
 			},
