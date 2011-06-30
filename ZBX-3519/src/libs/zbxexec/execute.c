@@ -260,8 +260,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	int					fd;
 #endif
 
-	if (NULL != error)
-		*error = '\0';
+	*error = '\0';
 
 	if (NULL != buffer)
 	{
@@ -435,7 +434,7 @@ close:
 
 	if (TIMEOUT_ERROR == ret)
 		zbx_strlcpy(error, "timeout while executing a shell script", max_error_len);
-	else if (NULL != error && '\0' != *error)
+	else if ('\0' != *error)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 
 	if (SUCCEED != ret && NULL != buffer)
