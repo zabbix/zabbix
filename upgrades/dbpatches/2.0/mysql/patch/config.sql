@@ -1,4 +1,4 @@
-ALTER TABLE config 
+ALTER TABLE config
 	MODIFY configid bigint unsigned NOT NULL,
 	MODIFY alert_usrgrpid bigint unsigned NULL,
 	MODIFY discovery_groupid bigint unsigned NOT NULL,
