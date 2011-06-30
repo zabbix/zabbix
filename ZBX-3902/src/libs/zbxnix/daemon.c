@@ -26,15 +26,13 @@
 
 #include "fatal.h"
 
-#define PARENT_PROCESS	parent_pid == (int)getpid()
-
 char		*CONFIG_PID_FILE = NULL;
-
 static int	parent_pid = -1;
 static int	exiting = 0;
 
 #define CHECKED_FIELD(siginfo, field)			(NULL == siginfo ? -1 : siginfo->field)
 #define CHECKED_FIELD_TYPE(siginfo, field, type)	(NULL == siginfo ? (type)-1 : siginfo->field)
+#define PARENT_PROCESS					parent_pid == (int)getpid()
 
 static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
@@ -117,7 +115,7 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 						found = (threads[i] == CHECKED_FIELD(siginfo, si_pid));
 
 					if (0 == found)	/* we should not worry too much about non-Zabbix child */
-						return;	/* processes, like watchdog alert scripts, terminating */
+						return;	/* processes like watchdog alert scripts terminating */
 
 					zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
 							CHECKED_FIELD(siginfo, si_pid),
@@ -155,7 +153,7 @@ int	daemon_start(int allow_root)
 	char			user[7] = "zabbix";
 
 	/* running as root ? */
-	if((0 == allow_root) && (0 == getuid() || 0 == getgid()))
+	if ((0 == allow_root) && (0 == getuid() || 0 == getgid()))
 	{
 		pwd = getpwnam(user);
 		if (NULL == pwd)
@@ -202,7 +200,7 @@ int	daemon_start(int allow_root)
 	signal(SIGHUP, SIG_IGN);
 
 	if (0 != (pid = zbx_fork()))
-		exit( 0 );
+		exit(0);
 
 	/* this is to eliminate warning: ignoring return value of chdir */
 	if (-1 == chdir("/"))
@@ -232,14 +230,13 @@ int	daemon_start(int allow_root)
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
 	sigaction(SIGPIPE, &phan, NULL);
-
 	sigaction(SIGILL, &phan, NULL);
 	sigaction(SIGFPE, &phan, NULL);
 	sigaction(SIGSEGV, &phan, NULL);
 	sigaction(SIGBUS, &phan, NULL);
 
 	/* Set SIGCHLD now to avoid race conditions. To avoid problems with */
-	/* EXECUTE_INT/DBL/STR and other cases it is unset in zbx_fork() */
+	/* EXECUTE_INT/DBL/STR and other cases it is set SIG_IGN in zbx_fork() */
 	phan.sa_sigaction = parent_signal_handler;
 	sigaction(SIGCHLD, &phan, NULL);
 

@@ -493,7 +493,7 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 
 #ifdef _WINDOWS
-	/* Must be called after all child processes loading. */
+	/* must be called after all child processes are loaded */
 	set_parent_signal_handler();
 #endif
 
