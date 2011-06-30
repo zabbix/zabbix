@@ -508,6 +508,16 @@ FIELD		|severity_name_2|t_varchar(32)	|'Warning'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_3|t_varchar(32)	|'Average'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_4|t_varchar(32)	|'High'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_5|t_varchar(32)	|'Disaster'|NOT NULL	|ZBX_SYNC
+FIELD		|ok_period	|t_integer	|'1800'	|NOT NULL	|ZBX_SYNC 
+FIELD		|blink_period	|t_integer	|'1800'	|NOT NULL	|ZBX_SYNC 
+FIELD		|problem_unack_color|t_varchar(6)|'DC0000'|NOT NULL	|ZBX_SYNC
+FIELD		|problem_ack_color|t_varchar(6)	|'DC0000'|NOT NULL	|ZBX_SYNC 
+FIELD		|ok_unack_color	|t_varchar(6)	|'00AA00'|NOT NULL	|ZBX_SYNC
+FIELD		|ok_ack_color	|t_varchar(6)	|'00AA00'|NOT NULL	|ZBX_SYNC   
+FIELD		|problem_unack_style|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
+FIELD		|problem_ack_style|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
+FIELD		|ok_unack_style	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
+FIELD		|ok_ack_style	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|	|NOT NULL	|0
