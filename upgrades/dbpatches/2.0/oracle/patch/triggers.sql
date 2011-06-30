@@ -114,7 +114,7 @@ INSERT INTO tmp_triggers (triggerid, eventid)
 	SELECT t.triggerid, MAX(e.eventid)
 		FROM triggers t, events e
 		WHERE t.value=2				-- TRIGGER_VALUE_UNKNOWN
-			AND e.source=0			-- EVENT_SOURCE_TRIGGERS	
+			AND e.source=0			-- EVENT_SOURCE_TRIGGERS
 			AND e.object=0			-- EVENT_OBJECT_TRIGGER
 			AND e.objectid=t.triggerid
 			AND e.value IN (0,1)		-- TRIGGER_VALUE_FALSE (OK), TRIGGER_VALUE_TRUE (PROBLEM)
