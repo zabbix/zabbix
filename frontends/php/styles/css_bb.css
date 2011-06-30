@@ -196,14 +196,14 @@ table.tableinfo tr.vertical_header td.hover_grey:hover{
 	background-color:#245078;
 }
 
-table.tableinfo tr.selected > td { background-color: #2F56A6; }
-table.tableinfo tr.selected:hover > td { background-color: #3663BF; }
-
 table.tableinfo tr.odd_row > td { background-color: #022744; }
 table.tableinfo tr.odd_row:hover > td { background-color: #245078; }
 
 table.tableinfo tr.even_row > td { background-color: #1D4161; }
 table.tableinfo tr.even_row:hover > td{ background-color: #245078; }
+
+table.tableinfo tr.selected > td { background-color: #2F56A6; }
+table.tableinfo tr.selected:hover > td { background-color: #3663BF; }
 
 table.tableinfo tr > td.active				{	background-color: #99EE9E;	border: 1px #99EE9E solid; }
 table.tableinfo tr:hover > td.active			{	background-color: #99EE99;	border: 1px #99EE99 solid; }
