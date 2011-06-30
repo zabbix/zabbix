@@ -18,9 +18,8 @@
 **/
 
 #include "common.h"
+#include "log.h"
 #include "threads.h"
-
-#include "log.h" /* required for strerror_from_system() on Windows */
 
 /******************************************************************************
  *                                                                            *
@@ -28,22 +27,24 @@
  *                                                                            *
  * Purpose: Flush stdout and stderr before forking                            *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: same as system fork function                                 *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *          Use this function instead of system fork function!                *
+ * Comments: Use this function instead of system fork function!               *
  *                                                                            *
  ******************************************************************************/
 #if !defined(_WINDOWS)
 int	zbx_fork()
 {
+	pid_t	pid;
+
 	fflush(stdout);
 	fflush(stderr);
-	return fork();
+	if (0 == (pid = fork()))
+		signal(SIGCHLD, SIG_IGN);	/* to avoid problems with EXECUTE_INT/DBL/STR and other cases */
+
+	return pid;
 }
 #endif
 
@@ -60,8 +61,7 @@ int	zbx_fork()
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *          The zbx_thread_exit must be called from the handler!              *
+ * Comments: The zbx_thread_exit must be called from the handler!             *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args)
@@ -111,12 +111,10 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 {
-	int	status = 0; /* significant 8 bits of the status */
+	int	status = 0;	/* significant 8 bits of the status */
 
 #ifdef _WINDOWS
 

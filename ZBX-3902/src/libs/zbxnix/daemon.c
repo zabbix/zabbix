@@ -26,9 +26,10 @@
 
 #include "fatal.h"
 
+#define PARENT_PROCESS	parent_pid == (int)getpid()
+
 char		*CONFIG_PID_FILE = NULL;
 
-static int	parent = 0;
 static int	parent_pid = -1;
 static int	exiting = 0;
 
@@ -75,7 +76,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					CHECKED_FIELD(siginfo, si_uid),
 					CHECKED_FIELD(siginfo, si_code));
 
-			if (1 == parent)
+			if (PARENT_PROCESS)
 			{
 				if (0 == exiting)
 				{
@@ -104,7 +105,7 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	switch (sig)
 	{
 		case SIGCHLD:
-			if (1 == parent)
+			if (PARENT_PROCESS)
 			{
 				if (0 == exiting)
 				{
@@ -237,6 +238,11 @@ int	daemon_start(int allow_root)
 	sigaction(SIGSEGV, &phan, NULL);
 	sigaction(SIGBUS, &phan, NULL);
 
+	/* Set SIGCHLD now to avoid race conditions. To avoid problems with */
+	/* EXECUTE_INT/DBL/STR and other cases it is unset in zbx_fork() */
+	phan.sa_sigaction = parent_signal_handler;
+	sigaction(SIGCHLD, &phan, NULL);
+
 	zbx_setproctitle("main process");
 
 	return MAIN_ZABBIX_ENTRY();
@@ -245,18 +251,6 @@ int	daemon_start(int allow_root)
 void	daemon_stop()
 {
 	drop_pid_file(CONFIG_PID_FILE);
-}
-
-void	set_parent_signal_handler()
-{
-	struct sigaction	phan;
-
-	parent = 1;	/* signalize signal handler that this process is a PARENT process */
-
-	phan.sa_sigaction = parent_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGCHLD, &phan, NULL);	/* for parent only, to avoid problems with EXECUTE_INT/DBL/STR and others */
 }
 
 void	set_child_signal_handler()

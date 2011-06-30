@@ -556,8 +556,6 @@ int	MAIN_ZABBIX_ENTRY()
 	/* Main process */
 	if (server_num == 0)
 	{
-		set_parent_signal_handler();
-
 		if (0 != CONFIG_HEARTBEAT_FORKS)
 		{
 			process_type = ZBX_PROCESS_TYPE_HEARTBEAT;

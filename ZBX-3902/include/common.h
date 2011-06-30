@@ -21,7 +21,6 @@
 #define ZABBIX_COMMON_H
 
 #include "sysinc.h"
-
 #include "zbxtypes.h"
 
 #ifdef DEBUG

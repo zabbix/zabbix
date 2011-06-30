@@ -583,8 +583,6 @@ int	MAIN_ZABBIX_ENTRY()
 	/* Main process */
 	if (server_num == 0)
 	{
-		set_parent_signal_handler();
-
 		process_type = ZBX_PROCESS_TYPE_WATCHDOG;
 		process_num = 1;
 

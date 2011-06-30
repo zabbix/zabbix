@@ -492,8 +492,10 @@ int	MAIN_ZABBIX_ENTRY()
 		threads[thread_num++] = zbx_thread_start(active_checks_thread, thread_args);
 	}
 
+#ifdef _WINDOWS
 	/* Must be called after all child processes loading. */
 	set_parent_signal_handler();
+#endif
 
 	/* wait for all threads exiting */
 	for (i = 0; i < 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0); i++)
@@ -524,7 +526,7 @@ void	zbx_on_exit()
 #if !defined(_WINDOWS)
 		sigset_t	set;
 
-		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
+		/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 		sigemptyset(&set);
 		sigaddset(&set, SIGCHLD);
 		sigprocmask(SIG_BLOCK, &set, NULL);
