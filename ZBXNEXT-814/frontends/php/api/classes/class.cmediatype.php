@@ -309,6 +309,7 @@ Copt::memoryPick();
  * @param string $mediatypes['gsm_modem']
  * @param string $mediatypes['username']
  * @param string $mediatypes['passwd']
+ * @param integer $mediatypes['status']
  * @return array|boolean
  */
 	public function create($mediatypes){
@@ -362,6 +363,7 @@ Copt::memoryPick();
  * @param string $mediatypes['gsm_modem']
  * @param string $mediatypes['username']
  * @param string $mediatypes['passwd']
+ * @param integer $mediatypes['status']
  * @return boolean
  */
 	public function update($mediatypes){
@@ -399,7 +401,7 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED);
 				}
 
-				if(!in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))){
+				if(array_key_exists('passwd', $mediatype) && !in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))){
 					$mediatype['passwd'] = '';
 				}
 

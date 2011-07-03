@@ -106,13 +106,15 @@ static void	init_config()
 	result = DBselect(
 			"select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,"
 				"mt.smtp_helo,mt.smtp_email,mt.exec_path,mt.gsm_modem,"
-				"mt.username,mt.passwd,m.sendto"
+				"mt.username,mt.passwd,mt.status,m.sendto"
 			" from media m,users_groups u,config c,media_type mt"
 			" where m.userid=u.userid"
 				" and u.usrgrpid=c.alert_usrgrpid"
 				" and m.mediatypeid=mt.mediatypeid"
 				" and m.active=%d",
-			MEDIA_STATUS_ACTIVE);
+				" and mt.status=%d",
+			MEDIA_STATUS_ACTIVE,
+			MEDIA_TYPE_STATUS_ACTIVE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -132,8 +134,9 @@ static void	init_config()
 		recipients[num].mediatype.gsm_modem = strdup(row[7]);
 		recipients[num].mediatype.username = strdup(row[8]);
 		recipients[num].mediatype.passwd = strdup(row[9]);
+		recipients[num].mediatype.status = atoi(row[10]);
 
-		recipients[num].alert.sendto = strdup(row[10]);
+		recipients[num].alert.sendto = strdup(row[11]);
 		recipients[num].alert.subject = strdup("Zabbix database is down.");
 		recipients[num].alert.message = strdup("Zabbix database is down.");
 

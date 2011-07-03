@@ -3959,6 +3959,12 @@ return array(
 				'length' => 255,
 				'default' => '',
 			),
+			'status' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'profiles' => array(
@@ -4243,6 +4249,12 @@ return array(
 				'default' => '',
 			),
 			'dynamic' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'sort_triggers' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

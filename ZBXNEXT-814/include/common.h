@@ -433,6 +433,14 @@ typedef enum
 	MEDIA_TYPE_EZ_TEXTING = 100
 } zbx_media_type_t;
 
+/* medi type statuses */
+typedef enum
+{
+       MEDIA_TYPE_STATUS_ACTIVE = 0,
+       MEDIA_TYPE_STATUS_DISABLED
+} zbx_media_type_status_t;
+
+
 /* alert statuses */
 typedef enum
 {

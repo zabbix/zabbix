@@ -112,7 +112,6 @@ include_once('include/page_header.php');
 					expandMapLabels($db_map);
 					$map_info = getSelementsInfo($db_map);
 					add_elementNames($db_map['selements']);
-//SDII($db_map);
 					$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.mselement["label_location"]='.$db_map['label_location'].'; '."\n";
 
 					foreach($db_map['selements'] as $snum => $selement){

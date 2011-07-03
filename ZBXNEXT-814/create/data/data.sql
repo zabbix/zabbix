@@ -56,9 +56,9 @@ INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',2,N
 -- Dumping data for table `media_type`
 --
 
-INSERT INTO media_type VALUES (1,0,'Email','mail.company.com','company.com','zabbix@company.com','','','','');
-INSERT INTO media_type VALUES (2,3,'Jabber','','','','','','jabber@company.com','zabbix');
-INSERT INTO media_type VALUES (3,2,'SMS','','','','','/dev/ttyS0','','');
+INSERT INTO media_type VALUES (1,0,'Email','mail.company.com','company.com','zabbix@company.com','','','','',0);
+INSERT INTO media_type VALUES (2,3,'Jabber','','','','','','jabber@company.com','zabbix',0);
+INSERT INTO media_type VALUES (3,2,'SMS','','','','','/dev/ttyS0','','',0);
 
 --
 -- Dumping data for table `groups`

@@ -850,6 +850,7 @@ FIELD		|exec_path	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|gsm_modem	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|username	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|passwd		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|profiles|profileid|0
 FIELD		|profileid	|t_id		|	|NOT NULL	|0

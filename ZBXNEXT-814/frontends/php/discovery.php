@@ -165,7 +165,6 @@ include_once('include/page_header.php');
 
 	$db_dservices = zbx_toHash($dservices, 'dserviceid');
 
-//SDII($db_dservices);
 	foreach($drules as $dnum => $drule){
 		$discovery_info = array();
 

@@ -437,7 +437,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			'limit' => ($config['search_limit']+1)
 		);
 		$actions = API::Action()->get($options);
-//SDII($actions);
 // sorting && paging
 		order_result($actions, $sortfield, $sortorder);
 		$paging = getPagingLine($actions);

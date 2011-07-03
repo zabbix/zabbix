@@ -36,7 +36,7 @@ include_once('include/page_header.php');
 
 // media form
 		'media_types'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'mediatypeid'=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
+		'mediatypeid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
 		'type'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',array_keys(media_type2str()))),'(isset({save}))'),
 		'description'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({save}))'),
 		'smtp_server'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
@@ -46,6 +46,7 @@ include_once('include/page_header.php');
 		'gsm_modem'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_SMS.')&&isset({save})'),
 		'username'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')&&isset({save})'),
 		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL, NULL),
+		'status'=>			array(T_ZBX_INT, O_OPT, NULL, 	IN(array(MEDIA_TYPE_STATUS_ACTIVE,MEDIA_TYPE_STATUS_DISABLED)), null),
 /* actions */
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -74,7 +75,8 @@ include_once('include/page_header.php');
 			'exec_path' => get_request('exec_path'),
 			'gsm_modem' => get_request('gsm_modem'),
 			'username' => get_request('username'),
-			'passwd' => get_request('password')
+			'passwd' => get_request('password'),
+			'status' => get_request('status')
 		);
 
 		if(is_null($mediatype['passwd'])) unset($mediatype['passwd']);
@@ -116,6 +118,42 @@ include_once('include/page_header.php');
 		if($go_result) unset($_REQUEST['form']);
 		show_messages($go_result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
 	}
+	else if($_REQUEST['go'] == 'disable'){
+		$go_result = true;
+
+		$media_types = get_request('media_types', array());
+		$options = array();
+
+		foreach($media_types as $id){
+			$options[] = array(
+				'mediatypeid' => $id,
+				'status' => MEDIA_TYPE_STATUS_DISABLED);
+		}
+
+		$go_result = API::Mediatype()->update($options);
+
+		if($go_result) unset($_REQUEST['form']);
+		show_messages($go_result, _('Media type disabled'), _('Media type was not disabled'));
+	}
+	else if($_REQUEST['go'] == 'activate'){
+		$go_result = true;
+
+		$media_types = get_request('media_types', array());
+		$options = array();
+
+		foreach($media_types as $id){
+			$options[] = array(
+				'mediatypeid' => $id,
+				'status' => MEDIA_TYPE_STATUS_ACTIVE);
+		}
+
+		$go_result = API::Mediatype()->update($options);
+
+		if($go_result) unset($_REQUEST['form']);
+		show_messages($go_result, _('Media type enabled'), _('Media type was not enabled'));
+	}
+
+
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
 		$url = new CUrl();
@@ -157,6 +195,7 @@ include_once('include/page_header.php');
 			$exec_path = $mediatype['exec_path'];
 			$gsm_modem = $mediatype['gsm_modem'];
 			$username = $mediatype['username'];
+			$status = $mediatype['status'];
 		}
 		else{
 			$type = get_request('type', 0);
@@ -169,6 +208,7 @@ include_once('include/page_header.php');
 
 			$default_username = ($type == MEDIA_TYPE_EZ_TEXTING) ? 'username' : 'user@server';
 			$username = get_request('username', $default_username);
+			$status = get_request('status', MEDIA_TYPE_STATUS_ACTIVE);
 		}
 
 		$frmMedia = new CFormTable(S_MEDIA);
@@ -236,6 +276,15 @@ include_once('include/page_header.php');
 			}
 		}
 
+		$cmbStatus = new CComboBox('status', $status);
+		$cmbStatus->addItems(array(
+			MEDIA_TYPE_STATUS_ACTIVE => _('Active'),
+			MEDIA_TYPE_STATUS_DISABLED => _('Disabled')
+		));
+
+		$frmMedia->addRow(_('Status'), $cmbStatus);
+
+
 		$frmMedia->addItemToBottomRow(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['mediatypeid'])){
 			$frmMedia->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SELECTED_MEDIA,url_param('form').url_param('mediatypeid'))));
@@ -259,8 +308,9 @@ include_once('include/page_header.php');
 			new CCheckBox('all_media_types', NULL, "checkAll('".$form->getName()."','all_media_types','media_types');"),
 			make_sorting_header(_('Description'),'description'),
 			make_sorting_header(_('Type'),'type'),
+			_('Status'),
 			make_sorting_header(_('Used in actions'),'usedInActions'),
-			S_DETAILS
+			_('Details')
 		));
 
 // Mediatype table
@@ -276,7 +326,6 @@ include_once('include/page_header.php');
 			'limit' => ($config['search_limit']+1)
 		);
 		$mediatypes = API::Mediatype()->get($options);
-
 
 // Check if media type are used by existing actions
 		$options = array(
@@ -338,11 +387,23 @@ include_once('include/page_header.php');
 				$actionLinks = '-';
 			}
 
+			$status_link = 'media_types.php?go='.(($mediatype['status'] == MEDIA_TYPE_STATUS_DISABLED) ? 'activate' : 'disable').
+				'&media_types%5B%5D='.$mediatype['mediatypeid'];
+
+			switch($mediatype['status']){
+				case MEDIA_TYPE_STATUS_ACTIVE:
+					$status = new CLink(S_ENABLED, $status_link, 'enabled');
+					break;
+				default:
+					$status = new CLink(S_DISABLED, $status_link, 'disabled');
+					break;
+			}
 
 			$table->addRow(array(
 				new CCheckBox('media_types['.$mediatype['mediatypeid'].']',NULL,NULL,$mediatype['mediatypeid']),
 				new CLink($mediatype['description'],'?form=update&mediatypeid='.$mediatype['mediatypeid']),
 				media_type2str($mediatype['type']),
+				$status,
 				$actionLinks,
 				$details
 			));
@@ -351,8 +412,14 @@ include_once('include/page_header.php');
 //----- GO ------
 		$goBox = new CComboBox('go');
 
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_MEDIATYPES_Q);
+		$goOption = new CComboItem('activate',_('Enable selected'));
+		$goOption->setAttribute('confirm',_('Enable selected media types?'));
+		$goBox->addItem($goOption);
+		$goOption = new CComboItem('disable',_('Disable selected'));
+		$goOption->setAttribute('confirm',_('Disable selected media types?'));
+		$goBox->addItem($goOption);
+		$goOption = new CComboItem('delete',_('Delete selected'));
+		$goOption->setAttribute('confirm',_('Delete selected media types?'));
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
