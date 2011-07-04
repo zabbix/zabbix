@@ -110,7 +110,7 @@ ALTER TABLE config ADD ok_ack_style integer WITH DEFAULT '0' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD snmptrap_logging integer WITH DEFAULT '0' NOT NULL
+ALTER TABLE config ADD snmptrap_logging integer WITH DEFAULT '1' NOT NULL
 /
 REORG TABLE config
 /
