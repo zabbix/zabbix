@@ -42,6 +42,8 @@ include_once('include/page_header.php');
 		'refresh_unsupported'=>	array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==5)&&isset({save})'),
 		'alert_usrgrpid'=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,			'isset({config})&&({config}==5)&&isset({save})'),
 		'discovery_groupid'=>	array(T_ZBX_INT, O_NO,	null,	DB_ID,			'isset({config})&&({config}==5)&&isset({save})'),
+		'snmptrap_logging'=>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),			null),
+
 
 		// image form
 		'imageid'=>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==3)&&(isset({form})&&({form}=="update"))'),
@@ -268,6 +270,7 @@ include_once('include/page_header.php');
 				'work_period' => get_request('work_period'),
 				'alert_usrgrpid' => get_request('alert_usrgrpid'),
 				'discovery_groupid' => get_request('discovery_groupid'),
+				'snmptrap_logging' => (get_request('snmptrap_logging') ? 1 : 0),
 			);
 		$result=update_config($configs);
 
@@ -874,6 +877,7 @@ include_once('include/page_header.php');
 					get_node_name_by_elid($row['usrgrpid'], null, ': ').$row['name']
 					);
 		$frmOther->addRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE, $cmbUsrGrp);
+		$frmOther->addRow(_('Log unmatched SNMP traps'), new CCheckBox('snmptrap_logging', $config['snmptrap_logging'], null, 1));
 
 		$frmOther->addItemToBottomRow(new CSubmit('save', S_SAVE));
 
