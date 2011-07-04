@@ -558,7 +558,7 @@ static ZBX_DC_HOST	*DCfind_host(zbx_uint64_t proxy_hostid, const char *host)
 
 static void	DCstrpool_replace(int found, const char **curr, const char *new)
 {
-	if (!found)
+	if (0 == found)
 	{
 		*curr = zbx_strpool_intern(new);
 	}
@@ -671,9 +671,9 @@ static void	DCsync_items(DB_RESULT result)
 
 		update_index = 0;
 
-		if (!(found && item->hostid == hostid && 0 == strcmp(item->key, row[6])))
+		if (0 == found || item->hostid != hostid || 0 != strcmp(item->key, row[6]))
 		{
-			if (found)
+			if (1 == found)
 			{
 				item_hk_local.hostid = item->hostid;
 				item_hk_local.key = item->key;
@@ -714,7 +714,7 @@ static void	DCsync_items(DB_RESULT result)
 		else
 			item->value_type = (unsigned char)atoi(row[5]);
 
-		if (!found)
+		if (0 == found)
 		{
 			item->triggers = NULL;
 		}
@@ -739,7 +739,7 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_hashset_insert(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK));
 		}
 
-		if (!found)
+		if (0 == found)
 		{
 			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = ZBX_NO_POLLER;
@@ -1223,7 +1223,7 @@ static void	DCsync_trigdeps(DB_RESULT tdep_result)
 
 			trigdep_down->trigger = zbx_hashset_search(&config->triggers, &triggerid_down);
 
-			if (!found)
+			if (0 == found)
 				trigdep_down->dependencies = NULL;
 
 			zbx_vector_uint64_append(&ids_down, triggerid_down);
@@ -1235,7 +1235,7 @@ static void	DCsync_trigdeps(DB_RESULT tdep_result)
 
 		trigdep_up = DCfind_id(&config->trigdeps, triggerid_up, sizeof(ZBX_DC_TRIGGER_DEPLIST), &found);
 
-		if (!found)
+		if (0 == found)
 			trigdep_up->dependencies = NULL;
 
 		zbx_vector_uint64_append(&ids_up, triggerid_up);
@@ -1304,7 +1304,6 @@ static void	DCsync_functions(DB_RESULT result)
 	zbx_uint64_t		itemid, functionid, triggerid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
-
 	zbx_ptr_pair_t		itemtrig;
 	zbx_vector_ptr_pair_t	itemtrigs;
 
@@ -1453,10 +1452,10 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		update_index = 0;
 
-		if (!(found && host->proxy_hostid == proxy_hostid &&
-					host->status == status && 0 == strcmp(host->host, row[2])))
+		if (0 == found || host->proxy_hostid != proxy_hostid || host->status != status ||
+				0 != strcmp(host->host, row[2]))
 		{
-			if (found)
+			if (1 == found)
 			{
 				host_ph_local.proxy_hostid = host->proxy_hostid;
 				host_ph_local.status = host->status;
@@ -1494,7 +1493,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->maintenance_from = atoi(row[9]);
 		host->status = status;
 
-		if (!found)
+		if (0 == found)
 		{
 			host->errors_from = atoi(row[10]);
 			host->available = (unsigned char)atoi(row[11]);
@@ -1552,7 +1551,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		{
 			proxy = DCfind_id(&config->proxies, hostid, sizeof(ZBX_DC_PROXY), &found);
 
-			if (!found)
+			if (0 == found)
 			{
 				proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
@@ -1732,9 +1731,9 @@ static void	DCsync_gmacros(DB_RESULT result)
 
 		update_index = 0;
 
-		if (!(found && 0 == strcmp(gmacro->macro, row[1])))
+		if (0 == found || 0 != strcmp(gmacro->macro, row[1]))
 		{
-			if (found)
+			if (1 == found)
 			{
 				gmacro_m_local.macro = gmacro->macro;
 				gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
@@ -1838,9 +1837,9 @@ static void	DCsync_hmacros(DB_RESULT result)
 
 		update_index = 0;
 
-		if (!(found && hmacro->hostid == hostid && 0 == strcmp(hmacro->macro, row[2])))
+		if (0 == found || hmacro->hostid != hostid || 0 != strcmp(hmacro->macro, row[2]))
 		{
-			if (found)
+			if (1 == found)
 			{
 				hmacro_hm_local.hostid = hmacro->hostid;
 				hmacro_hm_local.macro = hmacro->macro;
@@ -1952,7 +1951,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 		update_index = 0;
 
-		if (!(found && interface->hostid == hostid && interface->type == type && interface->main == main_))
+		if (0 == found || interface->hostid != hostid || interface->type != type || interface->main != main_)
 		{
 			if (found && 1 == interface->main)
 			{
@@ -2041,13 +2040,7 @@ static void	DCsync_interfaces(DB_RESULT result)
  *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCsync_configuration()
@@ -2321,10 +2314,6 @@ void	DCsync_configuration()
  * Function: init_configuration_cache                                         *
  *                                                                            *
  * Purpose: Allocate shared memory for configuration cache                    *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
@@ -2663,13 +2652,7 @@ void	init_configuration_cache()
  *                                                                            *
  * Purpose: Free memory allocated for configuration cache                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	free_configuration_cache()
@@ -2744,8 +2727,6 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
  * Return value: SUCCEED if record located and FAIL otherwise                 *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
@@ -2960,8 +2941,6 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key)
 {
@@ -2999,8 +2978,6 @@ unlock:
  * Return value: SUCCEED if item found, otherwise FAIL                        *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid)
@@ -3040,8 +3017,6 @@ unlock:
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_function_by_functionid(DC_FUNCTION *function, zbx_uint64_t functionid)
 {
@@ -3068,13 +3043,7 @@ unlock:
  *                                                                            *
  * Purpose: get triggers for specified items                                  *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
@@ -3095,7 +3064,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 			{
 				trigger = DCfind_id(trigger_info, dc_trigger->triggerid, sizeof(DC_TRIGGER), &found);
 
-				if (!found)
+				if (0 == found)
 				{
 					DCget_trigger(trigger, dc_trigger);
 					zbx_vector_ptr_append(trigger_order, trigger);
@@ -3133,13 +3102,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
  *                                                                            *
  * Purpose: get trigger by triggerid to be used in event processing           *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid)
@@ -3170,10 +3133,6 @@ int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid)
  * Function: DCconfig_get_time_based_triggers                                 *
  *                                                                            *
  * Purpose: get triggers that have time-based functions                       *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
@@ -3262,8 +3221,6 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type)
 {
@@ -3301,8 +3258,6 @@ unlock:
  * Return value: nextcheck or FAIL if no items for selected poller            *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
@@ -3795,14 +3750,10 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
  *                                                                            *
  * Purpose: check whether any of trigger dependencies have value TRUE         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCEED - trigger can change its value                       *
  *               FAIL - otherwise                                             *
  *                                                                            *
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
@@ -3826,13 +3777,7 @@ int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid)
  *                                                                            *
  * Purpose: set trigger value, value flags, and error                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
@@ -3859,13 +3804,7 @@ void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
  *                                                                            *
  * Purpose: set host maintenance status                                       *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
@@ -3894,13 +3833,7 @@ void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
  *                                                                            *
  * Purpose: get statistics of the database cache                              *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	*DCconfig_get_stats(int request)
@@ -4029,13 +3962,9 @@ int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts)
  *                                                                            *
  * Purpose: Get nextcheck for passive proxies                                 *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: nextcheck or FAIL if no passive proxies in queue             *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_proxypoller_nextcheck()

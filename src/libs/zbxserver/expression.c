@@ -2790,8 +2790,6 @@ error:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	evaluate_expression(int *result, char **expression, time_t now,
 		zbx_uint64_t triggerid, int trigger_value, char *error, int maxerrlen)
@@ -2815,19 +2813,17 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 	{
 		zbx_remove_spaces(*expression);
 
-		if (SUCCEED == substitute_functions(expression, now, error, maxerrlen))
+		if (SUCCEED == substitute_functions(expression, now, error, maxerrlen) &&
+				SUCCEED == evaluate(&value, *expression, error, maxerrlen))
 		{
-			if (SUCCEED == evaluate(&value, *expression, error, maxerrlen))
-			{
-				if (0 == cmp_double(value, 0))
-					*result = TRIGGER_VALUE_FALSE;
-				else
-					*result = TRIGGER_VALUE_TRUE;
+			if (0 == cmp_double(value, 0))
+				*result = TRIGGER_VALUE_FALSE;
+			else
+				*result = TRIGGER_VALUE_TRUE;
 
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() result:%d", __function_name, *result);
-				ret = SUCCEED;
-				goto out;
-			}
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() result:%d", __function_name, *result);
+			ret = SUCCEED;
+			goto out;
 		}
 	}
 out:
@@ -2894,8 +2890,10 @@ void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
 			memcpy(&(*data)[l], replace_to, sz_value);
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() Can't substitute macro: \"%.*s\" is not found in value set",
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro: \"%.*s\" is not found in value set",
 					__function_name, (int)sz_macro, *data + l);
+		}
 	}
 
 	zbx_free(replace_to);

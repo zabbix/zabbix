@@ -173,65 +173,65 @@ void	*DCget_stats(int request)
 
 	switch (request)
 	{
-	case ZBX_STATS_HISTORY_COUNTER:
-		value_uint = cache->stats.history_counter;
-		return &value_uint;
-	case ZBX_STATS_HISTORY_FLOAT_COUNTER:
-		value_uint = cache->stats.history_float_counter;
-		return &value_uint;
-	case ZBX_STATS_HISTORY_UINT_COUNTER:
-		value_uint = cache->stats.history_uint_counter;
-		return &value_uint;
-	case ZBX_STATS_HISTORY_STR_COUNTER:
-		value_uint = cache->stats.history_str_counter;
-		return &value_uint;
-	case ZBX_STATS_HISTORY_LOG_COUNTER:
-		value_uint = cache->stats.history_log_counter;
-		return &value_uint;
-	case ZBX_STATS_HISTORY_TEXT_COUNTER:
-		value_uint = cache->stats.history_text_counter;
-		return &value_uint;
-	case ZBX_STATS_NOTSUPPORTED_COUNTER:
-		value_uint = cache->stats.notsupported_counter;
-		return &value_uint;
-	case ZBX_STATS_HISTORY_TOTAL:
-		value_uint = CONFIG_HISTORY_CACHE_SIZE;
-		return &value_uint;
-	case ZBX_STATS_HISTORY_USED:
-		value_uint = cache->history_num * sizeof(ZBX_DC_HISTORY);
-		return &value_uint;
-	case ZBX_STATS_HISTORY_FREE:
-		value_uint = CONFIG_HISTORY_CACHE_SIZE - cache->history_num * sizeof(ZBX_DC_HISTORY);
-		return &value_uint;
-	case ZBX_STATS_HISTORY_PFREE:
-		value_double = 100 * ((double)(ZBX_HISTORY_SIZE - cache->history_num) / ZBX_HISTORY_SIZE);
-		return &value_double;
-	case ZBX_STATS_TREND_TOTAL:
-		value_uint = trend_mem->orig_size;
-		return &value_uint;
-	case ZBX_STATS_TREND_USED:
-		value_uint = trend_mem->orig_size - trend_mem->free_size;
-		return &value_uint;
-	case ZBX_STATS_TREND_FREE:
-		value_uint = trend_mem->free_size;
-		return &value_uint;
-	case ZBX_STATS_TREND_PFREE:
-		value_double = 100 * ((double)trend_mem->free_size / trend_mem->orig_size);
-		return &value_double;
-	case ZBX_STATS_TEXT_TOTAL:
-		value_uint = CONFIG_TEXT_CACHE_SIZE;
-		return &value_uint;
-	case ZBX_STATS_TEXT_USED:
-		value_uint = CONFIG_TEXT_CACHE_SIZE - cache->text_free;
-		return &value_uint;
-	case ZBX_STATS_TEXT_FREE:
-		value_uint = cache->text_free;
-		return &value_uint;
-	case ZBX_STATS_TEXT_PFREE:
-		value_double = 100.0 * ((double)cache->text_free / CONFIG_TEXT_CACHE_SIZE);
-		return &value_double;
-	default:
-		return NULL;
+		case ZBX_STATS_HISTORY_COUNTER:
+			value_uint = cache->stats.history_counter;
+			return &value_uint;
+		case ZBX_STATS_HISTORY_FLOAT_COUNTER:
+			value_uint = cache->stats.history_float_counter;
+			return &value_uint;
+		case ZBX_STATS_HISTORY_UINT_COUNTER:
+			value_uint = cache->stats.history_uint_counter;
+			return &value_uint;
+		case ZBX_STATS_HISTORY_STR_COUNTER:
+			value_uint = cache->stats.history_str_counter;
+			return &value_uint;
+		case ZBX_STATS_HISTORY_LOG_COUNTER:
+			value_uint = cache->stats.history_log_counter;
+			return &value_uint;
+		case ZBX_STATS_HISTORY_TEXT_COUNTER:
+			value_uint = cache->stats.history_text_counter;
+			return &value_uint;
+		case ZBX_STATS_NOTSUPPORTED_COUNTER:
+			value_uint = cache->stats.notsupported_counter;
+			return &value_uint;
+		case ZBX_STATS_HISTORY_TOTAL:
+			value_uint = CONFIG_HISTORY_CACHE_SIZE;
+			return &value_uint;
+		case ZBX_STATS_HISTORY_USED:
+			value_uint = cache->history_num * sizeof(ZBX_DC_HISTORY);
+			return &value_uint;
+		case ZBX_STATS_HISTORY_FREE:
+			value_uint = CONFIG_HISTORY_CACHE_SIZE - cache->history_num * sizeof(ZBX_DC_HISTORY);
+			return &value_uint;
+		case ZBX_STATS_HISTORY_PFREE:
+			value_double = 100 * ((double)(ZBX_HISTORY_SIZE - cache->history_num) / ZBX_HISTORY_SIZE);
+			return &value_double;
+		case ZBX_STATS_TREND_TOTAL:
+			value_uint = trend_mem->orig_size;
+			return &value_uint;
+		case ZBX_STATS_TREND_USED:
+			value_uint = trend_mem->orig_size - trend_mem->free_size;
+			return &value_uint;
+		case ZBX_STATS_TREND_FREE:
+			value_uint = trend_mem->free_size;
+			return &value_uint;
+		case ZBX_STATS_TREND_PFREE:
+			value_double = 100 * ((double)trend_mem->free_size / trend_mem->orig_size);
+			return &value_double;
+		case ZBX_STATS_TEXT_TOTAL:
+			value_uint = CONFIG_TEXT_CACHE_SIZE;
+			return &value_uint;
+		case ZBX_STATS_TEXT_USED:
+			value_uint = CONFIG_TEXT_CACHE_SIZE - cache->text_free;
+			return &value_uint;
+		case ZBX_STATS_TEXT_FREE:
+			value_uint = cache->text_free;
+			return &value_uint;
+		case ZBX_STATS_TEXT_PFREE:
+			value_double = 100.0 * ((double)cache->text_free / CONFIG_TEXT_CACHE_SIZE);
+			return &value_double;
+		default:
+			return NULL;
 	}
 }
 
@@ -889,8 +889,10 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 					error);
 		}
 		else
+		{
 			DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value, trigger->value_flags,
 					trigger->old_error, value, TRIGGER_VALUE_FLAG_NORMAL, &trigger->timespec, NULL);
+		}
 
 		zbx_free(trigger->expression);
 		zbx_free(trigger->old_error);

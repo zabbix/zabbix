@@ -41,13 +41,7 @@ static int		nextcheck_num;
  *                                                                            *
  * Purpose: initialize nextchecks array                                       *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCinit_nextchecks()
@@ -70,20 +64,14 @@ void	DCinit_nextchecks()
  *                                                                            *
  * Purpose: free memory allocated for `error_msg'es                           *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Dmitry Borovikov                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DCrelease_nextchecks()
 {
 	const char	*__function_name = "DCrelease_nextchecks";
 
-	int	i;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -99,21 +87,15 @@ static void	DCrelease_nextchecks()
  *                                                                            *
  * Purpose: add item nextcheck to the array                                   *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 {
 	const char	*__function_name = "DCadd_nextcheck";
 
-	int	i;
-	size_t	sz;
+	int		i;
+	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -160,35 +142,19 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
  *                                                                            *
  * Purpose: update triggers to UNKNOWN and generate events                    *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev, Dmitry Borovikov, Aleksandrs Saveljevs        *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCflush_nextchecks()
 {
-	typedef struct
-	{
-		zbx_uint64_t	objectid;
-		time_t		clock;
-	}
-	objectid_clock_t;
-
 	const char		*__function_name = "DCflush_nextchecks";
 
 	int			i;
-	zbx_uint64_t		events_maxid;
 	zbx_uint64_t		*itemids = NULL;
 	zbx_timespec_t		*timespecs = NULL;
 	const char		**errors = NULL;
 	zbx_hashset_t		trigger_info;
 	zbx_vector_ptr_t	trigger_order;
-	DC_TRIGGER		*trigger;
-	char			*error_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() nextcheck_num:%d", __function_name, nextcheck_num);
 
@@ -223,10 +189,20 @@ void	DCflush_nextchecks()
 
 	if (0 != trigger_order.values_num)
 	{
+		typedef struct
+		{
+			zbx_uint64_t	objectid;
+			time_t		clock;
+		}
+		objectid_clock_t;
+
 		char			*sql = NULL;
 		int			sql_alloc = 4096, sql_offset = 0;
 		objectid_clock_t 	*events = NULL;
 		int			events_alloc, events_num = 0;
+		zbx_uint64_t		events_maxid;
+		DC_TRIGGER		*trigger;
+		char			*error_esc;
 
 		sql = zbx_malloc(sql, sql_alloc);
 
