@@ -518,6 +518,7 @@ FIELD		|problem_unack_style|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|problem_ack_style|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
 FIELD		|ok_unack_style	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
 FIELD		|ok_ack_style	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
+FIELD		|snmptrap_logging|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|globalvars|globalvarid|0
 FIELD		|globalvarid	|t_id		|	|NOT NULL	|0
