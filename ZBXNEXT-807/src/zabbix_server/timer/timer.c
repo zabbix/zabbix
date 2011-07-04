@@ -86,9 +86,11 @@ static void	process_time_functions()
 						TRIGGER_VALUE_FLAG_UNKNOWN, &trigger->timespec, error);
 			}
 			else
+			{
 				DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value,
 						trigger->value_flags, trigger->old_error, value,
 						TRIGGER_VALUE_FLAG_NORMAL, &trigger->timespec, NULL);
+			}
 
 			zbx_free(trigger->expression);
 			zbx_free(trigger->old_error);
