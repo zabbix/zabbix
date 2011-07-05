@@ -1634,7 +1634,7 @@ ZABBIX.apps.map = (function(){
 					jQuery('#areaSizeHeight').val(element.data.height);
 				}
 			}
-			this.sysmap.updateImage();
+			sysmap.updateImage();
 		});
 
 		Link.prototype.bind('afterUpdate', function(){
