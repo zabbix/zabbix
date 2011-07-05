@@ -1181,8 +1181,7 @@ INDEX		|1		|clock
 TABLE|icon_map|iconmapid|ZBX_SYNC 
 FIELD		|iconmapid	|t_id		|	|NOT NULL	|0 
 FIELD		|name		|t_varchar(64)	|	|NOT NULL	|ZBX_SYNC 
-INDEX		|1		|iconmapid
-UNIQUE		|2		|name
+UNIQUE		|1		|name
 
 TABLE|icon_mapping|iconmappingid|ZBX_SYNC 
 FIELD		|iconmappingid	|t_id		|	|NOT NULL	|0 
