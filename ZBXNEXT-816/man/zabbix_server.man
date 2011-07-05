@@ -1,26 +1,26 @@
-.TH ZABBIX_SERVER 8 "4 August 2009"
+.TH ZABBIX_SERVER 8 "5 July 2011"
 .SH NAME
 zabbix_server \- Zabbix server daemon.
 .SH SYNOPSIS
-.B zabbix_server [-hV] [-c 
-.I config-file
-.B ] [-n <nodeid>]
+.B zabbix_server [-hV] [-c \fIconfig-file\fR] [-n \fInodeid\fR] [-R \fIoption\fR]
 .SH DESCRIPTION
 .B zabbix_server
 is a core daemon of Zabbix software.
 .SS Options
 .IP "-c, --config config-file"
-Use the alternate system wide
-.I config-file
-instead of
-.I /etc/zabbix/zabbix_server.conf
-.
+Use the alternate system wide \fIconfig-file\fR instead of \fI/etc/zabbix/zabbix_server.conf\fR.
 .IP "-n, --new-nodeid nodeid"
-Convert database data to new nodeid.
+Convert database data to new \fInodeid\fR.
+.IP "-R, --runtime-control option"
+Perform administrative functions according to \fIoption\fR.
 .IP "-h, --help"
 Display this help and exit.
 .IP "-V, --version"
 Output version information and exit.
+.SS Runtime control options
+.TP
+\fBconfig_cache_reload\fR
+Reload configuration cache.
 .SH FILES
 .TP
 .I /etc/zabbix/zabbix_server.conf

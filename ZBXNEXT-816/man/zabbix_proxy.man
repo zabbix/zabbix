@@ -1,24 +1,24 @@
-.TH ZABBIX_PROXY 8 "4 August 2009"
+.TH ZABBIX_PROXY 8 "5 July 2011"
 .SH NAME
 zabbix_proxy \- Zabbix Proxy daemon.
 .SH SYNOPSIS
-.B zabbix_proxy [-hV] [-c 
-.I config-file
-.B ]
+.B zabbix_proxy [-hV] [-c \fIconfig-file\fR] [-R \fIoption\fR]
 .SH DESCRIPTION
 .B zabbix_proxy
 is a Proxy daemon used for remote data collection.
 .SS Options
 .IP "-c, --config config-file"
-Use the alternate
-.I config-file
-instead  of
-.I /etc/zabbix/zabbix_proxy.conf
-.
+Use the alternate \fIconfig-file\fR instead of \fI/etc/zabbix/zabbix_proxy.conf\fR.
+.IP "-R, --runtime-control option"
+Perform administrative functions according to \fIoption\fR.
 .IP "-h, --help"
 Display this help and exit.
 .IP "-V, --version"
 Output version information and exit.
+.SS Runtime control options
+.TP
+\fBconfig_cache_reload\fR
+Reload configuration cache.
 .SH FILES
 .TP
 .I /etc/zabbix/zabbix_proxy.conf
