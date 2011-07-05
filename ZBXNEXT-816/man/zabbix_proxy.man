@@ -1,6 +1,6 @@
 .TH ZABBIX_PROXY 8 "5 July 2011"
 .SH NAME
-zabbix_proxy \- Zabbix Proxy daemon.
+zabbix_proxy \- Zabbix proxy daemon.
 .SH SYNOPSIS
 .B zabbix_proxy [-hV] [-c \fIconfig-file\fR] [-R \fIoption\fR]
 .SH DESCRIPTION
@@ -22,7 +22,7 @@ Reload configuration cache.
 .SH FILES
 .TP
 .I /etc/zabbix/zabbix_proxy.conf
-Default location of Zabbix Proxy configuration file.
+Default location of Zabbix proxy configuration file.
 .SH "SEE ALSO"
 .BR zabbix_agentd (8),
 .BR zabbix_get (8),
