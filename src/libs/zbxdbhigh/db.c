@@ -1422,7 +1422,7 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	while (FAIL == found)
 	{
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-			nodeid, table->table, table->recid);
+				nodeid, table->table, table->recid);
 
 		if (NULL == (row = DBfetch(result)))
 		{

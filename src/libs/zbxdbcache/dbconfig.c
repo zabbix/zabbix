@@ -2221,7 +2221,7 @@ void	DCsync_configuration()
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name,
 			ssec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total time : " ZBX_FS_DBL " sec.", __function_name,
-			isec + tsec + fsec + hsec + htsec + gmsec + hmsec + ifsec + ssec);
+			isec + tsec + dsec + fsec + hsec + htsec + gmsec + hmsec + ifsec + ssec);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __function_name,
 			config->items.num_data, config->items.num_slots);
@@ -2253,6 +2253,8 @@ void	DCsync_configuration()
 			config->triggers.num_data, config->triggers.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() time_trigs : %d (%d allocated)", __function_name,
 			config->time_triggers.values_num, config->time_triggers.values_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : %d (%d slots)", __function_name,
+			config->trigdeps.num_data, config->trigdeps.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d (%d slots)", __function_name,
 			config->hosts.num_data, config->hosts.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_ph   : %d (%d slots)", __function_name,
@@ -3712,15 +3714,15 @@ unlock:
  ******************************************************************************/
 static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST *trigdep, int level)
 {
-	int				i, ret = SUCCEED;
+	int				i;
 	const ZBX_DC_TRIGGER		*next_trigger;
 	const ZBX_DC_TRIGGER_DEPLIST	*next_trigdep;
 
-	if (level > 32)
+	if (32 < level)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Recursive trigger dependency detected "
-				"(triggerid:" ZBX_FS_UI64 ")!", trigdep->triggerid);
-		return ret;
+		zabbix_log(LOG_LEVEL_CRIT, "Recursive trigger dependency detected (triggerid:" ZBX_FS_UI64 ")!",
+				trigdep->triggerid);
+		return SUCCEED;
 	}
 
 	if (NULL != trigdep->dependencies)
@@ -3731,19 +3733,15 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 					TRIGGER_VALUE_TRUE == next_trigger->value &&
 					TRIGGER_VALUE_FLAG_NORMAL == next_trigger->value_flags)
 			{
-				ret = FAIL;
-				break;
+				return FAIL;
 			}
 
 			if (FAIL == DCconfig_check_trigger_dependencies_rec(next_trigdep, level + 1))
-			{
-				ret = FAIL;
-				break;
-			}
+				return FAIL;
 		}
 	}
 
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************
