@@ -12206,13 +12206,13 @@ INSERT INTO graphs_items VALUES (796,385,22137,0,0,'009900',1,2,0,5);
 -- Dumping data for table `sysmaps`
 --
 
-INSERT INTO sysmaps VALUES (2,'Local network',980,200,NULL,1,2,1,1,0,0,50,1,1,0,2,2,2,2,2,'','','','','');
+INSERT INTO sysmaps VALUES (2,'Local network',980,200,NULL,1,2,1,1,0,0,50,1,1,0,2,2,2,2,2,'','','','','',NULL);
 
 --
 -- Dumping data for table `sysmaps_elements`
 --
 
-INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,NULL,'Zabbix server',NULL,100,100,NULL,NULL);
+INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,NULL,'Zabbix server',NULL,100,100,NULL,NULL,'1');
 
 --
 -- Dumping data for table `screens`

@@ -976,6 +976,7 @@ FIELD		|x		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|y		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|iconid_disabled|t_id		|	|NULL		|ZBX_SYNC		|4|images	|imageid	|RESTRICT
 FIELD		|iconid_maintenance|t_id	|	|NULL		|ZBX_SYNC		|5|images	|imageid	|RESTRICT
+FIELD		|use_iconmap	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC 
 
 TABLE|sysmap_element_url|sysmapelementurlid|ZBX_SYNC
 FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0
@@ -1010,6 +1011,7 @@ FIELD		|label_string_hostgroup|t_varchar(255)|''|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_trigger|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_map|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_image|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
+FIELD		|iconmapid	|t_id		|	|NULL		|ZBX_SYNC		|2|iconmap	|		|RESTRICT 
 INDEX		|1		|name
 
 TABLE|sysmap_url|sysmapurlid|ZBX_SYNC
@@ -1175,3 +1177,17 @@ FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|listen_dns	|t_varchar(64)	|''	|NOT NULL	|0
 INDEX		|1		|clock
+
+TABLE|icon_map|iconmapid|ZBX_SYNC 
+FIELD		|iconmapid	|t_id		|	|NOT NULL	|0 
+FIELD		|name		|t_varchar(64)	|	|NOT NULL	|ZBX_SYNC 
+INDEX		|1		|name 
+
+TABLE|icon_mapping|iconmappingid|ZBX_SYNC 
+FIELD		|iconmappingid	|t_id		|	|NOT NULL	|0 
+FIELD		|iconmapid	|t_id		|	|NOT NULL	|0			|1|icon_map 
+FIELD		|iconid		|t_id		|	|		|ZBX_SYNC		|2|images		|imageid
+FIELD		|profile_link	|t_integer	|	|NOT NULL	|ZBX_SYNC 
+FIELD		|expression	|t_varchar(64)	|	|NOT NULL	|ZBX_SYNC 
+FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
+INDEX		|1		|iconmapid 
