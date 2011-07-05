@@ -1011,7 +1011,7 @@ FIELD		|label_string_hostgroup|t_varchar(255)|''|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_trigger|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_map|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_image|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
-FIELD		|iconmapid	|t_id		|	|NULL		|ZBX_SYNC		|2|iconmap	|		|RESTRICT 
+FIELD		|iconmapid	|t_id		|	|NULL		|ZBX_SYNC		|2|icon_map	|		|RESTRICT 
 INDEX		|1		|name
 
 TABLE|sysmap_url|sysmapurlid|ZBX_SYNC
@@ -1181,12 +1181,13 @@ INDEX		|1		|clock
 TABLE|icon_map|iconmapid|ZBX_SYNC 
 FIELD		|iconmapid	|t_id		|	|NOT NULL	|0 
 FIELD		|name		|t_varchar(64)	|	|NOT NULL	|ZBX_SYNC 
-INDEX		|1		|name 
+INDEX		|1		|iconmapid
+UNIQUE		|2		|name
 
 TABLE|icon_mapping|iconmappingid|ZBX_SYNC 
 FIELD		|iconmappingid	|t_id		|	|NOT NULL	|0 
-FIELD		|iconmapid	|t_id		|	|NOT NULL	|0			|1|icon_map 
-FIELD		|iconid		|t_id		|	|		|ZBX_SYNC		|2|images		|imageid
+FIELD		|iconmapid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|icon_map 		|		|RESTRICT
+FIELD		|iconid		|t_id		|	|NOT NULL	|ZBX_SYNC		|2|images		|imageid	|RESTRICT
 FIELD		|profile_link	|t_integer	|	|NOT NULL	|ZBX_SYNC 
 FIELD		|expression	|t_varchar(64)	|	|NOT NULL	|ZBX_SYNC 
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
