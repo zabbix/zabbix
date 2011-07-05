@@ -85,8 +85,8 @@ if(!isset($DB)){
 						$result = false;
 					}
 					elseif(false !== ($pgsql_version = pg_parameter_status('server_version'))){
-						// if server_version exists and begins with 9 then set bytea_output = 'escape', as PG9 new hex bytea default type output
-						if((int) $pgsql_version > 8){
+						if((int) $pgsql_version >= 9){
+							// change the output format for values of type bytea from hex (the default) to escape
 							DBexecute('set bytea_output = escape');
 						}
 					}
