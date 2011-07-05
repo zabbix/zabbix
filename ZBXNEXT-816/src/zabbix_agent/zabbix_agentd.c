@@ -72,7 +72,7 @@ const char	usage_message[] =
 	" [-idsx] [-m]"
 #endif
 	" [-c <file>] [-t <item>]";
-/*end of application USAGE message */
+/* end of application USAGE message */
 
 /* application HELP message */
 const char	*help_message[] = {
@@ -81,8 +81,8 @@ const char	*help_message[] = {
 	"  -c --config <file>    absolute path to the configuration file",
 	"  -h --help             give this help",
 	"  -V --version          display version number",
-	"  -p --print            print supported items and exit",
-	"  -t --test <item>      test specified item and exit",
+	"  -p --print            print built-in items and exit",
+	"  -t --test <item key>  test specified item and exit",
 #ifdef _WINDOWS
 	"",
 	"Functions:",
