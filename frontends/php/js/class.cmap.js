@@ -791,7 +791,7 @@ ZABBIX.apps.map = (function(){
 				opacity: 0.5,
 				helper: 'clone',
 				stop: jQuery.proxy(function(event, data){
-					this.update({
+					this.updatePosition({
 						x: parseInt(data.position.left, 10),
 						y: parseInt(data.position.top, 10)
 					});
@@ -851,10 +851,17 @@ ZABBIX.apps.map = (function(){
 				}
 
 				this.updateIcon();
+
+				this.align(false);
+				this.trigger('afterMove', this);
+			},
+
+			updatePosition: function(coords){
+				this.data.x = coords.x;
+				this.data.y = coords.y;
+
 				this.align();
 				this.trigger('afterMove', this);
-
-				this.sysmap.updateImage();
 			},
 
 			remove: function(){
@@ -879,7 +886,7 @@ ZABBIX.apps.map = (function(){
 				return this.selected;
 			},
 
-			align: function(force){
+			align: function(doAutoAlign){
 				var dims = {
 						height: this.domNode.height(),
 						width: this.domNode.width()
@@ -895,16 +902,13 @@ ZABBIX.apps.map = (function(){
 					gridSize = parseInt(this.sysmap.data.grid_size, 10),
 					realign = false;
 
-				force = force || false;
-
-
 				// if 'fit to map' area coords are 0 always
 				if((this.data.elementsubtype === '1') && (this.data.areatype === '0')){
 					newX = 0;
 					newY = 0;
 				}
 				// if autoalign is off
-				else if(!force && (this.sysmap.data.grid_align == '0')){
+				else if((doAutoAlign === false) || (typeof doAutoAlign === 'undefined' && (this.sysmap.data.grid_align == '0'))){
 					if((x + dims.width) > this.sysmap.data.width){
 						newX = this.sysmap.data.width - dims.width;
 					}
@@ -970,7 +974,7 @@ ZABBIX.apps.map = (function(){
 				});
 
 				if(realign){
-					this.align(force);
+					this.align(doAutoAlign);
 				}
 			},
 
@@ -1630,6 +1634,7 @@ ZABBIX.apps.map = (function(){
 					jQuery('#areaSizeHeight').val(element.data.height);
 				}
 			}
+			this.sysmap.updateImage();
 		});
 
 		Link.prototype.bind('afterUpdate', function(){
