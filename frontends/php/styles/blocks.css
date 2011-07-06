@@ -32,12 +32,13 @@
 }
 
 #sysmap_cnt .selected{
-	outline: 3px #FFCC00 solid;
+	border: 3px #FFCC00 solid;
+	margin:  -3px;
 }
 #sysmap_cnt .ui-selecting{
-	outline: 3px #FFCC00 solid;
+	border: 3px #FFCC00 solid;
+	margin:  -3px;
 }
-
 
 .floatWindow{
 	box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5);
