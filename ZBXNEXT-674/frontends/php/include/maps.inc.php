@@ -119,14 +119,21 @@ function getActionMapBySysmap($sysmap){
 	processAreasCoordinates($sysmap, $areas, $map_info);
 
 	$hostids = array();
-	foreach($sysmap['selements'] as $sid => $selement){
+	foreach($sysmap['selements'] as $sid => &$selement){
 		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
 			$hostids[$selement['elementid']] = $selement['elementid'];
+
+			// expanding hosts url macros again as some hosts were added from hostgroup areeas
+			// and automatic expanding only happens for elements that are defined for map in db
+			foreach($selement['urls'] as $urlid => $url){
+				$selement['urls'][$urlid]['url'] = str_replace('{HOST.ID}', $selement['elementid'], $url['url']);
+			}
 		}
 		if($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS){
 			unset($sysmap['selements'][$sid]);
 		}
 	}
+	unset($selement);
 
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
 
