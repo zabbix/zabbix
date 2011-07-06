@@ -170,7 +170,7 @@
 			</table>
 		</form>
 
-		<div id="mapLinksContainer" style="max-height: 128px; overflow-y: auto; overflow-x: hidden; display: none;">
+		<div id="mapLinksContainer" style="max-height: 128px; overflow-y: scroll; overflow-x: hidden; display: none;">
 			<table class="tableinfo">
 				<thead>
 				<tr class="header">
