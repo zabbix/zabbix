@@ -1,5 +1,6 @@
 Changes for 1.8.6rc1
 
+ - [ZBX-1074] fixed compilation errors regarding sem_lock and sem_unlock on HP-UX; thanks to Brian Collins (asaveljevs)
  - [ZBX-3063] added compatibility with PostgreSQL 9+; thanks to Andrey Groshev for patch (asaveljevs,Vedmak)
  - [ZBX-3890] added logging of ORACLE warning messages while connecting to the database (Sasha)
  - [ZBX-3880] fixed repeated processing of log-files through proxy when disabling a host or item (Sasha)
