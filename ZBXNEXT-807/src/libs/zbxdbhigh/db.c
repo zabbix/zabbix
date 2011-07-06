@@ -34,8 +34,10 @@ const char	*DBnode(const char *fieldid, int nodeid)
 	if (-1 == nodeid)
 		*dbnode = '\0';
 	else
+	{
 		zbx_snprintf(dbnode, sizeof(dbnode), " and %s between %d00000000000000 and %d99999999999999",
 				fieldid, nodeid, nodeid);
+	}
 
 	return dbnode;
 }
@@ -70,25 +72,26 @@ void	DBconnect(int flag)
 		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
 					CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
 
-		switch(err) {
-		case ZBX_DB_OK:
-			break;
-		case ZBX_DB_DOWN:
-			if (ZBX_DB_CONNECT_EXIT == flag)
-			{
+		switch(err)
+		{
+			case ZBX_DB_OK:
+				break;
+			case ZBX_DB_DOWN:
+				if (ZBX_DB_CONNECT_EXIT == flag)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
+					exit(FAIL);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+							" Reconnecting in 10 seconds");
+					zbx_sleep(10);
+				}
+				break;
+			default:
 				zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
 				exit(FAIL);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Database is down."
-						" Reconnecting in 10 seconds");
-				zbx_sleep(10);
-			}
-			break;
-		default:
-			zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
-			exit(FAIL);
 		}
 	}
 	while (ZBX_DB_OK != err);
@@ -327,7 +330,7 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
  */
 DB_RESULT	DBselectN(const char *query, int n)
 {
-	DB_RESULT rc;
+	DB_RESULT	rc;
 
 	rc = zbx_db_select_n(query, n);
 
@@ -404,7 +407,7 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 			TRIGGER_VALUE_FLAG_NORMAL == new_flags)) &&
 			SUCCEED == DCconfig_check_trigger_dependencies(triggerid);
 
-	if (generate_event) /* initial test passed */
+	if (generate_event)	/* initial test passed */
 	{
 		if ((TRIGGER_VALUE_FALSE == trigger_value && (TRIGGER_VALUE_TRUE == new_value &&
 								TRIGGER_VALUE_FLAG_UNKNOWN == new_flags)) ||
@@ -987,11 +990,11 @@ static int	DBget_escape_string_len(const char *src)
 		if (*s == '\r')
 			continue;
 
-		if (*s == '\''
 #if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-			|| *s == '\\'
+		if (*s == '\'' || *s == '\\')
+#else
+		if (*s == '\'')
 #endif
-			)
 		{
 			len++;
 		}
@@ -1035,11 +1038,11 @@ static void	DBescape_string(const char *src, char *dst, int len)
 		if (*s == '\r')
 			continue;
 
-		if (*s == '\''
 #if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-			|| *s == '\\'
+		if (*s == '\'' || *s == '\\')
+#else
+		if (*s == '\'')
 #endif
-			)
 		{
 			if (len < 2)
 				break;
@@ -1116,11 +1119,11 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
 		if (*s == '\r')
 			continue;
 
-		if (*s == '\''
 #if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-			|| *s == '\\'
+		if (*s == '\'' || *s == '\\')
+#else
+		if (*s == '\'')
 #endif
-			)
 		{
 			len++;
 		}
@@ -1358,8 +1361,11 @@ const ZBX_TABLE *DBget_table(const char *tablename)
 	int	t;
 
 	for (t = 0; NULL != tables[t].table; t++)
+	{
 		if (0 == strcmp(tables[t].table, tablename))
 			return &tables[t];
+	}
+
 	return NULL;
 }
 
@@ -1368,8 +1374,11 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 	int	f;
 
 	for (f = 0; NULL != table->fields[f].name; f++)
+	{
 		if (0 == strcmp(table->fields[f].name, fieldname))
 			return &table->fields[f];
+	}
+
 	return NULL;
 }
 
@@ -1387,7 +1396,9 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "autoreg_host") ||
 			0 == strcmp(tablename, "graph_discovery") ||
 			0 == strcmp(tablename, "trigger_discovery"))
+	{
 		return DCget_nextid(tablename, num);
+	}
 
 	return DBget_nextid(tablename, num);
 }
@@ -1481,19 +1492,15 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 					nodeid, table->table, table->recid);
 
-			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				DBfree_result(result);
-				continue;
-			}
-			else
+			if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 			{
 				ZBX_STR2UINT64(ret2, row[0]);
 				DBfree_result(result);
 				if (ret1 + num == ret2)
 					found = SUCCEED;
 			}
+			else
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 	}
 
@@ -1505,14 +1512,14 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num)
 {
-#define MAX_EXPRESSIONS 950
+#define MAX_EXPRESSIONS	950
 	int	i;
 
 	if (0 == num)
 		return;
 
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, " ");
-	if (num > MAX_EXPRESSIONS)
+	if (MAX_EXPRESSIONS < num)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, "(");
 
 	for (i = 0; i < num; i++)
@@ -1524,17 +1531,16 @@ void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const ch
 				(*sql_offset)--;
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 8, ") or ");
 			}
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 128, "%s in (",
-					fieldname);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 128, "%s in (", fieldname);
 		}
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 128, ZBX_FS_UI64 ",",
-				values[i]);
+
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 128, ZBX_FS_UI64 ",", values[i]);
 	}
 
 	(*sql_offset)--;
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, ")");
 
-	if (num > MAX_EXPRESSIONS)
+	if (MAX_EXPRESSIONS < num)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, ")");
 }
 
