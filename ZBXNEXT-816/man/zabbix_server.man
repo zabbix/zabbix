@@ -8,7 +8,7 @@ zabbix_server \- Zabbix server daemon.
 is a core daemon of Zabbix software.
 .SS Options
 .IP "-c, --config \fI<config-file>\fR"
-Use the alternate system wide \fIconfig-file\fR instead of \fI/etc/zabbix/zabbix_server.conf\fR.
+Use the alternate \fIconfig-file\fR instead of \fI/etc/zabbix/zabbix_server.conf\fR.
 .IP "-n, --new-nodeid \fI<nodeid>\fR"
 Convert database data to new \fInodeid\fR.
 .IP "-R, --runtime-control \fI<option>\fR"

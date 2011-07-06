@@ -12,7 +12,7 @@ zabbix_agentd \- Zabbix agent daemon.
 is a daemon for monitoring of various server parameters.
 .SS Options
 .IP "-c, --config \fI<config-file>\fR"
-Use the alternate system wide
+Use the alternate
 .I config-file
 instead of
 .I /etc/zabbix/zabbix_agentd.conf\fR.
