@@ -121,7 +121,7 @@ static int	housekeeping_process_log()
 			{
 				deleted = DBexecute(
 						"delete from %s"
-						" where ctid = any (array(select ctid from %s"
+						" where ctid = any(array(select ctid from %s"
 							" where %s=" ZBX_FS_UI64 " limit %d))",
 						housekeeper.tablename,
 						housekeeper.tablename,
