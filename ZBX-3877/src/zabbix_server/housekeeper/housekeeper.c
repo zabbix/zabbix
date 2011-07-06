@@ -26,7 +26,6 @@
 #include "housekeeper.h"
 
 extern unsigned char	process_type;
-extern int		ZBX_PG_SVERSION;
 
 /******************************************************************************
  *                                                                            *
@@ -100,6 +99,8 @@ static int	housekeeping_process_log()
 					housekeeper.value,
 					CONFIG_MAX_HOUSEKEEPER_DELETE);
 #elif defined(HAVE_POSTGRESQL)
+			extern int	ZBX_PG_SVERSION;
+
 			/* PostgreSQL array constructors are available since version 7.4 */
 			if (70400 > ZBX_PG_SVERSION)
 			{
@@ -120,7 +121,7 @@ static int	housekeeping_process_log()
 			{
 				deleted = DBexecute(
 						"delete from %s"
-						" where CTID = any (array(select CTID from %s"
+						" where ctid = any (array(select ctid from %s"
 							" where %s=" ZBX_FS_UI64 " limit %d))",
 						housekeeper.tablename,
 						housekeeper.tablename,
