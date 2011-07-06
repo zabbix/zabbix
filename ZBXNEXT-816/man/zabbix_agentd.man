@@ -2,9 +2,11 @@
 .SH NAME
 zabbix_agentd \- Zabbix agent daemon.
 .SH SYNOPSIS
-.B zabbix_agentd [-hpV] [-c 
-.I config-file
-.B ] [-t metric]
+.B zabbix_agentd [-hpV] [-c
+.I <config-file>
+.B ] [-t
+.I <item key>
+.B ]
 .SH DESCRIPTION
 .B zabbix_agentd
 is a daemon for monitoring of various server parameters.
@@ -12,12 +14,12 @@ is a daemon for monitoring of various server parameters.
 .IP "-c, --config \fI<config-file>\fR"
 Use the alternate system wide
 .I config-file
-instead  of
+instead of
 .I /etc/zabbix/zabbix_agentd.conf\fR.
 Use absolute path.
 .
 .IP "-p, --print"
-Print built-in items and exit.
+Print known items and exit.
 .IP "-t, --test \fI<item key>\fR"
 Test single item and exit.
 .IP "-h, --help"

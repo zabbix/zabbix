@@ -81,7 +81,7 @@ const char	*help_message[] = {
 	"  -c --config <file>    absolute path to the configuration file",
 	"  -h --help             give this help",
 	"  -V --version          display version number",
-	"  -p --print            print built-in items and exit",
+	"  -p --print            print known items and exit",
 	"  -t --test <item key>  test specified item and exit",
 #ifdef _WINDOWS
 	"",

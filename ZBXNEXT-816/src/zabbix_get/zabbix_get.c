@@ -31,11 +31,11 @@ const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-I <IP add
 
 const char	*help_message[] = {
 	"Options:",
-	"  -s --host <host name or IP>          Specify host name or IP address of a host.",
-	"  -p --port <port number>              Specify port number of agent running on the host. Default is 10050.",
+	"  -s --host <host name or IP>          Specify host name or IP address of a host",
+	"  -p --port <port number>              Specify port number of agent running on the host. Default is 10050",
 	"  -I --source-address <IP address>     Specify source IP address",
 	"",
-	"  -k --key <key of metric>             Specify item key to retrieve.",
+	"  -k --key <key of metric>             Specify key of item to retrieve value for",
 	"",
 	"  -h --help                            Give this help",
 	"  -V --version                         Display version number",

@@ -2,7 +2,7 @@
 .SH NAME
 zabbix_server \- Zabbix server daemon.
 .SH SYNOPSIS
-.B zabbix_server [-hV] [-c \fIconfig-file\fR] [-n \fInodeid\fR] [-R \fIoption\fR]
+.B zabbix_server [-hV] [-c \fI<config-file>\fR] [-n \fI<nodeid>\fR] [-R \fI<option>\fR]
 .SH DESCRIPTION
 .B zabbix_server
 is a core daemon of Zabbix software.

@@ -2,7 +2,7 @@
 .SH NAME
 zabbix_proxy \- Zabbix proxy daemon.
 .SH SYNOPSIS
-.B zabbix_proxy [-hV] [-c \fIconfig-file\fR] [-R \fIoption\fR]
+.B zabbix_proxy [-hV] [-c \fI<config-file>\fR] [-R \fI<option>\fR]
 .SH DESCRIPTION
 .B zabbix_proxy
 is a daemon used for remote data collection.
@@ -17,7 +17,7 @@ Runtime control options
 .RS 4
 .TP 4
 config_cache_reload
-Reload configuration cache. Ignored if cache is being currently loaded.
+Reload configuration cache. Ignored if cache is being currently loaded. Active Zabbix proxy will connect to the Zabbix server and request configuration data.
 .RE
 .RE
 .IP "-h, --help"
