@@ -172,6 +172,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3063] added compatibility with PostgreSQL 9+; thanks to Andrey Groshev for patch (asaveljevs,Vedmak)
  - [ZBX-3890] added logging of ORACLE warning messages while connecting to the database (Sasha)
  - [ZBX-3880] fixed repeated processing of log-files through proxy when disabling a host or item (Sasha)
  - [ZBX-3420] fixed wrong error message being logged in case of DNS resolution errors (asaveljevs,rudolfs)
