@@ -33,7 +33,7 @@
 
 #sysmap_cnt .selected{
 	border: 3px #FFCC00 solid;
-	margin:  -3px;
+	margin: -3px;
 }
 #sysmap_cnt .ui-selecting{
 	border: 3px #FFCC00 solid;
