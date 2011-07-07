@@ -15,13 +15,9 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**
-*/
-// JavaScript Document
+**/
 
-/**********************************************************************************************************************/
 //	Trigger log expression
-/**********************************************************************************************************************/
 var logexpr_count = 0;
 var key_count = 0;
 
@@ -311,7 +307,7 @@ function swapNodesNames(n1,n2){
 	}
 
 	if(is_number(id1) && is_number(id2)){
-		var elm = new Array();
+		var elm = [];
 		elm[0] = document.getElementsByName('expressions['+id1+'][value]')[0];
 		elm[1] = document.getElementsByName('expressions['+id1+'][type]')[0];
 		elm[2] = document.getElementsByName('expressions['+id1+'][view]')[0];
@@ -353,7 +349,6 @@ function add_keyword(bt_type){
 	}
 	catch(e){
 		throw('Error: '+(IE?e.description:e));
-		return false;
 	}
 
 	if(typeof(expr.value) == 'undefined' || expr.value == '') return false;
@@ -487,9 +482,8 @@ function set_macro(v){
 
 	expr_temp.value = '{TRIGGER.VALUE}' + sign + v;
 }
-/************************************************************************************/
+
 /*								GRAPH RELATED STUFF 								*/
-/************************************************************************************/
 var graphs = {
 graphtype : 0,
 
@@ -502,11 +496,9 @@ submit : function(obj){
 	}
 	document.getElementsByName('frm_graph')[0].submit();
 }
-}
+};
 
-/************************************************************************************/
 /*										SERVICES 									*/
-/************************************************************************************/
 function call_menu(evnt,id,name){
 	if(id != 0){
 		show_popup_menu(evnt,
@@ -606,7 +598,7 @@ function check_childs(form_name, chkMain, chkName){
 
 	for (var i=0; i < frmForm.length; i++){
 		if(frmForm.elements[i].type != 'checkbox') continue;
-		if(frmForm.elements[i].disabled == true) continue;
+		if(frmForm.elements[i].disabled) continue;
 
 		var splt = frmForm.elements[i].name.split('[');
 		var name = splt[0];
@@ -651,16 +643,12 @@ function cloneRow(elementid, count){
 	newEntry.style.display = '';
 }
 
-
-//------------------------------------------------------
 //					DASHBOARD JS MENU
-//------------------------------------------------------
-
 function create_page_menu(e,id){
-	if(!e) var e = window.event;
+	if(!e) e = window.event;
 	id='menu_'+id;
 
-	var dbrd_menu = new Array();
+	var dbrd_menu = [];
 
 //to create a copy of array, but not references!!!!
 //alert(id+' : '+page_menu[id]);
@@ -672,7 +660,7 @@ function create_page_menu(e,id){
 	for(var i=0; i < page_submenu[id].length; i++){
 		if((typeof(page_submenu[id][i]) != 'undefined') && !empty(page_submenu[id][i])){
 			var row = page_submenu[id][i];
-			var menu_row = new Array(row.name,"javascript: rm4favorites('"+row.favobj+"','"+row.favid+"','"+i+"');");
+			var menu_row = [row.name,"javascript: rm4favorites('"+row.favobj+"','"+row.favid+"','"+i+"');"];
 			dbrd_menu[dbrd_menu.length-1].push(menu_row);
 		}
 	}
@@ -680,13 +668,10 @@ function create_page_menu(e,id){
 	show_popup_menu(e,dbrd_menu,280);// JavaScript Document
 }
 
-//------------------------------------------------------
 //					TRIGGERS JS MENU
-//------------------------------------------------------
-
 function create_mon_trigger_menu(e, args, items){
-	var tr_menu = new Array(['Triggers',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
-								['Events','events.php?triggerid='+args[0].triggerid+'&nav_time='+args[0].lastchange,null]);
+	var tr_menu = [['Triggers',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
+								['Events','events.php?triggerid='+args[0].triggerid+'&nav_time='+args[0].lastchange,null]];
 
 	if((args.length > 1) && !is_null(args[1])) tr_menu.push(args[1]);
 	if((args.length > 1) && !is_null(args[2])) tr_menu.push(args[2]);
@@ -741,11 +726,7 @@ function create_mon_trigger_menu(e, args, items){
 	show_popup_menu(e,tr_menu,280);
 }
 
-
-//------------------------------------------------------
 //					USERS FORM
-//------------------------------------------------------
-
 function testUserSound(idx){
 	var sound = $(idx).options[$(idx).selectedIndex].value;
 	var repeat = $('messages[sounds.repeat]').options[$('messages[sounds.repeat]').selectedIndex].value;

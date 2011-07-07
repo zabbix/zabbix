@@ -1,4 +1,3 @@
-//Javascript document
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -18,10 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-/************************************************************************************/
-/*								PAGE REFRESH										*/
-/************************************************************************************/
 // Author: Aly
+
+/*								PAGE REFRESH										*/
 var PageRefresh = {
 delay:			null,	// refresh timeout
 delayLeft:		null,	// left till refresh
@@ -49,12 +47,6 @@ start: function(){
 	this.timeout = setTimeout('PageRefresh.check()', 1000);
 },
 
-restart: function(){
-	this.stop();
-	this.delayLeft = this.delay;
-	this.start();
-},
-
 stop: function(){
 	clearTimeout(this.timeout);
 },
@@ -64,13 +56,9 @@ restart: function(){
 	this.delayLeft = this.delay;
 	this.start();
 }
-}
+};
 
-/************************************************************************************/
 /*								MAIN MENU stuff										*/
-/************************************************************************************/
-// Author: Aly
-
 var MMenu = {
 menus:			{'empty': 0, 'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
 def_label:		null,
@@ -111,13 +99,9 @@ showSubMenu: function(show_label){
 		}
 	}
 }
-}
+};
 
-/************************************************************************************/
 /*						Automatic checkbox range selection 							*/
-/************************************************************************************/
-// Author: Aly
-
 var chkbxRange = {
 startbox:			null,			// start checkbox obj
 startbox_name: 		null,			// start checkbox name
@@ -153,7 +137,7 @@ init: function(){
 implement: function(obj){
 	var obj_name = obj.name.split('[')[0];
 
-	if(typeof(this.chkboxes[obj_name]) == 'undefined') this.chkboxes[obj_name] = new Array();
+	if(typeof(this.chkboxes[obj_name]) == 'undefined') this.chkboxes[obj_name] = [];
 	this.chkboxes[obj_name].push(obj);
 
 	addListener(obj, 'click', this.check.bindAsEventListener(this), false);
@@ -170,7 +154,7 @@ implement: function(obj){
 },
 
 check: function(e){
-	var e = e || window.event;
+	e = e || window.event;
 	var obj = Event.element(e);
 
 	PageRefresh.restart();
@@ -330,7 +314,7 @@ setGo: function(){
 },
 
 submitGo: function(e){
-	var e = e || window.event;
+	e = e || window.event;
 
 	if(this.pageGoCount > 0){
 		var goSelect = $('go');
@@ -339,7 +323,7 @@ submitGo: function(e){
 		if(is_null(confirmText) || !confirmText){
 //			confirmText = 'Continue with "'+goSelect.options[goSelect.selectedIndex].text+'"?';
 		}
-		else if(!Confirm(confirmText)){
+		else if(!confirm(confirmText)){
 			Event.stop(e);
 			return false;
 		}
@@ -360,9 +344,7 @@ submitGo: function(e){
 }
 };
 
-/************************************************************************************/
 /*								Audio Control System 								*/
-/************************************************************************************/
 var AudioList = {
 list:		{},		// audio files options
 dom:		{},		// dom objects links
@@ -565,12 +547,9 @@ remove: function(audiofile){
 	delete(this.dom[audiofile]);
 	delete(this.list[audiofile]);
 }
-}
+};
 
-/************************************************************************************/
-/*						Replace Standard Blink functionality						*/
-/************************************************************************************/
-
+/*						Replace Standart Blink functionality						*/
 /**
  * Sets HTML elements to blink.
  * Example of usage:
@@ -653,9 +632,8 @@ var jqBlink = {
 	}
 };
 
-/************************************************************************************/
+
 /*								ZABBIX HintBoxes 									*/
-/************************************************************************************/
 var hintBox = {
 boxes:				{},				// array of dom Hint Boxes
 boxesCount: 		0,				// unique box id
@@ -715,7 +693,7 @@ return box;
 showOver: function(e, obj, hint_text, width, className){
 	this.debug('showOver');
 
-	if (!e) var e = window.event;
+	if(!e) e = window.event;
 
 	var hintid = obj.getAttribute('hintid');
 	var hintbox = $(hintid);
@@ -727,7 +705,7 @@ showOver: function(e, obj, hint_text, width, className){
 
 	if(!empty(byClick)) return;
 
-	var hintbox = this.createBox(obj,hint_text, width, className, false);
+	hintbox = this.createBox(obj,hint_text, width, className, false);
 
 	obj.setAttribute('hintid', hintbox.id);
 	this.show(e, obj, hintbox);
@@ -736,7 +714,7 @@ showOver: function(e, obj, hint_text, width, className){
 hideOut: function(e, obj){
 	this.debug('hideOut');
 
-	if (!e) var e = window.event;
+	if (!e) e = window.event;
 
 	var hintid = obj.getAttribute('hintid');
 	var hintbox = $(hintid);
@@ -759,7 +737,7 @@ hideOut: function(e, obj){
 onClick: function(e, obj, hint_text, width, className){
 	this.debug('onClick');
 
-	if (!e) var e = window.event;
+	if (!e) e = window.event;
 	cancelEvent(e);
 
 	var hintid = obj.getAttribute('hintid');
@@ -774,7 +752,7 @@ onClick: function(e, obj, hint_text, width, className){
 		obj.removeAttribute('hintid');
 		this.hide(e, hintid);
 
-		var hintbox = this.createBox(obj, hint_text, width, className, true);
+		hintbox = this.createBox(obj, hint_text, width, className, true);
 
 		hintbox.setAttribute('byclick', 'true');
 		obj.setAttribute('hintid', hintbox.id);
@@ -788,7 +766,7 @@ onClick: function(e, obj, hint_text, width, className){
 		this.hide(e, hintid);
 	}
 	else{
-		var hintbox = this.createBox(obj,hint_text, width, className, true);
+		hintbox = this.createBox(obj,hint_text, width, className, true);
 
 		hintbox.setAttribute('byclick', 'true');
 		obj.setAttribute('hintid', hintbox.id);
@@ -800,32 +778,13 @@ onClick: function(e, obj, hint_text, width, className){
 show: function(e, obj, hintbox){
 	this.debug('show');
 
-	var hintid = hintbox.id;
-	// var body_width = get_bodywidth();
 	var body_width = document.viewport.getDimensions().width;
-
-//	pos = getPosition(obj);
-// this.debug('body width: ' + body_width);
-// this.debug('position.top: ' + pos.top);
-
-// by Object
-/*
-	if(parseInt(pos.left+obj.offsetWidth+4+hintbox.offsetWidth) > body_width){
-		pos.left-=parseInt(hintbox.offsetWidth);
-		pos.left-=4;
-		pos.left=(pos.left < 0)?0:pos.left;
-	}
-	else{
-		pos.left+= obj.offsetWidth+4;
-	}
-	hintbox.x	= pos.left;
-//*/
 
 	hintbox.style.visibility = 'hidden';
 	hintbox.style.display = 'block';
 
-	posit = $(obj).positionedOffset();
-	cumoff = $(obj).cumulativeOffset();
+	var posit = $(obj).positionedOffset();
+	var cumoff = $(obj).cumulativeOffset();
 	if(parseInt(cumoff.left+10+hintbox.offsetWidth) > body_width){
 		posit.left = posit.left - parseInt((cumoff.left+10+hintbox.offsetWidth) - body_width) + document.viewport.getScrollOffsets().left;
 		// posit.left-=parseInt(hintbox.offsetWidth);
@@ -841,29 +800,23 @@ show: function(e, obj, hintbox){
 	hintbox.style.top	= hintbox.y + 10 + parseInt(obj.offsetHeight/2) + 'px';
 	hintbox.style.visibility = 'visible';
 	hintbox.style.zIndex = '999';
-
-// IE6 z-index bug
-	//if(IE6) showPopupDiv(hintid, 'frame_'+hintid);
-
 },
 
 hide: function(e, boxid){
 	this.debug('hide');
 
-	if (!e) var e = window.event;
+	if (!e) e = window.event;
 	cancelEvent(e);
 
 	var hint = $(boxid);
 	if(!is_null(hint)){
 		delete(this.boxes[boxid]);
 
-		//hidePopupDiv('frame_'+hint.id);
 // Opera refresh bug!
 		hint.style.display = 'none';
 		//hintbox.setAttribute('byclick', 'true');
 		if(OP) setTimeout(function(){hint.remove();}, 200);
 		else hint.remove();
-
 	}
 },
 
@@ -892,16 +845,14 @@ debug: function(fnc_name, id){
 		this.debug_prev = str;
 	}
 }
-}
+};
 
-/************************************************************************************/
 /*								COLOR PICKER FUNCTIONS 								*/
-/************************************************************************************/
 function hide_color_picker(){
 	if(!color_picker) return;
 
 	color_picker.style.zIndex = 1000;
-	color_picker.style.visibility="hidden"
+	color_picker.style.visibility="hidden";
 	color_picker.style.left	= "-" + ((color_picker.style.width) ? color_picker.style.width : 100) + "px";
 
 	curr_lbl = null;
@@ -953,10 +904,7 @@ function set_color_by_name(name, color){
 	set_color(color);
 }
 
-/************************************************************************************/
 /*								ZABBIX AJAX REQUESTS 								*/
-/************************************************************************************/
-
 function add2favorites(favobj,favid){
 	if('undefined' == typeof(Ajax)){
 		throw("Prototype.js lib is required!");
@@ -968,7 +916,7 @@ function add2favorites(favobj,favid){
 		'favobj': 	favobj,
 		'favid': 	favid,
 		'action':	'add'
-	}
+	};
 
 	send_params(params);
 //	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
@@ -989,7 +937,7 @@ function rm4favorites(favobj,favid,menu_rowid){
 		'favid': 	favid,
 		'favcnt':	menu_rowid,
 		'action':	'remove'
-	}
+	};
 
 	send_params(params);
 //	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
@@ -997,16 +945,14 @@ function rm4favorites(favobj,favid,menu_rowid){
 
 function change_flicker_state(divid){
 	deselectAll();
-	var eff_time = 500;
 
 	var switchArrows = function(){
 		switchElementsClass($("flicker_icon_l"),"dbl_arrow_up","dbl_arrow_down");
 		switchElementsClass($("flicker_icon_r"),"dbl_arrow_up","dbl_arrow_down");
-	}
+	};
 
 	var filter_state = ShowHide(divid);
 	switchArrows();
-//	var filter_state = showHideEffect(divid,'slide', eff_time, switchArrows);
 
 	if(false === filter_state) return false;
 
@@ -1015,7 +961,7 @@ function change_flicker_state(divid){
 		'favobj': 	'filter',
 		'favref': 	divid,
 		'state':	filter_state
-	}
+	};
 
 	send_params(params);
 
@@ -1029,7 +975,7 @@ function changeHatStateUI(icon, divid){
 
 	var switchIcon = function(){
 		switchElementsClass(icon,"arrowup","arrowdown");
-	}
+	};
 
 	jQuery($(divid).parentNode).
 		find('.body').toggle().end().
@@ -1045,7 +991,7 @@ function changeHatStateUI(icon, divid){
 		'favobj': 	'hat',
 		'favref': 	divid,
 		'state':	hat_state
-	}
+	};
 
 	send_params(params);
 }
@@ -1053,15 +999,12 @@ function changeHatStateUI(icon, divid){
 function change_hat_state(icon, divid){
 	deselectAll();
 
-	var eff_time = 500;
-
 	var switchIcon = function(){
 		switchElementsClass(icon,"arrowup","arrowdown");
-	}
+	};
 
 	var hat_state = ShowHide(divid);
 	switchIcon();
-//	var hat_state = showHideEffect(divid, 'slide', eff_time, switchIcon);
 
 	if(false === hat_state) return false;
 
@@ -1070,13 +1013,13 @@ function change_hat_state(icon, divid){
 		'favobj': 	'hat',
 		'favref': 	divid,
 		'state':	hat_state
-	}
+	};
 
 	send_params(params);
 }
 
 function send_params(params){
-	if(typeof(params) == 'undefined') var params = new Array();
+	if(typeof(params) === 'undefined') params = [];
 
 	var url = new Curl(location.href);
 	url.setQuery('?output=ajax');
@@ -1085,7 +1028,7 @@ function send_params(params){
 		{
 			'method': 'post',
 			'parameters':params,
-			'onSuccess': function(resp){ },
+			'onSuccess': function(){ },
 //			'onSuccess': function(resp){ SDI(resp.responseText); },
 			'onFailure': function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
 		}
@@ -1098,7 +1041,7 @@ function setRefreshRate(pmasterid,dollid,interval,params){
 		throw("Prototype.js lib is required!");
 	}
 
-	if((typeof(params) == 'undefined') || is_null(params))  var params = new Array();
+	if((typeof(params) == 'undefined') || is_null(params)) params = {};
 	params['pmasterid'] = 	pmasterid;
 	params['favobj'] = 		'set_rf_rate';
 	params['favref'] = 		dollid;
@@ -1118,7 +1061,7 @@ function switch_mute(icon){
 		'favobj': 	'sound',
 		'favref':	'sound',
 		'state':	sound_state
-	}
+	};
 
 	send_params(params);
 }

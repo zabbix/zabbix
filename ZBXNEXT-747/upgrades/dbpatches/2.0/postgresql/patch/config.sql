@@ -1,4 +1,4 @@
-ALTER TABLE ONLY config 
+ALTER TABLE ONLY config
 	ALTER configid DROP DEFAULT,
 	ALTER alert_usrgrpid DROP DEFAULT,
 	ALTER alert_usrgrpid DROP NOT NULL,

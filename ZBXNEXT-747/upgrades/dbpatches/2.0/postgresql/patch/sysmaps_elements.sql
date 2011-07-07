@@ -11,18 +11,25 @@ ALTER TABLE ONLY sysmap_element_url ADD CONSTRAINT c_sysmap_element_url_1 FOREIG
 INSERT INTO sysmap_element_url (sysmapelementurlid,selementid,name,url)
 	SELECT selementid,selementid,url,url FROM sysmaps_elements WHERE url<>'';
 
-ALTER TABLE ONLY sysmaps_elements ALTER selementid DROP DEFAULT,
-				  ALTER sysmapid DROP DEFAULT,
-				  ALTER iconid_off DROP DEFAULT,
-				  ALTER iconid_off DROP NOT NULL,
-				  ALTER iconid_on DROP DEFAULT,
-				  ALTER iconid_on DROP NOT NULL,
-				  DROP COLUMN iconid_unknown,
-				  ALTER iconid_disabled DROP DEFAULT,
-				  ALTER iconid_disabled DROP NOT NULL,
-				  ALTER iconid_maintenance DROP DEFAULT,
-				  ALTER iconid_maintenance DROP NOT NULL,
-				  DROP COLUMN url;
+ALTER TABLE ONLY sysmaps_elements
+	ALTER selementid DROP DEFAULT,
+	ALTER sysmapid DROP DEFAULT,
+	ALTER iconid_off DROP DEFAULT,
+	ALTER iconid_off DROP NOT NULL,
+	ALTER iconid_on DROP DEFAULT,
+	ALTER iconid_on DROP NOT NULL,
+	DROP COLUMN iconid_unknown,
+	ALTER iconid_disabled DROP DEFAULT,
+	ALTER iconid_disabled DROP NOT NULL,
+	ALTER iconid_maintenance DROP DEFAULT,
+	ALTER iconid_maintenance DROP NOT NULL,
+	DROP COLUMN url,
+	ADD elementsubtype integer DEFAULT '0' NOT NULL,
+	ADD areatype integer DEFAULT '0' NOT NULL,
+	ADD width integer DEFAULT '200' NOT NULL,
+	ADD height integer DEFAULT '200' NOT NULL,
+	ADD viewtype integer DEFAULT '0' NOT NULL;
+
 DELETE FROM sysmaps_elements WHERE NOT EXISTS (SELECT 1 FROM sysmaps WHERE sysmaps.sysmapid=sysmaps_elements.sysmapid);
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0;
 UPDATE sysmaps_elements SET iconid_on=NULL WHERE iconid_on=0;

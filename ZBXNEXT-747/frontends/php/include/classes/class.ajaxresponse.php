@@ -8,6 +8,11 @@ class ajaxResponse {
 	private $_data = array();
 	private $_errors = array();
 
+	public function __construct($data = null){
+		if($data !== null)
+			$this->success($data);
+	}
+
 /**
  * Add error to ajax response. All errors are returned as array in 'errors' part of response.
  *

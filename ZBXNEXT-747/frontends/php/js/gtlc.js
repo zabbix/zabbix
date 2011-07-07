@@ -15,21 +15,12 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**
-*/
-// [!CDATA[
-/************************************************************************************/
+**/
+
 // GRAPHS TIMELINE CONTROLS (GTLC)
 // author: Aly
-/************************************************************************************/
 
-/************************************************************************************/
 // Title: graph magic initialization
-// Author: Aly
-/************************************************************************************/
-
-//timeControl.addObject(id, time, objData)
-
 var timeControl = {
 objectList: {},				// objects needs to be controlled
 
@@ -63,7 +54,7 @@ addObject: function(domid, time, objData){
 	}
 
 	var nowDate = new CDate();
-	now = parseInt(nowDate.getTime() / 1000);
+	var now = parseInt(nowDate.getTime() / 1000);
 
 	if(!isset('period', time))		time.period = 3600;
 	if(!isset('endtime', time))		time.endtime = now;
@@ -253,7 +244,7 @@ objectUpdate: function(domid, timelineid){
 	}
 
 	if(!obj.dynamic){
-		url = new Curl(location.href);
+		var url = new Curl(location.href);
 		url.setArgument('stime', url_stime);
 		url.setArgument('period', period);
 		url.unsetArgument('output');
@@ -288,7 +279,7 @@ objectReset: function(id){
 			}
 		}
 		else if(!this.objectList[key].dynamic){
-			url = new Curl(location.href);
+			var url = new Curl(location.href);
 			url.unsetArgument('stime');
 			url.unsetArgument('period');
 			url.unsetArgument('output');
@@ -306,7 +297,7 @@ loadDynamic: function(id, stime, period){
 
 	var dom_object = $(obj.domid);
 	if(!is_null(dom_object) && (dom_object.nodeName.toLowerCase() == 'img')){
-		url = new Curl(obj.src);
+		var url = new Curl(obj.src);
 		url.setArgument('stime', stime);
 		url.setArgument('period', period);
 		url.setArgument('refresh', Math.floor(Math.random()*1000));
@@ -318,10 +309,9 @@ loadDynamic: function(id, stime, period){
 updateProfile: function(id, stime, period){
 	if(typeof(Ajax) == 'undefined'){
 		throw("Prototype.js lib is required!");
-		return false;
 	}
 
-	var params = new Array();
+	var params = [];
 	params['favobj'] = 'timeline';
 	params['favid'] = id;
 	params['graphid'] = id;
@@ -346,13 +336,14 @@ debug: function(fnc_name, id){
 		this.debug_prev = str;
 	}
 }
-}
+
+};
 
 function datetoarray(unixtime){
 
 	var date = new CDate(unixtime*1000);
 
-	var thedate = new Array();
+	var thedate = [];
 	thedate[0] = date.getDate();
 	thedate[1] = date.getMonth()+1;
 	thedate[2] = date.getFullYear();
@@ -360,7 +351,7 @@ function datetoarray(unixtime){
 	thedate[4] = date.getMinutes();
 	thedate[5] = date.getSeconds();
 
-	for(i = 0; i < thedate.length; i++){
+	for(var i = 0; i < thedate.length; i++){
 		if((thedate[i]+'').length < 2) thedate[i] = '0'+thedate[i];
 	}
 return thedate;
@@ -382,16 +373,12 @@ function onload_update_scroll(id,w,period,stime,timel,bar_stime){
 }
 
 
-/************************************************************************************/
 // Title: TimeLine COntrol CORE
-// Author: Aly
-/************************************************************************************/
-
 var ZBX_TIMELINES = {};
 
 function create_timeline(tlid, period, starttime, usertime, endtime){
 	if(is_null(tlid)){
-		var tlid = ZBX_TIMELINES.length;
+		tlid = ZBX_TIMELINES.length;
 	}
 
 	var now = new CDate();
@@ -520,15 +507,12 @@ debug: function(fnc_name, id){
 }
 });
 
-/************************************************************************************/
 // Title: graph scrolling
-// Author: Aly
-/************************************************************************************/
 var ZBX_SCROLLBARS = {};
 
 function scrollCreate(sbid, w, timelineid, fixedperiod){
 	if(is_null(sbid)){
-		var sbid = ZBX_SCROLLBARS.length;
+		sbid = ZBX_SCROLLBARS.length;
 	}
 
 	if(is_null(timelineid)){
@@ -565,7 +549,7 @@ dom:{
 	'zoom': null,				// dom object
 	'text': null,				// dom object
 	'links': null,				// dom object
-	'linklist': new Array(),	// dom object
+	'linklist': [],	// dom object
 
 	'timeline': null,			// dom object
 	'info_left': null,			// dom object
@@ -588,7 +572,7 @@ dom:{
 
 	'subline': null,				// dom object
 	'nav_links': null,				// dom object
-	'nav_linklist': new Array(),	// dom object
+	'nav_linklist': [],	// dom object
 	'period_state': null,			// dom object
 	'info_period': null				// dom object period info
 },
@@ -687,10 +671,8 @@ scrollmouseover: function(){		//  U may use this func to attach some function on
 onchange: function(){			//  executed every time the bar period or bar time is changed(mouse button released)
 },
 
-//----------------------------------------------------------------
 //-------   MOVE   -----------------------------------------------
-//----------------------------------------------------------------
-setFullPeriod: function(e){
+setFullPeriod: function(){
 	this.debug('setFullPeriod');
 	if(this.disabled) return false;
 //---
@@ -930,9 +912,7 @@ setBarByGhost: function(){
 	this.onBarChange();
 },
 
-//----------------------------------------------------------------
 //-------   CALENDAR   -------------------------------------------
-//----------------------------------------------------------------
 calendarShowLeft: function(){
 	this.debug('calendarShowLeft');
 	if(this.disabled) return false;
@@ -1017,10 +997,8 @@ setCalendarRight: function(time){
 
 	this.onBarChange();
 },
-//----------------------------------------------------------------
-//-------   DRAG & DROP   ----------------------------------------
-//----------------------------------------------------------------
 
+//-------   DRAG & DROP   ----------------------------------------
 // <BAR>
 barDragStart: function(e, ui){
 	this.debug('barDragStart');
@@ -1470,8 +1448,8 @@ appendNavLinks: function(){
 
 	var links = 0;
 
-	var left = new Array();
-	var right = new Array();
+	var left = [];
+	var right = [];
 
 	var tmp_laquo = document.createElement('span');
 	this.dom.nav_links.appendChild(tmp_laquo);
@@ -1872,10 +1850,7 @@ resizeBox: function(px){
 });
 
 
-/************************************************************************************/
 // Title: selection box uppon graphs
-// Author: Aly
-/************************************************************************************/
 var ZBX_SBOX = {};		//selection box obj reference
 
 function sbox_init(sbid, timeline, domobjectid){
@@ -2279,4 +2254,3 @@ function moveSBoxes(){
 		ZBX_SBOX[key].sbox.moveSBoxByObj();
 	}
 }
-//]]

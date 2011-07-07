@@ -95,9 +95,16 @@ if(!isset($DB)){
 						( !empty($DB['PORT']) ? 'port='.$DB['PORT'] : '');
 
 					$DB['DB']= pg_connect($pg_connection_string);
+
 					if(!$DB['DB']){
 						$error = 'Error connecting to database';
 						$result = false;
+					}
+					elseif(false !== ($pgsql_version = pg_parameter_status('server_version'))){
+						if((int) $pgsql_version >= 9){
+							// change the output format for values of type bytea from hex (the default) to escape
+							DBexecute('set bytea_output = escape');
+						}
 					}
 				break;
 				case ZBX_DB_ORACLE:

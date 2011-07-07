@@ -28,8 +28,8 @@ function zbx_jsvalue($value, $asObject=false, $addQuotes=true){
 			return 'null';
 		}
 		else{
-			return strval($value);
-		}
+	return strval($value);
+	}
 	}
 	elseif(count($value) == 0){
 		return $asObject ? '{}' : '[]';
@@ -45,7 +45,7 @@ function zbx_jsvalue($value, $asObject=false, $addQuotes=true){
 	}
 	else{
 		return '['.implode(',',$value).']';
-	}
+}
 }
 
 function encodeValues(&$value, $encodeTwice=true){
@@ -275,7 +275,7 @@ function insert_javascript_for_tweenbox(){
 		}';
 
 	insert_js($js);
-	zbx_add_post_js('if(IE6 || IE7 ) $$("select option[disabled]").each(function(e){e.setStyle({color: "gray"});});');
+	zbx_add_post_js('if(IE7 ) $$("select option[disabled]").each(function(e){e.setStyle({color: "gray"});});');
 }
 
 function insert_javascript_for_visibilitybox(){
@@ -286,7 +286,7 @@ function insert_javascript_for_visibilitybox(){
 			var obj = document.getElementsByName(obj_name);
 
 			if(obj.length <= 0){
-				obj = new Array(document.getElementById(obj_name));
+				obj = [document.getElementById(obj_name)];
 			}
 
 			if((obj.length <= 0) || is_null(obj[0])) throw "'.S_CANNOT_FIND_OBJECTS_WITH_NAME.' [" + obj_name +"]";
@@ -519,7 +519,7 @@ function insert_js_function($fnct_name){
 					var parent = window.opener;
 					if(!parent) return close_window();
 
-					var items = { "object": object, "values": new Array() };
+					var items = { object: object, values: [] };
 
 					var chkBoxes = form.getInputs("checkbox");
 					for(var i=0; i < chkBoxes.length; i++){
@@ -550,7 +550,7 @@ function insert_js_function($fnct_name){
 					else
 						value[object] = singleValue;
 
-					var items = { "object": object, "values": new Array(value) };
+					var items = { object: object, values: [value] };
 
 					parent.addPopupValues(items);
 					close_window();

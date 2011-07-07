@@ -1797,8 +1797,6 @@ void	DCsync_configuration()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sync_num++;
-
 	sec = zbx_time();
 
 	item_result = DBselect(
@@ -1871,6 +1869,8 @@ void	DCsync_configuration()
 	ifsec = zbx_time() - sec;
 
 	LOCK_CACHE;
+
+	sync_num++;
 
 	sec = zbx_time();
 
