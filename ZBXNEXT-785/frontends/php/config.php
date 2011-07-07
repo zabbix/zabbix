@@ -34,7 +34,7 @@ include_once('include/page_header.php');
 <?php
 	$fields=array(
 		// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-		'config'=>				array(T_ZBX_INT, O_OPT,	null,	IN('0,3,5,6,7,8,9,10,11,12,13'),	null),
+		'config'=>				array(T_ZBX_INT, O_OPT,	null,	IN('0,3,5,6,7,8,9,10,11,12,13,14'),	null),
 		// other form
 		'alert_history'=>		array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
 		'event_history'=>		array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
@@ -668,6 +668,7 @@ include_once('include/page_header.php');
 		8 => _('GUI'),
 		0 => _('Housekeeper'),
 		3 => _('Images'),
+		14 => _('Icon mapping'),
 		10 => _('Regular expressions'),
 		11 => _('Macros'),
 		6 => _('Value mapping'),
@@ -1290,6 +1291,22 @@ include_once('include/page_header.php');
 
 		$triggerDisplayingForm = new CView('administration.general.triggerDisplayingOptions.edit', $data);
 		$cnf_wdgt->addItem($triggerDisplayingForm->render());
+	}
+//////////////////////////////////
+//  config = 14 // Icon mapping //
+//////////////////////////////////
+	elseif($_REQUEST['config'] == 14){
+		$data = array();
+		$data['form_refresh'] = get_request('form_refresh', 0);
+
+		if(isset($_REQUEST['form'])){
+			$iconMapView = new CView('administration.general.iconmap.edit', $data);
+		}
+		else{
+			$iconMapView = new CView('administration.general.iconmap.list', $data);
+		}
+
+		$cnf_wdgt->addItem($iconMapView->render());
 	}
 
 	$cnf_wdgt->show();
