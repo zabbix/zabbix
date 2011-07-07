@@ -16,12 +16,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-// JavaScript Document
-// Screen class beta
+
 // Author: Aly
 
-// [!CDATA[
-var ZBX_SCREENS = new Array();			// screens obj reference
+var ZBX_SCREENS = [];			// screens obj reference
 Position.includeScrollOffsets = true;
 
 // screenid ALWAYS must be a STRING (js doesn't support uint64) !!!!
@@ -59,7 +57,7 @@ initialize: function(screenid, obj_id, id){
 
 	this.screen_obj = $(obj_id);
 
-	function wedge(event){ return false }
+	function wedge(){ return false }
 
 	jQuery('.draggable').draggable({
 		revert: 'invalid',
@@ -137,4 +135,4 @@ debug: function(str){
 		}
 	}
 }
-}
+};

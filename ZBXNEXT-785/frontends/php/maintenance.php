@@ -343,8 +343,6 @@ include_once('include/page_header.php');
 			$frmMaintenance->addVar('maintenanceid', $_REQUEST['maintenanceid']);
 
 		$left_tab = new CTable();
-		$left_tab->setCellPadding(3);
-		$left_tab->setCellSpacing(3);
 
 // MAINTENANCE FORM {{{
 		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
@@ -493,8 +491,6 @@ include_once('include/page_header.php');
 		}
 
 		$right_tab = new CTable();
-		$right_tab->setCellPadding(3);
-		$right_tab->setCellSpacing(3);
 
 // MAINTENANCE HOSTS {{{
 		$options = array(

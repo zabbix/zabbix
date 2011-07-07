@@ -134,17 +134,6 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
 #endif
 
-#ifndef HAVE_GETOPT_LONG
-	struct option
-	{
-		const char *name;
-		int has_arg;
-		int *flag;
-		int val;
-	};
-#	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
-#endif
-
 #define	SUCCEED		0
 #define	FAIL		-1
 #define	NOTSUPPORTED	-2
@@ -422,6 +411,9 @@ typedef enum
 #define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 /* special item key used for internal Zabbix log */
 #define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
+
+/* runtime control options */
+#define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
 
 /* media types */
 typedef enum
@@ -749,7 +741,8 @@ typedef enum
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
-	ZBX_TASK_CHANGE_NODEID
+	ZBX_TASK_CHANGE_NODEID,
+	ZBX_TASK_CONFIG_CACHE_RELOAD
 }
 zbx_task_t;
 

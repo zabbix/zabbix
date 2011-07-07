@@ -19,52 +19,62 @@
 **/
 ?>
 <?php
-	function get_default_image($image=false, $imagetype=IMAGE_TYPE_ICON){
-		if($image){
-			$image = imagecreate(50, 50);
-			$color = imagecolorallocate($image, 250, 50, 50);
-			imagefill($image, 0, 0, $color);
+function get_default_image($image = false, $imagetype = IMAGE_TYPE_ICON){
+	if($image){
+		$image = imagecreate(50, 50);
+		$color = imagecolorallocate($image, 250, 50, 50);
+		imagefill($image, 0, 0, $color);
+	}
+	else{
+		$sql = 'SELECT i.imageid ' .
+				' FROM images i ' .
+				' WHERE ' . DBin_node('i.imageid', false) .
+				' AND imagetype=' . $imagetype .
+				' ORDER BY name ASC';
+		$result = DBselect($sql, 1);
+		if($image = DBfetch($result)) {
+			return $image;
 		}
 		else{
-			$sql = 'SELECT i.imageid '.
-				' FROM images i '.
-				' WHERE '.DBin_node('i.imageid', false).
-					' AND imagetype='.$imagetype.
-				' ORDER BY name ASC';
-			$result = DBselect($sql,1);
-			if($image = DBfetch($result)) return $image;
-			else{
-				$image = array();
-				$image['imageid'] = 0;
-			}
+			$image = array();
+			$image['imageid'] = 0;
 		}
+	}
 
 	return $image;
+}
+
+/**
+ * Get image data from db, cache is used
+ * @param  $imageid
+ * @return array image data from db
+ */
+function get_image_by_imageid($imageid){
+	static $images = array();
+
+	if(!isset($images[$imageid])){
+		$sql = 'SELECT * FROM images WHERE imageid=' . $imageid;
+
+		$row = DBfetch(DBselect($sql));
+		$row['image'] = zbx_unescape_image($row['image']);
+		$images[$imageid] = $row;
 	}
 
-	function get_image_by_imageid($imageid){
+	return $images[$imageid];
+}
 
-		$sql = 'SELECT * FROM images WHERE imageid='.$imageid;
-		$result = DBselect($sql);
-		if($row = DBfetch($result)){
-			$row['image'] = zbx_unescape_image($row['image']);
-		}
+function zbx_unescape_image($image){
+	global $DB;
 
-	return $row;
+	$result = ($image) ? $image : 0;
+	if($DB['TYPE'] == ZBX_DB_POSTGRESQL){
+		$result = pg_unescape_bytea($image);
 	}
-
-	function zbx_unescape_image($image){
-		global $DB;
-
-		$result = ($image)?$image:0;
-		if($DB['TYPE'] == ZBX_DB_POSTGRESQL){
-			$result = pg_unescape_bytea($image);
-		}
-		else if($DB['TYPE'] == ZBX_DB_SQLITE3){
-			$result = pack('H*', $image);
-		}
+	elseif($DB['TYPE'] == ZBX_DB_SQLITE3){
+		$result = pack('H*', $image);
+	}
 
 	return $result;
-	}
+}
 
 ?>

@@ -1091,10 +1091,6 @@ include_once('include/page_header.php');
 				$frmRegExp->addVar('regexpid', $_REQUEST['regexpid']);
 
 			$left_tab = new CTable();
-			$left_tab->setCellPadding(3);
-			$left_tab->setCellSpacing(3);
-
-			$left_tab->setAttribute('border',0);
 
 			$left_tab->addRow(create_hat(
 					S_REGULAR_EXPRESSION,
@@ -1105,17 +1101,12 @@ include_once('include/page_header.php');
 				));
 
 			$right_tab = new CTable();
-			$right_tab->setCellPadding(3);
-			$right_tab->setCellSpacing(3);
-
-			$right_tab->setAttribute('border',0);
 
 			$right_tab->addRow(create_hat(
 					S_EXPRESSIONS,
 					get_expressions_tab(),//null,
 					null,
 					'hat_expressions'
-//					CProfile::get('web.config.hats.hat_expressions.state',1)
 				));
 
 			if(isset($_REQUEST['new_expression'])){
@@ -1124,7 +1115,6 @@ include_once('include/page_header.php');
 						get_expression_form(),//null
 						null,
 						'hat_new_expression'
-//						CProfile::get('web.config.hats.hat_new_expression.state',1)
 					));
 			}
 
@@ -1136,9 +1126,6 @@ include_once('include/page_header.php');
 			$td_r->setAttribute('valign','top');
 
 			$outer_table = new CTable();
-			$outer_table->setAttribute('border',0);
-			$outer_table->setCellPadding(1);
-			$outer_table->setCellSpacing(1);
 			$outer_table->addRow(array($td_l,$td_r));
 
 			$frmRegExp->additem($outer_table);

@@ -37,9 +37,6 @@
 
 include_once('include/page_header.php');
 
-// js templates
-require_once('include/views/js/general.script.confirm.js.php');
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -90,15 +87,18 @@ require_once('include/views/js/general.script.confirm.js.php');
 		exit();
 	}
 
+// js templates
+	require_once('include/views/js/general.script.confirm.js.php');
+
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
 		'nodeids' => get_current_nodeid(),
 		'expandUrls' => true,
 		'selectSelements' => API_OUTPUT_EXTEND,
+		'selectLinks' => API_OUTPUT_EXTEND,
 		'preservekeys' => true,
 	);
 	$maps = API::Map()->get($options);
-	$maps = zbx_toHash($maps, 'sysmapid');
 
 	if($name = get_request(GET_PARAM_NAME)){
 		unset($_REQUEST['sysmapid']);
@@ -112,8 +112,9 @@ require_once('include/views/js/general.script.confirm.js.php');
 	else if(!isset($_REQUEST['sysmapid'])){
 		$_REQUEST['sysmapid'] = CProfile::get('web.maps.sysmapid');
 		if(is_null($_REQUEST['sysmapid']) || !isset($maps[$_REQUEST['sysmapid']])){
-			$first_map = reset($maps);
-			$_REQUEST['sysmapid'] = $first_map['sysmapid'];
+			if($first_map = reset($maps)){
+				$_REQUEST['sysmapid'] = $first_map['sysmapid'];
+			}
 		}
 	}
 

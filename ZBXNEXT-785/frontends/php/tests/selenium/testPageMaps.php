@@ -23,8 +23,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageMaps extends CWebTest{
 	// Returns all maps
-	public static function allMaps()
-	{
+	public static function allMaps(){
 		return DBdata('select * from sysmaps');
 	}
 
@@ -36,9 +35,8 @@ class testPageMaps extends CWebTest{
 		$this->assertTitle('Network maps');
 
 		$this->ok('Maps');
-// TODO
+
 		$this->ok('Configuration of network maps');
-//		$this->ok('CONFIGURATION OF NETWORK MAPS');
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
 		$this->ok(array('Name','Width','Height','Edit'));
@@ -124,11 +122,6 @@ class testPageMaps extends CWebTest{
 		$this->assertEquals($oldHashLinkTriggers,DBhash($sql4),"Chuck Norris: Map update changed data in table 'sysmaps_link_triggers'");
 	}
 
-	public function testPageMaps_MassDeleteAll(){
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	/**
 	* @dataProvider allMaps
 	*/
@@ -164,19 +157,6 @@ class testPageMaps extends CWebTest{
 		DBrestore_tables('sysmaps');
 	}
 
-	public function testPageMaps_MassExportAll(){
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	/**
-	* @dataProvider allMaps
-	*/
-	public function testPageMaps_MassExport($map){
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	public function testPageMaps_Create(){
 		$this->login('sysmaps.php');
 		$this->assertTitle('Network maps');
@@ -189,14 +169,5 @@ class testPageMaps extends CWebTest{
 		$this->ok('Configuration of network maps');
 	}
 
-	public function testPageMaps_Import(){
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageMaps_Sorting(){
-// TODO
-		$this->markTestIncomplete();
-	}
 }
 ?>

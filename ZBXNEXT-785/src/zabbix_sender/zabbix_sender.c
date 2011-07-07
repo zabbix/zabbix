@@ -30,7 +30,6 @@ const char	*progname = NULL;
 const char	title_message[] = "Zabbix Sender";
 const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c <file>]";
 
-#ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>                   Specify absolute path to the configuration file",
@@ -54,46 +53,16 @@ const char	*help_message[] = {
 	"",
 	"  -v --verbose                         Verbose mode, -vv for more details",
 	"",
-	" Other options:",
+	"Other options:",
 	"  -h --help                            Give this help",
 	"  -V --version                         Display version number",
-	0 /* end of text */
+	NULL	/* end of text */
 };
-#else
-const char	*help_message[] = {
-	"Options:",
-	"  -c <file>                    Specify absolute path to the configuration file",
-	"",
-	"  -z <server>                  Hostname or IP address of Zabbix Server",
-	"  -p <server port>             Specify port number of server trapper running on the server. Default is " ZBX_DEFAULT_SERVER_PORT_STR,
-	"  -s <hostname>                Specify hostname or IP address of a host",
-	"  -I <IP address>              Specify source IP address",
-	"",
-	"  -k <key>                     Specify item key",
-	"  -o <key value>               Specify value",
-	"",
-	"  -i <input file>              Load values from input file. Specify - for standard input",
-	"                               Each line of file contains whitespace delimited: <hostname> <key> <value>",
-	"                               Specify - in <hostname> to use hostname from configuration file or --host argument",
-	"  -T                           Each line of file contains whitespace delimited: <hostname> <key> <timestamp> <value>",
-	"                               This can be used with -i option",
-	"  -r                           Send metrics one by one as soon as they are received",
-	"                               This can be used when reading from standard input",
-	"",
-	"  -v                           Verbose mode, -vv for more details",
-	"",
-	" Other options:",
-	"  -h                           Give this help",
-	"  -V                           Display version number",
-	0 /* end of text */
-};
-#endif
 
 /* COMMAND LINE OPTIONS */
 
 /* long options */
-
-static struct zbx_option longopts[] =
+static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
 	{"zabbix-server",	1,	NULL,	'z'},
@@ -108,11 +77,10 @@ static struct zbx_option longopts[] =
 	{"verbose",		0,	NULL,	'v'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
-	{0,0,0,0}
+	{NULL}
 };
 
 /* short options */
-
 static char	shortopts[] = "c:I:z:p:s:k:o:Ti:rvhV";
 
 /* end of COMMAND LINE OPTIONS */
