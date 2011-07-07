@@ -173,6 +173,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3877] fixed slow Housekeeper for PostgreSQL 7.4+; thanks to Ildefonso Camargo (dimir)
  - [ZBXNEXT-816] added support for reloading configuration cache from the command line (Richlv,Sasha)
  - [ZBX-3063] added compatibility with PostgreSQL 9+; thanks to Andrey Groshev for patch (asaveljevs,Vedmak)
  - [ZBX-3890] added logging of ORACLE warning messages while connecting to the database (Sasha)
