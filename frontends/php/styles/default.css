@@ -1,4 +1,3 @@
-/* CSS Document */
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -16,8 +15,7 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**
-*/
+**/
 
 root { display: block; }
 /*
@@ -340,26 +338,57 @@ table.page_header tr td.page_header_r a{ margin: 0 5px; }
 table.page_footer{ margin-top: 20px; padding: 3px;}
 
 /********** FORM TABLE *************/
-table.formtable { background-color: #FFFFFF; color: #000000; border: 1px solid #AAAAAA; width: 50%; margin: auto;}
-table.formtable tr td { padding-left: 5px; padding-right: 5px; color: #000000; height: 24px; white-space: nowrap;word-spacing: 0;text-align: left; text-decoration: none;border: 0;}
-table.formtable tr.new td { background-color: #E0F0E0; }
-table.formtable tr.edit { background-color: #F0F0E0; }
-table.formtable tr.form_odd_row td{ background-color: #D8D8D8; }
-table.formtable tr.form_even_row td{ background-color: #DFDFDF; }
-table.formtable tr td { text-decoration: none; background-color: #EEEEEE; }
-table.formtable tr td.form_row_first{  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF; font-size:11px; font-weight: bold; }
-table.formtable tr td.form_row_last { color: #FFFFFF;  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; text-align: right; }
-table.formtable tr td.form_row_l { width: 30%; }
-table.formtable tr td.form_row_c { text-align: center; }
-table.formtable tr td.form_row_r { }
-table.formtable tr td.form_row_r table.calendar tr td{ padding-left: 1px; padding-right: 1px;}
+table.formtable {
+	background-color: #EEEEEE;
+	color: #000000;
+	border: 1px solid #AAAAAA;
+	width: 50%;
+	margin: auto;
+	white-space: nowrap;
+}
+table.formtable tr td {
+	padding: 0 5px;
+	height: 24px;
+	word-spacing: 0;
+	text-align: left;
+	text-decoration: none;
+}
+table.formtable tr.new {
+	background-color: #E0F0E0;
+}
+table.formtable tr.edit {
+	background-color: #F0F0E0;
+}
+table.formtable tr.form_odd_row{
+	background-color: #D8D8D8;
+}
+table.formtable tr.form_even_row{
+	background-color: #DFDFDF;
+}
+table.formtable tr td.form_row_first{
+	background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
+	color: #FFFFFF;
+	font-size:11px;
+	font-weight: bold;
+}
+table.formtable tr td.form_row_last{
+	color: #FFFFFF;
+	background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
+	text-align: right;
+}
+table.formtable tr td.form_row_l{
+	width: 30%;
+}
+table.formtable tr td.form_row_c{
+	text-align: center;
+}
+table.formtable tr td.form_row_r table.calendar tr td{
+	padding-left: 1px;
+	padding-right: 1px;
+}
 table.formlongtable{ width: 99%; }
 td.form_row_l_simple {  border-color: #AAAAAA; text-align:	left; white-space: nowrap; word-spacing: 0; width: 50%;}
 td.form_row_r_simple { border-color: #AAAAAA; text-align: left; }
-/*-------------- <SERVICES> -----------------*/
-
-
-/*-------------- </SERVICES> -----------------*/
 
 /************ HISTORY LOG TABLE ***********/
 table.log_history_table { background-color: #AAAAAA; width: 100%; border-color: gray; border-spacing: 1px 1px;}
@@ -435,7 +464,6 @@ table.tableinfo tr td.message { text-align: center;}
 table.tableinfo tr td.pre { white-space: pre;}
 table.tableinfo tr > td.center { vertical-align: middle; text-align: center; }
 
-
 /****** HEADER *********/
 .header a { color: #FFFFFF; }
 .header .header_l{ padding-left: 5px; }
@@ -473,10 +501,6 @@ table.right_table tr td.deny select { color: #CC0000; width: 320px;}
 /**************** GRAPH ****************/
 
 table.graph{ width: 100%; text-align: center; }
-
-/**************** MAP ****************/
-
-table.map{ text-align: left; border-width:0; padding-top: 1px; padding-bottom: 5px;}
 
 /************* MENU ************/
 

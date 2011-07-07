@@ -1,4 +1,22 @@
-/* Color CSS Document */
+/*
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
+
 .ok{ color: #00AA00; }
 .fail{ color: #DC0000; }
 .info{ color: #444444; }
@@ -61,12 +79,12 @@ table.tableinfo tr.header td.hover_grey:hover  { color: #000000; background-colo
 table.tableinfo tr.vertical_header td { background-color: #CED7DF;}
 table.tableinfo tr.vertical_header td.hover_grey:hover{ color: #EEEEEE; background-color:#999999; }
 table.tableinfo tr.footer td { color: #FFFFFF; background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; }
-table.tableinfo tr.selected > td { background-color: #FFFFBB; }
-table.tableinfo tr.selected:hover > td { background-color: #BBCCFF; }
 table.tableinfo tr.odd_row > td { background-color: #E1E7EC; }
 table.tableinfo tr.odd_row:hover > td { background-color: #BBCCFF; }
 table.tableinfo tr.even_row > td { background-color: #F2F7FA; }
 table.tableinfo tr.even_row:hover > td{ background-color: #BBCCFF; }
+table.tableinfo tr.selected > td { background-color: #FFFFBB; }
+table.tableinfo tr.selected:hover > td { background-color: #BBCCFF; }
 
 table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; color: #222222;}
 table.tableinfo tr:hover > td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }

@@ -602,6 +602,10 @@ COpt::memoryPick();
 	return $result;
 	}
 
+	/**
+	 * @param array $object
+	 * @return bool
+	 */
 	public function exists($object){
 		$options = array(
 			'filter' => array('flags' => null),
@@ -677,7 +681,7 @@ COpt::memoryPick();
  * Update existing graphs
  *
  * @param array $graphs
- * @return boolean
+ * @return bool
  */
 	public function update($graphs){
 		$graphs = zbx_toArray($graphs);
@@ -905,7 +909,7 @@ COpt::memoryPick();
  * Inherit template graphs from template to host
  *
  * @param array $data
- * @return boolean
+ * @return bool
  */
 	public function syncTemplates($data){
 
@@ -967,13 +971,13 @@ COpt::memoryPick();
 			return true;
 	}
 
-/**
- * Delete graphs
- *
- * @param array $graphs
- * @param array $graphs['graphids']
- * @return boolean
- */
+	/**
+	 * Delete graphs
+	 *
+	 * @param array $graphids
+	 * @param bool $nopermissions
+	 * @return bool
+	 */
 	public function delete($graphids, $nopermissions=false){
 
 			if(empty($graphids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));

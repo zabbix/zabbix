@@ -472,8 +472,8 @@ require_once('include/views/js/general.script.confirm.js.php');
 		}
 
 		$description->addAction('onclick',
-			"javascript: create_mon_trigger_menu(event, new Array({'triggerid': '".$trigger['triggerid'].
-				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
+			"javascript: create_mon_trigger_menu(event, [{'triggerid': '".$trigger['triggerid'].
+				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."],".
 			zbx_jsvalue($items, true).");"
 		);
 
