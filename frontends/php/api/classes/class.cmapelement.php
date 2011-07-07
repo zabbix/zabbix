@@ -549,7 +549,7 @@ COpt::memoryPick();
 			}
 
 			if($this->checkCircleSelementsLink($dbSelement['sysmapid'], $dbSelement['elementid'], $dbSelement['elementtype'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Circular link can not be created for map element "%s"', $dbSelement['label']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Circular link cannot be created for map element "%s".', $dbSelement['label']));
 			}
 		}
 		unset($selement);
@@ -603,9 +603,11 @@ COpt::memoryPick();
 
 		if(bccomp($sysmapid, $elementid) == 0) return true;
 
-		$dbElements = DBselect('SELECT elementid, elementtype '.
-						' FROM sysmaps_elements '.
-						' WHERE sysmapid='.$elementid);
+		$sql = 'SELECT elementid, elementtype '.
+				' FROM sysmaps_elements '.
+				' WHERE sysmapid='.$elementid .
+					' AND elementtype='.SYSMAP_ELEMENT_TYPE_MAP;
+		$dbElements = DBselect($sql);
 
 		while($element = DBfetch($dbElements)){
 			if($this->checkCircleSelementsLink($sysmapid, $element['elementid'], $element['elementtype']))
@@ -674,7 +676,7 @@ COpt::memoryPick();
 
 		$update = array();
 		$urlsToDelete = $urlsToUpdate = $urlsToAdd = array();
-		foreach($selements as $snumm => $selement){
+		foreach($selements as $selement){
 			$update[] = array(
 				'values' => $selement,
 				'where' => array('selementid'=>$selement['selementid']),

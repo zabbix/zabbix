@@ -302,7 +302,7 @@ function make_system_status($filter){
 					S_ACTIONS
 				));
 
-				foreach($data['triggers'] as $tnum => $trigger){
+				foreach($data['triggers'] as $trigger){
 					$event = $trigger['event'];
 					$ack = getEventAckState($event);
 

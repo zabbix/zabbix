@@ -1,5 +1,6 @@
 /*
-** Copyright (C) 2010-2011 Zabbix SIA
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -15,9 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-// JavaScript Document
 
-var ZBX_MESSAGES = new Array();				// obj instances
+var ZBX_MESSAGES = [];				// obj instances
 function initMessages(args){					// use this function to initialize Messaging system
 	var messagesListId = ZBX_MESSAGES.length;
 	ZBX_MESSAGES[messagesListId] = new CMessageList(messagesListId, args);
@@ -25,7 +25,6 @@ function initMessages(args){					// use this function to initialize Messaging sy
 return messagesListId;
 }
 
-// Puppet master Class
 // Author: Aly
 var CMessageList = Class.create(CDebug,{
 messageListId:			0,				// reference id
@@ -43,7 +42,7 @@ msgcounter:				0,				// how many messages have been added
 pipeLength:				15,				// how many messages to show
 
 messageList:			{},				// list of received messages
-messagePipe:			new Array(),	// messageid pipe line
+messagePipe:			[],	// messageid pipe line
 messageLast:			{},				// last message's sourceid by caption
 
 effectTimeout:			1000,			// effect time out
@@ -70,23 +69,16 @@ initialize: function($super, messagesListId, args){
 	this.updateSettings();
 
 	this.createContainer();
-	if(IE) this.fixIE();
 
 	addListener(this.dom.closeAll, 'click', this.closeAllMessages.bindAsEventListener(this));
 	addListener(this.dom.snooze, 'click', this.stopSound.bindAsEventListener(this));
 	addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
 
-	if(!IE6){
-		//jQuery(this.dom.container).mouseenter(function(){ jQuery(this).fadeTo('fast', 1); });
-		//jQuery(this.dom.container).mouseleave(function(){ jQuery(this).fadeTo('fast', 0.1); });
-
-		jQuery(this.dom.container).draggable({
-			handle: [this.dom.caption, this.dom.move], //this.dom.header,
-			axis: 'y',
-			containment: [0,0,0,1600],//'document',
-			stop: this.fixIE.bind(this)
-		});
-	}
+	jQuery(this.dom.container).draggable({
+		handle: [this.dom.caption, this.dom.move], //this.dom.header,
+		axis: 'y',
+		containment: [0,0,0,1600],//'document',
+	});
 },
 
 start: function(){
@@ -136,8 +128,8 @@ updateSettings: function(){
 		'method': 'message.settings',
 		'params': {},
 		'onSuccess': this.setSettings.bind(this),
-		'onFailure': function(resp){zbx_throw('Messages Widget: settings request failed.');}
-	}
+		'onFailure': function(){zbx_throw('Messages Widget: settings request failed.');}
+	};
 
 	new RPC.Call(rpcRequest);
 },
@@ -146,7 +138,7 @@ addMessage: function(newMessage){
 	this.debug('addMessage');
 //--
 
-	var newMessage = newMessage || {};
+	newMessage = newMessage || {};
 
 	while(isset(this.msgcounter, this.messageList)){
 		this.msgcounter++;
@@ -199,8 +191,8 @@ mute: function(e){
 	var rpcRequest = {
 		'method': action,
 		'params': {},
-		'onFailure': function(resp){zbx_throw('Messages Widget: mute request failed.');}
-	}
+		'onFailure': function(){zbx_throw('Messages Widget: mute request failed.');}
+	};
 
 	new RPC.Call(rpcRequest);
 
@@ -237,7 +229,7 @@ playSound: function(messages){
 	}
 },
 
-stopSound: function(e){
+stopSound: function(){
 	this.debug('stopSound');
 //--
 	if(!is_null(this.sounds.sound)){
@@ -263,18 +255,18 @@ closeMessage: function(messageid, withEffect){
 		this.messageList[messageid] = null;
 	}
 
-	this.messagePipe = new Array();
+	this.messagePipe = [];
 	for(var messageid in this.messageList) this.messagePipe.push(messageid);
 
 	if(this.messagePipe.length < 1){
-		this.messagePipe = new Array();
+		this.messagePipe = [];
 		this.messageList = {};
 
-		setTimeout(Element.hide.bind(Element, this.dom.container), IE6?100:this.effectTimeout);
+		setTimeout(Element.hide.bind(Element, this.dom.container), this.effectTimeout);
 	}
 },
 
-closeAllMessages: function(e){
+closeAllMessages: function(){
 	this.debug('closeAllMessages');
 //--
 	var lastMessageId = this.messagePipe.pop();
@@ -289,7 +281,7 @@ closeAllMessages: function(e){
 		},
 //		'onSuccess': function(resp){ SDI(resp)},
 		'onFailure': function(resp){zbx_throw('Messages Widget: message request failed.');}
-	}
+	};
 
 	new RPC.Call(rpcRequest);
 
@@ -300,7 +292,7 @@ closeAllMessages: function(e){
 	for(var messageid in this.messageList){
 		if(empty(this.messageList[messageid])) continue;
 
-		if(!effect) 
+		if(!effect)
 			this.closeMessage(this, messageid, effect);
 		else
 			setTimeout(this.closeMessage.bind(this, messageid, effect), count * this.effectTimeout * 0.5);
@@ -343,8 +335,8 @@ getServerMessages: function(){
 			'messageLast': this.messageLast
 		},
 		'onSuccess': this.serverRespond.bind(this),
-		'onFailure': function(resp){zbx_throw('Messages Widget: message request failed.');}
-	}
+		'onFailure': function(){zbx_throw('Messages Widget: message request failed.');}
+	};
 
 //SDJ(rpcRequest.params.messageLast);
 
@@ -358,7 +350,7 @@ serverRespond: function(messages){
 //--
 
 	for(var i=0; i < messages.length; i++){
-		var message = this.addMessage(messages[i]);
+		this.addMessage(messages[i]);
 	}
 
 	this.playSound(messages);
@@ -438,20 +430,10 @@ createContainer: function(){
 // Message List
 	this.dom.list = new CList().node;
 	this.dom.container.appendChild(this.dom.list);
-},
-
-fixIE: function(){
-	if(IE6){
-		this.dom.header.style.width = '100px';
-		showPopupDiv('zbx_messages','zbx_messages_frame');
-//		ie6pngfix.run(false);
-	}
 }
+
 });
 
-// JavaScript Document
-// Message Class
-// Author: Aly
 var CMessage = Class.create(CDebug,{
 list:				null,			// link to message list containing this message
 messageid:			null,			// msg id
@@ -484,7 +466,6 @@ initialize: function($super, messageList, message){
 	}
 
 	this.createMessage();
-	if(IE) this.fixIE();
 },
 
 show: function(){
@@ -495,7 +476,6 @@ close: function(){
 //--
 	$(this.dom.listItem).remove();
 
-	if(IE) this.fixIE();
 	this.dom = {};
 },
 
@@ -506,13 +486,8 @@ remove: function(){
 	this.debug('remove');
 //--
 
-	if(IE6){
-		$(this.dom.listItem).hide();
-	}
-	else{
-		jQuery(this.dom.listItem).slideUp(this.list.effectTimeout);
-		jQuery(this.dom.listItem).fadeOut(this.list.effectTimeout);
-	}
+	jQuery(this.dom.listItem).slideUp(this.list.effectTimeout);
+	jQuery(this.dom.listItem).fadeOut(this.list.effectTimeout);
 
 	setTimeout(this.close.bind(this), this.list.effectTimeout);
 },
@@ -543,7 +518,7 @@ createMessage: function(){
 	this.dom.title.className = 'title';
 
 // body
-	if(!is_array(this.body)) this.body = new Array(this.body);
+	if(!is_array(this.body)) this.body = [this.body];
 
 //	this.dom.message.style.height = (24+14*this.body.length)+'px';
 	for(var i=0; i < this.body.length; i++){
@@ -556,29 +531,9 @@ createMessage: function(){
 		$(this.dom.body).update(BBCode.Parse(this.body[i]));
 		this.dom.body.className = 'body';
 	}
-},
-
-fixIE: function(){
-	if(IE6){
-/*
-		var maxWidth = 60;
-		for(var tmpmsg in this.list.messageList){
-			var msgDims = getDimensions(this.list.messageList[tmpmsg].dom.message);
-			msgDims.width += 4;
-			if(maxWidth < msgDims.width) maxWidth = msgDims.width;
-		}
-
-		this.list.dom.header.style.width = maxWidth+'px';
-//*/
-		showPopupDiv('zbx_messages','zbx_messages_frame');
-	}
 }
+
 });
-
-
-// JavaScript Document
-// DOM Classes
-// Author: Aly
 
 var CNode = Class.create({
 node:		null,			// main node (ul)
@@ -603,7 +558,7 @@ setClass: function(className){
 
 
 var CList = Class.create(CNode,{
-items:		new Array(),	// items list
+items:		[],	// items list
 initialize: function($super, className){
 	className = className || '';
 
@@ -626,7 +581,7 @@ addItem: function($super, item, className){
 });
 
 var CListItem = Class.create(CNode,{
-items:		new Array(),	// items list
+items:		[],	// items list
 initialize: function($super, item, className){
 	className = className || '';
 	item = item || null;

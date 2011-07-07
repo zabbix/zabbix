@@ -210,7 +210,7 @@ function showNewCheckForm(e, dcheckType){
 // Port name sorting
 		var svcPorts = discoveryCheckTypeToString();
 		var portNameSvcValue = {};
-		var portNameOrder = new Array();
+		var portNameOrder = [];
 		for(var key in svcPorts){
 			portNameOrder.push(svcPorts[key]);
 			portNameSvcValue[svcPorts[key]] = key;
@@ -299,9 +299,9 @@ function saveNewDCheckForm(e){
 
 	var ajaxChecks = {
 		ajaxaction: 'validate',
-		ajaxdata: new Array()
+		ajaxdata: []
 	};
-	var validationErrors = new Array();
+	var validationErrors = [];
 
 	switch(parseInt(dCheck.type, 10)){
 		case ZBX_SVC.agent:

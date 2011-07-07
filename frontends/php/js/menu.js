@@ -304,7 +304,6 @@ function menu_onmousedown (n_id) {
 
 // --------------------------------------------------------------------------------
 // menu item Class
-
 function menu_item (o_parent, n_order) {
 
 	// store parameters passed to the constructor
@@ -452,7 +451,7 @@ function menu_item (o_parent, n_order) {
 			this.e_ielement.innerHTML = nText.substring(0, nText.length-10);
 			x--;
 			if(newResult < 1) {
-				this.e_ielement.innerHTML = this.e_ielement.innerHTML + '...';
+				this.e_ielement.innerHTML += '...';
 				x=0;
 				break;
 			}
@@ -504,8 +503,6 @@ function mitem_getstyle (n_pos, n_state) {
 	if(!a_css)
 		a_css = this.o_root.a_css_def;
 
-	//var a_css = this.o_root.a_css;
-
 	var a_oclass = a_css[n_pos ? 'inner' : 'outer'];
 
 	// same class for all states
@@ -514,7 +511,7 @@ function mitem_getstyle (n_pos, n_state) {
 
 
 	// inherit class from previous state if not explicitly defined
-	for (var n_currst = n_state; n_currst >= 0; n_currst--){
+	for(var n_currst = n_state; n_currst >= 0; n_currst--){
 		if(a_oclass[n_currst]) return a_oclass[n_currst];
 	}
 }

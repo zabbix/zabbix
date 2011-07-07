@@ -442,7 +442,7 @@ function addPopupValues(list){
 
 	var favorites = {'graphid': 1,'itemid': 1,'screenid': 1,'slideshowid': 1,'sysmapid': 1};
 	if(isset(list.object, favorites)){
-		var favid = new Array();
+		var favid = [];
 		for(var i=0; i < list.values.length; i++){
 			favid.push(list.values[i][list.object]);
 		}
