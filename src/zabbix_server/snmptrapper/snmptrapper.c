@@ -104,7 +104,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	char		cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], regex[MAX_STRING_LEN];
 	int		count, i, ret = FAIL, fallback = -1;
 
-	count = DCconfig_get_snmp_items_by_interface(interfaceid, &items);
+	count = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
 
 	for (i = 0; i < count; i++)
 	{
@@ -161,7 +161,7 @@ static void	process_trap(char *ip, char *begin, char *end)
 	zbx_timespec(&ts);
 	trap = zbx_dsprintf(trap, "%s%s", begin, end);
 
-	count = DCconfig_get_snmp_interfaceids(ip, &interfaceids);
+	count = DCconfig_get_snmp_interfaceids_by_ip(ip, &interfaceids);
 
 	for (i = 0; i < count; i++)
 	{
