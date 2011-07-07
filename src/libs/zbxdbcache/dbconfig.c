@@ -720,11 +720,15 @@ static void	DCsync_items(DB_RESULT result)
 		}
 		else if (NULL != item->triggers && NULL == item->triggers[0])
 		{
+			/* free the memory if no triggers were found during last sync */
+
 			config->items.mem_free_func(item->triggers);
 			item->triggers = NULL;
 		}
 		else if (NULL != item->triggers)
 		{
+			/* we can reuse the same memory if the trigger list has not changed */
+
 			item->triggers[0] = NULL;
 		}
 
@@ -3136,7 +3140,7 @@ int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid)
  *                                                                            *
  * Function: DCconfig_get_time_based_triggers                                 *
  *                                                                            *
- * Purpose: get triggers that have time-based functions                       *
+ * Purpose: get triggers that have time-based functions (sorted by triggerid) *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
