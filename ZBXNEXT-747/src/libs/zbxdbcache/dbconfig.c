@@ -267,7 +267,7 @@ ZBX_DC_INTERFACE_HT;
 
 typedef struct
 {
-	const char		*ip;	/* ip with resolved macros */
+	const char		*ip;
 	zbx_vector_uint64_t	interfaceids;
 }
 ZBX_DC_INTERFACE_IM;
@@ -304,7 +304,7 @@ typedef struct
 	zbx_hashset_t		hmacros_hm;		/* hostid, macro */
 	zbx_hashset_t		interfaces;
 	zbx_hashset_t		interfaces_ht;		/* hostid, type */
-	zbx_hashset_t		interface_snmpims;	/* ip with resolved macros, interfaceids for snmp interfaces */
+	zbx_hashset_t		interface_snmpims;	/* ip, interfaceids for snmp interfaces */
 	zbx_hashset_t		interface_snmpitems;	/* interfaceid, itemids for SNMP trap items */
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
@@ -1885,20 +1885,13 @@ void	DCsync_configuration()
 	strpool = zbx_strpool_info();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync_num   : %u", __function_name, sync_num);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name,
-			isec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name,
-			hsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpl sql  : " ZBX_FS_DBL " sec.", __function_name,
-			htsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacro sql : " ZBX_FS_DBL " sec.", __function_name,
-			gmsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacro sql : " ZBX_FS_DBL " sec.", __function_name,
-			hmsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() interf sql : " ZBX_FS_DBL " sec.", __function_name,
-			ifsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name,
-			ssec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name, isec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name, hsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpl sql  : " ZBX_FS_DBL " sec.", __function_name, htsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacro sql : " ZBX_FS_DBL " sec.", __function_name, gmsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacro sql : " ZBX_FS_DBL " sec.", __function_name, hmsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interf sql : " ZBX_FS_DBL " sec.", __function_name, ifsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name, ssec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total time : " ZBX_FS_DBL " sec.", __function_name,
 			isec + hsec + htsec + gmsec + hmsec + ifsec + ssec);
 
@@ -1946,11 +1939,11 @@ void	DCsync_configuration()
 			config->hmacros_hm.num_data, config->hmacros_hm.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : %d (%d slots)", __function_name,
 			config->interfaces.num_data, config->interfaces.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces_ht: %d (%d slots)", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interfac_ht: %d (%d slots)", __function_name,
 			config->interfaces_ht.num_data, config->interfaces_ht.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() interface_snmpitems: %d (%d slots)", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpitms: %d (%d slots)", __function_name,
 			config->interface_snmpitems.num_data, config->interface_snmpitems.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() interface_snmpim: %d (%d slots)", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpims : %d (%d slots)", __function_name,
 			config->interface_snmpims.num_data, config->interface_snmpims.num_slots);
 
 	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
@@ -2954,19 +2947,16 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_items_by_type                                       *
+ * Function: DCconfig_get_snmp_interfaceids_by_ip                             *
  *                                                                            *
- * Purpose: get array of items of the specified type                          *
+ * Purpose: get array of interface ids for the specified IP                   *
  *                                                                            *
- * Parameters: type - [IN] type of items to return                            *
- *             items - [OUT] pointer to array of DC_ITEM structures           *
- *                                                                            *
- * Return value: number of items                                              *
+ * Return value: number of interface ids returned                             *
  *                                                                            *
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_snmp_interfaceids(const char *ip, zbx_uint64_t **interfaceids)
+int	DCconfig_get_snmp_interfaceids_by_ip(const char *ip, zbx_uint64_t **interfaceids)
 {
 	const char		*__function_name = "DCconfig_get_snmp_interfaceids";
 
@@ -2998,20 +2988,17 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_items_by_type                                       *
+ * Function: DCconfig_get_snmp_items_by_interfaceid                           *
  *                                                                            *
- * Purpose: get array of items of the specified type                          *
+ * Purpose: get array of snmp trap items for the specified interfaceid        *
  *                                                                            *
- * Parameters: type - [IN] type of items to return                            *
- *             items - [OUT] pointer to array of DC_ITEM structures           *
- *                                                                            *
- * Return value: number of items                                              *
+ * Return value: number of items returned                                     *
  *                                                                            *
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
 
-int	DCconfig_get_snmp_items_by_interface(zbx_uint64_t interfaceid, DC_ITEM **items)
+int	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
 {
 	const char		*__function_name = "DCconfig_get_snmp_items_by_interface";
 
