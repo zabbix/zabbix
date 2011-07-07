@@ -20,7 +20,6 @@
 ?>
 <?php
 /**
- * File containing CMap class for API.
  * @package API
  */
 /**
@@ -30,7 +29,7 @@ class CMap extends CMapElement{
 /**
  * Get Map data
  *
- * @param _array $options
+ * @param array $options
  * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] HostGroup IDs
  * @param array $options['hostids'] Host IDs
@@ -307,7 +306,7 @@ class CMap extends CMapElement{
 						'sysmapids' => $maps_to_check,
 						'nodeids' => $nodeids,
 						'editable' => $options['editable'],
-						'preservekeys' => 1,
+						'preservekeys' => true,
 						'output' => API_OUTPUT_SHORTEN,
 					);
 					$allowed_maps = $this->get($map_options);
@@ -368,35 +367,46 @@ class CMap extends CMapElement{
 			}
 		}
 
-COpt::memoryPick();
+		COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
 			return $result;
 		}
 
 // Adding Elements
 		if(!is_null($options['selectSelements']) && str_in_array($options['selectSelements'], $subselects_allowed_outputs)){
-			if(!isset($selements)){
-				$selements = array();
+			$sysmapids = zbx_objectValues($result, 'sysmapid');
 
-				$sql = 'SELECT se.* '.
-						' FROM sysmaps_elements se '.
-						' WHERE '.DBcondition('se.sysmapid', $sysmapids);
-				$db_selements = DBselect($sql);
-				while($selement = DBfetch($db_selements)){
-					$selement['urls'] = array();
-					$selements[$selement['selementid']] = $selement;
-				}
+			$selements = array();
+
+			$sql = 'SELECT se.* '.
+					' FROM sysmaps_elements se '.
+					' WHERE '.DBcondition('se.sysmapid', $sysmapids);
+			$db_selements = DBselect($sql);
+			while($selement = DBfetch($db_selements)){
+				$selement['urls'] = array();
+				$selements[$selement['selementid']] = $selement;
 			}
 
 			if(!is_null($options['expandUrls'])){
-				$sql = 'SELECT sysmapid, name, url, elementtype'.
+				$sql = 'SELECT sysmapurlid, sysmapid, name, url, elementtype'.
 						' FROM sysmap_url'.
 						' WHERE '.DBcondition('sysmapid', $sysmapids);
 				$db_map_urls = DBselect($sql);
 				while($map_url = DBfetch($db_map_urls)){
 					foreach($selements as $snum => $selement){
-						if((bccomp($selement['sysmapid'],$map_url['sysmapid']) == 0) && ($selement['elementtype'] == $map_url['elementtype'])){
-							$selements[$snum]['urls'][] = $this->expandUrlMacro($map_url, $selement);
+						if((bccomp($selement['sysmapid'], $map_url['sysmapid']) == 0) &&
+							(
+								(
+									($selement['elementtype'] == $map_url['elementtype']) &&
+									($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP)
+								) ||
+								(
+									($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) &&
+									($map_url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
+								)
+							)
+						){
+							$selements[$snum]['urls'][$map_url['sysmapurlid']] = $this->expandUrlMacro($map_url, $selement);
 						}
 					}
 				}
@@ -408,9 +418,9 @@ COpt::memoryPick();
 			$db_selement_urls = DBselect($sql);
 			while($selement_url = DBfetch($db_selement_urls)){
 				if(is_null($options['expandUrls']))
-					$selements[$selement_url['selementid']]['urls'][] = $selement_url;
+					$selements[$selement_url['selementid']]['urls'][$selement_url['sysmapelementurlid']] = $selement_url;
 				else
-				$selements[$selement_url['selementid']]['urls'][] = $this->expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
+					$selements[$selement_url['selementid']]['urls'][$selement_url['sysmapelementurlid']] = $this->expandUrlMacro($selement_url, $selements[$selement_url['selementid']]);
 			}
 
 			foreach($selements as $selement){
@@ -441,7 +451,7 @@ COpt::memoryPick();
 			$sql = 'SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids);
 			$db_link_triggers = DBselect($sql);
 			while($link_trigger = DBfetch($db_link_triggers)){
-				$map_links[$link_trigger['linkid']]['linktriggers'][] = $link_trigger;
+				$map_links[$link_trigger['linkid']]['linktriggers'][$link_trigger['linktriggerid']] = $link_trigger;
 			}
 
 			foreach($map_links as $link){

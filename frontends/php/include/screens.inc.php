@@ -1304,7 +1304,9 @@ require_once('include/js.inc.php');
 							'sysmapids' => $resourceid,
 							'output' => API_OUTPUT_EXTEND,
 							'selectSelements' => API_OUTPUT_EXTEND,
-							'nopermissions' => 1
+							'selectLinks' => API_OUTPUT_EXTEND,
+							'nopermissions' => 1,
+							'preservekeys' => true,
 						);
 						$sysmaps = API::Map()->get($options);
 						$sysmap = reset($sysmaps);

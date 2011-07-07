@@ -1,4 +1,22 @@
-/* CSS Document */
+/*
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
+
 /* Dark Orange Theme by Aly */
 @import "darkorange/jquery-ui.css";
 @media print { body{ background-color:#A5A5A5; } }
@@ -49,10 +67,8 @@ table{
 
 table.page_footer{
 	background: #1A1A1A url('../images/gradients/table_head_bb.gif') repeat-x top left;
-	border-color: 	#1A1A1A;
-
-	border-top-width: 17px;
-	border-top-style: solid;
+	border-color: #1A1A1A;
+	border-top: 17px solid;
 }
 
 table.formtable {
@@ -154,8 +170,6 @@ table.tableinfo tr.vertical_header td {
 	background-color:#111111;
 }
 
-table.tableinfo tr.selected > td { background-color: #553020; }
-table.tableinfo tr.selected:hover > td { background-color: #6F3F00; }
 
 table.tableinfo tr.odd_row > td { background-color: #1F1F1F; }
 table.tableinfo tr.odd_row:hover > td { background-color: #6F3F00; }
@@ -163,6 +177,8 @@ table.tableinfo tr.odd_row:hover > td { background-color: #6F3F00; }
 table.tableinfo tr.even_row > td { background-color: #2F2F2F; }
 table.tableinfo tr.even_row:hover > td{ background-color: #6F3F00; }
 
+table.tableinfo tr.selected > td { background-color: #553020; }
+table.tableinfo tr.selected:hover > td { background-color: #6F3F00; }
 
 table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; }
 table.tableinfo tr:hover > td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
@@ -186,8 +202,8 @@ table.tableinfo tr.footer td{
 /**************************************************/
 
 table.tablestripped{
-	border: 1px solid #5A5A5A;;
-	border-top: 0px solid #AAAAAA;
+	border: 1px solid #5A5A5A;
+	border-top: 0 solid #AAAAAA;
 }
 
 table.tablestripped tr.form_odd_row td{
@@ -416,8 +432,8 @@ div.scrollbar .subline .nav_links .text{ color: #DFDFDF; }
 /* MESSAGES */
 div.messagecontainer .message .messagebox{
 	margin-right: 15px;
-	margin-left: 0px;
-	margin-bottom: 0px;
+	margin-left: 0;
+	margin-bottom: 0;
 }
 
 div.formElement_header{
@@ -495,7 +511,7 @@ div.suggest{ border: 1px #FF5500 solid; }
 .button:hover { border-color: #2f2f2f; color: #2f2f2f; background: #FF5500; text-decoration: none; }
 
 .link_menu{
-	border: 0px;
+	border: 0;
 	background: none;
 
 	color: #FF5500;
@@ -509,9 +525,9 @@ div.suggest{ border: 1px #FF5500 solid; }
 
 .link_menu[disabled], .link_menu[disabled]:hover{
 	color: #DFDFDF;
-	border: 0px;
+	border: 0;
 	cursor: default;
 }
 
-.column .widget .header{ border: 0px;}
-.column .widget .footer{ border: 0px;}
+.column .widget .header{ border: 0;}
+.column .widget .footer{ border: 0;}

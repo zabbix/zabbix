@@ -45,12 +45,15 @@
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
 		case PAGE_TYPE_JS:
-		case PAGE_TYPE_JSON:
 			header('Content-Type: application/javascript; charset=UTF-8');
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
-		case PAGE_TYPE_JSON_RPC:
+		case PAGE_TYPE_JSON:
 			header('Content-Type: application/json');
+			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+			break;
+		case PAGE_TYPE_JSON_RPC:
+			header('Content-Type: application/json-rpc');
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
 		case PAGE_TYPE_CSS:
@@ -125,11 +128,12 @@
 ?>
 <!doctype html>
 <html>
-  <head>
-    <title><?php echo $page_title; ?></title>
-	<meta name="Author" content="ZABBIX SIA" />
-	<link rel="shortcut icon" href="images/general/zabbix.ico" />
-	<link rel="stylesheet" type="text/css" href="css.css" />
+	<head>
+		<title><?php echo $page_title; ?></title>
+		<meta name="Author" content="ZABBIX SIA" />
+		<meta charset="utf-8" />
+		<link rel="shortcut icon" href="images/general/zabbix.ico" />
+		<link rel="stylesheet" type="text/css" href="css.css" />
 <?php
 	$css = 'css_ob.css';
 	$bodyCSS = 'originalblue';
@@ -157,26 +161,23 @@
 	print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
 
 	if($page['file'] == 'sysmap.php'){
-		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />');
+		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&amp;output=css" />');
 	}
 
 
 
 ?>
-<!--[if IE 6]>
-	<script type="text/javascript" src="js/ie6fix.js"></script>
-<![endif]-->
 <!--[if lte IE 7]>
 	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
 <![endif]-->
 <script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
-	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&lang='.CWebUser::$data['lang'];
+	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'];
 	print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
 
 	if(isset($page['scripts']) && is_array($page['scripts']) && !empty($page['scripts'])){
 		foreach($page['scripts'] as $id => $script){
-			$path .= '&files[]='.$script;
+			$path .= '&amp;files[]='.$script;
 		}
 		print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
 	}
@@ -289,10 +290,9 @@ COpt::compare_files_with_menu($ZBX_MENU);
 // --- ---
 				$jscript = 'javascript : '.
 					" var pos = getPosition('button_show_tree');".
-					" ShowHide('div_node_tree',IE6?'block':'table');".
+					" ShowHide('div_node_tree','table');".
 					' pos.top += 20;'.
-					" \$('div_node_tree').setStyle({top: pos.top+'px'});".
-					" if(IE6) showPopupDiv('div_node_tree','select_iframe');";		// IE6
+					" \$('div_node_tree').setStyle({top: pos.top+'px'});";
 				$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript); //sdelatj konstatntu!
 				$button_show_tree->setAttribute('id', 'button_show_tree');
 
@@ -324,10 +324,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 				$div_node_tree = new CDiv();
 				$div_node_tree->addItem($node_tree->getHTML());
-
-				$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "javascript: ".
-																				" if(IE6) hidePopupDiv('select_iframe');".	//IE6 fix
-																				" \$('div_node_tree').setStyle({display:'none'});"));
+				$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "\$('div_node_tree').setStyle({display:'none'});"));
 
 				$div_node_tree->setAttribute('id', 'div_node_tree');
 				$div_node_tree->addStyle('display: none');

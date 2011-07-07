@@ -1,4 +1,3 @@
-// JavaScript Document
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -16,11 +15,9 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**
-*/
-// Title: CDebug class
-// Author: Aly
+**/
 
+// Author: Aly
 var CDebug = Class.create({
 className:		null,			// debuging class name
 debug_status:	0,				// debug status: 0 - off, 1 - on, 2 - SDI;
@@ -38,9 +35,9 @@ debug: function(str, id){
 
 		if(typeof(id) != 'undefined') str+= ' :'+id;
 
-		if(this.debug_prev == str) return true;
+//		if(this.debug_prev == str) return true;
 
-		this.debug_info += str+'\n';		
+		this.debug_info += str+'\n';
 		if(this.debug_status == 2){
 			SDI(str);
 		}

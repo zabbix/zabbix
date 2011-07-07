@@ -1,4 +1,3 @@
-/* CSS Document */
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -16,8 +15,70 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**
-*/
+**/
+
+/************************************************************/
+/*					ZABBIX MAPS								*/
+/************************************************************/
+
+#sysmap_cnt .sysmap_element{
+	position: absolute;
+	z-index: 10;
+}
+
+#sysmap_cnt .selementArea{
+	background-color: rgb(204, 204, 204);
+	background-color: rgba(204, 204, 204, 0.5);
+}
+
+#sysmap_cnt .selected{
+	border: 3px #FFCC00 solid;
+	margin: -3px;
+}
+#sysmap_cnt .ui-selecting{
+	border: 3px #FFCC00 solid;
+	margin: -3px;
+}
+
+.floatWindow{
+	box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5);
+}
+
+fieldset{
+	margin: 0;
+	padding: 0;
+}
+
+table.gridTable{
+	empty-cells:show;
+	padding: 1px 3px;
+	white-space: nowrap;
+	text-align: left;
+	height: 22px;
+	border-collapse: collapse;
+	width: 100%
+}
+table.gridTable thead tr td{
+	font-weight: bold;
+	background-color: #CED7DF;
+}
+table.gridTable tfoot tr td{
+	text-align: right;
+	background-color: #CED7DF;
+}
+table.gridTable tbody tr td{
+	background-color: #F2F7FA;
+}
+table.gridTable tr td{
+	border: 2px solid white;
+}
+
+.colorpickerLabel{
+	border: 1px solid black;
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+}
 
 /************************************************************/
 /*					ZABBIX MESSAGING						*/
@@ -495,7 +556,7 @@ div.calendar input.calendar_textbox{
 
 /* default menu item */
 .pum_o_item {
-	font-family: sans-serif, Tahoma, Verdana, Geneva, Arial, Helvetica;
+	font-family: sans-serif;
 	font-size: 12px;
 	text-decoration: none;
 	background-color: #ECECFF;
@@ -516,7 +577,7 @@ div.calendar input.calendar_textbox{
 
 /* menu menu item with submenu */
 .pum_b_submenu{
-	font-family: sans-serif, Tahoma, Verdana, Geneva, Arial, Helvetica;
+	font-family: sans-serif;
 	font-size: 12px;
 	text-decoration: none;
 	font-weight: bold;
@@ -531,7 +592,7 @@ div.calendar input.calendar_textbox{
 }
 
 .pum_o_submenu{
-	font-family: sans-serif, Tahoma, Verdana, Geneva, Arial, Helvetica;
+	font-family: sans-serif;
 	font-size: 12px;
 	text-decoration: none;
 	background: #ECECFF;
