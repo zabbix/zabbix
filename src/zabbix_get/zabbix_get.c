@@ -29,54 +29,36 @@ const char	*progname = NULL;
 const char	title_message[] = "Zabbix Get";
 const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-I <IP address>] -k <key>";
 
-#ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
-        "Options:",
-	"  -s --host <host name or IP>          Specify host name or IP address of a host.",
-	"  -p --port <port number>              Specify port number of agent running on the host. Default is " ZBX_DEFAULT_AGENT_PORT_STR ".",
+	"Options:",
+	"  -s --host <host name or IP>          Specify host name or IP address of a host",
+	"  -p --port <port number>              Specify port number of agent running on the host. Default is " ZBX_DEFAULT_AGENT_PORT_STR,
 	"  -I --source-address <IP address>     Specify source IP address",
 	"",
-	"  -k --key <key of metric>             Specify item key to retrieve.",
+	"  -k --key <key of metric>             Specify key of item to retrieve value for",
 	"",
 	"  -h --help                            Give this help",
 	"  -V --version                         Display version number",
 	"",
 	"Example: zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\"",
-        0 /* end of text */
+	NULL	/* end of text */
 };
-#else
-const char	*help_message[] = {
-        "Options:",
-	"  -s <host name or IP>         Specify host name or IP address of a host.",
-	"  -p <port number>             Specify port number of agent running on the host. Default is " ZBX_DEFAULT_AGENT_PORT_STR ".",
-	"  -I <IP address>              Specify source IP address",
-	"",
-	"  -k <key of metric>           Specify item key to retrieve.",
-	"",
-	"  -h                           Give this help",
-	"  -V                           Display version number",
-	"",
-	"Example: zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\"",
-        0 /* end of text */
-};
-#endif
 
 /* COMMAND LINE OPTIONS */
 
 /* long options */
-struct zbx_option longopts[] =
+struct zbx_option	longopts[] =
 {
-	{"host",		1,	0,	's'},
-	{"port",		1,	0,	'p'},
-	{"key",			1,	0,	'k'},
-	{"source-address",	1,	0,	'I'},
-	{"help",		0,	0,	'h'},
-	{"version",		0,	0,	'V'},
-	{0,0,0,0}
+	{"host",		1,	NULL,	's'},
+	{"port",		1,	NULL,	'p'},
+	{"key",			1,	NULL,	'k'},
+	{"source-address",	1,	NULL,	'I'},
+	{"help",		0,	NULL,	'h'},
+	{"version",		0,	NULL,	'V'},
+	{NULL}
 };
 
 /* short options */
-
 static char     shortopts[] = "s:p:k:I:hV";
 
 /* end of COMMAND LINE OPTIONS */

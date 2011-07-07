@@ -53,44 +53,38 @@
 
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Server";
-const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
+const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>] [-R <option>]";
 
-#if !defined(HAVE_GETOPT_LONG)
 const char	*help_message[] = {
 	"Options:",
-	"  -c <file>       absolute path to the configuration file",
-	"  -h              give this help",
-	"  -n <nodeid>     convert database data to new nodeid",
-	"  -V              display version number",
+	"  -c --config <file>              absolute path to the configuration file",
+	"  -n --new-nodeid <nodeid>        convert database data to new nodeid",
+	"  -R --runtime-control <option>   perform administrative functions",
+	"",
+	"Runtime control options:",
+	"  " ZBX_CONFIG_CACHE_RELOAD "             reload configuration cache",
+	"",
+	"Other options:",
+	"  -h --help                       give this help",
+	"  -V --version                    display version number",
 	NULL	/* end of text */
 };
-#else
-const char	*help_message[] = {
-	"Options:",
-	"  -c --config <file>       absolute path to the configuration file",
-	"  -h --help                give this help",
-	"  -n --new-nodeid <nodeid> convert database data to new nodeid",
-	"  -V --version             display version number",
-	NULL	/* end of text */
-};
-#endif
 
 /* COMMAND LINE OPTIONS */
 
 /* long options */
-
-static struct zbx_option longopts[] =
+static struct zbx_option	longopts[] =
 {
-	{"config",	1,	0,	'c'},
-	{"help",	0,	0,	'h'},
-	{"new-nodeid",	1,	0,	'n'},
-	{"version",	0,	0,	'V'},
-	{0,0,0,0}
+	{"config",		1,	NULL,	'c'},
+	{"new-nodeid",		1,	NULL,	'n'},
+	{"runtime-control",	1,	NULL,	'R'},
+	{"help",		0,	NULL,	'h'},
+	{"version",		0,	NULL,	'V'},
+	{NULL}
 };
 
 /* short options */
-
-static char	shortopts[] = "c:n:hV";
+static char	shortopts[] = "c:n:hVR:";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -365,19 +359,29 @@ static void	zbx_load_config()
 		CONFIG_HOUSEKEEPER_FORKS = 0;
 }
 
+void	zbx_sigusr_handler(zbx_task_t task)
+{
+	switch (task)
+	{
+		case ZBX_TASK_CONFIG_CACHE_RELOAD:
+			if (ZBX_PROCESS_TYPE_CONFSYNCER == process_type)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
+				zbx_wakeup();
+			}
+			break;
+		default:
+			break;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: main                                                             *
  *                                                                            *
  * Purpose: executes server processes                                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	main(int argc, char **argv)
@@ -396,13 +400,23 @@ int	main(int argc, char **argv)
 			case 'c':
 				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
+			case 'R':
+				if (0 == strcmp(zbx_optarg, ZBX_CONFIG_CACHE_RELOAD))
+					task = ZBX_TASK_CONFIG_CACHE_RELOAD;
+				else
+				{
+					printf("invalid runtime control option: %s\n", zbx_optarg);
+					exit(EXIT_FAILURE);
+				}
+				break;
 			case 'h':
 				help();
 				exit(-1);
 				break;
 			case 'n':
-				nodeid=0;
-				if(zbx_optarg)	nodeid = atoi(zbx_optarg);
+				nodeid = 0;
+				if (zbx_optarg)
+					nodeid = atoi(zbx_optarg);
 				task = ZBX_TASK_CHANGE_NODEID;
 				break;
 			case 'V':
@@ -423,6 +437,9 @@ int	main(int argc, char **argv)
 	init_metrics();
 
 	zbx_load_config();
+
+	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
+		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
@@ -586,7 +603,7 @@ int	MAIN_ZABBIX_ENTRY()
 			threads[i] = pid;
 	}
 
-	/* Main process */
+	/* main process */
 	if (server_num == 0)
 	{
 		set_parent_signal_handler();
@@ -601,6 +618,7 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 	else if (server_num <= CONFIG_CONFSYNCER_FORKS)
 	{
+		/* the configuration syncer should be created first - variable threads[1] is used in daemon.c unit */
 		process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		process_num = server_num;
 

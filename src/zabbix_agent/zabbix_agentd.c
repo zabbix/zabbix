@@ -64,29 +64,25 @@ const char	title_message[] = APPLICATION_NAME
 	;
 /* end of application TITLE */
 
-
 /* application USAGE message */
 const char	usage_message[] =
 	"[-Vhp]"
 #ifdef _WINDOWS
 	" [-idsx] [-m]"
 #endif
-	" [-c <file>] [-t <item>]";
-/*end of application USAGE message */
+	" [-c <config-file>] [-t <item key>]";
+/* end of application USAGE message */
 
 /* application HELP message */
 const char	*help_message[] = {
 	"Options:",
 	"",
-	"  -c --config <file>    absolute path to the configuration file",
-	"  -h --help             give this help",
-	"  -V --version          display version number",
-	"  -p --print            print supported items and exit",
-	"  -t --test <item>      test specified item and exit",
-/*	"  -u --usage <item>     test specified item and exit",	*/ /* !!! TODO - print item usage !!! */
-
+	"  -c --config <config-file>  absolute path to the configuration file",
+	"  -h --help                  give this help",
+	"  -V --version               display version number",
+	"  -p --print                 print known items and exit",
+	"  -t --test <item key>       test specified item and exit",
 #ifdef _WINDOWS
-
 	"",
 	"Functions:",
 	"",
@@ -97,35 +93,29 @@ const char	*help_message[] = {
 	"  -x --stop             stop Zabbix agent service",
 
 	"  -m --multiple-agents  service name will include hostname",
-
 #endif
-
-	0	/* end of text */
+	NULL	/* end of text */
 };
 /* end of application HELP message */
 
 /* COMMAND LINE OPTIONS */
-static struct zbx_option longopts[] =
+static struct zbx_option	longopts[] =
 {
-	{"config",		1,	0,	'c'},
-	{"help",		0,	0,	'h'},
-	{"version",		0,	0,	'V'},
-	{"print",		0,	0,	'p'},
-	{"test",		1,	0,	't'},
-
+	{"config",		1,	NULL,	'c'},
+	{"help",		0,	NULL,	'h'},
+	{"version",		0,	NULL,	'V'},
+	{"print",		0,	NULL,	'p'},
+	{"test",		1,	NULL,	't'},
 #ifdef _WINDOWS
+	{"install",		0,	NULL,	'i'},
+	{"uninstall",		0,	NULL,	'd'},
 
-	{"install",		0,	0,	'i'},
-	{"uninstall",		0,	0,	'd'},
+	{"start",		0,	NULL,	's'},
+	{"stop",		0,	NULL,	'x'},
 
-	{"start",		0,	0,	's'},
-	{"stop",		0,	0,	'x'},
-
-	{"multiple-agents",	0,	0,	'm'},
-
+	{"multiple-agents",	0,	NULL,	'm'},
 #endif
-
-	{0,0,0,0}
+	{NULL}
 };
 
 static char	shortopts[] =
@@ -139,6 +129,8 @@ static char	shortopts[] =
 static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
+
+unsigned char	process_type = 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
@@ -555,6 +547,13 @@ void	zbx_on_exit()
 
 	exit(SUCCEED);
 }
+
+#ifdef ZABBIX_DAEMON
+void	zbx_sigusr_handler(zbx_task_t task)
+{
+	/* nothing to do */
+}
+#endif
 
 int	main(int argc, char **argv)
 {

@@ -65,5 +65,6 @@ void	collect_selfmon_stats();
 void	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
 		unsigned char state, double *value);
 void	zbx_sleep_loop(int sleeptime);
+void	zbx_wakeup();
 
 #endif	/* ZABBIX_ZBXSELF_H */
