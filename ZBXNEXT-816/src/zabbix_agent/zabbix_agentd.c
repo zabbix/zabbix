@@ -77,11 +77,11 @@ const char	usage_message[] =
 const char	*help_message[] = {
 	"Options:",
 	"",
-	"  -c --config <file>    absolute path to the configuration file",
-	"  -h --help             give this help",
-	"  -V --version          display version number",
-	"  -p --print            print known items and exit",
-	"  -t --test <item key>  test specified item and exit",
+	"  -c --config <config-file>  absolute path to the configuration file",
+	"  -h --help                  give this help",
+	"  -V --version               display version number",
+	"  -p --print                 print known items and exit",
+	"  -t --test <item key>       test specified item and exit",
 #ifdef _WINDOWS
 	"",
 	"Functions:",
