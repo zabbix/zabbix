@@ -976,6 +976,11 @@ FIELD		|x		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|y		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|iconid_disabled|t_id		|	|NULL		|ZBX_SYNC		|4|images	|imageid	|RESTRICT
 FIELD		|iconid_maintenance|t_id	|	|NULL		|ZBX_SYNC		|5|images	|imageid	|RESTRICT
+FIELD		|elementsubtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
+FIELD		|areatype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
+FIELD		|width		|t_integer	|'200'	|NOT NULL	|ZBX_SYNC 
+FIELD		|height		|t_integer	|'200'	|NOT NULL	|ZBX_SYNC 
+FIELD		|viewtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
 
 TABLE|sysmap_element_url|sysmapelementurlid|ZBX_SYNC
 FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0

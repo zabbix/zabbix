@@ -1,4 +1,22 @@
-/* CSS Document */
+/*
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
+
 /* Black and Blue Theme by Aly*/
 @import "darkblue/jquery-ui.css";
 
@@ -189,14 +207,14 @@ table.tableinfo tr.vertical_header td.hover_grey:hover{
 	background-color:#245078;
 }
 
-table.tableinfo tr.selected > td { background-color: #2F56A6; }
-table.tableinfo tr.selected:hover > td { background-color: #3663BF; }
-
 table.tableinfo tr.odd_row > td { background-color: #022744; }
 table.tableinfo tr.odd_row:hover > td { background-color: #245078; }
 
 table.tableinfo tr.even_row > td { background-color: #1D4161; }
 table.tableinfo tr.even_row:hover > td{ background-color: #245078; }
+
+table.tableinfo tr.selected > td { background-color: #2F56A6; }
+table.tableinfo tr.selected:hover > td { background-color: #3663BF; }
 
 table.tableinfo tr > td.active				{	background-color: #99EE9E;	border: 1px #99EE9E solid; }
 table.tableinfo tr:hover > td.active			{	background-color: #99EE99;	border: 1px #99EE99 solid; }
@@ -221,7 +239,7 @@ table.tableinfo tr.footer td{
 
 table.tablestripped{
 	border: 1px solid #77B7DA;
-	border-top: 0px solid #245078;
+	border-top: 0 solid #245078;
 }
 
 table.tablestripped tr.form_odd_row td{
@@ -454,8 +472,8 @@ div.scrollbar .subline .nav_links .text{ color: #FFFFFF; }
 /* MESSAGES */
 div.messagecontainer .message .messagebox{
 	margin-right: 15px;
-	margin-left: 0px;
-	margin-bottom: 0px;
+	margin-left: 0;
+	margin-bottom: 0;
 }
 
 div.formElement_header{
@@ -533,7 +551,7 @@ div.suggest{ border: 1px #77B7DA solid; }
 .button:hover { border-color: #022744; color: #022744; background: #77B7DA; text-decoration: none; }
 
 .link_menu{
-	border: 0px;
+	border: 0;
 	background: none;
 
 	color: #77B7DA;
@@ -547,12 +565,12 @@ div.suggest{ border: 1px #77B7DA solid; }
 
 .link_menu[disabled], .link_menu[disabled]:hover{
 	color: #FFFFFF;
-	border: 0px;
+	border: 0;
 	cursor: default;
 }
 
 .column .widget .header{ border: 1px solid #77B7DA;}
-.column .widget .footer{ border: 0px; background: #245078 url('../images/gradients/header_footer_blue.png') repeat-x top left;}
+.column .widget .footer{ border: 0; background: #245078 url('../images/gradients/header_footer_blue.png') repeat-x top left;}
 
 /*////////////////	INSTALLATION	////////////////////*/
 table.setup_wizard{

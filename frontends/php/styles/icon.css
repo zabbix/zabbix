@@ -1,4 +1,22 @@
-/* CSS Document */
+/*
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
+
 /********* DIV IMG *********/
 .zabbix_logo{
 	height: 31px;
@@ -52,10 +70,9 @@
 .filteropened{
 	height: 9px;
 	width: 9px;
-	background-image: url('../images/general/opened.gif');
-	background-repeat:no-repeat;
+	background: url('../images/general/opened.gif') no-repeat;
 	cursor:pointer;
-	margin: 0px 1px;
+	margin: 0 1px;
 }
 
 .status_icon{ height: 14px; width: 14px; background-repeat:no-repeat; cursor:pointer; margin: 0 1px 0 1px;	}
@@ -81,42 +98,36 @@
 .dbl_arrow_down{
 	height: 10px;
 	width: 9px;
-	background-image: url('../images/general/dbl_arrow_down2.png');
-	background-repeat:no-repeat;
+	background: url('../images/general/dbl_arrow_down2.png') no-repeat;
 	display:block;
 	cursor:pointer;
 }
 .dbl_arrow_up{
 	height: 10px;
 	width: 9px;
-	background-image: url('../images/general/dbl_arrow_up2.png');
-	background-repeat:no-repeat;
+	background: url('../images/general/dbl_arrow_up2.png') no-repeat;
 	cursor:pointer;
 }
 
 .sla_green{
 	height: 15px;
-	background-image: url('../images/gradients/sla_green15.png');
-	background-repeat:repeat-x;
+	background: url('../images/gradients/sla_green15.png') repeat-x;
 }
 .sla_red{
 	height: 15px;
-	background-image: url('../images/gradients/sla_red15.png');
-	background-repeat:repeat-x;
+	background: url('../images/gradients/sla_red15.png') repeat-x;
 }
 
 .icon_sortup{
 	height: 16px;
 	width: 19px;
-	background-image: url('../images/general/sort_up.gif');
-	background-repeat:no-repeat;
+	background: url('../images/general/sort_up.gif') no-repeat;
 	cursor: pointer;
 }
 .icon_sortdown{
 	height: 16px;
 	width: 19px;
-	background-image: url('../images/general/sort_down.gif');
-	background-repeat:no-repeat;
+	background: url('../images/general/sort_down.gif') no-repeat;
 	cursor: pointer;
 }
 .default_cursor{

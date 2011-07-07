@@ -63,6 +63,26 @@ ALTER TABLE sysmaps_elements DROP COLUMN url
 /
 REORG TABLE sysmaps_elements
 /
+ALTER TABLE sysmaps_elements ADD elementsubtype integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE sysmaps_elements
+/
+ALTER TABLE sysmaps_elements ADD areatype integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE sysmaps_elements
+/
+ALTER TABLE sysmaps_elements ADD width integer WITH DEFAULT '200' NOT NULL
+/
+REORG TABLE sysmaps_elements
+/
+ALTER TABLE sysmaps_elements ADD height integer WITH DEFAULT '200' NOT NULL
+/
+REORG TABLE sysmaps_elements
+/
+ALTER TABLE sysmaps_elements ADD viewtype integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE sysmaps_elements
+/
 DELETE FROM sysmaps_elements WHERE sysmapid NOT IN (SELECT sysmapid FROM sysmaps)
 /
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0
