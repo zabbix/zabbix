@@ -394,7 +394,18 @@ class CMap extends CMapElement{
 				$db_map_urls = DBselect($sql);
 				while($map_url = DBfetch($db_map_urls)){
 					foreach($selements as $snum => $selement){
-						if((bccomp($selement['sysmapid'], $map_url['sysmapid']) == 0) && ($selement['elementtype'] == $map_url['elementtype'])){
+						if((bccomp($selement['sysmapid'], $map_url['sysmapid']) == 0) &&
+							(
+								(
+									($selement['elementtype'] == $map_url['elementtype']) &&
+									($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP)
+								) ||
+								(
+									($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) &&
+									($map_url['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
+								)
+							)
+						){
 							$selements[$snum]['urls'][$map_url['sysmapurlid']] = $this->expandUrlMacro($map_url, $selement);
 						}
 					}
