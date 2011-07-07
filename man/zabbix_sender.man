@@ -1,17 +1,15 @@
-.TH ZABBIX_SENDER 8 "23 October 2010"
+.TH ZABBIX_SENDER 8 "5 July 2011"
 .if n .ad l
 .SH NAME
-zabbix_sender \- Zabbix Sender utility.
+zabbix_sender \- Zabbix sender utility.
 .SH SYNOPSIS
-.B zabbix_sender [-hpzvIV] {-kso | [-T] -i
-.I <file>\fB} [-c\fR
-.I <file>\fB]\fR
+.B zabbix_sender [-hpzvIV] {-kso | [-T] -i \fI<inputfile>\fB} [-c \fI<config-file>\fB]
 .SH DESCRIPTION
 .B zabbix_sender
 is a command line utility for sending data to a remote Zabbix server. On the Zabbix server an item of type \fBZabbix trapper\fR should be created with corresponding key. Note that incoming values will only be accepted from hosts specified in \fBAllowed hosts\fR field for this item.
 
 .SS Options
-.IP "-c, --config \fI<file>\fR"
+.IP "-c, --config \fI<config-file>\fR"
 Specify agent configuration file for reading server details.
 .IP "-z, --zabbix-server \fI<server>\fR"
 Hostname or IP address of Zabbix server.
@@ -27,10 +25,10 @@ Specify item key to send value to.
 Specify value.
 .IP "-i, --input-file \fI<inputfile>\fR"
 Load values from input file. Specify \fB-\fR for standard input. Each line of file contains whitespace delimited: \fB<hostname> <key> <value>\fR. Specify \fB-\fR in \fB<hostname>\fR to use hostname from configuration file or \fB--host\fR argument.
-.IP "-T --with-timestamps"
+.IP "-T, --with-timestamps"
 Each line of file contains whitespace delimited: \fB<hostname> <key> <timestamp> <value>\fR. This can be used with \fB--input-file\fR option. Timestamp should be specified in Unix timestamp format.
-.IP "-r --real-time"
-Send metrics one by one as soon as they are received. This can be used when reading from standard input.
+.IP "-r, --real-time"
+Send values one by one as soon as they are received. This can be used when reading from standard input.
 .IP "-v, --verbose"
 Verbose mode, -vv for more details.
 .IP "-h, --help"
