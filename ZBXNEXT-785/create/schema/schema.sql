@@ -1016,7 +1016,7 @@ FIELD		|label_string_hostgroup|t_varchar(255)|''|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_trigger|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_map|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_image|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
-FIELD		|iconmapid	|t_id		|	|NULL		|ZBX_SYNC		|2|icon_map	|		|RESTRICT 
+FIELD		|iconmapid	|t_id		|	|NULL		|ZBX_SYNC		|2|icon_map	|		|RESTRICT
 INDEX		|1		|name
 
 TABLE|sysmap_url|sysmapurlid|ZBX_SYNC
