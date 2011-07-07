@@ -1190,7 +1190,7 @@ UNIQUE		|1		|name
 
 TABLE|icon_mapping|iconmappingid|ZBX_SYNC 
 FIELD		|iconmappingid	|t_id		|	|NOT NULL	|0 
-FIELD		|iconmapid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|icon_map 		|		|RESTRICT
+FIELD		|iconmapid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|icon_map
 FIELD		|iconid		|t_id		|	|NOT NULL	|ZBX_SYNC		|2|images		|imageid	|RESTRICT
 FIELD		|profile_link	|t_integer	|	|NOT NULL	|ZBX_SYNC 
 FIELD		|expression	|t_varchar(64)	|	|NOT NULL	|ZBX_SYNC 
