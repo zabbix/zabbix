@@ -520,6 +520,8 @@ unlock:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static int	sleep_remains;
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_sleep_loop                                                   *
@@ -545,22 +547,29 @@ void	zbx_sleep_loop(int sleeptime)
 	if (sleeptime <= 0)
 		return;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "sleeping for %d seconds", sleeptime);
+	sleep_remains = sleeptime;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "sleeping for %d seconds", sleep_remains);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 	process_type_string = get_process_type_string(process_type);
+#endif
 
 	do
 	{
-		zbx_setproctitle("%s [sleeping for %d seconds]", process_type_string, sleeptime);
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		zbx_setproctitle("%s [sleeping for %d seconds]", process_type_string, sleep_remains);
+#endif
 		sleep(1);
 	}
-	while (--sleeptime > 0);
-#else
-	sleep(sleeptime);
-#endif	/* HAVE_FUNCTION_SETPROCTITLE */
+	while (--sleep_remains > 0);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+}
+
+void	zbx_wakeup()
+{
+	sleep_remains = 0;
 }
