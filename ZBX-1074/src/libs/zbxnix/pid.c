@@ -28,15 +28,15 @@ static int	fdpid = -1;
 
 int	create_pid_file(const char *pidfile)
 {
-	int		fd = 0;
+	int		fd;
 	struct stat	buf;
 	struct flock	fl;
 
-	fl.l_type = F_WRLCK;		/* F_RDLCK, F_WRLCK, F_UNLCK */
-	fl.l_whence = SEEK_SET;		/* SEEK_SET, SEEK_CUR, SEEK_END */
-	fl.l_start = 0;			/* offset from l_whence */
-	fl.l_len = 0;			/* length, 0 = to EOF */
-	fl.l_pid = zbx_get_thread_id();	/* our PID */
+	fl.l_type = F_WRLCK;	/* F_RDLCK, F_WRLCK, F_UNLCK */
+	fl.l_whence = SEEK_SET;	/* SEEK_SET, SEEK_CUR, SEEK_END */
+	fl.l_start = 0;		/* offset from l_whence */
+	fl.l_len = 0;		/* length, 0 = to EOF */
+	fl.l_pid = getpid();	/* our PID */
 
 	/* check if pid file already exists */
 	if (0 == stat(pidfile, &buf))
@@ -67,18 +67,38 @@ int	create_pid_file(const char *pidfile)
 	}
 
 	/* lock file */
-	fdpid = fileno(fpid);
-	if (-1 != fdpid)
+	if (-1 != (fdpid = fileno(fpid)))
 	{
 		fcntl(fdpid, F_SETLK, &fl);
 		fcntl(fdpid, F_SETFD, FD_CLOEXEC);
 	}
 
 	/* write pid to file */
-	fprintf(fpid, "%li", zbx_get_thread_id());
+	fprintf(fpid, "%d", (int)getpid());
 	fflush(fpid);
 
 	return SUCCEED;
+}
+
+int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len)
+{
+	int	fd, ret = FAIL;
+	char	buf[MAX_ID_LEN];
+
+	if (-1 == (fd = open(pidfile, O_RDONLY)))
+	{
+		zbx_snprintf(error, max_error_len, "cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
+		return ret;
+	}
+
+	if (-1 != read(fd, buf, sizeof(buf)))
+	{
+		if (1 == sscanf(buf, "%d", (int *)pid))
+			ret = SUCCEED;
+	}
+	close(fd);
+
+	return ret;
 }
 
 void	drop_pid_file(const char *pidfile)
