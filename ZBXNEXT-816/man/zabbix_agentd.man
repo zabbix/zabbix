@@ -2,11 +2,7 @@
 .SH NAME
 zabbix_agentd \- Zabbix agent daemon.
 .SH SYNOPSIS
-.B zabbix_agentd [-hpV] [-c
-.I <config-file>
-.B ] [-t
-.I <item key>
-.B ]
+.B zabbix_agentd [-hpV] [-c \fI<config-file>\fB] [-t \fI<item key>\fB]
 .SH DESCRIPTION
 .B zabbix_agentd
 is a daemon for monitoring of various server parameters.

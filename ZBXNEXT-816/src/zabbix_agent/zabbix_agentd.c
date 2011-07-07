@@ -64,14 +64,13 @@ const char	title_message[] = APPLICATION_NAME
 	;
 /* end of application TITLE */
 
-
 /* application USAGE message */
 const char	usage_message[] =
 	"[-Vhp]"
 #ifdef _WINDOWS
 	" [-idsx] [-m]"
 #endif
-	" [-c <file>] [-t <item>]";
+	" [-c <config-file>] [-t <item key>]";
 /* end of application USAGE message */
 
 /* application HELP message */
