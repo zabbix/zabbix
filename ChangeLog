@@ -172,11 +172,12 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBXNEXT-816] added support for reloading configuration cache from the command line (Richlv,Sasha)
  - [ZBX-3063] added compatibility with PostgreSQL 9+; thanks to Andrey Groshev for patch (asaveljevs,Vedmak)
  - [ZBX-3890] added logging of ORACLE warning messages while connecting to the database (Sasha)
  - [ZBX-3880] fixed repeated processing of log-files through proxy when disabling a host or item (Sasha)
  - [ZBX-3420] fixed wrong error message being logged in case of DNS resolution errors (asaveljevs,rudolfs)
- - [ZBX-3519] fixed unterminated processes when system.run[,wait] times out and added proper output handling for system.run[,nowait] on UNIX (rudolfs) 
+ - [ZBX-3519] fixed unterminated processes when system.run[,wait] times out and added proper output handling for system.run[,nowait] on UNIX (rudolfs)
  - [ZBX-3768] fixed 'uptime' and 's' units as according to the documentation (Sasha)
  - [ZBX-3490] added support for LVM devices and full path to devices to vfs.dev.read and vfs.dev.write; thanks to Takanori Suzuki (dimir, sasha)
  - [ZBX-3862] fixed broken popups in frontend in Internet Explorer 7 (KB)
