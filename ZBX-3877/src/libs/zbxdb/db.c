@@ -296,11 +296,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 	else
 	{
-		result = DBselect("select oid from pg_type where typname = 'bytea'");
+		result = DBselect("select oid from pg_type where typname='bytea'");
 		if (NULL != (row = DBfetch(result)))
-		{
 			ZBX_PG_BYTEAOID = atoi(row[0]);
-		}
 		DBfree_result(result);
 	}
 
@@ -309,10 +307,16 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
 #endif
 
-	if (ZBX_PG_SVERSION >= 80100)
+	if (80100 <= ZBX_PG_SVERSION)
 	{
 		/* disable "nonstandard use of \' in a string literal" warning */
 		DBexecute("set escape_string_warning to off");
+	}
+
+	if (90000 <= ZBX_PG_SVERSION)
+	{
+		/* change the output format for values of type bytea from hex (the default) to escape */
+		DBexecute("set bytea_output=escape");
 	}
 #elif defined(HAVE_SQLITE3)
 #ifdef	HAVE_FUNCTION_SQLITE3_OPEN_V2
@@ -1262,7 +1266,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 	if (result->fld_num > 0)
 	{
 		int	i;
-		
+
 		result->values = zbx_malloc(result->values, sizeof(char *) * result->fld_num);
 
 		for (i = 0; i < result->fld_num; i++)
