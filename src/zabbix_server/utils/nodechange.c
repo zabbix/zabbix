@@ -129,7 +129,6 @@ static int convert_triggers_expression(int old_id, int new_id)
 				new_expression_esc, row[1]);
 		zbx_free(new_expression_esc);
 	}
-
 	DBfree_result(result);
 
 	return SUCCEED;

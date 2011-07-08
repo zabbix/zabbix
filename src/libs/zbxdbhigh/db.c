@@ -1421,7 +1421,7 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	if (0 != (table->flags & ZBX_SYNC))
 	{
 		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid +
-				(zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid;
+			(zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)nodeid;
 		max = min + (zbx_uint64_t)__UINT64_C(99999999999);
 	}
 	else
@@ -1457,7 +1457,6 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 					exit(FAIL);
 				}
 			}
-
 			DBfree_result(result);
 
 			dbres = DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
