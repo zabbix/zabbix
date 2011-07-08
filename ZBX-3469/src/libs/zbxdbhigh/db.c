@@ -514,7 +514,7 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 		if (trigger_value != new_value ||
 				(trigger_type == TRIGGER_TYPE_MULTIPLE_TRUE && new_value == TRIGGER_VALUE_TRUE))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG,"VL: %s() triggerid:" ZBX_FS_UI64 " value: %d --> %d, reason:'%s'",
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() triggerid:" ZBX_FS_UI64 " value:%d-->%d, reason:'%s'",
 					__function_name, triggerid, trigger_value, new_value, reason ? reason : "");
 
 			if (reason == NULL)

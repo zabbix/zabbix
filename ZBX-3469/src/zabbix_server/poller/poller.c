@@ -181,28 +181,25 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	zbx_uint64_t	triggerid;
 	int		trigger_type, trigger_value, alloc_len = 2048, offset;
 	const char	*trigger_error;
-	char		failed_type_buf[8], host_avail_buf[32], item_host_avail_buf[256];
+	char		failed_type_buf[8], item_host_avail_buf[256];
 	char		*sql = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
-	/* build sql conditions depending on failed item type */
+	/* determine failed item type */
 	switch (type)
 	{
 		case ITEM_TYPE_ZABBIX:
 			zbx_snprintf(failed_type_buf, sizeof(failed_type_buf), "%d", ITEM_TYPE_ZABBIX);
-			zbx_snprintf(host_avail_buf, sizeof(host_avail_buf), "%s", "available");
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
 			zbx_snprintf(failed_type_buf, sizeof(failed_type_buf), "%d,%d,%d",
 					ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3);
-			zbx_snprintf(host_avail_buf, sizeof(host_avail_buf), "%s", "snmp_available");
 			break;
 		case ITEM_TYPE_IPMI:
 			zbx_snprintf(failed_type_buf, sizeof(failed_type_buf), "%d", ITEM_TYPE_IPMI);
-			zbx_snprintf(host_avail_buf, sizeof(host_avail_buf), "%s", "ipmi_available");
 			break;
 		default:
 			/* we should never end up here */
@@ -211,7 +208,12 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	sql = zbx_malloc(sql, alloc_len);
 
-	/* build sql condition depending on any item type */
+	/*
+	 * Determine if items' host is avaliable:
+	 * - (for zabbix items) item host.available = HOST_AVAILABLE_TRUE
+	 * - (for snmp items) item host.snmp_available = HOST_AVAILABLE_TRUE
+	 * - (for ibmi items) item host.ibmi_available = HOST_AVAILABLE_TRUE
+	 */
 	zbx_snprintf(item_host_avail_buf, sizeof(item_host_avail_buf), "i2.type=%d and h2.available=%d"
 			" or i2.type in (%d,%d,%d) and h2.snmp_available=%d"
 			" or i2.type=%d and h2.ipmi_available=%d",
@@ -222,9 +224,25 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			ITEM_TYPE_IPMI,
 			HOST_AVAILABLE_TRUE);
 
+	/*
+	 * Set trigger status to UNKNOWN if all are true:
+	 * - trigger's item status ACTIVE
+	 * - trigger's item type same as failed one
+	 * - trigger does not reference time-based functions- trigger status ENABLED
+	 * - trigger's host same as failed one
+	 * - trigger's host status MONITORED
+	 * - trigger does not reference "active" item
+	 *
+	 * An item is considered "active" if all are true:
+	 * - item status ACTIVE
+	 * - item's host status MONITORED
+	 * - item's trigger references time-based functions
+	 *   OR
+	 *   item is of different type AND it's host is AVAILABLE
+	 */
 	offset = 0;
 	zbx_snprintf_alloc(&sql, &alloc_len, &offset, 4096,
-			"select distinct t.triggerid,t.type,t.value,t.error,t.description"
+			"select distinct t.triggerid,t.type,t.value,t.error"
 			" from items i,functions f,triggers t,hosts h"
 			" where i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
@@ -232,6 +250,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				" and i.status=%d"
 				" and not i.key_ like '%s'"
 				" and i.type in (%s)"
+				" and f.function not in (" ZBX_SQL_TIME_FUNCTIONS ")"
 				" and t.status=%d"
 				" and h.hostid=" ZBX_FS_UI64
 				" and h.status=%d"
@@ -241,15 +260,15 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				" from functions f2,items i2,hosts h2"
 				" where f2.triggerid=f.triggerid"
 					" and f2.itemid=i2.itemid"
+					" and f2.itemid<>f.itemid"
 					" and i2.hostid=h2.hostid"
 					" and "
 					"("
 						"f2.function in (" ZBX_SQL_TIME_FUNCTIONS ")"	/* time-based function */
-						" or (%s)"					/* item available */
+						" or (i2.type not in (%s) and (%s))"		/* OR item available */
 					")"
 					" and i2.status=%d"
 					" and not i2.key_ like '%s'"
-					/*" and i2.type not in (%s)"*/
 					" and h2.status=%d"
 			")",
 			ITEM_STATUS_ACTIVE,
@@ -258,37 +277,12 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			TRIGGER_STATUS_ENABLED,
 			hostid,
 			HOST_STATUS_MONITORED,
+			failed_type_buf,
 			item_host_avail_buf,
 			ITEM_STATUS_ACTIVE,
 			SERVER_STATUS_KEY,
-			/*failed_type_buf,*/
 			HOST_STATUS_MONITORED);
 
-	zabbix_log(LOG_LEVEL_WARNING, "VL: %s", sql);
-
-	/*
-	 * For failed item set all affected triggers to UNKNOWN.
-	 *
-	 * Do not set UNKNOWN if:
-	 * - trigger contains at least one active item
-	 *   OR
-	 * - trigger contains at least one item with at least one
-	 *   time-based function
-	 *
-	 * An item is considered active if all next conditions are true:
-	 * - item.status = ITEM_STATUS_ACTIVE
-	 * - item host.status = HOST_STATUS_MONITORED
-	 * - (for zabbix items) item host.available = HOST_AVAILABLE_TRUE
-	 * - (for snmp items) item host.snmp_available = HOST_AVAILABLE_TRUE
-	 * - (for ibmi items) item host.ibmi_available = HOST_AVAILABLE_TRUE
-	 *
-	 * Subquery is used in order to filter out triggers that use
-	 * time-based functions. The functions are listed each on a
-	 * separate row:
-	 *
-	 * triggerid1 functionid1
-	 * triggerid1 functionid2
-	 */
 	result = DBselect("%s", sql);
 
 	zbx_free(sql);
@@ -300,15 +294,13 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		trigger_value = atoi(row[2]);
 		trigger_error = row[3];
 
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() VL: setting trigger '%s' (id:" ZBX_FS_UI64 ") status to UNKNOWN",
-				__function_name, row[4], triggerid);
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() setting trigger (id:" ZBX_FS_UI64 ") status to UNKNOWN",
+				__function_name, triggerid);
 
 		DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
 				trigger_error, TRIGGER_VALUE_UNKNOWN, now, reason);
 	}
 	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "VL: End of %s()", __function_name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
