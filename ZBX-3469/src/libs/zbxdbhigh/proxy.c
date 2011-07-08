@@ -302,21 +302,21 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		{
 			zbx_snprintf(condition, sizeof(condition),
 					" where t.proxy_hostid=" ZBX_FS_UI64
-						" and t.status=%d",
+						" and t.status in (%d,%d)",
 					proxy_hostid,
-					HOST_STATUS_MONITORED);
+					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 		}
 		else if (0 == strcmp(pt[i].table, "items"))
 		{
 			zbx_snprintf(condition, sizeof(condition),
 					", hosts r where t.hostid=r.hostid"
 						" and r.proxy_hostid=" ZBX_FS_UI64
-						" and r.status=%d"
-						" and t.status in (%d,%d)"
+						" and r.status in (%d,%d)"
+						" and t.status in (%d,%d,%d)"
 						" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 					proxy_hostid,
-					HOST_STATUS_MONITORED,
-					ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
+					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+					ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED,
 					ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 					ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
@@ -328,9 +328,9 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 			zbx_snprintf(condition, sizeof(condition),
 					", hosts r where t.hostid=r.hostid"
 						" and r.proxy_hostid=" ZBX_FS_UI64
-						" and r.status=%d",
+						" and r.status in (%d,%d)",
 					proxy_hostid,
-					HOST_STATUS_MONITORED);
+					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 		}
 		else if (0 == strcmp(pt[i].table, "drules"))
 		{

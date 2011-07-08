@@ -38,7 +38,7 @@
  *          Use this function instead of system fork function!                *
  *                                                                            *
  ******************************************************************************/
-#ifndef _WINDOWS
+#if !defined(_WINDOWS)
 int	zbx_fork()
 {
 	fflush(stdout);
@@ -69,19 +69,18 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 	ZBX_THREAD_HANDLE	thread = ZBX_THREAD_HANDLE_NULL;
 
 #ifdef _WINDOWS
-
 	unsigned	thrdaddr;
 
 	/* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
 	if (0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, handler, thread_args, 0, &thrdaddr)))
 	{
-		zbx_error("Error on thread creation. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("failed to create a thread: %s", strerror_from_system(GetLastError()));
 		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
 
-#else	/* not _WINDOWS */
+#else
 
-	if (0 == (thread = zbx_fork())) /* child process */
+	if (0 == (thread = zbx_fork()))	/* child process */
 	{
 		(*handler)(thread_args);
 
@@ -92,11 +91,10 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 	}
 	else if (-1 == thread)
 	{
-		zbx_error("Error on thread creation.");
+		zbx_error("failed to fork: %s", zbx_strerror(errno));
 		thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
-
-#endif	/* _WINDOWS */
+#endif
 
 	return thread;
 }

@@ -205,7 +205,11 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 
 #else
 
-	struct sembuf	sem_lock = { *mutex, -1, SEM_UNDO };
+	struct sembuf	sem_lock;
+
+	sem_lock.sem_num = *mutex;
+	sem_lock.sem_op = -1;
+	sem_lock.sem_flg = SEM_UNDO;
 
 	if (!*mutex)
 		return;
@@ -254,7 +258,11 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 
 #else
 
-	struct sembuf	sem_unlock = { *mutex, 1, SEM_UNDO };
+	struct sembuf	sem_unlock;
+
+	sem_unlock.sem_num = *mutex;
+	sem_unlock.sem_op = 1;
+	sem_unlock.sem_flg = SEM_UNDO;
 
 	if (!*mutex)
 		return;
