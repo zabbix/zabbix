@@ -2924,7 +2924,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 {
 	dst_trigger->triggerid = src_trigger->triggerid;
 	dst_trigger->expression = zbx_strdup(NULL, src_trigger->expression);
-	dst_trigger->old_error = zbx_strdup(NULL, src_trigger->error);
+	strscpy(dst_trigger->old_error, src_trigger->error);
 	dst_trigger->new_error = NULL;
 	dst_trigger->timespec.sec = 0;
 	dst_trigger->timespec.ns = 0;

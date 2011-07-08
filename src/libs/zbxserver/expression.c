@@ -339,14 +339,14 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 	const char	*__function_name = "evaluate";
 	char		*res, simple[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
 			value_str[MAX_STRING_LEN], c;
-	int		i, l, r, t;
+	int		i, l, r;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, exp);
 
 	res = NULL;
 
 	strscpy(tmp, exp);
-	t = 0;
+
 	while (NULL != strchr(tmp, ')'))
 	{
 		l=-1;

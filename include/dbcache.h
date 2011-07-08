@@ -141,7 +141,7 @@ typedef struct
 {
 	zbx_uint64_t	triggerid;
 	char		*expression;
-	char		*old_error;
+	char		old_error[TRIGGER_ERROR_LEN_MAX];
 	const char	*new_error;
 	zbx_timespec_t	timespec;
 	unsigned char	type;
