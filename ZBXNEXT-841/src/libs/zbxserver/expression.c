@@ -38,37 +38,22 @@
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
+ * Author: Alexander Vladishev, Rudolfs Kreicbergs                            *
  *                                                                            *
  ******************************************************************************/
 static int	DBget_trigger_severity_name(DB_TRIGGER *trigger, char **replace_to)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		res = FAIL;
+	DC_CONFIG	config;
 
-	if (0 == trigger->triggerid)
-		return res;
-
-	if (TRIGGER_SEVERITY_COUNT <= trigger->priority)
-		return res;
-
-	result = DBselect(
-			"select severity_name_%d"
-			" from config"
-			" where 1=1" DB_NODE,
-			trigger->priority, DBnode_local("configid"));
-
-	if (NULL != (row = DBfetch(result)))
+	if (0 == trigger->triggerid || TRIGGER_SEVERITY_COUNT <= trigger->priority ||
+			FAIL == DCconfig_get_config(&config))
 	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
-		res = SUCCEED;
+		return FAIL;
 	}
-	DBfree_result(result);
 
-	return res;
+	*replace_to = zbx_strdup(*replace_to, config.severity_name[trigger->priority]);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -77,13 +62,7 @@ static int	DBget_trigger_severity_name(DB_TRIGGER *trigger, char **replace_to)
  *                                                                            *
  * Purpose: get value of a user macro                                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBget_macro_value_by_triggerid(zbx_uint64_t triggerid, const char *macro, char **replace_to)
