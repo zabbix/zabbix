@@ -598,6 +598,57 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 	}
 }
 
+static void	DCsync_config(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_config";
+
+	DB_ROW			row;
+
+	ZBX_DC_CONFIG_TABLE	*local_config = NULL;
+
+	int			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	/* config table should have only one entry */
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
+		return;
+	}
+
+	/* store the config data */
+
+	local_config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
+
+	local_config->alert_history = atoi(row[1]);
+	local_config->event_history = atoi(row[2]);
+	local_config->refresh_unsupported = atoi(row[3]);
+	ZBX_STR2UINT64(local_config->discovery_groupid, row[4]);
+	local_config->ns_support = atoi(row[5]);
+
+	for (i = 0; 6 > i; i++)
+		DCstrpool_replace(0, &local_config->severity_name[i], row[6 + i]);
+
+	if (NULL != (row = DBfetch(result)))
+		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
+
+	/* free the previous entry */
+
+	if (NULL != config->config)
+	{
+		for (i = 0; 6 > i; i++)
+			zbx_strpool_release(local_config->severity_name[i]);
+
+		__config_mem_free_func(config->config);
+	}
+
+	config->config = local_config;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 static void	DCsync_items(DB_RESULT result)
 {
 	const char		*__function_name = "DCsync_items";
@@ -1707,57 +1758,6 @@ static void	DCsync_interfaces(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DCsync_config(DB_RESULT result)
-{
-	const char		*__function_name = "DCsync_config";
-
-	DB_ROW			row;
-
-	ZBX_DC_CONFIG_TABLE	*local_config = NULL;
-
-	int			i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	/* config table should have only one entry */
-
-	if (NULL == (row = DBfetch(result)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
-		return;
-	}
-
-	/* store the config data */
-
-	local_config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
-
-	local_config->alert_history = atoi(row[1]);
-	local_config->event_history = atoi(row[2]);
-	local_config->refresh_unsupported = atoi(row[3]);
-	ZBX_STR2UINT64(local_config->discovery_groupid, row[4]);
-	local_config->ns_support = atoi(row[5]);
-
-	for (i = 0; 6 > i; i++)
-		DCstrpool_replace(0, &local_config->severity_name[i], row[6 + i]);
-
-	if (NULL != (row = DBfetch(result)))
-		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
-
-	/* free the previous entry */
-
-	if (NULL != config->config)
-	{
-		for (i = 0; 6 > i; i++)
-			zbx_strpool_release(local_config->severity_name[i]);
-
-		__config_mem_free_func(config->config);
-	}
-
-	config->config = local_config;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DCsync_configuration                                             *
@@ -1790,6 +1790,17 @@ void	DCsync_configuration()
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sec = zbx_time();
+	conf_result = DBselect(
+			"select alert_history,event_history,refresh_unsupported,"
+				"discovery_groupid,ns_support,severity_name_0,severity_name_1,"
+				"severity_name_2,severity_name_3,severity_name_4,severity_name_5"
+			" from config"
+			" where 1=1"
+				DB_NODE,
+			DBnode_local("configid"));
+	csec = zbx_time() - sec;
 
 	sec = zbx_time();
 	item_result = DBselect(
@@ -1861,34 +1872,24 @@ void	DCsync_configuration()
 			DBnode_local("interfaceid"));
 	ifsec = zbx_time() - sec;
 
-	sec = zbx_time();
-	conf_result = DBselect(
-			"select alert_history,event_history,refresh_unsupported,"
-				"discovery_groupid,ns_support,severity_name_0,severity_name_1,"
-				"severity_name_2,severity_name_3,severity_name_4,severity_name_5"
-			" from config"
-			" where 1=1"
-				DB_NODE,
-			DBnode_local("configid"));
-	csec = zbx_time() - sec;
-
 	LOCK_CACHE;
 
 	sync_num++;
 
 	sec = zbx_time();
+	DCsync_config(conf_result);
 	DCsync_items(item_result);
 	DCsync_hosts(host_result);
 	DCsync_htmpls(htmpl_result);
 	DCsync_gmacros(gmacro_result);
 	DCsync_hmacros(hmacro_result);
 	DCsync_interfaces(if_result);
-	DCsync_config(conf_result);
 	ssec = zbx_time() - sec;
 
 	strpool = zbx_strpool_info();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync_num   : %u", __function_name, sync_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync config: " ZBX_FS_DBL " sec.", __function_name, csec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name, isec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name, hsec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpl sql  : " ZBX_FS_DBL " sec.", __function_name, htsec);
@@ -1896,9 +1897,8 @@ void	DCsync_configuration()
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacro sql : " ZBX_FS_DBL " sec.", __function_name, hmsec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() interf sql : " ZBX_FS_DBL " sec.", __function_name, ifsec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name, ssec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync config: " ZBX_FS_DBL " sec.", __function_name, csec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total time : " ZBX_FS_DBL " sec.", __function_name,
-			isec + hsec + htsec + gmsec + hmsec + ifsec + ssec + csec);
+			csec + isec + hsec + htsec + gmsec + hmsec + ifsec + ssec);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __function_name,
 			config->items.num_data, config->items.num_slots);
