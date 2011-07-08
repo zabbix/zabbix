@@ -46,6 +46,7 @@
 #else	/* not _WINDOWS */
 
 	int	zbx_fork();
+	int	zbx_child_fork();
 
 	#define ZBX_THREAD_ERROR	-1
 

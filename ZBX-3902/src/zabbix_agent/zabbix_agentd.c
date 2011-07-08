@@ -457,15 +457,15 @@ int	MAIN_ZABBIX_ENTRY()
 
 	if (1 == CONFIG_DISABLE_PASSIVE)
 	{
-		/* Only main process and active checks will be started */
-		CONFIG_ZABBIX_FORKS = 0;/* Listeners won't be needed for passive checks. */
+		/* only main process and active checks will be started */
+		CONFIG_ZABBIX_FORKS = 0;	/* listeners are not needed for passive checks */
 	}
 
-	/* Allocate memory for a collector, all listeners and an active check. */
+	/* allocate memory for a collector, all listeners and an active check */
 	threads_num = 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0);
 	threads = calloc(threads_num, sizeof(ZBX_THREAD_HANDLE));
 
-	/* Start the collector thread. */
+	/* start the collector thread */
 	thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 	thread_args->thread_num = thread_num;
 	thread_args->args = NULL;

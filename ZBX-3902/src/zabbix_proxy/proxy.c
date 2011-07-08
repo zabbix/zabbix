@@ -529,7 +529,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_HISTSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFMON_FORKS;
 	threads = calloc(threads_num, sizeof(pid_t));
 
-	if (CONFIG_TRAPPER_FORKS > 0)
+	if (0 < CONFIG_TRAPPER_FORKS)
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
@@ -544,7 +544,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_HISTSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFMON_FORKS;
 		i++)
 	{
-		if (0 == (pid = zbx_fork()))
+		if (0 == (pid = zbx_child_fork()))
 		{
 			server_num = i;
 			break;
@@ -553,7 +553,7 @@ int	MAIN_ZABBIX_ENTRY()
 			threads[i] = pid;
 	}
 
-	/* Main process */
+	/* main process */
 	if (server_num == 0)
 	{
 		if (0 != CONFIG_HEARTBEAT_FORKS)

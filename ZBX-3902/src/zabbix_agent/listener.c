@@ -79,17 +79,13 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 	zbx_free(args);
 
-#ifdef ZABBIX_DAEMON
-	set_child_signal_handler();
-#endif
-
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_setproctitle("listener [waiting for connection]");
 
 		if (SUCCEED == (ret = zbx_tcp_accept(&s)))
 		{
-			local_request_failed = 0;     /* Reset consecutive errors counter */
+			local_request_failed = 0;     /* reset consecutive errors counter */
 
 			zbx_setproctitle("listener [processing request]");
 			zabbix_log(LOG_LEVEL_DEBUG, "Processing request.");

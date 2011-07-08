@@ -756,8 +756,6 @@ void	main_discoverer_loop(unsigned char p)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_discoverer_loop() process_num:%d", process_num);
 
-	set_child_signal_handler();
-
 	zbx_process = p;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));

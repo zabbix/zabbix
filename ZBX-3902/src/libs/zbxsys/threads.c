@@ -21,28 +21,47 @@
 #include "log.h"
 #include "threads.h"
 
+#if !defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_fork                                                         *
  *                                                                            *
  * Purpose: Flush stdout and stderr before forking                            *
  *                                                                            *
- * Return value: same as system fork function                                 *
+ * Return value: same as system fork() function                               *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Use this function instead of system fork function!               *
+ ******************************************************************************/
+int	zbx_fork()
+{
+	fflush(stdout);
+	fflush(stderr);
+	return fork();
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_child_fork                                                   *
+ *                                                                            *
+ * Purpose: fork from master process and set SIGCHLD handler                  *
+ *                                                                            *
+ * Return value: same as system fork() function                               *
+ *                                                                            *
+ * Author: Rudolfs Kreicbergs                                                 *
+ *                                                                            *
+ * Comments: use this function only for forks from the main process           *
  *                                                                            *
  ******************************************************************************/
-#if !defined(_WINDOWS)
-int	zbx_fork()
+int	zbx_child_fork()
 {
 	pid_t	pid;
 
-	fflush(stdout);
-	fflush(stderr);
-	if (0 == (pid = fork()))
-		signal(SIGCHLD, SIG_IGN);	/* to avoid problems with EXECUTE_INT/DBL/STR and other cases */
+	pid = zbx_fork();
+
+	/* ignore SIGCHLD to avoid problems with exiting scripts in zbx_execute() and other cases */
+	if (0 == pid)
+		signal(SIGCHLD, SIG_IGN);
 
 	return pid;
 }
@@ -80,7 +99,7 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 
 #else
 
-	if (0 == (thread = zbx_fork()))	/* child process */
+	if (0 == (thread = zbx_child_fork()))	/* child process */
 	{
 		(*handler)(thread_args);
 

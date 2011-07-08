@@ -30,8 +30,6 @@ void	main_selfmon_loop()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	set_child_signal_handler();
-
 	for (;;)
 	{
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));

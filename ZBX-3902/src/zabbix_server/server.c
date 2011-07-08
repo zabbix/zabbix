@@ -446,13 +446,9 @@ int	MAIN_ZABBIX_ENTRY()
 	int		i, server_num = 0;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
-	{
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
-	}
 	else
-	{
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
-	}
 
 #ifdef	HAVE_SNMP
 #	define SNMP_FEATURE_STATUS	"YES"
@@ -537,7 +533,7 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
-	/* Need to set trigger status to UNKNOWN since last run */
+	/* need to set trigger status to UNKNOWN since last run */
 	DBupdate_triggers_status_after_restart();
 	DBclose();
 
@@ -555,7 +551,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_SELFMON_FORKS;
 	threads = calloc(threads_num, sizeof(pid_t));
 
-	if (CONFIG_TRAPPER_FORKS > 0)
+	if (0 < CONFIG_TRAPPER_FORKS)
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
@@ -571,7 +567,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_PROXYPOLLER_FORKS
 			+ CONFIG_SELFMON_FORKS; i++)
 	{
-		if (0 == (pid = zbx_fork()))
+		if (0 == (pid = zbx_child_fork()))
 		{
 			server_num = i;
 			break;
@@ -580,7 +576,7 @@ int	MAIN_ZABBIX_ENTRY()
 			threads[i] = pid;
 	}
 
-	/* Main process */
+	/* main process */
 	if (server_num == 0)
 	{
 		process_type = ZBX_PROCESS_TYPE_WATCHDOG;

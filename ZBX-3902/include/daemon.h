@@ -33,8 +33,6 @@ extern char	*CONFIG_PID_FILE;
 int	daemon_start(int allow_root);
 void	daemon_stop();
 
-void	set_child_signal_handler();
-
 #define ZBX_IS_RUNNING()	1
 #define ZBX_DO_EXIT()
 

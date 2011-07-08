@@ -111,15 +111,16 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					extern int	threads_num;
 					extern pid_t	*threads;
 				
-					for (i = 1; i < threads_num && !found; i++)
+					for (i = 1; i < threads_num && 0 == found; i++)
 						found = (threads[i] == CHECKED_FIELD(siginfo, si_pid));
 
-					if (0 == found)	/* we should not worry too much about non-Zabbix child */
-						return;	/* processes like watchdog alert scripts terminating */
+					/* we should not worry too much about non-Zabbix child */
+					/* processes like watchdog alert scripts terminating */
+					if (0 == found)
+						return;
 
 					zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
-							CHECKED_FIELD(siginfo, si_pid),
-							CHECKED_FIELD(siginfo, si_status));
+							CHECKED_FIELD(siginfo, si_pid), CHECKED_FIELD(siginfo, si_status));
 					exiting = 1;
 					zbx_on_exit();
 				}
@@ -153,7 +154,7 @@ int	daemon_start(int allow_root)
 	char			user[7] = "zabbix";
 
 	/* running as root ? */
-	if ((0 == allow_root) && (0 == getuid() || 0 == getgid()))
+	if (0 == allow_root && (0 == getuid() || 0 == getgid()))
 	{
 		pwd = getpwnam(user);
 		if (NULL == pwd)
@@ -234,9 +235,11 @@ int	daemon_start(int allow_root)
 	sigaction(SIGFPE, &phan, NULL);
 	sigaction(SIGSEGV, &phan, NULL);
 	sigaction(SIGBUS, &phan, NULL);
+	sigaction(SIGALRM, &phan, NULL);
 
-	/* Set SIGCHLD now to avoid race conditions. To avoid problems with */
-	/* EXECUTE_INT/DBL/STR and other cases it is set SIG_IGN in zbx_fork() */
+	/* Set SIGCHLD now to avoid race conditions when a child process is created before */
+	/* sigcaction() is called. To avoid problems when scripts exit in zbx_execute() and */
+	/* other cases, SIGCHLD is set to SIG_IGN in zbx_child_fork(). */
 	phan.sa_sigaction = parent_signal_handler;
 	sigaction(SIGCHLD, &phan, NULL);
 
@@ -248,14 +251,4 @@ int	daemon_start(int allow_root)
 void	daemon_stop()
 {
 	drop_pid_file(CONFIG_PID_FILE);
-}
-
-void	set_child_signal_handler()
-{
-	struct sigaction	phan;
-
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
 }

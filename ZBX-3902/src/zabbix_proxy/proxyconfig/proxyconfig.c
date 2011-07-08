@@ -98,8 +98,6 @@ void	main_proxyconfig_loop()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_proxyconfig_loop()");
 
-	set_child_signal_handler();
-
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);

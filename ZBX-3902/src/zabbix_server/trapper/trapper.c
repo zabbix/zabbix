@@ -424,8 +424,6 @@ void	main_trapper_loop(unsigned char p, zbx_sock_t *s)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	set_child_signal_handler();
-
 	zbx_process = p;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
