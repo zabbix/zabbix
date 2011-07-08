@@ -212,7 +212,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	 * Determine if items' host is avaliable:
 	 * - (for zabbix items) item host.available = HOST_AVAILABLE_TRUE
 	 * - (for snmp items) item host.snmp_available = HOST_AVAILABLE_TRUE
-	 * - (for ibmi items) item host.ibmi_available = HOST_AVAILABLE_TRUE
+	 * - (for ipmi items) item host.ipmi_available = HOST_AVAILABLE_TRUE
 	 */
 	zbx_snprintf(item_host_avail_buf, sizeof(item_host_avail_buf), "i2.type=%d and h2.available=%d"
 			" or i2.type in (%d,%d,%d) and h2.snmp_available=%d"
