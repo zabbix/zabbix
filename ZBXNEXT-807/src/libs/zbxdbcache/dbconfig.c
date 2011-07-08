@@ -1308,6 +1308,7 @@ static void	DCsync_functions(DB_RESULT result)
 	zbx_uint64_t		itemid, functionid, triggerid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
+
 	zbx_ptr_pair_t		itemtrig;
 	zbx_vector_ptr_pair_t	itemtrigs;
 
@@ -2255,10 +2256,10 @@ void	DCsync_configuration()
 			config->functions.num_data, config->functions.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __function_name,
 			config->triggers.num_data, config->triggers.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() time_trigs : %d (%d allocated)", __function_name,
-			config->time_triggers.values_num, config->time_triggers.values_alloc);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : %d (%d slots)", __function_name,
 			config->trigdeps.num_data, config->trigdeps.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() time_trigs : %d (%d allocated)", __function_name,
+			config->time_triggers.values_num, config->time_triggers.values_alloc);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d (%d slots)", __function_name,
 			config->hosts.num_data, config->hosts.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_ph   : %d (%d slots)", __function_name,
@@ -3724,7 +3725,7 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 
 	if (32 < level)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Recursive trigger dependency detected (triggerid:" ZBX_FS_UI64 ")!",
+		zabbix_log(LOG_LEVEL_CRIT, "recursive trigger dependency detected (triggerid:" ZBX_FS_UI64 ")",
 				trigdep->triggerid);
 		return SUCCEED;
 	}
