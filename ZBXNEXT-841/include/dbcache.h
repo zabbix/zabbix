@@ -140,6 +140,17 @@ typedef struct
 }
 DC_PROXY;
 
+typedef struct
+{
+	zbx_uint64_t	configid;
+	int		alert_history;
+	int		event_history;
+	int		refresh_unsupported;
+	int		ns_support;
+	char		severity_name[6][SEVERITY_NAME_LEN_MAX];
+}
+DC_CONFIG;
+
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
 		zbx_timespec_t *ts, unsigned char status, const char *error, int timestamp, const char *source,
 		int severity, int logeventid, int lastlogsize, int mtime);
