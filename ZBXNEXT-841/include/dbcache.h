@@ -56,6 +56,17 @@ extern int	CONFIG_PROXYDATA_FREQUENCY;
 
 typedef struct
 {
+	int		alert_history;
+	int		event_history;
+	int		refresh_unsupported;
+	zbx_uint64_t	discovery_groupid;
+	int		ns_support;
+	char		severity_name[6][SEVERITY_NAME_LEN_MAX];
+}
+DC_CONFIG;
+
+typedef struct
+{
 	char		ip_orig[INTERFACE_IP_LEN_MAX];
 	char		dns_orig[INTERFACE_DNS_LEN_MAX];
 	char		port_orig[INTERFACE_PORT_LEN_MAX];
@@ -139,17 +150,6 @@ typedef struct
 	unsigned short	port;
 }
 DC_PROXY;
-
-typedef struct
-{
-	int		alert_history;
-	int		event_history;
-	int		refresh_unsupported;
-	zbx_uint64_t	discovery_groupid;
-	int		ns_support;
-	char		severity_name[6][SEVERITY_NAME_LEN_MAX];
-}
-DC_CONFIG;
 
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
 		zbx_timespec_t *ts, unsigned char status, const char *error, int timestamp, const char *source,
