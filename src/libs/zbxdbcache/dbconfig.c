@@ -267,10 +267,10 @@ ZBX_DC_INTERFACE_HT;
 
 typedef struct
 {
-	zbx_uint64_t	configid;
 	int		alert_history;
 	int		event_history;
 	int		refresh_unsupported;
+	zbx_uint64_t	discovery_groupid;
 	int		ns_support;
 	const char	*severity_name[6];
 }
@@ -389,8 +389,10 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 	int	nextcheck;
 
 	if (ITEM_STATUS_NOTSUPPORTED == item->status)
+	{
 		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
 				CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
+	}
 	else
 	{
 		const ZBX_DC_FLEXITEM	*flexitem;
@@ -709,22 +711,30 @@ static void	DCsync_items(DB_RESULT result)
 			old_nextcheck = 0;
 
 			if (ITEM_STATUS_NOTSUPPORTED == status)
+			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
 						item->type, CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
+			}
 			else
+			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
 						item->type, delay, row[16], now, NULL);
+			}
 		}
 		else
 		{
 			old_nextcheck = item->nextcheck;
 
 			if (ITEM_STATUS_ACTIVE == status && (status != item->status || delay != item->delay))
+			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
 						item->type, delay, row[16], now, NULL);
+			}
 			else if (ITEM_STATUS_NOTSUPPORTED == status && status != item->status)
+			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
 						item->type, CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
+			}
 		}
 
 		item->status = status;
@@ -1713,7 +1723,7 @@ static void	DCsync_config(DB_RESULT result)
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "config table is empty");
+		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
 		return;
 	}
 
@@ -1721,17 +1731,17 @@ static void	DCsync_config(DB_RESULT result)
 
 	local_config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
 
-	ZBX_STR2UINT64(local_config->configid, row[0]);
 	local_config->alert_history = atoi(row[1]);
 	local_config->event_history = atoi(row[2]);
 	local_config->refresh_unsupported = atoi(row[3]);
-	local_config->ns_support = atoi(row[4]);
+	ZBX_STR2UINT64(local_config->discovery_groupid, row[4]);
+	local_config->ns_support = atoi(row[5]);
 
 	for (i = 0; 6 > i; i++)
-		DCstrpool_replace(0, &local_config->severity_name[i], row[5 + i]);
+		DCstrpool_replace(0, &local_config->severity_name[i], row[6 + i]);
 
-	if (NULL == (row = DBfetch(result)))
-		zabbix_log(LOG_LEVEL_ERR, "Warning! config table has multiple entries");
+	if (NULL != (row = DBfetch(result)))
+		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
 
 	/* free the previous entry */
 
@@ -1853,9 +1863,9 @@ void	DCsync_configuration()
 
 	sec = zbx_time();
 	conf_result = DBselect(
-			"select configid,alert_history,event_history,refresh_unsupported,ns_support,"
-				"severity_name_0,severity_name_1,severity_name_2,"
-				"severity_name_3,severity_name_4,severity_name_5"
+			"select alert_history,event_history,refresh_unsupported,"
+				"discovery_groupid,ns_support,severity_name_0,severity_name_1,"
+				"severity_name_2,severity_name_3,severity_name_4,severity_name_5"
 			" from config"
 			" where 1=1"
 				DB_NODE,
@@ -2899,8 +2909,7 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
 		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & dc_item->flags))
 			continue;
 
-		if (CONFIG_REFRESH_UNSUPPORTED == 0 &&
-				ITEM_STATUS_NOTSUPPORTED == dc_item->status)
+		if (0 == CONFIG_REFRESH_UNSUPPORTED && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
 			continue;
 
 		if (items_num == items_alloc)
@@ -2945,10 +2954,10 @@ int	DCconfig_get_config(DC_CONFIG *local_config)
 	if (NULL == config->config)
 		goto unlock;
 
-	local_config->configid = config->config->configid;
 	local_config->alert_history = config->config->alert_history;
 	local_config->event_history = config->config->event_history;
 	local_config->refresh_unsupported = config->config->refresh_unsupported;
+	local_config->discovery_groupid = config->config->discovery_groupid;
 	local_config->ns_support = config->config->ns_support;
 
 	for (i = 0; 6 > i; i++)

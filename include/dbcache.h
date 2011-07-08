@@ -142,10 +142,10 @@ DC_PROXY;
 
 typedef struct
 {
-	zbx_uint64_t	configid;
 	int		alert_history;
 	int		event_history;
 	int		refresh_unsupported;
+	zbx_uint64_t	discovery_groupid;
 	int		ns_support;
 	char		severity_name[6][SEVERITY_NAME_LEN_MAX];
 }
@@ -199,6 +199,7 @@ int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid,
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
 int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
+int	DCconfig_get_config(DC_CONFIG *local_config);
 
 void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now);
 void	DCrequeue_unreachable_item(zbx_uint64_t itemid);
