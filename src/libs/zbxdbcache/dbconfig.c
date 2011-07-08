@@ -267,6 +267,17 @@ ZBX_DC_INTERFACE_HT;
 
 typedef struct
 {
+	zbx_uint64_t	configid;
+	int		alert_history;
+	int		event_history;
+	int		refresh_unsupported;
+	int		ns_support;
+	const char	*severity_name[6];
+}
+ZBX_DC_CONFIG_TABLE;
+
+typedef struct
+{
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;	/* hostid, key */
 	zbx_hashset_t		snmpitems;
@@ -292,6 +303,7 @@ typedef struct
 	zbx_hashset_t		interfaces_ht;	/* hostid, type */
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
+	ZBX_DC_CONFIG_TABLE	*config;
 }
 ZBX_DC_CONFIG;
 
@@ -1685,6 +1697,57 @@ static void	DCsync_interfaces(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static void	DCsync_config(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_config";
+
+	DB_ROW			row;
+
+	ZBX_DC_CONFIG_TABLE	*local_config = NULL;
+
+	int			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	/* config table should have only one entry */
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "config table is empty");
+		return;
+	}
+
+	/* store the config data */
+
+	local_config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
+
+	ZBX_STR2UINT64(local_config->configid, row[0]);
+	local_config->alert_history = atoi(row[1]);
+	local_config->event_history = atoi(row[2]);
+	local_config->refresh_unsupported = atoi(row[3]);
+	local_config->ns_support = atoi(row[4]);
+
+	for (i = 0; 6 > i; i++)
+		DCstrpool_replace(0, &local_config->severity_name[i], row[5 + i]);
+
+	if (NULL == (row = DBfetch(result)))
+		zabbix_log(LOG_LEVEL_ERR, "Warning! config table has multiple entries");
+
+	/* free the previous entry */
+
+	if (NULL != config->config)
+	{
+		for (i = 0; 6 > i; i++)
+			zbx_strpool_release(local_config->severity_name[i]);
+
+		__config_mem_free_func(config->config);
+	}
+
+	config->config = local_config;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DCsync_configuration                                             *
@@ -1710,9 +1773,10 @@ void	DCsync_configuration()
 	DB_RESULT		gmacro_result;
 	DB_RESULT		hmacro_result;
 	DB_RESULT		if_result;
+	DB_RESULT		conf_result;
 
 	int			i;
-	double			sec, isec, hsec, htsec, gmsec, hmsec, ifsec, ssec;
+	double			sec, isec, hsec, htsec, gmsec, hmsec, ifsec, ssec, csec;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1787,6 +1851,17 @@ void	DCsync_configuration()
 			DBnode_local("interfaceid"));
 	ifsec = zbx_time() - sec;
 
+	sec = zbx_time();
+	conf_result = DBselect(
+			"select configid,alert_history,event_history,refresh_unsupported,ns_support,"
+				"severity_name_0,severity_name_1,severity_name_2,"
+				"severity_name_3,severity_name_4,severity_name_5"
+			" from config"
+			" where 1=1"
+				DB_NODE,
+			DBnode_local("configid"));
+	csec = zbx_time() - sec;
+
 	LOCK_CACHE;
 
 	sync_num++;
@@ -1798,27 +1873,22 @@ void	DCsync_configuration()
 	DCsync_gmacros(gmacro_result);
 	DCsync_hmacros(hmacro_result);
 	DCsync_interfaces(if_result);
+	DCsync_config(conf_result);
 	ssec = zbx_time() - sec;
 
 	strpool = zbx_strpool_info();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync_num   : %u", __function_name, sync_num);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name,
-			isec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name,
-			hsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpl sql  : " ZBX_FS_DBL " sec.", __function_name,
-			htsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacro sql : " ZBX_FS_DBL " sec.", __function_name,
-			gmsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacro sql : " ZBX_FS_DBL " sec.", __function_name,
-			hmsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() interf sql : " ZBX_FS_DBL " sec.", __function_name,
-			ifsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name,
-			ssec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name, isec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name, hsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpl sql  : " ZBX_FS_DBL " sec.", __function_name, htsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacro sql : " ZBX_FS_DBL " sec.", __function_name, gmsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacro sql : " ZBX_FS_DBL " sec.", __function_name, hmsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interf sql : " ZBX_FS_DBL " sec.", __function_name, ifsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name, ssec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync config: " ZBX_FS_DBL " sec.", __function_name, csec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total time : " ZBX_FS_DBL " sec.", __function_name,
-			isec + hsec + htsec + gmsec + hmsec + ifsec + ssec);
+			isec + hsec + htsec + gmsec + hmsec + ifsec + ssec + csec);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __function_name,
 			config->items.num_data, config->items.num_slots);
@@ -2121,7 +2191,7 @@ void	init_configuration_cache()
 
 	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG));
 
-#define	INIT_HASHSET_SIZE	1000 /* should be calculated dynamically based on config_size? */
+#define	INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on config_size? */
 
 #define CREATE_HASHSET(hashset)	CREATE_HASHSET_EXT(hashset, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC)
 
@@ -2184,6 +2254,8 @@ void	init_configuration_cache()
 					__config_mem_malloc_func,
 					__config_mem_realloc_func,
 					__config_mem_free_func);
+
+	config->config = NULL;
 
 #undef	INIT_HASHSET_SIZE
 
@@ -2847,6 +2919,48 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, items_num);
 
 	return items_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_config                                              *
+ *                                                                            *
+ * Purpose: get config table data                                             *
+ *                                                                            *
+ * Return value: SUCCEED if config data was located and FAIL otherwise        *
+ *                                                                            *
+ * Author: Rudolfs Kreicbergs                                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	DCconfig_get_config(DC_CONFIG *local_config)
+{
+	const char	*__function_name = "DCconfig_get_config";
+
+	int		i, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()");
+
+	LOCK_CACHE;
+
+	if (NULL == config->config)
+		goto unlock;
+
+	local_config->configid = config->config->configid;
+	local_config->alert_history = config->config->alert_history;
+	local_config->event_history = config->config->event_history;
+	local_config->refresh_unsupported = config->config->refresh_unsupported;
+	local_config->ns_support = config->config->ns_support;
+
+	for (i = 0; 6 > i; i++)
+		strscpy(local_config->severity_name[i], config->config->severity_name[i]);
+
+	ret = SUCCEED;
+unlock:
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now)

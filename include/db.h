@@ -208,6 +208,9 @@ zbx_graph_item_type;
 #define HTTPSTEP_REQUIRED_LEN		255
 #define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
 
+#define SEVERITY_NAME_LEN		32
+#define SEVERITY_NAME_LEN_MAX		SEVERITY_NAME_LEN+1
+
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.lastvalue,"		\
 				"i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,"	\
 				"i.lastclock,i.units,i.multiplier,i.formula,i.status,"		\
