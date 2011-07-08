@@ -93,7 +93,6 @@ static void	process_time_functions()
 			}
 
 			zbx_free(trigger->expression);
-			zbx_free(trigger->old_error);
 		}
 
 		DBcommit();

@@ -850,7 +850,6 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		}
 
 		zbx_free(trigger->expression);
-		zbx_free(trigger->old_error);
 	}
 
 	zbx_hashset_destroy(&trigger_info);
