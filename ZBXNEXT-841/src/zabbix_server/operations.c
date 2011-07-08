@@ -154,7 +154,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(eventid:" ZBX_FS_UI64 ")",
 			__function_name, event->eventid);
 
-	if (FAIL == DCconfig_get_config(&config))
+	if (FAIL == DCconfig_get_config(&config) || 0 == config.discovery_groupid)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Can't add discovered host:"
 				" Group for discovered hosts is not defined");
