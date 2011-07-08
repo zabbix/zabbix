@@ -42,6 +42,7 @@ function __autoload($class_name){
 		'chost' => 1,
 		'chostgroup' => 1,
 		'chostinterface'=> 1,
+		'ciconmap' => 1,
 		'cimage' => 1,
 		'citem' => 1,
 		'citemgeneral' => 1,

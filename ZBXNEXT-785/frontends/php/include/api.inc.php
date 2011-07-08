@@ -229,6 +229,13 @@ class API{
 		return self::getObject('image');
 	}
 
+	/**
+	 * @return CIconMap
+	 */
+	public static function IconMap(){
+		return self::getObject('iconmap');
+	}
+
 /**
  * @return CItem
  */

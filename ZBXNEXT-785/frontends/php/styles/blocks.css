@@ -21,6 +21,10 @@
 /*					ZABBIX MAPS								*/
 /************************************************************/
 
+.sortableRowPlaceholder{
+	height: 18px;
+}
+
 #sysmap_cnt .sysmap_element{
 	position: absolute;
 	z-index: 10;

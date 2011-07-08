@@ -160,12 +160,9 @@
 
 	print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
 
-	if($page['file'] == 'sysmap.php'){
+	if($page['file'] == 'sysmap.php' || $page['file'] == 'config.php'){
 		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&amp;output=css" />');
 	}
-
-
-
 ?>
 <!--[if lte IE 7]>
 	<link rel="stylesheet" type="text/css" href="styles/ie.css" />

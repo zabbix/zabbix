@@ -662,6 +662,7 @@ include_once('include/page_header.php');
 
 <?php
 	$form = new CForm();
+	$form->cleanItems();
 
 	$cmbConfig = new CCombobox('configDropDown', $_REQUEST['config'], 'javascript: redirect("config.php?config="+this.options[this.selectedIndex].value);');
 	$cmbConfig->addItems(array(
@@ -689,6 +690,9 @@ include_once('include/page_header.php');
 				break;
 			case 10:
 				$form->addItem(new CSubmit('form', _('New regular expression')));
+				break;
+			case 14:
+				$form->addItem(new CSubmit('form', _('Create icon map')));
 				break;
 		}
 	}
@@ -1286,10 +1290,50 @@ include_once('include/page_header.php');
 		$data = array();
 		$data['form_refresh'] = get_request('form_refresh', 0);
 
+		$data['iconList'] = array();
+		$iconList = API::Image()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
+		));
+		foreach($iconList as $icon){
+			$data['iconList'][$icon['imageid']] = $icon['name'];
+		}
+
+		$data['inventoryList'] = array();
+		$inventoryFields = getHostProfiles();
+		foreach($inventoryFields as $field){
+			$data['inventoryList'][$field['nr']] = $field['title'];
+		}
+
 		if(isset($_REQUEST['form'])){
+			if($data['form_refresh']){
+				$data['iconmap'] = get_request('iconmap');
+			}
+			elseif(isset($_REQUEST['iconmapid'])){
+				$data['iconmap'] = API::IconMap()->get(array(
+					'iconmapids' => $_REQUEST['iconmapid'],
+					'editable' => true,
+					'preservekeys' => true,
+					'selectMappings' => API_OUTPUT_EXTEND,
+				));
+			}
+			else{
+				$data['iconmap'] = array(
+					'name' => '',
+					'mappings' => array(),
+				);
+			}
+
 			$iconMapView = new CView('administration.general.iconmap.edit', $data);
 		}
 		else{
+			$cnf_wdgt->addHeader(_('Icon mapping'));
+			$data['iconmaps'] = API::IconMap()->get(array(
+				'editable' => true,
+				'preservekeys' => true,
+				'selectMappings' => API_OUTPUT_EXTEND,
+			));
+			order_result($data['iconmaps'], 'name');
 			$iconMapView = new CView('administration.general.iconmap.list', $data);
 		}
 
