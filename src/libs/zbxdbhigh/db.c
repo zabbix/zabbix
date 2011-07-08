@@ -27,6 +27,10 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 
+/* ID structure: NNNSSSDDDDDDDDDDD, where                      */
+/*      NNN - nodeid (to which node the id belongs to)         */
+/*      SSS - source nodeid (in which node was the id created) */
+/*      DDDDDDDDDDD - the ID itself                            */
 const char	*DBnode(const char *fieldid, int nodeid)
 {
 	static char	dbnode[128];
