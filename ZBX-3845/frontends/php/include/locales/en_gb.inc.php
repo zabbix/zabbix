@@ -2447,6 +2447,7 @@
 // class.cusergroup
 	'S_GROUP_IS_USED_IN_SCRIPT' =>	'User group [%1$s] is used in script [%2$s].',
 	'S_ONLY_SUPERADMIN_CAN_DELETE_USERGROUP' => 'Only Super Admins can delete User Groups.',
+	'S_GROUP_IS_USED_IN_CONFIGURATION' => 'User group [%1$s] is used in configuration for database down messages.',
 
 // class.cgraph.php
 	'S_GRAPH_ALREADY_EXISTS_ON' => 'Graph "%1$s" already exists on "%2$s".',
