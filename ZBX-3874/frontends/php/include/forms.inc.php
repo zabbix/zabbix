@@ -583,6 +583,24 @@
 			$newRow->setAttribute('id', 'triggers_row');
 
 			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages[enabled]', 'click', ".zbx_jsvalue($msgVisibility, true).");");
+			zbx_add_post_js("$('messages[enabled]').observe('click',function() {
+								if (this.checked
+										&& !$('messages[triggers.recovery]').checked
+										&& !$('messages[triggers.severities][0]').checked
+										&& !$('messages[triggers.severities][1]').checked
+										&& !$('messages[triggers.severities][2]').checked
+										&& !$('messages[triggers.severities][3]').checked
+										&& !$('messages[triggers.severities][4]').checked
+										&& !$('messages[triggers.severities][5]').checked) {
+									$('messages[triggers.recovery]').checked = true;
+									$('messages[triggers.severities][0]').checked = true;
+									$('messages[triggers.severities][1]').checked = true;
+									$('messages[triggers.severities][2]').checked = true;
+									$('messages[triggers.severities][3]').checked = true;
+									$('messages[triggers.severities][4]').checked = true;
+									$('messages[triggers.severities][5]').checked = true;
+								}
+							});");
  		}
 
 		$frmUser->addItemToBottomRow(new CButton('save',S_SAVE));
