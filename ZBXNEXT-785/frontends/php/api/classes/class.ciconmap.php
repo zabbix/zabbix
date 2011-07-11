@@ -235,6 +235,10 @@ class CIconMap extends CZBXAPI{
 	 * @return array
 	 */
 	public function create(array $iconMaps){
+		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can create icon maps.'));
+		}
+
 		$iconMaps = zbx_toArray($iconMaps);
 
 		$iconMapRequiredFields = array(
@@ -288,143 +292,100 @@ class CIconMap extends CZBXAPI{
 	 * @param array $iconmaps
 	 * @return array
 	 */
-	public function update(array $iconmaps){
-		//sdii($actions);
-		$actions = zbx_toArray($actions);
-		$actionids = zbx_objectValues($actions, 'actionid');
-		$update = array();
+	public function update(array $iconMaps){
+		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can create icon maps.'));
+		}
+
+		$iconMaps = zbx_toArray($iconMaps);
+
+		$iconMapIds = zbx_objectValues($iconMaps, 'iconmapid');
+		$updates = array();
+
+		$duplicates = array();
+		foreach($iconMaps as $iconMap){
+			if(!check_db_fields(array('iconmapid' => null), $iconMap)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters are used for icon map update method "%s".', $iconMap['name']));
+			}
+
+			if(isset($action['name'])){
+				if(isset($duplicates[$action['name']])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot create icon maps with identical name "%s".', $iconMap['name']));
+				}
+				else{
+					$duplicates[$action['name']] = $action['name'];
+				}
+			}
+		}
+
+		$this->validateMappings($iconMaps);
 
 
-		$options = array(
-			'actionids' => $actionids,
-			'editable' => true,
+		$iconMapsUpd = API::IconMap()->get(array(
+			'iconmapids' => $iconMapIds,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'selectOperations' => API_OUTPUT_EXTEND,
-			'selectConditions' => API_OUTPUT_EXTEND,
-		);
-		$updActions = $this->get($options);
-		foreach($actions as $action){
-			if(isset($action['actionid']) && !isset($updActions[$action['actionid']])){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-			}
-		}
+			'selectMappings' => API_OUTPUT_EXTEND,
+		));
 
-		// Check fields
-		$duplicates = array();
-		foreach($actions as $action){
-			if(!check_db_fields(array('actionid' => null), $action)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters are used for action update method "%s".',$action['name']));
-			}
-
-			// check if user change esc_period or eventsource
-			if(isset($action['esc_period']) || isset($action['eventsource'])){
-				$eventsource = isset($action['eventsource']) ? $action['eventsource']: $updActions[$action['actionid']]['eventsource'];
-				$esc_period = isset($action['esc_period']) ? $action['esc_period']: $updActions[$action['actionid']]['esc_period'];
-
-				if(($esc_period < 60) && (EVENT_SOURCE_TRIGGERS == $eventsource))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimum 60 seconds).', $action['name']));
-			}
-			//--
-			if(!isset($action['name'])) continue;
-
-			if(isset($duplicates[$action['name']]))
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
-			else
-				$duplicates[$action['name']] = $action['name'];
-		}
-		//------
-
-		$operationsCreate = $operationsUpdate = $operationidsDelete = array();
-		$conditionsCreate = $conditionsUpdate = $conditionidsDelete = array();
-		foreach($actions as $action){
+		$mappingsCreate = $mappingsUpdate = $mappingIdsDelete = array();
+		foreach($iconMaps as $iconMap){
 			// Existance
-			$options = array(
-				'filter' => array( 'name' => $action['name'] ),
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => 1,
-				'nopermissions' => true,
-				'preservekeys' => true,
-			);
-			$action_exists = $this->get($options);
-			if(($action_exist = reset($action_exists)) && (bccomp($action_exist['actionid'],$action['actionid']) != 0)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
+			if(isset($iconMap['name'])){
+				$options = array(
+					'filter' => array('name' => $iconMap['name']),
+					'output' => API_OUTPUT_SHORTEN,
+					'editable' => 1,
+					'nopermissions' => true,
+					'preservekeys' => true,
+				);
+				$iconMapExists = $this->get($options);
+				if(($iconMapExists = reset($iconMapExists)) && (bccomp($iconMapExists['iconmapid'], $iconMap['iconmapid']) != 0)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map "%s" already exists.', $iconMap['name']));
+				}
 			}
-			//----
 
-			if(isset($action['conditions'])){
-				$conditionsDb = isset($updActions[$action['actionid']]['conditions'])
-						? $updActions[$action['actionid']]['conditions']
-						: array();
+			if(isset($iconMap['mappings'])){
+				$mappingsDb = $iconMapsUpd[$iconMap['iconmapid']]['mappings'];
 
-				$this->validateConditions($action['conditions']);
+				foreach($iconMap['mappings'] as $mapping){
+					$mapping['iconmapid'] = $iconMap['iconmapid'];
 
-				foreach($action['conditions'] as $condition){
-					$condition['actionid'] = $action['actionid'];
-
-					if(!isset($condition['conditionid'])){
-						$conditionsCreate[] = $condition;
-					}
-					else if(isset($conditionsDb[$condition['conditionid']])){
-						$conditionsUpdate[] = $condition;
-						unset($conditionsDb[$condition['conditionid']]);
+					if(isset($mapping['iconmappingid']) && isset($mappingsDb[$mapping['iconmappingid']])){
+						$iconmappingid = $mapping['iconmappingid'];
+						unset($mapping['iconmappingid']);
+						$mappingsUpdate[] = array(
+							'values' => $mapping,
+							'where' => array('iconmappingid' => $iconmappingid),
+						);
+						unset($mappingsDb[$iconmappingid]);
 					}
 					else{
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action conditionid'));
+						$mappingsCreate[] = $mapping;
 					}
 				}
 
-				$conditionidsDelete = array_merge($conditionidsDelete, array_keys($conditionsDb));
+				$mappingIdsDelete = array_merge($mappingIdsDelete, array_keys($mappingsDb));
 			}
 
-			if(isset($action['operations']) && empty($action['operations'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" no operations defined.', $action['name']));
-			}
-			else if(isset($action['operations'])){
-				$this->validateOperations($action['operations']);
-
-				$operations_db = $updActions[$action['actionid']]['operations'];
-				foreach($action['operations'] as $operation){
-					$operation['actionid'] = $action['actionid'];
-
-					if(!isset($operation['operationid'])){
-						$operationsCreate[] = $operation;
-					}
-					else if(isset($operations_db[$operation['operationid']])){
-						$operationsUpdate[] = $operation;
-						unset($operations_db[$operation['operationid']]);
-					}
-					else{
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid'));
-					}
-				}
-				$operationidsDelete = array_merge($operationidsDelete, array_keys($operations_db));
-			}
-
-			$actionid = $action['actionid'];
-			unset($action['actionid']);
-			if(!empty($action)){
-				$update[] = array(
-					'values' => $action,
-					'where' => array('actionid' => $actionid),
+			$iconMapid = $iconMap['iconmapid'];
+			unset($iconMap['iconmapid']);
+			if(!empty($iconMap)){
+				$updates[] = array(
+					'values' => $iconMap,
+					'where' => array('iconmapid' => $iconMapid),
 				);
 			}
 		}
 
-		DB::update('actions', $update);
+		DB::update('icon_map', $updates);
+		DB::insert('icon_mapping', $mappingsCreate);
+		DB::update('icon_mapping', $mappingsUpdate);
+		if(!empty($mappingIdsDelete)){
+			DB::delete('icon_mapping', array('iconmappingid' => $mappingIdsDelete));
+		}
 
-		$this->addConditions($conditionsCreate);
-		$this->updateConditions($conditionsUpdate);
-		if(!empty($conditionidsDelete))
-			$this->deleteConditions($conditionidsDelete);
-
-		$this->addOperations($operationsCreate);
-		$this->updateOperations($operationsUpdate, $updActions);
-		if(!empty($operationidsDelete))
-			$this->deleteOperations($operationidsDelete);
-
-
-		return array('actionids' => $actionids);
+		return array('iconmapids' => $iconMapIds);
 	}
 
 	/**
@@ -481,7 +442,7 @@ class CIconMap extends CZBXAPI{
 		return (count($ids) == $count);
 	}
 
-	protected function validateMappings($iconMaps){
+	protected function validateMappings($iconMaps, $mustExist=true){
 		$inventoryFields = getHostProfiles();
 		$imageIds = API::Image()->get(array(
 			'output' => API_OUTPUT_SHORTEN,
@@ -491,8 +452,13 @@ class CIconMap extends CZBXAPI{
 
 		foreach($iconMaps as $iconMap){
 			if(!isset($iconMap['mappings']) || empty($iconMap['mappings'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Icon map "%s" must have at least one mapping.', $iconMap['name']));
+				if($mustExist){
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Icon map "%s" must have at least one mapping.', $iconMap['name']));
+				}
+				else{
+					continue;
+				}
 			}
 
 			$uniqField = array();

@@ -56,7 +56,7 @@ foreach($this->data['iconmap']['mappings'] as $iconmappingid => $mapping){
 	$DIViconPreview->addStyle('margin: 0 auto;');
 
 	$row = new CRow(array(
-		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s'),
+		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
 		$CCprofileLinks,
 		$TBexpression,
 		$CBicons,
@@ -88,7 +88,7 @@ $DIViconPreview = new CDiv(SPACE, 'sysmap_iconid_' . $firstIconId, 'divPreview_#
 $DIViconPreview->addStyle('margin: 0 auto;');
 
 $hiddenRow = new CRow(array(
-	new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s'),
+	new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
 	$CCprofileLinks,
 	$TBexpression,
 	$CBicons,

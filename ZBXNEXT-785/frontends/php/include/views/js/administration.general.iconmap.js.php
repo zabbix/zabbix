@@ -1,11 +1,12 @@
 <script type="text/javascript">
 	jQuery(document).ready(function(){
 		"use strict";
-console.log(jQuery("#iconMapTable tr.sortable").length <= 1);
+
 		jQuery("#iconMapTable").sortable({
 			disabled: (jQuery("#iconMapTable tr.sortable").length <= 1),
 			items: 'tbody tr.sortable',
 			axis: 'y',
+			cursor: 'move',
 			containment: 'parent',
 			placeholder: "sortableRowPlaceholder",
 			handle: 'span.ui-icon-arrowthick-2-n-s',
