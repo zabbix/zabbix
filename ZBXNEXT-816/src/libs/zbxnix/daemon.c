@@ -77,17 +77,30 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			{
 				if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_value.sival_int))
 				{
-					union sigval	s;
-					extern pid_t	*threads;
+					extern unsigned char	daemon_type;
 
-					s.sival_int = ZBX_TASK_CONFIG_CACHE_RELOAD;
-
-					if (-1 != sigqueue(threads[1], SIGUSR1, s))
-						zabbix_log(LOG_LEVEL_DEBUG,
-								"the signal is redirected to the configuration syncer");
+					if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the"
+								" configuration cache cannot be"
+								" performed for passive proxy");
+					}
 					else
-						zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
-								zbx_strerror(errno));
+					{
+						union sigval	s;
+						extern pid_t	*threads;
+
+						s.sival_int = ZBX_TASK_CONFIG_CACHE_RELOAD;
+
+						if (-1 != sigqueue(threads[1], SIGUSR1, s))
+							zabbix_log(LOG_LEVEL_DEBUG,
+									"the signal is redirected to"
+									" the configuration syncer");
+						else
+							zabbix_log(LOG_LEVEL_ERR,
+									"failed to redirect signal: %s",
+									zbx_strerror(errno));
+					}
 				}
 			}
 			else
@@ -144,7 +157,7 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					int		i, found = 0;
 					extern int	threads_num;
 					extern pid_t	*threads;
-				
+
 					for (i = 1; i < threads_num && !found; i++)
 						found = (threads[i] == CHECKED_FIELD(siginfo, si_pid));
 

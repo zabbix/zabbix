@@ -42,7 +42,7 @@
 
 #include "daemon.h"
 
-static unsigned char	zbx_process;
+extern unsigned char	daemon_type;
 extern unsigned char	process_type;
 
 /******************************************************************************
@@ -224,7 +224,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 
 	if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* Request for list of active checks */
 	{
-		ret = send_list_of_active_checks(sock, s, zbx_process);
+		ret = send_list_of_active_checks(sock, s);
 	}
 	else if (strncmp(s, "ZBX_GET_HISTORY_LAST_ID", 23) == 0) /* Request for last ids */
 	{
@@ -295,9 +295,9 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			{
 				if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
 				{
-					if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 						send_proxyconfig(sock, &jp);
-					else if (0 != (zbx_process & ZBX_PROCESS_PROXY_PASSIVE))
+					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "Received configuration data from server."
 								" Datalen " ZBX_FS_SIZE_T, (zbx_fs_size_t)datalen);
@@ -311,39 +311,39 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_DATA))
 				{
-					if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 						recv_proxyhistory(sock, &jp);
-					else if (0 != (zbx_process & ZBX_PROCESS_PROXY_PASSIVE))
+					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
 						send_proxyhistory(sock);
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_DISCOVERY_DATA))
 				{
-					if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 						recv_discovery_data(sock, &jp);
-					else if (0 != (zbx_process & ZBX_PROCESS_PROXY_PASSIVE))
+					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
 						send_discovery_data(sock);
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA))
 				{
-					if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 						recv_areg_data(sock, &jp);
-					else if (0 != (zbx_process & ZBX_PROCESS_PROXY_PASSIVE))
+					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
 						send_areg_data(sock);
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
 				{
-					if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 						recv_proxy_heartbeat(sock, &jp);
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 				{
-					ret = send_list_of_active_checks_json(sock, &jp, zbx_process);
+					ret = send_list_of_active_checks_json(sock, &jp);
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_HOST_AVAILABILITY))
 				{
-					if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+					if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 						recv_host_availability(sock, &jp);
-					else if (0 != (zbx_process & ZBX_PROCESS_PROXY_PASSIVE))
+					else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
 						send_host_availability(sock);
 				}
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
@@ -418,15 +418,13 @@ static void	process_trapper_child(zbx_sock_t *sock)
 	process_trap(sock, data, sizeof(data));
 }
 
-void	main_trapper_loop(unsigned char p, zbx_sock_t *s)
+void	main_trapper_loop(zbx_sock_t *s)
 {
 	const char	*__function_name = "main_trapper_loop";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	set_child_signal_handler();
-
-	zbx_process = p;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
