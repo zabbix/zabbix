@@ -575,6 +575,24 @@
 			$newRow->setAttribute('id', 'triggers_row');
 
 			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages_enabled', 'click', ".zbx_jsvalue($msgVisibility, true).");");
+			zbx_add_post_js("jQuery('#messages_enabled').bind('click',function() {
+								if (this.checked
+										&& !jQuery(\"input[id='messages_triggers.recovery']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_0']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_1']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_2']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_3']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_4']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_5']\").is(':checked')) {
+									jQuery(\"input[id='messages_triggers.recovery']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_0']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_1']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_2']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_3']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_4']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_5']\").attr('checked', true);
+								}
+							});");
  		}
 
 		$frmUser->addItemToBottomRow(new CSubmit('save',S_SAVE));
