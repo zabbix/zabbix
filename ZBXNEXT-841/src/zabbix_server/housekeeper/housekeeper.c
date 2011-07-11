@@ -34,8 +34,6 @@ extern unsigned char	process_type;
  *                                                                            *
  * Purpose: process table 'housekeeper' and remove data if required           *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
@@ -180,53 +178,43 @@ static int	housekeeping_sessions(int now)
 	return SUCCEED;
 }
 
-static int	housekeeping_alerts(int now)
+static void	housekeeping_alerts(int now)
 {
 	const char	*__function_name = "housekeeping_alerts";
-	DC_CONFIG	config;
-	int		res, deleted;
+	int		deleted, alert_history;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	if (SUCCEED == (res = DCconfig_get_config(&config)))
-	{
-		deleted = DBexecute("delete from alerts where clock<%d", now - config.alert_history * SEC_PER_DAY);
-		zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table 'alerts'", deleted);
-	}
+	deleted = DBexecute("delete from alerts where clock<%d",
+			now - *(int *)DCconfig_get_config_data(&alert_history, CONFIG_ALERT_HISTORY) * SEC_PER_DAY);
+	zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table 'alerts'", deleted);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	housekeeping_events(int now)
+static void	housekeeping_events(int now)
 {
 	const char	*__function_name = "housekeeping_events";
+	int		event_history;
 	DB_RESULT	result;
 	DB_ROW		row;
-	DC_CONFIG	config;
 	zbx_uint64_t	eventid;
-	int		res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	if (SUCCEED == (res = DCconfig_get_config(&config)))
+	result = DBselect("select eventid from events where clock<%d",
+			now - *(int *)DCconfig_get_config_data(&event_history, CONFIG_EVENT_HISTORY) * SEC_PER_DAY);
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		result = DBselect("select eventid from events where clock<%d", now - config.event_history * SEC_PER_DAY);
+		ZBX_STR2UINT64(eventid, row[0]);
 
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(eventid, row[0]);
-
-			DBexecute("delete from acknowledges where eventid=" ZBX_FS_UI64, eventid);
-			DBexecute("delete from events where eventid=" ZBX_FS_UI64, eventid);
-		}
-		DBfree_result(result);
+		DBexecute("delete from acknowledges where eventid=" ZBX_FS_UI64, eventid);
+		DBexecute("delete from events where eventid=" ZBX_FS_UI64, eventid);
 	}
+	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************

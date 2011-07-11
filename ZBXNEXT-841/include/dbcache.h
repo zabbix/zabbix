@@ -56,17 +56,6 @@ extern int	CONFIG_PROXYDATA_FREQUENCY;
 
 typedef struct
 {
-	int		alert_history;
-	int		event_history;
-	int		refresh_unsupported;
-	zbx_uint64_t	discovery_groupid;
-	int		ns_support;
-	char		severity_name[6][SEVERITY_NAME_LEN_MAX];
-}
-DC_CONFIG;
-
-typedef struct
-{
 	char		ip_orig[INTERFACE_IP_LEN_MAX];
 	char		dns_orig[INTERFACE_DNS_LEN_MAX];
 	char		port_orig[INTERFACE_PORT_LEN_MAX];
@@ -191,6 +180,7 @@ int	DCget_item_lastclock(zbx_uint64_t itemid);
 void	DCsync_configuration();
 void	init_configuration_cache();
 void	free_configuration_cache();
+void	DCload_config();
 
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key);
@@ -199,7 +189,14 @@ int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid,
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
 int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
-int	DCconfig_get_config(DC_CONFIG *local_config);
+
+#define	CONFIG_ALERT_HISTORY		1
+#define	CONFIG_EVENT_HISTORY		2
+#define	CONFIG_REFRESH_UNSUPPORTED	3
+#define	CONFIG_DISCOVERY_GROUPID	4
+#define	CONFIG_NS_SUPPORT		5
+void	*DCconfig_get_config_data(void *data, int type);
+int	DCget_trigger_severity_name(DB_TRIGGER *trigger, char **replace_to);
 
 void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now);
 void	DCrequeue_unreachable_item(zbx_uint64_t itemid);

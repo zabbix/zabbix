@@ -26,38 +26,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_trigger_severity_name                                      *
- *                                                                            *
- * Purpose: get trigger severity name                                         *
- *                                                                            *
- * Parameters: trigger    - [IN] a trigger data with priority field;          *
- *                               TRIGGER_SEVERITY_*                           *
- *             replace_to - [OUT] pointer to a buffer that will receive       *
- *                          a null-terminated trigger severity string         *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev, Rudolfs Kreicbergs                            *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_trigger_severity_name(DB_TRIGGER *trigger, char **replace_to)
-{
-	DC_CONFIG	config;
-
-	if (0 == trigger->triggerid || TRIGGER_SEVERITY_COUNT <= trigger->priority ||
-			FAIL == DCconfig_get_config(&config))
-	{
-		return FAIL;
-	}
-
-	*replace_to = zbx_strdup(*replace_to, config.severity_name[trigger->priority]);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBget_macro_value_by_triggerid                                   *
  *                                                                            *
  * Purpose: get value of a user macro                                         *
@@ -2330,7 +2298,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 					ret = get_escalation_history(event, escalation, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
-					ret = DBget_trigger_severity_name(&event->trigger, &replace_to);
+					ret = DCget_trigger_severity_name(&event->trigger, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_NSEVERITY))
 				{
 					if (0 != event->trigger.triggerid)
