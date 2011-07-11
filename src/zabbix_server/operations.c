@@ -148,13 +148,13 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	zbx_uint64_t	dhostid, hostid = 0, proxy_hostid, host_proxy_hostid;
 	char		*host = NULL, *host_esc, *host_unique;
 	unsigned short	port;
-	DC_CONFIG	config;
+	zbx_uint64_t	groupid;
 	unsigned char	svc_type, interface_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(eventid:" ZBX_FS_UI64 ")",
 			__function_name, event->eventid);
 
-	if (FAIL == DCconfig_get_config(&config) || 0 == config.discovery_groupid)
+	if (0 == *(zbx_uint64_t *)DCconfig_get_config_data(&groupid, CONFIG_DISCOVERY_GROUPID))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Can't add discovered host:"
 				" Group for discovered hosts is not defined");
@@ -334,7 +334,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	}
 
 	if (0 != hostid)
-		add_discovered_host_group(hostid, config.discovery_groupid);
+		add_discovered_host_group(hostid, groupid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 

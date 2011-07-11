@@ -166,10 +166,6 @@ int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
 
-/* From table config */
-int	CONFIG_REFRESH_UNSUPPORTED	= 0;
-int	CONFIG_NS_SUPPORT		= 0;
-
 /* Zabbix server startup time */
 int	CONFIG_SERVER_STARTUP_TIME	= 0;
 
@@ -533,23 +529,9 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
-	result = DBselect(
-			"select refresh_unsupported,ns_support"
-			" from config"
-			" where 1=1" DB_NODE,
-			DBnode_local("configid"));
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
-		CONFIG_NS_SUPPORT = atoi(row[1]);
-	}
-	DBfree_result(result);
-
 	if (0 != CONFIG_NODEID)
 	{
-		result = DBselect("select masterid from nodes where nodeid=%d",
-				CONFIG_NODEID);
+		result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
 
 		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 			CONFIG_MASTER_NODEID = atoi(row[0]);
@@ -560,7 +542,9 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
-	/* Need to set trigger status to UNKNOWN since last run */
+	DCload_config();
+
+	/* need to set trigger status to UNKNOWN since last run */
 	DBupdate_triggers_status_after_restart();
 	DBclose();
 

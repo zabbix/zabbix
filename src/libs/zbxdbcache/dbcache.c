@@ -1454,7 +1454,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		sql_offset = 0, i;
 	char		*value_esc, *source_esc;
-	int		history_text_num, history_log_num;
+	int		history_text_num, history_log_num, ns_support;
 	zbx_uint64_t	id;
 #ifdef HAVE_MULTIROW_INSERT
 	int		tmp_offset;
@@ -1466,7 +1466,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_add_history()");
 
-	if (0 != CONFIG_NS_SUPPORT)
+	if (0 != *(int *)DCconfig_get_config_data(&ns_support, CONFIG_NS_SUPPORT))
 		nsfield = ",ns";
 	else
 		nsfield = "";
@@ -1506,9 +1506,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 				history[i].itemid,
 				history[i].clock,
 				history[i].value.dbl);
-		if (0 != CONFIG_NS_SUPPORT)
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11,
-					",%d", history[i].ns);
+		if (0 != ns_support)
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11, ",%d", history[i].ns);
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ")%s", row_dl);
 	}
 
@@ -1553,9 +1552,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					history[i].itemid,
 					history[i].clock,
 					history[i].value.dbl);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11,
-						",%d", history[i].ns);
+			if (0 != ns_support)
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11, ",%d", history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ")%s", row_dl);
 		}
 
@@ -1601,9 +1599,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 				history[i].itemid,
 				history[i].clock,
 				history[i].value.ui64);
-		if (0 != CONFIG_NS_SUPPORT)
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11,
-					",%d", history[i].ns);
+		if (0 != ns_support)
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11, ",%d", history[i].ns);
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ")%s", row_dl);
 	}
 
@@ -1648,9 +1645,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					history[i].itemid,
 					history[i].clock,
 					history[i].value.ui64);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11,
-						",%d", history[i].ns);
+			if (0 != ns_support)
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11, ",%d", history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ")%s", row_dl);
 		}
 
@@ -1697,9 +1693,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 				history[i].itemid,
 				history[i].clock,
 				value_esc);
-		if (0 != CONFIG_NS_SUPPORT)
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11,
-					",%d", history[i].ns);
+		if (0 != ns_support)
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11, ",%d", history[i].ns);
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ")%s", row_dl);
 		zbx_free(value_esc);
 	}
@@ -1746,9 +1741,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					history[i].itemid,
 					history[i].clock,
 					value_esc);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11,
-						",%d", history[i].ns);
+			if (0 != ns_support)
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11, ",%d", history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ")%s", row_dl);
 			zbx_free(value_esc);
 		}
@@ -1810,9 +1804,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					history[i].itemid,
 					history[i].clock,
 					value_esc);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11,
-						",%d", history[i].ns);
+			if (0 != ns_support)
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11, ",%d", history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ")%s", row_dl);
 			zbx_free(value_esc);
 			id++;
@@ -1871,9 +1864,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					history[i].severity,
 					value_esc,
 					history[i].logeventid);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11,
-						",%d", history[i].ns);
+			if (0 != ns_support)
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 11, ",%d", history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4, ")%s", row_dl);
 			zbx_free(value_esc);
 			zbx_free(source_esc);
@@ -2758,11 +2750,7 @@ static void	DCadd_history_notsupported(zbx_uint64_t itemid, const char *error, z
  *                                                                            *
  * Purpose: add new value to the cache                                        *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags,
@@ -2817,13 +2805,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
  *                                                                            *
  * Purpose: Allocate shared memory for database cache                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 
@@ -2915,7 +2897,7 @@ void	init_database_cache(unsigned char p)
 	cache->last_ts.sec = 0;
 	cache->last_ts.ns = 0;
 
-#define	INIT_HASHSET_SIZE	1000 /* should be calculated dynamically based on trends size? */
+#define	INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on trends size? */
 
 	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
@@ -2935,13 +2917,7 @@ void	init_database_cache(unsigned char p)
  *                                                                            *
  * Purpose: writes updates and new data from pool and cache data to database  *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DCsync_all()
@@ -2960,13 +2936,7 @@ static void	DCsync_all()
  *                                                                            *
  * Purpose: Free memory allocated for database cache                          *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	free_database_cache()
@@ -3003,13 +2973,7 @@ void	free_database_cache()
  *                                                                            *
  * Purpose: Return next id for requested table                                *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	DCget_nextid(const char *table_name, int num)
@@ -3099,13 +3063,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
  *                                                                            *
  * Purpose: Return next id for requested table and store it in ids table      *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	DCget_nextid_shared(const char *table_name)
@@ -3204,15 +3162,9 @@ retry:
  *                                                                            *
  * Function: DCget_item_lastclock                                             *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: last clock or FAIL if item not found in dbcache              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCget_item_lastclock(zbx_uint64_t itemid)
