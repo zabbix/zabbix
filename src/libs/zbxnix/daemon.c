@@ -67,14 +67,15 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			exit(FAIL);
 			break;
 		case SIGUSR1:
-			zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),value_int:%d,sender_pid:%d].",
+			zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,value_int:%d].",
 					sig, get_signal_name(sig),
-					CHECKED_FIELD(siginfo, si_int),
-					CHECKED_FIELD(siginfo, si_pid));
+					CHECKED_FIELD(siginfo, si_pid),
+					CHECKED_FIELD(siginfo, si_uid),
+					CHECKED_FIELD(siginfo, si_value.sival_int));
 
 			if (1 == parent)
 			{
-				if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_int))
+				if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_value.sival_int))
 				{
 					union sigval	s;
 					extern pid_t	*threads;
@@ -93,7 +94,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			{
 				extern void	zbx_sigusr_handler(zbx_task_t task);
 
-				zbx_sigusr_handler(CHECKED_FIELD(siginfo, si_int));
+				zbx_sigusr_handler(CHECKED_FIELD(siginfo, si_value.sival_int));
 			}
 
 			break;
