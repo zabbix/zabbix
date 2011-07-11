@@ -306,16 +306,18 @@ include_once('include/page_header.php');
 		$groups = zbx_toObject($groups, 'groupid');
 		if(!empty($newgroup)){
 			$result = CHostGroup::create(array('name' => $newgroup));
-			$options = array(
-				'groupids' => $result['groupids'],
-				'output' => API_OUTPUT_EXTEND
-			);
-			$newgroup = CHostGroup::get($options);
-			if($newgroup){
-				$groups = array_merge($groups, $newgroup);
-			}
-			else{
-				$result = false;
+			if($result){
+				$options = array(
+					'groupids' => $result['groupids'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$newgroup = CHostGroup::get($options);
+				if($newgroup){
+					$groups = array_merge($groups, $newgroup);
+				}
+				else{
+					$result = false;
+				}
 			}
 		}
 
