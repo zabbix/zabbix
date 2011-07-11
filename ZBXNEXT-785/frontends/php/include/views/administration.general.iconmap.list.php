@@ -28,7 +28,7 @@ foreach($this->data['iconmaps'] as $iconmap){
 
 	$row = array();
 	foreach($mappings as $mapping){
-		$row[] = $mapping['profile_link'] . ':' . $mapping['expression'] . SPACE.RARR.SPACE . $mapping['iconid'] . BR();
+		$row[] = $mapping['inventory_link'] . ':' . $mapping['expression'] . SPACE.RARR.SPACE . $mapping['iconid'];
 	}
 	$table->addRow(array(
 		new CLink($iconmap['name'],'config.php?form=update&iconmapid='.$iconmap['iconmapid'].url_param('config')),

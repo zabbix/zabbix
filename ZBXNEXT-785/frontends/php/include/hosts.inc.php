@@ -610,33 +610,6 @@
 	}
 
 /*
- * Function: get_templates_by_hostid
- *
- * Description:
- *     Retrieve templates for specified host
- *
- * Author:
- *		Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *		mod by Aly
- */
-	function get_templates_by_hostid($hostid){
-		$result = array();
-		$db_templates = DBselect('SELECT DISTINCT h.hostid,h.host '.
-				' FROM hosts_templates ht '.
-					' LEFT JOIN hosts h ON h.hostid=ht.templateid '.
-				' WHERE ht.hostid='.$hostid.
-				' ORDER BY h.host');
-
-		while($template_data = DBfetch($db_templates)){
-			$result[$template_data['hostid']] = $template_data['host'];
-		}
-
-	return $result;
-	}
-
-/*
  * Function: get_viewed_groups
  *
  * Description:
@@ -893,9 +866,6 @@ return $result;
  *
  * Author:
  *		Artem "Aly" Suharev
- *
- * Comments:
- *
  */
 function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sql=array()){
 	global $USER_DETAILS;
@@ -1148,9 +1118,6 @@ return $result;
  *
  * Author:
  *		Aly
- *
- * Comments:
- *
  */
 	function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host=true){
 		global $page;
@@ -1207,8 +1174,6 @@ return $result;
 
 
 /* APPLICATIONS */
-
-
 	function get_application_by_applicationid($applicationid,$no_error_message=0){
 		$result = DBselect("select * from applications where applicationid=".$applicationid);
 		$row=DBfetch($result);
@@ -1244,10 +1209,6 @@ return $result;
 		}
 		error(S_NO_HOST_WITH." applicationid=[$applicationid]");
 		return	false;
-	}
-
-	function get_applications_by_hostid($hostid){
-		return DBselect('select * from applications where hostid='.$hostid);
 	}
 
 	/*

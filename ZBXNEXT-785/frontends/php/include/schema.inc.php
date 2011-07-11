@@ -5594,7 +5594,7 @@ return array(
 				'ref_table' => 'images',
 				'ref_field' => 'imageid',
 			),
-			'profile_link' => array(
+			'inventory_link' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

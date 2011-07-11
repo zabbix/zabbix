@@ -126,6 +126,10 @@ include_once('include/page_header.php');
 		'ok_period' =>		        array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 		'blink_period' =>		    array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 
+		// Icon Maps
+		'iconmapid' => 				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({config})&&({config}==14)&&(isset({form})&&({form}=="update"))'),
+		'iconmap' =>				array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==14)&&isset({save})'),
+
 		'form' =>			        array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh' =>	        array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
@@ -216,7 +220,7 @@ include_once('include/page_header.php');
 			}
 		}
 	}
-	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==8)){ // GUI
+	elseif(isset($_REQUEST['save']) && ($_REQUEST['config']==8)){ // GUI
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
@@ -255,7 +259,7 @@ include_once('include/page_header.php');
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,implode('; ',$msg));
 		}
 	}
-	else if(isset($_REQUEST['save'])&&uint_in_array($_REQUEST['config'],array(0,5,7))){
+	elseif(isset($_REQUEST['save'])&&uint_in_array($_REQUEST['config'], array(0, 5, 7))){
 
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
@@ -315,7 +319,7 @@ include_once('include/page_header.php');
 		}
 	}
 // VALUE MAPS
-	else if($_REQUEST['config']==6){
+	elseif($_REQUEST['config']==6){
 		$_REQUEST['valuemap'] = get_request('valuemap',array());
 		if(isset($_REQUEST['add_map'])){
 			$added = 0;
@@ -339,13 +343,13 @@ include_once('include/page_header.php');
 				}
 			}
 		}
-		else if(isset($_REQUEST['del_map'])&&isset($_REQUEST['rem_value'])){
+		elseif(isset($_REQUEST['del_map'])&&isset($_REQUEST['rem_value'])){
 
 			$_REQUEST['valuemap'] = get_request('valuemap',array());
 			foreach($_REQUEST['rem_value'] as $val)
 				unset($_REQUEST['valuemap'][$val]);
 		}
-		else if(isset($_REQUEST['save'])){
+		elseif(isset($_REQUEST['save'])){
 
 			$mapping = get_request('valuemap',array());
 			if(isset($_REQUEST['valuemapid'])){
@@ -373,7 +377,7 @@ include_once('include/page_header.php');
 			}
 			show_messages($result,$msg_ok, $msg_fail);
 		}
-		else if(isset($_REQUEST['delete']) && isset($_REQUEST['valuemapid'])){
+		elseif(isset($_REQUEST['delete']) && isset($_REQUEST['valuemapid'])){
 			$result = false;
 
 			$sql = 'SELECT * FROM valuemaps WHERE '.DBin_node('valuemapid').' AND valuemapid='.$_REQUEST['valuemapid'];
@@ -389,7 +393,7 @@ include_once('include/page_header.php');
 			show_messages($result, S_VALUE_MAP_DELETED, S_CANNNOT_DELETE_VALUE_MAP);
 		}
 	}
-	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==9)){
+	elseif(isset($_REQUEST['save']) && ($_REQUEST['config']==9)){
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
@@ -406,15 +410,15 @@ include_once('include/page_header.php');
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,$msg);
 		}
 	}
-	else if($_REQUEST['config'] == 10){
+	elseif($_REQUEST['config'] == 10){
 		if(inarr_isset(array('clone','regexpid'))){
 			unset($_REQUEST['regexpid']);
 			$_REQUEST['form'] = 'clone';
 		}
-		else if(isset($_REQUEST['cancel_new_expression'])){
+		elseif(isset($_REQUEST['cancel_new_expression'])){
 			unset($_REQUEST['new_expression']);
 		}
-		else if(isset($_REQUEST['save'])){
+		elseif(isset($_REQUEST['save'])){
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 
@@ -432,7 +436,7 @@ include_once('include/page_header.php');
 				$msg1 = S_REGULAR_EXPRESSION_UPDATED;
 				$msg2 = S_CANNOT_UPDATE_REGULAR_EXPRESSION;
 			}
-			else {
+			else{
 				$result = $regexpid = add_regexp($regexp);
 
 				$msg1 = S_REGULAR_EXPRESSION_ADDED;
@@ -532,8 +536,7 @@ include_once('include/page_header.php');
 			}
 		}
 	}
-
-	else if($_REQUEST['config'] == 11){ // Macros
+	elseif($_REQUEST['config'] == 11){ // Macros
 		if(isset($_REQUEST['save'])){
 			try{
 				DBstart();
@@ -619,7 +622,7 @@ include_once('include/page_header.php');
 
 	}
 	// Trigger severities
-	else if(($_REQUEST['config'] == 12) && (isset($_REQUEST['save']))){
+	elseif(($_REQUEST['config'] == 12) && (isset($_REQUEST['save']))){
 		$configs = array(
 			'severity_name_0' => get_request('severity_name_0', _('Not classified')),
 			'severity_color_0' => get_request('severity_color_0', ''),
@@ -640,7 +643,7 @@ include_once('include/page_header.php');
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 	}
 	// Trigger displaying options
-	else if(($_REQUEST['config'] == 13) && (isset($_REQUEST['save']))){
+	elseif(($_REQUEST['config'] == 13) && (isset($_REQUEST['save']))){
 		$configs = array(
 			'ok_period' => get_request('ok_period'),
 			'blink_period' => get_request('blink_period'),
@@ -658,8 +661,24 @@ include_once('include/page_header.php');
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 	}
-?>
+	elseif(($_REQUEST['config'] == 14) && (isset($_REQUEST['save']))){
+		if(isset($_REQUEST['iconmap']['iconmapid'])){
+			$result = API::IconMap()->update($_REQUEST['iconmap']);
+			$msgOk = _('Icon map updated');
+			$msgErr =  _('Cannot update icon map');
+		}
+		else{
+			$result = API::IconMap()->create($_REQUEST['iconmap']);
+			$msgOk = _('Icon map created');
+			$msgErr =  _('Cannot create icon map');
+		}
 
+		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
+		if($result){
+			unset($_REQUEST['form']);
+		}
+	}
+?>
 <?php
 	$form = new CForm();
 	$form->cleanItems();
@@ -1310,12 +1329,14 @@ include_once('include/page_header.php');
 				$data['iconmap'] = get_request('iconmap');
 			}
 			elseif(isset($_REQUEST['iconmapid'])){
-				$data['iconmap'] = API::IconMap()->get(array(
+				$iconMap = API::IconMap()->get(array(
+					'output' => API_OUTPUT_EXTEND,
 					'iconmapids' => $_REQUEST['iconmapid'],
 					'editable' => true,
 					'preservekeys' => true,
 					'selectMappings' => API_OUTPUT_EXTEND,
 				));
+				$data['iconmap'] = reset($iconMap);
 			}
 			else{
 				$data['iconmap'] = array(
@@ -1329,6 +1350,7 @@ include_once('include/page_header.php');
 		else{
 			$cnf_wdgt->addHeader(_('Icon mapping'));
 			$data['iconmaps'] = API::IconMap()->get(array(
+				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
 				'preservekeys' => true,
 				'selectMappings' => API_OUTPUT_EXTEND,
