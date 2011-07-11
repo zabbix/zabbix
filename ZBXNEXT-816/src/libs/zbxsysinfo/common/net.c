@@ -326,7 +326,7 @@ int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_
 	char		zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], *name,
 			buffer[MAX_STRING_LEN];
 	unsigned char	*msg_end, *msg_ptr, *p;
-	int		num_answers, num_query, q_type, q_class, q_ttl, q_len,
+	int		num_answers, num_query, q_type, q_class, q_len,
 			value, offset, c, i, type, n, res;
 	answer_t	answer;
 	struct in_addr	inaddr;
@@ -392,7 +392,7 @@ int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_
 
 		GETSHORT(q_type, msg_ptr);
 		GETSHORT(q_class, msg_ptr);
-		GETLONG(q_ttl, msg_ptr);
+		msg_ptr += INT32SZ;		/* skipping TTL */
 		GETSHORT(q_len, msg_ptr);
 
 		switch (q_type)
