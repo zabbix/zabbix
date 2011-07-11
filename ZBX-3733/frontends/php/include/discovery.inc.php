@@ -90,7 +90,7 @@ require_once('include/perm.inc.php');
 			case SVC_SNMPv2:
 			case SVC_SNMPv3:
 			case SVC_AGENT:
-				$external_param = ' "'.$key_.'"';
+				$external_param = ' &quot;'.$key_.'&quot;';
 				break;
 		}
 		$result = discovery_check_type2str($type);
@@ -179,8 +179,14 @@ require_once('include/perm.inc.php');
 	}
 
 	function add_discovery_rule($proxy_hostid, $name, $iprange, $delay, $status, $dchecks, $uniqueness_criteria){
-		if( !validate_ip_range($iprange) ){
+		if(!validate_ip_range($iprange)){
 			error(S_INCORRECT_IP_RANGE);
+			return false;
+		}
+
+		// checking to the duplicate of the name
+		if(CDRule::exists(array('name' => $name))){
+			error('Discovery rule with name "'.$name.'" already exists.');
 			return false;
 		}
 
