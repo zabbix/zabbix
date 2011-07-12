@@ -601,7 +601,6 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 #define DEFAULT_ALERT_HISTORY		365
 #define DEFAULT_EVENT_HISTORY		365
 #define DEFAULT_REFRESH_UNSUPPORTED	600
-#define DEFAULT_DISCOVERY_GROUPID	0
 #define DEFAULT_NS_SUPPORT		1
 static char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
 
@@ -632,7 +631,7 @@ static int	DCsync_config(DB_RESULT result)
 			config->config->alert_history = DEFAULT_ALERT_HISTORY;
 			config->config->event_history = DEFAULT_EVENT_HISTORY;
 			config->config->refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
-			config->config->discovery_groupid = DEFAULT_DISCOVERY_GROUPID;
+			config->config->discovery_groupid = 0;
 			config->config->ns_support = DEFAULT_NS_SUPPORT;
 
 			for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
