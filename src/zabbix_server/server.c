@@ -361,6 +361,7 @@ static void	zbx_load_config()
 		CONFIG_HOUSEKEEPER_FORKS = 0;
 }
 
+#ifdef HAVE_SIGQUEUE
 void	zbx_sigusr_handler(zbx_task_t task)
 {
 	switch (task)
@@ -376,6 +377,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
 			break;
 	}
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
