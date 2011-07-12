@@ -1499,17 +1499,11 @@ return $result;
 			if($db_app["templateid"] == 0)
 				continue;
 
+			// check if application is from right template
 			if(!is_null($templateids)){
-
-				unset($skip);
 				if($tmp_app_data = get_application_by_applicationid($db_app["templateid"])){
-					if(!uint_in_array($tmp_app_data["hostid"], $templateids)){
-						$skip = true;
-						break;
-					}
+					if(!uint_in_array($tmp_app_data["hostid"], $templateids)) continue;
 				}
-				if(isset($skip)) continue;
-
 			}
 
 			if($unlink_mode){
