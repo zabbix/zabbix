@@ -247,7 +247,7 @@
 					$node['nodetype'] ? 'bold' : null)
 				));
 			}
-			
+
 			$nodes_wdgt->addItem($table);
 		}
 	}

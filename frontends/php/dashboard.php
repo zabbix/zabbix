@@ -423,6 +423,9 @@ $right_col = array();
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
 
+	// activating blinking
+	zbx_add_post_js('jqBlink.init();');
+
 ?>
 <script type="text/javascript">
 //<!--<![CDATA[
@@ -439,7 +442,7 @@ function addPopupValues(list){
 
 	var favorites = {'graphid': 1,'itemid': 1,'screenid': 1,'slideshowid': 1,'sysmapid': 1};
 	if(isset(list.object, favorites)){
-		var favid = new Array();
+		var favid = [];
 		for(var i=0; i < list.values.length; i++){
 			favid.push(list.values[i][list.object]);
 		}

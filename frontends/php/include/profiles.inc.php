@@ -196,7 +196,7 @@ class CProfile{
 
 /************ CONFIG **************/
 
-function select_config($cache = true, $nodeid=null){
+function select_config($cache=true, $nodeid=null){
 	global $page, $ZBX_LOCALNODEID;
 	static $config;
 
@@ -231,17 +231,37 @@ function update_config($configs){
 		}
 	}
 
-// check color value for each severity.
-	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
-		$varName = 'severity_color_'.$i;
-		if(isset($configs[$varName]) && !is_null($configs[$varName])){
-			if(!preg_match('/[0-9a-f]{6}/i', $configs[$varName])){
-				error(_('Severity colour is not correct: expecting hexadecimal colour code (6 symbols).'));
+	// checking color values to be correct hexadecimal numbers
+	$colors = array(
+		'severity_color_0',
+		'severity_color_1',
+		'severity_color_2',
+		'severity_color_3',
+		'severity_color_4',
+		'severity_color_5',
+		'problem_unack_color',
+		'problem_ack_color',
+		'ok_unack_color',
+		'ok_ack_color'
+	);
+	foreach($colors as $color){
+		if(isset($configs[$color]) && !is_null($configs[$color])){
+			if(!preg_match('/[0-9a-f]{6}/i', $configs[$color])){
+				error(_('Colour is not correct: expecting hexadecimal colour code (6 symbols).'));
 				return false;
 			}
 		}
 	}
 
+	if(isset($configs['ok_period']) && !is_null($configs['ok_period']) && !ctype_digit($configs['ok_period'])){
+		error(_('"Display OK triggers" needs to be a positive integer.'));
+		return false;
+	}
+
+	if(isset($configs['blink_period']) && !is_null($configs['blink_period']) && !ctype_digit($configs['blink_period'])){
+		error(_('"Triggers blink on status change" needs to be a positive integer.'));
+		return false;
+	}
 
 	$currentConfig = select_config();
 // check duplicate severity names and if name is empty.

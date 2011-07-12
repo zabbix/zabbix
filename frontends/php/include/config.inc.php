@@ -344,7 +344,7 @@ function __autoload($class_name){
 
 	function detect_page_type($default=PAGE_TYPE_HTML){
 		if(isset($_REQUEST['output'])){
-			switch($_REQUEST['output']){
+			switch(strtolower($_REQUEST['output'])){
 				case 'text':
 					return PAGE_TYPE_TEXT;
 					break;
@@ -740,28 +740,37 @@ function __autoload($class_name){
 		global $page;
 		global $IMAGE_FORMAT_DEFAULT;
 
-		if($page['type'] != PAGE_TYPE_IMAGE){
-			ob_start();
+		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
+
+		ob_start();
+
+		if(IMAGE_FORMAT_JPEG == $format)
+			imagejpeg($image);
+		else
 			imagepng($image);
-			$image_txt = ob_get_contents();
-			ob_end_clean();
-//SDI($image_txt);
+
+		$imageSource = ob_get_contents();
+		ob_end_clean();
+
+		if($page['type'] != PAGE_TYPE_IMAGE){
 			session_start();
-			$id = md5($image_txt);
+			$imageId = md5(strlen($imageSource));
 			$_SESSION['image_id'] = array();
-			$_SESSION['image_id'][$id] = $image_txt;
+			$_SESSION['image_id'][$imageId] = $imageSource;
 			session_write_close();
-			print($id);
-
-//			print(base64_encode($image_txt));
 		}
-		else{
-			if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
 
-			if(IMAGE_FORMAT_JPEG == $format)
-				imagejpeg($image);
-			else
-				imagepng($image);
+		switch($page['type']){
+			case PAGE_TYPE_IMAGE:
+				print($imageSource);
+				break;
+			case PAGE_TYPE_JSON:
+				$json = new CJSON();
+				print($json->encode(array('result' => $imageId)));
+				break;
+			case PAGE_TYPE_TEXT:
+			default:
+				print($imageId);
 		}
 
 //		imagedestroy($image);

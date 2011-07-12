@@ -34,7 +34,7 @@ int	create_pid_file(const char *pidfile)
 	fl.l_whence = SEEK_SET;
 	fl.l_start = 0;
 	fl.l_len = 0;
-	fl.l_pid = zbx_get_thread_id();
+	fl.l_pid = getpid();
 
 	/* check if pid file already exists */
 	if (0 == stat(pidfile, &buf))
@@ -66,19 +66,36 @@ int	create_pid_file(const char *pidfile)
 	}
 
 	/* lock file */
-	fdpid = fileno(fpid);
-
-	if (-1 != fdpid)
+	if (-1 != (fdpid = fileno(fpid)))
 	{
 		fcntl(fdpid, F_SETLK, &fl);
 		fcntl(fdpid, F_SETFD, FD_CLOEXEC);
 	}
 
 	/* write pid to file */
-	fprintf(fpid, "%li", zbx_get_thread_id());
+	fprintf(fpid, "%d", (int)getpid());
 	fflush(fpid);
 
 	return SUCCEED;
+}
+
+int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len)
+{
+	int	ret = FAIL;
+	FILE	*fpid;
+
+	if (NULL == (fpid = fopen(pidfile, "r")))
+	{
+		zbx_snprintf(error, max_error_len, "cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
+		return ret;
+	}
+
+	if (1 == fscanf(fpid, "%d", (int *)pid))
+		ret = SUCCEED;
+
+	zbx_fclose(fpid);
+
+	return ret;
 }
 
 void	drop_pid_file(const char *pidfile)

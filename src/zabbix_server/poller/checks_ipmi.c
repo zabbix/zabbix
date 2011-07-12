@@ -417,8 +417,7 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 	}
 	h->done = 1;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(h->ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
 static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
@@ -459,8 +458,7 @@ static void	read_ipmi_sensor(zbx_ipmi_host_t *h, zbx_ipmi_sensor_t *s)
 	while (0 == h->done)
 		os_hnd->perform_one_op(os_hnd, &tv);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(h->ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
 static void	got_control_reading(ipmi_control_t *control, int err, int *val, void *cb_data)
@@ -469,7 +467,7 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 	zbx_ipmi_host_t		*h = cb_data;
 	int			n;
 	zbx_ipmi_control_t	*c;
-	const char		*c_type, *e_string;
+	const char		*e_string;
 	ipmi_entity_t		*ent;
 	size_t			sz;
 
@@ -507,7 +505,6 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 
 	ent = ipmi_control_get_entity(control);
 	e_string = ipmi_entity_get_entity_id_string(ent);
-	c_type = ipmi_control_get_type_string(control);
 
 	for (n = 0; n < c->num_values; n++)
 	{
@@ -520,8 +517,7 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 
 	h->done = 1;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(h->ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
 static void	got_control_setting(ipmi_control_t *control, int err, void *cb_data)
@@ -529,8 +525,6 @@ static void	got_control_setting(ipmi_control_t *control, int err, void *cb_data)
 	const char		*__function_name = "got_control_setting";
 	zbx_ipmi_host_t		*h = cb_data;
 	zbx_ipmi_control_t	*c;
-	const char		*c_type, *e_string;
-	ipmi_entity_t		*ent;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -555,12 +549,7 @@ static void	got_control_setting(ipmi_control_t *control, int err, void *cb_data)
 		return;
 	}
 
-	ent = ipmi_control_get_entity(control);
-	e_string = ipmi_entity_get_entity_id_string(ent);
-	c_type = ipmi_control_get_type_string(control);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "set value completed for control %s@[%s]:%d",
-			c->c_name, h->ip, h->port);
+	zabbix_log(LOG_LEVEL_DEBUG, "set value completed for control %s@[%s]:%d", c->c_name, h->ip, h->port);
 
 	h->done = 1;
 
@@ -599,8 +588,7 @@ static void	read_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c)
 	while (0 == h->done)
 		os_hnd->perform_one_op(os_hnd, &tv);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(h->ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 }
 
 static void	set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int value)
