@@ -598,6 +598,13 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 	}
 }
 
+#define DEFAULT_ALERT_HISTORY		365
+#define DEFAULT_EVENT_HISTORY		365
+#define DEFAULT_REFRESH_UNSUPPORTED	600
+#define DEFAULT_DISCOVERY_GROUPID	0
+#define DEFAULT_NS_SUPPORT		1
+static char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
+
 static int	DCsync_config(DB_RESULT result)
 {
 	const char		*__function_name = "DCsync_config";
@@ -616,42 +623,39 @@ static int	DCsync_config(DB_RESULT result)
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		static char	*default_severity_names[] =
-				{"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
-
 		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
 
 		if (0 == found)
 		{
 			/* load default config data */
 
-			config->config->alert_history = 365;
-			config->config->event_history = 365;
-			config->config->refresh_unsupported = 600;
-			config->config->discovery_groupid = 0;
-			config->config->ns_support = 1;
+			config->config->alert_history = DEFAULT_ALERT_HISTORY;
+			config->config->event_history = DEFAULT_EVENT_HISTORY;
+			config->config->refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
+			config->config->discovery_groupid = DEFAULT_DISCOVERY_GROUPID;
+			config->config->ns_support = DEFAULT_NS_SUPPORT;
 
 			for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
 				DCstrpool_replace(found, &config->config->severity_name[i], default_severity_names[i]);
 		}
+	}
+	else
+	{
+		/* store the config data */
 
-		goto exit;
+		config->config->alert_history = atoi(row[1]);
+		config->config->event_history = atoi(row[2]);
+		config->config->refresh_unsupported = atoi(row[3]);
+		ZBX_STR2UINT64(config->config->discovery_groupid, row[4]);
+		config->config->ns_support = atoi(row[5]);
+
+		for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
+			DCstrpool_replace(found, &config->config->severity_name[i], row[6 + i]);
+
+		if (NULL != (row = DBfetch(result)))	/* config table should have only one record */
+			zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
 	}
 
-	/* store the config data */
-
-	config->config->alert_history = atoi(row[1]);
-	config->config->event_history = atoi(row[2]);
-	config->config->refresh_unsupported = atoi(row[3]);
-	ZBX_STR2UINT64(config->config->discovery_groupid, row[4]);
-	config->config->ns_support = atoi(row[5]);
-
-	for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
-		DCstrpool_replace(found, &config->config->severity_name[i], row[6 + i]);
-
-	if (NULL != (row = DBfetch(result)))	/* config table should have only one record */
-		zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
-exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return SUCCEED;
