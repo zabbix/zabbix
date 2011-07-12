@@ -643,14 +643,14 @@ static int	DCsync_config(DB_RESULT result)
 	{
 		/* store the config data */
 
-		config->config->alert_history = atoi(row[1]);
-		config->config->event_history = atoi(row[2]);
-		config->config->refresh_unsupported = atoi(row[3]);
-		ZBX_STR2UINT64(config->config->discovery_groupid, row[4]);
-		config->config->ns_support = atoi(row[5]);
+		config->config->alert_history = atoi(row[0]);
+		config->config->event_history = atoi(row[1]);
+		config->config->refresh_unsupported = atoi(row[2]);
+		ZBX_STR2UINT64(config->config->discovery_groupid, row[3]);
+		config->config->ns_support = atoi(row[4]);
 
 		for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
-			DCstrpool_replace(found, &config->config->severity_name[i], row[6 + i]);
+			DCstrpool_replace(found, &config->config->severity_name[i], row[5 + i]);
 
 		if (NULL != (row = DBfetch(result)))	/* config table should have only one record */
 			zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
