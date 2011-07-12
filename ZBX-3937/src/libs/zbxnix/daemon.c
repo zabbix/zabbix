@@ -340,7 +340,7 @@ int	zbx_sigusr_send(zbx_task_t task)
 					(int)pid, zbx_strerror(errno));
 	}
 #else
-	zbx_snprintf(error, sizeof(error), "operation is not supported on the given operating system\n");
+	zbx_snprintf(error, sizeof(error), "operation is not supported on the given operating system");
 #endif
 
 	if (SUCCEED != ret)
