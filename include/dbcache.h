@@ -144,7 +144,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		zbx_timespec_t *ts, unsigned char status, const char *error, int timestamp, const char *source,
 		int severity, int logeventid, int lastlogsize, int mtime);
 int	DCsync_history(int sync_type);
-void	init_database_cache(unsigned char p);
+void	init_database_cache();
 void	free_database_cache();
 
 void	DCinit_nextchecks();
