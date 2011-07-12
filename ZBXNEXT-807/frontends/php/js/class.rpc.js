@@ -16,11 +16,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-// JavaScript Document
+
 // JSON RPC by Artem "Aly" Suharev (based on Prototype)
 
 var RPC = {
-//'_rpcurl':		'api_jsonrpc.php',	// rpc url
 '_rpcurl':		'jsrpc.php?output=json-rpc',		// rpc url
 '_callid':		0,					// rpc request id
 '_auth':		null,				// authentication hash
@@ -69,7 +68,6 @@ initialize: function(userParams){
 	this.auth = RPC.auth();
 },
 
-// DEBUG
 debug: function(fnc_name, id){
 	if(this.debug_status){
 		var str = 'RPC.Call['+RPC.id+'].'+fnc_name;
@@ -93,7 +91,6 @@ initialize: function($super, userParams) {
 	this.call();
 },
 
-// CALL RPC
 call: function(){
 	this.debug('call');
 //---

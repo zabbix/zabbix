@@ -51,7 +51,7 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 	FROM hosts
 	WHERE status IN (0,1) AND useipmi=1)
 /
-	
+
 ---- Patching table `items`
 ALTER TABLE items RENAME COLUMN description TO name
 /

@@ -509,10 +509,10 @@ class CTriggerPrototype extends CZBXAPI{
 
 // only_true
 		if(!is_null($options['only_true'])){
-
+			$config = select_config();
 			$sql_parts['where']['ot'] = '((t.value='.TRIGGER_VALUE_TRUE.')'.
 									' OR '.
-									'((t.value='.TRIGGER_VALUE_FALSE.') AND (t.lastchange>'.(time() - TRIGGER_FALSE_PERIOD).')))';
+									'((t.value='.TRIGGER_VALUE_FALSE.') AND (t.lastchange>'.(time() -  $config['ok_period']).')))';
 		}
 
 // min_severity

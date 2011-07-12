@@ -25,6 +25,6 @@ extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
 
-void	main_poller_loop(unsigned char p, unsigned char poller_type);
+void	main_poller_loop(unsigned char poller_type);
 
 #endif

@@ -239,7 +239,7 @@ class CJSON{
 
 // Fall back to PHP-only method
 		ini_set('pcre.backtrack_limit', '10000000');
-		
+
 		$this->_level = 0;
 		$result = null;
 
@@ -1054,7 +1054,7 @@ class CJSON{
 
 	/**
 	 *
-	 * The isValid method takes a UTF-16 encoded string and determines ifit is
+	 * The isValid method takes a UTF-16 encoded string and determines if it is
 	 * a syntactically correct JSON text.
 	 *
 	 * It is implemented as a Pushdown Automaton; that means it is a finite
@@ -1236,7 +1236,7 @@ class CJSON{
 	 * The state transition table takes the current state and the current symbol,
 	 * and returns either a new state or an action. A new state is a number between
 	 * 0 and 29. An action is a negative number between -1 and -9. A JSON text is
-	 * accepted ifthe end of the text is in state 9 and mode is MODE_DONE.
+	 * accepted if the end of the text is in state 9 and mode is MODE_DONE.
 	 *
 	 * @return void;
 	 *
@@ -1279,7 +1279,7 @@ class CJSON{
 
 	/**
 	 *
-	 * Push a mode onto the stack. Return false ifthere is overflow.
+	 * Push a mode onto the stack. Return false if there is overflow.
 	 *
 	 * @param int $mode Mode to push onto the stack
 	 *
@@ -1301,7 +1301,7 @@ class CJSON{
 	/**
 	 *
 	 * Pop the stack, assuring that the current mode matches the expectation.
-	 * Return false ifthere is underflow or ifthe modes mismatch.
+	 * Return false if there is underflow or if the modes mismatch.
 	 *
 	 * @param int $mode Mode to pop from the stack
 	 *

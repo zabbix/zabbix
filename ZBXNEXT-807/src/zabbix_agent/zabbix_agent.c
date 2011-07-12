@@ -29,36 +29,25 @@
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Agent";
 const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
-#if !defined(HAVE_GETOPT_LONG)
-const char	*help_message[] = {
-	"Options:",
-	"  -c <file>     absolute path to the configuration file",
-	"  -h            give this help",
-	"  -V            display version number",
-	"  -p            print supported items and exit",
-	"  -t <item>     test specified item and exit",
-	NULL	/* end of text */
-};
-#else
+
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>  absolute path to the configuration file",
 	"  -h --help           give this help",
 	"  -V --version        display version number",
-	"  -p --print          print supported items and exit",
+	"  -p --print          print known items and exit",
 	"  -t --test <item>    test specified item and exit",
 	NULL	/* end of text */
 };
-#endif
 
-struct zbx_option longopts[] =
+static struct zbx_option	longopts[] =
 {
-	{"config",	1,	0,	'c'},
-	{"help",	0,	0,	'h'},
-	{"version",	0,	0,	'V'},
-	{"print",	0,	0,	'p'},
-	{"test",	1,	0,	't'},
-	{0,0,0,0}
+	{"config",	1,	NULL,	'c'},
+	{"help",	0,	NULL,	'h'},
+	{"version",	0,	NULL,	'V'},
+	{"print",	0,	NULL,	'p'},
+	{"test",	1,	NULL,	't'},
+	{NULL}
 };
 
 void	child_signal_handler(int sig)

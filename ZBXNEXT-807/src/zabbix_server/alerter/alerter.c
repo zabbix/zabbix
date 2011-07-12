@@ -136,7 +136,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 void	main_alerter_loop()
 {
 	char			error[MAX_STRING_LEN], *error_esc;
-	int			res, now;
+	int			res;
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_ALERT		alert;
@@ -151,8 +151,6 @@ void	main_alerter_loop()
 	for (;;)
 	{
 		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
-
-		now = time(NULL);
 
 		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid"
 				",mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path"
@@ -206,6 +204,7 @@ void	main_alerter_loop()
 				error_esc = DBdyn_escape_string_len(error, ALERT_ERROR_LEN);
 
 				alert.retries++;
+
 				if (alert.retries < ALERT_MAX_RETRIES)
 				{
 					DBexecute("update alerts set retries=%d,error='%s' where alertid=" ZBX_FS_UI64,

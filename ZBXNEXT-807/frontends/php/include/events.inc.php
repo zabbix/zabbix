@@ -173,7 +173,14 @@ function make_small_eventlist($startEvent){
 			$duration = zbx_date2age($clock);
 		}
 
-		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
+		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
+		// add colors and blinking to span depending on configuration and trigger parameters
+		addTriggerValueStyle(
+			$eventStatusSpan,
+			$event['value'],
+			$event['clock'],
+			$event['acknowledged']
+		);
 
 		$ack = getEventAckState($event, true);
 
@@ -187,7 +194,7 @@ function make_small_eventlist($startEvent){
 				'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 				'action'
 			),
-			$value,
+			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),
 			($config['event_ack_enable'] ? $ack : null),
@@ -231,25 +238,31 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 	$db_events = API::Event()->get($options);
 
 	$lclock = time();
-	foreach($db_events as $id => $event) {
+	foreach($db_events as $event) {
 		$duration = zbx_date2age($lclock, $event['clock']);
 		$lclock = $event['clock'];
 
-		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
+		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
+		// add colors and blinking to span depending on configuration and trigger parameters
+		addTriggerValueStyle(
+			$eventStatusSpan,
+			$event['value'],
+			$event['clock'],
+			$event['acknowledged']
+		);
 
-// ack +++
 		$ack = getEventAckState($event);
-// ---
+
 		$table->addRow(array(
 			zbx_date2str(S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT,$event['clock']),
-			$value,
+			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),
 			$ack
 		));
 	}
 
-return $table;
+	return $table;
 }
 
 function getEventAckState($event, $extBackurl=false){

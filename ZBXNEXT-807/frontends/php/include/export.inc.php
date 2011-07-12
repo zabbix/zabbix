@@ -677,6 +677,10 @@ class zbxXML{
 				unset($sysmap['sysmapid']);
 				$exists = API::Map()->exists(array('name' => $sysmap['name']));
 
+				if(!isset($sysmap['label_format'])){
+					$sysmap['label_format'] = SYSMAP_LABEL_ADVANCED_OFF;
+				}
+
 				if($exists && isset($rules['maps']['exist'])){
 					$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
 					if(empty($db_maps)) throw new Exception(S_NO_PERMISSIONS_FOR_MAP.' ['.$sysmap['name'].'] import');
@@ -781,10 +785,10 @@ class zbxXML{
 				}
 				unset($selement);
 
-				foreach($sysmap['links'] as $lnum => &$link){
+				foreach($sysmap['links'] as &$link){
 					if(!isset($link['linktriggers'])) continue;
 
-					foreach($link['linktriggers'] as $ltnum => &$linktrigger){
+					foreach($link['linktriggers'] as &$linktrigger){
 						$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
 						if(empty($db_triggers)){
 							$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
