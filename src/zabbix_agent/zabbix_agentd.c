@@ -130,6 +130,8 @@ static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
 
+unsigned char	daemon_type = ZBX_DAEMON_TYPE_AGENT;
+
 unsigned char	process_type = 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)

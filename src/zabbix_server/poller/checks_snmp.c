@@ -420,7 +420,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 
 	struct variable_list	*vars;
 
-	int	len, status, running;
+	int	status, running;
 	int	ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(oid:%s,value:%s)", __function_name, OID, value);
@@ -454,7 +454,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 				memcpy(strval, vars->val.string, vars->val_len);
 				strval[vars->val_len] = 0;	/* terminate */
 
-				len = snprint_objid(temp, sizeof(temp), vars->name, vars->name_length);
+				snprint_objid(temp, sizeof(temp), vars->name, vars->name_length);
 				zabbix_log(LOG_LEVEL_DEBUG, "VAR: %s = %s (type=%d)(length = %d)",
 						temp, strval, vars->type, vars->val_len);
 
