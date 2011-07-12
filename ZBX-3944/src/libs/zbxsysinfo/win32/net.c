@@ -369,6 +369,9 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		for (i = 0; i < (int)pIfTable->dwNumEntries; i++)
 		{
+			LPTSTR	wdescr;
+			LPSTR	utf8_descr;
+
 			pIfRow.dwIndex = pIfTable->table[i].dwIndex;
 			if (NO_ERROR != (dwRetVal = GetIfEntry(&pIfRow)))
 			{
@@ -395,13 +398,11 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 			if (j == pIPAddrTable->dwNumEntries)
 				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, 3, " -");
 
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, 2, " ");
-			for (j = 0; j < pIfRow.dwDescrLen; j++)
-				if ('\0' != pIfRow.bDescr[j])
-					zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, 4,
-							"%c", pIfRow.bDescr[j]);
-
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, 2, "\n");
+			wdescr = zbx_acp_to_unicode(pIfRow.bDescr);
+			utf8_descr = zbx_unicode_to_utf8(wdescr);
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, strlen(utf8_descr) + 3, " %s\n", utf8_descr);
+			zbx_free(utf8_descr);
+			zbx_free(wdescr);
 		}
 	}
 
