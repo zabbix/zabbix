@@ -217,7 +217,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 #else
 	char		*name;
 	unsigned char	*msg_end, *msg_ptr, *p;
-	int		num_answers, num_query, q_type, q_class, q_ttl, q_len, value, c, n;
+	int		num_answers, num_query, q_type, q_class, q_len, value, c, n;
 	struct servent	*s;
 	HEADER		*hp;
 	struct protoent	*pr;
@@ -470,7 +470,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		GETSHORT(q_type, msg_ptr);
 		GETSHORT(q_class, msg_ptr);
-		GETLONG(q_ttl, msg_ptr);
+		msg_ptr += INT32SZ;		/* skipping TTL */
 		GETSHORT(q_len, msg_ptr);
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
 

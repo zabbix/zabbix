@@ -259,10 +259,9 @@ static void    zbx_load_config(const char *config_file)
 	}
 }
 
-static zbx_task_t	parse_commandline(int argc, char **argv)
+static void	parse_commandline(int argc, char **argv)
 {
-	zbx_task_t	task = ZBX_TASK_START;
-	char		ch = '\0';
+	char	ch = '\0';
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
@@ -325,21 +324,18 @@ static zbx_task_t	parse_commandline(int argc, char **argv)
 		usage();
 		exit(FAIL);
 	}
-
-	return task;
 }
 
 /* sending a huge amount of values in a single connection is likely to */
 /* take long and hit timeout, so we limit values to 250 per connection */
 #define VALUES_MAX	250
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	FILE			*in;
 	char			in_line[MAX_BUFFER_LEN], hostname[MAX_STRING_LEN], key[MAX_STRING_LEN],
 				key_value[MAX_BUFFER_LEN], clock[32];
-	int			task = ZBX_TASK_START, total_count = 0, succeed_count = 0, buffer_count = 0,
-				read_more = 0, ret = SUCCEED;
+	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = SUCCEED;
 	double			last_send = 0;
 	const char		*p;
 	zbx_thread_args_t	thread_args;
@@ -347,7 +343,7 @@ int main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
-	task = parse_commandline(argc, argv);
+	parse_commandline(argc, argv);
 
 	zbx_load_config(CONFIG_FILE);
 

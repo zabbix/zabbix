@@ -243,7 +243,7 @@ static void	autoreg_host_sender(struct zbx_json *j, int *records)
  ******************************************************************************/
 void	main_datasender_loop()
 {
-	int		now, records, r;
+	int		records, r;
 	double		sec;
 	struct zbx_json	j;
 
@@ -259,7 +259,6 @@ void	main_datasender_loop()
 
 	for (;;)
 	{
-		now = time(NULL);
 		sec = zbx_time();
 
 		zbx_setproctitle("%s [sending data]", get_process_type_string(process_type));

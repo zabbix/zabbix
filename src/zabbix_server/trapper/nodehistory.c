@@ -173,7 +173,7 @@ fail:
 static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *table, const char *record)
 {
 	const char	*r;
-	int		f, len;
+	int		f;
 	DB_EVENT	event;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_record_event()");
@@ -187,7 +187,7 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 		if (NULL == r)
 			goto error;
 
-		len = zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
+		zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 
 		if (0 == strcmp(table->fields[f].name, "eventid")) {
 			ZBX_STR2UINT64(event.eventid, buffer);
