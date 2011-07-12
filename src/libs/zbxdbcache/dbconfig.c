@@ -1797,7 +1797,7 @@ void	DCsync_configuration()
 	DB_RESULT		conf_result;
 
 	int			i;
-	double			sec, isec, hsec, htsec, gmsec, hmsec, ifsec, ssec, csec;
+	double			sec, csec, isec, hsec, htsec, gmsec, hmsec, ifsec, ssec;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
