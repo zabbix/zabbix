@@ -72,7 +72,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					CHECKED_FIELD(siginfo, si_pid),
 					CHECKED_FIELD(siginfo, si_uid),
 					CHECKED_FIELD(siginfo, si_value.sival_int));
-
+#ifdef HAVE_SIGQUEUE
 			if (1 == parent)
 			{
 				if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_value.sival_int))
@@ -109,7 +109,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 				zbx_sigusr_handler(CHECKED_FIELD(siginfo, si_value.sival_int));
 			}
-
+#endif
 			break;
 		case SIGQUIT:
 		case SIGINT:
@@ -326,6 +326,7 @@ int	zbx_sigusr_send(zbx_task_t task)
 {
 	int	ret = FAIL;
 	char	error[256];
+#ifdef HAVE_SIGQUEUE
 	pid_t	pid;
 
 	if (SUCCEED == read_pid_file(CONFIG_PID_FILE, &pid, error, sizeof(error)))
@@ -343,6 +344,9 @@ int	zbx_sigusr_send(zbx_task_t task)
 			zbx_snprintf(error, sizeof(error), "cannot send command to PID [%d]: %s",
 					(int)pid, zbx_strerror(errno));
 	}
+#else
+	zbx_snprintf(error, sizeof(error), "operation is not supported on the given operating system");
+#endif
 
 	if (SUCCEED != ret)
 		printf("%s\n", error);

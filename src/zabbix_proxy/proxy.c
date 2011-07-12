@@ -423,6 +423,7 @@ static void	zbx_load_config()
 	zbx_validate_config();
 }
 
+#ifdef HAVE_SIGQUEUE
 void	zbx_sigusr_handler(zbx_task_t task)
 {
 	switch (task)
@@ -438,6 +439,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
 			break;
 	}
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
