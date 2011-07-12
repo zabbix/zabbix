@@ -1424,8 +1424,11 @@ const ZBX_TABLE *DBget_table(const char *tablename)
 	int	t;
 
 	for (t = 0; NULL != tables[t].table; t++)
+	{
 		if (0 == strcmp(tables[t].table, tablename))
 			return &tables[t];
+	}
+
 	return NULL;
 }
 

@@ -348,6 +348,8 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		{"dchecks"},
 		{"regexps"},
 		{"expressions"},
+		{"groups"},
+		{"config"},
 		{NULL}
 	};
 
@@ -438,6 +440,11 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 			DBadd_condition_alloc(&condition, &condition_alloc, &condition_offset,
 					"t.hostid", hostids, hostids_num);
 		}
+		else if (0 == strcmp(pt[i].table, "groups"))
+		{
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
+					", config r where t.groupid=r.discovery_groupid");
+		}
 		else
 			*condition = '\0';
 
@@ -457,14 +464,10 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
  *                                                                            *
  * Purpose: update configuration table                                        *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tablename, struct zbx_json_parse *jp_obj)
@@ -568,6 +571,11 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 #endif
 			goto db_error;
 	}
+	else if (0 == strcmp(tablename, "groups"))
+	{
+		if (ZBX_DB_OK > DBexecute("delete from config"))
+			goto db_error;
+	}
 
 	p = NULL;
 	sql_offset = 0;
@@ -588,6 +596,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		/* check whether we need to insert a new entry or update an existing */
 		ZBX_STR2UINT64(recid, buf);
 		insert = (SUCCEED == uint64_array_exists(old, old_num, recid) ? 0 : 1);
+		uint64_array_add(&new, &new_alloc, &new_num, recid, 64);
 
 		if (0 != insert)
 		{
@@ -598,6 +607,10 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 			sql_offset--;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, ") values (" ZBX_FS_UI64 ",", recid);
+		}
+		else if (1 == field_count)	/* only primary key given, no update needed */
+		{
+			continue;
 		}
 		else
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "update %s set ", table->table);
@@ -683,8 +696,6 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
 #endif
 		}
-
-		uint64_array_add(&new, &new_alloc, &new_num, recid, 64);
 	}
 
 #ifdef HAVE_ORACLE
