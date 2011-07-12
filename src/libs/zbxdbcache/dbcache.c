@@ -50,7 +50,7 @@ static ZBX_MUTEX	cache_ids_lock;
 static char		*sql = NULL;
 static int		sql_allocated = 65536;
 
-static unsigned char	zbx_process;
+extern unsigned char	daemon_type;
 
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
 
@@ -1330,7 +1330,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		item.units = row[14];
 		item.error = row[15];
 
-		if (0 != (zbx_process & ZBX_PROCESS_PROXY))
+		if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
 		{
 			item.delta = ITEM_STORE_AS_IS;
 			h->keep_history = 1;
@@ -2159,7 +2159,7 @@ int	DCsync_history(int sync_type)
 			if (ZBX_HISTORY_SIZE <= f)
 				f -= ZBX_HISTORY_SIZE;
 
-			if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 			{
 				num = DCskip_items(f, n);
 
@@ -2266,7 +2266,7 @@ int	DCsync_history(int sync_type)
 
 		DBbegin();
 
-		if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 		{
 			DCmass_update_items(history, history_num);
 			DCmass_add_history(history, history_num);
@@ -2283,7 +2283,7 @@ int	DCsync_history(int sync_type)
 
 		DCflush_nextchecks();
 
-		if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 		{
 			LOCK_CACHE;
 
@@ -2776,7 +2776,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 	}
 
 	/* check for low-level discovery (lld) item */
-	if (0 != (ZBX_PROCESS_SERVER & zbx_process) && 0 != (ZBX_FLAG_DISCOVERY & flags))
+	if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type) && 0 != (ZBX_FLAG_DISCOVERY & flags))
 	{
 		DBlld_process_discovery_rule(itemid, value->text);
 		return;
@@ -2831,15 +2831,13 @@ ZBX_MEM_FUNC1_IMPL_MALLOC(__history, history_mem);
 ZBX_MEM_FUNC1_IMPL_MALLOC(__history_text, history_text_mem);
 ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
 
-void	init_database_cache(unsigned char p)
+void	init_database_cache()
 {
 	const char	*__function_name = "init_database_cache";
 	key_t		history_shm_key, history_text_shm_key, trend_shm_key;
 	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_process = p;
 
 	if (-1 == (history_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_ID)) ||
 			-1 == (history_text_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_TEXT_ID)) ||

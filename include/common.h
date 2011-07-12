@@ -476,11 +476,12 @@ typedef enum
        GROUP_STATUS_DISABLED
 } zbx_group_status_type_t;
 
-/* process type */
-#define ZBX_PROCESS_SERVER		0x01
-#define ZBX_PROCESS_PROXY_ACTIVE	0x02
-#define ZBX_PROCESS_PROXY_PASSIVE	0x04
-#define ZBX_PROCESS_PROXY		0x06	/* ZBX_PROCESS_PROXY_ACTIVE | ZBX_PROCESS_PROXY_PASSIVE */
+/* daemon type */
+#define ZBX_DAEMON_TYPE_SERVER		0x01
+#define ZBX_DAEMON_TYPE_PROXY_ACTIVE	0x02
+#define ZBX_DAEMON_TYPE_PROXY_PASSIVE	0x04
+#define ZBX_DAEMON_TYPE_PROXY		0x06	/* ZBX_DAEMON_TYPE_PROXY_ACTIVE | ZBX_DAEMON_TYPE_PROXY_PASSIVE */
+#define ZBX_DAEMON_TYPE_AGENT		0x08
 
 /* maintenance */
 typedef enum
@@ -511,7 +512,7 @@ typedef enum
 typedef enum
 {
 	ZBX_IGNORE_CASE = 0,
-	ZBX_CASE_SENSITIVE	
+	ZBX_CASE_SENSITIVE
 } zbx_case_sensitive_t;
 
 /* HTTP tests statuses */

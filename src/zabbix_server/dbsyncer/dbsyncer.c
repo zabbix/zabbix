@@ -49,7 +49,7 @@ extern int		process_num;
  ******************************************************************************/
 void	main_dbsyncer_loop()
 {
-	int	now, sleeptime, last_sleeptime = -1, num;
+	int	sleeptime, last_sleeptime = -1, num;
 	double	sec;
 	int	retry_up = 0, retry_dn = 0;
 
@@ -67,7 +67,6 @@ void	main_dbsyncer_loop()
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
 
-		now = time(NULL);
 		sec = zbx_time();
 		num = DCsync_history(ZBX_SYNC_PARTIAL);
 		sec = zbx_time() - sec;
