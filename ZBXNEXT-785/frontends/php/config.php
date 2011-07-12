@@ -662,7 +662,7 @@ include_once('include/page_header.php');
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 	}
 	elseif(($_REQUEST['config'] == 14) && (isset($_REQUEST['save']))){
-		$i = 1;
+		$i = 0;
 		foreach($_REQUEST['iconmap']['mappings'] as $iconmappingid => &$mapping){
 			$mapping['iconmappingid'] = $iconmappingid;
 			$mapping['sortorder'] = $i++;

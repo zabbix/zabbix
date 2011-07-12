@@ -24,7 +24,8 @@ ALTER TABLE sysmaps_elements
 	ADD areatype integer DEFAULT '0' NOT NULL,
 	ADD width integer DEFAULT '200' NOT NULL,
 	ADD height integer DEFAULT '200' NOT NULL,
-	ADD viewtype integer DEFAULT '0' NOT NULL;
+	ADD viewtype integer DEFAULT '0' NOT NULL,
+	ADD use_iconmap integer DEFAULT '1' NOT NULL;
 
 DELETE FROM sysmaps_elements WHERE sysmapid NOT IN (SELECT sysmapid FROM sysmaps);
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0;
