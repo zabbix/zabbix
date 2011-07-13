@@ -921,10 +921,10 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 			flag = ZBX_FLAG_VALUES;
 		}
 
-		if (num_param(parameters) == 2)
+		if (2 == num_param(parameters))
 		{
 			if (SUCCEED == get_function_parameter_uint(item->hostid, parameters, 2, &time_shift, &time_shift_flag) &&
-				ZBX_FLAG_SEC == time_shift_flag)
+					ZBX_FLAG_SEC == time_shift_flag)
 			{
 				now -= time_shift;
 				time_shift = 1;
@@ -1477,7 +1477,7 @@ static int	compare_last_and_prev(const DB_ITEM *item, time_t now)
 		if (item->lastvalue_str[i] != item->prevvalue_str[i])
 			return 1;
 	}
-	
+
 	if (ITEM_LASTVALUE_LEN > i || ITEM_VALUE_TYPE_STR == item->value_type)
 		return 0;
 
@@ -1508,7 +1508,7 @@ static int	compare_last_and_prev(const DB_ITEM *item, time_t now)
 clean:
 	zbx_free(last);
 	DBfree_result(result);
-	
+
 	return res;
 }
 
@@ -1966,13 +1966,13 @@ clean:
  ******************************************************************************/
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now)
 {
+	const char	*__function_name = "evaluate_function";
+
 	int		ret;
 	struct tm	*tm = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_function('%s.%s(%s)')",
-			zbx_host_key_string_by_item(item),
-			function,
-			parameter);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s.%s(%s)'",
+			__function_name, zbx_host_key_string_by_item(item), function, parameter);
 
 	*value = '\0';
 
@@ -2075,22 +2075,17 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Unsupported function:%s",
-				function);
-		zabbix_syslog("Unsupported function:%s",
-				function);
+		zabbix_log(LOG_LEVEL_WARNING, "unsupported function:%s", function);
+		zabbix_syslog("unsupported function:%s", function);
 		ret = FAIL;
 	}
 
 	if (SUCCEED == ret)
 		del_zeroes(value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of evaluate_function('%s.%s(%s)',value:'%s'):%s",
-			zbx_host_key_string_by_item(item),
-			function,
-			parameter,
-			value,
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s function:'%s.%s(%s)' value:'%s'",
+			__function_name, zbx_result_string(ret),
+			zbx_host_key_string_by_item(item), function, parameter, value);
 
 	return ret;
 }

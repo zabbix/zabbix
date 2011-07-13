@@ -189,23 +189,24 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 
 		zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 
-		if (0 == strcmp(table->fields[f].name, "eventid")) {
+		if (0 == strcmp(table->fields[f].name, "eventid"))
 			ZBX_STR2UINT64(event.eventid, buffer);
-		} else if (0 == strcmp(table->fields[f].name, "source")) {
+		else if (0 == strcmp(table->fields[f].name, "source"))
 			event.source = atoi(buffer);
-		} else if (0 == strcmp(table->fields[f].name, "object")) {
+		else if (0 == strcmp(table->fields[f].name, "object"))
 			event.object = atoi(buffer);
-		} else if (0 == strcmp(table->fields[f].name, "objectid")) {
+		else if (0 == strcmp(table->fields[f].name, "objectid"))
 			ZBX_STR2UINT64(event.objectid, buffer);
-		} else if (0 == strcmp(table->fields[f].name, "clock")) {
+		else if (0 == strcmp(table->fields[f].name, "clock"))
 			event.clock = atoi(buffer);
-		} else if (0 == strcmp(table->fields[f].name, "value")) {
+		else if (0 == strcmp(table->fields[f].name, "value"))
 			event.value = atoi(buffer);
-		} else if (0 == strcmp(table->fields[f].name, "acknowledged")) {
+		else if (0 == strcmp(table->fields[f].name, "value_changed"))
+			event.value_changed = atoi(buffer);
+		else if (0 == strcmp(table->fields[f].name, "acknowledged"))
 			event.acknowledged = atoi(buffer);
-		} else if (0 == strcmp(table->fields[f].name, "ns")) {
+		else if (0 == strcmp(table->fields[f].name, "ns"))
 			event.ns = atoi(buffer);
-		}
 	}
 
 	return process_event(&event, 0);
@@ -553,7 +554,7 @@ int	node_history(char *data, size_t datalen)
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* nodeid */
 			nodeid=atoi(buffer);
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* tablename */
-			
+
 			if (FAIL == is_direct_slave_node(sender_nodeid))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data from node %d"

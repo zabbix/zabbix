@@ -46,78 +46,65 @@ extern unsigned char	process_type;
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	process_time_functions()
 {
-	const char	*__function_name = "process_time_functions";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*exp, error[MAX_STRING_LEN];
-	zbx_uint64_t	triggerid;
-	int		trigger_type, trigger_value, trigger_flags, exp_value;
-	const char	*trigger_error;
-	zbx_timespec_t	ts;
+	const char		*__function_name = "process_time_functions";
+
+	int			i, value;
+	DC_TRIGGER		*trigger;
+	DC_TRIGGER		*trigger_info = NULL;
+	zbx_vector_ptr_t	trigger_order;
+	char			error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect(
-			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error,t.expression"
-			" from triggers t,functions f,items i,hosts h"
-			" where t.triggerid=f.triggerid"
-				" and f.itemid=i.itemid"
-				" and i.hostid=h.hostid"
-				" and t.status=%d"
-				" and f.function in ('nodata','date','dayofmonth','dayofweek','time','now')"
-				" and i.status=%d"
-				" and h.status=%d"
-				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
-				DB_NODE
-				" order by t.triggerid",
-			TRIGGER_STATUS_ENABLED,
-			ITEM_STATUS_ACTIVE,
-			HOST_STATUS_MONITORED,
-			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
-			DBnode_local("h.hostid"));
+	zbx_vector_ptr_create(&trigger_order);
 
-	DBbegin();
+	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order);
 
-	while (NULL != (row = DBfetch(result)))
+	if (0 != trigger_order.values_num)
 	{
-		ZBX_STR2UINT64(triggerid, row[0]);
-		trigger_type = atoi(row[1]);
-		trigger_value = atoi(row[2]);
-		trigger_flags = atoi(row[3]);
-		trigger_error = row[4];
-		exp = strdup(row[5]);
+		DBbegin();
 
-		zbx_timespec(&ts);
-
-		if (SUCCEED != evaluate_expression(&exp_value, &exp, ts.sec, triggerid, trigger_value, error, sizeof(error)))
+		for (i = 0; i < trigger_order.values_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s", exp, error);
+			trigger = (DC_TRIGGER *)trigger_order.values[i];
 
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_flags,
-					trigger_error, trigger_value, TRIGGER_VALUE_FLAG_UNKNOWN, &ts, error);
+			if (SUCCEED != evaluate_expression(&value, &trigger->expression, trigger->timespec.sec,
+						trigger->triggerid, trigger->value, error, sizeof(error)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s",
+						trigger->expression, error);
+
+				DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value,
+						trigger->value_flags, trigger->old_error, trigger->value,
+						TRIGGER_VALUE_FLAG_UNKNOWN, &trigger->timespec, error);
+			}
+			else
+			{
+				DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value,
+						trigger->value_flags, trigger->old_error, value,
+						TRIGGER_VALUE_FLAG_NORMAL, &trigger->timespec, NULL);
+			}
+
+			zbx_free(trigger->expression);
 		}
-		else
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_flags,
-					trigger_error, exp_value, TRIGGER_VALUE_FLAG_NORMAL, &ts, NULL);
 
-		zbx_free(exp);
+		DBcommit();
 	}
 
-	DBcommit();
-
-	DBfree_result(result);
+	zbx_free(trigger_info);
+	zbx_vector_ptr_destroy(&trigger_order);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-typedef struct zbx_host_maintenance_s
+typedef struct
 {
 	zbx_uint64_t	hostid;
 	time_t		maintenance_from;
@@ -135,11 +122,12 @@ static int	get_host_maintenance_nearestindex(zbx_host_maintenance_t *hm, int hm_
 {
 	int	first_index, last_index, index;
 
-	if (hm_count == 0)
+	if (0 == hm_count)
 		return 0;
 
 	first_index = 0;
 	last_index = hm_count - 1;
+
 	while (1)
 	{
 		index = first_index + (last_index - first_index) / 2;
@@ -173,6 +161,7 @@ static zbx_host_maintenance_t	*get_host_maintenance(zbx_host_maintenance_t **hm,
 	int	hm_index;
 
 	hm_index = get_host_maintenance_nearestindex(*hm, *hm_count, hostid, maintenance_from, maintenanceid);
+
 	if (hm_index < *hm_count && (*hm)[hm_index].hostid == hostid && (*hm)[hm_index].maintenance_from == maintenance_from &&
 			(*hm)[hm_index].maintenanceid == maintenanceid)
 		return &(*hm)[hm_index];
@@ -442,7 +431,7 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		if (value_before == value_inside && value_inside == value_after)
 			continue;
 
-		/* Preparing event for processing */
+		/* preparing event for processing */
 		memset(&event, 0, sizeof(DB_EVENT));
 		event.source = EVENT_SOURCE_TRIGGERS;
 		event.object = EVENT_OBJECT_TRIGGER;
@@ -459,12 +448,13 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 
 static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)
 {
-	typedef struct maintenance_s
+	typedef struct
 	{
 		zbx_uint64_t	hostid;
 		int		maintenance_from;
 		void		*next;
-	} maintenance_t;
+	}
+	maintenance_t;
 
 	const char	*__function_name = "update_maintenance_hosts";
 	int		i;
@@ -574,10 +564,10 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 	zbx_free(sql);
 	zbx_free(ids);
 
-	for (m = maintenances; m != NULL; m = m->next)
+	for (m = maintenances; NULL != m; m = m->next)
 		generate_events(m->hostid, m->maintenance_from, now);
 
-	for (m = maintenances; m != NULL; m = maintenances)
+	for (m = maintenances; NULL != m; m = maintenances)
 	{
 		maintenances = m->next;
 		zbx_free(m);
