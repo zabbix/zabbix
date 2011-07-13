@@ -1128,7 +1128,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 
 	nlen = sizeof(name);
 
-	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr*)&name, &nlen))
+	if (ZBX_TCP_ERROR == getpeername(s->socket, (struct sockaddr *)&name, &nlen))
 	{
 		zbx_set_tcp_strerror("connection rejected, getpeername() failed: %s", strerror_from_system(zbx_sock_last_error()));
 		return FAIL;

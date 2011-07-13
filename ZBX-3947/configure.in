@@ -402,12 +402,12 @@ AC_DEFINE(HAVE_SENSORDEV,1,[Define to 1 if struct 'sensordev' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
-AC_MSG_CHECKING(for struct sockaddr_storage.ss_family support)
+AC_MSG_CHECKING(for field ss_family in struct sockaddr_storage)
 AC_TRY_COMPILE([#include <sys/socket.h>],
 [struct sockaddr_storage ss;
 ss.ss_family = 0;
 ],
-AC_DEFINE(HAVE_SOCKADDR_STORAGE_SS_FAMILY, 1, [Define to 1 if struct 'sockaddr_storage.ss_family' exists.])
+AC_DEFINE(HAVE_SOCKADDR_STORAGE_SS_FAMILY, 1, [Define to 1 if 'sockaddr_storage.ss_family' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -952,7 +952,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])
 		fi
-		
+
 		if test "x$found_ibm_db2" = "xyes"; then
 			have_db="IBM DB2"
 			have_multirow_insert="yes"
@@ -1075,10 +1075,10 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	CFLAGS="${CFLAGS} ${DB_CPPFLAGS}"
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${DB_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${DB_LIBS}"
-	
+
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${DB_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${DB_LIBS}"
-	
+
 	dnl Checking for Jabber libraries
 	JABBER_CHECK_CONFIG()
 	if test "x$want_jabber" = "xyes"; then
@@ -1270,7 +1270,6 @@ dnl *                 Checks for operating systems                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-dnl Check for libperfstat 5.2.0.40 fileset
 AC_MSG_CHECKING(for libperfstat 5.2.0.40 fileset)
 AC_TRY_COMPILE([#include <libperfstat.h>],
 [perfstat_memory_total_t	memstats;
@@ -1280,7 +1279,6 @@ AC_DEFINE(HAVE_AIXOSLEVEL_520004,1,[Define to 1 if libperfstat 5.2.0.40 fileset 
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
-dnl Check for libperfstat 5.3.0.60 fileset
 AC_MSG_CHECKING(for libperfstat 5.3.0.60 fileset)
 AC_TRY_COMPILE([#include <libperfstat.h>],
 [perfstat_partition_total_t	lparstats;
