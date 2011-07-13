@@ -71,6 +71,9 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 
 	for (i = 0; i < pIfTable->dwNumEntries; i++)
 	{
+		LPTSTR	wdescr;
+		LPSTR	utf8_descr;
+
 		pIfRow->dwIndex = pIfTable->table[i].dwIndex;
 		if (NO_ERROR != (dwRetVal = GetIfEntry(pIfRow)))
 		{
@@ -79,15 +82,15 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 			continue;
 		}
 
-		for (j = 0; j < pIfRow->dwDescrLen; j++)
-			if ((char)pIfRow->bDescr[j] != if_name[j])
-				break;
-
-		if (j == pIfRow->dwDescrLen)
-		{
+		wdescr = zbx_acp_to_unicode(pIfRow->bDescr);
+		utf8_descr = zbx_unicode_to_utf8(wdescr);
+		if (0 == strcmp(if_name, utf8_descr))
 			ret = SUCCEED;
+		zbx_free(utf8_descr);
+		zbx_free(wdescr);
+
+		if (SUCCEED == ret)
 			break;
-		}
 
 		for (j = 0; j < pIPAddrTable->dwNumEntries; j++)
 		{
