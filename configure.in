@@ -62,62 +62,62 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
   execinfo.h libperfstat.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
-  #ifdef HAVE_SYS_TYPES_H
-  #  include <sys/types.h>
-  #endif
-  #ifdef HAVE_NETINET_IN_H
-  #  include <netinet/in.h>
-  #endif
-  #ifdef HAVE_ARPA_NAMESER_H
-  #  include <arpa/nameser.h>
-  #endif
-  #ifdef HAVE_NETDB_H
-  #  include <netdb.h>
-  #endif
+#ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_NAMESER_H
+#  include <arpa/nameser.h>
+#endif
+#ifdef HAVE_NETDB_H
+#  include <netdb.h>
+#endif
 ])
 AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
-  #include <stdio.h>
-  #ifdef STDC_HEADERS
-  #  include <stdlib.h>
-  #  include <stddef.h>
-  #else
-  #  ifdef HAVE_STDLIB_H
-  #    include <stdlib.h>
-  #  endif
-  #endif
-  #ifdef HAVE_SYS_TYPES_H
-  #  include <sys/types.h>
-  #endif
-  #ifdef HAVE_SYS_SOCKET_H
-  #  include <sys/socket.h>
-  #endif
-  /* for net/if_mib.h */
-  #ifdef HAVE_NET_IF_H
-  #  include <net/if.h>
-  #endif
+#include <stdio.h>
+#ifdef STDC_HEADERS
+#  include <stdlib.h>
+#  include <stddef.h>
+#else
+#  ifdef HAVE_STDLIB_H
+#    include <stdlib.h>
+#  endif
+#endif
+#ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+#endif
+/* for net/if_mib.h */
+#ifdef HAVE_NET_IF_H
+#  include <net/if.h>
+#endif
 ]) 
 AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
-  #ifdef HAVE_SYS_TYPES_H
-  #  include <sys/types.h>
-  #endif
-  #ifdef HAVE_SYS_PARAM_H
-  #  include <sys/param.h>
-  #endif
+#ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_PARAM_H
+#  include <sys/param.h>
+#endif
 ])
 AC_CHECK_HEADERS(sys/swap.h, [], [], [
-  #ifdef HAVE_SYS_PARAM_H
-  #  include <sys/param.h>
-  #endif
+#ifdef HAVE_SYS_PARAM_H
+#  include <sys/param.h>
+#endif
 ]) 
 AC_CHECK_HEADERS(sys/ucontext.h, [], [], [
-  #ifdef HAVE_SIGNAL_H
-  #  include <signal.h>
-  #endif
+#ifdef HAVE_SIGNAL_H
+#  include <signal.h>
+#endif
 ])
 AC_CHECK_HEADERS(devstat.h, [], [], [
-  #ifdef HAVE_SYS_DKSTAT_H
-  #  include <sys/dkstat.h>
-  #endif
+#ifdef HAVE_SYS_DKSTAT_H
+#  include <sys/dkstat.h>
+#endif
 ])
 
 dnl *****************************************************************
@@ -174,12 +174,12 @@ zbx_socklen_t=
 for arg2 in "struct sockaddr" void; do
   for arg3 in socklen_t size_t int; do
     AC_TRY_COMPILE([
-      #ifdef HAVE_SYS_TYPES_H
-      #  include <sys/types.h>
-      #endif
-      #ifdef HAVE_SYS_SOCKET_H
-      #  include <sys/socket.h>
-      #endif
+#ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+#endif
       extern int getpeername(int sockfd, $arg2 *addr, $arg3 *addrlen);
     ],[
       $arg3 addrlen;
@@ -400,6 +400,15 @@ sensordev.xname[0]='\0';
 sensordev.maxnumt[0]=0;
 ],
 AC_DEFINE(HAVE_SENSORDEV,1,[Define to 1 if struct 'sensordev' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for field ss_family in struct sockaddr_storage)
+AC_TRY_COMPILE([#include <sys/socket.h>],
+[struct sockaddr_storage ss;
+ss.ss_family = 0;
+],
+AC_DEFINE(HAVE_SOCKADDR_STORAGE_SS_FAMILY, 1, [Define to 1 if 'sockaddr_storage.ss_family' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -986,7 +995,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.])
 		fi
-		
+
 		if test "x$found_ibm_db2" = "xyes"; then
 			have_db="IBM DB2"
 			have_multirow_insert="yes"
@@ -1109,10 +1118,10 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	CFLAGS="${CFLAGS} ${DB_CPPFLAGS}"
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${DB_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${DB_LIBS}"
-	
+
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${DB_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${DB_LIBS}"
-	
+
 	dnl Checking for Jabber libraries
 	JABBER_CHECK_CONFIG()
 	if test "x$want_jabber" = "xyes"; then
@@ -1129,7 +1138,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	PROXY_LDFLAGS="${PROXY_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS}"
 
-	dnl Check for libCurl [default - yes]
+	dnl Checking for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
 	if test "x$want_curl" = "xyes"; then
 		if test "x$found_curl" != "xyes"; then
@@ -1312,8 +1321,16 @@ dnl *                 Checks for operating systems                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-dnl Check for libperfstat 5.3.0.60 fileset
-AC_MSG_CHECKING(for AIX OS level 5300-06)
+AC_MSG_CHECKING(for libperfstat 5.2.0.40 fileset)
+AC_TRY_COMPILE([#include <libperfstat.h>],
+[perfstat_memory_total_t	memstats;
+memstats.virt_active = 0;
+],
+AC_DEFINE(HAVE_AIXOSLEVEL_520004,1,[Define to 1 if libperfstat 5.2.0.40 fileset exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for libperfstat 5.3.0.60 fileset)
 AC_TRY_COMPILE([#include <libperfstat.h>],
 [perfstat_partition_total_t	lparstats;
 lparstats.type.b.donate_enabled = 0;
@@ -1322,7 +1339,7 @@ lparstats.busy_donated_purr = 0;
 lparstats.idle_stolen_purr = 0;
 lparstats.busy_stolen_purr = 0;
 ],
-AC_DEFINE(HAVE_AIXOSLEVEL_530006,1,[Define to 1 if AIX OS level 5300-06 exists.])
+AC_DEFINE(HAVE_AIXOSLEVEL_530006,1,[Define to 1 if libperfstat 5.3.0.60 fileset exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
