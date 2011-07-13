@@ -998,6 +998,7 @@ static void	free_event_info(DB_EVENT *event)
 
 static void	execute_escalation(DB_ESCALATION *escalation)
 {
+	const char	*__function_name = "execute_escalation";
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ACTION	action;
@@ -1005,7 +1006,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	char		*error = NULL;
 	int		source = (-1);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In execute_escalation()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect("select source from events where eventid=" ZBX_FS_UI64,
 			escalation->eventid);
@@ -1018,7 +1019,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 
 	if (NULL == error && EVENT_SOURCE_TRIGGERS == source)
 	{
-		/* Trigger disabled? */
+		/* trigger disabled? */
 		result = DBselect("select description,status from triggers where triggerid=" ZBX_FS_UI64,
 				escalation->triggerid);
 		if (NULL == (row = DBfetch(result)))
@@ -1032,7 +1033,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 
 	if (NULL == error && EVENT_SOURCE_TRIGGERS == source)
 	{
-		/* Item disabled? */
+		/* item disabled? */
 		result = DBselect("select i.name from items i,functions f,triggers t"
 				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid"
 				" and i.itemid=f.itemid and i.status=%d",
@@ -1046,7 +1047,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 
 	if (NULL == error && EVENT_SOURCE_TRIGGERS == source)
 	{
-		/* Host disabled? */
+		/* host disabled? */
 		result = DBselect("select h.host from hosts h,items i,functions f,triggers t"
 				" where t.triggerid=" ZBX_FS_UI64 " and t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid and i.hostid=h.hostid and h.status=%d",
@@ -1071,7 +1072,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 					escalation->actionid);
 			break;
 		default:
-			/* Never reached */
+			THIS_SHOULD_NEVER_HAPPEN;
 			return;
 	}
 
@@ -1141,7 +1142,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		zbx_free(error);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of execute_escalation()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	process_escalations(int now)

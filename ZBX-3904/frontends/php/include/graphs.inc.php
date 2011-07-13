@@ -713,8 +713,8 @@
 		if(!is_array($color)) $style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
 		else $style = $color;
 
-		ImageSetStyle($image, $style);
-		ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
+		imagesetstyle($image, $style);
+		imageline($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
 	}
 
 	function DashedRectangle($image,$x1,$y1,$x2,$y2,$color){

@@ -11,14 +11,21 @@ ALTER TABLE sysmap_element_url ADD CONSTRAINT c_sysmap_element_url_1 FOREIGN KEY
 INSERT INTO sysmap_element_url (sysmapelementurlid,selementid,name,url)
 	SELECT selementid,selementid,url,url FROM sysmaps_elements WHERE url<>'';
 
-ALTER TABLE sysmaps_elements MODIFY selementid bigint unsigned NOT NULL,
-			     MODIFY sysmapid bigint unsigned NOT NULL,
-			     MODIFY iconid_off bigint unsigned NULL,
-			     MODIFY iconid_on bigint unsigned NULL,
-			     DROP COLUMN iconid_unknown,
-			     MODIFY iconid_disabled bigint unsigned NULL,
-			     MODIFY iconid_maintenance bigint unsigned NULL,
-			     DROP COLUMN url;
+ALTER TABLE sysmaps_elements
+	MODIFY selementid bigint unsigned NOT NULL,
+	MODIFY sysmapid bigint unsigned NOT NULL,
+	MODIFY iconid_off bigint unsigned NULL,
+	MODIFY iconid_on bigint unsigned NULL,
+	DROP COLUMN iconid_unknown,
+	MODIFY iconid_disabled bigint unsigned NULL,
+	MODIFY iconid_maintenance bigint unsigned NULL,
+	DROP COLUMN url,
+	ADD elementsubtype integer DEFAULT '0' NOT NULL,
+	ADD areatype integer DEFAULT '0' NOT NULL,
+	ADD width integer DEFAULT '200' NOT NULL,
+	ADD height integer DEFAULT '200' NOT NULL,
+	ADD viewtype integer DEFAULT '0' NOT NULL;
+
 DELETE FROM sysmaps_elements WHERE sysmapid NOT IN (SELECT sysmapid FROM sysmaps);
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0;
 UPDATE sysmaps_elements SET iconid_on=NULL WHERE iconid_on=0;

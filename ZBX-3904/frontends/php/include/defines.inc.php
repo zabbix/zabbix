@@ -26,9 +26,6 @@
 	define('ZBX_LOGIN_ATTEMPTS',			5);
 	define('ZBX_LOGIN_BLOCK',				30); // sec
 
-	define('TRIGGER_FALSE_PERIOD',			1800);	// 30min, 0 - disable
-	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
-
 	define('ZBX_MIN_PERIOD',				3600);			// 1 hour
 	define('ZBX_MAX_PERIOD',				2*365*86400);	// ~2 years
 	define('ZBX_PERIOD_DEFAULT',			3600);			// 1 hour
@@ -292,6 +289,14 @@
 	define('SYSMAP_ELEMENT_TYPE_TRIGGER',	2);
 	define('SYSMAP_ELEMENT_TYPE_HOST_GROUP',3);
 	define('SYSMAP_ELEMENT_TYPE_IMAGE',		4);
+
+	define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP', 0);
+	define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS', 1);
+
+	define('SYSMAP_ELEMENT_AREA_TYPE_FIT', 0);
+	define('SYSMAP_ELEMENT_AREA_TYPE_CUSTOM', 1);
+
+	define('SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID', 0);
 
 	define('SYSMAP_ELEMENT_ICON_ON',			0);
 	define('SYSMAP_ELEMENT_ICON_OFF',			1);

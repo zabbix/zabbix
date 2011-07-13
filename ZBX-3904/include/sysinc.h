@@ -330,15 +330,6 @@
 #	include <lber.h>
 #endif
 
-#ifdef HAVE_GETOPT_H
-#	ifdef HAVE_GETOPT_LONG
-#		if !defined(_GNU_SOURCE)
-#			define _GNU_SOURCE
-#		endif
-#		include <getopt.h>
-#	endif
-#endif
-
 #ifdef HAVE_SYS_IPC_H
 #	include <sys/ipc.h>
 #endif

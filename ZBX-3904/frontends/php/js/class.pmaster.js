@@ -1,5 +1,6 @@
 /*
-** Copyright (C) 2010-2011 Zabbix SIA
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -15,9 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-// JavaScript Document
 
-var PMasters = new Array();				// obj instances 
+var PMasters = [];				// obj instances
 function initPMaster(pmid, args){		// use this function to initialize PMaster
 	if(typeof(PMasters[pmid]) == 'undefined'){
 		PMasters[pmid] = new CPMaster(pmid,args);
@@ -25,28 +25,27 @@ function initPMaster(pmid, args){		// use this function to initialize PMaster
 return pmid;
 }
 
-// Puppet master Class
 // Author: Aly
 var CPMaster = Class.create(CDebug,{
 pmasterid:			0,				// PMasters reference id
-dolls:				new Array(),	// list of updated objects
+dolls:				[],	// list of updated objects
 
 initialize: function($super, pmid, obj4upd){
 	this.pmasterid = pmid;
 	$super('CPMaster['+pmid+']');
 //--
-	
-	var doll = new Array();
+
+	var doll = [];
 	for(var id in obj4upd){
 		if((typeof(obj4upd[id]) != 'undefined') && (!is_null(obj4upd[id]))){
 			doll = obj4upd[id];
-			
+
 			if(typeof(doll['frequency']) == 'undefined')	doll['frequency'] = 60;
 			if(typeof(doll['url']) == 'undefined') 			doll['url'] = location.href;
 			if(typeof(doll['counter']) == 'undefined') 		doll['counter'] = 0;
 			if(typeof(doll['darken']) == 'undefined') 		doll['darken'] = 0;
-			if(typeof(doll['params']) == 'undefined') 		doll['params'] = new Array();
-			
+			if(typeof(doll['params']) == 'undefined') 		doll['params'] = [];
+
 			this.addStartDoll(id, doll.frequency, doll.url, doll.counter, doll.darken, doll.params);
 		}
 	}
@@ -55,20 +54,20 @@ initialize: function($super, pmid, obj4upd){
 addStartDoll: function(domid,frequency,url,counter,darken,params){
 	this.addDoll(domid,frequency,url,counter,darken,params);
 	this.dolls[domid].startDoll();
-	
+
 return this.dolls[domid];
 },
 
 addDoll: function(domid,frequency,url,counter,darken,params){
 	this.debug('addDoll', domid);
-	
-	var obj = document.getElementById(domid);
-	if((typeof(obj) == 'undefined')) return false; 
 
-	if(typeof(this.dolls[domid]) != 'undefined'){ 
+	var obj = document.getElementById(domid);
+	if((typeof(obj) == 'undefined')) return false;
+
+	if(typeof(this.dolls[domid]) != 'undefined'){
 		return this.dolls[domid];
 	}
-	
+
 	var obj4update = {
 		'domid': 		domid,
 		'url': 			url,
@@ -78,31 +77,31 @@ addDoll: function(domid,frequency,url,counter,darken,params){
 		'lastupdate': 	0,
 		'counter': 		0,
 		'ready': 		true
-	}
+	};
 
 	this.dolls[domid] = new CDoll(obj4update);
 	this.dolls[domid]._pmasterid = this.pmasterid;
-	
+
 return this.dolls[domid];
 },
 
 rmvDoll: function(domid){
 	this.debug('rmvDoll', domid);
-	
+
 	if((typeof(this.dolls[domid]) != 'undefined') && (!is_null(this.dolls[domid]))){
 		this.dolls[domid].pexec.stop();
 		this.dolls[domid].pexec = null;
-		
+
 		this.dolls[domid].rmvDarken();
-		
+
 		try{delete(this.dolls[domid]);} catch(e){this.dolls[domid] = null;}
 	}
 },
 
 startAllDolls: function(){
 	this.debug('startAllDolls');
-	
-	for(domid in this.dolls){
+
+	for(var domid in this.dolls){
 		if((typeof(this.dolls[domid]) != 'undefined') && (!is_null(this.dolls[domid]))){
 			this.dolls[domid].startDoll();
 		}
@@ -111,8 +110,8 @@ startAllDolls: function(){
 
 stopAllDolls: function(){
 	this.debug('stopAllDolls');
-	
-	for(domid in this.dolls){
+
+	for(var domid in this.dolls){
 		if((typeof(this.dolls[domid]) != 'undefined') && (!is_null(this.dolls[domid]))){
 			this.dolls[domid].stopDoll();
 		}
@@ -121,16 +120,14 @@ stopAllDolls: function(){
 
 clear: function(){
 	this.debug('clear');
-	
-	for(domid in this.dolls){
+
+	for(var domid in this.dolls){
 		this.rmvDoll(domid);
 	}
-	this.dolls = new Array();
+	this.dolls = [];
 }
 });
 
-// JavaScript Document
-// DOM obj light loader (DOLL)
 // Author: Aly
 var CDoll = Class.create(CDebug,{
 _pmasterid:		0,			// PMasters id to which doll belongs
@@ -175,9 +172,9 @@ startDoll: function(){
 },
 
 restartDoll: function(){
-	this.debug('restartDoll');	
+	this.debug('restartDoll');
 	if(!is_null(this.pexec)){
-		this.pexec.stop();		
+		this.pexec.stop();
 		try{delete(this.pexec);} catch(e){this.pexec = null;}
 		this.pexec = null;
 	}
@@ -187,9 +184,9 @@ restartDoll: function(){
 
 stopDoll: function(){
 	this.debug('stopDoll');
-	
+
 	if(!is_null(this.pexec)){
-		this.pexec.stop();		
+		this.pexec.stop();
 		try{delete(this.pexec);} catch(e){this.pexec = null;}
 		this.pexec = null;
 	}
@@ -249,13 +246,13 @@ params: function(params_){
 
 check4Update: function(){
 	this.debug('check4Update');
-	
+
 	var now = parseInt(new Date().getTime()/1000);
 
 //SDI((this._lastupdate + this._frequency)+' < '+(now + this.min_freq));
 	if(this._ready && ((this._lastupdate + this._frequency) < (now + this.min_freq))){ //
 		this.update();
-		this._lastupdate = now; 
+		this._lastupdate = now;
 	}
 },
 
@@ -263,10 +260,10 @@ update: function(){
 	this.debug('update');
 
 	this._ready = false;
-	
+
 	if(this._counter == 1) this.pexec.stop();
 	if(this._darken) this.setDarken();
-	
+
 	var url = new Curl(this._url);
 	url.setArgument('upd_counter', this.counter());
 	url.setArgument('pmasterid', this.pmasterid());
@@ -288,7 +285,7 @@ onSuccess: function(resp){
 	this.rmwDarken();
 	this.updateSortable();
 
-	var headers = resp.getAllResponseHeaders(); 
+	var headers = resp.getAllResponseHeaders();
 //alert(headers);
 	if(headers.indexOf('Ajax-response: false') > -1){
 		return false;
@@ -304,7 +301,7 @@ onSuccess: function(resp){
 
 onFailure: function(resp){
 	this.debug('onFailure');
-	
+
 	this.rmwDarken();
 	this._ready = true;
 	this.notify(false, this._pmasterid, this._domid, this._lastupdate, this.counter());
@@ -312,21 +309,21 @@ onFailure: function(resp){
 
 setDarken: function(){
 	this.debug('setDarken');
-	
+
 	if(is_null(this._domobj)) return false;
-	
+
 	if(is_null(this._domdark)){
-		this._domdark = document.createElement('div');		
+		this._domdark = document.createElement('div');
 		document.body.appendChild(this._domdark);
 		this._domdark.className = 'onajaxload';
 	}
-	
+
 	var obj_params = getPosition(this._domobj);
 	obj_params.height = this._domobj.offsetHeight;
 	obj_params.width = this._domobj.offsetWidth;
-	
+
 	Element.extend(this._domdark);
-	this._domdark.setStyle({'top': obj_params.top+'px', 
+	this._domdark.setStyle({'top': obj_params.top+'px',
 							'left': obj_params.left+'px',
 							'width': obj_params.width+'px',
 							'height': obj_params.height+'px'
@@ -335,10 +332,10 @@ setDarken: function(){
 
 rmwDarken: function(){
 	this.debug('rmvDarken');
-	
+
 	if(!is_null(this._domdark)){
 		this._domdark.style.cursor = 'auto';
-		
+
 		document.body.removeChild(this._domdark);
 		this._domdark = null;
 	}
@@ -347,15 +344,19 @@ rmwDarken: function(){
 updateSortable: function(){
 	if(empty(jQuery(".column"))) return false;
 
-	var widgets = jQuery(".column").sortable({
-		connectWith: ".column",
-        handle: 'div.header',
-        forcePlaceholderSize: true,
-        placeholder: 'widget ui-corner-all ui-sortable-placeholder',
-        opacity: '0.8',
-		update: function(e, ui){jQuery(".column").portletState("save", {"name": "dashboard"});}
-	}).portletState("load", {"name": "dashboard"})
-	.children('div').children('div.header').addClass('move');
+	jQuery(".column")
+		.sortable({
+			connectWith: ".column",
+			handle: 'div.header',
+			forcePlaceholderSize: true,
+			placeholder: 'widget ui-corner-all ui-sortable-placeholder',
+			opacity: '0.8',
+			update: function(){jQuery(".column").portletState("save", {"name": "dashboard"});}
+		})
+		.portletState("load", {"name": "dashboard"})
+		.children('div')
+		.children('div.header')
+		.addClass('move');
 
 //	jQuery(".column").disableSelection();
 }
