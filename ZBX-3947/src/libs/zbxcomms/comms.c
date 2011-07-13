@@ -1154,7 +1154,11 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 			hints.ai_family = PF_UNSPEC;
 			if (0 == getaddrinfo(start, NULL, &hints, &ai))
 			{
+#ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
 				if (ai->ai_family == name.ss_family)
+#else
+				if (ai->ai_family == name.__ss_family)
+#endif
 				{
 					switch (ai->ai_family)
 					{

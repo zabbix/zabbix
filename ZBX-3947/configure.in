@@ -402,6 +402,16 @@ AC_DEFINE(HAVE_SENSORDEV,1,[Define to 1 if struct 'sensordev' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+AC_MSG_CHECKING(for struct sockaddr_storage.ss_familiy support)
+AC_TRY_COMPILE([#include <sys/socket.h>],
+[
+	struct sockaddr_storage ss;
+	ss.ss_family = 0;
+],
+AC_DEFINE(HAVE_SOCKADDR_STORAGE_SS_FAMILY, 1, [Define to 1 if struct 'sockaddr_storage.ss_familiy' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 AC_MSG_CHECKING(for field mem_unit in struct sysinfo)
 AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 [struct sysinfo sysinfo;
@@ -1086,7 +1096,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	PROXY_LDFLAGS="${PROXY_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS}"
 
-	dnl Check for libCurl [default - yes]
+	dnl Checking for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
 	if test "x$want_curl" = "xyes"; then
 		if test "x$found_curl" != "xyes"; then
