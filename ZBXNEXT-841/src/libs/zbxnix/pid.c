@@ -81,21 +81,19 @@ int	create_pid_file(const char *pidfile)
 
 int	read_pid_file(const char *pidfile, pid_t *pid, char *error, size_t max_error_len)
 {
-	int	fd, ret = FAIL;
-	char	buf[MAX_ID_LEN];
+	int	ret = FAIL;
+	FILE	*fpid;
 
-	if (-1 == (fd = open(pidfile, O_RDONLY)))
+	if (NULL == (fpid = fopen(pidfile, "r")))
 	{
 		zbx_snprintf(error, max_error_len, "cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
 		return ret;
 	}
 
-	if (-1 != read(fd, buf, sizeof(buf)))
-	{
-		if (1 == sscanf(buf, "%d", (int *)pid))
-			ret = SUCCEED;
-	}
-	close(fd);
+	if (1 == fscanf(fpid, "%d", (int *)pid))
+		ret = SUCCEED;
+
+	zbx_fclose(fpid);
 
 	return ret;
 }

@@ -13,7 +13,9 @@ ZJP = bin/zabbix-java-proxy-$(VERSION).jar
 LIB = lib/org-json-2010-12-28.jar:lib/logback-core-0.9.27.jar:lib/logback-classic-0.9.27.jar:lib/slf4j-api-1.6.1.jar
 JUNIT = tests/junit-4.8.2.jar
 
-all: class
+all: $(ZJP)
+
+$(ZJP): class src/com/zabbix/proxy/*.java
 	$(JAVAC) -d class/src -classpath $(LIB) src/com/zabbix/proxy/*.java
 	$(JAR) cf $(ZJP) -C class/src .
 

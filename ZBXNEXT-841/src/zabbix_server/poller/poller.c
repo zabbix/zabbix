@@ -45,7 +45,6 @@
 
 #define MAX_BUNCH_ITEMS	32
 
-static unsigned char	zbx_process;
 extern unsigned char	process_type;
 extern int		process_num;
 
@@ -680,7 +679,7 @@ exit:
 	return num;
 }
 
-void	main_poller_loop(unsigned char p, unsigned char poller_type)
+void	main_poller_loop(unsigned char poller_type)
 {
 	int		nextcheck, sleeptime, processed;
 	double		sec;
@@ -689,8 +688,6 @@ void	main_poller_loop(unsigned char p, unsigned char poller_type)
 			get_process_type_string(process_type), process_num);
 
 	set_child_signal_handler();
-
-	zbx_process = p;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

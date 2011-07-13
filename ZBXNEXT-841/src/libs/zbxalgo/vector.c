@@ -38,7 +38,7 @@ static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *v
 	}													\
 	else if (vector->values_num == vector->values_alloc)							\
 	{													\
-		vector->values_alloc = vector->values_alloc * ARRAY_GROWTH_FACTOR;				\
+		vector->values_alloc = MAX(vector->values_alloc + 1, vector->values_alloc * ARRAY_GROWTH_FACTOR); \
 		vector->values = vector->mem_realloc_func(vector->values, vector->values_alloc * sizeof(__type)); \
 	}													\
 }														\
@@ -99,9 +99,25 @@ void	zbx_vector_ ## __id ## _remove_noorder(zbx_vector_ ## __id ## _t *vector, i
 														\
 void	zbx_vector_ ## __id ## _sort(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
 {														\
-	if (0 != vector->values_num)										\
+	if (2 <= vector->values_num)										\
 	{													\
 		qsort(vector->values, vector->values_num, sizeof(__type), compare_func);			\
+	}													\
+}														\
+														\
+void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
+{														\
+	if (2 <= vector->values_num)										\
+	{													\
+		int	i, j = 1;										\
+														\
+		for (i = 1; i < vector->values_num; i++)							\
+		{												\
+			if (0 != compare_func(&vector->values[i - 1], &vector->values[i]))			\
+				vector->values[j++] = vector->values[i];					\
+		}												\
+														\
+		vector->values_num = j;										\
 	}													\
 }														\
 														\
@@ -125,16 +141,16 @@ int	zbx_vector_ ## __id ## _lsearch(zbx_vector_ ## __id ## _t *vector, __type va
 	{													\
 		int	c = compare_func(&vector->values[*index], &value);					\
 														\
-		if (c < 0)											\
+		if (0 > c)											\
 		{												\
 			(*index)++;										\
 			continue;										\
 		}												\
 														\
-		if (c == 0)											\
+		if (0 == c)											\
 			return SUCCEED;										\
 														\
-		if (c > 0)											\
+		if (0 < c)											\
 			break;											\
 	}													\
 														\
@@ -177,3 +193,5 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 
 ZBX_VECTOR_IMPL(uint64, zbx_uint64_t);
 ZBX_VECTOR_IMPL(str, char *);
+ZBX_VECTOR_IMPL(ptr, void *);
+ZBX_VECTOR_IMPL(ptr_pair, zbx_ptr_pair_t);

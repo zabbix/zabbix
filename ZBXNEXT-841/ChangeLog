@@ -2,6 +2,7 @@
 Changes for 1.9.5
 
 New features:
+ - [ZBXNEXT-807] implemented configuration cache for triggers (asaveljevs)
  - [ZBXNEXT-674] added host area functionality for maps (Aly, Vedmak)
  - [ZBXNEXT-738] Added configurable colors and blinking for alarm states OK/PROBLEM (KB)
  - [ZBXNEXT-827] Move misc/conf to the top level source directory (Richlv)

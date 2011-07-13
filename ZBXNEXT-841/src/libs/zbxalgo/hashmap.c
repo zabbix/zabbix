@@ -41,7 +41,7 @@ static void	__hashmap_ensure_free_entry(zbx_hashmap_t *hm, ZBX_HASHMAP_SLOT_T *s
 	}
 	else if (slot->entries_num == slot->entries_alloc)
 	{
-		slot->entries_alloc = slot->entries_alloc * ARRAY_GROWTH_FACTOR;
+		slot->entries_alloc = MAX(slot->entries_alloc + 1, slot->entries_alloc * ARRAY_GROWTH_FACTOR);
 		slot->entries = hm->mem_realloc_func(slot->entries, slot->entries_alloc * sizeof(ZBX_HASHMAP_ENTRY_T));
 	}
 }
@@ -151,7 +151,7 @@ void	zbx_hashmap_set(zbx_hashmap_t *hm, zbx_uint64_t key, int value)
 			int			inc_slots, s;
 			ZBX_HASHMAP_SLOT_T	*new_slot;
 
-			inc_slots = next_prime(hm->num_slots * SLOT_GROWTH_FACTOR);
+			inc_slots = next_prime(MAX(hm->num_slots + 1, hm->num_slots * SLOT_GROWTH_FACTOR));
 
 			hm->slots = hm->mem_realloc_func(hm->slots, inc_slots * sizeof(ZBX_HASHMAP_SLOT_T));
 			memset(hm->slots + hm->num_slots, 0, (inc_slots - hm->num_slots) * sizeof(ZBX_HASHMAP_SLOT_T));
