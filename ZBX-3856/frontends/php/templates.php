@@ -252,10 +252,12 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-/**********************************/
-/* <<<--- TEMPLATE ACTIONS --->>> */
-/**********************************/
-// unlink, unlink_and_clear
+	/**********************************/
+	/* <<<--- TEMPLATE ACTIONS --->>> */
+	/**********************************/
+	/**
+	 * Unlink, unlink_and_clear
+	 */
 	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
@@ -268,19 +270,24 @@ include_once('include/page_header.php');
 		}
 		foreach($unlink_templates as $id) unset($_REQUEST['templates'][$id]);
 	}
-// clone
+	/**
+	 * Clone
+	 */
 	else if(isset($_REQUEST['clone']) && isset($_REQUEST['templateid'])){
 		unset($_REQUEST['templateid']);
 		$_REQUEST['form'] = 'clone';
 	}
-// full_clone
+	/**
+	 * Full_clone
+	 */
 	else if(isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])){
 		$_REQUEST['form'] = 'full_clone';
 		$_REQUEST['hosts'] = array();
 	}
-// save
+	/**
+	 * Save
+	 */
 	else if(isset($_REQUEST['save'])){
-
 		$groups = get_request('groups', array());
 		$hosts = get_request('hosts', array());
 		$templates = get_request('templates', array());
@@ -306,7 +313,7 @@ include_once('include/page_header.php');
 			$msg_fail = S_CANNOT_ADD_TEMPLATE;
 		}
 
-		try {
+		try{
 			DBstart();
 
 			// create new group
@@ -339,7 +346,7 @@ include_once('include/page_header.php');
 				'macros' => $macros
 			);
 
-// CREATE/UPDATE TEMPLATE {{{
+			// CREATE/UPDATE TEMPLATE
 			if($templateid){
 				$created = 0;
 				$template['templateid'] = $templateid;
@@ -361,19 +368,17 @@ include_once('include/page_header.php');
 					throw new Exception();
 				}
 			}
-// }}} CREATE/UPDATE TEMPLATE
 
-// FULL_CLONE {
-
+			// FULL_CLONE
 			if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
-// Host applications
+				// Host applications
 				$sql = 'SELECT * FROM applications WHERE hostid='.$clone_templateid.' AND templateid=0';
 				$res = DBselect($sql);
 				while($db_app = DBfetch($res)){
 					add_application($db_app['name'], $templateid, 0);
 				}
 
-// Host items
+				// Host items
 				$sql = 'SELECT DISTINCT i.itemid, i.description '.
 						' FROM items i '.
 						' WHERE i.hostid='.$clone_templateid.
@@ -386,10 +391,10 @@ include_once('include/page_header.php');
 				}
 				if(!$result) throw new Exception();
 
-// Host triggers
+				// Host triggers
 				if(!copy_triggers($clone_templateid, $templateid)) throw new Exception();
 
-// Host graphs
+				// Host graphs
 				$options = array(
 					'hostids' => $clone_templateid,
 					'inherited' => 0,
@@ -403,9 +408,11 @@ include_once('include/page_header.php');
 				if(!$result) throw new Exception();
 			}
 
-			$result = DBend(true);
-// }
-			show_messages($result, $msg_ok, $msg_fail);
+			if(!DBend(true)){
+				throw new Exception();
+			}
+
+			show_messages(true, $msg_ok, $msg_fail);
 
 			if($created){
 				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templateid, $template_name, 'hosts', NULL, NULL);
@@ -421,7 +428,9 @@ include_once('include/page_header.php');
 
 		unset($_REQUEST['save']);
 	}
-// delete, delete_and_clear
+	/**
+	 * Delete, delete and clear
+	 */
 	else if((isset($_REQUEST['delete']) || isset($_REQUEST['delete_and_clear'])) && isset($_REQUEST['templateid'])){
 		$unlink_mode = false;
 		if(isset($_REQUEST['delete'])){
@@ -436,13 +445,15 @@ include_once('include/page_header.php');
 
 		show_messages($result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
 		if($result){
-/*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$host['host'].']');*/
+		/*	add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$host['host'].']');*/
 			unset($_REQUEST['form']);
 			unset($_REQUEST['templateid']);
 		}
 		unset($_REQUEST['delete']);
 	}
-// ---------- GO ---------
+	/**
+	 * Go: delete, delete and clear
+	 */
 	else if(str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])){
 		$unlink_mode = false;
 		if($_REQUEST['go'] == 'delete'){
@@ -531,7 +542,7 @@ include_once('include/page_header.php');
 			}
 
 			if(($templateid > 0) && !isset($_REQUEST['form_refresh'])){
-	// get template groups from db
+				// get template groups from db
 				$options = array(
 					'hostids' => $templateid,
 					'editable' => 1
@@ -539,7 +550,7 @@ include_once('include/page_header.php');
 				$groups = CHostGroup::get($options);
 				$groups = zbx_objectValues($groups, 'groupid');
 
-	// get template hosts from db
+				// get template hosts from db
 				$params = array(
 					'templateids' => $templateid,
 					'editable' => 1,
