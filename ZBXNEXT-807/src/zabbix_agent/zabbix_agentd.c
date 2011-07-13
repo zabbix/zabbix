@@ -550,7 +550,7 @@ void	zbx_on_exit()
 	exit(SUCCEED);
 }
 
-#ifdef ZABBIX_DAEMON
+#if defined(HAVE_SIGQUEUE) && defined(ZABBIX_DAEMON)
 void	zbx_sigusr_handler(zbx_task_t task)
 {
 	/* nothing to do */

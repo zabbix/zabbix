@@ -801,6 +801,7 @@ AC_REPLACE_FUNCS(getloadavg)
 AC_CHECK_FUNCS(hstrerror)
 AC_CHECK_FUNCS(getenv)
 AC_CHECK_FUNCS(putenv)
+AC_CHECK_FUNCS(sigqueue)
 
 dnl *****************************************************************
 dnl *                                                               *
