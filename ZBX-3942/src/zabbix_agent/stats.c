@@ -185,6 +185,7 @@ void	init_collector_data()
 	collector->cpus.count = cpu_count;
 #ifdef _AIX
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
+	collector->vmstat_enabled = 0;
 #endif
 
 #endif	/* _WINDOWS */
@@ -267,7 +268,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #endif
 		collect_stats_diskdevices(&(collector->diskdevices));
 #ifdef _AIX
-		collect_vmstat_data(&collector->vmstat);
+		if (1 == collector->vmstat_enabled)
+			collect_vmstat_data(&collector->vmstat);
 #endif
 		zbx_setproctitle("collector [sleeping for 1 seconds]");
 		zbx_sleep(1);

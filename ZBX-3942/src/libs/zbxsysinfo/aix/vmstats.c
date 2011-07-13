@@ -32,6 +32,14 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		return SYSINFO_RET_FAIL;
 	}
 
+	/* if vmstat is disabled in collector get first data to return and enable it */
+	if (0 == collector->vmstat_enabled)
+	{
+		collect_vmstat_data(&collector->vmstat);
+
+		collector->vmstat_enabled = 1;
+	}
+
 	nparams = num_param(param);
 
 	if (nparams > 2)

@@ -40,6 +40,7 @@ typedef struct
 #endif	/* _WINDOWS */
 #ifdef _AIX
 	ZBX_VMSTAT_DATA		vmstat;
+	int			vmstat_enabled;
 #endif	/* _AIX */
 }
 ZBX_COLLECTOR_DATA;

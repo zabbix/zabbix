@@ -108,7 +108,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		return;
 	}
 
-	if (last_clock && now > last_clock)
+	if (now > last_clock)
 	{
 		/* --- kthr --- */
 		vmstat->kthr_r = (double)(cpustats.runque - last_runque) / (double)(now - last_clock);
