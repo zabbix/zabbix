@@ -396,7 +396,7 @@ int	main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
-	/* Parse the command-line. */
+	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
 		switch (ch)
@@ -418,9 +418,7 @@ int	main(int argc, char **argv)
 				exit(-1);
 				break;
 			case 'n':
-				nodeid = 0;
-				if (zbx_optarg)
-					nodeid = atoi(zbx_optarg);
+				nodeid = (NULL == zbx_optarg ? 0 : atoi(zbx_optarg));
 				task = ZBX_TASK_CHANGE_NODEID;
 				break;
 			case 'V':
@@ -437,7 +435,7 @@ int	main(int argc, char **argv)
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = zbx_strdup(CONFIG_FILE, "/etc/zabbix/zabbix_server.conf");
 
-	/* Required for simple checks */
+	/* required for simple checks */
 	init_metrics();
 
 	zbx_load_config();
@@ -564,8 +562,9 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
-	/* Need to set trigger status to UNKNOWN since last run */
+	/* need to set trigger status to UNKNOWN since last run */
 	DBupdate_triggers_status_after_restart();
+
 	DBclose();
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))
