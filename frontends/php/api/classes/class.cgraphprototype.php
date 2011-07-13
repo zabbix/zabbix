@@ -1018,7 +1018,7 @@ COpt::memoryPick();
 
 			DB::delete('screens_items', array(
 				'resourceid'=>$graphids,
-				'resourcetype='=>SCREEN_RESOURCE_GRAPH
+				'resourcetype'=>SCREEN_RESOURCE_GRAPH
 			));
 
 			DB::delete('profiles', array(

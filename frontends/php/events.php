@@ -614,8 +614,8 @@ include_once('include/page_header.php');
 				$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
 
 				$tr_desc = new CSpan($description,'pointer');
-				$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
-										" new Array({'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}),".
+				$tr_desc->addAction('onclick', "create_mon_trigger_menu(event, ".
+										" [{'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}],".
 										zbx_jsvalue($items, true).");");
 
 // Duration
@@ -625,6 +625,15 @@ include_once('include/page_header.php');
 				else
 					$event['duration'] = zbx_date2age($event['clock']);
 
+				$statusSpan = new CSpan(trigger_value2str($event['value']));
+				// add colors and blinking to span depending on configuration and trigger parameters
+				addTriggerValueStyle(
+					$statusSpan,
+					$event['value'],
+					$event['clock'],
+					$event['acknowledged']
+				);
+
 				$table->addRow(array(
 					new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
@@ -633,7 +642,7 @@ include_once('include/page_header.php');
 					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 					$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 					new CSpan($tr_desc, 'link_menu'),
-					new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value'])),
+					$statusSpan,
 					getSeverityCell($trigger['priority'], null, !$event['value']),
 					$event['duration'],
 					($config['event_ack_enable'])?$ack:NULL,
@@ -687,6 +696,7 @@ include_once('include/page_header.php');
 		'periodFixed' => CProfile::get('web.events.timelinefixed', 1)
 	);
 
+	zbx_add_post_js('jqBlink.init();');
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 	zbx_add_post_js('timeControl.processObjects();');
 

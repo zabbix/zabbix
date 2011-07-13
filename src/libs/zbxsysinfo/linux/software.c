@@ -148,10 +148,10 @@ int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, A
 		if ('\0' != *manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, NULL, 0, CONFIG_TIMEOUT) &&
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT) &&
 				'\0' != *buf)	/* consider PMS present, if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, NULL, 0, CONFIG_TIMEOUT))
+			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), CONFIG_TIMEOUT))
 				continue;
 
 			ret = SYSINFO_RET_OK;

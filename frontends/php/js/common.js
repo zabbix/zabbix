@@ -16,7 +16,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-// javascript document
 
 // jQuery no conflict
 if(typeof(jQuery) != 'undefined'){
@@ -29,7 +28,6 @@ var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
 var IE9 = (agt.indexOf("msie 9.0") != -1) && document.all && !OP;
 var IE8 = (agt.indexOf("msie 8.0") != -1) && document.all && !OP;
 var IE7 = (agt.indexOf("msie 7.0") != -1) && document.all && !OP;
-var IE6 = (agt.indexOf("msie 6.0") != -1) && document.all && !OP;
 var CR = (agt.indexOf("chrome") != -1);
 var SF = (agt.indexOf("safari") != -1) && !CR;
 var WK = (agt.indexOf("applewebkit") != -1);
@@ -40,7 +38,6 @@ var MC = (agt.indexOf("mac") != -1);
 function checkBrowser(){
  if(OP) alert('Opera');
  if(IE) alert('IE');
- if(IE6) alert('IE6');
  if(IE7) alert('IE7');
  if(IE8) alert('IE8');
  if(IE9) alert('IE9');
@@ -138,7 +135,7 @@ function SDJ(obj, name){
 
 	var debug = '';
 
-	var name = name || 'none';
+	name = name || 'none';
 	for(var key in obj){
 		if(typeof(obj[key]) == name) continue;
 
@@ -149,7 +146,7 @@ function SDJ(obj, name){
 
 /// Alpha-Betic sorting
 function addListener(element, eventname, expression, bubbling){
-	var bubbling = bubbling || false;
+	bubbling = bubbling || false;
 
 	element = $(element);
 	if(element.addEventListener){
@@ -500,7 +497,7 @@ function PopUp(url,width,height,form_name){
 }
 
 function redirect(uri, method, needle) {
-	var method = method || 'get';
+	method = method || 'get';
 	var url = new Curl(uri);
 
 	if(method.toLowerCase() == 'get'){
@@ -622,48 +619,6 @@ function showHideByName(name, style){
 	}
 }
 
-function showHideEffect(obj, eff, time, cb_afterFinish){
-	obj = $(obj);
-	if(!obj){
-		throw 'showHideEffect(): Object not found.';
-	}
-
-	if(typeof(Effect) == 'undefined'){
-		eff = 'none';
-	}
-
-	if(typeof(cb_afterFinish) == 'undefined'){
-		cb_afterFinish = function(){};
-	}
-
-	var timeShow = (typeof(time) == 'undefined')?0.5:(parseInt(time)/1000);
-	var show = (obj.style.display != 'none')?0:1;
-
-	switch(eff){
-		case 'blind':
-			if(show)
-				Effect.BlindDown(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
-			else
-				Effect.BlindUp(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
-			break;
-		case 'slide':
-			if(show)
-				Effect.SlideDown(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
-			else
-				Effect.SlideUp(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
-			break;
-		default:
-			if(show)
-				obj.show();
-			else
-				obj.hide();
-
-			cb_afterFinish();
-			break;
-	}
-return show;
-}
-
 function switchElementsClass(obj,class1,class2){
 	obj = $(obj);
 	if(!obj) return false;
@@ -682,12 +637,6 @@ function switchElementsClass(obj,class1,class2){
 	else{
 		obj.className = class1 + ' ' + obj.className;
 		result = class1;
-	}
-
-	if(IE6){
-		obj.style.filter = '';
-		obj.style.backgroundImage = '';
-		ie6pngfix.run();
 	}
 
 return result;

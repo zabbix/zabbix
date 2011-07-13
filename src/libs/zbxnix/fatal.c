@@ -57,6 +57,7 @@ const char	*get_signal_name(int sig)
 		case SIGINT:	return "SIGINT";
 		case SIGTERM:	return "SIGTERM";
 		case SIGPIPE:	return "SIGPIPE";
+		case SIGUSR1:	return "SIGUSR1";
 		default:	return "unknown";
 	}
 }

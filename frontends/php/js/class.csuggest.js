@@ -1,5 +1,6 @@
 /*
-** Copyright (C) 2010-2011 Zabbix SIA
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -15,8 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-// JavaScript Document
-var LCL_SUGGESTS = new Array();
+
+var LCL_SUGGESTS = [];
 
 function createSuggest(oid){
 	var sid = LCL_SUGGESTS.length;
@@ -85,7 +86,7 @@ needleChange: function(e){
 //--
 	this.hlIndex = 0;
 	this.suggestCount = 0;
-	
+
 	clearTimeout(this.timeoutNeedle);
 
 	var target = Event.element(e);
@@ -124,8 +125,8 @@ searchServer: function(needle){
 			'limit': this.suggestLimit
 		},
 		'onSuccess': this.serverRespond.bind(this, needle),
-		'onFailure': function(resp){zbx_throw('Suggest Widget: search request failed.');}
-	}
+		'onFailure': function(){zbx_throw('Suggest Widget: search request failed.');}
+	};
 
 	new RPC.Call(rpcRequest);
 
@@ -151,7 +152,7 @@ serverRespond: function(needle, respond){
 		this.showSuggests();
 		this.newSugTab(params.needle);
 	}
-	
+
 	if(this.saveToCache) this.saveCache(params.needle, params.list);
 },
 
@@ -267,7 +268,7 @@ onSelect: function(selection){
 searchFocus: function(e){
 	this.debug('keyPressed');
 //---
-	if(!e) var e = window.event;
+	if(!e) e = window.event;
 
 	var elem = e.element();
 	if(elem.match('input[type=text]') || elem.match('textarea') || elem.match('select')) return true;
@@ -284,13 +285,13 @@ keyPressed: function(e){
 	this.debug('keyPressed');
 //---
 
-	if(!e) var e = window.event;
+	if(!e) e = window.event;
 	var key = e.keyCode;
 
 	switch(true){
 		case(key == 27):
 			this.hlIndex = 0;
-			this.suggestCount = 0
+			this.suggestCount = 0;
 			this.removeHighLight(e);
 			this.setNeedleByHighLight(e);
 			this.hideSuggests(e);
@@ -378,7 +379,7 @@ suggestBlur: function(e){
 // HighLight
 // -----------------------------------------------------------------------
 
-removeHighLight: function(e){
+removeHighLight: function(){
 	this.debug('rmvHighLight');
 //---
 
@@ -386,7 +387,7 @@ removeHighLight: function(e){
 },
 
 
-highLightSuggest: function(e){
+highLightSuggest: function(){
 	this.debug('highLightSuggest');
 //---
 
@@ -394,7 +395,7 @@ highLightSuggest: function(e){
 	if(!is_null(row)) row.className = 'highlight';
 },
 
-setNeedleByHighLight: function(e){
+setNeedleByHighLight: function(){
 	this.debug('setNeedleByHighLight');
 //---
 	if(this.hlIndex == 0)
@@ -407,7 +408,7 @@ selectSuggest: function(e){
 	this.debug('selectSuggest');
 //---
 
-	this.setNeedleByHighLight(e)
+	this.setNeedleByHighLight(e);
 	this.hideSuggests();
 
 //SDJ(this.dom.input);
@@ -420,7 +421,7 @@ selectSuggest: function(e){
 // DOM creation
 // -----------------------------------------------------------------------
 
-showSuggests: function(e){
+showSuggests: function(){
 	this.debug('showSuggests');
 //---
 
@@ -440,18 +441,16 @@ showSuggests: function(e){
 	this.dom.suggest.style.display = 'block';
 },
 
-hideSuggests: function(e){
+hideSuggests: function(){
 	this.debug('hideSuggest');
 //--
 
 	if(!is_null(this.dom.suggest)){
 		this.dom.suggest.style.display = 'none';
-
-		if(IE6) showPopupDiv(this.dom.suggest, 'suggestFrame');
 	}
 },
 
-positionSuggests: function(e){
+positionSuggests: function(){
 	this.debug('positionSuggests');
 //---
 
@@ -462,8 +461,6 @@ positionSuggests: function(e){
 
 	this.dom.suggest.style.top = (pos.top+dims.height)+'px';
 	this.dom.suggest.style.left = pos.left+'px';
-
-	if(IE6) showPopupDiv(this.dom.suggest, 'suggestFrame');
 },
 
 newSugTab: function(needle){
@@ -511,9 +508,6 @@ newSugTab: function(needle){
 	this.dom.suggest.appendChild(this.dom.sugtab);
 
 	if(count == 0) this.hideSuggests();
-
-// IE6 Fix
-	if(count > 0 && IE6) showPopupDiv(this.dom.suggest, 'suggestFrame');
 
 	this.suggestCount = count;
 }

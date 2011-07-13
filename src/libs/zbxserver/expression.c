@@ -339,14 +339,14 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 	const char	*__function_name = "evaluate";
 	char		*res, simple[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
 			value_str[MAX_STRING_LEN], c;
-	int		i, l, r, t;
+	int		i, l, r;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, exp);
 
 	res = NULL;
 
 	strscpy(tmp, exp);
-	t = 0;
+
 	while (NULL != strchr(tmp, ')'))
 	{
 		l=-1;
@@ -2660,7 +2660,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
  *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
- * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)              *
+ * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)"             *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_functions(char **exp, time_t now, char *error, int maxerrlen)
@@ -2675,22 +2675,23 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *exp);
 
-	if (**exp == '\0')
+	if ('\0' == **exp)
 		goto empty;
 
 	*error = '\0';
 
 	out = zbx_malloc(out, out_alloc);
 
-	for (e = *exp; *e != '\0';)
+	for (e = *exp; '\0' != *e;)
 	{
-		if (*e == '{')
+		if ('{' == *e)
 		{
 			e++;	/* '{' */
 			f = functionid;
-			while (*e != '}' && *e != '\0')
+
+			while ('}' != *e && '\0' != *e)
 			{
-				if (functionid - f == MAX_ID_LEN)
+				if (MAX_ID_LEN == functionid - f)
 					break;
 				if (*e < '0' || *e > '9')
 					break;
@@ -2698,9 +2699,9 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 				*f++ = *e++;
 			}
 
-			if (*e != '}')
+			if ('}' != *e || f == functionid)
 			{
-				zbx_snprintf(error, maxerrlen, "Invalid expression [%s]", *exp);
+				zbx_snprintf(error, maxerrlen, "invalid expression [%s]", *exp);
 				goto error;
 			}
 
@@ -2716,7 +2717,7 @@ static int	substitute_functions(char **exp, time_t now, char *error, int maxerrl
 
 			if (NULL == (row = DBfetch(result)))
 			{
-				zbx_snprintf(error, maxerrlen, "Could not obtain function and item for functionid: %s",
+				zbx_snprintf(error, maxerrlen, "cannot obtain function and item for functionid: %s",
 						functionid);
 			}
 			else
@@ -2788,21 +2789,18 @@ error:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	evaluate_expression(int *result, char **expression, time_t now,
 		zbx_uint64_t triggerid, int trigger_value, char *error, int maxerrlen)
 {
-	const char		*__function_name = "evaluate_expression";
-	/* Required for substitution of macros */
-	DB_EVENT		event;
-	int			ret = FAIL;
-	double			value;
+	const char	*__function_name = "evaluate_expression";
+
+	DB_EVENT	event;
+	int		ret = FAIL;
+	double		value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
-	/* Substitute macros first */
 	memset(&event, 0, sizeof(DB_EVENT));
 	event.source = EVENT_SOURCE_TRIGGERS;
 	event.object = EVENT_OBJECT_TRIGGER;
@@ -2810,23 +2808,21 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 	event.value = trigger_value;
 
 	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION,
-			error, maxerrlen))
+				error, maxerrlen))
 	{
-		/* Evaluate expression */
 		zbx_remove_spaces(*expression);
-		if (SUCCEED == substitute_functions(expression, now, error, maxerrlen))
-		{
-			if (SUCCEED == evaluate(&value, *expression, error, maxerrlen))
-			{
-				if (0 == cmp_double(value, 0))
-					*result = TRIGGER_VALUE_FALSE;
-				else
-					*result = TRIGGER_VALUE_TRUE;
 
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() result:%d", __function_name, *result);
-				ret = SUCCEED;
-				goto out;
-			}
+		if (SUCCEED == substitute_functions(expression, now, error, maxerrlen) &&
+				SUCCEED == evaluate(&value, *expression, error, maxerrlen))
+		{
+			if (0 == cmp_double(value, 0))
+				*result = TRIGGER_VALUE_FALSE;
+			else
+				*result = TRIGGER_VALUE_TRUE;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() result:%d", __function_name, *result);
+			ret = SUCCEED;
+			goto out;
 		}
 	}
 out:
@@ -2893,8 +2889,10 @@ void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
 			memcpy(&(*data)[l], replace_to, sz_value);
 		}
 		else
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() Can't substitute macro: \"%.*s\" is not found in value set",
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro: \"%.*s\" is not found in value set",
 					__function_name, (int)sz_macro, *data + l);
+		}
 	}
 
 	zbx_free(replace_to);

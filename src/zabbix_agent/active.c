@@ -177,7 +177,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
  *                                                                            *
  * Comments:                                                                  *
  *    String represented as "ZBX_EOF" termination list                        *
- *    With '\n' delimeter between elements.                                   *
+ *    With '\n' delimiter between elements.                                   *
  *    Each element represented as:                                            *
  *           <key>:<refresh time>:<last log size>:<modification time>         *
  *                                                                            *

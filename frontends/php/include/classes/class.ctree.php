@@ -158,9 +158,7 @@ class CTree{
 
 					if($this->tree[$id]['nodetype'] == 2){
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
-						$img->setAttribute('onclick','javascript: '.
-												$this->treename.'.closeSNodeX("'.$id.'",this);'.
-												" if(IE6) showPopupDiv('div_node_tree','select_iframe');"); // IE6 Fix
+						$img->setAttribute('onclick', $this->treename.'.closeSNodeX("'.$id.'",this);');
 
 						$img->setAttribute('id','idi_'.$id);
 						$img->setAttribute('class', 'pointer');
@@ -177,9 +175,7 @@ class CTree{
 						$td->setAttribute('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 						$img= new CImg('images/general/tree/plus.gif','t','22','14');
 
-						$img->setAttribute('onclick','javascript: '.
-												$this->treename.'.closeSNodeX("'.$id.'",this);'.
-												" if(IE6) showPopupDiv('div_node_tree','select_iframe');");	// IE6 Fix
+						$img->setAttribute('onclick', $this->treename.'.closeSNodeX("'.$id.'",this);');
 
 						$img->setAttribute('id','idi_'.$id);
 						$img->setAttribute('class', 'pointer');
@@ -221,7 +217,7 @@ class CTree{
 	public function createJS(){
 
 		$js = '<script src="js/class.ctree.js" type="text/javascript"></script>'."\n".
-				'<script type="text/javascript">  var '.$this->treename.'_tree = new Array(0);';
+				'<script type="text/javascript">  var '.$this->treename.'_tree = [];';
 
 		foreach($this->tree as $id => $rows){
 			$parentid = $rows['parentid'];

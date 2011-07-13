@@ -21,7 +21,7 @@
 <?php
 /**
  * Description of class
- * Produces ZABBIX object for more comfortable usage of jQuery tabed view
+ * Produces Zabbix object for more comfortable usage of jQuery tabbed view
  * @author Aly
  */
 class CAccordion extends CDiv{
