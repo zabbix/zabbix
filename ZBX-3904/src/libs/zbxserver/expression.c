@@ -2544,8 +2544,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if	(0 == strcmp(m, MVAR_HOST_DNS))
 					replace_to = zbx_strdup(replace_to, interface.dns_orig);
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
-					replace_to = zbx_strdup(replace_to,
-							interface.useip ? interface.ip_orig : interface.dns_orig);
+					replace_to = zbx_strdup(replace_to, interface.useip ? interface.ip_orig : interface.dns_orig);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_INTERFACE_PORT)
