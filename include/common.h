@@ -982,6 +982,8 @@ int	is_hostname_char(char c);
 int	is_key_char(char c);
 int	is_function_char(char c);
 
+int	is_time_function(const char *func);
+
 int	parse_host(char **exp, char **host);
 int	parse_key(char **exp, char **key);
 int	parse_function(char **exp, char **func, char **params);

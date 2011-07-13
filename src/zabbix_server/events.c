@@ -35,7 +35,7 @@
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -47,31 +47,35 @@ static int	add_trigger_info(DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (event->object == EVENT_OBJECT_TRIGGER && event->objectid != 0)
+	if (EVENT_OBJECT_TRIGGER == event->object && 0 != event->objectid)
 	{
-		DB_RESULT	result;
-		DB_ROW		row;
-
-		result = DBselect(
-				"select description,expression,priority,type"
-				" from triggers"
-				" where triggerid=" ZBX_FS_UI64,
-				event->objectid);
-
-		if (NULL != (row = DBfetch(result)))
+		if (SUCCEED == DBis_node_local_id(event->objectid))
 		{
-			event->trigger.triggerid = event->objectid;
-			strscpy(event->trigger.description, row[0]);
-			strscpy(event->trigger.expression, row[1]);
-			event->trigger.priority = (unsigned char)atoi(row[2]);
-			event->trigger.type = (unsigned char)atoi(row[3]);
+			ret = DCconfig_get_trigger_for_event(&event->trigger, event->objectid);
 		}
 		else
-			ret = FAIL;
-		DBfree_result(result);
+		{
+			DB_RESULT	result;
+			DB_ROW		row;
 
-		if (TRIGGER_VALUE_CHANGED_NO == event->value_changed)
-			zabbix_log(LOG_LEVEL_DEBUG, "Skip actions");
+			result = DBselect(
+					"select description,expression,priority,type"
+					" from triggers"
+					" where triggerid=" ZBX_FS_UI64,
+					event->objectid);
+
+			if (NULL != (row = DBfetch(result)))
+			{
+				event->trigger.triggerid = event->objectid;
+				strscpy(event->trigger.description, row[0]);
+				strscpy(event->trigger.expression, row[1]);
+				event->trigger.priority = (unsigned char)atoi(row[2]);
+				event->trigger.type = (unsigned char)atoi(row[3]);
+			}
+			else
+				ret = FAIL;
+			DBfree_result(result);
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

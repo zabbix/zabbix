@@ -22,6 +22,7 @@
 
 #include "db.h"
 #include "sysinfo.h"
+#include "zbxalgo.h"
 
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
@@ -129,6 +130,28 @@ DC_ITEM;
 
 typedef struct
 {
+	zbx_uint64_t	functionid;
+	zbx_uint64_t	itemid;
+	char		*function;
+	char		*parameter;
+}
+DC_FUNCTION;
+
+typedef struct
+{
+	zbx_uint64_t	triggerid;
+	char		*expression;
+	char		old_error[TRIGGER_ERROR_LEN_MAX];
+	const char	*new_error;
+	zbx_timespec_t	timespec;
+	unsigned char	type;
+	unsigned char	value;
+	unsigned char	value_flags;
+}
+DC_TRIGGER;
+
+typedef struct
+{
 	zbx_uint64_t	hostid;
 	char            host[HOST_HOST_LEN_MAX];
 	int		proxy_config_nextcheck;
@@ -184,6 +207,11 @@ void	free_configuration_cache();
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key);
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
+int	DCconfig_get_function_by_functionid(DC_FUNCTION *function, zbx_uint64_t functionid);
+void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
+		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, const char **errors, int item_num);
+int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid);
+void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
@@ -194,6 +222,10 @@ void	DCrequeue_unreachable_item(zbx_uint64_t itemid);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
+int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
+
+void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
+		unsigned char value_flags, const char *error);
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 		int maintenance_type, int maintenance_from);
 

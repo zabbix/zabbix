@@ -489,6 +489,8 @@ DB_ESCALATION;
 #define DB_NODE			"%s"
 #define DBnode_local(fieldid)	DBnode(fieldid, CONFIG_NODEID)
 const char	*DBnode(const char *fieldid, int nodeid);
+#define DBis_node_local_id(id)	DBis_node_id(id, CONFIG_NODEID)
+int	DBis_node_id(zbx_uint64_t id, int nodeid);
 
 int	DBping();
 
