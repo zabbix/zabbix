@@ -286,7 +286,6 @@ include_once('include/page_header.php');
 		$templates = get_request('templates', array());
 		$templates_clear = get_request('clear_templates', array());
 		$templateid = get_request('templateid', 0);
-		$newgroup = get_request('newgroup', 0);
 		$template_name = get_request('template_name', '');
 
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
@@ -310,26 +309,16 @@ include_once('include/page_header.php');
 		try {
 			DBstart();
 
-// CREATE NEW GROUP
-			$groups = zbx_toObject($groups, 'groupid');
-			if(!empty($newgroup)){
-				$result = CHostGroup::create(array('name' => $newgroup));
-				if(!empty($result)){
-					$options = array(
-						'groupids' => $result['groupids'],
-						'output' => API_OUTPUT_EXTEND
-					);
-					$newgroup = CHostGroup::get($options);
-					if($newgroup){
-						$groups = array_merge($groups, $newgroup);
-					}
-					else{
-						throw new Exception();
-					}
-				} else {
+			// create new group
+			if(!zbx_empty($_REQUEST['newgroup'])){
+				$newGroup = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+
+				if(!$newGroup){
 					throw new Exception();
 				}
+				$groups[] = reset($newGroup['groupids']);
 			}
+			$groups = zbx_toObject($groups, 'groupid');
 
 			$templates = array_keys($templates);
 			$templates = zbx_toObject($templates, 'templateid');
