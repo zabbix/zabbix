@@ -564,7 +564,7 @@ int	MAIN_ZABBIX_ENTRY()
 		exit(FAIL);
 	}
 
-	threads_num = CONFIG_WATCHDOG_FORKS + CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
+	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_WATCHDOG_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
@@ -609,23 +609,10 @@ int	MAIN_ZABBIX_ENTRY()
 		}
 
 		zbx_on_exit();
-
-		return SUCCEED;
-	}
-
-	if (server_num <= (server_count += CONFIG_WATCHDOG_FORKS))
-	{
-		process_type = ZBX_PROCESS_TYPE_WATCHDOG;
-		process_num = server_num - server_count + CONFIG_WATCHDOG_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
-
-		main_watchdog_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
-		/* the configuration syncer should be created first - variable threads[1] is used in daemon.c unit */
+		/* !!! configuration syncer must server #1 - child_signal_handler() uses threads[1] !!! */
 
 		process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		process_num = server_num - server_count + CONFIG_CONFSYNCER_FORKS;
@@ -634,6 +621,16 @@ int	MAIN_ZABBIX_ENTRY()
 				server_num, get_process_type_string(process_type));
 
 		main_dbconfig_loop();
+	}
+	else if (server_num <= (server_count += CONFIG_WATCHDOG_FORKS))
+	{
+		process_type = ZBX_PROCESS_TYPE_WATCHDOG;
+		process_num = server_num - server_count + CONFIG_WATCHDOG_FORKS;
+
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
+				server_num, get_process_type_string(process_type));
+
+		main_watchdog_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_POLLER_FORKS))
 	{

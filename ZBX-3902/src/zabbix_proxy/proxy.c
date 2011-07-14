@@ -549,7 +549,7 @@ int	MAIN_ZABBIX_ENTRY()
 	DCsync_configuration();
 	DBclose();
 
-	threads_num = CONFIG_HEARTBEAT_FORKS + CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
+	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS
@@ -593,23 +593,10 @@ int	MAIN_ZABBIX_ENTRY()
 		}
 
 		zbx_on_exit();
-
-		return SUCCEED;
-	}
-
-	if (server_num <= (server_count += CONFIG_HEARTBEAT_FORKS))
-	{
-		process_type = ZBX_PROCESS_TYPE_HEARTBEAT;
-		process_num = server_num - server_count + CONFIG_HEARTBEAT_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
-
-		main_heart_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
-		/* the configuration syncer should be created first - variable threads[1] is used in daemon.c unit */
+		/* !!! configuration syncer must server #1 - child_signal_handler() uses threads[1] !!! */
 
 		process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		process_num = server_num - server_count + CONFIG_CONFSYNCER_FORKS;
@@ -618,6 +605,16 @@ int	MAIN_ZABBIX_ENTRY()
 				server_num, get_process_type_string(process_type));
 
 		main_proxyconfig_loop(server_num);
+	}
+	else if (server_num <= (server_count += CONFIG_HEARTBEAT_FORKS))
+	{
+		process_type = ZBX_PROCESS_TYPE_HEARTBEAT;
+		process_num = server_num - server_count + CONFIG_HEARTBEAT_FORKS;
+
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
+				server_num, get_process_type_string(process_type));
+
+		main_heart_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_DATASENDER_FORKS))
 	{
