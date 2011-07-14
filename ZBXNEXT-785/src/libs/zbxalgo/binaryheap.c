@@ -62,7 +62,7 @@ static void	__binary_heap_ensure_free_space(zbx_binary_heap_t *heap)
 	}
 	else if (heap->elems_num == heap->elems_alloc)
 	{
-		heap->elems_alloc = heap->elems_alloc * ARRAY_GROWTH_FACTOR;
+		heap->elems_alloc = MAX(heap->elems_alloc + 1, heap->elems_alloc * ARRAY_GROWTH_FACTOR);
 		heap->elems = heap->mem_realloc_func(heap->elems, heap->elems_alloc * sizeof(zbx_binary_heap_elem_t));
 	}
 }

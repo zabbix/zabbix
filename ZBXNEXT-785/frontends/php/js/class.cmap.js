@@ -799,7 +799,10 @@ ZABBIX.apps.map = (function(){
 			});
 
 			this.updateIcon();
-			this.align();
+			this.domNode.css({
+				top: this.data.y + 'px',
+				left: this.data.x + 'px',
+			});
 		}
 		Selement.prototype = {
 			getData: function(){

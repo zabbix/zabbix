@@ -38,10 +38,6 @@ extern int		process_num;
  *                                                                            *
  * Purpose: periodically synchronises data in memory cache with database      *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: never returns                                                    *
@@ -49,7 +45,7 @@ extern int		process_num;
  ******************************************************************************/
 void	main_dbsyncer_loop()
 {
-	int	now, sleeptime, last_sleeptime = -1, num;
+	int	sleeptime, last_sleeptime = -1, num;
 	double	sec;
 	int	retry_up = 0, retry_dn = 0;
 
@@ -67,7 +63,6 @@ void	main_dbsyncer_loop()
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
 
-		now = time(NULL);
 		sec = zbx_time();
 		num = DCsync_history(ZBX_SYNC_PARTIAL);
 		sec = zbx_time() - sec;
@@ -75,19 +70,19 @@ void	main_dbsyncer_loop()
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %d items",
 				get_process_type_string(process_type), process_num, sec, num);
 
-		if (last_sleeptime == -1)
+		if (-1 == last_sleeptime)
 		{
 			sleeptime = num ? ZBX_SYNC_MAX / num : CONFIG_HISTSYNCER_FREQUENCY;
 		}
 		else
 		{
 			sleeptime = last_sleeptime;
-			if (num > ZBX_SYNC_MAX)
+			if (ZBX_SYNC_MAX < num)
 			{
 				retry_up = 0;
 				retry_dn++;
 			}
-			else if (num < ZBX_SYNC_MAX / 2)
+			else if (ZBX_SYNC_MAX / 2 > num)
 			{
 				retry_up++;
 				retry_dn = 0;
@@ -95,22 +90,22 @@ void	main_dbsyncer_loop()
 			else
 				retry_up = retry_dn = 0;
 
-			if (retry_dn >= 3)
+			if (2 < retry_dn)
 			{
 				sleeptime--;
 				retry_dn = 0;
 			}
 
-			if (retry_up >= 3)
+			if (2 < retry_up)
 			{
 				sleeptime++;
 				retry_up = 0;
 			}
 		}
 
-		if (sleeptime < 0)
+		if (0 > sleeptime)
 			sleeptime = 0;
-		else if (sleeptime > CONFIG_HISTSYNCER_FREQUENCY)
+		else if (CONFIG_HISTSYNCER_FREQUENCY < sleeptime)
 			sleeptime = CONFIG_HISTSYNCER_FREQUENCY;
 
 		last_sleeptime = sleeptime;
