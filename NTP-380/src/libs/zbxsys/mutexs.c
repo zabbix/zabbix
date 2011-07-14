@@ -300,7 +300,7 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 #endif /* _WINDOWS */
 	
-	*mutex = (ZBX_MUTEX)NULL;
+	*mutex = ZBX_MUTEX_NULL;
 
 	return ZBX_MUTEX_OK;
 }

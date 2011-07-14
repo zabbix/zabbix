@@ -19,6 +19,9 @@
 
 #include "common.h"
 #include "checks_external.h"
+#include "zbxexec.h"
+
+extern int	CONFIG_TIMEOUT;
 
 /******************************************************************************
  *                                                                            *
@@ -45,9 +48,9 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 			*buf = NULL;
 	int		ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key);
 
-	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+	conn = 1 == item->useip ? item->host_ip : item->host_dns;
 
 	if (NULL != (pl = strchr(item->key, '[')))
 	{
@@ -58,7 +61,7 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 			*pr = '\0';
 		else
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "External check is not supported."
+			SET_MSG_RESULT(result, strdup("External check is not supported."
 						" No closing bracket ']' found."));
 			ret = NOTSUPPORTED;
 			goto exit;
@@ -82,16 +85,16 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 
 		if ('\0' == *buf)
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Script returned nothing"));
+			SET_MSG_RESULT(result, strdup("Script returned nothing"));
 			ret = NOTSUPPORTED;
 		}
-		else if (SUCCEED != set_result_type(result, item->value_type, item->data_type, buf))
+		else if (SUCCEED != set_result_type(result, item->value_type, buf))
 			ret = NOTSUPPORTED;
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot execute script: %s", error);
-		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+		SET_MSG_RESULT(result, strdup(error));
 		ret = NOTSUPPORTED;
 	}
 
@@ -103,7 +106,7 @@ exit:
 	if (NULL != pr)
 		*pr = ']';
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ret;
 }
