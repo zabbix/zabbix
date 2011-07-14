@@ -304,7 +304,7 @@ function make_event_details($eventid){
 
 	if($config['event_ack_enable']){
 		global $page;
-		$backurl = urlencode(urlencode($page['file'].'?eventid='.$eventid.'&triggerid='.$event['triggerid']));
+		$backurl = urlencode($page['file'].'?eventid='.$eventid.'&triggerid='.$event['triggerid']);
 
 		if($event['acknowledged'] == 1){
 			$rows = 0;
@@ -383,7 +383,7 @@ function make_small_eventlist($eventid, $trigger_data){
 		// if acknowledges are not disabled in configuration, let's show them
 		if($config['event_ack_enable']){
 			global $page;
-			$backurl = urlencode(urlencode($page['file'].'?eventid='.$curevent['eventid'].'&triggerid='.$trigger_data['triggerid']));
+			$backurl = urlencode($page['file'].'?eventid='.$curevent['eventid'].'&triggerid='.$trigger_data['triggerid']);
 
 			if($event['acknowledged'] == 1){
 				$rows = 0;

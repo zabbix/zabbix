@@ -55,8 +55,7 @@ include_once('include/page_header.php');
 	$_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
 
 	if(isset($_REQUEST['cancel'])){
-		$url = new CUrl(urldecode($_REQUEST['backurl']));
-		jsRedirect($url->getUrl());
+		jsRedirect($_REQUEST['backurl']);
 		exit();
 	}
 
@@ -114,8 +113,7 @@ include_once('include/page_header.php');
 		}
 
 		if(isset($_REQUEST['saveandreturn'])){
-			$url = new CUrl(urldecode($_REQUEST['backurl']));
-			jsRedirect($url->getUrl());
+			jsRedirect($_REQUEST['backurl']);
 			exit();
 		}
  	}
@@ -188,7 +186,7 @@ include_once('include/page_header.php');
 	$frmMsg->addRow(S_MESSAGE, new CTextArea('message', '', 80, 6));
 	$frmMsg->addItemToBottomRow(new CButton('saveandreturn', $btn_txt2));
 	$bulk ? '' : $frmMsg->addItemToBottomRow(new CButton('save', $btn_txt));
-	$frmMsg->addItemToBottomRow(new CButtonCancel('&backurl='.$_REQUEST['backurl']));
+	$frmMsg->addItemToBottomRow(new CButtonCancel('&backurl='.urlencode($_REQUEST['backurl'])));
 
 	$frmMsg->show(false);
 
