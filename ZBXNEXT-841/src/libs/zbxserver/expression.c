@@ -2298,7 +2298,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 					ret = get_escalation_history(event, escalation, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
-					ret = DCget_trigger_severity_name(&event->trigger, &replace_to);
+					ret = DCget_trigger_severity_name(event->trigger.priority, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_NSEVERITY))
 				{
 					if (0 != event->trigger.triggerid)

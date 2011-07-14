@@ -386,7 +386,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		else if (0 == strcmp(pt[i].table, "items"))
 		{
 			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					", hosts r where t.hostid=r.hostid"
+					",hosts r where t.hostid=r.hostid"
 						" and r.proxy_hostid=" ZBX_FS_UI64
 						" and r.status in (%d,%d)"
 						" and t.status in (%d,%d,%d)"
@@ -403,7 +403,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		else if (0 == strcmp(pt[i].table, "hosts_templates"))
 		{
 			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					", hosts r where t.hostid=r.hostid"
+					",hosts r where t.hostid=r.hostid"
 						" and r.proxy_hostid=" ZBX_FS_UI64
 						" and r.status in (%d,%d)",
 					proxy_hostid,
@@ -420,7 +420,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		else if (0 == strcmp(pt[i].table, "dchecks"))
 		{
 			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					", drules r where t.druleid=r.druleid"
+					",drules r where t.druleid=r.druleid"
 						" and r.proxy_hostid=" ZBX_FS_UI64
 						" and r.status=%d",
 					proxy_hostid,
@@ -443,7 +443,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		else if (0 == strcmp(pt[i].table, "groups"))
 		{
 			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					", config r where t.groupid=r.discovery_groupid");
+					",config r where t.groupid=r.discovery_groupid");
 		}
 		else
 			*condition = '\0';
@@ -602,7 +602,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "insert into %s (", table->table);
 
-			for (f = 0; f < field_count; f ++)
+			for (f = 0; f < field_count; f++)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s,", fields[f]->name);
 
 			sql_offset--;

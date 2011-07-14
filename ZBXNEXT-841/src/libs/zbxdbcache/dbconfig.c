@@ -641,11 +641,9 @@ static char	*default_severity_names[] = {"Not classified", "Information", "Warni
 
 static int	DCsync_config(DB_RESULT result)
 {
-	const char		*__function_name = "DCsync_config";
-
-	DB_ROW			row;
-
-	int			i, found = 1;
+	const char	*__function_name = "DCsync_config";
+	DB_ROW		row;
+	int		i, found = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2155,13 +2153,14 @@ void	DCsync_configuration()
 
 	sec = zbx_time();
 	conf_result = DBselect(
+			/* SQL statement must be synced with DCload_config() */
 			"select alert_history,event_history,refresh_unsupported,"
 				"discovery_groupid,ns_support,severity_name_0,severity_name_1,"
 				"severity_name_2,severity_name_3,severity_name_4,severity_name_5"
 			" from config"
 			" where 1=1"
 				DB_NODE,
-			DBnode_local("configid"));	/* must be synced with DCload_config() */
+			DBnode_local("configid"));
 	csec = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -3698,14 +3697,14 @@ void	*DCconfig_get_config_data(void *data, int type)
  * Author: Alexander Vladishev, Rudolfs Kreicbergs                            *
  *                                                                            *
  ******************************************************************************/
-int	DCget_trigger_severity_name(DB_TRIGGER *trigger, char **replace_to)
+int	DCget_trigger_severity_name(unsigned char priority, char **replace_to)
 {
-	if (0 == trigger->triggerid || TRIGGER_SEVERITY_COUNT <= trigger->priority)
+	if (TRIGGER_SEVERITY_COUNT <= priority)
 		return FAIL;
 
 	LOCK_CACHE;
 
-	*replace_to = zbx_strdup(*replace_to, config->config->severity_name[trigger->priority]);
+	*replace_to = zbx_strdup(*replace_to, config->config->severity_name[priority]);
 
 	UNLOCK_CACHE;
 
