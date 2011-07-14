@@ -50,70 +50,61 @@ void	update_functions(DB_ITEM *item)
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		value[MAX_STRING_LEN];
-	char		*value_esc, *function_esc, *parameter_esc;
+	char		*value_esc;
 	char		*lastvalue;
 	int		ret=SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_functions(" ZBX_FS_UI64 ")",
 		item->itemid);
 
-/* Oracle does'n support this */
-/*	zbx_snprintf(sql,sizeof(sql),"select function,parameter,itemid,lastvalue from functions where itemid=%d group by function,parameter,itemid order by function,parameter,itemid",item->itemid);*/
-	result = DBselect("select distinct function,parameter,itemid,lastvalue from functions where itemid=" ZBX_FS_UI64,
-		item->itemid);
+	/* we can't use `distinct` clause for a case-insensitive databases */
+	/* for example, functions regexp("Fail") and regexp("fail") will be returned as one record */
+	/* result = DBselect("select distinct function,parameter,itemid,lastvalue from functions where itemid=" ZBX_FS_UI64,
+		item->itemid); */
 
-	while((row=DBfetch(result)))
+	result = DBselect(
+			"select functionid,function,parameter,lastvalue"
+			" from functions"
+			" where itemid=" ZBX_FS_UI64,
+			item->itemid);
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		function.function=row[0];
-		function.parameter=row[1];
-		ZBX_STR2UINT64(function.itemid,row[2]);
-/*		function.itemid=atoi(row[2]); */
-/*		It is not required to check lastvalue for NULL here */
-		lastvalue=row[3];
+		ZBX_STR2UINT64(function.functionid, row[0]);
+		function.function = row[1];
+		function.parameter = row[2];
+		lastvalue = row[3];
 
-		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:" ZBX_FS_UI64 " Evaluating %s(%s)",
-			function.itemid,
-			function.function,
-			function.parameter);
+		zabbix_log(LOG_LEVEL_DEBUG, "update_functions() functionid:" ZBX_FS_UI64 " function:'%s(%s)'",
+				function.functionid, function.function, function.parameter);
 
-		ret = evaluate_function(value,item,function.function,function.parameter);
-		if( FAIL == ret)	
+		if (SUCCEED != (ret = evaluate_function(value, item, function.function, function.parameter)))
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s",
-				function.function);
+			zabbix_log(LOG_LEVEL_DEBUG, "evaluation failed for function:'%s(%s)'",
+					function.function, function.parameter);
 			continue;
 		}
-		if (ret == SUCCEED)
+		else
 		{
 			/* Update only if lastvalue differs from new one */
-			if( DBis_null(lastvalue)==SUCCEED || (strcmp(lastvalue,value) != 0))
+			if (SUCCEED == DBis_null(lastvalue) || 0 != strcmp(lastvalue, value))
 			{
 				value_esc = DBdyn_escape_string(value);
-				function_esc = DBdyn_escape_string(function.function);
-				parameter_esc = DBdyn_escape_string(function.parameter);
 
 				DBexecute("update functions"
 						" set lastvalue='%s'"
-						" where itemid=" ZBX_FS_UI64
-							" and function='%s'"
-							" and parameter='%s'",
-					value_esc, function.itemid,
-					function_esc, parameter_esc);
+						" where functionid=" ZBX_FS_UI64,
+					value_esc, function.functionid);
 
-				zbx_free(parameter_esc);
-				zbx_free(function_esc);
 				zbx_free(value_esc);
 			}
 			else
-			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Do not update functions, same value");
-			}
+				zabbix_log(LOG_LEVEL_DEBUG, "Do not update functions, same value");
 		}
 	}
-
 	DBfree_result(result);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End update_functions()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of update_functions()");
 }
 
 /******************************************************************************
