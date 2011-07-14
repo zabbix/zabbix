@@ -63,8 +63,11 @@ sub zabbix_receiver
 	my (@varbinds) = @{$_[1]};
 
 	# open the output file
-	sysopen(OUTPUT_FILE, $SNMPTrapperfile, O_WRONLY|O_APPEND|O_CREAT, 0666) or
-		die "Cannot open [$SNMPTrapperfile]: $!\n";
+	unless (sysopen(OUTPUT_FILE, $SNMPTrapperfile, O_WRONLY|O_APPEND|O_CREAT, 0666))
+	{
+		print STDERR "Cannot open [$SNMPTrapperfile]: $!\n";
+		return NETSNMPTRAPD_HANDLER_FAIL;
+	}
 
 	# get the host name
 	my $hostname = $pdu_info{'receivedfrom'} || 'unknown';
@@ -95,6 +98,8 @@ sub zabbix_receiver
 	}
 
 	close (OUTPUT_FILE);
+
+	return NETSNMPTRAPD_HANDLER_OK;
 }
 
 NetSNMP::TrapReceiver::register("all", \&zabbix_receiver) or
