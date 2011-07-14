@@ -111,7 +111,7 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					extern int	threads_num;
 					extern pid_t	*threads;
 				
-					for (i = 1; i < threads_num && 0 == found; i++)
+					for (i = 0; i < threads_num && 0 == found; i++)
 						found = (threads[i] == CHECKED_FIELD(siginfo, si_pid));
 
 					/* we should not worry too much about non-Zabbix child */

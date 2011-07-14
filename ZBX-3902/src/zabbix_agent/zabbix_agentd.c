@@ -493,12 +493,12 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 
 #ifdef _WINDOWS
-	/* must be called after all child processes are loaded */
+	/* must be called after all threads are created */
 	set_parent_signal_handler();
 #endif
 
-	/* wait for all threads exiting */
-	for (i = 0; i < 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0); i++)
+	/* wait for all threads to exit */
+	for (i = 0; i < threads_num; i++)
 	{
 		if (threads[i])
 		{
@@ -532,7 +532,7 @@ void	zbx_on_exit()
 		sigprocmask(SIG_BLOCK, &set, NULL);
 #endif
 
-		for (i = 0; i < 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0); i++)
+		for (i = 0; i < threads_num; i++)
 		{
 			if (threads[i])
 			{
@@ -548,7 +548,7 @@ void	zbx_on_exit()
 	daemon_stop();
 #endif
 
-	zbx_sleep(2);	/* wait for all threads closing */
+	zbx_sleep(2);	/* wait for all threads to exit */
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);

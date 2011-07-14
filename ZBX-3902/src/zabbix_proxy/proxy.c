@@ -467,7 +467,7 @@ int	main(int argc, char **argv)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	int		i, server_num = 0;
+	int		i, server_num = 0, server_count = 0;;
 	pid_t		pid;
 	zbx_sock_t	listen_sock;
 
@@ -523,30 +523,27 @@ int	MAIN_ZABBIX_ENTRY()
 	DCsync_configuration();
 	DBclose();
 
-	threads_num = 1 + CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
-			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
-			+ CONFIG_HISTSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFMON_FORKS;
+	threads_num = CONFIG_HEARTBEAT_FORKS + CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
+			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
+			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
+			+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS
+			+ CONFIG_SELFMON_FORKS;
 	threads = calloc(threads_num, sizeof(pid_t));
 
 	if (0 < CONFIG_TRAPPER_FORKS)
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Listener failed with error: %s.", zbx_tcp_strerror());
+			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
 			exit(1);
 		}
 	}
 
-	for (i = 1; i <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
-			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
-			+ CONFIG_HISTSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFMON_FORKS;
-		i++)
+	for (i = 0; i < threads_num; i++)
 	{
 		if (0 == (pid = zbx_child_fork()))
 		{
-			server_num = i;
+			server_num = i + 1;	/* servers are numbered starting from 1 */
 			break;
 		}
 		else
@@ -554,207 +551,162 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 
 	/* main process */
-	if (server_num == 0)
+	if (0 == server_num)
 	{
-		if (0 != CONFIG_HEARTBEAT_FORKS)
+		/* wait for all child processes to exit */
+
+		for (i = 0; i < threads_num; i++)
 		{
-			process_type = ZBX_PROCESS_TYPE_HEARTBEAT;
-			process_num = 1;
+			if (threads[i])
+			{
+				zbx_thread_wait(threads[i]);
+				zabbix_log(LOG_LEVEL_DEBUG, "process [%d] has terminated", i);
 
-			zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-					server_num, get_process_type_string(process_type));
-
-			main_heart_loop();
+				ZBX_DO_EXIT();
+			}
 		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "server #%d started");
 
-			for (;;)
-				zbx_sleep(SEC_PER_HOUR);
-		}
+		zbx_on_exit();
+
+		return SUCCEED;
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS)
+
+	if (server_num <= (server_count += CONFIG_HEARTBEAT_FORKS))
+	{
+		process_type = ZBX_PROCESS_TYPE_HEARTBEAT;
+		process_num = server_num - server_count + CONFIG_HEARTBEAT_FORKS;
+
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
+				server_num, get_process_type_string(process_type));
+
+		main_heart_loop();
+	}
+	else if (server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
 		process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
-		process_num = server_num;
+		process_num = server_num - server_count + CONFIG_CONFSYNCER_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
 		main_proxyconfig_loop(server_num);
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS)
+	else if (server_num <= (server_count += CONFIG_DATASENDER_FORKS))
 	{
 		process_type = ZBX_PROCESS_TYPE_DATASENDER;
-		process_num = server_num - CONFIG_CONFSYNCER_FORKS;
+		process_num = server_num - server_count + CONFIG_DATASENDER_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
 		main_datasender_loop();
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
-			+ CONFIG_POLLER_FORKS)
+	else if (server_num <= (server_count += CONFIG_POLLER_FORKS))
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
 #endif
 
 		process_type = ZBX_PROCESS_TYPE_POLLER;
-		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS;
+		process_num = server_num - server_count + CONFIG_POLLER_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
 		main_poller_loop(zbx_process, ZBX_POLLER_TYPE_NORMAL);
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
-			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS)
+	else if (server_num <= (server_count += CONFIG_UNREACHABLE_POLLER_FORKS))
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
 #endif
 
 		process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
-		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
-				- CONFIG_POLLER_FORKS;
+		process_num = server_num - server_count + CONFIG_UNREACHABLE_POLLER_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
 		main_poller_loop(zbx_process, ZBX_POLLER_TYPE_UNREACHABLE);
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
-			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			+ CONFIG_TRAPPER_FORKS)
+	else if (server_num <= (server_count += CONFIG_TRAPPER_FORKS))
 	{
 		process_type = ZBX_PROCESS_TYPE_TRAPPER;
-		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
-				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS;
+		process_num = server_num - server_count + CONFIG_TRAPPER_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
 		main_trapper_loop(zbx_process, &listen_sock);
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
-			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS)
+	else if (server_num <= (server_count += CONFIG_PINGER_FORKS))
 	{
 		process_type = ZBX_PROCESS_TYPE_PINGER;
-		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
-				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS
-				- CONFIG_TRAPPER_FORKS;
+		process_num = server_num - server_count + CONFIG_PINGER_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
 		main_pinger_loop();
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
-			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS)
+	else if (server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
 	{
 		process_type = ZBX_PROCESS_TYPE_HOUSEKEEPER;
-		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
-				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS
-				- CONFIG_TRAPPER_FORKS - CONFIG_PINGER_FORKS;
+		process_num = server_num - server_count + CONFIG_HOUSEKEEPER_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
 		main_housekeeper_loop();
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
-			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS)
+	else if (server_num <= (server_count += CONFIG_HTTPPOLLER_FORKS))
 	{
 		process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
-		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
-				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS
-				- CONFIG_TRAPPER_FORKS - CONFIG_PINGER_FORKS
-				- CONFIG_HOUSEKEEPER_FORKS;
+		process_num = server_num - server_count + CONFIG_HTTPPOLLER_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
 		main_httppoller_loop();
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
-			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
-			+ CONFIG_DISCOVERER_FORKS)
+	else if (server_num <= (server_count += CONFIG_DISCOVERER_FORKS))
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
 #endif
 
 		process_type = ZBX_PROCESS_TYPE_DISCOVERER;
-		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
-				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS
-				- CONFIG_TRAPPER_FORKS - CONFIG_PINGER_FORKS
-				- CONFIG_HOUSEKEEPER_FORKS - CONFIG_HTTPPOLLER_FORKS;
+		process_num = server_num - server_count + CONFIG_DISCOVERER_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
 		main_discoverer_loop(zbx_process);
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
-			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
-			+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS)
+	else if (server_num <= (server_count += CONFIG_HISTSYNCER_FORKS))
 	{
 		process_type = ZBX_PROCESS_TYPE_HISTSYNCER;
-		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
-				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS
-				- CONFIG_TRAPPER_FORKS - CONFIG_PINGER_FORKS
-				- CONFIG_HOUSEKEEPER_FORKS - CONFIG_HTTPPOLLER_FORKS
-				- CONFIG_DISCOVERER_FORKS;
+		process_num = server_num - server_count + CONFIG_HISTSYNCER_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
 		main_dbsyncer_loop();
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
-			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
-			+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS
-			+ CONFIG_IPMIPOLLER_FORKS)
+	else if (server_num <= (server_count += CONFIG_IPMIPOLLER_FORKS))
 	{
 		process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
-		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
-				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS
-				- CONFIG_TRAPPER_FORKS - CONFIG_PINGER_FORKS
-				- CONFIG_HOUSEKEEPER_FORKS - CONFIG_HTTPPOLLER_FORKS
-				- CONFIG_DISCOVERER_FORKS - CONFIG_HISTSYNCER_FORKS;
+		process_num = server_num - server_count + CONFIG_IPMIPOLLER_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
 		main_poller_loop(zbx_process, ZBX_POLLER_TYPE_IPMI);
 	}
-	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
-			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
-			+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS
-			+ CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFMON_FORKS)
+	else if (server_num <= (server_count += CONFIG_SELFMON_FORKS))
 	{
 		process_type = ZBX_PROCESS_TYPE_SELFMON;
-		process_num = server_num - CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS
-				- CONFIG_POLLER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS
-				- CONFIG_TRAPPER_FORKS - CONFIG_PINGER_FORKS
-				- CONFIG_HOUSEKEEPER_FORKS - CONFIG_HTTPPOLLER_FORKS
-				- CONFIG_DISCOVERER_FORKS - CONFIG_HISTSYNCER_FORKS
-				- CONFIG_IPMIPOLLER_FORKS;
+		process_num = server_num - server_count + CONFIG_SELFMON_FORKS;
 
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
@@ -779,12 +731,7 @@ void	zbx_on_exit()
 		sigaddset(&set, SIGCHLD);
 		sigprocmask(SIG_BLOCK, &set, NULL);
 
-		for (i = 1; i <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
-				+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-				+ CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
-				+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
-				+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS
-				+ CONFIG_IPMIPOLLER_FORKS + CONFIG_SELFMON_FORKS; i++)
+		for (i = 0; i < threads_num; i++)
 		{
 			if (threads[i])
 			{
@@ -802,7 +749,7 @@ void	zbx_on_exit()
 
 	free_metrics();
 
-	zbx_sleep(2); /* wait for all threads closing */
+	zbx_sleep(2);	/* wait for all child processes to exit */
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 	free_database_cache();
