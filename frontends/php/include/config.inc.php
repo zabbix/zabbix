@@ -85,9 +85,11 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 	function zbx_err_handler($errno, $errstr, $errfile, $errline)
 	{
+		if(preg_match('/^Function .+ is deprecated/', $errstr))
+			return;
 		error($errstr.'['.$errfile.':'.$errline.']');
 	}
-	
+
 	/********** START INITIALIZATION *********/
 
 	set_error_handler('zbx_err_handler');
@@ -103,10 +105,10 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
 	unset($show_setup);
-	
+
 	if(defined('ZBX_DENY_GUI_ACCESS')){
 		if(isset($ZBX_GUI_ACCESS_IP_RANGE) && is_array($ZBX_GUI_ACCESS_IP_RANGE)){
-			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?($_SERVER['HTTP_X_FORWARDED_FOR']):($_SERVER['REMOTE_ADDR']);	
+			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?($_SERVER['HTTP_X_FORWARDED_FOR']):($_SERVER['REMOTE_ADDR']);
 			if(!str_in_array($user_ip,$ZBX_GUI_ACCESS_IP_RANGE)) $DENY_GUI = TRUE;
 		}
 		else{
@@ -125,8 +127,8 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 			define('ZBX_DISTRIBUTED', false);
 			define('ZBX_PAGE_NO_AUTHERIZATION', true);
-			
-			$show_warning = true;			
+
+			$show_warning = true;
 		}
 		else
 		{
@@ -153,12 +155,12 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		if(file_exists($ZBX_CONFIGURATION_FILE)){
 			include $ZBX_CONFIGURATION_FILE;
 		}
-		
+
 		require_once('include/db.inc.php');
-		
+
 		define('ZBX_PAGE_NO_AUTHERIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
-		$show_setup = true;		
+		$show_setup = true;
 	}
 
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
@@ -186,7 +188,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		exit();
 	}
 //---
-	
+
 	if(isset($DENY_GUI)){
 		unset($show_warning);
 		include_once('warning.php');
@@ -239,7 +241,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 			{
 				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
-			
+
 			$ZBX_NODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, null, PERM_RES_DATA_ARRAY);
 
 			if ( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID]) )
@@ -262,7 +264,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 					$ZBX_CURRENT_SUBNODES[$nodeid] = $nodeid;
 				}
 			}
-			
+
 			zbx_set_post_cookie('zbx_current_nodeid',$ZBX_CURRENT_NODEID);
 			zbx_set_post_cookie('zbx_with_subnodes',$ZBX_WITH_SUBNODES);
 		}
@@ -334,7 +336,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 		include_once "include/page_footer.php";
 	}
-	
+
 	function detect_page_type($default=PAGE_TYPE_HTML){
 		if(isset($_REQUEST['output'])){
 			switch($_REQUEST['output']){
@@ -391,7 +393,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		show_error_message($msg);
 		include_once "include/page_footer.php";
 	}
-	
+
 //	The hash has form <sum of priorities>,<md5sum of triggerids>
 	function	calc_trigger_hash()
 	{
@@ -458,10 +460,10 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 						'font'	=> 4));
 					$width = max($width, ImageFontWidth(4) * strlen($msg) + 1);
 					$height += imagefontheight(4) + 1;
-					break;			
+					break;
 				case PAGE_TYPE_XML:
 					echo htmlspecialchars($msg)."\n";
-					break;			
+					break;
 				case PAGE_TYPE_HTML:
 				default:
 					echo "<p align=center>";
@@ -527,7 +529,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 			{
 				$message[$id]['y'] = 1 + (isset($previd) ? $message[$previd]['y'] + $message[$previd]['h'] : 0 );
 				$message[$id]['h'] = imagefontheight($msg['font']);
-				
+
 				ImageString(
 					$canvas,
 					$msg['font'],
@@ -536,7 +538,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 					$msg['text'],
 					ImageColorAllocate($canvas, $msg['color']['R'], $msg['color']['G'], $msg['color']['B'])
 					);
-				
+
 				$previd = $id;
 			}
 			ImageOut($canvas);
@@ -708,7 +710,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	function	validate_float($str)
 	{
 //		echo "Validating float:$str<br>";
-		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) 
+		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr))
 		{
 			return 0;
 		}
@@ -722,7 +724,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	function	validate_ticks($str)
 	{
 //		echo "Validating float:$str<br>";
-		if (eregi('^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$', $str, $arr)) 
+		if (eregi('^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$', $str, $arr))
 		{
 			return 0;
 		}
@@ -771,7 +773,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		{
 			switch($item["value_type"])
 			{
-				case ITEM_VALUE_TYPE_TEXT:	
+				case ITEM_VALUE_TYPE_TEXT:
 					if($DB_TYPE == "ORACLE")
 					{
 						if(isset($row["value"]))
@@ -784,10 +786,10 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 						}
 					}
 					/* do not use break */
-				case ITEM_VALUE_TYPE_STR:	
+				case ITEM_VALUE_TYPE_STR:
 					$value = nl2br(nbsp(htmlspecialchars($row["value"])));
 					break;
-				
+
 				default:
 					$value = $row["value"];
 					break;
@@ -827,7 +829,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 			DBexecute($sql);
 		}
 	}
-	
+
 	function get_str_month($num){
 		$month = '[Wrong value for month: '.$num.']';
 		switch($num){
@@ -844,10 +846,10 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 			case 11: $month = S_NOVEMBER; break;
 			case 12: $month = S_DECEMBER; break;
 		}
-	
+
 	return $month;
 	}
-	
+
 	function get_str_dayofweek($num){
 		$day = '[Wrong value for day of week: '.$num.']';
 		switch($num){
@@ -859,7 +861,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 			case 6: $day = S_SATURDAY; break;
 			case 7: $day = S_SUNDAY; break;
 		}
-	
+
 	return $day;
 	}
 
@@ -940,7 +942,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 	function	show_history($itemid,$from,$stime,$period)
 	{
-		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
+		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);
 		show_table_header("TILL $till (".($period/3600)." HOURs)");
 
 		echo "<center>";
@@ -1030,7 +1032,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 		$row=DBfetch(DBselect($sql." and t.status=0 and t.value=2"));
 		$status["triggers_count_unknown"]=$row["cnt"];
-// items 
+// items
 		$sql = "select count(i.itemid) as cnt from items i, hosts h where i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED;
 		$row=DBfetch(DBselect($sql));
 		$status["items_count"]=$row["cnt"];
@@ -1064,7 +1066,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 // users
 		$row=DBfetch(DBselect("select count(userid) as cnt from users"));
 		$status["users_count"]=$row["cnt"];
-		
+
 		$status["users_online"]=0;
 		$result=DBselect("select distinct s.userid from sessions s, users u where u.userid=s.userid and u.autologout>0 and (s.lastaccess+u.autologout)>".time());
 		while(DBfetch($result))		$status["users_online"]++;
@@ -1258,9 +1260,9 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	function zbx_stripslashes($value){
 		if(is_array($value)){
 			foreach($value as $id => $data)
-				$value[$id] = zbx_stripslashes($data); 
+				$value[$id] = zbx_stripslashes($data);
 				// $value = array_map('zbx_stripslashes',$value); /* don't use 'array_map' it buggy with indexes */
-		} 
+		}
 		else if(is_string($value)){
 			$value = stripslashes($value);
 		}
@@ -1310,7 +1312,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	echo "<b>".S_PERIOD.":</b>".SPACE;
 
 	$hour=3600;
-		
+
 		$a=array(S_1H=>3600,S_2H=>2*3600,S_4H=>4*3600,S_8H=>8*3600,S_12H=>12*3600,
 			S_24H=>24*3600,S_WEEK_SMALL=>7*24*3600,S_MONTH_SMALL=>31*24*3600,S_YEAR_SMALL=>365*24*3600);
 		foreach($a as $label=>$sec)
@@ -1460,7 +1462,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		if(!is_array($mappings))	return FALSE;
 
 		$valuemapid = get_dbid("valuemaps","valuemapid");
-		
+
 		$result = DBexecute("insert into valuemaps (valuemapid,name) values ($valuemapid,".zbx_dbstr($name).")");
 		if(!$result)
 			return $result;
@@ -1520,14 +1522,14 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		global $IMAGE_FORMAT_DEFAULT;
 
 		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
-		
-		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg"); 
-		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html"); 
-		else					Header( "Content-type:  image/png"); 
-		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
-//		Header( "Expires:  Mon, 17 Aug 2009 12:51:50 GMT"); 
+
+		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg");
+		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html");
+		else					Header( "Content-type:  image/png");
+		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
+//		Header( "Expires:  Mon, 17 Aug 2009 12:51:50 GMT");
 	}
-	
+
 	function ImageOut(&$image,$format=NULL){
 		global $page;
 		global $IMAGE_FORMAT_DEFAULT;
@@ -1543,12 +1545,12 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 			$_SESSION['imageid'][$id] = $image_txt;
 			session_write_close();
 			print($id);
-			
+
 //			print(base64_encode($image_txt));
 		}
 		else{
 			if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
-			
+
 			if(IMAGE_FORMAT_JPEG == $format)
 				imagejpeg($image);
 			else
