@@ -25,6 +25,6 @@
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
-void	main_trapper_loop(unsigned char p, zbx_sock_t *s);
+void	main_trapper_loop(zbx_sock_t *s);
 
 #endif

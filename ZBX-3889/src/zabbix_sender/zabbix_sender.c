@@ -30,7 +30,6 @@ const char	*progname = NULL;
 const char	title_message[] = "Zabbix Sender";
 const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c <file>]";
 
-#ifdef HAVE_GETOPT_LONG
 const char	*help_message[] = {
 	"Options:",
 	"  -c --config <file>                   Specify absolute path to the configuration file",
@@ -54,46 +53,16 @@ const char	*help_message[] = {
 	"",
 	"  -v --verbose                         Verbose mode, -vv for more details",
 	"",
-	" Other options:",
+	"Other options:",
 	"  -h --help                            Give this help",
 	"  -V --version                         Display version number",
-	0 /* end of text */
+	NULL	/* end of text */
 };
-#else
-const char	*help_message[] = {
-	"Options:",
-	"  -c <file>                    Specify absolute path to the configuration file",
-	"",
-	"  -z <server>                  Hostname or IP address of Zabbix Server",
-	"  -p <server port>             Specify port number of server trapper running on the server. Default is 10051",
-	"  -s <hostname>                Specify hostname or IP address of a host",
-	"  -I <IP address>              Specify source IP address",
-	"",
-	"  -k <key>                     Specify item key",
-	"  -o <key value>               Specify value",
-	"",
-	"  -i <input file>              Load values from input file. Specify - for standard input",
-	"                               Each line of file contains whitespace delimited: <hostname> <key> <value>",
-	"                               Specify - in <hostname> to use hostname from configuration file or --host argument",
-	"  -T                           Each line of file contains whitespace delimited: <hostname> <key> <timestamp> <value>",
-	"                               This can be used with -i option",
-	"  -r                           Send metrics one by one as soon as they are received",
-	"                               This can be used when reading from standard input",
-	"",
-	"  -v                           Verbose mode, -vv for more details",
-	"",
-	" Other options:",
-	"  -h                           Give this help",
-	"  -V                           Display version number",
-	0 /* end of text */
-};
-#endif
 
 /* COMMAND LINE OPTIONS */
 
 /* long options */
-
-static struct zbx_option longopts[] =
+static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
 	{"zabbix-server",	1,	NULL,	'z'},
@@ -108,11 +77,10 @@ static struct zbx_option longopts[] =
 	{"verbose",		0,	NULL,	'v'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
-	{0,0,0,0}
+	{NULL}
 };
 
 /* short options */
-
 static char	shortopts[] = "c:I:z:p:s:k:o:Ti:rvhV";
 
 /* end of COMMAND LINE OPTIONS */
@@ -295,14 +263,15 @@ static void    zbx_load_config(const char *config_file)
 	}
 }
 
-static zbx_task_t	parse_commandline(int argc, char **argv)
+static void	parse_commandline(int argc, char **argv)
 {
-	zbx_task_t	task = ZBX_TASK_START;
-	char		ch = '\0';
+	char	ch = '\0';
 
 	/* Parse the command-line. */
 	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
-		switch (ch) {
+	{
+		switch (ch)
+		{
 			case 'c':
 				CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
@@ -352,27 +321,25 @@ static zbx_task_t	parse_commandline(int argc, char **argv)
 				exit(FAIL);
 				break;
 		}
+	}
 
 	if (NULL == ZABBIX_SERVER && NULL == CONFIG_FILE)
 	{
 		usage();
 		exit(FAIL);
 	}
-
-	return task;
 }
 
 /* sending a huge amount of values in a single connection is likely to */
 /* take long and hit timeout, so we limit values to 250 per connection */
 #define VALUES_MAX	250
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	FILE			*in;
 	char			in_line[MAX_BUFFER_LEN], hostname[MAX_STRING_LEN], key[MAX_STRING_LEN],
 				key_value[MAX_BUFFER_LEN], clock[32];
-	int			task = ZBX_TASK_START, total_count = 0, succeed_count = 0, buffer_count = 0,
-				read_more = 0, ret = SUCCEED;
+	int			total_count = 0, succeed_count = 0, buffer_count = 0, read_more = 0, ret = SUCCEED;
 	double			last_send = 0;
 	const char		*p;
 	zbx_thread_args_t	thread_args;
@@ -380,7 +347,7 @@ int main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
-	task = parse_commandline(argc, argv);
+	parse_commandline(argc, argv);
 
 	zbx_load_config(CONFIG_FILE);
 
