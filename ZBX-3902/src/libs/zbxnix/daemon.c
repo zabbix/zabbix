@@ -91,7 +91,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 						s.sival_int = ZBX_TASK_CONFIG_CACHE_RELOAD;
 
-						if (-1 != sigqueue(threads[1], SIGUSR1, s))
+						if (-1 != sigqueue(threads[0], SIGUSR1, s))
 						{
 							zabbix_log(LOG_LEVEL_DEBUG, "the signal is redirected to"
 									" the configuration syncer");
