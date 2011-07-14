@@ -45,7 +45,6 @@
 #define MAX_REACHABLE_ITEMS	64
 #define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_REACHABLE_ITEMS to avoid buffer overflow */
 
-static unsigned char	zbx_process;
 extern unsigned char	process_type;
 extern int		process_num;
 
@@ -679,15 +678,13 @@ static int	get_values(unsigned char poller_type)
 	return num;
 }
 
-void	main_poller_loop(unsigned char p, unsigned char poller_type)
+void	main_poller_loop(unsigned char poller_type)
 {
 	int		nextcheck, sleeptime, processed;
 	double		sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() process_type:'%s' process_num:%d",
 			get_process_type_string(process_type), process_num);
-
-	zbx_process = p;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

@@ -23,6 +23,7 @@
 #include "pid.h"
 #include "cfg.h"
 #include "log.h"
+#include "zbxself.h"
 
 #include "fatal.h"
 
@@ -63,6 +64,53 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					CHECKED_FIELD_TYPE(siginfo, si_addr, void *));
 			print_fatal_info(sig, siginfo, context);
 			exit(FAIL);
+			break;
+		case SIGUSR1:
+			zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,value_int:%d].",
+					sig, get_signal_name(sig),
+					CHECKED_FIELD(siginfo, si_pid),
+					CHECKED_FIELD(siginfo, si_uid),
+					CHECKED_FIELD(siginfo, si_value.sival_int));
+#ifdef HAVE_SIGQUEUE
+			if (PARENT_PROCESS)
+			{
+				if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_value.sival_int))
+				{
+					extern unsigned char	daemon_type;
+
+					if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the"
+								" configuration cache cannot be"
+								" performed for passive proxy");
+					}
+					else
+					{
+						union sigval	s;
+						extern pid_t	*threads;
+
+						s.sival_int = ZBX_TASK_CONFIG_CACHE_RELOAD;
+
+						if (-1 != sigqueue(threads[1], SIGUSR1, s))
+						{
+							zabbix_log(LOG_LEVEL_DEBUG, "the signal is redirected to"
+									" the configuration syncer");
+						}
+						else
+						{
+							zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
+									zbx_strerror(errno));
+						}
+					}
+				}
+			}
+			else
+			{
+				extern void	zbx_sigusr_handler(zbx_task_t task);
+
+				zbx_sigusr_handler(CHECKED_FIELD(siginfo, si_value.sival_int));
+			}
+#endif
 			break;
 		case SIGQUIT:
 		case SIGINT:
@@ -110,7 +158,7 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					int		i, found = 0;
 					extern int	threads_num;
 					extern pid_t	*threads;
-				
+
 					for (i = 0; i < threads_num && 0 == found; i++)
 						found = (threads[i] == CHECKED_FIELD(siginfo, si_pid));
 
@@ -236,6 +284,7 @@ int	daemon_start(int allow_root)
 	sigaction(SIGSEGV, &phan, NULL);
 	sigaction(SIGBUS, &phan, NULL);
 	sigaction(SIGALRM, &phan, NULL);
+	sigaction(SIGUSR1, &phan, NULL);
 
 	/* Set SIGCHLD now to avoid race conditions when a child process is created before */
 	/* sigcaction() is called. To avoid problems when scripts exit in zbx_execute() and */
@@ -251,4 +300,36 @@ int	daemon_start(int allow_root)
 void	daemon_stop()
 {
 	drop_pid_file(CONFIG_PID_FILE);
+}
+
+int	zbx_sigusr_send(zbx_task_t task)
+{
+	int	ret = FAIL;
+	char	error[256];
+#ifdef HAVE_SIGQUEUE
+	pid_t	pid;
+
+	if (SUCCEED == read_pid_file(CONFIG_PID_FILE, &pid, error, sizeof(error)))
+	{
+		union sigval	s;
+
+		s.sival_int = task;
+
+		if (-1 != sigqueue(pid, SIGUSR1, s))
+		{
+			printf("command sent successfully\n");
+			ret = SUCCEED;
+		}
+		else
+			zbx_snprintf(error, sizeof(error), "cannot send command to PID [%d]: %s",
+					(int)pid, zbx_strerror(errno));
+	}
+#else
+	zbx_snprintf(error, sizeof(error), "operation is not supported on the given operating system");
+#endif
+
+	if (SUCCEED != ret)
+		printf("%s\n", error);
+
+	return ret;
 }
