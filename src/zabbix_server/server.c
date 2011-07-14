@@ -828,10 +828,9 @@ void test()
  ******************************************************************************/
 int main(int argc, char **argv)
 {
-	zbx_task_t	task  = ZBX_TASK_START;
-	char    ch      = '\0';
-
-	int	nodeid;
+	zbx_task_t	task = ZBX_TASK_START;
+	char    	ch = '\0';
+	int		nodeid = 0;
 
 	progname = argv[0];
 
@@ -846,7 +845,6 @@ int main(int argc, char **argv)
 			exit(-1);
 			break;
 		case 'n':
-			nodeid=0;
 			if(zbx_optarg)	nodeid = atoi(zbx_optarg);
 			task = ZBX_TASK_CHANGE_NODEID;
 			break;
@@ -1131,7 +1129,7 @@ void	zbx_on_exit()
 		{
 			if(threads[i]) {
 				kill(threads[i],SIGTERM);
-				threads[i] = (ZBX_THREAD_HANDLE)NULL;
+				threads[i] = ZBX_THREAD_HANDLE_NULL;
 			}
 		}
 	}

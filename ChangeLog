@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-380] fixed processing of triggers on case-insensitive databases (Sasha); updated compatibility for php 5.3+ (Vedmak)
  - [NTP-373] added a timeout handler for web.page.* checks (Sasha)
  - [NTP-373] added a timeout handler for external checks, user parameters, system.run anr net.tcp.* checks (Sasha)
  - [NTP-346] fixed processing of the system.uptime item under windows (Sasha)
