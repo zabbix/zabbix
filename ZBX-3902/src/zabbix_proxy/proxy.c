@@ -596,7 +596,7 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 	else if (server_num <= (server_count += CONFIG_CONFSYNCER_FORKS))
 	{
-		/* !!! configuration syncer must server #1 - child_signal_handler() uses threads[0] !!! */
+		/* !!! configuration syncer must be server #1 - child_signal_handler() uses threads[0] !!! */
 
 		process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
 		process_num = server_num - server_count + CONFIG_CONFSYNCER_FORKS;
