@@ -224,7 +224,7 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
 #define	CONFIG_DISCOVERY_GROUPID	4
 #define	CONFIG_NS_SUPPORT		5
 void	*DCconfig_get_config_data(void *data, int type);
-int	DCget_trigger_severity_name(DB_TRIGGER *trigger, char **replace_to);
+int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
 
 void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now);
 void	DCrequeue_unreachable_item(zbx_uint64_t itemid);
