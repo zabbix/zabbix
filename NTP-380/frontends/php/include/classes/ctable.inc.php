@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -26,24 +26,24 @@
 			$this->AddItem($item);
 			$this->SetClass($class);
 		}
-		
+
 		function SetAlign($value){
 			return $this->options['align'] = $value;
 		}
-		
+
 		function SetRowSpan($value){
 			return $this->options['rowspan'] = strval($value);
 		}
-		
+
 		function SetColSpan($value){
 			return $this->options['colspan'] =strval($value);
 		}
-		
+
 		function SetWidth($value){
 			if(is_string($value))$this->AddOption('width',$value);
 		}
 	}
-	
+
 	class CRow extends CTag{
 /* public */
 		function CRow($item=NULL,$class=NULL){
@@ -51,19 +51,19 @@
 			$this->AddItem($item);
 			$this->SetClass($class);
 		}
-		
+
 		function SetAlign($value){
 			return $this->options['align'] = $value;
 		}
-		
+
 		function AddItem($item){
-			if(strtolower(get_class($item))=='ccol') {
+			if(is_object($item) && strtolower(get_class($item))=='ccol') {
 				parent::AddItem($item);
 			}
 			elseif(is_array($item)){
 				foreach($item as $el){
-                        		if(strtolower(get_class($el))=='ccol') {
-                		        	parent::AddItem($el);
+					if(is_object($el) && strtolower(get_class($el))=='ccol') {
+						parent::AddItem($el);
 					} elseif(!is_null($el)) {
 						parent::AddItem('<td>'.unpack_object($el).'</td>');
 					}
@@ -73,7 +73,7 @@
 				parent::AddItem('<td>'.unpack_object($item).'</td>');
 			}
 		}
-		
+
 		function SetWidth($value){
 			if(is_string($value))$this->AddOption('width',$value);
 		}
@@ -94,7 +94,7 @@
 		function CTable($message=NULL,$class=NULL){
 			parent::CTag("table","yes");
 			$this->SetClass($class);
-				
+
 			$this->rownum = 0;
 			$this->oddRowClass = NULL;
 			$this->evenRowClass = NULL;
@@ -108,23 +108,23 @@
 
 			$this->message = $message;
 		}
-		
+
 		function SetOddRowClass($value=NULL){
 			$this->oddRowClass = $value;
 		}
-		
+
 		function SetEvenRowClass($value=NULL){
 			$this->evenRowClass = $value;
 		}
-		
+
 		function SetAlign($value){
 			return $this->options['align'] = $value;
 		}
-		
+
 		function SetCellPadding($value){
 			return $this->options['cellpadding'] = strval($value);
 		}
-		
+
 		function SetCellSpacing($value){
 			return $this->options['cellspacing'] = strval($value);
 		}
@@ -132,13 +132,13 @@
 		function PrepareRow($item,$rowClass=NULL){
 			if(is_null($item)) return NULL;
 
-			if(strtolower(get_class($item))=='ccol') {
+			if(is_object($item) && strtolower(get_class($item))=='ccol') {
 				if(isset($this->header) && !isset($item->options['colspan']))
 					$item->options['colspan'] = $this->colnum;
 
 				$item = new CRow($item,$rowClass);
 			}
-			if(strtolower(get_class($item))=='crow') {
+			if(is_object($item) && strtolower(get_class($item))=='crow') {
 				if(isset($rowClass))
 					$item->SetClass($rowClass);
 			}
@@ -156,7 +156,7 @@
 		function SetHeader($value=NULL,$class=NULL){
 			if(is_null($class)) $class = $this->headerClass;
 
-			if(strtolower(get_class($value))=='crow') {
+			if(is_object($value) && strtolower(get_class($value))=='crow') {
 				if(!is_null($class))	$value->SetClass($class);
 			}else{
 				$value = new CRow($value,$class);
@@ -191,7 +191,7 @@
 			$ret .= $this->header;
 			return $ret;
 		}
-		
+
 		function EndToString(){
 			$ret = "";
 			if($this->rownum == 0 && isset($this->message)) {

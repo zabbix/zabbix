@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -28,8 +28,8 @@
 			$this->SetName($name);
 		}
 		function AddRectArea($x1,$y1,$x2,$y2,$href,$alt)
-		{ 
-			return $this->AddArea(array($x1,$y1,$x2,$y2),$href,$alt,'rect'); 
+		{
+			return $this->AddArea(array($x1,$y1,$x2,$y2),$href,$alt,'rect');
 		}
 		function AddArea($coords,$href,$alt,$shape)
 		{
@@ -37,7 +37,7 @@
 		}
 		function AddItem($value)
 		{
-			if(strtolower(get_class($value)) != 'carea')
+			if(is_object($value) && strtolower(get_class($value)) != 'carea')
 				return $this->error("Incorrect value for AddItem [$value]");
 
 			return parent::AddItem($value);
