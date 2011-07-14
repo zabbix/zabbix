@@ -394,7 +394,7 @@ class CIconMap extends CZBXAPI{
 	 * @param array $iconmapids
 	 * @return array
 	 */
-	public function delete(array $iconmapids){
+	public function delete($iconmapids){
 		$iconmapids = zbx_toArray($iconmapids);
 
 		if(empty($iconmapids)){

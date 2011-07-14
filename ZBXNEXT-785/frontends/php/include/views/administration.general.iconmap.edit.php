@@ -39,9 +39,13 @@ if(isset($this->data['iconmap']['iconmapid'])){
 
 
 // header
-$TABLEiconMap->addRow(array(SPACE, _('Inventory field'), _('Expression'), _('Icon'), SPACE, SPACE));
+$TABLEiconMap->addRow(array(SPACE, SPACE, _('Inventory field'), _('Expression'), _('Icon'), SPACE, SPACE));
 
+$i = 1;
 foreach($this->data['iconmap']['mappings'] as $iconmappingid => $mapping){
+	$SPANnum = new CSpan($i++ . ':');
+	$SPANnum->addClass('rowNum');
+
 	$CCprofileLinks = new CComboBox('iconmap[mappings][' . $iconmappingid . '][inventory_link]', $mapping['inventory_link']);
 	$CCprofileLinks->addItems($this->data['inventoryList']);
 
@@ -57,6 +61,7 @@ foreach($this->data['iconmap']['mappings'] as $iconmappingid => $mapping){
 
 	$row = new CRow(array(
 		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
+		$SPANnum,
 		$CCprofileLinks,
 		$TBexpression,
 		$CBicons,
@@ -70,6 +75,9 @@ foreach($this->data['iconmap']['mappings'] as $iconmappingid => $mapping){
 // hidden row for js
 reset($this->data['iconList']);
 $firstIconId = key($this->data['iconList']);
+
+$SPANnum = new CSpan('0:');
+$SPANnum->addClass('rowNum');
 
 $CCprofileLinks = new CComboBox('iconmap[mappings][#{iconmappingid}][inventory_link]');
 $CCprofileLinks->addItems($this->data['inventoryList']);
@@ -89,6 +97,7 @@ $DIViconPreview->addStyle('margin: 0 auto;');
 
 $hiddenRow = new CRow(array(
 	new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
+	$SPANnum,
 	$CCprofileLinks,
 	$TBexpression,
 	$CBicons,
@@ -117,7 +126,7 @@ $footer = makeFormFooter(
 	array(new CSubmit('save', _('Save'))),
 	array(
 		new CSubmit('clone', _('Clone')),
-		new CSubmit('delete', _('Delete')),
+		new CButtonDelete(_('Delete icon map?'), url_param('form').url_param('iconmapid').url_param('config')),
 		new CButtonCancel(url_param('config')),
 	)
 );

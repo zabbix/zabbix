@@ -127,7 +127,7 @@ include_once('include/page_header.php');
 		'blink_period' =>		    array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 
 		// Icon Maps
-		'iconmapid' => 				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({config})&&({config}==14)&&(isset({form})&&({form}=="update"))'),
+		'iconmapid' => 				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({config})&&({config}==14)&&(((isset({form})&&({form}=="update")))||isset({delete}))'),
 		'iconmap' =>				array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==14)&&isset({save})'),
 
 		'form' =>			        array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
@@ -661,28 +661,36 @@ include_once('include/page_header.php');
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 	}
-	elseif(($_REQUEST['config'] == 14) && (isset($_REQUEST['save']))){
-		$i = 0;
-		foreach($_REQUEST['iconmap']['mappings'] as $iconmappingid => &$mapping){
-			$mapping['iconmappingid'] = $iconmappingid;
-			$mapping['sortorder'] = $i++;
-		}
-		unset($mapping);
+	elseif($_REQUEST['config'] == 14){
+		if(isset($_REQUEST['save'])){
+			$i = 0;
+			foreach($_REQUEST['iconmap']['mappings'] as $iconmappingid => &$mapping){
+				$mapping['iconmappingid'] = $iconmappingid;
+				$mapping['sortorder'] = $i++;
+			}
+			unset($mapping);
 
-		if(isset($_REQUEST['iconmap']['iconmapid'])){
-			$result = API::IconMap()->update($_REQUEST['iconmap']);
-			$msgOk = _('Icon map updated');
-			$msgErr =  _('Cannot update icon map');
-		}
-		else{
-			$result = API::IconMap()->create($_REQUEST['iconmap']);
-			$msgOk = _('Icon map created');
-			$msgErr =  _('Cannot create icon map');
-		}
+			if(isset($_REQUEST['iconmap']['iconmapid'])){
+				$result = API::IconMap()->update($_REQUEST['iconmap']);
+				$msgOk = _('Icon map updated');
+				$msgErr =  _('Cannot update icon map');
+			}
+			else{
+				$result = API::IconMap()->create($_REQUEST['iconmap']);
+				$msgOk = _('Icon map created');
+				$msgErr =  _('Cannot create icon map');
+			}
 
-		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
-		if($result){
-			unset($_REQUEST['form']);
+			show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
+			if($result){
+				unset($_REQUEST['form']);
+			}
+		}
+		elseif(isset($_REQUEST['delete'])){
+			$result = API::IconMap()->delete($_REQUEST['iconmapid']);
+			if($result){
+				unset($_REQUEST['form']);
+			}
 		}
 	}
 ?>
