@@ -175,6 +175,7 @@ include_once('include/page_header.php');
 
 		'reference'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
 		'writeonly'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
+		'noempty'=>			array(T_ZBX_STR, O_OPT, null,   null,		null),
 
 		'select'=>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
 
@@ -197,6 +198,7 @@ include_once('include/page_header.php');
 	$multiselect= get_request('multiselect', 0); //if create popup with checkboxes
 	$dstact 	= get_request('dstact', '');
 	$writeonly	= get_request('writeonly');
+	$noempty	= get_request('noempty'); 		// display/hide "Empty" button
 
 	$existed_templates = get_request('existed_templates', null);
 	$excludeids = get_request('excludeids', null);
@@ -391,14 +393,16 @@ include_once('include/page_header.php');
 		}
 
 		if(str_in_array($srctbl,array('triggers','hosts','host_group','hosts_and_templates'))){
-			$value1 = (isset($_REQUEST['dstfld1']) && (zbx_strpos($_REQUEST['dstfld1'], 'id') !== false))?0:'';
-			$value2 = (isset($_REQUEST['dstfld2']) && (zbx_strpos($_REQUEST['dstfld2'], 'id') !== false))?0:'';
+			if(zbx_empty($noempty)){
+				$value1 = (isset($_REQUEST['dstfld1']) && (zbx_strpos($_REQUEST['dstfld1'], 'id') !== false))?0:'';
+				$value2 = (isset($_REQUEST['dstfld2']) && (zbx_strpos($_REQUEST['dstfld2'], 'id') !== false))?0:'';
 
-			$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
-			$epmtyScript.= get_window_opener($dstfrm, $dstfld2, $value2);
-			$epmtyScript.= ' close_window(); return false;';
+				$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
+				$epmtyScript.= get_window_opener($dstfrm, $dstfld2, $value2);
+				$epmtyScript.= ' close_window(); return false;';
 
-			$frmTitle->addItem(array(SPACE,new CButton('empty',S_EMPTY, $epmtyScript)));
+				$frmTitle->addItem(array(SPACE,new CButton('empty',S_EMPTY, $epmtyScript)));
+			}
 		}
 	}
 
