@@ -64,6 +64,12 @@
 				navigation_bar_calc('web.httptest', $_REQUEST['favid'], true);
 			}
 		}
+		// saving fixed/dynamic setting to profile
+		if('timelinefixedperiod' == $_REQUEST['favobj']){
+			if(isset($_REQUEST['favid'])){
+				CProfile::update('web.httptest.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
+			}
+		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
@@ -264,7 +270,8 @@
 		'loadImage' => 1,
 		'loadScroll' => 0,
 		'dynamic' => 1,
-		'mainObject' => 1
+		'mainObject' => 1,
+		'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1)
 	);
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 
@@ -288,7 +295,8 @@
 		'loadImage' => 1,
 		'loadScroll' => 0,
 		'dynamic' => 1,
-		'mainObject' => 1
+		'mainObject' => 1,
+		'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1)
 	);
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 //-------------
@@ -302,7 +310,8 @@
 		'loadScroll' => 1,
 		'scrollWidthByImage' => 0,
 		'dynamic' => 1,
-		'mainObject' => 1
+		'mainObject' => 1,
+		'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1)
 	);
 
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');

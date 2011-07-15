@@ -127,42 +127,29 @@
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
-#define	ZBX_SERVICE_NAME_LEN	64
+#	define	ZBX_SERVICE_NAME_LEN	64
 extern char ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN];
 extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
-#endif /* _WINDOWS */
 
-#if defined(_WINDOWS)
-/*#	pragma warning (disable: 4100)*/
-#	pragma warning (disable: 4996) /* warning C4996: <function> was declared deprecated */
-#endif /* _WINDOWS */
-
-#ifndef HAVE_GETOPT_LONG
-	struct option
-	{
-		const char *name;
-		int has_arg;
-		int *flag;
-		int val;
-	};
-#	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
-#endif /* ndef HAVE_GETOPT_LONG */
+#	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
+#endif
 
 #define	SUCCEED		0
-#define	FAIL		(-1)
-#define	NOTSUPPORTED	(-2)
-#define	NETWORK_ERROR	(-3)
-#define	TIMEOUT_ERROR	(-4)
-#define	AGENT_ERROR	(-5)
+#define	FAIL		-1
+#define	NOTSUPPORTED	-2
+#define	NETWORK_ERROR	-3
+#define	TIMEOUT_ERROR	-4
+#define	AGENT_ERROR	-5
 const char	*zbx_result_string(int result);
 
-#define MAX_ID_LEN	21
-#define MAX_STRING_LEN	2048
-#define MAX_BUFFER_LEN	65536
+#define MAX_ID_LEN		21
+#define MAX_STRING_LEN		2048
+#define MAX_BUFFER_LEN		65536
+#define MAX_ZBX_HOSTNAME_LEN	64
 
 #define ZBX_DM_DELIMITER	'\255'
 
-/* Item types */
+/* item types */
 typedef enum
 {
 	ITEM_TYPE_ZABBIX = 0,
@@ -382,16 +369,19 @@ typedef enum
 	AUDIT_RESOURCE_REGEXP
 } zbx_auditlog_resourcetype_t;
 
-/* Special item key used for storing server status */
+/* special item key used for storing server status */
 #define SERVER_STATUS_KEY	"status"
-/* Special item key used for ICMP pings */
+/* special item key used for ICMP pings */
 #define SERVER_ICMPPING_KEY	"icmpping"
-/* Special item key used for ICMP ping latency */
+/* special item key used for ICMP ping latency */
 #define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
-/* Special item key used for ICMP ping loss packages */
+/* special item key used for ICMP ping loss packages */
 #define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
-/* Special item key used for internal Zabbix log */
+/* special item key used for internal Zabbix log */
 #define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
+
+/* runtime control options */
+#define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
 
 /* Media types */
 typedef enum
@@ -454,11 +444,12 @@ typedef enum
        GROUP_STATUS_DISABLED
 } zbx_group_status_type_t;
 
-/* process type */
-#define ZBX_PROCESS_SERVER		0x01
-#define ZBX_PROCESS_PROXY_ACTIVE	0x02
-#define ZBX_PROCESS_PROXY_PASSIVE	0x04
-#define ZBX_PROCESS_PROXY		0x06	/* ZBX_PROCESS_PROXY_ACTIVE | ZBX_PROCESS_PROXY_PASSIVE */
+/* daemon type */
+#define ZBX_DAEMON_TYPE_SERVER		0x01
+#define ZBX_DAEMON_TYPE_PROXY_ACTIVE	0x02
+#define ZBX_DAEMON_TYPE_PROXY_PASSIVE	0x04
+#define ZBX_DAEMON_TYPE_PROXY		0x06	/* ZBX_DAEMON_TYPE_PROXY_ACTIVE | ZBX_DAEMON_TYPE_PROXY_PASSIVE */
+#define ZBX_DAEMON_TYPE_AGENT		0x08
 
 /* maintenance */
 typedef enum
@@ -489,7 +480,7 @@ typedef enum
 typedef enum
 {
 	ZBX_IGNORE_CASE = 0,
-	ZBX_CASE_SENSITIVE	
+	ZBX_CASE_SENSITIVE
 } zbx_case_sensitive_t;
 
 /* HTTP Tests statuses */
@@ -695,7 +686,8 @@ typedef enum
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
-	ZBX_TASK_CHANGE_NODEID
+	ZBX_TASK_CHANGE_NODEID,
+	ZBX_TASK_CONFIG_CACHE_RELOAD
 }
 zbx_task_t;
 
@@ -809,6 +801,7 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
 
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
+#define strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 

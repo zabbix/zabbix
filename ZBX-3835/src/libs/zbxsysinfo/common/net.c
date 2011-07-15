@@ -168,6 +168,9 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 #ifndef T_TXT
 #	define T_TXT	ns_t_txt
 #endif	/* T_TXT */
+#ifndef T_SRV
+#	define T_SRV	ns_t_srv
+#endif	/* T_SRV */
 
 static char	*decode_type(int q_type)
 {
@@ -191,6 +194,7 @@ static char	*decode_type(int q_type)
 		case T_MINFO:	return "MINFO";	/* "mailbox information"; */
 		case T_MX:	return "MX";	/* "mail exchanger"; */
 		case T_TXT:	return "TXT";	/* "text"; */
+		case T_SRV:	return "SRV";	/* "service locator"; */
 		default:
 			zbx_snprintf(buf, sizeof(buf), "T_%d", q_type);
 			return buf;
@@ -304,6 +308,7 @@ int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_
 		{"MINFO", T_MINFO},
 		{"MX", T_MX},
 		{"TXT", T_TXT},
+		{"SRV", T_SRV},
 		{NULL}
 	};
 
@@ -321,7 +326,7 @@ int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_
 	char		zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], *name,
 			buffer[MAX_STRING_LEN];
 	unsigned char	*msg_end, *msg_ptr, *p;
-	int		num_answers, num_query, q_type, q_class, q_ttl, q_len,
+	int		num_answers, num_query, q_type, q_class, q_len,
 			value, offset, c, i, type, n, res;
 	answer_t	answer;
 	struct in_addr	inaddr;
@@ -387,7 +392,7 @@ int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_
 
 		GETSHORT(q_type, msg_ptr);
 		GETSHORT(q_class, msg_ptr);
-		GETLONG(q_ttl, msg_ptr);
+		msg_ptr += INT32SZ;		/* skipping TTL */
 		GETSHORT(q_len, msg_ptr);
 
 		switch (q_type)
@@ -531,6 +536,22 @@ int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_
 						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%c", *msg_ptr++);
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\"");
+				break;
+			case T_SRV:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
+
+				GETSHORT(value, msg_ptr);	/* priority */
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
+
+				GETSHORT(value, msg_ptr);	/* weight */
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
+
+				GETSHORT(value, msg_ptr);	/* port */
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
+
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
+					return SYSINFO_RET_FAIL;
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
 			default:
 				msg_ptr += q_len;

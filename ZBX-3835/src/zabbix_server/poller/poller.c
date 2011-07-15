@@ -45,7 +45,6 @@
 #define MAX_REACHABLE_ITEMS	64
 #define MAX_UNREACHABLE_ITEMS	1	/* must not be greater than MAX_REACHABLE_ITEMS to avoid buffer overflow */
 
-static unsigned char	zbx_process;
 extern unsigned char	process_type;
 extern int		process_num;
 
@@ -164,7 +163,8 @@ static void	update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 		init_result(&agent);
 		SET_UI64_RESULT(&agent, host_status);
 
-		dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0, 0);
+		dc_add_history(items[i].itemid, items[i].value_type, &agent, now,
+				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 
 		free_result(&agent);
 	}
@@ -451,8 +451,6 @@ static int	get_values(unsigned char poller_type)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DCinit_nextchecks();
-
 	num = DCconfig_get_poller_items(poller_type, items, ZBX_POLLER_TYPE_UNREACHABLE != poller_type
 								? MAX_REACHABLE_ITEMS : MAX_UNREACHABLE_ITEMS);
 
@@ -612,25 +610,18 @@ static int	get_values(unsigned char poller_type)
 		{
 			activate_host(&items[i], now);
 
-			dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0, 0);
+			dc_add_history(items[i].itemid, items[i].value_type, &agent, now,
+					ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, now);
 		}
 		else if (res == NOTSUPPORTED || res == AGENT_ERROR)
 		{
-			if (ITEM_STATUS_NOTSUPPORTED != items[i].status)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] became unsupported: %s",
-						items[i].host.host, items[i].key_orig,
-						ISSET_MSG(&agent) ? agent.msg : "(null)");
-				zabbix_syslog("Item [%s:%s] became unsupported: %s",
-						items[i].host.host, items[i].key_orig,
-						ISSET_MSG(&agent) ? agent.msg : "(null)");
-			}
-
 			activate_host(&items[i], now);
 
-			DCadd_nextcheck(items[i].itemid, now, agent.msg);	/* update error & status field in items table */
+			dc_add_history(items[i].itemid, items[i].value_type, NULL, now,
+					ITEM_STATUS_NOTSUPPORTED, agent.msg, 0, NULL, 0, 0, 0, 0);
+
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, now);
 		}
 		else if (res == NETWORK_ERROR)
@@ -682,14 +673,12 @@ static int	get_values(unsigned char poller_type)
 	zbx_free(snmpids);
 	zbx_free(ipmiids);
 
-	DCflush_nextchecks();
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return num;
 }
 
-void	main_poller_loop(unsigned char p, unsigned char poller_type)
+void	main_poller_loop(unsigned char poller_type)
 {
 	int		nextcheck, sleeptime, processed;
 	double		sec;
@@ -698,8 +687,6 @@ void	main_poller_loop(unsigned char p, unsigned char poller_type)
 			get_process_type_string(process_type), process_num);
 
 	set_child_signal_handler();
-
-	zbx_process = p;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

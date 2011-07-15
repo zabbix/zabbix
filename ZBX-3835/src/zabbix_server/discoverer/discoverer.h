@@ -20,6 +20,6 @@
 #ifndef ZABBIX_DISCOVERER_H
 #define ZABBIX_DISCOVERER_H
 
-void	main_discoverer_loop(unsigned char p);
+void	main_discoverer_loop();
 
 #endif

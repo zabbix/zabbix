@@ -113,7 +113,7 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
 	{
 		if (FAIL == zbx_check_hostname(host))
 		{
-			zbx_snprintf(error, error_max_len, "proxy name [%s] contains invalid characters", host);
+			zbx_snprintf(error, error_max_len, "invalid proxy name [%s]", host);
 			return ret;
 		}
 
@@ -302,21 +302,21 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		{
 			zbx_snprintf(condition, sizeof(condition),
 					" where t.proxy_hostid=" ZBX_FS_UI64
-						" and t.status=%d",
+						" and t.status in (%d,%d)",
 					proxy_hostid,
-					HOST_STATUS_MONITORED);
+					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 		}
 		else if (0 == strcmp(pt[i].table, "items"))
 		{
 			zbx_snprintf(condition, sizeof(condition),
 					", hosts r where t.hostid=r.hostid"
 						" and r.proxy_hostid=" ZBX_FS_UI64
-						" and r.status=%d"
-						" and t.status in (%d,%d)"
+						" and r.status in (%d,%d)"
+						" and t.status in (%d,%d,%d)"
 						" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 					proxy_hostid,
-					HOST_STATUS_MONITORED,
-					ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
+					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+					ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED,
 					ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 					ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
@@ -328,9 +328,9 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 			zbx_snprintf(condition, sizeof(condition),
 					", hosts r where t.hostid=r.hostid"
 						" and r.proxy_hostid=" ZBX_FS_UI64
-						" and r.status=%d",
+						" and r.status in (%d,%d)",
 					proxy_hostid,
-					HOST_STATUS_MONITORED);
+					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 		}
 		else if (0 == strcmp(pt[i].table, "drules"))
 		{
@@ -1268,8 +1268,6 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DCinit_nextchecks();
-
 	for (i = 0; i < value_num; i++)
 	{
 		if (SUCCEED != DCconfig_get_item_by_key(&item, proxy_hostid, values[i].host_name, values[i].key))
@@ -1295,7 +1293,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
 		{
-			DCadd_nextcheck(item.itemid, (time_t)values[i].clock, values[i].value);
+			dc_add_history(item.itemid, item.value_type, NULL, values[i].clock,
+					ITEM_STATUS_NOTSUPPORTED, values[i].value, 0, NULL, 0, 0, 0, 0);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -1314,8 +1313,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 					zbx_replace_invalid_utf8(values[i].source);
 
 				dc_add_history(item.itemid, item.value_type, &agent, values[i].clock,
-						values[i].timestamp, values[i].source, values[i].severity,
-						values[i].logeventid, values[i].lastlogsize, values[i].mtime);
+						ITEM_STATUS_ACTIVE, NULL, values[i].timestamp, values[i].source,
+						values[i].severity, values[i].logeventid, values[i].lastlogsize,
+						values[i].mtime);
 
 				if (NULL != processed)
 					(*processed)++;
@@ -1324,7 +1324,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
-				DCadd_nextcheck(item.itemid, (time_t)values[i].clock, agent.msg);
+
+				dc_add_history(item.itemid, item.value_type, NULL, values[i].clock,
+						ITEM_STATUS_NOTSUPPORTED, agent.msg, 0, NULL, 0, 0, 0, 0);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
@@ -1332,8 +1334,6 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			free_result(&agent);
 	 	}
 	}
-
-	DCflush_nextchecks();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

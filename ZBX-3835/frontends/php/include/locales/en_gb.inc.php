@@ -2141,13 +2141,6 @@
 	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
 	'S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED'=>	'Check the key, please. Default example was passed',
 	'S_ERROR_IN_ITEM_KEY' => 'Error in item key:',
-	'S_KEY_IS_VALID' => 'Key is valid',
-	'S_INCORRECT_SYNTAX_NEAR' => 'incorrect syntax near \'%1$s\' at position %2$d',
-	'S_INCORRECT_USAGE_OF_BRACKETS' => 'incorrect usage of bracket symbols. \'%s\' found after final bracket.',
-	'S_INVALID_CHARACTER_AT_POSITION' => 'invalid character \'%1$s\' at position %2$d',
-	'S_INVALID_KEY_FORMAT' => 'Invalid key format',
-	'S_KEY_CANNOT_BE_EMPTY' => 'Key cannot be empty',
-	'S_KEY_TOO_LARGE' => 'Key is too large: maximum %d characters',
 	'S_ITEM_UNLINKED' => 'Item "%s" unlinked',
 
 //	httptest.inc.php
@@ -2475,7 +2468,19 @@
 	'S_SECOND_IN_PARENTHESES' => '(seconds)',
 
 // class.cscreen.php
-	'S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM' => 'Incorrect resource provided for screen item'
+	'S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM' => 'Incorrect resource provided for screen item',
 
+// class.cbuttonqmessage.php
+	'S_ARE_YOU_SURE_YOU_WANT_TO_PERFORM_THIS_ACTION' => 'Are you sure you want perform this action?',
+	'S_INCORRECT_VALUE_FOR_SETMESSAGE' => 'Incorrect value for setMessage(): "%s".',
+
+// class.citemkey.php
+	'S_KEY_CANNOT_BE_EMPTY' => 'Key cannot be empty.',
+	'S_NO_KEY_ID_PROVIDED' => 'No key id provided.',
+	'S_NO_ITEM_KEY_PROVIDED' => 'Invalid item key format.',
+	'S_SIMPLE_CHECK_KEY_CANNOT_CONTAIN' => 'Simple check key cannot have parameters in [].',
+	'S_INCORRECT_SYNTAX_NEAR' => 'Incorrect syntax near \'%1$s\'',
+	'S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS' => 'Incorrect usage of bracket symbols. \'%s\' found after final bracket.',
+	'S_INVALID_KEY_FORMAT' => 'Invalid item key format.',
 );
 ?>

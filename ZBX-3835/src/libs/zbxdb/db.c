@@ -36,23 +36,73 @@ static int	txn_init = 0;
 #elif defined(HAVE_POSTGRESQL)
 	PGconn		*conn = NULL;
 	static int	ZBX_PG_BYTEAOID = 0;
+	int		ZBX_PG_SVERSION = 0;
 #elif defined(HAVE_SQLITE3)
 	sqlite3		*conn = NULL;
 	PHP_MUTEX	sqlite_access;
 #endif
+
+#if defined(HAVE_ORACLE)
+static const char	*zbx_oci_error(sword status)
+{
+	static char	errbuf[512];
+	sb4		errcode = 0;
+
+	errbuf[0] = '\0';
+
+	switch (status)
+	{
+		case OCI_SUCCESS_WITH_INFO:
+			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, &errcode,
+					(text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR);
+			break;
+		case OCI_NEED_DATA:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NEED_DATA");
+			break;
+		case OCI_NO_DATA:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NODATA");
+			break;
+		case OCI_ERROR:
+			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, &errcode,
+					(text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR);
+			break;
+		case OCI_INVALID_HANDLE:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_INVALID_HANDLE");
+			break;
+		case OCI_STILL_EXECUTING:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_STILL_EXECUTING");
+			break;
+		case OCI_CONTINUE:
+			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_CONTINUE");
+			break;
+	}
+
+	zbx_rtrim(errbuf, ZBX_WHITESPACE);
+
+	return errbuf;
+}
+#endif	/* HAVE_ORACLE */
 
 /*
  * Connect to the database.
  */
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
-	int	ret = ZBX_DB_OK;
+	int		ret = ZBX_DB_OK;
+#if defined(HAVE_IBM_DB2)
+	char		*connect = NULL;
+#elif defined(HAVE_ORACLE)
+	char		*connect = NULL;
+	sword		err = OCI_SUCCESS;
+#elif defined(HAVE_POSTGRESQL)
+	char		*cport = NULL;
+	DB_RESULT	result;
+	DB_ROW		row;
+#endif
 
 	txn_init = 1;
 
 #if defined(HAVE_IBM_DB2)
-	char	*connect = NULL;
-
 	connect = strdup("PROTOCOL=TCPIP;");
 	if (NULL != dbname && '\0' != *dbname)
 		connect = zbx_strdcatf(connect, "DATABASE=%s;", dbname);
@@ -80,7 +130,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 
 	/* connect to the database */
-	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLDriverConnect(ibm_db2.hdbc, NULL, connect, SQL_NTS,
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLDriverConnect(ibm_db2.hdbc, NULL, (SQLCHAR *)connect, SQL_NTS,
 								NULL, 0, NULL, SQL_DRIVER_NOPROMPT)))
 		ret = ZBX_DB_FAIL;
 
@@ -140,31 +190,28 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_FAIL == ret)
 	{
-		switch (mysql_errno(conn)) {
-		case CR_CONN_HOST_ERROR:
-		case CR_SERVER_GONE_ERROR:
-		case CR_CONNECTION_ERROR:
-		case CR_SERVER_LOST:
-		case ER_SERVER_SHUTDOWN:
-		case ER_ACCESS_DENIED_ERROR: /* wrong user or password */
-		case ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
-		case ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
-		case ER_UNKNOWN_ERROR:
-			ret = ZBX_DB_DOWN;
-			break;
-		default:
-			break;
+		switch (mysql_errno(conn))
+		{
+			case CR_CONN_HOST_ERROR:
+			case CR_SERVER_GONE_ERROR:
+			case CR_CONNECTION_ERROR:
+			case CR_SERVER_LOST:
+			case ER_SERVER_SHUTDOWN:
+			case ER_ACCESS_DENIED_ERROR:		/* wrong user or password */
+			case ER_ILLEGAL_GRANT_FOR_TABLE:	/* user without any privileges */
+			case ER_TABLEACCESS_DENIED_ERROR:	/* user without some privilege */
+			case ER_UNKNOWN_ERROR:
+				ret = ZBX_DB_DOWN;
+				break;
+			default:
+				break;
 		}
 	}
 #elif defined(HAVE_ORACLE)
-	char	*connect = NULL;
-	sword	err = OCI_SUCCESS;
-
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV)
 	if (NULL == getenv("NLS_LANG"))
 		putenv("NLS_LANG=.UTF8");
-#endif /* defined(HAVE_GETENV) && defined(HAVE_PUTENV) */
-
+#endif
 	memset(&oracle, 0, sizeof(oracle));
 
 	/* connection string format: [//]host[:port][/service name] */
@@ -189,6 +236,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 				(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
 				(dvoid * (*)(dvoid *, dvoid *, size_t))0,
 				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
+
 		if (OCI_SUCCESS != err)
 		{
 			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
@@ -219,6 +267,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX,
 						(void *)&oracle.srvhp, (ub4 *)0,
 						OCI_ATTR_SERVER, oracle.errhp);
+
 			if (OCI_SUCCESS != err)
 			{
 				zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
@@ -232,52 +281,49 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK != ret)
 		zbx_db_close();
 #elif defined(HAVE_POSTGRESQL)
-	char		*cport = NULL;
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		sversion;
-
 	if (0 != port)
-		cport = zbx_dsprintf(cport, "%i", port);
+		cport = zbx_dsprintf(cport, "%d", port);
 
 	conn = PQsetdbLogin(host, cport, NULL, NULL, dbname, user, password);
 
 	zbx_free(cport);
 
 	/* check to see that the backend connection was successfully made */
-	if (PQstatus(conn) != CONNECTION_OK)
+	if (CONNECTION_OK != PQstatus(conn))
 	{
 		zabbix_errlog(ERR_Z3001, dbname, 0, PQerrorMessage(conn));
 		ret = ZBX_DB_DOWN;
 	}
 	else
 	{
-		result = DBselect("select oid from pg_type where typname = 'bytea'");
+		result = DBselect("select oid from pg_type where typname='bytea'");
 		if (NULL != (row = DBfetch(result)))
-		{
 			ZBX_PG_BYTEAOID = atoi(row[0]);
-		}
 		DBfree_result(result);
 	}
 
 #ifdef	HAVE_FUNCTION_PQSERVERVERSION
-	sversion = PQserverVersion(conn);
-	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", sversion);
-#else
-	sversion = 0;
-#endif	/* HAVE_FUNCTION_PQSERVERVERSION */
+	ZBX_PG_SVERSION = PQserverVersion(conn);
+	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
+#endif
 
-	if (sversion >= 80100)
+	if (80100 <= ZBX_PG_SVERSION)
 	{
 		/* disable "nonstandard use of \' in a string literal" warning */
 		DBexecute("set escape_string_warning to off");
+	}
+
+	if (90000 <= ZBX_PG_SVERSION)
+	{
+		/* change the output format for values of type bytea from hex (the default) to escape */
+		DBexecute("set bytea_output=escape");
 	}
 #elif defined(HAVE_SQLITE3)
 #ifdef	HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != (ret = sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL)))
 #else
 	if (SQLITE_OK != (ret = sqlite3_open(dbname, &conn)))
-#endif	/* HAVE_FUNCTION_SQLITE3_OPEN_V2 */
+#endif
 	{
 		zabbix_errlog(ERR_Z3001, dbname, 0, sqlite3_errmsg(conn));
 		sqlite3_close(conn);
@@ -287,8 +333,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		char	*p, *path;
 
-		/* Do not return SQLITE_BUSY immediately, wait for N ms */
-		sqlite3_busy_timeout(conn, 60 * 1000);
+		/* do not return SQLITE_BUSY immediately, wait for N ms */
+		sqlite3_busy_timeout(conn, SEC_PER_MIN * 1000);
 
 		path = strdup(dbname);
 		if (NULL != (p = strrchr(path, '/')))
@@ -303,6 +349,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zbx_free(path);
 	}
 #endif	/* HAVE_SQLITE3 */
+
 	txn_init = 0;
 
 	return ret;
@@ -608,6 +655,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	int		status;
 #elif defined(HAVE_ORACLE)
 	OCIStmt		*stmthp = NULL;
+	sword		err = OCI_SUCCESS;
 #elif defined(HAVE_POSTGRESQL)
 	PGresult	*result;
 	char		*error = NULL;
@@ -716,8 +764,6 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		}
 	}
 #elif defined(HAVE_ORACLE)
-	sword err = OCI_SUCCESS;
-
 	err = OCIHandleAlloc( (dvoid *) oracle.envhp, (dvoid **) &stmthp,
 		OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0);
 
@@ -1220,7 +1266,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 	if (result->fld_num > 0)
 	{
 		int	i;
-		
+
 		result->values = zbx_malloc(result->values, sizeof(char *) * result->fld_num);
 
 		for (i = 0; i < result->fld_num; i++)
@@ -1395,7 +1441,7 @@ void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl)
 ub4	OCI_DBserver_status()
 {
 	sword	err;
-	ub4	server_status = OCI_SERVER_NOT_CONNECTED; 
+	ub4	server_status = OCI_SERVER_NOT_CONNECTED;
 
 	err = OCIAttrGet((void *)oracle.srvhp, OCI_HTYPE_SERVER, (void *)&server_status,
 			(ub4 *)0, OCI_ATTR_SERVER_STATUS, (OCIError *)oracle.errhp);
@@ -1406,40 +1452,5 @@ ub4	OCI_DBserver_status()
 	}
 
 	return server_status;
-}
-
-const char	*zbx_oci_error(sword status)
-{
-	static char	errbuf[512];
-	sb4		errcode = 0;
-
-	errbuf[0] = '\0';
-	switch (status)
-	{
-		case OCI_SUCCESS_WITH_INFO:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_SUCCESS_WITH_INFO");
-			break;
-		case OCI_NEED_DATA:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NEED_DATA");
-			break;
-		case OCI_NO_DATA:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_NODATA");
-			break;
-		case OCI_ERROR:
-			OCIErrorGet((dvoid *)oracle.errhp, (ub4)1, (text *)NULL, &errcode,
-				(text *)errbuf, (ub4)sizeof(errbuf), OCI_HTYPE_ERROR);
-			break;
-		case OCI_INVALID_HANDLE:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_INVALID_HANDLE");
-			break;
-		case OCI_STILL_EXECUTING:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_STILL_EXECUTING");
-			break;
-		case OCI_CONTINUE:
-			zbx_snprintf(errbuf, sizeof(errbuf), "%s", "OCI_CONTINUE");
-			break;
-	}
-
-	return errbuf;
 }
 #endif	/* HAVE_ORACLE */

@@ -409,7 +409,7 @@ insert into help_items values (5,'zabbix[trends_uint]','Number of values stored 
 insert into help_items values (5,'zabbix[triggers]','Number of triggers in Zabbix database.');
 insert into help_items values (5,'zabbix[uptime]','Uptime of Zabbix server process in seconds.');
 insert into help_items values (5,'zabbix[wcache,&lt;cache&gt;,&lt;mode&gt;]','Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free).');
-insert into help_items values (5,'zabbix[process,&lt;type&gt;,&lt;num&gt;,&lt;state&gt;]','Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage.');
+insert into help_items values (5,'zabbix[process,&lt;type&gt;,&lt;num&gt;,&lt;state&gt;]','Time a particular Zabbix process or a group of processes (identified by &lt;type&gt; and &lt;num&gt;) spent in &lt;state&gt; in percentage.');
 
 insert into help_items values (8,'grpfunc[&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;]','Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual.');
 
@@ -436,7 +436,7 @@ insert into help_items values(0,'system.cpu.switches','Context switches.');
 insert into help_items values(0,'system.cpu.util[&lt;cpu&gt; &lt;,type&gt; &lt;,mode&gt;]','CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used.');
 insert into help_items values(0,'system.boottime','Timestamp of system boot.');
 insert into help_items values(0,'system.cpu.num','Number of available proccessors.');
-insert into help_items values(0,'system.hostname','Return host name. String value. Example of returned value: www.zabbix.com');
+insert into help_items values(0,'system.hostname[&lt;type&gt;]','Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com');
 insert into help_items values(0,'system.localtime','System local time. Time in seconds.');
 insert into help_items values(0,'system.run[command,&lt;mode&gt]','Run specified command on the host.');
 insert into help_items values(0,'system.swap.in[&lt;swap&gt; &lt;,type&gt;]','Swap in. If type is count - swapins is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.');
@@ -488,7 +488,7 @@ insert into help_items values(7,'system.cpu.switches','Context switches.');
 insert into help_items values(7,'system.cpu.util[&lt;cpu&gt; &lt;,type&gt; &lt;,mode&gt;]','CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used.');
 insert into help_items values(7,'system.boottime','Timestamp of system boot.');
 insert into help_items values(7,'system.cpu.num','Number of available proccessors.');
-insert into help_items values(7,'system.hostname','Return host name. String value. Example of returned value: www.zabbix.com');
+insert into help_items values(7,'system.hostname[&lt;type&gt;]','Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com');
 insert into help_items values(7,'system.localtime','System local time. Time in seconds.');
 insert into help_items values(7,'system.run[command,&lt;mode&gt]','Run specified command on the host.');
 insert into help_items values(7,'system.swap.in[&lt;swap&gt; &lt;,type&gt;]','Swap in. If type is count - swapins is returned. If type is pages - pages swapped in is returned. If swap is missing all is used.');

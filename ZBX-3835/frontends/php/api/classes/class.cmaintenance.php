@@ -630,15 +630,15 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 
-				//checkig wheter a maintence with this name and different already exists
-				//first, getting all maintences with the same name as this
+				// checking whether a maintenance with this name and different id already exists
+				// first, getting all maintenances with the same name as this
 				$options = array(
 					'filter' => array(
 									'name'=>$maintenance['name']
 								)
 				);
 				$received_maintenaces = CMaintenance::get($options);
-				//now going though a result, to find records with different id, then our object
+				// now going through a result, to find records with different id than our object
 				foreach($received_maintenaces as $r_maintenace){
 					if ($r_maintenace['maintenanceid'] != $maintenance['maintenanceid']) {
 						//error! Maintenance with this name already exists

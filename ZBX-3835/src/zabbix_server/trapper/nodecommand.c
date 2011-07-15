@@ -150,31 +150,37 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 
 			if (SUCCEED == (ret = parse_ipmi_command(p, item.ipmi_sensor, &val)))
 			{
-				if (SUCCEED == (ret = set_ipmi_control_value(&item, val,
-						error, sizeof(error))))
+				if (SUCCEED == (ret = set_ipmi_control_value(&item, val, error, sizeof(error))))
 				{
 					*result = zbx_dsprintf(*result, "NODE %d: IPMI command successfully executed",
 							CONFIG_NODEID);
 				}
 				else
+				{
 					*result = zbx_dsprintf(*result, "NODE %d: Cannot execute IPMI command: %s",
 							CONFIG_NODEID, error);
+				}
 			}
 			else
+			{
 				 *result = zbx_dsprintf(*result, "NODE %d: Cannot parse IPMI command",
 						CONFIG_NODEID);
+			}
 		}
 		else
+		{
 			*result = zbx_dsprintf(*result, "NODE %d: Unknown Host ID [" ZBX_FS_UI64 "]",
 					CONFIG_NODEID, hostid);
+		}
+
 		DBfree_result(db_result);
 	}
 	else
 	{
-#endif
+#endif	/* HAVE_OPENIPMI */
 		if (SUCCEED != (ret = zbx_execute(p, result, error, sizeof(error), CONFIG_TRAPPER_TIMEOUT)))
-			*result = zbx_dsprintf(*result, "NODE %d: Cannot execute command: %s",
-					CONFIG_NODEID, error);
+			*result = zbx_dsprintf(*result, "NODE %d: Cannot execute command: %s", CONFIG_NODEID, error);
+
 #ifdef HAVE_OPENIPMI
 	}
 #endif
