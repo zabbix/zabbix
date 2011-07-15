@@ -168,6 +168,9 @@ int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
 
+/* From 'config' table - no need to cache ns_support */
+int	CONFIG_NS_SUPPORT		= 0;
+
 /* Zabbix server startup time */
 int	CONFIG_SERVER_STARTUP_TIME	= 0;
 
@@ -530,6 +533,12 @@ int	MAIN_ZABBIX_ENTRY()
 #endif
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
+
+	result = DBselect("select ns_support from config where 1=1" DB_NODE, DBnode_local("configid"));
+
+	if (NULL != (row = DBfetch(result)))
+		CONFIG_NS_SUPPORT = atoi(row[0]);
+	DBfree_result(result);
 
 	if (0 != CONFIG_NODEID)
 	{

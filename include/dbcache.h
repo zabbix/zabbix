@@ -46,7 +46,6 @@ extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
 extern int	CONFIG_JAVAPOLLER_FORKS;
 extern int	CONFIG_PINGER_FORKS;
-extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_NS_SUPPORT;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
@@ -222,7 +221,6 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
 #define	CONFIG_EVENT_HISTORY		2
 #define	CONFIG_REFRESH_UNSUPPORTED	3
 #define	CONFIG_DISCOVERY_GROUPID	4
-#define	CONFIG_NS_SUPPORT		5
 void	*DCconfig_get_config_data(void *data, int type);
 int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
 

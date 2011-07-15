@@ -474,8 +474,8 @@ INDEX		|1		|actionid
 
 TABLE|config|configid|ZBX_SYNC
 FIELD		|configid	|t_id		|	|NOT NULL	|0
-FIELD		|alert_history	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|event_history	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|alert_history	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|event_history	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|refresh_unsupported|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|work_period	|t_varchar(100)	|'1-5,00:00-24:00'|NOT NULL	|ZBX_SYNC
 FIELD		|alert_usrgrpid	|t_id		|	|NULL		|ZBX_SYNC		|1|usrgrp	|usrgrpid	|RESTRICT
@@ -495,19 +495,19 @@ FIELD		|dropdown_first_remember|t_integer|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|discovery_groupid|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|2|groups	|groupid	|RESTRICT
 FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
 FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_SYNC
-FIELD		|ns_support	|t_integer	|'0'	|NOT NULL	|0,ZBX_PROXY
+FIELD		|ns_support	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|severity_color_0|t_varchar(6)	|'DBDBDB'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_color_1|t_varchar(6)	|'D6F6FF'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_color_2|t_varchar(6)	|'FFF6A5'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_color_3|t_varchar(6)	|'FFB689'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_color_4|t_varchar(6)	|'FF9999'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_color_5|t_varchar(6)	|'FF3838'|NOT NULL	|ZBX_SYNC
-FIELD		|severity_name_0|t_varchar(32)	|'Not classified'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|severity_name_1|t_varchar(32)	|'Information'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|severity_name_2|t_varchar(32)	|'Warning'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|severity_name_3|t_varchar(32)	|'Average'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|severity_name_4|t_varchar(32)	|'High'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|severity_name_5|t_varchar(32)	|'Disaster'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|severity_name_0|t_varchar(32)	|'Not classified'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_name_1|t_varchar(32)	|'Information'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_name_2|t_varchar(32)	|'Warning'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_name_3|t_varchar(32)	|'Average'|NOT NULL	|ZBX_SYNC
+FIELD		|severity_name_4|t_varchar(32)	|'High'	|NOT NULL	|ZBX_SYNC
+FIELD		|severity_name_5|t_varchar(32)	|'Disaster'|NOT NULL	|ZBX_SYNC
 FIELD		|ok_period	|t_integer	|'1800'	|NOT NULL	|ZBX_SYNC 
 FIELD		|blink_period	|t_integer	|'1800'	|NOT NULL	|ZBX_SYNC 
 FIELD		|problem_unack_color|t_varchar(6)|'DC0000'|NOT NULL	|ZBX_SYNC
