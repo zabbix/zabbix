@@ -444,13 +444,12 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		{
 			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
 					",config r where t.groupid=r.discovery_groupid" DB_NODE,
-					DBnode_local("t.groupid"));
+					DBnode_local("r.configid"));
 		}
 		else if (0 == strcmp(pt[i].table, "config"))
 		{
 			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					" where 1=1" DB_NODE,
-					DBnode_local("configid"));
+					" where 1=1" DB_NODE, DBnode_local("configid"));
 		}
 		else
 			*condition = '\0';
