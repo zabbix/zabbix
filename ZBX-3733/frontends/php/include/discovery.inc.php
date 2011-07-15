@@ -186,7 +186,7 @@ require_once('include/perm.inc.php');
 
 		// checking to the duplicate of the name
 		if(CDRule::exists(array('name' => $name))){
-			error('Discovery rule with name "'.$name.'" already exists.');
+			error(S_DISCOVERY_RULE.SPACE.'['.$name.']'.SPACE.S_ALREADY_EXISTS_SMALL);
 			return false;
 		}
 
@@ -218,6 +218,12 @@ require_once('include/perm.inc.php');
 			error(S_INCORRECT_IP_RANGE);
 			return false;
 
+		}
+
+		// checking to the duplicate of the name
+		if(CDRule::exists(array('name' => $name))){
+			error(S_DISCOVERY_RULE.SPACE.'['.$name.']'.SPACE.S_ALREADY_EXISTS_SMALL);
+			return false;
 		}
 
 		$result = DBexecute('update drules set proxy_hostid='.$proxy_hostid.',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
