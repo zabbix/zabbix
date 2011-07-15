@@ -1994,7 +1994,6 @@
 	'S_EMPTY'=>				'Empty',
 	'S_STANDARD_ITEMS_BIG'=>		'STANDARD ITEMS',
 	'S_NO_ITEMS'=>				'No items',
-	'S_DISCOVERY_RULE'=>		'Discovery rule',
 	'S_DISCOVERY_RULES_BIG'=>		'DISCOVERY RULES',
 	'S_DISCOVERY_CHECKS_BIG'=>		'DISCOVERY CHECKS',
 	'S_HOSTS_AND_TEMPLATES_BIG'=>		'Hosts and templates',
