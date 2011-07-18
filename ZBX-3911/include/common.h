@@ -134,17 +134,6 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #	pragma warning (disable: 4996)	/* warning C4996: <function> was declared deprecated */
 #endif
 
-#ifndef HAVE_GETOPT_LONG
-	struct option
-	{
-		const char *name;
-		int has_arg;
-		int *flag;
-		int val;
-	};
-#	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
-#endif
-
 #define	SUCCEED		0
 #define	FAIL		-1
 #define	NOTSUPPORTED	-2
@@ -380,16 +369,19 @@ typedef enum
 	AUDIT_RESOURCE_REGEXP
 } zbx_auditlog_resourcetype_t;
 
-/* Special item key used for storing server status */
+/* special item key used for storing server status */
 #define SERVER_STATUS_KEY	"status"
-/* Special item key used for ICMP pings */
+/* special item key used for ICMP pings */
 #define SERVER_ICMPPING_KEY	"icmpping"
-/* Special item key used for ICMP ping latency */
+/* special item key used for ICMP ping latency */
 #define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
-/* Special item key used for ICMP ping loss packages */
+/* special item key used for ICMP ping loss packages */
 #define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
-/* Special item key used for internal Zabbix log */
+/* special item key used for internal Zabbix log */
 #define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
+
+/* runtime control options */
+#define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
 
 /* Media types */
 typedef enum
@@ -452,11 +444,12 @@ typedef enum
        GROUP_STATUS_DISABLED
 } zbx_group_status_type_t;
 
-/* process type */
-#define ZBX_PROCESS_SERVER		0x01
-#define ZBX_PROCESS_PROXY_ACTIVE	0x02
-#define ZBX_PROCESS_PROXY_PASSIVE	0x04
-#define ZBX_PROCESS_PROXY		0x06	/* ZBX_PROCESS_PROXY_ACTIVE | ZBX_PROCESS_PROXY_PASSIVE */
+/* daemon type */
+#define ZBX_DAEMON_TYPE_SERVER		0x01
+#define ZBX_DAEMON_TYPE_PROXY_ACTIVE	0x02
+#define ZBX_DAEMON_TYPE_PROXY_PASSIVE	0x04
+#define ZBX_DAEMON_TYPE_PROXY		0x06	/* ZBX_DAEMON_TYPE_PROXY_ACTIVE | ZBX_DAEMON_TYPE_PROXY_PASSIVE */
+#define ZBX_DAEMON_TYPE_AGENT		0x08
 
 /* maintenance */
 typedef enum
@@ -487,7 +480,7 @@ typedef enum
 typedef enum
 {
 	ZBX_IGNORE_CASE = 0,
-	ZBX_CASE_SENSITIVE	
+	ZBX_CASE_SENSITIVE
 } zbx_case_sensitive_t;
 
 /* HTTP Tests statuses */
@@ -693,7 +686,8 @@ typedef enum
 	ZBX_TASK_UNINSTALL_SERVICE,
 	ZBX_TASK_START_SERVICE,
 	ZBX_TASK_STOP_SERVICE,
-	ZBX_TASK_CHANGE_NODEID
+	ZBX_TASK_CHANGE_NODEID,
+	ZBX_TASK_CONFIG_CACHE_RELOAD
 }
 zbx_task_t;
 
