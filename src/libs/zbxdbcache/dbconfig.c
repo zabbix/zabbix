@@ -20,18 +20,19 @@
 #include "common.h"
 #include "log.h"
 #include "threads.h"
-
 #include "dbcache.h"
 #include "ipc.h"
 #include "mutexs.h"
-
 #include "memalloc.h"
 #include "strpool.h"
-
+#include "zbxserver.h"
 #include "zbxalgo.h"
 
-#define	LOCK_CACHE	zbx_mutex_lock(&config_lock)
-#define	UNLOCK_CACHE	zbx_mutex_unlock(&config_lock)
+static int	sync_in_progress = 0;
+#define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
+#define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_unlock(&config_lock)
+#define START_SYNC	LOCK_CACHE; sync_in_progress = 1
+#define FINISH_SYNC	sync_in_progress = 0; UNLOCK_CACHE
 
 #define ZBX_LOC_NOWHERE	0
 #define ZBX_LOC_QUEUE	1
@@ -2006,7 +2007,6 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 	ZBX_DC_INTERFACE	*interface;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
-
 	int			found, update_index;
 	zbx_uint64_t		interfaceid, hostid;
 	unsigned char		type, main_;
@@ -2074,7 +2074,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 		/* update interfaces_ht index using new data, if not done already */
 
-		if (update_index)
+		if (1 == update_index)
 		{
 			interface_ht_local.hostid = interface->hostid;
 			interface_ht_local.type = interface->type;
@@ -2084,7 +2084,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 		}
 	}
 
-	/* remove deleted interfaces from buffer */
+	/* remove deleted interfaces from buffer and resolve macros for ip and dns fields */
 
 	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -2092,24 +2092,60 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 	while (NULL != (interface = zbx_hashset_iter_next(&iter)))
 	{
-		if (FAIL != zbx_vector_uint64_bsearch(&ids, interface->interfaceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			continue;
-
-		if (1 == interface->main)
+		if (FAIL == zbx_vector_uint64_bsearch(&ids, interface->interfaceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
-			interface_ht_local.hostid = interface->hostid;
-			interface_ht_local.type = interface->type;
-			interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
+			/* remove from buffer */
 
-			if (sync_num != interface_ht->sync_num)
-				zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
+			if (1 == interface->main)
+			{
+				interface_ht_local.hostid = interface->hostid;
+				interface_ht_local.type = interface->type;
+				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
+
+				if (sync_num != interface_ht->sync_num)
+					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
+			}
+
+			zbx_strpool_release(interface->ip);
+			zbx_strpool_release(interface->dns);
+			zbx_strpool_release(interface->port);
+
+			zbx_hashset_iter_remove(&iter);
 		}
+		else if (1 != interface->main || INTERFACE_TYPE_AGENT != interface->type)
+		{
+			/* macros are not supported for the main agent interface, resolve for other interfaces */
 
-		zbx_strpool_release(interface->ip);
-		zbx_strpool_release(interface->dns);
-		zbx_strpool_release(interface->port);
+			int	macros;
+			char	*addr;
+			DC_HOST	host;
 
-		zbx_hashset_iter_remove(&iter);
+			macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
+			macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
+
+			if (0 != macros)
+			{
+				DCget_host_by_hostid(&host, hostid);
+
+				if (0 != (macros & 0x01))
+				{
+					addr = zbx_strdup(NULL, interface->ip);
+					substitute_simple_macros(NULL, NULL, &host, NULL, &addr,
+							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					DCstrpool_replace(1, &interface->ip, addr);
+					zbx_free(addr);
+				}
+
+				if (0 != (macros & 0x02))
+				{
+					addr = zbx_strdup(NULL, interface->dns);
+					substitute_simple_macros(NULL, NULL, &host, NULL, &addr,
+							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					DCstrpool_replace(1, &interface->dns, addr);
+					zbx_free(addr);
+				}
+			}
+		}
 	}
 
 	zbx_vector_uint64_destroy(&ids);
@@ -2276,7 +2312,7 @@ void	DCsync_configuration()
 			DBnode_local("interfaceid"));
 	ifsec = zbx_time() - sec;
 
-	LOCK_CACHE;
+	START_SYNC;
 
 	sync_num++;
 
@@ -2383,7 +2419,7 @@ void	DCsync_configuration()
 	zbx_mem_dump_stats(config_mem);
 	zbx_mem_dump_stats(strpool->mem_info);
 
-	UNLOCK_CACHE;
+	FINISH_SYNC;
 
 	DBfree_result(item_result);
 	DBfree_result(trig_result);
