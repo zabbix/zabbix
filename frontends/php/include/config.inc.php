@@ -143,9 +143,13 @@ function __autoload($class_name){
 	require_once('include/validate.inc.php');
 
 	function zbx_err_handler($errno, $errstr, $errfile, $errline){
-		error($errstr.'['.$errfile.':'.$errline.']');
-//		show_messages();
-//		die();
+		$pathLength = strlen(__FILE__);
+
+		// strlen(include/config.inc.php) = 22
+		$pathLength -= 22;
+		$errfile = substr($errfile, $pathLength);
+
+		error($errstr.' ['.$errfile.':'.$errline.']');
 	}
 
 	/********** START INITIALIZATION *********/
