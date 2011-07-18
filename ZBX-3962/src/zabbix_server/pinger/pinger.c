@@ -182,79 +182,95 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 		return NOTSUPPORTED;
 
 	if (0 == strcmp(cmd, SERVER_ICMPPING_KEY))
+	{
 		*icmpping = ICMPPING;
+	}
 	else if (0 == strcmp(cmd, SERVER_ICMPPINGLOSS_KEY))
+	{
 		*icmpping = ICMPPINGLOSS;
+	}
 	else if (0 == strcmp(cmd, SERVER_ICMPPINGSEC_KEY))
+	{
 		*icmpping = ICMPPINGSEC;
+	}
 	else
 	{
-		zbx_snprintf(error, max_error_len, "Unsupported pinger key");
+		zbx_snprintf(error, max_error_len, "unsupported pinger key");
 		return NOTSUPPORTED;
 	}
 
 	num_params = num_param(params);
 
-	if (num_params > 6 || (*icmpping != ICMPPINGSEC && num_params > 5))
+	if (6 < num_params || (ICMPPINGSEC != *icmpping && 5 < num_params))
 	{
-		zbx_snprintf(error, max_error_len, "Too many arguments");
+		zbx_snprintf(error, max_error_len, "too many arguments");
 		return NOTSUPPORTED;
 	}
 
-	if (0 != get_param(params, 2, buffer, sizeof(buffer)) || *buffer == '\0')
-		*count = 3;
-	else if (FAIL == is_uint(buffer) || (*count = atoi(buffer)) < MIN_COUNT || *count > MAX_COUNT)
+	if (0 != get_param(params, 2, buffer, sizeof(buffer)) || '\0' == *buffer)
 	{
-		zbx_snprintf(error, max_error_len, "Number of packets [%s] is not between %d and %d",
+		*count = 3;
+	}
+	else if (FAIL == is_uint(buffer) || MIN_COUNT > (*count = atoi(buffer)) || *count > MAX_COUNT)
+	{
+		zbx_snprintf(error, max_error_len, "number of packets [%s] is not between %d and %d",
 				buffer, MIN_COUNT, MAX_COUNT);
 		return NOTSUPPORTED;
 	}
 
-	if (0 != get_param(params, 3, buffer, sizeof(buffer)) || *buffer == '\0')
-		*interval = 0;
-	else if (FAIL == is_uint(buffer) || (*interval = atoi(buffer)) < MIN_INTERVAL)
+	if (0 != get_param(params, 3, buffer, sizeof(buffer)) || '\0' == *buffer)
 	{
-		zbx_snprintf(error, max_error_len, "Interval [%s] should be at least %d",
-				buffer, MIN_INTERVAL);
+		*interval = 0;
+	}
+	else if (FAIL == is_uint(buffer) || MIN_INTERVAL > (*interval = atoi(buffer)))
+	{
+		zbx_snprintf(error, max_error_len, "interval [%s] should be at least %d", buffer, MIN_INTERVAL);
 		return NOTSUPPORTED;
 	}
 
-	if (0 != get_param(params, 4, buffer, sizeof(buffer)) || *buffer == '\0')
-		*size = 0;
-	else if (FAIL == is_uint(buffer) || (*size = atoi(buffer)) < MIN_SIZE || *size > MAX_SIZE)
+	if (0 != get_param(params, 4, buffer, sizeof(buffer)) || '\0' == *buffer)
 	{
-		zbx_snprintf(error, max_error_len, "Packet size [%s] is not between %d and %d",
+		*size = 0;
+	}
+	else if (FAIL == is_uint(buffer) || MIN_SIZE > (*size = atoi(buffer)) || *size > MAX_SIZE)
+	{
+		zbx_snprintf(error, max_error_len, "packet size [%s] is not between %d and %d",
 				buffer, MIN_SIZE, MAX_SIZE);
 		return NOTSUPPORTED;
 	}
 
-	if (0 != get_param(params, 5, buffer, sizeof(buffer)) || *buffer == '\0')
+	if (0 != get_param(params, 5, buffer, sizeof(buffer)) || '\0' == *buffer)
 		*timeout = 0;
-	else if (FAIL == is_uint(buffer) || (*timeout = atoi(buffer)) < MIN_TIMEOUT)
+	else if (FAIL == is_uint(buffer) || MIN_TIMEOUT > (*timeout = atoi(buffer)))
 	{
-		zbx_snprintf(error, max_error_len, "Timeout [%s] should be at least %d",
-				buffer, MIN_TIMEOUT);
+		zbx_snprintf(error, max_error_len, "timeout [%s] should be at least %d", buffer, MIN_TIMEOUT);
 		return NOTSUPPORTED;
 	}
 
-	if (0 != get_param(params, 6, buffer, sizeof(buffer)) || *buffer == '\0')
+	if (0 != get_param(params, 6, buffer, sizeof(buffer)) || '\0' == *buffer)
 		*type = ICMPPINGSEC_AVG;
 	else
 	{
 		if (0 == strcmp(buffer, "min"))
+		{
 			*type = ICMPPINGSEC_MIN;
+		}
 		else if (0 == strcmp(buffer, "avg"))
+		{
 			*type = ICMPPINGSEC_AVG;
+		}
 		else if (0 == strcmp(buffer, "max"))
+		{
 			*type = ICMPPINGSEC_MAX;
+		}
 		else
 		{
-			zbx_snprintf(error, max_error_len, "Mode [%s] is not supported", buffer);
+			zbx_snprintf(error, max_error_len, "mode [%s] is not supported", buffer);
 			return NOTSUPPORTED;
 		}
 	}
 
-	if (0 != get_param(params, 1, buffer, sizeof(buffer)) || *buffer == '\0')
+	if (0 != get_param(params, 1, buffer, sizeof(buffer)) || '\0' == *buffer)
 		*addr = strdup(host_addr);
 	else
 		*addr = strdup(buffer);
@@ -367,12 +383,9 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	for (i = 0; i < num; i++)
 	{
 		items[i].key = strdup(items[i].key_orig);
-		substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-				&items[i].key, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		substitute_simple_macros(NULL, NULL, &items[i].host, NULL, &items[i].key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
-		items[i].interface.addr = strdup(items[i].interface.useip == 1 ? items[i].interface.ip_orig : items[i].interface.dns_orig);
-		substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-				&items[i].interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+		items[i].interface.addr = (1 == items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig);
 
 		if (SUCCEED == parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
 					&interval, &size, &timeout, &type, error, sizeof(error)))
@@ -392,7 +405,6 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, ts.sec);
 		}
 
-		zbx_free(items[i].interface.addr);
 		zbx_free(items[i].key);
 	}
 
