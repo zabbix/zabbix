@@ -713,7 +713,7 @@ static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_t
 				break;
 			case ZBX_REQUEST_HOST_CONN:
 				useip = (unsigned char)atoi(row[1]);
-				*replace_to = zbx_strdup(*replace_to, useip ? row[2] : row[3]);
+				*replace_to = zbx_strdup(*replace_to, 1 == useip ? row[2] : row[3]);
 				break;
 		}
 		ret = SUCCEED;
@@ -2491,8 +2491,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if	(0 == strcmp(m, MVAR_HOST_DNS))
 					replace_to = zbx_strdup(replace_to, interface.dns_orig);
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
-					replace_to = zbx_strdup(replace_to,
-							interface.useip ? interface.ip_orig : interface.dns_orig);
+					replace_to = zbx_strdup(replace_to, 1 == interface.useip ? interface.ip_orig : interface.dns_orig);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_INTERFACE_PORT)
@@ -2543,7 +2542,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_strdup(replace_to, interface.dns_orig);
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 					replace_to = zbx_strdup(replace_to,
-							interface.useip ? interface.ip_orig : interface.dns_orig);
+							1 == interface.useip ? interface.ip_orig : interface.dns_orig);
 			}
 		}
 
