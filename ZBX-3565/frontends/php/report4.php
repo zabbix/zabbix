@@ -225,12 +225,24 @@ include_once('include/page_header.php');
 		$table->show();
 
 		if($media_type == 0){
-			$table = new CTableInfo();
-			$table->addRow(new CSpan(SPACE.SPACE.SPACE.SPACE.SPACE.SPACE.'all'.SPACE.'('.implode('/', $media_types).')','off'));
-			$table->Show();
+			echo SBR;
+			$span = new CSpan(SPACE.SPACE.SPACE.SPACE.SPACE.SPACE.'all'.SPACE.SPACE.'('.SPACE);
+			$span->show();
+			$showFirstSlash = false;
+			foreach($media_types as $id => $description){
+				if($showFirstSlash){
+					$span = new CSpan(SPACE.'/'.SPACE);
+					$span->show();
+				}
+				$showFirstSlash = true;
+
+				$link = new CLink($description,'media_types.php?form=update&mediatypeid='.$id);
+				$link->show();
+			}
+			$span = new CSpan(SPACE.')');
+			$span->show();
 		}
 	}
-
 ?>
 <?php
 
