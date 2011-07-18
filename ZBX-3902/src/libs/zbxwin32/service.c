@@ -80,6 +80,9 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 	}
 
 	SetServiceStatus(serviceHandle, &serviceStatus);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent service stopped. Zabbix %s (revision %s).",
+			ZABBIX_VERSION, ZABBIX_REVISION);
 }
 
 static VOID WINAPI ServiceEntry(DWORD argc, LPTSTR *argv)

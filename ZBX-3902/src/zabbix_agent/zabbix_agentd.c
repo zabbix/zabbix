@@ -491,6 +491,8 @@ int	MAIN_ZABBIX_ENTRY()
 
 	/* wait for an exiting thread */
 	WaitForMultipleObjectsEx(threads_num, threads, FALSE, INFINITE, FALSE);
+
+	zbx_sleep(2);	/* allow threads to exit by themselves */
 #else
 	wait(&i);
 
