@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "db.h"
+#include "dbcache.h"
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
@@ -32,8 +33,6 @@ extern unsigned char	process_type;
  * Function: housekeeping_process_log                                         *
  *                                                                            *
  * Purpose: process table 'housekeeper' and remove data if required           *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
@@ -179,79 +178,43 @@ static int	housekeeping_sessions(int now)
 	return SUCCEED;
 }
 
-static int	housekeeping_alerts(int now)
+static void	housekeeping_alerts(int now)
 {
 	const char	*__function_name = "housekeeping_alerts";
-	int		alert_history;
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		res = SUCCEED;
-	int		deleted;
+	int		deleted, alert_history;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	result = DBselect("select alert_history from config");
+	deleted = DBexecute("delete from alerts where clock<%d",
+			now - *(int *)DCconfig_get_config_data(&alert_history, CONFIG_ALERT_HISTORY) * SEC_PER_DAY);
+	zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table 'alerts'", deleted);
 
-	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
-		res = FAIL;
-	}
-	else
-	{
-		alert_history = atoi(row[0]);
-
-		deleted = DBexecute("delete from alerts where clock<%d", now - alert_history * SEC_PER_DAY);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table 'alerts'", deleted);
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	housekeeping_events(int now)
+static void	housekeeping_events(int now)
 {
 	const char	*__function_name = "housekeeping_events";
 	int		event_history;
 	DB_RESULT	result;
-	DB_RESULT	result2;
-	DB_ROW		row1;
-	DB_ROW		row2;
+	DB_ROW		row;
 	zbx_uint64_t	eventid;
-	int		res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	result = DBselect("select event_history from config");
+	result = DBselect("select eventid from events where clock<%d",
+			now - *(int *)DCconfig_get_config_data(&event_history, CONFIG_EVENT_HISTORY) * SEC_PER_DAY);
 
-	if (NULL == (row1 = DBfetch(result)) || SUCCEED == DBis_null(row1[0]))
+	while (NULL != (row = DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
-		res = FAIL;
-	}
-	else
-	{
-		event_history = atoi(row1[0]);
+		ZBX_STR2UINT64(eventid, row[0]);
 
-		result2 = DBselect("select eventid from events where clock<%d", now - event_history * SEC_PER_DAY);
-
-		while (NULL != (row2 = DBfetch(result2)))
-		{
-			ZBX_STR2UINT64(eventid, row2[0]);
-
-			DBexecute("delete from acknowledges where eventid=" ZBX_FS_UI64, eventid);
-			DBexecute("delete from events where eventid=" ZBX_FS_UI64, eventid);
-		}
-		DBfree_result(result2);
+		DBexecute("delete from acknowledges where eventid=" ZBX_FS_UI64, eventid);
+		DBexecute("delete from events where eventid=" ZBX_FS_UI64, eventid);
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
