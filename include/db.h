@@ -35,7 +35,6 @@ extern int	CONFIG_NODEID;
 extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_NODE_NOHISTORY;
-extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
@@ -489,6 +488,8 @@ DB_ESCALATION;
 #define DB_NODE			"%s"
 #define DBnode_local(fieldid)	DBnode(fieldid, CONFIG_NODEID)
 const char	*DBnode(const char *fieldid, int nodeid);
+#define DBis_node_local_id(id)	DBis_node_id(id, CONFIG_NODEID)
+int	DBis_node_id(zbx_uint64_t id, int nodeid);
 
 int	DBping();
 

@@ -45,7 +45,6 @@
 
 #define MAX_BUNCH_ITEMS	32
 
-static unsigned char	zbx_process;
 extern unsigned char	process_type;
 extern int		process_num;
 
@@ -462,7 +461,7 @@ static int	get_values(unsigned char poller_type)
 	int		errcodes[MAX_BUNCH_ITEMS];
 	zbx_timespec_t	timespecs[MAX_BUNCH_ITEMS];
 	int		i, num;
-	char		*addr, *port;
+	char		*port;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -481,15 +480,7 @@ static int	get_values(unsigned char poller_type)
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
 		substitute_simple_macros(NULL, NULL, &items[i].host, NULL, &items[i].key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
-		items[i].interface.addr = (items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig);
-
-		if (INTERFACE_TYPE_AGENT != items[i].interface.type || 1 != items[i].interface.main)
-		{
-			addr = zbx_strdup(NULL, items[i].interface.addr);
-			substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-					&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			items[i].interface.addr = addr;
-		}
+		items[i].interface.addr = (1 == items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig);
 
 		switch (items[i].type)
 		{
@@ -637,8 +628,7 @@ static int	get_values(unsigned char poller_type)
 			DCrequeue_unreachable_item(items[i].itemid);
 		}
 
-		if (INTERFACE_TYPE_AGENT != items[i].interface.type || 1 != items[i].interface.main)
-			zbx_free(items[i].interface.addr);
+		zbx_free(items[i].key);
 
 		switch (items[i].type)
 		{
@@ -680,7 +670,7 @@ exit:
 	return num;
 }
 
-void	main_poller_loop(unsigned char p, unsigned char poller_type)
+void	main_poller_loop(unsigned char poller_type)
 {
 	int		nextcheck, sleeptime, processed;
 	double		sec;
@@ -689,8 +679,6 @@ void	main_poller_loop(unsigned char p, unsigned char poller_type)
 			get_process_type_string(process_type), process_num);
 
 	set_child_signal_handler();
-
-	zbx_process = p;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

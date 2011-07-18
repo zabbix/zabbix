@@ -67,35 +67,49 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			exit(FAIL);
 			break;
 		case SIGUSR1:
-			zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),value_int:%d,sender_pid:%d].",
+			zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,value_int:%d].",
 					sig, get_signal_name(sig),
-					CHECKED_FIELD(siginfo, si_int),
-					CHECKED_FIELD(siginfo, si_pid));
-
+					CHECKED_FIELD(siginfo, si_pid),
+					CHECKED_FIELD(siginfo, si_uid),
+					CHECKED_FIELD(siginfo, si_value.sival_int));
+#ifdef HAVE_SIGQUEUE
 			if (1 == parent)
 			{
-				if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_int))
+				if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_value.sival_int))
 				{
-					union sigval	s;
-					extern pid_t	*threads;
+					extern unsigned char	daemon_type;
 
-					s.sival_int = ZBX_TASK_CONFIG_CACHE_RELOAD;
-
-					if (-1 != sigqueue(threads[1], SIGUSR1, s))
-						zabbix_log(LOG_LEVEL_DEBUG,
-								"the signal is redirected to the configuration syncer");
+					if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the"
+								" configuration cache cannot be"
+								" performed for passive proxy");
+					}
 					else
-						zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
-								zbx_strerror(errno));
+					{
+						union sigval	s;
+						extern pid_t	*threads;
+
+						s.sival_int = ZBX_TASK_CONFIG_CACHE_RELOAD;
+
+						if (-1 != sigqueue(threads[1], SIGUSR1, s))
+							zabbix_log(LOG_LEVEL_DEBUG,
+									"the signal is redirected to"
+									" the configuration syncer");
+						else
+							zabbix_log(LOG_LEVEL_ERR,
+									"failed to redirect signal: %s",
+									zbx_strerror(errno));
+					}
 				}
 			}
 			else
 			{
 				extern void	zbx_sigusr_handler(zbx_task_t task);
 
-				zbx_sigusr_handler(CHECKED_FIELD(siginfo, si_int));
+				zbx_sigusr_handler(CHECKED_FIELD(siginfo, si_value.sival_int));
 			}
-
+#endif
 			break;
 		case SIGQUIT:
 		case SIGINT:
@@ -143,7 +157,7 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					int		i, found = 0;
 					extern int	threads_num;
 					extern pid_t	*threads;
-				
+
 					for (i = 1; i < threads_num && !found; i++)
 						found = (threads[i] == CHECKED_FIELD(siginfo, si_pid));
 
@@ -312,6 +326,7 @@ int	zbx_sigusr_send(zbx_task_t task)
 {
 	int	ret = FAIL;
 	char	error[256];
+#ifdef HAVE_SIGQUEUE
 	pid_t	pid;
 
 	if (SUCCEED == read_pid_file(CONFIG_PID_FILE, &pid, error, sizeof(error)))
@@ -329,6 +344,9 @@ int	zbx_sigusr_send(zbx_task_t task)
 			zbx_snprintf(error, sizeof(error), "cannot send command to PID [%d]: %s",
 					(int)pid, zbx_strerror(errno));
 	}
+#else
+	zbx_snprintf(error, sizeof(error), "operation is not supported on the given operating system");
+#endif
 
 	if (SUCCEED != ret)
 		printf("%s\n", error);

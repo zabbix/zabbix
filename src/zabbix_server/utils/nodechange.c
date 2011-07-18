@@ -51,11 +51,11 @@ static int convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const
 
 	p = new_exp;
 
-	for (i = 0; old_exp[i] != 0; i++)
+	for (i = 0; 0 != old_exp[i]; i++)
 	{
-		if (state == ID)
+		if (ID == state)
 		{
-			if (old_exp[i] == '}')
+			if ('}' == old_exp[i])
 			{
 				state = NORMAL;
 				ZBX_STR2UINT64(tmp, id);
@@ -69,7 +69,7 @@ static int convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const
 				p_id++;
 			}
 		}
-		else if (old_exp[i] == '{')
+		else if ('{' == old_exp[i])
 		{
 			state = ID;
 			memset(id,0,MAX_STRING_LEN);
@@ -105,8 +105,7 @@ static int convert_triggers_expression(int old_id, int new_id)
 	const ZBX_TABLE	*r_table;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		new_expression[MAX_STRING_LEN];
-	char		*new_expression_esc;
+	char		new_expression[MAX_STRING_LEN], *new_expression_esc;
 
 	if (NULL == (r_table = DBget_table("functions")))
 	{
@@ -114,9 +113,9 @@ static int convert_triggers_expression(int old_id, int new_id)
 		return FAIL;
 	}
 
-	prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
+	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 	if (r_table->flags & ZBX_SYNC)
-		prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
+		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
 
 	result = DBselect("select expression,triggerid from triggers");
 
@@ -127,8 +126,7 @@ static int convert_triggers_expression(int old_id, int new_id)
 
 		new_expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
 		DBexecute("update triggers set expression='%s' where triggerid=%s",
-				new_expression_esc,
-				row[1]);
+				new_expression_esc, row[1]);
 		zbx_free(new_expression_esc);
 	}
 	DBfree_result(result);
@@ -278,8 +276,6 @@ static int convert_condition_values(int old_id, int new_id, const char *rel_tabl
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	change_nodeid(int old_id, int new_id)
 {
@@ -393,13 +389,13 @@ int	change_nodeid(int old_id, int new_id)
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 
-	if (old_id != 0)
+	if (0 != old_id)
 	{
 		printf("Conversion from non-zero node id is not supported.\n");
 		return FAIL;
 	}
 
-	if (new_id > 999 || new_id < 0)
+	if (999 < new_id || 0 > new_id)
 	{
 		printf("Node ID must be in range of 0-999.\n");
 		return FAIL;
@@ -432,9 +428,13 @@ int	change_nodeid(int old_id, int new_id)
 		for (j = 0; NULL != tables[i].fields[j].name; j++)
 		{
 			for (s = 0; NULL != special_convs[s].table_name; s++)
+			{
 				if (0 == strcmp(special_convs[s].table_name, tables[i].table) &&
 						0 == strcmp(special_convs[s].field_name, tables[i].fields[j].name))
+				{
 					break;
+				}
+			}
 
 			if (NULL != special_convs[s].table_name)
 			{
@@ -447,7 +447,7 @@ int	change_nodeid(int old_id, int new_id)
 				continue;
 			}
 
-			if (tables[i].fields[j].type != ZBX_TYPE_ID)
+			if (ZBX_TYPE_ID != tables[i].fields[j].type)
 				continue;
 
 			if (0 == strcmp(tables[i].fields[j].name, tables[i].recid))	/* primary key */
@@ -492,10 +492,10 @@ int	change_nodeid(int old_id, int new_id)
 		}
 	}
 
-	/* Special processing for trigger expressions */
+	/* special processing for trigger expressions */
 	convert_triggers_expression(old_id, new_id);
 
-	/* Special processing for condition values */
+	/* special processing for condition values */
 	for (i = 0; NULL != condition_convs[i].rel; i++)
 		convert_condition_values(old_id, new_id, condition_convs[i].rel, condition_convs[i].type);
 
