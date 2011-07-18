@@ -52,7 +52,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 		goto fail;
 	}
 
-	item.interface.addr = (item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
+	item.interface.addr = (1 == item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
 
 	port = zbx_strdup(port, item.interface.port_orig);
 	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
@@ -165,7 +165,7 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 		goto fail;
 	}
 
-	item.interface.addr = (item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
+	item.interface.addr = (1 == item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
 	item.username = script->username;
 	item.publickey = script->publickey;
 	item.privatekey = script->privatekey;

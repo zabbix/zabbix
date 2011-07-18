@@ -211,7 +211,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	{
 		*count = 3;
 	}
-	else if (FAIL == is_uint(buffer) || MIN_COUNT > (*count = atoi(buffer)) ||  MAX_COUNT < *count)
+	else if (FAIL == is_uint(buffer) || MIN_COUNT > (*count = atoi(buffer)) || *count > MAX_COUNT)
 	{
 		zbx_snprintf(error, max_error_len, "number of packets [%s] is not between %d and %d",
 				buffer, MIN_COUNT, MAX_COUNT);
@@ -232,7 +232,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	{
 		*size = 0;
 	}
-	else if (FAIL == is_uint(buffer) || MIN_SIZE > (*size = atoi(buffer)) || MAX_SIZE < *size)
+	else if (FAIL == is_uint(buffer) || MIN_SIZE > (*size = atoi(buffer)) || *size > MAX_SIZE)
 	{
 		zbx_snprintf(error, max_error_len, "packet size [%s] is not between %d and %d",
 				buffer, MIN_SIZE, MAX_SIZE);
@@ -241,7 +241,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 
 	if (0 != get_param(params, 5, buffer, sizeof(buffer)) || '\0' == *buffer)
 		*timeout = 0;
-	else if (FAIL == is_uint(buffer) || (*timeout = atoi(buffer)) < MIN_TIMEOUT)
+	else if (FAIL == is_uint(buffer) || MIN_TIMEOUT > (*timeout = atoi(buffer)))
 	{
 		zbx_snprintf(error, max_error_len, "timeout [%s] should be at least %d", buffer, MIN_TIMEOUT);
 		return NOTSUPPORTED;
