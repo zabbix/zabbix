@@ -2,6 +2,7 @@
 Changes for 1.9.5
 
 New features:
+ - [ZBXNEXT-841] added 'config' table to configuration cache, refresh_unsupported now is read from cache and synced with proxies (rudolfs)
  - [ZBXNEXT-807] implemented configuration cache for triggers (asaveljevs)
  - [ZBXNEXT-674] added host area functionality for maps (Aly, Vedmak)
  - [ZBXNEXT-738] Added configurable colors and blinking for alarm states OK/PROBLEM (KB)
