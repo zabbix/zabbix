@@ -26,64 +26,11 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_trigger_severity_name                                      *
- *                                                                            *
- * Purpose: get trigger severity name                                         *
- *                                                                            *
- * Parameters: trigger    - [IN] a trigger data with priority field;          *
- *                               TRIGGER_SEVERITY_*                           *
- *             replace_to - [OUT] pointer to a buffer that will receive       *
- *                          a null-terminated trigger severity string         *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_trigger_severity_name(DB_TRIGGER *trigger, char **replace_to)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		res = FAIL;
-
-	if (0 == trigger->triggerid)
-		return res;
-
-	if (TRIGGER_SEVERITY_COUNT <= trigger->priority)
-		return res;
-
-	result = DBselect(
-			"select severity_name_%d"
-			" from config"
-			" where 1=1" DB_NODE,
-			trigger->priority, DBnode_local("configid"));
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
-		res = SUCCEED;
-	}
-	DBfree_result(result);
-
-	return res;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBget_macro_value_by_triggerid                                   *
  *                                                                            *
  * Purpose: get value of a user macro                                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBget_macro_value_by_triggerid(zbx_uint64_t triggerid, const char *macro, char **replace_to)
@@ -766,7 +713,7 @@ static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_t
 				break;
 			case ZBX_REQUEST_HOST_CONN:
 				useip = (unsigned char)atoi(row[1]);
-				*replace_to = zbx_strdup(*replace_to, useip ? row[2] : row[3]);
+				*replace_to = zbx_strdup(*replace_to, 1 == useip ? row[2] : row[3]);
 				break;
 		}
 		ret = SUCCEED;
@@ -2351,7 +2298,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strcmp(m, MVAR_ESC_HISTORY))
 					ret = get_escalation_history(event, escalation, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
-					ret = DBget_trigger_severity_name(&event->trigger, &replace_to);
+					ret = DCget_trigger_severity_name(event->trigger.priority, &replace_to);
 				else if (0 == strcmp(m, MVAR_TRIGGER_NSEVERITY))
 				{
 					if (0 != event->trigger.triggerid)
@@ -2544,8 +2491,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if	(0 == strcmp(m, MVAR_HOST_DNS))
 					replace_to = zbx_strdup(replace_to, interface.dns_orig);
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
-					replace_to = zbx_strdup(replace_to,
-							interface.useip ? interface.ip_orig : interface.dns_orig);
+					replace_to = zbx_strdup(replace_to, 1 == interface.useip ? interface.ip_orig : interface.dns_orig);
 			}
 		}
 		else if (macro_type & MACRO_TYPE_INTERFACE_PORT)
@@ -2596,7 +2542,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_strdup(replace_to, interface.dns_orig);
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 					replace_to = zbx_strdup(replace_to,
-							interface.useip ? interface.ip_orig : interface.dns_orig);
+							1 == interface.useip ? interface.ip_orig : interface.dns_orig);
 			}
 		}
 
