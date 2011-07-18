@@ -1929,13 +1929,11 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 	ZBX_DC_INTERFACE	*interface;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
-	DC_HOST			host;
 	int			found, update_index;
 	zbx_uint64_t		interfaceid, hostid;
 	unsigned char		type, main_;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
-	char			*addr;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2039,28 +2037,35 @@ static void	DCsync_interfaces(DB_RESULT result)
 		else if (1 != interface->main || INTERFACE_TYPE_AGENT != interface->type)
 		{
 			/* macros are not supported for the main agent interface, resolve for other interfaces */
+
 			int	macros;
+			char	*addr;
+			DC_HOST	host;
 
 			macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
 			macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
 
 			if (0 != macros)
+			{
 				DCget_host_by_hostid(&host, hostid);
 
-			if (0 != (macros & 0x01))
-			{
-				addr = zbx_strdup(NULL, interface->ip);
-				substitute_simple_macros(NULL, NULL, &host, NULL, &addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-				DCstrpool_replace(1, &interface->ip, addr);
-				zbx_free(addr);
-			}
+				if (0 != (macros & 0x01))
+				{
+					addr = zbx_strdup(NULL, interface->ip);
+					substitute_simple_macros(NULL, NULL, &host, NULL, &addr,
+							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					DCstrpool_replace(1, &interface->ip, addr);
+					zbx_free(addr);
+				}
 
-			if (0 != (macros & 0x02))
-			{
-				addr = zbx_strdup(NULL, interface->dns);
-				substitute_simple_macros(NULL, NULL, &host, NULL, &addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-				DCstrpool_replace(1, &interface->dns, addr);
-				zbx_free(addr);
+				if (0 != (macros & 0x02))
+				{
+					addr = zbx_strdup(NULL, interface->dns);
+					substitute_simple_macros(NULL, NULL, &host, NULL, &addr,
+							MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					DCstrpool_replace(1, &interface->dns, addr);
+					zbx_free(addr);
+				}
 			}
 		}
 	}
