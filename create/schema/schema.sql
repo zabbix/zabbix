@@ -476,7 +476,7 @@ TABLE|config|configid|ZBX_SYNC
 FIELD		|configid	|t_id		|	|NOT NULL	|0
 FIELD		|alert_history	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|event_history	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|refresh_unsupported|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|refresh_unsupported|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|work_period	|t_varchar(100)	|'1-5,00:00-24:00'|NOT NULL	|ZBX_SYNC
 FIELD		|alert_usrgrpid	|t_id		|	|NULL		|ZBX_SYNC		|1|usrgrp	|usrgrpid	|RESTRICT
 FIELD		|event_ack_enable|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
@@ -492,7 +492,7 @@ FIELD		|ldap_bind_password|t_varchar(128)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|ldap_search_attribute|t_varchar(128)|''|NOT NULL	|ZBX_SYNC
 FIELD		|dropdown_first_entry|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|dropdown_first_remember|t_integer|'1'	|NOT NULL	|ZBX_SYNC
-FIELD		|discovery_groupid|t_id		|	|NOT NULL	|ZBX_SYNC		|2|groups	|groupid	|RESTRICT
+FIELD		|discovery_groupid|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|2|groups	|groupid	|RESTRICT
 FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
 FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_SYNC
 FIELD		|ns_support	|t_integer	|'0'	|NOT NULL	|0
