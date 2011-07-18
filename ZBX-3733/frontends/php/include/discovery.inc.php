@@ -222,7 +222,7 @@ require_once('include/perm.inc.php');
 
 		// checking to the duplicate of the name
 		$drule = get_discovery_rule_by_druleid($druleid);
-		if($drule['name'] != $name){
+		if(strcmp($drule['name'], $name)){
 			if(CDRule::exists(array('name' => $name))){
 				error(S_DISCOVERY_RULE.SPACE.'['.$name.']'.SPACE.S_ALREADY_EXISTS_SMALL);
 				return false;
