@@ -263,7 +263,7 @@ include_once('include/page_header.php');
 	if($value_types)
 		$frmTitle->addVar('value_types', $value_types);
 
-//adding param to a form, so that it would remain when page is refreshed
+	// adding param to a form, so that it would remain when page is refreshed
 	$frmTitle->addVar('dstfrm', $dstfrm);
 	$frmTitle->addVar('dstact', $dstact);
 	$frmTitle->addVar('dstfld1', $dstfld1);
@@ -274,7 +274,8 @@ include_once('include/page_header.php');
 	$frmTitle->addVar('multiselect', $multiselect);
 	$frmTitle->addVar('writeonly', $writeonly);
 	$frmTitle->addVar('reference', $reference);
-	$frmTitle->addVar('submitParent', $submitParent	);
+	$frmTitle->addVar('submitParent', $submitParent);
+	$frmTitle->addVar('noempty', $noempty);
 
 	if(!is_null($existed_templates))
 		$frmTitle->addVar('existed_templates', $existed_templates);
