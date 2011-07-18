@@ -226,25 +226,18 @@ include_once('include/page_header.php');
 
 		if($media_type == 0){
 			echo SBR;
-			$span = new CSpan(SPACE.SPACE.SPACE.SPACE.SPACE.SPACE.'all'.SPACE.SPACE.'('.SPACE);
-			$span->show();
-			$showFirstSlash = false;
-			foreach($media_types as $id => $description){
-				if($showFirstSlash){
-					$span = new CSpan(SPACE.'/'.SPACE);
-					$span->show();
-				}
-				$showFirstSlash = true;
 
-				$link = new CLink($description,'media_types.php?form=update&mediatypeid='.$id);
-				$link->show();
+			$links = array();
+			foreach($media_types as $id => $description){
+				$links[] = new CLink($description, 'media_types.php?form=update&mediatypeid=' . $id);
+				$links[] = SPACE . '/' . SPACE;
 			}
-			$span = new CSpan(SPACE.')');
-			$span->show();
+			array_pop($links);
+
+			$linksDiv = new CDiv(array(SPACE . S_ALL_SMALL . SPACE . '(' . SPACE, $links, SPACE.')'));
+			$linksDiv->show();
 		}
 	}
-?>
-<?php
 
 include_once('include/page_footer.php');
 
