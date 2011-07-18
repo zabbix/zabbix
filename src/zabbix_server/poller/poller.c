@@ -628,6 +628,8 @@ static int	get_values(unsigned char poller_type)
 			DCrequeue_unreachable_item(items[i].itemid);
 		}
 
+		zbx_free(items[i].key);
+
 		switch (items[i].type)
 		{
 			case ITEM_TYPE_SNMPv3:
