@@ -173,7 +173,6 @@ int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
 
-int	CONFIG_REFRESH_UNSUPPORTED	= 600;
 int	CONFIG_NS_SUPPORT		= 0;
 
 /* Zabbix server startup time */
@@ -576,7 +575,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Listener failed with error: %s.", zbx_tcp_strerror());
+			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
 			exit(1);
 		}
 	}

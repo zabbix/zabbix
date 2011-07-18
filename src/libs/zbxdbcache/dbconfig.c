@@ -298,6 +298,16 @@ ZBX_DC_INTERFACE_HT;
 
 typedef struct
 {
+	int		alert_history;
+	int		event_history;
+	int		refresh_unsupported;
+	zbx_uint64_t	discovery_groupid;
+	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
+}
+ZBX_DC_CONFIG_TABLE;
+
+typedef struct
+{
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;	/* hostid, key */
 	zbx_hashset_t		snmpitems;
@@ -327,6 +337,7 @@ typedef struct
 	zbx_hashset_t		interfaces_ht;	/* hostid, type */
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
+	ZBX_DC_CONFIG_TABLE	*config;
 }
 ZBX_DC_CONFIG;
 
@@ -412,8 +423,10 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 	int	nextcheck;
 
 	if (ITEM_STATUS_NOTSUPPORTED == item->status)
+	{
 		nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
-				CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
+				config->config->refresh_unsupported, NULL, now, NULL);
+	}
 	else
 	{
 		const ZBX_DC_FLEXITEM	*flexitem;
@@ -619,6 +632,63 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 	}
 }
 
+#define DEFAULT_ALERT_HISTORY		365
+#define DEFAULT_EVENT_HISTORY		365
+#define DEFAULT_REFRESH_UNSUPPORTED	600
+static char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
+
+static int	DCsync_config(DB_RESULT result)
+{
+	const char	*__function_name = "DCsync_config";
+	DB_ROW		row;
+	int		i, found = 1;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL == config->config)
+	{
+		found = 0;
+		config->config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG_TABLE));
+	}
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
+
+		if (0 == found)
+		{
+			/* load default config data */
+
+			config->config->alert_history = DEFAULT_ALERT_HISTORY;
+			config->config->event_history = DEFAULT_EVENT_HISTORY;
+			config->config->refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
+			config->config->discovery_groupid = 0;
+
+			for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
+				DCstrpool_replace(found, &config->config->severity_name[i], default_severity_names[i]);
+		}
+	}
+	else
+	{
+		/* store the config data */
+
+		config->config->alert_history = atoi(row[0]);
+		config->config->event_history = atoi(row[1]);
+		config->config->refresh_unsupported = atoi(row[2]);
+		ZBX_STR2UINT64(config->config->discovery_groupid, row[3]);
+
+		for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
+			DCstrpool_replace(found, &config->config->severity_name[i], row[4 + i]);
+
+		if (NULL != (row = DBfetch(result)))	/* config table should have only one record */
+			zabbix_log(LOG_LEVEL_ERR, "table 'config' has multiple records");
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return SUCCEED;
+}
+
 static void	DCsync_items(DB_RESULT result)
 {
 	const char		*__function_name = "DCsync_items";
@@ -750,22 +820,30 @@ static void	DCsync_items(DB_RESULT result)
 			old_nextcheck = 0;
 
 			if (ITEM_STATUS_NOTSUPPORTED == status)
+			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
-						item->type, CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
+						item->type, config->config->refresh_unsupported, NULL, now, NULL);
+			}
 			else
+			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
 						item->type, delay, row[16], now, NULL);
+			}
 		}
 		else
 		{
 			old_nextcheck = item->nextcheck;
 
 			if (ITEM_STATUS_ACTIVE == status && (status != item->status || delay != item->delay))
+			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
 						item->type, delay, row[16], now, NULL);
+			}
 			else if (ITEM_STATUS_NOTSUPPORTED == status && status != item->status)
+			{
 				item->nextcheck = calculate_item_nextcheck(item->interfaceid, itemid,
-						item->type, CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
+						item->type, config->config->refresh_unsupported, NULL, now, NULL);
+			}
 		}
 
 		item->status = status;
@@ -2061,12 +2139,24 @@ void	DCsync_configuration()
 	DB_RESULT		gmacro_result;
 	DB_RESULT		hmacro_result;
 	DB_RESULT		if_result;
+	DB_RESULT		conf_result;
 
 	int			i;
-	double			sec, isec, tsec, dsec, fsec, hsec, htsec, gmsec, hmsec, ifsec, ssec;
+	double			sec, csec, isec, tsec, dsec, fsec, hsec, htsec, gmsec, hmsec, ifsec, ssec;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sec = zbx_time();
+	conf_result = DBselect(
+			/* SQL statement must be synced with DCload_config() */
+			"select alert_history,event_history,refresh_unsupported, discovery_groupid,severity_name_0,"
+				"severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5"
+			" from config"
+			" where 1=1"
+				DB_NODE,
+			DBnode_local("configid"));
+	csec = zbx_time() - sec;
 
 	sec = zbx_time();
 	item_result = DBselect(
@@ -2191,6 +2281,7 @@ void	DCsync_configuration()
 	sync_num++;
 
 	sec = zbx_time();
+	DCsync_config(conf_result);
 	DCsync_items(item_result);
 	DCsync_triggers(trig_result);
 	DCsync_trigdeps(tdep_result);
@@ -2205,28 +2296,19 @@ void	DCsync_configuration()
 	strpool = zbx_strpool_info();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync_num   : %u", __function_name, sync_num);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name,
-			isec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() trig sql   : " ZBX_FS_DBL " sec.", __function_name,
-			tsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() tdep sql   : " ZBX_FS_DBL " sec.", __function_name,
-			dsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() func sql   : " ZBX_FS_DBL " sec.", __function_name,
-			fsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name,
-			hsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpl sql  : " ZBX_FS_DBL " sec.", __function_name,
-			htsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacro sql : " ZBX_FS_DBL " sec.", __function_name,
-			gmsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacro sql : " ZBX_FS_DBL " sec.", __function_name,
-			hmsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() interf sql : " ZBX_FS_DBL " sec.", __function_name,
-			ifsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name,
-			ssec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync config: " ZBX_FS_DBL " sec.", __function_name, csec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name, isec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() trig sql   : " ZBX_FS_DBL " sec.", __function_name, tsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() tdep sql   : " ZBX_FS_DBL " sec.", __function_name, dsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() func sql   : " ZBX_FS_DBL " sec.", __function_name, fsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name, hsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() htmpl sql  : " ZBX_FS_DBL " sec.", __function_name, htsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() gmacro sql : " ZBX_FS_DBL " sec.", __function_name, gmsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hmacro sql : " ZBX_FS_DBL " sec.", __function_name, hmsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() interf sql : " ZBX_FS_DBL " sec.", __function_name, ifsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name, ssec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total time : " ZBX_FS_DBL " sec.", __function_name,
-			isec + tsec + dsec + fsec + hsec + htsec + gmsec + hmsec + ifsec + ssec);
+			csec + isec + tsec + dsec + fsec + hsec + htsec + gmsec + hmsec + ifsec + ssec);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d (%d slots)", __function_name,
 			config->items.num_data, config->items.num_slots);
@@ -2568,7 +2650,7 @@ void	init_configuration_cache()
 
 	config = __config_mem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG));
 
-#define	INIT_HASHSET_SIZE	1000 /* should be calculated dynamically based on config_size? */
+#define	INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on config_size? */
 
 #define CREATE_HASHSET(hashset)	CREATE_HASHSET_EXT(hashset, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC)
 
@@ -2640,6 +2722,8 @@ void	init_configuration_cache()
 					__config_mem_realloc_func,
 					__config_mem_free_func);
 
+	config->config = NULL;
+
 #undef	INIT_HASHSET_SIZE
 
 #undef	CREATE_HASHSET
@@ -2678,6 +2762,42 @@ void	free_configuration_cache()
 	UNLOCK_CACHE;
 
 	zbx_mutex_destroy(&config_lock);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCload_config                                                    *
+ *                                                                            *
+ * Purpose: load 'config' table in cache                                      *
+ *                                                                            *
+ * Author: Rudolfs Kreicbergs                                                 *
+ *                                                                            *
+ * Comments: !! SQL statement must be synced with DCsync_configuration()!!    *
+ *                                                                            *
+ ******************************************************************************/
+void	DCload_config()
+{
+	const char		*__function_name = "DCload_config";
+
+	DB_RESULT		result;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect(
+			"select alert_history,event_history,refresh_unsupported, discovery_groupid,severity_name_0,"
+				"severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5"
+			" from config"
+			" where 1=1"
+				DB_NODE,
+			DBnode_local("configid"));
+
+	LOCK_CACHE;
+
+	DCsync_config(result);
+
+	UNLOCK_CACHE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -3357,7 +3477,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 		zbx_binary_heap_remove_min(queue);
 		dc_item->location = ZBX_LOC_NOWHERE;
 
-		if (0 == CONFIG_REFRESH_UNSUPPORTED && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
+		if (0 == config->config->refresh_unsupported && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
 			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
@@ -3492,8 +3612,7 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
 		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & dc_item->flags))
 			continue;
 
-		if (CONFIG_REFRESH_UNSUPPORTED == 0 &&
-				ITEM_STATUS_NOTSUPPORTED == dc_item->status)
+		if (0 == config->config->refresh_unsupported && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
 			continue;
 
 		if (items_num == items_alloc)
@@ -3512,6 +3631,75 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, items_num);
 
 	return items_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_config_data                                         *
+ *                                                                            *
+ * Purpose: get config table data                                             *
+ *                                                                            *
+ * Return value: pointer to the returned data                                 *
+ *                                                                            *
+ * Author: Rudolfs Kreicbergs                                                 *
+ *                                                                            *
+ * Comments: data must be of correct data type                                *
+ *                                                                            *
+ ******************************************************************************/
+void	*DCconfig_get_config_data(void *data, int type)
+{
+	LOCK_CACHE;
+
+	switch(type)
+	{
+		case CONFIG_ALERT_HISTORY:
+			*(int *)data = config->config->alert_history;
+			break;
+		case CONFIG_EVENT_HISTORY:
+			*(int *)data = config->config->event_history;
+			break;
+		case CONFIG_REFRESH_UNSUPPORTED:
+			*(int *)data = config->config->refresh_unsupported;
+			break;
+		case CONFIG_DISCOVERY_GROUPID:
+			*(zbx_uint64_t *)data = config->config->discovery_groupid;
+			break;
+	}
+
+	UNLOCK_CACHE;
+
+	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_trigger_severity_name                                      *
+ *                                                                            *
+ * Purpose: get trigger severity name                                         *
+ *                                                                            *
+ * Parameters: trigger    - [IN] a trigger data with priority field;          *
+ *                               TRIGGER_SEVERITY_*                           *
+ *             replace_to - [OUT] pointer to a buffer that will receive       *
+ *                          a null-terminated trigger severity string         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev, Rudolfs Kreicbergs                            *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_trigger_severity_name(unsigned char priority, char **replace_to)
+{
+	if (TRIGGER_SEVERITY_COUNT <= priority)
+		return FAIL;
+
+	LOCK_CACHE;
+
+	*replace_to = zbx_strdup(*replace_to, config->config->severity_name[priority]);
+
+	UNLOCK_CACHE;
+
+	return SUCCEED;
 }
 
 void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now)
