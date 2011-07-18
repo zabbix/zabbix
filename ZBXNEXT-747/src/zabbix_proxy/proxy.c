@@ -86,7 +86,7 @@ static char	shortopts[] = "c:n:hVR:";
 int	threads_num = 0;
 pid_t	*threads = NULL;
 
-static unsigned char	zbx_process = ZBX_PROCESS_PROXY_ACTIVE;
+unsigned char	daemon_type		= ZBX_DAEMON_TYPE_PROXY_ACTIVE;
 
 int		process_num		= 0;
 unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
@@ -177,7 +177,6 @@ int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
 
-int	CONFIG_REFRESH_UNSUPPORTED	= 600;
 int	CONFIG_NS_SUPPORT		= 0;
 
 /* Zabbix server startup time */
@@ -422,16 +421,17 @@ static void	zbx_load_config()
 	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
 	{
 		CONFIG_CONFSYNCER_FORKS = CONFIG_DATASENDER_FORKS = 0;
-		zbx_process = ZBX_PROCESS_PROXY_PASSIVE;
+		daemon_type = ZBX_DAEMON_TYPE_PROXY_PASSIVE;
 	}
 	else
-		zbx_process = ZBX_PROCESS_PROXY_ACTIVE;
+		daemon_type = ZBX_DAEMON_TYPE_PROXY_ACTIVE;
 
 	zbx_set_defaults();
 
 	zbx_validate_config();
 }
 
+#ifdef HAVE_SIGQUEUE
 void	zbx_sigusr_handler(zbx_task_t task)
 {
 	switch (task)
@@ -447,6 +447,7 @@ void	zbx_sigusr_handler(zbx_task_t task)
 			break;
 	}
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -464,7 +465,7 @@ int	main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
-	/* Parse the command-line. */
+	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
 		switch (ch)
@@ -499,7 +500,7 @@ int	main(int argc, char **argv)
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = zbx_strdup(CONFIG_FILE, "/etc/zabbix/zabbix_proxy.conf");
 
-	/* Required for simple checks */
+	/* required for simple checks */
 	init_metrics();
 
 	zbx_load_config();
@@ -564,7 +565,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DBinit();
 
-	init_database_cache(zbx_process);
+	init_database_cache();
 	init_configuration_cache();
 	init_selfmon_collector();
 
@@ -583,7 +584,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Listener failed with error: %s.", zbx_tcp_strerror());
+			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
 			exit(1);
 		}
 	}
@@ -661,7 +662,7 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
-		main_poller_loop(zbx_process, ZBX_POLLER_TYPE_NORMAL);
+		main_poller_loop(ZBX_POLLER_TYPE_NORMAL);
 	}
 	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS)
@@ -677,7 +678,7 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
-		main_poller_loop(zbx_process, ZBX_POLLER_TYPE_UNREACHABLE);
+		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE);
 	}
 	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
@@ -690,7 +691,7 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
-		main_trapper_loop(zbx_process, &listen_sock);
+		main_trapper_loop(&listen_sock);
 	}
 	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
@@ -756,7 +757,7 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
-		main_discoverer_loop(zbx_process);
+		main_discoverer_loop();
 	}
 	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
@@ -793,7 +794,7 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
-		main_poller_loop(zbx_process, ZBX_POLLER_TYPE_IPMI);
+		main_poller_loop(ZBX_POLLER_TYPE_IPMI);
 	}
 	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
@@ -813,7 +814,7 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
 				server_num, get_process_type_string(process_type));
 
-		main_poller_loop(zbx_process, ZBX_POLLER_TYPE_JAVA);
+		main_poller_loop(ZBX_POLLER_TYPE_JAVA);
 	}
 	else if (server_num <= CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS

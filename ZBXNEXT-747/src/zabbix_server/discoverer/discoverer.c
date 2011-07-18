@@ -33,7 +33,7 @@
 #include "../poller/checks_snmp.h"
 
 extern int		CONFIG_DISCOVERER_FORKS;
-static unsigned char	zbx_process;
+extern unsigned char	daemon_type;
 extern unsigned char	process_type;
 extern int		process_num;
 
@@ -404,11 +404,11 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 
 			DBbegin();
 
-			if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 			{
 				discovery_update_service(drule, dcheck, dhost, ip, dns, port, status, value, now);
 			}
-			else if (0 != (zbx_process & ZBX_PROCESS_PROXY))
+			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
 			{
 				proxy_update_service(drule, dcheck, ip, dns, port, status, value, now);
 			}
@@ -705,11 +705,11 @@ static void	process_rule(DB_DRULE *drule)
 
 			DBbegin();
 
-			if (0 != (zbx_process & ZBX_PROCESS_SERVER))
+			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 			{
 				discovery_update_host(&dhost, ip, host_status, now);
 			}
-			else if (0 != (zbx_process & ZBX_PROCESS_PROXY))
+			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
 			{
 				proxy_update_host(drule, ip, dns, host_status, now);
 			}
@@ -807,7 +807,7 @@ static int	get_minnextcheck(int now)
  * Comments: executes once per 30 seconds (hardcoded)                         *
  *                                                                            *
  ******************************************************************************/
-void	main_discoverer_loop(unsigned char p)
+void	main_discoverer_loop()
 {
 	int	now, nextcheck, sleeptime;
 	double	sec;
@@ -815,8 +815,6 @@ void	main_discoverer_loop(unsigned char p)
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_discoverer_loop() process_num:%d", process_num);
 
 	set_child_signal_handler();
-
-	zbx_process = p;
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

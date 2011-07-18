@@ -2266,6 +2266,27 @@ int	is_function_char(char c)
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_time_function                                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - given function is time-based                      *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	is_time_function(const char *func)
+{
+	return str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ',');
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: make_hostname                                                    *
  *                                                                            *
  * Purpose: replace all not-allowed hostname symbols in the string            *
@@ -2282,9 +2303,9 @@ int	is_function_char(char c)
 void	make_hostname(char *host)
 {
 	char	*c;
-	
+
 	assert(host);
-	
+
 	for (c = host; '\0' != *c; ++c)
 		if (FAIL == is_hostname_char(*c))
 			*c = '_';
