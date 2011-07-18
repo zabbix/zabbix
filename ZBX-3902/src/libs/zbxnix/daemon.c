@@ -152,18 +152,6 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 			if (0 == exiting)
 			{
-				int		i, found = 0;
-				extern int	threads_num;
-				extern pid_t	*threads;
-
-				for (i = 0; i < threads_num && 0 == found; i++)
-					found = (threads[i] == CHECKED_FIELD(siginfo, si_pid));
-
-				/* we should not worry too much about non-Zabbix child */
-				/* processes like watchdog alert scripts terminating */
-				if (0 == found)
-					return;
-
 				zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
 						CHECKED_FIELD(siginfo, si_pid), CHECKED_FIELD(siginfo, si_status));
 				exiting = 1;

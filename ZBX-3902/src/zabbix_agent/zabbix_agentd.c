@@ -487,21 +487,16 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 
 #ifdef _WINDOWS
-	/* must be called after all threads are created */
-	set_parent_signal_handler();
+	set_parent_signal_handler();	/* must be called after all threads are created */
+
+	/* wait for an exiting thread */
+	WaitForMultipleObjectsEx(threads_num, threads, FALSE, INFINITE, FALSE);
+#else
+	wait(&i);
+
+	/* all exiting child processes should be caught by signal handlers */
+	THIS_SHOULD_NEVER_HAPPEN;
 #endif
-
-	/* wait for all threads to exit */
-	for (i = 0; i < threads_num; i++)
-	{
-		if (threads[i])
-		{
-			zbx_thread_wait(threads[i]);
-			zabbix_log(LOG_LEVEL_DEBUG, "thread [%d] has terminated", i);
-
-			ZBX_DO_EXIT();
-		}
-	}
 
 	zbx_on_exit();
 

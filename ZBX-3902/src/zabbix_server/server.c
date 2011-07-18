@@ -51,6 +51,12 @@
 #include "proxypoller/proxypoller.h"
 #include "selfmon/selfmon.h"
 
+#define INIT_SERVER(type, count)								\
+	process_type = type;									\
+	process_num = server_num - server_count + count;					\
+	zabbix_log(LOG_LEVEL_INFORMATION, "server #%d started [%s #%d]",			\
+			server_num, get_process_type_string(process_type), process_num)
+
 const char	*progname = NULL;
 const char	title_message[] = "Zabbix Server";
 const char	usage_message[] = "[-hV] [-c <file>] [-n <nodeid>] [-R <option>]";
@@ -585,26 +591,21 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		if (0 == (pid = zbx_child_fork()))
 		{
-			server_num = i + 1;	/* servers are numbered starting from 1 */
+			server_num = i + 1;	/* child processes are numbered starting from 1 */
 			break;
 		}
 		else
 			threads[i] = pid;
 	}
 
-	/* main process */
 	if (0 == server_num)
 	{
-		/* wait for all child processes to exit */
+		zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
 
-		for (i = 0; i < threads_num; i++)
-		{
-			if (threads[i])
-			{
-				zbx_thread_wait(threads[i]);
-				zabbix_log(LOG_LEVEL_DEBUG, "process [%d] has terminated", i);
-			}
-		}
+		wait(&i);	/* wait for any child to exit */
+
+		/* all exiting child processes should be caught by signal handlers */
+		THIS_SHOULD_NEVER_HAPPEN;
 
 		zbx_on_exit();
 	}
@@ -612,21 +613,13 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		/* !!! configuration syncer must be server #1 - child_signal_handler() uses threads[0] !!! */
 
-		process_type = ZBX_PROCESS_TYPE_CONFSYNCER;
-		process_num = server_num - server_count + CONFIG_CONFSYNCER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_CONFSYNCER, CONFIG_CONFSYNCER_FORKS);
 
 		main_dbconfig_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_WATCHDOG_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_WATCHDOG;
-		process_num = server_num - server_count + CONFIG_WATCHDOG_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_WATCHDOG, CONFIG_WATCHDOG_FORKS);
 
 		main_watchdog_loop();
 	}
@@ -636,11 +629,7 @@ int	MAIN_ZABBIX_ENTRY()
 		init_snmp("zabbix_server");
 #endif
 
-		process_type = ZBX_PROCESS_TYPE_POLLER;
-		process_num = server_num - server_count + CONFIG_POLLER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_POLLER, CONFIG_POLLER_FORKS);
 
 		main_poller_loop(ZBX_POLLER_TYPE_NORMAL);
 	}
@@ -650,81 +639,49 @@ int	MAIN_ZABBIX_ENTRY()
 		init_snmp("zabbix_server");
 #endif
 
-		process_type = ZBX_PROCESS_TYPE_UNREACHABLE;
-		process_num = server_num - server_count + CONFIG_UNREACHABLE_POLLER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_UNREACHABLE, CONFIG_UNREACHABLE_POLLER_FORKS);
 
 		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE);
 	}
 	else if (server_num <= (server_count += CONFIG_TRAPPER_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_TRAPPER;
-		process_num = server_num - server_count + CONFIG_TRAPPER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_TRAPPER, CONFIG_TRAPPER_FORKS);
 
 		main_trapper_loop(&listen_sock);
 	}
 	else if (server_num <= (server_count += CONFIG_PINGER_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_PINGER;
-		process_num = server_num - server_count + CONFIG_PINGER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_PINGER, CONFIG_PINGER_FORKS);
 
 		main_pinger_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_ALERTER_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_ALERTER;
-		process_num = server_num - server_count + CONFIG_ALERTER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_ALERTER, CONFIG_ALERTER_FORKS);
 
 		main_alerter_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_HOUSEKEEPER;
-		process_num = server_num - server_count + CONFIG_HOUSEKEEPER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_HOUSEKEEPER, CONFIG_HOUSEKEEPER_FORKS);
 
 		main_housekeeper_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_TIMER_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_TIMER;
-		process_num = server_num - server_count + CONFIG_TIMER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_TIMER, CONFIG_TIMER_FORKS);
 
 		main_timer_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_NODEWATCHER_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_NODEWATCHER;
-		process_num = server_num - server_count + CONFIG_NODEWATCHER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_NODEWATCHER, CONFIG_NODEWATCHER_FORKS);
 
 		main_nodewatcher_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_HTTPPOLLER_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
-		process_num = server_num - server_count + CONFIG_HTTPPOLLER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_HTTPPOLLER, CONFIG_HTTPPOLLER_FORKS);
 
 		main_httppoller_loop();
 	}
@@ -734,61 +691,37 @@ int	MAIN_ZABBIX_ENTRY()
 		init_snmp("zabbix_server");
 #endif
 
-		process_type = ZBX_PROCESS_TYPE_DISCOVERER;
-		process_num = server_num - server_count + CONFIG_DISCOVERER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_DISCOVERER, CONFIG_DISCOVERER_FORKS);
 
 		main_discoverer_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_HISTSYNCER_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_HISTSYNCER;
-		process_num = server_num - server_count + CONFIG_HISTSYNCER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_HISTSYNCER, CONFIG_HISTSYNCER_FORKS);
 
 		main_dbsyncer_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_ESCALATOR_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_ESCALATOR;
-		process_num = server_num - server_count + CONFIG_ESCALATOR_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_ESCALATOR, CONFIG_ESCALATOR_FORKS);
 
 		main_escalator_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_IPMIPOLLER_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_IPMIPOLLER;
-		process_num = server_num - server_count + CONFIG_IPMIPOLLER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_IPMIPOLLER, CONFIG_IPMIPOLLER_FORKS);
 
 		main_poller_loop(ZBX_POLLER_TYPE_IPMI);
 	}
 	else if (server_num <= (server_count += CONFIG_PROXYPOLLER_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_PROXYPOLLER;
-		process_num = server_num - server_count + CONFIG_PROXYPOLLER_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_PROXYPOLLER, CONFIG_PROXYPOLLER_FORKS);
 
 		main_proxypoller_loop();
 	}
 	else if (server_num <= (server_count += CONFIG_SELFMON_FORKS))
 	{
-		process_type = ZBX_PROCESS_TYPE_SELFMON;
-		process_num = server_num - server_count + CONFIG_SELFMON_FORKS;
-
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [%s]",
-				server_num, get_process_type_string(process_type));
+		INIT_SERVER(ZBX_PROCESS_TYPE_SELFMON, CONFIG_SELFMON_FORKS);
 
 		main_selfmon_loop();
 	}
