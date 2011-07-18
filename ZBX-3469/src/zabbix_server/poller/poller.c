@@ -181,7 +181,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	zbx_uint64_t	triggerid;
 	int		trigger_type, trigger_value, alloc_len = 2048, offset;
 	const char	*trigger_error;
-	char		failed_type_buf[8], item_host_avail_buf[256];
+	char		failed_type_buf[8];
 	char		*sql = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
@@ -207,22 +207,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	}
 
 	sql = zbx_malloc(sql, alloc_len);
-
-	/*
-	 * Determine if items' host is avaliable:
-	 * - (for zabbix items) item host.available = HOST_AVAILABLE_TRUE
-	 * - (for snmp items) item host.snmp_available = HOST_AVAILABLE_TRUE
-	 * - (for ipmi items) item host.ipmi_available = HOST_AVAILABLE_TRUE
-	 */
-	zbx_snprintf(item_host_avail_buf, sizeof(item_host_avail_buf), "i2.type=%d and h2.available=%d"
-			" or i2.type in (%d,%d,%d) and h2.snmp_available=%d"
-			" or i2.type=%d and h2.ipmi_available=%d",
-			ITEM_TYPE_ZABBIX,
-			HOST_AVAILABLE_TRUE,
-			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
-			HOST_AVAILABLE_TRUE,
-			ITEM_TYPE_IPMI,
-			HOST_AVAILABLE_TRUE);
 
 	/*
 	 * Set trigger status to UNKNOWN if all are true:
@@ -260,12 +244,21 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				" from functions f2,items i2,hosts h2"
 				" where f2.triggerid=f.triggerid"
 					" and f2.itemid=i2.itemid"
-					" and f2.itemid<>f.itemid"
 					" and i2.hostid=h2.hostid"
 					" and "
 					"("
-						"f2.function in (" ZBX_SQL_TIME_FUNCTIONS ")"	/* time-based function */
-						" or (i2.type not in (%s) and (%s))"		/* OR item available */
+						"f2.function in (" ZBX_SQL_TIME_FUNCTIONS ")"
+						" or "
+						"("
+							"i2.type not in (%s)"
+							" and "
+							"("
+								"i2.type not in (%d,%d,%d,%d,%d)"
+								" or (i2.type=%d and h2.available=%d)"
+								" or (i2.type in (%d,%d,%d) and h2.snmp_available=%d)"
+								" or (i2.type=%d and h2.ipmi_available=%d)"
+							")"
+						")"
 					")"
 					" and i2.status=%d"
 					" and not i2.key_ like '%s'"
@@ -278,7 +271,13 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			hostid,
 			HOST_STATUS_MONITORED,
 			failed_type_buf,
-			item_host_avail_buf,
+			ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI,
+			ITEM_TYPE_ZABBIX,
+			HOST_AVAILABLE_TRUE,
+			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
+			HOST_AVAILABLE_TRUE,
+			ITEM_TYPE_IPMI,
+			HOST_AVAILABLE_TRUE,
 			ITEM_STATUS_ACTIVE,
 			SERVER_STATUS_KEY,
 			HOST_STATUS_MONITORED);
