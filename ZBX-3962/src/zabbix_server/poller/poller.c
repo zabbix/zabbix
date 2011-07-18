@@ -636,6 +636,8 @@ static int	get_values(unsigned char poller_type)
 			DCrequeue_unreachable_item(items[i].itemid);
 		}
 
+		zbx_free(items[i].key);
+
 		if (INTERFACE_TYPE_AGENT != items[i].interface.type || 1 != items[i].interface.main)
 			zbx_free(items[i].interface.addr);
 
