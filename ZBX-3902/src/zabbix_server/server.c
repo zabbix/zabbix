@@ -603,8 +603,6 @@ int	MAIN_ZABBIX_ENTRY()
 			{
 				zbx_thread_wait(threads[i]);
 				zabbix_log(LOG_LEVEL_DEBUG, "process [%d] has terminated", i);
-
-				ZBX_DO_EXIT();
 			}
 		}
 

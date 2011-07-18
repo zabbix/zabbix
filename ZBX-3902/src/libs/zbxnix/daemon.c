@@ -127,6 +127,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				exiting = 1;
 				zbx_on_exit();
 			}
+
 			break;
 		case SIGPIPE:
 			zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d]. Ignoring ...",
@@ -168,6 +169,7 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				exiting = 1;
 				zbx_on_exit();
 			}
+
 			break;
 		default:
 			child_signal_handler(sig, siginfo, context);
@@ -280,7 +282,7 @@ int	daemon_start(int allow_root)
 	sigaction(SIGUSR1, &phan, NULL);
 
 	/* Set SIGCHLD now to avoid race conditions when a child process is created before */
-	/* sigcaction() is called. To avoid problems when scripts exit in zbx_execute() and */
+	/* sigaction() is called. To avoid problems when scripts exit in zbx_execute() and */
 	/* other cases, SIGCHLD is set to SIG_IGN in zbx_child_fork(). */
 	phan.sa_sigaction = parent_signal_handler;
 	sigaction(SIGCHLD, &phan, NULL);

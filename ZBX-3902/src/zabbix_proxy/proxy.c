@@ -493,7 +493,7 @@ int	main(int argc, char **argv)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	int		i, server_num = 0, server_count = 0;;
+	int		i, server_num = 0, server_count = 0;
 	pid_t		pid;
 	zbx_sock_t	listen_sock;
 
@@ -587,8 +587,6 @@ int	MAIN_ZABBIX_ENTRY()
 			{
 				zbx_thread_wait(threads[i]);
 				zabbix_log(LOG_LEVEL_DEBUG, "process [%d] has terminated", i);
-
-				ZBX_DO_EXIT();
 			}
 		}
 
