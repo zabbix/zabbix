@@ -32,8 +32,6 @@
  *                                                                            *
  * Parameters: va_list arguments                                              *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: do nothing if no zabbix[log] items                               *

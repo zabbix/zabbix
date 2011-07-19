@@ -2645,8 +2645,10 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (GET_STR_RESULT(value))
+			{
 				DCadd_history_log(itemid, value->str, ts, timestamp, source,
 						severity, logeventid, lastlogsize, mtime);
+			}
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
