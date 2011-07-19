@@ -82,7 +82,6 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 	}
 
 	SetServiceStatus(serviceHandle, &serviceStatus);
-
 }
 
 static VOID WINAPI ServiceEntry(DWORD argc, LPTSTR *argv)
