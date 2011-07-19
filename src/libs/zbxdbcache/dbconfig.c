@@ -2664,7 +2664,6 @@ static int	__config_interface_ht_compare(const void *d1, const void *d2)
 	if (interface_ht_1->type > interface_ht_2->type)
 		return +1;
 
-
 	return 0;
 }
 
@@ -2695,7 +2694,6 @@ static int	__config_nextcheck_compare(const void *d1, const void *d2)
 		return -1;
 	if (i1->nextcheck > i2->nextcheck)
 		return +1;
-
 
 	return 0;
 }
