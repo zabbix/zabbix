@@ -231,7 +231,7 @@ include_once('include/page_header.php');
 			$form->setTitle(S_DISCOVERY_RULE);
 		}
 
-		$uniqueness_criteria = -1;
+		$uniqueness_criteria = get_request('uniqueness_criteria', -1);
 		if(isset($_REQUEST['druleid']) && $rule_data && (!isset($_REQUEST["form_refresh"]))){
 			$proxy_hostid = $rule_data['proxy_hostid'];
 			$name = $rule_data['name'];
