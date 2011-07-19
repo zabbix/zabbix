@@ -2,6 +2,14 @@
 	jQuery(document).ready(function(){
 		"use strict";
 
+		function recalculateSortOrder(){
+			var i = 1;
+			jQuery("#iconMapTable tr.sortable .rowNum").each(function(){
+				jQuery(this).text(i++ + ':');
+			});
+
+		}
+
 		jQuery("#iconMapTable").sortable({
 			disabled: (jQuery("#iconMapTable tr.sortable").length <= 1),
 			items: 'tbody tr.sortable',
@@ -11,7 +19,8 @@
 			placeholder: "sortableRowPlaceholder",
 			handle: 'span.ui-icon-arrowthick-2-n-s',
 			tolerance: 'pointer',
-			opacity: 0.6
+			opacity: 0.6,
+			update: recalculateSortOrder
 		});
 
 		jQuery("#iconMapTable tbody").delegate('span.removeMapping', 'click', function(){
@@ -20,6 +29,7 @@
 			if(jQuery("#iconMapTable tr.sortable").length <= 1){
 				jQuery("#iconMapTable").sortable('disable');
 			}
+			recalculateSortOrder();
 		});
 
 		jQuery("#iconMapTable tbody").delegate('select.mappingIcon', 'change', function(){
@@ -44,6 +54,8 @@
 			if(jQuery("#iconMapTable tr.sortable").length > 1){
 				jQuery("#iconMapTable").sortable('enable');
 			}
+
+			recalculateSortOrder();
 		});
 
 		if(jQuery("#iconMapTable tr.sortable").length === 0){

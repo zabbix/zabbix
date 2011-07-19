@@ -1354,8 +1354,10 @@ include_once('include/page_header.php');
 				$data['iconmap'] = reset($iconMap);
 			}
 			else{
+				$firstIcon = reset($iconList);
 				$data['iconmap'] = array(
 					'name' => '',
+					'default_iconid' => $firstIcon['imageid'],
 					'mappings' => array(),
 				);
 			}

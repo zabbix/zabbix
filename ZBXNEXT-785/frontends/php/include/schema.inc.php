@@ -5570,6 +5570,13 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 			),
+			'default_iconid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'images',
+				'ref_field' => 'imageid',
+			),
 		),
 	),
 	'icon_mapping' => array(

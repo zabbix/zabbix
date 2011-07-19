@@ -27,8 +27,8 @@ $TBname = new CTextBox('iconmap[name]', $this->data['iconmap']['name']);
 $TBname->setAttribute('maxlength', 64);
 $iconMapTab->addRow(_('Name'), $TBname);
 
-$TABLEiconMap = new CTable();
-$TABLEiconMap->setAttribute('id', 'iconMapTable');
+$iconMapTable = new CTable();
+$iconMapTable->setAttribute('id', 'iconMapTable');
 
 $iconMapForm = new CForm();
 $iconMapForm->addVar('form', 1);
@@ -39,83 +39,105 @@ if(isset($this->data['iconmap']['iconmapid'])){
 
 
 // header
-$TABLEiconMap->addRow(array(SPACE, SPACE, _('Inventory field'), _('Expression'), _('Icon'), SPACE, SPACE));
+$iconMapTable->addRow(array(SPACE, SPACE, _('Inventory field'), _('Expression'), _('Icon'), SPACE, SPACE));
 
+order_result($this->data['iconmap']['mappings'], 'sortorder');
 $i = 1;
 foreach($this->data['iconmap']['mappings'] as $iconmappingid => $mapping){
-	$SPANnum = new CSpan($i++ . ':');
-	$SPANnum->addClass('rowNum');
+	$numSpan = new CSpan($i++ . ':');
+	$numSpan->addClass('rowNum');
 
-	$CCprofileLinks = new CComboBox('iconmap[mappings][' . $iconmappingid . '][inventory_link]', $mapping['inventory_link']);
-	$CCprofileLinks->addItems($this->data['inventoryList']);
+	$profileLinksComboBox = new CComboBox('iconmap[mappings][' . $iconmappingid . '][inventory_link]', $mapping['inventory_link']);
+	$profileLinksComboBox->addItems($this->data['inventoryList']);
 
-	$TBexpression = new CTextBox('iconmap[mappings][' . $iconmappingid . '][expression]', $mapping['expression']);
-	$TBexpression->setAttribute('maxlength', 64);
+	$expressionTextBox = new CTextBox('iconmap[mappings][' . $iconmappingid . '][expression]', $mapping['expression']);
+	$expressionTextBox->setAttribute('maxlength', 64);
 
-	$CBicons = new CComboBox('iconmap[mappings][' . $iconmappingid . '][iconid]', $mapping['iconid']);
-	$CBicons->addClass('mappingIcon');
-	$CBicons->addItems($this->data['iconList']);
+	$iconsComboBox = new CComboBox('iconmap[mappings][' . $iconmappingid . '][iconid]', $mapping['iconid']);
+	$iconsComboBox->addClass('mappingIcon');
+	$iconsComboBox->addItems($this->data['iconList']);
 
-	$DIViconPreview = new CDiv(SPACE, 'sysmap_iconid_' . $mapping['iconid'], 'divPreview_' . $iconmappingid);
-	$DIViconPreview->addStyle('margin: 0 auto;');
+	$iconPreviewDiv = new CDiv(SPACE, 'sysmap_iconid_' . $mapping['iconid'], 'divPreview_' . $iconmappingid);
+	$iconPreviewDiv->addStyle('margin: 0 auto;');
 
 	$row = new CRow(array(
 		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
-		$SPANnum,
-		$CCprofileLinks,
-		$TBexpression,
-		$CBicons,
-		$DIViconPreview,
+		$numSpan,
+		$profileLinksComboBox,
+		$expressionTextBox,
+		$iconsComboBox,
+		$iconPreviewDiv,
 		new CSpan(_('Remove'), 'link_menu removeMapping'),
 	), 'sortable');
 	$row->setAttribute('id', 'iconmapidRow_' . $iconmappingid);
-	$TABLEiconMap->addRow($row);
+	$iconMapTable->addRow($row);
 }
+
+
+// default icon row {{{
+$numSpan = new CSpan($i++ . ':');
+$numSpan->addClass('rowNum');
+
+$iconsComboBox = new CComboBox('iconmap[default_iconid]', $this->data['iconmap']['default_iconid']);
+$iconsComboBox->addClass('mappingIcon');
+$iconsComboBox->addItems($this->data['iconList']);
+
+$iconPreviewDiv = new CDiv(SPACE, 'sysmap_iconid_' . $this->data['iconmap']['default_iconid']);
+$iconPreviewDiv->addStyle('margin: 0 auto;');
+
+$iconMapTable->addRow(array(
+	SPACE,
+	_('Default'),
+	SPACE,
+	SPACE,
+	$iconsComboBox,
+	$iconPreviewDiv,
+));
+// }}}
 
 // hidden row for js
 reset($this->data['iconList']);
 $firstIconId = key($this->data['iconList']);
+$numSpan = new CSpan('0:');
+$numSpan->addClass('rowNum');
 
-$SPANnum = new CSpan('0:');
-$SPANnum->addClass('rowNum');
+$profileLinksComboBox = new CComboBox('iconmap[mappings][#{iconmappingid}][inventory_link]');
+$profileLinksComboBox->addItems($this->data['inventoryList']);
+$profileLinksComboBox->setAttribute('disabled', 'disabled');
 
-$CCprofileLinks = new CComboBox('iconmap[mappings][#{iconmappingid}][inventory_link]');
-$CCprofileLinks->addItems($this->data['inventoryList']);
-$CCprofileLinks->setAttribute('disabled', 'disabled');
+$expressionTextBox = new CTextBox('iconmap[mappings][#{iconmappingid}][expression]');
+$expressionTextBox->setAttribute('maxlength', 64);
+$expressionTextBox->setAttribute('disabled', 'disabled');
 
-$TBexpression = new CTextBox('iconmap[mappings][#{iconmappingid}][expression]');
-$TBexpression->setAttribute('maxlength', 64);
-$TBexpression->setAttribute('disabled', 'disabled');
+$iconsComboBox = new CComboBox('iconmap[mappings][#{iconmappingid}][iconid]', $firstIconId);
+$iconsComboBox->addClass('mappingIcon');
+$iconsComboBox->addItems($this->data['iconList']);
+$iconsComboBox->setAttribute('disabled', 'disabled');
 
-$CBicons = new CComboBox('iconmap[mappings][#{iconmappingid}][iconid]', $firstIconId);
-$CBicons->addClass('mappingIcon');
-$CBicons->addItems($this->data['iconList']);
-$CBicons->setAttribute('disabled', 'disabled');
-
-$DIViconPreview = new CDiv(SPACE, 'sysmap_iconid_' . $firstIconId, 'divPreview_#{iconmappingid}');
-$DIViconPreview->addStyle('margin: 0 auto;');
+$iconPreviewDiv = new CDiv(SPACE, 'sysmap_iconid_' . $firstIconId, 'divPreview_#{iconmappingid}');
+$iconPreviewDiv->addStyle('margin: 0 auto;');
 
 $hiddenRow = new CRow(array(
 	new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
-	$SPANnum,
-	$CCprofileLinks,
-	$TBexpression,
-	$CBicons,
-	$DIViconPreview,
+	$numSpan,
+	$profileLinksComboBox,
+	$expressionTextBox,
+	$iconsComboBox,
+	$iconPreviewDiv,
 	new CSpan(_('Remove'), 'link_menu removeMapping'),
 ), 'hidden');
 $hiddenRow->setAttribute('id', 'rowTpl');
-$TABLEiconMap->addRow($hiddenRow);
+$iconMapTable->addRow($hiddenRow);
 
 
-$SPANadd = new CSpan(_('Add'), 'link_menu');
-$SPANadd->setAttribute('id', 'addMapping');
-$COLadd = new CCol($SPANadd);
-$COLadd->setColSpan(5);
-$TABLEiconMap->addRow(array(SPACE, $COLadd));
+$addSpan = new CSpan(_('Add'), 'link_menu');
+$addSpan->setAttribute('id', 'addMapping');
+$addCol = new CCol($addSpan);
+$addCol->setColSpan(5);
+$iconMapTable->addRow(array(SPACE, $addCol));
 
 
-$iconMapTab->addRow(_('Mappings'), new CDiv($TABLEiconMap, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$iconMapTab->addRow(_('Mappings'), new CDiv($iconMapTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 $iconMapView = new CTabView();
 $iconMapView->addTab('iconmap', _('Icon map'), $iconMapTab);
 $iconMapForm->addItem($iconMapView);
