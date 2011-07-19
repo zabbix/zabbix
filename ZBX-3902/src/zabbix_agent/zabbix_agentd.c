@@ -490,16 +490,27 @@ int	MAIN_ZABBIX_ENTRY()
 	set_parent_signal_handler();	/* must be called after all threads are created */
 
 	/* wait for an exiting thread */
-	WaitForMultipleObjectsEx(threads_num, threads, FALSE, INFINITE, FALSE);
+	i = (int)WaitForMultipleObjectsEx(threads_num, threads, FALSE, INFINITE, FALSE);
 
-	if (ZBX_APP_STOPPED != application_status)
+	if (ZBX_IS_RUNNING())
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		ZBX_DO_EXIT();
-	}
+		/* Zabbix agent service should either be stopped by the user in ServiceCtrlHandler() or */
+		/* crash. If some thread has terminated normally, it means something is terribly wrong. */
 
-	/* allow other threads to terminate */
-	zbx_sleep(2);
+		zabbix_log(LOG_LEVEL_CRIT, "One thread has terminated unexpectedly (index:%d). Exiting ...",
+				i - WAIT_OBJECT_0);
+		THIS_SHOULD_NEVER_HAPPEN;
+
+		/* notify other threads and allow them to terminate */
+		ZBX_DO_EXIT();
+		zbx_sleep(1);
+	}
+	else
+	{
+		/* wait for the service worker thread to terminate us */
+		zbx_sleep(2);
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
 #else
 	wait(&i);
 
@@ -515,8 +526,6 @@ int	MAIN_ZABBIX_ENTRY()
 void	zbx_on_exit()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
-
-	ZBX_DO_EXIT();
 
 	if (NULL != threads)
 	{

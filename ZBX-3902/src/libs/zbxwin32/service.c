@@ -76,6 +76,7 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 
 			zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 					ZABBIX_VERSION, ZABBIX_REVISION);
+
 			break;
 		default:
 			break;
