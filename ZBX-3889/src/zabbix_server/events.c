@@ -300,15 +300,14 @@ int	process_event(DB_EVENT *event, int force_actions)
 	if (0 == event->eventid)
 		event->eventid = DBget_maxid("events");
 
-	if (ZBX_DB_OK > DBexecute("insert into events (eventid,source,object,objectid,clock,value)"
+	DBexecute("insert into events (eventid,source,object,objectid,clock,value)"
 			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d)",
 			event->eventid,
 			event->source,
 			event->object,
 			event->objectid,
 			event->clock,
-			event->value))
-		goto fail;
+			event->value);
 
 	if (0 != event->ack_eventid)
 		copy_acknowledges(event->ack_eventid, event->eventid);
