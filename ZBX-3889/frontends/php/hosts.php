@@ -494,12 +494,13 @@ include_once('include/page_header.php');
 // START SAVE TRANSACTION {{{
 		DBstart();
 
-		if(!empty($_REQUEST['newgroup'])){
-				$group = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
-				if($group){
-					$groups = array_merge($groups, $group['groupids']);
-			}
-				else throw new Exception();
+			// create new group
+			if(!zbx_empty($_REQUEST['newgroup'])){
+				$newGroup = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+				if(!$newGroup){
+					throw new Exception();
+				}
+				$groups[] = reset($newGroup['groupids']);
 			}
 			$groups = zbx_toObject($groups, 'groupid');
 
