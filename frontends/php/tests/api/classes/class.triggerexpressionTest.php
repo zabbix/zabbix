@@ -1328,6 +1328,24 @@ class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
 			array('(1 - 1-2-((((((({host:key.str("0")}))))))))&(1 - 1-2-((((((({host:key.str("0")}))))))))/(1 - 1-2-((((((({host:key.str("0")}))))))))',true),
 			array('(1 - 1-2-((((((({host:key.str("0")}))))))))+(1 - 1-2-((((((({host:key.str("0")}))))))))/(1 - 1-2-((((((({host:key.str("0")}))))))))',true),
 			array('1 - (1/(1 - 1-2-((((((({host:key.str("0")})))))))))+((1 - 1-2-((((((({host:key.str("0")})))))))))/(1 - 1-2-((((((({host:key.str("0")}))))))))/(1 - 1-2-((((((({host:key.str("0")}))))))))',true),
+	// by Aleksandrs (July 19, 2011; test cases for ZBX-3911)
+			array('{host:log[/data/logs/test.log,incorrect:FAIL].last(0)}', true),
+			array('{host:log[/data/logs/test.log,incorrect^FAIL].last(0)}', true),
+			array('{host:log[/data/logs/test.log,incorrect/FAIL].last(0)}', true),
+			array('{host:log[/data/logs/test.log,incorrect*FAIL].last(0)}', true),
+			array('{host:log[/data/logs/test.log,incorrect+FAIL].last(0)}', true),
+			array('{host:log[/data/logs/test.log,incorrect-FAIL].last(0)}', true),
+			array('{host:log[/data/logs/test.log,incorrect&FAIL].last(0)}', true),
+			array('{host:log[/data/logs/test.log,incorrect|FAIL].last(0)}', true),
+			array('{host:log[/data/logs/test.log,(incorrect|FAIL].last(0)}', true),
+			array('{host:log[/data/logs/test.log,incorrect|FAIL)].last(0)}', true),
+			array('{host:log[/data/logs/test.log,(incorrect|FAIL)].last(0)}', true),
+			array('{host:log[/data/logs/test.log,{incorrect|FAIL].last(0)}', true),
+			array('{host:log[/data/logs/test.log,incorrect|FAIL}].last(0)}', true),
+			array('{host:log[/data/logs/test.log,{incorrect|FAIL}].last(0)}', true),
+			array('{host:log[/data/logs/test.log,text1(incorrect|FAILtext2].last(0)}', true),
+			array('{host:log[/data/logs/test.log,text1incorrect|FAIL)text2].last(0)}', true),
+			array('{host:log[/data/logs/test.log,text1(incorrect|FAIL)text2].last(0)}', true),
 		);
 	}
 
