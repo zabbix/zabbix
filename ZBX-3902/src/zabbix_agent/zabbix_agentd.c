@@ -492,7 +492,9 @@ int	MAIN_ZABBIX_ENTRY()
 	/* wait for an exiting thread */
 	WaitForMultipleObjectsEx(threads_num, threads, FALSE, INFINITE, FALSE);
 
-	zbx_sleep(2);	/* allow threads to exit by themselves */
+	/* notify other threads and allow them to terminate */
+	ZBX_DO_EXIT();
+	zbx_sleep(2);
 #else
 	wait(&i);
 
@@ -539,7 +541,9 @@ void	zbx_on_exit()
 	daemon_stop();
 #endif
 
-	zbx_sleep(2);	/* wait for all threads to exit */
+#if !defined(_WINDOWS)
+	zbx_sleep(2);	/* wait for all processes to exit */
+#endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);

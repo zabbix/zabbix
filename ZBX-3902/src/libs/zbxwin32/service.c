@@ -47,8 +47,6 @@ static void	parent_signal_handler(int sig)
 
 static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 {
-	int	do_exit = 0;
-
 	serviceStatus.dwServiceType		= SERVICE_WIN32_OWN_PROCESS;
 	serviceStatus.dwCurrentState		= SERVICE_RUNNING;
 	serviceStatus.dwControlsAccepted	= SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
@@ -61,19 +59,23 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 	{
 		case SERVICE_CONTROL_STOP:
 		case SERVICE_CONTROL_SHUTDOWN:
+			zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent shutdown requested");
+
 			serviceStatus.dwCurrentState	= SERVICE_STOP_PENDING;
 			serviceStatus.dwWaitHint	= 4000;
-			SetServiceStatus(serviceHandle,&serviceStatus);
+			SetServiceStatus(serviceHandle, &serviceStatus);
 
+			/* notify other threads and allow them to terminate */
 			ZBX_DO_EXIT();
-
-			/* allow other threads to terminate */
 			zbx_sleep(1);
 
 			serviceStatus.dwCurrentState	= SERVICE_STOPPED;
 			serviceStatus.dwWaitHint	= 0;
 			serviceStatus.dwCheckPoint	= 0;
 			serviceStatus.dwWin32ExitCode	= 0;
+
+			zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
+					ZABBIX_VERSION, ZABBIX_REVISION);
 			break;
 		default:
 			break;
@@ -81,8 +83,6 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 
 	SetServiceStatus(serviceHandle, &serviceStatus);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent service stopped. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
 }
 
 static VOID WINAPI ServiceEntry(DWORD argc, LPTSTR *argv)
