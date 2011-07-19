@@ -268,7 +268,9 @@ include_once('include/page_header.php');
 /**********************************/
 /* <<<--- TEMPLATE ACTIONS --->>> */
 /**********************************/
-// unlink, unlink_and_clear
+	/**
+	 * Unlink, unlink_and_clear
+	 */
 	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
@@ -281,18 +283,24 @@ include_once('include/page_header.php');
 		}
 		foreach($unlink_templates as $id) unset($_REQUEST['templates'][$id]);
 	}
-// clone
+	/**
+	 * Clone
+	 */
 	else if(isset($_REQUEST['clone']) && isset($_REQUEST['templateid'])){
 		unset($_REQUEST['templateid']);
 		unset($_REQUEST['hosts']);
 		$_REQUEST['form'] = 'clone';
 	}
-// full_clone
+	/**
+	 * Full_clone
+	 */
 	else if(isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])){
 		$_REQUEST['form'] = 'full_clone';
 		$_REQUEST['hosts'] = array();
 	}
-// save
+	/**
+	 * Save
+	 */
 	else if(isset($_REQUEST['save'])){
 
 		$macros = get_request('macros', array());
@@ -304,8 +312,6 @@ include_once('include/page_header.php');
 		$newgroup = get_request('newgroup', 0);
 		$template_name = get_request('template_name', '');
 		$visiblename = get_request('visiblename', '');
-
-		$result = true;
 
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
 			access_deny();
@@ -326,98 +332,115 @@ include_once('include/page_header.php');
 			unset($macros[$mnum]['new']);
 		}
 
-		DBstart();
-
-// CREATE NEW GROUP
-		$groups = zbx_toObject($groups, 'groupid');
-		if(!empty($newgroup)){
-			$result = API::HostGroup()->create(array('name' => $newgroup));
-			$options = array(
-				'groupids' => $result['groupids'],
-				'output' => API_OUTPUT_EXTEND
-			);
-			$newgroup = API::HostGroup()->get($options);
-			if($newgroup){
-				$groups = array_merge($groups, $newgroup);
-			}
-			else{
-				$result = false;
-			}
-		}
-
-		$templates = array_keys($templates);
-		$templates = zbx_toObject($templates, 'templateid');
-		$templates_clear = zbx_toObject($templates_clear, 'templateid');
-
-		$hosts = zbx_toObject($hosts, 'hostid');
-
-		$template = array(
-			'host' => $template_name,
-			'name' => $visiblename,
-			'groups' => $groups,
-			'templates' => $templates,
-			'hosts' => $hosts,
-			'macros' => $macros
-		);
-
-// CREATE/UPDATE TEMPLATE {{{
 		if($templateid){
-			$created = 0;
-			$template['templateid'] = $templateid;
-			$template['templates_clear'] = $templates_clear;
-			$result = API::Template()->update($template);
-
 			$msg_ok = S_TEMPLATE_UPDATED;
 			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
 		}
 		else{
-			$created = 1;
-			$result = API::Template()->create($template);
-
-			if($result)
-				$templateid = reset($result['templateids']);
-
 			$msg_ok = S_TEMPLATE_ADDED;
 			$msg_fail = S_CANNOT_ADD_TEMPLATE;
 		}
-// }}} CREATE/UPDATE TEMPLATE
 
-// FULL_CLONE {{{
-		if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
+		try{
+			DBstart();
 
-			if(!copy_applications($clone_templateid, $templateid)) $result = false;
-
-			if(!copyItems($clone_templateid, $templateid)) $result = false;
-
-			if(!copy_triggers($clone_templateid, $templateid)) $result = false;
-
-// Host graphs
-			$options = array(
-				'hostids' => $clone_templateid,
-				'inherited' => 0,
-				'output' => API_OUTPUT_REFER
-			);
-			$db_graphs = API::Graph()->get($options);
-			foreach($db_graphs as $gnum => $db_graph){
-				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
+			// Create new group
+			$groups = zbx_toObject($groups, 'groupid');
+			if(!zbx_empty($newgroup)){
+				$result = API::HostGroup()->create(array('name' => $newgroup));
+				if(!$result){
+					throw new Exception();
+				}
+				$options = array(
+					'groupids' => $result['groupids'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$newgroup = API::HostGroup()->get($options);
+				if($newgroup){
+					$groups = array_merge($groups, $newgroup);
+				}
+				else{
+					throw new Exception();
+				}
 			}
-		}
-// }}} FULL_CLONE
 
-		$result = DBend($result);
+			$templates = array_keys($templates);
+			$templates = zbx_toObject($templates, 'templateid');
+			$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
-		show_messages($result, $msg_ok, $msg_fail);
+			$hosts = zbx_toObject($hosts, 'hostid');
 
-		if($result){
+			$template = array(
+				'host' => $template_name,
+				'name' => $visiblename,
+				'groups' => $groups,
+				'templates' => $templates,
+				'hosts' => $hosts,
+				'macros' => $macros
+			);
+
+			// Create/update template
+			if($templateid){
+				$created = 0;
+				$template['templateid'] = $templateid;
+				$template['templates_clear'] = $templates_clear;
+				if(!API::Template()->update($template)){
+					throw new Exception();
+				}
+			}
+			else{
+				$created = 1;
+				$result = API::Template()->create($template);
+				if($result){
+					$templateid = reset($result['templateids']);
+				}
+				else{
+					throw new Exception();
+				}
+			}
+
+			// Full clone
+			if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
+
+				if(!copy_applications($clone_templateid, $templateid)) throw new Exception();
+
+				if(!copyItems($clone_templateid, $templateid)) throw new Exception();
+
+				if(!copy_triggers($clone_templateid, $templateid)) throw new Exception();
+
+				// Host graphs
+				$options = array(
+					'hostids' => $clone_templateid,
+					'inherited' => 0,
+					'output' => API_OUTPUT_REFER
+				);
+				$db_graphs = API::Graph()->get($options);
+				$result = true;
+				foreach($db_graphs as $gnum => $db_graph){
+					$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
+				}
+				if(!$result) throw new Exception();
+			}
+
+			if(!DBend(true)) throw new Exception();
+			show_messages(true, $msg_ok, $msg_fail);
+
 			if($created){
 				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templateid, $template_name, 'hosts', NULL, NULL);
 			}
 			unset($_REQUEST['form']);
 			unset($_REQUEST['templateid']);
+
+		}
+		catch(Exception $e){
+			DBend(false);
+			show_messages(false, $msg_ok, $msg_fail);
 		}
 		unset($_REQUEST['save']);
 	}
-// delete, delete_and_clear
+	/**
+	 * Delete, delete_and_clear
+	 */
 	else if((isset($_REQUEST['delete']) || isset($_REQUEST['delete_and_clear'])) && isset($_REQUEST['templateid'])){
 		DBstart();
 
