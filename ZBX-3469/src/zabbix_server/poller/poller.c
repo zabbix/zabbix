@@ -179,10 +179,9 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
-	int		trigger_type, trigger_value, alloc_len = 2048, offset;
+	int		trigger_type, trigger_value;
 	const char	*trigger_error;
 	char		failed_type_buf[8];
-	char		*sql = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
@@ -206,8 +205,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			assert(0);
 	}
 
-	sql = zbx_malloc(sql, alloc_len);
-
 	/*
 	 * Set trigger status to UNKNOWN if all are true:
 	 * - trigger's item status ACTIVE
@@ -224,8 +221,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	 *   OR
 	 *   item is of different type AND it's host is AVAILABLE
 	 */
-	offset = 0;
-	zbx_snprintf_alloc(&sql, &alloc_len, &offset, 4096,
+	result = DBselect(
 			"select distinct t.triggerid,t.type,t.value,t.error"
 			" from items i,functions f,triggers t,hosts h"
 			" where i.itemid=f.itemid"
@@ -238,25 +234,21 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				" and t.status=%d"
 				" and h.hostid=" ZBX_FS_UI64
 				" and h.status=%d"
-			" and not exists"
-			" ("
+			" and not exists ("
 				"select 1"
 				" from functions f2,items i2,hosts h2"
 				" where f2.triggerid=f.triggerid"
 					" and f2.itemid=i2.itemid"
 					" and i2.hostid=h2.hostid"
-					" and "
-					"("
+					" and ("
 						"f2.function in (" ZBX_SQL_TIME_FUNCTIONS ")"
-						" or "
-						"("
+						" or ("
 							"i2.type not in (%s)"
-							" and "
-							"("
+							" and ("
 								"i2.type not in (%d,%d,%d,%d,%d)"
-								" or (i2.type=%d and h2.available=%d)"
+								" or (i2.type in (%d) and h2.available=%d)"
 								" or (i2.type in (%d,%d,%d) and h2.snmp_available=%d)"
-								" or (i2.type=%d and h2.ipmi_available=%d)"
+								" or (i2.type in (%d) and h2.ipmi_available=%d)"
 							")"
 						")"
 					")"
@@ -272,19 +264,12 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			HOST_STATUS_MONITORED,
 			failed_type_buf,
 			ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI,
-			ITEM_TYPE_ZABBIX,
-			HOST_AVAILABLE_TRUE,
-			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
-			HOST_AVAILABLE_TRUE,
-			ITEM_TYPE_IPMI,
-			HOST_AVAILABLE_TRUE,
+			ITEM_TYPE_ZABBIX, HOST_AVAILABLE_TRUE,
+			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, HOST_AVAILABLE_TRUE,
+			ITEM_TYPE_IPMI, HOST_AVAILABLE_TRUE,
 			ITEM_STATUS_ACTIVE,
 			SERVER_STATUS_KEY,
 			HOST_STATUS_MONITORED);
-
-	result = DBselect("%s", sql);
-
-	zbx_free(sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
