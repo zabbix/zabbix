@@ -492,8 +492,13 @@ int	MAIN_ZABBIX_ENTRY()
 	/* wait for an exiting thread */
 	WaitForMultipleObjectsEx(threads_num, threads, FALSE, INFINITE, FALSE);
 
-	/* notify other threads and allow them to terminate */
-	ZBX_DO_EXIT();
+	if (ZBX_APP_STOPPED != application_status)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		ZBX_DO_EXIT();
+	}
+
+	/* allow other threads to terminate */
 	zbx_sleep(2);
 #else
 	wait(&i);
