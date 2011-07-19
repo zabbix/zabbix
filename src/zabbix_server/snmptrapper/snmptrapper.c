@@ -52,11 +52,6 @@ static void	DBupdate_lastsize()
 	DBexecute("update globalvars set snmp_lastsize=%d", trap_lastsize);
 }
 
-static zbx_uint64_t	get_fallback_interface()
-{
-	return FAIL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: set_item_value                                                   *
@@ -154,7 +149,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 static void	process_trap(char *ip, char *begin, char *end)
 {
 	zbx_timespec_t	ts;
-	zbx_uint64_t	*interfaceids = NULL, fallback_interfaceid;
+	zbx_uint64_t	*interfaceids = NULL;
 	int		count, i, ret = FAIL;
 	char		*trap = NULL;
 
@@ -169,11 +164,8 @@ static void	process_trap(char *ip, char *begin, char *end)
 			ret = SUCCEED;
 	}
 
-	if (FAIL == ret && FAIL != (fallback_interfaceid = get_fallback_interface()))
-	{
-		trap = zbx_dsprintf(trap, "%s: %s%s", ip, begin, end);	/* print the IP for the global fallback */
-		process_trap_for_interface(fallback_interfaceid, trap, &ts);
-	}
+	if (FAIL == ret && 1 == *(int *)DCconfig_get_config_data(&i, CONFIG_SNMPTRAP_LOGGING))
+		zabbix_log(LOG_LEVEL_WARNING, "Unmatched trap received from [%s]: %s", ip, trap);
 
 	zbx_free(interfaceids);
 	zbx_free(trap);
