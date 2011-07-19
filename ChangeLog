@@ -177,6 +177,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3845] check, if this user group is used in the config, if so it cannot be deleted (Eduard)
  - [ZBX-3911] fixed wrong trigger expression parsing when key parameters contained "(" (KB)
  - [ZBX-3856] fixed new group creation from template page (Eduard)
  - [ZBX-3840] fixed possible path disclosure (Vedmak)
