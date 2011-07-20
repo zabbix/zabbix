@@ -196,7 +196,6 @@
 // HEADER {{{
 	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
-	$r_form->addVar('triggerid', get_request('triggerid'));
 	$r_form->addVar('stime', get_request('stime'));
 	$r_form->addVar('period', get_request('period'));
 
