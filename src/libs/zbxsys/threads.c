@@ -18,32 +18,52 @@
 **/
 
 #include "common.h"
+#include "log.h"
 #include "threads.h"
 
-#include "log.h" /* required for strerror_from_system() on Windows */
-
+#if !defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_fork                                                         *
  *                                                                            *
  * Purpose: Flush stdout and stderr before forking                            *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: same as system fork function                                 *
+ * Return value: same as system fork() function                               *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *          Use this function instead of system fork function!                *
- *                                                                            *
  ******************************************************************************/
-#if !defined(_WINDOWS)
 int	zbx_fork()
 {
 	fflush(stdout);
 	fflush(stderr);
 	return fork();
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_child_fork                                                   *
+ *                                                                            *
+ * Purpose: fork from master process and set SIGCHLD handler                  *
+ *                                                                            *
+ * Return value: same as system fork() function                               *
+ *                                                                            *
+ * Author: Rudolfs Kreicbergs                                                 *
+ *                                                                            *
+ * Comments: use this function only for forks from the main process           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_child_fork()
+{
+	pid_t	pid;
+
+	pid = zbx_fork();
+
+	/* ignore SIGCHLD to avoid problems with exiting scripts in zbx_execute() and other cases */
+	if (0 == pid)
+		signal(SIGCHLD, SIG_IGN);
+
+	return pid;
 }
 #endif
 
@@ -60,8 +80,7 @@ int	zbx_fork()
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *          The zbx_thread_exit must be called from the handler!              *
+ * Comments: The zbx_thread_exit must be called from the handler!             *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args)
@@ -80,7 +99,7 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
 
 #else
 
-	if (0 == (thread = zbx_fork()))	/* child process */
+	if (0 == (thread = zbx_child_fork()))	/* child process */
 	{
 		(*handler)(thread_args);
 
@@ -111,12 +130,10 @@ ZBX_THREAD_HANDLE	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 {
-	int	status = 0; /* significant 8 bits of the status */
+	int	status = 0;	/* significant 8 bits of the status */
 
 #ifdef _WINDOWS
 
