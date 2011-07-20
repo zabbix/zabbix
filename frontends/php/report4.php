@@ -222,9 +222,17 @@ include_once('include/page_header.php');
 		$table->show();
 
 		if($media_type == 0){
-			$table = new CTableInfo();
-			$table->addRow(new CSpan(SPACE.SPACE.SPACE.SPACE.SPACE.SPACE.'all'.SPACE.'('.implode('/', $media_types).')','off'));
-			$table->Show();
+			echo SBR;
+
+			$links = array();
+			foreach($media_types as $id => $description){
+				$links[] = new CLink($description, 'media_types.php?form=update&mediatypeid=' . $id);
+				$links[] = SPACE . '/' . SPACE;
+			}
+			array_pop($links);
+
+			$linksDiv = new CDiv(array(SPACE . S_ALL_SMALL . SPACE . '(' . SPACE, $links, SPACE.')'));
+			$linksDiv->show();
 		}
 	}
 

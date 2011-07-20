@@ -177,6 +177,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3565] reformating media types in notifications page, adding links to media types (Eduard)
  - [ZBX-3784] added validation on duplicate discovery rule name (Eduard)
  - [ZBX-3733] make possible to save Device uniqueness criteria status (discovery rule) in cloning event (Eduard)
  - [ZBX-3845] check, if this user group is used in the config, if so it cannot be deleted (Eduard)
