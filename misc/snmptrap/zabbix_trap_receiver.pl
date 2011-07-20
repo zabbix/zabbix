@@ -36,7 +36,7 @@
 
 ### Option: SNMPTrapperfile
 #	Temporary file used for passing data to the server (or proxy). Must be the same
-#		as in server (or proxy) configuration file.
+#	as in the server (or proxy) configuration file.
 #
 # Mandatory: yes
 # Default:
@@ -44,7 +44,7 @@ $SNMPTrapperfile = '/tmp/zabbix_traps.tmp';
 
 ### Option: DateTimeFormat
 #	The date time format in strftime() format. Please make sure to have a corresponding
-#               log time format for the SNMP trap items.
+#	log time format for the SNMP trap items.
 #
 # Mandatory: yes
 # Default:
@@ -103,6 +103,6 @@ sub zabbix_receiver
 }
 
 NetSNMP::TrapReceiver::register("all", \&zabbix_receiver) or
-	warn "failed to register Zabbix SNMP trap receiver\n";
+	die "failed to register Zabbix SNMP trap receiver\n";
 
 print STDOUT "Loaded Zabbix SNMP trap receiver\n";
