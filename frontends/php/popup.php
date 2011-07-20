@@ -188,6 +188,7 @@ include_once('include/page_header.php');
 
 		'reference'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
 		'writeonly'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
+		'noempty'=>			array(T_ZBX_STR, O_OPT, null,   null,		null),
 
 		'select'=>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
 
@@ -211,6 +212,7 @@ include_once('include/page_header.php');
 	$dstact 	= get_request('dstact', '');
 	$writeonly	= get_request('writeonly');
 	$simpleName	= get_request('simpleName');
+	$noempty	= get_request('noempty'); 		// display/hide "Empty" button
 
 	$existed_templates = get_request('existed_templates', null);
 	$excludeids = get_request('excludeids', null);
@@ -281,7 +283,7 @@ include_once('include/page_header.php');
 	if($normal_only)
 		$frmTitle->addVar('normal_only', $normal_only);
 
-//adding param to a form, so that it would remain when page is refreshed
+	// adding param to a form, so that it would remain when page is refreshed
 	$frmTitle->addVar('dstfrm', $dstfrm);
 	$frmTitle->addVar('dstact', $dstact);
 	$frmTitle->addVar('dstfld1', $dstfld1);
@@ -292,7 +294,8 @@ include_once('include/page_header.php');
 	$frmTitle->addVar('multiselect', $multiselect);
 	$frmTitle->addVar('writeonly', $writeonly);
 	$frmTitle->addVar('reference', $reference);
-	$frmTitle->addVar('submitParent', $submitParent	);
+	$frmTitle->addVar('submitParent', $submitParent);
+	$frmTitle->addVar('noempty', $noempty);
 
 	if(!is_null($existed_templates))
 		$frmTitle->addVar('existed_templates', $existed_templates);
@@ -417,14 +420,16 @@ include_once('include/page_header.php');
 		}
 
 		if(str_in_array($srctbl,array('triggers','hosts','host_group','hosts_and_templates'))){
-			$value1 = (isset($_REQUEST['dstfld1']) && (zbx_strpos($_REQUEST['dstfld1'], 'id') !== false))?0:'';
-			$value2 = (isset($_REQUEST['dstfld2']) && (zbx_strpos($_REQUEST['dstfld2'], 'id') !== false))?0:'';
+			if(zbx_empty($noempty)){
+				$value1 = (isset($_REQUEST['dstfld1']) && (zbx_strpos($_REQUEST['dstfld1'], 'id') !== false))?0:'';
+				$value2 = (isset($_REQUEST['dstfld2']) && (zbx_strpos($_REQUEST['dstfld2'], 'id') !== false))?0:'';
 
-			$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
-			$epmtyScript.= get_window_opener($dstfrm, $dstfld2, $value2);
-			$epmtyScript.= ' close_window(); return false;';
+				$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
+				$epmtyScript.= get_window_opener($dstfrm, $dstfld2, $value2);
+				$epmtyScript.= ' close_window(); return false;';
 
-			$frmTitle->addItem(new CSubmit('empty', S_EMPTY, $epmtyScript));
+				$frmTitle->addItem(array(SPACE,new CButton('empty', S_EMPTY, $epmtyScript)));
+			}
 		}
 	}
 

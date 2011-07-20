@@ -1690,10 +1690,9 @@
 				new CTextBox('hostname', $hostname, 32, true),
 				new CButton('btn_host', S_SELECT,
 					"return PopUp('popup.php?dstfrm=".$frmItem->getName().
-					"&dstfld1=hostname&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid',450,450);",
+					"&dstfld1=hostname&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&noempty=1',450,450);",
 					'H')
 			));
-
 
 			$interfaces = API::HostInterface()->get(array(
 				'hostids' => $hostid,

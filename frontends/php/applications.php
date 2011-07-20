@@ -265,12 +265,12 @@ include_once('include/page_header.php');
 		$frmApp->addVar("apphostid",$apphostid);
 
 		if(!isset($_REQUEST["applicationid"])){
-// any new application can SELECT host
+			// any new application can SELECT host
 			$frmApp->addRow(S_HOST,array(
 				new CTextBox('hostname', $hostname, 32, 'yes'),
 				new CButton('btn1', S_SELECT,
 					"return PopUp('popup.php?dstfrm=".$frmApp->getName().
-					"&dstfld1=apphostid&dstfld2=hostname&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name',450,450);",
+					"&dstfld1=apphostid&dstfld2=hostname&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name&noempty=1',450,450);",
 					'T')
 				));
 		}
@@ -358,7 +358,7 @@ include_once('include/page_header.php');
 				else{
 					$template_host = get_realhost_by_applicationid($application['templateid']);
 					$name = array(
-						new CLink($template_host['name'], 'applications.php?hostid='.$template_host['hostid']),
+						new CLink($template_host['name'], 'applications.php?hostid='.$template_host['hostid'], 'unknown'),
 						':',
 						$application['name']
 					);
