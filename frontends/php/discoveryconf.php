@@ -305,7 +305,7 @@ include_once('include/page_header.php');
 		$cmbUniquenessCriteria->addItem(-1, S_IP_ADDRESS);
 
 		foreach($dchecks as $id => $data){
-			$dchecks[$id]['name'] = discovery_check2str($data['type'], $data['snmp_community'], $data['key'], $data['ports']);
+			$dchecks[$id]['name'] = zbx_htmlstr(discovery_check2str($data['type'], $data['snmp_community'], $data['key'], $data['ports']));
 		}
 		order_result($dchecks, 'name');
 
