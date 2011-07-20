@@ -418,6 +418,9 @@ int	MAIN_ZABBIX_ENTRY()
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
 	zbx_sock_t			listen_sock;
 	int				i, thread_num = 0;
+#ifdef _WINDOWS
+	DWORD				res;
+#endif
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
@@ -451,15 +454,15 @@ int	MAIN_ZABBIX_ENTRY()
 
 	if (1 == CONFIG_DISABLE_PASSIVE)
 	{
-		/* Only main process and active checks will be started */
-		CONFIG_ZABBIX_FORKS = 0;/* Listeners won't be needed for passive checks. */
+		/* only main process and active checks will be started */
+		CONFIG_ZABBIX_FORKS = 0;	/* listeners are not needed for passive checks */
 	}
 
-	/* Allocate memory for a collector, all listeners and an active check. */
+	/* allocate memory for a collector, all listeners and an active check */
 	threads_num = 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0);
 	threads = calloc(threads_num, sizeof(ZBX_THREAD_HANDLE));
 
-	/* Start the collector thread. */
+	/* start the collector thread */
 	thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 	thread_args->thread_num = thread_num;
 	thread_args->args = NULL;
@@ -486,20 +489,36 @@ int	MAIN_ZABBIX_ENTRY()
 		threads[thread_num++] = zbx_thread_start(active_checks_thread, thread_args);
 	}
 
-	/* Must be called after all child processes loading. */
-	set_parent_signal_handler();
+#ifdef _WINDOWS
+	set_parent_signal_handler();	/* must be called after all threads are created */
 
-	/* wait for all threads exiting */
-	for (i = 0; i < 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0); i++)
+	/* wait for an exiting thread */
+	res = WaitForMultipleObjectsEx(threads_num, threads, FALSE, INFINITE, FALSE);
+
+	if (ZBX_IS_RUNNING())
 	{
-		if (threads[i])
-		{
-			zbx_thread_wait(threads[i]);
-			zabbix_log(LOG_LEVEL_DEBUG, "thread [%d] has terminated", i);
+		/* Zabbix agent service should either be stopped by the user in ServiceCtrlHandler() or */
+		/* crash. If some thread has terminated normally, it means something is terribly wrong. */
 
-			ZBX_DO_EXIT();
-		}
+		zabbix_log(LOG_LEVEL_CRIT, "One thread has terminated unexpectedly (code:%lu). Exiting ...", res);
+		THIS_SHOULD_NEVER_HAPPEN;
+
+		/* notify other threads and allow them to terminate */
+		ZBX_DO_EXIT();
+		zbx_sleep(1);
 	}
+	else
+	{
+		/* wait for the service worker thread to terminate us */
+		zbx_sleep(2);
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+#else
+	wait(&i);
+
+	/* all exiting child processes should be caught by signal handlers */
+	THIS_SHOULD_NEVER_HAPPEN;
+#endif
 
 	zbx_on_exit();
 
@@ -510,21 +529,19 @@ void	zbx_on_exit()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
-	ZBX_DO_EXIT();
-
 	if (NULL != threads)
 	{
 		int		i;
 #if !defined(_WINDOWS)
 		sigset_t	set;
 
-		/* ignore SIGCHLD signals in order for zbx_sleep() to work  */
+		/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 		sigemptyset(&set);
 		sigaddset(&set, SIGCHLD);
 		sigprocmask(SIG_BLOCK, &set, NULL);
 #endif
 
-		for (i = 0; i < 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0); i++)
+		for (i = 0; i < threads_num; i++)
 		{
 			if (threads[i])
 			{
@@ -536,7 +553,9 @@ void	zbx_on_exit()
 		zbx_free(threads);
 	}
 
-	zbx_sleep(2);	/* wait for all threads closing */
+#if !defined(_WINDOWS)
+	zbx_sleep(2);	/* wait for all processes to exit */
+#endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);

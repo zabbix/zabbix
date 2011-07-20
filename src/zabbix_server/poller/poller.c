@@ -678,8 +678,6 @@ void	main_poller_loop(unsigned char poller_type)
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() process_type:'%s' process_num:%d",
 			get_process_type_string(process_type), process_num);
 
-	set_child_signal_handler();
-
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);

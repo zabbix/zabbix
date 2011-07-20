@@ -28,13 +28,12 @@
 #include "fatal.h"
 
 char		*CONFIG_PID_FILE = NULL;
-
-static int	parent = 0;
 static int	parent_pid = -1;
 static int	exiting = 0;
 
 #define CHECKED_FIELD(siginfo, field)			(NULL == siginfo ? -1 : siginfo->field)
 #define CHECKED_FIELD_TYPE(siginfo, field, type)	(NULL == siginfo ? (type)-1 : siginfo->field)
+#define PARENT_PROCESS					(parent_pid == (int)getpid())
 
 static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
@@ -73,41 +72,40 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					CHECKED_FIELD(siginfo, si_uid),
 					CHECKED_FIELD(siginfo, si_value.sival_int));
 #ifdef HAVE_SIGQUEUE
-			if (1 == parent)
-			{
-				if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_value.sival_int))
-				{
-					extern unsigned char	daemon_type;
-
-					if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
-					{
-						zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the"
-								" configuration cache cannot be"
-								" performed for passive proxy");
-					}
-					else
-					{
-						union sigval	s;
-						extern pid_t	*threads;
-
-						s.sival_int = ZBX_TASK_CONFIG_CACHE_RELOAD;
-
-						if (-1 != sigqueue(threads[1], SIGUSR1, s))
-							zabbix_log(LOG_LEVEL_DEBUG,
-									"the signal is redirected to"
-									" the configuration syncer");
-						else
-							zabbix_log(LOG_LEVEL_ERR,
-									"failed to redirect signal: %s",
-									zbx_strerror(errno));
-					}
-				}
-			}
-			else
+			if (!PARENT_PROCESS)
 			{
 				extern void	zbx_sigusr_handler(zbx_task_t task);
 
 				zbx_sigusr_handler(CHECKED_FIELD(siginfo, si_value.sival_int));
+			}
+			else if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_value.sival_int))
+			{
+				extern unsigned char	daemon_type;
+
+				if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache"
+							" cannot be performed for a passive proxy");
+				}
+				else
+				{
+					union sigval	s;
+					extern pid_t	*threads;
+
+					s.sival_int = ZBX_TASK_CONFIG_CACHE_RELOAD;
+
+					/* threads[0] is configuration syncer (it is set in proxy.c and server.c) */
+					if (-1 != sigqueue(threads[0], SIGUSR1, s))
+					{
+						zabbix_log(LOG_LEVEL_DEBUG, "the signal is redirected to"
+								" the configuration syncer");
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_ERR, "failed to redirect signal: %s",
+								zbx_strerror(errno));
+					}
+				}
 			}
 #endif
 			break;
@@ -121,16 +119,15 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					CHECKED_FIELD(siginfo, si_uid),
 					CHECKED_FIELD(siginfo, si_code));
 
-			if (1 == parent)
-			{
-				if (0 == exiting)
-				{
-					exiting = 1;
-					zbx_on_exit();
-				}
-			}
-			else
+			if (!PARENT_PROCESS)
 				exit(FAIL);
+
+			if (0 == exiting)
+			{
+				exiting = 1;
+				zbx_on_exit();
+			}
+
 			break;
 		case SIGPIPE:
 			zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d]. Ignoring ...",
@@ -150,29 +147,17 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	switch (sig)
 	{
 		case SIGCHLD:
-			if (1 == parent)
-			{
-				if (0 == exiting)
-				{
-					int		i, found = 0;
-					extern int	threads_num;
-					extern pid_t	*threads;
-
-					for (i = 1; i < threads_num && !found; i++)
-						found = (threads[i] == CHECKED_FIELD(siginfo, si_pid));
-
-					if (0 == found)	/* we should not worry too much about non-Zabbix child */
-						return;	/* processes, like watchdog alert scripts, terminating */
-
-					zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
-							CHECKED_FIELD(siginfo, si_pid),
-							CHECKED_FIELD(siginfo, si_status));
-					exiting = 1;
-					zbx_on_exit();
-				}
-			}
-			else
+			if (!PARENT_PROCESS)
 				exit(FAIL);
+
+			if (0 == exiting)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
+						CHECKED_FIELD(siginfo, si_pid), CHECKED_FIELD(siginfo, si_status));
+				exiting = 1;
+				zbx_on_exit();
+			}
+
 			break;
 		default:
 			child_signal_handler(sig, siginfo, context);
@@ -276,13 +261,18 @@ int	daemon_start(int allow_root)
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
 	sigaction(SIGPIPE, &phan, NULL);
-
 	sigaction(SIGILL, &phan, NULL);
 	sigaction(SIGFPE, &phan, NULL);
 	sigaction(SIGSEGV, &phan, NULL);
 	sigaction(SIGBUS, &phan, NULL);
-
+	sigaction(SIGALRM, &phan, NULL);
 	sigaction(SIGUSR1, &phan, NULL);
+
+	/* Set SIGCHLD now to avoid race conditions when a child process is created before */
+	/* sigaction() is called. To avoid problems when scripts exit in zbx_execute() and */
+	/* other cases, SIGCHLD is set to SIG_IGN in zbx_child_fork(). */
+	phan.sa_sigaction = parent_signal_handler;
+	sigaction(SIGCHLD, &phan, NULL);
 
 	zbx_setproctitle("main process");
 
@@ -298,28 +288,6 @@ void	daemon_stop()
 		return;
 
 	drop_pid_file(CONFIG_PID_FILE);
-}
-
-void	set_parent_signal_handler()
-{
-	struct sigaction	phan;
-
-	parent = 1;	/* signalize signal handler that this process is a PARENT process */
-
-	phan.sa_sigaction = parent_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGCHLD, &phan, NULL);	/* for parent only, to avoid problems with EXECUTE_INT/DBL/STR and others */
-}
-
-void	set_child_signal_handler()
-{
-	struct sigaction	phan;
-
-	phan.sa_sigaction = child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
-	sigaction(SIGALRM, &phan, NULL);
 }
 
 int	zbx_sigusr_send(zbx_task_t task)
@@ -341,8 +309,10 @@ int	zbx_sigusr_send(zbx_task_t task)
 			ret = SUCCEED;
 		}
 		else
+		{
 			zbx_snprintf(error, sizeof(error), "cannot send command to PID [%d]: %s",
 					(int)pid, zbx_strerror(errno));
+		}
 	}
 #else
 	zbx_snprintf(error, sizeof(error), "operation is not supported on the given operating system");

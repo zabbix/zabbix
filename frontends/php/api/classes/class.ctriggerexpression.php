@@ -29,13 +29,11 @@ private $allowed;
 			if(($startSymbol != '(') && ($startSymbol != '{') && ($startSymbol != '-') && !zbx_ctype_digit($startSymbol))
 				throw new Exception('Incorrect trigger expression.');
 
-
 			for($symbolNum = 0; $symbolNum < $length; $symbolNum++){
 				$symbol = zbx_substr($expression, $symbolNum, 1);
-// SDI($symbol);
 				$this->parseOpenParts($this->previous['last']);
 				$this->parseCloseParts($symbol);
-// SDII($this->currExpr);
+
 				if($this->inParameter($symbol)){
 					$this->setPreviousSymbol($symbol);
 					continue;
@@ -43,7 +41,6 @@ private $allowed;
 
 				$this->checkSymbolSequence($symbol);
 				$this->setPreviousSymbol($symbol);
-// SDII($this->symbols);
 			}
 
 			$symbolNum = 0;
@@ -411,9 +408,10 @@ private $allowed;
 				else{
 					if(($symbol == ']') && $this->currExpr['part']['itemParam'])
 						$this->symbols['params'][$symbol]++;
-					else if(($symbol == ')') && $this->currExpr['part']['functionParam']){
+					else if($symbol == ')' && $this->currExpr['part']['functionParam']){
 						$this->symbols['close'][$symbol]++;
 						$this->symbols['params'][$symbol]++;
+						$this->currExpr['params']['count']++;
 					}
 					else if($symbol == ','){
 						$this->currExpr['params']['count']++;
@@ -433,7 +431,7 @@ private $allowed;
 			}
 			else{
 // SDI('Open: '.$symbol.' ');
-				if(isset($this->symbols['params'][$symbol]))
+				if(isset($this->symbols['params'][$symbol]) && !($this->currExpr['part']['itemParam'] && $symbol != ',' && $symbol != ']'))
 					$this->symbols['params'][$symbol]++;
 
 				if($symbol == ','){
@@ -552,18 +550,18 @@ private $allowed;
 			}
 
 			if(($symbol == ')') && $this->currExpr['part']['functionParam']){
-// +1 because (checkSequence is not counted this symbol yet)
+				// +1 because (checkSequence is not counted this symbol yet)
 				if($this->symbols['params']['('] == ($this->symbols['params'][')'] + 1)){
 					$this->symbols['params'][$symbol]++;
 
 					$this->writeParams();
-// count points to the last param index
+					// count points to the last param index
 					if($this->currExpr['params']['count'] != $this->currExpr['params']['comma']){
 						throw new Exception('Incorrect trigger function parameters syntax is used');
 					}
 
-// no need to close function part, it will be closed by expression end symbol
-//					$this->currExpr['part']['function'] = false;
+					// no need to close function part, it will be closed by expression end symbol
+					//$this->currExpr['part']['function'] = false;
 					$this->currExpr['part']['functionParam'] = false;
 					$this->currExpr['params']['quoteClose'] = false;
 					$this->currExpr['params']['count'] = 0;

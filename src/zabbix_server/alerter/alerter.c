@@ -142,8 +142,6 @@ void	main_alerter_loop()
 	DB_ALERT		alert;
 	DB_MEDIATYPE		mediatype;
 
-	set_child_signal_handler();
-
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);

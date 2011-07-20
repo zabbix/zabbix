@@ -313,8 +313,6 @@ void	main_housekeeper_loop()
 {
 	int	d, now;
 
-	set_child_signal_handler();
-
 	for (;;)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Executing housekeeper");
