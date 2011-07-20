@@ -531,8 +531,6 @@ void	main_pinger_loop()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop() process_num:%d", process_num);
 
-	set_child_signal_handler();
-
 	if (NULL == items)
 		items = zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
 

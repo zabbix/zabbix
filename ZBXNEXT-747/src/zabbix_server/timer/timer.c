@@ -759,8 +759,6 @@ void	main_timer_loop()
 {
 	int	now, nextcheck, sleeptime, maintenance = 1;
 
-	set_child_signal_handler();
-
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);

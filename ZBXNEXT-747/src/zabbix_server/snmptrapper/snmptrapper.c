@@ -387,13 +387,11 @@ static int	get_latest_data()
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-void	main_snmptrapper_loop(int server_num)
+void	main_snmptrapper_loop()
 {
 	const char	*__function_name = "main_snmptrapper_loop";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), trapfile [%s]", __function_name, CONFIG_SNMPTRAP_FILE);
-
-	set_child_signal_handler();
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
