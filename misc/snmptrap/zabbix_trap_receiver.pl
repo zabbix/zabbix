@@ -34,13 +34,13 @@
 #### ZABBIX SNMP TRAP RECEIVER CONFIGURATION ####
 #################################################
 
-### Option: SNMPTrapperfile
+### Option: SNMPTrapperFile
 #	Temporary file used for passing data to the server (or proxy). Must be the same
 #	as in the server (or proxy) configuration file.
 #
 # Mandatory: yes
 # Default:
-$SNMPTrapperfile = '/tmp/zabbix_traps.tmp';
+$SNMPTrapperFile = '/tmp/zabbix_traps.tmp';
 
 ### Option: DateTimeFormat
 #	The date time format in strftime() format. Please make sure to have a corresponding
@@ -63,9 +63,9 @@ sub zabbix_receiver
 	my (@varbinds) = @{$_[1]};
 
 	# open the output file
-	unless (sysopen(OUTPUT_FILE, $SNMPTrapperfile, O_WRONLY|O_APPEND|O_CREAT, 0666))
+	unless (sysopen(OUTPUT_FILE, $SNMPTrapperFile, O_WRONLY|O_APPEND|O_CREAT, 0666))
 	{
-		print STDERR "Cannot open [$SNMPTrapperfile]: $!\n";
+		print STDERR "Cannot open [$SNMPTrapperFile]: $!\n";
 		return NETSNMPTRAPD_HANDLER_FAIL;
 	}
 
