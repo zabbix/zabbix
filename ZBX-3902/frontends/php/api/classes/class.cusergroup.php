@@ -715,6 +715,17 @@ class CUserGroup extends CZBXAPI{
 			if(!empty($error_array))
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error_array);
 
+			// check, if this user group is used in the config. If so, it cannot be deleted
+			$config = select_config();
+			if(!empty($config)){
+				if(uint_in_array($config['alert_usrgrpid'], $usrgrpids)){
+					// get group name
+					$sql = 'SELECT ug.name FROM usrgrp ug WHERE ug.usrgrpid='.$config['alert_usrgrpid'];
+					$group = DBfetch(DBselect($sql));
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_GROUP_IS_USED_IN_CONFIGURATION, $group['name']));
+				}
+			}
 
 			DB::delete('rights', array(DBcondition('groupid', $usrgrpids)));
 			DB::delete('operations', array('object='.OPERATION_OBJECT_GROUP, DBcondition('objectid',$usrgrpids)));

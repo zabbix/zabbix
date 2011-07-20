@@ -1244,26 +1244,9 @@ return $result;
 			return false;
 		}
 
-
 		$host = get_host_by_hostid($hostid);
 
-		$hostids = array();
-		$db_hosts = get_hosts_by_templateid($host['hostid']);
-		while($db_host = DBfetch($db_hosts)){
-			$hostids[] = $db_host['hostid'];
-		}
-		$sql = 'SELECT applicationid
-			FROM applications
-			WHERE name='.zbx_dbstr($name).'
-				AND '.DBcondition('hostid', $hostids);
-		$lower_app = DBfetch(DBselect($sql));
-		if($lower_app){
-			error(S_APPLICATION.SPACE."'$name'".SPACE.S_ALREADY_EXISTS_IN_LINKED_HOSTS_SMALL);
-			return false;
-		}
-
-
-		$sql = 'SELECT applicationid
+		$sql = 'SELECT applicationid, templateid
 			FROM applications
 			WHERE name='.zbx_dbstr($name).'
 				AND hostid='.$hostid;
@@ -1271,17 +1254,18 @@ return $result;
 			$sql .= ' AND applicationid<>'.$applicationid;
 		}
 		$db_app = DBfetch(DBselect($sql));
-
-		if($db_app && $templateid == 0){
+		if($db_app && (($templateid == 0) || ($templateid && $db_app['templateid'] && $templateid != $db_app['templateid']))){
 			error(S_APPLICATION.SPACE."'$name'".SPACE.S_ALREADY_EXISTS_SMALL);
 			return false;
 		}
 
-		if($db_app && !is_null($applicationid)){ // delete old application with same name
+		// delete old application with same name
+		if($db_app && !is_null($applicationid)){
 			delete_application($db_app['applicationid']);
 		}
 
-		if($db_app && is_null($applicationid)){ // if found application with same name update them, adding not needed
+		// if found application with same name update them, adding not needed
+		if($db_app && is_null($applicationid)){
 			$applicationid = $db_app['applicationid'];
 		}
 
