@@ -61,7 +61,7 @@ int	zbx_child_fork()
 
 	/* ignore SIGCHLD to avoid problems with exiting scripts in zbx_execute() and other cases */
 	if (0 == pid)
-		signal(SIGCHLD, SIG_IGN);
+		signal(SIGCHLD, SIG_DFL);
 
 	return pid;
 }
