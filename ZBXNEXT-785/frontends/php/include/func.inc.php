@@ -652,11 +652,12 @@ function zbx_array_push(&$array, $add){
  * @return array
  */
 function zbx_arrayFindDuplicates(array $array){
-	function moreThanOne($a){
-		return $a > 1;
-	}
 	$countValues = array_count_values($array); // counting occurrences of every value in array
-	$countValues = array_filter($countValues, 'moreThanOne'); // removing all values that appear only once
+	foreach($countValues as $value => $count){
+		if($count <= 1){
+			unset($countValues[$value]);
+		}
+	}
 	arsort($countValues); // sorting, so that the most duplicates would be at the top
 	return $countValues;
 }

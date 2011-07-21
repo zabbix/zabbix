@@ -1123,10 +1123,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	zbx_free(args);
 
-#ifdef ZABBIX_DAEMON
-	set_child_signal_handler();
-#endif
-
 	if (NULL != (p = strchr(activechk_args.host, ',')))
 		*p = '\0';
 

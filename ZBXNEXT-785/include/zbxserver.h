@@ -38,6 +38,8 @@
 #define MACRO_TYPE_SCRIPT		0x0200
 #define MACRO_TYPE_ITEM_EXPRESSION	0x0400
 
+#define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
+
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now);
 
 int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_host,

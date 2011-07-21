@@ -141,7 +141,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	char		*buffer = NULL;
 	int		buffer_alloc = 2048;
 	int		buffer_offset = 0;
-	int		res = FAIL;
+	int		res = FAIL, refresh_unsupported;
 	zbx_uint64_t	hostid;
 	char		error[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
 	DC_ITEM		dc_item;
@@ -177,19 +177,15 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			hostid);
 
-	if (0 != CONFIG_REFRESH_UNSUPPORTED)
+	if (0 != *(int *)DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED))
 	{
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 256,
 				" and (i.status=%d or (i.status=%d and i.lastclock+%d<=%d))",
 				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
-				CONFIG_REFRESH_UNSUPPORTED, time(NULL));
+				refresh_unsupported, time(NULL));
 	}
 	else
-	{
-		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 256,
-				" and i.status=%d",
-				ITEM_STATUS_ACTIVE);
-	}
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 256, " and i.status=%d", ITEM_STATUS_ACTIVE);
 
 	result = DBselect("%s", buffer);
 
@@ -276,7 +272,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	DB_RESULT	result;
 	DB_ROW		row;
 	struct zbx_json	json;
-	int		res = FAIL;
+	int		res = FAIL, refresh_unsupported;
 	zbx_uint64_t	hostid;
 	char		error[MAX_STRING_LEN], *key;
 	DC_ITEM		dc_item;
@@ -324,13 +320,15 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			hostid);
 
-	if (0 != CONFIG_REFRESH_UNSUPPORTED)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " and (i.status=%d or (i.status=%d and i.lastclock+%d<=%d))",
+	if (0 != *(int *)DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				" and (i.status=%d or (i.status=%d and i.lastclock+%d<=%d))",
 				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
-				CONFIG_REFRESH_UNSUPPORTED, time(NULL));
+				refresh_unsupported, time(NULL));
+	}
 	else
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " and i.status=%d",
-				ITEM_STATUS_ACTIVE);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " and i.status=%d", ITEM_STATUS_ACTIVE);
 
 	zbx_free(name_esc);
 

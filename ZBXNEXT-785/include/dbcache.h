@@ -46,7 +46,6 @@ extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
 extern int	CONFIG_JAVAPOLLER_FORKS;
 extern int	CONFIG_PINGER_FORKS;
-extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_NS_SUPPORT;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
@@ -203,6 +202,7 @@ int	DCget_item_lastclock(zbx_uint64_t itemid);
 void	DCsync_configuration();
 void	init_configuration_cache();
 void	free_configuration_cache();
+void	DCload_config();
 
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key);
@@ -216,6 +216,13 @@ int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid,
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
 int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
+
+#define	CONFIG_ALERT_HISTORY		1
+#define	CONFIG_EVENT_HISTORY		2
+#define	CONFIG_REFRESH_UNSUPPORTED	3
+#define	CONFIG_DISCOVERY_GROUPID	4
+void	*DCconfig_get_config_data(void *data, int type);
+int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
 
 void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now);
 void	DCrequeue_unreachable_item(zbx_uint64_t itemid);

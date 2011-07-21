@@ -52,7 +52,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 		goto fail;
 	}
 
-	item.interface.addr = (item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
+	item.interface.addr = (1 == item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
 
 	port = zbx_strdup(port, item.interface.port_orig);
 	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
@@ -115,16 +115,14 @@ static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *er
 		goto fail;
 	}
 
-	item.interface.addr = zbx_strdup(item.interface.addr,
-			item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
-	substitute_simple_macros(NULL, NULL, host, NULL, &item.interface.addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+	item.interface.addr = (1 == item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
 
 	port = zbx_strdup(port, item.interface.port_orig);
 	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, &port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 
 	if (SUCCEED != (ret = is_ushort(port, &item.interface.port)))
 	{
-		zbx_snprintf(error, max_error_len, "Invalid port number [%s]", item.interface.port_orig);
+		zbx_snprintf(error, max_error_len, "invalid port number [%s]", item.interface.port_orig);
 		goto fail;
 	}
 
@@ -135,9 +133,8 @@ static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *er
 	}
 fail:
 	zbx_free(port);
-	zbx_free(item.interface.addr);
 #else
-	zbx_strlcpy(error, "Support for IPMI commands was not compiled in", max_error_len);
+	zbx_strlcpy(error, "support for IPMI commands was not compiled in", max_error_len);
 #endif	/* HAVE_OPENIPMI */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -168,7 +165,7 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 		goto fail;
 	}
 
-	item.interface.addr = (item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
+	item.interface.addr = (1 == item.interface.useip ? item.interface.ip_orig : item.interface.dns_orig);
 	item.username = script->username;
 	item.publickey = script->publickey;
 	item.privatekey = script->privatekey;

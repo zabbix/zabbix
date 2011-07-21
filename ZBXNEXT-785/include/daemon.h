@@ -22,7 +22,7 @@
 
 #if defined(_WINDOWS)
 #	error "This module allowed only for Unix OS"
-#endif /* _WINDOWS */
+#endif
 
 #define USE_PID_FILE	1
 
@@ -33,9 +33,6 @@ extern char	*CONFIG_PID_FILE;
 int	daemon_start(int allow_root);
 void	daemon_stop();
 
-void	set_parent_signal_handler();
-void	set_child_signal_handler();
-
 int	zbx_sigusr_send(zbx_task_t task);
 
 #define ZBX_IS_RUNNING()	1
@@ -43,4 +40,4 @@ int	zbx_sigusr_send(zbx_task_t task);
 
 #define START_MAIN_ZABBIX_ENTRY(a)	daemon_start(a)
 
-#endif /* ZABBIX_DAEMON_H */
+#endif	/* ZABBIX_DAEMON_H */

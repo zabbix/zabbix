@@ -644,7 +644,7 @@ class CUserGroup extends CZBXAPI{
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete User Groups.'));
 			}
 
-			//we must check, if this user group is used in one of the scripts. If so, it cannot be deleted
+			// check, if this user group is used in one of the scripts. If so, it cannot be deleted
 			$dbScripts = API::Script()->get(array(
 				'output' => array('scriptid','name','usrgrpid'),
 				'usrgrpids' => $usrgrpids,
@@ -656,6 +656,12 @@ class CUserGroup extends CZBXAPI{
 
 					self::exception(ZBX_API_ERROR_PARAMETERS,_s('User group "%1$s" is used in script "%2$s".', $dbUsrgrps[$script['usrgrpid']]['name'], $script['name']));
 				}
+			}
+
+			// check, if this user group is used in the config. If so, it cannot be deleted
+			$config = select_config();
+			if(isset($dbUsrgrps[$config['alert_usrgrpid']])){
+				self::exception(ZBX_API_ERROR_PARAMETERS,_s('User group [%s] is used in configuration for database down messages.', $dbUsrgrps[$config['alert_usrgrpid']]['name']));
 			}
 
 // delete action operation msg
