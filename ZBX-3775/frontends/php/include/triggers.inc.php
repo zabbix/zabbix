@@ -2363,7 +2363,7 @@ function utf8RawUrlDecode($source){
 			$tr_ov_menu  = new CPUMenu($tr_ov_menu,170);
 			$status_col->OnClick($tr_ov_menu->GetOnActionJS());
 			$status_col->addAction('onmouseover', 'this.style.border=\'1px dotted #0C0CF0\'');
-			$status_col->addAction('onmouseout', 'this.style.border = \'\';');
+			$status_col->addAction('onmouseout', 'this.style.border=\'1px solid #F2F7FA\'');
 		}
 		array_push($table_row,$status_col);
 
