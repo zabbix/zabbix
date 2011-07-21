@@ -504,6 +504,20 @@ typedef struct
 }
 DB_ESCALATION;
 
+typedef struct
+{
+	zbx_uint64_t	triggerid;
+	char		*exp;
+	char		*error;
+	char		new_error[MAX_STRING_LEN];
+	int		lastchange;
+	int		value;
+	int		new_value;
+	unsigned char	type;
+	unsigned char	update_trigger;
+	unsigned char	add_event;
+} zbx_trigger_t;
+
 #define DB_NODE			"%s"
 #define DBnode_local(fieldid)	DBnode(fieldid, CONFIG_NODEID)
 const char	*DBnode(const char *fieldid, int nodeid);
@@ -549,8 +563,11 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBremove_escalation(zbx_uint64_t escalationid);
 void	DBupdate_triggers_status_after_restart();
-int	DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
-		const char *trigger_error, int new_value, int now, const char *reason);
+void	DBcheck_trigger_for_update(zbx_uint64_t triggerid, unsigned char type, int value, const char *error,
+		int new_value, int now, unsigned char *update_trigger, unsigned char *add_event);
+int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset,
+		zbx_uint64_t triggerid, int value, const char *error,
+		int new_value, const char *new_error, int lastchange, unsigned char update_trigger);
 
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();

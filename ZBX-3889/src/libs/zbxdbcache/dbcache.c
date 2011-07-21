@@ -27,6 +27,7 @@
 #include "ipc.h"
 #include "mutexs.h"
 #include "zbxserver.h"
+#include "events.h"
 
 #include "memalloc.h"
 #include "zbxalgo.h"
@@ -835,23 +836,12 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char	*__function_name = "DCmass_update_triggers";
 
-	typedef struct zbx_trigger_s
-	{
-		zbx_uint64_t	triggerid;
-		char		*exp;
-		char		*error;
-		int		clock;
-		unsigned char	type;
-		unsigned char	value;
-	} zbx_trigger_t;
-
 	zbx_trigger_t	*tr = NULL, *tr_last = NULL;
 	int		tr_alloc, tr_num = 0;
 
-	char		error[MAX_STRING_LEN];
-	int		exp_value;
 	DB_RESULT	result;
 	DB_ROW		row;
+	DB_EVENT	event;
 	int		sql_offset = 0, i;
 	zbx_uint64_t	itemid, triggerid;
 
@@ -875,7 +865,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 				history[i].itemid);
 	}
 
-	if (sql[--sql_offset] == ',')
+	if (',' == sql[--sql_offset])
 	{
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 23, ") order by t.triggerid");
 	}
@@ -886,8 +876,6 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	}
 
 	result = DBselect("%s", sql);
-
-	sql_offset = 0;
 
 	tr_alloc = history_num;
 	tr = zbx_malloc(tr, tr_alloc * sizeof(zbx_trigger_t));
@@ -900,17 +888,17 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		{
 			if (tr_num == tr_alloc)
 			{
-				tr_alloc += 64;
+				tr_alloc *= 1.5;
 				tr = zbx_realloc(tr, tr_alloc * sizeof(zbx_trigger_t));
 			}
 
 			tr_last = &tr[tr_num++];
 			tr_last->triggerid = triggerid;
 			tr_last->type = (unsigned char)atoi(row[1]);
-			tr_last->value = (unsigned char)atoi(row[2]);
-			tr_last->error = strdup(row[3]);
-			tr_last->exp = strdup(row[4]);
-			tr_last->clock = 0;
+			tr_last->value = atoi(row[2]);
+			tr_last->error = zbx_strdup(NULL, row[3]);
+			tr_last->exp = zbx_strdup(NULL, row[4]);
+			tr_last->lastchange = 0;
 		}
 
 		ZBX_STR2UINT64(itemid, row[5]);
@@ -919,37 +907,73 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		{
 			if (itemid == history[i].itemid)
 			{
-				if (tr_last->clock < history[i].clock)
-					tr_last->clock = history[i].clock;
+				if (tr_last->lastchange < history[i].clock)
+					tr_last->lastchange = history[i].clock;
 				break;
 			}
 		}
 	}
-
 	DBfree_result(result);
+
+	sql_offset = 0;
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 7, "begin\n");
+#endif
 
 	for (i = 0; i < tr_num; i++)
 	{
-		if (0 == tr[i].clock)
+		tr_last = &tr[i];
+
+		if (0 == tr_last->lastchange)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
 
-		if (SUCCEED != evaluate_expression(&exp_value, &tr[i].exp, tr[i].clock,
-					tr[i].triggerid, tr[i].value, error, sizeof(error)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s", tr[i].exp, error);
+		evaluate_expression(&tr_last->new_value, &tr_last->exp, tr_last->lastchange, tr_last->triggerid,
+				tr_last->value, tr_last->new_error, sizeof(tr_last->new_error));
 
-			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value,
-					tr[i].error, TRIGGER_VALUE_UNKNOWN, tr[i].clock, error);
-		}
-		else
-			DBupdate_trigger_value(tr[i].triggerid, tr[i].type, tr[i].value,
-					tr[i].error, exp_value, tr[i].clock, NULL);
+		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
+				tr_last->new_value, tr_last->lastchange, &tr_last->update_trigger, &tr_last->add_event);
 
-		zbx_free(tr[i].error);
-		zbx_free(tr[i].exp);
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_allocated, &sql_offset, tr_last->triggerid,
+				tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
+				tr_last->lastchange, tr_last->update_trigger))
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 3, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
+
+		zbx_free(tr_last->error);
+		zbx_free(tr_last->exp);
+	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 6, "end;\n");
+#endif
+
+	if (sql_offset > 16)
+		DBexecute("%s", sql);
+
+	for (tr_last = &tr[0]; 0 != tr_num; tr_num--)
+	{
+		if (0 == tr_last->lastchange)
+			continue;
+
+		if (1 != tr_last->add_event)
+			continue;
+
+		/* Preparing event for processing */
+		memset(&event, 0, sizeof(DB_EVENT));
+		event.source = EVENT_SOURCE_TRIGGERS;
+		event.object = EVENT_OBJECT_TRIGGER;
+		event.objectid = tr_last->triggerid;
+		event.clock = tr_last->lastchange;
+		event.value = tr_last->new_value;
+
+		/* Processing event */
+		process_event(&event, 0);
+
+		tr_last++;
 	}
 
 	zbx_free(tr);

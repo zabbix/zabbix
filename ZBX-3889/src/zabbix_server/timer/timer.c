@@ -56,12 +56,15 @@ static void	process_time_functions()
 	const char	*__function_name = "process_time_functions";
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*exp, error[MAX_STRING_LEN];
-	zbx_uint64_t	triggerid;
-	int		trigger_type, trigger_value, exp_value;
-	const char	*trigger_error;
+	DB_EVENT	event;
+	zbx_trigger_t	*tr = NULL, *tr_last;
+	int		tr_alloc = 0, tr_num = 0;
+	char		*sql = NULL;
+	int		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sql = zbx_malloc(sql, sql_alloc);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.type,t.value,t.error,t.expression"
@@ -84,31 +87,75 @@ static void	process_time_functions()
 
 	DBbegin();
 
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
+
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(triggerid, row[0]);
-		trigger_type = atoi(row[1]);
-		trigger_value = atoi(row[2]);
-		trigger_error = row[3];
-		exp = strdup(row[4]);
-
-		if (SUCCEED != evaluate_expression(&exp_value, &exp, time(NULL), triggerid, trigger_value, error, sizeof(error)))
+		if (tr_num == tr_alloc)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s", exp, error);
-
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, TRIGGER_VALUE_UNKNOWN, time(NULL), error);
+			tr_alloc += 64;
+			tr = zbx_realloc(tr, tr_alloc * sizeof(zbx_trigger_t));
 		}
-		else
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, exp_value, time(NULL), NULL);
 
-		zbx_free(exp);
+		tr_last = &tr[tr_num++];
+
+		ZBX_STR2UINT64(tr_last->triggerid, row[0]);
+		tr_last->type = (unsigned char)atoi(row[1]);
+		tr_last->value = atoi(row[2]);
+		tr_last->error = row[3];
+		tr_last->exp = zbx_strdup(NULL, row[4]);
+		tr_last->lastchange = time(NULL);
+
+		evaluate_expression(&tr_last->new_value, &tr_last->exp, tr_last->lastchange, tr_last->triggerid,
+				tr_last->value, tr_last->new_error, sizeof(tr_last->new_error));
+
+		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
+				tr_last->new_value, tr_last->lastchange, &tr_last->update_trigger, &tr_last->add_event);
+
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
+				tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
+				tr_last->lastchange, tr_last->update_trigger))
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		zbx_free(tr_last->exp);
+	}
+	DBfree_result(result);
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
+
+	if (sql_offset > 16)
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	for (tr_last = &tr[0]; 0 != tr_num; tr_num--)
+	{
+		if (1 != tr_last->add_event)
+			continue;
+
+		/* Preparing event for processing */
+		memset(&event, 0, sizeof(DB_EVENT));
+		event.source = EVENT_SOURCE_TRIGGERS;
+		event.object = EVENT_OBJECT_TRIGGER;
+		event.objectid = tr_last->triggerid;
+		event.clock = tr_last->lastchange;
+		event.value = tr_last->new_value;
+
+		/* Processing event */
+		process_event(&event, 0);
+
+		tr_last++;
 	}
 
 	DBcommit();
 
-	DBfree_result(result);
+	zbx_free(tr);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

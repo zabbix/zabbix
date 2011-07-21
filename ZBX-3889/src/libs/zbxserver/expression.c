@@ -2258,9 +2258,13 @@ error:
  *             error         - [OUT] place error message if any               *
  *             maxerrlen     - [IN] max length of error message               *
  *                                                                            *
- * Return value:  SUCCEED - evaluated successfully, result - value of the exp *
- *                FAIL - otherwise                                            *
- *                error - error message                                       *
+ * Return value:                                                              *
+ *             SUCCEED       - evaluated successfully                         *
+ *                               result - TRIGGER_VALUE_(FALSE or TRUE)       *
+ *                               error  - empty message                       *
+ *             FAIL          - can not evaluate;                              *
+ *                               result - TRIGGER_VALUE_UNKNOWN               *
+ *                               error  - error message                       *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -2301,11 +2305,20 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() result:%d", __function_name, *result);
 				ret = SUCCEED;
-				goto out;
 			}
 		}
 	}
-out:
+
+	if (SUCCEED != ret)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s():expression [%s] cannot be evaluated: %s",
+				__function_name, expression, error);
+
+		*result = TRIGGER_VALUE_UNKNOWN;
+	}
+	else
+		*error = '\0';
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
