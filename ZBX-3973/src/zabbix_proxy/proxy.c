@@ -534,8 +534,16 @@ int	MAIN_ZABBIX_ENTRY()
 #	define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy [%s]. Zabbix %s (revision %s).",
-			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy. Zabbix %s (revision %s).",
+				ZABBIX_VERSION, ZABBIX_REVISION);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy [%s]. Zabbix %s (revision %s).",
+				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
 	zabbix_log(LOG_LEVEL_INFORMATION, "SNMP monitoring:       " SNMP_FEATURE_STATUS);
