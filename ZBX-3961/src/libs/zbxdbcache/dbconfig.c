@@ -283,8 +283,10 @@ static int	DCget_reachable_nextcheck(const ZBX_DC_ITEM *item, int now)
 	int	nextcheck;
 
 	if (ITEM_STATUS_NOTSUPPORTED == item->status)
+	{
 		nextcheck = calculate_item_nextcheck(item->itemid, item->type,
 				CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
+	}
 	else
 	{
 		const ZBX_DC_FLEXITEM	*flexitem;
@@ -415,17 +417,19 @@ static ZBX_DC_HOST	*DCfind_host(zbx_uint64_t proxy_hostid, const char *hostname)
 		return host_ph->host_ptr;
 }
 
-static void	DCstrpool_replace(int found, const char **curr, const char *new)
+static int	DCstrpool_replace(int found, const char **curr, const char *new)
 {
-	if (!found)
+	if (1 == found)
 	{
-		*curr = zbx_strpool_intern(new);
-	}
-	else if (0 != strcmp(*curr, new))
-	{
+		if (0 == strcmp(*curr, new))
+			return FAIL;
+
 		zbx_strpool_release(*curr);
-		*curr = zbx_strpool_intern(new);
 	}
+
+	*curr = zbx_strpool_intern(new);
+
+	return SUCCEED;	/* indicate that the string has been replaced */
 }
 
 static void	DCupdate_item_queue(ZBX_DC_ITEM *item, unsigned char old_poller_type, int old_nextcheck)
@@ -595,22 +599,30 @@ static void	DCsync_items(DB_RESULT result)
 			old_nextcheck = 0;
 
 			if (ITEM_STATUS_NOTSUPPORTED == status)
+			{
 				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
 						CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
+			}
 			else
+			{
 				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
 						delay, row[16], now, NULL);
+			}
 		}
 		else
 		{
 			old_nextcheck = item->nextcheck;
 
 			if (ITEM_STATUS_ACTIVE == status && (status != item->status || delay != item->delay))
+			{
 				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
 						delay, row[16], now, NULL);
+			}
 			else if (ITEM_STATUS_NOTSUPPORTED == status && status != item->status)
+			{
 				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
 						CONFIG_REFRESH_UNSUPPORTED, NULL, now, NULL);
+			}
 		}
 
 		item->status = status;
@@ -620,9 +632,9 @@ static void	DCsync_items(DB_RESULT result)
 		poller_by_item(itemid, proxy_hostid, item->type, item->key, &item->poller_type);
 		if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 				(ZBX_POLLER_TYPE_NORMAL == item->poller_type || ZBX_POLLER_TYPE_IPMI == item->poller_type))
+		{
 			item->poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-
-		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
+		}
 
 		/* SNMP items */
 
@@ -675,7 +687,13 @@ static void	DCsync_items(DB_RESULT result)
 			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
 
 			flexitem->itemid = itemid;
-			DCstrpool_replace(found, &flexitem->delay_flex, row[16]);
+
+			if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
+					ITEM_STATUS_NOTSUPPORTED != item->status)
+			{
+				item->nextcheck = calculate_item_nextcheck(item->itemid, item->type,
+				item->delay, flexitem->delay_flex, now, NULL);
+			}
 		}
 		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
 		{
@@ -796,6 +814,8 @@ static void	DCsync_items(DB_RESULT result)
 			zbx_strpool_release(calcitem->params);
 			zbx_hashset_remove(&config->calcitems, &itemid);
 		}
+
+		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
 	}
 
 	/* remove deleted or disabled items from buffer */
@@ -1219,12 +1239,9 @@ void	DCsync_configuration()
 	strpool = zbx_strpool_info();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync_num   : %u", __function_name, sync_num);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name,
-			isec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name,
-			hsec);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name,
-			ssec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name, isec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name, hsec);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name, ssec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total time : " ZBX_FS_DBL " sec.", __function_name,
 			isec + hsec + ssec);
 
@@ -1257,9 +1274,11 @@ void	DCsync_configuration()
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d (%d slots)", __function_name,
 			config->ipmihosts.num_data, config->ipmihosts.num_slots);
 
-	for (i = 0; i < ZBX_POLLER_TYPE_COUNT; i++)
+	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __function_name,
 				i, config->queues[i].elems_num, config->queues[i].elems_alloc);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() pqueue     : %d (%d allocated)", __function_name,
 			config->pqueue.elems_num, config->pqueue.elems_alloc);
@@ -2025,10 +2044,12 @@ void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now
 		dc_item->status = status;
 
 		old_poller_type = dc_item->poller_type;
-		if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
-			if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-				poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type, dc_item->key,
-						&dc_item->poller_type);
+		if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type &&
+				NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		{
+			poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type, dc_item->key,
+					&dc_item->poller_type);
+		}
 
 		old_nextcheck = dc_item->nextcheck;
 		dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);
