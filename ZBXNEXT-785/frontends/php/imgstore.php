@@ -32,25 +32,24 @@ include_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
+	$fields = array(
 		'css'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	null,		null),
 		'imageid'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
 		'iconid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 	);
-
 	check_fields($fields);
 ?>
 <?php
 	if(isset($_REQUEST['css'])){
-		$css= 'div.sysmap_iconid_0{'.
+		$css = 'div.sysmap_iconid_0{'.
 				' height: 50px; '.
 				' width: 50px; '.
 				' background-image: url("images/general/no_icon.png"); }'."\n";
 
 		$options = array(
-			'filter'=> array('imagetype'=> IMAGE_TYPE_ICON),
-			'output'=> API_OUTPUT_EXTEND,
-			'select_image'=> 1
+			'filter' => array('imagetype'=> IMAGE_TYPE_ICON),
+			'output' => API_OUTPUT_EXTEND,
+			'select_image' => 1,
 		);
 		$images = API::Image()->get($options);
 		foreach($images as $inum => $image){
@@ -69,8 +68,8 @@ include_once('include/page_header.php');
 
 		print($css);
 	}
-	else if(isset($_REQUEST['iconid'])){
-		$iconid = get_request('iconid',0);
+	elseif(isset($_REQUEST['iconid'])){
+		$iconid = get_request('iconid', 0);
 
 		if($iconid > 0){
 			$image = get_image_by_imageid($iconid);
@@ -81,7 +80,7 @@ include_once('include/page_header.php');
 			ImageOut($image);
 		}
 	}
-	else if(isset($_REQUEST['imageid'])){
+	elseif(isset($_REQUEST['imageid'])){
 		$imageid = get_request('imageid',0);
 
 		session_start();

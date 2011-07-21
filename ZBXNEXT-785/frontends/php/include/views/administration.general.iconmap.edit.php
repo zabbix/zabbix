@@ -57,8 +57,8 @@ foreach($this->data['iconmap']['mappings'] as $iconmappingid => $mapping){
 	$iconsComboBox->addClass('mappingIcon');
 	$iconsComboBox->addItems($this->data['iconList']);
 
-	$iconPreviewDiv = new CDiv(SPACE, 'sysmap_iconid_' . $mapping['iconid'], 'divPreview_' . $iconmappingid);
-	$iconPreviewDiv->addStyle('margin: 0 auto;');
+	$iconPreviewImage = new CImg('imgstore.php?iconid=' . $mapping['iconid'], 'Preview', 28, 28);
+	$iconPreviewImage->addClass('pointer preview');
 
 	$row = new CRow(array(
 		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
@@ -66,34 +66,13 @@ foreach($this->data['iconmap']['mappings'] as $iconmappingid => $mapping){
 		$profileLinksComboBox,
 		$expressionTextBox,
 		$iconsComboBox,
-		$iconPreviewDiv,
+		$iconPreviewImage,
 		new CSpan(_('Remove'), 'link_menu removeMapping'),
 	), 'sortable');
 	$row->setAttribute('id', 'iconmapidRow_' . $iconmappingid);
 	$iconMapTable->addRow($row);
 }
 
-
-// default icon row {{{
-$numSpan = new CSpan($i++ . ':');
-$numSpan->addClass('rowNum');
-
-$iconsComboBox = new CComboBox('iconmap[default_iconid]', $this->data['iconmap']['default_iconid']);
-$iconsComboBox->addClass('mappingIcon');
-$iconsComboBox->addItems($this->data['iconList']);
-
-$iconPreviewDiv = new CDiv(SPACE, 'sysmap_iconid_' . $this->data['iconmap']['default_iconid']);
-$iconPreviewDiv->addStyle('margin: 0 auto;');
-
-$iconMapTable->addRow(array(
-	SPACE,
-	_('Default'),
-	SPACE,
-	SPACE,
-	$iconsComboBox,
-	$iconPreviewDiv,
-));
-// }}}
 
 // hidden row for js
 reset($this->data['iconList']);
@@ -114,8 +93,8 @@ $iconsComboBox->addClass('mappingIcon');
 $iconsComboBox->addItems($this->data['iconList']);
 $iconsComboBox->setAttribute('disabled', 'disabled');
 
-$iconPreviewDiv = new CDiv(SPACE, 'sysmap_iconid_' . $firstIconId, 'divPreview_#{iconmappingid}');
-$iconPreviewDiv->addStyle('margin: 0 auto;');
+$iconPreviewImage = new CImg('imgstore.php?iconid=' . $firstIconId, 'Preview', 28, 28);
+$iconPreviewImage->addClass('pointer preview');
 
 $hiddenRow = new CRow(array(
 	new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
@@ -123,7 +102,7 @@ $hiddenRow = new CRow(array(
 	$profileLinksComboBox,
 	$expressionTextBox,
 	$iconsComboBox,
-	$iconPreviewDiv,
+	$iconPreviewImage,
 	new CSpan(_('Remove'), 'link_menu removeMapping'),
 ), 'hidden');
 $hiddenRow->setAttribute('id', 'rowTpl');
@@ -136,6 +115,25 @@ $addCol = new CCol($addSpan);
 $addCol->setColSpan(5);
 $iconMapTable->addRow(array(SPACE, $addCol));
 
+// <default icon row>
+$numSpan = new CSpan($i++ . ':');
+$numSpan->addClass('rowNum');
+
+$iconsComboBox = new CComboBox('iconmap[default_iconid]', $this->data['iconmap']['default_iconid']);
+$iconsComboBox->addClass('mappingIcon');
+$iconsComboBox->addItems($this->data['iconList']);
+
+$iconPreviewImage = new CImg('imgstore.php?iconid=' . $this->data['iconmap']['default_iconid'], 'Preview', 28, 28);
+$iconPreviewImage->addClass('pointer preview');
+
+$col = new CCol(_('Default'));
+$col->setColSpan(4);
+$iconMapTable->addRow(array(
+		$col,
+		$iconsComboBox,
+		$iconPreviewImage,
+	));
+// </default icon row>
 
 $iconMapTab->addRow(_('Mappings'), new CDiv($iconMapTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 $iconMapView = new CTabView();

@@ -60,11 +60,27 @@
 	foreach($images as $image){
 		$cmbImg->addItem(
 			$image['imageid'],
-			get_node_name_by_elid($image['imageid'], null, ': ').$image['name']
+			get_node_name_by_elid($image['imageid'], null, ': ') . $image['name']
 		);
 	}
-
 	$sysmapList->addRow(_('Background image'), $cmbImg);
+
+// <IconMapping>
+$iconMappingComboBox = new CComboBox('backgroundid', $data['backgroundid']);
+$iconMappingComboBox->addItem(0, _('<manual>'));
+$iconMaps = API::IconMap()->get(array(
+	'output' => array('iconmapid', 'name'),
+	'preservekeys' => true,
+));
+order_result($iconMaps, 'name');
+foreach($iconMaps as $iconMap){
+	$iconMappingComboBox->addItem($iconMap['iconmapid'], $iconMap['name']);
+}
+$iconMappingsLink = new CLink(_('show icon mappings'), 'config.php?config=14');
+$iconMappingsLink->setAttribute('target', '_blank');
+$sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPACE, $iconMappingsLink));
+// </IconMapping>
+
 	$sysmapList->addRow(_('Icon highlight'), new CCheckBox('highlight', $data['highlight'], null, 1));
 	$sysmapList->addRow(_('Mark elements on trigger status change'), new CCheckBox('markelements', $data['markelements'], null, 1));
 	$sysmapList->addRow(_('Expand single problem'), new CCheckBox('expandproblem', $data['expandproblem'], null, 1));

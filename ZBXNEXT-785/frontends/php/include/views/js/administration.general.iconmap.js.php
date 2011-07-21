@@ -16,7 +16,7 @@
 			axis: 'y',
 			cursor: 'move',
 			containment: 'parent',
-			placeholder: "sortableRowPlaceholder",
+			placeholder: 'sortableRowPlaceholder',
 			handle: 'span.ui-icon-arrowthick-2-n-s',
 			tolerance: 'pointer',
 			opacity: 0.6,
@@ -33,8 +33,11 @@
 		});
 
 		jQuery("#iconMapTable tbody").delegate('select.mappingIcon', 'change', function(){
-			jQuery(this).parent().next().children().removeClass();
-			jQuery(this).parent().next().children().addClass('sysmap_iconid_' + jQuery(this).val());
+			jQuery(this).parent().next().children().attr('src', 'imgstore.php?iconid=' + jQuery(this).val());
+		});
+
+		jQuery("#iconMapTable tbody").delegate('img.preview', 'click', function(){
+			hintBox.onClick(null, this, "<img src=" + jQuery(this).attr('src') + " >");
 		});
 
 		jQuery("#addMapping").click(function(){
@@ -47,7 +50,7 @@
 			}
 			mapping.iconmappingid = iconmappingid;
 			jQuery('<tr id="iconmapidRow_' + iconmappingid + '" class="sortable">' + tpl.evaluate(mapping) + '</tr>')
-					.insertBefore("#iconMapTable tbody tr:last-child");
+					.insertBefore("#rowTpl");
 			jQuery('#iconmapidRow_' + iconmappingid + ' :input').prop('disabled', false);
 			jQuery("#iconMapTable").sortable("refresh");
 
