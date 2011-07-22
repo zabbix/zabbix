@@ -692,7 +692,7 @@ static void	DCsync_items(DB_RESULT result)
 					ITEM_STATUS_NOTSUPPORTED != item->status)
 			{
 				item->nextcheck = calculate_item_nextcheck(item->itemid, item->type,
-				item->delay, flexitem->delay_flex, now, NULL);
+						item->delay, flexitem->delay_flex, now, NULL);
 			}
 		}
 		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))

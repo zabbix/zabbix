@@ -136,7 +136,7 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: allocating already allocated memory. "
 				"Please report this to Zabbix developers.",
 				filename, line);
-		/* exit if defined DEBUG, Ignore otherwise */
+		/* exit if defined DEBUG, ignore otherwise */
 		zbx_dbg_assert(0);
 	}
 
@@ -253,7 +253,7 @@ int	check_time_period(const char *period, time_t now)
 	int		d1, d2, h1, h2, m1, m2, flag, day, sec, ret = 0;
 	struct tm	*tm;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() period:'%s')", __function_name, period);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() period:'%s'", __function_name, period);
 
 	if (now == (time_t)NULL)
 		now = time(NULL);
@@ -539,7 +539,7 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
 	if (NULL != effective_delay)
 		*effective_delay = delay;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End %s(): nextcheck:%d delay:%d", __function_name, nextcheck, delay);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): nextcheck:%d delay:%d", __function_name, nextcheck, delay);
 
 	return nextcheck;
 }
@@ -672,7 +672,7 @@ static int	is_ip6(const char *ip)
 		p++;
 	}
 
-	if (2 <= colons && colons <= 7 && 3 >= nums && 1 == is_nums)
+	if (2 <= colons && colons <= 7 && 4 >= nums && 1 == is_nums)
 		res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
