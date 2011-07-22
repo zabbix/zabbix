@@ -888,7 +888,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		{
 			if (tr_num == tr_alloc)
 			{
-				tr_alloc *= 1.5;
+				tr_alloc += 64;
 				tr = zbx_realloc(tr, tr_alloc * sizeof(zbx_trigger_t));
 			}
 
@@ -942,9 +942,6 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 3, ";\n");
 
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
-
-		zbx_free(tr_last->error);
-		zbx_free(tr_last->exp);
 	}
 
 #ifdef HAVE_ORACLE
@@ -954,15 +951,18 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	if (sql_offset > 16)
 		DBexecute("%s", sql);
 
-	for (tr_last = &tr[0]; 0 != tr_num; tr_num--)
+	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
 	{
+		zbx_free(tr_last->error);
+		zbx_free(tr_last->exp);
+
 		if (0 == tr_last->lastchange)
 			continue;
 
 		if (1 != tr_last->add_event)
 			continue;
 
-		/* Preparing event for processing */
+		/* preparing event for processing */
 		memset(&event, 0, sizeof(DB_EVENT));
 		event.source = EVENT_SOURCE_TRIGGERS;
 		event.object = EVENT_OBJECT_TRIGGER;
@@ -970,10 +970,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		event.clock = tr_last->lastchange;
 		event.value = tr_last->new_value;
 
-		/* Processing event */
+		/* processing event */
 		process_event(&event, 0);
-
-		tr_last++;
 	}
 
 	zbx_free(tr);

@@ -120,8 +120,6 @@ static void	process_time_functions()
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-
-		zbx_free(tr_last->exp);
 	}
 	DBfree_result(result);
 
@@ -134,12 +132,14 @@ static void	process_time_functions()
 
 	zbx_free(sql);
 
-	for (tr_last = &tr[0]; 0 != tr_num; tr_num--)
+	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
 	{
+		zbx_free(tr_last->exp);
+
 		if (1 != tr_last->add_event)
 			continue;
 
-		/* Preparing event for processing */
+		/* preparing event for processing */
 		memset(&event, 0, sizeof(DB_EVENT));
 		event.source = EVENT_SOURCE_TRIGGERS;
 		event.object = EVENT_OBJECT_TRIGGER;
@@ -147,10 +147,8 @@ static void	process_time_functions()
 		event.clock = tr_last->lastchange;
 		event.value = tr_last->new_value;
 
-		/* Processing event */
+		/* processing event */
 		process_event(&event, 0);
-
-		tr_last++;
 	}
 
 	DBcommit();

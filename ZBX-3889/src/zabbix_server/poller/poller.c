@@ -248,12 +248,12 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 
 	zbx_free(sql);
 
-	for (tr_last = &tr[0]; 0 != tr_num; tr_num--)
+	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
 	{
 		if (1 != tr_last->add_event)
 			continue;
 
-		/* Preparing event for processing */
+		/* preparing event for processing */
 		memset(&event, 0, sizeof(DB_EVENT));
 		event.source = EVENT_SOURCE_TRIGGERS;
 		event.object = EVENT_OBJECT_TRIGGER;
@@ -261,10 +261,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 		event.clock = tr_last->lastchange;
 		event.value = tr_last->new_value;
 
-		/* Processing event */
+		/* processing event */
 		process_event(&event, 0);
-
-		tr_last++;
 	}
 
 	zbx_free(tr);
