@@ -211,9 +211,6 @@ include_once('include/page_header.php');
 // HEADER {{{
 	$r_form = new CForm('get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
-	$r_form->addVar('triggerid', get_request('triggerid'));
-	$r_form->addVar('stime', get_request('stime'));
-	$r_form->addVar('period', get_request('period'));
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 
@@ -288,7 +285,12 @@ include_once('include/page_header.php');
 		$filterForm->addVar('period', get_request('period'));
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
+			// trigger description
 			$trigger = expand_trigger_description($_REQUEST['triggerid']);
+			// prepending host name to trigger description
+			$triggerHostDB = get_hosts_by_triggerid($_REQUEST['triggerid']);
+			$triggerHost = DBfetch($triggerHostDB);
+			$trigger = $triggerHost['host'].':'.$trigger;
 		}
 		else{
 			$trigger = '';
