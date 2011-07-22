@@ -829,7 +829,6 @@
 	'S_INTERVAL'=>						_('Interval'),
 	'S_HISTORY'=>						_('History'),
 	'S_TRENDS'=>						_('Trends'),
-	'S_ZABBIX_INTERNAL'=>					_('Zabbix internal'),
 	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
 	'S_ACTIVE'=>						_('Active'),
 	'S_NOT_SUPPORTED'=>					_('Not supported'),
