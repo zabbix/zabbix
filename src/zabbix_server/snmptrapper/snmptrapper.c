@@ -184,8 +184,7 @@ static void	parse_traps(char *buffer)
 {
 	char	*c, *line, *begin = NULL, *end = NULL, *ip;
 
-	c = buffer;
-	line = buffer;
+	c = line = buffer;
 
 	DCinit_nextchecks();
 
@@ -239,22 +238,22 @@ static void	parse_traps(char *buffer)
  ******************************************************************************/
 static void	read_traps()
 {
-	const char	*__function_name = "process_traps";
+	const char	*__function_name = "read_traps";
 	int		nbytes;
 	char		buffer[MAX_BUFFER_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), lastsize [%lu]", __function_name, trap_lastsize);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize:%d", __function_name, trap_lastsize);
 
-	*buffer = 0;
+	*buffer = '\0';
 
 	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot set position to [%li]: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot set position to [%d]: %s",
 				__function_name, trap_lastsize, zbx_strerror(errno));
 		goto exit;
 	}
 
-	if (FAIL == (nbytes = read(trap_fd, buffer, sizeof(buffer))))
+	if (-1 == (nbytes = read(trap_fd, buffer, sizeof(buffer))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot read from [%s]: %s",
 				__function_name, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
@@ -264,7 +263,7 @@ static void	read_traps()
 	buffer[nbytes] = '\0';
 	zbx_rtrim(buffer + MAX(nbytes - 3, 0), " \r\n");
 
-	trap_lastsize += (off_t)nbytes;
+	trap_lastsize += nbytes;
 	DBupdate_lastsize();
 
 	parse_traps(buffer);
@@ -349,7 +348,7 @@ static int	get_latest_data()
 
 	if (-1 != trap_fd)	/* a trap file is already open */
 	{
-		if (FAIL == stat(CONFIG_SNMPTRAP_FILE, &file_buf))
+		if (0 != stat(CONFIG_SNMPTRAP_FILE, &file_buf))
 		{
 			/* file might have been renamed or deleted, process the current file */
 
