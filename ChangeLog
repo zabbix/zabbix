@@ -177,6 +177,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
+ - [ZBX-3469] fixed setting UNKNOWN trigger status when agent goes down (dimir)
  - [ZBX-3968] fixed issues with filtering in monitoring->events in Internet Explorer 7 (KB)
  - [ZBX-3973] added logging of proxy mode (active/passive) at startup (rudolfs)
  - [ZBX-3902] fixed possible zombie states in UNIX, moved watchdog (server) and heartbeats (proxy) to separate processes (main process just waits), added more logging to exiting Windows agent (rudolfs)
@@ -193,7 +194,7 @@ Changes for 1.8.6rc1
  - [ZBX-3944] added support of multibyte NIC names for the net.if.* checks under Windows (Sasha)
  - [ZBX-3947] fixed compilation under AIX 5.2 with fileset lower than 5.2.0.40 (Sasha)
  - [ZBX-3947] fixed compilation under AIX 5.2 with enabled IPv6 (Sasha)
- - [ZBX-3426] Fix application unlink and clear when it is linked from template (Eduard)
+ - [ZBX-3426] fixed application unlink and clear when it is linked from template (Eduard)
  - [ZBX-1074] fixed compilation errors regarding sem_lock and sem_unlock on HP-UX; thanks to Brian Collins (asaveljevs)
  - [ZBX-3877] fixed slow Housekeeper for PostgreSQL 7.4+; thanks to Ildefonso Camargo (dimir)
  - [ZBXNEXT-816] added support for reloading configuration cache from the command line (Richlv,Sasha)
