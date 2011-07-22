@@ -239,7 +239,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
  *             now    - timestamp for comparison                              *
  *                      if NULL - use current timestamp.                      *
  *                                                                            *
- * Return value: 0 - out of period, 1 - within the period                     *
+ * Return value: FAIL - out of period, SUCCEED - within the period            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -250,7 +250,7 @@ int	check_time_period(const char *period, time_t now)
 {
 	const char	*__function_name = "check_time_period";
 	const char	*s, *delim;
-	int		d1, d2, h1, h2, m1, m2, flag, day, sec, ret = 0;
+	int		d1, d2, h1, h2, m1, m2, flag, day, sec, ret = FAIL;
 	struct tm	*tm;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() period:'%s'", __function_name, period);
@@ -284,7 +284,7 @@ int	check_time_period(const char *period, time_t now)
 
 			if (day >= d1 && day <= d2 && sec >= 3600 * h1 + 60 * m1 && sec <= 3600 * h2 + 60 * m2)
 			{
-				ret = 1;
+				ret = SUCCEED;
 				break;
 			}
 		}
@@ -297,7 +297,7 @@ int	check_time_period(const char *period, time_t now)
 			break;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, 1 == ret ? "SUCCEED" : "FAIL");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -338,7 +338,7 @@ static int	get_current_delay(int delay, const char *flex_intervals, time_t now)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d sec at %s", flex_delay, flex_period);
 			
-			if (flex_delay < current_delay && 0 != check_time_period(flex_period, now))
+			if (flex_delay < current_delay && SUCCEED == check_time_period(flex_period, now))
 				current_delay = flex_delay;
 		}
 		else

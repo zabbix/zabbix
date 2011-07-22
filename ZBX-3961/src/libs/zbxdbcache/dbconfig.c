@@ -698,9 +698,16 @@ static void	DCsync_items(DB_RESULT result)
 		}
 		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
 		{
-			/* remove delay_flex parameter for non-flexible item */
+			/* remove delay_flex parameter for non-flexible item and update nextcheck */
+
 			zbx_strpool_release(flexitem->delay_flex);
 			zbx_hashset_remove(&config->flexitems, &itemid);
+
+			if (ITEM_STATUS_NOTSUPPORTED != item->status)
+			{
+				item->nextcheck = calculate_item_nextcheck(item->itemid, item->type,
+						item->delay, NULL, now, NULL);
+			}
 		}
 
 		/* trapper items */
