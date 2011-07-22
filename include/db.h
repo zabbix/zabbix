@@ -212,6 +212,7 @@ zbx_graph_item_type;
 				"i.lastclock,i.units,i.multiplier,i.formula,i.status,"		\
 				"i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
+#define ZBX_SQL_TIME_FUNCTIONS	"'nodata','date','dayofmonth','dayofweek','time','now'"
 #define ZBX_SQL_ITEM_FIELDS_NUM	19
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 

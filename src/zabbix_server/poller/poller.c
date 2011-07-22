@@ -78,7 +78,7 @@ static void	update_key_status(zbx_uint64_t hostid, int host_status, zbx_timespec
 	zbx_free(items);
 }
 
-static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_timespec_t *ts, char *reason)
+static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
 	const char	*__function_name = "update_triggers_status_to_unknown";
 	DB_RESULT	result;
@@ -86,26 +86,101 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_timespec_
 	zbx_uint64_t	triggerid;
 	int		trigger_type, trigger_value, trigger_flags;
 	const char	*trigger_error;
+	char		failed_type_buf[8];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64,
 			__function_name, hostid);
 
+	/* determine failed item type */
+	switch (type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			zbx_snprintf(failed_type_buf, sizeof(failed_type_buf), "%d", ITEM_TYPE_ZABBIX);
+			break;
+		case ITEM_TYPE_SNMPv1:
+		case ITEM_TYPE_SNMPv2c:
+		case ITEM_TYPE_SNMPv3:
+			zbx_snprintf(failed_type_buf, sizeof(failed_type_buf), "%d,%d,%d",
+					ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3);
+			break;
+		case ITEM_TYPE_IPMI:
+			zbx_snprintf(failed_type_buf, sizeof(failed_type_buf), "%d", ITEM_TYPE_IPMI);
+			break;
+		case ITEM_TYPE_JMX:
+			zbx_snprintf(failed_type_buf, sizeof(failed_type_buf), "%d", ITEM_TYPE_JMX);
+			break;
+		default:
+			/* we should never end up here */
+			assert(0);
+	}
+
+	/******************************************************************************
+	 * Set trigger status to UNKNOWN if all are true:                             *
+	 * - trigger's item status ACTIVE                                             *
+	 * - trigger's item type same as failed one                                   *
+	 * - trigger does not reference time-based functions- trigger status ENABLED  *
+	 * - trigger's host same as failed one                                        *
+	 * - trigger's host status MONITORED                                          *
+	 * - trigger does not reference "active" item                                 *
+	 *                                                                            *
+	 * An item is considered "active" if all are true:                            *
+	 * - item status ACTIVE                                                       *
+	 * - item's host status MONITORED                                             *
+	 * - item's trigger references time-based functions                           *
+	 *   OR                                                                       *
+	 *   item is of different type AND it's host is AVAILABLE                     *
+	 ******************************************************************************/
 	result = DBselect(
 			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error"
-			" from hosts h,items i,functions f,triggers t"
-			" where h.hostid=i.hostid"
-				" and i.itemid=f.itemid"
+			" from items i,functions f,triggers t,hosts h"
+			" where i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
-				" and t.status=%d"
+				" and i.hostid=h.hostid"
 				" and i.status=%d"
 				" and not i.key_ like '%s'"
-				" and not i.key_ like '%s%%'"
-				" and h.hostid=" ZBX_FS_UI64,
-			TRIGGER_STATUS_ENABLED,
+				" and i.type in (%s)"
+				" and f.function not in (" ZBX_SQL_TIME_FUNCTIONS ")"
+				" and t.status=%d"
+				" and h.hostid=" ZBX_FS_UI64
+				" and h.status=%d"
+			" and not exists ("
+				"select 1"
+				" from functions f2,items i2,hosts h2"
+				" where f2.triggerid=f.triggerid"
+					" and f2.itemid=i2.itemid"
+					" and i2.hostid=h2.hostid"
+					" and ("
+						"f2.function in (" ZBX_SQL_TIME_FUNCTIONS ")"
+						" or ("
+							"i2.type not in (%s)"
+							" and ("
+								"i2.type not in (%d,%d,%d,%d,%d,%d)"
+								" or (i2.type in (%d) and h2.available=%d)"
+								" or (i2.type in (%d,%d,%d) and h2.snmp_available=%d)"
+								" or (i2.type in (%d) and h2.ipmi_available=%d)"
+								" or (i2.type in (%d) and h2.jmx_available=%d)"
+							")"
+						")"
+					")"
+					" and i2.status=%d"
+					" and not i2.key_ like '%s'"
+					" and h2.status=%d"
+			")",
 			ITEM_STATUS_ACTIVE,
 			SERVER_STATUS_KEY,
-			SERVER_ICMPPING_KEY,
-			hostid);
+			failed_type_buf,
+			TRIGGER_STATUS_ENABLED,
+			hostid,
+			HOST_STATUS_MONITORED,
+			failed_type_buf,
+			ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_JMX,
+			ITEM_TYPE_ZABBIX, HOST_AVAILABLE_TRUE,
+			ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3, HOST_AVAILABLE_TRUE,
+			ITEM_TYPE_IPMI, HOST_AVAILABLE_TRUE,
+			ITEM_TYPE_JMX, HOST_AVAILABLE_TRUE,
+			ITEM_STATUS_ACTIVE,
+			SERVER_STATUS_KEY,
+			HOST_STATUS_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -117,6 +192,9 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_timespec_
 
 		DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_flags,
 				trigger_error, trigger_value, TRIGGER_VALUE_FLAG_UNKNOWN, ts, reason);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() setting trigger (id:" ZBX_FS_UI64 ") status to UNKNOWN",
+				__function_name, triggerid);
 	}
 	DBfree_result(result);
 
@@ -314,7 +392,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 				if (available == &item->host.available)
 					update_key_status(item->host.hostid, HOST_AVAILABLE_FALSE, ts);
 
-				update_triggers_status_to_unknown(item->host.hostid, ts, "Host is unavailable.");
+				update_triggers_status_to_unknown(item->host.hostid, item->type, ts, "Agent is unavailable.");
 			}
 
 			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
@@ -672,8 +750,8 @@ exit:
 
 void	main_poller_loop(unsigned char poller_type)
 {
-	int		nextcheck, sleeptime, processed;
-	double		sec;
+	int	nextcheck, sleeptime, processed;
+	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_poller_loop() process_type:'%s' process_num:%d",
 			get_process_type_string(process_type), process_num);
