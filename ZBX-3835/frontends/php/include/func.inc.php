@@ -24,7 +24,9 @@
 function redirect($url){
 	zbx_flush_post_cookies();
 
-	header('Location: '.$url);
+	$curl = new Curl($url);
+	$curl->setArgument('sid', null);
+	header('Location: '.$curl->getUrl());
 	exit();
 }
 
