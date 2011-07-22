@@ -70,7 +70,7 @@ static void	process_time_functions()
 				" and f.itemid=i.itemid"
 				" and i.hostid=h.hostid"
 				" and t.status=%d"
-				" and f.function in ('nodata','date','dayofmonth','dayofweek','time','now')"
+				" and f.function in (" ZBX_SQL_TIME_FUNCTIONS ")"
 				" and i.status=%d"
 				" and h.status=%d"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
