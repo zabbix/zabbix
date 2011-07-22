@@ -113,3 +113,11 @@ div.calendar input.calendar_textbox{
 	height: 14px;
 	vertical-align:middle;
 }
+
+div.calendar input[type="button"] {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	border: 1px solid #00888B;
+	background: #AADDEE;
+	cursor:pointer;
+}
