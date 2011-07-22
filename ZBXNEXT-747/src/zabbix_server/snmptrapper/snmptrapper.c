@@ -401,15 +401,13 @@ void	main_snmptrapper_loop()
 
 	while (ZBX_IS_RUNNING())
 	{
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
 		while (SUCCEED == get_latest_data())
 			read_traps();
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		zbx_setproctitle("%s [sleeping for 1 second]", get_process_type_string(process_type));
-		zbx_sleep(1);
+		zbx_sleep_loop(1);
 	}
 
 	if (-1 != trap_fd)
