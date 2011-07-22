@@ -1,5 +1,6 @@
 Changes for 1.8.6rc1
 
+ - [ZBX-3968] fixed issues with filtering in monitoring->events in Internet Explorer 7 (KB)
  - [ZBX-3469] fixed setting UNKNOWN trigger status when agent goes down (dimir)
  - [ZBX-3973] added logging of proxy mode (active/passive) at startup (rudolfs)
  - [ZBX-3902] fixed possible zombie states in UNIX, moved watchdog (server) and heartbeats (proxy) to separate processes (main process just waits), added more logging to exiting Windows agent (rudolfs)
