@@ -297,7 +297,7 @@ int	check_time_period(const char *period, time_t now)
 			break;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, 1 == ret ? "SUCCEED" : "FAIL");
 
 	return ret;
 }
@@ -443,7 +443,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 								s, day, tm->tm_hour, tm->tm_min, tm->tm_sec);
 						day_diff = -1;
 					}
-					
+
 					if (-1 != day_diff && (0 == next || next > now - sec + SEC_PER_DAY * day_diff + sec1))
 						next = now - sec + SEC_PER_DAY * day_diff + sec1;
 				}
@@ -521,7 +521,7 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
 				/* as soon as item check in the interval is not forbidden with delay=0, use it */
 				if (SEC_PER_YEAR != current_delay)
 					break;
-				
+
 				get_next_delay_interval(flex_intervals, next_interval + 1, &next_interval);
 			}
 			while (next_interval - now < SEC_PER_WEEK);	/* checking the nearest week for delay!=0 */
@@ -535,11 +535,11 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
 		while (nextcheck <= now)
 			nextcheck += delay;
 	}
-	
+
 	if (NULL != effective_delay)
 		*effective_delay = delay;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): nextcheck:%d delay:%d", __function_name, nextcheck, delay);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() nextcheck:%d delay:%d", __function_name, nextcheck, delay);
 
 	return nextcheck;
 }

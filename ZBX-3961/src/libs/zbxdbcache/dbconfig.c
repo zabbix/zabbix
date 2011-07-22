@@ -630,6 +630,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		old_poller_type = item->poller_type;
 		poller_by_item(itemid, proxy_hostid, item->type, item->key, &item->poller_type);
+
 		if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 				(ZBX_POLLER_TYPE_NORMAL == item->poller_type || ZBX_POLLER_TYPE_IPMI == item->poller_type))
 		{
