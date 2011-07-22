@@ -83,8 +83,7 @@ $page['file']	= 'index.php';
 			$url = is_null($request)?$USER_DETAILS['url']:$request;
 
 			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, $USER_DETAILS['userid'], '', null,null,null);
-
-			jsRedirect($url);
+			redirect($url);
 			exit();
 		}
 	}

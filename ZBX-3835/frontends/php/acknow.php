@@ -28,6 +28,7 @@ $page['title']	= 'S_ACKNOWLEDGES';
 $page['file']	= 'acknow.php';
 $page['hist_arg'] = array('eventid');
 
+ob_start();
 include_once('include/page_header.php');
 
 ?>
@@ -55,8 +56,8 @@ include_once('include/page_header.php');
 	$_REQUEST['backurl'] = get_request('backurl', 'tr_status.php');
 
 	if(isset($_REQUEST['cancel'])){
-		jsRedirect($_REQUEST['backurl']);
-		exit();
+		ob_end_clean();
+		redirect($_REQUEST['backurl']);
 	}
 
 	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQUEST['triggers'])){
@@ -113,10 +114,12 @@ include_once('include/page_header.php');
 		}
 
 		if(isset($_REQUEST['saveandreturn'])){
-			jsRedirect($_REQUEST['backurl']);
-			exit();
+			ob_end_clean();
+			redirect($_REQUEST['backurl']);
 		}
  	}
+
+ob_end_flush();
 
 ?>
 <?php
@@ -190,9 +193,6 @@ include_once('include/page_header.php');
 
 	$frmMsg->show(false);
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>
