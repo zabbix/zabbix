@@ -2267,7 +2267,7 @@ void	DCsync_configuration()
 	sec = zbx_time();
 	conf_result = DBselect(
 			/* SQL statement must be synced with DCload_config() */
-			"select alert_history,event_history,refresh_unsupported, discovery_groupid,snmptrap_logging,"
+			"select alert_history,event_history,refresh_unsupported,discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5"
 			" from config"
@@ -2928,7 +2928,7 @@ void	DCload_config()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select alert_history,event_history,refresh_unsupported, discovery_groupid,snmptrap_logging,"
+			"select alert_history,event_history,refresh_unsupported,discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
 				"severity_name_3,severity_name_4,severity_name_5"
 			" from config"
