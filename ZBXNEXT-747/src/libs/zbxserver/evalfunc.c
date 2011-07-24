@@ -192,7 +192,7 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		res = SUCCEED;
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGEVENTID is empty");
+		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
 
 	DBfree_result(result);
 	if ('@' == *arg1)
