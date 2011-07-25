@@ -76,6 +76,7 @@ class CScript extends CZBXAPI{
 			'search'				=> null,
 			'startSearch'			=> null,
 			'excludeSearch'			=> null,
+			'searchWildcardsEnabled'=> null,
 
 // OutPut
 			'extendoutput'			=> null,
