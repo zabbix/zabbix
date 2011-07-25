@@ -814,7 +814,7 @@ ZABBIX.apps.map = (function(){
 					dataFelds = [
 						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-						'height', 'viewtype', 'urls', 'elementName'
+						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap'
 					],
 					i,
 					ln;
@@ -837,8 +837,8 @@ ZABBIX.apps.map = (function(){
 					this.data.elementsubtype = '0';
 				}
 
-				// if we update all data and advanced_icons turned off or element is image, reset advanced iconids
-				if((unsetUndefined && (typeof data.advanced_icons === 'undefined')) || this.data.elementtype === '4'){
+				// if element is image we unset advanced icons
+				if(this.data.elementtype === '4'){
 					this.data.iconid_on = '0';
 					this.data.iconid_maintenance = '0';
 					this.data.iconid_disabled = '0';
@@ -1033,23 +1033,23 @@ ZABBIX.apps.map = (function(){
 					{
 						action: 'show',
 						value: '#subtypeRow, #hostGroupSelectRow',
-						cond: {
+						cond: [{
 							elementType: '3'
-						}
+						}]
 					},
 					{
 						action: 'show',
 						value: '#hostSelectRow',
-						cond: {
+						cond: [{
 							elementType: '0'
-						}
+						}]
 					},
 					{
 						action: 'show',
 						value: '#triggerSelectRow',
-						cond: {
+						cond: [{
 							elementType: '2'
-						}
+						}]
 					},
 					{
 						action: 'show',
@@ -1061,33 +1061,39 @@ ZABBIX.apps.map = (function(){
 					{
 						action: 'show',
 						value: '#areaTypeRow, #areaPlacingRow',
-						cond: {
+						cond: [{
 							elementType: '3',
 							subtypeHostGroupElements: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'show',
 						value: '#areaSizeRow',
-						cond: {
+						cond: [{
 							elementType: '3',
 							subtypeHostGroupElements: 'checked',
 							areaTypeCustom: 'checked'
-						}
-					},
-					{
-						action: 'show',
-						value: '#iconProblemRow, #iconMainetnanceRow, #iconDisabledRow',
-						cond: {
-							advanced_icons: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'hide',
-						value: '#advancedIconsRow',
-						cond: {
+						value: '#iconProblemRow, #iconMainetnanceRow, #iconDisabledRow',
+						cond: [{
 							elementType: '4'
-						}
+						}]
+					},
+					{
+						action: 'show',
+						value: '#useIconMapRow',
+						cond: [
+							{
+								elementType: '0'
+							},
+							{
+								elementType: '3',
+								subtypeHostGroupElements: 'checked'
+							}
+						]
 					}
 				];
 
@@ -1155,8 +1161,6 @@ ZABBIX.apps.map = (function(){
 				for(elementName in selement){
 					jQuery('[name='+elementName+']', this.domNode).val([selement[elementName]]);
 				}
-
-				jQuery('#advanced_icons').attr('checked', (selement.iconid_on != 0) || (selement.iconid_maintenance != 0) || (selement.iconid_disabled != 0));
 
 				// clear urls
 				jQuery('#urlContainer tr').remove();
@@ -1308,44 +1312,44 @@ ZABBIX.apps.map = (function(){
 					{
 						action: 'enable',
 						value: '#massLabel',
-						cond: {
+						cond: [{
 							chkboxLabel: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'enable',
 						value: '#massLabelLocation',
-						cond: {
+						cond: [{
 							chkboxLabelLocation: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'enable',
 						value: '#massIconidOff',
-						cond: {
+						cond: [{
 							chkboxMassIconidOff: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'enable',
 						value: '#massIconidOn',
-						cond: {
+						cond: [{
 							chkboxMassIconidOn: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'enable',
 						value: '#massIconidMaintenance',
-						cond: {
+						cond: [{
 							chkboxMassIconidMaintenance: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'enable',
 						value: '#massIconidDisabled',
-						cond: {
+						cond: [{
 							chkboxMassIconidDisabled: 'checked'
-						}
+						}]
 					}
 				];
 

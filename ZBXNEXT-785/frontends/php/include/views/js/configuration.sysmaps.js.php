@@ -100,15 +100,15 @@
 						<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&excludeids[]=#{sysmapid}',450,450)"><?php echo _('Select'); ?></span>
 					</td>
 				</tr>
+				<tr id="useIconMapRow">
+					<td><label for="use_iconmap"><?php echo _('Automatic icon selection'); ?></label></td>
+					<td><input type="checkbox" name="use_iconmap" id="use_iconmap" class="checkbox"></td>
+				</tr>
 				<tr>
 					<td><label for="iconid_off"><?php echo _('Icon (default)'); ?></label></td>
 					<td>
 						<select class="input" name="iconid_off" id="iconid_off"></select>
 					</td>
-				</tr>
-				<tr id="advancedIconsRow">
-					<td><label for="advanced_icons"><?php echo _('Use advanced icons'); ?></label></td>
-					<td><input type="checkbox" name="advanced_icons" id="advanced_icons" class="checkbox"></td>
 				</tr>
 				<tr id="iconProblemRow">
 					<td><label for="iconid_on"><?php echo _('Icon (problem)'); ?></label></td>
