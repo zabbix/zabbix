@@ -55,8 +55,8 @@ function check_authorisation(){
 		process_locales();
 
 		if(!isset($_REQUEST['request'])){
-			$parsedUrl = parse_url($_SERVER['REQUEST_URI']);
-			if(isset($parsedUrl['path']) && !preg_match('/.+\/(index.php)?$/i', $parsedUrl['path'])){
+			$parsedUrl = new Curl($_SERVER['REQUEST_URI']);
+			if(!zbx_empty($parsedUrl->getPath()) && !preg_match('/.+\/(index.php)?$/i', $parsedUrl->getPath())){
 				$_REQUEST['request'] = $_SERVER['REQUEST_URI'];
 			}
 		}
