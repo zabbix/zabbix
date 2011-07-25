@@ -1059,8 +1059,8 @@ static void	DCsync_items(DB_RESULT result)
 
 		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == proxy_hostid)
 		{
-
-			interface_snmpitem = DCfind_id(&config->interface_snmpitems, item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found);
+			interface_snmpitem = DCfind_id(&config->interface_snmpitems,
+					item->interfaceid, sizeof(ZBX_DC_INTERFACE_ITEM), &found);
 
 			if (0 == found)
 			{
@@ -2154,7 +2154,8 @@ static void	DCsync_interfaces(DB_RESULT result)
 			{
 				DCstrpool_replace(0, &interface->ip, interface->ip);
 
-				interface_snmpim = zbx_hashset_insert(&config->interface_snmpims, &interface_snmpim_local, sizeof(ZBX_DC_INTERFACE_IM));
+				interface_snmpim = zbx_hashset_insert(&config->interface_snmpims,
+						&interface_snmpim_local, sizeof(ZBX_DC_INTERFACE_IM));
 				zbx_vector_uint64_create_ext(&interface_snmpim->interfaceids,
 						__config_mem_malloc_func,
 						__config_mem_realloc_func,
@@ -3737,9 +3738,7 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
 				break;
 		}
 		else if (1 != ++counter || NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
-		{
-				break;
-		}
+			break;
 
 		if (0 != dc_host->proxy_hostid)
 			continue;
@@ -3827,7 +3826,6 @@ unlock:
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-
 int	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
 {
 	const char		*__function_name = "DCconfig_get_snmp_items_by_interface";
@@ -3842,14 +3840,16 @@ int	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **i
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_interface_snmpitem = zbx_hashset_search(&config->interface_snmpitems, &interfaceid)) ||
-			NULL == (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)) ||
+	if (NULL == (dc_interface = zbx_hashset_search(&config->interfaces, &interfaceid)) ||
 			NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_interface->hostid)) ||
 			HOST_MAINTENANCE_STATUS_OFF != dc_host->maintenance_status ||
 			MAINTENANCE_TYPE_NORMAL != dc_host->maintenance_type)
 	{
 		goto unlock;
 	}
+
+	if (NULL == (dc_interface_snmpitem = zbx_hashset_search(&config->interface_snmpitems, &interfaceid)))
+		goto unlock;
 
 	*items = zbx_malloc(*items, items_alloc * sizeof(DC_ITEM));
 
