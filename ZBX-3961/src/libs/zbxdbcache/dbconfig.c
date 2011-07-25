@@ -574,7 +574,6 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* store new information in item structure */
 
-		item->itemid = itemid;
 		item->hostid = hostid;
 		item->type = (unsigned char)atoi(row[3]);
 		item->data_type = (unsigned char)atoi(row[4]);
@@ -643,7 +642,6 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			snmpitem = DCfind_id(&config->snmpitems, itemid, sizeof(ZBX_DC_SNMPITEM), &found);
 
-			snmpitem->itemid = itemid;
 			DCstrpool_replace(found, &snmpitem->snmp_community, row[7]);
 			DCstrpool_replace(found, &snmpitem->snmp_oid, row[8]);
 			snmpitem->snmp_port = (unsigned short)atoi(row[9]);
@@ -671,7 +669,6 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			ipmiitem = DCfind_id(&config->ipmiitems, itemid, sizeof(ZBX_DC_IPMIITEM), &found);
 
-			ipmiitem->itemid = itemid;
 			DCstrpool_replace(found, &ipmiitem->ipmi_sensor, row[14]);
 		}
 		else if (NULL != (ipmiitem = zbx_hashset_search(&config->ipmiitems, &itemid)))
@@ -686,8 +683,6 @@ static void	DCsync_items(DB_RESULT result)
 		if ('\0' != *row[16])
 		{
 			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
-
-			flexitem->itemid = itemid;
 
 			if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
 					ITEM_STATUS_NOTSUPPORTED != item->status)
@@ -716,7 +711,6 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			trapitem = DCfind_id(&config->trapitems, itemid, sizeof(ZBX_DC_TRAPITEM), &found);
 
-			trapitem->itemid = itemid;
 			DCstrpool_replace(found, &trapitem->trapper_hosts, row[17]);
 		}
 		else if (NULL != (trapitem = zbx_hashset_search(&config->trapitems, &itemid)))
@@ -732,7 +726,6 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			logitem = DCfind_id(&config->logitems, itemid, sizeof(ZBX_DC_LOGITEM), &found);
 
-			logitem->itemid = itemid;
 			DCstrpool_replace(found, &logitem->logtimefmt, row[18]);
 		}
 		else if (NULL != (logitem = zbx_hashset_search(&config->logitems, &itemid)))
@@ -748,7 +741,6 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			dbitem = DCfind_id(&config->dbitems, itemid, sizeof(ZBX_DC_DBITEM), &found);
 
-			dbitem->itemid = itemid;
 			DCstrpool_replace(found, &dbitem->params, row[19]);
 		}
 		else if (NULL != (dbitem = zbx_hashset_search(&config->dbitems, &itemid)))
@@ -764,7 +756,6 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			sshitem = DCfind_id(&config->sshitems, itemid, sizeof(ZBX_DC_SSHITEM), &found);
 
-			sshitem->itemid = itemid;
 			sshitem->authtype = (unsigned short)atoi(row[21]);
 			DCstrpool_replace(found, &sshitem->username, row[22]);
 			DCstrpool_replace(found, &sshitem->password, row[23]);
@@ -791,7 +782,6 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			telnetitem = DCfind_id(&config->telnetitems, itemid, sizeof(ZBX_DC_TELNETITEM), &found);
 
-			telnetitem->itemid = itemid;
 			DCstrpool_replace(found, &telnetitem->username, row[22]);
 			DCstrpool_replace(found, &telnetitem->password, row[23]);
 			DCstrpool_replace(found, &telnetitem->params, row[19]);
@@ -813,7 +803,6 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			calcitem = DCfind_id(&config->calcitems, itemid, sizeof(ZBX_DC_CALCITEM), &found);
 
-			calcitem->itemid = itemid;
 			DCstrpool_replace(found, &calcitem->params, row[19]);
 		}
 		else if (NULL != (calcitem = zbx_hashset_search(&config->calcitems, &itemid)))
@@ -1038,7 +1027,6 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* store new information in host structure */
 
-		host->hostid = hostid;
 		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
 		host->useip = (unsigned char)atoi(row[3]);
@@ -1098,7 +1086,6 @@ static void	DCsync_hosts(DB_RESULT result)
 		{
 			ipmihost = DCfind_id(&config->ipmihosts, hostid, sizeof(ZBX_DC_IPMIHOST), &found);
 
-			ipmihost->hostid = hostid;
 			DCstrpool_replace(found, &ipmihost->ipmi_ip, row[8]);
 			ipmihost->ipmi_port = (unsigned short)atoi(row[9]);
 			ipmihost->ipmi_authtype = (signed char)atoi(row[10]);
