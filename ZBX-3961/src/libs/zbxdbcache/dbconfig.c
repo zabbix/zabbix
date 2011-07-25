@@ -683,7 +683,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* items with flexible intervals */
 
-		if (SUCCEED != DBis_null(row[16]) && '\0' != *row[16])
+		if ('\0' != *row[16])
 		{
 			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
 
@@ -712,7 +712,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* trapper items */
 
-		if (ITEM_TYPE_TRAPPER == item->type && SUCCEED != DBis_null(row[17]) && '\0' != *row[17])
+		if (ITEM_TYPE_TRAPPER == item->type && '\0' != *row[17])
 		{
 			trapitem = DCfind_id(&config->trapitems, itemid, sizeof(ZBX_DC_TRAPITEM), &found);
 
@@ -728,7 +728,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* log items */
 
-		if (ITEM_VALUE_TYPE_LOG == item->value_type && SUCCEED != DBis_null(row[18]) && '\0' != *row[18])
+		if (ITEM_VALUE_TYPE_LOG == item->value_type && '\0' != *row[18])
 		{
 			logitem = DCfind_id(&config->logitems, itemid, sizeof(ZBX_DC_LOGITEM), &found);
 
@@ -744,7 +744,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* db items */
 
-		if (ITEM_TYPE_DB_MONITOR == item->type && SUCCEED != DBis_null(row[19]) && '\0' != *row[19])
+		if (ITEM_TYPE_DB_MONITOR == item->type && '\0' != *row[19])
 		{
 			dbitem = DCfind_id(&config->dbitems, itemid, sizeof(ZBX_DC_DBITEM), &found);
 
