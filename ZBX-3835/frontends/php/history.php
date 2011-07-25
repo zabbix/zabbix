@@ -55,7 +55,7 @@ include_once('include/page_header.php');
 		'cmbitemlist'=>	array(T_ZBX_INT, O_OPT,	 null,	DB_ID, null),
 
 		'plaintext'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
-		'action'=>		array(T_ZBX_STR, O_OPT,	 null,	IN('"showgraph","showvalues","showlatest","add","remove"'), null),
+		'action'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	IN('"showgraph","showvalues","showlatest","add","remove"'), null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,		NULL),
@@ -71,8 +71,8 @@ include_once('include/page_header.php');
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	null,	null)
 	);
-
 	check_fields($fields);
+
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){

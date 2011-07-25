@@ -54,9 +54,11 @@ function check_authorisation(){
 		include_once('include/locales/en_gb.inc.php');
 		process_locales();
 
-
-		if(!isset($_REQUEST['request']) && (!strpos(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), 'index.php'))){
-			$_REQUEST['request'] = $_SERVER['REQUEST_URI'];
+		if(!isset($_REQUEST['request'])){
+			$parsedUrl = parse_url($_SERVER['REQUEST_URI']);
+			if(!strpos($parsedUrl['path'], 'index.php')){
+				$_REQUEST['request'] = $_SERVER['REQUEST_URI'];
+			}
 		}
 
 		include('index.php');
