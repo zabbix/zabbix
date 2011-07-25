@@ -408,7 +408,7 @@ setDateToOuterObj: function(){
 setNow: function(){
 	var now = new Date();
 
-	this.day = now.getDate()
+	this.day = now.getDate();
 	this.month = now.getMonth();
 	this.year = now.getFullYear();
 	this.hour = now.getHours();
@@ -449,20 +449,25 @@ sethour: function(){
 },
 
 setday: function(e,day,month,year){
-	
 	if(!is_null(this.clndr_selectedday)){
 		this.clndr_selectedday.removeClassName('selected');
 	}
-		
-	this.setSDT(day,month,year,this.hour,this.minute);
-	
+
 	var selectedday = Event.element(e);
 	Element.extend(selectedday);
-	
+
 	this.clndr_selectedday = selectedday;
 	this.clndr_selectedday.addClassName('selected');
-	
-	this.ondateselected();
+
+	this.day = day;
+	this.syncSDT();
+	this.syncBSDateBySDT();
+	this.syncCDT();
+	this.setCDate();
+
+	// actions to set & close date after click on "day"
+	//this.setSDT(day,month,year,this.hour,this.minute);
+	//this.ondateselected();
 },
 
 monthup: function(){
