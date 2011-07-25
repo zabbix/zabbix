@@ -167,7 +167,7 @@ include_once('include/page_header.php');
 // resets get params for proper page refresh
 	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
 		navigation_bar_calc('web.item.graph', $item['itemid'], true);
-		jsRedirect('history.php?action=showgraph&itemid=' . $item['itemid']);
+		jsRedirect('history.php?action=' . get_request('action', 'showgraph') . '&itemid=' . $item['itemid']);
 		include_once('include/page_footer.php');
 		exit();
 	}
