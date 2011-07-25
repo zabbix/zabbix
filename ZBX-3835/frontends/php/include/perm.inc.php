@@ -56,7 +56,7 @@ function check_authorisation(){
 
 		if(!isset($_REQUEST['request'])){
 			$parsedUrl = parse_url($_SERVER['REQUEST_URI']);
-			if(!strpos($parsedUrl['path'], 'index.php')){
+			if(isset($parsedUrl['path']) && !preg_match('/.+\/(index.php)?$/i', $parsedUrl['path'])){
 				$_REQUEST['request'] = $_SERVER['REQUEST_URI'];
 			}
 		}
