@@ -54,7 +54,8 @@ function check_authorisation(){
 		include_once('include/locales/en_gb.inc.php');
 		process_locales();
 
-		if(!isset($_REQUEST['request']) && (!strpos($_SERVER['REQUEST_URI'], 'index.php'))){
+
+		if(!isset($_REQUEST['request']) && (!strpos(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), 'index.php'))){
 			$_REQUEST['request'] = $_SERVER['REQUEST_URI'];
 		}
 

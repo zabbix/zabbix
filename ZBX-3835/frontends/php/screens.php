@@ -26,7 +26,7 @@
 
 	$page['title'] = 'S_CUSTOM_SCREENS';
 	$page['file'] = 'screens.php';
-	$page['hist_arg'] = array('elementid');
+	$page['hist_arg'] = array('elementid', 'screenname');
 	$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -137,7 +137,6 @@
 	else{
 		$id_has_been_fetched_from_profile = false;
 	}
-	$_REQUEST['elementid'] = $elementid;
 
 	$screens_wdgt = new CWidget();
 
@@ -185,18 +184,18 @@
 		show_error_message($error_msg);
 	}
 	else{
-		if (!isset($screens[$elementIdentifier])) {
+		if(!isset($screens[$elementIdentifier])){
 			//this means id was fetched from profile and this screen does not exist
 			//in this case we need to show the first one
 			$screen = reset($screens);
 		}
-		else {
+		else{
 			$screen = $screens[$elementIdentifier];
 		}
 
 		//if elementid is used to fetch an element, saving it in profile
-		if(2 != $_REQUEST['fullscreen'] && !$use_screen_name) {
-			CProfile::update('web.screens.elementid',$screen['screenid'] , PROFILE_TYPE_ID);
+		if(2 != $_REQUEST['fullscreen'] && !$use_screen_name){
+			CProfile::update('web.screens.elementid', $screen['screenid'], PROFILE_TYPE_ID);
 		}
 
 		$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
