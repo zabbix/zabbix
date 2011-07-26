@@ -567,7 +567,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 			continue;
 		}
 
-		if (check_time_period(row[3], (time_t)NULL) == 0)
+		if (FAIL == check_time_period(row[3], (time_t)NULL))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Won't send message (period)");
 			continue;
