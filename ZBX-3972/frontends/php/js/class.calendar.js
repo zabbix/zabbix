@@ -460,6 +460,8 @@ setday: function(e,day,month,year){
 	this.clndr_selectedday.addClassName('selected');
 
 	this.day = day;
+	this.month = month;
+	this.year = year;
 	this.syncSDT();
 	this.syncBSDateBySDT();
 	this.syncCDT();
