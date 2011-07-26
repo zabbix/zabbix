@@ -2231,14 +2231,22 @@ function utf8RawUrlDecode($source){
 
 			$style = 'cursor: pointer; ';
 
-			if((time()-$trhosts[$hostname]['lastchange'])<300)
-				$style .= 'background-image: url(images/gradients/blink1.gif); '.
-					'background-position: top left; '.
-					'background-repeat: repeat;';
-			else if((time()-$trhosts[$hostname]['lastchange'])<900)
-				$style .= 'background-image: url(images/gradients/blink2.gif); '.
-					'background-position: top left; '.
-					'background-repeat: repeat;';
+			// for how long triggers should blink on status change (set by user in administration->general)
+			$config = select_config();
+			$blinkPeriod = $config['blink_period'];
+
+			if($blinkPeriod > 0){
+				// for the first 1/3 of time it is one style (blinks to blink1.gif)
+				if(time() - $trhosts[$hostname]['lastchange'] < ceil($blinkPeriod / 3))
+					$style .= 'background-image: url(images/gradients/blink1.gif); '.
+						'background-position: top left; '.
+						'background-repeat: repeat;';
+				// then, it is another (blinks to blink2.gif)
+				else if(time() - $trhosts[$hostname]['lastchange'] < $blinkPeriod)
+					$style .= 'background-image: url(images/gradients/blink2.gif); '.
+						'background-position: top left; '.
+						'background-repeat: repeat;';
+			}
 
 			unset($item_menu);
 			$tr_ov_menu = array(
