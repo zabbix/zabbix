@@ -607,7 +607,6 @@ function __autoload($class_name){
 		$str = trim($str,';');
 		$periods = explode(';',$str);
 		foreach($periods as $preiod){
-//			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr)) return NULL;
 			if(!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $preiod, $arr)) return NULL;
 
 			for($i = $arr[1]; $i <= $arr[2]; $i++){

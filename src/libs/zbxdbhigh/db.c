@@ -592,13 +592,12 @@ int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int	hour;
-	int	num;
-	double	value_min, value_avg, value_max;
+	int		hour, num;
+	double		value_min, value_avg, value_max;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_trend()");
 
-	hour=clock-clock%3600;
+	hour=clock-clock%SEC_PER_HOUR;
 
 	result = DBselect("select num,value_min,value_avg,value_max from trends where itemid=" ZBX_FS_UI64 " and clock=%d",
 		itemid,
@@ -644,13 +643,12 @@ int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		hour;
-	int		num;
+	int		hour, num;
 	zbx_uint64_t	value_min, value_avg, value_max;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_trend_uint()");
 
-	hour=clock-clock%3600;
+	hour=clock-clock%SEC_PER_HOUR;
 
 	result = DBselect("select num,value_min,value_avg,value_max from trends_uint where itemid=" ZBX_FS_UI64 " and clock=%d",
 		itemid,
