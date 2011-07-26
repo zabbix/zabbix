@@ -73,7 +73,8 @@ static void	set_item_value(DC_ITEM *item, char *trap, zbx_timespec_t *ts)
 		if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			calc_timestamp(trap, &timestamp, item->logtimefmt);
 
-		dc_add_history(item->itemid, item->value_type, item->flags, &value, ts, ITEM_STATUS_ACTIVE, NULL, timestamp, NULL, 0, 0, 0, 0);
+		dc_add_history(item->itemid, item->value_type, item->flags, &value,
+				ts, ITEM_STATUS_ACTIVE, NULL, timestamp, NULL, 0, 0, 0, 0);
 	}
 	else
 		DCadd_nextcheck(item->itemid, ts->sec, value.msg);
@@ -212,8 +213,9 @@ static void	parse_traps(char *buffer)
 
 		if (NULL == (c = strchr(c, ' ')))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "invalid trap format");
-			return;
+			zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s...]", begin);
+			begin = NULL;
+			continue;
 		}
 
 		*c++ = '\0';
@@ -223,6 +225,8 @@ static void	parse_traps(char *buffer)
 	/* process the last trap */
 	if (NULL != end)
 		process_trap(ip, begin, end);
+	else
+		zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s]", buffer);
 
 	DCflush_nextchecks();
 }
@@ -248,15 +252,15 @@ static void	read_traps()
 
 	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot set position to [%d]: %s",
-				__function_name, trap_lastsize, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to [%d] for [%s]: %s",
+				trap_lastsize, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		goto exit;
 	}
 
-	if (-1 == (nbytes = read(trap_fd, buffer, sizeof(buffer))))
+	if (-1 == (nbytes = read(trap_fd, buffer, sizeof(buffer) - 1)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot read from [%s]: %s",
-				__function_name, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot read from [%s]: %s",
+				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		goto exit;
 	}
 
@@ -305,21 +309,16 @@ static void	close_trap_file()
  ******************************************************************************/
 static int	open_trap_file()
 {
-	const char	*__function_name = "open_trap_file";
 	struct stat	file_buf;
 
 	if (-1 == (trap_fd = open(CONFIG_SNMPTRAP_FILE, O_RDONLY)))
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot open [%s]: %s",
-					__function_name, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
-		}
+			zabbix_log(LOG_LEVEL_CRIT, "cannot open [%s]: %s", CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 	}
 	else if (FAIL == stat(CONFIG_SNMPTRAP_FILE, &file_buf))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot stat [%s]: %s",
-				__function_name, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot stat [%s]: %s", CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		close_trap_file();
 	}
 	else
@@ -343,7 +342,6 @@ static int	open_trap_file()
  ******************************************************************************/
 static int	get_latest_data()
 {
-	const char	*__function_name = "get_latest_data";
 	struct stat	file_buf;
 
 	if (-1 != trap_fd)	/* a trap file is already open */
@@ -354,8 +352,8 @@ static int	get_latest_data()
 
 			if (ENOENT != errno)
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot stat [%s]: %s",
-						__function_name, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+				zabbix_log(LOG_LEVEL_CRIT, "cannot stat [%s]: %s",
+						CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 			}
 			read_traps();
 			close_trap_file();
@@ -368,7 +366,9 @@ static int	get_latest_data()
 			close_trap_file();
 		}
 		else if (file_buf.st_size == trap_lastsize)
+		{
 			return FAIL;	/* no new traps */
+		}
 	}
 
 	if (-1 == trap_fd && -1 == open_trap_file())
@@ -405,7 +405,6 @@ void	main_snmptrapper_loop()
 		while (SUCCEED == get_latest_data())
 			read_traps();
 
-		zbx_setproctitle("%s [sleeping for 1 second]", get_process_type_string(process_type));
 		zbx_sleep_loop(1);
 	}
 

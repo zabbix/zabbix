@@ -2152,7 +2152,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 			if (NULL == (interface_snmpim = zbx_hashset_search(&config->interface_snmpims, &interface_snmpim_local)))
 			{
-				DCstrpool_replace(0, &interface->ip, interface->ip);
+				DCstrpool_replace(0, &interface_snmpim->ip, interface_snmpim->ip);
 
 				interface_snmpim = zbx_hashset_insert(&config->interface_snmpims,
 						&interface_snmpim_local, sizeof(ZBX_DC_INTERFACE_IM));
@@ -3738,7 +3738,9 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
 				break;
 		}
 		else if (1 != ++counter || NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
+		{
 			break;
+		}
 
 		if (0 != dc_host->proxy_hostid)
 			continue;
@@ -3858,7 +3860,7 @@ int	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **i
 		if (NULL == (dc_item = zbx_hashset_search(&config->items, &dc_interface_snmpitem->itemids.values[i])))
 			continue;
 
-		if (0 == CONFIG_REFRESH_UNSUPPORTED && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
+		if (0 == config->config->refresh_unsupported && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
 			continue;
 
 		if (items_num == items_alloc)
