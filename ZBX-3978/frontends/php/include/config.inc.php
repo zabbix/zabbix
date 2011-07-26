@@ -580,8 +580,16 @@ function __autoload($class_name){
 		$str = trim($str,';');
 		$periods = explode(';',$str);
 		foreach($periods as $preiod){
-//			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr)) return NULL;
 			if(!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $preiod, $arr)) return NULL;
+
+			// 00:00 should become 23:59, upper bound is not included
+			$end_h = intval($arr[5]);
+			$end_m = intval($arr[6]);
+			$end_m--;
+			if($end_m < 0){
+				$end_m = 59;
+				$end_h = $end_h == 0 ? 23 : $end_h - 1;
+			}
 
 			for($i = $arr[1]; $i <= $arr[2]; $i++){
 				if(!isset($out[$i])) $out[$i] = array();
@@ -589,8 +597,8 @@ function __autoload($class_name){
 					array(
 						'start_h'	=> $arr[3],
 						'start_m'	=> $arr[4],
-						'end_h'		=> $arr[5],
-						'end_m'		=> $arr[6]
+						'end_h'		=> sprintf('%02s', $end_h),
+						'end_m'		=> sprintf('%02s', $end_m),
 					));
 			}
 		}

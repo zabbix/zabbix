@@ -1518,8 +1518,7 @@ class CChart extends CGraphDraw{
 		$start = find_period_start($periods,$from);
 		$end = -1;
 		while(($start < $max_time) && ($start > 0)){
-			// end date does not include upper bound ("-1" makes 23:00:00 become 22:59:59)
-			$end = find_period_end($periods,$start,$max_time) - 1;
+			$end = find_period_end($periods,$start,$max_time);
 
 			$x1 = round((($start-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
 			$x2 = ceil((($end-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
