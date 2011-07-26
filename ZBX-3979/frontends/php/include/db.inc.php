@@ -943,7 +943,7 @@ else {
 				$search[$field] =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
-					zbx_dbstr($start.zbx_strtoupper($pattern).'%');
+					zbx_dbstr(zbx_strtoupper($pattern));
 			}
 		}
 
