@@ -323,7 +323,7 @@ int	check_time_period(const char *period, time_t now)
 			sec1 = SEC_PER_HOUR * h1 + SEC_PER_MIN * m1;
 			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2 - 1;	/* do not include upper bound */
 
-			if (day >= d1 && day <= d2 && sec >= sec1 && sec < sec2)
+			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)
 			{
 				ret = 1;
 				break;
