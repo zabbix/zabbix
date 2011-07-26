@@ -371,7 +371,7 @@ int	check_time_period(const char *period, time_t now)
 {
 	const char	*s, *delim;
 	int		d1, d2, h1, h2, m1, m2, flag;
-	int		day, sec;
+	int		day, sec, sec1, sec2;
 	struct tm	*tm;
 	int		ret = 0;
 
@@ -382,7 +382,7 @@ int	check_time_period(const char *period, time_t now)
 
 	tm = localtime(&now);
 	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
-	sec = 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
+	sec = SEC_PER_HOUR * tm->tm_hour + SEC_PER_MIN * tm->tm_min + tm->tm_sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%d,%d:%d", day, (int)tm->tm_hour, (int)tm->tm_min);
 
@@ -406,7 +406,10 @@ int	check_time_period(const char *period, time_t now)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d-%d,%d:%d-%d:%d", d1, d2, h1, m1, h2, m2);
 
-			if (day >= d1 && day <= d2 && sec >= 3600 * h1 + 60 * m1 && sec <= 3600 * h2 + 60 * m2)
+			sec1 = SEC_PER_HOUR * h1 + SEC_PER_MIN * m1;
+			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2 - 1;	/* do not include upper bound */
+
+			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)
 			{
 				ret = 1;
 				break;
@@ -507,7 +510,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 
 	tm = localtime(&now);
 	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
-	sec = 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
+	sec = SEC_PER_HOUR * tm->tm_hour + SEC_PER_MIN * tm->tm_min + tm->tm_sec;
 
 	for (s = flex_intervals; '\0' != *s;)
 	{
@@ -529,8 +532,8 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d/%d-%d,%d:%d-%d:%d", delay, d1, d2, h1, m1, h2, m2);
 
-			sec1 = 3600 * h1 + 60 * m1;
-			sec2 = 3600 * h2 + 60 * m2;
+			sec1 = SEC_PER_HOUR * h1 + SEC_PER_MIN * m1;
+			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2 - 1;	/* do not include upper bound */
 
 			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)	/* current period */
 			{
@@ -2064,11 +2067,11 @@ int	str2uint(const char *str)
 
 	switch (str[sz])
 	{
-		case 's': factor = 1;         break;
-		case 'm': factor = 60;        break;
-		case 'h': factor = 3600;      break;
-		case 'd': factor = 3600*24;   break;
-		case 'w': factor = 3600*24*7; break;
+		case 's': factor = 1;			break;
+		case 'm': factor = SEC_PER_MIN;		break;
+		case 'h': factor = SEC_PER_HOUR;	break;
+		case 'd': factor = SEC_PER_DAY;		break;
+		case 'w': factor = SEC_PER_WEEK;	break;
 	}
 
 	return atoi(str) * factor;
@@ -2162,10 +2165,10 @@ double	str2double(const char *str)
 		case 'G': factor = 1024*1024*1024;		break;
 		case 'T': factor = 1024*1024*1024*(double)1024;	break;
 		case 's': factor = 1;				break;
-		case 'm': factor = 60;				break;
-		case 'h': factor = 3600;			break;
-		case 'd': factor = 3600*24;			break;
-		case 'w': factor = 3600*24*7;			break;
+		case 'm': factor = SEC_PER_MIN;			break;
+		case 'h': factor = SEC_PER_HOUR;		break;
+		case 'd': factor = SEC_PER_DAY;			break;
+		case 'w': factor = SEC_PER_WEEK;		break;
 	}
 
 	return atof(str) * factor;
