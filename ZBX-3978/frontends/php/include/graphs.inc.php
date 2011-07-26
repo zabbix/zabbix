@@ -1354,7 +1354,7 @@
 			}
 
 			if($next_h >= 0 && $next_m >= 0){
-				$new_time = mktime($next_h, $next_m, 59, $date['mon'], $date['mday'], $date['year']);
+				$new_time = mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
 
 				if($new_time == $time) return $time;
 				if($new_time > $max_time) return $max_time;
