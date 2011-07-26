@@ -50,7 +50,7 @@ $page['file']	= 'index.php';
 
 		CUser::logout($sessionid);
 
-		jsRedirect('index.php');
+		redirect('index.php');
 		exit();
 	}
 
@@ -80,11 +80,10 @@ $page['file']	= 'index.php';
 		$login = CUser::authenticate(array('user'=>$name, 'password'=>$passwd, 'auth_type'=>$authentication_type));
 
 		if($login){
-			$url = is_null($request)?$USER_DETAILS['url']:$request;
+			$url = is_null($request) ? $USER_DETAILS['url'] : $request;
 
 			add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, $USER_DETAILS['userid'], '', null,null,null);
-
-			jsRedirect($url);
+			redirect($url);
 			exit();
 		}
 	}
