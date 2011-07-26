@@ -1685,7 +1685,7 @@
 			new CTextBox('host',$host,32,true),
 			new CButton('btn_host', S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmItem->getName().
-				"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=host&srcfld2=hostid',450,450);",
+				"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=host&srcfld2=hostid&noempty=1',450,450);",
 				'H')
 			));
 
