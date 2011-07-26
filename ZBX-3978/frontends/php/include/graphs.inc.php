@@ -1354,7 +1354,7 @@
 			}
 
 			if($next_h >= 0 && $next_m >= 0){
-				// end date does not include upper bound ("-1" makes 23:00 become 22:59)
+				// end date does not include upper bound ("-1" makes 23:00:00 become 22:59:59)
 				$new_time = mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']) - 1;
 
 				if($new_time == $time) return $time;
