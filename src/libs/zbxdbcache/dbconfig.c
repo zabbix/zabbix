@@ -2072,6 +2072,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 	while (NULL != (interface_snmpim = zbx_hashset_iter_next(&iter)))
 	{
+		zbx_strpool_release(interface_snmpim->ip);
 		zbx_vector_uint64_destroy(&interface_snmpim->interfaceids);
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -2152,7 +2153,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 			if (NULL == (interface_snmpim = zbx_hashset_search(&config->interface_snmpims, &interface_snmpim_local)))
 			{
-				DCstrpool_replace(0, &interface_snmpim->ip, interface_snmpim->ip);
+				interface_snmpim_local.ip = zbx_strpool_acquire(interface->ip);
 
 				interface_snmpim = zbx_hashset_insert(&config->interface_snmpims,
 						&interface_snmpim_local, sizeof(ZBX_DC_INTERFACE_IM));
@@ -2165,6 +2166,11 @@ static void	DCsync_interfaces(DB_RESULT result)
 			zbx_vector_uint64_append(&interface_snmpim->interfaceids, interfaceid);
 		}
 	}
+
+	zbx_hashset_iter_reset(&config->interface_snmpims, &iter);
+
+	while (NULL != (interface_snmpim = zbx_hashset_iter_next(&iter)))
+		zbx_vector_uint64_sort(&interface_snmpim->interfaceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	/* remove deleted interfaces from buffer and resolve macros for ip and dns fields */
 
