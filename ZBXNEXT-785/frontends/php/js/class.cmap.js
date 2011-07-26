@@ -756,8 +756,7 @@ ZABBIX.apps.map = (function(){
 					x: 0,
 					y: 0,
 					urls: {},
-					elementName: this.sysmap.iconList[0].name, // image name
-					image: this.sysmap.iconList[0].imageid
+					elementName: this.sysmap.iconList[0].name // image name
 				};
 
 				// generate unique selementid
@@ -1054,9 +1053,9 @@ ZABBIX.apps.map = (function(){
 					{
 						action: 'show',
 						value: '#mapSelectRow',
-						cond: {
+						cond: [{
 							elementType: '1'
-						}
+						}]
 					},
 					{
 						action: 'show',
@@ -1080,6 +1079,13 @@ ZABBIX.apps.map = (function(){
 						value: '#iconProblemRow, #iconMainetnanceRow, #iconDisabledRow',
 						cond: [{
 							elementType: '4'
+						}]
+					},
+					{
+						action: 'disable',
+						value: '#iconid_off, #iconid_on, #iconid_maintenance, #iconid_disabled',
+						cond: [{
+							use_iconmap: 'checked'
 						}]
 					},
 					{
@@ -1117,6 +1123,16 @@ ZABBIX.apps.map = (function(){
 			// apply jQuery UI elements
 			jQuery('#elementApply, #elementRemove, #elementClose').button();
 
+
+			if(this.sysmap.data.iconmapid === '0'){
+				jQuery('#use_iconmapLabel')
+					.mouseenter(function(){
+						hintBox.showOver(null, this, locale['S_ICONMAP_IS_NOT_ENABLED']);
+					})
+					.mouseleave(function(){
+						hintBox.hideOut(null, this);
+					});
+			}
 
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
@@ -1167,6 +1183,20 @@ ZABBIX.apps.map = (function(){
 				this.addUrls(selement.urls);
 
 				this.actionProcessor.process();
+
+				// shold be after actionProcessor proscessing
+				if(this.sysmap.data.iconmapid === '0'){
+					jQuery('#use_iconmap')
+						.prop('disabled', true)
+						.prop('checked', false);
+					jQuery('#use_iconmapLabel')
+						.mouseover(function(){
+							hintBox.showOver(null, this, locale['S_ICONMAP_IS_NOT_ENABLED']);
+						})
+						.mouseout(function(){
+							hintBox.hideOut(null, this);
+						});
+				}
 
 				this.updateList(selement.selementid);
 			},

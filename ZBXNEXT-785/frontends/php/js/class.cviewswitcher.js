@@ -324,6 +324,14 @@ ActionProcessor.prototype = {
 						this.actionDisable(action.value);
 					}
 					break;
+				case 'disable':
+					if(this.checkConditions(action.cond)){
+						this.actionDisable(action.value);
+					}
+					else{
+						this.actionEnable(action.value);
+					}
+					break;
 			}
 		}
 	},

@@ -635,7 +635,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 		if($result){
 			foreach($result as $key => $val){
 				if(is_null($val)){
-					$result[$key] = 0;
+					$result[$key] = '0';
 				}
 			}
 		}

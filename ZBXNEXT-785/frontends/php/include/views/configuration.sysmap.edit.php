@@ -66,7 +66,7 @@
 	$sysmapList->addRow(_('Background image'), $cmbImg);
 
 // <IconMapping>
-$iconMappingComboBox = new CComboBox('backgroundid', $data['backgroundid']);
+$iconMappingComboBox = new CComboBox('iconmapid', $data['iconmapid']);
 $iconMappingComboBox->addItem(0, _('<manual>'));
 $iconMaps = API::IconMap()->get(array(
 	'output' => array('iconmapid', 'name'),

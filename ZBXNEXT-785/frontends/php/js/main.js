@@ -637,8 +637,6 @@ var jqBlink = {
 var hintBox = {
 boxes:				{},				// array of dom Hint Boxes
 boxesCount: 		0,				// unique box id
-
-
 debug_status: 		0,				// debug status: 0 - off, 1 - on, 2 - SDI;
 debug_info: 		'',				// debug string
 debug_prev:			'',				// don't log repeated fnc

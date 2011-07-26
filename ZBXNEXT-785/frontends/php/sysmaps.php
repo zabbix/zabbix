@@ -52,6 +52,7 @@ include_once('include/page_header.php');
 		'width'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		'height'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,				'isset({save})'),
+		'iconmapid'=>		array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,				'isset({save})'),
 		'expandproblem'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'markelements'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'show_unack'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,2),		null),
@@ -165,6 +166,7 @@ include_once('include/page_header.php');
 			'width' => $_REQUEST['width'],
 			'height' => $_REQUEST['height'],
 			'backgroundid' => $_REQUEST['backgroundid'],
+			'iconmapid' => $_REQUEST['iconmapid'],
 			'highlight' => get_request('highlight', 0),
 			'markelements' => get_request('markelements', 0),
 			'expandproblem' => get_request('expandproblem', 0),
@@ -275,6 +277,7 @@ include_once('include/page_header.php');
 				$sysmap['width'] = get_request('width', 800);
 				$sysmap['height'] = get_request('height', 600);
 				$sysmap['backgroundid'] = get_request('backgroundid', 0);
+				$sysmap['iconmapid'] = get_request('iconmapid', 0);
 				$sysmap['label_format'] = get_request('label_format', 0);
 				$sysmap['label_type_host'] = get_request('label_type_host', 2);
 				$sysmap['label_type_hostgroup'] = get_request('label_type_hostgroup', 2);

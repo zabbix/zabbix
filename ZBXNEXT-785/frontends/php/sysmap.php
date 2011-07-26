@@ -249,7 +249,6 @@ while($row = DBfetch($result)){
 	$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);
 }
 
-
 zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.zbx_jsvalue(array('sysmap' => $sysmap, 'iconList' => $iconList), true).');');
 
 
