@@ -177,6 +177,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc2
 
+ - [ZBX-3961] added recalculation of nextcheck time after changed flexible intervals (rudolfs)
  - [ZBX-3978] fixed time period calculation, do not include upper bound (dimir,Sasha,KB)
 
 --------------------------------------------------------------------------------
