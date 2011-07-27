@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-27 19:36+0300\n"
-"PO-Revision-Date: 2011-06-14 09:52+0200\n"
+"POT-Creation-Date: 2011-07-28 00:52+0300\n"
+"PO-Revision-Date: 2011-07-11 18:10+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -24,19 +24,19 @@ msgstr " на "
 
 #: include/profiles.inc.php:257
 msgid "\"Display OK triggers\" needs to be a positive integer."
-msgstr ""
+msgstr "\"Показывать триггеры ОК\" должно быть целым положительным числом."
 
 #: include/profiles.inc.php:262
 msgid "\"Triggers blink on status change\" needs to be a positive integer."
-msgstr ""
+msgstr "\"Мигание триггеров при изменении состояния\" должно быть целым положительным числом."
 
 #: include/func.inc.php:391
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d день, "
+msgstr[1] "%1$d дня, "
+msgstr[2] "%1$d дней, "
 
 #: chart4.php:87 chart5.php:90
 #, php-format
@@ -47,9 +47,9 @@ msgstr "%1$s (год %2$s)"
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "показано %2$d из %1$d проблемы"
+msgstr[1] "показано %2$d из %1$d проблем"
+msgstr[2] "показано %2$d из %1$d проблем"
 
 #: discovery.php:241
 #, php-format
@@ -214,11 +214,11 @@ msgstr "Подтверждено"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:55
 msgid "Acknowledged problem events"
-msgstr ""
+msgstr "Подтвержденные события о проблемах"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:89
 msgid "Acknowledged recovery events"
-msgstr ""
+msgstr "Подтвержденные события о восстановлении"
 
 #: include/locales/en_gb.inc.php:241
 msgid "Acknowledges"
@@ -660,7 +660,7 @@ msgstr "Черный & Синий"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:34
 msgid "Blinking"
-msgstr ""
+msgstr "Мигание"
 
 #: include/locales/en_gb.inc.php:1571
 msgid "Blocked"
@@ -1595,7 +1595,7 @@ msgstr "Цвет (ОК)"
 
 #: include/profiles.inc.php:250
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
+msgstr "Цвет не корректный: ожидается шестнадцатеричный код цвета (6 символов)."
 
 #: include/locales/en_gb.inc.php:1300
 msgid "Column span"
@@ -2667,7 +2667,7 @@ msgstr "Состояние обнаружения"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:112
 msgid "Display OK triggers"
-msgstr ""
+msgstr "Отображать триггеры ОК"
 
 #: include/locales/en_gb.inc.php:1662
 msgid "Displaying"
@@ -3719,7 +3719,7 @@ msgstr "У узла сети \"%s\" выбран параметр использ
 
 #: include/screens.inc.php:723
 msgid "Host (ascending)"
-msgstr ""
+msgstr "Узел сети (в порядке возрастания)"
 
 #: include/views/configuration.sysmap.edit.php:86
 msgid "Host Group label type"
@@ -5069,7 +5069,7 @@ msgstr "Последнее изменение"
 
 #: include/screens.inc.php:721
 msgid "Last change (descending)"
-msgstr ""
+msgstr "Последнее изменение (в порядке убывания)"
 
 #: include/locales/en_gb.inc.php:969
 msgid "Last check"
@@ -7211,7 +7211,7 @@ msgstr "Сбросить"
 
 #: include/views/js/administration.general.triggerDisplayingOptions.js.php:12
 msgid "Reset all fields to default values?"
-msgstr ""
+msgstr "Сбросить все поля в значения по умолчанию?"
 
 #: include/views/js/administration.general.triggerSeverity.js.php:12
 msgid "Reset all names and colours to default values?"
@@ -7897,7 +7897,7 @@ msgstr "Важность"
 
 #: include/screens.inc.php:722
 msgid "Severity (descending)"
-msgstr ""
+msgstr "Важность (в порядке убывания)"
 
 #: include/profiles.inc.php:276
 msgid "Severity name cannot be empty."
@@ -8138,7 +8138,7 @@ msgstr "Порядок сортировки (0->999)"
 
 #: include/screens.inc.php:715
 msgid "Sort triggers by"
-msgstr ""
+msgstr "Сортировать триггеры по"
 
 #: include/locales/en_gb.inc.php:578
 msgid "Source"
@@ -8443,7 +8443,7 @@ msgstr "Шаблон с таким же видимым именем \"%s\" уж�
 
 #: include/locales/en_gb.inc.php:908
 msgid "Templated item"
-msgstr "Шаблонный элемент"
+msgstr "Элемент из шаблона"
 
 #: include/locales/en_gb.inc.php:805
 msgid "Templated items"
@@ -8722,7 +8722,7 @@ msgstr "Зависимости триггера"
 #: config.php:676
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:121
 msgid "Trigger displaying options"
-msgstr ""
+msgstr "Опции отображения триггера"
 
 #: include/locales/en_gb.inc.php:1465
 msgid "Trigger form"
@@ -8802,7 +8802,7 @@ msgstr "Триггеры (а/д)[п/н/о]"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:118
 msgid "Triggers blink on status change"
-msgstr ""
+msgstr "Мигание триггеров при изменении состояния"
 
 #: include/locales/en_gb.inc.php:1417
 msgid "Triggers deleted"
@@ -8968,11 +8968,11 @@ msgstr "Только неподтвержденные"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:38
 msgid "Unacknowledged problem events"
-msgstr ""
+msgstr "Неподтвержденные события о проблемах"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:72
 msgid "Unacknowledged recovery events"
-msgstr ""
+msgstr "Неподтвержденные события о восстановлении"
 
 #: include/locales/en_gb.inc.php:1572
 msgid "Unblock selected"

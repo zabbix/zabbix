@@ -1,4 +1,12 @@
 --------------------------------------------------------------------------------
+Changes for 1.9.6
+
+New features:
+ - [ZBX-1357] updated German, Latvian, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 1.9.5
 
 New features:

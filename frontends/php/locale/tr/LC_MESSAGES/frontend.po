@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-27 19:36+0300\n"
+"POT-Creation-Date: 2011-07-28 00:52+0300\n"
 "PO-Revision-Date: 2011-06-07 11:42+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -10357,18 +10357,3 @@ msgstr "µ"
 
 #~ msgid "Circular link can not be created for map element \"%s\""
 #~ msgstr "\"%s\" harita elemanı için çevrimsel bağlantı oluşturulamadı"
-
-#~ msgid "DISCOVERY CHECKS"
-#~ msgstr "KEŞİF KONTROLLERİ"
-
-#~ msgid "PLAIN TEXT"
-#~ msgstr "DÜZ METİN"
-
-#~ msgid "SIMPLE GRAPH"
-#~ msgstr "BASİT GRAFİK"
-
-#~ msgid "STANDARD ITEMS"
-#~ msgstr "STANDART ÖĞELER"
-
-#~ msgid "Severity colour is not correct: expecting hexadecimal colour code (6 symbols)."
-#~ msgstr "Önem derecesi rengi doğru değil: onaltılık renk kodu bekleniyor (6 sembol)"
