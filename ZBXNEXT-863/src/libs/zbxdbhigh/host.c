@@ -1590,9 +1590,9 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 */
 
-/* delete from inventories */
+/* delete from profiles */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from inventories"
+			"delete from profiles"
 			" where idx='web.favorite.graphids'"
 				" and source='itemid'"
 				" and");
