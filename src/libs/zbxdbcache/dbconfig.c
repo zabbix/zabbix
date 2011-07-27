@@ -299,10 +299,10 @@ ZBX_DC_INTERFACE_HT;
 
 typedef struct
 {
-	const char		*ip;
+	const char		*addr;
 	zbx_vector_uint64_t	interfaceids;
 }
-ZBX_DC_INTERFACE_IM;
+ZBX_DC_INTERFACE_ADDR;
 
 typedef struct
 {
@@ -351,7 +351,7 @@ typedef struct
 	zbx_hashset_t		hmacros_hm;		/* hostid, macro */
 	zbx_hashset_t		interfaces;
 	zbx_hashset_t		interfaces_ht;		/* hostid, type */
-	zbx_hashset_t		interface_snmpims;	/* ip, interfaceids for snmp interfaces */
+	zbx_hashset_t		interface_snmpaddrs;	/* addr, interfaceids for SNMP interfaces */
 	zbx_hashset_t		interface_snmpitems;	/* interfaceid, itemids for SNMP trap items */
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
@@ -2056,7 +2056,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 	ZBX_DC_INTERFACE	*interface;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
-	ZBX_DC_INTERFACE_IM	*interface_snmpim, interface_snmpim_local;
+	ZBX_DC_INTERFACE_ADDR	*interface_snmpaddr, interface_snmpaddr_local;
 
 	int			found, update_index;
 	zbx_uint64_t		interfaceid, hostid;
@@ -2066,14 +2066,14 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* clear interface_snmpims list */
+	/* clear interface_snmpaddrs list */
 
-	zbx_hashset_iter_reset(&config->interface_snmpims, &iter);
+	zbx_hashset_iter_reset(&config->interface_snmpaddrs, &iter);
 
-	while (NULL != (interface_snmpim = zbx_hashset_iter_next(&iter)))
+	while (NULL != (interface_snmpaddr = zbx_hashset_iter_next(&iter)))
 	{
-		zbx_strpool_release(interface_snmpim->ip);
-		zbx_vector_uint64_destroy(&interface_snmpim->interfaceids);
+		zbx_strpool_release(interface_snmpaddr->addr);
+		zbx_vector_uint64_destroy(&interface_snmpaddr->interfaceids);
 		zbx_hashset_iter_remove(&iter);
 	}
 
@@ -2145,32 +2145,27 @@ static void	DCsync_interfaces(DB_RESULT result)
 			zbx_hashset_insert(&config->interfaces_ht, &interface_ht_local, sizeof(ZBX_DC_INTERFACE_HT));
 		}
 
-		/* update interface_snmpims */
+		/* update interface_snmpaddrs */
 
 		if (INTERFACE_TYPE_SNMP == interface->type)	/* used only for SNMP traps */
 		{
-			interface_snmpim_local.ip = interface->ip;
+			interface_snmpaddr_local.addr = (1 == interface->useip ? interface->ip : interface->dns);
 
-			if (NULL == (interface_snmpim = zbx_hashset_search(&config->interface_snmpims, &interface_snmpim_local)))
+			if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &interface_snmpaddr_local)))
 			{
-				interface_snmpim_local.ip = zbx_strpool_acquire(interface->ip);
+				interface_snmpaddr->addr = zbx_strpool_acquire(interface_snmpaddr_local.addr);
 
-				interface_snmpim = zbx_hashset_insert(&config->interface_snmpims,
-						&interface_snmpim_local, sizeof(ZBX_DC_INTERFACE_IM));
-				zbx_vector_uint64_create_ext(&interface_snmpim->interfaceids,
+				interface_snmpaddr = zbx_hashset_insert(&config->interface_snmpaddrs,
+						&interface_snmpaddr_local, sizeof(ZBX_DC_INTERFACE_ADDR));
+				zbx_vector_uint64_create_ext(&interface_snmpaddr->interfaceids,
 						__config_mem_malloc_func,
 						__config_mem_realloc_func,
 						__config_mem_free_func);
 			}
 
-			zbx_vector_uint64_append(&interface_snmpim->interfaceids, interfaceid);
+			zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
 		}
 	}
-
-	zbx_hashset_iter_reset(&config->interface_snmpims, &iter);
-
-	while (NULL != (interface_snmpim = zbx_hashset_iter_next(&iter)))
-		zbx_vector_uint64_sort(&interface_snmpim->interfaceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	/* remove deleted interfaces from buffer and resolve macros for ip and dns fields */
 
@@ -2415,7 +2410,7 @@ void	DCsync_configuration()
 	DCsync_htmpls(htmpl_result);
 	DCsync_gmacros(gmacro_result);
 	DCsync_hmacros(hmacro_result);
-	DCsync_interfaces(if_result);	/* resolves macros for interface_snmpims, must be after DCsync_hmacros() */
+	DCsync_interfaces(if_result);	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
 	ssec = zbx_time() - sec;
 
 	strpool = zbx_strpool_info();
@@ -2491,8 +2486,8 @@ void	DCsync_configuration()
 			config->interfaces_ht.num_data, config->interfaces_ht.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpitms: %d (%d slots)", __function_name,
 			config->interface_snmpitems.num_data, config->interface_snmpitems.num_slots);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpims : %d (%d slots)", __function_name,
-			config->interface_snmpims.num_data, config->interface_snmpims.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() if_snmpaddr: %d (%d slots)", __function_name,
+			config->interface_snmpaddrs.num_data, config->interface_snmpaddrs.num_slots);
 
 	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 	{
@@ -2674,19 +2669,19 @@ static int	__config_interface_ht_compare(const void *d1, const void *d2)
 	return 0;
 }
 
-static zbx_hash_t	__config_interface_im_hash(const void *data)
+static zbx_hash_t	__config_interface_addr_hash(const void *data)
 {
-	const ZBX_DC_INTERFACE_IM	*interface_im = (const ZBX_DC_INTERFACE_IM *)data;
+	const ZBX_DC_INTERFACE_ADDR	*interface_addr = (const ZBX_DC_INTERFACE_ADDR *)data;
 
-	return ZBX_DEFAULT_STRING_HASH_ALGO(interface_im->ip, strlen(interface_im->ip), ZBX_DEFAULT_HASH_SEED);
+	return ZBX_DEFAULT_STRING_HASH_ALGO(interface_addr->addr, strlen(interface_addr->addr), ZBX_DEFAULT_HASH_SEED);
 }
 
-static int	__config_interface_im_compare(const void *d1, const void *d2)
+static int	__config_interface_addr_compare(const void *d1, const void *d2)
 {
-	const ZBX_DC_INTERFACE_IM	*interface_im_1 = (const ZBX_DC_INTERFACE_IM *)d1;
-	const ZBX_DC_INTERFACE_IM	*interface_im_2 = (const ZBX_DC_INTERFACE_IM *)d2;
+	const ZBX_DC_INTERFACE_ADDR	*interface_addr_1 = (const ZBX_DC_INTERFACE_ADDR *)d1;
+	const ZBX_DC_INTERFACE_ADDR	*interface_addr_2 = (const ZBX_DC_INTERFACE_ADDR *)d2;
 
-	return (interface_im_1->ip == interface_im_2->ip ? 0 : strcmp(interface_im_1->ip, interface_im_2->ip));
+	return (interface_addr_1->addr == interface_addr_2->addr ? 0 : strcmp(interface_addr_1->addr, interface_addr_2->addr));
 }
 
 static int	__config_nextcheck_compare(const void *d1, const void *d2)
@@ -2837,7 +2832,7 @@ void	init_configuration_cache()
 	CREATE_HASHSET_EXT(config->gmacros_m, __config_gmacro_m_hash, __config_gmacro_m_compare);
 	CREATE_HASHSET_EXT(config->hmacros_hm, __config_hmacro_hm_hash, __config_hmacro_hm_compare);
 	CREATE_HASHSET_EXT(config->interfaces_ht, __config_interface_ht_hash, __config_interface_ht_compare);
-	CREATE_HASHSET_EXT(config->interface_snmpims, __config_interface_im_hash, __config_interface_im_compare);
+	CREATE_HASHSET_EXT(config->interface_snmpaddrs, __config_interface_addr_hash, __config_interface_addr_compare);
 
 	zbx_vector_ptr_create_ext(&config->time_triggers,
 			__config_mem_malloc_func,
@@ -3784,35 +3779,35 @@ int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_snmp_interfaceids_by_ip                             *
+ * Function: DCconfig_get_snmp_interfaceids_by_addr                           *
  *                                                                            *
- * Purpose: get array of interface ids for the specified IP                   *
+ * Purpose: get array of interface ids for the specified address              *
  *                                                                            *
  * Return value: number of interface ids returned                             *
  *                                                                            *
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_snmp_interfaceids_by_ip(const char *ip, zbx_uint64_t **interfaceids)
+int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids)
 {
-	const char		*__function_name = "DCconfig_get_snmp_interfaceids";
+	const char		*__function_name = "DCconfig_get_snmp_interfaceids_by_addr";
 
 	int			count = 0, i;
-	ZBX_DC_INTERFACE_IM	*dc_interface_snmpim, dc_interface_snmpim_local;
+	ZBX_DC_INTERFACE_ADDR	*dc_interface_snmpaddr, dc_interface_snmpaddr_local;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __function_name, addr);
 
-	dc_interface_snmpim_local.ip = ip;
+	dc_interface_snmpaddr_local.addr = addr;
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_interface_snmpim = zbx_hashset_search(&config->interface_snmpims, &dc_interface_snmpim_local)))
+	if (NULL == (dc_interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &dc_interface_snmpaddr_local)))
 		goto unlock;
 
-	*interfaceids = zbx_malloc(*interfaceids, dc_interface_snmpim->interfaceids.values_num * sizeof(zbx_uint64_t));
+	*interfaceids = zbx_malloc(*interfaceids, dc_interface_snmpaddr->interfaceids.values_num * sizeof(zbx_uint64_t));
 
-	for (i = 0; i < dc_interface_snmpim->interfaceids.values_num; i++)
-		(*interfaceids)[i] = dc_interface_snmpim->interfaceids.values[i];
+	for (i = 0; i < dc_interface_snmpaddr->interfaceids.values_num; i++)
+		(*interfaceids)[i] = dc_interface_snmpaddr->interfaceids.values[i];
 
 	count = i;
 unlock:

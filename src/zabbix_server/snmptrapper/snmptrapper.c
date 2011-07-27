@@ -140,14 +140,14 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
  *                                                                            *
  * Purpose: process a single trap                                             *
  *                                                                            *
- * Parameters: ip - [IN] ip address of the target interface(s)                *
+ * Parameters: addr - [IN] address of the target interface(s)                 *
  *             begin - [IN] beginning of the trap message                     *
  *             end - [IN] end of the trap message                             *
  *                                                                            *
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	process_trap(char *ip, char *begin, char *end)
+static void	process_trap(char *addr, char *begin, char *end)
 {
 	zbx_timespec_t	ts;
 	zbx_uint64_t	*interfaceids = NULL;
@@ -157,7 +157,7 @@ static void	process_trap(char *ip, char *begin, char *end)
 	zbx_timespec(&ts);
 	trap = zbx_dsprintf(trap, "%s%s", begin, end);
 
-	count = DCconfig_get_snmp_interfaceids_by_ip(ip, &interfaceids);
+	count = DCconfig_get_snmp_interfaceids_by_addr(addr, &interfaceids);
 
 	for (i = 0; i < count; i++)
 	{
@@ -166,7 +166,7 @@ static void	process_trap(char *ip, char *begin, char *end)
 	}
 
 	if (FAIL == ret && 1 == *(int *)DCconfig_get_config_data(&i, CONFIG_SNMPTRAP_LOGGING))
-		zabbix_log(LOG_LEVEL_WARNING, "unmatched trap received from [%s]: %s", ip, trap);
+		zabbix_log(LOG_LEVEL_WARNING, "unmatched trap received from [%s]: %s", addr, trap);
 
 	zbx_free(interfaceids);
 	zbx_free(trap);
@@ -183,7 +183,7 @@ static void	process_trap(char *ip, char *begin, char *end)
  ******************************************************************************/
 static void	parse_traps(char *buffer)
 {
-	char	*c, *line, *begin = NULL, *end = NULL, *ip;
+	char	*c, *line, *begin = NULL, *end = NULL, *addr;
 
 	c = line = buffer;
 
@@ -198,23 +198,24 @@ static void	parse_traps(char *buffer)
 			continue;
 
 		*c = '\0';
-		c += 8;	/* c now points to the IP address */
+		c += 8;	/* c now points to the address */
 
 		/* process the previos trap */
 		if (NULL != begin)
 		{
 			*(line - 1) = '\0';
-			process_trap(ip, begin, end);
+			process_trap(addr, begin, end);
 		}
 
 		/* parse the current trap */
 		begin = line;
-		ip = c;
+		addr = c;
 
 		if (NULL == (c = strchr(c, ' ')))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s...]", begin);
 			begin = NULL;
+			c = addr;
 			continue;
 		}
 
@@ -224,7 +225,7 @@ static void	parse_traps(char *buffer)
 
 	/* process the last trap */
 	if (NULL != end)
-		process_trap(ip, begin, end);
+		process_trap(addr, begin, end);
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s]", buffer);
 
