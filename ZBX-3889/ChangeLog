@@ -1,6 +1,6 @@
 Changes for 1.8.6rc1
 
- - [ZBX-3889] fixed deadlocks while processing of triggers (Sasha)
+ - [ZBX-3889] fixed deadlocks while processing triggers (Sasha)
  - [ZBX-3911] fixed wrong trigger expression parsing when key parameters contained "(" (KB)
  - [ZBX-3856] fixed application unlink and clear when it is linked from template (Eduard)
  - [ZBX-3840] fixed possible path disclosure (Vedmak)

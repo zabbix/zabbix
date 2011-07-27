@@ -518,23 +518,14 @@ void	DBcheck_trigger_for_update(zbx_uint64_t triggerid, unsigned char type, int 
 			update_status = value != new_value;
 			break;
 	}
+
+	/* do not update status if there are dependencies with status TRUE */
 	update_status = update_status && SUCCEED != trigger_dependent(triggerid);
 
-	/* New trigger value differs from current one AND ... */
-	/* ... Do not update status if there are dependencies with status TRUE */
 	if (0 != update_status)
-	{
-		/* New trigger status is NOT equal to previous one, update trigger */
-		if (value != new_value ||
-				(TRIGGER_TYPE_MULTIPLE_TRUE == type && TRIGGER_VALUE_TRUE == new_value))
-		{
-			*update_trigger = *add_event = 1;
-		}
-	}
+		*update_trigger = *add_event = 1;	/* update trigger */
 	else if (new_value == TRIGGER_VALUE_UNKNOWN)
-	{
-		*update_trigger = 2;
-	}
+		*update_trigger = 2;	/* update only the error field */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() update_trigger:%d add_event:%d",
 			__function_name, *update_trigger, *add_event);

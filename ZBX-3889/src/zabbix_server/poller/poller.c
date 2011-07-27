@@ -38,8 +38,8 @@
 #include "checks_ipmi.h"
 #include "checks_db.h"
 #ifdef HAVE_SSH2
-#include "checks_ssh.h"
-#endif	/* HAVE_SSH2 */
+#	include "checks_ssh.h"
+#endif
 #include "checks_telnet.h"
 #include "checks_calculated.h"
 
@@ -184,8 +184,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 	char		*sql = NULL;
 	int		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64,
-			__function_name, hostid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -233,7 +232,9 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
 				tr_last->value, tr_last->error, tr_last->new_value, reason,
 				tr_last->lastchange, tr_last->update_trigger))
+		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+		}
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
