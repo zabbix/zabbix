@@ -613,7 +613,7 @@ static void	process_maintenance()
 
 	now = time(NULL);
 	tm = localtime(&now);
-	sec = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
+	sec = tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec;
 
 	result = DBselect(
 			"select m.maintenanceid,m.maintenance_type,m.active_since,"
@@ -645,30 +645,30 @@ static void	process_maintenance()
 		case TIMEPERIOD_TYPE_DAILY:
 			db_start_date = now - sec + db_start_time;
 			if (sec < db_start_time)
-				db_start_date -= SEC_PER_DAY;
+				db_start_date -= 86400;
 
 			if (db_start_date < db_active_since)
 				continue;
 
 			tm = localtime(&db_active_since);
-			active_since = db_active_since - (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec);
+			active_since = db_active_since - (tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec);
 
-			day = (db_start_date - active_since) / SEC_PER_DAY + 1;
-			db_start_date -= SEC_PER_DAY * (day % db_every);
+			day = (db_start_date - active_since) / 86400 + 1;
+			db_start_date -= 86400 * (day % db_every);
 			break;
 		case TIMEPERIOD_TYPE_WEEKLY:
 			db_start_date = now - sec + db_start_time;
 			if (sec < db_start_time)
-				db_start_date -= SEC_PER_DAY;
+				db_start_date -= 86400;
 
 			if (db_start_date < db_active_since)
 				continue;
 
 			tm = localtime(&db_active_since);
 			wday = (tm->tm_wday == 0 ? 7 : tm->tm_wday) - 1;
-			active_since = db_active_since - (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec);
+			active_since = db_active_since - (wday * 86400 + tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec);
 
-			for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
+			for (; db_start_date >= db_active_since; db_start_date -= 86400)
 			{
 				/* check for every x week(s) */
 				week = (db_start_date - active_since) / 604800 + 1;
@@ -687,9 +687,9 @@ static void	process_maintenance()
 		case TIMEPERIOD_TYPE_MONTHLY:
 			db_start_date = now - sec + db_start_time;
 			if (sec < db_start_time)
-				db_start_date -= SEC_PER_DAY;
+				db_start_date -= 86400;
 
-			for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
+			for (; db_start_date >= db_active_since; db_start_date -= 86400)
 			{
 				/* check for month */
 				tm = localtime(&db_start_date);
@@ -783,7 +783,7 @@ void	main_timer_loop()
 		sleeptime = nextcheck - now;
 
 		/* process maintenance every minute */
-		maintenance = (0 == nextcheck % SEC_PER_MIN ? 1 : 0);
+		maintenance = (0 == nextcheck % 60 ? 1 : 0);
 
 		zbx_sleep_loop(sleeptime);
 	}
