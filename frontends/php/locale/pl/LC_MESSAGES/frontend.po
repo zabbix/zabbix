@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-27 19:36+0300\n"
-"PO-Revision-Date: 2011-05-02 18:24+0200\n"
+"POT-Creation-Date: 2011-07-28 00:52+0300\n"
+"PO-Revision-Date: 2011-07-23 16:06+0200\n"
 "Last-Translator: Lukasz <lucas.urbaniak@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -34,9 +34,9 @@ msgstr ""
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d dzień,"
+msgstr[1] "%1$d dni,"
+msgstr[2] "%1$d dni,"
 
 #: chart4.php:87 chart5.php:90
 #, php-format
@@ -47,9 +47,9 @@ msgstr "%1$s (rok %2$s)"
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%2$d z %1$d problemu jest wyświetlony."
+msgstr[1] "%2$d z %1$d problemów są wyświetlone."
+msgstr[2] "%2$d z %1$d problemów są wyświetlone."
 
 #: discovery.php:241
 #, php-format
@@ -89,7 +89,7 @@ msgstr "(Najpierw wybierz hosta)"
 
 #: include/screens.inc.php:819 popup.php:1696 popup.php:1699
 msgid "- all groups -"
-msgstr ""
+msgstr "- wszystkie grupy -"
 
 #: include/locales/en_gb.inc.php:493
 msgid "- other -"
@@ -513,7 +513,7 @@ msgstr "Kwiecień"
 
 #: include/classes/class.cbuttonqmessage.php:49
 msgid "Are you sure you want perform this action?"
-msgstr ""
+msgstr "Czy jesteś pewny że chcesz przeprowadzić tą czynność?"
 
 #: include/locales/en_gb.inc.php:1691
 msgid "Are you sure you want to delete"
@@ -591,7 +591,7 @@ msgstr "Auto-wylogowanie (0-wyłącz)"
 #: include/views/configuration.host.edit.php:534
 #: include/views/configuration.host.massupdate.php:218
 msgid "Automatic"
-msgstr ""
+msgstr "Automatycznie"
 
 #: hosts.php:770 include/locales/en_gb.inc.php:763 popup.php:446
 msgid "Availability"
@@ -660,7 +660,7 @@ msgstr "Czerń i błękit"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:34
 msgid "Blinking"
-msgstr ""
+msgstr "Miganie"
 
 #: include/locales/en_gb.inc.php:1571
 msgid "Blocked"
@@ -1320,7 +1320,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:799
 msgid "Cannot unlink template"
-msgstr ""
+msgstr "Nie mogę od linkować szablonu"
 
 #: include/locales/en_gb.inc.php:717
 msgid "Cannot update"
@@ -1764,7 +1764,7 @@ msgstr "Skopiuj"
 
 #: include/locales/en_gb.inc.php:920
 msgid "Copy selected items?"
-msgstr ""
+msgstr "Czy skopiować zaznaczona pozycje?"
 
 #: include/locales/en_gb.inc.php:85
 msgid "Copy selected to ..."
@@ -1772,12 +1772,12 @@ msgstr "Kopiuj wybrane do..."
 
 #: include/locales/en_gb.inc.php:1462
 msgid "Copy selected triggers?"
-msgstr ""
+msgstr "Czy skopiować zaznaczony wywoływacz?"
 
 #: api/classes/class.cuser.php:987
 #, php-format
 msgid "Correct login [%s]"
-msgstr ""
+msgstr "Poprawny login [%s]"
 
 #: include/locales/en_gb.inc.php:1889
 msgid "Could not save image!"
@@ -1853,7 +1853,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:935
 msgid "Create prototype"
-msgstr ""
+msgstr "Utwórz prototyp"
 
 #: include/locales/en_gb.inc.php:95
 msgid "Create rule"
@@ -1869,7 +1869,7 @@ msgstr "Stwórz skrypt"
 
 #: include/locales/en_gb.inc.php:2010
 msgid "Create trigger"
-msgstr ""
+msgstr "Utwórz wywoływacz"
 
 #: config.php:687
 msgid "Create value map"
@@ -1882,7 +1882,7 @@ msgstr "Błąd krytyczny"
 #: include/validate.inc.php:549
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr ""
+msgstr "Błąd krytyczny. Nie poprawna wartość \"%1$s\" dla pola \"%2$s\" "
 
 #: include/views/js/configuration.action.edit.js.php:85
 #: include/views/js/configuration.action.edit.js.php:180
@@ -1936,15 +1936,15 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1646
 msgid "Czech (CZ)"
-msgstr ""
+msgstr "Czeski (CZ)"
 
 #: include/locales/en_gb.inc.php:324
 msgid "D"
-msgstr ""
+msgstr "D"
 
 #: include/locales/en_gb.inc.php:1100
 msgid "DASHBOARD CONFIGURATION"
-msgstr ""
+msgstr "Konfiguracja tablicy"
 
 #: include/locales/en_gb.inc.php:127
 msgid "DETAILS OF SCENARIO"
@@ -1968,7 +1968,7 @@ msgstr ""
 
 #: include/menu.inc.php:213
 msgid "DM"
-msgstr ""
+msgstr "DM"
 
 #: include/locales/en_gb.inc.php:726 popup.php:446
 msgid "DNS"
@@ -1981,7 +1981,7 @@ msgstr "Nazwa DNS"
 
 #: include/locales/en_gb.inc.php:958
 msgid "DOWN"
-msgstr ""
+msgstr "DÓŁ"
 
 #: include/locales/en_gb.inc.php:1191
 msgid "Daily"
@@ -1993,7 +1993,7 @@ msgstr "Ciemny pomarańcz"
 
 #: include/locales/en_gb.inc.php:1238
 msgid "Darken"
-msgstr ""
+msgstr "Ciemniejszy"
 
 #: include/locales/en_gb.inc.php:1080 include/menu.inc.php:33
 msgid "Dashboard"
@@ -2001,11 +2001,11 @@ msgstr "Deska rozdzielcza"
 
 #: include/locales/en_gb.inc.php:1099
 msgid "Dashboard configuration"
-msgstr ""
+msgstr "Konfiguracja tablicy"
 
 #: include/locales/en_gb.inc.php:1105
 msgid "Dashboard filter"
-msgstr ""
+msgstr "Filtr tablicy"
 
 #: include/locales/en_gb.inc.php:312
 #: include/views/js/configuration.sysmaps.js.php:207
@@ -2020,7 +2020,7 @@ msgstr "Dane"
 #: include/classes/class.cpie.php:617
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec"
-msgstr ""
+msgstr "Dane z %1$s. Wygenerowane w %2$s sek"
 
 #: include/locales/en_gb.inc.php:1308
 msgid "Data overview"
@@ -2028,7 +2028,7 @@ msgstr "Przegląd danych"
 
 #: include/locales/en_gb.inc.php:864
 msgid "Data type"
-msgstr ""
+msgstr "Typ danych"
 
 #: include/setup.inc.php:240 include/setup.inc.php:294
 msgid "Database file"
@@ -2113,15 +2113,15 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1549
 msgid "Debug mode"
-msgstr ""
+msgstr "Tryb debug"
 
 #: include/locales/en_gb.inc.php:1531
 msgid "Debug mode updated"
-msgstr ""
+msgstr "Tryb debug zaktualizowany"
 
 #: include/locales/en_gb.inc.php:65
 msgid "Dec"
-msgstr ""
+msgstr "Gru"
 
 #: include/locales/en_gb.inc.php:78 include/locales/en_gb.inc.php:667
 msgid "December"
@@ -2180,7 +2180,7 @@ msgstr "Usuń"
 
 #: include/locales/en_gb.inc.php:1026
 msgid "Delete Links between selected elements?"
-msgstr ""
+msgstr "Czy skasować połączenia pomiędzy zaznaczonymi elementami?"
 
 #: include/locales/en_gb.inc.php:2014
 msgid "Delete Service"
@@ -10373,483 +10373,3 @@ msgstr "µ"
 
 #~ msgid "STANDARD ITEMS"
 #~ msgstr "ELEMENTY STANDARDOWE"
-
-#~ msgid " - all groups - "
-#~ msgstr "- wszystkie grupy -"
-
-#~ msgid "Circular link can not be created"
-#~ msgstr "Ogólny link nie może być utworzony"
-
-#~ msgid "Delete rule?"
-#~ msgstr "Usunąć regułę?"
-
-#~ msgid "Enable profile"
-#~ msgstr "Włącz profil"
-
-#~ msgid "New check"
-#~ msgstr "Nowe sprawdzenie"
-
-#~ msgid "Use profile"
-#~ msgstr "Użyj profilu"
-
-#~ msgid "ports"
-#~ msgstr "porty"
-
-#~ msgid "Action \"%s\" has no operations defined."
-#~ msgstr "Działanie \"%s\" nie ma zdefiniowanych operacji."
-
-#~ msgid "CONFIGURATION OF DISCOVERY"
-#~ msgstr "KONFIGURACJA WYKRYCIA"
-
-#~ msgid "Discovery rule added"
-#~ msgstr "Reguła wykrycia dodana"
-
-#~ msgid "Discovery rules deleted"
-#~ msgstr "Reguły wykrycia usunięte"
-
-#~ msgid "Discovery rules updated"
-#~ msgstr "Reguły wykrycia uaktualnione"
-
-#~ msgid "Imported"
-#~ msgstr "Zaimportowane"
-
-#~ msgid "failed"
-#~ msgstr "nieudane"
-
-#~ msgid "successfully"
-#~ msgstr "udane"
-
-#~ msgid "Auto-login"
-#~ msgstr "Auto-logowanie (1 miesiąc)"
-
-#~ msgid "Copyright 2001-2011 by"
-#~ msgstr "Prawa autorskie 2001-2011 dla"
-
-#~ msgid "Create Image"
-#~ msgstr "Utwórz Obraz"
-
-#~ msgid "Extended"
-#~ msgstr "Rozszerzony"
-
-#~ msgid "Themes"
-#~ msgstr "Motywy"
-
-#~ msgid "Trigger description"
-#~ msgstr "Opis wyzwalacza"
-
-#~ msgid "User cannot delete himself"
-#~ msgstr "Użytkownik nie może usunąć sam siebie"
-
-#~ msgid "from"
-#~ msgstr "od"
-
-#~ msgid "successful"
-#~ msgstr "udany"
-
-#~ msgid "was not"
-#~ msgstr "nie był"
-
-#~ msgid "Incorrect IP"
-#~ msgstr "Niepoprawne IP"
-
-#~ msgid "Incorrect discovery check"
-#~ msgstr "Niepoprawne sprawdzenie wykrycia"
-
-#~ msgid "Incorrect discovery status"
-#~ msgstr "Niepoprawny status wykrycia"
-
-#~ msgid "Incorrect host"
-#~ msgstr "Niepoprawna stacja"
-
-#~ msgid "Incorrect period"
-#~ msgstr "Niepoprawny okres"
-
-#~ msgid "Incorrect port"
-#~ msgstr "Niepoprawny port"
-
-#~ msgid "Incorrect trigger"
-#~ msgstr "Niepoprawny wyzwalacz"
-
-#~ msgid "Remote commands"
-#~ msgstr "Polecenia zdalne"
-
-#~ msgid "Send message to"
-#~ msgstr "Wyślij wiadomość do"
-
-#~ msgid "Show items with description like"
-#~ msgstr "Pokaż elementy z opisem w rodzaju"
-
-#~ msgid "Tools"
-#~ msgstr "Narzędzia"
-
-#~ msgid "Asset Tag"
-#~ msgstr "Etykietka Zasobu"
-
-#~ msgid "Date HW Decommissioned"
-#~ msgstr "Data Zdania Sprzętu"
-
-#~ msgid "Date HW Installed"
-#~ msgstr "Data Instalacji Sprzętu"
-
-#~ msgid "Date HW Maintenance Expires"
-#~ msgstr "Data Wygaśnięcia Serwisu Sprzętu"
-
-#~ msgid "Date HW Purchased"
-#~ msgstr "Data Zakupu Sprzętu"
-
-#~ msgid "Device Chassis"
-#~ msgstr "Obudowa Urządzenia"
-
-#~ msgid "Device Contract Number"
-#~ msgstr "Numer Kontraktowy Urządzenia"
-
-#~ msgid "Device Deployment Status"
-#~ msgstr "Status Wdrożenia Urządzenia"
-
-#~ msgid "Device Hardware"
-#~ msgstr "Urządzenie: Sprzęt"
-
-#~ msgid "Device Notes"
-#~ msgstr "Urządzenie: Notatki"
-
-#~ msgid "Device Port Connections"
-#~ msgstr "Połączenia Portów Urządzenia"
-
-#~ msgid "Device Software"
-#~ msgstr "Urządzenie: Oprogramowanie"
-
-#~ msgid "Device Vendor"
-#~ msgstr "Dostawca Urządzenia"
-
-#~ msgid "Device type"
-#~ msgstr "Typ urządzenia"
-
-#~ msgid "Extended host profile"
-#~ msgstr "Rozszerzony profil stacji"
-
-#~ msgid "HW Architecture"
-#~ msgstr "Architektura sprzętu"
-
-#~ msgid "Host MAC Address"
-#~ msgstr "Adres MAC Stacji"
-
-#~ msgid "Host Router"
-#~ msgstr "Router Stacji"
-
-#~ msgid "Host Subnet Mask"
-#~ msgstr "Maska Podsieci Stacji"
-
-#~ msgid "Installer Name"
-#~ msgstr "Nazwa Instalatora"
-
-#~ msgid "MAC Address"
-#~ msgstr "Adres MAC"
-
-#~ msgid "Model Number"
-#~ msgstr "Numer Modelu"
-
-#~ msgid "OOB IP Address"
-#~ msgstr "Adres OOB IP"
-
-#~ msgid "OOB Router"
-#~ msgstr "Router OOB"
-
-#~ msgid "OOB Subnet Mask"
-#~ msgstr "Maska podsieci OOB"
-
-#~ msgid "OS (Full Details)"
-#~ msgstr "OS (Szczegóły)"
-
-#~ msgid "Primary POC Cell"
-#~ msgstr "Kontakt Główny - Telefon komórkowy"
-
-#~ msgid "Primary POC Comments"
-#~ msgstr "Kontakt Główny - Komentarz"
-
-#~ msgid "Primary POC Email"
-#~ msgstr "Kontakt Główny - Email"
-
-#~ msgid "Primary POC Name"
-#~ msgstr "Kontakt Główny - Nazwa"
-
-#~ msgid "Primary POC Phone 1"
-#~ msgstr "Kontakt Główny - Telefon 1"
-
-#~ msgid "Primary POC Phone 2"
-#~ msgstr "Kontakt Główny - Telefon 2"
-
-#~ msgid "Primary POC Screen Name"
-#~ msgstr "Kontakt Główny - Nazwa na ekranie"
-
-#~ msgid "Secondary POC Cell"
-#~ msgstr "Kontakt Dodatkowy - Telefon komórkowy"
-
-#~ msgid "Secondary POC Comments"
-#~ msgstr "Kontakt Dodatkowy - Komentarz"
-
-#~ msgid "Secondary POC Email"
-#~ msgstr "Kontakt Dodatkowy - Email"
-
-#~ msgid "Secondary POC Name"
-#~ msgstr "Kontakt Dodatkowy - Nazwa"
-
-#~ msgid "Secondary POC Phone 1"
-#~ msgstr "Kontakt Dodatkowy - Telefon 1"
-
-#~ msgid "Secondary POC Phone 2"
-#~ msgstr "Kontakt Dodatkowy - Telefon 2"
-
-#~ msgid "Secondary POC Screen Name"
-#~ msgstr "Kontakt Dodatkowy - Nazwa na ekranie"
-
-#~ msgid "Serial Number"
-#~ msgstr "Numer Seryjny"
-
-#~ msgid "SerialNo"
-#~ msgstr "Nr seryjny"
-
-#~ msgid "Site Address 1"
-#~ msgstr "Adres Lokalizacji 1"
-
-#~ msgid "Site Address 2"
-#~ msgstr "Adres Lokalizacji 2"
-
-#~ msgid "Site Address 3"
-#~ msgstr "Adres Lokalizacji 3"
-
-#~ msgid "Site City"
-#~ msgstr "Miasto Lokalizacji"
-
-#~ msgid "Site Country"
-#~ msgstr "Państwo Lokalizacji"
-
-#~ msgid "Site Notes"
-#~ msgstr "Lokalizacja - notatki"
-
-#~ msgid "Site Rack Location"
-#~ msgstr "Lokalizacja Szafy Rackowej"
-
-#~ msgid "Site State / Province"
-#~ msgstr "Województwo Lokalizacji"
-
-#~ msgid "Site Zip / Postal"
-#~ msgstr "Kod pocztowy Lokalizacji"
-
-#~ msgid "Software Application #1"
-#~ msgstr "Aplikacja programowa #1"
-
-#~ msgid "Software Application #2"
-#~ msgstr "Aplikacja programowa #2"
-
-#~ msgid "Software Application #3"
-#~ msgstr "Aplikacja programowa #3"
-
-#~ msgid "Software Application #4"
-#~ msgstr "Aplikacja programowa #4"
-
-#~ msgid "Software Application #5"
-#~ msgstr "Aplikacja programowa #5"
-
-#~ msgid "URL #1"
-#~ msgstr "URL #1"
-
-#~ msgid "URL #2"
-#~ msgstr "URL #2"
-
-#~ msgid "URL #3"
-#~ msgstr "URL #3"
-
-#~ msgid "Use extended profile"
-#~ msgstr "Użyj profilu rozszerzonego"
-
-#~ msgid "Connected as"
-#~ msgstr "Połączony jako"
-
-#~ msgid "Zabbix SIA"
-#~ msgstr "Zabbix SIA"
-
-#~ msgid "- all -"
-#~ msgstr "- wszystkie -"
-
-#~ msgid "Action conditions"
-#~ msgstr "Warunki działania"
-
-#~ msgid "Average problem"
-#~ msgstr "Normalny problem"
-
-#~ msgid "Delete selected action?"
-#~ msgstr "Usunąć wybrane działanie?"
-
-#~ msgid "Edit operation"
-#~ msgstr "Edycja operacji"
-
-#~ msgid "Enable escalations"
-#~ msgstr "Włącz eskalacje"
-
-#~ msgid "Escalation rules"
-#~ msgstr "Reguły eskalacji"
-
-#~ msgid "Incorrect operation type"
-#~ msgstr "Niepoprawny typ operacji"
-
-#~ msgid "Incorrect steps"
-#~ msgstr "Niepoprawne kroki"
-
-#~ msgid "Incorrect user"
-#~ msgstr "Niepoprawny użytkownik"
-
-#~ msgid "Infinity"
-#~ msgstr "Nieskończoność"
-
-#~ msgid "Minor problem"
-#~ msgstr "Drobny problem "
-
-#~ msgid "Run remote commands"
-#~ msgstr "Uruchom zdalne polecenia"
-
-#~ msgid "Serious problem"
-#~ msgstr "Poważny problem"
-
-#~ msgid "Single user"
-#~ msgstr "Pojedyczy użytkownik"
-
-#~ msgid "Actions deleted"
-#~ msgstr "Działania usunięte"
-
-#~ msgid "Back"
-#~ msgstr "Powrót"
-
-#~ msgid "Cannot connect to Zabbix server"
-#~ msgstr "Nie można połączyć się z serwerem ZABBIXa"
-
-#~ msgid "Cannot delete actions"
-#~ msgstr "Nie można usunąć działań"
-
-#~ msgid "Create Host"
-#~ msgstr "Utwórz Stację"
-
-#~ msgid "Create Template"
-#~ msgstr "Utwórz Wzorzec"
-
-#~ msgid "Do not add"
-#~ msgstr "Nie dodawaj"
-
-#~ msgid "Download"
-#~ msgstr "Pobierz"
-
-#~ msgid "EXPORT"
-#~ msgstr "EKSPORT"
-
-#~ msgid "Elements"
-#~ msgstr "Elementy"
-
-#~ msgid "Escalation"
-#~ msgstr "Eskalacja"
-
-#~ msgid "Escalation rule"
-#~ msgstr "Reguła eskalacji"
-
-#~ msgid "Every"
-#~ msgstr "Każdy"
-
-#~ msgid "Export"
-#~ msgstr "Eksport"
-
-#~ msgid "Export/Import"
-#~ msgstr "Eksport/Import"
-
-#~ msgid "Favourite"
-#~ msgstr "Ulubione"
-
-#~ msgid "Fill with default value"
-#~ msgstr "Wypełnij domyślną wartością"
-
-#~ msgid "IMPORT"
-#~ msgstr "IMPORT"
-
-#~ msgid "Incorrect description"
-#~ msgstr "Niepoprawny opis"
-
-#~ msgid "Leave empty"
-#~ msgstr "Zostaw puste"
-
-#~ msgid "Link with template"
-#~ msgstr "Powiąż ze Wzorcem"
-
-#~ msgid "Locales"
-#~ msgstr "Lokalizacje"
-
-#~ msgid "No data for export"
-#~ msgstr "Brak danych do eksportu"
-
-#~ msgid "No permissions !"
-#~ msgstr "Brak uprawnień!"
-
-#~ msgid "Not acknowledged"
-#~ msgstr "Nie zatwierdzone"
-
-#~ msgid "Only host info"
-#~ msgstr "Tylko info o stacji"
-
-#~ msgid "QUEUE"
-#~ msgstr "KOLEJKA"
-
-#~ msgid "Refresh"
-#~ msgstr "Odśwież"
-
-#~ msgid "Required host"
-#~ msgstr "Wymagana stacja"
-
-#~ msgid "SNMP port"
-#~ msgstr "Port SNMP"
-
-#~ msgid "Select graph to display"
-#~ msgstr "Wybierz wykres do wyświetlenia"
-
-#~ msgid "Select graph..."
-#~ msgstr "Wybierz wykres..."
-
-#~ msgid "Select host..."
-#~ msgstr "Wybierz stację..."
-
-#~ msgid "Show only problems"
-#~ msgstr "Pokaż tylko problemy"
-
-#~ msgid "Show problem-unacknowledged"
-#~ msgstr "Pokaż problem-niezatwierdzony"
-
-#~ msgid "Skip existing items"
-#~ msgstr "Pomiń istniejące elementy"
-
-#~ msgid "Sound"
-#~ msgstr "Dźwięk"
-
-#~ msgid "User cannot disable himself"
-#~ msgstr "Użytkownik nie może wyłączyć samego siebie"
-
-#~ msgid "locale"
-#~ msgstr "lokalizacja"
-
-#~ msgid "new"
-#~ msgstr "nowy"
-
-#~ msgid "permissions"
-#~ msgstr "Uprawnienia"
-
-#~ msgid "update existing non linked items"
-#~ msgstr "Uaktualnij istniejące nie podłączone elementy"
-
-#~ msgid "Cannot_update slideshow"
-#~ msgstr "Nie można uaktualnić pokazu slajdów"
-
-#~ msgid "Use IPMI"
-#~ msgstr "Użyj IPMI"
-
-#~ msgid "IPMI IP address"
-#~ msgstr "Adres IP IPMI"
-
-#~ msgid "IPMI port"
-#~ msgstr "Port IPMI"
-
-#~ msgid "SCREENS 45645645"
-#~ msgstr "EKRANY"
