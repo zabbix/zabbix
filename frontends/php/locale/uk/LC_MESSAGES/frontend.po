@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-27 19:36+0300\n"
-"PO-Revision-Date: 2011-06-13 22:51+0200\n"
+"POT-Creation-Date: 2011-07-28 00:52+0300\n"
+"PO-Revision-Date: 2011-07-19 10:15+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -24,19 +24,19 @@ msgstr " на "
 
 #: include/profiles.inc.php:257
 msgid "\"Display OK triggers\" needs to be a positive integer."
-msgstr ""
+msgstr "\"Відображати тригери ОК\" повинно бути цілим додатним числом."
 
 #: include/profiles.inc.php:262
 msgid "\"Triggers blink on status change\" needs to be a positive integer."
-msgstr ""
+msgstr "\"Мигання тригера при зміні статусу\" повинно бути цілим додатним числом."
 
 #: include/func.inc.php:391
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$d день, "
+msgstr[1] "%1$d дні, "
+msgstr[2] "%1$d днів, "
 
 #: chart4.php:87 chart5.php:90
 #, php-format
@@ -47,9 +47,9 @@ msgstr "%1$s (рік %2$s)"
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%2$d із %1$d проблеми відображено"
+msgstr[1] "%2$d із %1$d проблем відображено"
+msgstr[2] "%2$d із %1$d проблем відображено"
 
 #: discovery.php:241
 #, php-format
@@ -81,7 +81,7 @@ msgstr "(мінімум 60 секунд, 0 - використовувати за
 
 #: include/locales/en_gb.inc.php:96
 msgid "(no proxy)"
-msgstr "(немає проксі)"
+msgstr "(без проксі)"
 
 #: include/locales/en_gb.inc.php:182
 msgid "(select host first)"
@@ -214,11 +214,11 @@ msgstr "Підтверджено"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:55
 msgid "Acknowledged problem events"
-msgstr ""
+msgstr "Підтверджені події проблем"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:89
 msgid "Acknowledged recovery events"
-msgstr ""
+msgstr "Підтверджені події відновлення"
 
 #: include/locales/en_gb.inc.php:241
 msgid "Acknowledges"
@@ -660,7 +660,7 @@ msgstr "Бірюзові сутінки"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:34
 msgid "Blinking"
-msgstr ""
+msgstr "Мигання"
 
 #: include/locales/en_gb.inc.php:1571
 msgid "Blocked"
@@ -1595,7 +1595,7 @@ msgstr "Колір (ОК)"
 
 #: include/profiles.inc.php:250
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
-msgstr ""
+msgstr "Колір є недійсним: очікується шістнадцятковий код кольору (6 символів)."
 
 #: include/locales/en_gb.inc.php:1300
 msgid "Column span"
@@ -2172,7 +2172,7 @@ msgstr "Затримка (сукунд)"
 
 #: queue.php:247
 msgid "Delayed by"
-msgstr "Відкласти"
+msgstr "Затримується на"
 
 #: include/locales/en_gb.inc.php:1376
 msgid "Delete"
@@ -2667,7 +2667,7 @@ msgstr "Стан виявлення"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:112
 msgid "Display OK triggers"
-msgstr ""
+msgstr "Відображувати тригери ОК"
 
 #: include/locales/en_gb.inc.php:1662
 msgid "Displaying"
@@ -3718,7 +3718,7 @@ msgstr "У вузла мережі \"%s\" вибрано параметр вик
 
 #: include/screens.inc.php:723
 msgid "Host (ascending)"
-msgstr ""
+msgstr "Вузел мережі (в порядку зростання)"
 
 #: include/views/configuration.sysmap.edit.php:86
 msgid "Host Group label type"
@@ -3825,7 +3825,7 @@ msgstr "Статус вузла мережі оновлено"
 
 #: include/hosts.inc.php:240
 msgid "Host subnet mask"
-msgstr "Маска мережі вузла мережі"
+msgstr "Маска підмережі вузла мережі"
 
 #: include/actions.inc.php:40
 msgid "Host template"
@@ -4369,7 +4369,7 @@ msgstr "Використано некоректну функцію"
 #: api/classes/class.cscreen.php:548
 #, php-format
 msgid "Incorrect graph ID \"%s\" provided for screen element."
-msgstr "Некоректний ID графіка \"%s\" надано для елемента карти мережі."
+msgstr "Некоректний ID графіка \"%s\" надано для елемента комплексного екрану."
 
 #: include/profiles.inc.php:229
 msgid "Incorrect group"
@@ -4382,12 +4382,12 @@ msgstr "Некоректна група."
 #: api/classes/class.cscreen.php:537
 #, php-format
 msgid "Incorrect host ID \"%s\" provided for screen element."
-msgstr "Некоректний ID вузла мережі \"%s\" надано для елемента карти мережі."
+msgstr "Некоректний ID вузла мережі \"%s\" надано для елемента комплексного екрану."
 
 #: api/classes/class.cscreen.php:526
 #, php-format
 msgid "Incorrect host group ID \"%s\" provided for screen element."
-msgstr "Некоректний ID групи вузла мережі \"%s\" надано для елемента карти мережі."
+msgstr "Некоректний ID групи вузла мережі \"%s\" надано для елемента комплексного екрану."
 
 #: include/actions.inc.php:650
 msgid "Incorrect host."
@@ -4411,7 +4411,7 @@ msgstr "Вказано некоректний порт \"%s\" для інтер�
 #: api/classes/class.cscreen.php:560
 #, php-format
 msgid "Incorrect item ID \"%s\" provided for screen element."
-msgstr "Некоректний ID елемента даних \"%s\" надано для елемента карти мережі."
+msgstr "Некоректний ID елемента даних \"%s\" надано для елемента комплексного екрану."
 
 #: api/classes/class.cgraph.php:1152
 #: api/classes/class.cgraphprototype.php:1162
@@ -4462,7 +4462,7 @@ msgstr "Некоректний тиждень періоду сервісу"
 #: api/classes/class.cscreen.php:571
 #, php-format
 msgid "Incorrect map ID \"%s\" provided for screen element."
-msgstr "Некоректний ID карти мережі \"%s\" надано для елемента карти мережі."
+msgstr "Некоректний ID карти мережі \"%s\" надано для елемента комплексного екрану."
 
 #: api/classes/class.cmap.php:587
 #, php-format
@@ -4521,7 +4521,7 @@ msgstr "Некоректний проксі."
 
 #: api/classes/class.cdrule.php:470
 msgid "Incorrect proxyid."
-msgstr "Некоректний ID проксі."
+msgstr "Некоректний proxyid."
 
 #: api/classes/class.cscreen.php:486
 msgid "Incorrect resource provided for screen item"
@@ -4727,7 +4727,7 @@ msgstr "Елемент даних"
 #: api/classes/class.citem.php:1387
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host profile field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
-msgstr "Елемент даних \"%1$s\" не може заповнити відсутнє поле під номером \"%2$d\" профілю вузла мережі. Доступні варіанти: від 0 (не заповнюється) до %3$d."
+msgstr "Елемент даних \"%1$s\" не може заповнити відсутнє поле (під номером \"%2$d\") профілю вузла мережі. Доступні варіанти: від 0 (не заповнюється) до %3$d."
 
 #: api/classes/class.cdiscoveryrule.php:872 api/classes/class.citem.php:1222
 #: api/classes/class.citemprototype.php:926
@@ -5067,7 +5067,7 @@ msgstr "Остання зміна"
 
 #: include/screens.inc.php:721
 msgid "Last change (descending)"
-msgstr ""
+msgstr "Остання зміна (в порядку спадання)"
 
 #: include/locales/en_gb.inc.php:969
 msgid "Last check"
@@ -5937,12 +5937,12 @@ msgstr "Немає визначених груп елементів даних"
 #: api/classes/class.caction.php:1512
 #, php-format
 msgid "No authentication type specified for action operation command \"%s\"."
-msgstr "Не вказано тип аутентифікації для команди в операції дії \"%s\"."
+msgstr "Не вказано тип аутентифікації для команди \"%s\" в операції дії."
 
 #: api/classes/class.caction.php:1515 api/classes/class.caction.php:1528
 #, php-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr "Не вказано імені користувача аутентифікації для команди в операції дії \"%s\"."
+msgstr "Не вказано імені користувача аутентифікації для команди \"%s\" в операції дії."
 
 #: api/classes/class.caction.php:1499
 msgid "No command specified for action operation."
@@ -6001,7 +6001,7 @@ msgstr "Немає подій для підтвердження"
 #: api/classes/class.caction.php:1507
 #, php-format
 msgid "No execution target specified for action operation command \"%s\"."
-msgstr "Не вказано ціль для виконання для команди в операції дії \"%s\"."
+msgstr "Не вказано ціль виконання для команди \"%s\" в операції дії."
 
 #: include/locales/en_gb.inc.php:904
 msgid "No flexible intervals"
@@ -6193,7 +6193,7 @@ msgstr "Немає визначених проксі"
 
 #: include/views/configuration.discovery.edit.php:46
 msgid "No proxy"
-msgstr "Немає проксі"
+msgstr "Без проксі"
 
 #: api/classes/class.caction.php:1519
 #, php-format
@@ -6222,7 +6222,7 @@ msgstr "Комплексні екрани не визначено"
 
 #: api/classes/class.caction.php:1533
 msgid "No script specified for action operation command."
-msgstr "Немає вказаного скрипта для команди в операції дії."
+msgstr "Не вказано скрипт для команди в операції дії."
 
 #: include/views/administration.script.list.php:37 popup.php:1782
 msgid "No scripts defined"
@@ -6458,7 +6458,7 @@ msgstr "УВІМК"
 
 #: include/hosts.inc.php:250
 msgid "OOB IP address"
-msgstr "OOB IP адреса (резервна)"
+msgstr "OOB IP адреса"
 
 #: include/hosts.inc.php:260
 msgid "OOB router"
@@ -6466,7 +6466,7 @@ msgstr "OOB роутер"
 
 #: include/hosts.inc.php:255
 msgid "OOB subnet mask"
-msgstr "OOB маска мережі"
+msgstr "OOB маска підмережі"
 
 #: include/locales/en_gb.inc.php:284
 #: include/views/configuration.action.edit.php:130
@@ -7208,7 +7208,7 @@ msgstr "Скинути"
 
 #: include/views/js/administration.general.triggerDisplayingOptions.js.php:12
 msgid "Reset all fields to default values?"
-msgstr ""
+msgstr "Скинути всі поля в значення по замовчуванню?"
 
 #: include/views/js/administration.general.triggerSeverity.js.php:12
 msgid "Reset all names and colours to default values?"
@@ -7341,7 +7341,7 @@ msgstr "Виконати глобальний скрипт:"
 
 #: include/actions.inc.php:245
 msgid "Run remote commands on current host"
-msgstr "Виконати віддалені команди через поточний вузел мережі"
+msgstr "Виконати віддалені команди на поточному вузлі мережі"
 
 #: include/actions.inc.php:264
 msgid "Run remote commands on host groups: "
@@ -7489,7 +7489,7 @@ msgstr "Кількість SQL selects"
 #: include/db.inc.php:1251 include/db.inc.php:1299 include/db.inc.php:1335
 #, php-format
 msgid "SQL statement execution has failed \"%s\""
-msgstr "Виконання SQL оператора отримало невдачу \"%s\""
+msgstr "Виникла помилка при виконанні SQL запиту \"%s\""
 
 #: include/locales/en_gb.inc.php:97
 #: include/views/configuration.action.edit.php:643
@@ -7894,7 +7894,7 @@ msgstr "Важливість"
 
 #: include/screens.inc.php:722
 msgid "Severity (descending)"
-msgstr ""
+msgstr "Важливість (в порядку спадання)"
 
 #: include/profiles.inc.php:276
 msgid "Severity name cannot be empty."
@@ -7939,7 +7939,7 @@ msgstr "Відображувати вузли мережі в періодах �
 
 #: latest.php:146
 msgid "Show items with name like"
-msgstr "Відображувати елементи даних з іменем, яке схоже на"
+msgstr "Відображувати елементи даних, які в імені містять"
 
 #: include/locales/en_gb.inc.php:561
 msgid "Show legend"
@@ -8135,7 +8135,7 @@ msgstr "Порядок сортування (0->999)"
 
 #: include/screens.inc.php:715
 msgid "Sort triggers by"
-msgstr ""
+msgstr "Сортувати тригери за"
 
 #: include/locales/en_gb.inc.php:578
 msgid "Source"
@@ -8719,7 +8719,7 @@ msgstr "Залежності тригера"
 #: config.php:676
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:121
 msgid "Trigger displaying options"
-msgstr ""
+msgstr "Параметри відображення тригера"
 
 #: include/locales/en_gb.inc.php:1465
 msgid "Trigger form"
@@ -8799,7 +8799,7 @@ msgstr "Тригери (а/д)[п/н/о]"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:118
 msgid "Triggers blink on status change"
-msgstr ""
+msgstr "Мигання тригера при зміні статусу"
 
 #: include/locales/en_gb.inc.php:1417
 msgid "Triggers deleted"
@@ -8882,7 +8882,7 @@ msgstr "Тип інформації"
 
 #: api/classes/class.citemgeneral.php:222
 msgid "Type of information must be Log for log key."
-msgstr "Тип інформації має бути Лог (багато полів) для ключів логів."
+msgstr "Тип інформації має бути Лог (багато полів) для ключа логів."
 
 #: include/locales/en_gb.inc.php:809
 msgid "Types"
@@ -8965,11 +8965,11 @@ msgstr "Тільки непідтверджені"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:38
 msgid "Unacknowledged problem events"
-msgstr ""
+msgstr "Непідтверджені події проблем"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:72
 msgid "Unacknowledged recovery events"
-msgstr ""
+msgstr "Непідтверджені події відновлення"
 
 #: include/locales/en_gb.inc.php:1572
 msgid "Unblock selected"
@@ -9318,7 +9318,7 @@ msgstr "Змінні"
 
 #: include/hosts.inc.php:200
 msgid "Vendor"
-msgstr "Виробник"
+msgstr "Постачальник"
 
 #: include/locales/en_gb.inc.php:1318
 msgid "Vertical"
@@ -9659,7 +9659,7 @@ msgstr "У вас немає повноважень або метод повід
 
 #: api/classes/class.cusermedia.php:397
 msgid "You do not have permissions to create user medias."
-msgstr "У вас немає повноважень для створення методу повідомлень користувача."
+msgstr "У вас немає повноважень для створення методів повідомлень користувача."
 
 #: api/classes/class.cuser.php:378
 msgid "You do not have permissions to create users."

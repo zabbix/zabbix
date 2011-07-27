@@ -3,14 +3,15 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-07-27 19:36+0300\n"
-"PO-Revision-Date: 2011-06-02 17:02+0200\n"
+"PO-Revision-Date: 2011-07-27 23:39+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -10168,7 +10169,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:262
 msgid "min value"
-msgstr ""
+msgstr "min vērtība"
 
 #: include/func.inc.php:399 include/func.inc.php:450
 #: include/locales/en_gb.inc.php:36
