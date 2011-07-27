@@ -2041,26 +2041,26 @@ char	*DBsql_id_ins(zbx_uint64_t id)
 	return buf[n];
 }
 
-#define ZBX_MAX_PROFILE_FIELDS	70
+#define ZBX_MAX_INVENTORY_FIELDS	70
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_profile_field                                              *
+ * Function: DBget_inventory_field                                            *
  *                                                                            *
- * Purpose: get corresponding host_profile field name                         *
+ * Purpose: get corresponding host_inventory field name                       *
  *                                                                            *
- * Parameters: profile_link - [IN] field number; 1..ZBX_MAX_PROFILE_FIELDS    *
+ * Parameters: inventory_link - [IN] field number; 1..ZBX_MAX_INVENTORY_FIELDS*
  *                                                                            *
- * Return value: field name or NULL if value of profile_link is incorrect     *
+ * Return value: field name or NULL if value of inventory_link is incorrect   *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-const char	*DBget_profile_field(unsigned char profile_link)
+const char	*DBget_inventory_field(unsigned char inventory_link)
 {
-	static const char	*profile_fields[ZBX_MAX_PROFILE_FIELDS] =
+	static const char	*inventory_fields[ZBX_MAX_INVENTORY_FIELDS] =
 	{
 		"type", "type_full", "name", "alias", "os", "os_full", "os_short", "serialno_a", "serialno_b", "tag",
 		"asset_tag", "macaddress_a", "macaddress_b", "hardware", "hardware_full", "software", "software_full",
@@ -2075,19 +2075,19 @@ const char	*DBget_profile_field(unsigned char profile_link)
 		"poc_2_screen", "poc_2_notes"
 	};
 
-	if (1 > profile_link || profile_link > ZBX_MAX_PROFILE_FIELDS)
+	if (1 > inventory_link || inventory_link > ZBX_MAX_INVENTORY_FIELDS)
 		return NULL;
 
-	return profile_fields[profile_link - 1];
+	return inventory_fields[inventory_link - 1];
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_profile_field_len                                          *
+ * Function: DBget_inventory_field_len                                        *
  *                                                                            *
- * Purpose: get host_profile field length by profile_link                     *
+ * Purpose: get host_inventory field length by inventory_link                 *
  *                                                                            *
- * Parameters: profile_link - [IN] field number; 1..ZBX_MAX_PROFILE_FIELDS    *
+ * Parameters: inventory_link - [IN] field number; 1..ZBX_MAX_INVENTORY_FIELDS*
  *                                                                            *
  * Return value: field length                                                 *
  *                                                                            *
@@ -2096,34 +2096,34 @@ const char	*DBget_profile_field(unsigned char profile_link)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-unsigned short	DBget_profile_field_len(unsigned char profile_link)
+unsigned short	DBget_inventory_field_len(unsigned char inventory_link)
 {
-	static unsigned short	*profile_field_len = NULL;
-	const char		*profile_field;
+	static unsigned short	*inventory_field_len = NULL;
+	const char		*inventory_field;
 	const ZBX_TABLE		*table;
 	const ZBX_FIELD		*field;
 
-	if (1 > profile_link || profile_link > ZBX_MAX_PROFILE_FIELDS)
+	if (1 > inventory_link || inventory_link > ZBX_MAX_INVENTORY_FIELDS)
 		assert(0);
 
-	profile_link--;
+	inventory_link--;
 
-	if (NULL == profile_field_len)
+	if (NULL == inventory_field_len)
 	{
-		profile_field_len = zbx_malloc(profile_field_len, ZBX_MAX_PROFILE_FIELDS * sizeof(unsigned short));
-		memset(profile_field_len, 0, ZBX_MAX_PROFILE_FIELDS * sizeof(unsigned short));
+		inventory_field_len = zbx_malloc(inventory_field_len, ZBX_MAX_INVENTORY_FIELDS * sizeof(unsigned short));
+		memset(inventory_field_len, 0, ZBX_MAX_INVENTORY_FIELDS * sizeof(unsigned short));
 	}
 
-	if (0 != profile_field_len[profile_link])
-		return profile_field_len[profile_link];
+	if (0 != inventory_field_len[inventory_link])
+		return inventory_field_len[inventory_link];
 
-	profile_field = DBget_profile_field(profile_link + 1);
-	assert(table = DBget_table("host_profile"));
-	assert(field = DBget_field(table, profile_field));
+	inventory_field = DBget_inventory_field(inventory_link + 1);
+	assert(table = DBget_table("host_inventory"));
+	assert(field = DBget_field(table, inventory_field));
 
-	profile_field_len[profile_link] = field->length;
+	inventory_field_len[inventory_link] = field->length;
 
-	return profile_field_len[profile_link];
+	return inventory_field_len[inventory_link];
 }
 
-#undef ZBX_MAX_PROFILE_FIELDS
+#undef ZBX_MAX_INVENTORY_FIELDS
