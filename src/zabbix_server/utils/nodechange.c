@@ -136,9 +136,9 @@ static int convert_triggers_expression(int old_id, int new_id)
 
 /******************************************************************************
  *                                                                            *
- * Function: convert_inventories                                                 *
+ * Function: convert_profiles                                                 *
  *                                                                            *
- * Purpose: convert inventories idx2 and value_id fields to new node ID          *
+ * Purpose: convert profiles idx2 and value_id fields to new node ID          *
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
@@ -150,13 +150,13 @@ static int convert_triggers_expression(int old_id, int new_id)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int convert_inventories(int old_id, int new_id, const char *field_name)
+static int convert_profiles(int old_id, int new_id, const char *field_name)
 {
 	zbx_uint64_t	prefix;
 
 	prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id + (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
 
-	DBexecute("update inventories set %s=%s+" ZBX_FS_UI64 " where %s>0",
+	DBexecute("update profiles set %s=%s+" ZBX_FS_UI64 " where %s>0",
 			field_name,
 			field_name,
 			prefix,
@@ -471,9 +471,9 @@ int	change_nodeid(int old_id, int new_id)
 				if (r_table->flags & ZBX_SYNC)
 					prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
 			}
-			else if (0 == strcmp("inventories", tables[i].table))	/* special processing for table 'inventories' */
+			else if (0 == strcmp("profiles", tables[i].table))	/* special processing for table 'profiles' */
 			{
-				convert_inventories(old_id, new_id, tables[i].fields[j].name);
+				convert_profiles(old_id, new_id, tables[i].fields[j].name);
 				continue;
 			}
 			else
