@@ -585,14 +585,15 @@ static void	DBupdate_trigger_value(zbx_uint64_t triggerid, unsigned char type, i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DBcheck_trigger_for_update(triggerid, type, value, error,
-			new_value, lastchange, &update_trigger, &add_event);
+	DBcheck_trigger_for_update(triggerid, type, value, error, new_value, lastchange, &update_trigger, &add_event);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
 	if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, triggerid, value, error,
 			new_value, new_error, lastchange, update_trigger))
+	{
 		DBexecute("%s", sql);
+	}
 
 	zbx_free(sql);
 
@@ -616,22 +617,21 @@ static void	DBupdate_trigger_value(zbx_uint64_t triggerid, unsigned char type, i
 void	DBdelete_service(zbx_uint64_t serviceid)
 {
 	DBexecute("delete from services_links where servicedownid=" ZBX_FS_UI64 " or serviceupid=" ZBX_FS_UI64,
-		serviceid,
-		serviceid);
-	DBexecute("delete from services where serviceid=" ZBX_FS_UI64,
-		serviceid);
+		serviceid, serviceid);
+	DBexecute("delete from services where serviceid=" ZBX_FS_UI64, serviceid);
 }
 
 void	DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
 {
+	const char	*__function_name = "DBdelete_services_by_triggerid";
+
 	zbx_uint64_t	serviceid;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_services_by_triggerid(" ZBX_FS_UI64 ")",
-		triggerid);
-	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64,
-		triggerid);
+	zabbix_log(LOG_LEVEL_DEBUG,"In %s() triggerid:" ZBX_FS_UI64, __function_name, triggerid);
+
+	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64, triggerid);
 
 	while((row=DBfetch(result)))
 	{
@@ -640,20 +640,15 @@ void	DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_services_by_triggerid(" ZBX_FS_UI64 ")",
-		triggerid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	DBdelete_trigger(zbx_uint64_t triggerid)
 {
 	DBexecute("delete from trigger_depends where triggerid_down=" ZBX_FS_UI64 " or triggerid_up=" ZBX_FS_UI64,
-		triggerid,
-		triggerid);
-	DBexecute("delete from functions where triggerid=" ZBX_FS_UI64,
-		triggerid);
-	DBexecute("delete from events where object=%d and objectid=" ZBX_FS_UI64,
-		EVENT_OBJECT_TRIGGER,
-		triggerid);
+		triggerid, triggerid);
+	DBexecute("delete from functions where triggerid=" ZBX_FS_UI64,	triggerid);
+	DBexecute("delete from events where object=%d and objectid=" ZBX_FS_UI64, EVENT_OBJECT_TRIGGER, triggerid);
 
 	DBdelete_services_by_triggerid(triggerid);
 
@@ -749,47 +744,37 @@ int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int	hour;
-	int	num;
-	double	value_min, value_avg, value_max;
+	int		hour, num;
+	double		value_min, value_avg, value_max;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_trend()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_trend()");
 
-	hour=clock-clock%3600;
+	hour = clock - clock % 3600;
 
 	result = DBselect("select num,value_min,value_avg,value_max from trends where itemid=" ZBX_FS_UI64 " and clock=%d",
-		itemid,
-		hour);
+		itemid, hour);
 
-	row=DBfetch(result);
-
-	if(row)
+	if (NULL != (row = DBfetch(result)))
 	{
-		num=atoi(row[0]);
-		value_min=atof(row[1]);
-		value_avg=atof(row[2]);
-		value_max=atof(row[3]);
-		if(value<value_min)	value_min=value;
-		if(value>value_max)	value_max=value;
+		num = atoi(row[0]);
+		value_min = atof(row[1]);
+		value_avg = atof(row[2]);
+		value_max = atof(row[3]);
+		if (value < value_min)
+			value_min=value;
+		if (value > value_max)
+			value_max=value;
 		value_avg=(num*value_avg+value)/(num+1);
 		num++;
-		DBexecute("update trends set num=%d, value_min=" ZBX_FS_DBL ", value_avg=" ZBX_FS_DBL ", value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64 " and clock=%d",
-			num,
-			value_min,
-			value_avg,
-			value_max,
-			itemid,
-			hour);
+		DBexecute("update trends set num=%d, value_min=" ZBX_FS_DBL ", value_avg=" ZBX_FS_DBL ", value_max=" ZBX_FS_DBL
+				" where itemid=" ZBX_FS_UI64 " and clock=%d",
+				num, value_min, value_avg, value_max, itemid, hour);
 	}
 	else
 	{
-		DBexecute("insert into trends (clock,itemid,num,value_min,value_avg,value_max) values (%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ")",
-			hour,
-			itemid,
-			1,
-			value,
-			value,
-			value);
+		DBexecute("insert into trends (clock,itemid,num,value_min,value_avg,value_max)"
+				" values (%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ")",
+				hour, itemid, 1, value, value, value);
 	}
 
 	DBfree_result(result);

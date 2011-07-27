@@ -269,7 +269,7 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 	if (*sql_offset == 0)
 	{
 #ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "begin\n");
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 7, "begin\n");
 #endif
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -345,7 +345,7 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 	if (lastrecord || *sql_offset > ZBX_MAX_SQL_SIZE)
 	{
 #ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "end;\n");
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 6, "end;\n");
 #endif
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -402,7 +402,7 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 	if (*sql_offset == 0)
 	{
 #ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "begin\n");
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 7, "begin\n");
 #endif
 	}
 
@@ -471,7 +471,7 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 	if (lastrecord || *sql_offset > ZBX_MAX_SQL_SIZE)
 	{
 #ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "end;\n");
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 6, "end;\n");
 #endif
 		if (DBexecute("%s", *sql) >= ZBX_DB_OK)
 			res = SUCCEED;
