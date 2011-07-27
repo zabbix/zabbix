@@ -27,7 +27,7 @@
 #
 # 2. Filter
 #    Filter allows to dump only specific entries from some tables. This is
-#     currently used to dump only interesting entries from the 'inventories' table.
+#     currently used to dump only interesting entries from the 'profiles' table.
 #    Filter entries are specified in FILTERFILE file. Each line contains space
 #     separated:
 #         table field value1 value2 value3...
@@ -90,8 +90,8 @@ help_items \
 hostmacro \
 hosts \
 hosts_groups \
-hosts_inventories \
-hosts_inventories_ext \
+hosts_profiles \
+hosts_profiles_ext \
 hosts_templates \
 httpstep \
 httpstepitem \
@@ -109,7 +109,7 @@ media_type \
 opconditions \
 operations \
 opmediatypes \
-inventories \
+profiles \
 regexps \
 rights \
 screens \
