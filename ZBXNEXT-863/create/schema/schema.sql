@@ -670,9 +670,9 @@ FIELD		|groupid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|groups
 UNIQUE		|1		|hostid,groupid
 INDEX		|2		|groupid
 
-TABLE|host_profile|hostid|ZBX_SYNC
+TABLE|host_inventory|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
-FIELD		|profile_mode	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|type_full	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
@@ -811,7 +811,7 @@ FIELD		|filter		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|interfaceid	|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|4|interface	|		|RESTRICT
 FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|profile_link	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|inventory_link	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid
@@ -861,8 +861,8 @@ FIELD		|gsm_modem	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|username	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|passwd		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 
-TABLE|profiles|profileid|0
-FIELD		|profileid	|t_id		|	|NOT NULL	|0
+TABLE|inventories|inventoryid|0
+FIELD		|inventoryid	|t_id		|	|NOT NULL	|0
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
 FIELD		|idx		|t_varchar(96)	|''	|NOT NULL	|0
 FIELD		|idx2		|t_id		|'0'	|NOT NULL	|0
@@ -872,7 +872,7 @@ FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|source		|t_varchar(96)	|''	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|userid,idx,idx2
-INDEX		|2		|userid,profileid
+INDEX		|2		|userid,inventoryid
 
 TABLE|rights|rightid|ZBX_SYNC
 FIELD		|rightid	|t_id		|	|NOT NULL	|0
