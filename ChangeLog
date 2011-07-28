@@ -1,4 +1,5 @@
 Changes for 1.8.6rc2
+
  - [ZBX-3835] fixed possible security vulnerability in redirects (Vedmak)
 
 Changes for 1.8.6rc1
