@@ -205,6 +205,7 @@ static void	parse_traps(char *buffer)
 		{
 			*(line - 1) = '\0';
 			process_trap(addr, begin, end);
+			end = NULL;
 		}
 
 		/* parse the current trap */
@@ -226,7 +227,7 @@ static void	parse_traps(char *buffer)
 	/* process the last trap */
 	if (NULL != end)
 		process_trap(addr, begin, end);
-	else
+	else if (NULL == addr)	/* no trap was found */
 		zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s]", buffer);
 
 	DCflush_nextchecks();
@@ -265,13 +266,16 @@ static void	read_traps()
 		goto exit;
 	}
 
-	buffer[nbytes] = '\0';
-	zbx_rtrim(buffer + MAX(nbytes - 3, 0), " \r\n");
+	if (0 < nbytes)
+	{
+		buffer[nbytes] = '\0';
+		zbx_rtrim(buffer + MAX(nbytes - 3, 0), " \r\n");
 
-	trap_lastsize += nbytes;
-	DBupdate_lastsize();
+		trap_lastsize += nbytes;
+		DBupdate_lastsize();
 
-	parse_traps(buffer);
+		parse_traps(buffer);
+	}
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
