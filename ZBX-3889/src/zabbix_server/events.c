@@ -270,32 +270,44 @@ out:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	process_event(DB_EVENT *event, int force_actions)
+int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid, int clock,
+		int value, int acknowledged, int force_actions)
 {
 	const char	*__function_name = "process_event";
+	DB_EVENT	event;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " object:%d objectid:" ZBX_FS_UI64 " value:%d",
-			__function_name, event->eventid, event->object, event->objectid, event->value);
+			__function_name, eventid, object, objectid, value);
 
-	if (SUCCEED != add_trigger_info(event))
+	/* preparing event for processing */
+	memset(&event, 0, sizeof(DB_EVENT));
+	event.eventid = eventid;
+	event.source = source;
+	event.object = object;
+	event.objectid = objectid;
+	event.clock = clock;
+	event.value = value;
+	event.acknowledged = acknowledged;
+
+	if (SUCCEED != add_trigger_info(&event))
 		goto fail;
 
-	if (0 == event->eventid)
-		event->eventid = DBget_maxid("events");
+	if (0 == event.eventid)
+		event.eventid = DBget_maxid("events");
 
 	DBexecute("insert into events (eventid,source,object,objectid,clock,value)"
 			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d)",
-			event->eventid, event->source, event->object, event->objectid, event->clock, event->value);
+			event.eventid, event.source, event.object, event.objectid, event.clock, event.value);
 
-	if (0 != event->ack_eventid)
-		copy_acknowledges(event->ack_eventid, event->eventid);
+	if (0 != event.ack_eventid)
+		copy_acknowledges(event.ack_eventid, event.eventid);
 
-	if (0 == event->skip_actions || 1 == force_actions)
-		process_actions(event);
+	if (0 == event.skip_actions || 1 == force_actions)
+		process_actions(&event);
 
-	if (EVENT_OBJECT_TRIGGER == event->object)
-		DBupdate_services(event->objectid, (TRIGGER_VALUE_TRUE == event->value) ? event->trigger.priority : 0, event->clock);
+	if (EVENT_OBJECT_TRIGGER == event.object)
+		DBupdate_services(event.objectid, (TRIGGER_VALUE_TRUE == event.value) ? event.trigger.priority : 0, event.clock);
 
 	ret = SUCCEED;
 fail:

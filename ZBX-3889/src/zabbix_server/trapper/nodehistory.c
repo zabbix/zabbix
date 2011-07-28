@@ -173,12 +173,10 @@ fail:
 static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *table, const char *record)
 {
 	const char	*r;
-	int		f;
-	DB_EVENT	event;
+	int		f, source, object, clock, value, acknowledged;
+	zbx_uint64_t	eventid, objectid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_record_event()");
-
-	memset(&event, 0, sizeof(event));
 
 	r = record;
 
@@ -190,23 +188,23 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 		zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 
 		if (0 == strcmp(table->fields[f].name, "eventid")) {
-			ZBX_STR2UINT64(event.eventid, buffer);
+			ZBX_STR2UINT64(eventid, buffer);
 		} else if (0 == strcmp(table->fields[f].name, "source")) {
-			event.source = atoi(buffer);
+			source = atoi(buffer);
 		} else if (0 == strcmp(table->fields[f].name, "object")) {
-			event.object = atoi(buffer);
+			object = atoi(buffer);
 		} else if (0 == strcmp(table->fields[f].name, "objectid")) {
-			ZBX_STR2UINT64(event.objectid, buffer);
+			ZBX_STR2UINT64(objectid, buffer);
 		} else if (0 == strcmp(table->fields[f].name, "clock")) {
-			event.clock = atoi(buffer);
+			clock = atoi(buffer);
 		} else if (0 == strcmp(table->fields[f].name, "value")) {
-			event.value = atoi(buffer);
+			value = atoi(buffer);
 		} else if (0 == strcmp(table->fields[f].name, "acknowledged")) {
-			event.acknowledged = atoi(buffer);
+			acknowledged = atoi(buffer);
 		}
 	}
 
-	return process_event(&event, 0);
+	return process_event(0, source, object, objectid, clock, value, acknowledged, 0);
 error:
 	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
 		CONFIG_NODEID,

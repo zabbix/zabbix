@@ -178,7 +178,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 	const char		*__function_name = "update_triggers_status_to_unknown";
 	DB_RESULT		result;
 	DB_ROW			row;
-	DB_EVENT		event;
 	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last;
 	int			tr_alloc = 0, tr_num = 0;
 	char			*sql = NULL;
@@ -254,16 +253,9 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 		if (1 != tr_last->add_event)
 			continue;
 
-		/* preparing event for processing */
-		memset(&event, 0, sizeof(DB_EVENT));
-		event.source = EVENT_SOURCE_TRIGGERS;
-		event.object = EVENT_OBJECT_TRIGGER;
-		event.objectid = tr_last->triggerid;
-		event.clock = tr_last->lastchange;
-		event.value = tr_last->new_value;
-
 		/* processing event */
-		process_event(&event, 0);
+		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+				tr_last->lastchange, tr_last->new_value, 0, 0);
 	}
 
 	zbx_free(tr);

@@ -578,7 +578,6 @@ static void	DBupdate_trigger_value(zbx_uint64_t triggerid, unsigned char type, i
 		int new_value, const char *new_error, int lastchange)
 {
 	const char	*__function_name = "DBupdate_trigger_value";
-	DB_EVENT	event;
 	char		*sql = NULL;
 	int		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
 	unsigned char	update_trigger, add_event;
@@ -599,16 +598,8 @@ static void	DBupdate_trigger_value(zbx_uint64_t triggerid, unsigned char type, i
 
 	if (1 == add_event)
 	{
-		/* Preparing event for processing */
-		memset(&event, 0, sizeof(DB_EVENT));
-		event.source = EVENT_SOURCE_TRIGGERS;
-		event.object = EVENT_OBJECT_TRIGGER;
-		event.objectid = triggerid;
-		event.clock = lastchange;
-		event.value = new_value;
-
 		/* Processing event */
-		process_event(&event, 0);
+		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, lastchange, new_value, 0, 0);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1887,7 +1878,6 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 	char		*host_esc;
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_EVENT	event;
 	zbx_uint64_t	autoreg_hostid;
 	int		res = SUCCEED;
 
@@ -1933,16 +1923,9 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
 		}
 		DBfree_result(result);
 
-		/* Preparing auto registration event for processing */
-		memset(&event, 0, sizeof(DB_EVENT));
-		event.source	= EVENT_SOURCE_AUTO_REGISTRATION;
-		event.object	= EVENT_OBJECT_ZABBIX_ACTIVE;
-		event.objectid	= autoreg_hostid;
-		event.clock	= now;
-		event.value	= TRIGGER_VALUE_TRUE;
-
 		/* Processing event */
-		process_event(&event, 0);
+		process_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
+				autoreg_hostid, now, TRIGGER_VALUE_TRUE, 0, 0);
 	}
 
 	zbx_free(host_esc);
