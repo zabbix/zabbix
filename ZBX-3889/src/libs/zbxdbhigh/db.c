@@ -1569,13 +1569,12 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	int		found = FAIL, dbres, nodeid;
 	const ZBX_TABLE	*table;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'",
-			__function_name, tablename);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __function_name, tablename);
 
 	table = DBget_table(tablename);
-	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
+	nodeid = 0 <= CONFIG_NODEID ? CONFIG_NODEID : 0;
 
-	if (table->flags & ZBX_SYNC)
+	if (0 != (table->flags & ZBX_SYNC))
 	{
 		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)nodeid;
 		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(99999999999);
@@ -1589,23 +1588,19 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	do
 	{
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-			nodeid,
-			table->table,
-			table->recid);
+			nodeid, table->table, table->recid);
 
 		if (NULL == (row = DBfetch(result)))
 		{
 			DBfree_result(result);
 
 			result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-					table->recid,
-					table->table,
-					table->recid,
-					min,
-					max);
+					table->recid, table->table, table->recid, min, max);
 
 			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+			{
 				ret1 = min;
+			}
 			else
 			{
 				ZBX_STR2UINT64(ret1, row[0]);
@@ -1613,9 +1608,7 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 				{
 					zabbix_log(LOG_LEVEL_CRIT, "DBget_maxid: Maximum number of id's was exceeded"
 							" [table:%s, field:%s, id:" ZBX_FS_UI64 "]",
-							table->table,
-							table->recid,
-							ret1);
+							table->table, table->recid, ret1);
 					exit(FAIL);
 				}
 			}
@@ -1623,19 +1616,14 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 			dbres = DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
 					" values (%d,'%s','%s'," ZBX_FS_UI64 ")",
-					nodeid,
-					table->table,
-					table->recid,
-					ret1);
+					nodeid, table->table, table->recid, ret1);
 
-			if (dbres < ZBX_DB_OK)
+			if (ZBX_DB_OK > dbres)
 			{
 				/* solving the problem of an invisible record created in a parallel transaction */
 				DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s'"
 						" and field_name='%s'",
-						nodeid,
-						table->table,
-						table->recid);
+						nodeid, table->table, table->recid);
 			}
 
 			continue;
@@ -1648,22 +1636,15 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			if (ret1 < min || ret1 >= max)
 			{
 				DBexecute("delete from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-					nodeid,
-					table->table,
-					table->recid);
+						nodeid, table->table, table->recid);
 				continue;
 			}
 
 			DBexecute("update ids set nextid=nextid+%d where nodeid=%d and table_name='%s' and field_name='%s'",
-					num,
-					nodeid,
-					table->table,
-					table->recid);
+					num, nodeid, table->table, table->recid);
 
 			result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-				nodeid,
-				table->table,
-				table->recid);
+					nodeid, table->table, table->recid);
 
 			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
 			{
@@ -1682,11 +1663,8 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	}
 	while (FAIL == found);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() \"%s\".\"%s\":" ZBX_FS_UI64,
-			__function_name,
-			table->table,
-			table->recid,
-			ret2);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' recid:'%s' ret2:" ZBX_FS_UI64,
+			__function_name, table->table, table->recid, ret2);
 
 	return ret2 - num + 1;
 }

@@ -3083,13 +3083,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
  *                                                                            *
  * Purpose: Return next id for requested table and store it in ids table      *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	DCget_nextid_shared(const char *table_name)
@@ -3100,12 +3094,11 @@ zbx_uint64_t	DCget_nextid_shared(const char *table_name)
 	ZBX_DC_ID	*id;
 	zbx_uint64_t	nextid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'",
-			__function_name, table_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, table_name);
 
 	LOCK_CACHE_IDS;
 
-	for (i = 0; i < ZBX_IDS_SIZE; i++)
+	for (i = 0; ZBX_IDS_SIZE > i; i++)
 	{
 		id = &ids->id[i];
 
@@ -3122,29 +3115,16 @@ zbx_uint64_t	DCget_nextid_shared(const char *table_name)
 			break;
 	}
 
-	if (i == ZBX_IDS_SIZE)
+	if (ZBX_IDS_SIZE == i)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for ids");
-		exit(-1);
+		zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for ids");
+		exit(FAIL);
 	}
 
-	if (id->reserved > 0)
-	{
-		id->lastid++;
-		id->reserved--;
-
-		nextid = id->lastid;
-
-		UNLOCK_CACHE_IDS;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 "]",
-				__function_name, table_name, nextid);
-
-		return nextid;
-	}
+	if (0 < id->reserved)
+		goto exit;
 
 	UNLOCK_CACHE_IDS;
-
 retry:
 	nextid = DBget_nextid(table_name, ZBX_RESERVE) - 1;
 
@@ -3170,7 +3150,7 @@ retry:
 		id->lastid = nextid;
 		id->reserved = ZBX_RESERVE;
 	}
-
+exit:
 	id->lastid++;
 	id->reserved--;
 
