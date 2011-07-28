@@ -283,11 +283,11 @@ function getEventAckState($event, $extBackurl=false){
 	}
 
 	if($event['acknowledged'] == 0){
-		$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'].'&backurl='.$backurl,'on');
+		$ack = new CSpan(S_NO, 'on');
 	}
 	else{
 		$rows = is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges'];
-		$ack = array(new CLink(new CSpan(S_YES,'off'),'acknow.php?eventid='.$event['eventid'].'&backurl='.$backurl),' ('.$rows.')');
+		$ack = array(new CSpan(S_YES,'off'),' ('.$rows.')');
 	}
 
 return $ack;
