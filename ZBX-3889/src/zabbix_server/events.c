@@ -107,7 +107,8 @@ static int	add_trigger_info(DB_EVENT *event)
 	if (EVENT_OBJECT_TRIGGER == event->object && 0 != event->objectid)
 	{
 		result = DBselect("select description,expression,priority,type"
-				" from triggers where triggerid=" ZBX_FS_UI64,
+				" from triggers"
+				" where triggerid=" ZBX_FS_UI64,
 				event->objectid);
 
 		if (NULL != (row = DBfetch(result)))
@@ -202,7 +203,10 @@ static void	copy_acknowledges(zbx_uint64_t src_eventid, zbx_uint64_t dst_eventid
 			" dst_eventid:" ZBX_FS_UI64,
 			__function_name, src_eventid, dst_eventid);
 
-	result = DBselect("select acknowledgeid from acknowledges where eventid=" ZBX_FS_UI64, src_eventid);
+	result = DBselect("select acknowledgeid"
+			" from acknowledges"
+			" where eventid=" ZBX_FS_UI64,
+			src_eventid);
 
 	while (NULL != (row = DBfetch(result)))
 	{

@@ -752,7 +752,7 @@ int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 	hour = clock - clock % 3600;
 
 	result = DBselect("select num,value_min,value_avg,value_max from trends where itemid=" ZBX_FS_UI64 " and clock=%d",
-		itemid, hour);
+			itemid, hour);
 
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -766,7 +766,7 @@ int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 			value_max=value;
 		value_avg=(num*value_avg+value)/(num+1);
 		num++;
-		DBexecute("update trends set num=%d, value_min=" ZBX_FS_DBL ", value_avg=" ZBX_FS_DBL ", value_max=" ZBX_FS_DBL
+		DBexecute("update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL ",value_max=" ZBX_FS_DBL
 				" where itemid=" ZBX_FS_UI64 " and clock=%d",
 				num, value_min, value_avg, value_max, itemid, hour);
 	}
@@ -1588,7 +1588,7 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	do
 	{
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-			nodeid, table->table, table->recid);
+				nodeid, table->table, table->recid);
 
 		if (NULL == (row = DBfetch(result)))
 		{
@@ -1663,8 +1663,8 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	}
 	while (FAIL == found);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' recid:'%s' ret2:" ZBX_FS_UI64,
-			__function_name, table->table, table->recid, ret2);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64 " table:'%s' recid:'%s'",
+			__function_name, ret2 - num + 1, table->table, table->recid);
 
 	return ret2 - num + 1;
 }

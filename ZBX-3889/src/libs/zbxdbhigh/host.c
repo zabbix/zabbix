@@ -645,8 +645,11 @@ static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select l.serviceupid,s.algorithm from services_links l,services s"
-			" where s.serviceid=l.serviceupid and l.servicedownid=" ZBX_FS_UI64, serviceid);
+	result = DBselect("select l.serviceupid,s.algorithm"
+			" from services_links l,services s"
+			" where s.serviceid=l.serviceupid"
+				" and l.servicedownid=" ZBX_FS_UI64,
+			serviceid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -666,10 +669,12 @@ static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
 	}
 	DBfree_result(result);
 
-	result = DBselect("select serviceupid from services_links where servicedownid=" ZBX_FS_UI64,
-		serviceid);
+	result = DBselect("select serviceupid"
+			" from services_links"
+			" where servicedownid=" ZBX_FS_UI64,
+			serviceid);
 
-	while ((row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceupid, row[0]);
 		DBupdate_services_rec(serviceupid, clock);
