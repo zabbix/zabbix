@@ -2149,21 +2149,39 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 		if (INTERFACE_TYPE_SNMP == interface->type)	/* used only for SNMP traps */
 		{
-			interface_snmpaddr_local.addr = (1 == interface->useip ? interface->ip : interface->dns);
-
-			if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &interface_snmpaddr_local)))
+			if ('\0' != (interface_snmpaddr_local.addr = interface->ip))
 			{
-				interface_snmpaddr->addr = zbx_strpool_acquire(interface_snmpaddr_local.addr);
+				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &interface_snmpaddr_local)))
+				{
+					interface_snmpaddr_local.addr = zbx_strpool_acquire(interface->ip);
 
-				interface_snmpaddr = zbx_hashset_insert(&config->interface_snmpaddrs,
-						&interface_snmpaddr_local, sizeof(ZBX_DC_INTERFACE_ADDR));
-				zbx_vector_uint64_create_ext(&interface_snmpaddr->interfaceids,
-						__config_mem_malloc_func,
-						__config_mem_realloc_func,
-						__config_mem_free_func);
+					interface_snmpaddr = zbx_hashset_insert(&config->interface_snmpaddrs,
+							&interface_snmpaddr_local, sizeof(ZBX_DC_INTERFACE_ADDR));
+					zbx_vector_uint64_create_ext(&interface_snmpaddr->interfaceids,
+							__config_mem_malloc_func,
+							__config_mem_realloc_func,
+							__config_mem_free_func);
+				}
+
+				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
 			}
 
-			zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
+			if ('\0' != (interface_snmpaddr_local.addr = interface->dns))
+			{
+				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &interface_snmpaddr_local)))
+				{
+					interface_snmpaddr_local.addr = zbx_strpool_acquire(interface->dns);
+
+					interface_snmpaddr = zbx_hashset_insert(&config->interface_snmpaddrs,
+							&interface_snmpaddr_local, sizeof(ZBX_DC_INTERFACE_ADDR));
+					zbx_vector_uint64_create_ext(&interface_snmpaddr->interfaceids,
+							__config_mem_malloc_func,
+							__config_mem_realloc_func,
+							__config_mem_free_func);
+				}
+
+				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
+			}
 		}
 	}
 
