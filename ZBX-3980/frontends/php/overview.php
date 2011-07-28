@@ -136,12 +136,12 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		}
 
 		$col = new CCol(SPACE, 'not_classified');
-		$col->setAttribute('style','background-image: url(images/gradients/blink1.gif); '.
-			'background-position: top left; background-repeat: repeate;');
+		$col->setAttribute('style','background-image: url(images/gradients/blink1_sample.gif); '.
+			'background-position: top left; background-repeat: repeat;');
 		$help_table->addRow(array($col, $firstThirdLabel));
 		$col = new CCol(SPACE, 'not_classified');
-		$col->setAttribute('style','background-image: url(images/gradients/blink2.gif); '.
-			'background-position: top left; background-repeat: repeate;');
+		$col->setAttribute('style','background-image: url(images/gradients/blink2_sample.gif); '.
+			'background-position: top left; background-repeat: repeat;');
 		$help_table->addRow(array($col, $fullLabel));
 		$help_table->addRow(array(new CCol(SPACE), S_NO_TRIGGER));
 	}
