@@ -276,7 +276,7 @@ function getEventAckState($event, $extBackurl=false){
 	}
 
 	if($extBackurl){
-		$backurl = urlencode(urlencode($page['file'].'?eventid='.$event['eventid'].'&triggerid='.$event['objectid']));
+		$backurl = urlencode($page['file'].'?eventid='.$event['eventid'].'&triggerid='.$event['objectid']);
 	}
 	else{
 		$backurl = $page['file'];
