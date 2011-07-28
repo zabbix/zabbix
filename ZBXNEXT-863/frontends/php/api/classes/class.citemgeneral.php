@@ -79,7 +79,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			'filter'				=> array(),
 			'interfaceid'			=> array('host' => 1),
 			'port'					=> array(),
-			'profile_link'          => array(),
+			'inventory_link'		=> array(),
 		);
 	}
 
