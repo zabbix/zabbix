@@ -587,11 +587,11 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
-		while (-1 == wait(&i))
+		while (-1 == wait(&i))	/* wait for any child to exit */
 		{
 			if (EINTR != errno)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s");
+				zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 				break;
 			}
 		}
