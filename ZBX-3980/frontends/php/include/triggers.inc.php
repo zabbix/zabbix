@@ -256,7 +256,7 @@ function getSeverityStyle($severity, $type=true){
 		TRIGGER_SEVERITY_AVERAGE => 'average',
 		TRIGGER_SEVERITY_WARNING => 'warning',
 		TRIGGER_SEVERITY_INFORMATION => 'information',
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => 'unknown_trigger',
+		TRIGGER_SEVERITY_NOT_CLASSIFIED => 'not_classified',
 	);
 
 	if(!$type)
@@ -2226,7 +2226,7 @@ function utf8RawUrlDecode($source){
 					$css_class = 'normal';
 					break;
 				default:
-					$css_class = 'unknown_trigger';
+					$css_class = 'not_classified';
 			}
 
 			$style = 'cursor: pointer; ';

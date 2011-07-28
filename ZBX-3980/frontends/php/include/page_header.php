@@ -153,7 +153,8 @@
 		echo '.average { background-color: #' . $config['severity_color_3']. ' !important;}'."\n";
 		echo '.warning { background-color: #' . $config['severity_color_2']. ' !important;}'."\n";
 		echo '.information { background-color: #' . $config['severity_color_1']. ' !important;}'."\n";
-		echo '.unknown_trigger { background-color: #' . $config['severity_color_0']. ' !important;}'."\n";
+		echo '.not_classified { background-color: #' . $config['severity_color_0']. ' !important;}'."\n";
+		echo '.trigger_unknown { background-color: #DBDBDB !important;}'."\n";
 		echo '</style>';
 
 	}

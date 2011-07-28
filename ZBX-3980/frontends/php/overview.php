@@ -112,7 +112,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		$help_table->addRow(array(getSeverityCell($i), S_ENABLED));
 	}
 
-	$help_table->addRow(array(new CCol(SPACE, 'unknown_trigger'), S_UNKNOWN));
+	$help_table->addRow(array(new CCol(SPACE, 'trigger_unknown'), S_UNKNOWN));
 
 	if($_REQUEST['type']==SHOW_TRIGGERS){
 		// info about blinking
@@ -135,11 +135,11 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 			);
 		}
 
-		$col = new CCol(SPACE, 'unknown_trigger');
+		$col = new CCol(SPACE, 'not_classified');
 		$col->setAttribute('style','background-image: url(images/gradients/blink1.gif); '.
 			'background-position: top left; background-repeat: repeate;');
 		$help_table->addRow(array($col, $firstThirdLabel));
-		$col = new CCol(SPACE, 'unknown_trigger');
+		$col = new CCol(SPACE, 'not_classified');
 		$col->setAttribute('style','background-image: url(images/gradients/blink2.gif); '.
 			'background-position: top left; background-repeat: repeate;');
 		$help_table->addRow(array($col, $fullLabel));
