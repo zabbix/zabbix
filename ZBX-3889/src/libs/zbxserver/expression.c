@@ -2256,12 +2256,10 @@ error:
  *             triggerid     - [IN] trigger identificator from database       *
  *             trigger_value - [IN] current trigger value                     *
  *             error         - [OUT] place error message if any               *
- *             maxerrlen     - [IN] max length of error message               *
  *                                                                            *
  * Return value:                                                              *
  *             SUCCEED       - evaluated successfully                         *
  *                               result - TRIGGER_VALUE_(FALSE or TRUE)       *
- *                               error  - empty message                       *
  *             FAIL          - can not evaluate;                              *
  *                               result - TRIGGER_VALUE_UNKNOWN               *
  *                               error  - error message                       *
@@ -2272,13 +2270,14 @@ error:
  *                                                                            *
  ******************************************************************************/
 int	evaluate_expression(int *result, char **expression, time_t now,
-		zbx_uint64_t triggerid, int trigger_value, char *error, int maxerrlen)
+		zbx_uint64_t triggerid, int trigger_value, char **error)
 {
-	const char		*__function_name = "evaluate_expression";
+	const char	*__function_name = "evaluate_expression";
 	/* Required for substitution of macros */
-	DB_EVENT		event;
-	int			ret = FAIL;
-	double			value;
+	DB_EVENT	event;
+	int		ret = FAIL;
+	double		value;
+	char		err[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
@@ -2289,14 +2288,14 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 	event.objectid = triggerid;
 	event.value = trigger_value;
 
-	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION,
-			error, maxerrlen))
+	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, NULL, expression,
+			MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 	{
 		/* Evaluate expression */
 		zbx_remove_spaces(*expression);
-		if (SUCCEED == substitute_functions(expression, now, error, maxerrlen))
+		if (SUCCEED == substitute_functions(expression, now, err, sizeof(err)))
 		{
-			if (SUCCEED == evaluate(&value, *expression, error, maxerrlen))
+			if (SUCCEED == evaluate(&value, *expression, err, sizeof(err)))
 			{
 				if (0 == cmp_double(value, 0))
 					*result = TRIGGER_VALUE_FALSE;
@@ -2312,12 +2311,11 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s():expression [%s] cannot be evaluated: %s",
-				__function_name, expression, error);
+				__function_name, expression, err);
 
+		*error = zbx_strdup(*error, err);
 		*result = TRIGGER_VALUE_UNKNOWN;
 	}
-	else
-		*error = '\0';
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

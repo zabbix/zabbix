@@ -895,6 +895,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			tr_last->type = (unsigned char)atoi(row[1]);
 			tr_last->value = atoi(row[2]);
 			tr_last->error = zbx_strdup(NULL, row[3]);
+			tr_last->new_error = NULL;
 			tr_last->expression = zbx_strdup(NULL, row[4]);
 			tr_last->lastchange = 0;
 		}
@@ -929,7 +930,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		}
 
 		evaluate_expression(&tr_last->new_value, &tr_last->expression, tr_last->lastchange, tr_last->triggerid,
-				tr_last->value, tr_last->new_error, sizeof(tr_last->new_error));
+				tr_last->value, &tr_last->new_error);
 
 		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
 				tr_last->new_value, tr_last->lastchange, &tr_last->update_trigger, &tr_last->add_event);
@@ -952,6 +953,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
 	{
 		zbx_free(tr_last->error);
+		zbx_free(tr_last->new_error);
 		zbx_free(tr_last->expression);
 
 		if (0 == tr_last->lastchange)

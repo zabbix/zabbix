@@ -285,7 +285,7 @@ typedef struct
 	zbx_uint64_t	triggerid;
 	char		*expression;
 	char		*error;
-	char		new_error[MAX_STRING_LEN];
+	char		*new_error;
 	int		lastchange;
 	int		value;
 	int		new_value;
