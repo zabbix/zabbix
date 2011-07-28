@@ -34,7 +34,7 @@ int main()
 	assert(TRUE == thrift_framed_transport_open(transport, NULL));
 	assert(TRUE == thrift_framed_transport_is_open(transport));
 
-	client = g_object_new(TYPE_CASSANDRA_CLIENT, "input_protocol", protocol, "output_protocol", protocol);
+	client = g_object_new(TYPE_CASSANDRA_CLIENT, "input_protocol", protocol, "output_protocol", protocol, NULL);
 	assert(NULL != client);
 
 	printf("been here 1\n"); fflush(stdout);
