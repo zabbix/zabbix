@@ -2226,7 +2226,7 @@ function utf8RawUrlDecode($source){
 					$css_class = 'normal';
 					break;
 				default:
-					$css_class = 'not_classified';
+					$css_class = 'trigger_unknown';
 			}
 
 			$style = 'cursor: pointer; ';
