@@ -115,14 +115,34 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$help_table->addRow(array(new CCol(SPACE, 'unknown_trigger'), S_UNKNOWN));
 
 	if($_REQUEST['type']==SHOW_TRIGGERS){
+		// info about blinking
+		$config = select_config();
+		if($config['blink_period'] == 0){
+			$firstThirdLabel = _('Blinking disabled');
+			$fullLabel = _('Blinking disabled');
+		}
+		else{
+			$firstThird = ceil($config['blink_period'] / 3);
+			$firstThirdLabel = _s(
+				'Blinks for %1$d min %2$d sec',
+				floor($firstThird / 60), // full minutes
+				$firstThird % 60 // seconds
+			);
+			$fullLabel = _s(
+				'Blinks for %1$d min %2$d sec',
+				floor($config['blink_period'] / 60), // full minutes
+				$config['blink_period'] % 60 // seconds
+			);
+		}
+
 		$col = new CCol(SPACE, 'unknown_trigger');
 		$col->setAttribute('style','background-image: url(images/gradients/blink1.gif); '.
 			'background-position: top left; background-repeat: repeate;');
-		$help_table->addRow(array($col, S_5_MIN));
+		$help_table->addRow(array($col, $firstThirdLabel));
 		$col = new CCol(SPACE, 'unknown_trigger');
 		$col->setAttribute('style','background-image: url(images/gradients/blink2.gif); '.
 			'background-position: top left; background-repeat: repeate;');
-		$help_table->addRow(array($col, S_15_MIN));
+		$help_table->addRow(array($col, $fullLabel));
 		$help_table->addRow(array(new CCol(SPACE), S_NO_TRIGGER));
 	}
 	else{
