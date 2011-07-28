@@ -135,6 +135,8 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 			);
 		}
 
+		// blinking preview in help popup
+		// *_sample.gif files are just copies of regular blinking gifs, but having different files for samples and table fix asynchronous blinking in help tooltip
 		$col = new CCol(SPACE, 'not_classified');
 		$col->setAttribute('style','background-image: url(images/gradients/blink1_sample.gif); '.
 			'background-position: top left; background-repeat: repeat;');
