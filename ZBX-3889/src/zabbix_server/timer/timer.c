@@ -53,14 +53,14 @@ extern unsigned char	process_type;
  ******************************************************************************/
 static void	process_time_functions()
 {
-	const char	*__function_name = "process_time_functions";
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_EVENT	event;
-	zbx_trigger_t	*tr = NULL, *tr_last;
-	int		tr_alloc = 0, tr_num = 0;
-	char		*sql = NULL;
-	int		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	const char		*__function_name = "process_time_functions";
+	DB_RESULT		result;
+	DB_ROW			row;
+	DB_EVENT		event;
+	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last;
+	int			tr_alloc = 0, tr_num = 0;
+	char			*sql = NULL;
+	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -96,7 +96,7 @@ static void	process_time_functions()
 		if (tr_num == tr_alloc)
 		{
 			tr_alloc += 64;
-			tr = zbx_realloc(tr, tr_alloc * sizeof(zbx_trigger_t));
+			tr = zbx_realloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
 		}
 
 		tr_last = &tr[tr_num++];
@@ -105,10 +105,10 @@ static void	process_time_functions()
 		tr_last->type = (unsigned char)atoi(row[1]);
 		tr_last->value = atoi(row[2]);
 		tr_last->error = row[3];
-		tr_last->exp = zbx_strdup(NULL, row[4]);
+		tr_last->expression = zbx_strdup(NULL, row[4]);
 		tr_last->lastchange = time(NULL);
 
-		evaluate_expression(&tr_last->new_value, &tr_last->exp, tr_last->lastchange, tr_last->triggerid,
+		evaluate_expression(&tr_last->new_value, &tr_last->expression, tr_last->lastchange, tr_last->triggerid,
 				tr_last->value, tr_last->new_error, sizeof(tr_last->new_error));
 
 		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
@@ -136,7 +136,7 @@ static void	process_time_functions()
 
 	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
 	{
-		zbx_free(tr_last->exp);
+		zbx_free(tr_last->expression);
 
 		if (1 != tr_last->add_event)
 			continue;

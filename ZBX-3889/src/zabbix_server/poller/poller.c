@@ -175,14 +175,14 @@ static void	update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char *reason)
 {
-	const char	*__function_name = "update_triggers_status_to_unknown";
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_EVENT	event;
-	zbx_trigger_t	*tr = NULL, *tr_last;
-	int		tr_alloc = 0, tr_num = 0;
-	char		*sql = NULL;
-	int		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	const char		*__function_name = "update_triggers_status_to_unknown";
+	DB_RESULT		result;
+	DB_ROW			row;
+	DB_EVENT		event;
+	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last;
+	int			tr_alloc = 0, tr_num = 0;
+	char			*sql = NULL;
+	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
@@ -214,7 +214,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 		if (tr_num == tr_alloc)
 		{
 			tr_alloc += 64;
-			tr = zbx_realloc(tr, tr_alloc * sizeof(zbx_trigger_t));
+			tr = zbx_realloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
 		}
 
 		tr_last = &tr[tr_num++];

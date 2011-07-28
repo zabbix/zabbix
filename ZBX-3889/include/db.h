@@ -282,6 +282,21 @@ DB_TRIGGER;
 
 typedef struct
 {
+	zbx_uint64_t	triggerid;
+	char		*expression;
+	char		*error;
+	char		new_error[MAX_STRING_LEN];
+	int		lastchange;
+	int		value;
+	int		new_value;
+	unsigned char	type;
+	unsigned char	update_trigger;
+	unsigned char	add_event;
+}
+DB_TRIGGER_UPDATE;
+
+typedef struct
+{
 	DB_TRIGGER	trigger;
 	zbx_uint64_t	eventid;
 	zbx_uint64_t	objectid;
@@ -503,20 +518,6 @@ typedef struct
 	int			nextcheck;
 }
 DB_ESCALATION;
-
-typedef struct
-{
-	zbx_uint64_t	triggerid;
-	char		*exp;
-	char		*error;
-	char		new_error[MAX_STRING_LEN];
-	int		lastchange;
-	int		value;
-	int		new_value;
-	unsigned char	type;
-	unsigned char	update_trigger;
-	unsigned char	add_event;
-} zbx_trigger_t;
 
 #define DB_NODE			"%s"
 #define DBnode_local(fieldid)	DBnode(fieldid, CONFIG_NODEID)

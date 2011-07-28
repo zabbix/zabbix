@@ -834,16 +834,14 @@ static void	DCsync_trends()
  ******************************************************************************/
 static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 {
-	const char	*__function_name = "DCmass_update_triggers";
-
-	zbx_trigger_t	*tr = NULL, *tr_last = NULL;
-	int		tr_alloc, tr_num = 0;
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_EVENT	event;
-	int		sql_offset = 0, i;
-	zbx_uint64_t	itemid, triggerid;
+	const char		*__function_name = "DCmass_update_triggers";
+	DB_RESULT		result;
+	DB_ROW			row;
+	DB_EVENT		event;
+	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last = NULL;
+	int			tr_alloc, tr_num = 0;
+	int			sql_offset = 0, i;
+	zbx_uint64_t		itemid, triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -878,7 +876,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	result = DBselect("%s", sql);
 
 	tr_alloc = history_num;
-	tr = zbx_malloc(tr, tr_alloc * sizeof(zbx_trigger_t));
+	tr = zbx_malloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -889,7 +887,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			if (tr_num == tr_alloc)
 			{
 				tr_alloc += 64;
-				tr = zbx_realloc(tr, tr_alloc * sizeof(zbx_trigger_t));
+				tr = zbx_realloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
 			}
 
 			tr_last = &tr[tr_num++];
@@ -897,7 +895,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			tr_last->type = (unsigned char)atoi(row[1]);
 			tr_last->value = atoi(row[2]);
 			tr_last->error = zbx_strdup(NULL, row[3]);
-			tr_last->exp = zbx_strdup(NULL, row[4]);
+			tr_last->expression = zbx_strdup(NULL, row[4]);
 			tr_last->lastchange = 0;
 		}
 
@@ -930,7 +928,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 		}
 
-		evaluate_expression(&tr_last->new_value, &tr_last->exp, tr_last->lastchange, tr_last->triggerid,
+		evaluate_expression(&tr_last->new_value, &tr_last->expression, tr_last->lastchange, tr_last->triggerid,
 				tr_last->value, tr_last->new_error, sizeof(tr_last->new_error));
 
 		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
@@ -954,7 +952,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
 	{
 		zbx_free(tr_last->error);
-		zbx_free(tr_last->exp);
+		zbx_free(tr_last->expression);
 
 		if (0 == tr_last->lastchange)
 			continue;
