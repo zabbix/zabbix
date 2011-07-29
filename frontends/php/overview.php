@@ -126,7 +126,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 			array(
 				$col,
 				$config['blink_period'] > 0
-					? _s("Blinks when age is less then %s", convertUnitsS($config['blink_period']))
+					? _s("Blinks when age is less than %s", convertUnitsS($config['blink_period']))
 					: _('Blinking on status change is disabled')
 			)
 		);
