@@ -35,7 +35,7 @@ $triggerDOFormList->addRow(SPACE, array($headerDiv, _('Blinking')));
 
 // Unacknowledged problem events
 $triggerDOFormList->addRow(
-	_('Unacknowledged problem events'),
+	_('Unacknowledged PROBLEM events'),
 	array(
 		new CDiv(
 			new CColor('problem_unack_color', $data['problem_unack_color']),
@@ -52,7 +52,7 @@ $triggerDOFormList->addRow(
 
 // Acknowledged problem events
 $triggerDOFormList->addRow(
-	_('Acknowledged problem events'),
+	_('Acknowledged PROBLEM events'),
 	array(
 		new CDiv(
 			new CColor('problem_ack_color', $data['problem_ack_color']),
@@ -69,7 +69,7 @@ $triggerDOFormList->addRow(
 
 // Unacknowledged recovery events
 $triggerDOFormList->addRow(
-	_('Unacknowledged recovery events'),
+	_('Unacknowledged OK events'),
 	array(
 		new CDiv(
 			new CColor('ok_unack_color', $data['ok_unack_color']),
@@ -86,7 +86,7 @@ $triggerDOFormList->addRow(
 
 // Acknowledged recovery events
 $triggerDOFormList->addRow(
-	_('Acknowledged recovery events'),
+	_('Acknowledged OK events'),
 	array(
 		new CDiv(
 			new CColor('ok_ack_color', $data['ok_ack_color']),
@@ -109,13 +109,13 @@ $triggerDOFormList->addRow(BR());
 $okPeriodTextBox = new CTextBox('ok_period', $data['ok_period']);
 $okPeriodTextBox->addStyle('width: 4em;');
 $okPeriodTextBox->setAttribute('maxlength', '6');
-$triggerDOFormList->addRow(_('Display OK triggers'), array($okPeriodTextBox, SPACE, _('seconds')));
+$triggerDOFormList->addRow(_('Display OK triggers for'), array($okPeriodTextBox, SPACE, _('seconds')));
 
 // Triggers blink on status change
 $okPeriodTextBox = new CTextBox('blink_period', $data['blink_period']);
 $okPeriodTextBox->addStyle('width: 4em;');
 $okPeriodTextBox->setAttribute('maxlength', '6');
-$triggerDOFormList->addRow(_('Triggers blink on status change'), array($okPeriodTextBox, SPACE, _('seconds')));
+$triggerDOFormList->addRow(_('On status change triggers blink for'), array($okPeriodTextBox, SPACE, _('seconds')));
 
 $severityView = new CTabView();
 $severityView->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList);
