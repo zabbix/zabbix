@@ -17,6 +17,9 @@ int main()
 	ThriftProtocol		*protocol;
 	CassandraClient		*client;
 
+	InvalidRequestException	*ire = NULL;
+	GError			*error = NULL;
+
 	g_type_init();
 
 	tsocket = g_object_new(THRIFT_TYPE_SOCKET, "hostname", "localhost", "port", 9160, NULL);
@@ -38,7 +41,7 @@ int main()
 	assert(NULL != client);
 
 	printf("been here 1\n"); fflush(stdout);
-	cassandra_client_set_keyspace(CASSANDRA_IF(client), "Twissandra", NULL, NULL);
+	cassandra_client_set_keyspace(CASSANDRA_IF(client), "Twissandra", &ire, &error);
 	printf("been here 2\n"); fflush(stdout);
 
 	g_object_unref(client);
