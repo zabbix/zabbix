@@ -120,7 +120,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 		// blinking preview in help popup
 		$col = new CCol(SPACE, 'not_classified');
-		$col->setAttribute('style','background-image: url(images/gradients/blink1.gif); '.
+		$col->setAttribute('style','background-image: url(images/gradients/blink.gif); '.
 			'background-position: top left; background-repeat: repeat;');
 		$help_table->addRow(
 			array(
