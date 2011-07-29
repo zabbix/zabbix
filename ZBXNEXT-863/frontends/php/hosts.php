@@ -71,8 +71,8 @@ include_once('include/page_header.php');
 
 		'mass_clear_tpls'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
 
-		'profile_mode'=>		array(T_ZBX_INT, O_OPT, NULL, IN(HOST_PROFILE_DISABLED.','.HOST_PROFILE_MANUAL.','.HOST_PROFILE_AUTOMATIC),	NULL),
-		'host_profile'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	NULL,   NULL),
+		'inventory_mode'=>		array(T_ZBX_INT, O_OPT, NULL, IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC),	NULL),
+		'host_inventory'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	NULL,   NULL),
 
 		'macros_rem'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
 		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS,   null,	null),
@@ -154,7 +154,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
-			'selectProfile' => true
+			'selectInventory' => true
 		);
 		$hosts = API::Host()->get($params);
 		order_result($hosts, 'name');
@@ -359,12 +359,12 @@ include_once('include/page_header.php');
 				}
 			}
 
-// PROFILES {{{
-			if(isset($visible['profile_mode'])){
-				$new_values['profile_mode'] = get_request('profile_mode', HOST_PROFILE_DISABLED);
-				$new_values['profile'] = $new_values['profile_mode'] != HOST_PROFILE_DISABLED ? get_request('host_profile', array()) : array();
+// INVENTORIES {{{
+			if(isset($visible['inventory_mode'])){
+				$new_values['inventory_mode'] = get_request('inventory_mode', HOST_INVENTORY_DISABLED);
+				$new_values['inventory'] = $new_values['inventory_mode'] != HOST_INVENTORY_DISABLED ? get_request('host_inventory', array()) : array();
 			}
-// }}} PROFILES
+// }}} INVENTORIES
 
 			$newgroup = array();
 			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
@@ -519,8 +519,8 @@ include_once('include/page_header.php');
 				'templates' => $templates,
 				'interfaces' => $interfaces,
 				'macros' => $macros,
-				'profile' => (get_request('profile_mode') != HOST_PROFILE_DISABLED) ? get_request('host_profile', array()) : array(),
-				'profile_mode' => get_request('profile_mode')
+				'inventory' => (get_request('inventory_mode') != HOST_INVENTORY_DISABLED) ? get_request('host_inventory', array()) : array(),
+				'inventory_mode' => get_request('inventory_mode')
 			);
 
 			if($create_new){

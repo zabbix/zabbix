@@ -122,7 +122,7 @@ switch($itemType) {
 												ITEM_TYPE_DB_MONITOR.','.
 												ITEM_TYPE_TELNET.','.
 												ITEM_TYPE_CALCULATED,'type'), $paramsFieldName),
-		'profile_link' =>       array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})&&{value_type}!='.ITEM_VALUE_TYPE_LOG),
+		'inventory_link' =>       array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})&&{value_type}!='.ITEM_VALUE_TYPE_LOG),
 
 		//hidden fields for better gui
 		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
@@ -449,7 +449,7 @@ switch($itemType) {
 			'ipmi_sensor'		=> get_request('ipmi_sensor'),
 			'data_type'		=> get_request('data_type'),
 			'applications' => $applications,
-			'profile_link' => get_request('profile_link'),
+			'inventory_link' => get_request('inventory_link'),
 		);
 
 		if(isset($_REQUEST['itemid'])){
@@ -599,7 +599,7 @@ switch($itemType) {
 				'params'			=> get_request('params'),
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
 				'data_type'		=> get_request('data_type'),
-				'profile_link'  => get_request('profile_link'),
+				'inventory_link'  => get_request('inventory_link'),
 				'applications'  => get_request('applications',array())
 			);
 		$delay_flex = get_request('delay_flex',array());

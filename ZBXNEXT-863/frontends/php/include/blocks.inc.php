@@ -923,22 +923,22 @@ function make_latest_issues($filter = array(), $showStatus=false){
 		}
 
 		if(isset($thosts_cache[$trigger['hostid']])){
-			$hprofile = $thosts_cache[$trigger['hostid']];
+			$hinventory = $thosts_cache[$trigger['hostid']];
 		}
 		else{
-			$hprofile = API::Host()->get(array(
+			$hinventory = API::Host()->get(array(
 				'hostids' => $trigger['hostid'],
 				'output' => API_OUTPUT_SHORTEN,
-				'selectProfile' => true,
+				'selectInventory' => true,
 			));
-			$hprofile = reset($hprofile);
-			$thosts_cache[$hprofile['hostid']] = $hprofile;
+			$hinventory = reset($hinventory);
+			$thosts_cache[$hinventory['hostid']] = $hinventory;
 		}
 
 		$menus.= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=".$group['groupid'].'&hostid='.$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-		if(!empty($hprofile['profile']))
-			$menus.= "['".S_PROFILE."',\"javascript: redirect('hostprofiles.php?hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+		if(!empty($hinventory['inventory']))
+			$menus.= "['".S_HOST_INVENTORIES."',\"javascript: redirect('hostinventories.php?hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 		$menus = rtrim($menus,',');
 		$menus = 'show_popup_menu(event,['.$menus.'],180);';
