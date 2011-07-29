@@ -30,7 +30,7 @@
 .unknown { color: #999999; }
 .normal	{ background-color: #AADDDD; }
 
-.disaster, .high, .average, .warning, .information, .unknown_trigger, .normal { color: #222; }
+.disaster, .high, .average, .warning, .information, .not_classified, .trigger_unknown, .normal { color: #222; }
 
 /*////////////////	LINKS	////////////////////*/
 a:link 		{	color:#FF5500;  }
