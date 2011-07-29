@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 
 #include <thrift.h>
@@ -9,6 +10,149 @@
 
 #include "cassandra.h"
 
+static void	output_byte_array(const char *label, const GByteArray *array)
+{
+	int	i;
+
+	printf("%s='", label);
+
+	for (i = 0; i < array->len; i++)
+		printf("%02x", array->data[i]);
+
+	printf("' ");
+}
+
+static void	report_error(InvalidRequestException *ire, NotFoundException *nfe, UnavailableException *ue, TimedOutException *toe, GError *error)
+{
+	if (NULL != error)
+	{
+		printf("got error: %s\n", error->message);
+		g_error_free(error);
+	}
+
+	if (NULL != ire)
+	{
+		printf("got InvalidRequestException: %s\n", ire->why);
+		g_object_unref(ire);
+	}
+
+	if (NULL != nfe)
+	{
+		printf("got NotFoundException\n");
+		g_object_unref(nfe);
+	}
+
+	if (NULL != ue)
+	{
+		printf("got UnavailableException");
+		g_object_unref(ue);
+	}
+
+	if (NULL != toe)
+	{
+		printf("got TimedOutException\n");
+		g_object_unref(toe);
+	}
+}
+
+static void	test_keyspace(CassandraClient *client)
+{
+	InvalidRequestException	*ire = NULL;
+	GError			*error = NULL;
+
+	if (FALSE == cassandra_client_set_keyspace(CASSANDRA_IF(client), "history_keyspace", &ire, &error))
+	{
+		report_error(ire, NULL, NULL, NULL, error);
+		exit(EXIT_FAILURE);
+	}
+}
+
+static void	test_set_value(CassandraClient *client)
+{
+	InvalidRequestException	*ire = NULL;
+	UnavailableException	*ue = NULL;
+	TimedOutException	*toe = NULL;
+	GError			*error = NULL;
+
+	GByteArray		*key;
+	GByteArray		*name;
+	GByteArray		*value;
+	Column			*column;
+	ColumnParent		*column_parent;
+
+	key = g_byte_array_new();
+	g_byte_array_append(key, "\0\0\0\0\0\0\0\1", 8);
+
+	name = g_byte_array_new();
+	g_byte_array_append(name, "\1", 1);
+
+	value = g_byte_array_new();
+	g_byte_array_append(value, "\1\1\1\1\1\1\1\1", 8);
+
+	column_parent = g_object_new(TYPE_COLUMN_PARENT, NULL);
+	column_parent->column_family = "metric2";
+
+	column = g_object_new(TYPE_COLUMN, NULL);
+	column->name = name;
+	column->value = value;
+	column->__isset_value = TRUE;
+	column->timestamp = time(NULL);
+	column->__isset_timestamp = TRUE;
+
+	if (FALSE == cassandra_client_insert(CASSANDRA_IF(client), key, column_parent, column, CONSISTENCY_LEVEL_ONE, &ire, &ue, &toe, &error))
+	{
+		report_error(ire, NULL, ue, toe, error);
+		exit(EXIT_FAILURE);
+	}
+
+	g_object_unref(column);
+	g_object_unref(column_parent);
+	g_byte_array_free(value, TRUE);
+	g_byte_array_free(name, TRUE);
+	g_byte_array_free(key, TRUE);
+}
+
+static void	test_get_value(CassandraClient *client)
+{
+	InvalidRequestException	*ire = NULL;
+	NotFoundException	*nfe = NULL;
+	UnavailableException	*ue = NULL;
+	TimedOutException	*toe = NULL;
+	GError			*error = NULL;
+
+	GByteArray		*key;
+	GByteArray		*column;
+	ColumnPath		*column_path;
+	ColumnOrSuperColumn	*query_result = NULL;
+
+	key = g_byte_array_new();
+	g_byte_array_append(key, "\0\0\0\0\0\0\0\1", 8);
+
+	column = g_byte_array_new();
+	g_byte_array_append(column, "\2", 1);
+
+	column_path = g_object_new(TYPE_COLUMN_PATH, NULL);
+	column_path->column_family = "metric2";
+	column_path->__isset_column = TRUE;
+	column_path->column = column;
+
+	if (FALSE == cassandra_client_get(CASSANDRA_IF(client), &query_result, key, column_path, CONSISTENCY_LEVEL_ONE, &ire, &nfe, &ue, &toe, &error))
+	{
+		report_error(ire, nfe, ue, toe, error);
+		exit(EXIT_FAILURE);
+	}
+
+	output_byte_array("column", column);
+	output_byte_array("name", query_result->column->name);
+	output_byte_array("value", query_result->column->value);
+	printf("\n");
+
+	/* should free query_result? */
+	g_object_unref(column_path);
+	g_byte_array_free(column, TRUE);
+	g_byte_array_free(key, TRUE);
+}
+
 int main()
 {
 	ThriftSocket		*tsocket;
@@ -17,32 +161,21 @@ int main()
 	ThriftProtocol		*protocol;
 	CassandraClient		*client;
 
-	InvalidRequestException	*ire = NULL;
-	GError			*error = NULL;
-
 	g_type_init();
 
 	tsocket = g_object_new(THRIFT_TYPE_SOCKET, "hostname", "localhost", "port", 9160, NULL);
-	assert(NULL != tsocket);
-
 	transport = g_object_new(THRIFT_TYPE_FRAMED_TRANSPORT, "transport", THRIFT_TRANSPORT(tsocket), NULL);
-	assert(NULL != transport);
-
 	protocol2 = g_object_new(THRIFT_TYPE_BINARY_PROTOCOL, "transport", transport, NULL);
-	assert(NULL != protocol2);
-
 	protocol = THRIFT_PROTOCOL(protocol2);
-	assert(NULL != protocol);
 
 	assert(TRUE == thrift_framed_transport_open(transport, NULL));
 	assert(TRUE == thrift_framed_transport_is_open(transport));
 
 	client = g_object_new(TYPE_CASSANDRA_CLIENT, "input_protocol", protocol, "output_protocol", protocol, NULL);
-	assert(NULL != client);
 
-	printf("been here 1\n"); fflush(stdout);
-	cassandra_client_set_keyspace(CASSANDRA_IF(client), "Twissandra", &ire, &error);
-	printf("been here 2\n"); fflush(stdout);
+	test_keyspace(client);
+	test_set_value(client);
+	test_get_value(client);
 
 	g_object_unref(client);
 
