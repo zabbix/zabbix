@@ -464,16 +464,14 @@ static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
  ******************************************************************************/
 static int	trigger_dependent(zbx_uint64_t triggerid)
 {
-	int	ret;
-	int	level = 0;
+	const char	*__function_name = "trigger_dependent";
+	int		ret, level = 0;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In trigger_dependent(triggerid:" ZBX_FS_UI64 ")",
-		triggerid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __function_name, triggerid);
 
 	ret = trigger_dependent_rec(triggerid, &level);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of trigger_dependent():%s",
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -498,7 +496,7 @@ static int	trigger_dependent(zbx_uint64_t triggerid)
  *                                                                            *
  ******************************************************************************/
 void	DBcheck_trigger_for_update(zbx_uint64_t triggerid, unsigned char type, int value, const char *error,
-		int new_value, int now, unsigned char *update_trigger, unsigned char *add_event)
+		int new_value, const char *new_error, int now, unsigned char *update_trigger, unsigned char *add_event)
 {
 	const char	*__function_name = "DBcheck_trigger_for_update";
 	int		update_status;
@@ -508,32 +506,29 @@ void	DBcheck_trigger_for_update(zbx_uint64_t triggerid, unsigned char type, int 
 
 	*update_trigger = *add_event = 0;
 
-	switch (type)
-	{
-		case TRIGGER_TYPE_MULTIPLE_TRUE:
-			update_status = value != new_value || TRIGGER_VALUE_TRUE == new_value;
-			break;
-		case TRIGGER_TYPE_NORMAL:
-		default:
-			update_status = value != new_value;
-			break;
-	}
+	update_status = (value != new_value);
+	if (TRIGGER_TYPE_MULTIPLE_TRUE == type)
+		update_status = (update_status || TRIGGER_VALUE_TRUE == new_value);
 
-	/* do not update status if there are dependencies with status TRUE */
-	update_status = update_status && SUCCEED != trigger_dependent(triggerid);
-
+	/* do not update status if there are dependencies with status PROBLEM */
 	if (0 != update_status)
-		*update_trigger = *add_event = 1;	/* update trigger */
-	else if (new_value == TRIGGER_VALUE_UNKNOWN)
-		*update_trigger = 2;	/* update only the error field */
+	{
+		if (SUCCEED != trigger_dependent(triggerid))
+			*update_trigger = *add_event = 1;	/* update trigger and create event */
+	}
+	else if (new_value == TRIGGER_VALUE_UNKNOWN && 0 != strcmp(error, new_error))
+	{
+		if (SUCCEED != trigger_dependent(triggerid))
+			*update_trigger = 2;			/* update only the error field */
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() update_trigger:%d add_event:%d",
 			__function_name, *update_trigger, *add_event);
 }
 
-int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset,
-		zbx_uint64_t triggerid, int value, const char *error,
-		int new_value, const char *new_error, int lastchange, unsigned char update_trigger)
+int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_uint64_t triggerid,
+		int value, const char *error, int new_value, const char *new_error, int lastchange,
+		unsigned char update_trigger)
 {
 	char	*new_error_esc;
 
@@ -544,21 +539,12 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset,
 		if (value != new_value)
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 18, ",value=%d", new_value);
 
-		if ((NULL == new_error || '\0' == new_error) && '\0' != error)
-		{
+		if ('\0' != error)
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 10, ",error=''");
-		}
-		else if (NULL != new_error && 0 != strcmp(error, new_error))
-		{
-			new_error_esc = DBdyn_escape_string_len(new_error, TRIGGER_ERROR_LEN);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 10 + strlen(new_error_esc),
-					",error='%s'", new_error_esc);
-			zbx_free(new_error_esc);
-		}
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 38, " where triggerid=" ZBX_FS_UI64, triggerid);
 	}
-	else if (2 == update_trigger && 0 != strcmp(error, new_error))
+	else if (2 == update_trigger)
 	{
 		new_error_esc = DBdyn_escape_string_len(new_error, TRIGGER_ERROR_LEN);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 66 + strlen(new_error_esc),
@@ -584,7 +570,8 @@ static void	DBupdate_trigger_value(zbx_uint64_t triggerid, unsigned char type, i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DBcheck_trigger_for_update(triggerid, type, value, error, new_value, lastchange, &update_trigger, &add_event);
+	DBcheck_trigger_for_update(triggerid, type, value, error, new_value, new_error,
+			lastchange, &update_trigger, &add_event);
 
 	sql = zbx_malloc(sql, sql_alloc);
 

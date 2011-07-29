@@ -226,7 +226,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 		tr_last->lastchange = now;
 
 		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
-				tr_last->new_value, tr_last->lastchange, &tr_last->update_trigger, &tr_last->add_event);
+				tr_last->new_value, tr_last->new_error, tr_last->lastchange, &tr_last->update_trigger,
+				&tr_last->add_event);
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
 				tr_last->value, tr_last->error, tr_last->new_value, reason,
