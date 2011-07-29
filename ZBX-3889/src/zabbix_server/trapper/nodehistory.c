@@ -160,14 +160,10 @@ fail:
  *                                                                            *
  * Purpose: process record update                                             *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *table, const char *record)
@@ -180,37 +176,33 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 
 	r = record;
 
-	for (f = 0; table->fields[f].name != 0; f++)
+	for (f = 0; 0 != table->fields[f].name; f++)
 	{
 		if (NULL == r)
 			goto error;
 
 		zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 
-		if (0 == strcmp(table->fields[f].name, "eventid")) {
+		if (0 == strcmp(table->fields[f].name, "eventid"))
 			ZBX_STR2UINT64(eventid, buffer);
-		} else if (0 == strcmp(table->fields[f].name, "source")) {
+		else if (0 == strcmp(table->fields[f].name, "source"))
 			source = atoi(buffer);
-		} else if (0 == strcmp(table->fields[f].name, "object")) {
+		else if (0 == strcmp(table->fields[f].name, "object"))
 			object = atoi(buffer);
-		} else if (0 == strcmp(table->fields[f].name, "objectid")) {
+		else if (0 == strcmp(table->fields[f].name, "objectid"))
 			ZBX_STR2UINT64(objectid, buffer);
-		} else if (0 == strcmp(table->fields[f].name, "clock")) {
+		else if (0 == strcmp(table->fields[f].name, "clock"))
 			clock = atoi(buffer);
-		} else if (0 == strcmp(table->fields[f].name, "value")) {
+		else if (0 == strcmp(table->fields[f].name, "value"))
 			value = atoi(buffer);
-		} else if (0 == strcmp(table->fields[f].name, "acknowledged")) {
+		else if (0 == strcmp(table->fields[f].name, "acknowledged"))
 			acknowledged = atoi(buffer);
-		}
 	}
 
 	return process_event(0, source, object, objectid, clock, value, acknowledged, 0);
 error:
-	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
-		CONFIG_NODEID,
-		sender_nodeid,
-		nodeid,
-		record);
+	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
+		CONFIG_NODEID, sender_nodeid, nodeid, record);
 
 	return FAIL;
 }

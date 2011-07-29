@@ -492,8 +492,6 @@ static int	trigger_dependent(zbx_uint64_t triggerid)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 void	DBcheck_trigger_for_update(zbx_uint64_t triggerid, unsigned char type, int value, const char *error,
 		int new_value, const char *new_error, int now, unsigned char *update_trigger, unsigned char *add_event)
@@ -530,8 +528,6 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 		int value, const char *error, int new_value, const char *new_error, int lastchange,
 		unsigned char update_trigger)
 {
-	char	*new_error_esc;
-
 	if (1 == update_trigger)
 	{
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 42, "update triggers set lastchange=%d", lastchange);
@@ -546,6 +542,8 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 	}
 	else if (2 == update_trigger)
 	{
+		char	*new_error_esc;
+
 		new_error_esc = DBdyn_escape_string_len(new_error, TRIGGER_ERROR_LEN);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 66 + strlen(new_error_esc),
 				"update triggers"
@@ -584,10 +582,7 @@ static void	DBupdate_trigger_value(zbx_uint64_t triggerid, unsigned char type, i
 	zbx_free(sql);
 
 	if (1 == add_event)
-	{
-		/* Processing event */
 		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, lastchange, new_value, 0, 0);
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

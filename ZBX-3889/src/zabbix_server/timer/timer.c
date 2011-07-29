@@ -42,13 +42,7 @@ extern unsigned char	process_type;
  *                                                                            *
  * Purpose: re-calculate and update values of time-driven functions           *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	process_time_functions()
@@ -143,7 +137,6 @@ static void	process_time_functions()
 		if (1 != tr_last->add_event)
 			continue;
 
-		/* processing event */
 		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
 				tr_last->lastchange, tr_last->new_value, 0, 0);
 	}

@@ -28,13 +28,7 @@
  *                                                                            *
  * Purpose: generate UP/DOWN event if required                                *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_add_event(int object, zbx_uint64_t objectid, int now, int value)

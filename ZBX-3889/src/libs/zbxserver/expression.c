@@ -1637,13 +1637,7 @@ fail:
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
@@ -2266,14 +2260,12 @@ error:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	evaluate_expression(int *result, char **expression, time_t now,
 		zbx_uint64_t triggerid, int trigger_value, char **error)
 {
 	const char	*__function_name = "evaluate_expression";
-	/* Required for substitution of macros */
+
 	DB_EVENT	event;
 	int		ret = FAIL;
 	double		value;
@@ -2281,7 +2273,7 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
-	/* Substitute macros first */
+	/* substitute macros first */
 	memset(&event, 0, sizeof(DB_EVENT));
 	event.source = EVENT_SOURCE_TRIGGERS;
 	event.object = EVENT_OBJECT_TRIGGER;
@@ -2291,7 +2283,7 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, NULL, expression,
 			MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 	{
-		/* Evaluate expression */
+		/* evaluate expression */
 		zbx_remove_spaces(*expression);
 		if (SUCCEED == substitute_functions(expression, now, err, sizeof(err)))
 		{
