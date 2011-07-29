@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-28 00:52+0300\n"
+"POT-Creation-Date: 2011-07-29 10:42+0300\n"
 "PO-Revision-Date: 2011-06-07 11:42+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -30,11 +30,12 @@ msgstr ""
 msgid "\"Triggers blink on status change\" needs to be a positive integer."
 msgstr ""
 
-#: include/func.inc.php:391
+#: include/func.inc.php:374
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
 msgstr[0] ""
+msgstr[1] ""
 
 #: chart4.php:87 chart5.php:90
 #, php-format
@@ -46,6 +47,7 @@ msgstr "%1$s (yıl %2$s)"
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
 msgstr[0] ""
+msgstr[1] ""
 
 #: discovery.php:241
 #, php-format
@@ -1724,7 +1726,7 @@ msgstr "Bağlan"
 #: include/page_footer.php:103
 #, php-format
 msgid "Connected as '%1$s'"
-msgstr " '%1$s' olarak oturum açıldı"
+msgstr "'%1$s' olarak oturum açıldı"
 
 #: include/page_footer.php:100
 #, php-format
@@ -1877,7 +1879,7 @@ msgstr "Kritik hata"
 #: include/validate.inc.php:549
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr "Kritik hata. \"%2$s\" alanı için \"%1$s1 değeri geçersiz."
+msgstr "Kritik hata. \"%2$s\" alanı için \"%1$s\" değeri geçersiz."
 
 #: include/views/js/configuration.action.edit.js.php:85
 #: include/views/js/configuration.action.edit.js.php:180
@@ -2603,7 +2605,7 @@ msgstr "Keşif kuralı  [%1$s:%2$s] silindi."
 #: api/classes/class.ctemplate.php:1973
 #, php-format
 msgid "Discovery rule [%1$s:%2$s] unlinked."
-msgstr " [%1$s:%2$s]  keşif kuralının bağlantısı kaldırıldı."
+msgstr "[%1$s:%2$s]  keşif kuralının bağlantısı kaldırıldı."
 
 #: api/classes/class.cdrule.php:602 api/classes/class.cdrule.php:670
 #, php-format
@@ -2717,12 +2719,12 @@ msgstr "Aşağı"
 #: api/classes/class.cwebcheck.php:527
 #, php-format
 msgid "Download speed for scenario '%s'"
-msgstr " '%s' senaryosu için karşıdan yükleme hızı"
+msgstr "'%s' senaryosu için karşıdan yükleme hızı"
 
 #: api/classes/class.cwebcheck.php:616
 #, php-format
 msgid "Download speed for step '%1$s' of scenario '%2$s'"
-msgstr " '%2$s' senaryosu  '%1$s'  adımının karşıdan yükleme hızı"
+msgstr "'%2$s' senaryosu  '%1$s'  adımının karşıdan yükleme hızı"
 
 #: include/locales/en_gb.inc.php:115 include/locales/en_gb.inc.php:1380
 msgid "Downtime"
@@ -3140,7 +3142,7 @@ msgstr ""
 #: api/classes/class.cwebcheck.php:535
 #, php-format
 msgid "Failed step of scenario '%s'"
-msgstr " '%s' senaryosunun başarısız adımı"
+msgstr "'%s' senaryosunun başarısız adımı"
 
 #: api/classes/class.ctemplate.php:1123
 msgid "Failed to update template"
@@ -3188,7 +3190,7 @@ msgstr "\"konak\" alanı zorunlu."
 
 #: api/classes/class.cdrule.php:541
 msgid "Field \"name\" is required."
-msgstr "\"isim1 alanı gerekiyor."
+msgstr "\"isim\" alanı gerekiyor."
 
 #: hostprofiles.php:126
 msgid "Field:"
@@ -3382,7 +3384,7 @@ msgstr "Grafik"
 #: api/classes/class.cgraph.php:846 api/classes/class.cgraphprototype.php:835
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ]"
-msgstr " [ %1$s ] grafiği:  [ %2$s ]'de zaten var"
+msgstr "[ %1$s ] grafiği:  [ %2$s ]'de zaten var"
 
 #: api/classes/class.cgraph.php:867 api/classes/class.cgraphprototype.php:856
 #, php-format
@@ -3394,7 +3396,7 @@ msgstr "Grafik [ %1$s ]: zaten [ %2$s ] üzerinde var (başka bir şablondan kal
 #: api/classes/class.cgraphprototype.php:885
 #, php-format
 msgid "Graph [ %1$s ]: already exists on [ %2$s ] (items are not identical)"
-msgstr " [ %1$s ] grafiği:  [ %2$s ]'de zaten var (öğeler özdeş değil)"
+msgstr "[ %1$s ] grafiği:  [ %2$s ]'de zaten var (öğeler özdeş değil)"
 
 #: api/classes/class.cgraph.php:819 api/classes/class.cgraphprototype.php:808
 #, php-format
@@ -3414,7 +3416,7 @@ msgstr "[ %1$s ] grafiği: kalıtlanamaz. [ %2$s ] üzerinde gereken öğeler bu
 #: api/classes/class.ctemplate.php:2075
 #, php-format
 msgid "Graph [%1$s] unlinked."
-msgstr " [%1$s] grafiğinin bağlantısı kaldırıldı."
+msgstr "[%1$s] grafiğinin bağlantısı kaldırıldı."
 
 #: api/classes/class.cgraph.php:1033
 #, php-format
@@ -3444,7 +3446,7 @@ msgstr "Grafik ismi"
 #: api/classes/class.ctemplate.php:2057
 #, php-format
 msgid "Graph prototype [%1$s] unlinked."
-msgstr " [%1$s] grafik prototipinin bağlantısı kaldırıldı."
+msgstr "[%1$s] grafik prototipinin bağlantısı kaldırıldı."
 
 #: api/classes/class.cgraphprototype.php:1035
 #, php-format
@@ -3475,7 +3477,7 @@ msgstr "Grafik güncellendi"
 #: api/classes/class.cgraph.php:1118
 #, php-format
 msgid "Graph with name \"%1$s\" already exists"
-msgstr " \"%1$s\" isimli grafik zaten var"
+msgstr "\"%1$s\" isimli grafik zaten var"
 
 #: api/classes/class.cgraph.php:849 api/classes/class.cgraph.php:870
 #: api/classes/class.cgraphprototype.php:838
@@ -3698,12 +3700,12 @@ msgstr "Konak"
 #: api/classes/class.cproxy.php:367 api/classes/class.ctemplate.php:1041
 #, php-format
 msgid "Host \"%s\" already exists."
-msgstr " \"%s\" konağı zaten var."
+msgstr "\"%s\" konağı zaten var."
 
 #: api/classes/class.chost.php:2240
 #, php-format
 msgid "Host \"%s\" deleted."
-msgstr " \"%s\" konağı silindi."
+msgstr "\"%s\" konağı silindi."
 
 #: include/export.inc.php:899
 #, php-format
@@ -4047,11 +4049,11 @@ msgstr "Simge(bilinmeyen)"
 
 #: include/views/configuration.sysmap.edit.php:68
 msgid "Icon highlight"
-msgstr "simge aydınlatma"
+msgstr "Simge aydınlatma"
 
 #: include/views/configuration.sysmap.edit.php:119
 msgid "Icon label location"
-msgstr "simge etiket konumu"
+msgstr "Simge etiket konumu"
 
 #: include/views/configuration.sysmap.edit.php:114
 msgid "Icon label type"
@@ -4293,7 +4295,7 @@ msgstr "Yönteme geçersiz değişkenler geçirildi."
 #: api/classes/class.chost.php:1360
 #, php-format
 msgid "Incorrect characters used for Host name \"%s\""
-msgstr " \"%s\" isimli Konak için geçersiz karakterler kullanılmış."
+msgstr "\"%s\" isimli Konak için geçersiz karakterler kullanılmış."
 
 #: api/classes/class.chost.php:1728
 #, php-format
@@ -4833,7 +4835,7 @@ msgstr "\"%1$s\" anahtarlı öğe zaten \"%2$s\" konağı üzerinde bilinmeyen �
 #: api/classes/class.cwebcheck.php:549
 #, php-format
 msgid "Item with key [%s] already exists"
-msgstr "\"%1$s\" anahtarlı öğe zaten var."
+msgstr "[%s] anahtarlı öğe zaten var."
 
 #: hosts.php:763 hosts.php:845 include/locales/en_gb.inc.php:710
 #: include/views/configuration.host.edit.php:254
@@ -5367,7 +5369,7 @@ msgstr "Bakım güncellendi"
 #: include/db.inc.php:1164
 #, php-format
 msgid "Mandatory field \"%1$s\" is missing in table \"%2$s\"."
-msgstr " \"%2$s\" tablosunda \"%1$s zorunlu alanı eksik"
+msgstr "\"%2$s\" tablosunda \"%1$s\" zorunlu alanı eksik"
 
 #: include/views/configuration.host.edit.php:525
 #: include/views/configuration.host.massupdate.php:217
@@ -5572,7 +5574,7 @@ msgstr "Hafıza kullanımı"
 msgid "Menu"
 msgstr "Menü"
 
-#: acknow.php:188 auditacts.php:151 auditacts.php:213
+#: acknow.php:190 auditacts.php:151 auditacts.php:213
 #: include/actions.inc.php:329 include/actions.inc.php:338
 #: include/actions.inc.php:344 include/actions.inc.php:766
 #: include/actions.inc.php:809 include/actions.inc.php:842
@@ -6030,7 +6032,7 @@ msgstr "Şablon için hiçbir grup yok"
 #: api/classes/class.ctemplate.php:991
 #, php-format
 msgid "No groups for template [ %s ]"
-msgstr " [ %s ] şablonu için grup yok"
+msgstr "[ %s ] şablonu için grup yok"
 
 #: include/locales/en_gb.inc.php:720
 msgid "No host groups defined"
@@ -7232,7 +7234,7 @@ msgstr "Yanıt kodu"
 #: api/classes/class.cwebcheck.php:630
 #, php-format
 msgid "Response code for step '%1$s' of scenario '%2$s'"
-msgstr " '%2$s' senaryosunun '%1$s' adımı için yanıt kodu"
+msgstr "'%2$s' senaryosunun '%1$s' adımı için yanıt kodu"
 
 #: include/locales/en_gb.inc.php:131
 msgid "Response time"
@@ -7241,7 +7243,7 @@ msgstr "Yanıt süresi"
 #: api/classes/class.cwebcheck.php:623
 #, php-format
 msgid "Response time for step '%1$s' of scenario '%2$s'"
-msgstr " '%2$s' senaryosunun '%1$s' adımı için yanıt süresi"
+msgstr "'%2$s' senaryosunun '%1$s' adımı için yanıt süresi"
 
 #: include/locales/en_gb.inc.php:1586
 msgid "Result"
@@ -8384,7 +8386,7 @@ msgstr "\"%s\" şablonu zaten var."
 #: api/classes/class.ctemplate.php:1252
 #, php-format
 msgid "Template [%1$s] deleted."
-msgstr " [%1$s] şablonu silindi."
+msgstr "[%1$s] şablonu silindi."
 
 #: include/locales/en_gb.inc.php:787
 msgid "Template deleted"
@@ -8661,7 +8663,7 @@ msgstr "[%1$s:%2$s] tetiği oluşturuldu."
 #: api/classes/class.ctrigger.php:1429
 #, php-format
 msgid "Trigger [%1$s:%2$s] deleted."
-msgstr " [%1$s:%2$s] tetiği silindi"
+msgstr "[%1$s:%2$s] tetiği silindi"
 
 #: api/classes/class.ctriggerprototype.php:1135
 #, php-format
@@ -8676,14 +8678,14 @@ msgstr "[%1$s:%2$s] tetiğinin bağlantısı kaldırıldı."
 #: api/classes/class.ctrigger.php:1614
 #, php-format
 msgid "Trigger [%1$s:%2$s] updated."
-msgstr " [%1$s:%2$s] tetiği güncellendi"
+msgstr "[%1$s:%2$s] tetiği güncellendi"
 
 #: api/classes/class.ctrigger.php:1701 api/classes/class.ctrigger.php:1736
 #: api/classes/class.ctriggerprototype.php:1505
 #: api/classes/class.ctriggerprototype.php:1540
 #, php-format
 msgid "Trigger [%1$s] already exists on [%2$s]"
-msgstr " [%1$s:%2$s] tetiği zaten [%2$s] üzerinde var"
+msgstr "[%1$s] tetiği zaten [%2$s] üzerinde var"
 
 #: api/classes/class.ctriggerprototype.php:1212
 #, php-format
@@ -8745,7 +8747,7 @@ msgstr "[%1$s:%2$s] tetik prototipinin bağlantısı kaldırıldı."
 #: api/classes/class.ctriggerprototype.php:1437
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] updated."
-msgstr " [%1$s:%2$s] tetik prototipi güncellendi."
+msgstr "[%1$s:%2$s] tetik prototipi güncellendi."
 
 #: include/views/configuration.host.edit.php:380
 #: include/views/configuration.template.edit.php:310
@@ -9368,12 +9370,12 @@ msgstr "Web öğesi"
 #: api/classes/class.cwebcheck.php:584 api/classes/class.cwebcheck.php:680
 #, php-format
 msgid "Web item [%s] created."
-msgstr " [%s] web öğesi yaratıldı."
+msgstr "[%s] web öğesi yaratıldı."
 
 #: api/classes/class.cwebcheck.php:643
 #, php-format
 msgid "Web item with key [%s] already exists."
-msgstr " [%s] anahtarlı web öğesi zaten var."
+msgstr "[%s] anahtarlı web öğesi zaten var."
 
 #: include/locales/en_gb.inc.php:847
 msgid "Web monitoring"
@@ -9883,7 +9885,7 @@ msgstr "oluşturuldu"
 msgid "ctype module"
 msgstr "ctype modülü"
 
-#: include/func.inc.php:426 include/locales/en_gb.inc.php:32
+#: include/func.inc.php:409 include/locales/en_gb.inc.php:32
 msgid "d"
 msgstr "g"
 
@@ -9992,7 +9994,7 @@ msgstr "konak için"
 msgid "found"
 msgstr "bulunan"
 
-#: include/func.inc.php:433 include/locales/en_gb.inc.php:33
+#: include/func.inc.php:416 include/locales/en_gb.inc.php:33
 msgid "h"
 msgstr "s"
 
@@ -10126,7 +10128,7 @@ msgstr "libxml modülü"
 msgid "like"
 msgstr "benzer"
 
-#: include/func.inc.php:419 include/func.inc.php:440
+#: include/func.inc.php:402 include/func.inc.php:423
 #: include/locales/en_gb.inc.php:30 include/locales/en_gb.inc.php:34
 #: include/locales/en_gb.inc.php:1752
 msgid "m"
@@ -10160,7 +10162,7 @@ msgstr "min"
 msgid "min value"
 msgstr "min değer"
 
-#: include/func.inc.php:399 include/func.inc.php:450
+#: include/func.inc.php:382 include/func.inc.php:433
 #: include/locales/en_gb.inc.php:36
 msgid "ms"
 msgstr "ms"
@@ -10270,7 +10272,7 @@ msgstr "kök"
 msgid "running"
 msgstr "çalışıyor"
 
-#: include/func.inc.php:399 include/func.inc.php:445
+#: include/func.inc.php:382 include/func.inc.php:428
 #: include/locales/en_gb.inc.php:35
 msgid "s"
 msgstr "s"
@@ -10343,7 +10345,7 @@ msgstr "hafta"
 msgid "with template host cannot contain items from other hosts."
 msgstr ""
 
-#: include/func.inc.php:412 include/locales/en_gb.inc.php:29
+#: include/func.inc.php:395 include/locales/en_gb.inc.php:29
 msgid "y"
 msgstr "y"
 
@@ -10354,6 +10356,3 @@ msgstr "evet"
 #: include/locales/en_gb.inc.php:1750
 msgid "µ"
 msgstr "µ"
-
-#~ msgid "Circular link can not be created for map element \"%s\""
-#~ msgstr "\"%s\" harita elemanı için çevrimsel bağlantı oluşturulamadı"
