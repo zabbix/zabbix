@@ -201,7 +201,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 				" and i.status=%d"
 				" and not i.key_ like '%s'"
 				" and not i.key_ like '%s%%'"
-				" and h.hostid=" ZBX_FS_UI64,
+				" and h.hostid=" ZBX_FS_UI64
+			" order by t.triggerid",
 			TRIGGER_STATUS_ENABLED,
 			ITEM_STATUS_ACTIVE,
 			SERVER_STATUS_KEY,
