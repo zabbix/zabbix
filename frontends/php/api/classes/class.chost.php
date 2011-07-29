@@ -489,8 +489,8 @@ class CHost extends CZBXAPI{
 // withInventory
 		if(!is_null($options['withInventory']) && $options['withInventory']){
 			$sql_parts['where'][] = ' h.hostid IN ( '.
-					' SELECT hp.hostid '.
-					' FROM host_inventory hp )';
+					' SELECT hi.hostid '.
+					' FROM host_inventory hi )';
 		}
 
 // search
@@ -773,20 +773,20 @@ Copt::memoryPick();
 			if(is_array($options['selectInventory'])){
 				// if we are given a list of fields that needs to be fetched
 				$dbTable = DB::getSchema('host_inventory');
-				$selectHP = array('hp.hostid');
+				$selectHI = array('hi.hostid');
 				foreach($options['selectInventory'] as $field){
 					if(isset($dbTable['fields'][$field]))
-						$selectHP[] = 'hp.'.$field;
+						$selectHI[] = 'hi.'.$field;
 				}
 			}
 			else{
 				// all fields are needed
-				$selectHP = array('hp.*');
+				$selectHI = array('hi.*');
 			}
 
-			$sql = 'SELECT '.implode(', ', $selectHP).
-				' FROM host_inventory hp '.
-				' WHERE '.DBcondition('hp.hostid', $hostids);
+			$sql = 'SELECT '.implode(', ', $selectHI).
+				' FROM host_inventory hi '.
+				' WHERE '.DBcondition('hi.hostid', $hostids);
 			$db_inventory = DBselect($sql);
 			while($inventory = DBfetch($db_inventory))
 				$result[$inventory['hostid']]['inventory'] = $inventory;
