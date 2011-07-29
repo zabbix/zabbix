@@ -26,19 +26,19 @@ require_once(dirname(__FILE__).'/../../include/hosts.inc.php');
 
 class API_JSON_Item extends CZabbixTest
 {
-	public static function profile_links()
+	public static function inventory_links()
 	{
 		$data = array();
-		$profileFields = getHostProfiles();
-		$profileFieldNumbers = array_keys($profileFields);
-		foreach($profileFieldNumbers as $nr){
+		$inventoryFields = getHostInventories();
+		$inventoryFieldNumbers = array_keys($inventoryFields);
+		foreach($inventoryFieldNumbers as $nr){
 			$data[] = array(
 				$nr,
-				$nr != 1  // item that has profile_link == 1 exists in test data
+				$nr != 1  // item that has inventory_link == 1 exists in test data
 			);
 		}
 		// few non-existing fields
-		$maxNr = max($profileFieldNumbers);
+		$maxNr = max($inventoryFieldNumbers);
 		$data[] = array($maxNr + 1, false);
 		$data[] = array('string', false);
 
@@ -46,9 +46,9 @@ class API_JSON_Item extends CZabbixTest
 	}
 
 	/**
-	 * @dataProvider profile_links
+	 * @dataProvider inventory_links
 	 */
-	public function testCItem_create_profile_item($profileFieldNr, $successExpected)
+	public function testCItem_create_inventory_item($inventoryFieldNr, $successExpected)
 	{
 		DBsave_tables('items');
 
@@ -58,12 +58,12 @@ class API_JSON_Item extends CZabbixTest
 		$result = $this->api_acall(
 			'item.create',
 			array(
-				"name" => "Item that populates field ".$profileFieldNr,
-				"key_" => "key.test.pop.".$profileFieldNr,
+				"name" => "Item that populates field ".$inventoryFieldNr,
+				"key_" => "key.test.pop.".$inventoryFieldNr,
 				"hostid" => "10017",
 				"type"  => "0",
-                "interfaceid"  => "10017",
-				"profile_link" => $profileFieldNr
+				"interfaceid"  => "10017",
+				"inventory_link" => $inventoryFieldNr
 			),
 			&$debug
 		);

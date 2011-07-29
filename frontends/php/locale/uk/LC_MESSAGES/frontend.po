@@ -3136,7 +3136,7 @@ msgstr "Лют"
 msgid "February"
 msgstr "Лютий"
 
-#: hostprofilesoverview.php:86 include/locales/en_gb.inc.php:1805
+#: hostinventoriesoverview.php:86 include/locales/en_gb.inc.php:1805
 msgid "Field"
 msgstr "Поле"
 
@@ -3152,7 +3152,7 @@ msgstr "Поле \"host\" є обов'язковим"
 msgid "Field \"name\" is required."
 msgstr "Поле \"name\" є обов'язковим."
 
-#: hostprofiles.php:126
+#: hostinventories.php:126
 msgid "Field:"
 msgstr ""
 
@@ -3459,7 +3459,7 @@ msgstr "Графіки видалено"
 msgid "Grid"
 msgstr "Сітка"
 
-#: hostprofilesoverview.php:79 hostprofiles.php:93 hostprofiles.php:160
+#: hostinventoriesoverview.php:79 hostinventories.php:93 hostinventories.php:160
 #: hosts.php:717 include/locales/en_gb.inc.php:278
 msgid "Group"
 msgstr "Група"
@@ -3494,7 +3494,7 @@ msgstr "Назва групи"
 msgid "Group updated"
 msgstr "Групу оновлено"
 
-#: hostprofilesoverview.php:80
+#: hostinventoriesoverview.php:80
 msgid "Grouping by"
 msgstr ""
 
@@ -3527,15 +3527,15 @@ msgstr "ІСТОРІЯ ПОДІЙ"
 msgid "HOST GROUPS"
 msgstr "ГРУПИ ВУЗЛІВ МЕРЕЖІ"
 
-#: hostprofilesoverview.php:61
-msgid "HOST PROFILE OVERVIEW"
+#: hostinventoriesoverview.php:61
+msgid "HOST INVENTORY OVERVIEW"
 msgstr ""
 
-#: hostprofiles.php:84
-msgid "HOST PROFILES"
+#: hostinventories.php:84
+msgid "HOST INVENTORIES"
 msgstr "ПРОФІЛІ ВУЗЛІВ МЕРЕЖІ"
 
-#: hostprofilesoverview.php:81 hostprofiles.php:94 hosts_mon.php:120
+#: hostinventoriesoverview.php:81 hostinventories.php:94 hosts_mon.php:120
 #: hosts_mon.php:125 hosts.php:722
 msgid "HOSTS"
 msgstr "ВУЗЛИ МЕРЕЖІ"
@@ -3640,7 +3640,7 @@ msgstr "Горизонтальний"
 msgid "Horizontal align"
 msgstr "Вирівнювання по горизонталі"
 
-#: hostprofiles.php:159 include/actions.inc.php:42
+#: hostinventories.php:159 include/actions.inc.php:42
 #: include/locales/en_gb.inc.php:724 include/locales/en_gb.inc.php:1799
 #: include/views/configuration.host.edit.php:58
 #: include/views/configuration.host.edit.php:408
@@ -3677,7 +3677,7 @@ msgid "Host IP"
 msgstr "IP адреса вузла мережі"
 
 #: include/forms.inc.php:3821
-msgid "Host Profile"
+msgid "Host Inventory"
 msgstr "Профіль вузла мережі"
 
 #: include/views/administration.script.list.php:46
@@ -3688,7 +3688,7 @@ msgstr "Доступ до вузла мережі"
 msgid "Host added"
 msgstr "Вузел мережі додано"
 
-#: hostprofilesoverview.php:87 include/locales/en_gb.inc.php:466
+#: hostinventoriesoverview.php:87 include/locales/en_gb.inc.php:466
 msgid "Host count"
 msgstr "Кількість вузлів мережі"
 
@@ -3737,15 +3737,15 @@ msgid "Host networks"
 msgstr "Мережі вузла мережі"
 
 #: include/views/configuration.host.edit.php:592
-msgid "Host profile"
+msgid "Host inventory"
 msgstr "Профіль вузла мережі"
 
 #: include/locales/en_gb.inc.php:1654
-msgid "Host profile overview"
+msgid "Host inventory overview"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1651
-msgid "Host profiles"
+msgid "Host inventories"
 msgstr "Профіль вузлів мережі"
 
 #: include/hosts.inc.php:245
@@ -4060,9 +4060,9 @@ msgstr "Імпорт комплексного екрану"
 msgid "Imported successfully"
 msgstr "Імпортовано успішно"
 
-#: hostprofiles.php:184
+#: hostinventories.php:184
 #, php-format
-msgid "Impossible to filter by profile field \"%s\", which does not exist."
+msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1327
@@ -4658,7 +4658,7 @@ msgstr "Елемент даних"
 
 #: api/classes/class.citem.php:1387
 #, php-format
-msgid "Item \"%1$s\" cannot populate a missing host profile field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
+msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Елемент даних \"%1$s\" не може заповнити відсутнє поле під номером \"%2$d\" профілю вузла мережі. Доступні варіанти: від 0 (не заповнюється) до %3$d."
 
 #: api/classes/class.cdiscoveryrule.php:872 api/classes/class.citem.php:1222
@@ -4740,7 +4740,7 @@ msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Елемент не було оновлено. Будь ласка введіть коректний інтервал оновлення."
 
 #: include/forms.inc.php:2160
-msgid "Item will populate host profile field"
+msgid "Item will populate host inventory field"
 msgstr "Елемент даних заповнить поле профілю вузла мережі"
 
 #: api/classes/class.citemgeneral.php:240
@@ -5201,7 +5201,7 @@ msgstr "M"
 msgid "M Y"
 msgstr "M Y"
 
-#: hostprofiles.php:166 include/hosts.inc.php:105
+#: hostinventories.php:166 include/hosts.inc.php:105
 msgid "MAC address A"
 msgstr "MAC адреса A"
 
@@ -5662,7 +5662,7 @@ msgid "NTLM authentication"
 msgstr "NTLM аутентифікація"
 
 #: actionconf.php:164 actionconf.php:418 discoveryconf.php:246
-#: disc_prototypes.php:376 host_discovery.php:451 hostprofiles.php:161
+#: disc_prototypes.php:376 host_discovery.php:451 hostinventories.php:161
 #: hosts.php:760 include/forms.inc.php:1014 include/forms.inc.php:1736
 #: include/hosts.inc.php:60 include/locales/en_gb.inc.php:1541
 #: include/views/administration.script.edit.php:43
@@ -6187,7 +6187,7 @@ msgstr "Не визначено груп користувачів"
 msgid "No users defined"
 msgstr "Не визначено користувачів"
 
-#: hostprofiles.php:158 include/actions.inc.php:48
+#: hostinventories.php:158 include/actions.inc.php:48
 #: include/locales/en_gb.inc.php:452 include/page_header.php:320 queue.php:248
 msgid "Node"
 msgstr "Нода"
@@ -6381,7 +6381,7 @@ msgstr "OOB маска мережі"
 msgid "OR"
 msgstr "АБО"
 
-#: hostprofiles.php:163 include/hosts.inc.php:70
+#: hostinventories.php:163 include/hosts.inc.php:70
 msgid "OS"
 msgstr "ОС"
 
@@ -6833,7 +6833,7 @@ msgid "Profile"
 msgstr "Профіль"
 
 #: include/views/configuration.host.massupdate.php:220
-msgid "Profile mode"
+msgid "Inventory mode"
 msgstr "Режим профілю"
 
 #: popup.php:77
@@ -7711,7 +7711,7 @@ msgstr "Непідтверджені окремо"
 msgid "September"
 msgstr "Вересень"
 
-#: hostprofiles.php:164 include/hosts.inc.php:85
+#: hostinventories.php:164 include/hosts.inc.php:85
 msgid "Serial number A"
 msgstr "Серійний номер А"
 
@@ -8244,7 +8244,7 @@ msgstr "ПРАВДА"
 msgid "Table \"%s\" does not exist."
 msgstr "Таблиця \"%s\" не існує."
 
-#: hostprofiles.php:165 include/hosts.inc.php:95
+#: hostinventories.php:165 include/hosts.inc.php:95
 msgid "Tag"
 msgstr "Тег"
 
@@ -8729,10 +8729,10 @@ msgstr "Має бути обрано два елементи"
 
 #: api/classes/class.citem.php:1451
 #, php-format
-msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host profile field \"%3$s\", this would lead to a conflict."
+msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr "Два елемента даних (\"%1$s\" та \"%2$s\") не можуть заповнити одне поле в профілі вузла мережі \"%3$s\", це призведе до конфлікту."
 
-#: hostprofiles.php:162 include/hosts.inc.php:50
+#: hostinventories.php:162 include/hosts.inc.php:50
 #: include/locales/en_gb.inc.php:299
 #: include/views/administration.script.edit.php:49
 #: include/views/administration.script.list.php:41
@@ -9845,7 +9845,7 @@ msgstr "esc_step_from та esc_step_to повинні встановлювати
 msgid "every"
 msgstr "кожен"
 
-#: hostprofiles.php:123
+#: hostinventories.php:123
 msgid "exactly"
 msgstr ""
 
@@ -9998,7 +9998,7 @@ msgstr "ост."
 msgid "libxml module"
 msgstr "модуль libxml"
 
-#: hostprofiles.php:122 include/actions.inc.php:25
+#: hostinventories.php:122 include/actions.inc.php:25
 #: include/locales/en_gb.inc.php:286
 msgid "like"
 msgstr "містить"
@@ -10078,7 +10078,7 @@ msgstr "не містить"
 msgid "not running"
 msgstr "не запущено"
 
-#: hostprofilesoverview.php:66 include/locales/en_gb.inc.php:494
+#: hostinventoriesoverview.php:66 include/locales/en_gb.inc.php:494
 msgid "not selected"
 msgstr "не обрано"
 

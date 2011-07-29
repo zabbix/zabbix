@@ -1648,11 +1648,11 @@
 //	index.php
 	'S_ZABBIX_BIG'=>			_('ZABBIX'),
 
-//	hostprofiles.php
-	'S_HOST_PROFILES'=>			_('Host profiles'),
+//	hostinventories.php
+	'S_HOST_INVENTORIES'=>			_('Host inventories'),
 
-//	hostprofilesoverview.php
-	'S_HOST_PROFILE_OVERVIEW'=>			_('Host profile overview'),
+//	hostinventoriesoverview.php
+	'S_HOST_INVENTORY_OVERVIEW'=>		_('Host inventory overview'),
 
 //	search.php
 	'S_EDIT_HOSTS' => _('Edit hosts'),

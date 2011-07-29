@@ -1511,7 +1511,7 @@
 		$formula = get_request('formula', '1');
 		$logtimefmt = get_request('logtimefmt', '');
 
-		$profile_link = get_request('profile_link', '0');
+		$inventory_link = get_request('inventory_link', '0');
 
 		$add_groupid = get_request('add_groupid', get_request('groupid', 0));
 
@@ -1585,7 +1585,7 @@
 			$formula		= $item_data['formula'];
 			$logtimefmt		= $item_data['logtimefmt'];
 
-			$profile_link   = $item_data['profile_link'];
+			$inventory_link   = $item_data['inventory_link'];
 
 			$new_application	= get_request('new_application',	'');
 
@@ -2122,52 +2122,52 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmItem->addRow(S_APPLICATIONS,$cmbApps);
 
-		// control to choose host_profile field, that will be populated by this item (if any)
+		// control to choose host_inventory field, that will be populated by this item (if any)
 		if(!$parent_discoveryid){
 			$itemCloned = isset($_REQUEST['clone']);
-			$hostProfileFieldDropDown = new CComboBox('profile_link');
-			$possibleHostProfiles = getHostProfiles();
+			$hostInventoryFieldDropDown = new CComboBox('inventory_link');
+			$possibleHostInventories = getHostInventories();
 
 			// which fields are already being populated by other items
 			$options = array(
-				'output' => array('profile_link'),
+				'output' => array('inventory_link'),
 				'filter' => array('hostid' => $hostid),
 				'nopermissions' => true
 			);
 			$alreadyPopulated = API::item()->get($options);
-			$alreadyPopulated = zbx_toHash($alreadyPopulated, 'profile_link');
+			$alreadyPopulated = zbx_toHash($alreadyPopulated, 'inventory_link');
 			// default option - do not populate
-			$hostProfileFieldDropDown->addItem(0, '-'._('None').'-', $profile_link == '0' ? 'yes' : null); // 'yes' means 'selected'
-			// a list of available host profile fields
-			foreach($possibleHostProfiles as $fieldNo => $fieldInfo){
+			$hostInventoryFieldDropDown->addItem(0, '-'._('None').'-', $inventory_link == '0' ? 'yes' : null); // 'yes' means 'selected'
+			// a list of available host inventory fields
+			foreach($possibleHostInventories as $fieldNo => $fieldInfo){
 				if(isset($alreadyPopulated[$fieldNo])){
-					$enabled = isset($item_data['profile_link'])
-							? $item_data['profile_link'] == $fieldNo
-							: $profile_link == $fieldNo && !$itemCloned;
+					$enabled = isset($item_data['inventory_link'])
+							? $item_data['inventory_link'] == $fieldNo
+							: $inventory_link == $fieldNo && !$itemCloned;
 				}
 				else{
 					$enabled = true;
 				}
-				$hostProfileFieldDropDown->addItem(
+				$hostInventoryFieldDropDown->addItem(
 					$fieldNo,
 					$fieldInfo['title'],
-					($profile_link == $fieldNo && $enabled  ? 'yes' : null), // selected?
+					($inventory_link == $fieldNo && $enabled  ? 'yes' : null), // selected?
 					$enabled ? 'yes' : 'no'
 				);
 			}
 
-			$row =  new CRow(array(_('Item will populate host profile field'), $hostProfileFieldDropDown));
-			$row->setAttribute('id', 'row_profile_link');
+			$row =  new CRow(array(_('Item will populate host inventory field'), $hostInventoryFieldDropDown));
+			$row->setAttribute('id', 'row_inventory_link');
 			$frmItem->addRow($row);
-			// profile link field should not be visible for all item value types except 'log'
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'row_profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'row_profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_profile_link');
+			// inventory link field should not be visible for all item value types except 'log'
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'row_inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'row_inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_inventory_link');
 		}
 
 		$tarea = new CTextArea('description', $description);
@@ -3816,14 +3816,14 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 	return $form;
 	}
 
-	function insert_host_profile_form(){
-		$frmHostP = new CFormTable(_('Host Profile'));
+	function insert_host_inventory_form(){
+		$frmHostP = new CFormTable(_('Host Inventory'));
 
-		$table_titles = getHostProfiles();
+		$table_titles = getHostInventories();
 		$table_titles = zbx_toHash($table_titles, 'db_field');
 		$sql_fields = implode(', ', array_keys($table_titles));
 
-		$sql = 'SELECT '.$sql_fields.' FROM host_profile WHERE hostid='.$_REQUEST['hostid'];
+		$sql = 'SELECT '.$sql_fields.' FROM host_inventory WHERE hostid='.$_REQUEST['hostid'];
 		$result = DBselect($sql);
 
 		$row = DBfetch($result);
