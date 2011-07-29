@@ -115,21 +115,15 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$help_table->addRow(array(new CCol(SPACE, 'trigger_unknown'), S_UNKNOWN));
 
 	if($_REQUEST['type']==SHOW_TRIGGERS){
-		// info about blinking
+		// blinking preview in help popup (only if blinking is enabled)
 		$config = select_config();
+		if($config['blink_period'] > 0){
+			$col = new CCol(SPACE, 'not_classified');
+			$col->setAttribute('style','background-image: url(images/gradients/blink.gif); '.
+				'background-position: top left; background-repeat: repeat;');
+			$help_table->addRow(array($col, _s("Age less than %s", convertUnitsS($config['blink_period']))));
+		}
 
-		// blinking preview in help popup
-		$col = new CCol(SPACE, 'not_classified');
-		$col->setAttribute('style','background-image: url(images/gradients/blink.gif); '.
-			'background-position: top left; background-repeat: repeat;');
-		$help_table->addRow(
-			array(
-				$col,
-				$config['blink_period'] > 0
-					? _s("Blinks when age is less than %s", convertUnitsS($config['blink_period']))
-					: _('Blinking on status change is disabled')
-			)
-		);
 		$help_table->addRow(array(new CCol(SPACE), S_NO_TRIGGER));
 	}
 	else{
