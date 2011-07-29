@@ -2233,19 +2233,11 @@ function utf8RawUrlDecode($source){
 
 			// for how long triggers should blink on status change (set by user in administration->general)
 			$config = select_config();
-			$blinkPeriod = $config['blink_period'];
-
-			if($blinkPeriod > 0){
-				// for the first 1/3 of time it is one style (blinks to blink1.gif)
-				if(time() - $trhosts[$hostname]['lastchange'] < ceil($blinkPeriod / 3))
-					$style .= 'background-image: url(images/gradients/blink1.gif); '.
-						'background-position: top left; '.
-						'background-repeat: repeat;';
-				// then, it is another (blinks to blink2.gif)
-				else if(time() - $trhosts[$hostname]['lastchange'] < $blinkPeriod)
-					$style .= 'background-image: url(images/gradients/blink2.gif); '.
-						'background-position: top left; '.
-						'background-repeat: repeat;';
+			// set blinking gif as background if trigger age is less then $config['blink_period']
+			if($config['blink_period'] > 0 && time() - $trhosts[$hostname]['lastchange'] < $config['blink_period']) {
+				$style .= 'background-image: url(images/gradients/blink1.gif); '.
+					'background-position: top left; '.
+					'background-repeat: repeat;';
 			}
 
 			unset($item_menu);

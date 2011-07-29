@@ -117,26 +117,19 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	if($_REQUEST['type']==SHOW_TRIGGERS){
 		// info about blinking
 		$config = select_config();
-		if($config['blink_period'] == 0){
-			$firstThirdLabel = _('Blinking disabled');
-			$fullLabel = _('Blinking disabled');
-		}
-		else{
-			$firstThird = ceil($config['blink_period'] / 3);
-			$firstThirdLabel = convertUnitsS($firstThird);
-			$fullLabel = convertUnitsS($config['blink_period'] );
-		}
 
 		// blinking preview in help popup
-		// *_sample.gif files are just copies of regular blinking gifs, but having different files for samples and table fix asynchronous blinking in help tooltip
 		$col = new CCol(SPACE, 'not_classified');
-		$col->setAttribute('style','background-image: url(images/gradients/blink1_sample.gif); '.
+		$col->setAttribute('style','background-image: url(images/gradients/blink1.gif); '.
 			'background-position: top left; background-repeat: repeat;');
-		$help_table->addRow(array($col, $firstThirdLabel));
-		$col = new CCol(SPACE, 'not_classified');
-		$col->setAttribute('style','background-image: url(images/gradients/blink2_sample.gif); '.
-			'background-position: top left; background-repeat: repeat;');
-		$help_table->addRow(array($col, $fullLabel));
+		$help_table->addRow(
+			array(
+				$col,
+				$config['blink_period'] > 0
+					? _s("Blinks when age is less then %s", convertUnitsS($config['blink_period']))
+					: _('Blinking on status change is disabled')
+			)
+		);
 		$help_table->addRow(array(new CCol(SPACE), S_NO_TRIGGER));
 	}
 	else{
