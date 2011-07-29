@@ -123,26 +123,8 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		}
 		else{
 			$firstThird = ceil($config['blink_period'] / 3);
-			$firstThirdLabel = $firstThird % 60 == 0
-								? _s(
-									'Blinks for %d min',
-									floor($firstThird / 60) // full minutes
-								)
-								: _s(
-									'Blinks for %1$d min %2$d sec',
-									floor($firstThird / 60), // full minutes
-									$firstThird % 60 // seconds
-								);
-			$fullLabel = $config['blink_period'] % 60 == 0
-								? _s(
-									'Blinks for %d min',
-									floor($config['blink_period'] / 60) // full minutes
-								)
-								: _s(
-									'Blinks for %1$d min %2$d sec',
-									floor($config['blink_period'] / 60), // full minutes
-									$config['blink_period'] % 60 // seconds
-								);
+			$firstThirdLabel = convertUnitsS($firstThird);
+			$fullLabel = convertUnitsS($config['blink_period'] );
 		}
 
 		// blinking preview in help popup
