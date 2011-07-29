@@ -2235,7 +2235,7 @@ function utf8RawUrlDecode($source){
 			$config = select_config();
 			// set blinking gif as background if trigger age is less then $config['blink_period']
 			if($config['blink_period'] > 0 && time() - $trhosts[$hostname]['lastchange'] < $config['blink_period']) {
-				$style .= 'background-image: url(images/gradients/blink1.gif); '.
+				$style .= 'background-image: url(images/gradients/blink.gif); '.
 					'background-position: top left; '.
 					'background-repeat: repeat;';
 			}
