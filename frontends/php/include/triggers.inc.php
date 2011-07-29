@@ -256,7 +256,7 @@ function getSeverityStyle($severity, $type=true){
 		TRIGGER_SEVERITY_AVERAGE => 'average',
 		TRIGGER_SEVERITY_WARNING => 'warning',
 		TRIGGER_SEVERITY_INFORMATION => 'information',
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => 'unknown_trigger',
+		TRIGGER_SEVERITY_NOT_CLASSIFIED => 'not_classified',
 	);
 
 	if(!$type)
@@ -2226,19 +2226,19 @@ function utf8RawUrlDecode($source){
 					$css_class = 'normal';
 					break;
 				default:
-					$css_class = 'unknown_trigger';
+					$css_class = 'trigger_unknown';
 			}
 
 			$style = 'cursor: pointer; ';
 
-			if((time()-$trhosts[$hostname]['lastchange'])<300)
-				$style .= 'background-image: url(images/gradients/blink1.gif); '.
+			// for how long triggers should blink on status change (set by user in administration->general)
+			$config = select_config();
+			// set blinking gif as background if trigger age is less then $config['blink_period']
+			if($config['blink_period'] > 0 && time() - $trhosts[$hostname]['lastchange'] < $config['blink_period']) {
+				$style .= 'background-image: url(images/gradients/blink.gif); '.
 					'background-position: top left; '.
 					'background-repeat: repeat;';
-			else if((time()-$trhosts[$hostname]['lastchange'])<900)
-				$style .= 'background-image: url(images/gradients/blink2.gif); '.
-					'background-position: top left; '.
-					'background-repeat: repeat;';
+			}
 
 			unset($item_menu);
 			$tr_ov_menu = array(

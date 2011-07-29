@@ -112,17 +112,18 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		$help_table->addRow(array(getSeverityCell($i), S_ENABLED));
 	}
 
-	$help_table->addRow(array(new CCol(SPACE, 'unknown_trigger'), S_UNKNOWN));
+	$help_table->addRow(array(new CCol(SPACE, 'trigger_unknown'), S_UNKNOWN));
 
 	if($_REQUEST['type']==SHOW_TRIGGERS){
-		$col = new CCol(SPACE, 'unknown_trigger');
-		$col->setAttribute('style','background-image: url(images/gradients/blink1.gif); '.
-			'background-position: top left; background-repeat: repeate;');
-		$help_table->addRow(array($col, S_5_MIN));
-		$col = new CCol(SPACE, 'unknown_trigger');
-		$col->setAttribute('style','background-image: url(images/gradients/blink2.gif); '.
-			'background-position: top left; background-repeat: repeate;');
-		$help_table->addRow(array($col, S_15_MIN));
+		// blinking preview in help popup (only if blinking is enabled)
+		$config = select_config();
+		if($config['blink_period'] > 0){
+			$col = new CCol(SPACE, 'not_classified');
+			$col->setAttribute('style','background-image: url(images/gradients/blink.gif); '.
+				'background-position: top left; background-repeat: repeat;');
+			$help_table->addRow(array($col, _s("Age less than %s", convertUnitsS($config['blink_period']))));
+		}
+
 		$help_table->addRow(array(new CCol(SPACE), S_NO_TRIGGER));
 	}
 	else{
