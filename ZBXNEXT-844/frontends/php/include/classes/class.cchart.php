@@ -192,13 +192,13 @@ class CChart extends CGraphDraw{
 
 		$this->data = array();
 
-		$now = time(NULL);
+		$now = time();
 
 		if(!isset($this->stime)){
-			$this->stime	= $now - $this->period;
+			$this->stime = $now - $this->period;
 		}
 
-		$this->diffTZ = (date('Z',$this->stime) - date('Z',$this->stime + $this->period));
+		$this->diffTZ = (date('Z' ,$this->stime) - date('Z', $this->stime + $this->period));
 
 		$this->from_time	= $this->stime; // + timeZone offset
 		$this->to_time		= $this->stime + $this->period; // + timeZone offset
@@ -264,7 +264,7 @@ class CChart extends CGraphDraw{
 						' AND clock>='.$from_time.
 						' AND clock<='.$to_time.
 					' GROUP BY itemid,'.$calc_field
-					);
+				);
 			}
 			else{
 				$this->dataFrom = 'trends';

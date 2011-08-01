@@ -67,6 +67,10 @@ class CConfigFile{
 
 			if(isset($DB['SCHEMA'])) $this->config['DB']['SCHEMA'] = $DB['SCHEMA'];
 
+			if(isset($DB['USE_CASSANDRA'])) $this->config['DB']['USE_CASSANDRA'] = $DB['USE_CASSANDRA'];
+			if(isset($DB['CASSANDRA_IP'])) $this->config['DB']['CASSANDRA_IP'] = $DB['CASSANDRA_IP'];
+			if(isset($DB['CASSANDRA_KEYSPACE'])) $this->config['DB']['CASSANDRA_KEYSPACE'] = $DB['CASSANDRA_KEYSPACE'];
+
 			if(isset($ZBX_SERVER)) $this->config['ZBX_SERVER'] = $ZBX_SERVER;
 			if(isset($ZBX_SERVER_PORT)) $this->config['ZBX_SERVER_PORT'] = $ZBX_SERVER_PORT;
 			if(isset($ZBX_SERVER_NAME)) $this->config['ZBX_SERVER_NAME'] = $ZBX_SERVER_NAME;

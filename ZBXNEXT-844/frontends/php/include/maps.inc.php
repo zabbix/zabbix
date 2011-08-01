@@ -702,7 +702,6 @@
 				}
 			}
 			else if((0 == strcmp($function, 'min')) || (0 == strcmp($function, 'max')) || (0 == strcmp($function, 'avg'))){
-
 				if($item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $item['value_type'] != ITEM_VALUE_TYPE_UINT64){
 					$label = str_replace($expr, '???', $label);
 					continue;
