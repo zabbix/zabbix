@@ -386,10 +386,6 @@ void	main_housekeeper_loop()
 /* Transaction is not required here. It causes timeouts under MySQL. */
 /*		DBcommit();*/
 
-/*		zbx_setproctitle("housekeeper [vacuuming database]");*/
-
-/*		DBvacuum();*/
-
 		DBclose();
 
 		zbx_sleep_loop(CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);

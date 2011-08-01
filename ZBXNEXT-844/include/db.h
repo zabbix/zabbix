@@ -515,7 +515,6 @@ void    DBconnect(int flag);
 void	DBinit();
 
 void    DBclose();
-void    DBvacuum();
 
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

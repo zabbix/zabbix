@@ -1079,29 +1079,6 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
 	return SUCCEED;
 }
 
-void	DBvacuum()
-{
-#ifdef	HAVE_POSTGRESQL
-	char	*table_for_housekeeping[] = {"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
-			"sysmaps_elements", "sysmaps_link_triggers","sysmaps", "config", "groups", "hosts_groups", "alerts",
-			"actions", "events", "functions", "history", "history_str", "hosts", "trends",
-			"items", "media", "media_type", "triggers", "trigger_depends", "users",
-			"sessions", "rights", "service_alarms", "profiles", "screens", "screens_items",
-			NULL};
-
-	char	*table;
-	int	i;
-
-	zbx_setproctitle("housekeeper [vacuum DB]");
-
-	i = 0;
-	while (NULL != (table = table_for_housekeeping[i++]))
-	{
-		DBexecute("vacuum analyze %s", table);
-	}
-#endif
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DBget_escape_string_len                                          *
