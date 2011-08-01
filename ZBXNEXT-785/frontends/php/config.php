@@ -670,7 +670,8 @@ include_once('include/page_header.php');
 			}
 			unset($mapping);
 
-			if(isset($_REQUEST['iconmap']['iconmapid'])){
+			if(isset($_REQUEST['iconmapid'])){
+				$_REQUEST['iconmap']['iconmapid'] = $_REQUEST['iconmapid'];
 				$result = API::IconMap()->update($_REQUEST['iconmap']);
 				$msgOk = _('Icon map updated');
 				$msgErr =  _('Cannot update icon map');
@@ -691,6 +692,10 @@ include_once('include/page_header.php');
 			if($result){
 				unset($_REQUEST['form']);
 			}
+		}
+		elseif(isset($_REQUEST['clone'])){
+			unset($_REQUEST['iconmapid']);
+			$_REQUEST['form'] = 'clone';
 		}
 	}
 ?>
@@ -1323,6 +1328,7 @@ include_once('include/page_header.php');
 	elseif($_REQUEST['config'] == 14){
 		$data = array();
 		$data['form_refresh'] = get_request('form_refresh', 0);
+		$data['iconmapid'] = get_request('iconmapid', null);
 
 		$data['iconList'] = array();
 		$iconList = API::Image()->get(array(
@@ -1340,10 +1346,11 @@ include_once('include/page_header.php');
 		}
 
 		if(isset($_REQUEST['form'])){
-			if($data['form_refresh']){
+			if($data['form_refresh'] || ($_REQUEST['form'] === 'clone')){
 				$data['iconmap'] = get_request('iconmap');
 			}
 			elseif(isset($_REQUEST['iconmapid'])){
+
 				$iconMap = API::IconMap()->get(array(
 					'output' => API_OUTPUT_EXTEND,
 					'iconmapids' => $_REQUEST['iconmapid'],

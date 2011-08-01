@@ -1125,12 +1125,12 @@ ZABBIX.apps.map = (function(){
 
 
 			if(this.sysmap.data.iconmapid === '0'){
-				jQuery('#use_iconmapLabel')
+				jQuery('#asd')
 					.mouseenter(function(){
-						hintBox.showOver(null, this, locale['S_ICONMAP_IS_NOT_ENABLED']);
+						hintBox.showOver(this, locale['S_ICONMAP_IS_NOT_ENABLED']);
 					})
 					.mouseleave(function(){
-						hintBox.hideOut(null, this);
+						hintBox.hideOut(this);
 					});
 			}
 
@@ -1189,13 +1189,6 @@ ZABBIX.apps.map = (function(){
 					jQuery('#use_iconmap')
 						.prop('disabled', true)
 						.prop('checked', false);
-					jQuery('#use_iconmapLabel')
-						.mouseover(function(){
-							hintBox.showOver(null, this, locale['S_ICONMAP_IS_NOT_ENABLED']);
-						})
-						.mouseout(function(){
-							hintBox.hideOut(null, this);
-						});
 				}
 
 				this.updateList(selement.selementid);

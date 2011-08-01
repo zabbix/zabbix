@@ -308,12 +308,15 @@ class CIconMap extends CZBXAPI{
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters are used for icon map update method "%s".', $iconMap['name']));
 			}
 
-			if(isset($action['name'])){
-				if(isset($duplicates[$action['name']])){
+			if(isset($iconMap['name'])){
+				if(zbx_empty($iconMap['name'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map name cannot be empty.'));
+				}
+				elseif(isset($duplicates[$iconMap['name']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot create icon maps with identical name "%s".', $iconMap['name']));
 				}
 				else{
-					$duplicates[$action['name']] = $action['name'];
+					$duplicates[$iconMap['name']] = $iconMap['name'];
 				}
 			}
 		}

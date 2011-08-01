@@ -637,13 +637,8 @@ var jqBlink = {
 var hintBox = {
 boxes:				{},				// array of dom Hint Boxes
 boxesCount: 		0,				// unique box id
-debug_status: 		0,				// debug status: 0 - off, 1 - on, 2 - SDI;
-debug_info: 		'',				// debug string
-debug_prev:			'',				// don't log repeated fnc
 
 createBox: function(obj, hint_text, width, className, byClick){
-	this.debug('createBox');
-
 	var boxid = 'hintbox_'+this.boxesCount;
 
 	var box = document.createElement('div');
@@ -669,7 +664,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	if(byClick){
 		close_link = '<div class="link" '+
 						'style="text-align: right; border-bottom: 1px #333 solid;" '+
-						'onclick="javascript: hintBox.hide(event, \''+boxid+'\');">'+locale['S_CLOSE']+'</div>';
+						'onclick="javascript: hintBox.hide(\''+boxid+'\');">'+locale['S_CLOSE']+'</div>';
 	}
 
 	box.innerHTML = close_link + hint_text;
@@ -688,11 +683,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 return box;
 },
 
-showOver: function(e, obj, hint_text, width, className){
-	this.debug('showOver');
-
-	if(!e) e = window.event;
-
+showOver: function(obj, hint_text, width, className){
 	var hintid = obj.getAttribute('hintid');
 	var hintbox = $(hintid);
 
@@ -703,17 +694,13 @@ showOver: function(e, obj, hint_text, width, className){
 
 	if(!empty(byClick)) return;
 
-	hintbox = this.createBox(obj,hint_text, width, className, false);
+	hintbox = this.createBox(obj, hint_text, width, className, false);
 
 	obj.setAttribute('hintid', hintbox.id);
-	this.show(e, obj, hintbox);
+	this.show(obj, hintbox);
 },
 
-hideOut: function(e, obj){
-	this.debug('hideOut');
-
-	if (!e) e = window.event;
-
+hideOut: function(obj){
 	var hintid = obj.getAttribute('hintid');
 	var hintbox = $(hintid);
 
@@ -728,16 +715,11 @@ hideOut: function(e, obj){
 		obj.removeAttribute('hintid');
 		obj.removeAttribute('byclick');
 
-		this.hide(e, hintid);
+		this.hide(hintid);
 	}
 },
 
-onClick: function(e, obj, hint_text, width, className){
-	this.debug('onClick');
-
-	if (!e) e = window.event;
-	cancelEvent(e);
-
+onClick: function(obj, hint_text, width, className){
 	var hintid = obj.getAttribute('hintid');
 	var hintbox = $(hintid);
 
@@ -748,20 +730,20 @@ onClick: function(e, obj, hint_text, width, className){
 
 	if(!empty(hintid) && empty(byClick)){
 		obj.removeAttribute('hintid');
-		this.hide(e, hintid);
+		this.hide(hintid);
 
 		hintbox = this.createBox(obj, hint_text, width, className, true);
 
 		hintbox.setAttribute('byclick', 'true');
 		obj.setAttribute('hintid', hintbox.id);
 
-		this.show(e, obj, hintbox);
+		this.show(obj, hintbox);
 	}
 	else if(!empty(hintid)){
 		obj.removeAttribute('hintid');
 		hintbox.removeAttribute('byclick');
 
-		this.hide(e, hintid);
+		this.hide(hintid);
 	}
 	else{
 		hintbox = this.createBox(obj,hint_text, width, className, true);
@@ -769,13 +751,11 @@ onClick: function(e, obj, hint_text, width, className){
 		hintbox.setAttribute('byclick', 'true');
 		obj.setAttribute('hintid', hintbox.id);
 
-		this.show(e, obj, hintbox);
+		this.show(obj, hintbox);
 	}
 },
 
-show: function(e, obj, hintbox){
-	this.debug('show');
-
+show: function(obj, hintbox){
 	var body_width = document.viewport.getDimensions().width;
 
 	hintbox.style.visibility = 'hidden';
@@ -792,20 +772,15 @@ show: function(e, obj, hintbox){
 	else{
 		posit.left+=10;
 	}
-	hintbox.x	= posit.left;
-	hintbox.y	= posit.top;
+	hintbox.x = posit.left;
+	hintbox.y = posit.top;
 	hintbox.style.left = hintbox.x + 'px';
-	hintbox.style.top	= hintbox.y + 10 + parseInt(obj.offsetHeight/2) + 'px';
+	hintbox.style.top = hintbox.y + 10 + parseInt(obj.offsetHeight/2) + 'px';
 	hintbox.style.visibility = 'visible';
 	hintbox.style.zIndex = '999';
 },
 
-hide: function(e, boxid){
-	this.debug('hide');
-
-	if (!e) e = window.event;
-	cancelEvent(e);
-
+hide: function(boxid){
 	var hint = $(boxid);
 	if(!is_null(hint)){
 		delete(this.boxes[boxid]);
@@ -819,28 +794,10 @@ hide: function(e, boxid){
 },
 
 hideAll: function(){
-	this.debug('hideAll');
-
 	for(var id in this.boxes){
 		if((typeof(this.boxes[id]) != 'undefined') && !empty(this.boxes[id])){
 			this.hide(id);
 		}
-	}
-},
-
-debug: function(fnc_name, id){
-	if(this.debug_status){
-		var str = 'PMaster.'+fnc_name;
-		if(typeof(id) != 'undefined') str+= ' :'+id;
-
-		if(this.debug_prev == str) return true;
-
-		this.debug_info += str + '\n';
-		if(this.debug_status == 2){
-			SDI(str);
-		}
-
-		this.debug_prev = str;
 	}
 }
 };
