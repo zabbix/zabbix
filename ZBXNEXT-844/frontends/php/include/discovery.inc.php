@@ -90,7 +90,7 @@ require_once('include/perm.inc.php');
 			case SVC_SNMPv2:
 			case SVC_SNMPv3:
 			case SVC_AGENT:
-				$external_param = ' &quot;'.$key_.'&quot;';
+				$external_param = ' "'.$key_.'"';
 				break;
 		}
 		$result = discovery_check_type2str($type);

@@ -70,7 +70,7 @@ static void	process_time_functions()
 				" and f.itemid=i.itemid"
 				" and i.hostid=h.hostid"
 				" and t.status=%d"
-				" and f.function in ('nodata','date','dayofmonth','dayofweek','time','now')"
+				" and f.function in (" ZBX_SQL_TIME_FUNCTIONS ")"
 				" and i.status=%d"
 				" and h.status=%d"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
@@ -760,8 +760,6 @@ static void	process_maintenance()
 void	main_timer_loop()
 {
 	int	now, nextcheck, sleeptime, maintenance = 1;
-
-	set_child_signal_handler();
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

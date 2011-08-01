@@ -21,7 +21,6 @@
 #define ZABBIX_COMMON_H
 
 #include "sysinc.h"
-
 #include "zbxtypes.h"
 
 #ifdef DEBUG
@@ -122,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"15 April 2011"
-#define	ZABBIX_VERSION		"1.8.6rc1"
+#define	ZABBIX_REVDATE		"29 July 2011"
+#define	ZABBIX_VERSION		"1.8.6rc2"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
