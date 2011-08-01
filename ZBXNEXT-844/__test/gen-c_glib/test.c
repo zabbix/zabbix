@@ -81,7 +81,7 @@ static void	test_set_value(CassandraClient *client)
 	ColumnParent		*column_parent;
 
 	key = g_byte_array_new();
-	g_byte_array_append(key, "\0\0\0\0\0\0\0\1", 8);
+	g_byte_array_append(key, "\0\10" "\0\0\0\0\0\0\0\1" "\0" "\0\10" "\0\0\0\0\0\0\0\2" "\0", 22);
 
 	name = g_byte_array_new();
 	g_byte_array_append(name, "\1", 1);
@@ -90,7 +90,7 @@ static void	test_set_value(CassandraClient *client)
 	g_byte_array_append(value, "\1\1\1\1\1\1\1\1", 8);
 
 	column_parent = g_object_new(TYPE_COLUMN_PARENT, NULL);
-	column_parent->column_family = "metric2";
+	column_parent->column_family = "metric";
 
 	column = g_object_new(TYPE_COLUMN, NULL);
 	column->name = name;
@@ -126,13 +126,13 @@ static void	test_get_value(CassandraClient *client)
 	ColumnOrSuperColumn	*query_result = NULL;
 
 	key = g_byte_array_new();
-	g_byte_array_append(key, "\0\0\0\0\0\0\0\1", 8);
+	g_byte_array_append(key, "\0\10" "\0\0\0\0\0\0\0\1" "\0" "\0\10" "\0\0\0\0\0\0\0\2" "\0", 22);
 
 	column = g_byte_array_new();
-	g_byte_array_append(column, "\2", 1);
+	g_byte_array_append(column, "\1", 1);
 
 	column_path = g_object_new(TYPE_COLUMN_PATH, NULL);
-	column_path->column_family = "metric2";
+	column_path->column_family = "metric";
 	column_path->__isset_column = TRUE;
 	column_path->column = column;
 
