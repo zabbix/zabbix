@@ -153,6 +153,7 @@ static void	test_get_value(CassandraClient *client)
 	g_byte_array_free(key, TRUE);
 }
 
+/*
 int main()
 {
 	ThriftSocket		*tsocket;
@@ -187,9 +188,9 @@ int main()
 
 	return 0;
 }
+*/
 
 /*
-
 int main(int argc, char *argv[]){
   try{
     boost::shared_ptr<TTransport> socket = boost::shared_ptr<TSocket>(new TSocket("127.0.0.1", 9160));
