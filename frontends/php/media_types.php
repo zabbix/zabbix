@@ -278,7 +278,7 @@ include_once('include/page_header.php');
 		$mediatypes = API::Mediatype()->get($options);
 
 
-// Check if media type are used by existing actions
+// Check if media types are used by existing actions
 		$options = array(
 			'mediatypeids' => zbx_objectValues($mediatypes, 'mediatypeid'),
 			'output' => API_OUTPUT_EXTEND,
