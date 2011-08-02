@@ -81,7 +81,7 @@ require_once('include/views/js/configuration.action.edit.js.php');
 	morder_result($data['conditions'], array('conditiontype','operator'), ZBX_SORT_DOWN);
 
 // group conditions by type
-	$condElements = new CTable(_('No conditions defined'), 'formElementTable');
+	$condElements = new CTable(_('No conditions defined.'), 'formElementTable');
 
 	$i=0;
 	$grouped_conditions = array();
@@ -331,7 +331,7 @@ require_once('include/views/js/configuration.action.edit.js.php');
 		$operationsHeader = array(new CCheckBox('all_operations',null,'checkAll("'.$frmAction->getName().'","all_operations","g_operationid");'),
 			_('Details'), _('Action'));
 
-	$tblOper = new CTable(_('No operations defined'), 'formElementTable');
+	$tblOper = new CTable(_('No operations defined.'), 'formElementTable');
 	$tblOper->setHeader($operationsHeader);
 
 	$delay = count_operations_delay($data['operations'],$data['esc_period']);
@@ -784,7 +784,7 @@ require_once('include/views/js/configuration.action.edit.js.php');
 			zbx_rksort($opconditions);
 
 			$grouped_opconditions = array();
-			$cond_el = new CTable(_('No conditions defined'));
+			$cond_el = new CTable(_('No conditions defined.'));
 			$i = 0;
 
 			foreach($opconditions as $condition){
