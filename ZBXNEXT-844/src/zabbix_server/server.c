@@ -186,6 +186,12 @@ int	CONFIG_PROXYPOLLER_FORKS	= 1;
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600; /* 1h */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1; /* 1s */
 
+#ifdef HAVE_CASSANDRA
+char	*CONFIG_CASSANDRA_HOST		= NULL;
+int	CONFIG_CASSANDRA_PORT		= 0;
+char	*CONFIG_CASSANDRA_KEYSPACE	= NULL;
+#endif
+
 /* Mutex for node syncs */
 ZBX_MUTEX	node_sync_access;
 
@@ -310,6 +316,14 @@ static void	zbx_load_config()
 			PARM_OPT,	1,			SEC_PER_WEEK},
 		{"ProxyDataFrequency",		&CONFIG_PROXYDATA_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
+#ifdef HAVE_CASSANDRA
+		{"CassandraHost",		&CONFIG_CASSANDRA_HOST,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"CassandraPort",		&CONFIG_CASSANDRA_PORT,			TYPE_INT,
+			PARM_OPT,	1024,			65535},
+		{"CassandraKeyspace",		&CONFIG_CASSANDRA_KEYSPACE,		TYPE_STRING,
+			PARM_MAND,	0,			0},
+#endif
 		{NULL}
 	};
 
@@ -365,6 +379,18 @@ static void	zbx_load_config()
 
 	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
 		CONFIG_HOUSEKEEPER_FORKS = 0;
+
+#ifdef HAVE_CASSANDRA
+	if (NULL == CONFIG_CASSANDRA_HOST)
+	{
+		CONFIG_CASSANDRA_HOST = zbx_strdup(CONFIG_CASSANDRA_HOST, "localhost");
+	}
+
+	if (0 == CONFIG_CASSANDRA_PORT)
+	{
+		CONFIG_CASSANDRA_PORT = 9160;
+	}
+#endif
 }
 
 #ifdef HAVE_SIGQUEUE
