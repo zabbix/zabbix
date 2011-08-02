@@ -2057,3 +2057,118 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 
 	return host_name_temp;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_history                                                    *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters: itemid     - [IN] item identificator from database             *
+ *                               required parameter                           *
+ *             value_type - [IN] item value type                              *
+ *                               required parameter                           *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to, const char *field_name, int last_n)
+{
+	const char	*__function_name = "DBget_history";
+	char		sql[512];
+	size_t		offset;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		**h_value = NULL;
+	int		h_alloc, h_num = 0;
+	size_t		sz;
+	const char	*func[] = {"min", "avg", "max", "sum", "count"};
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL == field_name)
+		field_name = "value";
+
+	switch (function)
+	{
+		case ZBX_DB_GET_HIST_MIN:
+		case ZBX_DB_GET_HIST_AVG:
+		case ZBX_DB_GET_HIST_MAX:
+		case ZBX_DB_GET_HIST_SUM:
+			h_alloc = 2;
+			offset = zbx_snprintf(sql, sizeof(sql), "select %s(%s)", func[function], field_name);
+			break;
+		case ZBX_DB_GET_HIST_COUNT:
+			h_alloc = 2;
+			offset = zbx_snprintf(sql, sizeof(sql), "select %s(*)", func[function]);
+			break;
+		case ZBX_DB_GET_HIST_DELTA:
+			h_alloc = 2;
+			offset = zbx_snprintf(sql, sizeof(sql), "select max(%s)-min(%s)", field_name, field_name);
+			break;
+		case ZBX_DB_GET_HIST_VALUE:
+			h_alloc = last_n + 1;
+			offset = zbx_snprintf(sql, sizeof(sql), "select %s", field_name);
+			break;
+		default:
+			assert(0);
+	}
+
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
+			get_table_by_value_type(value_type), itemid);
+	if (0 != clock_from)
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock>%d", clock_from);
+	if (0 != clock_to)
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock<=%d", clock_to);
+
+	if (0 != last_n)
+	{
+		switch (value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
+			case ITEM_VALUE_TYPE_STR:
+				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by clock desc");
+				break;
+			default:
+				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by id desc");
+		}
+		result = DBselectN(sql, last_n);
+	}
+	else
+		result = DBselect("%s", sql);
+
+	*h_value = zbx_malloc(*h_value, h_alloc * sizeof(char *));
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		sz = strlen(row[0]) + 1;
+		h_value[h_num] = zbx_malloc(NULL, sz);
+		memcpy(&h_value[h_num], row[0], sz);
+		h_num++;
+	}
+	DBfree_result(result);
+
+	h_value[h_num] = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return h_value;
+}
+
+void	DBfree_history(char **h_value)
+{
+	const char	*__function_name = "DBfree_history";
+	int		h_num;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	for (h_num = 0; NULL != h_value[h_num]; h_num++)
+		zbx_free(h_value[h_num]);
+
+	zbx_free(h_value);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}

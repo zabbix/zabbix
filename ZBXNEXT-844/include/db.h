@@ -603,4 +603,15 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now);
 void	DBproxy_register_host(const char *host);
 void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset);
 char	*DBget_unique_hostname_by_sample(char *host_name_sample);
+
+#define ZBX_DB_GET_HIST_MIN	0
+#define ZBX_DB_GET_HIST_AVG	1
+#define ZBX_DB_GET_HIST_MAX	2
+#define ZBX_DB_GET_HIST_SUM	3
+#define ZBX_DB_GET_HIST_COUNT	4
+#define ZBX_DB_GET_HIST_DELTA	5
+#define ZBX_DB_GET_HIST_VALUE	6
+char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to, const char *field_name, int last_n);
+void	DBfree_history(char **value);
+
 #endif
