@@ -1125,13 +1125,13 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 247,
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 253,
 			"select i.itemid,i.status,i.lastclock,i.prevorgvalue,i.delta,i.multiplier,i.formula,"
-				"i.history,i.trends,i.lastns,i.hostid,i.inventory_link,hp.inventory_mode,i.valuemapid,"
+				"i.history,i.trends,i.lastns,i.hostid,i.inventory_link,hi.inventory_mode,i.valuemapid,"
 				"i.units,i.error"
 			" from items i"
-				" left join host_inventory hp"
-					" on hp.hostid=i.hostid"
+				" left join host_inventory hi"
+					" on hi.hostid=i.hostid"
 			" where");
 
 	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "i.itemid", ids, ids_num);
