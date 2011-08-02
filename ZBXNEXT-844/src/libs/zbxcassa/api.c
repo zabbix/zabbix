@@ -1,6 +1,25 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+/*
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
+
+#include "common.h"
+
+#ifdef HAVE_CASSANDRA
 
 #include <thrift.h>
 #include <transport/thrift_socket.h>
@@ -10,269 +29,230 @@
 
 #include "cassandra.h"
 
-static void	output_byte_array(const char *label, const GByteArray *array)
+#include "log.h"
+#include "zbxdb.h"
+#include "zbxcassa.h"
+
+typedef struct
 {
-	int	i;
-
-	printf("%s='", label);
-
-	for (i = 0; i < array->len; i++)
-		printf("%02x", array->data[i]);
-
-	printf("' ");
+	ThriftSocket	*socket;
+	ThriftTransport	*transport;
+	ThriftProtocol	*protocol;
+	CassandraClient	*client;
 }
+zbx_cassandra_handle_t;
 
-static void	report_error(InvalidRequestException *ire, NotFoundException *nfe, UnavailableException *ue, TimedOutException *toe, GError *error)
+static zbx_cassandra_handle_t	conn;
+
+static void	zbx_cassandra_log_errors(char *description, GError *error,
+		InvalidRequestException *ire, NotFoundException *nfe,
+		UnavailableException *ue, TimedOutException *toe)
 {
 	if (NULL != error)
 	{
-		printf("got error: %s\n", error->message);
+		zabbix_log(LOG_LEVEL_ERR, "CASSANDRA ERROR (%s): %s", description, error->message);
 		g_error_free(error);
 	}
 
 	if (NULL != ire)
 	{
-		printf("got InvalidRequestException: %s\n", ire->why);
+		zabbix_log(LOG_LEVEL_ERR, "CASSANDRA EXCEPTION: InvalidRequestException, %s", ire->why);
 		g_object_unref(ire);
 	}
 
 	if (NULL != nfe)
 	{
-		printf("got NotFoundException\n");
+		zabbix_log(LOG_LEVEL_ERR, "CASSANDRA EXCEPTION: NotFoundException");
 		g_object_unref(nfe);
 	}
 
 	if (NULL != ue)
 	{
-		printf("got UnavailableException");
+		zabbix_log(LOG_LEVEL_ERR, "CASSANDRA EXCEPTION: UnavailableException");
 		g_object_unref(ue);
 	}
 
 	if (NULL != toe)
 	{
-		printf("got TimedOutException\n");
+		zabbix_log(LOG_LEVEL_ERR, "CASSANDRA EXCEPTION: TimedOutException");
 		g_object_unref(toe);
 	}
 }
 
-static void	test_keyspace(CassandraClient *client)
+int	zbx_cassandra_connect(const char *host, const char *keyspace, int port)
 {
+	int			ret = ZBX_DB_OK;
+	char			description[MAX_STRING_LEN];
+
 	InvalidRequestException	*ire = NULL;
 	GError			*error = NULL;
 
-	if (FALSE == cassandra_client_set_keyspace(CASSANDRA_IF(client), "history_keyspace", &ire, &error))
+	memset(&conn, 0, sizeof(conn));
+
+	conn.socket = g_object_new(THRIFT_TYPE_SOCKET, "hostname", host, "port", port, NULL);
+	conn.transport = g_object_new(THRIFT_TYPE_FRAMED_TRANSPORT, "transport", THRIFT_TRANSPORT(conn.socket), NULL);
+	conn.protocol = THRIFT_PROTOCOL(g_object_new(THRIFT_TYPE_BINARY_PROTOCOL, "transport", conn.transport, NULL));
+
+	if (TRUE != thrift_framed_transport_open(conn.transport, &error))
 	{
-		report_error(ire, NULL, NULL, NULL, error);
-		exit(EXIT_FAILURE);
+		ret = ZBX_DB_FAIL;
+		zbx_snprintf(description, sizeof(description), "connecting to '%s':%d", host, port);
+		zbx_cassandra_log_errors(description, error, NULL, NULL, NULL, NULL);
+		goto exit;
 	}
+
+	conn.client = g_object_new(TYPE_CASSANDRA_CLIENT, "input_protocol", conn.protocol,
+			"output_protocol", conn.protocol, NULL);
+
+	if (TRUE != cassandra_client_set_keyspace(CASSANDRA_IF(conn.client), keyspace, &ire, &error))
+	{
+		ret = ZBX_DB_FAIL;
+		zbx_snprintf(description, sizeof(description), "setting keyspace to '%s'", keyspace);
+		zbx_cassandra_log_errors(description, error, ire, NULL, NULL, NULL);
+		goto exit;
+	}
+exit:
+	if (ZBX_DB_OK != ret)
+		zbx_cassandra_close();
+
+	return ret;
 }
 
-static void	test_set_value(CassandraClient *client)
+void	zbx_cassandra_close()
 {
+	thrift_framed_transport_close(conn.transport, NULL);
+
+	g_object_unref(conn.client);
+	g_object_unref(conn.protocol);
+	g_object_unref(conn.transport);
+	g_object_unref(conn.socket);
+
+	memset(&conn, 0, sizeof(conn));
+}
+
+static GByteArray	*zbx_cassandra_get_composite_type(const zbx_uint64_pair_t *key)
+{
+	GByteArray	*__key;
+	zbx_uint64_t	key1, key2;
+
+	key1 = zbx_htobe_uint64(key->first);
+	key2 = zbx_htobe_uint64(key->second);
+
+	__key = g_byte_array_sized_new(22);			/* encoding CompositeType(LongType, LongType): */
+	g_byte_array_append(__key, "\0\10", 2);			/* <--- length of the first component: 8 bytes */
+	g_byte_array_append(__key, (const guint8 *)&key1, 8);	/* <--- first component in big-endian format */
+	g_byte_array_append(__key, "\0", 1);			/* <--- end-of-component byte: zero for inserts */
+	g_byte_array_append(__key, "\0\10", 2);			/* <--- length of the second component: 8 bytes */
+	g_byte_array_append(__key, (const guint8 *)&key2, 8);	/* <--- second component in big-endian format */
+	g_byte_array_append(__key, "\0", 1);			/* <--- end-of-component byte: zero for inserts */
+
+	return __key;
+}
+
+int	zbx_cassandra_set_value(const zbx_uint64_pair_t *key, char *column_family, const char *column, const char *value)
+{
+	int			ret = ZBX_DB_OK;
+	char			description[MAX_STRING_LEN];
+
 	InvalidRequestException	*ire = NULL;
 	UnavailableException	*ue = NULL;
 	TimedOutException	*toe = NULL;
 	GError			*error = NULL;
 
-	GByteArray		*key;
-	GByteArray		*name;
-	GByteArray		*value;
-	Column			*column;
-	ColumnParent		*column_parent;
+	GByteArray		*__key;
+	GByteArray		*__name;
+	GByteArray		*__value;
+	Column			*__column;
+	ColumnParent		*__column_parent;
 
-	key = g_byte_array_new();
-	g_byte_array_append(key, "\0\10" "\0\0\0\0\0\0\0\1" "\0" "\0\10" "\0\0\0\0\0\0\0\2" "\0", 22);
+	__key = zbx_cassandra_get_composite_type(key);
 
-	name = g_byte_array_new();
-	g_byte_array_append(name, "\1", 1);
+	__name = g_byte_array_new();
+	g_byte_array_append(__name, column, strlen(column));
 
-	value = g_byte_array_new();
-	g_byte_array_append(value, "\1\1\1\1\1\1\1\1", 8);
+	__value = g_byte_array_new();
+	g_byte_array_append(__value, value, strlen(value));
 
-	column_parent = g_object_new(TYPE_COLUMN_PARENT, NULL);
-	column_parent->column_family = "metric";
+	__column_parent = g_object_new(TYPE_COLUMN_PARENT, NULL);
+	__column_parent->column_family = column_family;
 
-	column = g_object_new(TYPE_COLUMN, NULL);
-	column->name = name;
-	column->value = value;
-	column->__isset_value = TRUE;
-	column->timestamp = time(NULL);
-	column->__isset_timestamp = TRUE;
+	__column = g_object_new(TYPE_COLUMN, NULL);
+	__column->name = __name;
+	__column->value = __value;
+	__column->__isset_value = TRUE;
+	__column->timestamp = time(NULL);
+	__column->__isset_timestamp = TRUE;
 
-	if (FALSE == cassandra_client_insert(CASSANDRA_IF(client), key, column_parent, column, CONSISTENCY_LEVEL_ONE, &ire, &ue, &toe, &error))
+	if (TRUE != cassandra_client_insert(CASSANDRA_IF(conn.client), __key, __column_parent, __column,
+				CONSISTENCY_LEVEL_ONE, &ire, &ue, &toe, &error))
 	{
-		report_error(ire, NULL, ue, toe, error);
-		exit(EXIT_FAILURE);
+		ret = ZBX_DB_DOWN;
+		zbx_snprintf(description, sizeof(description), "setting value for"
+				" %s['" ZBX_FS_UI64 ":" ZBX_FS_UI64 "']['%s'] to '%s'",
+				column_family, key->first, key->second, column, value);
+		zbx_cassandra_log_errors(description, error, ire, NULL, ue, toe);
 	}
 
-	g_object_unref(column);
-	g_object_unref(column_parent);
-	g_byte_array_free(value, TRUE);
-	g_byte_array_free(name, TRUE);
-	g_byte_array_free(key, TRUE);
+	g_object_unref(__column);
+	g_object_unref(__column_parent);
+	g_byte_array_free(__value, TRUE);
+	g_byte_array_free(__name, TRUE);
+	g_byte_array_free(__key, TRUE);
+
+	return ret;
 }
 
-static void	test_get_value(CassandraClient *client)
+char	*zbx_cassandra_get_value(const zbx_uint64_pair_t *key, char *column_family, const char *column)
 {
+	char			*result = NULL;
+	char			description[MAX_STRING_LEN];
+
 	InvalidRequestException	*ire = NULL;
 	NotFoundException	*nfe = NULL;
 	UnavailableException	*ue = NULL;
 	TimedOutException	*toe = NULL;
 	GError			*error = NULL;
 
-	GByteArray		*key;
-	GByteArray		*column;
-	ColumnPath		*column_path;
-	ColumnOrSuperColumn	*query_result = NULL;
+	GByteArray		*__key;
+	GByteArray		*__column;
+	ColumnPath		*__column_path;
+	ColumnOrSuperColumn	*__result = NULL;
 
-	key = g_byte_array_new();
-	g_byte_array_append(key, "\0\10" "\0\0\0\0\0\0\0\1" "\0" "\0\10" "\0\0\0\0\0\0\0\2" "\0", 22);
+	__key = zbx_cassandra_get_composite_type(key);
 
-	column = g_byte_array_new();
-	g_byte_array_append(column, "\1", 1);
+	__column = g_byte_array_new();
+	g_byte_array_append(__column, column, strlen(column));
 
-	column_path = g_object_new(TYPE_COLUMN_PATH, NULL);
-	column_path->column_family = "metric";
-	column_path->__isset_column = TRUE;
-	column_path->column = column;
+	__column_path = g_object_new(TYPE_COLUMN_PATH, NULL);
+	__column_path->column_family = column_family;
+	__column_path->column = __column;
+	__column_path->__isset_column = TRUE;
 
-	if (FALSE == cassandra_client_get(CASSANDRA_IF(client), &query_result, key, column_path, CONSISTENCY_LEVEL_ONE, &ire, &nfe, &ue, &toe, &error))
+	if (TRUE != cassandra_client_get(CASSANDRA_IF(conn.client), &__result, __key, __column_path,
+				CONSISTENCY_LEVEL_ONE, &ire, &nfe, &ue, &toe, &error))
 	{
-		report_error(ire, nfe, ue, toe, error);
-		exit(EXIT_FAILURE);
+		if (NULL == nfe)
+		{
+			result = (char *)ZBX_DB_DOWN;
+			zbx_snprintf(description, sizeof(description), "getting value for"
+					" %s['" ZBX_FS_UI64 ":" ZBX_FS_UI64 "']['%s']",
+					column_family, key->first, key->second, column);
+			zbx_cassandra_log_errors(description, error, ire, nfe, ue, toe);
+		}
+	}
+	else
+	{
+		result = zbx_malloc(result, __result->column->value->len + 1);
+		memcpy(result, __result->column->value->data, __result->column->value->len);
+		result[__result->column->value->len] = '\0';
 	}
 
-	output_byte_array("column", column);
-	output_byte_array("name", query_result->column->name);
-	output_byte_array("value", query_result->column->value);
-	printf("\n");
+	g_object_unref(__result);
+	g_object_unref(__column_path);
+	g_byte_array_free(__column, TRUE);
+	g_byte_array_free(__key, TRUE);
 
-	/* should free query_result? */
-	g_object_unref(column_path);
-	g_byte_array_free(column, TRUE);
-	g_byte_array_free(key, TRUE);
+	return result;
 }
 
-/*
-int main()
-{
-	ThriftSocket		*tsocket;
-	ThriftTransport		*transport;
-	ThriftBinaryProtocol	*protocol2;
-	ThriftProtocol		*protocol;
-	CassandraClient		*client;
-
-	g_type_init();
-
-	tsocket = g_object_new(THRIFT_TYPE_SOCKET, "hostname", "localhost", "port", 9160, NULL);
-	transport = g_object_new(THRIFT_TYPE_FRAMED_TRANSPORT, "transport", THRIFT_TRANSPORT(tsocket), NULL);
-	protocol2 = g_object_new(THRIFT_TYPE_BINARY_PROTOCOL, "transport", transport, NULL);
-	protocol = THRIFT_PROTOCOL(protocol2);
-
-	assert(TRUE == thrift_framed_transport_open(transport, NULL));
-	assert(TRUE == thrift_framed_transport_is_open(transport));
-
-	client = g_object_new(TYPE_CASSANDRA_CLIENT, "input_protocol", protocol, "output_protocol", protocol, NULL);
-
-	test_keyspace(client);
-	test_set_value(client);
-	test_get_value(client);
-
-	g_object_unref(client);
-
-	assert(TRUE == thrift_framed_transport_close(transport, NULL));
-
-	g_object_unref(protocol2);
-	g_object_unref(transport);
-	g_object_unref(tsocket);
-
-	return 0;
-}
-*/
-
-/*
-int main(int argc, char *argv[]){
-  try{
-    boost::shared_ptr<TTransport> socket = boost::shared_ptr<TSocket>(new TSocket("127.0.0.1", 9160));
-    boost::shared_ptr<TTransport> tr = boost::shared_ptr<TFramedTransport>(new TFramedTransport (socket));
-    boost::shared_ptr<TProtocol> p = boost::shared_ptr<TBinaryProtocol>(new TBinaryProtocol(tr));
-
-    CassandraClient cass(p);
-    tr->open();
-
-    cass.set_keyspace("Keyspace1");
-
-    string key = "1";
-    ColumnParent cparent;
-    cparent.column_family = "Standard1";
-    Column c;
-    c.name = "name";
-    c.value = "John Smith";
-
-    // have to go through all of this just to get the timestamp in ms
-    struct timeval td;
-    gettimeofday(&td, NULL);
-    int64_t ms = td.tv_sec;
-    ms = ms * 1000;
-    int64_t usec = td.tv_usec;
-    usec = usec / 1000;
-    ms += usec;
-    c.timestamp = ms;
-
-    // insert the "name" column
-    cass.insert(key, cparent, c, ConsistencyLevel::ONE);
-
-    // insert another column, "age"
-    c.name = "age";
-    c.value = "42";
-    cass.insert(key, cparent, c, ConsistencyLevel::ONE);
-
-    // get a single cell
-    ColumnPath cp;
-    cp.__isset.column = true;           // this must be set of you'll get an error re: Padraig O'Sullivan
-    cp.column = "name";
-    cp.column_family = "Standard1";
-    cp.super_column = "";
-    ColumnOrSuperColumn sc;
-
-    cass.get(sc, key, cp, ConsistencyLevel::ONE);
-    printf("Column [%s]  Value [%s]  TS [%lld]\n",
-      sc.column.name.c_str(), sc.column.value.c_str(), sc.column.timestamp);
-
-    // get the entire row for a key
-    SliceRange sr;
-    sr.start = "";
-    sr.finish = "";
-
-    SlicePredicate sp;
-    sp.slice_range = sr;
-    sp.__isset.slice_range = true; // set __isset for the columns instead if you use them
-
-    KeyRange range;
-    range.start_key = key;
-    range.end_key = "";
-    range.__isset.start_key = true;
-    range.__isset.end_key = true;
-
-    vector<KeySlice> results;
-    cass.get_range_slices(results, cparent, sp, range, ConsistencyLevel::ONE);
-    for(size_t i=0; i<results.size(); i++){
-      printf("Key: %s\n", results[i].key.c_str());
-      for(size_t x=0; x<results[i].columns.size(); x++){
-        printf("Column: %s  Value: %s\n", results[i].columns[x].column.name.c_str(),
-          results[i].columns[x].column.value.c_str());
-      }
-    }
-
-    tr->close();
-  }catch(TTransportException te){
-    printf("Exception: %s  [%d]\n", te.what(), te.getType());
-  }catch(InvalidRequestException ire){
-    printf("Exception: %s  [%s]\n", ire.what(), ire.why.c_str());
-  }catch(NotFoundException nfe){
-    printf("Exception: %s\n", nfe.what());
-  }
-  printf("Done!!!\n");
-  return;
-}
-*/
+#endif

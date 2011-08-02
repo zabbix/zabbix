@@ -51,6 +51,10 @@
 #include "proxypoller/proxypoller.h"
 #include "selfmon/selfmon.h"
 
+#ifdef HAVE_CASSANDRA
+#	include <glib-object.h>
+#endif
+
 #define INIT_SERVER(type, count)								\
 	process_type = type;									\
 	process_num = server_num - server_count + count;					\
@@ -447,10 +451,6 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
 		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
 
-#ifdef HAVE_OPENIPMI
-	init_ipmi_handler();
-#endif
-
 	switch (task)
 	{
 		case ZBX_TASK_CHANGE_NODEID:
@@ -460,6 +460,14 @@ int	main(int argc, char **argv)
 		default:
 			break;
 	}
+
+#ifdef HAVE_CASSANDRA
+	g_type_init();
+#endif
+
+#ifdef HAVE_OPENIPMI
+	init_ipmi_handler();
+#endif
 
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }

@@ -159,3 +159,38 @@ zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data)
 
 	return data;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_htobe_uint64                                                 *
+ *                                                                            *
+ * Purpose: convert unsigned integer 64 bit                                   *
+ *          from host byte order                                              *
+ *          to big-endian byte order format                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: unsigned integer 64 bit in big-endian byte order format      *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_htobe_uint64(zbx_uint64_t data)
+{
+	unsigned char	buf[8];
+
+	buf[7] = (unsigned char)data;	data >>= 8;
+	buf[6] = (unsigned char)data;	data >>= 8;
+	buf[5] = (unsigned char)data;	data >>= 8;
+	buf[4] = (unsigned char)data;	data >>= 8;
+	buf[3] = (unsigned char)data;	data >>= 8;
+	buf[2] = (unsigned char)data;	data >>= 8;
+	buf[1] = (unsigned char)data;	data >>= 8;
+	buf[0] = (unsigned char)data;
+
+	memcpy(&data, buf, sizeof(buf));
+
+	return data;
+}
