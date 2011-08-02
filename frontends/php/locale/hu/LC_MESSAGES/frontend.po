@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-27 19:36+0300\n"
+"POT-Creation-Date: 2011-08-02 09:57+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -13,23 +13,23 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Basepath: ../../\n"
 
-#: include/page_header.php:460
+#: include/page_header.php:461
 msgid " failed login attempts logged. Last failed attempt was from "
 msgstr ""
 
-#: include/page_header.php:462
+#: include/page_header.php:463
 msgid " on "
 msgstr ""
 
 #: include/profiles.inc.php:257
-msgid "\"Display OK triggers\" needs to be a positive integer."
+msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr ""
 
 #: include/profiles.inc.php:262
-msgid "\"Triggers blink on status change\" needs to be a positive integer."
+msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr ""
 
-#: include/func.inc.php:391
+#: include/func.inc.php:374
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
@@ -208,12 +208,12 @@ msgstr ""
 msgid "Acknowledged"
 msgstr "Nyugtázva"
 
-#: include/views/administration.general.triggerDisplayingOptions.edit.php:55
-msgid "Acknowledged problem events"
+#: include/views/administration.general.triggerDisplayingOptions.edit.php:89
+msgid "Acknowledged OK events"
 msgstr ""
 
-#: include/views/administration.general.triggerDisplayingOptions.edit.php:89
-msgid "Acknowledged recovery events"
+#: include/views/administration.general.triggerDisplayingOptions.edit.php:55
+msgid "Acknowledged PROBLEM events"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:241
@@ -392,6 +392,11 @@ msgstr "Kor"
 msgid "Age less than"
 msgstr ""
 
+#: overview.php:124
+#, php-format
+msgid "Age less than %s"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:168
 #: include/views/administration.script.list.php:76 popup.php:1835
 msgid "Agent"
@@ -414,7 +419,7 @@ msgid "Align icons"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:491 include/locales/en_gb.inc.php:1109
-#: include/nodes.inc.php:163 include/page_header.php:303
+#: include/nodes.inc.php:163 include/page_header.php:304
 #: include/views/administration.script.edit.php:75
 #: include/views/administration.script.edit.php:84
 #: include/views/administration.script.list.php:93
@@ -1885,7 +1890,7 @@ msgstr ""
 msgid "Current host"
 msgstr ""
 
-#: include/page_header.php:334
+#: include/page_header.php:335
 msgid "Current node"
 msgstr "Kiválasztott csomópont"
 
@@ -2661,7 +2666,7 @@ msgid "Discovery status"
 msgstr "Felderítés állapota"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:112
-msgid "Display OK triggers"
+msgid "Display OK triggers for"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1662
@@ -3343,7 +3348,7 @@ msgstr "Kép lekérése: Nem található adat az elemhez!"
 msgid "Get selected elements FAILED."
 msgstr ""
 
-#: include/page_header.php:215
+#: include/page_header.php:216
 msgid "Get support"
 msgstr "Támogatás"
 
@@ -3616,7 +3621,7 @@ msgstr ""
 msgid "Height"
 msgstr "Magasság"
 
-#: include/page_header.php:213 include/views/general.login.php:41
+#: include/page_header.php:214 include/views/general.login.php:41
 msgid "Help"
 msgstr "Segítség"
 
@@ -5238,7 +5243,7 @@ msgid "Logged in as"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1982 include/menu.inc.php:246
-#: include/page_header.php:246
+#: include/page_header.php:247
 msgid "Login"
 msgstr "Belépés"
 
@@ -5256,7 +5261,7 @@ msgstr ""
 msgid "Login name or password is incorrect"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1983 include/page_header.php:243
+#: include/locales/en_gb.inc.php:1983 include/page_header.php:244
 msgid "Logout"
 msgstr "Kilépés"
 
@@ -5573,7 +5578,7 @@ msgstr "Memóriahasználat"
 msgid "Menu"
 msgstr "Menü"
 
-#: acknow.php:188 auditacts.php:151 auditacts.php:213
+#: acknow.php:190 auditacts.php:151 auditacts.php:213
 #: include/actions.inc.php:329 include/actions.inc.php:338
 #: include/actions.inc.php:344 include/actions.inc.php:766
 #: include/actions.inc.php:809 include/actions.inc.php:842
@@ -6273,7 +6278,7 @@ msgid "No users defined"
 msgstr "Nincsenek felhasználók definiálva"
 
 #: hostprofiles.php:158 include/actions.inc.php:48
-#: include/locales/en_gb.inc.php:452 include/page_header.php:320 queue.php:248
+#: include/locales/en_gb.inc.php:452 include/page_header.php:321 queue.php:248
 msgid "Node"
 msgstr "Csomópont"
 
@@ -6505,6 +6510,10 @@ msgstr "Ok"
 #: include/locales/en_gb.inc.php:275 sysmap.php:170
 msgid "On"
 msgstr "BEKAPCSOL"
+
+#: include/views/administration.general.triggerDisplayingOptions.edit.php:118
+msgid "On status change triggers blink for"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1613
 msgid "Once"
@@ -6875,7 +6884,7 @@ msgstr ""
 msgid "Primary POC screen name"
 msgstr ""
 
-#: include/page_header.php:220
+#: include/page_header.php:221
 msgid "Print"
 msgstr "Nyomtatás"
 
@@ -6917,7 +6926,7 @@ msgstr "Számítás, ha legalább egy alárendelt elem állapota hibás"
 msgid "Problems"
 msgstr "Hibák"
 
-#: include/locales/en_gb.inc.php:1975 include/page_header.php:227
+#: include/locales/en_gb.inc.php:1975 include/page_header.php:228
 msgid "Profile"
 msgstr "Profil"
 
@@ -7719,7 +7728,7 @@ msgstr ""
 msgid "Seconds"
 msgstr "Másodpercek"
 
-#: include/locales/en_gb.inc.php:1495 include/page_header.php:327
+#: include/locales/en_gb.inc.php:1495 include/page_header.php:328
 #: include/views/configuration.action.edit.php:173
 #: include/views/configuration.action.edit.php:183
 #: include/views/configuration.action.edit.php:193
@@ -8788,10 +8797,6 @@ msgstr "Trigger-ek"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Triggerek (e/l)[h/i/o]"
 
-#: include/views/administration.general.triggerDisplayingOptions.edit.php:118
-msgid "Triggers blink on status change"
-msgstr ""
-
 #: include/locales/en_gb.inc.php:1417
 msgid "Triggers deleted"
 msgstr "Triggerek törölve"
@@ -8949,17 +8954,17 @@ msgstr "A konfiguráció kiválaszhatása sikertelen"
 msgid "Unacknowledged"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1110
-#: include/views/configuration.sysmap.edit.php:125
-msgid "Unacknowledged only"
+#: include/views/administration.general.triggerDisplayingOptions.edit.php:72
+msgid "Unacknowledged OK events"
 msgstr ""
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:38
-msgid "Unacknowledged problem events"
+msgid "Unacknowledged PROBLEM events"
 msgstr ""
 
-#: include/views/administration.general.triggerDisplayingOptions.edit.php:72
-msgid "Unacknowledged recovery events"
+#: include/locales/en_gb.inc.php:1110
+#: include/views/configuration.sysmap.edit.php:125
+msgid "Unacknowledged only"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1572
@@ -9884,7 +9889,7 @@ msgstr ""
 msgid "ctype module"
 msgstr "ctype modul"
 
-#: include/func.inc.php:426 include/locales/en_gb.inc.php:32
+#: include/func.inc.php:409 include/locales/en_gb.inc.php:32
 msgid "d"
 msgstr "n"
 
@@ -9993,7 +9998,7 @@ msgstr "a hoszon"
 msgid "found"
 msgstr "talált"
 
-#: include/func.inc.php:433 include/locales/en_gb.inc.php:33
+#: include/func.inc.php:416 include/locales/en_gb.inc.php:33
 msgid "h"
 msgstr "ó"
 
@@ -10127,7 +10132,7 @@ msgstr "libxml modul"
 msgid "like"
 msgstr "mint"
 
-#: include/func.inc.php:419 include/func.inc.php:440
+#: include/func.inc.php:402 include/func.inc.php:423
 #: include/locales/en_gb.inc.php:30 include/locales/en_gb.inc.php:34
 #: include/locales/en_gb.inc.php:1752
 msgid "m"
@@ -10161,7 +10166,7 @@ msgstr "min"
 msgid "min value"
 msgstr "legkisebb érték"
 
-#: include/func.inc.php:399 include/func.inc.php:450
+#: include/func.inc.php:382 include/func.inc.php:433
 #: include/locales/en_gb.inc.php:36
 msgid "ms"
 msgstr "szmp"
@@ -10271,7 +10276,7 @@ msgstr "root"
 msgid "running"
 msgstr "fut"
 
-#: include/func.inc.php:399 include/func.inc.php:445
+#: include/func.inc.php:382 include/func.inc.php:428
 #: include/locales/en_gb.inc.php:35
 msgid "s"
 msgstr "mp"
@@ -10344,7 +10349,7 @@ msgstr "hét"
 msgid "with template host cannot contain items from other hosts."
 msgstr ""
 
-#: include/func.inc.php:412 include/locales/en_gb.inc.php:29
+#: include/func.inc.php:395 include/locales/en_gb.inc.php:29
 msgid "y"
 msgstr "É"
 
