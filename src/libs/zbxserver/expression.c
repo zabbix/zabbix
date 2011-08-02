@@ -1807,6 +1807,82 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_INVENTORY_POC_SECONDARY_SCREEN	MVAR_INVENTORY "POC.SECONDARY.SCREEN}"
 #define MVAR_INVENTORY_POC_SECONDARY_NOTES	MVAR_INVENTORY "POC.SECONDARY.NOTES}"
 
+/* PROFILE.* is deprecated, use INVENTORY.* instead */
+#define MVAR_PROFILE				"{PROFILE."
+#define MVAR_PROFILE_TYPE			MVAR_PROFILE "TYPE}"
+#define MVAR_PROFILE_DEVICETYPE			MVAR_PROFILE "DEVICETYPE}"
+#define MVAR_PROFILE_TYPE_FULL			MVAR_PROFILE "TYPE.FULL}"
+#define MVAR_PROFILE_NAME			MVAR_PROFILE "NAME}"
+#define MVAR_PROFILE_ALIAS			MVAR_PROFILE "ALIAS}"
+#define MVAR_PROFILE_OS				MVAR_PROFILE "OS}"
+#define MVAR_PROFILE_OS_FULL			MVAR_PROFILE "OS.FULL}"
+#define MVAR_PROFILE_OS_SHORT			MVAR_PROFILE "OS.SHORT}"
+#define MVAR_PROFILE_SERIALNO_A			MVAR_PROFILE "SERIALNO.A}"
+#define MVAR_PROFILE_SERIALNO			MVAR_PROFILE "SERIALNO}"
+#define MVAR_PROFILE_SERIALNO_B			MVAR_PROFILE "SERIALNO.B}"
+#define MVAR_PROFILE_TAG			MVAR_PROFILE "TAG}"
+#define MVAR_PROFILE_ASSET_TAG			MVAR_PROFILE "ASSET.TAG}"
+#define MVAR_PROFILE_MACADDRESS_A		MVAR_PROFILE "MACADDRESS.A}"
+#define MVAR_PROFILE_MACADDRESS			MVAR_PROFILE "MACADDRESS}"
+#define MVAR_PROFILE_MACADDRESS_B		MVAR_PROFILE "MACADDRESS.B}"
+#define MVAR_PROFILE_HARDWARE			MVAR_PROFILE "HARDWARE}"
+#define MVAR_PROFILE_HARDWARE_FULL		MVAR_PROFILE "HARDWARE.FULL}"
+#define MVAR_PROFILE_SOFTWARE			MVAR_PROFILE "SOFTWARE}"
+#define MVAR_PROFILE_SOFTWARE_FULL		MVAR_PROFILE "SOFTWARE.FULL}"
+#define MVAR_PROFILE_SOFTWARE_APP_A		MVAR_PROFILE "SOFTWARE.APP.A}"
+#define MVAR_PROFILE_SOFTWARE_APP_B		MVAR_PROFILE "SOFTWARE.APP.B}"
+#define MVAR_PROFILE_SOFTWARE_APP_C		MVAR_PROFILE "SOFTWARE.APP.C}"
+#define MVAR_PROFILE_SOFTWARE_APP_D		MVAR_PROFILE "SOFTWARE.APP.D}"
+#define MVAR_PROFILE_SOFTWARE_APP_E		MVAR_PROFILE "SOFTWARE.APP.E}"
+#define MVAR_PROFILE_CONTACT			MVAR_PROFILE "CONTACT}"
+#define MVAR_PROFILE_LOCATION			MVAR_PROFILE "LOCATION}"
+#define MVAR_PROFILE_LOCATION_LAT		MVAR_PROFILE "LOCATION.LAT}"
+#define MVAR_PROFILE_LOCATION_LON		MVAR_PROFILE "LOCATION.LON}"
+#define MVAR_PROFILE_NOTES			MVAR_PROFILE "NOTES}"
+#define MVAR_PROFILE_CHASSIS			MVAR_PROFILE "CHASSIS}"
+#define MVAR_PROFILE_MODEL			MVAR_PROFILE "MODEL}"
+#define MVAR_PROFILE_HW_ARCH			MVAR_PROFILE "HW.ARCH}"
+#define MVAR_PROFILE_VENDOR			MVAR_PROFILE "VENDOR}"
+#define MVAR_PROFILE_CONTRACT_NUMBER		MVAR_PROFILE "CONTRACT.NUMBER}"
+#define MVAR_PROFILE_INSTALLER_NAME		MVAR_PROFILE "INSTALLER.NAME}"
+#define MVAR_PROFILE_DEPLOYMENT_STATUS		MVAR_PROFILE "DEPLOYMENT.STATUS}"
+#define MVAR_PROFILE_URL_A			MVAR_PROFILE "URL.A}"
+#define MVAR_PROFILE_URL_B			MVAR_PROFILE "URL.B}"
+#define MVAR_PROFILE_URL_C			MVAR_PROFILE "URL.C}"
+#define MVAR_PROFILE_HOST_NETWORKS		MVAR_PROFILE "HOST.NETWORKS}"
+#define MVAR_PROFILE_HOST_NETMASK		MVAR_PROFILE "HOST.NETMASK}"
+#define MVAR_PROFILE_HOST_ROUTER		MVAR_PROFILE "HOST.ROUTER}"
+#define MVAR_PROFILE_OOB_IP			MVAR_PROFILE "OOB.IP}"
+#define MVAR_PROFILE_OOB_NETMASK		MVAR_PROFILE "OOB.NETMASK}"
+#define MVAR_PROFILE_OOB_ROUTER			MVAR_PROFILE "OOB.ROUTER}"
+#define MVAR_PROFILE_HW_DATE_PURCHASE		MVAR_PROFILE "HW.DATE.PURCHASE}"
+#define MVAR_PROFILE_HW_DATE_INSTALL		MVAR_PROFILE "HW.DATE.INSTALL}"
+#define MVAR_PROFILE_HW_DATE_EXPIRY		MVAR_PROFILE "HW.DATE.EXPIRY}"
+#define MVAR_PROFILE_HW_DATE_DECOMM		MVAR_PROFILE "HW.DATE.DECOMM}"
+#define MVAR_PROFILE_SITE_ADDRESS_A		MVAR_PROFILE "SITE.ADDRESS.A}"
+#define MVAR_PROFILE_SITE_ADDRESS_B		MVAR_PROFILE "SITE.ADDRESS.B}"
+#define MVAR_PROFILE_SITE_ADDRESS_C		MVAR_PROFILE "SITE.ADDRESS.C}"
+#define MVAR_PROFILE_SITE_CITY			MVAR_PROFILE "SITE.CITY}"
+#define MVAR_PROFILE_SITE_STATE			MVAR_PROFILE "SITE.STATE}"
+#define MVAR_PROFILE_SITE_COUNTRY		MVAR_PROFILE "SITE.COUNTRY}"
+#define MVAR_PROFILE_SITE_ZIP			MVAR_PROFILE "SITE.ZIP}"
+#define MVAR_PROFILE_SITE_RACK			MVAR_PROFILE "SITE.RACK}"
+#define MVAR_PROFILE_SITE_NOTES			MVAR_PROFILE "SITE.NOTES}"
+#define MVAR_PROFILE_POC_PRIMARY_NAME		MVAR_PROFILE "POC.PRIMARY.NAME}"
+#define MVAR_PROFILE_POC_PRIMARY_EMAIL		MVAR_PROFILE "POC.PRIMARY.EMAIL}"
+#define MVAR_PROFILE_POC_PRIMARY_PHONE_A	MVAR_PROFILE "POC.PRIMARY.PHONE.A}"
+#define MVAR_PROFILE_POC_PRIMARY_PHONE_B	MVAR_PROFILE "POC.PRIMARY.PHONE.B}"
+#define MVAR_PROFILE_POC_PRIMARY_CELL		MVAR_PROFILE "POC.PRIMARY.CELL}"
+#define MVAR_PROFILE_POC_PRIMARY_SCREEN		MVAR_PROFILE "POC.PRIMARY.SCREEN}"
+#define MVAR_PROFILE_POC_PRIMARY_NOTES		MVAR_PROFILE "POC.PRIMARY.NOTES}"
+#define MVAR_PROFILE_POC_SECONDARY_NAME		MVAR_PROFILE "POC.SECONDARY.NAME}"
+#define MVAR_PROFILE_POC_SECONDARY_EMAIL	MVAR_PROFILE "POC.SECONDARY.EMAIL}"
+#define MVAR_PROFILE_POC_SECONDARY_PHONE_A	MVAR_PROFILE "POC.SECONDARY.PHONE.A}"
+#define MVAR_PROFILE_POC_SECONDARY_PHONE_B	MVAR_PROFILE "POC.SECONDARY.PHONE.B}"
+#define MVAR_PROFILE_POC_SECONDARY_CELL		MVAR_PROFILE "POC.SECONDARY.CELL}"
+#define MVAR_PROFILE_POC_SECONDARY_SCREEN	MVAR_PROFILE "POC.SECONDARY.SCREEN}"
+#define MVAR_PROFILE_POC_SECONDARY_NOTES	MVAR_PROFILE "POC.SECONDARY.NOTES}"
+
 #define MVAR_NODE_ID			"{NODE.ID}"
 #define MVAR_NODE_NAME			"{NODE.NAME}"
 
@@ -1845,6 +1921,28 @@ static const char	*ex_macros[] =
 	MVAR_INVENTORY_POC_SECONDARY_NAME, MVAR_INVENTORY_POC_SECONDARY_EMAIL, MVAR_INVENTORY_POC_SECONDARY_PHONE_A,
 	MVAR_INVENTORY_POC_SECONDARY_PHONE_B, MVAR_INVENTORY_POC_SECONDARY_CELL, MVAR_INVENTORY_POC_SECONDARY_SCREEN,
 	MVAR_INVENTORY_POC_SECONDARY_NOTES,
+	/* PROFILE.* is deprecated, use INVENTORY.* instead */
+	MVAR_PROFILE_TYPE, MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_TYPE_FULL,
+	MVAR_PROFILE_NAME, MVAR_PROFILE_ALIAS, MVAR_PROFILE_OS, MVAR_PROFILE_OS_FULL, MVAR_PROFILE_OS_SHORT,
+	MVAR_PROFILE_SERIALNO_A, MVAR_PROFILE_SERIALNO, MVAR_PROFILE_SERIALNO_B, MVAR_PROFILE_TAG,
+	MVAR_PROFILE_ASSET_TAG, MVAR_PROFILE_MACADDRESS_A, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_MACADDRESS_B,
+	MVAR_PROFILE_HARDWARE, MVAR_PROFILE_HARDWARE_FULL, MVAR_PROFILE_SOFTWARE, MVAR_PROFILE_SOFTWARE_FULL,
+	MVAR_PROFILE_SOFTWARE_APP_A, MVAR_PROFILE_SOFTWARE_APP_B, MVAR_PROFILE_SOFTWARE_APP_C,
+	MVAR_PROFILE_SOFTWARE_APP_D, MVAR_PROFILE_SOFTWARE_APP_E, MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION,
+	MVAR_PROFILE_LOCATION_LAT, MVAR_PROFILE_LOCATION_LON, MVAR_PROFILE_NOTES, MVAR_PROFILE_CHASSIS,
+	MVAR_PROFILE_MODEL, MVAR_PROFILE_HW_ARCH, MVAR_PROFILE_VENDOR, MVAR_PROFILE_CONTRACT_NUMBER,
+	MVAR_PROFILE_INSTALLER_NAME, MVAR_PROFILE_DEPLOYMENT_STATUS, MVAR_PROFILE_URL_A, MVAR_PROFILE_URL_B,
+	MVAR_PROFILE_URL_C, MVAR_PROFILE_HOST_NETWORKS, MVAR_PROFILE_HOST_NETMASK, MVAR_PROFILE_HOST_ROUTER,
+	MVAR_PROFILE_OOB_IP, MVAR_PROFILE_OOB_NETMASK, MVAR_PROFILE_OOB_ROUTER, MVAR_PROFILE_HW_DATE_PURCHASE,
+	MVAR_PROFILE_HW_DATE_INSTALL, MVAR_PROFILE_HW_DATE_EXPIRY, MVAR_PROFILE_HW_DATE_DECOMM,
+	MVAR_PROFILE_SITE_ADDRESS_A, MVAR_PROFILE_SITE_ADDRESS_B, MVAR_PROFILE_SITE_ADDRESS_C,
+	MVAR_PROFILE_SITE_CITY, MVAR_PROFILE_SITE_STATE, MVAR_PROFILE_SITE_COUNTRY, MVAR_PROFILE_SITE_ZIP,
+	MVAR_PROFILE_SITE_RACK, MVAR_PROFILE_SITE_NOTES, MVAR_PROFILE_POC_PRIMARY_NAME,
+	MVAR_PROFILE_POC_PRIMARY_EMAIL, MVAR_PROFILE_POC_PRIMARY_PHONE_A, MVAR_PROFILE_POC_PRIMARY_PHONE_B,
+	MVAR_PROFILE_POC_PRIMARY_CELL, MVAR_PROFILE_POC_PRIMARY_SCREEN, MVAR_PROFILE_POC_PRIMARY_NOTES,
+	MVAR_PROFILE_POC_SECONDARY_NAME, MVAR_PROFILE_POC_SECONDARY_EMAIL, MVAR_PROFILE_POC_SECONDARY_PHONE_A,
+	MVAR_PROFILE_POC_SECONDARY_PHONE_B, MVAR_PROFILE_POC_SECONDARY_CELL, MVAR_PROFILE_POC_SECONDARY_SCREEN,
+	MVAR_PROFILE_POC_SECONDARY_NOTES,
 	MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOSTNAME, MVAR_PROXY_NAME,
 	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_IPADDRESS,
 	MVAR_ITEM_NAME, MVAR_ITEM_DESCRIPTION,
@@ -2014,6 +2112,147 @@ static int	get_host_inventory(const char *macro, DB_TRIGGER *trigger, char **rep
 	else if (0 == strcmp(macro, MVAR_INVENTORY_POC_SECONDARY_SCREEN))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_2_screen");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_POC_SECONDARY_NOTES))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_2_notes");
+	/* PROFILE.* is deprecated, use INVENTORY.* instead */
+	else if (0 == strcmp(macro, MVAR_PROFILE_TYPE) || 0 == strcmp(macro, MVAR_PROFILE_DEVICETYPE))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "type");
+	else if (0 == strcmp(macro, MVAR_PROFILE_TYPE_FULL))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "type_full");
+	else if (0 == strcmp(macro, MVAR_PROFILE_NAME))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "name");
+	else if (0 == strcmp(macro, MVAR_PROFILE_ALIAS))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "alias");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OS))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "os");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OS_FULL))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "os_full");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OS_SHORT))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "os_short");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SERIALNO_A))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "serialno_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SERIALNO) || 0 == strcmp(macro, MVAR_PROFILE_SERIALNO_B))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "serialno_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_TAG))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "tag");
+	else if (0 == strcmp(macro, MVAR_PROFILE_ASSET_TAG))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "asset_tag");
+	else if (0 == strcmp(macro, MVAR_PROFILE_MACADDRESS_A))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "macaddress_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_MACADDRESS) || 0 == strcmp(macro, MVAR_PROFILE_MACADDRESS_B))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "macaddress_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HARDWARE))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "hardware");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HARDWARE_FULL))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "hardware_full");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_FULL))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software_full");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_A))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software_app_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_B))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software_app_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_C))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software_app_c");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_D))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software_app_d");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE_APP_E))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software_app_e");
+	else if (0 == strcmp(macro, MVAR_PROFILE_CONTACT))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "contact");
+	else if (0 == strcmp(macro, MVAR_PROFILE_LOCATION))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "location");
+	else if (0 == strcmp(macro, MVAR_PROFILE_LOCATION_LAT))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "location_lat");
+	else if (0 == strcmp(macro, MVAR_PROFILE_LOCATION_LON))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "location_lon");
+	else if (0 == strcmp(macro, MVAR_PROFILE_NOTES))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "notes");
+	else if (0 == strcmp(macro, MVAR_PROFILE_CHASSIS))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "chassis");
+	else if (0 == strcmp(macro, MVAR_PROFILE_MODEL))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "model");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HW_ARCH))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "hw_arch");
+	else if (0 == strcmp(macro, MVAR_PROFILE_VENDOR))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "vendor");
+	else if (0 == strcmp(macro, MVAR_PROFILE_CONTRACT_NUMBER))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "contract_number");
+	else if (0 == strcmp(macro, MVAR_PROFILE_INSTALLER_NAME))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "installer_name");
+	else if (0 == strcmp(macro, MVAR_PROFILE_DEPLOYMENT_STATUS))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "deployment_status");
+	else if (0 == strcmp(macro, MVAR_PROFILE_URL_A))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "url_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_URL_B))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "url_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_URL_C))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "url_c");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HOST_NETWORKS))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "host_networks");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HOST_NETMASK))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "host_netmask");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HOST_ROUTER))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "host_router");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OOB_IP))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "oob_ip");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OOB_NETMASK))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "oob_netmask");
+	else if (0 == strcmp(macro, MVAR_PROFILE_OOB_ROUTER))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "oob_router");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_PURCHASE))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "date_hw_purchase");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_INSTALL))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "date_hw_install");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_EXPIRY))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "date_hw_expiry");
+	else if (0 == strcmp(macro, MVAR_PROFILE_HW_DATE_DECOMM))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "date_hw_decomm");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ADDRESS_A))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "site_address_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ADDRESS_B))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "site_address_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ADDRESS_C))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "site_address_c");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_CITY))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "site_city");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_STATE))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "site_state");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_COUNTRY))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "site_country");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_ZIP))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "site_zip");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_RACK))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "site_rack");
+	else if (0 == strcmp(macro, MVAR_PROFILE_SITE_NOTES))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "site_notes");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_NAME))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_1_name");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_EMAIL))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_1_email");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_PHONE_A))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_1_phone_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_PHONE_B))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_1_phone_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_CELL))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_1_cell");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_SCREEN))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_1_screen");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_PRIMARY_NOTES))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_1_notes");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_NAME))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_2_name");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_EMAIL))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_2_email");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_PHONE_A))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_2_phone_a");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_PHONE_B))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_2_phone_b");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_CELL))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_2_cell");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_SCREEN))
+		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_2_screen");
+	else if (0 == strcmp(macro, MVAR_PROFILE_POC_SECONDARY_NOTES))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_2_notes");
 
 	return SUCCEED;
@@ -2193,7 +2432,8 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					else
 						ret = FAIL;
 				}
-				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1))
+				else if (0 == strncmp(m, MVAR_INVENTORY, sizeof(MVAR_INVENTORY) - 1) ||
+						0 == strncmp(m, MVAR_PROFILE, sizeof(MVAR_PROFILE) - 1))	/* deprecated */
 					ret = get_host_inventory(m, &event->trigger, &replace_to, N_functionid);
 				else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
