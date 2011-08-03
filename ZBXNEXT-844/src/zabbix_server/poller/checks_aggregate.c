@@ -26,6 +26,7 @@
 #define ZBX_GRP_FUNC_AVG	1
 #define ZBX_GRP_FUNC_MAX	2
 #define ZBX_GRP_FUNC_SUM	3
+
 static void	evaluate_one(double *result, int *num, int grp_func, const char *value, unsigned char value_type)
 {
 	double	value_float;
@@ -223,7 +224,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 	else
 	{
 		int	clock_from;
-		char	**h_value = NULL;
+		char	**h_value;
 
 		clock_from = time(NULL) - atoi(param);
 

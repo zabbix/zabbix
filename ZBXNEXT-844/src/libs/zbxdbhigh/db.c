@@ -2130,25 +2130,22 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
 			case ITEM_VALUE_TYPE_STR:
-				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by clock desc");
+				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+						" order by itemid,clock desc");
 				break;
 			default:
-				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by id desc");
+				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+						" order by id desc");
 		}
 		result = DBselectN(sql, last_n);
 	}
 	else
 		result = DBselect("%s", sql);
 
-	*h_value = zbx_malloc(*h_value, h_alloc * sizeof(char *));
+	h_value = zbx_malloc(h_value, h_alloc * sizeof(char *));
 
 	while (NULL != (row = DBfetch(result)))
-	{
-		sz = strlen(row[0]) + 1;
-		h_value[h_num] = zbx_malloc(NULL, sz);
-		memcpy(&h_value[h_num], row[0], sz);
-		h_num++;
-	}
+		h_value[h_num++] = zbx_strdup(NULL, row[0]);
 	DBfree_result(result);
 
 	h_value[h_num] = NULL;
