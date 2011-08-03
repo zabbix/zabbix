@@ -32,7 +32,7 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'serviceid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,						NULL),
-		'period'=>		array(T_ZBX_STR, O_OPT,	null,	IN('"dayly","weekly","monthly","yearly"'),	NULL),
+		'period'=>		array(T_ZBX_STR, O_OPT,	null,	IN('"daily","weekly","monthly","yearly"'),	NULL),
 		'year'=>		array(T_ZBX_INT, O_OPT,	null,	null,						NULL)
 	);
 
@@ -70,7 +70,7 @@ include_once('include/page_header.php');
 	$form->addVar('serviceid', $_REQUEST['serviceid']);
 
 	$cmbPeriod = new CComboBox('period', $period, 'submit();');
-	$cmbPeriod->addItem('dayly',S_DAILY);
+	$cmbPeriod->addItem('daily',S_DAILY);
 	$cmbPeriod->addItem('weekly',S_WEEKLY);
 	$cmbPeriod->addItem('monthly',S_MONTHLY);
 	$cmbPeriod->addItem('yearly',S_YEARLY);
@@ -114,7 +114,7 @@ include_once('include/page_header.php');
 				function format_time($t){	return zbx_date2str(S_REPORT3_MONTHLY_DATE_FORMAT,$t);	}
 				function format_time2($t){	return null; };
 				break;
-			case 'dayly':
+			case 'daily':
 				$from	= 1;
 				$to	= 365;
 				array_unshift($header, new CCol(S_DAY,'center'));
