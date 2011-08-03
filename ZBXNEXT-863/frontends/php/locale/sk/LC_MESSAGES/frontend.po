@@ -3138,7 +3138,7 @@ msgstr "Feb"
 msgid "February"
 msgstr "Február"
 
-#: hostinventoriesoverview.php:86 include/locales/en_gb.inc.php:1805
+#: hostprofilesoverview.php:86 include/locales/en_gb.inc.php:1805
 msgid "Field"
 msgstr "Field"
 
@@ -3154,7 +3154,7 @@ msgstr ""
 msgid "Field \"name\" is required."
 msgstr ""
 
-#: hostinventories.php:126
+#: hostprofiles.php:126
 msgid "Field:"
 msgstr ""
 
@@ -3461,7 +3461,7 @@ msgstr "Graphs deleted"
 msgid "Grid"
 msgstr "Grid"
 
-#: hostinventoriesoverview.php:79 hostinventories.php:93 hostinventories.php:160
+#: hostprofilesoverview.php:79 hostprofiles.php:93 hostprofiles.php:160
 #: hosts.php:717 include/locales/en_gb.inc.php:278
 msgid "Group"
 msgstr "Skupina"
@@ -3496,7 +3496,7 @@ msgstr "Meno skupiny"
 msgid "Group updated"
 msgstr "Group updated"
 
-#: hostinventoriesoverview.php:80
+#: hostprofilesoverview.php:80
 msgid "Grouping by"
 msgstr ""
 
@@ -3529,15 +3529,15 @@ msgstr "HISTORY OF EVENTS"
 msgid "HOST GROUPS"
 msgstr "SKUPINY HOSTOV"
 
-#: hostinventoriesoverview.php:61
-msgid "HOST INVENTORY OVERVIEW"
+#: hostprofilesoverview.php:61
+msgid "HOST PROFILE OVERVIEW"
 msgstr ""
 
-#: hostinventories.php:84
-msgid "HOST INVENTORIES"
-msgstr "HOST INVENTORIES"
+#: hostprofiles.php:84
+msgid "HOST PROFILES"
+msgstr "HOST PROFILES"
 
-#: hostinventoriesoverview.php:81 hostinventories.php:94 hosts_mon.php:120
+#: hostprofilesoverview.php:81 hostprofiles.php:94 hosts_mon.php:120
 #: hosts_mon.php:125 hosts.php:722
 msgid "HOSTS"
 msgstr "HOSTY"
@@ -3642,7 +3642,7 @@ msgstr "Horizontal"
 msgid "Horizontal align"
 msgstr "Horizontal align"
 
-#: hostinventories.php:159 include/actions.inc.php:42
+#: hostprofiles.php:159 include/actions.inc.php:42
 #: include/locales/en_gb.inc.php:724 include/locales/en_gb.inc.php:1799
 #: include/views/configuration.host.edit.php:58
 #: include/views/configuration.host.edit.php:408
@@ -3679,7 +3679,7 @@ msgid "Host IP"
 msgstr "Hostova IP"
 
 #: include/forms.inc.php:3821
-msgid "Host Inventory"
+msgid "Host Profile"
 msgstr ""
 
 #: include/views/administration.script.list.php:46
@@ -3690,7 +3690,7 @@ msgstr "Host access"
 msgid "Host added"
 msgstr "Host pridaný"
 
-#: hostinventoriesoverview.php:87 include/locales/en_gb.inc.php:466
+#: hostprofilesoverview.php:87 include/locales/en_gb.inc.php:466
 msgid "Host count"
 msgstr "Host count"
 
@@ -3739,16 +3739,16 @@ msgid "Host networks"
 msgstr ""
 
 #: include/views/configuration.host.edit.php:592
-msgid "Host inventory"
-msgstr "Host inventory"
+msgid "Host profile"
+msgstr "Host profile"
 
 #: include/locales/en_gb.inc.php:1654
-msgid "Host inventory overview"
+msgid "Host profile overview"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1651
-msgid "Host inventories"
-msgstr "Host inventories"
+msgid "Host profiles"
+msgstr "Host profiles"
 
 #: include/hosts.inc.php:245
 msgid "Host router"
@@ -4062,9 +4062,9 @@ msgstr "Import screen"
 msgid "Imported successfully"
 msgstr ""
 
-#: hostinventories.php:184
+#: hostprofiles.php:184
 #, php-format
-msgid "Impossible to filter by inventory field \"%s\", which does not exist."
+msgid "Impossible to filter by profile field \"%s\", which does not exist."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1327
@@ -4660,7 +4660,7 @@ msgstr "Item"
 
 #: api/classes/class.citem.php:1387
 #, php-format
-msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
+msgid "Item \"%1$s\" cannot populate a missing host profile field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr ""
 
 #: api/classes/class.cdiscoveryrule.php:872 api/classes/class.citem.php:1222
@@ -4742,7 +4742,7 @@ msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Item will not be refreshed. Please enter a correct update interval."
 
 #: include/forms.inc.php:2160
-msgid "Item will populate host inventory field"
+msgid "Item will populate host profile field"
 msgstr ""
 
 #: api/classes/class.citemgeneral.php:240
@@ -5203,7 +5203,7 @@ msgstr "M"
 msgid "M Y"
 msgstr "M Y"
 
-#: hostinventories.php:166 include/hosts.inc.php:105
+#: hostprofiles.php:166 include/hosts.inc.php:105
 msgid "MAC address A"
 msgstr ""
 
@@ -5664,7 +5664,7 @@ msgid "NTLM authentication"
 msgstr ""
 
 #: actionconf.php:164 actionconf.php:418 discoveryconf.php:246
-#: disc_prototypes.php:376 host_discovery.php:451 hostinventories.php:161
+#: disc_prototypes.php:376 host_discovery.php:451 hostprofiles.php:161
 #: hosts.php:760 include/forms.inc.php:1014 include/forms.inc.php:1736
 #: include/hosts.inc.php:60 include/locales/en_gb.inc.php:1541
 #: include/views/administration.script.edit.php:43
@@ -6189,7 +6189,7 @@ msgstr "No user groups defined"
 msgid "No users defined"
 msgstr "No users defined"
 
-#: hostinventories.php:158 include/actions.inc.php:48
+#: hostprofiles.php:158 include/actions.inc.php:48
 #: include/locales/en_gb.inc.php:452 include/page_header.php:320 queue.php:248
 msgid "Node"
 msgstr "Node"
@@ -6384,7 +6384,7 @@ msgstr ""
 msgid "OR"
 msgstr "OR"
 
-#: hostinventories.php:163 include/hosts.inc.php:70
+#: hostprofiles.php:163 include/hosts.inc.php:70
 msgid "OS"
 msgstr "OS"
 
@@ -6837,7 +6837,7 @@ msgid "Profile"
 msgstr "Profil"
 
 #: include/views/configuration.host.massupdate.php:220
-msgid "Inventory mode"
+msgid "Profile mode"
 msgstr ""
 
 #: popup.php:77
@@ -7715,7 +7715,7 @@ msgstr "Separated"
 msgid "September"
 msgstr "September"
 
-#: hostinventories.php:164 include/hosts.inc.php:85
+#: hostprofiles.php:164 include/hosts.inc.php:85
 msgid "Serial number A"
 msgstr ""
 
@@ -8249,7 +8249,7 @@ msgstr "TRUE"
 msgid "Table \"%s\" does not exist."
 msgstr ""
 
-#: hostinventories.php:165 include/hosts.inc.php:95
+#: hostprofiles.php:165 include/hosts.inc.php:95
 msgid "Tag"
 msgstr "Tag"
 
@@ -8734,10 +8734,10 @@ msgstr "Two elements should be selected"
 
 #: api/classes/class.citem.php:1451
 #, php-format
-msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
+msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host profile field \"%3$s\", this would lead to a conflict."
 msgstr ""
 
-#: hostinventories.php:162 include/hosts.inc.php:50
+#: hostprofiles.php:162 include/hosts.inc.php:50
 #: include/locales/en_gb.inc.php:299
 #: include/views/administration.script.edit.php:49
 #: include/views/administration.script.list.php:41
@@ -9851,7 +9851,7 @@ msgstr ""
 msgid "every"
 msgstr "every"
 
-#: hostinventories.php:123
+#: hostprofiles.php:123
 msgid "exactly"
 msgstr ""
 
@@ -10004,7 +10004,7 @@ msgstr "last"
 msgid "libxml module"
 msgstr "libxml module"
 
-#: hostinventories.php:122 include/actions.inc.php:25
+#: hostprofiles.php:122 include/actions.inc.php:25
 #: include/locales/en_gb.inc.php:286
 msgid "like"
 msgstr "like"
@@ -10084,7 +10084,7 @@ msgstr "not like"
 msgid "not running"
 msgstr "not running"
 
-#: hostinventoriesoverview.php:66 include/locales/en_gb.inc.php:494
+#: hostprofilesoverview.php:66 include/locales/en_gb.inc.php:494
 msgid "not selected"
 msgstr "not selected"
 
@@ -10494,8 +10494,8 @@ msgstr "µ"
 #~ msgid "Enable selected hosts?"
 #~ msgstr "Enable selected hosts?"
 
-#~ msgid "Extended host inventory"
-#~ msgstr "Extended host inventory"
+#~ msgid "Extended host profile"
+#~ msgstr "Extended host profile"
 
 #~ msgid "Group function"
 #~ msgstr "Group function"
