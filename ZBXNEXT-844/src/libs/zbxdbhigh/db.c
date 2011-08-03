@@ -2109,19 +2109,19 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 		case ZBX_DB_GET_HIST_AVG:
 		case ZBX_DB_GET_HIST_MAX:
 		case ZBX_DB_GET_HIST_SUM:
-			h_alloc = 2;
+			h_alloc = 1;
 			offset = zbx_snprintf(sql, sizeof(sql), "select %s(%s)", func[function], field_name);
 			break;
 		case ZBX_DB_GET_HIST_COUNT:
-			h_alloc = 2;
+			h_alloc = 1;
 			offset = zbx_snprintf(sql, sizeof(sql), "select %s(*)", func[function]);
 			break;
 		case ZBX_DB_GET_HIST_DELTA:
-			h_alloc = 2;
+			h_alloc = 1;
 			offset = zbx_snprintf(sql, sizeof(sql), "select max(%s)-min(%s)", field_name, field_name);
 			break;
 		case ZBX_DB_GET_HIST_VALUE:
-			h_alloc = last_n + 1;
+			h_alloc = (0 == last_n ? 128 : last_n);
 			offset = zbx_snprintf(sql, sizeof(sql), "select %s", field_name);
 			break;
 		default:
@@ -2154,10 +2154,18 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 	else
 		result = DBselect("%s", sql);
 
-	h_value = zbx_malloc(h_value, h_alloc * sizeof(char *));
+	h_value = zbx_malloc(h_value, (h_alloc + 1) * sizeof(char *));
 
 	while (NULL != (row = DBfetch(result)))
+	{
+		if (h_alloc == h_num)
+		{
+			h_alloc = MAX(h_alloc + 1, h_alloc * 3 / 2);
+			h_value = zbx_realloc(h_value, (h_alloc + 1) * sizeof(char *));
+		}
+
 		h_value[h_num++] = zbx_strdup(NULL, row[0]);
+	}
 	DBfree_result(result);
 
 	h_value[h_num] = NULL;
