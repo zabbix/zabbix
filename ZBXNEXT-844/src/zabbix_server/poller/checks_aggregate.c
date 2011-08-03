@@ -107,7 +107,7 @@ static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3 + strlen(esc),
 				"'%s'", esc);
-		
+
 		if (n != num)
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 2, ",");
 

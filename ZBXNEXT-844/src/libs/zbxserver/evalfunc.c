@@ -356,7 +356,6 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	char		*arg2 = NULL, *arg3 = NULL;
 	char		**h_value;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
@@ -423,7 +422,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 				zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for counting textual values", arg3);
 				fail = 1;
 			}
-			
+
 			if (fail)
 			{
 				zbx_free(arg2);
@@ -448,7 +447,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 
 		now -= time_shift;
 	}
-	
+
 	if (NULL != arg2 && '\0' == *arg2 && (numeric_search || OP_LIKE == op))
 		zbx_free(arg2);
 
@@ -1256,7 +1255,7 @@ clean:
  * Return value: 0 - values are equal                                         *
  *               non-zero - otherwise                                         *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
+ * Author: Aleksandrs Saveljevs, Alexander Vladishev                          *
  *                                                                            *
  * Comments: To be used by functions abschange(), change(), and diff().       *
  *                                                                            *
@@ -1271,7 +1270,7 @@ static int	compare_last_and_prev(const DB_ITEM *item, time_t now)
 		if (item->lastvalue_str[i] != item->prevvalue_str[i])
 			return 1;
 	}
-	
+
 	if (ITEM_LASTVALUE_LEN > i || ITEM_VALUE_TYPE_STR == item->value_type)
 		return 0;
 
@@ -1282,7 +1281,7 @@ static int	compare_last_and_prev(const DB_ITEM *item, time_t now)
 	if (NULL != h_value[0] && NULL != h_value[1])
 		res = strcmp(h_value[0], h_value[1]);
 	DBfree_history(h_value);
-	
+
 	return res;
 }
 
