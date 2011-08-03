@@ -5,6 +5,7 @@ New features:
  - [ZBX-1357] updated German, Latvian, Polish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4004] fixed typos in function names (Richlv)
  - [ZBX-4002] fixed template name being reported as host name when incorrect characters were used (Richlv)
 
 --------------------------------------------------------------------------------
