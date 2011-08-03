@@ -193,8 +193,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 
 	if (0 == ids_num)
 	{
-		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No items for key [%s] in group(s) [%s]",
-				itemkey, groups));
+		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No items for key [%s] in group(s) [%s]", itemkey, groups));
 		goto clean;
 	}
 
@@ -254,8 +253,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 
 	if (0 == num)
 	{
-		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key [%s] in group [%s]",
-				itemkey, groups));
+		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key [%s] in group [%s]", itemkey, groups));
 		goto clean;
 	}
 

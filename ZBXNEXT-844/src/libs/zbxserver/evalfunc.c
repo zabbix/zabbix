@@ -758,7 +758,8 @@ clean:
 static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_LAST";
-	int		arg1, flag, time_shift = 0, time_shift_flag, res = FAIL, written_len;
+	int		arg1, flag, time_shift = 0, time_shift_flag, res = FAIL, written_len, h_num;
+	char		**h_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -834,8 +835,6 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	}
 	else
 	{
-		char	**h_value;
-		int	h_num;
 history:
 		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, arg1);
 
@@ -1696,13 +1695,12 @@ clean:
  ******************************************************************************/
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now)
 {
+	const char	*__function_name = "evaluate_function";
 	int		ret;
 	struct tm	*tm = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_function('%s.%s(%s)')",
-			zbx_host_key_string_by_item(item),
-			function,
-			parameter);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s.%s(%s)'", __function_name,
+			zbx_host_key_string_by_item(item), function, parameter);
 
 	*value = '\0';
 
@@ -1815,12 +1813,7 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	if (SUCCEED == ret)
 		del_zeroes(value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of evaluate_function('%s.%s(%s)',value:'%s'):%s",
-			zbx_host_key_string_by_item(item),
-			function,
-			parameter,
-			value,
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s'", __function_name, zbx_result_string(ret), value);
 
 	return ret;
 }
