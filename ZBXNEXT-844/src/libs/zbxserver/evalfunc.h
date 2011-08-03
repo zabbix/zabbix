@@ -33,7 +33,4 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 int	replace_value_by_map(char *value, int max_len, zbx_uint64_t valuemapid);
 int	add_value_suffix(char *value, int max_len, const char *units, int value_type);
 
-const char	*get_table_by_value_type(int value_type);
-const char	*get_key_by_value_type(int value_type);
-
 #endif

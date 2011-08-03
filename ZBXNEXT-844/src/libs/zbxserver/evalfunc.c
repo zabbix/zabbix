@@ -25,32 +25,6 @@
 
 #include "evalfunc.h"
 
-const char	*get_table_by_value_type(int value_type)
-{
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:	return "history";
-		case ITEM_VALUE_TYPE_UINT64:	return "history_uint";
-		case ITEM_VALUE_TYPE_STR:	return "history_str";
-		case ITEM_VALUE_TYPE_TEXT:	return "history_text";
-		case ITEM_VALUE_TYPE_LOG:	return "history_log";
-		default:			return NULL;
-	}
-}
-
-const char	*get_key_by_value_type(int value_type)
-{
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:
-		case ITEM_VALUE_TYPE_UINT64:
-		case ITEM_VALUE_TYPE_STR:	return "clock";
-		case ITEM_VALUE_TYPE_TEXT:
-		case ITEM_VALUE_TYPE_LOG:	return "id";
-		default:			return NULL;
-	}
-}
-
 static int	get_function_parameter_uint(DB_ITEM *item, const char *parameters, int Nparam, int *value, int *flag)
 {
 	const char	*__function_name = "get_function_parameter_uint";
