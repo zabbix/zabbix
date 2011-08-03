@@ -1734,7 +1734,6 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 #define MVAR_INVENTORY				"{INVENTORY."			/* a prefix for all inventory macros */
 #define MVAR_INVENTORY_TYPE			MVAR_INVENTORY "TYPE}"
-#define MVAR_INVENTORY_DEVICETYPE		MVAR_INVENTORY "DEVICETYPE}"	/* deprecated */
 #define MVAR_INVENTORY_TYPE_FULL		MVAR_INVENTORY "TYPE.FULL}"
 #define MVAR_INVENTORY_NAME			MVAR_INVENTORY "NAME}"
 #define MVAR_INVENTORY_ALIAS			MVAR_INVENTORY "ALIAS}"
@@ -1742,12 +1741,10 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_INVENTORY_OS_FULL			MVAR_INVENTORY "OS.FULL}"
 #define MVAR_INVENTORY_OS_SHORT			MVAR_INVENTORY "OS.SHORT}"
 #define MVAR_INVENTORY_SERIALNO_A		MVAR_INVENTORY "SERIALNO.A}"
-#define MVAR_INVENTORY_SERIALNO			MVAR_INVENTORY "SERIALNO}"	/* deprecated */
 #define MVAR_INVENTORY_SERIALNO_B		MVAR_INVENTORY "SERIALNO.B}"
 #define MVAR_INVENTORY_TAG			MVAR_INVENTORY "TAG}"
 #define MVAR_INVENTORY_ASSET_TAG		MVAR_INVENTORY "ASSET.TAG}"
 #define MVAR_INVENTORY_MACADDRESS_A		MVAR_INVENTORY "MACADDRESS.A}"
-#define MVAR_INVENTORY_MACADDRESS		MVAR_INVENTORY "MACADDRESS}"	/* deprecated */
 #define MVAR_INVENTORY_MACADDRESS_B		MVAR_INVENTORY "MACADDRESS.B}"
 #define MVAR_INVENTORY_HARDWARE			MVAR_INVENTORY "HARDWARE}"
 #define MVAR_INVENTORY_HARDWARE_FULL		MVAR_INVENTORY "HARDWARE.FULL}"
@@ -1900,10 +1897,10 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 static const char	*ex_macros[] =
 {
-	MVAR_INVENTORY_TYPE, MVAR_INVENTORY_DEVICETYPE, MVAR_INVENTORY_TYPE_FULL,
+	MVAR_INVENTORY_TYPE, MVAR_INVENTORY_TYPE_FULL,
 	MVAR_INVENTORY_NAME, MVAR_INVENTORY_ALIAS, MVAR_INVENTORY_OS, MVAR_INVENTORY_OS_FULL, MVAR_INVENTORY_OS_SHORT,
-	MVAR_INVENTORY_SERIALNO_A, MVAR_INVENTORY_SERIALNO, MVAR_INVENTORY_SERIALNO_B, MVAR_INVENTORY_TAG,
-	MVAR_INVENTORY_ASSET_TAG, MVAR_INVENTORY_MACADDRESS_A, MVAR_INVENTORY_MACADDRESS, MVAR_INVENTORY_MACADDRESS_B,
+	MVAR_INVENTORY_SERIALNO_A, MVAR_INVENTORY_SERIALNO_B, MVAR_INVENTORY_TAG,
+	MVAR_INVENTORY_ASSET_TAG, MVAR_INVENTORY_MACADDRESS_A, MVAR_INVENTORY_MACADDRESS_B,
 	MVAR_INVENTORY_HARDWARE, MVAR_INVENTORY_HARDWARE_FULL, MVAR_INVENTORY_SOFTWARE, MVAR_INVENTORY_SOFTWARE_FULL,
 	MVAR_INVENTORY_SOFTWARE_APP_A, MVAR_INVENTORY_SOFTWARE_APP_B, MVAR_INVENTORY_SOFTWARE_APP_C,
 	MVAR_INVENTORY_SOFTWARE_APP_D, MVAR_INVENTORY_SOFTWARE_APP_E, MVAR_INVENTORY_CONTACT, MVAR_INVENTORY_LOCATION,
@@ -1973,7 +1970,7 @@ static const char	*ex_macros[] =
  ******************************************************************************/
 static int	get_host_inventory(const char *macro, DB_TRIGGER *trigger, char **replace_to, int N_functionid)
 {
-	if (0 == strcmp(macro, MVAR_INVENTORY_TYPE) || 0 == strcmp(macro, MVAR_INVENTORY_DEVICETYPE))
+	if (0 == strcmp(macro, MVAR_INVENTORY_TYPE))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "type");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_TYPE_FULL))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "type_full");
@@ -1989,7 +1986,7 @@ static int	get_host_inventory(const char *macro, DB_TRIGGER *trigger, char **rep
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "os_short");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_SERIALNO_A))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "serialno_a");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_SERIALNO) || 0 == strcmp(macro, MVAR_INVENTORY_SERIALNO_B))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_SERIALNO_B))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "serialno_b");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_TAG))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "tag");
@@ -1997,7 +1994,7 @@ static int	get_host_inventory(const char *macro, DB_TRIGGER *trigger, char **rep
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "asset_tag");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_MACADDRESS_A))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "macaddress_a");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_MACADDRESS) || 0 == strcmp(macro, MVAR_INVENTORY_MACADDRESS_B))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_MACADDRESS_B))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "macaddress_b");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_HARDWARE))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "hardware");
