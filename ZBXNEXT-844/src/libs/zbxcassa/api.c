@@ -130,82 +130,136 @@ void	zbx_cassandra_close()
 	memset(&conn, 0, sizeof(conn));
 }
 
-static GByteArray	*zbx_cassandra_get_composite_type(const zbx_uint64_pair_t *key)
+static GByteArray	*zbx_cassandra_get_composite_type(zbx_uint64_t comp1, zbx_uint64_t comp2)
 {
-	GByteArray	*__key;
-	zbx_uint64_t	key1, key2;
+	GByteArray	*array;
 
-	key1 = zbx_htobe_uint64(key->first);
-	key2 = zbx_htobe_uint64(key->second);
+	comp1 = zbx_htobe_uint64(comp1);
+	comp2 = zbx_htobe_uint64(comp2);
 
-	__key = g_byte_array_sized_new(22);			/* encoding CompositeType(LongType, LongType): */
-	g_byte_array_append(__key, "\0\10", 2);			/* <--- length of the first component: 8 bytes */
-	g_byte_array_append(__key, (const guint8 *)&key1, 8);	/* <--- first component in big-endian format */
-	g_byte_array_append(__key, "\0", 1);			/* <--- end-of-component byte: zero for inserts */
-	g_byte_array_append(__key, "\0\10", 2);			/* <--- length of the second component: 8 bytes */
-	g_byte_array_append(__key, (const guint8 *)&key2, 8);	/* <--- second component in big-endian format */
-	g_byte_array_append(__key, "\0", 1);			/* <--- end-of-component byte: zero for inserts */
+	array = g_byte_array_sized_new(22);			/* encoding CompositeType(LongType, LongType): */
+	g_byte_array_append(array, "\0\10", 2);			/* <--- length of the first component: 8 bytes */
+	g_byte_array_append(array, (const guint8 *)&comp1, 8);	/* <--- first component in big-endian format */
+	g_byte_array_append(array, "\0", 1);			/* <--- end-of-component byte: zero for inserts */
+	g_byte_array_append(array, "\0\10", 2);			/* <--- length of the second component: 8 bytes */
+	g_byte_array_append(array, (const guint8 *)&comp2, 8);	/* <--- second component in big-endian format */
+	g_byte_array_append(array, "\0", 1);			/* <--- end-of-component byte: zero for inserts */
 
-	return __key;
+	return array;
 }
 
-int	zbx_cassandra_set_value(const zbx_uint64_pair_t *key, char *column_family, const char *column, const char *value)
+static GByteArray	*zbx_cassandra_get_long_type(zbx_uint64_t value)
+{
+	GByteArray	*array;
+
+	value = zbx_htobe_uint64(value);
+
+	array = g_byte_array_sized_new(8);
+	g_byte_array_append(array, (const guint8 *)&value, 8);
+
+	return array;
+}
+
+static GByteArray	*zbx_cassandra_get_string_type(const char *value)
+{
+	int		length;
+	GByteArray	*array;
+
+	length = strlen(value);
+
+	array = g_byte_array_sized_new(length);
+	g_byte_array_append(array, value, length);
+
+	return array;
+}
+
+static const char	*zbx_cassandra_decode_type(const GByteArray *value)
+{
+	static char	buffer[MAX_STRING_LEN];
+
+	if (22 == value->len && '\10' == value->data[1] && '\10' == value->data[12])
+	{
+		/* assume it is CompositeType(LongType, LongType) */
+
+		zbx_uint64_t	comp1, comp2;
+
+		memcpy(&comp1, &value->data[2], 8);
+		memcpy(&comp2, &value->data[13], 8);
+
+		comp1 = zbx_betoh_uint64(comp1);
+		comp2 = zbx_betoh_uint64(comp2);
+
+		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64 ":" ZBX_FS_UI64, comp1, comp2);
+	}
+	else if (8 == value->len && '\0' == value->data[0])
+	{
+		/* assume it is LongType */
+
+		zbx_uint64_t	number;
+
+		memcpy(&number, value->data, 8);
+		number = zbx_betoh_uint64(number);
+		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, number);
+	}
+	else
+	{
+		/* assume it is just a string */
+
+		zbx_snprintf(buffer, sizeof(buffer), "%s", value->data);
+	}
+
+	return buffer;
+}
+
+static int	zbx_cassandra_set_value(GByteArray *key, char *column_family, GByteArray *column, GByteArray *value)
 {
 	int			ret = ZBX_DB_OK;
-	char			description[MAX_STRING_LEN];
 
 	InvalidRequestException	*ire = NULL;
 	UnavailableException	*ue = NULL;
 	TimedOutException	*toe = NULL;
 	GError			*error = NULL;
 
-	GByteArray		*__key;
-	GByteArray		*__name;
-	GByteArray		*__value;
 	Column			*__column;
 	ColumnParent		*__column_parent;
-
-	__key = zbx_cassandra_get_composite_type(key);
-
-	__name = g_byte_array_new();
-	g_byte_array_append(__name, column, strlen(column));
-
-	__value = g_byte_array_new();
-	g_byte_array_append(__value, value, strlen(value));
 
 	__column_parent = g_object_new(TYPE_COLUMN_PARENT, NULL);
 	__column_parent->column_family = column_family;
 
 	__column = g_object_new(TYPE_COLUMN, NULL);
-	__column->name = __name;
-	__column->value = __value;
+	__column->name = column;
+	__column->value = value;
 	__column->__isset_value = TRUE;
 	__column->timestamp = time(NULL);
 	__column->__isset_timestamp = TRUE;
 
-	if (TRUE != cassandra_client_insert(CASSANDRA_IF(conn.client), __key, __column_parent, __column,
+	if (TRUE != cassandra_client_insert(CASSANDRA_IF(conn.client), key, __column_parent, __column,
 				CONSISTENCY_LEVEL_ONE, &ire, &ue, &toe, &error))
 	{
+		int	descr_offset = 0;
+		char	descr[MAX_STRING_LEN];
+
 		ret = ZBX_DB_DOWN;
-		zbx_snprintf(description, sizeof(description), "setting value for"
-				" %s['" ZBX_FS_UI64 ":" ZBX_FS_UI64 "']['%s'] to '%s'",
-				column_family, key->first, key->second, column, value);
-		zbx_cassandra_log_errors(description, error, ire, NULL, ue, toe);
+		descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+				"setting value for %s", column_family);
+		descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+				"['%s']", zbx_cassandra_decode_type(key));
+		descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+				"['%s']", zbx_cassandra_decode_type(column));
+		zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+				" to ['%s']", zbx_cassandra_decode_type(value));
+		zbx_cassandra_log_errors(descr, error, ire, NULL, ue, toe);
 	}
 
 	g_object_unref(__column);
 	g_object_unref(__column_parent);
-	g_byte_array_free(__value, TRUE);
-	g_byte_array_free(__name, TRUE);
-	g_byte_array_free(__key, TRUE);
 
 	return ret;
 }
 
-char	*zbx_cassandra_get_value(const zbx_uint64_pair_t *key, char *column_family, const char *column)
+static char	*zbx_cassandra_get_value(GByteArray *key, char *column_family, GByteArray *column)
 {
 	char			*result = NULL;
-	char			description[MAX_STRING_LEN];
 
 	InvalidRequestException	*ire = NULL;
 	NotFoundException	*nfe = NULL;
@@ -213,31 +267,30 @@ char	*zbx_cassandra_get_value(const zbx_uint64_pair_t *key, char *column_family,
 	TimedOutException	*toe = NULL;
 	GError			*error = NULL;
 
-	GByteArray		*__key;
-	GByteArray		*__column;
 	ColumnPath		*__column_path;
 	ColumnOrSuperColumn	*__result = NULL;
 
-	__key = zbx_cassandra_get_composite_type(key);
-
-	__column = g_byte_array_new();
-	g_byte_array_append(__column, column, strlen(column));
-
 	__column_path = g_object_new(TYPE_COLUMN_PATH, NULL);
 	__column_path->column_family = column_family;
-	__column_path->column = __column;
+	__column_path->column = column;
 	__column_path->__isset_column = TRUE;
 
-	if (TRUE != cassandra_client_get(CASSANDRA_IF(conn.client), &__result, __key, __column_path,
+	if (TRUE != cassandra_client_get(CASSANDRA_IF(conn.client), &__result, key, __column_path,
 				CONSISTENCY_LEVEL_ONE, &ire, &nfe, &ue, &toe, &error))
 	{
 		if (NULL == nfe)
 		{
+			int	descr_offset = 0;
+			char	descr[MAX_STRING_LEN];
+
 			result = (char *)ZBX_DB_DOWN;
-			zbx_snprintf(description, sizeof(description), "getting value for"
-					" %s['" ZBX_FS_UI64 ":" ZBX_FS_UI64 "']['%s']",
-					column_family, key->first, key->second, column);
-			zbx_cassandra_log_errors(description, error, ire, nfe, ue, toe);
+			descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+					"getting value for %s", column_family);
+			descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+					"['%s']", zbx_cassandra_decode_type(key));
+			zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+					"['%s']", zbx_cassandra_decode_type(column));
+			zbx_cassandra_log_errors(descr, error, ire, nfe, ue, toe);
 		}
 	}
 	else
@@ -249,10 +302,25 @@ char	*zbx_cassandra_get_value(const zbx_uint64_pair_t *key, char *column_family,
 
 	g_object_unref(__result);
 	g_object_unref(__column_path);
-	g_byte_array_free(__column, TRUE);
-	g_byte_array_free(__key, TRUE);
 
 	return result;
+}
+
+int	zbx_cassandra_save_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, const char *value)
+{
+	GByteArray	*__key;
+	GByteArray	*__column;
+	GByteArray	*__value;
+
+	__key = zbx_cassandra_get_composite_type(itemid, clock - clock % SEC_PER_DAY);
+	__column = zbx_cassandra_get_long_type(clock * 1000);
+	__value = zbx_cassandra_get_string_type(value);
+
+	zbx_cassandra_set_value(__key, "metric", __column, __value);
+
+	g_byte_array_free(__value, TRUE);
+	g_byte_array_free(__column, TRUE);
+	g_byte_array_free(__key, TRUE);
 }
 
 #endif

@@ -24,13 +24,14 @@
 
 #ifdef HAVE_CASSANDRA
 
-#include "zbxalgo.h"
+extern char	*CONFIG_CASSANDRA_HOST;
+extern int	CONFIG_CASSANDRA_PORT;
+extern char	*CONFIG_CASSANDRA_KEYSPACE;
 
 int	zbx_cassandra_connect(const char *host, const char *keyspace, int port);
 void	zbx_cassandra_close();
 
-int	zbx_cassandra_set_value(const zbx_uint64_pair_t *key, char *column_family, const char *column, const char *value);
-char	*zbx_cassandra_get_value(const zbx_uint64_pair_t *key, char *column_family, const char *column);
+int	zbx_cassandra_save_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, const char *value);
 
 #endif
 

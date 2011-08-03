@@ -53,6 +53,7 @@
 
 #ifdef HAVE_CASSANDRA
 #	include <glib-object.h>
+#	include "zbxcassa.h"
 #endif
 
 #define INIT_SERVER(type, count)								\
@@ -805,8 +806,14 @@ void	zbx_on_exit()
 	zbx_sleep(2);	/* wait for all child processes to exit */
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
+#ifdef HAVE_CASSANDRA
+	zbx_cassandra_connect(CONFIG_CASSANDRA_HOST, CONFIG_CASSANDRA_KEYSPACE, CONFIG_CASSANDRA_PORT);
+#endif
 	free_database_cache();
 	free_configuration_cache();
+#ifdef HAVE_CASSANDRA
+	zbx_cassandra_close();
+#endif
 	DBclose();
 
 	zbx_mutex_destroy(&node_sync_access);

@@ -68,15 +68,6 @@ void	zbx_default_mem_free_func(void *ptr);
 int	is_prime(int n);
 int	next_prime(int n);
 
-/* pair */
-
-typedef struct
-{
-	zbx_uint64_t	first;
-	zbx_uint64_t	second;
-}
-zbx_uint64_pair_t;
-
 /* hashset */
 
 #define	ZBX_HASHSET_ENTRY_T	struct zbx_hashset_entry_s

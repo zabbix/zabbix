@@ -31,6 +31,10 @@
 #include "memalloc.h"
 #include "zbxalgo.h"
 
+#ifdef HAVE_CASSANDRA
+#	include "zbxcassa.h"
+#endif
+
 static zbx_mem_info_t	*history_mem = NULL;
 static zbx_mem_info_t	*history_text_mem = NULL;
 static zbx_mem_info_t	*trend_mem = NULL;
@@ -1370,6 +1374,9 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	char		*value_esc, *source_esc;
 	int		history_text_num, history_log_num;
 	zbx_uint64_t	id;
+#ifdef HAVE_CASSANDRA
+	char		value[MAX_STRING_LEN];
+#endif
 #ifdef HAVE_MULTIROW_INSERT
 	int		tmp_offset;
 #endif
@@ -1383,7 +1390,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 /*
  * history
  */
-#ifdef HAVE_MULTIROW_INSERT
+#if !defined(HAVE_CASSANDRA) && defined(HAVE_MULTIROW_INSERT)
 	tmp_offset = sql_offset;
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 			"insert into history (itemid,clock,value) values ");
@@ -1400,7 +1407,10 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != history[i].value_null)
 			continue;
 
-#ifdef HAVE_MULTIROW_INSERT
+#if defined(HAVE_CASSANDRA)
+		zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, history[i].value.dbl);
+		zbx_cassandra_save_history_value(history[i].itemid, history[i].clock, value);
+#elif defined(HAVE_MULTIROW_INSERT)
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL "),",
 				history[i].itemid,
@@ -1416,7 +1426,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 	}
 
-#ifdef HAVE_MULTIROW_INSERT
+#if !defined(HAVE_CASSANDRA) && defined(HAVE_MULTIROW_INSERT)
 	if (sql[sql_offset - 1] == ',')
 	{
 		sql_offset--;
@@ -1477,7 +1487,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 /*
  * history_uint
  */
-#ifdef HAVE_MULTIROW_INSERT
+#if !defined(HAVE_CASSANDRA) && defined(HAVE_MULTIROW_INSERT)
 	tmp_offset = sql_offset;
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 			"insert into history_uint (itemid,clock,value) values ");
@@ -1494,7 +1504,10 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != history[i].value_null)
 			continue;
 
-#ifdef HAVE_MULTIROW_INSERT
+#if defined(HAVE_CASSANDRA)
+		zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, history[i].value.ui64);
+		zbx_cassandra_save_history_value(history[i].itemid, history[i].clock, value);
+#elif defined(HAVE_MULTIROW_INSERT)
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 "),",
 				history[i].itemid,
@@ -1510,7 +1523,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 	}
 
-#ifdef HAVE_MULTIROW_INSERT
+#if !defined(HAVE_CASSANDRA) && defined(HAVE_MULTIROW_INSERT)
 	if (sql[sql_offset - 1] == ',')
 	{
 		sql_offset--;
@@ -1670,10 +1683,12 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	history_log_num = 0;
 
 	for (i = 0; i < history_num; i++)
+	{
 		if (ITEM_VALUE_TYPE_TEXT == history[i].value_type)
 			history_text_num++;
 		else if (ITEM_VALUE_TYPE_LOG == history[i].value_type)
 			history_log_num++;
+	}
 
 /*
  * history_text
