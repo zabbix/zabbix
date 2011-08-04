@@ -1,4 +1,4 @@
-.TH ZABBIX_PROXY 8 "5 July 2011"
+.TH ZABBIX_PROXY 8 "4 August 2011"
 .SH NAME
 zabbix_proxy \- Zabbix proxy daemon.
 .SH SYNOPSIS

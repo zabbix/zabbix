@@ -1,4 +1,4 @@
-.TH ZABBIX_SERVER 8 "5 July 2011"
+.TH ZABBIX_SERVER 8 "4 August 2011"
 .SH NAME
 zabbix_server \- Zabbix server daemon.
 .SH SYNOPSIS
