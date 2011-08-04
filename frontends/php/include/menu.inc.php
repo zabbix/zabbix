@@ -83,7 +83,7 @@ $ZBX_MENU = array(
 						'user_type'=>USER_TYPE_ZABBIX_ADMIN),
 				array(
 						'url'=>'srv_status.php',
-						'label'=>_('IT Services'),
+						'label'=>_('IT services'),
 						'forse_disable_all_nodes' => true,
 						'sub_pages'=>array('report3.php','report7.php','chart_sla.php','chart5.php')
 					),
@@ -192,7 +192,7 @@ $ZBX_MENU = array(
 					'label' => _('Discovery')
 					),
 				array('url'=>'services.php',
-						'label'=>_('IT Services'),
+						'label'=>_('IT services'),
 						'sub_pages'=>array('services_form.php')
 					),
 			)

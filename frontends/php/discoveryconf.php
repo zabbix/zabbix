@@ -41,7 +41,7 @@ $fields=array(
 	'iprange'=>				array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 	'delay'=>				array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
 	'status'=>				array(T_ZBX_INT, O_OPT,	 null,	IN('0,1'), 	'isset({save})'),
-	'uniqueness_criteria'=>	array(T_ZBX_INT, O_OPT,  null, NULL,		'isset({save})', _('Device uniqueness criteria.')),
+	'uniqueness_criteria'=>	array(T_ZBX_INT, O_OPT,  null, NULL,		'isset({save})', _('Device uniqueness criteria')),
 	'g_druleid'=>			array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 	'dchecks'=>				array(null, O_OPT, null, null, null),
 // Actions
@@ -115,14 +115,14 @@ if(get_request('save')){
 		$discoveryRule['druleid'] = get_request('druleid');
 		$result = API::drule()->update($discoveryRule);
 
-		$msg_ok = _('Discovery rule updated.');
-		$msg_fail = _('Cannot update discovery rule.');
+		$msg_ok = _('Discovery rule updated');
+		$msg_fail = _('Cannot update discovery rule');
 	}
 	else{
 		$result = API::drule()->create($discoveryRule);
 
-		$msg_ok = _('Discovery rule created.');
-		$msg_fail = _('Cannot create discovery rule.');
+		$msg_ok = _('Discovery rule created');
+		$msg_fail = _('Cannot create discovery rule');
 	}
 
 	show_messages($result, $msg_ok, $msg_fail);
@@ -137,7 +137,7 @@ if(get_request('save')){
 }
 else if(get_request('delete') && get_request('druleid')){
 	$result = delete_discovery_rule($_REQUEST['druleid']);
-	show_messages($result, _('Discovery rule deleted.'), _('Cannot delete discovery rule.'));
+	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 	if($result){
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$_REQUEST['druleid'].']');
@@ -159,7 +159,7 @@ else if(str_in_array($_REQUEST['go'], array('activate','disable')) && isset($_RE
 			$go_result = true;
 		}
 	}
-	show_messages($go_result, _('Discovery rules updated.'));
+	show_messages($go_result, _('Discovery rules updated'));
 }
 else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_druleid'])){
 	$go_result = false;
@@ -170,7 +170,7 @@ else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_druleid'])){
 			$go_result = true;
 		}
 	}
-	show_messages($go_result, _('Discovery rules deleted.'));
+	show_messages($go_result, _('Discovery rules deleted'));
 }
 
 if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){

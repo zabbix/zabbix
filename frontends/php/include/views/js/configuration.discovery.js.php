@@ -34,7 +34,7 @@
 							size="16" maxlength="255"></td>
 				</tr>
 				<tr id="newCheckCommunityRow" class="hidden">
-					<td><label for="snmp_community"><?php print(_('SNMP Community')); ?></label></td>
+					<td><label for="snmp_community"><?php print(_('SNMP community')); ?></label></td>
 					<td><input type="text" id="snmp_community" name="snmp_community" value=""
 							class="input text" size="20" maxlength="255"></td>
 				</tr>
@@ -313,7 +313,7 @@ function saveNewDCheckForm(e){
 		case ZBX_SVC.snmpv1:
 		case ZBX_SVC.snmpv2:
 			if(dCheck.snmp_community == '')
-				validationErrors.push('<?php echo _('Incorrect SNMP Community.'); ?>');
+				validationErrors.push('<?php echo _('Incorrect SNMP community.'); ?>');
 		case ZBX_SVC.snmpv3:
 			if(dCheck.key_ == '')
 				validationErrors.push('<?php echo _('Incorrect SNMP OID.'); ?>');

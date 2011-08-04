@@ -83,7 +83,7 @@
 	$labelTypeHostgroup = new CComboBox('label_type_hostgroup', $data['label_type_hostgroup'], null, $labelTypesLimited);
 	$customLabelHostgroup = new CTextarea('label_string_hostgroup', $data['label_string_hostgroup']);
 	if($data['label_type_hostgroup'] != MAP_LABEL_TYPE_CUSTOM) $customLabelHostgroup->addClass('hidden');
-	$sysmapList->addRow(_('Host Group label type'), array($labelTypeHostgroup, BR(), $customLabelHostgroup));
+	$sysmapList->addRow(_('Host group label type'), array($labelTypeHostgroup, BR(), $customLabelHostgroup));
 
 // host
 	$labelTypeHost = new CComboBox('label_type_host', $data['label_type_host'], null, $labelTypes);
