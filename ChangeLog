@@ -188,6 +188,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.7rc1
 
+ - [ZBXNEXT-869] clarify in manpages how the process for runtime signalling is found (Richlv)
+
 --------------------------------------------------------------------------------
 Changes for 1.8.6rc2
 
