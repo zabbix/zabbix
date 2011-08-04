@@ -1,5 +1,6 @@
 Changes for 1.8.7rc1
 
+ - [ZBX-4008] updated Japanese translation; thanks to Kodai Terashima (Richlv)
  - [ZBX-4005] updated French translation; thanks to Joseph Bueno (Richlv)
  - [ZBXNEXT-869] clarify in manpages how the process for runtime signalling is found (Richlv)
 
