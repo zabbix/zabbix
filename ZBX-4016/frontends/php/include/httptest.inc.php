@@ -58,7 +58,7 @@ require_once('include/items.inc.php');
 		return $status;
 	}
 
-	function db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $status_codes, $delay, $history, $trends){
+	function db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $status_codes, $delay, $history, $trends, $status){
 		if($no <= 0){
 			error(S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE);
 			return false;
@@ -123,38 +123,38 @@ require_once('include/items.inc.php');
 			}
 
 			$item_args = array(
-				'description'		=> $item['description'],
-				'key_'			=> $item['key_'],
-				'hostid'		=> $hostid,
-				'delay'			=> $delay,
-				'type'			=> ITEM_TYPE_HTTPTEST,
-				'snmp_community'=>	'',
-				'snmp_oid'		=> '',
-				'value_type'		=> $item['type'],
-				'data_type'		=> ITEM_DATA_TYPE_DECIMAL,
-				'trapper_hosts'		=> 'localhost',
-				'snmp_port'		=> 161,
-				'units'			=> $item['units'],
-				'multiplier'		=> 0,
+				'description'			=> $item['description'],
+				'key_'					=> $item['key_'],
+				'hostid'				=> $hostid,
+				'delay'					=> $delay,
+				'type'					=> ITEM_TYPE_HTTPTEST,
+				'snmp_community'		=>	'',
+				'snmp_oid'				=> '',
+				'value_type'			=> $item['type'],
+				'data_type'				=> ITEM_DATA_TYPE_DECIMAL,
+				'trapper_hosts'			=> 'localhost',
+				'snmp_port'				=> 161,
+				'units'					=> $item['units'],
+				'multiplier'			=> 0,
 				'snmpv3_securityname'	=> '',
 				'snmpv3_securitylevel'	=> 0,
 				'snmpv3_authpassphrase'	=> '',
 				'snmpv3_privpassphrase'	=> '',
-				'formula'		=> 0,
-				'logtimefmt'		=> '',
-				'delay_flex'		=> '',
-				'authtype'		=> 0,
-				'username'		=> '',
-				'password'		=> '',
-				'publickey'		=> '',
-				'privatekey'		=> '',
-				'params'		=> '',
-				'ipmi_sensor'		=> '',
-				'applications'		=> array($applicationid));
+				'formula'				=> 0,
+				'logtimefmt'			=> '',
+				'delay_flex'			=> '',
+				'authtype'				=> 0,
+				'username'				=> '',
+				'password'				=> '',
+				'publickey'				=> '',
+				'privatekey'			=> '',
+				'params'				=> '',
+				'ipmi_sensor'			=> '',
+				'applications'			=> array($applicationid),
+				'status'				=> $status);
 
 			if(!$item_data){
 				$item_args['history'] = $history;
-				$item_args['status'] = ITEM_STATUS_ACTIVE;
 				$item_args['delta'] = 0;
 				$item_args['trends'] = $trends;
 				$item_args['valuemapid'] = 0;
@@ -167,7 +167,6 @@ require_once('include/items.inc.php');
 				$itemid = $item_data['itemid'];
 
 				$item_args['history'] = $item_data['history'];
-				$item_args['status'] = $item_data['status'];
 				$item_args['delta'] = $item_data['delta'];
 				$item_args['trends'] = $item_data['trends'];
 				$item_args['valuemapid'] = $item_data['valuemapid'];
@@ -279,7 +278,7 @@ require_once('include/items.inc.php');
 				if(!isset($s['status_codes']))	$s['status_codes'] = '';
 
 				$result = db_save_step($hostid, $applicationid, $httptestid, $name, $s['name'], $sid+1, $s['timeout'],
-					$s['url'], $s['posts'], $s['required'],$s['status_codes'], $delay, $history, $trends);
+					$s['url'], $s['posts'], $s['required'],$s['status_codes'], $delay, $history, $trends, $status);
 
 				if(!$result){
 					throw new Exception('Cannot create web step');
@@ -324,38 +323,38 @@ require_once('include/items.inc.php');
 				}
 
 				$item_args = array(
-					'description'	=> $item['description'],
-					'key_'			=> $item['key_'],
-					'hostid'		=> $hostid,
-					'delay'			=> $delay,
-					'type'			=> ITEM_TYPE_HTTPTEST,
-					'snmp_community'=> '',
-					'snmp_oid'		=> '',
-					'value_type'	=> $item['type'],
-					'data_type'		=> ITEM_DATA_TYPE_DECIMAL,
-					'trapper_hosts'	=> 'localhost',
-					'snmp_port'		=> 161,
-					'units'			=> $item['units'],
-					'multiplier'	=> 0,
+					'description'			=> $item['description'],
+					'key_'					=> $item['key_'],
+					'hostid'				=> $hostid,
+					'delay'					=> $delay,
+					'type'					=> ITEM_TYPE_HTTPTEST,
+					'snmp_community'		=> '',
+					'snmp_oid'				=> '',
+					'value_type'			=> $item['type'],
+					'data_type'				=> ITEM_DATA_TYPE_DECIMAL,
+					'trapper_hosts'			=> 'localhost',
+					'snmp_port'				=> 161,
+					'units'					=> $item['units'],
+					'multiplier'			=> 0,
 					'snmpv3_securityname'	=> '',
 					'snmpv3_securitylevel'	=> 0,
 					'snmpv3_authpassphrase'	=> '',
 					'snmpv3_privpassphrase'	=> '',
-					'formula'			=> 0,
-					'logtimefmt'		=> '',
-					'delay_flex'		=> '',
-					'authtype'		=> 0,
-					'username'		=> '',
-					'password'		=> '',
-					'publickey'		=> '',
-					'privatekey'		=> '',
-					'params'			=> '',
-					'ipmi_sensor'		=> '',
-					'applications'		=> array($applicationid));
+					'formula'				=> 0,
+					'logtimefmt'			=> '',
+					'delay_flex'			=> '',
+					'authtype'				=> 0,
+					'username'				=> '',
+					'password'				=> '',
+					'publickey'				=> '',
+					'privatekey'			=> '',
+					'params'				=> '',
+					'ipmi_sensor'			=> '',
+					'applications'			=> array($applicationid),
+					'status' 				=> $status);
 
 				if(!$item_data){
 					$item_args['history'] = $history;
-					$item_args['status'] = ITEM_STATUS_ACTIVE;
 					$item_args['delta'] = 0;
 					$item_args['trends'] = $trends;
 					$item_args['valuemapid'] = 0;
@@ -368,7 +367,6 @@ require_once('include/items.inc.php');
 					$itemid = $item_data['itemid'];
 
 					$item_args['history'] = $item_data['history'];
-					$item_args['status'] = $item_data['status'];
 					$item_args['delta'] = $item_data['delta'];
 					$item_args['trends'] = $item_data['trends'];
 					$item_args['valuemapid'] = $item_data['valuemapid'];
