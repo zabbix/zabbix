@@ -552,7 +552,6 @@ include_once('include/page_header.php');
 function addPopupValues(list){
 	if(!isset('object', list)){
 		throw("Error hash attribute 'list' doesn't contain 'object' index");
-		return false;
 	}
 
 	var favorites = {'itemid': 1};

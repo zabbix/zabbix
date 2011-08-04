@@ -89,6 +89,26 @@ class CHistory extends CZBXAPI{
 		$options = zbx_array_merge($def_options, $options);
 
 
+
+		if(
+			$options['history'] == ITEM_VALUE_TYPE_UINT64
+			|| $options['history'] == ITEM_VALUE_TYPE_FLOAT
+			&& CassandraHistory::i()->enabled()
+		){
+			foreach($options['itemids'] as $itemid){
+				$data = CassandraHistory::i()->getData($itemid, $options['time_from'], $options['time_till'], $options['limit']);
+//sdii($data);
+				foreach($data as $clock => $value){
+					$result[] = array(
+						'itemid' => $itemid,
+						'clock' => $clock,
+						'value' => $value,
+					);
+				}
+			}
+			return $result;
+		}
+
 		switch($options['history']){
 			case ITEM_VALUE_TYPE_LOG:
 				$sql_parts['from']['history'] = 'history_log h';
