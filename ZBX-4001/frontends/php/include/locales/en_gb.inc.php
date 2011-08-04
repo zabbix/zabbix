@@ -32,8 +32,6 @@
 	'S_DAY_SHORT'=>				_('d'),
 	'S_HOUR_SHORT' =>			_('h'),
 	'S_MINUTE_SHORT' =>			_('m'),
-	'S_SECOND_SHORT' =>			_('s'),
-	'S_MILLISECOND_SHORT' =>		_('ms'),
 
 	'S_WEEKDAY_SUNDAY_SHORT' =>		_('Sun'),
 	'S_WEEKDAY_MONDAY_SHORT' =>		_('Mon'),
@@ -973,12 +971,10 @@
 //	sysmap.php
 	'S_HIDDEN'=>			_('Hidden'),
 	'S_SHOWN'=>				_('Shown'),
-	'S_ALIGN_ICONS'=>		_('Align icons'),
 	'S_UPPER_LEVEL_MAPS'=>	_('Upper level maps'),
 	'S_LINKS'=>				_('Links'),
 	'S_LINK'=>				_('Link'),
 	'S_LABEL'=>				_('Label'),
-	'S_GRID'=>				_('Grid'),
 	'S_GO_TO'=>				_('Go to'),
 	'S_X'=>					_('X'),
 	'S_ICON_PROBLEM'=>			_('Icon (problem)'),
@@ -988,11 +984,8 @@
 	'S_ICON_DISABLED'=>			_('Icon (disabled)'),
 	'S_LINK_STATUS_INDICATOR'=>		_('Link status indicator'),
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	_('Configuration of network maps'),
-	'S_CONFIGURATION_OF_NETWORK_MAPS_BIG'=>	_('CONFIGURATION OF NETWORK MAPS'),
-	'S_GET_IMG_ELEMENT_DATA_NOT_FOUND'=>	_('Get Img: Element data not found!'),
 	'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
 
-	'S_ADD_ELEMENT'=>			_('Add element'),
 	'S_COORDINATE_X'=>			_('Coordinate X'),
 	'S_COORDINATE_Y'=>			_('Coordinate Y'),
 
@@ -1031,11 +1024,6 @@
 
 	'S_BOTTOM'=>					_('Bottom'),
 	'S_TOP'=>						_('Top'),
-	'S_LINK_STATUS_INDICATORS'=>	_('Link status indicators'),
-
-	'S_REMOVE_ELEMENT'=>			_('Remove element'),
-	'S_ADD_LINK'=>					_('Add link'),
-	'S_REMOVE_LINK'=>				_('Remove link'),
 
 	'S_CANNOT_FIND_IMAGE'=>			_('Cannot find image'),
 	'S_CANNOT_FIND_BACKGROUND_IMAGE'=>	_('Cannot find background image'),
@@ -1119,8 +1107,6 @@
 	'S_SHOW_GRAPH_OF_ITEM'=>		_('Show graph of item'),
 	'S_SHOW_VALUES_OF_ITEM'=>		_('Show values of item'),
 	'S_VALUES'=>				_('Values'),
-	'S_5_MIN'=>				_('5 min'),
-	'S_15_MIN'=>				_('15 min'),
 
 //	queue.php
 	'S_TOTAL'=>				_('Total'),
@@ -1692,7 +1678,6 @@
 	'S_MACROS_ES'=>_('macro(s)'),
 
 //	popup_link_tr.php
-	'S_NEW_INDICATORS'=>			_('New indicators'),
 	'S_EDIT_CONNECTOR'=>			_('Edit connector'),
 
 //	tr_logform.php
