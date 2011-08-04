@@ -161,6 +161,16 @@ static GByteArray	*zbx_cassandra_encode_long_type(zbx_uint64_t value)
 	return array;
 }
 
+static zbx_uint64_t	zbx_cassandra_decode_long_type(const GByteArray *value)
+{
+	zbx_uint64_t	number;
+
+	memcpy(&number, value->data, 8);
+	number = zbx_betoh_uint64(number);
+
+	return number;
+}
+
 static GByteArray	*zbx_cassandra_encode_ascii_type(const char *value)
 {
 	int		length;
@@ -207,11 +217,7 @@ static const char	*zbx_cassandra_decode_type(const GByteArray *value)
 	{
 		/* assume it is LongType */
 
-		zbx_uint64_t	number;
-
-		memcpy(&number, value->data, 8);
-		number = zbx_betoh_uint64(number);
-		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, number);
+		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, zbx_cassandra_decode_long_type(value));
 	}
 	else
 	{
@@ -321,10 +327,8 @@ static char	*zbx_cassandra_get_value(GByteArray *key, char *column_family, GByte
 	return result;
 }
 
-static int	zbx_cassandra_get_values(zbx_vector_str_t *values, GByteArray *key, char *column_family, SlicePredicate *predicate)
+static GPtrArray	*zbx_cassandra_get_values(GByteArray *key, char *column_family, SlicePredicate *predicate)
 {
-	int			i, ret = ZBX_DB_OK;
-
 	InvalidRequestException	*ire = NULL;
 	UnavailableException	*ue = NULL;
 	TimedOutException	*toe = NULL;
@@ -344,7 +348,8 @@ static int	zbx_cassandra_get_values(zbx_vector_str_t *values, GByteArray *key, c
 		int	descr_offset = 0;
 		char	descr[MAX_STRING_LEN];
 
-		ret = ZBX_DB_DOWN;
+		g_ptr_array_unref(__result);
+		__result = NULL;
 
 		descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
 				"getting values for %s", column_family);
@@ -359,22 +364,10 @@ static int	zbx_cassandra_get_values(zbx_vector_str_t *values, GByteArray *key, c
 
 		zbx_cassandra_log_errors(descr, error, ire, NULL, ue, toe);
 	}
-	else
-	{
-		for (i = 0; i < __result->len; i++)
-		{
-			ColumnOrSuperColumn	*__cosc = COLUMN_OR_SUPER_COLUMN(__result->pdata[i]);
 
-			assert(TRUE == __cosc->__isset_column);
-
-			zbx_vector_str_append(values, zbx_cassandra_decode_ascii_type(__cosc->column->value));
-		}
-	}
-
-	g_ptr_array_free(__result, TRUE);
 	g_object_unref(__column_parent);
 
-	return ret;
+	return __result;
 }
 
 void	zbx_cassandra_save_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, const char *value)
@@ -389,59 +382,124 @@ void	zbx_cassandra_save_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, c
 
 	zbx_cassandra_set_value(__key, "metric", __column, __value);
 
-	g_byte_array_free(__value, TRUE);
-	g_byte_array_free(__column, TRUE);
-	g_byte_array_free(__key, TRUE);
+	g_byte_array_unref(__value);
+	g_byte_array_unref(__column);
+	g_byte_array_unref(__key);
 
 	__key = zbx_cassandra_encode_long_type(itemid);
 	__column = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
-	__value = zbx_cassandra_encode_ascii_type("");
+	__value = zbx_cassandra_encode_ascii_type("\1");
 
 	zbx_cassandra_set_value(__key, "metric_by_parameter", __column, __value);
 
-	g_byte_array_free(__value, TRUE);
-	g_byte_array_free(__column, TRUE);
-	g_byte_array_free(__key, TRUE);
+	g_byte_array_unref(__value);
+	g_byte_array_unref(__column);
+	g_byte_array_unref(__key);
 }
 
 void	zbx_cassandra_fetch_history_values(zbx_vector_str_t *values, zbx_uint64_t itemid,
 		zbx_uint64_t clock_from, zbx_uint64_t clock_to, int last_n)
 {
-	zbx_uint64_t	clock;
+	int		i, j;
 
-	GByteArray	*__key;
-	SlicePredicate	*__predicate;
+	GByteArray	*__index_key;
+	SlicePredicate	*__index_predicate;
+	GPtrArray	*__index_result;
 
-	clock_from++;	/* lower bound is not inclusive */
+	GByteArray	*__value_key;
+	SlicePredicate	*__value_predicate;
+	GPtrArray	*__value_result;
 
-	if (0 == last_n)
-		last_n = 2000000000;
+	if (0 != clock_from)
+		clock_from++;
 
-	__predicate = g_object_new(TYPE_SLICE_PREDICATE, NULL);
-	__predicate->slice_range = g_object_new(TYPE_SLICE_RANGE, NULL);
-	__predicate->slice_range->start = zbx_cassandra_encode_long_type(clock_to * 1000);
-	__predicate->slice_range->finish = zbx_cassandra_encode_long_type(clock_from * 1000);
-	__predicate->slice_range->reversed = TRUE;
-	__predicate->__isset_slice_range = TRUE;
+	if (0 == clock_to)
+		clock_to = time(NULL);
 
-	for (clock = clock_to - clock_to % SEC_PER_DAY; clock + SEC_PER_DAY > clock_from; clock -= SEC_PER_DAY)
+	__index_key = zbx_cassandra_encode_long_type(itemid);
+
+	__index_predicate = g_object_new(TYPE_SLICE_PREDICATE, NULL);
+	__index_predicate->slice_range = g_object_new(TYPE_SLICE_RANGE, NULL);
+	__index_predicate->slice_range->start = zbx_cassandra_encode_composite_type(
+			itemid, clock_to - clock_to % SEC_PER_DAY);
+	__index_predicate->slice_range->finish = zbx_cassandra_encode_composite_type(
+			itemid, clock_from - clock_from % SEC_PER_DAY);
+	__index_predicate->slice_range->reversed = TRUE;
+	__index_predicate->slice_range->count = INT_MAX;
+	__index_predicate->__isset_slice_range = TRUE;
+
+	__value_predicate = g_object_new(TYPE_SLICE_PREDICATE, NULL);
+	__value_predicate->slice_range = g_object_new(TYPE_SLICE_RANGE, NULL);
+	__value_predicate->slice_range->start = zbx_cassandra_encode_long_type(clock_to * 1000);
+	__value_predicate->slice_range->finish = zbx_cassandra_encode_long_type(clock_from * 1000);
+	__value_predicate->slice_range->reversed = TRUE;
+	__value_predicate->slice_range->count = INT_MAX;
+	__value_predicate->__isset_slice_range = TRUE;
+
+	while (1)
 	{
-		__predicate->slice_range->count = last_n - values->values_num;
+		if (0 != last_n)
+			__index_predicate->slice_range->count = MAX(1, last_n / 5);
 
-		__key = zbx_cassandra_encode_composite_type(itemid, clock);
+		__index_result = zbx_cassandra_get_values(__index_key, "metric_by_parameter", __index_predicate);
 
-		zbx_cassandra_get_values(values, __key, "metric", __predicate);
+		for (i = 0; i < __index_result->len; i++)
+		{
+			__value_key = COLUMN_OR_SUPER_COLUMN(__index_result->pdata[i])->column->name;
 
-		g_byte_array_unref(__key);
+			if (0 != last_n)
+				__value_predicate->slice_range->count = last_n;
 
-		if (last_n == values->values_num)
+			__value_result = zbx_cassandra_get_values(__value_key, "metric", __value_predicate);
+
+			for (j = 0; j < __value_result->len; j++)
+			{
+				GByteArray	*__array;
+
+				__array = COLUMN_OR_SUPER_COLUMN(__value_result->pdata[j])->column->value;
+				zbx_vector_str_append(values, zbx_cassandra_decode_ascii_type(__array));
+			}
+
+			if (0 != last_n && 0 == (last_n -= __value_result->len))
+			{
+				g_ptr_array_unref(__value_result);
+				break;
+			}
+			else
+				g_ptr_array_unref(__value_result);
+		}
+
+		if (0 == last_n || __index_predicate->slice_range->count != __index_result->len)
+		{
+			g_ptr_array_unref(__index_result);
 			break;
+		}
+		else
+		{
+			g_byte_array_unref(__index_predicate->slice_range->start);
+
+			/* continue our search with the lowest date found */
+			/* byte "\xff" (-1) at the end makes it exclusive */
+			__index_predicate->slice_range->start = g_byte_array_ref(
+					__index_result->pdata[__index_result->len - 1]);
+			g_byte_array_remove_index_fast(__index_predicate->slice_range->start, 21);
+			g_byte_array_append(__index_predicate->slice_range->start, "\xff", 1);
+
+			g_ptr_array_unref(__index_result);
+		}
 	}
 
-	g_byte_array_free(__predicate->slice_range->finish, TRUE);
-	g_byte_array_free(__predicate->slice_range->start, TRUE);
-	g_object_unref(__predicate->slice_range);
-	g_object_unref(__predicate);
+	g_byte_array_unref(__value_predicate->slice_range->finish);
+	g_byte_array_unref(__value_predicate->slice_range->start);
+	g_object_unref(__value_predicate->slice_range);
+	g_object_unref(__value_predicate);
+
+	g_byte_array_unref(__index_predicate->slice_range->finish);
+	g_byte_array_unref(__index_predicate->slice_range->start);
+	g_object_unref(__index_predicate->slice_range);
+	g_object_unref(__index_predicate);
+
+	g_byte_array_unref(__index_key);
 }
 
 #endif
