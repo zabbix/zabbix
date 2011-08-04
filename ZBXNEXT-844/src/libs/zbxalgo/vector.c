@@ -162,3 +162,4 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 }
 
 ZBX_VECTOR_IMPL(uint64, zbx_uint64_t);
+ZBX_VECTOR_IMPL(str, char *);
