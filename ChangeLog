@@ -190,17 +190,15 @@ Changes for 1.8.7rc1
 
  - [ZBXNEXT-869] clarify in manpages how the process for runtime signalling is found (Richlv)
 
---------------------------------------------------------------------------------
 Changes for 1.8.6rc2
 
  - [ZBX-3990] fixed exiting proxy and server on cache reload using runtime control options (rudolfs)
  - [ZBX-3835] fixed possible security vulnerability in redirects (Vedmak)
 
---------------------------------------------------------------------------------
 Changes for 1.8.6rc1
 
- - [ZBX-3469] fixed setting UNKNOWN trigger status when agent goes down (dimir)
  - [ZBX-3968] fixed issues with filtering in monitoring->events in Internet Explorer 7 (KB)
+ - [ZBX-3469] fixed setting UNKNOWN trigger status when agent goes down (dimir)
  - [ZBX-3973] added logging of proxy mode (active/passive) at startup (rudolfs)
  - [ZBX-3902] fixed possible zombie states in UNIX, moved watchdog (server) and heartbeats (proxy) to separate processes (main process just waits), added more logging to exiting Windows agent (rudolfs)
  - [ZBX-3166] fixed application updating in Template linking event. Changed linked Template color in application page. Added param NOEMPTY for popup page witch allows hide Empty button in application and item pages (Eduard)
@@ -252,6 +250,7 @@ Changes for 1.8.6rc1
  - [ZBX-3682] fixed import of map elements having empty label; thanks to Takanori Suzuki (Alexei)
  - [ZBX-3679] fixed incorrect "No nodes defined" when screen selection popup has no elements (Alexei)
  - [ZBX-3638] fixed displaying of vertical text in case of special HTML characters (Alexei)
+ - [ZBX-3582] fixed screen import (Vedmak)
  - [ZBX-3801] added check for duplicate template IDs when creating host through API (KB)
  - [ZBX-3802] fixed error when try to open custom screen from history link (Vedmak)
  - [ZBX-3794] added timeout support to vfs.file.* commands (dimir)
