@@ -412,7 +412,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$form = new CForm();
 		$form->setName('actions');
 
-		$tblActions = new CTableInfo(_('No actions defined'));
+		$tblActions = new CTableInfo(_('No actions defined.'));
 		$tblActions->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->getName()."','all_items','g_actionid');"),
 			make_sorting_header(_('Name'), 'name'),

@@ -87,7 +87,7 @@ function condition_value2str($conditiontype, $value){
 			));
 
 			if(!$group = reset($groups))
-				error(_s('No host groups with groupid "%s"', $value));
+				error(_s('No host groups with groupid "%s".', $value));
 
 			$str_val = '';
 			if(id2nodeid($value) != get_current_nodeid())
@@ -614,7 +614,7 @@ function validate_condition($conditiontype, $value){
 				'nodeids' => get_current_nodeid(true),
 			));
 			if(empty($groups)){
-				error(_('Incorrect group.'));
+				error(_('Incorrect host group.'));
 				return false;
 			}
 			break;

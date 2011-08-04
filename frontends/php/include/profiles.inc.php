@@ -226,7 +226,7 @@ function update_config($configs){
 	}
 	if(isset($configs['alert_usrgrpid']) && !is_null($configs['alert_usrgrpid'])){
 		if(($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
-			error(_('Incorrect group'));
+			error(_('Incorrect user group.'));
 			return false;
 		}
 	}
