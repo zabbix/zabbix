@@ -260,7 +260,7 @@ static int	zbx_cassandra_set_value(GByteArray *key, char *column_family, GByteAr
 		descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
 				"['%s']", zbx_cassandra_decode_type(column));
 		zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
-				" to ['%s']", zbx_cassandra_decode_type(value));
+				" to '%s'", zbx_cassandra_decode_type(value));
 
 		zbx_cassandra_log_errors(descr, error, ire, NULL, ue, toe);
 	}
@@ -392,6 +392,16 @@ void	zbx_cassandra_save_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, c
 	g_byte_array_free(__value, TRUE);
 	g_byte_array_free(__column, TRUE);
 	g_byte_array_free(__key, TRUE);
+
+	__key = zbx_cassandra_encode_long_type(itemid);
+	__column = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
+	__value = zbx_cassandra_encode_ascii_type("");
+
+	zbx_cassandra_set_value(__key, "metric_by_parameter", __column, __value);
+
+	g_byte_array_free(__value, TRUE);
+	g_byte_array_free(__column, TRUE);
+	g_byte_array_free(__key, TRUE);
 }
 
 void	zbx_cassandra_fetch_history_values(zbx_vector_str_t *values, zbx_uint64_t itemid,
@@ -402,13 +412,15 @@ void	zbx_cassandra_fetch_history_values(zbx_vector_str_t *values, zbx_uint64_t i
 	GByteArray	*__key;
 	SlicePredicate	*__predicate;
 
+	clock_from++;	/* lower bound is not inclusive */
+
 	if (0 == last_n)
 		last_n = 2000000000;
 
 	__predicate = g_object_new(TYPE_SLICE_PREDICATE, NULL);
 	__predicate->slice_range = g_object_new(TYPE_SLICE_RANGE, NULL);
 	__predicate->slice_range->start = zbx_cassandra_encode_long_type(clock_to * 1000);
-	__predicate->slice_range->finish = zbx_cassandra_encode_long_type((clock_from + 1) * 1000);
+	__predicate->slice_range->finish = zbx_cassandra_encode_long_type(clock_from * 1000);
 	__predicate->slice_range->reversed = TRUE;
 	__predicate->__isset_slice_range = TRUE;
 
