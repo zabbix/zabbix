@@ -258,7 +258,7 @@ $ZBX_MENU = array(
 function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 	global $ZBX_MENU, $USER_DETAILS;
 
-	$denyed_page_requested = false;
+	$denied_page_requested = false;
 
 /* NOTE - menu array format:
 	first level:
@@ -335,7 +335,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 //SDI($label.' : '.$show_menu.' : '.$deny);
 
 		if($page_exists && $deny){
-			$denyed_page_requested = true;
+			$denied_page_requested = true;
 		}
 
 		if(!$show_menu){
@@ -356,10 +356,10 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 	}
 
 	if(!$page_exists && ($page['type']!=PAGE_TYPE_XML)&&($page['type']!=PAGE_TYPE_CSV)&&($page['type']!=PAGE_TYPE_TEXT_FILE)){
-		$denyed_page_requested = true;
+		$denied_page_requested = true;
 	}
 
-return $denyed_page_requested;
+return $denied_page_requested;
 }
 
 function zbx_define_menu_restrictions($page, $ZBX_MENU){

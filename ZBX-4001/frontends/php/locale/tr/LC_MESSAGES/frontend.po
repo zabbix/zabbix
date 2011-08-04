@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-29 10:42+0300\n"
+"POT-Creation-Date: 2011-08-02 09:57+0300\n"
 "PO-Revision-Date: 2011-06-07 11:42+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -14,20 +14,20 @@ msgstr ""
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
-#: include/page_header.php:460
+#: include/page_header.php:461
 msgid " failed login attempts logged. Last failed attempt was from "
 msgstr "başarısız giriş denemeleri kayıt altına alındı. Son başarısız girişin yapıldığı"
 
-#: include/page_header.php:462
+#: include/page_header.php:463
 msgid " on "
 msgstr ""
 
 #: include/profiles.inc.php:257
-msgid "\"Display OK triggers\" needs to be a positive integer."
+msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
 msgstr ""
 
 #: include/profiles.inc.php:262
-msgid "\"Triggers blink on status change\" needs to be a positive integer."
+msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr ""
 
 #: include/func.inc.php:374
@@ -209,12 +209,12 @@ msgstr "Onay durumu"
 msgid "Acknowledged"
 msgstr "Onaylandı"
 
-#: include/views/administration.general.triggerDisplayingOptions.edit.php:55
-msgid "Acknowledged problem events"
+#: include/views/administration.general.triggerDisplayingOptions.edit.php:89
+msgid "Acknowledged OK events"
 msgstr ""
 
-#: include/views/administration.general.triggerDisplayingOptions.edit.php:89
-msgid "Acknowledged recovery events"
+#: include/views/administration.general.triggerDisplayingOptions.edit.php:55
+msgid "Acknowledged PROBLEM events"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:241
@@ -393,6 +393,11 @@ msgstr "Süre"
 msgid "Age less than"
 msgstr "Yaşı dan küçük"
 
+#: overview.php:124
+#, php-format
+msgid "Age less than %s"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:168
 #: include/views/administration.script.list.php:76 popup.php:1835
 msgid "Agent"
@@ -415,7 +420,7 @@ msgid "Align icons"
 msgstr "Simgeleri hizala"
 
 #: include/locales/en_gb.inc.php:491 include/locales/en_gb.inc.php:1109
-#: include/nodes.inc.php:163 include/page_header.php:303
+#: include/nodes.inc.php:163 include/page_header.php:304
 #: include/views/administration.script.edit.php:75
 #: include/views/administration.script.edit.php:84
 #: include/views/administration.script.list.php:93
@@ -1886,7 +1891,7 @@ msgstr "Kritik hata. \"%2$s\" alanı için \"%1$s\" değeri geçersiz."
 msgid "Current host"
 msgstr "Geçerli konak"
 
-#: include/page_header.php:334
+#: include/page_header.php:335
 msgid "Current node"
 msgstr "Geçerli düğüm"
 
@@ -2662,7 +2667,7 @@ msgid "Discovery status"
 msgstr "Keşif Durumu"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:112
-msgid "Display OK triggers"
+msgid "Display OK triggers for"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1662
@@ -3344,7 +3349,7 @@ msgstr "Resim Al: Eleman verisi bulunamadı!"
 msgid "Get selected elements FAILED."
 msgstr "Seçilen elemanları alma BAŞARISIZ."
 
-#: include/page_header.php:215
+#: include/page_header.php:216
 msgid "Get support"
 msgstr "Destek Al"
 
@@ -3617,7 +3622,7 @@ msgstr "Donanım(Tüm detaylar)"
 msgid "Height"
 msgstr "Yükseklik"
 
-#: include/page_header.php:213 include/views/general.login.php:41
+#: include/page_header.php:214 include/views/general.login.php:41
 msgid "Help"
 msgstr "Yardım"
 
@@ -5239,7 +5244,7 @@ msgid "Logged in as"
 msgstr "olarak oturum açıldı"
 
 #: include/locales/en_gb.inc.php:1982 include/menu.inc.php:246
-#: include/page_header.php:246
+#: include/page_header.php:247
 msgid "Login"
 msgstr "Oturum aç"
 
@@ -5257,7 +5262,7 @@ msgstr "Oturum açma başarısız [%s]"
 msgid "Login name or password is incorrect"
 msgstr "Oturum açma için isim veya parola geçersiz"
 
-#: include/locales/en_gb.inc.php:1983 include/page_header.php:243
+#: include/locales/en_gb.inc.php:1983 include/page_header.php:244
 msgid "Logout"
 msgstr "Oturum kapat"
 
@@ -6274,7 +6279,7 @@ msgid "No users defined"
 msgstr "Hiçbir kullanıcı tanımlanmamış"
 
 #: hostprofiles.php:158 include/actions.inc.php:48
-#: include/locales/en_gb.inc.php:452 include/page_header.php:320 queue.php:248
+#: include/locales/en_gb.inc.php:452 include/page_header.php:321 queue.php:248
 msgid "Node"
 msgstr "Düğüm"
 
@@ -6506,6 +6511,10 @@ msgstr "Tamam"
 #: include/locales/en_gb.inc.php:275 sysmap.php:170
 msgid "On"
 msgstr "Açık"
+
+#: include/views/administration.general.triggerDisplayingOptions.edit.php:118
+msgid "On status change triggers blink for"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1613
 msgid "Once"
@@ -6876,7 +6885,7 @@ msgstr "Birincil İKK telefon B"
 msgid "Primary POC screen name"
 msgstr "Birincil İKK ekran ismi"
 
-#: include/page_header.php:220
+#: include/page_header.php:221
 msgid "Print"
 msgstr "Yazıcı"
 
@@ -6918,7 +6927,7 @@ msgstr "Sorun, eğer en az alttakilerden birinde sorun varsa"
 msgid "Problems"
 msgstr "Problemler"
 
-#: include/locales/en_gb.inc.php:1975 include/page_header.php:227
+#: include/locales/en_gb.inc.php:1975 include/page_header.php:228
 msgid "Profile"
 msgstr "Profil"
 
@@ -7720,7 +7729,7 @@ msgstr "İkincil İKK ekran ismi"
 msgid "Seconds"
 msgstr "Saniye"
 
-#: include/locales/en_gb.inc.php:1495 include/page_header.php:327
+#: include/locales/en_gb.inc.php:1495 include/page_header.php:328
 #: include/views/configuration.action.edit.php:173
 #: include/views/configuration.action.edit.php:183
 #: include/views/configuration.action.edit.php:193
@@ -8789,10 +8798,6 @@ msgstr "Tetikler"
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Tetikler (a/p)[s/b/t]"
 
-#: include/views/administration.general.triggerDisplayingOptions.edit.php:118
-msgid "Triggers blink on status change"
-msgstr ""
-
 #: include/locales/en_gb.inc.php:1417
 msgid "Triggers deleted"
 msgstr "Tetikler silindi"
@@ -8950,18 +8955,18 @@ msgstr "Yapılandırma seçilemiyor"
 msgid "Unacknowledged"
 msgstr "Onaylanmamış"
 
+#: include/views/administration.general.triggerDisplayingOptions.edit.php:72
+msgid "Unacknowledged OK events"
+msgstr ""
+
+#: include/views/administration.general.triggerDisplayingOptions.edit.php:38
+msgid "Unacknowledged PROBLEM events"
+msgstr ""
+
 #: include/locales/en_gb.inc.php:1110
 #: include/views/configuration.sysmap.edit.php:125
 msgid "Unacknowledged only"
 msgstr "Sadece onaylanmamışlar"
-
-#: include/views/administration.general.triggerDisplayingOptions.edit.php:38
-msgid "Unacknowledged problem events"
-msgstr ""
-
-#: include/views/administration.general.triggerDisplayingOptions.edit.php:72
-msgid "Unacknowledged recovery events"
-msgstr ""
 
 #: include/locales/en_gb.inc.php:1572
 msgid "Unblock selected"
