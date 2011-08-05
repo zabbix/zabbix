@@ -5,14 +5,16 @@ class CassandraHistory {
 	private static $instance = null;
 
 	private $pool = null;
-	private $cf = null;
+	private $metric = null;
+	private $itemidIndex = null;
 
 	private function __construct(){
 		global $DB;
 
 		if(isset($DB['USE_CASSANDRA'])){
 			$this->pool = new ConnectionPool($DB['CASSANDRA_KEYSPACE'], $DB['CASSANDRA_IP']);
-			$this->cf = new ColumnFamily($this->pool, 'metric');
+			$this->metric = new ColumnFamily($this->pool, 'metric');
+			$this->itemidIndex = new ColumnFamily($this->pool, 'metric_by_parameter');
 		}
 	}
 
@@ -37,7 +39,7 @@ class CassandraHistory {
 		$data = $this->getData($itemid, $from, $to);
 
 		foreach($data as $clock => $value){
-			$idx = round(($pxSize * (($clock + ($timeSize - $from % $timeSize)) % $timeSize)) / $timeSize, 0);
+			$idx = ($pxSize * (($clock + ($timeSize - $from % $timeSize)) % $timeSize)) / $timeSize;
 			$groupedData[$idx][] = $value;
 
 			if(!isset($maxClocks[$idx]) || $maxClocks[$idx] < $clock){
@@ -56,46 +58,56 @@ class CassandraHistory {
 		return $result;
 	}
 
-	public function getData($itemid, $from = null, $to = null, $limit = null){
+	public function getData($itemid, $from = null, $to = null, $limit = null, $order = ZBX_SORT_UP){
 		$result = array();
 
-//sdi($itemid);
-//sdi($from);
-//sdi($to);
-		if(null === $from){
-			$from = 0;
-		}
-		if(null === $to){
-			$to = time();
-		}
 
 		$tzOffset = date('Z');
-		$time = strtotime('midnight', $from) + $tzOffset;
 
+		if(null === $from){
+			$from = 0;
+			$keyFrom = '';
+		}
+		else{
+			$keyFrom = $this->_packCompositeKey($itemid, strtotime('midnight', $from) + $tzOffset);
+		}
+
+		if(null === $to){
+			$to = time();
+			$keyTo = '';
+		}
+		else{
+			$keyTo = $this->_packCompositeKey($itemid, $to + $tzOffset);
+		}
+
+		if($order == ZBX_SORT_DOWN){
+			$tmp = $keyFrom;
+			$keyFrom = $keyTo;
+			$keyTo = $tmp;
+		}
+		$keys = $this->itemidIndex->get($itemid, null, $keyFrom, $keyTo, ($order == ZBX_SORT_DOWN), PHP_INT_MAX);
+
+		$keys = array_keys($keys);
+
+		$rows = $this->metric->multiget($keys, null, '', '', ($order == ZBX_SORT_DOWN), PHP_INT_MAX);
 
 
 		$count = 0;
-		while($time < $to){
-			try{
-				$dayData = $this->cf->get($this->_packCompositeKey($itemid, $time));
+		foreach($rows as $column){
+			foreach($column as $timeOffset => $value){
 
-				foreach($dayData as $timeOffset => $value){
+				$clock = bcround(bcdiv($timeOffset, 1000));
 
-					$clock = bcround(bcdiv($timeOffset, 1000));
-
-					if(($clock > $from) && ($clock < $to)){
-						$result[$clock] = $value;
-						$count++;
-						if(null !== $limit && $count > $limit){
-							break 2;
-						}
+				if(($clock > $from) && ($clock < $to)){
+					$result[$clock] = $value;
+					$count++;
+					if((null !== $limit) && ($count > $limit)){
+						break 2;
 					}
 				}
 			}
-			catch(cassandra_NotFoundException $e){}
-
-			$time = strtotime('tomorrow', $time) + $tzOffset;
 		}
+
 
 		return $result;
 	}

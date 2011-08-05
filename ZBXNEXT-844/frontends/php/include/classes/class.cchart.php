@@ -265,6 +265,7 @@ class CChart extends CGraphDraw{
 				$itemData = CassandraHistory::i()->getDataForGraph($this->items[$i]['itemid'], $from_time, $to_time, $p, $x);
 //sdii($itemData);
 				foreach($itemData as $idx => $pointData){
+					$idx--;
 					$curr_data['count'][$idx]	= $pointData['count'];
 					$curr_data['min'][$idx]	= $pointData['min'];
 					$curr_data['max'][$idx]	= $pointData['max'];

@@ -91,13 +91,13 @@ class CHistory extends CZBXAPI{
 
 
 		if(
-			$options['history'] == ITEM_VALUE_TYPE_UINT64
-			|| $options['history'] == ITEM_VALUE_TYPE_FLOAT
+			($options['history'] == ITEM_VALUE_TYPE_UINT64
+			|| $options['history'] == ITEM_VALUE_TYPE_FLOAT)
 			&& CassandraHistory::i()->enabled()
 		){
 			foreach($options['itemids'] as $itemid){
-				$data = CassandraHistory::i()->getData($itemid, $options['time_from'], $options['time_till'], $options['limit']);
-//sdii($data);
+				$data = CassandraHistory::i()->getData($itemid, $options['time_from'], $options['time_till'], $options['limit'], ZBX_SORT_DOWN);
+
 				foreach($data as $clock => $value){
 					$result[] = array(
 						'itemid' => $itemid,
@@ -242,26 +242,22 @@ class CHistory extends CZBXAPI{
 		$num = 0;
 		$group = array();
 		while($data = DBfetch($db_res)){
+
 			if($options['countOutput']){
 				$result = $data;
 			}
 			else{
-				if($options['output'] == API_OUTPUT_SHORTEN){
-					$result[$num] = $data;
-
-
+				$result[$num] = $data;
 // grouping
-					if($groupOutput){
-						$dataid = $data[$options['groupOutput']];
-						if(!isset($group[$dataid])) $group[$dataid] = array();
-						$group[$dataid][] = $result[$num];
-					}
-
-					$num++;
+				if($groupOutput){
+					$dataid = $data[$options['groupOutput']];
+					if(!isset($group[$dataid])) $group[$dataid] = array();
+					$group[$dataid][] = $result[$num];
 				}
+
+				$num++;
 			}
 		}
-
 
 		return $result;
 	}

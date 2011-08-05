@@ -416,7 +416,7 @@ include_once('include/page_header.php');
 
 			$options['sortfield'] = 'clock';
 			$hData = CHistory::get($options);
-			foreach($hData as $hnum => $data){
+			foreach($hData as $data){
 				$item = $items[$data['itemid']];
 				$host = reset($item['hosts']);
 
