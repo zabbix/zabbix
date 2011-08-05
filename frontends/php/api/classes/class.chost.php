@@ -1780,7 +1780,7 @@ Copt::memoryPick();
 
 		if(isset($data['inventory'])){
 			$updateInventory = $data['inventory'];
-			$updateInventory['inventory_mode'] = isset($data['inventory_mode']) ? $data['inventory_mode'] : HOST_INVENTORY_MANUAL;
+			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 			unset($data['inventory']);
 			unset($data['inventory_mode']);
 		}
