@@ -3,14 +3,15 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-08-05 13:48+0300\n"
-"PO-Revision-Date: 2011-07-28 00:05+0200\n"
+"PO-Revision-Date: 2011-08-05 13:34+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -334,7 +335,7 @@ msgstr "Pievienot prototipu"
 
 #: include/locales/en_gb.inc.php:1999
 msgid "Add service"
-msgstr ""
+msgstr "Pievienot servisu"
 
 #: include/locales/en_gb.inc.php:1551
 msgid "Add to"
@@ -1003,7 +1004,7 @@ msgstr ""
 #: include/export.inc.php:822
 #, php-format
 msgid "Cannot create map \"%s\"."
-msgstr ""
+msgstr "Karti \"%s\" nav iespējams izveidot."
 
 #: api/classes/class.cusermedia.php:425 api/classes/class.cuser.php:405
 #, php-format
@@ -1103,7 +1104,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1348
 msgid "Cannot delete service"
-msgstr ""
+msgstr "Servisu nav iespējams izdzēst"
 
 #: include/locales/en_gb.inc.php:1327
 msgid "Cannot delete slideshow"
@@ -1170,7 +1171,7 @@ msgstr "Mezglu grupu nav iespējams atrast"
 
 #: include/locales/en_gb.inc.php:1028
 msgid "Cannot find image"
-msgstr ""
+msgstr "Attēlu nav iespējams atrast"
 
 #: include/locales/en_gb.inc.php:1279
 msgid "Cannot find item"
@@ -1178,7 +1179,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1033
 msgid "Cannot find map"
-msgstr ""
+msgstr "Karti nav iespējams atrast"
 
 #: include/locales/en_gb.inc.php:1034
 msgid "Cannot find screen"
@@ -1475,15 +1476,15 @@ msgstr "Mainīt paroli"
 
 #: include/locales/en_gb.inc.php:872
 msgid "Character"
-msgstr ""
+msgstr "Simbols"
 
 #: include/locales/en_gb.inc.php:413
 msgid "Character string included"
-msgstr ""
+msgstr "Simbolu rinda iekļauta"
 
 #: include/locales/en_gb.inc.php:415
 msgid "Character string not included"
-msgstr ""
+msgstr "Simbolu rinda nav iekļāuta"
 
 #: include/hosts.inc.php:185
 msgid "Chassis"
@@ -1580,7 +1581,7 @@ msgstr "Krāsa"
 #: include/locales/en_gb.inc.php:1008
 #: include/views/js/configuration.sysmaps.js.php:212
 msgid "Colour (OK)"
-msgstr ""
+msgstr "Krāsa (OK)"
 
 #: include/profiles.inc.php:250
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
@@ -1707,7 +1708,7 @@ msgstr ""
 
 #: include/views/administration.script.edit.php:107
 msgid "Confirmation text"
-msgstr ""
+msgstr "Apstiprinājuma teksts"
 
 #: include/locales/en_gb.inc.php:723
 #: include/views/configuration.host.edit.php:192
@@ -1794,15 +1795,15 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:554
 msgid "Create graph"
-msgstr ""
+msgstr "Izveidot grafiku"
 
 #: include/locales/en_gb.inc.php:1549
 msgid "Create group"
-msgstr ""
+msgstr "Izveidot grupu"
 
 #: config.php:684
 msgid "Create image"
-msgstr ""
+msgstr "Izveidot attēlu"
 
 #: include/locales/en_gb.inc.php:890
 msgid "Create item"
@@ -1814,7 +1815,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1004
 msgid "Create map"
-msgstr ""
+msgstr "Izveidot karti"
 
 #: include/locales/en_gb.inc.php:398
 msgid "Create media type"
@@ -1854,7 +1855,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1548
 msgid "Create user"
-msgstr ""
+msgstr "Izveidot lietotāju"
 
 #: config.php:687
 msgid "Create value map"
@@ -1957,12 +1958,12 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:724 popup.php:446
 msgid "DNS"
-msgstr ""
+msgstr "DNS"
 
 #: include/locales/en_gb.inc.php:735
 #: include/views/configuration.host.edit.php:192
 msgid "DNS name"
-msgstr ""
+msgstr "DNS vārds"
 
 #: include/locales/en_gb.inc.php:956
 msgid "DOWN"
@@ -2017,7 +2018,7 @@ msgstr "Datu tips"
 
 #: include/setup.inc.php:240 include/setup.inc.php:294
 msgid "Database file"
-msgstr ""
+msgstr "Datubāzes fails"
 
 #: include/setup.inc.php:243
 msgid "Database host"
@@ -2029,16 +2030,16 @@ msgstr ""
 
 #: include/setup.inc.php:245 include/setup.inc.php:302
 msgid "Database name"
-msgstr ""
+msgstr "Datubāzes vārds"
 
 #: include/setup.inc.php:304
 msgid "Database password"
-msgstr ""
+msgstr "Datubāzes parole"
 
 #: include/setup.inc.php:244 include/setup.inc.php:299
 #: include/setup.inc.php:301
 msgid "Database port"
-msgstr ""
+msgstr "Datubāzes ports"
 
 #: include/setup.inc.php:247 include/setup.inc.php:306
 msgid "Database schema"
@@ -2054,15 +2055,15 @@ msgstr ""
 
 #: include/setup.inc.php:303
 msgid "Database user"
-msgstr ""
+msgstr "Datubāzes lietotājs"
 
 #: include/locales/en_gb.inc.php:638
 msgid "Date"
-msgstr ""
+msgstr "Datums"
 
 #: include/hosts.inc.php:270
 msgid "Date HW installed"
-msgstr ""
+msgstr "Datums, kad aparatūra uzstādīta"
 
 #: include/hosts.inc.php:275
 msgid "Date HW maintenance expires"
@@ -2070,7 +2071,7 @@ msgstr ""
 
 #: include/hosts.inc.php:265
 msgid "Date HW purchased"
-msgstr ""
+msgstr "Datums, kad aparatūra iegādāta"
 
 #: include/hosts.inc.php:280
 msgid "Date hw decommissioned"
@@ -2197,7 +2198,7 @@ msgstr "Dzēst no grupas"
 
 #: include/locales/en_gb.inc.php:549
 msgid "Delete graph?"
-msgstr ""
+msgstr "Dzēst grafiku?"
 
 #: include/locales/en_gb.inc.php:178
 msgid "Delete history of selected WEB scenarios?"
@@ -2260,11 +2261,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1017
 msgid "Delete selected elements?"
-msgstr "Dzēst iezīmētos elementus?"
+msgstr "Vai dzēst iezīmētos elementus?"
 
 #: include/locales/en_gb.inc.php:564
 msgid "Delete selected graphs?"
-msgstr ""
+msgstr "Vai dzēst izvēlētos grafikus?"
 
 #: include/locales/en_gb.inc.php:676
 msgid "Delete selected group?"
@@ -2292,7 +2293,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:379
 msgid "Delete selected image?"
-msgstr ""
+msgstr "Vai dzēst iezīmēto attēlu?"
 
 #: include/locales/en_gb.inc.php:1762
 msgid "Delete selected item?"
@@ -2308,7 +2309,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1010
 msgid "Delete selected maps?"
-msgstr "Dzēst iezīmētās kartes?"
+msgstr "Vai dzēst iezīmētās kartes?"
 
 #: include/locales/en_gb.inc.php:444
 msgid "Delete selected media types?"
