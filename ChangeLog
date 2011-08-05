@@ -191,6 +191,7 @@ Changes for 1.8.7rc1
 
  - [ZBX-3961] added recalculation of nextcheck time after changed flexible intervals (rudolfs)
  - [ZBX-3978] fixed time period calculation, do not include upper bound (dimir,Sasha,KB)
+ - [ZBX-4000] fixed stop propagation in IE9 for Map (Eduard)
  - [ZBX-2467] added more command line arguments to objdump to request more debugging information about crashes (asaveljevs)
  - [ZBX-3972] added NOW and DONE buttons into js calendar - change action after day selection (Eduard)
  - [ZBX-3993] fixed transmitting of templated user macros between server and proxy (Sasha)
