@@ -119,9 +119,9 @@ class CassandraUtil {
 class ColumnFamily {
 
 	/** The default limit to the number of rows retrieved in queries. */
-	const DEFAULT_ROW_COUNT = 100; // default max # of rows for get_range()
+	const DEFAULT_ROW_COUNT = 2147483647; // default max # of rows for get_range()
 	/** The default limit to the number of columns retrieved in queries. */
-	const DEFAULT_COLUMN_COUNT = 100; // default max # of columns for get()
+	const DEFAULT_COLUMN_COUNT = 2147483647; // default max # of columns for get()
 	/** The maximum number that can be returned by get_count(). */
 	const MAX_COUNT = 2147483647; # 2^31 - 1
 

@@ -58,9 +58,30 @@ class CassandraHistory {
 		return $result;
 	}
 
+	public function getAggregate($itemid, $timestamp, $function){
+		$result = null;
+
+		$data = $this->getData($itemid, $timestamp, time());
+
+		if(!empty($data)){
+			switch($function){
+				case 'min':
+					$result = min($data);
+					break;
+				case 'max':
+					$result = max($data);
+					break;
+				case 'avg':
+					$result = zbx_avg($data);
+					break;
+			}
+		}
+
+		return $result;
+	}
+
 	public function getData($itemid, $from = null, $to = null, $limit = null, $order = ZBX_SORT_UP){
 		$result = array();
-
 
 		$tzOffset = date('Z');
 
@@ -85,11 +106,11 @@ class CassandraHistory {
 			$keyFrom = $keyTo;
 			$keyTo = $tmp;
 		}
-		$keys = $this->itemidIndex->get($itemid, null, $keyFrom, $keyTo, ($order == ZBX_SORT_DOWN), PHP_INT_MAX);
+		$keys = $this->itemidIndex->get($itemid, null, $keyFrom, $keyTo, ($order == ZBX_SORT_DOWN));
 
 		$keys = array_keys($keys);
 
-		$rows = $this->metric->multiget($keys, null, '', '', ($order == ZBX_SORT_DOWN), PHP_INT_MAX);
+		$rows = $this->metric->multiget($keys, null, '', '', ($order == ZBX_SORT_DOWN));
 
 
 		$count = 0;

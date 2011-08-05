@@ -261,6 +261,7 @@ class CChart extends CGraphDraw{
 			$curr_data['clock'] = NULL;
 
 
+			// Cassandra
 			if(CassandraHistory::i()->enabled()){
 				$itemData = CassandraHistory::i()->getDataForGraph($this->items[$i]['itemid'], $from_time, $to_time, $p, $x);
 //sdii($itemData);
