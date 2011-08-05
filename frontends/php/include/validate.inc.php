@@ -218,10 +218,10 @@
 		$str = trim($str,';');
 		$out = "";
 		$periods = explode(';',$str);
-		foreach($periods as $preiod){
+		foreach($periods as $period){
 			// arr[idx]   1       2         3             4            5            6
-//			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr)) return false;
-			if(!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $preiod, $arr)) return false;
+//			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $period, $arr)) return false;
+			if(!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $arr)) return false;
 
 			if($arr[1] > $arr[2]) // check week day
 				return false;
