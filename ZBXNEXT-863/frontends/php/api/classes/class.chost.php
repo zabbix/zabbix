@@ -1511,7 +1511,7 @@ Copt::memoryPick();
 				$fields = implode(', ', $fields);
 
 				$values = array_map('zbx_dbstr', $host['inventory']);
-				$values[] = $host['inventory_mode'];
+				$values[] = isset($host['inventory_mode']) ? $host['inventory_mode'] : HOST_INVENTORY_MANUAL;
 				$values = implode(', ', $values);
 
 				DBexecute('INSERT INTO host_inventory (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
