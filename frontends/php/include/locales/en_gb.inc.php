@@ -1984,6 +1984,8 @@
 	'S_FRIDAY_SHORT_BIG'=>		_('F'),
 	'S_SATURDAY_SHORT_BIG'=>	_('S'),
 	'S_SUNDAY_SHORT_BIG'=>		_('S'),
+	'S_NOW'=>	'Now',
+	'S_DONE'=>	'Done',
 
 //	gtlc.js
 	'S_ZOOM'=>			_('Zoom'),
