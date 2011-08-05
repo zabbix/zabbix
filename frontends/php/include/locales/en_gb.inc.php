@@ -2415,6 +2415,8 @@
 	'S_FRIDAY_SHORT_BIG'=>		'F',
 	'S_SATURDAY_SHORT_BIG'=>	'S',
 	'S_SUNDAY_SHORT_BIG'=>		'S',
+	'S_NOW'=>	'Now',
+	'S_DONE'=>	'Done',
 
 //	gtlc.js
 	'S_ZOOM'=>			'Zoom',
