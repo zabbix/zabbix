@@ -25,6 +25,9 @@
 #include "threads.h"
 #include "zbxserver.h"
 #include "dbcache.h"
+#ifdef HAVE_CASSANDRA
+#	include "zbxcassa.h"
+#endif
 
 const char	*DBnode(const char *fieldid, int nodeid)
 {
@@ -2095,10 +2098,164 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		**h_value = NULL;
-	int		h_alloc, h_num = 0;
+	int		h_alloc = 1, h_num = 0;
 	const char	*func[] = {"min", "avg", "max", "sum", "count"};
+#ifdef HAVE_CASSANDRA
+	zbx_vector_str_t	c_values;
+	int			i;
+	double			f, sum_f = 0, max_f = 0, min_f = 0;
+	zbx_uint64_t		l, sum_l = 0, max_l = 0, min_l = 0;
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+#ifdef HAVE_CASSANDRA
+	if (ITEM_VALUE_TYPE_FLOAT != value_type && ITEM_VALUE_TYPE_UINT64 != value_type)
+		goto from_db;
+
+	zbx_vector_str_create(&c_values);
+	zbx_cassandra_fetch_history_values(&c_values, itemid, clock_from, clock_to, last_n);
+
+	if (ZBX_DB_GET_HIST_VALUE == function)
+		h_alloc = c_values.values_num;
+
+	h_value = zbx_malloc(h_value, (h_alloc + 1) * sizeof(char *));
+
+	switch (function)
+	{
+		case ZBX_DB_GET_HIST_MIN:
+			if (0 == c_values.values_num)
+				break;
+
+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					f = atof(c_values.values[i]);
+					if (0 == h_num || f < min_f)
+						min_f = f;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, min_f);
+			}
+			else
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					ZBX_STR2UINT64(l, c_values.values[i]);
+					if (0 == h_num || l < min_l)
+						min_l = l;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_UI64, min_l);
+			}
+			break;
+		case ZBX_DB_GET_HIST_AVG:
+			if (0 == c_values.values_num)
+				break;
+
+			for (i = 0; i < c_values.values_num; i++)
+				sum_f += atof(c_values.values[i]);
+
+			h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, sum_f);
+			break;
+		case ZBX_DB_GET_HIST_MAX:
+			if (0 == c_values.values_num)
+				break;
+
+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					f = atof(c_values.values[i]);
+					if (0 == h_num || f > max_f)
+						max_f = f;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, max_f);
+			}
+			else
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					ZBX_STR2UINT64(l, c_values.values[i]);
+					if (0 == h_num || l > max_l)
+						max_l = l;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_UI64, max_l);
+			}
+			break;
+		case ZBX_DB_GET_HIST_SUM:
+			if (0 == c_values.values_num)
+				break;
+
+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
+			{
+				for (i = 0; i < c_values.values_num; i++)
+					sum_f += atof(c_values.values[i]);
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, sum_f);
+			}
+			else
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					ZBX_STR2UINT64(l, c_values.values[i]);
+					sum_l += l;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_UI64, sum_l);
+			}
+			break;
+		case ZBX_DB_GET_HIST_DELTA:
+			if (0 == c_values.values_num)
+				break;
+
+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					f = atof(c_values.values[i]);
+					if (0 == h_num || f < min_f)
+						min_f = f;
+					if (0 == h_num || f > max_f)
+						max_f = f;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, max_f - min_f);
+			}
+			else
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					ZBX_STR2UINT64(l, c_values.values[i]);
+					if (0 == h_num || l < min_l)
+						min_l = l;
+					if (0 == h_num || l > max_l)
+						max_l = l;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_UI64, max_l - min_l);
+			}
+			break;
+		case ZBX_DB_GET_HIST_COUNT:
+			h_value[h_num++] = zbx_dsprintf(NULL, "%d", c_values.values_num);
+			break;
+		case ZBX_DB_GET_HIST_VALUE:
+			for (i = 0; i < c_values.values_num; i++)
+				h_value[h_num++] = zbx_strdup(NULL, c_values.values[i]);
+			break;
+	}
+	zbx_vector_str_destroy(&c_values);
+
+	h_value[h_num] = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return h_value;
+from_db:
+#endif
 
 	if (NULL == field_name)
 		field_name = "value";
@@ -2109,15 +2266,12 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 		case ZBX_DB_GET_HIST_AVG:
 		case ZBX_DB_GET_HIST_MAX:
 		case ZBX_DB_GET_HIST_SUM:
-			h_alloc = 1;
 			offset = zbx_snprintf(sql, sizeof(sql), "select %s(%s)", func[function], field_name);
 			break;
 		case ZBX_DB_GET_HIST_COUNT:
-			h_alloc = 1;
 			offset = zbx_snprintf(sql, sizeof(sql), "select %s(*)", func[function]);
 			break;
 		case ZBX_DB_GET_HIST_DELTA:
-			h_alloc = 1;
 			offset = zbx_snprintf(sql, sizeof(sql), "select max(%s)-min(%s)", field_name, field_name);
 			break;
 		case ZBX_DB_GET_HIST_VALUE:
