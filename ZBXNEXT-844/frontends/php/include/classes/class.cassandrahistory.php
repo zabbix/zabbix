@@ -107,19 +107,17 @@ class CassandraHistory {
 			$keyTo = $tmp;
 		}
 		$keys = $this->itemidIndex->get($itemid, null, $keyFrom, $keyTo, ($order == ZBX_SORT_DOWN));
-
 		$keys = array_keys($keys);
 
 		$rows = $this->metric->multiget($keys, null, '', '', ($order == ZBX_SORT_DOWN));
-
-
+//sdii($rows);
 		$count = 0;
 		foreach($rows as $column){
 			foreach($column as $timeOffset => $value){
 
 				$clock = bcround(bcdiv($timeOffset, 1000));
 
-				if(($clock > $from) && ($clock < $to)){
+				if(($clock >= $from) && ($clock <= $to)){
 					$result[$clock] = $value;
 					$count++;
 					if((null !== $limit) && ($count > $limit)){
