@@ -279,11 +279,11 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 		switch (condition->operator)
 		{
 		case CONDITION_OPERATOR_IN:
-			if (1 == check_time_period(condition->value, (time_t)NULL))
+			if (SUCCEED == check_time_period(condition->value, (time_t)NULL))
 				ret = SUCCEED;
 			break;
 		case CONDITION_OPERATOR_NOT_IN:
-			if (1 != check_time_period(condition->value, (time_t)NULL))
+			if (FAIL == check_time_period(condition->value, (time_t)NULL))
 				ret = SUCCEED;
 			break;
 		default:
