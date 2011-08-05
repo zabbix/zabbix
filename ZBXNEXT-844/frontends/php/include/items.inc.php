@@ -1488,7 +1488,7 @@
 					($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT || $db_item["value_type"] == ITEM_VALUE_TYPE_UINT64))
 			{
 
-				$value = CassandraHistory::i()->getData($db_item['itemid'], null, $clock, ZBX_SORT_DOWN);
+				$value = CassandraHistory::i()->getData($db_item['itemid'], null, $clock, 1, ZBX_SORT_DOWN);
 				$value = reset($value);
 			}
 			else{

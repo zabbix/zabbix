@@ -120,15 +120,15 @@ class CassandraHistory {
 				if(($clock >= $from) && ($clock <= $to)){
 					$result[$clock] = $value;
 					$count++;
-					if((null !== $limit) && ($count > $limit)){
+					if((null !== $limit) && ($count >= $limit)){
 						break 2;
 					}
 				}
 			}
 		}
 
-
 		return $result;
+
 	}
 
 
