@@ -189,6 +189,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.7rc1
 
+ - [ZBX-4018] fixed server crash on unsupported aggregate items (asaveljevs,Sasha)
  - [ZBX-3908] allow empty string for formula field if multiplier is switched off (Eduard)
  - [ZBX-3961] added recalculation of nextcheck time after changed flexible intervals (rudolfs)
  - [ZBX-3978] fixed time period calculation, do not include upper bound (dimir,Sasha,KB)
