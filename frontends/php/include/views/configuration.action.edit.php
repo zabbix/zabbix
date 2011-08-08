@@ -274,7 +274,7 @@ require_once('include/views/js/configuration.action.edit.js.php');
 		case CONDITION_TYPE_DSERVICE_TYPE:
 			$cmbCondVal = new CComboBox('new_condition[value]');
 			foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP,
-				SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,SVC_AGENT,SVC_SNMPv1,SVC_SNMPv2,SVC_SNMPv3,
+				SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,SVC_AGENT,SVC_SNMPv1,SVC_SNMPv2c,SVC_SNMPv3,
 				SVC_ICMPPING) as $svc)
 				$cmbCondVal->addItem($svc,discovery_check_type2str($svc));
 			$rowCondition[] = $cmbCondVal;
