@@ -122,6 +122,12 @@ require_once('include/items.inc.php');
 					' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.$hostid));
 			}
 
+			// transform httptest status to item status
+			$itemStatus = ITEM_STATUS_DISABLED;
+			if($status == HTTPTEST_STATUS_ACTIVE){
+				$itemStatus = ITEM_STATUS_ACTIVE;
+			}
+
 			$item_args = array(
 				'description'			=> $item['description'],
 				'key_'					=> $item['key_'],
@@ -151,7 +157,7 @@ require_once('include/items.inc.php');
 				'params'				=> '',
 				'ipmi_sensor'			=> '',
 				'applications'			=> array($applicationid),
-				'status'				=> $status);
+				'status'				=> $itemStatus);
 
 			if(!$item_data){
 				$item_args['history'] = $history;
@@ -322,6 +328,12 @@ require_once('include/items.inc.php');
 						' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.$hostid));
 				}
 
+				// transform httptest status to item status
+				$itemStatus = ITEM_STATUS_DISABLED;
+				if($status == HTTPTEST_STATUS_ACTIVE){
+					$itemStatus = ITEM_STATUS_ACTIVE;
+				}
+
 				$item_args = array(
 					'description'			=> $item['description'],
 					'key_'					=> $item['key_'],
@@ -351,7 +363,7 @@ require_once('include/items.inc.php');
 					'params'				=> '',
 					'ipmi_sensor'			=> '',
 					'applications'			=> array($applicationid),
-					'status' 				=> $status);
+					'status' 				=> $itemStatus);
 
 				if(!$item_data){
 					$item_args['history'] = $history;
