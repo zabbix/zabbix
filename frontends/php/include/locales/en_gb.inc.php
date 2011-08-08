@@ -1536,7 +1536,7 @@
 	'S_SCREEN_UPDATED'=>			'Screen updated',
 	'S_CANNOT_UPDATE_SCREEN'=>		'Cannot update screen',
 	'S_SCREEN_DELETED'=>			'Screen deleted',
-	'S_CANNOT_DELETE_SCREEN'=>		'Cannot deleted screen',
+	'S_CANNOT_DELETE_SCREEN'=>		'Cannot delete screen',
 	'S_COLUMNS'=>				'Columns',
 	'S_ROWS'=>				'Rows',
 	'S_NO_SCREENS_DEFINED'=>		'No screens defined',
