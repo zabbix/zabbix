@@ -3533,30 +3533,16 @@ int	DBdelete_host(zbx_uint64_t hostid)
 		zbx_free(graphids);
 	}
 
+	zbx_free(sql);
+
 	/* delete host from maps */
 	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_HOST, &hostid, 1);
 
 	/* delete action conditions */
 	DBdelete_action_conditions(CONDITION_TYPE_HOST, hostid);
 
-	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
-
 	/* delete host */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from hosts"
-			" where hostid=" ZBX_FS_UI64 ";\n",
-			hostid);
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
-
-	DBexecute("%s", sql);
-
-	zbx_free(sql);
+	DBexecute("delete from hosts where hostid=" ZBX_FS_UI64, hostid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 

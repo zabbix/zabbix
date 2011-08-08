@@ -564,9 +564,9 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBget_host_inventory_value                                         *
+ * Function: DBget_host_inventory_value                                       *
  *                                                                            *
- * Purpose: request host inventory value by triggerid and field name            *
+ * Purpose: request host inventory value by triggerid and field name          *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1552,8 +1552,8 @@ static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: returns requested host inventory value                         *
- *                      or *UNKNOWN* if inventory is not defined                *
+ * Return value: returns requested host inventory value                       *
+ *                      or *UNKNOWN* if inventory is not defined              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -1954,9 +1954,9 @@ static const char	*ex_macros[] =
 
 /******************************************************************************
  *                                                                            *
- * Function: get_host_inventory                                                 *
+ * Function: get_host_inventory                                               *
  *                                                                            *
- * Purpose: request host inventory value by macro and triggerid                 *
+ * Purpose: request host inventory value by macro and triggerid               *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
