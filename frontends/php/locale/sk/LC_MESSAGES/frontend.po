@@ -1144,8 +1144,8 @@ msgid "Cannot delete value map"
 msgstr "Cannot delete value map"
 
 #: include/locales/en_gb.inc.php:1240
-msgid "Cannot deleted screen"
-msgstr "Cannot deleted screen"
+msgid "Cannot delete screen"
+msgstr "Cannot delete screen"
 
 #: include/locales/en_gb.inc.php:1029
 msgid "Cannot find background image"
