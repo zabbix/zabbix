@@ -1012,11 +1012,11 @@ msgstr ""
 
 #: actionconf.php:175
 msgid "Cannot delete action"
-msgstr "Cannot delete action"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:705
 msgid "Cannot delete application"
-msgstr "Cannot delete application"
+msgstr ""
 
 #: api/classes/class.cdiscoveryrule.php:744 discoveryconf.php:140
 #: host_discovery.php:185 host_discovery.php:270
@@ -1025,7 +1025,7 @@ msgstr "Nie je možné vymazať pátračové pravidlo"
 
 #: api/classes/class.citem.php:1070 include/locales/en_gb.inc.php:541
 msgid "Cannot delete graph"
-msgstr "Cannot delete graph"
+msgstr ""
 
 #: api/classes/class.cgraphprototype.php:1015
 msgid "Cannot delete graph prototype"
@@ -1033,11 +1033,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:543
 msgid "Cannot delete graphs"
-msgstr "Cannot delete graphs"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1504
 msgid "Cannot delete group"
-msgstr "Cannot delete group"
+msgstr ""
 
 #: hosts.php:620 hosts.php:648
 msgid "Cannot delete host"
@@ -1045,19 +1045,19 @@ msgstr "Nebolo možné zmazať hosta"
 
 #: include/locales/en_gb.inc.php:392
 msgid "Cannot delete image"
-msgstr "Cannot delete image"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:819
 msgid "Cannot delete item"
-msgstr "Cannot delete item"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:821
 msgid "Cannot delete items"
-msgstr "Cannot delete items"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:613
 msgid "Cannot delete maintenance"
-msgstr "Cannot delete maintenance"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1001
 msgid "Cannot delete network map"
@@ -1073,11 +1073,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1510
 msgid "Cannot delete proxy"
-msgstr "Cannot delete proxy"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:434
 msgid "Cannot delete regular expression"
-msgstr "Cannot delete regular expression"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:165
 msgid "Cannot delete scenario"
@@ -1085,7 +1085,7 @@ msgstr "Nebolo možné vymazať scenár"
 
 #: scripts.php:142 scripts.php:159
 msgid "Cannot delete script"
-msgstr "Cannot delete script"
+msgstr ""
 
 #: api/classes/class.cscript.php:530
 #, php-format
@@ -1103,11 +1103,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1348
 msgid "Cannot delete service"
-msgstr "Cannot delete service"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1327
 msgid "Cannot delete slideshow"
-msgstr "Cannot delete slideshow"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:786
 msgid "Cannot delete template"
@@ -1129,11 +1129,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1406
 msgid "Cannot delete trigger"
-msgstr "Cannot delete trigger"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1404
 msgid "Cannot delete triggers"
-msgstr "Cannot delete triggers"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1493
 msgid "Cannot delete user"
@@ -1141,11 +1141,11 @@ msgstr "Nie je možné vymazať užívateľa"
 
 #: include/locales/en_gb.inc.php:355
 msgid "Cannot delete value map"
-msgstr "Cannot delete value map"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1240
 msgid "Cannot delete screen"
-msgstr "Cannot delete screen"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1029
 msgid "Cannot find background image"
@@ -1153,7 +1153,7 @@ msgstr "Nebolo možné nájsť obrázok pozadia"
 
 #: include/locales/en_gb.inc.php:1278
 msgid "Cannot find graph"
-msgstr "Cannot find graph"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1031
 msgid "Cannot find host"
@@ -1166,7 +1166,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1032
 msgid "Cannot find hostgroup"
-msgstr "Cannot find hostgroup"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1028
 msgid "Cannot find image"
@@ -1174,7 +1174,7 @@ msgstr "Nebolo možné nájsť obrázok"
 
 #: include/locales/en_gb.inc.php:1279
 msgid "Cannot find item"
-msgstr "Cannot find item"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1033
 msgid "Cannot find map"
@@ -1182,7 +1182,7 @@ msgstr "Nebolo možné nájsť mapu"
 
 #: include/locales/en_gb.inc.php:1034
 msgid "Cannot find screen"
-msgstr "Cannot find screen"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1030
 msgid "Cannot find trigger"
@@ -1190,7 +1190,7 @@ msgstr "Nebolo možné nájsť spušťač"
 
 #: include/locales/en_gb.inc.php:1395
 msgid "Cannot format Tree. Check logic structure in service links"
-msgstr "Cannot format Tree. Check logic structure in service links"
+msgstr ""
 
 #: api/classes/class.ctemplate.php:1415
 msgid "Cannot have empty visible template name"
@@ -1209,15 +1209,15 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1864
 msgid "Cannot link hardlinked service."
-msgstr "Cannot link hardlinked service."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1865
 msgid "Cannot link service to itself."
-msgstr "Cannot link service to itself."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:798
 msgid "Cannot link template"
-msgstr "Cannot link template"
+msgstr ""
 
 #: api/classes/class.cuser.php:887
 msgid "Cannot logout."
@@ -1269,7 +1269,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1934
 msgid "Cannot rename guest user"
-msgstr "Cannot rename guest user"
+msgstr ""
 
 #: api/classes/class.cdrule.php:452
 msgid "Cannot save discovery rule without checks."
@@ -1281,7 +1281,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1514
 msgid "Cannot unblock users"
-msgstr "Cannot unblock users"
+msgstr ""
 
 #: api/classes/class.ctemplate.php:2101
 msgid "Cannot unlink and clear applications"
@@ -1313,31 +1313,31 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:797
 msgid "Cannot unlink template"
-msgstr "Cannot unlink template"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:715
 msgid "Cannot update"
-msgstr "Cannot update"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1516
 msgid "Cannot update GUI access"
-msgstr "Cannot update GUI access"
+msgstr ""
 
 #: actionconf.php:153
 msgid "Cannot update action"
-msgstr "Cannot update action"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:701
 msgid "Cannot update application"
-msgstr "Cannot update application"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1457
 msgid "Cannot update comment"
-msgstr "Cannot update comment"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1518
 msgid "Cannot update debug mode"
-msgstr "Cannot update debug mode"
+msgstr ""
 
 #: discoveryconf.php:119 host_discovery.php:246
 msgid "Cannot update discovery rule"
@@ -1345,19 +1345,19 @@ msgstr "Nebolo možné zmeniť pátračové pravidlo"
 
 #: include/locales/en_gb.inc.php:539
 msgid "Cannot update graph"
-msgstr "Cannot update graph"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1502
 msgid "Cannot update group"
-msgstr "Cannot update group"
+msgstr ""
 
 #: hosts.php:455 include/locales/en_gb.inc.php:714
 msgid "Cannot update host"
-msgstr "Cannot update host"
+msgstr ""
 
 #: hosts.php:634 hosts.php:662
 msgid "Cannot update host status"
-msgstr "Cannot update host status"
+msgstr ""
 
 #: hosts.php:435
 msgid "Cannot update hosts"
@@ -1365,11 +1365,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:394
 msgid "Cannot update image"
-msgstr "Cannot update image"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:816
 msgid "Cannot update item"
-msgstr "Cannot update item"
+msgstr ""
 
 #: api/classes/class.chost.php:1936 api/classes/class.ctemplate.php:1578
 #: config.php:579
@@ -1378,11 +1378,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:693
 msgid "Cannot update macros"
-msgstr "Cannot update macros"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:612
 msgid "Cannot update maintenance"
-msgstr "Cannot update maintenance"
+msgstr ""
 
 #: include/export.inc.php:813
 #, php-format
@@ -1399,11 +1399,11 @@ msgstr "Nebolo možné obnoviť nód"
 
 #: include/locales/en_gb.inc.php:1508
 msgid "Cannot update proxy"
-msgstr "Cannot update proxy"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:431
 msgid "Cannot update regular expression"
-msgstr "Cannot update regular expression"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:162
 msgid "Cannot update scenario"
@@ -1411,15 +1411,15 @@ msgstr "Nebolo možné zmeniť scenár"
 
 #: include/locales/en_gb.inc.php:1238
 msgid "Cannot update screen"
-msgstr "Cannot update screen"
+msgstr ""
 
 #: scripts.php:110
 msgid "Cannot update script"
-msgstr "Cannot update script"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1344
 msgid "Cannot update service"
-msgstr "Cannot update service"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1323
 msgid "Cannot update slideshow"
@@ -1427,47 +1427,47 @@ msgstr ""
 
 #: actionconf.php:315 trigger_prototypes.php:255 triggers.php:295
 msgid "Cannot update status"
-msgstr "Cannot update status"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:782
 msgid "Cannot update template"
-msgstr "Cannot update template"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1418
 msgid "Cannot update trigger"
-msgstr "Cannot update trigger"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1497
 msgid "Cannot update user"
-msgstr "Cannot update user"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1498
 msgid "Cannot update user. Both passwords must be equal."
-msgstr "Cannot update user. Both passwords must be equal."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1512
 msgid "Cannot update users status"
-msgstr "Cannot update users status"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:351
 msgid "Cannot update value map"
-msgstr "Cannot update value map"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1652
 msgid "Caption"
-msgstr "Caption"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:421
 msgid "Case sensitive"
-msgstr "Case sensitive"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1308
 msgid "Centre"
-msgstr "Centre"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1416
 msgid "Change"
-msgstr "Change"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1543
 msgid "Change password"
@@ -1475,15 +1475,15 @@ msgstr "Zmeniť heslo"
 
 #: include/locales/en_gb.inc.php:872
 msgid "Character"
-msgstr "Character"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:413
 msgid "Character string included"
-msgstr "Character string included"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:415
 msgid "Character string not included"
-msgstr "Character string not included"
+msgstr ""
 
 #: include/hosts.inc.php:185
 msgid "Chassis"
@@ -1495,7 +1495,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1670
 msgid "Check expression part starting from '"
-msgstr "Check expression part starting from '"
+msgstr ""
 
 #: api/classes/class.citemgeneral.php:203
 msgid "Check the key, please. Default example was passed."
@@ -1519,7 +1519,7 @@ msgstr "Dieťa"
 
 #: include/locales/en_gb.inc.php:1627
 msgid "Chinese (CN)"
-msgstr "Chinese (CN)"
+msgstr ""
 
 #: api/classes/class.ctemplate.php:1801
 msgid "Circular link cannot be created"
@@ -1532,23 +1532,23 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1598
 msgid "Clear"
-msgstr "Clear"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:812
 msgid "Clear history"
-msgstr "Clear history"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:811
 msgid "Clear history for selected"
-msgstr "Clear history for selected"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:771
 msgid "Clear when unlinking"
-msgstr "Clear when unlinking"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1292
 msgid "Clock"
-msgstr "Clock"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1363
 #: include/views/administration.script.edit.php:119
@@ -1557,14 +1557,14 @@ msgstr "Clock"
 #: include/views/configuration.host.edit.php:601
 #: include/views/configuration.sysmap.edit.php:191
 msgid "Clone"
-msgstr "Clone"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1573
 #: include/views/js/configuration.sysmaps.js.php:166
 #: include/views/js/configuration.sysmaps.js.php:247
 #: include/views/js/configuration.sysmaps.js.php:331
 msgid "Close"
-msgstr "Close"
+msgstr ""
 
 #: include/views/js/configuration.action.edit.js.php:293
 msgid "Close currently opened remote command details without saving?"
@@ -1575,7 +1575,7 @@ msgstr ""
 #: include/views/administration.general.triggerSeverity.edit.php:41
 #: include/views/js/configuration.sysmaps.js.php:227
 msgid "Colour"
-msgstr "Colour"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1008
 #: include/views/js/configuration.sysmaps.js.php:212
@@ -1588,7 +1588,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1286
 msgid "Column span"
-msgstr "Column span"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1241
 msgid "Columns"
@@ -1596,16 +1596,16 @@ msgstr "Stĺpcov"
 
 #: include/locales/en_gb.inc.php:1699
 msgid "Combined result"
-msgstr "Combined result"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1571
 #: include/views/administration.script.edit.php:66
 msgid "Command"
-msgstr "Command"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:270
 msgid "Command actions"
-msgstr "Command actions"
+msgstr ""
 
 #: scripts.php:90
 msgid "Command cannot be empty."
@@ -1621,7 +1621,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1456
 msgid "Comment updated"
-msgstr "Comment updated"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1471
 msgid "Comments"
@@ -1633,17 +1633,17 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1217
 msgid "Compare values for multiple periods"
-msgstr "Compare values for multiple periods"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:261
 msgid "Condition"
-msgstr "Condition"
+msgstr ""
 
 #: actionconf.php:419 include/views/configuration.action.edit.php:142
 #: include/views/configuration.action.edit.php:319
 #: include/views/configuration.action.edit.php:858
 msgid "Conditions"
-msgstr "Conditions"
+msgstr ""
 
 #: include/menu.inc.php:136
 msgid "Configuration"
@@ -1651,7 +1651,7 @@ msgstr "Konfigurácia"
 
 #: include/locales/en_gb.inc.php:1341
 msgid "Configuration of IT services"
-msgstr "Configuration of IT services"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:148
 msgid "Configuration of Web monitoring"
@@ -1659,11 +1659,11 @@ msgstr "Konfigurácia Web monitoringu"
 
 #: include/locales/en_gb.inc.php:362
 msgid "Configuration of Zabbix"
-msgstr "Configuration of Zabbix"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:255
 msgid "Configuration of actions"
-msgstr "Configuration of actions"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:92
 msgid "Configuration of discovery"
@@ -1671,39 +1671,39 @@ msgstr "Nastavenie pátrača"
 
 #: include/locales/en_gb.inc.php:535
 msgid "Configuration of graphs"
-msgstr "Configuration of graphs"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:814
 msgid "Configuration of items"
-msgstr "Configuration of items"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:986
 msgid "Configuration of network maps"
-msgstr "Configuration of network maps"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1234
 msgid "Configuration of screens"
-msgstr "Configuration of screens"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1267
 msgid "Configuration of slideshows"
-msgstr "Configuration of slideshows"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1401
 msgid "Configuration of triggers"
-msgstr "Configuration of triggers"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:364
 msgid "Configuration updated"
-msgstr "Configuration updated"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:365
 msgid "Configuration was not updated"
-msgstr "Configuration was not updated"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1089
 msgid "Configure"
-msgstr "Configure"
+msgstr ""
 
 #: include/views/administration.script.edit.php:107
 msgid "Confirmation text"
@@ -1713,7 +1713,7 @@ msgstr ""
 #: include/views/configuration.host.edit.php:192
 #: include/views/js/configuration.sysmaps.js.php:197
 msgid "Connect to"
-msgstr "Connect to"
+msgstr ""
 
 #: include/page_footer.php:103
 #, php-format
@@ -1727,7 +1727,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:992
 msgid "Connectors"
-msgstr "Connectors"
+msgstr ""
 
 #: include/hosts.inc.php:160
 msgid "Contact"
@@ -1740,20 +1740,20 @@ msgstr ""
 #: include/locales/en_gb.inc.php:989
 #: include/views/js/configuration.sysmaps.js.php:133
 msgid "Coordinate X"
-msgstr "Coordinate X"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:990
 #: include/views/js/configuration.sysmaps.js.php:137
 msgid "Coordinate Y"
-msgstr "Coordinate Y"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:895
 msgid "Copy"
-msgstr "Copy"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:918
 msgid "Copy selected items?"
-msgstr "Copy selected items?"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:83
 msgid "Copy selected to ..."
@@ -1761,7 +1761,7 @@ msgstr "Kopírovať označené do ..."
 
 #: include/locales/en_gb.inc.php:1448
 msgid "Copy selected triggers?"
-msgstr "Copy selected triggers?"
+msgstr ""
 
 #: api/classes/class.cuser.php:987
 #, php-format
@@ -1770,7 +1770,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1874
 msgid "Could not save image!"
-msgstr "Could not save image!"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1113
 msgid "Count"
@@ -1778,7 +1778,7 @@ msgstr "Počet"
 
 #: include/locales/en_gb.inc.php:1270
 msgid "Count of slides"
-msgstr "Count of slides"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1195
 msgid "Create"
@@ -1786,11 +1786,11 @@ msgstr "Vytvoriť"
 
 #: actionconf.php:342
 msgid "Create Action"
-msgstr "Create Action"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:699
 msgid "Create application"
-msgstr "Create application"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:554
 msgid "Create graph"
@@ -1810,7 +1810,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:619
 msgid "Create maintenance period"
-msgstr "Create maintenance period"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1004
 msgid "Create map"
@@ -1842,7 +1842,7 @@ msgstr ""
 
 #: include/views/administration.script.list.php:25
 msgid "Create script"
-msgstr "Create script"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1257
 msgid "Create slide show"
@@ -1850,7 +1850,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1423 include/locales/en_gb.inc.php:1997
 msgid "Create trigger"
-msgstr "Create Log Trigger"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1548
 msgid "Create user"
@@ -1858,11 +1858,11 @@ msgstr ""
 
 #: config.php:687
 msgid "Create value map"
-msgstr "Create value map"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1790
 msgid "Critical error"
-msgstr "Critical error"
+msgstr ""
 
 #: include/validate.inc.php:549
 #, php-format
@@ -1876,11 +1876,11 @@ msgstr ""
 
 #: include/page_header.php:335
 msgid "Current node"
-msgstr "Current node"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:314
 msgid "Custom graphs"
-msgstr "Custom graphs"
+msgstr ""
 
 #: include/maps.inc.php:69
 msgid "Custom label"
@@ -1893,11 +1893,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:887
 msgid "Custom multiplier"
-msgstr "Custom multiplier"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1318
 msgid "Custom screens"
-msgstr "Custom screens"
+msgstr ""
 
 #: include/views/configuration.action.edit.php:642
 msgid "Custom script"
@@ -1917,11 +1917,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1334
 msgid "Custom slides"
-msgstr "Custom slides"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1632
 msgid "Czech (CZ)"
-msgstr "Czech (CZ)"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:322
 msgid "D"
@@ -1937,11 +1937,11 @@ msgstr "DETAILY SCENÁRA"
 
 #: include/locales/en_gb.inc.php:1412
 msgid "DISABLED"
-msgstr "DISABLED"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:957
 msgid "DISCOVERED"
-msgstr "DISCOVERED"
+msgstr ""
 
 #: discoveryconf.php:237
 msgid "DISCOVERY"
@@ -1949,7 +1949,7 @@ msgstr "PÁTRAČ"
 
 #: include/locales/en_gb.inc.php:1655
 msgid "DISCOVERY RULES"
-msgstr "DISCOVERY RULES"
+msgstr ""
 
 #: include/menu.inc.php:213
 msgid "DM"
@@ -1966,15 +1966,15 @@ msgstr "DNS meno"
 
 #: include/locales/en_gb.inc.php:956
 msgid "DOWN"
-msgstr "DOWN"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1177
 msgid "Daily"
-msgstr "Daily"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:344
 msgid "Dark orange"
-msgstr "Dark orange"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1224
 msgid "Darken"
@@ -1990,13 +1990,13 @@ msgstr "Konfigurácia konzoly"
 
 #: include/locales/en_gb.inc.php:1093
 msgid "Dashboard filter"
-msgstr "Dashboard filter"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:310
 #: include/views/js/configuration.sysmaps.js.php:207
 #: include/views/js/configuration.sysmaps.js.php:367
 msgid "Dashed line"
-msgstr "Dashed line"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1106
 msgid "Data"
@@ -2009,11 +2009,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1294
 msgid "Data overview"
-msgstr "Data overview"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:862
 msgid "Data type"
-msgstr "Data type"
+msgstr ""
 
 #: include/setup.inc.php:240 include/setup.inc.php:294
 msgid "Database file"
@@ -2025,7 +2025,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:838
 msgid "Database monitor"
-msgstr "Database monitor"
+msgstr ""
 
 #: include/setup.inc.php:245 include/setup.inc.php:302
 msgid "Database name"
@@ -2058,7 +2058,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:638
 msgid "Date"
-msgstr "Date"
+msgstr ""
 
 #: include/hosts.inc.php:270
 msgid "Date HW installed"
@@ -2078,15 +2078,15 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1173
 msgid "Day"
-msgstr "Day"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:642
 msgid "Day of month"
-msgstr "Day of month"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:641
 msgid "Day of week"
-msgstr "Day of week"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:347
 msgid "Days"
@@ -2094,15 +2094,15 @@ msgstr "Dní"
 
 #: include/locales/en_gb.inc.php:1534
 msgid "Debug"
-msgstr "Debug"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1535
 msgid "Debug mode"
-msgstr "Debug mode"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1517
 msgid "Debug mode updated"
-msgstr "Debug mode updated"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:63
 msgid "Dec"
@@ -2114,42 +2114,42 @@ msgstr "December"
 
 #: include/locales/en_gb.inc.php:863
 msgid "Decimal"
-msgstr "Decimal"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:382 include/locales/en_gb.inc.php:740
 #: include/views/configuration.action.edit.php:357
 msgid "Default"
-msgstr "Default"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:482
 msgid "Default authentication"
-msgstr "Default authentication"
+msgstr ""
 
 #: include/views/configuration.action.edit.php:58
 #: include/views/configuration.action.edit.php:539
 msgid "Default message"
-msgstr "Default message"
+msgstr ""
 
 #: include/views/configuration.action.edit.php:57
 msgid "Default subject"
-msgstr "Default subject"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:345
 msgid "Default theme"
-msgstr "Default theme"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1580
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
-msgstr "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1579
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
-msgstr "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
+msgstr ""
 
 #: discoveryconf.php:248 include/locales/en_gb.inc.php:271
 #: include/views/configuration.action.edit.php:329
 msgid "Delay"
-msgstr "Delay"
+msgstr ""
 
 #: include/views/configuration.discovery.edit.php:61
 msgid "Delay (seconds)"
@@ -2157,7 +2157,7 @@ msgstr ""
 
 #: queue.php:247
 msgid "Delayed by"
-msgstr "Delayed by"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1362
 msgid "Delete"
