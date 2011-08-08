@@ -115,9 +115,9 @@ class CassandraHistory {
 		foreach($rows as $column){
 			foreach($column as $timeOffset => $value){
 
-				$clock = bcround(bcdiv($timeOffset, 1000));
+				$clock = bcround(bcdiv($timeOffset, 1000, 0));
 
-				if(($clock >= $from) && ($clock <= $to)){
+				if((bccomp($clock, $from) >= 0) && (bccomp($clock, $to) <= 0)){
 					$result[$clock] = $value;
 					$count++;
 					if((null !== $limit) && ($count >= $limit)){

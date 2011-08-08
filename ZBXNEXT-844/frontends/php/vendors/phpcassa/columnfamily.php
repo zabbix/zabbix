@@ -942,10 +942,17 @@ class ColumnFamily {
 		// If we are on a 32bit architecture we have to explicitly deal with
 		// 64-bit twos-complement arithmetic since PHP wants to treat all ints
 		// as signed and any int over 2^31 - 1 as a float
-		if (PHP_INT_SIZE == 4) {
+		if (PHP_INT_SIZE != 4) {
 
 			$hi = $arr[1];
 			$lo = $arr[2];
+
+			// TODO: use another way to convert to 64
+			$hi = sprintf("%u", $hi);
+			$lo = sprintf("%u", $lo);
+			return bcadd(bcmul($hi, "4294967296", 0), $lo, 0);
+
+
 			$isNeg = $hi  < 0;
 
 			// Check for a negative
@@ -1020,6 +1027,7 @@ class ColumnFamily {
 			return self::unpack_long($value);
 		else if ($data_type == 'IntegerType') {
 			// TODO: remove this
+
 			return self::unpack_long($value);
 
 			$res = unpack('N', $value);
