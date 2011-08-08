@@ -1144,7 +1144,7 @@ msgid "Cannot delete value map"
 msgstr "Не вдалося видалити перетворення значення"
 
 #: include/locales/en_gb.inc.php:1240
-msgid "Cannot deleted screen"
+msgid "Cannot delete screen"
 msgstr "Не вдалося видалити комплексний екран"
 
 #: include/locales/en_gb.inc.php:1029

@@ -1137,7 +1137,7 @@ msgid "Cannot delete value map"
 msgstr "값 매핑을 삭제할 수 없습니다"
 
 #: include/locales/en_gb.inc.php:1240
-msgid "Cannot deleted screen"
+msgid "Cannot delete screen"
 msgstr "스크린을 삭제할 수 없습니다"
 
 #: include/locales/en_gb.inc.php:1029

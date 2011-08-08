@@ -1140,7 +1140,7 @@ msgid "Cannot delete value map"
 msgstr "No es posible eliminar la asignación"
 
 #: include/locales/en_gb.inc.php:1240
-msgid "Cannot deleted screen"
+msgid "Cannot delete screen"
 msgstr "No es posible eliminar la pantalla"
 
 #: include/locales/en_gb.inc.php:1029
