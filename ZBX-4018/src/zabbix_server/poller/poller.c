@@ -124,7 +124,12 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			res = NOTSUPPORTED;
 	}
 
-	if (SUCCEED != res && ISSET_MSG(result))
+	if (SUCCEED != res && !ISSET_MSG(result))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, zbx_result_string(res)));
+	}
+
+	if (SUCCEED != res)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
 		zabbix_syslog("Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
