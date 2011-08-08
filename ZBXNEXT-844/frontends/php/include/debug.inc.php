@@ -25,12 +25,12 @@ function SDB($return=false){
 	foreach($backtrace as $n => $bt){
 		$result .= '  --['.$n.']-- '.$bt['file'].' : '.$bt['line'].'<br/>';
 		$result .= "&nbsp;&nbsp;<b>".(isset($bt['class']) ? $bt['class'].$bt['type'].$bt['function'] : $bt['function']).'</b>';
-		
+
 		$args = array();
 		foreach($bt['args'] as $arg){
 			$args[] = is_array($arg) ? print_r($arg, true) : $arg;
 		}
-		
+
 		$result .= '( '.implode(', ', $args).' ) <br/>';
 	}
 	if($return) return $result;
@@ -41,4 +41,16 @@ function SDII($msg='SDII') { echo 'DEBUG INFO: '; echo '<pre>'.print_r($msg, tru
 function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
 function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
 
+function EXECTIME($label = 'exectime'){
+	static $periods = array();
+
+	if(!isset($periods[$label])){
+		$periods[$label] = microtime(true);
+		echo $label.' started.<br />';
+
+	}
+	else{
+		echo $label.': ' . round(microtime(true) - $periods[$label], 5) . '<br />';
+	}
+}
 ?>
