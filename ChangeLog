@@ -5,6 +5,7 @@ New features:
  - [ZBX-1357] updated German, Latvian, Polish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4010] fixed undefined constant SVC_SNMPv2 in discovery action conditions (Richlv)
  - [ZBX-3775] fixed html formatting in Overview (Eduard)
  - [ZBX-4001] fixed nearly duplicate strings, clarified error messages and removed obsolete translation strings (Richlv, sasha)
  - [ZBX-4004] fixed typos in function names (Richlv)
