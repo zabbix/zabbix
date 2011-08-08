@@ -112,13 +112,13 @@ require_once('include/items.inc.php');
 			);
 
 		foreach($monitored_items as $item){
-			$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
+			$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.delta,i.valuemapid '.
 				' from items i, httpstepitem hi '.
 				' where hi.httpstepid='.$httpstepid.' and hi.itemid=i.itemid '.
 				' and hi.type='.$item['httpstepitemtype']));
 
 			if(!$item_data){
-				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
+				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.delta,i.valuemapid '.
 					' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.$hostid));
 			}
 
@@ -312,13 +312,13 @@ require_once('include/items.inc.php');
 			);
 
 			foreach($monitored_items as $item){
-				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
+				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.delta,i.valuemapid '.
 					' from items i, httptestitem hi '.
 					' where hi.httptestid='.$httptestid.' and hi.itemid=i.itemid '.
 					' and hi.type='.$item['httptestitemtype']));
 
 				if(!$item_data){
-					$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
+					$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.delta,i.valuemapid '.
 						' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.$hostid));
 				}
 
