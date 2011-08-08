@@ -80,18 +80,18 @@ if($_REQUEST['hostid'] > 0){
 	if(empty($res)) access_deny();
 }
 
-$hostprof_wdgt = new CWidget();
-$hostprof_wdgt->addPageHeader(_('HOST INVENTORIES'));
+$hostinvent_wdgt = new CWidget();
+$hostinvent_wdgt->addPageHeader(_('HOST INVENTORIES'));
 
 // host details
 if($_REQUEST['hostid'] > 0){
-	$hostprof_wdgt->addItem(insert_host_inventory_form());
+	$hostinvent_wdgt->addItem(insert_host_inventory_form());
 }
 // list of hosts
 else{
 	$r_form = new CForm('get');
 	$r_form->addItem(array(_('Group'), $pageFilter->getGroupsCB(true)));
-	$hostprof_wdgt->addHeader(_('HOSTS'), $r_form);
+	$hostinvent_wdgt->addHeader(_('HOSTS'), $r_form);
 
 	// HOST INVENTORY FILTER {{{
 	if(isset($_REQUEST['filter_set'])){
@@ -146,12 +146,12 @@ else{
 	$filter_form->setAttribute('name','zbx_filter');
 	$filter_form->setAttribute('id','zbx_filter');
 	$filter_form->addItem($filter_table);
-	$hostprof_wdgt->addFlicker($filter_form, CProfile::get('web.hostinventories.filter.state', 0));
+	$hostinvent_wdgt->addFlicker($filter_form, CProfile::get('web.hostinventories.filter.state', 0));
 	// }}} HOST INVENTORY FILTER
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
-	$hostprof_wdgt->addHeader($numrows);
+	$hostinvent_wdgt->addHeader($numrows);
 
 	$table = new CTableInfo();
 	$table->setHeader(array(
@@ -256,10 +256,10 @@ else{
 	}
 
 	$table = array($paging, $table, $paging);
-	$hostprof_wdgt->addItem($table);
+	$hostinvent_wdgt->addItem($table);
 }
 
-$hostprof_wdgt->show();
+$hostinvent_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>
