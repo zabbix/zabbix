@@ -1140,7 +1140,7 @@ msgid "Cannot delete value map"
 msgstr "Kan inte ta bort värdeskarta"
 
 #: include/locales/en_gb.inc.php:1240
-msgid "Cannot deleted screen"
+msgid "Cannot delete screen"
 msgstr "Kan inte ta bort skärm"
 
 #: include/locales/en_gb.inc.php:1029

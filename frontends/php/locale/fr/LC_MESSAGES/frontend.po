@@ -1143,7 +1143,7 @@ msgid "Cannot delete value map"
 msgstr "Suppression de table de correspondance impossible"
 
 #: include/locales/en_gb.inc.php:1240
-msgid "Cannot deleted screen"
+msgid "Cannot delete screen"
 msgstr "Impossible de supprimer l'écran"
 
 #: include/locales/en_gb.inc.php:1029

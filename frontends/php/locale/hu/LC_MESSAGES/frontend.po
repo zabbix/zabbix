@@ -1140,7 +1140,7 @@ msgid "Cannot delete value map"
 msgstr "Az érték-hozzárendelést nem lehet törölni"
 
 #: include/locales/en_gb.inc.php:1240
-msgid "Cannot deleted screen"
+msgid "Cannot delete screen"
 msgstr "Képernyő törlése sikertelen"
 
 #: include/locales/en_gb.inc.php:1029

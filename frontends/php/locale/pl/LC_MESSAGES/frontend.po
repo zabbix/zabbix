@@ -1144,7 +1144,7 @@ msgid "Cannot delete value map"
 msgstr "Nie można usunąć mapy wartości"
 
 #: include/locales/en_gb.inc.php:1240
-msgid "Cannot deleted screen"
+msgid "Cannot delete screen"
 msgstr "Nie można usunąć ekranu"
 
 #: include/locales/en_gb.inc.php:1029
