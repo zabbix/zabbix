@@ -214,7 +214,7 @@ function get_operation_desc($type, $data){
 				if(!empty($users)){
 					order_result($users, 'alias');
 
-					$result[] = bold(array(_('Send message to users').':'.SPACE);
+					$result[] = bold(array(_('Send message to users').':'.SPACE));
 					$result[] = array(implode(', ', zbx_objectValues($users,'alias')), BR());
 				}
 
@@ -226,7 +226,7 @@ function get_operation_desc($type, $data){
 				if(!empty($usrgrps)){
 					order_result($usrgrps, 'name');
 
-					$result[] = bold(array(_('Send message to groups').':'.SPACE);
+					$result[] = bold(array(_('Send message to groups').':'.SPACE));
 					$result[] = array(implode(', ', zbx_objectValues($usrgrps,'name')), BR());
 				}
 				break;
