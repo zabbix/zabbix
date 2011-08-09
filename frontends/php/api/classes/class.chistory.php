@@ -70,6 +70,7 @@ class CHistory extends CZBXAPI{
 			'searchByAny'			=> null,
 			'startSearch'			=> null,
 			'excludeSearch'			=> null,
+			'searchWildcardsEnabled'	=> null,
 
 			'time_from'				=> null,
 			'time_till'				=> null,

@@ -80,6 +80,7 @@ class CHostGroup extends CZBXAPI{
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 
 // output
 			'output'					=> API_OUTPUT_REFER,
