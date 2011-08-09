@@ -1890,37 +1890,37 @@ static const char	*ex_macros[] =
  ******************************************************************************/
 static int	get_host_inventory(const char *macro, DB_TRIGGER *trigger, char **replace_to, int N_functionid)
 {
-	if (0 == strcmp(macro, MVAR_INVENTORY_TYPE))
+	if (0 == strcmp(macro, MVAR_INVENTORY_TYPE) || 0 == strcmp(macro, MVAR_PROFILE_DEVICETYPE))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "type");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_TYPE_FULL))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "type_full");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_NAME))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_NAME) || 0 == strcmp(macro, MVAR_PROFILE_NAME))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "name");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_ALIAS))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "alias");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_OS))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_OS) || 0 == strcmp(macro, MVAR_PROFILE_OS))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "os");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_OS_FULL))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "os_full");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_OS_SHORT))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "os_short");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_SERIALNO_A))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_SERIALNO_A) || 0 == strcmp(macro, MVAR_PROFILE_SERIALNO))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "serialno_a");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_SERIALNO_B))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "serialno_b");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_TAG))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_TAG) || 0 == strcmp(macro, MVAR_PROFILE_TAG))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "tag");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_ASSET_TAG))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "asset_tag");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_MACADDRESS_A))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_MACADDRESS_A) || 0 == strcmp(macro, MVAR_PROFILE_MACADDRESS))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "macaddress_a");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_MACADDRESS_B))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "macaddress_b");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_HARDWARE))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_HARDWARE) || 0 == strcmp(macro, MVAR_PROFILE_HARDWARE))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "hardware");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_HARDWARE_FULL))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "hardware_full");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_SOFTWARE))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_SOFTWARE) || 0 == strcmp(macro, MVAR_PROFILE_SOFTWARE))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_SOFTWARE_FULL))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software_full");
@@ -1934,15 +1934,15 @@ static int	get_host_inventory(const char *macro, DB_TRIGGER *trigger, char **rep
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software_app_d");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_SOFTWARE_APP_E))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software_app_e");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_CONTACT))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_CONTACT) || 0 == strcmp(macro, MVAR_PROFILE_CONTACT))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "contact");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_LOCATION))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_LOCATION) || 0 == strcmp(macro, MVAR_PROFILE_LOCATION))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "location");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_LOCATION_LAT))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "location_lat");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_LOCATION_LON))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "location_lon");
-	else if (0 == strcmp(macro, MVAR_INVENTORY_NOTES))
+	else if (0 == strcmp(macro, MVAR_INVENTORY_NOTES) || 0 == strcmp(macro, MVAR_PROFILE_NOTES))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "notes");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_CHASSIS))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "chassis");
@@ -2030,29 +2030,6 @@ static int	get_host_inventory(const char *macro, DB_TRIGGER *trigger, char **rep
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_2_screen");
 	else if (0 == strcmp(macro, MVAR_INVENTORY_POC_SECONDARY_NOTES))
 		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "poc_2_notes");
-	/* PROFILE.* is deprecated, use INVENTORY.* instead */
-	else if (0 == strcmp(macro, MVAR_PROFILE_DEVICETYPE))
-		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "type");
-	else if (0 == strcmp(macro, MVAR_PROFILE_NAME))
-		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "name");
-	else if (0 == strcmp(macro, MVAR_PROFILE_OS))
-		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "os");
-	else if (0 == strcmp(macro, MVAR_PROFILE_SERIALNO))
-		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "serialno_a");
-	else if (0 == strcmp(macro, MVAR_PROFILE_TAG))
-		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "tag");
-	else if (0 == strcmp(macro, MVAR_PROFILE_MACADDRESS))
-		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "macaddress_a");
-	else if (0 == strcmp(macro, MVAR_PROFILE_HARDWARE))
-		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "hardware");
-	else if (0 == strcmp(macro, MVAR_PROFILE_SOFTWARE))
-		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "software");
-	else if (0 == strcmp(macro, MVAR_PROFILE_CONTACT))
-		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "contact");
-	else if (0 == strcmp(macro, MVAR_PROFILE_LOCATION))
-		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "location");
-	else if (0 == strcmp(macro, MVAR_PROFILE_NOTES))
-		return DBget_host_inventory_value(trigger, replace_to, N_functionid, "notes");
 
 	return SUCCEED;
 }
