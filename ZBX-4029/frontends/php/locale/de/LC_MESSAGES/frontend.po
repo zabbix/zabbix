@@ -7345,32 +7345,32 @@ msgid "Rules"
 msgstr "Regeln"
 
 #: include/actions.inc.php:351
-msgid "Run IPMI command:"
-msgstr "IPMI-Kommando ausführen:"
+msgid "Run IPMI command"
+msgstr "IPMI-Kommando ausführen"
 
 #: include/actions.inc.php:354
-msgid "Run SSH commands:"
-msgstr "SSH-Kommando ausführen:"
+msgid "Run SSH commands"
+msgstr "SSH-Kommando ausführen"
 
 #: include/actions.inc.php:357
-msgid "Run TELNET commands:"
-msgstr "TELNET-Kommando ausführen:"
+msgid "Run TELNET commands"
+msgstr "TELNET-Kommando ausführen"
 
 #: include/actions.inc.php:375
-msgid "Run commands:"
-msgstr "Kommando ausführen:"
+msgid "Run commands"
+msgstr "Kommando ausführen"
 
 #: include/actions.inc.php:361
-msgid "Run custom commands on Zabbix agent:"
-msgstr "Eigenes Kommando ausführen auf Zabbix-Agent:"
+msgid "Run custom commands on Zabbix agent"
+msgstr "Eigenes Kommando ausführen auf Zabbix-Agent"
 
 #: include/actions.inc.php:363
-msgid "Run custom commands on Zabbix server:"
-msgstr "Eigenes Kommando ausführen auf Zabbix-Server:"
+msgid "Run custom commands on Zabbix server"
+msgstr "Eigenes Kommando ausführen auf Zabbix-Server"
 
 #: include/actions.inc.php:372
-msgid "Run global script:"
-msgstr "Globales Skript ausführen:"
+msgid "Run global script"
+msgstr "Globales Skript ausführen"
 
 #: include/actions.inc.php:245
 msgid "Run remote commands on current host"
@@ -7817,12 +7817,12 @@ msgid "Send message"
 msgstr "Nachricht schicken"
 
 #: include/actions.inc.php:229
-msgid "Send message to groups:"
-msgstr "Nachrichten an Gruppe schicken:"
+msgid "Send message to groups"
+msgstr "Nachrichten an Gruppe schicken"
 
 #: include/actions.inc.php:217
-msgid "Send message to users:"
-msgstr "Nachricht an Benutzer schicken:"
+msgid "Send message to users"
+msgstr "Nachricht an Benutzer schicken"
 
 #: include/views/configuration.action.edit.php:537
 msgid "Send only to"

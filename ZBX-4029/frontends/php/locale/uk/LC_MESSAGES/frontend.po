@@ -7264,44 +7264,44 @@ msgid "Rules"
 msgstr "Правила"
 
 #: include/actions.inc.php:351
-msgid "Run IPMI command:"
-msgstr "Виконати IPMI команду:"
+msgid "Run IPMI command"
+msgstr "Виконати IPMI команду"
 
 #: include/actions.inc.php:354
-msgid "Run SSH commands:"
-msgstr "Виконати SSH команди:"
+msgid "Run SSH commands"
+msgstr "Виконати SSH команди"
 
 #: include/actions.inc.php:357
-msgid "Run TELNET commands:"
-msgstr "Виконати TELNET команди:"
+msgid "Run TELNET commands"
+msgstr "Виконати TELNET команди"
 
 #: include/actions.inc.php:375
-msgid "Run commands:"
-msgstr "Виконати команди:"
+msgid "Run commands"
+msgstr "Виконати команди"
 
 #: include/actions.inc.php:361
-msgid "Run custom commands on Zabbix agent:"
-msgstr "Виконати довільні команди через Zabbix агент:"
+msgid "Run custom commands on Zabbix agent"
+msgstr "Виконати довільні команди через Zabbix агент"
 
 #: include/actions.inc.php:363
-msgid "Run custom commands on Zabbix server:"
-msgstr "Виконати довільні команди через Zabbix сервер:"
+msgid "Run custom commands on Zabbix server"
+msgstr "Виконати довільні команди через Zabbix сервер"
 
 #: include/actions.inc.php:372
-msgid "Run global script:"
-msgstr "Виконати глобальний скрипт:"
+msgid "Run global script"
+msgstr "Виконати глобальний скрипт"
 
 #: include/actions.inc.php:245
 msgid "Run remote commands on current host"
 msgstr "Виконати віддалені команди на поточному вузлі мережі"
 
 #: include/actions.inc.php:264
-msgid "Run remote commands on host groups: "
-msgstr "Виконати віддалені команди на групі вузлів мережі: "
+msgid "Run remote commands on host groups"
+msgstr "Виконати віддалені команди на групі вузлів мережі"
 
 #: include/actions.inc.php:252
-msgid "Run remote commands on hosts: "
-msgstr "Виконати віддалені команди на вузлах мережі: "
+msgid "Run remote commands on hosts"
+msgstr "Виконати віддалені команди на вузлах мережі"
 
 #: include/locales/en_gb.inc.php:1622
 msgid "Russian (RU)"
@@ -7736,12 +7736,12 @@ msgid "Send message"
 msgstr "Надіслати повідомлення"
 
 #: include/actions.inc.php:229
-msgid "Send message to groups:"
-msgstr "Надіслати повідомлення групам:"
+msgid "Send message to groups"
+msgstr "Надіслати повідомлення групам"
 
 #: include/actions.inc.php:217
-msgid "Send message to users:"
-msgstr "Надіслати повідомлення користувачам:"
+msgid "Send message to users"
+msgstr "Надіслати повідомлення користувачам"
 
 #: include/views/configuration.action.edit.php:537
 msgid "Send only to"
