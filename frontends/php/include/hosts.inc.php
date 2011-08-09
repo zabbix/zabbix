@@ -407,7 +407,7 @@
 		return $profileFields;
 
 		/*
-		// code below look at schema and gets field numbers from there
+		// code below looks at schema and gets field numbers from there
 		// we decided to use hard coded array (above) instead of this approach
 		// uncomment this block to fall back to schema approach (if needed)
 
