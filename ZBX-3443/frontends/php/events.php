@@ -455,26 +455,25 @@
 
 			if($_REQUEST['hide_unknown']) $options['hide_unknown'] = 1;
 
-			$triggers = array();
-			if($pageFilter->hostid > 0 || $pageFilter->groupid > 0){
-				$trigOpt = array(
-					'nodeids' => get_current_nodeid(),
-					'output' => API_OUTPUT_SHORTEN
-				);
+			if($pageFilter->hostsSelected){
+				if($pageFilter->hostid > 0 || $pageFilter->groupid > 0){
+					$trigOpt = array(
+						'nodeids' => get_current_nodeid(),
+						'output' => API_OUTPUT_SHORTEN
+					);
 
-				if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0))
-					$trigOpt['triggerids'] = $_REQUEST['triggerid'];
-				else if($pageFilter->hostid > 0)
-					$trigOpt['hostids'] = $pageFilter->hostid;
-				else if($pageFilter->groupid > 0)
-					$trigOpt['groupids'] = $pageFilter->groupid;
+					if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0))
+						$trigOpt['triggerids'] = $_REQUEST['triggerid'];
+					else if($pageFilter->hostid > 0)
+						$trigOpt['hostids'] = $pageFilter->hostid;
+					else if($pageFilter->groupid > 0)
+						$trigOpt['groupids'] = $pageFilter->groupid;
 
-				$triggers = CTrigger::get($trigOpt);
-				$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+					$triggers = CTrigger::get($trigOpt);
+					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+				}
 			}
-
-			// prevent fetching data in "not selected" event
-			if(!$pageFilter->hostsSelected){
+			else{
 				$options['triggerids'] = array();
 			}
 
