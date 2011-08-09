@@ -110,14 +110,16 @@ class CassandraHistory {
 		$keys = array_keys($keys);
 
 		$rows = $this->metric->multiget($keys, null, '', '', ($order == ZBX_SORT_DOWN));
-//sdii($rows);
+
 		$count = 0;
-		foreach($rows as $column){
+		foreach($rows as $key => $column){
+			$unpackedKey = unpack('x/Cb/N2/x/x/Cb/N/Ntime/x/', $key);
+
 			foreach($column as $timeOffset => $value){
+				// maybe in future we will need to handle milliseconds here.
+				$clock = round($timeOffset / 1000, 0) + $unpackedKey['time'];
 
-				$clock = bcround(bcdiv($timeOffset, 1000, 0));
-
-				if((bccomp($clock, $from) >= 0) && (bccomp($clock, $to) <= 0)){
+				if(($clock >= $from) && ($clock <= $to)){
 					$result[$clock] = $value;
 					$count++;
 					if((null !== $limit) && ($count >= $limit)){
@@ -128,7 +130,6 @@ class CassandraHistory {
 		}
 
 		return $result;
-
 	}
 
 

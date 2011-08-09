@@ -1026,10 +1026,6 @@ class ColumnFamily {
 		if ($data_type == 'LongType')
 			return self::unpack_long($value);
 		else if ($data_type == 'IntegerType') {
-			// TODO: remove this
-
-			return self::unpack_long($value);
-
 			$res = unpack('N', $value);
 			return $res[1];
 		}
