@@ -7257,44 +7257,44 @@ msgid "Rules"
 msgstr "Kurallar"
 
 #: include/actions.inc.php:351
-msgid "Run IPMI command:"
-msgstr "IPMI komutunu çalıştır:"
+msgid "Run IPMI command"
+msgstr "IPMI komutunu çalıştır"
 
 #: include/actions.inc.php:354
-msgid "Run SSH commands:"
-msgstr "SSH komutlarını çalıştır:"
+msgid "Run SSH commands"
+msgstr "SSH komutlarını çalıştır"
 
 #: include/actions.inc.php:357
-msgid "Run TELNET commands:"
-msgstr "TELNET komutlarını çalıştır:"
+msgid "Run TELNET commands"
+msgstr "TELNET komutlarını çalıştır"
 
 #: include/actions.inc.php:375
-msgid "Run commands:"
-msgstr "Komutları çalıştır:"
+msgid "Run commands"
+msgstr "Komutları çalıştır"
 
 #: include/actions.inc.php:361
-msgid "Run custom commands on Zabbix agent:"
-msgstr "Zabbix aracı üzerinde özel komutları çalıştır:"
+msgid "Run custom commands on Zabbix agent"
+msgstr "Zabbix aracı üzerinde özel komutları çalıştır"
 
 #: include/actions.inc.php:363
-msgid "Run custom commands on Zabbix server:"
-msgstr "Zabbix sunucu üzerinde özel komutları çalıştır:"
+msgid "Run custom commands on Zabbix server"
+msgstr "Zabbix sunucu üzerinde özel komutları çalıştır"
 
 #: include/actions.inc.php:372
-msgid "Run global script:"
+msgid "Run global script"
 msgstr "Genel betiği çalıştır"
 
 #: include/actions.inc.php:245
 msgid "Run remote commands on current host"
-msgstr "Geçerli konak üzerinde uzak komutları çalıştır:"
+msgstr "Geçerli konak üzerinde uzak komutları çalıştır"
 
 #: include/actions.inc.php:264
-msgid "Run remote commands on host groups: "
-msgstr "Konak grupları üzerinde uzak komutları çalıştır:"
+msgid "Run remote commands on host groups"
+msgstr "Konak grupları üzerinde uzak komutları çalıştır"
 
 #: include/actions.inc.php:252
-msgid "Run remote commands on hosts: "
-msgstr "Konaklar üzerinde uzak komutları çalıştır:"
+msgid "Run remote commands on hosts"
+msgstr "Konaklar üzerinde uzak komutları çalıştır"
 
 #: include/locales/en_gb.inc.php:1622
 msgid "Russian (RU)"
@@ -7729,12 +7729,12 @@ msgid "Send message"
 msgstr "Mesaj gönder"
 
 #: include/actions.inc.php:229
-msgid "Send message to groups:"
-msgstr "Gruplara mesaj gönder:"
+msgid "Send message to groups"
+msgstr "Gruplara mesaj gönder"
 
 #: include/actions.inc.php:217
-msgid "Send message to users:"
-msgstr "Kullanıcılara mesaj gönder:"
+msgid "Send message to users"
+msgstr "Kullanıcılara mesaj gönder"
 
 #: include/views/configuration.action.edit.php:537
 msgid "Send only to"
