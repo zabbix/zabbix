@@ -60,25 +60,26 @@ void	DBconnect(int flag)
 		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
 					CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
 
-		switch(err) {
-		case ZBX_DB_OK:
-			break;
-		case ZBX_DB_DOWN:
-			if (ZBX_DB_CONNECT_EXIT == flag)
-			{
+		switch(err)
+		{
+			case ZBX_DB_OK:
+				break;
+			case ZBX_DB_DOWN:
+				if (ZBX_DB_CONNECT_EXIT == flag)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
+					exit(FAIL);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Database is down."
+							" Reconnecting in 10 seconds");
+					zbx_sleep(10);
+				}
+				break;
+			default:
 				zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
 				exit(FAIL);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "Database is down."
-						" Reconnecting in 10 seconds");
-				zbx_sleep(10);
-			}
-			break;
-		default:
-			zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
-			exit(FAIL);
 		}
 	}
 	while (ZBX_DB_OK != err);
@@ -88,20 +89,13 @@ void	DBconnect(int flag)
  *                                                                            *
  * Function: DBinit                                                           *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DBinit()
 {
-	zbx_db_init(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
+	zbx_db_init(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME,
+			CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
 }
 
 /******************************************************************************
@@ -110,13 +104,11 @@ void	DBinit()
  *                                                                            *
  * Purpose: Check if database is down                                         *
  *                                                                            *
- * Parameters: -                                                              *
- *                                                                            *
  * Return value: SUCCEED - database is up, FAIL - database is down            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: Connection is left open                                          *
  *                                                                            *
  ******************************************************************************/
 int	DBping()
@@ -125,8 +117,6 @@ int	DBping()
 
 	ret = (ZBX_DB_OK != zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
 				CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)) ? FAIL : SUCCEED;
-	DBclose();
-
 	return ret;
 }
 
@@ -135,10 +125,6 @@ int	DBping()
  * Function: DBbegin                                                          *
  *                                                                            *
  * Purpose: Start transaction                                                 *
- *                                                                            *
- * Parameters: -                                                              *
- *                                                                            *
- * Return value: -                                                            *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
