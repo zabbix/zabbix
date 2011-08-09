@@ -277,7 +277,7 @@
 			47 => array(
 				'nr' => 47,
 				'db_field' => 'date_hw_decomm',
-				'title' => _('Date hw decommissioned'),
+				'title' => _('Date HW decommissioned'),
 			),
 			48 => array(
 				'nr' => 48,
@@ -459,7 +459,7 @@
 			'date_hw_purchase' => _('Date HW purchased'),
 			'date_hw_install' => _('Date HW installed'),
 			'date_hw_expiry' => _('Date HW maintenance expires'),
-			'date_hw_decomm' => _('Date hw decommissioned'),
+			'date_hw_decomm' => _('Date HW decommissioned'),
 			'site_address_a' => _('Site address A'),
 			'site_address_b' => _('Site address B'),
 			'site_address_c' => _('Site address C'),

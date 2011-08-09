@@ -1830,7 +1830,7 @@ Copt::memoryPick();
 			if(!empty($groupids_to_del)){
 				$result = $this->massRemove(array('hostids' => $hostids, 'groupids' => $groupids_to_del));
 				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot remove group'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete group'));
 				}
 			}
 		}

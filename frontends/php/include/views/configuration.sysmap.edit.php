@@ -189,7 +189,7 @@
 	$others = array();
 	if(isset($_REQUEST['sysmapid']) && ($_REQUEST['sysmapid']>0)){
 		$others[] = new CButton('clone', _('Clone'));
-		$others[] = new CButtonDelete(_('Delete system map?'), url_param('form').url_param('sysmapid'));
+		$others[] = new CButtonDelete(_('Delete network map?'), url_param('form').url_param('sysmapid'));
 	}
 	$others[] = new CButtonCancel();
 

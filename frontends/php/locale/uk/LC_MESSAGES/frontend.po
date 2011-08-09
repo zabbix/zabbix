@@ -1260,7 +1260,7 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "Не вдалось виконати оператор оновлення для таблиці \"%s\" де немає умови."
 
 #: api/classes/class.chost.php:1833
-msgid "Cannot remove group"
+msgid "Cannot delete group"
 msgstr "Не вдалося видалити групу"
 
 #: api/classes/class.chost.php:1929 config.php:574
@@ -1785,7 +1785,7 @@ msgid "Create"
 msgstr "Створити"
 
 #: actionconf.php:342
-msgid "Create Action"
+msgid "Create action"
 msgstr "Створити дію"
 
 #: include/locales/en_gb.inc.php:699
@@ -2073,7 +2073,7 @@ msgid "Date HW purchased"
 msgstr "Дата придбання HW"
 
 #: include/hosts.inc.php:280
-msgid "Date hw decommissioned"
+msgid "Date HW decommissioned"
 msgstr "Дата списання HW"
 
 #: include/locales/en_gb.inc.php:1173
@@ -2391,7 +2391,7 @@ msgid "Delete slideshow?"
 msgstr "Видалити слайдшоу?"
 
 #: include/views/configuration.sysmap.edit.php:192
-msgid "Delete system map?"
+msgid "Delete network map?"
 msgstr "Видалити карту мережі?"
 
 #: include/locales/en_gb.inc.php:790
@@ -2781,7 +2781,7 @@ msgid "Edit"
 msgstr "Змінити"
 
 #: include/locales/en_gb.inc.php:914
-msgid "Edit Trigger"
+msgid "Edit trigger"
 msgstr "Редагувати тригер"
 
 #: include/locales/en_gb.inc.php:1681
@@ -2932,7 +2932,7 @@ msgid "Error"
 msgstr "Помилка"
 
 #: include/locales/en_gb.inc.php:1576
-msgid "Error Description"
+msgid "Error description"
 msgstr "Опис помилки"
 
 #: include/locales/en_gb.inc.php:1828
@@ -3285,7 +3285,7 @@ msgid "GUI"
 msgstr "Веб інтерфейс"
 
 #: include/locales/en_gb.inc.php:1607
-msgid "GUI Messaging"
+msgid "GUI messaging"
 msgstr "Повідомлювати в інтерфейсі"
 
 #: include/locales/en_gb.inc.php:1533
@@ -5507,11 +5507,11 @@ msgid "Media types"
 msgstr "Методи повідомлень"
 
 #: include/locales/en_gb.inc.php:1942
-msgid "Mediatype already exists:"
+msgid "Media type already exists:"
 msgstr "Метод повідомлень вже існує:"
 
 #: include/locales/en_gb.inc.php:1943
-msgid "Mediatypes used by action:"
+msgid "Media types used by action:"
 msgstr "Метод повідомлень використовується в дії:"
 
 #: include/locales/en_gb.inc.php:1742
@@ -6700,7 +6700,7 @@ msgid "Password (once again)"
 msgstr "Пароль (підтвердження)"
 
 #: include/locales/en_gb.inc.php:1941
-msgid "Password required for mediatype"
+msgid "Password required for media type"
 msgstr "Потрібен пароль для метода повідомлень"
 
 #: include/locales/en_gb.inc.php:1494
