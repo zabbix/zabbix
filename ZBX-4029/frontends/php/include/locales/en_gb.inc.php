@@ -911,7 +911,7 @@
 	'S_PRIVATE_KEY_FILE'=>					_('Private key file'),
 	'S_PUBLIC_KEY'=>					_('Public key'),
 	'S_AUTHENTICATION_METHOD'=>				_('Authentication method'),
-	'S_EDIT_TRIGGER'=>					_('Edit Trigger'),
+	'S_EDIT_TRIGGER'=>					_('Edit trigger'),
 	'S_ENABLE_SELECTED_ITEMS_Q'=>				_('Enable selected items?'),
 	'S_DISABLE_SELECTED_ITEMS_Q'=>				_('Disable selected items?'),
 	'S_MASS_UPDATE_SELECTED_ITEMS_Q'=>			_('Mass update selected items?'),
@@ -1573,7 +1573,7 @@
 	'S_CLOSE'=>				_('Close'),
 
 	'S_SCRIPT_ERROR'=>			_('SCRIPT ERROR'),
-	'S_SCRIPT_ERROR_DESCRIPTION'=>		_('Error Description'),
+	'S_SCRIPT_ERROR_DESCRIPTION'=>		_('Error description'),
 	'S_SCRIPT_SEND_ERROR'=>			_('Can\'t send command, check connection'),
 	'S_SCRIPT_READ_ERROR'=>			_('Can\'t read script response, check connection'),
 	'S_SCRIPT_TIMEOUT_ERROR'=>		_('Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value'),
@@ -1604,7 +1604,7 @@
 	'S_MESSAGES'=>				_('Messages'),
 	'S_PROBLEM_ON'=>			_('Problem on'),
 	'S_RECOVERY'=>				_('Recovery'),
-	'S_GUI_MESSAGING'=>			_('GUI Messaging'),
+	'S_GUI_MESSAGING'=>			_('GUI messaging'),
 	'S_PLAY_SOUND'=>			_('Play sound'),
 	'S_MESSAGE_TIMEOUT'=>		_('Message timeout'),
 	'S_PLAY'=>					_('Play'),
@@ -1938,9 +1938,9 @@
 
 // class.cmediatype.php
 	'S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE' =>	_('Wrong fields for media type'),
-	'S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED' =>	_('Password required for mediatype'),
-	'S_MEDIATYPE_ALREADY_EXISTS'=>				_('Mediatype already exists:'),
-	'S_MEDIATYPE_USED_BY_ACTIONS'=>	_('Mediatypes used by action:'),
+	'S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED' =>	_('Password required for media type'),
+	'S_MEDIA_TYPE_ALREADY_EXISTS'=>				_('Media type already exists:'),
+	'S_MEDIA_TYPES_USED_BY_ACTIONS'=>	_('Media types used by action:'),
 	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES'=>_('Only Super Admins can create media types'),
 	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>_('Only Super Admins can delete media types'),
 
