@@ -151,7 +151,7 @@ require_once('include/items.inc.php');
 				'params'				=> '',
 				'ipmi_sensor'			=> '',
 				'applications'			=> array($applicationid),
-				'status' 				=> ($status==HTTPTEST_STATUS_ACTIVE)?ITEM_STATUS_ACTIVE:ITEM_STATUS_DISABLED); // transform httptest status to item status
+				'status' 				=> ($status == HTTPTEST_STATUS_ACTIVE) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED); // transform httptest status to item status
 
 			if(!$item_data){
 				$item_args['history'] = $history;
@@ -351,7 +351,7 @@ require_once('include/items.inc.php');
 					'params'				=> '',
 					'ipmi_sensor'			=> '',
 					'applications'			=> array($applicationid),
-					'status' 				=> ($status==HTTPTEST_STATUS_ACTIVE)?ITEM_STATUS_ACTIVE:ITEM_STATUS_DISABLED); // transform httptest status to item status
+					'status' 				=> ($status == HTTPTEST_STATUS_ACTIVE) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED); // transform httptest status to item status
 
 				if(!$item_data){
 					$item_args['history'] = $history;
