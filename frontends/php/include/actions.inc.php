@@ -369,7 +369,7 @@ function get_operation_desc($type, $data){
 						));
 						$userScript = reset($userScripts);
 
-						$result[] = array(bold(_('Run global script').':').SPACE), italic($userScript['name']));
+						$result[] = array(bold(_('Run global script').':'.SPACE), italic($userScript['name']));
 						break;
 					default:
 						$result[] = array(bold(_('Run commands').':'), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
