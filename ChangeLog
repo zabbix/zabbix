@@ -190,6 +190,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.7rc1
 
+ - [ZBX-4016] fixed item status on insert and update (Eduard)
  - [ZBX-3443] fixed trigger filter in Event (Eduard)
  - [ZBX-3979] adding support searchWildcardsEnabled flag in API for searching using wildcards (Eduard)
  - [ZBX-4018] fixed server crash on unsupported aggregate items (asaveljevs,Sasha)
