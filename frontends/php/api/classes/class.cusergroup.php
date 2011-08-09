@@ -72,6 +72,8 @@ class CUserGroup extends CZBXAPI{
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
+
 // OutPut
 			'editable'					=> null,
 			'output'					=> API_OUTPUT_REFER,

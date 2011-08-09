@@ -65,8 +65,9 @@ class CDiscoveryRule extends CItemGeneral{
 			'filter'				=> null,
 			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
+			'startSearch'			=> null,
 			'excludeSearch'			=> null,
+			'searchWildcardsEnabled'=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
