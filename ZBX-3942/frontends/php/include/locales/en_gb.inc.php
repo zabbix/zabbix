@@ -1536,7 +1536,7 @@
 	'S_SCREEN_UPDATED'=>			'Screen updated',
 	'S_CANNOT_UPDATE_SCREEN'=>		'Cannot update screen',
 	'S_SCREEN_DELETED'=>			'Screen deleted',
-	'S_CANNOT_DELETE_SCREEN'=>		'Cannot deleted screen',
+	'S_CANNOT_DELETE_SCREEN'=>		'Cannot delete screen',
 	'S_COLUMNS'=>				'Columns',
 	'S_ROWS'=>				'Rows',
 	'S_NO_SCREENS_DEFINED'=>		'No screens defined',
@@ -2415,6 +2415,8 @@
 	'S_FRIDAY_SHORT_BIG'=>		'F',
 	'S_SATURDAY_SHORT_BIG'=>	'S',
 	'S_SUNDAY_SHORT_BIG'=>		'S',
+	'S_NOW'=>	'Now',
+	'S_DONE'=>	'Done',
 
 //	gtlc.js
 	'S_ZOOM'=>			'Zoom',
@@ -2447,6 +2449,7 @@
 // class.cusergroup
 	'S_GROUP_IS_USED_IN_SCRIPT' =>	'User group [%1$s] is used in script [%2$s].',
 	'S_ONLY_SUPERADMIN_CAN_DELETE_USERGROUP' => 'Only Super Admins can delete User Groups.',
+	'S_GROUP_IS_USED_IN_CONFIGURATION' => 'User group [%1$s] is used in configuration for database down messages.',
 
 // class.cgraph.php
 	'S_GRAPH_ALREADY_EXISTS_ON' => 'Graph "%1$s" already exists on "%2$s".',

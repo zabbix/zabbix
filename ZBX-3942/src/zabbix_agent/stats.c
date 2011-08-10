@@ -248,10 +248,6 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	zbx_free(args);
 
-#ifdef ZABBIX_DAEMON
-	set_child_signal_handler();
-#endif
-
 	if (SUCCEED != init_cpu_collector(&(collector->cpus)))
 		free_cpu_collector(&(collector->cpus));
 
@@ -280,7 +276,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 #ifdef _WINDOWS
 	free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
-#endif /* _WINDOWS */
+#endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
 

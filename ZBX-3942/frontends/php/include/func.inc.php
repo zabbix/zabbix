@@ -24,7 +24,9 @@
 function redirect($url){
 	zbx_flush_post_cookies();
 
-	header('Location: '.$url);
+	$curl = new Curl($url);
+	$curl->setArgument('sid', null);
+	header('Location: '.$curl->getUrl());
 	exit();
 }
 
@@ -39,25 +41,6 @@ function jsRedirect($url,$timeout=null){
 		$script.='window.location.replace("'.$url.'");';
 	}
 	insert_js($script);
-}
-
-function resetGetParams($params, $newURL=null){
-	zbx_value2array($params);
-
-	$redirect = false;
-	$url = new CUrl($newURL);
-
-	foreach($params as $num => $param){
-		if(!isset($_GET[$param])) continue;
-
-		$redirect = true;
-		$url->setArgument($param, null);
-	}
-
-	if($redirect){
-		jsRedirect($url->getUrl());
-		include_once('include/page_footer.php');
-	}
 }
 
 function get_request($name, $def=NULL){
@@ -615,11 +598,12 @@ return preg_match("/^\-?[0-9]+$/", $var);
  * @return array
  */
 function zbx_arrayFindDuplicates(array $array){
-	function moreThanOne($a){
-		return $a > 1;
-	}
 	$countValues = array_count_values($array); // counting occurrences of every value in array
-	$countValues = array_filter($countValues, 'moreThanOne'); // removing all values that appear only once
+	foreach($countValues as $value => $count){
+		if($count <= 1){
+			unset($countValues[$value]);
+		}
+	}
 	arsort($countValues); // sorting, so that the most duplicates would be at the top
 	return $countValues;
 }

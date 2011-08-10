@@ -179,8 +179,14 @@ require_once('include/perm.inc.php');
 	}
 
 	function add_discovery_rule($proxy_hostid, $name, $iprange, $delay, $status, $dchecks, $uniqueness_criteria){
-		if( !validate_ip_range($iprange) ){
+		if(!validate_ip_range($iprange)){
 			error(S_INCORRECT_IP_RANGE);
+			return false;
+		}
+
+		// checking to the duplicate of the name
+		if(CDRule::exists(array('name' => $name))){
+			error(S_DISCOVERY_RULE.SPACE.'['.$name.']'.SPACE.S_ALREADY_EXISTS_SMALL);
 			return false;
 		}
 
@@ -212,6 +218,15 @@ require_once('include/perm.inc.php');
 			error(S_INCORRECT_IP_RANGE);
 			return false;
 
+		}
+
+		// checking to the duplicate of the name
+		$drule = get_discovery_rule_by_druleid($druleid);
+		if(strcmp($drule['name'], $name)){
+			if(CDRule::exists(array('name' => $name))){
+				error(S_DISCOVERY_RULE.SPACE.'['.$name.']'.SPACE.S_ALREADY_EXISTS_SMALL);
+				return false;
+			}
 		}
 
 		$result = DBexecute('update drules set proxy_hostid='.$proxy_hostid.',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.

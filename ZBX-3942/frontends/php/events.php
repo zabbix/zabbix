@@ -196,9 +196,6 @@
 // HEADER {{{
 	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
-	$r_form->addVar('triggerid', get_request('triggerid'));
-	$r_form->addVar('stime', get_request('stime'));
-	$r_form->addVar('period', get_request('period'));
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 
@@ -255,7 +252,12 @@
 		$filterForm->addVar('period', get_request('period'));
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
+			// trigger description
 			$trigger = expand_trigger_description($_REQUEST['triggerid']);
+			// prepending host name to trigger description
+			$triggerHostDB = get_hosts_by_triggerid($_REQUEST['triggerid']);
+			$triggerHost = DBfetch($triggerHostDB);
+			$trigger = $triggerHost['host'].':'.$trigger;
 		}
 		else{
 			$trigger = '';
@@ -440,23 +442,6 @@
 				S_ACTIONS
 			));
 
-			$triggers = array();
-			if(($pageFilter->hostid > 0) || ($pageFilter->groupid > 0)){
-				$trigOpt = array(
-					'nodeids' => get_current_nodeid(),
-					'output' => API_OUTPUT_SHORTEN
-				);
-
-				if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0))
-					$trigOpt['triggerids'] = $_REQUEST['triggerid'];
-				else if($pageFilter->hostid > 0)
-					$trigOpt['hostids'] = $pageFilter->hostid;
-				else if($pageFilter->groupid > 0)
-					$trigOpt['groupids'] = $pageFilter->groupid;
-
-				$triggers = CTrigger::get($trigOpt);
-			}
-
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'object' => EVENT_OBJECT_TRIGGER,
@@ -469,7 +454,28 @@
 			);
 
 			if($_REQUEST['hide_unknown']) $options['hide_unknown'] = 1;
-			if(!empty($triggers)) $options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+
+			if($pageFilter->hostsSelected){
+				if($pageFilter->hostid > 0 || $pageFilter->groupid > 0){
+					$trigOpt = array(
+						'nodeids' => get_current_nodeid(),
+						'output' => API_OUTPUT_SHORTEN
+					);
+
+					if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0))
+						$trigOpt['triggerids'] = $_REQUEST['triggerid'];
+					else if($pageFilter->hostid > 0)
+						$trigOpt['hostids'] = $pageFilter->hostid;
+					else if($pageFilter->groupid > 0)
+						$trigOpt['groupids'] = $pageFilter->groupid;
+
+					$triggers = CTrigger::get($trigOpt);
+					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+				}
+			}
+			else{
+				$options['triggerids'] = array();
+			}
 
 			$events = CEvent::get($options);
 

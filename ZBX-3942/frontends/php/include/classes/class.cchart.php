@@ -667,7 +667,8 @@ class CChart extends CGraphDraw{
 
 				if(!isset($val)) continue;
 
-				for($ci=0; $ci < min(count($val),count($shift_val)); $ci++){
+				$size = min(count($val),count($shift_val));
+				for($ci=0; $ci < $size; $ci++){
 					if($data['count'][$ci] == 0) continue;
 
 					$val[$ci] = bcadd($shift_val[$ci], $val[$ci]);

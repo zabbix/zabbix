@@ -50,9 +50,15 @@ function check_authorisation(){
 
 	$user = array('sessionid'=>$sessionid);
 	if(!$auth = CUser::checkAuthentication($user)){
-
 		include_once('include/locales/en_gb.inc.php');
 		process_locales();
+
+		if(!isset($_REQUEST['request'])){
+			$parsedUrl = new Curl($_SERVER['REQUEST_URI']);
+			if(!zbx_empty($parsedUrl->getPath()) && !preg_match('/.*\/(index.php)?$/i', $parsedUrl->getPath())){
+				$_REQUEST['request'] = $_SERVER['REQUEST_URI'];
+			}
+		}
 
 		include('index.php');
 		exit();
