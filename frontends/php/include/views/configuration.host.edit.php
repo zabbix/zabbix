@@ -47,8 +47,8 @@
 
 	$_REQUEST['hostid'] = get_request('hostid', 0);
 
-	$profile_mode	= get_request('profile_mode', HOST_PROFILE_DISABLED);
-	$host_profile	= get_request('host_profile',array());
+	$inventory_mode	= get_request('inventory_mode', HOST_INVENTORY_DISABLED);
+	$host_inventory	= get_request('host_inventory',array());
 
 	$macros = get_request('macros',array());
 	$interfaces = get_request('interfaces',array());
@@ -62,7 +62,7 @@
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'selectProfile' => true,
+			'selectInventory' => true,
 			'output' => API_OUTPUT_EXTEND
 		));
 		$dbHost = reset($dbHosts);
@@ -91,14 +91,14 @@
 			}
 		}
 
-		// getting items that populate host profile fields
-		$hostItemsToProfile = API::Item()->get(array(
+		// getting items that populate host inventory fields
+		$hostItemsToInventory = API::Item()->get(array(
 			'filter' => array('hostid'=>$dbHost['hostid']),
-			'output' => array('profile_link', 'name', 'key_'),
+			'output' => array('inventory_link', 'name', 'key_'),
 			'preserveKeys' => true,
 			'nopermissions' => true
 		));
-		$hostItemsToProfile = zbx_toHash($hostItemsToProfile, 'profile_link');
+		$hostItemsToInventory = zbx_toHash($hostItemsToInventory, 'inventory_link');
 	}
 	else{
 		$original_templates = array();
@@ -122,10 +122,10 @@
 		$interfaces = $dbHost['interfaces'];
 		$host_groups = zbx_objectValues($dbHost['groups'], 'groupid');
 
-// BEGIN: HOSTS PROFILE Section
-		$host_profile = $dbHost['profile'];
-		$profile_mode = empty($host_profile) ? HOST_PROFILE_DISABLED : $dbHost['profile']['profile_mode'];
-// END:   HOSTS PROFILE Section
+// BEGIN: HOSTS INVENTORY Section
+		$host_inventory = $dbHost['inventory'];
+		$inventory_mode = empty($host_inventory) ? HOST_INVENTORY_DISABLED : $dbHost['inventory']['inventory_mode'];
+// END:   HOSTS INVENTORY Section
 
 		$templates = array();
 		foreach($original_templates as $tnum => $tpl){
@@ -502,69 +502,69 @@
 	$divTabs->addTab('macroTab', _('Macros'), $macrolist);
 // } MACROS WIDGET
 
-	$profileFormList = new CFormList('profilelist');
+	$inventoryFormList = new CFormList('inventorylist');
 
-	// radio buttons for profile type choice
-	$profileTypeRadioButton = array(
+	// radio buttons for inventory type choice
+	$inventoryTypeRadioButton = array(
 		new CRadioButton(
-			'profile_mode',
-			HOST_PROFILE_DISABLED,
+			'inventory_mode',
+			HOST_INVENTORY_DISABLED,
 			null, // class
-			'host_profile_radio_'.HOST_PROFILE_DISABLED,
-			$profile_mode == HOST_PROFILE_DISABLED // checked?
+			'host_inventory_radio_'.HOST_INVENTORY_DISABLED,
+			$inventory_mode == HOST_INVENTORY_DISABLED // checked?
 		),
-		new CLabel(_('Disabled'), 'host_profile_radio_'.HOST_PROFILE_DISABLED),
+		new CLabel(_('Disabled'), 'host_inventory_radio_'.HOST_INVENTORY_DISABLED),
 
 		new CRadioButton(
-			'profile_mode',
-			HOST_PROFILE_MANUAL,
+			'inventory_mode',
+			HOST_INVENTORY_MANUAL,
 			null,
-			'host_profile_radio_'.HOST_PROFILE_MANUAL,
-			$profile_mode == HOST_PROFILE_MANUAL
+			'host_inventory_radio_'.HOST_INVENTORY_MANUAL,
+			$inventory_mode == HOST_INVENTORY_MANUAL
 		),
-		new CLabel(_('Manual'), 'host_profile_radio_'.HOST_PROFILE_MANUAL),
+		new CLabel(_('Manual'), 'host_inventory_radio_'.HOST_INVENTORY_MANUAL),
 
 		new CRadioButton(
-			'profile_mode',
-			HOST_PROFILE_AUTOMATIC,
+			'inventory_mode',
+			HOST_INVENTORY_AUTOMATIC,
 			null,
-			'host_profile_radio_'.HOST_PROFILE_AUTOMATIC,
-			$profile_mode == HOST_PROFILE_AUTOMATIC
+			'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC,
+			$inventory_mode == HOST_INVENTORY_AUTOMATIC
 		),
-		new CLabel(_('Automatic'), 'host_profile_radio_'.HOST_PROFILE_AUTOMATIC),
+		new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
 	);
-	$profileFormList->addRow(new CDiv($profileTypeRadioButton, 'jqueryinputset'));
+	$inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset'));
 
-	$hostProfileTable = DB::getSchema('host_profile');
-	$hostProfileFields = getHostProfiles();
+	$hostInventoryTable = DB::getSchema('host_inventory');
+	$hostInventoryFields = getHostInventories();
 
-	foreach($hostProfileFields as $profileNo => $profileInfo){
-		if(!isset($host_profile[$profileInfo['db_field']])){
-			$host_profile[$profileInfo['db_field']] = '';
+	foreach($hostInventoryFields as $inventoryNo => $inventoryInfo){
+		if(!isset($host_inventory[$inventoryInfo['db_field']])){
+			$host_inventory[$inventoryInfo['db_field']] = '';
 		}
 
-		if($hostProfileTable['fields'][$profileInfo['db_field']]['type'] == DB::FIELD_TYPE_TEXT){
-			$input = new CTextArea('host_profile['.$profileInfo['db_field'].']', $host_profile[$profileInfo['db_field']]);
+		if($hostInventoryTable['fields'][$inventoryInfo['db_field']]['type'] == DB::FIELD_TYPE_TEXT){
+			$input = new CTextArea('host_inventory['.$inventoryInfo['db_field'].']', $host_inventory[$inventoryInfo['db_field']]);
 			$input->addStyle('width: 64em;');
 		}
 		else{
-			$fieldLength = $hostProfileTable['fields'][$profileInfo['db_field']]['length'];
-			$input = new CTextBox('host_profile['.$profileInfo['db_field'].']', $host_profile[$profileInfo['db_field']]);
+			$fieldLength = $hostInventoryTable['fields'][$inventoryInfo['db_field']]['length'];
+			$input = new CTextBox('host_inventory['.$inventoryInfo['db_field'].']', $host_inventory[$inventoryInfo['db_field']]);
 			$input->setAttribute('maxlength', $fieldLength);
 			$input->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
 		}
-		if($profile_mode == HOST_PROFILE_DISABLED){
+		if($inventory_mode == HOST_INVENTORY_DISABLED){
 			$input->setAttribute('disabled', 'disabled');
 		}
 
 		// link to populating item at the right side (if any)
-		if(isset($hostItemsToProfile[$profileNo])){
-			$itemName = itemName($hostItemsToProfile[$profileNo]);
-			$populatingLink = new CLink($itemName, 'items.php?form=update&itemid='.$hostItemsToProfile[$profileNo]['itemid']);
+		if(isset($hostItemsToInventory[$inventoryNo])){
+			$itemName = itemName($hostItemsToInventory[$inventoryNo]);
+			$populatingLink = new CLink($itemName, 'items.php?form=update&itemid='.$hostItemsToInventory[$inventoryNo]['itemid']);
 			$populatingLink->setAttribute('title', _s('This field is automatically populated by item "%s".', $itemName));
 			$populatingItemCell = array(' &larr; ', $populatingLink);
 			$input->addClass('linked_to_item'); // this will be used for disabling fields via jquery
-			if($profile_mode == HOST_PROFILE_AUTOMATIC){
+			if($inventory_mode == HOST_INVENTORY_AUTOMATIC){
 				$input->setAttribute('disabled', 'disabled');
 			}
 		}
@@ -577,20 +577,20 @@
 		);
 		$input->addStyle('float: left;');
 		// those links are visible only in automatic mode
-		if($profile_mode != HOST_PROFILE_AUTOMATIC){
+		if($inventory_mode != HOST_INVENTORY_AUTOMATIC){
 			$populatingItem->addStyle("display:none");
 		}
 
-		$profileFormList->addRow($profileInfo['title'], array($input, $populatingItem));
+		$inventoryFormList->addRow($inventoryInfo['title'], array($input, $populatingItem));
 	}
 
 	// clearing the float
 	$clearFixDiv = new CDiv();
 	$clearFixDiv->addStyle("clear: both;");
-	$profileFormList->addRow('', $clearFixDiv);
+	$inventoryFormList->addRow('', $clearFixDiv);
 
-	$divTabs->addTab('profileTab', _('Host profile'), $profileFormList);
-// } PROFILE WIDGET
+	$divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
+// } INVENTORY WIDGET
 
 	$frmHost->addItem($divTabs);
 

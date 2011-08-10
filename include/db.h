@@ -617,7 +617,7 @@ char	*DBsql_id_ins(zbx_uint64_t id);
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		unsigned char useip, const char *ip, const char *dns, unsigned short port);
 
-const char	*DBget_profile_field(unsigned char profile_link);
-unsigned short	DBget_profile_field_len(unsigned char profile_link);
+const char	*DBget_inventory_field(unsigned char inventory_link);
+unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
 
 #endif

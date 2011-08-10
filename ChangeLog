@@ -3,6 +3,7 @@ Changes for 1.9.6
 
 New features:
  - [ZBX-1357] updated German, Latvian, Polish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+ - [ZBXNEXT-863] renamed "host profile" to "host inventory" (dimir)
 
 Bug fixes:
  - [ZBX-4010] fixed undefined constant SVC_SNMPv2 in discovery action conditions (Richlv)

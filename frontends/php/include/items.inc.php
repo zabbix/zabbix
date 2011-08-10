@@ -455,7 +455,7 @@
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
-					'authtype,username,password,publickey,privatekey,flags,filter,description,profile_link'.
+					'authtype,username,password,publickey,privatekey,flags,filter,description,inventory_link'.
 			' FROM items '.
 			' WHERE itemid='.$itemid;
 		$row = DBfetch(DBselect($sql));

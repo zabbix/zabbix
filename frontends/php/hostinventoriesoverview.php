@@ -23,8 +23,8 @@ require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = 'S_HOST_PROFILE_OVERVIEW';
-$page['file'] = 'hostprofilesoverview.php';
+$page['title'] = 'S_HOST_INVENTORY_OVERVIEW';
+$page['file'] = 'hostinventoriesoverview.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 
 require_once('include/page_header.php');
@@ -57,33 +57,33 @@ $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['groupby'] = get_request('groupby', '');
 $groupFieldTitle = '';
 
-$hostprof_wdgt = new CWidget();
-$hostprof_wdgt->addPageHeader(_('HOST PROFILE OVERVIEW'));
+$hostinvent_wdgt = new CWidget();
+$hostinvent_wdgt->addPageHeader(_('HOST INVENTORY OVERVIEW'));
 
-// getting profile fields to make a drop down
-$profileFields = getHostProfiles(true); // 'true' means list should be ordered by title
-$profileFieldsComboBox = new CComboBox('groupby', $_REQUEST['groupby'], 'submit()');
-$profileFieldsComboBox->addItem('', _('not selected'));
-foreach($profileFields as $profileField){
-	$profileFieldsComboBox->addItem(
-		$profileField['db_field'],
-		$profileField['title'],
-		$_REQUEST['groupby'] === $profileField['db_field'] ? 'yes' : null // selected?
+// getting inventory fields to make a drop down
+$inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
+$inventoryFieldsComboBox = new CComboBox('groupby', $_REQUEST['groupby'], 'submit()');
+$inventoryFieldsComboBox->addItem('', _('not selected'));
+foreach($inventoryFields as $inventoryField){
+	$inventoryFieldsComboBox->addItem(
+		$inventoryField['db_field'],
+		$inventoryField['title'],
+		$_REQUEST['groupby'] === $inventoryField['db_field'] ? 'yes' : null // selected?
 	);
-	if($_REQUEST['groupby'] === $profileField['db_field']){
-		$groupFieldTitle = $profileField['title'];
+	if($_REQUEST['groupby'] === $inventoryField['db_field']){
+		$groupFieldTitle = $inventoryField['title'];
 	}
 }
 
 $r_form = new CForm('get');
 $r_form->addItem(array(_('Group'), $pageFilter->getGroupsCB(true)));
-$r_form->addItem(array(_('Grouping by'), $profileFieldsComboBox));
-$hostprof_wdgt->addHeader(_('HOSTS'), $r_form);
+$r_form->addItem(array(_('Grouping by'), $inventoryFieldsComboBox));
+$hostinvent_wdgt->addHeader(_('HOSTS'), $r_form);
 
 $table = new CTableInfo();
 $table->setHeader(
 	array(
-		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'profile_field'),
+		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'inventory_field'),
 		make_sorting_header(_('Host count'), 'host_count'),
 	)
 );
@@ -93,8 +93,8 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 
 	$options = array(
 		'output' => array('hostid', 'name'),
-		'selectProfile' => array($_REQUEST['groupby']), // only one field is required
-		'withProfile' => true
+		'selectInventory' => array($_REQUEST['groupby']), // only one field is required
+		'withInventory' => true
 	);
 	if($pageFilter->groupid > 0)
 		$options['groupids'] = $pageFilter->groupid;
@@ -104,11 +104,11 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 	// aggregating data by chosen field value
 	$report = array();
 	foreach($hosts as $host){
-		if($host['profile'][$_REQUEST['groupby']] !== ''){
-			$lowerValue = zbx_strtolower($host['profile'][$_REQUEST['groupby']]);
+		if($host['inventory'][$_REQUEST['groupby']] !== ''){
+			$lowerValue = zbx_strtolower($host['inventory'][$_REQUEST['groupby']]);
 			if(!isset($report[$lowerValue])){
 				$report[$lowerValue] = array(
-					'profile_field' => $host['profile'][$_REQUEST['groupby']],
+					'inventory_field' => $host['inventory'][$_REQUEST['groupby']],
 					'host_count' => 1
 				);
 			}
@@ -122,15 +122,15 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 
 	foreach($report as $rep){
 		$row = array(
-			new CSpan($rep['profile_field'], 'pre'),
-			new CLink($rep['host_count'],'hostprofiles.php?filter_field='.$_REQUEST['groupby'].'&filter_field_value='.urlencode($rep['profile_field']).'&filter_set=1&filter_exact=1'.url_param('groupid')),
+			new CSpan($rep['inventory_field'], 'pre'),
+			new CLink($rep['host_count'],'hostinventories.php?filter_field='.$_REQUEST['groupby'].'&filter_field_value='.urlencode($rep['inventory_field']).'&filter_set=1&filter_exact=1'.url_param('groupid')),
 		);
 		$table->addRow($row);
 	}
 }
 
-$hostprof_wdgt->addItem($table);
-$hostprof_wdgt->show();
+$hostinvent_wdgt->addItem($table);
+$hostinvent_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>

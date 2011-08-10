@@ -237,9 +237,9 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
 
 /******************************************************************************
  *                                                                            *
- * Function: validate_profile_links                                           *
+ * Function: validate_inventory_links                                         *
  *                                                                            *
- * Description: Check collisions in item profile links                        *
+ * Description: Check collisions in item inventory links                      *
  *                                                                            *
  * Parameters: hostid     - [IN] host identificator from database             *
  *             templateid - [IN] template identificator from database         *
@@ -251,7 +251,7 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	validate_profile_links(zbx_uint64_t hostid, zbx_uint64_t templateid, char *error, size_t max_error_len)
+static int	validate_inventory_links(zbx_uint64_t hostid, zbx_uint64_t templateid, char *error, size_t max_error_len)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -262,10 +262,10 @@ static int	validate_profile_links(zbx_uint64_t hostid, zbx_uint64_t templateid, 
 			"select ti.itemid"
 			" from items ti,items i"
 			" where ti.key_<>i.key_"
-				" and ti.profile_link=i.profile_link"
+				" and ti.inventory_link=i.inventory_link"
 				" and ti.hostid=" ZBX_FS_UI64
 				" and i.hostid=" ZBX_FS_UI64
-				" and ti.profile_link<>0"
+				" and ti.inventory_link<>0"
 				" and not exists ("
 					"select *"
 					" from items"
@@ -278,7 +278,7 @@ static int	validate_profile_links(zbx_uint64_t hostid, zbx_uint64_t templateid, 
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		zbx_strlcpy(error, "Two items cannot populate one host profile field", max_error_len);
+		zbx_strlcpy(error, "Two items cannot populate one host inventory field", max_error_len);
 		ret = FAIL;
 	}
 	DBfree_result(result);
@@ -404,7 +404,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 	unsigned char	t_flags, h_flags, type;
 	zbx_uint64_t	interfaceids[4];
 
-	if (SUCCEED != (res = validate_profile_links(hostid, templateid, error, max_error_len)))
+	if (SUCCEED != (res = validate_inventory_links(hostid, templateid, error, max_error_len)))
 		return res;
 
 	sql = zbx_malloc(sql, sql_alloc);
@@ -2614,7 +2614,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 				"ti.snmpv3_authpassphrase,ti.snmpv3_privpassphrase,"
 				"ti.authtype,ti.username,ti.password,ti.publickey,"
 				"ti.privatekey,ti.flags,ti.filter,ti.description,"
-				"ti.profile_link,hi.itemid"
+				"ti.inventory_link,hi.itemid"
 			" from items ti"
 			" left join items hi on hi.key_=ti.key_"
 				" and hi.hostid=" ZBX_FS_UI64
@@ -2706,7 +2706,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						"flags=%d,"
 						"filter='%s',"
 						"description='%s',"
-						"profile_link=%s,"
+						"inventory_link=%s,"
 						"interfaceid=%s"
 					" where itemid=" ZBX_FS_UI64 ";\n",
 					name_esc,
@@ -2742,7 +2742,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					(int)flags,
 					filter_esc,
 					description_esc,
-					row[34],	/* profile_link */
+					row[34],	/* inventory_link */
 					DBsql_id_ins(interfaceid),
 					itemid);
 		}
@@ -2761,7 +2761,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 						"snmpv3_securityname,snmpv3_securitylevel,"
 						"snmpv3_authpassphrase,snmpv3_privpassphrase,"
 						"authtype,username,password,publickey,privatekey,templateid,"
-						"flags,filter,description,profile_link,interfaceid)"
+						"flags,filter,description,inventory_link,interfaceid)"
 					" values"
 						" (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%s,%s,"
 						"%s,'%s',%s,%s,%s,'%s','%s',%s,%s,'%s','%s',%s,'%s','%s',"
@@ -2803,7 +2803,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 					(int)flags,
 					filter_esc,
 					description_esc,
-					row[34],	/* profile_link */
+					row[34],	/* inventory_link */
 					DBsql_id_ins(interfaceid));
 
 			zbx_free(key_esc);
@@ -3533,85 +3533,16 @@ int	DBdelete_host(zbx_uint64_t hostid)
 		zbx_free(graphids);
 	}
 
+	zbx_free(sql);
+
 	/* delete host from maps */
 	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_HOST, &hostid, 1);
 
 	/* delete action conditions */
 	DBdelete_action_conditions(CONDITION_TYPE_HOST, hostid);
 
-	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
-
-	/* delete host from template linkages */
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from hosts_templates"
-			" where hostid=" ZBX_FS_UI64 ";\n",
-			hostid);
-*/
-
-	/* delete host profile */
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from hosts_profiles"
-			" where hostid=" ZBX_FS_UI64 ";\n",
-			hostid);
-*/
-
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from hosts_profiles_ext"
-			" where hostid=" ZBX_FS_UI64 ";\n",
-			hostid);
-*/
-
-	/* delete applications */
-/*	-- CASCADE DELETE
- 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from applications"
-			" where hostid=" ZBX_FS_UI64 ";\n",
-			hostid);
-*/
-
-	/* delete host level macros */
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from hostmacro"
-			" where hostid=" ZBX_FS_UI64 ";\n",
-			hostid);
-*/
-
-	/* delete maintenance hosts */
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from maintenances_hosts"
-			" where hostid=" ZBX_FS_UI64 ";\n",
-			hostid);
-*/
-
-	/* delete host from group */
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from hosts_groups"
-			" where hostid=" ZBX_FS_UI64 ";\n",
-			hostid);
-*/
-
 	/* delete host */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from hosts"
-			" where hostid=" ZBX_FS_UI64 ";\n",
-			hostid);
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
-
-	DBexecute("%s", sql);
-
-	zbx_free(sql);
+	DBexecute("delete from hosts where hostid=" ZBX_FS_UI64, hostid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 

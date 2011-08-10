@@ -28,22 +28,22 @@
 	}
 
 	/**
-	 * Get info about what host profile fields we have, their numbers and names
+	 * Get info about what host inventory fields we have, their numbers and names
 	 * Example of usage:
-	 *      $profiles = getHostProfiles();
-	 *      echo $profiles[1]['db_field']; // host_networks
-	 *      echo $profiles[1]['title']; // Host networks
-	 *      echo $profiles[1]['nr']; // 1
+	 *      $inventories = getHostInventories();
+	 *      echo $inventories[1]['db_field']; // host_networks
+	 *      echo $inventories[1]['title']; // Host networks
+	 *      echo $inventories[1]['nr']; // 1
 	 * @author Konstantin Buravcov
 	 * @param bool $orderedByTitle whether an array should be ordered by field title, not by number
 	 * @return array
 	 */
-	function getHostProfiles($orderedByTitle=false){
+	function getHostInventories($orderedByTitle=false){
 		/**
 		 * WARNING! Before modifying this array, make sure changes are synced with C
-		 * C analog is located in function DBget_profile_field() in src/libs/zbxdbhigh/db.c
+		 * C analog is located in function DBget_inventory_field() in src/libs/zbxdbhigh/db.c
 		 */
-		$profileFields = array(
+		$inventoryFields = array(
 			1 => array(
 				'nr' => 1,
 				'db_field' => 'type',
@@ -398,21 +398,21 @@
 
 		// array is ordered by number by default, should we change that and order by title?
 		if($orderedByTitle){
-			function sortProfilesByTitle($a, $b){
+			function sortInventoriesByTitle($a, $b){
 				return strcmp($a['title'], $b['title']);
 			}
-			uasort($profileFields, 'sortProfilesByTitle');
+			uasort($inventoryFields, 'sortInventoriesByTitle');
 		}
 
-		return $profileFields;
+		return $inventoryFields;
 
 		/*
 		// code below looks at schema and gets field numbers from there
 		// we decided to use hard coded array (above) instead of this approach
 		// uncomment this block to fall back to schema approach (if needed)
 
-		$profileSchema = DB::getSchema('host_profile');
-		$profileTitles = array(
+		$inventorySchema = DB::getSchema('host_inventory');
+		$inventoryTitles = array(
 			'type' => _('Type'),
 			'type_full' => _('Type (Full details)'),
 			'name' => _('Name'),
@@ -484,14 +484,14 @@
 			'poc_2_screen' => _('Secondary POC screen name'),
 			'poc_2_notes' => _('Secondary POC notes'),
 		);
-		$fieldNo = 0; // field numbering is critical for item linkage with host profiles
-		foreach ($profileSchema['fields'] as $field_name=>$field){
+		$fieldNo = 0; // field numbering is critical for item linkage with host inventories
+		foreach ($inventorySchema['fields'] as $field_name=>$field){
 			// we are interested in id field
-			if($field['type'] != 'id' && $field_name != 'profile_mode'){
+			if($field['type'] != 'id' && $field_name != 'inventory_mode'){
 				$result[$fieldNo] = array(
 					'db_field' => $field_name,
-					// if no title is defined in getHostProfileTitles() function for this field, we assume that title is equal to DB field name
-					'title' => isset($profileTitles[$field_name]) ? $profileTitles[$field_name] : $field_name
+					// if no title is defined in getHostInventoryTitles() function for this field, we assume that title is equal to DB field name
+					'title' => isset($inventoryTitles[$field_name]) ? $inventoryTitles[$field_name] : $field_name
 				);
 			}
 			$fieldNo++;
