@@ -474,6 +474,8 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 	if (SUCCEED != DCconfig_deactivate_host(item, now))
 		return;
 
+	DBbegin();
+
 	*error_msg = '\0';
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
@@ -529,7 +531,6 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d where hostid=" ZBX_FS_UI64,
 			fld_disable_until, *disable_until, item->host.hostid);
 
-	DBbegin();
 	DBexecute("%s", sql);
 	DBcommit();
 
