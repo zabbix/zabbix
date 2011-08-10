@@ -79,6 +79,7 @@ typedef enum {
 
 #define	ZBX_DB_CONNECT_NORMAL	0
 #define	ZBX_DB_CONNECT_EXIT	1
+#define	ZBX_DB_CONNECT_ONCE	2
 
 #define DB_FULL_DELETE	0
 #define DB_PART_DELETE	1
@@ -509,26 +510,24 @@ DB_ESCALATION;
 #define DBnode_local(fieldid)	DBnode(fieldid, CONFIG_NODEID)
 const char	*DBnode(const char *fieldid, int nodeid);
 
-int	DBping();
-
-void    DBconnect(int flag);
+int	DBconnect(int flag);
 void	DBinit();
 
-void    DBclose();
-void    DBvacuum();
+void	DBclose();
+void	DBvacuum();
 
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define DBexecute __zbx_DBexecute
-#endif /* HAVE___VA_ARGS__ */
+#endif
 int	__zbx_DBexecute(const char *fmt, ...);
 
 #ifdef HAVE___VA_ARGS__
 #	define DBselect(fmt, ...) __zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define DBselect __zbx_DBselect
-#endif /* HAVE___VA_ARGS__ */
+#endif
 DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
 DB_RESULT	DBselectN(const char *query, int n);

@@ -30,13 +30,13 @@ const char	*DBnode(const char *fieldid, int nodeid)
 {
 	static char	dbnode[128];
 
-	if (nodeid == -1)
-		*dbnode = '\0';
-	else
+	if (-1 != nodeid)
+	{
 		zbx_snprintf(dbnode, sizeof(dbnode), " and %s between %d00000000000000 and %d99999999999999",
-				fieldid,
-				nodeid,
-				nodeid);
+				fieldid, nodeid, nodeid);
+	}
+	else
+		*dbnode = '\0';
 
 	return dbnode;
 }
@@ -46,43 +46,46 @@ void	DBclose()
 	zbx_db_close();
 }
 
-/*
- * Connect to the database.
- * If fails, program terminates.
- */
-void	DBconnect(int flag)
+/******************************************************************************
+ *                                                                            *
+ * Function: DBconnect                                                        *
+ *                                                                            *
+ * Purpose: connect to the database                                           *
+ *                                                                            *
+ * Parameters: flag - ZBX_DB_CONNECT_EXIT (exit on failure),                  *
+ *                    ZBX_DB_CONNECT_ONCE (try once and return the result) or *
+ *                    ZBX_DB_CONNECT_NORMAL (retry until connected)           *
+ *                                                                            *
+ * Return value: same as zbx_db_connect()                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	DBconnect(int flag)
 {
+	const char	*__function_name = "DBconnect";
+
 	int	err;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Connect to the database");
-	do
-	{
-		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
-					CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __function_name, flag);
 
-		switch(err)
+	while (ZBX_DB_OK != (err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
+			CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)))
+	{
+		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == flag)
 		{
-			case ZBX_DB_OK:
-				break;
-			case ZBX_DB_DOWN:
-				if (ZBX_DB_CONNECT_EXIT == flag)
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
-					exit(FAIL);
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Database is down."
-							" Reconnecting in 10 seconds");
-					zbx_sleep(10);
-				}
-				break;
-			default:
-				zabbix_log(LOG_LEVEL_DEBUG, "Could not connect to the database. Exiting...");
-				exit(FAIL);
+			zabbix_log(LOG_LEVEL_CRIT, "Could not connect to the database. Exiting...");
+			exit(FAIL);
 		}
+
+		if (ZBX_DB_CONNECT_ONCE == flag)
+			break;
+
+		zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in 10 seconds");
+		zbx_sleep(10);
 	}
-	while (ZBX_DB_OK != err);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, err);
+
+	return err;
 }
 
 /******************************************************************************
@@ -96,28 +99,6 @@ void	DBinit()
 {
 	zbx_db_init(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME,
 			CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBping                                                           *
- *                                                                            *
- * Purpose: Check if database is down                                         *
- *                                                                            *
- * Return value: SUCCEED - database is up, FAIL - database is down            *
- *                                                                            *
- * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
- *                                                                            *
- * Comments: Connection is left open                                          *
- *                                                                            *
- ******************************************************************************/
-int	DBping()
-{
-	int ret;
-
-	ret = (ZBX_DB_OK != zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
-				CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)) ? FAIL : SUCCEED;
-	return ret;
 }
 
 /******************************************************************************
@@ -137,15 +118,14 @@ void	DBbegin()
 
 	rc = zbx_db_begin();
 
-	while (rc == ZBX_DB_DOWN)
+	while (ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_begin()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
-					" Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
 			sleep(10);
 		}
 	}
@@ -156,10 +136,6 @@ void	DBbegin()
  * Function: DBcommit                                                         *
  *                                                                            *
  * Purpose: Commit transaction                                                *
- *                                                                            *
- * Parameters: -                                                              *
- *                                                                            *
- * Return value: -                                                            *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -179,8 +155,7 @@ void	DBcommit()
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_commit()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
-					" Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
 			sleep(10);
 		}
 	}
@@ -191,10 +166,6 @@ void	DBcommit()
  * Function: DBrollback                                                       *
  *                                                                            *
  * Purpose: Rollback transaction                                              *
- *                                                                            *
- * Parameters: -                                                              *
- *                                                                            *
- * Return value: -                                                            *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -214,8 +185,7 @@ void	DBrollback()
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_rollback()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
-					" Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
 			sleep(10);
 		}
 	}
@@ -234,17 +204,16 @@ int	__zbx_DBexecute(const char *fmt, ...)
 
 	rc = zbx_db_vexecute(fmt, args);
 
-	while (rc == ZBX_DB_DOWN)
+	while (ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 		rc = zbx_db_vexecute(fmt, args);
 
-		if (rc == ZBX_DB_DOWN)
+		if (ZBX_DB_DOWN == rc)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
-					" Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
 			sleep(10);
 		}
 	}
@@ -286,8 +255,7 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 
 		if (rc == (DB_RESULT)ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
-					" Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
 			sleep(10);
 		}
 	}
@@ -316,8 +284,7 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 		if (rc == (DB_RESULT)ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down."
-					" Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
 			sleep(10);
 		}
 	}
@@ -347,9 +314,7 @@ int	latest_service_alarm(zbx_uint64_t serviceid, int status)
 	row = DBfetch(result);
 
 	if (NULL != row && FAIL == DBis_null(row[1]) && status == atoi(row[1]))
-	{
 		ret = SUCCEED;
-	}
 
 	DBfree_result(result);
 

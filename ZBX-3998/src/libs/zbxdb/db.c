@@ -83,9 +83,17 @@ static const char	*zbx_oci_error(sword status)
 }
 #endif	/* HAVE_ORACLE */
 
-/*
- * Connect to the database.
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_connect                                                   *
+ *                                                                            *
+ * Purpose: connect to the database                                           *
+ *                                                                            *
+ * Return value: ZBX_DB_OK - succefully connected                             *
+ *               ZBX_DB_DOWN - database is down                               *
+ *               ZBX_DB_FAIL - failed to connect                              *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
 	int		ret = ZBX_DB_OK;
@@ -320,9 +328,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 #elif defined(HAVE_SQLITE3)
 #ifdef	HAVE_FUNCTION_SQLITE3_OPEN_V2
-	if (SQLITE_OK != (ret = sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL)))
+	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
-	if (SQLITE_OK != (ret = sqlite3_open(dbname, &conn)))
+	if (SQLITE_OK != sqlite3_open(dbname, &conn))
 #endif
 	{
 		zabbix_errlog(ERR_Z3001, dbname, 0, sqlite3_errmsg(conn));
@@ -834,7 +842,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 lbl_exec:
 	if (SQLITE_OK != (err = sqlite3_exec(conn, sql, NULL, 0, &error)))
 	{
-		if (err == SQLITE_BUSY) goto lbl_exec; /* attention deadlock!!! */
+		if (SQLITE_BUSY == err)
+				goto lbl_exec; /* Deadlock!!! */
 
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
@@ -855,15 +864,11 @@ lbl_exec:
 		}
 	}
 
-	if (ret == ZBX_DB_OK)
-	{
+	if (ZBX_DB_OK == ret)
 		ret = sqlite3_changes(conn);
-	}
 
 	if (0 == txn_level)
-	{
 		php_sem_release(&sqlite_access);
-	}
 #endif	/* HAVE_SQLITE3 */
 
 	if (CONFIG_LOG_SLOW_QUERIES)
@@ -1107,9 +1112,8 @@ error:
 	result->row_num = 0;
 
 	if (NULL == result->pg_result)
-	{
 		zabbix_errlog(ERR_Z3005, 0, "Result is NULL", sql);
-	}
+
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
 		error = zbx_dsprintf(error, "%s:%s",
@@ -1124,13 +1128,10 @@ error:
 	else	/* init rownum */
 		result->row_num = PQntuples(result->pg_result);
 #elif defined(HAVE_SQLITE3)
-	if (0 == txn_level)
+	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
-			exit(FAIL);
-		}
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
+		exit(FAIL);
 	}
 
 	result = zbx_malloc(NULL, sizeof(ZBX_SQ_DB_RESULT));
@@ -1139,7 +1140,8 @@ error:
 lbl_get_table:
 	if (SQLITE_OK != (ret = sqlite3_get_table(conn,sql, &result->data, &result->nrow, &result->ncolumn, &error)))
 	{
-		if (ret == SQLITE_BUSY) goto lbl_get_table; /* attention deadlock!!! */
+		if (SQLITE_BUSY == ret)
+			goto lbl_get_table;	/* Deadlock!!! */
 
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
@@ -1150,8 +1152,8 @@ lbl_get_table:
 		{
 			case SQLITE_ERROR:	/* SQL error or missing database; assuming SQL error, because if we
 						   are this far into execution, zbx_db_connect() was successful */
-			case SQLITE_NOMEM:	/* A malloc() failed */
-			case SQLITE_MISMATCH:	/* Data type mismatch */
+			case SQLITE_NOMEM:	/* a malloc() failed */
+			case SQLITE_MISMATCH:	/* data type mismatch */
 				result = NULL;
 				break;
 			default:
@@ -1161,9 +1163,7 @@ lbl_get_table:
 	}
 
 	if (0 == txn_level)
-	{
 		php_sem_release(&sqlite_access);
-	}
 #endif	/* HAVE_SQLITE3 */
 
 	if (CONFIG_LOG_SLOW_QUERIES)

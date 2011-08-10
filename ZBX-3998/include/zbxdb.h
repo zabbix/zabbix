@@ -22,13 +22,13 @@
 
 #include "common.h"
 
-#define	ZBX_DB_OK	(0)
-#define	ZBX_DB_FAIL	(-1)
-#define	ZBX_DB_DOWN	(-2)
+#define	ZBX_DB_OK	0
+#define	ZBX_DB_FAIL	-1
+#define	ZBX_DB_DOWN	-2
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
 
-#if defined(HAVE_IBM_DB2)
+#ifdef HAVE_IBM_DB2
 
 #	include <sqlcli1.h>
 

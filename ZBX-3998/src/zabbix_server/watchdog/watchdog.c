@@ -33,6 +33,9 @@
 
 #define STR_REPLACE(str1, str2)	if (NULL == str1 || 0 != strcmp(str1, str2)) str1 = zbx_strdup(str1, str2)
 
+#define ALERT_FREQUENCY		15 * SEC_PER_MIN
+#define DB_PING_FREQUENCY	SEC_PER_MIN
+
 typedef struct
 {
 	DB_ALERT	alert;
@@ -54,6 +57,8 @@ extern int		CONFIG_CONFSYNCER_FREQUENCY;
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
+ * Comments: messages are sent only every ALERT_FREQUENCY seconds             *
+ *                                                                            *
  ******************************************************************************/
 static void	send_alerts()
 {
@@ -62,7 +67,7 @@ static void	send_alerts()
 
 	now = time(NULL);
 
-	if (now > lastsent + 15 * SEC_PER_MIN)
+	if (now > lastsent + ALERT_FREQUENCY)
 	{
 		for (i = 0; i < recipients.values_num; i++)
 		{
@@ -163,46 +168,12 @@ static void	sync_config()
 
 /******************************************************************************
  *                                                                            *
- * Function: ping_database                                                    *
- *                                                                            *
- * Purpose: check availability of database                                    *
- *                                                                            *
- * Return value: SUCCEED - database is up, FAIL - database is down            *
- *                                                                            *
- * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
- *                                                                            *
- * Comments: the connection to the database is left open for config syncing   *
- *                                                                            *
- ******************************************************************************/
-static int	ping_database()
-{
-	const char	*__function_name = "ping_database";
-
-	int		ret;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (FAIL == (ret = DBping()))	/* check whether a connection to the database can be made */
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Watchdog: Database is down");
-		send_alerts();
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: main_watchdog_loop                                               *
  *                                                                            *
- * Purpose: periodically checks availability of database and alerts admins if *
- *          down                                                              *
+ * Purpose: check database availability every DB_PING_FREQUENCY seconds and   *
+ *          alert admins if it is down                                        *
  *                                                                            *
  * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
- *                                                                            *
- * Comments: check database availability every 60 seconds (hardcoded)         *
  *                                                                            *
  ******************************************************************************/
 void	main_watchdog_loop()
@@ -220,16 +191,22 @@ void	main_watchdog_loop()
 	{
 		zbx_setproctitle("%s [pinging database]", get_process_type_string(process_type));
 
-		if (SUCCEED == ping_database() && nextsync <= (now = (int)time(NULL)))
+		if (ZBX_DB_OK != DBconnect(ZBX_DB_CONNECT_ONCE))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Watchdog: Database is down");
+			send_alerts();
+		}
+		else if (nextsync <= (now = (int)time(NULL)))
 		{
 			zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 
-			sync_config();	/* ping_database() has left the connection open */
+			sync_config();
+
 			nextsync = now + CONFIG_CONFSYNCER_FREQUENCY;
 		}
 
 		DBclose();
 
-		zbx_sleep_loop(SEC_PER_MIN);
+		zbx_sleep_loop(DB_PING_FREQUENCY);
 	}
 }
