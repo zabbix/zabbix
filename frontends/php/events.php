@@ -531,23 +531,6 @@ include_once('include/page_header.php');
 				);
 			}
 
-			$triggers = array();
-			if(($pageFilter->hostid > 0) || ($pageFilter->groupid > 0)){
-				$trigOpt = array(
-					'nodeids' => get_current_nodeid(),
-					'output' => API_OUTPUT_SHORTEN
-				);
-
-				if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0))
-					$trigOpt['triggerids'] = $_REQUEST['triggerid'];
-				else if($pageFilter->hostid > 0)
-					$trigOpt['hostids'] = $pageFilter->hostid;
-				else if($pageFilter->groupid > 0)
-					$trigOpt['groupids'] = $pageFilter->groupid;
-
-				$triggers = API::Trigger()->get($trigOpt);
-			}
-
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'filter' => array(
@@ -563,7 +546,28 @@ include_once('include/page_header.php');
 			);
 
 			if($_REQUEST['showUnknown']) $options['filter']['value_changed'] = null;
-			if(!empty($triggers)) $options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+
+			if($pageFilter->hostsSelected){
+				if($pageFilter->hostid > 0 || $pageFilter->groupid > 0){
+					$trigOpt = array(
+						'nodeids' => get_current_nodeid(),
+						'output' => API_OUTPUT_SHORTEN
+					);
+
+					if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0))
+						$trigOpt['triggerids'] = $_REQUEST['triggerid'];
+					else if($pageFilter->hostid > 0)
+						$trigOpt['hostids'] = $pageFilter->hostid;
+					else if($pageFilter->groupid > 0)
+						$trigOpt['groupids'] = $pageFilter->groupid;
+
+					$triggers = API::Trigger()->get($trigOpt);
+					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+				}
+			}
+			else{
+				$options['triggerids'] = array();
+			}
 
 			$events = API::Event()->get($options);
 

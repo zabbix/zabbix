@@ -67,11 +67,12 @@ class CGraphPrototype extends CZBXAPI{
 			'nopermissions'			=> null,
 
 // filter
-			'filter'					=> null,
-			'search'					=> null,
+			'filter'				=> null,
+			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'			=> null,
+			'excludeSearch'			=> null,
+			'searchWildcardsEnabled'=> null,
 
 // output
 			'output'				=> API_OUTPUT_REFER,

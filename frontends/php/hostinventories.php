@@ -23,8 +23,8 @@ require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = 'S_HOST_PROFILES';
-$page['file'] = 'hostprofiles.php';
+$page['title'] = 'S_HOST_INVENTORIES';
+$page['file'] = 'hostinventories.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 
 require_once('include/page_header.php');
@@ -50,7 +50,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 if(isset($_REQUEST['favobj'])){
 	if('filter' == $_REQUEST['favobj']){
-		CProfile::update('web.hostprofiles.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.hostinventories.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
 	}
 }
 
@@ -80,42 +80,42 @@ if($_REQUEST['hostid'] > 0){
 	if(empty($res)) access_deny();
 }
 
-$hostprof_wdgt = new CWidget();
-$hostprof_wdgt->addPageHeader(_('HOST PROFILES'));
+$hostinvent_wdgt = new CWidget();
+$hostinvent_wdgt->addPageHeader(_('HOST INVENTORIES'));
 
 // host details
 if($_REQUEST['hostid'] > 0){
-	$hostprof_wdgt->addItem(insert_host_profile_form());
+	$hostinvent_wdgt->addItem(insert_host_inventory_form());
 }
 // list of hosts
 else{
 	$r_form = new CForm('get');
 	$r_form->addItem(array(_('Group'), $pageFilter->getGroupsCB(true)));
-	$hostprof_wdgt->addHeader(_('HOSTS'), $r_form);
+	$hostinvent_wdgt->addHeader(_('HOSTS'), $r_form);
 
-	// HOST PROFILE FILTER {{{
+	// HOST INVENTORY FILTER {{{
 	if(isset($_REQUEST['filter_set'])){
 		$_REQUEST['filter_field'] = get_request('filter_field');
 		$_REQUEST['filter_field_value'] = get_request('filter_field_value');
 		$_REQUEST['filter_exact'] = get_request('filter_exact');
-		CProfile::update('web.hostprofiles.filter_field', $_REQUEST['filter_field'], PROFILE_TYPE_STR);
-		CProfile::update('web.hostprofiles.filter_field_value', $_REQUEST['filter_field_value'], PROFILE_TYPE_STR);
-		CProfile::update('web.hostprofiles.filter_exact', $_REQUEST['filter_exact'], PROFILE_TYPE_INT);
+		CProfile::update('web.hostinventories.filter_field', $_REQUEST['filter_field'], PROFILE_TYPE_STR);
+		CProfile::update('web.hostinventories.filter_field_value', $_REQUEST['filter_field_value'], PROFILE_TYPE_STR);
+		CProfile::update('web.hostinventories.filter_exact', $_REQUEST['filter_exact'], PROFILE_TYPE_INT);
 	}
 	else{
-		$_REQUEST['filter_field'] = CProfile::get('web.hostprofiles.filter_field');
-		$_REQUEST['filter_field_value'] = CProfile::get('web.hostprofiles.filter_field_value');
-		$_REQUEST['filter_exact'] = CProfile::get('web.hostprofiles.filter_exact');
+		$_REQUEST['filter_field'] = CProfile::get('web.hostinventories.filter_field');
+		$_REQUEST['filter_field_value'] = CProfile::get('web.hostinventories.filter_field_value');
+		$_REQUEST['filter_exact'] = CProfile::get('web.hostinventories.filter_exact');
 	}
 
 	$filter_table = new CTable('', 'filter_config');
-	// getting profile fields to make a drop down
-	$profileFields = getHostProfiles(true); // 'true' means list should be ordered by title
-	$profileFieldsComboBox = new CComboBox('filter_field', $_REQUEST['filter_field']);
-	foreach($profileFields as $profileField){
-		$profileFieldsComboBox->addItem(
-			$profileField['db_field'],
-			$profileField['title']
+	// getting inventory fields to make a drop down
+	$inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
+	$inventoryFieldsComboBox = new CComboBox('filter_field', $_REQUEST['filter_field']);
+	foreach($inventoryFields as $inventoryField){
+		$inventoryFieldsComboBox->addItem(
+			$inventoryField['db_field'],
+			$inventoryField['title']
 		);
 	}
 	$exactComboBox = new CComboBox('filter_exact', $_REQUEST['filter_exact']);
@@ -123,7 +123,7 @@ else{
 	$exactComboBox->addItem('1', _('exactly'));
 	$filter_table->addRow(array(
 		array(
-			array(bold(_('Field:')), $profileFieldsComboBox),
+			array(bold(_('Field:')), $inventoryFieldsComboBox),
 			array(
 				$exactComboBox,
 				new CTextBox('filter_field_value', $_REQUEST['filter_field_value'], 20)
@@ -146,12 +146,12 @@ else{
 	$filter_form->setAttribute('name','zbx_filter');
 	$filter_form->setAttribute('id','zbx_filter');
 	$filter_form->addItem($filter_table);
-	$hostprof_wdgt->addFlicker($filter_form, CProfile::get('web.hostprofiles.filter.state', 0));
-	// }}} HOST PROFILE FILTER
+	$hostinvent_wdgt->addFlicker($filter_form, CProfile::get('web.hostinventories.filter.state', 0));
+	// }}} HOST INVENTORY FILTER
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
-	$hostprof_wdgt->addHeader($numrows);
+	$hostinvent_wdgt->addHeader($numrows);
 
 	$table = new CTableInfo();
 	$table->setHeader(array(
@@ -167,8 +167,8 @@ else{
 	);
 
 	if($pageFilter->groupsSelected){
-		// which profile fields we will need for displaying
-		$requiredProfileFields = array(
+		// which inventory fields we will need for displaying
+		$requiredInventoryFields = array(
 			'name',
 			'type',
 			'os',
@@ -177,24 +177,24 @@ else{
 			'macaddress_a'
 		);
 
-		// checking if correct profile field is specified for filter
-		$possibleProfileFields = getHostProfiles();
-		$possibleProfileFields = zbx_toHash($possibleProfileFields, 'db_field');
-		if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value']) && !isset($possibleProfileFields[$_REQUEST['filter_field']])){
-			error(_s('Impossible to filter by profile field "%s", which does not exist.', $_REQUEST['filter_field']));
+		// checking if correct inventory field is specified for filter
+		$possibleInventoryFields = getHostInventories();
+		$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
+		if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value']) && !isset($possibleInventoryFields[$_REQUEST['filter_field']])){
+			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $_REQUEST['filter_field']));
 			$hosts = array();
 			$paging = getPagingLine($hosts);
 		}
 		else{
 			// if we are filtering by field, this field is also required
 			if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value'])){
-				$requiredProfileFields[] = $_REQUEST['filter_field'];
+				$requiredInventoryFields[] = $_REQUEST['filter_field'];
 			}
 
 			$options = array(
 				'output' => array('hostid', 'name'),
-				'selectProfile' => $requiredProfileFields,
-				'withProfile' => true,
+				'selectInventory' => $requiredInventoryFields,
+				'withInventory' => true,
 				'selectGroups' => API_OUTPUT_EXTEND,
 				'limit' => ($config['search_limit'] + 1)
 			);
@@ -203,22 +203,22 @@ else{
 
 			$hosts = API::Host()->get($options);
 
-			// copy some profile fields to the uppers array level for sorting
+			// copy some inventory fields to the uppers array level for sorting
 			// and filter out hosts if we are using filter
 			foreach($hosts as $num => $host){
-				$hosts[$num]['pr_name'] = $host['profile']['name'];
-				$hosts[$num]['pr_type'] = $host['profile']['type'];
-				$hosts[$num]['pr_os'] = $host['profile']['os'];
-				$hosts[$num]['pr_serialno_a'] = $host['profile']['serialno_a'];
-				$hosts[$num]['pr_tag'] = $host['profile']['tag'];
-				$hosts[$num]['pr_macaddress_a'] = $host['profile']['macaddress_a'];
-				// if we are filtering by profile field
+				$hosts[$num]['pr_name'] = $host['inventory']['name'];
+				$hosts[$num]['pr_type'] = $host['inventory']['type'];
+				$hosts[$num]['pr_os'] = $host['inventory']['os'];
+				$hosts[$num]['pr_serialno_a'] = $host['inventory']['serialno_a'];
+				$hosts[$num]['pr_tag'] = $host['inventory']['tag'];
+				$hosts[$num]['pr_macaddress_a'] = $host['inventory']['macaddress_a'];
+				// if we are filtering by inventory field
 				if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value'])){
 					// must we filter exactly or using a substring (both are case insensitive)
 					$match = $_REQUEST['filter_exact']
-							? zbx_strtolower($hosts[$num]['profile'][$_REQUEST['filter_field']]) === zbx_strtolower($_REQUEST['filter_field_value'])
+							? zbx_strtolower($hosts[$num]['inventory'][$_REQUEST['filter_field']]) === zbx_strtolower($_REQUEST['filter_field_value'])
 							: zbx_strpos(
-								zbx_strtolower($hosts[$num]['profile'][$_REQUEST['filter_field']]),
+								zbx_strtolower($hosts[$num]['inventory'][$_REQUEST['filter_field']]),
 								zbx_strtolower($_REQUEST['filter_field_value'])
 							) !== false;
 					if(!$match){
@@ -242,12 +242,12 @@ else{
 					get_node_name_by_elid($host['hostid']),
 					new CLink($host['name'],'?hostid='.$host['hostid'].url_param('groupid')),
 					$host_groups,
-					zbx_str2links($host['profile']['name']),
-					zbx_str2links($host['profile']['type']),
-					zbx_str2links($host['profile']['os']),
-					zbx_str2links($host['profile']['serialno_a']),
-					zbx_str2links($host['profile']['tag']),
-					zbx_str2links($host['profile']['macaddress_a']),
+					zbx_str2links($host['inventory']['name']),
+					zbx_str2links($host['inventory']['type']),
+					zbx_str2links($host['inventory']['os']),
+					zbx_str2links($host['inventory']['serialno_a']),
+					zbx_str2links($host['inventory']['tag']),
+					zbx_str2links($host['inventory']['macaddress_a']),
 				);
 
 				$table->addRow($row);
@@ -256,10 +256,10 @@ else{
 	}
 
 	$table = array($paging, $table, $paging);
-	$hostprof_wdgt->addItem($table);
+	$hostinvent_wdgt->addItem($table);
 }
 
-$hostprof_wdgt->show();
+$hostinvent_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>
