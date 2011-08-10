@@ -2395,9 +2395,9 @@ char	*zbx_age2str(int age)
 	int		days, hours, minutes, offset;
 	static char	buffer[32];
 
-	days	= (int)((double)age / 86400);
-	hours	= (int)((double)(age - days * 86400) / 3600);
-	minutes	= (int)((double)(age - days * 86400 - hours * 3600) / 60);
+	days	= (int)((double)age / SEC_PER_DAY);
+	hours	= (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
+	minutes	= (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
 	offset	= 0;
 
 	if (days)

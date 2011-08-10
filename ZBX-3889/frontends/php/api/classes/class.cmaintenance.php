@@ -77,7 +77,8 @@ class CMaintenance extends CZBXAPI{
 			'search'					=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
-			'filter'				=> null,
+			'filter'					=> null,
+			'searchWildcardsEnabled'	=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,

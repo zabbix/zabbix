@@ -73,6 +73,7 @@ class CTemplate extends CZBXAPI{
 			'search'					=> '',
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,

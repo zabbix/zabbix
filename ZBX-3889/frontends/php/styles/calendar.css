@@ -18,6 +18,7 @@ div.calendartime{
 	text-align: center;
 	padding-top: 2px;
 	padding-bottom: 2px;
+	height: 42px;
 }
 
 table.calendarhat{
@@ -111,4 +112,12 @@ div.calendar input.calendar_textbox{
 	width: 26px;
 	height: 14px;
 	vertical-align:middle;
+}
+
+div.calendar input[type="button"] {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	border: 1px solid #00888B;
+	background: #AADDEE;
+	cursor:pointer;
 }

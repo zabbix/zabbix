@@ -349,7 +349,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 			continue;
 		}
 
-		if (check_time_period(row[3], (time_t)NULL) == 0)
+		if (FAIL == check_time_period(row[3], (time_t)NULL))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Won't send message (period)");
 			continue;
@@ -1002,8 +1002,6 @@ void	main_escalator_loop()
 	double	sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_escalator_loop()");
-
-	set_child_signal_handler();
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

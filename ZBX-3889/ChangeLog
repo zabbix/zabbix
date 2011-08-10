@@ -1,15 +1,50 @@
+Changes for 1.8.7rc1
+
+ - [ZBX-4016] fixed item status on insert and update (Eduard)
+ - [ZBX-3443] fixed trigger filter in Event (Eduard)
+ - [ZBX-3979] adding support searchWildcardsEnabled flag in API for searching using wildcards (Eduard)
+ - [ZBX-4018] fixed server crash on unsupported aggregate items (asaveljevs,Sasha)
+ - [ZBX-3908] allow empty string for formula field if multiplier is switched off (Eduard)
+ - [ZBX-3961] added recalculation of nextcheck time after changed flexible intervals (rudolfs)
+ - [ZBX-3978] fixed time period calculation, do not include upper bound (dimir,Sasha,KB)
+ - [ZBX-4000] fixed stop propagation in IE9 for Map (Eduard)
+ - [ZBX-2467] added more command line arguments to objdump to request more debugging information about crashes (asaveljevs)
+ - [ZBX-3972] added NOW and DONE buttons into js calendar - change action after day selection (Eduard)
+ - [ZBX-3993] fixed transmitting of templated user macros between server and proxy (Sasha)
+ - [ZBX-4008] updated Japanese translation; thanks to Kodai Terashima (Richlv)
+ - [ZBX-4005] updated French translation; thanks to Joseph Bueno (Richlv)
+ - [ZBXNEXT-869] clarify in manpages how the process for runtime signalling is found (Richlv)
+
+Changes for 1.8.6
+
+1.8.6rc2 was released as 1.8.6 without any changes
+
+Changes for 1.8.6rc2
+
+ - [ZBX-3990] fixed exiting proxy and server on cache reload using runtime control options (rudolfs)
+ - [ZBX-3835] fixed possible security vulnerability in redirects (Vedmak)
+
 Changes for 1.8.6rc1
 
  - [ZBX-3889] fixed deadlocks while processing triggers (Sasha)
+ - [ZBX-3968] fixed issues with filtering in monitoring->events in Internet Explorer 7 (KB)
+ - [ZBX-3469] fixed setting UNKNOWN trigger status when agent goes down (dimir)
+ - [ZBX-3973] added logging of proxy mode (active/passive) at startup (rudolfs)
+ - [ZBX-3902] fixed possible zombie states in UNIX, moved watchdog (server) and heartbeats (proxy) to separate processes (main process just waits), added more logging to exiting Windows agent (rudolfs)
+ - [ZBX-3166] fixed application updating in Template linking event. Changed linked Template color in application page. Added param NOEMPTY for popup page witch allows hide Empty button in application and item pages (Eduard)
+ - [ZBX-3565] reformating media types in notifications page, adding links to media types (Eduard)
+ - [ZBX-3784] added validation on duplicate discovery rule name (Eduard)
+ - [ZBX-3733] make possible to save Device uniqueness criteria status (discovery rule) in cloning event (Eduard)
+ - [ZBX-3845] check, if this user group is used in the config, if so it cannot be deleted (Eduard)
  - [ZBX-3911] fixed wrong trigger expression parsing when key parameters contained "(" (KB)
- - [ZBX-3856] fixed application unlink and clear when it is linked from template (Eduard)
+ - [ZBX-3856] fixed new group creation from template page (Eduard)
  - [ZBX-3840] fixed possible path disclosure (Vedmak)
  - [ZBXNEXT-849] added example MySQL UserParameter to monitor database and table size (Richlv)
  - [ZBX-3935] fixed possible function redeclaration error (Vedmak)
  - [ZBX-3944] added support of multibyte NIC names for the net.if.* checks under Windows (Sasha)
  - [ZBX-3947] fixed compilation under AIX 5.2 with fileset lower than 5.2.0.40 (Sasha)
  - [ZBX-3947] fixed compilation under AIX 5.2 with enabled IPv6 (Sasha)
- - [ZBX-3426] Fix application unlink and clear when it is linked from template (Eduard)
+ - [ZBX-3426] fixed application unlink and clear when it is linked from template (Eduard)
  - [ZBX-1074] fixed compilation errors regarding sem_lock and sem_unlock on HP-UX; thanks to Brian Collins (asaveljevs)
  - [ZBX-3877] fixed slow Housekeeper for PostgreSQL 7.4+; thanks to Ildefonso Camargo (dimir)
  - [ZBXNEXT-816] added support for reloading configuration cache from the command line (Richlv,Sasha)

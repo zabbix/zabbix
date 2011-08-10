@@ -231,7 +231,7 @@ include_once('include/page_header.php');
 			$form->setTitle(S_DISCOVERY_RULE);
 		}
 
-		$uniqueness_criteria = -1;
+		$uniqueness_criteria = get_request('uniqueness_criteria', -1);
 		if(isset($_REQUEST['druleid']) && $rule_data && (!isset($_REQUEST["form_refresh"]))){
 			$proxy_hostid = $rule_data['proxy_hostid'];
 			$name = $rule_data['name'];
@@ -305,7 +305,7 @@ include_once('include/page_header.php');
 		$cmbUniquenessCriteria->addItem(-1, S_IP_ADDRESS);
 
 		foreach($dchecks as $id => $data){
-			$dchecks[$id]['name'] = discovery_check2str($data['type'], $data['snmp_community'], $data['key'], $data['ports']);
+			$dchecks[$id]['name'] = zbx_htmlstr(discovery_check2str($data['type'], $data['snmp_community'], $data['key'], $data['ports']));
 		}
 		order_result($dchecks, 'name');
 

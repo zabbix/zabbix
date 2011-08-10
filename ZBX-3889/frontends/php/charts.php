@@ -119,8 +119,10 @@ include_once('include/page_header.php');
 
 // resets get params for proper page refresh
 	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
-		navigation_bar_calc('web.graph',$_REQUEST['graphid'], true);
-		resetGetParams(array('period', 'stime'));
+		navigation_bar_calc('web.graph', $_REQUEST['graphid'], true);
+		jsRedirect('charts.php?graphid=' . $_REQUEST['graphid']);
+		include_once('include/page_footer.php');
+		exit();
 	}
 //--
 
