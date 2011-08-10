@@ -908,8 +908,8 @@ msgid "Cannot add item"
 msgstr "Impossible d'ajouter l'élément"
 
 #: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
-msgid "Cannot add macro"
-msgstr "Impossible d'ajouter la macro"
+msgid "Cannot add macro."
+msgstr "Impossible d'ajouter la macro."
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot add maintenance"
@@ -1232,8 +1232,8 @@ msgid "Cannot logout."
 msgstr "Impossible de se déconnecter"
 
 #: api/classes/class.chost.php:1733
-msgid "Cannot mass update host name"
-msgstr "Impossible de réaliser une modification massive sur nom d'hôte"
+msgid "Cannot mass update host name."
+msgstr "Impossible de réaliser une modification massive sur nom d'hôte."
 
 #: api/classes/class.ctemplate.php:1375
 msgid "Cannot mass update template name"
@@ -1241,8 +1241,8 @@ msgstr "Impossible de réaliser une modification massive sur nom du modèle"
 
 #: api/classes/class.chost.php:1723
 #, fuzzy
-msgid "Cannot mass update visible host name"
-msgstr "Impossible de réaliser une modification massive sur nom d'hôte visible"
+msgid "Cannot mass update visible host name."
+msgstr "Impossible de réaliser une modification massive sur nom d'hôte visible."
 
 #: api/classes/class.ctemplate.php:1348
 #, fuzzy
@@ -1270,8 +1270,8 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
 #: api/classes/class.chost.php:1930 config.php:574
-msgid "Cannot remove macro"
-msgstr "Impossible de supprimer la macro"
+msgid "Cannot remove macro."
+msgstr "Impossible de supprimer la macro."
 
 #: include/locales/en_gb.inc.php:1929
 msgid "Cannot rename guest user"
@@ -1384,12 +1384,12 @@ msgstr "Impossible d'actualiser l'élément"
 
 #: api/classes/class.chost.php:1937 api/classes/class.ctemplate.php:1579
 #: config.php:579
-msgid "Cannot update macro"
-msgstr "Impossible de modifier la macro"
+msgid "Cannot update macro."
+msgstr "Impossible de modifier la macro."
 
 #: include/locales/en_gb.inc.php:692
-msgid "Cannot update macros"
-msgstr "Impossible de modifier les macros"
+msgid "Cannot update macros."
+msgstr "Impossible de modifier les macros."
 
 #: include/locales/en_gb.inc.php:611
 msgid "Cannot update maintenance"
@@ -2735,13 +2735,13 @@ msgstr "Première entrée du menu déroulant"
 
 #: api/classes/class.chost.php:1365
 #, fuzzy, php-format
-msgid "Duplicate host. Host with the same host name \"%s\" already exists in data"
-msgstr "Hôte dupliqué. Hôte avec le même nom d'hôte \"%s\" déjà existante dans les données"
+msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
+msgstr "Hôte dupliqué. Hôte avec le même nom d'hôte \"%s\" déjà existante dans les données."
 
 #: api/classes/class.chost.php:1396
 #, fuzzy, php-format
-msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data"
-msgstr "Hôte dupliqué. Hôte avect le même nom visible \"%s\" existe déjà dans les données"
+msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
+msgstr "Hôte dupliqué. Hôte avect le même nom visible \"%s\" existe déjà dans les données."
 
 #: api/classes/class.cmap.php:579
 #, php-format
@@ -2852,8 +2852,8 @@ msgstr "Vide"
 #: api/classes/class.citem.php:1018 api/classes/class.citemprototype.php:705
 #: api/classes/class.cproxy.php:475 api/classes/class.ctemplate.php:1139
 #: api/classes/class.ctrigger.php:1372 api/classes/class.cusergroup.php:642
-msgid "Empty input parameter"
-msgstr "Paramêtre d'entrée vide"
+msgid "Empty input parameter."
+msgstr "Paramêtre d'entrée vide."
 
 #: api/classes/class.cdrule.php:427
 msgid "Empty input."
@@ -3830,8 +3830,8 @@ msgstr "Temps de l'hôte"
 
 #: api/classes/class.chost.php:1578 api/classes/class.chost.php:1583
 #: api/classes/class.chost.php:1588 api/classes/class.chost.php:1597
-msgid "Host update failed"
-msgstr "Échec actualisation de l'hôte"
+msgid "Host update failed."
+msgstr "Échec actualisation de l'hôte."
 
 #: hosts.php:454
 msgid "Host updated"
@@ -6004,12 +6004,12 @@ msgstr ""
 
 #: api/classes/class.chost.php:1321 api/classes/class.chost.php:1331
 #, php-format
-msgid "No groups for host \"%s\""
-msgstr "Pas de groupes pour l'hôte \"%s\""
+msgid "No groups for host \"%s\"."
+msgstr "Pas de groupes pour l'hôte \"%s\"."
 
 #: api/classes/class.chost.php:1715
-msgid "No groups for hosts"
-msgstr "pas de groupes pour les hôtes"
+msgid "No groups for hosts."
+msgstr "pas de groupes pour les hôtes."
 
 #: api/classes/class.ctemplate.php:1340
 msgid "No groups for template"
@@ -6061,8 +6061,8 @@ msgstr "Pas d'interface pour l'élément."
 
 #: api/classes/class.chost.php:1324 api/classes/class.chost.php:1342
 #, php-format
-msgid "No interfaces for host \"%s\""
-msgstr "Pas d'interface pour l'hôte \"%s\""
+msgid "No interfaces for host \"%s\"."
+msgstr "Pas d'interface pour l'hôte \"%s\"."
 
 #: api/classes/class.cproxy.php:353
 #, php-format

@@ -1302,7 +1302,7 @@ Copt::memoryPick();
 		$hostNames = array();
 		foreach($hosts as $inum => &$host){
 			if(!check_db_fields($hostDBfields, $host)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host "%s"', isset($host['host']) ? $host['host'] : ''));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
 			}
 
 			if($update || $delete){
@@ -1318,17 +1318,17 @@ Copt::memoryPick();
 				}
 
 				if(!isset($host['groups']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s"', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
 
 				if(!isset($host['interfaces']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s"', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s".', $host['host']));
 			}
 
 			if($delete) continue;
 
 			if(isset($host['groups'])){
 				if(!is_array($host['groups']) || empty($host['groups']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s"', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
 
 				foreach($host['groups'] as $gnum => $group){
 					if(!isset($dbGroups[$group['groupid']])){
@@ -1339,7 +1339,7 @@ Copt::memoryPick();
 
 			if(isset($host['interfaces'])){
 				if(!is_array($host['interfaces']) || empty($host['interfaces']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s"', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s".', $host['host']));
 			}
 
 			if(isset($host['host'])){
@@ -1358,11 +1358,11 @@ Copt::memoryPick();
 				}
 
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Host name "%s"', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for host name "%s".', $host['host']));
 				}
 
 				if(isset($hostNames['host'][$host['host']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same host name "%s" already exists in data', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same host name "%s" already exists in data.', $host['host']));
 
 				$hostNames['host'][$host['host']] = $update ? $host['hostid'] : 1;
 			}
@@ -1372,7 +1372,7 @@ Copt::memoryPick();
 					// if visible name is empty replace it with host name
 					if(zbx_empty(trim($host['name']))){
 						if(!isset($host['host'])){
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Visible name cannot be empty if missing host name'));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Visible name cannot be empty if host name is missing.'));
 		}
 						$host['name'] = $host['host'];
 					}
@@ -1393,8 +1393,7 @@ Copt::memoryPick();
 				}
 
 				if(isset($hostNames['name'][$host['name']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same visible name "%s" already exists in data', $host['name']));
-
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same visible name "%s" already exists in data.', $host['name']));
 				$hostNames['name'][$host['name']] = $update ? $host['hostid'] : 1;
 			}
 		}
@@ -1575,17 +1574,17 @@ Copt::memoryPick();
 //----
 				if(!empty($interfacesToDelete)){
 					$result = API::HostInterface()->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
-					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed'));
+					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 				}
 
 				if(!empty($interfacesToUpdate)){
 					$result = API::HostInterface()->update($interfacesToUpdate);
-					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed'));
+					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 				}
 
 				if(!empty($interfacesToAdd)){
 					$result = API::HostInterface()->create($interfacesToAdd);
-					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed'));
+					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 				}
 			}
 			unset($host['interfaces']);
@@ -1594,7 +1593,7 @@ Copt::memoryPick();
 			$data['hosts'] = $host;
 			$result = $this->massUpdate($data);
 
-			if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed'));
+			if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 		}
 
 		return array('hostids' => $hostids);
@@ -1621,7 +1620,7 @@ Copt::memoryPick();
 
 		foreach($data['hosts'] as $hnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have enough rights for operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have enough rights for operation.'));
 			}
 		}
 
@@ -1712,7 +1711,7 @@ Copt::memoryPick();
 
 // CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 		if(isset($data['groups']) && empty($data['groups'])){
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for hosts'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for hosts.'));
 		}
 // }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
 
@@ -1720,17 +1719,17 @@ Copt::memoryPick();
 // UPDATE HOSTS PROPERTIES {{{
 			if(isset($data['name'])){
 				if(count($hosts) > 1){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible host name'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible host name.'));
 				}
 			}
 
 		if(isset($data['host'])){
 			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Host name "%s"', $data['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for host name "%s".', $data['host']));
 			}
 
 			if(count($hosts) > 1){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update host name'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update host name.'));
 			}
 
 			$cur_host = reset($hosts);
@@ -1748,7 +1747,7 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
-//can't add host with the same name as existing template
+// can't add host with the same name as existing template
 			if(API::Template()->exists(array('host' => $cur_host['host'])))
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$cur_host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 		}
@@ -1822,7 +1821,7 @@ Copt::memoryPick();
 					'groups' => zbx_toObject($groups_to_add, 'groupid')
 				));
 				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add group.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add host group.'));
 				}
 			}
 
@@ -1831,7 +1830,7 @@ Copt::memoryPick();
 			if(!empty($groupids_to_del)){
 				$result = $this->massRemove(array('hostids' => $hostids, 'groupids' => $groupids_to_del));
 				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete group.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host group.'));
 				}
 			}
 		}
@@ -1927,14 +1926,14 @@ Copt::memoryPick();
 			if(!empty($macrosToDelete)){
 				$result = $this->massRemove(array('hostids' => $hostids, 'macros' => $macrosToDelete));
 				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot remove macro'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot remove macro.'));
 				}
 			}
 
 			if(!empty($macrosToUpdate)){
 				$result = API::UserMacro()->massUpdate(array('hosts' => $hosts, 'macros' => $macrosToUpdate));
 				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update macro'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update macro.'));
 				}
 			}
 
@@ -1943,7 +1942,7 @@ Copt::memoryPick();
 
 				$result = $this->massAdd(array('hosts' => $hosts, 'macros' => $macrosToAdd));
 				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add macro'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add macro.'));
 				}
 			}
 		}
@@ -1956,7 +1955,7 @@ Copt::memoryPick();
 			if($updateInventory['inventory_mode'] == HOST_INVENTORY_DISABLED){
 				$sql = 'DELETE FROM host_inventory WHERE '.DBcondition('hostid', $hostids);
 				if(!DBexecute($sql))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete inventory'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete inventory.'));
 			}
 
 			else{
@@ -2115,7 +2114,7 @@ Copt::memoryPick();
  */
 	public function delete($hosts){
 
-		if(empty($hosts)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+		if(empty($hosts)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 		$hosts = zbx_toArray($hosts);
 		$hostids = zbx_objectValues($hosts, 'hostid');

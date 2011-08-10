@@ -906,8 +906,8 @@ msgid "Cannot add item"
 msgstr "Item não foi adicionado"
 
 #: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
-msgid "Cannot add macro"
-msgstr "Não foi possível adicionar macro"
+msgid "Cannot add macro."
+msgstr "Não foi possível adicionar macro."
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot add maintenance"
@@ -1265,8 +1265,8 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
 #: api/classes/class.chost.php:1930 config.php:574
-msgid "Cannot remove macro"
-msgstr "Não foi possível remover macro"
+msgid "Cannot remove macro."
+msgstr "Não foi possível remover macro."
 
 #: include/locales/en_gb.inc.php:1929
 msgid "Cannot rename guest user"
@@ -1378,12 +1378,12 @@ msgstr "Item não foi atualizado"
 
 #: api/classes/class.chost.php:1937 api/classes/class.ctemplate.php:1579
 #: config.php:579
-msgid "Cannot update macro"
-msgstr "Não foi possível atualizar macro"
+msgid "Cannot update macro."
+msgstr "Não foi possível atualizar macro."
 
 #: include/locales/en_gb.inc.php:692
-msgid "Cannot update macros"
-msgstr "Macros não foram atualizadas"
+msgid "Cannot update macros."
+msgstr "Macros não foram atualizadas."
 
 #: include/locales/en_gb.inc.php:611
 msgid "Cannot update maintenance"
@@ -2838,8 +2838,8 @@ msgstr "Vazio"
 #: api/classes/class.citem.php:1018 api/classes/class.citemprototype.php:705
 #: api/classes/class.cproxy.php:475 api/classes/class.ctemplate.php:1139
 #: api/classes/class.ctrigger.php:1372 api/classes/class.cusergroup.php:642
-msgid "Empty input parameter"
-msgstr "Parâmetro de entrada vazio"
+msgid "Empty input parameter."
+msgstr "Parâmetro de entrada vazio."
 
 #: api/classes/class.cdrule.php:427
 msgid "Empty input."
@@ -3809,8 +3809,8 @@ msgstr ""
 
 #: api/classes/class.chost.php:1578 api/classes/class.chost.php:1583
 #: api/classes/class.chost.php:1588 api/classes/class.chost.php:1597
-msgid "Host update failed"
-msgstr "Atualização de host falhou"
+msgid "Host update failed."
+msgstr "Atualização de host falhou."
 
 #: hosts.php:454
 msgid "Host updated"
@@ -9579,8 +9579,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr ""
 
 #: api/classes/class.chost.php:1624
-msgid "You do not have enough rights for operation"
-msgstr "Você não possui permissões suficientes para a operação"
+msgid "You do not have enough rights for operation."
+msgstr "Você não possui permissões suficientes para a operação."
 
 #: include/locales/en_gb.inc.php:1968
 msgid "You do not have permission to perform this operation"
