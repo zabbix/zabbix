@@ -1255,10 +1255,6 @@ msgstr ""
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
-#: api/classes/class.chost.php:1833
-msgid "Cannot delete group"
-msgstr ""
-
 #: api/classes/class.chost.php:1929 config.php:574
 msgid "Cannot remove macro"
 msgstr ""

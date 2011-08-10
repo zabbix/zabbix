@@ -1035,7 +1035,7 @@ msgstr "Не вдалося видалити прототип графіка"
 msgid "Cannot delete graphs"
 msgstr "Не вдалося видалити графіки"
 
-#: include/locales/en_gb.inc.php:1504
+#: include/locales/en_gb.inc.php:1504 api/classes/class.chost.php:1833
 msgid "Cannot delete group"
 msgstr "Не вдалося видалити групу"
 
@@ -1258,10 +1258,6 @@ msgstr "Не вдалося виконати оператор оновлення
 #, php-format
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "Не вдалось виконати оператор оновлення для таблиці \"%s\" де немає умови."
-
-#: api/classes/class.chost.php:1833
-msgid "Cannot delete group"
-msgstr "Не вдалося видалити групу"
 
 #: api/classes/class.chost.php:1929 config.php:574
 msgid "Cannot remove macro"
