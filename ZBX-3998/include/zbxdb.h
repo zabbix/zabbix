@@ -28,7 +28,7 @@
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
 
-#ifdef HAVE_IBM_DB2
+#if defined(HAVE_IBM_DB2)
 
 #	include <sqlcli1.h>
 

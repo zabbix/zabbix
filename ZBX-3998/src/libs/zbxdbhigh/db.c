@@ -52,8 +52,8 @@ void	DBclose()
  *                                                                            *
  * Purpose: connect to the database                                           *
  *                                                                            *
- * Parameters: flag - ZBX_DB_CONNECT_EXIT (exit on failure),                  *
- *                    ZBX_DB_CONNECT_ONCE (try once and return the result) or *
+ * Parameters: flag - ZBX_DB_CONNECT_ONCE (try once and return the result),   *
+ *                    ZBX_DB_CONNECT_EXIT (exit on failure) or                *
  *                    ZBX_DB_CONNECT_NORMAL (retry until connected)           *
  *                                                                            *
  * Return value: same as zbx_db_connect()                                     *
@@ -70,14 +70,14 @@ int	DBconnect(int flag)
 	while (ZBX_DB_OK != (err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
 			CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)))
 	{
+		if (ZBX_DB_CONNECT_ONCE == flag)
+			break;
+
 		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == flag)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Could not connect to the database. Exiting...");
 			exit(FAIL);
 		}
-
-		if (ZBX_DB_CONNECT_ONCE == flag)
-			break;
 
 		zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in 10 seconds");
 		zbx_sleep(10);
