@@ -501,9 +501,9 @@ Copt::memoryPick();
 					'active_till' => time()+86400,
 				);
 				if(!check_db_fields($db_fields, $maintenance)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
 				}
-				// checking whether a maintence with this name already exists
+				// checking whether a maintenance with this name already exists
 				if($this->exists(array('name' => $maintenance['name']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
@@ -649,7 +649,7 @@ Copt::memoryPick();
 				'maintenanceid' => null,
 			);
 			if(!check_db_fields($db_fields, $maintenance)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
 			}
 
 			$update[$mnum] = array(
