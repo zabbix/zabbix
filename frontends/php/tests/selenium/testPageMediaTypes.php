@@ -99,7 +99,7 @@ class testPageMediaTypes extends CWebTest{
 		if($used_by_operations){
 			$this->nok('Media type deleted');
 			$this->ok('Media type was not deleted');
-			$this->ok('Mediatypes used by action');
+			$this->ok('Media types used by action');
 		}
 		else{
 			$this->ok('Media type deleted');

@@ -327,7 +327,7 @@ class CUserGroup extends CZBXAPI{
 
 
 		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-			self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can add user groups.'));
 		}
 
 		$usrgrps = zbx_toArray($usrgrps);
@@ -338,7 +338,7 @@ class CUserGroup extends CZBXAPI{
 					'name' => null,
 				);
 				if(!check_db_fields($usrgrp_db_fields, $usrgrp)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for UserGroup');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for user group.'));
 				}
 
 				if($this->exists(array('name' => $usrgrp['name'], 'nodeids' => get_current_nodeid(false)))){
@@ -360,7 +360,7 @@ class CUserGroup extends CZBXAPI{
 				if(!empty($mass_add)){
 					$mass_add['usrgrpids'] = $usrgrpids[$gnum];
 					if(!$this->massAdd($mass_add))
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot add users');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add users.'));
 				}
 			}
 
@@ -376,7 +376,7 @@ class CUserGroup extends CZBXAPI{
 	public function update($usrgrps){
 
 		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-			self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can update user groups.'));
 		}
 
 		$usrgrps = zbx_toArray($usrgrps);
@@ -385,14 +385,14 @@ class CUserGroup extends CZBXAPI{
 			foreach($usrgrps as $ugnum => $usrgrp){
 				$group_db_fields = array('usrgrpid' => null);
 				if(!check_db_fields($group_db_fields, $usrgrp)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for UserGroup');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for user group.'));
 				}
 
 				$mass_update = $usrgrp;
 				$mass_update['usrgrpids'] = $usrgrp['usrgrpid'];
 				unset($mass_update['usrgrpid']);
 				if(!$this->massUpdate($mass_update))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot update group');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update group.'));
 			}
 
 		return array('usrgrpids'=> $usrgrpids);
@@ -401,7 +401,7 @@ class CUserGroup extends CZBXAPI{
 	public function massAdd($data){
 
 		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-			self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can add user groups.'));
 		}
 
 		$usrgrpids = zbx_toArray($data['usrgrpids']);
@@ -480,7 +480,7 @@ class CUserGroup extends CZBXAPI{
 	public function massUpdate($data){
 
 		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-			self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can update user groups.'));
 		}
 
 		$usrgrpids = zbx_toArray($data['usrgrpids']);
@@ -501,7 +501,7 @@ class CUserGroup extends CZBXAPI{
 					));
 					$group_exists = reset($group_exists);
 					if($group_exists && (bccomp($group_exists['usrgrpid'],$usrgrpid) != 0) ){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP . ' ' . $data['name'] . ' ' . S_ALREADY_EXISTS_SMALL);
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP.' '.$data['name'].' '.S_ALREADY_EXISTS_SMALL);
 					}
 				}
 
@@ -643,7 +643,7 @@ class CUserGroup extends CZBXAPI{
 
 			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				//GETTEXT: Api exception
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete User Groups.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete user groups.'));
 			}
 
 			// check, if this user group is used in one of the scripts. If so, it cannot be deleted

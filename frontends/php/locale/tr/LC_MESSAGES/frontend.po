@@ -1257,7 +1257,7 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "where koşulu olmadan \"%s\" tablosunda update komutu gerçekleştirilemez."
 
 #: api/classes/class.chost.php:1833
-msgid "Cannot remove group"
+msgid "Cannot delete group"
 msgstr "Grup kaldırılamaz"
 
 #: api/classes/class.chost.php:1929 config.php:574
@@ -1782,7 +1782,7 @@ msgid "Create"
 msgstr "Oluştur"
 
 #: actionconf.php:342
-msgid "Create Action"
+msgid "Create action"
 msgstr "Eylem oluştur"
 
 #: include/locales/en_gb.inc.php:699
@@ -2070,7 +2070,7 @@ msgid "Date HW purchased"
 msgstr "HW'nin alındığı tarih"
 
 #: include/hosts.inc.php:280
-msgid "Date hw decommissioned"
+msgid "Date HW decommissioned"
 msgstr "HW'nin faaliyetine son verildiği tarih"
 
 #: include/locales/en_gb.inc.php:1173
@@ -2387,7 +2387,7 @@ msgid "Delete slideshow?"
 msgstr "Slayt gösterisi silinsin mi?"
 
 #: include/views/configuration.sysmap.edit.php:192
-msgid "Delete system map?"
+msgid "Delete network map?"
 msgstr "Sistem haritası silinsin mi?"
 
 #: include/locales/en_gb.inc.php:790
@@ -2777,7 +2777,7 @@ msgid "Edit"
 msgstr "Düzenle"
 
 #: include/locales/en_gb.inc.php:914
-msgid "Edit Trigger"
+msgid "Edit trigger"
 msgstr "Tetiği düzenle"
 
 #: include/locales/en_gb.inc.php:1681
@@ -2928,7 +2928,7 @@ msgid "Error"
 msgstr "Hata"
 
 #: include/locales/en_gb.inc.php:1576
-msgid "Error Description"
+msgid "Error description"
 msgstr "Hata Açıklaması"
 
 #: include/locales/en_gb.inc.php:1828
@@ -3281,7 +3281,7 @@ msgid "GUI"
 msgstr "GUI"
 
 #: include/locales/en_gb.inc.php:1607
-msgid "GUI Messaging"
+msgid "GUI messaging"
 msgstr "GUI Mesajlaşması"
 
 #: include/locales/en_gb.inc.php:1533
@@ -5500,11 +5500,11 @@ msgid "Media types"
 msgstr "İletişim aracı tipleri"
 
 #: include/locales/en_gb.inc.php:1942
-msgid "Mediatype already exists:"
+msgid "Media type already exists:"
 msgstr "İletişim aracı tipi zaten var:"
 
 #: include/locales/en_gb.inc.php:1943
-msgid "Mediatypes used by action:"
+msgid "Media types used by action:"
 msgstr "İletişim aracının kullanıldığı eylem:"
 
 #: include/locales/en_gb.inc.php:1742
@@ -6693,7 +6693,7 @@ msgid "Password (once again)"
 msgstr "Parola (Tekrar)"
 
 #: include/locales/en_gb.inc.php:1941
-msgid "Password required for mediatype"
+msgid "Password required for media type"
 msgstr "İletişim aracı için parola gerekiyor"
 
 #: include/locales/en_gb.inc.php:1494
@@ -7257,44 +7257,44 @@ msgid "Rules"
 msgstr "Kurallar"
 
 #: include/actions.inc.php:351
-msgid "Run IPMI command:"
-msgstr "IPMI komutunu çalıştır:"
+msgid "Run IPMI command"
+msgstr "IPMI komutunu çalıştır"
 
 #: include/actions.inc.php:354
-msgid "Run SSH commands:"
-msgstr "SSH komutlarını çalıştır:"
+msgid "Run SSH commands"
+msgstr "SSH komutlarını çalıştır"
 
 #: include/actions.inc.php:357
-msgid "Run TELNET commands:"
-msgstr "TELNET komutlarını çalıştır:"
+msgid "Run TELNET commands"
+msgstr "TELNET komutlarını çalıştır"
 
 #: include/actions.inc.php:375
-msgid "Run commands:"
-msgstr "Komutları çalıştır:"
+msgid "Run commands"
+msgstr "Komutları çalıştır"
 
 #: include/actions.inc.php:361
-msgid "Run custom commands on Zabbix agent:"
-msgstr "Zabbix aracı üzerinde özel komutları çalıştır:"
+msgid "Run custom commands on Zabbix agent"
+msgstr "Zabbix aracı üzerinde özel komutları çalıştır"
 
 #: include/actions.inc.php:363
-msgid "Run custom commands on Zabbix server:"
-msgstr "Zabbix sunucu üzerinde özel komutları çalıştır:"
+msgid "Run custom commands on Zabbix server"
+msgstr "Zabbix sunucu üzerinde özel komutları çalıştır"
 
 #: include/actions.inc.php:372
-msgid "Run global script:"
+msgid "Run global script"
 msgstr "Genel betiği çalıştır"
 
 #: include/actions.inc.php:245
 msgid "Run remote commands on current host"
-msgstr "Geçerli konak üzerinde uzak komutları çalıştır:"
+msgstr "Geçerli konak üzerinde uzak komutları çalıştır"
 
 #: include/actions.inc.php:264
-msgid "Run remote commands on host groups: "
-msgstr "Konak grupları üzerinde uzak komutları çalıştır:"
+msgid "Run remote commands on host groups"
+msgstr "Konak grupları üzerinde uzak komutları çalıştır"
 
 #: include/actions.inc.php:252
-msgid "Run remote commands on hosts: "
-msgstr "Konaklar üzerinde uzak komutları çalıştır:"
+msgid "Run remote commands on hosts"
+msgstr "Konaklar üzerinde uzak komutları çalıştır"
 
 #: include/locales/en_gb.inc.php:1622
 msgid "Russian (RU)"
@@ -7729,12 +7729,12 @@ msgid "Send message"
 msgstr "Mesaj gönder"
 
 #: include/actions.inc.php:229
-msgid "Send message to groups:"
-msgstr "Gruplara mesaj gönder:"
+msgid "Send message to groups"
+msgstr "Gruplara mesaj gönder"
 
 #: include/actions.inc.php:217
-msgid "Send message to users:"
-msgstr "Kullanıcılara mesaj gönder:"
+msgid "Send message to users"
+msgstr "Kullanıcılara mesaj gönder"
 
 #: include/views/configuration.action.edit.php:537
 msgid "Send only to"

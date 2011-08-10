@@ -1256,7 +1256,7 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
 #: api/classes/class.chost.php:1833
-msgid "Cannot remove group"
+msgid "Cannot delete group"
 msgstr ""
 
 #: api/classes/class.chost.php:1929 config.php:574
@@ -1781,7 +1781,7 @@ msgid "Create"
 msgstr ""
 
 #: actionconf.php:342
-msgid "Create Action"
+msgid "Create action"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:699
@@ -2069,7 +2069,7 @@ msgid "Date HW purchased"
 msgstr ""
 
 #: include/hosts.inc.php:280
-msgid "Date hw decommissioned"
+msgid "Date HW decommissioned"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1173
@@ -2386,7 +2386,7 @@ msgid "Delete slideshow?"
 msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:192
-msgid "Delete system map?"
+msgid "Delete network map?"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:790
@@ -2776,7 +2776,7 @@ msgid "Edit"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:914
-msgid "Edit Trigger"
+msgid "Edit trigger"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1681
@@ -2927,7 +2927,7 @@ msgid "Error"
 msgstr "Errore"
 
 #: include/locales/en_gb.inc.php:1576
-msgid "Error Description"
+msgid "Error description"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1828
@@ -3280,7 +3280,7 @@ msgid "GUI"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1607
-msgid "GUI Messaging"
+msgid "GUI messaging"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1533
@@ -5499,11 +5499,11 @@ msgid "Media types"
 msgstr "Tipi di mezzo"
 
 #: include/locales/en_gb.inc.php:1942
-msgid "Mediatype already exists:"
+msgid "Media type already exists:"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1943
-msgid "Mediatypes used by action:"
+msgid "Media types used by action:"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1742
@@ -6692,7 +6692,7 @@ msgid "Password (once again)"
 msgstr "Password (ripeti)"
 
 #: include/locales/en_gb.inc.php:1941
-msgid "Password required for mediatype"
+msgid "Password required for media type"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1494

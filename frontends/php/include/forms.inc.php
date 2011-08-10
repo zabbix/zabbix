@@ -2215,10 +2215,10 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$frmItem->addRow(S_GROUP,$cmbGroups);
 
 			$cmbAction = new CComboBox('action');
-			$cmbAction->addItem('add to group', _('Add to group'));
+			$cmbAction->addItem('add to group', _('Add to host group'));
 			if(isset($_REQUEST['itemid'])){
-				$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
-				$cmbAction->addItem('delete from group', _('Delete from group'));
+				$cmbAction->addItem('update in group', _('Update in host group'));
+				$cmbAction->addItem('delete from group', _('Delete from host group'));
 			}
 			$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CSubmit('register',S_DO)));
 		}

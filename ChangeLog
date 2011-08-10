@@ -6,6 +6,7 @@ New features:
  - [ZBXNEXT-863] renamed "host profile" to "host inventory" (dimir)
 
 Bug fixes:
+ - [ZBX-4029] fixed inconsistent and untranslatable strings in frontend and clarified frontend messages (Richlv)
  - [ZBX-4010] fixed undefined constant SVC_SNMPv2 in discovery action conditions (Richlv)
  - [ZBX-3775] fixed html formatting in Overview (Eduard)
  - [ZBX-4001] fixed nearly duplicate strings, clarified error messages and removed obsolete translation strings (Richlv, sasha)
