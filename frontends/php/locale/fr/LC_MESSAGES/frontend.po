@@ -1034,7 +1034,7 @@ msgstr "Impossible de supprimer le prototype de graphique"
 msgid "Cannot delete graphs"
 msgstr "Impossible de supprimer les graphiques"
 
-#: include/locales/en_gb.inc.php:1504
+#: include/locales/en_gb.inc.php:1504 api/classes/class.chost.php:1833
 msgid "Cannot delete group"
 msgstr "Impossible de supprimer le groupe"
 
@@ -1260,10 +1260,6 @@ msgstr ""
 #, php-format
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
-
-#: api/classes/class.chost.php:1833
-msgid "Cannot delete group"
-msgstr "Impossible de supprimer le groupe"
 
 #: api/classes/class.chost.php:1929 config.php:574
 msgid "Cannot remove macro"

@@ -1035,10 +1035,6 @@ msgstr "Nie można usunąć prototyp wykresu"
 msgid "Cannot delete graphs"
 msgstr "Nie można usunąć wykresów "
 
-#: include/locales/en_gb.inc.php:1504
-msgid "Cannot delete group"
-msgstr "Nie można usunąć grupy"
-
 #: hosts.php:620 hosts.php:648
 msgid "Cannot delete host"
 msgstr "Nie można usunąć stacji"
@@ -1258,10 +1254,6 @@ msgstr ""
 #, php-format
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
-
-#: api/classes/class.chost.php:1833
-msgid "Cannot delete group"
-msgstr "Nie mogę usunąć grupy."
 
 #: api/classes/class.chost.php:1929 config.php:574
 msgid "Cannot remove macro"

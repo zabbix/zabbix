@@ -1030,7 +1030,7 @@ msgstr ""
 msgid "Cannot delete graphs"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1504
+#: include/locales/en_gb.inc.php:1504 api/classes/class.chost.php:1833
 msgid "Cannot delete group"
 msgstr ""
 
@@ -1252,10 +1252,6 @@ msgstr ""
 #: include/db.inc.php:1285
 #, php-format
 msgid "Cannot perform update statement on table \"%s\" without where condition."
-msgstr ""
-
-#: api/classes/class.chost.php:1833
-msgid "Cannot delete group"
 msgstr ""
 
 #: api/classes/class.chost.php:1929 config.php:574

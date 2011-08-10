@@ -1032,10 +1032,6 @@ msgstr "Kan grafiek prototype niet verwijderen"
 msgid "Cannot delete graphs"
 msgstr "Kan grafieken niet verwijderen"
 
-#: include/locales/en_gb.inc.php:1504
-msgid "Cannot delete group"
-msgstr "Kan groep niet verwijderen"
-
 #: hosts.php:620 hosts.php:648
 msgid "Cannot delete host"
 msgstr "Kan host niet verwijderen"
@@ -1255,10 +1251,6 @@ msgstr ""
 #, php-format
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
-
-#: api/classes/class.chost.php:1833
-msgid "Cannot delete group"
-msgstr "Kan de groep niet verwijderen"
 
 #: api/classes/class.chost.php:1929 config.php:574
 msgid "Cannot remove macro"
