@@ -555,12 +555,12 @@
 					));
 				}
 			}
+			else{
+				$events = array();
+				$paging = getPagingLine($events);
+			}
 		}
 
-		if(empty($paging)){
-			$events = array();
-			$paging = getPagingLine($events);
-		}
 		$table = array($paging, $table, $paging);
 
 		$jsmenu = new CPUMenu(null,170);
