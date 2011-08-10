@@ -857,8 +857,8 @@ class CItem extends CItemGeneral{
 		foreach($items as $inum => $item){
 			$items[$inum]['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
-		// validate if everything is ok with 'item->profile fields' linkage
-		self::validateProfileLinks($items, $update);
+		// validate if everything is ok with 'item->inventory fields' linkage
+		self::validateInventoryLinks($items, $update);
 		parent::checkInput($items, $update);
 	}
 
@@ -1264,12 +1264,12 @@ class CItem extends CItemGeneral{
 		}
 
 		if(!zbx_empty($insertItems)){
-			self::validateProfileLinks($insertItems, false); // false means 'create'
+			self::validateInventoryLinks($insertItems, false); // false means 'create'
 		$this->createReal($insertItems);
 		}
 
 		if(!zbx_empty($updateItems)){
-			self::validateProfileLinks($updateItems, true); // true means 'update'
+			self::validateInventoryLinks($updateItems, true); // true means 'update'
 		$this->updateReal($updateItems);
 		}
 
@@ -1280,18 +1280,18 @@ class CItem extends CItemGeneral{
 
 	/**
 	 * Check, if items that are about to be inserted or updated violate the rule:
-	 * only one item can be linked to a profile filed.
+	 * only one item can be linked to a inventory filed.
 	 * If everything is ok, function return true or throws Exception otherwise
 	 * @static
 	 * @param array $items
 	 * @param bool $update whether this is update operation
 	 * @return bool
 	 */
-	public static function validateProfileLinks(array $items, $update=false){
+	public static function validateInventoryLinks(array $items, $update=false){
 
-		// profile link field is not being updated, or being updated to 0, no need to validate anything then
+		// inventory link field is not being updated, or being updated to 0, no need to validate anything then
 		foreach($items as $i=>$item){
-			if(!isset($item['profile_link']) || $item['profile_link'] == 0){
+			if(!isset($item['inventory_link']) || $item['inventory_link'] == 0){
 				unset($items[$i]);
 			}
 		}
@@ -1300,17 +1300,17 @@ class CItem extends CItemGeneral{
 			return true;
 		}
 
-		$possibleHostProfiles = getHostProfiles();
+		$possibleHostInventories = getHostInventories();
 		if($update){
-			// for successful validation we need three fields for each item: profile_link, hostid and key_
+			// for successful validation we need three fields for each item: inventory_link, hostid and key_
 			// problem is, that when we are updating an item, we might not have them, because they are not changed
 			// so, we need to find out what is missing and use API to get the lacking info
 			$itemsWithNoHostId = array();
-			$itemsWithNoProfileLink = array();
+			$itemsWithNoInventoryLink = array();
 			$itemsWithNoKeys = array();
 			foreach($items as $item){
-				if(!isset($item['profile_link'])){
-					$itemsWithNoProfileLink[$item['itemid']] = $item['itemid'];
+				if(!isset($item['inventory_link'])){
+					$itemsWithNoInventoryLink[$item['itemid']] = $item['itemid'];
 				}
 				if(!isset($item['hostid'])){
 					$itemsWithNoHostId[$item['itemid']] = $item['itemid'];
@@ -1319,12 +1319,12 @@ class CItem extends CItemGeneral{
 					$itemsWithNoKeys[$item['itemid']] = $item['itemid'];
 				}
 			}
-			$itemsToFind = array_merge($itemsWithNoHostId, $itemsWithNoProfileLink, $itemsWithNoKeys);
+			$itemsToFind = array_merge($itemsWithNoHostId, $itemsWithNoInventoryLink, $itemsWithNoKeys);
 			// are there any items with lacking info?
 			if(!zbx_empty($itemsToFind)){
 			// getting it
 				$options = array(
-					'output' => array('hostid', 'profile_link', 'key_'),
+					'output' => array('hostid', 'inventory_link', 'key_'),
 					'filter' => array(
 						'itemid' => $itemsToFind
 					),
@@ -1332,14 +1332,14 @@ class CItem extends CItemGeneral{
 				);
 				$missingInfo = API::Item()->get($options);
 				$missingInfo = zbx_toHash($missingInfo, 'itemid');
-				// appending host ids, profile_links and keys where they are needed
+				// appending host ids, inventory_links and keys where they are needed
 				foreach($items as $i=>$item){
 					if (isset($missingInfo[$item['itemid']])){
 						if(!isset($items[$i]['hostid'])){
 							$items[$i]['hostid'] = $missingInfo[$item['itemid']]['hostid'];
 						}
-						if(!isset($items[$i]['profile_link'])){
-							$items[$i]['profile_link'] = $missingInfo[$item['itemid']]['profile_link'];
+						if(!isset($items[$i]['inventory_link'])){
+							$items[$i]['inventory_link'] = $missingInfo[$item['itemid']]['inventory_link'];
 						}
 						if(!isset($items[$i]['key_'])){
 							$items[$i]['key_'] = $missingInfo[$item['itemid']]['key_'];
@@ -1351,9 +1351,9 @@ class CItem extends CItemGeneral{
 
 		$hostIds = zbx_objectValues($items, 'hostid');
 
-		// getting all profile links on every affected host
+		// getting all inventory links on every affected host
 		$options = array(
-			'output' => array('key_', 'profile_link', 'hostid'),
+			'output' => array('key_', 'inventory_link', 'hostid'),
 			'filter' => array(
 				'hostid' => $hostIds
 			),
@@ -1361,16 +1361,16 @@ class CItem extends CItemGeneral{
 		);
 		$itemsOnHostsInfo = API::Item()->get($options);
 
-		// now, changing array to: 'hostid' => array('key_'=>'profile_link')
+		// now, changing array to: 'hostid' => array('key_'=>'inventory_link')
 		$linksOnHostsCurr = array();
 		foreach($itemsOnHostsInfo as $info){
 			// 0 means no link - we are not interested in those ones
-			if($info['profile_link'] != 0){
+			if($info['inventory_link'] != 0){
 				if(!isset($linksOnHostsCurr[$info['hostid']])){
-					$linksOnHostsCurr[$info['hostid']] = array($info['key_'] => $info['profile_link']);
+					$linksOnHostsCurr[$info['hostid']] = array($info['key_'] => $info['inventory_link']);
 				}
 				else{
-					$linksOnHostsCurr[$info['hostid']][$info['key_']] = $info['profile_link'];
+					$linksOnHostsCurr[$info['hostid']][$info['key_']] = $info['inventory_link'];
 				}
 			}
 		}
@@ -1378,23 +1378,23 @@ class CItem extends CItemGeneral{
 		$linksOnHostsFuture = array();
 
 		foreach($items as $item){
-			// checking if profile_link value is a valid number
+			// checking if inventory_link value is a valid number
 			if($update || $item['value_type'] != ITEM_VALUE_TYPE_LOG){
-				// does profile field with provided number exists?
-				if(!isset($possibleHostProfiles[$item['profile_link']])){
-					$maxVar = max(array_keys($possibleHostProfiles));
+				// does inventory field with provided number exists?
+				if(!isset($possibleHostInventories[$item['inventory_link']])){
+					$maxVar = max(array_keys($possibleHostInventories));
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
-						_s('Item "%1$s" cannot populate a missing host profile field number "%2$d". Choices are: from 0 (do not populate) to %3$d.', $item['name'], $item['profile_link'], $maxVar)
+						_s('Item "%1$s" cannot populate a missing host inventory field number "%2$d". Choices are: from 0 (do not populate) to %3$d.', $item['name'], $item['inventory_link'], $maxVar)
 					);
 				}
 			}
 
 			if(!isset($linksOnHostsFuture[$item['hostid']])){
-				$linksOnHostsFuture[$item['hostid']] = array($item['key_'] => $item['profile_link']);
+				$linksOnHostsFuture[$item['hostid']] = array($item['key_'] => $item['inventory_link']);
 			}
 			else{
-				$linksOnHostsFuture[$item['hostid']][$item['key_']] = $item['profile_link'];
+				$linksOnHostsFuture[$item['hostid']][$item['key_']] = $item['inventory_link'];
 			}
 		}
 
@@ -1406,16 +1406,16 @@ class CItem extends CItemGeneral{
 				$futureSituation = $linksOnHostsFuture[$hostId];
 			}
 			$valuesCount = array_count_values($futureSituation);
-			// if we have a duplicate profile links after merging - we are in trouble
+			// if we have a duplicate inventory links after merging - we are in trouble
 			if(max($valuesCount) > 1){
-				// what profile field caused this conflict?
+				// what inventory field caused this conflict?
 				$conflictedLink = array_keys($valuesCount, 2);
 				$conflictedLink = reset($conflictedLink);
 
 				// which of updated items populates this link?
 				$beingSavedItemName = '';
 				foreach($items as $item){
-					if($item['profile_link'] == $conflictedLink){
+					if($item['inventory_link'] == $conflictedLink){
 						if(isset($item['name'])){
 							$beingSavedItemName = $item['name'];
 						}
@@ -1439,7 +1439,7 @@ class CItem extends CItemGeneral{
 					'output' => array('name'),
 					'filter' => array(
 						'hostid' => $hostId,
-						'profile_link' => $conflictedLink
+						'inventory_link' => $conflictedLink
 					),
 					'nopermissions' => true
 				);
@@ -1449,10 +1449,10 @@ class CItem extends CItemGeneral{
 				self::exception(
 					ZBX_API_ERROR_PARAMETERS,
 					_s(
-						'Two items ("%1$s" and "%2$s") cannot populate one host profile field "%3$s", this would lead to a conflict.',
+						'Two items ("%1$s" and "%2$s") cannot populate one host inventory field "%3$s", this would lead to a conflict.',
 						$beingSavedItemName,
 						$originalItemName,
-						$possibleHostProfiles[$conflictedLink]['title']
+						$possibleHostInventories[$conflictedLink]['title']
 					)
 				);
 			}

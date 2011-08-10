@@ -74,7 +74,7 @@ class testGeneric extends CWebTest
 			array('discoveryconf.php','Configuration of discovery'),
 
 			// Inventory
-			array('hostprofiles.php','Host profiles'),
+			array('hostinventories.php','Host inventories'),
 
 			// Reports
 			// TODO Does not work under SQLite well. Extremely slow!
