@@ -214,7 +214,7 @@ function get_operation_desc($type, $data){
 				if(!empty($users)){
 					order_result($users, 'alias');
 
-					$result[] = bold(array(_('Send message to users:').SPACE));
+					$result[] = bold(array(_('Send message to users').':'.SPACE));
 					$result[] = array(implode(', ', zbx_objectValues($users,'alias')), BR());
 				}
 
@@ -226,7 +226,7 @@ function get_operation_desc($type, $data){
 				if(!empty($usrgrps)){
 					order_result($usrgrps, 'name');
 
-					$result[] = bold(array(_('Send message to groups:').SPACE));
+					$result[] = bold(array(_('Send message to user groups').':'.SPACE));
 					$result[] = array(implode(', ', zbx_objectValues($usrgrps,'name')), BR());
 				}
 				break;
@@ -249,7 +249,7 @@ function get_operation_desc($type, $data){
 				if(!empty($hosts)){
 					order_result($hosts, 'name');
 
-					$result[] = bold(_('Run remote commands on hosts: '));
+					$result[] = bold(_('Run remote commands on hosts').':'.SPACE);
 					$result[] = array(implode(', ', zbx_objectValues($hosts,'name')), BR());
 				}
 
@@ -261,7 +261,7 @@ function get_operation_desc($type, $data){
 				if(!empty($groups)){
 					order_result($groups, 'name');
 
-					$result[] = bold(_('Run remote commands on host groups: '));
+					$result[] = bold(_('Run remote commands on host groups').':'.SPACE);
 					$result[] = array(implode(', ', zbx_objectValues($groups,'name')), BR());
 				}
 				break;
@@ -290,9 +290,9 @@ function get_operation_desc($type, $data){
 					order_result($groups, 'name');
 
 					if(OPERATION_TYPE_GROUP_ADD == $data['operationtype'])
-						$result[] = bold(_('Add to host groups: '));
+						$result[] = bold(_('Add to host groups').':'.SPACE);
 					else
-						$result[] = bold(_('Remove from host groups: '));
+						$result[] = bold(_('Remove from host groups').':'.SPACE);
 
 					$result[] = array(implode(', ', zbx_objectValues($groups,'name')), BR());
 				}
@@ -310,9 +310,9 @@ function get_operation_desc($type, $data){
 					order_result($templates, 'name');
 
 					if(OPERATION_TYPE_TEMPLATE_ADD == $data['operationtype'])
-						$result[] = bold(_('Link to templates: '));
+						$result[] = bold(_('Link to templates').':'.SPACE);
 					else
-						$result[] = bold(_('Unlink from templates: '));
+						$result[] = bold(_('Unlink from templates').':'.SPACE);
 
 					$result[] = array(implode(', ', zbx_objectValues($templates, 'name')), BR());
 				}
@@ -348,19 +348,19 @@ function get_operation_desc($type, $data){
 			case OPERATION_TYPE_COMMAND:
 				switch($data['opcommand']['type']){
 					case ZBX_SCRIPT_TYPE_IPMI:
-						$result[] = array(bold(_('Run IPMI command:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						$result[] = array(bold(_('Run IPMI command').':'), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						break;
 					case ZBX_SCRIPT_TYPE_SSH:
-						$result[] = array(bold(_('Run SSH commands:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						$result[] = array(bold(_('Run SSH commands').':'), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						break;
 					case ZBX_SCRIPT_TYPE_TELNET:
-						$result[] = array(bold(_('Run TELNET commands:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						$result[] = array(bold(_('Run TELNET commands').':'), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						break;
 					case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 						if($data['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT)
-							$result[] = array(bold(_('Run custom commands on Zabbix agent:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+							$result[] = array(bold(_('Run custom commands on Zabbix agent').':'), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						else
-							$result[] = array(bold(_('Run custom commands on Zabbix server:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+							$result[] = array(bold(_('Run custom commands on Zabbix server').':'), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						break;
 					case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 						$userScripts = API::Script()->get(array(
@@ -369,10 +369,10 @@ function get_operation_desc($type, $data){
 						));
 						$userScript = reset($userScripts);
 
-						$result[] = array(bold(_('Run global script:').SPACE), italic($userScript['name']));
+						$result[] = array(bold(_('Run global script').':'.SPACE), italic($userScript['name']));
 						break;
 					default:
-						$result[] = array(bold(_('Run commands:')), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						$result[] = array(bold(_('Run commands').':'), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 				}
 				break;
 			default:
@@ -475,8 +475,8 @@ function operation_type2str($type=null){
 		OPERATION_TYPE_HOST_REMOVE => _('Remove host'),
 		OPERATION_TYPE_HOST_ENABLE => _('Enable host'),
 		OPERATION_TYPE_HOST_DISABLE => _('Disable host'),
-		OPERATION_TYPE_GROUP_ADD => _('Add to group'),
-		OPERATION_TYPE_GROUP_REMOVE => _('Remove from group'),
+		OPERATION_TYPE_GROUP_ADD => _('Add to host group'),
+		OPERATION_TYPE_GROUP_REMOVE => _('Remove from host group'),
 		OPERATION_TYPE_TEMPLATE_ADD => _('Link to template'),
 		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
 	);

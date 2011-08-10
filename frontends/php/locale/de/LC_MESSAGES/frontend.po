@@ -1281,7 +1281,7 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "Update-Statement in Tabelle \"%s\" nicht ohne Where-Klausel möglich."
 
 #: api/classes/class.chost.php:1833
-msgid "Cannot remove group"
+msgid "Cannot delete group"
 msgstr "Kann Gruppe nicht entfernen"
 
 #: api/classes/class.chost.php:1929 config.php:574
@@ -1816,7 +1816,7 @@ msgid "Create"
 msgstr "Erzeugen"
 
 #: actionconf.php:342
-msgid "Create Action"
+msgid "Create action"
 msgstr "Aktion erstellen"
 
 #: include/locales/en_gb.inc.php:699
@@ -2106,7 +2106,7 @@ msgid "Date HW purchased"
 msgstr "HW-Anschaffungsdatum"
 
 #: include/hosts.inc.php:280
-msgid "Date hw decommissioned"
+msgid "Date HW decommissioned"
 msgstr "HW-Stilllegungsdatum"
 
 #: include/locales/en_gb.inc.php:1173
@@ -2427,7 +2427,7 @@ msgid "Delete slideshow?"
 msgstr "Vorführung löschen?"
 
 #: include/views/configuration.sysmap.edit.php:192
-msgid "Delete system map?"
+msgid "Delete network map?"
 msgstr "System-Karte löschen?"
 
 #: include/locales/en_gb.inc.php:790
@@ -2824,7 +2824,7 @@ msgid "Edit"
 msgstr "Ändern"
 
 #: include/locales/en_gb.inc.php:914
-msgid "Edit Trigger"
+msgid "Edit trigger"
 msgstr "Auslöser bearbeiten"
 
 #: include/locales/en_gb.inc.php:1681
@@ -2976,7 +2976,7 @@ msgid "Error"
 msgstr "Fehler"
 
 #: include/locales/en_gb.inc.php:1576
-msgid "Error Description"
+msgid "Error description"
 msgstr "Fehlerbeschreibung"
 
 #: include/locales/en_gb.inc.php:1828
@@ -3335,7 +3335,7 @@ msgid "GUI"
 msgstr "GUI"
 
 #: include/locales/en_gb.inc.php:1607
-msgid "GUI Messaging"
+msgid "GUI messaging"
 msgstr "GUI-Benachrichtigung"
 
 #: include/locales/en_gb.inc.php:1533
@@ -5569,11 +5569,11 @@ msgid "Media types"
 msgstr "Medientypen"
 
 #: include/locales/en_gb.inc.php:1942
-msgid "Mediatype already exists:"
+msgid "Media type already exists:"
 msgstr "Medientyp existiert bereits:"
 
 #: include/locales/en_gb.inc.php:1943
-msgid "Mediatypes used by action:"
+msgid "Media types used by action:"
 msgstr "Medientyp verwendet von Aktion:"
 
 #: include/locales/en_gb.inc.php:1742
@@ -6777,7 +6777,7 @@ msgid "Password (once again)"
 msgstr "Kennwort (Wiederholung)"
 
 #: include/locales/en_gb.inc.php:1941
-msgid "Password required for mediatype"
+msgid "Password required for media type"
 msgstr "Kennwort notwenig für Medien-Typen"
 
 #: include/locales/en_gb.inc.php:1494
@@ -7345,32 +7345,32 @@ msgid "Rules"
 msgstr "Regeln"
 
 #: include/actions.inc.php:351
-msgid "Run IPMI command:"
-msgstr "IPMI-Kommando ausführen:"
+msgid "Run IPMI command"
+msgstr "IPMI-Kommando ausführen"
 
 #: include/actions.inc.php:354
-msgid "Run SSH commands:"
-msgstr "SSH-Kommando ausführen:"
+msgid "Run SSH commands"
+msgstr "SSH-Kommando ausführen"
 
 #: include/actions.inc.php:357
-msgid "Run TELNET commands:"
-msgstr "TELNET-Kommando ausführen:"
+msgid "Run TELNET commands"
+msgstr "TELNET-Kommando ausführen"
 
 #: include/actions.inc.php:375
-msgid "Run commands:"
-msgstr "Kommando ausführen:"
+msgid "Run commands"
+msgstr "Kommando ausführen"
 
 #: include/actions.inc.php:361
-msgid "Run custom commands on Zabbix agent:"
-msgstr "Eigenes Kommando ausführen auf Zabbix-Agent:"
+msgid "Run custom commands on Zabbix agent"
+msgstr "Eigenes Kommando ausführen auf Zabbix-Agent"
 
 #: include/actions.inc.php:363
-msgid "Run custom commands on Zabbix server:"
-msgstr "Eigenes Kommando ausführen auf Zabbix-Server:"
+msgid "Run custom commands on Zabbix server"
+msgstr "Eigenes Kommando ausführen auf Zabbix-Server"
 
 #: include/actions.inc.php:372
-msgid "Run global script:"
-msgstr "Globales Skript ausführen:"
+msgid "Run global script"
+msgstr "Globales Skript ausführen"
 
 #: include/actions.inc.php:245
 msgid "Run remote commands on current host"
@@ -7817,12 +7817,12 @@ msgid "Send message"
 msgstr "Nachricht schicken"
 
 #: include/actions.inc.php:229
-msgid "Send message to groups:"
-msgstr "Nachrichten an Gruppe schicken:"
+msgid "Send message to groups"
+msgstr "Nachrichten an Gruppe schicken"
 
 #: include/actions.inc.php:217
-msgid "Send message to users:"
-msgstr "Nachricht an Benutzer schicken:"
+msgid "Send message to users"
+msgstr "Nachricht an Benutzer schicken"
 
 #: include/views/configuration.action.edit.php:537
 msgid "Send only to"

@@ -788,7 +788,7 @@ COpt::memoryPick();
 			$duplicates = array();
 			foreach($actions as $action){
 				if(!check_db_fields($action_db_fields, $action))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter is used for action "%s".', $action['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter for action "%s".', $action['name']));
 
 				if(isset($action['esc_period']) && ($action['esc_period'] < 60) && (EVENT_SOURCE_TRIGGERS == $action['eventsource']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimum 60 seconds).', $action['name']));
@@ -823,7 +823,7 @@ COpt::memoryPick();
 				}
 
 				if(!isset($action['operations']) || empty($action['operations'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter used for action "%s".', $action['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter for action "%s".', $action['name']));
 				}
 				else{
 					foreach($action['operations'] as $operation){
@@ -882,10 +882,10 @@ COpt::memoryPick();
 		$duplicates = array();
 			foreach($actions as $action){
 			if(!check_db_fields(array('actionid' => null), $action)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters are used for action update method "%s".',$action['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters for action update method "%s".',$action['name']));
 			}
 
-// check if user change esc_period or eventsource
+// check if user changed esc_period or eventsource
 			if(isset($action['esc_period']) || isset($action['eventsource'])){
 				$eventsource = isset($action['eventsource']) ? $action['eventsource']: $updActions[$action['actionid']]['eventsource'];
 				$esc_period = isset($action['esc_period']) ? $action['esc_period']: $updActions[$action['actionid']]['esc_period'];
@@ -1035,7 +1035,7 @@ COpt::memoryPick();
 				'operationtype' => null,
 			);
 			if(!check_db_fields($operationDbFields, $operation)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameter used for Operations'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameter for operations.'));
 			}
 		}
 
@@ -1615,7 +1615,7 @@ COpt::memoryPick();
 		}
 
 		if(!API::HostGroup()->isWritable($hostGroupIdsAll))
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation group. Host group does not exist or you have no access to this host group.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation host group. Host group does not exist or you have no access to this host group.'));
 		if(!API::Host()->isWritable($hostIdsAll))
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation host. Host does not exist or you have no access to this host.'));
 		if(!API::User()->isReadable($userIdsAll))
@@ -1691,7 +1691,7 @@ COpt::memoryPick();
 				case CONDITION_TYPE_HOST_NAME:
 					break;
 				default:
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition type'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition type.'));
 			}
 		}
 
@@ -1723,7 +1723,7 @@ COpt::memoryPick();
 					}
 					break;
 				default:
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation condition type'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation condition type.'));
 			}
 		}
 
