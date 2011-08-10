@@ -44,7 +44,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(!DBfetch(DBselect('select itemid from items where itemid='.$_REQUEST['itemid']))){
-		show_error_message(S_NO_ITEM_DEFINED);
+		show_error_message(S_NO_ITEMS_DEFINED);
 	}
 
 	$options = array(
