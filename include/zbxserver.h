@@ -43,7 +43,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *host,
 		char *error, int maxerrlen);
 
 int	evaluate_expression(int *result, char **expression, time_t now,
-		zbx_uint64_t trigggerid, int trigger_value, char *error, int maxerrlen);
+		zbx_uint64_t trigggerid, int trigger_value, char **error);
 int	evaluate(double *value, char *exp, char *error, int maxerrlen);
 
 #endif
