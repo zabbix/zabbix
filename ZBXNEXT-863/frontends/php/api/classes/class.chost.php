@@ -118,6 +118,7 @@ class CHost extends CZBXAPI{
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
@@ -1725,7 +1726,7 @@ Copt::memoryPick();
 
 		if(isset($data['host'])){
 			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Hostname "%s"', $data['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Host name "%s"', $data['host']));
 			}
 
 			if(count($hosts) > 1){

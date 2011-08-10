@@ -455,6 +455,15 @@ div.calendartime{
 	text-align: center;
 	padding-top: 2px;
 	padding-bottom: 2px;
+	height: 42px;
+}
+
+div.calendar input[type="button"] {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	border: 1px solid #00888B;
+	background: #AADDEE;
+	cursor:pointer;
 }
 
 table.calendarhat{

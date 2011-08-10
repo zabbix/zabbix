@@ -73,6 +73,7 @@ class CTemplateScreen extends CScreen{
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
 			'selectScreenItems'		=> null,

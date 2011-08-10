@@ -102,6 +102,7 @@ class CTrigger extends CZBXAPI{
 			'searchByAny'			=> null,
 			'startSearch'			=> null,
 			'excludeSearch'			=> null,
+			'searchWildcardsEnabled'	=> null,
 
 // OutPut
 			'expandData'			=> null,

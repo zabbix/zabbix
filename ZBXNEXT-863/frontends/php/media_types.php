@@ -254,7 +254,7 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('frm_media_types');
 
-		$table=new CTableInfo(_('No media types defined'));
+		$table=new CTableInfo(_('No media types defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_media_types', NULL, "checkAll('".$form->getName()."','all_media_types','media_types');"),
 			make_sorting_header(_('Description'),'description'),
@@ -278,7 +278,7 @@ include_once('include/page_header.php');
 		$mediatypes = API::Mediatype()->get($options);
 
 
-// Check if media type are used by existing actions
+// Check if media types are used by existing actions
 		$options = array(
 			'mediatypeids' => zbx_objectValues($mediatypes, 'mediatypeid'),
 			'output' => API_OUTPUT_EXTEND,

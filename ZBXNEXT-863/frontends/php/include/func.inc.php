@@ -24,7 +24,9 @@
 function redirect($url){
 	zbx_flush_post_cookies();
 
-	header('Location: '.$url);
+	$curl = new Curl($url);
+	$curl->setArgument('sid', null);
+	header('Location: '.$curl->getUrl());
 	exit();
 }
 
@@ -39,25 +41,6 @@ function jsRedirect($url,$timeout=null){
 		$script.='window.location.replace("'.$url.'");';
 	}
 	insert_js($script);
-}
-
-function resetGetParams($params, $newURL=null){
-	zbx_value2array($params);
-
-	$redirect = false;
-	$url = new CUrl($newURL);
-
-	foreach($params as $num => $param){
-		if(!isset($_GET[$param])) continue;
-
-		$redirect = true;
-		$url->setArgument($param, null);
-	}
-
-	if($redirect){
-		jsRedirect($url->getUrl());
-		include_once('include/page_footer.php');
-	}
 }
 
 function get_request($name, $def=NULL){

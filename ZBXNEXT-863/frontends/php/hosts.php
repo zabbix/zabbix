@@ -755,7 +755,7 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('hosts');
 
-		$table = new CTableInfo(_('No hosts defined'));
+		$table = new CTableInfo(_('No hosts defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_hosts', null, "checkAll('" . $form->getName() . "','all_hosts','hosts');"),
 			make_sorting_header(_('Name'), 'name'),

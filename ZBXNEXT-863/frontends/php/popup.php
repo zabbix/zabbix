@@ -849,7 +849,7 @@ include_once('include/page_header.php');
 		$form->setName('triggerform');
 		$form->setAttribute('id', 'triggers');
 
-		$table = new CTableInfo(_('No triggers defined'));
+		$table = new CTableInfo(_('No triggers defined.'));
 
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox('all_triggers', NULL, "checkAll('".$form->getName()."', 'all_triggers','triggers');") : null),
@@ -1054,7 +1054,7 @@ include_once('include/page_header.php');
 		$form->setName('itemform');
 		$form->setAttribute('id', 'items');
 
-		$table = new CTableInfo(_('No item prototypes defined'));
+		$table = new CTableInfo(_('No item prototypes defined.'));
 
 		if($multiselect)
 			$header = array(
@@ -1717,7 +1717,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'drules'){
-		$table = new CTableInfo(_('No discovery rules defined'));
+		$table = new CTableInfo(_('No discovery rules defined.'));
 		$table->setHeader(S_NAME);
 
 		$result = DBselect('SELECT DISTINCT * FROM drules WHERE '.DBin_node('druleid', $nodeid));
@@ -1734,7 +1734,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'dchecks'){
-		$table = new CTableInfo(_('No discovery checks defined'));
+		$table = new CTableInfo(_('No discovery checks defined.'));
 		$table->setHeader(S_NAME);
 
 		$result = DBselect('SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.ports FROM drules r,dchecks c'.
@@ -1779,7 +1779,7 @@ include_once('include/page_header.php');
 		$form->setName('scriptform');
 		$form->attr('id', 'scripts');
 
-		$table = new CTableInfo(_('No scripts defined'));
+		$table = new CTableInfo(_('No scripts defined.'));
 
 		if($multiselect)
 			$header = array(
