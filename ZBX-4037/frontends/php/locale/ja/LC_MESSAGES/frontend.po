@@ -902,8 +902,8 @@ msgid "Cannot add item"
 msgstr "アイテムを追加できません"
 
 #: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
-msgid "Cannot add macro"
-msgstr "マクロを追加できません"
+msgid "Cannot add macro."
+msgstr "マクロを追加できません."
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot add maintenance"
@@ -1261,8 +1261,8 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
 #: api/classes/class.chost.php:1930 config.php:574
-msgid "Cannot remove macro"
-msgstr "マクロを削除できません"
+msgid "Cannot remove macro."
+msgstr "マクロを削除できません."
 
 #: include/locales/en_gb.inc.php:1929
 msgid "Cannot rename guest user"
@@ -1374,12 +1374,12 @@ msgstr "アイテムを更新できません"
 
 #: api/classes/class.chost.php:1937 api/classes/class.ctemplate.php:1579
 #: config.php:579
-msgid "Cannot update macro"
-msgstr "マクロを更新できません"
+msgid "Cannot update macro."
+msgstr "マクロを更新できません."
 
 #: include/locales/en_gb.inc.php:692
-msgid "Cannot update macros"
-msgstr "マクロを更新できません"
+msgid "Cannot update macros."
+msgstr "マクロを更新できません."
 
 #: include/locales/en_gb.inc.php:611
 msgid "Cannot update maintenance"
@@ -2833,8 +2833,8 @@ msgstr "空白"
 #: api/classes/class.citem.php:1018 api/classes/class.citemprototype.php:705
 #: api/classes/class.cproxy.php:475 api/classes/class.ctemplate.php:1139
 #: api/classes/class.ctrigger.php:1372 api/classes/class.cusergroup.php:642
-msgid "Empty input parameter"
-msgstr "入力パラメータが空白です"
+msgid "Empty input parameter."
+msgstr "入力パラメータが空白です."
 
 #: api/classes/class.cdrule.php:427
 msgid "Empty input."
@@ -3804,8 +3804,8 @@ msgstr ""
 
 #: api/classes/class.chost.php:1578 api/classes/class.chost.php:1583
 #: api/classes/class.chost.php:1588 api/classes/class.chost.php:1597
-msgid "Host update failed"
-msgstr "ホストの更新に失敗しました"
+msgid "Host update failed."
+msgstr "ホストの更新に失敗しました."
 
 #: hosts.php:454
 msgid "Host updated"
@@ -9570,8 +9570,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr ""
 
 #: api/classes/class.chost.php:1624
-msgid "You do not have enough rights for operation"
-msgstr "操作に対して十分な権限を有していません"
+msgid "You do not have enough rights for operation."
+msgstr "操作に対して十分な権限を有していません."
 
 #: include/locales/en_gb.inc.php:1968
 msgid "You do not have permission to perform this operation"

@@ -905,8 +905,8 @@ msgid "Cannot add item"
 msgstr "Elem felvétele sikertelen"
 
 #: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
-msgid "Cannot add macro"
-msgstr "Makró hozzáadása sikertelen"
+msgid "Cannot add macro."
+msgstr "Makró hozzáadása sikertelen."
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot add maintenance"
@@ -2837,8 +2837,8 @@ msgstr "Üres"
 #: api/classes/class.citem.php:1018 api/classes/class.citemprototype.php:705
 #: api/classes/class.cproxy.php:475 api/classes/class.ctemplate.php:1139
 #: api/classes/class.ctrigger.php:1372 api/classes/class.cusergroup.php:642
-msgid "Empty input parameter"
-msgstr "Üres bemeneti paraméter"
+msgid "Empty input parameter."
+msgstr "Üres bemeneti paraméter."
 
 #: api/classes/class.cdrule.php:427
 msgid "Empty input."
