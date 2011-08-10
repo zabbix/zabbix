@@ -200,7 +200,7 @@ class testFormAction extends CWebTest {
 		$this->click("add_operation");
 		$this->wait();
 		$this->ok("Send message to users: Admin");
-		$this->ok("Send message to groups: Database administrators, Zabbix administrators");
+		$this->ok("Send message to user groups: Database administrators, Zabbix administrators");
 		$this->click("new_operation");
 		$this->wait();
 		$this->select("new_operation_operationtype", "label=Remote command");

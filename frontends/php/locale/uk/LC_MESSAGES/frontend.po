@@ -1260,7 +1260,7 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "Не вдалось виконати оператор оновлення для таблиці \"%s\" де немає умови."
 
 #: api/classes/class.chost.php:1833
-msgid "Cannot remove group"
+msgid "Cannot delete group"
 msgstr "Не вдалося видалити групу"
 
 #: api/classes/class.chost.php:1929 config.php:574
@@ -1785,7 +1785,7 @@ msgid "Create"
 msgstr "Створити"
 
 #: actionconf.php:342
-msgid "Create Action"
+msgid "Create action"
 msgstr "Створити дію"
 
 #: include/locales/en_gb.inc.php:699
@@ -2073,7 +2073,7 @@ msgid "Date HW purchased"
 msgstr "Дата придбання HW"
 
 #: include/hosts.inc.php:280
-msgid "Date hw decommissioned"
+msgid "Date HW decommissioned"
 msgstr "Дата списання HW"
 
 #: include/locales/en_gb.inc.php:1173
@@ -2391,7 +2391,7 @@ msgid "Delete slideshow?"
 msgstr "Видалити слайдшоу?"
 
 #: include/views/configuration.sysmap.edit.php:192
-msgid "Delete system map?"
+msgid "Delete network map?"
 msgstr "Видалити карту мережі?"
 
 #: include/locales/en_gb.inc.php:790
@@ -2781,7 +2781,7 @@ msgid "Edit"
 msgstr "Змінити"
 
 #: include/locales/en_gb.inc.php:914
-msgid "Edit Trigger"
+msgid "Edit trigger"
 msgstr "Редагувати тригер"
 
 #: include/locales/en_gb.inc.php:1681
@@ -2932,7 +2932,7 @@ msgid "Error"
 msgstr "Помилка"
 
 #: include/locales/en_gb.inc.php:1576
-msgid "Error Description"
+msgid "Error description"
 msgstr "Опис помилки"
 
 #: include/locales/en_gb.inc.php:1828
@@ -3285,7 +3285,7 @@ msgid "GUI"
 msgstr "Веб інтерфейс"
 
 #: include/locales/en_gb.inc.php:1607
-msgid "GUI Messaging"
+msgid "GUI messaging"
 msgstr "Повідомлювати в інтерфейсі"
 
 #: include/locales/en_gb.inc.php:1533
@@ -5507,11 +5507,11 @@ msgid "Media types"
 msgstr "Методи повідомлень"
 
 #: include/locales/en_gb.inc.php:1942
-msgid "Mediatype already exists:"
+msgid "Media type already exists:"
 msgstr "Метод повідомлень вже існує:"
 
 #: include/locales/en_gb.inc.php:1943
-msgid "Mediatypes used by action:"
+msgid "Media types used by action:"
 msgstr "Метод повідомлень використовується в дії:"
 
 #: include/locales/en_gb.inc.php:1742
@@ -6700,7 +6700,7 @@ msgid "Password (once again)"
 msgstr "Пароль (підтвердження)"
 
 #: include/locales/en_gb.inc.php:1941
-msgid "Password required for mediatype"
+msgid "Password required for media type"
 msgstr "Потрібен пароль для метода повідомлень"
 
 #: include/locales/en_gb.inc.php:1494
@@ -7264,44 +7264,44 @@ msgid "Rules"
 msgstr "Правила"
 
 #: include/actions.inc.php:351
-msgid "Run IPMI command:"
-msgstr "Виконати IPMI команду:"
+msgid "Run IPMI command"
+msgstr "Виконати IPMI команду"
 
 #: include/actions.inc.php:354
-msgid "Run SSH commands:"
-msgstr "Виконати SSH команди:"
+msgid "Run SSH commands"
+msgstr "Виконати SSH команди"
 
 #: include/actions.inc.php:357
-msgid "Run TELNET commands:"
-msgstr "Виконати TELNET команди:"
+msgid "Run TELNET commands"
+msgstr "Виконати TELNET команди"
 
 #: include/actions.inc.php:375
-msgid "Run commands:"
-msgstr "Виконати команди:"
+msgid "Run commands"
+msgstr "Виконати команди"
 
 #: include/actions.inc.php:361
-msgid "Run custom commands on Zabbix agent:"
-msgstr "Виконати довільні команди через Zabbix агент:"
+msgid "Run custom commands on Zabbix agent"
+msgstr "Виконати довільні команди через Zabbix агент"
 
 #: include/actions.inc.php:363
-msgid "Run custom commands on Zabbix server:"
-msgstr "Виконати довільні команди через Zabbix сервер:"
+msgid "Run custom commands on Zabbix server"
+msgstr "Виконати довільні команди через Zabbix сервер"
 
 #: include/actions.inc.php:372
-msgid "Run global script:"
-msgstr "Виконати глобальний скрипт:"
+msgid "Run global script"
+msgstr "Виконати глобальний скрипт"
 
 #: include/actions.inc.php:245
 msgid "Run remote commands on current host"
 msgstr "Виконати віддалені команди на поточному вузлі мережі"
 
 #: include/actions.inc.php:264
-msgid "Run remote commands on host groups: "
-msgstr "Виконати віддалені команди на групі вузлів мережі: "
+msgid "Run remote commands on host groups"
+msgstr "Виконати віддалені команди на групі вузлів мережі"
 
 #: include/actions.inc.php:252
-msgid "Run remote commands on hosts: "
-msgstr "Виконати віддалені команди на вузлах мережі: "
+msgid "Run remote commands on hosts"
+msgstr "Виконати віддалені команди на вузлах мережі"
 
 #: include/locales/en_gb.inc.php:1622
 msgid "Russian (RU)"
@@ -7736,12 +7736,12 @@ msgid "Send message"
 msgstr "Надіслати повідомлення"
 
 #: include/actions.inc.php:229
-msgid "Send message to groups:"
-msgstr "Надіслати повідомлення групам:"
+msgid "Send message to groups"
+msgstr "Надіслати повідомлення групам"
 
 #: include/actions.inc.php:217
-msgid "Send message to users:"
-msgstr "Надіслати повідомлення користувачам:"
+msgid "Send message to users"
+msgstr "Надіслати повідомлення користувачам"
 
 #: include/views/configuration.action.edit.php:537
 msgid "Send only to"

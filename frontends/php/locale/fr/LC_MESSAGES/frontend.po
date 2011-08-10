@@ -1262,7 +1262,7 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
 #: api/classes/class.chost.php:1833
-msgid "Cannot remove group"
+msgid "Cannot delete group"
 msgstr "Impossible de supprimer le groupe"
 
 #: api/classes/class.chost.php:1929 config.php:574
@@ -1790,7 +1790,7 @@ msgid "Create"
 msgstr "Créer"
 
 #: actionconf.php:342
-msgid "Create Action"
+msgid "Create action"
 msgstr "Créer une action"
 
 #: include/locales/en_gb.inc.php:699
@@ -2082,7 +2082,7 @@ msgid "Date HW purchased"
 msgstr "Date HW acheté"
 
 #: include/hosts.inc.php:280
-msgid "Date hw decommissioned"
+msgid "Date HW decommissioned"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1173
@@ -2399,7 +2399,7 @@ msgid "Delete slideshow?"
 msgstr "Supprimer le diaporama ?"
 
 #: include/views/configuration.sysmap.edit.php:192
-msgid "Delete system map?"
+msgid "Delete network map?"
 msgstr "Supprimer la carte système ?"
 
 #: include/locales/en_gb.inc.php:790
@@ -2791,7 +2791,7 @@ msgid "Edit"
 msgstr "Edition"
 
 #: include/locales/en_gb.inc.php:914
-msgid "Edit Trigger"
+msgid "Edit trigger"
 msgstr "Modifier déclencheur"
 
 #: include/locales/en_gb.inc.php:1681
@@ -2942,7 +2942,7 @@ msgid "Error"
 msgstr "Erreur"
 
 #: include/locales/en_gb.inc.php:1576
-msgid "Error Description"
+msgid "Error description"
 msgstr "Description de l'erreur"
 
 #: include/locales/en_gb.inc.php:1828
@@ -3295,7 +3295,7 @@ msgid "GUI"
 msgstr "GUI"
 
 #: include/locales/en_gb.inc.php:1607
-msgid "GUI Messaging"
+msgid "GUI messaging"
 msgstr "Messagerie GUI"
 
 #: include/locales/en_gb.inc.php:1533
@@ -5524,11 +5524,11 @@ msgid "Media types"
 msgstr "Types média"
 
 #: include/locales/en_gb.inc.php:1942
-msgid "Mediatype already exists:"
+msgid "Media type already exists:"
 msgstr "Le type de media existe déjà:"
 
 #: include/locales/en_gb.inc.php:1943
-msgid "Mediatypes used by action:"
+msgid "Media types used by action:"
 msgstr "Types de media utilisés par les opérations de l'action"
 
 #: include/locales/en_gb.inc.php:1742
@@ -6719,7 +6719,7 @@ msgid "Password (once again)"
 msgstr "Mot de passe (une autre fois)"
 
 #: include/locales/en_gb.inc.php:1941
-msgid "Password required for mediatype"
+msgid "Password required for media type"
 msgstr "Mot de passe obligatoire pour ce type de media"
 
 #: include/locales/en_gb.inc.php:1494
@@ -7284,16 +7284,16 @@ msgid "Rules"
 msgstr "Règles"
 
 #: include/actions.inc.php:351
-msgid "Run IPMI command:"
-msgstr "Exécuter commandes IPMI :"
+msgid "Run IPMI command"
+msgstr "Exécuter commandes IPMI"
 
 #: include/actions.inc.php:354
-msgid "Run SSH commands:"
-msgstr "Exécuter commandes SSH :"
+msgid "Run SSH commands"
+msgstr "Exécuter commandes SSH"
 
 #: include/actions.inc.php:357
-msgid "Run TELNET commands:"
-msgstr "Exécuter commandes TELNET :"
+msgid "Run TELNET commands"
+msgstr "Exécuter commandes TELNET"
 
 #: include/actions.inc.php:375
 msgid "Run commands:"
@@ -7308,8 +7308,8 @@ msgid "Run custom commands on Zabbix server:"
 msgstr ""
 
 #: include/actions.inc.php:372
-msgid "Run global script:"
-msgstr "Exécuter script global :"
+msgid "Run global script"
+msgstr "Exécuter script global"
 
 #: include/actions.inc.php:245
 msgid "Run remote commands on current host"
@@ -7756,12 +7756,12 @@ msgid "Send message"
 msgstr "Envoi message"
 
 #: include/actions.inc.php:229
-msgid "Send message to groups:"
-msgstr "Envoyer le messages aux groupes :"
+msgid "Send message to groups"
+msgstr "Envoyer le messages aux groupes"
 
 #: include/actions.inc.php:217
-msgid "Send message to users:"
-msgstr "Envoyer le messages aux utilisateurs :"
+msgid "Send message to users"
+msgstr "Envoyer le messages aux utilisateurs"
 
 #: include/views/configuration.action.edit.php:537
 msgid "Send only to"
