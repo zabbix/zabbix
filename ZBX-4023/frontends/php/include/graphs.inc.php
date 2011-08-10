@@ -682,7 +682,7 @@
 		if($result){
 			foreach($graphs as $graphid => $graph){
 				if(isset($host_list[$graphid]))
-					info(S_GRAPH_DELETED_FROM_HOSTS_PART1.$graph['name'].S_GRAPH_DELETED_FROM_HOSTS_PART2.SPACE.S_GRAPH_DELETED_FROM_HOSTS_PART3.':'.SPACE.'"'.implode('","', array_keys($host_list[$graphid])).'"');
+					info(S_GRAPH_DELETED_FROM_HOSTS_PART1.$graph['name'].S_GRAPH_DELETED_FROM_HOSTS_PART2.':'.SPACE.'"'.implode('","', array_keys($host_list[$graphid])).'"');
 			}
 		}
 

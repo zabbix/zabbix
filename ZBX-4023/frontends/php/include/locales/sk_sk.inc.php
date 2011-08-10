@@ -1910,7 +1910,6 @@
 	'S_SKIPPED_COPYING_OF_GRAPH'=>			'Skipped copying of graph',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Graph "',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			'" deleted from host',
-	'S_GRAPH_DELETED_FROM_HOSTS_PART3'=>			'',
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>			'Unable to select configuration',
 	'S_ON_SMALL'=>			'on',
 	'S_EVERY_SMALL'=>			'every',
