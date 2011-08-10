@@ -52,8 +52,8 @@ class CHost extends CZBXAPI{
  * @param boolean $options['selectGraphs'] select Graphs
  * @param boolean $options['selectApplications'] select Applications
  * @param boolean $options['selectMacros'] select Macros
- * @param boolean|array $options['selectProfile'] select Profile
- * @param boolean $options['withProfile'] select only hosts with profiles
+ * @param boolean|array $options['selectInventory'] select Inventory
+ * @param boolean $options['withInventory'] select only hosts with inventory
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
  * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
@@ -108,7 +108,7 @@ class CHost extends CZBXAPI{
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
-			'withProfile'				=> null,
+			'withInventory'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 
@@ -134,7 +134,7 @@ class CHost extends CZBXAPI{
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
 			'selectInterfaces'			=> null,
-			'selectProfile'				=> null,
+			'selectInventory'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -487,11 +487,11 @@ class CHost extends CZBXAPI{
 						' AND i.itemid=gi.itemid)';
 		}
 
-// withProfile
-		if(!is_null($options['withProfile']) && $options['withProfile']){
+// withInventory
+		if(!is_null($options['withInventory']) && $options['withInventory']){
 			$sql_parts['where'][] = ' h.hostid IN ( '.
-					' SELECT hp.hostid '.
-					' FROM host_profile hp )';
+					' SELECT hin.hostid '.
+					' FROM host_inventory hin )';
 		}
 
 // search
@@ -608,8 +608,8 @@ class CHost extends CZBXAPI{
 					if(!is_null($options['selectDiscoveries']) && !isset($result[$host['hostid']]['discoveries'])){
 						$result[$host['hostid']]['discoveries'] = array();
 					}
-					if(!is_null($options['selectProfile']) && !isset($result[$host['hostid']]['profile'])){
-						$result[$host['hostid']]['profile'] = array();
+					if(!is_null($options['selectInventory']) && !isset($result[$host['hostid']]['inventory'])){
+						$result[$host['hostid']]['inventory'] = array();
 					}
 					if(!is_null($options['selectTriggers']) && !isset($result[$host['hostid']]['triggers'])){
 						$result[$host['hostid']]['triggers'] = array();
@@ -769,28 +769,28 @@ Copt::memoryPick();
 			}
 		}
 
-// Adding Profiles
-		if(!is_null($options['selectProfile']) && $options['selectProfile'] !== false){
-			if(is_array($options['selectProfile'])){
+// Adding Inventories
+		if(!is_null($options['selectInventory']) && $options['selectInventory'] !== false){
+			if(is_array($options['selectInventory'])){
 				// if we are given a list of fields that needs to be fetched
-				$dbTable = DB::getSchema('host_profile');
-				$selectHP = array('hp.hostid');
-				foreach($options['selectProfile'] as $field){
+				$dbTable = DB::getSchema('host_inventory');
+				$selectHIn = array('hin.hostid');
+				foreach($options['selectInventory'] as $field){
 					if(isset($dbTable['fields'][$field]))
-						$selectHP[] = 'hp.'.$field;
+						$selectHIn[] = 'hin.'.$field;
 				}
 			}
 			else{
 				// all fields are needed
-				$selectHP = array('hp.*');
+				$selectHIn = array('hin.*');
 			}
 
-			$sql = 'SELECT '.implode(', ', $selectHP).
-				' FROM host_profile hp '.
-				' WHERE '.DBcondition('hp.hostid', $hostids);
-			$db_profile = DBselect($sql);
-			while($profile = DBfetch($db_profile))
-				$result[$profile['hostid']]['profile'] = $profile;
+			$sql = 'SELECT '.implode(', ', $selectHIn).
+				' FROM host_inventory hin '.
+				' WHERE '.DBcondition('hin.hostid', $hostids);
+			$db_inventory = DBselect($sql);
+			while($inventory = DBfetch($db_inventory))
+				$result[$inventory['hostid']]['inventory'] = $inventory;
 		}
 
 // Adding Templates
@@ -1506,16 +1506,16 @@ Copt::memoryPick();
 				self::exception();
 			}
 
-			if(isset($host['profile']) && !empty($host['profile'])){
-				$fields = array_keys($host['profile']);
-				$fields[] = 'profile_mode';
+			if(isset($host['inventory']) && !empty($host['inventory'])){
+				$fields = array_keys($host['inventory']);
+				$fields[] = 'inventory_mode';
 				$fields = implode(', ', $fields);
 
-				$values = array_map('zbx_dbstr', $host['profile']);
-				$values[] = $host['profile_mode'];
+				$values = array_map('zbx_dbstr', $host['inventory']);
+				$values[] = isset($host['inventory_mode']) ? $host['inventory_mode'] : HOST_INVENTORY_MANUAL;
 				$values = implode(', ', $values);
 
-				DBexecute('INSERT INTO host_profile (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
+				DBexecute('INSERT INTO host_inventory (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
 			}
 		}
 
@@ -1779,11 +1779,11 @@ Copt::memoryPick();
 			unset($data['macros']);
 		}
 
-		if(isset($data['profile'])){
-			$updateProfile = $data['profile'];
-			$updateProfile['profile_mode'] = $data['profile_mode'];
-			unset($data['profile']);
-			unset($data['profile_mode']);
+		if(isset($data['inventory'])){
+			$updateInventory = $data['inventory'];
+			$updateInventory['inventory_mode'] = $data['inventory_mode'];
+			unset($data['inventory']);
+			unset($data['inventory_mode']);
 		}
 
 		if(isset($data['status'])){
@@ -1950,85 +1950,85 @@ Copt::memoryPick();
 // }}} UPDATE MACROS
 
 
-// PROFILE {{{
-		if(isset($updateProfile)){
+// INVENTORY {{{
+		if(isset($updateInventory)){
 
-			if($updateProfile['profile_mode'] == HOST_PROFILE_DISABLED){
-				$sql = 'DELETE FROM host_profile WHERE '.DBcondition('hostid', $hostids);
+			if($updateInventory['inventory_mode'] == HOST_INVENTORY_DISABLED){
+				$sql = 'DELETE FROM host_inventory WHERE '.DBcondition('hostid', $hostids);
 				if(!DBexecute($sql))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete profile'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete inventory'));
 			}
 
 			else{
-				$hostsWithProfiles = array();
-				$existing_profiles_db = DBselect('SELECT hostid FROM host_profile WHERE '.DBcondition('hostid', $hostids));
-				while($existing_profile = DBfetch($existing_profiles_db)){
-					$hostsWithProfiles[] = $existing_profile['hostid'];
+				$hostsWithInventories = array();
+				$existing_inventories_db = DBselect('SELECT hostid FROM host_inventory WHERE '.DBcondition('hostid', $hostids));
+				while($existing_inventory = DBfetch($existing_inventories_db)){
+					$hostsWithInventories[] = $existing_inventory['hostid'];
 				}
 
-				// when hosts are being updated to use automatic mode for host profiles,
-				// we must check if some items are set to populate profile fields of every host.
+				// when hosts are being updated to use automatic mode for host inventories,
+				// we must check if some items are set to populate inventory fields of every host.
 				// if they do, mass update for those fields should be ignored
-				if($updateProfile['profile_mode'] == HOST_PROFILE_AUTOMATIC){
+				if($updateInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC){
 					// getting all items on all affected hosts
 					$options = array(
-						'output' => array('profile_link', 'hostid'),
+						'output' => array('inventory_link', 'hostid'),
 						'filter' => array('hostid' => $hostids),
 						'nopermissions' => true
 					);
-					$itemsToProfiles = API::item()->get($options);
+					$itemsToInventories = API::item()->get($options);
 
-					// gathering links to array: 'hostid'=>array('profile_name_1'=>true, 'profile_name_2'=>true)
-					$profileLinksOnHosts = array();
-					$profileFields = getHostProfiles();
-					foreach($itemsToProfiles as $pr){
-						if($pr['profile_link'] != 0){ // 0 means 'no link'
-							if(isset($profileLinksOnHosts[$pr['hostid']])){
-								$profileLinksOnHosts[$pr['hostid']][$profileFields[$pr['profile_link']]['db_field']] = true;
+					// gathering links to array: 'hostid'=>array('inventory_name_1'=>true, 'inventory_name_2'=>true)
+					$inventoryLinksOnHosts = array();
+					$inventoryFields = getHostInventories();
+					foreach($itemsToInventories as $pr){
+						if($pr['inventory_link'] != 0){ // 0 means 'no link'
+							if(isset($inventoryLinksOnHosts[$pr['hostid']])){
+								$inventoryLinksOnHosts[$pr['hostid']][$inventoryFields[$pr['inventory_link']]['db_field']] = true;
 							}else{
-								$profileLinksOnHosts[$pr['hostid']] = array($profileFields[$pr['profile_link']]['db_field']=>true);
+								$inventoryLinksOnHosts[$pr['hostid']] = array($inventoryFields[$pr['inventory_link']]['db_field']=>true);
 							}
 						}
 					}
 
-					// now we have all info we need to determine, which profile fields should be saved
-					$profilesToSave = array();
+					// now we have all info we need to determine, which inventory fields should be saved
+					$inventoriesToSave = array();
 					foreach($hostids as $hostid){
-						$profilesToSave[$hostid] = $updateProfile;
-						$profilesToSave[$hostid]['hostid'] = $hostid;
-						foreach($updateProfile as $profileName=>$pr){
-							if(isset($profileLinksOnHosts[$hostid][$profileName])){
-								unset($profilesToSave[$hostid][$profileName]);
+						$inventoriesToSave[$hostid] = $updateInventory;
+						$inventoriesToSave[$hostid]['hostid'] = $hostid;
+						foreach($updateInventory as $inventoryName=>$pr){
+							if(isset($inventoryLinksOnHosts[$hostid][$inventoryName])){
+								unset($inventoriesToSave[$hostid][$inventoryName]);
 							}
 						}
 					}
 				}
 				else{
 					// if mode is not automatic, all the fields can be saved
-					$profilesToSave = array();
+					$inventoriesToSave = array();
 					foreach($hostids as $hostid){
-						$profilesToSave[$hostid] = $updateProfile;
-						$profilesToSave[$hostid]['hostid'] = $hostid;
+						$inventoriesToSave[$hostid] = $updateInventory;
+						$inventoriesToSave[$hostid]['hostid'] = $hostid;
 					}
 				}
 
-				$hostsWithoutProfile = array_diff($hostids, $hostsWithProfiles);
+				$hostsWithoutInventory = array_diff($hostids, $hostsWithInventories);
 
-				// hosts that have no profiles yet, need profiles to be inserted
-				foreach($hostsWithoutProfile as $hostid){
-					DB::insert('host_profile', array($profilesToSave[$hostid]), false);
+				// hosts that have no inventory yet, need it to be inserted
+				foreach($hostsWithoutInventory as $hostid){
+					DB::insert('host_inventory', array($inventoriesToSave[$hostid]), false);
 				}
 
-				// those hosts that already have a profile, need their profiles to be updated
-				foreach($hostsWithProfiles as $hostid){
-					DB::update('host_profile', array(
-						'values' => $profilesToSave[$hostid],
+				// those hosts that already have an inventory, need it to be updated
+				foreach($hostsWithInventories as $hostid){
+					DB::update('host_inventory', array(
+						'values' => $inventoriesToSave[$hostid],
 						'where' => array('hostid' => $hostid)
 					));
 				}
 			}
 		}
-// }}} PROFILE
+// }}} INVENTORY
 		return array('hostids' => $hostids);
 	}
 
@@ -2227,8 +2227,8 @@ Copt::memoryPick();
 			'operationid'=>$delOperationids,
 		));
 
-// delete host profile
-			DB::delete('host_profile', array('hostid'=>$hostids));
+// delete host inventory
+			DB::delete('host_inventory', array('hostid'=>$hostids));
 
 // delete host applications
 		DB::delete('applications', array('hostid'=>$hostids));

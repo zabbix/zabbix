@@ -30,8 +30,8 @@ $ipmi_authtype	= get_request('ipmi_authtype', -1);
 $ipmi_privilege	= get_request('ipmi_privilege', 2);
 $ipmi_username	= get_request('ipmi_username', '');
 $ipmi_password	= get_request('ipmi_password', '');
-$profile_mode	= get_request('profile_mode', HOST_PROFILE_DISABLED);
-$host_profile = get_request('host_profile', array());
+$inventory_mode	= get_request('inventory_mode', HOST_INVENTORY_DISABLED);
+$host_inventory = get_request('host_inventory', array());
 
 
 $templates	= get_request('templates',array());
@@ -212,22 +212,22 @@ $frmHost->addRow(array(
 	new CTextBox('ipmi_password', $ipmi_password, 20)
 );
 
-$profileModesCC = new CComboBox('profile_mode', $profile_mode, 'submit()');
-$profileModesCC->addItem(HOST_PROFILE_DISABLED, _('Disabled'));
-$profileModesCC->addItem(HOST_PROFILE_MANUAL, _('Manual'));
-$profileModesCC->addItem(HOST_PROFILE_AUTOMATIC, _('Automatic'));
+$inventoryModesCC = new CComboBox('inventory_mode', $inventory_mode, 'submit()');
+$inventoryModesCC->addItem(HOST_INVENTORY_DISABLED, _('Disabled'));
+$inventoryModesCC->addItem(HOST_INVENTORY_MANUAL, _('Manual'));
+$inventoryModesCC->addItem(HOST_INVENTORY_AUTOMATIC, _('Automatic'));
 $frmHost->addRow(array(
-	new CVisibilityBox('visible[profile_mode]', isset($visible['profile_mode']), 'profile_mode', S_ORIGINAL), _('Profile mode')),
-	$profileModesCC
+	new CVisibilityBox('visible[inventory_mode]', isset($visible['inventory_mode']), 'inventory_mode', S_ORIGINAL), _('Inventory mode')),
+	$inventoryModesCC
 );
 
-$profile_fields = getHostProfiles();
-$profile_fields = zbx_toHash($profile_fields, 'db_field');
-if($profile_mode != HOST_PROFILE_DISABLED){
-	foreach($profile_fields as $field => $caption){
+$inventory_fields = getHostInventories();
+$inventory_fields = zbx_toHash($inventory_fields, 'db_field');
+if($inventory_mode != HOST_INVENTORY_DISABLED){
+	foreach($inventory_fields as $field => $caption){
 		$caption = $caption['title'];
-		if(!isset($host_profile[$field])){
-			$host_profile[$field] = '';
+		if(!isset($host_inventory[$field])){
+			$host_inventory[$field] = '';
 		}
 
 		$frmHost->addRow(
@@ -235,12 +235,12 @@ if($profile_mode != HOST_PROFILE_DISABLED){
 				new CVisibilityBox(
 					'visible['.$field.']',
 					isset($visible[$field]),
-					'host_profile['.$field.']',
+					'host_inventory['.$field.']',
 					S_ORIGINAL
 				),
 				$caption
 			),
-			new CTextBox('host_profile['.$field.']', $host_profile[$field], 80)
+			new CTextBox('host_inventory['.$field.']', $host_inventory[$field], 80)
 		);
 	}
 }

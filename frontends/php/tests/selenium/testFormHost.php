@@ -27,13 +27,13 @@ class testFormHost extends CWebTest{
 	public function testFormHost_Layout(){
 		$this->login('hosts.php?form=1');
 
-		$this->click('link=Host profile');
+		$this->click('link=Host inventory');
 
-		$profileFields = getHostProfiles();
-		$profileFields = zbx_toHash($profileFields, 'db_field');
-		foreach($profileFields as $fieldId => $fieldName){
+		$inventoryFields = getHostInventories();
+		$inventoryFields = zbx_toHash($inventoryFields, 'db_field');
+		foreach($inventoryFields as $fieldId => $fieldName){
 			$this->ok($fieldName['title']);
-			$this->assertElementPresent('host_profile['.$fieldId.']');
+			$this->assertElementPresent('host_inventory['.$fieldId.']');
 		}
 	}
 
