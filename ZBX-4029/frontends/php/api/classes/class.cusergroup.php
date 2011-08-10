@@ -358,7 +358,7 @@ class CUserGroup extends CZBXAPI{
 				if(!empty($mass_add)){
 					$mass_add['usrgrpids'] = $usrgrpids[$gnum];
 					if(!$this->massAdd($mass_add))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add users'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add users.'));
 				}
 			}
 
@@ -390,7 +390,7 @@ class CUserGroup extends CZBXAPI{
 				$mass_update['usrgrpids'] = $usrgrp['usrgrpid'];
 				unset($mass_update['usrgrpid']);
 				if(!$this->massUpdate($mass_update))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update group'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update group.'));
 			}
 
 		return array('usrgrpids'=> $usrgrpids);
