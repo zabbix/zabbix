@@ -788,7 +788,6 @@
 	'S_DELETE_TEMPLATE_Q' => _('Delete template?'),
 	'S_DELETE_AND_CLEAR_TEMPLATE_Q' => _('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
 
-	'S_UPDATE_IN_GROUP'=>			_('Update in group'),
 	'S_TEMPLATE_LINKAGE'=>			_('Template linkage'),
 	'S_TEMPLATES'=>				_('Templates'),
 	'S_UNLINK'=>				_('Unlink'),
