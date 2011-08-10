@@ -1,5 +1,6 @@
 Changes for 1.8.7rc1
 
+ - [ZBX-3889] fixed deadlocks while processing triggers (Sasha)
  - [ZBX-4023] fixed excess spacing and fake plural in graph deletion message (Richlv)
  - [ZBX-4016] fixed item status on insert and update (Eduard)
  - [ZBX-3443] fixed trigger filter in Event (Eduard)
@@ -27,7 +28,6 @@ Changes for 1.8.6rc2
 
 Changes for 1.8.6rc1
 
- - [ZBX-3889] fixed deadlocks while processing triggers (Sasha)
  - [ZBX-3968] fixed issues with filtering in monitoring->events in Internet Explorer 7 (KB)
  - [ZBX-3469] fixed setting UNKNOWN trigger status when agent goes down (dimir)
  - [ZBX-3973] added logging of proxy mode (active/passive) at startup (rudolfs)
