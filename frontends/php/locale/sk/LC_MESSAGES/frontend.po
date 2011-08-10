@@ -1035,7 +1035,7 @@ msgstr ""
 msgid "Cannot delete graphs"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1504
+#: include/locales/en_gb.inc.php:1504 api/classes/class.chost.php:1833
 msgid "Cannot delete group"
 msgstr ""
 
@@ -1257,10 +1257,6 @@ msgstr ""
 #: include/db.inc.php:1285
 #, php-format
 msgid "Cannot perform update statement on table \"%s\" without where condition."
-msgstr ""
-
-#: api/classes/class.chost.php:1833
-msgid "Cannot delete group"
 msgstr ""
 
 #: api/classes/class.chost.php:1929 config.php:574
@@ -2779,10 +2775,6 @@ msgstr ""
 #: include/views/configuration.action.edit.php:373
 #: include/views/js/configuration.sysmaps.js.php:349
 msgid "Edit"
-msgstr ""
-
-#: include/locales/en_gb.inc.php:914
-msgid "Edit trigger"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1681
@@ -10315,6 +10307,9 @@ msgstr "yes"
 msgid "µ"
 msgstr "µ"
 
+#~ msgid "Edit trigger"
+#~ msgstr "Edit trigger"
+
 #~ msgid "15 min"
 #~ msgstr "15 min"
 
@@ -11388,9 +11383,6 @@ msgstr "µ"
 
 #~ msgid "IPMI port"
 #~ msgstr "IPMI port"
-
-#~ msgid "Edit trigger"
-#~ msgstr "Edit trigger"
 
 #~ msgid "(year"
 #~ msgstr "(year"

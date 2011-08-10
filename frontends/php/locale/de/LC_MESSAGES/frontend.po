@@ -1056,10 +1056,6 @@ msgstr ""
 msgid "Cannot delete graphs"
 msgstr "Kann Graphen nicht löschen"
 
-#: include/locales/en_gb.inc.php:1504
-msgid "Cannot delete group"
-msgstr "Kann Gruppe nicht löschen"
-
 #: hosts.php:620 hosts.php:648
 msgid "Cannot delete host"
 msgstr "Kann System nicht löschen"
@@ -1279,10 +1275,6 @@ msgstr "Update-Statement in Tabelle \"%s\" nicht ohne Werte möglich."
 #, php-format
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "Update-Statement in Tabelle \"%s\" nicht ohne Where-Klausel möglich."
-
-#: api/classes/class.chost.php:1833
-msgid "Cannot delete group"
-msgstr "Kann Gruppe nicht entfernen"
 
 #: api/classes/class.chost.php:1929 config.php:574
 msgid "Cannot remove macro"
