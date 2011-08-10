@@ -199,10 +199,10 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 			acknowledged = atoi(buffer);
 	}
 
-	return process_event(0, source, object, objectid, clock, value, acknowledged, 0);
+	return process_event(eventid, source, object, objectid, clock, value, acknowledged, 0);
 error:
 	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
-		CONFIG_NODEID, sender_nodeid, nodeid, record);
+			CONFIG_NODEID, sender_nodeid, nodeid, record);
 
 	return FAIL;
 }
