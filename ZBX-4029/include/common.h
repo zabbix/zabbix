@@ -535,9 +535,9 @@ typedef enum
 #define HOST_MAINTENANCE_STATUS_OFF	0
 #define HOST_MAINTENANCE_STATUS_ON	1
 
-/* host profile mode */
-#define HOST_PROFILE_MANUAL		0
-#define HOST_PROFILE_AUTOMATIC		1
+/* host inventory mode */
+#define HOST_INVENTORY_MANUAL		0
+#define HOST_INVENTORY_AUTOMATIC	1
 
 /* host availability */
 #define HOST_AVAILABLE_UNKNOWN	0

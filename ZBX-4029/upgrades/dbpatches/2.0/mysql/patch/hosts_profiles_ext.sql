@@ -1,1 +1,1 @@
--- see host_profile.sql
+-- see host_inventory.sql
