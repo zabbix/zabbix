@@ -1,4 +1,17 @@
 --------------------------------------------------------------------------------
+Changes for 1.9.6
+
+New features:
+ - [ZBX-1357] updated German, Latvian, Polish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+ - [ZBX-4010] fixed undefined constant SVC_SNMPv2 in discovery action conditions (Richlv)
+ - [ZBX-3775] fixed html formatting in Overview (Eduard)
+ - [ZBX-4001] fixed nearly duplicate strings, clarified error messages and removed obsolete translation strings (Richlv, sasha)
+ - [ZBX-4004] fixed typos in function names (Richlv)
+ - [ZBX-4002] fixed template name being reported as host name when incorrect characters were used (Richlv)
+
+--------------------------------------------------------------------------------
 Changes for 1.9.5
 
 New features:
@@ -175,16 +188,37 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 1.8.6rc2
+Changes for 1.8.7rc1
 
+ - [ZBX-4023] fixed excess spacing and fake plural in graph deletion message (Richlv)
+ - [ZBX-4016] fixed item status on insert and update (Eduard)
+ - [ZBX-3443] fixed trigger filter in Event (Eduard)
+ - [ZBX-3979] adding support searchWildcardsEnabled flag in API for searching using wildcards (Eduard)
+ - [ZBX-4018] fixed server crash on unsupported aggregate items (asaveljevs,Sasha)
+ - [ZBX-3908] allow empty string for formula field if multiplier is switched off (Eduard)
  - [ZBX-3961] added recalculation of nextcheck time after changed flexible intervals (rudolfs)
  - [ZBX-3978] fixed time period calculation, do not include upper bound (dimir,Sasha,KB)
+ - [ZBX-4000] fixed stop propagation in IE9 for Map (Eduard)
+ - [ZBX-2467] added more command line arguments to objdump to request more debugging information about crashes (asaveljevs)
+ - [ZBX-3972] added NOW and DONE buttons into js calendar - change action after day selection (Eduard)
+ - [ZBX-3993] fixed transmitting of templated user macros between server and proxy (Sasha)
+ - [ZBX-4008] updated Japanese translation; thanks to Kodai Terashima (Richlv)
+ - [ZBX-4005] updated French translation; thanks to Joseph Bueno (Richlv)
+ - [ZBXNEXT-869] clarify in manpages how the process for runtime signalling is found (Richlv)
 
---------------------------------------------------------------------------------
+Changes for 1.8.6
+
+1.8.6rc2 was released as 1.8.6 without any changes
+
+Changes for 1.8.6rc2
+
+ - [ZBX-3990] fixed exiting proxy and server on cache reload using runtime control options (rudolfs)
+ - [ZBX-3835] fixed possible security vulnerability in redirects (Vedmak)
+
 Changes for 1.8.6rc1
 
- - [ZBX-3469] fixed setting UNKNOWN trigger status when agent goes down (dimir)
  - [ZBX-3968] fixed issues with filtering in monitoring->events in Internet Explorer 7 (KB)
+ - [ZBX-3469] fixed setting UNKNOWN trigger status when agent goes down (dimir)
  - [ZBX-3973] added logging of proxy mode (active/passive) at startup (rudolfs)
  - [ZBX-3902] fixed possible zombie states in UNIX, moved watchdog (server) and heartbeats (proxy) to separate processes (main process just waits), added more logging to exiting Windows agent (rudolfs)
  - [ZBX-3166] fixed application updating in Template linking event. Changed linked Template color in application page. Added param NOEMPTY for popup page witch allows hide Empty button in application and item pages (Eduard)
@@ -236,6 +270,7 @@ Changes for 1.8.6rc1
  - [ZBX-3682] fixed import of map elements having empty label; thanks to Takanori Suzuki (Alexei)
  - [ZBX-3679] fixed incorrect "No nodes defined" when screen selection popup has no elements (Alexei)
  - [ZBX-3638] fixed displaying of vertical text in case of special HTML characters (Alexei)
+ - [ZBX-3582] fixed screen import (Vedmak)
  - [ZBX-3801] added check for duplicate template IDs when creating host through API (KB)
  - [ZBX-3802] fixed error when try to open custom screen from history link (Vedmak)
  - [ZBX-3794] added timeout support to vfs.file.* commands (dimir)

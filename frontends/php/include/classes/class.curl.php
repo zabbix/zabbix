@@ -195,6 +195,11 @@ class Curl{
 		$url = $this->protocol ? $this->protocol.'://' : '';
 		$url .= $this->username ? $this->username : '';
 		$url .= $this->password ? ':'.$this->password : '';
+
+		if($this->username || $this->password){
+			$url .= '@';
+		}
+
 		$url .= $this->host ? $this->host : '';
 		$url .= $this->port ? ':'.$this->port : '';
 		$url .= $this->path ? $this->path : '';

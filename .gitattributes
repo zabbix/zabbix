@@ -191,8 +191,7 @@ frontends/php/images/general/zabbix_od.png -text
 frontends/php/images/general/zabbix_unavailable.png -text
 frontends/php/images/general/zabbix_unknown.png -text
 frontends/php/images/general/zero.gif -text
-frontends/php/images/gradients/blink1.gif -text svneol=unset#unset
-frontends/php/images/gradients/blink2.gif -text svneol=unset#unset
+frontends/php/images/gradients/blink.gif -text svneol=unset#unset
 frontends/php/images/gradients/button.gif -text svneol=unset#unset
 frontends/php/images/gradients/gradient.png -text
 frontends/php/images/gradients/header_footer_blue.png -text svneol=unset#image/png
@@ -236,7 +235,6 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/views/administration.script.list.php -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
 frontends/php/locale/es/LC_MESSAGES/frontend.po -text

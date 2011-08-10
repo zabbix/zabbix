@@ -439,6 +439,7 @@ div.calendar{
 }
 div.calendartime{
 	background-color:#000E19;
+	height: 38px;
 }
 
 div.calendardays{

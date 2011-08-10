@@ -1,4 +1,4 @@
-.TH ZABBIX_PROXY 8 "5 July 2011"
+.TH ZABBIX_PROXY 8 "4 August 2011"
 .SH NAME
 zabbix_proxy \- Zabbix proxy daemon.
 .SH SYNOPSIS
@@ -18,6 +18,7 @@ Runtime control options
 .TP 4
 config_cache_reload
 Reload configuration cache. Ignored if cache is being currently loaded. Active Zabbix proxy will connect to the Zabbix server and request configuration data.
+Default configuration file (unless \fB-c\fR option is specified) will be used to find PID file and signal will be sent to process, listed in PID file.
 .RE
 .RE
 .IP "-h, --help"

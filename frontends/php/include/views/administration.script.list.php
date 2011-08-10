@@ -34,7 +34,7 @@
 	$form->setName('frm_scripts');
 	$form->setAttribute('id', 'scripts');
 
-	$table = new CTableInfo(_('No scripts defined'));
+	$table = new CTableInfo(_('No scripts defined.'));
 	$table->setHeader(array(
 		new CCheckBox('all_scripts', null, "checkAll('".$form->getName()."','all_scripts','scripts');"),
 		make_sorting_header(_('Name'), 'name'),
@@ -95,7 +95,6 @@
 			((PERM_READ_WRITE == $script['host_access']) ? _('Write') : _('Read'))
 		));
 	}
-
 
 
 //----- GO ------
