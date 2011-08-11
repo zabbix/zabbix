@@ -192,6 +192,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.7rc1
 
+ - [ZBX-3874] enable all triggers severities after clicking on GUI Messaging, in event when GUI Messaging was inactive (Eduard)
  - [ZBX-4023] fixed excess spacing and fake plural in graph deletion message (Richlv)
  - [ZBX-4016] fixed item status on insert and update (Eduard)
  - [ZBX-3443] fixed trigger filter in Event (Eduard)
