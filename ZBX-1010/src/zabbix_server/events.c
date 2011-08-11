@@ -35,8 +35,6 @@
  *             last_eventid - [OUT] last trigger identifier                   *
  *             last_value   - [OUT] last trigger value                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments: "UNKNOWN" events will be ignored                                 *
@@ -50,8 +48,7 @@ static void	get_latest_event_status(zbx_uint64_t triggerid,
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64,
-			__function_name, triggerid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __function_name, triggerid);
 
 	/* object and objectid are used for efficient */
 	/* sort by the same index as in where condition */
@@ -82,11 +79,8 @@ static void	get_latest_event_status(zbx_uint64_t triggerid,
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() last_eventid:" ZBX_FS_UI64
-			" last_value:%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() last_eventid:" ZBX_FS_UI64 " last_value:%d",
 			__function_name, *last_eventid, *last_value);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -97,11 +91,7 @@ static void	get_latest_event_status(zbx_uint64_t triggerid,
  *                                                                            *
  * Parameters: event - [IN] event data                                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	add_trigger_info(DB_EVENT *event)
@@ -116,8 +106,7 @@ static int	add_trigger_info(DB_EVENT *event)
 
 	if (EVENT_OBJECT_TRIGGER == event->object && 0 != event->objectid)
 	{
-		result = DBselect(
-				"select description,expression,priority,type"
+		result = DBselect("select description,expression,priority,type"
 				" from triggers"
 				" where triggerid=" ZBX_FS_UI64,
 				event->objectid);
@@ -144,7 +133,7 @@ static int	add_trigger_info(DB_EVENT *event)
 		 * if event->trigger.type is not TRIGGER_TYPE_MULTIPLE_TRUE:
 		 * (4)  TRUE  / TRUE	(TRUE/UNKNOWN/TRUE)
 		 */
-		if (event->value == TRIGGER_VALUE_UNKNOWN)	/* (1) */
+		if (TRIGGER_VALUE_UNKNOWN == event->value)	/* (1) */
 		{
 			event->skip_actions = 1;
 		}
@@ -172,13 +161,15 @@ static int	add_trigger_info(DB_EVENT *event)
 					(last_value == TRIGGER_VALUE_FALSE ||			/* (1) */
 					(event->trigger.type != TRIGGER_TYPE_MULTIPLE_TRUE &&	/* (2) */
 					last_value == TRIGGER_VALUE_TRUE)))
+			{
 				event->ack_eventid = last_eventid;
+			}
 		}
 
 		if (1 == event->skip_actions)
-			zabbix_log(LOG_LEVEL_DEBUG, "Skip actions");
+			zabbix_log(LOG_LEVEL_DEBUG, "skip actions");
 		if (0 != event->ack_eventid)
-			zabbix_log(LOG_LEVEL_DEBUG, "Copy acknowledges");
+			zabbix_log(LOG_LEVEL_DEBUG, "copy acknowledges");
 	}
 fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -195,11 +186,7 @@ fail:
  * Parameters: src_eventid - [IN] source event identifier from database       *
  *             dst_eventid - [IN] destination event identifier from database  *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	copy_acknowledges(zbx_uint64_t src_eventid, zbx_uint64_t dst_eventid)
@@ -216,8 +203,7 @@ static void	copy_acknowledges(zbx_uint64_t src_eventid, zbx_uint64_t dst_eventid
 			" dst_eventid:" ZBX_FS_UI64,
 			__function_name, src_eventid, dst_eventid);
 
-	result = DBselect(
-			"select acknowledgeid"
+	result = DBselect("select acknowledgeid"
 			" from acknowledges"
 			" where eventid=" ZBX_FS_UI64,
 			src_eventid);
@@ -278,44 +264,50 @@ out:
  *                                                                            *
  * Parameters: event - event data (event.eventid - new event)                 *
  *                                                                            *
- * Return value: SUCCESS - event added                                        *
+ * Return value: SUCCEED - event added                                        *
+ *               FAIL    - event not added                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-int	process_event(DB_EVENT *event, int force_actions)
+int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid, int clock,
+		int value, int acknowledged, int force_actions)
 {
 	const char	*__function_name = "process_event";
+	DB_EVENT	event;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " object:%d objectid:" ZBX_FS_UI64 " value:%d",
-			__function_name, event->eventid, event->object, event->objectid, event->value);
+			__function_name, eventid, object, objectid, value);
 
-	if (SUCCEED != add_trigger_info(event))
+	/* preparing event for processing */
+	memset(&event, 0, sizeof(DB_EVENT));
+	event.eventid = eventid;
+	event.source = source;
+	event.object = object;
+	event.objectid = objectid;
+	event.clock = clock;
+	event.value = value;
+	event.acknowledged = acknowledged;
+
+	if (SUCCEED != add_trigger_info(&event))
 		goto fail;
 
-	if (0 == event->eventid)
-		event->eventid = DBget_maxid("events");
+	if (0 == event.eventid)
+		event.eventid = DBget_maxid("events");
 
 	DBexecute("insert into events (eventid,source,object,objectid,clock,value)"
 			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d)",
-			event->eventid,
-			event->source,
-			event->object,
-			event->objectid,
-			event->clock,
-			event->value);
+			event.eventid, event.source, event.object, event.objectid, event.clock, event.value);
 
-	if (0 != event->ack_eventid)
-		copy_acknowledges(event->ack_eventid, event->eventid);
+	if (0 != event.ack_eventid)
+		copy_acknowledges(event.ack_eventid, event.eventid);
 
-	if (0 == event->skip_actions || 1 == force_actions)
-		process_actions(event);
+	if (0 == event.skip_actions || 1 == force_actions)
+		process_actions(&event);
 
-	if (event->object == EVENT_OBJECT_TRIGGER)
-		DBupdate_services(event->objectid, (TRIGGER_VALUE_TRUE == event->value) ? event->trigger.priority : 0, event->clock);
+	if (EVENT_OBJECT_TRIGGER == event.object)
+		DBupdate_services(event.objectid, (TRIGGER_VALUE_TRUE == event.value) ? event.trigger.priority : 0, event.clock);
 
 	ret = SUCCEED;
 fail:
