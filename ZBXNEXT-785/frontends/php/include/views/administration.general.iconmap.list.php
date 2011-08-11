@@ -22,20 +22,20 @@
 $table = new CTableInfo();
 $table->setHeader(array(_('Name'), _('Icon map')));
 
-foreach($this->data['iconmaps'] as $iconmap){
+foreach ($this->data['iconmaps'] as $iconmap) {
 	$mappings = $iconmap['mappings'];
 	order_result($mappings, 'sortorder');
 
 	$row = array();
-	foreach($mappings as $mapping){
+	foreach ($mappings as $mapping) {
 		$row[] = $this->data['inventoryList'][$mapping['inventory_link']] . ':'
-				. $mapping['expression'] . SPACE.RARR.SPACE . $this->data['iconList'][$mapping['iconid']];
+				. $mapping['expression'] . SPACE . RARR . SPACE . $this->data['iconList'][$mapping['iconid']];
 		$row[] = BR();
 	}
 	$table->addRow(array(
-		new CLink($iconmap['name'],'config.php?form=update&iconmapid='.$iconmap['iconmapid'].url_param('config')),
-		$row
-	));
+			new CLink($iconmap['name'], 'config.php?form=update&iconmapid=' . $iconmap['iconmapid'] . url_param('config')),
+			$row
+		));
 }
 
 return $table;

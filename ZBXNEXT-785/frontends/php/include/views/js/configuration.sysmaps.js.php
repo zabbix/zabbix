@@ -2,7 +2,7 @@
 	<div class="floatWindow" style="display: none;">
 		<form id="selementForm" name="selementForm">
 			<input type="hidden" id="elementid" name="elementid">
-			<table id="elementFormTable" class="formtable" style="width:100%">
+			<table id="elementFormTable" class="formtable" style="width:100%" rules="groups" frame="border">
 				<thead>
 				<tr class="header">
 					<td id="formDragHandler" colspan="2" class="form_row_first move"><?php echo _('Edit map element'); ?></td>
@@ -100,6 +100,9 @@
 						<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&excludeids[]=#{sysmapid}',450,450)"><?php echo _('Select'); ?></span>
 					</td>
 				</tr>
+				</tbody>
+
+				<tbody class="grouped">
 				<tr id="useIconMapRow">
 					<td><label for="use_iconmap" id=use_iconmapLabel><?php echo _('Automatic icon selection'); ?></label></td>
 					<td><input type="checkbox" name="use_iconmap" id="use_iconmap" class="checkbox"></td>
@@ -129,6 +132,9 @@
 						</select>
 					</td>
 				</tr>
+				</tbody>
+
+				<tbody>
 				<tr>
 					<td><label for="x"><?php echo _('Coordinate X'); ?></label></td>
 					<td><input id="x" maxlength="5" value="0" size="5" name="x" class="input"></td>

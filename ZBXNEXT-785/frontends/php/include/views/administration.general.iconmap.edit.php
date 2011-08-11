@@ -33,8 +33,8 @@ $iconMapTable->setAttribute('id', 'iconMapTable');
 $iconMapForm = new CForm();
 $iconMapForm->addVar('form', 1);
 $iconMapForm->addVar('config', 14);
-if(isset($this->data['iconmap']['iconmapid'])){
-	$iconMapForm->addVar('iconmap[iconmapid]', $this->data['iconmap']['iconmapid']);
+if (isset($this->data['iconmapid'])) {
+	$iconMapForm->addVar('iconmapid', $this->data['iconmap']['iconmapid']);
 }
 
 
@@ -43,7 +43,7 @@ $iconMapTable->addRow(array(SPACE, SPACE, _('Inventory field'), _('Expression'),
 
 order_result($this->data['iconmap']['mappings'], 'sortorder');
 $i = 1;
-foreach($this->data['iconmap']['mappings'] as $iconmappingid => $mapping){
+foreach ($this->data['iconmap']['mappings'] as $iconmappingid => $mapping) {
 	$numSpan = new CSpan($i++ . ':');
 	$numSpan->addClass('rowNum');
 
@@ -129,10 +129,10 @@ $iconPreviewImage->addClass('pointer preview');
 $col = new CCol(_('Default'));
 $col->setColSpan(4);
 $iconMapTable->addRow(array(
-		$col,
-		$iconsComboBox,
-		$iconPreviewImage,
-	));
+	$col,
+	$iconsComboBox,
+	$iconPreviewImage,
+));
 // </default icon row>
 
 $iconMapTab->addRow(_('Mappings'), new CDiv($iconMapTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
@@ -142,14 +142,15 @@ $iconMapForm->addItem($iconMapView);
 
 
 // Footer
-$footer = makeFormFooter(
-	array(new CSubmit('save', _('Save'))),
-	array(
+$secondaryActions = array(new CButtonCancel(url_param('config')));
+if (isset($this->data['iconmapid'])) {
+	array_unshift($secondaryActions,
 		new CSubmit('clone', _('Clone')),
-		new CButtonDelete(_('Delete icon map?'), url_param('form').url_param('iconmapid').url_param('config')),
-		new CButtonCancel(url_param('config')),
-	)
-);
+		new CButtonDelete(_('Delete icon map?'), url_param('form') . url_param('iconmapid') . url_param('config'))
+	);
+}
+$footer = makeFormFooter(array(new CSubmit('save', _('Save'))), $secondaryActions);
+
 $iconMapForm->addItem($footer);
 
 

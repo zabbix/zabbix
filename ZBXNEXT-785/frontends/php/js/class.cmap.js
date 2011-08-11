@@ -1125,7 +1125,7 @@ ZABBIX.apps.map = (function(){
 
 
 			if(this.sysmap.data.iconmapid === '0'){
-				jQuery('#asd')
+				jQuery('#use_iconmapLabel')
 					.mouseenter(function(){
 						hintBox.showOver(this, locale['S_ICONMAP_IS_NOT_ENABLED']);
 					})

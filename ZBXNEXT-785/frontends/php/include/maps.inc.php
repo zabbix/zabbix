@@ -296,34 +296,32 @@ function MyDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype){
 	}
 }
 
-function get_png_by_selement($selement, $info){
-
-	switch($info['icon_type']){
-		case SYSMAP_ELEMENT_ICON_ON:
-			$info['iconid'] = $selement['iconid_on'];
-			break;
-		case SYSMAP_ELEMENT_ICON_MAINTENANCE:
-			$info['iconid'] = $selement['iconid_maintenance'];
-			break;
-		case SYSMAP_ELEMENT_ICON_DISABLED:
-			$info['iconid'] = $selement['iconid_disabled'];
-			break;
-		case SYSMAP_ELEMENT_ICON_OFF:
-		default:
-// element image
-			$info['iconid'] = $selement['iconid_off'];
-			break;
-	}
+function get_png_by_selement($selement, $info) {
+//	switch ($info['icon_type']) {
+//		case SYSMAP_ELEMENT_ICON_ON:
+//			$info['iconid'] = $selement['iconid_on'];
+//			break;
+//		case SYSMAP_ELEMENT_ICON_MAINTENANCE:
+//			$info['iconid'] = $selement['iconid_maintenance'];
+//			break;
+//		case SYSMAP_ELEMENT_ICON_DISABLED:
+//			$info['iconid'] = $selement['iconid_disabled'];
+//			break;
+//		case SYSMAP_ELEMENT_ICON_OFF:
+//			/* falls through */
+//		default:
+//			$info['iconid'] = $selement['iconid_off'];
+//			break;
+//	}
 
 	// Process for default icons
-	if($info['iconid'] == 0){
-		$info['iconid'] = $selement['iconid_off'];
-	}
-	//------
+//	if ($info['iconid'] == 0) {
+//		$info['iconid'] = $selement['iconid_off'];
+//	}
 
 	$image = get_image_by_imageid($info['iconid']);
 
-	if(!$image){
+	if (!$image) {
 		return get_default_image(true);
 	}
 
@@ -701,6 +699,10 @@ function getTriggersInfo($selement, $i){
 		);
 	}
 
+	if ($info['iconid'] == 0) {
+		$info['iconid'] = $selement['iconid_off'];
+	}
+
 	return $info;
 }
 
@@ -776,6 +778,10 @@ function getHostsInfo($selement, $i, $show_unack){
 			'msg' => S_OK_BIG,
 			'color' => $colors['Dark Green'],
 		);
+	}
+
+	if ($info['iconid'] == 0) {
+		$info['iconid'] = $selement['iconid_off'];
 	}
 
 	return $info;
@@ -862,6 +868,11 @@ function getHostGroupsInfo($selement, $i, $show_unack){
 			'color' => $colors['Dark Green'],
 		);
 	}
+
+	if ($info['iconid'] == 0) {
+		$info['iconid'] = $selement['iconid_off'];
+	}
+
 	return $info;
 }
 
@@ -945,6 +956,10 @@ function getMapsInfo($selement, $i, $show_unack){
 			'msg' => S_OK_BIG,
 			'color' => $colors['Dark Green'],
 		);
+	}
+
+	if ($info['iconid'] == 0) {
+		$info['iconid'] = $selement['iconid_off'];
 	}
 
 	return $info;
