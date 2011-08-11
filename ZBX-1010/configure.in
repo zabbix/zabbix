@@ -402,15 +402,6 @@ AC_DEFINE(HAVE_SENSORDEV,1,[Define to 1 if struct 'sensordev' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
-AC_MSG_CHECKING(for field ss_family in struct sockaddr_storage)
-AC_TRY_COMPILE([#include <sys/socket.h>],
-[struct sockaddr_storage ss;
-ss.ss_family = 0;
-],
-AC_DEFINE(HAVE_SOCKADDR_STORAGE_SS_FAMILY, 1, [Define to 1 if 'sockaddr_storage.ss_family' exists.])
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
-
 AC_MSG_CHECKING(for struct statvfs64 in sys/statvfs.h)
 AC_TRY_COMPILE(
 [
@@ -427,6 +418,15 @@ AC_TRY_COMPILE(
 	statvfs64("/", &s);
 ],
 AC_DEFINE(HAVE_SYS_STATVFS64, 1, [Define to 1 if struct 'statvfs64' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for field ss_family in struct sockaddr_storage)
+AC_TRY_COMPILE([#include <sys/socket.h>],
+[struct sockaddr_storage ss;
+ss.ss_family = 0;
+],
+AC_DEFINE(HAVE_SOCKADDR_STORAGE_SS_FAMILY, 1, [Define to 1 if 'sockaddr_storage.ss_family' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
