@@ -192,6 +192,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.7rc1
 
+ - [ZBX-1010] fixed processing of a vfs.fs.size metric on Solaris with filesystems more than 2TB (Sasha)
  - [ZBX-3874] enable all triggers severities after clicking on GUI Messaging, in event when GUI Messaging was inactive (Eduard)
  - [ZBX-4023] fixed excess spacing and fake plural in graph deletion message (Richlv)
  - [ZBX-4016] fixed item status on insert and update (Eduard)
