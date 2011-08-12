@@ -44,6 +44,7 @@ typedef struct
 	unsigned char	h_status[MAX_COLLECTOR_HISTORY];
 	int		h_first;
 	int		h_count;
+	int		cpu_num;
 }
 ZBX_SINGLE_CPU_STAT_DATA;
 
