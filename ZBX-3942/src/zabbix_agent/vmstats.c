@@ -108,6 +108,9 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		return;
 	}
 
+	if (0 == last_clock)
+		last_clock = (int)((double)cpustats.lbolt / 100);
+
 	if (now > last_clock)
 	{
 		/* --- kthr --- */
