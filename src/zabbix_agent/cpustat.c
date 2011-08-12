@@ -32,13 +32,18 @@ static ZBX_MUTEX	cpustats_lock;
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 	const char			*__function_name = "init_cpu_collector";
-	int				ret = FAIL;
+	int				cpu_num, ret = FAIL;
 #ifdef _WINDOWS
 	TCHAR				cpu[8];
 	char				counterPath[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
-	int				cpu_num;
+#else
+#ifdef HAVE_KSTAT_H
+	kstat_ctl_t			*kc;
+	kstat_t				*k, *kd;
 #endif
+#endif
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifdef _WINDOWS
@@ -81,6 +86,30 @@ clean:
 		zbx_error("unable to create mutex for cpu collector");
 		exit(FAIL);
 	}
+
+	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
+		pcpus->cpu[cpu_num].cpu_num = cpu_num;
+
+#ifdef HAVE_KSTAT_H
+	/* Solaris */
+
+	if (NULL != (kc = kstat_open()))
+	{
+		if (NULL != (k = kstat_lookup(kc, "unix", 0, "kstat_headers")) && -1 != kstat_read(kc, k, NULL))
+		{
+			int     i;
+
+			for (i = 0, cpu_num = 1; i < k->ks_ndata; i++)
+			{
+				kd = (kstat_t *)k->ks_data;
+				if (0 == strcmp(kd[i].ks_module, "cpu_info"))
+					pcpus->cpu[cpu_num++].cpu_num = kd[i].ks_instance + 1;
+			}
+		}
+
+		kstat_close(kc);
+	}
+#endif	/* HAVE_KSTAT_H */
 
 	ret = SUCCEED;
 #endif	/* _WINDOWS */
@@ -312,7 +341,8 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 	for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
 	{
-		if (NULL == (k = kstat_lookup(kc, "cpu_stat", cpu_num - 1, NULL)) || -1 == kstat_read(kc, k, NULL))
+		if (NULL == (k = kstat_lookup(kc, "cpu_stat", pcpus->cpu[cpu_num].cpu_num - 1, NULL)) ||
+				-1 == kstat_read(kc, k, NULL))
 		{
 			update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
 			continue;
@@ -435,6 +465,20 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 	update_cpustats(pcpus);
 }
 
+static ZBX_SINGLE_CPU_STAT_DATA	*get_cpustat_by_num(ZBX_CPUS_STAT_DATA *pcpus, int cpu_num)
+{
+	int	i;
+
+	for (i = 0; i <= pcpus->count; i++)
+		if (pcpus->cpu[i].cpu_num == cpu_num)
+			break;
+
+	if (i <= pcpus->count)
+		return &pcpus->cpu[i];
+
+	return NULL;
+}
+
 int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 {
 	int				i, time, idx_curr, idx_base;
@@ -465,10 +509,8 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (0 > cpu_num || cpu_num > collector->cpus.count)
+	if (NULL == (cpu = get_cpustat_by_num(&collector->cpus, cpu_num)))
 		return SYSINFO_RET_FAIL;
-
-	cpu = &collector->cpus.cpu[cpu_num];
 
 	if (0 == cpu->h_count)
 	{
