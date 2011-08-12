@@ -906,8 +906,8 @@ msgid "Cannot add item"
 msgstr "Kan item niet toevoegen"
 
 #: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
-msgid "Cannot add macro"
-msgstr "Kan macro niet toevoegen"
+msgid "Cannot add macro."
+msgstr "Kan macro niet toevoegen."
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot add maintenance"
@@ -1229,8 +1229,8 @@ msgid "Cannot logout."
 msgstr ""
 
 #: api/classes/class.chost.php:1733
-msgid "Cannot mass update host name"
-msgstr "Kan de hostnaam niet in bulk bijwerken"
+msgid "Cannot mass update host name."
+msgstr "Kan de hostnaam niet in bulk bijwerken."
 
 #: api/classes/class.ctemplate.php:1375
 msgid "Cannot mass update template name"
@@ -1265,8 +1265,8 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
 #: api/classes/class.chost.php:1930 config.php:574
-msgid "Cannot remove macro"
-msgstr "Kan macro niet verwijderen"
+msgid "Cannot remove macro."
+msgstr "Kan macro niet verwijderen."
 
 #: include/locales/en_gb.inc.php:1929
 msgid "Cannot rename guest user"
@@ -1378,12 +1378,12 @@ msgstr "Kan item niet bijwerken"
 
 #: api/classes/class.chost.php:1937 api/classes/class.ctemplate.php:1579
 #: config.php:579
-msgid "Cannot update macro"
-msgstr "Kan macro niet bijwerken"
+msgid "Cannot update macro."
+msgstr "Kan macro niet bijwerken."
 
 #: include/locales/en_gb.inc.php:692
-msgid "Cannot update macros"
-msgstr "Kan macros niet bijwerken"
+msgid "Cannot update macros."
+msgstr "Kan macros niet bijwerken."
 
 #: include/locales/en_gb.inc.php:611
 msgid "Cannot update maintenance"

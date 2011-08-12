@@ -903,8 +903,8 @@ msgid "Cannot add item"
 msgstr "Cannot add item"
 
 #: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
-msgid "Cannot add macro"
-msgstr "Cannot add macro"
+msgid "Cannot add macro."
+msgstr "Cannot add macro."
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot add maintenance"
