@@ -64,7 +64,7 @@ include_once('include/page_header.php');
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
 		// GUI
-		'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),		'isset({config})&&({config}==8)&&isset({save})'),
+		'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
 		'event_expire'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'event_show_max'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'dropdown_first_entry'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1,2'),		'isset({config})&&({config}==8)&&isset({save})'),
@@ -1049,6 +1049,9 @@ include_once('include/page_header.php');
 			$data['config']['event_expire'] = get_request('event_expire');
 			$data['config']['event_show_max'] = get_request('event_show_max');
 		}
+		else{
+			$data['config'] = select_config(false);
+		}
 
 		$guiForm = new CView('administration.general.gui.edit', $data);
 		$cnf_wdgt->addItem($guiForm->render());
@@ -1216,6 +1219,9 @@ include_once('include/page_header.php');
 			$data['config']['severity_color_4'] = get_request('severity_color_4', '');
 			$data['config']['severity_name_5'] = get_request('severity_name_5');
 			$data['config']['severity_color_5'] = get_request('severity_color_5', '');
+		}
+		else{
+			$data['config'] = select_config(false);
 		}
 
 		$triggerSeverityForm = new CView('administration.general.triggerSeverity.edit', $data);
