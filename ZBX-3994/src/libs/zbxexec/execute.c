@@ -120,7 +120,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	const char	*__function_name = "zbx_popen";
 	int		fd[2];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:'%s'", __function_name, command);
+	zabbix_log(LOG_LEVEL_ERR, "In %s() command:'%s'", __function_name, command);
 
 	if (-1 == pipe(fd))
 		return -1;
@@ -136,7 +136,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 	{
 		close(fd[1]);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, fd[0]);
+		zabbix_log(LOG_LEVEL_ERR, "End of %s():%d child:%d", __function_name, fd[0], *pid);
 
 		return fd[0];
 	}
@@ -154,7 +154,7 @@ static int	zbx_popen(pid_t *pid, const char *command)
 		exit(0);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): executing script", __function_name);
+	zabbix_log(LOG_LEVEL_ERR, "%s(): executing script, parent:%d [%s]", __function_name, getppid(), command);
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
 
@@ -182,7 +182,7 @@ static int	zbx_waitpid(pid_t pid)
 	const char	*__function_name = "zbx_waitpid";
 	int		rc, status;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_ERR, "In %s()", __function_name);
 
 	do
 	{
@@ -200,7 +200,7 @@ retry:
 		if (-1 == (rc = waitpid(pid, &status, WUNTRACED)))
 		{
 #endif
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() waitpid failure: %s", __function_name, zbx_strerror(errno));
+			zabbix_log(LOG_LEVEL_ERR, "%s() waitpid failure: %s", __function_name, zbx_strerror(errno));
 			goto exit;
 		}
 
@@ -217,7 +217,7 @@ retry:
 	}
 	while (!WIFEXITED(status) && !WIFSIGNALED(status));
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
+	zabbix_log(LOG_LEVEL_ERR, "End of %s():%d", __function_name, rc);
 
 	return rc;
 }
@@ -409,6 +409,8 @@ close:
 
 		close(fd);
 
+zabbix_log(LOG_LEVEL_ERR, "before usleep(0.5 secs)");
+usleep(500 * 1000);	/* 0.5 seconds */
 		if (-1 == rc || -1 == zbx_waitpid(pid))
 		{
 			if (EINTR == errno)
@@ -440,6 +442,7 @@ close:
 	if (SUCCEED != ret && NULL != buffer)
 		zbx_free(*buffer);
 
+zabbix_log(LOG_LEVEL_ERR, "End of zbx_execute()");
 	return ret;
 }
 
