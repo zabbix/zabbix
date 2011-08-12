@@ -492,10 +492,6 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
  *                                                                            *
  * Purpose: Start transaction                                                 *
  *                                                                            *
- * Parameters: -                                                              *
- *                                                                            *
- * Return value: -                                                            *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Do nothing if DB does not support transactions                   *
@@ -547,10 +543,6 @@ int	zbx_db_begin()
  *                                                                            *
  * Purpose: Commit transaction                                                *
  *                                                                            *
- * Parameters: -                                                              *
- *                                                                            *
- * Return value: -                                                            *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Do nothing if DB does not support transactions                   *
@@ -598,10 +590,6 @@ int	zbx_db_commit()
  * Function: zbx_db_rollback                                                  *
  *                                                                            *
  * Purpose: Rollback transaction                                              *
- *                                                                            *
- * Parameters: -                                                              *
- *                                                                            *
- * Return value: -                                                            *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -775,17 +763,17 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	err = OCIHandleAlloc( (dvoid *) oracle.envhp, (dvoid **) &stmthp,
 		OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0);
 
-	if (err == OCI_SUCCESS) {
+	if (OCI_SUCCESS == err) {
 		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql,
 			(ub4) strlen((char *) sql),
 			(ub4) OCI_NTV_SYNTAX, (ub4) OCI_DEFAULT);
 	}
 
-	if (err == OCI_SUCCESS) {
+	if (OCI_SUCCESS == err) {
 		err = OCIStmtExecute(oracle.svchp, stmthp, oracle.errhp, (ub4) 1, (ub4) 0,
 			(CONST OCISnapshot *) NULL, (OCISnapshot *) NULL, OCI_COMMIT_ON_SUCCESS);
 
-		if (err == OCI_SUCCESS) {
+		if (OCI_SUCCESS == err) {
 			ub4 nrows = 0;
 
 			err = OCIAttrGet((void *)stmthp, OCI_HTYPE_STMT, (ub4 *)&nrows,
@@ -883,9 +871,16 @@ lbl_exec:
 	return ret;
 }
 
-/*
- * Execute SQL statement. For select statements only.
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_vselect                                                   *
+ *                                                                            *
+ * Purpose: execute a select statement                                        *
+ *                                                                            *
+ * Return value: data, NULL (on error) or (DB_RESULT)ZBX_DB_DOWN              *
+ *                                                                            *
+ ******************************************************************************/
+
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 {
 	char		*sql = NULL;
@@ -910,7 +905,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
+	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
 #if defined(HAVE_IBM_DB2)
 	result = zbx_malloc(result, sizeof(ZBX_IBM_DB2_RESULT));
@@ -1000,41 +995,31 @@ error:
 	result = zbx_malloc(NULL, sizeof(ZBX_OCI_DB_RESULT));
 	memset(result, 0, sizeof(ZBX_OCI_DB_RESULT));
 
-	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp,
-		OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
+	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
-	if (err == OCI_SUCCESS)
+	if (OCI_SUCCESS == err)
 	{
-		err = OCIStmtPrepare(result->stmthp, oracle.errhp, (text *)sql,
-			(ub4)strlen((char *)sql),
-			(ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
+		err = OCIStmtPrepare(result->stmthp, oracle.errhp, (text *)sql, (ub4)strlen((char *)sql),
+				(ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
 	}
 
-	if (err == OCI_SUCCESS)
+	if (OCI_SUCCESS == err)
 	{
 		err = OCIStmtExecute(oracle.svchp, result->stmthp, oracle.errhp, (ub4)0, (ub4)0,
-			(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS);
-		/*
-		if (err == OCI_NO_DATA)
-		{
-			OCI_DBfree_result(result);
-			result = NULL;
-			err = OCI_SUCCESS;
-		}
-		*/
+				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS);
 	}
 
-	if (err == OCI_SUCCESS)
+	if (OCI_SUCCESS == err)
 	{
-		/* Get the number of columns in the query */
+		/* get the number of columns in the query */
 		err = OCIAttrGet((void *)result->stmthp, OCI_HTYPE_STMT, (void *)&result->ncolumn,
 				  (ub4 *)0, OCI_ATTR_PARAM_COUNT, oracle.errhp);
 	}
 
-	if (err != OCI_SUCCESS)
+	if (OCI_SUCCESS != err)
 		goto error;
 
-	assert(result->ncolumn > 0);
+	assert(0 < result->ncolumn);
 
 	result->values = zbx_malloc(NULL, result->ncolumn * sizeof(char *));
 	memset(result->values, 0, result->ncolumn * sizeof(char *));
@@ -1046,35 +1031,32 @@ error:
 		ub4		char_semantics;
 		ub2		col_width;
 
-		/* Request a parameter descriptor in the select-list */
-		err = OCIParamGet((void *)result->stmthp, OCI_HTYPE_STMT, oracle.errhp,
-			(void **)&parmdp, (ub4)counter);
+		/* request a parameter descriptor in the select-list */
+		err = OCIParamGet((void *)result->stmthp, OCI_HTYPE_STMT, oracle.errhp, (void **)&parmdp, (ub4)counter);
 
-		if (err == OCI_SUCCESS)
+		if (OCI_SUCCESS == err)
 		{
-			/* Retrieve the length semantics for the column */
+			/* retrieve the length semantics for the column */
 			char_semantics = 0;
 			err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM,
 				(void *)&char_semantics, (ub4 *)0, (ub4)OCI_ATTR_CHAR_USED,
 				(OCIError *)oracle.errhp);
 		}
 
-		if (err == OCI_SUCCESS)
+		if (OCI_SUCCESS == err)
 		{
 			col_width = 0;
 			if (char_semantics)
 			{
-				/* Retrieve the column width in characters */
-				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM,
-					(void *)&col_width, (ub4 *)0, (ub4)OCI_ATTR_CHAR_SIZE,
-					(OCIError *)oracle.errhp);
+				/* retrieve the column width in characters */
+				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width, (ub4 *)0,
+					(ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
 			}
 			else
 			{
-				/* Retrieve the column width in bytes */
-				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM,
-					(void *)&col_width,(ub4 *)0, (ub4)OCI_ATTR_DATA_SIZE,
-					(OCIError *)oracle.errhp);
+				/* retrieve the column width in bytes */
+				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,(ub4 *)0,
+						(ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
 			}
 		}
 		col_width++;
@@ -1082,7 +1064,7 @@ error:
 		result->values[counter - 1] = zbx_malloc(NULL, col_width);
 		memset(result->values[counter - 1], 0, col_width);
 
-		if (err == OCI_SUCCESS)
+		if (OCI_SUCCESS == err)
 		{
 			/* represent any data as characters */
 			err = OCIDefineByPos(result->stmthp, &defnp, oracle.errhp, counter,
@@ -1096,7 +1078,7 @@ error:
 	}
 
 error:
-	if (err != OCI_SUCCESS)
+	if (OCI_SUCCESS != err)
 	{
 		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
 
@@ -1170,7 +1152,7 @@ lbl_get_table:
 	{
 		sec = zbx_time() - sec;
 		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
-			zabbix_log(LOG_LEVEL_WARNING, "Slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
+			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
 	zbx_free(sql);
@@ -1199,11 +1181,17 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 {
 #if defined(HAVE_IBM_DB2)
 	int	i;
+#elif defined(HAVE_ORACLE)
+	sword		rc;
+	static char	errbuf[512];
+	sb4		errcode;
+#endif
 
 	if (NULL == result)
 		return NULL;
 
-	if (SUCCEED != zbx_ibm_db2_success(SQLFetch(result->hstmt))) /* e.g., SQL_NO_DATA_FOUND */
+#if defined(HAVE_IBM_DB2)
+	if (SUCCEED != zbx_ibm_db2_success(SQLFetch(result->hstmt)))	/* e.g., SQL_NO_DATA_FOUND */
 		return NULL;
 
 	for (i = 0; i < result->ncolumn; i++)
@@ -1213,18 +1201,8 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return result->values;
 #elif defined(HAVE_MYSQL)
-	if (NULL == result)
-		return NULL;
-
 	return mysql_fetch_row(result);
 #elif defined(HAVE_ORACLE)
-	sword		rc;
-	static char	errbuf[512];
-	sb4		errcode;
-
-	if (NULL == result)
-		return NULL;
-
 	if (OCI_NO_DATA == (rc = OCIStmtFetch2(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)))
 		return NULL;
 
@@ -1248,10 +1226,6 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return result->values;
 #elif defined(HAVE_POSTGRESQL)
-	/* EOF */
-	if (NULL == result)
-		return NULL;
-
 	/* free old data */
 	if (NULL != result->values)
 		zbx_free(result->values);
@@ -1278,7 +1252,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			else
 			{
 				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
-				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID) /* binary data type BYTEAOID */
+				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID)	/* binary data type BYTEAOID */
 					zbx_pg_unescape_bytea((u_char *)result->values[i]);
 			}
 		}
@@ -1289,17 +1263,13 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 	return result->values;
 #elif defined(HAVE_SQLITE3)
 	/* EOF */
-	if (NULL == result)
-		return NULL;
-
-	/* EOF */
 	if (result->curow >= result->nrow)
 		return NULL;
 
 	if (NULL == result->data)
 		return NULL;
 
-	result->curow++; /* NOTE: first row == header row */
+	result->curow++;	/* NOTE: first row == header row */
 
 	return &(result->data[result->curow * result->ncolumn]);
 #endif

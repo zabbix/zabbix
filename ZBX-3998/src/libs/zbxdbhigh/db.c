@@ -105,11 +105,11 @@ void	DBinit()
  *                                                                            *
  * Function: DBbegin                                                          *
  *                                                                            *
- * Purpose: Start transaction                                                 *
+ * Purpose: start a transaction                                               *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing if DB does not support transactions                   *
+ * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBbegin()
@@ -233,10 +233,36 @@ DB_ROW	DBfetch(DB_RESULT result)
 	return zbx_db_fetch(result);
 }
 
-/*
- * Execute SQL statement. For select statements only.
- * If fails, program terminates.
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: DBselect_once                                                    *
+ *                                                                            *
+ * Purpose: execute a select statement only once                              *
+ *                                                                            *
+ ******************************************************************************/
+DB_RESULT	__zbx_DBselect_once(const char *fmt, ...)
+{
+	va_list		args;
+	DB_RESULT	rc;
+
+	va_start(args, fmt);
+
+	rc = zbx_db_vselect(fmt, args);
+
+	va_end(args);
+
+	return rc;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBselect                                                         *
+ *                                                                            *
+ * Purpose: execute a select statement                                        *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
 DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 {
 	va_list		args;
@@ -265,10 +291,15 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 	return rc;
 }
 
-/*
- * Execute SQL statement. For select statements only.
- * If fails, program terminates.
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: DBselectN                                                        *
+ *                                                                            *
+ * Purpose: execute a select statement and get the first N entries            *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
 DB_RESULT	DBselectN(const char *query, int n)
 {
 	DB_RESULT rc;

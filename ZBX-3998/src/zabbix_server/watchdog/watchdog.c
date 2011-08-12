@@ -95,11 +95,12 @@ static void	sync_config()
 	DB_RESULT	result;
 	DB_ROW		row;
 	ZBX_RECIPIENT	*recipient;
-	int		count = 0, new_count;
+	int		count = 0, old_count;
+	static int	no_recipients = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select mt.mediatypeid,mt.type,mt.description,"
+	result = DBselect_once("select mt.mediatypeid,mt.type,mt.description,"
 				"mt.smtp_server,mt.smtp_helo,mt.smtp_email,"
 				"mt.exec_path,mt.gsm_modem,"
 				"mt.username,mt.passwd,m.sendto"
@@ -109,6 +110,15 @@ static void	sync_config()
 					" and m.mediatypeid=mt.mediatypeid"
 					" and m.active=%d",
 				MEDIA_STATUS_ACTIVE);
+
+	if (NULL == result || (DB_RESULT)ZBX_DB_DOWN == result)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Watchdog: Database is down");
+		send_alerts();
+		goto exit;
+	}
+
+	old_count = recipients.values_num;
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -141,9 +151,20 @@ static void	sync_config()
 	}
 	DBfree_result(result);
 
-	new_count = count;
+	if (0 < old_count && 0 == count)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Watchdog: no users will receive database down messages");
+		no_recipients = 1;
+	}
+	else if (1 == no_recipients && 0 < count)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "Watchdog: %d user(s) will receive database down messages", count);
+		no_recipients = 0;
+	}
 
-	while (count < recipients.values_num)
+	recipients.values_num = count;
+
+	while (count < old_count)
 	{
 		recipient = recipients.values[count++];
 
@@ -160,9 +181,7 @@ static void	sync_config()
 
 		zbx_free(recipient);
 	}
-
-	recipients.values_num = new_count;
-
+exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values_num:%d", __function_name, recipients.values_num);
 }
 

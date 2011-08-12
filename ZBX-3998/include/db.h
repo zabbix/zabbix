@@ -81,9 +81,6 @@ typedef enum {
 #define	ZBX_DB_CONNECT_EXIT	1
 #define	ZBX_DB_CONNECT_ONCE	2
 
-#define DB_FULL_DELETE	0
-#define DB_PART_DELETE	1
-
 /* Trigger related defines */
 #define TRIGGER_DESCRIPTION_LEN		1020
 #define TRIGGER_DESCRIPTION_LEN_MAX	TRIGGER_DESCRIPTION_LEN+1
@@ -524,10 +521,13 @@ void	DBvacuum();
 int	__zbx_DBexecute(const char *fmt, ...);
 
 #ifdef HAVE___VA_ARGS__
-#	define DBselect(fmt, ...) __zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define DBselect_once(fmt, ...)	__zbx_DBselect_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define DBselect(fmt, ...)	__zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
-#	define DBselect __zbx_DBselect
+#	define DBselect_once	__zbx_DBselect_once
+#	define DBselect		__zbx_DBselect
 #endif
+DB_RESULT	__zbx_DBselect_once(const char *fmt, ...);
 DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
 DB_RESULT	DBselectN(const char *query, int n);
