@@ -985,6 +985,16 @@ function getSelementsInfo($sysmap){
 	$hostgroups_map = array();
 	$hosts_map = array();
 
+	if ($sysmap['sysmapid']) {
+		$iconMap = API::IconMap()->get(array(
+			'sysmapids' => $sysmap['sysmapid'],
+			'selectMappings' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		$iconMap = reset($iconMap);
+		$hostsToGetProfiles = array();
+	}
+
 	$selements = zbx_toHash($sysmap['selements'], 'selementid');
 	foreach($selements as $selementid => $selement){
 		$selements[$selementid]['hosts'] = array();
@@ -1030,6 +1040,12 @@ function getSelementsInfo($sysmap){
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST:
 				$hosts_map[$selement['elementid']][$selement['selementid']] = $selement['selementid'];
+
+				// if we have icon map applied, we need to get profiles for all hosts,
+				// where automatic icon selection is enabled.
+				if ($sysmap['iconmapid'] && $selement['use_iconmap']) {
+					$hostsToGetProfiles[] = $selement['elementid'];
+				}
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$triggers_map[$selement['elementid']][$selement['selementid']] = $selement['selementid'];
@@ -1039,6 +1055,18 @@ function getSelementsInfo($sysmap){
 
 
 	// get hosts data {{{
+
+	if ($sysmap['iconmapid']) {
+		$options = array(
+			'hostids' => $hostsToGetProfiles,
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => true,
+			'preservekeys' => true,
+			'selectProfile' => true,
+		);
+		$hostInventories = API::Host()->get($options);
+	}
+
 	$all_hosts = array();
 	if(!empty($hosts_map)){
 		$options = array(
@@ -1251,6 +1279,10 @@ function getSelementsInfo($sysmap){
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST:
 				$info[$selementid] = getHostsInfo($selement, $i, $show_unack);
+
+				if ($sysmap['iconmapid'] && $selement['use_iconmap']) {
+					$info[$selementid]['iconid'] = getIconByMapping($iconMap, $hostInventories[$selement['elementid']]);
+				}
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$info[$selementid] = getTriggersInfo($selement, $i);
@@ -2354,6 +2386,36 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2){
 	return array($ax, $ay);
 }
 
+/**
+ * @param $iconMap
+ * @param $inventory
+ * @return int icon id
+ */
+function getIconByMapping($iconMap, $inventory) {
+	$iconid = null;
+	$profiles = getHostProfiles();
 
+	if (isset($inventory['profile'])) {
+		foreach ($iconMap['mappings'] as $mapping) {
+			try {
+				$expr = new GlobalRegExp($mapping['expression']);
+				if ($expr->match($inventory['profile'][$profiles[$mapping['inventory_link']]['db_field']])) {
+					$iconid = $mapping['iconid'];
+					break;
+				}
+			}
+			catch(Exception $e) {
+				continue;
+			}
+		}
+	}
+
+
+	if (null === $iconid) {
+		$iconid = $iconMap['default_iconid'];
+	}
+
+	return $iconid;
+}
 
 ?>

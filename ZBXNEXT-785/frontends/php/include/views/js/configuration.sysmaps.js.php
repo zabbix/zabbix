@@ -105,7 +105,7 @@
 				<tbody class="grouped">
 				<tr id="useIconMapRow">
 					<td><label for="use_iconmap" id=use_iconmapLabel><?php echo _('Automatic icon selection'); ?></label></td>
-					<td><input type="checkbox" name="use_iconmap" id="use_iconmap" class="checkbox"></td>
+					<td><input type="checkbox" name="use_iconmap" id="use_iconmap" class="checkbox" value="1"></td>
 				</tr>
 				<tr>
 					<td><label for="iconid_off"><?php echo _('Icon (default)'); ?></label></td>

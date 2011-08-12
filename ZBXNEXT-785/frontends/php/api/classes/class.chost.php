@@ -788,8 +788,9 @@ Copt::memoryPick();
 				' FROM host_profile hp '.
 				' WHERE '.DBcondition('hp.hostid', $hostids);
 			$db_profile = DBselect($sql);
-			while($profile = DBfetch($db_profile))
+			while ($profile = DBfetch($db_profile)) {
 				$result[$profile['hostid']]['profile'] = $profile;
+			}
 		}
 
 // Adding Templates

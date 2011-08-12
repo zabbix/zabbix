@@ -1,17 +1,37 @@
 <?php
 
+/**
+ * Class for regular expressions and Zabbix global expressions.
+ * Any string that begins with '@' is treated as Zabbix expression.
+ * Data from Zabbix expressions is taken from DB, and cached in static variable.
+ * @throws Exception
+ */
 class GlobalRegExp {
 	const ERROR_REGEXP_EMPTY = 1;
 	const ERROR_REGEXP_NOT_EXISTS = 2;
 
 	/**
+	 * Determine if it's Zabbix expression.
 	 * @var bool
 	 */
-	protected $isGlobalRegexp;
+	protected $isZabbixRegexp;
 
 	/**
-	 * Checks if expression is valid
-	 *
+	 * If we create simple regular expression this contains itself as a string,
+	 * if we create Zabbix expression this contains array of expressions taken from DB.
+	 * @var array|string
+	 */
+	protected $expression;
+
+	/**
+	 * Cache for Zabbix expressions.
+	 * @var array
+	 */
+	private static $_cachedExpressions = array();
+
+
+	/**
+	 * Checks if expression is valid.
 	 * @static
 	 * @throws Exception
 	 * @param $regExp
@@ -37,86 +57,115 @@ class GlobalRegExp {
 	}
 
 	/**
-	 * Initialize expression, gets data from db for global expressions
-	 *
+	 * Initialize expression, gets data from db for Zabbix expressions.
 	 * @throws Exception
-	 * @param $regExp
+	 * @param string $regExp
 	 */
 	public function __construct($regExp) {
 		if ($regExp[0] == '@') {
-			$this->isGlobalRegexp = true;
-			$this->expression = array();
-
+			$this->isZabbixRegexp = true;
 			$regExp = substr($regExp, 1);
-			$sql = 'SELECT regexpid, expression, expression_type, exp_delimiter, case_sensitive'.
-				' FROM expressions e, regexps r'.
-				' WHERE e.regexpid = r.regexpid'.
-				' AND r.name='.zbx_dbstr($regExp);
-			$dbRegExps = DBselect($sql);
-			while ($expression = DBfetch($dbRegExps)) {
-				$this->expression[] = $expression;
+
+			if (!isset(self::$_cachedExpressions[$regExp])) {
+				self::$_cachedExpressions[$regExp] = array();
+
+				$sql = 'SELECT e.regexpid, e.expression, e.expression_type, e.exp_delimiter, e.case_sensitive'.
+					' FROM expressions e, regexps r'.
+					' WHERE e.regexpid = r.regexpid'.
+					' AND r.name='.zbx_dbstr($regExp);
+				$dbRegExps = DBselect($sql);
+				while ($expression = DBfetch($dbRegExps)) {
+					self::$_cachedExpressions[$regExp][] = $expression;
+				}
+
+				if (empty(self::$_cachedExpressions[$regExp])) {
+					unset(self::$_cachedExpressions[$regExp]);
+					throw new Exception('Does not exists', self::ERROR_REGEXP_NOT_EXISTS);
+				}
 			}
-			if (empty($this->expression)) {
-				throw new Exception('Does not exists', self::ERROR_REGEXP_NOT_EXISTS);
-			}
+
+			$this->expression = self::$_cachedExpressions[$regExp];
 		}
 		else {
-			$this->isGlobalRegexp = false;
+			$this->isZabbixRegexp = false;
 			$this->expression = $regExp;
 		}
 	}
 
 	/**
-	 * @param $string
+	 * @param string $string
 	 * @return bool
 	 */
 	public function match($string) {
-		if ($this->isGlobalRegexp) {
-			$result = (bool) preg_match($this->expression, $string);
-		}
-		else {
+		if ($this->isZabbixRegexp) {
 			$result = true;
 
 			foreach ($this->expression as $expression){
-
 				if ($expression['expression_type'] == EXPRESSION_TYPE_TRUE || $expression['expression_type'] == EXPRESSION_TYPE_FALSE) {
-					$pattern = '/'.$expression['expression'].'/';
-					if ($expression['case_sensitive']) {
-						$pattern .= 'i';
-					}
-
-					$expectedResult = ($expression['expression_type'] == EXPRESSION_TYPE_TRUE);
-
-					$result = (preg_match($pattern, $string) == $expectedResult);
+					$result = $this->_matchRegular($expression, $string);
 				}
 				else {
-					if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED) {
-						$paterns = explode($expression['exp_delimiter'], $expression['expression']);
-					}
-					else {
-						$paterns = array($expression['expression']);
-					}
+					$result = $this->_matchString($expression, $string);
 
-					$expectedResult = ($expression['expression_type'] != EXPRESSION_TYPE_NOT_INCLUDED);
-
-
-					if ($expression['case_sensitive']) {
-						foreach ($paterns as  $patern) {
-							$result &= ((zbx_strstr($string, $patern) !== false) == $expectedResult);
-						}
-					}
-					else {
-						foreach ($paterns as  $patern) {
-							$result &= ((zbx_stristr($string, $patern) !== false) == $expectedResult);
-						}
-					}
 				}
 
 				if (!$result) {
 					break;
 				}
 			}
+		}
+		else {
+			$result = (bool) preg_match('/'.$this->expression.'/', $string);
+		}
 
+		return $result;
+	}
+
+	/**
+	 * Matches expression as regular expression.
+	 * @param array $expression
+	 * @param string $string
+	 * @return bool
+	 */
+	private function _matchRegular(array $expression, $string) {
+		$pattern = '/'.$expression['expression'].'/';
+		if ($expression['case_sensitive']) {
+			$pattern .= 'i';
+		}
+
+		$expectedResult = ($expression['expression_type'] == EXPRESSION_TYPE_TRUE);
+
+		return (preg_match($pattern, $string) == $expectedResult);
+	}
+
+	/**
+	 * Matches expression as string.
+	 * @param array $expression
+	 * @param string $string
+	 * @return bool
+	 */
+	private function _matchString(array $expression, $string) {
+		$result = true;
+
+		if ($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED) {
+			$paterns = explode($expression['exp_delimiter'], $expression['expression']);
+		}
+		else {
+			$paterns = array($expression['expression']);
+		}
+
+		$expectedResult = ($expression['expression_type'] != EXPRESSION_TYPE_NOT_INCLUDED);
+
+
+		if ($expression['case_sensitive']) {
+			foreach ($paterns as  $patern) {
+				$result &= ((zbx_strstr($string, $patern) !== false) == $expectedResult);
+			}
+		}
+		else {
+			foreach ($paterns as  $patern) {
+				$result &= ((zbx_stristr($string, $patern) !== false) == $expectedResult);
+			}
 		}
 
 		return $result;

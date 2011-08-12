@@ -135,7 +135,7 @@ include_once('include/page_header.php');
 	);
 ?>
 <?php
-	$_REQUEST['config'] = get_request('config', CProfile::get('web.config.config', 0));
+$_REQUEST['config'] = get_request('config', CProfile::get('web.config.config', 0));
 
 check_fields($fields);
 
