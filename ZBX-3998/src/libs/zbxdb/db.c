@@ -272,9 +272,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		}
 		else
 		{
-			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX,
-						(void *)&oracle.srvhp, (ub4 *)0,
-						OCI_ATTR_SERVER, oracle.errhp);
+			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX, (void *)&oracle.srvhp, (ub4 *)0,
+					OCI_ATTR_SERVER, oracle.errhp);
 
 			if (OCI_SUCCESS != err)
 			{
@@ -666,9 +665,9 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	sql = zbx_dvsprintf(sql, fmt, args);
 
 	if (0 == txn_init && 0 == txn_level)
-		zabbix_log(LOG_LEVEL_DEBUG, "Query without transaction detected");
+		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
+	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
 #if defined(HAVE_IBM_DB2)
 	/* allocate a statement handle */
@@ -702,7 +701,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 		ret = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
-	else if (rows >= 0)
+	else if (0 <= rows)
 	{
 		ret = (int)rows;
 	}
@@ -720,6 +719,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		if (0 != (status = mysql_query(conn, sql)))
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+
 			switch (mysql_errno(conn))
 			{
 				case CR_CONN_HOST_ERROR:
@@ -740,40 +740,38 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		}
 		else
 		{
-			do
+			while (0 == status)
 			{
-				if (mysql_field_count(conn) == 0)
+				if (0 != mysql_field_count(conn))
 				{
-					ret += (int)mysql_affected_rows(conn);
-				}
-				else  /* some error occurred */
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "Could not retrieve result set");
+					zabbix_log(LOG_LEVEL_DEBUG, "could not retrieve result set");
 					break;
 				}
+				else
+					ret += (int)mysql_affected_rows(conn);
 
 				/* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
-				if ((status = mysql_next_result(conn)) > 0)
+				if (0 < (status = mysql_next_result(conn)))
 					zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 			}
-			while (status == 0);
 		}
 	}
 #elif defined(HAVE_ORACLE)
-	err = OCIHandleAlloc( (dvoid *) oracle.envhp, (dvoid **) &stmthp,
-		OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0);
+	err = OCIHandleAlloc( (dvoid *) oracle.envhp, (dvoid **) &stmthp, OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0);
 
-	if (OCI_SUCCESS == err) {
-		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql,
-			(ub4) strlen((char *) sql),
-			(ub4) OCI_NTV_SYNTAX, (ub4) OCI_DEFAULT);
+	if (OCI_SUCCESS == err)
+	{
+		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql, (ub4) strlen((char *) sql),
+				(ub4) OCI_NTV_SYNTAX, (ub4) OCI_DEFAULT);
 	}
 
-	if (OCI_SUCCESS == err) {
+	if (OCI_SUCCESS == err)
+	{
 		err = OCIStmtExecute(oracle.svchp, stmthp, oracle.errhp, (ub4) 1, (ub4) 0,
-			(CONST OCISnapshot *) NULL, (OCISnapshot *) NULL, OCI_COMMIT_ON_SUCCESS);
+				(CONST OCISnapshot *) NULL, (OCISnapshot *) NULL, OCI_COMMIT_ON_SUCCESS);
 
-		if (OCI_SUCCESS == err) {
+		if (OCI_SUCCESS == err)
+		{
 			ub4 nrows = 0;
 
 			err = OCIAttrGet((void *)stmthp, OCI_HTYPE_STMT, (ub4 *)&nrows,
@@ -783,12 +781,13 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		}
 	}
 
-	if (err != OCI_SUCCESS) {
+	if (OCI_SUCCESS != err)
+	{
 		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
 		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 
-	if (stmthp)
+	if (NULL != stmthp)
 	{
 		(void)OCIHandleFree((dvoid *)stmthp, OCI_HTYPE_STMT);
 		stmthp = NULL;
@@ -798,9 +797,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	if (NULL == result)
 	{
-		zabbix_errlog(ERR_Z3005, 0, "Result is NULL", sql);
+		zabbix_errlog(ERR_Z3005, 0, "result is NULL", sql);
 		ret = ZBX_DB_FAIL;
 	}
+
 	if (PGRES_COMMAND_OK != PQresultStatus(result))
 	{
 		error = zbx_dsprintf(error, "%s:%s",
@@ -813,25 +813,21 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 
 	if (ZBX_DB_OK == ret)
-	{
 		ret = atoi(PQcmdTuples(result));
-	}
+
 	PQclear(result);
 #elif defined(HAVE_SQLITE3)
-	if (0 == txn_level)
+	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
-			exit(FAIL);
-		}
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: unable to create lock on SQLite database");
+		exit(FAIL);
 	}
 
 lbl_exec:
 	if (SQLITE_OK != (err = sqlite3_exec(conn, sql, NULL, 0, &error)))
 	{
 		if (SQLITE_BUSY == err)
-				goto lbl_exec; /* Deadlock!!! */
+			goto lbl_exec;	/* Deadlock!!! */
 
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
@@ -863,7 +859,7 @@ lbl_exec:
 	{
 		sec = zbx_time() - sec;
 		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
-			zabbix_log(LOG_LEVEL_WARNING, "Slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
+			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
 	zbx_free(sql);
@@ -934,9 +930,11 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	for (i = 0; i < result->ncolumn; i++)
 	{
 		/* get the display size for a column */
-		if (SUCCEED != zbx_ibm_db2_success(ret = SQLColAttribute(result->hstmt, (SQLSMALLINT)(i + 1), SQL_DESC_DISPLAY_SIZE,
-												NULL, 0, NULL, &result->values_len[i])))
+		if (SUCCEED != zbx_ibm_db2_success(ret = SQLColAttribute(result->hstmt, (SQLSMALLINT)(i + 1),
+				SQL_DESC_DISPLAY_SIZE, NULL, 0, NULL, &result->values_len[i])))
+		{
 			goto error;
+		}
 
 		result->values_len[i] += 1; /* '\0'; */
 
@@ -945,9 +943,11 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 		result->nalloc++;
 
 		/* bind columns to program variables, converting all types to CHAR */
-		if (SUCCEED != zbx_ibm_db2_success(ret = SQLBindCol(result->hstmt, (SQLSMALLINT)(i + 1), SQL_C_CHAR,
-								result->values_cli[i], result->values_len[i], &result->values_len[i])))
+		if (SUCCEED != zbx_ibm_db2_success(ret = SQLBindCol(result->hstmt, (SQLSMALLINT)(i + 1),
+				SQL_C_CHAR, result->values_cli[i], result->values_len[i], &result->values_len[i])))
+		{
 			goto error;
+		}
 	}
 error:
 	if (SUCCEED != zbx_ibm_db2_success(ret) || 0 == result->ncolumn)
@@ -1038,9 +1038,8 @@ error:
 		{
 			/* retrieve the length semantics for the column */
 			char_semantics = 0;
-			err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM,
-				(void *)&char_semantics, (ub4 *)0, (ub4)OCI_ATTR_CHAR_USED,
-				(OCIError *)oracle.errhp);
+			err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&char_semantics, (ub4 *)0,
+					(ub4)OCI_ATTR_CHAR_USED, (OCIError *)oracle.errhp);
 		}
 
 		if (OCI_SUCCESS == err)
@@ -1050,7 +1049,7 @@ error:
 			{
 				/* retrieve the column width in characters */
 				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width, (ub4 *)0,
-					(ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
+						(ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
 			}
 			else
 			{
@@ -1068,8 +1067,8 @@ error:
 		{
 			/* represent any data as characters */
 			err = OCIDefineByPos(result->stmthp, &defnp, oracle.errhp, counter,
-				(dvoid *)result->values[counter - 1], col_width, SQLT_STR,
-				(dvoid *)0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT);
+					(dvoid *)result->values[counter - 1], col_width, SQLT_STR,
+					(dvoid *)0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT);
 		}
 
 		/* free cell descriptor */
@@ -1094,7 +1093,7 @@ error:
 	result->row_num = 0;
 
 	if (NULL == result->pg_result)
-		zabbix_errlog(ERR_Z3005, 0, "Result is NULL", sql);
+		zabbix_errlog(ERR_Z3005, 0, "result is NULL", sql);
 
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
@@ -1112,7 +1111,7 @@ error:
 #elif defined(HAVE_SQLITE3)
 	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: unable to create lock on SQLite database");
 		exit(FAIL);
 	}
 
