@@ -909,8 +909,8 @@ msgid "Cannot add item"
 msgstr "Не вдалося додати елемент даних"
 
 #: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
-msgid "Cannot add macro"
-msgstr "Не вдалося додати макрос"
+msgid "Cannot add macro."
+msgstr "Не вдалося додати макрос."
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot add maintenance"
@@ -1232,16 +1232,16 @@ msgid "Cannot logout."
 msgstr "Не вдалося виконати вихід."
 
 #: api/classes/class.chost.php:1733
-msgid "Cannot mass update host name"
-msgstr "Не вдалося масове оновлення імені вузла мережі"
+msgid "Cannot mass update host name."
+msgstr "Не вдалося масове оновлення імені вузла мережі."
 
 #: api/classes/class.ctemplate.php:1375
 msgid "Cannot mass update template name"
 msgstr "Не вдалося масове оновлення імені шаблона"
 
 #: api/classes/class.chost.php:1723
-msgid "Cannot mass update visible host name"
-msgstr "Не вдалося масове оновлення видимого імені вузла мережі"
+msgid "Cannot mass update visible host name."
+msgstr "Не вдалося масове оновлення видимого імені вузла мережі."
 
 #: api/classes/class.ctemplate.php:1348
 msgid "Cannot mass update visible template name"
@@ -1268,8 +1268,8 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "Не вдалось виконати оператор оновлення для таблиці \"%s\" де немає умови."
 
 #: api/classes/class.chost.php:1930 config.php:574
-msgid "Cannot remove macro"
-msgstr "Не вдалося видалити макрос"
+msgid "Cannot remove macro."
+msgstr "Не вдалося видалити макрос."
 
 #: include/locales/en_gb.inc.php:1929
 msgid "Cannot rename guest user"
@@ -1381,12 +1381,12 @@ msgstr "Не вдалося оновити елемент даних"
 
 #: api/classes/class.chost.php:1937 api/classes/class.ctemplate.php:1579
 #: config.php:579
-msgid "Cannot update macro"
-msgstr "Не вдалося оновити макрос"
+msgid "Cannot update macro."
+msgstr "Не вдалося оновити макрос."
 
 #: include/locales/en_gb.inc.php:692
-msgid "Cannot update macros"
-msgstr "Не вдалося оновити макроси"
+msgid "Cannot update macros."
+msgstr "Не вдалося оновити макроси."
 
 #: include/locales/en_gb.inc.php:611
 msgid "Cannot update maintenance"
@@ -2725,13 +2725,13 @@ msgstr "Перший запис у списку"
 
 #: api/classes/class.chost.php:1365
 #, php-format
-msgid "Duplicate host. Host with the same host name \"%s\" already exists in data"
-msgstr "Дублікат вузла мережі. Вузел мережі з таким самим іменем \"%s\" вже існує в конфігурації"
+msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
+msgstr "Дублікат вузла мережі. Вузел мережі з таким самим іменем \"%s\" вже існує в конфігурації."
 
 #: api/classes/class.chost.php:1396
 #, php-format
-msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data"
-msgstr "Дублікат вузла мережі. Вузел мережі з таким самим видимим іменем \"%s\" вже існує в конфігурації"
+msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
+msgstr "Дублікат вузла мережі. Вузел мережі з таким самим видимим іменем \"%s\" вже існує в конфігурації."
 
 #: api/classes/class.cmap.php:579
 #, php-format
@@ -2842,8 +2842,8 @@ msgstr "Пусто"
 #: api/classes/class.citem.php:1018 api/classes/class.citemprototype.php:705
 #: api/classes/class.cproxy.php:475 api/classes/class.ctemplate.php:1139
 #: api/classes/class.ctrigger.php:1372 api/classes/class.cusergroup.php:642
-msgid "Empty input parameter"
-msgstr "Вхідний параметр є пустим"
+msgid "Empty input parameter."
+msgstr "Вхідний параметр є пустим."
 
 #: api/classes/class.cdrule.php:427
 msgid "Empty input."
@@ -3813,8 +3813,8 @@ msgstr "Час вузла мережі"
 
 #: api/classes/class.chost.php:1578 api/classes/class.chost.php:1583
 #: api/classes/class.chost.php:1588 api/classes/class.chost.php:1597
-msgid "Host update failed"
-msgstr "Оновлення вузла мережі невдале"
+msgid "Host update failed."
+msgstr "Оновлення вузла мережі невдале."
 
 #: hosts.php:454
 msgid "Host updated"
@@ -5986,12 +5986,12 @@ msgstr ""
 
 #: api/classes/class.chost.php:1321 api/classes/class.chost.php:1331
 #, php-format
-msgid "No groups for host \"%s\""
-msgstr "Немає груп для вузла мережі \"%s\""
+msgid "No groups for host \"%s\"."
+msgstr "Немає груп для вузла мережі \"%s\"."
 
 #: api/classes/class.chost.php:1715
-msgid "No groups for hosts"
-msgstr "Немає груп у вузлів мережі"
+msgid "No groups for hosts."
+msgstr "Немає груп у вузлів мережі."
 
 #: api/classes/class.ctemplate.php:1340
 msgid "No groups for template"
@@ -6043,8 +6043,8 @@ msgstr "Немає інтерфейсу для елемента даних."
 
 #: api/classes/class.chost.php:1324 api/classes/class.chost.php:1342
 #, php-format
-msgid "No interfaces for host \"%s\""
-msgstr "Немає інтерфейсів для вузла мережі \"%s\""
+msgid "No interfaces for host \"%s\"."
+msgstr "Немає інтерфейсів для вузла мережі \"%s\"."
 
 #: api/classes/class.cproxy.php:353
 #, php-format
@@ -9412,8 +9412,8 @@ msgstr "Помилкові поля для графіка"
 
 #: api/classes/class.chost.php:1305
 #, php-format
-msgid "Wrong fields for host \"%s\""
-msgstr "Помилкові поля для вузла мережі \"%s\""
+msgid "Wrong fields for host \"%s\"."
+msgstr "Помилкові поля для вузла мережі \"%s\"."
 
 #: api/classes/class.cgraph.php:1061
 #: api/classes/class.cgraphprototype.php:1063
@@ -9587,8 +9587,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Ви не вказали цілі глобального скрипта \"%s\" в операції дії."
 
 #: api/classes/class.chost.php:1624
-msgid "You do not have enough rights for operation"
-msgstr "Ви не маєте достатніх прав для операції"
+msgid "You do not have enough rights for operation."
+msgstr "Ви не маєте достатніх прав для операції."
 
 #: include/locales/en_gb.inc.php:1968
 msgid "You do not have permission to perform this operation"

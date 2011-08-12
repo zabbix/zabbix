@@ -909,8 +909,8 @@ msgid "Cannot add item"
 msgstr "Nie można dodać elementu"
 
 #: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
-msgid "Cannot add macro"
-msgstr "Nie można dodać makra"
+msgid "Cannot add macro."
+msgstr "Nie można dodać makra."
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot add maintenance"
@@ -1232,8 +1232,8 @@ msgid "Cannot logout."
 msgstr "Nie mogę wylogować."
 
 #: api/classes/class.chost.php:1733
-msgid "Cannot mass update host name"
-msgstr "Nie można zaktualizować masowo nazwy hosta"
+msgid "Cannot mass update host name."
+msgstr "Nie można zaktualizować masowo nazwy hosta."
 
 #: api/classes/class.ctemplate.php:1375
 msgid "Cannot mass update template name"
@@ -1268,8 +1268,8 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
 #: api/classes/class.chost.php:1930 config.php:574
-msgid "Cannot remove macro"
-msgstr "Nie można usunąć makra"
+msgid "Cannot remove macro."
+msgstr "Nie można usunąć makra."
 
 #: include/locales/en_gb.inc.php:1929
 msgid "Cannot rename guest user"
@@ -1381,12 +1381,12 @@ msgstr "Nie można uaktualnić elementu"
 
 #: api/classes/class.chost.php:1937 api/classes/class.ctemplate.php:1579
 #: config.php:579
-msgid "Cannot update macro"
-msgstr "Nie można zaktualizować makra"
+msgid "Cannot update macro."
+msgstr "Nie można zaktualizować makra."
 
 #: include/locales/en_gb.inc.php:692
-msgid "Cannot update macros"
-msgstr "Nie można zaktualizować makr"
+msgid "Cannot update macros."
+msgstr "Nie można zaktualizować makr."
 
 #: include/locales/en_gb.inc.php:611
 msgid "Cannot update maintenance"
