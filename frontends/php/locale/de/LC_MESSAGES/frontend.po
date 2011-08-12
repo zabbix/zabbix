@@ -925,8 +925,8 @@ msgid "Cannot add item"
 msgstr "Kann Element nicht hinzufügen"
 
 #: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
-msgid "Cannot add macro"
-msgstr "Kann Makro nicht hinzufügen"
+msgid "Cannot add macro."
+msgstr "Kann Makro nicht hinzufügen."
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot add maintenance"
@@ -1253,16 +1253,16 @@ msgid "Cannot logout."
 msgstr "Abmelden nicht möglich."
 
 #: api/classes/class.chost.php:1733
-msgid "Cannot mass update host name"
-msgstr "Massen-Update für Host-Namen nicht möglich"
+msgid "Cannot mass update host name."
+msgstr "Massen-Update für Host-Namen nicht möglich."
 
 #: api/classes/class.ctemplate.php:1375
 msgid "Cannot mass update template name"
 msgstr "Massen-Update für Vorlagen-Namen nicht möglich"
 
 #: api/classes/class.chost.php:1723
-msgid "Cannot mass update visible host name"
-msgstr "Massen-Update für sichtbaren Host-Namen nicht möglich"
+msgid "Cannot mass update visible host name."
+msgstr "Massen-Update für sichtbaren Host-Namen nicht möglich."
 
 #: api/classes/class.ctemplate.php:1348
 msgid "Cannot mass update visible template name"
@@ -1289,8 +1289,8 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "Update-Statement in Tabelle \"%s\" nicht ohne Where-Klausel möglich."
 
 #: api/classes/class.chost.php:1930 config.php:574
-msgid "Cannot remove macro"
-msgstr "Kann Makro nicht entfernen"
+msgid "Cannot remove macro."
+msgstr "Kann Makro nicht entfernen."
 
 #: include/locales/en_gb.inc.php:1929
 msgid "Cannot rename guest user"
@@ -1402,12 +1402,12 @@ msgstr "Kann Element nicht aktualisieren"
 
 #: api/classes/class.chost.php:1937 api/classes/class.ctemplate.php:1579
 #: config.php:579
-msgid "Cannot update macro"
-msgstr "Kann Makro nicht aktualisieren"
+msgid "Cannot update macro."
+msgstr "Kann Makro nicht aktualisieren."
 
 #: include/locales/en_gb.inc.php:692
-msgid "Cannot update macros"
-msgstr "Kann Makros nicht aktualisieren"
+msgid "Cannot update macros."
+msgstr "Kann Makros nicht aktualisieren."
 
 #: include/locales/en_gb.inc.php:611
 msgid "Cannot update maintenance"
@@ -2886,8 +2886,8 @@ msgstr "Leer"
 #: api/classes/class.cproxy.php:475 api/classes/class.ctemplate.php:1139
 #: api/classes/class.ctrigger.php:1372 api/classes/class.cusergroup.php:642
 #, fuzzy
-msgid "Empty input parameter"
-msgstr "Leerer Eingabe-Parameter"
+msgid "Empty input parameter."
+msgstr "Leerer Eingabe-Parameter."
 
 #: api/classes/class.cdrule.php:427
 msgid "Empty input."
@@ -3864,8 +3864,8 @@ msgstr "Host-Zeit"
 
 #: api/classes/class.chost.php:1578 api/classes/class.chost.php:1583
 #: api/classes/class.chost.php:1588 api/classes/class.chost.php:1597
-msgid "Host update failed"
-msgstr "System konnte nicht aktualisiert werden"
+msgid "Host update failed."
+msgstr "System konnte nicht aktualisiert werden."
 
 #: hosts.php:454
 msgid "Host updated"
@@ -6049,12 +6049,12 @@ msgstr ""
 
 #: api/classes/class.chost.php:1321 api/classes/class.chost.php:1331
 #, php-format
-msgid "No groups for host \"%s\""
-msgstr "Keine Gruppen für Host \"%s\""
+msgid "No groups for host \"%s\"."
+msgstr "Keine Gruppen für Host \"%s\"."
 
 #: api/classes/class.chost.php:1715
-msgid "No groups for hosts"
-msgstr "Keine Gruppen für Host"
+msgid "No groups for hosts."
+msgstr "Keine Gruppen für Host."
 
 #: api/classes/class.ctemplate.php:1340
 msgid "No groups for template"
@@ -9506,8 +9506,8 @@ msgstr "Falsche Felder für Graph"
 
 #: api/classes/class.chost.php:1305
 #, php-format
-msgid "Wrong fields for host \"%s\""
-msgstr "Falsche Felder für Host \"%s\""
+msgid "Wrong fields for host \"%s\"."
+msgstr "Falsche Felder für Host \"%s\"."
 
 #: api/classes/class.cgraph.php:1061
 #: api/classes/class.cgraphprototype.php:1063
@@ -9683,8 +9683,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr ""
 
 #: api/classes/class.chost.php:1624
-msgid "You do not have enough rights for operation"
-msgstr "Sie haben nicht genügend Rechte für Operation"
+msgid "You do not have enough rights for operation."
+msgstr "Sie haben nicht genügend Rechte für Operation."
 
 #: include/locales/en_gb.inc.php:1968
 msgid "You do not have permission to perform this operation"

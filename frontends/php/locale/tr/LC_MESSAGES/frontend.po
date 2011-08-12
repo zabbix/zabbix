@@ -906,8 +906,8 @@ msgid "Cannot add item"
 msgstr "Öğe eklenemedi"
 
 #: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
-msgid "Cannot add macro"
-msgstr "Makro eklenemedi"
+msgid "Cannot add macro."
+msgstr "Makro eklenemedi."
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot add maintenance"
@@ -1229,16 +1229,16 @@ msgid "Cannot logout."
 msgstr "Oturum kapatılamadı."
 
 #: api/classes/class.chost.php:1733
-msgid "Cannot mass update host name"
-msgstr "Konak ismi toplu olarak güncellenmedi"
+msgid "Cannot mass update host name."
+msgstr "Konak ismi toplu olarak güncellenmedi."
 
 #: api/classes/class.ctemplate.php:1375
 msgid "Cannot mass update template name"
 msgstr "Şablon ismi toplu olarak güncellenmedi"
 
 #: api/classes/class.chost.php:1723
-msgid "Cannot mass update visible host name"
-msgstr "Görünen konak ismi toplu olarak güncellenmedi"
+msgid "Cannot mass update visible host name."
+msgstr "Görünen konak ismi toplu olarak güncellenmedi."
 
 #: api/classes/class.ctemplate.php:1348
 msgid "Cannot mass update visible template name"
@@ -1265,8 +1265,8 @@ msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "where koşulu olmadan \"%s\" tablosunda update komutu gerçekleştirilemez."
 
 #: api/classes/class.chost.php:1930 config.php:574
-msgid "Cannot remove macro"
-msgstr "Makro kaldırılamaz"
+msgid "Cannot remove macro."
+msgstr "Makro kaldırılamaz."
 
 #: include/locales/en_gb.inc.php:1929
 msgid "Cannot rename guest user"
@@ -1378,12 +1378,12 @@ msgstr "Öğe güncellenemedi"
 
 #: api/classes/class.chost.php:1937 api/classes/class.ctemplate.php:1579
 #: config.php:579
-msgid "Cannot update macro"
-msgstr "Makro güncellenemedi"
+msgid "Cannot update macro."
+msgstr "Makro güncellenemedi."
 
 #: include/locales/en_gb.inc.php:692
-msgid "Cannot update macros"
-msgstr "Makrolar güncellenemedi"
+msgid "Cannot update macros."
+msgstr "Makrolar güncellenemedi."
 
 #: include/locales/en_gb.inc.php:611
 msgid "Cannot update maintenance"
@@ -2838,8 +2838,8 @@ msgstr "Boş"
 #: api/classes/class.citem.php:1018 api/classes/class.citemprototype.php:705
 #: api/classes/class.cproxy.php:475 api/classes/class.ctemplate.php:1139
 #: api/classes/class.ctrigger.php:1372 api/classes/class.cusergroup.php:642
-msgid "Empty input parameter"
-msgstr "Boş girdi parametresi"
+msgid "Empty input parameter."
+msgstr "Boş girdi parametresi."
 
 #: api/classes/class.cdrule.php:427
 msgid "Empty input."
@@ -3809,8 +3809,8 @@ msgstr "Konak zamanı"
 
 #: api/classes/class.chost.php:1578 api/classes/class.chost.php:1583
 #: api/classes/class.chost.php:1588 api/classes/class.chost.php:1597
-msgid "Host update failed"
-msgstr "Konak güncellemesi başarısız"
+msgid "Host update failed."
+msgstr "Konak güncellemesi başarısız."
 
 #: hosts.php:454
 msgid "Host updated"
@@ -5979,12 +5979,12 @@ msgstr ""
 
 #: api/classes/class.chost.php:1321 api/classes/class.chost.php:1331
 #, php-format
-msgid "No groups for host \"%s\""
-msgstr "\"%s\" konağı için hiçbir grup yok"
+msgid "No groups for host \"%s\"."
+msgstr "\"%s\" konağı için hiçbir grup yok."
 
 #: api/classes/class.chost.php:1715
-msgid "No groups for hosts"
-msgstr "Konaklar için hiçbir grup yok"
+msgid "No groups for hosts."
+msgstr "Konaklar için hiçbir grup yok."
 
 #: api/classes/class.ctemplate.php:1340
 msgid "No groups for template"
@@ -6036,8 +6036,8 @@ msgstr "Öğe için hiçbir arabirim yok."
 
 #: api/classes/class.chost.php:1324 api/classes/class.chost.php:1342
 #, php-format
-msgid "No interfaces for host \"%s\""
-msgstr "\"%s\" konağı için hiçbir arabirim yok"
+msgid "No interfaces for host \"%s\"."
+msgstr "\"%s\" konağı için hiçbir arabirim yok."
 
 #: api/classes/class.cproxy.php:353
 #, php-format
@@ -9404,8 +9404,8 @@ msgstr "Grafik için yanlış alanlar"
 
 #: api/classes/class.chost.php:1305
 #, php-format
-msgid "Wrong fields for host \"%s\""
-msgstr "\"%s\" konağı için yanlış alanlar"
+msgid "Wrong fields for host \"%s\"."
+msgstr "\"%s\" konağı için yanlış alanlar."
 
 #: api/classes/class.cgraph.php:1061
 #: api/classes/class.cgraphprototype.php:1063
@@ -9579,8 +9579,8 @@ msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "\"%s\" eylem işlem genel betiği için hedef belirtmemişsiniz."
 
 #: api/classes/class.chost.php:1624
-msgid "You do not have enough rights for operation"
-msgstr "Bu işlem için yeterli hakkınız yok"
+msgid "You do not have enough rights for operation."
+msgstr "Bu işlem için yeterli hakkınız yok."
 
 #: include/locales/en_gb.inc.php:1968
 msgid "You do not have permission to perform this operation"

@@ -908,8 +908,8 @@ msgid "Cannot add item"
 msgstr "Nelze přidat položku"
 
 #: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
-msgid "Cannot add macro"
-msgstr "Nelze přidat makro"
+msgid "Cannot add macro."
+msgstr "Nelze přidat makro."
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot add maintenance"
@@ -1384,8 +1384,8 @@ msgid "Cannot update macro"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:692
-msgid "Cannot update macros"
-msgstr "Nelze upravit makra"
+msgid "Cannot update macros."
+msgstr "Nelze upravit makra."
 
 #: include/locales/en_gb.inc.php:611
 msgid "Cannot update maintenance"
@@ -2841,8 +2841,8 @@ msgstr "Prázdný"
 #: api/classes/class.citem.php:1018 api/classes/class.citemprototype.php:705
 #: api/classes/class.cproxy.php:475 api/classes/class.ctemplate.php:1139
 #: api/classes/class.ctrigger.php:1372 api/classes/class.cusergroup.php:642
-msgid "Empty input parameter"
-msgstr "Prázdný vstupní parametr"
+msgid "Empty input parameter."
+msgstr "Prázdný vstupní parametr."
 
 #: api/classes/class.cdrule.php:427
 msgid "Empty input."
