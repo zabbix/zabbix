@@ -192,10 +192,11 @@
 	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON_BIG.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
 // }}}PAGE HEADER
 
-
 // HEADER {{{
 	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
+	$r_form->addVar('stime', get_request('stime'));
+	$r_form->addVar('period', get_request('period'));
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 
