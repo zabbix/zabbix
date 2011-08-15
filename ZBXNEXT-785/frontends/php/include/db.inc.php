@@ -902,10 +902,14 @@ else {
 			if(!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
 			if($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
 
-// escaping parameter that is about to be used in LIKE statement
-			$pattern = str_replace(array("!","%","_"),  array("!!","!%","!_"), $pattern);
-
-			$search[$field] = ' UPPER('.$tableShort.'.'.$field.') '.$exclude.' LIKE '.zbx_dbstr($start.zbx_strtoupper($pattern).'%')." ESCAPE '!' ";
+			// escaping parameter that is about to be used in LIKE statement
+			if(empty($options['searchWildcardsEnabled'])){
+				$pattern = str_replace(array("!","%","_"),  array("!!","!%","!_"), $pattern);
+				$search[$field] = ' UPPER('.$tableShort.'.'.$field.') '.$exclude.' LIKE '.zbx_dbstr($start.zbx_strtoupper($pattern).'%')." ESCAPE '!' ";
+			}
+			else{
+				$search[$field] = ' UPPER('.$tableShort.'.'.$field.') '.$exclude.' LIKE '.zbx_dbstr($start.zbx_strtoupper($pattern));
+			}
 		}
 
 		if(!empty($search)){

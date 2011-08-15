@@ -83,11 +83,12 @@ class CEvent extends CZBXAPI{
 			'eventid_from'			=> null,
 			'eventid_till'			=> null,
 // filter
-			'filter'					=> null,
-			'search'					=> null,
+			'filter'				=> null,
+			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'startSearch'			=> null,
+			'excludeSearch'			=> null,
+			'searchWildcardsEnabled'=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,

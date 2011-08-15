@@ -77,7 +77,8 @@ class CMaintenance extends CZBXAPI{
 			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
-			'filter'				=> null,
+			'filter'					=> null,
+			'searchWildcardsEnabled'	=> null,
 
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
@@ -501,11 +502,11 @@ Copt::memoryPick();
 					'active_till' => time()+86400,
 				);
 				if(!check_db_fields($db_fields, $maintenance)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
 				}
-				//checkig wheter a maintence with this name already exists
+				// checking whether a maintenance with this name already exists
 				if($this->exists(array('name' => $maintenance['name']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%s" already exists.', $maintenance['name']));
 				}
 
 				$insert[$mnum] = $maintenance;
@@ -600,8 +601,8 @@ Copt::memoryPick();
 // now going though a result, to find records with different id than our object
 			foreach($received_maintenaces as $r_maintenace){
 				if(bccomp($r_maintenace['maintenanceid'],$maintenance['maintenanceid']) != 0){
-//error! Maintenance with this name already exists
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+// error! Maintenance with this name already exists
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%s" already exists.', $maintenance['name']));
 				}
 			}
 
@@ -649,7 +650,7 @@ Copt::memoryPick();
 				'maintenanceid' => null,
 			);
 			if(!check_db_fields($db_fields, $maintenance)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
 			}
 
 			$update[$mnum] = array(
@@ -832,5 +833,4 @@ Copt::memoryPick();
 	}
 
 }
-
 ?>

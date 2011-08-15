@@ -157,14 +157,14 @@ class API_JSON_Host extends CZabbixTest
 	}
 
 
-	public static function profileGetRequests()
+	public static function inventoryGetRequests()
 	{
 		return array(
 			array(
 				// request
 				array(
-					'withProfile' => true,
-					'selectProfile'=> array('type'),
+					'withInventory' => true,
+					'selectInventory'=> array('type'),
 					'hostids' => 10017
 				),
 				// expected result
@@ -176,8 +176,8 @@ class API_JSON_Host extends CZabbixTest
 			array(
 				// request
 				array(
-					'withProfile' => true,
-					'selectProfile'=> array('os', 'tag'),
+					'withInventory' => true,
+					'selectInventory'=> array('os', 'tag'),
 					'hostids' => 10017
 				),
 				// expected result
@@ -190,8 +190,8 @@ class API_JSON_Host extends CZabbixTest
 			array(
 				// request
 				array(
-					'withProfile' => true,
-					'selectProfile'=> array('blabla'), // non existent field
+					'withInventory' => true,
+					'selectInventory'=> array('blabla'), // non existent field
 					'hostids' => 10017
 				),
 				// expected result
@@ -204,9 +204,9 @@ class API_JSON_Host extends CZabbixTest
 
 
 	/**
-	 * @dataProvider profileGetRequests
+	 * @dataProvider inventoryGetRequests
 	 */
-	public function testCHostGetProfiles($request, $expectedResult)
+	public function testCHostGetInventories($request, $expectedResult)
 	{
 		$debug = null;
 
@@ -217,8 +217,8 @@ class API_JSON_Host extends CZabbixTest
 		);
 
 		$this->assertFalse(
-			!isset($result['result'][0]['profile']) || $result['result'][0]['profile'] != $expectedResult,
-			"Chuck Norris: I was expecting that host.get would return this result in 'profiles' element: ".print_r($expectedResult, true).", but it returned: ".print_r($result, true)." \nDebug: ".print_r($debug, true)
+			!isset($result['result'][0]['inventory']) || $result['result'][0]['inventory'] != $expectedResult,
+			"Chuck Norris: I was expecting that host.get would return this result in 'inventories' element: ".print_r($expectedResult, true).", but it returned: ".print_r($result, true)." \nDebug: ".print_r($debug, true)
 		);
 
 	}

@@ -38,7 +38,7 @@ include_once('include/page_header.php');
 	check_fields($fields);
 ?>
 <?php
-	if(!isset($_REQUEST['triggerid'])) fatal_error(S_NO_TRIGGER_DEFINED);
+	if(!isset($_REQUEST['triggerid'])) fatal_error(S_NO_TRIGGERS_DEFINED);
 
 	$options = array(
 		'triggerids' => $_REQUEST['triggerid'],

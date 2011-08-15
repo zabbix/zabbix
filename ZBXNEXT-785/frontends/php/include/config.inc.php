@@ -335,11 +335,11 @@ function __autoload($class_name){
 
 			$url = urlencode($req->toString());
 			$footer = new CCol(
-							array(
-								new CButton('login',S_LOGIN,"javascript: document.location = 'index.php?request=$url';"),
-								new CButton('back',S_CANCEL,'javascript: window.history.back();')
-							),
-							'left');
+				array(
+					new CButton('login',S_LOGIN,"javascript: document.location = 'index.php?request=$url';"),
+					new CButton('back',S_CANCEL,'javascript: window.history.back();')
+				),
+				'left');
 			$table->setFooter($footer,'footer');
 			$table->show();
 		}
@@ -607,9 +607,8 @@ function __autoload($class_name){
 		$out = NULL;
 		$str = trim($str,';');
 		$periods = explode(';',$str);
-		foreach($periods as $preiod){
-//			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr)) return NULL;
-			if(!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $preiod, $arr)) return NULL;
+		foreach($periods as $period){
+			if(!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $arr)) return NULL;
 
 			for($i = $arr[1]; $i <= $arr[2]; $i++){
 				if(!isset($out[$i])) $out[$i] = array();

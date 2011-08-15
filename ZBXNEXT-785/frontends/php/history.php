@@ -54,7 +54,7 @@ include_once('include/page_header.php');
 		'cmbitemlist'=>	array(T_ZBX_INT, O_OPT,	 null,	DB_ID, null),
 
 		'plaintext'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
-		'action'=>		array(T_ZBX_STR, O_OPT,	 null,	IN('"showgraph","showvalues","showlatest","add","remove"'), null),
+		'action'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	IN('"showgraph","showvalues","showlatest","add","remove"'), null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,		NULL),
@@ -166,7 +166,9 @@ include_once('include/page_header.php');
 // resets get params for proper page refresh
 	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
 		navigation_bar_calc('web.item.graph', $item['itemid'], true);
-		resetGetParams(array('period', 'stime'));
+		jsRedirect('history.php?action=' . get_request('action', 'showgraph') . '&itemid=' . $item['itemid']);
+		include_once('include/page_footer.php');
+		exit();
 	}
 //--
 

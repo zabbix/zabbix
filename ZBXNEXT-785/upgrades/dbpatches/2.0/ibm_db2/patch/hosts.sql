@@ -109,7 +109,7 @@ ALTER TABLE items ADD description varchar(2048) WITH DEFAULT '' NOT NULL
 /
 REORG TABLE items
 /
-ALTER TABLE items ADD profile_link integer WITH DEFAULT '0' NOT NULL
+ALTER TABLE items ADD inventory_link integer WITH DEFAULT '0' NOT NULL
 /
 REORG TABLE items
 /

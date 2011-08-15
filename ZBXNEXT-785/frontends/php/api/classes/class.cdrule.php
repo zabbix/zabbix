@@ -68,6 +68,7 @@ class CDRule extends CZBXAPI{
 			'searchByAny'			=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 
 // output
 			'output'				=> API_OUTPUT_REFER,
@@ -496,7 +497,7 @@ COpt::memoryPick();
 				case SVC_SNMPv1:
 				case SVC_SNMPv2c:
 					if(!isset($dCheck['snmp_community']) || zbx_empty($dCheck['snmp_community']))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP Community.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP community.'));
 				case SVC_SNMPv3:
 					if(!isset($dCheck['key_']) || zbx_empty($dCheck['key_']))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP OID.'));
