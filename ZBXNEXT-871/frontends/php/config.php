@@ -64,7 +64,7 @@ include_once('include/page_header.php');
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
 		// GUI
-		'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
+		'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),	null),
 		'event_expire'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'event_show_max'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'dropdown_first_entry'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1,2'),		'isset({config})&&({config}==8)&&isset({save})'),
@@ -216,13 +216,13 @@ include_once('include/page_header.php');
 			}
 		}
 	}
-	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==8)){ // GUI
+	else if(isset($_REQUEST['save']) && ($_REQUEST['config'] == 8)){ // GUI
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
 		$configs = array(
 			'default_theme' => get_request('default_theme'),
-			'event_ack_enable' => get_request('event_ack_enable'),
+			'event_ack_enable' => (is_null(get_request('event_ack_enable')) ? 0 : 1),
 			'event_expire' => get_request('event_expire'),
 			'event_show_max' => get_request('event_show_max'),
 			'dropdown_first_entry' => get_request('dropdown_first_entry'),

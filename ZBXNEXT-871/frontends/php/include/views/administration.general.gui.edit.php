@@ -28,11 +28,10 @@ $comboTheme->addItem('css_od.css', _('Dark orange'));
 $comboDdFirstEntry = new CComboBox('dropdown_first_entry', $this->data['config']['dropdown_first_entry']);
 $comboDdFirstEntry->addItem(ZBX_DROPDOWN_FIRST_NONE, _('None'));
 $comboDdFirstEntry->addItem(ZBX_DROPDOWN_FIRST_ALL, _('All'));
-$checkDdFirstRemember = new CCheckBox('dropdown_first_remember', $this->data['config']['dropdown_first_remember'], null, 1);
 
 $guiTab = new CFormList('scriptsTab');
 $guiTab->addRow(_('Default theme'), array($comboTheme));
-$guiTab->addRow(_('Dropdown first entry'), array($comboDdFirstEntry, $checkDdFirstRemember, _('remember selected')));
+$guiTab->addRow(_('Dropdown first entry'), array($comboDdFirstEntry, new CCheckBox('dropdown_first_remember', $this->data['config']['dropdown_first_remember'], null, 1), _('remember selected')));
 $guiTab->addRow(_('Search/Filter elements limit'), new CNumericBox('search_limit', $this->data['config']['search_limit'], 6));
 $guiTab->addRow(_('Max count of elements to show inside table cell'), new CNumericBox('max_in_table', $this->data['config']['max_in_table'], 5));
 $guiTab->addRow(_('Enable event acknowledges'), new CCheckBox('event_ack_enable', $this->data['config']['event_ack_enable'], null, 1));
