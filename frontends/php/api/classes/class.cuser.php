@@ -995,7 +995,7 @@ Copt::memoryPick();
 		if($userInfo['attempt_failed'])
 			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$userInfo['userid']);
 
-		self::$userData = $userData;
+		CWebUser::$data = self::$userData = $userData;
 
 	return isset($user['userData']) ? $userData : $userData['sessionid'];
 	}
@@ -1046,7 +1046,7 @@ Copt::memoryPick();
 		$userData['sessionid'] = $sessionid;
 		$userData['gui_access'] = $guiAccess;
 
-		self::$userData = $userData;
+		CWebUser::$data = self::$userData = $userData;
 
 		return $userData;
 	}
