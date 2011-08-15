@@ -1062,7 +1062,7 @@ function getSelementsInfo($sysmap){
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectProfile' => true,
+			'selectInventory' => true,
 		);
 		$hostInventories = API::Host()->get($options);
 	}
@@ -2393,13 +2393,13 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2){
  */
 function getIconByMapping($iconMap, $inventory) {
 	$iconid = null;
-	$profiles = getHostProfiles();
+	$profiles = getHostInventories();
 
-	if (isset($inventory['profile'])) {
+	if (isset($inventory['inventory'])) {
 		foreach ($iconMap['mappings'] as $mapping) {
 			try {
 				$expr = new GlobalRegExp($mapping['expression']);
-				if ($expr->match($inventory['profile'][$profiles[$mapping['inventory_link']]['db_field']])) {
+				if ($expr->match($inventory['inventory'][$profiles[$mapping['inventory_link']]['db_field']])) {
 					$iconid = $mapping['iconid'];
 					break;
 				}

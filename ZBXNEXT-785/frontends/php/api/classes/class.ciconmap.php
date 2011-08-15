@@ -500,7 +500,7 @@ class CIconMap extends CZBXAPI {
 	 * @return void
 	 */
 	protected function validateMappings($iconMaps, $mustExist = true) {
-		$inventoryFields = getHostProfiles();
+		$inventoryFields = getHostInventories();
 		$imageIds = API::Image()->get(array(
 			'output' => API_OUTPUT_SHORTEN,
 			'preservekeys' => true,

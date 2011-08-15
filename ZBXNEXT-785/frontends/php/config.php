@@ -1386,7 +1386,7 @@ elseif ($_REQUEST['config'] == 14) {
 	}
 
 	$data['inventoryList'] = array();
-	$inventoryFields = getHostProfiles();
+	$inventoryFields = getHostInventories();
 	foreach ($inventoryFields as $field) {
 		$data['inventoryList'][$field['nr']] = $field['title'];
 	}
