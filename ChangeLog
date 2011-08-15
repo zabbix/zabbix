@@ -194,6 +194,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.7rc1
 
+ - [ZBX-4044] removed redundant query "SET CHARACTER SET" (asaveljevs,Vedmak)
  - [ZBX-3997] fixed IE9 dragging (Eduard)
  - [ZBX-4043] fixed processing of system.cpu.util on Solaris with non-sequential cpu numbers (Sasha)
  - [ZBX-4036] fixed period slider position saving in Monitoring->Events (Eduard)
