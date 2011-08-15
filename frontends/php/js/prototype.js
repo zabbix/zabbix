@@ -4300,24 +4300,53 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
   var MOUSEENTER_MOUSELEAVE_EVENTS_SUPPORTED = 'onmouseenter' in docEl
     && 'onmouseleave' in docEl;
 
+
+
+  var isIELegacyEvent = function(event) { return false; };
+
+  if (window.attachEvent) {
+    if (window.addEventListener) {
+      isIELegacyEvent = function(event) {
+        return !(event instanceof window.Event);
+      };
+    } else {
+      isIELegacyEvent = function(event) { return true; };
+    }
+  }
+
   var _isButton;
-  if (Prototype.Browser.IE) {
-    var buttonMap = { 0: 1, 1: 4, 2: 2 };
-    _isButton = function(event, code) {
-      return event.button === buttonMap[code];
-    };
-  } else if (Prototype.Browser.WebKit) {
-    _isButton = function(event, code) {
-      switch (code) {
-        case 0: return event.which == 1 && !event.metaKey;
-        case 1: return event.which == 1 && event.metaKey;
-        default: return false;
+
+  function _isButtonForDOMEvents(event, code) {
+    return event.which ? (event.which === code + 1) : (event.button === code);
+  }
+
+  var legacyButtonMap = { 0: 1, 1: 4, 2: 2 };
+  function _isButtonForLegacyEvents(event, code) {
+    return event.button === legacyButtonMap[code];
+  }
+
+  function _isButtonForWebKit(event, code) {
+    switch (code) {
+      case 0: return event.which == 1 && !event.metaKey;
+      case 1: return event.which == 2 || (event.which == 1 && event.metaKey);
+      case 2: return event.which == 3;
+      default: return false;
+    }
+  }
+
+  if (window.attachEvent) {
+    if (!window.addEventListener) {
+      _isButton = _isButtonForLegacyEvents;
+    } else {
+      _isButton = function(event, code) {
+        return isIELegacyEvent(event) ? _isButtonForLegacyEvents(event, code) :
+         _isButtonForDOMEvents(event, code);
       }
-    };
+    }
+  } else if (Prototype.Browser.WebKit) {
+    _isButton = _isButtonForWebKit;
   } else {
-    _isButton = function(event, code) {
-      return event.which ? (event.which === code + 1) : (event.button === code);
-    };
+    _isButton = _isButtonForDOMEvents;
   }
 
   function isLeftClick(event)   { return _isButton(event, 0) }
@@ -4347,9 +4376,14 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
 
   function findElement(event, expression) {
     var element = Event.element(event);
+
     if (!expression) return element;
-    var elements = [element].concat(element.ancestors());
-    return Selector.findElement(elements, expression, 0);
+    while (element) {
+      if (Object.isElement(element) && Prototype.Selector.match(element, expression)) {
+        return Element.extend(element);
+      }
+      element = element.parentNode;
+    }
   }
 
   function pointer(event) {
@@ -4383,49 +4417,59 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
     event.stopped = true;
   }
 
-  Event.Methods = {
-    isLeftClick: isLeftClick,
-    isMiddleClick: isMiddleClick,
-    isRightClick: isRightClick,
 
-    element: element,
+  Event.Methods = {
+    isLeftClick:   isLeftClick,
+    isMiddleClick: isMiddleClick,
+    isRightClick:  isRightClick,
+
+    element:     element,
     findElement: findElement,
 
-    pointer: pointer,
+    pointer:  pointer,
     pointerX: pointerX,
     pointerY: pointerY,
 
     stop: stop
   };
 
-
   var methods = Object.keys(Event.Methods).inject({ }, function(m, name) {
     m[name] = Event.Methods[name].methodize();
     return m;
   });
 
-  if (Prototype.Browser.IE) {
+  if (window.attachEvent) {
     function _relatedTarget(event) {
       var element;
       switch (event.type) {
-        case 'mouseover': element = event.fromElement; break;
-        case 'mouseout':  element = event.toElement;   break;
-        default: return null;
+        case 'mouseover':
+        case 'mouseenter':
+          element = event.fromElement;
+          break;
+        case 'mouseout':
+        case 'mouseleave':
+          element = event.toElement;
+          break;
+        default:
+          return null;
       }
       return Element.extend(element);
     }
 
-    Object.extend(methods, {
+    var additionalMethods = {
       stopPropagation: function() { this.cancelBubble = true },
       preventDefault:  function() { this.returnValue = false },
       inspect: function() { return '[object Event]' }
-    });
+    };
 
     Event.extend = function(event, element) {
       if (!event) return false;
-      if (event._extendedByPrototype) return event;
 
+      if (!isIELegacyEvent(event)) return event;
+
+      if (event._extendedByPrototype) return event;
       event._extendedByPrototype = Prototype.emptyFunction;
+
       var pointer = Event.pointer(event);
 
       Object.extend(event, {
@@ -4435,12 +4479,18 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
         pageY:  pointer.y
       });
 
-      return Object.extend(event, methods);
+      Object.extend(event, methods);
+      Object.extend(event, additionalMethods);
+
+      return event;
     };
   } else {
+    Event.extend = Prototype.K;
+  }
+
+  if (window.addEventListener) {
     Event.prototype = window.Event.prototype || document.createEvent('HTMLEvents').__proto__;
     Object.extend(Event.prototype, methods);
-    Event.extend = Prototype.K;
   }
 
   function _createResponder(element, eventName, handler) {
@@ -4518,12 +4568,12 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
     window.addEventListener('unload', Prototype.emptyFunction, false);
 
 
-  var _getDOMEventName = Prototype.K;
+  var _getDOMEventName = Prototype.K,
+      translations = { mouseenter: "mouseover", mouseleave: "mouseout" };
 
   if (!MOUSEENTER_MOUSELEAVE_EVENTS_SUPPORTED) {
     _getDOMEventName = function(eventName) {
-      var translations = { mouseenter: "mouseover", mouseleave: "mouseout" };
-      return eventName in translations ? translations[eventName] : eventName;
+      return (translations[eventName] || eventName);
     };
   }
 
@@ -4539,7 +4589,7 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
         element.addEventListener("dataavailable", responder, false);
       else {
         element.attachEvent("ondataavailable", responder);
-        element.attachEvent("onfilterchange", responder);
+        element.attachEvent("onlosecapture", responder);
       }
     } else {
       var actualEventName = _getDOMEventName(eventName);
@@ -4557,46 +4607,44 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
     element = $(element);
 
     var registry = Element.retrieve(element, 'prototype_event_registry');
+    if (!registry) return element;
 
-    if (Object.isUndefined(registry)) return element;
-
-    if (eventName && !handler) {
-      var responders = registry.get(eventName);
-
-      if (Object.isUndefined(responders)) return element;
-
-      responders.each( function(r) {
-        Element.stopObserving(element, eventName, r.handler);
-      });
-      return element;
-    } else if (!eventName) {
+    if (!eventName) {
       registry.each( function(pair) {
-        var eventName = pair.key, responders = pair.value;
-
-        responders.each( function(r) {
-          Element.stopObserving(element, eventName, r.handler);
-        });
+        var eventName = pair.key;
+        stopObserving(element, eventName);
       });
       return element;
     }
 
     var responders = registry.get(eventName);
+    if (!responders) return element;
 
-    if (!responders) return;
+    if (!handler) {
+      responders.each(function(r) {
+        stopObserving(element, eventName, r.handler);
+      });
+      return element;
+    }
 
-    var responder = responders.find( function(r) { return r.handler === handler; });
+    var i = responders.length, responder;
+    while (i--) {
+      if (responders[i].handler === handler) {
+        responder = responders[i];
+        break;
+      }
+    }
     if (!responder) return element;
-
-    var actualEventName = _getDOMEventName(eventName);
 
     if (eventName.include(':')) {
       if (element.removeEventListener)
         element.removeEventListener("dataavailable", responder, false);
       else {
         element.detachEvent("ondataavailable", responder);
-        element.detachEvent("onfilterchange",  responder);
+        element.detachEvent("onlosecapture", responder);
       }
     } else {
+      var actualEventName = _getDOMEventName(eventName);
       if (element.removeEventListener)
         element.removeEventListener(actualEventName, responder, false);
       else
@@ -4620,10 +4668,10 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
     var event;
     if (document.createEvent) {
       event = document.createEvent('HTMLEvents');
-      event.initEvent('dataavailable', true, true);
+      event.initEvent('dataavailable', bubble, true);
     } else {
       event = document.createEventObject();
-      event.eventType = bubble ? 'ondataavailable' : 'onfilterchange';
+      event.eventType = bubble ? 'ondataavailable' : 'onlosecapture';
     }
 
     event.eventName = eventName;
@@ -4637,13 +4685,47 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
     return Event.extend(event);
   }
 
+  Event.Handler = Class.create({
+    initialize: function(element, eventName, selector, callback) {
+      this.element   = $(element);
+      this.eventName = eventName;
+      this.selector  = selector;
+      this.callback  = callback;
+      this.handler   = this.handleEvent.bind(this);
+    },
+
+    start: function() {
+      Event.observe(this.element, this.eventName, this.handler);
+      return this;
+    },
+
+    stop: function() {
+      Event.stopObserving(this.element, this.eventName, this.handler);
+      return this;
+    },
+
+    handleEvent: function(event) {
+      var element = Event.findElement(event, this.selector);
+      if (element) this.callback.call(this.element, event, element);
+    }
+  });
+
+  function on(element, eventName, selector, callback) {
+    element = $(element);
+    if (Object.isFunction(selector) && Object.isUndefined(callback)) {
+      callback = selector, selector = null;
+    }
+
+    return new Event.Handler(element, eventName, selector, callback).start();
+  }
 
   Object.extend(Event, Event.Methods);
 
   Object.extend(Event, {
     fire:          fire,
     observe:       observe,
-    stopObserving: stopObserving
+    stopObserving: stopObserving,
+    on:            on
   });
 
   Element.addMethods({
@@ -4651,7 +4733,9 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
 
     observe:       observe,
 
-    stopObserving: stopObserving
+    stopObserving: stopObserving,
+
+    on:            on
   });
 
   Object.extend(document, {
@@ -4660,6 +4744,8 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
     observe:       observe.methodize(),
 
     stopObserving: stopObserving.methodize(),
+
+    on:            on.methodize(),
 
     loaded:        false
   });
