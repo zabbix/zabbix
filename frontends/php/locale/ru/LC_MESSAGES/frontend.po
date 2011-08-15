@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-10 18:09+0300\n"
+"POT-Creation-Date: 2011-08-15 09:47+0300\n"
 "PO-Revision-Date: 2011-07-11 18:10+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -340,7 +340,7 @@ msgstr ""
 msgid "Add to"
 msgstr "Добавить в"
 
-#: include/actions.inc.php:478 include/forms.inc.php:2218
+#: include/actions.inc.php:478 include/forms.inc.php:2236
 msgid "Add to host group"
 msgstr ""
 
@@ -892,13 +892,13 @@ msgstr "Не удалось добавить график"
 msgid "Cannot add group"
 msgstr "Не удалось добавить группу"
 
-#: api/classes/class.chost.php:1825
-msgid "Cannot add group."
-msgstr ""
-
 #: hosts.php:460
 msgid "Cannot add host"
 msgstr "Не удалось добавить узел сети"
+
+#: api/classes/class.chost.php:1824
+msgid "Cannot add host group."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:390
 msgid "Cannot add image"
@@ -908,7 +908,11 @@ msgstr "Не удалось добавить изображение"
 msgid "Cannot add item"
 msgstr "Не удалось добавить элемент данных"
 
-#: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
+#: api/classes/class.ctemplate.php:1588
+msgid "Cannot add macro"
+msgstr ""
+
+#: api/classes/class.chost.php:1945
 msgid "Cannot add macro."
 msgstr "Не удалось добавить макрос."
 
@@ -1043,20 +1047,20 @@ msgstr "Не удалось удалить график"
 msgid "Cannot delete group"
 msgstr "Не удалось удалить группу"
 
-#: api/classes/class.chost.php:1834
-msgid "Cannot delete group."
-msgstr ""
-
 #: hosts.php:620 hosts.php:648
 msgid "Cannot delete host"
 msgstr "Не удалось удалить узел сети"
+
+#: api/classes/class.chost.php:1833
+msgid "Cannot delete host group."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:392
 msgid "Cannot delete image"
 msgstr "Не удалось удалить изображение"
 
-#: api/classes/class.chost.php:1959
-msgid "Cannot delete inventory"
+#: api/classes/class.chost.php:1958
+msgid "Cannot delete inventory."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:815
@@ -1231,7 +1235,7 @@ msgstr "Не удалось присоединить шаблон"
 msgid "Cannot logout."
 msgstr "Не удалось выполнить выход."
 
-#: api/classes/class.chost.php:1733
+#: api/classes/class.chost.php:1732
 msgid "Cannot mass update host name."
 msgstr "Не удалось произвести массовое обновление имени узла сети."
 
@@ -1239,7 +1243,7 @@ msgstr "Не удалось произвести массовое обновле
 msgid "Cannot mass update template name"
 msgstr "Не удалось произвести массовое обновление имени шаблона"
 
-#: api/classes/class.chost.php:1723
+#: api/classes/class.chost.php:1722
 msgid "Cannot mass update visible host name."
 msgstr "Не удалось массово обновить видимое имя узла сети."
 
@@ -1267,7 +1271,11 @@ msgstr "Не удалось выполнить оператор для обно�
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "Не удалось выполнить оператор для обновления таблицы \"%s\" без условия where."
 
-#: api/classes/class.chost.php:1930 config.php:574
+#: config.php:574
+msgid "Cannot remove macro"
+msgstr ""
+
+#: api/classes/class.chost.php:1929
 msgid "Cannot remove macro."
 msgstr "Не удалось удалить макрос."
 
@@ -1379,14 +1387,17 @@ msgstr "Не удалось обновить изображение"
 msgid "Cannot update item"
 msgstr "Не удалось обновить элемент данных"
 
-#: api/classes/class.chost.php:1937 api/classes/class.ctemplate.php:1579
-#: config.php:579
+#: api/classes/class.ctemplate.php:1579 config.php:579
+msgid "Cannot update macro"
+msgstr ""
+
+#: api/classes/class.chost.php:1936
 msgid "Cannot update macro."
 msgstr "Не удалось обновить макрос."
 
 #: include/locales/en_gb.inc.php:692
-msgid "Cannot update macros."
-msgstr "Не удалось обновить макросы."
+msgid "Cannot update macros"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:611
 msgid "Cannot update maintenance"
@@ -2199,7 +2210,7 @@ msgstr "Удалить правило обнаружения?"
 msgid "Delete expression?"
 msgstr "Удалить выражение?"
 
-#: include/forms.inc.php:2221
+#: include/forms.inc.php:2239
 msgid "Delete from host group"
 msgstr ""
 
@@ -2446,8 +2457,8 @@ msgstr "Зависит от"
 msgid "Deployment status"
 msgstr "Состояние развертывания"
 
-#: host_discovery.php:639 include/forms.inc.php:2175
-#: include/forms.inc.php:2484 include/locales/en_gb.inc.php:821
+#: host_discovery.php:639 include/forms.inc.php:2193
+#: include/forms.inc.php:2502 include/locales/en_gb.inc.php:821
 #: include/views/administration.script.edit.php:71 media_types.php:260
 msgid "Description"
 msgstr "Описание"
@@ -2838,10 +2849,14 @@ msgstr "Пусто"
 #: api/classes/class.cdiscoveryrule.php:686 api/classes/class.cgraph.php:984
 #: api/classes/class.cgraphprototype.php:974
 #: api/classes/class.chostgroup.php:703
-#: api/classes/class.chostinterface.php:673 api/classes/class.chost.php:2118
-#: api/classes/class.citem.php:1018 api/classes/class.citemprototype.php:705
-#: api/classes/class.cproxy.php:475 api/classes/class.ctemplate.php:1139
-#: api/classes/class.ctrigger.php:1372 api/classes/class.cusergroup.php:642
+#: api/classes/class.chostinterface.php:673 api/classes/class.citem.php:1018
+#: api/classes/class.citemprototype.php:705 api/classes/class.cproxy.php:475
+#: api/classes/class.ctemplate.php:1139 api/classes/class.ctrigger.php:1372
+#: api/classes/class.cusergroup.php:642
+msgid "Empty input parameter"
+msgstr ""
+
+#: api/classes/class.chost.php:2117
 msgid "Empty input parameter."
 msgstr "Входной параметр пустой."
 
@@ -3063,7 +3078,7 @@ msgstr "Расширенный круговой"
 msgid "Export selected"
 msgstr "Экспортировать выбранное"
 
-#: events.php:263
+#: events.php:264
 msgid "Export to CSV"
 msgstr "Экспорт в CSV"
 
@@ -3683,7 +3698,7 @@ msgstr "Узел сети"
 msgid "Host \"%s\" already exists."
 msgstr "Узел сети \"%s\" уже существует."
 
-#: api/classes/class.chost.php:2241
+#: api/classes/class.chost.php:2240
 #, php-format
 msgid "Host \"%s\" deleted."
 msgstr "Узел сети \"%s\" удален."
@@ -3701,7 +3716,7 @@ msgstr "Узел сети (в порядке возрастания)"
 msgid "Host IP"
 msgstr "IP адрес узла сети"
 
-#: include/forms.inc.php:3820
+#: include/forms.inc.php:3838
 msgid "Host Inventory"
 msgstr ""
 
@@ -3812,8 +3827,8 @@ msgstr "Шаблон узла сети"
 msgid "Host time"
 msgstr "Время узла сети"
 
-#: api/classes/class.chost.php:1578 api/classes/class.chost.php:1583
-#: api/classes/class.chost.php:1588 api/classes/class.chost.php:1597
+#: api/classes/class.chost.php:1577 api/classes/class.chost.php:1582
+#: api/classes/class.chost.php:1587 api/classes/class.chost.php:1596
 msgid "Host update failed."
 msgstr "Ошибка при обновлении узла сети."
 
@@ -3821,12 +3836,12 @@ msgstr "Ошибка при обновлении узла сети."
 msgid "Host updated"
 msgstr "Узел сети обновлен"
 
-#: api/classes/class.chost.php:1424 api/classes/class.ctemplate.php:1396
+#: api/classes/class.chost.php:1423 api/classes/class.ctemplate.php:1396
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Узел сети с таким же именем \"%s\" уже существует."
 
-#: api/classes/class.chost.php:1430 api/classes/class.ctemplate.php:1052
+#: api/classes/class.chost.php:1429 api/classes/class.ctemplate.php:1052
 #: api/classes/class.ctemplate.php:1369
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
@@ -4267,11 +4282,6 @@ msgstr "В функцию переданы некорректные аргуме
 msgid "Incorrect arguments passed to method."
 msgstr "Для метода предоставлены некорректные аргументы."
 
-#: api/classes/class.chost.php:1361 api/classes/class.chost.php:1729
-#, php-format
-msgid "Incorrect characters used for Host name \"%s\""
-msgstr "Использованы недопустимые символы в имени узла сети \"%s\""
-
 #: include/locales/en_gb.inc.php:1877
 msgid "Incorrect characters used for Node name"
 msgstr "Использованы недопустимые символы в имени Ноды"
@@ -4285,6 +4295,11 @@ msgstr "Использованы недопустимые символы в им
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
 msgstr "Использованы недопустимые символы в имени шаблона [ %1$s ]"
+
+#: api/classes/class.chost.php:1361 api/classes/class.chost.php:1728
+#, php-format
+msgid "Incorrect characters used for host name \"%s\"."
+msgstr ""
 
 #: api/classes/class.ctemplate.php:1401
 #, php-format
@@ -4719,7 +4734,7 @@ msgstr "Элемент данных \"%1$s:%2$s\" удален."
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "У элемента данных \"%1$s:%2$s\" ошибочный порт \"%3$s\"."
 
-#: include/forms.inc.php:1685
+#: include/forms.inc.php:1703
 #, php-format
 msgid "Item %1$s : %2$s"
 msgstr "Элемент данных %1$s : %2$s"
@@ -4781,7 +4796,7 @@ msgstr "Элемент данных использует интерфейс уз
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Элемент данных не обновлен. Пожалуйста, введите корректный интервал обновления."
 
-#: include/forms.inc.php:2159
+#: include/forms.inc.php:2177
 msgid "Item will populate host inventory field"
 msgstr ""
 
@@ -5317,6 +5332,12 @@ msgstr "Макросы обновлены"
 msgid "Maintenance"
 msgstr "Обслуживание"
 
+#: api/classes/class.cmaintenance.php:509
+#: api/classes/class.cmaintenance.php:605
+#, php-format
+msgid "Maintenance \"%s\" already exists."
+msgstr ""
+
 #: include/locales/en_gb.inc.php:601
 msgid "Maintenance added"
 msgstr "Обслуживание добавлено"
@@ -5725,7 +5746,7 @@ msgstr "Аутентификация NTLM"
 
 #: actionconf.php:164 actionconf.php:418 discoveryconf.php:246
 #: disc_prototypes.php:376 host_discovery.php:451 hostinventories.php:161
-#: hosts.php:761 include/forms.inc.php:1014 include/forms.inc.php:1735
+#: hosts.php:761 include/forms.inc.php:1032 include/forms.inc.php:1753
 #: include/hosts.inc.php:60 include/locales/en_gb.inc.php:1523
 #: include/views/administration.script.edit.php:43
 #: include/views/administration.script.list.php:40
@@ -5991,7 +6012,7 @@ msgstr ""
 msgid "No groups for host \"%s\"."
 msgstr "Группы для узла сети \"%s\" не заданы."
 
-#: api/classes/class.chost.php:1715
+#: api/classes/class.chost.php:1714
 msgid "No groups for hosts."
 msgstr "Группы для узлов сети не заданы."
 
@@ -6251,16 +6272,16 @@ msgstr "Нода с таким ID уже существует"
 msgid "Nodes"
 msgstr "Нода"
 
-#: include/forms.inc.php:2140 include/locales/en_gb.inc.php:739
+#: include/forms.inc.php:2158 include/locales/en_gb.inc.php:739
 #: include/locales/en_gb.inc.php:1348
 msgid "None"
 msgstr "Пусто"
 
-#: include/forms.inc.php:2977 include/locales/en_gb.inc.php:525
+#: include/forms.inc.php:2995 include/locales/en_gb.inc.php:525
 msgid "Normal"
 msgstr "Нормальный"
 
-#: include/forms.inc.php:2978
+#: include/forms.inc.php:2996
 msgid "Normal + Multiple PROBLEM events"
 msgstr "Нормальный + Множественные события ПРОБЛЕМА"
 
@@ -8379,12 +8400,12 @@ msgstr "Шаблон с группой элементов данных"
 msgid "Template with item key"
 msgstr "Шаблон с ключем элемента данных"
 
-#: api/classes/class.chost.php:1440 api/classes/class.ctemplate.php:1391
+#: api/classes/class.chost.php:1439 api/classes/class.ctemplate.php:1391
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Шаблон с таким же именем \"%s\" уже существует."
 
-#: api/classes/class.chost.php:1446 api/classes/class.ctemplate.php:1048
+#: api/classes/class.chost.php:1445 api/classes/class.ctemplate.php:1048
 #: api/classes/class.ctemplate.php:1364
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
@@ -9005,7 +9026,7 @@ msgstr "Вверх"
 msgid "Update"
 msgstr "Обновить"
 
-#: include/forms.inc.php:2220
+#: include/forms.inc.php:2238
 msgid "Update in host group"
 msgstr ""
 
@@ -9286,8 +9307,8 @@ msgid "Visible name"
 msgstr "Видимое имя"
 
 #: api/classes/class.chost.php:1375
-msgid "Visible name cannot be empty if missing host name"
-msgstr "Видимое имя не может быть пустым, если опущено имя узла сети"
+msgid "Visible name cannot be empty if host name is missing."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:1976
 msgid "W"
@@ -9589,7 +9610,7 @@ msgstr "Вы не указали цели для команды \"%s\" в опе
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr "Вы не указали цели глобального скрипта \"%s\" в операции действия."
 
-#: api/classes/class.chost.php:1624
+#: api/classes/class.chost.php:1623
 msgid "You do not have enough rights for operation."
 msgstr "У вас нет полномочий для этой операции."
 
