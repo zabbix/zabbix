@@ -64,11 +64,11 @@ include_once('include/page_header.php');
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
 		// GUI
-		'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),		'isset({config})&&({config}==8)&&isset({save})'),
+		'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
 		'event_expire'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'event_show_max'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'dropdown_first_entry'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1,2'),		'isset({config})&&({config}==8)&&isset({save})'),
-		'dropdown_first_remember'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),	null),
+		'dropdown_first_remember'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
 		'max_in_table' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'search_limit' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,999999),	'isset({config})&&({config}==8)&&isset({save})'),
 
@@ -216,13 +216,13 @@ include_once('include/page_header.php');
 			}
 		}
 	}
-	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==8)){ // GUI
+	else if(isset($_REQUEST['save']) && ($_REQUEST['config'] == 8)){ // GUI
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
 		$configs = array(
 			'default_theme' => get_request('default_theme'),
-			'event_ack_enable' => get_request('event_ack_enable'),
+			'event_ack_enable' => (is_null(get_request('event_ack_enable')) ? 0 : 1),
 			'event_expire' => get_request('event_expire'),
 			'event_show_max' => get_request('event_show_max'),
 			'dropdown_first_entry' => get_request('dropdown_first_entry'),
@@ -703,7 +703,7 @@ include_once('include/page_header.php');
 /////////////////////////////////
 //  config = 0 // Housekeeper  //
 /////////////////////////////////
-	if($_REQUEST['config']==0){ //housekeeper
+	if($_REQUEST['config'] == 0){
 
 		$frmHouseKeep = new CFormTable(S_HOUSEKEEPER, "config.php");
 		$frmHouseKeep->setHelp("web.config.housekeeper.php");
@@ -721,7 +721,7 @@ include_once('include/page_header.php');
 ////////////////////////////
 //  config = 3 // Images  //
 ////////////////////////////
-	elseif($_REQUEST["config"]==3){ // Images
+	elseif($_REQUEST["config"] == 3){
 		if(isset($_REQUEST["form"])){
 			$frmImages = new CFormTable(S_IMAGE, 'config.php', 'post', 'multipart/form-data');
 			$frmImages->setHelp('web.config.images.php');
@@ -842,7 +842,7 @@ include_once('include/page_header.php');
 //////////////////////////////////////
 //  config = 5 // Other Parameters  //
 //////////////////////////////////////
-	else if($_REQUEST['config']==5){ // Other parameters
+	elseif($_REQUEST['config'] == 5){
 
 		$frmOther = new CFormTable(S_OTHER_PARAMETERS, 'config.php');
 		$frmOther->setHelp('web.config.other.php');
@@ -882,7 +882,7 @@ include_once('include/page_header.php');
 ///////////////////////////////////
 //  config = 6 // Value Mapping  //
 ///////////////////////////////////
-	elseif($_REQUEST['config']==6){ // Value Mapping
+	elseif($_REQUEST['config'] == 6){
 		if(isset($_REQUEST['form'])){
 			$frmValmap = new CFormTable(S_VALUE_MAP);
 			$frmValmap->setHelp("web.mapping.php");
@@ -1018,7 +1018,7 @@ include_once('include/page_header.php');
 /////////////////////////////////
 //  config = 7 // Work Period  //
 /////////////////////////////////
-	else if($_REQUEST['config']==7){ //work period
+	elseif($_REQUEST['config'] == 7){
 
 		$frmHouseKeep = new CFormTable(S_WORKING_TIME, "config.php");
 		$frmHouseKeep->setHelp("web.config.workperiod.php");
@@ -1034,48 +1034,32 @@ include_once('include/page_header.php');
 /////////////////////////
 //  config = 8 // GUI  //
 /////////////////////////
-	else if($_REQUEST['config']==8){ // GUI
+	elseif($_REQUEST['config'] == 8){
+		$data = array();
+		$data['form'] = get_request('form', 1);
+		$data['form_refresh'] = get_request('form_refresh', 0);
 
-		$frmGUI = new CFormTable(S_GUI, "config.php");
-		$frmGUI->addVar("config", get_request("config",8));
+		if($data['form_refresh']){
+			$data['config']['default_theme'] = get_request('default_theme');
+			$data['config']['event_ack_enable'] = get_request('event_ack_enable');
+			$data['config']['dropdown_first_entry'] = get_request('dropdown_first_entry');
+			$data['config']['dropdown_first_remember'] = get_request('dropdown_first_remember');
+			$data['config']['search_limit'] = get_request('search_limit');
+			$data['config']['max_in_table'] = get_request('max_in_table');
+			$data['config']['event_expire'] = get_request('event_expire');
+			$data['config']['event_show_max'] = get_request('event_show_max');
+		}
+		else{
+			$data['config'] = select_config(false);
+		}
 
-		$combo_theme = new CComboBox('default_theme', $config['default_theme']);
-		$combo_theme->addItem('css_ob.css',S_ORIGINAL_BLUE);
-		$combo_theme->addItem('css_bb.css',S_BLACK_AND_BLUE);
-		$combo_theme->addItem('css_od.css',S_DARK_ORANGE);
-
-		$exp_select = new CComboBox('event_ack_enable', $config['event_ack_enable']);
-		$exp_select->addItem(EVENT_ACK_ENABLED,S_ENABLED);
-		$exp_select->addItem(EVENT_ACK_DISABLED,S_DISABLED);
-
-		$combo_dd_first_entry = new CComboBox('dropdown_first_entry', $config['dropdown_first_entry']);
-		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_NONE, S_NONE);
-		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ALL, S_ALL_S);
-
-		$check_dd_first_remember = new CCheckBox('dropdown_first_remember', $config['dropdown_first_remember'], null, 1);
-
-		$frmGUI->addRow(S_DEFAULT_THEME, $combo_theme);
-		$frmGUI->addRow(S_DROPDOWN_FIRST_ENTRY, array(
-			$combo_dd_first_entry,
-			$check_dd_first_remember,
-			S_DROPDOWN_REMEMBER_SELECTED
-			));
-
-		$frmGUI->addRow(S_SEARCH_LIMIT, new CNumericBox('search_limit', $config['search_limit'], 6));
-		$frmGUI->addRow(S_MAX_IN_TABLE, new CNumericBox('max_in_table', $config['max_in_table'], 5));
-		$frmGUI->addRow(S_EVENT_ACKNOWLEDGES,$exp_select);
-		$frmGUI->addRow(S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')',
-			new CTextBox('event_expire',$config['event_expire'],5));
-		$frmGUI->addRow(S_MAX_COUNT_OF_EVENTS,
-			new CTextBox('event_show_max',$config['event_show_max'],5));
-		$frmGUI->addItemToBottomRow(new CSubmit("save",S_SAVE));
-
-		$cnf_wdgt->addItem($frmGUI);
+		$guiForm = new CView('administration.general.gui.edit', $data);
+		$cnf_wdgt->addItem($guiForm->render());
 	}
 //////////////////////////////////////////
 //  config = 10 // Regular Expressions  //
 //////////////////////////////////////////
-	else if($_REQUEST['config'] == 10){
+	elseif($_REQUEST['config'] == 10){
 		if(isset($_REQUEST['form'])){
 
 			$frmRegExp = new CForm('post','config.php');
@@ -1205,7 +1189,7 @@ include_once('include/page_header.php');
 /////////////////////////////
 //  config = 11 // Macros  //
 /////////////////////////////
-	else if($_REQUEST['config']==11){
+	elseif($_REQUEST['config'] == 11){
 		$form = new CForm();
 		$tbl = new CTable();
 		$tbl->addRow(get_macros_widget());
@@ -1217,7 +1201,7 @@ include_once('include/page_header.php');
 /////////////////////////////////////////
 //  config = 12 // Trigger severities  //
 /////////////////////////////////////////
-	else if($_REQUEST['config']==12){
+	elseif($_REQUEST['config'] == 12){
 		$data = array();
 		$data['form'] = get_request('form', 1);
 		$data['form_refresh'] = get_request('form_refresh', 0);
@@ -1236,6 +1220,9 @@ include_once('include/page_header.php');
 			$data['config']['severity_name_5'] = get_request('severity_name_5');
 			$data['config']['severity_color_5'] = get_request('severity_color_5', '');
 		}
+		else{
+			$data['config'] = select_config(false);
+		}
 
 		$triggerSeverityForm = new CView('administration.general.triggerSeverity.edit', $data);
 		$cnf_wdgt->addItem($triggerSeverityForm->render());
@@ -1243,7 +1230,7 @@ include_once('include/page_header.php');
 ////////////////////////////////////////////////
 //  config = 13 // Trigger displaying options //
 ////////////////////////////////////////////////
-	else if($_REQUEST['config']==13){
+	elseif($_REQUEST['config'] == 13){
 		$data = array();
 		$data['form'] = get_request('form', 1);
 		$data['form_refresh'] = get_request('form_refresh', 0);
