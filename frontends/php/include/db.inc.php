@@ -82,7 +82,6 @@ if(!isset($DB)){
 						}
 						else{
 							DBexecute('SET NAMES utf8');
-							DBexecute('SET CHARACTER SET utf8');
 						}
 					}
 				break;
