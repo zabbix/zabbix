@@ -75,11 +75,11 @@ int	DBconnect(int flag)
 
 		if (ZBX_DB_FAIL == err || ZBX_DB_CONNECT_EXIT == flag)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Could not connect to the database. Exiting...");
+			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the database. Exiting...");
 			exit(FAIL);
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in 10 seconds");
+		zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in 10 seconds.");
 		zbx_sleep(10);
 	}
 
@@ -125,7 +125,7 @@ void	DBbegin()
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_begin()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
 		}
 	}
@@ -135,11 +135,11 @@ void	DBbegin()
  *                                                                            *
  * Function: DBcommit                                                         *
  *                                                                            *
- * Purpose: Commit transaction                                                *
+ * Purpose: commit a transaction                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing if DB does not support transactions                   *
+ * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBcommit()
@@ -155,7 +155,7 @@ void	DBcommit()
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_commit()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
 		}
 	}
@@ -165,11 +165,11 @@ void	DBcommit()
  *                                                                            *
  * Function: DBrollback                                                       *
  *                                                                            *
- * Purpose: Rollback transaction                                              *
+ * Purpose: rollback a transaction                                            *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing if DB does not support transactions                   *
+ * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBrollback()
@@ -185,16 +185,21 @@ void	DBrollback()
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_rollback()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
 		}
 	}
 }
 
-/*
- * Execute SQL statement. For non-select statements only.
- * If fails, program terminates.
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: DBexecute                                                        *
+ *                                                                            *
+ * Purpose: execute a non-select statement                                    *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
 int	__zbx_DBexecute(const char *fmt, ...)
 {
 	va_list	args;
@@ -213,7 +218,7 @@ int	__zbx_DBexecute(const char *fmt, ...)
 
 		if (ZBX_DB_DOWN == rc)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
 		}
 	}
@@ -237,7 +242,7 @@ DB_ROW	DBfetch(DB_RESULT result)
  *                                                                            *
  * Function: DBselect_once                                                    *
  *                                                                            *
- * Purpose: execute a select statement only once                              *
+ * Purpose: execute a select statement                                        *
  *                                                                            *
  ******************************************************************************/
 DB_RESULT	__zbx_DBselect_once(const char *fmt, ...)
@@ -281,7 +286,7 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 
 		if (rc == (DB_RESULT)ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
 		}
 	}
@@ -315,7 +320,7 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 		if (rc == (DB_RESULT)ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
 		}
 	}

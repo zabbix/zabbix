@@ -309,7 +309,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		DBfree_result(result);
 	}
 
-#ifdef	HAVE_FUNCTION_PQSERVERVERSION
+#ifdef HAVE_FUNCTION_PQSERVERVERSION
 	ZBX_PG_SVERSION = PQserverVersion(conn);
 	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
 #endif
@@ -326,7 +326,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		DBexecute("set bytea_output=escape");
 	}
 #elif defined(HAVE_SQLITE3)
-#ifdef	HAVE_FUNCTION_SQLITE3_OPEN_V2
+#ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
 	if (SQLITE_OK != sqlite3_open(dbname, &conn))
@@ -744,7 +744,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 			{
 				if (0 != mysql_field_count(conn))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "could not retrieve result set");
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve result set");
 					break;
 				}
 				else
@@ -757,22 +757,22 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		}
 	}
 #elif defined(HAVE_ORACLE)
-	err = OCIHandleAlloc( (dvoid *) oracle.envhp, (dvoid **) &stmthp, OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0);
+	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
 	if (OCI_SUCCESS == err)
 	{
-		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql, (ub4) strlen((char *) sql),
-				(ub4) OCI_NTV_SYNTAX, (ub4) OCI_DEFAULT);
+		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql, (ub4)strlen((char *)sql),
+				(ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
 	}
 
 	if (OCI_SUCCESS == err)
 	{
-		err = OCIStmtExecute(oracle.svchp, stmthp, oracle.errhp, (ub4) 1, (ub4) 0,
-				(CONST OCISnapshot *) NULL, (OCISnapshot *) NULL, OCI_COMMIT_ON_SUCCESS);
+		err = OCIStmtExecute(oracle.svchp, stmthp, oracle.errhp, (ub4)1, (ub4)0,
+				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS);
 
 		if (OCI_SUCCESS == err)
 		{
-			ub4 nrows = 0;
+			ub4	nrows = 0;
 
 			err = OCIAttrGet((void *)stmthp, OCI_HTYPE_STMT, (ub4 *)&nrows,
 					  (ub4 *)0, OCI_ATTR_ROW_COUNT, oracle.errhp);
@@ -827,7 +827,7 @@ lbl_exec:
 	if (SQLITE_OK != (err = sqlite3_exec(conn, sql, NULL, 0, &error)))
 	{
 		if (SQLITE_BUSY == err)
-			goto lbl_exec;	/* Deadlock!!! */
+			goto lbl_exec;
 
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
@@ -876,7 +876,6 @@ lbl_exec:
  * Return value: data, NULL (on error) or (DB_RESULT)ZBX_DB_DOWN              *
  *                                                                            *
  ******************************************************************************/
-
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 {
 	char		*sql = NULL;
@@ -1054,7 +1053,7 @@ error:
 			else
 			{
 				/* retrieve the column width in bytes */
-				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width,(ub4 *)0,
+				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width, (ub4 *)0,
 						(ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
 			}
 		}
@@ -1122,7 +1121,7 @@ lbl_get_table:
 	if (SQLITE_OK != (ret = sqlite3_get_table(conn,sql, &result->data, &result->nrow, &result->ncolumn, &error)))
 	{
 		if (SQLITE_BUSY == ret)
-			goto lbl_get_table;	/* Deadlock!!! */
+			goto lbl_get_table;
 
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
@@ -1179,7 +1178,7 @@ DB_RESULT	zbx_db_select_n(const char *query, int n)
 DB_ROW	zbx_db_fetch(DB_RESULT result)
 {
 #if defined(HAVE_IBM_DB2)
-	int	i;
+	int		i;
 #elif defined(HAVE_ORACLE)
 	sword		rc;
 	static char	errbuf[512];

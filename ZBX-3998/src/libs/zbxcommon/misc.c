@@ -118,7 +118,7 @@ double	zbx_current_time()
  *                                                                            *
  * Function: zbx_calloc2                                                      *
  *                                                                            *
- * Purpose: allocates size bytes of memory                                    *
+ * Purpose: allocates nmemb * size bytes of memory and fills it with zeros    *
  *                                                                            *
  * Return value: returns a pointer to the newly allocated memory              *
  *                                                                            *
@@ -154,6 +154,7 @@ void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, si
 
 	exit(FAIL);
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_malloc2                                                      *
