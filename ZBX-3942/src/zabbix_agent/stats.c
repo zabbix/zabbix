@@ -33,10 +33,6 @@
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
-#ifdef _AIX
-extern ZBX_MUTEX	vmstat_access;
-#endif
-
 #if !defined(_WINDOWS)
 static int	shm_id;
 #endif
@@ -191,13 +187,6 @@ void	init_collector_data()
 
 #ifdef _AIX
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
-	collector->vmstat_flags = 0;
-
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&vmstat_access, ZBX_MUTEX_VMSTAT))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "unable to create mutex for vmstat data");
-		exit(FAIL);
-	}
 #endif
 }
 
@@ -226,10 +215,6 @@ void	free_collector_data()
 
 	if (-1 == shmctl(shm_id, IPC_RMID, 0))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for collector: %s", zbx_strerror(errno));
-#endif
-
-#ifdef _AIX
-	zbx_mutex_destroy(&vmstat_access);
 #endif
 
 	collector = NULL;
@@ -274,7 +259,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #endif
 		collect_stats_diskdevices(&(collector->diskdevices));
 #ifdef _AIX
-		if (0 != collector->vmstat_flags & ZBX_VMSTAT_ENABLED)
+		if (1 == collector->vmstat.enabled)
 			collect_vmstat_data(&collector->vmstat);
 #endif
 		zbx_setproctitle("collector [sleeping for 1 seconds]");

@@ -31,9 +31,6 @@
 #	include "vmstats.h"
 #endif	/* _AIX */
 
-#define ZBX_VMSTAT_ENABLED		0x01
-#define ZBX_VMSTAT_DATA_AVAILABLE	0x02
-
 typedef struct
 {
 	ZBX_CPUS_STAT_DATA	cpus;
@@ -42,7 +39,6 @@ typedef struct
 	ZBX_PERF_STAT_DATA	perfs;
 #endif	/* _WINDOWS */
 #ifdef _AIX
-	int			vmstat_flags;	/* e. g. collecting enabled, data available */
 	ZBX_VMSTAT_DATA		vmstat;
 #endif	/* _AIX */
 }

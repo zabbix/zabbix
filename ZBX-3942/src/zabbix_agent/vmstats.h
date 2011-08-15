@@ -27,6 +27,8 @@
 typedef struct
 {
 	/* public */
+	unsigned char	enabled;		/* collecting enabled */
+	unsigned char	data_available;		/* data was collected at least once */
 	unsigned char	shared_enabled; 	/* partition runs in shared mode */
 	unsigned char	pool_util_authority;	/* pool utilization available */
 	unsigned char	aix52stats;

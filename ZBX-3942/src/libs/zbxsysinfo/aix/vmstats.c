@@ -21,15 +21,12 @@
 #include "sysinfo.h"
 #include "stats.h"
 
-extern ZBX_MUTEX		vmstat_access;
-#define LOCK_VMSTAT		zbx_mutex_lock(&vmstat_access)
-#define UNLOCK_VMSTAT		zbx_mutex_unlock(&vmstat_access)
 #define ZBX_WAIT_VMSTAT_DATA	2	/* seconds to wait for vmstat data to become available */
 
 int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	section[16], type[8];
-	int	nparams, wait = ZBX_WAIT_VMSTAT_DATA, data_available = 0;
+	int	nparams, wait = ZBX_WAIT_VMSTAT_DATA;
 
 	if (!VMSTAT_COLLECTOR_STARTED(collector))
 	{
@@ -38,24 +35,19 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	}
 
 	/* if vmstat is disabled in collector get first data to return and enable it */
-	if (0 == collector->vmstat_flags & ZBX_VMSTAT_ENABLED)
+	if (0 == collector->vmstat.enabled)
 	{
-		LOCK_VMSTAT;
-		collector->vmstat_flags |= ZBX_VMSTAT_ENABLED;
-		UNLOCK_VMSTAT;
+		collector->vmstat.enabled = 1;
 
 		/* wait until vmstat data is available */
 		while (wait--)
 		{
 			sleep(1);
-			if (0 != collector->vmstat_flags & ZBX_VMSTAT_DATA_AVAILABLE)
-			{
-				data_available = 1;
+			if (1 == collector->vmstat.data_available)
 				break;
-			}
 		}
 
-		if (0 == data_available)
+		if (0 == collector->vmstat.data_available)
 			return SYSINFO_RET_FAIL;
 	}
 

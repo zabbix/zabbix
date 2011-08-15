@@ -167,7 +167,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 			dpcpu_sy += dbusy_donated_purr + dbusy_stolen_purr;
 
 			delta_purr += didle_donated_purr + dbusy_donated_purr + didle_stolen_purr + dbusy_stolen_purr;
-			pcputime = delta_purr; 
+			pcputime = delta_purr;
 		}
 #endif	/* HAVE_AIXOSLEVEL_530006 */
 
@@ -201,8 +201,8 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		vmstat->cpu_wa = (double)dpcpu_wa * 100.0 / (double)pcputime;
 
 		if (lparstats.type.b.shared_enabled)
-		{   
-			/* Physical Processor Consumed */  
+		{
+			/* Physical Processor Consumed */
 			vmstat->cpu_pc = (double)delta_purr / (double)dtimebase;
 
 			/* Percentage of Entitlement Consumed */
@@ -212,8 +212,8 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 			vmstat->cpu_lbusy = (double)(dlcpu_us + dlcpu_sy) * 100.0 / (double)lcputime;
 
 			if (lparstats.type.b.pool_util_authority)
-			{ 
-				/* Available Pool Processor (app) */ 
+			{
+				/* Available Pool Processor (app) */
 				vmstat->cpu_app = (double)(lparstats.pool_idle_time - last_pool_idle_time) / (XINTFRAC * (double)dtimebase);
 			}
 		}
@@ -237,7 +237,8 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 #endif
 		vmstat->mem_fre = (zbx_uint64_t)memstats.real_free;	/* free real memory (in 4KB pages) */
 	}
-	else
+
+	if (0 == vmstat->data_available)
 	{
 #ifdef _AIXVERSION_530
 		vmstat->shared_enabled = (unsigned char)lparstats.type.b.shared_enabled;
@@ -246,6 +247,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 #ifdef HAVE_AIXOSLEVEL_520004
 		vmstat->aix52stats = 1;
 #endif
+		vmstat->data_available = 1;
 	}
 
 	/* saving last values */
