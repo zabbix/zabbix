@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-10 18:09+0300\n"
+"POT-Creation-Date: 2011-08-15 09:47+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -339,7 +339,7 @@ msgstr ""
 msgid "Add to"
 msgstr "Přidat do"
 
-#: include/actions.inc.php:478 include/forms.inc.php:2218
+#: include/actions.inc.php:478 include/forms.inc.php:2236
 msgid "Add to host group"
 msgstr ""
 
@@ -891,13 +891,13 @@ msgstr "Nelze přidat graf"
 msgid "Cannot add group"
 msgstr "Nelze přidat skupinu"
 
-#: api/classes/class.chost.php:1825
-msgid "Cannot add group."
-msgstr ""
-
 #: hosts.php:460
 msgid "Cannot add host"
 msgstr "Nelze přidat hostitele"
+
+#: api/classes/class.chost.php:1824
+msgid "Cannot add host group."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:390
 msgid "Cannot add image"
@@ -907,7 +907,11 @@ msgstr "Nelze přidat obrázek"
 msgid "Cannot add item"
 msgstr "Nelze přidat položku"
 
-#: api/classes/class.chost.php:1946 api/classes/class.ctemplate.php:1588
+#: api/classes/class.ctemplate.php:1588
+msgid "Cannot add macro"
+msgstr ""
+
+#: api/classes/class.chost.php:1945
 msgid "Cannot add macro."
 msgstr "Nelze přidat makro."
 
@@ -1042,20 +1046,20 @@ msgstr "Nelze smazat grafy"
 msgid "Cannot delete group"
 msgstr "Nelze smazat skupinu"
 
-#: api/classes/class.chost.php:1834
-msgid "Cannot delete group."
-msgstr ""
-
 #: hosts.php:620 hosts.php:648
 msgid "Cannot delete host"
 msgstr "Nelze smazat hostitele"
+
+#: api/classes/class.chost.php:1833
+msgid "Cannot delete host group."
+msgstr ""
 
 #: include/locales/en_gb.inc.php:392
 msgid "Cannot delete image"
 msgstr "Nelze smazat obrázek"
 
-#: api/classes/class.chost.php:1959
-msgid "Cannot delete inventory"
+#: api/classes/class.chost.php:1958
+msgid "Cannot delete inventory."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:815
@@ -1230,16 +1234,16 @@ msgstr "Nelze připojit šablonu"
 msgid "Cannot logout."
 msgstr ""
 
-#: api/classes/class.chost.php:1733
-msgid "Cannot mass update host name"
+#: api/classes/class.chost.php:1732
+msgid "Cannot mass update host name."
 msgstr ""
 
 #: api/classes/class.ctemplate.php:1375
 msgid "Cannot mass update template name"
 msgstr ""
 
-#: api/classes/class.chost.php:1723
-msgid "Cannot mass update visible host name"
+#: api/classes/class.chost.php:1722
+msgid "Cannot mass update visible host name."
 msgstr ""
 
 #: api/classes/class.ctemplate.php:1348
@@ -1266,8 +1270,12 @@ msgstr ""
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
-#: api/classes/class.chost.php:1930 config.php:574
+#: config.php:574
 msgid "Cannot remove macro"
+msgstr ""
+
+#: api/classes/class.chost.php:1929
+msgid "Cannot remove macro."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1929
@@ -1378,14 +1386,17 @@ msgstr "Nelze upravit obrázek"
 msgid "Cannot update item"
 msgstr "Nelze upravit položku"
 
-#: api/classes/class.chost.php:1937 api/classes/class.ctemplate.php:1579
-#: config.php:579
+#: api/classes/class.ctemplate.php:1579 config.php:579
 msgid "Cannot update macro"
 msgstr ""
 
+#: api/classes/class.chost.php:1936
+msgid "Cannot update macro."
+msgstr ""
+
 #: include/locales/en_gb.inc.php:692
-msgid "Cannot update macros."
-msgstr "Nelze upravit makra."
+msgid "Cannot update macros"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:611
 msgid "Cannot update maintenance"
@@ -2198,7 +2209,7 @@ msgstr ""
 msgid "Delete expression?"
 msgstr "Smazat výraz?"
 
-#: include/forms.inc.php:2221
+#: include/forms.inc.php:2239
 msgid "Delete from host group"
 msgstr ""
 
@@ -2445,8 +2456,8 @@ msgstr "Závisí na:"
 msgid "Deployment status"
 msgstr ""
 
-#: host_discovery.php:639 include/forms.inc.php:2175
-#: include/forms.inc.php:2484 include/locales/en_gb.inc.php:821
+#: host_discovery.php:639 include/forms.inc.php:2193
+#: include/forms.inc.php:2502 include/locales/en_gb.inc.php:821
 #: include/views/administration.script.edit.php:71 media_types.php:260
 msgid "Description"
 msgstr "Popis"
@@ -2724,12 +2735,12 @@ msgstr "První položka v rozbalovacích seznamech"
 
 #: api/classes/class.chost.php:1365
 #, php-format
-msgid "Duplicate host. Host with the same host name \"%s\" already exists in data"
+msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr ""
 
 #: api/classes/class.chost.php:1396
 #, php-format
-msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data"
+msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr ""
 
 #: api/classes/class.cmap.php:579
@@ -2837,10 +2848,14 @@ msgstr "Prázdný"
 #: api/classes/class.cdiscoveryrule.php:686 api/classes/class.cgraph.php:984
 #: api/classes/class.cgraphprototype.php:974
 #: api/classes/class.chostgroup.php:703
-#: api/classes/class.chostinterface.php:673 api/classes/class.chost.php:2118
-#: api/classes/class.citem.php:1018 api/classes/class.citemprototype.php:705
-#: api/classes/class.cproxy.php:475 api/classes/class.ctemplate.php:1139
-#: api/classes/class.ctrigger.php:1372 api/classes/class.cusergroup.php:642
+#: api/classes/class.chostinterface.php:673 api/classes/class.citem.php:1018
+#: api/classes/class.citemprototype.php:705 api/classes/class.cproxy.php:475
+#: api/classes/class.ctemplate.php:1139 api/classes/class.ctrigger.php:1372
+#: api/classes/class.cusergroup.php:642
+msgid "Empty input parameter"
+msgstr ""
+
+#: api/classes/class.chost.php:2117
 msgid "Empty input parameter."
 msgstr "Prázdný vstupní parametr."
 
@@ -3061,7 +3076,7 @@ msgstr "Rozdělený koláčový"
 msgid "Export selected"
 msgstr "Exportovat vybrané"
 
-#: events.php:263
+#: events.php:264
 msgid "Export to CSV"
 msgstr ""
 
@@ -3681,7 +3696,7 @@ msgstr "Hostitel"
 msgid "Host \"%s\" already exists."
 msgstr ""
 
-#: api/classes/class.chost.php:2241
+#: api/classes/class.chost.php:2240
 #, php-format
 msgid "Host \"%s\" deleted."
 msgstr ""
@@ -3699,7 +3714,7 @@ msgstr ""
 msgid "Host IP"
 msgstr "IP hostitele"
 
-#: include/forms.inc.php:3820
+#: include/forms.inc.php:3838
 msgid "Host Inventory"
 msgstr ""
 
@@ -3810,21 +3825,21 @@ msgstr "Šablona hostitele"
 msgid "Host time"
 msgstr ""
 
-#: api/classes/class.chost.php:1578 api/classes/class.chost.php:1583
-#: api/classes/class.chost.php:1588 api/classes/class.chost.php:1597
-msgid "Host update failed"
+#: api/classes/class.chost.php:1577 api/classes/class.chost.php:1582
+#: api/classes/class.chost.php:1587 api/classes/class.chost.php:1596
+msgid "Host update failed."
 msgstr ""
 
 #: hosts.php:454
 msgid "Host updated"
 msgstr "Hostitel byl aktualizován"
 
-#: api/classes/class.chost.php:1424 api/classes/class.ctemplate.php:1396
+#: api/classes/class.chost.php:1423 api/classes/class.ctemplate.php:1396
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr ""
 
-#: api/classes/class.chost.php:1430 api/classes/class.ctemplate.php:1052
+#: api/classes/class.chost.php:1429 api/classes/class.ctemplate.php:1052
 #: api/classes/class.ctemplate.php:1369
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
@@ -4265,11 +4280,6 @@ msgstr "Funkci byly předány neplatné argumenty"
 msgid "Incorrect arguments passed to method."
 msgstr ""
 
-#: api/classes/class.chost.php:1361 api/classes/class.chost.php:1729
-#, php-format
-msgid "Incorrect characters used for Host name \"%s\""
-msgstr ""
-
 #: include/locales/en_gb.inc.php:1877
 msgid "Incorrect characters used for Node name"
 msgstr "Pro název uzlu jsou použity neplatné znaky"
@@ -4282,6 +4292,11 @@ msgstr ""
 #: api/classes/class.ctemplate.php:1033
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
+msgstr ""
+
+#: api/classes/class.chost.php:1361 api/classes/class.chost.php:1728
+#, php-format
+msgid "Incorrect characters used for host name \"%s\"."
 msgstr ""
 
 #: api/classes/class.ctemplate.php:1401
@@ -4717,7 +4732,7 @@ msgstr ""
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr ""
 
-#: include/forms.inc.php:1685
+#: include/forms.inc.php:1703
 #, php-format
 msgid "Item %1$s : %2$s"
 msgstr ""
@@ -4779,7 +4794,7 @@ msgstr ""
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Položka nebude akutalizována. Zadejte, prosím, správný interval aktualizací."
 
-#: include/forms.inc.php:2159
+#: include/forms.inc.php:2177
 msgid "Item will populate host inventory field"
 msgstr ""
 
@@ -5314,6 +5329,12 @@ msgstr "Makra byla aktualizována"
 msgid "Maintenance"
 msgstr "Servisní okna"
 
+#: api/classes/class.cmaintenance.php:509
+#: api/classes/class.cmaintenance.php:605
+#, php-format
+msgid "Maintenance \"%s\" already exists."
+msgstr ""
+
 #: include/locales/en_gb.inc.php:601
 msgid "Maintenance added"
 msgstr "Servisní okno bylo přidáno"
@@ -5722,7 +5743,7 @@ msgstr ""
 
 #: actionconf.php:164 actionconf.php:418 discoveryconf.php:246
 #: disc_prototypes.php:376 host_discovery.php:451 hostinventories.php:161
-#: hosts.php:761 include/forms.inc.php:1014 include/forms.inc.php:1735
+#: hosts.php:761 include/forms.inc.php:1032 include/forms.inc.php:1753
 #: include/hosts.inc.php:60 include/locales/en_gb.inc.php:1523
 #: include/views/administration.script.edit.php:43
 #: include/views/administration.script.list.php:40
@@ -5985,11 +6006,11 @@ msgstr ""
 
 #: api/classes/class.chost.php:1321 api/classes/class.chost.php:1331
 #, php-format
-msgid "No groups for host \"%s\""
+msgid "No groups for host \"%s\"."
 msgstr ""
 
-#: api/classes/class.chost.php:1715
-msgid "No groups for hosts"
+#: api/classes/class.chost.php:1714
+msgid "No groups for hosts."
 msgstr ""
 
 #: api/classes/class.ctemplate.php:1340
@@ -6042,7 +6063,7 @@ msgstr ""
 
 #: api/classes/class.chost.php:1324 api/classes/class.chost.php:1342
 #, php-format
-msgid "No interfaces for host \"%s\""
+msgid "No interfaces for host \"%s\"."
 msgstr ""
 
 #: api/classes/class.cproxy.php:353
@@ -6248,16 +6269,16 @@ msgstr "Uzel se stejným ID již existuje"
 msgid "Nodes"
 msgstr "Uzly"
 
-#: include/forms.inc.php:2140 include/locales/en_gb.inc.php:739
+#: include/forms.inc.php:2158 include/locales/en_gb.inc.php:739
 #: include/locales/en_gb.inc.php:1348
 msgid "None"
 msgstr "Žádná"
 
-#: include/forms.inc.php:2977 include/locales/en_gb.inc.php:525
+#: include/forms.inc.php:2995 include/locales/en_gb.inc.php:525
 msgid "Normal"
 msgstr "Normální"
 
-#: include/forms.inc.php:2978
+#: include/forms.inc.php:2996
 msgid "Normal + Multiple PROBLEM events"
 msgstr ""
 
@@ -8375,12 +8396,12 @@ msgstr "Šablona s aplikací"
 msgid "Template with item key"
 msgstr "Šablona s klíčem položky"
 
-#: api/classes/class.chost.php:1440 api/classes/class.ctemplate.php:1391
+#: api/classes/class.chost.php:1439 api/classes/class.ctemplate.php:1391
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr ""
 
-#: api/classes/class.chost.php:1446 api/classes/class.ctemplate.php:1048
+#: api/classes/class.chost.php:1445 api/classes/class.ctemplate.php:1048
 #: api/classes/class.ctemplate.php:1364
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
@@ -9001,7 +9022,7 @@ msgstr "Nahoru"
 msgid "Update"
 msgstr "Aktualizovat"
 
-#: include/forms.inc.php:2220
+#: include/forms.inc.php:2238
 msgid "Update in host group"
 msgstr ""
 
@@ -9282,7 +9303,7 @@ msgid "Visible name"
 msgstr ""
 
 #: api/classes/class.chost.php:1375
-msgid "Visible name cannot be empty if missing host name"
+msgid "Visible name cannot be empty if host name is missing."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1976
@@ -9411,7 +9432,7 @@ msgstr ""
 
 #: api/classes/class.chost.php:1305
 #, php-format
-msgid "Wrong fields for host \"%s\""
+msgid "Wrong fields for host \"%s\"."
 msgstr ""
 
 #: api/classes/class.cgraph.php:1061
@@ -9585,8 +9606,8 @@ msgstr ""
 msgid "You did not specify targets for action operation global script \"%s\"."
 msgstr ""
 
-#: api/classes/class.chost.php:1624
-msgid "You do not have enough rights for operation"
+#: api/classes/class.chost.php:1623
+msgid "You do not have enough rights for operation."
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1968
