@@ -242,7 +242,7 @@ include_once('include/page_header.php');
 			if(!is_null($val = get_request('event_ack_enable')))
 				$msg[] = S_EVENT_ACKNOWLEDGES.' ['.($val?(S_DISABLED):(S_ENABLED)).']';
 			if(!is_null($val = get_request('event_expire')))
-				$msg[] = S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')'.' ['.$val.']';
+				$msg[] = _('Show events not older than (in days)').' ['.$val.']';
 			if(!is_null($val = get_request('event_show_max')))
 				$msg[] = S_SHOW_EVENTS_MAX.' ['.$val.']';
 			if(!is_null($val = get_request('dropdown_first_entry')))
@@ -275,13 +275,13 @@ include_once('include/page_header.php');
 		if($result){
 			$msg = array();
 			if(!is_null($val = get_request('event_history')))
-				$msg[] = S_DO_NOT_KEEP_EVENTS_OLDER_THAN.' ['.$val.']';
+				$msg[] = _('Do not keep events older than (in days)').' ['.$val.']';
 			if(!is_null($val = get_request('alert_history')))
-				$msg[] = S_DO_NOT_KEEP_ACTIONS_OLDER_THAN.' ['.$val.']';
+				$msg[] = _('Do not keep actions older than (in days)').' ['.$val.']';
 			if(!is_null($val = get_request('refresh_unsupported')))
-				$msg[] = S_REFRESH_UNSUPPORTED_ITEMS.' ['.$val.']';
+				$msg[] = _('Refresh unsupported items (in sec)').' ['.$val.']';
 			if(!is_null($val = get_request('work_period')))
-				$msg[] = S_WORKING_TIME.' ['.$val.']';
+				$msg[] = _('Working time').' ['.$val.']';
 			if(!is_null($val = get_request('discovery_groupid'))){
 				$val = API::HostGroup()->get(array(
 					'groupids' => $val,
@@ -291,7 +291,7 @@ include_once('include/page_header.php');
 
 				if(!empty($val)){
 					$val = array_pop($val);
-					$msg[] = S_GROUP_FOR_DISCOVERED_HOSTS.' ['.$val['name'].']';
+					$msg[] = _('Group for discovered hosts').' ['.$val['name'].']';
 
 					if(bccomp($val['groupid'],$orig_config['discovery_groupid']) !=0 ){
 						setHostGroupInternal($orig_config['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
@@ -308,7 +308,7 @@ include_once('include/page_header.php');
 					$val = $val['name'];
 				}
 
-				$msg[] = S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE.' ['.$val.']';
+				$msg[] = _('User group for database down message').' ['.$val.']';
 			}
 
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,implode('; ',$msg));
@@ -704,19 +704,20 @@ include_once('include/page_header.php');
 //  config = 0 // Housekeeper  //
 /////////////////////////////////
 	if($_REQUEST['config'] == 0){
+		$data = array();
+		$data['form'] = get_request('form', 1);
+		$data['form_refresh'] = get_request('form_refresh', 0);
 
-		$frmHouseKeep = new CFormTable(S_HOUSEKEEPER, "config.php");
-		$frmHouseKeep->setHelp("web.config.housekeeper.php");
-		$frmHouseKeep->addVar("config", get_request("config", 0));
+		if($data['form_refresh']){
+			$data['config']['alert_history'] = get_request('alert_history');
+			$data['config']['event_history'] = get_request('event_history');
+		}
+		else{
+			$data['config'] = select_config(false);
+		}
 
-		$frmHouseKeep->addRow(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN,
-			new CNumericBox("alert_history", $config["alert_history"], 5));
-		$frmHouseKeep->addRow(S_DO_NOT_KEEP_EVENTS_OLDER_THAN,
-			new CNumericBox("event_history", $config["event_history"], 5));
-
-		$frmHouseKeep->addItemToBottomRow(new CSubmit("save", S_SAVE));
-
-		$cnf_wdgt->addItem($frmHouseKeep);
+		$houseKeeperForm = new CView('administration.general.housekeeper.edit', $data);
+		$cnf_wdgt->addItem($houseKeeperForm->render());
 	}
 ////////////////////////////
 //  config = 3 // Images  //
@@ -843,41 +844,28 @@ include_once('include/page_header.php');
 //  config = 5 // Other Parameters  //
 //////////////////////////////////////
 	elseif($_REQUEST['config'] == 5){
+		$data = array();
+		$data['form'] = get_request('form', 1);
+		$data['form_refresh'] = get_request('form_refresh', 0);
 
-		$frmOther = new CFormTable(S_OTHER_PARAMETERS, 'config.php');
-		$frmOther->setHelp('web.config.other.php');
-		$frmOther->addVar('config',get_request('config', 5));
-
-		$frmOther->addRow(S_REFRESH_UNSUPPORTED_ITEMS,
-			new CNumericBox('refresh_unsupported', $config['refresh_unsupported'], 5));
-
-		$cmbGrp = new CComboBox('discovery_groupid', $config['discovery_groupid']);
-		$groups = API::HostGroup()->get(array(
-			'sortfield'=>'name',
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND
-		));
-		foreach($groups as $gnum => $group){
-			$cmbGrp->addItem($group['groupid'], $group['name']);
+		if($data['form_refresh']){
+			$data['config']['discovery_groupid'] = get_request('discovery_groupid');
+			$data['config']['alert_usrgrpid'] = get_request('alert_usrgrpid');
+			$data['config']['refresh_unsupported'] = get_request('refresh_unsupported');
 		}
-		$frmOther->addRow(S_GROUP_FOR_DISCOVERED_HOSTS, $cmbGrp);
+		else{
+			$data['config'] = select_config(false);
+		}
 
+		$data['discovery_groups'] = API::HostGroup()->get(array(
+										'sortfield'=>'name',
+										'editable' => 1,
+										'output' => API_OUTPUT_EXTEND
+									));
+		$data['alert_usrgrps'] = DBfetchArray(DBselect('SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' order by name'));
 
-		$cmbUsrGrp = new CComboBox('alert_usrgrpid', $config['alert_usrgrpid']);
-		$cmbUsrGrp->addItem(0, S_NONE);
-		$result=DBselect('SELECT usrgrpid,name FROM usrgrp'.
-				' WHERE '.DBin_node('usrgrpid').
-				' order by name');
-		while($row = DBfetch($result))
-			$cmbUsrGrp->addItem(
-					$row['usrgrpid'],
-					get_node_name_by_elid($row['usrgrpid'], null, ': ').$row['name']
-					);
-		$frmOther->addRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE, $cmbUsrGrp);
-
-		$frmOther->addItemToBottomRow(new CSubmit('save', S_SAVE));
-
-		$cnf_wdgt->addItem($frmOther);
+		$otherForm = new CView('administration.general.other.edit', $data);
+		$cnf_wdgt->addItem($otherForm->render());
 	}
 ///////////////////////////////////
 //  config = 6 // Value Mapping  //
@@ -1016,20 +1004,22 @@ include_once('include/page_header.php');
 		}
 	}
 /////////////////////////////////
-//  config = 7 // Work Period  //
+//  config = 7 // Working time //
 /////////////////////////////////
 	elseif($_REQUEST['config'] == 7){
+		$data = array();
+		$data['form'] = get_request('form', 1);
+		$data['form_refresh'] = get_request('form_refresh', 0);
 
-		$frmHouseKeep = new CFormTable(S_WORKING_TIME, "config.php");
-		$frmHouseKeep->setHelp("web.config.workperiod.php");
-		$frmHouseKeep->addVar("config",get_request("config", 7));
+		if($data['form_refresh']){
+			$data['config']['work_period'] = get_request('work_period');
+		}
+		else{
+			$data['config'] = select_config(false);
+		}
 
-		$frmHouseKeep->addRow(S_WORKING_TIME,
-			new CTextBox("work_period",$config["work_period"], 35));
-
-		$frmHouseKeep->addItemToBottomRow(new CSubmit("save", S_SAVE));
-
-		$cnf_wdgt->addItem($frmHouseKeep);
+		$workingTimeForm = new CView('administration.general.workingtime.edit', $data);
+		$cnf_wdgt->addItem($workingTimeForm->render());
 	}
 /////////////////////////
 //  config = 8 // GUI  //
