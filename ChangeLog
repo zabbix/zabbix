@@ -2,6 +2,7 @@
 Changes for 1.9.6
 
 New features:
+ - [ZBXNEXT-885] redesign general->Housekeeper, Working time and Other (Eduard)
  - [ZBXNEXT-871] redesign general->gui (Eduard)
  - [ZBX-1357] updated German, Latvian, Polish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-863] renamed "host profile" to "host inventory" (dimir)
