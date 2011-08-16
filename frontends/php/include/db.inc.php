@@ -1003,6 +1003,19 @@ else {
 		else return $val;
 	}
 
+	/**
+	 * Transform DB cursor to array
+	 *
+	 * @return array
+	 */
+	function DBfetchArray($cursor){
+		$result = array();
+		while($row = DBfetch($cursor)){
+			$result[] = $row;
+		}
+		return $result;
+	}
+
 /**
  * Initialize access to SQLite3 database
  *

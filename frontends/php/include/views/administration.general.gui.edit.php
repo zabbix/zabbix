@@ -35,7 +35,7 @@ $guiTab->addRow(_('Dropdown first entry'), array($comboDdFirstEntry, new CCheckB
 $guiTab->addRow(_('Search/Filter elements limit'), new CNumericBox('search_limit', $this->data['config']['search_limit'], 6));
 $guiTab->addRow(_('Max count of elements to show inside table cell'), new CNumericBox('max_in_table', $this->data['config']['max_in_table'], 5));
 $guiTab->addRow(_('Enable event acknowledges'), new CCheckBox('event_ack_enable', $this->data['config']['event_ack_enable'], null, 1));
-$guiTab->addRow(_('Show events not older').SPACE.'('._('Days').')', new CTextBox('event_expire', $this->data['config']['event_expire'], 5));
+$guiTab->addRow(_('Show events not older than (in days)'), new CTextBox('event_expire', $this->data['config']['event_expire'], 5));
 $guiTab->addRow(_('Max count of events per trigger to show'), new CTextBox('event_show_max', $this->data['config']['event_show_max'], 5));
 
 $guiView = new CTabView();
@@ -51,3 +51,4 @@ $guiForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save')))));
 
 return $guiForm;
 ?>
+
