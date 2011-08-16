@@ -22,19 +22,19 @@
 
 $otherTab = new CFormList('scriptsTab');
 
-$discoveryGroups = new CComboBox('discovery_groupid', $this->data['config']['discovery_groupid']);
-foreach($this->data['discoveryGroups'] as $gnum => $group){
-	$discoveryGroups->addItem($group['groupid'], $group['name']);
+$discoveryGroup = new CComboBox('discovery_groupid', $this->data['config']['discovery_groupid']);
+foreach($this->data['discovery_groups'] as $i => $group){
+	$discoveryGroup->addItem($group['groupid'], $group['name']);
 }
 
 $alertUserGroup = new CComboBox('alert_usrgrpid', $this->data['config']['alert_usrgrpid']);
 $alertUserGroup->addItem(0, _('None'));
-while($row = DBfetch($this->data['alert_usrgrp'])){
-	$alertUserGroup->addItem($row['usrgrpid'], get_node_name_by_elid($row['usrgrpid'], null, ': ').$row['name']);
+foreach($this->data['alert_usrgrps'] as $i => $usrgrp){
+	$alertUserGroup->addItem($usrgrp['usrgrpid'], get_node_name_by_elid($usrgrp['usrgrpid'], null, ': ').$usrgrp['name']);
 }
 
 $otherTab->addRow(_('Refresh unsupported items (in sec)'), new CNumericBox('refresh_unsupported', $this->data['config']['refresh_unsupported'], 5));
-$otherTab->addRow(_('Group for discovered hosts'), $discoveryGroups);
+$otherTab->addRow(_('Group for discovered hosts'), $discoveryGroup);
 $otherTab->addRow(_('User group for database down message'), $alertUserGroup);
 
 $otherView = new CTabView();

@@ -857,12 +857,12 @@ include_once('include/page_header.php');
 			$data['config'] = select_config(false);
 		}
 
-		$data['discoveryGroups'] = API::HostGroup()->get(array(
+		$data['discovery_groups'] = API::HostGroup()->get(array(
 										'sortfield'=>'name',
 										'editable' => 1,
 										'output' => API_OUTPUT_EXTEND
 									));
-		$data['alert_usrgrp'] = DBselect('SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' order by name');
+		$data['alert_usrgrps'] = DBfetchArray(DBselect('SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' order by name'));
 
 		$otherForm = new CView('administration.general.other.edit', $data);
 		$cnf_wdgt->addItem($otherForm->render());
