@@ -1116,8 +1116,8 @@
 			}
 		}
 
-		if(preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/u', $name, $arr)){
-			$macros = CuserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
+		if(preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $name, $arr)){
+			$macros = CUserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
 			$name = str_replace(array_keys($macros), array_values($macros), $name);
 		}
 
