@@ -82,7 +82,6 @@ if(!isset($DB)){
 						}
 						else{
 							DBexecute('SET NAMES utf8');
-							DBexecute('SET CHARACTER SET utf8');
 						}
 					}
 				break;
@@ -1002,6 +1001,19 @@ else {
 			return 'NULL';
 		}
 		else return $val;
+	}
+
+	/**
+	 * Transform DB cursor to array
+	 *
+	 * @return array
+	 */
+	function DBfetchArray($cursor){
+		$result = array();
+		while($row = DBfetch($cursor)){
+			$result[] = $row;
+		}
+		return $result;
 	}
 
 /**

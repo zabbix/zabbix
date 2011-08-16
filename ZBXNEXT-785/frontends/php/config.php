@@ -64,11 +64,11 @@ include_once('include/page_header.php');
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
 		// GUI
-		'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),		'isset({config})&&({config}==8)&&isset({save})'),
+		'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
 		'event_expire'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'event_show_max'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'dropdown_first_entry'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1,2'),		'isset({config})&&({config}==8)&&isset({save})'),
-		'dropdown_first_remember'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),	null),
+		'dropdown_first_remember'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
 		'max_in_table' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'search_limit' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,999999),	'isset({config})&&({config}==8)&&isset({save})'),
 
@@ -227,7 +227,7 @@ elseif (isset($_REQUEST['save']) && ($_REQUEST['config'] == 8)) { // GUI
 
 	$configs = array(
 		'default_theme' => get_request('default_theme'),
-		'event_ack_enable' => get_request('event_ack_enable'),
+		'event_ack_enable' => (is_null(get_request('event_ack_enable')) ? 0 : 1),
 		'event_expire' => get_request('event_expire'),
 		'event_show_max' => get_request('event_show_max'),
 		'dropdown_first_entry' => get_request('dropdown_first_entry'),
@@ -249,7 +249,7 @@ elseif (isset($_REQUEST['save']) && ($_REQUEST['config'] == 8)) { // GUI
 			$msg[] = S_EVENT_ACKNOWLEDGES . ' [' . ($val ? (S_DISABLED) : (S_ENABLED)) . ']';
 		}
 		if (!is_null($val = get_request('event_expire'))) {
-			$msg[] = S_SHOW_EVENTS_NOT_OLDER . SPACE . '(' . S_DAYS . ')' . ' [' . $val . ']';
+			$msg[] = _('Show events not older than (in days)').' ['.$val.']';
 		}
 		if (!is_null($val = get_request('event_show_max'))) {
 			$msg[] = S_SHOW_EVENTS_MAX . ' [' . $val . ']';
@@ -288,16 +288,16 @@ elseif (isset($_REQUEST['save']) && uint_in_array($_REQUEST['config'], array(0, 
 	if ($result) {
 		$msg = array();
 		if (!is_null($val = get_request('event_history'))) {
-			$msg[] = S_DO_NOT_KEEP_EVENTS_OLDER_THAN . ' [' . $val . ']';
+			$msg[] = _('Do not keep events older than (in days)').' ['.$val.']';
 		}
 		if (!is_null($val = get_request('alert_history'))) {
-			$msg[] = S_DO_NOT_KEEP_ACTIONS_OLDER_THAN . ' [' . $val . ']';
+			$msg[] = _('Do not keep actions older than (in days)').' ['.$val.']';
 		}
 		if (!is_null($val = get_request('refresh_unsupported'))) {
-			$msg[] = S_REFRESH_UNSUPPORTED_ITEMS . ' [' . $val . ']';
+			$msg[] = _('Refresh unsupported items (in sec)').' ['.$val.']';
 		}
 		if (!is_null($val = get_request('work_period'))) {
-			$msg[] = S_WORKING_TIME . ' [' . $val . ']';
+			$msg[] = _('Working time').' ['.$val.']';
 		}
 		if (!is_null($val = get_request('discovery_groupid'))) {
 			$val = API::HostGroup()->get(array(
@@ -308,7 +308,7 @@ elseif (isset($_REQUEST['save']) && uint_in_array($_REQUEST['config'], array(0, 
 
 			if (!empty($val)) {
 				$val = array_pop($val);
-				$msg[] = S_GROUP_FOR_DISCOVERED_HOSTS . ' [' . $val['name'] . ']';
+				$msg[] = _('Group for discovered hosts').' ['.$val['name'].']';
 
 				if (bccomp($val['groupid'], $orig_config['discovery_groupid']) != 0) {
 					setHostGroupInternal($orig_config['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
@@ -325,7 +325,7 @@ elseif (isset($_REQUEST['save']) && uint_in_array($_REQUEST['config'], array(0, 
 				$val = $val['name'];
 			}
 
-			$msg[] = S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE . ' [' . $val . ']';
+			$msg[] = _('User group for database down message').' ['.$val.']';
 		}
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
@@ -780,20 +780,21 @@ if (isset($_REQUEST['config'])) {
 /////////////////////////////////
 //  config = 0 // Housekeeper  //
 /////////////////////////////////
-if ($_REQUEST['config'] == 0) { //housekeeper
+if ($_REQUEST['config'] == 0) {
+	$data = array();
+	$data['form'] = get_request('form', 1);
+	$data['form_refresh'] = get_request('form_refresh', 0);
 
-	$frmHouseKeep = new CFormTable(S_HOUSEKEEPER, "config.php");
-	$frmHouseKeep->setHelp("web.config.housekeeper.php");
-	$frmHouseKeep->addVar("config", get_request("config", 0));
+	if ($data['form_refresh']) {
+		$data['config']['alert_history'] = get_request('alert_history');
+		$data['config']['event_history'] = get_request('event_history');
+	}
+	else {
+		$data['config'] = select_config(false);
+	}
 
-	$frmHouseKeep->addRow(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN,
-		new CNumericBox("alert_history", $config["alert_history"], 5));
-	$frmHouseKeep->addRow(S_DO_NOT_KEEP_EVENTS_OLDER_THAN,
-		new CNumericBox("event_history", $config["event_history"], 5));
-
-	$frmHouseKeep->addItemToBottomRow(new CSubmit("save", S_SAVE));
-
-	$cnf_wdgt->addItem($frmHouseKeep);
+	$houseKeeperForm = new CView('administration.general.housekeeper.edit', $data);
+	$cnf_wdgt->addItem($houseKeeperForm->render());
 }
 	////////////////////////////
 	//  config = 3 // Images  //
@@ -923,44 +924,29 @@ elseif ($_REQUEST["config"] == 3) { // Images
 	//////////////////////////////////////
 	//  config = 5 // Other Parameters  //
 	//////////////////////////////////////
-elseif ($_REQUEST['config'] == 5) { // Other parameters
+elseif ($_REQUEST['config'] == 5) {
+	$data = array();
+	$data['form'] = get_request('form', 1);
+	$data['form_refresh'] = get_request('form_refresh', 0);
 
-	$frmOther = new CFormTable(S_OTHER_PARAMETERS, 'config.php');
-	$frmOther->setHelp('web.config.other.php');
-	$frmOther->addVar('config', get_request('config', 5));
+	if ($data['form_refresh']) {
+		$data['config']['discovery_groupid'] = get_request('discovery_groupid');
+		$data['config']['alert_usrgrpid'] = get_request('alert_usrgrpid');
+		$data['config']['refresh_unsupported'] = get_request('refresh_unsupported');
+	}
+	else {
+		$data['config'] = select_config(false);
+	}
 
-	$frmOther->addRow(S_REFRESH_UNSUPPORTED_ITEMS,
-		new CNumericBox('refresh_unsupported', $config['refresh_unsupported'], 5));
-
-	$cmbGrp = new CComboBox('discovery_groupid', $config['discovery_groupid']);
-	$groups = API::HostGroup()->get(array(
-		'sortfield' => 'name',
+	$data['discovery_groups'] = API::HostGroup()->get(array(
+		'sortfield'=>'name',
 		'editable' => 1,
 		'output' => API_OUTPUT_EXTEND
 	));
-	foreach ($groups as $gnum => $group) {
-		$cmbGrp->addItem($group['groupid'], $group['name']);
-	}
-	$frmOther->addRow(S_GROUP_FOR_DISCOVERED_HOSTS, $cmbGrp);
+	$data['alert_usrgrps'] = DBfetchArray(DBselect('SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' order by name'));
 
-
-	$cmbUsrGrp = new CComboBox('alert_usrgrpid', $config['alert_usrgrpid']);
-	$cmbUsrGrp->addItem(0, S_NONE);
-	$result = DBselect('SELECT usrgrpid,name FROM usrgrp' .
-			' WHERE ' . DBin_node('usrgrpid') .
-			' order by name');
-	while ($row = DBfetch($result))
-	{
-		$cmbUsrGrp->addItem(
-			$row['usrgrpid'],
-			get_node_name_by_elid($row['usrgrpid'], null, ': ') . $row['name']
-		);
-	}
-	$frmOther->addRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE, $cmbUsrGrp);
-
-	$frmOther->addItemToBottomRow(new CSubmit('save', S_SAVE));
-
-	$cnf_wdgt->addItem($frmOther);
+	$otherForm = new CView('administration.general.other.edit', $data);
+	$cnf_wdgt->addItem($otherForm->render());
 }
 	///////////////////////////////////
 	//  config = 6 // Value Mapping  //
@@ -1101,60 +1087,45 @@ elseif ($_REQUEST['config'] == 6) { // Value Mapping
 	/////////////////////////////////
 	//  config = 7 // Work Period  //
 	/////////////////////////////////
-elseif ($_REQUEST['config'] == 7) { //work period
+elseif ($_REQUEST['config'] == 7) {
+	$data = array();
+	$data['form'] = get_request('form', 1);
+	$data['form_refresh'] = get_request('form_refresh', 0);
 
-	$frmHouseKeep = new CFormTable(S_WORKING_TIME, "config.php");
-	$frmHouseKeep->setHelp("web.config.workperiod.php");
-	$frmHouseKeep->addVar("config", get_request("config", 7));
+	if($data['form_refresh']) {
+		$data['config']['work_period'] = get_request('work_period');
+	}
+	else {
+		$data['config'] = select_config(false);
+	}
 
-	$frmHouseKeep->addRow(S_WORKING_TIME, new CTextBox("work_period", $config["work_period"], 35));
-
-	$frmHouseKeep->addItemToBottomRow(new CSubmit("save", S_SAVE));
-
-	$cnf_wdgt->addItem($frmHouseKeep);
+	$workingTimeForm = new CView('administration.general.workingtime.edit', $data);
+	$cnf_wdgt->addItem($workingTimeForm->render());
 }
 	/////////////////////////
 	//  config = 8 // GUI  //
 	/////////////////////////
-elseif ($_REQUEST['config'] == 8) { // GUI
+elseif($_REQUEST['config'] == 8){
+	$data = array();
+	$data['form'] = get_request('form', 1);
+	$data['form_refresh'] = get_request('form_refresh', 0);
 
-	$frmGUI = new CFormTable(S_GUI, "config.php");
-	$frmGUI->addVar("config", get_request("config", 8));
+	if($data['form_refresh']){
+		$data['config']['default_theme'] = get_request('default_theme');
+		$data['config']['event_ack_enable'] = get_request('event_ack_enable');
+		$data['config']['dropdown_first_entry'] = get_request('dropdown_first_entry');
+		$data['config']['dropdown_first_remember'] = get_request('dropdown_first_remember');
+		$data['config']['search_limit'] = get_request('search_limit');
+		$data['config']['max_in_table'] = get_request('max_in_table');
+		$data['config']['event_expire'] = get_request('event_expire');
+		$data['config']['event_show_max'] = get_request('event_show_max');
+	}
+	else{
+		$data['config'] = select_config(false);
+	}
 
-	$combo_theme = new CComboBox('default_theme', $config['default_theme']);
-	$combo_theme->addItem('css_ob.css', S_ORIGINAL_BLUE);
-	$combo_theme->addItem('css_bb.css', S_BLACK_AND_BLUE);
-	$combo_theme->addItem('css_od.css', S_DARK_ORANGE);
-
-	$exp_select = new CComboBox('event_ack_enable', $config['event_ack_enable']);
-	$exp_select->addItem(EVENT_ACK_ENABLED, S_ENABLED);
-	$exp_select->addItem(EVENT_ACK_DISABLED, S_DISABLED);
-
-	$combo_dd_first_entry = new CComboBox('dropdown_first_entry', $config['dropdown_first_entry']);
-	$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_NONE, S_NONE);
-	$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ALL, S_ALL_S);
-
-	$check_dd_first_remember = new CCheckBox('dropdown_first_remember', $config['dropdown_first_remember'], null, 1);
-
-	$frmGUI->addRow(S_DEFAULT_THEME, $combo_theme);
-	$frmGUI->addRow(S_DROPDOWN_FIRST_ENTRY, array(
-		$combo_dd_first_entry,
-		$check_dd_first_remember,
-		S_DROPDOWN_REMEMBER_SELECTED
-	));
-
-	$frmGUI->addRow(S_SEARCH_LIMIT, new CNumericBox('search_limit', $config['search_limit'], 6));
-	$frmGUI->addRow(S_MAX_IN_TABLE, new CNumericBox('max_in_table', $config['max_in_table'], 5));
-	$frmGUI->addRow(S_EVENT_ACKNOWLEDGES, $exp_select);
-	$frmGUI->addRow(S_SHOW_EVENTS_NOT_OLDER . SPACE . '(' . S_DAYS . ')',
-		new CTextBox('event_expire', $config['event_expire'], 5)
-	);
-	$frmGUI->addRow(S_MAX_COUNT_OF_EVENTS,
-		new CTextBox('event_show_max', $config['event_show_max'], 5)
-	);
-	$frmGUI->addItemToBottomRow(new CSubmit("save", S_SAVE));
-
-	$cnf_wdgt->addItem($frmGUI);
+	$guiForm = new CView('administration.general.gui.edit', $data);
+	$cnf_wdgt->addItem($guiForm->render());
 }
 	//////////////////////////////////////////
 	//  config = 10 // Regular Expressions  //

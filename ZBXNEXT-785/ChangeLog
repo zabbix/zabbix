@@ -2,10 +2,13 @@
 Changes for 1.9.6
 
 New features:
+ - [ZBXNEXT-885] redesign general->Housekeeper, Working time and Other (Eduard)
+ - [ZBXNEXT-871] redesign general->gui (Eduard)
  - [ZBX-1357] updated German, Latvian, Polish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-863] renamed "host profile" to "host inventory" (dimir)
 
 Bug fixes:
+ - [ZBX-4017] fixed host deletion using api (Vedmak)
  - [ZBX-4029,ZBX-4037] fixed inconsistent and untranslatable strings in frontend and clarified frontend messages (Richlv)
  - [ZBX-4010] fixed undefined constant SVC_SNMPv2 in discovery action conditions (Richlv)
  - [ZBX-3775] fixed html formatting in Overview (Eduard)
@@ -192,6 +195,9 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.7rc1
 
+ - [ZBX-4034] fixed macros resolving in item names (Vedmak)
+ - [ZBX-4044] removed redundant query "SET CHARACTER SET" (asaveljevs,Vedmak)
+ - [ZBX-3997] fixed IE9 dragging (Eduard)
  - [ZBX-4043] fixed processing of system.cpu.util on Solaris with non-sequential cpu numbers (Sasha)
  - [ZBX-4036] fixed period slider position saving in Monitoring->Events (Eduard)
  - [ZBX-1010] fixed processing of a vfs.fs.size metric on Solaris with filesystems larger than 2TB (Sasha)
