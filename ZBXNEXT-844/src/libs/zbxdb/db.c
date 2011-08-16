@@ -185,7 +185,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK == ret)
 	{
 		DBexecute("SET NAMES utf8");
-		DBexecute("SET CHARACTER SET utf8");
 	}
 
 	if (ZBX_DB_FAIL == ret)

@@ -1094,8 +1094,6 @@
 	 *   name: 'Test item $1, $2, $3'
 	 *   result: 'Test item a, b, Zabbix-server'
 	 *
-	 * @author Konstantin Buravcov
-	 * @see ZBX-3503
 	 * @param array $item
 	 * @return string
 	 */
@@ -1117,6 +1115,12 @@
 				}
 			}
 		}
+
+		if(preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $name, $arr)){
+			$macros = CUserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
+			$name = str_replace(array_keys($macros), array_values($macros), $name);
+		}
+
 		return $name;
 	}
 
@@ -1128,18 +1132,12 @@
 	return get_host_by_itemid($itemid);
 	}
 
-/*
- * Function: get_items_data_overview
- *
- * Description:
- *     Retrieve overview table object for items
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
+	/**
+	 * Retrieve overview table object for items.
+	 * @param $hostids
+	 * @param null $view_style
+	 * @return CTableInfo
+	 */
 	function get_items_data_overview($hostids,$view_style=null){
 		global $USER_DETAILS;
 

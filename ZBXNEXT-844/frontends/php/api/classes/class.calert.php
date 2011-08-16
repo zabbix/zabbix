@@ -78,12 +78,13 @@ class CAlert extends CZBXAPI{
 			'nopermissions'			=> null,
 
 // filter
-			'filter'					=> null,
-			'search'					=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
+			'filter'				=> null,
+			'search'				=> null,
+			'startSearch'			=> null,
+			'excludeSearch'			=> null,
 			'time_from'				=> null,
 			'time_till'				=> null,
+			'searchWildcardsEnabled'=> null,
 
 // OutPut
 			'extendoutput'			=> null,

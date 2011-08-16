@@ -279,11 +279,11 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 		switch (condition->operator)
 		{
 		case CONDITION_OPERATOR_IN:
-			if (1 == check_time_period(condition->value, (time_t)NULL))
+			if (SUCCEED == check_time_period(condition->value, (time_t)NULL))
 				ret = SUCCEED;
 			break;
 		case CONDITION_OPERATOR_NOT_IN:
-			if (1 != check_time_period(condition->value, (time_t)NULL))
+			if (FAIL == check_time_period(condition->value, (time_t)NULL))
 				ret = SUCCEED;
 			break;
 		default:
@@ -1156,8 +1156,6 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
  *                                                                            *
  * Parameters: event - event to apply actions for                             *
  *                                                                            *
- * Return value: -                                                            *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: dependencies are checked in a different place                    *
@@ -1172,15 +1170,11 @@ void	process_actions(DB_EVENT *event)
 	zbx_uint64_t	actionid;
 	unsigned char	evaltype;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64,
-			__function_name, event->eventid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, event->eventid);
 
-	result = DBselect(
-			"select actionid,evaltype"
+	result = DBselect("select actionid,evaltype"
 			" from actions"
-			" where status=%d"
-				" and eventsource=%d"
-				DB_NODE,
+			" where status=%d and eventsource=%d" DB_NODE,
 			ACTION_STATUS_ACTIVE, event->source, DBnode_local("actionid"));
 
 	while (NULL != (row = DBfetch(result)))

@@ -1536,7 +1536,7 @@
 	'S_SCREEN_UPDATED'=>			'Screen updated',
 	'S_CANNOT_UPDATE_SCREEN'=>		'Cannot update screen',
 	'S_SCREEN_DELETED'=>			'Screen deleted',
-	'S_CANNOT_DELETE_SCREEN'=>		'Cannot deleted screen',
+	'S_CANNOT_DELETE_SCREEN'=>		'Cannot delete screen',
 	'S_COLUMNS'=>				'Columns',
 	'S_ROWS'=>				'Rows',
 	'S_NO_SCREENS_DEFINED'=>		'No screens defined',
@@ -2253,7 +2253,6 @@
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Graph "',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			'" deleted from host',
-	'S_GRAPH_DELETED_FROM_HOSTS_PART3'=>			'',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',
@@ -2415,6 +2414,8 @@
 	'S_FRIDAY_SHORT_BIG'=>		'F',
 	'S_SATURDAY_SHORT_BIG'=>	'S',
 	'S_SUNDAY_SHORT_BIG'=>		'S',
+	'S_NOW'=>	'Now',
+	'S_DONE'=>	'Done',
 
 //	gtlc.js
 	'S_ZOOM'=>			'Zoom',

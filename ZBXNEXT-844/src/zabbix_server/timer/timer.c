@@ -42,26 +42,22 @@ extern unsigned char	process_type;
  *                                                                            *
  * Purpose: re-calculate and update values of time-driven functions           *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	process_time_functions()
 {
-	const char	*__function_name = "process_time_functions";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*exp, error[MAX_STRING_LEN];
-	zbx_uint64_t	triggerid;
-	int		trigger_type, trigger_value, exp_value;
-	const char	*trigger_error;
+	const char		*__function_name = "process_time_functions";
+	DB_RESULT		result;
+	DB_ROW			row;
+	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last;
+	int			tr_alloc = 0, tr_num = 0;
+	char			*sql = NULL;
+	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sql = zbx_malloc(sql, sql_alloc);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.type,t.value,t.error,t.expression"
@@ -75,7 +71,7 @@ static void	process_time_functions()
 				" and h.status=%d"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
 				DB_NODE
-				" order by t.triggerid",
+			" order by t.triggerid",
 			TRIGGER_STATUS_ENABLED,
 			ITEM_STATUS_ACTIVE,
 			HOST_STATUS_MONITORED,
@@ -84,31 +80,70 @@ static void	process_time_functions()
 
 	DBbegin();
 
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
+
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(triggerid, row[0]);
-		trigger_type = atoi(row[1]);
-		trigger_value = atoi(row[2]);
-		trigger_error = row[3];
-		exp = strdup(row[4]);
-
-		if (SUCCEED != evaluate_expression(&exp_value, &exp, time(NULL), triggerid, trigger_value, error, sizeof(error)))
+		if (tr_num == tr_alloc)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s", exp, error);
-
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, TRIGGER_VALUE_UNKNOWN, time(NULL), error);
+			tr_alloc += 64;
+			tr = zbx_realloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
 		}
-		else
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, exp_value, time(NULL), NULL);
 
-		zbx_free(exp);
+		tr_last = &tr[tr_num++];
+
+		ZBX_STR2UINT64(tr_last->triggerid, row[0]);
+		tr_last->type = (unsigned char)atoi(row[1]);
+		tr_last->value = atoi(row[2]);
+		tr_last->error = row[3];
+		tr_last->new_error = NULL;
+		tr_last->expression = zbx_strdup(NULL, row[4]);
+		tr_last->lastchange = time(NULL);
+
+		evaluate_expression(&tr_last->new_value, &tr_last->expression, tr_last->lastchange, tr_last->triggerid,
+				tr_last->value, &tr_last->new_error);
+
+		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
+				tr_last->new_value, tr_last->new_error, tr_last->lastchange, &tr_last->update_trigger,
+				&tr_last->add_event);
+
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
+				tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
+				tr_last->lastchange, tr_last->update_trigger))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+		}
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	DBfree_result(result);
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
+
+	if (sql_offset > 16)
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
+	{
+		zbx_free(tr_last->expression);
+		zbx_free(tr_last->new_error);
+
+		if (1 != tr_last->add_event)
+			continue;
+
+		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+				tr_last->lastchange, tr_last->new_value, 0, 0);
 	}
 
 	DBcommit();
 
-	DBfree_result(result);
+	zbx_free(tr);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -412,7 +447,6 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
 	int		value_before, value_inside, value_after;
-	DB_EVENT	event;
 
 	result = DBselect(
 			"select distinct t.triggerid"
@@ -436,15 +470,8 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		if (value_before == value_inside && value_inside == value_after)
 			continue;
 
-		/* Preparing event for processing */
-		memset(&event, 0, sizeof(DB_EVENT));
-		event.source = EVENT_SOURCE_TRIGGERS;
-		event.object = EVENT_OBJECT_TRIGGER;
-		event.objectid = triggerid;
-		event.clock = maintenance_to;
-		event.value = value_after;
-
-		process_event(&event, 1);
+		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
+				maintenance_to, value_after, 0, 1);
 	}
 	DBfree_result(result);
 }
@@ -613,7 +640,7 @@ static void	process_maintenance()
 
 	now = time(NULL);
 	tm = localtime(&now);
-	sec = tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec;
+	sec = tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec;
 
 	result = DBselect(
 			"select m.maintenanceid,m.maintenance_type,m.active_since,"
@@ -645,30 +672,30 @@ static void	process_maintenance()
 		case TIMEPERIOD_TYPE_DAILY:
 			db_start_date = now - sec + db_start_time;
 			if (sec < db_start_time)
-				db_start_date -= 86400;
+				db_start_date -= SEC_PER_DAY;
 
 			if (db_start_date < db_active_since)
 				continue;
 
 			tm = localtime(&db_active_since);
-			active_since = db_active_since - (tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec);
+			active_since = db_active_since - (tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec);
 
-			day = (db_start_date - active_since) / 86400 + 1;
-			db_start_date -= 86400 * (day % db_every);
+			day = (db_start_date - active_since) / SEC_PER_DAY + 1;
+			db_start_date -= SEC_PER_DAY * (day % db_every);
 			break;
 		case TIMEPERIOD_TYPE_WEEKLY:
 			db_start_date = now - sec + db_start_time;
 			if (sec < db_start_time)
-				db_start_date -= 86400;
+				db_start_date -= SEC_PER_DAY;
 
 			if (db_start_date < db_active_since)
 				continue;
 
 			tm = localtime(&db_active_since);
 			wday = (tm->tm_wday == 0 ? 7 : tm->tm_wday) - 1;
-			active_since = db_active_since - (wday * 86400 + tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec);
+			active_since = db_active_since - (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec);
 
-			for (; db_start_date >= db_active_since; db_start_date -= 86400)
+			for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
 			{
 				/* check for every x week(s) */
 				week = (db_start_date - active_since) / 604800 + 1;
@@ -687,9 +714,9 @@ static void	process_maintenance()
 		case TIMEPERIOD_TYPE_MONTHLY:
 			db_start_date = now - sec + db_start_time;
 			if (sec < db_start_time)
-				db_start_date -= 86400;
+				db_start_date -= SEC_PER_DAY;
 
-			for (; db_start_date >= db_active_since; db_start_date -= 86400)
+			for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
 			{
 				/* check for month */
 				tm = localtime(&db_start_date);
@@ -783,7 +810,7 @@ void	main_timer_loop()
 		sleeptime = nextcheck - now;
 
 		/* process maintenance every minute */
-		maintenance = (0 == nextcheck % 60 ? 1 : 0);
+		maintenance = (0 == nextcheck % SEC_PER_MIN ? 1 : 0);
 
 		zbx_sleep_loop(sleeptime);
 	}
