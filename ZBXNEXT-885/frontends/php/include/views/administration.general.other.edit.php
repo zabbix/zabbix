@@ -23,13 +23,13 @@
 $otherTab = new CFormList('scriptsTab');
 
 $discoveryGroup = new CComboBox('discovery_groupid', $this->data['config']['discovery_groupid']);
-foreach($this->data['discovery_groups'] as $i => $group){
+foreach($this->data['discovery_groups'] as $group){
 	$discoveryGroup->addItem($group['groupid'], $group['name']);
 }
 
 $alertUserGroup = new CComboBox('alert_usrgrpid', $this->data['config']['alert_usrgrpid']);
 $alertUserGroup->addItem(0, _('None'));
-foreach($this->data['alert_usrgrps'] as $i => $usrgrp){
+foreach($this->data['alert_usrgrps'] as $usrgrp){
 	$alertUserGroup->addItem($usrgrp['usrgrpid'], get_node_name_by_elid($usrgrp['usrgrpid'], null, ': ').$usrgrp['name']);
 }
 
