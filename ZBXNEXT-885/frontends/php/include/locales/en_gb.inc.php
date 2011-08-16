@@ -345,7 +345,6 @@
 	'S_DEFAULT_THEME'=>				_('Default theme'),
 	'S_EVENT_ACKNOWLEDGES'=>			_('Event acknowledges'),
 	'S_DAYS'=>					_('Days'),
-	'S_SHOW_EVENTS_NOT_OLDER'=>			_('Show events not older'),
 	'S_SHOW_EVENTS_MAX'=>				_('Show events max'),
 	'S_MAX_COUNT_OF_EVENTS'=>			_('Max count of events per trigger to show'),
 	'S_CANNNOT_UPDATE_VALUE_MAP'=>			_('Cannot update value map'),

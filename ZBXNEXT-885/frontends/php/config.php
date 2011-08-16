@@ -242,7 +242,7 @@ include_once('include/page_header.php');
 			if(!is_null($val = get_request('event_ack_enable')))
 				$msg[] = S_EVENT_ACKNOWLEDGES.' ['.($val?(S_DISABLED):(S_ENABLED)).']';
 			if(!is_null($val = get_request('event_expire')))
-				$msg[] = S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')'.' ['.$val.']';
+				$msg[] = _('Show events not older than (in days)').' ['.$val.']';
 			if(!is_null($val = get_request('event_show_max')))
 				$msg[] = S_SHOW_EVENTS_MAX.' ['.$val.']';
 			if(!is_null($val = get_request('dropdown_first_entry')))
