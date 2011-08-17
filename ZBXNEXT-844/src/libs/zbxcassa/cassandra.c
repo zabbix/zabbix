@@ -3614,7 +3614,7 @@ gboolean cassandra_client_send_batch_mutate (CassandraIf * iface, const GHashTab
 
           GList *key_list = NULL, *iter = NULL;
           gchar * key;
-          GPtrArray * value;
+          GPtrArray * value2; /* Zabbix: renamed from "value" to "value2" so as not to shadow the "value" hash table! */
           g_hash_table_foreach ((GHashTable *)  value, thrift_hash_table_get_keys, &key_list);
           gchar * keys[g_list_length (key_list)];
           int i=0, key_count = g_list_length (key_list);
@@ -3627,18 +3627,18 @@ gboolean cassandra_client_send_batch_mutate (CassandraIf * iface, const GHashTab
           for (i = 0; i < key_count; ++i)
           {
             key = keys[i];
-            value = (GPtrArray *) g_hash_table_lookup (((GHashTable *)  value), (gpointer) key);
+            value2 = (GPtrArray *) g_hash_table_lookup (((GHashTable *)  value), (gpointer) key); /* Zabbix */
 
             if ((ret = thrift_protocol_write_string (protocol,  key, error)) < 0)
               return 0;
             {
-              if ((ret = thrift_protocol_write_list_begin (protocol, T_STRUCT, (gint32)  value->len, error)) < 0)
+              if ((ret = thrift_protocol_write_list_begin (protocol, T_STRUCT, (gint32)  value2->len, error)) < 0) /* Zabbix */
                 return 0;
               xfer += ret;
               guint i;
-              for (i=0; i< value->len; i++)
+              for (i=0; i< value2->len; i++) /* Zabbix */
               {
-                if ((ret = thrift_struct_write (THRIFT_STRUCT (g_ptr_array_index ((GPtrArray *)  value, i)), protocol, error)) < 0)
+                if ((ret = thrift_struct_write (THRIFT_STRUCT (g_ptr_array_index ((GPtrArray *)  value2, i)), protocol, error)) < 0) /* Zabbix */
                   return 0;
                 xfer += ret;
 

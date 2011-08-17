@@ -361,23 +361,17 @@ void	zbx_cassandra_add_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, co
 				(GDestroyNotify)g_byte_array_unref, (GDestroyNotify)g_hash_table_unref);
 	}
 
-	/* metric */
-
 	__key = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
 	__column = zbx_cassandra_encode_integer_type((clock % SEC_PER_DAY) * 1000);
 	__value = zbx_cassandra_encode_ascii_type(value);
 
 	zbx_cassandra_add_mutation(__key, "metric", __column, __value);
 
-	/* metric_by_parameter */
-
 	__key = zbx_cassandra_encode_long_type(itemid);
 	__column = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
 	__value = zbx_cassandra_encode_ascii_type("\1");
 
 	zbx_cassandra_add_mutation(__key, "metric_by_parameter", __column, __value);
-
-	/* save to Cassandra */
 
 	if (ZBX_CASSANDRA_HISTORY_BATCH_MAX == ++history.values_num)
 		zbx_cassandra_save_history_values();
