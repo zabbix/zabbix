@@ -1427,7 +1427,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #if defined(HAVE_CASSANDRA)
 		zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, history[i].value.dbl);
-		zbx_cassandra_save_history_value(history[i].itemid, history[i].clock, value);
+		zbx_cassandra_add_history_value(history[i].itemid, history[i].clock, value);
 #endif
 /* #elif defined(HAVE_MULTIROW_INSERT) */
 #ifdef HAVE_MULTIROW_INSERT
@@ -1528,7 +1528,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #if defined(HAVE_CASSANDRA)
 		zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, history[i].value.ui64);
-		zbx_cassandra_save_history_value(history[i].itemid, history[i].clock, value);
+		zbx_cassandra_add_history_value(history[i].itemid, history[i].clock, value);
 #endif
 /* #elif defined(HAVE_MULTIROW_INSERT) */
 #ifdef HAVE_MULTIROW_INSERT
@@ -1847,6 +1847,10 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
+#ifdef HAVE_CASSANDRA
+	zbx_cassandra_save_history_values();
+#endif
 }
 
 /******************************************************************************

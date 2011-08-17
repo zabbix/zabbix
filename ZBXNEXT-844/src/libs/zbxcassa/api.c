@@ -45,6 +45,17 @@ zbx_cassandra_handle_t;
 
 static zbx_cassandra_handle_t	conn;
 
+#define ZBX_CASSANDRA_HISTORY_BATCH_MAX	5
+
+typedef struct
+{
+	GHashTable	*mutation_map;
+	int		values_num;
+}
+zbx_cassandra_history_t;
+
+static zbx_cassandra_history_t	history;
+
 static void	zbx_cassandra_log_errors(char *description, GError *error,
 		InvalidRequestException *ire, NotFoundException *nfe,
 		UnavailableException *ue, TimedOutException *toe)
@@ -83,7 +94,7 @@ static void	zbx_cassandra_log_errors(char *description, GError *error,
 int	zbx_cassandra_connect(const char *host, const char *keyspace, int port)
 {
 	int			ret = ZBX_DB_OK;
-	char			description[MAX_STRING_LEN];
+	char			descr[MAX_STRING_LEN];
 
 	InvalidRequestException	*ire = NULL;
 	GError			*error = NULL;
@@ -97,8 +108,8 @@ int	zbx_cassandra_connect(const char *host, const char *keyspace, int port)
 	if (TRUE != thrift_framed_transport_open(conn.transport, &error))
 	{
 		ret = ZBX_DB_FAIL;
-		zbx_snprintf(description, sizeof(description), "connecting to '%s':%d", host, port);
-		zbx_cassandra_log_errors(description, error, NULL, NULL, NULL, NULL);
+		zbx_snprintf(descr, sizeof(descr), "connecting to '%s':%d", host, port);
+		zbx_cassandra_log_errors(descr, error, NULL, NULL, NULL, NULL);
 		goto exit;
 	}
 
@@ -108,8 +119,8 @@ int	zbx_cassandra_connect(const char *host, const char *keyspace, int port)
 	if (TRUE != cassandra_client_set_keyspace(CASSANDRA_IF(conn.client), keyspace, &ire, &error))
 	{
 		ret = ZBX_DB_FAIL;
-		zbx_snprintf(description, sizeof(description), "setting keyspace to '%s'", keyspace);
-		zbx_cassandra_log_errors(description, error, ire, NULL, NULL, NULL);
+		zbx_snprintf(descr, sizeof(descr), "setting keyspace to '%s'", keyspace);
+		zbx_cassandra_log_errors(descr, error, ire, NULL, NULL, NULL);
 		goto exit;
 	}
 exit:
@@ -270,102 +281,127 @@ static const char	*zbx_cassandra_decode_type(const GByteArray *value)
 	return buffer;
 }
 
-static int	zbx_cassandra_set_value(GByteArray *key, char *column_family, GByteArray *column, GByteArray *value)
+static void	zbx_cassandra_free_column_or_supercolumn(gpointer data)
 {
-	int			ret = ZBX_DB_OK;
-
-	InvalidRequestException	*ire = NULL;
-	UnavailableException	*ue = NULL;
-	TimedOutException	*toe = NULL;
-	GError			*error = NULL;
-
+	ColumnOrSuperColumn	*__cosc;
 	Column			*__column;
-	ColumnParent		*__column_parent;
 
-	__column_parent = g_object_new(TYPE_COLUMN_PARENT, NULL);
-	__column_parent->column_family = column_family;
+	__cosc = COLUMN_OR_SUPER_COLUMN(data);
+	assert(TRUE == __cosc->__isset_column);
 
-	__column = g_object_new(TYPE_COLUMN, NULL);
-	__column->name = column;
-	__column->value = value;
-	__column->__isset_value = TRUE;
-	__column->timestamp = time(NULL);
-	__column->__isset_timestamp = TRUE;
+	__column = COLUMN(__cosc->column);
+	assert(TRUE == __column->__isset_value);
+	assert(TRUE == __column->__isset_timestamp);
 
-	if (TRUE != cassandra_client_insert(CASSANDRA_IF(conn.client), key, __column_parent, __column,
-				CONSISTENCY_LEVEL_ONE, &ire, &ue, &toe, &error))
-	{
-		int	descr_offset = 0;
-		char	descr[MAX_STRING_LEN];
-
-		ret = ZBX_DB_DOWN;
-
-		descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
-				"setting value for %s", column_family);
-		descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
-				"['%s']", zbx_cassandra_decode_type(key));
-		descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
-				"['%s']", zbx_cassandra_decode_type(column));
-		zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
-				" to '%s'", zbx_cassandra_decode_type(value));
-
-		zbx_cassandra_log_errors(descr, error, ire, NULL, ue, toe);
-	}
-
+	g_byte_array_unref(__column->value);
+	g_byte_array_unref(__column->name);
 	g_object_unref(__column);
-	g_object_unref(__column_parent);
-
-	return ret;
+	g_object_unref(__cosc);
 }
 
-static char	*zbx_cassandra_get_value(GByteArray *key, char *column_family, GByteArray *column)
+static void	zbx_cassandra_free_mutation(gpointer data)
 {
-	char			*result = NULL;
+	Mutation	*__mutation;
 
+	__mutation = MUTATION(data);
+	assert(TRUE == __mutation->__isset_column_or_supercolumn);
+
+	zbx_cassandra_free_column_or_supercolumn(__mutation->column_or_supercolumn);
+
+	g_object_unref(__mutation);
+}
+
+static void	zbx_cassandra_add_mutation(GByteArray *key, char *column_family, GByteArray *column, GByteArray *value)
+{
+	GHashTable		*__cf_map;
+	ColumnOrSuperColumn	*__cf_cosc;
+	Column			*__cf_column;
+	GPtrArray		*__cf_mutlist;
+	Mutation		*__cf_mutation;
+
+	if (NULL == (__cf_map = g_hash_table_lookup(history.mutation_map, key)))
+	{
+		__cf_map = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, (GDestroyNotify)g_ptr_array_unref);
+		g_hash_table_insert(history.mutation_map, key, __cf_map);
+	}
+
+	if (NULL == (__cf_mutlist = g_hash_table_lookup(__cf_map, column_family)))
+	{
+		__cf_mutlist = g_ptr_array_new_with_free_func(zbx_cassandra_free_mutation);
+		g_hash_table_insert(__cf_map, column_family, __cf_mutlist);
+	}
+
+	__cf_column = g_object_new(TYPE_COLUMN, NULL);
+	__cf_column->name = column;
+	__cf_column->value = value;
+	__cf_column->__isset_value = TRUE;
+	__cf_column->timestamp = time(NULL);
+	__cf_column->__isset_timestamp = TRUE;
+
+	__cf_cosc = g_object_new(TYPE_COLUMN_OR_SUPER_COLUMN, NULL);
+	__cf_cosc->column = __cf_column;
+	__cf_cosc->__isset_column = TRUE;
+
+	__cf_mutation = g_object_new(TYPE_MUTATION, NULL);
+	__cf_mutation->column_or_supercolumn = __cf_cosc;
+	__cf_mutation->__isset_column_or_supercolumn = TRUE;
+
+	g_ptr_array_add(__cf_mutlist, __cf_mutation);
+}
+
+void	zbx_cassandra_add_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, const char *value)
+{
+	GByteArray		*__key;
+	GByteArray		*__column;
+	GByteArray		*__value;
+
+	if (NULL == history.mutation_map)
+	{
+		history.mutation_map = g_hash_table_new_full(g_direct_hash, g_direct_equal,
+				(GDestroyNotify)g_byte_array_unref, (GDestroyNotify)g_hash_table_unref);
+	}
+
+	/* metric */
+
+	__key = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
+	__column = zbx_cassandra_encode_integer_type((clock % SEC_PER_DAY) * 1000);
+	__value = zbx_cassandra_encode_ascii_type(value);
+
+	zbx_cassandra_add_mutation(__key, "metric", __column, __value);
+
+	/* metric_by_parameter */
+
+	__key = zbx_cassandra_encode_long_type(itemid);
+	__column = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
+	__value = zbx_cassandra_encode_ascii_type("\1");
+
+	zbx_cassandra_add_mutation(__key, "metric_by_parameter", __column, __value);
+
+	/* save to Cassandra */
+
+	if (ZBX_CASSANDRA_HISTORY_BATCH_MAX == ++history.values_num)
+		zbx_cassandra_save_history_values();
+}
+
+void	zbx_cassandra_save_history_values()
+{
 	InvalidRequestException	*ire = NULL;
-	NotFoundException	*nfe = NULL;
 	UnavailableException	*ue = NULL;
 	TimedOutException	*toe = NULL;
 	GError			*error = NULL;
 
-	ColumnPath		*__column_path;
-	ColumnOrSuperColumn	*__result = NULL;
+	if (0 == history.values_num)
+		return;
 
-	__column_path = g_object_new(TYPE_COLUMN_PATH, NULL);
-	__column_path->column_family = column_family;
-	__column_path->column = column;
-	__column_path->__isset_column = TRUE;
-
-	if (TRUE != cassandra_client_get(CASSANDRA_IF(conn.client), &__result, key, __column_path,
-				CONSISTENCY_LEVEL_ONE, &ire, &nfe, &ue, &toe, &error))
+	if (TRUE != cassandra_client_batch_mutate(CASSANDRA_IF(conn.client), history.mutation_map,
+				CONSISTENCY_LEVEL_ONE, &ire, &ue, &toe, &error))
 	{
-		if (NULL == nfe)
-		{
-			int	descr_offset = 0;
-			char	descr[MAX_STRING_LEN];
-
-			result = (char *)ZBX_DB_DOWN;
-
-			descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
-					"getting value for %s", column_family);
-			descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
-					"['%s']", zbx_cassandra_decode_type(key));
-			zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
-					"['%s']", zbx_cassandra_decode_type(column));
-
-			zbx_cassandra_log_errors(descr, error, ire, nfe, ue, toe);
-		}
-	}
-	else
-	{
-		result = zbx_cassandra_decode_ascii_type(__result->column->value);
-
-		g_object_unref(__result);
+		zbx_cassandra_log_errors("saving a bunch of history values", error, ire, NULL, ue, toe);
 	}
 
-	g_object_unref(__column_path);
-
-	return result;
+	g_hash_table_unref(history.mutation_map);
+	history.mutation_map = NULL;
+	history.values_num = 0;
 }
 
 static GPtrArray	*zbx_cassandra_get_values(GByteArray *key, char *column_family, SlicePredicate *predicate)
@@ -381,7 +417,7 @@ static GPtrArray	*zbx_cassandra_get_values(GByteArray *key, char *column_family,
 	__column_parent = g_object_new(TYPE_COLUMN_PARENT, NULL);
 	__column_parent->column_family = column_family;
 
-	__result = g_ptr_array_new();
+	__result = g_ptr_array_new_with_free_func(zbx_cassandra_free_column_or_supercolumn);
 
 	if (TRUE != cassandra_client_get_slice(CASSANDRA_IF(conn.client), &__result, key, __column_parent,
 				predicate, CONSISTENCY_LEVEL_ONE, &ire, &ue, &toe, &error))
@@ -409,33 +445,6 @@ static GPtrArray	*zbx_cassandra_get_values(GByteArray *key, char *column_family,
 	g_object_unref(__column_parent);
 
 	return __result;
-}
-
-void	zbx_cassandra_save_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, const char *value)
-{
-	GByteArray	*__key;
-	GByteArray	*__column;
-	GByteArray	*__value;
-
-	__key = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
-	__column = zbx_cassandra_encode_integer_type((clock % SEC_PER_DAY) * 1000);
-	__value = zbx_cassandra_encode_ascii_type(value);
-
-	zbx_cassandra_set_value(__key, "metric", __column, __value);
-
-	g_byte_array_unref(__value);
-	g_byte_array_unref(__column);
-	g_byte_array_unref(__key);
-
-	__key = zbx_cassandra_encode_long_type(itemid);
-	__column = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
-	__value = zbx_cassandra_encode_ascii_type("\1");
-
-	zbx_cassandra_set_value(__key, "metric_by_parameter", __column, __value);
-
-	g_byte_array_unref(__value);
-	g_byte_array_unref(__column);
-	g_byte_array_unref(__key);
 }
 
 void	zbx_cassandra_fetch_history_values(zbx_vector_str_t *values, zbx_uint64_t itemid,
@@ -550,6 +559,133 @@ void	zbx_cassandra_fetch_history_values(zbx_vector_str_t *values, zbx_uint64_t i
 	g_object_unref(__index_predicate);
 
 	g_byte_array_unref(__index_key);
+}
+
+/* code that is currently not being used: */
+
+static int	zbx_cassandra_set_value(GByteArray *key, char *column_family, GByteArray *column, GByteArray *value)
+{
+	int			ret = ZBX_DB_OK;
+
+	InvalidRequestException	*ire = NULL;
+	UnavailableException	*ue = NULL;
+	TimedOutException	*toe = NULL;
+	GError			*error = NULL;
+
+	Column			*__column;
+	ColumnParent		*__column_parent;
+
+	__column_parent = g_object_new(TYPE_COLUMN_PARENT, NULL);
+	__column_parent->column_family = column_family;
+
+	__column = g_object_new(TYPE_COLUMN, NULL);
+	__column->name = column;
+	__column->value = value;
+	__column->__isset_value = TRUE;
+	__column->timestamp = time(NULL);
+	__column->__isset_timestamp = TRUE;
+
+	if (TRUE != cassandra_client_insert(CASSANDRA_IF(conn.client), key, __column_parent, __column,
+				CONSISTENCY_LEVEL_ONE, &ire, &ue, &toe, &error))
+	{
+		int	descr_offset = 0;
+		char	descr[MAX_STRING_LEN];
+
+		ret = ZBX_DB_DOWN;
+
+		descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+				"setting value for %s", column_family);
+		descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+				"['%s']", zbx_cassandra_decode_type(key));
+		descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+				"['%s']", zbx_cassandra_decode_type(column));
+		zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+				" to '%s'", zbx_cassandra_decode_type(value));
+
+		zbx_cassandra_log_errors(descr, error, ire, NULL, ue, toe);
+	}
+
+	g_object_unref(__column);
+	g_object_unref(__column_parent);
+
+	return ret;
+}
+
+static char	*zbx_cassandra_get_value(GByteArray *key, char *column_family, GByteArray *column)
+{
+	char			*result = NULL;
+
+	InvalidRequestException	*ire = NULL;
+	NotFoundException	*nfe = NULL;
+	UnavailableException	*ue = NULL;
+	TimedOutException	*toe = NULL;
+	GError			*error = NULL;
+
+	ColumnPath		*__column_path;
+	ColumnOrSuperColumn	*__result = NULL;
+
+	__column_path = g_object_new(TYPE_COLUMN_PATH, NULL);
+	__column_path->column_family = column_family;
+	__column_path->column = column;
+	__column_path->__isset_column = TRUE;
+
+	if (TRUE != cassandra_client_get(CASSANDRA_IF(conn.client), &__result, key, __column_path,
+				CONSISTENCY_LEVEL_ONE, &ire, &nfe, &ue, &toe, &error))
+	{
+		if (NULL == nfe)
+		{
+			int	descr_offset = 0;
+			char	descr[MAX_STRING_LEN];
+
+			result = (char *)ZBX_DB_DOWN;
+
+			descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+					"getting value for %s", column_family);
+			descr_offset += zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+					"['%s']", zbx_cassandra_decode_type(key));
+			zbx_snprintf(descr + descr_offset, sizeof(descr) - descr_offset,
+					"['%s']", zbx_cassandra_decode_type(column));
+
+			zbx_cassandra_log_errors(descr, error, ire, nfe, ue, toe);
+		}
+	}
+	else
+	{
+		result = zbx_cassandra_decode_ascii_type(__result->column->value);
+
+		g_object_unref(__result);
+	}
+
+	g_object_unref(__column_path);
+
+	return result;
+}
+
+void	zbx_cassandra_save_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, const char *value)
+{
+	GByteArray	*__key;
+	GByteArray	*__column;
+	GByteArray	*__value;
+
+	__key = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
+	__column = zbx_cassandra_encode_integer_type((clock % SEC_PER_DAY) * 1000);
+	__value = zbx_cassandra_encode_ascii_type(value);
+
+	zbx_cassandra_set_value(__key, "metric", __column, __value);
+
+	g_byte_array_unref(__value);
+	g_byte_array_unref(__column);
+	g_byte_array_unref(__key);
+
+	__key = zbx_cassandra_encode_long_type(itemid);
+	__column = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
+	__value = zbx_cassandra_encode_ascii_type("\1");
+
+	zbx_cassandra_set_value(__key, "metric_by_parameter", __column, __value);
+
+	g_byte_array_unref(__value);
+	g_byte_array_unref(__column);
+	g_byte_array_unref(__key);
 }
 
 #endif
