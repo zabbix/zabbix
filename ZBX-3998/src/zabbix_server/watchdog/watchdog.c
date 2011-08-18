@@ -122,6 +122,8 @@ static void	sync_config()
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		/* add the recipients to the list */
+
 		if (count >= recipients.values_num)
 		{
 			recipient = zbx_calloc(NULL, 1, sizeof(ZBX_RECIPIENT));
@@ -132,6 +134,8 @@ static void	sync_config()
 
 		ZBX_STR2UINT64(recipient->mediatype.mediatypeid, row[0]);
 		recipient->mediatype.type = atoi(row[1]);
+
+		/* the recipients are likely to be the same, change only what's different */
 
 		STR_REPLACE(recipient->mediatype.description, row[2]);
 		STR_REPLACE(recipient->mediatype.smtp_server, row[3]);
@@ -166,6 +170,8 @@ static void	sync_config()
 
 	while (count < old_count)
 	{
+		/* some recipients have been deleted, free the older entries */
+
 		recipient = recipients.values[count++];
 
 		zbx_free(recipient->mediatype.description);
