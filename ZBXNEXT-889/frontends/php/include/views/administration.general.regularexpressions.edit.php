@@ -34,7 +34,9 @@ $regExpRightTable = new CTable();
 $regExpRightTable->addRow(create_hat(_('Expressions'), get_expressions_tab(), null, 'hat_expressions'));
 
 if(isset($_REQUEST['new_expression'])){
-	$regExpRightTable->addRow(create_hat(_('New expression'), get_expression_form(), null, 'hat_new_expression'));
+	$hatTable = create_hat(_('New expression'), get_expression_form(), null, 'hat_new_expression');
+	$hatTable->setAttribute('style', 'margin-top: 3px;');
+	$regExpRightTable->addRow($hatTable);
 }
 
 $regExpLeftColumn = new CCol($regExpLeftTable);
@@ -44,12 +46,9 @@ $regExpRightColumn = new CCol($regExpRightTable);
 $regExpRightColumn->setAttribute('valign','top');
 
 $regExpOuterTable = new CTable();
-$regExpOuterTable->addRow(array($regExpLeftColumn, $regExpRightColumn));
+$regExpOuterTable->addRow(array($regExpLeftColumn, new CCol('&nbsp;'), $regExpRightColumn));
 
-$regExpTab = new CTabView();
-$regExpTab->addTab('regularExpressions', _('Regular expression'), $regExpOuterTable);
-
-$regExpForm->addItem($regExpTab);
+$regExpForm->addItem($regExpOuterTable);
 
 show_messages();
 
