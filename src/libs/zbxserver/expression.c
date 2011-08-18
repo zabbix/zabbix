@@ -2740,19 +2740,12 @@ error:
  *                                  TRIGGER_VALUE_(FALSE or TRUE)             *
  *             new_value     - [OUT] evaluated value                          *
  *                                   TRIGGER_VALUE(FALSE, TRUE or UNKNOWN)    *
- *             new_error     - [OUT] place error message if any               *
- *                                                                            *
- * Return value:                                                              *
- *             SUCCEED       - evaluated successfully                         *
- *                               new_value - TRIGGER_VALUE_(FALSE or TRUE)    *
- *             FAIL          - can not evaluate;                              *
- *                               new_value - TRIGGER_VALUE_UNKNOWN            *
- *                               new_error - error message                    *
+ *             new_error     - [OUT] place error message for UNKNOWN results  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now, unsigned char value,
+void	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now, unsigned char value,
 		unsigned char *new_value, char **new_error)
 {
 	const char	*__function_name = "evaluate_expression";
@@ -2771,8 +2764,8 @@ int	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now, u
 	event.objectid = triggerid;
 	event.value = value;
 
-	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION,
-			err, sizeof(err)))
+	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, expression,
+			MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 	{
 		/* evaluate expression */
 		zbx_remove_spaces(*expression);
@@ -2799,9 +2792,7 @@ int	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now, u
 		*new_value = TRIGGER_VALUE_UNKNOWN;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
