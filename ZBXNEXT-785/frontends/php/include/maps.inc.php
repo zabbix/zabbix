@@ -297,28 +297,6 @@ function MyDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype){
 }
 
 function get_png_by_selement($selement, $info) {
-//	switch ($info['icon_type']) {
-//		case SYSMAP_ELEMENT_ICON_ON:
-//			$info['iconid'] = $selement['iconid_on'];
-//			break;
-//		case SYSMAP_ELEMENT_ICON_MAINTENANCE:
-//			$info['iconid'] = $selement['iconid_maintenance'];
-//			break;
-//		case SYSMAP_ELEMENT_ICON_DISABLED:
-//			$info['iconid'] = $selement['iconid_disabled'];
-//			break;
-//		case SYSMAP_ELEMENT_ICON_OFF:
-//			/* falls through */
-//		default:
-//			$info['iconid'] = $selement['iconid_off'];
-//			break;
-//	}
-
-	// Process for default icons
-//	if ($info['iconid'] == 0) {
-//		$info['iconid'] = $selement['iconid_off'];
-//	}
-
 	$image = get_image_by_imageid($info['iconid']);
 
 	if (!$image) {
@@ -2108,7 +2086,6 @@ function drawMapLabels(&$im, $map, $map_info, $resolveMacros=true){
 			$iconX = imagesx($image);
 			$iconY = imagesy($image);
 		}
-
 
 		if(!is_null($hl_color)){
 			$icon_hl = 14;

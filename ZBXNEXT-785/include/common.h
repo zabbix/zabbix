@@ -122,7 +122,7 @@
 
 #define	APPLICATION_NAME	"Zabbix Agent"
 #define	ZABBIX_REVDATE		"26 July 2011"
-#define	ZABBIX_VERSION		"1.9.5"
+#define	ZABBIX_VERSION		"1.9.6"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -535,9 +535,9 @@ typedef enum
 #define HOST_MAINTENANCE_STATUS_OFF	0
 #define HOST_MAINTENANCE_STATUS_ON	1
 
-/* host profile mode */
-#define HOST_PROFILE_MANUAL		0
-#define HOST_PROFILE_AUTOMATIC		1
+/* host inventory mode */
+#define HOST_INVENTORY_MANUAL		0
+#define HOST_INVENTORY_AUTOMATIC	1
 
 /* host availability */
 #define HOST_AVAILABLE_UNKNOWN	0

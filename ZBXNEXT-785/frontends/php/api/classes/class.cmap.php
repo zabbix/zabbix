@@ -85,6 +85,7 @@ class CMap extends CMapElement{
 			'output'					=> API_OUTPUT_REFER,
 			'selectSelements'			=> null,
 			'selectLinks'				=> null,
+			'selectIconMap'				=> null,
 			'countOutput'				=> null,
 			'expandUrls' 				=> null,
 			'preservekeys'				=> null,
@@ -208,6 +209,9 @@ class CMap extends CMapElement{
 					}
 					if(!is_null($options['selectLinks']) && !isset($result[$sysmap['sysmapid']]['links'])){
 						$result[$sysmap['sysmapid']]['links'] = array();
+					}
+					if(!is_null($options['selectIconMap']) && !isset($result[$sysmap['sysmapid']]['iconmap'])){
+						$result[$sysmap['sysmapid']]['iconmap'] = array();
 					}
 					if(!isset($result[$sysmap['sysmapid']]['urls'])){
 						$result[$sysmap['sysmapid']]['urls'] = array();
@@ -432,6 +436,26 @@ class CMap extends CMapElement{
 					$result[$selement['sysmapid']]['selements'][$selement['selementid']] = $selement;
 				else
 					$result[$selement['sysmapid']]['selements'][] = $selement;
+			}
+		}
+
+		// Adding icon maps
+		if(!is_null($options['selectIconMap']) && str_in_array($options['selectIconMap'], $subselects_allowed_outputs)){
+			$params = array(
+				'sysmapids' => $sysmapids,
+				'output' => $options['selectIconMap'],
+				'selectMappings' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+				'nopermissions' => true,
+			);
+			$iconMaps = API::IconMap()->get($params);
+			foreach($iconMaps as $iconMap){
+				$isysmaps = $iconMap['sysmaps'];
+				unset($iconMap['sysmaps']);
+
+				foreach($isysmaps as $sysmap){
+					$result[$sysmap['sysmapid']]['iconmap'] = $iconMap;
+				}
 			}
 		}
 

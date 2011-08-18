@@ -23,11 +23,16 @@
  * @package API
  */
 
+/**
+ * Class for operating icon maps.
+ * Icon maps work only with map elements that represent hosts, and used for automatic changing
+ * icons based on host inventory data.
+ * Icon maps has read access for everyone and write access only for superamins
+ */
 class CIconMap extends CZBXAPI {
 
 	/**
-	 * Get IconMap data
-	 *
+	 * Get IconMap data.
 	 * @param array $options
 	 * @param array $options['nodeids']
 	 * @param array $options['iconmapids']
@@ -210,6 +215,14 @@ class CIconMap extends CZBXAPI {
 						$result[$iconMap['iconmapid']] = array();
 					}
 
+					if (isset($iconMap['sysmapid'])) {
+						if (!isset($result[$iconMap['iconmapid']]['sysmaps'])) {
+							$result[$iconMap['iconmapid']]['sysmaps'] = array();
+						}
+
+						$result[$iconMap['iconmapid']]['sysmaps'][] = array('sysmapid' => $iconMap['sysmapid']);
+					}
+
 					if (!is_null($options['selectMappings']) && !isset($result[$iconMap['iconmapid']]['mappings'])) {
 						$result[$iconMap['iconmapid']]['mappings'] = array();
 					}
@@ -242,8 +255,7 @@ class CIconMap extends CZBXAPI {
 	}
 
 	/**
-	 * Add IconMap
-	 *
+	 * Add IconMap.
 	 * @param array $iconMaps
 	 * @return array
 	 */
@@ -300,8 +312,7 @@ class CIconMap extends CZBXAPI {
 	}
 
 	/**
-	 * Update IconMap
-	 *
+	 * Update IconMap.
 	 * @param array $iconMaps
 	 * @return array
 	 */
@@ -409,8 +420,7 @@ class CIconMap extends CZBXAPI {
 	}
 
 	/**
-	 * Delete IconMap
-	 *
+	 * Delete IconMap.
 	 * @param array $iconmapids
 	 * @return array
 	 */
@@ -440,8 +450,7 @@ class CIconMap extends CZBXAPI {
 	}
 
 	/**
-	 * Check if user have read permissions for given icon map ids
-	 *
+	 * Check if user have read permissions for given icon map ids.
 	 * @param $ids
 	 * @return bool
 	 */
@@ -466,8 +475,7 @@ class CIconMap extends CZBXAPI {
 	}
 
 	/**
-	 * Check if user have write permissions for given icon map ids
-	 *
+	 * Check if user have write permissions for given icon map ids.
 	 * @param $ids
 	 * @return bool
 	 */
@@ -493,8 +501,8 @@ class CIconMap extends CZBXAPI {
 	}
 
 	/**
-	 * Checks icon maps
-	 *
+	 * Checks icon maps.
+	 * @throws APIException
 	 * @param $iconMaps
 	 * @param bool $mustExist if icon map should be checked against having at least one mapping
 	 * @return void

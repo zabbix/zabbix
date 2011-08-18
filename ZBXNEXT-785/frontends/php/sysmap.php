@@ -226,7 +226,6 @@ $container->Show();
 insert_show_color_picker_javascript();
 
 
-
 add_elementNames($sysmap['selements']);
 
 foreach($sysmap['links'] as &$link){
@@ -243,13 +242,28 @@ foreach($sysmap['links'] as &$link){
 unset($link);
 
 
+if ($sysmap['iconmapid']) {
+	$iconMaps = API::IconMap()->get(array(
+		'iconmapids' => $sysmap['iconmapid'],
+		'output' => array('default_iconid'),
+		'preservekeys' => true,
+	));
+	$iconMap = reset($iconMaps);
+	$defaultAutoIconId = $iconMap['default_iconid'];
+}
+else{
+	$defaultAutoIconId = null;
+}
+
 $iconList = array();
-$result = DBselect('SELECT imageid, name FROM images WHERE imagetype=1 AND '.DBin_node('imageid'));
+$result = DBselect('SELECT i.imageid, i.name FROM images i WHERE i.imagetype='.IMAGE_TYPE_ICON.' AND '.DBin_node('i.imageid'));
 while($row = DBfetch($result)){
 	$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);
 }
 
-zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.zbx_jsvalue(array('sysmap' => $sysmap, 'iconList' => $iconList), true).');');
+zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.zbx_jsvalue(array(
+			'sysmap' => $sysmap, 'iconList' => $iconList, 'defaultAutoIconId' => $defaultAutoIconId), true).');'
+);
 
 
 include_once('include/page_footer.php');

@@ -385,9 +385,6 @@ table.formtable tr td.form_row_r table.calendar tr td{
 	padding-left: 1px;
 	padding-right: 1px;
 }
-table.formtable tbody.grouped{
-	border: 2px solid #CED7DF;
-}
 
 table.formlongtable{ width: 99%; }
 td.form_row_l_simple {  border-color: #AAAAAA; text-align:	left; white-space: nowrap; word-spacing: 0; width: 50%;}

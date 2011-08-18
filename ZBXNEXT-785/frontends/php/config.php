@@ -144,8 +144,8 @@ CProfile::update('web.config.config', $_REQUEST['config'], PROFILE_TYPE_INT);
 $orig_config = select_config(false, get_current_nodeid(false));
 
 $result = 0;
+// Images
 if ($_REQUEST['config'] == 3) {
-	// IMAGES ACTIONS
 	if (isset($_REQUEST['save'])) {
 
 		$file = isset($_FILES['image']) && $_FILES['image']['name'] != '' ? $_FILES['image'] : null;
@@ -212,7 +212,7 @@ if ($_REQUEST['config'] == 3) {
 
 		$result = API::Image()->delete($_REQUEST['imageid']);
 
-		show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
+		show_messages($result, _('Image deleted'), _('Cannot delete image'));
 		if ($result) {
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, 'Image [' . $image['name'] . '] deleted');
 			unset($_REQUEST['form']);
