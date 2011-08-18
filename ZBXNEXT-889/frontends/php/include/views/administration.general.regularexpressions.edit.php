@@ -33,7 +33,7 @@ $oRegExpLeftTable->addRow(create_hat(_('Regular expression'), get_regexp_form(),
 $oRegExpRightTable = new CTable();
 $oRegExpRightTable->addRow(create_hat(_('Expressions'), get_expressions_tab(), null, 'hat_expressions'));
 
-if(isset($_REQUEST['new_expression'])){
+if (isset($_REQUEST['new_expression'])) {
 	$oHatTable = create_hat(_('New expression'), get_expression_form(), null, 'hat_new_expression');
 	$oHatTable->setAttribute('style', 'margin-top: 3px;');
 	$oRegExpRightTable->addRow($oHatTable);

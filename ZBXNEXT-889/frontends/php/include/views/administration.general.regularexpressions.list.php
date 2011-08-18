@@ -32,19 +32,19 @@ $oRegExpTable->setFooter(new CCol(array(new CButtonQMessage('delete', _('Delete 
 
 $aCount = array();
 $aExpressions = array();
-foreach($this->data['db_exps'] as $aExp){
-	if(!isset($aExpressions[$aExp['regexpid']])){
+foreach($this->data['db_exps'] as $aExp) {
+	if (!isset($aExpressions[$aExp['regexpid']])) {
 		$aCount[$aExp['regexpid']] = 1;
 	}
-	else{
+	else {
 		$aCount[$aExp['regexpid']]++;
 	}
-	if(!isset($aExpressions[$aExp['regexpid']])){
+	if (!isset($aExpressions[$aExp['regexpid']])) {
 		$aExpressions[$aExp['regexpid']] = new CTable();
 	}
 	$aExpressions[$aExp['regexpid']]->addRow(array($aCount[$aExp['regexpid']], ' &raquo; ', $aExp['expression'], ' ['.expression_type2str($aExp['expression_type']).']'));
 }
-foreach($this->data['regexps'] as $iRegexpid => $aRegexp){
+foreach($this->data['regexps'] as $iRegexpid => $aRegexp) {
 	$oRegExpTable->addRow(array(
 		new CCheckBox('regexpids['.$aRegexp['regexpid'].']', null, null, $aRegexp['regexpid']),
 		new CLink($aRegexp['name'], 'config.php?form=update'.url_param('config').'&regexpid='.$aRegexp['regexpid'].'#form'),
