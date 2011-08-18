@@ -1,0 +1,19 @@
+This directory contains data for building Zabbix RPM packages for
+CentOS 5 and RHEL 5 GNU/Linux distributions.
+
+* build.sh
+Run this script to generate RPM packages. Make sure rpm Release is
+properly set in zabbix.spec.tmpl . If script finishes successfully the
+packages will be available in directories RPMS (binary packages) and
+SRPMS (source packages).
+
+* SOURCES
+This directory contains scripts, patches, config files that are
+referenced from the spec file.
+
+* zabbix.spec.tmpl
+This is the template that is used to generate RPM spec file when you
+run build.sh script. Please do not forget to update changelog when
+it's changed. Keep the upper most changelog entry the templated
+one. When you run build.sh script the template variables will be
+replaced with needed values.

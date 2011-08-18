@@ -1,0 +1,7 @@
+/var/log/zabbix/zabbix_COMPONENT.log {
+	missingok
+	monthly
+	notifempty
+	compress
+	create 0664 zabbix zabbix
+}
