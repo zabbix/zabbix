@@ -3,7 +3,9 @@ CentOS 5 and RHEL 5 GNU/Linux distributions.
 
 * build.sh
 Run this script to generate RPM packages. Make sure rpm Release is
-properly set in zabbix.spec.tmpl .
+properly set in zabbix.spec.tmpl . If script finishes successfully the
+packages will be available in directories RPMS (binary packages) and
+SRPMS (source packages).
 
 * SOURCES
 This directory contains scripts, patches, config files that are
