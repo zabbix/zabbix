@@ -133,16 +133,16 @@ static void	sync_config()
 		ZBX_STR2UINT64(recipient->mediatype.mediatypeid, row[0]);
 		recipient->mediatype.type = atoi(row[1]);
 
-		STR_REPLACE(recipient->mediatype.description, strdup(row[2]));
-		STR_REPLACE(recipient->mediatype.smtp_server, strdup(row[3]));
-		STR_REPLACE(recipient->mediatype.smtp_helo, strdup(row[4]));
-		STR_REPLACE(recipient->mediatype.smtp_email, strdup(row[5]));
-		STR_REPLACE(recipient->mediatype.exec_path, strdup(row[6]));
-		STR_REPLACE(recipient->mediatype.gsm_modem, strdup(row[7]));
-		STR_REPLACE(recipient->mediatype.username, strdup(row[8]));
-		STR_REPLACE(recipient->mediatype.passwd, strdup(row[9]));
+		STR_REPLACE(recipient->mediatype.description, row[2]);
+		STR_REPLACE(recipient->mediatype.smtp_server, row[3]);
+		STR_REPLACE(recipient->mediatype.smtp_helo, row[4]);
+		STR_REPLACE(recipient->mediatype.smtp_email, row[5]);
+		STR_REPLACE(recipient->mediatype.exec_path, row[6]);
+		STR_REPLACE(recipient->mediatype.gsm_modem, row[7]);
+		STR_REPLACE(recipient->mediatype.username, row[8]);
+		STR_REPLACE(recipient->mediatype.passwd, row[9]);
 
-		STR_REPLACE(recipient->alert.sendto, strdup(row[10]));
+		STR_REPLACE(recipient->alert.sendto, row[10]);
 
 		if (NULL == recipient->alert.subject)
 			recipient->alert.message = recipient->alert.subject = zbx_strdup(NULL, "Zabbix database is down.");
@@ -158,7 +158,7 @@ static void	sync_config()
 	}
 	else if (1 == no_recipients && 0 < count)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "watchdog: %d user(s) will receive database down messages", count);
+		zabbix_log(LOG_LEVEL_WARNING, "watchdog: %d user(s) will receive database down messages", count);
 		no_recipients = 0;
 	}
 
