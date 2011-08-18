@@ -20,37 +20,37 @@
 ?>
 <?php
 
-$regExpForm = new CForm();
-$regExpForm->setName('regularExpressionsForm');
-$regExpForm->addVar('form', $this->data['form']);
-$regExpForm->addVar('form_refresh', $this->data['form_refresh']);
-$regExpForm->addVar('config', get_request('config', 10));
-$regExpForm->addVar('regexpid', get_request('regexpid'));
+$oRegExpForm = new CForm();
+$oRegExpForm->setName('regularExpressionsForm');
+$oRegExpForm->addVar('form', $this->data['form']);
+$oRegExpForm->addVar('form_refresh', $this->data['form_refresh']);
+$oRegExpForm->addVar('config', get_request('config', 10));
+$oRegExpForm->addVar('regexpid', get_request('regexpid'));
 
-$regExpLeftTable = new CTable();
-$regExpLeftTable->addRow(create_hat(_('Regular expression'), get_regexp_form(), null, 'hat_regexp'));
+$oRegExpLeftTable = new CTable();
+$oRegExpLeftTable->addRow(create_hat(_('Regular expression'), get_regexp_form(), null, 'hat_regexp'));
 
-$regExpRightTable = new CTable();
-$regExpRightTable->addRow(create_hat(_('Expressions'), get_expressions_tab(), null, 'hat_expressions'));
+$oRegExpRightTable = new CTable();
+$oRegExpRightTable->addRow(create_hat(_('Expressions'), get_expressions_tab(), null, 'hat_expressions'));
 
 if(isset($_REQUEST['new_expression'])){
-	$hatTable = create_hat(_('New expression'), get_expression_form(), null, 'hat_new_expression');
-	$hatTable->setAttribute('style', 'margin-top: 3px;');
-	$regExpRightTable->addRow($hatTable);
+	$oHatTable = create_hat(_('New expression'), get_expression_form(), null, 'hat_new_expression');
+	$oHatTable->setAttribute('style', 'margin-top: 3px;');
+	$oRegExpRightTable->addRow($oHatTable);
 }
 
-$regExpLeftColumn = new CCol($regExpLeftTable);
-$regExpLeftColumn->setAttribute('valign','top');
+$oRegExpLeftColumn = new CCol($oRegExpLeftTable);
+$oRegExpLeftColumn->setAttribute('valign','top');
 
-$regExpRightColumn = new CCol($regExpRightTable);
-$regExpRightColumn->setAttribute('valign','top');
+$oRegExpRightColumn = new CCol($oRegExpRightTable);
+$oRegExpRightColumn->setAttribute('valign','top');
 
-$regExpOuterTable = new CTable();
-$regExpOuterTable->addRow(array($regExpLeftColumn, new CCol('&nbsp;'), $regExpRightColumn));
+$oRegExpOuterTable = new CTable();
+$oRegExpOuterTable->addRow(array($oRegExpLeftColumn, new CCol('&nbsp;'), $oRegExpRightColumn));
 
-$regExpForm->addItem($regExpOuterTable);
+$oRegExpForm->addItem($oRegExpOuterTable);
 
 show_messages();
 
-return $regExpForm;
+return $oRegExpForm;
 ?>

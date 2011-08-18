@@ -21,38 +21,38 @@
 <?php
 $this->data['cnf_wdgt']->addHeader(_('Regular expressions'));
 
-$regExpForm = new CForm();
-$regExpForm->setName('regularExpressionsForm');
-$regExpForm->addVar('config', get_request('config', 10));
-$regExpForm->addItem(BR());
+$oRegExpForm = new CForm();
+$oRegExpForm->setName('regularExpressionsForm');
+$oRegExpForm->addVar('config', get_request('config', 10));
+$oRegExpForm->addItem(BR());
 
-$regExpTable = new CTableInfo();
-$regExpTable->setHeader(array(new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm','all_regexps','regexpids');"), _('Name'), _('Expressions')));
-$regExpTable->setFooter(new CCol(array(new CButtonQMessage('delete', _('Delete selected'), _('Delete selected regular expressions?')))));
+$oRegExpTable = new CTableInfo();
+$oRegExpTable->setHeader(array(new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm','all_regexps','regexpids');"), _('Name'), _('Expressions')));
+$oRegExpTable->setFooter(new CCol(array(new CButtonQMessage('delete', _('Delete selected'), _('Delete selected regular expressions?')))));
 
-$count = array();
-$expressions = array();
-foreach($this->data['db_exps'] as $exp){
-	if(!isset($expressions[$exp['regexpid']])){
-		$count[$exp['regexpid']] = 1;
+$aCount = array();
+$aExpressions = array();
+foreach($this->data['db_exps'] as $aExp){
+	if(!isset($aExpressions[$aExp['regexpid']])){
+		$aCount[$aExp['regexpid']] = 1;
 	}
 	else{
-		$count[$exp['regexpid']]++;
+		$aCount[$aExp['regexpid']]++;
 	}
-	if(!isset($expressions[$exp['regexpid']])){
-		$expressions[$exp['regexpid']] = new CTable();
+	if(!isset($aExpressions[$aExp['regexpid']])){
+		$aExpressions[$aExp['regexpid']] = new CTable();
 	}
-	$expressions[$exp['regexpid']]->addRow(array($count[$exp['regexpid']], ' &raquo; ', $exp['expression'], ' ['.expression_type2str($exp['expression_type']).']'));
+	$aExpressions[$aExp['regexpid']]->addRow(array($aCount[$aExp['regexpid']], ' &raquo; ', $aExp['expression'], ' ['.expression_type2str($aExp['expression_type']).']'));
 }
-foreach($this->data['regexps'] as $regexpid => $regexp){
-	$regExpTable->addRow(array(
-		new CCheckBox('regexpids['.$regexp['regexpid'].']', null, null, $regexp['regexpid']),
-		new CLink($regexp['name'], 'config.php?form=update'.url_param('config').'&regexpid='.$regexp['regexpid'].'#form'),
-		isset($expressions[$regexpid]) ? $expressions[$regexpid] : '-'
+foreach($this->data['regexps'] as $iRegexpid => $aRegexp){
+	$oRegExpTable->addRow(array(
+		new CCheckBox('regexpids['.$aRegexp['regexpid'].']', null, null, $aRegexp['regexpid']),
+		new CLink($aRegexp['name'], 'config.php?form=update'.url_param('config').'&regexpid='.$aRegexp['regexpid'].'#form'),
+		isset($aExpressions[$iRegexpid]) ? $aExpressions[$iRegexpid] : '-'
 	));
 }
 
-$regExpForm->addItem($regExpTable);
+$oRegExpForm->addItem($oRegExpTable);
 
-return $regExpForm;
+return $oRegExpForm;
 ?>
