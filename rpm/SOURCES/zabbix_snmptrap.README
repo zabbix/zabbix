@@ -1,0 +1,15 @@
+Processing SNMP traps in Zabbix
+===============================
+
+The Zabbix source archive contains a script called snmptrapd.sh that's used
+for processing of received SNMP traps in Zabbix (see Zabbix Manual for the
+details [1]). I have split the script into 2 parts - one containing
+configuration and second the script itself (renamed to zabbix-snmptrap).
+Zabbix 1.9+ will get a new implementation of the traps processing [2], but
+we should have a solution for 1.8.
+
+May 2011, Dan Horák
+
+
+[1] http://www.zabbix.com/documentation/1.8/manual/config/utilities
+[2] https://support.zabbix.com/browse/ZBXNEXT-747
