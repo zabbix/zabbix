@@ -406,11 +406,11 @@ close:
 
 			*p = '\0';
 		}
+if (-1 == rc)
+	zabbix_log(LOG_LEVEL_ERR, "read() failed: %s", zbx_strerror(errno));
 
 		close(fd);
 
-zabbix_log(LOG_LEVEL_ERR, "before usleep(0.5 secs)");
-usleep(500 * 1000);	/* 0.5 seconds */
 		if (-1 == rc || -1 == zbx_waitpid(pid))
 		{
 			if (EINTR == errno)
