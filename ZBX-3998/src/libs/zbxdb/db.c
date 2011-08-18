@@ -740,7 +740,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		}
 		else
 		{
-			while (0 == status)
+			do
 			{
 				if (0 != mysql_field_count(conn))
 				{
@@ -754,6 +754,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				if (0 < (status = mysql_next_result(conn)))
 					zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 			}
+			while (0 == status);
 		}
 	}
 #elif defined(HAVE_ORACLE)
