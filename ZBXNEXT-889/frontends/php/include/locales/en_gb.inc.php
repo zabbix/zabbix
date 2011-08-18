@@ -399,17 +399,13 @@
 	'S_REGULAR_EXPRESSION'=>			_('Regular expression'),
 	'S_EXPRESSION'=>				_('Expression'),
 
-	'S_EXPECTED_RESULT'=>				_('Expected result'),
 	'S_CHARACTER_STRING_INCLUDED'=>			_('Character string included'),
 	'S_ANY_CHARACTER_STRING_INCLUDED'=>		_('Any character string included'),
 	'S_CHARACTER_STRING_NOT_INCLUDED'=>		_('Character string not included'),
 	'S_RESULT_IS_TRUE'=>				_('Result is TRUE'),
 	'S_RESULT_IS_FALSE'=>				_('Result is FALSE'),
 
-	'S_EXPRESSION_TYPE'=>				_('Expression type'),
-	'S_CASE_SENSITIVE'=>				_('Case sensitive'),
 	'S_TEST'=>					_('Test'),
-	'S_DELIMITER'=>					_('Delimiter'),
 	'S_TEST_STRING'=>				_('Test string'),
 	'S_INCORRECT_EXPRESSION'=>			_('Incorrect expression'),
 
