@@ -2251,7 +2251,7 @@ error:
  *             value         - [IN] current trigger value                     *
  *                                  TRIGGER_VALUE_(FALSE or TRUE)             *
  *             new_value     - [OUT] evaluated value                          *
- *                                   TRIGGER_VALUE(FALSE, TRUE or UNKNOWN)    *
+ *                                   TRIGGER_VALUE_(FALSE, TRUE or UNKNOWN)   *
  *             new_error     - [OUT] place error message for UNKNOWN results  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -2269,7 +2269,6 @@ void	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
-	/* substitute macros first */
 	memset(&event, 0, sizeof(DB_EVENT));
 	event.source = EVENT_SOURCE_TRIGGERS;
 	event.object = EVENT_OBJECT_TRIGGER;
@@ -2279,7 +2278,6 @@ void	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now,
 	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, NULL, expression,
 			MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 	{
-		/* evaluate expression */
 		zbx_remove_spaces(*expression);
 
 		if (SUCCEED == substitute_functions(expression, now, err, sizeof(err)) &&
@@ -2291,6 +2289,7 @@ void	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now,
 				*new_value = TRIGGER_VALUE_TRUE;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() new_value:%d", __function_name, *new_value);
+
 			ret = SUCCEED;
 		}
 	}

@@ -480,22 +480,24 @@ static int	trigger_dependent(zbx_uint64_t triggerid)
  *                                                                            *
  * Function: DBget_trigger_update_sql                                         *
  *                                                                            *
- * Purpose: generates sql statment for updating trigger value                 *
+ * Purpose: generates sql statement for updating trigger value                *
  *                                                                            *
  * Parameters: add_event - [OUT] 0 - do not add event                         *
  *                               1 - generate new event                       *
  *                                                                            *
- * Return value: SUCCEED - sql statememt generated successfully               *
+ * Return value: SUCCEED - sql statement generated successfully               *
  *               FAIL    - trigger update isn't required                      *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: do not update value if there are dependencies with value PROBLEM *
  *                                                                            *
  ******************************************************************************/
 int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_uint64_t triggerid,
 		unsigned char type, int value, const char *error, int new_value, const char *new_error, int lastchange,
 		unsigned char *add_event)
 {
-	const char	*__function_name = "DBcheck_trigger_for_update";
+	const char	*__function_name = "DBget_trigger_update_sql";
 	char		*new_error_esc;
 	int		generate_event, ret = FAIL;
 
@@ -506,9 +508,8 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 
 	generate_event = (value != new_value);
 	if (TRIGGER_TYPE_MULTIPLE_TRUE == type && 0 == generate_event)
-		generate_event = TRIGGER_VALUE_TRUE == new_value;
+		generate_event = (TRIGGER_VALUE_TRUE == new_value);
 
-	/* do not update status if there are dependencies with status PROBLEM */
 	if (0 != generate_event)
 	{
 		if (SUCCEED != trigger_dependent(triggerid))
@@ -561,6 +562,7 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 					" where triggerid=" ZBX_FS_UI64,
 					new_error_esc, triggerid);
 			zbx_free(new_error_esc);
+
 			ret = SUCCEED;
 		}
 	}

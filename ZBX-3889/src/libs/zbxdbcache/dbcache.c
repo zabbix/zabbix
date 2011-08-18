@@ -945,7 +945,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 6, "end;\n");
 #endif
 
-	if (sql_offset > 16)
+	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
