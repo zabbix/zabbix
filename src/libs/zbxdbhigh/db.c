@@ -362,16 +362,18 @@ DB_RESULT	DBselectN(const char *query, int n)
  *                                                                            *
  * Function: DBget_trigger_update_sql                                         *
  *                                                                            *
- * Purpose: generates sql statment for updating trigger value                 *
+ * Purpose: generates sql statement for updating trigger value                *
  *                                                                            *
  * Parameters: add_event      - [OUT] 0 - do not add event                    *
  *                                    1 - generate new event                  *
  *             value_changed  - [OUT] TRIGGER_VALUE_CHANGED_[NO|YES]          *
  *                                                                            *
- * Return value: SUCCEED - sql statememt generated successfully               *
+ * Return value: SUCCEED - sql statement generated successfully               *
  *               FAIL    - trigger update isn't required                      *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: do not update value if there are dependencies with value PROBLEM *
  *                                                                            *
  ******************************************************************************/
 int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_uint64_t triggerid,
@@ -434,7 +436,6 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 
 	if (0 != generate_event)
 	{
-		/* do not update status if there are dependencies with status PROBLEM */
 		if (SUCCEED == DCconfig_check_trigger_dependencies(triggerid))
 		{
 			if (NULL == *sql)
@@ -488,7 +489,6 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 	}
 	else if (TRIGGER_VALUE_FLAG_UNKNOWN == new_value_flags && 0 != strcmp(error, new_error))
 	{
-		/* do not update error if there are dependencies with status PROBLEM */
 		if (SUCCEED == DCconfig_check_trigger_dependencies(triggerid))
 		{
 			DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, new_error);
@@ -506,6 +506,7 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 					" where triggerid=" ZBX_FS_UI64,
 					new_error_esc, triggerid);
 			zbx_free(new_error_esc);
+
 			ret = SUCCEED;
 		}
 	}
