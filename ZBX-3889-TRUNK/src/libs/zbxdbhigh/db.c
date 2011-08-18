@@ -438,7 +438,10 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 		if (SUCCEED == DCconfig_check_trigger_dependencies(triggerid))
 		{
 			if (NULL == *sql)
+			{
+				*sql_alloc = 2 * ZBX_KIBIBYTE;
 				*sql = zbx_malloc(*sql, *sql_alloc);
+			}
 
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 42, "update triggers set lastchange=%d",
 					ts->sec);
@@ -491,7 +494,10 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 			DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, new_error);
 
 			if (NULL == *sql)
+			{
+				*sql_alloc = 2 * ZBX_KIBIBYTE;
 				*sql = zbx_malloc(*sql, *sql_alloc);
+			}
 
 			new_error_esc = DBdyn_escape_string_len(new_error, TRIGGER_ERROR_LEN);
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 66 + strlen(new_error_esc),
@@ -514,7 +520,7 @@ static void	DBupdate_trigger_value(zbx_uint64_t triggerid, unsigned char type, i
 {
 	const char	*__function_name = "DBupdate_trigger_value";
 	char		*sql = NULL;
-	int		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		sql_alloc = 0, sql_offset = 0;
 	unsigned char	add_event, value_changed;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
