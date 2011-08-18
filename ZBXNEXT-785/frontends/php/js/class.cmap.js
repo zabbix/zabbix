@@ -847,6 +847,10 @@ ZABBIX.apps.map = (function(){
 					this.data.elementsubtype = '0';
 				}
 
+				if(unsetUndefined && typeof this.data.use_iconmap === 'undefined'){
+					this.data.use_iconmap = '0';
+				}
+
 				// if element is image we unset advanced icons
 				if(this.data.elementtype === '4'){
 					this.data.iconid_on = '0';
