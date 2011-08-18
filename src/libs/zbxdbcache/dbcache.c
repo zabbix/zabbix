@@ -867,7 +867,6 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		if (1 != trigger->add_event)
 			continue;
 
-		/* processing event */
 		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid, &trigger->timespec,
 				trigger->new_value, trigger->value_changed, 0, 0);
 	}

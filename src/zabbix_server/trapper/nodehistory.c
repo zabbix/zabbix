@@ -178,7 +178,7 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 
 	r = record;
 
-	for (f = 0; 0 != table->fields[f].name; f++)
+	for (f = 0; NULL != table->fields[f].name; f++)
 	{
 		if (NULL == r)
 			goto error;

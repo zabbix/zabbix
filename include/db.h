@@ -592,9 +592,8 @@ int	DBdelete_host(zbx_uint64_t hostid);
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, int *gitems_alloc, int *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 
-/* History related functions */
-int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
-int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
+void	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
+void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
 void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num);
 

@@ -366,7 +366,7 @@ DB_RESULT	DBselectN(const char *query, int n)
  *                                                                            *
  * Parameters: add_event      - [OUT] 0 - do not add event                    *
  *                                    1 - generate new event                  *
- *             value_changed  - [OUT] TRIGGER_VALUE_CHANGED_[NO|YES]          *
+ *             value_changed  - [OUT] TRIGGER_VALUE_CHANGED_(NO or YES)       *
  *                                                                            *
  * Return value: SUCCEED - sql statement generated successfully               *
  *               FAIL    - trigger update isn't required                      *
@@ -429,7 +429,6 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 	/*                                                                                                */
 	/**************************************************************************************************/
 
-
 	generate_event = (value != new_value || value_flags != new_value_flags);
 	if (TRIGGER_TYPE_MULTIPLE_TRUE == type && 0 == generate_event)
 		generate_event = (TRIGGER_VALUE_TRUE == new_value && TRIGGER_VALUE_FLAG_NORMAL == new_value_flags);
@@ -451,7 +450,7 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 18, ",value=%d", new_value);
 
 			if (value_flags != new_value_flags)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 18, ",value_flags=%d", new_value_flags);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 24, ",value_flags=%d", new_value_flags);
 
 			if (NULL == new_error)
 			{
@@ -475,9 +474,8 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 38, " where triggerid=" ZBX_FS_UI64, triggerid);
 
-			*add_event = 1;	/* create event */
+			*add_event = 1;
 
-			/* decide on the value_changed flag */
 			if (value != new_value || (TRIGGER_TYPE_MULTIPLE_TRUE == type &&
 					TRIGGER_VALUE_TRUE == new_value && TRIGGER_VALUE_FLAG_UNKNOWN != new_value_flags))
 			{
@@ -628,14 +626,15 @@ void	DBupdate_triggers_status_after_restart()
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
+void	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
+	const char	*__function_name = "DBadd_trend";
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		hour, num;
 	double		value_min, value_avg, value_max;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_trend()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	hour = clock - clock % SEC_PER_HOUR;
 
@@ -654,71 +653,73 @@ int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 			value_max = value;
 		value_avg = (num * value_avg + value) / (num + 1);
 		num++;
-		DBexecute("update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL ",value_max=" ZBX_FS_DBL
-				" where itemid=" ZBX_FS_UI64 " and clock=%d",
+
+		DBexecute("update trends"
+				" set num=%d,"
+				"value_min=" ZBX_FS_DBL ","
+				"value_avg=" ZBX_FS_DBL ","
+				"value_max=" ZBX_FS_DBL
+				" where itemid=" ZBX_FS_UI64
+					" and clock=%d",
 				num, value_min, value_avg, value_max, itemid, hour);
 	}
 	else
 	{
-		DBexecute("insert into trends (clock,itemid,num,value_min,value_avg,value_max)"
-				" values (%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ")",
-				hour, itemid, 1, value, value, value);
+		DBexecute("insert into trends (itemid,clock,num,value_min,value_avg,value_max)"
+				" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ")",
+				itemid, hour, 1, value, value, value);
 	}
-
 	DBfree_result(result);
 
-	return SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
+void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 {
+	const char	*__function_name = "DBadd_trend_uint";
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		hour, num;
 	zbx_uint64_t	value_min, value_avg, value_max;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_trend_uint()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	hour=clock-clock%SEC_PER_HOUR;
+	hour = clock - clock % SEC_PER_HOUR;
 
 	result = DBselect("select num,value_min,value_avg,value_max from trends_uint where itemid=" ZBX_FS_UI64 " and clock=%d",
-		itemid,
-		hour);
+		itemid, hour);
 
-	row=DBfetch(result);
-
-	if(row)
+	if (NULL != (row = DBfetch(result)))
 	{
 		num = atoi(row[0]);
 		ZBX_STR2UINT64(value_min, row[1]);
 		ZBX_STR2UINT64(value_avg, row[2]);
 		ZBX_STR2UINT64(value_max, row[3]);
-		if(value<value_min)	value_min=value;
-		if(value>value_max)	value_max=value;
-		value_avg=(num*value_avg+value)/(num+1);
+		if (value < value_min)
+			value_min = value;
+		if (value > value_max)
+			value_max = value;
+		value_avg = (num * value_avg + value) / (num + 1);
 		num++;
-		DBexecute("update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg=" ZBX_FS_UI64 ",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64 " and clock=%d",
-			num,
-			value_min,
-			value_avg,
-			value_max,
-			itemid,
-			hour);
+
+		DBexecute("update trends_uint"
+				" set num=%d,"
+				"value_min=" ZBX_FS_UI64 ","
+				"value_avg=" ZBX_FS_UI64 ","
+				"value_max=" ZBX_FS_UI64
+				" where itemid=" ZBX_FS_UI64
+					" and clock=%d",
+				num, value_min, value_avg, value_max, itemid, hour);
 	}
 	else
 	{
-		DBexecute("insert into trends_uint (clock,itemid,num,value_min,value_avg,value_max) values (%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-			hour,
-			itemid,
-			1,
-			value,
-			value,
-			value);
+		DBexecute("insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max)"
+				" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+				itemid, hour, 1, value, value, value);
 	}
-
 	DBfree_result(result);
 
-	return SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 int	DBget_row_count(const char *table_name)
@@ -1767,6 +1768,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 	int		res = SUCCEED;
 
 	host_esc = DBdyn_escape_string_len(host, HOST_HOST_LEN);
+
 	ts.sec = now;
 	ts.ns = 0;
 

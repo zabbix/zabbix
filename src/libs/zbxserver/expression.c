@@ -2777,6 +2777,7 @@ void	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now, 
 				*new_value = TRIGGER_VALUE_TRUE;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() new_value:%d", __function_name, *new_value);
+
 			ret = SUCCEED;
 		}
 	}
