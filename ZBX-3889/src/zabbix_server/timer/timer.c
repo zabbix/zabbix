@@ -102,8 +102,8 @@ static void	process_time_functions()
 		tr_last->expression = zbx_strdup(NULL, row[4]);
 		tr_last->lastchange = time(NULL);
 
-		evaluate_expression(&tr_last->new_value, &tr_last->expression, tr_last->lastchange, tr_last->triggerid,
-				tr_last->value, &tr_last->new_error);
+		evaluate_expression(tr_last->triggerid, &tr_last->expression, tr_last->lastchange,
+				tr_last->value, &tr_last->new_value, &tr_last->new_error);
 
 		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
 				tr_last->new_value, tr_last->new_error, tr_last->lastchange, &tr_last->update_trigger,
