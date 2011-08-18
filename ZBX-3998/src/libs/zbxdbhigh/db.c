@@ -148,7 +148,7 @@ void	DBcommit()
 
 	rc = zbx_db_commit();
 
-	while (rc == ZBX_DB_DOWN)
+	while (ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -178,7 +178,7 @@ void	DBrollback()
 
 	rc = zbx_db_rollback();
 
-	while (rc == ZBX_DB_DOWN)
+	while (ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -277,14 +277,14 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 
 	rc = zbx_db_vselect(fmt, args);
 
-	while (rc == (DB_RESULT)ZBX_DB_DOWN)
+	while ((DB_RESULT)ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 		rc = zbx_db_vselect(fmt, args);
 
-		if (rc == (DB_RESULT)ZBX_DB_DOWN)
+		if ((DB_RESULT)ZBX_DB_DOWN == rc)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -311,14 +311,14 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 	rc = zbx_db_select_n(query, n);
 
-	while (rc == (DB_RESULT)ZBX_DB_DOWN)
+	while ((DB_RESULT)ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 		rc = zbx_db_select_n(query, n);
 
-		if (rc == (DB_RESULT)ZBX_DB_DOWN)
+		if ((DB_RESULT)ZBX_DB_DOWN == rc)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -361,16 +361,18 @@ int	latest_service_alarm(zbx_uint64_t serviceid, int status)
 
 int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_service_alarm()");
+	const char	*__function_name = "DBadd_service_alarm";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != latest_service_alarm(serviceid, status))
 	{
 		DBexecute("insert into service_alarms (servicealarmid,serviceid,clock,value)"
-			" values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
-			DBget_maxid("service_alarms"), serviceid, clock, status);
+				" values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
+				DBget_maxid("service_alarms"), serviceid, clock, status);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of add_service_alarm()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return SUCCEED;
 }
@@ -392,6 +394,7 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
  ******************************************************************************/
 static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
 {
+	const char	*__function_name = "trigger_dependent_rec";
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -399,37 +402,36 @@ static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
 	zbx_uint64_t	triggerid_tmp;
 	int		value_tmp;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In trigger_dependent_rec(triggerid:" ZBX_FS_UI64 ",level:%d)",
-		triggerid,
-		*level);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " level:%d",
+			__function_name, triggerid, *level);
 
 	(*level)++;
 
-	if(*level > 32)
+	if (32 < *level)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "Recursive trigger dependency detected! Please fix. Triggerid:" ZBX_FS_UI64,
-			triggerid);
-		return ret;
+				triggerid);
+		goto exit;
 	}
 
-	result = DBselect("select t.triggerid, t.value from trigger_depends d,triggers t where d.triggerid_down=" ZBX_FS_UI64 " and d.triggerid_up=t.triggerid",
-		triggerid);
-	while((row=DBfetch(result)))
+	result = DBselect("select t.triggerid, t.value from trigger_depends d,triggers t where d.triggerid_down="
+			ZBX_FS_UI64 " and d.triggerid_up=t.triggerid", triggerid);
+	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid_tmp, row[0]);
 		value_tmp = atoi(row[1]);
-		if(TRIGGER_VALUE_TRUE == value_tmp || trigger_dependent_rec(triggerid_tmp, level) == SUCCEED)
+
+		if (TRIGGER_VALUE_TRUE == value_tmp || SUCCEED == trigger_dependent_rec(triggerid_tmp, level))
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "This trigger depends on " ZBX_FS_UI64 ". Will not apply actions",
-				triggerid_tmp);
+			zabbix_log(LOG_LEVEL_DEBUG, "This trigger depends on " ZBX_FS_UI64 ". Will not apply actions",
+					triggerid_tmp);
 			ret = SUCCEED;
 			break;
 		}
 	}
 	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of trigger_dependent_rec():%s",
-			zbx_result_string(ret));
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -446,21 +448,19 @@ static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	trigger_dependent(zbx_uint64_t triggerid)
 {
-	int	ret;
-	int	level = 0;
+	const char	*__function_name = "trigger_dependent";
+	int		ret;
+	int		level = 0;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In trigger_dependent(triggerid:" ZBX_FS_UI64 ")",
-		triggerid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64,
+			__function_name, triggerid);
 
 	ret = trigger_dependent_rec(triggerid, &level);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of trigger_dependent():%s",
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -565,44 +565,43 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 void	DBdelete_service(zbx_uint64_t serviceid)
 {
 	DBexecute("delete from services_links where servicedownid=" ZBX_FS_UI64 " or serviceupid=" ZBX_FS_UI64,
-		serviceid,
-		serviceid);
+			serviceid, serviceid);
 	DBexecute("delete from services where serviceid=" ZBX_FS_UI64,
-		serviceid);
+			serviceid);
 }
 
 void	DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
 {
+	const char	*__function_name = "DBdelete_services_by_triggerid";
 	zbx_uint64_t	serviceid;
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_services_by_triggerid(" ZBX_FS_UI64 ")",
-		triggerid);
-	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64,
-		triggerid);
+	zabbix_log(LOG_LEVEL_DEBUG,"In %s() triggerid:" ZBX_FS_UI64,
+			__function_name, triggerid);
 
-	while((row=DBfetch(result)))
+	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64,
+			triggerid);
+
+	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceid, row[0]);
 		DBdelete_service(serviceid);
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_services_by_triggerid(" ZBX_FS_UI64 ")",
-		triggerid);
+	zabbix_log(LOG_LEVEL_DEBUG,"End of %s() triggerid:" ZBX_FS_UI64,
+			__function_name, triggerid);
 }
 
 void	DBdelete_trigger(zbx_uint64_t triggerid)
 {
 	DBexecute("delete from trigger_depends where triggerid_down=" ZBX_FS_UI64 " or triggerid_up=" ZBX_FS_UI64,
-		triggerid,
-		triggerid);
+			triggerid, triggerid);
 	DBexecute("delete from functions where triggerid=" ZBX_FS_UI64,
-		triggerid);
+			triggerid);
 	DBexecute("delete from events where object=%d and objectid=" ZBX_FS_UI64,
-		EVENT_OBJECT_TRIGGER,
-		triggerid);
+			EVENT_OBJECT_TRIGGER, triggerid);
 
 	DBdelete_services_by_triggerid(triggerid);
 
@@ -1091,10 +1090,6 @@ void	DBvacuum()
  *                                                                            *
  * Function: DBget_escape_string_len                                          *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: return length of escaped string with terminating '\0'        *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
@@ -1132,10 +1127,6 @@ static int	DBget_escape_string_len(const char *src)
 /******************************************************************************
  *                                                                            *
  * Function: DBescape_string                                                  *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
@@ -1188,15 +1179,9 @@ static void	DBescape_string(const char *src, char *dst, int len)
  *                                                                            *
  * Function: DBdyn_escape_string                                              *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 char	*DBdyn_escape_string(const char *src)
@@ -1216,10 +1201,6 @@ char	*DBdyn_escape_string(const char *src)
 /******************************************************************************
  *                                                                            *
  * Function: DBdyn_escape_string_len                                          *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
@@ -1267,10 +1248,6 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
  *                                                                            *
  * Function: DBget_escape_like_pattern_len                                    *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: return length of escaped LIKE pattern with terminating '\0'  *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
@@ -1299,10 +1276,6 @@ static int	DBget_escape_like_pattern_len(const char *src)
 /******************************************************************************
  *                                                                            *
  * Function: DBescape_like_pattern                                            *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value: escaped string to be used as pattern in LIKE                 *
  *                                                                            *
@@ -1363,15 +1336,9 @@ static void	DBescape_like_pattern(const char *src, char *dst, int len)
  *                                                                            *
  * Function: DBdyn_escape_like_pattern                                        *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: escaped string to be used as pattern in LIKE                 *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 char	*DBdyn_escape_like_pattern(const char *src)
@@ -1531,13 +1498,12 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	int		found = FAIL, dbres, nodeid;
 	const ZBX_TABLE	*table;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'",
-			__function_name, tablename);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tablename:'%s'", __function_name, tablename);
 
 	table = DBget_table(tablename);
-	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
+	nodeid = 0 <= CONFIG_NODEID ? CONFIG_NODEID : 0;
 
-	if (table->flags & ZBX_SYNC)
+	if (0 != (table->flags & ZBX_SYNC))
 	{
 		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)nodeid;
 		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(99999999999);
@@ -1551,33 +1517,27 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	do
 	{
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-			nodeid,
-			table->table,
-			table->recid);
+				nodeid, table->table, table->recid);
 
 		if (NULL == (row = DBfetch(result)))
 		{
 			DBfree_result(result);
 
 			result = DBselect("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-					table->recid,
-					table->table,
-					table->recid,
-					min,
-					max);
+					table->recid, table->table, table->recid, min, max);
 
 			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+			{
 				ret1 = min;
+			}
 			else
 			{
 				ZBX_STR2UINT64(ret1, row[0]);
 				if (ret1 >= max)
 				{
-					zabbix_log(LOG_LEVEL_CRIT, "DBget_maxid: Maximum number of id's was exceeded"
+					zabbix_log(LOG_LEVEL_CRIT, "maximum number of id's exceeded"
 							" [table:%s, field:%s, id:" ZBX_FS_UI64 "]",
-							table->table,
-							table->recid,
-							ret1);
+							table->table, table->recid, ret1);
 					exit(FAIL);
 				}
 			}
@@ -1585,19 +1545,14 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 			dbres = DBexecute("insert into ids (nodeid,table_name,field_name,nextid)"
 					" values (%d,'%s','%s'," ZBX_FS_UI64 ")",
-					nodeid,
-					table->table,
-					table->recid,
-					ret1);
+					nodeid, table->table, table->recid, ret1);
 
-			if (dbres < ZBX_DB_OK)
+			if (ZBX_DB_OK > dbres)
 			{
 				/* solving the problem of an invisible record created in a parallel transaction */
 				DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s'"
 						" and field_name='%s'",
-						nodeid,
-						table->table,
-						table->recid);
+						nodeid, table->table, table->recid);
 			}
 
 			continue;
@@ -1610,22 +1565,15 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			if (ret1 < min || ret1 >= max)
 			{
 				DBexecute("delete from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-					nodeid,
-					table->table,
-					table->recid);
+						nodeid, table->table, table->recid);
 				continue;
 			}
 
 			DBexecute("update ids set nextid=nextid+%d where nodeid=%d and table_name='%s' and field_name='%s'",
-					num,
-					nodeid,
-					table->table,
-					table->recid);
+					num, nodeid, table->table, table->recid);
 
 			result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-				nodeid,
-				table->table,
-				table->recid);
+					nodeid, table->table, table->recid);
 
 			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
 			{
@@ -1644,11 +1592,8 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	}
 	while (FAIL == found);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() \"%s\".\"%s\":" ZBX_FS_UI64,
-			__function_name,
-			table->table,
-			table->recid,
-			ret2);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' recid:'%s' ret2:" ZBX_FS_UI64,
+			__function_name, table->table, table->recid, ret2);
 
 	return ret2 - num + 1;
 }
@@ -1694,15 +1639,9 @@ static char	buf_string[640];
  *                                                                            *
  * Function: zbx_host_string                                                  *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: <host> or "???" if host not found                            *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_host_string(zbx_uint64_t hostid)
@@ -1730,15 +1669,9 @@ const char	*zbx_host_string(zbx_uint64_t hostid)
  *                                                                            *
  * Function: zbx_host_key_string                                              *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: <host>:<key> or "???" if item not found                      *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_host_key_string(zbx_uint64_t itemid)
@@ -1767,15 +1700,9 @@ const char	*zbx_host_key_string(zbx_uint64_t itemid)
  *                                                                            *
  * Function: zbx_host_key_string_by_item                                      *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: <host>:<key>                                                 *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_host_key_string_by_item(DB_ITEM *item)
@@ -1789,15 +1716,9 @@ const char	*zbx_host_key_string_by_item(DB_ITEM *item)
  *                                                                            *
  * Function: zbx_user_string                                                  *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: "Name Surname (Alias)" or "unknown" if user not found        *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 const char	*zbx_user_string(zbx_uint64_t userid)
@@ -1859,11 +1780,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value)
  *                                                                            *
  * Parameters: host - host name                                               *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
@@ -1940,11 +1857,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now)
  *                                                                            *
  * Parameters: host - host name                                               *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DBproxy_register_host(const char *host)
@@ -1966,13 +1879,7 @@ void	DBproxy_register_host(const char *host)
  *                                                                            *
  * Purpose: execute a set of SQL statements IF it is big enough               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Dmitry Borovikov                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
@@ -2017,6 +1924,7 @@ void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
  ******************************************************************************/
 char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 {
+	const char	*__function_name = "DBget_unique_hostname_by_sample";
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		num = 2;	/* produce alternatives starting from "2" */
@@ -2024,8 +1932,8 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 
 	assert(host_name_sample && *host_name_sample);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_unique_hostname_by_sample() sample:'%s'",
-			host_name_sample);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sample:'%s'",
+			__function_name, host_name_sample);
 
 	host_name_sample_esc = DBdyn_escape_like_pattern(host_name_sample);
 	result = DBselect(
@@ -2043,15 +1951,11 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 	while (NULL != (row = DBfetch(result)))
 	{
 		if (0 < strcmp(host_name_temp, row[0]))
-		{
-			/* skip those which are lexicographically smaller */
-			continue;
-		}
+			continue;	/* skip those which are lexicographically smaller */
+
 		if (0 > strcmp(host_name_temp, row[0]))
-		{
-			/* found, all other will be bigger */
-			break;
-		}
+			break;	/* found, all other will be bigger */
+
 		/* 0 == strcmp(host_name_temp, row[0]) */
 		/* must construct bigger one, the constructed one already exists */
 		host_name_temp = zbx_dsprintf(host_name_temp, "%s_%d", host_name_sample, num++);
@@ -2060,8 +1964,8 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 
 	zbx_free(host_name_sample_esc);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DBget_unique_hostname_by_sample() constructed:'%s'",
-			host_name_temp);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() constructed:'%s'",
+			__function_name, host_name_temp);
 
 	return host_name_temp;
 }
