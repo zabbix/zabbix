@@ -299,13 +299,9 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		tr_last->error = row[3];
 		tr_last->lastchange = now;
 
-		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
-				tr_last->new_value, reason, tr_last->lastchange, &tr_last->update_trigger,
-				&tr_last->add_event);
-
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
-				tr_last->value, tr_last->error, tr_last->new_value, reason,
-				tr_last->lastchange, tr_last->update_trigger))
+				tr_last->type, tr_last->value, tr_last->error, tr_last->new_value, reason,
+				tr_last->lastchange, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 		}

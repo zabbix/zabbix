@@ -291,7 +291,6 @@ typedef struct
 	int		value;
 	int		new_value;
 	unsigned char	type;
-	unsigned char	update_trigger;
 	unsigned char	add_event;
 }
 DB_TRIGGER_UPDATE;
@@ -565,11 +564,9 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBremove_escalation(zbx_uint64_t escalationid);
 void	DBupdate_triggers_status_after_restart();
-void	DBcheck_trigger_for_update(zbx_uint64_t triggerid, unsigned char type, int value, const char *error,
-		int new_value, const char *new_error, int now, unsigned char *update_trigger, unsigned char *add_event);
 int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_uint64_t triggerid,
-		int value, const char *error, int new_value, const char *new_error, int lastchange,
-		unsigned char update_trigger);
+		unsigned char type, int value, const char *error, int new_value, const char *new_error, int lastchange,
+		unsigned char *add_event);
 
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();

@@ -105,13 +105,9 @@ static void	process_time_functions()
 		evaluate_expression(tr_last->triggerid, &tr_last->expression, tr_last->lastchange,
 				tr_last->value, &tr_last->new_value, &tr_last->new_error);
 
-		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
-				tr_last->new_value, tr_last->new_error, tr_last->lastchange, &tr_last->update_trigger,
-				&tr_last->add_event);
-
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
-				tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
-				tr_last->lastchange, tr_last->update_trigger))
+				tr_last->type, tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
+				tr_last->lastchange, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 		}
