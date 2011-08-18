@@ -523,7 +523,7 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 
 			if (NULL == new_error)
 			{
-				if ('\0' != error)
+				if ('\0' != *error)
 					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 10, ",error=''");
 			}
 			else if (0 != strcmp(error, new_error))
