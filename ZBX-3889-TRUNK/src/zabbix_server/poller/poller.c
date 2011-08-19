@@ -228,13 +228,16 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	zbx_free(sql);
 
-	for (trigger = &tr[0]; 0 != tr_num; tr_num--, trigger++)
+	if (0 != tr_num)
 	{
-		if (1 != trigger->add_event)
-			continue;
+		for (trigger = &tr[0]; 0 != tr_num; tr_num--, trigger++)
+		{
+			if (1 != trigger->add_event)
+				continue;
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-				&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+		}
 	}
 
 	zbx_free(tr);
