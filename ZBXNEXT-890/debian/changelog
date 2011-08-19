@@ -1,3 +1,9 @@
+zabbix (1:1.8.7rc1-1) unstable; urgency=low
+
+  * Bump version number
+
+ -- Vladimir Levijev <vladimir.levijev@zabbix.com>  Fri, 19 Aug 2011 18:49:35 +0300
+
 zabbix (1:1.8.6-1) unstable; urgency=low
 
   * New upstream release.
