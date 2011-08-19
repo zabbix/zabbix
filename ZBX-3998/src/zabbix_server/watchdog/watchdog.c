@@ -157,12 +157,12 @@ static void	sync_config()
 
 	if (0 < old_count && 0 == count)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "watchdog: no users will receive database down messages");
+		zabbix_log(LOG_LEVEL_WARNING, "watchdog: no recipients found for database down messages");
 		no_recipients = 1;
 	}
 	else if (1 == no_recipients && 0 < count)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "watchdog: %d user(s) will receive database down messages", count);
+		zabbix_log(LOG_LEVEL_WARNING, "watchdog: %d recipient(s) found for database down messages", count);
 		no_recipients = 0;
 	}
 
