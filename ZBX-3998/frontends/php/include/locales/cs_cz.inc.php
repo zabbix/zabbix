@@ -2162,7 +2162,6 @@
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Kopírování grafu přeskočeno',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Graf "',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			'" byl smazaný z hostitelů',
-	'S_GRAPH_DELETED_FROM_HOSTS_PART3'=>			'',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Nepodařilo se načíst nastavení',

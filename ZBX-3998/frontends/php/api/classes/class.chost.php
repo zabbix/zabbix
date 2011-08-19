@@ -120,6 +120,7 @@ class CHost extends CZBXAPI{
 			'search'					=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,

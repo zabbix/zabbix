@@ -1068,7 +1068,7 @@ static void	proxy_get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
 	if (NULL == (row = DBfetch(result)))
 		*lastid = 0;
 	else
-		ZBX_STR2UINT64(*lastid, row[0])
+		ZBX_STR2UINT64(*lastid, row[0]);
 
 	DBfree_result(result);
 
@@ -1187,7 +1187,7 @@ static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *h
 	{
 		zbx_json_addobject(j, NULL);
 
-		ZBX_STR2UINT64(*lastid, row[0])
+		ZBX_STR2UINT64(*lastid, row[0]);
 
 		for (f = 0; NULL != ht->fields[f].field; f++)
 		{

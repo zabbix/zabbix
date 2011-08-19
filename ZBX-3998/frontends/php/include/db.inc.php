@@ -66,7 +66,6 @@ if(!isset($DB)){
 						}
 						else{
 							DBexecute('SET NAMES utf8');
-							DBexecute('SET CHARACTER SET utf8');
 						}
 					}
 					break;
@@ -928,15 +927,23 @@ else {
 			if($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
 
 			// escaping parameter that is about to be used in LIKE statement
-			$pattern = str_replace("!", "!!", $pattern);
-			$pattern = str_replace("%", "!%", $pattern);
-			$pattern = str_replace("_", "!_", $pattern);
+			if(empty($options['searchWildcardsEnabled'])){
+				$pattern = str_replace("!", "!!", $pattern);
+				$pattern = str_replace("%", "!%", $pattern);
+				$pattern = str_replace("_", "!_", $pattern);
 
-			$search[$field] =
-				' UPPER('.$tableShort.'.'.$field.') '.
-				$exclude.' LIKE '.
-				zbx_dbstr($start.zbx_strtoupper($pattern).'%').
-				" ESCAPE '!'";
+				$search[$field] =
+					' UPPER('.$tableShort.'.'.$field.') '.
+					$exclude.' LIKE '.
+					zbx_dbstr($start.zbx_strtoupper($pattern).'%').
+					" ESCAPE '!'";
+			}
+			else{
+				$search[$field] =
+					' UPPER('.$tableShort.'.'.$field.') '.
+					$exclude.' LIKE '.
+					zbx_dbstr(zbx_strtoupper($pattern));
+			}
 		}
 
 		if(!empty($search)) $sql_parts['where']['search'] = '( '.implode(' OR ', $search).' )';
