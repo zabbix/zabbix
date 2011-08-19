@@ -757,7 +757,8 @@ ZABBIX.apps.map = (function(){
 					x: 0,
 					y: 0,
 					urls: {},
-					elementName: this.sysmap.iconList[0].name // image name
+					elementName: this.sysmap.iconList[0].name, // image name
+					use_iconmap: '1'
 				};
 
 				// generate unique selementid
