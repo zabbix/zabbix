@@ -1,0 +1,51 @@
+#!/bin/sh -e
+
+# If /tmp/ZABBIX_PACKAGE_DEBUG file exists then enable debugging of this script.
+#if [ -e /tmp/ZABBIX_PACKAGE_DEBUG ]; then
+#    set -x
+#fi
+
+. /usr/share/debconf/confmodule
+db_version 2.0 || [ $? -lt 30 ]
+	
+if [ "$1" = "configure" ]; then
+    if ! getent group zabbix > /dev/null 2>&1 ; then
+        addgroup --system --quiet zabbix
+    fi
+
+    # Does the user 'zabbix' exist?
+    #
+    # (No need to move the zabbix user's home directory as done in the
+    # *-mysql and *-pgsql packages because the *-sqlite3 packages were
+    # introduced in 1.8.6-1 which did not have the bug #593458 with the
+    # wrong home directory.)
+    if ! getent passwd zabbix > /dev/null 2>&1 ; then
+        # Not yet. Create it.
+        adduser --quiet \
+            --system --disabled-login --ingroup zabbix \
+            --home /var/run/zabbix/ --no-create-home \
+            zabbix
+    fi
+
+    chown zabbix:zabbix /var/log/zabbix-server -R
+    chown -R zabbix:www-data /var/lib/zabbix
+
+    # dbconfig-common configuration to set up database
+    . /usr/share/dbconfig-common/dpkg/postinst.sqlite3 
+
+    dbc_generate_include=template:/etc/zabbix/zabbix_server.conf
+    dbc_generate_include_owner=zabbix
+    dbc_generate_include_perms=640
+    dbc_generate_include_args="-U -o template_infile=/usr/share/zabbix-server-sqlite3/zabbix_server.conf"
+    dbc_dbfile_owner=zabbix:www-data
+    dbc_dbfile_perms=0660
+
+    dbc_go zabbix-server-sqlite3 $@
+
+fi
+
+db_stop
+
+#DEBHELPER#
+
+exit 0

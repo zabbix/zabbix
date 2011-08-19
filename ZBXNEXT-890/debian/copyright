@@ -1,0 +1,33 @@
+This package was debianized by Michael Ablassmeier <abi@debian.org> on
+Tue, 23 Mar 2004 22:46:45 +0100. It is actually maintained by Michael
+Ablassmeier and Fabio Tranchitella <kobold@debian.org>. Today it is mainly
+maintained by Christoph Haas <haas@debian.org> and Fabio Tranchitella
+<kobold@debian.org>.
+
+It was downloaded from http://www.zabbix.com/download.php 
+
+Upstream Author: Alexei Vladishev <alexei.vladishev@zabbix.com>
+
+Copyright:
+
+    Copyright (C) 2000-2005 SIA Zabbix
+    Author: Alexei Vladishev <alexei.vladishev@zabbix.com>
+
+    For the win32 agent:
+      Copyright (C) 2002,2003 Victor Kirhenshtein
+
+    For the md5 implementations:
+      Copyright (C) 1999, 2002 Aladdin Enterprises
+
+    For the init.d for SuSE in misc/init.d/suse:
+      Copyright (c) 07/2004 A.Tophofen, Germany
+
+License:
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License version 2 as
+  published by the Free Software Foundation.
+
+  On Debian GNU/Linux systems, the complete text of the GNU General
+  Public License can be found in `/usr/share/common-licenses/GPL-2'.
+

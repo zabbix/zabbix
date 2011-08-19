@@ -1,0 +1,46 @@
+IPv6 confusion
+--------------
+
+ The Zabbix packages in Debian are IPv6-enabled. Please be aware that if
+ you are just using IPv4 then you may need to specify your IP addresses
+ in the /etc/zabbix/zabbix-agentd.conf in IPv6 syntax, too. Example:
+
+ Server=10.20.30.40,::ffff:10.20.30.40
+
+        ^---- IPv4    ^---- IPv6
+
+agent versus agentd
+-------------------
+
+ There are two ways to run a Zabbix agent:
+
+ a) zabbix-agentd (daemon process)
+
+    This is the common way to use the agent. A zabbix_agentd daemon process
+    is started by an init.d script and is running permanently. The
+    configuration file is /etc/zabbix/zabbix-agentd.conf
+
+ b) zabbix-agent (run on demand by your inetd)
+
+    This allows you to run the Zabbix agent on demand without having it
+    running permanently on your system. The configuration file for this
+    kind of operation is /etc/zabbix/zabbix-agent.conf
+
+    You will have to run the zabbix-agent process from your inet daemon
+    (openbsd-inetd or xinetd) by adding this line to your services:
+
+    zabbix_agent stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_agent
+
+    Also add these service definitions to your /etc/services file:
+
+    zabbix_agent 10050/tcp
+    zabbix_trap 10051/tcp
+
+    Don't forget to restart your inetd.
+
+    This method is however not recommended and the zabbix-agent binary may in
+    the future be removed in favor of the zabbix-agentd. Unless you have a
+    reason not to do so you are encouraged to use the agentd.
+
+ -- Christoph Haas <haas@debian.org> Sat, 04 Sep 2010 17:40:01 +0100
+

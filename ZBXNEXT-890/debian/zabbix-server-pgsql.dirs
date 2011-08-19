@@ -1,0 +1,12 @@
+etc/zabbix
+usr/bin
+usr/sbin
+etc/zabbix/alert.d
+etc/logrotate.d
+etc/init.d
+usr/share/zabbix-server-pgsql
+var/log/zabbix-server
+usr/share/doc/zabbix-server-pgsql
+usr/share/dbconfig-common/data/zabbix-server-pgsql/install
+usr/share/dbconfig-common/data/zabbix-server-pgsql/upgrade/pgsql
+

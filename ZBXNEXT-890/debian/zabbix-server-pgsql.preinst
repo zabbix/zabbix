@@ -1,0 +1,17 @@
+#!/bin/sh -e
+. /usr/share/debconf/confmodule
+db_version 2.0 || [ $? -lt 30 ]
+	
+if [ "$1" = "upgrade" ]; then
+    if [ -n "$2" ] && dpkg --compare-versions "$2" lt "1:1.8"; then
+      db_fset zabbix-server-pgsql/server seen false
+      db_input critical zabbix-server-pgsql/server
+      db_go
+    fi
+fi
+
+db_stop
+
+#DEBHELPER#
+
+exit 0

@@ -1,0 +1,144 @@
+# Portuguese translation for zabbix debconf messages.
+# Copyright (C) Tiago Fernandes <tjg.fernandes@gmail.com>, 2006
+# This file is distributed under the same license as the Zabbix package.
+# Tiago Fernandes <tjg.fernandes@gmail.com>, 2006-2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: zabbix 1.1.3-1\n"
+"Report-Msgid-Bugs-To: zabbix@packages.debian.org\n"
+"POT-Creation-Date: 2011-08-07 17:31+0200\n"
+"PO-Revision-Date: 2009-10-07 10:00+0100\n"
+"Last-Translator: Tiago Fernandes <tjg.fernandes@gmail.com>\n"
+"Language-Team: Portuguese <traduz@debianpt.org>\n"
+"Language: pt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Country: PORTUGAL\n"
+"X-Poedit-Language: Portuguese\n"
+
+#. Type: string
+#. Description
+#: ../zabbix-agent.templates:2001 ../zabbix-frontend-php.templates:4001
+msgid "Zabbix server host address:"
+msgstr "Endereço do servidor Zabbix:"
+
+#. Type: string
+#. Description
+#: ../zabbix-agent.templates:2001 ../zabbix-frontend-php.templates:4001
+msgid ""
+"Please enter the host name or IP address of the Zabbix server you want to "
+"connect to."
+msgstr ""
+"Por favor, insira o nome ou endereço do servidor Zabbix ao qual deseja ligar."
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:2001
+msgid "Configure Apache?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:2001
+#, fuzzy
+#| msgid ""
+#| "Zabbix supports any web server supported by PHP5, however only Apache can "
+#| "be configured automatically."
+msgid ""
+"The Zabbix web frontend runs on any web server that supportes PHP5. However "
+"only Apache (2.x) can be configured automatically at this point."
+msgstr ""
+"O Zabbix suporta qualquer servidor web suportado por PHP5, contudo apenas o "
+"Apache poderá ser configurado automaticamente."
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:2001
+msgid ""
+"Please choose whether you want to reconfigure Apache so that the Zabbix web "
+"frontend is made available at the URL http://.../zabbix"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:3001
+#, fuzzy
+#| msgid "Restart the web server(s) now?"
+msgid "Restart Apache now?"
+msgstr "Reiniciar o(s) servidor(es) web agora?"
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:3001
+msgid ""
+"In order to apply the changes needed for Zabbix configuration, the web "
+"server needs to be restarted."
+msgstr ""
+"É necessário reiniciar o servidor web, por forma a aplicar as alterações "
+"necessárias na configuração do Zabbix."
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:3001
+msgid ""
+"Please choose whether you prefer doing it automatically now or manually "
+"later."
+msgstr ""
+"Por favor, escolha se prefere fazer a alteração agora automaticamente ou se "
+"mais tarde manualmente."
+
+#. Type: string
+#. Description
+#. Type: string
+#. Description
+#: ../zabbix-frontend-php.templates:4001 ../zabbix-frontend-php.templates:5001
+msgid "This is needed for some advanced frontend functionalities."
+msgstr "Isto é necessário para algumas funcionalidades avançadas do Interface."
+
+#. Type: string
+#. Description
+#: ../zabbix-frontend-php.templates:5001
+msgid "Zabbix server port:"
+msgstr "Porta do servidor Zabbix:"
+
+#. Type: string
+#. Description
+#: ../zabbix-frontend-php.templates:5001
+msgid "Please enter the port used by the Zabbix server."
+msgstr "Por favor, insira a porta utilizada pelo servidor Zabbix."
+
+#. Type: note
+#. Description
+#: ../zabbix-server-mysql.templates:2001 ../zabbix-server-pgsql.templates:2001
+msgid "The SQL database must be upgraded manually"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../zabbix-server-mysql.templates:2001
+msgid ""
+"The SQL database used by Zabbix must be upgraded manually using the scripts "
+"available in /usr/share/doc/zabbix-server-mysql. Zabbix will not work "
+"properly until the database upgrade is completed."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../zabbix-server-pgsql.templates:2001
+msgid ""
+"The SQL database used by Zabbix must be upgraded manually using the scripts "
+"available in /usr/share/doc/zabbix-server-pgsql. Zabbix will not work "
+"properly until the database upgrade is completed."
+msgstr ""
+
+#~ msgid "Web server to reconfigure for Zabbix:"
+#~ msgstr "Servidor web a reconfigurar para o Zabbix:"
+
+#~ msgid ""
+#~ "Please select which Apache version you want to configure the Zabbix "
+#~ "frontend for."
+#~ msgstr ""
+#~ "Por favor, seleccione a versão do Apache para a qual deseja configurar o "
+#~ "interface web do Zabbix."

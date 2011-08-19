@@ -1,0 +1,82 @@
+#!/bin/sh -e
+
+# If /tmp/ZABBIX_PACKAGE_DEBUG file exists then enable debugging of this script.
+#if [ -e /tmp/ZABBIX_PACKAGE_DEBUG ]; then
+#    set -x
+#fi
+
+. /usr/share/debconf/confmodule
+db_version 2.0 || [ $? -lt 30 ]
+	
+. /usr/share/dbconfig-common/dpkg/postinst.mysql 
+
+dbc_generate_include=template:/etc/zabbix/zabbix_server.conf
+dbc_generate_include_owner="zabbix"
+dbc_generate_include_perms="640"
+dbc_generate_include_args="-U -o template_infile=/usr/share/zabbix-server-mysql/zabbix_server.conf"
+
+dbc_go zabbix-server-mysql $@
+
+if [ "$1" = "configure" ]; then
+    if ! getent group zabbix > /dev/null 2>&1 ; then
+        addgroup --system --quiet zabbix
+    fi
+
+    # Does the user 'zabbix' exist?
+    if ! getent passwd zabbix > /dev/null 2>&1 ; then
+        # Not yet. Create it.
+        adduser --quiet \
+            --system --disabled-login --ingroup zabbix \
+            --home /var/run/zabbix/ --no-create-home \
+            zabbix
+    else
+        # Yes, user 'zabbix' exists. 
+        # [This entire fix can be removed after the Wheezy release.]
+        # Change the home directory from /var/run/zabbix-server 
+        # to /var/run/zabbix (relates to bug #593458).
+        # Check current home directory of the 'zabbix' user.
+        if getent passwd zabbix | cut -d: -f6 | grep -q /var/run/zabbix-server; then
+            # Home directory is still the old /var/run/zabbix-server directory.
+            # All processes run by the 'zabbix' user must be stopped
+            # before usermod can change the home directory.
+            # "zabbix-server" gets stopped by zabbix-server.preinst automatically.
+            echo Moving home directory of user zabbix to /var/run/zabbix/
+            for component in proxy agent; do
+                if [ -x /etc/init.d/zabbix-$component ]; then
+                    invoke-rc.d zabbix-$component stop
+                fi
+            done
+            # Remove an existing /var/run/zabbix directory just in case
+            rm -rf /var/run/zabbix
+            # Move the home directory
+            usermod -m -d /var/run/zabbix zabbix
+            # Create the home directory if it did not exist
+            # (up to 1.8.5-1 the 'zabbix' user had a non-existing home directory)
+            if [ ! -d /var/run/zabbix ]; then
+                mkdir /var/run/zabbix
+                chown zabbix:zabbix /var/run/zabbix
+            fi
+            # Change the location of the PID file in the config files
+            sed -i 's#/var/run/zabbix-.*/#/var/run/zabbix/#' /etc/zabbix/zabbix_*.conf
+            # Start the processes again
+            for component in proxy agent; do
+                if [ -x /etc/init.d/zabbix-$component ]; then
+                    invoke-rc.d zabbix-$component start
+                fi
+            done
+        fi
+    fi
+
+    # Remove old/wrong home directory before 1.8.5-2
+    if [ -d /var/run/zabbix-proxy ]; then
+        rm -rf /var/run/zabbix-proxy
+    fi
+
+    chown zabbix:zabbix /var/log/zabbix-server -R
+fi
+
+db_stop
+
+#DEBHELPER#
+
+exit 0

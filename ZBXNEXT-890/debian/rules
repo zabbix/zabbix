@@ -1,0 +1,263 @@
+#!/usr/bin/make -f
+
+# The Zabbix sources are compiled once for each VARIANT. The proxy and server
+# packages always contain one kind of database support. The zabbix-agent and
+# zabbix-frontend-php package do not have any kind of database support and
+# are created from one of the above mentioned builds.
+
+# extract
+#
+#     Copies the source directory into debian/tmp... to compile the
+#     files there.
+#
+# patch
+#
+#     Apply Quilt patches.
+#
+# prepare
+#
+#     Magic autotools stuff (replacing config.auto and config.guess with
+#     up-to-date versions from the autotools-dev package. And some black
+#     magic so that our patch to remove -lcrypto is actually doing something.
+#     
+# configure
+#
+#     Configure the copied source tree for each database backend flavor.
+#
+# build
+#
+#     Compile the actual sources for each database backend flavor.
+#
+# Enable this export to get more detailed information about what debhelper does
+#export DH_VERBOSE=1
+
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+## Include the 'quilt' patch manager using debian/patches
+include /usr/share/quilt/quilt.make
+
+## Define the names of the resulting binary packages
+PKG_AGENT = zabbix-agent
+PKG_SERVER_MYSQL = zabbix-server-mysql
+PKG_SERVER_PGSQL = zabbix-server-pgsql
+PKG_SERVER_SQLITE3 = zabbix-server-sqlite3
+PKG_FRONTEND = zabbix-frontend-php
+PKG_PROXY_MYSQL = zabbix-proxy-mysql
+PKG_PROXY_PGSQL = zabbix-proxy-pgsql
+PKG_PROXY_SQLITE3 = zabbix-proxy-sqlite3
+
+# Define the directories where the binary packages' files are assembled
+TMP_AGENT = $(CURDIR)/debian/$(PKG_AGENT)
+TMP_SERVER_MYSQL = $(CURDIR)/debian/$(PKG_SERVER_MYSQL)
+TMP_SERVER_PGSQL = $(CURDIR)/debian/$(PKG_SERVER_PGSQL)
+TMP_SERVER_SQLITE3 = $(CURDIR)/debian/$(PKG_SERVER_SQLITE3)
+TMP_FRONTEND = $(CURDIR)/debian/$(PKG_FRONTEND)
+TMP_PROXY_MYSQL = $(CURDIR)/debian/$(PKG_PROXY_MYSQL)
+TMP_PROXY_PGSQL = $(CURDIR)/debian/$(PKG_PROXY_PGSQL)
+TMP_PROXY_SQLITE3 = $(CURDIR)/debian/$(PKG_PROXY_SQLITE3)
+
+# Deprecated: formerly this script didn't use dh_install
+INSTALL = install
+INSTALL_FILE    = $(INSTALL) -p    -oroot -groot -m644
+INSTALL_PROGRAM = $(INSTALL) -p    -oroot -groot -m755
+INSTALL_SCRIPT  = $(INSTALL) -p    -oroot -groot -m755
+INSTALL_DIR     = $(INSTALL) -p -d -oroot -groot -m755
+
+CFLAGS = -Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+    CFLAGS += -O0
+else
+    CFLAGS += -O2
+endif
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
+    INSTALL_PROGRAM += -s
+endif
+
+# Zabbix server and proxy packages will be built for these database backends
+VARIANTS := PGSQL MYSQL SQLITE3
+
+CONFFLAGS_COMMON  = --host=$(DEB_HOST_GNU_TYPE) \
+                    --build=$(DEB_BUILD_GNU_TYPE) \
+                    --prefix=/usr \
+                    --mandir=\$${prefix}/share/man \
+                    --infodir=\$${prefix}/share/info \
+                    --enable-server \
+                    --enable-agent \
+                    --enable-proxy \
+                    --with-jabber \
+                    --with-ldap \
+                    --enable-ipv6 \
+                    --with-net-snmp \
+                    --with-openipmi \
+                    --with-ssh2 \
+                    --with-libcurl
+
+CONFFLAGS_SERVER_MYSQL = $(CONFFLAGS_COMMON) --with-mysql
+CONFFLAGS_SERVER_PGSQL = $(CONFFLAGS_COMMON) --with-pgsql
+CONFFLAGS_SERVER_SQLITE3 = $(CONFFLAGS_COMMON) --with-sqlite3
+
+# The source package will be compiled for each database flavor in
+# subdirectories of this directory:
+BUILDDIR := $(CURDIR)/debian/tmp-build
+
+# Replace config.auto and config.guess from the current autotools-dev package
+# and reconfigure the autoconf magic to have the "-lcrypto" linking removed.
+prepare: patch prepare-stamp
+prepare-stamp:
+	dh_autotools-dev_updateconfig
+	# we removed -lcrypto stuff so lets re-run autotools:
+	autoreconf
+	touch prepare-stamp
+
+# Copy the source directory (without the 'debian' directory) to other locations
+# to configure and compile the sources there for each database flavor.
+extract: $(foreach s,$(VARIANTS),extract-$(s)-stamp)
+extract-%-stamp:
+	@echo "--------------------------"
+	@echo "Copying source directory to $(BUILDDIR)-$(*) for building the $(*) variant there"
+	@echo "--------------------------"
+	mkdir $(BUILDDIR)-$(*)
+	tar -cSf - --exclude=./.svn --exclude=./debian --exclude zbxclock.swf . | tar -xSpf - -C $(BUILDDIR)-$(*)
+	touch $@
+
+# Configure the flavors
+configure: $(foreach s,$(VARIANTS),configure-$(s)-stamp)
+configure-%-stamp: extract-%-stamp
+	@echo "--------------------------"
+	@echo "Configuring the $(*) flavor in $(BUILDDIR)-$(*)"
+	@echo "--------------------------"
+	dh_testdir
+	cd $(BUILDDIR)-$(*) && ./configure $(CONFFLAGS_COMMON) $(CONFFLAGS_SERVER_$(*))
+	touch $@
+
+# Compile the flavors
+build: prepare $(foreach s,$(VARIANTS),build-$(s)-stamp)
+build-%-stamp: configure-%-stamp
+	@echo "--------------------------"
+	@echo "Compiling the $(*) flavor in $(BUILDDIR)-$(*)"
+	@echo "--------------------------"
+	dh_testdir
+	$(MAKE) -C $(BUILDDIR)-$(*)
+	touch $@
+
+clean: unpatch
+	dh_testdir
+	dh_testroot
+	rm -f *-stamp
+	rm -f config.log
+	[ ! -f Makefile ] || $(MAKE) distclean
+	[ ! -f src/zabbix_agent/Makefile ] || $(MAKE) -C src/zabbix_agent/ clean
+	[ ! -f src/zabbix_get/Makefile ] || $(MAKE) -C src/zabbix_get/ clean
+	[ ! -f src/zabbix_sender/Makefile ] || $(MAKE) -C src/zabbix_sender/ clean
+	[ ! -f src/zabbix_proxy/Makefile ] || $(MAKE) -C src/zabbix_proxy/ clean
+	debconf-updatepo
+	dh_autotools-dev_restoreconfig
+	@echo Removing build directories in $(BUILDDIR)
+	$(RM) -r debian/tmp*
+	dh_clean
+
+# Build architecture-independent files here.
+binary-indep: build
+	dh_testdir -i
+	dh_testroot -i
+	dh_prep -i
+	dh_installdirs -i
+	dh_install -i
+	# --------------------------------
+	# Rename during install
+	# zabbix-frontend-php
+	cp debian/templates/dbconfig.php.in $(TMP_FRONTEND)/usr/share/doc/zabbix-frontend-php/dbconfig.php
+	cp debian/conf/apache.conf $(TMP_FRONTEND)/etc/zabbix/apache.conf
+	# --------------------------------
+	# zabbix-frontend-php
+	# javscript libraries and fonts come from the respective Debian packages.
+	# they get linked later with dh_link.
+	rm -r $(TMP_FRONTEND)/usr/share/zabbix/fonts/DejaVuSans.ttf
+	rm -r $(TMP_FRONTEND)/usr/share/zabbix/js/prototype.js
+	rm -r $(TMP_FRONTEND)/usr/share/zabbix/js/scriptaculous*
+	rm -f $(TMP_FRONTEND)/usr/share/zabbix/conf/COPYING
+	# --------------------------------
+	dh_installdocs -i
+	dh_installchangelogs -i ChangeLog
+	dh_installexamples -i
+	dh_installman -i
+	dh_installdebconf -i
+	#dh_installinit -i
+	dh_installlogrotate -i
+	dh_link -i
+	dh_compress -i
+	dh_fixperms -i
+	# --------------------------------
+	# zabbix-frontend-php
+	# disable frontend-based installation
+	mv $(TMP_FRONTEND)/usr/share/zabbix/setup.php $(TMP_FRONTEND)/usr/share/zabbix/setup.php.disabled
+	# remove executable permissions on PNG file
+	find $(TMP_FRONTEND) -type f -name '*.png' -print0 | xargs -0r chmod a-x
+	# --------------------------------
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
+
+# Build architecture-dependent files here.
+binary-arch: build
+	dh_testdir -a
+	dh_testroot -a
+	dh_prep -a
+	dh_installdirs -a
+	dh_install -a
+	# Rename during install
+	# zabbix-agent
+	cp debian/templates/zabbix_agentd.conf.in $(TMP_AGENT)/usr/share/$(PKG_AGENT)/zabbix_agentd.conf
+	# zabbix-server-mysql
+	cp debian/templates/zabbix_server.conf.in $(TMP_SERVER_MYSQL)/usr/share/$(PKG_SERVER_MYSQL)/zabbix_server.conf
+	cat create/schema/mysql.sql create/data/data.sql create/data/images_mysql.sql > $(TMP_SERVER_MYSQL)/usr/share/dbconfig-common/data/$(PKG_SERVER_MYSQL)/install/mysql
+	# zabbix-server-pgsql
+	cp debian/templates/zabbix_server.conf.in $(TMP_SERVER_PGSQL)/usr/share/$(PKG_SERVER_PGSQL)/zabbix_server.conf
+	cat create/schema/postgresql.sql create/data/data.sql create/data/images_pgsql.sql > $(TMP_SERVER_PGSQL)/usr/share/dbconfig-common/data/$(PKG_SERVER_PGSQL)/install/pgsql
+	# zabbix-server-sqlite3
+	cp debian/templates/zabbix_server_sqlite3.conf.in $(TMP_SERVER_SQLITE3)/usr/share/$(PKG_SERVER_SQLITE3)/zabbix_server.conf
+	cat create/schema/sqlite.sql create/data/data.sql create/data/images_sqlite3.sql > $(TMP_SERVER_SQLITE3)/usr/share/dbconfig-common/data/$(PKG_SERVER_SQLITE3)/install/sqlite3
+	# zabbix-proxy-mysql
+	cp debian/templates/zabbix_proxy.conf.in $(TMP_PROXY_MYSQL)/usr/share/zabbix-proxy/zabbix_proxy.conf
+	cp create/schema/mysql.sql $(TMP_PROXY_MYSQL)/usr/share/dbconfig-common/data/$(PKG_PROXY_MYSQL)/install/mysql
+	# zabbix-proxy-pgsql
+	cp debian/templates/zabbix_proxy.conf.in $(TMP_PROXY_PGSQL)/usr/share/zabbix-proxy/zabbix_proxy.conf
+	cp create/schema/postgresql.sql $(TMP_PROXY_PGSQL)/usr/share/dbconfig-common/data/$(PKG_PROXY_PGSQL)/install/pgsql
+	# zabbix-proxy-sqlite3
+	cp debian/templates/zabbix_proxy_sqlite3.conf.in $(TMP_PROXY_SQLITE3)/usr/share/zabbix-proxy/zabbix_proxy.conf
+	cp create/schema/sqlite.sql $(TMP_PROXY_SQLITE3)/usr/share/dbconfig-common/data/$(PKG_PROXY_SQLITE3)/install/sqlite3
+	# --------------------------------
+	dh_installdocs -a
+	dh_installchangelogs -a ChangeLog
+	dh_installexamples -a
+	dh_installman -a
+	dh_installdebconf -a
+	#dh_installinit -a
+	dh_installinit -p $(PKG_SERVER_MYSQL) --name zabbix-server
+	dh_installinit -p $(PKG_SERVER_PGSQL) --name zabbix-server
+	dh_installinit -p $(PKG_SERVER_SQLITE3) --name zabbix-server
+	dh_installinit -p $(PKG_PROXY_MYSQL) --name zabbix-proxy
+	dh_installinit -p $(PKG_PROXY_PGSQL) --name zabbix-proxy
+	dh_installinit -p $(PKG_PROXY_SQLITE3) --name zabbix-proxy
+	dh_installinit -p $(PKG_AGENT)
+	dh_installlogrotate -a
+	dh_link -a
+	dh_compress -a
+	dh_fixperms -a
+	dh_strip -a
+	dh_makeshlibs -a
+	dh_shlibdeps -a
+	dh_installdeb -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+binary: binary-arch binary-indep 
+
+.PHONY: clean build configure extract binary-arch binary-indep binary
+

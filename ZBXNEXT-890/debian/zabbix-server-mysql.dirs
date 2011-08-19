@@ -1,0 +1,12 @@
+etc/zabbix
+usr/bin
+usr/sbin
+etc/zabbix/alert.d
+etc/logrotate.d
+etc/init.d
+usr/share/zabbix-server-mysql
+var/log/zabbix-server
+usr/share/doc/zabbix-server-mysql
+usr/share/dbconfig-common/data/zabbix-server-mysql/install
+usr/share/dbconfig-common/data/zabbix-server-mysql/upgrade/mysql
+

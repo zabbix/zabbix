@@ -1,0 +1,5 @@
+[type: gettext/rfc822deb] zabbix-agent.templates
+[type: gettext/rfc822deb] zabbix-frontend-php.templates
+[type: gettext/rfc822deb] zabbix-server-mysql.templates
+[type: gettext/rfc822deb] zabbix-server-pgsql.templates
+

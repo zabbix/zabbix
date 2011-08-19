@@ -1,0 +1,25 @@
+Index: zabbix/create/data/data.sql
+===================================================================
+--- zabbix.orig/create/data/data.sql	2011-08-08 16:20:42.668997795 +0200
++++ zabbix/create/data/data.sql	2011-08-08 16:22:36.237886545 +0200
+@@ -17,6 +17,12 @@
+ -- Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ --
+ 
++-- Start a transaction to avoid heavy fsync()'ing when using SQLite3.
++-- Also reported upstream: https://support.zabbix.com/browse/ZBX-4024
++-- Without the transaction the database setup can take over one hour
++-- while in a transaction it is just a matter of seconds.
++BEGIN;
++
+ --
+ -- Dumping data for table `config`
+ --
+@@ -12333,3 +12339,7 @@
+ --
+ 
+ INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,0,0,'Zabbix server',NULL,100,100,'',0,0);
++
++-- Finish the transaction.
++COMMIT;
++

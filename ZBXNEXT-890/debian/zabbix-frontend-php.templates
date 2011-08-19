@@ -1,0 +1,45 @@
+# These templates have been reviewed by the debian-l10n-english
+# team
+#
+# If modifications/additions/rewording are needed, please ask
+# debian-l10n-english@lists.debian.org for advice.
+#
+# Even minor modifications require translation updates and such
+# changes should be coordinated with translators and reviewers.
+
+Template: zabbix-frontend-php/configure-apache
+Type: boolean
+Default: true
+_Description: Configure Apache?
+ The Zabbix web frontend runs on any web server that supportes PHP5.
+ However only Apache (2.x) can be configured automatically at this point.
+ .
+ Please choose whether you want to reconfigure Apache so that the Zabbix web
+ frontend is made available at the URL http://.../zabbix
+
+Template: zabbix-frontend-php/restart-webserver
+Type: boolean
+Default: true
+_Description: Restart Apache now?
+ In order to apply the changes needed for Zabbix configuration, the
+ web server needs to be restarted.
+ .
+ Please choose whether you prefer doing it automatically now
+ or manually later.
+
+Template: zabbix-frontend-php/zabbix-server
+Type: string
+Default: 127.0.0.1
+_Description: Zabbix server host address:
+ Please enter the host name or IP address of the Zabbix server you
+ want to connect to.
+ .
+ This is needed for some advanced frontend functionalities.
+
+Template: zabbix-frontend-php/zabbix-server-port
+Type: string
+Default: 10051
+_Description: Zabbix server port:
+ Please enter the port used by the Zabbix server.
+ .
+ This is needed for some advanced frontend functionalities.

@@ -1,0 +1,13 @@
+etc/zabbix
+usr/bin
+usr/sbin
+etc/zabbix/alert.d
+etc/logrotate.d
+etc/init.d
+usr/share/zabbix-server-sqlite3
+var/log/zabbix-server
+var/lib/zabbix
+usr/share/doc/zabbix-server-sqlite3
+usr/share/dbconfig-common/data/zabbix-server-sqlite3/install
+usr/share/dbconfig-common/data/zabbix-server-sqlite3/upgrade/sqlite3
+

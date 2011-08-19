@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+. /usr/share/debconf/confmodule
+. /usr/share/dbconfig-common/dpkg/prerm.sqlite3
+
+#DEBHELPER#
+
+dbc_go zabbix-proxy-sqlite3 $@
+
+exit 0

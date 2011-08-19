@@ -1,0 +1,12 @@
+zabbix for Debian
+-----------------
+
+ Please point your Browser to http://your_server/zabbix/ in order to configure
+ your zabbix-frontend. Per Default, the Username is "Admin" with password
+ "zabbix". To prevent other Persons from viewing your data, change this
+ password immediately after logging in.
+
+ If you are using PostgreSQL as a database backend and just see a blank page
+ in your browser then please make sure that the 'php5-pgsql' package is
+ installed.
+

@@ -1,0 +1,186 @@
+# zabbix po-debconf translation to Spanish
+# Copyright (C) 2009 Software in the Public Interest
+# This file is distributed under the same license as the zabbix package.
+#
+# Changes:
+#   - Initial translation
+#       Francisco Javier Cuadrado <fcocuadrado@gmail.com>, 2009
+#
+# Traductores, si no conocen el formato PO, merece la pena leer la
+# documentación de gettext, especialmente las secciones dedicadas a este
+# formato, por ejemplo ejecutando:
+#       info -n '(gettext)PO Files'
+#       info -n '(gettext)Header Entry'
+#
+# Equipo de traducción al español, por favor lean antes de traducir
+# los siguientes documentos:
+#
+#   - El proyecto de traducción de Debian al español
+#     http://www.debian.org/intl/spanish/
+#     especialmente las notas y normas de traducción en
+#     http://www.debian.org/intl/spanish/notas
+#
+#   - La guía de traducción de po's de debconf:
+#     /usr/share/doc/po-debconf/README-trans
+#     o http://www.debian.org/intl/l10n/po-debconf/README-trans
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: zabbix 1:1.6.6-1\n"
+"Report-Msgid-Bugs-To: zabbix@packages.debian.org\n"
+"POT-Creation-Date: 2011-08-07 17:31+0200\n"
+"PO-Revision-Date: 2009-09-28 08:48+0100\n"
+"Last-Translator: Francisco Javier Cuadrado <fcocuadrado@gmail.com>\n"
+"Language-Team: Debian l10n Spanish <debian-l10n-spanish@lists.debian.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: string
+#. Description
+#: ../zabbix-agent.templates:2001 ../zabbix-frontend-php.templates:4001
+msgid "Zabbix server host address:"
+msgstr "Dirección de la máquina del servidor de Zabbix:"
+
+#. Type: string
+#. Description
+#: ../zabbix-agent.templates:2001 ../zabbix-frontend-php.templates:4001
+msgid ""
+"Please enter the host name or IP address of the Zabbix server you want to "
+"connect to."
+msgstr ""
+"Introduzca el nombre de la máquina o la dirección IP del servidor de Zabbix "
+"al que quiere conectarse."
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:2001
+msgid "Configure Apache?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:2001
+#, fuzzy
+#| msgid ""
+#| "Zabbix supports any web server supported by PHP5, however only Apache can "
+#| "be configured automatically."
+msgid ""
+"The Zabbix web frontend runs on any web server that supportes PHP5. However "
+"only Apache (2.x) can be configured automatically at this point."
+msgstr ""
+"Zabbix permite utilizar cualquier servidor web que pueda utilizar PHP5, sin "
+"embargo sólo se puede configurar automáticamente Apache."
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:2001
+msgid ""
+"Please choose whether you want to reconfigure Apache so that the Zabbix web "
+"frontend is made available at the URL http://.../zabbix"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:3001
+#, fuzzy
+#| msgid "Restart the web server(s) now?"
+msgid "Restart Apache now?"
+msgstr "¿Desea reiniciar el/los servidor/es web ahora?"
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:3001
+msgid ""
+"In order to apply the changes needed for Zabbix configuration, the web "
+"server needs to be restarted."
+msgstr ""
+"Para poder aplicar los cambios necesarios en la configuración de Zabbix, el "
+"servidor web se tiene que reiniciar."
+
+#. Type: boolean
+#. Description
+#: ../zabbix-frontend-php.templates:3001
+msgid ""
+"Please choose whether you prefer doing it automatically now or manually "
+"later."
+msgstr ""
+"Elija si prefiere realizarlo automáticamente ahora o manualmente más tarde."
+
+#. Type: string
+#. Description
+#. Type: string
+#. Description
+#: ../zabbix-frontend-php.templates:4001 ../zabbix-frontend-php.templates:5001
+msgid "This is needed for some advanced frontend functionalities."
+msgstr ""
+"Esto es necesario para algunas funcionalidades avanzadas de la interfaz "
+"(«frontend»)."
+
+#. Type: string
+#. Description
+#: ../zabbix-frontend-php.templates:5001
+msgid "Zabbix server port:"
+msgstr "Puerto del servidor de Zabbix:"
+
+#. Type: string
+#. Description
+#: ../zabbix-frontend-php.templates:5001
+msgid "Please enter the port used by the Zabbix server."
+msgstr "Introduzca el puerto del servidor de Zabbix."
+
+#. Type: note
+#. Description
+#: ../zabbix-server-mysql.templates:2001 ../zabbix-server-pgsql.templates:2001
+msgid "The SQL database must be upgraded manually"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../zabbix-server-mysql.templates:2001
+msgid ""
+"The SQL database used by Zabbix must be upgraded manually using the scripts "
+"available in /usr/share/doc/zabbix-server-mysql. Zabbix will not work "
+"properly until the database upgrade is completed."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../zabbix-server-pgsql.templates:2001
+msgid ""
+"The SQL database used by Zabbix must be upgraded manually using the scripts "
+"available in /usr/share/doc/zabbix-server-pgsql. Zabbix will not work "
+"properly until the database upgrade is completed."
+msgstr ""
+
+#~ msgid "Web server to reconfigure for Zabbix:"
+#~ msgstr "Reconfiguración del servidor web que utiliza Zabbix:"
+
+#~ msgid ""
+#~ "Please select which Apache version you want to configure the Zabbix "
+#~ "frontend for."
+#~ msgstr ""
+#~ "Elija que versión de Apache quiere configurar para la interfaz de Zabbix."
+
+#~ msgid ""
+#~ "Please enter the host name or the IP address of the Zabbix server you "
+#~ "want to connect to. This is needed for some advanced frontend "
+#~ "functionality."
+#~ msgstr ""
+#~ "Introduzca el nombre de la máquina o la dirección IP del servidor de "
+#~ "Zabbix al que quiere conectarse. Esto es necesario para algunas "
+#~ "funcionalidades avanzadas de la interfaz («frontend»)."
+
+#~ msgid "apache, apache-ssl, apache-perl, apache2"
+#~ msgstr "apache, apache-ssl, apache-perl, apache2"
+
+#~ msgid ""
+#~ "Zabbix supports any web server that php4 does, but this automatic "
+#~ "configuration process only supports Apache. Please select which  apache "
+#~ "version you want to configure the Zabbix frontend for."
+#~ msgstr ""
+#~ "Zabbix permite utilizar cualquier servidor web que utilice php4, pero "
+#~ "este proceso de configuración automática sólo se puede realizar con "
+#~ "Apache. Seleccione que versión de apache quiere configurar para la "
+#~ "interfaz («frontend») de Zabbix."

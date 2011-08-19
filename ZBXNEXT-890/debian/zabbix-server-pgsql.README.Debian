@@ -1,0 +1,54 @@
+ZABBIX server for Debian
+-------------------------
+
+ This zabbix-server-pgsql package will offer to create the database
+ automatically during the installation. If you chose to do this step
+ manually then please find the SQL scripts in /usr/share/zabbix-server.
+ Please configure the database access in the /etc/zabbix/zabbix_server.conf
+ so that Zabbix knows where to find the database.
+
+PHP settings
+------------
+
+ Zabbix requires minimum resource settings for PHP to work properly.
+ During the first-time setup it will complain if these are not set.
+ What you basically need to do is set these parameters in your
+ /etc/php5/apache2/php.ini file:
+
+ post_max_size = 16M
+ max_execution_time = 300
+ max_input_time = 300
+ date.timezone = ...
+ # (see http://www.php.net/manual/en/timezones.php)
+
+ And then restart Apache:
+
+ $> apache2ctl restart
+
+Upgrading from 1.6 to 1.8 manually
+----------------------------------
+
+ THIS STEP IS IMPORTANT FOR EVERYBODY WHO UPGRADES FROM <1.8 to 1.8!
+
+ Unfortunately the database can not be upgraded automatically from
+ Zabbix server installations earlier than 1.8 to version 1.8.
+ Please run the necessary SQL queries manually. They are found in
+ the /usr/share/doc/zabbix-server-pgsql/examples directory.
+
+ It is a good idea to stop the Zabbix server while you apply the SQL
+ commands to prevent locks on the table. You will also want to backup
+ the database before doing the upgrade.
+
+ Sorry for the inconvenience. Due to several possible database schemas
+ it was not possible to offer you a more convenient way.
+
+Performance hint
+----------------
+
+ If you are using Zabbix 1.8 with node-based distributed setup, please run the
+ following SQL patch. It should improve performance of configuration syncing a
+ lot.
+
+ DROP INDEX node_cksum_cksum_1;
+ CREATE INDEX node_cksum_1 on node_cksum (nodeid,cksumtype,tablename,recordid);
+

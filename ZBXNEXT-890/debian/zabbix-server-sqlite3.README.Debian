@@ -1,0 +1,27 @@
+ZABBIX server for Debian
+-------------------------
+
+ This zabbix-server-sqlite3 package will offer to create the database
+ automatically during the installation. If you chose to do this step
+ manually then please find the SQL scripts in /usr/share/zabbix-server.
+ Please configure the database access in the /etc/zabbix/zabbix_server.conf
+ so that Zabbix knows where to find the database.
+
+PHP settings
+------------
+
+ Zabbix requires minimum resource settings for PHP to work properly.
+ During the first-time setup it will complain if these are not set.
+ What you basically need to do is set these parameters in your
+ /etc/php5/apache2/php.ini file:
+
+ post_max_size = 16M
+ max_execution_time = 300
+ max_input_time = 300
+ date.timezone = ...
+ # (see http://www.php.net/manual/en/timezones.php)
+
+ And then restart Apache:
+
+ $> apache2ctl restart
+
