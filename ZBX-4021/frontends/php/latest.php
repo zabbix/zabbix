@@ -216,6 +216,9 @@ include_once('include/page_header.php');
 
 //	$table->ShowStart();
 
+	/**
+	 * Display APPLICATION ITEMS
+	 */
 	$db_apps = array();
 	$db_appids = array();
 
@@ -230,6 +233,7 @@ include_once('include/page_header.php');
 		$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
 	}
 
+	// select hosts
 	$sql = 'SELECT DISTINCT h.host,h.hostid, a.* '.
 			' FROM applications a, hosts h '.$sql_from.
 			' WHERE a.hostid=h.hostid'.
@@ -237,7 +241,7 @@ include_once('include/page_header.php');
 				' AND '.DBcondition('h.hostid',$available_hosts).
 				' AND h.status='.HOST_STATUS_MONITORED.
 			order_by('h.host,h.hostid','a.name,a.applicationid');
-//SDI($sql);
+
 	$db_app_res = DBselect($sql);
 	while($db_app = DBfetch($db_app_res)){
 		$db_app['item_cnt'] = 0;
@@ -247,13 +251,15 @@ include_once('include/page_header.php');
 	}
 
 	$tab_rows = array();
+
+	// select items
 	$sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 			' FROM items i,items_applications ia'.
 			' WHERE '.DBcondition('ia.applicationid',$db_appids).
 				' AND i.itemid=ia.itemid AND i.lastvalue IS NOT NULL'.
-				' AND (i.status='.ITEM_STATUS_ACTIVE. ' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
+				' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
 			order_by('i.description,i.itemid,i.lastclock');
-//SDI($sql);
+
 	$db_items = DBselect($sql);
 	while($db_item = DBfetch($db_items)){
 		$description = item_description($db_item);
@@ -304,7 +310,7 @@ include_once('include/page_header.php');
 			$actions = new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
 		}
 
-		$item_status = $db_item['status']==3?'unknown': null;
+		$item_status = $db_item['status'] == 3 ? 'unknown' : null;
 
 		array_push($app_rows, new CRow(array(
 			SPACE,
@@ -368,10 +374,13 @@ include_once('include/page_header.php');
 			$table->addRow($row);
 	}
 
-// OTHER ITEMS (which doesn't linked to application)
+	/**
+	 * Display OTHER ITEMS (which doesn't linked to application)
+	 */
 	$db_hosts = array();
 	$db_hostids = array();
 
+	// select hosts
 	$sql = 'SELECT DISTINCT h.host,h.hostid '.
 			' FROM hosts h'.$sql_from.', items i '.
 				' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
@@ -379,12 +388,13 @@ include_once('include/page_header.php');
 				$sql_where.
 				' AND h.hostid=i.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND i.lastvalue IS NOT NULL '.
+				' AND (i.status='.ITEM_STATUS_ACTIVE. ' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
 				' AND '.DBcondition('h.hostid',$available_hosts).
 			' ORDER BY h.host';
 
 	$db_host_res = DBselect($sql);
-	while($db_host = DBfetch($db_host_res)){
+	while($db_host = DBfetch($db_host_res)) {
 		$db_host['item_cnt'] = 0;
 
 		$db_hosts[$db_host['hostid']] = $db_host;
@@ -393,6 +403,7 @@ include_once('include/page_header.php');
 
 	$tab_rows = array();
 
+	// select items
 	$sql = 'SELECT DISTINCT h.host,h.hostid,i.* '.
 			' FROM hosts h'.$sql_from.', items i '.
 				' LEFT JOIN items_applications ia ON ia.itemid=i.itemid'.
@@ -400,74 +411,78 @@ include_once('include/page_header.php');
 				$sql_where.
 				' AND h.hostid=i.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND '.DBcondition('h.hostid',$db_hostids).
+				' AND i.lastvalue IS NOT NULL '.
+				' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
+				' AND '.DBcondition('h.hostid', $db_hostids).
 			' ORDER BY i.description,i.itemid';
 	$db_items = DBselect($sql);
-	while($db_item = DBfetch($db_items)){
+	while ($db_item = DBfetch($db_items)) {
 
 		$description = item_description($db_item);
 
-		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
+		if (!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select'])) continue;
 
-		if(strpos($db_item['units'], ',') !== false)
+		if (strpos($db_item['units'], ',') !== false)
 			list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
 		else
 			$db_item['unitsLong'] = '';
 
 		$db_host = &$db_hosts[$db_item['hostid']];
 
-		if(!isset($tab_rows[$db_host['hostid']])) $tab_rows[$db_host['hostid']] = array();
+		if (!isset($tab_rows[$db_host['hostid']])) $tab_rows[$db_host['hostid']] = array();
 		$app_rows = &$tab_rows[$db_host['hostid']];
 
 		$db_host['item_cnt']++;
 
-		if(isset($showAll) && !empty($apps) && !isset($apps[0])) continue;
-		else if(isset($hideAll) && (empty($apps) || isset($apps[0]))) continue;
+		if (isset($showAll) && !empty($apps) && !isset($apps[0])) continue;
+		else if (isset($hideAll) && (empty($apps) || isset($apps[0]))) continue;
 
-
-
-		if(isset($db_item['lastclock']))
-			$lastclock=zbx_date2str(S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT,$db_item['lastclock']);
+		// column "lastclock"
+		if (isset($db_item['lastclock']))
+			$lastclock = zbx_date2str(S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT, $db_item['lastclock']);
 		else
-			$lastclock = new CCol(' - ');
+			$lastclock = ' - ';
 
-		$lastvalue=format_lastvalue($db_item);
+		// column "lastvalue"
+		$lastvalue = format_lastvalue($db_item);
 
-		if( isset($db_item['lastvalue']) && isset($db_item['prevvalue']) &&
-			($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) &&
-			($db_item['lastvalue']-$db_item['prevvalue'] != 0) )
-		{
+		// column "change"
+		if (isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
+				&& ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64)
+				&& ($db_item['lastvalue'] - $db_item['prevvalue'] != 0)) {
 			$change = '';
-			if($db_item['lastvalue']-$db_item['prevvalue']>0){
+			if(($db_item['lastvalue'] - $db_item['prevvalue']) > 0) {
 				$change = '+';
 			}
 
 			$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
-			$change = $change . convert_units(bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits), $db_item['units'], 0);
+			$change = $change.convert_units(bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits), $db_item['units'], 0);
 			$change = nbsp($change);
 		}
-		else{
-			$change = new CCol(' - ');
+		else {
+			$change = ' - ';
 		}
 
-		if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
-			$actions=new CLink(S_GRAPH,'history.php?action=showgraph&itemid='.$db_item['itemid']);
+		// column "action"
+		if (($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type'] == ITEM_VALUE_TYPE_UINT64)) {
+			$actions = new CLink(S_GRAPH, 'history.php?action=showgraph&itemid='.$db_item['itemid']);
 		}
 		else{
-			$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
+			$actions = new CLink(S_HISTORY, 'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
 		}
+
+		$item_status = $db_item['status'] == 3 ? 'unknown' : null;
 
 		array_push($app_rows, new CRow(array(
 			SPACE,
-			is_show_all_nodes()?($db_host['item_cnt']?SPACE:get_node_name_by_elid($db_item['itemid'])):null,
-			$_REQUEST['hostid']?NULL:($db_host['item_cnt']?SPACE:$db_item['host']),
-			SPACE.SPACE.$description,
-			$lastclock,
-			new CCol($lastvalue),
-			$change,
-			$actions
-			)));
+			is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
+			$_REQUEST['hostid'] ? NULL : ($db_host['item_cnt'] ? SPACE : $db_item['host']),
+			new CCol(SPACE.SPACE.$description, $item_status),
+			new CCol($lastclock, $item_status),
+			new CCol($lastvalue, $item_status),
+			new CCol($change, $item_status),
+			new CCol($actions, $item_status)
+		)));
 	}
 	unset($app_rows);
 	unset($db_host);
