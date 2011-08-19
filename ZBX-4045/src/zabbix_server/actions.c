@@ -426,7 +426,7 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
+		zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
 				condition->conditiontype, condition->conditionid);
 	}
 
@@ -648,7 +648,7 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if (CONDITION_TYPE_DHOST_IP == condition->conditiontype)
 	{
-		if (event->object == EVENT_OBJECT_DHOST)
+		if (EVENT_OBJECT_DHOST == event->object)
 		{
 			result = DBselect(
 					"select distinct ip"
@@ -741,7 +741,7 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		condition_value = atoi(condition->value);
 
-		if (event->object == EVENT_OBJECT_DHOST)
+		if (EVENT_OBJECT_DHOST == event->object)
 		{
 			result = DBselect(
 					"select status,lastup,lastdown"
@@ -760,8 +760,8 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 
 		if (NULL != (row = DBfetch(result)))
 		{
-			tmp_int	= (atoi(row[0]) == DOBJECT_STATUS_UP) ? atoi(row[1]) : atoi(row[2]);
-			now	= time(NULL);
+			tmp_int = DOBJECT_STATUS_UP == atoi(row[0]) ? atoi(row[1]) : atoi(row[2]);
+			now = time(NULL);
 
 			switch (condition->operator)
 			{
@@ -782,7 +782,7 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if (CONDITION_TYPE_DSERVICE_PORT == condition->conditiontype)
 	{
-		if (event->object == EVENT_OBJECT_DSERVICE)
+		if (EVENT_OBJECT_DSERVICE == event->object)
 		{
 			result = DBselect(
 					"select port"
@@ -994,8 +994,8 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid, unsig
 	DB_ROW		row;
 	DB_CONDITION	condition;
 
-	int	ret = SUCCEED;	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
-	int	cond, old_type = -1, exit = 0;
+	int		ret = SUCCEED;	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */
+	int		cond, old_type = -1, exit = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
 
@@ -1024,35 +1024,38 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid, unsig
 				}
 				else						/* AND conditions */
 				{
-					/* break if PREVIOUS AND condition is FALSE */
-					if (FAIL == ret)
+					if (FAIL == ret)	/* break if PREVIOUS AND condition is FALSE */
 						exit = 1;
 					else if (FAIL == check_action_condition(event, &condition))
 						ret = FAIL;
 				}
+
 				old_type = condition.conditiontype;
+
 				break;
 			case ACTION_EVAL_TYPE_AND:
 				cond = check_action_condition(event, &condition);
-				/* break if any AND condition is FALSE */
-				if (FAIL == cond)
+
+				if (FAIL == cond)	/* break if any AND condition is FALSE */
 				{
 					ret = FAIL;
 					exit = 1;
 				}
 				else
 					ret = SUCCEED;
+
 				break;
 			case ACTION_EVAL_TYPE_OR:
 				cond = check_action_condition(event, &condition);
-				/* break if any OR condition is TRUE */
-				if (SUCCEED == cond)
+
+				if (SUCCEED == cond)	/* break if any OR condition is TRUE */
 				{
 					ret = SUCCEED;
 					exit = 1;
 				}
 				else
 					ret = FAIL;
+
 				break;
 			default:
 				ret = FAIL;
