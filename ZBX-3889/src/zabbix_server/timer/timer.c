@@ -125,16 +125,19 @@ static void	process_time_functions()
 
 	zbx_free(sql);
 
-	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
+	if (0 != tr_num)
 	{
-		zbx_free(tr_last->expression);
-		zbx_free(tr_last->new_error);
+		for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
+		{
+			zbx_free(tr_last->expression);
+			zbx_free(tr_last->new_error);
 
-		if (1 != tr_last->add_event)
-			continue;
+			if (1 != tr_last->add_event)
+				continue;
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-				tr_last->lastchange, tr_last->new_value, 0, 0);
+			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, tr_last->new_value, 0, 0);
+		}
 	}
 
 	DBcommit();

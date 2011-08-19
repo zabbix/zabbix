@@ -913,6 +913,9 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	}
 	DBfree_result(result);
 
+	if (0 == tr_num)
+		goto clean;
+
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 7, "begin\n");
@@ -964,7 +967,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
 				tr_last->lastchange, tr_last->new_value, 0, 0);
 	}
-
+clean:
 	zbx_free(tr);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
