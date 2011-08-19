@@ -27,6 +27,7 @@
 #include "zbxmedia.h"
 #include "zbxserver.h"
 #include "zbxself.h"
+#include "zbxexec.h"
 
 #include "alerter.h"
 
@@ -53,6 +54,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 	int 	pid, res = FAIL;
 	char	full_path[MAX_STRING_LEN];
+	char*	output = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): alertid [" ZBX_FS_UI64 "] mediatype [%d]",
 			__function_name, alert->alertid, mediatype->type);
@@ -85,29 +87,20 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	}
 	else if (MEDIA_TYPE_EXEC == mediatype->type)
 	{
-		if (-1 == (pid = zbx_fork()))
+		zbx_snprintf(full_path, sizeof(full_path), "%s/%s '%s' '%s' '%s'",
+				CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path, alert->sendto, alert->subject, alert->message);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "before executing [%s]", full_path);
+		if (SUCCEED == (res = zbx_execute(full_path, &output, error, max_error_len, 40)))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "%s(): failed to fork(): %s", __function_name, zbx_strerror(errno));
-		}
-		else if (0 != pid)
-		{
-			waitpid(pid, NULL, 0);
-			res = SUCCEED;
+			zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", mediatype->exec_path, output);
+			free(output);
 		}
 		else
 		{
-			zbx_snprintf(full_path, sizeof(full_path), "%s/%s",
-					CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
-
-			zabbix_log(LOG_LEVEL_DEBUG, "before executing [%s]", full_path);
-
-			execl(full_path, mediatype->exec_path, alert->sendto,
-					alert->subject, alert->message, (char *)NULL);
-
-			/* execl() returns only when an error occurs */
-			zabbix_log(LOG_LEVEL_ERR, "error executing [%s]: %s", full_path, zbx_strerror(errno));
-			zabbix_syslog("error executing [%s]: %s", full_path, zbx_strerror(errno));
-			exit(0);
+			res = FAIL;
+			zabbix_log(LOG_LEVEL_ERR, "error executing [%s]: %s", full_path, error);
+			zabbix_syslog("error executing [%s]: %s", full_path, error);
 		}
 	}
 	else
