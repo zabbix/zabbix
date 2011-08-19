@@ -135,7 +135,7 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 			int			inc_slots, new_slot;
 			ZBX_HASHSET_ENTRY_T	**prev_next, *curr_entry, *tmp;
 
-			inc_slots = next_prime(hs->num_slots * SLOT_GROWTH_FACTOR);
+			inc_slots = next_prime(MAX(hs->num_slots + 1, hs->num_slots * SLOT_GROWTH_FACTOR));
 
 			hs->slots = hs->mem_realloc_func(hs->slots, inc_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
 			memset(hs->slots + hs->num_slots, 0, (inc_slots - hs->num_slots) * sizeof(ZBX_HASHSET_ENTRY_T *));

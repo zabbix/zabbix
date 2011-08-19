@@ -256,6 +256,19 @@ int	zbx_default_uint64_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+int	zbx_default_ptr_compare_func(const void *d1, const void *d2)
+{
+	const void	*p1 = *(const void **)d1;
+	const void	*p2 = *(const void **)d2;
+
+	if (p1 < p2)
+		return -1;
+	if (p1 > p2)
+		return +1;
+
+	return 0;
+}
+
 /* default memory management functions */
 
 void	*zbx_default_mem_malloc_func(void *old, size_t size)
