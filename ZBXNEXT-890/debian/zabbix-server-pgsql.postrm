@@ -1,0 +1,35 @@
+#!/bin/sh
+
+set -e
+#set -x
+
+if [ -f /usr/share/debconf/confmodule ]; then
+	. /usr/share/debconf/confmodule
+fi
+if [ -f /usr/share/dbconfig-common/dpkg/postrm.pgsql  ]; then
+	. /usr/share/dbconfig-common/dpkg/postrm.pgsql 
+	
+	dbc_dbuser=zabbix
+	dbc_dbname=zabbix
+	dbc_go zabbix-server-pgsql $@
+fi
+
+case "$1" in
+    failed-upgrade|abort-install|abort-upgrade|disappear|upgrade)
+    ;;
+    remove)
+    ;;
+    purge)
+        rm -fr /var/log/zabbix-server
+        rm -fr /var/run/zabbix-server
+        rm -f /etc/zabbix/zabbix_server.conf
+        ucf --purge /etc/zabbix/zabbix_server.conf || true
+    ;;
+
+    *)
+        echo "postrm called with unknown argument \`$1'" >&2
+        exit 1
+esac
+
+
+#DEBHELPER#

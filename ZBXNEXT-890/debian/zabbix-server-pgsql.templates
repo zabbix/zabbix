@@ -1,0 +1,15 @@
+# These templates have been reviewed by the debian-l10n-english
+# team
+#
+# If modifications/additions/rewording are needed, please ask
+# debian-l10n-english@lists.debian.org for advice.
+#
+# Even minor modifications require translation updates and such
+# changes should be coordinated with translators and reviewers.
+
+Template: zabbix-server-pgsql/server
+Type: note
+_Description: The SQL database must be upgraded manually
+ The SQL database used by Zabbix must be upgraded manually using the scripts
+ available in /usr/share/doc/zabbix-server-pgsql. Zabbix will not work properly
+ until the database upgrade is completed.

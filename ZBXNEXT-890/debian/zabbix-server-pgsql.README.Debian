@@ -1,0 +1,42 @@
+ZABBIX server for Debian
+-------------------------
+
+ This zabbix-server-pgsql package will offer to create the database
+ automatically during the installation. If you chose to do this step
+ manually then please find the SQL scripts in /usr/share/zabbix-server.
+ Please configure the database access in the /etc/zabbix/zabbix_server.conf
+ so that Zabbix knows where to find the database.
+
+
+Upgrading the database schema manually (MANDATORY!)
+---------------------------------------------------
+
+ THIS STEP IS MANDATORY FOR EVERYBODY WHO UPGRADES FROM <1.8 to 1.8.
+ ZABBIX 1.8 WILL NOT WORK PROPERLY IF YOU IGNORE THIS SECTION.
+
+ Unfortunately the database can not be upgraded automatically from
+ Zabbix server installations earlier than 1.8 to version 1.8.
+ If you are upgrading from Debian Lenny (Zabbix version 1.4) you will
+ need to update from 1.4 to 1.6 first. Then do the upgrade from 1.6 to
+ 1.8. Sorry for the inconvenience. We tried hard to spare you this step.
+
+ Upgrade 1.4 -> 1.6
+ ~~~~~~~~~~~~~~~~~~
+
+ $> /etc/init.d/zabbix-server stop
+
+ $> psql -h localhost zabbix zabbix \
+    < /usr/share/doc/zabbix-server-pgsql/examples/1.6/patch.sql
+
+ $> /etc/init.d/zabbix-server start
+
+ Upgrade 1.6 -> 1.8
+ ~~~~~~~~~~~~~~~~~~
+
+ $> /etc/init.d/zabbix-server stop
+
+ $> psql -h localhost zabbix zabbix \
+    < /usr/share/doc/zabbix-server-pgsql/examples/1.8/patch.sql
+ 
+ $> /etc/init.d/zabbix-server start
+

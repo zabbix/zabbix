@@ -1,0 +1,46 @@
+#!/bin/sh -e
+
+CONFFILE1="/usr/share/zabbix-agent/zabbix_agentd.conf"
+CONFFILE_DEST1="/etc/zabbix/zabbix_agentd.conf"
+
+CONFFILE2="/usr/share/zabbix-agent/zabbix_agent.conf"
+CONFFILE_DEST2="/etc/zabbix/zabbix_agent.conf"
+
+. /usr/share/debconf/confmodule
+db_version 2.0 || [ $? -lt 30 ]
+
+if [ "$1" = "configure" ]; then
+
+    RET=""
+    db_get zabbix-agent/server || true
+    zabbix_server="$RET"
+    if [ "$zabbix_server" = "" ]; then
+        zabbix_server="localhost"
+    fi
+
+    sed "s/^[# ]*Server=.*/Server=$zabbix_server/g" < $CONFFILE1 > $CONFFILE_DEST1.new 
+    ucf --debconf-ok $CONFFILE_DEST1.new $CONFFILE_DEST1
+    rm -f $CONFFILE_DEST1.new
+
+    sed "s/^[# ]*Server=.*/Server=$zabbix_server/g" < $CONFFILE2 > $CONFFILE_DEST2.new 
+    ucf --debconf-ok $CONFFILE_DEST2.new $CONFFILE_DEST2
+    rm -f $CONFFILE_DEST2.new
+
+    if ! getent group zabbix > /dev/null 2>&1 ; then
+    addgroup --system --quiet zabbix
+    fi
+
+    if ! getent passwd zabbix > /dev/null 2>&1 ; then
+    adduser --quiet \
+        --system --disabled-login --ingroup zabbix \
+        --home /var/run/zabbix-server/ --no-create-home \
+        zabbix
+    fi
+    chown zabbix:zabbix /var/log/zabbix-agent -R
+fi
+
+db_stop
+
+#DEBHELPER#
+
+exit 0

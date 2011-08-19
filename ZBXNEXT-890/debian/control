@@ -1,0 +1,130 @@
+Source: zabbix
+Section: net
+Priority: optional
+Maintainer: Christoph Haas <haas@debian.org>
+Uploaders: Fabio Tranchitella <kobold@debian.org>, Michael Ablassmeier <abi@debian.org>
+Build-Depends: debhelper (>= 5.0.0), libsnmp9-dev | libsnmp-dev, libmysqlclient15-dev, automake1.9, po-debconf, libpq-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev, libldap2-dev,libiksemel-dev, libopenipmi-dev
+Standards-Version: 3.8.4
+Vcs-Svn: svn://svn.debian.org/svn/collab-maint/deb-maint/zabbix/trunk
+Vcs-Browser: http://svn.debian.org/wsvn/collab-maint/deb-maint/zabbix/trunk/?op=log
+ 
+Package: zabbix-agent
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, adduser, ucf, lsb-base
+Suggests: logrotate
+Description: network monitoring solution - agent
+ Zabbix is a server/client network monitoring system with many features.
+ It can be used for:
+ .
+  - high level monitoring of IT services;
+  - centralized monitoring of your servers and applications;
+  - monitoring of SNMP-enabled devices;
+  - performance monitoring (process load, network activity, disk
+    activity, memory usage, OS parameters etc.);
+  - data visualization.
+ .
+ This package provides the software needed to integrate a host as a Zabbix
+ client.
+
+Package: zabbix-server-mysql
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
+Pre-Depends: debconf
+Recommends: mysql-server (>= 4.0.16-2), snmpd
+Suggests: zabbix-frontend-php, logrotate
+Conflicts: zabbix-server-pgsql
+Description: network monitoring solution - server (using MySQL)
+ Zabbix is a server/client network monitoring system with many features.
+ It can be used for:
+ .
+  - high level monitoring of IT services;
+  - centralized monitoring of your servers and applications;
+  - monitoring of SNMP-enabled devices;
+  - performance monitoring (process load, network activity, disk
+    activity, memory usage, OS parameters etc.);
+  - data visualization.
+ .
+ This package provides the software needed to integrate a host as a Zabbix
+ client. It collects information from Zabbix clients and stores it in a
+ MySQL database back-end.
+
+Package: zabbix-server-pgsql
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
+Pre-Depends: debconf
+Recommends: postgresql, snmpd
+Suggests: zabbix-frontend-php, logrotate
+Conflicts: zabbix-server-mysql
+Description: network monitoring solution - server (using PostgreSQL)
+ Zabbix is a server/client network monitoring system with many features.
+ It can be used for:
+ .
+  - high level monitoring of IT services;
+  - centralized monitoring of your servers and applications;
+  - monitoring of SNMP-enabled devices;
+  - performance monitoring (process load, network activity, disk
+    activity, memory usage, OS parameters etc.);
+  - data visualization.
+ .
+ This package provides the software needed to integrate a host as a Zabbix
+ client. It collects information from Zabbix clients and stores it in a
+ PostgreSQL database back-end.
+
+Package: zabbix-frontend-php
+Architecture: all
+Depends: ${misc:Depends}, apache2 | httpd, php5, php5-mysql | php5-pgsql, php5-gd, ucf, dbconfig-common (>= 1.8.19), libjs-prototype (>= 1.6.0.3), libjs-scriptaculous (>= 1.8.2), ttf-dejavu-core
+Description: network monitoring solution - PHP front-end
+ Zabbix is a server/client network monitoring system with many features.
+ It can be used for:
+ .
+  - high level monitoring of IT services;
+  - centralized monitoring of your servers and applications;
+  - monitoring of SNMP-enabled devices;
+  - performance monitoring (process load, network activity, disk
+    activity, memory usage, OS parameters etc.);
+  - data visualization.
+ .
+ This package provides a web-browsable front-end to the Zabbix server, which
+ can display graphs of the data collected from clients.
+
+Package: zabbix-proxy-pgsql
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
+Recommends: postgresql
+Conflicts: zabbix-proxy-mysql
+Suggests: logrotate
+Description: network monitoring solution - proxy (using PostgreSQL)
+ Zabbix is a server/client network monitoring system with many features.
+ It can be used for:
+ .
+  - high level monitoring of IT services;
+  - centralized monitoring of your servers and applications;
+  - monitoring of SNMP-enabled devices;
+  - performance monitoring (process load, network activity, disk
+    activity, memory usage, OS parameters etc.);
+  - data visualization.
+ .
+ This package provides the software needed to integrate a host as a Zabbix
+ proxy. It collects information from Zabbix clients and passes it to a
+ server running a MySQL database back-end.
+
+Package: zabbix-proxy-mysql
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
+Recommends: mysql-server (>= 4.0.16-2)
+Suggests: logrotate
+Conflicts: zabbix-proxy-pgsql
+Description: network monitoring solution - proxy (using MySQL)
+ Zabbix is a server/client network monitoring system with many features.
+ It can be used for:
+ .
+  - high level monitoring of IT services;
+  - centralized monitoring of your servers and applications;
+  - monitoring of SNMP-enabled devices;
+  - performance monitoring (process load, network activity, disk
+    activity, memory usage, OS parameters etc.);
+  - data visualization.
+ .
+ This package provides the software needed to integrate a host as a Zabbix
+ proxy. It collects information from Zabbix clients and passes it to a
+ server running a PostgreSQL database back-end.

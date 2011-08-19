@@ -1,0 +1,9 @@
+/var/log/zabbix-agent/zabbix_agentd.log {
+    daily
+    rotate 7
+    compress
+    missingok
+    notifempty
+    create 0640 zabbix zabbix
+    sharedscripts
+}

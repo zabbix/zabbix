@@ -1,0 +1,13 @@
+Index: trunk/m4/netsnmp.m4
+===================================================================
+--- trunk.orig/m4/netsnmp.m4	2010-04-11 11:12:27.907343950 +0200
++++ trunk/m4/netsnmp.m4	2010-04-11 11:12:32.283687408 +0200
+@@ -58,7 +58,7 @@
+ 			esac
+ 		done
+ 
+-		_full_libnetsnmp_libs="`$_libnetsnmp_config --libs` -lcrypto"
++		_full_libnetsnmp_libs="`$_libnetsnmp_config --libs`"
+ 		for i in $_full_libnetsnmp_libs; do
+ 			case $i in
+ 				-l*)
