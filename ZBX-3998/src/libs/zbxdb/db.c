@@ -743,13 +743,11 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 			{
 				if (0 != mysql_field_count(conn))
 				{
-					ret += (int)mysql_affected_rows(conn);
-				}
-				else  /* some error occurred */
-				{
 					zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve result set");
 					break;
 				}
+				else
+					ret += (int)mysql_affected_rows(conn);
 
 				/* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
 				if (0 < (status = mysql_next_result(conn)))
