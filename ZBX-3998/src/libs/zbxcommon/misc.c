@@ -141,7 +141,7 @@ void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, si
 	}
 
 	for (
-		max_attempts = 10, size = MAX(size, 1), nmemb = MAX(nmemb, 1);
+		max_attempts = 10, nmemb = MAX(nmemb, 1), size = MAX(size, 1);
 		0 < max_attempts && NULL == ptr;
 		ptr = calloc(nmemb, size), max_attempts--
 	);
