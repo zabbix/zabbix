@@ -206,7 +206,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		trigger->value_flags = atoi(row[3]);
 		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
 		strscpy(trigger->error, row[4]);
-		memcpy(&trigger->timespec, ts, sizeof(trigger->timespec));
+		trigger->timespec = *ts;
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
 				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->new_value, reason,
