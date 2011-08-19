@@ -1,3 +1,9 @@
+zabbix (1:1.8.7rc1-1) testing-proposed-updates; urgency=high
+
+  * Bump version to 1.8.7rc1
+
+ -- Vladimir Levijev <vladimir.levijev@zabbix.com>  Fri, 19 Aug 2011 13:36:45 +0300
+
 zabbix (1:1.8.2-1squeeze2) testing-proposed-updates; urgency=high
 
   * Fixed database schema upgrade from Zabbix 1.4 (Lenny) to 1.8 (Squeeze)
