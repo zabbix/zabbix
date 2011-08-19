@@ -22,41 +22,44 @@
 
 #include "checks_aggregate.h"
 
-static int	evaluate_one(double *result, int *num, char *grpfunc, const char *value_str, unsigned char valuetype)
+#define ZBX_GRP_FUNC_MIN	0
+#define ZBX_GRP_FUNC_AVG	1
+#define ZBX_GRP_FUNC_MAX	2
+#define ZBX_GRP_FUNC_SUM	3
+
+static void	evaluate_one(double *result, int *num, int grp_func, const char *value, unsigned char value_type)
 {
-	int		ret = SUCCEED;
-	double		value = 0;
-	zbx_uint64_t	value_uint64;
+	double	value_float;
 
-	if (ITEM_VALUE_TYPE_FLOAT == valuetype)
-		value = atof(value_str);
-	else if (ITEM_VALUE_TYPE_UINT64 == valuetype)
+	switch (value_type)
 	{
-		ZBX_STR2UINT64(value_uint64, value_str);
-		value = (double)value_uint64;
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+			value_float = atof(value);
+			break;
+		default:
+			assert(0);
 	}
 
-	if (0 == strcmp(grpfunc, "grpavg") || 0 == strcmp(grpfunc, "grpsum"))
+	switch (grp_func)
 	{
-		*result += value;
-		*num += 1;
+		case ZBX_GRP_FUNC_AVG:
+		case ZBX_GRP_FUNC_SUM:
+			*result += value_float;
+			break;
+		case ZBX_GRP_FUNC_MIN:
+			if (0 == *num || value_float < *result)
+				*result = value_float;
+			break;
+		case ZBX_GRP_FUNC_MAX:
+			if (0 == *num || value_float > *result)
+				*result = value_float;
+			break;
+		default:
+			assert(0);
 	}
-	else if (0 == strcmp(grpfunc, "grpmax"))
-	{
-		if (0 == *num || value > *result)
-			*result = value;
-		*num += 1;
-	}
-	else if (0 == strcmp(grpfunc, "grpmin"))
-	{
-		if (0 == *num || value < *result)
-			*result = value;
-		*num += 1;
-	}
-	else
-		ret = FAIL;
 
-	return ret;
+	*num += 1;
 }
 
 /*
@@ -138,41 +141,68 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 {
 	const char	*__function_name = "evaluate_aggregate";
 	char		*sql = NULL;
-	int		sql_alloc = 1024, sql_offset;
-	zbx_uint64_t	*ids = NULL;
+	int		sql_alloc = 1024, sql_offset = 0;
+	zbx_uint64_t	itemid, *ids = NULL;
 	int		ids_alloc = 0, ids_num = 0;
 
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	unsigned char	valuetype;
+	unsigned char	value_type;
 	double		d = 0;
-	const char	*value;
 	int		num = 0;
-	int		now;
+	int		item_func, grp_func;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grpfunc:'%s' groups:'%s' itemkey:'%s' function:'%s(%s)'",
 			__function_name, grpfunc, groups, itemkey, itemfunc, param);
 
-	now = time(NULL);
+	if (0 == strcmp(grpfunc, "grpmin"))
+		grp_func = ZBX_GRP_FUNC_MIN;
+	else if (0 == strcmp(grpfunc, "grpavg"))
+		grp_func = ZBX_GRP_FUNC_AVG;
+	else if (0 == strcmp(grpfunc, "grpmax"))
+		grp_func = ZBX_GRP_FUNC_MAX;
+	else if (0 == strcmp(grpfunc, "grpsum"))
+		grp_func = ZBX_GRP_FUNC_SUM;
+	else
+	{
+		SET_MSG_RESULT(res, zbx_strdup(NULL, "unsupported group function"));
+		goto clean;
+	}
+
+	if (0 == strcmp(itemfunc, "min"))
+		item_func = ZBX_DB_GET_HIST_MIN;
+	else if (0 == strcmp(itemfunc, "avg"))
+		item_func = ZBX_DB_GET_HIST_AVG;
+	else if (0 == strcmp(itemfunc, "max"))
+		item_func = ZBX_DB_GET_HIST_MAX;
+	else if (0 == strcmp(itemfunc, "sum"))
+		item_func = ZBX_DB_GET_HIST_SUM;
+	else if (0 == strcmp(itemfunc, "count"))
+		item_func = ZBX_DB_GET_HIST_COUNT;
+	else if (0 == strcmp(itemfunc, "last"))
+		item_func = ZBX_DB_GET_HIST_VALUE;
+	else
+	{
+		SET_MSG_RESULT(res, zbx_strdup(NULL, "unsupported item function"));
+		goto clean;
+	}
 
 	aggregate_get_items(&ids, &ids_alloc, &ids_num, groups, itemkey);
 
 	if (0 == ids_num)
 	{
-		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No items for key [%s] in group(s) [%s]",
-				itemkey, groups));
+		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No items for key [%s] in group(s) [%s]", itemkey, groups));
 		goto clean;
 	}
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	if (0 == strcmp(itemfunc, "last"))
+	if (ZBX_DB_GET_HIST_VALUE == item_func)
 	{
-		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
-				"select itemid,value_type,lastvalue"
+				"select value_type,lastvalue"
 				" from items"
 				" where lastvalue is not null"
 					" and value_type in (%d,%d)"
@@ -184,94 +214,46 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			valuetype = (unsigned char)atoi(row[1]);
-			value = row[2];
+			value_type = (unsigned char)atoi(row[0]);
 
-			if (FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
-			{
-				SET_MSG_RESULT(res, strdup("Unsupported group function"));
-				DBfree_result(result);
-				goto clean;
-			}
-		}
-		DBfree_result(result);
-	}
-	else if (0 == strcmp(itemfunc, "avg") || 0 == strcmp(itemfunc, "count") ||
-			0 == strcmp(itemfunc, "max") || 0 == strcmp(itemfunc, "min") ||
-			0 == strcmp(itemfunc, "sum"))
-	{
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
-				"select i.itemid,i.value_type,%s(h.value)"
-				" from items i,history h"
-				" where h.itemid=i.itemid"
-					" and h.clock>%d"
-					" and i.value_type=%d"
-					" and",
-				itemfunc,
-				now - atoi(param),
-				ITEM_VALUE_TYPE_FLOAT);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", ids, ids_num);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-				" group by i.itemid,i.value_type");
-
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			valuetype = (unsigned char)atoi(row[1]);
-			value = row[2];
-
-			if (FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
-			{
-				SET_MSG_RESULT(res, strdup("Unsupported group function"));
-				DBfree_result(result);
-				goto clean;
-			}
-		}
-		DBfree_result(result);
-
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
-				"select i.itemid,i.value_type,%s(h.value)"
-				" from items i,history_uint h"
-				" where h.itemid=i.itemid"
-					" and h.clock>%d"
-					" and i.value_type=%d"
-					" and",
-				itemfunc,
-				now - atoi(param),
-				ITEM_VALUE_TYPE_UINT64);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", ids, ids_num);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-				" group by i.itemid,i.value_type");
-
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			valuetype = (unsigned char)atoi(row[1]);
-			value = row[2];
-
-			if (FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
-			{
-				SET_MSG_RESULT(res, strdup("Unsupported group function"));
-				DBfree_result(result);
-				goto clean;
-			}
+			evaluate_one(&d, &num, grp_func, row[1], value_type);
 		}
 		DBfree_result(result);
 	}
 	else
 	{
-		SET_MSG_RESULT(res, strdup("Unsupported item function"));
-		goto clean;
+		int	clock_from;
+		char	**h_value;
+
+		clock_from = time(NULL) - atoi(param);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				"select itemid,value_type"
+				" from items"
+				" where value_type in (%d,%d)"
+					" and",
+				ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids, ids_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(itemid, row[0]);
+			value_type = (unsigned char)atoi(row[1]);
+
+			h_value = DBget_history(itemid, value_type, item_func, clock_from, 0, NULL, NULL, 0);
+
+			if (NULL != h_value[0])
+				evaluate_one(&d, &num, grp_func, h_value[0], value_type);
+			DBfree_history(h_value);
+		}
+		DBfree_result(result);
 	}
 
 	if (0 == num)
 	{
-		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key [%s] in group [%s]",
-				itemkey, groups));
+		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key [%s] in group [%s]", itemkey, groups));
 		goto clean;
 	}
 

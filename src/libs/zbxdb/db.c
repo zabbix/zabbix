@@ -28,18 +28,18 @@ static int	txn_level = 0;
 static int	txn_init = 0;
 
 #if defined(HAVE_IBM_DB2)
-	zbx_ibm_db2_handle_t	ibm_db2;
+static zbx_ibm_db2_handle_t	ibm_db2;
 #elif defined(HAVE_MYSQL)
-	MYSQL		*conn = NULL;
+static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
-	zbx_oracle_db_handle_t	oracle;
+static zbx_oracle_db_handle_t	oracle;
 #elif defined(HAVE_POSTGRESQL)
-	PGconn		*conn = NULL;
-	static int	ZBX_PG_BYTEAOID = 0;
-	int		ZBX_PG_SVERSION = 0;
+static PGconn			*conn = NULL;
+static int			ZBX_PG_BYTEAOID = 0;
+int				ZBX_PG_SVERSION = 0;
 #elif defined(HAVE_SQLITE3)
-	sqlite3		*conn = NULL;
-	PHP_MUTEX	sqlite_access;
+static sqlite3			*conn = NULL;
+PHP_MUTEX			sqlite_access;
 #endif
 
 #if defined(HAVE_ORACLE)
@@ -743,7 +743,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 			{
 				if (0 != mysql_field_count(conn))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "Could not retrieve result set");
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve result set");
 					break;
 				}
 				else
@@ -1376,7 +1376,7 @@ int	IBM_DB2server_status()
 	if (SUCCEED != zbx_ibm_db2_success(SQLGetConnectAttr(ibm_db2.hdbc, SQL_ATTR_CONNECTION_DEAD,
 								&server_status, SQL_IS_POINTER, NULL)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Could not determine IBM DB2 server status, assuming not connected");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot determine IBM DB2 server status, assuming not connected");
 	}
 
 	return (SQL_CD_FALSE == server_status ? SQL_CD_TRUE : SQL_CD_FALSE);
@@ -1413,10 +1413,10 @@ ub4	OCI_DBserver_status()
 
 	err = OCIAttrGet((void *)oracle.srvhp, OCI_HTYPE_SERVER, (void *)&server_status,
 			(ub4 *)0, OCI_ATTR_SERVER_STATUS, (OCIError *)oracle.errhp);
-	
+
 	if (OCI_SUCCESS != err)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Could not determine Oracle server status, assuming not connected");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot determine Oracle server status, assuming not connected");
 	}
 
 	return server_status;
