@@ -72,6 +72,7 @@ class CIconMap extends CZBXAPI {
 			'searchByAny' => null,
 			'startSearch' => null,
 			'excludeSearch' => null,
+			'searchWildcardsEnabled' => null,
 // OutPut
 			'output' => API_OUTPUT_REFER,
 			'selectMappings' => null,
@@ -345,7 +346,7 @@ class CIconMap extends CZBXAPI {
 			}
 		}
 
-		$this->validateMappings($iconMaps);
+		$this->validateMappings($iconMaps, false);
 
 
 		$iconMapsUpd = API::IconMap()->get(array(
