@@ -686,12 +686,14 @@ zbx_script_t;
 #	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
-#define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
-#define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old, size)
-#define zbx_strdup(old, str)	zbx_strdup2(__FILE__, __LINE__, old, str)
+#define zbx_calloc(old, nmemb, size)	zbx_calloc2(__FILE__, __LINE__, old, nmemb, size)
+#define zbx_malloc(old, size)		zbx_malloc2(__FILE__, __LINE__, old, size)
+#define zbx_realloc(src, size)		zbx_realloc2(__FILE__, __LINE__, src, size)
+#define zbx_strdup(old, str)		zbx_strdup2(__FILE__, __LINE__, old, str)
 
 #define ZBX_STRDUP(var, str)	(var = zbx_strdup(var, str))
 
+void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size);
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
 void    *zbx_realloc2(const char *filename, int line, void *old, size_t size);
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
