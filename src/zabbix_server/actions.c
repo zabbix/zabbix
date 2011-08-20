@@ -1166,8 +1166,6 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
  *                                                                            *
  * Parameters: event - event to apply actions for                             *
  *                                                                            *
- * Return value: -                                                            *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: dependencies are checked in a different place                    *
@@ -1182,15 +1180,11 @@ void	process_actions(DB_EVENT *event)
 	zbx_uint64_t	actionid;
 	unsigned char	evaltype;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64,
-			__function_name, event->eventid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, event->eventid);
 
-	result = DBselect(
-			"select actionid,evaltype"
+	result = DBselect("select actionid,evaltype"
 			" from actions"
-			" where status=%d"
-				" and eventsource=%d"
-				DB_NODE,
+			" where status=%d and eventsource=%d" DB_NODE,
 			ACTION_STATUS_ACTIVE, event->source, DBnode_local("actionid"));
 
 	while (NULL != (row = DBfetch(result)))
