@@ -2121,13 +2121,7 @@ fail:
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_host,
@@ -2740,27 +2734,26 @@ error:
  *                                                                            *
  * Purpose: evaluate trigger expression                                       *
  *                                                                            *
- * Parameters: expression    - [IN] short trigger expression string           *
- *             triggerid     - [IN] trigger identificator from database       *
- *             trigger_value - [IN] current trigger value                     *
- *             error         - [OUT] place error message if any               *
- *             maxerrlen     - [IN] max length of error message               *
- *                                                                            *
- * Return value:  SUCCEED - evaluated successfully, result - value of the exp *
- *                FAIL - otherwise                                            *
- *                error - error message                                       *
+ * Parameters: triggerid     - [IN] trigger identificator from database       *
+ *             expression    - [IN] short trigger expression string           *
+ *             value         - [IN] current trigger value                     *
+ *                                  TRIGGER_VALUE_(FALSE or TRUE)             *
+ *             new_value     - [OUT] evaluated value                          *
+ *                                   TRIGGER_VALUE_(FALSE, TRUE or UNKNOWN)   *
+ *             new_error     - [OUT] place error message for UNKNOWN results  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_expression(int *result, char **expression, time_t now,
-		zbx_uint64_t triggerid, int trigger_value, char *error, int maxerrlen)
+void	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now, unsigned char value,
+		unsigned char *new_value, char **new_error)
 {
 	const char	*__function_name = "evaluate_expression";
 
 	DB_EVENT	event;
 	int		ret = FAIL;
-	double		value;
+	double		expr_result;
+	char		err[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
@@ -2768,30 +2761,37 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 	event.source = EVENT_SOURCE_TRIGGERS;
 	event.object = EVENT_OBJECT_TRIGGER;
 	event.objectid = triggerid;
-	event.value = trigger_value;
+	event.value = value;
 
-	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION,
-				error, maxerrlen))
+	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, expression,
+			MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 	{
 		zbx_remove_spaces(*expression);
 
-		if (SUCCEED == substitute_functions(expression, now, error, maxerrlen) &&
-				SUCCEED == evaluate(&value, *expression, error, maxerrlen))
+		if (SUCCEED == substitute_functions(expression, now, err, sizeof(err)) &&
+				SUCCEED == evaluate(&expr_result, *expression, err, sizeof(err)))
 		{
-			if (0 == cmp_double(value, 0))
-				*result = TRIGGER_VALUE_FALSE;
+			if (0 == cmp_double(expr_result, 0))
+				*new_value = TRIGGER_VALUE_FALSE;
 			else
-				*result = TRIGGER_VALUE_TRUE;
+				*new_value = TRIGGER_VALUE_TRUE;
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() result:%d", __function_name, *result);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() new_value:%d", __function_name, *new_value);
+
 			ret = SUCCEED;
-			goto out;
 		}
 	}
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return ret;
+	if (SUCCEED != ret)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s():expression [%s] cannot be evaluated: %s",
+				__function_name, expression, err);
+
+		*new_error = zbx_strdup(*new_error, err);
+		*new_value = TRIGGER_VALUE_UNKNOWN;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)

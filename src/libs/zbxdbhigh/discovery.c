@@ -28,28 +28,17 @@
  *                                                                            *
  * Purpose: generate UP/DOWN event if required                                *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_add_event(int object, zbx_uint64_t objectid, int now, int value)
 {
-	DB_EVENT	event;
+	zbx_timespec_t	ts;
 
-	memset(&event, 0, sizeof(DB_EVENT));
+	ts.sec = now;
+	ts.ns = 0;
 
-	event.source	= EVENT_SOURCE_DISCOVERY;
-	event.object	= object;
-	event.objectid	= objectid;
-	event.clock 	= now;
-	event.value 	= value;
-
-	process_event(&event, 1);
+	process_event(0, EVENT_SOURCE_DISCOVERY, object, objectid, &ts, value, TRIGGER_VALUE_CHANGED_NO, 0, 1);
 }
 
 static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)

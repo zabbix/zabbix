@@ -152,7 +152,7 @@ void	DCflush_nextchecks()
 	int			i;
 	zbx_uint64_t		*itemids = NULL;
 	zbx_timespec_t		*timespecs = NULL;
-	const char		**errors = NULL;
+	char			**errors = NULL;
 	zbx_hashset_t		trigger_info;
 	zbx_vector_ptr_t	trigger_order;
 
@@ -163,7 +163,7 @@ void	DCflush_nextchecks()
 
 	itemids = zbx_malloc(itemids, nextcheck_num * sizeof(zbx_uint64_t));
 	timespecs = zbx_malloc(timespecs, nextcheck_num * sizeof(zbx_timespec_t));
-	errors = zbx_malloc(errors, nextcheck_num * sizeof(const char *));
+	errors = zbx_malloc(errors, nextcheck_num * sizeof(char *));
 
 	for (i = 0; i < nextcheck_num; i++)
 	{
