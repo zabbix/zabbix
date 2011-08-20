@@ -195,6 +195,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.7rc1
 
+ - [ZBX-3998] reload recipient list for database down messages every CacheUpdateFrequency seconds (rudolfs)
  - [ZBX-4034] fixed macros resolving in item names (Vedmak)
  - [ZBX-4044] removed redundant query "SET CHARACTER SET" (asaveljevs,Vedmak)
  - [ZBX-3997] fixed IE9 dragging (Eduard)

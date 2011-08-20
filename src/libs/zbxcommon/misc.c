@@ -204,6 +204,47 @@ double	zbx_current_time()
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_calloc2                                                      *
+ *                                                                            *
+ * Purpose: allocates nmemb * size bytes of memory and fills it with zeros    *
+ *                                                                            *
+ * Return value: returns a pointer to the newly allocated memory              *
+ *                                                                            *
+ * Author: Eugene Grigorjev, Rudolfs Kreicbergs                               *
+ *                                                                            *
+ ******************************************************************************/
+void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
+{
+	int	max_attempts;
+	void	*ptr = NULL;
+
+	/* old pointer must be NULL */
+	if (NULL != old)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_calloc: allocating already allocated memory. "
+				"Please report this to Zabbix developers.",
+				filename, line);
+		/* exit if defined DEBUG, ignore otherwise */
+		zbx_dbg_assert(0);
+	}
+
+	for (
+		max_attempts = 10, nmemb = MAX(nmemb, 1), size = MAX(size, 1);
+		0 < max_attempts && NULL == ptr;
+		ptr = calloc(nmemb, size), max_attempts--
+	);
+
+	if (NULL != ptr)
+		return ptr;
+
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_calloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
+			filename, line, (zbx_fs_size_t)size);
+
+	exit(FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_malloc2                                                      *
  *                                                                            *
  * Purpose: allocates size bytes of memory                                    *

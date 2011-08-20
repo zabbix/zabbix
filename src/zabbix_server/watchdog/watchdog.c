@@ -25,10 +25,16 @@
 #include "zlog.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "zbxalgo.h"
 
 #include "../alerter/alerter.h"
 
 #include "watchdog.h"
+
+#define STR_REPLACE(str1, str2)	if (NULL == str1 || 0 != strcmp(str1, str2)) str1 = zbx_strdup(str1, str2)
+
+#define ALERT_FREQUENCY		15 * SEC_PER_MIN
+#define DB_PING_FREQUENCY	SEC_PER_MIN
 
 typedef struct
 {
@@ -37,14 +43,11 @@ typedef struct
 }
 ZBX_RECIPIENT;
 
-#define	ZBX_MAX_RECIPIENTS	32
-
-ZBX_RECIPIENT	recipients[ZBX_MAX_RECIPIENTS];
-
-static int	num = 0;
-static int	lastsent = 0;
+static zbx_vector_ptr_t	recipients;
+static int		lastsent = 0;
 
 extern unsigned char	process_type;
+extern int		CONFIG_CONFSYNCER_FREQUENCY;
 
 /******************************************************************************
  *                                                                            *
@@ -54,6 +57,8 @@ extern unsigned char	process_type;
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
+ * Comments: messages are sent only every ALERT_FREQUENCY seconds             *
+ *                                                                            *
  ******************************************************************************/
 static void	send_alerts()
 {
@@ -62,11 +67,12 @@ static void	send_alerts()
 
 	now = time(NULL);
 
-	if (now > lastsent + 15 * SEC_PER_MIN)
+	if (now > lastsent + ALERT_FREQUENCY)
 	{
-		for (i = 0; i < num; i++)
+		for (i = 0; i < recipients.values_num; i++)
 		{
-			execute_action(&recipients[i].alert, &recipients[i].mediatype, error, sizeof(error));
+			execute_action(&((ZBX_RECIPIENT *)recipients.values[i])->alert,
+					&((ZBX_RECIPIENT *)recipients.values[i])->mediatype, error, sizeof(error));
 		}
 
 		lastsent = now;
@@ -75,23 +81,26 @@ static void	send_alerts()
 
 /******************************************************************************
  *                                                                            *
- * Function: init_config                                                      *
+ * Function: sync_config                                                      *
  *                                                                            *
- * Purpose: init list of medias to send notifications in case if DB is down   *
+ * Purpose: sync list of medias to send notifications in case if DB is down   *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
-static void	init_config()
+static void	sync_config()
 {
-	const char	*__function_name = "init_config";
+	const char	*__function_name = "sync_config";
 
 	DB_RESULT	result;
 	DB_ROW		row;
+	ZBX_RECIPIENT	*recipient;
+	int		count = 0, old_count;
+	static int	no_recipients = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect(
+	result = DBselect_once(
 			"select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,"
 				"mt.smtp_helo,mt.smtp_email,mt.exec_path,mt.gsm_modem,"
 				"mt.username,mt.passwd,m.sendto"
@@ -102,98 +111,127 @@ static void	init_config()
 				" and m.active=%d",
 			MEDIA_STATUS_ACTIVE);
 
+	if (NULL == result || (DB_RESULT)ZBX_DB_DOWN == result)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "watchdog: database is down");
+		send_alerts();
+		goto exit;
+	}
+
+	old_count = recipients.values_num;
+
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (num >= ZBX_MAX_RECIPIENTS)
-			break;
+		/* add the recipients to the list */
 
-		memset(&recipients[num].mediatype, 0, sizeof(DB_MEDIATYPE));
-		memset(&recipients[num].alert, 0, sizeof(DB_ALERT));
+		if (count >= recipients.values_num)
+		{
+			recipient = zbx_calloc(NULL, 1, sizeof(ZBX_RECIPIENT));
+			zbx_vector_ptr_append(&recipients, recipient);
+		}
+		else
+			recipient = recipients.values[count];
 
-		ZBX_STR2UINT64(recipients[num].mediatype.mediatypeid, row[0]);
-		recipients[num].mediatype.type = atoi(row[1]);
-		recipients[num].mediatype.description = strdup(row[2]);
-		recipients[num].mediatype.smtp_server = strdup(row[3]);
-		recipients[num].mediatype.smtp_helo = strdup(row[4]);
-		recipients[num].mediatype.smtp_email = strdup(row[5]);
-		recipients[num].mediatype.exec_path = strdup(row[6]);
-		recipients[num].mediatype.gsm_modem = strdup(row[7]);
-		recipients[num].mediatype.username = strdup(row[8]);
-		recipients[num].mediatype.passwd = strdup(row[9]);
+		ZBX_STR2UINT64(recipient->mediatype.mediatypeid, row[0]);
+		recipient->mediatype.type = atoi(row[1]);
 
-		recipients[num].alert.sendto = strdup(row[10]);
-		recipients[num].alert.subject = strdup("Zabbix database is down.");
-		recipients[num].alert.message = strdup("Zabbix database is down.");
+		/* the recipients are likely to be the same, change only what's different */
 
-		num++;
+		STR_REPLACE(recipient->mediatype.description, row[2]);
+		STR_REPLACE(recipient->mediatype.smtp_server, row[3]);
+		STR_REPLACE(recipient->mediatype.smtp_helo, row[4]);
+		STR_REPLACE(recipient->mediatype.smtp_email, row[5]);
+		STR_REPLACE(recipient->mediatype.exec_path, row[6]);
+		STR_REPLACE(recipient->mediatype.gsm_modem, row[7]);
+		STR_REPLACE(recipient->mediatype.username, row[8]);
+		STR_REPLACE(recipient->mediatype.passwd, row[9]);
+
+		STR_REPLACE(recipient->alert.sendto, row[10]);
+
+		if (NULL == recipient->alert.subject)
+			recipient->alert.message = recipient->alert.subject = zbx_strdup(NULL, "Zabbix database is down.");
+
+		count++;
 	}
-
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: ping_database                                                    *
- *                                                                            *
- * Purpose: check availability of database                                    *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-static void	ping_database()
-{
-	const char	*__function_name = "ping_database";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (FAIL == DBping())	/* check whether a connection to the database can be made */
+	if (0 < old_count && 0 == count)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Watchdog: Database is down");
-		send_alerts();
+		zabbix_log(LOG_LEVEL_WARNING, "watchdog: no recipients found for database down messages");
+		no_recipients = 1;
 	}
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Watchdog: Database is up");
+	else if (1 == no_recipients && 0 < count)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "watchdog: %d recipient(s) found for database down messages", count);
+		no_recipients = 0;
+	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	recipients.values_num = count;
+
+	while (count < old_count)
+	{
+		/* some recipients have been deleted, free the older entries */
+
+		recipient = recipients.values[count++];
+
+		zbx_free(recipient->mediatype.description);
+		zbx_free(recipient->mediatype.smtp_server);
+		zbx_free(recipient->mediatype.smtp_helo);
+		zbx_free(recipient->mediatype.smtp_email);
+		zbx_free(recipient->mediatype.exec_path);
+		zbx_free(recipient->mediatype.gsm_modem);
+		zbx_free(recipient->mediatype.username);
+		zbx_free(recipient->mediatype.passwd);
+		zbx_free(recipient->alert.sendto);
+		zbx_free(recipient->alert.subject);
+
+		zbx_free(recipient);
+	}
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values_num:%d", __function_name, recipients.values_num);
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: main_watchdog_loop                                               *
  *                                                                            *
- * Purpose: periodically checks availability of database and alerts admins if *
- *          down                                                              *
+ * Purpose: check database availability every DB_PING_FREQUENCY seconds and   *
+ *          alert admins if it is down                                        *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: check database availability every 60 seconds (hardcoded)         *
+ * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
 void	main_watchdog_loop()
 {
+	int	now, nextsync = 0;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_watchdog_loop()");
 
 	/* disable writing to database in zabbix_syslog() */
 	CONFIG_ENABLE_LOG = 0;
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	zbx_setproctitle("%s [initializing]", get_process_type_string(process_type));
-
-	init_config();
-
-	DBclose();
+	zbx_vector_ptr_create(&recipients);
 
 	for (;;)
 	{
 		zbx_setproctitle("%s [pinging database]", get_process_type_string(process_type));
 
-		ping_database();
+		if (ZBX_DB_OK != DBconnect(ZBX_DB_CONNECT_ONCE))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "watchdog: database is down");
+			send_alerts();
+		}
+		else if (nextsync <= (now = (int)time(NULL)))
+		{
+			zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 
-		zbx_sleep_loop(SEC_PER_MIN);
+			sync_config();
+
+			nextsync = now + CONFIG_CONFSYNCER_FREQUENCY;
+		}
+
+		DBclose();
+
+		zbx_sleep_loop(DB_PING_FREQUENCY);
 	}
 }
