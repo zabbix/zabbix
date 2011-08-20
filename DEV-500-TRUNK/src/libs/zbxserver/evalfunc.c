@@ -111,12 +111,11 @@ clean:
 static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_LOGEVENTID";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		sql[128], *arg1 = NULL, *arg1_esc;
+	char		*arg1 = NULL, *arg1_esc;
 	int		res = FAIL;
 	ZBX_REGEXP	*regexps = NULL;
 	int		regexps_alloc = 0, regexps_num = 0;
+	char		**h_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -131,6 +130,9 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 
 	if ('@' == *arg1)
 	{
+		DB_RESULT	result;
+		DB_ROW		row;
+
 		arg1_esc = DBdyn_escape_string(arg1 + 1);
 		result = DBselect("select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 				" from regexps r,expressions e"
@@ -145,26 +147,20 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		DBfree_result(result);
 	}
 
-	zbx_snprintf(sql, sizeof(sql),
-			"select logeventid"
-			" from history_log"
-			" where itemid=" ZBX_FS_UI64
-			" order by id desc",
-			item->itemid);
+	h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, "logeventid", 1);
 
-	result = DBselectN(sql, 1);
-
-	if (NULL == (row = DBfetch(result)))
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGEVENTID is empty");
-	else
+	if (NULL != h_value[0])
 	{
-		if (SUCCEED == regexp_match_ex(regexps, regexps_num, row[0], arg1, ZBX_CASE_SENSITIVE))
+		if (SUCCEED == regexp_match_ex(regexps, regexps_num, h_value[0], arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 		res = SUCCEED;
 	}
-	DBfree_result(result);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
+	DBfree_history(h_value);
+
 	if ('@' == *arg1)
 		zbx_free(regexps);
 	zbx_free(arg1);
@@ -194,10 +190,9 @@ clean:
 static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_LOGSOURCE";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		sql[128], *arg1 = NULL;
+	char		*arg1 = NULL;
 	int		res = FAIL;
+	char		**h_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -210,26 +205,19 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 	if (FAIL == get_function_parameter_str(item->hostid, parameters, 1, &arg1))
 		goto clean;
 
-	zbx_snprintf(sql, sizeof(sql),
-			"select source"
-			" from history_log"
-			" where itemid=" ZBX_FS_UI64
-			" order by id desc",
-			item->itemid);
+	h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, "source", 1);
 
-	result = DBselectN(sql, 1);
-
-	if (NULL == (row = DBfetch(result)))
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSOURCE is empty");
-	else
+	if (NULL != h_value[0])
 	{
-		if (0 == strcmp(row[0], arg1))
+		if (0 == strcmp(h_value[0], arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 		res = SUCCEED;
 	}
-	DBfree_result(result);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSOURCE is empty");
+	DBfree_history(h_value);
 
 	zbx_free(arg1);
 clean:
@@ -258,33 +246,24 @@ clean:
 static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
 	const char	*__function_name = "evaluate_LOGSEVERITY";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		sql[128];
 	int		res = FAIL;
+	char		**h_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto clean;
 
-	zbx_snprintf(sql, sizeof(sql),
-			"select severity"
-			" from history_log"
-			" where itemid=" ZBX_FS_UI64
-			" order by id desc",
-			item->itemid);
+	h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, "severity", 1);
 
-	result = DBselectN(sql, 1);
-
-	if (NULL == (row = DBfetch(result)))
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSEVERITY is empty");
-	else
+	if (NULL != h_value[0])
 	{
-		zbx_strlcpy(value, row[0], MAX_BUFFER_LEN);
+		zbx_strlcpy(value, h_value[0], MAX_BUFFER_LEN);
 		res = SUCCEED;
 	}
-	DBfree_result(result);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSEVERITY is empty");
+	DBfree_history(h_value);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
