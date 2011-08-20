@@ -42,24 +42,17 @@ extern unsigned char	process_type;
  *                                                                            *
  * Purpose: re-calculate and update values of time-driven functions           *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	process_time_functions()
 {
 	const char		*__function_name = "process_time_functions";
-
-	int			i, value;
+	char			*sql = NULL;
+	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0, i;
 	DC_TRIGGER		*trigger;
 	DC_TRIGGER		*trigger_info = NULL;
 	zbx_vector_ptr_t	trigger_order;
-	char			error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -71,28 +64,48 @@ static void	process_time_functions()
 	{
 		DBbegin();
 
+		sql = zbx_malloc(sql, sql_alloc);
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
 		for (i = 0; i < trigger_order.values_num; i++)
 		{
 			trigger = (DC_TRIGGER *)trigger_order.values[i];
 
-			if (SUCCEED != evaluate_expression(&value, &trigger->expression, trigger->timespec.sec,
-						trigger->triggerid, trigger->value, error, sizeof(error)))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s",
-						trigger->expression, error);
+			evaluate_expression(trigger->triggerid, &trigger->expression, trigger->timespec.sec,
+					trigger->value, &trigger->new_value, &trigger->new_error);
 
-				DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value,
-						trigger->value_flags, trigger->old_error, trigger->value,
-						TRIGGER_VALUE_FLAG_UNKNOWN, &trigger->timespec, error);
-			}
-			else
+			if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
+					trigger->type, trigger->value, trigger->value_flags, trigger->error,
+					trigger->new_value, trigger->new_error, &trigger->timespec, &trigger->add_event,
+					&trigger->value_changed))
 			{
-				DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value,
-						trigger->value_flags, trigger->old_error, value,
-						TRIGGER_VALUE_FLAG_NORMAL, &trigger->timespec, NULL);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 			}
 
 			zbx_free(trigger->expression);
+			zbx_free(trigger->new_error);
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
+
+		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+			DBexecute("%s", sql);
+
+		zbx_free(sql);
+
+		for (i = 0; i < trigger_order.values_num; i++)
+		{
+			trigger = (DC_TRIGGER *)trigger_order.values[i];
+
+			if (1 != trigger->add_event)
+				continue;
+
+			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
 		}
 
 		DBcommit();
@@ -407,7 +420,10 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
 	int		value_before, value_inside, value_after;
-	DB_EVENT	event;
+	zbx_timespec_t	ts;
+
+	ts.sec = maintenance_to;
+	ts.ns = 0;
 
 	result = DBselect(
 			"select distinct t.triggerid"
@@ -431,17 +447,8 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		if (value_before == value_inside && value_inside == value_after)
 			continue;
 
-		/* preparing event for processing */
-		memset(&event, 0, sizeof(DB_EVENT));
-		event.source = EVENT_SOURCE_TRIGGERS;
-		event.object = EVENT_OBJECT_TRIGGER;
-		event.objectid = triggerid;
-		event.clock = maintenance_to;
-		event.ns = 0;
-		event.value = value_after;
-		event.value_changed = TRIGGER_VALUE_CHANGED_NO;
-
-		process_event(&event, 1);
+		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
+				&ts, value_after, TRIGGER_VALUE_CHANGED_NO, 0, 1);
 	}
 	DBfree_result(result);
 }

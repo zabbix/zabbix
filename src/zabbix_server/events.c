@@ -33,11 +33,7 @@
  *                                                                            *
  * Parameters: event - [IN] event data                                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	add_trigger_info(DB_EVENT *event)
@@ -91,47 +87,51 @@ static int	add_trigger_info(DB_EVENT *event)
  *                                                                            *
  * Parameters: event - event data (event.eventid - new event)                 *
  *                                                                            *
- * Return value: SUCCESS - event added                                        *
+ * Return value: SUCCEED - event added                                        *
+ *               FAIL    - event not added                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-int	process_event(DB_EVENT *event, int force_actions)
+int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid, const zbx_timespec_t *timespec,
+		int value, unsigned char value_changed, int acknowledged, int force_actions)
 {
 	const char	*__function_name = "process_event";
+	DB_EVENT	event;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64
-			" object:%d objectid:" ZBX_FS_UI64
-			" value:%d value_changed:%d",
-			__function_name, event->eventid, event->object,
-			event->objectid, event->value, event->value_changed);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64 " object:%d objectid:" ZBX_FS_UI64 " value:%d"
+			" value_changed:%d", __function_name, eventid, object, objectid, value, (int)value_changed);
 
-	if (TRIGGER_VALUE_CHANGED_YES == event->value_changed || 1 == force_actions)
-		if (SUCCEED != add_trigger_info(event))
+	/* preparing event for processing */
+	memset(&event, 0, sizeof(DB_EVENT));
+	event.eventid = eventid;
+	event.source = source;
+	event.object = object;
+	event.objectid = objectid;
+	event.clock = timespec->sec;
+	event.ns = timespec->ns;
+	event.value = value;
+	event.value_changed = value_changed;
+	event.acknowledged = acknowledged;
+
+	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed || 1 == force_actions)
+		if (SUCCEED != add_trigger_info(&event))
 			goto fail;
 
-	if (0 == event->eventid)
-		event->eventid = DBget_maxid("events");
+	if (0 == event.eventid)
+		event.eventid = DBget_maxid("events");
 
 	DBexecute("insert into events (eventid,source,object,objectid,clock,ns,value,value_changed)"
 			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d,%d)",
-			event->eventid,
-			event->source,
-			event->object,
-			event->objectid,
-			event->clock,
-			event->ns,
-			event->value,
-			event->value_changed);
+			event.eventid, event.source, event.object, event.objectid, event.clock, event.ns,
+			event.value, (int)event.value_changed);
 
-	if (TRIGGER_VALUE_CHANGED_YES == event->value_changed || 1 == force_actions)
-		process_actions(event);
+	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed || 1 == force_actions)
+		process_actions(&event);
 
-	if (TRIGGER_VALUE_CHANGED_YES == event->value_changed && EVENT_OBJECT_TRIGGER == event->object)
-		DBupdate_services(event->objectid, TRIGGER_VALUE_TRUE == event->value ? event->trigger.priority : 0, event->clock);
+	if (TRIGGER_VALUE_CHANGED_YES == event.value_changed && EVENT_OBJECT_TRIGGER == event.object)
+		DBupdate_services(event.objectid, TRIGGER_VALUE_TRUE == event.value ? event.trigger.priority : 0, event.clock);
 
 	ret = SUCCEED;
 fail:

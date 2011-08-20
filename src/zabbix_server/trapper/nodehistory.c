@@ -160,29 +160,27 @@ fail:
  *                                                                            *
  * Purpose: process record update                                             *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *table, const char *record)
 {
 	const char	*r;
-	int		f;
-	DB_EVENT	event;
+	int		f, source = 0, object = 0, value = 0, acknowledged = 0;
+	unsigned char	value_changed = 0;
+	zbx_uint64_t	eventid = 0, objectid = 0;
+	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_record_event()");
 
-	memset(&event, 0, sizeof(event));
-
+	ts.sec = 0;
+	ts.ns = 0;
 	r = record;
 
-	for (f = 0; table->fields[f].name != 0; f++)
+	for (f = 0; NULL != table->fields[f].name; f++)
 	{
 		if (NULL == r)
 			goto error;
@@ -190,32 +188,29 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 		zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 
 		if (0 == strcmp(table->fields[f].name, "eventid"))
-			ZBX_STR2UINT64(event.eventid, buffer);
+			ZBX_STR2UINT64(eventid, buffer);
 		else if (0 == strcmp(table->fields[f].name, "source"))
-			event.source = atoi(buffer);
+			source = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "object"))
-			event.object = atoi(buffer);
+			object = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "objectid"))
-			ZBX_STR2UINT64(event.objectid, buffer);
+			ZBX_STR2UINT64(objectid, buffer);
 		else if (0 == strcmp(table->fields[f].name, "clock"))
-			event.clock = atoi(buffer);
-		else if (0 == strcmp(table->fields[f].name, "value"))
-			event.value = atoi(buffer);
-		else if (0 == strcmp(table->fields[f].name, "value_changed"))
-			event.value_changed = atoi(buffer);
-		else if (0 == strcmp(table->fields[f].name, "acknowledged"))
-			event.acknowledged = atoi(buffer);
+			ts.sec = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "ns"))
-			event.ns = atoi(buffer);
+			ts.ns = atoi(buffer);
+		else if (0 == strcmp(table->fields[f].name, "value"))
+			value = atoi(buffer);
+		else if (0 == strcmp(table->fields[f].name, "value_changed"))
+			value_changed = (unsigned char)atoi(buffer);
+		else if (0 == strcmp(table->fields[f].name, "acknowledged"))
+			acknowledged = atoi(buffer);
 	}
 
-	return process_event(&event, 0);
+	return process_event(eventid, source, object, objectid, &ts, value, value_changed, acknowledged, 0);
 error:
-	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
-		CONFIG_NODEID,
-		sender_nodeid,
-		nodeid,
-		record);
+	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
+			CONFIG_NODEID, sender_nodeid, nodeid, record);
 
 	return FAIL;
 }
@@ -272,7 +267,7 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 	if (*sql_offset == 0)
 	{
 #ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "begin\n");
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 7, "begin\n");
 #endif
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -348,7 +343,7 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 	if (lastrecord || *sql_offset > ZBX_MAX_SQL_SIZE)
 	{
 #ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "end;\n");
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 6, "end;\n");
 #endif
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -405,7 +400,7 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 	if (*sql_offset == 0)
 	{
 #ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "begin\n");
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 7, "begin\n");
 #endif
 	}
 
@@ -474,7 +469,7 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 	if (lastrecord || *sql_offset > ZBX_MAX_SQL_SIZE)
 	{
 #ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "end;\n");
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 6, "end;\n");
 #endif
 		if (DBexecute("%s", *sql) >= ZBX_DB_OK)
 			res = SUCCEED;

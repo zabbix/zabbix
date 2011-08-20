@@ -203,6 +203,7 @@ Changes for 1.8.7rc1
  - [ZBX-4036] fixed period slider position saving in Monitoring->Events (Eduard)
  - [ZBX-1010] fixed processing of a vfs.fs.size metric on Solaris with filesystems larger than 2TB (Sasha)
  - [ZBX-3874] always enable all trigger severity checkboxes after enabling GUI Messaging in user profile (Eduard)
+ - [ZBX-3889] fixed deadlocks while processing triggers (Sasha)
  - [ZBX-4023] fixed excess spacing and fake plural in graph deletion message (Richlv)
  - [ZBX-4016] fixed web monitoring item status on insert and update (Eduard)
  - [ZBX-3443] fixed "not selected" working as "all" in Monitoring->Events (Eduard)
