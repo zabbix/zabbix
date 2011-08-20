@@ -169,8 +169,8 @@ fail:
 static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *table, const char *record)
 {
 	const char	*r;
-	int		f, source, object, clock, value, acknowledged;
-	zbx_uint64_t	eventid, objectid;
+	int		f, source = 0, object = 0, clock = 0, value = 0, acknowledged = 0;
+	zbx_uint64_t	eventid = 0, objectid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_record_event()");
 
