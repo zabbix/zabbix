@@ -207,14 +207,14 @@ retry:
 		}
 
 		if (WIFEXITED(status))
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() exited, status:%d", __function_name, WEXITSTATUS(status));
+			zabbix_log(LOG_LEVEL_ERR, "%s() exited, status:%d", __function_name, WEXITSTATUS(status));
 		else if (WIFSIGNALED(status))
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() killed by signal %d", __function_name, WTERMSIG(status));
+			zabbix_log(LOG_LEVEL_ERR, "%s() killed by signal %d", __function_name, WTERMSIG(status));
 		else if (WIFSTOPPED(status))
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() stopped by signal %d", __function_name, WSTOPSIG(status));
+			zabbix_log(LOG_LEVEL_ERR, "%s() stopped by signal %d", __function_name, WSTOPSIG(status));
 #ifdef WIFCONTINUED
 		else if (WIFCONTINUED(status))
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() continued", __function_name);
+			zabbix_log(LOG_LEVEL_ERR, "%s() continued", __function_name);
 #endif
 	}
 	while (!WIFEXITED(status) && !WIFSIGNALED(status));
@@ -406,23 +406,33 @@ close:
 					break;
 			}
 
+			if (-1 == rc && EINTR == errno)
+				ret = TIMEOUT_ERROR;
+
 			*p = '\0';
 		}
-if (-1 == rc)
-	zabbix_log(LOG_LEVEL_ERR, "read() failed: %s", zbx_strerror(errno));
 
 		close(fd);
 
 		if (-1 == rc || -1 == zbx_waitpid(pid))
 		{
-			if (EINTR == errno)
-				ret = TIMEOUT_ERROR;
-			else
+			struct stat	st;
+			char		proc[MAX_STRING_LEN];
+
+			zbx_snprintf(proc, sizeof(proc), "/proc/%d", pid);
+
+			if (TIMEOUT_ERROR != ret)
 				zbx_snprintf(error, max_error_len, "zbx_waitpid() failed: %s", zbx_strerror(errno));
+
+			if (0 != stat(proc, &st))
+				zabbix_log(LOG_LEVEL_ERR, "1: '%s' is not present", proc);
 
 			/* kill the whole process group, pid must be the leader */
 			if (-1 == kill(-pid, SIGTERM))
-				zabbix_log(LOG_LEVEL_ERR, "failed to kill [%s]: %s", command, zbx_strerror(errno));
+				zabbix_log(LOG_LEVEL_ERR, "failed to kill [%s] (pid:%d): %s", command, pid, zbx_strerror(errno));
+
+			if (0 != stat(proc, &st))
+				zabbix_log(LOG_LEVEL_ERR, "2: '%s' is not present", proc);
 
 			zbx_waitpid(pid);
 		}
