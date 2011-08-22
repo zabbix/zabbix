@@ -2084,6 +2084,7 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 
 	if (ZBX_DB_GET_HIST_VALUE == function)
 		h_alloc = (0 == last_n ? 128 : last_n);
+
 	h_value = zbx_malloc(h_value, (h_alloc + 1) * sizeof(char *));
 retry:
 	switch (function)
@@ -2109,6 +2110,7 @@ retry:
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
 			get_table_by_value_type(value_type), itemid);
+
 	if (NULL == ts)
 	{
 		if (0 != clock_from)
@@ -2143,6 +2145,7 @@ retry:
 		else if (0 != retry)
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 					" order by itemid,clock desc,ns desc");
+
 		result = DBselectN(sql, last_n);
 	}
 	else
@@ -2168,7 +2171,7 @@ retry:
 
 	h_value[h_num] = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() h_num:%d", __function_name, h_num);
 
 	return h_value;
 }
