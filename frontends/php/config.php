@@ -34,34 +34,34 @@ include_once('include/page_header.php');
 <?php
 	$fields=array(
 		// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-		'config'=>				array(T_ZBX_INT, O_OPT,	null,	IN('0,3,5,6,7,8,9,10,11,12,13'),	null),
+		'config'=>					array(T_ZBX_INT, O_OPT,	null,	IN('0,3,5,6,7,8,9,10,11,12,13'),	null),
 		// other form
-		'alert_history'=>		array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
-		'event_history'=>		array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
-		'work_period'=>			array(T_ZBX_STR, O_NO,	null,	null,			'isset({config})&&({config}==7)&&isset({save})'),
-		'refresh_unsupported'=>	array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==5)&&isset({save})'),
-		'alert_usrgrpid'=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,			'isset({config})&&({config}==5)&&isset({save})'),
-		'discovery_groupid'=>	array(T_ZBX_INT, O_NO,	null,	DB_ID,			'isset({config})&&({config}==5)&&isset({save})'),
+		'alert_history'=>			array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
+		'event_history'=>			array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
+		'work_period'=>				array(T_ZBX_STR, O_NO,	null,	null,				'isset({config})&&({config}==7)&&isset({save})'),
+		'refresh_unsupported'=>		array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==5)&&isset({save})'),
+		'alert_usrgrpid'=>			array(T_ZBX_INT, O_NO,	null,	DB_ID,				'isset({config})&&({config}==5)&&isset({save})'),
+		'discovery_groupid'=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,				'isset({config})&&({config}==5)&&isset({save})'),
 
 		// image form
-		'imageid'=>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==3)&&(isset({form})&&({form}=="update"))'),
-		'name'=>				array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,		'isset({config})&&({config}==3)&&isset({save})'),
-		'imagetype'=>			array(T_ZBX_INT, O_OPT,	null,	IN('1,2'),		'isset({config})&&({config}==3)&&(isset({save}))'),
+		'imageid'=>					array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==3)&&(isset({form})&&({form}=="update"))'),
+		'name'=>					array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,		'isset({config})&&({config}==3)&&isset({save})'),
+		'imagetype'=>				array(T_ZBX_INT, O_OPT,	null,	IN('1,2'),		'isset({config})&&({config}==3)&&(isset({save}))'),
 
 		// value mapping
-		'valuemapid'=>			array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==6)&&(isset({form})&&({form}=="update"))'),
-		'mapname'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 		'isset({config})&&({config}==6)&&isset({save})'),
-		'valuemap'=>			array(T_ZBX_STR, O_OPT,	null,	null,	null),
-		'rem_value'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535), null),
-		'add_value'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({add_map})'),
-		'add_newvalue'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({add_map})'),
+		'valuemapid'=>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==6)&&(isset({form})&&({form}=="update"))'),
+		'mapname'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 		'isset({config})&&({config}==6)&&isset({save})'),
+		'valuemap'=>				array(T_ZBX_STR, O_OPT,	null,	null,	null),
+		'rem_value'=>				array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535), null),
+		'add_value'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({add_map})'),
+		'add_newvalue'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({add_map})'),
 
 		// actions
-		'add_map'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'del_map'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'add_map'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'del_map'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'delete'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
 		// GUI
 		'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
@@ -73,22 +73,22 @@ include_once('include/page_header.php');
 		'search_limit' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,999999),	'isset({config})&&({config}==8)&&isset({save})'),
 
 		// Macros
-		'macros_rem'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
-		'macro_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
-		'value_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
-		'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'macros_rem'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'macros'=>					array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
+		'macro_new'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
+		'value_new'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
+		'macro_add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'macros_del' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
 		// Themes
-		'default_theme'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,			'isset({config})&&({config}==9)&&isset({save})'),
+		'default_theme'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,			'isset({config})&&({config}==9)&&isset({save})'),
 
 		// regexp
-		'regexpids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-		'regexpid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({config})&&({config}==10)&&(isset({form})&&({form}=="update"))'),
-		'rename'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==10)&&isset({save})', S_NAME),
-		'test_string'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==10)&&isset({save})', S_TEST_STRING),
-		'delete_regexp'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
+		'regexpids'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+		'regexpid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({config})&&({config}==10)&&(isset({form})&&({form}=="update"))'),
+		'rename'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', S_NAME),
+		'test_string'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', S_TEST_STRING),
+		'delete_regexp'=>			array(T_ZBX_STR, O_OPT,	null,	null,		null),
 
 		'g_expressionid'=>			array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'expressions'=>				array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==10)&&isset({save})'),
@@ -1050,130 +1050,31 @@ include_once('include/page_header.php');
 //  config = 10 // Regular Expressions  //
 //////////////////////////////////////////
 	elseif($_REQUEST['config'] == 10){
+		$data = array();
+
 		if(isset($_REQUEST['form'])){
+			$data['form'] = get_request('form', 1);
+			$data['form_refresh'] = get_request('form_refresh', 0) + 1;
 
-			$frmRegExp = new CForm('post','config.php');
-			$frmRegExp->setName(S_REGULAR_EXPRESSION);
-			$frmRegExp->addVar('form', get_request('form', 1));
-
-			$from_rfr = get_request('form_refresh', 0);
-			$frmRegExp->addVar('form_refresh', $from_rfr+1);
-			$frmRegExp->addVar('config', get_request('config', 10));
-
-			if(isset($_REQUEST['regexpid']))
-				$frmRegExp->addVar('regexpid', $_REQUEST['regexpid']);
-
-			$left_tab = new CTable();
-
-			$left_tab->addRow(create_hat(
-					S_REGULAR_EXPRESSION,
-					get_regexp_form(),//null,
-					null,
-					'hat_regexp'
-					//CProfile::get('web.config.hats.hat_regexp.state',1)
-				));
-
-			$right_tab = new CTable();
-
-			$right_tab->addRow(create_hat(
-					S_EXPRESSIONS,
-					get_expressions_tab(),//null,
-					null,
-					'hat_expressions'
-				));
-
-			if(isset($_REQUEST['new_expression'])){
-				$right_tab->addRow(create_hat(
-						S_NEW_EXPRESSION,
-						get_expression_form(),//null
-						null,
-						'hat_new_expression'
-					));
-			}
-
-
-			$td_l = new CCol($left_tab);
-			$td_l->setAttribute('valign','top');
-
-			$td_r = new CCol($right_tab);
-			$td_r->setAttribute('valign','top');
-
-			$outer_table = new CTable();
-			$outer_table->addRow(array($td_l,$td_r));
-
-			$frmRegExp->additem($outer_table);
-
-			show_messages();
-
-			$cnf_wdgt->addItem($frmRegExp);
+			$regExpForm = new CView('administration.general.regularexpressions.edit', $data);
+			$cnf_wdgt->addItem($regExpForm->render());
 		}
 		else{
-			$cnf_wdgt->addItem(BR());
+			$data['cnf_wdgt'] = &$cnf_wdgt;
+			$data['regexps'] = array();
+			$data['regexpids'] = array();
 
-			$cnf_wdgt->addHeader(S_REGULAR_EXPRESSIONS);
-// ----
-			$regexps = array();
-			$regexpids = array();
-
-			$sql = 'SELECT re.* '.
-					' FROM regexps re '.
-					' WHERE '.DBin_node('re.regexpid').
-					' ORDER BY re.name';
-
-			$db_regexps = DBselect($sql);
+			$db_regexps = DBselect('SELECT re.* FROM regexps re WHERE '.DBin_node('re.regexpid').' ORDER BY re.name');
 			while($regexp = DBfetch($db_regexps)){
 				$regexp['expressions'] = array();
-
-				$regexps[$regexp['regexpid']] = $regexp;
-				$regexpids[$regexp['regexpid']] = $regexp['regexpid'];
+				$data['regexps'][$regexp['regexpid']] = $regexp;
+				$data['regexpids'][$regexp['regexpid']] = $regexp['regexpid'];
 			}
 
-			$count = array();
-			$expressions = array();
-			$sql = 'SELECT e.* '.
-					' FROM expressions e '.
-					' WHERE '.DBin_node('e.expressionid').
-						' AND '.DBcondition('e.regexpid',$regexpids).
-					' ORDER BY e.expression_type';
+			$data['db_exps'] = DBfetchArray(DBselect('SELECT e.* FROM expressions e WHERE '.DBin_node('e.expressionid').' AND '.DBcondition('e.regexpid', $data['regexpids']).' ORDER BY e.expression_type'));
 
-			$db_exps = DBselect($sql);
-			while($exp = DBfetch($db_exps)){
-				if(!isset($expressions[$exp['regexpid']])) $count[$exp['regexpid']] = 1;
-				else $count[$exp['regexpid']]++;
-
-				if(!isset($expressions[$exp['regexpid']])) $expressions[$exp['regexpid']] = new CTable();
-
-				$expressions[$exp['regexpid']]->addRow(array($count[$exp['regexpid']], ' &raquo; ', $exp['expression'],' ['.expression_type2str($exp['expression_type']).']'));
-
-				$regexp[$exp['regexpid']]['expressions'][$exp['expressionid']] = $exp;
-			}
-
-			$form = new CForm();
-			$form->setName('regexp');
-
-			$table = new CTableInfo();
-			$table->setHeader(array(
-				new CCheckBox('all_regexps',null,"checkAll('".$form->GetName()."','all_regexps','regexpids');"),
-				S_NAME,
-				S_EXPRESSIONS
-				));
-
-			foreach($regexps as $regexpid => $regexp){
-
-				$table->addRow(array(
-					new CCheckBox('regexpids['.$regexp['regexpid'].']',null,null,$regexp['regexpid']),
-					new CLink($regexp['name'],'config.php?form=update'.url_param('config').'&regexpid='.$regexp['regexpid'].'#form'),
-					isset($expressions[$regexpid])?$expressions[$regexpid]:'-'
-					));
-			}
-
-			$table->setFooter(new CCol(array(
-				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_REGULAR_EXPRESSIONS_Q)
-			)));
-
-			$form->addItem($table);
-
-			$cnf_wdgt->addItem($form);
+			$regExpForm = new CView('administration.general.regularexpressions.list', $data);
+			$cnf_wdgt->addItem($regExpForm->render());
 		}
 	}
 /////////////////////////////

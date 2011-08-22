@@ -393,23 +393,16 @@
 	'S_EZ_TEXTING_CANADA' => _('Canada (136 characters)'),
 	'S_MESSAGE_TEXT_LIMIT' => _('Message text limit'),
 
-	'S_REGULAR_EXPRESSIONS'=>			_('Regular expressions'),
 	'S_REGULAR_EXPRESSION'=>			_('Regular expression'),
-	'S_EXPRESSIONS'=>				_('Expressions'),
 	'S_EXPRESSION'=>				_('Expression'),
 
-	'S_EXPECTED_RESULT'=>				_('Expected result'),
 	'S_CHARACTER_STRING_INCLUDED'=>			_('Character string included'),
 	'S_ANY_CHARACTER_STRING_INCLUDED'=>		_('Any character string included'),
 	'S_CHARACTER_STRING_NOT_INCLUDED'=>		_('Character string not included'),
 	'S_RESULT_IS_TRUE'=>				_('Result is TRUE'),
 	'S_RESULT_IS_FALSE'=>				_('Result is FALSE'),
 
-	'S_EXPRESSION_TYPE'=>				_('Expression type'),
-	'S_NEW_EXPRESSION'=>				_('New expression'),
-	'S_CASE_SENSITIVE'=>				_('Case sensitive'),
 	'S_TEST'=>					_('Test'),
-	'S_DELIMITER'=>					_('Delimiter'),
 	'S_TEST_STRING'=>				_('Test string'),
 	'S_INCORRECT_EXPRESSION'=>			_('Incorrect expression'),
 
@@ -423,7 +416,6 @@
 	'S_CANNOT_DELETE_REGULAR_EXPRESSION'=>		_('Cannot delete regular expression'),
 
 	'S_DELETE_REGULAR_EXPRESSION_Q'=>		_('Delete regular expression?'),
-	'S_DELETE_SELECTED_REGULAR_EXPRESSIONS_Q'=>	_('Delete selected regular expressions?'),
 
 	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		_('Value maps are used to create a mapping between numeric values and string representations'),
 
