@@ -238,8 +238,7 @@ include_once('include/page_header.php');
 			' FROM applications a, hosts h '.$sql_from.
 			' WHERE a.hostid=h.hostid'.
 				$sql_where.
-				' AND '.DBcondition('h.hostid',$available_hosts).
-				' AND h.status='.HOST_STATUS_MONITORED.
+				' AND '.DBcondition('h.hostid', $available_hosts).
 			order_by('h.host,h.hostid','a.name,a.applicationid');
 
 	$db_app_res = DBselect($sql);
@@ -310,7 +309,7 @@ include_once('include/page_header.php');
 			$actions = new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
 		}
 
-		$item_status = $db_item['status'] == 3 ? 'unknown' : null;
+		$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;
 
 		array_push($app_rows, new CRow(array(
 			SPACE,
@@ -387,9 +386,6 @@ include_once('include/page_header.php');
 			' WHERE ia.itemid is NULL '.
 				$sql_where.
 				' AND h.hostid=i.hostid '.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND i.lastvalue IS NOT NULL '.
-				' AND (i.status='.ITEM_STATUS_ACTIVE. ' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
 				' AND '.DBcondition('h.hostid',$available_hosts).
 			' ORDER BY h.host';
 
@@ -410,7 +406,6 @@ include_once('include/page_header.php');
 			' WHERE ia.itemid is NULL '.
 				$sql_where.
 				' AND h.hostid=i.hostid '.
-				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND i.lastvalue IS NOT NULL '.
 				' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
 				' AND '.DBcondition('h.hostid', $db_hostids).
@@ -471,7 +466,7 @@ include_once('include/page_header.php');
 			$actions = new CLink(S_HISTORY, 'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
 		}
 
-		$item_status = $db_item['status'] == 3 ? 'unknown' : null;
+		$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;
 
 		array_push($app_rows, new CRow(array(
 			SPACE,
