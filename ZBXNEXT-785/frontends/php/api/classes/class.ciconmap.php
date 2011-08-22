@@ -517,7 +517,11 @@ class CIconMap extends CZBXAPI {
 		));
 
 		foreach ($iconMaps as $iconMap) {
-			if (!isset($iconMap['mappings']) || empty($iconMap['mappings'])) {
+			if (isset($iconMap['mappings']) && empty($iconMap['mappings'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Icon map "%s" must have at least one mapping.', $iconMap['name']));
+			}
+			elseif (!isset($iconMap['mappings'])) {
 				if ($mustExist) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Icon map "%s" must have at least one mapping.', $iconMap['name']));

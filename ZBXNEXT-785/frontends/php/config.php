@@ -695,12 +695,18 @@ elseif (($_REQUEST['config'] == 13) && (isset($_REQUEST['save']))) {
 }
 elseif ($_REQUEST['config'] == 14) {
 	if (isset($_REQUEST['save'])) {
+
+		$_REQUEST['iconmap']['mappings'] = isset($_REQUEST['iconmap']['mappings'])
+			? $_REQUEST['iconmap']['mappings']
+			: array();
+
 		$i = 0;
 		foreach ($_REQUEST['iconmap']['mappings'] as $iconmappingid => &$mapping) {
 			$mapping['iconmappingid'] = $iconmappingid;
 			$mapping['sortorder'] = $i++;
 		}
 		unset($mapping);
+
 
 		if (isset($_REQUEST['iconmapid'])) {
 			$_REQUEST['iconmap']['iconmapid'] = $_REQUEST['iconmapid'];
