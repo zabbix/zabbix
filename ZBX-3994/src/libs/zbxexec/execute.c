@@ -141,27 +141,29 @@ static int	zbx_popen(pid_t *pid, const char *command)
 		return fd[0];
 	}
 
+	zabbix_log(LOG_LEVEL_ERR, "\tchild has started");
+
 	/* child process */
 	close(fd[0]);
 	if (-1 == dup2(fd[1], STDOUT_FILENO))
-		zabbix_log(LOG_LEVEL_ERR, "dup2() failed: %s", zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_ERR, "\tdup2() failed: %s", zbx_strerror(errno));
 
 	close(fd[1]);
 
 	/* set the child as the process group leader, otherwise orphans may be left after timeout */
 	if (-1 == setpgid(0, 0))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to create a process group: %s",
+		zabbix_log(LOG_LEVEL_ERR, "\t%s(): failed to create a process group: %s",
 				__function_name, zbx_strerror(errno));
 		exit(0);
 	}
 
-	zabbix_log(LOG_LEVEL_ERR, "%s(): executing script, parent:%d [%s]", __function_name, getppid(), command);
+	zabbix_log(LOG_LEVEL_ERR, "\t%s(): executing script, parent:%d [%s]", __function_name, getppid(), command);
 
 	execl("/bin/sh", "sh", "-c", command, NULL);
 
 	/* execl() returns only when an error occurs */
-	zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));
+	zabbix_log(LOG_LEVEL_WARNING, "\texecl() failed for [%s]: %s", command, zbx_strerror(errno));
 	exit(0);
 }
 
