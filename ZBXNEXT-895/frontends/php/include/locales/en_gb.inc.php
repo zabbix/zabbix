@@ -1659,8 +1659,6 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>_('Unnecessary symbols detected'),
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>_('Not allowed symbols detected after element'),
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>_('Not allowed symbols detected before element'),
-	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>_('Are you sure you want to delete'),
-	'S_MACROS_ES'=>_('macro(s)'),
 
 //	popup_link_tr.php
 	'S_EDIT_CONNECTOR'=>			_('Edit connector'),

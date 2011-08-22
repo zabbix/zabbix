@@ -1180,13 +1180,24 @@ include_once('include/page_header.php');
 //  config = 11 // Macros  //
 /////////////////////////////
 	elseif($_REQUEST['config'] == 11){
-		$form = new CForm();
-		$tbl = new CTable();
-		$tbl->addRow(get_macros_widget());
-		$tbl->addStyle('width: 50%;');
-		$tbl->addStyle('margin: 0 auto;');
-		$form->addItem($tbl);
-		$cnf_wdgt->addItem($form);
+		$data = array();
+		$data['form'] = get_request('form', 1);
+		$data['form_refresh'] = get_request('form_refresh', 0);
+		$data['macros'] = array();
+
+		if ($data['form_refresh']) {
+			$data['macros'] = get_request('macros', array());
+		}
+		else {
+			$data['macros'] = API::UserMacro()->get(array('output' => API_OUTPUT_EXTEND, 'globalmacro' => 1));
+			order_result($data['macros'], 'macro');
+		}
+		if (empty($data['macros'])) {
+			$data['macros'] = array(0 => array('macro' => '', 'value' => ''));
+		}
+
+		$macrosForm = new CView('administration.general.macros.edit', $data);
+		$cnf_wdgt->addItem($macrosForm->render());
 	}
 /////////////////////////////////////////
 //  config = 12 // Trigger severities  //
