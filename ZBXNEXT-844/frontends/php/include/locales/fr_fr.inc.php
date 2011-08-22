@@ -1890,7 +1890,6 @@
 	'S_NO_HOST_GROUPS_WITH'=>			'Pas de groupe d\'hôte avec',
 	'S_INCORRECT_PARAMETERS_FOR_SMALL'=>			'paramètres incorrects pour',
 	'S_NO_HOST_WITH'=>			'Pas d\'hôte avec',
-	'S_ALREADY_EXISTS_IN_LINKED_HOSTS_SMALL'=>			'existe déjà dans les hôtes liés',
 	'S_ADDED_NEW_APPLICATION'=>			'Nouvelle application ajoutée',
 	'S_UPDATED_APPLICATION'=>			'Application mise à jour',
 	'S_USED_BY_ITEM_SMALL'=>			'utilisé par l\'élément',

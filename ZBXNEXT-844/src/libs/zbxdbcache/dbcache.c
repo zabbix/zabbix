@@ -917,6 +917,9 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	}
 	DBfree_result(result);
 
+	if (0 == tr_num)
+		goto clean;
+
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 7, "begin\n");
@@ -932,16 +935,12 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 		}
 
-		evaluate_expression(&tr_last->new_value, &tr_last->expression, tr_last->lastchange, tr_last->triggerid,
-				tr_last->value, &tr_last->new_error);
-
-		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
-				tr_last->new_value, tr_last->new_error, tr_last->lastchange, &tr_last->update_trigger,
-				&tr_last->add_event);
+		evaluate_expression(tr_last->triggerid, &tr_last->expression, tr_last->lastchange,
+				tr_last->value, &tr_last->new_value, &tr_last->new_error);
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_allocated, &sql_offset, tr_last->triggerid,
-				tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
-				tr_last->lastchange, tr_last->update_trigger))
+				tr_last->type, tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
+				tr_last->lastchange, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 3, ";\n");
 		}
@@ -953,7 +952,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 6, "end;\n");
 #endif
 
-	if (sql_offset > 16)
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
@@ -972,7 +971,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
 				tr_last->lastchange, tr_last->new_value, 0, 0);
 	}
-
+clean:
 	zbx_free(tr);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1288,7 +1287,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1365,7 +1364,7 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_free(ids);
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1845,7 +1844,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 #ifdef HAVE_CASSANDRA
@@ -2106,7 +2105,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

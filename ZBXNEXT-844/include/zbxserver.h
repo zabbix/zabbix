@@ -42,8 +42,8 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *host,
 		DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data, int macro_type,
 		char *error, int maxerrlen);
 
-int	evaluate_expression(int *result, char **expression, time_t now,
-		zbx_uint64_t trigggerid, int trigger_value, char **error);
+void	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now,
+		int value, int *new_value, char **new_error);
 int	evaluate(double *value, char *exp, char *error, int maxerrlen);
 
 #endif
