@@ -260,8 +260,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	int					fd;
 #endif
 
-	if (error && max_error_len)
-		*error = '\0';
+	*error = '\0';
 
 	if (NULL != buffer)
 	{

@@ -54,7 +54,10 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 	int 	pid, res = FAIL;
 	char	full_path[MAX_STRING_LEN];
-	char*	output = NULL;
+	char	*output = NULL;
+	char	*send_to;
+	char	*subject;
+	char	*message;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): alertid [" ZBX_FS_UI64 "] mediatype [%d]",
 			__function_name, alert->alertid, mediatype->type);
@@ -87,20 +90,26 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	}
 	else if (MEDIA_TYPE_EXEC == mediatype->type)
 	{
-		zbx_snprintf(full_path, sizeof(full_path), "%s/%s '%s' '%s' '%s'",
-				CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path, alert->sendto, alert->subject, alert->message);
+		send_to = dyn_escape_param(alert->sendto);
+		subject = dyn_escape_param(alert->subject);
+		message = dyn_escape_param(alert->message);
+
+		zbx_snprintf(full_path, sizeof(full_path), "%s/%s \"%s\" \"%s\" \"%s\"",
+				CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path, send_to, subject, message);
+
+		zbx_free(send_to);
+		zbx_free(subject);
+		zbx_free(message);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "before executing [%s]", full_path);
 		if (SUCCEED == (res = zbx_execute(full_path, &output, error, max_error_len, 40)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", mediatype->exec_path, output);
-			free(output);
+			zbx_free(output);
 		}
 		else
 		{
 			res = FAIL;
-			zabbix_log(LOG_LEVEL_ERR, "error executing [%s]: %s", full_path, error);
-			zabbix_syslog("error executing [%s]: %s", full_path, error);
 		}
 	}
 	else
