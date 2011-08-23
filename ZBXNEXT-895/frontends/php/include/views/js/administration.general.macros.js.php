@@ -12,7 +12,7 @@
 
 		var cb = document.createElement('input');
 		cb.setAttribute('type', 'checkbox');
-		cb.className = 'checkbox';
+		cb.className = 'input checkbox pointer';
 		td1.appendChild(cb);
 		td1.appendChild(document.createTextNode(' '));
 
@@ -22,7 +22,7 @@
 		var text1 = document.createElement('input');
 		text1.setAttribute('type', 'text');
 		text1.setAttribute('name', 'macros['+addMacroRow.macro_count+'][macro]');
-		text1.className = 'input';
+		text1.className = 'input text';
 		text1.setAttribute('size', 30);
 		text1.setAttribute('placeholder', '{$MACRO}');
 		td2.appendChild(text1);
@@ -43,7 +43,7 @@
 		text2.setAttribute('type', 'text');
 		text2.setAttribute('placeholder', "<<?php echo _('Value'); ?>>");
 		text2.setAttribute('name', 'macros['+addMacroRow.macro_count+'][value]');
-		text2.className = 'input';
+		text2.className = 'input text';
 		text2.setAttribute('size', 40);
 		td4.appendChild(text2);
 

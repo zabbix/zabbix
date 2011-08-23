@@ -57,12 +57,16 @@ $buttonRow->addItem($buttonColumn);
 
 $macrosTable->addRow($buttonRow);
 
+// form list
+$macrosFormList = new CFormList('macrosFormList');
+$macrosFormList->addRow($macrosTable);
+
 // tab
 $macrosTab = new CTabView();
-$macrosTab->addTab('macros', _('Macros'), $macrosTable);
+$macrosTab->addTab('macros', _('Macros'), $macrosFormList);
 
 $macrosForm->addItem($macrosTab);
-$macrosForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'), "if (deleted_macro_cnt > 0) return confirm('"._('Are you sure you want to delete')." '+deleted_macro_cnt+' "._('macro(s)')."?');"))));
+$macrosForm->addItem(makeFormFooter(array(), array(new CSubmit('save', _('Save'), "if (deleted_macro_cnt > 0) return confirm('"._('Are you sure you want to delete')." '+deleted_macro_cnt+' "._('macro(s)')."?');"))));
 
 return $macrosForm;
 ?>
