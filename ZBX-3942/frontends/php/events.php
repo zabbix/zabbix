@@ -192,10 +192,11 @@
 	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON_BIG.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
 // }}}PAGE HEADER
 
-
 // HEADER {{{
 	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
+	$r_form->addVar('stime', get_request('stime'));
+	$r_form->addVar('period', get_request('period'));
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 
@@ -442,124 +443,123 @@
 				S_ACTIONS
 			));
 
-			$options = array(
-				'nodeids' => get_current_nodeid(),
-				'object' => EVENT_OBJECT_TRIGGER,
-				'time_from' => $from,
-				'time_till' => $till,
-				'output' => API_OUTPUT_SHORTEN,
-				'sortfield' => 'clock',
-				'sortorder' => ZBX_SORT_DOWN,
-				'limit' => ($config['search_limit']+1)
-			);
-
-			if($_REQUEST['hide_unknown']) $options['hide_unknown'] = 1;
-
 			if($pageFilter->hostsSelected){
-				if($pageFilter->hostid > 0 || $pageFilter->groupid > 0){
-					$trigOpt = array(
-						'nodeids' => get_current_nodeid(),
-						'output' => API_OUTPUT_SHORTEN
-					);
+				$options = array(
+					'nodeids' => get_current_nodeid(),
+					'object' => EVENT_OBJECT_TRIGGER,
+					'time_from' => $from,
+					'time_till' => $till,
+					'output' => API_OUTPUT_SHORTEN,
+					'sortfield' => 'clock',
+					'sortorder' => ZBX_SORT_DOWN,
+					'limit' => ($config['search_limit']+1)
+				);
 
-					if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0))
-						$trigOpt['triggerids'] = $_REQUEST['triggerid'];
-					else if($pageFilter->hostid > 0)
-						$trigOpt['hostids'] = $pageFilter->hostid;
-					else if($pageFilter->groupid > 0)
-						$trigOpt['groupids'] = $pageFilter->groupid;
+				if($_REQUEST['hide_unknown']) $options['hide_unknown'] = 1;
 
-					$triggers = CTrigger::get($trigOpt);
-					$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+				// trigger options
+				$trigOpt = array(
+					'nodeids' => get_current_nodeid(),
+					'output' => API_OUTPUT_SHORTEN
+				);
+
+				if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0))
+					$trigOpt['triggerids'] = $_REQUEST['triggerid'];
+				else if($pageFilter->hostid > 0)
+					$trigOpt['hostids'] = $pageFilter->hostid;
+				else if($pageFilter->groupid > 0)
+					$trigOpt['groupids'] = $pageFilter->groupid;
+
+				$triggers = CTrigger::get($trigOpt);
+				$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+
+				// query event with short data
+				$events = CEvent::get($options);
+
+				// get pagging
+				$paging = getPagingLine($events);
+
+				// query event with extend data
+				$options = array(
+					'nodeids' => get_current_nodeid(),
+					'eventids' => zbx_objectValues($events,'eventid'),
+					'output' => API_OUTPUT_EXTEND,
+					'sortfield' => 'eventid',
+					'sortorder' => ZBX_SORT_DOWN,
+					'nopermissions' => 1
+				);
+				$events = CEvent::get($options);
+				order_result($events, 'clock', ZBX_SORT_DOWN);
+
+				$triggersOptions = array(
+					'triggerids' => zbx_objectValues($events, 'objectid'),
+					'select_hosts' => API_OUTPUT_EXTEND,
+					'select_triggers' => API_OUTPUT_EXTEND,
+					'select_items' => API_OUTPUT_EXTEND,
+					'output' => API_OUTPUT_EXTEND
+				);
+				$triggers = CTrigger::get($triggersOptions);
+				$triggers = zbx_toHash($triggers, 'triggerid');
+
+				foreach($events as $enum => $event){
+					$trigger = $triggers[$event['objectid']];
+					$host = reset($trigger['hosts']);
+
+					$items = array();
+					foreach($trigger['items'] as $inum => $item){
+						$i = array();
+						$i['itemid'] = $item['itemid'];
+						$i['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
+						$i['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))? 'showgraph':'showvalues';
+						$i['description'] = item_description($item);
+						$items[] = $i;
+					}
+
+					// actions
+					$actions = get_event_actions_status($event['eventid']);
+
+					if($config['event_ack_enable']){
+						if($event['acknowledged'] == 1){
+							$ack = new CLink(S_YES,'acknow.php?eventid='.$event['eventid'].'&backurl='.$page['file']);
+						}
+						else{
+							$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'].'&backurl='.$page['file'],'on');
+						}
+					}
+
+					$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'])), ZBX_FLAG_EVENT);
+					$tr_desc = new CSpan($description,'pointer');
+					$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
+											" new Array({'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}),".
+											zbx_jsvalue($items, true).");");
+
+					// duration
+					$tr_event = $event + $trigger;
+					if($next_event = get_next_event($tr_event, $events, $_REQUEST['hide_unknown']))
+						$event['duration'] = zbx_date2age($tr_event['clock'], $next_event['clock']);
+					else
+						$event['duration'] = zbx_date2age($tr_event['clock']);
+
+					$table->addRow(array(
+						new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
+							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
+							'action'
+							),
+						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
+						$_REQUEST['hostid'] == 0 ? $host['host'] : null,
+						new CSpan($tr_desc, 'link_menu'),
+						new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value'])),
+						new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'],$event['value'])),
+						$event['duration'],
+						($config['event_ack_enable'])?$ack:NULL,
+						$actions
+					));
 				}
 			}
 			else{
-				$options['triggerids'] = array();
+				$events = array();
+				$paging = getPagingLine($events);
 			}
-
-			$events = CEvent::get($options);
-
-			$paging = getPagingLine($events);
-
-			$options = array(
-				'nodeids' => get_current_nodeid(),
-				'eventids' => zbx_objectValues($events,'eventid'),
-				'output' => API_OUTPUT_EXTEND,
-				'sortfield' => 'eventid',
-				'sortorder' => ZBX_SORT_DOWN,
-				'nopermissions' => 1
-			);
-
-			$events = CEvent::get($options);
-			order_result($events, 'clock', ZBX_SORT_DOWN);
-
-			$triggersOptions = array(
-				'triggerids' => zbx_objectValues($events, 'objectid'),
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'select_triggers' => API_OUTPUT_EXTEND,
-				'select_items' => API_OUTPUT_EXTEND,
-				'output' => API_OUTPUT_EXTEND
-			);
-			$triggers = CTrigger::get($triggersOptions);
-			$triggers = zbx_toHash($triggers, 'triggerid');
-
-			foreach($events as $enum => $event){
-				$trigger = $triggers[$event['objectid']];
-				$host = reset($trigger['hosts']);
-
-				$items = array();
-				foreach($trigger['items'] as $inum => $item){
-					$i = array();
-					$i['itemid'] = $item['itemid'];
-					$i['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
-					$i['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))? 'showgraph':'showvalues';
-					$i['description'] = item_description($item);
-					$items[] = $i;
-				}
-
-// Actions
-				$actions = get_event_actions_status($event['eventid']);
-
-
-				if($config['event_ack_enable']){
-					if($event['acknowledged'] == 1){
-						$ack = new CLink(S_YES,'acknow.php?eventid='.$event['eventid'].'&backurl='.$page['file']);
-					}
-					else{
-						$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'].'&backurl='.$page['file'],'on');
-					}
-				}
-
-				$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'])), ZBX_FLAG_EVENT);
-				$tr_desc = new CSpan($description,'pointer');
-				$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
-										" new Array({'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}),".
-										zbx_jsvalue($items, true).");");
-
-// Duration
-				$tr_event = $event + $trigger;
-				if($next_event = get_next_event($tr_event, $events, $_REQUEST['hide_unknown']))
-					$event['duration'] = zbx_date2age($tr_event['clock'], $next_event['clock']);
-				else
-					$event['duration'] = zbx_date2age($tr_event['clock']);
-
-
-				$table->addRow(array(
-					new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
-						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
-						'action'
-						),
-					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-					$_REQUEST['hostid'] == 0 ? $host['host'] : null,
-					new CSpan($tr_desc, 'link_menu'),
-					new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value'])),
-					new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'],$event['value'])),
-					$event['duration'],
-					($config['event_ack_enable'])?$ack:NULL,
-					$actions
-				));
-			}
-
 		}
 
 		$table = array($paging, $table, $paging);

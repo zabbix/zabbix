@@ -42,26 +42,22 @@ extern unsigned char	process_type;
  *                                                                            *
  * Purpose: re-calculate and update values of time-driven functions           *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	process_time_functions()
 {
-	const char	*__function_name = "process_time_functions";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*exp, error[MAX_STRING_LEN];
-	zbx_uint64_t	triggerid;
-	int		trigger_type, trigger_value, exp_value;
-	const char	*trigger_error;
+	const char		*__function_name = "process_time_functions";
+	DB_RESULT		result;
+	DB_ROW			row;
+	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last;
+	int			tr_alloc = 0, tr_num = 0;
+	char			*sql = NULL;
+	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sql = zbx_malloc(sql, sql_alloc);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.type,t.value,t.error,t.expression"
@@ -75,7 +71,7 @@ static void	process_time_functions()
 				" and h.status=%d"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
 				DB_NODE
-				" order by t.triggerid",
+			" order by t.triggerid",
 			TRIGGER_STATUS_ENABLED,
 			ITEM_STATUS_ACTIVE,
 			HOST_STATUS_MONITORED,
@@ -84,31 +80,69 @@ static void	process_time_functions()
 
 	DBbegin();
 
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
+
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(triggerid, row[0]);
-		trigger_type = atoi(row[1]);
-		trigger_value = atoi(row[2]);
-		trigger_error = row[3];
-		exp = strdup(row[4]);
-
-		if (SUCCEED != evaluate_expression(&exp_value, &exp, time(NULL), triggerid, trigger_value, error, sizeof(error)))
+		if (tr_num == tr_alloc)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s", exp, error);
-
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, TRIGGER_VALUE_UNKNOWN, time(NULL), error);
+			tr_alloc += 64;
+			tr = zbx_realloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
 		}
-		else
-			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, exp_value, time(NULL), NULL);
 
-		zbx_free(exp);
+		tr_last = &tr[tr_num++];
+
+		ZBX_STR2UINT64(tr_last->triggerid, row[0]);
+		tr_last->type = (unsigned char)atoi(row[1]);
+		tr_last->value = atoi(row[2]);
+		tr_last->error = row[3];
+		tr_last->new_error = NULL;
+		tr_last->expression = zbx_strdup(NULL, row[4]);
+		tr_last->lastchange = time(NULL);
+
+		evaluate_expression(tr_last->triggerid, &tr_last->expression, tr_last->lastchange,
+				tr_last->value, &tr_last->new_value, &tr_last->new_error);
+
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
+				tr_last->type, tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
+				tr_last->lastchange, &tr_last->add_event))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+		}
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	DBfree_result(result);
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
+
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	if (0 != tr_num)
+	{
+		for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
+		{
+			zbx_free(tr_last->expression);
+			zbx_free(tr_last->new_error);
+
+			if (1 != tr_last->add_event)
+				continue;
+
+			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, tr_last->new_value, 0, 0);
+		}
 	}
 
 	DBcommit();
 
-	DBfree_result(result);
+	zbx_free(tr);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -412,7 +446,6 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
 	int		value_before, value_inside, value_after;
-	DB_EVENT	event;
 
 	result = DBselect(
 			"select distinct t.triggerid"
@@ -436,15 +469,8 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		if (value_before == value_inside && value_inside == value_after)
 			continue;
 
-		/* Preparing event for processing */
-		memset(&event, 0, sizeof(DB_EVENT));
-		event.source = EVENT_SOURCE_TRIGGERS;
-		event.object = EVENT_OBJECT_TRIGGER;
-		event.objectid = triggerid;
-		event.clock = maintenance_to;
-		event.value = value_after;
-
-		process_event(&event, 1);
+		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
+				maintenance_to, value_after, 0, 1);
 	}
 	DBfree_result(result);
 }
