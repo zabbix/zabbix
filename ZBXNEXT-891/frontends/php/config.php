@@ -881,7 +881,7 @@ include_once('include/page_header.php');
 			$data['confirmMessage'] = null;
 
 			if (!empty($data['valuemapid'])) {
-				$db_valuemap = DBfetch(DBselect('SELECT * FROM valuemaps v WHERE v.valuemapid = '.$data['valuemapid']));
+				$db_valuemap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid = '.$data['valuemapid']));
 				$data['mapname'] = $db_valuemap['name'];
 				$data['title'] = ' "'.$data['mapname'].'"';
 
@@ -927,7 +927,6 @@ include_once('include/page_header.php');
 
 			$valueMappingForm = new CView('administration.general.valuemapping.list', $data);
 			$cnf_wdgt->addItem($valueMappingForm->render());
-
 		}
 	}
 /////////////////////////////////
