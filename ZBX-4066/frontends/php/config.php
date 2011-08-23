@@ -557,10 +557,10 @@ include_once('include/page_header.php');
 						'output' => API_OUTPUT_EXTEND
 					));
 					$new_macros = zbx_toHash($new_macros, 'globalmacroid');
-					foreach($macrosToDelete as $delm){
+					foreach($macrosToDelete as $macroid){
 						add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO,
-							$delm['globalmacroid'],
-							$global_macros[$delm['globalmacroid']]['macro'],
+							zbx_dbstr($macroid),
+							$global_macros[$macroid]['macro'],
 							null,null,null);
 					}
 					foreach($new_macroids['globalmacroids'] as $newid){
