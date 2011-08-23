@@ -238,6 +238,8 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/views/administration.general.gui.edit.php -text
 frontends/php/include/views/administration.general.housekeeper.edit.php -text
 frontends/php/include/views/administration.general.other.edit.php -text
+frontends/php/include/views/administration.general.regularexpressions.edit.php -text
+frontends/php/include/views/administration.general.regularexpressions.list.php -text
 frontends/php/include/views/administration.general.workingtime.edit.php -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text

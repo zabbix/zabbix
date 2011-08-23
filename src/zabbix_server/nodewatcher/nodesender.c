@@ -783,7 +783,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 	zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset, 8, "end;\n");
 #endif
 
-	if (exsql_offset > 16) /* In ORACLE always present begin..end; */
+	if (exsql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", exsql);
 	zbx_free(exsql);
 
