@@ -31,7 +31,4 @@ extern  int     CONFIG_SERVER_STARTUP_TIME;
 int	evaluate_macro_function(char *value, const char *host, const char *key,
 		const char *function, const char *parameter);
 
-const char	*get_table_by_value_type(int value_type);
-const char	*get_key_by_value_type(int value_type);
-
 #endif

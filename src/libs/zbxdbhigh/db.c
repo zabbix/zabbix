@@ -2060,3 +2060,160 @@ unsigned short	DBget_inventory_field_len(unsigned char inventory_link)
 }
 
 #undef ZBX_MAX_INVENTORY_FIELDS
+
+static const char	*get_table_by_value_type(unsigned char value_type)
+{
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			return "history";
+		case ITEM_VALUE_TYPE_STR:
+			return "history_str";
+		case ITEM_VALUE_TYPE_LOG:
+			return "history_log";
+		case ITEM_VALUE_TYPE_UINT64:
+			return "history_uint";
+		case ITEM_VALUE_TYPE_TEXT:
+			return "history_text";
+		default:
+			assert(0);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_history                                                    *
+ *                                                                            *
+ * Parameters: itemid     - [IN] item identificator from database             *
+ *                               required parameter                           *
+ *             value_type - [IN] item value type                              *
+ *                               required parameter                           *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to,
+		zbx_timespec_t *ts, const char *field_name, int last_n)
+{
+	const char	*__function_name = "DBget_history";
+	char		sql[512];
+	size_t		offset;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		**h_value = NULL;
+	int		h_alloc = 1, h_num = 0, retry = 0;
+	const char	*func[] = {"min", "avg", "max", "sum", "count"};
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL == field_name)
+		field_name = "value";
+
+	if (ZBX_DB_GET_HIST_VALUE == function)
+		h_alloc = (0 == last_n ? 128 : last_n);
+
+	h_value = zbx_malloc(h_value, (h_alloc + 1) * sizeof(char *));
+retry:
+	switch (function)
+	{
+		case ZBX_DB_GET_HIST_MIN:
+		case ZBX_DB_GET_HIST_AVG:
+		case ZBX_DB_GET_HIST_MAX:
+		case ZBX_DB_GET_HIST_SUM:
+			offset = zbx_snprintf(sql, sizeof(sql), "select %s(%s)", func[function], field_name);
+			break;
+		case ZBX_DB_GET_HIST_COUNT:
+			offset = zbx_snprintf(sql, sizeof(sql), "select %s(*)", func[function]);
+			break;
+		case ZBX_DB_GET_HIST_DELTA:
+			offset = zbx_snprintf(sql, sizeof(sql), "select max(%s)-min(%s)", field_name, field_name);
+			break;
+		case ZBX_DB_GET_HIST_VALUE:
+			offset = zbx_snprintf(sql, sizeof(sql), "select %s", field_name);
+			break;
+		default:
+			assert(0);
+	}
+
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
+			get_table_by_value_type(value_type), itemid);
+
+	if (NULL == ts)
+	{
+		if (0 != clock_from)
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock>%d", clock_from);
+		if (0 != clock_to)
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock<=%d", clock_to);
+	}
+	else if (0 == retry)
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d and ns=%d", ts->sec, ts->ns);
+	else if (1 == retry)
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d and ns<%d", ts->sec, ts->ns);
+	else
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock<%d", ts->sec);
+
+	if (0 != last_n)
+	{
+		if (NULL == ts)
+		{
+			switch (value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+				case ITEM_VALUE_TYPE_UINT64:
+				case ITEM_VALUE_TYPE_STR:
+					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+							" order by itemid,clock desc");
+					break;
+				default:
+					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+							" order by id desc");
+			}
+		}
+		else if (0 != retry)
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+					" order by itemid,clock desc,ns desc");
+
+		result = DBselectN(sql, last_n);
+	}
+	else
+		result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (h_alloc == h_num)
+		{
+			h_alloc = MAX(h_alloc + 1, h_alloc * 3 / 2);
+			h_value = zbx_realloc(h_value, (h_alloc + 1) * sizeof(char *));
+		}
+
+		h_value[h_num++] = zbx_strdup(NULL, row[0]);
+	}
+	DBfree_result(result);
+
+	if (NULL != ts && 0 == h_num && 2 > retry)
+	{
+		retry++;
+		goto retry;
+	}
+
+	h_value[h_num] = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() h_num:%d", __function_name, h_num);
+
+	return h_value;
+}
+
+void	DBfree_history(char **h_value)
+{
+	const char	*__function_name = "DBfree_history";
+	int		h_num;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	for (h_num = 0; NULL != h_value[h_num]; h_num++)
+		zbx_free(h_value[h_num]);
+
+	zbx_free(h_value);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
