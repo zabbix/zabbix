@@ -42,11 +42,16 @@ else {
 	array_push($valuemapElements, new CSubmit('del_map', _('Delete selected')));
 }
 
+$addValueInput = new CTextBox('add_value', '', 10);
+$addValueInput->setAttribute('maxlength', '64');
+$addNewValueInput = new CTextBox('add_newvalue', '', 10);
+$addNewValueInput->setAttribute('maxlength', '64');
+
 // append form list
 $valueMappingFormList = new CFormList('valueMappingFormList');
 $valueMappingFormList->addRow(_('Name'), array(new CTextBox('mapname', $this->data['mapname'], 40)));
 $valueMappingFormList->addRow(_('Mapping'), $valuemapElements);
-$valueMappingFormList->addRow(_('New mapping'), array(new CTextBox('add_value', '', 10), new CSpan(RARR, 'rarr'), new CTextBox('add_newvalue', '', 10), SPACE, new CSubmit('add_map', _('Add'))));
+$valueMappingFormList->addRow(_('New mapping'), array($addValueInput, new CSpan(RARR, 'rarr'), $addNewValueInput, SPACE, new CSubmit('add_map', _('Add'))));
 
 // append tab
 $valueMappingTab = new CTabView();
