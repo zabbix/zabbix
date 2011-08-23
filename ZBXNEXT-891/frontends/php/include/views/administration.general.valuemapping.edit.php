@@ -59,10 +59,10 @@ if (empty($valuemapElements)) {
 	$saveButton->setAttribute('disabled', 'true');
 }
 if (!empty($this->data['valuemapid'])) {
-	$valueMappingForm->addItem(makeFormFooter(array($saveButton, new CButtonDelete($this->data['confirmMessage'], url_param('form').url_param('valuemapid').url_param('config')), new CButtonCancel(url_param('config')))));
+	$valueMappingForm->addItem(makeFormFooter(array($saveButton), array(new CButtonDelete($this->data['confirmMessage'], url_param('form').url_param('valuemapid').url_param('config')), new CButtonCancel(url_param('config')))));
 }
 else {
-	$valueMappingForm->addItem(makeFormFooter(array($saveButton, new CButtonCancel(url_param('config')))));
+	$valueMappingForm->addItem(makeFormFooter(array($saveButton), new CButtonCancel(url_param('config'))));
 }
 
 return $valueMappingForm;
