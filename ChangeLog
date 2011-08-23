@@ -1,5 +1,6 @@
 Changes for 1.8.7rc1
 
+ - [ZBX-4021] fixing item visibility in event then last value is null (Eduard)
  - [ZBX-4052] fixed key macros resolving in item names (Vedmak)
  - [ZBX-1357] removed outdated translation strings from all translations (Richlv)
  - [ZBX-3998] reload recipient list for database down messages every CacheUpdateFrequency seconds (rudolfs)
