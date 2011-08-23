@@ -28,6 +28,7 @@
 #include "mutexs.h"
 #include "zbxserver.h"
 #include "proxy.h"
+#include "events.h"
 
 #include "memalloc.h"
 #include "zbxalgo.h"
@@ -791,14 +792,13 @@ static void	DCsync_trends()
 static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char		*__function_name = "DCmass_update_triggers";
-
-	int			i, item_num = 0, value;
+	int			sql_offset = 0;
+	int			i, item_num = 0;
 	zbx_uint64_t		*itemids = NULL;
 	zbx_timespec_t		*timespecs = NULL;
 	zbx_hashset_t		trigger_info;
 	zbx_vector_ptr_t	trigger_order;
 	DC_TRIGGER		*trigger;
-	char			error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -829,27 +829,46 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num);
 
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 7, "begin\n");
+#endif
+
 	for (i = 0; i < trigger_order.values_num; i++)
 	{
 		trigger = (DC_TRIGGER *)trigger_order.values[i];
 
-		if (SUCCEED != evaluate_expression(&value, &trigger->expression, trigger->timespec.sec,
-					trigger->triggerid, trigger->value, error, sizeof(error)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s",
-					trigger->expression, error);
+		evaluate_expression(trigger->triggerid, &trigger->expression, trigger->timespec.sec,
+				trigger->value, &trigger->new_value, &trigger->new_error);
 
-			DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value, trigger->value_flags,
-					trigger->old_error, trigger->value, TRIGGER_VALUE_FLAG_UNKNOWN, &trigger->timespec,
-					error);
-		}
-		else
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_allocated, &sql_offset, trigger->triggerid,
+				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->new_value,
+				trigger->new_error, &trigger->timespec, &trigger->add_event, &trigger->value_changed))
 		{
-			DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value, trigger->value_flags,
-					trigger->old_error, value, TRIGGER_VALUE_FLAG_NORMAL, &trigger->timespec, NULL);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 3, ";\n");
 		}
+
+		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 
 		zbx_free(trigger->expression);
+		zbx_free(trigger->new_error);
+	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 6, "end;\n");
+#endif
+
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	for (i = 0; i < trigger_order.values_num; i++)
+	{
+		trigger = (DC_TRIGGER *)trigger_order.values[i];
+
+		if (1 != trigger->add_event)
+			continue;
+
+		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid, &trigger->timespec,
+				trigger->new_value, trigger->value_changed, 0, 0);
 	}
 
 	zbx_hashset_destroy(&trigger_info);
@@ -1229,7 +1248,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1304,7 +1323,7 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_free(ids);
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1765,7 +1784,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 }
 
@@ -1924,7 +1943,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -2924,12 +2943,11 @@ zbx_uint64_t	DCget_nextid_shared(const char *table_name)
 	ZBX_DC_ID	*id;
 	zbx_uint64_t	nextid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'",
-			__function_name, table_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, table_name);
 
 	LOCK_CACHE_IDS;
 
-	for (i = 0; i < ZBX_IDS_SIZE; i++)
+	for (i = 0; ZBX_IDS_SIZE > i; i++)
 	{
 		id = &ids->id[i];
 
@@ -2946,29 +2964,16 @@ zbx_uint64_t	DCget_nextid_shared(const char *table_name)
 			break;
 	}
 
-	if (i == ZBX_IDS_SIZE)
+	if (ZBX_IDS_SIZE == i)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for ids");
-		exit(-1);
+		zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for ids");
+		exit(FAIL);
 	}
 
-	if (id->reserved > 0)
-	{
-		id->lastid++;
-		id->reserved--;
-
-		nextid = id->lastid;
-
-		UNLOCK_CACHE_IDS;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 "]",
-				__function_name, table_name, nextid);
-
-		return nextid;
-	}
+	if (0 < id->reserved)
+		goto exit;
 
 	UNLOCK_CACHE_IDS;
-
 retry:
 	nextid = DBget_nextid(table_name, ZBX_RESERVE) - 1;
 
@@ -2994,7 +2999,7 @@ retry:
 		id->lastid = nextid;
 		id->reserved = ZBX_RESERVE;
 	}
-
+exit:
 	id->lastid++;
 	id->reserved--;
 

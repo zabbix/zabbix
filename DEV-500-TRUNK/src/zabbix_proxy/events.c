@@ -25,7 +25,7 @@
  *                                                                            *
  * Purpose: process new event                                                 *
  *                                                                            *
- * Parameters: event - event data (event.eventid - new event)                 *
+ * Parameters: event data                                                     *
  *                                                                            *
  * Return value: SUCCESS - event added                                        *
  *                                                                            *
@@ -34,7 +34,8 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	process_event(DB_EVENT *event, int force_actions)
+int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid, const zbx_timespec_t *timespec,
+		int value, unsigned char value_changed, int acknowledged, int force_actions)
 {
 	return SUCCEED;
 }

@@ -778,8 +778,6 @@ static void	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
  *                                                                            *
  * Parameters: serviceid - item to update services for                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: recursive function                                               *
@@ -788,50 +786,46 @@ static void	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
  ******************************************************************************/
 static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
 {
-	int	status;
+	int		algorithm, status = 0;
 	zbx_uint64_t	serviceupid;
-	int	algorithm;
+	DB_RESULT	result;
+	DB_ROW		row;
 
-	DB_RESULT result;
-	DB_ROW	row;
+	result = DBselect("select l.serviceupid,s.algorithm"
+			" from services_links l,services s"
+			" where s.serviceid=l.serviceupid"
+				" and l.servicedownid=" ZBX_FS_UI64,
+			serviceid);
 
-	result = DBselect("select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=" ZBX_FS_UI64,
-		serviceid);
-	status=0;
-	while((row=DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(serviceupid,row[0]);
-		algorithm=atoi(row[1]);
-		if(SERVICE_ALGORITHM_NONE == algorithm)
-		{
-/* Do nothing */
-		}
-		else if((SERVICE_ALGORITHM_MAX == algorithm) ||
-			(SERVICE_ALGORITHM_MIN == algorithm))
+		ZBX_STR2UINT64(serviceupid, row[0]);
+		algorithm = atoi(row[1]);
+
+		if (SERVICE_ALGORITHM_MAX == algorithm || SERVICE_ALGORITHM_MIN == algorithm)
 		{
 			status = DBget_service_status(serviceupid, algorithm, 0);
 
 			DBadd_service_alarm(serviceupid, status, clock);
-			DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64,
-				status,
-				serviceupid);
+			DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64, status, serviceupid);
 		}
-		else
-			zabbix_log(LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]", algorithm);
+		else if (SERVICE_ALGORITHM_NONE != algorithm)
+			zabbix_log(LOG_LEVEL_ERR, "unknown calculation algorithm of service status [%d]", algorithm);
 	}
 	DBfree_result(result);
 
-	result = DBselect("select serviceupid from services_links where servicedownid=" ZBX_FS_UI64,
-		serviceid);
+	result = DBselect("select serviceupid"
+			" from services_links"
+			" where servicedownid=" ZBX_FS_UI64,
+			serviceid);
 
-	while((row=DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(serviceupid,row[0]);
+		ZBX_STR2UINT64(serviceupid, row[0]);
 		DBupdate_services_rec(serviceupid, clock);
 	}
 	DBfree_result(result);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -907,8 +901,6 @@ static void	DBupdate_services_status_all(void)
  * Parameters: serviceid - item to update services for                        *
  *             status - new status of the service                             *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
@@ -920,19 +912,13 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
 	DB_ROW		row;
 	zbx_uint64_t	serviceid;
 
-	result = DBselect(
-			"select serviceid"
-			" from services"
-			" where triggerid=" ZBX_FS_UI64,
-			triggerid);
+	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64, triggerid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceid, row[0]);
 
-		DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64,
-				status,
-				serviceid);
+		DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64, status, serviceid);
 
 		DBadd_service_alarm(serviceid, status, clock);
 		DBupdate_services_rec(serviceid, clock);
@@ -1393,7 +1379,7 @@ static void	DBdelete_history_by_itemids(zbx_uint64_t *itemids, int itemids_num)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16)
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zbx_free(sql);

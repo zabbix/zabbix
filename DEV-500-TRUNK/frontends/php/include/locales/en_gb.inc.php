@@ -333,11 +333,9 @@
 // Colours
 
 //	config.php
-	'S_GUI'=>					_('GUI'),
 	'S_DROPDOWN_FIRST_ENTRY'=>			_('Dropdown first entry'),
 	'S_DROPDOWN_REMEMBER_SELECTED'=>		_('remember selected'),
 	'S_MAX_IN_TABLE' =>				_('Max count of elements to show inside table cell'),
-	'S_SEARCH_LIMIT' =>				_('Search/Filter elements limit'),
 	'S_SYSTEM_DEFAULT'=>				_('System default'),
 	'S_BLACK_AND_BLUE'=>				_('Black & Blue'),
 	'S_ORIGINAL_BLUE'=>				_('Original blue'),
@@ -346,7 +344,6 @@
 	'S_EVENT_ACKNOWLEDGES'=>			_('Event acknowledges'),
 	'S_DAYS'=>					_('Days'),
 	'S_SHOW_EVENTS_MAX'=>				_('Show events max'),
-	'S_MAX_COUNT_OF_EVENTS'=>			_('Max count of events per trigger to show'),
 	'S_CANNNOT_UPDATE_VALUE_MAP'=>			_('Cannot update value map'),
 	'S_VALUE_MAP_ADDED'=>				_('Value map added'),
 	'S_CANNNOT_ADD_VALUE_MAP'=>			_('Cannot add value map'),
@@ -396,23 +393,16 @@
 	'S_EZ_TEXTING_CANADA' => _('Canada (136 characters)'),
 	'S_MESSAGE_TEXT_LIMIT' => _('Message text limit'),
 
-	'S_REGULAR_EXPRESSIONS'=>			_('Regular expressions'),
 	'S_REGULAR_EXPRESSION'=>			_('Regular expression'),
-	'S_EXPRESSIONS'=>				_('Expressions'),
 	'S_EXPRESSION'=>				_('Expression'),
 
-	'S_EXPECTED_RESULT'=>				_('Expected result'),
 	'S_CHARACTER_STRING_INCLUDED'=>			_('Character string included'),
 	'S_ANY_CHARACTER_STRING_INCLUDED'=>		_('Any character string included'),
 	'S_CHARACTER_STRING_NOT_INCLUDED'=>		_('Character string not included'),
 	'S_RESULT_IS_TRUE'=>				_('Result is TRUE'),
 	'S_RESULT_IS_FALSE'=>				_('Result is FALSE'),
 
-	'S_EXPRESSION_TYPE'=>				_('Expression type'),
-	'S_NEW_EXPRESSION'=>				_('New expression'),
-	'S_CASE_SENSITIVE'=>				_('Case sensitive'),
 	'S_TEST'=>					_('Test'),
-	'S_DELIMITER'=>					_('Delimiter'),
 	'S_TEST_STRING'=>				_('Test string'),
 	'S_INCORRECT_EXPRESSION'=>			_('Incorrect expression'),
 
@@ -426,7 +416,6 @@
 	'S_CANNOT_DELETE_REGULAR_EXPRESSION'=>		_('Cannot delete regular expression'),
 
 	'S_DELETE_REGULAR_EXPRESSION_Q'=>		_('Delete regular expression?'),
-	'S_DELETE_SELECTED_REGULAR_EXPRESSIONS_Q'=>	_('Delete selected regular expressions?'),
 
 	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		_('Value maps are used to create a mapping between numeric values and string representations'),
 

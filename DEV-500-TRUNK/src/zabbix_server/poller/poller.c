@@ -25,6 +25,7 @@
 #include "daemon.h"
 #include "zbxserver.h"
 #include "zbxself.h"
+#include "../events.h"
 
 #include "poller.h"
 
@@ -37,8 +38,8 @@
 #include "checks_ipmi.h"
 #include "checks_db.h"
 #ifdef HAVE_SSH2
-#include "checks_ssh.h"
-#endif	/* HAVE_SSH2 */
+#	include "checks_ssh.h"
+#endif
 #include "checks_telnet.h"
 #include "checks_java.h"
 #include "checks_calculated.h"
@@ -83,13 +84,19 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	const char	*__function_name = "update_triggers_status_to_unknown";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	triggerid;
-	int		trigger_type, trigger_value, trigger_flags;
-	const char	*trigger_error;
+	DC_TRIGGER	*tr = NULL, *trigger;
+	int		tr_alloc = 0, tr_num = 0;
+	char		*sql = NULL;
+	int		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 	char		failed_type_buf[8];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64,
-			__function_name, hostid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
 
 	/* determine failed item type */
 	switch (type)
@@ -165,7 +172,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 					" and i2.status=%d"
 					" and not i2.key_ like '%s'"
 					" and h2.status=%d"
-			")",
+			")"
+			" order by t.triggerid",
 			ITEM_STATUS_ACTIVE,
 			SERVER_STATUS_KEY,
 			failed_type_buf,
@@ -184,19 +192,55 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(triggerid, row[0]);
-		trigger_type = atoi(row[1]);
-		trigger_value = atoi(row[2]);
-		trigger_flags = atoi(row[3]);
-		trigger_error = row[4];
+		if (tr_num == tr_alloc)
+		{
+			tr_alloc += 64;
+			tr = zbx_realloc(tr, tr_alloc * sizeof(DC_TRIGGER));
+		}
 
-		DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_flags,
-				trigger_error, trigger_value, TRIGGER_VALUE_FLAG_UNKNOWN, ts, reason);
+		trigger = &tr[tr_num++];
 
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() setting trigger (id:" ZBX_FS_UI64 ") status to UNKNOWN",
-				__function_name, triggerid);
+		ZBX_STR2UINT64(trigger->triggerid, row[0]);
+		trigger->type = (unsigned char)atoi(row[1]);
+		trigger->value = atoi(row[2]);
+		trigger->value_flags = atoi(row[3]);
+		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
+		strscpy(trigger->error, row[4]);
+		trigger->timespec = *ts;
+
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
+				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->new_value, reason,
+				&trigger->timespec, &trigger->add_event, &trigger->value_changed))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+		}
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 	DBfree_result(result);
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
+
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	if (0 != tr_num)
+	{
+		for (trigger = &tr[0]; 0 != tr_num; tr_num--, trigger++)
+		{
+			if (1 != trigger->add_event)
+				continue;
+
+			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+		}
+	}
+
+	zbx_free(tr);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -352,6 +396,8 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	if (SUCCEED != DCconfig_deactivate_host(item, ts->sec))
 		return;
 
+	DBbegin();
+
 	*error_msg = '\0';
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
@@ -405,7 +451,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d where hostid=" ZBX_FS_UI64,
 			fld_disable_until, *disable_until, item->host.hostid);
 
-	DBbegin();
 	DBexecute("%s", sql);
 	DBcommit();
 
