@@ -34,12 +34,12 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		return SYSINFO_RET_FAIL;
 	}
 
-	/* if vmstat is disabled in collector get first data to return and enable it */
+	/* if vmstat is disabled enable it and wait for the first data */
 	if (0 == collector->vmstat.enabled)
 	{
 		collector->vmstat.enabled = 1;
 
-		/* wait until vmstat data is available */
+		/* wait till vmstat data is available */
 		while (wait--)
 		{
 			sleep(1);
