@@ -325,7 +325,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 /* header */
 	$form = new CForm(null, 'get');
-	$form->cleanItems();
 
 	$form->addVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
@@ -457,23 +456,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 // CONDITIONS FORM {{{
 		$tblCond = new CTable(null, 'formElementTable');
 
-
-		$conditions	= get_request('conditions', array());
-
-		if (($_REQUEST['eventsource'] == EVENT_SOURCE_TRIGGERS) && !isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])) {
-			$conditions = array(
-				array(
-					'type' => CONDITION_TYPE_TRIGGER_VALUE,
-					'operator' => CONDITION_OPERATOR_EQUAL,
-					'value' => TRIGGER_VALUE_TRUE,
-				),
-				array(
-					'type' => CONDITION_TYPE_MAINTENANCE,
-					'operator' => CONDITION_OPERATOR_NOT_IN,
-					'value' => '',
-				),
-			);
-		}
+		$conditions	= get_request('conditions',array());
 
 		if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
 			$eventsource = $action['eventsource'];
@@ -484,7 +467,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				$condition_data['type'] = $condition_data['conditiontype'];
 			}
 			unset($condition_data);
-
 		}
 		else{
 			$evaltype = get_request('evaltype');

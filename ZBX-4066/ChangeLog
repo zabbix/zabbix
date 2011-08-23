@@ -1,6 +1,5 @@
 Changes for 1.8.7rc1
 
- - [ZBXNEXT-898] two default conditions are created automatically for new trigger actions (Vedmak)
  - [ZBX-4021] fixing item visibility in event then last value is null (Eduard)
  - [ZBX-4052] fixed key macros resolving in item names (Vedmak)
  - [ZBX-1357] removed outdated translation strings from all translations (Richlv)
