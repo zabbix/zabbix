@@ -1064,120 +1064,38 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_history_value(zbx_uint64_t itemid, char **replace_to,
-		const char *tablename, const char *fieldname, int clock, int ns)
+static int	DBget_history_value(zbx_uint64_t itemid, unsigned char value_type, char **replace_to,
+		const char *field_name, int clock, int ns)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		sql[MAX_STRING_LEN];
-	int		max_clock = 0, ret = FAIL;
+	int		ret = FAIL;
+	char		**h_value;
+	zbx_timespec_t	ts;
 
 	if (0 == CONFIG_NS_SUPPORT)
 	{
-		zbx_snprintf(sql, sizeof(sql),
-				"select %s"
-				" from %s"
-				" where itemid=" ZBX_FS_UI64
-					" and clock<=%d"
-				" order by itemid,clock desc",
-				fieldname, tablename, itemid, clock);
+		h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, clock, NULL, field_name, 1);
 
-		result = DBselectN(sql, 1);
-
-		if (NULL != (row = DBfetch(result)))
+		if (NULL != h_value[0])
 		{
-			*replace_to = zbx_strdup(*replace_to, row[0]);
+			*replace_to = zbx_strdup(*replace_to, h_value[0]);
 			ret = SUCCEED;
 		}
-
-		DBfree_result(result);
+		DBfree_history(h_value);
 
 		return ret;
 	}
 
-	zbx_snprintf(sql, sizeof(sql),
-			"select %s"
-			" from %s"
-			" where itemid=" ZBX_FS_UI64
-				" and clock=%d"
-				" and ns=%d",
-			fieldname, tablename, itemid, clock, ns);
+	ts.sec = clock;
+	ts.ns = ns;
 
-	result = DBselectN(sql, 1);
+	h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, &ts, field_name, 1);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != h_value[0])
 	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
+		*replace_to = zbx_strdup(*replace_to, h_value[0]);
 		ret = SUCCEED;
 	}
-
-	DBfree_result(result);
-
-	if (SUCCEED == ret)
-		return ret;
-
-	result = DBselect(
-			"select distinct clock"
-			" from %s"
-			" where itemid=" ZBX_FS_UI64
-				" and clock=%d"
-				" and ns<%d",
-			tablename, itemid, clock, ns);
-
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-		max_clock = atoi(row[0]);
-
-	DBfree_result(result);
-
-	if (0 == max_clock)
-	{
-		result = DBselect(
-				"select max(clock)"
-				" from %s"
-				" where itemid=" ZBX_FS_UI64
-					" and clock<%d",
-				tablename, itemid, clock);
-
-		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-			max_clock = atoi(row[0]);
-
-		DBfree_result(result);
-	}
-
-	if (0 == max_clock)
-		return ret;
-
-	if (clock == max_clock)
-	{
-		zbx_snprintf(sql, sizeof(sql),
-				"select %s"
-				" from %s"
-				" where itemid=" ZBX_FS_UI64
-					" and clock=%d"
-					" and ns<%d"
-				" order by itemid,clock desc,ns desc",
-				fieldname, tablename, itemid, clock, ns);
-	}
-	else
-	{
-		zbx_snprintf(sql, sizeof(sql),
-				"select %s"
-				" from %s"
-				" where itemid=" ZBX_FS_UI64
-					" and clock=%d"
-				" order by itemid,clock desc,ns desc",
-				fieldname, tablename, itemid, max_clock);
-	}
-
-	result = DBselectN(sql, 1);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
-		ret = SUCCEED;
-	}
-
-	DBfree_result(result);
+	DBfree_history(h_value);
 
 	return ret;
 }
@@ -1199,30 +1117,36 @@ static int	DBget_history_value(zbx_uint64_t itemid, char **replace_to,
  *                                                                            *
  ******************************************************************************/
 static int	DBget_history_log_value(DB_TRIGGER *trigger, char **replace_to,
-		int N_functionid, const char *fieldname, int clock, int ns)
+		int N_functionid, const char *field_name, int clock, int ns)
 {
 	const char	*__function_name = "DBget_history_log_value";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	functionid, itemid;
-	int		value_type, ret = FAIL;
+	zbx_uint64_t	functionid;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == trigger_get_N_functionid(trigger, N_functionid, &functionid))
 		goto fail;
 
-	result = DBselect("select i.itemid,i.value_type from items i,functions f"
-			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
+	result = DBselect("select i.itemid,i.value_type"
+			" from items i,functions f"
+			" where i.itemid=f.itemid"
+				" and f.functionid=" ZBX_FS_UI64,
 			functionid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		value_type = atoi(row[1]);
+		zbx_uint64_t	itemid;
+		unsigned char	value_type;
 
-		if (value_type == ITEM_VALUE_TYPE_LOG)
-			ret = DBget_history_value(itemid, replace_to, "history_log", fieldname, clock, ns);
+		if (ITEM_VALUE_TYPE_LOG == (value_type = (unsigned char)atoi(row[1])))
+		{
+			ZBX_STR2UINT64(itemid, row[0]);
+
+			ret = DBget_history_value(itemid, value_type, replace_to, field_name, clock, ns);
+		}
 	}
 	DBfree_result(result);
 fail:
@@ -1253,11 +1177,8 @@ static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_fun
 	const char	*__function_name = "DBget_item_lastvalue";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_RESULT	h_result;
-	DB_ROW		h_row;
-	zbx_uint64_t	valuemapid, functionid;
-	int		value_type, ret = FAIL;
-	char		tmp[MAX_STRING_LEN];
+	zbx_uint64_t	functionid;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1273,6 +1194,12 @@ static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_fun
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4]))
 	{
+		zbx_uint64_t	itemid, valuemapid;
+		unsigned char	value_type;
+		char		**h_value;
+		char		tmp[MAX_STRING_LEN];
+
+		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
 		ZBX_DBROW2UINT64(valuemapid, row[2]);
 
@@ -1280,18 +1207,14 @@ static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_fun
 		{
 			case ITEM_VALUE_TYPE_LOG:
 			case ITEM_VALUE_TYPE_TEXT:
-				zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s order by id desc",
-						value_type == ITEM_VALUE_TYPE_LOG ? "history_log" : "history_text",
-						row[0]);
+				h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, NULL, 1);
 
-				h_result = DBselectN(tmp, 1);
-
-				if (NULL != (h_row = DBfetch(h_result)))
-					ZBX_STRDUP(*lastvalue, h_row[0]);
+				if (NULL != h_value[0])
+					*lastvalue = zbx_strdup(*lastvalue, h_value[0]);
 				else
 					ZBX_STRDUP(*lastvalue, row[4]);
 
-				DBfree_result(h_result);
+				DBfree_history(h_value);
 				break;
 			default:
 				zbx_strlcpy(tmp, row[4], sizeof(tmp));
@@ -1329,9 +1252,8 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 	const char	*__function_name = "DBget_item_value";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	functionid, itemid, valuemapid;
-	int		value_type, ret = FAIL;
-	char		tmp[MAX_STRING_LEN];
+	zbx_uint64_t	functionid;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1347,11 +1269,15 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 
 	if (NULL != (row = DBfetch(result)))
 	{
+		zbx_uint64_t	itemid, valuemapid;
+		unsigned char	value_type;
+		char		tmp[MAX_STRING_LEN];
+
 		ZBX_STR2UINT64(itemid, row[0]);
-		value_type = atoi(row[1]);
+		value_type = (unsigned char)atoi(row[1]);
 		ZBX_DBROW2UINT64(valuemapid, row[2]);
 
-		if (SUCCEED == (ret = DBget_history_value(itemid, value, get_table_by_value_type(value_type), "value", clock, ns)))
+		if (SUCCEED == (ret = DBget_history_value(itemid, value_type, value, "value", clock, ns)))
 		{
 			switch (value_type)
 			{
