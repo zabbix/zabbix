@@ -927,11 +927,11 @@ else {
 			if($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
 
 			// escaping parameter that is about to be used in LIKE statement
-			if(empty($options['searchWildcardsEnabled'])){
-				$pattern = str_replace("!", "!!", $pattern);
-				$pattern = str_replace("%", "!%", $pattern);
-				$pattern = str_replace("_", "!_", $pattern);
+			$pattern = str_replace("!", "!!", $pattern);
+			$pattern = str_replace("%", "!%", $pattern);
+			$pattern = str_replace("_", "!_", $pattern);
 
+			if(empty($options['searchWildcardsEnabled'])){
 				$search[$field] =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
@@ -939,10 +939,12 @@ else {
 					" ESCAPE '!'";
 			}
 			else{
+				$pattern = str_replace("*", "%", $pattern);
 				$search[$field] =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
-					zbx_dbstr(zbx_strtoupper($pattern));
+					zbx_dbstr(zbx_strtoupper($pattern)).
+					" ESCAPE '!'";
 			}
 		}
 
