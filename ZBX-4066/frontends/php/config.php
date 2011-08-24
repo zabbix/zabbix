@@ -497,84 +497,92 @@ include_once('include/page_header.php');
 		}
 	}
 
-	else if($_REQUEST['config'] == 11){ // Macros
-		if(isset($_REQUEST['save'])){
-			try{
+	// Macros
+	else if($_REQUEST['config'] == 11) {
+		if (isset($_REQUEST['save'])) {
+			try {
 				DBstart();
 
+				$globalMacros = CUserMacro::get(array('globalmacro' => 1, 'output' => API_OUTPUT_EXTEND));
+				$globalMacros = zbx_toHash($globalMacros, 'macro');
+
 				$newMacros = get_request('macros', array());
-				foreach($newMacros as $mnum => $nmacro){
-					if(zbx_empty($nmacro['value'])) unset($newMacros[$mnum]);
+				foreach ($newMacros as $number => $newMacro) {
+					// remove item from new macros array if value is empty
+					if (zbx_empty($newMacro['value'])) {
+						unset($newMacros[$number]);
+					}
 				}
 
-				$global_macros = CUserMacro::get(array(
-					'globalmacro' => 1,
-					'output' => API_OUTPUT_EXTEND
-				));
-				$global_macros = zbx_toHash($global_macros, 'macro');
+				// update
+				$macrosToUpdate = array();
+				foreach ($newMacros as $number => $newMacro) {
+					if (isset($globalMacros[$newMacro['macro']])) {
+						$macrosToUpdate[] = $newMacro;
+
+						// remove item from new macros array
+						unset($newMacros[$number]);
+					}
+				}
+				if (!empty($macrosToUpdate)) {
+					if (!CUsermacro::updateGlobal($macrosToUpdate)) {
+						throw new Exception(S_CANNOT_UPDATE_MACRO);
+					}
+				}
 
 				$newMacroMacros = zbx_objectValues($newMacros, 'macro');
 				$newMacroMacros = zbx_toHash($newMacroMacros, 'macro');
 
-// Delete
+				// delete
 				$macrosToDelete = array();
-				foreach($global_macros as $gmacro){
-					if(!isset($newMacroMacros[$gmacro['macro']])){
-						$macrosToDelete[] = $gmacro['macro'];
-					}
-				}
+				$macrosToUpdate = zbx_toHash($macrosToUpdate, 'macro');
+				foreach ($globalMacros as $globalMacro) {
+					if (empty($newMacroMacros[$globalMacro['macro']]) && empty($macrosToUpdate[$globalMacro['macro']])) {
+						$macrosToDelete[] = $globalMacro['macro'];
 
-// Update
-				$macrosToUpdate = array();
-				foreach($newMacros as $mnum => $nmacro){
-					if(isset($global_macros[$nmacro['macro']])){
-						$macrosToUpdate[] = $nmacro;
-						unset($newMacros[$mnum]);
+						// remove item from new macros array
+						foreach ($newMacros as $number => $newMacro) {
+							if ($newMacro['macro'] == $globalMacro['macro']) {
+								unset($newMacros[$number]);
+								break;
+							}
+						}
 					}
 				}
-//----
-				if(!empty($macrosToDelete)){
-					if(!CUserMacro::deleteGlobal($macrosToDelete))
+				if (!empty($macrosToDelete)) {
+					if (!CUserMacro::deleteGlobal($macrosToDelete)) {
 						throw new Exception(S_CANNOT_REMOVE_MACRO);
+					}
+					foreach ($macrosToDelete as $macro) {
+						add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $globalMacros[$macro]['globalmacroid'], $macro.SPACE.RARR.SPACE.$globalMacros[$macro]['value'], null, null, null);
+					}
 				}
 
-				if(!empty($macrosToUpdate)){
-					if(!CUsermacro::updateGlobal($macrosToUpdate))
-						throw new Exception(S_CANNOT_UPDATE_MACRO);
-				}
-
-				if(!empty($newMacros)){
+				// create
+				if (!empty($newMacros)) {
 					$macrosToAdd = array_values($newMacros);
 					$new_macroids = CUsermacro::createGlobal($macrosToAdd);
-					if(!$new_macroids)
+					if (!$new_macroids) {
 						throw new Exception(S_CANNOT_ADD_MACRO);
+					}
 				}
 
-				if(!empty($macrosToAdd)){
+				if (!empty($macrosToAdd)) {
 					$new_macros = CUserMacro::get(array(
 						'globalmacroids' => $new_macroids['globalmacroids'],
 						'globalmacro' => 1,
 						'output' => API_OUTPUT_EXTEND
 					));
 					$new_macros = zbx_toHash($new_macros, 'globalmacroid');
-					foreach($macrosToDelete as $macroid){
-						add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO,
-							zbx_dbstr($macroid),
-							$global_macros[$macroid]['macro'],
-							null,null,null);
-					}
 					foreach($new_macroids['globalmacroids'] as $newid){
-						add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO,
-							$newid,
-							$new_macros[$newid]['macro'],
-							null,null,null);
+						add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $newid, $new_macros[$newid]['macro'], null,null,null);
 					}
 				}
 
 				DBend(true);
 				show_messages(true, S_MACROS_UPDATED, S_CANNOT_UPDATE_MACROS);
 			}
-			catch(Exception $e){
+			catch(Exception $e) {
 				DBend(false);
 				error($e->getMessage());
 				show_messages(false, S_MACROS_UPDATED, S_CANNOT_UPDATE_MACROS);
