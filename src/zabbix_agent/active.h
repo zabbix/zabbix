@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@ extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern int	CONFIG_BUFFER_SEND;
 extern int	CONFIG_BUFFER_SIZE;
 extern int	CONFIG_MAX_LINES_PER_SECOND;
-extern char	*CONFIG_LISTEN_IP;
-extern int	CONFIG_LISTEN_PORT;
 
 /* define minimal and maximal values of lines to send by agent */
 /* per second for checks `log' and `eventlog', used to parse key parameters */
@@ -57,14 +55,13 @@ extern int	CONFIG_LISTEN_PORT;
 
 typedef struct
 {
-	char		*key, *key_orig;
-	int		refresh;
-	int		nextcheck;
-	int		status;
+	char	*key, *key_orig;
+	int	refresh;
+	int	nextcheck;
+	int	status;
 /* must be long for fseek() */
-	long		lastlogsize;
-	int		mtime;
-	unsigned char	skip_old_data;	/* for processing [event]log metrics */
+	long	lastlogsize;
+	int	mtime;
 }
 ZBX_ACTIVE_METRIC;
 
@@ -84,7 +81,7 @@ typedef struct
 	char		*source;
 	int		severity;
 	long		lastlogsize;
-	zbx_timespec_t	ts;
+	int		clock;
 	int		logeventid;
 	int		mtime;
 	unsigned char	persistent;

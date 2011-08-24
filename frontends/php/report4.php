@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,6 +49,14 @@ include_once('include/page_header.php');
 	$_REQUEST['media_type']	= $media_type;
 
 	$css = getUserTheme($USER_DETAILS);
+	$vTextColor = ($css == 'css_od.css')?'&color=white':'';
+
+	$header = array();
+	$db_users = DBselect('select * from users where '.DBin_node('userid').' order by alias,userid');
+	while($user_data = DBfetch($db_users)){
+		array_push($header, new CImg('vtext.php?text='.urlencode($user_data['alias']).$vTextColor));
+		$users[$user_data['userid']] = $user_data['alias'];
+	}
 
 	$media_types = array();
 
@@ -64,10 +72,11 @@ include_once('include/page_header.php');
 	// if no media types were defined, we have nothing to show
 	if (zbx_empty($media_types)){
 		show_table_header(S_NOTIFICATIONS_BIG);
-		$table = new CTableInfo(_('No media types defined.'));
+		$table = new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
 		$table->Show();
 	}
-	else{
+	else
+	{
 		$table = new CTableInfo();
 
 		if( ($min_time = DBfetch(DBselect('select min(clock) as clock from alerts'))) && $min_time['clock'])
@@ -93,6 +102,7 @@ include_once('include/page_header.php');
 				unset($media_types[$media_type_id]);
 			}
 		}
+
 		$form->addItem($cmbMedia);
 
 		$form->addItem(SPACE.S_PERIOD.SPACE);
@@ -112,13 +122,6 @@ include_once('include/page_header.php');
 		}
 
 		show_table_header(S_NOTIFICATIONS_BIG, $form);
-
-		$header = array();
-		$db_users = DBselect('select * from users where '.DBin_node('userid').' order by alias,userid');
-		while($user_data = DBfetch($db_users)){
-			array_push($header, new CImg('vtext.php?text='.urlencode($user_data['alias']).'&theme='.$css));
-			$users[$user_data['userid']] = $user_data['alias'];
-		}
 
 		switch($period){
 			case 'yearly':
@@ -175,22 +178,22 @@ include_once('include/page_header.php');
 
 			$table_row = array(format_time($start),format_time2($end));
 
-			// getting all alerts in this period of time
+			//getting all alerts in this period of time
 			$options = array(
 				'output'=> array('mediatypeid', 'userid'),
 				'time_from'=>$start,
 				'time_till'=>$end
 			);
 
-			// if we must get only specific media type, no need to select the other ones
+			//if we must get only specific media type, no need to select the other ones
 			if ($media_type > 0){
 				$options['mediatypeids'] = $media_type;
 			}
 
-			// getting data through API
-			$alert_info = API::Alert()->get($options);
+			//getting data through API
+			$alert_info = CAlert::get($options);
 
-			// counting alert count for each user and media type
+			//counting alert count for each user and media type
 			$summary = array();
 			foreach($users as $userid => $alias){
 				$summary[$userid] = array();

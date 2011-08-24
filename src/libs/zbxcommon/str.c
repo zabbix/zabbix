@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -274,8 +274,7 @@ void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src)
 
 	if (*offset + sz >= *alloc_len)
 	{
-		while (*offset + sz >= *alloc_len)
-			*alloc_len *= 2;
+		*alloc_len += sz < 32 ? 64 : 2 * sz;
 		*str = zbx_realloc(*str, *alloc_len);
 	}
 
@@ -412,9 +411,9 @@ void	del_zeroes(char *s)
  * Parameters: str - string for processing                                    *
  *             charlist - null terminated list of characters                  *
  *                                                                            *
- * Return value: number of trimmed characters                                 *
+ * Return value: length of stripped string                                    *
  *                                                                            *
- * Author: Eugene Grigorjev, Aleksandrs Saveljevs                             *
+ * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -422,18 +421,14 @@ void	del_zeroes(char *s)
 int	zbx_rtrim(char *str, const char *charlist)
 {
 	char	*p;
-	int	count = 0;
 
 	if (NULL == str || '\0' == *str)
-		return count;
+		return 0;
 
 	for (p = str + strlen(str) - 1; p >= str && NULL != strchr(charlist, *p); p--)
-	{
 		*p = '\0';
-		count++;
-	}
 
-	return count;
+	return (int)(p - str);
 }
 
 /******************************************************************************
@@ -2400,10 +2395,10 @@ char	*zbx_age2str(int age)
 	int		days, hours, minutes, offset;
 	static char	buffer[32];
 
-	days = (int)((double)age / SEC_PER_DAY);
-	hours = (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
+	days	= (int)((double)age / SEC_PER_DAY);
+	hours	= (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
 	minutes	= (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
-	offset = 0;
+	offset	= 0;
 
 	if (days)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
@@ -2419,7 +2414,7 @@ char	*zbx_date2str(time_t date)
 	static char	buffer[11];
 	struct tm	*tm;
 
-	tm = localtime(&date);
+	tm	= localtime(&date);
 	zbx_snprintf(buffer, sizeof(buffer), "%.4d.%.2d.%.2d",
 			tm->tm_year + 1900,
 			tm->tm_mon + 1,
@@ -2433,7 +2428,7 @@ char	*zbx_time2str(time_t time)
 	static char	buffer[9];
 	struct tm	*tm;
 
-	tm = localtime(&time);
+	tm	= localtime(&time);
 	zbx_snprintf(buffer, sizeof(buffer), "%.2d:%.2d:%.2d",
 			tm->tm_hour,
 			tm->tm_min,
@@ -2452,7 +2447,7 @@ static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 	if (NULL == s2)
 		return -1;
 
-	while (0 != n && '\0' != *s1 && '\0' != *s2 &&
+	while (n && '\0' != *s1 && '\0' != *s2 &&
 			tolower((unsigned char)*s1) == tolower((unsigned char)*s2))
 	{
 		s1++;
@@ -2460,7 +2455,7 @@ static int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 		n--;
 	}
 
-	return 0 == n ? 0 : tolower((unsigned char)*s1) - tolower((unsigned char)*s2);
+	return n == 0 ? 0 : tolower((unsigned char)*s1) - tolower((unsigned char)*s2);
 }
 
 char	*zbx_strcasestr(const char *haystack, const char *needle)
@@ -2536,25 +2531,6 @@ const char	*zbx_permission_string(int perm)
 	}
 }
 
-const char	*zbx_host_type_string(zbx_item_type_t item_type)
-{
-	switch (item_type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			return "Zabbix";
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			return "SNMP";
-		case ITEM_TYPE_IPMI:
-			return "IPMI";
-		case ITEM_TYPE_JMX:
-			return "JMX";
-		default:
-			return "generic";
-	}
-}
-
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 {
 	switch (value_type)
@@ -2569,41 +2545,6 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 			return "Numeric (unsigned)";
 		case ITEM_VALUE_TYPE_TEXT:
 			return "Text";
-		default:
-			return "unknown";
-	}
-}
-
-const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type)
-{
-	switch (data_type)
-	{
-		case ITEM_DATA_TYPE_DECIMAL:
-			return "Decimal";
-		case ITEM_DATA_TYPE_OCTAL:
-			return "Octal";
-		case ITEM_DATA_TYPE_HEXADECIMAL:
-			return "Hexadecimal";
-		case ITEM_DATA_TYPE_BOOLEAN:
-			return "Boolean";
-		default:
-			return "unknown";
-	}
-}
-
-const char	*zbx_interface_type_string(zbx_interface_type_t type)
-{
-	switch (type)
-	{
-		case INTERFACE_TYPE_AGENT:
-			return "Zabbix agent";
-		case INTERFACE_TYPE_SNMP:
-			return "SNMP";
-		case INTERFACE_TYPE_IPMI:
-			return "IPMI";
-		case INTERFACE_TYPE_JMX:
-			return "JMX";
-		case INTERFACE_TYPE_UNKNOWN:
 		default:
 			return "unknown";
 	}
@@ -2625,8 +2566,27 @@ const char	*zbx_result_string(int result)
 			return "TIMEOUT_ERROR";
 		case AGENT_ERROR:
 			return "AGENT_ERROR";
-		case PROXY_ERROR:
-			return "PROXY_ERROR";
+		default:
+			return "unknown";
+	}
+}
+
+const char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
+{
+	switch (severity)
+	{
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+			return "Not classified";
+		case TRIGGER_SEVERITY_INFORMATION:
+			return "Information";
+		case TRIGGER_SEVERITY_WARNING:
+			return "Warning";
+		case TRIGGER_SEVERITY_AVERAGE:
+			return "Average";
+		case TRIGGER_SEVERITY_HIGH:
+			return "High";
+		case TRIGGER_SEVERITY_DISASTER:
+			return "Disaster";
 		default:
 			return "unknown";
 	}
@@ -2685,16 +2645,6 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 			return "ICMP Ping";
 		default:
 			return "unknown";
-	}
-}
-
-const char	*zbx_nodetype_string(unsigned char nodetype)
-{
-	switch (nodetype)
-	{
-		case ZBX_NODE_MASTER: return "MASTER";
-		case ZBX_NODE_SLAVE: return "SLAVE";
-		default: return "unknown";
 	}
 }
 
@@ -2843,26 +2793,20 @@ LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string)
 }
 
 /* convert from unicode to utf8 */
-LPSTR	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size)
+int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size)
 {
 	/* convert from wide_string to utf8_string */
 	if (0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, -1, utf8_string, utf8_size, NULL, NULL))
-		*utf8_string = '\0';
+		return FAIL;
 
-	return utf8_string;
+	return SUCCEED;
 }
 #endif
-
-void	zbx_strlower(char *str)
-{
-	for (; '\0' != *str; str++)
-		*str = tolower(*str);
-}
 
 void	zbx_strupper(char *str)
 {
 	for (; '\0' != *str; str++)
-		*str = toupper(*str);
+		*str = toupper((int)*str);
 }
 
 #if defined(_WINDOWS)
@@ -3145,17 +3089,21 @@ void	zbx_replace_invalid_utf8(char *text)
 	*out = '\0';
 }
 
-void	dos2unix(char *str)
+void	win2unix_eol(char *text)
 {
-	char	*o = str;
+	size_t	i, sz;
 
-	while ('\0' != *str)
+	sz = strlen(text);
+
+	for (i = 0; i < sz; i++)
 	{
-		if ('\r' == str[0] && '\n' == str[1])	/* CR+LF (Windows) */
-			str++;
-		*o++ = *str++;
+		if (text[i] == '\r' && text[i + 1] == '\n')	/* CR+LF (Windows) */
+		{
+			text[i] = '\n';	/* LF (Unix) */
+			sz--;
+			memmove(&text[i + 1], &text[i + 2], (sz - i) * sizeof(char));
+		}
 	}
-	*o = '\0';
 }
 
 int	is_ascii_string(const char *str)

@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('ip', ZBX_SORT_UP);
+	validate_sort_and_sortorder('ip',ZBX_SORT_UP);
 
 ?>
 <?php
@@ -61,19 +61,18 @@ include_once('include/page_header.php');
 	$dscvry_wdgt = new CWidget('hat_discovery');
 
 // HEADER
-	$r_form = new CForm('get');
+	$r_form = new CForm();
+	$r_form->setMethod('get');
 
-	$fullscreen = get_request('fullscreen', 0);
 	$druleid = get_request('druleid', 0);
+	$fullscreen = get_request('fullscreen', 0);
 
-	$r_form->addVar('fullscreen', $fullscreen);
-
-	$fs_icon = get_icon('fullscreen', array('fullscreen' => $fullscreen));
+	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$dscvry_wdgt->addPageHeader(S_STATUS_OF_DISCOVERY_BIG, $fs_icon);
 
 // 2nd header
-	$cmbDRules = new CComboBox('druleid', $druleid, 'submit()');
-	$cmbDRules->addItem(0, S_ALL_SMALL);
+	$cmbDRules = new CComboBox('druleid',$druleid,'submit()');
+	$cmbDRules->addItem(0,S_ALL_SMALL);
 
 	$options = array(
 		'filter' => array(
@@ -81,7 +80,7 @@ include_once('include/page_header.php');
 		),
 		'output' => API_OUTPUT_EXTEND
 	);
-	$drules = API::DRule()->get($options);
+	$drules = CDRule::get($options);
 
 	order_result($drules, 'name');
 	foreach($drules as $dnum => $drule){
@@ -90,23 +89,35 @@ include_once('include/page_header.php');
 			get_node_name_by_elid($drule['druleid'], null, ': ').$drule['name']
 		);
 	}
+	$r_form->addVar('fullscreen', $fullscreen);
+	$r_form->addItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
 
-	$r_form->addItem(array(S_DISCOVERY_RULE.SPACE, $cmbDRules));
+//	$dscvry_wdgt->addHeader(array(S_FOUND.': ',$numrows), $r_form);
 
+	$numrows = new CDiv();
+	$numrows->setAttribute('name', 'numrows');
 
 	$dscvry_wdgt->addHeader(S_DISCOVERY_RULES_BIG, $r_form);
+//	$dscvry_wdgt->addHeader($numrows);
+//-------------
+
+
+	$sortfield = getPageSortField('ip');
+	$sortorder = getPageSortOrder();
+
 	$options = array(
-		'selectHosts' => array('hostid', 'name', 'status'),
+		'selectHosts' => array('hostid', 'host', 'status'),
 		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => getPageSortField('ip'),
-		'sortorder' => getPageSortOrder(),
+		'sortfield' => $sortfield,
+		'sortorder' => $sortorder,
 		'limitSelects' => 1
 	);
-	if($druleid > 0) $options['druleids'] = $druleid;
-	else $options['druleids'] = zbx_objectValues($drules, 'druleid');
-	$dservices = API::DService()->get($options);
 
-	$gMacros = API::UserMacro()->get(array(
+	if($druleid>0) $options['druleids'] = $druleid;
+	else $options['druleids'] = zbx_objectValues($drules,'druleid');
+
+	$dservices = CDService::get($options);
+	$gMacros = CUserMacro::get(array(
 		'output' => API_OUTPUT_EXTEND,
 		'globalmacro' => 1
 	));
@@ -136,8 +147,9 @@ include_once('include/page_header.php');
 	);
 
 	$css = getUserTheme($USER_DETAILS);
+	$vTextColor = ($css == 'css_od.css')?'&color=white':'';
 	foreach($services as $name => $foo) {
-		$header[] = new CImg('vtext.php?text='.urlencode($name).'&theme='.$css);
+		$header[] = new CImg('vtext.php?text='.urlencode($name).$vTextColor);
 	}
 
 	$table = new CTableInfo();
@@ -152,7 +164,7 @@ include_once('include/page_header.php');
 	);
 	if($druleid>0) $options['druleids'] = $druleid;
 
-	$drules = API::DRule()->get($options);
+	$drules = CDRule::get($options);
 	order_result($drules, 'name');
 
 	$options = array(
@@ -160,7 +172,7 @@ include_once('include/page_header.php');
 		'selectDServices' => API_OUTPUT_REFER,
 		'output' => API_OUTPUT_REFER
 	);
-	$db_dhosts = API::DHost()->get($options);
+	$db_dhosts = CDHost::get($options);
 	$db_dhosts = zbx_toHash($db_dhosts, 'dhostid');
 
 	$db_dservices = zbx_toHash($dservices, 'dserviceid');
@@ -190,7 +202,7 @@ include_once('include/page_header.php');
 				$hostName = '';
 
 				$host = reset($db_dservices[$dservice['dserviceid']]['hosts']);
-				if(!is_null($host)) $hostName = $host['name'];
+				if(!is_null($host)) $hostName = $host['host'];
 
 				if(isset($primary_ip)){
 					if($primary_ip === $dservice['ip']) $htype = 'primary';
@@ -204,7 +216,6 @@ include_once('include/page_header.php');
 				if(!isset($discovery_info[$dservice['ip']])){
 					$discovery_info[$dservice['ip']] = array(
 						'ip' => $dservice['ip'],
-						'dns' => $dservice['dns'],
 						'type' => $htype,
 						'class' => $hclass,
 						'host' => $hostName,
@@ -230,15 +241,12 @@ include_once('include/page_header.php');
 						discovery_port2str($dservice['type'], $dservice['port']).
 						$key_;
 
-				$discovery_info[$dservice['ip']]['services'][$service_name] = array(
-					'class' => $class,
-					'time' => $dservice[$time]
-				);
+				$discovery_info[$dservice['ip']]['services'][$service_name] = array('class' => $class, 'time' => $dservice[$time]);
 			}
 		}
 
 		if($druleid == 0 && !empty($discovery_info)){
-			$col = new CCol(array(bold($drule['name']),	SPACE.'('._n('%d device', '%d devices', count($discovery_info)).')'));
+			$col = new CCol(array(bold($drule['name']),	SPACE.'('.count($discovery_info).SPACE.S_ITEMS.')'));
 			$col->setColSpan(count($services) + 3);
 
 			$table->addRow(array(get_node_name_by_elid($drule['druleid']),$col));
@@ -247,10 +255,9 @@ include_once('include/page_header.php');
 		order_result($discovery_info, $_REQUEST['sort'], $_REQUEST['sortorder']);
 
 		foreach($discovery_info as $ip => $h_data){
-			$dns = $h_data['dns'] == '' ? '' : ' ('.$h_data['dns'].')';
 			$table_row = array(
 				get_node_name_by_elid($h_data['druleid']),
-				$h_data['type'] == 'primary' ? new CSpan($ip.$dns, $h_data['class']) : new CSpan(SPACE.SPACE.$ip.$dns),
+				$h_data['type'] == 'primary' ? new CSpan($ip, $h_data['class']) : new CSpan(SPACE.SPACE.$ip),
 				new CSpan(empty($h_data['host']) ? '-' : $h_data['host']),
 				new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave') ?
 						'' : convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])
@@ -262,6 +269,8 @@ include_once('include/page_header.php');
 
 				$hint = new CDiv(SPACE, $class);
 
+
+
 				$hintTable = null;
 				if(isset($h_data['services'][$name])){
 					$class = $h_data['services'][$name]['class'];
@@ -270,10 +279,10 @@ include_once('include/page_header.php');
 					$hintTable = new CTableInfo();
 					$hintTable->setAttribute('style','width: auto;');
 
-					if($class == 'active') {
+					if ($class == 'active') {
 						$hintTable->setHeader(S_UP_TIME);
 					}
-					else if($class == 'inactive') {
+					else if ($class == 'inactive') {
 						$hintTable->setHeader(S_DOWN_TIME);
 					}
 
@@ -297,5 +306,7 @@ include_once('include/page_header.php');
 
 ?>
 <?php
+
 include_once('include/page_footer.php');
+
 ?>

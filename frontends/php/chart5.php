@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ include_once('include/page_header.php');
 			'nodeids' => get_current_nodeid(true)
 		);
 
-		$db_data = API::Trigger()->get($options);
+		$db_data = CTrigger::get($options);
 		if(empty($db_data)) access_deny();
 	}
 ?>
@@ -86,8 +86,7 @@ include_once('include/page_header.php');
 	imagefilledrectangle($im,0,0,$x,$y,$white);
 	imagerectangle($im,0,0,$x-1,$y-1,$black);
 
-	$d = zbx_date2str('Y');
-	$str = _s('%1$s (year %2$s)', $service['name'], $d);
+	$str=S_CHART5_HEADER_TITLE_PART1.' '.$service['name'].' '.S_CHART5_HEADER_TITLE_PART2.' '.zbx_date2str(S_CHART5_HEADER_DATE_FORMAT).' '.S_CHART5_HEADER_TITLE_PART3;
 	$x=imagesx($im)/2-imagefontwidth(4)*zbx_strlen($str)/2;
 	// imagestring($im, 4,$x,1, $str , $darkred);
 	imageText($im, 10, 0, $x, 14, $darkred, $str);

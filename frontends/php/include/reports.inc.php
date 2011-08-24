@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2008 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,9 @@
 <?php
 
 function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
+	global $USER_DETAILS;
+
+	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
 
@@ -44,8 +47,8 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 	}
 
-	$filterForm->addRow(_('Template group'),$cmbGroups);
-	$filterForm->addRow(_('Template'),$cmbHosts);
+	$filterForm->addRow(S_GROUP,$cmbGroups);
+	$filterForm->addRow(S_HOST,$cmbHosts);
 
 	if(1 == $config){
 		$cmbTrigs = new CComboBox('tpl_triggerid',get_request('tpl_triggerid',0),'submit()');
@@ -103,8 +106,8 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 					);
 		}
 
-		$filterForm->addRow(_('Template trigger'),$cmbTrigs);
-		$filterForm->addRow(_('Filter by host group'),$cmbHGrps);
+		$filterForm->addRow(S_TRIGGER,$cmbTrigs);
+		$filterForm->addRow(S_FILTER.SPACE.S_HOST_GROUP,$cmbHGrps);
 	}
 
 //*
@@ -170,9 +173,11 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 	$filterForm->addRow(S_PERIOD, $filtertimetab);
 
 //*/
-	$filterForm->addItemToBottomRow(new CSubmit('filter_set',S_FILTER));
+	$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
 
-	$reset = new CButton("filter_rst", S_RESET, 'javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
+	$reset = new CButton("filter_rst",S_RESET);
+	$reset->setType('button');
+	$reset->setAction('javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
 
 	$filterForm->addItemToBottomRow($reset);
 
@@ -180,14 +185,21 @@ return $filterForm;
 }
 
 function bar_report_form(){
+	global $USER_DETAILS;
+
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+
 	$config = get_request('config',1);
 	$items = get_request('items',array());
+	$function_type = get_request('function_type',CALC_FNC_AVG);
 	$scaletype = get_request('scaletype',TIMEPERIOD_TYPE_WEEKLY);
 
 	$title = get_request('title',S_REPORT.' 1');
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 	$showlegend = get_request('showlegend',0);
+
+//	$showLegend =
 
 	$report_timesince = $_REQUEST['report_timesince'];
 	$report_timetill = $_REQUEST['report_timetill'];
@@ -196,6 +208,7 @@ function bar_report_form(){
 	$reportForm->setAttribute('name','zbx_report');
 	$reportForm->setAttribute('id','zbx_report');
 
+//	$reportForm->setMethod('post');
 	if(isset($_REQUEST['report_show']) && !empty($items))
 		$reportForm->addVar('report_show','show');
 
@@ -295,6 +308,9 @@ function bar_report_form(){
 			$host = get_host_by_itemid($gitem['itemid']);
 			$item = get_item_by_itemid($gitem['itemid']);
 
+			if($host['status'] == HOST_STATUS_TEMPLATE) $only_hostid = $host['hostid'];
+			else $monitored_hosts = 1;
+
 			$color = new CColorCell(null,$gitem['color']);
 
 			$caption = new CSpan($gitem['caption'], 'link');
@@ -304,7 +320,7 @@ function bar_report_form(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['name'].': '.itemName($item);
+			$description = $host['host'].': '.item_description($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
@@ -315,7 +331,7 @@ function bar_report_form(){
 					$color,
 				));
 		}
-		$delete_button = new CSubmit('delete_item', S_DELETE_SELECTED);
+		$delete_button = new CButton('delete_item', S_DELETE_SELECTED);
 	}
 	else{
 		$items_table = $delete_button = null;
@@ -331,7 +347,7 @@ function bar_report_form(){
 				));
 	unset($items_table, $delete_button);
 
-	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
+	$reportForm->addItemToBottomRow(new CButton('report_show',S_SHOW));
 
 	$reset = new CButton('reset',S_RESET);
 	$reset->setType('reset');
@@ -341,6 +357,8 @@ return $reportForm;
 }
 
 function bar_report_form2(){
+	global $USER_DETAILS;
+
 	$config = get_request('config',1);
 
 	$title = get_request('title',S_REPORT.' 2');
@@ -349,6 +367,7 @@ function bar_report_form2(){
 
 	$sorttype = get_request('sorttype',0);
 
+	$captions = get_request('captions',array());
 	$items = get_request('items',array());
 	$periods = get_request('periods',array());
 
@@ -409,7 +428,7 @@ function bar_report_form2(){
 					$color,
 				));
 		}
-		$delete_button = new CSubmit('delete_period', S_DELETE_SELECTED);
+		$delete_button = new CButton('delete_period', S_DELETE_SELECTED);
 	}
 	else{
 		$periods_table = $delete_button = null;
@@ -435,6 +454,9 @@ function bar_report_form2(){
 			$host = get_host_by_itemid($gitem['itemid']);
 			$item = get_item_by_itemid($gitem['itemid']);
 
+			if($host['status'] == HOST_STATUS_TEMPLATE) $only_hostid = $host['hostid'];
+			else $monitored_hosts = 1;
+
 			$caption = new CSpan($gitem['caption'], 'link');
 			$caption->onClick(
 					'return PopUp("popup_bitem.php?config=2&list_name=items&dstfrm='.$reportForm->GetName().
@@ -442,7 +464,7 @@ function bar_report_form2(){
 					url_param($gid,false,'gid').
 					'",550,400,"graph_item_form");');
 
-			$description = $host['name'].': '.itemName($item);
+			$description = $host['host'].': '.item_description($item);
 
 			$items_table->addRow(array(
 					new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
@@ -451,7 +473,7 @@ function bar_report_form2(){
 					graph_item_calc_fnc2str($gitem['calc_fnc'],0)
 				));
 		}
-		$delete_button = new CSubmit('delete_item', S_DELETE_SELECTED);
+		$delete_button = new CButton('delete_item', S_DELETE_SELECTED);
 	}
 	else{
 		$items_table = $delete_button = null;
@@ -469,7 +491,7 @@ function bar_report_form2(){
 //--------------
 
 
-	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
+	$reportForm->addItemToBottomRow(new CButton('report_show',S_SHOW));
 
 	$reset = new CButton('reset',S_RESET);
 	$reset->setType('reset');
@@ -479,18 +501,23 @@ return $reportForm;
 }
 
 function bar_report_form3(){
+	global $USER_DETAILS;
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+
 	$config = get_request('config',1);
 
 	$title = get_request('title',S_REPORT.' 3');
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 
+	$sorttype = get_request('sorttype',0);
 	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
 	$report_timesince = get_request('report_timesince',date('YmdHis', time()-86400));
 	$report_timetill = get_request('report_timetill',date('YmdHis'));
 
+	$captions = get_request('captions',array());
 	$items = get_request('items',array());
 
 	$hostids = get_request('hostids', array());
@@ -531,7 +558,7 @@ function bar_report_form3(){
 		'output' => 'extend'
 	);
 
-	$db_groups = API::HostGroup()->get($options);
+	$db_groups = CHostGroup::get($options);
 	order_result($db_groups, 'name');
 	foreach($db_groups as $gnum => $group){
 		$groupids[$group['groupid']] = $group['groupid'];
@@ -558,29 +585,29 @@ function bar_report_form3(){
 
 	$options = array(
 		'real_hosts' => 1,
-		'output' => array('hostid', 'name')
+		'output' => array('hostid', 'host')
 	);
 	if($groupid > 0){
 		$options['groupids'] = $groupid;
 	}
-	$db_hosts = API::Host()->get($options);
+	$db_hosts = CHost::get($options);
 	$db_hosts = zbx_toHash($db_hosts, 'hostid');
-	order_result($db_hosts, 'name');
+	order_result($db_hosts, 'host');
 
 	foreach($db_hosts as $hnum => $host){
-		$host_tb->addItem($host['hostid'],$host['name']);
+		$host_tb->addItem($host['hostid'],$host['host']);
 	}
 
 	$options = array(
 		'real_hosts' => 1,
-		'output' => array('hostid', 'name'),
+		'output' => array('hostid', 'host'),
 		'hostids' => $hostids,
 	);
-	$db_hosts2 = API::Host()->get($options);
-	order_result($db_hosts2, 'name');
+	$db_hosts2 = CHost::get($options);
+	order_result($db_hosts2, 'host');
 	foreach($db_hosts2 as $hnum => $host){
 		if(!isset($db_hosts[$host['hostid']]))
-			$host_tb->addItem($host['hostid'],$host['name']);
+			$host_tb->addItem($host['hostid'],$host['host']);
 	}
 
 	$reportForm->addRow(S_HOSTS, $host_tb->Get(S_SELECTED_HOSTS,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
@@ -678,15 +705,15 @@ function bar_report_form3(){
 	if(count($items) && ($items[0]['itemid'] > 0)){
 		$itemid = $items[0]['itemid'];
 		$description = get_item_by_itemid($itemid);
-		$description = itemName($description);
+		$description = item_description($description);
 	}
 	$reportForm->addVar('items[0][itemid]',$itemid);
 
-	$txtCondVal = new CTextBox('items[0][name]',$description,50,'yes');
+	$txtCondVal = new CTextBox('items[0][description]',$description,50,'yes');
 	$btnSelect = new CButton('btn1',S_SELECT,
 			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
-			"&dstfld1=items_0_itemid&dstfld2=items_0_description&".
-			"srctbl=items&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
+			"&dstfld1=items[0][itemid]&dstfld2=items[0][description]&".
+			"srctbl=items&srcfld1=itemid&srcfld2=description&monitored_hosts=1');",
 			'T');
 
 	$reportForm->addRow(S_ITEM , array($txtCondVal,$btnSelect));
@@ -707,7 +734,7 @@ function bar_report_form3(){
 //--------------
 
 
-	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
+	$reportForm->addItemToBottomRow(new CButton('report_show',S_SHOW));
 
 	$reset = new CButton('reset',S_RESET);
 	$reset->setType('reset');

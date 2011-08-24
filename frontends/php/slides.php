@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,6 +75,7 @@ include_once('include/page_header.php');
 				navigation_bar_calc('web.slides', $_REQUEST['elementid'],true);
 			}
 		}
+
 		if(str_in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -110,33 +111,19 @@ include_once('include/page_header.php');
 						$slideshow = get_slideshow_by_slideshowid($elementid);
 						$screen = get_slideshow($elementid, $step);
 
-						$screens = API::Screen()->get(array(
-							'screenids' => $screen['screenid']
-						));
-						if(empty($screens)){
-							print alert('No permissions');
-						}
-						else{
-							$screens = API::Screen()->get(array(
-								'screenids' => $screen['screenid'],
-								'output' => API_OUTPUT_EXTEND,
-								'selectScreenItems' => API_OUTPUT_EXTEND
-							));
-							$cur_screen = reset($screens);
-							$element = get_screen($cur_screen,2,$effectiveperiod);
+						$element = get_screen($screen['screenid'],2,$effectiveperiod);
 
-							$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
+						$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
 
-							if($screen['delay'] > 0) $refresh = $screen['delay'];
-							else $refresh = $slideshow['delay'];
+						if($screen['delay'] > 0) $refresh = $screen['delay'];
+						else $refresh = $slideshow['delay'];
 
-							$element->show();
+						$element->show();
 
-							$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh*$refresh_multipl)."\n";
-							$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
-							$script.= 'timeControl.processObjects();';
-							insert_js($script);
-						}
+						$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh*$refresh_multipl)."\n";
+						$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
+						$script.= 'timeControl.processObjects();';
+						insert_js($script);
 					}
 					else{
 						print(SBR.S_NO_SLIDESHOWS_DEFINED);
@@ -186,7 +173,7 @@ include_once('include/page_header.php');
 
 	$slides_wdgt = new CWidget('hat_slides');
 
-	$formHeader = new CForm('get');
+	$formHeader = new CForm(null, 'get');
 	$cmbConfig = new CComboBox('config', 'slides.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConfig->addItem('screens.php', S_SCREENS);
 		$cmbConfig->addItem('slides.php', S_SLIDESHOWS);
@@ -246,7 +233,7 @@ include_once('include/page_header.php');
 // }}} PAGE HEADER
 
 // HEADER {{{
-		$form = new CForm('get');
+		$form = new CForm(null, 'get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 		$cmbElements = new CComboBox('elementid', $elementid, 'submit()');

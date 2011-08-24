@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,13 +23,13 @@ class CListBox extends CComboBox{
 /* public */
 	public function __construct($name='listbox',$value=NULL,$size=5,$action=NULL){
 		parent::__construct($name,NULL,$action);
-		$this->attr('multiple', 'multiple');
-		$this->attr('size', $size);
+		$this->attributes['multiple'] = 'multiple';
+		$this->attributes['size'] = $size;
 		$this->setValue($value);
 	}
 
 	public function setSize($value){
-		$this->attr('size', $value);
+		$this->attributes['size'] = $value;
 	}
 }
 ?>

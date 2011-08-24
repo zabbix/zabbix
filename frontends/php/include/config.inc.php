@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,40 +31,30 @@ function __autoload($class_name){
 		'capplication' => 1,
 		'cdcheck' => 1,
 		'cdhost' => 1,
-		'cdiscoveryrule' => 1,
 		'cdrule' => 1,
 		'cdservice' => 1,
 		'cevent' => 1,
 		'cgraph' => 1,
-		'cgraphprototype' => 1,
 		'cgraphitem' => 1,
 		'chistory' => 1,
 		'chost' => 1,
 		'chostgroup' => 1,
-		'chostinterface'=> 1,
 		'cimage' => 1,
 		'citem' => 1,
-		'citemgeneral' => 1,
-		'citemprototype' => 1,
 		'cmaintenance' => 1,
 		'cmap' => 1,
-		'cmapelement' => 1,
 		'cmediatype' => 1,
 		'cproxy' => 1,
 		'cscreen' => 1,
 		'cscript' => 1,
 		'ctemplate' => 1,
-		'ctemplatescreen' => 1,
 		'ctrigger' => 1,
 		'ctriggerexpression' => 1,
 		'citemkey' => 1,
-		'ctriggerprototype' => 1,
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,
-		'cusermedia' => 1,
-		'cwebcheck' => 1,
-		'czbxapi' => 1,
+		'czbxapi' => 1
 	);
 
 	$rpc = array(
@@ -83,38 +73,38 @@ function __autoload($class_name){
 }
 ?>
 <?php
-	require_once('include/api.inc.php');
 
-	require_once('include/gettextwrapper.inc.php');
 	require_once('include/defines.inc.php');
 	require_once('include/func.inc.php');
 	require_once('include/html.inc.php');
 	require_once('include/copt.lib.php');
 	require_once('include/profiles.inc.php');
-
 	require_once('conf/maintenance.inc.php');
-// ABC sorting
+
+	require_once('include/nodes.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/items.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/graphs.inc.php');
+
+	require_once('include/maps.inc.php');
 	require_once('include/acknow.inc.php');
+	require_once('include/services.inc.php');
+	require_once('include/httptest.inc.php');
+
 	include_once('include/actions.inc.php');
 	include_once('include/discovery.inc.php');
-	require_once('include/events.inc.php');
-	require_once('include/graphs.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/httptest.inc.php');
-	require_once('include/ident.inc.php');
-	require_once('include/images.inc.php');
-	require_once('include/items.inc.php');
-	require_once('include/maintenances.inc.php');
-	require_once('include/maps.inc.php');
-	require_once('include/media.inc.php');
-	require_once('include/nodes.inc.php');
-	require_once('include/services.inc.php');
+
 	require_once('include/sounds.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/users.inc.php');
+	require_once('include/images.inc.php');
+	require_once('include/events.inc.php');
+	require_once('include/scripts.inc.php');
+	require_once('include/maintenances.inc.php');
 	require_once('include/valuemap.inc.php');
+
+	require_once('include/users.inc.php');
 // GLOBALS
-	global $USER_DETAILS, $USER_RIGHTS, $ZBX_PAGE_POST_JS, $page;
+	global $USER_DETAILS, $USER_RIGHTS, $page;
 
 	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
@@ -158,6 +148,7 @@ function __autoload($class_name){
 
 	unset($show_setup);
 
+
 	if(defined('ZBX_DENY_GUI_ACCESS')){
 		if(isset($ZBX_GUI_ACCESS_IP_RANGE) && is_array($ZBX_GUI_ACCESS_IP_RANGE)){
 			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?($_SERVER['HTTP_X_FORWARDED_FOR']):($_SERVER['REMOTE_ADDR']);
@@ -176,7 +167,7 @@ function __autoload($class_name){
 		else{
 			$show_warning = true;
 			define('ZBX_DISTRIBUTED', false);
-			if(!defined('ZBX_PAGE_NO_AUTHORIZATION')) define('ZBX_PAGE_NO_AUTHORIZATION', true);
+			define('ZBX_PAGE_NO_AUTHORIZATION', true);
 			error($config->error);
 		}
 
@@ -188,7 +179,7 @@ function __autoload($class_name){
 				$_REQUEST['message'] = $error;
 
 				define('ZBX_DISTRIBUTED', false);
-				if(!defined('ZBX_PAGE_NO_AUTHORIZATION')) define('ZBX_PAGE_NO_AUTHORIZATION', true);
+				define('ZBX_PAGE_NO_AUTHORIZATION', true);
 
 				$show_warning = true;
 			}
@@ -221,52 +212,39 @@ function __autoload($class_name){
 
 		require_once('include/db.inc.php');
 
-		if(!defined('ZBX_PAGE_NO_AUTHORIZATION')) define('ZBX_PAGE_NO_AUTHORIZATION', true);
+		define('ZBX_PAGE_NO_AUTHORIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
 	}
 
 	if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')){
-		if(!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))){
-			include_once('include/locales/en_gb.inc.php');
+		check_authorisation();
+
+		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
+			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 			process_locales();
-
-			include('index.php');
-			exit();
 		}
 
-		if(function_exists('bindtextdomain')){
-			//initializing gettext translations depending on language selected by user
-			$locales = zbx_locale_variants(CWebUser::$data['lang']);
+		include_once('include/locales/en_gb.inc.php');
+		process_locales();
 
-			$locale_found = false;
-			foreach($locales as $locale){
-				putenv('LC_ALL='.$locale);
-				putenv('LANG='.$locale);
-				putenv('LANGUAGE='.$locale);
+		if($USER_DETAILS['attempt_failed']) {
+			$attemps = bold($USER_DETAILS['attempt_failed']);
+			$attempip = bold($USER_DETAILS['attempt_ip']);
+			$attempdate = bold(zbx_date2str(S_CUSER_ERROR_DATE_FORMAT,$USER_DETAILS['attempt_clock']));
 
-				if(setlocale(LC_ALL, $locale)){
-					$locale_found = true;
-					CWebUser::$data['locale'] = $locale;
-					break;
-				}
-			}
-
-			if(!$locale_found && CWebUser::$data['lang'] != 'en_GB' && CWebUser::$data['lang'] != 'en_gb'){
-				error('Locale for language "'.CWebUser::$data['lang'].'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
-			}
-			bindtextdomain('frontend', 'locale');
-			bind_textdomain_codeset('frontend', 'UTF-8');
-			textdomain('frontend');
+			$error_msg = array(
+				$attemps,
+				SPACE.S_CUSER_ERROR_FAILED_LOGIN_ATTEMPTS,SPACE.S_CUSER_ERROR_LAST_FAILED_ATTEMPTS.SPACE,
+				$attempip,
+				SPACE.S_ON_SMALL.SPACE,
+				$attempdate
+			);
+			error(new CSpan($error_msg));
 		}
-		else{
-			error('Your PHP has no gettext support. Zabbix translations are not available.');
-		}
-// Numeric Locale to default
-		setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
 	}
 	else{
-		CWebUser::$data = array(
+		$USER_DETAILS = array(
 			'alias' =>ZBX_GUEST_USER,
 			'userid'=>0,
 			'lang'  =>'en_gb',
@@ -276,7 +254,6 @@ function __autoload($class_name){
 				'nodeid'=>0)
 			);
 
-		$USER_DETAILS = CWebUser::$data;
 	}
 
 	include_once('include/locales/en_gb.inc.php');
@@ -317,16 +294,17 @@ function __autoload($class_name){
 	/********** END INITIALIZATION ************/
 
 	function access_deny(){
+		global $USER_DETAILS;
 		include_once('include/page_header.php');
 
-		if(CWebUser::$data['alias'] != ZBX_GUEST_USER){
+		if($USER_DETAILS['alias'] != ZBX_GUEST_USER){
 			show_error_message(S_NO_PERMISSIONS);
 		}
 		else{
 			$req = new Curl($_SERVER['REQUEST_URI']);
 			$req->setArgument('sid', null);
 
-			$table = new CTable(null, 'warningTable');
+			$table = new CTable(null, 'warning');
 			$table->setAlign('center');
 			$table->setHeader(new CCol(S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD, 'left'),'header');
 
@@ -334,11 +312,11 @@ function __autoload($class_name){
 
 			$url = urlencode($req->toString());
 			$footer = new CCol(
-				array(
-					new CButton('login',S_LOGIN,"javascript: document.location = 'index.php?request=$url';"),
-					new CButton('back',S_CANCEL,'javascript: window.history.back();')
-				),
-				'left');
+							array(
+								new CButton('login',S_LOGIN,"javascript: document.location = 'index.php?request=$url';"),
+								new CButton('back',S_CANCEL,'javascript: window.history.back();')
+							),
+							'left');
 			$table->setFooter($footer,'footer');
 			$table->show();
 		}
@@ -348,10 +326,7 @@ function __autoload($class_name){
 
 	function detect_page_type($default=PAGE_TYPE_HTML){
 		if(isset($_REQUEST['output'])){
-			switch(strtolower($_REQUEST['output'])){
-				case 'text':
-					return PAGE_TYPE_TEXT;
-					break;
+			switch($_REQUEST['output']){
 				case 'ajax':
 					return PAGE_TYPE_JS;
 					break;
@@ -386,9 +361,13 @@ function __autoload($class_name){
 		$message = array();
 		$width = 0;
 		$height= 0;
+		$img_space = null;
 
 		if(!$bool && !is_null($errmsg))		$msg=S_CONFIG_ERROR_HEAD.': '.$errmsg;
 		else if($bool && !is_null($okmsg))	$msg=$okmsg;
+
+		$api_errors = CZBXAPI::resetErrors();
+		if(!empty($api_errors)) error($api_errors);
 
 		if(isset($msg)){
 			switch($page['type']){
@@ -425,6 +404,8 @@ function __autoload($class_name){
 
 					$msg_tab->addRow($row);
 					$msg_tab->show();
+
+					$img_space = new CImg('images/general/tree/zero.gif','space','100','2');
 					break;
 			}
 		}
@@ -493,6 +474,8 @@ function __autoload($class_name){
 			$ZBX_MESSAGES = null;
 		}
 
+		if(!is_null($img_space)) print(unpack_object($img_space));
+
 		if($page['type'] == PAGE_TYPE_IMAGE && count($message) > 0){
 			$width += 2;
 			$height += 2;
@@ -541,34 +524,24 @@ function __autoload($class_name){
 	}
 
 	function error($msgs){
-		global $ZBX_MESSAGES;
+		global $ZBX_MESSAGES, $USER_DETAILS;
 		$msgs = zbx_toArray($msgs);
 
 		if(is_null($ZBX_MESSAGES))
 			$ZBX_MESSAGES = array();
 
 		foreach($msgs as $msg){
-			if(isset(CWebUser::$data['debug_mode']) && !is_object($msg) && !CWebUser::$data['debug_mode']){
+			if(isset($USER_DETAILS['debug_mode']) && !is_object($msg) && !$USER_DETAILS['debug_mode']){
 				$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
 			}
 			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
 		}
 	}
 
-	function clear_messages($count=null){
+	function clear_messages(){
 		global $ZBX_MESSAGES;
 
-		$result = array();
-		if(!is_null($count)){
-			while($count-- > 0)
-				array_unshift($result, array_pop($ZBX_MESSAGES));
-		}
-		else{
-			$result = $ZBX_MESSAGES;
-			$ZBX_MESSAGES = null;
-		}
-
-		return $result;
+		$ZBX_MESSAGES = null;
 	}
 
 	function fatal_error($msg){
@@ -732,48 +705,39 @@ function __autoload($class_name){
 
 		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
 
-		if(IMAGE_FORMAT_JPEG == $format)	header( "Content-type:  image/jpeg");
-		if(IMAGE_FORMAT_TEXT == $format)	header( "Content-type:  text/html");
-		else								header( "Content-type:  image/png");
+		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg");
+		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html");
+		else								Header( "Content-type:  image/png");
 
-		header("Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
+		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 	}
 
 	function ImageOut(&$image,$format=NULL){
 		global $page;
 		global $IMAGE_FORMAT_DEFAULT;
 
-		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
-
-		ob_start();
-
-		if(IMAGE_FORMAT_JPEG == $format)
-			imagejpeg($image);
-		else
-			imagepng($image);
-
-		$imageSource = ob_get_contents();
-		ob_end_clean();
-
 		if($page['type'] != PAGE_TYPE_IMAGE){
+			ob_start();
+			imagepng($image);
+			$image_txt = ob_get_contents();
+			ob_end_clean();
+//SDI($image_txt);
 			session_start();
-			$imageId = md5(strlen($imageSource));
+			$id = md5($image_txt);
 			$_SESSION['image_id'] = array();
-			$_SESSION['image_id'][$imageId] = $imageSource;
+			$_SESSION['image_id'][$id] = $image_txt;
 			session_write_close();
-		}
+			print($id);
 
-		switch($page['type']){
-			case PAGE_TYPE_IMAGE:
-				print($imageSource);
-				break;
-			case PAGE_TYPE_JSON:
-				$json = new CJSON();
-				print($json->encode(array('result' => $imageId)));
-				break;
-			case PAGE_TYPE_TEXT:
-			default:
-				print($imageId);
+//			print(base64_encode($image_txt));
+		}
+		else{
+			if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
+
+			if(IMAGE_FORMAT_JPEG == $format)
+				imagejpeg($image);
+			else
+				imagepng($image);
 		}
 
 //		imagedestroy($image);

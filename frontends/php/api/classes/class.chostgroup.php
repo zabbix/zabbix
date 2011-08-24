@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,11 +33,12 @@ class CHostGroup extends CZBXAPI{
  * @param array $params
  * @return array
  */
-	public function get($params){
+	public static function get($params){
+		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = self::$userData['type'];
-		$userid = self::$userData['userid'];
+		$user_type = $USER_DETAILS['type'];
+		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('groupid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -77,15 +78,15 @@ class CHostGroup extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 
 // output
 			'output'					=> API_OUTPUT_REFER,
-			'selectHosts'				=> null,
-			'selectTemplates'			=> null,
+			'extendoutput'				=> null,
+			'select_hosts'				=> null,
+			'select_templates'			=> null,
 
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -99,20 +100,18 @@ class CHostGroup extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $params);
 
-		if(is_array($options['output'])){
-			unset($sql_parts['select']['groups']);
 
-			$dbTable = DB::getSchema('groups');
-			$sql_parts['select']['groupid'] = 'g.groupid';
-			foreach($options['output'] as $key => $field){
-				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = 'g.'.$field;
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+
+			if(!is_null($options['select_hosts'])){
+				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
-
-			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
+
 // editable + PERMISSION CHECK
+
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
@@ -404,16 +403,16 @@ class CHostGroup extends CZBXAPI{
 
 					if(!isset($result[$group['groupid']])) $result[$group['groupid']]= array();
 
-					if(!is_null($options['selectTemplates']) && !isset($result[$group['groupid']]['templates'])){
+					if(!is_null($options['select_templates']) && !isset($result[$group['groupid']]['templates'])){
 						$result[$group['groupid']]['templates'] = array();
 					}
 
-					if(!is_null($options['selectHosts']) && !isset($result[$group['groupid']]['hosts'])){
+					if(!is_null($options['select_hosts']) && !isset($result[$group['groupid']]['hosts'])){
 						$result[$group['groupid']]['hosts'] = array();
 					}
 
 // hostids
-					if(isset($group['hostid']) && is_null($options['selectHosts'])){
+					if(isset($group['hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$group['groupid']]['hosts']))
 							$result[$group['groupid']]['hosts'] = array();
 
@@ -455,21 +454,21 @@ class CHostGroup extends CZBXAPI{
 
 COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
-
 // Adding hosts
-		if(!is_null($options['selectHosts'])){
+		if(!is_null($options['select_hosts'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'groupids' => $groupids,
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['selectHosts'];
-				$hosts = API::Host()->get($obj_params);
+			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_hosts'];
+				$hosts = CHost::get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
 
@@ -489,11 +488,11 @@ COpt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['selectHosts']){
+			else if(API_OUTPUT_COUNT == $options['select_hosts']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$hosts = API::Host()->get($obj_params);
+				$hosts = CHost::get($obj_params);
 				$hosts = zbx_toHash($hosts, 'groupid');
 				foreach($result as $groupid => $group){
 					if(isset($hosts[$groupid]))
@@ -505,16 +504,16 @@ COpt::memoryPick();
 		}
 
 // Adding templates
-		if(!is_null($options['selectTemplates'])){
+		if(!is_null($options['select_templates'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'groupids' => $groupids,
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['selectTemplates']) || str_in_array($options['selectTemplates'], $subselects_allowed_outputs)){
-				$obj_params['output'] = $options['selectTemplates'];
-				$templates = API::Template()->get($obj_params);
+			if(is_array($options['select_templates']) || str_in_array($options['select_templates'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_templates'];
+				$templates = CTemplate::get($obj_params);
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
 
 				$count = array();
@@ -533,11 +532,11 @@ COpt::memoryPick();
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['selectTemplates']){
+			else if(API_OUTPUT_COUNT == $options['select_templates']){
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
-				$templates = API::Template()->get($obj_params);
+				$templates = CTemplate::get($obj_params);
 				$templates = zbx_toHash($templates, 'groupid');
 				foreach($result as $groupid => $group){
 					if(isset($templates[$groupid]))
@@ -563,7 +562,7 @@ COpt::memoryPick();
  * @param array $data['name']
  * @return string|boolean HostGroup ID or false if error
  */
-	public function getObjects($hostgroupData){
+	public static function getObjects($hostgroupData){
 		$options = array(
 			'filter' => $hostgroupData,
 			'output' => API_OUTPUT_EXTEND
@@ -577,12 +576,12 @@ COpt::memoryPick();
 			$options['nodeids'] = get_current_nodeid(false);
 
 
-		$result = $this->get($options);
+		$result = self::get($options);
 
 	return $result;
 	}
 
-	public function exists($object){
+	public static function exists($object){
 		$keyFields = array('name', 'groupid');
 
 		$options = array(
@@ -596,24 +595,27 @@ COpt::memoryPick();
 		else if(isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
-		$objs = $this->get($options);
+		$objs = self::get($options);
 
 	return !empty($objs);
 	}
 
 /**
- * Add hostGroups
+ * Add hostgroupGroups
  *
  * @param array $groups array with HostGroup names
  * @param array $groups['name']
  * @return array
  */
-	public function create($groups){
-
+	public static function create($groups){
+		global $USER_DETAILS;
 		$groups = zbx_toArray($groups);
 		$insert = array();
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create HostGroups');
 			}
 
@@ -621,7 +623,7 @@ COpt::memoryPick();
 				if(!is_array($group) || !isset($group['name']) || empty($group['name'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ name ]');
 				}
-				if($this->exists(array('name' => $group['name']))){
+				if(self::exists(array('name' => $group['name']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
 				}
 
@@ -629,7 +631,16 @@ COpt::memoryPick();
 			}
 			$groupids = DB::insert('groups', $insert);
 
+			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
 	}
 
 /**
@@ -640,9 +651,12 @@ COpt::memoryPick();
  * @param array $groups[0]['groupid'], ...
  * @return boolean
  */
-	public function update($groups){
+	public static function update($groups){
 		$groups = zbx_toArray($groups);
 		$groupids = zbx_objectValues($groups, 'groupid');
+
+		try{
+			self::BeginTransaction(__METHOD__);
 
 			if(empty($groups)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
@@ -655,7 +669,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$upd_groups = $this->get($options);
+			$upd_groups = self::get($options);
 			foreach($groups as $gnum => $group){
 				if(!isset($upd_groups[$group['groupid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -671,11 +685,11 @@ COpt::memoryPick();
 				'editable' => 1,
 				'nopermissions' => 1
 			);
-			$groupsNames = $this->get($options);
+			$groupsNames = self::get($options);
 			$groupsNames = zbx_toHash($groupsNames, 'name');
 
 			foreach($groups as $num => $group){
-				if(isset($group['name']) && isset($groupsNames[$group['name']]) && (bccomp($groupsNames[$group['name']]['groupid'],$group['groupid']) != 0)){
+				if(isset($group['name']) && isset($groupsNames[$group['name']]) && ($groupsNames[$group['name']]['groupid'] != $group['groupid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
 				}
 
@@ -690,151 +704,62 @@ COpt::memoryPick();
 
 			}
 
+			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
 	}
 
 /**
  * Delete HostGroups
  *
- * @param array $groupids
+ * @param array $groups
+ * @param array $groups[0,..]['groupid']
  * @return boolean
  */
-	public function delete($groupids){
-			if(empty($groupids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+	public static function delete($groups){
+		$groups = zbx_toArray($groups);
+		$groupids = zbx_objectValues($groups, 'groupid');
 
-			$groupids = zbx_toArray($groupids);
+		try{
+			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'groupids' => $groupids,
-				'editable' => true,
-				'output' => API_OUTPUT_EXTEND,
+				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
 			);
-			$del_groups = $this->get($options);
-			foreach($groupids as $groupid){
-				if(!isset($del_groups[$groupid])){
+			$del_groups = self::get($options);
+			foreach($groups as $gnum => $group){
+				if(!isset($del_groups[$group['groupid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
 
-			$dlt_groupids = getDeletableHostGroups($groupids);
-			if(count($groupids) != count($dlt_groupids)){
-				foreach($groupids as $num => $groupid){
-					if($del_groups[$groupid]['internal'] == ZBX_INTERNAL_GROUP)
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-								S_GROUP.' ['.$del_groups[$groupid]['name'].'] '.S_INTERNAL_AND_CANNOT_DELETED_SMALL);
-					else
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Group "%s" cannot be deleted, because some hosts depend on it.', $del_groups[$groupid]['name']));
-			}
-		}
-
-		$dbScripts = API::Script()->get(array(
-			'groupids' => $groupids,
-			'nopermissions' => true
-		));
-
-		if(!empty($dbScripts)){
-			foreach($dbScripts as $snum => $script){
-				if($script['groupid'] == 0) continue;
-
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Group "%s" cannot be deleted, because it is used in a global script.', $del_groups[$script['groupid']]['name']));
-				}
+			if(empty($groupids)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
 			}
 
-// delete screens items
-			$resources = array(
-				SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
-				SCREEN_RESOURCE_HOSTS_INFO,
-				SCREEN_RESOURCE_TRIGGERS_INFO,
-				SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
-				SCREEN_RESOURCE_DATA_OVERVIEW
-			);
-			DB::delete('screens_items', array(
-				'resourceid'=>$groupids,
-				'resourcetype'=>$resources
-			));
+			$result = delete_host_group($groupids);
+			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete group');
 
-// delete sysmap element
-		if(!empty($groupids))
-				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids));
-
-// disable actions
-// actions from conditions
-			$actionids = array();
-			$sql = 'SELECT DISTINCT c.actionid '.
-					' FROM conditions c '.
-					' WHERE c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
-						' AND '.DBcondition('c.value',$groupids);
-			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions))
-				$actionids[$db_action['actionid']] = $db_action['actionid'];
-
-// actions from operations
-			$sql = 'SELECT DISTINCT o.actionid '.
-					' FROM operations o, opgroup og '.
-					' WHERE o.operationid=og.operationid '.
-						' AND '.DBcondition('og.groupid',$groupids);
-			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions))
-				$actionids[$db_action['actionid']] = $db_action['actionid'];
-
-			if(!empty($actionids)){
-				$update = array();
-				$update[] = array(
-					'values' => array('status' => ACTION_STATUS_DISABLED),
-					'where' => array('actionid' => $actionids)
-				);
-				DB::update('actions', $update);
-			}
-
-// delete action conditions
-			DB::delete('conditions', array(
-				'conditiontype'=>CONDITION_TYPE_HOST_GROUP,
-				'value'=>$groupids
-			));
-
-// delete action operation commands
-			$operationids = array();
-			$sql = 'SELECT DISTINCT og.operationid '.
-					' FROM opgroup og '.
-					' WHERE '.DBcondition('og.groupid', $groupids);
-			$dbOperations = DBselect($sql);
-			while($dbOperation = DBfetch($dbOperations))
-				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
-
-			DB::delete('opgroup', array(
-				'groupid'=>$groupids,
-			));
-
-// delete empty operations
-			$delOperationids = array();
-			$sql = 'SELECT DISTINCT o.operationid '.
-					' FROM operations o '.
-					' WHERE '.DBcondition('o.operationid', $operationids).
-						' AND NOT EXISTS(SELECT og.opgroupid FROM opgroup og WHERE og.operationid=o.operationid)';
-			$dbOperations = DBselect($sql);
-			while($dbOperation = DBfetch($dbOperations))
-				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
-
-			DB::delete('operations', array(
-				'operationid'=>$delOperationids,
-			));
-
-// Host groups
-			DB::delete('groups', array(
-				'groupid'=>$groupids
-			));
-
-
-// TODO: remove audit
-			foreach($groupids as $groupid){
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $del_groups[$groupid]['name'], 'groups', NULL, NULL);
-			}
-
-
+			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
 	}
 
 /**
@@ -846,16 +771,19 @@ COpt::memoryPick();
  * @param array $data['templates']
  * @return boolean
  */
-	public function massAdd($data){
+	public static function massAdd($data){
 		$groups = zbx_toArray($data['groups']);
 		$groupids = zbx_objectValues($groups, 'groupid');
+
+		try{
+			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'groupids' => $groupids,
 				'editable' => 1,
 				'preservekeys' => 1
 			);
-			$upd_groups = $this->get($options);
+			$upd_groups = self::get($options);
 			foreach($groups as $gnum => $group){
 				if(!isset($upd_groups[$group['groupid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -880,19 +808,27 @@ COpt::memoryPick();
 				$linked[$pair['groupid']][$pair['hostid']] = 1;
 			}
 
-			$insert = array();
 			foreach($groupids as $gnum => $groupid){
 				foreach($objectids as $hostid){
-					if(isset($linked[$groupid][$hostid]))
-						continue;
-
-					$insert[] = array('hostid' => $hostid, 'groupid' => $groupid);
+					if(isset($linked[$groupid][$hostid])) continue;
+					$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
+					$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, $groupid)");
+					if(!$result){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+					}
 				}
 			}
 
-			DB::insert('hosts_groups', $insert);
-
+			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
 	}
 
 /**
@@ -904,8 +840,10 @@ COpt::memoryPick();
  * @param array $data['templateids']
  * @return boolean
  */
-	public function massRemove($data){
+	public static function massRemove($data){
 		$groupids = zbx_toArray($data['groupids'], 'groupid');
+		try{
+			self::BeginTransaction(__METHOD__);
 
 			$options = array(
 				'groupids' => $groupids,
@@ -913,7 +851,7 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
-			$upd_groups = $this->get($options);
+			$upd_groups = self::get($options);
 			foreach($groupids as $groupid){
 				if(!isset($upd_groups[$groupid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -931,12 +869,21 @@ COpt::memoryPick();
 				}
 
 				DB::delete('hosts_groups', array(
-					'hostid'=>$objectids_to_unlink,
-					'groupid'=>$groupids
+					DBcondition('hostid', $objectids_to_unlink),
+					DBcondition('groupid', $groupids)
 				));
 			}
 
+			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
 	}
 
 /**
@@ -948,7 +895,7 @@ COpt::memoryPick();
  * @param array $data['templates']
  * @return boolean
  */
-	public function massUpdate($data){
+	public static function massUpdate($data){
 		$groups = zbx_toArray($data['groups']);
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
@@ -957,20 +904,23 @@ COpt::memoryPick();
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		$templateids = zbx_objectValues($templates, 'templateid');
 
+		try{
+			self::BeginTransaction(__METHOD__);
+
 			$hosts_to_unlink = $hosts_to_link = array();
 			$options = array(
 				'groupids' => $groupids,
 				'preservekeys' => 1,
 			);
 			if(!is_null($hosts)){
-				$groups_hosts = API::Host()->get($options);
+				$groups_hosts = CHost::get($options);
 				$hosts_to_unlink = array_diff(array_keys($groups_hosts), $hostids);
 				$hosts_to_link = array_diff($hostids, array_keys($groups_hosts));
 			}
 
 			$templates_to_unlink = $templates_to_link = array();
 			if(!is_null($templates)){
-				$groups_templates = API::Template()->get($options);
+				$groups_templates = CTemplate::get($options);
 				$templates_to_unlink = array_diff(array_keys($groups_templates), $templateids);
 				$templates_to_link = array_diff($templateids, array_keys($groups_templates));
 			}
@@ -984,7 +934,7 @@ COpt::memoryPick();
 				'editable' => 1,
 				'preservekeys' => 1
 			);
-			$allowed_groups = $this->get($options);
+			$allowed_groups = self::get($options);
 			foreach($groups as $num => $group){
 				if(!isset($allowed_groups[$group['groupid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -998,7 +948,7 @@ COpt::memoryPick();
 					'editable' => 1,
 					'preservekeys' => 1
 				);
-				$allowed_hosts = API::Host()->get($options);
+				$allowed_hosts = CHost::get($options);
 				foreach($hosts_to_check as $num => $hostid){
 					if(!isset($allowed_hosts[$hostid])){
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -1013,7 +963,7 @@ COpt::memoryPick();
 					'editable' => 1,
 					'preservekeys' => 1
 				);
-				$allowed_templates = API::Template()->get($options);
+				$allowed_templates = CTemplate::get($options);
 				foreach($templates_to_check as $num => $templateid){
 					if(!isset($allowed_templates[$templateid])){
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -1041,42 +991,17 @@ COpt::memoryPick();
 				}
 			}
 
+			self::EndTransaction(true, __METHOD__);
 			return array('groupids' => $groupids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
 	}
-
-	public function isReadable($ids){
-		if(!is_array($ids)) return false;
-		if(empty($ids)) return true;
-
-		$ids = array_unique($ids);
-
-		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'groupids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
-			'countOutput' => true
-		));
-
-		return (count($ids) == $count);
-	}
-
-	public function isWritable($ids){
-		if(!is_array($ids)) return false;
-		if(empty($ids)) return true;
-
-		$ids = array_unique($ids);
-
-		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'groupids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
-			'editable' => true,
-			'countOutput' => true
-		));
-
-		return (count($ids) == $count);
-	}
-
 }
 
 ?>

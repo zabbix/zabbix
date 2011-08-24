@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,8 +44,12 @@ function jsRedirect($url,$timeout=null){
 }
 
 function get_request($name, $def=NULL){
-	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
+	if(isset($_REQUEST[$name]))
+		return $_REQUEST[$name];
+	else
+		return $def;
 }
+
 
 function inarr_isset($keys, $array=null){
 	if(is_null($array)) $array =& $_REQUEST;
@@ -371,7 +375,7 @@ function convertUnitsUptime($value){
 	$secs -= $mins * SEC_PER_MIN;
 
 	if($days != 0)
-		$value .= _n('%1$d day, ', '%1$d days, ', $days);
+		$value .= $days.' '.S_DAYS_SMALL.', ';
 	$value .= sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
 
 	return $value;
@@ -379,7 +383,7 @@ function convertUnitsUptime($value){
 
 function convertUnitsS($value){
 	if(floor(abs($value) * 1000) == 0){
-		$value = ($value == 0 ? '0'._('s') : '< 1'._('ms'));
+		$value = ($value == 0 ? '0'.S_SECOND_SHORT : '< 1'.S_MILLISECOND_SHORT);
 		return $value;
 	}
 
@@ -392,45 +396,45 @@ function convertUnitsS($value){
 	$n_unit = 0;
 
 	if(($n = floor($secs / SEC_PER_YEAR)) != 0){
-		$value .= $n._('y').' ';
+		$value .= $n.S_YEAR_SHORT.' ';
 		$secs -= $n * SEC_PER_YEAR;
 		if (0 == $n_unit)
 			$n_unit = 4;
 	}
 
 	if(($n = floor($secs / SEC_PER_MONTH)) != 0){
-		$value .= $n._('m').' ';
+		$value .= $n.S_MONTH_SHORT.' ';
 		$secs -= $n * SEC_PER_MONTH;
 		if (0 == $n_unit)
 			$n_unit = 3;
 	}
 
 	if(($n = floor($secs / SEC_PER_DAY)) != 0){
-		$value .= $n._('d').' ';
+		$value .= $n.S_DAY_SHORT.' ';
 		$secs -= $n * SEC_PER_DAY;
 		if (0 == $n_unit)
 			$n_unit = 2;
 	}
 
 	if($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0){
-		$value .= $n._('h').' ';
+		$value .= $n.S_HOUR_SHORT.' ';
 		$secs -= $n * SEC_PER_HOUR;
 		if (0 == $n_unit)
 			$n_unit = 1;
 	}
 
 	if($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0){
-		$value .= $n._('m').' ';
+		$value .= $n.S_MINUTE_SHORT.' ';
 		$secs -= $n * SEC_PER_MIN;
 	}
 
 	if($n_unit < 2 && ($n = floor($secs)) != 0){
-		$value .= $n._('s').' ';
+		$value .= $n.S_SECOND_SHORT.' ';
 		$secs -= $n;
 	}
 
 	if($n_unit < 1 && ($n = round($secs * 1000)) != 0)
-		$value .= $n._('ms');
+		$value .= $n.S_MILLISECOND_SHORT;
 
 	return rtrim($value);
 }
@@ -451,6 +455,8 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	if($units == 's'){
 		return convertUnitsS($value);
 	}
+
+	$u='';
 
 // Any other unit
 //-------------------
@@ -574,50 +580,7 @@ function zbx_is_int($var){
 	else
 		if(($var>0) && zbx_ctype_digit($var)) return true;
 
-return preg_match("/^\-?\d{1,20}+$/", $var);
-}
-
-function zbx_array_diff($primary, $secondary, $field){
-	$fields1 = zbx_objectValues($primary, $field);
-	$fields2 = zbx_objectValues($secondary, $field);
-
-	$first = array_diff($fields1, $fields2);
-	$first = zbx_toHash($first);
-
-	$second = array_diff($fields2, $fields1);
-	$second = zbx_toHash($second);
-
-	$result = array(
-		'first' => array(),
-		'second' => array(),
-		'both' => array()
-	);
-
-	foreach($primary as $array){
-		if(!isset($array[$field]))
-			$result['first'][] = $array;
-		else if(isset($first[$array[$field]]))
-			$result['first'][] = $array;
-		else
-			$result['both'][$array[$field]] = $array;
-	}
-
-	foreach($secondary as $array){
-		if(!isset($array[$field]))
-			$result['second'][] = $array;
-		else if(isset($second[$array[$field]]))
-			$result['second'][] = $array;
-	}
-
-	return $result;
-}
-
-function zbx_array_push(&$array, $add){
-	foreach($array as $key => $value){
-		foreach($add as $newKey => $newValue){
-			$array[$key][$newKey] = $newValue;
-		}
-	}
+return preg_match("/^\-?[0-9]+$/", $var);
 }
 
 /**
@@ -672,10 +635,6 @@ return $str_res;
 
 function zbx_htmlstr($str){
 	return str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'), $str);
-}
-
-function zbx_formatDomId($value){
-	return str_replace(array('[',']'),array('_',''), $value);
 }
 
 function zbx_strlen($str){
@@ -811,15 +770,6 @@ function zbx_strpos($haystack, $needle, $offset=0){
 	}
 }
 
-function zbx_stripos($haystack, $needle, $offset=0){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
-		return mb_stripos($haystack, $needle, $offset);
-	}
-	else{
-		return stripos($haystack, $needle, $offset);
-	}
-}
-
 function zbx_strrpos($haystack, $needle){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		return mb_strrpos($haystack, $needle);
@@ -904,38 +854,39 @@ function zbx_rksort(&$array, $flags=NULL){
 
 
 // used only in morder_result
-function sortSub($data, $sortorder){
+function sortSub($array, $sortorder){
 	$result = array();
 
-	$keys = array_keys($data);
+	$keys = array_keys($array);
 	natcasesort($keys);
+
 
 	if($sortorder != ZBX_SORT_UP)
 		$keys = array_reverse($keys);
 
 	foreach($keys as $key){
-		$tst = reset($data[$key]);
-		if(is_array($tst) && isset($tst[0]) && !is_array($tst[0])){
-			$data[$key] = sortSub($data[$key], $sortorder);
+		$tst = reset($array[$key]);
+		if(isset($tst[0]) && !is_array($tst[0])){
+			$array[$key] = sortSub($array[$key], $sortorder);
 		}
 
-		foreach($data[$key] as $id){
+		foreach($array[$key] as $id){
 			$result[] = $id;
 		}
 	}
 	return $result;
 }
 
-function morder_result(&$data, $sortfields, $sortorder=ZBX_SORT_UP){
+function morder_result(&$array, $sortfields, $sortorder=ZBX_SORT_UP){
 	$tmp = array();
 	$result = array();
 
-	foreach($data as $key => $value){
+	foreach($array as $key => $el){
 		unset($pointer);
 		$pointer =& $tmp;
 		foreach($sortfields as $f){
-			if(!isset($pointer[$value[$f]])) $pointer[$value[$f]] = array();
-			$pointer =& $pointer[$value[$f]];
+			if(!isset($pointer[$el[$f]])) $pointer[$el[$f]] = array();
+			$pointer =& $pointer[$el[$f]];
 		}
 		$pointer[] = $key;
 	}
@@ -943,20 +894,16 @@ function morder_result(&$data, $sortfields, $sortorder=ZBX_SORT_UP){
 	$order = sortSub($tmp, $sortorder);
 
 	foreach($order as $key){
-		$result[$key] = $data[$key];
+		$result[$key] = $array[$key];
 	}
 
-	$data = $result;
+	$array = $result;
 	return true;
 }
 
+
 function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
-
-	if(is_array($sortfield)){
-		morder_result($data, $sortfield, $sortorder);
-		return true;
-	}
 
 	if(is_null($sortfield)){
 		natcasesort($data);
@@ -1001,19 +948,13 @@ return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
 }
 /************* END SORT *************/
 
-function unsetExcept(&$array, $allowedFields){
-	foreach($array as $key => $value){
-		if(!isset($allowedFields[$key])) unset($array[$key]);
-	}
-}
-
 function zbx_implodeHash($glue1, $glue2, $hash){
 	if(is_null($glue2)) $glue2 = $glue1;
 	$str = '';
 
 	foreach($hash as $key => $value){
-		if(!empty($str)) $str.= $glue2;
-		$str.= $key.$glue1.$value;
+		if(!empty($str)) $str.= $glue1;
+		$str.= $key.$glue2.$value;
 	}
 
 return $str;
@@ -1075,17 +1016,6 @@ function zbx_value2array(&$values){
 			$tmp[$values] = $values;
 
 		$values = $tmp;
-	}
-}
-
-// creates chain of relation parent -> childs, for all chain levels
-function createParentToChildRelation(&$chain, $link, $parentField, $childField){
-	if(!isset($chain[$link[$parentField]]))
-		$chain[$link[$parentField]] = array();
-
-	$chain[$link[$parentField]][$link[$childField]] = $link[$childField];
-	if(isset($chain[$link[$childField]])){
-		$chain[$link[$parentField]] = zbx_array_merge($chain[$link[$parentField]], $chain[$link[$childField]]);
 	}
 }
 
@@ -1197,24 +1127,6 @@ function zbx_cleanHashes(&$value){
 
 return $value;
 }
-
-function zbx_toCSV($values){
-	$csv = '';
-
-	$glue = '","';
-	foreach($values as $row){
-		if(!is_array($row)) $row = array($row);
-		foreach($row as $num => $value){
-			if(is_null($value)) unset($row[$num]);
-			else $row[$num] = str_replace('"', '""', $value);
-		}
-
-		$csv .= '"'.implode($glue, $row).'"'."\n";
-	}
-
-return $csv;
-}
-
 // }}} ARRAY FUNCTION
 function zbx_array_mintersect($keys, $array){
 	$result = array();
@@ -1353,7 +1265,7 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
 
 /************* PAGING *************/
 function getPagingLine(&$items, $autotrim=true){
-	global $page;
+	global $USER_DETAILS, $page;
 	$config = select_config();
 
 	$search_limit = '';
@@ -1369,7 +1281,7 @@ function getPagingLine(&$items, $autotrim=true){
 		$start = ($last_page == $page['file']) ? CProfile::get('web.paging.start', 0) : 0;
 	}
 
-	$rows_per_page = CWebUser::$data['rows_per_page'];
+	$rows_per_page = $USER_DETAILS['rows_per_page'];
 
 	$cnt_items = count($items);
 	$cnt_pages = ceil($cnt_items / $rows_per_page);
@@ -1490,6 +1402,8 @@ function add_doll_objects($ref_tab, $pmid='mainpage'){
 }
 
 function format_doll_init($doll){
+	global $USER_DETAILS;
+
 	$args = array('frequency' => 60,
 					'url' => '',
 					'counter' => 0,

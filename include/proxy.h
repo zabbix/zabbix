@@ -1,7 +1,7 @@
 
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 
 AGENT_VALUE
 {
-	zbx_timespec_t	ts;
+	int	clock;
 	char	host_name[HOST_HOST_LEN_MAX];
 	char	key[ITEM_KEY_LEN_MAX];
 	char	*value;
@@ -45,7 +45,7 @@ AGENT_VALUE
 	int	logeventid;
 };
 
-int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int max_error_len);
+int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int error_max_len);
 
 void	update_proxy_lastaccess(const zbx_uint64_t hostid);
 
@@ -68,7 +68,5 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		const zbx_uint64_t proxy_hostid, char *info, int max_info_size);
 void	process_dhis_data(struct zbx_json_parse *jp);
 void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid);
-
-void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value);
 
 #endif

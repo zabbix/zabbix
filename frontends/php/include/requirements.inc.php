@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@
 
 		return $result;
 	}
-
+	
 	function check_php_upload_max_filesize(){
 		$required = 2*1024*1024;
 		$recommended = 16*1024*1024;
@@ -136,7 +136,7 @@
 
 		$current = ini_get('max_execution_time');
 
-		if($current >= $recommended || $current == 0){
+		if($current >= $recommended){
 			$req = 2;
 		}
 		else if($current >= $required){
@@ -157,7 +157,7 @@
 
 		return $result;
 	}
-
+	
 	function check_php_max_input_time(){
 		$required = 300;
 		$recommended = 600;
@@ -257,8 +257,14 @@
 			$current[] = BR();
 		}
 
-// Semaphore related functions are checked elsewhere. The 'false' is to prevent autoloading of the SQLite3 class.
-		if(class_exists('SQLite3', false)){
+		if(function_exists('sqlite3_open') &&
+			function_exists('sqlite3_close') &&
+			function_exists('sqlite3_query') &&
+			function_exists('sqlite3_error') &&
+			function_exists('sqlite3_fetch_array') &&
+			function_exists('sqlite3_query_close') &&
+			function_exists('sqlite3_exec')){
+
 			$current[] = 'SQLite3';
 			$current[] = BR();
 		}
@@ -454,13 +460,13 @@
 
 		return $result;
 	}
-
+	
 	function check_php_session() {
 		$current = function_exists('session_start') &&
 			function_exists('session_write_close');
-
+		
 		$req = $current ? 1 : 0;
-
+		
 		return array(
 			'name' => S_SESSION_MODULE,
 			'current' => $req ? S_YES_SMALL : S_NO_SMALL,
@@ -469,23 +475,7 @@
 			'result' => $req,
 			'error' => S_REQUIRED_SESSION_MODULE.SPACE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-session]'
 			);
-
-	}
-
-	function check_php_gettext() {
-		$current = function_exists('bindtextdomain');
-
-		$req = $current ? 1 : 0;
-
-		return array(
-			'name' => S_PHP_GETTEXT,
-			'current' => $req ? S_YES_SMALL : S_NO_SMALL,
-			'required' => null,
-			'recommended' => null,
-			'result' => $req,
-			'error' => S_REQUIRED_GETTEXT_MODULE.SPACE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-gettext]'
-			);
-
+			
 	}
 
 	function check_php_requirements(){
@@ -503,7 +493,6 @@
 		$result[] = check_php_mbstring();
 		$result[] = check_php_sockets();
 		$result[] = check_php_session();
-		$result[] = check_php_gettext();
 		$result[] = check_php_gd();
 		$result[] = check_php_gd_png();
 		$result[] = check_php_xml();

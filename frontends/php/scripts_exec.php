@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,14 +21,15 @@
 <?php
 	include_once "include/config.inc.php";
 	require_once "include/hosts.inc.php";
+	require_once "include/scripts.inc.php";
 	require_once "include/forms.inc.php";
 
-	$page['title'] = 'S_SCRIPTS';
+	$page['title'] = "S_SCRIPTS";
 	$page['file'] = 'scripts_exec.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
-	include_once ('include/page_header.php');
+include_once "include/page_header.php";
 
 //		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields=array(
@@ -47,7 +48,7 @@ if(isset($_REQUEST['execute'])){
 			' WHERE scriptid='.$scriptid;
 	$script_info = DBfetch(DBselect($sql));
 
-	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
+	$result = CScript::execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
 	if($result === false){
 		show_messages(false, '', S_SCRIPT_ERROR);
 	}
@@ -59,7 +60,7 @@ if(isset($_REQUEST['execute'])){
 			$message = '';
 		}
 
-		$frmResult = new CFormTable($script_info['name']);
+		$frmResult = new CFormTable($script_info['name'].': '.script_make_command($scriptid, $hostid));
 		$frmResult->addRow(S_RESULT, new CTextArea('message', $message, 100, 25, 'yes'));
 		$frmResult->addItemToBottomRow(new CButton('close', S_CLOSE, 'window.close();'));
 		$frmResult->show();

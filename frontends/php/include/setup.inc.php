@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@
 
 			$this->EventHandler();
 
-			parent::__construct('post');
+			parent::__construct(null, 'post');
 		}
 
 		function getConfig($name, $default = null){
@@ -97,14 +97,14 @@
 				new CCol($this->getState(), 'right')
 				), 'center');
 
-			$next = new CSubmit('next['.$this->getStep().']', S_NEXT.' >>');
+			$next = new CButton('next['.$this->getStep().']', S_NEXT.' >>');
 			if($this->DISABLE_NEXT_BUTTON) $next->setEnabled(false);
 
 			$table->setFooter(array(
-				new CCol(new CSubmit('cancel',S_CANCEL),'left'),
+				new CCol(new CButton('cancel',S_CANCEL),'left'),
 				new CCol(array(
-					isset($this->stage[$this->getStep()-1]) ? new CSubmit('back['.$this->getStep().']', '<< '.S_PREVIOUS) : null,
-					isset($this->stage[$this->getStep()+1]) ? $next: new CSubmit('finish', S_FINISH)
+					isset($this->stage[$this->getStep()-1]) ? new CButton('back['.$this->getStep().']', '<< '.S_PREVIOUS) : null,
+					isset($this->stage[$this->getStep()+1]) ? $next: new CButton('finish', S_FINISH)
 					) , 'right')
 				),'footer');
 
@@ -129,7 +129,7 @@
 		}
 
 		function stage0(){
-			return new CDiv(array('Welcome to the Zabbix frontend installation wizard.',BR(),BR(),
+			return new CTag('div', 'yes', array('Welcome to the Zabbix frontend installation wizard.',BR(),BR(),
 				'This installation wizard will guide you through the installation of Zabbix frontend',BR(),BR(),
 				'Click the "Next" button to proceed to the next screen. If you want to change something '.
 				'on a previous screen, click "Previous" button',BR(),BR(),
@@ -146,14 +146,14 @@
 				$license = zbx_nl2br(nbsp(file_get_contents($LICENCE_FILE)));
 
 			$action = <<<JS
-if(this.checked) $("next_1").writeAttribute('disabled', false);
-else $("next_1").writeAttribute('disabled', 'disabled');
+if(this.checked) $("next[1]").writeAttribute('disabled', false);
+else $("next[1]").writeAttribute('disabled', 'disabled');
 JS;
 
 			return array(
 				new CDiv(new CSpan($license), 'licence'),
 				BR(),
-				new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel('I agree', 'agree')), 'maxwidth center')
+				new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel('I agree', 'agree')), 'center')
 			);
 		}
 
@@ -211,7 +211,7 @@ JS;
 					BR(), BR(),
 					'Please correct all issues and press "Retry" button',
 					BR(), BR(),
-					new CSubmit('retry', S_RETRY)
+					new CButton('retry', S_RETRY)
 					);
 			}
 			else{
@@ -234,21 +234,15 @@ JS;
 			foreach($ZBX_CONFIG['allowed_db'] as $id => $name){
 				$cmbType->addItem($id, $name);
 			}
-			$table->addRow(array(new CCol(_('Database type'),'header'), $cmbType));
-			switch($DB['TYPE']){
-				case ZBX_DB_SQLITE3:
-					$table->addRow(array(new CCol(_('Database file'),'header'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))));
-				break;
-				default:
-					$table->addRow(array(new CCol(_('Database host'),'header'), new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost'))));
-					$table->addRow(array(new CCol(_('Database port'),'header'), array(new CNumericBox('port', $this->getConfig('DB_PORT', '0'),5),' 0 - use default port')));
-					$table->addRow(array(new CCol(_('Database name'),'header'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))));
-					if($DB['TYPE'] == ZBX_DB_DB2)
-						$table->addRow(array(new CCol(_('Database schema'),'header'), new CTextBox('schema', $this->getConfig('DB_SCHEMA', ''))));
-					$table->addRow(array(new CCol(_('User'),'header'), new CTextBox('user', $this->getConfig('DB_USER',	'root'))));
-					$table->addRow(array(new CCol(_('Password'),'header'), new CPassBox('password', $this->getConfig('DB_PASSWORD', ''))));
-				break;
-			}
+			$table->addRow(array(new CCol(S_TYPE,'header'), $cmbType));
+			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost'))));
+			$table->addRow(array(new CCol(S_PORT,'header'), array(new CNumericBox('port', $this->getConfig('DB_PORT', '0'),5),' 0 - use default port')));
+			$table->addRow(array(new CCol(S_NAME,'header'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))));
+			$table->addRow(array(new CCol(S_USER,'header'), new CTextBox('user', $this->getConfig('DB_USER',	'root'))));
+			$table->addRow(array(new CCol(S_PASSWORD,'header'), new CPassBox('password', $this->getConfig('DB_PASSWORD', ''))));
+
+			if($DB['TYPE'] == 'IBM_DB2')
+				$table->addRow(array(new CCol(S_SCHEMA,'header'), new CTextBox('schema', $this->getConfig('DB_SCHEMA', ''))));
 
 			return array(
 				'Please create database manually,', BR(),
@@ -260,8 +254,8 @@ JS;
 				BR(),
 				!$this->DISABLE_NEXT_BUTTON ? new CSpan(S_OK, 'ok') :  new CSpan(S_FAIL, 'fail'),
 				BR(),
-				new  CSubmit('retry', 'Test connection')
-				);
+				new CButton('retry', 'Test connection')
+			);
 		}
 
 		function stage4(){
@@ -283,35 +277,22 @@ JS;
 		function stage5(){
 			$allowed_db = $this->getConfig('allowed_db', array());
 
-			$DB['TYPE'] = $this->getConfig('DB_TYPE');
-
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
-			$table->addRow(array(new CCol(_('Database type'),'header'), $allowed_db[$this->getConfig('DB_TYPE')]));
-
-			switch($DB['TYPE']){
-				case ZBX_DB_SQLITE3:
-					$table->addRow(array(new CCol(_('Database file'),'header'), $this->getConfig('DB_DATABASE')));
-				break;
-				default:
-					$table->addRow(array(new CCol(_('Database server'),'header'), $this->getConfig('DB_SERVER')));
-					if($this->getConfig('DB_PORT') == 0)
-						$table->addRow(array(new CCol(_('Database port'),'header'), _('default')));
-					else
-						$table->addRow(array(new CCol(_('Database port'),'header'), $this->getConfig('DB_PORT')));
-					$table->addRow(array(new CCol(_('Database name'),'header'), $this->getConfig('DB_DATABASE')));
-					$table->addRow(array(new CCol(_('Database user'),'header'), $this->getConfig('DB_USER')));
-					$table->addRow(array(new CCol(_('Database password'),'header'),	preg_replace('/./','*',$this->getConfig('DB_PASSWORD'))));
-					if($this->getConfig('DB_TYPE', '') == ZBX_DB_DB2)
-						$table->addRow(array(new CCol(_('Database schema'),'header'),	$this->getConfig('DB_SCHEMA')));
-				break;
-			}
+			$table->addRow(array(new CCol('Database type:','header'), $allowed_db[$this->getConfig('DB_TYPE')]));
+			$table->addRow(array(new CCol('Database server:','header'), $this->getConfig('DB_SERVER')));
+			$table->addRow(array(new CCol('Database port:','header'), $this->getConfig('DB_PORT')));
+			$table->addRow(array(new CCol('Database name:','header'), $this->getConfig('DB_DATABASE')));
+			$table->addRow(array(new CCol('Database user:','header'), $this->getConfig('DB_USER')));
+			$table->addRow(array(new CCol('Database password:','header'),	preg_replace('/./','*',$this->getConfig('DB_PASSWORD'))));
+			if($this->getConfig('DB_TYPE', '') == 'IBM_DB2')
+				$table->addRow(array(new CCol('Database schema:','header'),	$this->getConfig('DB_SCHEMA')));
 
 			$table->addRow(BR());
 
-			$table->addRow(array(new CCol(_('Zabbix server'),'header'), $this->getConfig('ZBX_SERVER')));
-			$table->addRow(array(new CCol(_('Zabbix server port'),'header'), $this->getConfig('ZBX_SERVER_PORT')));
-			$table->addRow(array(new CCol(_('Zabbix server name'),'header'), $this->getConfig('ZBX_SERVER_NAME')));
+			$table->addRow(array(new CCol('Zabbix server:','header'), $this->getConfig('ZBX_SERVER')));
+			$table->addRow(array(new CCol('Zabbix server port:','header'), $this->getConfig('ZBX_SERVER_PORT')));
+			$table->addRow(array(new CCol('Zabbix server name:','header'), $this->getConfig('ZBX_SERVER_NAME')));
 
 			return array(
 				'Please check configuration parameters.', BR(),
@@ -363,7 +344,7 @@ JS;
 				else if($config->config['DB']['PASSWORD'] != $this->getConfig('DB_PASSWORD')){
 					$error = 'Config file DB password is not equal to wizard input.';
 				}
-				else if(($this->getConfig('DB_TYPE') == ZBX_DB_DB2) && ($config->config['DB']['SCHEMA'] != $this->getConfig('DB_SCHEMA'))){
+				else if(($this->getConfig('DB_TYPE') == 'IBM_DB2') && ($config->config['DB']['SCHEMA'] != $this->getConfig('DB_SCHEMA'))){
 					$error = 'Config file DB schema is not equal to wizard input.';
 				}
 				else if($config->config['ZBX_SERVER'] != $this->getConfig('ZBX_SERVER')){
@@ -400,13 +381,13 @@ JS;
 
 			return array(
 				$table, BR(),
-				$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', S_RETRY), BR(),BR()) : null,
+				$this->DISABLE_NEXT_BUTTON ? array(new CButton('retry', S_RETRY), BR(),BR()) : null,
 				!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) ?
 					array('Please install configuration file manually, or fix permissions on conf directory.',BR(),BR(),
 						'Press "Save configuration file" button, download configuration file ',
 						'and save it as ',BR(),
 						'"'.$ZBX_CONFIGURATION_FILE.'"',BR(),BR(),
-						new CSubmit('save_config',"Save configuration file"),
+						new CButton('save_config',"Save configuration file"),
 						BR(),BR()
 						)
 					: null,
@@ -442,7 +423,7 @@ JS;
 			}
 			else{
 				$result = true;
-				if(!zbx_empty($DB['SCHEMA']) && ($DB['TYPE'] == ZBX_DB_DB2)){
+				if(!zbx_empty($DB['SCHEMA']) && ($DB['TYPE'] == 'IBM_DB2')){
 					$db_schema = DBselect("SELECT schemaname FROM syscat.schemata WHERE schemaname='".db2_escape_string($DB['SCHEMA'])."'");
 					$result = DBfetch($db_schema);
 				}
@@ -455,8 +436,8 @@ JS;
 
 			DBclose();
 
-			if($DB['TYPE'] == ZBX_DB_SQLITE3 && !zbx_is_callable(array('ftok','sem_get','sem_acquire','sem_release','sem_remove'))){
-				error('Support of SQLite3 requires PHP IPC functions');
+			if($DB['TYPE'] == 'SQLITE3' && !zbx_is_callable(array('sem_get','sem_acquire','sem_release','sem_remove'))){
+				error('SQLite3 requires IPC functions');
 				$result = false;
 			}
 

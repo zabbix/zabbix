@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 
 
-	$form = new CForm('get');
+	$form = new CForm(null, 'get');
 	$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 
 	$cmbType = new CComboBox('type', $_REQUEST['type'], 'submit()');
@@ -108,22 +108,20 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		$help_table->addRow(array(new CCol(SPACE, 'normal'), S_DISABLED));
 	}
 
-	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
-		$help_table->addRow(array(getSeverityCell($i), S_ENABLED));
-	}
+	foreach(array(1,2,3,4,5) as $tr_severity)
+		$help_table->addRow(array(new CCol(get_severity_description($tr_severity),get_severity_style($tr_severity)),S_ENABLED));
 
-	$help_table->addRow(array(new CCol(SPACE, 'trigger_unknown'), S_UNKNOWN));
+	$help_table->addRow(array(new CCol(SPACE, 'unknown_trigger'), S_UNKNOWN));
 
 	if($_REQUEST['type']==SHOW_TRIGGERS){
-		// blinking preview in help popup (only if blinking is enabled)
-		$config = select_config();
-		if($config['blink_period'] > 0){
-			$col = new CCol(SPACE, 'not_classified');
-			$col->setAttribute('style','background-image: url(images/gradients/blink.gif); '.
-				'background-position: top left; background-repeat: repeat;');
-			$help_table->addRow(array($col, _s("Age less than %s", convertUnitsS($config['blink_period']))));
-		}
-
+		$col = new CCol(SPACE, 'unknown_trigger');
+		$col->setAttribute('style','background-image: url(images/gradients/blink1.gif); '.
+			'background-position: top left; background-repeat: repeate;');
+		$help_table->addRow(array($col, S_5_MIN));
+		$col = new CCol(SPACE, 'unknown_trigger');
+		$col->setAttribute('style','background-image: url(images/gradients/blink2.gif); '.
+			'background-position: top left; background-repeat: repeate;');
+		$help_table->addRow(array($col, S_15_MIN));
 		$help_table->addRow(array(new CCol(SPACE), S_NO_TRIGGER));
 	}
 	else{
@@ -138,7 +136,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
 
 // 2nd header
-	$form_l = new CForm('get');
+	$form_l = new CForm(null, 'get');
 	$form_l->addVar('groupid',$_REQUEST['groupid']);
 
 	$cmbStyle = new CComboBox('view_style',$_REQUEST['view_style'],'submit()');

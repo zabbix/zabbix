@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 	return SUCCEED;
 }
 
-void zabbix_close_log()
+void zabbix_close_log(void)
 {
 	if (LOG_TYPE_SYSLOG == log_type)
 	{
@@ -396,7 +396,8 @@ char *strerror_from_system(unsigned long error)
 		return utf8_string;
 	}
 
-	zbx_unicode_to_utf8_static(wide_string, utf8_string + offset, sizeof(utf8_string) - offset);
+	if (FAIL == zbx_unicode_to_utf8_static(wide_string, utf8_string + offset, sizeof(utf8_string) - offset))
+		utf8_string[offset] = '\0';
 
 	zbx_rtrim(utf8_string, "\r\n ");
 
@@ -407,7 +408,7 @@ char *strerror_from_system(unsigned long error)
 }
 
 #ifdef _WINDOWS
-char	*strerror_from_module(unsigned long error, LPCTSTR module)
+char *strerror_from_module(unsigned long error, LPCTSTR module)
 {
 	int		offset = 0;
 	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
@@ -430,7 +431,8 @@ char	*strerror_from_module(unsigned long error, LPCTSTR module)
 		return utf8_string;
 	}
 
-	zbx_unicode_to_utf8_static(wide_string, utf8_string + offset, sizeof(utf8_string) - offset);
+	if (FAIL == zbx_unicode_to_utf8_static(wide_string, utf8_string + offset, sizeof(utf8_string) - offset))
+		utf8_string[offset] = '\0';
 
 	zbx_rtrim(utf8_string, "\r\n ");
 

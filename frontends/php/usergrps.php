@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ include_once('include/page_header.php');
 		'users'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			null),
 		'users_status'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		'isset({save})'),
 		'gui_access'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'),	'isset({save})'),
+		'api_access'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		'isset({save})'),
 		'debug_mode'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		'isset({save})'),
 		'new_right'=>			array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'right_to_del'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
@@ -57,6 +58,7 @@ include_once('include/page_header.php');
 
 		'set_users_status'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 		'set_gui_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'), null),
+		'set_api_access'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 		'set_debug_mode'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
@@ -132,6 +134,7 @@ include_once('include/page_header.php');
 			'name' => $_REQUEST['gname'],
 			'users_status' => $_REQUEST['users_status'],
 			'gui_access' => $_REQUEST['gui_access'],
+			'api_access' => $_REQUEST['api_access'],
 			'debug_mode' => $_REQUEST['debug_mode'],
 			'userids' => get_request('group_users', array()),
 			'rights' => array_values(get_request('group_rights', array())),
@@ -142,13 +145,13 @@ include_once('include/page_header.php');
 
 			$usrgrp['usrgrpid'] = $_REQUEST['usrgrpid'];
 
-			$result = API::UserGroup()->update($usrgrp);
+			$result = CUserGroup::update($usrgrp);
 			show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
 		}
 		else{
 			$action = AUDIT_ACTION_ADD;
 
-			$result = API::UserGroup()->create($usrgrp);
+			$result = CUserGroup::create($usrgrp);
 			show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
 		}
 
@@ -158,12 +161,10 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['delete'])){
-		$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
+		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'extendoutput' => 1));
 		$group = reset($group);
 
-		DBstart();
-		$result = API::UserGroup()->delete($_REQUEST['usrgrpid']);
-		$result = DBend($result);
+		$result = CUserGroup::delete($_REQUEST['usrgrpid']);
 
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		if($result){
@@ -188,7 +189,7 @@ include_once('include/page_header.php');
 		}
 
 		if(!empty($groups)){
-			$go_result = API::UserGroup()->delete($groupids);
+			$go_result = CUserGroup::delete($groupids);
 
 			if($go_result){
 				foreach($groups as $groupid => $group){
@@ -226,6 +227,37 @@ include_once('include/page_header.php');
 			}
 
 			show_messages($go_result, S_GUI_ACCESS_UPDATED, S_CANNOT_UPDATE_GUI_ACCESS);
+		}
+	}
+	else if(str_in_array($_REQUEST['go'], array('enable_api', 'disable_api'))){
+		$groupids = get_request('group_groupid', get_request('usrgrpid'));
+		zbx_value2array($groupids);
+
+		$set_api_access = ($_REQUEST['go'] == 'enable_api')?GROUP_API_ACCESS_ENABLED:GROUP_API_ACCESS_DISABLED;
+
+		$groups = array();
+		$sql = 'SELECT ug.usrgrpid, ug.name '.
+				' FROM usrgrp ug '.
+				' WHERE '.DBin_node('ug.usrgrpid').
+					' AND '.DBcondition('ug.usrgrpid',$groupids);
+		$res = DBselect($sql);
+		while($group = DBfetch($res)){
+			$groups[$group['usrgrpid']] = $group;
+		}
+
+		if(!empty($groups)){
+			DBstart();
+			$go_result = change_group_api_access($groupids,$set_api_access);
+			$go_result = DBend($go_result);
+
+			if($go_result){
+				$audit_action = ($set_api_access == GROUP_API_ACCESS_DISABLED)?AUDIT_ACTION_DISABLE:AUDIT_ACTION_ENABLE;
+				foreach($groups as $groupid => $group){
+					add_audit($audit_action,AUDIT_RESOURCE_USER_GROUP,'API access for group name ['.$group['name'].']');
+				}
+			}
+
+			show_messages($go_result, S_API_ACCESS_UPDATED, S_CANNOT_UPDATE_API_ACCESS);
 		}
 	}
 	else if(str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))){
@@ -301,14 +333,14 @@ include_once('include/page_header.php');
 <?php
 
 // Config
-	$frmForm = new CForm('get');
+	$frmForm = new CForm(null, 'get');
 
 	$cmbConf = new CComboBox('config','usergrps.php');
 	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('usergrps.php',S_USER_GROUPS);
 		$cmbConf->addItem('users.php',S_USERS);
 
-	$frmForm->addItem(array($cmbConf,SPACE,new CSubmit('form', S_CREATE_GROUP)));
+	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form', S_CREATE_GROUP)));
 
 	$usrgroup_wdgt = new CWidget();
 	$usrgroup_wdgt->addPageHeader(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
@@ -336,6 +368,7 @@ include_once('include/page_header.php');
 			S_MEMBERS,
 			S_USERS_STATUS,
 			S_GUI_ACCESS,
+			S_API_ACCESS,
 			S_DEBUG_MODE
 		));
 
@@ -344,12 +377,12 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'selectUsers' => API_OUTPUT_EXTEND,
+			'select_users' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$usrgrps = API::UserGroup()->get($options);
+		$usrgrps = CUserGroup::get($options);
 
 // sorting
 		order_result($usrgrps, $sortfield, $sortorder);
@@ -358,6 +391,10 @@ include_once('include/page_header.php');
 
 		foreach($usrgrps as $ugnum => $usrgrp){
 			$usrgrpid = $usrgrp['usrgrpid'];
+
+			$api_access = ($usrgrp['api_access'] == GROUP_API_ACCESS_ENABLED)
+				? new CLink(S_ENABLED, 'usergrps.php?go=disable_api&usrgrpid='.$usrgrpid, 'orange')
+				: new CLink(S_DISABLED, 'usergrps.php?go=enable_api&usrgrpid='.$usrgrpid, 'enabled');
 
 			$debug_mode = ($usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 				? new CLink(S_ENABLED, 'usergrps.php?go=disable_debug&usrgrpid='.$usrgrpid, 'orange')
@@ -418,6 +455,7 @@ include_once('include/page_header.php');
 				new CCol($users, 'wraptext'),
 				$users_status,
 				$gui_access,
+				$api_access,
 				$debug_mode
 			));
 		}
@@ -425,12 +463,20 @@ include_once('include/page_header.php');
 // goBox
 		$goBox = new CComboBox('go');
 
-		$goOption = new CComboItem('enable_status', _('Enable selected'));
+		$goOption = new CComboItem('enable_status',S_ENABLE_SELECTED);
 		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable_status',S_DISABLE_SELECTED);
 		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_GROUPS_Q);
+		$goBox->addItem($goOption);
+
+		$goOption = new CComboItem('enable_api',S_ENABLE_API);
+		$goOption->setAttribute('confirm',S_ENABLE_API_SELECTED_GROUPS_Q);
+		$goBox->addItem($goOption);
+
+		$goOption = new CComboItem('disable_api',S_DISABLE_API);
+		$goOption->setAttribute('confirm',S_DISABLE_API_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('enable_debug',S_ENABLE_DEBUG);
@@ -446,7 +492,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO);
+		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');

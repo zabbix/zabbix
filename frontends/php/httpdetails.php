@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -155,7 +155,7 @@
 		}
 
 		$itemids = array();
-		$sql = 'SELECT i.lastvalue, i.lastclock, i.value_type, i.valuemapid, i.units, i.itemid, hi.type as httpitem_type '.
+		$sql = 'SELECT i.lastvalue, i.value_type, i.valuemapid, i.units, i.itemid, hi.type as httpitem_type '.
 				' FROM items i, httpstepitem hi '.
 				' WHERE hi.itemid=i.itemid '.
 					' AND hi.httpstepid='.$httpstep_data['httpstepid'];
@@ -167,7 +167,6 @@
 
 			if($item_data['httpitem_type'] == HTTPSTEP_ITEM_TYPE_TIME){
 				$totalTime['lastvalue'] += $item_data['lastvalue'];
-				$totalTime['lastclock'] = $item_data['lastclock'];
 				$totalTime['value_type'] = $item_data['value_type'];
 				$totalTime['valuemapid'] = $item_data['valuemapid'];
 				$totalTime['units'] = $item_data['units'];
@@ -177,16 +176,13 @@
 		}
 
 		$speed = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
-		$resp = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
-
 		$respTime = $httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastvalue'];
-		$respItemTime = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
-
+		$resp = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
 		$table->addRow(array(
 			$httpstep_data['name'],
-			$speed,
-			($respTime == 0 ? '-' : $respItemTime),
-			$resp,
+			($speed == 0 ? '-' : $speed),
+			($respTime == 0 ? '-' : format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME])),
+			($resp == 0 ? '-' : $resp),
 			new CSpan($status['msg'], $status['style'])
 		));
 	}
@@ -208,9 +204,9 @@
 	}
 
 	$table->addRow(array(
-		bold(S_TOTAL_BIG),
+		new CSpan(S_TOTAL_BIG, 'bold'),
 		SPACE,
-		bold(format_lastvalue($totalTime)),
+		new CSpan(format_lastvalue($totalTime), 'bold'),
 		SPACE,
 		new CSpan($status['msg'], $status['style'].' bold')
 	));

@@ -4,4 +4,4 @@ CREATE TABLE autoreg_host (
         host            nvarchar2(64)           DEFAULT ''      ,
         PRIMARY KEY (autoreg_hostid)
 );
-CREATE UNIQUE INDEX autoreg_host_1 on autoreg_host (proxy_hostid,host);
+CREATE INDEX autoreg_host_1 on autoreg_host (proxy_hostid,host);

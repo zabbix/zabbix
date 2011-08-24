@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,10 +63,11 @@ class CTree{
 
 /* private */
 	private function makeHeaders(){
-		$c = 0;
-		$tr = new CRow($this->fields['caption'], 'header');
+		$c=0;
+		$tr = new CRow();
+		$tr->addItem($this->fields['caption']);
+		$tr->setClass('header');
 		unset($this->fields['caption']);
-
 		foreach($this->fields as $id => $caption){
 			$tr->addItem($caption);
 			$fields[$c] = $id;
@@ -100,26 +101,26 @@ class CTree{
 		$tr->setAttribute('style',($this->tree[$id]['parentid'] != '0')?('display: none;'):(''));
 
 
-		foreach($this->fields as $value){
+		foreach($this->fields as $key => $value){
 			$style = null;
-
+			
 			if(($value == 'status') && ($this->tree[$id]['serviceid'] > 0)){
 				switch($this->tree[$id][$value]){
 					case TRIGGER_SEVERITY_DISASTER:
-						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_DISASTER);
-						$style = getSeverityStyle(TRIGGER_SEVERITY_DISASTER);
+						$this->tree[$id][$value] = S_DISASTER;
+						$style = 'disaster'; 
 						break;
 					case TRIGGER_SEVERITY_HIGH:
-						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_HIGH);
-						$style = getSeverityStyle(TRIGGER_SEVERITY_HIGH);
+						$this->tree[$id][$value] = S_HIGH;
+						$style = 'high'; 
 						break;
 					case TRIGGER_SEVERITY_AVERAGE:
-						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_AVERAGE);
-						$style = getSeverityStyle(TRIGGER_SEVERITY_AVERAGE);
+						$this->tree[$id][$value] = S_AVERAGE;
+						$style = 'average'; 
 						break;
 					case TRIGGER_SEVERITY_WARNING:
-						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_WARNING);
-						$style = getSeverityStyle(TRIGGER_SEVERITY_WARNING);
+						$this->tree[$id][$value] = S_WARNING;
+						$style = 'warning'; 
 						break;
 					case TRIGGER_SEVERITY_INFORMATION:
 					default:
@@ -127,7 +128,7 @@ class CTree{
 						break;
 				}
 			}
-
+			
 			$tr->addItem(new CCol($this->tree[$id][$value], $style));
 		}
 
@@ -158,10 +159,12 @@ class CTree{
 
 					if($this->tree[$id]['nodetype'] == 2){
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
-						$img->setAttribute('onclick', $this->treename.'.closeSNodeX("'.$id.'",this);');
+						$img->setAttribute('onclick','javascript: '.
+												$this->treename.'.closeSNodeX("'.$id.'",this);'.
+												" if(IE6) showPopupDiv('div_node_tree','select_iframe');"); // IE6 Fix
 
 						$img->setAttribute('id','idi_'.$id);
-						$img->setAttribute('class', 'pointer');
+						$img->setClass('pointer');
 					}
 					else {
 						$img = new CImg('images/general/tree/pointl.gif','y','22','14');
@@ -175,10 +178,12 @@ class CTree{
 						$td->setAttribute('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
 						$img= new CImg('images/general/tree/plus.gif','t','22','14');
 
-						$img->setAttribute('onclick', $this->treename.'.closeSNodeX("'.$id.'",this);');
+						$img->setAttribute('onclick','javascript: '.
+												$this->treename.'.closeSNodeX("'.$id.'",this);'.
+												" if(IE6) showPopupDiv('div_node_tree','select_iframe');");	// IE6 Fix
 
 						$img->setAttribute('id','idi_'.$id);
-						$img->setAttribute('class', 'pointer');
+						$img->setClass('pointer');
 					}
 					else {
 						$td->setAttribute('style','width:22px; background-image:url(images/general/tree/pointc.gif);');
@@ -217,7 +222,7 @@ class CTree{
 	public function createJS(){
 
 		$js = '<script src="js/class.ctree.js" type="text/javascript"></script>'."\n".
-				'<script type="text/javascript">  var '.$this->treename.'_tree = [];';
+				'<script type="text/javascript">  var '.$this->treename.'_tree = new Array(0);';
 
 		foreach($this->tree as $id => $rows){
 			$parentid = $rows['parentid'];
@@ -234,7 +239,7 @@ class CTree{
 		$js.= 'var '.$this->treename.' = null';
 		$js.= '</script>'."\n";
 
-		zbx_add_post_js($this->treename.' = new CTree("tree_'.CWebUser::$data['alias'].'_'.$this->treename.'", '.$this->treename.'_tree);');
+		zbx_add_post_js($this->treename.' = new CTree("tree_'.$this->getUserAlias().'_'.$this->treename.'", '.$this->treename.'_tree);');
 
 	return new CJSscript($js);
 	}
@@ -275,6 +280,11 @@ class CTree{
 
 	private function destroy(){
 		unset($this->tree);
+	}
+
+	private function getUserAlias(){
+		global $USER_DETAILS;
+	return $USER_DETAILS['alias'];
 	}
 }
 ?>

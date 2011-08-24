@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,9 @@
 
 extern  int     CONFIG_SERVER_STARTUP_TIME;
 
-int	evaluate_macro_function(char *value, const char *host, const char *key,
-		const char *function, const char *parameter);
+int	evaluate_macro_function(char *value, const char *host, const char *key, const char *function, const char *parameter);
+
+int	replace_value_by_map(char *value, int max_len, zbx_uint64_t valuemapid);
+int	add_value_suffix(char *value, int max_len, const char *units, int value_type);
 
 #endif

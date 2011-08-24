@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,6 +38,10 @@ extern int		process_num;
  *                                                                            *
  * Purpose: periodically synchronises data in memory cache with database      *
  *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: never returns                                                    *
@@ -68,19 +72,19 @@ void	main_dbsyncer_loop()
 		zabbix_log(LOG_LEVEL_DEBUG, "%s #%d spent " ZBX_FS_DBL " seconds while processing %d items",
 				get_process_type_string(process_type), process_num, sec, num);
 
-		if (-1 == last_sleeptime)
+		if (last_sleeptime == -1)
 		{
 			sleeptime = num ? ZBX_SYNC_MAX / num : CONFIG_HISTSYNCER_FREQUENCY;
 		}
 		else
 		{
 			sleeptime = last_sleeptime;
-			if (ZBX_SYNC_MAX < num)
+			if (num > ZBX_SYNC_MAX)
 			{
 				retry_up = 0;
 				retry_dn++;
 			}
-			else if (ZBX_SYNC_MAX / 2 > num)
+			else if (num < ZBX_SYNC_MAX / 2)
 			{
 				retry_up++;
 				retry_dn = 0;
@@ -88,22 +92,22 @@ void	main_dbsyncer_loop()
 			else
 				retry_up = retry_dn = 0;
 
-			if (2 < retry_dn)
+			if (retry_dn >= 3)
 			{
 				sleeptime--;
 				retry_dn = 0;
 			}
 
-			if (2 < retry_up)
+			if (retry_up >= 3)
 			{
 				sleeptime++;
 				retry_up = 0;
 			}
 		}
 
-		if (0 > sleeptime)
+		if (sleeptime < 0)
 			sleeptime = 0;
-		else if (CONFIG_HISTSYNCER_FREQUENCY < sleeptime)
+		else if (sleeptime > CONFIG_HISTSYNCER_FREQUENCY)
 			sleeptime = CONFIG_HISTSYNCER_FREQUENCY;
 
 		last_sleeptime = sleeptime;

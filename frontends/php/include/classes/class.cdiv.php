@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,12 +20,9 @@
 ?>
 <?php
 class CDiv extends CTag{
-	public function __construct($items=null, $class=null, $id=null){
+	public function __construct($items=NULL,$class=NULL){
 		parent::__construct('div','yes');
-		$this->attr('class', $class);
-		if($id !== null){
-			$this->attr('id', zbx_formatDomId($id));
-		}
+		$this->setClass($class);
 		$this->addItem($items);
 
 		$this->tag_body_start = '';
@@ -33,19 +30,6 @@ class CDiv extends CTag{
 		$this->tag_end = '';
 		$this->tag_body_start = '';
 		$this->tag_body_end = '';
-
-	return $this;
-	}
-
-	public function useJQueryStyle(){
-		$this->setAttribute('class', $this->getAttribute('class').' jqueryinputset');
-
-		if(!defined('ZBX_JQUERY_INPUTSET')){
-			define('ZBX_JQUERY_INPUTSET', true);
-			zbx_add_post_js('setTimeout(function(){jQuery("div.jqueryinputset").buttonset();}, 10);');
-		}
-
-	return $this;
 	}
 }
 ?>

@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2006 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,6 +138,7 @@ static void	history_sender(struct zbx_json *j, int *records)
 static void	dhistory_sender(struct zbx_json *j, int *records)
 {
 	const char	*__function_name = "dhistory_sender";
+
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 

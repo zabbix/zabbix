@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,15 @@
 ?>
 <?php
 
+function zbx_session_start($userid, $name, $password){
+	$sessionid = md5(time().$password.$name.rand(0,10000000));
+	zbx_setcookie('zbx_sessionid',$sessionid);
+
+	DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$userid.','.time().','.ZBX_SESSION_ACTIVE.')');
+
+return $sessionid;
+}
+
 function permission2str($group_permission){
 	$str_perm[PERM_READ_WRITE]	= S_READ_WRITE;
 	$str_perm[PERM_READ_ONLY]	= S_READ_ONLY;
@@ -30,6 +39,34 @@ function permission2str($group_permission){
 
 	return S_UNKNOWN;
 }
+
+/*****************************************
+	CHECK USER AUTHORISATION
+*****************************************/
+
+function check_authorisation(){
+	global $USER_DETAILS;
+	$sessionid = get_cookie('zbx_sessionid');
+
+	$user = array('sessionid'=>$sessionid);
+	if(!$auth = CUser::checkAuthentication($user)){
+		include_once('include/locales/en_gb.inc.php');
+		process_locales();
+
+		if(!isset($_REQUEST['request'])){
+			$parsedUrl = new Curl($_SERVER['REQUEST_URI']);
+			if(!zbx_empty($parsedUrl->getPath()) && !preg_match('/.*\/(index.php)?$/i', $parsedUrl->getPath())){
+				$_REQUEST['request'] = $_SERVER['REQUEST_URI'];
+			}
+		}
+
+		include('index.php');
+		exit();
+	}
+
+return $auth;
+}
+
 
 /***********************************************
 	CHECK USER ACCESS TO SYSTEM STATUS
@@ -86,10 +123,8 @@ return (GROUP_GUI_ACCESS_DISABLED == $res)?false:true;
 function get_user_auth($userid){
 	global $USER_DETAILS;
 
-	if((bccomp($userid,$USER_DETAILS['userid']) == 0) && isset($USER_DETAILS['gui_access']))
-		return $USER_DETAILS['gui_access'];
-	else
-		$result = GROUP_GUI_ACCESS_SYSTEM;
+	if(($userid == $USER_DETAILS['userid']) && isset($USER_DETAILS['gui_access'])) return $USER_DETAILS['gui_access'];
+	else $result = GROUP_GUI_ACCESS_SYSTEM;
 
 	$sql = 'SELECT MAX(g.gui_access) as gui_access '.
 		' FROM usrgrp g, users_groups ug '.
@@ -102,6 +137,18 @@ function get_user_auth($userid){
 	}
 
 return $result;
+}
+
+function get_user_debug_mode($userid){
+	$sql = 'SELECT g.usrgrpid '.
+			' FROM usrgrp g, users_groups ug '.
+			' WHERE ug.userid = '.$userid.
+				' AND g.usrgrpid = ug.usrgrpid '.
+				' AND g.debug_mode = '.GROUP_DEBUG_MODE_ENABLED;
+	if($res = DBfetch(DBselect($sql,1))){
+		return true;
+	}
+return false;
 }
 
 /* Function: get_user_system_auth()
@@ -149,7 +196,7 @@ function available_groups($groupids, $editable=null){
 	$options['groupids'] = $groupids;
 	$options['editable'] = $editable;
 
-	$groups = API::HostGroup()->get($options);
+	$groups = CHostGroup::get($options);
 return zbx_objectValues($groups, 'groupid');
 }
 function available_hosts($hostids, $editable=null){
@@ -158,7 +205,7 @@ function available_hosts($hostids, $editable=null){
 	$options['editable'] = $editable;
 	$options['templated_hosts'] = 1;
 
-	$hosts = API::Host()->get($options);
+	$hosts = CHost::get($options);
 
 return zbx_objectValues($hosts, 'hostid');
 }
@@ -170,7 +217,7 @@ function available_triggers($triggerids, $editable=null){
 		'nodes' => get_current_nodeid(true)
 	);
 
-	$triggers = API::Trigger()->get($options);
+	$triggers = CTrigger::get($options);
 
 return zbx_objectValues($triggers, 'triggerid');
 }
@@ -210,7 +257,7 @@ COpt::counter_up('perm');
 	else
 		$where = '';
 
-//		$sortorder = (isset($DB['TYPE']) && (($DB['TYPE'] == ZBX_DB_MYSQL) || ($DB['TYPE'] == ZBX_DB_SQLITE3)))?' DESC ':'';
+//		$sortorder = (isset($DB['TYPE']) && (($DB['TYPE'] == 'MYSQL') || ($DB['TYPE'] == 'SQLITE3')))?' DESC ':'';
 //SDI($sql);
 	$sql = 'SELECT DISTINCT n.nodeid, n.name as node_name, h.hostid, h.host, min(r.permission) as permission, ug.userid '.
 		' FROM hosts h '.
@@ -276,6 +323,8 @@ return $result;
 }
 
 function get_accessible_groups_by_user($user_data,$perm,$perm_res=null,$nodeid=null){
+	global $ZBX_LOCALNODEID;
+
 	if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
 	if(is_null($nodeid)) $nodeid = get_current_nodeid();
 
@@ -463,16 +512,15 @@ function get_accessible_hosts_by_rights(&$rights,$user_type,$perm,$perm_res=null
 	$host_perm = array();
 
 	$where = array();
-	array_push($where, 'h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
 	if(!is_null($nodeid))	array_push($where, DBin_node('h.hostid', $nodeid));
 	$where = count($where)?$where = ' WHERE '.implode(' AND ',$where):'';
 
-	$sql = 'SELECT n.nodeid as nodeid,n.name as node_name,hg.groupid as groupid,h.hostid,h.host,h.name as host_name,h.status '.
+	$sql = 'SELECT n.nodeid as nodeid,n.name as node_name,hg.groupid as groupid,h.hostid, h.host '.
 				' FROM hosts h '.
 					' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid '.
 					' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('h.hostid').
 				$where.
-				' ORDER BY n.name,h.name';
+				' ORDER BY n.name,h.host';
 
 	$perm_by_host = array();
 	$db_hosts = DBselect($sql);

@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
 var globalAllObjForViewSwitcher = {};
 var CViewSwitcher = Class.create({
 mainObj:			null,
@@ -157,7 +156,6 @@ hideObj: function(data) {
 
 	this.disableObj($(data.id), true);
 	$(data.id).style.display = 'none';
-
 },
 
 showObj: function(data){
@@ -209,129 +207,3 @@ hideAllObjs: function(){
 }
 
 });
-
-
-function ActionProcessor(actions){
-	this.actions = actions || {};
-	this.bindEvents();
-}
-ActionProcessor.prototype = {
-
-	bindEvents: function(){
-
-		var elementId,
-			elementsList = {};
-
-		for(var i=0; i<this.actions.length; i++){
-			var action = this.actions[i];
-
-			for(elementId in action.cond){
-				elementsList[elementId] = true;
-			}
-		}
-
-		var handler = jQuery.proxy(this.process, this);
-		for(elementId in elementsList){
-			var elem = jQuery('#'+elementId);
-
-			switch(elem.get(0).nodeName.toLowerCase()){
-				case 'select':
-					elem.change(handler);
-				break;
-				case 'input':
-					switch(elem.attr('type')){
-						case 'checkbox':
-						case 'text':
-							elem.change(handler);
-							break;
-						case 'radio':
-							var elemName = elem.attr('name');
-							jQuery('input[name='+elemName+']').click(handler);
-							break;
-						default:
-							elem.click(handler);
-					}
-				break;
-			}
-		}
-	},
-
-	getValue: function(elementId){
-		var elem = jQuery('#'+elementId);
-		var type = elem.attr('type');
-
-		if((type == 'radio') || (type == 'checkbox')){
-			return elem.prop('checked') === true ? 'checked' : 'unchecked';
-		}
-		else{
-			return elem.val();
-		}
-	},
-
-	checkConditions: function(conditions){
-		for(var elementId in conditions){
-			if(this.getValue(elementId) !== conditions[elementId]){
-				return false;
-			}
-		}
-		return true;
-	},
-
-	process: function(){
-		var action;
-
-		for(var i=0; i<this.actions.length; i++){
-			action = this.actions[i];
-
-			switch(action.action){
-				case 'show':
-					if(this.checkConditions(action.cond)){
-						this.actionShow(action.value);
-					}
-					else{
-						this.actionHide(action.value);
-					}
-					break;
-				case 'hide':
-					if(this.checkConditions(action.cond)){
-						this.actionHide(action.value);
-					}
-					else{
-						this.actionShow(action.value);
-					}
-					break;
-				case 'enable':
-					if(this.checkConditions(action.cond)){
-						this.actionEnable(action.value);
-					}
-					else{
-						this.actionDisable(action.value);
-					}
-					break;
-			}
-		}
-	},
-
-	actionShow: function(value){
-		jQuery(value)
-			.toggle(true)
-			.find(':input')
-			.prop('disabled', false);
-	},
-
-	actionHide: function(value){
-		jQuery(value)
-			.toggle(false)
-			.find(':input')
-			.prop('disabled', true);
-	},
-
-	actionEnable: function(value){
-		jQuery(value).prop('disabled', false);
-	},
-
-	actionDisable: function(value){
-		jQuery(value).prop('disabled', true);
-	}
-
-};

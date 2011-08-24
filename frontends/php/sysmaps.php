@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,22 +54,10 @@ include_once('include/page_header.php');
 		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,				'isset({save})'),
 		'expandproblem'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'markelements'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
-		'show_unack'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,2),		null),
+		'show_unack'=>	        array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,2),		null),
 		'highlight'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
-		'label_format'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
-		'label_type_host'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
-		'label_type_hostgroup'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
-		'label_type_trigger'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
-		'label_type_map'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
-		'label_type_image'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
-		'label_string_host'=>		array(T_ZBX_STR, O_OPT,	 NULL,	null,		'isset({save})'),
-		'label_string_hostgroup'=>	array(T_ZBX_STR, O_OPT,	 NULL,	null,		'isset({save})'),
-		'label_string_trigger'=>	array(T_ZBX_STR, O_OPT,	 NULL,	null,		'isset({save})'),
-		'label_string_map'=>		array(T_ZBX_STR, O_OPT,	 NULL,	null,		'isset({save})'),
-		'label_string_image'=>		array(T_ZBX_STR, O_OPT,	 NULL,	null,		'isset({save})'),
-		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(MAP_LABEL_TYPE_LABEL,MAP_LABEL_TYPE_CUSTOM),		'isset({save})'),
+		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
-		'urls'=>			array(T_ZBX_STR, O_OPT,	 NULL,	null,		null),
 // Actions
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -89,17 +77,13 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['sysmapid'])){
 		$options = array(
 			'sysmapids' => $_REQUEST['sysmapid'],
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'editable' => 1,
+			'extendoutput' => 1,
 		);
-		$maps = API::Map()->get($options);
+		$maps = CMap::get($options);
 
-		if(empty($maps)){
-			access_deny();
-		}
-		else{
-			$sysmap = reset($maps);
-		}
+		if(empty($maps)) access_deny();
+		else $sysmap = reset($maps);
 	}
 ?>
 <?php
@@ -110,18 +94,18 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'sysmapids' => $maps,
-			'selectSelements' => API_OUTPUT_EXTEND,
-			'selectLinks' => API_OUTPUT_EXTEND,
+			'select_selements' => API_OUTPUT_EXTEND,
+			'select_links' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$sysmaps = API::Map()->get($options);
+		$sysmaps = CMap::get($options);
 
 		$options = array(
 			'sysmapids' => zbx_objectValues($sysmaps, 'sysmapid'),
 			'output' => API_OUTPUT_EXTEND,
 			'select_image' => 1
 		);
-		$images = API::Image()->get($options);
+		$images = CImage::get($options);
 
 
 		prepareMapExport($sysmaps);
@@ -151,7 +135,7 @@ include_once('include/page_header.php');
 		if($result) $result = zbxXML::parseMap($rules);
 
 		$result = DBend($result);
-		show_messages($result, _('Imported successfully'), _('Import failed'));
+		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
 	}
 
 ?>
@@ -159,71 +143,65 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go', 'none');
 
 	if(isset($_REQUEST['save'])){
-
-		$map = array(
-			'name' => $_REQUEST['name'],
-			'width' => $_REQUEST['width'],
-			'height' => $_REQUEST['height'],
-			'backgroundid' => $_REQUEST['backgroundid'],
-			'highlight' => get_request('highlight', 0),
-			'markelements' => get_request('markelements', 0),
-			'expandproblem' => get_request('expandproblem', 0),
-			'label_format' => get_request('label_format',0),
-			'label_type_host' => get_request('label_type_host',2),
-			'label_type_hostgroup' => get_request('label_type_hostgroup',2),
-			'label_type_trigger' => get_request('label_type_trigger',2),
-			'label_type_map' => get_request('label_type_map',2),
-			'label_type_image' => get_request('label_type_image',2),
-			'label_string_host' => get_request('label_string_host',''),
-			'label_string_hostgroup' => get_request('label_string_hostgroup',''),
-			'label_string_trigger' => get_request('label_string_trigger',''),
-			'label_string_map' => get_request('label_string_map',''),
-			'label_string_image' => get_request('label_string_image',''),
-			'label_type' => $_REQUEST['label_type'],
-			'label_location' => $_REQUEST['label_location'],
-			'show_unack' => get_request('show_unack', 0),
-			'urls' => get_request('urls', array())
-		);
-
-		foreach($map['urls'] as $unum => $url){
-			if(zbx_empty($url['name']) && zbx_empty($url['url']))
-				unset($map['urls'][$unum]);
-		}
-
 		if(isset($_REQUEST['sysmapid'])){
 // TODO check permission by new value.
-			$map['sysmapid'] = $_REQUEST['sysmapid'];
-			$result = API::Map()->update($map);
+			$map = array(
+				'sysmapid' => $_REQUEST['sysmapid'],
+				'name' => $_REQUEST['name'],
+				'width' => $_REQUEST['width'],
+				'height' => $_REQUEST['height'],
+				'backgroundid' => $_REQUEST['backgroundid'],
+				'highlight' => get_request('highlight', 0),
+				'markelements' => get_request('markelements', 0),
+				'expandproblem' => get_request('expandproblem', 0),
+				'label_type' => $_REQUEST['label_type'],
+				'label_location' => $_REQUEST['label_location'],
+				'show_unack' => get_request('show_unack', 0),
+			);
 
-			add_audit_if($result, AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
-			show_messages($result, S_MAP_UPDATED, S_CANNOT_UPDATE_MAP);
+			DBstart();
+			$result = CMap::update($map);
+			$result = DBend($result);
+
+			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
+			show_messages($result,S_MAP_UPDATED,S_CANNOT_UPDATE_MAP);
 		}
-		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
+		else {
+			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 
-			$result = API::Map()->create($map);
+			$map = array(
+				'name' => $_REQUEST['name'],
+				'width' => $_REQUEST['width'],
+				'height' => $_REQUEST['height'],
+				'backgroundid' => $_REQUEST['backgroundid'],
+				'highlight' => get_request('highlight', 0),
+				'markelements' => get_request('markelements', 0),
+				'expandproblem' => get_request('expandproblem', 0),
+				'label_type' => $_REQUEST['label_type'],
+				'label_location' => $_REQUEST['label_location'],
+				'show_unack' => get_request('show_unack', 0),
+			);
 
-			add_audit_if($result, AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
-			show_messages($result, S_MAP_ADDED, S_CANNOT_ADD_MAP);
+			DBstart();
+			$result = CMap::create($map);
+			$result = DBend($result);
+
+			add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
+			show_messages($result,S_MAP_ADDED,S_CANNOT_ADD_MAP);
 		}
-
 		if($result){
 			unset($_REQUEST['form']);
 		}
 	}
-	else if((isset($_REQUEST['delete']) && isset($_REQUEST['sysmapid'])) || ($_REQUEST['go'] == 'delete')){
+	else if((isset($_REQUEST['delete'])&&isset($_REQUEST['sysmapid'])) || ($_REQUEST['go'] == 'delete')){
 		$sysmapids = get_request('maps', array());
 		if(isset($_REQUEST['sysmapid'])){
 			$sysmapids[] = $_REQUEST['sysmapid'];
 		}
 
-		$maps = API::Map()->get(array(
-			'sysmapids' => $sysmapids,
-			'output' => array('name'),
-			'editable' => true
-		));
-		$go_result = API::Map()->delete($sysmapids);
+		$maps = CMap::get(array('sysmapids' => $sysmapids, 'output' => API_OUTPUT_EXTEND, 'editable => 1'));
+		$go_result = CMap::delete($sysmapids);
 
 		show_messages($go_result, S_MAP_DELETED, S_CANNOT_DELETE_MAP);
 		if($go_result){
@@ -245,60 +223,19 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$form = new CForm('get');
-	$form->cleanItems();
-	$form->addItem(new CSubmit('form', S_CREATE_MAP));
-	$form->addItem(new CSubmit('form', S_IMPORT_MAP));
+	$form = new CForm(null, 'get');
+	$form->addItem(new CButton('form', S_CREATE_MAP));
+	$form->addItem(new CButton('form', S_IMPORT_MAP));
 
 	$map_wdgt = new CWidget();
 	$map_wdgt->addPageHeader(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
 
 
 	if(isset($_REQUEST['form'])){
-		if($_REQUEST['form'] == S_IMPORT_MAP){
+		if($_REQUEST['form'] == S_IMPORT_MAP)
 			$map_wdgt->addItem(import_map_form($rules));
-		}
-		else if(($_REQUEST['form'] == S_CREATE_MAP) || ($_REQUEST['form'] == 'update')){
-			$sysmap = array();
-
-			if(isset($_REQUEST['sysmapid'])){
-				$sysmaps = API::Map()->get(array(
-					'sysmapids' => $_REQUEST['sysmapid'],
-					'output' => API_OUTPUT_EXTEND,
-					'editable' => true
-				));
-				$sysmap = reset($sysmaps);
-			}
-
-			if(!isset($_REQUEST['sysmapid']) || isset($_REQUEST['form_refresh'])){
-				$sysmap['name'] = get_request('name', '');
-				$sysmap['width'] = get_request('width', 800);
-				$sysmap['height'] = get_request('height', 600);
-				$sysmap['backgroundid'] = get_request('backgroundid', 0);
-				$sysmap['label_format'] = get_request('label_format', 0);
-				$sysmap['label_type_host'] = get_request('label_type_host', 2);
-				$sysmap['label_type_hostgroup'] = get_request('label_type_hostgroup', 2);
-				$sysmap['label_type_trigger'] = get_request('label_type_trigger', 2);
-				$sysmap['label_type_map'] = get_request('label_type_map', 2);
-				$sysmap['label_type_image'] = get_request('label_type_image', 2);
-				$sysmap['label_string_host'] = get_request('label_string_host', '');
-				$sysmap['label_string_hostgroup'] = get_request('label_string_hostgroup', '');
-				$sysmap['label_string_trigger'] = get_request('label_string_trigger', '');
-				$sysmap['label_string_map'] = get_request('label_string_map', '');
-				$sysmap['label_string_image'] = get_request('label_string_image', '');
-				$sysmap['label_type'] = get_request('label_type', 0);
-				$sysmap['label_location'] = get_request('label_location', 0);
-				$sysmap['highlight'] = get_request('highlight', 0);
-				$sysmap['markelements'] = get_request('markelements', 0);
-				$sysmap['expandproblem'] = get_request('expandproblem', 0);
-				$sysmap['show_unack'] = get_request('show_unack', 0);
-
-				$sysmap['urls'] = get_request('urls', array());
-			}
-
-			$formLoad = new CView('configuration.sysmap.edit', $sysmap);
-			$map_wdgt->addItem($formLoad->render());
-		}
+		else if(($_REQUEST['form'] == S_CREATE_MAP) || ($_REQUEST['form'] == 'update'))
+			$map_wdgt->addItem(insert_map_form());
 	}
 	else{
 		$form = new CForm();
@@ -316,23 +253,25 @@ include_once('include/page_header.php');
 			make_sorting_header(S_NAME,'name'),
 			make_sorting_header(S_WIDTH,'width'),
 			make_sorting_header(S_HEIGHT,'height'),
-			S_EDIT
-		));
+			S_EDIT));
 
 
 		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
+
 		$options = array(
 			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND,
+			'extendoutput' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$maps = API::Map()->get($options);
+		$maps = CMap::get($options);
 
+// sorting
 		order_result($maps, $sortfield, $sortorder);
 		$paging = getPagingLine($maps);
+//-------
 
 		foreach($maps as $mnum => $map){
 			$table->addRow(array(
@@ -341,7 +280,7 @@ include_once('include/page_header.php');
 				$map['width'],
 				$map['height'],
 				new CLink(S_EDIT, 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form')
-			));
+				));
 		}
 
 // goBox
@@ -353,7 +292,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO);
+		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "maps";');

@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class CTag extends CObject{
 			$this->addItem($body);
 		}
 
-		$this->addClass($class);
+		$this->setClass($class);
 	}
 
 	public function showStart(){	echo $this->startToString();}
@@ -66,7 +66,7 @@ class CTag extends CObject{
 	public function startToString(){
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach($this->attributes as $key => $value){
-			$res .= ' '.$key.'="'.zbx_htmlstr($value).'"';
+			$res .= ' '.$key.'="'.$value.'"';
 		}
 		$res .= ($this->paired==='yes')? '>':' />';
 
@@ -76,6 +76,10 @@ class CTag extends CObject{
 	public function bodyToString(){
 		$res = $this->tag_body_start;
 	return $res.parent::toString(false);
+
+		/*foreach($this->items as $item)
+			$res .= $item;
+		return $res;*/
 	}
 
 	public function endToString(){
@@ -109,21 +113,13 @@ class CTag extends CObject{
 	return NULL;
 	}
 
-	public function addClass($cssClass){
-		if(!isset($this->attributes['class']) || zbx_empty($this->attributes['class']))
-				$this->attributes['class'] = $cssClass;
+	public function setClass($value){
+		if(isset($value))
+			$this->attributes['class'] = $value;
 		else
-			$this->attributes['class'] .= ' '.$cssClass;
+			unset($this->attributes['class']);
 
-	return $this->attributes['class'];
-	}
-
-// jQuery style alias
-	public function attr($name, $value=null){
-		if(is_null($value))
-			$this->getAttribute($name);
-		else
-			$this->setAttribute($name, $value);
+	return $value;
 	}
 
 	public function getAttribute($name){
@@ -135,17 +131,13 @@ class CTag extends CObject{
 	}
 
 	public function setAttribute($name, $value){
-		if(is_object($value))
-			$value = unpack_object($value);
-
-		if(!is_null($value))
-			$this->attributes[$name] = $value;
+		if(is_object($value)){
+			$this->attributes[$name] = unpack_object($value);
+		}
+		else if(isset($value))
+			$this->attributes[$name] = htmlspecialchars(str_replace(array("\r", "\n"), '', strval($value)));
 		else
-			$this->removeAttribute($name);
-	}
-
-	public function removeAttr($name){
-		$this->removeAttribute($name);
+			unset($this->attributes[$name]);
 	}
 
 	public function removeAttribute($name){
@@ -156,19 +148,15 @@ class CTag extends CObject{
 		$this->setAttribute($name, $value);
 	}
 
-	public function setHint($text, $width='', $class='', $byClick=true, $updateBlinking=false){
+	public function setHint($text, $width='', $class='', $byclick=true){
 		if(empty($text)) return false;
 
-		encodeValues($text);
 		$text = unpack_object($text);
 
-		// in case there are  OK/PROBLEM statuses in hint, we might want them to blink
-		$blinkUpdate = $updateBlinking ? ' jqBlink.findObjects();' : '';
-
-		$this->addAction('onmouseover',	"javascript: hintBox.showOver(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');".$blinkUpdate);
+		$this->addAction('onmouseover',	"javascript: hintBox.showOver(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');");
 		$this->addAction('onmouseout',	"javascript: hintBox.hideOut(event,this);");
-		if($byClick){
-			$this->addAction('onclick',	"javascript: hintBox.onClick(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');".$blinkUpdate);
+		if($byclick){
+			$this->addAction('onclick',	"javascript: hintBox.onClick(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');");
 		}
 	}
 
@@ -197,16 +185,6 @@ class CTag extends CObject{
 	public function error($value){
 		error('class('.get_class($this).') - '.$value);
 		return 1;
-	}
-
-	public function getForm($method='post', $action=null, $enctype=null){
-		$form = new CForm($method, $action, $enctype);
-		$form->addItem($this);
-	return $form;
-	}
-
-	public function setTitle($value='title'){
-		$this->setAttribute('title', $value);
 	}
 }
 ?>

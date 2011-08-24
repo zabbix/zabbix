@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,11 +241,8 @@ int	zbx_default_int_compare_func(const void *d1, const void *d2)
 	const int	*i1 = (const int *)d1;
 	const int	*i2 = (const int *)d2;
 
-	if (*i1 < *i2)
-		return -1;
-	if (*i1 > *i2)
-		return +1;
-
+	if (*i1 < *i2) return -1;
+	if (*i1 > *i2) return +1;
 	return 0;
 }
 
@@ -254,25 +251,9 @@ int	zbx_default_uint64_compare_func(const void *d1, const void *d2)
 	const zbx_uint64_t	*i1 = (const zbx_uint64_t *)d1;
 	const zbx_uint64_t	*i2 = (const zbx_uint64_t *)d2;
 
-	if (*i1 < *i2)
-		return -1;
-	if (*i1 > *i2)
-		return +1;
-
+	if (*i1 < *i2) return -1;
+	if (*i1 > *i2) return +1;
 	return 0;
-}
-
-int	zbx_default_uint64_ptr_compare_func(const void *d1, const void *d2)
-{
-	const zbx_uint64_t	*p1 = *(const zbx_uint64_t **)d1;
-	const zbx_uint64_t	*p2 = *(const zbx_uint64_t **)d2;
-
-	return zbx_default_uint64_compare_func(p1, p2);
-}
-
-int	zbx_default_str_compare_func(const void *d1, const void *d2)
-{
-	return strcmp(*(const char **)d1, *(const char **)d2);
 }
 
 int	zbx_default_ptr_compare_func(const void *d1, const void *d2)

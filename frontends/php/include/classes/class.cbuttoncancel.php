@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,13 +20,16 @@
 ?>
 <?php
 class CButtonCancel extends CButton{
-	public function __construct($vars=NULL, $action=NULL, $class=null){
-		parent::__construct('cancel',S_CANCEL, $action, $class);
-
-		if(is_null($action)) $this->setVars($vars);
+	public function __construct($vars=NULL,$action=NULL){
+		parent::__construct('cancel',S_CANCEL);
+		$this->attributes['type'] = 'button';
+		$this->setVars($vars);
+		if(!is_null($action))
+			$this->setAttribute('onclick', $action);
 	}
-
 	public function setVars($value=NULL){
+		global $page;
+
 		$url = '?cancel=1';
 		if(!is_null($value)) $url.= $value;
 

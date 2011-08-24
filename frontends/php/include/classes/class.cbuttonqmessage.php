@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,17 +19,17 @@
 **/
 ?>
 <?php
-class CButtonQMessage extends CSubmit{
+class CButtonQMessage extends CButton{
  public $vars;
  public $msg;
  public $name;
 
-	public function __construct($name, $caption, $msg=NULL, $vars=NULL, $class=null){
+	public function __construct($name, $caption, $msg=NULL, $vars=NULL){
 		$this->vars = null;
 		$this->msg = null;
 		$this->name = $name;
 
-		parent::__construct($name,$caption,null,$class);
+		parent::__construct($name,$caption);
 
 		$this->setMessage($msg);
 		$this->setVars($vars);
@@ -46,10 +46,10 @@ class CButtonQMessage extends CSubmit{
 
 	public function setMessage($value=NULL){
 		if(is_null($value))
-			$value = _('Are you sure you want perform this action?');
+			$value = S_ARE_YOU_SURE_YOU_WANT_TO_PERFORM_THIS_ACTION;
 
 		if(!is_string($value)){
-			return $this->error(_s('Incorrect value for setMessage(): "%s".', $value));
+			return $this->error(sprintf(S_INCORRECT_VALUE_FOR_SETMESSAGE, $value));
 		}
 		// if message will contain single quotes, it will break everything, so it must be escaped
 		$this->msg = zbx_jsvalue(
@@ -62,7 +62,7 @@ class CButtonQMessage extends CSubmit{
 
 	public function setAction($value=null){
 		if(!is_null($value))
-			return parent::setAttribute('onclick', $value);
+			return parent::setAction($value);
 
 		global $page;
 
@@ -78,7 +78,7 @@ class CButtonQMessage extends CSubmit{
 			$action = 'true';
 		}
 
-		return parent::setAttribute('onclick', 'if('.$confirmation.') return '.$action.'; else return false;');
+		return parent::setAction('if('.$confirmation.') return '.$action.'; else return false;');
 	}
 }
 ?>

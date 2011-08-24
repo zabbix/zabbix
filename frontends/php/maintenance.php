@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,13 +123,13 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['maintenanceid'])){
 			$maintenance['maintenanceid'] = $_REQUEST['maintenanceid'];
 
-			$result = API::Maintenance()->update($maintenance);
+			$result = CMaintenance::update($maintenance);
 
 			$msg1 = S_MAINTENANCE_UPDATED;
 			$msg2 = S_CANNOT_UPDATE_MAINTENANCE;
 		}
 		else{
-			$result = API::Maintenance()->create($maintenance);
+			$result = CMaintenance::create($maintenance);
 
 			$msg1 = S_MAINTENANCE_ADDED;
 			$msg2 = S_CANNOT_ADD_MAINTENANCE;
@@ -159,7 +159,7 @@ include_once('include/page_header.php');
 			$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
 		}
 
-		$go_result = API::Maintenance()->delete($maintenanceids);
+		$go_result = CMaintenance::delete($maintenanceids);
 
 		show_messages($go_result,S_MAINTENANCE_DELETED,S_CANNOT_DELETE_MAINTENANCE);
 		if($go_result){
@@ -323,18 +323,18 @@ include_once('include/page_header.php');
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 
 
-	$frmForm = new CForm('get');
+	$frmForm = new CForm(null, 'get');
 
 	if(!isset($_REQUEST['form'])){
-		$frmForm->addItem(new CSubmit('form',S_CREATE_MAINTENANCE_PERIOD));
+		$frmForm->addItem(new CButton('form',S_CREATE_MAINTENANCE_PERIOD));
 	}
 
 	$maintenance_wdgt = new CWidget();
-	$maintenance_wdgt->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'), $frmForm);
+	$maintenance_wdgt->addPageHeader(S_CONFIGURATION_OF_MAINTENANCE_PERIODS, $frmForm);
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
-		$frmMaintenance = new CForm();
+		$frmMaintenance = new CForm('maintenance.php', 'post');
 		$frmMaintenance->setName(S_MAINTENANCE);
 		$frmMaintenance->addVar('form', get_request('form', 1));
 		$frmMaintenance->addVar('form_refresh', get_request('form_refresh',0)+1);
@@ -343,6 +343,8 @@ include_once('include/page_header.php');
 			$frmMaintenance->addVar('maintenanceid', $_REQUEST['maintenanceid']);
 
 		$left_tab = new CTable();
+		$left_tab->setCellPadding(3);
+		$left_tab->setCellSpacing(3);
 
 // MAINTENANCE FORM {{{
 		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
@@ -351,7 +353,7 @@ include_once('include/page_header.php');
 				'maintenanceids' => $_REQUEST['maintenanceid'],
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$maintenance = API::Maintenance()->get($options);
+			$maintenance = CMaintenance::get($options);
 			$maintenance = reset($maintenance);
 
 			$mname				= $maintenance['name'];
@@ -411,9 +413,9 @@ include_once('include/page_header.php');
 		$tblMntc->addRow(array(S_DESCRIPTION, new CTextArea('description', $description,66,5)));
 
 
-		$footer = array(new CSubmit('save', S_SAVE));
+		$footer = array(new CButton('save', S_SAVE));
 		if(isset($_REQUEST['maintenanceid'])){
-			$footer[] = new CSubmit('clone',S_CLONE);
+			$footer[] = new CButton('clone',S_CLONE);
 			$footer[] = new CButtonDelete(S_DELETE_MAINTENANCE_PERIOD_Q, url_param('form').url_param('maintenanceid'));
 		}
 		$footer[] = new CButtonCancel();
@@ -455,7 +457,7 @@ include_once('include/page_header.php');
 				timeperiod_type2str($timeperiod['timeperiod_type']),
 				new CCol(shedule2str($timeperiod), 'wraptext'),
 				zbx_date2age(0,$timeperiod['period']),
-				new CSubmit('edit_timeperiodid['.$id.']', S_EDIT)
+				new CButton('edit_timeperiodid['.$id.']', S_EDIT)
 			));
 
 			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][timeperiod_type]', $timeperiod['timeperiod_type']));
@@ -470,10 +472,10 @@ include_once('include/page_header.php');
 
 		$footer = array();
 		if(!isset($_REQUEST['new_timeperiod'])){
-			$footer[] = new CSubmit('new_timeperiod', S_NEW);
+			$footer[] = new CButton('new_timeperiod', S_NEW);
 		}
 		if($tblPeriod->ItemsCount() > 0 ){
-			$footer[] = new CSubmit('del_timeperiod', S_DELETE_SELECTED);
+			$footer[] = new CButton('del_timeperiod', S_DELETE_SELECTED);
 		}
 
 		$left_tab->addRow(new CFormElement(S_MAINTENANCE, $tblPeriod, $footer));
@@ -491,6 +493,8 @@ include_once('include/page_header.php');
 		}
 
 		$right_tab = new CTable();
+		$right_tab->setCellPadding(3);
+		$right_tab->setCellSpacing(3);
 
 // MAINTENANCE HOSTS {{{
 		$options = array(
@@ -499,7 +503,7 @@ include_once('include/page_header.php');
 			'real_hosts' => true,
 			'preservekeys' => true
 		);
-		$all_groups = API::HostGroup()->get($options);
+		$all_groups = CHostGroup::get($options);
 		order_result($all_groups, 'name');
 
 		$twb_groupid = get_request('twb_groupid', 0);
@@ -514,7 +518,7 @@ include_once('include/page_header.php');
 		}
 
 		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
-			$hostids = API::Host()->get(array(
+			$hostids = CHost::get(array(
 				'maintenanceids' => $_REQUEST['maintenanceid'],
 				'real_hosts' => 1,
 				'output' => API_OUTPUT_SHORTEN,
@@ -535,7 +539,7 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'groupids' => $twb_groupid,
 		);
-		$hosts = API::Host()->get($options);
+		$hosts = CHost::get($options);
 
 		// selected hosts
 		$options = array(
@@ -544,14 +548,14 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'hostids' => $hostids,
 		);
-		$hosts_selected = API::Host()->get($options);
+		$hosts_selected = CHost::get($options);
 
 		$hosts = array_merge($hosts, $hosts_selected);
 		$hosts = zbx_toHash($hosts, 'hostid');
-		order_result($hosts, 'name');
+		order_result($hosts, 'host');
 
 		foreach($hosts as $host){
-			$host_tb->addItem($host['hostid'], $host['name']);
+			$host_tb->addItem($host['hostid'], $host['host']);
 		}
 
 		$tblHlink = new CTable(null, 'formElementTable');
@@ -565,7 +569,7 @@ include_once('include/page_header.php');
 		$tblGlink = new CTable(null, 'formElementTable');
 
 		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
-			$groupids = API::HostGroup()->get(array(
+			$groupids = CHostGroup::get(array(
 				'maintenanceids' => $_REQUEST['maintenanceid'],
 				'real_hosts' => 1,
 				'output' => API_OUTPUT_SHORTEN,
@@ -604,7 +608,7 @@ include_once('include/page_header.php');
 	}
 	else{
 // Table HEADER
-		$form = new CForm('get');
+		$form = new CForm(null,'get');
 		$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
 
 		$numrows = new CDiv();
@@ -617,7 +621,7 @@ include_once('include/page_header.php');
 		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'output' => API_OUTPUT_EXTEND,
+			'extendoutput' => 1,
 			'editable' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -633,7 +637,7 @@ include_once('include/page_header.php');
 			$options['groupids'] = array();
 		}
 
-		$maintenances = API::Maintenance()->get($options);
+		$maintenances = CMaintenance::get($options);
 
 		$form = new CForm();
 		$form->setName('maintenances');
@@ -689,7 +693,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 		// goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO.' (0)');
+		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');

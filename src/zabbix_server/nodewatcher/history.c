@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2006 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int get_history_lastid(int master_nodeid, int nodeid, const ZBX_TABLE *table, zbx_uint64_t *lastid)
+static int get_history_lastid(int master_nodeid, int nodeid, ZBX_TABLE *table, zbx_uint64_t *lastid)
 {
 	zbx_sock_t	sock;
 	char		data[MAX_STRING_LEN], *answer;
@@ -93,7 +93,7 @@ disconnect:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid, int nodeid)
+static void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -155,45 +155,32 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 	}
 
 	result = DBselectN(tmp, 10000);
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (table->flags & ZBX_HISTORY_SYNC)
-		{
+	while (NULL != (row = DBfetch(result))) {
+		if (table->flags & ZBX_HISTORY_SYNC) {
 			ZBX_STR2UINT64(lastid, row[0]);
 			fld = 1;
-		}
-		else
+		} else
 			fld = 0;
 
-		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 2, "\n");
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n");
 
-		for (f = 0; NULL != table->fields[f].name; f++)
-		{
+		for (f = 0; table->fields[f].name != 0; f++) {
 			if ((table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
 				continue;
 
+			len = (int)strlen(row[fld]);
+
 			if (table->fields[f].type == ZBX_TYPE_INT ||
-					table->fields[f].type == ZBX_TYPE_UINT ||
-					table->fields[f].type == ZBX_TYPE_ID ||
-					table->fields[f].type == ZBX_TYPE_FLOAT)
+				table->fields[f].type == ZBX_TYPE_UINT ||
+				table->fields[f].type == ZBX_TYPE_ID ||
+				table->fields[f].type == ZBX_TYPE_FLOAT)
 			{
-				if (SUCCEED == DBis_null(row[fld]))
-				{
-					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 6, "NULL%c",
-							ZBX_DM_DELIMITER);
-				}
-				else
-				{
-					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s%c",
-							row[fld], ZBX_DM_DELIMITER);
-				}
-			}
-			else
-			{ /* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT */
-				len = (int)strlen(row[fld]);
+				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s%c",
+					row[fld], ZBX_DM_DELIMITER);
+			} else { /* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT */
 				len = zbx_binary2hex((u_char *)row[fld], len, &tmp, &tmp_allocated);
 				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, len + 8, "%s%c",
-						tmp, ZBX_DM_DELIMITER);
+					tmp, ZBX_DM_DELIMITER);
 			}
 			fld++;
 		}

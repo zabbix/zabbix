@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 ?>
 <?php
 class CForm extends CTag{
-	public function __construct($method='post', $action=NULL, $enctype=NULL){
+	public function __construct($action=NULL, $method='post', $enctype=NULL){
 		parent::__construct('form','yes');
 		$this->setMethod($method);
 		$this->setAction($action);
@@ -30,7 +30,7 @@ class CForm extends CTag{
 
 		if(isset($_COOKIE['zbx_sessionid']))
 			$this->addVar('sid', substr($_COOKIE['zbx_sessionid'],16,16));
-
+			
 		$this->addVar('form_refresh',get_request('form_refresh',0)+1);
 	}
 
@@ -59,10 +59,10 @@ class CForm extends CTag{
 	return $this->setAttribute('enctype',$value);
 	}
 
-	public function addVar($name, $value, $id=null){
+	public function addVar($name, $value){
 		if(empty($value) && $value != 0)	return $value;
 
-		return $this->addItem(new CVar($name, $value, $id));
+	return $this->addItem(new CVar($name, $value));
 	}
 }
 ?>

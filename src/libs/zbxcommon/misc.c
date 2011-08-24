@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,102 +69,6 @@ int	get_nodeid_by_id(zbx_uint64_t id)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_timespec                                                     *
- *                                                                            *
- * Purpose: Gets the current time.                                            *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: Time in seconds since midnight (00:00:00),                       *
- *           January 1, 1970, coordinated universal time (UTC).               *
- *                                                                            *
- ******************************************************************************/
-void	zbx_timespec(zbx_timespec_t *ts)
-{
-	static zbx_timespec_t	*last_ts = NULL;
-	static int		corr = 0;
-#ifdef _WINDOWS
-	LARGE_INTEGER	tickPerSecond, tick;
-	static int	boottime = 0;
-	BOOL		rc = FALSE;
-#else
-	struct timeval	tv;
-	int		rc = -1;
-#	ifdef HAVE_TIME_CLOCK_GETTIME
-	struct timespec	tp;
-#	endif
-#endif
-
-	if (NULL == last_ts)
-		last_ts = zbx_malloc(last_ts, sizeof(zbx_timespec_t));
-
-#ifdef _WINDOWS
-	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
-	{
-		if (TRUE == (rc = QueryPerformanceCounter(&tick)))
-		{
-			ts->ns = (int)(1000000000 * (tick.QuadPart % tickPerSecond.QuadPart) / tickPerSecond.QuadPart);
-
-			tick.QuadPart = tick.QuadPart / tickPerSecond.QuadPart;
-
-			if (0 == boottime)
-				boottime = (int)(time(NULL) - tick.QuadPart);
-	
-			ts->sec = (int)(tick.QuadPart + boottime);
-		}
-	}
-	
-	if (TRUE != rc)
-	{
-		struct _timeb   tb;
-
-		_ftime(&tb);
-
-		ts->sec = (int)tb.time;
-		ts->ns = tb.millitm * 1000000;
-	}
-#else	/* not _WINDOWS */
-#ifdef HAVE_TIME_CLOCK_GETTIME
-	if (0 == (rc = clock_gettime(CLOCK_REALTIME, &tp)))
-	{
-		ts->sec = (int)tp.tv_sec;
-		ts->ns = (int)tp.tv_nsec;
-	}
-#endif	/* HAVE_TIME_CLOCK_GETTIME */
-
-	if (0 != rc && 0 == (rc = gettimeofday(&tv, NULL)))
-	{
-		ts->sec = (int)tv.tv_sec;
-		ts->ns = (int)tv.tv_usec * 1000;
-	}
-
-	if (0 != rc)
-	{
-		ts->sec = (int)time(NULL);
-		ts->ns = 0;
-	}
-#endif	/* not _WINDOWS */
-
-	if (last_ts->ns == ts->ns && last_ts->sec == ts->sec)
-	{
-		ts->ns += ++corr;
-
-		while (ts->ns >= 1000000000)
-		{
-			ts->sec++;
-			ts->ns -= 1000000000;
-		}
-	}
-	else
-	{
-		last_ts->sec = ts->sec;
-		last_ts->ns = ts->ns;
-		corr = 0;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_time                                                         *
  *                                                                            *
  * Purpose: Gets the current time.                                            *
@@ -179,11 +83,19 @@ void	zbx_timespec(zbx_timespec_t *ts)
  ******************************************************************************/
 double	zbx_time()
 {
-	zbx_timespec_t	ts;
+#if defined(_WINDOWS)
+	struct _timeb current;
 
-	zbx_timespec(&ts);
+	_ftime(&current);
 
-	return (double)ts.sec + 1.0e-9 * (double)ts.ns;
+	return (((double)current.time) + 1.0e-3 * ((double)current.millitm));
+#else
+	struct timeval current;
+
+	gettimeofday(&current, NULL);
+
+	return (((double)current.tv_sec) + 1.0e-6 * ((double)current.tv_usec));
+#endif
 }
 
 /******************************************************************************
@@ -288,7 +200,7 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
  *                                                                            *
  * Function: zbx_realloc2                                                     *
  *                                                                            *
- * Purpose: changes the size of the memory block pointed to by old            *
+ * Purpose: changes the size of the memory block pointed to by src            *
  *          to size bytes                                                     *
  *                                                                            *
  * Return value: returns a pointer to the newly allocated memory              *
@@ -296,7 +208,7 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
+void    *zbx_realloc2(const char *filename, int line, void *src, size_t size)
 {
 	int	max_attempts;
 	void	*ptr = NULL;
@@ -304,7 +216,7 @@ void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
 	for (
 		max_attempts = 10, size = MAX(size, 1);
 		0 < max_attempts && NULL == ptr;
-		ptr = realloc(old, size), max_attempts--
+		ptr = realloc(src, size), max_attempts--
 	);
 
 	if (NULL != ptr)
@@ -619,28 +531,27 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
-		int delay, const char *flex_intervals, time_t now, int *effective_delay)
+int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
+		const char *flex_intervals, time_t now, int *effective_delay)
 {
 	const char	*__function_name = "calculate_item_nextcheck";
 	int		nextcheck;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " delay:%d flex_intervals:'%s' now:%d",
-			__function_name, interfaceid, itemid, delay, NULL == flex_intervals ? "" : flex_intervals, (int)now);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " delay:%d flex_intervals:'%s' now:%d",
+			__function_name, itemid, delay, NULL == flex_intervals ? "" : flex_intervals, now);
 
 	if (0 == delay)
 		delay = SEC_PER_YEAR;
 
 	/* special processing of active items to see better view in queue */
-	if (ITEM_TYPE_ZABBIX_ACTIVE == item_type)
+	if (item_type == ITEM_TYPE_ZABBIX_ACTIVE)
 	{
 		nextcheck = (int)now + delay;
 	}
 	else
 	{
-		int		current_delay;
-		time_t		next_interval;
-		zbx_uint64_t	shift;
+		int	current_delay;
+		time_t	next_interval;
 
 		current_delay = get_current_delay(delay, flex_intervals, now);
 
@@ -663,8 +574,7 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 		}
 
 		delay = current_delay;
-		shift = (ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
-		nextcheck = delay * (int)(now / (time_t)delay) + (int)(shift % (zbx_uint64_t)delay);
+		nextcheck = delay * (int)(now / (time_t)delay) + (int)(itemid % (zbx_uint64_t)delay);
 
 		while (nextcheck <= now)
 			nextcheck += delay;
@@ -1540,9 +1450,6 @@ int	is_uint64(const char *str, zbx_uint64_t *value)
 	register zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
 	register zbx_uint64_t	value_uint64 = 0, c;
 
-	if ('\0' == *str)
-		return FAIL;
-
 	while ('\0' != *str)
 	{
 		if (*str >= '0' && *str <= '9')
@@ -1605,44 +1512,6 @@ int	is_ushort(const char *str, unsigned short *value)
 		*value = value_ushort;
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: is_boolean                                                       *
- *                                                                            *
- * Purpose: check if the string is boolean                                    *
- *                                                                            *
- * Parameters: str - string to check                                          *
- *                                                                            *
- * Return value:  SUCCEED - the string is boolean                             *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-int	is_boolean(const char *str, zbx_uint64_t *value)
-{
-	int	res;
-
-	if (SUCCEED == (res = is_double(str)))
-		*value = (0 != atof(str));
-	else
-	{
-		char	tmp[16];
-
-		strscpy(tmp, str);
-		zbx_strlower(tmp);
-
-		if (SUCCEED == (res = str_in_list("true,t,yes,y,on,up,running,enabled,available", tmp, ',')))
-			*value = 1;
-		else if (SUCCEED == (res = str_in_list("false,f,no,n,off,down,unused,disabled,unavailable", tmp, ',')))
-			*value = 0;
-	}
-
-	return res;
 }
 
 /******************************************************************************
@@ -1763,7 +1632,7 @@ int	is_hex_string(const char *str)
  *                                                                            *
  * Purpose: check if uin64 integer matches a list of integers                 *
  *                                                                            *
- * Parameters: list -  integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699)         *
+ * Parameters: list -  integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699          *
  *             value-  value                                                  *
  *                                                                            *
  * Return value: FAIL - out of period, SUCCEED - within the list              *
@@ -1958,38 +1827,6 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values
 
 		memmove(&values[index], &values[index + 1], sizeof(zbx_uint64_t) * ((*num) - index - 1));
 		(*num)--;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: uint64_array_remove_both                                         *
- *                                                                            *
- * Purpose: remove equal values from both arrays                              *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num)
-{
-	int	rindex, index;
-
-	for (rindex = 0; rindex < *rm_num; rindex++)
-	{
-		index = get_nearestindex(values, sizeof(zbx_uint64_t), *num, rm_values[rindex]);
-		if (index == *num || values[index] != rm_values[rindex])
-			continue;
-
-		memmove(&values[index], &values[index + 1], sizeof(zbx_uint64_t) * ((*num) - index - 1));
-		(*num)--;
-		memmove(&rm_values[rindex], &rm_values[rindex + 1], sizeof(zbx_uint64_t) * ((*rm_num) - rindex - 1));
-		(*rm_num)--; rindex--;
 	}
 }
 
@@ -2205,27 +2042,6 @@ int	is_function_char(char c)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_time_function                                                 *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:  SUCCEED - given function is time-based                      *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-int	is_time_function(const char *func)
-{
-	return str_in_list("nodata,date,dayofmonth,dayofweek,time,now", func, ',');
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: make_hostname                                                    *
  *                                                                            *
  * Purpose: replace all not-allowed hostname symbols in the string            *
@@ -2240,46 +2056,12 @@ int	is_time_function(const char *func)
 void	make_hostname(char *host)
 {
 	char	*c;
-
+	
 	assert(host);
-
+	
 	for (c = host; '\0' != *c; ++c)
 		if (FAIL == is_hostname_char(*c))
 			*c = '_';
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_interface_type_by_item_type                                  *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: Interface type                                               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
- *                                                                            *
- ******************************************************************************/
-unsigned char	get_interface_type_by_item_type(unsigned char type)
-{
-	switch (type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			return INTERFACE_TYPE_AGENT;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			return INTERFACE_TYPE_SNMP;
-		case ITEM_TYPE_IPMI:
-			return INTERFACE_TYPE_IPMI;
-		case ITEM_TYPE_JMX:
-			return INTERFACE_TYPE_JMX;
-		default:
-			return INTERFACE_TYPE_AGENT;
-	}
 }
 
 /******************************************************************************

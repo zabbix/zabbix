@@ -1,6 +1,7 @@
+//Javascript document
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,9 +18,10 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-// Author: Aly
-
+/************************************************************************************/
 /*								PAGE REFRESH										*/
+/************************************************************************************/
+// Author: Aly
 var PageRefresh = {
 delay:			null,	// refresh timeout
 delayLeft:		null,	// left till refresh
@@ -47,6 +49,12 @@ start: function(){
 	this.timeout = setTimeout('PageRefresh.check()', 1000);
 },
 
+restart: function(){
+	this.stop();
+	this.delayLeft = this.delay;
+	this.start();
+},
+
 stop: function(){
 	clearTimeout(this.timeout);
 },
@@ -56,9 +64,13 @@ restart: function(){
 	this.delayLeft = this.delay;
 	this.start();
 }
-};
+}
 
+/************************************************************************************/
 /*								MAIN MENU stuff										*/
+/************************************************************************************/
+// Author: Aly
+
 var MMenu = {
 menus:			{'empty': 0, 'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
 def_label:		null,
@@ -99,9 +111,13 @@ showSubMenu: function(show_label){
 		}
 	}
 }
-};
+}
 
+/************************************************************************************/
 /*						Automatic checkbox range selection 							*/
+/************************************************************************************/
+// Author: Aly
+
 var chkbxRange = {
 startbox:			null,			// start checkbox obj
 startbox_name: 		null,			// start checkbox name
@@ -137,7 +153,7 @@ init: function(){
 implement: function(obj){
 	var obj_name = obj.name.split('[')[0];
 
-	if(typeof(this.chkboxes[obj_name]) == 'undefined') this.chkboxes[obj_name] = [];
+	if(typeof(this.chkboxes[obj_name]) == 'undefined') this.chkboxes[obj_name] = new Array();
 	this.chkboxes[obj_name].push(obj);
 
 	addListener(obj, 'click', this.check.bindAsEventListener(this), false);
@@ -154,7 +170,7 @@ implement: function(obj){
 },
 
 check: function(e){
-	e = e || window.event;
+	var e = e || window.event;
 	var obj = Event.element(e);
 
 	PageRefresh.restart();
@@ -314,7 +330,7 @@ setGo: function(){
 },
 
 submitGo: function(e){
-	e = e || window.event;
+	var e = e || window.event;
 
 	if(this.pageGoCount > 0){
 		var goSelect = $('go');
@@ -323,7 +339,7 @@ submitGo: function(e){
 		if(is_null(confirmText) || !confirmText){
 //			confirmText = 'Continue with "'+goSelect.options[goSelect.selectedIndex].text+'"?';
 		}
-		else if(!confirm(confirmText)){
+		else if(!Confirm(confirmText)){
 			Event.stop(e);
 			return false;
 		}
@@ -344,7 +360,9 @@ submitGo: function(e){
 }
 };
 
+/************************************************************************************/
 /*								Audio Control System 								*/
+/************************************************************************************/
 var AudioList = {
 list:		{},		// audio files options
 dom:		{},		// dom objects links
@@ -547,93 +565,42 @@ remove: function(audiofile){
 	delete(this.dom[audiofile]);
 	delete(this.list[audiofile]);
 }
-};
+}
 
+/************************************************************************************/
 /*						Replace Standart Blink functionality						*/
-/**
- * Sets HTML elements to blink.
- * Example of usage:
- *      <span class="blink" data-seconds-to-blink="60">test 1</span>
- *      <span class="blink" data-seconds-to-blink="30">test 2</span>
- *      <span class="blink">test 3</span>
- *      <script type="text/javascript">
- *          jQuery(document).ready(function(
- *              jqBlink.init();
- *          ));
- *      </script>
- * Elements with class 'blink' will blink for 'data-seconds-to-blink' seconds
- * If 'data-seconds-to-blink' is omitted, element will blink forever.
- * @author Konstantin Buravcov
- */
-var jqBlink = {
+/************************************************************************************/
+// Author: Aly
+var blink = {
+	blinkobjs: new Array(),
 
-	objects: [], // those objects will blink
-	shown: false, // are objects currently shown or hidden?
-	blinkInterval: 1000, // how fast will they blink (ms)
-	secondsSinceInit: 0,
-
-	/**
-	 * Initialize blinking
-	 */
 	init: function(){
-		if(this.objects.length === 0){
-			this.findObjects();
+
+		if(IE)
+			this.blinkobjs = $$('*[name=blink]');
+		else
+			this.blinkobjs = document.getElementsByName("blink");
+
+		if(this.blinkobjs.length > 0) this.view();
+	},
+	hide: function(){
+		for(var id=0; id<this.blinkobjs.length; id++){
+			this.blinkobjs[id].style.visibility = 'hidden';
 		}
-		this.blink();
+		setTimeout('blink.view()',500);
 	},
-
-	/**
-	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
-	 */
-	blink: function(){
-		// maybe some of the objects should not blink any more?
-		this.filterOutNonBlinking();
-		// changing visibility state
-		this.objects.css(
-			'visibility',
-			this.shown ? 'hidden' : 'visible'
-		);
-		// reversing the value of indicator attribute
-		this.shown = !this.shown;
-		// I close my eyes only for a moment, and a moment's gone
-		this.secondsSinceInit += this.blinkInterval / 1000;
-		// repeating this function with delay
-		setTimeout(jQuery.proxy(this.blink, this), this.blinkInterval);
-	},
-
-	/**
-	 * Find all elements with class 'blink' and store them in this.objects
-	 */
-	findObjects: function(){
-		this.objects = jQuery('.blink');
-	},
-
-	/**
-	 * Check all currently found objects and exclude ones that should stop blinking by now
-	 */
-	filterOutNonBlinking: function(){
-		var that = this;
-
-		this.objects = this.objects.filter(function(){
-			var obj = jQuery(this);
-			if(typeof obj.data('timeToBlink') !== 'undefined'){
-				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
-				// if object stops blinking, it should be left visible
-				if(!shouldBlink && !that.shown){
-					obj.css('visibility', 'visible');
-				}
-				return shouldBlink;
-			}
-			else{
-				// no time-to-blink attribute, should blink forever
-				return true;
-			}
-		});
+	view: function(){
+		for(var id=0; id<this.blinkobjs.length; id++){
+			this.blinkobjs[id].style.visibility = 'visible'
+		}
+		setTimeout('blink.hide()',1000);
 	}
-};
+}
 
 
+/************************************************************************************/
 /*								ZABBIX HintBoxes 									*/
+/************************************************************************************/
 var hintBox = {
 boxes:				{},				// array of dom Hint Boxes
 boxesCount: 		0,				// unique box id
@@ -660,7 +627,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	box.className = 'hintbox';
 
 	if(!empty(className)){
-		hint_text = "<span class=\"" + className + "\">" + hint_text + "</span>";
+		hint_text = "<span class=" + className + ">" + hint_text + "</"+"span>";
 	}
 
 	if(!empty(width)){
@@ -693,7 +660,7 @@ return box;
 showOver: function(e, obj, hint_text, width, className){
 	this.debug('showOver');
 
-	if(!e) e = window.event;
+	if (!e) var e = window.event;
 
 	var hintid = obj.getAttribute('hintid');
 	var hintbox = $(hintid);
@@ -705,7 +672,7 @@ showOver: function(e, obj, hint_text, width, className){
 
 	if(!empty(byClick)) return;
 
-	hintbox = this.createBox(obj,hint_text, width, className, false);
+	var hintbox = this.createBox(obj,hint_text, width, className, false);
 
 	obj.setAttribute('hintid', hintbox.id);
 	this.show(e, obj, hintbox);
@@ -714,7 +681,7 @@ showOver: function(e, obj, hint_text, width, className){
 hideOut: function(e, obj){
 	this.debug('hideOut');
 
-	if (!e) e = window.event;
+	if (!e) var e = window.event;
 
 	var hintid = obj.getAttribute('hintid');
 	var hintbox = $(hintid);
@@ -737,7 +704,7 @@ hideOut: function(e, obj){
 onClick: function(e, obj, hint_text, width, className){
 	this.debug('onClick');
 
-	if (!e) e = window.event;
+	if (!e) var e = window.event;
 	cancelEvent(e);
 
 	var hintid = obj.getAttribute('hintid');
@@ -752,7 +719,7 @@ onClick: function(e, obj, hint_text, width, className){
 		obj.removeAttribute('hintid');
 		this.hide(e, hintid);
 
-		hintbox = this.createBox(obj, hint_text, width, className, true);
+		var hintbox = this.createBox(obj, hint_text, width, className, true);
 
 		hintbox.setAttribute('byclick', 'true');
 		obj.setAttribute('hintid', hintbox.id);
@@ -766,7 +733,7 @@ onClick: function(e, obj, hint_text, width, className){
 		this.hide(e, hintid);
 	}
 	else{
-		hintbox = this.createBox(obj,hint_text, width, className, true);
+		var hintbox = this.createBox(obj,hint_text, width, className, true);
 
 		hintbox.setAttribute('byclick', 'true');
 		obj.setAttribute('hintid', hintbox.id);
@@ -778,13 +745,32 @@ onClick: function(e, obj, hint_text, width, className){
 show: function(e, obj, hintbox){
 	this.debug('show');
 
+	var hintid = hintbox.id;
+	// var body_width = get_bodywidth();
 	var body_width = document.viewport.getDimensions().width;
+
+//	pos = getPosition(obj);
+// this.debug('body width: ' + body_width);
+// this.debug('position.top: ' + pos.top);
+
+// by Object
+/*
+	if(parseInt(pos.left+obj.offsetWidth+4+hintbox.offsetWidth) > body_width){
+		pos.left-=parseInt(hintbox.offsetWidth);
+		pos.left-=4;
+		pos.left=(pos.left < 0)?0:pos.left;
+	}
+	else{
+		pos.left+= obj.offsetWidth+4;
+	}
+	hintbox.x	= pos.left;
+//*/
 
 	hintbox.style.visibility = 'hidden';
 	hintbox.style.display = 'block';
 
-	var posit = $(obj).positionedOffset();
-	var cumoff = $(obj).cumulativeOffset();
+	posit = $(obj).positionedOffset();
+	cumoff = $(obj).cumulativeOffset();
 	if(parseInt(cumoff.left+10+hintbox.offsetWidth) > body_width){
 		posit.left = posit.left - parseInt((cumoff.left+10+hintbox.offsetWidth) - body_width) + document.viewport.getScrollOffsets().left;
 		// posit.left-=parseInt(hintbox.offsetWidth);
@@ -800,23 +786,29 @@ show: function(e, obj, hintbox){
 	hintbox.style.top	= hintbox.y + 10 + parseInt(obj.offsetHeight/2) + 'px';
 	hintbox.style.visibility = 'visible';
 	hintbox.style.zIndex = '999';
+
+// IE6 z-index bug
+	//if(IE6) showPopupDiv(hintid, 'frame_'+hintid);
+
 },
 
 hide: function(e, boxid){
 	this.debug('hide');
 
-	if (!e) e = window.event;
+	if (!e) var e = window.event;
 	cancelEvent(e);
 
 	var hint = $(boxid);
 	if(!is_null(hint)){
 		delete(this.boxes[boxid]);
 
+		//hidePopupDiv('frame_'+hint.id);
 // Opera refresh bug!
 		hint.style.display = 'none';
 		//hintbox.setAttribute('byclick', 'true');
 		if(OP) setTimeout(function(){hint.remove();}, 200);
 		else hint.remove();
+
 	}
 },
 
@@ -845,14 +837,16 @@ debug: function(fnc_name, id){
 		this.debug_prev = str;
 	}
 }
-};
+}
 
+/************************************************************************************/
 /*								COLOR PICKER FUNCTIONS 								*/
+/************************************************************************************/
 function hide_color_picker(){
 	if(!color_picker) return;
 
 	color_picker.style.zIndex = 1000;
-	color_picker.style.visibility="hidden";
+	color_picker.style.visibility="hidden"
 	color_picker.style.left	= "-" + ((color_picker.style.width) ? color_picker.style.width : 100) + "px";
 
 	curr_lbl = null;
@@ -892,7 +886,7 @@ function set_color(color){
 		curr_lbl.style.background = curr_lbl.style.color = "#" + color;
 		curr_lbl.title = "#" + color;
 	}
-	if(curr_txt) curr_txt.value = color.toString().toUpperCase();
+	if(curr_txt)	curr_txt.value = color;
 
 	hide_color_picker();
 }
@@ -904,10 +898,14 @@ function set_color_by_name(name, color){
 	set_color(color);
 }
 
+/************************************************************************************/
 /*								ZABBIX AJAX REQUESTS 								*/
+/************************************************************************************/
+
 function add2favorites(favobj,favid){
 	if('undefined' == typeof(Ajax)){
 		throw("Prototype.js lib is required!");
+		return false;
 	}
 
 	if((typeof(favid) == 'undefined') || empty(favid)) return;
@@ -916,7 +914,7 @@ function add2favorites(favobj,favid){
 		'favobj': 	favobj,
 		'favid': 	favid,
 		'action':	'add'
-	};
+	}
 
 	send_params(params);
 //	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
@@ -927,6 +925,7 @@ function rm4favorites(favobj,favid,menu_rowid){
 //	alert(favobj+','+favid+','+menu_rowid);
 	if('undefined' == typeof(Ajax)){
 		throw("Prototype.js lib is required!");
+		return false;
 	}
 
 	if((typeof(favobj) == 'undefined') || (typeof(favid) == 'undefined'))
@@ -937,7 +936,7 @@ function rm4favorites(favobj,favid,menu_rowid){
 		'favid': 	favid,
 		'favcnt':	menu_rowid,
 		'action':	'remove'
-	};
+	}
 
 	send_params(params);
 //	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
@@ -945,14 +944,16 @@ function rm4favorites(favobj,favid,menu_rowid){
 
 function change_flicker_state(divid){
 	deselectAll();
+	var eff_time = 500;
 
 	var switchArrows = function(){
 		switchElementsClass($("flicker_icon_l"),"dbl_arrow_up","dbl_arrow_down");
 		switchElementsClass($("flicker_icon_r"),"dbl_arrow_up","dbl_arrow_down");
-	};
+	}
 
 	var filter_state = ShowHide(divid);
 	switchArrows();
+//	var filter_state = showHideEffect(divid,'slide', eff_time, switchArrows);
 
 	if(false === filter_state) return false;
 
@@ -961,7 +962,7 @@ function change_flicker_state(divid){
 		'favobj': 	'filter',
 		'favref': 	divid,
 		'state':	filter_state
-	};
+	}
 
 	send_params(params);
 
@@ -969,42 +970,18 @@ function change_flicker_state(divid){
 	if(typeof(moveSBoxes) != 'undefined') moveSBoxes();
 }
 
-function changeHatStateUI(icon, divid){
-	deselectAll();
-
-
-	var switchIcon = function(){
-		switchElementsClass(icon,"arrowup","arrowdown");
-	};
-
-	jQuery($(divid).parentNode).
-		find('.body').toggle().end().
-		find('.footer').toggle().end();
-
-	switchIcon();
-
-	var hat_state = jQuery(icon).hasClass("arrowup") ? 1 : 0;
-	if(false === hat_state) return false;
-
-	var params = {
-		'action':	'flop',
-		'favobj': 	'hat',
-		'favref': 	divid,
-		'state':	hat_state
-	};
-
-	send_params(params);
-}
-
 function change_hat_state(icon, divid){
 	deselectAll();
 
+	var eff_time = 500;
+
 	var switchIcon = function(){
 		switchElementsClass(icon,"arrowup","arrowdown");
-	};
+	}
 
 	var hat_state = ShowHide(divid);
 	switchIcon();
+//	var hat_state = showHideEffect(divid, 'slide', eff_time, switchIcon);
 
 	if(false === hat_state) return false;
 
@@ -1013,25 +990,25 @@ function change_hat_state(icon, divid){
 		'favobj': 	'hat',
 		'favref': 	divid,
 		'state':	hat_state
-	};
+	}
 
 	send_params(params);
 }
 
 function send_params(params){
-	if(typeof(params) === 'undefined') params = [];
+	if(typeof(params) == 'undefined') var params = new Array();
 
 	var url = new Curl(location.href);
 	url.setQuery('?output=ajax');
 
 	new Ajax.Request(url.getUrl(),
-		{
-			'method': 'post',
-			'parameters':params,
-			'onSuccess': function(){ },
-//			'onSuccess': function(resp){ SDI(resp.responseText); },
-			'onFailure': function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
-		}
+					{
+						'method': 'post',
+						'parameters':params,
+						'onSuccess': function(resp){ },
+//						'onSuccess': function(resp){ SDI(resp.responseText); },
+						'onFailure': function(){document.location = url.getPath()+'?'+Object.toQueryString(params);}
+					}
 	);
 }
 
@@ -1039,9 +1016,10 @@ function send_params(params){
 function setRefreshRate(pmasterid,dollid,interval,params){
 	if(typeof(Ajax) == 'undefined'){
 		throw("Prototype.js lib is required!");
+		return false;
 	}
 
-	if((typeof(params) == 'undefined') || is_null(params)) params = {};
+	if((typeof(params) == 'undefined') || is_null(params))  var params = new Array();
 	params['pmasterid'] = 	pmasterid;
 	params['favobj'] = 		'set_rf_rate';
 	params['favref'] = 		dollid;
@@ -1061,7 +1039,7 @@ function switch_mute(icon){
 		'favobj': 	'sound',
 		'favref':	'sound',
 		'state':	sound_state
-	};
+	}
 
 	send_params(params);
 }

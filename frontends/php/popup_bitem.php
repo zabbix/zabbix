@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ include_once 'include/page_header.php';
 	$_REQUEST['caption'] = get_request('caption','');
 	$_REQUEST['axisside'] = get_request('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['itemid']) && ($_REQUEST['itemid'] > 0)){
-		$_REQUEST['caption'] = itemName(get_item_by_itemid($_REQUEST['itemid']));
+		$_REQUEST['caption'] = item_description(get_item_by_itemid($_REQUEST['itemid']));
 	}
 
 	insert_js_function('add_bitem');
@@ -110,7 +110,7 @@ include_once 'include/page_header.php';
 		$description = '';
 		if($itemid > 0){
 			$description = get_item_by_itemid($itemid);
-			$description = itemName($description);
+			$description = item_description($description);
 		}
 
 		$frmGItem->addVar('gid',$gid);
@@ -123,12 +123,12 @@ include_once 'include/page_header.php';
 
 //		$frmGItem->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
 
-		$txtCondVal = new CTextBox('name',$description,50,'yes');
+		$txtCondVal = new CTextBox('description',$description,50,'yes');
 
-		$btnSelect = new CSubmit('btn1',S_SELECT,
+		$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
-				'&dstfld1=itemid&dstfld2=name&srctbl=items'.
-				"&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
+				'&dstfld1=itemid&dstfld2=description&srctbl=items'.
+				"&srcfld1=itemid&srcfld2=description&monitored_hosts=1');",
 				'T');
 
 		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
@@ -156,7 +156,7 @@ include_once 'include/page_header.php';
 			$frmGItem->addVar('color',$color);
 
 
-		$frmGItem->addItemToBottomRow(new CSubmit('save', isset($gid)?S_SAVE:S_ADD));
+		$frmGItem->addItemToBottomRow(new CButton('save', isset($gid)?S_SAVE:S_ADD));
 
 		$frmGItem->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmGItem->Show();

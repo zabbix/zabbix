@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2006 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,6 +122,9 @@
 			return false;
 
 		if(validate_ipv4($parts[0], $arr)){
+			$ip_parts = explode('.', $parts[0]);
+
+//			if( !ereg('^[0-9]{1,2}$', $parts[1])) return false;
 			if(!preg_match('/^([0-9]{1,2})$/', $parts[1])) return false;
 
 			sscanf($parts[1], "%d", $mask);
@@ -129,6 +132,9 @@
 			if( $mask > 32 ) return false;
 		}
 		else if( defined('ZBX_HAVE_IPV6') && validate_ipv6($parts[0], $arr) ){
+			$ip_parts = explode(':', $parts[0]);
+
+//			if( !ereg('^[0-9]{1,3}$', $parts[1]) ) return false;
 			if(!preg_match('/^([0-9]{1,3})$/', $parts[1])) return false;
 
 			sscanf($parts[1], "%d", $mask);
@@ -546,11 +552,11 @@
 
 			if(!$valid){
 				if($flags&P_SYS){
-					info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field.',$_REQUEST[$field], $caption));
+					info(S_CRITICAL_ERROR.'.'.SPACE.S_INCORRECT_VALUE_FOR.SPACE.'['.$caption.'] = "'.$_REQUEST[$field].'"');
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info(_s('Warning. Incorrect value for field "%s".',$caption));
+					info(S_WARNING.'.'.SPACE.S_INCORRECT_VALUE_FOR.SPACE.'['.$caption.']');
 					return ZBX_VALID_WARNING;
 				}
 			}

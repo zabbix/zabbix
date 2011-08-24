@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,8 +25,9 @@ require_once('include/js.inc.php');
 
 $dstfrm	= get_request('dstfrm',	0);	// destination form
 
-$page['title'] = 'S_GRAPH_ITEM';
+$page['title'] = "S_GRAPH_ITEM";
 $page['file'] = 'popup_gitem.php';
+$page['scripts'] = array();
 
 define('ZBX_PAGE_NO_MENU', 1);
 
@@ -38,8 +39,6 @@ include_once('include/page_header.php');
 	$fields=array(
 		'dstfrm'=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
 
-		'parent_discoveryid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
-		'normal_only'=>	array(T_ZBX_INT, O_OPT,	 null,	null,			null),
 		'graphid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
 		'gid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
 		'graphtype'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,3'),		'isset({save})'),
@@ -148,7 +147,7 @@ include_once('include/page_header.php');
 		$description = '';
 		if($itemid > 0){
 			$description = get_item_by_itemid($itemid);
-			$description = itemName($description);
+			$description = item_description($description);
 		}
 
 		$frmGItem->addVar('graphid',$graphid);
@@ -158,7 +157,7 @@ include_once('include/page_header.php');
 		$frmGItem->addVar('graphtype',$graphtype);
 		$frmGItem->addVar('only_hostid',$only_hostid);
 
-		$txtCondVal = new CTextBox('name',$description,50,'yes');
+		$txtCondVal = new CTextBox('description',$description,50,'yes');
 
 		$host_condition = '';
 		if(isset($only_hostid)){// graph for template must use only one host
@@ -168,25 +167,11 @@ include_once('include/page_header.php');
 			$host_condition = "&real_hosts=1";
 		}
 
-		$parent_discoveryid = get_request('parent_discoveryid', false);
-		$normal_only = get_request('normal_only') ? '&normal_only=1' : '';
-		if($parent_discoveryid){
-			$btnSelect = new CSubmit('btn1',S_SELECT,
+		$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmGItem->GetName().
-						"&dstfld1=itemid&dstfld2=name&".
-						"srctbl=prototypes&srcfld1=itemid&srcfld2=name&parent_discoveryid=".$parent_discoveryid.
-						"', 800, 600);",
-				'T'
-			);
-		}
-		else{
-			$btnSelect = new CSubmit('btn1',S_SELECT,
-				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmGItem->GetName().
-						"&dstfld1=itemid&dstfld2=name".$normal_only.
-						"&srctbl=items&srcfld1=itemid&srcfld2=name".$host_condition."', 800, 600);",
-				'T'
-			);
-		}
+				"&dstfld1=itemid&dstfld2=description&".
+				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."');",
+				'T');
 
 		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
 
@@ -267,7 +252,7 @@ include_once('include/page_header.php');
 			$frmGItem->addRow(S_SORT_ORDER_0_100, new CTextBox('sortorder',$sortorder,3));
 		}
 
-		$frmGItem->addItemToBottomRow(new CSubmit('save', isset($gid) ? S_SAVE : S_ADD));
+		$frmGItem->addItemToBottomRow(new CButton('save', isset($gid) ? S_SAVE : S_ADD));
 
 		$frmGItem->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmGItem->show();

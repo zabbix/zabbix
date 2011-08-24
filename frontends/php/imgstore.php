@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,10 +52,10 @@ include_once('include/page_header.php');
 			'output'=> API_OUTPUT_EXTEND,
 			'select_image'=> 1
 		);
-		$images = API::Image()->get($options);
+		$images = CImage::get($options);
 		foreach($images as $inum => $image){
 //SDI($image['image']);
-			$image['image'] = base64_decode($image['image']);
+			$image['image'] = zbx_unescape_image(base64_decode($image['image']));
 
 			$ico = imagecreatefromstring($image['image']);
 			$w = imagesx($ico);
@@ -64,7 +64,8 @@ include_once('include/page_header.php');
 			$css.= 'div.sysmap_iconid_'.$image['imageid'].'{'.
 						' height: '.$h.'px; '.
 						' width: '.$w.'px; '.
-						' background: url("imgstore.php?iconid='.$image['imageid'].'") no-repeat center center;}'."\n";
+						' background-image: url("imgstore.php?iconid='.$image['imageid'].'");'.
+						' background-repeat:no-repeat; }'."\n";
 		}
 
 		print($css);
@@ -82,14 +83,13 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['imageid'])){
+		session_start();
 		$imageid = get_request('imageid',0);
 
-		session_start();
 		if(isset($_SESSION['image_id'][$imageid])){
 			echo $_SESSION['image_id'][$imageid];
 			unset($_SESSION['image_id'][$imageid]);
 		}
-		session_write_close();
 	}
 ?>
 <?php

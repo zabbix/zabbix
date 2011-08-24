@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -15,12 +15,21 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**/
-
+**
+*/
+// [!CDATA[
+/************************************************************************************/
 // GRAPHS TIMELINE CONTROLS (GTLC)
 // author: Aly
+/************************************************************************************/
 
+/************************************************************************************/
 // Title: graph magic initialization
+// Author: Aly
+/************************************************************************************/
+
+//timeControl.addObject(id, time, objData)
+
 var timeControl = {
 objectList: {},				// objects needs to be controlled
 
@@ -49,12 +58,12 @@ addObject: function(domid, time, objData){
 		'mainObject': 0			// object on changing will reflect on all others
 	};
 
-	for(var key in this.objectList[domid]){
+	for(key in this.objectList[domid]){
 		if(isset(key, objData)) this.objectList[domid][key] = objData[key];
 	}
 
 	var nowDate = new CDate();
-	var now = parseInt(nowDate.getTime() / 1000);
+	now = parseInt(nowDate.getTime() / 1000);
 
 	if(!isset('period', time))		time.period = 3600;
 	if(!isset('endtime', time))		time.endtime = now;
@@ -67,32 +76,32 @@ addObject: function(domid, time, objData){
 	else time.usertime = (nowDate.setZBXDate(time.usertime) / 1000);
 
 	this.objectList[domid].time = time;
-	this.objectList[domid].timeline = create_timeline(this.objectList[domid].domid,
-									  parseInt(time.period),
-									  parseInt(time.starttime),
-									  parseInt(time.usertime),
+	this.objectList[domid].timeline = create_timeline(this.objectList[domid].domid, 
+									  parseInt(time.period), 
+									  parseInt(time.starttime), 
+									  parseInt(time.usertime), 
 									  parseInt(time.endtime));
 },
 
 processObjects: function(){
 	this.debug('processObjects');
-
+	
 	for(var key in this.objectList){
 		if(empty(this.objectList[key])) continue;
 
 		if(this.objectList[key].processed == 1) continue;
 		else this.objectList[key].processed= 1;
-
+		
 		var obj = this.objectList[key];
 
 		if((!isset('width', obj.objDims) || (obj.objDims.width < 0)) && isset('shiftXleft', obj.objDims) && isset('shiftXright', obj.objDims)){
-			var g_width = get_bodywidth();
+			var g_width = get_bodywidth();	
 			if(!is_number(g_width)) g_width = 1000;
-
+			
 			if(!isset('width', obj.objDims)) obj.objDims.width = 0;
 			obj.objDims.width += g_width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
 		}
-
+		
 		if(isset('graphtype', obj.objDims) && (obj.objDims.graphtype < 2)){
 			var g_url = new Curl(obj.src);
 			g_url.setArgument('width', obj.objDims.width);
@@ -118,9 +127,9 @@ processObjects: function(){
 
 addImage: function(objid){
 	this.debug('addImage', objid);
-
+	
 	var obj = this.objectList[objid];
-
+	
 	var g_img = document.createElement('img');
 	$(obj.containerid).appendChild(g_img);
 
@@ -139,12 +148,14 @@ addImage: function(objid){
 		addListener(g_img, 'load', obj.sbox_listener);
 
 		addListener(g_img, 'load', moveSBoxes);
-
+		
 		if(IE){
 // workaround to IE6 & IE7 DOM redraw problem
 			addListener(obj.domid, 'load', function(){ setTimeout( function(){$('scrollbar_cntr').show();}, 500);});
 		}
 	}
+
+
 },
 
 addSBox: function(e, objid){
@@ -154,14 +165,14 @@ addSBox: function(e, objid){
 
 	var g_img = $(obj.domid);
 	if(!is_null(g_img)) removeListener(g_img, 'load', obj.sbox_listener);
-
+	
 	ZBX_SBOX[obj.domid] = new Object;
 	ZBX_SBOX[obj.domid].shiftT = parseInt(obj.objDims.shiftYtop);
 	ZBX_SBOX[obj.domid].shiftL = parseInt(obj.objDims.shiftXleft);
 	ZBX_SBOX[obj.domid].shiftR = parseInt(obj.objDims.shiftXright);
 	ZBX_SBOX[obj.domid].height = parseInt(obj.objDims.graphHeight);
 	ZBX_SBOX[obj.domid].width = parseInt(obj.objDims.width);
-
+	
 	var sbox = sbox_init(obj.domid, obj.timeline.timelineid, obj.domid);
 	sbox.onchange = this.objectUpdate.bind(this);
 },
@@ -172,10 +183,10 @@ addScroll: function(e, objid){
 //SDJ(this.objectList);
 	var g_img = $(obj.domid);
 	if(!is_null(g_img)) removeListener(g_img, 'load', obj.scroll_listener);
-
+	
 	var g_width = null;
 	if(obj.scrollWidthByImage == 0){
-		g_width = get_bodywidth() - 30;
+		g_width = get_bodywidth() - 30;	
 		if(!is_number(g_width)) g_width = 900;
 	}
 
@@ -193,15 +204,15 @@ objectUpdate: function(domid, timelineid){
 	this.debug('objectUpdate', domid);
 
 	if(!isset(domid, this.objectList)) throw('timeControl: Object is not declared "'+domid+'"');
-
+	
 	var obj = this.objectList[domid];
-
+		
 	var usertime = ZBX_TIMELINES[timelineid].usertime();
 	var period = ZBX_TIMELINES[timelineid].period();
 	var now = ZBX_TIMELINES[timelineid].now();
-
+	
 	if(now) usertime += 86400*365;
-
+	
 //	var date = datetoarray(usertime - period);
 //	var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
 
@@ -220,7 +231,7 @@ objectUpdate: function(domid, timelineid){
 					this.objectList[key].timeline.period(period);
 					this.objectList[key].timeline.usertime(usertime);
 					this.loadDynamic(this.objectList[key].domid, url_stime, period);
-
+					
 					if(isset(key, ZBX_SCROLLBARS)){
 						ZBX_SCROLLBARS[key].setBarPosition();
 						ZBX_SCROLLBARS[key].setGhostByBar();
@@ -228,11 +239,11 @@ objectUpdate: function(domid, timelineid){
 						if(this.objectList[key].loadImage && !is_null($(obj.domid))) ZBX_SCROLLBARS[key].disabled = 1;
 					}
 				}
-			}
+			}			
 		}
 		else{
 			this.loadDynamic(obj.domid, url_stime, period);
-
+			
 			if(isset(domid, ZBX_SCROLLBARS)){
 				ZBX_SCROLLBARS[domid].setBarPosition();
 				ZBX_SCROLLBARS[domid].setGhostByBar();
@@ -242,9 +253,9 @@ objectUpdate: function(domid, timelineid){
 
 		}
 	}
-
+	
 	if(!obj.dynamic){
-		var url = new Curl(location.href);
+		url = new Curl(location.href);
 		url.setArgument('stime', url_stime);
 		url.setArgument('period', period);
 		url.unsetArgument('output');
@@ -260,9 +271,9 @@ objectReset: function(id){
 
 	var period = 3600;
 	var url_stime = 201911051255;
-
+	
 	this.updateProfile(id, url_stime, period);
-
+	
 	for(var key in this.objectList){
 		if(empty(this.objectList[key])) continue;
 
@@ -270,7 +281,7 @@ objectReset: function(id){
 			this.objectList[key].timeline.period(period);
 			this.objectList[key].timeline.usertime(usertime);
 			this.loadDynamic(this.objectList[key].domid, url_stime, period);
-
+			
 			if(isset(key, ZBX_SCROLLBARS)){
 				ZBX_SCROLLBARS[key].setBarPosition();
 				ZBX_SCROLLBARS[key].setGhostByBar();
@@ -279,25 +290,25 @@ objectReset: function(id){
 			}
 		}
 		else if(!this.objectList[key].dynamic){
-			var url = new Curl(location.href);
+			url = new Curl(location.href);
 			url.unsetArgument('stime');
 			url.unsetArgument('period');
 			url.unsetArgument('output');
-
+	
 //	alert(uri.getUrl());
 			location.href = url.getUrl();
 		}
-	}
+	}	
 },
 
 loadDynamic: function(id, stime, period){
 	this.debug('loadDynamic', id);
-
+	
 	var obj = this.objectList[id];
-
+	
 	var dom_object = $(obj.domid);
 	if(!is_null(dom_object) && (dom_object.nodeName.toLowerCase() == 'img')){
-		var url = new Curl(obj.src);
+		url = new Curl(obj.src);
 		url.setArgument('stime', stime);
 		url.setArgument('period', period);
 		url.setArgument('refresh', Math.floor(Math.random()*1000));
@@ -309,9 +320,10 @@ loadDynamic: function(id, stime, period){
 updateProfile: function(id, stime, period){
 	if(typeof(Ajax) == 'undefined'){
 		throw("Prototype.js lib is required!");
+		return false;
 	}
 
-	var params = [];
+	var params = new Array();
 	params['favobj'] = 'timeline';
 	params['favid'] = id;
 	params['graphid'] = id;
@@ -332,26 +344,25 @@ debug: function(fnc_name, id){
 		if(this.debug_status == 2){
 			SDI(str);
 		}
-
+		
 		this.debug_prev = str;
 	}
 }
-
-};
+}
 
 function datetoarray(unixtime){
 
 	var date = new CDate(unixtime*1000);
 
-	var thedate = [];
+	var thedate = new Array();
 	thedate[0] = date.getDate();
 	thedate[1] = date.getMonth()+1;
 	thedate[2] = date.getFullYear();
 	thedate[3] = date.getHours();
 	thedate[4] = date.getMinutes();
 	thedate[5] = date.getSeconds();
-
-	for(var i = 0; i < thedate.length; i++){
+		
+	for(i = 0; i < thedate.length; i++){
 		if((thedate[i]+'').length < 2) thedate[i] = '0'+thedate[i];
 	}
 return thedate;
@@ -373,22 +384,26 @@ function onload_update_scroll(id,w,period,stime,timel,bar_stime){
 }
 
 
+/************************************************************************************/
 // Title: TimeLine COntrol CORE
+// Author: Aly
+/************************************************************************************/
+
 var ZBX_TIMELINES = {};
 
 function create_timeline(tlid, period, starttime, usertime, endtime){
 	if(is_null(tlid)){
-		tlid = ZBX_TIMELINES.length;
+		var tlid = ZBX_TIMELINES.length;
 	}
-
+	
 	var now = new CDate();
 	now = parseInt(now.getTime() / 1000);
 
 	if('undefined' == typeof(usertime)) usertime = now;
 	if('undefined' == typeof(endtime)) endtime = now;
-
+	
 	ZBX_TIMELINES[tlid] = new CTimeLine(tlid, period, starttime, usertime, endtime);
-
+	
 return ZBX_TIMELINES[tlid];
 }
 
@@ -409,7 +424,7 @@ initialize: function($super,id, period, starttime, usertime, endtime){
 	$super('CTimeLine['+id+']');
 
 	if((endtime - starttime) < (3*this.minperiod)) starttime = endtime - (3*this.minperiod);
-
+	
 	this.starttime(starttime);
 	this.endtime(endtime);
 
@@ -464,7 +479,7 @@ usertime: function(usertime){
 	this._usertime = usertime;
 
 	this.now();
-
+	
 return this._usertime;
 },
 
@@ -472,7 +487,7 @@ starttime: function(starttime){
 	this.debug('starttime');
 
 	if('undefined'==typeof(starttime)) return this._starttime;
-
+	
 	this._starttime = starttime;
 
 return this._starttime;
@@ -480,9 +495,9 @@ return this._starttime;
 
 endtime: function(endtime){
 	this.debug('endtime');
-
+	
 	if('undefined'==typeof(endtime)) return this._endtime;
-
+	
 	if(endtime < (this._starttime+this._period*3)) endtime = this._starttime+this._period*3;
 
 	this._endtime = endtime;
@@ -507,27 +522,31 @@ debug: function(fnc_name, id){
 }
 });
 
+/************************************************************************************/
 // Title: graph scrolling
+// Author: Aly
+/************************************************************************************/
 var ZBX_SCROLLBARS = {};
 
 function scrollCreate(sbid, w, timelineid, fixedperiod){
 	if(is_null(sbid)){
-		sbid = ZBX_SCROLLBARS.length;
+		var sbid = ZBX_SCROLLBARS.length;
 	}
-
+	
 	if(is_null(timelineid)){
 		throw "Parameters haven't been sent properly";
+		return false;
 	}
 
 	if(is_null(w)){
 		var dims = getDimensions(sbid);
 		w = dims.width - 2;
 	}
-
+	
 	if(w < 600) w = 600;
 
 	ZBX_SCROLLBARS[sbid] = new CScrollBar(sbid, timelineid, w, fixedperiod);
-
+	
 return ZBX_SCROLLBARS[sbid];
 }
 
@@ -543,43 +562,43 @@ clndrRight:		null,		// calendar object Right
 
 dom:{
 	'scrollbar': null,		// dom object
-
+	
 	'info': null,				// dom object
 	'gmenu': null,				// dom object
 	'zoom': null,				// dom object
 	'text': null,				// dom object
 	'links': null,				// dom object
-	'linklist': [],	// dom object
-
+	'linklist': new Array(),	// dom object
+	
 	'timeline': null,			// dom object
 	'info_left': null,			// dom object
 	'info_right': null,			// dom object
-
+	
 	'sublevel': null,			// dom object
 	'left': null,				// dom object
 	'right': null,				// dom object
 	'bg': null,					// dom object
-
+	
 	'overlevel': null,			// dom object
-
+	
 	'bar': null,				// dom object
 	'icon': null,				// dom object
 	'center': null,				// dom object
-
+	
 	'ghost': null,				// dom object
 	'left_arr': null,			// dom object
 	'right_arr': null,			// dom object
-
+	
 	'subline': null,				// dom object
 	'nav_links': null,				// dom object
-	'nav_linklist': [],	// dom object
+	'nav_linklist': new Array(),	// dom object
 	'period_state': null,			// dom object
 	'info_period': null				// dom object period info
 },
 
 // params
 size:{
-	'scrollline': null,		// scroll line width
+	'scrollline': null,		// scroll line width 
 	'barminwidth': 21		// bar minimal width
 },
 
@@ -591,9 +610,6 @@ position:{
 },
 
 px2sec:			null,		// seconds in pixel
-
-//debug_status:	2,				// debug status: 0 - off, 1 - on, 2 - SDI;
-//debug_info:		'',				// debug string
 
 // status
 scrollmsover: 0,			// if mouse over scrollbar then = 1, out = 0
@@ -618,7 +634,7 @@ try{
 // Variable initialization
 		this.timeline = ZBX_TIMELINES[timelineid];
 		this.ghostBox = new CGhostBox(this.dom.ghost);
-
+		
 		this.size.scrollline = width - (17*2) - 2; // border
 		this.px2sec = (this.timeline.endtime() - this.timeline.starttime()) / this.size.scrollline;
 //--
@@ -631,10 +647,10 @@ try{
 
 // AFTER px2sec is set.	important!
 		this.position.bar = getDimensions(this.bar);
-
+		
 		this.setBarPosition();
 		this.setGhostByBar();
-
+		
 		this.setTabInfo();
 //-------------------------------
 
@@ -646,16 +662,16 @@ try{
 		this.disabled = 0;
 
 //try{
-	}
+	} 
 	catch(e){
 		throw "ERROR: ScrollBar initialization failed!";
+		return false;
 	}
 },
 
-onBarChange: function(){
+onBarChange: function(){	
 	this.changed = 1;
 //	SDI(this.timeline+' : '+this.scrollbarMaxW+' : '+this.barW+' : '+this.barX);
-
 	this.onchange(this.scrollbarid, this.timeline.timelineid, true);
 },
 
@@ -671,8 +687,10 @@ scrollmouseover: function(){		//  U may use this func to attach some function on
 onchange: function(){			//  executed every time the bar period or bar time is changed(mouse button released)
 },
 
+//----------------------------------------------------------------
 //-------   MOVE   -----------------------------------------------
-setFullPeriod: function(){
+//----------------------------------------------------------------
+setFullPeriod: function(e){
 	this.debug('setFullPeriod');
 	if(this.disabled) return false;
 //---
@@ -693,7 +711,7 @@ setZoom: function(e, zoom){
 	this.debug('setZoom', zoom);
 	if(this.disabled) return false;
 //---
-
+	
 	this.timeline.period(zoom);
 
 // bar
@@ -701,7 +719,7 @@ setZoom: function(e, zoom){
 	this.setGhostByBar();
 
 	this.setTabInfo();
-
+	
 	this.onBarChange();
 },
 
@@ -711,10 +729,10 @@ navigateLeft: function(e, left){
 //---
 
 	deselectAll();
-
+	
 	var period = false;
 	if(typeof(left) == 'undefined') period = this.timeline.period();
-
+	
 //	var dimensions = this.position.bar;
 //	this.setBarPosition(dimensions.left-1, dimensions.width, true);
 
@@ -723,11 +741,12 @@ navigateLeft: function(e, left){
 		var usertime = this.timeline.usertime();
 		if(period)
 			var new_usertime = usertime - period; // by clicking this.dom.left we move bar by period
-		else
+		else 
 			var new_usertime = usertime - left;
 
 // If we slide to another TimeZone
-		new_usertime -= this.getTZdiff(usertime, new_usertime);
+		var TZOffset = this.getTZdiff(usertime, new_usertime);
+		new_usertime -= TZOffset;
 //------------
 		this.timeline.usertime(new_usertime);
 	}
@@ -735,7 +754,7 @@ navigateLeft: function(e, left){
 // dynamic
 		if(period)
 			var new_period = this.timeline.period() + 86400; // by clicking this.dom.left we expand period by 1day
-		else
+		else 
 			var new_period = this.timeline.period() + left;
 
 		this.timeline.period(new_period);
@@ -756,18 +775,18 @@ navigateRight: function(e, right){
 //---
 
 	deselectAll();
-
+	
 	var period = false;
 	if(typeof(right) == 'undefined') period = this.timeline.period();
 //	var dimensions = this.position.bar;
 //	this.setBarPosition(dimensions.left+1, dimensions.width, true);
-
+	
 	var usertime = this.timeline.usertime();
 	if(this.fixedperiod == 1){
 // fixed
 		if(period)
 			var new_usertime = usertime + period; // by clicking this.dom.left we move bar by period
-		else
+		else 
 			var new_usertime = usertime + right;
 	}
 	else{
@@ -782,11 +801,12 @@ navigateRight: function(e, right){
 		}
 
 		this.timeline.period(new_period);
-	}
+	}	
 //-----------------
 
 // If we slide to another TimeZone
-	new_usertime -= this.getTZdiff(usertime, new_usertime);
+	var TZOffset = this.getTZdiff(usertime, new_usertime);
+	new_usertime -= TZOffset;
 //------------
 
 	this.timeline.usertime(new_usertime);
@@ -805,11 +825,11 @@ setBarPosition: function(rightSide, periodWidth, setTimeLine){
 	if('undefined' == typeof(periodWidth))	var periodWidth =  null;
 	if('undefined' == typeof(rightSide))	var rightSide = null;
 	if('undefined' == typeof(setTimeLine))	var setTimeLine = false;
-
+	
 	if(is_null(periodWidth)){
-		var periodTime = this.timeline.period();
+		var periodTime = this.timeline.period();	
 		var width = Math.round(periodTime/this.px2sec);		// Ceil
-		periodWidth = width;
+		var periodWidth = width;
 	}
 	else{
 		var width = periodWidth;
@@ -820,10 +840,10 @@ setBarPosition: function(rightSide, periodWidth, setTimeLine){
 		var userTime = this.timeline.usertime();
 		var startTime = this.timeline.starttime();
 		var endTime = this.timeline.endtime();
-
+		
 		var tmp_right = (userTime - startTime)/this.px2sec;
 
-		rightSide = Math.round(tmp_right);
+		var rightSide = Math.round(tmp_right);
 		var right = rightSide;
 	}
 	else{
@@ -835,7 +855,7 @@ setBarPosition: function(rightSide, periodWidth, setTimeLine){
 	if(width < this.size.barminwidth){
 		width = this.size.barminwidth;
 	}
-
+	
 // Left min
 	if((right - width) < 0){
 		if(width < this.size.barminwidth) width = this.size.barminwidth;
@@ -850,7 +870,7 @@ setBarPosition: function(rightSide, periodWidth, setTimeLine){
 	if(right > this.size.scrollline){
 		if(width < this.size.barminwidth) width = this.size.barminwidth;
 		right = this.size.scrollline;
-
+		
 // actual bar dimensions shouldnt be over side limits
 		rightSide = right;
 //		periodWidth = width;
@@ -870,58 +890,54 @@ setBarPosition: function(rightSide, periodWidth, setTimeLine){
 	if(setTimeLine){
 		this.updateTimeLine(this.position.bar);
 	}
-
+	
 	this.position.bar.left = right - width;
 	this.position.bar.width = width;
-	this.position.bar.right = right;
+	this.position.bar.right = right;	
 },
 
-setGhostByBar: function(ui){
+setGhostByBar: function(){
 	this.debug('setGhostByBar');
-//--
-	if(arguments.length > 0){
-		var dims = {'left': ui.position.left, 'width': jQuery(ui.helper.context).width()};
-	}
-	else{
-		var dims = getDimensions(this.dom.bar);
-	}
-
+	
+	var dims = getDimensions(this.dom.bar);
+	
 // ghost
 	this.dom.ghost.style.left = dims.left + 'px';
 	this.dom.ghost.style.width = dims.width + 'px';
-
-
+	
 // arrows
 	this.dom.left_arr.style.left = (dims.left-4) + 'px';
 	this.dom.right_arr.style.left = (dims.left+dims.width-3) + 'px';
-
+	
 	this.position.ghost = getDimensions(this.dom.ghost);
 },
 
 setBarByGhost: function(){
 	this.debug('setBarByGhost');
 	var dimensions = getDimensions(this.dom.ghost);
-
+	
 // bar
 // set time
 	this.setBarPosition(dimensions.right, dimensions.width, false);
-
 //	this.setGhostByBar();
-//	this.setTabInfo();
 
+//	this.setTabInfo();
+	
 	this.onBarChange();
 },
 
+//----------------------------------------------------------------
 //-------   CALENDAR   -------------------------------------------
+//----------------------------------------------------------------
 calendarShowLeft: function(){
 	this.debug('calendarShowLeft');
 	if(this.disabled) return false;
 //---
 
-	var pos = getPosition(this.dom.info_left);
-	pos.top+=34;
-	pos.left-=145;
-
+	var pos = getPosition(this.dom.info_left); 
+	pos.top+=34; 
+	pos.left-=145; 
+	
 	if(CR) pos.top-=20;
 	this.clndrLeft.clndr.clndrshow(pos.top,pos.left);
 },
@@ -931,11 +947,11 @@ calendarShowRight: function(){
 	if(this.disabled) return false;
 //---
 
-	var pos = getPosition(this.dom.info_right);
+	var pos = getPosition(this.dom.info_right); 
 
-	pos.top+=34;
-	pos.left-=77;
-
+	pos.top+=34; 
+	pos.left-=77; 
+	
 	if(CR) pos.top-=20;
 	this.clndrRight.clndr.clndrshow(pos.top,pos.left);
 },
@@ -946,7 +962,7 @@ setCalendarLeft: function(time){
 //---
 
 	time = parseInt(time / 1000);
-
+	
 	if(this.fixedperiod == 1){
 // fixed
 		var new_usertime = time + this.timeline.period();
@@ -956,7 +972,7 @@ setCalendarLeft: function(time){
 // dynamic
 		var new_period = Math.abs(this.timeline.usertime() - time);
 		this.timeline.period(new_period);
-	}
+	}	
 //-----------------
 
 // bar
@@ -964,7 +980,7 @@ setCalendarLeft: function(time){
 	this.setGhostByBar();
 
 	this.setTabInfo();
-
+	
 	this.onBarChange();
 },
 
@@ -974,7 +990,7 @@ setCalendarRight: function(time){
 //---
 
 	time = parseInt(time / 1000);
-
+	
 	if(this.fixedperiod == 1){
 // fixed
 		this.timeline.usertime(time);
@@ -983,10 +999,10 @@ setCalendarRight: function(time){
 // dynamic
 		var startusertime = this.timeline.usertime() - this.timeline.period();
 		this.timeline.usertime(time);
-
+		
 		var new_period = this.timeline.usertime() - startusertime;
 		this.timeline.period(new_period);
-	}
+	}	
 //-----------------
 
 // bar
@@ -994,43 +1010,68 @@ setCalendarRight: function(time){
 	this.setGhostByBar();
 
 	this.setTabInfo();
-
+	
 	this.onBarChange();
 },
-
+//----------------------------------------------------------------
 //-------   DRAG & DROP   ----------------------------------------
+//----------------------------------------------------------------
+
 // <BAR>
-barDragStart: function(e, ui){
+getBarDimensions: function(x,y,draggable){
+	this.debug('getBarDimensions');
+	if(this.disabled){
+		var dims = getDimensions(draggable.element);
+		return[dims.left,y];
+	}
+//---
+
+	function constrain(n, lower, upper) {
+		if (n > upper) return upper;
+		else if (n < lower) return lower;
+		else return n;
+	}
+	
+	var element_dimensions = draggable.element.getDimensions();
+	var parent_dimensions = this.dom.overlevel.getDimensions();
+
+	return[
+		constrain(x, 0, parent_dimensions.width - element_dimensions.width),
+		constrain(y, 0, parent_dimensions.hight - element_dimensions.hight),
+	];
+},
+
+barDragStart: function(dragable,e){
 	this.debug('barDragStart');
 	if(this.disabled) return false;
 //---
 },
 
-barDragChange: function(e,ui){
+barDragChange: function(dragable,e){
 	this.debug('barDragChange');
 	if(this.disabled){
-		ui.helper[0].stop(e);
+		dragable.endDrag(e);
 		return false;
 	}
 //---
 
-	var element = ui.helper.context;
+	var element = dragable.element;
 	this.position.bar = getDimensions(element);
 
-	this.setGhostByBar(ui);
+	this.setGhostByBar();
 
 	this.updateTimeLine(this.position.bar);
 	this.setTabInfo();
 },
 
-barDragEnd: function(e, ui){
+barDragEnd: function(dragable,e){
 	this.debug('barDragEnd');
 	if(this.disabled) return false;
 //---
 
-	var element = ui.helper.context;
+	var element = dragable.element;
 	this.position.bar = getDimensions(element);
-
+	
 	this.ghostBox.endResize();
 
 	this.setBarByGhost();
@@ -1038,76 +1079,100 @@ barDragEnd: function(e, ui){
 
 makeBarDragable: function(element){
 	this.debug('makeBarDragable');
-//--
+//---
 
-	//TODO:  write proper function
-	jQuery(element).draggable({
-		containment: 'parent',
-		axis: 'x',
-		start: this.barDragStart.bind(this),
-		drag: this.barDragChange.bind(this),
-		stop: this.barDragEnd.bind(this)
-	});
+	new Draggable(element,{
+				ghosting: false,
+				snap: this.getBarDimensions.bind(this),
+				constraint: 'horizontal',
+				onStart: this.barDragStart.bind(this),
+				change: this.barDragChange.bind(this),
+				onEnd: this.barDragEnd.bind(this)
+				});
 
 },
 // </BAR>
 
 
 // <LEFT ARR>
+get_dragable_left_arr_dimensions: function(x,y,draggable){
+	this.debug('get_dragable_left_arr_dimensions');
+	if(this.disabled){
+		var dims = getDimensions(draggable.element);
+		return[dims.left,y];
+	}
+//-----
+
+	function constrain(n, lower, upper) {
+		if (n > upper) return upper;
+		else if (n < lower) return lower;
+		else return n;
+	}
+	
+	var element_dimensions = draggable.element.getDimensions();
+	var parent_dimensions = this.dom.overlevel.getDimensions();
+	
+	return[
+		constrain(x, -4, parent_dimensions.width - element_dimensions.width + 3),
+		constrain(y, 0, parent_dimensions.hight - element_dimensions.hight),
+	];
+},
+
 make_left_arr_dragable: function(element){
 	this.debug('make_left_arr_dragable');
 //---
-	var pD = {
-		'left': jQuery(this.dom.overlevel).offset().left,
-		'width': jQuery(this.dom.overlevel).width()
-	}
 
-//TODO:  write proper function
-	jQuery(element).draggable({
-		containment: [pD.left-4, 0, pD.width+pD.left-4, 0],
-		axis: 'x',
-		start: this.leftArrowDragStart.bind(this),
-		drag: this.leftArrowDragChange.bind(this),
-		stop: this.leftArrowDragEnd.bind(this)
-	});
+	new Draggable(element,{
+				ghosting: false,
+				snap: this.get_dragable_left_arr_dimensions.bind(this),
+				constraint: 'horizontal',
+				onStart: this.leftArrowDragStart.bind(this),
+				change: this.leftArrowDragChange.bind(this),
+				onEnd: this.leftArrowDragEnd.bind(this)
+				});
 
 },
 
-leftArrowDragStart: function(e, ui){
+leftArrowDragStart: function(dragable, e){
 	this.debug('leftArrowDragStart');
 	if(this.disabled) return false;
 //---
-	var element = ui.helper.context;
+
+	var element = dragable.element;
 	this.position.leftArr = getDimensions(element);
 
 	this.ghostBox.userstartime = this.timeline.usertime();
 	this.ghostBox.usertime = this.timeline.usertime();
 	this.ghostBox.startResize(0);
-
+	
 },
 
-leftArrowDragChange: function(e, ui){
+leftArrowDragChange: function(dragable, e){
 	this.debug('leftArrowDragChange');
 	if(this.disabled){
-		ui.helper.context.stop(e);
+		dragable.endDrag(e);
 		return false;
 	}
 //---
 
-	this.ghostBox.resizeBox(ui.position.left - ui.originalPosition.left);
+	var element = dragable.element;
+	var leftArrPos = getDimensions(element);
+
+	this.ghostBox.resizeBox(leftArrPos.right - this.position.leftArr.right);
 	this.position.ghost = getDimensions(this.dom.ghost);
 
 	this.updateTimeLine(this.position.ghost);
-	this.setTabInfo();
+	this.setTabInfo();	
 },
 
-leftArrowDragEnd: function(e, ui){
+leftArrowDragEnd: function(dragable, e){
 	this.debug('leftArrowDragEnd');
 	if(this.disabled) return false;
 //---
-	var element = ui.helper.context;
-	this.position.leftArr = getDimensions(element);
 
+	var element = dragable.element;
+	this.position.leftArr = getDimensions(element);
+	
 	this.ghostBox.endResize();
 
 	this.setBarByGhost();
@@ -1115,59 +1180,82 @@ leftArrowDragEnd: function(e, ui){
 // </LEFT ARR>
 
 // <RIGHT ARR>
+get_dragable_right_arr_dimensions: function(x,y,draggable){
+	this.debug('get_dragable_right_arr_dimensions');
+	if(this.disabled){
+		var dims = getDimensions(draggable.element);
+		return[dims.left,y];
+	}
+//-----
+
+	function constrain(n, lower, upper) {
+		if (n > upper) return upper;
+		else if (n < lower) return lower;
+		else return n;
+	}
+	
+	var element_dimensions = draggable.element.getDimensions();
+	var parent_dimensions = this.dom.overlevel.getDimensions();
+	
+	return[
+		constrain(x, -3, parent_dimensions.width - element_dimensions.width+4),
+		constrain(y, 0, parent_dimensions.hight - element_dimensions.hight),
+	];
+},
+
 make_right_arr_dragable: function(element){
 	this.debug('make_right_arr_dragable');
 //---
-	var pD = {
-		'left': jQuery(this.dom.overlevel).offset().left,
-		'width': jQuery(this.dom.overlevel).width()
-	}
 
-//TODO:  write proper function
-	jQuery(element).draggable({
-		containment: [pD.left-4, 0, pD.width+pD.left-5, 0],
-		axis: 'x',
-		start: this.rightArrowDragStart.bind(this),
-		drag: this.rightArrowDragChange.bind(this),
-		stop: this.rightArrowDragEnd.bind(this)
-	});
+	new Draggable(element,{
+				ghosting: false,
+				snap: this.get_dragable_right_arr_dimensions.bind(this),
+				constraint: 'horizontal',
+				onStart: this.rightArrowDragStart.bind(this),
+				change: this.rightArrowDragChange.bind(this),
+				onEnd: this.rightArrowDragEnd.bind(this)
+				});
+
 },
 
-rightArrowDragStart: function(e, ui){
+rightArrowDragStart: function(dragable, e){
 	this.debug('rightArrowDragStart');
 	if(this.disabled) return false;
 //---
 
-	var element = ui.helper.context;
+	var element = dragable.element;
 	this.position.rightArr = getDimensions(element);
 
 	this.ghostBox.userstartime = this.timeline.usertime() - this.timeline.period();
 	this.ghostBox.startResize(1);
 },
 
-rightArrowDragChange: function(e, ui){
+rightArrowDragChange: function(dragable, e){
 	this.debug('rightArrowDragChange');
 	if(this.disabled){
-		ui.helper.context.stop(e);
+		dragable.endDrag(e);
 		return false;
 	}
 //---
 
-	this.ghostBox.resizeBox(ui.position.left - ui.originalPosition.left);
+	var element = dragable.element;
+	var rightArrPos = getDimensions(element);
+	
+	this.ghostBox.resizeBox(rightArrPos.right - this.position.rightArr.right);
 	this.position.ghost = getDimensions(this.dom.ghost);
 
 	this.updateTimeLine(this.position.ghost);
 	this.setTabInfo();
 },
 
-rightArrowDragEnd: function(e, ui){
+rightArrowDragEnd: function(dragable, e){
 	this.debug('rightArrowDragEnd');
 	if(this.disabled) return false;
 //---
 
-	var element = ui.helper.context;
+	var element = dragable.element;
 	this.position.rightArr = getDimensions(element);
-
+	
 	this.ghostBox.endResize();
 
 	this.setBarByGhost();
@@ -1211,7 +1299,7 @@ getTZdiff: function(time1, time2){
 
 	var date = new CDate(time1*1000);
 	var TimezoneOffset = date.getTimezoneOffset();
-
+	
 	date.setTime(time2*1000);
 	var offset = (TimezoneOffset - date.getTimezoneOffset()) * 60;
 
@@ -1242,9 +1330,10 @@ updateTimeLine: function(dim){
 
 // TimeLine Update
 	var starttime = this.timeline.starttime();
+	var usertime = this.timeline.usertime();
 	var period = this.timeline.period();
 
-	var new_usertime = parseInt(dim.right * this.px2sec,10) + starttime;
+	var new_usertime = parseInt(dim.right * this.px2sec,10) + starttime;	
 	var new_period = parseInt(dim.width * this.px2sec,10);
 
 	if(new_period > 86400){
@@ -1256,19 +1345,17 @@ updateTimeLine: function(dim){
 	var left = false;
 	if((this.ghostBox.sideToMove == 1)&& (this.ghostBox.flip >= 0)) right = true;
 	else if((this.ghostBox.sideToMove == 0) && (this.ghostBox.flip < 0)) right = true;
-
+	
 	if((this.ghostBox.sideToMove == 0)&& (this.ghostBox.flip >= 0)) left = true;
 	else if((this.ghostBox.sideToMove == 1)&& (this.ghostBox.flip < 0)) left = true;
 
 // Hack for bars most right position
 	if((dim.right) == this.size.scrollline){
 		if(dim.width != this.position.bar.width){
-			this.position.bar.width = dim.width;
 			this.timeline.period(new_period);
 		}
-
+		
 		this.timeline.setNow();
-
 	}
 	else{
 		if(right){
@@ -1282,15 +1369,15 @@ updateTimeLine: function(dim){
 		if(period >= 86400) new_usertime = this.roundTime(new_usertime);
 
 		if(dim.width != this.position.bar.width){
-			this.position.bar.width = dim.width;
 			this.timeline.period(new_period);
 		}
 
 		this.timeline.usertime(new_usertime);
+		
+		var	real_period = this.timeline.period();
+		var real_usertime = this.timeline.usertime();	
+//SDI(left+' : '+new_usertime+' ('+real_usertime+')  p '+new_period+' ('+real_period+')');
 	}
-//var	real_period = this.timeline.period();
-//var real_usertime = this.timeline.usertime();
-//SDI(left+' : '+new_usertime+' ('+real_usertime+')  p '+(new_period/3600)+' ('+(real_period/3600)+')');
 //---------------
 },
 
@@ -1305,19 +1392,19 @@ setTabInfo: function(){
 	var userstarttime = usertime-period;
 
 	this.dom.info_period.innerHTML = this.formatStampByDHM(period, true, false);
-
+	
 	var date = datetoarray(userstarttime);
 	this.dom.info_left.innerHTML = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4];//+':'+date[5];
-
+	
 	var date = datetoarray(usertime);
 	var right_info = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4];//+':'+date[5];
 
 	if(this.timeline.now()){
 		right_info += '  ('+locale['S_NOW_SMALL']+'!)  ';
 	}
-
+	
 	this.dom.info_right.innerHTML = right_info;
-
+	
 //	seting ZOOM link styles
 	this.setZoomLinksStyle();
 },
@@ -1342,12 +1429,12 @@ deselectall: function(){
 	else if(!KQ){
 		var sel = window.getSelection();
 		sel.removeAllRanges();
-	}
+	}	
 },
 
 formatStampByDHM: function(timestamp, tsDouble, extend){
 	this.debug('formatStampByDHM');
-
+	
 	timestamp = timestamp || 0;
 	var years = 0;
 	var months = 0;
@@ -1361,7 +1448,7 @@ formatStampByDHM: function(timestamp, tsDouble, extend){
 	var days = 	parseInt((timestamp - years*365*86400 - months*30*86400 - weeks*7*86400)/86400);
 	var hours =  parseInt((timestamp - years*365*86400 - months*30*86400 - weeks*7*86400 - days*86400)/3600);
 	var minutes = parseInt((timestamp - years*365*86400 - months*30*86400 - weeks*7*86400 - days*86400 - hours*3600)/60);
-
+	
 	if(tsDouble){
 		if(months.toString().length == 1) months = '0'+months;
 		if(weeks.toString().length == 1) weeks = '0'+weeks;
@@ -1374,12 +1461,12 @@ formatStampByDHM: function(timestamp, tsDouble, extend){
 	str+=(years == 0)?(''):(years+locale['S_YEAR_SHORT']+' ');
 	str+=(months == 0)?(''):(months+locale['S_MONTH_SHORT']+' ');
 	str+=(weeks == 0)?(''):(weeks+locale['S_WEEK_SHORT']+' ');
-
+	
 	if(extend && tsDouble) str+=days+locale['S_DAY_SHORT']+' ';
 	else str+=(days == 0)?(''):(days+locale['S_DAY_SHORT']+' ');
-
+	
 	str+=hours+locale['S_HOUR_SHORT']+' '+minutes+locale['S_MINUTE_SHORT']+' ';
-
+	
 return str;
 },
 
@@ -1389,13 +1476,13 @@ return str;
 appendCalendars: function(){
 	this.debug('appendCalendars');
 //---
-
+	
 	this.clndrLeft = create_calendar((this.timeline.usertime() - this.timeline.period()), this.dom.info_left, null, null, 'scrollbar_cntr');
 	this.clndrRight = create_calendar(this.timeline.usertime(), this.dom.info_right, null, null, 'scrollbar_cntr');
 
 	this.clndrLeft.clndr.onselect = this.setCalendarLeft.bind(this);
 	addListener(this.dom.info_left, 'click', this.calendarShowLeft.bindAsEventListener(this));
-
+	
 	this.clndrRight.clndr.onselect = this.setCalendarRight.bind(this);
 	addListener(this.dom.info_right, 'click', this.calendarShowRight.bindAsEventListener(this));
 },
@@ -1405,7 +1492,7 @@ appendZoomLinks: function(){
 //---
 
 	var timeline = this.timeline.endtime() - this.timeline.starttime();
-
+	
 	var caption = '';
 	var zooms = [3600, (2*3600), (3*3600), (6*3600), (12*3600), 86400, (7*86400), (14*86400), (30*86400), (90*86400), (180*86400), (365*86400)];
 
@@ -1424,7 +1511,7 @@ appendZoomLinks: function(){
 		this.dom.linklist[links].setAttribute('zoom', zooms[key]);
 		this.dom.linklist[links].appendChild(document.createTextNode(caption));
 		addListener(this.dom.linklist[links],'click',this.setZoom.bindAsEventListener(this, zooms[key]),true);
-
+		
 		links++;
 	}
 
@@ -1442,20 +1529,20 @@ appendNavLinks: function(){
 //---
 
 	var timeline = this.timeline.endtime() - this.timeline.starttime();
-
+	
 	var caption = '';
 	var moves = [3600, (12*3600), 86400, (7*86400), (30*86400), (180*86400), (365*86400)];
 
 	var links = 0;
-
-	var left = [];
-	var right = [];
-
+	
+	var left = new Array();
+	var right = new Array();
+	
 	var tmp_laquo = document.createElement('span');
 	this.dom.nav_links.appendChild(tmp_laquo);
 	tmp_laquo.className = 'text';
 	tmp_laquo.innerHTML = ' &laquo;&laquo; ';
-
+	
 	for(var i=moves.length; i>=0; i--){
 		if(!isset(i, moves) || !is_number(moves[i])) continue;
 		if((timeline / moves[i]) < 1) continue;
@@ -1465,7 +1552,7 @@ appendNavLinks: function(){
 
 		this.dom.nav_linklist[links] = document.createElement('span');
 		this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
-
+		
 		this.dom.nav_linklist[links].className = 'link';
 		this.dom.nav_linklist[links].setAttribute('nav', moves[i]);
 		this.dom.nav_linklist[links].appendChild(document.createTextNode(caption));
@@ -1473,24 +1560,24 @@ appendNavLinks: function(){
 
 		links++;
 	}
-
+	
 	var tmp_laquo = document.createElement('span');
 	this.dom.nav_links.appendChild(tmp_laquo);
 	tmp_laquo.className = 'text';
 	tmp_laquo.innerHTML = ' | ';
 
-
+	
 	for(var i=0; i<moves.length; i++){
 		if(!isset(i, moves) || !is_number(moves[i])) continue;
 		if((timeline / moves[i]) < 1) continue;
 
 		caption = this.formatStampByDHM(moves[i], false, true);
 		caption = caption.split(' ',2)[0];
-
+		
 
 		this.dom.nav_linklist[links] = document.createElement('span');
 		this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
-
+		
 		this.dom.nav_linklist[links].className = 'link';
 		this.dom.nav_linklist[links].setAttribute('nav', moves[i]);
 		this.dom.nav_linklist[links].appendChild(document.createTextNode(caption));
@@ -1498,7 +1585,7 @@ appendNavLinks: function(){
 
 		links++;
 	}
-
+	
 	var tmp_raquo = document.createElement('span');
 	this.dom.nav_links.appendChild(tmp_raquo);
 	tmp_raquo.className = 'text';
@@ -1510,7 +1597,7 @@ setZoomLinksStyle: function(){
 	var period = this.timeline.period();
 	for(var i=0; i < this.dom.linklist.length; i++){
 		if(!isset(i,this.dom.linklist) || empty(this.dom.linklist[i])) continue;
-
+		
 		var linkzoom = this.dom.linklist[i].getAttribute('zoom');
 
 		if(linkzoom == period){
@@ -1525,7 +1612,7 @@ setZoomLinksStyle: function(){
 			this.dom.linklist[i].style.fontSize = '10px';
 //			this.dom.linklist[i].style.color = '';
 		}
-
+		
 	}
 
 	i = this.dom.linklist.length - 1;
@@ -1540,7 +1627,7 @@ setZoomLinksStyle: function(){
 scrollcreate: function(w){
 	var scr_cntr = $('scrollbar_cntr');
 	if(is_null(scr_cntr)) throw('ERROR: SCROLL [scrollcreate]: scroll container node is not found!');
-
+	
 	scr_cntr.style.paddingRight = '2px';
 	scr_cntr.style.paddingLeft = '2px';
 	// scr_cntr.style.backgroundColor = '#E5E5E5';
@@ -1558,7 +1645,7 @@ scrollcreate: function(w){
 	this.dom.scrollbar.appendChild(this.dom.info);
 	this.dom.info.className = 'info';
 	$(this.dom.info).setStyle({width: w+'px'});
-
+	
 //	this.dom.gmenu = document.createElement('div');
 //	this.dom.info.appendChild(this.dom.gmenu);
 //	this.dom.gmenu.className = 'gmenu';
@@ -1566,13 +1653,13 @@ scrollcreate: function(w){
 	this.dom.zoom = document.createElement('div');
 	this.dom.info.appendChild(this.dom.zoom);
 	this.dom.zoom.className = 'zoom';
-
+	
 	this.dom.text = document.createElement('span');
 	this.dom.zoom.appendChild(this.dom.text);
 	this.dom.text.className = 'text';
-
+	
 	this.dom.text.appendChild(document.createTextNode(locale['S_ZOOM']+':'));
-
+	
 	this.dom.links = document.createElement('span');
 	this.dom.zoom.appendChild(this.dom.links);
 	this.dom.links.className = 'links';
@@ -1581,7 +1668,7 @@ scrollcreate: function(w){
 	this.dom.timeline = document.createElement('div');
 	this.dom.info.appendChild(this.dom.timeline);
 	this.dom.timeline.className = 'timeline';
-
+	
 // Left
 	this.dom.info_left = document.createElement('span');
 	this.dom.timeline.appendChild(this.dom.info_left);
@@ -1598,7 +1685,7 @@ scrollcreate: function(w){
 	this.dom.timeline.appendChild(this.dom.info_right);
 	this.dom.info_right.className = 'info_right link';
 	this.dom.info_right.appendChild(document.createTextNode('02.07.2009 12:15:12'));
-
+	
 // </INFO>
 
 // <SUBLEVEL>
@@ -1627,7 +1714,7 @@ scrollcreate: function(w){
 	this.dom.scrollbar.appendChild(this.dom.overlevel);
 	this.dom.overlevel.className = 'overlevel';
 	$(this.dom.overlevel).setStyle({width: (w-17*2)+'px'});
-
+	
 	this.dom.bar = document.createElement('div');
 	this.dom.overlevel.appendChild(this.dom.bar);
 	this.dom.bar.className = 'bar';
@@ -1635,7 +1722,7 @@ scrollcreate: function(w){
 	this.dom.icon = document.createElement('div');
 	this.dom.bar.appendChild(this.dom.icon);
 	this.dom.icon.className = 'icon';
-
+	
 	this.dom.center = document.createElement('div');
 	this.dom.icon.appendChild(this.dom.center);
 	this.dom.center.className = 'center';
@@ -1643,15 +1730,15 @@ scrollcreate: function(w){
 	this.dom.ghost = document.createElement('div');
 	this.dom.overlevel.appendChild(this.dom.ghost);
 	this.dom.ghost.className = 'ghost';
-
+	
 	this.dom.left_arr = document.createElement('div');
 	this.dom.overlevel.appendChild(this.dom.left_arr);
 	this.dom.left_arr.className = 'left_arr';
-
+	
 	this.dom.right_arr = document.createElement('div');
 	this.dom.overlevel.appendChild(this.dom.right_arr);
 	this.dom.right_arr.className = 'right_arr';
-//</OVERLEVEL>
+// </OVERLEVEL>
 
 // <SUBLINE>
 	this.dom.subline = document.createElement('div');
@@ -1697,7 +1784,7 @@ scrollcreate: function(w){
 
 
 // </SUBLINE>
-
+	
 /*
 <div class="scrollbar">
 	<div class="info">
@@ -1778,23 +1865,23 @@ flip:			null,	// if flip < 0, ghost is fliped
 
 initialize: function($super,id){
 	$super('CGhostBox['+id+']');
-
+	
 	this.box = $(id);
 	if(is_null(this.box)) throw('Cannot initialize GhostBox with given object id');
 },
 
 startResize: function(side){
 	this.debug('startResize');
-
+	
 	this.sideToMove = side;
 	this.flip = 0;
-
+	
 	var dimensions = getDimensions(this.box);
-
+	
 	this.start.width = dimensions.width;	// - borders (2 x 1px)
 	this.start.leftSide = dimensions.left;
 	this.start.rightSide = dimensions.right;
-
+	
 	this.box.style.zIndex = 20;
 },
 
@@ -1804,7 +1891,7 @@ endResize: function(){
 	this.box.style.zIndex = 0;
 },
 
-calcResizeByPX: function(px){
+calcResizeByPX: function(px){	
 	this.debug('calcResizeByPX');
 // -px: moveLeft, +px: moveRight
 
@@ -1832,14 +1919,14 @@ calcResizeByPX: function(px){
 			this.current.rightSide = this.start.rightSide + px;
 		}
 	}
-
+	
 	this.current.width = this.current.rightSide - this.current.leftSide;
 //SDI(this.current.width+' = '+this.current.rightSide+' - '+this.current.leftSide);
 },
 
 resizeBox: function(px){
 	this.debug('resizeBox');
-
+	
 	if('undefined' != typeof(px)){
 		this.calcResizeByPX(px);
 	}
@@ -1850,15 +1937,18 @@ resizeBox: function(px){
 });
 
 
+/************************************************************************************/
 // Title: selection box uppon graphs
+// Author: Aly
+/************************************************************************************/
 var ZBX_SBOX = {};		//selection box obj reference
 
 function sbox_init(sbid, timeline, domobjectid){
 	if(!isset(domobjectid, ZBX_SBOX)) throw('TimeControl: SBOX is not defined for object "'+domobjectid+'"');
 	if(is_null(timeline)) throw("Parametrs haven't been sent properly");
-
-	if(is_null(sbid)) sbid = ZBX_SBOX.length;
-
+	
+	if(is_null(sbid))	var sbid = ZBX_SBOX.length;
+	
 	var dims = getDimensions(domobjectid);
 	var width = dims.width - (ZBX_SBOX[domobjectid].shiftL + ZBX_SBOX[domobjectid].shiftR);
 //graph borders
@@ -1869,9 +1959,9 @@ function sbox_init(sbid, timeline, domobjectid){
 
 // Listeners
 	addListener(window,'resize',moveSBoxes);
-
+		
 	if(KQ) setTimeout('ZBX_SBOX['+sbid+'].sbox.moveSBoxByObj('+sbid+');',500);
-
+	
 	ZBX_SBOX[sbid].sbox = box;
 return box;
 }
@@ -1917,11 +2007,11 @@ initialize: function($super, sbid, timelineid, obj, width, height){
 //--
 
 // Variable initialization
-	this.timeline = ZBX_TIMELINES[timelineid];
-
+	this.timeline = ZBX_TIMELINES[timelineid];		
+	
 	this.cobj.width = width;
 	this.cobj.height = height;
-
+	
 	this.box.width = 0;
 //--
 
@@ -1936,12 +2026,12 @@ initialize: function($super, sbid, timelineid, obj, width, height){
 		addListener(document, 'mousemove', this.mousemove.bindAsEventListener(this),true);
 		addListener(this.dom_obj, 'click', function(event){ cancelEvent(event);});
 	}
-
+	
 	addListener(document, 'mouseup', this.mouseup.bindAsEventListener(this),true);
-
+	
 //---------
 
-	ZBX_SBOX[this.sbox_id].mousedown = false;
+	ZBX_SBOX[this.sbox_id].mousedown = false;	
 },
 
 onselect: function(){
@@ -1967,7 +2057,7 @@ onselect: function(){
 },
 
 onchange: function(){			// bind any func to this
-
+	
 },
 
 mousedown: function(e){
@@ -1994,7 +2084,7 @@ mousedown: function(e){
 
 		ZBX_SBOX[this.sbox_id].mousedown = true;
 	}
-
+	
 return false;
 },
 
@@ -2002,7 +2092,7 @@ mousemove: function(e){
 	this.debug('mousemove',this.sbox_id);
 
 	e = e || window.event;
-
+	
 	if(IE) cancelEvent(e);
 
 	if(ZBX_SBOX[this.sbox_id].mousedown == true){
@@ -2028,17 +2118,17 @@ mouseup: function(e){
 
 create_box: function(){
 	this.debug('create_box');
-
+	
 	if(is_null(this.dom_box)){
 		this.dom_box = document.createElement('div');
 		this.dom_obj.appendChild(this.dom_box);
-
+		
 		this.dom_period_span = document.createElement('span');
 		this.dom_box.appendChild(this.dom_period_span);
 
 		this.dom_period_span.setAttribute('id','period_span');
 		this.dom_period_span.innerHTML = this.period;
-
+		
 		var dims = getDimensions(this.dom_obj);
 		this.shifts.left = dims.left;
 		this.shifts.top = dims.top;
@@ -2065,12 +2155,12 @@ create_box: function(){
 		if(IE) this.dom_box.onmousemove = this.mousemove.bindAsEventListener(this);
 	}
 
-	ZBX_SBOX[this.sbox_id].mousedown = false;
+	ZBX_SBOX[this.sbox_id].mousedown = false;	
 },
 
 resizebox: function(){
 	this.debug('resizebox',this.sbox_id);
-
+	
 	if(ZBX_SBOX[this.sbox_id].mousedown == true){
 // fix wrong selection box
 
@@ -2090,15 +2180,15 @@ resizebox: function(){
 		}
 
 		this.period = this.calcperiod();
-
-		if(!is_null(this.dom_box))
+		
+		if(!is_null(this.dom_box)) 
 			this.dom_period_span.innerHTML = this.FormatStampbyDHM(this.period)+((this.period<3600)?' [min 1h]':'');
 	}
 },
 
 moveleft: function(left, width){
 	this.debug('moveleft');
-
+	
 //	this.box.left = left;
 	if(!is_null(this.dom_box)) this.dom_box.style.left = left+'px';
 
@@ -2108,10 +2198,10 @@ moveleft: function(left, width){
 
 moveright: function(width){
 	this.debug('moveright');
-
+	
 //	this.box.left = (this.start_event.left - this.cobj.left);
 	if(!is_null(this.dom_box)) this.dom_box.style.left = this.box.left+'px';
-
+	
 	if(!is_null(this.dom_box)) this.dom_box.style.width = width+'px';
 	this.box.width = width;
 },
@@ -2133,7 +2223,7 @@ return	new_period;
 
 FormatStampbyDHM: function(timestamp){
 	this.debug('FormatStampbyDHM');
-
+	
 	timestamp = timestamp || 0;
 	var days = 	parseInt(timestamp/86400);
 	var hours =  parseInt((timestamp - days*86400)/3600);
@@ -2141,7 +2231,7 @@ FormatStampbyDHM: function(timestamp){
 
 	var str = (days==0)?(''):(days+'d ');
 	str+=hours+'h '+minutes+'m ';
-
+	
 return str;
 },
 
@@ -2153,13 +2243,13 @@ validateW: function(w){
 
 	if(this.mouse_event.left < this.cobj.left)
 		w = 0;//(this.start_event.left - this.cobj.left);
-
+	
 return w;
 },
 
 validateH: function(h){
 	this.debug('validateH');
-
+	
 	if(h<=0) h=1;
 	if(((this.start_event.top-this.cobj.top)+h)>this.cobj.height)
 		h = this.cobj.height - this.start_event.top;
@@ -2168,7 +2258,7 @@ return h;
 
 moveSBoxByObj: function(){
 	this.debug('moveSBoxByObj',this.sbox_id);
-
+	
 	var posxy = getPosition(this.grphobj);
 	var dims = getDimensions(this.grphobj);
 
@@ -2192,7 +2282,7 @@ optimizeEvent: function(e){
 		this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
 		this.mouse_event.top = e.clientY + document.body.scrollTop	+ document.documentElement.scrollTop;
 	}
-
+	
 	this.mouse_event.left = parseInt(this.mouse_event.left);
 	this.mouse_event.top = parseInt(this.mouse_event.top);
 
@@ -2205,12 +2295,12 @@ optimizeEvent: function(e){
 clear_params: function(){
 	this.debug('clear_params',this.sbox_id);
 
-	if(!is_null(this.dom_box))
+	if(!is_null(this.dom_box)) 
 		this.dom_obj.removeChild(this.dom_box);
-
+	
 	this.mouse_event = {};
 	this.start_event = {};
-
+	
 	this.dom_box = null;
 
 	this.shifts = {};
@@ -2254,3 +2344,4 @@ function moveSBoxes(){
 		ZBX_SBOX[key].sbox.moveSBoxByObj();
 	}
 }
+//]]

@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,53 +22,36 @@
 class CComboBox extends CTag{
 	public $value;
 
-	public function __construct($name='combobox', $value=null, $action=null, $items=null){
+	public function __construct($name='combobox', $value=NULL, $action=NULL){
 		parent::__construct('select', 'yes');
 		$this->tag_end = '';
 
-		$this->attr('id', zbx_formatDomId($name));
-		$this->attr('name', $name);
+		$this->attributes['id'] = $name;
+		$this->attributes['name'] = $name;
 
-		$this->attr('class', 'input select');
-		$this->attr('size', 1);
+		$this->attributes['class'] = 'select';
+		$this->attributes['size'] = 1;
 
 		$this->value = $value;
-		$this->attr('onchange',$action);
+		$this->setAction($action);
+	}
 
-		if(is_array($items)) $this->addItems($items);
+	public function setAction($value='submit()', $event='onchange'){
+		$this->setAttribute($event,$value);
 	}
 
 	public function setValue($value=NULL){
 		$this->value = $value;
 	}
 
-	public function addItems($items){
-		foreach($items as $value => $caption){
-			$selected = (int) ($value == $this->value);
-			parent::addItem(new CComboItem($value, $caption, $selected));
-		}
-	}
-
-	public function addItemsInGroup($label, $items){
-		$group = new COptGroup($label);
-		foreach($items as $value => $caption){
-			$selected = (int) ($value == $this->value);
-			$group->addItem(new CComboItem($value, $caption, $selected));
-		}
-		parent::addItem($group);
-	}
-
-
 	public function addItem($value, $caption='', $selected=NULL, $enabled='yes'){
+//			if($enabled=='no') return;	/* disable item method 1 */
 		if(is_object($value) && (zbx_strtolower(get_class($value)) == 'ccomboitem')){
 			parent::addItem($value);
 		}
 		else{
-			$title = false;
-
 			if(zbx_strlen($caption) > 44){
-				$this->setAttribute('class', $this->getAttribute('class').' selectShorten');
-				$title = true;
+				$this->setAttribute('class', 'select selectShorten');
 			}
 
 			if(is_null($selected)){
@@ -81,22 +64,33 @@ class CComboBox extends CTag{
 					$selected = 'yes';
 				}
 			}
-			else{
-				$selected = 'yes';
-			}
 
-			$citem = new CComboItem($value, $caption, $selected, $enabled);
-			if($title) $citem->setTitle($caption);
-			parent::addItem($citem);
+			parent::addItem(new CComboItem($value, $caption, $selected, $enabled));
 		}
+	}
+
+	public function addItems($items){
+		foreach($items as $value => $caption){
+			$selected = (int) ($value == $this->value);
+			parent::addItem(new CComboItem($value, $caption, $selected));
+		}
+	}
+	
+	public function addItemsInGroup($label, $items){
+		$group = new COptGroup($label);
+		foreach($items as $value => $caption){
+			$selected = (int) ($value == $this->value);
+			$group->addItem(new CComboItem($value, $caption, $selected));
+		}
+		parent::addItem($group);
 	}
 }
 
 class COptGroup extends CTag{
 	public function __construct($label){
 		parent::__construct('optgroup', 'yes');
-
-		$this->setAttribute('label', $label);
+		
+		$this->setAttribute('label', $label);	
 	}
 }
 

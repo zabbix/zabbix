@@ -1,6 +1,7 @@
+//Javascript document
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -15,11 +16,16 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**/
+**/ 
 
+/************************************************************************************/
+/*								COOKIES CONTROL 									*/
+/************************************************************************************/
+// Title: cookies class
+// Description: to manipulate cookies on client side
 // Author: Aly
 var cookie ={
-cookies: [],
+cookies: new Array(),
 
 init: function(){
 	var path = new Curl();
@@ -34,7 +40,7 @@ init: function(){
 		}
 		else{
 			this.cookies[cookiePair[0]] = cookiePair[1];
-//SDI(cookiePair[0] + ' ' + cookiePair[1]);
+//SDI(cookiePair[0] + ' ' + cookiePair[1]);			
 		}
 	}
 },
@@ -45,12 +51,12 @@ create: function(name,value,days){
 		date.setTime(date.getTime()+(days*24*60*60*1000));
 		var expires = "; expires="+date.toGMTString();
 	}
-	else{
+	else{ 
 		var expires = "";
 	}
 
 	document.cookie = name+"="+value+expires+"; path=/";
-
+	
 // Apache header size limit
 	if(document.cookie.length > 8000){
 		document.cookie = name+"=; path=/";
@@ -68,10 +74,10 @@ createArray: function(name,value,days){
 	var list = value.join(',');
 	var list_part = "";
 	var part = 1;
-
+	
 	var part_count = parseInt(this.read(name+'_parts'),10);
 	if(is_null(part_count)) part_count = 1;
-
+	
 	var tmp_index = 0
 	var result = true;
 	while(list.length > 0){
@@ -93,7 +99,7 @@ createArray: function(name,value,days){
 	}
 
 	this.create(name+'_parts', part-1);
-
+	
 	while(part <= part_count){
 		this.erase(name+'_'+part);
 		part++;
@@ -101,7 +107,7 @@ createArray: function(name,value,days){
 },
 
 createJSON: function(name,value,days){
-	var value_array = [];
+	var value_array = new Array();
 	for(var key in value){
 		if(!empty(value[key])) value_array.push(value[key]);
 	}
@@ -112,7 +118,7 @@ createJSON: function(name,value,days){
 read: function(name){
 	if(typeof(this.cookies[name]) != 'undefined'){
 		return this.cookies[name];
-	}
+	} 
 	else if(document.cookie.indexOf(name) != -1){
 		var nameEQ = name + "=";
 		var ca = document.cookie.split(';');
@@ -161,7 +167,7 @@ printall: function(){
 	var allCookies = document.cookie.split('; ');
 	for (var i=0;i<allCookies.length;i++) {
 		var cookiePair = allCookies[i].split('=');
-
+		
 		SDI("[" + cookiePair[0] + "] is " + cookiePair[1]); // assumes print is already defined
 	}
 },
@@ -191,89 +197,4 @@ eraseArrayByPattern: function(pattern){
 		}
 	}
 }
-};
-
-/**
- * jQuery Cookie plugin
- *
- * Copyright (c) 2010 Klaus Hartl (stilbuero.de)
- * Dual licensed under the MIT and GPL licenses:
- * http://www.opensource.org/licenses/mit-license.php
- * http://www.gnu.org/licenses/gpl.html
- *
- */
-
-/**
- * Create a cookie with the given key and value and other optional parameters.
- *
- * @example $.cookie('the_cookie', 'the_value');
- * @desc Set the value of a cookie.
- * @example $.cookie('the_cookie', 'the_value', { expires: 7, path: '/', domain: 'jquery.com', secure: true });
- * @desc Create a cookie with all available options.
- * @example $.cookie('the_cookie', 'the_value');
- * @desc Create a session cookie.
- * @example $.cookie('the_cookie', null);
- * @desc Delete a cookie by passing null as value. Keep in mind that you have to use the same path and domain
- *       used when the cookie was set.
- *
- * @param String key The key of the cookie.
- * @param String value The value of the cookie.
- * @param Object options An object literal containing key/value pairs to provide optional cookie attributes.
- * @option Number|Date expires Either an integer specifying the expiration date from now on in days or a Date object.
- *                             If a negative value is specified (e.g. a date in the past), the cookie will be deleted.
- *                             If set to null or omitted, the cookie will be a session cookie and will not be retained
- *                             when the the browser exits.
- * @option String path The value of the path atribute of the cookie (default: path of page that created the cookie).
- * @option String domain The value of the domain attribute of the cookie (default: domain of page that created the cookie).
- * @option Boolean secure If true, the secure attribute of the cookie will be set and the cookie transmission will
- *                        require a secure protocol (like HTTPS).
- * @type undefined
- *
- * @name $.cookie
- * @cat Plugins/Cookie
- * @author Klaus Hartl/klaus.hartl@stilbuero.de
- */
-
-/**
- * Get the value of a cookie with the given key.
- *
- * @example $.cookie('the_cookie');
- * @desc Get the value of a cookie.
- *
- * @param String key The key of the cookie.
- * @return The value of the cookie.
- * @type String
- *
- * @name $.cookie
- * @cat Plugins/Cookie
- * @author Klaus Hartl/klaus.hartl@stilbuero.de
- */
-jQuery.cookie = function (key, value, options) {
-    // key and value given, set cookie...
-    if (arguments.length > 1 && (value === null || typeof value !== "object")) {
-        options = jQuery.extend({}, options);
-
-        if (value === null) {
-            options.expires = -1;
-        }
-
-        if (typeof options.expires === 'number') {
-            var days = options.expires, t = options.expires = new Date();
-            t.setDate(t.getDate() + days);
-        }
-
-        return (document.cookie = [
-            encodeURIComponent(key), '=',
-            options.raw ? String(value) : encodeURIComponent(String(value)),
-            options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
-            options.path ? '; path=' + options.path : '',
-            options.domain ? '; domain=' + options.domain : '',
-            options.secure ? '; secure' : ''
-        ].join(''));
-    }
-
-    // key and possibly options given, get cookie...
-    options = value || {};
-    var result, decode = options.raw ? function (s) { return s; } : decodeURIComponent;
-    return (result = new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie)) ? decode(result[1]) : null;
-};
+}

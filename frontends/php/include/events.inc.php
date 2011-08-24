@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 	}
 
 	function get_tr_event_by_eventid($eventid){
-		$sql = 'SELECT e.*,t.triggerid, t.description,t.expression,t.priority,t.status,t.type '.
+		$sql = 'SELECT e.*,t.triggerid, t.description,t.priority,t.status,t.type '.
 				' FROM events e,triggers t '.
 				' WHERE e.eventid='.$eventid.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
@@ -58,23 +58,161 @@
 		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
 		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
 		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
-		$triggerids = API::Trigger()->get($options);
+		$triggerids = CTrigger::get($options);
 
 		$options = array(
 			'countOutput' => 1,
 			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
-			'filter' => array(
-				'value_changed' => TRIGGER_VALUE_CHANGED_YES,
-				'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
-				'acknowledged' => $ack ? 1 : 0,
-			),
 			'object' => EVENT_OBJECT_TRIGGER,
+			'acknowledged' => $ack ? 1 : 0,
+			'value' => is_null($value_event) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value_event,
 			'nopermissions' => 1
 		);
-		$event_count = API::Event()->get($options);
+		$event_count = CEvent::get($options);
 
 	return $event_count;
 	}
+
+/* function:
+ *     event_initial_time
+ *
+ * description:
+ *     returns 'true' if event is initial, otherwise false;
+ *
+ * author: Aly
+ */
+function event_initial_time($row,$hide_unknown=0){
+	$events = get_latest_events($row,$hide_unknown);
+
+	if(!empty($events) &&
+		($events[0]['value'] == $row['value']) &&
+		($row['type'] == TRIGGER_MULT_EVENT_ENABLED) &&
+		($row['value'] == TRIGGER_VALUE_TRUE))
+	{
+		return true;
+	}
+	if(!empty($events) && ($events[0]['value'] == $row['value'])){
+		return false;
+	}
+
+	return true;
+}
+
+/* function:
+ *     first_initial_eventid
+ *
+ * description:
+ *     return first initial eventid
+ *
+ * author: Aly
+ */
+
+function first_initial_eventid($row,$hide_unknown=0){
+
+	$events = get_latest_events($row,$hide_unknown);
+
+	$sql_cond=($hide_unknown == 1)?' AND e.value<>2 ':'';
+
+	if(empty($events)){
+		$sql = 'SELECT e.eventid '.
+				' FROM events e '.
+				' WHERE e.objectid='.$row['triggerid'].$sql_cond.
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' ORDER BY e.object, e.objectid, e.eventid';
+		$res = DBselect($sql,1);
+
+		if($rows = DBfetch($res)) return $rows['eventid'];
+	}
+	else if(!empty($events) && ($events[0]['value'] != $row['value'])){
+		$eventid = $events[0]['eventid'];
+		$sql = 'SELECT e.eventid '.
+				' FROM events e '.
+				' WHERE e.eventid > '.$eventid.
+					' AND e.objectid='.$row['triggerid'].$sql_cond.
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' ORDER BY e.object, e.objectid, e.eventid';
+		$res = DBselect($sql,1);
+
+		if($rows = DBfetch($res)){
+			return $rows['eventid'];
+		}
+
+		$row['eventid'] = $eventid;
+		$row['value'] = $events[0]['value'];
+
+		return first_initial_eventid($row,$hide_unknown);			// recursion!!!
+	}
+	else if(!empty($events) && ($events[0]['value'] == $row['value'])){
+		$eventid = (count($events) > 1)?($events[1]['eventid']):(0);
+
+		$sql = 'SELECT e.eventid,e.clock '.
+				' FROM events e '.
+				' WHERE e.eventid > '.$eventid.
+					' AND e.objectid='.$row['triggerid'].
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' AND e.value='.$row['value'].
+				' ORDER BY e.object, e.objectid, e.eventid';
+		$res = DBselect($sql,1);
+		$rows = DBfetch($res);
+
+		return $rows['eventid'];
+	}
+return false;
+}
+
+/* function:
+ *     get_latest_events
+ *
+ * description:
+ *     return latest events by VALUE
+ *
+ * author: Aly
+ */
+function get_latest_events($row,$hide_unknown=0){
+	$events = array();
+
+// SQL's are optimized that's why it's splited that way
+
+/*******************************************/
+// Check for optimization after changing!  */
+/*******************************************/
+
+	$sql = 'SELECT e.eventid, e.clock, e.value '.
+			' FROM events e '.
+			' WHERE e.objectid='.$row['triggerid'].
+				' AND e.eventid < '.$row['eventid'].
+				' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' AND e.value='.TRIGGER_VALUE_FALSE.
+			' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
+	if($rez = DBfetch(DBselect($sql,1))) $events[] = $rez;
+
+	$sql = 'SELECT e.eventid, e.clock, e.value '.
+			' FROM events e'.
+			' WHERE e.objectid='.$row['triggerid'].
+				' AND e.eventid < '.$row['eventid'].
+				' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' AND e.value='.TRIGGER_VALUE_TRUE.
+			' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
+
+	if($rez = DBfetch(DBselect($sql,1))) $events[] = $rez;
+
+	if($hide_unknown == 0){
+		$sql = 'SELECT e.eventid, e.clock, e.value '.
+				' FROM events e'.
+				' WHERE e.objectid='.$row['triggerid'].
+					' AND e.eventid < '.$row['eventid'].
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' AND e.value='.TRIGGER_VALUE_UNKNOWN.
+				' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
+		if($rez = DBfetch(DBselect($sql,1))) $events[] = $rez;
+	}
+
+/*******************************************/
+
+	order_result($events, 'clock', ZBX_SORT_DOWN);
+
+return $events;
+}
 
 /* function:
  *     get_next_event
@@ -84,49 +222,102 @@
  *
  * author: Aly
  */
-function get_next_event($currentEvent, $eventList = null, $showUnknown=false){
-	if(!is_null($eventList)){
-		$nextEvent = reset($eventList);
-		foreach($eventList as $enum => $event){
-			if(bccomp($event['eventid'], $currentEvent['eventid']) == 0){
-				if(bccomp($event['eventid'], $nextEvent['eventid']) == 0) $nextEvent = false;
-				break;
-			}
+function get_next_event($event, $event_list=array(), $hide_unknown=true){
 
-			if(($event['object'] == $currentEvent['object']) &&
-				(bccomp($event['objectid'], $currentEvent['objectid']) == 0) &&
-				($event['clock'] >= $currentEvent['clock']) &&
-				(bccomp($event['eventid'], $currentEvent['eventid']) != 0)
-			){
-				$nextEvent = $event;
+	if(!empty($event_list)){
+		$next_event = false;
+		if((TRIGGER_VALUE_TRUE == $event['value']) && (TRIGGER_MULT_EVENT_ENABLED == $event['type'])){
+			foreach($event_list as $e){
+				if(($e['objectid'] == $event['objectid'])
+						&& ($e['eventid'] > $event['eventid']) && ($e['clock'] > $event['clock'])
+						&& ($e['value'] != TRIGGER_VALUE_UNKNOWN)){
+					$next_event = $e;
+				}
 			}
-
 		}
-		if($nextEvent) return $nextEvent;
+		else{
+			foreach($event_list as $e){
+				if(($e['objectid'] == $event['objectid'])
+						&& ($e['eventid'] > $event['eventid']) && ($e['clock'] > $event['clock'])
+						&& ($e['value'] != TRIGGER_VALUE_UNKNOWN) && ($e['value'] != $event['value'])){
+					$next_event = $e;
+				}
+			}
+		}
+
+		if($next_event) return $next_event;
 	}
 
 
-	$sql = 'SELECT e.* '.
-		' FROM events e '.
-		' WHERE e.objectid='.$currentEvent['objectid'].
-			' AND e.eventid > '.$currentEvent['eventid'].
-			' AND e.object='.EVENT_OBJECT_TRIGGER.
-			($showUnknown ? '' : ' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES).
-		' ORDER BY e.object, e.objectid, e.eventid';
+	if((TRIGGER_VALUE_TRUE == $event['value']) && (TRIGGER_MULT_EVENT_ENABLED == $event['type'])){
+		$sql = 'SELECT e.eventid, e.value, e.clock '.
+			' FROM events e'.
+			' WHERE e.objectid='.$event['objectid'].
+				' AND e.eventid > '.$event['eventid'].
+				' AND e.object='.EVENT_OBJECT_TRIGGER.
+				($hide_unknown ? ' AND e.value<>'.TRIGGER_VALUE_UNKNOWN : '').
+			' ORDER BY e.object, e.objectid, e.eventid';
+	}
+	else{
+		$sql = 'SELECT e.eventid, e.value, e.clock '.
+			' FROM events e'.
+			' WHERE e.objectid='.$event['objectid'].
+				' AND e.eventid > '.$event['eventid'].
+				' AND e.object='.EVENT_OBJECT_TRIGGER.
+//				' AND e.value<>'.$event['value'].
+				($hide_unknown ? ' AND e.value<>'.TRIGGER_VALUE_UNKNOWN : '').
+			' ORDER BY e.object, e.objectid, e.eventid';
+	}
 
 	return DBfetch(DBselect($sql,1));
 }
 
 // author: Aly
-function make_event_details($event, $trigger){
+function make_event_details($eventid){
 	$config = select_config();
+
+	$event = get_tr_event_by_eventid($eventid);
+
 	$table = new CTableInfo();
 
-	$table->addRow(array(S_EVENT, expand_trigger_description_by_data(array_merge($trigger, $event), ZBX_FLAG_EVENT)));
-	$table->addRow(array(S_TIME, zbx_date2str(S_EVENTS_EVENT_DETAILS_DATE_FORMAT,$event['clock'])));
+	$table->AddRow(array(S_EVENT, expand_trigger_description($event['triggerid'])));
+	$table->AddRow(array(S_TIME, zbx_date2str(S_EVENTS_EVENT_DETAILS_DATE_FORMAT,$event['clock'])));
+
+	$duration = zbx_date2age($event['clock']);
+
+	if($next_event = get_next_event($event)){
+		$duration = zbx_date2age($event['clock'],$next_event['clock']);
+	}
+
+	if($event['value'] == TRIGGER_VALUE_FALSE){
+		$value=new CCol(S_OK_BIG,'off');
+	}
+	elseif($event['value'] == TRIGGER_VALUE_TRUE){
+		$value=new CCol(S_PROBLEM_BIG,'on');
+	}
+	else{
+		$value=new CCol(S_UNKNOWN_BIG,'unknown');
+	}
+
+	$table->addRow(array(S_STATUS, $value));
+	$table->addRow(array(S_DURATION, $duration));
 
 	if($config['event_ack_enable']){
-		$ack = getEventAckState($event, true);
+		global $page;
+		$backurl = urlencode($page['file'].'?eventid='.$eventid.'&triggerid='.$event['triggerid']);
+
+		if($event['acknowledged'] == 1){
+			$rows = 0;
+			$db_acks = get_acknowledges_by_eventid($event["eventid"]);
+			while($a = DBfetch($db_acks))
+				$rows++;
+
+			$ack = array(new CLink(S_YES, 'acknow.php?eventid='.$event['eventid'].'&backurl='.$backurl, 'off'), ' ('.$rows.')');
+		}
+		else{
+			$ack = array(new CLink(S_NO, 'acknow.php?eventid='.$event['eventid'].'&backurl='.$backurl, 'on'));
+		}
+
 		$table->addRow(array(S_ACKNOWLEDGED, $ack));
 	}
 
@@ -134,10 +325,11 @@ function make_event_details($event, $trigger){
 return $table;
 }
 
-function make_small_eventlist($startEvent){
+function make_small_eventlist($eventid, $trigger_data){
 	$config = select_config();
 
 	$table = new CTableInfo();
+
 
 	$table->setHeader(array(
 		S_TIME,
@@ -148,42 +340,65 @@ function make_small_eventlist($startEvent){
 		S_ACTIONS
 	));
 
-	$clock = $startEvent['clock'];
 
 	$options = array(
-		'triggerids' => $startEvent['objectid'],
-		'eventid_till' => $startEvent['eventid'],
+		'eventids' => $eventid,
 		'output' => API_OUTPUT_EXTEND,
-		'select_acknowledges' => API_OUTPUT_COUNT,
+//		'select_triggers' => API_OUTPUT_EXTEND
+	);
+	$curevent = CEvent::get($options);
+	$curevent = reset($curevent);
+
+	$clock = $curevent['clock'];
+
+	$options = array(
+		'triggerids' => $trigger_data['triggerid'],
+		'eventid_till' => $curevent['eventid'],
+		'select_triggers' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'clock',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20
 	);
-	$events = API::Event()->get($options);
-	order_result($events, array('clock', 'eventid'), ZBX_SORT_DOWN);
-	foreach($events as $enum => $event){
-		$lclock = $clock;
-		$duration = zbx_date2age($lclock, $event['clock']);
-		$clock = $event['clock'];
+	$events = CEvent::get($options);
 
-		if((bccomp($startEvent['eventid'],$event['eventid']) == 0) && ($nextevent = get_next_event($event,$events,true))) {
+	foreach($events as $enum => $event){
+		$trigger = reset($event['triggers']);
+
+		$event['type'] = $trigger['type'];
+
+		$lclock = $clock;
+		$clock = $event['clock'];
+		$duration = zbx_date2age($lclock, $clock);
+
+		if($curevent['eventid'] == $event['eventid'] && ($nextevent = get_next_event($event))) {
 			$duration = zbx_date2age($nextevent['clock'], $clock);
 		}
-		else if(bccomp($startEvent['eventid'],$event['eventid']) == 0){
+		else if($curevent['eventid'] == $event['eventid']) {
 			$duration = zbx_date2age($clock);
 		}
 
-		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
-		// add colors and blinking to span depending on configuration and trigger parameters
-		addTriggerValueStyle(
-			$eventStatusSpan,
-			$event['value'],
-			$event['clock'],
-			$event['acknowledged']
-		);
+		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 
-		$ack = getEventAckState($event, true);
+		// if acknowledges are not disabled in configuration, let's show them
+		if($config['event_ack_enable']){
+			global $page;
+			$backurl = urlencode($page['file'].'?eventid='.$curevent['eventid'].'&triggerid='.$trigger_data['triggerid']);
 
+			if($event['acknowledged'] == 1){
+				$rows = 0;
+				$db_acks = get_acknowledges_by_eventid($event['eventid']);
+				while($a = DBfetch($db_acks))
+					$rows++;
+
+				$ack = array(new CLink(S_YES, 'acknow.php?eventid='.$event['eventid'].
+						'&backurl='.$backurl, 'off'), ' ('.$rows.')');
+			}
+			else{
+				$ack = array(new CLink(S_NO, 'acknow.php?eventid='.$event['eventid'].
+						'&backurl='.$backurl, 'on'));
+			}
+		}
 //actions
 		$actions = get_event_actions_stat_hints($event['eventid']);
 //--------
@@ -191,10 +406,10 @@ function make_small_eventlist($startEvent){
 		$table->addRow(array(
 			new CLink(
 				zbx_date2str(S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT,$event['clock']),
-				'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
+				'tr_events.php?triggerid='.$trigger_data['triggerid'].'&eventid='.$event['eventid'],
 				'action'
 			),
-			$eventStatusSpan,
+			$value,
 			$duration,
 			zbx_date2age($event['clock']),
 			($config['event_ack_enable'] ? $ack : null),
@@ -221,76 +436,54 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 
 	$table->setAttribute('style', 'width: 400px;');
 
-	$options = array(
-		'output' => API_OUTPUT_EXTEND,
-		'triggerids' => $triggerid,
-		'eventid_till' => $eventid,
-		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER,
-			'value_changed' => TRIGGER_VALUE_CHANGED_YES
-		),
-		'nopermissions' => 1,
-		'select_acknowledges' => API_OUTPUT_COUNT,
-		'sortfield' => 'clock',
-		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => ZBX_WIDGET_ROWS
-	);
-	$db_events = API::Event()->get($options);
+	$event_list = array();
+	$sql = 'SELECT * '.
+			' FROM events '.
+			' WHERE eventid<='.$eventid.
+				' AND object='.EVENT_OBJECT_TRIGGER.
+				' AND objectid='.$triggerid.
+			' ORDER BY eventid DESC';
+	$db_events = DBselect($sql, ZBX_WIDGET_ROWS);
+
+	$count = 0;
+	while($event = DBfetch($db_events)){
+		if(!empty($event_list) && ($event_list[$count]['value'] != $event['value'])) {
+			$count++;
+		}
+		else if(!empty($event_list) &&
+			($event_list[$count]['value'] == $event['value']) &&
+			($trigger_type == TRIGGER_MULT_EVENT_ENABLED) &&
+			($event['value'] == TRIGGER_VALUE_TRUE))
+		{
+			$count++;
+		}
+
+		$event_list[$count] = $event;
+	}
 
 	$lclock = time();
-	foreach($db_events as $event) {
+	foreach($event_list as $id => $event) {
 		$duration = zbx_date2age($lclock, $event['clock']);
 		$lclock = $event['clock'];
 
-		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
-		// add colors and blinking to span depending on configuration and trigger parameters
-		addTriggerValueStyle(
-			$eventStatusSpan,
-			$event['value'],
-			$event['clock'],
-			$event['acknowledged']
-		);
+		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 
-		$ack = getEventAckState($event);
-
+// ack +++
+		$ack = new CSpan(S_NO,'on');
+		if($event['acknowledged']) {
+			$ack=new CSpan(S_YES,'off');
+		}
+// ---
 		$table->addRow(array(
 			zbx_date2str(S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT,$event['clock']),
-			$eventStatusSpan,
+			$value,
 			$duration,
 			zbx_date2age($event['clock']),
-			$ack
+			$config['event_ack_enable']? $ack : NULL //hide acknowledges if they are turned off
 		));
 	}
 
-	return $table;
-}
-
-function getEventAckState($event, $extBackurl=false){
-	$config = select_config();
-	global $page;
-
-	if(!$config['event_ack_enable']) return null;
-//	if(($event['value'] != TRIGGER_VALUE_TRUE) || ($event['value_changed'] == TRIGGER_VALUE_CHANGED_NO)){
-	if($event['value_changed'] == TRIGGER_VALUE_CHANGED_NO){
-		return SPACE;
-	}
-
-	if($extBackurl){
-		$backurl = urlencode($page['file'].'?eventid='.$event['eventid'].'&triggerid='.$event['objectid']);
-	}
-	else{
-		$backurl = $page['file'];
-	}
-
-	if($event['acknowledged'] == 0){
-		$ack = new CSpan(S_NO, 'on');
-	}
-	else{
-		$rows = is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges'];
-		$ack = array(new CSpan(S_YES,'off'),' ('.$rows.')');
-	}
-
-return $ack;
+return $table;
 }
 
 function getLastEvents($options){
@@ -299,20 +492,17 @@ function getLastEvents($options){
 	$triggerOptions = array(
 		'filter' => array(),
 		'skipDependent'	=> 1,
-		'selectHosts' => array('hostid', 'host'),
+		'select_hosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
-//		'expandDescription' => 1,
+		'expandDescription' => 1,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $options['limit']
 	);
 
 	$eventOptions = array(
+		'object' => EVENT_OBJECT_TRIGGER,
 		'output' => API_OUTPUT_EXTEND,
-		'filter' => array(
-			'object' => EVENT_OBJECT_TRIGGER,
-			'value_changed' => TRIGGER_VALUE_CHANGED_YES
-		),
 		'sortfield' => 'clock',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $options['limit']
@@ -333,12 +523,12 @@ function getLastEvents($options){
 	}
 
 // triggers
-	$triggers = API::Trigger()->get($triggerOptions);
+	$triggers = CTrigger::get($triggerOptions);
 	$triggers = zbx_toHash($triggers, 'triggerid');
 
 // events
 	$eventOptions['triggerids'] = zbx_objectValues($triggers, 'triggerid');
-	$events = API::Event()->get($eventOptions);
+	$events = CEvent::get($eventOptions);
 
 	$sortClock = array();
 	$sortEvent = array();
@@ -350,10 +540,6 @@ function getLastEvents($options){
 
 		$sortClock[$enum] = $event['clock'];
 		$sortEvent[$enum] = $event['eventid'];
-
-		//expanding description for the state where event was
-		$merged_event = array_merge($event, $triggers[$event['objectid']]);
-		$events[$enum]['trigger']['description'] = expand_trigger_description_by_data($merged_event, ZBX_FLAG_EVENT);
 	}
 
 	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);

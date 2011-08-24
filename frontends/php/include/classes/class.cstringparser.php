@@ -473,8 +473,8 @@ class CStringParser {
 	private function saveSymbols() {
 		//$this->saveDebug("Saving symbol {$this->levelData[$this->currentLevel]['levelType']}\n");
 
-//		$strStart = $this->levelData[$this->currentLevel]['openSymbolNum'];
-//		$strEnd = $this->levelData[$this->currentLevel]['closeSymbolNum'];
+		$strStart = $this->levelData[$this->currentLevel]['openSymbolNum'];
+		$strEnd = $this->levelData[$this->currentLevel]['closeSymbolNum'];
 		//$this->levelData[$this->currentLevel]['value'] = mb_substr($this->expression, $strStart, $strEnd-$strStart+1); // should be changed to zbx_substr
 
 		//$this->saveDebug(print_r($this->levelData, true));
@@ -669,10 +669,11 @@ class CStringParser {
                                 if(!is_callable($customFunction)) continue;
 
         			$ret = call_user_func_array($customFunction, Array(&$parent, &$levelData, $index, &$this->expression, &$this->ess[$levelData['levelType']]));
+
         			if(isset($ret['valid']) && $ret['valid'] === false && isset($ret['errArray']) && is_array($ret['errArray']) && isset($ret['errArray']['errorCode']) && isset($ret['errArray']['errStart']) && isset($ret['errArray']['errEnd'])) {
         				$this->errors[] = $ret['errArray'];
 	        		}
-			}
+                        }
 		}
 
 		if(isset($levelData['parts']) && is_array($levelData['parts']))
@@ -758,6 +759,5 @@ class CStringParser {
 		file_put_contents($debugfile, $debugStr, FILE_APPEND);
 	}
 }
-
 
 ?>

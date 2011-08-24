@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ include_once('include/page_header.php');
 
 	$available_hosts = $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array();
 
-	$r_form = new CForm('get');
+	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
 	$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
@@ -144,7 +144,7 @@ include_once('include/page_header.php');
 	$httpmon_wdgt->addItem(SPACE);
 
 // TABLE
-	$form = new CForm('get');
+	$form = new CForm(null, 'get');
 	$form->setName('scenarios');
 	$form->addVar('hostid', $_REQUEST['hostid']);
 
@@ -156,7 +156,7 @@ include_once('include/page_header.php');
 	$table  = new CTableInfo();
 	$table->SetHeader(array(
 		is_show_all_nodes() ? make_sorting_header(S_NODE,'h.hostid') : null,
-		$_REQUEST['hostid'] ==0 ? make_sorting_header(S_HOST,'h.name') : NULL,
+		$_REQUEST['hostid'] ==0 ? make_sorting_header(S_HOST,'h.host') : NULL,
 		make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
 		S_NUMBER_OF_STEPS,
 		S_STATE,
@@ -173,12 +173,12 @@ include_once('include/page_header.php');
 		$sql_where = ' AND h.hostid='.$_REQUEST['hostid'];
 	}
 
-	$sql = 'SELECT DISTINCT h.name as hostname,h.hostid,a.* '.
+	$sql = 'SELECT DISTINCT h.host,h.hostid,a.* '.
 			' FROM applications a,hosts h '.
 			' WHERE a.hostid=h.hostid '.
 				$sql_where.
 				' AND '.DBcondition('h.hostid',$available_hosts).
-			order_by('a.applicationid,h.name,h.hostid','a.name');
+			order_by('a.applicationid,h.host,h.hostid','a.name');
 //SDI($sql);
 	$db_app_res = DBselect($sql);
 	while($db_app = DBfetch($db_app_res)){
@@ -192,7 +192,7 @@ include_once('include/page_header.php');
 	$db_httptests = array();
 	$db_httptestids = array();
 
-	$sql = 'SELECT wt.*,a.name as application, h.name as hostname,h.hostid '.
+	$sql = 'SELECT wt.*,a.name as application, h.host,h.hostid '.
 		' FROM httptest wt '.
 			' LEFT JOIN applications a on wt.applicationid=a.applicationid '.
 			' LEFT JOIN hosts h on h.hostid=a.hostid '.
@@ -296,7 +296,7 @@ include_once('include/page_header.php');
 
 		$table->addRow(array(
 				get_node_name_by_elid($db_app['applicationid']),
-				($_REQUEST['hostid'] > 0)?NULL:$db_app['hostname'],
+				($_REQUEST['hostid'] > 0)?NULL:$db_app['host'],
 				$col
 			));
 

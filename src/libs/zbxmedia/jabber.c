@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -217,7 +217,7 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
 
 	init_result(&result);
 
-	zbx_snprintf(command, sizeof(command), "net.dns.record[,_xmpp-client._tcp.%s,SRV]", server);
+	zbx_snprintf(command, sizeof(command), "net.tcp.dns.query[,_xmpp-client._tcp.%s,SRV]", server);
 
 	if (SUCCEED == process(command, 0, &result))
 	{

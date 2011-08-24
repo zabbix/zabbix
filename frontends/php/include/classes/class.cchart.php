@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ class CChart extends CGraphDraw{
 
 		$item = get_item_by_itemid($itemid);
 		$this->items[$this->num] = $item;
-		$this->items[$this->num]['name'] = itemName($item);
+		$this->items[$this->num]['description'] = item_description($item);
 		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $item['delay_flex']);
 
 		if(strpos($item['units'], ',') !== false)
@@ -129,7 +129,7 @@ class CChart extends CGraphDraw{
 
 		$host = get_host_by_hostid($item['hostid']);
 
-		$this->items[$this->num]['hostname'] = $host['name'];
+		$this->items[$this->num]['host'] = $host['host'];
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
 		$this->items[$this->num]['drawtype'] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
 		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_DEFAULT : $axis;
@@ -460,7 +460,7 @@ class CChart extends CGraphDraw{
 
 				if($fnc_cnt['cnt'] != 1) continue;
 
-				$trigger = API::UserMacro()->resolveTrigger($trigger);
+				CUserMacro::resolveTrigger($trigger);
 				if(!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) continue;
 
 				$val = $arr[3];
@@ -471,13 +471,22 @@ class CChart extends CGraphDraw{
 				$minY = $this->m_minY[$this->items[$inum]['axisside']];
 				$maxY = $this->m_maxY[$this->items[$inum]['axisside']];
 
-				array_push($this->triggers, array(
+				switch($trigger['priority']){
+					case TRIGGER_SEVERITY_DISASTER:	$color = 'Priority Disaster'; break;
+					case TRIGGER_SEVERITY_HIGH: $color = 'Priority High'; break;
+					case TRIGGER_SEVERITY_AVERAGE: $color = 'Priority Average'; break;
+					case TRIGGER_SEVERITY_WARNING: $color = 'Priority Warning'; break;
+					case TRIGGER_SEVERITY_INFORMATION: $color = 'Priority Information'; break;
+					default: $color = 'Priority';
+				}
+
+				array_push($this->triggers,array(
 					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
-					'color' => getSeverityColor($trigger['priority']),
+					'color' => $color,
 					'description' => S_TRIGGER.': '.expand_trigger_description_by_data($trigger),
 					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
-				));
+					));
 				++$cnt;
 			}
 		}
@@ -658,7 +667,8 @@ class CChart extends CGraphDraw{
 
 				if(!isset($val)) continue;
 
-				for($ci=0; $ci < min(count($val),count($shift_val)); $ci++){
+				$size = min(count($val),count($shift_val));
+				for($ci=0; $ci < $size; $ci++){
 					if($data['count'][$ci] == 0) continue;
 
 					$val[$ci] = bcadd($shift_val[$ci], $val[$ci]);
@@ -678,6 +688,8 @@ class CChart extends CGraphDraw{
 	}
 
 	protected function calcZero(){
+		$left = GRAPH_YAXIS_SIDE_LEFT;
+		$right = GRAPH_YAXIS_SIDE_RIGHT;
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT);
 
 		foreach($sides as $num => $side){
@@ -1153,6 +1165,7 @@ class CChart extends CGraphDraw{
 		$main_interval = $this->grid['horizontal']['main']['interval'];
 		$main_intervalX = $this->grid['horizontal']['main']['intervalx'];
 		$main_offset = $this->grid['horizontal']['main']['offset'];
+		$main_offsetX = $this->grid['horizontal']['main']['offsetx'];
 
 		$sub = &$this->grid['horizontal']['sub'];
 		$interval = $sub['interval'];
@@ -1486,7 +1499,7 @@ class CChart extends CGraphDraw{
 			$this->shiftY,
 			$this->sizeX+$this->shiftXleft-2,	// -2 border
 			$this->sizeY+$this->shiftY,
-			$this->getColor($this->graphtheme['nonworktimecolor'], 0)
+			$this->getColor($this->graphtheme['noneworktimecolor'], 0)
 		);
 
 		$now = time();
@@ -1630,8 +1643,8 @@ class CChart extends CGraphDraw{
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
 
-			if($this->itemsHost) $item_caption = $this->items[$i]['name'];
-			else $item_caption = $this->items[$i]['hostname'].': '.$this->items[$i]['name'];
+			if($this->itemsHost) $item_caption = $this->items[$i]['description'];
+			else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['description'];
 
 			if(isset($data) && isset($data['min'])){
 				if($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT)
@@ -1990,6 +2003,8 @@ class CChart extends CGraphDraw{
 
 		set_image_header();
 
+		check_authorisation();
+
 		$this->selectData();
 
 		$this->m_minY[GRAPH_YAXIS_SIDE_LEFT]	= $this->calculateMinY(GRAPH_YAXIS_SIDE_LEFT);
@@ -2037,6 +2052,7 @@ class CChart extends CGraphDraw{
 		$this->fullSizeY = $this->sizeY+$this->shiftY+$this->legendOffsetY;
 
 		if($this->drawLegend){
+			$trCount = $this->m_showTriggers?count($this->triggers):0;
 			$this->fullSizeY += 14 * ($this->num+1+(($this->sizeY < 120)?0:count($this->triggers))) + 8;
 		}
 
@@ -2173,6 +2189,7 @@ class CChart extends CGraphDraw{
 
 		$this->drawLogo();
 
+		$end_time=getmicrotime();
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
 
 // if we get chart from config by get method
@@ -2180,7 +2197,7 @@ class CChart extends CGraphDraw{
 		if(isset($this->dataFrom))
 			$datafrom = 'Data from '.$this->dataFrom.'. ';
 
-		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,$datafrom._s('Generated in %s sec', $str), $this->getColor('Gray'));
+		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,$datafrom.'Generated in '.$str.' sec', $this->getColor('Gray'));
 
 		unset($this->items, $this->data);
 

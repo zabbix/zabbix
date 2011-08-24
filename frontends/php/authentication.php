@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,45 +106,39 @@ include_once('include/page_header.php');
 	else if($_REQUEST['config']==ZBX_AUTH_LDAP){
 		if(isset($_REQUEST['save'])){
 			$alias = get_request('user', $USER_DETAILS['alias']);
-			$passwd = get_request('user_password', '');
+			$passwd = get_request('user_password','');
 
-			try{
-				$config = select_config();
-				$cur_auth_type = $config['authentication_type'];
+			$config=select_config();
+			$cur_auth_type = $config['authentication_type'] ;
 
-				foreach($config as $id => $value){
-					if(isset($_REQUEST[$id])){
-						$config[$id] = $_REQUEST[$id];
-						$ldap_cnf[str_replace('ldap_','',$id)] = $_REQUEST[$id];
-					}
-					else{
-						unset($config[$id]);
-					}
+			foreach($config as $id => $value){
+				if(isset($_REQUEST[$id])){
+					$config[$id] = $_REQUEST[$id];
+					$ldap_cnf[str_replace('ldap_','',$id)] = $_REQUEST[$id];
 				}
-
-				if(ZBX_AUTH_LDAP == $config['authentication_type']){
-					$login = API::User()->ldapLogin(array(
-						'user' => $alias,
-						'password' => $passwd,
-						'cnf' => $ldap_cnf
-					));
-					if(!$login) throw new Exception();
+				else{
+					unset($config[$id]);
 				}
+			}
+
+			$result = true;
+			if(ZBX_AUTH_LDAP == $config['authentication_type']){
+				$result = CUser::ldapLogin(array('user'=>$alias,'password'=>$passwd,'cnf'=>$ldap_cnf));
+			}
 
 // If we do save and auth_type changed, reset all sessions
-				if($cur_auth_type <> $config['authentication_type']){
-					DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
-				}
-
-				if(!update_config($config)){
-					throw new Exception();
-				}
-
-				show_messages(true, _('LDAP updated.'), null);
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('LDAP'));
+			if($result && ($cur_auth_type<>$config['authentication_type'])){
+				DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid<>'.zbx_dbstr($USER_DETAILS['sessionid']));
 			}
-			catch(Exception $e){
-				show_messages(false, null, _('LDAP was not updated.'));
+
+			if($result){
+				$result=update_config($config);
+			}
+
+			show_messages($result, S_LDAP.SPACE.S_UPDATED, S_LDAP.SPACE.S_WAS_NOT.SPACE.S_UPDATED);
+
+			if($result){
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,S_LDAP);
 			}
 		}
 		else if(isset($_REQUEST['test'])){
@@ -158,13 +152,9 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$result = API::User()->ldapLogin(array(
-				'user' => $alias,
-				'password' => $passwd,
-				'cnf' => $ldap_cnf
-			));
+			$result = CUser::ldapLogin(array('user'=>$alias,'password'=>$passwd,'cnf'=>$ldap_cnf));
 
-			show_messages($result, _('LDAP login successful.'), _('LDAP login was not successful.'));
+			show_messages($result, S_LDAP.SPACE.S_LOGIN.SPACE.S_SUCCESSFUL_SMALL, S_LDAP.SPACE.S_LOGIN.SPACE.S_WAS_NOT.SPACE.S_SUCCESSFUL_SMALL);
 		}
 	}
 	else if(ZBX_AUTH_HTTP==$_REQUEST['config']){
@@ -226,7 +216,7 @@ include_once('include/page_header.php');
 	}
 
 	show_table_header(S_AUTHENTICATION_TO_ZABBIX, $auth);
-
+	
 	if(ZBX_AUTH_INTERNAL==$_REQUEST['config']){
 
 		$form_refresh_internal = get_request('form_refresh_internal',0);
@@ -246,7 +236,7 @@ include_once('include/page_header.php');
 		$action = "javascript: if(confirm('".S_SWITCHING_HTTP."')) return true; else return false;";
 		$frmAuth->addRow(S_ZABBIX_INTERNAL_AUTH.SPACE.S_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_INTERNAL == $config['authentication_type']), $action, ZBX_AUTH_INTERNAL));
 
-		$frmAuth->addItemToBottomRow(new CSubmit('save',S_SAVE));
+		$frmAuth->addItemToBottomRow(new CButton('save',S_SAVE));
 		$frmAuth->Show();
 	}
 	else if(ZBX_AUTH_LDAP==$_REQUEST['config']){
@@ -309,8 +299,8 @@ include_once('include/page_header.php');
 		$frmAuth->addRow(S_LOGIN , $usr_test);
 		$frmAuth->addRow(S_USER.SPACE.S_PASSWORD,new CPassBox('user_password'));
 
-		$frmAuth->addItemToBottomRow(new CSubmit('save',S_SAVE));
-		$frmAuth->addItemToBottomRow(new CSubmit('test',S_TEST));
+		$frmAuth->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmAuth->addItemToBottomRow(new CButton('test',S_TEST));
 		$frmAuth->Show();
 	}
 	else if(ZBX_AUTH_HTTP==$_REQUEST['config']){
@@ -332,7 +322,7 @@ include_once('include/page_header.php');
 		$action = "javascript: if(confirm('".S_SWITCHING_HTTP."')) return true; else return false;";
 		$frmAuth->addRow(S_HTTP_AUTH.SPACE.S_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_HTTP == $config['authentication_type']), $action, ZBX_AUTH_HTTP));
 
-		$frmAuth->addItemToBottomRow(new CSubmit('save',S_SAVE));
+		$frmAuth->addItemToBottomRow(new CButton('save',S_SAVE));
 		$frmAuth->Show();
 	}
 

@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,12 +35,16 @@ function get_acknowledges_by_eventid($eventid){
 	return DBselect("SELECT a.*, u.alias FROM acknowledges a LEFT JOIN users u ON u.userid=a.userid  WHERE a.eventid=$eventid");
 }
 
-function make_acktab_by_eventid($event){
+function make_acktab_by_eventid($eventid){
 	$table = new CTableInfo();
 	$table->SetHeader(array(S_TIME,S_USER, S_COMMENTS));
 
-	$acknowledges = $event['acknowledges'];
-	foreach($acknowledges as $anum => $ack){
+	$acks = get_acknowledges_by_eventid($eventid);
+
+	while($ack = DBfetch($acks)){
+		//$users = CUser::get(array('userids' => $ack['userid'],  'output' => API_OUTPUT_EXTEND));
+		//$user = reset($users);
+
 		$table->addRow(array(
 			zbx_date2str(S_ACKNOWINC_BY_EVENTS_DATE_FORMAT,$ack['clock']),
 			$ack['alias'],

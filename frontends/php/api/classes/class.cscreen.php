@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,20 +30,28 @@ class CScreen extends CZBXAPI{
 /**
  * Get Screen data
  *
- * @param array $options
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $options
  * @param array $options['nodeids'] Node IDs
  * @param boolean $options['with_items'] only with items
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
+ * @param int $options['extendoutput'] return all fields for Hosts
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in host names
  * @param int $options['limit'] limit selection
  * @param string $options['order'] deprecated parameter (for now)
  * @return array|boolean Host data as array or false if error
  */
-	public function get($options=array()){
+	public static function get($options=array()){
+		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = self::$userData['type'];
+		$user_type = $USER_DETAILS['type'];
 
 		$sort_columns = array('screenid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -52,11 +60,9 @@ class CScreen extends CZBXAPI{
 		$sql_parts = array(
 			'select' => array('screens' => 's.screenid'),
 			'from' => array('screens' => 'screens s'),
-			'where' => array('template' => 's.templateid IS NULL'),
+			'where' => array(),
 			'order' => array(),
-			'group' => array(),
-			'limit' => null
-		);
+			'limit' => null);
 
 		$def_options = array(
 			'nodeids'					=> null,
@@ -68,16 +74,15 @@ class CScreen extends CZBXAPI{
 // filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 
 // OutPut
+			'extendoutput'				=> null,
 			'output'					=> API_OUTPUT_REFER,
-			'selectScreenItems'			=> null,
+			'select_screenitems'		=> null,
 			'countOutput'				=> null,
-			'groupCount'				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
@@ -87,17 +92,15 @@ class CScreen extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		if(is_array($options['output'])){
-			unset($sql_parts['select']['screens']);
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
 
-			$dbTable = DB::getSchema('screens');
-			foreach($options['output'] as $key => $field){
-				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = 's.'.$field;
+			if(!is_null($options['select_screenitems'])){
+				$options['select_screenitems'] = API_OUTPUT_EXTEND;
 			}
-
-			$options['output'] = API_OUTPUT_CUSTOM;
 		}
+
+// editable + PERMISSION CHECK
 
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
@@ -119,6 +122,18 @@ class CScreen extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('si.screenitemid', $options['screenitemids']);
 		}
 
+// extendoutput
+		if($options['output'] == API_OUTPUT_EXTEND){
+			$sql_parts['select']['screens'] = 's.*';
+		}
+
+// countOutput
+		if(!is_null($options['countOutput'])){
+			$options['sortfield'] = '';
+
+			$sql_parts['select'] = array('count(DISTINCT s.screenid) as rowscount');
+		}
+
 // filter
 		if(is_array($options['filter'])){
 			zbx_db_filter('screens s', $options, $sql_parts);
@@ -127,24 +142,6 @@ class CScreen extends CZBXAPI{
 // search
 		if(is_array($options['search'])){
 			zbx_db_search('screens s', $options, $sql_parts);
-		}
-
-// output
-		if($options['output'] == API_OUTPUT_EXTEND){
-			$sql_parts['select']['screens'] = 's.*';
-		}
-
-// countOutput
-		if(!is_null($options['countOutput'])){
-			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(DISTINCT s.screenid) as rowscount');
-
-// groupCount
-			if(!is_null($options['groupCount'])){
-				foreach($sql_parts['group'] as $key => $fields){
-					$sql_parts['select'][$key] = $fields;
-				}
-			}
 		}
 
 // order
@@ -171,18 +168,15 @@ class CScreen extends CZBXAPI{
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['group'] = array_unique($sql_parts['group']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
 
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
-		$sql_group = '';
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['group']))		$sql_group.= ' GROUP BY '.implode(',',$sql_parts['group']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
@@ -190,15 +184,11 @@ class CScreen extends CZBXAPI{
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('s.screenid', $nodeids).
 					$sql_where.
-				$sql_group.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($screen = DBfetch($res)){
 			if(!is_null($options['countOutput'])){
-				if(!is_null($options['groupCount']))
-					$result[] = $screen;
-				else
-					$result = $screen['rowscount'];
+				$result = $screen['rowscount'];
 			}
 			else{
 				$screenids[$screen['screenid']] = $screen['screenid'];
@@ -209,11 +199,11 @@ class CScreen extends CZBXAPI{
 				else{
 					if(!isset($result[$screen['screenid']])) $result[$screen['screenid']]= array();
 
-					if(!is_null($options['selectScreenItems']) && !isset($result[$screen['screenid']]['screenitems'])){
+					if(!is_null($options['select_screenitems']) && !isset($result[$screen['screenid']]['screenitems'])){
 						$result[$screen['screenid']]['screenitems'] = array();
 					}
 
-					if(isset($screen['screenitemid']) && is_null($options['selectScreenItems'])){
+					if(isset($screen['screenitemid']) && is_null($options['select_screenitems'])){
 						if(!isset($result[$screen['screenid']]['screenitems']))
 							$result[$screen['screenid']]['screenitems'] = array();
 
@@ -226,7 +216,6 @@ class CScreen extends CZBXAPI{
 			}
 		}
 
-// editable + PERMISSION CHECK
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){}
 		else if(!empty($result)){
 			$groups_to_check = array();
@@ -287,7 +276,7 @@ sdii($screens_to_check);
 								'nodeids' => $nodeids,
 								'groupids' => $groups_to_check,
 								'editable' => $options['editable']);
-			$allowed_groups = API::HostGroup()->get($group_options);
+			$allowed_groups = CHostgroup::get($group_options);
 			$allowed_groups = zbx_objectValues($allowed_groups, 'groupid');
 
 // host
@@ -295,7 +284,7 @@ sdii($screens_to_check);
 								'nodeids' => $nodeids,
 								'hostids' => $hosts_to_check,
 								'editable' => $options['editable']);
-			$allowed_hosts = API::Host()->get($host_options);
+			$allowed_hosts = CHost::get($host_options);
 			$allowed_hosts = zbx_objectValues($allowed_hosts, 'hostid');
 
 // graph
@@ -303,32 +292,30 @@ sdii($screens_to_check);
 								'nodeids' => $nodeids,
 								'graphids' => $graphs_to_check,
 								'editable' => $options['editable']);
-			$allowed_graphs = API::Graph()->get($graph_options);
+			$allowed_graphs = CGraph::get($graph_options);
 			$allowed_graphs = zbx_objectValues($allowed_graphs, 'graphid');
 
 // item
 			$item_options = array(
-				'nodeids' => $nodeids,
-				'itemids' => $items_to_check,
-				'webitems' => 1,
-				'editable' => $options['editable']
-			);
-			$allowed_items = API::Item()->get($item_options);
+								'nodeids' => $nodeids,
+								'itemids' => $items_to_check,
+								'webitems' => 1,
+								'editable' => $options['editable']);
+			$allowed_items = CItem::get($item_options);
 			$allowed_items = zbx_objectValues($allowed_items, 'itemid');
 // map
 			$map_options = array(
-				'nodeids' => $nodeids,
-				'sysmapids' => $maps_to_check,
-				'editable' => $options['editable']
-			);
-			$allowed_maps = API::Map()->get($map_options);
+								'nodeids' => $nodeids,
+								'sysmapids' => $maps_to_check,
+								'editable' => $options['editable']);
+			$allowed_maps = CMap::get($map_options);
 			$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
 // screen
 			$screens_options = array(
 								'nodeids' => $nodeids,
 								'screenids' => $screens_to_check,
 								'editable' => $options['editable']);
-			$allowed_screens = API::Screen()->get($screens_options);
+			$allowed_screens = CScreen::get($screens_options);
 			$allowed_screens = zbx_objectValues($allowed_screens, 'screenid');
 
 
@@ -351,7 +338,7 @@ SDI('/////////////////////////////////');
 // group
 			foreach($restr_groups as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if((bccomp($screen_item['resourceid'],$resourceid) == 0) &&
+					if(($screen_item['resourceid'] == $resourceid) &&
 						uint_in_array($screen_item['resourcetype'], array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO,SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW,SCREEN_RESOURCE_HOSTGROUP_TRIGGERS))
 					){
 						unset($result[$screen_item['screenid']]);
@@ -362,7 +349,7 @@ SDI('/////////////////////////////////');
 // host
 			foreach($restr_hosts as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if((bccomp($screen_item['resourceid'],$resourceid) == 0) &&
+					if(($screen_item['resourceid'] == $resourceid) &&
 						uint_in_array($screen_item['resourcetype'], array(SCREEN_RESOURCE_HOST_TRIGGERS))
 					){
 						unset($result[$screen_item['screenid']]);
@@ -373,7 +360,7 @@ SDI('/////////////////////////////////');
 // graph
 			foreach($restr_graphs as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if((bccomp($screen_item['resourceid'],$resourceid) == 0) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_GRAPH)){
+					if(($screen_item['resourceid'] == $resourceid) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_GRAPH)){
 						unset($result[$screen_item['screenid']]);
 						unset($screens_items[$screen_itemid]);
 					}
@@ -382,7 +369,7 @@ SDI('/////////////////////////////////');
 // item
 			foreach($restr_items as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if((bccomp($screen_item['resourceid'],$resourceid) == 0) &&
+					if(($screen_item['resourceid'] == $resourceid) &&
 						uint_in_array($screen_item['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))
 					){
 						unset($result[$screen_item['screenid']]);
@@ -393,7 +380,7 @@ SDI('/////////////////////////////////');
 // map
 			foreach($restr_maps as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if((bccomp($screen_item['resourceid'],$resourceid) == 0) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_MAP)){
+					if($screen_item['resourceid'] == $resourceid && ($screen_item['resourcetype'] == SCREEN_RESOURCE_MAP)){
 						unset($result[$screen_item['screenid']]);
 						unset($screens_items[$screen_itemid]);
 					}
@@ -402,7 +389,7 @@ SDI('/////////////////////////////////');
 // screen
 			foreach($restr_screens as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
-					if((bccomp($screen_item['resourceid'],$resourceid) == 0) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_SCREEN)){
+					if($screen_item['resourceid'] == $resourceid && ($screen_item['resourcetype'] == SCREEN_RESOURCE_SCREEN)){
 						unset($result[$screen_item['screenid']]);
 						unset($screens_items[$screen_itemid]);
 					}
@@ -411,12 +398,13 @@ SDI('/////////////////////////////////');
 		}
 
 		if(!is_null($options['countOutput'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
 
 // Adding ScreenItems
-		if(!is_null($options['selectScreenItems']) && str_in_array($options['selectScreenItems'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_screenitems']) && str_in_array($options['select_screenitems'], $subselects_allowed_outputs)){
 			if(!isset($screens_items)){
 				$screens_items = array();
 				$db_sitems = DBselect('SELECT * FROM screens_items WHERE '.DBcondition('screenid', $screenids));
@@ -442,12 +430,27 @@ SDI('/////////////////////////////////');
 	return $result;
 	}
 
-	public function exists($data){
+	public static function getObjects($data){
+		$options = array(
+			'filter' => $data,
+			'output'=>API_OUTPUT_EXTEND
+		);
+
+		if(isset($data['node']))
+			$options['nodeids'] = getNodeIdByNodeName($data['node']);
+		else if(isset($data['nodeids']))
+			$options['nodeids'] = $data['nodeids'];
+
+		$result = self::get($options);
+
+	return $result;
+	}
+
+	public static function exists($data){
 		$keyFields = array(array('screenid', 'name'));
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $data),
-			'preservekeys' => 1,
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => 1,
 			'limit' => 1
@@ -458,12 +461,12 @@ SDI('/////////////////////////////////');
 		else if(isset($data['nodeids']))
 			$options['nodeids'] = $data['nodeids'];
 
-		$screens = $this->get($options);
+		$sysmaps = self::get($options);
 
-		return !empty($screens);
+	return !empty($sysmaps);
 	}
 
-	protected function checkItems($screenitems){
+	protected static function checkItems($screenitems){
 		$hostgroups = array();
 		$hosts = array();
 		$graphs = array();
@@ -484,7 +487,7 @@ SDI('/////////////////////////////////');
 
 			if(isset($item['resourceid']) && ($item['resourceid'] == 0)){
 				if(uint_in_array($item['resourcetype'], $resources))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource provided for screen item'));
+					throw new Exception(S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				else
 					continue;
 			}
@@ -517,40 +520,40 @@ SDI('/////////////////////////////////');
 		}
 
 		if(!empty($hostgroups)){
-			$result = API::HostGroup()->get(array(
+			$result = CHostGroup::get(array(
 				'groupids' => $hostgroups,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
 			));
 			foreach($hostgroups as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect host group ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Host group identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 		if(!empty($hosts)){
-			$result = API::Host()->get(array(
+			$result = CHost::get(array(
 				'hostids' => $hosts,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
 			));
 			foreach($hosts as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect host ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Host identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 		if(!empty($graphs)){
-			$result = API::Graph()->get(array(
+			$result = CGraph::get(array(
 				'graphids' => $graphs,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
 			));
 			foreach($graphs as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect graph ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Graph identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 		if(!empty($items)){
-			$result = API::Item()->get(array(
+			$result = CItem::get(array(
 				'itemids' => $items,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
@@ -558,29 +561,29 @@ SDI('/////////////////////////////////');
 			));
 			foreach($items as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect item ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Item identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 		if(!empty($maps)){
-			$result = API::Map()->get(array(
+			$result = CMap::get(array(
 				'sysmapids' => $maps,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
 			));
 			foreach($maps as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect map ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Map identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 		if(!empty($screens)){
-			$result = $this->get(array(
+			$result = self::get(array(
 				'screenids' => $screens,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
 			));
 			foreach($screens as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect screen ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'Incorrect Screen identity "'.$id.'" provided for Screens item resource');
 			}
 		}
 	}
@@ -594,35 +597,39 @@ SDI('/////////////////////////////////');
  * @param int $screens['vsize']
  * @return array
  */
-	public function create($screens){
+	public static function create($screens){
 		$screens = zbx_toArray($screens);
+		$insert_screens = array();
 		$insert_screen_items = array();
+
+		try{
+			self::BeginTransaction(__METHOD__);
 
 			$newScreenNames = zbx_objectValues($screens, 'name');
 // Exists
 			$options = array(
 				'filter' => array('name' => $newScreenNames),
-				'output' => API_OUTPUT_EXTEND,
+				'output' => 'extend',
 				'nopermissions' => 1
 			);
-			$db_screens = $this->get($options);
+			$db_screens = self::get($options);
 			foreach($db_screens as $dbsnum => $db_screen){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$db_screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 //---
 
 			foreach($screens as $snum => $screen){
-
 				$screen_db_fields = array('name' => null);
 				if(!check_db_fields($screen_db_fields, $screen)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen [ %s ]', $screen['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen [ '.$screen['name'].' ]');
 				}
 
-				if($this->exists($screen)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
+				$iscr = array('name' => $screen['name']);
+				if(isset($screen['hsize'])) $iscr['hsize'] = $screen['hsize'];
+				if(isset($screen['vsize'])) $iscr['vsize'] = $screen['vsize'];
+				$insert_screens[$snum] = $iscr;
 			}
-			$screenids = DB::insert('screens', $screens);
+			$screenids = DB::insert('screens', $insert_screens);
 
 			foreach($screens as $snum => $screen){
 				if(isset($screen['screenitems'])){
@@ -632,9 +639,18 @@ SDI('/////////////////////////////////');
 					}
 				}
 			}
-			$this->addItems($insert_screen_items);
+			self::addItems($insert_screen_items);
 
+			self::EndTransaction(true, __METHOD__);
 			return array('screenids' => $screenids);
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
 	}
 
 /**
@@ -647,60 +663,70 @@ SDI('/////////////////////////////////');
  * @param int $screens['vsize']
  * @return boolean
  */
-	public function update($screens){
+	public static function update($screens){
 		$screens = zbx_toArray($screens);
 		$update = array();
 
-		$options = array(
-			'screenids' => zbx_objectValues($screens, 'screenid'),
-			'editable' => 1,
-			'output' => API_OUTPUT_SHORTEN,
-			'preservekeys' => 1,
-		);
-		$upd_screens = $this->get($options);
-		foreach($screens as $gnum => $screen){
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$options = array(
+				'screenids' => zbx_objectValues($screens, 'screenid'),
+				'editable' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+				'preservekeys' => 1,
+			);
+			$upd_screens = self::get($options);
+			foreach($screens as $gnum => $screen){
 				if(!isset($screen['screenid'], $upd_screens[$screen['screenid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
 			}
+
+			foreach($screens as $snum => $screen){
+				if(isset($screen['name'])){
+					$options = array(
+						'filter' => array('name' => $screen['name']),
+						'preservekeys' => 1,
+						'nopermissions' => 1,
+						'output' => API_OUTPUT_SHORTEN,
+					);
+					$exist_screens = self::get($options);
+					$exist_screen = reset($exist_screens);
+
+					if($exist_screen && ($exist_screen['screenid'] != $screen['screenid']))
+						self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
+
+				$screenid = $screen['screenid'];
+				unset($screen['screenid']);
+				if(!empty($screen)){
+					$update[] = array(
+						'values' => $screen,
+						'where' => array('screenid='.$screenid),
+					);
+				}
+
+				if(isset($screen['screenitems'])){
+					$update_items = array(
+						'screenids' => $screenid,
+						'screenitems' => $screen['screenitems'],
+					);
+					self::updateItems($update_items);
+				}
+			}
+			DB::update('screens', $update);
+
+			self::EndTransaction(true, __METHOD__);
+			return true;
 		}
-
-		foreach($screens as $snum => $screen){
-			if(isset($screen['name'])){
-				$options = array(
-					'filter' => array(
-						'name' => $screen['name'],
-					),
-					'preservekeys' => 1,
-					'nopermissions' => 1,
-					'output' => API_OUTPUT_SHORTEN,
-				);
-				$exist_screen = $this->get($options);
-				$exist_screen = reset($exist_screen);
-
-				if($exist_screen && (bccomp($exist_screen['screenid'],$screen['screenid']) != 0))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
-			}
-
-			$screenid = $screen['screenid'];
-			unset($screen['screenid']);
-			if(!empty($screen)){
-				$update[] = array(
-					'values' => $screen,
-					'where' => array('screenid' => $screenid),
-				);
-			}
-
-			if(isset($screen['screenitems'])){
-				$update_items = array(
-					'screenids' => $screenid,
-					'screenitems' => $screen['screenitems'],
-				);
-				$this->updateItems($update_items);
-			}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
 		}
-		DB::update('screens', $update);
-
-		return array('screenids' => zbx_objectValues($screens, 'screenid'));
 	}
 
 /**
@@ -709,27 +735,37 @@ SDI('/////////////////////////////////');
  * @param array $screenids
  * @return boolean
  */
-	public function delete($screenids){
+	public static function delete($screenids){
 		$screenids = zbx_toArray($screenids);
 
-		$options = array(
+		try{
+			self::BeginTransaction(__METHOD__);
+
+			$options = array(
 				'screenids' => $screenids,
 				'editable' => 1,
 				'preservekeys' => 1,
-		);
-		$del_screens = $this->get($options);
+			);
+			$del_screens = self::get($options);
+			foreach($screenids as $screenid){
+				if(!isset($del_screens[$screenid])) self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
 
-		foreach($screenids as $screenid){
-			if(!isset($del_screens[$screenid]))
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			DB::delete('screens_items', DBcondition('screenid', $screenids));
+			DB::delete('screens_items', array(DBcondition('resourceid', $screenids), 'resourcetype='.SCREEN_RESOURCE_SCREEN));
+			DB::delete('slides', DBcondition('screenid', $screenids));
+			DB::delete('screens', DBcondition('screenid', $screenids));
+
+			self::EndTransaction(true, __METHOD__);
+			return array('screenids' => $screenids);
 		}
-
-		DB::delete('screens_items', array('screenid'=>$screenids));
-		DB::delete('screens_items', array('resourceid'=>$screenids, 'resourcetype'=>SCREEN_RESOURCE_SCREEN));
-		DB::delete('slides', array('screenid'=>$screenids));
-		DB::delete('screens', array('screenid'=>$screenids));
-
-		return array('screenids' => $screenids);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
 	}
 
 /**
@@ -738,53 +774,47 @@ SDI('/////////////////////////////////');
  * @param array $screenitems
  * @return boolean
  */
-	protected function addItems($screenitems){
+	protected static function addItems($screenitems){
 		$insert = array();
 
-		$this->checkItems($screenitems);
+		self::checkItems($screenitems);
 
 		foreach($screenitems as $screenitem){
 			$items_db_fields = array(
 				'screenid' => null,
-					'resourcetype' => null,
+				'resourcetype' => null,
 				'resourceid' => null,
 				'x' => null,
 				'y' => null,
 			);
-
 			if(!check_db_fields($items_db_fields, $screenitem)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for screen items'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen items');
 			}
 
 			$insert[] = $screenitem;
 		}
-
 		DB::insert('screens_items', $insert);
-
-	return true;
+		return true;
 	}
 
-	protected function updateItems($data){
+	protected static function updateItems($data){
 		$screenids = zbx_toArray($data['screenids']);
 		$insert = array();
 		$update = array();
 		$delete = array();
 
 
-		$this->checkItems($data['screenitems']);
+		self::checkItems($data['screenitems']);
 
 		$options = array(
 			'screenids' => $screenids,
 			'nopermissions' => 1,
 			'output' => API_OUTPUT_EXTEND,
-			'selectScreenItems' => API_OUTPUT_EXTEND,
+			'select_screenitems' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
 		);
-		$screens = $this->get($options);
+		$screens = self::get($options);
 
-		$templateScreens = API::TemplateScreen()->get($options);
-
-		$screens = array_merge($screens, $templateScreens);
 
 		foreach($data['screenitems'] as $new_item){
 			$items_db_fields = array(
@@ -792,7 +822,7 @@ SDI('/////////////////////////////////');
 				'y' => null,
 			);
 			if(!check_db_fields($items_db_fields, $new_item)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for screen items'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen items');
 			}
 		}
 
@@ -805,9 +835,9 @@ SDI('/////////////////////////////////');
 
 						$tmpupd = array(
 							'where' => array(
-								'screenid' => $screen['screenid'],
-								'x' => $new_item['x'],
-								'y' => $new_item['y']
+								'screenid='.$screen['screenid'],
+								'x='.$new_item['x'],
+								'y='.$new_item['y']
 							)
 						);
 
@@ -829,7 +859,7 @@ SDI('/////////////////////////////////');
 					'resourceid' => null,
 				);
 				if(!check_db_fields($items_db_fields, $new_item)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for screen items'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for screen items');
 				}
 
 				$new_item['screenid'] = $screen['screenid'];
@@ -843,9 +873,10 @@ SDI('/////////////////////////////////');
 
 		if(!empty($insert)) DB::insert('screens_items', $insert);
 		if(!empty($update)) DB::update('screens_items', $update);
-		if(!empty($delete)) DB::delete('screens_items', array('screenitemid'=>$delete));
+		if(!empty($delete)) DB::delete('screens_items', DBcondition('screenitemid', $delete));
 
-	return true;
+		return true;
 	}
+
 }
 ?>

@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ int process_eventlog(
 	char		**out_source,
 	unsigned short	*out_severity,
 	char		**out_message,
-	unsigned long	*out_eventid,
-	unsigned char	skip_old_data);
+	unsigned long	*out_eventid);
 
 #endif /* ZABBIX_EVENTLOG_H */

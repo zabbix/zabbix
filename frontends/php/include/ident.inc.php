@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ function screenIdents($screenids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$screens = API::Screen()->get($options);
+	$screens = CScreen::get($options);
 	foreach($screens as $inum => $screen){
 		$idents[$screen['screenid']] = array(
 			'node' => get_node_name_by_elid($screen['screenid'], true),
@@ -49,7 +49,7 @@ function sysmapIdents($sysmapids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$sysmaps = API::Map()->get($options);
+	$sysmaps = CMap::get($options);
 	foreach($sysmaps as $snum => $sysmap){
 		$idents[$sysmap['sysmapid']] = array(
 			'node' => get_node_name_by_elid($sysmap['sysmapid'], true),
@@ -69,7 +69,7 @@ function hostgroupIdents($groupids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$groups = API::HostGroup()->get($options);
+	$groups = CHostgroup::get($options);
 	foreach($groups as $gnum => $group){
 		$idents[$group['groupid']] = array(
 			'node' => get_node_name_by_elid($group['groupid'], true),
@@ -89,7 +89,7 @@ function hostIdents($hostids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$hosts = API::Host()->get($options);
+	$hosts = CHost::get($options);
 	foreach($hosts as $hnum => $host){
 		$idents[$host['hostid']] = array(
 			'node' => get_node_name_by_elid($host['hostid'], true),
@@ -106,12 +106,12 @@ function itemIdents($itemids){
 	$options = array(
 		'itemids' => $itemids,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'host'),
+		'select_hosts' => array('hostid', 'host'),
 		'nodeids'=> get_current_nodeid(true),
 		'webitems' => 1,
 	);
 
-	$items = API::Item()->get($options);
+	$items = CItem::get($options);
 	foreach($items as $inum => $item){
 		$host = reset($item['hosts']);
 
@@ -130,12 +130,12 @@ function triggerIdents($triggerids){
 
 	$options = array(
 		'triggerids' => $triggerids,
-		'selectHosts' => array('hostid', 'host'),
+		'select_hosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$triggers = API::Trigger()->get($options);
+	$triggers = CTrigger::get($options);
 	foreach($triggers as $tnum => $trigger){
 		$host = reset($trigger['hosts']);
 
@@ -155,12 +155,12 @@ function graphIdents($graphids){
 
 	$options = array(
 		'graphids' => $graphids,
-		'selectHosts' => array('hostid', 'host'),
+		'select_hosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$graphs = API::Graph()->get($options);
+	$graphs = CGraph::get($options);
 	foreach($graphs as $inum => $graph){
 		$host = reset($graph['hosts']);
 
@@ -183,7 +183,7 @@ function imageIdents($imageids){
 		'nodeids'=> get_current_nodeid(true)
 	);
 
-	$images = API::Image()->get($options);
+	$images = CImage::get($options);
 	foreach($images as $inum => $image){
 		$idents[$image['imageid']] = array(
 			'node' => get_node_name_by_elid($image['imageid'], true),
@@ -208,7 +208,7 @@ function getImageByIdent($ident){
 			'nodeids' => get_current_nodeid(true)
 		);
 
-		$dbImages = API::Image()->get($options);
+		$dbImages = CImage::get($options);
 		foreach($dbImages as $inum => $img){
 			if(!isset($images[$img['name']])) $images[$img['name']] = array();
 

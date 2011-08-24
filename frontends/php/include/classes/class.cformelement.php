@@ -26,7 +26,7 @@ class CFormElement{
 	public function toString(){
 
 		$content = array();
-
+		
 		if(!is_null($this->header)){
 			$header_div = new CDiv($this->header, 'formElement_header');
 			$content[] = $header_div;

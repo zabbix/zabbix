@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,15 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.9.6');
-	define('ZABBIX_API_VERSION','1.2');
+	define('ZABBIX_VERSION','1.8.7rc1');
+	define('ZABBIX_API_VERSION','1.3');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
 	define('ZBX_LOGIN_BLOCK',				30); // sec
+
+	define('TRIGGER_FALSE_PERIOD',			1800);	// 30min, 0 - disable
+	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
 
 	define('ZBX_MIN_PERIOD',				3600);			// 1 hour
 	define('ZBX_MAX_PERIOD',				2*365*86400);	// ~2 years
@@ -47,26 +50,16 @@
 	define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT', 2);
 	define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
 
-	define('ZBX_DEFAULT_INTERVAL',		 	'1-7,00:00-24:00');
-
 // for partitioned DB installs!!
 	define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
 
 /* END OF USERS DEFINES */
-	define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
-	define('ZBX_SCRIPT_TYPE_IPMI',			1);
-	define('ZBX_SCRIPT_TYPE_SSH',			2);
-	define('ZBX_SCRIPT_TYPE_TELNET',		3);
-	define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
-
-
-	define('ZBX_SCRIPT_EXECUTE_ON_AGENT', 0);
-	define('ZBX_SCRIPT_EXECUTE_ON_SERVER', 1);
-
-	define('ZBX_FLAG_DISCOVERY_NORMAL', 0x0);
-	define('ZBX_FLAG_DISCOVERY', 0x1);
-	define('ZBX_FLAG_DISCOVERY_CHILD', 0x2);
-	define('ZBX_FLAG_DISCOVERY_CREATED', 0x4);
+	define('ZBX_MAP_HIGHLIGHT', 0x1);
+	define('ZBX_MAP_EXPANDPROBLEM', 0x2);
+	define('ZBX_MAP_MARKELEMENTS', 0x4);
+	define('ZBX_MAP_EXTACK_UNACK', 0x8);
+	define('ZBX_MAP_EXTACK_TOTAL', 0x10);
+	define('ZBX_MAP_EXTACK_SEPARATED', ZBX_MAP_EXTACK_UNACK | ZBX_MAP_EXTACK_TOTAL );
 
 	define('EXTACK_OPTION_ALL',		0);
 	define('EXTACK_OPTION_UNACK',	1);
@@ -89,12 +82,6 @@
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
 
-	define('ZBX_DB_DB2',		'IBM_DB2');
-	define('ZBX_DB_MYSQL',		'MYSQL');
-	define('ZBX_DB_ORACLE',		'ORACLE');
-	define('ZBX_DB_POSTGRESQL',		'POSTGRESQL');
-	define('ZBX_DB_SQLITE3',		'SQLITE3');
-
 	define('PAGE_TYPE_HTML',			0);
 	define('PAGE_TYPE_IMAGE',			1);
 	define('PAGE_TYPE_XML',				2);
@@ -104,8 +91,6 @@
 	define('PAGE_TYPE_JSON',			6);	// simple JSON
 	define('PAGE_TYPE_JSON_RPC',		7);	// api call
 	define('PAGE_TYPE_TEXT_FILE',		8);	// api call
-	define('PAGE_TYPE_TEXT',			9); // simple text
-	define('PAGE_TYPE_CSV',				10); // CSV format
 
 
 	define('ZBX_SESSION_ACTIVE',		0);
@@ -239,18 +224,6 @@
 	define('HOST_MAINTENANCE_STATUS_OFF',	0);
 	define('HOST_MAINTENANCE_STATUS_ON',	1);
 
-	define('INTERFACE_SECONDARY',	0);
-	define('INTERFACE_PRIMARY',		1);
-
-	define('INTERFACE_USE_DNS',		0);
-	define('INTERFACE_USE_IP',		1);
-
-	define('INTERFACE_TYPE_UNKNOWN',	0);
-	define('INTERFACE_TYPE_AGENT',		1);
-	define('INTERFACE_TYPE_SNMP',		2);
-	define('INTERFACE_TYPE_IPMI',		3);
-	define('INTERFACE_TYPE_JMX',		4);
-
 	define('MAINTENANCE_STATUS_ACTIVE',		0);
 	define('MAINTENANCE_STATUS_APPROACH',	1);
 	define('MAINTENANCE_STATUS_EXPIRED',	2);
@@ -269,15 +242,11 @@
 	define('TIMEPERIOD_TYPE_MONTHLY',	4);
 	define('TIMEPERIOD_TYPE_YEARLY',	5);
 
-	define('SYSMAP_LABEL_ADVANCED_OFF',		0);
-	define('SYSMAP_LABEL_ADVANCED_ON',		1);
-
 	define('MAP_LABEL_TYPE_LABEL',		0);
 	define('MAP_LABEL_TYPE_IP',			1);
 	define('MAP_LABEL_TYPE_NAME',		2);
 	define('MAP_LABEL_TYPE_STATUS',		3);
 	define('MAP_LABEL_TYPE_NOTHING',	4);
-	define('MAP_LABEL_TYPE_CUSTOM',		5);
 
 	define('MAP_LABEL_LOC_BOTTOM',		0);
 	define('MAP_LABEL_LOC_LEFT',		1);
@@ -290,33 +259,14 @@
 	define('SYSMAP_ELEMENT_TYPE_HOST_GROUP',3);
 	define('SYSMAP_ELEMENT_TYPE_IMAGE',		4);
 
-	define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP', 0);
-	define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS', 1);
-
-	define('SYSMAP_ELEMENT_AREA_TYPE_FIT', 0);
-	define('SYSMAP_ELEMENT_AREA_TYPE_CUSTOM', 1);
-
-	define('SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID', 0);
-
 	define('SYSMAP_ELEMENT_ICON_ON',			0);
 	define('SYSMAP_ELEMENT_ICON_OFF',			1);
+	define('SYSMAP_ELEMENT_ICON_UNKNOWN',		2);
 	define('SYSMAP_ELEMENT_ICON_MAINTENANCE',	3);
 	define('SYSMAP_ELEMENT_ICON_DISABLED',		4);
 
-	define('SYSMAP_HIGHLIGHT_OFF',		0);
-	define('SYSMAP_HIGHLIGHT_ON',		1);
-
-	define('SYSMAP_EXPANDPROBLEM_OFF',		0);
-	define('SYSMAP_EXPANDPROBLEM_ON',		1);
-
-	define('SYSMAP_MARKELEMENTS_OFF',		0);
-	define('SYSMAP_MARKELEMENTS_ON',		1);
-
-	define('SYSMAP_GRID_SHOW_ON',		1);
-	define('SYSMAP_GRID_SHOW_OFF',		0);
-
-	define('SYSMAP_GRID_ALIGN_ON',		1);
-	define('SYSMAP_GRID_ALIGN_OFF',		0);
+	define('SYSMAP_HIGHLIGH_OFF',		0);
+	define('SYSMAP_HIGHLIGH_ON',		1);
 
 	define('ITEM_TYPE_ZABBIX',			0);
 	define('ITEM_TYPE_SNMPV1',			1);
@@ -334,7 +284,6 @@
 	define('ITEM_TYPE_SSH',				13);
 	define('ITEM_TYPE_TELNET',			14);
 	define('ITEM_TYPE_CALCULATED',		15);
-	define('ITEM_TYPE_JMX',			16);
 
 	define('ITEM_VALUE_TYPE_FLOAT',		0);
 	define('ITEM_VALUE_TYPE_STR',		1);
@@ -345,7 +294,6 @@
 	define('ITEM_DATA_TYPE_DECIMAL',		0);
 	define('ITEM_DATA_TYPE_OCTAL',			1);
 	define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
-	define('ITEM_DATA_TYPE_BOOLEAN',	3);
 
 	define('ITEM_STATUS_ACTIVE',		0);
 	define('ITEM_STATUS_DISABLED',		1);
@@ -389,13 +337,7 @@
 
 	define('TRIGGER_VALUE_FALSE',		0);
 	define('TRIGGER_VALUE_TRUE',		1);
-	define('TRIGGER_VALUE_UNKNOWN',		2); // only in "events" table
-
-	define('TRIGGER_VALUE_FLAG_NORMAL',	0);
-	define('TRIGGER_VALUE_FLAG_UNKNOWN',1);
-
-	define('TRIGGER_VALUE_CHANGED_NO',	0);
-	define('TRIGGER_VALUE_CHANGED_YES',	1);
+	define('TRIGGER_VALUE_UNKNOWN',		2);
 
 	define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 	define('TRIGGER_SEVERITY_INFORMATION',		1);
@@ -403,9 +345,6 @@
 	define('TRIGGER_SEVERITY_AVERAGE',			3);
 	define('TRIGGER_SEVERITY_HIGH',				4);
 	define('TRIGGER_SEVERITY_DISASTER',			5);
-
-	define('TRIGGER_SEVERITY_COUNT',			6);
-
 
 	define('ALERT_MAX_RETRIES',		3);
 
@@ -479,15 +418,6 @@
 	define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
 	define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
 
-	define('SCREEN_TYPE_NORMAL', 0);
-	define('SCREEN_TYPE_TEMPLATED', 1);
-
-	define('DEFAULT_LATEST_ISSUES_CNT', 20);
-
-	define('SCREEN_SORT_TRIGGERS_DATE_DESC', 0);
-	define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC', 1);
-	define('SCREEN_SORT_TRIGGERS_HOST_NAME_ASC', 2);
-
 /* alignes */
 	define('HALIGN_DEFAULT',0);
 	define('HALIGN_CENTER',	0);
@@ -505,12 +435,11 @@
 
 /* view style [OVERVIEW]*/
 	define('STYLE_LEFT',	0);
-	define('STYLE_TOP',		1);
+	define('STYLE_TOP',	1);
 
 /* time module tipe */
 	define('TIME_TYPE_LOCAL',	0);
 	define('TIME_TYPE_SERVER',	1);
-	define('TIME_TYPE_HOST',	2);
 
 	define('FILTER_TASK_SHOW',			0);
 	define('FILTER_TASK_HIDE',			1);
@@ -603,9 +532,6 @@
 	define('EVENT_ACK_DISABLED',	'0');
 	define('EVENT_ACK_ENABLED',		'1');
 
-	define('EVENT_NOT_ACKNOWLEDGED',	'0');
-	define('EVENT_ACKNOWLEDGED',		'1');
-
 	define('EVENTS_NOFALSEFORB_STATUS_ALL',		0);	// used with TRIGGERS_OPTION_NOFALSEFORB
 	define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1);	// used with TRIGGERS_OPTION_NOFALSEFORB
 	define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2);	// used with TRIGGERS_OPTION_NOFALSEFORB
@@ -676,11 +602,9 @@
 	define('SVC_TCP',	8);
 	define('SVC_AGENT',	9);
 	define('SVC_SNMPv1',	10);
-	define('SVC_SNMPv2c',	11);
+	define('SVC_SNMPv2',	11);
 	define('SVC_ICMPPING',	12);
 	define('SVC_SNMPv3',	13);
-	define('SVC_HTTPS',		14);
-	define('SVC_TELNET',	15);
 
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
@@ -694,10 +618,6 @@
 	define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
 	define('EXPRESSION_TYPE_TRUE',			3);
 	define('EXPRESSION_TYPE_FALSE',			4);
-
-	define('HOST_INVENTORY_DISABLED',		-1);
-	define('HOST_INVENTORY_MANUAL',			0);
-	define('HOST_INVENTORY_AUTOMATIC',		1);
 
 	define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 	define('EXPRESSION_HOST_UNKNOWN',	'#ERROR_HOST#');
@@ -748,15 +668,30 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
-	define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
-	define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
+//	define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
+	define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER.VALUE\})');
 	define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
+
+	define('ZBX_PREG_EXPRESSION_TOKEN_FORMAT', '^(['.ZBX_PREG_PRINT.']*)('.ZBX_PREG_SIMPLE_EXPRESSION_FORMAT.'|'.ZBX_PREG_EXPRESSION_SIMPLE_MACROS.')(['.ZBX_PREG_PRINT.']*)$');
 //-------
 
 // REGEXP IDS
 	define('ZBX_KEY_ID',		1);
 	define('ZBX_KEY_NAME_ID',	2);
 	define('ZBX_KEY_PARAM_ID',	6);
+
+	define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 2);
+	define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2 + ZBX_KEY_ID);
+	define('ZBX_SIMPLE_EXPRESSION_KEY_NAME_ID', 2 + ZBX_KEY_NAME_ID);
+	define('ZBX_SIMPLE_EXPRESSION_KEY_PARAM_ID', 2 + ZBX_KEY_PARAM_ID);
+	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_ID', 3+ZBX_KEY_PARAM_ID);
+	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID', 4+ZBX_KEY_PARAM_ID);
+	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID', 6+ZBX_KEY_PARAM_ID);
+
+	define('ZBX_EXPRESSION_LEFT_ID', 1);
+	define('ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID', 2);
+	define('ZBX_EXPRESSION_MACRO_ID', 9+ZBX_KEY_PARAM_ID);
+	define('ZBX_EXPRESSION_RIGHT_ID', 10+ZBX_KEY_PARAM_ID);
 //--------
 
 	define('ZBX_HISTORY_COUNT',5);
@@ -845,7 +780,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('SEC_PER_YEAR', (365*SEC_PER_DAY));
 
 // if magic quotes on, then get rid of them
-	if(version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()){
+	if(get_magic_quotes_gpc()){
 		$_GET	 = zbx_stripslashes($_GET);
 		$_POST	 = zbx_stripslashes($_POST);
 		$_COOKIE = zbx_stripslashes($_COOKIE);
@@ -860,4 +795,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 // BC Math scale
 	bcscale(7);
+
+// Numeric Locale to default
+	setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
 ?>

@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,8 +190,8 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$form = new CForm('get');
-	$form->addItem(new CSubmit("form", S_CREATE_SLIDESHOW));
+	$form = new CForm(null, 'get');
+	$form->addItem(new CButton("form", S_CREATE_SLIDESHOW));
 
 	$slide_wdgt = new CWidget();
 	$slide_wdgt->addPageHeader(S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
@@ -263,7 +263,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO);
+		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "shows";');

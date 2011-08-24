@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,12 +45,14 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
 int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_external";
-	char		*params = NULL, *command = NULL,
+	char		*conn, *params = NULL, *command = NULL,
 			*p, *pl, *pr = NULL, error[ITEM_ERROR_LEN_MAX],
 			*buf = NULL;
 	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
+
+	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 
 	if (NULL != (pl = strchr(item->key, '[')))
 	{
@@ -70,10 +72,10 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (NULL != params)
 		command = zbx_dsprintf(command, "%s/%s %s %s",
-				CONFIG_EXTERNALSCRIPTS, item->key, item->interface.addr, params);
+				CONFIG_EXTERNALSCRIPTS, item->key, conn, params);
 	else
 		command = zbx_dsprintf(command, "%s/%s %s",
-				CONFIG_EXTERNALSCRIPTS, item->key, item->interface.addr);
+				CONFIG_EXTERNALSCRIPTS, item->key, conn);
 
 	if (SUCCEED == zbx_execute(command, &buf, error, sizeof(error), CONFIG_TIMEOUT))
 	{
@@ -83,7 +85,12 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 
-		if (SUCCEED != set_result_type(result, item->value_type, item->data_type, buf))
+		if ('\0' == *buf)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Script returned nothing"));
+			ret = NOTSUPPORTED;
+		}
+		else if (SUCCEED != set_result_type(result, item->value_type, item->data_type, buf))
 			ret = NOTSUPPORTED;
 	}
 	else

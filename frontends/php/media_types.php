@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,19 +76,19 @@ include_once('include/page_header.php');
 			'username' => get_request('username'),
 			'passwd' => get_request('password')
 		);
-
+		
 		if(is_null($mediatype['passwd'])) unset($mediatype['passwd']);
 
 		if(isset($_REQUEST['mediatypeid'])){
 			$action = AUDIT_ACTION_UPDATE;
 			$mediatype['mediatypeid'] = $_REQUEST['mediatypeid'];
 
-			$result = API::Mediatype()->update($mediatype);
+			$result = CMediatype::update($mediatype);
 			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
 		}
 		else{
 			$action = AUDIT_ACTION_ADD;
-			$result = API::Mediatype()->create($mediatype);
+			$result = CMediatype::create($mediatype);
 			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
 		}
 
@@ -98,7 +98,7 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['mediatypeid'])){
-		$result = API::Mediatype()->delete($_REQUEST['mediatypeid']);
+		$result = CMediatype::delete($_REQUEST['mediatypeid']);
 		show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
 
 		if($result){
@@ -111,7 +111,7 @@ include_once('include/page_header.php');
 		$go_result = true;
 		$media_types = get_request('media_types', array());
 
-		$go_result = API::Mediatype()->delete($media_types);
+		$go_result = CMediatype::delete($media_types);
 
 		if($go_result) unset($_REQUEST['form']);
 		show_messages($go_result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
@@ -127,10 +127,10 @@ include_once('include/page_header.php');
 <?php
 	$medias_wdgt = new CWidget();
 
-	$form = new CForm('get');
+	$form = new CForm(null, 'get');
 
 	if(!isset($_REQUEST['form']))
-		$form->addItem(new CSubmit('form', S_CREATE_MEDIA_TYPE));
+		$form->addItem(new CButton('form', S_CREATE_MEDIA_TYPE));
 
 	$medias_wdgt->addPageHeader(S_CONFIGURATION_OF_MEDIA_TYPES_BIG, $form);
 
@@ -142,11 +142,11 @@ include_once('include/page_header.php');
 				'mediatypeids' => $_REQUEST['mediatypeid'],
 				'output' => API_OUTPUT_EXTEND,
 			);
-			$mediatypes = API::Mediatype()->get($options);
+			$mediatypes = CMediatype::get($options);
 			$mediatype = reset($mediatypes);
 			$password = $mediatype['passwd'];
 		}
-
+		
 		if(isset($_REQUEST['mediatypeid']) && !isset($_REQUEST['form_refresh'])){
 			$mediatypeid = $mediatype['mediatypeid'];
 			$type = $mediatype['type'];
@@ -188,7 +188,7 @@ include_once('include/page_header.php');
 			MEDIA_TYPE_JABBER => S_JABBER,
 		));
 		$cmbType->addItemsInGroup(S_COMMERCIAL, array(MEDIA_TYPE_EZ_TEXTING => S_EZ_TEXTING));
-
+		
 		$row = array($cmbType);
 		if($type == MEDIA_TYPE_EZ_TEXTING){
 			$ez_texting_link = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
@@ -210,7 +210,7 @@ include_once('include/page_header.php');
 		}
 		else if($type == MEDIA_TYPE_JABBER || $type == MEDIA_TYPE_EZ_TEXTING){
 			if(isset($_REQUEST['mediatypeid']) && !empty($password)){
-				$chPass_btn = new CButton('chPass_btn', S_CHANGE_PASSWORD, 'this.style.display="none"; $("password").enable().show().focus();');
+				$chPass_btn = new CButton('chPass_btn', S_CHANGE_PASSWORD, 'this.style.display="none"; $("password").enable().show().focus();', false);
 				$pass_txt = new CPassBox('password', '', 30);
 				$pass_txt->setAttribute('disabled', 'disabled');
 				$pass_txt->addStyle('display: none;');
@@ -229,16 +229,17 @@ include_once('include/page_header.php');
 				$frmMedia->addRow(S_PASSWORD, $pass_fields);
 				$limit_cb = new CComboBox('exec_path', $exec_path);
 				$limit_cb->addItems(array(
-					EZ_TEXTING_LIMIT_USA => S_EZ_TEXTING_USA,
+					EZ_TEXTING_LIMIT_USA => S_EZ_TEXTING_USA, 
 					EZ_TEXTING_LIMIT_CANADA => S_EZ_TEXTING_CANADA,
 				));
 				$frmMedia->addRow(S_MESSAGE_TEXT_LIMIT, $limit_cb);
 			}
 		}
 
-		$frmMedia->addItemToBottomRow(new CSubmit('save', S_SAVE));
+		$frmMedia->addItemToBottomRow(new CButton('save', S_SAVE));
 		if(isset($_REQUEST['mediatypeid'])){
-			$frmMedia->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SELECTED_MEDIA,url_param('form').url_param('mediatypeid'))));
+			$frmMedia->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SELECTED_MEDIA,
+				url_param('form').url_param('mediatypeid'))));
 		}
 		$frmMedia->addItemToBottomRow(array(SPACE, new CButtonCancel()));
 
@@ -254,12 +255,11 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('frm_media_types');
 
-		$table=new CTableInfo(_('No media types defined.'));
+		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
 		$table->setHeader(array(
 			new CCheckBox('all_media_types', NULL, "checkAll('".$form->getName()."','all_media_types','media_types');"),
-			make_sorting_header(_('Description'),'description'),
-			make_sorting_header(_('Type'),'type'),
-			make_sorting_header(_('Used in actions'),'usedInActions'),
+			make_sorting_header(S_DESCRIPTION,'description'),
+			make_sorting_header(S_TYPE,'type'),
 			S_DETAILS
 		));
 
@@ -269,34 +269,12 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1,
-			'editable' => true,
+			'editable' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$mediatypes = API::Mediatype()->get($options);
-
-
-// Check if media types are used by existing actions
-		$options = array(
-			'mediatypeids' => zbx_objectValues($mediatypes, 'mediatypeid'),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1,
-		);
-		$actions = API::Action()->get($options);
-
-		foreach($actions as $actionid => $action){
-			if(!isset($mediatypes[$action['mediatypeid']]['listOfActions']))
-				$mediatypes[$action['mediatypeid']]['listOfActions'] = array();
-			$mediatypes[$action['mediatypeid']]['listOfActions'][] = array('actionid' => $actionid, 'name' => $action['name']);
-		}
-
-		foreach($mediatypes as $mnum => $mediatype){
-// !isset() for better default sorting
-			$mediatypes[$mnum]['usedInActions'] = !isset($mediatype['listOfActions']);
-		}
-
+		$mediatypes = CMediatype::get($options);
 		order_result($mediatypes, $sortfield, $sortorder);
 
 		$paging = getPagingLine($mediatypes);
@@ -325,25 +303,10 @@ include_once('include/page_header.php');
 					$details = '';
 			}
 
-			$actionLinks = array();
-			if(isset($mediatype['listOfActions'])){
-				order_result($mediatype['listOfActions'], 'name');
-				foreach($mediatype['listOfActions'] as $mediaaction){
-					$actionLinks[] = new CLink($mediaaction['name'],'actionconf.php?form=update&actionid='.$mediaaction['actionid']);
-					$actionLinks[] = ', ';
-				}
-				array_pop($actionLinks);
-			}
-			else{
-				$actionLinks = '-';
-			}
-
-
 			$table->addRow(array(
 				new CCheckBox('media_types['.$mediatype['mediatypeid'].']',NULL,NULL,$mediatype['mediatypeid']),
 				new CLink($mediatype['description'],'?form=update&mediatypeid='.$mediatype['mediatypeid']),
 				media_type2str($mediatype['type']),
-				$actionLinks,
 				$details
 			));
 		}
@@ -356,7 +319,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO.' (0)');
+		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "media_types";');

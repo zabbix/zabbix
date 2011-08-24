@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,14 +113,13 @@ int	CONFIG_HTTPPOLLER_FORKS		= 1;
 int	CONFIG_IPMIPOLLER_FORKS		= 0;
 int	CONFIG_TIMER_FORKS		= 1;
 int	CONFIG_TRAPPER_FORKS		= 5;
-int	CONFIG_JAVAPOLLER_FORKS		= 0;
 int	CONFIG_ESCALATOR_FORKS		= 1;
 int	CONFIG_SELFMON_FORKS		= 1;
 int	CONFIG_WATCHDOG_FORKS		= 1;
 int	CONFIG_DATASENDER_FORKS		= 0;
 int	CONFIG_HEARTBEAT_FORKS		= 0;
 
-int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
+int	CONFIG_LISTEN_PORT		= 10051;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
@@ -164,9 +163,6 @@ int	CONFIG_MASTER_NODEID		= 0;
 int	CONFIG_NODE_NOEVENTS		= 0;
 int	CONFIG_NODE_NOHISTORY		= 0;
 
-char	*CONFIG_JAVA_PROXY		= NULL;
-int	CONFIG_JAVA_PROXY_PORT		= ZBX_DEFAULT_SERVER_PORT;
-
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
@@ -174,8 +170,8 @@ int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
 
-/* From 'config' table - no need to cache ns_support */
-int	CONFIG_NS_SUPPORT		= 0;
+/* From table config */
+int	CONFIG_REFRESH_UNSUPPORTED	= 0;
 
 /* Zabbix server startup time */
 int	CONFIG_SERVER_STARTUP_TIME	= 0;
@@ -226,12 +222,6 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			1000},
 		{"StartTrappers",		&CONFIG_TRAPPER_FORKS,			TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"StartJavaPollers",		&CONFIG_JAVAPOLLER_FORKS,		TYPE_INT,
-			PARM_OPT,	0,			1000},
-		{"JavaProxy",			&CONFIG_JAVA_PROXY,			TYPE_STRING,
-			PARM_OPT,	0,			0},
-		{"JavaProxyPort",		&CONFIG_JAVA_PROXY_PORT,		TYPE_INT,
-			PARM_OPT,	1024,			32767},
 		{"CacheSize",			&CONFIG_CONF_CACHE_SIZE,		TYPE_INT,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_INT,
@@ -329,34 +319,41 @@ static void	zbx_load_config()
 		exit(1);
 	}
 
-	if ((NULL == CONFIG_JAVA_PROXY || '\0' == *CONFIG_JAVA_PROXY) && CONFIG_JAVAPOLLER_FORKS > 0)
+	if (NULL == CONFIG_PID_FILE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "JavaProxy not in config file or empty");
-		exit(1);
+		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_server.pid");
 	}
 
-	if (NULL == CONFIG_PID_FILE)
-		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_server.pid");
-
 	if (NULL == CONFIG_ALERT_SCRIPTS_PATH)
+	{
 		CONFIG_ALERT_SCRIPTS_PATH = zbx_strdup(CONFIG_ALERT_SCRIPTS_PATH, "/home/zabbix/bin");
+	}
 
 	if (NULL == CONFIG_TMPDIR)
+	{
 		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
+	}
 
 	if (NULL == CONFIG_FPING_LOCATION)
+	{
 		CONFIG_FPING_LOCATION = zbx_strdup(CONFIG_FPING_LOCATION, "/usr/sbin/fping");
-
+	}
 #ifdef HAVE_IPV6
 	if (NULL == CONFIG_FPING6_LOCATION)
+	{
 		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
+	}
 #endif
 
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
+	{
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
+	}
 
 	if (0 == CONFIG_NODEID)
+	{
 		CONFIG_NODEWATCHER_FORKS = 0;
+	}
 
 #ifdef HAVE_SQLITE3
 	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
@@ -401,7 +398,7 @@ int	main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
-	/* parse the command-line */
+	/* Parse the command-line. */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
 		switch (ch)
@@ -423,7 +420,9 @@ int	main(int argc, char **argv)
 				exit(-1);
 				break;
 			case 'n':
-				nodeid = (NULL == zbx_optarg ? 0 : atoi(zbx_optarg));
+				nodeid = 0;
+				if (zbx_optarg)
+					nodeid = atoi(zbx_optarg);
 				task = ZBX_TASK_CHANGE_NODEID;
 				break;
 			case 'V':
@@ -440,7 +439,7 @@ int	main(int argc, char **argv)
 	if (NULL == CONFIG_FILE)
 		CONFIG_FILE = zbx_strdup(CONFIG_FILE, "/etc/zabbix/zabbix_server.conf");
 
-	/* required for simple checks */
+	/* Required for simple checks */
 	init_metrics();
 
 	zbx_load_config();
@@ -540,15 +539,17 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
-	result = DBselect("select ns_support from config where 1=1" DB_NODE, DBnode_local("configid"));
+	result = DBselect("select refresh_unsupported from config where 1=1" DB_NODE,
+			DBnode_local("configid"));
 
 	if (NULL != (row = DBfetch(result)))
-		CONFIG_NS_SUPPORT = atoi(row[0]);
+		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
 	DBfree_result(result);
 
 	if (0 != CONFIG_NODEID)
 	{
-		result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
+		result = DBselect("select masterid from nodes where nodeid=%d",
+				CONFIG_NODEID);
 
 		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 			CONFIG_MASTER_NODEID = atoi(row[0]);
@@ -559,11 +560,8 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
-	DCload_config();
-
 	/* need to set trigger status to UNKNOWN since last run */
 	DBupdate_triggers_status_after_restart();
-
 	DBclose();
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC))
@@ -577,7 +575,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
 			+ CONFIG_HISTSYNCER_FORKS + CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS
-			+ CONFIG_JAVAPOLLER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS;
+			+ CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 < CONFIG_TRAPPER_FORKS)
@@ -722,12 +720,6 @@ int	MAIN_ZABBIX_ENTRY()
 
 		main_poller_loop(ZBX_POLLER_TYPE_IPMI);
 	}
-	else if (server_num <= (server_count += CONFIG_JAVAPOLLER_FORKS))
-	{
-		INIT_SERVER(ZBX_PROCESS_TYPE_JAVAPOLLER, CONFIG_JAVAPOLLER_FORKS);
-
-		main_poller_loop(ZBX_POLLER_TYPE_JAVA);
-	}
 	else if (server_num <= (server_count += CONFIG_PROXYPOLLER_FORKS))
 	{
 		INIT_SERVER(ZBX_PROCESS_TYPE_PROXYPOLLER, CONFIG_PROXYPOLLER_FORKS);
@@ -769,6 +761,10 @@ void	zbx_on_exit()
 
 		zbx_free(threads);
 	}
+
+#ifdef USE_PID_FILE
+	daemon_stop();
+#endif
 
 	free_metrics();
 

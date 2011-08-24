@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class CGraphDraw{
 			'gridcolor' => 'cccccc',
 			'maingridcolor' => 'aaaaaa',
 			'gridbordercolor' => '000000',
-			'nonworktimecolor' => 'eaeaea',
+			'noneworktimecolor' => 'eaeaea',
 			'leftpercentilecolor' => '00AA00',
 			'righttpercentilecolor' => 'AA0000',
 			'legendview' => '1',
@@ -115,6 +115,13 @@ class CGraphDraw{
 			'ValueMax'		=> array(255,180,180,50),
 			'ValueMin'		=> array(100,255,100,50),
 
+			'Priority Disaster'	=> array(255,0,0),
+			'Priority High'		=> array(255,100,100),
+			'Priority Average'	=> array(221,120,120),
+			'Priority Warning'	=> array(239,239,204),
+			'Priority Information'	=> array(204,226,204),
+			'Priority'		=> array(188,188,188),
+
 			'Not Work Period'	=> array(230,230,230),
 
 			'UnknownData'		=> array(130,130,130, 50)
@@ -134,12 +141,15 @@ class CGraphDraw{
 	}
 
 	public function applyGraphTheme($description=null){
+		global $USER_DETAILS;
 
 		if(!is_null($description)){
 			$sql_where = ' AND gt.description='.zbx_dbstr($description);
 		}
 		else{
-			$css = getUserTheme(CWebUser::$data);
+			$css = getUserTheme($USER_DETAILS);
+			if($css == 'css_od.css') $css = 'css_bb.css';
+
 			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
 		}
 
@@ -243,19 +253,19 @@ class CGraphDraw{
 
 	public function drawHeader(){
 		if(!isset($this->header)){
-			$str=$this->items[0]['hostname'].': '.$this->items[0]['name'];
+			$str=$this->items[0]['host'].': '.$this->items[0]['description'];
 		}
 		else{
 			$str=$this->header;
 		}
 
 		$str.=$this->period2str($this->period);
-
+		
 		$fontnum = 11;
 		if(($this->sizeX < 500) && ($this->type == GRAPH_TYPE_NORMAL || $this->type == GRAPH_TYPE_BAR)) $fontnum = 8;
 		$dims = imageTextSize( $fontnum, 0, $str );
 		$x = $this->fullSizeX/2-($dims['width']/2);
-
+		
 		imagetext($this->im, $fontnum, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
 	}
 

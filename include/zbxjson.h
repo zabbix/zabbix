@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,20 +23,16 @@
 #include <stdarg.h>
 
 #define ZBX_PROTO_TAG_CLOCK		"clock"
-#define ZBX_PROTO_TAG_NS		"ns"
 #define ZBX_PROTO_TAG_DATA		"data"
 #define ZBX_PROTO_TAG_REGEXP		"regexp"
-#define ZBX_PROTO_TAG_DELAY		"delay"
-#define ZBX_PROTO_TAG_DRULE		"drule"
-#define ZBX_PROTO_TAG_DCHECK		"dcheck"
+#define	ZBX_PROTO_TAG_DELAY		"delay"
+#define	ZBX_PROTO_TAG_DRULE		"drule"
+#define	ZBX_PROTO_TAG_DCHECK		"dcheck"
 #define ZBX_PROTO_TAG_HOST		"host"
 #define ZBX_PROTO_TAG_INFO		"info"
 #define ZBX_PROTO_TAG_IP		"ip"
-#define ZBX_PROTO_TAG_DNS		"dns"
-#define ZBX_PROTO_TAG_CONN		"conn"
 #define ZBX_PROTO_TAG_KEY		"key"
 #define ZBX_PROTO_TAG_KEY_ORIG		"key_orig"
-#define ZBX_PROTO_TAG_KEYS		"keys"
 #define ZBX_PROTO_TAG_LOGLASTSIZE	"lastlogsize"
 #define ZBX_PROTO_TAG_MTIME		"mtime"
 #define ZBX_PROTO_TAG_LOGTIMESTAMP	"timestamp"
@@ -56,29 +52,23 @@
 #define ZBX_PROTO_TAG_AVAILABLE		"available"
 #define ZBX_PROTO_TAG_SNMP_AVAILABLE	"snmp_available"
 #define ZBX_PROTO_TAG_IPMI_AVAILABLE	"ipmi_available"
-#define ZBX_PROTO_TAG_JMX_AVAILABLE	"jmx_available"
 #define ZBX_PROTO_TAG_ERROR		"error"
 #define ZBX_PROTO_TAG_SNMP_ERROR	"snmp_error"
 #define ZBX_PROTO_TAG_IPMI_ERROR	"ipmi_error"
-#define ZBX_PROTO_TAG_JMX_ERROR		"jmx_error"
-#define ZBX_PROTO_TAG_USERNAME		"username"
-#define ZBX_PROTO_TAG_PASSWORD		"password"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
 
-#define ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS	"active checks"
-#define ZBX_PROTO_VALUE_PROXY_CONFIG		"proxy config"
-#define ZBX_PROTO_VALUE_PROXY_HEARTBEAT		"proxy heartbeat"
+#define	ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS	"active checks"
+#define	ZBX_PROTO_VALUE_PROXY_CONFIG		"proxy config"
+#define	ZBX_PROTO_VALUE_PROXY_HEARTBEAT		"proxy heartbeat"
 #define ZBX_PROTO_VALUE_DISCOVERY_DATA		"discovery data"
 #define ZBX_PROTO_VALUE_HOST_AVAILABILITY	"host availability"
 #define ZBX_PROTO_VALUE_HISTORY_DATA		"history data"
 #define ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA	"auto registration"
-#define ZBX_PROTO_VALUE_SENDER_DATA		"sender data"
-#define ZBX_PROTO_VALUE_AGENT_DATA		"agent data"
+#define	ZBX_PROTO_VALUE_SENDER_DATA		"sender data"
+#define	ZBX_PROTO_VALUE_AGENT_DATA		"agent data"
 #define ZBX_PROTO_VALUE_COMMAND			"command"
-#define ZBX_PROTO_VALUE_JAVA_PROXY_INTERNAL	"java proxy internal"
-#define ZBX_PROTO_VALUE_JAVA_PROXY_JMX		"java proxy jmx"
 
 typedef enum
 {
@@ -129,12 +119,12 @@ void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value
 int	zbx_json_close(struct zbx_json *j);
 
 int		zbx_json_open(char *buffer, struct zbx_json_parse *jp);
+const char	*zbx_json_decodevalue(const char *p, char *string, size_t len);
 const char	*zbx_json_next(struct zbx_json_parse *jp, const char *p);
-const char	*zbx_json_next_value(struct zbx_json_parse *jp, const char *p, char *string, size_t len, int *is_null);
+const char	*zbx_json_next_value(struct zbx_json_parse *jp, const char *p, char *string, size_t len);
 const char	*zbx_json_pair_next(struct zbx_json_parse *jp, const char *p, char *name, size_t len);
 const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name);
 int		zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *string, size_t len);
-int		zbx_json_value_by_name_dyn(struct zbx_json_parse *jp, const char *name, char **string, size_t *string_alloc);
 int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp);
 int		zbx_json_brackets_by_name(struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out);
 int		zbx_json_object_is_empty(struct zbx_json_parse *jp);

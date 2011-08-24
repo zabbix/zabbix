@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 **/
 
 var CSwitcher = Class.create({
+initProc: null,		// on if init method is running
 switcherName : '',
 switchers : {},
 classOpened : 'filteropened',
@@ -39,28 +40,27 @@ initialize : function(name){
 			}
 		}
 	}
-
+	
 	var divs = $$('div[data-switcherid]');
 
 	for(var i=0; i<divs.length; i++){
 		if(!isset(i, divs)) continue;
 
 		addListener(divs[i], 'click', this.showHide.bindAsEventListener(this));
-
+		
 		var switcherid = divs[i].getAttribute('data-switcherid');
 		this.switchers[switcherid] = {};
 		this.switchers[switcherid]['object'] = divs[i];
 	}
-
-	var to_change = cookie.readArray(this.switcherName);
-	if(to_change != null){
+		
+	if((to_change = cookie.readArray(this.switcherName)) != null){
 		for(var i=0; i<to_change.length; i++){
 			if(!isset(i, to_change)) continue;
 
 			this.open(to_change[i]);
-		}
+		}	
 	}
-
+	
 	this.init = false;
 },
 
@@ -72,7 +72,7 @@ open : function(switcherid){
 			if(!isset(i, elements)) continue;
 			elements[i].style.display = '';
 		}
-
+		
 		this.switchers[switcherid]['state'] = 1;
 
 		if(this.init === false) this.storeCookie();
@@ -106,7 +106,7 @@ showHide : function(e){
 			divs[i].className = newClassName;
 		}
 	}
-
+	
 	var elements = $$('tr[data-parentid]');
 	for(var i=0; i<elements.length; i++){
 		if(empty(elements[i])) continue;
@@ -120,7 +120,7 @@ showHide : function(e){
 			}
 		}
 	}
-
+	
 	if(empty(switcherid)){
 		for(var i in this.switchers){
 			this.switchers[i]['state'] = state;
@@ -134,9 +134,9 @@ showHide : function(e){
 
 storeCookie : function(){
 //	cookie.erase(this.switcherName);
-
-	var storeArray = [];
-
+	
+	var storeArray = new Array();
+	
 	for(var i in this.switchers){
 		if(this.switchers[i]['state'] == 1){
 			storeArray.push(i);

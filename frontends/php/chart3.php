@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -116,7 +116,7 @@ include_once('include/page_header.php');
 			'nodeids' => get_current_nodeid(true),
 			'output' => API_OUTPUT_SHORTEN,
 		);
-		$db_data = API::Item()->get($options);
+		$db_data = CItem::get($options);
 		$db_data = zbx_toHash($db_data, 'itemid');
 		foreach($items as $id => $gitem){
 			if(!isset($db_data[$gitem['itemid']])) access_deny();
@@ -136,7 +136,7 @@ include_once('include/page_header.php');
 	$graph->setWidth(get_request('width',		900));
 	$graph->setHeight(get_request('height',		200));
 
-	$graph->showLegend(get_request('legend'	,1));
+//	$graph->showLegend(get_request('legend'	,1));
 
 	$graph->showWorkPeriod(get_request('showworkperiod'	,1));
 	$graph->showTriggers(get_request('showtriggers'		,1));

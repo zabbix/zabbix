@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,11 +32,6 @@
 
 		$serviceid=get_dbid("services","serviceid");
 
-		$result = DBexecute('INSERT INTO services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)'.
-							' VALUES ('.$serviceid.','.zbx_dbstr($name).',0,'.$triggerid.','.zbx_dbstr($algorithm).
-								','.$showsla.','.zbx_dbstr($goodsla).','.$sortorder.')');
-		if(!$result) return FALSE;
-
 		remove_service_links($serviceid); //removes all links with current serviceid
 
 		$result =($parentid != 0)?(add_service_link($serviceid,$parentid,0)):(true); //add parent
@@ -46,6 +41,13 @@
 			$result = add_service_link($child['serviceid'],$serviceid,$child['soft']);
 		}
 
+		if(!$result){
+			return FALSE;
+		}
+
+		$result=DBexecute('INSERT INTO services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)'.
+							' VALUES ('.$serviceid.','.zbx_dbstr($name).',0 ,'.$triggerid.' ,'.zbx_dbstr($algorithm).
+								' ,'.$showsla.','.zbx_dbstr($goodsla).','.$sortorder.')');
 		if(!$result) return FALSE;
 
 		update_services_status_all(); // updating status to all services by the dependency
@@ -531,6 +533,26 @@ if($serviceid == 1 || $serviceid == 2){
 
 	return $sla_time;
 	}
+
+	// function get_service_status_description($status){
+		// $desc=new CSpan(S_OK_BIG,'green');
+		// if(TRIGGER_SEVERITY_DISASTER == $status){
+			// $desc=new CTag('div','yes',S_DISASTER,'disaster');
+		// }
+		// else if(TRIGGER_SEVERITY_HIGH == $status){
+			// $desc=new CTag('div','yes',S_SERIOUS_PROBLEM,'high');
+		// }
+		// else if(TRIGGER_SEVERITY_AVERAGE == $status){
+			// $desc=new CTag('div','yes',S_AVERAGE_PROBLEM,'average');
+		// }
+		// else if(TRIGGER_SEVERITY_WARNING == $status){
+			// $desc=new CTag('div','yes',S_MINOR_PROBLEM,'warning');
+		// }
+		// else if(TRIGGER_SEVERITY_INFORMATION == $status){
+			// $desc=new CSpan(S_OK_BIG,'green');
+		// }
+	// return $desc;
+	// }
 
 	function get_service_by_serviceid($serviceid){
 		$res = DBfetch(DBselect("SELECT * FROM services WHERE serviceid=".$serviceid));

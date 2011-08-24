@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 // Tech. Support: http://www.softcomplex.com/forum/forumdisplay.php?fid=40
 // Notes: This script is free. Visit official site for further details.
 //        This script adapted by Eugene Grigorjev for using as popup menu
-//        of Zabbix software. See http://www.zabbix.com.
+//        of ZABBIX software. See http://www.zabbix.com.
 //debugger;
 
 function show_popup_menu(e, content, width){
@@ -38,7 +38,7 @@ function show_popup_menu(e, content, width){
 
 	var cursor = get_cursor_position(e);
 
-	new popup_menu(content, pos, cursor.x, cursor.y);
+	new popup_menu (content, pos, cursor.x, cursor.y);
 
 	return false;
 }
@@ -254,8 +254,7 @@ function menu_onmouseout (n_id) {
 	o_item.upstatus(7);
 
 	// run mouseover timer
-	this.o_hidetimer = setTimeout('if(typeof(A_MENUS['+ this.n_id +']) != "undefined") A_MENUS['+ this.n_id +'].collapse();',
-			o_item.getprop('hide_delay'));
+	this.o_hidetimer = setTimeout('A_MENUS['+ this.n_id +'].collapse();', o_item.getprop('hide_delay'));
 }
 
 // --------------------------------------------------------------------------------
@@ -304,6 +303,7 @@ function menu_onmousedown (n_id) {
 
 // --------------------------------------------------------------------------------
 // menu item Class
+
 function menu_item (o_parent, n_order) {
 
 	// store parameters passed to the constructor
@@ -385,9 +385,7 @@ function menu_item (o_parent, n_order) {
 		this.n_y -= this.getprop('height') * (o_parent.a_config.length - item_offset);
 	}
 
-	if(!is_null(this.a_config[1])
-		&& (this.a_config[1].indexOf('javascript') == -1)
-		&& !(!is_null(this.a_config[2]) || this.a_config[2] == 'nosid')){
+	if(!is_null(this.a_config[1]) && (this.a_config[1].indexOf('javascript') == -1)){
 		var url = new Curl(this.a_config[1]);
 		this.a_config[1] = url.getUrl();
 	}
@@ -420,43 +418,16 @@ function menu_item (o_parent, n_order) {
 	var eldiv = document.createElement('div');
 	eldiv.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id +'i');
 	eldiv.className = this.getstyle(1, 0);
-
-	//truncating long strings - they don't fit in the popup menu'
-	if(typeof(this.a_config[0])=='string' && this.a_config[0].length > 35)
-		eldiv.setAttribute('title', this.a_config[0]);
-
 	eldiv.innerHTML = this.a_config[0];
-
 	el.appendChild(eldiv);
-
+	
 //	console.log(el,el.innerHTML);
 	document.body.appendChild(el);
-
 
 	this.e_ielement = document.getElementById('e' + o_root.n_id + '_' + this.n_id + 'i');
 	this.e_oelement = document.getElementById('e' + o_root.n_id + '_' + this.n_id + 'o');
 
 	this.b_visible = !this.n_depth;
-
-	var newResult = 0;
-	var nText = '';
-
-	newResult = (this.e_ielement.scrollWidth - this.getprop('width'));
-	if(newResult > 0){
-		// anti down
-		var x=500;
-		while(x){
-			newResult = (this.e_ielement.scrollWidth - this.getprop('width'));
-			nText = this.e_ielement.innerHTML;
-			this.e_ielement.innerHTML = nText.substring(0, nText.length-10);
-			x--;
-			if(newResult < 1) {
-				this.e_ielement.innerHTML += '...';
-				x=0;
-				break;
-			}
-		}
-	}
 
 	// no more initialization if leaf
 	if (this.a_config.length < item_offset)
@@ -503,6 +474,8 @@ function mitem_getstyle (n_pos, n_state) {
 	if(!a_css)
 		a_css = this.o_root.a_css_def;
 
+	//var a_css = this.o_root.a_css;
+
 	var a_oclass = a_css[n_pos ? 'inner' : 'outer'];
 
 	// same class for all states
@@ -511,7 +484,7 @@ function mitem_getstyle (n_pos, n_state) {
 
 
 	// inherit class from previous state if not explicitly defined
-	for(var n_currst = n_state; n_currst >= 0; n_currst--){
+	for (var n_currst = n_state; n_currst >= 0; n_currst--){
 		if(a_oclass[n_currst]) return a_oclass[n_currst];
 	}
 }

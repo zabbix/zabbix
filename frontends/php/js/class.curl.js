@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -15,13 +15,17 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**/
+**/ 
+// JavaScript Document
 
+/************************************************************************************/
+/*								URL MANIPULATION CLASS 								*/
+/************************************************************************************/
 // Author: Aly
 var Curl = Class.create();
 
 Curl.prototype = {
-url: 		'',		//	actually, it's deprecated/private variable
+url: 		'',		//	actually, it's deprecated/private variable 
 port:		 -1,
 host: 		'',
 protocol: 	'',
@@ -34,14 +38,14 @@ query:		'',
 args:		null,
 
 initialize: function(url){
-	url = url || location.href;
+	var url = url || location.href;
 
 	this.url = url;
 	this.args = {};
 
 	this.query=(this.url.indexOf('?')>=0)?this.url.substring(this.url.indexOf('?')+1):'';
 	if(this.query.indexOf('#')>=0) this.query=this.query.substring(0,this.query.indexOf('#'));
-
+	
 	var protocolSepIndex=this.url.indexOf('://');
 	if(protocolSepIndex>=0){
 		this.protocol=this.url.substring(0,protocolSepIndex).toLowerCase();
@@ -60,7 +64,7 @@ initialize: function(url){
 			}
 			this.host=this.host.substring(atIndex+1);
 		}
-
+		
 		var host_ipv6 = this.host.indexOf(']');
 		if(host_ipv6>=0){
 			if(host_ipv6 < (this.host.length-1)){
@@ -83,13 +87,13 @@ initialize: function(url){
 		}
 		this.file=this.url.substring(protocolSepIndex+3);
 		this.file=this.file.substring(this.file.indexOf('/'));
-
+		
 		if(this.file == this.host) this.file = '';
 	}
 	else{
 		this.file=this.url;
 	}
-
+	
 	if(this.file.indexOf('?')>=0) this.file=this.file.substring(0, this.file.indexOf('?'));
 
 	var refSepIndex=this.file.indexOf('#');
@@ -122,8 +126,8 @@ addSID: function(){
 
 formatQuery: function(){
 	if(this.args.lenght < 1) return;
-
-	var query = [];
+	
+	var query = new Array();
 	for(var key in this.args){
 		if((typeof(this.args[key]) != 'undefined') && !is_null(this.args[key])){
 			query.push(key+'='+encodeURIComponent(this.args[key]));
@@ -178,7 +182,7 @@ getArguments: function(){
 
 getUrl: function(){
 	this.formatQuery();
-
+ 
 	var url = this.protocol.length > 0 ? this.protocol+'://':'';
 	url +=  this.username.length > 0 ? encodeURI(this.username):'';
 	url +=  this.password.length > 0 ? encodeURI(':'+this.password):'';
@@ -187,7 +191,7 @@ getUrl: function(){
 	url +=  this.path.length > 0 ? encodeURI(this.path):'';
 	url +=  this.query.length > 0 ? '?'+this.query:'';
 	url +=  this.reference.length > 0 ? encodeURI('#'+this.reference):'';
-
+	
 return url;
 },
 
@@ -195,7 +199,7 @@ setPort: function(port){
 	this.port = port;
 },
 
-getPort: function(){
+getPort: function(){ 
 	return this.port;
 },
 
@@ -204,13 +208,13 @@ setQuery: function(query){
 	if(this.query.indexOf('?')>=0){
 		this.query= this.query.substring(this.query.indexOf('?')+1);
 	}
-
+	
 	this.formatArguments();
 
 	this.addSID();
 },
 
-getQuery: function(){
+getQuery: function(){ 
 	this.formatQuery();
 	return this.query;
 },
@@ -272,4 +276,4 @@ getPath: function(){
 setPath: function(path){
 	this.path = path;
 }
-};
+}

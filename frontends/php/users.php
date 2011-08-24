@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,9 +111,9 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['save'])){
-		$config = select_config();
+		$config = select_config();		
 		$auth_type = isset($_REQUEST['userid']) ? get_user_system_auth($_REQUEST['userid']) : $config['authentication_type'];
-
+		
 		if(isset($_REQUEST['userid']) && (ZBX_AUTH_INTERNAL != $auth_type)){
 			$_REQUEST['password1'] = $_REQUEST['password2'] = null;
 		}
@@ -124,7 +124,7 @@ include_once('include/page_header.php');
 			$_REQUEST['password1'] = get_request('password1', null);
 			$_REQUEST['password2'] = get_request('password2', null);
 		}
-
+		
 		if($_REQUEST['password1'] != $_REQUEST['password2']){
 			if(isset($_REQUEST['userid']))
 				show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
@@ -144,6 +144,7 @@ include_once('include/page_header.php');
 			$user['alias'] = get_request('alias');
 			$user['passwd'] = get_request('password1');
 			$user['url'] = get_request('url');
+			$user['autologin'] = get_request('autologin', 0);
 			$user['autologout'] = get_request('autologout', 0);
 			$user['lang'] = get_request('lang');
 			$user['theme'] = get_request('theme');
@@ -162,13 +163,13 @@ include_once('include/page_header.php');
 				$user['userid'] = $_REQUEST['userid'];
 
 				DBstart();
-				$result = API::User()->update(array($user));
-
-				if($result !== false)
-					$result = API::User()->updateMedia(array(
-						'users' => $user,
-						'medias' => $user['user_medias']
-					));
+				$result = CUser::update($user);
+				if(!$result)
+					error(CUser::resetErrors());
+				// if($result)	$result = CUserGroup::updateUsers(array('users' => $user, 'usrgrps' => $usrgrps));
+				// if($result === false)
+					// error(CUserGroup::resetErrors());
+				if($result !== false) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
 
@@ -178,8 +179,12 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_ADD;
 
 				DBstart();
-				$result = API::User()->create($user);
-
+				$result = CUser::create($user);
+				if(!$result)
+					error(CUser::resetErrors());
+				// if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
+				// if($result === false)
+					// error(CUserGroup::resetErrors());
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
 
@@ -208,10 +213,11 @@ include_once('include/page_header.php');
 
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['userid'])){
-		$users = API::User()->get(array('userids' => $_REQUEST['userid'],  'output' => API_OUTPUT_EXTEND));
+		$users = CUser::get(array('userids' => $_REQUEST['userid'],  'output' => API_OUTPUT_EXTEND));
 		$user = reset($users);
 
-		$result = API::User()->delete($users);
+		$result = CUser::delete($users);
+		if(!$result) error(CUser::resetErrors());
 
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
 		if($result){
@@ -223,10 +229,10 @@ include_once('include/page_header.php');
 	}
 // Add USER to GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==1)){
-		$user = API::User()->get(array('userids'=>$_REQUEST['userid'],'output'=>API_OUTPUT_EXTEND));
+		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
 		$user = reset($user);
 
-		$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'output' => API_OUTPUT_EXTEND));
+		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'output' => API_OUTPUT_EXTEND));
 		$group = reset($group);
 
 		DBstart();
@@ -246,10 +252,10 @@ include_once('include/page_header.php');
 	}
 // Remove USER from GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==0)){
-		$user = API::User()->get(array('userids'=>$_REQUEST['userid'],'output'=>API_OUTPUT_EXTEND));
+		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
 		$user = reset($user);
 
-		$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'output' => API_OUTPUT_EXTEND));
+		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'output' => API_OUTPUT_EXTEND));
 		$group = reset($group);
 
 		DBstart();
@@ -282,7 +288,7 @@ include_once('include/page_header.php');
 				'userids'=>$group_userid,
 				'output' => API_OUTPUT_EXTEND
 			);
-			$users = API::User()->get($options);
+			$users = CUser::get($options);
 			foreach($users as $unum => $user){
 				info('User '.$user['alias'].' unblocked');
 				add_audit(AUDIT_ACTION_UPDATE,	AUDIT_RESOURCE_USER,
@@ -296,7 +302,7 @@ include_once('include/page_header.php');
 		$go_result = false;
 
 		$group_userid = get_request('group_userid', array());
-		$db_users = API::User()->get(array('userids' => $group_userid, 'output' => API_OUTPUT_EXTEND));
+		$db_users = CUser::get(array('userids' => $group_userid, 'output' => API_OUTPUT_EXTEND));
 		$db_users = zbx_toHash($db_users, 'userid');
 
 		DBstart();
@@ -304,7 +310,8 @@ include_once('include/page_header.php');
 			if(!isset($db_users[$userid])) continue;
 			$user_data = $db_users[$userid];
 
-			$go_result |= (bool) API::User()->delete($user_data);
+			$go_result |= (bool) CUser::delete($user_data);
+			if(!$go_result) error(CUser::resetErrors());
 
 			if($go_result){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
@@ -328,11 +335,11 @@ include_once('include/page_header.php');
 	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid', CProfile::get('web.users.filter.usrgrpid', 0));
 	CProfile::update('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 
-	$frmForm = new CForm('get');
+	$frmForm = new CForm(null, 'get');
 	$cmbConf = new CComboBox('config', 'users.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('usergrps.php', S_USER_GROUPS);
 		$cmbConf->addItem('users.php', S_USERS);
-	$frmForm->addItem(array($cmbConf, new CSubmit('form', S_CREATE_USER)));
+	$frmForm->addItem(array($cmbConf, new CButton('form', S_CREATE_USER)));
 
 	$user_wdgt = new CWidget();
 	$user_wdgt->addPageHeader(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
@@ -344,7 +351,7 @@ include_once('include/page_header.php');
 		$user_wdgt->addItem($userForm);
 	}
 	else{
-		$form = new CForm('get');
+		$form = new CForm(null, 'get');
 
 		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
 		$cmbUGrp->addItem(0, S_ALL_S);
@@ -353,7 +360,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => 'name'
 		);
-		$usrgrps = API::UserGroup()->get($options);
+		$usrgrps = CUserGroup::get($options);
 		foreach($usrgrps as $ugnum => $usrgrp){
 			$cmbUGrp->addItem($usrgrp['usrgrpid'], $usrgrp['name']);
 		}
@@ -367,7 +374,7 @@ include_once('include/page_header.php');
 		$user_wdgt->addHeader(S_USERS_BIG, $form);
 		$user_wdgt->addHeader($numrows);
 
-		$form = new CForm();
+		$form = new CForm(null,'post');
 		$form->setName('users');
 
 		$table=new CTableInfo(S_NO_USERS_DEFINED);
@@ -381,6 +388,7 @@ include_once('include/page_header.php');
 			S_IS_ONLINE_Q,
 			S_LOGIN,
 			S_GUI_ACCESS,
+			S_API_ACCESS,
 			S_DEBUG_MODE,
 			S_STATUS
 		));
@@ -388,15 +396,15 @@ include_once('include/page_header.php');
 // User table
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'selectUsrgrps' => API_OUTPUT_EXTEND,
-			'getAccess' => 1,
+			'select_usrgrps' => API_OUTPUT_EXTEND,
+			'get_access' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
 		if($_REQUEST['filter_usrgrpid'] > 0){
 			$options['usrgrpids'] = $_REQUEST['filter_usrgrpid'];
 		}
 
-		$users = API::User()->get($options);
+		$users = CUser::get($options);
 
 // sorting
 		order_result($users, getPageSortField('alias'), getPageSortOrder());
@@ -463,6 +471,7 @@ include_once('include/page_header.php');
 
 			$gui_access = new CSpan($gui_access, $gui_access_style);
 			$users_status = ($user['users_status'] == 1) ? new CSpan(S_DISABLED, 'red') : new CSpan(S_ENABLED, 'green');
+			$api_access = ($user['api_access'] == GROUP_API_ACCESS_ENABLED) ? new CSpan(S_ENABLED, 'orange') : new CSpan(S_DISABLED, 'green');
 			$debug_mode = ($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) ? new CSpan(S_ENABLED, 'orange') : new CSpan(S_DISABLED, 'green');
 
 			$table->addRow(array(
@@ -475,6 +484,7 @@ include_once('include/page_header.php');
 				$online,
 				$blocked,
 				$gui_access,
+				$api_access,
 				$debug_mode,
 				$users_status
 			));
@@ -494,7 +504,7 @@ include_once('include/page_header.php');
 
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton', S_GO);
+		$goButton = new CButton('goButton', S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
@@ -509,7 +519,7 @@ include_once('include/page_header.php');
 
 		$user_wdgt->addItem($form);
 	}
-
+	
 	$user_wdgt->show();
 
 

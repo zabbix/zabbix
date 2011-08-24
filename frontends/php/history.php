@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ if(isset($_REQUEST['plaintext'])) define('ZBX_PAGE_NO_MENU', 1);
 else if(PAGE_TYPE_HTML == $page['type']) define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once('include/page_header.php');
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -70,8 +71,8 @@ include_once('include/page_header.php');
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	null,	null)
 	);
-
 	check_fields($fields);
+
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
@@ -148,11 +149,11 @@ include_once('include/page_header.php');
 		'nodeids' => get_current_nodeid(),
 		'itemids' => $_REQUEST['itemid'],
 		'webitems' => 1,
-		'selectHosts' => array('hostid','name'),
+		'select_hosts' => array('hostid','host'),
 		'output' => API_OUTPUT_EXTEND
 	);
 
-	$items = API::Item()->get($options);
+	$items = CItem::get($options);
 	$items = zbx_toHash($items, 'itemid');
 
 	foreach($_REQUEST['itemid'] as $inum =>  $itemid){
@@ -161,7 +162,7 @@ include_once('include/page_header.php');
 
 	$item = reset($items);
 	$host = reset($item['hosts']);
-	$item['hostname'] = $host['name'];
+	$item['host'] = $host['host'];
 
 // resets get params for proper page refresh
 	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
@@ -194,9 +195,9 @@ include_once('include/page_header.php');
 	);
 
 	if(count($items) == 1){
-		$ptData['header'][] = $item['hostname'].': '.itemName($item);
+		$ptData['header'][] = $item['host'].': '.item_description($item);
 
-		$header['left'] = array(new CLink($item['hostname'], 'latest.php?hostid='.$item['hostid']), ': ', itemName($item));
+		$header['left'] = array(new CLink($item['host'],'latest.php?hostid='.$item['hostid']),': ',item_description($item));
 
 		if('showgraph' == $_REQUEST['action']){
 			$header['right'][] = get_icon('favourite', array(
@@ -207,7 +208,7 @@ include_once('include/page_header.php');
 		}
 	}
 
-	$form = new CForm('get');
+	$form = new CForm(null, 'get');
 	$form->addVar('itemid', $_REQUEST['itemid']);
 
 	if(isset($_REQUEST['filter_task']))	$form->addVar('filter_task',$_REQUEST['filter_task']);
@@ -223,7 +224,7 @@ include_once('include/page_header.php');
 	$form->addItem($cmbAction);
 
 	if($_REQUEST['action'] != 'showgraph')
-		$form->addItem(array(SPACE, new CSubmit('plaintext',S_AS_PLAIN_TEXT)));
+		$form->addItem(array(SPACE, new CButton('plaintext',S_AS_PLAIN_TEXT)));
 
 	array_unshift($header['right'], $form, SPACE);
 //--
@@ -254,7 +255,7 @@ include_once('include/page_header.php');
 				}
 
 				$host = reset($item['hosts']);
-				$cmbitemlist->addItem($itemid,$host['name'].': '.itemName($item));
+				$cmbitemlist->addItem($itemid,$host['host'].': '.item_description($item));
 			}
 
 			$addItemBttn = new CButton('add_log',S_ADD,"return PopUp('popup.php?multiselect=1".'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
@@ -262,7 +263,7 @@ include_once('include/page_header.php');
 
 			if(count($items) > 1){
 				insert_js_function('removeSelectedItems');
-				$delItemBttn = new CSubmit('remove_log',S_REMOVE_SELECTED, "javascript: removeSelectedItems('cmbitemlist_', 'itemid')");
+				$delItemBttn = new CButton('remove_log',S_REMOVE_SELECTED, "javascript: removeSelectedItems('cmbitemlist[]', 'itemid')");
 			}
 
 			$filterForm->addRow(S_ITEMS_LIST, array($cmbitemlist, BR(), $addItemBttn, $delItemBttn));
@@ -289,7 +290,7 @@ include_once('include/page_header.php');
 
 			$filterForm->addRow(S_SELECTED, $tmp);
 
-			$filterForm->addItemToBottomRow(new CSubmit('select',S_FILTER));
+			$filterForm->addItemToBottomRow(new CButton('select',S_FILTER));
 		}
 // ------
 
@@ -338,7 +339,7 @@ include_once('include/page_header.php');
 			}
 
 			$options['sortfield'] = 'id';
-			$hData = API::History()->get($options);
+			$hData = CHistory::get($options);
 
 			foreach($hData as $hnum => $data){
 				$color_style = null;
@@ -367,7 +368,7 @@ include_once('include/page_header.php');
 				$row = array(nbsp(zbx_date2str(S_HISTORY_LOG_ITEM_DATE_FORMAT, $data['clock'])));
 
 				if($fewItems)
-					$row[] = $host['hostname'].':'.itemName($item);
+					$row[] = $host['host'].':'.item_description($item);
 
 				if($logItem){
 					$row[] = ($data['timestamp'] == 0) ? '-' : zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT, $data['timestamp']);
@@ -385,6 +386,7 @@ include_once('include/page_header.php');
 				$data['value'] = encode_log(trim($data['value'], "\r\n"));
 				$row[] = new CCol($data['value'], 'pre');
 
+
 				$crow = new CRow($row);
 				if(is_null($color_style)){
 					$min_color = 0x98;
@@ -395,7 +397,7 @@ include_once('include/page_header.php');
 					$crow->setAttribute('style','background-color: '.sprintf("#%X%X%X",$int_color,$int_color,$int_color));
 				}
 				else if(!is_null($color_style)){
-					$crow->setAttribute('class', $color_style);
+					$crow->setClass($color_style);
 				}
 
 				$table->addRow($crow);
@@ -413,7 +415,7 @@ include_once('include/page_header.php');
 			$table->setHeader(array(S_TIMESTAMP, S_VALUE));
 
 			$options['sortfield'] = 'clock';
-			$hData = API::History()->get($options);
+			$hData = CHistory::get($options);
 			foreach($hData as $hnum => $data){
 				$item = $items[$data['itemid']];
 				$host = reset($item['hosts']);
@@ -558,7 +560,7 @@ function addPopupValues(list){
 		for(var i=0; i < list.values.length; i++){
 			if(!isset(i, list.values) || empty(list.values[i])) continue;
 
-			create_var('zbx_filter', 'itemid['+list.values[i].itemid+']', list.values[i].itemid, false);
+			create_var('zbx_filter', 'itemid['+list.values[i]+']', list.values[i], false);
 		}
 
 		$('zbx_filter').submit();

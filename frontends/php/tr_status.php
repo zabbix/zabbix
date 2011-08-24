@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,14 +19,21 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/acknow.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/events.inc.php');
+	require_once('include/scripts.inc.php');
 
-$page['file'] = 'tr_status.php';
-$page['title'] = 'S_STATUS_OF_TRIGGERS';
-$page['hist_arg'] = array('groupid', 'hostid');
-$page['scripts'] = array('class.cswitcher.js');
+	$page['file'] = 'tr_status.php';
+	$page['title'] = 'S_STATUS_OF_TRIGGERS';
+	$page['scripts'] = array('effects.js');
+	$page['hist_arg'] = array('groupid', 'hostid');
+	$page['scripts'] = array('class.cswitcher.js');
 
-$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+
 ?>
 <?php
 if($page['type'] == PAGE_TYPE_HTML){
@@ -35,8 +42,6 @@ if($page['type'] == PAGE_TYPE_HTML){
 
 include_once('include/page_header.php');
 
-// js templates
-require_once('include/views/js/general.script.confirm.js.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -164,7 +169,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 <?php
 	$trigg_wdgt = new CWidget();
 
-	$r_form = new CForm('get');
+	$r_form = new CForm(null, 'get');
 	$r_form->addItem(array(S_GROUP . SPACE, $pageFilter->getGroupsCB(true)));
 	$r_form->addItem(array(SPACE . S_HOST . SPACE, $pageFilter->getHostsCB(true)));
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
@@ -212,12 +217,12 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$severity_select = new CComboBox('show_severity', $show_severity);
 	$cb_items = array(
 		-1 => S_ALL_S,
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
-		TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
-		TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
-		TRIGGER_SEVERITY_AVERAGE => getSeverityCaption(TRIGGER_SEVERITY_AVERAGE),
-		TRIGGER_SEVERITY_HIGH => getSeverityCaption(TRIGGER_SEVERITY_HIGH),
-		TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER),
+		TRIGGER_SEVERITY_NOT_CLASSIFIED => S_NOT_CLASSIFIED,
+		TRIGGER_SEVERITY_INFORMATION => S_INFORMATION,
+		TRIGGER_SEVERITY_WARNING => S_WARNING,
+		TRIGGER_SEVERITY_AVERAGE => S_AVERAGE,
+		TRIGGER_SEVERITY_HIGH => S_HIGH,
+		TRIGGER_SEVERITY_DISASTER => S_DISASTER,
 	);
 	$severity_select->addItems($cb_items);
 	$filterForm->addRow(S_MIN_SEVERITY, $severity_select);
@@ -242,8 +247,8 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 	$filterForm->addRow(S_FILTER_BY_NAME, new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
 
-	$filterForm->addItemToBottomRow(new CSubmit('filter_set', S_FILTER));
-	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', S_RESET));
+	$filterForm->addItemToBottomRow(new CButton('filter_set', S_FILTER));
+	$filterForm->addItemToBottomRow(new CButton('filter_rst', S_RESET));
 
 	$trigg_wdgt->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
 /*************** FILTER END ******************/
@@ -254,7 +259,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$triggerInfo->show();
 	}
 
-	$m_form = new CForm('get','acknow.php');
+	$m_form = new CForm('acknow.php');
 	$m_form->setName('tr_status');
 	$m_form->addVar('backurl', $page['file']);
 
@@ -280,7 +285,6 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$config['event_ack_enable'] ? $header_cb : null,
 		make_sorting_header(S_SEVERITY, 'priority'),
 		S_STATUS,
-		S_INFO,
 		make_sorting_header(S_LAST_CHANGE, 'lastchange'),
 		S_AGE,
 		$show_event_col ? S_DURATION : NULL,
@@ -336,7 +340,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$options['lastChangeSince'] = time() - ($_REQUEST['status_change_days'] * 86400);
 	}
 
-	$triggers = API::Trigger()->get($options);
+	$triggers = CTrigger::get($options);
 
 // sorting && paging
 	order_result($triggers, $sortfield, $sortorder);
@@ -346,12 +350,11 @@ require_once('include/views/js/general.script.confirm.js.php');
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
-		'selectItems' => API_OUTPUT_EXTEND,
-		'selectDependencies' => API_OUTPUT_EXTEND
+		'select_hosts' => array('hostid', 'host', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'select_items' => API_OUTPUT_EXTEND,
+		'select_dependencies' => API_OUTPUT_EXTEND
 	);
-	$triggers = API::Trigger()->get($options);
-
+	$triggers = CTrigger::get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');
 
 	order_result($triggers, $sortfield, $sortorder);
@@ -360,17 +363,14 @@ require_once('include/views/js/general.script.confirm.js.php');
 	if($config['event_ack_enable']){
 		foreach($triggers as $tnum => $trigger){
 			$options = array(
-				'countOutput' => true,
+				'countOutput' => 1,
 				'triggerids' => $trigger['triggerid'],
-				'filter' => array(
-					'object' => EVENT_OBJECT_TRIGGER,
-					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
-					'acknowledged' => 0,
-					'value' => TRIGGER_VALUE_TRUE,
-				),
-				'nopermissions' => true
+				'object' => EVENT_OBJECT_TRIGGER,
+				'acknowledged' => 0,
+				'value' => TRIGGER_VALUE_TRUE,
+				'nopermissions' => 1
 			);
-			$triggers[$tnum]['event_count'] = API::Event()->get($options);
+			$triggers[$tnum]['event_count'] = CEvent::get($options);
 		}
 	}
 
@@ -386,22 +386,18 @@ require_once('include/views/js/general.script.confirm.js.php');
 	}
 
 
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($tr_hostids);
+	$scripts_by_hosts = Cscript::getScriptsByHosts($tr_hostids);
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
 			'nodeids' => get_current_nodeid(),
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-			'filter' => array(
-				'value_changed' => TRIGGER_VALUE_CHANGED_YES,
-			),
+			'nopermissions' => 1,
 			'output' => API_OUTPUT_EXTEND,
-			'select_acknowledges' => API_OUTPUT_COUNT,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),
 			'sortfield' => 'eventid',
 			'sortorder' => ZBX_SORT_DOWN,
-			'nopermissions' => true,
 			//'limit' => $config['event_show_max']
 		);
 
@@ -409,12 +405,12 @@ require_once('include/views/js/general.script.confirm.js.php');
 			case EVENTS_OPTION_ALL:
 			break;
 			case EVENTS_OPTION_NOT_ACK:
-				$ev_options['acknowledged'] = false;
+				$ev_options['acknowledged'] = 0;
 				$ev_options['value'] = TRIGGER_VALUE_TRUE;
 			break;
 		}
 
-		$events = API::Event()->get($ev_options);
+		$events = CEvent::get($ev_options);
 		order_result($events, 'clock', ZBX_SORT_DOWN);
 
 		foreach($events as $enum => $event){
@@ -424,29 +420,29 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 
 	foreach($triggers as $tnum => $trigger){
-
+		
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
 
 		$items = array();
 
 		$used_hosts = array();
 		foreach($trigger['hosts'] as $th){
-			$used_hosts[$th['hostid']] = $th['name'];
+			$used_hosts[$th['hostid']] = $th['host'];
 		}
 		$used_host_count = count($used_hosts);
-
+		
 		foreach($trigger['items'] as $inum => $item){
-			$item_name = itemName($item);
+			$item_description = item_description($item);
 
 			//if we have items from different hosts, we must prefix a host name
 			if ($used_host_count > 1) {
-				$item_name = $used_hosts[$item['hostid']].':'.$item_name;
+				$item_description = $used_hosts[$item['hostid']].':'.$item_description;
 			}
 
 			$items[$inum]['itemid'] = $item['itemid'];
 			$items[$inum]['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 			$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-			$items[$inum]['name'] = $item_name;
+			$items[$inum]['description'] = $item_description;
 		}
 		$trigger['items'] = $items;
 
@@ -459,10 +455,9 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$hosts = reset($trigger['hosts']);
 
 		$menu_trigger_conf = 'null';
-		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
-			$str_tmp = zbx_jsvalue('javascript: redirect("triggers.php?form=update&triggerid='.
-					$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid']).'")');
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',". $str_tmp .",
+		if($admin_links){
+			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript:
+				redirect('triggers.php?form=update&triggerid=".$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid'])."')\",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
@@ -472,12 +467,12 @@ require_once('include/views/js/general.script.confirm.js.php');
 		}
 
 		$description->addAction('onclick',
-			"javascript: create_mon_trigger_menu(event, [{'triggerid': '".$trigger['triggerid'].
-				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."],".
+			"javascript: create_mon_trigger_menu(event, new Array({'triggerid': '".$trigger['triggerid'].
+				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
 			zbx_jsvalue($items, true).");"
 		);
 
-
+		
 // }}} trigger description js menu
 
 		if($_REQUEST['show_details']){
@@ -539,18 +534,12 @@ require_once('include/views/js/general.script.confirm.js.php');
 			if(isset($scripts_by_hosts[$trigger_host['hostid']])){
 				foreach($scripts_by_hosts[$trigger_host['hostid']] as $id => $script){
 					$script_nodeid = id2nodeid($script['scriptid']);
-					if( (bccomp($host_nodeid, $script_nodeid ) == 0)){
-						$str_tmp = zbx_jsvalue('javascript: executeScript('.$trigger_host['hostid'].', '.
-								$script['scriptid'].', '.
-								zbx_jsvalue($script['confirmation']).
-								')');
-
-						$menus.= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-					}
+					if( (bccomp($host_nodeid, $script_nodeid ) == 0))
+						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger_host['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 			}
 			if(!empty($scripts_by_hosts)){
-				$menus = "[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
+				$menus = "[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 			}
 
 			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
@@ -558,8 +547,8 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 			$menus = rtrim($menus,',');
 			$menus = 'show_popup_menu(event,['.$menus.'],180);';
-
-
+			
+			
 
 			$maint_span = null;
 			if($trigger_host['maintenance_status']){
@@ -571,7 +560,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 					'maintenanceids' => $trigger_host['maintenanceid'],
 					'output' => API_OUTPUT_EXTEND
 				);
-				$maintenances = API::Maintenance()->get($maintenanceOptions);
+				$maintenances = CMaintenance::get($maintenanceOptions);
 				$maintenance = reset($maintenances);
 
 				$maint_hint = new CSpan($maintenance['name'].($maintenance['description']=='' ? '' : ': '.$maintenance['description']));
@@ -579,11 +568,16 @@ require_once('include/views/js/general.script.confirm.js.php');
 				$maint_span->setHint($maint_hint);
 			}
 
-			$hosts_span = new CSpan($trigger_host['name'], 'link_menu');
+			
+
+
+			$hosts_span = new CSpan($trigger_host['host'], 'link_menu');
 			$hosts_span->setAttribute('onclick','javascript: '.$menus);
 			$hosts_list[] = $hosts_span;
 			$hosts_list[] = $maint_span;
 			$hosts_list[] = ', ';
+
+			
 		}
 
 		array_pop($hosts_list);
@@ -591,15 +585,12 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$host->addStyle('white-space: normal;');
 // }}} host JS menu
 
-		$statusSpan = new CSpan(trigger_value2str($trigger['value']));
-		// add colors and blinking to span depending on configuration and trigger parameters
-		addTriggerValueStyle(
-			$statusSpan,
-			$trigger['value'],
-			$trigger['lastchange'],
-			$trigger['event_count'] == 0
-		);
+		
 
+		$status = new CSpan(trigger_value2str($trigger['value']), get_trigger_value_style($trigger['value']));
+		if((time() - $trigger['lastchange']) < TRIGGER_BLINK_PERIOD){
+			$status->setAttribute('name', 'blink');
+		}
 		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
 		//.'&stime='.date('YmdHis', $trigger['lastchange']
 
@@ -628,25 +619,15 @@ require_once('include/views/js/general.script.confirm.js.php');
 		}
 
 
-		$severity_col = getSeverityCell($trigger['priority'], null, !$trigger['value']);
+		$severity_col = new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value']));
 		if($show_event_col) $severity_col->setColSpan(2);
-
-
-// Unknown triggers
-		$unknown = SPACE;
-		if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
-			$unknown = new CDiv(SPACE,'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], '', 'on');
-		}
-//----
 
 		$table->addRow(array(
 			$open_close,
 			$config['event_ack_enable'] ?
 				($show_event_col ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', null, $trigger['triggerid'])) : null,
 			$severity_col,
-			$statusSpan,
-			$unknown,
+			$status,
 			$lastchange,
 			zbx_date2age($trigger['lastchange']),
 			$show_event_col ? SPACE : NULL,
@@ -664,19 +645,23 @@ require_once('include/views/js/general.script.confirm.js.php');
 			foreach($trigger['events'] as $enum => $row_event){
 				$i++;
 
-				$eventStatusSpan = new CSpan(trigger_value2str($row_event['value']));
-				// add colors and blinking to span depending on configuration and trigger parameters
-				addTriggerValueStyle(
-					$eventStatusSpan,
-					$row_event['value'],
-					$row_event['clock'],
-					$row_event['acknowledged']
-				);
+				$status = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));
 
-				$statusSpan = new CCol($eventStatusSpan);
-				$statusSpan->setColSpan(2);
-
-				$ack = getEventAckState($row_event);
+				if($config['event_ack_enable']){
+					if($row_event['value'] == TRIGGER_VALUE_TRUE){
+						if($row_event['acknowledged'] == 1){
+							$acks_cnt = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM acknowledges WHERE eventid='.$row_event['eventid']));
+							$ack = array(new CSpan(S_YES, 'off'),SPACE.'('.$acks_cnt['cnt'].SPACE,
+								new CLink(S_SHOW,'acknow.php?eventid='.$row_event['eventid'].'&backurl='.$page['file']),')');
+						}
+						else{
+							$ack = new CLink(S_NOT_ACKNOWLEDGED, 'acknow.php?eventid='.$row_event['eventid'].'&backurl='.$page['file'], 'on');
+						}
+					}
+					else{
+						$ack = SPACE;
+					}
+				}
 
 				if(($row_event['acknowledged'] == 0) && ($row_event['value'] == TRIGGER_VALUE_TRUE)){
 					$ack_cb = new CCheckBox('events['.$row_event['eventid'].']', 'no', NULL, $row_event['eventid']);
@@ -696,7 +681,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 				$row = new CRow(array(
 					SPACE,
 					$config['event_ack_enable'] ? $ack_cb_col : null,
-					$statusSpan,
+					$status,
 					$clock,
 					zbx_date2age($row_event['clock']),
 					zbx_date2age($next_clock, $row_event['clock']),
@@ -721,7 +706,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$goBox->addItem('bulkacknowledge', S_BULK_ACKNOWLEDGE);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton', S_GO.' (0)');
+		$goButton = new CButton('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id', 'goButton');
 
 		$show_event_col ? zbx_add_post_js('chkbxRange.pageGoName = "events";') : zbx_add_post_js('chkbxRange.pageGoName = "triggers";');
@@ -735,7 +720,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$trigg_wdgt->addItem($m_form);
 	$trigg_wdgt->show();
 
-	zbx_add_post_js('jqBlink.init();');
+	zbx_add_post_js('blink.init();');
 	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
 
 	$jsmenu = new CPUMenu(null, 170);

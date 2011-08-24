@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,13 +26,14 @@ class CFormTable extends CForm{
 	private $title;
 	private $tableclass = 'formtable';
 
+
 	protected $top_items = array();
 	protected $center_items = array();
 	protected $bottom_items = array();
 
 	public function __construct($title=null, $action=null, $method=null, $enctype=null, $form_variable=null){
 		$method = is_null($method) ? 'post' : $method;
-		parent::__construct($method, $action, $enctype);
+		parent::__construct($action, $method, $enctype);
 
 		$this->setTitle($title);
 		$this->setHelp();
@@ -58,8 +59,8 @@ class CFormTable extends CForm{
 		if(!is_string($value)){
 			return $this->error('Incorrect value for setAlign ['.$value.']');
 		}
-		$this->attr('name', $value);
-		$this->attr('id', zbx_formatDomId($value));
+		$this->setAttribute('name',$value);
+		$this->setAttribute('id',$value);
 	return true;
 	}
 
@@ -93,7 +94,7 @@ class CFormTable extends CForm{
 	return 0;
 	}
 
-	public function addRow($item1, $item2=NULL, $class=NULL, $id=null){
+	public function addRow($item1, $item2=NULL, $class=NULL){
 		if(is_object($item1) && zbx_strtolower(get_class($item1)) == 'crow'){
 		}
 		else if(is_object($item1) && zbx_strtolower(get_class($item1)) == 'ctable'){
@@ -103,6 +104,7 @@ class CFormTable extends CForm{
 			$item1 = new CRow($td);
 		}
 		else{
+			$tmp = $item1;
 			if(is_string($item1)){
 				$item1 = nbsp($item1);
 			}
@@ -110,14 +112,13 @@ class CFormTable extends CForm{
 			if(empty($item1)) $item1 = SPACE;
 			if(empty($item2)) $item2 = SPACE;
 
-			$item1 = new CRow(array(
-				new CCol($item1, 'form_row_l'),
-				new CCol($item2, 'form_row_r')
-			), $class);
+			$item1 = new CRow(
+							array(
+								new CCol($item1,'form_row_l'),
+								new CCol($item2,'form_row_r')
+							),
+							$class);
 		}
-
-		if(!is_null($id))
-			$item1->attr('id', zbx_formatDomId($id));
 
 		array_push($this->center_items, $item1);
 
@@ -125,11 +126,14 @@ class CFormTable extends CForm{
 	}
 
 	public function addSpanRow($value, $class=NULL){
+		if(is_string($value))
+			$item1=nbsp($value);
+
 		if(is_null($value)) $value = SPACE;
 		if(is_null($class)) $class = 'form_row_c';
 
 		$col = new CCol($value,$class);
-		$col->setColSpan(2);
+			$col->setColSpan(2);
 		array_push($this->center_items,new CRow($col));
 	}
 

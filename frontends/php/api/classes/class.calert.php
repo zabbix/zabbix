@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,11 +46,12 @@ class CAlert extends CZBXAPI{
  * @param array $options['order']
  * @return array|int item data as array or false if error
  */
-	public function get($options=array()){
+	public static function get($options=array()){
+		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = self::$userData['type'];
-		$userid = self::$userData['userid'];
+		$user_type = $USER_DETAILS['type'];
+		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('alertid','clock','eventid','status'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
@@ -62,7 +63,7 @@ class CAlert extends CZBXAPI{
 			'where' => array(),
 			'order' => array(),
 			'limit' => null,
-			);
+		);
 
 		$def_options = array(
 			'nodeids'				=> null,
@@ -79,7 +80,6 @@ class CAlert extends CZBXAPI{
 // filter
 			'filter'				=> null,
 			'search'				=> null,
-			'searchByAny'			=> null,
 			'startSearch'			=> null,
 			'excludeSearch'			=> null,
 			'time_from'				=> null,
@@ -87,10 +87,11 @@ class CAlert extends CZBXAPI{
 			'searchWildcardsEnabled'=> null,
 
 // OutPut
+			'extendoutput'			=> null,
 			'output'				=> API_OUTPUT_REFER,
-			'selectMediatypes'		=> null,
-			'selectUsers'			=> null,
-			'selectHosts'			=> null,
+			'select_mediatypes'		=> null,
+			'select_users'			=> null,
+			'select_hosts'			=> null,
 			'countOutput'			=> null,
 			'preservekeys'			=> null,
 			'editable'				=> null,
@@ -102,14 +103,24 @@ class CAlert extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+
+			if(!is_null($options['select_mediatypes'])){
+				$options['select_mediatypes'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_users'])){
+				$options['select_users'] = API_OUTPUT_EXTEND;
+			}
+		}
+
+
 		if(is_array($options['output'])){
 			unset($sql_parts['select']['alerts']);
-
-			$dbTable = DB::getSchema('alerts');
-			$sql_parts['select']['alertid'] = 'a.alertid';
+			$sql_parts['select']['alertid'] = ' a.alertid';
 			foreach($options['output'] as $key => $field){
-				if(isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = 'a.'.$field;
+				$sql_parts['select'][$field] = ' a.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -279,7 +290,7 @@ class CAlert extends CZBXAPI{
 			$sql_parts['where'][] = 'a.clock<'.$options['time_till'];
 		}
 
-// output
+// extendoutput
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['alerts'] = 'a.*';
 		}
@@ -356,16 +367,16 @@ class CAlert extends CZBXAPI{
 				else{
 					if(!isset($result[$alert['alertid']])) $result[$alert['alertid']]= array();
 
-					if(!is_null($options['selectMediatypes']) && !isset($result[$alert['alertid']]['mediatypes'])){
+					if(!is_null($options['select_mediatypes']) && !isset($result[$alert['alertid']]['mediatypes'])){
 						$result[$alert['alertid']]['mediatypes'] = array();
 					}
 
-					if(!is_null($options['selectUsers']) && !isset($result[$alert['alertid']]['users'])){
+					if(!is_null($options['select_users']) && !isset($result[$alert['alertid']]['users'])){
 						$result[$alert['alertid']]['users'] = array();
 					}
 
 // hostids
-					if(isset($alert['hostid']) && is_null($options['selectHosts'])){
+					if(isset($alert['hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$alert['alertid']]['hosts']))
 							$result[$alert['alertid']]['hosts'] = array();
 
@@ -373,14 +384,14 @@ class CAlert extends CZBXAPI{
 //						unset($alert['hostid']);
 					}
 // userids
-					if(isset($alert['userid']) && is_null($options['selectUsers'])){
+					if(isset($alert['userid']) && is_null($options['select_users'])){
 						if(!isset($result[$alert['alertid']]['users']))
 							$result[$alert['alertid']]['users'] = array();
 
 						$result[$alert['alertid']]['users'][] = array('userid' => $alert['userid']);
 					}
 // mediatypeids
-					if(isset($alert['mediatypeid']) && is_null($options['selectMediatypes'])){
+					if(isset($alert['mediatypeid']) && is_null($options['select_mediatypes'])){
 						if(!isset($result[$alert['alertid']]['mediatypes']))
 							$result[$alert['alertid']]['mediatypes'] = array();
 
@@ -394,6 +405,7 @@ class CAlert extends CZBXAPI{
 
 COpt::memoryPick();
 		if(!is_null($options['countOutput'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
@@ -403,27 +415,27 @@ COpt::memoryPick();
 		$mediatypes = array();
 
 // Adding hosts
-		if(!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['selectHosts'],
+				'output' => $options['select_hosts'],
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
-			$hosts = API::Host()->get($obj_params);
+			$hosts = CHost::get($obj_params);
 		}
 
 // Adding Users
-		if(!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_users']) && str_in_array($options['select_users'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['selectUsers'],
+				'output' => $options['select_users'],
 				'userids' => $userids,
 				'preservekeys' => 1
 			);
-			$users = API::User()->get($obj_params);
+			$users = CUser::get($obj_params);
 		}
 
 // Adding MediaTypes
-		if(!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_mediatypes']) && str_in_array($options['select_mediatypes'], $subselects_allowed_outputs)){
 			$sql = 'SELECT mt.* FROM media_type mt WHERE '.DBcondition('mt.mediatypeid', $mediatypeids);
 			$res = DBselect($sql);
 			while($media = DBfetch($res)){
@@ -467,46 +479,57 @@ COpt::memoryPick();
  * @param array $alerts[0,...]['url'] OPTIONAL
  * @return boolean
  */
-	public function create($alerts){
+	public static function create($alerts){
 		$alerts = zbx_toArray($alerts);
 		$alertids = array();
+		$result = false;
 
-			foreach($alerts as $anum => $alert){
-				$alert_db_fields = array(
-					'actionid'		=> null,
-					'eventid'		=> null,
-					'userid'		=> null,
-					'clock'			=> time(),
-					'mediatypeid'	=> 0,
-					'sendto'		=> null,
-					'subject'		=> '',
-					'message'		=> '',
-					'status'		=> ALERT_STATUS_NOT_SENT,
-					'retries'		=> 0,
-					'error'			=> '',
-					'nextcheck'		=> null,
-					'esc_step'		=> 0,
-					'alerttype'		=> ALERT_TYPE_MESSAGE
-				);
+		self::BeginTransaction(__METHOD__);
+		foreach($alerts as $anum => $alert){
+			$alert_db_fields = array(
+				'actionid'		=> null,
+				'eventid'		=> null,
+				'userid'		=> null,
+				'clock'			=> time(),
+				'mediatypeid'	=> 0,
+				'sendto'		=> null,
+				'subject'		=> '',
+				'message'		=> '',
+				'status'		=> ALERT_STATUS_NOT_SENT,
+				'retries'		=> 0,
+				'error'			=> '',
+				'nextcheck'		=> null,
+				'esc_step'		=> 0,
+				'alerttype'		=> ALERT_TYPE_MESSAGE
+			);
 
-				if(!check_db_fields($alert_db_fields, $alert)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for Alert');
-				}
-
-				$alertid = get_dbid('alerts', 'alertid');
-				$sql = 'INSERT INTO alerts '.
-						'(alertid, actionid, eventid, userid, mediatypeid, clock, sendto, subject, message, status, retries, error, nextcheck, esc_step, alerttype) '.
-						' VALUES ('.$alertid.','.$alert['actionid'].','.$alert['eventid'].','.$alert['userid'].','.$alert['mediatypeid'].','.
-									$alert['clock'].','.zbx_dbstr($alert['sendto']).','.zbx_dbstr($alert['subject']).','.zbx_dbstr($alert['message']).','.
-									$alert['status'].','.$alert['retries'].','.zbx_dbstr($alert['error']).','.$alert['nextcheck'].','.
-									$alert['esc_step'].','.$alert['alerttype'].' )';
-				if(!DBexecute($sql))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
-				$alertids[] = $alertid;
+			if(!check_db_fields($alert_db_fields, $alert)){
+				$result = false;
+				break;
 			}
 
+			$alertid = get_dbid('alerts', 'alertid');
+			$sql = 'INSERT INTO alerts '.
+					'(alertid, actionid, eventid, userid, mediatypeid, clock, sendto, subject, message, status, retries, error, nextcheck, esc_step, alerttype) '.
+					' VALUES ('.$alertid.','.$alert['actionid'].','.$alert['eventid'].','.$alert['userid'].','.$alert['mediatypeid'].','.
+								$alert['clock'].','.zbx_dbstr($alert['sendto']).','.zbx_dbstr($alert['subject']).','.zbx_dbstr($alert['message']).','.
+								$alert['status'].','.$alert['retries'].','.zbx_dbstr($alert['error']).','.$alert['nextcheck'].','.
+								$alert['esc_step'].','.$alert['alerttype'].' )';
+			$result = DBexecute($sql);
+			if(!$result) break;
+
+			$alertids[] = $alertid;
+		}
+
+		$result = self::EndTransaction($result, __METHOD__);
+
+		if($result){
 			return array('alertids'=>$alertids);
+		}
+		else{
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
+			return false;
+		}
 	}
 
 /**
@@ -515,26 +538,44 @@ COpt::memoryPick();
  * @param array $alertids
  * @return boolean
  */
-	public function delete($alertids){
+	public static function delete($alertids){
+		$alerts = zbx_toArray($alerts);
+		$alertids = array();
+		$result = false;
+//------
 
-			$options = array(
+		$options = array(
 			'alertids' => zbx_objectValues($alerts, 'alertid'),
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1
-			);
-			$del_alerts = $this->get($options);
-			foreach($alertids as $snum => $alertid){
-				if(!isset($del_alerts[$alertid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
+		);
+		$del_alerts = self::get($options);
+		foreach($alerts as $snum => $alert){
+			if(!isset($del_alerts[$alert['alertid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				return false;
 			}
 
-			$sql = 'DELETE FROM alerts WHERE '.DBcondition('alertid', $alertids);
-			if(!DBexecute($sql))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+			$alertids[] = $alert['alertid'];
+		}
 
-			return array('alertids'=> $alertids);
+		if(!empty($alertids)){
+			$sql = 'DELETE FROM alerts WHERE '.DBcondition('alertid', $alertids);
+			$result = DBexecute($sql);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_EMPTY_INPUT_PARAMETER.' [ alertids ]');
+			$result = false;
+		}
+
+		if($result){
+			return array('alertids'=>$alertids);
+		}
+		else{
+			self::setError(__METHOD__);
+			return false;
+		}
 	}
 }
 ?>

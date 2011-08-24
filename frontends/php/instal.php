@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,14 +61,14 @@ include_once('include/page_footer.php');
 			'Not implemented yet!',
 			BR(),BR(),BR()
 			),
-		new CSubmit('install',S_NEW_INSTALLATION));
+		new CButton('install',S_NEW_INSTALLATION));
 	$form->addRow(
 		array(bold(S_UPDATE_BIG),BR(),BR(),
 			bold(S_DESCRIPTION),BR(),
 			'Not implemented yet!',
 			BR(),BR(),BR()
 			),
-		new CSubmit('update',S_UPDATE));
+		new CButton('update',S_UPDATE));
 	$form->show();
 
 ?>

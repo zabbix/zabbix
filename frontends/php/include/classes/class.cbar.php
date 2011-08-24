@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -293,6 +293,9 @@ class CBar extends CGraphDraw{
 				else
 					$this->gridLinesCount = round($this->sizeX/$this->gridPixels) + 1;
 
+				$tmp_maxY = $this->maxValue[$axis];
+				$tmp_minY = $this->minValue[$axis];
+
 				$maxValue = $this->maxValue[$axis];
 				$minValue = $this->minValue[$axis];
 
@@ -517,6 +520,13 @@ class CBar extends CGraphDraw{
 			$hstr_count = $this->gridLinesCount;
 
 			if($this->column){
+				if(GRAPH_YAXIS_SIDE_LEFT == $axis){
+					$shiftXLeft = $this->shiftXleft;
+				}
+				else{
+					$shiftXLeft = $this->shiftXleft+$this->sizeX+$this->shiftXCaptionLeft+2;	// +2 because of some mistake somewhere in calculations! FIX IT!
+				}
+
 				for($i=0;$i<=$hstr_count;$i++){
 					$str = convert_units(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),$this->units[$axis]);
 
@@ -612,6 +622,7 @@ class CBar extends CGraphDraw{
 							);
 
 
+				$dims = imageTextSize(8, 0, $caption);
 				imageText($this->im, 8, 0,
 					$shiftX+10,
 					$shiftY-5+14*$count+10,
@@ -627,6 +638,7 @@ class CBar extends CGraphDraw{
 	public function draw(){
 		$start_time=getmicrotime();
 		set_image_header();
+		check_authorisation();
 
 		$this->column = uint_in_array($this->type, array(GRAPH_TYPE_COLUMN, GRAPH_TYPE_COLUMN_STACKED));
 
@@ -721,8 +733,9 @@ class CBar extends CGraphDraw{
 			}
 		}
 
+		$end_time=getmicrotime();
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
-		imagestring($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12, _s("Generated in %s sec", $str), $this->GetColor('Gray'));
+		imagestring($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->GetColor('Gray'));
 
 		unset($this->items, $this->data);
 

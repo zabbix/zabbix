@@ -1,7 +1,7 @@
 // JavaScript Document
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,10 +29,10 @@ var CLNDR = new Array();			// calendar obj reference
 function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid){
 	id = id || CLNDR.length;
 	if('undefined' == typeof(utime_field_id)) utime_field_id = null;
-
+	
 	CLNDR[id] = new Object;
 	CLNDR[id].clndr = new calendar(id, time, timeobjects, utime_field_id, parentNodeid);
-
+	
 return CLNDR[id];
 }
 
@@ -115,13 +115,13 @@ initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid){
 	else{
 		this.setSDateFromOuterObj();
 	}
-
+	
 	this.cdt.setTime(this.sdt.getTime());
 	this.cdt.setDate(1);
-
+	
 	this.syncBSDateBySDT();
 	this.setCDate();
-
+	
 	utime_field_id = $(utime_field_id);
 	if(!is_null(utime_field_id)){
 		this.clndr_utime_field = utime_field_id;
@@ -143,7 +143,7 @@ clndrhide: function(e){
 	if((typeof(e) != 'undefined')){
 		cancelEvent(e);
 	}
-
+	
 	this.clndr_calendar.hide();
 	this.visible = 0;
 },
@@ -154,7 +154,7 @@ clndrshow: function(top,left){
 	}
 	else{
 		if(this.status){
-			this.setSDateFromOuterObj();
+			this.setSDateFromOuterObj();		
 
 			this.cdt.setTime(this.sdt.getTime());
 			this.cdt.setDate(1);
@@ -162,12 +162,12 @@ clndrshow: function(top,left){
 			this.syncBSDateBySDT();
 			this.setCDate();
 		}
-
+		
 		if(('undefined' != typeof(top)) && ('undefined' != typeof(left))){
 			this.clndr_calendar.style.top = top + 'px';
 			this.clndr_calendar.style.left = left + 'px';
 		}
-
+		
 		this.clndr_calendar.show();
 		this.visible = 1;
 	}
@@ -198,7 +198,7 @@ setSDateFromOuterObj: function(){
 		case 1:
 			var val = null;
 			var result = false;
-
+			
 			if(this.timeobjects[0].tagName.toLowerCase() == 'input'){
 				val = this.timeobjects[0].value;
 			}
@@ -208,11 +208,12 @@ setSDateFromOuterObj: function(){
 
 			if(is_string(val)){
 				var datetime = val.split(' ');
-
+				
 				var date = datetime[0].split('.');
 				var time = new Array();
 				if(datetime.length > 1)	var time = datetime[1].split(':');
-
+				
+				
 				if(date.length == 3){
 					result = this.setSDateDMY(date[0],date[1],date[2]);
 					if(time.length == 2){
@@ -226,7 +227,7 @@ setSDateFromOuterObj: function(){
 					}
 				}
 			}
-
+			
 			if(!result){
 				return false;
 			}
@@ -257,7 +258,7 @@ setSDateFromOuterObj: function(){
 				if(val.length>4){
 					val[3] = parseInt(val[3],10);
 					val[4] = parseInt(val[4],10);
-
+				
 					if((val[3] > -1) && (val[3] < 24)){
 						this.sdt.setHours(val[3]);
 						result = true;
@@ -302,7 +303,7 @@ setSDateDMY: function(d,m,y){
 		this.sdt.setYear(y);
 		result = true;
 	}
-
+	
 	if((y > 1970) && (y < 2100)){
 		this.sdt.setFullYear(y);
 		result = true;
@@ -318,7 +319,7 @@ setSDateDMY: function(d,m,y){
 			result = true;
 		}
 	}
-
+	
 	this.sdt.setHours(00);
 	this.sdt.setMinutes(00);
 	this.sdt.setSeconds(00);
@@ -343,7 +344,7 @@ setDateToOuterObj: function(){
 			break;
 		case 3:
 		case 5:
-// Day
+// Day		
 			if(this.timeobjects[0].tagName.toLowerCase() == 'input'){
 				this.timeobjects[0].value = this.sdt.getDate();
 			}
@@ -353,7 +354,7 @@ setDateToOuterObj: function(){
 				else
 					this.timeobjects[0].textContent = this.sdt.getDate();
 			}
-// Month
+// Month	
 			if(this.timeobjects[1].tagName.toLowerCase() == 'input'){
 				this.timeobjects[1].value = this.sdt.getMonth()+1;
 			}
@@ -474,10 +475,10 @@ setday: function(e,day,month,year){
 monthup: function(){
 //	var monthlastday = (this.day == this.daysInMonth(this.month,this.year));
 	this.month++;
-
+	
 	if(this.month > 11){
 		this.month = 0;
-		this.yearup();
+		this.yearup();		
 	}
 	else{
 		this.syncCDT();
@@ -488,10 +489,10 @@ monthup: function(){
 monthdown: function(){
 
 	this.month--;
-
+	
 	if(this.month < 0){
 		this.month = 11;
-		this.yeardown();
+		this.yeardown();		
 	}
 	else{
 		this.syncCDT();
@@ -500,22 +501,22 @@ monthdown: function(){
 },
 
 yearup: function(){
-
+	
 	this.year++;
-
-	this.syncCDT();
-	this.setCDate();
+	
+	this.syncCDT();	
+	this.setCDate();	
 },
 
 yeardown: function(){
-
+	
 	if((this.year-1) < 1970){  // shouldn't be lower
 		return ;
 	}
 
 	this.year--;
 	this.syncCDT();
-	this.setCDate();
+	this.setCDate();	
 },
 
 setSDT: function(d,m,y,h,i){
@@ -551,19 +552,19 @@ syncCDT: function(){
 },
 
 setCDate: function(){
-
+	
 	this.clndr_minute.value = this.minute;
 	this.clndr_hour.value = this.hour;
 
 	if(IE){
 		this.clndr_month.innerHTML = this.monthname[this.month].toString();
-		this.clndr_year.innerHTML = this.year;
+		this.clndr_year.innerHTML = this.year;		
 	}
 	else{
 		this.clndr_month.textContent = this.monthname[this.month];
 		this.clndr_year.textContent = this.year;
 	}
-
+	
 	this.createDaysTab();
 },
 
@@ -582,7 +583,7 @@ daysInMonth: function(m,y){
 	else if(m==2){
 		days = this.daysInFeb(y);
 	}
-
+	
 return days;
 },
 
@@ -641,7 +642,7 @@ createDaysTab: function(){
 			addListener(td,'click',this.setday.bindAsEventListener(this,this.cdt.getDate(),this.cdt.getMonth(),this.cdt.getFullYear()));
 
 			td.appendChild(document.createTextNode(this.cdt.getDate()));
-
+			
 			this.cdt.setTime(this.cdt.getTime() + (86400000));	// + 1day
 		}
 	}
@@ -666,7 +667,7 @@ calendarcreate: function(parentNodeid){
 
 	// addListener(this.clndr_calendar,'mousemove', deselectAll);
 
-	//*********** CALENDAR HAT ******************************
+	//*********** CALENDAR HAT ****************************** 
 		var line_div = document.createElement('div');
 	this.clndr_calendar.appendChild(line_div);
 
@@ -804,7 +805,7 @@ calendarcreate: function(parentNodeid){
 
 	this.clndr_calendar.appendChild(this.clndr_days);
 
-		this.clndr_days.className = 'calendardays';
+		this.clndr_days.className = 'calendardays';	
 
 	//******** HOURS, MINUTES *************
 	var line_div = document.createElement('div');
@@ -890,7 +891,7 @@ calendarcreate: function(parentNodeid){
 		</tr>
 	</tbody>
 	</table>
-
+	
 	<table border="0" cellpadding="2" cellspacing="0" class="calendarhat" width="100%">
 	<tbody>
 		<tr class="header">
@@ -921,7 +922,7 @@ calendarcreate: function(parentNodeid){
 </table>
 </div>
 <div class="calendartime">
-	<input type="text" name="hour" value="hh" maxlength="2" class="calendar_textbox" /> :
+	<input type="text" name="hour" value="hh" maxlength="2" class="calendar_textbox" /> : 
 	<input type="text" name="minute" value="mm" maxlength="2" class="calendar_textbox" />
 </div>
 </div>

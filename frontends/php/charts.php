@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,7 +119,7 @@ include_once('include/page_header.php');
 
 // resets get params for proper page refresh
 	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
-		navigation_bar_calc('web.graph',$_REQUEST['graphid'], true);
+		navigation_bar_calc('web.graph', $_REQUEST['graphid'], true);
 		jsRedirect('charts.php?graphid=' . $_REQUEST['graphid']);
 		include_once('include/page_footer.php');
 		exit();
@@ -128,7 +128,7 @@ include_once('include/page_header.php');
 
 	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
 
-	$r_form = new CForm('get');
+	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 	$r_form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));

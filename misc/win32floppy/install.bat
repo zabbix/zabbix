@@ -1,13 +1,13 @@
 @echo off
-REM Installation script for Windows Zabbix Agent
+REM Installation script for Windows ZABBIX Agent
 REM Version 1
 REM 
 REM Written by Eugene Grigorjev, Nov 2005
 REM email: eugene.grigorjev@zabbix.com
 
-ECHO Installation script for Windows Zabbix Agent [ http://www.zabbix.com ]
+ECHO Installation script for Windows ZABBIX Agent [ http://www.zabbix.com ]
 ECHO.
-ECHO Welcome to Zabbix Agent installation!
+ECHO Welcome to ZABBIX Agent installation!
 ECHO.
 
 SET srcbindir=.
@@ -72,7 +72,7 @@ ECHO # To get more information about ZABBIX, go http://www.zabbix.com >> "%Confi
 ECHO. >> "%Configfile%"
 ECHO ############ GENERAL PARAMETERS ################# >> "%Configfile%"
 ECHO. >> "%Configfile%"
-ECHO # List of comma delimited IP addresses (or hostnames) of Zabbix Servers.  >> "%Configfile%"
+ECHO # List of comma delimited IP addresses (or hostnames) of ZABBIX Servers.  >> "%Configfile%"
 ECHO # No spaces allowed. First entry is used for sending active checks. >> "%Configfile%"
 ECHO # Note that hostnames must resolve hostname - IP address and >> "%Configfile%"
 ECHO # IP address - hostname. >> "%Configfile%"
@@ -156,12 +156,12 @@ ECHO Installing ZABBIX Agent files...
 COPY "%srcbindir%/%zabbix_agent%" "%install_dir%/%zabbix_agent%" > NULL
 IF ERRORLEVEL 1 GOTO Err_copy
 
-ECHO Creating Zabbix Agent service...
+ECHO Creating ZABBIX Agent srvice...
 
 CALL "%install_dir%/%zabbix_agent%" --config "%Configfile%" install 
 IF ERRORLEVEL 1 GOTO Err_install
 
-ECHO Starting Zabbix Agent service...
+ECHO Starting ZABBIX Agent srvice...
 
 CALL "%install_dir%/%zabbix_agent%" start
 IF ERRORLEVEL 1 GOTO Err_start
@@ -169,28 +169,28 @@ IF ERRORLEVEL 1 GOTO Err_start
 ECHO.
 ECHO #############################################################
 ECHO                     Congratulations! 
-ECHO   Zabbix agent for Windows successfuly instaled on Your PC!
+ECHO   ZABBIX agent for Windows successfuly instaled on Your PC!
 ECHO.
 ECHO     Installation directory: %install_dir%
 ECHO     Configureation file: %Configfile%
 ECHO.
-ECHO   Zabbix agent has the following configuration:
-ECHO     Agent hostname for Zabbix Server: %Hostname%
-ECHO     Zabbix Server IP: %serverip%
-ECHO     Zabbix Server port: %serverport%
-ECHO     Zabbix Agent listen port: %listenport%
+ECHO   ZABBIX agent have next configuration:
+ECHO     Agent hostname for ZABBIX Server: %Hostname%
+ECHO     ZABBIX Server IP: %serverip%
+ECHO     ZABBIX Server port: %serverport%
+ECHO     ZABBIX Agent listen port: %listenport%
 ECHO     Connection timeout: %timeout%
 ECHO     Start Agent count: %startagents%
 ECHO     Debug level: %debuglevel%
 ECHO     Log file: %logfile%
 ECHO.
-ECHO   IF You want to change configuration or configure Zabbix Agent
-ECHO in more detail, you can manualy change configureation file and
-ECHO restart Zabbix Agent service.
+ECHO   IF You want change configurations or more detailed configure 
+ECHO ZABBIX Agent, you can manualy change configureation file and 
+ECHO restart ZABBIX Agent service.
 ECHO.
-ECHO   Now You can configure Zabbix Server to monitor this PC.
+ECHO   Now You can configure ZABBIX Server to monitore this PC.
 ECHO.
-ECHO            Thank You for using Zabbix software.
+ECHO            Thank You for using ZABBIX software.
 ECHO                  http://www.zabbix.com
 ECHO #############################################################
 ECHO.
@@ -202,11 +202,11 @@ ECHO INSTALL ERROR: Please use script with required parameters!
 GOTO Syntax 
 
 :Err_start
-ECHO INSTALL ERROR: Can't start Zabbix Agent service!
+ECHO INSTALL ERROR: Can't start ZABBIX Agent service!
 GOTO Syntax 
 
 :Err_install
-ECHO INSTALL ERROR: Can't install Zabbix Agent as service!
+ECHO INSTALL ERROR: Can't install ZABBIX Agent as service!
 GOTO Syntax 
 
 :Err_copy
@@ -218,7 +218,7 @@ ECHO INSTALL ERROR: Can't create installation directory "%install_dir%"!
 GOTO Syntax 
 
 :Err_config_dir
-ECHO INSTALL ERROR: Can't create directory "%config_dir%" for configuration file!
+ECHO INSTALL ERROR: Can't create directory "%config_dir%" for configuretion file!
 GOTO Syntax 
 
 :Syntax
@@ -228,7 +228,7 @@ ECHO Usage:
 ECHO    %0 "hostname" "srver ip" ["install path]" ["config file dir"]
 ECHO.
 ECHO    Default installation path is "%def_install_dir%"
-ECHO    Default configuration file is "%Configfile%"
+ECHO    Default configureation file is "%Configfile%"
 ECHO -------------------------------------------------------------
 
 :End

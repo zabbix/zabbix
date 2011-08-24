@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@
 #include "sysinfo.h"
 #include "md5.h"
 #include "file.h"
-
-#define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
 
 extern int	CONFIG_TIMEOUT;
 
@@ -100,84 +98,6 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	ret = SYSINFO_RET_OK;
 err:
-	return ret;
-}
-
-int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char		filename[MAX_STRING_LEN], encoding[32];
-	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
-	int		contents_alloc = 512, contents_offset = 0;
-	int		nbytes, flen, f = -1, ret = SYSINFO_RET_FAIL;
-	struct stat	stat_buf;
-	double		ts;
-
-	ts = zbx_time();
-
-	if (2 < num_param(param))
-		goto err;
-
-	if (0 != get_param(param, 1, filename, sizeof(filename)))
-		goto err;
-
-	if (0 != get_param(param, 2, encoding, sizeof(encoding)))
-		*encoding = '\0';
-
-	zbx_strupper(encoding);
-
-	if (0 != zbx_stat(filename, &stat_buf))
-		goto err;
-
-	if (CONFIG_TIMEOUT < zbx_time() - ts)
-		goto err;
-
-	if (ZBX_MAX_DB_FILE_SIZE < stat_buf.st_size)
-		goto err;
-
-	if (-1 == (f = zbx_open(filename, O_RDONLY)))
-		goto err;
-
-	if (CONFIG_TIMEOUT < zbx_time() - ts)
-		goto err;
-
-	contents = zbx_malloc(contents, contents_alloc);
-
-	flen = 0;
-
-	while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
-	{
-		if (CONFIG_TIMEOUT < zbx_time() - ts || ZBX_MAX_DB_FILE_SIZE < (flen += nbytes))
-			goto err;
-
-		utf8 = convert_to_utf8(read_buf, nbytes, encoding);
-		zbx_strcpy_alloc(&contents, &contents_alloc, &contents_offset, utf8);
-		zbx_free(utf8);
-	}
-
-	if (-1 == nbytes)	/* error occurred */
-	{
-		zbx_free(contents);
-		goto err;
-	}
-
-	if (0 != contents_offset)
-	{
-		zbx_rtrim(contents, "\r\n");
-
-		if ('\0' == *contents)
-			zbx_free(contents);
-	}
-
-	if (NULL == contents)	/* EOF */
-		contents = zbx_strdup(contents, "EOF");
-
-	SET_TEXT_RESULT(result, contents);
-
-	ret = SYSINFO_RET_OK;
-err:
-	if (-1 != f)
-		close(f);
-
 	return ret;
 }
 

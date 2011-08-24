@@ -5,6 +5,6 @@ CREATE TABLE node_cksum (
 	recordid		number(20)		DEFAULT '0'	NOT NULL,
 	cksumtype		number(10)		DEFAULT '0'	NOT NULL,
 	cksum		nclob		DEFAULT ''	,
-	sync		nvarchar2(128)		DEFAULT ''
+	sync		nvarchar2(128)		DEFAULT ''	
 );
 CREATE INDEX node_cksum_1 on node_cksum (nodeid,cksumtype,tablename,recordid);

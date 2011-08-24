@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -132,11 +132,15 @@ include_once('include/page_header.php');
 		$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
 	}
 /* limit opened application count */
+	// while(count($_REQUEST['applications']) > 25){
+		// array_shift($_REQUEST['applications']);
+	// }
 
 	rm4favorites('web.httpconf.applications');
 	foreach($_REQUEST['applications'] as $application){
 		add2favorites('web.httpconf.applications', $application);
 	}
+	// CProfile::update('web.httpconf.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
 
 	if(isset($_REQUEST['del_sel_step'])&&isset($_REQUEST['sel_step'])&&is_array($_REQUEST['sel_step'])){
 		foreach($_REQUEST['sel_step'] as $sid)
@@ -168,7 +172,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['httptestid'])){
 		$result = false;
 		if($httptest_data = get_httptest_by_httptestid($_REQUEST['httptestid'])){
-			$result = API::WebCheck()->delete($_REQUEST['httptestid']);
+			$result = delete_httptest($_REQUEST['httptestid']);
 		}
 		show_messages($result, S_SCENARIO_DELETED, S_CANNOT_DELETE_SCENARIO);
 		if($result){
@@ -185,99 +189,53 @@ include_once('include/page_header.php');
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		try{
-			DBstart();
+		/*
+		$delay_flex = get_request('delay_flex',array());
+		$db_delay_flex = '';
+		foreach($delay_flex as $val)
+			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+		$db_delay_flex = trim($db_delay_flex,';');
+		// for future use */
 
-			if(isset($_REQUEST['httptestid'])){
-				$action = AUDIT_ACTION_UPDATE;
-				$message_true = S_SCENARIO_UPDATED;
-				$message_false = S_CANNOT_UPDATE_SCENARIO;
-			}
-			else{
-				$action = AUDIT_ACTION_ADD;
-				$message_true = S_SCENARIO_ADDED;
-				$message_false = S_CANNOT_ADD_SCENARIO;
-			}
+		if($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE){
+			$http_user = htmlspecialchars($_REQUEST['http_user']);
+			$http_password = htmlspecialchars($_REQUEST['http_password']);
+		}
+		else{
+			$http_user = '';
+			$http_password = '';
+		}
 
-			$i = 1;
-			foreach($_REQUEST['steps'] as $snum => $step){
-				$_REQUEST['steps'][$snum]['no'] = $i++;
-				$stepid = isset($step['httpstepid']) ? $step['httpstepid'] : null;
-				if(!is_null($stepid)){
-					$_REQUEST['steps'][$snum]['webstepid'] = $stepid;
-					unset($_REQUEST['steps'][$snum]['httpstepid']);
-				}
-			}
+		if(isset($_REQUEST['httptestid'])){
+			$result = update_httptest($_REQUEST['httptestid'], $_REQUEST['hostid'], $_REQUEST['application'],
+				$_REQUEST['name'],$_REQUEST['authentication'],$http_user,$http_password,
+				$_REQUEST['delay'],$_REQUEST['status'],$_REQUEST['agent'],
+				$_REQUEST['macros'],$_REQUEST['steps']);
 
-			$webcheck = array(
-				'hostid' => $_REQUEST['hostid'],
-				'name' => $_REQUEST['name'],
-				'authentication' => $_REQUEST['authentication'],
-				'delay' => $_REQUEST['delay'],
-				'status' => $_REQUEST['status'],
-				'agent' => $_REQUEST['agent'],
-				'macros' => $_REQUEST['macros'],
-				'steps' => get_request('steps', array()),
-			);
+			$httptestid = $_REQUEST['httptestid'];
+			$action = AUDIT_ACTION_UPDATE;
 
+			show_messages($result, S_SCENARIO_UPDATED, S_CANNOT_UPDATE_SCENARIO);
+		}
+		else{
+			$httptestid = add_httptest($_REQUEST['hostid'],$_REQUEST['application'],
+				$_REQUEST['name'],$_REQUEST['authentication'],$http_user,$http_password,
+				$_REQUEST['delay'],$_REQUEST['status'],$_REQUEST['agent'],
+				$_REQUEST['macros'],$_REQUEST['steps']);
 
-			$sql = 'SELECT applicationid FROM applications WHERE name='.zbx_dbstr($_REQUEST['application']).
-					' AND hostid='.$_REQUEST['hostid'];
-			if($applicationid = DBfetch(DBselect($sql))){
-				$webcheck['applicationid'] = $applicationid['applicationid'];
-			}
-			else{
-				$result = API::Application()->create(array(
-					'name' => $_REQUEST['application'],
-					'hostid' => $_REQUEST['hostid']
-				));
-
-				if(!$result){
-					throw new Exception(S_CANNOT_ADD_NEW_APPLICATION.' [ '.$application.' ]');
-				}
-				else{
-					$webcheck['applicationid'] = reset($result['applicationids']);
-				}
-			}
-
-			if($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE){
-				$webcheck['http_user'] = htmlspecialchars($_REQUEST['http_user']);
-				$webcheck['http_password'] = htmlspecialchars($_REQUEST['http_password']);
-			}
-			else{
-				$webcheck['http_user'] = '';
-				$webcheck['http_password'] = '';
-			}
-
-			if(isset($_REQUEST['httptestid'])){
-				$webcheck['webcheckid'] = $httptestid = $_REQUEST['httptestid'];
-				$result = API::WebCheck()->update($webcheck);
-				if(!$result)
-					throw new Exception();
-			}
-			else{
-				$result = API::WebCheck()->create($webcheck);
-				if(!$result)
-					throw new Exception();
-
-				$httptestid = reset($result['webcheckids']);
-			}
-
+			$result = $httptestid;
+			$action = AUDIT_ACTION_ADD;
+			show_messages($result, S_SCENARIO_ADDED, S_CANNOT_ADD_SCENARIO);
+		}
+		if($result){
 			$host = get_host_by_hostid($_REQUEST['hostid']);
+
 			add_audit($action, AUDIT_RESOURCE_SCENARIO,
 				S_SCENARIO.' ['.$_REQUEST['name'].'] ['.$httptestid.'] '.S_HOST.' ['.$host['host'].']');
 
 			unset($_REQUEST['httptestid']);
 			unset($_REQUEST['form']);
-
-			show_messages(true, $message_true);
-			DBend(true);
 		}
-		catch(Exception $e){
-			DBend(false);
-			show_messages(false, null, $message_false);
-		}
-
 	}
 // -------- GO ---------
 	else if(($_REQUEST['go'] == 'activate') && isset($_REQUEST['group_httptestid'])){
@@ -341,7 +299,21 @@ include_once('include/page_header.php');
 		show_messages($go_result, S_HISTORY_CLEARED, $go_result);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_httptestid'])){
-		$go_result = API::WebCheck()->delete($_REQUEST['group_httptestid']);
+		$go_result = false;
+
+		$group_httptestid = $_REQUEST['group_httptestid'];
+		foreach($group_httptestid as $id){
+			if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
+			/* if($httptest_data['templateid']<>0)	continue; // for future use */
+			if(delete_httptest($id)){
+				$go_result = true;
+
+				$host = get_host_by_applicationid($httptest_data['applicationid']);
+
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
+					S_SCENARIO.' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']');
+			}
+		}
 		show_messages($go_result, S_SCENARIO_DELETED, null);
 	}
 
@@ -357,7 +329,7 @@ include_once('include/page_header.php');
 	$_REQUEST['steps'] = get_request('steps',array());
 	foreach($_REQUEST['steps'] as $s1id => $s1){
 		foreach($_REQUEST['steps'] as $s2id => $s2){
-			if((strcmp($s1['name'],$s2['name'])==0) && (bccomp($s1id,$s2id) != 0)){
+			if((strcmp($s1['name'],$s2['name'])==0) && $s1id != $s2id){
 				$_REQUEST['steps'][$s1id] = $_REQUEST['steps'][$s2id];
 				unset($_REQUEST['steps'][$s2id]);
 			}
@@ -367,17 +339,18 @@ include_once('include/page_header.php');
 
 
 	if (!isset($_REQUEST['form'])){
-		$form_button = new CForm('get');
+		//creating button "Create scenario"
+		$form_button = new CForm(null, 'get');
 		$form_button->addVar('hostid', $_REQUEST['hostid']);
 		//if host is selected
 		if(!isset($_REQUEST['form']) && ($_REQUEST['hostid'] > 0)){
 			//allowing to press button
-			$create_scenario_button = new CSubmit('form', S_CREATE_SCENARIO);
+			$create_scenario_button = new CButton('form', S_CREATE_SCENARIO);
 			$create_scenario_button->setEnabled('yes');
 		}
 		else{
 			//adding additional hint to button
-			$create_scenario_button = new CSubmit('form', S_CREATE_SCENARIO.' '.S_SELECT_HOST_FIRST);
+			$create_scenario_button = new CButton('form', S_CREATE_SCENARIO.' '.S_SELECT_HOST_FIRST);
 			//and disabling it
 			$create_scenario_button->setEnabled('no');
 		}
@@ -387,7 +360,7 @@ include_once('include/page_header.php');
 		$form_button = null;
 	}
 
-
+	
 
 	$http_wdgt = new CWidget();
 	$http_wdgt->addPageHeader(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form_button);
@@ -551,7 +524,7 @@ include_once('include/page_header.php');
 				'");');
 
 			if(zbx_strlen($s['url']) > 70){
-				$url = new CSpan(substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],zbx_strlen($s['url'])-25,25));
+				$url = new CTag('span','yes', substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],zbx_strlen($s['url'])-25,25));
 				$url->setHint($s['url']);
 			}
 			else{
@@ -574,13 +547,13 @@ include_once('include/page_header.php');
 			(count($steps) > 0) ? array ($tblSteps, BR()) : null ,
 			new CButton('add_step',S_ADD,
 				'return PopUp("popup_httpstep.php?dstfrm='.$form->getName().'");'),
-			(count($steps) > 0) ? new CSubmit('del_sel_step',S_DELETE_SELECTED) : null
+			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
 			));
 
-		$form->addItemToBottomRow(new CSubmit("save",S_SAVE));
+		$form->addItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["httptestid"])){
 			$form->addItemToBottomRow(SPACE);
-			$form->addItemToBottomRow(new CSubmit("clone",S_CLONE));
+			$form->addItemToBottomRow(new CButton("clone",S_CLONE));
 			$form->addItemToBottomRow(SPACE);
 			$form->addItemToBottomRow(new CButtonDelete(S_DELETE_SCENARIO_Q,
 				url_param("form").url_param("httptestid").url_param('hostid')));
@@ -591,7 +564,7 @@ include_once('include/page_header.php');
 		$http_wdgt->addItem($form);
 	}
 	else{
-		$form = new CForm('get');
+		$form = new CForm(null, 'get');
 
 		$form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
@@ -645,12 +618,12 @@ include_once('include/page_header.php');
 			$sql_where = ' AND h.hostid='.$_REQUEST['hostid'];
 		}
 
-		$sql = 'SELECT DISTINCT h.name as hostname,h.hostid,a.* '.
+		$sql = 'SELECT DISTINCT h.host,h.hostid,a.* '.
 				' FROM applications a,hosts h '.
 				' WHERE a.hostid=h.hostid '.
 					$sql_where.
 					' AND '.DBcondition('h.hostid',$available_hosts).
-				order_by('a.applicationid,h.name,h.hostid','a.name');
+				order_by('a.applicationid,h.host,h.hostid','a.name');
 		$db_app_res = DBselect($sql);
 		while($db_app = DBfetch($db_app_res)){
 			$db_app['scenarios_cnt'] = 0;
@@ -663,13 +636,13 @@ include_once('include/page_header.php');
 		$db_httptests = array();
 		$db_httptestids = array();
 
-		$sql = 'SELECT wt.*,a.name as application, h.name as hostname,h.hostid '.
+		$sql = 'SELECT wt.*,a.name as application, h.host,h.hostid '.
 			' FROM httptest wt '.
 				' LEFT JOIN applications a on wt.applicationid=a.applicationid '.
 				' LEFT JOIN hosts h on h.hostid=a.hostid '.
 			' WHERE '.DBcondition('a.applicationid',$db_appids).
 				($showdisabled==0?' AND wt.status <> 1':'').
-			order_by('wt.name,wt.status','h.name');
+			order_by('wt.name,wt.status','h.host');
 //SDI($sql);
 		$db_httptests_res = DBselect($sql);
 		while($httptest_data = DBfetch($db_httptests_res)){
@@ -721,7 +694,7 @@ include_once('include/page_header.php');
 				new CRow(array(
 					$chkBox,
 					is_show_all_nodes()?SPACE:NULL,
-					($_REQUEST['hostid']>0) ? null : $db_app['hostname'],
+					($_REQUEST['hostid']>0) ? null : $db_app['host'],
 					$name,
 					$step_cout,
 					$httptest_data['delay'],
@@ -783,7 +756,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO.' (0)');
+		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');

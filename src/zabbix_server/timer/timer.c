@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,82 +42,112 @@ extern unsigned char	process_type;
  *                                                                            *
  * Purpose: re-calculate and update values of time-driven functions           *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
+ * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	process_time_functions()
 {
 	const char		*__function_name = "process_time_functions";
+	DB_RESULT		result;
+	DB_ROW			row;
+	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last;
+	int			tr_alloc = 0, tr_num = 0;
 	char			*sql = NULL;
-	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0, i;
-	DC_TRIGGER		*trigger;
-	DC_TRIGGER		*trigger_info = NULL;
-	zbx_vector_ptr_t	trigger_order;
+	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_ptr_create(&trigger_order);
+	sql = zbx_malloc(sql, sql_alloc);
 
-	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order);
+	result = DBselect(
+			"select distinct t.triggerid,t.type,t.value,t.error,t.expression"
+			" from triggers t,functions f,items i,hosts h"
+			" where t.triggerid=f.triggerid"
+				" and f.itemid=i.itemid"
+				" and i.hostid=h.hostid"
+				" and t.status=%d"
+				" and f.function in (" ZBX_SQL_TIME_FUNCTIONS ")"
+				" and i.status=%d"
+				" and h.status=%d"
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
+				DB_NODE
+			" order by t.triggerid",
+			TRIGGER_STATUS_ENABLED,
+			ITEM_STATUS_ACTIVE,
+			HOST_STATUS_MONITORED,
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
+			DBnode_local("h.hostid"));
 
-	if (0 != trigger_order.values_num)
+	DBbegin();
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		DBbegin();
-
-		sql = zbx_malloc(sql, sql_alloc);
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
-		for (i = 0; i < trigger_order.values_num; i++)
+		if (tr_num == tr_alloc)
 		{
-			trigger = (DC_TRIGGER *)trigger_order.values[i];
-
-			evaluate_expression(trigger->triggerid, &trigger->expression, trigger->timespec.sec,
-					trigger->value, &trigger->new_value, &trigger->new_error);
-
-			if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-					trigger->type, trigger->value, trigger->value_flags, trigger->error,
-					trigger->new_value, trigger->new_error, &trigger->timespec, &trigger->add_event,
-					&trigger->value_changed))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
-			}
-
-			zbx_free(trigger->expression);
-			zbx_free(trigger->new_error);
-
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			tr_alloc += 64;
+			tr = zbx_realloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
 		}
+
+		tr_last = &tr[tr_num++];
+
+		ZBX_STR2UINT64(tr_last->triggerid, row[0]);
+		tr_last->type = (unsigned char)atoi(row[1]);
+		tr_last->value = atoi(row[2]);
+		tr_last->error = row[3];
+		tr_last->new_error = NULL;
+		tr_last->expression = zbx_strdup(NULL, row[4]);
+		tr_last->lastchange = time(NULL);
+
+		evaluate_expression(tr_last->triggerid, &tr_last->expression, tr_last->lastchange,
+				tr_last->value, &tr_last->new_value, &tr_last->new_error);
+
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
+				tr_last->type, tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
+				tr_last->lastchange, &tr_last->add_event))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+		}
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	DBfree_result(result);
+
 #ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
-		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-			DBexecute("%s", sql);
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
 
-		zbx_free(sql);
+	zbx_free(sql);
 
-		for (i = 0; i < trigger_order.values_num; i++)
+	if (0 != tr_num)
+	{
+		for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
 		{
-			trigger = (DC_TRIGGER *)trigger_order.values[i];
+			zbx_free(tr_last->expression);
+			zbx_free(tr_last->new_error);
 
-			if (1 != trigger->add_event)
+			if (1 != tr_last->add_event)
 				continue;
 
-			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, tr_last->new_value, 0, 0);
 		}
-
-		DBcommit();
 	}
 
-	zbx_free(trigger_info);
-	zbx_vector_ptr_destroy(&trigger_order);
+	DBcommit();
+
+	zbx_free(tr);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-typedef struct
+typedef struct zbx_host_maintenance_s
 {
 	zbx_uint64_t	hostid;
 	time_t		maintenance_from;
@@ -135,12 +165,11 @@ static int	get_host_maintenance_nearestindex(zbx_host_maintenance_t *hm, int hm_
 {
 	int	first_index, last_index, index;
 
-	if (0 == hm_count)
+	if (hm_count == 0)
 		return 0;
 
 	first_index = 0;
 	last_index = hm_count - 1;
-
 	while (1)
 	{
 		index = first_index + (last_index - first_index) / 2;
@@ -174,7 +203,6 @@ static zbx_host_maintenance_t	*get_host_maintenance(zbx_host_maintenance_t **hm,
 	int	hm_index;
 
 	hm_index = get_host_maintenance_nearestindex(*hm, *hm_count, hostid, maintenance_from, maintenanceid);
-
 	if (hm_index < *hm_count && (*hm)[hm_index].hostid == hostid && (*hm)[hm_index].maintenance_from == maintenance_from &&
 			(*hm)[hm_index].maintenanceid == maintenanceid)
 		return &(*hm)[hm_index];
@@ -211,8 +239,6 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	assert(maintenanceid);
-
 	result = DBselect(
 			"select h.hostid,h.maintenanceid,h.maintenance_status,h.maintenance_type,h.maintenance_from "
 			"from maintenances_hosts mh,hosts h "
@@ -225,7 +251,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(host_hostid, row[0]);
-		ZBX_DBROW2UINT64(host_maintenanceid, row[1]);
+		ZBX_STR2UINT64(host_maintenanceid, row[1]);
 		host_maintenance_status = atoi(row[2]);
 		host_maintenance_type = atoi(row[3]);
 		host_maintenance_from = atoi(row[4]);
@@ -249,7 +275,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(host_hostid, row[0]);
-		ZBX_DBROW2UINT64(host_maintenanceid, row[1]);
+		ZBX_STR2UINT64(host_maintenanceid, row[1]);
 		host_maintenance_status = atoi(row[2]);
 		host_maintenance_type = atoi(row[3]);
 		host_maintenance_from = atoi(row[4]);
@@ -420,10 +446,6 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
 	int		value_before, value_inside, value_after;
-	zbx_timespec_t	ts;
-
-	ts.sec = maintenance_to;
-	ts.ns = 0;
 
 	result = DBselect(
 			"select distinct t.triggerid"
@@ -448,20 +470,19 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 			continue;
 
 		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
-				&ts, value_after, TRIGGER_VALUE_CHANGED_NO, 0, 1);
+				maintenance_to, value_after, 0, 1);
 	}
 	DBfree_result(result);
 }
 
 static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)
 {
-	typedef struct
+	typedef struct maintenance_s
 	{
 		zbx_uint64_t	hostid;
 		int		maintenance_from;
 		void		*next;
-	}
-	maintenance_t;
+	} maintenance_t;
 
 	const char	*__function_name = "update_maintenance_hosts";
 	int		i;
@@ -553,7 +574,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
 			"update hosts"
-			" set maintenanceid=null,"
+			" set maintenanceid=0,"
 				"maintenance_status=%d,"
 				"maintenance_type=0,"
 				"maintenance_from=0"
@@ -571,10 +592,10 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 	zbx_free(sql);
 	zbx_free(ids);
 
-	for (m = maintenances; NULL != m; m = m->next)
+	for (m = maintenances; m != NULL; m = m->next)
 		generate_events(m->hostid, m->maintenance_from, now);
 
-	for (m = maintenances; NULL != m; m = maintenances)
+	for (m = maintenances; m != NULL; m = maintenances)
 	{
 		maintenances = m->next;
 		zbx_free(m);

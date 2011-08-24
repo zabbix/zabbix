@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,11 +38,12 @@ class CHostsInfo extends CTable{
 	}
 
 	public function bodyToString(){
+		global $USER_DETAILS;
 		$this->cleanItems();
 
 		$total = 0;
 
-		$accessible_hosts = get_accessible_hosts_by_user(CWebUser::$data,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
+		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 
 		$cond_from = '';
 		if(remove_nodes_from_id($this->groupid)>0){

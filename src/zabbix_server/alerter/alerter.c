@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -162,7 +162,7 @@ void	main_alerter_loop()
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(alert.alertid, row[0]);
-			ZBX_STR2UINT64(alert.mediatypeid, row[1]);
+			alert.mediatypeid	= atoi(row[1]);
 			alert.sendto		= row[2];
 			alert.subject		= row[3];
 			alert.message		= row[4];

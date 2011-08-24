@@ -13,6 +13,7 @@ libzbxdbhigh_a_SOURCES = \
 	${ODBC_SRC} \
 	db.c \
 	dbschema.c \
+	macro.c	\
 	proxy.c \
 	discovery.c
 

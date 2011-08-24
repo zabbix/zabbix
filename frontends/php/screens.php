@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,25 +121,22 @@
 	}
 ?>
 <?php
-// js templates
-	require_once('include/views/js/general.script.confirm.js.php');
 
-// whether we should use screen name to fetch a screen (if this is false, elementid is used)
+	//whether we should use screen name to fetch a screen (if this is false, elementid is used)
 	$use_screen_name = isset($_REQUEST['screenname']);
 
-// getting element id from GET parameters
+	//getiing element id from GET paramters
 	$elementid = get_request('elementid', false);
-// if none is provided
+	//if none is provided
 	if($elementid === false && !$use_screen_name){
-// get element id saved in profile from the last visit
+		//get element id saved in profile from the last visit
 		$elementid = CProfile::get('web.screens.elementid', null);
-// this flag will be used in case this element does not exist
+		//this flag will be used in case this element does not exist
 		$id_has_been_fetched_from_profile = true;
 	}
 	else{
 		$id_has_been_fetched_from_profile = false;
 	}
-
 
 	$screens_wdgt = new CWidget();
 
@@ -154,13 +151,10 @@
 	$formHeader->addItem($cmbConfig);
 
 
-	$screens = API::Screen()->get(array(
+	$screens = CScreen::get(array(
 		'nodeids' => get_current_nodeid(),
-		'output' => API_OUTPUT_EXTEND,
-		'selectScreenItems' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND
 	));
-
-
 
 	//if screen name is provided it takes priority over elementid
 	if ($use_screen_name) {
@@ -176,7 +170,7 @@
 
 	//no screens defined at all
 	if(empty($screens)){
-		$screens_wdgt->addPageHeader(_s('SCREENS'), $formHeader);
+		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
 		$screens_wdgt->addItem(BR());
 		$screens_wdgt->addItem(new CTableInfo(S_NO_SCREENS_DEFINED));
 		$screens_wdgt->show();
@@ -190,18 +184,18 @@
 		show_error_message($error_msg);
 	}
 	else{
-		if (!isset($screens[$elementIdentifier])) {
+		if(!isset($screens[$elementIdentifier])){
 			//this means id was fetched from profile and this screen does not exist
 			//in this case we need to show the first one
 			$screen = reset($screens);
 		}
-		else {
+		else{
 			$screen = $screens[$elementIdentifier];
 		}
 
 		//if elementid is used to fetch an element, saving it in profile
-		if(2 != $_REQUEST['fullscreen'] && !$use_screen_name) {
-			CProfile::update('web.screens.elementid',$screen['screenid'] , PROFILE_TYPE_ID);
+		if(2 != $_REQUEST['fullscreen'] && !$use_screen_name){
+			CProfile::update('web.screens.elementid', $screen['screenid'], PROFILE_TYPE_ID);
 		}
 
 		$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
@@ -216,13 +210,13 @@
 		));
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
-		$screens_wdgt->addPageHeader(_s('SCREENS'), array($formHeader, SPACE, $icon, $fs_icon));
+		$screens_wdgt->addPageHeader(S_SCREENS_BIG, array($formHeader, SPACE, $icon, $fs_icon));
 		$screens_wdgt->addItem(BR());
 // }}} PAGE HEADER
 
 
 // HEADER {{{
-		$form = new CForm('get');
+		$form = new CForm(null, 'get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 		$cmbElements = new CComboBox('elementid', $screen['screenid'], 'submit()');
@@ -253,7 +247,7 @@
 			foreach($options as $option) $params[$option] = 1;
 			$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 			$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
-
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 			validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 
 			$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
@@ -271,7 +265,7 @@
 			$form->addItem(array(SPACE.S_HOST.SPACE, $cmbHosts));
 		}
 
-		$element = get_screen($screen, 0, $effectiveperiod);
+		$element = get_screen($screen['screenid'], 0, $effectiveperiod);
 
 		if(2 != $_REQUEST['fullscreen']){
 			$timeline = array(
@@ -308,9 +302,6 @@
 		echo SBR;
 	}
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

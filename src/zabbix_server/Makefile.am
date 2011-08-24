@@ -24,7 +24,6 @@ zabbix_server_SOURCES = \
 	actions.c actions.h \
 	operations.c operations.h \
 	events.c events.h \
-	scripts.c scripts.h \
 	zlog.c \
 	server.c
 

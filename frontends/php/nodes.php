@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,14 +112,14 @@
 
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST, null, null, false);
 
-	$frmForm = new CForm('get');
+	$frmForm = new CForm(null, 'get');
 	$cmbConf = new CComboBox('config', 'nodes.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('nodes.php', S_NODES);
 		$cmbConf->addItem('proxies.php', S_PROXIES);
 	$frmForm->addItem($cmbConf);
 
 	if(!isset($_REQUEST['form']) && ZBX_DISTRIBUTED){
-		$frmForm->addItem(new CSubmit('form', S_NEW_NODE));
+		$frmForm->addItem(new CButton('form', S_NEW_NODE));
 	}
 
 	$nodes_wdgt->addPageHeader(S_CONFIGURATION_OF_NODES, $frmForm);
@@ -134,7 +134,7 @@
 				$frm_title .= ' "'.$node_data['name'].'"';
 			}
 
-			$master_node = DBfetch(DBselect('SELECT name FROM nodes WHERE masterid IS NULL AND nodetype='.ZBX_NODE_LOCAL));
+			$master_node = DBfetch(DBselect('SELECT name FROM nodes WHERE masterid=0 AND nodetype='.ZBX_NODE_LOCAL));
 			$has_master = (!$master_node) ? true : false;
 
 
@@ -209,7 +209,7 @@
 			$frmNode->addRow(S_DO_NOT_KEEP_TRENDS_OLDER_THAN, new CNumericBox('slave_trends', $slave_trends, 6));
 
 
-			$frmNode->addItemToBottomRow(new CSubmit('save', S_SAVE));
+			$frmNode->addItemToBottomRow(new CButton('save', S_SAVE));
 			if(isset($_REQUEST['nodeid']) && $node_type != ZBX_NODE_LOCAL){
 				$frmNode->addItemToBottomRow(SPACE);
 				$frmNode->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_NODE_Q, url_param('form').url_param('nodeid')));
@@ -247,7 +247,7 @@
 					$node['nodetype'] ? 'bold' : null)
 				));
 			}
-
+			
 			$nodes_wdgt->addItem($table);
 		}
 	}

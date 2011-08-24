@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,18 +169,14 @@ fail:
 static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *table, const char *record)
 {
 	const char	*r;
-	int		f, source = 0, object = 0, value = 0, acknowledged = 0;
-	unsigned char	value_changed = 0;
+	int		f, source = 0, object = 0, clock = 0, value = 0, acknowledged = 0;
 	zbx_uint64_t	eventid = 0, objectid = 0;
-	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_record_event()");
 
-	ts.sec = 0;
-	ts.ns = 0;
 	r = record;
 
-	for (f = 0; NULL != table->fields[f].name; f++)
+	for (f = 0; 0 != table->fields[f].name; f++)
 	{
 		if (NULL == r)
 			goto error;
@@ -196,18 +192,14 @@ static int	process_record_event(int sender_nodeid, int nodeid, const ZBX_TABLE *
 		else if (0 == strcmp(table->fields[f].name, "objectid"))
 			ZBX_STR2UINT64(objectid, buffer);
 		else if (0 == strcmp(table->fields[f].name, "clock"))
-			ts.sec = atoi(buffer);
-		else if (0 == strcmp(table->fields[f].name, "ns"))
-			ts.ns = atoi(buffer);
+			clock = atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "value"))
 			value = atoi(buffer);
-		else if (0 == strcmp(table->fields[f].name, "value_changed"))
-			value_changed = (unsigned char)atoi(buffer);
 		else if (0 == strcmp(table->fields[f].name, "acknowledged"))
 			acknowledged = atoi(buffer);
 	}
 
-	return process_event(eventid, source, object, objectid, &ts, value, value_changed, acknowledged, 0);
+	return process_event(eventid, source, object, objectid, clock, value, acknowledged, 0);
 error:
 	zabbix_log(LOG_LEVEL_ERR, "NODE %d: received invalid record from node %d for node %d [%s]",
 			CONFIG_NODEID, sender_nodeid, nodeid, record);
@@ -549,7 +541,7 @@ int	node_history(char *data, size_t datalen)
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* nodeid */
 			nodeid=atoi(buffer);
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* tablename */
-
+			
 			if (FAIL == is_direct_slave_node(sender_nodeid))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data from node %d"

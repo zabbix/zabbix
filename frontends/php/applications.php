@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,31 +88,23 @@ include_once('include/page_header.php');
 /****** APPLICATIONS **********/
 	if(isset($_REQUEST['save'])){
 		DBstart();
-		$application = array(
-			'name' => $_REQUEST['appname'],
-			'hostid' => $_REQUEST['apphostid']
-		);
-
 		if(isset($_REQUEST['applicationid'])){
-			$application['applicationid'] = $_REQUEST['applicationid'];
-			$DBapplications = API::Application()->update($application);
-
+			$applicationid = update_application($_REQUEST['applicationid'],$_REQUEST['appname'], $_REQUEST['apphostid']);
 			$action		= AUDIT_ACTION_UPDATE;
 			$msg_ok		= S_APPLICATION_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_APPLICATION;
+			
 		}
-		else{
-			$DBapplications = API::Application()->create($application);
-
+		else {
+			$applicationid = add_application($_REQUEST['appname'], $_REQUEST['apphostid']);
 			$action		= AUDIT_ACTION_ADD;
 			$msg_ok		= S_APPLICATION_ADDED;
 			$msg_fail	= S_CANNOT_ADD_APPLICATION;
 		}
-		$result = DBend($DBapplications);
+		$result = DBend($applicationid);
 
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){
-			$applicationid = reset($DBapplications['applicationids']);
 			add_audit($action,AUDIT_RESOURCE_APPLICATION,S_APPLICATION.' ['.$_REQUEST['appname'].' ] ['.$applicationid.']');
 			unset($_REQUEST['form']);
 		}
@@ -125,7 +117,7 @@ include_once('include/page_header.php');
 				$host = get_host_by_hostid($app['hostid']);
 
 				DBstart();
-				$result = API::Application()->delete($_REQUEST['applicationid']);
+				$result = CApplication::delete($_REQUEST['applicationid']);
 				$result = DBend($result);
 			}
 			show_messages($result, S_APPLICATION_DELETED, S_CANNOT_DELETE_APPLICATION);
@@ -154,7 +146,7 @@ include_once('include/page_header.php');
 		while($db_app = DBfetch($db_applications)){
 			if(!isset($applications[$db_app['applicationid']]))	continue;
 
-			$go_result &= (bool) API::Application()->delete($db_app['applicationid']);
+			$go_result &= (bool) CApplication::delete($db_app['applicationid']);
 
 			if($go_result){
 				$host = get_host_by_hostid($db_app['hostid']);
@@ -218,13 +210,14 @@ include_once('include/page_header.php');
 <?php
 	$app_wdgt = new CWidget();
 
-	$frmForm = new CForm('get');
+	$frmForm = new CForm(null, 'get');
+	$frmForm->addVar('hostid',get_request('hostid', 0));
+
 	if(!isset($_REQUEST['form'])){
-		$frmForm->addItem(SPACE);
-		$frmForm->addItem(new CSubmit('form', S_CREATE_APPLICATION));
+		$frmForm->addItem(new CButton('form', S_CREATE_APPLICATION));
 	}
 
-	$app_wdgt->addPageheader(_('CONFIGURATION OF APPLICATIONS'), $frmForm);
+	$app_wdgt->addPageheader(S_CONFIGURATION_OF_APPLICATIONS, $frmForm);
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
@@ -247,11 +240,11 @@ include_once('include/page_header.php');
 
 		$db_host = get_host_by_hostid($apphostid,1 /* no error message */);
 		if($db_host){
-			$hostname = $db_host['name'];
+			$apphost = $db_host["host"];
 		}
 		else{
+			$apphost = '';
 			$apphostid = 0;
-			$hostname = '';
 		}
 
 		$frmApp = new CFormTable($frm_title);
@@ -267,15 +260,15 @@ include_once('include/page_header.php');
 		if(!isset($_REQUEST["applicationid"])){
 			// any new application can SELECT host
 			$frmApp->addRow(S_HOST,array(
-				new CTextBox('hostname', $hostname, 32, 'yes'),
-				new CButton('btn1', S_SELECT,
+				new CTextBox("apphost",$apphost,32,'yes'),
+				new CButton("btn1",S_SELECT,
 					"return PopUp('popup.php?dstfrm=".$frmApp->getName().
-					"&dstfld1=apphostid&dstfld2=hostname&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name&noempty=1',450,450);",
+					"&dstfld1=apphostid&dstfld2=apphost&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=host&noempty=1',450,450);",
 					'T')
 				));
 		}
 
-		$frmApp->addItemToBottomRow(new CSubmit('save',S_SAVE));
+		$frmApp->addItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($_REQUEST['applicationid'])){
 			$frmApp->addItemToBottomRow(SPACE);
 			$frmApp->addItemToBottomRow(new CButtonDelete(S_DELETE_APPLICATION,
@@ -290,7 +283,7 @@ include_once('include/page_header.php');
 	}
 	else{
 
-		$form = new CForm('get');
+		$form = new CForm(null, 'get');
 		$form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
 
@@ -306,7 +299,7 @@ include_once('include/page_header.php');
 		if($pageFilter->hostsSelected){
 // Header Host
 			if($_REQUEST['hostid'] > 0){
-				$tbl_header_host = get_header_host_table($_REQUEST['hostid'], 'applications');
+				$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'triggers', 'graphs'));
 				$app_wdgt->addItem($tbl_header_host);
 			}
 
@@ -335,17 +328,17 @@ include_once('include/page_header.php');
 				$options['hostids'] = $pageFilter->hostid;
 			else if($pageFilter->groupid > 0)
 				$options['groupids'] = $pageFilter->groupid;
-			$applications = API::Application()->get($options);
+			$applications = CApplication::get($options);
 
 			$paging = getPagingLine($applications);
 
 			$options = array(
 				'applicationids' => zbx_objectValues($applications, 'applicationid'),
 				'output' => API_OUTPUT_EXTEND,
-				'selectItems' => API_OUTPUT_REFER,
+				'select_items' => API_OUTPUT_REFER,
 				'expandData' => 1,
 			);
-			$applications = API::Application()->get($options);
+			$applications = CApplication::get($options);
 
 			order_result($applications, $sortfield, $sortorder);
 
@@ -358,7 +351,7 @@ include_once('include/page_header.php');
 				else{
 					$template_host = get_realhost_by_applicationid($application['templateid']);
 					$name = array(
-						new CLink($template_host['name'], 'applications.php?hostid='.$template_host['hostid'], 'unknown'),
+						new CLink($template_host['host'], 'applications.php?hostid='.$template_host['hostid'], 'unknown'),
 						':',
 						$application['name']
 					);
@@ -387,12 +380,12 @@ include_once('include/page_header.php');
 			$goBox->addItem($goOption);
 
 			// goButton name is necessary!!!
-			$goButton = new CSubmit('goButton',S_GO.' (0)');
+			$goButton = new CButton('goButton',S_GO.' (0)');
 			$goButton->setAttribute('id','goButton');
 
 			zbx_add_post_js('chkbxRange.pageGoName = "applications";');
 
-			$footer = get_table_header(array($goBox, $goButton));
+			$footer = get_table_header(new CCol(array($goBox, $goButton)));
 	//----
 
 			$table = array($paging,$table,$paging,$footer);

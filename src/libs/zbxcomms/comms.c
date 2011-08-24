@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2006 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,37 @@
 #include "common.h"
 #include "comms.h"
 #include "log.h"
+
+#if defined(_WINDOWS)
+#	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
+		typedef int ssize_t;
+#	else
+		typedef long ssize_t;
+#	endif /* __INT_MAX__ */
+
+#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
+#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
+
+#	define ZBX_TCP_ERROR		SOCKET_ERROR
+#	define ZBX_SOCK_ERROR		INVALID_SOCKET
+
+#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) closesocket(s)
+#	define zbx_sock_last_error()	WSAGetLastError()
+
+#	define ZBX_SOCK_ERR_TIMEDOUT	WSAETIMEDOUT
+#else
+#	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
+#	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
+
+#	define ZBX_TCP_ERROR		-1
+#	define ZBX_SOCK_ERROR		-1
+
+#	define zbx_sock_close(s)	if (ZBX_SOCK_ERROR != (s)) close(s)
+#	define zbx_sock_last_error()	errno
+
+#	define ZBX_SOCK_ERR_TIMEDOUT	EINTR
+
+#endif	/* _WINDOWS */
 
 #if defined(HAVE_IPV6)
 #	define ZBX_SOCKADDR struct sockaddr_storage
@@ -83,6 +114,7 @@ static void	__zbx_zbx_set_tcp_strerror(const char *fmt, ...)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
+
 #if defined(HAVE_IPV6)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 {
@@ -320,7 +352,8 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen))
 	{
-		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_set_tcp_strerror("*** Cannot connect to [[%s]:%d]: %s",
+				ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		goto out;
 	}
@@ -400,7 +433,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_send_ext                                                 *
+ * Function: zbx_tcp_send                                                     *
  *                                                                            *
  * Purpose: send data                                                         *
  *                                                                            *
@@ -419,6 +452,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int timeout)
 {
 	zbx_uint64_t	len64;
+
 	ssize_t		i = 0, written = 0;
 	int		ret = SUCCEED;
 
@@ -427,9 +461,9 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
 
-	if (0 != (flags & ZBX_TCP_PROTOCOL))
+	if (flags & ZBX_TCP_NEW_PROTOCOL)
 	{
-		/* write header */
+		/* Write header */
 		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(zbx_sock_last_error()));
@@ -440,8 +474,8 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 		len64 = (zbx_uint64_t)strlen(data);
 		len64 = zbx_htole_uint64(len64);
 
-		/* write data length */
-		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *)&len64, sizeof(len64)))
+		/* Write data length */
+		if (ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *) &len64, sizeof(len64)))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
@@ -451,7 +485,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 
 	while (written < (ssize_t)strlen(data))
 	{
-		if (ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data + written, (int)(strlen(data) - written))))
+		if (ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data+written,(int)(strlen(data)-written))))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			ret = FAIL;
@@ -585,8 +619,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 		{
 			if (ZBX_SOCKET_COUNT == s->num_socks)
 			{
-				zbx_set_tcp_strerror("not enough space for socket [[%s]:%s]",
-						ip ? ip : "-", port);
+				zbx_set_tcp_strerror("not enough space for socket [[%s]:%s]", ip ? ip : "-", port);
 				goto out;
 			}
 
@@ -673,7 +706,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 	if (0 == s->num_socks)
 	{
 		zbx_set_tcp_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
-				listen_ip ? listen_ip : "-", listen_port);
+				listen_ip, listen_port);
 		goto out;
 	}
 
@@ -779,7 +812,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 	if (0 == s->num_socks)
 	{
 		zbx_set_tcp_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
-				listen_ip ? listen_ip : "-", listen_port);
+				listen_ip, listen_port);
 		goto out;
 	}
 
@@ -897,21 +930,25 @@ void	zbx_tcp_free(zbx_sock_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_recv_ext                                                 *
+ * Function: zbx_tcp_recv                                                     *
  *                                                                            *
  * Purpose: receive data                                                      *
  *                                                                            *
- * Return value: number of bytes received - success,                          *
+ * Return value: SUCCEED - success                                            *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
+int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
 {
-#define ZBX_BUF_LEN	ZBX_STAT_BUF_LEN * 8
-	ssize_t		nbytes, left, read_bytes, total_bytes;
+#define ZBX_BUF_LEN	ZBX_STAT_BUF_LEN*8
+
+	ssize_t		nbytes, left;
+	ssize_t		read_bytes;
+
 	int		allocated, offset;
+	int		ret = SUCCEED;
 	zbx_uint64_t	expected_len;
 
 	ZBX_TCP_START();
@@ -921,66 +958,58 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 	zbx_free(s->buf_dyn);
 
-	total_bytes = 0;
+	memset(s->buf_stat, 0, sizeof(s->buf_stat));
+	*data = s->buf_stat;
+
 	read_bytes = 0;
 	s->buf_type = ZBX_BUF_TYPE_STAT;
-
-	*data = s->buf_stat;
 
 	left = ZBX_TCP_HEADER_LEN;
 	nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, left);
 
-	if (ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
+	if( ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN) )
 	{
-		total_bytes += nbytes;
 
 		left = sizeof(zbx_uint64_t);
 		nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left);
 		expected_len = zbx_letoh_uint64(expected_len);
 
+		/* The rest was already cleared */
+		memset(s->buf_stat, 0, ZBX_TCP_HEADER_LEN);
+
 		flags |= ZBX_TCP_READ_UNTIL_CLOSE;
 	}
-	else if (ZBX_TCP_ERROR != nbytes)
+	else if( ZBX_TCP_ERROR != nbytes )
 	{
-		read_bytes = nbytes;
-		expected_len = 16 * ZBX_MEBIBYTE;
+		read_bytes	= nbytes;
+		expected_len	= 16*1024*1024;
 	}
 
-	if (ZBX_TCP_ERROR != nbytes)
+	if( ZBX_TCP_ERROR != nbytes )
 	{
-		s->buf_stat[read_bytes] = '\0';
-
-		if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
-		{
-			if (0 == nbytes)
-				goto cleanup;
-		}
-		else
-		{
-			if (nbytes < left)
-				goto cleanup;
+		if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) {
+			if(nbytes == 0)		goto cleanup;
+		} else {
+			if(nbytes < left)	goto cleanup;
 		}
 
 		left = sizeof(s->buf_stat) - read_bytes - 1;
 
-		/* check for an empty socket if exactly ZBX_TCP_HEADER_LEN bytes (without a header) were sent */
-		if (0 == read_bytes || '\n' != s->buf_stat[read_bytes - 1])	/* requests to passive agents end with '\n' */
+		/* fill static buffer */
+		if ( s->buf_stat[ read_bytes - 1 ] != '\n' ) /* Don't try to read from an empty socket. */
 		{
-			/* fill static buffer */
-			while (read_bytes < expected_len && 0 < left &&
-					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat + read_bytes, left)))
+			while(	read_bytes < expected_len && left > 0
+				&& ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
 			{
 				read_bytes += nbytes;
 
-				if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
+				if( flags & ZBX_TCP_READ_UNTIL_CLOSE )
 				{
-					if (0 == nbytes)
-						break;
+					if(nbytes == 0)	break;
 				}
 				else
 				{
-					if (nbytes < left)
-						break;
+					if(nbytes < left) break;
 				}
 
 				left -= nbytes;
@@ -988,34 +1017,28 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 		}
 
 		s->buf_stat[read_bytes] = '\0';
-
-		if (sizeof(s->buf_stat) - 1 == read_bytes)	/* static buffer is full */
+		if( (sizeof(s->buf_stat) - 1) == read_bytes) /* static buffer is full */
 		{
-			allocated = ZBX_BUF_LEN;
-			s->buf_type = ZBX_BUF_TYPE_DYN;
-			s->buf_dyn = zbx_malloc(s->buf_dyn, allocated);
+			allocated		= ZBX_BUF_LEN;
 
+			s->buf_type		= ZBX_BUF_TYPE_DYN;
+			s->buf_dyn		= zbx_malloc(s->buf_dyn, allocated);
+
+			memset(s->buf_dyn, 0, allocated);
 			memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));
 
 			offset = read_bytes;
-
 			/* fill dynamic buffer */
-			while (read_bytes < expected_len &&
-					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat) - 1)))
+			while( read_bytes < expected_len && ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat)-1)) )
 			{
 				s->buf_stat[nbytes] = '\0';
 				zbx_snprintf_alloc(&(s->buf_dyn), &allocated, &offset, sizeof(s->buf_stat), "%s", s->buf_stat);
 				read_bytes += nbytes;
 
-				if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))
-				{
-					if (0 == nbytes)
-						break;
-				}
-				else
-				{
-					if (nbytes < sizeof(s->buf_stat) - 1)
-						break;
+				if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) {
+					if(nbytes == 0)	break;
+				} else {
+					if(nbytes < sizeof(s->buf_stat) - 1) break;
 				}
 			}
 
@@ -1023,19 +1046,16 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 		}
 	}
 
-	if (ZBX_TCP_ERROR == nbytes)
+	if( ZBX_TCP_ERROR == nbytes )
 	{
 		zbx_set_tcp_strerror("ZBX_TCP_READ() failed: %s", strerror_from_system(zbx_sock_last_error()));
-		total_bytes = FAIL;
+		ret = FAIL;
 	}
 cleanup:
 	if (0 != timeout)
 		zbx_tcp_timeout_cleanup(s);
 
-	if (FAIL != total_bytes)
-		total_bytes += read_bytes;
-
-	return total_bytes;
+	return ret;
 }
 
 char	*get_ip_by_socket(zbx_sock_t *s)
@@ -1215,12 +1235,12 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 			*end = ',';
 	}
 #if defined(HAVE_IPV6)
-	if (0 == getnameinfo((struct sockaddr *)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
-		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
+	if (0 == getnameinfo((struct sockaddr*)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
+		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s]", sname, ip_list);
 	else
-		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s].", ip_list);
+		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s]", ip_list);
 #else
-	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s].", sname, ip_list);
+	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s]", sname, ip_list);
 #endif
 	return	FAIL;
 }

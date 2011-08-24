@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ require_once('include/page_header.php');
 	$fields=array(
 		'text'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,			null),
 		'font'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,5),	null),
-		'theme'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
+		'color'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 	);
 
 	check_fields($fields);
@@ -42,15 +42,14 @@ require_once('include/page_header.php');
 
 	$text = get_request('text', ' ');
 	$font = get_request('font', 9);
-	$theme = get_request('theme', 'css_ob.css');
+	$color = get_request('color', 'black');
 
-	switch($theme){
-		case 'css_bb.css':
-		case 'css_od.css':
+	switch($color){
+		case 'white':
 			$color = array('red' => 255, 'green' => 255, 'blue' => 255);
 			$shadow = array('red' => 105, 'green' => 105, 'blue' => 105);
 			break;
-		case 'css_ob.css':
+		case 'black':
 		default:
 			$color = array('red' => 0, 'green' => 0, 'blue' => 0);
 			$shadow = array('red' => 175, 'green' => 175, 'blue' => 175);
@@ -62,17 +61,17 @@ require_once('include/page_header.php');
 
 	$width = imagesx($im);
 	$height = imagesy($im);
-
+	
 	$white = imagecolorallocate($im, $shadow['red'], $shadow['green'], $shadow['blue']);
-	imagefilledrectangle($im, 0 ,0, $width-1, $height-1, $white);
+	imagefilledrectangle($im, 0 ,0, $width-1, $height-1, $white);	
 
 	$text_color = imagecolorallocate($im, $color['red'], $color['green'], $color['blue']);
 	imageText($im, $font, 0, 0, $size['height'], $text_color, $text);
-
-
-	$newImage = imagecreatetruecolor($height, $width);
+	
+	
+	$newImage = imagecreatetruecolor($height, $width);	
 	$white = imagecolorallocate($newImage, $shadow['red'], $shadow['green'], $shadow['blue']);
-
+	
 	// imagealphablending($newImage, false);
 	// imagesavealpha($newImage, true);
 	for($w=0; $w<$width; $w++){
@@ -82,7 +81,7 @@ require_once('include/page_header.php');
 		}
 	}
 	imagecolortransparent($newImage, $white);
-
+	
 	imageOut($newImage);
 	imagedestroy($newImage);
 	imagedestroy($im);

@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "zbxjson.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused)
@@ -162,40 +161,4 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 			return (fl[i].function)(fsname, result);
 
 	return SYSINFO_RET_FAIL;
-}
-
-int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	int		ret = SYSINFO_RET_FAIL;
-	struct mnttab	mt;
-	FILE		*f;
-	struct zbx_json	j;
-
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addarray(&j, cmd);
-
-	/* opening the mounted filesystems file */
-	if (NULL != (f = fopen("/etc/mnttab", "r")))
-	{
-		/* fill mnttab structure from file */
-		while (-1 != getmntent(f, &mt))
-		{
-			zbx_json_addobject(&j, NULL);
-			zbx_json_addstring(&j, "{#FSNAME}", mt.mnt_mountp, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&j);
-		}
-
-		zbx_fclose(f);
-
-		ret = SYSINFO_RET_OK;
-	}
-
-	zbx_json_close(&j);
-
-	SET_STR_RESULT(result, strdup(j.buffer));
-
-	zbx_json_free(&j);
-
-	return ret;
 }

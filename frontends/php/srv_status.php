@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -273,7 +273,7 @@ include_once('include/page_header.php');
 		if($tree){
 // creates form for choosing a preset interval
 			$r_form = new CForm();
-			$r_form->setAttribute('class', 'nowrap');
+			$r_form->setClass('nowrap');
 			$r_form->setMethod('get');
 			$r_form->setAttribute('name', 'period_choice');
 			$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);

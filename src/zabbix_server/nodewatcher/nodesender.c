@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2006 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 
 /******************************************************************************
  *                                                                            *
- * Function: DMcolect_table_data                                              *
+ * Function: get_config_data                                                  *
  *                                                                            *
  * Purpose: obtain configuration changes to required node                     *
  *                                                                            *
@@ -195,119 +195,114 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
+ * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE *table,
-		char **data, int *data_alloc, int *data_offset)
+char	*get_config_data(int nodeid, int dest_nodetype)
 {
-#define ZBX_REC_UPDATED	'1'
-#define ZBX_REC_DELETED	'2'
-	const char	*__function_name = "DMcolect_table_data";
+	const char	*__function_name = "get_config_data";
 	DB_RESULT	result;
 	DB_RESULT	result2;
 	DB_ROW		row;
 	DB_ROW		row2;
+	const ZBX_TABLE	*table;
 
-	char	*hex = NULL, *sql = NULL, sync[129], *s,
-		*curr_cksum, *d_curr_cksum, *prev_cksum, *d_prev_cksum;
-	int	sql_offset = 0;
-	int	hex_allocated = 1024, sql_allocated = 8 * 1024;
+	char	*data = NULL, *hex = NULL, *sql = NULL, c[2], sync[129], *s, *r[2], *d[2];
+	int	data_offset = 0, sql_offset = 0;
+	int	data_allocated = 1024, hex_allocated = 1024, sql_allocated = 8192;
 	int	f, j, rowlen;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [table:'%s']", __function_name, table->table);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() node:%d dest_nodetype:%s", __function_name,
+			nodeid, (dest_nodetype == ZBX_NODE_MASTER) ? "MASTER" : "SLAVE");
 
+	data = zbx_malloc(data, data_allocated);
 	hex = zbx_malloc(hex, hex_allocated);
 	sql = zbx_malloc(sql, sql_allocated);
+	c[0] = '1';	/* for new and updated records */
+	c[1] = '2';	/* for deleted records */
 
-	result = DBselect(
-			/* Find new records */
-			"select curr.recordid,prev.cksum,curr.cksum,curr.sync"
-			" from node_cksum curr"
-				" left join node_cksum prev"
-					" on prev.nodeid=curr.nodeid"
-						" and prev.tablename=curr.tablename"
-						" and prev.recordid=curr.recordid"
-						" and prev.cksumtype=%d"
-			" where curr.nodeid=%d"
-				" and curr.tablename='%s'"
-				" and curr.cksumtype=%d"
-				" and prev.tablename is null"
-			" union all "
-			/* Find updated records */
-			"select curr.recordid,prev.cksum,curr.cksum,prev.sync"
-			" from node_cksum curr,node_cksum prev"
-			" where curr.nodeid=prev.nodeid"
-				" and curr.tablename=prev.tablename"
-				" and curr.recordid=prev.recordid"
-				" and curr.nodeid=%d"
-				" and curr.tablename='%s'"
-				" and curr.cksumtype=%d"
-				" and prev.cksumtype=%d"
-			" union all "
-			/* Find deleted records */
-			"select prev.recordid,prev.cksum,curr.cksum,prev.sync"
-			" from node_cksum prev"
-				" left join node_cksum curr"
-					" on curr.nodeid=prev.nodeid"
-						" and curr.tablename=prev.tablename"
-						" and curr.recordid=prev.recordid"
-						" and curr.cksumtype=%d"
-			" where prev.nodeid=%d"
-				" and prev.tablename='%s'"
-				" and prev.cksumtype=%d"
-				" and curr.tablename is null",
-			NODE_CKSUM_TYPE_OLD, nodeid, table->table, NODE_CKSUM_TYPE_NEW,
-			nodeid, table->table, NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD,
-			NODE_CKSUM_TYPE_NEW, nodeid, table->table, NODE_CKSUM_TYPE_OLD);
+	zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 16, "Data%c%d%c%d",
+			ZBX_DM_DELIMITER, CONFIG_NODEID, ZBX_DM_DELIMITER, nodeid);
+
+	/* Find updated records */
+	result = DBselect("select curr.tablename,curr.recordid,prev.cksum,curr.cksum,prev.sync "
+		"from node_cksum curr, node_cksum prev "
+		"where curr.nodeid=%d and prev.nodeid=curr.nodeid and "
+		"curr.tablename=prev.tablename and curr.recordid=prev.recordid and "
+		"curr.cksumtype=%d and prev.cksumtype=%d "
+		"union all "
+	/* Find new records */
+		"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,curr.sync "
+		"from node_cksum curr left join node_cksum prev "
+		"on prev.nodeid=curr.nodeid and prev.tablename=curr.tablename and "
+		"prev.recordid=curr.recordid and prev.cksumtype=%d "
+		"where curr.nodeid=%d and curr.cksumtype=%d and prev.tablename is null "
+		"union all "
+	/* Find deleted records */
+		"select prev.tablename,prev.recordid,prev.cksum,curr.cksum,prev.sync "
+		"from node_cksum prev left join node_cksum curr "
+		"on curr.nodeid=prev.nodeid and curr.tablename=prev.tablename and "
+		"curr.recordid=prev.recordid and curr.cksumtype=%d "
+		"where prev.nodeid=%d and prev.cksumtype=%d and curr.tablename is null",
+		nodeid, NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD,
+		NODE_CKSUM_TYPE_OLD, nodeid, NODE_CKSUM_TYPE_NEW,
+		NODE_CKSUM_TYPE_NEW, nodeid, NODE_CKSUM_TYPE_OLD);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (FAIL == DBis_null(row[3]))
-			zbx_strlcpy(sync, row[3], sizeof(sync));
+		/* Found table */
+		if (NULL == (table = DBget_table(row[0])))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot find table [%s]",
+					row[0]);
+			continue;
+		}
+
+		if (FAIL == DBis_null(row[4]))
+			zbx_strlcpy(sync, row[4], sizeof(sync));
 		else
 			memset(sync, ' ', sizeof(sync));
 
+		s = sync;
+
 		/* Special (simpler) processing for operation DELETE */
-		if (SUCCEED == DBis_null(row[2]))
+		if (SUCCEED == DBis_null(row[3]))
 		{
-			if ((dest_nodetype == ZBX_NODE_SLAVE && sync[0] != ZBX_REC_DELETED) ||
-					(dest_nodetype == ZBX_NODE_MASTER && sync[1] != ZBX_REC_DELETED))
+			if ((dest_nodetype == ZBX_NODE_SLAVE && s[0] != c[1]) ||
+					(dest_nodetype == ZBX_NODE_MASTER && s[1] != c[1]))
 			{
-				zbx_snprintf_alloc(data, data_alloc, data_offset, 128, "\n%s%c%s%c%d",
-						table->table, ZBX_DM_DELIMITER, row[0], ZBX_DM_DELIMITER,
+				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n%s%c%s%c%d",
+						row[0], ZBX_DM_DELIMITER,
+						row[1], ZBX_DM_DELIMITER,
 						NODE_CONFIGLOG_OP_DELETE);
 			}
 			continue;
 		}
 
-		prev_cksum = (SUCCEED == DBis_null(row[1]) ? NULL : row[1]);
-		curr_cksum = row[2];
-		s = sync;
+		r[0] = (SUCCEED == DBis_null(row[2]) ? NULL : row[2]);
+		r[1] = row[3];
 		f = 0;
-
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "select ");
 
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "select ");
 		do
 		{
 			while (0 == (table->fields[f].flags & ZBX_SYNC))
 				f++;
 
-			d_prev_cksum = NULL;
-			if (NULL != prev_cksum && NULL != (d_prev_cksum = strchr(prev_cksum, ',')))
-				*d_prev_cksum = '\0';
+			d[0] = NULL;
+			d[1] = NULL;
+			if (NULL != r[0] && NULL != (d[0] = strchr(r[0], ',')))
+				*d[0] = '\0';
+			if (NULL != r[1] && NULL != (d[1] = strchr(r[1], ',')))
+				*d[1] = '\0';
 
-			d_curr_cksum = NULL;
-			if (NULL != curr_cksum && NULL != (d_curr_cksum = strchr(curr_cksum, ',')))
-				*d_curr_cksum = '\0';
-
-			if (prev_cksum == NULL || curr_cksum == NULL ||
-					(dest_nodetype == ZBX_NODE_SLAVE && s[0] != ZBX_REC_UPDATED) ||
-					(dest_nodetype == ZBX_NODE_MASTER && s[1] != ZBX_REC_UPDATED) ||
-					0 != strcmp(prev_cksum, curr_cksum))
+			if (NULL == r[0] || NULL == r[1] ||
+					(ZBX_NODE_SLAVE == dest_nodetype && s[0] != c[0]) ||
+					(ZBX_NODE_MASTER == dest_nodetype && s[1] != c[0]) ||
+					0 != strcmp(r[0], r[1]))
 			{
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "%s,",
 						table->fields[f].name);
@@ -321,64 +316,65 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 			s += 2;
 			f++;
 
-			if (d_prev_cksum != NULL)
+			if (d[0] != NULL)
 			{
-				*d_prev_cksum = ',';
-				prev_cksum = d_prev_cksum + 1;
+				*d[0] = ',';
+				r[0] = d[0] + 1;
 			}
 			else
-				prev_cksum = NULL;
-
-			if (d_curr_cksum != NULL)
+				r[0] = NULL;
+			if (d[1] != NULL)
 			{
-				*d_curr_cksum = ',';
-				curr_cksum = d_curr_cksum + 1;
+				*d[1] = ',';
+				r[1] = d[1] + 1;
 			}
 			else
-				curr_cksum = NULL;
+				r[1] = NULL;
 		}
-		while (NULL != d_prev_cksum || NULL != d_curr_cksum);
+		while (NULL != d[0] || NULL != d[1]);
 
-		if (sql[sql_offset - 1] != ',')
+		if (sql[sql_offset-1] != ',')
 			continue;
 
 		sql_offset--;
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, " from %s where %s=%s",
-				table->table, table->recid, row[0]);
+			row[0],
+			table->recid,
+			row[1]);
 
 		result2 = DBselect("%s", sql);
 		if (NULL == (row2 = DBfetch(result2)))
 			goto out;
 
-		zbx_snprintf_alloc(data, data_alloc, data_offset, 128, "\n%s%c%s%c%d",
-				table->table, ZBX_DM_DELIMITER, row[0], ZBX_DM_DELIMITER,
-				NODE_CONFIGLOG_OP_UPDATE);
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n%s%c%s%c%d",
+			row[0],
+			ZBX_DM_DELIMITER,
+			row[1],
+			ZBX_DM_DELIMITER,
+			NODE_CONFIGLOG_OP_UPDATE);
 
-		prev_cksum = DBis_null(row[1]) == SUCCEED ? NULL : row[1];
-		curr_cksum = row[2];
+		r[0] = DBis_null(row[2]) == SUCCEED ? NULL : row[2];
+		r[1] = row[3];
 		s = sync;
 		f = 0;
 		j = 0;
 
 		do
 		{
-			while (0 == (table->fields[f].flags & ZBX_SYNC))
+			while ((table->fields[f].flags & ZBX_SYNC) == 0)
 				f++;
 
-			d_prev_cksum = NULL;
-			if (NULL != prev_cksum && NULL != (d_prev_cksum = strchr(prev_cksum, ',')))
-				*d_prev_cksum = '\0';
+			d[0] = NULL;
+			d[1] = NULL;
+			if (NULL != r[0] && NULL != (d[0] = strchr(r[0], ',')))
+				*d[0] = '\0';
+			if (NULL != r[1] && NULL != (d[1] = strchr(r[1], ',')))
+				*d[1] = '\0';
 
-			d_curr_cksum = NULL;
-			if (NULL != curr_cksum && NULL != (d_curr_cksum = strchr(curr_cksum, ',')))
-				*d_curr_cksum = '\0';
+			if (r[0] == NULL || r[1] == NULL || (dest_nodetype == ZBX_NODE_SLAVE && *s != c[0]) ||
+				(dest_nodetype == ZBX_NODE_MASTER && *(s+1) != c[0]) || strcmp(r[0], r[1]) != 0) {
 
-			if (prev_cksum == NULL || curr_cksum == NULL ||
-					(dest_nodetype == ZBX_NODE_SLAVE && s[0] != ZBX_REC_UPDATED) ||
-					(dest_nodetype == ZBX_NODE_MASTER && s[1] != ZBX_REC_UPDATED) ||
-					0 != strcmp(prev_cksum, curr_cksum))
-			{
-				zbx_snprintf_alloc(data, data_alloc, data_offset, 128, "%c%s%c%d%c",
+				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%c%s%c%d%c",
 						ZBX_DM_DELIMITER, table->fields[f].name,
 						ZBX_DM_DELIMITER, table->fields[f].type,
 						ZBX_DM_DELIMITER);
@@ -386,26 +382,26 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 				/* Fieldname, type, value */
 				if (SUCCEED == DBis_null(row2[j]))
 				{
-					zbx_snprintf_alloc(data, data_alloc, data_offset, 5, "NULL");
+					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 5, "NULL");
 				}
 				else if (table->fields[f].type == ZBX_TYPE_INT ||
 					table->fields[f].type == ZBX_TYPE_UINT ||
 					table->fields[f].type == ZBX_TYPE_ID ||
 					table->fields[f].type == ZBX_TYPE_FLOAT)
 				{
-					zbx_snprintf_alloc(data, data_alloc, data_offset, 128, "%s", row2[j]);
+					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s", row2[j]);
 				}
 				else
 				{
-					if (table->fields[f].type == ZBX_TYPE_BLOB)
+					if (ZBX_TYPE_BLOB == table->fields[f].type)
 						rowlen = atoi(row2[j + 1]);
 					else
 						rowlen = strlen(row2[j]);
-					rowlen = zbx_binary2hex((u_char *)row2[j], rowlen, &hex, &hex_allocated);
-					zbx_snprintf_alloc(data, data_alloc, data_offset, rowlen + 1, "%s", hex);
+					zbx_binary2hex((u_char *)row2[j], rowlen, &hex, &hex_allocated);
+					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, strlen(hex) + 128, "%s", hex);
 				}
 
-				if (table->fields[f].type == ZBX_TYPE_BLOB)
+				if (ZBX_TYPE_BLOB == table->fields[f].type)
 					j += 2;
 				else
 					j++;
@@ -413,23 +409,23 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 			s += 2;
 			f++;
 
-			if (d_prev_cksum != NULL)
+			if (NULL != d[0])
 			{
-				*d_prev_cksum = ',';
-				prev_cksum = d_prev_cksum + 1;
+				*d[0] = ',';
+				r[0] = d[0] + 1;
 			}
 			else
-				prev_cksum = NULL;
+				r[0] = NULL;
 
-			if (d_curr_cksum != NULL)
+			if (NULL != d[1])
 			{
-				*d_curr_cksum = ',';
-				curr_cksum = d_curr_cksum + 1;
+				*d[1] = ',';
+				r[1] = d[1] + 1;
 			}
 			else
-				curr_cksum = NULL;
+				r[1] = NULL;
 		}
-		while (NULL != d_prev_cksum || NULL != d_curr_cksum);
+		while (NULL != d[0] || NULL != d[1]);
 out:
 		DBfree_result(result2);
 	}
@@ -437,112 +433,6 @@ out:
 
 	zbx_free(hex);
 	zbx_free(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DMget_table_data                                                 *
- *                                                                            *
- * Purpose: get configuration changes to required node for specified table    *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: SUCCESS - processed successfully                             *
- *               FAIL - an error occurred                                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	DMget_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE *table,
-		char **data, int *data_alloc, int *data_offset,
-		char **ptbls, int *ptbls_alloc, int *ptbls_offset)
-{
-	const char	*__function_name = "DMget_table_data";
-
-	int		f, res = SUCCEED;
-	const ZBX_TABLE	*fk_table;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [table:'%s']",
-			__function_name, table->table);
-
-	if (SUCCEED == str_in_list(*ptbls, table->table, ','))
-		return SUCCEED;
-
-	zbx_snprintf_alloc(ptbls, ptbls_alloc, ptbls_offset, ZBX_TABLENAME_LEN + 2, "%s%s",
-			*ptbls_offset ? "," : "", table->table);
-
-	for (f = 0; NULL != table->fields[f].name; f++)
-	{
-		if (0 == (table->fields[f].flags & ZBX_SYNC))
-			continue;
-
-		if (NULL == table->fields[f].fk_table)
-			continue;
-
-		fk_table = DBget_table(table->fields[f].fk_table);
-		DMget_table_data(nodeid, dest_nodetype, fk_table,
-				data, data_alloc, data_offset,
-				ptbls, ptbls_alloc, ptbls_offset);
-	}
-	DMcollect_table_data(nodeid, dest_nodetype, table,
-			data, data_alloc, data_offset);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(res));
-
-	return res;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DMget_config_data                                                *
- *                                                                            *
- * Purpose: get configuration changes to required node                        *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: SUCCESS - processed successfully                             *
- *               FAIL - an error occurred                                     *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-char	*DMget_config_data(int nodeid, int dest_nodetype)
-{
-	const char	*__function_name = "DMget_config_data";
-
-	char		*ptbls = NULL;	/* list of processed tables */
-	int		ptbls_alloc = 1024, ptbls_offset = 0;
-	char		*data = NULL;
-	int		data_alloc = 1024, data_offset = 0;
-	int		t;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [node:%d] [dest_nodetype:%s]", __function_name,
-			nodeid, zbx_nodetype_string(dest_nodetype));
-
-	ptbls = zbx_malloc(ptbls, ptbls_alloc);
-	data = zbx_malloc(data, data_alloc);
-
-	zbx_snprintf_alloc(&data, &data_alloc, &data_offset, 16, "Data%c%d%c%d",
-			ZBX_DM_DELIMITER, CONFIG_NODEID, ZBX_DM_DELIMITER, nodeid);
-
-	for (t = 0; NULL != tables[t].table; t++)
-	{
-		if (0 == (tables[t].flags & ZBX_SYNC))
-			continue;
-
-		DMget_table_data(nodeid, dest_nodetype, &tables[t],
-				&data, &data_alloc, &data_offset,
-				&ptbls, &ptbls_alloc, &ptbls_offset);
-	}
-
-	zbx_free(ptbls);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -601,43 +491,29 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 		*sql[1] = '\0';
 	}
 
-	result = DBselect(
-			/* Find new records */
-			"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,NULL"
-			" from node_cksum curr"
-				" left join node_cksum prev"
-					" on prev.nodeid=curr.nodeid"
-						" and prev.tablename=curr.tablename"
-						" and prev.recordid=curr.recordid"
-						" and prev.cksumtype=%d"
-			" where curr.nodeid=%d"
-				" and curr.cksumtype=%d"
-				" and prev.tablename is null%s"
-			" union all "
-			/* Find updated records */
-			"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,prev.sync"
-			" from node_cksum curr, node_cksum prev"
-			" where curr.nodeid=%d"
-				" and prev.nodeid=curr.nodeid"
-				" and curr.tablename=prev.tablename"
-				" and curr.recordid=prev.recordid"
-				" and curr.cksumtype=%d"
-				" and prev.cksumtype=%d%s"
-			" union all "
-			/* Find deleted records */
-			"select prev.tablename,prev.recordid,prev.cksum,curr.cksum,prev.sync"
-			" from node_cksum prev"
-				" left join node_cksum curr"
-					" on curr.nodeid=prev.nodeid"
-						" and curr.tablename=prev.tablename"
-						" and curr.recordid=prev.recordid"
-						" and curr.cksumtype=%d"
-			" where prev.nodeid=%d"
-				" and prev.cksumtype=%d"
-				" and curr.tablename is null%s",
-			NODE_CKSUM_TYPE_OLD, nodeid, NODE_CKSUM_TYPE_NEW, sql[0],
-			nodeid, NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD, sql[0],
-			NODE_CKSUM_TYPE_NEW, nodeid, NODE_CKSUM_TYPE_OLD, sql[1]);
+	/* Find updated records */
+	result = DBselect("select curr.tablename,curr.recordid,prev.cksum,curr.cksum,prev.sync "
+		"from node_cksum curr, node_cksum prev "
+		"where curr.nodeid=%d and prev.nodeid=curr.nodeid and "
+		"curr.tablename=prev.tablename and curr.recordid=prev.recordid and "
+		"curr.cksumtype=%d and prev.cksumtype=%d%s "
+		"union all "
+	/* Find new records */
+		"select curr.tablename,curr.recordid,prev.cksum,curr.cksum,NULL "
+		"from node_cksum curr left join node_cksum prev "
+		"on prev.nodeid=curr.nodeid and prev.tablename=curr.tablename and "
+		"prev.recordid=curr.recordid and prev.cksumtype=%d "
+		"where curr.nodeid=%d and curr.cksumtype=%d and prev.tablename is null%s "
+		"union all "
+	/* Find deleted records */
+		"select prev.tablename,prev.recordid,prev.cksum,curr.cksum,prev.sync "
+		"from node_cksum prev left join node_cksum curr "
+		"on curr.nodeid=prev.nodeid and curr.tablename=prev.tablename and "
+		"curr.recordid=prev.recordid and curr.cksumtype=%d "
+		"where prev.nodeid=%d and prev.cksumtype=%d and curr.tablename is null%s",
+		nodeid, NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD, sql[0],
+		NODE_CKSUM_TYPE_OLD, nodeid, NODE_CKSUM_TYPE_NEW, sql[0],
+		NODE_CKSUM_TYPE_NEW, nodeid, NODE_CKSUM_TYPE_OLD, sql[1]);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -875,7 +751,7 @@ void process_nodes()
 /*		DBbegin();*/
 
 		res = calculate_checksums(nodeid, NULL, 0);
-		if (SUCCEED == res && NULL != (data = DMget_config_data(nodeid, ZBX_NODE_MASTER))) {
+		if (SUCCEED == res && NULL != (data = get_config_data(nodeid, ZBX_NODE_MASTER))) {
 			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending configuration changes to master node %d for node %d datalen %d",
 				CONFIG_NODEID,
 				master_nodeid,

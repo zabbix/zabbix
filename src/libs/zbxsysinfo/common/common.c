@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,26 +49,23 @@ ZBX_METRIC	parameters_common[] =
 	{"agent.ping",		0,		AGENT_PING, 		0,	0},
 	{"agent.version",	0,		AGENT_VERSION,		0,	0},
 
-	{"system.localtime",	CF_USEUPARAM,	SYSTEM_LOCALTIME,	0,	"utc"},
+	{"system.localtime",	0,		SYSTEM_LOCALTIME,	0,	0},
 	{"system.run",		CF_USEUPARAM,	SYSTEM_RUN,	 	0,	"echo test"},
 
 	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"localhost,,80"},
 	{"web.page.perf",	CF_USEUPARAM,	WEB_PAGE_PERF,	 	0,	"localhost,,80"},
 	{"web.page.regexp",	CF_USEUPARAM,	WEB_PAGE_REGEXP,	0,	"localhost,,80,OK"},
 
-	{"vfs.file.size",	CF_USEUPARAM,	VFS_FILE_SIZE, 		0,	VFS_TEST_FILE},
-	{"vfs.file.time",	CF_USEUPARAM,	VFS_FILE_TIME,		0,	VFS_TEST_FILE ",modify"},
 	{"vfs.file.exists",	CF_USEUPARAM,	VFS_FILE_EXISTS,	0,	VFS_TEST_FILE},
-	{"vfs.file.contents",	CF_USEUPARAM,	VFS_FILE_CONTENTS,	0,	VFS_TEST_FILE},
+	{"vfs.file.time",	CF_USEUPARAM,	VFS_FILE_TIME,		0,	VFS_TEST_FILE ",modify"},
+	{"vfs.file.size",	CF_USEUPARAM,	VFS_FILE_SIZE, 		0,	VFS_TEST_FILE},
 	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
 	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
-	{"vfs.file.md5sum",	CF_USEUPARAM,	VFS_FILE_MD5SUM,	0,	VFS_TEST_FILE},
 	{"vfs.file.cksum",	CF_USEUPARAM,	VFS_FILE_CKSUM,		0,	VFS_TEST_FILE},
+	{"vfs.file.md5sum",	CF_USEUPARAM,	VFS_FILE_MD5SUM,	0,	VFS_TEST_FILE},
 
-	{"net.dns",		CF_USEUPARAM,	NET_DNS,		0,	",zabbix.com"},
-	{"net.dns.record",	CF_USEUPARAM,	NET_DNS_RECORD,		0,	",zabbix.com"},
-	{"net.tcp.dns",		CF_USEUPARAM,	NET_DNS,		0,	",zabbix.com"}, /* deprecated */
-	{"net.tcp.dns.query",	CF_USEUPARAM,	NET_DNS_RECORD,		0,	",zabbix.com"}, /* deprecated */
+	{"net.tcp.dns",		CF_USEUPARAM,	NET_TCP_DNS,		0,	",zabbix.com"},
+	{"net.tcp.dns.query",	CF_USEUPARAM,	NET_TCP_DNS_QUERY,	0,	",zabbix.com"},
 	{"net.tcp.port",	CF_USEUPARAM,	NET_TCP_PORT,		0,	",80"},
 
 	{"system.hostname",	CF_USEUPARAM,	SYSTEM_HOSTNAME,	0,	0},
@@ -124,7 +121,7 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
-#endif	/* HAVE_PROC */
+#endif /* HAVE_PROC */
 }
 
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -139,23 +136,6 @@ static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGE
 	SET_STR_RESULT(result, zbx_strdup(NULL, ZABBIX_VERSION));
 
 	return SYSINFO_RET_OK;
-}
-
-int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	int	ret;
-
-	ret = EXECUTE_STR(cmd, param, flags, result);
-
-	if (SYSINFO_RET_FAIL == ret && 0 == result->type)
-	{
-		/* only whitespace */
-
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
-		ret = SYSINFO_RET_OK;
-	}
-
-	return ret;
 }
 
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

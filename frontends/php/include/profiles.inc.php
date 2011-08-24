@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,18 +22,19 @@
 /********** USER PROFILE ***********/
 
 class CProfile{
-	private static $userDetails = array();
+
 	private static $profiles = null;
 	private static $update = array();
 	private static $insert = array();
 
 	public static function init(){
-		self::$userDetails = CWebUser::$data;
+		global $USER_DETAILS;
+
 		self::$profiles = array();
 
 		$sql = 'SELECT * '.
 				' FROM profiles '.
-				' WHERE userid='.self::$userDetails['userid'].
+				' WHERE userid='.$USER_DETAILS['userid'].
 					' AND '.DBin_node('profileid', false).
 				' ORDER BY userid ASC, profileid ASC';
 		$db_profiles = DBselect($sql);
@@ -48,17 +49,13 @@ class CProfile{
 	}
 
 	public static function flush(){
-// if not initialised, no changes were made
-		if(is_null(self::$profiles)) return true;
-
-		if(self::$userDetails['userid'] <= 0) return;
 
 		if(!empty(self::$insert) || !empty(self::$update)){
 
 			DBstart();
 			foreach(self::$insert as $idx => $profile){
 				foreach($profile as $idx2 => $data){
-					self::insertDB($idx, $data['value'], $data['type'], $idx2);
+					$result = self::insertDB($idx, $data['value'], $data['type'], $idx2);
 				}
 			}
 
@@ -90,6 +87,8 @@ class CProfile{
 	}
 
 	public static function update($idx, $value, $type, $idx2=0){
+		global $USER_DETAILS;
+
 		if(is_null(self::$profiles)){
 			self::init();
 		}
@@ -124,12 +123,13 @@ class CProfile{
 	}
 
 	private static function insertDB($idx, $value, $type, $idx2){
+		global $USER_DETAILS;
 
 		$value_type = self::getFieldByType($type);
 
 		$values = array(
 			'profileid' => get_dbid('profiles', 'profileid'),
-			'userid' => self::$userDetails['userid'],
+			'userid' => $USER_DETAILS['userid'],
 			'idx' => zbx_dbstr($idx),
 			$value_type => ($value_type == 'value_str') ? zbx_dbstr($value) : $value,
 			'type' => $type,
@@ -142,6 +142,8 @@ class CProfile{
 	}
 
 	private static function updateDB($idx, $value, $type, $idx2){
+		global $USER_DETAILS;
+
 		$sql_cond = '';
 // dirty fix, but havn't figureout something better
 		if($idx != 'web.nodes.switch_node') $sql_cond .= ' AND '.DBin_node('profileid', false);
@@ -154,7 +156,7 @@ class CProfile{
 		$sql = 'UPDATE profiles SET '.
 					$value_type.'='.$value.','.
 					' type='.$type.
-				' WHERE userid='.self::$userDetails['userid'].
+				' WHERE userid='.$USER_DETAILS['userid'].
 					' AND idx='.zbx_dbstr($idx).
 					$sql_cond;
 
@@ -196,14 +198,13 @@ class CProfile{
 
 /************ CONFIG **************/
 
-function select_config($cache=true, $nodeid=null){
-	global $page, $ZBX_LOCALNODEID;
+function select_config($cache = true){
+	global $page;
 	static $config;
 
 	if($cache && isset($config)) return $config;
-	if(is_null($nodeid)) $nodeid = $ZBX_LOCALNODEID;
 
-	$row = DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', $nodeid)));
+	$row = DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', get_current_nodeid(false))));
 
 	if($row){
 		$config = $row;
@@ -221,81 +222,19 @@ function update_config($configs){
 	if(isset($configs['work_period']) && !is_null($configs['work_period'])){
 		if(!validate_period($configs['work_period'])){
 			error(S_INCORRECT_WORK_PERIOD);
-			return false;
+			return NULL;
 		}
 	}
 	if(isset($configs['alert_usrgrpid']) && !is_null($configs['alert_usrgrpid'])){
 		if(($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
-			error(_('Incorrect user group.'));
-			return false;
+			error(S_INCORRECT_GROUP);;
+			return NULL;
 		}
 	}
-
-	// checking color values to be correct hexadecimal numbers
-	$colors = array(
-		'severity_color_0',
-		'severity_color_1',
-		'severity_color_2',
-		'severity_color_3',
-		'severity_color_4',
-		'severity_color_5',
-		'problem_unack_color',
-		'problem_ack_color',
-		'ok_unack_color',
-		'ok_ack_color'
-	);
-	foreach($colors as $color){
-		if(isset($configs[$color]) && !is_null($configs[$color])){
-			if(!preg_match('/[0-9a-f]{6}/i', $configs[$color])){
-				error(_('Colour is not correct: expecting hexadecimal colour code (6 symbols).'));
-				return false;
-			}
-		}
-	}
-
-	if(isset($configs['ok_period']) && !is_null($configs['ok_period']) && !ctype_digit($configs['ok_period'])){
-		error(_('"Display OK triggers" needs to be "0" or a positive integer.'));
-		return false;
-	}
-
-	if(isset($configs['blink_period']) && !is_null($configs['blink_period']) && !ctype_digit($configs['blink_period'])){
-		error(_('"Triggers blink on status change" needs to be "0" or a positive integer.'));
-		return false;
-	}
-
-	$currentConfig = select_config();
-// check duplicate severity names and if name is empty.
-	$names = array();
-	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
-		$varName = 'severity_name_'.$i;
-		if(!isset($configs[$varName]) || is_null($configs[$varName])){
-			$configs[$varName] = $currentConfig[$varName];
-		}
-
-		if($configs[$varName] == ''){
-			error(_s('Severity name cannot be empty.'));
-			return false;
-		}
-
-		if(isset($names[$configs[$varName]])){
-			error(_s('Duplicate severity name "%s".', $configs[$varName]));
-			return false;
-		}
-		else{
-			$names[$configs[$varName]] = 1;
-		}
-	}
-
 
 	foreach($configs as $key => $value){
-		if(!is_null($value)){
-			if($key == 'alert_usrgrpid'){
-				$update[] = $key.'='.zero2null($value);
-			}
-			else{
-				$update[] = $key.'='.zbx_dbstr($value);
-			}
-		}
+		if(!is_null($value))
+			$update[] = $key.'='.zbx_dbstr($value);
 	}
 
 	if(count($update) == 0){
@@ -309,17 +248,19 @@ return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('
 
 /************ HISTORY **************/
 function get_user_history(){
+	global $USER_DETAILS;
+
 	$result = array();
 	$delimiter = new CSpan('&raquo;','delimiter');
 
 	$sql = 'SELECT title1, url1, title2, url2, title3, url3, title4, url4, title5, url5
-			FROM user_history WHERE userid='.CWebUser::$data['userid'];
+			FROM user_history WHERE userid='.$USER_DETAILS['userid'];
 	$history = DBfetch(DBSelect($sql));
 
 	if($history && !zbx_empty($history['url4']))
-		CWebUser::$data['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
+		$USER_DETAILS['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
 	else
-		CWebUser::$data['last_page'] = array('title' => S_DASHBOARD, 'url' => 'dashboard.php');
+		$USER_DETAILS['last_page'] = array('title' => S_DASHBOARD, 'url' => 'dashboard.php');
 
 	for($i = 1; $i<6; $i++){
 		if(defined($history['title'.$i])){
@@ -334,7 +275,9 @@ function get_user_history(){
 }
 
 function add_user_history($page){
-	$userid = CWebUser::$data['userid'];
+	global $USER_DETAILS;
+
+	$userid = $USER_DETAILS['userid'];
 	$title = $page['title'];
 
 	if(isset($page['hist_arg']) && is_array($page['hist_arg'])){
@@ -394,11 +337,13 @@ return $result;
 /********** USER FAVORITES ***********/
 // Author: Aly
 function get_favorites($idx){
+	global $USER_DETAILS;
+
 	$result = array();
 
 	$sql = 'SELECT value_id, source '.
 			' FROM profiles '.
-			' WHERE userid='.CWebUser::$data['userid'].
+			' WHERE userid='.$USER_DETAILS['userid'].
 				' AND idx='.zbx_dbstr($idx).
 			' ORDER BY profileid ASC';
 	$db_profiles = DBselect($sql);
@@ -411,6 +356,8 @@ function get_favorites($idx){
 
 // Author: Aly
 function add2favorites($favobj, $favid, $source=null){
+	global $USER_DETAILS;
+
 	$favorites = get_favorites($favobj);
 
 	foreach($favorites as $id => $favorite){
@@ -422,7 +369,7 @@ function add2favorites($favobj, $favid, $source=null){
 	DBstart();
 	$values = array(
 		'profileid' => get_dbid('profiles', 'profileid'),
-		'userid' => CWebUser::$data['userid'],
+		'userid' => $USER_DETAILS['userid'],
 		'idx' => zbx_dbstr($favobj),
 		'value_id' =>  $favid,
 		'type' => PROFILE_TYPE_ID
@@ -439,8 +386,10 @@ return $result;
 
 // Author: Aly
 function rm4favorites($favobj, $favid=0, $source=null){
+	global $USER_DETAILS;
+
 	$sql = 'DELETE FROM profiles '.
-		' WHERE userid='.CWebUser::$data['userid'].
+		' WHERE userid='.$USER_DETAILS['userid'].
 			' AND idx='.zbx_dbstr($favobj).
 			(($favid > 0) ? ' AND value_id='.$favid : '').
 			(is_null($source) ? '' : ' AND source='.zbx_dbstr($source));
@@ -462,5 +411,4 @@ function infavorites($favobj, $favid, $source=null){
 	return false;
 }
 /********** END USER FAVORITES ***********/
-
 ?>

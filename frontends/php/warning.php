@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,13 +49,13 @@ $refresh_rate = 30; //seconds
 		redirect('index.php');
 	}
 //	clear_messages();
-CWebUser::$data['refresh'] = $refresh_rate;
+$USER_DETAILS['refresh'] = $refresh_rate;
 
 include_once('include/page_header.php');
 
 unset($USER_DETAILS);
 
-	$table = new CTable(null, 'warningTable');
+	$table = new CTable(null, 'warning');
 	$table->setAlign('center');
 	$table->setAttribute('style','width: 480px; margin-top: 100px;');
 	$table->setHeader(array(new CCol(S_ZABBIX.SPACE.ZABBIX_VERSION, 'left')),'header');
@@ -70,7 +70,10 @@ unset($USER_DETAILS);
 	$msg = new CSpan(bold(SPACE.$warning_msg));
 	$msg->setAttribute('style','line-height: 20px; vertical-align: top;');
 
-	$table->addRow(new CCol(array($img, $msg),'center'));
+	$table->addRow(new CCol(array(
+						$img,
+						$msg),
+						'center'));
 	$table->addRow(SPACE);
 
 	$table->setFooter(new CCol(new CButton('retry',S_RETRY,'javascript: document.location.reload();'),'left'),'footer');

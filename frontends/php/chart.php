@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(!DBfetch(DBselect('select itemid from items where itemid='.$_REQUEST['itemid']))){
-		show_error_message(S_NO_ITEMS_DEFINED);
+		show_error_message(S_NO_ITEM_DEFINED);
 	}
 
 	$options = array(
@@ -53,7 +53,7 @@ include_once('include/page_header.php');
 		'nodeids' => get_current_nodeid(true)
 	);
 
-	$db_data = API::Item()->get($options);
+	$db_data = CItem::get($options);
 	if(empty($db_data)) access_deny();
 
 	$graph = new CChart();

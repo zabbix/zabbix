@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ private $css_class;
 private $pageHeaders;
 private $headers;
 private $flicker;
+private $items;
 
 	public function __construct($id=null,$body=null,$state=null){
 		if(is_null($id)){
@@ -84,14 +85,23 @@ private $flicker;
 	}
 
 	public function get(){
+//		$widget = new CTable();
+//		$widget->setAttribute('width','100%');
+//		$widget->setCellPadding(0);
+//		$widget->setCellSpacing(0);
+
 		$widget = array();
 
 		if(!empty($this->pageHeaders)){
-			$widget[] = $this->createPageHeader();
+			$header_tab = $this->createPageHeader();
+//			$widget->addRow(new CCol($header_tab));
+			$widget[] = $header_tab;
 		}
 
 		if(!empty($this->headers)){
-			$widget[] = $this->createHeader();
+			$header_tab = $this->createHeader();
+//			$widget->addRow($header_tab);
+			$widget[] = $header_tab;
 		}
 
 		if(is_null($this->state)){
@@ -105,36 +115,42 @@ private $flicker;
 			$flicker_tab->setCellPadding(0);
 			$flicker_tab->setCellSpacing(0);
 
-			$div = new CDiv($this->flicker,null,$flicker_domid);
+			$div = new CDiv($this->flicker);
+			$div->setAttribute('id',$flicker_domid);
 			if(!$this->flicker_state) $div->setAttribute('style','display: none;');
 
 //			$flicker_tab->addRow($div);
 
-			$icon_l = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down','flicker_icon_l');
+			$icon_l = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down');
 			$icon_l->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
+			$icon_l->setAttribute('id','flicker_icon_l');
 
-			$icon_r = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down','flicker_icon_r');
+			$icon_r = new CDiv(SPACE.SPACE, $this->flicker_state?'dbl_arrow_up':'dbl_arrow_down');
 			$icon_r->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
+			$icon_r->setAttribute('id','flicker_icon_r');
 
-			$icons_row = new CTable(null,'textwhite');
+			$icons_row = new CTable(null,'whitetext');
 			$icons_row->addRow(array($icon_l,new CSpan(SPACE.S_FILTER.SPACE),$icon_r));
 
 			$thin_tab = $this->createFlicker($icons_row);
-			$thin_tab->attr('id','filter_icon');
+			$thin_tab->setAttribute('id','filter_icon');
 			$thin_tab->addAction('onclick', "javascript: change_flicker_state('".$flicker_domid."');");
 
 			$flicker_tab->addRow($thin_tab,'textcolorstyles pointer');
 
 			$flicker_tab->addRow($div);
 
+//			$widget->addRow($flicker_tab);
 			$widget[] = $flicker_tab;
 		}
 
-		$div = new CDiv($this->body, 'mainwidget');
+		$div = new CDiv($this->body);
 		$div->setAttribute('id',$this->domid);
+//		$div->setAttribute('style','width: 1180px; overflow: auto;');
 
 		if(!$this->state) $div->setAttribute('style','display: none;');
 
+//		$widget->addRow($div);
 		$widget[] = $div;
 
 	return $widget;
@@ -147,6 +163,7 @@ private $flicker;
 	public function toString(){
 		$tab = $this->get();
 
+//	return $tab->toString();
 	return unpack_object($tab);
 	}
 
@@ -157,14 +174,16 @@ private $flicker;
 			$pageHeader[] = $this->createPageHeaderRow($header['left'], $header['right']);
 		}
 
-	return new CDiv($pageHeader);
+		// $pageHeader[] = BR();
+
+	return $pageHeader;
 	}
 
 	private function createPageHeaderRow($col1, $col2=SPACE){
 		if(isset($_REQUEST['print'])){
 			hide_form_items($col1);
 			hide_form_items($col2);
-// if empty header, do not show it
+		//if empty header than do not show it
 			if(($col1 == SPACE) && ($col2 == SPACE)) return new CJSscript('');
 		}
 
@@ -183,21 +202,25 @@ private $flicker;
 		$right_tab = new CTable(null,'nowrap');
 		$right_tab->setAttribute('width','100%');
 
+//		$right_tab->addRow($right_row, 'textblackwhite');
 		$right_tab->addRow($right_row);
 
-		$table = new CTable(NULL,'ui-widget-header ui-corner-all header maxwidth');
+		$table = new CTable(NULL,'header bottom_space');
+//		$table->setAttribute('border',0);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
-		$td_r = new CCol($right_tab,'header_r right');
-		$table->addRow(array(new CCol($col1,'header_l left'), $td_r));
+		$td_r = new CCol($right_tab,'header_r');
+		$td_r->setAttribute('align','right');
+
+		$table->addRow(array(new CCol($col1,'header_l'), $td_r));
 
 	return $table;
 	}
 
 	private function createHeader(){
-		$header = reset($this->headers);
-		//$header = array_shift($this->headers);
+		$header = array_shift($this->headers);
+
 
 		$td_l = new CCol(SPACE);
 		$td_l->setAttribute('width','100%');
@@ -223,11 +246,7 @@ private $flicker;
 
 		$header['right'] = $right_tab;
 
-
-		$header_tab = new CTable(null, $this->css_class.' maxwidth');
-		if($this->css_class != 'header_wide')
-			$header_tab->addClass('ui-widget-header ui-corner-all');
-
+		$header_tab = new CTable(null,$this->css_class);
 		$header_tab->setCellSpacing(0);
 		$header_tab->setCellPadding(1);
 
@@ -238,30 +257,31 @@ private $flicker;
 		$header_tab->addRow($this->createHeaderRow($header['left'],$right_tab),'first');
 
 		foreach($this->headers as $num => $header){
-			if($num == 0) continue;
 			$header_tab->addRow($this->createHeaderRow($header['left'],$header['right']), 'next');
 		}
 
-		return new CDiv($header_tab);
+	return $header_tab;
 	}
 
 	private function createHeaderRow($col1, $col2=SPACE){
 		if(isset($_REQUEST['print'])){
 			hide_form_items($col1);
 			hide_form_items($col2);
-// if empty header, do not show it
+//if empty header than do not show it
 			if(($col1 === SPACE) && ($col2 === SPACE)) return new CJSscript('');
 		}
 
-		$td_r = new CCol($col2,'header_r right');
-		$row = array(new CCol($col1,'header_l left'), $td_r);
+		$td_r = new CCol($col2,'header_r');
+		$td_r->setAttribute('align','right');
+
+		$row = array(new CCol($col1,'header_l'), $td_r);
 
 	return $row;
 	}
 
 	private function createFlicker($col1, $col2=NULL){
 
-		$table = new CTable(NULL,'textwhite maxwidth middle flicker');
+		$table = new CTable(NULL,'flicker');
 //		$table->setAttribute('border',1);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
@@ -281,5 +301,3 @@ private $flicker;
 	return $table;
 	}
 }
-
-?>

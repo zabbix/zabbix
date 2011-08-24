@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -414,14 +414,6 @@
 
 #ifdef HAVE_IO_H
 #	include <io.h>
-#endif
-
-#ifdef HAVE_SYS_MNTTAB_H
-#	include <sys/mnttab.h>
-#endif
-
-#ifdef HAVE_MNTENT_H
-#	include <mntent.h>
 #endif
 
 #endif

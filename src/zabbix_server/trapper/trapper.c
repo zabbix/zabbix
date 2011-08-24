@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -248,7 +248,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			else
 			{
 				res = calculate_checksums(nodeid, NULL, 0);
-				if (SUCCEED == res && NULL != (data = DMget_config_data(nodeid, ZBX_NODE_SLAVE)))
+				if (SUCCEED == res && NULL != (data = get_config_data(nodeid, ZBX_NODE_SLAVE)))
 				{
 					zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending configuration changes"
 							" to slave node %d for node %d datalen " ZBX_FS_SIZE_T,
@@ -393,7 +393,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			av.severity	= 0;
 		}
 
-		zbx_timespec(&av.ts);
+		av.clock = time(NULL);
 
 		process_mass_data(sock, 0, &av, 1, NULL);
 

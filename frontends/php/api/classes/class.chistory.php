@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,12 @@ class CHistory extends CZBXAPI{
 /**
  * Get history data
  *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8.3
+ * @version 1.3
+ *
  * @param array $options
  * @param array $options['itemids']
  * @param boolean $options['editable']
@@ -39,7 +45,8 @@ class CHistory extends CZBXAPI{
  * @param string $options['order']
  * @return array|int item data as array or false if error
  */
-	public function get($options=array()){
+	public static function get($options=array()){
+		global $USER_DETAILS;
 
 		$nodeCheck = false;
 		$result = array();
@@ -65,11 +72,10 @@ class CHistory extends CZBXAPI{
 			'nopermissions'			=> null,
 
 // filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
 
 			'time_from'				=> null,
@@ -111,16 +117,15 @@ class CHistory extends CZBXAPI{
 		}
 
 // editable + PERMISSION CHECK
-		if((USER_TYPE_SUPER_ADMIN == self::$userData['type']) || $options['nopermissions']){
+		if((USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']) || $options['nopermissions']){
 		}
 		else{
 			$itemOptions = array(
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'editable' => $options['editable'],
 				'preservekeys' => 1
 			);
 			if(!is_null($options['itemids'])) $itemOptions['itemids'] = $options['itemids'];
-			$items = API::Item()->get($itemOptions);
+			$items = CItem::get($itemOptions);
 
 			$options['itemids'] = array_keys($items);
 		}
@@ -236,6 +241,7 @@ class CHistory extends CZBXAPI{
 
 
 		$itemids = array();
+		$triggerids = array();
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
@@ -311,10 +317,10 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public function create($items=array()){
+	public static function create($items=array()){
 	}
 
-	public function delete($itemids=array()){
+	public static function delete($itemids=array()){
 	}
 }
 ?>

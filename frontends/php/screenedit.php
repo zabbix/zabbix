@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,18 +19,19 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/screens.inc.php');
-	require_once('include/forms.inc.php');
-	require_once('include/blocks.inc.php');
 
-	$page['title'] = 'S_CONFIGURATION_OF_SCREENS';
-	$page['file'] = 'screenedit.php';
-	$page['hist_arg'] = array('screenid');
-	$page['scripts'] = array('class.cscreen.js', 'class.calendar.js', 'gtlc.js');
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+require_once('include/config.inc.php');
+require_once('include/screens.inc.php');
+require_once('include/forms.inc.php');
+require_once('include/blocks.inc.php');
 
-	include_once('include/page_header.php');
+$page['title'] = 'S_CONFIGURATION_OF_SCREENS';
+$page['file'] = 'screenedit.php';
+$page['hist_arg'] = array('screenid');
+$page['scripts'] = array('effects.js','dragdrop.js','class.cscreen.js','class.calendar.js','gtlc.js');
+
+include_once('include/page_header.php');
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -41,22 +42,18 @@
 		'resourcetype'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,16),	'isset({save})'),
 		'caption'=>		array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'resourceid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID, 	'isset({save})'),
-		'templateid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID, 	null),
 		'width'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'height'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'colspan'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
 		'rowspan'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
 		'elements'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,65535),	null),
-		'sort_triggers'=>   array(T_ZBX_INT, O_OPT,  null,  IN(array(SCREEN_SORT_TRIGGERS_DATE_DESC, SCREEN_SORT_TRIGGERS_SEVERITY_DESC, SCREEN_SORT_TRIGGERS_HOST_NAME_ASC)),	null),
 		'valign'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(VALIGN_MIDDLE,VALIGN_BOTTOM),		null),
 		'halign'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(HALIGN_CENTER,HALIGN_RIGHT),		null),
-		'style'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,2),	'isset({save})'),
+		'style'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(STYLE_HORISONTAL,STYLE_VERTICAL),	'isset({save})'),
 		'url'=>			array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})'),
 		'dynamic'=>		array(T_ZBX_INT, O_OPT,  null,  null,			null),
 		'x'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
 		'y'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
-		'screen_type'=>			array(T_ZBX_INT, O_OPT,  null,  null,		null),
-
 
 // STATUS OF TRIGGER
 		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
@@ -74,87 +71,32 @@
 		'rmv_col'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
 
 		'sw_pos'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
-		'ajaxAction'=>	array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-
 	);
 
 	check_fields($fields);
-	$_REQUEST['dynmic'] = get_request('dynamic', SCREEN_SIMPLE_ITEM);
+	$_REQUEST['dynmic'] = get_request('dynamic',SCREEN_SIMPLE_ITEM);
 ?>
 <?php
+	$trigg_wdgt = new CWidget();
+	$trigg_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREEN_BIG);
+	
+	//show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
+
 	$options = array(
 		'screenids' => $_REQUEST['screenid'],
 		'editable' => 1,
-		'output' => API_OUTPUT_EXTEND,
-		'selectScreenItems' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND
 	);
-	$screens = API::Screen()->get($options);
-	if(empty($screens)){
-		$screens = API::TemplateScreen()->get($options);
-		if(empty($screens)) access_deny();
-	}
+	$screens = CScreen::get($options);
+	if(empty($screens)) access_deny();
 
 	$screen = reset($screens);
-
-/* AJAX */
-	if(isset($_REQUEST['ajaxAction'])){
-
-		switch($_REQUEST['ajaxAction']){
-			case 'sw_pos':
-				$sw_pos = get_request('sw_pos', array());
-				if(count($sw_pos) > 3){
-					$sql = 'SELECT screenitemid, colspan, rowspan '.
-							' FROM screens_items '.
-							' WHERE y='.$sw_pos[0].
-								' AND x='.$sw_pos[1].
-								' AND screenid='.$screen['screenid'];
-					$fitem = DBfetch(DBselect($sql));
-
-					$sql = 'SELECT screenitemid, colspan, rowspan '.
-							' FROM screens_items '.
-							' WHERE y='.$sw_pos[2].
-								' AND x='.$sw_pos[3].
-								' AND screenid='.$screen['screenid'];
-					$sitem = DBfetch(DBselect($sql));
-
-					if($fitem){
-						DBexecute('UPDATE screens_items '.
-									' SET y='.$sw_pos[2].',x='.$sw_pos[3].
-									',colspan='.(isset($sitem['colspan']) ? $sitem['colspan'] : 0).
-									',rowspan='.(isset($sitem['rowspan']) ? $sitem['rowspan'] : 0).
-									' WHERE y='.$sw_pos[0].
-										' AND x='.$sw_pos[1].
-										' AND screenid='.$screen['screenid'].
-										' AND screenitemid='.$fitem['screenitemid']);
-
-					}
-
-					if($sitem){
-						DBexecute('UPDATE screens_items '.
-									' SET y='.$sw_pos[0].',x='.$sw_pos[1].
-									',colspan='.(isset($fitem['colspan']) ? $fitem['colspan'] : 0).
-									',rowspan='.(isset($fitem['rowspan']) ? $fitem['rowspan'] : 0).
-									' WHERE y='.$sw_pos[2].
-										' AND x='.$sw_pos[3].
-										' AND screenid='.$screen['screenid'].
-										' AND screenitemid='.$sitem['screenitemid']);
-					}
-					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Items switched');
-				}
-
-				echo '{"result": true}';
-			break;
-		}
-	}
-
-	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
-		exit();
-	}
-
+	
+	$trigg_wdgt->addHeader($screen['name']);
+	$trigg_wdgt->addItem(BR());
+	
 	if(isset($_REQUEST['save'])){
 		if(!isset($_REQUEST['elements'])) $_REQUEST['elements'] = 0;
-		if(!isset($_REQUEST['sort_triggers'])) $_REQUEST['sort_triggers'] = SCREEN_SORT_TRIGGERS_DATE_DESC;
 
 		try{
 			DBstart();
@@ -167,11 +109,12 @@
 				$msg_ok = S_ITEM_ADDED;
 				$msg_err = S_CANNOT_ADD_ITEM;
 			}
+
 			if(isset($_REQUEST['screenitemid'])){
 				$result = update_screen_item($_REQUEST['screenitemid'],
 					$_REQUEST['resourcetype'],$_REQUEST['resourceid'],$_REQUEST['width'],
 					$_REQUEST['height'],$_REQUEST['colspan'],$_REQUEST['rowspan'],
-					$_REQUEST['elements'],$_REQUEST['sort_triggers'],$_REQUEST['valign'],
+					$_REQUEST['elements'],$_REQUEST['valign'],
 					$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
 
 				if(!$result) throw new Exception();
@@ -181,7 +124,7 @@
 					$_REQUEST['resourcetype'],$_REQUEST['screenid'],
 					$_REQUEST['x'],$_REQUEST['y'],$_REQUEST['resourceid'],
 					$_REQUEST['width'],$_REQUEST['height'],$_REQUEST['colspan'],
-					$_REQUEST['rowspan'],$_REQUEST['elements'],$_REQUEST['sort_triggers'],$_REQUEST['valign'],
+					$_REQUEST['rowspan'],$_REQUEST['elements'],$_REQUEST['valign'],
 					$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
 
 				if(!$result) throw new Exception();
@@ -252,31 +195,57 @@
 			show_messages(false, '', S_CANNOT_REMOVE_ROW_OR_COLUMN);
       }
 	}
+	else if(isset($_REQUEST['sw_pos'])){
+		$sw_pos = get_request('sw_pos', array());
+		if(count($sw_pos) > 3){
+			$sql = 'SELECT screenitemid, colspan, rowspan '.
+					' FROM screens_items '.
+					' WHERE y='.$sw_pos[0].
+						' AND x='.$sw_pos[1].
+						' AND screenid='.$screen['screenid'];
+			$fitem = DBfetch(DBselect($sql));
+			
+			$sql = 'SELECT screenitemid, colspan, rowspan '.
+					' FROM screens_items '.
+					' WHERE y='.$sw_pos[2].
+						' AND x='.$sw_pos[3].
+						' AND screenid='.$screen['screenid'];
+			$sitem = DBfetch(DBselect($sql));
+			
+			if($fitem){
+				DBexecute('UPDATE screens_items '.
+							' SET y='.$sw_pos[2].',x='.$sw_pos[3].
+							',colspan='.(isset($sitem['colspan']) ? $sitem['colspan'] : 0).
+							',rowspan='.(isset($sitem['rowspan']) ? $sitem['rowspan'] : 0).
+							' WHERE y='.$sw_pos[0].
+								' AND x='.$sw_pos[1].
+								' AND screenid='.$screen['screenid'].
+								' AND screenitemid='.$fitem['screenitemid']);
+								
+			}
 
-	$screen_wdgt = new CWidget();
-	$screen_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREEN_BIG);
-
-	$screen_wdgt->addHeader($screen['name']);
-	$screen_wdgt->addItem(BR());
-
-	if($screen['templateid'])
-		$screen_wdgt->addItem(get_header_host_table($screen['templateid']));
-
-	//getting updated screen, so we wont have to refresh the page to see changes
-	$screens = API::Screen()->get($options);
-	if(empty($screens)){
-		$screens = API::TemplateScreen()->get($options);
-		if(empty($screens)) access_deny();
+			if($sitem){
+				DBexecute('UPDATE screens_items '.
+							' SET y='.$sw_pos[0].',x='.$sw_pos[1].
+							',colspan='.(isset($fitem['colspan']) ? $fitem['colspan'] : 0).
+							',rowspan='.(isset($fitem['rowspan']) ? $fitem['rowspan'] : 0).
+							' WHERE y='.$sw_pos[2].
+								' AND x='.$sw_pos[3].
+								' AND screenid='.$screen['screenid'].
+								' AND screenitemid='.$sitem['screenitemid']);
+			}
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Items switched');
+		}
 	}
-	$screen = reset($screens);
 
+	if($_REQUEST['screenid'] > 0){
+		$table = get_screen($_REQUEST['screenid'], 1);
+		$trigg_wdgt->addItem($table);
+		zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');
+		zbx_add_post_js('timeControl.processObjects();');
+	}
 
-	$table = get_screen($screen, 1); // 1 - edit mode
-	$screen_wdgt->addItem($table);
-	zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');
-	zbx_add_post_js('timeControl.processObjects();');
-
-	$screen_wdgt->show();
+	$trigg_wdgt->show();
 ?>
 <?php
 

@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,14 +19,15 @@
 **/
 ?>
 <?php
-class CNumericBox extends CInput{
+class CNumericBox extends CTextBox{
 	public function __construct($name='number',$value='0',$size=20,$readonly='no',$allowempty=false){
-		parent::__construct('text', $name, $value);
-		$this->setReadonly($readonly);
-		$this->attr('size', $size);
-		$this->attr('maxlength', $size);
+		parent::__construct($name,$value,$size,$readonly);
+		$this->setAttribute('maxlength', $size);
+		$this->setAttribute('style', 'text-align: right;');
 
-		$this->attr('style', 'text-align: right;');
+		$this->addAction('onkeypress',
+			' var c = (window.event) ? event.keyCode : event.which;'.
+				' if(event.ctrlKey || c <= 31 || (c >= 48 && c <= 57) || (c >= 37 && c <= 40) || c==46 || c==35 || c==36) return true; else return false; ');
 
 		$this->addAction('onchange',
 				($allowempty ? ' if(this.value.length==0 || this.value==null) this.value = \'\'; else ' : '').

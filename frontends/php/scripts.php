@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,272 +19,310 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+include_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/scripts.inc.php');
+require_once('include/users.inc.php');
 
 $page['title'] = 'S_SCRIPTS';
 $page['file'] = 'scripts.php';
-$page['hist_arg'] = array('scriptid');
+$page['hist_arg'] = array('scriptid', 'form');
 
-require_once('include/page_header.php');
+include_once('include/page_header.php');
+
 ?>
 <?php
-//		VAR						TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'scriptid'=>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	null),
-	'scripts'=>			array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,	null),
-// Actions
-	'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-// form
-	'action'=>			array(T_ZBX_INT, O_OPT,  P_ACT, 		IN('0,1'),	null),
-	'save'=>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	NULL,		null),
-	'delete'=>			array(T_ZBX_STR, O_OPT,  P_ACT, 		null,	null),
-	'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-// form
-	'name'=>			array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
-	'type'=>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),	'isset({save})'),
-	'execute_on'=>		array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),	'isset({save})&&{type}=='.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT),
-	'command'=>			array(T_ZBX_STR, O_OPT,  NULL,			null,	'isset({save})'),
-	'commandipmi'=>			array(T_ZBX_STR, O_OPT,  NULL,		null,	'isset({save})'),
-	'description'=>		array(T_ZBX_STR, O_OPT,  NULL,			NULL,	'isset({save})'),
-	'access'=>			array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1,2,3'),	'isset({save})'),
-	'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,		'isset({save})'),
-	'usrgrpid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,			DB_ID,		'isset({save})'),
-	'confirmation'=>		array(T_ZBX_STR, O_OPT,  NULL,			NULL,	null),
-	'enableConfirmation'=>	array(T_ZBX_STR, O_OPT,  NULL,			NULL,	null),
 
-	'form'=>			array(T_ZBX_STR, O_OPT,  NULL,		  	NULL,		null),
-	'form_refresh'=>	array(T_ZBX_INT, O_OPT,	 NULL,			NULL,		null),
+//---------------------------------- CHECKS ------------------------------------
+//		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+$fields=array(
+		'scriptid'=>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	null),
+		'scripts'=>				array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,	null),
+// Actions
+		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+// form
+		'action'=>				array(T_ZBX_INT, O_OPT,  P_ACT, 		IN('0,1'),	null),
+		'save'=>				array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	NULL,		null),
+		'delete'=>				array(T_ZBX_STR, O_OPT,  P_ACT, 		null,	null),
+// form
+		'name'=>				array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
+		'command'=>				array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
+		'access'=>				array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1,2,3'),	'isset({save})'),
+		'groupid'=>				array(T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,		'isset({save})'),
+		'usrgrpid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,			DB_ID,		'isset({save})'),
+
+		'form'=>				array(T_ZBX_STR, O_OPT,  NULL,		  	NULL,		null),
+		'form_refresh'=>		array(T_ZBX_INT, O_OPT,	 NULL,			NULL,		null),
 );
 
 check_fields($fields);
 
-$_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['go'] = get_request('go','none');
 
-validate_sort_and_sortorder('name', ZBX_SORT_UP);
-
-$sid = get_request('scriptid');
-if($sid){
-	$scripts = API::Script()->get(array(
-		'scriptids' => $sid,
-		'output' => API_OUTPUT_SHORTEN,
-	));
-	if(empty($scripts)) access_deny();
-}
+validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 ?>
 <?php
-	if(isset($_REQUEST['clone']) && isset($_REQUEST['scriptid'])){
-		unset($_REQUEST['scriptid']);
-		$_REQUEST['form'] = 'clone';
-	}
-	else if(isset($_REQUEST['save'])){
-		$confirmation = get_request('confirmation', '');
-		$enableConfirmation = get_request('enableConfirmation', false);
+	if(isset($_REQUEST['action'])){
 
-		$command = ($_REQUEST['type'] == ZBX_SCRIPT_TYPE_IPMI) ? $_REQUEST['commandipmi'] : $_REQUEST['command'];
-		if($enableConfirmation && zbx_empty($confirmation)){
-			error(_('Please enter confirmation text.'));
-			show_messages(null, null, _('Cannot add script'));
-		}
-		else if(zbx_empty($command)){
-			error(_('Command cannot be empty.'));
-			show_messages(null, null, _('Cannot add script'));
-		}
-		else{
-			$script = array(
-				'name' => $_REQUEST['name'],
-				'type' => $_REQUEST['type'],
-				'execute_on' => $_REQUEST['execute_on'],
-				'command' => $command,
-				'description' => $_REQUEST['description'],
-				'usrgrpid' => $_REQUEST['usrgrpid'],
-				'groupid' => $_REQUEST['groupid'],
-				'host_access' => $_REQUEST['access'],
-				'confirmation' => get_request('confirmation', ''),
-			);
+		if(isset($_REQUEST['save'])){
 
-			if(isset($_REQUEST['scriptid'])){
-				$script['scriptid'] = $_REQUEST['scriptid'];
+			$cond = (isset($_REQUEST['scriptid']))?(' AND scriptid<>'.$_REQUEST['scriptid']):('');
+			$scripts = DBfetch(DBselect('SELECT count(scriptid) as cnt FROM scripts WHERE name='.zbx_dbstr($_REQUEST['name']).$cond.' and '.DBin_node('scriptid', get_current_nodeid(false)),1));
 
-				$result = API::Script()->update($script);
-				show_messages($result, _('Script updated'), _('Cannot update script'));
-
-				$audit_action = AUDIT_ACTION_UPDATE;
+			if($scripts && $scripts['cnt']>0){
+				error(S_SCRIPT.SPACE.'['.htmlspecialchars($_REQUEST['name']).']'.SPACE.S_ALREADY_EXISTS_SMALL);
+				show_messages(null,S_ERROR,S_CANNOT_ADD_SCRIPT);
 			}
 			else{
-				$result = API::Script()->create($script);
 
-				show_messages($result, _('Script added'), _('Cannot add script'));
+				if(isset($_REQUEST['scriptid'])){
+					$result = update_script($_REQUEST['scriptid'],$_REQUEST['name'],$_REQUEST['command'],$_REQUEST['usrgrpid'],$_REQUEST['groupid'],$_REQUEST['access']);
 
-				$audit_action = AUDIT_ACTION_ADD;
+					show_messages($result, S_SCRIPT_UPDATED, S_CANNOT_UPDATE_SCRIPT);
+					$scriptid = $_REQUEST['scriptid'];
+					$audit_acrion = AUDIT_ACTION_UPDATE;
+				}
+				else {
+					$result = add_script($_REQUEST['name'],$_REQUEST['command'],$_REQUEST['usrgrpid'],$_REQUEST['groupid'],$_REQUEST['access']);
+
+					show_messages($result, S_SCRIPT_ADDED, S_CANNOT_ADD_SCRIPT);
+					$scriptid = $result;
+					$audit_acrion = AUDIT_ACTION_ADD;
+				}
+
+				add_audit_if($result,$audit_acrion,AUDIT_RESOURCE_SCRIPT,' Name ['.$_REQUEST['name'].'] id ['.$scriptid.']');
+
+				if($result){
+					unset($_REQUEST['action']);
+					unset($_REQUEST['form']);
+					unset($_REQUEST['scriptid']);
+				}
 			}
+		}
+		else if(isset($_REQUEST['delete'])){
+			$scriptid = get_request('scriptid', 0);
 
-			$scriptid = isset($result['scriptids']) ? reset($result['scriptids']) : null;
-
-			add_audit_if($result,$audit_action,AUDIT_RESOURCE_SCRIPT,' Name ['.$_REQUEST['name'].'] id ['.$scriptid.']');
+			$result = CScript::delete($scriptid);
 
 			if($result){
-				unset($_REQUEST['action']);
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
+			}
+
+			show_messages($result, S_SCRIPT_DELETED, S_CANNOT_DELETE_SCRIPT);
+
+			if($result){
 				unset($_REQUEST['form']);
 				unset($_REQUEST['scriptid']);
 			}
 		}
-	}
-	else if(isset($_REQUEST['delete'])){
-		$scriptid = get_request('scriptid', 0);
+	// ------ GO -----
+		else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['scripts'])){
+			$scriptids = $_REQUEST['scripts'];
 
-		$result = API::Script()->delete($scriptid);
+			$go_result = CScript::delete($scriptids);
+			if($go_result){
+				foreach($scriptids as $snum => $scriptid)
+					add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
+			}
 
-		if($result){
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$scriptid.']');
+			show_messages($go_result, S_SCRIPT_DELETED, S_CANNOT_DELETE_SCRIPT);
+
+			if($go_result){
+				unset($_REQUEST['form']);
+				unset($_REQUEST['scriptid']);
+			}
 		}
 
-		show_messages($result, _('Script deleted'), _('Cannot delete script'));
-
-		if($result){
-			unset($_REQUEST['form']);
-			unset($_REQUEST['scriptid']);
+		if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+			$url = new CUrl();
+			$path = $url->getPath();
+			insert_js('cookie.eraseArray("'.$path.'")');
 		}
-	}
-// ------ GO -----
-	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['scripts'])){
-		$scriptids = $_REQUEST['scripts'];
-
-		$go_result = API::Script()->delete($scriptids);
-		if($go_result){
-			foreach($scriptids as $snum => $scriptid)
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, _('Script').' ['.$scriptid.']');
-		}
-
-		show_messages($go_result, _('Script deleted'), _('Cannot delete script'));
-
-		if($go_result){
-			unset($_REQUEST['form']);
-			unset($_REQUEST['scriptid']);
-		}
-	}
-
-	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 ?>
 <?php
-// Script configuration form
+
+	$scripts_wdgt = new CWidget();
+
+	$frmForm = new CForm();
+	$frmForm->setMethod('get');
+	$frmForm->addItem(new CButton('form',S_CREATE_SCRIPT,"javascript: redirect('scripts.php?form=1');"));
+	$scripts_wdgt->addPageHeader(S_SCRIPTS_CONFIGURATION_BIG, $frmForm);
+
 	if(isset($_REQUEST['form'])){
-		$data = array();
-		$data['form'] = get_request('form', 1);
-		$data['form_refresh'] = get_request('form_refresh', 0);
-		$data['scriptid'] = get_request('scriptid');
 
-		if(!$data['scriptid'] || isset($_REQUEST['form_refresh'])){
-			$data['name'] = get_request('name', '');
-			$data['type'] = get_request('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT);
-			$data['execute_on'] = get_request('execute_on', ZBX_SCRIPT_EXECUTE_ON_SERVER);
-			$data['command'] = get_request('command', '');
-			$data['commandipmi'] = get_request('commandipmi', '');
-			$data['description'] = get_request('description', '');
-			$data['usrgrpid'] = get_request('usrgrpid',	0);
-			$data['groupid'] = get_request('groupid', 0);
-			$data['access'] = get_request('host_access', 0);
-			$data['confirmation'] = get_request('confirmation',	'');
-			$data['enableConfirmation'] = get_request('enableConfirmation', false);
-		}
-		else if($data['scriptid']){
-			$options = array(
-				'scriptids' => $data['scriptid'],
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$script = API::Script()->get($options);
-			$script = reset($script);
-			$data['name'] = $script['name'];
-			$data['type'] = $script['type'];
-			$data['execute_on'] = $script['execute_on'];
-			$data['command'] = $data['commandipmi'] = $script['command'];
-			$data['description'] = $script['description'];
-			$data['usrgrpid'] = $script['usrgrpid'];
-			$data['groupid'] = $script['groupid'];
-			$data['access'] = $script['host_access'];
-			$data['confirmation'] = $script['confirmation'];
-			$data['enableConfirmation'] = !empty($script['confirmation']);
+		$frmScr = new CFormTable(S_SCRIPT,'scripts.php','POST',null,'form');
+		$frmScr->setAttribute('id','scripts');
+
+		if(isset($_REQUEST['scriptid'])) $frmScr->addVar('scriptid',$_REQUEST['scriptid']);
+
+		if(!isset($_REQUEST['scriptid']) || isset($_REQUEST['form_refresh'])){
+			$name = get_request('name','');
+			$command  = get_request('command','');
+
+			$usrgrpid = get_request('usrgrpid',	0);
+			$groupid = get_request('groupid',	0);
+
+			$access = get_request('access',	PERM_READ_ONLY);
 		}
 
-		$scriptForm = new CView('administration.script.edit');
+		if(isset($_REQUEST['scriptid']) && !isset($_REQUEST['form_refresh'])){
+			$frmScr->addVar('form_refresh',get_request('form_refresh',1));
 
-		$scriptForm->set('form',$data['form']);
-		$scriptForm->set('form_refresh',$data['form_refresh']);
-		$scriptForm->set('scriptid',$data['scriptid']);
-		$scriptForm->set('name',$data['name']);
-		$scriptForm->set('type',$data['type']);
-		$scriptForm->set('execute_on',$data['execute_on']);
-		$scriptForm->set('command',$data['command']);
-		$scriptForm->set('commandipmi',$data['commandipmi']);
-		$scriptForm->set('description',$data['description']);
-		$scriptForm->set('usrgrpid',$data['usrgrpid']);
-		$scriptForm->set('groupid',$data['groupid']);
-		$scriptForm->set('access',$data['access']);
-		$scriptForm->set('confirmation',$data['confirmation']);
-		$scriptForm->set('enableConfirmation',$data['enableConfirmation']);
-		// Get list of all groups
-		$groups = API::HostGroup()->get(array(
-			'output' => array('groupid','name')
-		));
-		order_result($groups, 'name');
-		$scriptForm->set('groups',$groups);
-		// Get list of user groups
-		$usergroups = API::UserGroup()->get(array(
-			'output' => array('usrgrpid','name')
-		));
-		order_result($usergroups, 'name');
-		$scriptForm->set('usergroups',$usergroups);
+			if($script = get_script_by_scriptid($_REQUEST['scriptid'])){
+				$name = $script['name'];
+				$command  = $script['command'];
 
-		$scriptForm->render();
-		$scriptForm->show();
+				$usrgrpid = $script['usrgrpid'];
+				$groupid = $script['groupid'];
+
+				$access = $script['host_access'];
+			}
+		}
+
+		$frmScr->addRow(S_NAME,new CTextBox('name',$name,80));
+		$frmScr->addRow(S_COMMAND,new CTextBox('command',$command,80));
+
+		$usr_groups = new CCombobox('usrgrpid',$usrgrpid);
+		$usr_groups->addItem(0,S_ALL_S);
+
+		$usrgrps = CUserGroup::get(array('extendoutput'=>1, 'sortfield'=>'name'));
+
+		foreach($usrgrps as $ugnum => $usr_group){
+			$usr_groups->addItem($usr_group['usrgrpid'],$usr_group['name']);
+		}
+
+		$frmScr->addRow(S_USER_GROUPS,$usr_groups);
+
+		$host_groups = new CCombobox('groupid',$groupid);
+		$host_groups->addItem(0,S_ALL_S);
+
+		$groups = CHostGroup::get(array('extendoutput' => 1, 'sortfield'=>'name'));
+		foreach($groups as $gnum => $group){
+			$host_groups->addItem($group['groupid'],$group['name']);
+		}
+
+		$frmScr->addRow(S_HOST_GROUPS,$host_groups);
+
+		$select_acc = new CCombobox('access',$access);
+		$select_acc->addItem(PERM_READ_ONLY,S_READ);
+		$select_acc->addItem(PERM_READ_WRITE,S_WRITE);
+
+		$frmScr->addRow(S_REQUIRED_HOST.SPACE.S_PERMISSIONS_SMALL,$select_acc);
+
+		$frmScr->addItemToBottomRow(new CButton('save',S_SAVE,"javascript: document.getElementById('scripts').action+='?action=1'; "));
+		$frmScr->addItemToBottomRow(SPACE);
+
+		if(isset($_REQUEST['scriptid'])) {
+			$deleteButton = new CButtonDelete(S_DELETE_SCRIPTS_Q, '&action=1&scriptid='.$_REQUEST['scriptid']);
+			$frmScr->addItemToBottomRow($deleteButton);
+			$frmScr->addItemToBottomRow(SPACE);
+		}
+
+		$frmScr->addItemToBottomRow(new CButtonCancel());
+		$scripts_wdgt->addItem($frmScr);
 	}
-	else{
-// List of scripts
-		$scriptList = new CView('administration.script.list');
+	else {
+		$form = new CForm();
+		$form->setName('frm_scripts');
+		$form->setAttribute('id', 'scripts');
+		$form->addVar('action', '1');
 
-		// List of scripts
-		$options = array(
-			'output' => array('scriptid','name','command','host_access','usrgrpid','groupid','type','execute_on'),
-			'editable' => true,
-			'selectGroups' => API_OUTPUT_EXTEND
+		$numrows = new CDiv();
+		$numrows->setAttribute('name','numrows');
+
+		$scripts_wdgt->addHeader(S_SCRIPTS_BIG);
+		$scripts_wdgt->addHeader($numrows);
+
+		$table = new CTableInfo(S_NO_SCRIPTS_DEFINED);
+		$table->setHeader(array(
+				new CCheckBox('all_scripts',null,"checkAll('".$form->getName()."','all_scripts','scripts');"),
+				make_sorting_header(S_NAME,'name'),
+				make_sorting_header(S_COMMAND,'command'),
+				S_USER_GROUP,
+				S_HOST_GROUP,
+				S_HOST_ACCESS
+			)
 		);
-		$scripts = API::Script()->get($options);
 
-// Find script host group name and user group name. Set to '' if all host/user groups used.
+		$sortfield = getPageSortField('name');
+		$sortorder = getPageSortOrder();
+
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'editable' => 1,
+			'select_groups' => API_OUTPUT_EXTEND
+		);
+		$scripts = CScript::get($options);
+
+// sorting
+		order_result($scripts, $sortfield, $sortorder);
+
+// PAGING UPPER
+		$paging = getPagingLine($scripts);
+		$scripts_wdgt->addItem($paging);
+//---------
+
 		foreach($scripts as $snum => $script){
 			$scriptid = $script['scriptid'];
 
+			$user_group_name = S_ALL_S;
+
 			if($script['usrgrpid'] > 0){
-				$user_group = API::UserGroup()->get(array('usrgrpids' => $script['usrgrpid'], 'output' => API_OUTPUT_EXTEND));
+				$user_group = CUserGroup::get(array('usrgrpids' => $script['usrgrpid'], 'extendoutput' => 1));
 				$user_group = reset($user_group);
 
-				$scripts[$snum]['userGroupName'] = $user_group['name'];
-			}
-			else{
-				// All user groups
-				$scripts[$snum]['userGroupName'] = '';
+				$user_group_name = $user_group['name'];
 			}
 
+			$host_group_name = S_ALL_S;
 			if($script['groupid'] > 0){
 				$group = array_pop($script['groups']);
-				$scripts[$snum]['hostGroupName'] = $group['name'];
+				$host_group_name = $group['name'];
 			}
-			else{
-				// All host groups
-				$scripts[$snum]['hostGroupName'] = '';
-			}
+
+
+			$table->addRow(array(
+					new CCheckBox('scripts['.$script['scriptid'].']','no',NULL,$script['scriptid']),
+					new CLink($script['name'],'scripts.php?form=1'.'&scriptid='.$script['scriptid'].'#form'),
+					htmlspecialchars($script['command']),
+					$user_group_name,
+					$host_group_name,
+					((PERM_READ_WRITE == $script['host_access'])?S_WRITE:S_READ)
+				));
 		}
 
-		$scriptList->set('scripts',$scripts);
 
-		$scriptList->render();
-		$scriptList->show();
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$items_wdgt->addItem($paging);
+//---------
+
+//----- GO ------
+		$goBox = new CComboBox('go');
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_SCRIPTS_Q);
+		$goBox->addItem($goOption);
+
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO);
+		$goButton->setAttribute('id','goButton');
+
+		zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
+
+		$table->setFooter(new CCol(array($goBox, $goButton)));
+//----
+
+		$form->addItem($table);
+		$scripts_wdgt->addItem($form);
 	}
+
+	$scripts_wdgt->show();
+
 ?>
 <?php
+
 include_once('include/page_footer.php');
+
 ?>

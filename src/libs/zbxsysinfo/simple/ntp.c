@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -185,6 +185,8 @@ int	check_ntp(char *host, unsigned short port, int timeout, int *value_int)
 	char		*buf = NULL, packet[NTP_PACKET_MIN];
 	ntp_data	data;
 
+	assert(value_int);
+
 	*value_int = 0;
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
@@ -198,7 +200,7 @@ int	check_ntp(char *host, unsigned short port, int timeout, int *value_int)
 			if (SUCCEED == (ret = zbx_tcp_recv(&s, &buf)))
 			{
 				unpack_ntp(&data, (unsigned char *)buf, (int)strlen(buf));
-				*value_int = (0 < data.receive ? (int)(data.receive - ZBX_JAN_1970_IN_SEC) : 0);
+				*value_int = (data.receive > 0 ? (int)(data.receive - ZBX_JAN_1970_IN_SEC) : 0);
 			}
 		}
 

@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
+/* ARRAYS */
 		'hosts'=>				array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 	NULL),
 		'groups'=>				array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 	NULL),
 		'hostids'=>				array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 	NULL),
@@ -51,7 +52,7 @@ include_once('include/page_header.php');
 		'form_refresh'=>		array(T_ZBX_STR, O_OPT, NULL,			NULL,	NULL)
 	);
 	check_fields($fields);
-	validate_sort_and_sortorder('name', ZBX_SORT_UP);
+	validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
 
@@ -59,6 +60,11 @@ include_once('include/page_header.php');
 	if(get_request('groupid', 0) > 0){
 		$groupids = available_groups($_REQUEST['groupid'], 1);
 		if(empty($groupids)) access_deny();
+	}
+
+	if(get_request('hostid', 0) > 0){
+		$hostids = available_hosts($_REQUEST['hostid'], 1);
+		if(empty($hostids)) access_deny();
 	}
 ?>
 <?php
@@ -71,42 +77,28 @@ include_once('include/page_header.php');
 
 		$objects = get_request('hosts', array());
 
-		$hosts = API::Host()->get(array(
-			'hostids' => $objects,
-			'output' => API_OUTPUT_SHORTEN
-		));
-
-		$templates = API::Template()->get(array(
-			'templateids' => $objects,
-			'output' => API_OUTPUT_SHORTEN
-		));
+		$hosts = CHost::get(array('hostids' => $objects, 'output' => API_OUTPUT_SHORTEN));
+		$templates = CTemplate::get(array('templateids' => $objects, 'output' => API_OUTPUT_SHORTEN));
 
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
-			$old_group = API::HostGroup()->get(array(
-				'groupids' => $_REQUEST['groupid'],
-				'output' => API_OUTPUT_EXTEND
-			));
+			$old_group = CHostGroup::get(array('groupids' => $_REQUEST['groupid'],	'output' => API_OUTPUT_EXTEND));
 			$old_group = reset($old_group);
-
-			$result = API::HostGroup()->update(array(
-				'groupid' => $_REQUEST['groupid'],
-				'name' => $_REQUEST['gname']
-			));
-
+		
+			$result = CHostGroup::update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));
 			if($result){
 				$options = array(
 					'groupids' => $result['groupids'],
 					'output' => API_OUTPUT_EXTEND
 				);
-				$groups = API::HostGroup()->get($options);
+				$groups = CHostGroup::get($options);
 
 				$data = array(
 					'hosts' => $hosts,
 					'templates' => $templates,
 					'groups' => $groups
 				);
-				$result = API::HostGroup()->massUpdate($data);
+				$result = CHostGroup::massUpdate($data);
 			}
 			$result = DBend($result);
 			if($result){
@@ -122,33 +114,33 @@ include_once('include/page_header.php');
 				access_deny();
 
 			DBstart();
-			$result = API::HostGroup()->create(array('name' => $_REQUEST['gname']));
+			$result = CHostgroup::create(array('name' => $_REQUEST['gname']));
 			if($result){
 				$options = array(
 					'groupids' => $result['groupids'],
 					'output' => API_OUTPUT_EXTEND
 				);
-				$groups = API::HostGroup()->get($options);
+				$groups = CHostGroup::get($options);
 
 				$data = array(
 					'hosts' => $hosts,
 					'templates' => $templates,
 					'groups' => $groups
 				);
-				$result = API::HostGroup()->massAdd($data);
+				$result = CHostGroup::massAdd($data);
 
 				if($result){
 					$group = reset($groups);
 					add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'], null, null, null);
 				}
 			}
-
+			if($result === false) error(CHostGroup::resetErrors());
+			$result = ($result) ? true : false;
 			$result = DBend($result);
 
 			$msg_ok		= S_GROUP_ADDED;
 			$msg_fail	= S_CANNOT_ADD_GROUP;
 		}
-
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){
 			unset($_REQUEST['form']);
@@ -156,41 +148,57 @@ include_once('include/page_header.php');
 		unset($_REQUEST['save']);
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])){
+		$result = false;
 		DBstart();
-		$result = API::HostGroup()->delete($_REQUEST['groupid']);
+		$result = delete_host_group($_REQUEST['groupid']);
 		$result = DBend($result);
 
+		unset($_REQUEST['form']);
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-
-		if($result){
-			unset($_REQUEST['form']);
-		}
-		unset($_REQUEST['delete']);
+		unset($_REQUEST['groupid']);
 	}
 // --------- GO  ----------
 	else if($_REQUEST['go'] == 'delete'){
-		$groups = get_request('groups', array());
-		$go_result = API::HostGroup()->delete($groups);
+/* group operations */
+			$go_result = true;
 
-		show_messages($go_result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-	}
+			$groups = get_request('groups', array());
+
+			DBstart();
+			$sql = 'SELECT g.groupid, g.name '.
+					' FROM groups g '.
+					' WHERE '.DBin_node('g.groupid').
+						' AND '.DBcondition('g.groupid', $groups);
+			$db_groups = DBselect($sql);
+			while($db_group=DBfetch($db_groups)){
+				if(!isset($groups[$db_group['groupid']])) continue;
+
+/*				if(!$group = get_hostgroup_by_groupid($db_group['groupid'])) continue;*/
+				$go_result &= delete_host_group($db_group['groupid']);
+
+/*
+				if($result){
+					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,
+					S_HOST_GROUP.' ['.$group['name'].' ] ['.$group['groupid'].']');
+				}
+//*/
+			}
+			$go_result = DBend($go_result);
+			show_messages($go_result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+		}
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable'))){
 
 		$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$groups = get_request('groups', array());
 		if(!empty($groups)){
 			DBstart();
-			$hosts = API::Host()->get(array(
-				'groupids' => $groups,
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND
-			));
+			$hosts = CHost::get(array('groupids' => $groups, 'editable' => 1, 'output' => API_OUTPUT_EXTEND));
 
 			if(empty($hosts)){
 				$go_result = true;
 			}
 			else{
-				$go_result = API::Host()->massUpdate(array('hosts' => $hosts, 'status' => $status));
+				$go_result = CHost::massUpdate(array('hosts' => $hosts, 'status' => $status));
 				if($go_result){
 					foreach($hosts as $host){
 						add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST,
@@ -220,13 +228,15 @@ include_once('include/page_header.php');
 	}
 	else{
 		$frmForm = new CForm();
-		$frmForm->addItem(new CSubmit('form', S_CREATE_GROUP));
+		$frmForm->addItem(new CButton('form', S_CREATE_GROUP));
 	}
 
 	$groups_wdgt = new CWidget();
 	$groups_wdgt->addPageHeader(S_CONFIGURATION_OF_GROUPS, $frmForm);
 
 	if(isset($_REQUEST['form'])){
+		global $USER_DETAILS;
+
 		$groupid = get_request('groupid', 0);
 		$hosts = get_request('hosts', array());
 
@@ -245,11 +255,13 @@ include_once('include/page_header.php');
 					'templated_hosts' => 1,
 					'output' => API_OUTPUT_SHORTEN
 				);
-				$hosts = API::Host()->get($params);
+				$hosts = CHost::get($params);
 				$hosts = zbx_objectValues($hosts, 'hostid');
 				$hosts = zbx_toHash($hosts, 'hostid');
 			}
 		}
+
+		
 
 		$frmHostG = new CFormTable($frm_title, 'hostgroups.php');
 		$frmHostG->setName('hg_form');
@@ -265,14 +277,17 @@ include_once('include/page_header.php');
 			'not_proxy_host' => 1,
 			'sortfield' => 'name',
 			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND);
-		$db_groups = API::HostGroup()->get($params);
+			'extendoutput' => 1);
+		$db_groups = CHostGroup::get($params);
 		$twb_groupid = get_request('twb_groupid', -1);
 		if($twb_groupid == -1){
 			$gr = reset($db_groups);
 			$twb_groupid = $gr['groupid'];
 		}
+		
+		
 
+		
 		//creating <select> with list of host groups
 		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
 
@@ -287,6 +302,9 @@ include_once('include/page_header.php');
 			$cmbGroups->addItem($row['groupid'], $row['name']);
 		}
 
+
+
+
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
 
 		//if $twb_groupid is '0', we need to get all hosts, if not, hosts from given group
@@ -294,39 +312,36 @@ include_once('include/page_header.php');
 			//get all hosts from all groups
 			$params = array(
 				'templated_hosts' => 1,
-				'sortfield' => 'name',
+				'sortfield' => 'host',
 				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND
-			);
+				'extendoutput' => 1);
 
-		}
-		else {
+		} else {
 			// get hosts from selected twb_groupid combo
 			$params = array(
 				'groupids' => $twb_groupid,
 				'templated_hosts' => 1,
-				'sortfield' => 'name',
+				'sortfield' => 'host',
 				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND
-			);
+				'extendoutput' => 1);
 		}
 
-		$db_hosts = API::Host()->get($params);
+		$db_hosts = CHost::get($params);
 
 		foreach($db_hosts as $num => $db_host){
 // add all except selected hosts
 			if(!isset($hosts[$db_host['hostid']]))
-				$cmbHosts->addItem($db_host['hostid'], $db_host['name']);
+				$cmbHosts->addItem($db_host['hostid'], $db_host['host']);
 		}
 
 // select selected hosts and add them
 		$params = array(
 			'hostids' => $hosts,
 			'templated_hosts' => 1,
-			'sortfield' => 'name',
+			'sortfield' => 'host',
 			'output' => API_OUTPUT_EXTEND
 		);
-		$r_hosts = API::Host()->get($params);
+		$r_hosts = CHost::get($params);
 
 		$params = array(
 			'hostids' => $hosts,
@@ -335,25 +350,31 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_SHORTEN
 		);
 
-		$rw_hosts = API::Host()->get($params);
+		$rw_hosts = CHost::get($params);
 		$rw_hosts = zbx_toHash($rw_hosts, 'hostid');
 		foreach($r_hosts as $num => $host){
 			if(isset($rw_hosts[$host['hostid']]))
-				$cmbHosts->addItem($host['hostid'], $host['name']);
+				$cmbHosts->addItem($host['hostid'], $host['host']);
 			else
-				$cmbHosts->addItem($host['hostid'], $host['name'], true, false);
+				$cmbHosts->addItem($host['hostid'], $host['host'], true, false);
 		}
 
 		$frmHostG->addRow(S_HOSTS, $cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
 
-		$frmHostG->addItemToBottomRow(new CSubmit('save', S_SAVE));
+		$frmHostG->addItemToBottomRow(new CButton('save',S_SAVE));
 		if($groupid > 0){
+			$frmHostG->addItemToBottomRow(SPACE);
+			$frmHostG->addItemToBottomRow(new CButton('clone',S_CLONE));
+			$frmHostG->addItemToBottomRow(SPACE);
+
 			$dltButton = new CButtonDelete(S_DELETE_SELECTED_GROUP, url_param('form').url_param('groupid'));
 			$dlt_groups = getDeletableHostGroups($_REQUEST['groupid']);
+
 			if(empty($dlt_groups)) $dltButton->setAttribute('disabled', 'disabled');
 
-			$frmHostG->addItemToBottomRow(array(new CSubmit('clone',S_CLONE), $dltButton));
+			$frmHostG->addItemToBottomRow($dltButton);
 		}
+		$frmHostG->addItemToBottomRow(SPACE);
 		$frmHostG->addItemToBottomRow(new CButtonCancel());
 		$groups_wdgt->addItem($frmHostG);
 	}
@@ -364,8 +385,8 @@ include_once('include/page_header.php');
 		$groups_wdgt->addHeader(S_HOST_GROUPS_BIG);
 		$groups_wdgt->addHeader($numrows);
 
-// Host groups table
-		$form = new CForm();
+// Host Groups table
+		$form = new CForm('hostgroups.php');
 		$form->setName('form_groups');
 
 		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
@@ -385,7 +406,7 @@ include_once('include/page_header.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$groups = API::HostGroup()->get($options);
+		$groups = CHostGroup::get($options);
 
 		order_result($groups, $sortfield, $sortorder);
 		$paging = getPagingLine($groups);
@@ -394,26 +415,26 @@ include_once('include/page_header.php');
 // COUNT hosts, templates
 		$options = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'selectHosts' => API_OUTPUT_COUNT,
-			'selectTemplates' => API_OUTPUT_COUNT,
+			'select_hosts' => API_OUTPUT_COUNT,
+			'select_templates' => API_OUTPUT_COUNT,
 			'nopermissions' => 1
 		);
-		$groupCounts = API::HostGroup()->get($options);
+		$groupCounts = CHostGroup::get($options);
 		$groupCounts = zbx_toHash($groupCounts, 'groupid');
 //-----
 
 // Data
 		$options = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'selectHosts' => array('hostid','name','status'),
-			'selectTemplates' => array('hostid','name','status'),
+			'select_hosts' => array('hostid','host','status'),
+			'select_templates' => array('hostid','host','status'),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 			'limitSelects' => $config['max_in_table']+1
 		);
 
 // sorting && paging
-		$groups = API::HostGroup()->get($options);
+		$groups = CHostGroup::get($options);
 		order_result($groups, $sortfield, $sortorder);
 //---------
 
@@ -432,7 +453,7 @@ include_once('include/page_header.php');
 				}
 
 				$url = 'templates.php?form=update&templateid='.$template['hostid'].'&groupid='.$group['groupid'];
-				$hosts_output[] = new CLink($template['name'], $url, 'unknown');
+				$hosts_output[] = new CLink($template['host'], $url, 'unknown');
 				$hosts_output[] = ', ';
 			}
 			if(!empty($hosts_output)){
@@ -459,7 +480,7 @@ include_once('include/page_header.php');
 						$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
 					break;
 				}
-				$hosts_output[] = new CLink($host['name'], $url, $style);
+				$hosts_output[] = new CLink($host['host'], $url, $style);
 				$hosts_output[] = ', ';
 
 			}
@@ -495,7 +516,7 @@ include_once('include/page_header.php');
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO);
+		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "groups";');

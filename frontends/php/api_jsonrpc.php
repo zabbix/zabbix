@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,9 +49,12 @@ $data = $http_request->body();
 if($allowed_content[$content_type] == 'json-rpc'){
 	header('Content-Type: application/json');
 
-	$jsonRpc = new CJSONrpc($data);
+	$json_rpc = new CJSONrpc();
 
-	print($jsonRpc->execute());
+	$json_rpc->process($data);
+	$data = $json_rpc->result();
+
+	echo $data;
 }
 else if($allowed_content[$content_type] == 'xml-rpc'){
 

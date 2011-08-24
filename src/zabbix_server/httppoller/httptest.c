@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,6 @@ static int	process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret;
-	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
 
@@ -83,8 +82,7 @@ static int	process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		zbx_timespec(&ts);
-		dc_add_history(itemid, (unsigned char)atoi(row[0]), 0, value, &ts,
+		dc_add_history(itemid, (unsigned char)atoi(row[0]), value, time(NULL),
 				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 		ret = SUCCEED;
 	}
@@ -145,6 +143,7 @@ static void	process_test_data(zbx_uint64_t httptestid, ZBX_HTTPSTAT *stat)
 
 		free_result(&value);
 	}
+
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -197,6 +196,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat)
 
 		free_result(&value);
 	}
+
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -271,11 +271,11 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERAGENT, httptest->agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0)) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0)) ||
 			/* The pointed data are not copied by the library. As a consequence, the data */
 			/* must be preserved by the calling application until the transfer finishes. */
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, httpstep.posts)))
@@ -320,10 +320,10 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		if ('\0' != *httpstep.posts)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: use post [%s]", httpstep.posts);
-			curl_easy_setopt(easyhandle, CURLOPT_POST, 1L);
+			curl_easy_setopt(easyhandle, CURLOPT_POST, 1);
 		}
 		else
-			curl_easy_setopt(easyhandle, CURLOPT_POST, 0L);
+			curl_easy_setopt(easyhandle, CURLOPT_POST, 0);
 
 		if (HTTPTEST_AUTH_NONE != httptest->authentication)
 		{
@@ -361,7 +361,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: go to URL [%s]", httpstep.url);
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, httpstep.url)) ||
-					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)httpstep.timeout)))
+					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, httpstep.timeout)) ||
+					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_CONNECTTIMEOUT, httpstep.timeout)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Web scenario step [%s:%s] error: could not set cURL option [%d]: %s",
 						httptest->name, httpstep.name, opt, curl_easy_strerror(err));
@@ -453,6 +454,7 @@ clean:
 		else
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
+
 	DBfree_result(result);
 
 	err_str_esc = DBdyn_escape_string_len(err_str, HTTPTEST_ERROR_LEN);
@@ -545,6 +547,7 @@ void	process_httptests(int httppoller_num, int now)
 
 		process_httptest(&httptest);
 	}
+
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

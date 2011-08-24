@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2001-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,32 +82,39 @@ include_once('include/page_header.php');
 	$search_wdgt->addHeader(array(S_SEARCH_BIG.': ',bold($search)), SPACE);
 
 //-------------
-	$left_col[] = array();
-	$right_col[] = array();
+	$left_tab = new CTable();
+	$left_tab->setCellPadding(3);
+	$left_tab->setCellSpacing(3);
+
+	$left_tab->setAttribute('border',0);
+
+	$right_tab = new CTable();
+	$right_tab->setCellPadding(3);
+	$right_tab->setCellSpacing(3);
+
+	$right_tab->setAttribute('border',0);
 
 // FIND Hosts
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'search' => array(
-			'name' => $search,
+			'host' => $search,
 			'dns' => $search,
 			'ip' => $search
 		),
 		'limit' => $rows_per_page,
-		'selectGroups' => API_OUTPUT_EXTEND,
-		'selectInterfaces' => API_OUTPUT_EXTEND,
-		'selectItems' => API_OUTPUT_COUNT,
-		'selectTriggers' => API_OUTPUT_COUNT,
-		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectApplications' => API_OUTPUT_COUNT,
-		'output' => array('name','status'),
-		'searchByAny' => true
+		'select_groups' => API_OUTPUT_EXTEND,
+		'select_items' => API_OUTPUT_COUNT,
+		'select_triggers' => API_OUTPUT_COUNT,
+		'select_graphs' => API_OUTPUT_COUNT,
+		'select_applications' => API_OUTPUT_COUNT,
+		'output' => API_OUTPUT_EXTEND,
 	);
-	$db_hosts = API::Host()->get($params);
+	$db_hosts = CHost::get($params);
 
-	order_result($db_hosts, 'name');
+	order_result($db_hosts, 'host');
 
-	$hosts = selectByPattern($db_hosts, 'name', $search, $rows_per_page);
+	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
 	$hostids = zbx_objectValues($hosts, 'hostid');
 
 	$params = array(
@@ -115,21 +122,20 @@ include_once('include/page_header.php');
 		'hostids' => $hostids,
 		'editable' => 1
 	);
-	$rw_hosts = API::Host()->get($params);
+	$rw_hosts = CHost::get($params);
 	$rw_hosts = zbx_toHash($rw_hosts,'hostid');
 
 	$params = array(
 		'nodeids'=> get_current_nodeid(true),
 		'search' => array(
-			'name' => $search,
+			'host' => $search,
 			'dns' => $search,
 			'ip' => $search
 		),
 		'countOutput' => 1,
-		'searchByAny' => true
 	);
 
-	$overalCount = API::Host()->get($params);
+	$overalCount = CHost::get($params);
 	$viewCount = count($hosts);
 
 	$header = array(
@@ -152,11 +158,6 @@ include_once('include/page_header.php');
 	foreach($hosts as $hnum => $host){
 		$hostid = $host['hostid'];
 
-		$interface = reset($host['interfaces']);
-		$host['ip'] = $interface['ip'];
-		$host['dns'] = $interface['dns'];
-		$host['port'] = $interface['port'];
-
 		switch($host['status']){
 			case HOST_STATUS_NOT_MONITORED:
 				$style = 'on';
@@ -170,7 +171,7 @@ include_once('include/page_header.php');
 		$group = reset($host['groups']);
 		$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
 
-		$caption = make_decoration($host['name'], $search);
+		$caption = make_decoration($host['host'], $search);
 
 		if(isset($rw_hosts[$hostid])){
 			$host_link = new CLink($caption,'hosts.php?form=update&'.$link, $style);
@@ -208,14 +209,14 @@ include_once('include/page_header.php');
 			$graphs_link,
 		));
 	}
+	$table->setFooter(new CCol(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL));
 
-	$sysmap_menu = get_icon('menu', array('menu' => 'sysmaps'));
 
-	$wdgt_hosts = new CUIWidget('search_hosts',$table);
-	$wdgt_hosts->setHeader(S_HOSTS, SPACE);
-	$wdgt_hosts->setFooter(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL);
+	$wdgt_hosts = new CWidget('search_hosts',$table);
+	$wdgt_hosts->setClass('header');
+	$wdgt_hosts->addHeader(S_HOSTS, SPACE);
 
-	$left_col[] = $wdgt_hosts;
+	$left_tab->addRow($wdgt_hosts);
 //----------------
 
 
@@ -224,10 +225,10 @@ include_once('include/page_header.php');
 		'nodeids'=> get_current_nodeid(true),
 		'output' => API_OUTPUT_EXTEND,
 		'search' => array('name' => $search),
-		'limit' => $rows_per_page
+		'limit' => $rows_per_page,
 	);
 
-	$db_hostGroups = API::HostGroup()->get($params);
+	$db_hostGroups = CHostGroup::get($params);
 	order_result($db_hostGroups, 'name');
 
 	$hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
@@ -239,7 +240,7 @@ include_once('include/page_header.php');
 		'editable' => 1
 	);
 
-	$rw_hostGroups = API::HostGroup()->get($params);
+	$rw_hostGroups = CHostGroup::get($params);
 	$rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
 
 	$params = array(
@@ -247,7 +248,7 @@ include_once('include/page_header.php');
 		'search' => array('name' => $search),
 		'countOutput' => 1
 	);
-	$overalCount = API::HostGroup()->get($params);
+	$overalCount = CHostGroup::get($params);
 	$viewCount = count($hostGroups);
 
 	$header = array(
@@ -292,31 +293,32 @@ include_once('include/page_header.php');
 			$admin_link,
 		));
 	}
+	$table->setFooter(new CCol(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL));
 
-	$wdgt_hgroups = new CUIWidget('search_hostgroup',$table);
-	$wdgt_hgroups->setHeader(S_HOST_GROUPS, SPACE);
-	$wdgt_hgroups->setFooter(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL);
-	$right_col[] = $wdgt_hgroups;
+	$wdgt_hgroups = new CWidget('search_hostgroup',$table);
+	$wdgt_hgroups->setClass('header');
+	$wdgt_hgroups->addHeader(S_HOST_GROUPS, SPACE);
+	$right_tab->addRow($wdgt_hgroups);
 //----------------
 
 // FIND Templates
 	if($admin){
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
-			'search' => array('name' => $search),
-			'output' => array('name'),
-			'selectGroups' => API_OUTPUT_REFER,
-			'sortfield' => 'name',
-			'selectItems' => API_OUTPUT_COUNT,
-			'selectTriggers' => API_OUTPUT_COUNT,
-			'selectGraphs' => API_OUTPUT_COUNT,
-			'selectApplications' => API_OUTPUT_COUNT,
+			'search' => array('host' => $search),
+			'output' => API_OUTPUT_EXTEND,
+			'select_groups' => API_OUTPUT_REFER,
+			'sortfield' => 'host',
+			'select_items' => API_OUTPUT_COUNT,
+			'select_triggers' => API_OUTPUT_COUNT,
+			'select_graphs' => API_OUTPUT_COUNT,
+			'select_applications' => API_OUTPUT_COUNT,
 			'limit' => $rows_per_page
 		);
-		$db_templates = API::Template()->get($params);
-		order_result($db_templates, 'name');
+		$db_templates = CTemplate::get($params);
+		order_result($db_templates, 'host');
 
-		$templates = selectByPattern($db_templates, 'name', $search, $rows_per_page);
+		$templates = selectByPattern($db_templates, 'host', $search, $rows_per_page);
 		$templateids = zbx_objectValues($templates, 'templateid');
 
 		$params = array(
@@ -324,17 +326,17 @@ include_once('include/page_header.php');
 			'templateids' => $templateids,
 			'editable' => 1
 		);
-		$rw_templates = API::Template()->get($params);
+		$rw_templates = CTemplate::get($params);
 		$rw_templates = zbx_toHash($rw_templates,'templateid');
 
 		$params = array(
 			'nodeids'=> get_current_nodeid(true),
-			'search' => array('name' => $search),
+			'search' => array('host' => $search),
 			'countOutput' => 1,
 			'editable' => 1
 		);
 
-		$overalCount = API::Template()->get($params);
+		$overalCount = CTemplate::get($params);
 		$viewCount = count($templates);
 
 		$header = array(
@@ -355,7 +357,7 @@ include_once('include/page_header.php');
 			$group = reset($template['groups']);
 			$link = 'groupid='.$group['groupid'].'&hostid='.$templateid.'&switch_node='.id2nodeid($templateid);
 
-			$caption = make_decoration($template['name'], $search);
+			$caption = make_decoration($template['host'], $search);
 
 			if(isset($rw_templates[$templateid])){
 				$template_link = new CLink($caption,'templates.php?form=update&'.'&templateid='.$templateid.'&switch_node='.id2nodeid($templateid));
@@ -381,26 +383,32 @@ include_once('include/page_header.php');
 				$graphs_link
 			));
 		}
+		$table->setFooter(new CCol(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL));
 
-		$wdgt_templates = new CUIWidget('search_templates',$table);
-		$wdgt_templates->setHeader(S_TEMPLATES, SPACE);
-		$wdgt_templates->setFooter(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL);
-		$right_col[] = $wdgt_templates;
+
+		$wdgt_templates = new CWidget('search_templates',$table);
+		$wdgt_templates->setClass('header');
+		$wdgt_templates->addHeader(S_TEMPLATES, SPACE);
+		$right_tab->addRow($wdgt_templates);
 	}
 //----------------
 
-	$leftDiv = new CDiv($left_col, 'column');
-	$rightDiv = new CDiv($right_col, 'column');
+	$td_l = new CCol($left_tab);
+	$td_l->setAttribute('valign','top');
 
-	$ieTab = new CTable();
-	$ieTab->addRow(array($leftDiv,$rightDiv), 'top');
+	$td_r = new CCol($right_tab);
+	$td_r->setAttribute('valign','top');
 
-	$search_wdgt->addItem($ieTab);
+	$outer_table = new CTable();
+	$outer_table->setAttribute('border',0);
+	$outer_table->setCellPadding(1);
+	$outer_table->setCellSpacing(1);
+	$outer_table->addRow(array($td_l,$td_r));
+
+	$search_wdgt->addItem($outer_table);
+
 	$search_wdgt->show();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

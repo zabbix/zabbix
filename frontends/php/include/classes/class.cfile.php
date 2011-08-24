@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,15 +19,18 @@
 **/
 ?>
 <?php
-class CFile extends CInput{
+class CFile extends CTag{
 	public function __construct($name='file',$value=''){
-		parent::__construct('file',$name, $value);
+		parent::__construct('input','no');
+		$this->setClass('biginput');
+		$this->setAttribute('type','file');
+		$this->setName($name);
 		$this->setFile($value);
 	}
 
 	public function setFile($value=''){
 		if(!is_string($value)){
-			return $this->error('Incorrect value for setFile ['.$value.']');
+			return $this->error('Incorrect value for SetFile ['.$value.']');
 		}
 	return $this->setAttribute('value',$value);
 	}

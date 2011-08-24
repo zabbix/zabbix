@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ function add_users(formname) {
 // -
 
 // create user twinbox +
-	$form = new CForm('post','users.php');
+	$form = new CForm('users.php');
 	$form->setAttribute('id', 'users');
 
 	$user_tb = new CTweenBox($form, 'usersid', null, 10);
@@ -100,6 +100,7 @@ function add_users(formname) {
 	$form->addItem($user_tb->get('asdasda','asdasdasdas'));
 // -
 	$button = new CButton('select', S_SELECT, 'add_users("'.$dstfrm.'")');
+	$button->setType('button');
 
 	$form->addItem($button);
 	$form->show();

@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2006 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "common.h"
 
-#ifndef HAVE_SQLITE3
 #include "cfg.h"
 #include "db.h"
 #include "log.h"
@@ -51,11 +50,11 @@ static int convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const
 
 	p = new_exp;
 
-	for (i = 0; 0 != old_exp[i]; i++)
+	for (i = 0; old_exp[i] != 0; i++)
 	{
-		if (ID == state)
+		if (state == ID)
 		{
-			if ('}' == old_exp[i])
+			if (old_exp[i] == '}')
 			{
 				state = NORMAL;
 				ZBX_STR2UINT64(tmp, id);
@@ -69,7 +68,7 @@ static int convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const
 				p_id++;
 			}
 		}
-		else if ('{' == old_exp[i])
+		else if (old_exp[i] == '{')
 		{
 			state = ID;
 			memset(id,0,MAX_STRING_LEN);
@@ -105,7 +104,8 @@ static int convert_triggers_expression(int old_id, int new_id)
 	const ZBX_TABLE	*r_table;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		new_expression[MAX_STRING_LEN], *new_expression_esc;
+	char		new_expression[MAX_STRING_LEN];
+	char		*new_expression_esc;
 
 	if (NULL == (r_table = DBget_table("functions")))
 	{
@@ -113,9 +113,9 @@ static int convert_triggers_expression(int old_id, int new_id)
 		return FAIL;
 	}
 
-	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
+	prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
 	if (r_table->flags & ZBX_SYNC)
-		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
+		prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
 
 	result = DBselect("select expression,triggerid from triggers");
 
@@ -126,7 +126,8 @@ static int convert_triggers_expression(int old_id, int new_id)
 
 		new_expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
 		DBexecute("update triggers set expression='%s' where triggerid=%s",
-				new_expression_esc, row[1]);
+				new_expression_esc,
+				row[1]);
 		zbx_free(new_expression_esc);
 	}
 	DBfree_result(result);
@@ -193,9 +194,9 @@ static int convert_special_field(int old_id, int new_id, const char *table_name,
 		return FAIL;
 	}
 
-	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
+	prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
 	if (r_table->flags & ZBX_SYNC)
-		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
+		prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
 
 	DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s=%d and %s>0",
 			table_name,
@@ -276,8 +277,10 @@ static int convert_condition_values(int old_id, int new_id, const char *rel_tabl
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
  ******************************************************************************/
-int	change_nodeid(int old_id, int new_id)
+int change_nodeid(int old_id, int new_id)
 {
 	struct conv_t
 	{
@@ -308,6 +311,13 @@ int	change_nodeid(int old_id, int new_id)
 			{"triggers",	EVENT_OBJECT_TRIGGER},
 			{"dhosts",	EVENT_OBJECT_DHOST},
 			{"dservices",	EVENT_OBJECT_DSERVICE},
+			{NULL}
+			}
+		},
+		{"operations",		"objectid",	"object",
+			{
+			{"users",	OPERATION_OBJECT_USER},
+			{"usrgrp",	OPERATION_OBJECT_GROUP},
 			{NULL}
 			}
 		},
@@ -389,13 +399,13 @@ int	change_nodeid(int old_id, int new_id)
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 
-	if (0 != old_id)
+	if(old_id!=0)
 	{
 		printf("Conversion from non-zero node id is not supported.\n");
 		return FAIL;
 	}
 
-	if (999 < new_id || 0 > new_id)
+	if(new_id>999 || new_id<0)
 	{
 		printf("Node ID must be in range of 0-999.\n");
 		return FAIL;
@@ -407,17 +417,7 @@ int	change_nodeid(int old_id, int new_id)
 
 	DBbegin();
 
-	printf("Dropping foreign keys ");
-	fflush(stdout);
-
-	for (i = 0; NULL != db_schema_fkeys_drop[i]; i++)
-	{
-		DBexecute("%s", db_schema_fkeys_drop[i]);
-		printf(".");
-		fflush(stdout);
-	}
-
-	printf(" done.\nConverting tables ");
+	printf("Converting tables ");
 	fflush(stdout);
 
 	for (i = 0; NULL != tables[i].table; i++)
@@ -428,13 +428,9 @@ int	change_nodeid(int old_id, int new_id)
 		for (j = 0; NULL != tables[i].fields[j].name; j++)
 		{
 			for (s = 0; NULL != special_convs[s].table_name; s++)
-			{
 				if (0 == strcmp(special_convs[s].table_name, tables[i].table) &&
 						0 == strcmp(special_convs[s].field_name, tables[i].fields[j].name))
-				{
 					break;
-				}
-			}
 
 			if (NULL != special_convs[s].table_name)
 			{
@@ -447,85 +443,65 @@ int	change_nodeid(int old_id, int new_id)
 				continue;
 			}
 
-			if (ZBX_TYPE_ID != tables[i].fields[j].type)
-				continue;
-
-			if (0 == strcmp(tables[i].fields[j].name, tables[i].recid))	/* primary key */
+			if (tables[i].fields[j].type == ZBX_TYPE_ID)
 			{
-				prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
+				if (0 == strcmp(tables[i].fields[j].name, tables[i].recid))	/* primary key */
+				{
+					prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
 
-				if (tables[i].flags & ZBX_SYNC)
-					prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
-			}
-			else if (NULL != tables[i].fields[j].fk_table)	/* relations */
-			{
-				if (NULL == (r_table = DBget_table(tables[i].fields[j].fk_table)))
+					if (tables[i].flags & ZBX_SYNC)
+						prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
+				}
+				else if (NULL != tables[i].fields[j].rel)	/* relations */
+				{
+					if (NULL == (r_table = DBget_table(tables[i].fields[j].rel)))
+					{
+						printf("%s.%s FAILED\n", tables[i].table, tables[i].fields[j].name);
+						fflush(stdout);
+						continue;
+					}
+
+					prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
+
+					if (r_table->flags & ZBX_SYNC)
+						prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
+				}
+				else if (0 == strcmp("profiles", tables[i].table))	/* special processing for table 'profiles' */
+				{
+					convert_profiles(old_id, new_id, tables[i].fields[j].name);
+					continue;
+				}
+				else
 				{
 					printf("%s.%s FAILED\n", tables[i].table, tables[i].fields[j].name);
 					fflush(stdout);
 					continue;
 				}
 
-				prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
-
-				if (r_table->flags & ZBX_SYNC)
-					prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
+				DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s>0",
+						tables[i].table,
+						tables[i].fields[j].name,
+						tables[i].fields[j].name,
+						prefix,
+						tables[i].fields[j].name);
 			}
-			else if (0 == strcmp("profiles", tables[i].table))	/* special processing for table 'profiles' */
-			{
-				convert_profiles(old_id, new_id, tables[i].fields[j].name);
-				continue;
-			}
-			else
-			{
-				printf("%s.%s FAILED\n", tables[i].table, tables[i].fields[j].name);
-				fflush(stdout);
-				continue;
-			}
-
-			DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s>0",
-					tables[i].table,
-					tables[i].fields[j].name,
-					tables[i].fields[j].name,
-					prefix,
-					tables[i].fields[j].name);
 		}
 	}
 
-	/* special processing for trigger expressions */
+	/* Special processing for trigger expressions */
 	convert_triggers_expression(old_id, new_id);
 
-	/* special processing for condition values */
+	/* Special processing for condition values */
 	for (i = 0; NULL != condition_convs[i].rel; i++)
 		convert_condition_values(old_id, new_id, condition_convs[i].rel, condition_convs[i].type);
 
 	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)",
 			new_id);
 
-	printf(" done.\nCreating foreign keys ");
-	fflush(stdout);
-
-	for (i = 0; NULL != db_schema_fkeys[i]; i++)
-	{
-		DBexecute("%s", db_schema_fkeys[i]);
-		printf(".");
-		fflush(stdout);
-	}
-
-	printf(" done.\nConversion completed.\n");
-	fflush(stdout);
-
 	DBcommit();
 
 	DBclose();
+	printf(" done.\nConversion completed.\n");
 
 	return SUCCEED;
 }
-#else	/* HAVE_SQLITE3 */
-int	change_nodeid(int old_id, int new_id)
-{
-	printf("Distributed monitoring with SQLite3 is not supported.\n");
-	return FAIL;
-}
-#endif
-

@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,10 +35,6 @@ class CObject{
 	return $res;
 	}
 
-	public function __toString(){
-		return $this->toString();
-	}
-
 	public function show($destroy=true){
 		echo $this->toString($destroy);
 	}
@@ -61,6 +57,7 @@ class CObject{
 		}
 		else if(is_string($value)){
 			array_push($this->items, zbx_htmlstr($value));
+//				array_push($this->items,htmlspecialchars($value));
 		}
 		else if(is_array($value)){
 			foreach($value as $item){
@@ -70,8 +67,6 @@ class CObject{
 		else if(!is_null($value)){
 			array_push($this->items,unpack_object($value));
 		}
-
-		return $this;
 	}
 }
 
@@ -107,4 +102,3 @@ function implode_objects($glue, &$pieces){
 
 return implode($glue, $pieces);
 }
-?>

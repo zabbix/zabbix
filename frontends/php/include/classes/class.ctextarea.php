@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,25 +21,24 @@
 <?php
 class CTextArea extends CTag{
 /* public */
-	public function __construct($name='textarea',$value='', $cols=77, $rows=7, $readonly=false){
+	public function __construct($name='textarea',$value='',$cols=77,$rows=7,$readonly='no'){
 		parent::__construct('textarea','yes');
-		$this->attributes['class'] = 'input textarea';
+		$this->attributes['class'] = 'biginput';
 
-		$this->attr('id', zbx_formatDomId($name));
-		$this->attr('name', $name);
-		$this->attr('rows', $rows);
-		$this->attr('cols', $cols);
-
+		$this->attributes['id'] = $name;
+		$this->attributes['name'] = $name;
+		$this->attributes['rows'] = $rows;
+		$this->attributes['cols'] = $cols;
 		$this->setReadonly($readonly);
 
 		$this->addItem($value);
 	}
 
-	public function setReadonly($value=true){
-		if($value)
-			$this->attributes['readonly'] = 'readonly';
-		else
-			$this->removeAttribute('readonly');
+	public function setReadonly($value='yes'){
+		if($value==='yes' || $value === true)
+			return $this->attributes['readonly'] = 'readonly';
+
+		$this->removeAttribute('readonly');
 	}
 
 	public function setValue($value=''){

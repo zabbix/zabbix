@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,31 +25,9 @@
 #include "../nodewatcher/nodesender.h"
 #include "../nodewatcher/nodewatcher.h"
 
-static char	*buf = NULL, *tmp = NULL;
-static int	buf_alloc = 128, tmp_alloc = 16;
-
-static void	make_delete_sql(char **sql, int *sql_alloc, int *sql_offset,
-		const ZBX_TABLE *table, zbx_uint64_t *ids, int *ids_num)
-{
-	if (NULL == table)
-		return;
-
-	if (0 == *ids_num)
-		return;
-
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 19 + ZBX_TABLENAME_LEN,
-			"delete from %s where",
-			table->table);
-
-	DBadd_condition_alloc(sql, sql_alloc, sql_offset,
-			table->recid, ids, *ids_num);
-
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 3, ";\n");
-
-	DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
-
-	*ids_num = 0;
-}
+static char	*sql = NULL, *buf = NULL, *fld = NULL, *tmp = NULL;
+static int	sql_alloc = 4096, sql_offset, buf_alloc = 128,
+		fld_alloc = 1024, fld_offset, tmp_alloc = 16;
 
 /******************************************************************************
  *                                                                            *
@@ -59,7 +37,8 @@ static void	make_delete_sql(char **sql, int *sql_alloc, int *sql_offset,
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -71,15 +50,11 @@ static void	process_deleted_records(int nodeid, char *data, int sender_nodetype)
 	const char	*__function_name = "process_deleted_records";
 	char		*r, *lf;
 	const ZBX_TABLE	*table = NULL;
-	zbx_uint64_t	recid, *ids = NULL;
-	int		ids_alloc = 0, ids_num = 0;
-	char		*sql = NULL;
-	int		sql_alloc = 4096, sql_offset = 0;
+	zbx_uint64_t	recid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
-
+	sql_offset = 0;
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
 #endif
@@ -92,21 +67,23 @@ static void	process_deleted_records(int nodeid, char *data, int sender_nodetype)
 		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 
 		if (NULL == table || 0 != strcmp(table->table, buf))
-		{
-			make_delete_sql(&sql, &sql_alloc, &sql_offset, table, ids, &ids_num);
-
 			if (NULL == (table = DBget_table(buf)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find table [%s]", __function_name, buf);
 				goto next;
 			}
-		}
 
 		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 		ZBX_STR2UINT64(recid, buf);
 
 		if ('2' == *r)	/* NODE_CONFIGLOG_OP_DELETE */
-			uint64_array_add(&ids, &ids_alloc, &ids_num, recid, 64);
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+					"delete from %s where %s=" ZBX_FS_UI64 ";\n",
+					table->table, table->recid, recid);
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
 next:
 		if (lf != NULL)
 		{
@@ -117,16 +94,12 @@ next:
 			break;
 	}
 
-	make_delete_sql(&sql, &sql_alloc, &sql_offset, table, ids, &ids_num);
-
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
-
-	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -139,7 +112,8 @@ next:
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -150,63 +124,36 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 {
 	const char	*__function_name = "process_updated_records";
 	char		*r, *lf, *value_esc;
-	int		len, op, dnum;
+	int		len, valuetype;
 	const ZBX_TABLE	*table = NULL;
-	const ZBX_FIELD	*field = NULL;
 	zbx_uint64_t	recid;
-	char		*dsql = NULL,
-			*isql = NULL, *ifld = NULL, *ival = NULL,
-			*usql = NULL, *ufld = NULL;
-	int		dsql_alloc = 4096, dsql_offset = 0, dtmp_offset = 0,
-			isql_alloc = 4096, isql_offset = 0,
-			ifld_alloc = 4096, ifld_offset = 0,
-			ival_alloc = 4096, ival_offset = 0,
-			usql_alloc = 4096, usql_offset = 0,
-			ufld_alloc = 4096, ufld_offset = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	dsql = zbx_malloc(dsql, dsql_alloc);
-	isql = zbx_malloc(isql, isql_alloc);
-	ifld = zbx_malloc(ifld, ifld_alloc);
-	ival = zbx_malloc(ival, ival_alloc);
-	usql = zbx_malloc(usql, usql_alloc);
-	ufld = zbx_malloc(ufld, ufld_alloc);
-
+	sql_offset = 0;
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 7, "begin\n");
-	zbx_snprintf_alloc(&isql, &isql_alloc, &isql_offset, 7, "begin\n");
-	zbx_snprintf_alloc(&usql, &usql_alloc, &usql_offset, 7, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
 #endif
 
+	r = data;
 	for (r = data; '\0' != *r;)
 	{
 		if (NULL != (lf = strchr(r, '\n')))
 			*lf = '\0';
 
-		/* table name */
 		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 
 		if (NULL == table || 0 != strcmp(table->table, buf))
-		{
 			if (NULL == (table = DBget_table(buf)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find table [%s]", __function_name, buf);
 				goto next;
 			}
-		}
 
-		/* record id */
 		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 		ZBX_STR2UINT64(recid, buf);
-
-		if (NULL == r)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): invalid record", __function_name);
-			goto next;
-		}
 
 		if ('0' == *r)	/* NODE_CONFIGLOG_OP_UPDATE */
 		{
@@ -214,208 +161,70 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 					table->table, table->recid, recid);
 
 			if (NULL == (row = DBfetch(result)))
-				op = NODE_CONFIGLOG_OP_ADD;
-			else
-				op = NODE_CONFIGLOG_OP_UPDATE;
-
+				*r = '1';	/* NODE_CONFIGLOG_OP_ADD */
 			DBfree_result(result);
+
+			if ('0' != *r)	/* NODE_CONFIGLOG_OP_UPDATE */
+				goto next;
 
 			zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 
-			ifld_offset = 0;
-			ival_offset = 0;
-			ufld_offset = 0;
-			dtmp_offset = dsql_offset;
-			dnum = 0;
-
-			if (op == NODE_CONFIGLOG_OP_ADD && NULL != table->uniq)
-			{
-				zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 20 + ZBX_TABLENAME_LEN,
-						"delete from %s where ", table->table);
-			}
-
+			fld_offset = 0;
 			while (NULL != r)
 			{
-				/* field name */
 				len = zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+				zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, len + 2, "%s=", buf);
 
-				if (NULL == (field = DBget_field(table, buf)))
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find field [%s.%s]",
-							__function_name, table->table, buf);
-					goto next;
-				}
-
-				if (NODE_CONFIGLOG_OP_UPDATE == op)
-					zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset, len + 2, "%s=", buf);
-				else	/* NODE_CONFIGLOG_OP_ADD */
-					zbx_snprintf_alloc(&ifld, &ifld_alloc, &ifld_offset, len + 2, "%s,", buf);
-
-				/* value type (ignored) */
 				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+				valuetype = atoi(buf);
 
 				len = zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 
 				if (0 == strcmp(buf, "NULL"))
 				{
-					if (NODE_CONFIGLOG_OP_UPDATE == op)
-						zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset, 6, "NULL,");
-					else	/* NODE_CONFIGLOG_OP_ADD */
-						zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset, 6, "NULL,");
+					zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, 6, "NULL,");
 					continue;
 				}
 
-				switch (field->type)
-				{
-					case ZBX_TYPE_ID:
-						/* if the field relates the same table
-						 * for example: host.proxy_hostid relates with host.hostid
-						 */
-						if (NODE_CONFIGLOG_OP_ADD == op &&
-								NULL != field->fk_table &&
-								0 == strcmp(table->table, field->fk_table))
-						{
-							zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-									ZBX_FIELDNAME_LEN + len + 3, "%s=%s,", field->name, buf);
-							zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-									6, "NULL,");
-							break;
-						}
-					case ZBX_TYPE_INT:
-					case ZBX_TYPE_UINT:
-					case ZBX_TYPE_FLOAT:
-						if (NODE_CONFIGLOG_OP_UPDATE == op)
-							zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-									len + 2, "%s,", buf);
-						else	/* NODE_CONFIGLOG_OP_ADD */
-						{
-							zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-									len + 2, "%s,", buf);
-
-							if (NULL != table->uniq && SUCCEED == str_in_list(table->uniq, field->name, ','))
-							{
-								zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset,
-										ZBX_FIELDNAME_LEN + len + 3,
-										"%s=%s and ", field->name, buf);
-								dnum++;
-							}
-						}
-						break;
-					case ZBX_TYPE_BLOB:
-						if ('\0' == *buf)
-						{
-							if (NODE_CONFIGLOG_OP_UPDATE == op)
-								zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-										4, "'',");
-							else	/* NODE_CONFIGLOG_OP_ADD */
-								zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-										4, "'',");
-						}
-						else
-						{
+				switch (valuetype) {
+				case ZBX_TYPE_INT:
+				case ZBX_TYPE_UINT:
+				case ZBX_TYPE_ID:
+				case ZBX_TYPE_FLOAT:
+					zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, len + 2, "%s,", buf);
+					break;
+				case ZBX_TYPE_BLOB:
+					if ('\0' == *buf)
+						zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, 4, "'',");
+					else
+					{
 #if defined(HAVE_POSTGRESQL)
-							len = zbx_hex2binary(buf);
-							len = zbx_pg_escape_bytea((u_char *)buf, len, &tmp, &tmp_alloc);
-							if (NODE_CONFIGLOG_OP_UPDATE == op)
-								zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-										len + 4, "'%s',", tmp);
-							else	/* NODE_CONFIGLOG_OP_ADD */
-								zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-										len + 4, "'%s',", tmp);
+						len = zbx_hex2binary(buf);
+						len = zbx_pg_escape_bytea((u_char *)buf, len, &tmp, &tmp_alloc);
+						zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, len + 4, "'%s',", tmp);
 #else
-							if (NODE_CONFIGLOG_OP_UPDATE == op)
-								zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-										len + 4, "0x%s,", buf);
-							else	/* NODE_CONFIGLOG_OP_ADD */
-								zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-										len + 4, "0x%s,", buf);
+						zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, len + 4, "0x%s,", buf);
 #endif
-						}
-						break;
-					default:	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR */
-						zbx_hex2binary(buf);
-						value_esc = DBdyn_escape_string(buf);
-						len = strlen(value_esc);
+					}
+					break;
+				default:	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR */
+					zbx_hex2binary(buf);
+					value_esc = DBdyn_escape_string(buf);
+					len = strlen(value_esc);
 
-						if (NODE_CONFIGLOG_OP_UPDATE == op)
-							zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-									len + 4, "'%s',", value_esc);
-						else	/* NODE_CONFIGLOG_OP_ADD */
-						{
-							zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-									len + 4, "'%s',", value_esc);
+					zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, len + 4, "'%s',", value_esc);
 
-							if (NULL != table->uniq && SUCCEED == str_in_list(table->uniq, field->name, ','))
-							{
-								zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset,
-										ZBX_FIELDNAME_LEN + len + 3,
-										"%s='%s' and ", field->name, value_esc);
-								dnum++;
-							}
-						}
-
-						zbx_free(value_esc)
+					zbx_free(value_esc)
 				}
 			}
+			if (fld_offset != 0)
+				fld[fld_offset - 1] = '\0';
 
-			if (dsql_offset != dtmp_offset)
-			{
-				if (dnum != num_param(table->uniq))
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s(): missing required fields [%s][%s]",
-							__function_name, table->table, table->uniq);
-					dsql_offset = dtmp_offset;
-					goto next;
-				}
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, fld_offset + 192,
+					"update %s set %s where %s=" ZBX_FS_UI64 ";\n",
+					table->table, fld, table->recid, recid);
 
-				dsql_offset -= 5;
-				zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 3, ";\n");
-			}
-
-			if (0 != ifld_offset)
-			{
-				ifld[--ifld_offset] = '\0';
-				ival[--ival_offset] = '\0';
-
-				zbx_snprintf_alloc(&isql, &isql_alloc, &isql_offset,
-						50 + ZBX_TABLENAME_LEN + ZBX_FIELDNAME_LEN + ifld_offset + ival_offset,
-						"insert into %s (%s,%s) values (" ZBX_FS_UI64 ",%s);\n",
-						table->table, table->recid, ifld, recid, ival);
-			}
-
-			if (0 != ufld_offset)
-			{
-				ufld[--ufld_offset] = '\0';
-
-				zbx_snprintf_alloc(&usql, &usql_alloc, &usql_offset,
-						42 + ZBX_TABLENAME_LEN + ZBX_FIELDNAME_LEN + ufld_offset,
-						"update %s set %s where %s=" ZBX_FS_UI64 ";\n",
-						table->table, ufld, table->recid, recid);
-			}
-
-			if (dsql_offset > ZBX_MAX_SQL_SIZE || isql_offset > ZBX_MAX_SQL_SIZE || usql_offset > ZBX_MAX_SQL_SIZE)
-			{
-#ifdef HAVE_ORACLE
-				zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 6, "end;\n");
-				zbx_snprintf_alloc(&isql, &isql_alloc, &isql_offset, 6, "end;\n");
-				zbx_snprintf_alloc(&usql, &usql_alloc, &usql_offset, 6, "end;\n");
-#endif
-				if (dsql_offset > 16)
-					DBexecute("%s", dsql);
-				if (isql_offset > 16)
-					DBexecute("%s", isql);
-				if (usql_offset > 16)
-					DBexecute("%s", usql);
-
-				dsql_offset = 0;
-				isql_offset = 0;
-				usql_offset = 0;
-#ifdef HAVE_ORACLE
-				zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 7, "begin\n");
-				zbx_snprintf_alloc(&isql, &isql_alloc, &isql_offset, 7, "begin\n");
-				zbx_snprintf_alloc(&usql, &usql_alloc, &usql_offset, 7, "begin\n");
-#endif
-			}
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 next:
 		if (lf != NULL)
@@ -428,24 +237,145 @@ next:
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 6, "end;\n");
-	zbx_snprintf_alloc(&isql, &isql_alloc, &isql_offset, 6, "end;\n");
-	zbx_snprintf_alloc(&usql, &usql_alloc, &usql_offset, 6, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
-	if (dsql_offset > 16)
-		DBexecute("%s", dsql);
-	if (isql_offset > 16)
-		DBexecute("%s", isql);
-	if (usql_offset > 16)
-		DBexecute("%s", usql);
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
 
-	zbx_free(ufld);
-	zbx_free(usql);
-	zbx_free(ival);
-	zbx_free(ifld);
-	zbx_free(isql);
-	zbx_free(dsql);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_new_records                                              *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	process_new_records(int nodeid, char *data, int sender_nodetype)
+{
+	const char	*__function_name = "process_new_records";
+	char		*r, *lf, *value_esc;
+	int		len, valuetype;
+	const ZBX_TABLE	*table = NULL;
+	zbx_uint64_t	recid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sql_offset = 0;
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+#endif
+
+	for (r = data; '\0' != *r;)
+	{
+		if (NULL != (lf = strchr(r, '\n')))
+			*lf = '\0';
+
+		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+
+		if (NULL == table || 0 != strcmp(table->table, buf))
+			if (NULL == (table = DBget_table(buf)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find table [%s]", __function_name, buf);
+				goto next;
+			}
+
+		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+		ZBX_STR2UINT64(recid, buf);
+
+		if ('1' == *r)	/* NODE_CONFIGLOG_OP_ADD */
+		{
+			zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+					"insert into %s (%s,", table->table, table->recid);
+
+			fld_offset = 0;
+			zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, 32, ZBX_FS_UI64 ",", recid);
+
+			while (NULL != r)
+			{
+				len = zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, len + 2, "%s,", buf);
+
+				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+				valuetype = atoi(buf);
+
+				len = zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+
+				if (0 == strcmp(buf, "NULL"))
+				{
+					zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, 6, "NULL,");
+					continue;
+				}
+
+				switch (valuetype) {
+				case ZBX_TYPE_INT:
+				case ZBX_TYPE_UINT:
+				case ZBX_TYPE_ID:
+				case ZBX_TYPE_FLOAT:
+					zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, len + 2, "%s,", buf);
+					break;
+				case ZBX_TYPE_BLOB:
+					if ('\0' == *buf)
+						zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, 4, "'',");
+					else
+					{
+#if defined(HAVE_POSTGRESQL)
+						len = zbx_hex2binary(buf);
+						len = zbx_pg_escape_bytea((u_char *)buf, len, &tmp, &tmp_alloc);
+						zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, len + 4, "'%s',", tmp);
+#else
+						zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, len + 4, "0x%s,", buf);
+#endif
+					}
+					break;
+				default:	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR */
+					zbx_hex2binary(buf);
+					value_esc = DBdyn_escape_string(buf);
+					len = strlen(value_esc);
+
+					zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, len + 4, "'%s',", value_esc);
+
+					zbx_free(value_esc)
+				}
+			}
+			sql[--sql_offset] = '\0';
+			fld[--fld_offset] = '\0';
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, fld_offset + 16, ") values (%s);\n", fld);
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+next:
+		if (lf != NULL)
+		{
+			*lf++ = '\n';
+			r = lf;
+			data = lf;
+		}
+		else
+			break;
+	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+#endif
+
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -458,7 +388,8 @@ next:
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -469,7 +400,7 @@ static void	process_checksum(int nodeid, char *data, int sender_nodetype)
 {
 	const char	*__function_name = "process_checksum";
 	char		*r, *lf;
-	int		len, tmp_offset;
+	int		len;
 	const ZBX_TABLE	*table = NULL;
 	zbx_uint64_t	recid;
 
@@ -480,7 +411,6 @@ static void	process_checksum(int nodeid, char *data, int sender_nodetype)
 		if (NULL != (lf = strchr(r, '\n')))
 			*lf = '\0';
 
-		/* table name */
 		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 
 		if (NULL == table || 0 != strcmp(table->table, buf))
@@ -490,27 +420,28 @@ static void	process_checksum(int nodeid, char *data, int sender_nodetype)
 				goto next;
 			}
 
-		/* record id */
 		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 		ZBX_STR2UINT64(recid, buf);
 
-		if ('0' == *r)	/* NODE_CONFIGLOG_OP_UPDATE */
+		if ('0' == *r || '1' == *r)	/* NODE_CONFIGLOG_OP_UPDATE || NODE_CONFIGLOG_OP_ADD */
 		{
 			zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 
-			tmp_offset = 0;
+			fld_offset = 0;
 			while (NULL != r)
 			{
-				/* field name */
 				len = zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 	
-				zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, len + 2, "%s,", buf);
+				zbx_snprintf_alloc(&fld, &fld_alloc, &fld_offset, len + 2, "%s,", buf);
+
+				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);	/* value type */
+				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);	/* value */
 			}
-			if (tmp_offset != 0)
-				tmp[--tmp_offset] = '\0';
+			if (fld_offset != 0)
+				fld[fld_offset - 1] = '\0';
 
 			if (SUCCEED == calculate_checksums(nodeid, table->table, recid))
-				update_checksums(nodeid, sender_nodetype, SUCCEED, table->table, recid, tmp);
+				update_checksums(nodeid, sender_nodetype, SUCCEED, table->table, recid, fld);
 		}
 next:
 		if (lf != NULL)
@@ -603,13 +534,18 @@ int	node_sync(char *data, int *sender_nodeid, int *nodeid)
 			*lf++ = '\n';
 			data = lf;
 
+			sql = zbx_malloc(sql, sql_alloc);
 			buf = zbx_malloc(buf, buf_alloc);
+			fld = zbx_malloc(fld, fld_alloc);
 
-			process_updated_records(*nodeid, data, sender_nodetype);
 			process_deleted_records(*nodeid, data, sender_nodetype);
+			process_updated_records(*nodeid, data, sender_nodetype);
+			process_new_records(*nodeid, data, sender_nodetype);
 			process_checksum(*nodeid, data, sender_nodetype);
 
+			zbx_free(fld);
 			zbx_free(buf);
+			zbx_free(sql);
 		}
 	}
 quit:

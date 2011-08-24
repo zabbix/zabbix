@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,12 +16,15 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
+// JavaScript Document
+// Tree manipulations class
 // author: Aly
+
+
 var CTree = Class.create();
 CTree.prototype = {
 tree_name: null,
-treenode: [],
+treenode: new Array(),   
 
 initialize : function(tree_name, treenode){
 	this.tree_name = tree_name;
@@ -44,7 +47,7 @@ getNodeStatus : function(id){
 		} else {
 			return 'open';
 		}
-	}
+	} 
 	catch(e){
 		return 'close';
 	}
@@ -54,7 +57,7 @@ ChangeNodeStatus : function(id){
 	try{
 		if(this.treenode[id].status == 'close'){
 			this.treenode[id].status = 'open';
-		}
+		} 
 		else {
 			this.treenode[id].status = 'close';
 		}
@@ -67,7 +70,7 @@ ChangeNodeStatus : function(id){
 			}
 		}
 		cookie.create(this.tree_name,cookie_str);
-	}
+	} 
 	catch(e){
 		IE?(alert(e.description)):(alert(e));
 	}
@@ -80,15 +83,16 @@ closeSNodeX : function(id,img){
 		if(this.getNodeStatus(id) == 'close'){
 			this.OpenNode(nodelist);
 			img.src = 'images/general/tree/minus.gif';
-		}
+		} 
 		else {
 			this.CloseNode(nodelist);
 			img.src = 'images/general/tree/plus.gif';
 		}
 		this.ChangeNodeStatus(id);
-	}
+	} 
 	catch(e){
 		throw('JSTree ERROR [closeSNodeX]: '+e);
+		return;
 	}
 },
 
@@ -103,12 +107,12 @@ OpenNode : function(nodelist){
 				}
 			}
 		}
-	}
+	} 
 	catch(e){
 		throw('JSTree ERROR [OpenNode]: '+e);
 	}
 },
-
+	
 CloseNode : function(nodelist){
 	try{
 		var c = nodelist.length-1;
@@ -120,13 +124,13 @@ CloseNode : function(nodelist){
 				}
 			}
 		}
-	}
-	catch(e){
+	} 
+	catch(e){ 
 		throw('JSTree ERROR [CloseNode]: '+e);
 	}
 },
 
-onStartOpen : function(){
+onStartOpen : function(nodes){
 	var nodes = tree_init.split(',');
 	var c = nodes.length-1;
 	for(var i=0; i<c;i++){
@@ -137,7 +141,7 @@ onStartOpen : function(){
 					var nodelist = this.treenode[nodes[i]].nodelist.split(',');
 					this.OpenNode(nodelist);
 				}
-			}
+			} 
 			catch(e){
 				cookie.erase(this.tree_name);
 				throw('JSTree ERROR [OnStartOpen]: '+e);
@@ -152,9 +156,9 @@ onStartSetStatus : function(id){
 		var img_id='idi_'+id;
 		var img = document.getElementById(img_id);
 		img.src = 'images/general/tree/minus.gif';
-
+		
 		this.treenode[id].status = 'open';
-	}
+	} 
 	catch(e){
 		throw('JSTree ERROR [OnStartSetStatus]: '+e);
 	}
@@ -164,19 +168,19 @@ checkParent : function(id){
 	try{
 		if(id == '0'){
 			return true;
-		}
+		} 
 		else if(typeof(this.treenode[id]) == 'undefined'){
 			return false;
 		}
 		else if(this.treenode[id].status != 'open'){
 			return false;
-		}
+		} 
 		else {
 			return this.checkParent(this.treenode[id].parentid);
 		}
-	}
+	} 
 	catch(e){
 		throw('JSTree ERROR [checkPparent]: '+e);
 	}
 }
-};
+}

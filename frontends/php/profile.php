@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ $fields=array(
 //Primary Actions
 	else if(isset($_REQUEST['cancel'])){
 		ob_end_clean();
-		redirect(CWebUser::$data['last_page']['url']);
+		redirect($USER_DETAILS['last_page']['url']);
 	}
 	else if(isset($_REQUEST['save'])){
 		$auth_type = get_user_system_auth($USER_DETAILS['userid']);
@@ -127,6 +127,7 @@ $fields=array(
 			$user['alias'] = $USER_DETAILS['alias'];
 			$user['passwd'] = get_request('password1');
 			$user['url'] = get_request('url');
+			$user['autologin'] = get_request('autologin', 0);
 			$user['autologout'] = get_request('autologout', 0);
 			$user['lang'] = get_request('lang');
 			$user['theme'] = get_request('theme');
@@ -145,17 +146,17 @@ $fields=array(
 			DBstart();
 			updateMessageSettings($messages);
 
-			$result = API::User()->updateProfile($user);
-			if($result && (CwebUser::$data['type'] > USER_TYPE_ZABBIX_USER)){
+			$result = CUser::updateProfile($user);
+			if($result && ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)){
 				$data = array(
 					'users' => $user,
 					'medias' => $user['user_medias']
 				);
-				$result = API::User()->updateMedia($data);
+				$result = CUser::updateMedia($data);
 			}
 
 			$result = DBend($result);
-			if(!$result) error(API::User()->resetErrors());
+			if(!$result) error(CUser::resetErrors());
 
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,
@@ -163,7 +164,7 @@ $fields=array(
 					' Surname ['.$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
 
 				ob_end_clean();
-				redirect(CWebUser::$data['last_page']['url']);
+				redirect($USER_DETAILS['last_page']['url']);
 			}
 			else{
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);

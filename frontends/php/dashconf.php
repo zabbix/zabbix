@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,18 +111,11 @@ include_once('include/page_header.php');
 
 //-------------
 // GROUPS
-	$divTabs = new CTabView(array('remember'=>1));
-	if(!isset($_REQUEST['form_refresh']))
-		$divTabs->setSelected(0);
-
-	$dashForm = new CForm();
+	$dashForm = new CFormTable(S_FILTER);
+	$dashForm->addVar('form_refresh', 1);
 	$dashForm->setName('dashconf');
 	$dashForm->setAttribute('id', 'dashform');
 
-	$form_refresh = get_request('form_refresh', 0);
-	$dashForm->addVar('form_refresh', ++$form_refresh);
-
-	$dashList = new CFormList('dashlist');
 	if(isset($_REQUEST['form_refresh'])){
 		$filterEnable = get_request('filterEnable', 0);
 
@@ -162,7 +155,7 @@ include_once('include/page_header.php');
 		$cbFilter->setAttribute('onclick', "$('dashform').enable(); create_var('" . $dashForm->getName() . "', 'filterEnable', 1, true);");
 	}
 
-	$dashList->addRow(S_DASHBOARD_FILTER, $cbFilter);
+	$dashForm->addRow(S_DASHBOARD_FILTER, $cbFilter);
 
 	$dashForm->addVar('groupids', $groupids);
 
@@ -172,7 +165,7 @@ include_once('include/page_header.php');
 
 	if(!$filterEnable) $cmbGroups->setAttribute('disabled', 'disabled');
 
-	$dashList->addRow(S_HOST_GROUPS, $cmbGroups);
+	$dashForm->addRow(S_HOST_GROUPS, $cmbGroups);
 
 	if($grpswitch == 1){
 		$options = array(
@@ -180,7 +173,7 @@ include_once('include/page_header.php');
 			'groupids' => $groupids,
 			'output' => API_OUTPUT_EXTEND
 		);
-		$groups = API::HostGroup()->get($options);
+		$groups = CHostGroup::get($options);
 		order_result($groups, 'name');
 
 		$lstGroups = new CListBox('del_groups[]', null, 15);
@@ -192,12 +185,12 @@ include_once('include/page_header.php');
 		if(!$filterEnable) $lstGroups->setAttribute('disabled', 'disabled');
 
 		$addButton = new CButton('add', S_ADD, "return PopUp('popup_right.php?dstfrm=" . $dashForm->getName() . "&permission=" . PERM_READ_WRITE . "',450,450);");
-		$addButton->setEnabled($filterEnable);
+		if(!$filterEnable) $addButton->setAttribute('disabled', 'disabled');
 
 		$delButton = new CButton('delete', S_DELETE_SELECTED);
-		$delButton->setEnabled($filterEnable);
+		if(!$filterEnable) $delButton->setAttribute('disabled', 'disabled');
 
-		$dashList->addRow(
+		$dashForm->addRow(
 			S_GROUPS,
 			array($lstGroups, BR(), $addButton, $delButton)
 		);
@@ -208,7 +201,7 @@ include_once('include/page_header.php');
 	$cbMain = new CCheckBox('maintenance', $maintenance, null, '1');
 	if(!$filterEnable) $cbMain->setAttribute('disabled', 'disabled');
 
-	$dashList->addRow(S_HOSTS, array($cbMain, S_SHOW_HOSTS_IN_MAINTENANCE));
+	$dashForm->addRow(S_HOSTS, array($cbMain, S_SHOW_HOSTS_IN_MAINTENANCE));
 
 // Trigger
 	$severity = zbx_toHash($severity);
@@ -230,7 +223,7 @@ include_once('include/page_header.php');
 	}
 	array_pop($trgSeverities);
 
-	$dashList->addRow(S_TRIGGERS_WITH_SEVERITY, $trgSeverities);
+	$dashForm->addRow(S_TRIGGERS_WITH_SEVERITY, $trgSeverities);
 
 	$config = select_config();
 	$cb = new CComboBox('extAck', $extAck);
@@ -243,18 +236,10 @@ include_once('include/page_header.php');
 	if(!$config['event_ack_enable']){
 		$cb->setAttribute('title', S_EVENT_ACKNOWLEDGING_DISABLED);
 	}
-	$dashList->addRow(S_PROBLEM_DISPLAY, $cb);
+	$dashForm->addRow(S_PROBLEM_DISPLAY, $cb);
 //-----
 
-	$divTabs->addTab('dashFilterTab', S_FILTER, $dashList);
-
-	$dashForm->addItem($divTabs);
-
-// Footer
-	$main = array(new CSubmit('save', S_SAVE));
-	$others = array();
-
-	$dashForm->addItem(makeFormFooter($main, $others));
+	$dashForm->addItemToBottomRow(new CButton('save', S_SAVE));
 
 	$dashboard_wdgt->addItem($dashForm);
 	$dashboard_wdgt->show();
@@ -263,5 +248,4 @@ include_once('include/page_header.php');
 <?php
 
 include_once('include/page_footer.php');
-
 ?>

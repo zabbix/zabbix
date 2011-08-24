@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,18 +16,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
-// jQuery no conflict
-if(typeof(jQuery) != 'undefined'){
-	jQuery.noConflict();
-}
-
+// javascript document
 var agt = navigator.userAgent.toLowerCase();
 var OP = (agt.indexOf("opera") != -1) && window.opera;
 var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
 var IE9 = (agt.indexOf("msie 9.0") != -1) && document.all && !OP;
 var IE8 = (agt.indexOf("msie 8.0") != -1) && document.all && !OP;
 var IE7 = (agt.indexOf("msie 7.0") != -1) && document.all && !OP;
+var IE6 = (agt.indexOf("msie 6.0") != -1) && document.all && !OP;
 var CR = (agt.indexOf("chrome") != -1);
 var SF = (agt.indexOf("safari") != -1) && !CR;
 var WK = (agt.indexOf("applewebkit") != -1);
@@ -38,6 +34,7 @@ var MC = (agt.indexOf("mac") != -1);
 function checkBrowser(){
  if(OP) alert('Opera');
  if(IE) alert('IE');
+ if(IE6) alert('IE6');
  if(IE7) alert('IE7');
  if(IE8) alert('IE8');
  if(IE9) alert('IE9');
@@ -51,7 +48,6 @@ return 0;
 }
 
 function isset(key, obj){
-	if(is_null(key) || is_null(obj)) return false;
 	return (typeof(obj[key]) != 'undefined');
 }
 
@@ -93,11 +89,6 @@ function is_array(obj) {
 }
 
 function SDI(msg){
-	if(GK || WK){
-		console.log(msg);
-		return true;
-	}
-
 	var div_help = document.getElementById('div_help');
 
 	if((typeof(div_help) == 'undefined') || empty(div_help)){
@@ -110,7 +101,7 @@ function SDI(msg){
 		div_help.setAttribute('id','div_help');
 		div_help.setAttribute('style','position: absolute; left: 10px; top: 100px; border: 1px red solid; width: 400px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
 
-		//jQuery(div_help).draggable();
+		//new Draggable(div_help,{});
 	}
 
 	var pre = document.createElement('pre');
@@ -128,12 +119,10 @@ function SDI(msg){
 }
 
 function SDJ(obj, name){
-	if(GK || WK){
-		console.dir(obj);
-		return true;
-	}
-
 	var debug = '';
+//	debug = obj.toSource();
+//	SDI(debug);
+//return null;
 
 	name = name || 'none';
 	for(var key in obj){
@@ -146,7 +135,7 @@ function SDJ(obj, name){
 
 /// Alpha-Betic sorting
 function addListener(element, eventname, expression, bubbling){
-	bubbling = bubbling || false;
+	var bubbling = bubbling || false;
 
 	element = $(element);
 	if(element.addEventListener){
@@ -293,7 +282,7 @@ function create_var(form_name, var_name, var_val, subm){
 		frmForm.appendChild(objVar);
 
 		objVar.setAttribute('name',	var_name);
-		objVar.setAttribute('id',	var_name.replace("]","").replace("[","_"));
+		objVar.setAttribute('id',	var_name);
 	}
 
 	if(is_null(var_val)){
@@ -500,7 +489,7 @@ function PopUp(url,width,height,form_name){
 }
 
 function redirect(uri, method, needle) {
-	method = method || 'get';
+	var method = method || 'get';
 	var url = new Curl(uri);
 
 	if(method.toLowerCase() == 'get'){
@@ -622,6 +611,48 @@ function showHideByName(name, style){
 	}
 }
 
+function showHideEffect(obj, eff, time, cb_afterFinish){
+	obj = $(obj);
+	if(!obj){
+		throw 'showHideEffect(): Object not found.';
+	}
+
+	if(typeof(Effect) == 'undefined'){
+		eff = 'none';
+	}
+
+	if(typeof(cb_afterFinish) == 'undefined'){
+		cb_afterFinish = function(){};
+	}
+
+	var timeShow = (typeof(time) == 'undefined')?0.5:(parseInt(time)/1000);
+	var show = (obj.style.display != 'none')?0:1;
+
+	switch(eff){
+		case 'blind':
+			if(show)
+				Effect.BlindDown(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
+			else
+				Effect.BlindUp(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
+			break;
+		case 'slide':
+			if(show)
+				Effect.SlideDown(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
+			else
+				Effect.SlideUp(obj, { afterFinish: cb_afterFinish, duration: timeShow, queue: {position: 'end',scope: eff,limit: 2}} );
+			break;
+		default:
+			if(show)
+				obj.show();
+			else
+				obj.hide();
+
+			cb_afterFinish();
+			break;
+	}
+return show;
+}
+
 function switchElementsClass(obj,class1,class2){
 	obj = $(obj);
 	if(!obj) return false;
@@ -640,6 +671,12 @@ function switchElementsClass(obj,class1,class2){
 	else{
 		obj.className = class1 + ' ' + obj.className;
 		result = class1;
+	}
+
+	if(IE6){
+		obj.style.filter = '';
+		obj.style.backgroundImage = '';
+		ie6pngfix.run();
 	}
 
 return result;

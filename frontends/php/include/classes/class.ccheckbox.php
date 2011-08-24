@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,22 +19,40 @@
 **/
 ?>
 <?php
-class CCheckBox extends CInput{
+class CCheckBox extends CTag{
 /* public */
 	public function __construct($name='checkbox',$checked='no',$action=null,$value='yes'){
-		parent::__construct('checkbox', $name, $value, 'checkbox pointer');
+		parent::__construct('input','no');
+		$this->tag_body_start = '';
 
-		$this->setAttribute('onclick', $action);
+		$this->setAttribute('class','checkbox');
+		$this->setAttribute('type','checkbox');
+		$this->setAttribute('value',$value);
+		$this->setAttribute('name',$name);
+		$this->setAttribute('id',$name);
+
+		$this->setAction($action);
 		$this->setChecked($checked);
 	}
 
+	public function setEnabled($value='yes'){
+		if($value === 'yes' || $value == true || $value == 1){
+			return $this->removeAttribute('disabled');
+		}
+		$this->attributes['disabled'] = 'disabled';
+
+	return true;
+	}
+
 	public function setChecked($value='yes'){
-		if(($value === true) || (is_numeric($value) && ($value!=0)) || (is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1'))
+		if((is_numeric($value) && ($value!=0)) || (is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1'))
 			return $this->attributes['checked'] = 'checked';
 
 		$this->removeAttribute('checked');
-		return $this;
 	}
 
+	public function setAction($value='submit()', $event='onclick'){
+		$this->addAction('onclick', $value);
+	}
 }
 ?>

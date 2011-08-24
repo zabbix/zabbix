@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,7 +72,6 @@
 	}
 
 	function delete_valuemap($valuemapid){
-		DBexecute('UPDATE items SET valuemapid=NULL WHERE valuemapid='.$valuemapid);
 		DBexecute('DELETE FROM mappings WHERE valuemapid='.$valuemapid);
 		DBexecute('DELETE FROM valuemaps WHERE valuemapid='.$valuemapid);
 	return TRUE;

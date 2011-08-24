@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ check_fields($fields);
 // NODES
 	if($nodeid == 0) $nodeids = get_current_nodeid(true);
 	else $nodeids = $nodeid;
-
+	
 	$count=0;
 	$grouplist = array();
 
@@ -85,7 +85,7 @@ check_fields($fields);
 		'nodeids' => $nodeids,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$groups = API::HostGroup()->get($options);
+	$groups = CHostGroup::get($options);
 	foreach($groups as $gnum => $row){
 		$groups[$gnum]['nodename'] = get_node_name_by_elid($row['groupid'], true, ':').$row['name'];
 		if($nodeid == 0) $groups[$gnum]['name'] = $groups[$gnum]['nodename'];
@@ -107,6 +107,7 @@ check_fields($fields);
 	insert_js('var grouplist = '.zbx_jsvalue($grouplist).';');
 
 	$button = new CButton('select', S_SELECT, 'add_groups("'.$dstfrm.'")');
+	$button->setType('button');
 	$table->setFooter(new CCol($button,'right'));
 
 	$form->addItem($table);

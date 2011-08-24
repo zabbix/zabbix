@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class CTable extends CTag{
 
 	public function __construct($message=NULL,$class=NULL){
 		parent::__construct('table','yes');
-		$this->setAttribute('class', $class);
+		$this->setClass($class);
 
 		$this->rownum = 0;
 		$this->oddRowClass = NULL;
@@ -82,14 +82,14 @@ class CTable extends CTag{
 		}
 		if(is_object($item) && zbx_strtolower(get_class($item))=='crow') {
 			if(isset($rowClass))
-				$item->setAttribute('class', $rowClass);
+				$item->setClass($rowClass);
 		}
 		else{
 			$item = new CRow($item,$rowClass);
 		}
 		if(!isset($item->attributes['class']) || is_array($item->attributes['class'])){
 			$class = ($this->rownum % 2)?$this->oddRowClass:$this->evenRowClass;
-			$item->setAttribute('class', $class);
+			$item->setClass($class);
 			$item->setAttribute('origClass', $class);
 		}
 
@@ -101,7 +101,7 @@ class CTable extends CTag{
 		if(is_null($class)) $class = $this->headerClass;
 
 		if(is_object($value) && zbx_strtolower(get_class($value))=='crow') {
-			if(!is_null($class)) $value->setAttribute('class', $class);
+			if(!is_null($class)) $value->setClass($class);
 		}
 		else{
 			$value = new CRow($value,$class);

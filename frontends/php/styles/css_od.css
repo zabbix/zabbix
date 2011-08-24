@@ -1,36 +1,47 @@
-/*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
-**
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**/
-
+/* CSS Document */
 /* Dark Orange Theme by Aly */
-@import "darkorange/jquery-ui.css";
-@media print { body{ background-color:#A5A5A5; } }
-@media screen { body{ background-color:#1A1A1A; color: #FF5500; } }
 
-.delimiter { color:#AAF; }
-.textcolorstyles { color: #FF5500; }
-.textblackwhite{ color: #EAEAEA; }
-.pum_oheader { background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
-.right_header { border-color: #222222; }
-.unknown { color: #999999; }
-.normal	{ background-color: #AADDDD; }
+@media print {
+	body{
+		background-color:#A5A5A5;
+	}
+}
 
-.disaster, .high, .average, .warning, .information, .not_classified, .trigger_unknown, .normal { color: #222; }
+@media screen {
+	body{
+		background-color:#1A1A1A;
+		color: #FF5500;
+	}
+}
+
+.delimiter{
+	color:#AAF;
+}
+
+.textcolorstyles{
+	color: #FF5500;
+}
+
+.textblackwhite{
+	color: #EAEAEA;
+}
+
+.pum_oheader {
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
+
+.right_header {
+	border-color: #222222;
+}
+
+
+
+.unknown	{
+	color: #999999;
+}
+.normal		{
+	background-color: #AADDDD;
+}
 
 /*////////////////	LINKS	////////////////////*/
 a:link 		{	color:#FF5500;  }
@@ -67,8 +78,10 @@ table{
 
 table.page_footer{
 	background: #1A1A1A url('../images/gradients/table_head_bb.gif') repeat-x top left;
-	border-color: #1A1A1A;
-	border-top: 17px solid;
+	border-color: 	#1A1A1A;
+
+	border-top-width: 17px;
+	border-top-style: solid;
 }
 
 table.formtable {
@@ -147,7 +160,7 @@ table.filter .subfilter_active{
 
 table.tableinfo{
 	color: #DFDFDF;
-	background-color: #1F1F1F;
+	background-color: #5A5A5A;
 }
 
 table.tableinfo tr td {
@@ -170,6 +183,8 @@ table.tableinfo tr.vertical_header td {
 	background-color:#111111;
 }
 
+table.tableinfo tr.selected > td { background-color: #6F6F6F; }
+table.tableinfo tr.selected:hover > td { background-color: #6F6F6F; }
 
 table.tableinfo tr.odd_row > td { background-color: #1F1F1F; }
 table.tableinfo tr.odd_row:hover > td { background-color: #6F3F00; }
@@ -177,8 +192,45 @@ table.tableinfo tr.odd_row:hover > td { background-color: #6F3F00; }
 table.tableinfo tr.even_row > td { background-color: #2F2F2F; }
 table.tableinfo tr.even_row:hover > td{ background-color: #6F3F00; }
 
-table.tableinfo tr.selected > td { background-color: #553020; }
-table.tableinfo tr.selected:hover > td { background-color: #6F3F00; }
+
+table.tableinfo tr > td.disaster_empty { border: 1px #FF0000 solid; }
+table.tableinfo tr:hover > td.disaster_empty { border: 1px #FF0000 solid; }
+
+table.tableinfo tr > td.disaster { background-color: #FF0000;	border: 1px #FF0000 solid; }
+table.tableinfo tr:hover > td.disaster { background-color: #FA0000;	border: 1px #FA0000 solid; }
+
+table.tableinfo tr > td.high_empty { border: 1px #FF8888 solid; }
+table.tableinfo tr:hover > td.high_empty { border: 1px #FF8888 solid; }
+
+table.tableinfo tr > td.high				{	background-color: #FF8888;	border: 1px #FF8888 solid; }
+table.tableinfo tr:hover > td.high			{	background-color: #FA8388;	border: 1px #FA8388 solid; }
+
+table.tableinfo tr > td.average_empty			{	border: 1px #DDAAAA solid; }
+table.tableinfo tr:hover > td.average_empty		{	border: 1px #DDAAAA solid; }
+
+table.tableinfo tr > td.average				{	background-color: #DDAAAA;	border: 1px #DDAAAA solid; }
+table.tableinfo tr:hover > td.average			{	background-color: #D8A5AA;	border: 1px #D8A5AA solid; }
+
+table.tableinfo tr > td.warning_empty			{	border: 1px #EFEFCC solid; }
+table.tableinfo tr:hover > td.warning_empty		{	border: 1px #EAEACC solid; }
+
+table.tableinfo tr > td.warning				{	background-color: #EFEFCC;	border: 1px #EFEFCC solid; }
+table.tableinfo tr:hover > td.warning			{	background-color: #EAEACC;	border: 1px #EAEACC solid; }
+
+table.tableinfo tr > td.information_empty			{	border: 1px #BBE2BB solid; }
+table.tableinfo tr:hover > td.information_empty		{	border: 1px #B7DDBB solid; }
+
+table.tableinfo tr > td.information			{	background-color: #BBE2BB;	border: 1px #CCE2CC solid; }
+table.tableinfo tr:hover > td.information			{	background-color: #B7DDBB;	border: 1px #C7DDCC solid; }
+
+table.tableinfo tr > td.unknown_trigger_empty		{	border: 1px #ACACAC solid; }
+table.tableinfo tr:hover > td.unknown_trigger_empty	{	border: 1px #ACA7AC solid; }
+
+table.tableinfo tr > td.unknown_trigger			{	background-color: #BCBCBC;	border: 1px #BCBCBC solid; }
+table.tableinfo tr:hover > td.unknown_trigger		{	background-color: #BCB7BC;	border: 1px #BCB7BC solid; }
+
+table.tableinfo tr > td.normal				{	background-color: #AAFFAA;	border: 1px #AAFFAA solid; }
+table.tableinfo tr:hover > td.normal			{	background-color: #AAF9AA;	border: 1px #AAF9AA solid; }
 
 table.tableinfo tr > td.active				{	background-color: #AADDAA;	border: 1px #AADDAA solid; }
 table.tableinfo tr:hover > td.active			{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
@@ -202,8 +254,8 @@ table.tableinfo tr.footer td{
 /**************************************************/
 
 table.tablestripped{
-	border: 1px solid #5A5A5A;
-	border-top: 0 solid #AAAAAA;
+	border: 1px solid #5A5A5A;;
+	border-top: 0px solid #AAAAAA;
 }
 
 table.tablestripped tr.form_odd_row td{
@@ -223,7 +275,7 @@ table.tablestripped tr.footer td {
 
 table.header{
 	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border: 1px solid #5A5A5A;
+	border: 1px solid #5A5A5A;;
 }
 
 table.header tr td.header_l{
@@ -339,6 +391,18 @@ table.header_wide tr.first td.header_r{
 	color: #DFDFDF;
 }
 
+table.infobox{
+	border: 1px #AAAAAA solid;
+	background-color:#444444;
+
+	color: #DADADA;
+}
+
+table.infobox a:link		{	color:#FF5500;	 }
+table.infobox a:visited 	{	color:#FF5500;	 }
+table.infobox a:hover 		{	color:#FF8800;	 }
+table.infobox a:active 		{	color:#FF8800;	 }
+
 table.chart{
 	background-color: #1A1A1A;
 }
@@ -388,9 +452,6 @@ table.suggest tr td{
 }
 /*----------*/
 
-table.filter_config{
-	background-color: #2F2F2F;
-}
 
 /*////////////////	DIVS	////////////////////*/
 /* calendar */
@@ -421,19 +482,28 @@ div.calendar input.calendar_textbox{
 }
 
 /* SCROLLBAR */
-div.scrollbar{ background-color: #3F3F3F; border: 1px solid #AA5500; }
+div.scrollbar{
+	background-color: #3F3F3F;
+	border: 1px solid #AA5500;
+}
 
-div.scrollbar .info .zoom .text{ color: #DFDFDF; }
+div.scrollbar .info .zoom .text{
+	color: #DFDFDF;
+}
 
-div.scrollbar .subline .info_period{ color: #DFDFDF; }
+div.scrollbar .subline .info_period{
+	color: #DFDFDF;
+}
 
-div.scrollbar .subline .nav_links .text{ color: #DFDFDF; }
+div.scrollbar .subline .nav_links .text{
+	color: #DFDFDF;
+}
 
 /* MESSAGES */
 div.messagecontainer .message .messagebox{
 	margin-right: 15px;
-	margin-left: 0;
-	margin-bottom: 0;
+	margin-left: 0px;
+	margin-bottom: 0px;
 }
 
 div.formElement_header{
@@ -442,92 +512,182 @@ div.formElement_header{
 div.formElement_body{
 	border: 1px solid #222222;
 }
-div.formElement_footer{ background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
-div.thin_header{ background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
-div.zabbix_logo{ background-image:url('../images/general/zabbix_od.png'); }
-.iconzbxavailable{ background-image: url('../images/general/zabbix_available_bb.png'); }
-.iconsnmpavailable{ background-image: url('../images/general/snmp_available_bb.png'); }
-.iconjmxavailable{ background-image: url('../images/general/jmx_available_bb.png'); }
-.iconipmiavailable{ background-image: url('../images/general/ipmi_available_bb.png'); }
-.sla_green{ background-image: url('../images/gradients/sla_blue15.png'); }
-.icon_sortup{ background-image: url('../images/general/sort_up_od.gif'); }
-.icon_sortdown{ background-image: url('../images/general/sort_down_od.gif'); }
+div.formElement_footer{
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
 
-.menu_icon:hover{ background-color: #FF5500; }
-div.iconmenu_b{ background-color: transparent; }
+div.thin_header{
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
 
-div.messagecontainer{ background-color: #8c8a8b;}
-div#scrolltableft{ color: #00CCFF; }
-div#scrolltabright{ color: #00CCFF; }
-div#selection_box{ filter:alpha(opacity=60); opacity:.60; background-color:#6666FF; }
+div.zabbix_logo{
+	background-image:url('../images/general/zabbix_od.png');
+}
 
-div.formElement{ border: 1px solid #5A5A5A;}
-div.formElement_body{ background-color: #1A1A1A; }
+div.iconzbxavailable{
+	background-image: url('../images/general/zabbix_available_bb.png');
+}
 
+div.iconsnmpavailable{
+	background-image: url('../images/general/snmp_available_bb.png');
+}
 
-div.objectgroup{ border-color: #CC5500; background-color: #2F2F2F; }
+div.iconipmiavailable{
+	background-image: url('../images/general/ipmi_available_bb.png');
+}
 
-.footer .dt input.main{ border-color: #FF5500; }
-.footer .dt input.main:hover{ border-color: #FF5500; }
+div.sla_green{
+	background-image: url('../images/gradients/sla_blue15.png');
+}
 
+div.icon_sortup{
+	background-image: url('../images/general/sort_up_od.gif');
+}
 
-ul.objectlist li{ color: #DADADA; }
+div.icon_sortdown{
+	background-image: url('../images/general/sort_down_od.gif');
+}
 
-div.border_dotted{ border: 1px dotted #CC5500; }
+div.menu_icon:hover{
+	-webkit-box-shadow: 0 0 6px #FF5500;
+	-moz-box-shadow: 0 0 6px #FF5500;
+	box-shadow: 0 0 6px #FF5500;
+	background-color: #FF5500;
+}
+div.iconmenu_b{
+	background-color: transparent;
+}
 
-.formElementTable tr td{ color: #DFDFDF; }
+div.messagecontainer{
+	background-color: #8c8a8b;
+}
 
-span.info{ color:	#FF5500; }
+div#scrolltableft{
+	color: #00CCFF;
+}
 
-span.link{ color: #FF5500; }
-span.link:hover{ color: #FF8800; }
+div#scrolltabright{
+	color: #00CCFF;
+}
 
-span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
+div#selection_box{
+	filter:alpha(opacity=60);
+	opacity:.60;
+	background-color:#6666FF;
+}
 
-div.suggest{ border: 1px #FF5500 solid; }
+div.formElement{
+	border: 1px solid #5A5A5A;;
+}
 
-/*////////////////	FORMS	////////////////////*/
-.input, .input[disabled]:hover{
-	border: 1px solid #DFDFDF;
-	background-color: #2F2F2F;
+div.formElement_body{
+	background-color: #1A1A1A;
+}
+
+.formElementTable tr td{
 	color: #DFDFDF;
 }
 
-.input:focus { border-color: #FF5500; color: #FF5500;}
-.input:hover { border-color: #FF5500; color: #FF5500;}
+span.info{
+	color:	#FF5500;
+}
 
-.input[readonly], .input[readonly]:hover{
+span.link{
+	color: #FF5500;
+}
+
+span.link:hover{
+	color: #FF8800;
+}
+
+span.darklink{
+	color: #AA5500;
+}
+
+span.darklink:hover{
+	color: #FF5500;
+}
+
+span.biglink{
+	color: #FF5500;
+}
+
+span.biglink:hover{
+	color: #FF8800;
+}
+
+
+span.link_menu{
+	color: #FF5500;
+	border-bottom-color: #FF5500;
+}
+
+span.link_menu:hover{
+	color: #FF8800;
+	border-bottom-color: #FF8800;
+}
+
+div.suggest{
+	border: 1px #FF5500 solid;
+}
+
+/*////////////////	FORMS	////////////////////*/
+.button{
+	border-color: #FF5500;
+	background: #2f2f2f;
+	color: #FF5500;
+}
+
+.button:hover {
+	border-color: #2f2f2f;
+	color: #2f2f2f;
+	background: #FF5500;
+	text-decoration: none;
+	-webkit-box-shadow: 0 0 6px #FF5500;
+	-moz-box-shadow: 0 0 6px #FF5500;
+	box-shadow: 0 0 6px #FF5500;
+}
+
+.biginput[readonly], .biginput[readonly]:hover{
 /* NOTE: Ignored by IE */
 	border-color: #DFDFDF;
 	background-color: #777777;
 	color: #DFDFDF;
 }
 
-.shadow {}
-.shadow:hover{ -webkit-box-shadow: 0 0 6px #FF5500; -moz-box-shadow: 0 0 6px #FF5500; box-shadow: 0 0 6px #FF5500; }
 
-.select{ cursor: pointer; margin: 1px 4px 1px 2px; }
-.button{  border-color: #FF5500; background: #2f2f2f; color: #FF5500; }
-.button:hover { border-color: #2f2f2f; color: #2f2f2f; background: #FF5500; text-decoration: none; }
+.select{
+	border: 1px solid #DFDFDF;
+	background: #2F2F2F;
+	color: white;
+	cursor: pointer;
+	margin: 1px 4px 1px 2px;
+}
 
-.link_menu{
-	border: 0;
-	background: none;
-
+.select:hover{
+	border-color: #FF5500;
+	background-color: #2F2F2F;
 	color: #FF5500;
-	border-bottom: 1px dotted #FF5500;
 }
 
-.link_menu:hover{
-	color: #FF8800;
-	border-bottom-color: #FF8800;
+.select:focus{
+	border-color: #FF5500;
+	background-color: #2F2F2F;
+	color: #FF5500;
 }
 
-.link_menu[disabled], .link_menu[disabled]:hover{
+.biginput, .biginput[disabled]:hover{
+	border: 1px solid #DFDFDF;
+	background-color: #2F2F2F;
 	color: #DFDFDF;
-	border: 0;
-	cursor: default;
 }
 
-.column .widget .header{ border: 0;}
-.column .widget .footer{ border: 0;}
+.biginput:focus	{
+	border-color: #FF5500;
+	color: #FF5500;
+}
+
+.biginput:hover	{
+	border-color: #FF5500;
+	color: #FF5500;
+}

@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2006 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ int	is_master_node(int current_nodeid, int master_nodeid)
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		current_nodeid = (SUCCEED == DBis_null(row[0])) ? 0 : atoi(row[0]);
+		current_nodeid = atoi(row[0]);
 		if (current_nodeid == master_nodeid)
 			res = SUCCEED;
 		else if (0 != current_nodeid)

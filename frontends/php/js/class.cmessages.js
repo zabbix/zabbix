@@ -1,6 +1,5 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2010 Artem "Aly" Suharev
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +15,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+// JavaScript Document
 
-var ZBX_MESSAGES = [];				// obj instances
+var ZBX_MESSAGES = new Array();				// obj instances
 function initMessages(args){					// use this function to initialize Messaging system
 	var messagesListId = ZBX_MESSAGES.length;
 	ZBX_MESSAGES[messagesListId] = new CMessageList(messagesListId, args);
@@ -25,6 +25,7 @@ function initMessages(args){					// use this function to initialize Messaging sy
 return messagesListId;
 }
 
+// Puppet master Class
 // Author: Aly
 var CMessageList = Class.create(CDebug,{
 messageListId:			0,				// reference id
@@ -42,7 +43,7 @@ msgcounter:				0,				// how many messages have been added
 pipeLength:				15,				// how many messages to show
 
 messageList:			{},				// list of received messages
-messagePipe:			[],	// messageid pipe line
+messagePipe:			new Array(),	// messageid pipe line
 messageLast:			{},				// last message's sourceid by caption
 
 effectTimeout:			1000,			// effect time out
@@ -69,15 +70,28 @@ initialize: function($super, messagesListId, args){
 	this.updateSettings();
 
 	this.createContainer();
+	if(IE) this.fixIE();
 
 	addListener(this.dom.closeAll, 'click', this.closeAllMessages.bindAsEventListener(this));
 	addListener(this.dom.snooze, 'click', this.stopSound.bindAsEventListener(this));
 	addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
 
-	jQuery(this.dom.container).draggable({
-		handle: [this.dom.caption, this.dom.move], //this.dom.header,
-		axis: 'y',
-		containment: [0,0,0,1600],//'document',
+	//addListener(this.dom.header, 'mouseover', function(this.dom.move){} this.mute.bindAsEventListener(this));
+
+	new Draggable(this.dom.container, {
+		handle: this.dom.caption, //this.dom.header,
+		constraint: 'vertical',
+		scroll: window,
+		onEnd: this.fixIE.bind(this),
+		snap: function(x,y){if(y < 0) return [x,0]; else return [x,y];}
+	});
+
+	new Draggable(this.dom.container, {
+		handle: this.dom.move, //this.dom.header,
+		constraint: 'vertical',
+		scroll: window,
+		onEnd: this.fixIE.bind(this),
+		snap: function(x,y){if(y < 0) return [x,0]; else return [x,y];}
 	});
 },
 
@@ -113,7 +127,7 @@ setSettings: function(settings){
 	this.sounds.repeat = settings['sounds.repeat'];
 	this.sounds.mute = settings['sounds.mute'];
 	if(this.sounds.mute == 1){
-		this.dom.mute.className = 'iconmute menu_icon shadow';
+		this.dom.mute.className = 'iconmute menu_icon';
 	}
 
 	if(settings.enabled != 1) this.stop();
@@ -128,8 +142,8 @@ updateSettings: function(){
 		'method': 'message.settings',
 		'params': {},
 		'onSuccess': this.setSettings.bind(this),
-		'onFailure': function(){zbx_throw('Messages Widget: settings request failed.');}
-	};
+		'onFailure': function(resp){zbx_throw('Messages Widget: settings request failed.');}
+	}
 
 	new RPC.Call(rpcRequest);
 },
@@ -138,7 +152,7 @@ addMessage: function(newMessage){
 	this.debug('addMessage');
 //--
 
-	newMessage = newMessage || {};
+	var newMessage = newMessage || {};
 
 	while(isset(this.msgcounter, this.messageList)){
 		this.msgcounter++;
@@ -161,11 +175,7 @@ addMessage: function(newMessage){
 	};
 
 
-	if(this.msgcounter == 1){
-		//$(this.dom.container).show();
-		jQuery(this.dom.container).fadeTo('fast', 0.9);
-	}
-
+	$(this.dom.container).show();
 
 return this.messageList[this.msgcounter];
 },
@@ -191,8 +201,8 @@ mute: function(e){
 	var rpcRequest = {
 		'method': action,
 		'params': {},
-		'onFailure': function(){zbx_throw('Messages Widget: mute request failed.');}
-	};
+		'onFailure': function(resp){zbx_throw('Messages Widget: mute request failed.');}
+	}
 
 	new RPC.Call(rpcRequest);
 
@@ -229,7 +239,7 @@ playSound: function(messages){
 	}
 },
 
-stopSound: function(){
+stopSound: function(e){
 	this.debug('stopSound');
 //--
 	if(!is_null(this.sounds.sound)){
@@ -255,18 +265,18 @@ closeMessage: function(messageid, withEffect){
 		this.messageList[messageid] = null;
 	}
 
-	this.messagePipe = [];
+	this.messagePipe = new Array();
 	for(var messageid in this.messageList) this.messagePipe.push(messageid);
 
 	if(this.messagePipe.length < 1){
-		this.messagePipe = [];
+		this.messagePipe = new Array();
 		this.messageList = {};
 
-		setTimeout(Element.hide.bind(Element, this.dom.container), this.effectTimeout);
+		setTimeout(Element.hide.bind(Element, this.dom.container), IE6?100:this.effectTimeout);
 	}
 },
 
-closeAllMessages: function(){
+closeAllMessages: function(e){
 	this.debug('closeAllMessages');
 //--
 	var lastMessageId = this.messagePipe.pop();
@@ -281,23 +291,16 @@ closeAllMessages: function(){
 		},
 //		'onSuccess': function(resp){ SDI(resp)},
 		'onFailure': function(resp){zbx_throw('Messages Widget: message request failed.');}
-	};
+	}
 
 	new RPC.Call(rpcRequest);
 
-	jQuery(this.dom.container).slideUp(this.effectTimeout);
+	Effect.BlindUp(this.dom.container, {duration: (this.effectTimeout / 1000)});
 
-	var count = 0;
-	var effect = false;
 	for(var messageid in this.messageList){
 		if(empty(this.messageList[messageid])) continue;
 
-		if(!effect)
-			this.closeMessage(this, messageid, effect);
-		else
-			setTimeout(this.closeMessage.bind(this, messageid, effect), count * this.effectTimeout * 0.5);
-
-		count++;
+		setTimeout(this.closeMessage.bind(this, messageid, false), this.effectTimeout);
 	}
 },
 
@@ -335,8 +338,8 @@ getServerMessages: function(){
 			'messageLast': this.messageLast
 		},
 		'onSuccess': this.serverRespond.bind(this),
-		'onFailure': function(){zbx_throw('Messages Widget: message request failed.');}
-	};
+		'onFailure': function(resp){zbx_throw('Messages Widget: message request failed.');}
+	}
 
 //SDJ(rpcRequest.params.messageLast);
 
@@ -350,7 +353,7 @@ serverRespond: function(messages){
 //--
 
 	for(var i=0; i < messages.length; i++){
-		this.addMessage(messages[i]);
+		var message = this.addMessage(messages[i]);
 	}
 
 	this.playSound(messages);
@@ -401,7 +404,7 @@ createContainer: function(){
 // move
 	this.dom.move = document.createElement('div');
 	this.dom.move.setAttribute('title', locale['S_MOVE']);
-	this.dom.move.className = 'iconmove menu_icon shadow';
+	this.dom.move.className = 'iconmove menu_icon';
 	//this.dom.move.style.display = 'none';
 
 	this.dom.controlList.addItem(this.dom.move, 'linear');
@@ -409,31 +412,41 @@ createContainer: function(){
 // snooze
 	this.dom.snooze = document.createElement('div');
 	this.dom.snooze.setAttribute('title', locale['S_SNOOZE']);
-	this.dom.snooze.className = 'iconsnooze menu_icon shadow';
+	this.dom.snooze.className = 'iconsnooze menu_icon';
 
 	this.dom.controlList.addItem(this.dom.snooze, 'linear');
 
 // mute
 	this.dom.mute = document.createElement('div');
 	this.dom.mute.setAttribute('title', locale['S_MUTE']+'/'+locale['S_UNMUTE']);
-	this.dom.mute.className = 'iconsound menu_icon shadow';
+	this.dom.mute.className = 'iconsound menu_icon';
 
 	this.dom.controlList.addItem(this.dom.mute, 'linear');
 
 // close all
 	this.dom.closeAll = document.createElement('div');
 	this.dom.closeAll.setAttribute('title', locale['S_CLEAR']);
-	this.dom.closeAll.className = 'iconclose menu_icon shadow';
+	this.dom.closeAll.className = 'iconclose menu_icon';
 
 	this.dom.controlList.addItem(this.dom.closeAll, 'linear');
 
 // Message List
 	this.dom.list = new CList().node;
 	this.dom.container.appendChild(this.dom.list);
-}
+},
 
+fixIE: function(){
+	if(IE6){
+		this.dom.header.style.width = '100px';
+		showPopupDiv('zbx_messages','zbx_messages_frame');
+//		ie6pngfix.run(false);
+	}
+}
 });
 
+// JavaScript Document
+// Message Class
+// Author: Aly
 var CMessage = Class.create(CDebug,{
 list:				null,			// link to message list containing this message
 messageid:			null,			// msg id
@@ -449,6 +462,7 @@ body:				['No text'],	// msg details
 timeout:			60,				// msg timeout
 
 dom:				{},				// msg dom links
+
 
 initialize: function($super, messageList, message){
 	this.messageid = message.messageid;
@@ -466,6 +480,7 @@ initialize: function($super, messageList, message){
 	}
 
 	this.createMessage();
+	if(IE) this.fixIE();
 },
 
 show: function(){
@@ -476,6 +491,7 @@ close: function(){
 //--
 	$(this.dom.listItem).remove();
 
+	if(IE) this.fixIE();
 	this.dom = {};
 },
 
@@ -483,11 +499,13 @@ notify: function(){
 },
 
 remove: function(){
-	this.debug('remove');
-//--
-
-	jQuery(this.dom.listItem).slideUp(this.list.effectTimeout);
-	jQuery(this.dom.listItem).fadeOut(this.list.effectTimeout);
+	if(IE6){
+		$(this.dom.listItem).hide();
+	}
+	else{
+		Effect.BlindUp(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
+		Effect.Fade(this.dom.listItem, {duration: (this.list.effectTimeout / 1000)});
+	}
 
 	setTimeout(this.close.bind(this), this.list.effectTimeout);
 },
@@ -518,7 +536,7 @@ createMessage: function(){
 	this.dom.title.className = 'title';
 
 // body
-	if(!is_array(this.body)) this.body = [this.body];
+	if(!is_array(this.body)) this.body = new Array(this.body);
 
 //	this.dom.message.style.height = (24+14*this.body.length)+'px';
 	for(var i=0; i < this.body.length; i++){
@@ -531,68 +549,21 @@ createMessage: function(){
 		$(this.dom.body).update(BBCode.Parse(this.body[i]));
 		this.dom.body.className = 'body';
 	}
-}
-
-});
-
-var CNode = Class.create({
-node:		null,			// main node (ul)
-initialize: function(nodeName){
-	this.node = document.createElement(nodeName);
-	return this.node;
 },
 
-addItem: function(item){
+fixIE: function(){
+	if(IE6){
+/*
+		var maxWidth = 60;
+		for(var tmpmsg in this.list.messageList){
+			var msgDims = getDimensions(this.list.messageList[tmpmsg].dom.message);
+			msgDims.width += 4;
+			if(maxWidth < msgDims.width) maxWidth = msgDims.width;
+		}
 
-	if(is_object(item)) this.node.appendChild(item);
-	else if(is_string(item)) this.node.appendChild(documect.createTextNode(item));
-	else return true;
-},
-
-setClass: function(className){
-	className = className || '';
-
-	this.node.className = className;
-}
-});
-
-
-var CList = Class.create(CNode,{
-items:		[],	// items list
-initialize: function($super, className){
-	className = className || '';
-
-	$super('ul');
-	this.setClass(this.classNames);
-
-	Object.extend(this.node, this);
-},
-
-addItem: function($super, item, className){
-	className = className || '';
-
-	if(!is_object(item, CListItem)){
-		item = new CListItem(item, className).node;
+		this.list.dom.header.style.width = maxWidth+'px';
+//*/
+		showPopupDiv('zbx_messages','zbx_messages_frame');
 	}
-
-	$super(item);
-	this.items.push(item);
-}
-});
-
-var CListItem = Class.create(CNode,{
-items:		[],	// items list
-initialize: function($super, item, className){
-	className = className || '';
-	item = item || null;
-
-	$super('li');
-	this.setClass(className);
-	this.addItem(item);
-},
-
-addItem: function($super, item){
-	$super(item);
-	this.items.push(item);
 }
 });

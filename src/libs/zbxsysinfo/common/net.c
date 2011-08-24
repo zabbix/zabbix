@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,11 +26,6 @@
 
 #include "net.h"
 
-#ifdef _WINDOWS
-#	include <windns.h>
-#	pragma comment(lib, "Dnsapi.lib") /* add the library for DnsQuery function */
-#endif
-
 /*
  * 0 - NOT OK
  * 1 - OK
@@ -42,12 +37,16 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 	char		*buf;
 	int		net, val = SUCCEED;
 
+	assert(value_int);
+
 	*value_int = 0;
 
 	if (SUCCEED == (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
 	{
 		if (NULL != request)
+		{
 			net = zbx_tcp_send_raw(&s, request);
+		}
 
 		if (NULL != expect && SUCCEED == net)
 		{
@@ -61,10 +60,14 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 		}
 
 		if (NULL != sendtoclose && SUCCEED == net && SUCCEED == val)
+		{
 			zbx_tcp_send_raw(&s, sendtoclose);
+		}
 
 		if (SUCCEED == net && SUCCEED == val)
+		{
 			*value_int = 1;
+		}
 
 		zbx_tcp_close(&s);
 	}
@@ -84,7 +87,7 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	int		value_int, ret;
 	char		ip[64], port_str[8];
 
-	if (2 < num_param(param))
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, ip, sizeof(ip)))
@@ -100,135 +103,216 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		return SYSINFO_RET_FAIL;
 
 	if (SYSINFO_RET_OK == (ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int)))
+	{
 		SET_UI64_RESULT(result, value_int);
+	}
 
 	return ret;
 }
 
-#if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
+#ifndef _WINDOWS
+#ifdef HAVE_RES_QUERY
 
-static const char	*decode_type(int q_type)
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+
+#ifndef T_ANY
+#	define T_ANY	ns_t_any
+#endif
+#ifndef T_A
+#	define T_A	ns_t_a
+#endif
+#ifndef T_NS
+#	define T_NS	ns_t_ns
+#endif	/* T_NS */
+#ifndef T_MD
+#	define T_MD	ns_t_md
+#endif	/* T_MD */
+#ifndef T_MF
+#	define T_MF	ns_t_mf
+#endif	/* T_MF */
+#ifndef T_CNAME
+#	define T_CNAME	ns_t_cname
+#endif	/* T_CNAME */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
+#ifndef T_MB
+#	define T_MB	ns_t_mb
+#endif	/* T_MB */
+#ifndef T_MG
+#	define T_MG	ns_t_mg
+#endif	/* T_MG */
+#ifndef T_MR
+#	define T_MR	ns_t_mr
+#endif	/* T_MR */
+#ifndef T_NULL
+#	define T_NULL	ns_t_null
+#endif	/* T_NULL */
+#ifndef T_WKS
+#	define T_WKS	ns_t_wks
+#endif	/* T_WKS */
+#ifndef T_PTR
+#	define T_PTR	ns_t_ptr
+#endif	/* T_PTR */
+#ifndef T_HINFO
+#	define T_HINFO	ns_t_hinfo
+#endif	/* T_HINFO */
+#ifndef T_MINFO
+#	define T_MINFO	ns_t_minfo
+#endif	/* T_MINFO */
+#ifndef T_MX
+#	define T_MX	ns_t_mx
+#endif	/* T_MX */
+#ifndef T_TXT
+#	define T_TXT	ns_t_txt
+#endif	/* T_TXT */
+#ifndef T_SRV
+#	define T_SRV	ns_t_srv
+#endif	/* T_SRV */
+
+static char	*decode_type(int q_type)
 {
 	static char	buf[16];
 
 	switch (q_type)
 	{
-		case T_A:
-			return "A";	/* address */
-		case T_NS:
-			return "NS";	/* name server */
-		case T_MD:
-			return "MD";	/* mail destination */		/* obsolete */
-		case T_MF:
-			return "MF";	/* mail forwarder */		/* obsolete */
-		case T_CNAME:
-			return "CNAME";	/* canonical name */
-		case T_SOA:
-			return "SOA";	/* start of authority */
-		case T_MB:
-			return "MB";	/* mailbox */			/* experimental */
-		case T_MG:
-			return "MG";	/* mail group member */		/* experimental */
-		case T_MR:
-			return "MR";	/* mail rename */		/* experimental */
-		case T_NULL:
-			return "NULL";	/* null */			/* obsolete */
-		case T_WKS:
-			return "WKS";	/* well-known service */	/* obsolete */
-		case T_PTR:
-			return "PTR";	/* domain name pointer */
-		case T_HINFO:
-			return "HINFO";	/* host information */
-		case T_MINFO:
-			return "MINFO";	/* mailbox information */	/* experimental */
-		case T_MX:
-			return "MX";	/* mail exchanger */
-		case T_TXT:
-			return "TXT";	/* text */
-		case T_SRV:
-			return "SRV";	/* service locator */
+		case T_A:	return "A";	/* "address"; */
+		case T_NS:	return "NS";	/* "name server"; */
+		case T_MD:	return "MD";	/* "mail forwarder"; */
+		case T_MF:	return "MF";	/* "mail forwarder"; */
+		case T_CNAME:	return "CNAME";	/* "canonical name"; */
+		case T_SOA:	return "SOA";	/* "start of authority"; */
+		case T_MB:	return "MB";	/* "mailbox"; */
+		case T_MG:	return "MG";	/* "mail group member"; */
+		case T_MR:	return "MR";	/* "mail rename"; */
+		case T_NULL:	return "NULL";	/* "null"; */
+		case T_WKS:	return "WKS";	/* "well-known service"; */
+		case T_PTR:	return "PTR";	/* "domain name pointer"; */
+		case T_HINFO:	return "HINFO";	/* "host information"; */
+		case T_MINFO:	return "MINFO";	/* "mailbox information"; */
+		case T_MX:	return "MX";	/* "mail exchanger"; */
+		case T_TXT:	return "TXT";	/* "text"; */
+		case T_SRV:	return "SRV";	/* "service locator"; */
 		default:
 			zbx_snprintf(buf, sizeof(buf), "T_%d", q_type);
 			return buf;
 	}
 }
 
-#if !defined(_WINDOWS)
 static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char **msg_ptr)
 {
 	int		res;
 	static char	buffer[MAX_STRING_LEN];
 
-	if (-1 == (res = dn_expand(msg, msg_end, *msg_ptr, buffer, sizeof(buffer))))
+	if ((res = dn_expand(msg, msg_end, *msg_ptr, buffer, sizeof(buffer))) < 0)
 		return NULL;
 
 	*msg_ptr += res;
 
 	return buffer;
 }
-#endif	/* !defined(_WINDOWS) */
 
-#endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
+#endif /* HAVE_RES_QUERY */
+#endif /* not _WINDOWS */
 
-static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, int short_answer)
+int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
+#if !defined(_WINDOWS)
+#ifdef HAVE_RES_QUERY
+	int		res;
+	char		ip[MAX_STRING_LEN];
+	char		zone[MAX_STRING_LEN];
+#if defined(NS_PACKETSZ)
+	char	respbuf[NS_PACKETSZ];
+#elif defined(PACKETSZ)
+	char	respbuf[PACKETSZ];
+#else
+	char	respbuf[512];
+#endif
+	struct	in_addr in;
 
-	int		res, type, retrans, retry, i, offset = 0, ret = SYSINFO_RET_FAIL;
-	char		ip[MAX_STRING_LEN], zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
-	struct in_addr	inaddr;
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;
 
-	typedef struct
+	if(get_param(param, 1, ip, MAX_STRING_LEN) != 0)
 	{
+		ip[0] = '\0';
+	}
+
+	/* default parameter */
+	if(ip[0] == '\0')
+	{
+		strscpy(ip, "127.0.0.1");
+	}
+
+	if(get_param(param, 2, zone, MAX_STRING_LEN) != 0)
+	{
+		zone[0] = '\0';
+	}
+
+	/* default parameter */
+	if(zone[0] == '\0')
+	{
+		strscpy(zone, "localhost");
+	}
+
+	res = inet_aton(ip, &in);
+	if(res != 1)
+	{
+		SET_UI64_RESULT(result,0);
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (!(_res.options & RES_INIT))
+		res_init();
+
+	res = res_query(zone, C_IN, T_SOA, (unsigned char *)respbuf, sizeof(respbuf));
+
+	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
+
+	return SYSINFO_RET_OK;
+#else /* HAVE_RES_QUERY is not defined */
+	return SYSINFO_RET_FAIL;
+#endif /* ifdef HAVE_RES_QUERY */
+#else /* _WINDOWS is defined */
+	return SYSINFO_RET_FAIL;
+#endif /* if !defined(_WINDOWS) */
+}
+
+int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifndef _WINDOWS
+#ifdef HAVE_RES_QUERY
+	typedef struct resolv_querytype_s {
 		char	*name;
 		int	type;
-	}
-	resolv_querytype_t;
+	} resolv_querytype_t;
 
-	static const resolv_querytype_t	qt[] =
-	{
-		{"ANY",		T_ANY},
-		{"A",		T_A},
-		{"NS",		T_NS},
-		{"MD",		T_MD},
-		{"MF",		T_MF},
-		{"CNAME",	T_CNAME},
-		{"SOA",		T_SOA},
-		{"MB",		T_MB},
-		{"MG",		T_MG},
-		{"MR",		T_MR},
-		{"NULL",	T_NULL},
-#ifndef _WINDOWS
-		{"WKS",		T_WKS},
-#endif
-		{"PTR",		T_PTR},
-		{"HINFO",	T_HINFO},
-		{"MINFO",	T_MINFO},
-		{"MX",		T_MX},
-		{"TXT",		T_TXT},
-		{"SRV",		T_SRV},
+	static resolv_querytype_t qt[] = {
+		{"ANY", T_ANY},
+		{"A", T_A},
+		{"NS", T_NS},
+		{"MD", T_MD},
+		{"MF", T_MF},
+		{"CNAME", T_CNAME},
+		{"SOA", T_SOA},
+		{"MB", T_MB},
+		{"MG", T_MG},
+		{"MR", T_MR},
+		{"NULL", T_NULL},
+		{"WKS", T_WKS},
+		{"PTR", T_PTR},
+		{"HINFO", T_HINFO},
+		{"MINFO", T_MINFO},
+		{"MX", T_MX},
+		{"TXT", T_TXT},
+		{"SRV", T_SRV},
 		{NULL}
 	};
 
-#ifdef _WINDOWS
-	PDNS_RECORD	pQueryResults, pDnsRecord;
-	LPTSTR		wzone;
-	char		tmp2[MAX_STRING_LEN];
-#else
-	char		*name;
-	unsigned char	*msg_end, *msg_ptr, *p;
-	int		num_answers, num_query, q_type, q_class, q_len, value, c, n;
-	struct servent	*s;
-	HEADER		*hp;
-	struct protoent	*pr;
-#if PACKETSZ > 1024
-	unsigned char	buf[PACKETSZ];
-#else
-	unsigned char	buf[1024];
-#endif
-
-	typedef union
-	{
+	typedef union {
 		HEADER		h;
 #if defined(NS_PACKETSZ)
 		unsigned char	buffer[NS_PACKETSZ];
@@ -237,218 +321,55 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 #else
 		unsigned char	buffer[512];
 #endif
-	}
-	answer_t;
+	} answer_t;
 
+	char		zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], *name,
+			buffer[MAX_STRING_LEN];
+	unsigned char	*msg_end, *msg_ptr, *p;
+	int		num_answers, num_query, q_type, q_class, q_len,
+			value, offset, c, i, type, n, res;
 	answer_t	answer;
-#endif	/* _WINDOWS */
+	struct in_addr	inaddr;
+	struct protoent	*pr;
+	struct servent	*s;
 
-	*buffer = '\0';
-
-	if (5 < num_param(param))
+	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, ip, sizeof(ip)))
-		*ip = '\0';
+	if (get_param(param, 2, zone, sizeof(zone)) != 0)
+		*zone = '\0';
 
-	if (0 != get_param(param, 2, zone, sizeof(zone)) || '\0' == *zone)
-		strscpy(zone, "zabbix.com");
+	if (*zone == '\0')
+		strscpy(zone, "localhost");
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp)
+	if (get_param(param, 3, tmp, sizeof(tmp)) != 0 || *tmp == ' ')
 		type = T_SOA;
 	else
 	{
-		for (i = 0; NULL != qt[i].name; i++)
+		for (i = 0; qt[i].name != NULL; i++)
 		{
-#ifdef _WINDOWS
-			if (0 == lstrcmpiA(qt[i].name, tmp))
-#else
 			if (0 == strcasecmp(qt[i].name, tmp))
-#endif
 			{
 				type = qt[i].type;
 				break;
 			}
 		}
 
-		if (NULL == qt[i].name)
+		if (qt[i].name == NULL)
 			return SYSINFO_RET_FAIL;
 	}
 
-	if (0 != get_param(param, 4, tmp, sizeof(tmp)) || '\0' == *tmp)
-		retrans = 1;
-	else
-		retrans = atoi(tmp);
-
-	if (0 != get_param(param, 5, tmp, sizeof(tmp)) || '\0' == *tmp)
-		retry = 2;
-	else
-		retry = atoi(tmp);
-
-#ifdef _WINDOWS
-	wzone = zbx_utf8_to_unicode(zone);
-	res = DnsQuery(wzone, type, DNS_QUERY_STANDARD, NULL, &pQueryResults, NULL);
-	zbx_free(wzone);
-
-	if (1 == short_answer)
-	{
-		SET_UI64_RESULT(result, DNS_RCODE_NOERROR != res ? 0 : 1);
-		ret = SYSINFO_RET_OK;
-		goto clean;
-	}
-
-	if (DNS_RCODE_NOERROR != res)
-		return SYSINFO_RET_FAIL;
-
-	pDnsRecord = pQueryResults;
-
-	while (NULL != pDnsRecord)
-	{
-		if (DnsSectionAnswer != pDnsRecord->Flags.S.Section)
-		{
-			pDnsRecord = pDnsRecord->pNext;
-			continue;
-		}
-
-		if (NULL == pDnsRecord->pName)
-			goto clean;
-
-		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%-20s",
-				zbx_unicode_to_utf8_static(pDnsRecord->pName, tmp, sizeof(tmp)));
-		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s",
-				decode_type(pDnsRecord->wType));
-
-		switch (pDnsRecord->wType)
-		{
-			case T_A:
-				inaddr.s_addr = pDnsRecord->Data.A.IpAddress;
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						inet_ntoa(inaddr));
-				break;
-			case T_NS:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.NS.pNameHost, tmp, sizeof(tmp)));
-				break;
-			case T_MD:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MD.pNameHost, tmp, sizeof(tmp)));
-				break;
-			case T_MF:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MF.pNameHost, tmp, sizeof(tmp)));
-				break;
-			case T_CNAME:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.CNAME.pNameHost, tmp, sizeof(tmp)));
-				break;
-			case T_SOA:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s %lu %lu %lu %lu %lu",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.SOA.pNamePrimaryServer, tmp, sizeof(tmp)),
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.SOA.pNameAdministrator, tmp2, sizeof(tmp2)),
-						pDnsRecord->Data.SOA.dwSerialNo,
-						pDnsRecord->Data.SOA.dwRefresh,
-						pDnsRecord->Data.SOA.dwRetry,
-						pDnsRecord->Data.SOA.dwExpire,
-						pDnsRecord->Data.SOA.dwDefaultTtl);
-				break;
-			case T_MB:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MB.pNameHost, tmp, sizeof(tmp)));
-				break;
-			case T_MG:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MG.pNameHost, tmp, sizeof(tmp)));
-				break;
-			case T_MR:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MR.pNameHost, tmp, sizeof(tmp)));
-				break;
-			case T_NULL:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " len:%lu",
-						pDnsRecord->Data.Null.dwByteCount);
-				break;
-			case T_PTR:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.PTR.pNameHost, tmp, sizeof(tmp)));
-				break;
-			case T_HINFO:
-				for (i = 0; i < (int)(pDnsRecord->Data.HINFO.dwStringCount); i++)
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"%s\"",
-							zbx_unicode_to_utf8_static(pDnsRecord->Data.HINFO.pStringArray[i], tmp, sizeof(tmp)));
-				break;
-			case T_MINFO:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s %s",
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MINFO.pNameMailbox, tmp, sizeof(tmp)),
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MINFO.pNameErrorsMailbox, tmp2, sizeof(tmp2)));
-				break;
-			case T_MX:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %hu %s",
-						pDnsRecord->Data.MX.wPreference,
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.MX.pNameExchange, tmp, sizeof(tmp)));
-				break;
-			case T_TXT:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"");
-
-				for (i = 0; i < (int)(pDnsRecord->Data.TXT.dwStringCount); i++)
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s ",
-							zbx_unicode_to_utf8_static(pDnsRecord->Data.TXT.pStringArray[i], tmp, sizeof(tmp)));
-
-				if (0 < i)
-					offset -= 1;	/* remove the trailing space */
-
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\"");
-
-				break;
-			case T_SRV:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %hu %hu %hu %s",
-						pDnsRecord->Data.SRV.wPriority,
-						pDnsRecord->Data.SRV.wWeight,
-						pDnsRecord->Data.SRV.wPort,
-						zbx_unicode_to_utf8_static(pDnsRecord->Data.SRV.pNameTarget, tmp, sizeof(tmp)));
-				break;
-			default:
-				break;
-		}
-
-		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
-
-		pDnsRecord = pDnsRecord->pNext;
-	}
-#else	/* not _WINDOWS */
-	res_init();	/* initialize always, settings might have changed */
-
-	if (-1 == (res = res_mkquery(QUERY, zone, C_IN, type, NULL, 0, NULL, buf, sizeof(buf))))
-		return SYSINFO_RET_FAIL;
-
-	if ('\0' != *ip)
-	{
-		if (0 == inet_aton(ip, &inaddr))
-			return SYSINFO_RET_FAIL;
-
-		_res.nsaddr_list[0].sin_addr = inaddr;
-		_res.nsaddr_list[0].sin_family = AF_INET;
-		_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);
-		_res.nscount = 1;
-	}
-
-	_res.retrans = retrans;
-	_res.retry = retry;
-
-	res = res_send(buf, res, answer.buffer, sizeof(answer.buffer));
-
-	hp = (HEADER *)answer.buffer;
-
-	if (1 == short_answer)
-	{
-		SET_UI64_RESULT(result, NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res ? 0 : 1);
-		return SYSINFO_RET_OK;
-	}
-
-	if (NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res)
-		return SYSINFO_RET_FAIL;
+	res_init();
 
 	*buffer = '\0';
 	offset = 0;
+
+	/*zabbix_log(LOG_LEVEL_CRIT, "== %s %s", cmd, decode_type(type));*/
+	if (-1 == (res = res_query(zone, C_IN, type, answer.buffer, sizeof(answer.buffer))))
+	{
+		/*zabbix_log(LOG_LEVEL_CRIT, "=< %d", res);*/
+		return SYSINFO_RET_FAIL;
+	}
 
 	msg_end = answer.buffer + res;
 
@@ -457,11 +378,12 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	msg_ptr = answer.buffer + HFIXEDSZ;
 
-	/* skipping query records */
-	for (; 0 < num_query && msg_ptr < msg_end; num_query--)
+	/*zabbix_log(LOG_LEVEL_CRIT, "== %d num_answers=%d num_query=%d", res, num_answers, num_query);*/
+	/* skipping query records*/
+	for (; num_query > 0 && msg_ptr < msg_end; num_query--)
 		msg_ptr += dn_skipname(msg_ptr, msg_end) + QFIXEDSZ;
 
-	for (; 0 < num_answers && msg_ptr < msg_end; num_answers--)
+	for (; num_answers > 0 && msg_ptr < msg_end; num_answers--)
 	{
 		if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 			return SYSINFO_RET_FAIL;
@@ -472,7 +394,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		GETSHORT(q_class, msg_ptr);
 		msg_ptr += INT32SZ;		/* skipping TTL */
 		GETSHORT(q_len, msg_ptr);
-		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
 
 		switch (q_type)
 		{
@@ -481,76 +402,74 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				{
 					case C_IN:
 					case C_HS:
-						memcpy(&inaddr, msg_ptr, INADDRSZ);
-						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", inet_ntoa(inaddr));
+						bcopy(msg_ptr, &inaddr, INADDRSZ);
+						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s %s", decode_type(q_type), inet_ntoa(inaddr));
 						break;
 					default:
 						;
 				}
-
 				msg_ptr += q_len;
-
 				break;
 			case T_NS:
 			case T_CNAME:
 			case T_MB:
-			case T_MD:
-			case T_MF:
 			case T_MG:
 			case T_MR:
 			case T_PTR:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 					return SYSINFO_RET_FAIL;
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s %s", decode_type(q_type), name);
 				break;
+			case T_MD:
+			case T_MF:
 			case T_MX:
-				GETSHORT(value, msg_ptr);	/* preference */
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
+				GETSHORT(value, msg_ptr);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s %d", decode_type(q_type), value);
 
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* exchange */
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-
 				break;
 			case T_SOA:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* source host */
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
+
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* administrator */
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
-				GETLONG(value, msg_ptr);	/* serial number */
+				GETLONG(value, msg_ptr);
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr);	/* refresh time */
+				GETLONG(value, msg_ptr);
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr);	/* retry time */
+				GETLONG(value, msg_ptr);
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr);	/* expire time */
+				GETLONG(value, msg_ptr);
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETLONG(value, msg_ptr);	/* minimum TTL */
+				GETLONG(value, msg_ptr);
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
-
 				break;
 			case T_NULL:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " len:%d", q_len);
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s len:%d", decode_type(q_type), q_len);
 				msg_ptr += q_len;
 				break;
 			case T_WKS:
-				if (INT32SZ + 1 > q_len)
+				if (q_len < INT32SZ + 1)
 					return SYSINFO_RET_FAIL;
 
 				p = msg_ptr + q_len;
 
-				memcpy(&inaddr, msg_ptr, INADDRSZ);
+				bcopy(msg_ptr, &inaddr, INADDRSZ);
 				msg_ptr += INT32SZ;
 
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", inet_ntoa(inaddr));
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s %s", decode_type(q_type), inet_ntoa(inaddr));
 
 				if (NULL != (pr = getprotobynumber(*msg_ptr)))
 					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", pr->p_name);
@@ -563,118 +482,92 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 				while (msg_ptr < p)
 				{
 					c = *msg_ptr++;
-
-					do
-					{
-						if (0 != (c & 0200))
+					do {
+						if (c & 0200)
 						{
 							s = getservbyport((int)htons(n), pr ? pr->p_name : NULL);
-
-							if (NULL != s)
+							if (s != NULL)
 								offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", s->s_name);
 							else
 								offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " #%d", n);
 						}
-
 						c <<= 1;
-					}
-					while (0 != (++n & 07));
+					} while (++n & 07);
 				}
-
 				break;
 			case T_HINFO:
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
+
 				p = msg_ptr + q_len;
 				c = *msg_ptr++;
 
-				if (0 != c)
+				if (c != 0)
 				{
-					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"%.*s\"", c, msg_ptr);
+					offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %.*s", c, msg_ptr);
 					msg_ptr += c;
 				}
 
-				if (msg_ptr < p)
-				{
+				if (msg_ptr < p) {
 					c = *msg_ptr++;
 
-					if (0 != c)
+					if (c != 0)
 					{
-						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"%.*s\"", c, msg_ptr);
+						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %.*s", c, msg_ptr);
 						msg_ptr += c;
 					}
 				}
-
 				break;
 			case T_MINFO:
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox responsible for mailing lists */
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
+					return SYSINFO_RET_FAIL;
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s %s", decode_type(q_type), name);
+
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox for error messages */
-					return SYSINFO_RET_FAIL;
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-
 				break;
 			case T_TXT:
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " \"");
-				p = msg_ptr + q_len;
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s \"", decode_type(q_type));
 
+				p = msg_ptr + q_len;
 				while (msg_ptr < p)
 				{
-					for (c = *msg_ptr++; 0 < c && msg_ptr < p; c--)
+					for (c = *msg_ptr++; c > 0 && msg_ptr < p; c--)
 						offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%c", *msg_ptr++);
 				}
-
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\"");
-
 				break;
 			case T_SRV:
-				GETSHORT(value, msg_ptr);       /* priority */
+				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
+
+				GETSHORT(value, msg_ptr);	/* priority */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETSHORT(value, msg_ptr);       /* weight */
+				GETSHORT(value, msg_ptr);	/* weight */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				GETSHORT(value, msg_ptr);       /* port */
+				GETSHORT(value, msg_ptr);	/* port */
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %d", value);
 
-				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* target */
+				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 					return SYSINFO_RET_FAIL;
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
-
 				break;
 			default:
 				msg_ptr += q_len;
-				break;
 		}
-
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
 	}
-#endif	/* _WINDOWS */
+	if (offset != 0)
+		buffer[--offset] = '\0';
 
-	zbx_rtrim(buffer + MAX(offset - 1, 0), "\n");
+	SET_TEXT_RESULT(result, strdup(buffer));
 
-	SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
-	ret = SYSINFO_RET_OK;
-
-#ifdef _WINDOWS
-clean:
-	if (DNS_RCODE_NOERROR == res)
-		DnsRecordListFree(pQueryResults, DnsFreeRecordList);
-#endif
-	return ret;
-
-#else	/* both HAVE_RES_QUERY and _WINDOWS not defined */
-
+	return SYSINFO_RET_OK;
+#else /* HAVE_RES_QUERY is not defined */
 	return SYSINFO_RET_FAIL;
-
-#endif	/* defined(HAVE_RES_QUERY) || defined(_WINDOWS) */
-}
-
-int	NET_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return dns_query(cmd, param, flags, result, 1);
-}
-int	NET_DNS_RECORD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return dns_query(cmd, param, flags, result, 0);
+#endif /* ifdef HAVE_RES_QUERY */
+#else /* _WINDOWS is defined */
+	return SYSINFO_RET_FAIL;
+#endif /* ifndef _WINDOWS */
 }

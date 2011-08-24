@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,10 +16,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
+// JavaScript Document
 // JSON RPC by Artem "Aly" Suharev (based on Prototype)
 
 var RPC = {
+//'_rpcurl':		'api_jsonrpc.php',	// rpc url
 '_rpcurl':		'jsrpc.php?output=json-rpc',		// rpc url
 '_callid':		0,					// rpc request id
 '_auth':		null,				// authentication hash
@@ -40,7 +41,7 @@ rpcurl: function(rpcurl_){
 	if('undefined' == typeof(rpcurl_)) return this._rpcurl;
 	else this._rpcurl = rpcurl_;
 }
-};
+}
 
 RPC.Base = Class.create({
 // PRIVATE
@@ -60,7 +61,7 @@ initialize: function(userParams){
 		'request':	{},
 		'onSucces': function(){},
 		'onFailure': function(){}
-	};
+	}
 
 	Object.extend(this.userParams, userParams || { });
 
@@ -68,6 +69,7 @@ initialize: function(userParams){
 	this.auth = RPC.auth();
 },
 
+// DEBUG
 debug: function(fnc_name, id){
 	if(this.debug_status){
 		var str = 'RPC.Call['+RPC.id+'].'+fnc_name;
@@ -91,23 +93,24 @@ initialize: function($super, userParams) {
 	this.call();
 },
 
+// CALL RPC
 call: function(){
 	this.debug('call');
 //---
 	var header = {
 		'Content-type': 'application/json-rpc'
-	};
+	}
 
 	var body = {
 		'jsonrpc': '2.0',
 		'method': this.userParams.method,
 		'params': this.userParams.params,
 		'auth': this.auth
-	};
+	}
 
 	var request = {
 		'requestHeaders': header
-	};
+	}
 
 	if(this.userParams.notification == 0){
 		body.id = this.callid;
@@ -144,11 +147,13 @@ processError: function(resp){
 // JSON request failed OR server responded with incorrect JSON
 	if(is_null(resp) || !isset('responseJSON', resp)){
 		throw('RPC call ['+this.userParams.method+'] request failed');
+		return true;
 	}
 
 // JSON have wrong header or no respond at all
 	if(empty(resp.responseJSON)){
 		throw('RPC: Server call ['+this.userParams.method+'] responded with incorrect JSON.');
+		return true;
 	}
 
 // RPC responded with error || with incorrect JSON
@@ -158,9 +163,10 @@ processError: function(resp){
 	}
 	else if(!isset('result', resp.responseJSON)){
 		throw('RPC: Server call ['+this.userParams.method+'] responded with incorrect JSON.');
+		return true;
 	}
 
-	return false;
+return false;
 }
 }
 );

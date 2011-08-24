@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,17 +56,18 @@
 	function make_decoration($haystack, $needle, $class=null){
 		$result = $haystack;
 
-		$pos = zbx_stripos($haystack,$needle);
+		$pos = stripos($haystack,$needle);
 		if($pos !== FALSE){
 			$start = zbx_substring($haystack, 0, $pos);
-			$end = zbx_substring($haystack, $pos + zbx_strlen($needle));
-			$found = zbx_substring($haystack, $pos, $pos + zbx_strlen($needle));
+//			$middle = substr($haystack, $pos, zbx_strlen($needle));
+			$middle = $needle;
+			$end = substr($haystack, $pos+zbx_strlen($needle));
 
 			if(is_null($class)){
-				$result = array($start, bold($found), $end);
+				$result = array($start, bold($middle), $end);
 			}
 			else{
-				$result = array($start, new CSpan($found, $class), $end);
+				$result = array($start, new CSpan($middle, $class), $end);
 			}
 		}
 
@@ -179,7 +180,7 @@
 			}
 		}
 		else if(is_object($obj)){
-			$formObjects = array('cform','ccheckbox','cselect','cbutton','csubmit','cbuttonqmessage','cbuttondelete','cbuttoncancel');
+			$formObjects = array('cform','ccheckbox','cselect','cbutton','cbuttonqmessage','cbuttondelete','cbuttoncancel');
 			if(is_object($obj) && str_in_array(zbx_strtolower(get_class($obj)), $formObjects)){
 				$obj=SPACE;
 			}
@@ -222,15 +223,15 @@
 
 		$right_tab->addRow($right_row);
 
-		$table = new CTable(NULL,'header maxwidth ui-widget-header ui-corner-all');
+		$table = new CTable(NULL,'header');
 //		$table->setAttribute('border',0);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
-		$td_r = new CCol($right_tab,'header_r right');
+		$td_r = new CCol($right_tab,'header_r');
 		$td_r->setAttribute('align','right');
 
-		$table->addRow(array(new CCol($col1,'header_l left'), $td_r));
+		$table->addRow(array(new CCol($col1,'header_l'), $td_r));
 	return $table;
 	}
 
@@ -277,156 +278,5 @@
 		}
 
 		return $icon;
-	}
-
-/**
-* returns Ctable object with host header
-*
-* {@source}
-* @access public
-* @static
-* @version 1
-*
-* @param string $hostid
-* @param array $elemnts [items, triggers, graphs, applications]
-* @return object
-*/
-	function get_header_host_table($hostid, $current=null){
-		$elements = array(
-			'items' => 'items',
-			'triggers' => 'triggers',
-			'graphs' => 'graphs',
-			'applications' => 'applications',
-			'screens' => 'screens',
-			'discoveries' => 'discoveries'
-		);
-
-		if(!is_null($current))
-			unset($elements[$current]);
-
-		$header_host_opt = array(
-			'hostids' => $hostid,
-			'output' => API_OUTPUT_EXTEND,
-			'templated_hosts' => 1,
-		);
-		if(isset($elements['items'])) $header_host_opt['selectItems'] = API_OUTPUT_COUNT;
-		if(isset($elements['triggers'])) $header_host_opt['selectTriggers'] = API_OUTPUT_COUNT;
-		if(isset($elements['graphs'])) $header_host_opt['selectGraphs'] = API_OUTPUT_COUNT;
-		if(isset($elements['applications'])) $header_host_opt['selectApplications'] = API_OUTPUT_COUNT;
-		if(isset($elements['screens'])) $header_host_opt['selectScreens'] = API_OUTPUT_COUNT;
-		if(isset($elements['discoveries'])) $header_host_opt['selectDiscoveries'] = API_OUTPUT_COUNT;
-
-		$header_hosts = API::Host()->get($header_host_opt);
-
-		if(!$header_host = reset($header_hosts)){
-			$header_host = array(
-				'hostid' => 0,
-				'name' => ($current == 'host') ? S_NEW_HOST : _('New template'),
-				'status' => ($current == 'host') ? HOST_STATUS_NOT_MONITORED : HOST_STATUS_TEMPLATE,
-				'available' => HOST_AVAILABLE_UNKNOWN,
-				'screens' => 0,
-				'items' => 0,
-				'graphs' => 0,
-				'triggers' => 0,
-				'applications' => 0,
-				'discoveries' => 0,
-				'proxy_hostid' => 0
-			);
-		}
-
-
-		$description = array();
-		if($header_host['proxy_hostid']){
-			$proxy = get_host_by_hostid($header_host['proxy_hostid']);
-			$description[] = $proxy['host'].':';
-		}
-		$description[] = $header_host['name'];
-
-		$list = new CList(null, 'objectlist');
-
-		if($header_host['status'] == HOST_STATUS_TEMPLATE)
-			$list->addItem(array('&laquo; ', new CLink(S_TEMPLATE_LIST, 'templates.php?templateid='.$header_host['hostid'].url_param('groupid'))));
-		else
-			$list->addItem(array('&laquo; ', new CLink(S_HOST_LIST, 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid'))));
-
-
-		$tbl_header_host = new CDiv(null, 'objectgroup ui-widget-content ui-corner-all');
-		if($header_host['status'] == HOST_STATUS_TEMPLATE){
-			$list->addItem(array(bold(S_TEMPLATE.': '), new CLink($description, 'templates.php?form=update&templateid='.$header_host['hostid'])));
-		}
-		else{
-			switch($header_host['status']){
-				case HOST_STATUS_MONITORED:
-					$status = new CSpan(S_MONITORED, 'off');
-					break;
-				case HOST_STATUS_NOT_MONITORED:
-					$status = new CSpan(S_NOT_MONITORED, 'on');
-					break;
-				default:
-					$status = S_UNKNOWN;
-			}
-
-			if($header_host['available'] == HOST_AVAILABLE_TRUE)
-				$available = new CSpan(S_AVAILABLE, 'off');
-			else if($header_host['available'] == HOST_AVAILABLE_FALSE)
-				$available = new CSpan(S_NOT_AVAILABLE, 'on');
-			else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
-				$available = new CSpan(S_UNKNOWN, 'unknown');
-
-			$list->addItem(array(bold(S_HOST.': '), new CLink($description, 'hosts.php?form=update&hostid='.$header_host['hostid'])));
-			$list->addItem($status);
-			$list->addItem(array(S_AVAILABILITY.': ', $available));
-		}
-
-		if(isset($elements['items'])){
-			$list->addItem(array(new CLink(S_ITEMS, 'items.php?hostid='.$header_host['hostid']),' ('.$header_host['items'].')'));
-		}
-		if(isset($elements['triggers'])){
-			$list->addItem(array(new CLink(S_TRIGGERS, 'triggers.php?hostid='.$header_host['hostid']),' ('.$header_host['triggers'].')'));
-		}
-		if(isset($elements['graphs'])){
-			$list->addItem(array(new CLink(S_GRAPHS, 'graphs.php?hostid='.$header_host['hostid']),' ('.$header_host['graphs'].')'));
-		}
-		if(isset($elements['applications'])){
-			$list->addItem(array(new CLink(S_APPLICATIONS, 'applications.php?hostid='.$header_host['hostid']),' ('.$header_host['applications'].')'));
-		}
-		if(isset($elements['discoveries'])){
-			$list->addItem(array(new CLink(S_DISCOVERY, 'host_discovery.php?hostid='.$header_host['hostid']),' ('.$header_host['discoveries'].')'));
-		}
-		if($header_host['status'] == HOST_STATUS_TEMPLATE){
-			if(isset($elements['screens'])){
-				$list->addItem(array(new CLink(S_SCREENS, 'screenconf.php?templateid='.$header_host['hostid']), ' ('.$header_host['screens'].')'));
-			}
-		}
-
-		$tbl_header_host->addItem($list);
-		return $tbl_header_host;
-	}
-
-
-	function makeFormFooter($main, $other=array()){
-		$mainBttns = new CDiv();
-		foreach($main as $bttn){
-			$bttn->addClass('main');
-			$bttn->useJQueryStyle();
-
-			$mainBttns->addItem($bttn);
-		}
-
-		$otherBttns = new CDiv($other);
-		$otherBttns->useJQueryStyle();
-
-		if(empty($other)){
-			$space = new CDiv($mainBttns, 'dt right');
-		}
-		else{
-			$space = new CDiv($mainBttns, 'dt floatleft right');
-		}
-
-		$buttons = new CDiv(array($otherBttns), 'dd');
-
-		$footer = new CDiv(new CDiv(array($space, $buttons),'formrow'), 'objectgroup footer min-width ui-widget-content ui-corner-all');
-
-		return $footer;
 	}
 ?>

@@ -10,7 +10,7 @@ class CPageFilter{
 
 // profiles idx
 	private $_profileIdx = array();
-
+	
 	private $_profileIds = array();
 	private $_requestIds = array();
 
@@ -92,11 +92,11 @@ options = array(
 		}
 
 // groups
-
 		if(isset($options['groups'])){
 			if(!isset($options['groupid']) && isset($options['hostid'])){
 				$options['groupid'] = 0;
 			}
+
 			$this->_initGroups($options['groupid'], $options['groups']);
 		}
 
@@ -153,15 +153,18 @@ options = array(
 		$this->_requestIds['hostid'] = isset($options['hostid'])?$options['hostid']:null;
 		$this->_requestIds['graphid'] = isset($options['graphid'])?$options['graphid']:null;
 		$this->_requestIds['triggerid'] = isset($options['triggerid'])?$options['triggerid']:null;
+
+//SDII($this->_profileIds);
+//SDII($this->_requestIds);
 	}
 
 	private function _updateByGraph(&$options){
-		$graphs = API::Graph()->get(array(
+		$graphs = CGraph::get(array(
 			'graphids' => $options['graphid'],
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_REFER,
-			'selectTemplates' => API_OUTPUT_REFER,
-			'selectGroups' => API_OUTPUT_REFER,
+			'select_hosts' => API_OUTPUT_REFER,
+			'select_templates' => API_OUTPUT_REFER,
+			'select_groups' => API_OUTPUT_REFER,
 		));
 
 		if($graph = reset($graphs)){
@@ -198,11 +201,11 @@ options = array(
 	}
 
 	private function _updateByHost(&$options){
-		$hosts = API::Host()->get(array(
+		$hosts = CHost::get(array(
 			'hostids' => $options['hostid'],
 			'templated_hosts' => 1,
 			'output' => array('hostid', 'host'),
-			'selectGroups' => API_OUTPUT_REFER,
+			'select_groups' => API_OUTPUT_REFER,
 		));
 
 		if($host = reset($hosts)){
@@ -219,12 +222,12 @@ options = array(
 	}
 
 	private function _updateByTrigger(&$options){
-		$triggers = API::Trigger()->get(array(
+		$triggers = CTrigger::get(array(
 			'triggerids' => $options['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_REFER,
-			'selectTemplates' => API_OUTPUT_REFER,
-			'selectGroups' => API_OUTPUT_REFER,
+			'select_hosts' => API_OUTPUT_REFER,
+			'select_templates' => API_OUTPUT_REFER,
+			'select_groups' => API_OUTPUT_REFER,
 		));
 
 		if($trigger = reset($triggers)){
@@ -266,8 +269,7 @@ options = array(
 			'output' => API_OUTPUT_EXTEND,
 		);
 		$options = zbx_array_merge($def_options, $options);
-		$groups = API::HostGroup()->get($options);
-
+		$groups = CHostGroup::get($options);
 		order_result($groups, 'name');
 
 		$this->data['groups'] = array();
@@ -293,7 +295,6 @@ options = array(
 		}
 
 		$this->isSelected['groupsSelected'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['groups'])) || ($groupid > 0);
-
 		$this->isSelected['groupsAll'] = (($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL) && !empty($this->data['groups']) && ($groupid == 0));
 		$this->ids['groupid'] = $groupid;
 	}
@@ -307,15 +308,15 @@ options = array(
 		else{
 			$def_options = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-				'output' => array('hostid', 'name'),
+				'output' => array('hostid', 'host'),
 				'groupids' => (($this->groupid > 0) ? $this->groupid : null),
 			);
 			$options = zbx_array_merge($def_options, $options);
-			$hosts = API::Host()->get($options);
+			$hosts = CHost::get($options);
 			order_result($hosts, 'host');
 
 			foreach($hosts as $host){
-				$this->data['hosts'][$host['hostid']] = $host['name'];
+				$this->data['hosts'][$host['hostid']] = $host['host'];
 			}
 
 			if(is_null($hostid)) $hostid = $this->_profileIds['hostid'];
@@ -356,7 +357,7 @@ options = array(
 				'hostids' => $this->hostid > 0 ? $this->hostid : null
 			);
 			$options = zbx_array_merge($def_ptions, $options);
-			$graphs = API::Graph()->get($options);
+			$graphs = CGraph::get($options);
 			order_result($graphs, 'name');
 
 			foreach($graphs as $graph){
@@ -375,10 +376,10 @@ options = array(
 			if($graphid > 0 && !isset($this->data['graphs'][$graphid])){
 				// then let's take a look how the desired graph is named
 				$options = array(
-					'output' => array('name'),
+					'output' => API_OUTPUT_EXTEND,
 					'graphids' => array($graphid)
 				);
-				$selectedGraphInfo = API::Graph()->get($options);
+				$selectedGraphInfo = CGraph::get($options);
 				$selectedGraphInfo = reset($selectedGraphInfo);
 				$graphid = 0;
 				// if there is a graph with the same name on new host, why not show it then?
@@ -414,7 +415,7 @@ options = array(
 				'hostids' => (($this->hostid > 0) ? $this->hostid : null),
 			);
 			$options = zbx_array_merge($def_ptions, $options);
-			$triggers = API::Trigger()->get($options);
+			$triggers = Ctrigger::get($options);
 			order_result($triggers, 'description');
 
 			foreach($triggers as $trigger){
@@ -442,7 +443,7 @@ options = array(
 		return $this->_getCB('groupid', $this->groupid, $this->groups, $withNode);
 	}
 
-	public function getGraphsCB($withNode=false){
+	public function getGraphsCB($withNode=false){		
 		$cmb = new CComboBox('graphid', $this->graphid, 'javascript: submit();');
 		$items = $this->graphs;
 

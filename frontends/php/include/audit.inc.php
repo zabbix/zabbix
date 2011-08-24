@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,8 +68,9 @@
 	}
 
 	function add_audit($action,$resourcetype,$details){
-		if(CWebUser::$data['userid'] == 0) return true;
+		global $USER_DETAILS;
 
+		if(!isset($USER_DETAILS['userid']))	check_authorisation();
 
 		$auditid = get_dbid('auditlog','auditid');
 
@@ -79,7 +80,7 @@
 		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
 
 		if(($result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details,ip) '.
-			' VALUES ('.$auditid.','.CWebUser::$data['userid'].','.time().','.
+			' VALUES ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.
 						$action.','.$resourcetype.','.zbx_dbstr($details).','.
 						zbx_dbstr($ip).')')))
 		{
@@ -90,6 +91,10 @@
 	}
 
 	function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $table_name, $values_old, $values_new){
+		global $USER_DETAILS;
+
+		if(!isset($USER_DETAILS["userid"]))
+			check_authorisation();
 
 		if($action == AUDIT_ACTION_UPDATE){
 			$values_diff = array();
@@ -105,19 +110,19 @@
 		$auditid = get_dbid('auditlog', 'auditid');
 
 		if(zbx_strlen($resourcename) > 255)
-			$resourcename = zbx_substr($resourcename, 0, 252).'...';
+			$details = zbx_substr($resourcename, 0, 252).'...';
 
 		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
 		/*SDI(
 			'INSERT INTO auditlog (auditid,userid,clock,ip,action,resourcetype,resourceid,resourcename)'.
-			' values ('.$auditid.','.CWebUser::$data['userid'].','.time().','.zbx_dbstr($ip).
+			' values ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.zbx_dbstr($ip).
 			','.$action.','.$resourcetype.','.$resourceid.','.zbx_dbstr($resourcename).')');*/
 		$result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,ip,action,resourcetype,resourceid,resourcename)'.
-				' values ('.$auditid.','.CWebUser::$data['userid'].','.time().','.zbx_dbstr($ip).
+				' values ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.zbx_dbstr($ip).
 				','.$action.','.$resourcetype.','.$resourceid.','.zbx_dbstr($resourcename).')');
 
 		if($result && $action == AUDIT_ACTION_UPDATE){
-			foreach ($values_diff as $id){
+			foreach($values_diff as $id){
 				$auditdetailid = get_dbid('auditlog_details', 'auditdetailid');
 				$result &= DBexecute('insert into auditlog_details (auditdetailid,auditid,table_name,field_name,oldvalue,newvalue)'.
 						' values ('.$auditdetailid.','.$auditid.','.zbx_dbstr($table_name).','.

@@ -9,5 +9,4 @@ libspecsysinfo_a_SOURCES = \
 	diskio.c \
 	diskspace.c \
 	inodes.c \
-	memory.c \
-	net.c
+	memory.c

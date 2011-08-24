@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,13 +30,16 @@ class CGraphItem extends CZBXAPI{
 /**
 * Get GraphItems data
 *
+* @static
 * @param array $options
 * @return array|boolean
 */
-	public function get($options = array()){
+	public static function get($options = array()){
+		global $USER_DETAILS;
+
 		$result = array();
-		$user_type = self::$userData['type'];
-		$userid = self::$userData['userid'];
+		$user_type = $USER_DETAILS['type'];
+		$userid = $USER_DETAILS['userid'];
 		$result = array();
 
 		$sort_columns = array('gitemid'); // allowed columns for sorting
@@ -58,9 +61,10 @@ class CGraphItem extends CZBXAPI{
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // output
-			'selectGraphs'			=> null,
+			'select_graphs'			=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'expandData'			=> null,
+			'extendoutput'			=> null,
 			'countOutput'			=> null,
 			'preservekeys'			=> null,
 
@@ -71,7 +75,13 @@ class CGraphItem extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+		}
+
+
 // editable + PERMISSION CHECK
+
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
@@ -206,7 +216,7 @@ class CGraphItem extends CZBXAPI{
 						$result[$gitem['gitemid']]= array();
 
 // graphids
-					if(isset($gitem['graphid']) && is_null($options['selectGraphs'])){
+					if(isset($gitem['graphid']) && is_null($options['select_graphs'])){
 						if(!isset($result[$gitem['gitemid']]['graphs'])) $result[$gitem['gitemid']]['graphs'] = array();
 
 						$result[$gitem['gitemid']]['graphs'][] = array('graphid' => $gitem['graphid']);
@@ -219,18 +229,19 @@ class CGraphItem extends CZBXAPI{
 		}
 
 		if(!is_null($options['countOutput'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
 // Adding graphs
-		if(!is_null($options['selectGraphs']) && str_in_array($options['selectGraphs'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_graphs']) && str_in_array($options['select_graphs'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['selectGraphs'],
+				'output' => $options['select_graphs'],
 				'gitemids' => $gitemids,
 				'preservekeys' => 1
 			);
-			$graphs = API::Graph()->get($obj_params);
+			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				$gitems = $graph['gitems'];
 				unset($graph['gitems']);
@@ -251,12 +262,13 @@ class CGraphItem extends CZBXAPI{
 /**
  * Get graph items by graph id and graph item id
  *
- * @param array $gitem_data
+ * @static
+ * @param _array $gitem_data
  * @param array $gitem_data['itemid']
  * @param array $gitem_data['graphid']
  * @return string|boolean graphid
  */
-	public function getObjects($gitem_data){
+	public static function getObjects($gitem_data){
 		$result = array();
 		$gitemids = array();
 
@@ -270,7 +282,7 @@ class CGraphItem extends CZBXAPI{
 		}
 
 		if(!empty($gitemids))
-			$result = $this->get(array('gitemids'=>$gitemids, 'output' => API_OUTPUT_EXTEND));
+			$result = self::get(array('gitemids'=>$gitemids, 'extendoutput'=>1));
 
 	return $result;
 	}

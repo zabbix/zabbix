@@ -1,6 +1,6 @@
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ const char	*help_message[] = {
 	"  -c --config <file>                   Specify absolute path to the configuration file",
 	"",
 	"  -z --zabbix-server <server>          Hostname or IP address of Zabbix Server",
-	"  -p --port <server port>              Specify port number of server trapper running on the server. Default is " ZBX_DEFAULT_SERVER_PORT_STR,
+	"  -p --port <server port>              Specify port number of server trapper running on the server. Default is 10051",
 	"  -s --host <hostname>                 Specify host name. Host IP address and DNS name will not work",
 	"  -I --source-address <IP address>     Specify source IP address",
 	"",
@@ -99,14 +99,16 @@ static char	*ZABBIX_KEY = NULL;
 static char	*ZABBIX_KEY_VALUE = NULL;
 
 #if !defined(_WINDOWS)
+
 static void	send_signal_handler(int sig)
 {
 	if (SIGALRM == sig)
-		zabbix_log(LOG_LEVEL_WARNING, "timeout while executing operation");
+		zabbix_log(LOG_LEVEL_WARNING, "Timeout while executing operation");
 
 	exit(FAIL);
 }
-#endif
+
+#endif /* NOT _WINDOWS */
 
 typedef struct
 {
@@ -148,7 +150,7 @@ static int	check_response(char *response)
 		ret = FAIL;
 
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info)))
-		printf("info from server: \"%s\"\n", info);
+		printf("Info from server: \"%s\"\n", info);
 
 	return ret;
 }
@@ -170,7 +172,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGTERM, send_signal_handler);
 	signal(SIGQUIT, send_signal_handler);
 	signal(SIGALRM, send_signal_handler);
-#endif
+#endif /* NOT _WINDOWS */
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, GET_SENDER_TIMEOUT)))
 	{
@@ -180,7 +182,9 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", answer);
 				if (NULL == answer || SUCCEED != check_response(answer))
+				{
 					zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from server [%s]", answer);
+				}
 				else
 					ret = SUCCEED;
 			}
@@ -263,8 +267,8 @@ static void	parse_commandline(int argc, char **argv)
 {
 	char	ch = '\0';
 
-	/* parse the command-line */
-	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	/* Parse the command-line. */
+	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
 	{
 		switch (ch)
 		{
@@ -307,7 +311,7 @@ static void	parse_commandline(int argc, char **argv)
 				REAL_TIME = 1;
 				break;
 			case 'v':
-				if (LOG_LEVEL_WARNING == CONFIG_LOG_LEVEL)
+				if(CONFIG_LOG_LEVEL == LOG_LEVEL_WARNING)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_DEBUG;
 				else
 					CONFIG_LOG_LEVEL = LOG_LEVEL_WARNING;
@@ -355,7 +359,7 @@ int	main(int argc, char **argv)
 		goto exit;
 	}
 	if (0 == ZABBIX_SERVER_PORT)
-		ZABBIX_SERVER_PORT = ZBX_DEFAULT_SERVER_PORT;
+		ZABBIX_SERVER_PORT = 10051;
 
 	if (MIN_ZABBIX_PORT > ZABBIX_SERVER_PORT)
 	{

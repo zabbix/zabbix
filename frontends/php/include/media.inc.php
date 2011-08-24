@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@
 
 		foreach($mapping as $id => $map){
 			$result[$id] = new CSpan($map['letter'], $map['style']);
-			$result[$id]->SetHint(getSeverityCaption($id)." (".(isset($map['style']) ? "on" : "off").")");
+			$result[$id]->SetHint(get_severity_description($id)." (".(isset($map['style']) ? "on" : "off").")");
 		}
 
 	return $result;

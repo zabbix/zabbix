@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ include_once('include/page_header.php');
 		$rq_severity	= get_request('severity',63);
 
 		$severity = array();
-		for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
+		for($i=0; $i<6; $i++){
 			if($rq_severity & (1 << $i)) $severity[$i] = $i;
 		}
 	}
@@ -100,7 +100,7 @@ include_once('include/page_header.php');
 	$sendto		=  get_request('sendto','');
 	$mediatypeid	= get_request('mediatypeid',0);
 	$active		= get_request('active',0);
-	$period		= get_request('period',ZBX_DEFAULT_INTERVAL);
+	$period		= get_request('period','1-7,00:00-23:59');
 
 
 	$frmMedia = new CFormTable(S_NEW_MEDIA);
@@ -135,7 +135,7 @@ include_once('include/page_header.php');
 					str_in_array($i,$severity)?'yes':'no',
 					null,		/* action */
 					$i),		/* value */
-				getSeverityCaption($i)
+				get_severity_description($i)
 			),
 			BR());
 	}
@@ -146,7 +146,7 @@ include_once('include/page_header.php');
 	$cmbStat->addItem(1,S_DISABLED);
 	$frmMedia->addRow(S_STATUS,$cmbStat);
 
-	$frmMedia->addItemToBottomRow(new CSubmit('add', ($media > -1)?S_SAVE:S_ADD));
+	$frmMedia->addItemToBottomRow(new CButton('add', ($media > -1)?S_SAVE:S_ADD));
 	$frmMedia->addItemToBottomRow(SPACE);
 	$frmMedia->addItemToBottomRow(new CButtonCancel(null, 'close_window();'));
 	$frmMedia->Show();
