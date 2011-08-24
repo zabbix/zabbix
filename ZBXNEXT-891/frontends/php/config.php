@@ -905,6 +905,11 @@ include_once('include/page_header.php');
 				}
 			}
 
+			if (empty($data['valuemapid']) && !empty($data['form_refresh'])) {
+				$data['mapname'] = get_request('mapname', '');
+				$data['valuemap'] = get_request('valuemap', array());
+			}
+
 			$valueMappingForm = new CView('administration.general.valuemapping.edit', $data);
 			$cnf_wdgt->addItem($valueMappingForm->render());
 		}
