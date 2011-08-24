@@ -19,23 +19,20 @@
 **/
 ?>
 <?php
-
-$this->data['cnf_wdgt']->addHeader(_('Value mapping'));
-
 $valueMappingForm = new CForm();
 $valueMappingForm->setName('valuemappingForm');
-$valueMappingForm->addVar('config', get_request('config', 6));
+$valueMappingForm->addVar('config', 6);
 $valueMappingForm->addItem(BR());
 
 $valueMappingTable = new CTableInfo();
 $valueMappingTable->setHeader(array(_('Name'), _('Value map')));
 
-foreach($this->data['valuemaps'] as $valuemap) {
+foreach ($this->data['valuemaps'] as $valuemap) {
 	$maps = $valuemap['maps'];
 	order_result($maps, 'value');
 
 	$mappings_row = array();
-	foreach($maps as $map) {
+	foreach ($maps as $map) {
 		array_push($mappings_row, $map['value'], SPACE.RARR.SPACE, $map['newvalue'], BR());
 	}
 	$valueMappingTable->addRow(array(new CLink($valuemap['name'],'config.php?form=update&valuemapid='.$valuemap['valuemapid'].url_param('config')), empty($mappings_row) ? SPACE : $mappings_row));

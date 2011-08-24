@@ -75,7 +75,7 @@
 		DBexecute('UPDATE items SET valuemapid=NULL WHERE valuemapid='.$valuemapid);
 		DBexecute('DELETE FROM mappings WHERE valuemapid='.$valuemapid);
 		DBexecute('DELETE FROM valuemaps WHERE valuemapid='.$valuemapid);
-	return TRUE;
+		return true;
 	}
 
 	function replace_value_by_map($value, $valuemapid){

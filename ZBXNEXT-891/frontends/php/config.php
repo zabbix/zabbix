@@ -373,17 +373,16 @@ include_once('include/page_header.php');
 			}
 			show_messages($result,$msg_ok, $msg_fail);
 		}
-		else if(isset($_REQUEST['delete']) && isset($_REQUEST['valuemapid'])){
+		elseif (isset($_REQUEST['delete']) && isset($_REQUEST['valuemapid'])) {
 			$result = false;
 
-			$sql = 'SELECT * FROM valuemaps WHERE '.DBin_node('valuemapid').' AND valuemapid='.$_REQUEST['valuemapid'];
+			$sql = 'SELECT m.name, m.valuemapid FROM valuemaps m WHERE '.DBin_node('m.valuemapid').' AND m.valuemapid='.$_REQUEST['valuemapid'];
 			if($map_data = DBfetch(DBselect($sql))){
 				$result = delete_valuemap($_REQUEST['valuemapid']);
 			}
 
-			if($result){
-				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP,
-					_('Value map').' ['.$map_data['name'].'] ['.$map_data['valuemapid'].']');
+			if ($result) {
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP, _('Value map').' ['.$map_data['name'].'] ['.$map_data['valuemapid'].']');
 				unset($_REQUEST['form']);
 			}
 			show_messages($result, S_VALUE_MAP_DELETED, S_CANNNOT_DELETE_VALUE_MAP);
@@ -871,6 +870,7 @@ include_once('include/page_header.php');
 //  config = 6 // Value Mapping  //
 ///////////////////////////////////
 	elseif ($_REQUEST['config'] == 6) {
+		$data = array();
 		if (isset($_REQUEST['form'])) {
 			$data['form'] = get_request('form', 1);
 			$data['form_refresh'] = get_request('form_refresh', 0);
@@ -886,8 +886,8 @@ include_once('include/page_header.php');
 				$data['title'] = ' "'.$data['mapname'].'"';
 
 				if (empty($data['form_refresh'])) {
-					$db_mappings = DBselect('SELECT * FROM mappings m WHERE m.valuemapid = '.$data['valuemapid']);
-					while($mapping = DBfetch($db_mappings)) {
+					$db_mappings = DBselect('SELECT m.value, m.newvalue FROM mappings m WHERE m.valuemapid = '.$data['valuemapid']);
+					while ($mapping = DBfetch($db_mappings)) {
 						$data['valuemap'][] = array('value' => $mapping['value'], 'newvalue' => $mapping['newvalue']);
 					}
 				}
@@ -909,7 +909,7 @@ include_once('include/page_header.php');
 			$cnf_wdgt->addItem($valueMappingForm->render());
 		}
 		else{
-			$data['cnf_wdgt'] = &$cnf_wdgt;
+			$cnf_wdgt->addHeader(_('Value mapping'));
 			$data['valuemaps'] = array();
 
 			$db_valuemaps = DBselect('SELECT v.valuemapid, v.name FROM valuemaps v WHERE '.DBin_node('valuemapid'));
@@ -922,7 +922,6 @@ include_once('include/page_header.php');
 			while ($db_map = DBfetch($db_maps)) {
 				$data['valuemaps'][$db_map['valuemapid']]['maps'][] = array('value' => $db_map['value'], 'newvalue' => $db_map['newvalue']);
 			}
-
 			order_result($data['valuemaps'], 'name');
 
 			$valueMappingForm = new CView('administration.general.valuemapping.list', $data);
