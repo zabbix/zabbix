@@ -244,13 +244,10 @@ return $output;
  *
  * author: Aly
  */
-function zbx_date2age($start_date, $end_date = 0, $utime = false){
-	if(!$utime){
+function zbx_date2age($start_date, $end_date = null, $utime = false) {
+	if (!$utime) {
 		$start_date = date('U', $start_date);
-		if($end_date)
-			$end_date = date('U', $end_date);
-		else
-			$end_date = time();
+		$end_date = $end_date ? date('U', $end_date) : time();
 	}
 
 	return convertUnitsS(abs($end_date - $start_date));
