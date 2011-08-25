@@ -991,10 +991,10 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		update_index = 0;
 
-		if (!(found && host->proxy_hostid == proxy_hostid &&
-					host->status == status && 0 == strcmp(host->host, row[2])))
+		if (0 == found || host->proxy_hostid != proxy_hostid || host->status != status ||
+				0 != strcmp(host->host, row[2]))
 		{
-			if (found)
+			if (1 == found)
 			{
 				host_ph_local.proxy_hostid = host->proxy_hostid;
 				host_ph_local.status = host->status;
@@ -1015,6 +1015,15 @@ static void	DCsync_hosts(DB_RESULT result)
 
 			if (NULL != host_ph)
 			{
+				if (HOST_STATUS_MONITORED == host_ph->status && (0 == found || sync_num == host_ph->sync_num))
+				{
+					/* duplicate hosts found */
+
+					zabbix_log(LOG_LEVEL_CRIT, "Error: duplicate hosts [%s] found. Exiting...",
+							host_ph->host);
+					exit(FAIL);
+				}
+
 				host_ph->host_ptr = host;
 				host_ph->sync_num = sync_num;
 			}
@@ -1022,8 +1031,8 @@ static void	DCsync_hosts(DB_RESULT result)
 				update_index = 1;
 		}
 
-		update_queue = (!found && HOST_STATUS_PROXY_PASSIVE == status)
-				|| (found && host->status != status);
+		update_queue = (0 == found && HOST_STATUS_PROXY_PASSIVE == status)
+				|| (1 == found && host->status != status);
 
 		/* store new information in host structure */
 
@@ -1038,7 +1047,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->maintenance_from = atoi(row[16]);
 		host->status = status;
 
-		if (!found)
+		if (0 == found)
 		{
 			host->errors_from = atoi(row[17]);
 			host->available = (unsigned char)atoi(row[18]);
@@ -1067,7 +1076,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* update hosts_ph index using new data, if not done already */
 
-		if (update_index)
+		if (1 == update_index)
 		{
 			host_ph_local.proxy_hostid = host->proxy_hostid;
 			host_ph_local.status = host->status;
