@@ -52,12 +52,9 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 {
 	const char	*__function_name = "execute_action";
 
-	int 	pid, res = FAIL;
+	int 	res = FAIL;
 	char	full_path[MAX_STRING_LEN];
-	char	*output = NULL;
-	char	*send_to;
-	char	*subject;
-	char	*message;
+	char	*send_to, *subject, *message, *output = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): alertid [" ZBX_FS_UI64 "] mediatype [%d]",
 			__function_name, alert->alertid, mediatype->type);
@@ -69,7 +66,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 				alert->sendto, alert->subject, alert->message, error, max_error_len);
 		alarm(0);
 	}
-#if defined(HAVE_JABBER)
+#ifdef HAVE_JABBER
 	else if (MEDIA_TYPE_JABBER == mediatype->type)
 	{
 		/* Jabber uses its own timeouts */
@@ -101,16 +98,13 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 		zbx_free(subject);
 		zbx_free(message);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "before executing [%s]", full_path);
 		if (SUCCEED == (res = zbx_execute(full_path, &output, error, max_error_len, 40)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", mediatype->exec_path, output);
 			zbx_free(output);
 		}
 		else
-		{
 			res = FAIL;
-		}
 	}
 	else
 	{
