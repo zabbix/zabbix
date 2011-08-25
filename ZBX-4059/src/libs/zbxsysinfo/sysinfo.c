@@ -393,8 +393,8 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
-	register char	*p;
-	register int	i = 0;
+	char	*p;
+	int	i = 0;
 
 	int	(*function)() = NULL;
 	int	ret = SUCCEED;
@@ -413,75 +413,64 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 	*error = '\0';
 
-	alias_expand(in_command, usr_command, MAX_STRING_LEN);
+	alias_expand(in_command, usr_command, sizeof(usr_command));
 
 	usr_command_len = (int)strlen(usr_command);
 
-	for( p=usr_command+usr_command_len-1; p>usr_command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
+	for (p = usr_command + usr_command_len - 1; p > usr_command && NULL != strchr(ZBX_WHITESPACE, *p); --p)
+		;
 
-	if( (p[1]=='\r') || (p[1]=='\n') || (p[1]==' '))
+	if (NULL != strchr(ZBX_WHITESPACE, p[1]))
+		p[1] = '\0';
+
+	if (0 != parse_command(usr_command, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param)))
 	{
-		p[1]=0;
-	}
-
-	function=0;
-
-	if(parse_command(usr_command, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN) != 0)
-	{
-		for(i=0; commands[i].key != 0; i++)
+		for (i = 0; NULL != commands[i].key; i++)
 		{
-			if( strcmp(commands[i].key, usr_cmd) == 0)
+			if (0 == strcmp(commands[i].key, usr_cmd))
 			{
-				function=commands[i].function;
+				function = commands[i].function;
 				break;
 			}
 		}
 	}
 
 	param[0] = '\0';
-	if(function != 0)
-	{
 
-		if(commands[i].flags & CF_USEUPARAM)
+	if (NULL != function)
+	{
+		if (0 != (commands[i].flags & CF_USEUPARAM))
 		{
-			if((flags & PROCESS_TEST) && (flags & PROCESS_USE_TEST_PARAM) && commands[i].test_param)
+			if (0 != (flags & PROCESS_TEST) &&
+					0 != (flags & PROCESS_USE_TEST_PARAM) &&
+					NULL != commands[i].test_param)
 			{
-				zbx_strlcpy(usr_param, commands[i].test_param, MAX_STRING_LEN);
+				zbx_strlcpy(usr_param, commands[i].test_param, sizeof(usr_param));
 			}
 		}
 		else
-		{
 			usr_param[0] = '\0';
-		}
 
-		if(commands[i].main_param)
+		if (NULL != commands[i].main_param)
 		{
-			if(commands[i].flags & CF_USEUPARAM)
+			if (0 != (commands[i].flags & CF_USEUPARAM))
 			{
-				err = replace_param(
-					commands[i].main_param,
-					usr_param,
-					param,
-					MAX_STRING_LEN,
-					error, sizeof(error));
+				err = replace_param(commands[i].main_param, usr_param,
+						param, sizeof(param), error, sizeof(error));
 			}
 			else
-			{
 				zbx_snprintf(param, sizeof(param), "%s", commands[i].main_param);
-			}
 		}
 		else
-		{
 			zbx_snprintf(param, sizeof(param), "%s", usr_param);
-		}
 
-		if(err != FAIL)
+		if (FAIL != err)
 		{
 			err = function(usr_command, param, flags, result);
 
-			if(err == SYSINFO_RET_FAIL)
+			if (SYSINFO_RET_FAIL == err)
 				err = NOTSUPPORTED;
-			else if(err == SYSINFO_RET_TIMEOUT)
+			else if (err == SYSINFO_RET_TIMEOUT)
 				err = TIMEOUT_ERROR;
 		}
 		else
@@ -492,15 +481,13 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 	}
 	else
-	{
 		err = NOTSUPPORTED;
-	}
 
-	if(flags & PROCESS_TEST)
+	if (0 != (flags & PROCESS_TEST))
 	{
 		printf("%s", usr_cmd);
 
-		if(commands[i].flags & CF_USEUPARAM)
+		if (0 != (commands[i].flags & CF_USEUPARAM))
 		{
 			printf("[%s]", usr_param);
 			i = 2 + (int)strlen(usr_param);
@@ -510,26 +497,24 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 		i += (int)strlen(usr_cmd);
 
-#define COLUMN_2_X 45 /* max of spaces count */
-		i = i > COLUMN_2_X ? 1 : (COLUMN_2_X - i);
+#define COLUMN_2_X 45	/* max of spaces count */
+		i = i > COLUMN_2_X ? 1 : COLUMN_2_X - i;
 
-		printf("%-*.*s", i, i, " "); /* print spaces */
+		printf("%-*.*s", i, i, " ");	/* print spaces */
 	}
 
-	if(err == NOTSUPPORTED)
+	if (NOTSUPPORTED == err)
 	{
-		if(!(result->type & AR_MESSAGE))
-		{
-			SET_MSG_RESULT(result, strdup("ZBX_NOTSUPPORTED"));
-		}
+		if (!ISSET_MSG(result))
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_NOTSUPPORTED"));
+
 		ret = NOTSUPPORTED;
 	}
-	else if(err == TIMEOUT_ERROR)
+	else if (TIMEOUT_ERROR == err)
 	{
-		if(!(result->type & AR_MESSAGE))
-		{
-			SET_MSG_RESULT(result, strdup("ZBX_ERROR"));
-		}
+		if (!ISSET_MSG(result))
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_ERROR"));
+
 		ret = TIMEOUT_ERROR;
 	}
 
@@ -544,66 +529,69 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 
 	assert(result);
 
-	switch (value_type) {
-	case ITEM_VALUE_TYPE_UINT64:
-		zbx_rtrim(c, " \"");
-		zbx_ltrim(c, " \"+");
-		del_zeroes(c);
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_UINT64:
+			zbx_rtrim(c, " \"");
+			zbx_ltrim(c, " \"+");
+			del_zeroes(c);
 
-		switch (data_type) {
-		case ITEM_DATA_TYPE_OCTAL:
-			if (SUCCEED == is_uoct(c))
+			switch (data_type)
 			{
-				ZBX_OCT2UINT64(value_uint64, c);
-				SET_UI64_RESULT(result, value_uint64);
-				ret = SUCCEED;
+				case ITEM_DATA_TYPE_OCTAL:
+					if (SUCCEED == is_uoct(c))
+					{
+						ZBX_OCT2UINT64(value_uint64, c);
+						SET_UI64_RESULT(result, value_uint64);
+						ret = SUCCEED;
+					}
+					break;
+				case ITEM_DATA_TYPE_HEXADECIMAL:
+					if (SUCCEED == is_uhex(c))
+					{
+						ZBX_HEX2UINT64(value_uint64, c);
+						SET_UI64_RESULT(result, value_uint64);
+						ret = SUCCEED;
+					}
+					else if (SUCCEED == is_hex_string(c))
+					{
+						zbx_remove_whitespace(c);
+						ZBX_HEX2UINT64(value_uint64, c);
+						SET_UI64_RESULT(result, value_uint64);
+						ret = SUCCEED;
+					}
+					break;
+				default:	/* ITEM_DATA_TYPE_DECIMAL */
+					if (SUCCEED == is_uint64(c, &value_uint64))
+					{
+						SET_UI64_RESULT(result, value_uint64);
+						ret = SUCCEED;
+					}
 			}
-			break;
-		case ITEM_DATA_TYPE_HEXADECIMAL:
-			if (SUCCEED == is_uhex(c))
-			{
-				ZBX_HEX2UINT64(value_uint64, c);
-				SET_UI64_RESULT(result, value_uint64);
-				ret = SUCCEED;
-			}
-			else if (SUCCEED == is_hex_string(c))
-			{
-				zbx_remove_whitespace(c);
-				ZBX_HEX2UINT64(value_uint64, c);
-				SET_UI64_RESULT(result, value_uint64);
-				ret = SUCCEED;
-			}
-			break;
-		default:	/* ITEM_DATA_TYPE_DECIMAL */
-			if (SUCCEED == is_uint64(c, &value_uint64))
-			{
-				SET_UI64_RESULT(result, value_uint64);
-				ret = SUCCEED;
-			}
-		}
-		break;
-	case ITEM_VALUE_TYPE_FLOAT:
-		zbx_rtrim(c, " \"");
-		zbx_ltrim(c, " \"+");
 
-		if (SUCCEED != is_double(c))
 			break;
-		value_double = atof(c);
+		case ITEM_VALUE_TYPE_FLOAT:
+			zbx_rtrim(c, " \"");
+			zbx_ltrim(c, " \"+");
 
-		SET_DBL_RESULT(result, value_double);
-		ret = SUCCEED;
-		break;
-	case ITEM_VALUE_TYPE_STR:
-	case ITEM_VALUE_TYPE_LOG:
-		zbx_replace_invalid_utf8(c);
-		SET_STR_RESULT(result, strdup(c));
-		ret = SUCCEED;
-		break;
-	case ITEM_VALUE_TYPE_TEXT:
-		zbx_replace_invalid_utf8(c);
-		SET_TEXT_RESULT(result, strdup(c));
-		ret = SUCCEED;
-		break;
+			if (SUCCEED != is_double(c))
+				break;
+			value_double = atof(c);
+
+			SET_DBL_RESULT(result, value_double);
+			ret = SUCCEED;
+			break;
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_LOG:
+			zbx_replace_invalid_utf8(c);
+			SET_STR_RESULT(result, strdup(c));
+			ret = SUCCEED;
+			break;
+		case ITEM_VALUE_TYPE_TEXT:
+			zbx_replace_invalid_utf8(c);
+			SET_TEXT_RESULT(result, strdup(c));
+			ret = SUCCEED;
+			break;
 	}
 
 	if (SUCCEED != ret)
