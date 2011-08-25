@@ -45,8 +45,12 @@ foreach ($macros as $macroid => $macro) {
 }
 
 // buttons
-$deleteButton = new CButton('macros_del', _('Delete selected'), '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); if (typeof(deleted_macro_cnt) == \'undefined\') deleted_macro_cnt=1; else deleted_macro_cnt++; });');
 $addButton = new CButton('macro_add', _('Add'), 'javascript: addMacroRow()');
+$addButton->setAttribute('style', 'margin-top:10px;');
+$deleteButton = new CButton('macros_del', _('Delete selected'), '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); if (typeof(deleted_macro_cnt) == \'undefined\') deleted_macro_cnt=1; else deleted_macro_cnt++; });');
+$deleteButton->setAttribute('style', 'margin-top:10px;');
+$saveButton = new CSubmit('save', _('Save'), "if (deleted_macro_cnt > 0) return confirm('"._('Are you sure you want to delete')." '+deleted_macro_cnt+' "._('macro(s)')."?');");
+$saveButton->addClass('main');
 
 $buttonColumn = new CCol(array($addButton, SPACE, $deleteButton));
 $buttonColumn->setAttribute('colspan', 4);
@@ -66,7 +70,7 @@ $macrosTab = new CTabView();
 $macrosTab->addTab('macros', _('Macros'), $macrosFormList);
 
 $macrosForm->addItem($macrosTab);
-$macrosForm->addItem(makeFormFooter(array(), array(new CSubmit('save', _('Save'), "if (deleted_macro_cnt > 0) return confirm('"._('Are you sure you want to delete')." '+deleted_macro_cnt+' "._('macro(s)')."?');"))));
+$macrosForm->addItem(makeFormFooter(array(), array($saveButton)));
 
 return $macrosForm;
 ?>
