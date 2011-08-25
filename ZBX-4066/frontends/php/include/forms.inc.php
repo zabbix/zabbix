@@ -5297,6 +5297,7 @@ JAVASCRIPT;
 				text1.className = "biginput";
 				text1.setAttribute("size",30);
 				text1.setAttribute("placeholder","{$MACRO}");
+				text1.setAttribute("style", "text-transform:uppercase;");
 				td2.appendChild(text1);
 				td2.appendChild(document.createTextNode(" "));
 
@@ -5328,6 +5329,7 @@ JAVASCRIPT;
 		foreach($macros as $macroid => $macro){
 			$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30);
 			$text1->setAttribute('placeholder', '{$MACRO}');
+			$text1->setAttribute('style', 'text-transform:uppercase;');
 			$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40);
 			$text2->setAttribute('placeholder', '<'.S_VALUE.'>');
 			$span = new CSpan(RARR);

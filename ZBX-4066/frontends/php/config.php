@@ -508,11 +508,24 @@ include_once('include/page_header.php');
 
 				$newMacros = get_request('macros', array());
 				foreach ($newMacros as $number => $newMacro) {
-					// remove item from new macros array if value is empty
-					if (zbx_empty($newMacro['value'])) {
+					// transform macros to uppercase {$aaa} => {$AAA}
+					$newMacros[$number]['macro'] = zbx_strtoupper($newMacro['macro']);
+
+					// remove duplicated item from new macros array
+					foreach ($newMacros as $duplicateNumber => $duplicateNewMacro) {
+						if ($number != $duplicateNumber && $newMacro['macro'] == $duplicateNewMacro['macro']) {
+							unset($newMacros[$number]);
+						}
+					}
+
+					// remove item from new macros array if name and value is empty
+					if (zbx_empty($newMacro['macro']) && zbx_empty($newMacro['value'])) {
 						unset($newMacros[$number]);
 					}
 				}
+
+				// save filtered macro array
+				$_REQUEST['macros'] = $newMacros;
 
 				// update
 				$macrosToUpdate = array();
@@ -560,22 +573,17 @@ include_once('include/page_header.php');
 
 				// create
 				if (!empty($newMacros)) {
-					$macrosToAdd = array_values($newMacros);
-					$new_macroids = CUsermacro::createGlobal($macrosToAdd);
-					if (!$new_macroids) {
+					$newMacrosIds = CUsermacro::createGlobal(array_values($newMacros));
+					if (!$newMacrosIds) {
 						throw new Exception(S_CANNOT_ADD_MACRO);
 					}
-				}
-
-				if (!empty($macrosToAdd)) {
-					$new_macros = CUserMacro::get(array(
-						'globalmacroids' => $new_macroids['globalmacroids'],
+					$newMacrosCreated = CUserMacro::get(array(
+						'globalmacroids' => $newMacrosIds['globalmacroids'],
 						'globalmacro' => 1,
 						'output' => API_OUTPUT_EXTEND
 					));
-					$new_macros = zbx_toHash($new_macros, 'globalmacroid');
-					foreach($new_macroids['globalmacroids'] as $newid){
-						add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $newid, $new_macros[$newid]['macro'], null,null,null);
+					foreach ($newMacrosCreated as $macro) {
+						add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
 					}
 				}
 
