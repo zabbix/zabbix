@@ -838,6 +838,7 @@
 	'S_MACRO_TOO_LONG'=>				'Macro name is too long, should not exceed 64 chars.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Macro value is too long, should not exceed 255 chars.',
 	'S_EMPTY_MACRO_VALUE'=>				'Empty macro value',
+	'S_EMPTY_MACRO_DUPLICATED'=>		'More than one macro with same name found:',
 	'S_MACROS_UPDATED'=>				'Macros updated',
 	'S_CANNOT_UPDATE_MACROS'=>				'Cannot update macros',
 	'S_CANNOT_ADD_MACRO'=>				'Cannot add macro',

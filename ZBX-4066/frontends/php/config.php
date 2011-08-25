@@ -507,14 +507,15 @@ include_once('include/page_header.php');
 				$globalMacros = zbx_toHash($globalMacros, 'macro');
 
 				$newMacros = get_request('macros', array());
+				$duplicatedMacros = array();
 				foreach ($newMacros as $number => $newMacro) {
 					// transform macros to uppercase {$aaa} => {$AAA}
 					$newMacros[$number]['macro'] = zbx_strtoupper($newMacro['macro']);
 
-					// remove duplicated item from new macros array
+					// search for duplicates items in new macros array
 					foreach ($newMacros as $duplicateNumber => $duplicateNewMacro) {
 						if ($number != $duplicateNumber && $newMacro['macro'] == $duplicateNewMacro['macro']) {
-							unset($newMacros[$number]);
+							$duplicatedMacros[] = $duplicateNewMacro['macro'];
 						}
 					}
 
@@ -522,6 +523,11 @@ include_once('include/page_header.php');
 					if (zbx_empty($newMacro['macro']) && zbx_empty($newMacro['value'])) {
 						unset($newMacros[$number]);
 					}
+				}
+
+				// validate duplicates macros
+				if (!empty($duplicatedMacros)) {
+					throw new Exception(S_EMPTY_MACRO_DUPLICATED.SPACE.implode(', ', array_unique($duplicatedMacros)));
 				}
 
 				// save filtered macro array
