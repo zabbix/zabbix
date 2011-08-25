@@ -913,6 +913,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	}
 	DBfree_result(result);
 
+	evaluate_expressions(tr, tr_num);
+
 	if (0 == tr_num)
 		goto clean;
 
@@ -924,15 +926,6 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < tr_num; i++)
 	{
 		tr_last = &tr[i];
-
-		if (0 == tr_last->lastchange)
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		evaluate_expression(tr_last->triggerid, &tr_last->expression, tr_last->lastchange,
-				tr_last->value, &tr_last->new_value, &tr_last->new_error);
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_allocated, &sql_offset, tr_last->triggerid,
 				tr_last->type, tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
@@ -951,8 +944,10 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
-	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
+	for (i = 0; i < tr_num; i++)
 	{
+		tr_last = &tr[i];
+
 		zbx_free(tr_last->error);
 		zbx_free(tr_last->new_error);
 		zbx_free(tr_last->expression);

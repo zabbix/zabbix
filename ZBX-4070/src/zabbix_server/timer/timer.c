@@ -53,11 +53,9 @@ static void	process_time_functions()
 	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last;
 	int			tr_alloc = 0, tr_num = 0;
 	char			*sql = NULL;
-	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.type,t.value,t.error,t.expression"
@@ -78,12 +76,6 @@ static void	process_time_functions()
 			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
 			DBnode_local("h.hostid"));
 
-	DBbegin();
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
-
 	while (NULL != (row = DBfetch(result)))
 	{
 		if (tr_num == tr_alloc)
@@ -97,13 +89,28 @@ static void	process_time_functions()
 		ZBX_STR2UINT64(tr_last->triggerid, row[0]);
 		tr_last->type = (unsigned char)atoi(row[1]);
 		tr_last->value = atoi(row[2]);
-		tr_last->error = row[3];
+		tr_last->error = zbx_strdup(NULL, row[3]);
 		tr_last->new_error = NULL;
 		tr_last->expression = zbx_strdup(NULL, row[4]);
 		tr_last->lastchange = time(NULL);
+	}
+	DBfree_result(result);
 
-		evaluate_expression(tr_last->triggerid, &tr_last->expression, tr_last->lastchange,
-				tr_last->value, &tr_last->new_value, &tr_last->new_error);
+	if (0 == tr_num)
+		goto clean;
+
+	evaluate_expressions(tr, tr_num);
+
+	DBbegin();
+
+	sql = zbx_malloc(sql, sql_alloc);
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
+
+	for (i = 0; i < tr_num; i++)
+	{
+		tr_last = &tr[i];
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
 				tr_last->type, tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
@@ -114,7 +121,6 @@ static void	process_time_functions()
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-	DBfree_result(result);
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
@@ -125,23 +131,23 @@ static void	process_time_functions()
 
 	zbx_free(sql);
 
-	if (0 != tr_num)
+	for (i = 0; i < tr_num; i++)
 	{
-		for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
-		{
-			zbx_free(tr_last->expression);
-			zbx_free(tr_last->new_error);
+		tr_last = &tr[i];
 
-			if (1 != tr_last->add_event)
-				continue;
+		zbx_free(tr_last->error);
+		zbx_free(tr_last->new_error);
+		zbx_free(tr_last->expression);
 
-			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-					tr_last->lastchange, tr_last->new_value, 0, 0);
-		}
+		if (1 != tr_last->add_event)
+			continue;
+
+		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+				tr_last->lastchange, tr_last->new_value, 0, 0);
 	}
 
 	DBcommit();
-
+clean:
 	zbx_free(tr);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
