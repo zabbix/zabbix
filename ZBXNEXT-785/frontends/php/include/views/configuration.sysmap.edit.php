@@ -29,7 +29,7 @@
 	$inputLength = 60;
 
 	$divTabs = new CTabView(array('remember'=>1));
-	if(!isset($_REQUEST['form_refresh']))
+	if (!isset($_REQUEST['form_refresh']))
 		$divTabs->setSelected(0);
 
 // Sysmap Form
@@ -38,7 +38,7 @@
 	$frmSysmap->addVar('form', get_request('form', 1));
 
 	$formRefresh = get_request('form_refresh',0);
-	$frmSysmap->addVar('form_refresh', $formRefresh+1);
+	$frmSysmap->addVar('form_refresh', $formRefresh + 1);
 
 // HOST WIDGET {
 	$sysmapList = new CFormList('sysmaplist');
@@ -57,10 +57,10 @@
 		'output' => API_OUTPUT_EXTEND,
 	));
 	order_result($images, 'name');
-	foreach($images as $image){
+	foreach ($images as $image) {
 		$cmbImg->addItem(
 			$image['imageid'],
-			get_node_name_by_elid($image['imageid'], null, ': ') . $image['name']
+			get_node_name_by_elid($image['imageid'], null, ': ').$image['name']
 		);
 	}
 	$sysmapList->addRow(_('Background image'), $cmbImg);
@@ -73,7 +73,7 @@ $iconMaps = API::IconMap()->get(array(
 	'preservekeys' => true,
 ));
 order_result($iconMaps, 'name');
-foreach($iconMaps as $iconMap){
+foreach ($iconMaps as $iconMap) {
 	$iconMappingComboBox->addItem($iconMap['iconmapid'], $iconMap['name']);
 }
 $iconMappingsLink = new CLink(_('show icon mappings'), 'config.php?config=14');
@@ -98,31 +98,31 @@ $sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPA
 // hostgroup
 	$labelTypeHostgroup = new CComboBox('label_type_hostgroup', $data['label_type_hostgroup'], null, $labelTypesLimited);
 	$customLabelHostgroup = new CTextarea('label_string_hostgroup', $data['label_string_hostgroup']);
-	if($data['label_type_hostgroup'] != MAP_LABEL_TYPE_CUSTOM) $customLabelHostgroup->addClass('hidden');
+	if ($data['label_type_hostgroup'] != MAP_LABEL_TYPE_CUSTOM) $customLabelHostgroup->addClass('hidden');
 	$sysmapList->addRow(_('Host group label type'), array($labelTypeHostgroup, BR(), $customLabelHostgroup));
 
 // host
 	$labelTypeHost = new CComboBox('label_type_host', $data['label_type_host'], null, $labelTypes);
 	$customLabelHost = new CTextarea('label_string_host', $data['label_string_host']);
-	if($data['label_type_host'] != MAP_LABEL_TYPE_CUSTOM) $customLabelHost->addClass('hidden');
+	if ($data['label_type_host'] != MAP_LABEL_TYPE_CUSTOM) $customLabelHost->addClass('hidden');
 	$sysmapList->addRow(_('Host label type'), array($labelTypeHost, BR(), $customLabelHost));
 
 // trigger
 	$labelTypeTrigger = new CComboBox('label_type_trigger', $data['label_type_trigger'], null, $labelTypesLimited);
 	$customLabelTrigger = new CTextarea('label_string_trigger', $data['label_string_trigger']);
-	if($data['label_type_trigger'] != MAP_LABEL_TYPE_CUSTOM) $customLabelTrigger->addClass('hidden');
+	if ($data['label_type_trigger'] != MAP_LABEL_TYPE_CUSTOM) $customLabelTrigger->addClass('hidden');
 	$sysmapList->addRow(_('Trigger label type'), array($labelTypeTrigger, BR(), $customLabelTrigger));
 
 // map
 	$labelTypeMap = new CComboBox('label_type_map', $data['label_type_map'], null, $labelTypesLimited);
 	$customLabelMap = new CTextarea('label_string_map', $data['label_string_map']);
-	if($data['label_type_map'] != MAP_LABEL_TYPE_CUSTOM) $customLabelMap->addClass('hidden');
+	if ($data['label_type_map'] != MAP_LABEL_TYPE_CUSTOM) $customLabelMap->addClass('hidden');
 	$sysmapList->addRow(_('Map label type'), array($labelTypeMap, BR(), $customLabelMap));
 
 // image
 	$labelTypeImage = new CComboBox('label_type_image', $data['label_type_image'], null, $labelTypesImage);
 	$customLabelImage = new CTextarea('label_string_image', $data['label_string_image']);
-	if($data['label_type_image'] != MAP_LABEL_TYPE_CUSTOM) $customLabelImage->addClass('hidden');
+	if ($data['label_type_image'] != MAP_LABEL_TYPE_CUSTOM) $customLabelImage->addClass('hidden');
 	$sysmapList->addRow(_('Image label type'), array($labelTypeImage, BR(), $customLabelImage));
 // --
 
@@ -130,7 +130,7 @@ $sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPA
 	$sysmapList->addRow(_('Icon label type'), new CComboBox('label_type', $data['label_type'], null, $labelTypes));
 
 	$cmbLocation = new CComboBox('label_location', $data['label_location']);
-	$cmbLocation->addItems(array(0=> _('Bottom'),1=> _('Left'),2=> _('Right'),3=> _('Top')));
+	$cmbLocation->addItems(array(0 => _('Bottom'),1 => _('Left'),2 => _('Right'),3 => _('Top')));
 
 	$sysmapList->addRow(_('Icon label location'), $cmbLocation);
 
@@ -141,7 +141,7 @@ $sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPA
 		EXTACK_OPTION_UNACK => _('Unacknowledged only'),
 	));
 	$selectShowUnack->setEnabled($config['event_ack_enable']);
-	if(!$config['event_ack_enable']){
+	if (!$config['event_ack_enable']) {
 		$selectShowUnack->setAttribute('title', _('Acknowledging disabled'));
 	}
 	$sysmapList->addRow(_('Problem display'), $selectShowUnack);
@@ -149,11 +149,11 @@ $sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPA
 	$url_table = new Ctable();
 	$url_table->setHeader(array(_('Name'), _('URL'), _('Element'), SPACE));
 
-	if(empty($data['urls'])){
+	if (empty($data['urls'])) {
 		$data['urls'][] = array('name' => '', 'url' => '', 'elementtype' => 0);
 	}
 	$i = 0;
-	foreach($data['urls'] as $url){
+	foreach ($data['urls'] as $url) {
 		$url_label = new CTextBox('urls['.$i.'][name]', $url['name'], 32);
 		$url_link = new CTextBox('urls['.$i.'][url]', $url['url'], 32);
 
@@ -203,7 +203,7 @@ $sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPA
 // Footer
 	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
-	if(isset($_REQUEST['sysmapid']) && ($_REQUEST['sysmapid']>0)){
+	if (isset($_REQUEST['sysmapid']) && ($_REQUEST['sysmapid']>0)) {
 		$others[] = new CButton('clone', _('Clone'));
 		$others[] = new CButtonDelete(_('Delete network map?'), url_param('form').url_param('sysmapid'));
 	}
