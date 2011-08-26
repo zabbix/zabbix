@@ -113,7 +113,8 @@ include_once('include/page_header.php');
 			'sysmapids' => $maps,
 			'selectSelements' => API_OUTPUT_EXTEND,
 			'selectLinks' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
+			'selectIconMap' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
 		);
 		$sysmaps = API::Map()->get($options);
 

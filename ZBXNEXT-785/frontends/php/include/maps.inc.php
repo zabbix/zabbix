@@ -1386,8 +1386,8 @@ function prepareMapExport(&$exportMaps){
 
 		$images[$sysmap['backgroundid']] = $sysmap['backgroundid'];
 
-		foreach($sysmap['links'] as $lnum => $link){
-			foreach($link['linktriggers'] as $ltnum => $linktrigger){
+		foreach($sysmap['links'] as $link){
+			foreach($link['linktriggers'] as $linktrigger){
 				array_push($triggers, $linktrigger['triggerid']);
 			}
 		}
@@ -1402,13 +1402,18 @@ function prepareMapExport(&$exportMaps){
 	try{
 		foreach($exportMaps as &$sysmap){
 			unset($sysmap['sysmapid']);
+			unset($sysmap['iconmapid']);
+			if (!empty($sysmap['iconmap'])) {
+				$sysmap['iconmap'] = $sysmap['iconmap']['name'];
+			}
+
 			foreach($sysmap['urls'] as $unum => $url){
 				unset($sysmap['urls'][$unum]['sysmapurlid']);
 			}
 
 			$sysmap['backgroundid'] = ($sysmap['backgroundid'] > 0) ? $images[$sysmap['backgroundid']] : '';
 
-			foreach($sysmap['selements'] as $snum => &$selement){
+			foreach($sysmap['selements'] as &$selement){
 				unset($selement['sysmapid']);
 
 				foreach($selement['urls'] as $unum => $url){
@@ -1440,10 +1445,10 @@ function prepareMapExport(&$exportMaps){
 			}
 			unset($selement);
 
-			foreach($sysmap['links'] as $lnum => &$link){
+			foreach($sysmap['links'] as &$link){
 				unset($link['sysmapid']);
 				unset($link['linkid']);
-				foreach($link['linktriggers'] as $ltnum => &$linktrigger){
+				foreach($link['linktriggers'] as &$linktrigger){
 					unset($linktrigger['linktriggerid']);
 					unset($linktrigger['linkid']);
 					$linktrigger['triggerid'] = $triggers[$linktrigger['triggerid']];
@@ -1457,7 +1462,6 @@ function prepareMapExport(&$exportMaps){
 	catch(Exception $e){
 		throw new Exception($e->getMessage());
 	}
-	//SDII($exportMaps);
 }
 
 function prepareImageExport($images){
