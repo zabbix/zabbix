@@ -539,7 +539,7 @@ class CImage extends CZBXAPI{
 			' WHERE sm.sysmapid=se.sysmapid '.
 				' AND ('.
 					' sm.iconmapid IS NULL'.
-					' OR se.use_iconmap=0'.
+					' OR se.use_iconmap='.SYSMAP_ELEMENT_USE_ICONMAP_OFF.
 				' )'.
 				' AND ('.
 					DBCondition('se.iconid_off', $imageids).

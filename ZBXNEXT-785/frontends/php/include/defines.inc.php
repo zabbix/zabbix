@@ -318,6 +318,9 @@
 	define('SYSMAP_GRID_ALIGN_ON',		1);
 	define('SYSMAP_GRID_ALIGN_OFF',		0);
 
+	define('SYSMAP_ELEMENT_USE_ICONMAP_ON', 1);
+	define('SYSMAP_ELEMENT_USE_ICONMAP_OFF', 0);
+
 	define('ITEM_TYPE_ZABBIX',			0);
 	define('ITEM_TYPE_SNMPV1',			1);
 	define('ITEM_TYPE_TRAPPER',			2);
