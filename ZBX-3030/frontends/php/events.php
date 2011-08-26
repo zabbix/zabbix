@@ -465,7 +465,6 @@
 					'object' => EVENT_OBJECT_TRIGGER,
 					'time_from' => $from,
 					'time_till' => $till,
-					'hide_unknown' => ($_REQUEST['hide_unknown'] ? true : null),
 					'output' => API_OUTPUT_SHORTEN,
 					'sortfield' => 'eventid',
 					'sortorder' => ZBX_SORT_DOWN,
@@ -496,8 +495,11 @@
 				);
 				$triggers = CTrigger::get($triggersOptions);
 
-
 				foreach ($events as $event) {
+					if ($_REQUEST['hide_unknown'] && $event['value'] == TRIGGER_VALUE_UNKNOWN) {
+						continue;
+					}
+
 					$trigger = $triggers[$event['objectid']];
 					$host = reset($trigger['hosts']);
 

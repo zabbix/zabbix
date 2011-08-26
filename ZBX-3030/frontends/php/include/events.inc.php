@@ -220,16 +220,14 @@ return $events;
  * @param array $evenList of preselected events
  * @return array|bool
  */
-function get_next_event($event, $evenList=array()) {
-	if(!empty($evenList)){
+function get_next_event($event, $evenList = array()) {
+	if (!empty($evenList)) {
 		$nextEvent = false;
-
 		foreach ($evenList as $e) {
-			if(($e['objectid'] == $event['objectid'])
-				&& ($e['eventid'] > $event['eventid'])
-				&& ($e['clock'] > $event['clock'])
-				&& ($e['value'] != $event['value'])
-			){
+			if ($e['eventid'] == $event['eventid']) {
+				break;
+			}
+			if ($e['objectid'] == $event['objectid']) {
 				$nextEvent = $e;
 			}
 		}
@@ -244,7 +242,6 @@ function get_next_event($event, $evenList=array()) {
 		' WHERE e.objectid='.$event['objectid'].
 			' AND e.eventid>'.$event['eventid'].
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
-			' AND e.value<>'.$event['value'].
 		' ORDER BY e.object, e.objectid, e.eventid';
 
 	return DBfetch(DBselect($sql, 1));
@@ -323,7 +320,7 @@ function make_small_eventlist($eventid, $trigger_data){
 
 	$options = array(
 		'triggerids' => $trigger_data['triggerid'],
-		'eventid_till' => $curevent['eventid'],
+		'time_till' => $curevent['clock'],
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
