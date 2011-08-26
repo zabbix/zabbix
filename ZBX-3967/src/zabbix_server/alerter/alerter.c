@@ -31,6 +31,8 @@
 
 #include "alerter.h"
 
+#define	ALARM_ACTION_TIMEOUT	40
+
 extern unsigned char	process_type;
 
 /******************************************************************************
@@ -53,15 +55,13 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	const char	*__function_name = "execute_action";
 
 	int 	res = FAIL;
-	char	full_path[MAX_STRING_LEN];
-	char	*send_to, *subject, *message, *output = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): alertid [" ZBX_FS_UI64 "] mediatype [%d]",
 			__function_name, alert->alertid, mediatype->type);
 
 	if (MEDIA_TYPE_EMAIL == mediatype->type)
 	{
-		alarm(40);
+		alarm(ALARM_ACTION_TIMEOUT);
 		res = send_email(mediatype->smtp_server, mediatype->smtp_helo, mediatype->smtp_email,
 				alert->sendto, alert->subject, alert->message, error, max_error_len);
 		alarm(0);
@@ -87,6 +87,8 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	}
 	else if (MEDIA_TYPE_EXEC == mediatype->type)
 	{
+		char	full_path[MAX_STRING_LEN], *send_to, *subject, *message, *output = NULL;
+
 		send_to = dyn_escape_param(alert->sendto);
 		subject = dyn_escape_param(alert->subject);
 		message = dyn_escape_param(alert->message);
@@ -98,7 +100,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 		zbx_free(subject);
 		zbx_free(message);
 
-		if (SUCCEED == (res = zbx_execute(full_path, &output, error, max_error_len, 40)))
+		if (SUCCEED == (res = zbx_execute(full_path, &output, error, max_error_len, ALARM_ACTION_TIMEOUT)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", mediatype->exec_path, output);
 			zbx_free(output);
@@ -125,8 +127,6 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
  * Purpose: periodically check table alerts and send notifications if needed  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
 void	main_alerter_loop()
@@ -158,61 +158,55 @@ void	main_alerter_loop()
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(alert.alertid, row[0]);
-			alert.mediatypeid	= atoi(row[1]);
-			alert.sendto		= row[2];
-			alert.subject		= row[3];
-			alert.message		= row[4];
-			alert.status		= atoi(row[5]);
+			alert.mediatypeid = atoi(row[1]);
+			alert.sendto = row[2];
+			alert.subject = row[3];
+			alert.message = row[4];
+			alert.status = atoi(row[5]);
 
 			ZBX_STR2UINT64(mediatype.mediatypeid, row[6]);
-			mediatype.type		= atoi(row[7]);
-			mediatype.description	= row[8];
-			mediatype.smtp_server	= row[9];
-			mediatype.smtp_helo	= row[10];
-			mediatype.smtp_email	= row[11];
-			mediatype.exec_path	= row[12];
-			mediatype.gsm_modem	= row[13];
-			mediatype.username	= row[14];
-			mediatype.passwd	= row[15];
+			mediatype.type = atoi(row[7]);
+			mediatype.description = row[8];
+			mediatype.smtp_server = row[9];
+			mediatype.smtp_helo = row[10];
+			mediatype.smtp_email = row[11];
+			mediatype.exec_path = row[12];
+			mediatype.gsm_modem = row[13];
+			mediatype.username = row[14];
+			mediatype.passwd = row[15];
 
-			alert.retries		= atoi(row[16]);
+			alert.retries = atoi(row[16]);
 
 			*error = '\0';
 			res = execute_action(&alert, &mediatype, error, sizeof(error));
 
-			if (res == SUCCEED)
+			if (SUCCEED == res)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Alert ID [" ZBX_FS_UI64 "] was sent successfully",
-					alert.alertid);
+						alert.alertid);
 				DBexecute("update alerts set status=%d,error='' where alertid=" ZBX_FS_UI64,
-					ALERT_STATUS_SENT,
-					alert.alertid);
+						ALERT_STATUS_SENT, alert.alertid);
 			}
 			else
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Error sending alert ID [" ZBX_FS_UI64 "]",
-					alert.alertid);
+						alert.alertid);
 				zabbix_syslog("Error sending alert ID [" ZBX_FS_UI64 "]",
-					alert.alertid);
+						alert.alertid);
 
 				error_esc = DBdyn_escape_string_len(error, ALERT_ERROR_LEN);
 
 				alert.retries++;
 
-				if (alert.retries < ALERT_MAX_RETRIES)
+				if (ALERT_MAX_RETRIES > alert.retries)
 				{
 					DBexecute("update alerts set retries=%d,error='%s' where alertid=" ZBX_FS_UI64,
-						alert.retries,
-						error_esc,
-						alert.alertid);
+							alert.retries, error_esc, alert.alertid);
 				}
 				else
 				{
 					DBexecute("update alerts set status=%d,retries=%d,error='%s' where alertid=" ZBX_FS_UI64,
-						ALERT_STATUS_FAILED,
-						alert.retries,
-						error_esc,
-						alert.alertid);
+							ALERT_STATUS_FAILED, alert.retries, error_esc, alert.alertid);
 				}
 
 				zbx_free(error_esc);
