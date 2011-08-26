@@ -1456,6 +1456,9 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 
 	item->h_lastvalue_str[0] = NULL;
 	item->h_lastvalue_str[1] = NULL;
+	item->h_lasteventid = NULL;
+	item->h_lastsource = NULL;
+	item->h_lastseverity = NULL;
 
 	key = zbx_dsprintf(key, "%s", item->key_orig);
 	substitute_simple_macros(NULL, item, NULL, NULL, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
@@ -1466,6 +1469,9 @@ void	DBfree_item_from_db(DB_ITEM *item)
 {
 	zbx_free(item->h_lastvalue_str[0]);
 	zbx_free(item->h_lastvalue_str[1]);
+	zbx_free(item->h_lasteventid);
+	zbx_free(item->h_lastsource);
+	zbx_free(item->h_lastseverity);
 }
 
 const ZBX_TABLE *DBget_table(const char *tablename)

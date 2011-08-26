@@ -147,19 +147,32 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		DBfree_result(result);
 	}
 
-	h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, "logeventid", 1);
-
-	if (NULL != h_value[0])
+	if (NULL == item->h_lasteventid)
 	{
-		if (SUCCEED == regexp_match_ex(regexps, regexps_num, h_value[0], arg1, ZBX_CASE_SENSITIVE))
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, "logeventid", 1);
+
+		if (NULL != h_value[0])
+		{
+			item->h_lasteventid = zbx_strdup(item->h_lasteventid, h_value[0]);
+
+			if (SUCCEED == regexp_match_ex(regexps, regexps_num, h_value[0], arg1, ZBX_CASE_SENSITIVE))
+				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+			else
+				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+			res = SUCCEED;
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
+		DBfree_history(h_value);
+	}
+	else
+	{
+		if (SUCCEED == regexp_match_ex(regexps, regexps_num, item->h_lasteventid, arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 		res = SUCCEED;
 	}
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGEVENTID is empty");
-	DBfree_history(h_value);
 
 	if ('@' == *arg1)
 		zbx_free(regexps);
@@ -205,19 +218,32 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 	if (FAIL == get_function_parameter_str(item, parameters, 1, &arg1))
 		goto clean;
 
-	h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, "source", 1);
-
-	if (NULL != h_value[0])
+	if (NULL == item->h_lastsource)
 	{
-		if (0 == strcmp(h_value[0], arg1))
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, "source", 1);
+
+		if (NULL != h_value[0])
+		{
+			item->h_lastsource = zbx_strdup(item->h_lastsource, h_value[0]);
+
+			if (0 == strcmp(h_value[0], arg1))
+				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+			else
+				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+			res = SUCCEED;
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSOURCE is empty");
+		DBfree_history(h_value);
+	}
+	else
+	{
+		if (0 == strcmp(item->h_lastsource, arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 		res = SUCCEED;
 	}
-	else
-		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSOURCE is empty");
-	DBfree_history(h_value);
 
 	zbx_free(arg1);
 clean:
@@ -254,16 +280,26 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function
 	if (ITEM_VALUE_TYPE_LOG != item->value_type)
 		goto clean;
 
-	h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, "severity", 1);
-
-	if (NULL != h_value[0])
+	if (NULL == item->h_lastseverity)
 	{
-		zbx_strlcpy(value, h_value[0], MAX_BUFFER_LEN);
-		res = SUCCEED;
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, "severity", 1);
+
+		if (NULL != h_value[0])
+		{
+			item->h_lastseverity = zbx_strdup(item->h_lastseverity, h_value[0]);
+
+			zbx_strlcpy(value, h_value[0], MAX_BUFFER_LEN);
+			res = SUCCEED;
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSEVERITY is empty");
+		DBfree_history(h_value);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "result for LOGSEVERITY is empty");
-	DBfree_history(h_value);
+	{
+		zbx_strlcpy(value, item->h_lastseverity, MAX_BUFFER_LEN);
+		res = SUCCEED;
+	}
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 

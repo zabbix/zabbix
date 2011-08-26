@@ -371,6 +371,9 @@ typedef struct
 	char	*error;
 
 	char	*h_lastvalue_str[2];
+	char	*h_lasteventid;
+	char	*h_lastsource;
+	char	*h_lastseverity;
 }
 DB_ITEM;
 
