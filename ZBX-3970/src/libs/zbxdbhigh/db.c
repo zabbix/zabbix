@@ -118,12 +118,12 @@ void	DBbegin()
 
 	rc = zbx_db_begin();
 
-	while (ZBX_DB_DOWN == rc)
+	while (ZBX_DB_OK > rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_DOWN == (rc = zbx_db_begin()))
+		if (ZBX_DB_OK > (rc = zbx_db_begin()))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
