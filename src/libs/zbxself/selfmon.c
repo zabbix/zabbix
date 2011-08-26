@@ -84,8 +84,6 @@ extern int	CONFIG_SELFMON_FORKS;
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	get_process_type_forks(unsigned char process_type)
 {
@@ -143,8 +141,6 @@ int	get_process_type_forks(unsigned char process_type)
  * Purpose: Returns process name                                              *
  *                                                                            *
  * Parameters: process_type - [IN] process type; ZBX_PROCESS_TYPE_*           *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -208,13 +204,7 @@ const char	*get_process_type_string(unsigned char process_type)
  * Purpose: Initialize structures and prepare state                           *
  *          for self-monitoring collector                                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	init_selfmon_collector()
@@ -232,9 +222,9 @@ void	init_selfmon_collector()
 
 	sz_total = sz = sizeof(zbx_selfmon_collector_t);
 	sz_total += sz_array = sizeof(zbx_stat_process_t *) * ZBX_PROCESS_TYPE_COUNT;
-	for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
-		sz_total += sz_process[process_type] =
-			sizeof(zbx_stat_process_t) * get_process_type_forks(process_type);
+
+	for (process_type = 0; ZBX_PROCESS_TYPE_COUNT > process_type; process_type++)
+		sz_total += sz_process[process_type] = sizeof(zbx_stat_process_t) * get_process_type_forks(process_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)sz_total);
 
@@ -268,7 +258,7 @@ void	init_selfmon_collector()
 
 	ticks = times(&buf);
 
-	for (process_type = 0; process_type < ZBX_PROCESS_TYPE_COUNT; process_type++)
+	for (process_type = 0; ZBX_PROCESS_TYPE_COUNT > process_type; process_type++)
 	{
 		collector->process[process_type] = (zbx_stat_process_t *)p; p += sz_process[process_type];
 		memset(collector->process[process_type], 0, sz_process[process_type]);
@@ -290,13 +280,7 @@ void	init_selfmon_collector()
  *                                                                            *
  * Purpose: Free memory allocated for self-monitoring collector               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	free_selfmon_collector()
@@ -329,15 +313,9 @@ void	free_selfmon_collector()
  *                                                                            *
  * Function: update_selfmon_counter                                           *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
  * Parameters: state - [IN] new process state; ZBX_PROCESS_STATE_*            *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	update_selfmon_counter(unsigned char state)
@@ -369,15 +347,7 @@ void	update_selfmon_counter(unsigned char state)
  *                                                                            *
  * Function: collect_selfmon_stats                                            *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	collect_selfmon_stats()
@@ -435,11 +405,7 @@ void	collect_selfmon_stats()
  *             value        - [OUT] a pointer to a variable that receives     *
  *                                  requested statistics                      *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int process_num,
@@ -471,7 +437,7 @@ void	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int 
 
 	LOCK_SM;
 
-	if (collector->count <= 1)
+	if (1 >= collector->count)
 		goto unlock;
 
 	if (MAX_HISTORY <= (current = (collector->first + collector->count - 1)))
@@ -486,6 +452,7 @@ void	get_selfmon_stats(unsigned char process_type, unsigned char aggr_func, int 
 
 		for (s = 0; s < ZBX_PROCESS_STATE_COUNT; s++)
 			one_total += process->h_counter[s][current] - process->h_counter[s][collector->first];
+
 		one_counter = process->h_counter[state][current] - process->h_counter[state][collector->first];
 
 		switch (aggr_func)
@@ -530,11 +497,7 @@ static int	sleep_remains;
  *                                                                            *
  * Parameters: sleeptime - [IN] required sleeptime, in seconds                *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_sleep_loop(int sleeptime)
@@ -542,9 +505,9 @@ void	zbx_sleep_loop(int sleeptime)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 	extern unsigned char	process_type;
 	const char		*process_type_string;
-#endif	/* HAVE_FUNCTION_SETPROCTITLE */
+#endif
 
-	if (sleeptime <= 0)
+	if (0 >= sleeptime)
 		return;
 
 	sleep_remains = sleeptime;
@@ -564,7 +527,7 @@ void	zbx_sleep_loop(int sleeptime)
 #endif
 		sleep(1);
 	}
-	while (--sleep_remains > 0);
+	while (0 < --sleep_remains);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 }
