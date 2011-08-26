@@ -470,8 +470,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 			if (SYSINFO_RET_FAIL == err)
 				err = NOTSUPPORTED;
-			else if (err == SYSINFO_RET_TIMEOUT)
-				err = TIMEOUT_ERROR;
 		}
 		else
 		{

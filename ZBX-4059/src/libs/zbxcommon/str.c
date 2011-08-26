@@ -1450,8 +1450,8 @@ int	num_param(const char *p)
  ******************************************************************************/
 int	get_param(const char *p, int num, char *buf, int maxlen)
 {
-/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	state, array, idx = 1, buf_i = 0;
+	int	state;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+	int	array, idx = 1, buf_i = 0;
 
 	*buf = '\0';
 
@@ -1500,8 +1500,9 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 					state = 2;
 				}
 				break;
-			/* Quoted */
 			case 1:
+				/* quoted */
+
 				if ('"' == *p)
 				{
 					if (0 != array && idx == num)
@@ -1525,8 +1526,9 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 				else if (idx == num)
 					buf[buf_i++] = *p;
 				break;
-			/* Unquoted */
 			case 2:
+				/* unquoted */
+
 				if (',' == *p || (']' == *p && 0 != array))
 				{
 					p--;
