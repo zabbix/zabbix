@@ -2164,7 +2164,6 @@
 	'S_NO_HOST_GROUPS_WITH'=>			'No host groups with',
 	'S_INCORRECT_PARAMETERS_FOR_SMALL'=>			'incorrect parameters for',
 	'S_NO_HOST_WITH'=>				'No host with',
-	'S_ALREADY_EXISTS_IN_LINKED_HOSTS_SMALL'=>	'already exists in linked hosts',
 	'S_ADDED_NEW_APPLICATION'=>			'Added new application',
 	'S_UPDATED_APPLICATION'=>			'Updated application',
 	'S_USED_BY_ITEM_SMALL'=>			'used by item',

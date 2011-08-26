@@ -121,7 +121,7 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"4 August 2011"
+#define	ZABBIX_REVDATE		"24 August 2011"
 #define	ZABBIX_VERSION		"1.8.7rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
@@ -632,10 +632,12 @@ const char	*zbx_permission_string(int perm);
 #	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
-#define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
-#define zbx_realloc(src, size)	zbx_realloc2(__FILE__, __LINE__, src, size)
-#define zbx_strdup(old, str)	zbx_strdup2(__FILE__, __LINE__, old, str)
+#define zbx_calloc(old, nmemb, size)	zbx_calloc2(__FILE__, __LINE__, old, nmemb, size)
+#define zbx_malloc(old, size)		zbx_malloc2(__FILE__, __LINE__, old, size)
+#define zbx_realloc(src, size)		zbx_realloc2(__FILE__, __LINE__, src, size)
+#define zbx_strdup(old, str)		zbx_strdup2(__FILE__, __LINE__, old, str)
 
+void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size);
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
 void    *zbx_realloc2(const char *filename, int line, void *src, size_t size);
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);

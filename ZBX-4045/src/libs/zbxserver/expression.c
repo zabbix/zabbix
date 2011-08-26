@@ -942,46 +942,43 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
  *                                                                            *
  ******************************************************************************/
 static int	DBget_history_log_value(DB_TRIGGER *trigger, char **replace_to,
-		int N_functionid, const char *fieldname)
+		int N_functionid, const char *field_name)
 {
 	const char	*__function_name = "DBget_history_log_value";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_RESULT	h_result;
-	DB_ROW		h_row;
 	zbx_uint64_t	functionid;
-	int		value_type, ret = FAIL;
-	char		sql[MAX_STRING_LEN];
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == trigger_get_N_functionid(trigger, N_functionid, &functionid))
 		goto fail;
 
-	result = DBselect("select i.itemid,i.value_type from items i,functions f"
-			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
+	result = DBselect("select i.itemid,i.value_type"
+			" from items i,functions f"
+			" where i.itemid=f.itemid"
+				" and f.functionid=" ZBX_FS_UI64,
 			functionid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		value_type = atoi(row[1]);
+		zbx_uint64_t	itemid;
+		unsigned char	value_type;
+		char		**h_value;
 
-		if (value_type == ITEM_VALUE_TYPE_LOG)
+		if (ITEM_VALUE_TYPE_LOG == (value_type = (unsigned char)atoi(row[1])))
 		{
-			zbx_snprintf(sql, sizeof(sql), "select %s from history_log"
-					" where itemid=%s order by id desc",
-					fieldname,
-					row[0]);
+			ZBX_STR2UINT64(itemid, row[0]);
 
-			h_result = DBselectN(sql, 1);
+			h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, field_name, 1);
 
-			if (NULL != (h_row = DBfetch(h_result)) && SUCCEED != DBis_null(h_row[0]))
+			if (NULL != h_value[0])
 			{
-				*replace_to = zbx_strdup(*replace_to, h_row[0]);
+				*replace_to = zbx_strdup(*replace_to, h_value[0]);
 				ret = SUCCEED;
 			}
-
-			DBfree_result(h_result);
+			DBfree_history(h_value);
 		}
 	}
 	DBfree_result(result);
@@ -1013,11 +1010,8 @@ static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_fun
 	const char	*__function_name = "DBget_item_lastvalue";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_RESULT	h_result;
-	DB_ROW		h_row;
-	zbx_uint64_t	valuemapid, functionid;
-	int		value_type, ret = FAIL;
-	char		tmp[MAX_STRING_LEN];
+	zbx_uint64_t	functionid;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1033,6 +1027,12 @@ static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_fun
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4]))
 	{
+		zbx_uint64_t	itemid, valuemapid;
+		unsigned char	value_type;
+		char		**h_value;
+		char		tmp[MAX_STRING_LEN];
+
+		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
 		ZBX_STR2UINT64(valuemapid, row[2]);
 
@@ -1040,18 +1040,14 @@ static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_fun
 		{
 			case ITEM_VALUE_TYPE_LOG:
 			case ITEM_VALUE_TYPE_TEXT:
-				zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s order by id desc",
-						value_type == ITEM_VALUE_TYPE_LOG ? "history_log" : "history_text",
-						row[0]);
+				h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, 1);
 
-				h_result = DBselectN(tmp, 1);
-
-				if (NULL != (h_row = DBfetch(h_result)))
-					*lastvalue = zbx_strdup(*lastvalue, h_row[0]);
+				if (NULL != h_value[0])
+					*lastvalue = zbx_strdup(*lastvalue, h_value[0]);
 				else
 					*lastvalue = zbx_strdup(*lastvalue, row[4]);
 
-				DBfree_result(h_result);
+				DBfree_history(h_value);
 				break;
 			case ITEM_VALUE_TYPE_STR:
 				zbx_strlcpy(tmp, row[4], sizeof(tmp));
@@ -1101,11 +1097,8 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 	const char	*__function_name = "DBget_item_value";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_RESULT	h_result;
-	DB_ROW		h_row;
-	zbx_uint64_t	functionid, valuemapid;
-	int		value_type, ret = FAIL;
-	char		tmp[MAX_STRING_LEN];
+	zbx_uint64_t	functionid;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1121,30 +1114,34 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		value_type = atoi(row[1]);
+		zbx_uint64_t	itemid, valuemapid;
+		unsigned char	value_type;
+		char		**h_value;
+		char		tmp[MAX_STRING_LEN];
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		value_type = (unsigned char)atoi(row[1]);
 		ZBX_STR2UINT64(valuemapid, row[2]);
 
-		zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s and clock<=%d order by itemid,clock desc",
-				get_table_by_value_type(value_type), row[0], clock);
+		h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, clock, NULL, 1);
 
-		h_result = DBselectN(tmp, 1);
-		if (NULL != (h_row = DBfetch(h_result)))
+		if (NULL != h_value[0])
 		{
 			switch (value_type)
 			{
 				case ITEM_VALUE_TYPE_LOG:
 				case ITEM_VALUE_TYPE_TEXT:
-					*value = zbx_strdup(*value, h_row[0]);
+					*value = zbx_strdup(*value, h_value[0]);
 					break;
 				case ITEM_VALUE_TYPE_STR:
-					zbx_strlcpy(tmp, h_row[0], sizeof(tmp));
+					strscpy(tmp, h_value[0]);
 
 					replace_value_by_map(tmp, sizeof(tmp), valuemapid);
 
 					*value = zbx_strdup(*value, tmp);
 					break;
 				default:
-					zbx_strlcpy(tmp, h_row[0], sizeof(tmp));
+					strscpy(tmp, h_value[0]);
 
 					if (ITEM_VALUE_TYPE_FLOAT == value_type)
 						del_zeroes(tmp);
@@ -1156,7 +1153,7 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 			}
 			ret = SUCCEED;
 		}
-		DBfree_result(h_result);
+		DBfree_history(h_value);
 	}
 	DBfree_result(result);
 fail:
@@ -2246,57 +2243,51 @@ error:
  *                                                                            *
  * Purpose: evaluate trigger expression                                       *
  *                                                                            *
- * Parameters: expression    - [IN] short trigger expression string           *
- *             triggerid     - [IN] trigger identificator from database       *
- *             trigger_value - [IN] current trigger value                     *
- *             error         - [OUT] place error message if any               *
- *                                                                            *
- * Return value:                                                              *
- *             SUCCEED       - evaluated successfully                         *
- *                               result - TRIGGER_VALUE_(FALSE or TRUE)       *
- *             FAIL          - can not evaluate;                              *
- *                               result - TRIGGER_VALUE_UNKNOWN               *
- *                               error  - error message                       *
+ * Parameters: triggerid     - [IN] trigger identificator from database       *
+ *             expression    - [IN] short trigger expression string           *
+ *             value         - [IN] current trigger value                     *
+ *                                  TRIGGER_VALUE_(FALSE or TRUE)             *
+ *             new_value     - [OUT] evaluated value                          *
+ *                                   TRIGGER_VALUE_(FALSE, TRUE or UNKNOWN)   *
+ *             new_error     - [OUT] place error message for UNKNOWN results  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_expression(int *result, char **expression, time_t now,
-		zbx_uint64_t triggerid, int trigger_value, char **error)
+void	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now,
+		int value, int *new_value, char **new_error)
 {
 	const char	*__function_name = "evaluate_expression";
 
 	DB_EVENT	event;
 	int		ret = FAIL;
-	double		value;
+	double		expr_result;
 	char		err[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
-	/* substitute macros first */
 	memset(&event, 0, sizeof(DB_EVENT));
 	event.source = EVENT_SOURCE_TRIGGERS;
 	event.object = EVENT_OBJECT_TRIGGER;
 	event.objectid = triggerid;
-	event.value = trigger_value;
+	event.value = value;
 
 	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, NULL, expression,
 			MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
 	{
-		/* evaluate expression */
 		zbx_remove_spaces(*expression);
-		if (SUCCEED == substitute_functions(expression, now, err, sizeof(err)))
-		{
-			if (SUCCEED == evaluate(&value, *expression, err, sizeof(err)))
-			{
-				if (0 == cmp_double(value, 0))
-					*result = TRIGGER_VALUE_FALSE;
-				else
-					*result = TRIGGER_VALUE_TRUE;
 
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() result:%d", __function_name, *result);
-				ret = SUCCEED;
-			}
+		if (SUCCEED == substitute_functions(expression, now, err, sizeof(err)) &&
+				SUCCEED == evaluate(&expr_result, *expression, err, sizeof(err)))
+		{
+			if (0 == cmp_double(expr_result, 0))
+				*new_value = TRIGGER_VALUE_FALSE;
+			else
+				*new_value = TRIGGER_VALUE_TRUE;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() new_value:%d", __function_name, *new_value);
+
+			ret = SUCCEED;
 		}
 	}
 
@@ -2305,11 +2296,9 @@ int	evaluate_expression(int *result, char **expression, time_t now,
 		zabbix_log(LOG_LEVEL_DEBUG, "%s():expression [%s] cannot be evaluated: %s",
 				__function_name, expression, err);
 
-		*error = zbx_strdup(*error, err);
-		*result = TRIGGER_VALUE_UNKNOWN;
+		*new_error = zbx_strdup(*new_error, err);
+		*new_value = TRIGGER_VALUE_UNKNOWN;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

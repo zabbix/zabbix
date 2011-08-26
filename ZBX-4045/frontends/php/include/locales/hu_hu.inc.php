@@ -1613,7 +1613,6 @@
 	'S_NO_HOST_GROUPS_WITH'=>			'Nincsenek ilyen hosztcsoportok',
 	'S_INCORRECT_PARAMETERS_FOR_SMALL'=>			'hibás paraméterek',
 	'S_NO_HOST_WITH'=>			'Nincs ilyen hoszt',
-	'S_ALREADY_EXISTS_IN_LINKED_HOSTS_SMALL'=>			'már létezik a csatolt hosztokon',
 	'S_ADDED_NEW_APPLICATION'=>			'Új alkalmazás létrehozva',
 	'S_UPDATED_APPLICATION'=>			'Alkalmazás frissítve',
 	'S_USED_BY_ITEM_SMALL'=>			'a következő elem által használva',
