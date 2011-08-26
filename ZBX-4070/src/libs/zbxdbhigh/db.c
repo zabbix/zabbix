@@ -1109,23 +1109,20 @@ void	DBvacuum()
 static int	DBget_escape_string_len(const char *src)
 {
 	const char	*s;
-	int		len = 0;
+	int		len = 1;	/* '\0' */
 
-	len++;	/* '\0' */
-
-	for (s = src; s && *s; s++)
+	for (s = src; NULL != s && '\0' != *s; s++)
 	{
 		if (*s == '\r')
 			continue;
 
-		if (*s == '\''
-#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-			|| *s == '\\'
-#endif
-			)
-		{
+#if defined(HAVE_MYSQL) && defined(HAVE_POSTGRESQL)
+		if (*s == '\'' || *s == '\\')
 			len++;
-		}
+#else
+		if (*s == '\'')
+			len++;
+#endif
 		len++;
 	}
 
@@ -1148,25 +1145,25 @@ static void	DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
-#	define ZBX_DB_ESC_CH	'\''
-#else
+#if defined(HAVE_MYSQL) && defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_ESC_CH	'\\'
+#else
+#	define ZBX_DB_ESC_CH	'\''
 #endif
 	assert(dst);
 
 	len--;	/* '\0' */
 
-	for (s = src, d = dst; s && *s && len; s++)
+	for (s = src, d = dst; NULL != s && '\0' != *s && 0 < len; s++)
 	{
 		if (*s == '\r')
 			continue;
 
-		if (*s == '\''
-#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-			|| *s == '\\'
+#if defined(HAVE_MYSQL) && defined(HAVE_POSTGRESQL)
+		if (*s == '\'' || *s == '\\')
+#else
+		if (*s == '\'')
 #endif
-			)
 		{
 			if (len < 2)
 				break;
@@ -1221,28 +1218,25 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;
-	int		len = 0;
+	int		len = 1;	/* '\0' */
 
-	len++;	/* '\0' */
-
-	for (s = src; s && *s; s++)
+	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
 	{
-		if (max_src_len <= 0)
-			break;
-
 		if (*s == '\r')
 			continue;
 
-		if (*s == '\''
-#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-			|| *s == '\\'
-#endif
-			)
-		{
+#if defined(HAVE_MYSQL) && defined(HAVE_POSTGRESQL)
+		if (*s == '\'' || *s == '\\')
 			len++;
-		}
+#else
+		if (*s == '\'')
+			len++;
+#endif
 		len++;
-		max_src_len--;
+
+		/* only UTF-8 characters should reduce a variable max_src_len */
+		if (0x80 != (0xc0 & *s))
+			max_src_len--;
 	}
 
 	dst = zbx_malloc(dst, len);
@@ -1381,62 +1375,68 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->trends			= atoi(row[23]);
 	item->value_type		= atoi(row[13]);
 
-	if (SUCCEED == DBis_null(row[10]))
-		item->lastvalue_null = 1;
-	else
+	if (SUCCEED != DBis_null(row[10]))
 	{
-		item->lastvalue_null = 0;
-		switch (item->value_type) {
-		case ITEM_VALUE_TYPE_FLOAT:
-			item->lastvalue_dbl = atof(row[10]);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(item->lastvalue_uint64, row[10]);
-			break;
-		default:
-			item->lastvalue_str = row[10];
-			break;
-		}
-	}
+		item->lastvalue_null[0] = 0;
+		item->lastvalue[0].str = row[10];
 
-	if (SUCCEED == DBis_null(row[11]))
-		item->prevvalue_null = 1;
-	else
-	{
-		item->prevvalue_null = 0;
-		switch (item->value_type) {
-		case ITEM_VALUE_TYPE_FLOAT:
-			item->prevvalue_dbl = atof(row[11]);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(item->prevvalue_uint64, row[11]);
-			break;
-		default:
-			item->prevvalue_str = row[11];
-			break;
+		switch (item->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				item->lastvalue[0].dbl = atof(row[10]);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UINT64(item->lastvalue[0].ui64, row[10]);
+				break;
+			default:
+				;
 		}
 	}
+	else
+		item->lastvalue_null[0] = 1;
+
+	if (SUCCEED != DBis_null(row[11]))
+	{
+		item->lastvalue_null[1] = 0;
+		item->lastvalue[1].str = row[11];
+
+		switch (item->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				item->lastvalue[1].dbl = atof(row[11]);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UINT64(item->lastvalue[1].ui64, row[11]);
+				break;
+			default:
+				;
+		}
+	}
+	else
+		item->lastvalue_null[1] = 1;
 
 	ZBX_STR2UINT64(item->hostid, row[12]);
 	item->delta			= atoi(row[14]);
 
-	if (SUCCEED == DBis_null(row[15]))
-		item->prevorgvalue_null = 1;
-	else
+	if (SUCCEED != DBis_null(row[15]))
 	{
 		item->prevorgvalue_null = 0;
-		switch (item->value_type) {
-		case ITEM_VALUE_TYPE_FLOAT:
-			item->prevorgvalue_dbl = atof(row[15]);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(item->prevorgvalue_uint64, row[15]);
-			break;
-		default:
-			item->prevorgvalue_str = row[15];
-			break;
+		item->prevorgvalue.str = row[15];
+
+		switch (item->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				item->prevorgvalue.dbl = atof(row[15]);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UINT64(item->prevorgvalue.ui64, row[15]);
+				break;
+			default:
+				;
 		}
 	}
+	else
+		item->prevorgvalue_null = 1;
 
 	if (SUCCEED == DBis_null(row[16]))
 		item->lastclock = 0;
@@ -1454,9 +1454,18 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->data_type			= atoi(row[25]);
 	item->mtime			= atoi(row[26]);
 
+	item->h_lastvalue_str[0] = NULL;
+	item->h_lastvalue_str[1] = NULL;
+
 	key = zbx_dsprintf(key, "%s", item->key_orig);
 	substitute_simple_macros(NULL, item, NULL, NULL, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 	item->key = key;
+}
+
+void	DBfree_item_from_db(DB_ITEM *item)
+{
+	zbx_free(item->h_lastvalue_str[0]);
+	zbx_free(item->h_lastvalue_str[1]);
 }
 
 const ZBX_TABLE *DBget_table(const char *tablename)

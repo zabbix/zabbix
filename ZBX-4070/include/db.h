@@ -324,6 +324,15 @@ typedef struct
 }
 DB_HOST;
 
+typedef union
+{
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+}
+history_value_t;
+
 typedef struct
 {
 	zbx_uint64_t	itemid;
@@ -342,19 +351,11 @@ typedef struct
 	int     delay;
 	int     history;
 	int	trends;
-	char	*prevorgvalue_str;
-	double	prevorgvalue_dbl;
-	zbx_uint64_t	prevorgvalue_uint64;
-	int	prevorgvalue_null;
-	char	*lastvalue_str;
-	double	lastvalue_dbl;
-	zbx_uint64_t	lastvalue_uint64;
 	int	lastclock;
-	int     lastvalue_null;
-	char	*prevvalue_str;
-	double	prevvalue_dbl;
-	zbx_uint64_t	prevvalue_uint64;
-	int     prevvalue_null;
+	int		lastvalue_null[2];
+	history_value_t	lastvalue[2];
+	int		prevorgvalue_null;
+	history_value_t	prevorgvalue;
 	time_t  lastcheck;
 	zbx_item_value_type_t	value_type;
 	int	delta;
@@ -368,6 +369,8 @@ typedef struct
 	zbx_uint64_t	valuemapid;
 
 	char	*error;
+
+	char	*h_lastvalue_str[2];
 }
 DB_ITEM;
 
@@ -580,6 +583,7 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
+void	DBfree_item_from_db(DB_ITEM *item);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);

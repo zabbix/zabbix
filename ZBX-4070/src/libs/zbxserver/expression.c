@@ -2342,6 +2342,7 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 			else
 				func->value = zbx_strdup(func->value, value);
 		}
+		DBfree_item_from_db(&item);	/* free cached historical fields item.h_* */
 	}
 	DBfree_result(result);
 
@@ -2588,9 +2589,11 @@ void	evaluate_expressions(DB_TRIGGER_UPDATE *tr, int tr_num)
 	}
 
 	for (i = 0; i < tr_num; i++)
+	{
 		if (NULL != tr[i].new_error)
 			zabbix_log(LOG_LEVEL_DEBUG, "%s():expression [%s] cannot be evaluated: %s",
 					__function_name, tr[i].expression, tr[i].new_error);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
