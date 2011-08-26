@@ -28,12 +28,12 @@ foreach ($this->data['iconmaps'] as $iconmap) {
 
 	$row = array();
 	foreach ($mappings as $mapping) {
-		$row[] = $this->data['inventoryList'][$mapping['inventory_link']] . ':'
-				. $mapping['expression'] . SPACE . RARR . SPACE . $this->data['iconList'][$mapping['iconid']];
+		$row[] = $this->data['inventoryList'][$mapping['inventory_link']].':'
+				.$mapping['expression'].SPACE.RARR.SPACE.$this->data['iconList'][$mapping['iconid']];
 		$row[] = BR();
 	}
 	$table->addRow(array(
-			new CLink($iconmap['name'], 'config.php?form=update&iconmapid=' . $iconmap['iconmapid'] . url_param('config')),
+			new CLink($iconmap['name'], 'config.php?form=update&iconmapid='.$iconmap['iconmapid'].url_param('config')),
 			$row
 		));
 }

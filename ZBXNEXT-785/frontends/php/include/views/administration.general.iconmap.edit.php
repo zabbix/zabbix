@@ -44,20 +44,20 @@ $iconMapTable->addRow(array(SPACE, SPACE, _('Inventory field'), _('Expression'),
 order_result($this->data['iconmap']['mappings'], 'sortorder');
 $i = 1;
 foreach ($this->data['iconmap']['mappings'] as $iconmappingid => $mapping) {
-	$numSpan = new CSpan($i++ . ':');
+	$numSpan = new CSpan($i++.':');
 	$numSpan->addClass('rowNum');
 
-	$profileLinksComboBox = new CComboBox('iconmap[mappings][' . $iconmappingid . '][inventory_link]', $mapping['inventory_link']);
+	$profileLinksComboBox = new CComboBox('iconmap[mappings]['.$iconmappingid.'][inventory_link]', $mapping['inventory_link']);
 	$profileLinksComboBox->addItems($this->data['inventoryList']);
 
-	$expressionTextBox = new CTextBox('iconmap[mappings][' . $iconmappingid . '][expression]', $mapping['expression']);
+	$expressionTextBox = new CTextBox('iconmap[mappings]['.$iconmappingid.'][expression]', $mapping['expression']);
 	$expressionTextBox->setAttribute('maxlength', 64);
 
-	$iconsComboBox = new CComboBox('iconmap[mappings][' . $iconmappingid . '][iconid]', $mapping['iconid']);
+	$iconsComboBox = new CComboBox('iconmap[mappings]['.$iconmappingid.'][iconid]', $mapping['iconid']);
 	$iconsComboBox->addClass('mappingIcon');
 	$iconsComboBox->addItems($this->data['iconList']);
 
-	$iconPreviewImage = new CImg('imgstore.php?iconid=' . $mapping['iconid'], 'Preview', 28, 28);
+	$iconPreviewImage = new CImg('imgstore.php?iconid='.$mapping['iconid'], 'Preview', 28, 28);
 	$iconPreviewImage->addClass('pointer preview');
 
 	$row = new CRow(array(
@@ -69,7 +69,7 @@ foreach ($this->data['iconmap']['mappings'] as $iconmappingid => $mapping) {
 		$iconPreviewImage,
 		new CSpan(_('Remove'), 'link_menu removeMapping'),
 	), 'sortable');
-	$row->setAttribute('id', 'iconmapidRow_' . $iconmappingid);
+	$row->setAttribute('id', 'iconmapidRow_'.$iconmappingid);
 	$iconMapTable->addRow($row);
 }
 
@@ -93,7 +93,7 @@ $iconsComboBox->addClass('mappingIcon');
 $iconsComboBox->addItems($this->data['iconList']);
 $iconsComboBox->setAttribute('disabled', 'disabled');
 
-$iconPreviewImage = new CImg('imgstore.php?iconid=' . $firstIconId, 'Preview', 28, 28);
+$iconPreviewImage = new CImg('imgstore.php?iconid='.$firstIconId, 'Preview', 28, 28);
 $iconPreviewImage->addClass('pointer preview');
 
 $hiddenRow = new CRow(array(
@@ -116,14 +116,14 @@ $addCol->setColSpan(5);
 $iconMapTable->addRow(array(SPACE, $addCol));
 
 // <default icon row>
-$numSpan = new CSpan($i++ . ':');
+$numSpan = new CSpan($i++.':');
 $numSpan->addClass('rowNum');
 
 $iconsComboBox = new CComboBox('iconmap[default_iconid]', $this->data['iconmap']['default_iconid']);
 $iconsComboBox->addClass('mappingIcon');
 $iconsComboBox->addItems($this->data['iconList']);
 
-$iconPreviewImage = new CImg('imgstore.php?iconid=' . $this->data['iconmap']['default_iconid'], 'Preview', 28, 28);
+$iconPreviewImage = new CImg('imgstore.php?iconid='.$this->data['iconmap']['default_iconid'], 'Preview', 28, 28);
 $iconPreviewImage->addClass('pointer preview');
 
 $col = new CCol(_('Default'));
@@ -146,7 +146,7 @@ $secondaryActions = array(new CButtonCancel(url_param('config')));
 if (isset($this->data['iconmapid'])) {
 	array_unshift($secondaryActions,
 		new CSubmit('clone', _('Clone')),
-		new CButtonDelete(_('Delete icon map?'), url_param('form') . url_param('iconmapid') . url_param('config'))
+		new CButtonDelete(_('Delete icon map?'), url_param('form').url_param('iconmapid').url_param('config'))
 	);
 }
 $footer = makeFormFooter(array(new CSubmit('save', _('Save'))), $secondaryActions);
