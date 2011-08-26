@@ -57,7 +57,7 @@ foreach ($this->data['iconmap']['mappings'] as $iconmappingid => $mapping) {
 	$iconsComboBox->addClass('mappingIcon');
 	$iconsComboBox->addItems($this->data['iconList']);
 
-	$iconPreviewImage = new CImg('imgstore.php?iconid='.$mapping['iconid'], 'Preview', 28, 28);
+	$iconPreviewImage = new CImg('imgstore.php?iconid='.$mapping['iconid'], _('Preview'), ZBX_ICON_PREVIEW_WIDTH, ZBX_ICON_PREVIEW_HEIGHT);
 	$iconPreviewImage->addClass('pointer preview');
 
 	$row = new CRow(array(
@@ -93,7 +93,7 @@ $iconsComboBox->addClass('mappingIcon');
 $iconsComboBox->addItems($this->data['iconList']);
 $iconsComboBox->setAttribute('disabled', 'disabled');
 
-$iconPreviewImage = new CImg('imgstore.php?iconid='.$firstIconId, 'Preview', 28, 28);
+$iconPreviewImage = new CImg('imgstore.php?iconid='.$firstIconId, _('Preview'), ZBX_ICON_PREVIEW_WIDTH, ZBX_ICON_PREVIEW_HEIGHT);
 $iconPreviewImage->addClass('pointer preview');
 
 $hiddenRow = new CRow(array(
@@ -123,7 +123,7 @@ $iconsComboBox = new CComboBox('iconmap[default_iconid]', $this->data['iconmap']
 $iconsComboBox->addClass('mappingIcon');
 $iconsComboBox->addItems($this->data['iconList']);
 
-$iconPreviewImage = new CImg('imgstore.php?iconid='.$this->data['iconmap']['default_iconid'], 'Preview', 28, 28);
+$iconPreviewImage = new CImg('imgstore.php?iconid='.$this->data['iconmap']['default_iconid'], _('Preview'), ZBX_ICON_PREVIEW_WIDTH, ZBX_ICON_PREVIEW_HEIGHT);
 $iconPreviewImage->addClass('pointer preview');
 
 $col = new CCol(_('Default'));
