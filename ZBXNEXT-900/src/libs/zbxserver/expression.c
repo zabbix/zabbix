@@ -1806,7 +1806,11 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
 					if (0 != event->trigger.triggerid)
+					{
 						replace_to = zbx_strdup(replace_to, event->trigger.url);
+						substitute_simple_macros(event, item, dc_host, dc_item, escalation, &replace_to,
+								MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
+					}
 					else
 						ret = FAIL;
 				}
@@ -1996,6 +2000,14 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 					if (NULL != replace_to && FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
 						zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 				}
+			}
+		}
+		else if (macro_type & MACRO_TYPE_TRIGGER_URL)
+		{
+			if (EVENT_SOURCE_TRIGGERS == event->source)
+			{
+				if (0 == strcmp(m, MVAR_TRIGGER_ID))
+					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
 			}
 		}
 		else if (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_HOST_IPMI_IP))
