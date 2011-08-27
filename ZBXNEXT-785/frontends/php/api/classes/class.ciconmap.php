@@ -90,7 +90,7 @@ class CIconMap extends CZBXAPI {
 
 			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
-					$sql_parts['select'][$field] = 'im.' . $field;
+					$sql_parts['select'][$field] = 'im.'.$field;
 				}
 			}
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -155,10 +155,10 @@ class CIconMap extends CZBXAPI {
 		if (!zbx_empty($options['sortfield'])) {
 			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
-			$sql_parts['order'][] = 'im.' . $options['sortfield'] . ' ' . $sortorder;
+			$sql_parts['order'][] = 'im.'.$options['sortfield'].' '.$sortorder;
 
-			if (!str_in_array('im.' . $options['sortfield'], $sql_parts['select']) && !str_in_array('im.*', $sql_parts['select'])) {
-				$sql_parts['select'][] = 'im.' . $options['sortfield'];
+			if (!str_in_array('im.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('im.*', $sql_parts['select'])) {
+				$sql_parts['select'][] = 'im.'.$options['sortfield'];
 			}
 		}
 
@@ -186,17 +186,17 @@ class CIconMap extends CZBXAPI {
 			$sql_from .= implode(',', $sql_parts['from']);
 		}
 		if (!empty($sql_parts['where'])) {
-			$sql_where .= ' AND ' . implode(' AND ', $sql_parts['where']);
+			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
 		}
 		if (!empty($sql_parts['order'])) {
-			$sql_order .= ' ORDER BY ' . implode(',', $sql_parts['order']);
+			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
 		}
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT ' . $sql_select .
-				' FROM ' . $sql_from .
-				' WHERE ' . DBin_node('im.iconmapid', $nodeids) .
-				$sql_where .
+		$sql = 'SELECT '.$sql_select.
+				' FROM '.$sql_from.
+				' WHERE '.DBin_node('im.iconmapid', $nodeids).
+				$sql_where.
 				$sql_order;
 		//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
@@ -240,7 +240,7 @@ class CIconMap extends CZBXAPI {
 		// Adding Objects
 		// Adding Conditions
 		if (!is_null($options['selectMappings']) && str_in_array($options['selectMappings'], $subselects_allowed_outputs)) {
-			$sql = 'SELECT imp.* FROM icon_mapping imp WHERE ' . DBcondition('imp.iconmapid', $iconMapids);
+			$sql = 'SELECT imp.* FROM icon_mapping imp WHERE '.DBcondition('imp.iconmapid', $iconMapids);
 			$res = DBselect($sql);
 			while ($mapping = DBfetch($res)) {
 				$result[$mapping['iconmapid']]['mappings'][$mapping['iconmappingid']] = $mapping;
@@ -330,7 +330,7 @@ class CIconMap extends CZBXAPI {
 		$duplicates = array();
 		foreach ($iconMaps as $iconMap) {
 			if (!check_db_fields(array('iconmapid' => null), $iconMap)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters are used for icon map update method "%s".', $iconMap['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameters for icon map update method "%s".', $iconMap['name']));
 			}
 
 			if (isset($iconMap['name'])) {
@@ -362,7 +362,7 @@ class CIconMap extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map with iconmapid "%s" does not exist.', $iconMap['iconmapid']));
 			}
 
-			// Existance
+			// Existence
 			if (isset($iconMap['name'])) {
 				$options = array(
 					'filter' => array('name' => $iconMap['name']),
@@ -439,7 +439,7 @@ class CIconMap extends CZBXAPI {
 				' FROM sysmaps m, icon_map im'.
 				' WHERE m.iconmapid=im.iconmapid'.
 					' AND '.DBcondition('m.iconmapid', $iconmapids);
-		if($names = DBfetch(DBselect($sql))){
+		if ($names = DBfetch(DBselect($sql))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Icon map "%1$s" cannot be deleted. Used in map "%2$s"',	$names['iconmapname'], $names['mapname'])
 			);
@@ -451,7 +451,7 @@ class CIconMap extends CZBXAPI {
 	}
 
 	/**
-	 * Check if user have read permissions for given icon map ids.
+	 * Check if user has read permissions for given icon map IDs.
 	 * @param $ids
 	 * @return bool
 	 */
@@ -476,7 +476,7 @@ class CIconMap extends CZBXAPI {
 	}
 
 	/**
-	 * Check if user have write permissions for given icon map ids.
+	 * Check if user has write permissions for given icon map IDs.
 	 * @param $ids
 	 * @return bool
 	 */
@@ -534,35 +534,35 @@ class CIconMap extends CZBXAPI {
 			$uniqField = array();
 			foreach ($iconMap['mappings'] as $mapping) {
 				if (!isset($mapping['expression'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Required field "expression" is missed in mapping.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Required field "expression" is missing in icon mapping.'));
 				}
 				elseif (!isset($mapping['inventory_link'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Required field "inventory_link" is missed in mapping.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Required field "inventory_link" is missing in icon mapping.'));
 				}
 				elseif (!isset($mapping['iconid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Required field "iconid" is missed in mapping.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Required field "iconid" is missing in icon mapping.'));
 				}
 				elseif (!isset($inventoryFields[$mapping['inventory_link']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Icon map "%1$s" has mapping with wrong inventory link "%2$s".', $iconMap['name'], $mapping['inventory_link']));
+						_s('Icon map "%1$s" has mapping with incorrect inventory link "%2$s".', $iconMap['name'], $mapping['inventory_link']));
 				}
 				elseif (!isset($imageIds[$mapping['iconid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Icon map "%1$s" has mapping with wrong iconid "%2$s".', $iconMap['name'], $mapping['iconid']));
+						_s('Icon map "%1$s" has mapping with incorrect iconid "%2$s".', $iconMap['name'], $mapping['iconid']));
 				}
 
 				try {
 					GlobalRegExp::isValid($mapping['expression']);
 				}
 				catch(Exception $e) {
-					switch($e->getCode()) {
+					switch ($e->getCode()) {
 						case GlobalRegExp::ERROR_REGEXP_EMPTY:
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_s('Icon map "%s" cannot have mapping with empty expression.', $iconMap['name']));
 							break;
 						case GlobalRegExp::ERROR_REGEXP_NOT_EXISTS:
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Icon map "%s" cannot have mapping with global expression that does not exists.', $iconMap['name']));
+								_s('Icon map "%s" cannot have mapping with global expression that does not exist.', $iconMap['name']));
 							break;
 						default:
 							self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -570,14 +570,14 @@ class CIconMap extends CZBXAPI {
 					}
 				}
 
-				if (isset($uniqField[$mapping['inventory_link'] . $mapping['expression']])) {
+				if (isset($uniqField[$mapping['inventory_link'].$mapping['expression']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Icon mapping entry "%1$s" against "%2$s" already exists.',
 							$mapping['expression'],
 							$inventoryFields[$mapping['inventory_link']]['title'])
 					);
 				}
-				$uniqField[$mapping['inventory_link'] . $mapping['expression']] = true;
+				$uniqField[$mapping['inventory_link'].$mapping['expression']] = true;
 			}
 		}
 	}
