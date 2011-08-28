@@ -24,7 +24,7 @@ require_once('include/maps.inc.php');
 require_once('include/ident.inc.php');
 require_once('include/forms.inc.php');
 
-if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])){
+if (isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])) {
 	$EXPORT_DATA = true;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
@@ -32,7 +32,7 @@ if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['m
 
 	require_once('include/export.inc.php');
 }
-else{
+else {
 	$EXPORT_DATA = false;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);

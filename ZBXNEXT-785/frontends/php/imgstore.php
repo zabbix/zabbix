@@ -40,7 +40,7 @@ include_once('include/page_header.php');
 	check_fields($fields);
 ?>
 <?php
-	if(isset($_REQUEST['css'])){
+	if (isset($_REQUEST['css'])) {
 		$css = 'div.sysmap_iconid_0{'.
 				' height: 50px; '.
 				' width: 50px; '.
@@ -52,7 +52,7 @@ include_once('include/page_header.php');
 			'select_image' => 1,
 		);
 		$images = API::Image()->get($options);
-		foreach($images as $inum => $image){
+		foreach ($images as $inum => $image) {
 //SDI($image['image']);
 			$image['image'] = base64_decode($image['image']);
 
@@ -60,31 +60,31 @@ include_once('include/page_header.php');
 			$w = imagesx($ico);
 			$h = imagesy($ico);
 
-			$css.= 'div.sysmap_iconid_'.$image['imageid'].'{'.
-						' height: '.$h.'px; '.
-						' width: '.$w.'px; '.
+			$css .= 'div.sysmap_iconid_'.$image['imageid'].'{'.
+						' height: '.$h.'px;'.
+						' width: '.$w.'px;'.
 						' background: url("imgstore.php?iconid='.$image['imageid'].'") no-repeat center center;}'."\n";
 		}
 
 		print($css);
 	}
-	elseif(isset($_REQUEST['iconid'])){
+	elseif (isset($_REQUEST['iconid'])) {
 		$iconid = get_request('iconid', 0);
 
-		if($iconid > 0){
+		if ($iconid > 0) {
 			$image = get_image_by_imageid($iconid);
 			print($image['image']);
 		}
-		else{
+		else {
 			$image = get_default_image(true);
 			ImageOut($image);
 		}
 	}
-	elseif(isset($_REQUEST['imageid'])){
+	elseif (isset($_REQUEST['imageid'])) {
 		$imageid = get_request('imageid',0);
 
 		session_start();
-		if(isset($_SESSION['image_id'][$imageid])){
+		if (isset($_SESSION['image_id'][$imageid])) {
 			echo $_SESSION['image_id'][$imageid];
 			unset($_SESSION['image_id'][$imageid]);
 		}
