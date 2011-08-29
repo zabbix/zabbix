@@ -52,8 +52,8 @@ class CHost extends CZBXAPI{
  * @param boolean $options['selectGraphs'] select Graphs
  * @param boolean $options['selectApplications'] select Applications
  * @param boolean $options['selectMacros'] select Macros
- * @param boolean|array $options['selectProfile'] select Profile
- * @param boolean $options['withProfile'] select only hosts with profiles
+ * @param boolean|array $options['selectInventory'] select Inventory
+ * @param boolean $options['withInventory'] select only hosts with inventory
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in Host name
  * @param string $options['extendPattern'] search hosts by pattern in Host name, ip and DNS
@@ -108,7 +108,7 @@ class CHost extends CZBXAPI{
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
-			'withProfile'				=> null,
+			'withInventory'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 
@@ -118,6 +118,7 @@ class CHost extends CZBXAPI{
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
@@ -133,7 +134,7 @@ class CHost extends CZBXAPI{
 			'selectMacros'				=> null,
 			'selectScreens'				=> null,
 			'selectInterfaces'			=> null,
-			'selectProfile'				=> null,
+			'selectInventory'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -486,11 +487,11 @@ class CHost extends CZBXAPI{
 						' AND i.itemid=gi.itemid)';
 		}
 
-// withProfile
-		if(!is_null($options['withProfile']) && $options['withProfile']){
+// withInventory
+		if(!is_null($options['withInventory']) && $options['withInventory']){
 			$sql_parts['where'][] = ' h.hostid IN ( '.
-					' SELECT hp.hostid '.
-					' FROM host_profile hp )';
+					' SELECT hin.hostid '.
+					' FROM host_inventory hin )';
 		}
 
 // search
@@ -607,8 +608,8 @@ class CHost extends CZBXAPI{
 					if(!is_null($options['selectDiscoveries']) && !isset($result[$host['hostid']]['discoveries'])){
 						$result[$host['hostid']]['discoveries'] = array();
 					}
-					if(!is_null($options['selectProfile']) && !isset($result[$host['hostid']]['profile'])){
-						$result[$host['hostid']]['profile'] = array();
+					if(!is_null($options['selectInventory']) && !isset($result[$host['hostid']]['inventory'])){
+						$result[$host['hostid']]['inventory'] = array();
 					}
 					if(!is_null($options['selectTriggers']) && !isset($result[$host['hostid']]['triggers'])){
 						$result[$host['hostid']]['triggers'] = array();
@@ -768,28 +769,28 @@ Copt::memoryPick();
 			}
 		}
 
-// Adding Profiles
-		if(!is_null($options['selectProfile']) && $options['selectProfile'] !== false){
-			if(is_array($options['selectProfile'])){
+// Adding Inventories
+		if(!is_null($options['selectInventory']) && $options['selectInventory'] !== false){
+			if(is_array($options['selectInventory'])){
 				// if we are given a list of fields that needs to be fetched
-				$dbTable = DB::getSchema('host_profile');
-				$selectHP = array('hp.hostid');
-				foreach($options['selectProfile'] as $field){
+				$dbTable = DB::getSchema('host_inventory');
+				$selectHIn = array('hin.hostid');
+				foreach($options['selectInventory'] as $field){
 					if(isset($dbTable['fields'][$field]))
-						$selectHP[] = 'hp.'.$field;
+						$selectHIn[] = 'hin.'.$field;
 				}
 			}
 			else{
 				// all fields are needed
-				$selectHP = array('hp.*');
+				$selectHIn = array('hin.*');
 			}
 
-			$sql = 'SELECT '.implode(', ', $selectHP).
-				' FROM host_profile hp '.
-				' WHERE '.DBcondition('hp.hostid', $hostids);
-			$db_profile = DBselect($sql);
-			while($profile = DBfetch($db_profile))
-				$result[$profile['hostid']]['profile'] = $profile;
+			$sql = 'SELECT '.implode(', ', $selectHIn).
+				' FROM host_inventory hin '.
+				' WHERE '.DBcondition('hin.hostid', $hostids);
+			$db_inventory = DBselect($sql);
+			while($inventory = DBfetch($db_inventory))
+				$result[$inventory['hostid']]['inventory'] = $inventory;
 		}
 
 // Adding Templates
@@ -1301,7 +1302,7 @@ Copt::memoryPick();
 		$hostNames = array();
 		foreach($hosts as $inum => &$host){
 			if(!check_db_fields($hostDBfields, $host)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host "%s"', isset($host['host']) ? $host['host'] : ''));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
 			}
 
 			if($update || $delete){
@@ -1317,17 +1318,17 @@ Copt::memoryPick();
 				}
 
 				if(!isset($host['groups']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s"', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
 
 				if(!isset($host['interfaces']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s"', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s".', $host['host']));
 			}
 
 			if($delete) continue;
 
 			if(isset($host['groups'])){
 				if(!is_array($host['groups']) || empty($host['groups']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s"', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for host "%s".', $host['host']));
 
 				foreach($host['groups'] as $gnum => $group){
 					if(!isset($dbGroups[$group['groupid']])){
@@ -1338,7 +1339,7 @@ Copt::memoryPick();
 
 			if(isset($host['interfaces'])){
 				if(!is_array($host['interfaces']) || empty($host['interfaces']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s"', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for host "%s".', $host['host']));
 			}
 
 			if(isset($host['host'])){
@@ -1357,11 +1358,11 @@ Copt::memoryPick();
 				}
 
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Host name "%s"', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for host name "%s".', $host['host']));
 				}
 
 				if(isset($hostNames['host'][$host['host']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same host name "%s" already exists in data', $host['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same host name "%s" already exists in data.', $host['host']));
 
 				$hostNames['host'][$host['host']] = $update ? $host['hostid'] : 1;
 			}
@@ -1371,7 +1372,7 @@ Copt::memoryPick();
 					// if visible name is empty replace it with host name
 					if(zbx_empty(trim($host['name']))){
 						if(!isset($host['host'])){
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Visible name cannot be empty if missing host name'));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Visible name cannot be empty if host name is missing.'));
 		}
 						$host['name'] = $host['host'];
 					}
@@ -1392,8 +1393,7 @@ Copt::memoryPick();
 				}
 
 				if(isset($hostNames['name'][$host['name']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same visible name "%s" already exists in data', $host['name']));
-
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate host. Host with the same visible name "%s" already exists in data.', $host['name']));
 				$hostNames['name'][$host['name']] = $update ? $host['hostid'] : 1;
 			}
 		}
@@ -1505,16 +1505,16 @@ Copt::memoryPick();
 				self::exception();
 			}
 
-			if(isset($host['profile']) && !empty($host['profile'])){
-				$fields = array_keys($host['profile']);
-				$fields[] = 'profile_mode';
+			if(isset($host['inventory']) && !empty($host['inventory'])){
+				$fields = array_keys($host['inventory']);
+				$fields[] = 'inventory_mode';
 				$fields = implode(', ', $fields);
 
-				$values = array_map('zbx_dbstr', $host['profile']);
-				$values[] = $host['profile_mode'];
+				$values = array_map('zbx_dbstr', $host['inventory']);
+				$values[] = isset($host['inventory_mode']) ? $host['inventory_mode'] : HOST_INVENTORY_MANUAL;
 				$values = implode(', ', $values);
 
-				DBexecute('INSERT INTO host_profile (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
+				DBexecute('INSERT INTO host_inventory (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
 			}
 		}
 
@@ -1574,17 +1574,17 @@ Copt::memoryPick();
 //----
 				if(!empty($interfacesToDelete)){
 					$result = API::HostInterface()->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
-					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed'));
+					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 				}
 
 				if(!empty($interfacesToUpdate)){
 					$result = API::HostInterface()->update($interfacesToUpdate);
-					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed'));
+					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 				}
 
 				if(!empty($interfacesToAdd)){
 					$result = API::HostInterface()->create($interfacesToAdd);
-					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed'));
+					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 				}
 			}
 			unset($host['interfaces']);
@@ -1593,7 +1593,7 @@ Copt::memoryPick();
 			$data['hosts'] = $host;
 			$result = $this->massUpdate($data);
 
-			if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed'));
+			if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 		}
 
 		return array('hostids' => $hostids);
@@ -1620,7 +1620,7 @@ Copt::memoryPick();
 
 		foreach($data['hosts'] as $hnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have enough rights for operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have enough rights for operation.'));
 			}
 		}
 
@@ -1711,7 +1711,7 @@ Copt::memoryPick();
 
 // CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 		if(isset($data['groups']) && empty($data['groups'])){
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for hosts'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No groups for hosts.'));
 		}
 // }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
 
@@ -1719,17 +1719,17 @@ Copt::memoryPick();
 // UPDATE HOSTS PROPERTIES {{{
 			if(isset($data['name'])){
 				if(count($hosts) > 1){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible host name'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible host name.'));
 				}
 			}
 
 		if(isset($data['host'])){
 			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Hostname "%s"', $data['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for host name "%s".', $data['host']));
 			}
 
 			if(count($hosts) > 1){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update host name'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update host name.'));
 			}
 
 			$cur_host = reset($hosts);
@@ -1747,7 +1747,7 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
-//can't add host with the same name as existing template
+// can't add host with the same name as existing template
 			if(API::Template()->exists(array('host' => $cur_host['host'])))
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$cur_host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 		}
@@ -1778,11 +1778,11 @@ Copt::memoryPick();
 			unset($data['macros']);
 		}
 
-		if(isset($data['profile'])){
-			$updateProfile = $data['profile'];
-			$updateProfile['profile_mode'] = $data['profile_mode'];
-			unset($data['profile']);
-			unset($data['profile_mode']);
+		if(isset($data['inventory'])){
+			$updateInventory = $data['inventory'];
+			$updateInventory['inventory_mode'] = $data['inventory_mode'];
+			unset($data['inventory']);
+			unset($data['inventory_mode']);
 		}
 
 		if(isset($data['status'])){
@@ -1821,7 +1821,7 @@ Copt::memoryPick();
 					'groups' => zbx_toObject($groups_to_add, 'groupid')
 				));
 				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add group'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add host group.'));
 				}
 			}
 
@@ -1830,7 +1830,7 @@ Copt::memoryPick();
 			if(!empty($groupids_to_del)){
 				$result = $this->massRemove(array('hostids' => $hostids, 'groupids' => $groupids_to_del));
 				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot remove group'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host group.'));
 				}
 			}
 		}
@@ -1926,14 +1926,14 @@ Copt::memoryPick();
 			if(!empty($macrosToDelete)){
 				$result = $this->massRemove(array('hostids' => $hostids, 'macros' => $macrosToDelete));
 				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot remove macro'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot remove macro.'));
 				}
 			}
 
 			if(!empty($macrosToUpdate)){
 				$result = API::UserMacro()->massUpdate(array('hosts' => $hosts, 'macros' => $macrosToUpdate));
 				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update macro'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update macro.'));
 				}
 			}
 
@@ -1942,92 +1942,92 @@ Copt::memoryPick();
 
 				$result = $this->massAdd(array('hosts' => $hosts, 'macros' => $macrosToAdd));
 				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add macro'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add macro.'));
 				}
 			}
 		}
 // }}} UPDATE MACROS
 
 
-// PROFILE {{{
-		if(isset($updateProfile)){
+// INVENTORY {{{
+		if(isset($updateInventory)){
 
-			if($updateProfile['profile_mode'] == HOST_PROFILE_DISABLED){
-				$sql = 'DELETE FROM host_profile WHERE '.DBcondition('hostid', $hostids);
+			if($updateInventory['inventory_mode'] == HOST_INVENTORY_DISABLED){
+				$sql = 'DELETE FROM host_inventory WHERE '.DBcondition('hostid', $hostids);
 				if(!DBexecute($sql))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete profile'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete inventory.'));
 			}
 
 			else{
-				$hostsWithProfiles = array();
-				$existing_profiles_db = DBselect('SELECT hostid FROM host_profile WHERE '.DBcondition('hostid', $hostids));
-				while($existing_profile = DBfetch($existing_profiles_db)){
-					$hostsWithProfiles[] = $existing_profile['hostid'];
+				$hostsWithInventories = array();
+				$existing_inventories_db = DBselect('SELECT hostid FROM host_inventory WHERE '.DBcondition('hostid', $hostids));
+				while($existing_inventory = DBfetch($existing_inventories_db)){
+					$hostsWithInventories[] = $existing_inventory['hostid'];
 				}
 
-				// when hosts are being updated to use automatic mode for host profiles,
-				// we must check if some items are set to populate profile fields of every host.
+				// when hosts are being updated to use automatic mode for host inventories,
+				// we must check if some items are set to populate inventory fields of every host.
 				// if they do, mass update for those fields should be ignored
-				if($updateProfile['profile_mode'] == HOST_PROFILE_AUTOMATIC){
+				if($updateInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC){
 					// getting all items on all affected hosts
 					$options = array(
-						'output' => array('profile_link', 'hostid'),
+						'output' => array('inventory_link', 'hostid'),
 						'filter' => array('hostid' => $hostids),
 						'nopermissions' => true
 					);
-					$itemsToProfiles = API::item()->get($options);
+					$itemsToInventories = API::item()->get($options);
 
-					// gathering links to array: 'hostid'=>array('profile_name_1'=>true, 'profile_name_2'=>true)
-					$profileLinksOnHosts = array();
-					$profileFields = getHostProfiles();
-					foreach($itemsToProfiles as $pr){
-						if($pr['profile_link'] != 0){ // 0 means 'no link'
-							if(isset($profileLinksOnHosts[$pr['hostid']])){
-								$profileLinksOnHosts[$pr['hostid']][$profileFields[$pr['profile_link']]['db_field']] = true;
+					// gathering links to array: 'hostid'=>array('inventory_name_1'=>true, 'inventory_name_2'=>true)
+					$inventoryLinksOnHosts = array();
+					$inventoryFields = getHostInventories();
+					foreach($itemsToInventories as $pr){
+						if($pr['inventory_link'] != 0){ // 0 means 'no link'
+							if(isset($inventoryLinksOnHosts[$pr['hostid']])){
+								$inventoryLinksOnHosts[$pr['hostid']][$inventoryFields[$pr['inventory_link']]['db_field']] = true;
 							}else{
-								$profileLinksOnHosts[$pr['hostid']] = array($profileFields[$pr['profile_link']]['db_field']=>true);
+								$inventoryLinksOnHosts[$pr['hostid']] = array($inventoryFields[$pr['inventory_link']]['db_field']=>true);
 							}
 						}
 					}
 
-					// now we have all info we need to determine, which profile fields should be saved
-					$profilesToSave = array();
+					// now we have all info we need to determine, which inventory fields should be saved
+					$inventoriesToSave = array();
 					foreach($hostids as $hostid){
-						$profilesToSave[$hostid] = $updateProfile;
-						$profilesToSave[$hostid]['hostid'] = $hostid;
-						foreach($updateProfile as $profileName=>$pr){
-							if(isset($profileLinksOnHosts[$hostid][$profileName])){
-								unset($profilesToSave[$hostid][$profileName]);
+						$inventoriesToSave[$hostid] = $updateInventory;
+						$inventoriesToSave[$hostid]['hostid'] = $hostid;
+						foreach($updateInventory as $inventoryName=>$pr){
+							if(isset($inventoryLinksOnHosts[$hostid][$inventoryName])){
+								unset($inventoriesToSave[$hostid][$inventoryName]);
 							}
 						}
 					}
 				}
 				else{
 					// if mode is not automatic, all the fields can be saved
-					$profilesToSave = array();
+					$inventoriesToSave = array();
 					foreach($hostids as $hostid){
-						$profilesToSave[$hostid] = $updateProfile;
-						$profilesToSave[$hostid]['hostid'] = $hostid;
+						$inventoriesToSave[$hostid] = $updateInventory;
+						$inventoriesToSave[$hostid]['hostid'] = $hostid;
 					}
 				}
 
-				$hostsWithoutProfile = array_diff($hostids, $hostsWithProfiles);
+				$hostsWithoutInventory = array_diff($hostids, $hostsWithInventories);
 
-				// hosts that have no profiles yet, need profiles to be inserted
-				foreach($hostsWithoutProfile as $hostid){
-					DB::insert('host_profile', array($profilesToSave[$hostid]), false);
+				// hosts that have no inventory yet, need it to be inserted
+				foreach($hostsWithoutInventory as $hostid){
+					DB::insert('host_inventory', array($inventoriesToSave[$hostid]), false);
 				}
 
-				// those hosts that already have a profile, need their profiles to be updated
-				foreach($hostsWithProfiles as $hostid){
-					DB::update('host_profile', array(
-						'values' => $profilesToSave[$hostid],
+				// those hosts that already have an inventory, need it to be updated
+				foreach($hostsWithInventories as $hostid){
+					DB::update('host_inventory', array(
+						'values' => $inventoriesToSave[$hostid],
 						'where' => array('hostid' => $hostid)
 					));
 				}
 			}
 		}
-// }}} PROFILE
+// }}} INVENTORY
 		return array('hostids' => $hostids);
 	}
 
@@ -2114,7 +2114,7 @@ Copt::memoryPick();
  */
 	public function delete($hosts){
 
-		if(empty($hosts)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+		if(empty($hosts)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 		$hosts = zbx_toArray($hosts);
 		$hostids = zbx_objectValues($hosts, 'hostid');
@@ -2226,8 +2226,8 @@ Copt::memoryPick();
 			'operationid'=>$delOperationids,
 		));
 
-// delete host profile
-			DB::delete('host_profile', array('hostid'=>$hostids));
+// delete host inventory
+			DB::delete('host_inventory', array('hostid'=>$hostids));
 
 // delete host applications
 		DB::delete('applications', array('hostid'=>$hostids));

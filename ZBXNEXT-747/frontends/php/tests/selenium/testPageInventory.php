@@ -24,7 +24,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 class testPageInventory extends CWebTest{
 	// Returns all host inventories
 	public static function allInventory(){
-		return DBdata("select * from host_profile order by hostid");
+		return DBdata("select * from host_inventory order by hostid");
 	}
 
 	/**
@@ -35,12 +35,12 @@ class testPageInventory extends CWebTest{
 		$host = DBfetch(DBselect("select name from hosts where hostid=$hostid"));
 		$name = $host['name'];
 
-		$this->login('hostprofiles.php');
+		$this->login('hostinventories.php');
 
 		$this->dropdown_select_wait('groupid','all');
 
-		$this->assertTitle('Host profiles');
-		$this->ok('HOST PROFILES');
+		$this->assertTitle('Host inventories');
+		$this->ok('HOST INVENTORIES');
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
 // Header
@@ -61,9 +61,9 @@ class testPageInventory extends CWebTest{
 	/**
 	* @dataProvider allInventory
 	*/
-	public function testPageHostProfile_ViewProfile($inventory){
-		$this->login('hostprofiles.php?hostid='.$inventory['hostid']);
-		$this->assertTitle('Host profiles');
+	public function testPageHostInventory_ViewInventory($inventory){
+		$this->login('hostinventories.php?hostid='.$inventory['hostid']);
+		$this->assertTitle('Host inventories');
 
 		unset($inventory['hostid']);
 		$this->ok($inventory);
@@ -71,11 +71,11 @@ class testPageInventory extends CWebTest{
 		$this->button_click('cancel');
 		$this->wait();
 
-		$this->assertTitle('Host profiles');
-		$this->ok('HOST PROFILES');
+		$this->assertTitle('Host inventories');
+		$this->ok('HOST INVENTORIES');
 	}
 
-	public function testPageHostProfile_Sorting(){
+	public function testPageHostInventory_Sorting(){
 // TODO
 		$this->markTestIncomplete();
 	}

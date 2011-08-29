@@ -85,9 +85,7 @@ zbx_graph_item_type;
 
 #define	ZBX_DB_CONNECT_NORMAL	0
 #define	ZBX_DB_CONNECT_EXIT	1
-
-#define DB_FULL_DELETE	0
-#define DB_PART_DELETE	1
+#define	ZBX_DB_CONNECT_ONCE	2
 
 #define TRIGGER_DESCRIPTION_LEN		1020
 #define TRIGGER_DESCRIPTION_LEN_MAX	TRIGGER_DESCRIPTION_LEN+1
@@ -212,6 +210,7 @@ zbx_graph_item_type;
 				"i.lastclock,i.units,i.multiplier,i.formula,i.status,"		\
 				"i.valuemapid,i.trends,i.data_type"
 #define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
+#define ZBX_SQL_TIME_FUNCTIONS	"'nodata','date','dayofmonth','dayofweek','time','now'"
 #define ZBX_SQL_ITEM_FIELDS_NUM	19
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
@@ -302,7 +301,7 @@ typedef struct
 	int		object;
 	int		clock;
 	int		value;
-	int		value_changed;
+	unsigned char	value_changed;
 	int		acknowledged;
 	int		ns;
 }
@@ -491,25 +490,26 @@ const char	*DBnode(const char *fieldid, int nodeid);
 #define DBis_node_local_id(id)	DBis_node_id(id, CONFIG_NODEID)
 int	DBis_node_id(zbx_uint64_t id, int nodeid);
 
-int	DBping();
-
-void    DBconnect(int flag);
+int	DBconnect(int flag);
 void	DBinit();
 
-void    DBclose();
+void	DBclose();
 
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define DBexecute __zbx_DBexecute
-#endif /* HAVE___VA_ARGS__ */
+#endif
 int	__zbx_DBexecute(const char *fmt, ...);
 
 #ifdef HAVE___VA_ARGS__
-#	define DBselect(fmt, ...) __zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define DBselect_once(fmt, ...)	__zbx_DBselect_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define DBselect(fmt, ...)	__zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
-#	define DBselect __zbx_DBselect
-#endif /* HAVE___VA_ARGS__ */
+#	define DBselect_once	__zbx_DBselect_once
+#	define DBselect		__zbx_DBselect
+#endif
+DB_RESULT	__zbx_DBselect_once(const char *fmt, ...);
 DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
 DB_RESULT	DBselectN(const char *query, int n);
@@ -555,9 +555,9 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBremove_escalation(zbx_uint64_t escalationid);
 void	DBupdate_triggers_status_after_restart();
-int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger_value, int trigger_flags,
-		const char *trigger_error, int new_value, int new_flags, const zbx_timespec_t *ts, const char *reason);
-
+int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_uint64_t triggerid,
+		unsigned char type, int value, int value_flags, const char *error, int new_value, const char *new_error,
+		const zbx_timespec_t *ts, unsigned char *add_event, unsigned char *value_changed);
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
 int	DBget_queue_count(int from, int to);
@@ -591,9 +591,8 @@ int	DBdelete_host(zbx_uint64_t hostid);
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, int *gitems_alloc, int *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 
-/* History related functions */
-int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
-int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
+void	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
+void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
 void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num);
 
@@ -616,7 +615,18 @@ char	*DBsql_id_ins(zbx_uint64_t id);
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		unsigned char useip, const char *ip, const char *dns, unsigned short port);
 
-const char	*DBget_profile_field(unsigned char profile_link);
-unsigned short	DBget_profile_field_len(unsigned char profile_link);
+const char	*DBget_inventory_field(unsigned char inventory_link);
+unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
+
+#define ZBX_DB_GET_HIST_MIN	0
+#define ZBX_DB_GET_HIST_AVG	1
+#define ZBX_DB_GET_HIST_MAX	2
+#define ZBX_DB_GET_HIST_SUM	3
+#define ZBX_DB_GET_HIST_COUNT	4
+#define ZBX_DB_GET_HIST_DELTA	5
+#define ZBX_DB_GET_HIST_VALUE	6
+char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to,
+		zbx_timespec_t *ts, const char *field_name, int last_n);
+void	DBfree_history(char **value);
 
 #endif

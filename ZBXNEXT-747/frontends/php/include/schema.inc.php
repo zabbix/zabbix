@@ -2299,25 +2299,25 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '1',
 			),
 			'problem_ack_style' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '1',
 			),
 			'ok_unack_style' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '1',
 			),
 			'ok_ack_style' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '0',
+				'default' => '1',
 			),
 		),
 	),
@@ -3033,7 +3033,7 @@ return array(
 			),
 		),
 	),
-	'host_profile' => array(
+	'host_inventory' => array(
 		'key' => 'hostid',
 		'fields' => array(
 			'hostid' => array(
@@ -3043,7 +3043,7 @@ return array(
 				'ref_table' => 'hosts',
 				'ref_field' => 'hostid',
 			),
-			'profile_mode' => array(
+			'inventory_mode' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -3818,7 +3818,7 @@ return array(
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			),
-			'profile_link' => array(
+			'inventory_link' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -4303,6 +4303,12 @@ return array(
 				'default' => '',
 			),
 			'dynamic' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'sort_triggers' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

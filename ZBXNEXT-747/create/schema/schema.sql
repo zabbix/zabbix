@@ -514,10 +514,10 @@ FIELD		|problem_unack_color|t_varchar(6)|'DC0000'|NOT NULL	|ZBX_SYNC
 FIELD		|problem_ack_color|t_varchar(6)	|'DC0000'|NOT NULL	|ZBX_SYNC 
 FIELD		|ok_unack_color	|t_varchar(6)	|'00AA00'|NOT NULL	|ZBX_SYNC
 FIELD		|ok_ack_color	|t_varchar(6)	|'00AA00'|NOT NULL	|ZBX_SYNC   
-FIELD		|problem_unack_style|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
-FIELD		|problem_ack_style|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
-FIELD		|ok_unack_style	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
-FIELD		|ok_ack_style	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
+FIELD		|problem_unack_style|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|problem_ack_style|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|ok_unack_style	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|ok_ack_style	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|snmptrap_logging|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 
 TABLE|globalvars|globalvarid|0
@@ -675,9 +675,9 @@ FIELD		|groupid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|groups
 UNIQUE		|1		|hostid,groupid
 INDEX		|2		|groupid
 
-TABLE|host_profile|hostid|ZBX_SYNC
+TABLE|host_inventory|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
-FIELD		|profile_mode	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|type_full	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
@@ -816,7 +816,7 @@ FIELD		|filter		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|interfaceid	|t_id		|	|NULL		|ZBX_SYNC,ZBX_PROXY	|4|interface	|		|RESTRICT
 FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|profile_link	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|inventory_link	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid

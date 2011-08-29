@@ -339,7 +339,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	$form->cleanItems();
 	$form->addVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
-		$form->addItem(new CSubmit('form', _('Create Action')));
+		$form->addItem(new CSubmit('form', _('Create action')));
 	}
 	$action_wdgt->addPageHeader(_('CONFIGURATION OF ACTIONS'), $form);
 
@@ -380,11 +380,18 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$action['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
 			$action['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG);
 
-			$action['conditions'] = get_request('conditions', array(array(
-				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
-				'operator' => CONDITION_OPERATOR_EQUAL,
-				'value' => TRIGGER_VALUE_TRUE
-			)));
+			$action['conditions'] = get_request('conditions', array(
+				array(
+					'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
+					'operator' => CONDITION_OPERATOR_EQUAL,
+					'value' => TRIGGER_VALUE_TRUE,
+				),
+				array(
+					'conditiontype' => CONDITION_TYPE_MAINTENANCE,
+					'operator' => CONDITION_OPERATOR_NOT_IN,
+					'value' => '',
+				),
+			));
 			$action['operations'] = get_request('operations', array());
 		}
 
@@ -412,7 +419,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$form = new CForm();
 		$form->setName('actions');
 
-		$tblActions = new CTableInfo(_('No actions defined'));
+		$tblActions = new CTableInfo(_('No actions defined.'));
 		$tblActions->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->getName()."','all_items','g_actionid');"),
 			make_sorting_header(_('Name'), 'name'),

@@ -28,6 +28,7 @@
 #include "mutexs.h"
 #include "zbxserver.h"
 #include "proxy.h"
+#include "events.h"
 
 #include "memalloc.h"
 #include "zbxalgo.h"
@@ -791,14 +792,13 @@ static void	DCsync_trends()
 static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char		*__function_name = "DCmass_update_triggers";
-
-	int			i, item_num = 0, value;
+	int			sql_offset = 0;
+	int			i, item_num = 0;
 	zbx_uint64_t		*itemids = NULL;
 	zbx_timespec_t		*timespecs = NULL;
 	zbx_hashset_t		trigger_info;
 	zbx_vector_ptr_t	trigger_order;
 	DC_TRIGGER		*trigger;
-	char			error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -829,27 +829,46 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num);
 
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 7, "begin\n");
+#endif
+
 	for (i = 0; i < trigger_order.values_num; i++)
 	{
 		trigger = (DC_TRIGGER *)trigger_order.values[i];
 
-		if (SUCCEED != evaluate_expression(&value, &trigger->expression, trigger->timespec.sec,
-					trigger->triggerid, trigger->value, error, sizeof(error)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s",
-					trigger->expression, error);
+		evaluate_expression(trigger->triggerid, &trigger->expression, trigger->timespec.sec,
+				trigger->value, &trigger->new_value, &trigger->new_error);
 
-			DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value, trigger->value_flags,
-					trigger->old_error, trigger->value, TRIGGER_VALUE_FLAG_UNKNOWN, &trigger->timespec,
-					error);
-		}
-		else
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_allocated, &sql_offset, trigger->triggerid,
+				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->new_value,
+				trigger->new_error, &trigger->timespec, &trigger->add_event, &trigger->value_changed))
 		{
-			DBupdate_trigger_value(trigger->triggerid, trigger->type, trigger->value, trigger->value_flags,
-					trigger->old_error, value, TRIGGER_VALUE_FLAG_NORMAL, &trigger->timespec, NULL);
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 3, ";\n");
 		}
+
+		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 
 		zbx_free(trigger->expression);
+		zbx_free(trigger->new_error);
+	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 6, "end;\n");
+#endif
+
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	for (i = 0; i < trigger_order.values_num; i++)
+	{
+		trigger = (DC_TRIGGER *)trigger_order.values[i];
+
+		if (1 != trigger->add_event)
+			continue;
+
+		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid, &trigger->timespec,
+				trigger->new_value, trigger->value_changed, 0, 0);
 	}
 
 	zbx_hashset_destroy(&trigger_info);
@@ -1053,43 +1072,43 @@ notsupported:
 	zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 32, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 }
 
-static void	DCadd_update_profile_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY *h, unsigned char profile_link)
+static void	DCadd_update_inventory_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY *h, unsigned char inventory_link)
 {
-	const char	*profile_field;
+	const char	*inventory_field;
 	char		value[MAX_BUFFER_LEN], *value_esc;
-	int		update_profile = 0;
-	unsigned short	profile_field_len;
+	int		update_inventory = 0;
+	unsigned short	inventory_field_len;
 
-	if (1 == h->value_null || NULL == (profile_field = DBget_profile_field(profile_link)))
+	if (1 == h->value_null || NULL == (inventory_field = DBget_inventory_field(inventory_link)))
 		return;
 
 	switch (h->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, h->value.dbl);
-			update_profile = 1;
+			update_inventory = 1;
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, h->value.ui64);
-			update_profile = 1;
+			update_inventory = 1;
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			strscpy(value, h->value_orig.str);
-			update_profile = 1;
+			update_inventory = 1;
 			break;
 	}
 
-	if (1 != update_profile)
+	if (1 != update_inventory)
 		return;
 
 	zbx_format_value(value, sizeof(value), item->valuemapid, item->units, h->value_type);
 
-	profile_field_len = DBget_profile_field_len(profile_link);
-	value_esc = DBdyn_escape_string_len(value, profile_field_len);
+	inventory_field_len = DBget_inventory_field_len(inventory_link);
+	value_esc = DBdyn_escape_string_len(value, inventory_field_len);
 	zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 128 + strlen(value_esc),
-			"update host_profile set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
-			profile_field, value_esc, item->hostid);
+			"update host_inventory set %s='%s' where hostid=" ZBX_FS_UI64 ";\n",
+			inventory_field, value_esc, item->hostid);
 	zbx_free(value_esc);
 }
 
@@ -1115,7 +1134,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	ZBX_DC_HISTORY	*h;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc, ids_num = 0;
-	unsigned char	profile_link;
+	unsigned char	inventory_link;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1125,13 +1144,13 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 247,
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 253,
 			"select i.itemid,i.status,i.lastclock,i.prevorgvalue,i.delta,i.multiplier,i.formula,"
-				"i.history,i.trends,i.lastns,i.hostid,i.profile_link,hp.profile_mode,i.valuemapid,"
+				"i.history,i.trends,i.lastns,i.hostid,i.inventory_link,hi.inventory_mode,i.valuemapid,"
 				"i.units,i.error"
 			" from items i"
-				" left join host_profile hp"
-					" on hp.hostid=i.hostid"
+				" left join host_inventory hi"
+					" on hi.hostid=i.hostid"
 			" where");
 
 	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "i.itemid", ids, ids_num);
@@ -1197,10 +1216,10 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		item.trends = atoi(row[8]);
 		ZBX_STR2UINT64(item.hostid, row[10]);
 
-		if (SUCCEED != DBis_null(row[12]) && HOST_PROFILE_AUTOMATIC == (unsigned char)atoi(row[12]))
-			profile_link = (unsigned char)atoi(row[11]);
+		if (SUCCEED != DBis_null(row[12]) && HOST_INVENTORY_AUTOMATIC == (unsigned char)atoi(row[12]))
+			inventory_link = (unsigned char)atoi(row[11]);
 		else
-			profile_link = 0;
+			inventory_link = 0;
 
 		ZBX_DBROW2UINT64(item.valuemapid, row[13]);
 		item.units = row[14];
@@ -1219,7 +1238,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		}
 
 		DCadd_update_item_sql(&sql_offset, &item, h);
-		DCadd_update_profile_sql(&sql_offset, &item, h, profile_link);
+		DCadd_update_inventory_sql(&sql_offset, &item, h, inventory_link);
 
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 	}
@@ -1229,7 +1248,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1307,7 +1326,7 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 
 	zbx_free(ids);
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1768,7 +1787,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 }
 
@@ -1927,7 +1946,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -2929,12 +2948,11 @@ zbx_uint64_t	DCget_nextid_shared(const char *table_name)
 	ZBX_DC_ID	*id;
 	zbx_uint64_t	nextid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'",
-			__function_name, table_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, table_name);
 
 	LOCK_CACHE_IDS;
 
-	for (i = 0; i < ZBX_IDS_SIZE; i++)
+	for (i = 0; ZBX_IDS_SIZE > i; i++)
 	{
 		id = &ids->id[i];
 
@@ -2951,29 +2969,16 @@ zbx_uint64_t	DCget_nextid_shared(const char *table_name)
 			break;
 	}
 
-	if (i == ZBX_IDS_SIZE)
+	if (ZBX_IDS_SIZE == i)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for ids");
-		exit(-1);
+		zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for ids");
+		exit(FAIL);
 	}
 
-	if (id->reserved > 0)
-	{
-		id->lastid++;
-		id->reserved--;
-
-		nextid = id->lastid;
-
-		UNLOCK_CACHE_IDS;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 "]",
-				__function_name, table_name, nextid);
-
-		return nextid;
-	}
+	if (0 < id->reserved)
+		goto exit;
 
 	UNLOCK_CACHE_IDS;
-
 retry:
 	nextid = DBget_nextid(table_name, ZBX_RESERVE) - 1;
 
@@ -2999,7 +3004,7 @@ retry:
 		id->lastid = nextid;
 		id->reserved = ZBX_RESERVE;
 	}
-
+exit:
 	id->lastid++;
 	id->reserved--;
 

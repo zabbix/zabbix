@@ -465,7 +465,7 @@ function item_type2str($type = null){
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
-					'authtype,username,password,publickey,privatekey,flags,filter,description,profile_link'.
+					'authtype,username,password,publickey,privatekey,flags,filter,description,inventory_link'.
 			' FROM items '.
 			' WHERE itemid='.$itemid;
 		$row = DBfetch(DBselect($sql));
@@ -594,8 +594,6 @@ function item_type2str($type = null){
 	 *   name: 'Test item $1, $2, $3'
 	 *   result: 'Test item a, b, Zabbix-server'
 	 *
-	 * @author Konstantin Buravcov
-	 * @see ZBX-3503
 	 * @param array $item
 	 * @return string
 	 */
@@ -610,12 +608,22 @@ function item_type2str($type = null){
 
 			if($ItemKey->isValid()){
 				$keyParameters = $ItemKey->getParameters();
-				// according to zabbix docs we must replace $1 to $9 macros with item key parameters
-				for($paramNo = 9; $paramNo > 0; $paramNo--){
-					$replaceTo = isset($keyParameters[$paramNo - 1]) ? $keyParameters[$paramNo - 1] : '';
-					$name = str_replace('$'.$paramNo, $replaceTo, $name);
+
+				$searchOffset = 0;
+				while(preg_match('/\$[1-9]/', $name, $matches, PREG_OFFSET_CAPTURE, $searchOffset)){
+					// matches[0][0] - matched param, [1] - second character of it
+					$paramNumber = $matches[0][0][1] - 1;
+					$replaceString = isset($keyParameters[$paramNumber]) ? $keyParameters[$paramNumber] : '';
+
+					$name = substr_replace($name, $replaceString, $matches[0][1], 2);
+					$searchOffset = $matches[0][1] + strlen($replaceString);
 				}
 			}
+		}
+
+		if(preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $name, $arr)){
+			$macros = API::UserMacro()->getMacros(array('macros' => $arr[1], 'itemid' => $item['itemid']));
+			$name = str_replace(array_keys($macros), array_values($macros), $name);
 		}
 
 		return $name;
@@ -642,18 +650,12 @@ function item_type2str($type = null){
 		return $item['itemid'];
 	}
 
-/*
- * Function: get_items_data_overview
- *
- * Description:
- *     Retrieve overview table object for items
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
+	/**
+	 * Retrieve overview table object for items.
+	 * @param $hostids
+	 * @param null $view_style
+	 * @return CTableInfo
+	 */
 	function get_items_data_overview($hostids,$view_style=null){
 		global $USER_DETAILS;
 

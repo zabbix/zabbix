@@ -587,17 +587,19 @@ static ZBX_DC_HOST	*DCfind_host(zbx_uint64_t proxy_hostid, const char *host)
 		return host_ph->host_ptr;
 }
 
-static void	DCstrpool_replace(int found, const char **curr, const char *new)
+static int	DCstrpool_replace(int found, const char **curr, const char *new)
 {
-	if (0 == found)
+	if (1 == found)
 	{
-		*curr = zbx_strpool_intern(new);
-	}
-	else if (0 != strcmp(*curr, new))
-	{
+		if (0 == strcmp(*curr, new))
+			return FAIL;
+
 		zbx_strpool_release(*curr);
-		*curr = zbx_strpool_intern(new);
 	}
+
+	*curr = zbx_strpool_intern(new);
+
+	return SUCCEED;	/* indicate that the string has been replaced */
 }
 
 static void	DCupdate_item_queue(ZBX_DC_ITEM *item, unsigned char old_poller_type, int old_nextcheck)
@@ -880,6 +882,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		old_poller_type = item->poller_type;
 		poller_by_item(itemid, proxy_hostid, item->type, item->key, item->flags, &item->poller_type);
+
 		if (ZBX_POLLER_TYPE_UNREACHABLE == old_poller_type &&
 				(ZBX_POLLER_TYPE_NORMAL == item->poller_type ||
 				ZBX_POLLER_TYPE_IPMI == item->poller_type ||
@@ -931,22 +934,34 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* items with flexible intervals */
 
-		if (SUCCEED != DBis_null(row[16]) && '\0' != *row[16])
+		if ('\0' != *row[16])
 		{
 			flexitem = DCfind_id(&config->flexitems, itemid, sizeof(ZBX_DC_FLEXITEM), &found);
 
-			DCstrpool_replace(found, &flexitem->delay_flex, row[16]);
+			if (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]) &&
+					ITEM_STATUS_NOTSUPPORTED != item->status)
+			{
+				item->nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
+						item->delay, flexitem->delay_flex, now, NULL);
+			}
 		}
 		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
 		{
-			/* remove delay_flex parameter for non-flexible item */
+			/* remove delay_flex parameter for non-flexible item and update nextcheck */
+
 			zbx_strpool_release(flexitem->delay_flex);
 			zbx_hashset_remove(&config->flexitems, &itemid);
+
+			if (ITEM_STATUS_NOTSUPPORTED != item->status)
+			{
+				item->nextcheck = calculate_item_nextcheck(item->interfaceid, item->itemid, item->type,
+						item->delay, NULL, now, NULL);
+			}
 		}
 
 		/* trapper items */
 
-		if (ITEM_TYPE_TRAPPER == item->type && SUCCEED != DBis_null(row[17]) && '\0' != *row[17])
+		if (ITEM_TYPE_TRAPPER == item->type && '\0' != *row[17])
 		{
 			trapitem = DCfind_id(&config->trapitems, itemid, sizeof(ZBX_DC_TRAPITEM), &found);
 
@@ -961,7 +976,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* log items */
 
-		if (ITEM_VALUE_TYPE_LOG == item->value_type && SUCCEED != DBis_null(row[18]) && '\0' != *row[18])
+		if (ITEM_VALUE_TYPE_LOG == item->value_type && '\0' != *row[18])
 		{
 			logitem = DCfind_id(&config->logitems, itemid, sizeof(ZBX_DC_LOGITEM), &found);
 
@@ -976,7 +991,7 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* db items */
 
-		if (ITEM_TYPE_DB_MONITOR == item->type && SUCCEED != DBis_null(row[19]) && '\0' != *row[19])
+		if (ITEM_TYPE_DB_MONITOR == item->type && '\0' != *row[19])
 		{
 			dbitem = DCfind_id(&config->dbitems, itemid, sizeof(ZBX_DC_DBITEM), &found);
 
@@ -3207,13 +3222,14 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 {
 	dst_trigger->triggerid = src_trigger->triggerid;
 	dst_trigger->expression = zbx_strdup(NULL, src_trigger->expression);
-	strscpy(dst_trigger->old_error, src_trigger->error);
+	strscpy(dst_trigger->error, src_trigger->error);
 	dst_trigger->new_error = NULL;
 	dst_trigger->timespec.sec = 0;
 	dst_trigger->timespec.ns = 0;
 	dst_trigger->type = src_trigger->type;
 	dst_trigger->value = src_trigger->value;
 	dst_trigger->value_flags = src_trigger->value_flags;
+	dst_trigger->new_value = TRIGGER_VALUE_UNKNOWN;
 }
 
 /******************************************************************************
@@ -3337,7 +3353,7 @@ unlock:
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, const char **errors, int item_num)
+		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int item_num)
 {
 	int			i, j, found;
 	const ZBX_DC_ITEM	*dc_item;
@@ -3370,7 +3386,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 						trigger->timespec.ns = timespecs[i].ns;
 
 						if (NULL != errors)
-							trigger->new_error = errors[i];
+							trigger->new_error = zbx_strdup(NULL, errors[i]);
 					}
 				}
 				else if (NULL != errors)
@@ -3985,10 +4001,13 @@ void	DCrequeue_reachable_item(zbx_uint64_t itemid, unsigned char status, int now
 		dc_item->status = status;
 
 		old_poller_type = dc_item->poller_type;
-		if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type)
-			if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-				poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type,
-						dc_item->key, dc_item->flags, &dc_item->poller_type);
+
+		if (ZBX_POLLER_TYPE_UNREACHABLE == dc_item->poller_type &&
+				NULL != (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		{
+			poller_by_item(dc_item->itemid, dc_host->proxy_hostid, dc_item->type,
+					dc_item->key, dc_item->flags, &dc_item->poller_type);
+		}
 
 		old_nextcheck = dc_item->nextcheck;
 		dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, now);

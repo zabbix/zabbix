@@ -120,7 +120,7 @@ switch($itemType) {
 												ITEM_TYPE_DB_MONITOR.','.
 												ITEM_TYPE_TELNET.','.
 												ITEM_TYPE_CALCULATED,'type'), $paramsFieldName),
-		'profile_link' =>       array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})&&{value_type}!='.ITEM_VALUE_TYPE_LOG),
+		'inventory_link' =>       array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})&&{value_type}!='.ITEM_VALUE_TYPE_LOG),
 
 		//hidden fields for better gui
 		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
@@ -151,7 +151,7 @@ switch($itemType) {
 		'multiplier'=>		array(T_ZBX_INT, O_OPT,  null,  null,		null),
 		'delta'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({value_type})&&'.IN('0,3','value_type').'(isset({data_type})&&({data_type}!='.ITEM_DATA_TYPE_BOOLEAN.'))'),
 
-		'formula'=>		array(T_ZBX_DBL, O_OPT,  null,  '({value_type}==0&&{}!=0)||({value_type}==3&&{}>0)',	'isset({save})&&isset({multiplier})&&({multiplier}==1)', S_CUSTOM_MULTIPLIER),
+		'formula'=>		array(T_ZBX_DBL, O_OPT,  P_UNSET_EMPTY,  '({value_type}==0&&{}!=0)||({value_type}==3&&{}>0)',	'isset({save})&&isset({multiplier})&&({multiplier}==1)', S_CUSTOM_MULTIPLIER),
 		'logtimefmt'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
 
 		'group_itemid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
@@ -447,7 +447,7 @@ switch($itemType) {
 			'ipmi_sensor'		=> get_request('ipmi_sensor'),
 			'data_type'		=> get_request('data_type'),
 			'applications' => $applications,
-			'profile_link' => get_request('profile_link'),
+			'inventory_link' => get_request('inventory_link'),
 		);
 
 		if(isset($_REQUEST['itemid'])){
@@ -597,7 +597,7 @@ switch($itemType) {
 				'params'			=> get_request('params'),
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
 				'data_type'		=> get_request('data_type'),
-				'profile_link'  => get_request('profile_link'),
+				'inventory_link'  => get_request('inventory_link'),
 				'applications'  => get_request('applications',array())
 			);
 		$delay_flex = get_request('delay_flex',array());

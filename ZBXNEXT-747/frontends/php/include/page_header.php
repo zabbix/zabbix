@@ -120,9 +120,9 @@
 	$main_menu	= array();
 	$sub_menus	= array();
 
-	$denyed_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
+	$denied_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
 
-	zbx_flush_post_cookies($denyed_page_requested);
+	zbx_flush_post_cookies($denied_page_requested);
 
 	if($page['type'] == PAGE_TYPE_HTML){
 ?>
@@ -153,7 +153,8 @@
 		echo '.average { background-color: #' . $config['severity_color_3']. ' !important;}'."\n";
 		echo '.warning { background-color: #' . $config['severity_color_2']. ' !important;}'."\n";
 		echo '.information { background-color: #' . $config['severity_color_1']. ' !important;}'."\n";
-		echo '.unknown_trigger { background-color: #' . $config['severity_color_0']. ' !important;}'."\n";
+		echo '.not_classified { background-color: #' . $config['severity_color_0']. ' !important;}'."\n";
+		echo '.trigger_unknown { background-color: #DBDBDB !important;}'."\n";
 		echo '</style>';
 
 	}
@@ -443,7 +444,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	unset($db_nodes, $node_data);
 	unset($sub_menu_table, $sub_menu_rows);
 
-	if($denyed_page_requested){
+	if($denied_page_requested){
 		access_deny();
 	}
 

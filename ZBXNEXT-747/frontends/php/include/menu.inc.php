@@ -83,7 +83,7 @@ $ZBX_MENU = array(
 						'user_type'=>USER_TYPE_ZABBIX_ADMIN),
 				array(
 						'url'=>'srv_status.php',
-						'label'=>_('IT Services'),
+						'label'=>_('IT services'),
 						'forse_disable_all_nodes' => true,
 						'sub_pages'=>array('report3.php','report7.php','chart_sla.php','chart5.php')
 					),
@@ -100,8 +100,8 @@ $ZBX_MENU = array(
 			'node_perm'		=> PERM_READ_LIST,
 			'default_page_id'	=> 0,
 			'pages'=>array(
-				array('url'=>'hostprofilesoverview.php', 'label'=>_('Overview')),
-				array('url'=>'hostprofiles.php', 'label'=>_('Hosts'))
+				array('url'=>'hostinventoriesoverview.php', 'label'=>_('Overview')),
+				array('url'=>'hostinventories.php', 'label'=>_('Hosts'))
 			)
 	),
 	'reports'=>array(
@@ -192,7 +192,7 @@ $ZBX_MENU = array(
 					'label' => _('Discovery')
 					),
 				array('url'=>'services.php',
-						'label'=>_('IT Services'),
+						'label'=>_('IT services'),
 						'sub_pages'=>array('services_form.php')
 					),
 			)
@@ -258,7 +258,7 @@ $ZBX_MENU = array(
 function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 	global $ZBX_MENU, $USER_DETAILS;
 
-	$denyed_page_requested = false;
+	$denied_page_requested = false;
 
 /* NOTE - menu array format:
 	first level:
@@ -335,7 +335,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 //SDI($label.' : '.$show_menu.' : '.$deny);
 
 		if($page_exists && $deny){
-			$denyed_page_requested = true;
+			$denied_page_requested = true;
 		}
 
 		if(!$show_menu){
@@ -356,10 +356,10 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 	}
 
 	if(!$page_exists && ($page['type']!=PAGE_TYPE_XML)&&($page['type']!=PAGE_TYPE_CSV)&&($page['type']!=PAGE_TYPE_TEXT_FILE)){
-		$denyed_page_requested = true;
+		$denied_page_requested = true;
 	}
 
-return $denyed_page_requested;
+return $denied_page_requested;
 }
 
 function zbx_define_menu_restrictions($page, $ZBX_MENU){

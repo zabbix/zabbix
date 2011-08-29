@@ -194,11 +194,14 @@ return true;
 
 function cancelEvent(e){
 	if(!e) e = window.event;
-//SDI(e.type);
+
 	if(e){
 		if(IE){
 			e.cancelBubble = true;
 			e.returnValue = false;
+			if(IE9){
+				e.preventDefault();
+			}
 		}
 		else{
 			e.stopPropagation();

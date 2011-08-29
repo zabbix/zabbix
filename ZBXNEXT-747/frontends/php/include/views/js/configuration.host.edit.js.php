@@ -122,23 +122,23 @@ function removeInterfaceRow(hostInterfaceId){
 
 jQuery(document).ready(function(){
 
-	// radio button of profile modes was clicked
-	jQuery("div.jqueryinputset input[name=profile_mode]").click(function(){
+	// radio button of inventory modes was clicked
+	jQuery("div.jqueryinputset input[name=inventory_mode]").click(function(){
 		// action depending on which button was clicked
-		var profileFields = jQuery("#profilelist :input:gt(2)");
+		var inventoryFields = jQuery("#inventorylist :input:gt(2)");
 		switch(jQuery(this).val()){
-			case '<?php echo HOST_PROFILE_DISABLED ?>':
-				profileFields.attr("disabled", "disabled"); // disabling all input fields
+			case '<?php echo HOST_INVENTORY_DISABLED ?>':
+				inventoryFields.attr("disabled", "disabled"); // disabling all input fields
 				jQuery('.populating_item').hide();
 			break;
-			case '<?php echo HOST_PROFILE_MANUAL ?>':
-				profileFields.removeAttr("disabled"); // enabling all input fields (if they were disabled)
+			case '<?php echo HOST_INVENTORY_MANUAL ?>':
+				inventoryFields.removeAttr("disabled"); // enabling all input fields (if they were disabled)
 				jQuery('.populating_item').hide();
 			break;
-			case '<?php echo HOST_PROFILE_AUTOMATIC ?>':
+			case '<?php echo HOST_INVENTORY_AUTOMATIC ?>':
 				// disabling all input fields
-				profileFields.removeAttr("disabled");
-				profileFields.filter('.linked_to_item').attr("disabled", "disabled"); // disabling all input fields
+				inventoryFields.removeAttr("disabled");
+				inventoryFields.filter('.linked_to_item').attr("disabled", "disabled"); // disabling all input fields
 				jQuery('.populating_item').show();
 			break;
 		}
