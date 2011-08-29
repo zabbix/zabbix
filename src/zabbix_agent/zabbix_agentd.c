@@ -460,7 +460,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	/* allocate memory for a collector, all listeners and an active check */
 	threads_num = 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0);
-	threads = calloc(threads_num, sizeof(ZBX_THREAD_HANDLE));
+	threads = zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
 	/* start the collector thread */
 	thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
@@ -514,7 +514,14 @@ int	MAIN_ZABBIX_ENTRY()
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 #else
-	wait(&i);
+	while (-1 == wait(&i))	/* wait for any child to exit */
+	{
+		if (EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			break;
+		}
+	}
 
 	/* all exiting child processes should be caught by signal handlers */
 	THIS_SHOULD_NEVER_HAPPEN;

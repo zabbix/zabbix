@@ -590,7 +590,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_HISTSYNCER_FORKS + CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS
 			+ CONFIG_JAVAPOLLER_FORKS + CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS
 			+ CONFIG_SELFMON_FORKS;
-	threads = calloc(threads_num, sizeof(pid_t));
+	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 < CONFIG_TRAPPER_FORKS)
 	{
@@ -616,7 +616,14 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "server #0 started [main process]");
 
-		wait(&i);	/* wait for any child to exit */
+		while (-1 == wait(&i))	/* wait for any child to exit */
+		{
+			if (EINTR != errno)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+				break;
+			}
+		}
 
 		/* all exiting child processes should be caught by signal handlers */
 		THIS_SHOULD_NEVER_HAPPEN;

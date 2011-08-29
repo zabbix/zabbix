@@ -20,7 +20,7 @@
 #include "common.h"
 #include "log.h"
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
 #endif
@@ -37,16 +37,16 @@ char	ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 const char	*get_program_name(const char *path)
 {
 	const char	*filename = NULL;
 
 	for (filename = path; path && *path; path++)
-		if (*path == '\\' || *path == '/')
+	{
+		if ('\\' == *path || '/' == *path)
 			filename = path + 1;
+	}
 
 	return filename;
 }
@@ -57,18 +57,14 @@ const char	*get_program_name(const char *path)
  *                                                                            *
  * Purpose: Get Node ID by resource ID                                        *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: Node ID                                                      *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	get_nodeid_by_id(zbx_uint64_t id)
 {
-	return (int)(id/__UINT64_C(100000000000000))%1000;
+	return (int)(id / __UINT64_C(100000000000000)) % 1000;
 }
 
 /******************************************************************************
@@ -76,10 +72,6 @@ int	get_nodeid_by_id(zbx_uint64_t id)
  * Function: zbx_timespec                                                     *
  *                                                                            *
  * Purpose: Gets the current time.                                            *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -95,13 +87,13 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	LARGE_INTEGER	tickPerSecond, tick;
 	static int	boottime = 0;
 	BOOL		rc = FALSE;
-#else	/* not _WINDOWS */
+#else
 	struct timeval	tv;
 	int		rc = -1;
-#ifdef HAVE_TIME_CLOCK_GETTIME
+#	ifdef HAVE_TIME_CLOCK_GETTIME
 	struct timespec	tp;
-#endif	/* HAVE_TIME_CLOCK_GETTIME */
-#endif	/* not _WINDOWS */
+#	endif
+#endif
 
 	if (NULL == last_ts)
 		last_ts = zbx_malloc(last_ts, sizeof(zbx_timespec_t));
@@ -177,8 +169,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
  *                                                                            *
  * Purpose: Gets the current time.                                            *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: Time in seconds                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -202,8 +192,6 @@ double	zbx_time()
  *                                                                            *
  * Purpose: Gets the current time including UTC offset                        *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: Time in seconds                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -216,17 +204,54 @@ double	zbx_current_time()
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_calloc2                                                      *
+ *                                                                            *
+ * Purpose: allocates nmemb * size bytes of memory and fills it with zeros    *
+ *                                                                            *
+ * Return value: returns a pointer to the newly allocated memory              *
+ *                                                                            *
+ * Author: Eugene Grigorjev, Rudolfs Kreicbergs                               *
+ *                                                                            *
+ ******************************************************************************/
+void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
+{
+	int	max_attempts;
+	void	*ptr = NULL;
+
+	/* old pointer must be NULL */
+	if (NULL != old)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_calloc: allocating already allocated memory. "
+				"Please report this to Zabbix developers.",
+				filename, line);
+		/* exit if defined DEBUG, ignore otherwise */
+		zbx_dbg_assert(0);
+	}
+
+	for (
+		max_attempts = 10, nmemb = MAX(nmemb, 1), size = MAX(size, 1);
+		0 < max_attempts && NULL == ptr;
+		ptr = calloc(nmemb, size), max_attempts--
+	);
+
+	if (NULL != ptr)
+		return ptr;
+
+	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_calloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
+			filename, line, (zbx_fs_size_t)size);
+
+	exit(FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_malloc2                                                      *
  *                                                                            *
  * Purpose: allocates size bytes of memory                                    *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: returns a pointer to the newly allocated memory              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
@@ -234,19 +259,19 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
 	int	max_attempts;
 	void	*ptr = NULL;
 
-	/* Old pointer must be NULL */
+	/* old pointer must be NULL */
 	if (NULL != old)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: allocating already allocated memory. "
 				"Please report this to Zabbix developers.",
 				filename, line);
-		/* Exit if defined DEBUG. Ignore otherwise. */
+		/* exit if defined DEBUG, ignore otherwise */
 		zbx_dbg_assert(0);
 	}
 
 	for (
 		max_attempts = 10, size = MAX(size, 1);
-		max_attempts > 0 && NULL == ptr;
+		0 < max_attempts && NULL == ptr;
 		ptr = malloc(size), max_attempts--
 	);
 
@@ -255,10 +280,8 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
 
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
-	exit(FAIL);
 
-	/* Program will never reach this point. */
-	return ptr;
+	exit(FAIL);
 }
 
 /******************************************************************************
@@ -268,13 +291,9 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
  * Purpose: changes the size of the memory block pointed to by old            *
  *          to size bytes                                                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: returns a pointer to the newly allocated memory              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
@@ -284,7 +303,7 @@ void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
 
 	for (
 		max_attempts = 10, size = MAX(size, 1);
-		max_attempts > 0 && NULL == ptr;
+		0 < max_attempts && NULL == ptr;
 		ptr = realloc(old, size), max_attempts--
 	);
 
@@ -293,10 +312,8 @@ void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
 
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_realloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
-	exit(FAIL);
 
-	/* Program will never reach this point. */
-	return ptr;
+	exit(FAIL);
 }
 
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
@@ -306,7 +323,7 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
 
 	zbx_free(old);
 
-	for (retry = 10; retry > 0 && NULL == ptr; ptr = strdup(str), retry--)
+	for (retry = 10; 0 < retry && NULL == ptr; ptr = strdup(str), retry--)
 		;
 
 	if (NULL != ptr)
@@ -314,10 +331,8 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
 
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_strdup: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)(strlen(str) + 1));
-	exit(FAIL);
 
-	/* Program will never reach this point. */
-	return ptr;
+	exit(FAIL);
 }
 
 /******************************************************************************
@@ -326,27 +341,21 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
  *                                                                            *
  * Purpose: set process title                                                 *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 void	__zbx_zbx_setproctitle(const char *fmt, ...)
 {
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-
 	char	title[MAX_STRING_LEN];
-	va_list args;
+	va_list	args;
 
 	va_start(args, fmt);
 	zbx_vsnprintf(title, sizeof(title), fmt, args);
 	va_end(args);
 
 	setproctitle(title);
-
-#endif /* HAVE_FUNCTION_SETPROCTITLE */
+#endif
 }
 
 /******************************************************************************
@@ -359,30 +368,28 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
  *             now    - timestamp for comparison                              *
  *                      if NULL - use current timestamp.                      *
  *                                                                            *
- * Return value: 0 - out of period, 1 - within the period                     *
+ * Return value: FAIL - out of period, SUCCEED - within the period            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *        !!! Don't forget to sync code with PHP !!!                          *
+ * Comments:   !!! Don't forget to sync code with PHP !!!                     *
  *                                                                            *
  ******************************************************************************/
 int	check_time_period(const char *period, time_t now)
 {
+	const char	*__function_name = "check_time_period";
 	const char	*s, *delim;
-	int		d1, d2, h1, h2, m1, m2, flag;
-	int		day, sec;
+	int		d1, d2, h1, h2, m1, m2, flag, day, sec, sec1, sec2, ret = FAIL;
 	struct tm	*tm;
-	int		ret = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In check_time_period(%s)", period);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() period:'%s'", __function_name, period);
 
 	if (now == (time_t)NULL)
 		now = time(NULL);
 
 	tm = localtime(&now);
 	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
-	sec = 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
+	sec = SEC_PER_HOUR * tm->tm_hour + SEC_PER_MIN * tm->tm_min + tm->tm_sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%d,%d:%d", day, (int)tm->tm_hour, (int)tm->tm_min);
 
@@ -390,38 +397,39 @@ int	check_time_period(const char *period, time_t now)
 	{
 		delim = strchr(s, ';');
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Period [%s]", s);
+		zabbix_log(LOG_LEVEL_DEBUG, "period [%s]", s);
 
 		flag = (6 == sscanf(s, "%d-%d,%d:%d-%d:%d", &d1, &d2, &h1, &m1, &h2, &m2));
 
-		if (!flag)
+		if (0 == flag)
 		{
 			flag = (5 == sscanf(s, "%d,%d:%d-%d:%d", &d1, &h1, &m1, &h2, &m2));
 			d2 = d1;
 		}
 
-		if (!flag)
-			zabbix_log(LOG_LEVEL_ERR, "Time period format is wrong [%s]", period);
-		else
+		if (0 != flag)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d-%d,%d:%d-%d:%d", d1, d2, h1, m1, h2, m2);
 
-			if (day >= d1 && day <= d2 && sec >= 3600 * h1 + 60 * m1 && sec <= 3600 * h2 + 60 * m2)
+			sec1 = SEC_PER_HOUR * h1 + SEC_PER_MIN * m1;
+			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2 - 1;	/* do not include upper bound */
+
+			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)
 			{
-				ret = 1;
+				ret = SUCCEED;
 				break;
 			}
 		}
+		else
+			zabbix_log(LOG_LEVEL_ERR, "wrong time period format [%s]", period);
 
 		if (NULL != delim)
-		{
 			s = delim + 1;
-		}
 		else
 			break;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of check_time_period():%s", ret == 1 ? "SUCCEED" : "FAIL");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -456,23 +464,23 @@ static int	get_current_delay(int delay, const char *flex_intervals, time_t now)
 	{
 		delim = strchr(s, ';');
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Delay period [%s]", s);
+		zabbix_log(LOG_LEVEL_DEBUG, "delay period [%s]", s);
 
 		if (2 == sscanf(s, "%d/%29[^;]s", &flex_delay, flex_period))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d sec at %s", flex_delay, flex_period);
 			
-			if (flex_delay < current_delay && 0 != check_time_period(flex_period, now))
+			if (flex_delay < current_delay && SUCCEED == check_time_period(flex_period, now))
 				current_delay = flex_delay;
 		}
 		else
-			zabbix_log(LOG_LEVEL_ERR, "Delay period format is wrong [%s]", s);
+			zabbix_log(LOG_LEVEL_ERR, "wrong delay period format [%s]", s);
 
 		if (NULL == delim)
 			break;
 	}
 	
-	if (current_delay == SEC_PER_YEAR)
+	if (SEC_PER_YEAR == current_delay)
 		return delay;
 
 	return current_delay == 0 ? SEC_PER_YEAR : current_delay;
@@ -507,54 +515,53 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 
 	tm = localtime(&now);
 	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
-	sec = 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
+	sec = SEC_PER_HOUR * tm->tm_hour + SEC_PER_MIN * tm->tm_min + tm->tm_sec;
 
 	for (s = flex_intervals; '\0' != *s;)
 	{
 		delim = strchr(s, ';');
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Delay period [%s]", s);
+		zabbix_log(LOG_LEVEL_DEBUG, "delay period [%s]", s);
 
 		flag = (7 == sscanf(s, "%d/%d-%d,%d:%d-%d:%d", &delay, &d1, &d2, &h1, &m1, &h2, &m2));
 
-		if (!flag)
+		if (0 == flag)
 		{
 			flag = (6 == sscanf(s, "%d/%d,%d:%d-%d:%d", &delay, &d1, &h1, &m1, &h2, &m2));
 			d2 = d1;
 		}
 		
-		if (!flag)
-			zabbix_log(LOG_LEVEL_ERR, "Delay period format is wrong [%s]", s);
-		else
+		if (0 != flag)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d/%d-%d,%d:%d-%d:%d", delay, d1, d2, h1, m1, h2, m2);
 
-			sec1 = 3600 * h1 + 60 * m1;
-			sec2 = 3600 * h2 + 60 * m2;
+			sec1 = SEC_PER_HOUR * h1 + SEC_PER_MIN * m1;
+			sec2 = SEC_PER_HOUR * h2 + SEC_PER_MIN * m2 - 1;	/* do not include upper bound */
 
 			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)	/* current period */
 			{
-				if (next == 0 || next > now - sec + sec2)
+				if (0 == next || next > now - sec + sec2)
 					next = now - sec + sec2;
 			}
 			else if (day >= d1 && day <= d2 && sec < sec1)			/* will be active today */
 			{
-				if (next == 0 || next > now - sec + sec1)
+				if (0 == next || next > now - sec + sec1)
 					next = now - sec + sec1;
 			}
 			else
 			{
 				int	next_day;
+
 				next_day = (day + 1 <= 7 ? day + 1 : 1);
 
 				if (next_day >= d1 && next_day <= d2)                   /* will be active tomorrow */
 				{
-					if (next == 0 || next > now - sec + SEC_PER_DAY + sec1)
+					if (0 == next || next > now - sec + SEC_PER_DAY + sec1)
 						next = now - sec + SEC_PER_DAY + sec1;
 				}
 				else                                                    /* later in the future */
 				{
-					int day_diff = (-1);
+					int day_diff = -1;
 
 					if (day < d1)
 						day_diff = d1 - day;
@@ -564,30 +571,29 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 					{
 						/* should never happen */
 						zabbix_log(LOG_LEVEL_ERR,
-								"Could not deduce day difference [%s, day=%d, time=%02d:%02d:%02d]",
+								"could not deduce day difference [%s, day=%d, time=%02d:%02d:%02d]",
 								s, day, tm->tm_hour, tm->tm_min, tm->tm_sec);
-						day_diff = (-1);
+						day_diff = -1;
 					}
-					
-					if (day_diff != (-1))
-						if (next == 0 || next > now - sec + SEC_PER_DAY * day_diff + sec1)
-							next = now - sec + SEC_PER_DAY * day_diff + sec1;
+
+					if (-1 != day_diff && (0 == next || next > now - sec + SEC_PER_DAY * day_diff + sec1))
+						next = now - sec + SEC_PER_DAY * day_diff + sec1;
 				}
 			}
 		}
+		else
+			zabbix_log(LOG_LEVEL_ERR, "wrong delay period format [%s]", s);
 
 		if (NULL != delim)
-		{
 			s = delim + 1;
-		}
 		else
 			break;
 	}
 
-	if (next != 0 && next_interval != NULL)
+	if (0 != next && NULL != next_interval)
 		*next_interval = next;
 
-	return next != 0 ? SUCCEED : FAIL;
+	return 0 != next ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -648,10 +654,10 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 				/* as soon as item check in the interval is not forbidden with delay=0, use it */
 				if (SEC_PER_YEAR != current_delay)
 					break;
-				
+
 				get_next_delay_interval(flex_intervals, next_interval + 1, &next_interval);
 			}
-			while (next_interval - now < SEC_PER_WEEK); /* checking the nearest week for delay!=0 */
+			while (next_interval - now < SEC_PER_WEEK);	/* checking the nearest week for delay!=0 */
 
 			now = next_interval;
 		}
@@ -663,11 +669,11 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 		while (nextcheck <= now)
 			nextcheck += delay;
 	}
-	
+
 	if (NULL != effective_delay)
 		*effective_delay = delay;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d delay:%d", __function_name, nextcheck, delay);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() nextcheck:%d delay:%d", __function_name, nextcheck, delay);
 
 	return nextcheck;
 }
@@ -685,8 +691,6 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
  * Return value: nextcheck value                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now)
@@ -714,38 +718,41 @@ time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t
  *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	is_ip4(const char *ip)
 {
+	const char	*__function_name = "is_ip4";
 	const char	*p = ip;
 	int		nums, dots, res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip4() [%s]",
-			ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
 
 	nums = 0;
 	dots = 0;
-	while ('\0' != *p) {
-		if (*p >= '0' && *p <= '9') {
+	while ('\0' != *p)
+	{
+		if ('0' <= *p && *p <= '9')
+		{
 			nums++;
-		} else if (*p == '.') {
-			if (nums == 0 || nums > 3)
+		}
+		else if ('.' == *p)
+		{
+			if (0 == nums || 3 < nums)
 				break;
 			nums = 0;
 			dots++;
-		} else {
+		}
+		else
+		{
 			nums = 0;
 			break;
 		}
 		p++;
 	}
-	if (dots == 3 && nums >= 1 && nums <= 3)
+	if (dots == 3 && 1 <= nums && nums <= 3)
 		res = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of is_ip4(result:%d)",
-			res);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
 }
@@ -769,10 +776,11 @@ int	is_ip4(const char *ip)
  ******************************************************************************/
 static int	is_ip6(const char *ip)
 {
+	const char	*__function_name = "is_ip6";
 	const char	*p = ip;
 	int		nums = 0, is_nums = 0, colons = 0, dcolons = 0, res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip6() ip:'%s'", ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
 
 	while ('\0' != *p)
 	{
@@ -781,11 +789,11 @@ static int	is_ip6(const char *ip)
 			nums++;
 			is_nums = 1;
 		}
-		else if (*p == ':')
+		else if (':' == *p)
 		{
-			if (nums == 0 && colons > 0)
+			if (0 == nums && 0 < colons)
 				dcolons++;
-			if (nums > 4 || dcolons > 1)
+			if (4 < nums || 1 < dcolons)
 				break;
 			nums = 0;
 			colons++;
@@ -798,14 +806,14 @@ static int	is_ip6(const char *ip)
 		p++;
 	}
 
-	if (colons >= 2 && colons <= 7 && nums <= 4 && is_nums == 1)
+	if (2 <= colons && colons <= 7 && 4 >= nums && 1 == is_nums)
 		res = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of is_ip6():%s", zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
 }
-#endif /*HAVE_IPV6*/
+#endif	/*HAVE_IPV6*/
 
 /******************************************************************************
  *                                                                            *
@@ -820,20 +828,17 @@ static int	is_ip6(const char *ip)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	is_ip(const char *ip)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip() [%s]",
-			ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip() ip:'%s'", ip);
 
 	if (SUCCEED == is_ip4(ip))
 		return SUCCEED;
 #if defined(HAVE_IPV6)
 	if (SUCCEED == is_ip6(ip))
 		return SUCCEED;
-#endif /*HAVE_IPV6*/
+#endif
 	return FAIL;
 }
 
@@ -851,8 +856,6 @@ int	is_ip(const char *ip)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	expand_ipv6(const char *ip, char *str, size_t str_len )
 {
@@ -861,18 +864,18 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 	int		c, dc, pos = 0, j, len, ip_len;
 
 	c = 0; /* colons count */
-	for(ptr = strchr(ip, ':'); ptr != NULL; ptr = strchr(ptr + 1, ':'))
+	for (ptr = strchr(ip, ':'); ptr != NULL; ptr = strchr(ptr + 1, ':'))
 	{
 		c ++;
 	}
 
-	if(c < 2 || c > 7)
+	if (c < 2 || c > 7)
 	{
 		return FAIL;
 	}
 
 	ip_len = strlen(ip);
-	if((ip[0] == ':' && ip[1] != ':') || (ip[ip_len - 1] == ':' && ip[ip_len - 2] != ':'))
+	if ((ip[0] == ':' && ip[1] != ':') || (ip[ip_len - 1] == ':' && ip[ip_len - 2] != ':'))
 	{
 		return FAIL;
 	}
@@ -881,20 +884,20 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 
 	dc  = 0; /* double colon flag */
 	len = 0;
-	for(j = 0; j<ip_len; j++)
+	for (j = 0; j<ip_len; j++)
 	{
-		if((ip[j] >= '0' && ip[j] <= '9') || (ip[j] >= 'A' && ip[j] <= 'F') || (ip[j] >= 'a' && ip[j] <= 'f'))
+		if ((ip[j] >= '0' && ip[j] <= '9') || (ip[j] >= 'A' && ip[j] <= 'F') || (ip[j] >= 'a' && ip[j] <= 'f'))
 		{
-			if(len > 3)
+			if (len > 3)
 				return FAIL;
 			buf[len ++] = ip[j];
 		}
-		else if(ip[j] != ':')
+		else if (ip[j] != ':')
 			return FAIL;
 
-		if(ip[j] == ':' || ip[j + 1] == '\0')
+		if (ip[j] == ':' || ip[j + 1] == '\0')
 		{
-			if(len)
+			if (len)
 			{
 				buf[len] = 0x00;
 				sscanf(buf, "%x", &i[pos]);
@@ -902,9 +905,9 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 				len = 0;
 			}
 
-			if(ip[j + 1] == ':')
+			if (ip[j + 1] == ':')
 			{
-				if(dc == 0)
+				if (dc == 0)
 				{
 					dc = 1;
 					pos = ( 8 - c ) + pos + (j == 0 ? 1 : 0);
@@ -933,8 +936,6 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
  * Return value: pointer to result buffer                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 char	*collapse_ipv6(char *str, size_t str_len)
@@ -998,8 +999,6 @@ char	*collapse_ipv6(char *str, size_t str_len)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	ip6_in_list(char *list, char *ip)
 {
@@ -1008,49 +1007,49 @@ static int	ip6_in_list(char *list, char *ip)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In ip6_in_list(list:%s,ip:%s)", list, ip);
 
-	if(FAIL == expand_ipv6(ip, buffer, sizeof(buffer)))
+	if (FAIL == expand_ipv6(ip, buffer, sizeof(buffer)))
 	{
 		goto out;
 	}
 
-	if(sscanf(buffer, "%x:%x:%x:%x:%x:%x:%x:%x", &i[0], &i[1], &i[2], &i[3], &i[4], &i[5], &i[6], &i[7]) != 8)
+	if (sscanf(buffer, "%x:%x:%x:%x:%x:%x:%x:%x", &i[0], &i[1], &i[2], &i[3], &i[4], &i[5], &i[6], &i[7]) != 8)
 	{
 		goto out;
 	}
 
-	for(start = list; start[0] != '\0';)
+	for (start = list; start[0] != '\0';)
 	{
 
-		if(NULL != (comma = strchr(start, ',')))
+		if (NULL != (comma = strchr(start, ',')))
 		{
 			comma[0] = '\0';
 		}
 
-		if(NULL != (dash = strchr(start, '-')))
+		if (NULL != (dash = strchr(start, '-')))
 		{
 			dash[0] = '\0';
-			if(sscanf(dash + 1, "%x", &j[8]) != 1)
+			if (sscanf(dash + 1, "%x", &j[8]) != 1)
 			{
 				goto next;
 			}
 		}
 
-		if(FAIL == expand_ipv6(start, buffer, sizeof(buffer)))
+		if (FAIL == expand_ipv6(start, buffer, sizeof(buffer)))
 		{
 			goto next;
 		}
 
-		if(sscanf(buffer, "%x:%x:%x:%x:%x:%x:%x:%x", &j[0], &j[1], &j[2], &j[3], &j[4], &j[5], &j[6], &j[7]) != 8)
+		if (sscanf(buffer, "%x:%x:%x:%x:%x:%x:%x:%x", &j[0], &j[1], &j[2], &j[3], &j[4], &j[5], &j[6], &j[7]) != 8)
 		{
 			goto next;
 		}
 
-		if(dash == NULL)
+		if (dash == NULL)
 		{
 			j[8] = j[7];
 		}
 
-		if(i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3] &&
+		if (i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3] &&
 			i[4] == j[4] && i[5] == j[5] && i[6] == j[6] &&
 			i[7] >= j[7] && i[7] <= j[8])
 		{
@@ -1058,13 +1057,13 @@ static int	ip6_in_list(char *list, char *ip)
 			break;
 		}
 next:
-		if(dash != NULL)
+		if (dash != NULL)
 		{
 			dash[0] = '-';
 			dash = NULL;
 		}
 
-		if(comma != NULL)
+		if (comma != NULL)
 		{
 			comma[0] = ',';
 			start = comma + 1;
@@ -1076,12 +1075,12 @@ next:
 		}
 	}
 out:
-	if(dash != NULL)
+	if (dash != NULL)
 	{
 		dash[0] = '-';
 	}
 
-	if(comma != NULL)
+	if (comma != NULL)
 	{
 		comma[0] = ',';
 	}
@@ -1104,8 +1103,6 @@ out:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	ip_in_list(char *list, char *ip)
 {
@@ -1115,7 +1112,7 @@ int	ip_in_list(char *list, char *ip)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In ip_in_list(list:%s,ip:%s)", list, ip);
 
-	if(sscanf(ip, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]) != 4)
+	if (sscanf(ip, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]) != 4)
 	{
 #if defined(HAVE_IPV6)
 		ret = ip6_in_list(list, ip);
@@ -1123,45 +1120,45 @@ int	ip_in_list(char *list, char *ip)
 		goto out;
 	}
 
-	for(start = list; start[0] != '\0';)
+	for (start = list; start[0] != '\0';)
 	{
-		if(NULL != (comma = strchr(start, ',')))
+		if (NULL != (comma = strchr(start, ',')))
 		{
 			comma[0] = '\0';
 		}
 
-		if(NULL != (dash = strchr(start, '-')))
+		if (NULL != (dash = strchr(start, '-')))
 		{
 			dash[0] = '\0';
-			if(sscanf(dash + 1, "%d", &j[4]) != 1)
+			if (sscanf(dash + 1, "%d", &j[4]) != 1)
 			{
 				goto next;
 			}
 		}
 
-		if(sscanf(start, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) != 4)
+		if (sscanf(start, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) != 4)
 		{
 			goto next;
 		}
 
-		if(dash == NULL)
+		if (dash == NULL)
 		{
 			j[4] = j[3];
 		}
 
-		if(i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] >= j[3] && i[3] <= j[4])
+		if (i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] >= j[3] && i[3] <= j[4])
 		{
 			ret = SUCCEED;
 			break;
 		}
 next:
-		if(dash != NULL)
+		if (dash != NULL)
 		{
 			dash[0] = '-';
 			dash = NULL;
 		}
 
-		if(comma != NULL)
+		if (comma != NULL)
 		{
 			comma[0] = ',';
 			start = comma + 1;
@@ -1174,12 +1171,12 @@ next:
 	}
 
 out:
-	if(dash != NULL)
+	if (dash != NULL)
 	{
 		dash[0] = '-';
 	}
 
-	if(comma != NULL)
+	if (comma != NULL)
 	{
 		comma[0] = ',';
 	}
@@ -1203,8 +1200,6 @@ out:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	int_in_list(char *list, int value)
 {
@@ -1215,19 +1210,19 @@ int	int_in_list(char *list, int value)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In int_in_list(list:%s,value:%d)", list, value);
 
-	for(start = list; start[0] != '\0';)
+	for (start = list; start[0] != '\0';)
 	{
 		end=strchr(start, ',');
 
-		if(end != NULL)
+		if (end != NULL)
 		{
 			c=end[0];
 			end[0]='\0';
 		}
 
-		if(sscanf(start,"%d-%d",&i1,&i2) == 2)
+		if (sscanf(start,"%d-%d",&i1,&i2) == 2)
 		{
-			if(value>=i1 && value<=i2)
+			if (value>=i1 && value<=i2)
 			{
 				ret = SUCCEED;
 				break;
@@ -1235,14 +1230,14 @@ int	int_in_list(char *list, int value)
 		}
 		else
 		{
-			if(atoi(start) == value)
+			if (atoi(start) == value)
 			{
 				ret = SUCCEED;
 				break;
 			}
 		}
 
-		if(end != NULL)
+		if (end != NULL)
 		{
 			end[0]=c;
 			start=end+1;
@@ -1253,7 +1248,7 @@ int	int_in_list(char *list, int value)
 		}
 	}
 
-	if(end != NULL)
+	if (end != NULL)
 	{
 		end[0]=c;
 	}
@@ -1306,26 +1301,26 @@ int	is_double_prefix(const char *c)
 	int i;
 	int dot=-1;
 
-	for(i=0;c[i]!=0;i++)
+	for (i=0;c[i]!=0;i++)
 	{
 		/* Negative number? */
-		if(c[i]=='-' && i==0)
+		if (c[i]=='-' && i==0)
 		{
 			continue;
 		}
 
-		if((c[i]>='0')&&(c[i]<='9'))
+		if ((c[i]>='0')&&(c[i]<='9'))
 		{
 			continue;
 		}
 
-		if((c[i]=='.')&&(dot==-1))
+		if ((c[i]=='.')&&(dot==-1))
 		{
 			dot=i;
 			continue;
 		}
 		/* Last character is suffix 'K', 'M', 'G', 'T', 's', 'm', 'h', 'd', 'w' */
-		if(strchr("KMGTsmhdw", c[i])!=NULL && c[i+1]=='\0')
+		if (strchr("KMGTsmhdw", c[i])!=NULL && c[i+1]=='\0')
 		{
 			continue;
 		}
@@ -1348,8 +1343,6 @@ int	is_double_prefix(const char *c)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	is_double(const char *c)
 {
@@ -1357,40 +1350,40 @@ int	is_double(const char *c)
 	int dot=-1;
 	int len;
 
-	for(i=0; c[i]==' ' && c[i]!=0;i++); /* trim left spaces */
+	for (i=0; c[i]==' ' && c[i]!=0;i++); /* trim left spaces */
 
-	for(len=0; c[i]!=0; i++, len++)
+	for (len=0; c[i]!=0; i++, len++)
 	{
 		/* Negative number? */
-		if(c[i]=='-' && i==0)
+		if (c[i]=='-' && i==0)
 		{
 			continue;
 		}
 
-		if((c[i]>='0')&&(c[i]<='9'))
+		if ((c[i]>='0')&&(c[i]<='9'))
 		{
 			continue;
 		}
 
-		if((c[i]=='.')&&(dot==-1))
+		if ((c[i]=='.')&&(dot==-1))
 		{
 			dot=i;
 			continue;
 		}
 
-		if(c[i]==' ') /* check right spaces */
+		if (c[i]==' ') /* check right spaces */
 		{
-			for( ; c[i]==' ' && c[i]!=0;i++); /* trim right spaces */
+			for ( ; c[i]==' ' && c[i]!=0;i++); /* trim right spaces */
 
-			if(c[i]==0) break; /* SUCCEED */
+			if (c[i]==0) break; /* SUCCEED */
 		}
 
 		return FAIL;
 	}
 
-	if(len <= 0) return FAIL;
+	if (len <= 0) return FAIL;
 
-	if(len == 1 && dot!=-1) return FAIL;
+	if (len == 1 && dot!=-1) return FAIL;
 
 	return SUCCEED;
 }
@@ -1447,33 +1440,31 @@ int	is_uint_prefix(const char *c)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	is_uint(const char *c)
 {
 	int	i;
 	int	len;
 
-	for(i=0; c[i]==' ' && c[i]!=0;i++); /* trim left spaces */
+	for (i=0; c[i]==' ' && c[i]!=0;i++); /* trim left spaces */
 
-	for(len=0; c[i]!=0; i++,len++)
+	for (len=0; c[i]!=0; i++,len++)
 	{
-		if((c[i]>='0')&&(c[i]<='9'))
+		if ((c[i]>='0')&&(c[i]<='9'))
 		{
 			continue;
 		}
 
-		if(c[i]==' ') /* check right spaces */
+		if (c[i]==' ') /* check right spaces */
 		{
-			for( ; c[i]==' ' && c[i]!=0;i++); /* trim right spaces */
+			for ( ; c[i]==' ' && c[i]!=0;i++); /* trim right spaces */
 
-			if(c[i]==0) break; /* SUCCEED */
+			if (c[i]==0) break; /* SUCCEED */
 		}
 		return FAIL;
 	}
 
-	if(len <= 0) return FAIL;
+	if (len <= 0) return FAIL;
 
 	return SUCCEED;
 }
@@ -1513,8 +1504,6 @@ int	_wis_uint(const wchar_t *wide_string)
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	is_int_prefix(const char *c)
 {
@@ -1544,8 +1533,6 @@ int	is_int_prefix(const char *c)
  *                FAIL - the string is not number or overflow                 *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	is_uint64(const char *str, zbx_uint64_t *value)
@@ -1589,8 +1576,6 @@ int	is_uint64(const char *str, zbx_uint64_t *value)
  *                FAIL - the string is not number or overflow                 *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	is_ushort(const char *str, unsigned short *value)
@@ -1673,8 +1658,6 @@ int	is_boolean(const char *str, zbx_uint64_t *value)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	is_uoct(const char *str)
 {
@@ -1712,8 +1695,6 @@ int	is_uoct(const char *str)
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	is_uhex(const char *str)
@@ -1754,8 +1735,6 @@ int	is_uhex(const char *str)
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	is_hex_string(const char *str)
 {
@@ -1791,8 +1770,6 @@ int	is_hex_string(const char *str)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	uint64_in_list(char *list, zbx_uint64_t value)
 {
@@ -1803,19 +1780,19 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In int_in_list(list:%s,value:" ZBX_FS_UI64 ")", list, value);
 
-	for(start = list; start[0] != '\0';)
+	for (start = list; start[0] != '\0';)
 	{
 		end=strchr(start, ',');
 
-		if(end != NULL)
+		if (end != NULL)
 		{
 			c=end[0];
 			end[0]='\0';
 		}
 
-		if(sscanf(start,ZBX_FS_UI64 "-" ZBX_FS_UI64,&i1,&i2) == 2)
+		if (sscanf(start,ZBX_FS_UI64 "-" ZBX_FS_UI64,&i1,&i2) == 2)
 		{
-			if(value>=i1 && value<=i2)
+			if (value>=i1 && value<=i2)
 			{
 				ret = SUCCEED;
 				break;
@@ -1824,14 +1801,14 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
 		else
 		{
 			ZBX_STR2UINT64(tmp_uint64,start);
-			if(tmp_uint64 == value)
+			if (tmp_uint64 == value)
 			{
 				ret = SUCCEED;
 				break;
 			}
 		}
 
-		if(end != NULL)
+		if (end != NULL)
 		{
 			end[0]=c;
 			start=end+1;
@@ -1842,7 +1819,7 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
 		}
 	}
 
-	if(end != NULL)
+	if (end != NULL)
 	{
 		end[0]=c;
 	}
@@ -1895,13 +1872,7 @@ int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)
  *                                                                            *
  * Purpose: add uint64 value to dynamic array                                 *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step)
@@ -1937,13 +1908,7 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
  *                                                                            *
  * Purpose: merge two uint64 arrays                                           *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step)
@@ -1958,15 +1923,7 @@ void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_
  *                                                                            *
  * Function: uint64_array_exists                                              *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
@@ -1986,13 +1943,7 @@ int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
  *                                                                            *
  * Purpose: remove uint64 values from array                                   *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num)
@@ -2064,11 +2015,11 @@ int	str2uint(const char *str)
 
 	switch (str[sz])
 	{
-		case 's': factor = 1;         break;
-		case 'm': factor = 60;        break;
-		case 'h': factor = 3600;      break;
-		case 'd': factor = 3600*24;   break;
-		case 'w': factor = 3600*24*7; break;
+		case 's': factor = 1;			break;
+		case 'm': factor = SEC_PER_MIN;		break;
+		case 'h': factor = SEC_PER_HOUR;	break;
+		case 'd': factor = SEC_PER_DAY;		break;
+		case 'w': factor = SEC_PER_WEEK;	break;
 	}
 
 	return atoi(str) * factor;
@@ -2162,10 +2113,10 @@ double	str2double(const char *str)
 		case 'G': factor = 1024*1024*1024;		break;
 		case 'T': factor = 1024*1024*1024*(double)1024;	break;
 		case 's': factor = 1;				break;
-		case 'm': factor = 60;				break;
-		case 'h': factor = 3600;			break;
-		case 'd': factor = 3600*24;			break;
-		case 'w': factor = 3600*24*7;			break;
+		case 'm': factor = SEC_PER_MIN;			break;
+		case 'h': factor = SEC_PER_HOUR;		break;
+		case 'd': factor = SEC_PER_DAY;			break;
+		case 'w': factor = SEC_PER_WEEK;		break;
 	}
 
 	return atof(str) * factor;
@@ -2174,10 +2125,6 @@ double	str2double(const char *str)
 /******************************************************************************
  *                                                                            *
  * Function: is_hostname_char                                                 *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - the char is allowed in the host name              *
  *                FAIL - otherwise                                            *
@@ -2209,10 +2156,6 @@ int	is_hostname_char(char c)
  *                                                                            *
  * Function: is_key_char                                                      *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - the char is allowed in the item key               *
  *                FAIL - otherwise                                            *
  *                                                                            *
@@ -2242,10 +2185,6 @@ int	is_key_char(char c)
 /******************************************************************************
  *                                                                            *
  * Function: is_function_char                                                 *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - the char is allowed in the trigger function       *
  *                FAIL - otherwise                                            *
@@ -2292,8 +2231,6 @@ int	is_time_function(const char *func)
  * Purpose: replace all not-allowed hostname symbols in the string            *
  *                                                                            *
  * Parameters: host - the target C-style string                               *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Dmitry Borovikov                                                   *
  *                                                                            *
@@ -2358,8 +2295,6 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
  * Return value: sleep time, in seconds                                       *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	calculate_sleeptime(int nextcheck, int max_sleeptime)

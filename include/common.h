@@ -121,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"18 May 2011"
-#define	ZABBIX_VERSION		"1.9.5"
+#define	ZABBIX_REVDATE		"26 July 2011"
+#define	ZABBIX_VERSION		"1.9.6"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -536,9 +536,9 @@ typedef enum
 #define HOST_MAINTENANCE_STATUS_OFF	0
 #define HOST_MAINTENANCE_STATUS_ON	1
 
-/* host profile mode */
-#define HOST_PROFILE_MANUAL		0
-#define HOST_PROFILE_AUTOMATIC		1
+/* host inventory mode */
+#define HOST_INVENTORY_MANUAL		0
+#define HOST_INVENTORY_AUTOMATIC	1
 
 /* host availability */
 #define HOST_AVAILABLE_UNKNOWN	0
@@ -687,12 +687,14 @@ zbx_script_t;
 #	define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
-#define zbx_malloc(old, size)	zbx_malloc2(__FILE__, __LINE__, old, size)
-#define zbx_realloc(old, size)	zbx_realloc2(__FILE__, __LINE__, old, size)
-#define zbx_strdup(old, str)	zbx_strdup2(__FILE__, __LINE__, old, str)
+#define zbx_calloc(old, nmemb, size)	zbx_calloc2(__FILE__, __LINE__, old, nmemb, size)
+#define zbx_malloc(old, size)		zbx_malloc2(__FILE__, __LINE__, old, size)
+#define zbx_realloc(src, size)		zbx_realloc2(__FILE__, __LINE__, src, size)
+#define zbx_strdup(old, str)		zbx_strdup2(__FILE__, __LINE__, old, str)
 
 #define ZBX_STRDUP(var, str)	(var = zbx_strdup(var, str))
 
+void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size);
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
 void    *zbx_realloc2(const char *filename, int line, void *old, size_t size);
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);

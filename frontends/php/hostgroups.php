@@ -364,7 +364,7 @@ include_once('include/page_header.php');
 		$groups_wdgt->addHeader(S_HOST_GROUPS_BIG);
 		$groups_wdgt->addHeader($numrows);
 
-// Host Groups table
+// Host groups table
 		$form = new CForm();
 		$form->setName('form_groups');
 

@@ -94,19 +94,19 @@ ALTER TABLE config ADD ok_ack_color varchar(6) WITH DEFAULT '00AA00' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD problem_unack_style integer WITH DEFAULT '0' NOT NULL
+ALTER TABLE config ADD problem_unack_style integer WITH DEFAULT '1' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD problem_ack_style integer WITH DEFAULT '0' NOT NULL
+ALTER TABLE config ADD problem_ack_style integer WITH DEFAULT '1' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD ok_unack_style integer WITH DEFAULT '0' NOT NULL
+ALTER TABLE config ADD ok_unack_style integer WITH DEFAULT '1' NOT NULL
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD ok_ack_style integer WITH DEFAULT '0' NOT NULL
+ALTER TABLE config ADD ok_ack_style integer WITH DEFAULT '1' NOT NULL
 /
 REORG TABLE config
 /

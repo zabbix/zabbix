@@ -226,7 +226,7 @@ function update_config($configs){
 	}
 	if(isset($configs['alert_usrgrpid']) && !is_null($configs['alert_usrgrpid'])){
 		if(($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
-			error(_('Incorrect group'));
+			error(_('Incorrect user group.'));
 			return false;
 		}
 	}
@@ -254,12 +254,12 @@ function update_config($configs){
 	}
 
 	if(isset($configs['ok_period']) && !is_null($configs['ok_period']) && !ctype_digit($configs['ok_period'])){
-		error(_('"Display OK triggers" needs to be a positive integer.'));
+		error(_('"Display OK triggers" needs to be "0" or a positive integer.'));
 		return false;
 	}
 
 	if(isset($configs['blink_period']) && !is_null($configs['blink_period']) && !ctype_digit($configs['blink_period'])){
-		error(_('"Triggers blink on status change" needs to be a positive integer.'));
+		error(_('"Triggers blink on status change" needs to be "0" or a positive integer.'));
 		return false;
 	}
 

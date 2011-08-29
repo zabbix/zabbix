@@ -575,6 +575,24 @@
 			$newRow->setAttribute('id', 'triggers_row');
 
 			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages_enabled', 'click', ".zbx_jsvalue($msgVisibility, true).");");
+			zbx_add_post_js("jQuery('#messages_enabled').bind('click',function() {
+								if (this.checked
+										&& !jQuery(\"input[id='messages_triggers.recovery']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_0']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_1']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_2']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_3']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_4']\").is(':checked')
+										&& !jQuery(\"input[id='messages_triggers.severities_5']\").is(':checked')) {
+									jQuery(\"input[id='messages_triggers.recovery']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_0']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_1']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_2']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_3']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_4']\").attr('checked', true);
+									jQuery(\"input[id='messages_triggers.severities_5']\").attr('checked', true);
+								}
+							});");
  		}
 
 		$frmUser->addItemToBottomRow(new CSubmit('save',S_SAVE));
@@ -1511,7 +1529,7 @@
 		$formula = get_request('formula', '1');
 		$logtimefmt = get_request('logtimefmt', '');
 
-		$profile_link = get_request('profile_link', '0');
+		$inventory_link = get_request('inventory_link', '0');
 
 		$add_groupid = get_request('add_groupid', get_request('groupid', 0));
 
@@ -1585,7 +1603,7 @@
 			$formula		= $item_data['formula'];
 			$logtimefmt		= $item_data['logtimefmt'];
 
-			$profile_link   = $item_data['profile_link'];
+			$inventory_link   = $item_data['inventory_link'];
 
 			$new_application	= get_request('new_application',	'');
 
@@ -2115,52 +2133,52 @@
 		}
 		$frmItem->addRow(S_APPLICATIONS,$cmbApps);
 
-		// control to choose host_profile field, that will be populated by this item (if any)
+		// control to choose host_inventory field, that will be populated by this item (if any)
 		if(!$parent_discoveryid){
 			$itemCloned = isset($_REQUEST['clone']);
-			$hostProfileFieldDropDown = new CComboBox('profile_link');
-			$possibleHostProfiles = getHostProfiles();
+			$hostInventoryFieldDropDown = new CComboBox('inventory_link');
+			$possibleHostInventories = getHostInventories();
 
 			// which fields are already being populated by other items
 			$options = array(
-				'output' => array('profile_link'),
+				'output' => array('inventory_link'),
 				'filter' => array('hostid' => $hostid),
 				'nopermissions' => true
 			);
 			$alreadyPopulated = API::item()->get($options);
-			$alreadyPopulated = zbx_toHash($alreadyPopulated, 'profile_link');
+			$alreadyPopulated = zbx_toHash($alreadyPopulated, 'inventory_link');
 			// default option - do not populate
-			$hostProfileFieldDropDown->addItem(0, '-'._('None').'-', $profile_link == '0' ? 'yes' : null); // 'yes' means 'selected'
-			// a list of available host profile fields
-			foreach($possibleHostProfiles as $fieldNo => $fieldInfo){
+			$hostInventoryFieldDropDown->addItem(0, '-'._('None').'-', $inventory_link == '0' ? 'yes' : null); // 'yes' means 'selected'
+			// a list of available host inventory fields
+			foreach($possibleHostInventories as $fieldNo => $fieldInfo){
 				if(isset($alreadyPopulated[$fieldNo])){
-					$enabled = isset($item_data['profile_link'])
-							? $item_data['profile_link'] == $fieldNo
-							: $profile_link == $fieldNo && !$itemCloned;
+					$enabled = isset($item_data['inventory_link'])
+							? $item_data['inventory_link'] == $fieldNo
+							: $inventory_link == $fieldNo && !$itemCloned;
 				}
 				else{
 					$enabled = true;
 				}
-				$hostProfileFieldDropDown->addItem(
+				$hostInventoryFieldDropDown->addItem(
 					$fieldNo,
 					$fieldInfo['title'],
-					($profile_link == $fieldNo && $enabled  ? 'yes' : null), // selected?
+					($inventory_link == $fieldNo && $enabled  ? 'yes' : null), // selected?
 					$enabled ? 'yes' : 'no'
 				);
 			}
 
-			$row =  new CRow(array(_('Item will populate host profile field'), $hostProfileFieldDropDown));
-			$row->setAttribute('id', 'row_profile_link');
+			$row =  new CRow(array(_('Item will populate host inventory field'), $hostInventoryFieldDropDown));
+			$row->setAttribute('id', 'row_inventory_link');
 			$frmItem->addRow($row);
-			// profile link field should not be visible for all item value types except 'log'
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'row_profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'row_profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'profile_link');
-			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_profile_link');
+			// inventory link field should not be visible for all item value types except 'log'
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_STR, 'row_inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_TEXT, 'row_inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_FLOAT, 'row_inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'inventory_link');
+			zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_inventory_link');
 		}
 
 		$tarea = new CTextArea('description', $description);
@@ -2208,10 +2226,10 @@
 			$frmItem->addRow(S_GROUP,$cmbGroups);
 
 			$cmbAction = new CComboBox('action');
-			$cmbAction->addItem('add to group', _('Add to group'));
+			$cmbAction->addItem('add to group', _('Add to host group'));
 			if(isset($_REQUEST['itemid'])){
-				$cmbAction->addItem('update in group',S_UPDATE_IN_GROUP);
-				$cmbAction->addItem('delete from group', _('Delete from group'));
+				$cmbAction->addItem('update in group', _('Update in host group'));
+				$cmbAction->addItem('delete from group', _('Delete from host group'));
 			}
 			$frmItem->addItemToBottomRow(array($cmbAction, SPACE, new CSubmit('register',S_DO)));
 		}
@@ -3809,14 +3827,14 @@
 	return $form;
 	}
 
-	function insert_host_profile_form(){
-		$frmHostP = new CFormTable(_('Host Profile'));
+	function insert_host_inventory_form(){
+		$frmHostP = new CFormTable(_('Host Inventory'));
 
-		$table_titles = getHostProfiles();
+		$table_titles = getHostInventories();
 		$table_titles = zbx_toHash($table_titles, 'db_field');
 		$sql_fields = implode(', ', array_keys($table_titles));
 
-		$sql = 'SELECT '.$sql_fields.' FROM host_profile WHERE hostid='.$_REQUEST['hostid'];
+		$sql = 'SELECT '.$sql_fields.' FROM host_inventory WHERE hostid='.$_REQUEST['hostid'];
 		$result = DBselect($sql);
 
 		$row = DBfetch($result);
@@ -3863,7 +3881,7 @@
 	}
 
 	function get_regexp_form(){
-		if(isset($_REQUEST['regexpid']) && !isset($_REQUEST["form_refresh"])){
+		if(isset($_REQUEST['regexpid']) && !isset($_REQUEST['form_refresh'])){
 			$sql = 'SELECT re.* '.
 				' FROM regexps re '.
 				' WHERE '.DBin_node('re.regexpid').
@@ -3900,7 +3918,7 @@
 		$tabExp = new CTableInfo();
 
 		$td1 = new CCol(S_EXPRESSION);
-		$td2 = new CCol(S_EXPECTED_RESULT);
+		$td2 = new CCol(_('Expected result'));
 		$td3 = new CCol(S_RESULT);
 
 		$tabExp->setHeader(array($td1,$td2,$td3));
@@ -3959,7 +3977,7 @@
 
 			$expec_result = expression_type2str($expression['expression_type']);
 			if(EXPRESSION_TYPE_ANY_INCLUDED == $expression['expression_type'])
-				$expec_result.=' ('.S_DELIMITER."='".$expression['exp_delimiter']."')";
+				$expec_result.=' ('._('Delimiter')."='".$expression['exp_delimiter']."')";
 
 			$tabExp->addRow(array(
 						$expression['expression'],
@@ -4009,8 +4027,7 @@
 	}
 
 	function get_expressions_tab(){
-
-		if(isset($_REQUEST['regexpid']) && !isset($_REQUEST["form_refresh"])){
+		if(isset($_REQUEST['regexpid']) && !isset($_REQUEST['form_refresh'])){
 			$expressions = array();
 			$sql = 'SELECT e.* '.
 					' FROM expressions e '.
@@ -4024,15 +4041,15 @@
 			}
 		}
 		else{
-			$expressions 	= get_request('expressions',array());
+			$expressions = get_request('expressions',array());
 		}
 
 		$tblExp = new CTableInfo();
 		$tblExp->setHeader(array(
-				new CCheckBox('all_expressions',null,'checkAll("Regular expression","all_expressions","g_expressionid");'),
-				S_EXPRESSION,
-				S_EXPECTED_RESULT,
-				S_CASE_SENSITIVE,
+				new CCheckBox('all_expressions', null, 'checkAll("regularExpressionsForm", "all_expressions", "g_expressionid");'),
+				_('Expression'),
+				_('Expected result'),
+				_('Case sensitive'),
 				S_EDIT
 			));
 
@@ -4041,16 +4058,15 @@
 
 			$exp_result = expression_type2str($expression['expression_type']);
 			if(EXPRESSION_TYPE_ANY_INCLUDED == $expression['expression_type'])
-				$exp_result.=' ('.S_DELIMITER."='".$expression['exp_delimiter']."')";
+				$exp_result.=' ('._('Delimiter')."='".$expression['exp_delimiter']."')";
 
 			$tblExp->addRow(array(
 				new CCheckBox('g_expressionid[]', 'no', null, $id),
 				$expression['expression'],
 				$exp_result,
-				$expression['case_sensitive']?S_YES:S_NO,
-				new CSubmit('edit_expressionid['.$id.']',S_EDIT)
+				$expression['case_sensitive'] ? _('Yes') : _('No'),
+				new CSubmit('edit_expressionid['.$id.']', _('Edit'))
 				));
-
 
 			$tblExp->addItem(new Cvar('expressions['.$id.'][expression]',		$expression['expression']));
 			$tblExp->addItem(new Cvar('expressions['.$id.'][expression_type]',	$expression['expression_type']));
@@ -4060,14 +4076,13 @@
 
 		$buttons = array();
 		if(!isset($_REQUEST['new_expression'])){
-			$buttons[] = new CSubmit('new_expression',S_NEW);
-			$buttons[] = new CSubmit('delete_expression',S_DELETE);
+			$buttons[] = new CSubmit('new_expression', _('New'));
+			$buttons[] = new CSubmit('delete_expression', _('Delete'));
 		}
 
 		$td = new CCol($buttons);
-		$td->setAttribute('colspan','5');
-		$td->setAttribute('style','text-align: right;');
-
+		$td->setAttribute('colspan', '5');
+		$td->setAttribute('style', 'text-align: right;');
 
 		$tblExp->setFooter($td);
 
@@ -4081,7 +4096,7 @@
 		$new_expression = get_request('new_expression', array());
 
 		if(is_array($new_expression) && isset($new_expression['id'])){
-			$tblExp->addItem(new Cvar('new_expression[id]',$new_expression['id']));
+			$tblExp->addItem(new Cvar('new_expression[id]', $new_expression['id']));
 		}
 
 		if(!is_array($new_expression)){
@@ -4093,46 +4108,45 @@
 		if(!isset($new_expression['case_sensitive']))		$new_expression['case_sensitive']	= 0;
 		if(!isset($new_expression['exp_delimiter']))		$new_expression['exp_delimiter']	= ',';
 
-		$tblExp->addRow(array(S_EXPRESSION, new CTextBox('new_expression[expression]',$new_expression['expression'],60)));
+		$tblExp->addRow(array(_('Expression'), new CTextBox('new_expression[expression]', $new_expression['expression'], 60)));
 
-		$cmbType = new CComboBox('new_expression[expression_type]',$new_expression['expression_type'],'javascript: submit();');
-		$cmbType->addItem(EXPRESSION_TYPE_INCLUDED,expression_type2str(EXPRESSION_TYPE_INCLUDED));
-		$cmbType->addItem(EXPRESSION_TYPE_ANY_INCLUDED,expression_type2str(EXPRESSION_TYPE_ANY_INCLUDED));
-		$cmbType->addItem(EXPRESSION_TYPE_NOT_INCLUDED,expression_type2str(EXPRESSION_TYPE_NOT_INCLUDED));
-		$cmbType->addItem(EXPRESSION_TYPE_TRUE,expression_type2str(EXPRESSION_TYPE_TRUE));
-		$cmbType->addItem(EXPRESSION_TYPE_FALSE,expression_type2str(EXPRESSION_TYPE_FALSE));
+		$cmbType = new CComboBox('new_expression[expression_type]', $new_expression['expression_type'], 'javascript: submit();');
+		$cmbType->addItem(EXPRESSION_TYPE_INCLUDED, expression_type2str(EXPRESSION_TYPE_INCLUDED));
+		$cmbType->addItem(EXPRESSION_TYPE_ANY_INCLUDED, expression_type2str(EXPRESSION_TYPE_ANY_INCLUDED));
+		$cmbType->addItem(EXPRESSION_TYPE_NOT_INCLUDED, expression_type2str(EXPRESSION_TYPE_NOT_INCLUDED));
+		$cmbType->addItem(EXPRESSION_TYPE_TRUE, expression_type2str(EXPRESSION_TYPE_TRUE));
+		$cmbType->addItem(EXPRESSION_TYPE_FALSE, expression_type2str(EXPRESSION_TYPE_FALSE));
 
-		$tblExp->addRow(array(S_EXPRESSION_TYPE,$cmbType));
+		$tblExp->addRow(array(_('Expression type'), $cmbType));
 
 		if(EXPRESSION_TYPE_ANY_INCLUDED == $new_expression['expression_type']){
-			$cmbDelimiter = new CComboBox('new_expression[exp_delimiter]',$new_expression['exp_delimiter']);
-			$cmbDelimiter->addItem(',',',');
-			$cmbDelimiter->addItem('.','.');
-			$cmbDelimiter->addItem('/','/');
+			$cmbDelimiter = new CComboBox('new_expression[exp_delimiter]', $new_expression['exp_delimiter']);
+			$cmbDelimiter->addItem(',', ',');
+			$cmbDelimiter->addItem('.', '.');
+			$cmbDelimiter->addItem('/', '/');
 
-			$tblExp->addRow(array(S_DELIMITER,$cmbDelimiter));
+			$tblExp->addRow(array(_('Delimiter'), $cmbDelimiter));
 		}
 		else{
-			$tblExp->addItem(new Cvar('new_expression[exp_delimiter]',$new_expression['exp_delimiter']));
+			$tblExp->addItem(new Cvar('new_expression[exp_delimiter]', $new_expression['exp_delimiter']));
 		}
 
-		$chkbCase = new CCheckBox('new_expression[case_sensitive]', $new_expression['case_sensitive'],null,1);
+		$chkbCase = new CCheckBox('new_expression[case_sensitive]', $new_expression['case_sensitive'], null, 1);
 
-		$tblExp->addRow(array(S_CASE_SENSITIVE,$chkbCase));
+		$tblExp->addRow(array(_('Case sensitive'), $chkbCase));
 
 		$tblExpFooter = new CTableInfo($tblExp);
 
 		$oper_buttons = array();
-
-		$oper_buttons[] = new CSubmit('add_expression',isset($new_expression['id'])?S_SAVE:S_ADD);
-		$oper_buttons[] = new CSubmit('cancel_new_expression',S_CANCEL);
+		$oper_buttons[] = new CSubmit('add_expression', isset($new_expression['id']) ? _('Save') : _('Add'));
+		$oper_buttons[] = new CSubmit('cancel_new_expression', _('Cancel'));
 
 		$td = new CCol($oper_buttons);
-		$td->setAttribute('colspan',2);
-		$td->setAttribute('style','text-align: right;');
+		$td->setAttribute('colspan', 2);
+		$td->setAttribute('style', 'text-align: right;');
 
 		$tblExpFooter->setFooter($td);
-// end of condition list preparation
+
 	return $tblExpFooter;
 	}
 

@@ -140,12 +140,15 @@ typedef struct
 {
 	zbx_uint64_t	triggerid;
 	char		*expression;
-	char		old_error[TRIGGER_ERROR_LEN_MAX];
-	const char	*new_error;
+	char		error[TRIGGER_ERROR_LEN_MAX];
+	char		*new_error;
 	zbx_timespec_t	timespec;
 	unsigned char	type;
 	unsigned char	value;
 	unsigned char	value_flags;
+	unsigned char	new_value;
+	unsigned char	add_event;
+	unsigned char	value_changed;
 }
 DC_TRIGGER;
 
@@ -209,7 +212,7 @@ int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const cha
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
 int	DCconfig_get_function_by_functionid(DC_FUNCTION *function, zbx_uint64_t functionid);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, const char **errors, int item_num);
+		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int item_num);
 int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid);
 void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order);
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);

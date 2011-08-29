@@ -26,7 +26,7 @@
 
 	$page['title'] = 'S_CUSTOM_SCREENS';
 	$page['file'] = 'screens.php';
-	$page['hist_arg'] = array('elementid');
+	$page['hist_arg'] = array('elementid', 'screenname');
 	$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -139,7 +139,7 @@
 	else{
 		$id_has_been_fetched_from_profile = false;
 	}
-	$_REQUEST['elementid'] = $elementid;
+
 
 	$screens_wdgt = new CWidget();
 

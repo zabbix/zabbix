@@ -571,7 +571,7 @@ include_once('include/page_header.php');
 		$form->setName('groupform');
 		$form->setAttribute('id', 'groups');
 
-		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
+		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox("all_groups", NULL, "javascript: checkAll('".$form->getName()."', 'all_groups','groups');") : null),
 			S_NAME
@@ -714,7 +714,7 @@ include_once('include/page_header.php');
 		$form->setName('usrgrpform');
 		$form->setAttribute('id', 'usrgrps');
 
-		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
+		$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox("all_usrgrps", NULL, "javascript: checkAll('".$form->getName()."', 'all_usrgrps','usrgrps');") : null),
 			S_NAME
@@ -849,7 +849,7 @@ include_once('include/page_header.php');
 		$form->setName('triggerform');
 		$form->setAttribute('id', 'triggers');
 
-		$table = new CTableInfo(_('No triggers defined'));
+		$table = new CTableInfo(_('No triggers defined.'));
 
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox('all_triggers', NULL, "checkAll('".$form->getName()."', 'all_triggers','triggers');") : null),
@@ -1054,7 +1054,7 @@ include_once('include/page_header.php');
 		$form->setName('itemform');
 		$form->setAttribute('id', 'items');
 
-		$table = new CTableInfo(_('No item prototypes defined'));
+		$table = new CTableInfo(_('No item prototypes defined.'));
 
 		if($multiselect)
 			$header = array(
@@ -1645,7 +1645,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'overview'){
-		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
+		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 		$table->setHeader(S_NAME);
 
 		$options = array(
@@ -1676,7 +1676,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'host_group_scr'){
-		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
+		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 		$table->setHeader(array(S_NAME));
 
 		$options = array(
@@ -1717,7 +1717,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'drules'){
-		$table = new CTableInfo(_('No discovery rules defined'));
+		$table = new CTableInfo(_('No discovery rules defined.'));
 		$table->setHeader(S_NAME);
 
 		$result = DBselect('SELECT DISTINCT * FROM drules WHERE '.DBin_node('druleid', $nodeid));
@@ -1734,7 +1734,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'dchecks'){
-		$table = new CTableInfo(_('No discovery checks defined'));
+		$table = new CTableInfo(_('No discovery checks defined.'));
 		$table->setHeader(S_NAME);
 
 		$result = DBselect('SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.ports FROM drules r,dchecks c'.
@@ -1779,7 +1779,7 @@ include_once('include/page_header.php');
 		$form->setName('scriptform');
 		$form->attr('id', 'scripts');
 
-		$table = new CTableInfo(_('No scripts defined'));
+		$table = new CTableInfo(_('No scripts defined.'));
 
 		if($multiselect)
 			$header = array(

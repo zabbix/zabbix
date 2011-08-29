@@ -22,9 +22,9 @@
 
 #include "common.h"
 
-#define	ZBX_DB_OK	(0)
-#define	ZBX_DB_FAIL	(-1)
-#define	ZBX_DB_DOWN	(-2)
+#define ZBX_DB_OK	0
+#define ZBX_DB_FAIL	-1
+#define ZBX_DB_DOWN	-2
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
 
@@ -38,8 +38,6 @@
 		SQLHANDLE	hdbc;
 	}
 	zbx_ibm_db2_handle_t;
-
-	extern zbx_ibm_db2_handle_t	ibm_db2;
 
 #	define DB_ROW		char **
 #	define DB_RESULT	ZBX_IBM_DB2_RESULT *
@@ -68,8 +66,6 @@
 #	include "errmsg.h"
 #	include "mysqld_error.h"
 
-	extern MYSQL	*conn;
-
 #	define DB_ROW		MYSQL_ROW
 #	define DB_RESULT	MYSQL_RES *
 #	define DBfree_result	mysql_free_result
@@ -86,8 +82,6 @@
 		OCIServer	*srvhp;
 	}
 	zbx_oracle_db_handle_t;
-
-	extern zbx_oracle_db_handle_t	oracle;
 
 #	define DB_ROW		char **
 #	define DB_RESULT	ZBX_OCI_DB_RESULT *
@@ -108,8 +102,6 @@
 
 #	include <libpq-fe.h>
 
-	extern PGconn	*conn;
-
 #	define DB_ROW		char **
 #	define DB_RESULT	ZBX_PG_DB_RESULT *
 #	define DBfree_result	PG_DBfree_result
@@ -129,8 +121,6 @@
 #elif defined(HAVE_SQLITE3)
 
 #	include <sqlite3.h>
-
-	extern sqlite3		*conn;
 
 #	define DB_ROW		char **
 #	define DB_RESULT	ZBX_SQ_DB_RESULT *
