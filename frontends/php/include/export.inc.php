@@ -892,11 +892,11 @@ class zbxXML{
 
 						// did host use ipmi? if so, adding another interface of "ipmi" type
 						if(isset($host_db['useipmi']) && $host_db['useipmi']){
-							// when saving host in 1.8, it's possible to set use_ipmi=1 and not to fill an IP address
-							//  we were not really sure what to do with this host, and decided to take host ip address instead and show info message about this
+							// when saving a host in 1.8, it's possible to set useipmi=1 and not to fill an IP address
+							//  we were not really sure what to do with this host, and decided to take host IP address instead and show info message about this
 							if($host_db['ipmi_ip'] == ''){
 								$ipmi_ip = $host_db['ip'];
-								info(_s('Host "%s" has "use_ipmi" parameter checked, but has no "ipmi_ip" parameter! Using host IP address as an address for IPMI interface.', $host_db['host']));
+								info(_s('Host "%s" has "useipmi" parameter checked, but has no "ipmi_ip" parameter! Using host IP address as an address for IPMI interface.', $host_db['host']));
 							}
 							else{
 								$ipmi_ip = $host_db['ipmi_ip'];
