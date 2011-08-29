@@ -981,7 +981,7 @@ FIELD		|areatype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|width		|t_integer	|'200'	|NOT NULL	|ZBX_SYNC 
 FIELD		|height		|t_integer	|'200'	|NOT NULL	|ZBX_SYNC 
 FIELD		|viewtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|use_iconmap	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC 
+FIELD		|use_iconmap	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 
 TABLE|sysmap_element_url|sysmapelementurlid|ZBX_SYNC
 FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0
@@ -1183,17 +1183,17 @@ FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|listen_dns	|t_varchar(64)	|''	|NOT NULL	|0
 INDEX		|1		|clock
 
-TABLE|icon_map|iconmapid|ZBX_SYNC 
-FIELD		|iconmapid	|t_id		|	|NOT NULL	|0 
-FIELD		|name		|t_varchar(64)	|	|NOT NULL	|ZBX_SYNC 
-FIELD		|default_iconid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|images		|imageid	|RESTRICT
+TABLE|icon_map|iconmapid|ZBX_SYNC
+FIELD		|iconmapid	|t_id		|	|NOT NULL	|0
+FIELD		|name		|t_varchar(64)	|	|NOT NULL	|ZBX_SYNC
+FIELD		|default_iconid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|images	|imageid	|RESTRICT
 INDEX		|1		|name
 
-TABLE|icon_mapping|iconmappingid|ZBX_SYNC 
-FIELD		|iconmappingid	|t_id		|	|NOT NULL	|0 
+TABLE|icon_mapping|iconmappingid|ZBX_SYNC
+FIELD		|iconmappingid	|t_id		|	|NOT NULL	|0
 FIELD		|iconmapid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|icon_map
-FIELD		|iconid		|t_id		|	|NOT NULL	|ZBX_SYNC		|2|images		|imageid	|RESTRICT
-FIELD		|inventory_link	|t_integer	|	|NOT NULL	|ZBX_SYNC 
-FIELD		|expression	|t_varchar(64)	|	|NOT NULL	|ZBX_SYNC 
-FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
-INDEX		|1		|iconmapid 
+FIELD		|iconid		|t_id		|	|NOT NULL	|ZBX_SYNC		|2|images	|imageid	|RESTRICT
+FIELD		|inventory_link	|t_integer	|	|NOT NULL	|ZBX_SYNC
+FIELD		|expression	|t_varchar(64)	|	|NOT NULL	|ZBX_SYNC
+FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|iconmapid
