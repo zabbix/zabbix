@@ -147,7 +147,7 @@ class CMap extends CMapElement{
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
 		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
+			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
 
 			$sql_parts['order'][] = 's.'.$options['sortfield'].' '.$sortorder;
 
@@ -173,15 +173,15 @@ class CMap extends CMapElement{
 		$sql_from = '';
 		$sql_where = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select']))	$sql_select .= implode(',', $sql_parts['select']);
-		if(!empty($sql_parts['from']))		$sql_from .= implode(',', $sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
-				' FROM '.$sql_from.
-				' WHERE '.DBin_node('s.sysmapid', $nodeids).
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
+				FROM '.$sql_from.'
+				WHERE '.DBin_node('s.sysmapid', $nodeids).
 					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
@@ -413,8 +413,8 @@ class CMap extends CMapElement{
 				}
 			}
 
-			$sql = 'SELECT sysmapelementurlid, selementid, name, url'.
-					' FROM sysmap_element_url'.
+			$sql = 'SELECT sysmapelementurlid, selementid, name, url  '.
+					' FROM sysmap_element_url '.
 					' WHERE '.DBcondition('selementid', array_keys($selements));
 			$db_selement_urls = DBselect($sql);
 			while($selement_url = DBfetch($db_selement_urls)){
