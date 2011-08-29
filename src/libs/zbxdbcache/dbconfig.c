@@ -991,10 +991,10 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		update_index = 0;
 
-		if (0 == found || host->proxy_hostid != proxy_hostid || host->status != status ||
-				0 != strcmp(host->host, row[2]))
+		if (!(found && host->proxy_hostid == proxy_hostid &&
+					host->status == status && 0 == strcmp(host->host, row[2])))
 		{
-			if (1 == found)
+			if (found)
 			{
 				host_ph_local.proxy_hostid = host->proxy_hostid;
 				host_ph_local.status = host->status;
@@ -1015,15 +1015,6 @@ static void	DCsync_hosts(DB_RESULT result)
 
 			if (NULL != host_ph)
 			{
-				if (HOST_STATUS_MONITORED == host_ph->status && (0 == found || sync_num == host_ph->sync_num))
-				{
-					/* duplicate hosts found */
-
-					zabbix_log(LOG_LEVEL_CRIT, "Error: duplicate hosts [%s] found. Exiting...",
-							host_ph->host);
-					exit(FAIL);
-				}
-
 				host_ph->host_ptr = host;
 				host_ph->sync_num = sync_num;
 			}
@@ -1031,8 +1022,8 @@ static void	DCsync_hosts(DB_RESULT result)
 				update_index = 1;
 		}
 
-		update_queue = (0 == found && HOST_STATUS_PROXY_PASSIVE == status)
-				|| (1 == found && host->status != status);
+		update_queue = (!found && HOST_STATUS_PROXY_PASSIVE == status)
+				|| (found && host->status != status);
 
 		/* store new information in host structure */
 
@@ -1047,7 +1038,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->maintenance_from = atoi(row[16]);
 		host->status = status;
 
-		if (0 == found)
+		if (!found)
 		{
 			host->errors_from = atoi(row[17]);
 			host->available = (unsigned char)atoi(row[18]);
@@ -1076,7 +1067,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* update hosts_ph index using new data, if not done already */
 
-		if (1 == update_index)
+		if (update_index)
 		{
 			host_ph_local.proxy_hostid = host->proxy_hostid;
 			host_ph_local.status = host->status;
@@ -1177,7 +1168,13 @@ static void	DCsync_hosts(DB_RESULT result)
  *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCsync_configuration()
@@ -1305,6 +1302,10 @@ void	DCsync_configuration()
  * Function: init_configuration_cache                                         *
  *                                                                            *
  * Purpose: Allocate shared memory for configuration cache                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
@@ -1491,7 +1492,13 @@ void	init_configuration_cache()
  *                                                                            *
  * Purpose: Free memory allocated for configuration cache                     *
  *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	free_configuration_cache()
@@ -1562,6 +1569,8 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
  * Return value: SUCCEED if record located and FAIL otherwise                 *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
@@ -1700,6 +1709,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *hostname, const char *key)
 {
@@ -1738,6 +1749,8 @@ unlock:
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid)
 {
@@ -1774,6 +1787,8 @@ unlock:
  * Return value: nextcheck or FAIL if no items for selected poller            *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
@@ -2198,7 +2213,13 @@ unlock:
  *                                                                            *
  * Purpose: set host maintenance status                                       *
  *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
@@ -2227,7 +2248,13 @@ void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
  *                                                                            *
  * Purpose: get statistics of the database cache                              *
  *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	*DCconfig_get_stats(int request)
@@ -2323,9 +2350,13 @@ int	DCconfig_get_proxypoller_hosts(DC_HOST *hosts, int max_hosts)
  *                                                                            *
  * Purpose: Get nextcheck for passive proxies                                 *
  *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
  * Return value: nextcheck or FAIL if no passive proxies in queue             *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_proxypoller_nextcheck()

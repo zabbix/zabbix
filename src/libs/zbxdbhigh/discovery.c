@@ -50,7 +50,8 @@ static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char 
 				" and ds.dcheckid=" ZBX_FS_UI64
 				" and ds.value" ZBX_SQL_STRCMP
 			" order by dh.dhostid",
-			dcheckid, ZBX_SQL_STRVAL_EQ(value_esc));
+			dcheckid,
+			ZBX_SQL_STRVAL_EQ(value_esc));
 
 	zbx_free(value_esc);
 
@@ -71,7 +72,8 @@ static DB_RESULT	discovery_get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
 				" and dh.druleid=" ZBX_FS_UI64
 				" and ds.ip" ZBX_SQL_STRCMP
 			" order by dh.dhostid",
-			druleid, ZBX_SQL_STRVAL_EQ(ip_esc));
+			druleid,
+			ZBX_SQL_STRVAL_EQ(ip_esc));
 
 	zbx_free(ip_esc);
 
@@ -86,7 +88,11 @@ static DB_RESULT	discovery_get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
  *                                                                            *
  * Parameters: host ip address                                                *
  *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
@@ -106,7 +112,8 @@ static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char
 			" from dservices"
 			" where dhostid=" ZBX_FS_UI64
 				" and ip" ZBX_SQL_STRCMP,
-			dhost->dhostid, ZBX_SQL_STRVAL_NE(ip_esc));
+			dhost->dhostid,
+			ZBX_SQL_STRVAL_NE(ip_esc));
 
 	result = DBselectN(sql, 1);
 
@@ -116,18 +123,21 @@ static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char
 
 		DBexecute("insert into dhosts (dhostid,druleid)"
 				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				dhostid, drule->druleid);
+				dhostid,
+				drule->druleid);
 
 		DBexecute("update dservices"
 				" set dhostid=" ZBX_FS_UI64
 				" where dhostid=" ZBX_FS_UI64
 					" and ip" ZBX_SQL_STRCMP,
-				dhostid, dhost->dhostid, ZBX_SQL_STRVAL_EQ(ip_esc));
+				dhostid,
+				dhost->dhostid,
+				ZBX_SQL_STRVAL_EQ(ip_esc));
 
-		dhost->dhostid = dhostid;
-		dhost->status = DOBJECT_STATUS_DOWN;
-		dhost->lastup = 0;
-		dhost->lastdown = 0;
+		dhost->dhostid	= dhostid;
+		dhost->status	= DOBJECT_STATUS_DOWN;
+		dhost->lastup	= 0;
+		dhost->lastdown	= 0;
 	}
 	DBfree_result(result);
 
@@ -145,7 +155,11 @@ static void	discovery_separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char
  *                                                                            *
  * Parameters: host ip address                                                *
  *                                                                            *
+ * Return value: dhostid or 0 if we didn't add host                           *
+ *                                                                            *
  * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_register_host(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, const char *ip, int status, const char *value)
@@ -178,28 +192,32 @@ static void	discovery_register_host(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST
 
 	if (NULL == row)
 	{
-		if (DOBJECT_STATUS_UP == status)	/* add host only if service is up */
+		/* Add host only if service is up */
+		if (status == DOBJECT_STATUS_UP)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "new host discovered at %s", ip);
+			zabbix_log(LOG_LEVEL_DEBUG, "New host discovered at %s",
+					ip);
 
-			dhost->dhostid = DBget_maxid("dhosts");
-			dhost->status = DOBJECT_STATUS_DOWN;
-			dhost->lastup = 0;
-			dhost->lastdown = 0;
+			dhost->dhostid	= DBget_maxid("dhosts");
+			dhost->status	= DOBJECT_STATUS_DOWN;
+			dhost->lastup	= 0;
+			dhost->lastdown	= 0;
 
 			DBexecute("insert into dhosts (dhostid,druleid)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-					dhost->dhostid, drule->druleid);
+					dhost->dhostid,
+					drule->druleid);
 		}
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "host at %s is already in database", ip);
+		zabbix_log(LOG_LEVEL_DEBUG, "Host at %s is already in database",
+				ip);
 
 		ZBX_STR2UINT64(dhost->dhostid, row[0]);
-		dhost->status = atoi(row[1]);
-		dhost->lastup = atoi(row[2]);
-		dhost->lastdown = atoi(row[3]);
+		dhost->status	= atoi(row[1]);
+		dhost->lastup	= atoi(row[2]);
+		dhost->lastdown	= atoi(row[3]);
 
 		if (0 == drule->unique_dcheckid)
 			discovery_separate_host(drule, dhost, ip);
@@ -217,7 +235,11 @@ static void	discovery_register_host(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST
  *                                                                            *
  * Parameters: host ip address                                                *
  *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
@@ -253,28 +275,35 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		if (DOBJECT_STATUS_UP == status)	/* add host only if service is up */
+		/* Add host only if service is up */
+		if (status == DOBJECT_STATUS_UP)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "new service discovered on port %d", port);
+			zabbix_log(LOG_LEVEL_DEBUG, "New service discovered on port %d", port);
 
-			dservice->dserviceid = DBget_maxid("dservices");
-			dservice->status = DOBJECT_STATUS_DOWN;
+			dservice->dserviceid	= DBget_maxid("dservices");
+			dservice->status	= DOBJECT_STATUS_DOWN;
 
 			DBexecute("insert into dservices (dserviceid,dhostid,dcheckid,type,key_,ip,port,status)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s','%s',%d,%d)",
-					dservice->dserviceid, dhost->dhostid, dcheck->dcheckid, dcheck->type,
-					key_esc, ip_esc, port, dservice->status);
+					dservice->dserviceid,
+					dhost->dhostid,
+					dcheck->dcheckid,
+					dcheck->type,
+					key_esc,
+					ip_esc,
+					port,
+					dservice->status);
 		}
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "service is already in database");
+		zabbix_log(LOG_LEVEL_DEBUG, "Service is already in database");
 
 		ZBX_STR2UINT64(dservice->dserviceid, row[0]);
 		ZBX_STR2UINT64(dhostid, row[1]);
-		dservice->status = atoi(row[2]);
-		dservice->lastup = atoi(row[3]);
-		dservice->lastdown = atoi(row[4]);
+		dservice->status	= atoi(row[2]);
+		dservice->lastup	= atoi(row[3]);
+		dservice->lastdown	= atoi(row[4]);
 		strscpy(dservice->value, row[5]);
 
 		if (dhostid != dhost->dhostid)
@@ -282,8 +311,8 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
 			DBexecute("update dservices"
 					" set dhostid=" ZBX_FS_UI64
 					" where dhostid=" ZBX_FS_UI64,
-					dhost->dhostid, dhostid);
-
+					dhost->dhostid,
+					dhostid);
 			DBexecute("delete from dhosts"
 					" where dhostid=" ZBX_FS_UI64,
 					dhostid);
@@ -304,7 +333,13 @@ static void	discovery_register_service(DB_DRULE *drule, DB_DCHECK *dcheck,
  *                                                                            *
  * Purpose: update discovered service details                                 *
  *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_dservice(DB_DSERVICE *service)
@@ -314,7 +349,11 @@ static void	discovery_update_dservice(DB_DSERVICE *service)
 	value_esc = DBdyn_escape_string_len(service->value, DSERVICE_VALUE_LEN);
 
 	DBexecute("update dservices set status=%d,lastup=%d,lastdown=%d,value='%s' where dserviceid=" ZBX_FS_UI64,
-			service->status, service->lastup, service->lastdown, value_esc, service->dserviceid);
+			service->status,
+			service->lastup,
+			service->lastdown,
+			value_esc,
+			service->dserviceid);
 
 	zbx_free(value_esc);
 }
@@ -324,7 +363,14 @@ static void	discovery_update_dservice(DB_DSERVICE *service)
  * Function: discovery_update_dservice_value                                  *
  *                                                                            *
  * Purpose: update discovered service details                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_dservice_value(DB_DSERVICE *service)
@@ -334,7 +380,8 @@ static void	discovery_update_dservice_value(DB_DSERVICE *service)
 	value_esc = DBdyn_escape_string_len(service->value, DSERVICE_VALUE_LEN);
 
 	DBexecute("update dservices set value='%s' where dserviceid=" ZBX_FS_UI64,
-			value_esc, service->dserviceid);
+			value_esc,
+			service->dserviceid);
 
 	zbx_free(value_esc);
 }
@@ -343,20 +390,27 @@ static void	discovery_update_dservice_value(DB_DSERVICE *service)
  *                                                                            *
  * Function: discovery_update_service_status                                  *
  *                                                                            *
- * Purpose: process and update the new service status                         *
+ * Purpose: process new service status                                        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_service_status(DB_DSERVICE *dservice, int status, const char *value, int now)
 {
-	if (DOBJECT_STATUS_UP == status)
+	/* Update service status */
+	if (status == DOBJECT_STATUS_UP)
 	{
-		if (DOBJECT_STATUS_DOWN == dservice->status || 0 == dservice->lastup)
+		if (dservice->status == DOBJECT_STATUS_DOWN || dservice->lastup == 0)
 		{
-			dservice->status = status;
-			dservice->lastdown = 0;
-			dservice->lastup = now;
+			dservice->status	= status;
+			dservice->lastdown	= 0;
+			dservice->lastup	= now;
 
 			zbx_strlcpy(dservice->value, value, sizeof(dservice->value));
 			discovery_update_dservice(dservice);
@@ -370,17 +424,16 @@ static void	discovery_update_service_status(DB_DSERVICE *dservice, int status, c
 	}
 	else	/* DOBJECT_STATUS_DOWN */
 	{
-		if (DOBJECT_STATUS_UP == dservice->status || 0 == dservice->lastdown)
+		if (dservice->status == DOBJECT_STATUS_UP || dservice->lastdown == 0)
 		{
-			dservice->status = status;
-			dservice->lastdown = now;
-			dservice->lastup = 0;
+			dservice->status	= status;
+			dservice->lastdown	= now;
+			dservice->lastup	= 0;
 
 			discovery_update_dservice(dservice);
 			discovery_add_event(EVENT_OBJECT_DSERVICE, dservice->dserviceid, now, DOBJECT_STATUS_LOST);
 		}
 	}
-
 	discovery_add_event(EVENT_OBJECT_DSERVICE, dservice->dserviceid, now, status);
 }
 
@@ -390,13 +443,22 @@ static void	discovery_update_service_status(DB_DSERVICE *dservice, int status, c
  *                                                                            *
  * Purpose: update discovered host details                                    *
  *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_dhost(DB_DHOST *dhost)
 {
 	DBexecute("update dhosts set status=%d,lastup=%d,lastdown=%d where dhostid=" ZBX_FS_UI64,
-			dhost->status, dhost->lastup, dhost->lastdown, dhost->dhostid);
+			dhost->status,
+			dhost->lastup,
+			dhost->lastdown,
+			dhost->dhostid);
 }
 
 /******************************************************************************
@@ -405,19 +467,25 @@ static void	discovery_update_dhost(DB_DHOST *dhost)
  *                                                                            *
  * Purpose: update new host status                                            *
  *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	discovery_update_host_status(DB_DHOST *dhost, int status, int now)
 {
-	/* update host status */
-	if (DOBJECT_STATUS_UP == status)
+	/* Update host status */
+	if (status == DOBJECT_STATUS_UP)
 	{
-		if (DOBJECT_STATUS_DOWN == dhost->status || 0 == dhost->lastup)
+		if (dhost->status == DOBJECT_STATUS_DOWN || dhost->lastup == 0)
 		{
-			dhost->status = status;
-			dhost->lastdown = 0;
-			dhost->lastup = now;
+			dhost->status	= status;
+			dhost->lastdown	= 0;
+			dhost->lastup	= now;
 
 			discovery_update_dhost(dhost);
 			discovery_add_event(EVENT_OBJECT_DHOST, dhost->dhostid, now, DOBJECT_STATUS_DISCOVER);
@@ -425,11 +493,11 @@ static void	discovery_update_host_status(DB_DHOST *dhost, int status, int now)
 	}
 	else	/* DOBJECT_STATUS_DOWN */
 	{
-		if (DOBJECT_STATUS_UP == dhost->status || 0 == dhost->lastdown)
+		if (dhost->status == DOBJECT_STATUS_UP || dhost->lastdown == 0)
 		{
-			dhost->status = status;
-			dhost->lastdown = now;
-			dhost->lastup = 0;
+			dhost->status	= status;
+			dhost->lastdown	= now;
+			dhost->lastup	= 0;
 
 			discovery_update_dhost(dhost);
 			discovery_add_event(EVENT_OBJECT_DHOST, dhost->dhostid, now, DOBJECT_STATUS_LOST);
@@ -446,7 +514,11 @@ static void	discovery_update_host_status(DB_DHOST *dhost, int status, int now)
  *                                                                            *
  * Parameters: host - host info                                               *
  *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	discovery_update_host(DB_DHOST *dhost, const char *ip, int status, int now)
@@ -469,7 +541,11 @@ void	discovery_update_host(DB_DHOST *dhost, const char *ip, int status, int now)
  *                                                                            *
  * Parameters: service - service info                                         *
  *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	discovery_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
@@ -484,15 +560,15 @@ void	discovery_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhos
 
 	memset(&dservice, 0, sizeof(dservice));
 
-	/* register host if is not registered yet */
+	/* Register host if is not registered yet */
 	if (0 == dhost->dhostid)
 		discovery_register_host(drule, dcheck, dhost, ip, status, value);
 
-	/* register service if is not registered yet */
+	/* Register service if is not registered yet */
 	if (0 != dhost->dhostid)
 		discovery_register_service(drule, dcheck, dhost, &dservice, ip, port, status, now);
 
-	/* service was not registered because we do not add down service */
+	/* Service wasn't registered because we do not add down service */
 	if (0 != dservice.dserviceid)
 		discovery_update_service_status(&dservice, status, value, now);
 
