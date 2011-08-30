@@ -36,18 +36,35 @@ $macros = array_values($this->data['macros']);
 foreach ($macros as $macroid => $macro) {
 	$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30);
 	$text1->setAttribute('placeholder', '{$MACRO}');
+	$text1->setAttribute('style', 'text-transform:uppercase;');
 	$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40);
 	$text2->setAttribute('placeholder', '<'._('Value').'>');
 	$span = new CSpan(RARR);
 	$span->addStyle('vertical-align:top;');
+	$checkbox = new CCheckBox();
+	if (empty($macro['macro']) || (!empty($macro['type']) && $macro['type'] == 'new')) {
+		$checkbox->setAttribute('value', 'no');
+	}
 
-	$macrosTable->addRow(array(new CCheckBox(), $text1, $span, $text2));
+	$macrosTable->addRow(array($checkbox, $text1, $span, $text2));
 }
 
 // buttons
 $addButton = new CButton('macro_add', _('Add'), 'javascript: addMacroRow()');
 $addButton->setAttribute('style', 'margin-top:10px;');
-$deleteButton = new CButton('macros_del', _('Delete selected'), '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); if (typeof(deleted_macro_cnt) == \'undefined\') deleted_macro_cnt=1; else deleted_macro_cnt++; });');
+$deleteButton = new CButton('macros_del', _('Delete selected'), 'jQuery(document).ready(function() {
+																	jQuery(\'#tbl_macros input:checked\').each(function() {
+																		jQuery(this.parentNode.parentNode).remove();
+																		if (jQuery(this).val() == \'yes\') {
+																			if (typeof(deleted_macro_cnt) == \'undefined\') {
+																				deleted_macro_cnt = 1;
+																			}
+																			else {
+																				deleted_macro_cnt++;
+																			}
+																		}
+																	});
+																});');
 $deleteButton->setAttribute('style', 'margin-top:10px;');
 $saveButton = new CSubmit('save', _('Save'), "if (deleted_macro_cnt > 0) return confirm('"._('Are you sure you want to delete')." '+deleted_macro_cnt+' "._('macro(s)')."?');");
 $saveButton->addClass('main');

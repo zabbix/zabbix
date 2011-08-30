@@ -678,8 +678,6 @@
 	'S_MACRO_TOO_LONG'=>				_('Macro name is too long, should not exceed 64 chars.'),
 	'S_MACRO_VALUE_TOO_LONG'=>			_('Macro value is too long, should not exceed 255 chars.'),
 	'S_EMPTY_MACRO_VALUE'=>				_('Empty macro value'),
-	'S_MACROS_UPDATED'=>				_('Macros updated'),
-	'S_CANNOT_UPDATE_MACROS'=>				_('Cannot update macros'),
 	'S_HOST_LIST'=>					_('Hosts list'),
 	'S_IN'=>					_('In'),
 	'S_APPLICATION'=>				_('Application'),

@@ -25,6 +25,7 @@
 		text1.className = 'input text';
 		text1.setAttribute('size', 30);
 		text1.setAttribute('placeholder', '{$MACRO}');
+		text1.setAttribute('style', 'text-transform:uppercase;');
 		td2.appendChild(text1);
 		td2.appendChild(document.createTextNode(' '));
 
