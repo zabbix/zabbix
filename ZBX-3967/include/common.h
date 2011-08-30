@@ -737,7 +737,7 @@ void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
-char	*zbx_escape_symbols(const char *src, const char *symbols);
+char	*zbx_dyn_escape_string(const char *src, const char *symbols);
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay,
 		const char *delay_flex, time_t now, int *effective_delay);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
