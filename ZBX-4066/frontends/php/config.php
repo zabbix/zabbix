@@ -498,7 +498,7 @@ include_once('include/page_header.php');
 	}
 
 	// Macros
-	else if($_REQUEST['config'] == 11) {
+	else if ($_REQUEST['config'] == 11) {
 		if (isset($_REQUEST['save'])) {
 			try {
 				DBstart();
@@ -607,7 +607,7 @@ include_once('include/page_header.php');
 				DBend(true);
 				show_messages(true, S_MACROS_UPDATED, S_CANNOT_UPDATE_MACROS);
 			}
-			catch(Exception $e) {
+			catch (Exception $e) {
 				DBend(false);
 				error($e->getMessage());
 				show_messages(false, S_MACROS_UPDATED, S_CANNOT_UPDATE_MACROS);
