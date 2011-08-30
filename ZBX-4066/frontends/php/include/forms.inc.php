@@ -5335,14 +5335,14 @@ JAVASCRIPT;
 			$span = new CSpan(RARR);
 			$span->addStyle('vertical-align:top;');
 			$checkbox = new CCheckBox();
-			if (empty($macro['macro'])) {
+			if (empty($macro['macro']) || (!empty($macro['type']) && $macro['type'] == 'new')) {
 				$checkbox->setAttribute('value', 'no');
 			}
 
 			$macros_tbl->addRow(array($checkbox, $text1, $span, $text2));
 		}
 
-		$script = '	$$("#tbl_macros input:checked").each(function(obj){
+		$script = '	$$("#tbl_macros input:checked").each(function(obj) {
 						$(obj.parentNode.parentNode).remove();
 						if ($(obj).value == \'yes\') {
 							if (typeof(deleted_macro_cnt) == \'undefined\') {

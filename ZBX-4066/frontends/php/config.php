@@ -523,7 +523,7 @@ include_once('include/page_header.php');
 					// search for duplicates items in new macros array
 					foreach ($newMacros as $duplicateNumber => $duplicateNewMacro) {
 						if ($number != $duplicateNumber && $newMacro['macro'] == $duplicateNewMacro['macro']) {
-							$duplicatedMacros[] = $duplicateNewMacro['macro'];
+							$duplicatedMacros[] = '"'.$duplicateNewMacro['macro'].'"';
 						}
 					}
 				}
@@ -585,6 +585,11 @@ include_once('include/page_header.php');
 
 				// create
 				if (!empty($newMacros)) {
+					// mark marcos as new
+					foreach ($newMacros as $number => $macro) {
+						$_REQUEST['macros'][$number]['type'] = 'new';
+					}
+
 					$newMacrosIds = CUsermacro::createGlobal(array_values($newMacros));
 					if (!$newMacrosIds) {
 						throw new Exception(S_CANNOT_ADD_MACRO);
