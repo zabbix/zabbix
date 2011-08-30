@@ -2297,18 +2297,16 @@ int	num_key_param(char *param)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_escape_symbols_len(const char *src, const char *symbols)
+static size_t	zbx_escape_symbols_len(const char *src, const char *symbols)
 {
 	size_t	sz = 1;	/* '\0' */
 	int	i;
 
 	for (; '\0' != *src; src++)
 	{
-		for (i = 0; i < strlen(symbols); i++)
-		{
-			if (symbols[i] == *src)
-				sz++;
-		}
+		if (NULL != strchr(symbols, *src))
+			sz++;
+
 		sz++;
 	}
 
@@ -2317,7 +2315,7 @@ size_t	zbx_escape_symbols_len(const char *src, const char *symbols)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_escape_symbols                                               *
+ * Function: zbx_dyn_escape_string                                            *
  *                                                                            *
  * Purpose: escape symbols in the source string                               *
  *                                                                            *
@@ -2329,7 +2327,7 @@ size_t	zbx_escape_symbols_len(const char *src, const char *symbols)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_escape_symbols(const char *src, const char *symbols)
+char	*zbx_dyn_escape_string(const char *src, const char *symbols)
 {
 	size_t	sz;
 	char	*d, *dst = NULL;
@@ -2341,11 +2339,9 @@ char	*zbx_escape_symbols(const char *src, const char *symbols)
 
 	for (d = dst; '\0' != *src; src++)
 	{
-		for (i = 0; i < strlen(symbols); i++)
-		{
-			if (symbols[i] == *src)
-				*d++ = '\\';
-		}
+		if (NULL != strchr(symbols, *src))
+			*d++ = '\\';
+
 		*d++ = *src;
 	}
 

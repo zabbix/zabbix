@@ -129,7 +129,7 @@ static void run_remote_command(char* host_name, char* command)
 		else
 		{
 #endif
-			param = zbx_escape_symbols(p, "\"");
+			param = zbx_dyn_escape_string(p, "\"");
 			item.key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);
 			zbx_free(param);
 

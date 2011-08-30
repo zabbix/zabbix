@@ -89,9 +89,9 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	{
 		char	full_path[MAX_STRING_LEN], *send_to, *subject, *message, *output = NULL;
 
-		send_to = zbx_escape_symbols(alert->sendto, "\"\\");
-		subject = zbx_escape_symbols(alert->subject, "\"\\");
-		message = zbx_escape_symbols(alert->message, "\"\\");
+		send_to = zbx_dyn_escape_string(alert->sendto, "\"\\");
+		subject = zbx_dyn_escape_string(alert->subject, "\"\\");
+		message = zbx_dyn_escape_string(alert->message, "\"\\");
 
 		zbx_snprintf(full_path, sizeof(full_path), "%s/%s \"%s\" \"%s\" \"%s\"",
 				CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path, send_to, subject, message);
