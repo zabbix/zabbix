@@ -40,26 +40,26 @@ if(PAGE_TYPE_HTML == $page['type']){
 include_once('include/page_header.php');
 ?>
 <?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//		VAR			      TYPE     OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'apps'=>			array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
+		'apps'=>		array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
 		'applicationid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-		'close'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
-		'open'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
+		'close'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
+		'open'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
 
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
+		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
 // filter
-		'select'=>			array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
-		'show_without_data'=>array(T_ZBX_INT, O_OPT, NULL,	IN('1'),		NULL),
-		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
-		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
+		'select'=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
+		'show_without_data'=>	array(T_ZBX_INT, O_OPT, NULL,	IN('0,1'),	NULL),
+		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
+		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		NULL),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,		NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
 	);
 
 	check_fields($fields);
@@ -96,7 +96,6 @@ include_once('include/page_header.php');
 		$_REQUEST['select'] = CProfile::get('web.latest.filter.select', '');
 		$_REQUEST['show_without_data'] = CProfile::get('web.latest.filter.show_without_data', 0);
 	}
-
 // --------------
 
 	$latest_wdgt = new CWidget();

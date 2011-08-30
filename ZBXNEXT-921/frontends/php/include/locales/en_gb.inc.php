@@ -1149,7 +1149,7 @@
 	'S_UPDATE_EXISTING_NON_LINKED_ITEMS'=>			'update existing non linked items',
 	'S_COPY'=>						'Copy',
 	'S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE'=>			'Show items with description like',
-	'S_SHOW_ITEMS_WITHOUT_DATA'=> 'Show items without data',
+	'S_SHOW_ITEMS_WITHOUT_DATA'=>				'Show items without data',
 	'S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q'=>	'History clearing can take a long time. Continue?',
 	'S_MASS_UPDATE'=>					'Mass update',
 	'S_SEARCH'=>						'Search',
