@@ -1,6 +1,8 @@
 CREATE TABLE icon_map (
 	iconmapid                bigint                                    NOT NULL,
-	name                     varchar(64)                               NOT NULL,
+	name                     varchar(64)     DEFAULT ''                NOT NULL,
+	default_iconid           bigint                                    NOT NULL,
 	PRIMARY KEY (iconmapid)
 ) with OIDS;
-CREATE UNIQUE INDEX icon_map_1 ON icon_map (name);
+CREATE INDEX icon_map_1 ON icon_map (name);
+ALTER TABLE ONLY icon_map ADD CONSTRAINT c_icon_map_1 FOREIGN KEY (default_iconid) REFERENCES images (imageid);

@@ -94,7 +94,7 @@ ALTER TABLE sysmaps ADD label_string_image varchar(255) WITH DEFAULT '' NOT NULL
 /
 REORG TABLE sysmaps
 /
-ALTER TABLE sysmaps ADD iconmapid bigint WITH DEFAULT NULL
+ALTER TABLE sysmaps ADD iconmapid bigint NULL
 /
 REORG TABLE sysmaps
 /

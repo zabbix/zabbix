@@ -2,8 +2,8 @@ CREATE TABLE icon_mapping (
 	iconmappingid            bigint unsigned                           NOT NULL,
 	iconmapid                bigint unsigned                           NOT NULL,
 	iconid                   bigint unsigned                           NOT NULL,
-	inventory_link           integer                                   NOT NULL,
-	expression               varchar(64)                               NOT NULL,
+	inventory_link           integer         DEFAULT '0'               NOT NULL,
+	expression               varchar(64)     DEFAULT ''                NOT NULL,
 	sortorder                integer         DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (iconmappingid)
 ) ENGINE=InnoDB;
