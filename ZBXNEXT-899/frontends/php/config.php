@@ -147,11 +147,11 @@ include_once('include/page_header.php');
 			$file = isset($_FILES['image']) && $_FILES['image']['name'] != '' ? $_FILES['image'] : null;
 			if (!is_null($file)) {
 				if ($file['error'] != 0 || $file['size'] == 0) {
-					error(_('Incorrect Image'));
+					error(_('Incorrect image'));
 					return false;
 				}
 				if ($file['size'] < ZBX_MAX_IMAGE_SIZE) {
-					$image = fread(fopen($file['tmp_name'],'r'), filesize($file['tmp_name']));
+					$image = fread(fopen($file['tmp_name'], 'r'), filesize($file['tmp_name']));
 				}
 				else {
 					error(_('Image size must be less than 1MB'));
