@@ -5338,8 +5338,8 @@ JAVASCRIPT;
 			$macros_tbl->addRow(array(new CCheckBox(), $text1, $span, $text2));
 		}
 
-		$script = '$$("#tbl_macros input:checked").each(function(obj){
-					$(obj.parentNode.parentNode).remove();
+		$script = '	$$("#tbl_macros input:checked").each(function(obj){
+						$(obj.parentNode.parentNode).remove();
 						if ($(obj).value == \'yes\') {
 							if (typeof(deleted_macro_cnt) == \'undefined\') {
 								deleted_macro_cnt = 1;
