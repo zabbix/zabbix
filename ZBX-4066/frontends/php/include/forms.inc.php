@@ -5338,8 +5338,17 @@ JAVASCRIPT;
 			$macros_tbl->addRow(array(new CCheckBox(), $text1, $span, $text2));
 		}
 
-
-		$script = '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); if (typeof(deleted_macro_cnt) == \'undefined\') deleted_macro_cnt=1; else deleted_macro_cnt++; });';
+		$script = '$$("#tbl_macros input:checked").each(function(obj){
+					$(obj.parentNode.parentNode).remove();
+						if ($(obj).value == \'yes\') {
+							if (typeof(deleted_macro_cnt) == \'undefined\') {
+								deleted_macro_cnt = 1;
+							}
+							else {
+								deleted_macro_cnt++;
+							}
+						}
+					});';
 		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED, $script);
 		$delete_btn->setType('button');
 
