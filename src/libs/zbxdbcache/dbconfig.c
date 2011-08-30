@@ -2440,6 +2440,7 @@ void	DCsync_configuration()
 
 	FINISH_SYNC;
 
+	DBfree_result(conf_result);
 	DBfree_result(item_result);
 	DBfree_result(trig_result);
 	DBfree_result(tdep_result);
