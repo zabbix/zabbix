@@ -1029,27 +1029,7 @@ static void	DCsync_hosts(DB_RESULT result)
 				host_ph->sync_num = sync_num;
 			}
 			else
-			{
-				if (HOST_STATUS_MONITORED != status)
-				{
-					if (HOST_STATUS_PROXY_ACTIVE == status)
-						host_ph_local.status = HOST_STATUS_PROXY_PASSIVE;
-					else
-						host_ph_local.status = HOST_STATUS_PROXY_ACTIVE;
-
-					if (NULL != zbx_hashset_search(&config->hosts_ph, &host_ph_local) &&
-							(0 == found || sync_num == host_ph->sync_num))
-					{
-						/* duplicate proxies found */
-
-						zabbix_log(LOG_LEVEL_CRIT, "Error: duplicate proxies [%s] found. Exiting...",
-								host_ph->host);
-						exit(FAIL);
-					}
-				}
-
 				update_index = 1;
-			}
 		}
 
 		update_queue = (0 == found && HOST_STATUS_PROXY_PASSIVE == status)
