@@ -5334,8 +5334,12 @@ JAVASCRIPT;
 			$text2->setAttribute('placeholder', '<'.S_VALUE.'>');
 			$span = new CSpan(RARR);
 			$span->addStyle('vertical-align:top;');
+			$checkbox = new CCheckBox();
+			if (empty($macro['macro'])) {
+				$checkbox->setAttribute('value', 'no');
+			}
 
-			$macros_tbl->addRow(array(new CCheckBox(), $text1, $span, $text2));
+			$macros_tbl->addRow(array($checkbox, $text1, $span, $text2));
 		}
 
 		$script = '	$$("#tbl_macros input:checked").each(function(obj){

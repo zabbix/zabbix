@@ -507,6 +507,14 @@ include_once('include/page_header.php');
 				$globalMacros = zbx_toHash($globalMacros, 'macro');
 
 				$newMacros = get_request('macros', array());
+
+				// remove item from new macros array if name and value is empty
+				foreach ($newMacros as $number => $newMacro) {
+					if (zbx_empty($newMacro['macro']) && zbx_empty($newMacro['value'])) {
+						unset($newMacros[$number]);
+					}
+				}
+
 				$duplicatedMacros = array();
 				foreach ($newMacros as $number => $newMacro) {
 					// transform macros to uppercase {$aaa} => {$AAA}
@@ -518,16 +526,11 @@ include_once('include/page_header.php');
 							$duplicatedMacros[] = $duplicateNewMacro['macro'];
 						}
 					}
-
-					// remove item from new macros array if name and value is empty
-					if (zbx_empty($newMacro['macro']) && zbx_empty($newMacro['value'])) {
-						unset($newMacros[$number]);
-					}
 				}
 
 				// validate duplicates macros
 				if (!empty($duplicatedMacros)) {
-					throw new Exception(S_EMPTY_MACRO_DUPLICATED.SPACE.implode(', ', array_unique($duplicatedMacros)));
+					throw new Exception(S_DUPLICATED_MACRO_FOUND.SPACE.implode(', ', array_unique($duplicatedMacros)));
 				}
 
 				// save filtered macro array
@@ -546,6 +549,9 @@ include_once('include/page_header.php');
 				if (!empty($macrosToUpdate)) {
 					if (!CUsermacro::updateGlobal($macrosToUpdate)) {
 						throw new Exception(S_CANNOT_UPDATE_MACRO);
+					}
+					foreach ($macrosToUpdate as $macro) {
+						add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $globalMacros[$macro['macro']]['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
 					}
 				}
 
