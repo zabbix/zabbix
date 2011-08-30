@@ -134,17 +134,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 		zabbix_syslog("Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
 	}
 
-	/* remove formatting symbols from the end of the result */
+	/* remove formatting characters from the end of the result */
 	/* so it could be checked by "is_uint64" and "is_double" functions */
 	/* when we try to get "int" or "float" values from "string" result */
 	if (ISSET_STR(result))
-	{
 		zbx_rtrim(result->str, " \r\n");
-	}
+
 	if (ISSET_TEXT(result))
-	{
 		zbx_rtrim(result->text, " \r\n");
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 

@@ -618,13 +618,13 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				if ('\0' != *host)
 				{
 					/* by host name */
-					make_hostname(host); /* replace not-allowed symbols */
+					make_hostname(host); /* replace not-allowed characters */
 					host_unique = DBget_unique_hostname_by_sample(host);
 				}
 				else
 				{
 					/* by ip */
-					make_hostname(row[1]); /* replace not-allowed symbols */
+					make_hostname(row[1]); /* replace not-allowed characters */
 					host_unique = DBget_unique_hostname_by_sample(row[1]);
 				}
 

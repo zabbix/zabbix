@@ -484,8 +484,10 @@ void	zbx_remove_chars(register char *str, const char *charlist)
 		return;
 
 	for (p = str; '\0' != *p; p++)
+	{
 		if (NULL == strchr(charlist, *p))
 			*str++ = *p;
+	}
 
 	*str = '\0';
 }
@@ -2285,29 +2287,26 @@ int	num_key_param(char *param)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_escape_symbols_len                                           *
+ * Function: zbx_get_escape_string_len                                        *
  *                                                                            *
  * Purpose: calculate the required size for the escaped string                *
  *                                                                            *
  * Parameters: src - [IN] null terminated source string                       *
- *             symbols - [IN] null terminated to-be-escaped symbol list       *
+ *             charlist - [IN] null terminated to-be-escaped character list   *
  *                                                                            *
  * Return value: size of the escaped string                                   *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static size_t	zbx_escape_symbols_len(const char *src, const char *symbols)
+static size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
 {
 	size_t	sz = 1;	/* '\0' */
-	int	i;
 
-	for (; '\0' != *src; src++)
+	for (; '\0' != *src; src++, sz++)
 	{
-		if (NULL != strchr(symbols, *src))
+		if (NULL != strchr(charlist, *src))
 			sz++;
-
-		sz++;
 	}
 
 	return sz;
@@ -2317,29 +2316,28 @@ static size_t	zbx_escape_symbols_len(const char *src, const char *symbols)
  *                                                                            *
  * Function: zbx_dyn_escape_string                                            *
  *                                                                            *
- * Purpose: escape symbols in the source string                               *
+ * Purpose: escape characters in the source string                            *
  *                                                                            *
  * Parameters: src - [IN] null terminated source string                       *
- *             symbols - [IN] null terminated to-be-escaped symbol list       *
+ *             charlist - [IN] null terminated to-be-escaped character list   *
  *                                                                            *
  * Return value: the escaped string                                           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dyn_escape_string(const char *src, const char *symbols)
+char	*zbx_dyn_escape_string(const char *src, const char *charlist)
 {
 	size_t	sz;
 	char	*d, *dst = NULL;
-	int	i;
 
-	sz = zbx_escape_symbols_len(src, symbols);
+	sz = zbx_get_escape_string_len(src, charlist);
 
-	dst = malloc(sz);
+	dst = zbx_malloc(dst, sz);
 
 	for (d = dst; '\0' != *src; src++)
 	{
-		if (NULL != strchr(symbols, *src))
+		if (NULL != strchr(charlist, *src))
 			*d++ = '\\';
 
 		*d++ = *src;

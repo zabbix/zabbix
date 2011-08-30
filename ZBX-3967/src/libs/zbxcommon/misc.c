@@ -2003,7 +2003,7 @@ int	is_function_char(char c)
  *                                                                            *
  * Function: make_hostname                                                    *
  *                                                                            *
- * Purpose: replace all not-allowed hostname symbols in the string            *
+ * Purpose: replace all not-allowed hostname characters in the string         *
  *                                                                            *
  * Parameters: host - the target C-style string                               *
  *                                                                            *
@@ -2019,8 +2019,10 @@ void	make_hostname(char *host)
 	assert(host);
 	
 	for (c = host; '\0' != *c; ++c)
+	{
 		if (FAIL == is_hostname_char(*c))
 			*c = '_';
+	}
 }
 
 /******************************************************************************
