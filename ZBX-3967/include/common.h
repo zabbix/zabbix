@@ -762,7 +762,7 @@ void	zbx_strarr_free(char **arr);
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define zbx_setproctitle __zbx_zbx_setproctitle
-#endif /* HAVE___VA_ARGS__ */
+#endif
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
 #define ZBX_KIBIBYTE		1024

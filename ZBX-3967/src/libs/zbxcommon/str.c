@@ -415,8 +415,6 @@ void	del_zeroes(char *s)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_rtrim(char *str, const char *charlist)
 {
@@ -443,8 +441,6 @@ int	zbx_rtrim(char *str, const char *charlist)
  * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_ltrim(char *str, const char *charlist)
@@ -478,8 +474,6 @@ void	zbx_ltrim(char *str, const char *charlist)
  * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_remove_chars(register char *str, const char *charlist)
@@ -603,8 +597,6 @@ void	compress_signs(char *str)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 void	rtrim_spaces(char *c)
 {
@@ -632,8 +624,6 @@ void	rtrim_spaces(char *c)
  * Return value: string without left spaces                                   *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	ltrim_spaces(char *c)
@@ -670,8 +660,6 @@ void	ltrim_spaces(char *c)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 void	lrtrim_spaces(char *c)
 {
@@ -707,8 +695,6 @@ void	lrtrim_spaces(char *c)
  * Returns strlen(src); if retval >= siz, truncation occurred.                *
  *                                                                            *
  * Author: Todd C. Miller <Todd.Miller@courtesan.com>                         *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
@@ -752,8 +738,6 @@ size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
  * If retval >= siz, truncation occurred.                                     *
  *                                                                            *
  * Author: Todd C. Miller <Todd.Miller@courtesan.com>                         *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz)
@@ -937,8 +921,6 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_check_hostname(const char *hostname)
 {
@@ -973,8 +955,6 @@ int	zbx_check_hostname(const char *hostname)
  *               or FAIL and pointer to incorrect char                        *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	parse_host(char **exp, char **host)
@@ -1017,8 +997,6 @@ int	parse_host(char **exp, char **host)
  *               or FAIL and pointer to incorrect char                        *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	parse_key(char **exp, char **key)
@@ -1183,8 +1161,6 @@ succeed:
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	parse_function(char **exp, char **func, char **params)
 {
@@ -1303,8 +1279,6 @@ error:
  * Return value: return SUCCEED or FAIL                                       *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	parse_host_key(char *exp, char **host, char **key)
@@ -1888,8 +1862,6 @@ const char	*get_string(const char *p, char *buf, size_t bufsize)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 char	zbx_num2hex(u_char c)
 {
@@ -1912,8 +1884,6 @@ char	zbx_num2hex(u_char c)
  *      0-15                                                                  *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 u_char	zbx_hex2num(char c)
@@ -1939,8 +1909,6 @@ u_char	zbx_hex2num(char c)
  * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen)
@@ -1984,8 +1952,6 @@ int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_hex2binary(char *io)
 {
@@ -2026,8 +1992,6 @@ int	zbx_hex2binary(char *io)
  * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
@@ -2112,8 +2076,6 @@ int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_pg_unescape_bytea(u_char *io)
 {
@@ -2168,8 +2130,6 @@ int	zbx_pg_unescape_bytea(u_char *io)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator)
 {
@@ -2219,8 +2179,6 @@ int	zbx_get_next_field(const char **line, char **output, int *olen, char separat
  * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	str_in_list(const char *list, const char *value, char delimiter)
@@ -2329,22 +2287,20 @@ int	num_key_param(char *param)
  *                                                                            *
  * Function: zbx_escape_symbols_len                                           *
  *                                                                            *
- * Purpose: calculate size of buffer for escaped string                       *
+ * Purpose: calculate the required size for the escaped string                *
  *                                                                            *
- * Parameters: src - [IN] source string                                       *
- *             symbols - [IN] symbols that should be escaped                  *
+ * Parameters: src - [IN] null terminated source string                       *
+ *             symbols - [IN] null terminated to-be-escaped symbol list       *
  *                                                                            *
- * Return value: size of escaped string                                       *
+ * Return value: size of the escaped string                                   *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_escape_symbols_len(const char *src, const char *symbols)
 {
 	size_t	sz = 1;	/* '\0' */
-	int		i;
+	int	i;
 
 	for (; '\0' != *src; src++)
 	{
@@ -2363,23 +2319,21 @@ size_t	zbx_escape_symbols_len(const char *src, const char *symbols)
  *                                                                            *
  * Function: zbx_escape_symbols                                               *
  *                                                                            *
- * Purpose: escaping symbols in source string                                 *
+ * Purpose: escape symbols in the source string                               *
  *                                                                            *
- * Parameters: src - [IN] source string                                       *
- *             symbols - [IN] symbols that should be escaped                  *
+ * Parameters: src - [IN] null terminated source string                       *
+ *             symbols - [IN] null terminated to-be-escaped symbol list       *
  *                                                                            *
- * Return value: escaped string                                               *
+ * Return value: the escaped string                                           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_escape_symbols(const char *src, const char *symbols)
 {
 	size_t	sz;
 	char	*d, *dst = NULL;
-	int		i;
+	int	i;
 
 	sz = zbx_escape_symbols_len(src, symbols);
 
@@ -2937,8 +2891,6 @@ int	zbx_strlen_utf8(const char *text)
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 char	*zbx_replace_utf8(const char *text)
 {
@@ -2994,8 +2946,6 @@ bad:
  * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_replace_invalid_utf8(char *text)
@@ -3267,8 +3217,6 @@ void	zbx_strarr_add(char ***arr, const char *entry)
  * Return value:                                                              *
  *                                                                            *
  * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_strarr_free(char **arr)
