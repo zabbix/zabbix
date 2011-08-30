@@ -2327,11 +2327,12 @@ int	num_key_param(char *param)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_escape_param_len                                             *
+ * Function: zbx_escape_symbols_len                                           *
  *                                                                            *
  * Purpose: calculate size of buffer for escaped string                       *
  *                                                                            *
  * Parameters: src - [IN] source string                                       *
+ *             symbols - [IN] symbols that should be escaped                  *
  *                                                                            *
  * Return value: size of escaped string                                       *
  *                                                                            *
@@ -2340,14 +2341,18 @@ int	num_key_param(char *param)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static size_t	get_escape_param_len(const char *src)
+size_t	zbx_escape_symbols_len(const char *src, const char *symbols)
 {
 	size_t	sz = 1;	/* '\0' */
+	int		i;
 
 	for (; '\0' != *src; src++)
 	{
-		if ('"' == *src)
-			sz++;
+		for (i = 0; i < strlen(symbols); i++)
+		{
+			if (symbols[i] == *src)
+				sz++;
+		}
 		sz++;
 	}
 
@@ -2356,11 +2361,12 @@ static size_t	get_escape_param_len(const char *src)
 
 /******************************************************************************
  *                                                                            *
- * Function: dyn_escape_param                                                 *
+ * Function: zbx_escape_symbols                                               *
  *                                                                            *
- * Purpose: escaping source string for using in quoted key parameters         *
+ * Purpose: escaping symbols in source string                                 *
  *                                                                            *
  * Parameters: src - [IN] source string                                       *
+ *             symbols - [IN] symbols that should be escaped                  *
  *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
@@ -2369,19 +2375,23 @@ static size_t	get_escape_param_len(const char *src)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-char	*dyn_escape_param(const char *src)
+char	*zbx_escape_symbols(const char *src, const char *symbols)
 {
 	size_t	sz;
 	char	*d, *dst = NULL;
+	int		i;
 
-	sz = get_escape_param_len(src);
+	sz = zbx_escape_symbols_len(src, symbols);
 
 	dst = malloc(sz);
 
 	for (d = dst; '\0' != *src; src++)
 	{
-		if ('"' == *src)
-			*d++ = '\\';
+		for (i = 0; i < strlen(symbols); i++)
+		{
+			if (symbols[i] == *src)
+				*d++ = '\\';
+		}
 		*d++ = *src;
 	}
 
