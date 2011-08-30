@@ -560,7 +560,9 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
     left: -4px; /*must have*/
     width: 200px; /*must have*/
     height: 200px; /*must have*/
-}/*
+}
+
+/*
  * jQuery UI Progressbar 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
@@ -571,3 +573,16 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  */
 .originalblue .ui-progressbar { height:2em; text-align: left; }
 .originalblue .ui-progressbar .ui-progressbar-value {margin: -1px; height:100%; }
+
+/* jQuery UI Tooltip */
+.ui-tooltip {
+	padding:8px;
+	position:absolute;
+	z-index:9999;
+	-o-box-shadow: 0 0 5px #aaa;
+	-moz-box-shadow: 0 0 5px #aaa;
+	-webkit-box-shadow: 0 0 5px #aaa;
+	box-shadow: 0 0 5px #aaa;
+}
+* html .ui-tooltip { background-image: none; }
+body .ui-tooltip { border-width:2px; }

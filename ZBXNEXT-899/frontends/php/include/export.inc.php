@@ -651,7 +651,7 @@ class zbxXML{
 							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['background']['missed'])))
 						{
 
-// No need to decode_base64
+							// No need to decode_base64
 							$image['image'] = $image['encodedImage'];
 
 							unset($image['encodedImage']);
@@ -659,15 +659,15 @@ class zbxXML{
 						}
 					}
 				}
-//sdi($images_to_add);
-				if(!empty($images_to_add)){
+
+				if (!empty($images_to_add)) {
 					$result = API::Image()->create($images_to_add);
-					if(!$result) throw new Exception(S_CANNOT_ADD_IMAGE);
+					if (!$result) throw new Exception(_('Cannot add image'));
 				}
-//sdi($images_to_update);
-				if(!empty($images_to_update)){
+
+				if (!empty($images_to_update)) {
 					$result = API::Image()->update($images_to_update);
-					if(!$result) throw new Exception(S_CANNOT_UPDATE_IMAGE);
+					if (!$result) throw new Exception(_('Cannot update image'));
 				}
 			}
 

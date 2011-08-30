@@ -41,4 +41,22 @@ function SDII($msg='SDII') { echo 'DEBUG INFO: '; echo '<pre>'.print_r($msg, tru
 function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
 function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
 
+function sdf(&$var) {
+	$value = $var;
+	$var = $new = null;
+	$varname = false;
+	foreach ($GLOBALS as $key => $val) {
+		if ($val === $new) $varname = $key;
+	}
+
+	echo '$'.$varname.'=';
+
+	if (is_array($value) || is_object($value)) {
+		echo '<pre>'.print_r($value, true).'</pre>';
+	}
+	else {
+		echo $value;
+	}
+	echo SBR;
+}
 ?>
