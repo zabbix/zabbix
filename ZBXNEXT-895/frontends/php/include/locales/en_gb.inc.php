@@ -333,11 +333,9 @@
 // Colours
 
 //	config.php
-	'S_GUI'=>					_('GUI'),
 	'S_DROPDOWN_FIRST_ENTRY'=>			_('Dropdown first entry'),
 	'S_DROPDOWN_REMEMBER_SELECTED'=>		_('remember selected'),
 	'S_MAX_IN_TABLE' =>				_('Max count of elements to show inside table cell'),
-	'S_SEARCH_LIMIT' =>				_('Search/Filter elements limit'),
 	'S_SYSTEM_DEFAULT'=>				_('System default'),
 	'S_BLACK_AND_BLUE'=>				_('Black & Blue'),
 	'S_ORIGINAL_BLUE'=>				_('Original blue'),
@@ -346,7 +344,6 @@
 	'S_EVENT_ACKNOWLEDGES'=>			_('Event acknowledges'),
 	'S_DAYS'=>					_('Days'),
 	'S_SHOW_EVENTS_MAX'=>				_('Show events max'),
-	'S_MAX_COUNT_OF_EVENTS'=>			_('Max count of events per trigger to show'),
 	'S_CANNNOT_UPDATE_VALUE_MAP'=>			_('Cannot update value map'),
 	'S_VALUE_MAP_ADDED'=>				_('Value map added'),
 	'S_CANNNOT_ADD_VALUE_MAP'=>			_('Cannot add value map'),

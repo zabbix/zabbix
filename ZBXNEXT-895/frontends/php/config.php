@@ -532,7 +532,6 @@ include_once('include/page_header.php');
 			}
 		}
 	}
-
 	// Macros
 	elseif ($_REQUEST['config'] == 11) {
 		if (isset($_REQUEST['save'])) {
@@ -641,12 +640,12 @@ include_once('include/page_header.php');
 				}
 
 				DBend(true);
-				show_messages(true, _('Macros updated'), _('Cannot update macros'));
+				show_message(_('Macros updated'));
 			}
 			catch (Exception $e) {
 				DBend(false);
 				error($e->getMessage());
-				show_messages(false, _('Macros updated'), _('Cannot update macros'));
+				show_error_message(_('Cannot update macros'));
 			}
 		}
 
@@ -1212,7 +1211,7 @@ include_once('include/page_header.php');
 /////////////////////////////
 //  config = 11 // Macros  //
 /////////////////////////////
-	elseif($_REQUEST['config'] == 11){
+	elseif ($_REQUEST['config'] == 11) {
 		$data = array();
 		$data['form'] = get_request('form', 1);
 		$data['form_refresh'] = get_request('form_refresh', 0);
