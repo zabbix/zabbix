@@ -144,61 +144,74 @@ include_once('include/page_header.php');
 	// Images
 	if ($_REQUEST['config'] == 3) {
 		if (isset($_REQUEST['save'])) {
-			$file = isset($_FILES['image']) && $_FILES['image']['name'] != '' ? $_FILES['image'] : null;
-			if (!is_null($file)) {
-				if ($file['error'] != 0 || $file['size'] == 0) {
-					error(_('Incorrect image'));
-					return false;
-				}
-				if ($file['size'] < ZBX_MAX_IMAGE_SIZE) {
-					$image = fread(fopen($file['tmp_name'], 'r'), filesize($file['tmp_name']));
-				}
-				else {
-					error(_('Image size must be less than 1MB'));
-					return false;
-				}
-
-				$image = base64_encode($image);
-			}
 
 			if (isset($_REQUEST['imageid'])) {
-				$val = array(
-					'imageid' => $_REQUEST['imageid'],
-					'name' => $_REQUEST['name'],
-					'imagetype' => $_REQUEST['imagetype'],
-					'image' => is_null($file) ? null : $image
-				);
-				$result = API::Image()->update($val);
-
 				$msg_ok = _('Image updated');
 				$msg_fail = _('Cannot update image');
-				$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
 			}
 			else {
-				if (is_null($file)) {
-					error(_('Select image to download'));
-					return false;
-				}
-				if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-					access_deny();
-				}
-
-				$val = array(
-					'name' => $_REQUEST['name'],
-					'imagetype' => $_REQUEST['imagetype'],
-					'image' => $image
-				);
-				$result = API::Image()->create($val);
-
 				$msg_ok = _('Image added');
 				$msg_fail = _('Cannot add image');
-				$audit_action = 'Image ['.$_REQUEST['name'].'] added';
 			}
 
-			show_messages($result, $msg_ok, $msg_fail);
-			if ($result) {
-				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, $audit_action);
-				unset($_REQUEST['form']);
+			try {
+				DBstart();
+				$file = isset($_FILES['image']) && $_FILES['image']['name'] != '' ? $_FILES['image'] : null;
+				if (!is_null($file)) {
+					if ($file['error'] != 0 || $file['size'] == 0) {
+						throw new Exception(_('Incorrect image'));
+					}
+					if ($file['size'] < ZBX_MAX_IMAGE_SIZE) {
+						$image = fread(fopen($file['tmp_name'], 'r'), filesize($file['tmp_name']));
+					}
+					else {
+						throw new Exception(_('Image size must be less than 1MB'));
+					}
+
+					$image = base64_encode($image);
+				}
+
+				if (isset($_REQUEST['imageid'])) {
+					$val = array(
+						'imageid' => $_REQUEST['imageid'],
+						'name' => $_REQUEST['name'],
+						'imagetype' => $_REQUEST['imagetype'],
+						'image' => is_null($file) ? null : $image
+					);
+					$result = API::Image()->update($val);
+
+					$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
+				}
+				else {
+					if (is_null($file)) {
+						throw new Exception(_('Select image to download'));
+					}
+					if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+						access_deny();
+					}
+
+					$val = array(
+						'name' => $_REQUEST['name'],
+						'imagetype' => $_REQUEST['imagetype'],
+						'image' => $image
+					);
+					$result = API::Image()->create($val);
+
+					$audit_action = 'Image ['.$_REQUEST['name'].'] added';
+				}
+
+				if ($result) {
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, $audit_action);
+					unset($_REQUEST['form']);
+				}
+
+				DBend($result);
+				show_messages($result, $msg_ok, $msg_fail);
+			}
+			catch (Exception $e) {
+				DBend(false);
+				error($e->getMessage());
+				show_error_message($msg_fail);
 			}
 		}
 		elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
@@ -728,7 +741,7 @@ include_once('include/page_header.php');
 
 		if (!empty($data['form'])) {
 			if (!empty($_REQUEST['imageid'])) {
-				$image = DBfetch(DBselect('SELECT i.name,i.imagetype FROM images i WHERE i.imageid='.$_REQUEST['imageid']));
+				$image = DBfetch(DBselect('SELECT i.imagetype, i.name FROM images i WHERE i.imageid = '.$_REQUEST['imageid']));
 
 				$data['imageid'] = $_REQUEST['imageid'];
 				$data['imagename'] = $image['name'];

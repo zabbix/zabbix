@@ -36,7 +36,12 @@ $imageFormList->addRow(_('Name'), new CTextBox('name', $this->data['imagename'],
 $imageFormList->addRow(_('Type'), $imageCb);
 $imageFormList->addRow(_('Upload'), new CFile('image'));
 if (!empty($this->data['imageid'])) {
-	$imageFormList->addRow(_('Image'), new CLink(new CImg('imgstore.php?iconid='.$this->data['imageid'], 'no image', null), 'image.php?imageid='.$this->data['imageid']));
+	if ($data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
+		$imageFormList->addRow(_('Image'), new CLink(new CImg('imgstore.php?iconid='.$this->data['imageid'], 'no image', 200), 'image.php?imageid='.$this->data['imageid']));
+	}
+	else {
+		$imageFormList->addRow(_('Image'), new CImg('imgstore.php?iconid='.$this->data['imageid'], 'no image', null));
+	}
 }
 
 // append tab
