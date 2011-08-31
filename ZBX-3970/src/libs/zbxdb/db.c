@@ -795,13 +795,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 #elif defined(HAVE_POSTGRESQL)
 	result = PQexec(conn,sql);
 
-	if (NULL == result)
-	{
-		zabbix_errlog(ERR_Z3005, 0, "result is NULL", sql);
-		ret = (CONNECTION_OK == PQstatus(conn) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
-	}
-
-	if (PGRES_COMMAND_OK != PQresultStatus(result))
+	if (NULL == result || PGRES_COMMAND_OK != PQresultStatus(result))
 	{
 		error = zbx_dsprintf(error, "%s:%s",
 				PQresStatus(PQresultStatus(result)),
