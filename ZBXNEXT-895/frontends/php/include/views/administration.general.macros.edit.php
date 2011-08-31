@@ -27,24 +27,24 @@ $macrosForm->addVar('form', $this->data['form']);
 $macrosForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $macrosForm->addVar('config', get_request('config', 11));
 
-$macrosTable = new CTable(SPACE, 'macrosTable');
+$macrosTable = new CTable(SPACE, 'formElementTable');
 $macrosTable->setAttribute('id', 'tbl_macros');
 $macrosTable->addRow(array(SPACE, _('Macro'), SPACE, _('Value')));
 
 // fields
 $macros = array_values($this->data['macros']);
 foreach ($macros as $macroid => $macro) {
-	$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30);
-	$text1->setAttribute('placeholder', '{$MACRO}');
-	$text1->setAttribute('style', 'text-transform:uppercase;');
-	$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40);
-	$text2->setAttribute('placeholder', '<'._('Value').'>');
-	$span = new CSpan(RARR);
-	$span->addStyle('vertical-align:top;');
 	$checkbox = new CCheckBox();
 	if (empty($macro['macro']) || (!empty($macro['type']) && $macro['type'] == 'new')) {
 		$checkbox->setAttribute('value', 'no');
 	}
+	$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30, 'no', 64);
+	$text1->setAttribute('placeholder', '{$MACRO}');
+	$text1->setAttribute('style', 'text-transform:uppercase;');
+	$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40, 'no', 255);
+	$text2->setAttribute('placeholder', '<'._('Value').'>');
+	$span = new CSpan(RARR);
+	$span->addStyle('vertical-align:top;');
 
 	$macrosTable->addRow(array($checkbox, $text1, $span, $text2));
 }

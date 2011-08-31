@@ -20,10 +20,11 @@
 		tr.appendChild(td2);
 
 		var text1 = document.createElement('input');
+		text1.className = 'input text';
 		text1.setAttribute('type', 'text');
 		text1.setAttribute('name', 'macros['+addMacroRow.macro_count+'][macro]');
-		text1.className = 'input text';
 		text1.setAttribute('size', 30);
+		text1.setAttribute('maxlength', 64);
 		text1.setAttribute('placeholder', '{$MACRO}');
 		text1.setAttribute('style', 'text-transform:uppercase;');
 		td2.appendChild(text1);
@@ -41,11 +42,12 @@
 		tr.appendChild(td4);
 
 		var text2 = document.createElement('input');
+		text2.className = 'input text';
 		text2.setAttribute('type', 'text');
 		text2.setAttribute('placeholder', "<<?php echo _('Value'); ?>>");
 		text2.setAttribute('name', 'macros['+addMacroRow.macro_count+'][value]');
-		text2.className = 'input text';
 		text2.setAttribute('size', 40);
+		text2.setAttribute('maxlength', 255);
 		td4.appendChild(text2);
 
 		var sd = $('row_new_macro').insert({before : tr});
