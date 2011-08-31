@@ -1113,16 +1113,16 @@ static int	DBget_escape_string_len(const char *src)
 
 	for (s = src; NULL != s && '\0' != *s; s++)
 	{
-		if (*s == '\r')
+		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL) && defined(HAVE_POSTGRESQL)
-		if (*s == '\'' || *s == '\\')
-			len++;
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || '\\' == *s)
 #else
-		if (*s == '\'')
-			len++;
+		if ('\'' == *s)
 #endif
+			len++;
+
 		len++;
 	}
 
@@ -1145,7 +1145,7 @@ static void	DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
-#if defined(HAVE_MYSQL) && defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_ESC_CH	'\\'
 #else
 #	define ZBX_DB_ESC_CH	'\''
@@ -1156,16 +1156,16 @@ static void	DBescape_string(const char *src, char *dst, int len)
 
 	for (s = src, d = dst; NULL != s && '\0' != *s && 0 < len; s++)
 	{
-		if (*s == '\r')
+		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL) && defined(HAVE_POSTGRESQL)
-		if (*s == '\'' || *s == '\\')
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || '\\' == *s)
 #else
-		if (*s == '\'')
+		if ('\'' == *s)
 #endif
 		{
-			if (len < 2)
+			if (2 > len)
 				break;
 #if defined(HAVE_POSTGRESQL)
 			*d++ = *s;
@@ -1222,16 +1222,16 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
 
 	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
 	{
-		if (*s == '\r')
+		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL) && defined(HAVE_POSTGRESQL)
-		if (*s == '\'' || *s == '\\')
-			len++;
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || '\\' == *s)
 #else
-		if (*s == '\'')
-			len++;
+		if ('\'' == *s)
 #endif
+			len++;
+
 		len++;
 
 		/* only UTF-8 characters should reduce a variable max_src_len */

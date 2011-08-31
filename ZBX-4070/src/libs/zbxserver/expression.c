@@ -2324,21 +2324,29 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 			func = (zbx_func_t *)ifunc->functions.values[i];
 
 			if (ITEM_STATUS_DISABLED == item.status)
+			{
 				func->error = zbx_dsprintf(func->error, "Item disabled for function: {%s:%s.%s(%s)}",
 						item.host_name, item.key, func->function, func->parameter);
+			}
 			else if (ITEM_STATUS_NOTSUPPORTED == item.status)
+			{
 				func->error = zbx_dsprintf(func->error, "Item not supported for function: {%s:%s.%s(%s)}",
 						item.host_name, item.key, func->function, func->parameter);
+			}
 			else if (HOST_STATUS_NOT_MONITORED == host_status)
+			{
 				func->error = zbx_dsprintf(func->error, "Host disabled for function: {%s:%s.%s(%s)}",
 						item.host_name, item.key, func->function, func->parameter);
+			}
 
 			if (NULL != func->error)
 				continue;
 
 			if (SUCCEED != evaluate_function(value, &item, func->function, func->parameter, func->lastchange))
+			{
 				func->error = zbx_dsprintf(func->error, "Evaluation failed for function: {%s:%s.%s(%s)}",
 						item.host_name, item.key, func->function, func->parameter);
+			}
 			else
 				func->value = zbx_strdup(func->value, value);
 		}

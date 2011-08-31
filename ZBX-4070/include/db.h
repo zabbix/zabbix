@@ -36,7 +36,7 @@ extern int	CONFIG_NODEID;
 extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_NODE_NOHISTORY;
-extern int     CONFIG_REFRESH_UNSUPPORTED;
+extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
@@ -335,45 +335,45 @@ history_value_t;
 
 typedef struct
 {
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	hostid;
-	zbx_item_type_t	type;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	zbx_item_type_t		type;
 	zbx_item_data_type_t	data_type;
 	zbx_item_status_t	status;
-	char	*description;
-	char	*key;
-	char	*key_orig;
-	char	*host_name;
-	char	*host_ip;
-	char	*host_dns;
-	int	useip;
-	int     port;
-	int     delay;
-	int     history;
-	int	trends;
-	int	lastclock;
-	int		lastvalue_null[2];
-	history_value_t	lastvalue[2];
-	int		prevorgvalue_null;
-	history_value_t	prevorgvalue;
-	time_t  lastcheck;
+	char			*description;
+	char			*key;
+	char			*key_orig;
+	char			*host_name;
+	char			*host_ip;
+	char			*host_dns;
+	int			useip;
+	int			port;
+	int			delay;
+	int			history;
+	int			trends;
+	int			lastclock;
+	int			lastvalue_null[2];
+	history_value_t		lastvalue[2];
+	int			prevorgvalue_null;
+	history_value_t		prevorgvalue;
+	time_t 			lastcheck;
 	zbx_item_value_type_t	value_type;
-	int	delta;
-	int	multiplier;
-	char	*units;
+	int			delta;
+	int			multiplier;
+	char			*units;
 
-	char	*formula;
-	int	lastlogsize;
-	int	mtime;
+	char			*formula;
+	int			lastlogsize;
+	int			mtime;
 
-	zbx_uint64_t	valuemapid;
+	zbx_uint64_t		valuemapid;
 
-	char	*error;
+	char			*error;
 
-	char	*h_lastvalue_str[2];
-	char	*h_lasteventid;
-	char	*h_lastsource;
-	char	*h_lastseverity;
+	char			*h_lastvalue_str[2];
+	char			*h_lasteventid;
+	char			*h_lastsource;
+	char			*h_lastseverity;
 }
 DB_ITEM;
 
@@ -381,10 +381,10 @@ typedef struct
 {
 	zbx_uint64_t	mediaid;
 	zbx_uint64_t	mediatypeid;
-	char	*sendto;
-	char	*period;
-	int	active;
-	int	severity;
+	char		*sendto;
+	char		*period;
+	int		active;
+	int		severity;
 }
 DB_MEDIA;
 
