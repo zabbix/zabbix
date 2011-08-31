@@ -728,7 +728,7 @@ include_once('include/page_header.php');
 
 		if (!empty($data['form'])) {
 			if (!empty($_REQUEST['imageid'])) {
-				$image = DBfetch(DBselect('SELECT i.imagetype, i.name FROM images i WHERE i.imageid = '.$_REQUEST['imageid']));
+				$image = DBfetch(DBselect('SELECT i.name,i.imagetype FROM images i WHERE i.imageid='.$_REQUEST['imageid']));
 
 				$data['imageid'] = $_REQUEST['imageid'];
 				$data['imagename'] = $image['name'];
