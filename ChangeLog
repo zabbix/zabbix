@@ -2,6 +2,7 @@
 Changes for 1.9.6
 
 New features:
+ - [ZBXNEXT-891] redesign general->Value mapping (Eduard)
  - [ZBXNEXT-889] redesign general->Regular expressions (Eduard)
  - [ZBXNEXT-885] redesign general->Housekeeper, Working time and Other (Eduard)
  - [ZBXNEXT-871] redesign general->gui (Eduard)
@@ -9,6 +10,7 @@ New features:
  - [ZBXNEXT-863] renamed "host profile" to "host inventory" (dimir)
 
 Bug fixes:
+ - [ZBX-4049] fixed memory leak in configuration syncer (rudolfs)
  - [ZBX-4017] fixed host deletion using api (Vedmak)
  - [ZBX-4029,ZBX-4037] fixed inconsistent and untranslatable strings in frontend and clarified frontend messages (Richlv)
  - [ZBX-4010] fixed undefined constant SVC_SNMPv2 in discovery action conditions (Richlv)
@@ -194,6 +196,10 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.8rc1
+
+ - [ZBX-4059] fixed a potential buffer overflow in item parameter parsing (rudolfs)
+
 Changes for 1.8.7rc1
 
  - [ZBX-4045] added check for duplicate hosts - if found, configuration syncer logs a warning and exits (rudolfs)

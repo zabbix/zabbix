@@ -400,7 +400,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 					0 != (flags & PROCESS_USE_TEST_PARAM) &&
 					NULL != commands[i].test_param)
 			{
-				strscpy(usr_param, commands[i].test_param);
+				zbx_strlcpy(usr_param, commands[i].test_param, sizeof(usr_param));
 			}
 		}
 		else
@@ -414,10 +414,10 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 						param, sizeof(param), error, sizeof(error));
 			}
 			else
-				strscpy(param, commands[i].main_param);
+				zbx_strlcpy(param, commands[i].main_param, sizeof(param));
 		}
 		else
-			strscpy(param, usr_param);
+			zbx_strlcpy(param, usr_param, sizeof(param));
 
 		if (FAIL != err)
 		{
