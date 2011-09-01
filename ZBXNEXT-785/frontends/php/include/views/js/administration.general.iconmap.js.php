@@ -7,7 +7,6 @@
 			jQuery("#iconMapTable tr.sortable .rowNum").each(function() {
 				jQuery(this).text(i++ + ':');
 			});
-
 		}
 
 		jQuery("#iconMapTable").sortable({

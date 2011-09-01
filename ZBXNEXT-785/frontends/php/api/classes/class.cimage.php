@@ -64,7 +64,7 @@ class CImage extends CZBXAPI{
 			'filter'				=> null,
 			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
+			'startSearch'			=> null,
 			'excludeSearch'			=> null,
 			'searchWildcardsEnabled'=> null,
 

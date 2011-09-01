@@ -21,6 +21,7 @@
 <?php
 $table = new CTableInfo();
 $table->setHeader(array(_('Name'), _('Icon map')));
+$table->addItem(BR());
 
 foreach ($this->data['iconmaps'] as $iconmap) {
 	$mappings = $iconmap['mappings'];

@@ -693,6 +693,7 @@ elseif (($_REQUEST['config'] == 13) && (isset($_REQUEST['save']))) {
 
 	show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 }
+// Icon mapping
 elseif ($_REQUEST['config'] == 14) {
 	if (isset($_REQUEST['save'])) {
 
@@ -1355,8 +1356,9 @@ elseif ($_REQUEST['config'] == 14) {
 
 	$data['iconList'] = array();
 	$iconList = API::Image()->get(array(
+		'filter'=> array('imagetype'=> IMAGE_TYPE_ICON),
 		'output' => API_OUTPUT_EXTEND,
-		'preservekeys' => true,
+		'preservekeys' => true
 	));
 	foreach ($iconList as $icon) {
 		$data['iconList'][$icon['imageid']] = $icon['name'];
