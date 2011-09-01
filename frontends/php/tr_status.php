@@ -467,7 +467,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		}
 		$menu_trigger_url = 'null';
 		if(!zbx_empty($trigger['url'])){
-			$menu_trigger_url = "['".S_URL."',\"javascript: window.location.href='".$trigger['url']."'\",
+			$menu_trigger_url = "['".S_URL."',\"javascript: window.location.href='".resolveTriggerUrl($trigger)."'\",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 

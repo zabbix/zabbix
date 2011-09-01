@@ -3685,4 +3685,15 @@ $triggerExpressionRules['quotedString'] = Array(
 	'allowedSymbolsBefore' => ' *',
 	'allowedSymbolsAfter' => ' *',
 	'parent' => Array('keyFunctionParam', 'keyParam'));
+
+
+/**
+ * Resolve {TRIGGER.ID} macro in trigger url.
+ * @param array $trigger trigger data with url and triggerid
+ * @return string
+ */
+function resolveTriggerUrl($trigger) {
+	return str_replace('{TRIGGER.ID}', $trigger['triggerid'], $trigger['url']);
+}
+
 ?>
