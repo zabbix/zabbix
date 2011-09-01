@@ -20,7 +20,6 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 #include "zbxserver.h"
 
 #include "evalfunc.h"
@@ -1797,7 +1796,6 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	else
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "unsupported function:%s", function);
-		zabbix_syslog("unsupported function:%s", function);
 		ret = FAIL;
 	}
 
@@ -2233,8 +2231,6 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 	{
 		DBfree_result(result);
 		zabbix_log(LOG_LEVEL_WARNING, "Function [%s:%s.%s(%s)] not found. Query returned empty result",
-				host, key, function, parameter);
-		zabbix_syslog("Function [%s:%s.%s(%s)] not found. Query returned empty result",
 				host, key, function, parameter);
 		return FAIL;
 	}

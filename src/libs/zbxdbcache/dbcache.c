@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "log.h"
-#include "zlog.h"
 #include "threads.h"
 
 #include "db.h"
@@ -2004,9 +2003,6 @@ int	DCsync_history(int sync_type)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_first:%d history_num:%d",
 			__function_name, cache->history_first, cache->history_num);
-
-	/* disable processing of the zabbix_syslog() calls */
-	CONFIG_ENABLE_LOG = 0;
 
 	if (ZBX_SYNC_FULL == sync_type)
 	{

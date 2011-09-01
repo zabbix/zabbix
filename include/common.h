@@ -408,8 +408,6 @@ typedef enum
 #define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
 /* special item key used for ICMP ping loss packages */
 #define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
-/* special item key used for internal Zabbix log */
-#define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
