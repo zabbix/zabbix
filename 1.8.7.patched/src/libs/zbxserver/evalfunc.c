@@ -428,7 +428,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	if (ZBX_FLAG_SEC == flag && NULL == arg2)
 	{
 		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_COUNT,
-				now - arg1, now, NULL, 0);
+				now - arg1, now, NULL, NULL, 0);
 
 		if (NULL == h_value[0])
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -440,10 +440,10 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	{
 		if (ZBX_FLAG_VALUES == flag)
 			h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-					0, now, NULL, arg1);
+					0, now, NULL, NULL, arg1);
 		else
 			h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
-					now - arg1, now, NULL, 0);
+					now - arg1, now, NULL, NULL, 0);
 
 		for (h_num = 0; NULL != h_value[h_num]; h_num++)
 		{
@@ -608,7 +608,7 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
 
 	if (ZBX_FLAG_SEC == flag)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_SUM, now - arg1, now, NULL, 0);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_SUM, now - arg1, now, NULL, NULL, 0);
 
 		if (NULL != h_value[0])
 		{
@@ -621,7 +621,7 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
 	}
 	else if (ZBX_FLAG_VALUES == flag)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, arg1);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, NULL, arg1);
 
 		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
@@ -704,7 +704,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 
 	if (ZBX_FLAG_SEC == flag)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_AVG, now - arg1, now, NULL, 0);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_AVG, now - arg1, now, NULL, NULL, 0);
 
 		if (NULL != h_value[0])
 		{
@@ -717,7 +717,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 	}
 	else if (ZBX_FLAG_VALUES == flag)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, arg1);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, NULL, arg1);
 
 		for (h_num = 0; NULL != h_value[h_num]; h_num++)
 			sum += atof(h_value[h_num]);
@@ -836,7 +836,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	else
 	{
 history:
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, arg1);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, NULL, arg1);
 
 		for (h_num = 0; NULL != h_value[h_num]; h_num++)
 		{
@@ -905,7 +905,7 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 
 	if (ZBX_FLAG_SEC == flag)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_MIN, now - arg1, now, NULL, 0);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_MIN, now - arg1, now, NULL, NULL, 0);
 
 		if (NULL != h_value[0])
 		{
@@ -918,7 +918,7 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 	}
 	else if (ZBX_FLAG_VALUES == flag)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, arg1);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, NULL, arg1);
 
 		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
@@ -1007,7 +1007,7 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
 
 	if (ZBX_FLAG_SEC == flag)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_MAX, now - arg1, now, NULL, 0);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_MAX, now - arg1, now, NULL, NULL, 0);
 
 		if (NULL != h_value[0])
 		{
@@ -1020,7 +1020,7 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
 	}
 	else if (ZBX_FLAG_VALUES == flag)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, arg1);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, NULL, arg1);
 
 		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
@@ -1109,7 +1109,7 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
 
 	if (ZBX_FLAG_SEC == flag)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_DELTA, now - arg1, now, NULL, 0);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_DELTA, now - arg1, now, NULL, NULL, 0);
 
 		if (NULL != h_value[0])
 		{
@@ -1122,7 +1122,7 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
 	}
 	else if (ZBX_FLAG_VALUES == flag)
 	{
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, arg1);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, NULL, arg1);
 
 		if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
@@ -1249,7 +1249,7 @@ static int	compare_last_and_prev(const DB_ITEM *item, time_t now)
 
 	res = 0;	/* if values are no longer in history, consider them equal */
 
-	h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, 2);
+	h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, NULL, 2);
 
 	if (NULL != h_value[0] && NULL != h_value[1])
 		res = strcmp(h_value[0], h_value[1]);
@@ -1503,9 +1503,9 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	}
 
 	if (ZBX_FLAG_SEC == flag)
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, now - arg2, 0, NULL, 0);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, now - arg2, 0, NULL, NULL, 0);
 	else
-		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, arg2);
+		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, NULL, arg2);
 
 	rows = 0;
 	if (ZBX_FUNC_STR == func)
