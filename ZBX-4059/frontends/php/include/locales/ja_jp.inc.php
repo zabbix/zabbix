@@ -1890,7 +1890,6 @@
 	'S_NO_HOST_GROUPS_WITH'=>			'ホストグループが存在しません',
 	'S_INCORRECT_PARAMETERS_FOR_SMALL'=>			'パラメータが間違っています',
 	'S_NO_HOST_WITH'=>			'ホストが存在しません',
-	'S_ALREADY_EXISTS_IN_LINKED_HOSTS_SMALL'=>			'リンクされたホストにすでに存在します',
 	'S_ADDED_NEW_APPLICATION'=>			'新規アプリケーションを追加しました',
 	'S_UPDATED_APPLICATION'=>			'アプリケーションを更新しました',
 	'S_USED_BY_ITEM_SMALL'=>			'アイテムに利用されています',

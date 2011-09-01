@@ -299,13 +299,9 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		tr_last->error = row[3];
 		tr_last->lastchange = now;
 
-		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
-				tr_last->new_value, reason, tr_last->lastchange, &tr_last->update_trigger,
-				&tr_last->add_event);
-
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
-				tr_last->value, tr_last->error, tr_last->new_value, reason,
-				tr_last->lastchange, tr_last->update_trigger))
+				tr_last->type, tr_last->value, tr_last->error, tr_last->new_value, reason,
+				tr_last->lastchange, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 		}
@@ -318,18 +314,21 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
-	if (sql_offset > 16)
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
 
-	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
+	if (0 != tr_num)
 	{
-		if (1 != tr_last->add_event)
-			continue;
+		for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
+		{
+			if (1 != tr_last->add_event)
+				continue;
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-				tr_last->lastchange, tr_last->new_value, 0, 0);
+			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, tr_last->new_value, 0, 0);
+		}
 	}
 
 	zbx_free(tr);

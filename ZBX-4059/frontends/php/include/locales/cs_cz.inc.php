@@ -2077,7 +2077,6 @@
 	'S_NO_HOST_GROUPS_WITH'=>			'Neexistuje skupina hostitelů s',
 	'S_INCORRECT_PARAMETERS_FOR_SMALL'=>			'neplatné parametry pro',
 	'S_NO_HOST_WITH'=>				'Neexistuje hostitel s',
-	'S_ALREADY_EXISTS_IN_LINKED_HOSTS_SMALL'=>	'již pro propojené hostitele existuje',
 	'S_ADDED_NEW_APPLICATION'=>			'Přidána nová aplikace',
 	'S_UPDATED_APPLICATION'=>			'Aktualizována aplikace',
 	'S_USED_BY_ITEM_SMALL'=>			'použita položkou',
