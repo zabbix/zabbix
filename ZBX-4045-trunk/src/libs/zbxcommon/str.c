@@ -1455,90 +1455,93 @@ int	num_param(const char *p)
  ******************************************************************************/
 int	get_param(const char *p, int num, char *buf, int maxlen)
 {
-/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	state, array, idx = 1, buf_i = 0;
+	int	state;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+	int	array, idx = 1, buf_i = 0;
 
 	*buf = '\0';
 
-	for (state = 0, array = 0; '\0' != *p && idx <= num && buf_i < maxlen; p++)
+	for (state = 0, array = 0; '\0' != *p && idx <= num && buf_i < maxlen - 1; p++)
 	{
-		switch (state) {
-		/* Init state */
-		case 0:
-			if (',' == *p)
-			{
-				if (0 == array)
-					idx++;
+		switch (state)
+		{
+			/* init state */
+			case 0:
+				if (',' == *p)
+				{
+					if (0 == array)
+						idx++;
+					else if (idx == num)
+						buf[buf_i++] = *p;
+				}
+				else if ('"' == *p)
+				{
+					state = 1;
+					if (0 != array && idx == num)
+						buf[buf_i++] = *p;
+				}
+				else if ('[' == *p)
+				{
+					if (0 != array && idx == num)
+						buf[buf_i++] = *p;
+					array++;
+				}
+				else if (']' == *p && 0 != array)
+				{
+					array--;
+					if (0 != array && idx == num)
+						buf[buf_i++] = *p;
+
+					/* skip spaces */
+					while (' ' == p[1])
+						p++;
+
+					if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+						return 1;	/* incorrect syntax */
+				}
+				else if (' ' != *p)
+				{
+					if (idx == num)
+						buf[buf_i++] = *p;
+					state = 2;
+				}
+				break;
+			case 1:
+				/* quoted */
+
+				if ('"' == *p)
+				{
+					if (0 != array && idx == num)
+						buf[buf_i++] = *p;
+
+					/* skip spaces */
+					while (' ' == p[1])
+						p++;
+
+					if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+						return 1;	/* incorrect syntax */
+
+					state = 0;
+				}
+				else if ('\\' == *p && '"' == p[1] && 0 == array)
+				{
+					p++;
+					if (idx == num)
+						buf[buf_i++] = *p;
+				}
 				else if (idx == num)
 					buf[buf_i++] = *p;
-			}
-			else if ('"' == *p)
-			{
-				state = 1;
-				if (0 != array && idx == num)
-					buf[buf_i++] = *p;
-			}
-			else if ('[' == *p)
-			{
-				if (0 != array && idx == num)
-					buf[buf_i++] = *p;
-				array++;
-			}
-			else if (']' == *p && 0 != array)
-			{
-				array--;
-				if (0 != array && idx == num)
-					buf[buf_i++] = *p;
+				break;
+			case 2:
+				/* unquoted */
 
-				/* skip spaces */
-				while (' ' == p[1])
-					p++;
-
-				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
-					return 1;	/* incorrect syntax */
-			}
-			else if (' ' != *p)
-			{
-				if (idx == num)
+				if (',' == *p || (']' == *p && 0 != array))
+				{
+					p--;
+					state = 0;
+				}
+				else if (idx == num)
 					buf[buf_i++] = *p;
-				state = 2;
-			}
-			break;
-		/* Quoted */
-		case 1:
-			if ('"' == *p)
-			{
-				if (0 != array && idx == num)
-					buf[buf_i++] = *p;
-
-				/* skip spaces */
-				while (' ' == p[1])
-					p++;
-
-				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
-					return 1;	/* incorrect syntax */
-
-				state = 0;
-			}
-			else if ('\\' == *p && '"' == p[1] && 0 == array)
-			{
-				p++;
-				if (idx == num)
-					buf[buf_i++] = *p;
-			}
-			else if (idx == num)
-				buf[buf_i++] = *p;
-			break;
-		/* Unquoted */
-		case 2:
-			if (',' == *p || (']' == *p && 0 != array))
-			{
-				p--;
-				state = 0;
-			}
-			else if (idx == num)
-				buf[buf_i++] = *p;
-			break;
+				break;
 		}
 
 		if (idx > num)
@@ -1546,11 +1549,11 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 	}
 
 	/* missing terminating '"' character */
-	if (state == 1)
+	if (1 == state)
 		return 1;
 
 	/* missing terminating ']' character */
-	if (array != 0)
+	if (0 != array)
 		return 1;
 
 	buf[buf_i] = '\0';
