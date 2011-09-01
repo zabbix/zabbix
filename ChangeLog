@@ -6,7 +6,7 @@ New features:
  - [ZBXNEXT-889] redesign general->Regular expressions (Eduard)
  - [ZBXNEXT-885] redesign general->Housekeeper, Working time and Other (Eduard)
  - [ZBXNEXT-871] redesign general->gui (Eduard)
- - [ZBX-1357] updated German, Latvian, Polish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+ - [ZBX-1357] updated German, Japanese, Latvian, Polish, Russian, Turkish and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-863] renamed "host profile" to "host inventory" (dimir)
 
 Bug fixes:
