@@ -202,8 +202,9 @@ Changes for 1.8.8rc1
 
 Changes for 1.8.7rc1
 
+ - [ZBX-4045] added check for duplicate hosts - if found, configuration syncer logs a warning and exits (rudolfs)
  - [ZBXNEXT-898] new trigger actions have "trigger = PROBLEM" and "not in maintenance" conditions by default (Vedmak)
- - [ZBX-4021] fixing item visibility in event then last value is null (Eduard)
+ - [ZBX-4021] fixed item visibility in event then last value is null (Eduard)
  - [ZBX-4052] fixed key macros resolving in item names (Vedmak)
  - [ZBX-3998] reload recipient list for database down messages every CacheUpdateFrequency seconds (rudolfs)
  - [ZBX-4034] fixed macros resolving in item names (Vedmak)
@@ -217,7 +218,7 @@ Changes for 1.8.7rc1
  - [ZBX-4023] fixed excess spacing and fake plural in graph deletion message (Richlv)
  - [ZBX-4016] fixed web monitoring item status on insert and update (Eduard)
  - [ZBX-3443] fixed "not selected" working as "all" in Monitoring->Events (Eduard)
- - [ZBX-3979] adding searchWildcardsEnabled flag in API for searching using wildcards (Eduard)
+ - [ZBX-3979] added searchWildcardsEnabled flag in API for searching using wildcards (Eduard)
  - [ZBX-4018] fixed server crash on unsupported aggregate items (asaveljevs,Sasha)
  - [ZBX-3908] allow empty string for formula field if multiplier is switched off (Eduard)
  - [ZBX-3961] added recalculation of nextcheck time after changed flexible intervals (rudolfs)

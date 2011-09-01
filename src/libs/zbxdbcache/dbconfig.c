@@ -1577,6 +1577,16 @@ static void	DCsync_hosts(DB_RESULT result)
 
 			if (NULL != host_ph)
 			{
+				if (0 == found || sync_num == host_ph->sync_num)
+				{
+					/* duplicate hosts or proxies found */
+
+					zabbix_log(LOG_LEVEL_CRIT, "Error: duplicate %s [%s] found. Exiting...",
+							HOST_STATUS_MONITORED == host_ph->status ? "hosts" : "proxies",
+							host_ph->host);
+					exit(FAIL);
+				}
+
 				host_ph->host_ptr = host;
 				host_ph->sync_num = sync_num;
 			}
@@ -1612,7 +1622,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* update hosts_ph index using new data, if not done already */
 
-		if (update_index)
+		if (1 == update_index)
 		{
 			host_ph_local.proxy_hostid = host->proxy_hostid;
 			host_ph_local.status = host->status;
