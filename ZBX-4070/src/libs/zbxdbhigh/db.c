@@ -2053,6 +2053,7 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 			break;
 		default:
 			assert(0);
+			break;
 	}
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
@@ -2075,6 +2076,7 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 			default:
 				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 						" order by id desc");
+				break;
 		}
 		result = DBselectN(sql, last_n);
 	}

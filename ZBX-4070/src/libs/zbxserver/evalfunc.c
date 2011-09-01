@@ -105,8 +105,6 @@ clean:
  *                                                                            *
  * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
@@ -154,11 +152,6 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		if (NULL != h_value[0])
 		{
 			item->h_lasteventid = zbx_strdup(item->h_lasteventid, h_value[0]);
-
-			if (SUCCEED == regexp_match_ex(regexps, regexps_num, h_value[0], arg1, ZBX_CASE_SENSITIVE))
-				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
-			else
-				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 			res = SUCCEED;
 		}
 		else
@@ -166,12 +159,14 @@ static int	evaluate_LOGEVENTID(char *value, DB_ITEM *item, const char *function,
 		DBfree_history(h_value);
 	}
 	else
+		res = SUCCEED;
+
+	if (SUCCEED == res)
 	{
 		if (SUCCEED == regexp_match_ex(regexps, regexps_num, item->h_lasteventid, arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
-		res = SUCCEED;
 	}
 
 	if ('@' == *arg1)
@@ -196,8 +191,6 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
@@ -225,11 +218,6 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 		if (NULL != h_value[0])
 		{
 			item->h_lastsource = zbx_strdup(item->h_lastsource, h_value[0]);
-
-			if (0 == strcmp(h_value[0], arg1))
-				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
-			else
-				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 			res = SUCCEED;
 		}
 		else
@@ -237,12 +225,14 @@ static int	evaluate_LOGSOURCE(char *value, DB_ITEM *item, const char *function, 
 		DBfree_history(h_value);
 	}
 	else
+		res = SUCCEED;
+
+	if (SUCCEED == res)
 	{
 		if (0 == strcmp(item->h_lastsource, arg1))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
-		res = SUCCEED;
 	}
 
 	zbx_free(arg1);
@@ -266,8 +256,6 @@ clean:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
@@ -287,8 +275,6 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function
 		if (NULL != h_value[0])
 		{
 			item->h_lastseverity = zbx_strdup(item->h_lastseverity, h_value[0]);
-
-			zbx_strlcpy(value, h_value[0], MAX_BUFFER_LEN);
 			res = SUCCEED;
 		}
 		else
@@ -296,10 +282,10 @@ static int	evaluate_LOGSEVERITY(char *value, DB_ITEM *item, const char *function
 		DBfree_history(h_value);
 	}
 	else
-	{
-		zbx_strlcpy(value, item->h_lastseverity, MAX_BUFFER_LEN);
 		res = SUCCEED;
-	}
+
+	if (SUCCEED == res)
+		zbx_strlcpy(value, item->h_lastseverity, MAX_BUFFER_LEN);
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
@@ -323,8 +309,6 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 #define OP_EQ	0
@@ -429,6 +413,7 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 						return SUCCEED;
 					break;
 			}
+			break;
 	}
 
 	return FAIL;
@@ -486,64 +471,53 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	op = (numeric_search ? OP_EQ : OP_LIKE);
 
 	if (4 < (nparams = num_param(parameters)))
-		goto clean;
+		goto exit;
 
 	if (FAIL == get_function_parameter_uint(item, parameters, 1, &arg1, &flag))
-		goto clean;
+		goto exit;
 
-	if (2 <= nparams)
-	{
-		if (FAIL == get_function_parameter_str(item, parameters, 2, &arg2))
-			goto clean;
-	}
+	if (2 <= nparams && FAIL == get_function_parameter_str(item, parameters, 2, &arg2))
+		goto exit;
 
 	if (3 <= nparams)
 	{
+		int	fail = 0;
+
 		if (FAIL == get_function_parameter_str(item, parameters, 3, &arg3))
-		{
-			zbx_free(arg2);
 			goto clean;
-		}
+
+		if ('\0' == *arg3)
+			op = 0 != numeric_search ? OP_EQ : OP_LIKE;
+		else if (0 == strcmp(arg3, "eq"))
+			op = OP_EQ;
+		else if (0 == strcmp(arg3, "ne"))
+			op = OP_NE;
+		else if (0 == strcmp(arg3, "gt"))
+			op = OP_GT;
+		else if (0 == strcmp(arg3, "ge"))
+			op = OP_GE;
+		else if (0 == strcmp(arg3, "lt"))
+			op = OP_LT;
+		else if (0 == strcmp(arg3, "le"))
+			op = OP_LE;
+		else if (0 == strcmp(arg3, "like"))
+			op = OP_LIKE;
 		else
-		{
-			int fail = 0;
+			fail = 1;
 
-			if ('\0' == *arg3 && numeric_search) op = OP_EQ;
-			else if ('\0' == *arg3 && !numeric_search) op = OP_LIKE;
-			else if (0 == strcmp(arg3, "eq")) op = OP_EQ;
-			else if (0 == strcmp(arg3, "ne")) op = OP_NE;
-			else if (0 == strcmp(arg3, "gt")) op = OP_GT;
-			else if (0 == strcmp(arg3, "ge")) op = OP_GE;
-			else if (0 == strcmp(arg3, "lt")) op = OP_LT;
-			else if (0 == strcmp(arg3, "le")) op = OP_LE;
-			else if (0 == strcmp(arg3, "like")) op = OP_LIKE;
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for function COUNT", arg3);
-				fail = 1;
-			}
+		if (1 == fail)
+			zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for function COUNT", arg3);
+		else if (0 != numeric_search && OP_LIKE == op)
+			zabbix_log(LOG_LEVEL_DEBUG, "operator \"like\" is not supported for counting numeric values");
+		else if (0 == numeric_search && OP_LIKE != op && OP_EQ != op && OP_NE != op)
+			zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for counting textual values", arg3);
+		else
+			fail = 0;
 
-			if (!fail && numeric_search && OP_LIKE == op)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "operator \"like\" is not supported for counting numeric values");
-				fail = 1;
-			}
+		zbx_free(arg3);
 
-			if (!fail && !numeric_search && !(OP_LIKE == op || OP_EQ == op || OP_NE == op))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for counting textual values", arg3);
-				fail = 1;
-			}
-
-			if (fail)
-			{
-				zbx_free(arg2);
-				zbx_free(arg3);
-				goto clean;
-			}
-
-			zbx_free(arg3);
-		}
+		if (1 == fail)
+			goto clean;
 	}
 
 	if (4 <= nparams)
@@ -551,14 +525,13 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 		if (FAIL == get_function_parameter_uint(item, parameters, 4, &time_shift, &time_shift_flag) ||
 				ZBX_FLAG_SEC != time_shift_flag)
 		{
-			zbx_free(arg2);
 			goto clean;
 		}
 
 		now -= time_shift;
 	}
 
-	if (NULL != arg2 && '\0' == *arg2 && (numeric_search || OP_LIKE == op))
+	if (NULL != arg2 && '\0' == *arg2 && (0 != numeric_search || OP_LIKE == op))
 		zbx_free(arg2);
 
 	if (ZBX_FLAG_SEC == flag && NULL == arg2)
@@ -576,23 +549,23 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	{
 		if (ZBX_FLAG_VALUES == flag)
 		{
-			if (0 == time_shift)
-			{
-				if (SUCCEED == evaluate_COUNT_local(item, op, arg1, arg2, &count))
-					goto skip_get_history;
-			}
+			if (0 == time_shift && SUCCEED == evaluate_COUNT_local(item, op, arg1, arg2, &count))
+				goto skip_get_history;
 
 			h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
 					0, now, NULL, arg1);
 		}
 		else
+		{
 			h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE,
 					now - arg1, now, NULL, 0);
+		}
 
 		if (ZBX_FLAG_VALUES == flag && 0 == time_shift &&
 				(ITEM_VALUE_TYPE_TEXT == item->value_type || ITEM_VALUE_TYPE_LOG == item->value_type))
 		{
 			/* only last and prev value will be cached */
+
 			for (h_num = 0; NULL != h_value[h_num] && 2 > h_num; h_num++)
 			{
 				if (NULL == item->h_lastvalue_str[h_num] &&
@@ -604,18 +577,21 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 		}
 
 		for (h_num = 0; NULL != h_value[h_num]; h_num++)
+		{
 			if (NULL == arg2 || SUCCEED == evaluate_COUNT_one(item->value_type, op, h_value[h_num], arg2))
 				count++;
+		}
 		DBfree_history(h_value);
 skip_get_history:
 		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", count);
 	}
-	zbx_free(arg2);
 
 	res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() value:%s", __function_name, value);
 clean:
+	zbx_free(arg2);
+exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
@@ -643,8 +619,6 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
@@ -741,8 +715,6 @@ clean:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
@@ -824,8 +796,6 @@ clean:
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
@@ -885,6 +855,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 					}
 					else
 						zbx_strlcpy(value, item->h_lastvalue_str[0], MAX_BUFFER_LEN);
+					break;
 			}
 		}
 	}
@@ -910,6 +881,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 					}
 					else
 						zbx_strlcpy(value, item->h_lastvalue_str[1], MAX_BUFFER_LEN);
+					break;
 			}
 		}
 	}
@@ -921,6 +893,7 @@ history:
 		if (0 == time_shift && (ITEM_VALUE_TYPE_TEXT == item->value_type || ITEM_VALUE_TYPE_LOG == item->value_type))
 		{
 			/* only last and prev value will be cached */
+
 			for (h_num = 0; NULL != h_value[h_num] && 2 > h_num; h_num++)
 			{
 				if (NULL == item->h_lastvalue_str[h_num] &&
@@ -961,8 +934,6 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
@@ -1064,8 +1035,6 @@ clean:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
@@ -1165,8 +1134,6 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
@@ -1272,8 +1239,6 @@ clean:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_NODATA(char *value, DB_ITEM *item, const char *function, const char *parameters)
 {
@@ -1348,8 +1313,10 @@ static int	compare_last_and_prev(DB_ITEM *item, time_t now)
 	h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, 2);
 
 	for (i = 0; NULL != h_value[i]; i++)
+	{
 		if (NULL == item->h_lastvalue_str[i] && ITEM_LASTVALUE_LEN <= zbx_strlen_utf8(h_value[i]))
 			item->h_lastvalue_str[i] = zbx_strdup(NULL, h_value[i]);
+	}
 
 	if (NULL != h_value[0] && NULL != h_value[1])
 		res = strcmp(h_value[0], h_value[1]);
@@ -1372,8 +1339,6 @@ static int	compare_last_and_prev(DB_ITEM *item, time_t now)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
@@ -1394,11 +1359,15 @@ static int	evaluate_ABSCHANGE(char *value, DB_ITEM *item, const char *function, 
 		case ITEM_VALUE_TYPE_UINT64:
 			/* to avoid overflow */
 			if (item->lastvalue[0].ui64 >= item->lastvalue[1].ui64)
+			{
 				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64,
 						item->lastvalue[0].ui64 - item->lastvalue[1].ui64);
+			}
 			else
+			{
 				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64,
 						item->lastvalue[1].ui64 - item->lastvalue[0].ui64);
+			}
 			break;
 		default:
 			if (0 == compare_last_and_prev(item, now))
@@ -1428,8 +1397,6 @@ clean:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
 {
@@ -1450,11 +1417,15 @@ static int	evaluate_CHANGE(char *value, DB_ITEM *item, const char *function, con
 		case ITEM_VALUE_TYPE_UINT64:
 			/* to avoid overflow */
 			if (item->lastvalue[0].ui64 >= item->lastvalue[1].ui64)
+			{
 				zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_UI64,
 						item->lastvalue[0].ui64 - item->lastvalue[1].ui64);
+			}
 			else
+			{
 				zbx_snprintf(value, MAX_BUFFER_LEN, "-" ZBX_FS_UI64,
 						item->lastvalue[1].ui64 - item->lastvalue[0].ui64);
+			}
 			break;
 		default:
 			if (0 == compare_last_and_prev(item, now))
@@ -1484,8 +1455,6 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_DIFF(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
@@ -1541,8 +1510,6 @@ clean:
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 #define ZBX_FUNC_STR		1
 #define ZBX_FUNC_REGEXP		2
@@ -1566,7 +1533,7 @@ static int	evaluate_STR_one(int func, ZBX_REGEXP *regexps, int regexps_num, cons
 }
 
 static int	evaluate_STR_local(DB_ITEM *item, int func, ZBX_REGEXP *regexps, int regexps_num,
-			const char *arg1, int arg2, int *rows)
+			const char *arg1, int arg2, int *found)
 {
 	int	h_num;
 
@@ -1577,18 +1544,18 @@ static int	evaluate_STR_local(DB_ITEM *item, int func, ZBX_REGEXP *regexps, int 
 		if (1 == item->lastvalue_null[h_num])
 			return SUCCEED;
 
-		*rows = 1;
-
 		if (ITEM_VALUE_TYPE_STR != item->value_type && NULL == item->h_lastvalue_str[h_num] &&
 				ITEM_LASTVALUE_LEN == zbx_strlen_utf8(item->lastvalue[h_num].str))
+		{
 			return FAIL;
+		}
 
 		lastvalue = (NULL == item->h_lastvalue_str[h_num] ? item->lastvalue[h_num].str :
 				item->h_lastvalue_str[h_num]);
 
 		if (SUCCEED == evaluate_STR_one(func, regexps, regexps_num, lastvalue, arg1))
 		{
-			*rows = 2;
+			*found = 1;
 			return SUCCEED;
 		}
 	}
@@ -1605,7 +1572,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*arg1 = NULL, *arg1_esc;
-	int		arg2, flag, func, rows = 0, h_num, res = FAIL;
+	int		arg2, flag, func, found = 0, h_num, res = FAIL;
 	ZBX_REGEXP	*regexps = NULL;
 	int		regexps_alloc = 0, regexps_num = 0;
 	char		**h_value;
@@ -1614,7 +1581,9 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 
 	if (ITEM_VALUE_TYPE_STR != item->value_type && ITEM_VALUE_TYPE_TEXT != item->value_type &&
 			ITEM_VALUE_TYPE_LOG != item->value_type)
+	{
 		goto exit;
+	}
 
 	if (0 == strcmp(function, "str"))
 		func = ZBX_FUNC_STR;
@@ -1648,14 +1617,22 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 		zbx_free(arg1_esc);
 
 		while (NULL != (row = DBfetch(result)))
+		{
 			add_regexp_ex(&regexps, &regexps_alloc, &regexps_num,
 					row[0], row[1], atoi(row[2]), row[3][0], atoi(row[4]));
+		}
 		DBfree_result(result);
 	}
 
 	if (ZBX_FLAG_VALUES == flag)
 	{
-		if (SUCCEED == evaluate_STR_local(item, func, regexps, regexps_num, arg1, arg2, &rows))
+		if (0 == arg2 || 1 == item->lastvalue_null[0])
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "result for STR is empty");
+			goto clean;
+		}
+
+		if (SUCCEED == evaluate_STR_local(item, func, regexps, regexps_num, arg1, arg2, &found))
 			goto skip_get_history;
 
 		h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, arg2);
@@ -1666,6 +1643,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	if (ZBX_FLAG_VALUES == flag && ITEM_VALUE_TYPE_STR != item->value_type)
 	{
 		/* only last and prev value will be cached */
+
 		for (h_num = 0; NULL != h_value[h_num] && 2 > h_num; h_num++)
 		{
 			if (NULL == item->h_lastvalue_str[h_num] &&
@@ -1676,36 +1654,33 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 		}
 	}
 
+	if (NULL == h_value[0])
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "result for STR is empty");
+		goto clean;
+	}
+
 	for (h_num = 0; NULL != h_value[h_num]; h_num++)
 	{
 		if (SUCCEED == evaluate_STR_one(func, regexps, regexps_num, h_value[h_num], arg1))
 		{
-			rows = 2;
+			found = 1;
 			break;
 		}
-		rows = 1;
 	}
 	DBfree_history(h_value);
 skip_get_history:
+	if (1 == found)
+		zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
+	else
+		zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+
+	res = SUCCEED;
+clean:
 	if ((ZBX_FUNC_REGEXP == func || ZBX_FUNC_IREGEXP == func) && '@' == *arg1)
 		zbx_free(regexps);
 
 	zbx_free(arg1);
-
-	if (0 == rows)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "result for STR is empty");
-		res = FAIL;
-	}
-	else
-	{
-		if (2 == rows)
-			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
-		else
-			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
-	}
-
-	res = SUCCEED;
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
@@ -1730,8 +1705,6 @@ exit:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_STRLEN(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
@@ -1769,8 +1742,6 @@ clean:
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_FUZZYTIME(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now)
@@ -1834,8 +1805,6 @@ clean:
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now)
@@ -1948,10 +1917,8 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Unsupported function:%s",
-				function);
-		zabbix_syslog("Unsupported function:%s",
-				function);
+		zabbix_log(LOG_LEVEL_WARNING, "unsupported function: %s", function);
+		zabbix_syslog("unsupported function: %s", function);
 		ret = FAIL;
 	}
 
@@ -1972,11 +1939,7 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
  * Parameters: value - value for adjusting                                    *
  *             max_len - max len of the value                                 *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	add_value_suffix_uptime(char *value, size_t max_len)
@@ -2020,11 +1983,7 @@ static void	add_value_suffix_uptime(char *value, size_t max_len)
  * Parameters: value - value for adjusting                                    *
  *             max_len - max len of the value                                 *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	add_value_suffix_s(char *value, size_t max_len)
@@ -2115,11 +2074,7 @@ clean:
  *             max_len - max len of the value                                 *
  *             units - units (bps, b, B, etc)                                 *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	add_value_suffix_normal(char *value, int max_len, const char *units)
@@ -2264,8 +2219,6 @@ int	add_value_suffix(char *value, int max_len, const char *units, int value_type
  *               FAIL - evaluation failed, value contains old value           *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	replace_value_by_map(char *value, int max_len, zbx_uint64_t valuemapid)
