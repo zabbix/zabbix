@@ -1577,11 +1577,12 @@ static void	DCsync_hosts(DB_RESULT result)
 
 			if (NULL != host_ph)
 			{
-				if (HOST_STATUS_MONITORED == host_ph->status && (0 == found || sync_num == host_ph->sync_num))
+				if (0 == found || sync_num == host_ph->sync_num)
 				{
-					/* duplicate hosts found */
+					/* duplicate hosts or proxies found */
 
-					zabbix_log(LOG_LEVEL_CRIT, "Error: duplicate hosts [%s] found. Exiting...",
+					zabbix_log(LOG_LEVEL_CRIT, "Error: duplicate %s [%s] found. Exiting...",
+							HOST_STATUS_MONITORED == host_ph->status ? "hosts" : "proxies",
 							host_ph->host);
 					exit(FAIL);
 				}
