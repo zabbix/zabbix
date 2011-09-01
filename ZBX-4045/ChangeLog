@@ -1,3 +1,7 @@
+Changes for 1.8.8rc1
+
+ - [ZBX-4059] fixed a potential buffer overflow in item parameter parsing (rudolfs)
+
 Changes for 1.8.7rc1
 
  - [ZBXNEXT-898] new trigger actions have "trigger = PROBLEM" and "not in maintenance" conditions by default (Vedmak)
