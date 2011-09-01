@@ -2209,7 +2209,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					if (0 != event->trigger.triggerid)
 					{
 						replace_to = zbx_strdup(replace_to, event->trigger.url);
-						substitute_simple_macros(event, item, dc_host, dc_item, escalation, &replace_to,
+						substitute_simple_macros(event, hostid, dc_host, escalation, &replace_to,
 								MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 					}
 					else
