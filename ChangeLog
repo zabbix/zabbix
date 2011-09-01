@@ -1,5 +1,6 @@
 Changes for 1.8.8rc1
 
+ - [ZBX-4045] added check for duplicate hosts or proxies - if found, configuration syncer logs a warning and exits (rudolfs)
  - [ZBX-4059] fixed a potential buffer overflow in item parameter parsing (rudolfs)
 
 Changes for 1.8.7rc1
