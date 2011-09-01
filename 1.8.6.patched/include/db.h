@@ -290,6 +290,7 @@ typedef struct
 	int		source;
 	int		object;
 	int		clock;
+	int		ns;
 	int		value;
 	int		acknowledged;
 	int		skip_actions;
@@ -338,6 +339,7 @@ typedef struct
 	double	lastvalue_dbl;
 	zbx_uint64_t	lastvalue_uint64;
 	int	lastclock;
+	int	lastns;
 	int     lastvalue_null;
 	char	*prevvalue_str;
 	double	prevvalue_dbl;
@@ -551,7 +553,7 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 int	DBremove_escalation(zbx_uint64_t escalationid);
 void	DBupdate_triggers_status_after_restart();
 int	DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
-		const char *trigger_error, int new_value, int now, const char *reason);
+		const char *trigger_error, int new_value, zbx_timespec_t *ts, const char *reason);
 
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();

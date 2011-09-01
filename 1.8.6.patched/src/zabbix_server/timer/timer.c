@@ -60,6 +60,7 @@ static void	process_time_functions()
 	zbx_uint64_t	triggerid;
 	int		trigger_type, trigger_value, exp_value;
 	const char	*trigger_error;
+	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -92,16 +93,18 @@ static void	process_time_functions()
 		trigger_error = row[3];
 		exp = strdup(row[4]);
 
-		if (SUCCEED != evaluate_expression(&exp_value, &exp, time(NULL), triggerid, trigger_value, error, sizeof(error)))
+		zbx_timespec(&ts);
+
+		if (SUCCEED != evaluate_expression(&exp_value, &exp, ts.sec, triggerid, trigger_value, error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "expression [%s] cannot be evaluated: %s", exp, error);
 
 			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, TRIGGER_VALUE_UNKNOWN, time(NULL), error);
+					trigger_error, TRIGGER_VALUE_UNKNOWN, &ts, error);
 		}
 		else
 			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
-					trigger_error, exp_value, time(NULL), NULL);
+					trigger_error, exp_value, &ts, NULL);
 
 		zbx_free(exp);
 	}
