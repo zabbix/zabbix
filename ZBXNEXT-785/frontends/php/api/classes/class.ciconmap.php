@@ -266,16 +266,16 @@ class CIconMap extends CZBXAPI {
 		}
 
 		$iconMaps = zbx_toArray($iconMaps);
+		$iconMapRequiredFields = array('name' => null);
 
-		$iconMapRequiredFields = array(
-			'name' => null
-		);
 		$duplicates = array();
 		foreach ($iconMaps as $iconMap) {
 			if (!check_db_fields($iconMapRequiredFields, $iconMap)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter is used for icon map "%s".', $iconMap['name']));
 			}
-
+			if (zbx_empty($iconMap['name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map name cannot be empty.'));
+			}
 			if (isset($duplicates[$iconMap['name']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot create icon maps with identical name "%s".', $iconMap['name']));
 			}
@@ -298,7 +298,6 @@ class CIconMap extends CZBXAPI {
 		}
 
 		$iconMapids = DB::insert('icon_map', $iconMaps);
-
 
 		$mappings = array();
 		foreach ($iconMaps as $imnum => $iconMap) {

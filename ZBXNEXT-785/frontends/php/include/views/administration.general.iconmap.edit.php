@@ -66,7 +66,7 @@ foreach ($this->data['iconmap']['mappings'] as $iconmappingid => $mapping) {
 		$expressionTextBox,
 		$iconsComboBox,
 		$iconPreviewImage,
-		new CSpan(_('Remove'), 'link_menu removeMapping'),
+		new CButton('remove', _('Remove'), '', 'link_menu removeMapping'),
 	), 'sortable');
 	$row->setAttribute('id', 'iconmapidRow_'.$iconmappingid);
 	$iconMapTable->addRow($row);
@@ -94,22 +94,21 @@ $iconsComboBox->setAttribute('disabled', 'disabled');
 
 $iconPreviewImage = new CImg('imgstore.php?iconid='.$firstIconId, _('Preview'), ZBX_ICON_PREVIEW_WIDTH, ZBX_ICON_PREVIEW_HEIGHT, 'pointer preview');
 
-$hiddenRow = new CRow(array(
+// row template
+$hiddenRowTemplate = new CRow(array(
 	new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
 	$numSpan,
 	$profileLinksComboBox,
 	$expressionTextBox,
 	$iconsComboBox,
 	$iconPreviewImage,
-	new CSpan(_('Remove'), 'link_menu removeMapping'),
+	new CButton('remove', _('Remove'), '', 'link_menu removeMapping'),
 ), 'hidden');
-$hiddenRow->setAttribute('id', 'rowTpl');
-$iconMapTable->addRow($hiddenRow);
+$hiddenRowTemplate->setAttribute('id', 'rowTpl');
+$iconMapTable->addRow($hiddenRowTemplate);
 
-
-$addSpan = new CSpan(_('Add'), 'link_menu');
-$addSpan->setAttribute('id', 'addMapping');
-$addCol = new CCol($addSpan);
+// add row button
+$addCol = new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'));
 $addCol->setColSpan(5);
 $iconMapTable->addRow(array(SPACE, $addCol));
 

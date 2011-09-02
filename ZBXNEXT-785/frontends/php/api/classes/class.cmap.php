@@ -822,7 +822,7 @@ COpt::memoryPick();
 
 			$dbMap = $dbMaps[$map['sysmapid']];
 
-// URLS
+			// URLS
 			if (isset($map['urls'])) {
 				$urlDiff = zbx_array_diff($map['urls'], $dbMap['urls'], 'name');
 
@@ -841,7 +841,19 @@ COpt::memoryPick();
 				$urlidsToDelete = array_merge($urlidsToDelete, zbx_objectValues($urlDiff['second'], 'sysmapurlid'));
 			}
 
-// Elements
+			// remove previous values from icons then iconmap is used
+			if (isset($map['selements'])) {
+				foreach ($map['selements'] as $number => $selement) {
+					if ($selement['use_iconmap']) {
+						$map['selements'][$number]['iconid_off'] = null;
+						$map['selements'][$number]['iconid_on'] = null;
+						$map['selements'][$number]['iconid_disabled'] = null;
+						$map['selements'][$number]['iconid_maintenance'] = null;
+					}
+				}
+			}
+
+			// Elements
 			if (isset($map['selements'])) {
 				$selementDiff = zbx_array_diff($map['selements'], $dbMap['selements'], 'selementid');
 				// We need sysmapid for add operations
@@ -854,7 +866,7 @@ COpt::memoryPick();
 				$selementsToDelete = array_merge($selementsToDelete, $selementDiff['second']);
 			}
 
-// Links
+			// Links
 			if (isset($map['links'])) {
 				$linkDiff = zbx_array_diff($map['links'], $dbMap['links'], 'linkid');
 				// We need sysmapid for add operations
@@ -870,14 +882,14 @@ COpt::memoryPick();
 
 		DB::update('sysmaps', $updateMaps);
 
-// Urls
+		// Urls
 		DB::insert('sysmap_url', $urlsToAdd);
 		DB::update('sysmap_url', $urlsToUpdate);
 
 		if (!empty($urlidsToDelete))
 			DB::delete('sysmap_url', array('sysmapurlid' => $urlidsToDelete));
 
-// Selements
+		// Selements
 		$newSelementIds = array('selementids' => array());
 		if (!empty($selementsToAdd))
 			$newSelementIds = $this->createSelements($selementsToAdd);
@@ -888,7 +900,7 @@ COpt::memoryPick();
 		if (!empty($selementsToDelete))
 			$this->deleteSelements($selementsToDelete);
 
-// Links
+		// Links
 		if (!empty($linksToAdd)) {
 
 			$mapVirtSelements = array();
@@ -916,7 +928,7 @@ COpt::memoryPick();
 		if (!empty($linksToDelete))
 			$this->deleteLinks($linksToDelete);
 
-// linkTriggers
+		// linkTriggers
 		$linkTriggersToDelete = $linkTriggersToUpdate = $linkTriggersToAdd = array();
 		foreach ($newLinkIds['linkids'] as $lnum => $linkid) {
 			if (!isset($linksToAdd[$lnum]['linktriggers'])) continue;

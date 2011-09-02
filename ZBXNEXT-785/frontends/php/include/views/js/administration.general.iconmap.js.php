@@ -22,7 +22,7 @@
 			update: recalculateSortOrder
 		});
 
-		jQuery("#iconMapTable tbody").delegate('span.removeMapping', 'click', function() {
+		jQuery("#iconMapTable tbody").delegate('input.removeMapping', 'click', function() {
 			jQuery(this).parent().parent().remove();
 
 			if (jQuery("#iconMapTable tr.sortable").length <= 1) {
