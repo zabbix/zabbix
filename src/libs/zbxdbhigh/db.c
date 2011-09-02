@@ -2172,7 +2172,7 @@ retry:
 	else
 		result = DBselect("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
 		if (h_alloc == h_num)
 		{
