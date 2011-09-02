@@ -22,20 +22,20 @@ cd $directory/locale
 
 echo "Merging new strings in po files..."
 
-for translation in */LC_MESSAGES/frontend.po; do
-	echo -n "$translation" | cut -d/ -f1
+for i in */LC_MESSAGES/frontend.po; do
+	echo -n "$i" | cut -d/ -f1
 	# fuzzy matching provides all kinds of interesting results, for example,
 	# "NTLM authentication" is translated as "LDAP-Authentifizierung" - thus
 	# it is disabled
 	msgmerge --no-fuzzy-matching --no-wrap --update \
---backup=off "$translation" frontend.pot
-	# dropping obsolete strings
-	msgattrib --no-obsolete --no-wrap --sort-output $translation -o $translation
+--backup=off "$i" frontend.pot
 done
 
-for translation in */LC_MESSAGES/frontend.po; do
-	echo -ne "$translation\t"
+# 'msgattrib --no-obsolete' could be used to automatically drop obsolete strings
+
+for i in */LC_MESSAGES/frontend.po; do
+	echo -ne "$i\t"
 	# setting output file to /dev/null so that unneeded messages.mo file
 	# is not created
-	msgfmt -c --statistics -o /dev/null $translation
+	msgfmt -c --statistics -o /dev/null $i
 done
