@@ -481,7 +481,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 
 	if (3 <= nparams)
 	{
-		int	fail = 0;
+		int	fail = 2;
 
 		if (FAIL == get_function_parameter_str(item, parameters, 3, &arg3))
 			goto clean;
@@ -516,7 +516,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 
 		zbx_free(arg3);
 
-		if (1 == fail)
+		if (0 != fail)
 			goto clean;
 	}
 
@@ -1657,6 +1657,7 @@ static int	evaluate_STR(char *value, DB_ITEM *item, const char *function, const 
 	if (NULL == h_value[0])
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "result for STR is empty");
+		DBfree_history(h_value);
 		goto clean;
 	}
 
