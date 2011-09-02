@@ -392,13 +392,12 @@ include_once('include/page_header.php');
 		$ev_options = array(
 			'nodeids' => get_current_nodeid(),
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-			'nopermissions' => 1,
+			'nopermissions' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'time_from' => time() - ($config['event_expire']*86400),
+			'time_from' => time() - ($config['event_expire'] * 86400),
 			'time_till' => time(),
 			'sortfield' => 'eventid',
 			'sortorder' => ZBX_SORT_DOWN,
-			//'limit' => $config['event_show_max']
 		);
 
 		switch($show_events){
@@ -409,9 +408,8 @@ include_once('include/page_header.php');
 				$ev_options['value'] = TRIGGER_VALUE_TRUE;
 			break;
 		}
-
 		$events = CEvent::get($ev_options);
-		order_result($events, 'clock', ZBX_SORT_DOWN);
+		morder_result($events, array('clock', 'eventid'), ZBX_SORT_DOWN);
 
 		foreach($events as $enum => $event){
 			$triggers[$event['objectid']]['events'][] = $event;
@@ -568,16 +566,11 @@ include_once('include/page_header.php');
 				$maint_span->setHint($maint_hint);
 			}
 
-
-
-
 			$hosts_span = new CSpan($trigger_host['host'], 'link_menu');
 			$hosts_span->setAttribute('onclick','javascript: '.$menus);
 			$hosts_list[] = $hosts_span;
 			$hosts_list[] = $maint_span;
 			$hosts_list[] = ', ';
-
-
 		}
 
 		array_pop($hosts_list);
