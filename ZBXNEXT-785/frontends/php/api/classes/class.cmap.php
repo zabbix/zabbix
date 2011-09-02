@@ -841,18 +841,6 @@ COpt::memoryPick();
 				$urlidsToDelete = array_merge($urlidsToDelete, zbx_objectValues($urlDiff['second'], 'sysmapurlid'));
 			}
 
-			// remove previous values from icons then iconmap is used
-			if (isset($map['selements'])) {
-				foreach ($map['selements'] as $number => $selement) {
-					if ($selement['use_iconmap']) {
-						$map['selements'][$number]['iconid_off'] = null;
-						$map['selements'][$number]['iconid_on'] = null;
-						$map['selements'][$number]['iconid_disabled'] = null;
-						$map['selements'][$number]['iconid_maintenance'] = null;
-					}
-				}
-			}
-
 			// Elements
 			if (isset($map['selements'])) {
 				$selementDiff = zbx_array_diff($map['selements'], $dbMap['selements'], 'selementid');
