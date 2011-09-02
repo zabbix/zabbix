@@ -198,6 +198,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.8rc1
 
+ - [ZBX-3970] fixed proxy crash after database connection to postgresql is recovered (Deniss)
  - [ZBX-3175] fixed value type for 'vfs.fs.size[/var,used]' in data.sql (Sasha)
  - [ZBXNEXT-900] added support of {TRIGGER.ID} macro in a trigger url (Vedmak,Sasha)
  - [ZBX-4045] added check for duplicate hosts - if found, configuration syncer logs a warning and exits (rudolfs)
