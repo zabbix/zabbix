@@ -2062,7 +2062,7 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 
 	h_value = zbx_malloc(h_value, (h_alloc + 1) * sizeof(char *));
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
 		if (h_alloc == h_num)
 		{

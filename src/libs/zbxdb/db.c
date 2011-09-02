@@ -1275,13 +1275,13 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 int	zbx_db_is_null(const char *field)
 {
-	int	ret = FAIL;
-
-	if (NULL == field)		ret = SUCCEED;
-#if defined(HAVE_ORACLE)
-	else if ('\0' == field[0])	ret = SUCCEED;
+	if (NULL == field)
+		return SUCCEED;
+#ifdef HAVE_ORACLE
+	if ('\0' == *field)
+		return SUCCEED;
 #endif
-	return ret;
+	return FAIL;
 }
 
 #if defined(HAVE_IBM_DB2)
