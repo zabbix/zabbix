@@ -887,32 +887,44 @@ else {
 	}
 
 
-	function zbx_db_search($table, $options, &$sql_parts){
+	function zbx_db_search($table, $options, &$sql_parts) {
 		list($table, $tableShort) = explode(' ', $table);
 
 		$tableSchema = DB::getSchema($table);
-		if(!$tableSchema) info('Error in search request for table ['.$table.']');
+		if (!$tableSchema) info('Error in search request for table ['.$table.']');
 
 		$start = is_null($options['startSearch'])?'%':'';
 		$exclude = is_null($options['excludeSearch'])?'':' NOT ';
 
 		$search = array();
-		foreach($options['search'] as $field => $pattern){
-			if(!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
-			if($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
+		foreach ($options['search'] as $field => $pattern) {
+			if (!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
+			if ($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
 
 			// escaping parameter that is about to be used in LIKE statement
-			if(empty($options['searchWildcardsEnabled'])){
-				$pattern = str_replace(array("!","%","_"),  array("!!","!%","!_"), $pattern);
-				$search[$field] = ' UPPER('.$tableShort.'.'.$field.') '.$exclude.' LIKE '.zbx_dbstr($start.zbx_strtoupper($pattern).'%')." ESCAPE '!' ";
+			$pattern = str_replace("!", "!!", $pattern);
+			$pattern = str_replace("%", "!%", $pattern);
+			$pattern = str_replace("_", "!_", $pattern);
+
+			if (empty($options['searchWildcardsEnabled'])) {
+				$search[$field] =
+					' UPPER('.$tableShort.'.'.$field.') '.
+					$exclude.' LIKE '.
+					zbx_dbstr($start.zbx_strtoupper($pattern).'%').
+					" ESCAPE '!'";
 			}
-			else{
-				$search[$field] = ' UPPER('.$tableShort.'.'.$field.') '.$exclude.' LIKE '.zbx_dbstr($start.zbx_strtoupper($pattern));
+			else {
+				$pattern = str_replace("*", "%", $pattern);
+				$search[$field] =
+					' UPPER('.$tableShort.'.'.$field.') '.
+					$exclude.' LIKE '.
+					zbx_dbstr(zbx_strtoupper($pattern)).
+					" ESCAPE '!'";
 			}
 		}
 
-		if(!empty($search)){
-			if(isset($sql_parts['where']['search'])){
+		if (!empty($search)) {
+			if (isset($sql_parts['where']['search'])) {
 				$search[] = $sql_parts['where']['search'];
 			}
 

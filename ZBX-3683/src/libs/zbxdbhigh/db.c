@@ -137,12 +137,12 @@ void	DBbegin()
 
 	rc = zbx_db_begin();
 
-	while (ZBX_DB_DOWN == rc)
+	while (ZBX_DB_OK > rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_DOWN == (rc = zbx_db_begin()))
+		if (ZBX_DB_OK > (rc = zbx_db_begin()))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -167,12 +167,12 @@ void	DBcommit()
 
 	rc = zbx_db_commit();
 
-	while (ZBX_DB_DOWN == rc)
+	while (ZBX_DB_OK > rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_DOWN == (rc = zbx_db_commit()))
+		if (ZBX_DB_OK > (rc = zbx_db_commit()))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -197,12 +197,12 @@ void	DBrollback()
 
 	rc = zbx_db_rollback();
 
-	while (ZBX_DB_DOWN == rc)
+	while (ZBX_DB_OK > rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_DOWN == (rc = zbx_db_rollback()))
+		if (ZBX_DB_OK > (rc = zbx_db_rollback()))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -228,14 +228,12 @@ int	__zbx_DBexecute(const char *fmt, ...)
 
 	rc = zbx_db_vexecute(fmt, args);
 
-	while (ZBX_DB_DOWN == rc)
+	while (ZBX_DB_OK > rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		rc = zbx_db_vexecute(fmt, args);
-
-		if (ZBX_DB_DOWN == rc)
+		if (ZBX_DB_OK > (rc = zbx_db_vexecute(fmt, args)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -301,9 +299,7 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		rc = zbx_db_vselect(fmt, args);
-
-		if ((DB_RESULT)ZBX_DB_DOWN == rc)
+		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_vselect(fmt, args)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -335,9 +331,7 @@ DB_RESULT	DBselectN(const char *query, int n)
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		rc = zbx_db_select_n(query, n);
-
-		if ((DB_RESULT)ZBX_DB_DOWN == rc)
+		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_select_n(query, n)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
