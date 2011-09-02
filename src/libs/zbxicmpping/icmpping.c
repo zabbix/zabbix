@@ -21,7 +21,6 @@
 #include "threads.h"
 #include "comms.h"
 #include "log.h"
-#include "zlog.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_FPING_LOCATION;
@@ -352,10 +351,7 @@ int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __function_name, hosts_count);
 
 	if (NOTSUPPORTED == (res = process_ping(hosts, hosts_count, count, interval, size, timeout, error, max_error_len)))
-	{
 		zabbix_log(LOG_LEVEL_ERR, "%s", error);
-		zabbix_syslog("%s", error);
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
