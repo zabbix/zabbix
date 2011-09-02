@@ -1,5 +1,6 @@
 Changes for 1.8.8rc1
 
+ - [ZBX-3970] fixed proxy crash after database connection to postgresql is recovered (Deniss)
  - [ZBX-3175] fixed value type for 'vfs.fs.size[/var,used]' in data.sql (Sasha)
  - [ZBX-4068] updated French translation; thanks to Joseph Bueno (Richlv)
  - [ZBX-4066] fixed macros saving in administration (Eduard)

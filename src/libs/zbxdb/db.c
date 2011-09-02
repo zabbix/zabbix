@@ -798,7 +798,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	if (NULL == result)
 	{
 		zabbix_errlog(ERR_Z3005, 0, "result is NULL", sql);
-		ret = ZBX_DB_FAIL;
+		ret = (CONNECTION_OK == PQstatus(conn) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 
 	if (PGRES_COMMAND_OK != PQresultStatus(result))
