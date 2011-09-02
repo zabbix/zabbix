@@ -2297,9 +2297,6 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 		zbx_vector_uint64_append(&itemids, ifunc->itemid);
 	}
 
-	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			49 + sizeof(ZBX_SQL_ITEM_FIELDS) + sizeof(ZBX_SQL_ITEM_TABLES),
 			"select %s,h.status"
