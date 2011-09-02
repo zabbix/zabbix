@@ -21,7 +21,6 @@
 
 #include "comms.h"
 #include "log.h"
-#include "zlog.h"
 #include "zbxjson.h"
 #include "zbxserver.h"
 #include "dbcache.h"
@@ -280,10 +279,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 
 			alarm(CONFIG_TIMEOUT);
 			if (SUCCEED != zbx_tcp_send_raw(sock, reply))
-			{
 				zabbix_log(LOG_LEVEL_WARNING, "Error sending %s to node", reply);
-				zabbix_syslog("Trapper: error sending %s to node", reply);
-			}
 			alarm(0);
 
 			return ret;
@@ -399,10 +395,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 
 		alarm(CONFIG_TIMEOUT);
 		if (SUCCEED != zbx_tcp_send_raw(sock, SUCCEED == ret ? "OK" : "NOT OK"))
-		{
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
-			zabbix_syslog("Trapper: error sending result back");
-		}
 		alarm(0);
 	}
 	return ret;

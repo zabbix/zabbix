@@ -171,9 +171,6 @@ char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 
-/* Global variable to control if we should write warnings to log[] */
-int	CONFIG_ENABLE_LOG		= 1;
-
 /* From 'config' table - no need to cache ns_support */
 int	CONFIG_NS_SUPPORT		= 0;
 

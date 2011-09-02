@@ -19,7 +19,6 @@
 
 #include "common.h"
 
-#include "zlog.h"
 #include "db.h"
 #include "dbcache.h"
 #include "daemon.h"
@@ -314,7 +313,6 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 				zbx_host_type_string(item->type), item->host.host);
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
-		zabbix_syslog("%s", error_msg);
 
 		*available = HOST_AVAILABLE_TRUE;
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
@@ -455,10 +453,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	DBcommit();
 
 	if ('\0' != *error_msg)
-	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
-		zabbix_syslog("%s", error_msg);
-	}
 }
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
@@ -548,7 +543,6 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_NOTSUPPORTED"));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
-		zabbix_syslog("Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
 	}
 
 	/* remove formatting symbols from the end of the result */
