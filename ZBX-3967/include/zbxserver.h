@@ -29,12 +29,13 @@
 #define MACRO_TYPE_MESSAGE_BODY		0x0004
 #define MACRO_TYPE_MESSAGE		0x0006	/* (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) */
 #define MACRO_TYPE_TRIGGER_EXPRESSION	0x0008
-#define MACRO_TYPE_ITEM_KEY		0x0010
-#define MACRO_TYPE_HOST_IPMI_IP		0x0020
-#define MACRO_TYPE_FUNCTION_PARAMETER	0x0040
-#define MACRO_TYPE_ITEM_FIELD		0x0080
-#define MACRO_TYPE_SCRIPT		0x0100
-#define MACRO_TYPE_ITEM_EXPRESSION	0x0200
+#define MACRO_TYPE_TRIGGER_URL		0x0010
+#define MACRO_TYPE_ITEM_KEY		0x0020
+#define MACRO_TYPE_HOST_IPMI_IP		0x0040
+#define MACRO_TYPE_FUNCTION_PARAMETER	0x0080
+#define MACRO_TYPE_ITEM_FIELD		0x0100
+#define MACRO_TYPE_SCRIPT		0x0200
+#define MACRO_TYPE_ITEM_EXPRESSION	0x0400
 
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now);
 
@@ -42,8 +43,8 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *host,
 		DC_ITEM *dc_item, DB_ESCALATION *escalation, char **data, int macro_type,
 		char *error, int maxerrlen);
 
-int	evaluate_expression(int *result, char **expression, time_t now,
-		zbx_uint64_t trigggerid, int trigger_value, char **error);
+void	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now,
+		int value, int *new_value, char **new_error);
 int	evaluate(double *value, char *exp, char *error, int maxerrlen);
 
 #endif

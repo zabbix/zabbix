@@ -102,16 +102,12 @@ static void	process_time_functions()
 		tr_last->expression = zbx_strdup(NULL, row[4]);
 		tr_last->lastchange = time(NULL);
 
-		evaluate_expression(&tr_last->new_value, &tr_last->expression, tr_last->lastchange, tr_last->triggerid,
-				tr_last->value, &tr_last->new_error);
-
-		DBcheck_trigger_for_update(tr_last->triggerid, tr_last->type, tr_last->value, tr_last->error,
-				tr_last->new_value, tr_last->new_error, tr_last->lastchange, &tr_last->update_trigger,
-				&tr_last->add_event);
+		evaluate_expression(tr_last->triggerid, &tr_last->expression, tr_last->lastchange,
+				tr_last->value, &tr_last->new_value, &tr_last->new_error);
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
-				tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
-				tr_last->lastchange, tr_last->update_trigger))
+				tr_last->type, tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
+				tr_last->lastchange, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 		}
@@ -124,21 +120,24 @@ static void	process_time_functions()
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
-	if (sql_offset > 16)
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
 
-	for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
+	if (0 != tr_num)
 	{
-		zbx_free(tr_last->expression);
-		zbx_free(tr_last->new_error);
+		for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
+		{
+			zbx_free(tr_last->expression);
+			zbx_free(tr_last->new_error);
 
-		if (1 != tr_last->add_event)
-			continue;
+			if (1 != tr_last->add_event)
+				continue;
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-				tr_last->lastchange, tr_last->new_value, 0, 0);
+			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, tr_last->new_value, 0, 0);
+		}
 	}
 
 	DBcommit();
