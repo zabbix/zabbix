@@ -2,6 +2,7 @@
 Changes for 1.9.6
 
 New features:
+ - [ZBX-3683] removed the obsolete item zabbix[log] (Sasha)
  - [ZBXNEXT-891] redesign general->Value mapping (Eduard)
  - [ZBXNEXT-889] redesign general->Regular expressions (Eduard)
  - [ZBXNEXT-885] redesign general->Housekeeper, Working time and Other (Eduard)

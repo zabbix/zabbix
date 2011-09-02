@@ -25,7 +25,6 @@ zabbix_server_SOURCES = \
 	operations.c operations.h \
 	events.c events.h \
 	scripts.c scripts.h \
-	zlog.c \
 	server.c
 
 zabbix_server_LDADD = \
