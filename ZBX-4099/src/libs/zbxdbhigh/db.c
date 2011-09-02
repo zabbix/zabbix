@@ -2064,6 +2064,9 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		if (SUCCEED == DBis_null(row[0]))
+			continue;
+
 		if (h_alloc == h_num)
 		{
 			h_alloc = MAX(h_alloc + 1, h_alloc * 3 / 2);
