@@ -198,6 +198,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.8rc1
 
+ - [ZBX-3175] fixed value type for 'vfs.fs.size[/var,used]' in data.sql (Sasha)
  - [ZBXNEXT-900] added support of {TRIGGER.ID} macro in a trigger url (Vedmak,Sasha)
  - [ZBX-4059] fixed a potential buffer overflow in item parameter parsing (rudolfs)
 
