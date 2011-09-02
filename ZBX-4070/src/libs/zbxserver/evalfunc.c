@@ -487,7 +487,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 			goto clean;
 
 		if ('\0' == *arg3)
-			op = 0 != numeric_search ? OP_EQ : OP_LIKE;
+			op = (0 != numeric_search ? OP_EQ : OP_LIKE);
 		else if (0 == strcmp(arg3, "eq"))
 			op = OP_EQ;
 		else if (0 == strcmp(arg3, "ne"))
