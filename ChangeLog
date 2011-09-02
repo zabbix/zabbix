@@ -1,6 +1,6 @@
 Changes for 1.8.8rc1
 
- - [ZBX-3105] fixed value type for 'vfs.fs.size[/var,used]' in data.sql (Sasha)
+ - [ZBX-3175] fixed value type for 'vfs.fs.size[/var,used]' in data.sql (Sasha)
  - [ZBX-4068] updated French translation; thanks to Joseph Bueno (Richlv)
  - [ZBX-4066] fixed macros saving in administration (Eduard)
  - [ZBXNEXT-900] added support of {TRIGGER.ID} macro in a trigger url (Vedmak,Sasha)
