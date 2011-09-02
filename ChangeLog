@@ -200,6 +200,7 @@ Changes for 1.8.8rc1
 
  - [ZBX-3175] fixed value type for 'vfs.fs.size[/var,used]' in data.sql (Sasha)
  - [ZBXNEXT-900] added support of {TRIGGER.ID} macro in a trigger url (Vedmak,Sasha)
+ - [ZBX-4045] added check for duplicate hosts - if found, configuration syncer logs a warning and exits (rudolfs)
  - [ZBX-4059] fixed a potential buffer overflow in item parameter parsing (rudolfs)
 
 Changes for 1.8.7
@@ -208,7 +209,6 @@ Changes for 1.8.7
 
 Changes for 1.8.7rc1
 
- - [ZBX-4045] added check for duplicate hosts - if found, configuration syncer logs a warning and exits (rudolfs)
  - [ZBXNEXT-898] new trigger actions have "trigger = PROBLEM" and "not in maintenance" conditions by default (Vedmak)
  - [ZBX-4021] fixed item visibility in event then last value is null (Eduard)
  - [ZBX-4052] fixed key macros resolving in item names (Vedmak)
