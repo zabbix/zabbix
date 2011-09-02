@@ -2282,20 +2282,16 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 	int			sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0, i;
 	zbx_ifunc_t		*ifunc = NULL;
 	zbx_func_t		*func;
-	zbx_vector_uint64_t	itemids;
+	zbx_uint64_t		*itemids = NULL;
 	unsigned char		host_status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d", __function_name, ifuncs->values_num);
 
 	sql = zbx_malloc(sql, sql_alloc);
-
-	zbx_vector_uint64_create(&itemids);
+	itemids = zbx_malloc(itemids, ifuncs->values_num * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < ifuncs->values_num; i++)
-	{
-		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
-		zbx_vector_uint64_append(&itemids, ifunc->itemid);
-	}
+		itemids[i] = ((zbx_ifunc_t *)ifuncs->values[i])->itemid;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			49 + sizeof(ZBX_SQL_ITEM_FIELDS) + sizeof(ZBX_SQL_ITEM_TABLES),
@@ -2304,9 +2300,13 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 			" where i.hostid=h.hostid"
 				" and",
 			ZBX_SQL_ITEM_FIELDS, ZBX_SQL_ITEM_TABLES);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids.values, itemids.values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids, ifuncs->values_num);
+
+	zbx_free(itemids);
 
 	result = DBselect("%s", sql);
+
+	zbx_free(sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2362,10 +2362,6 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 		DBfree_item_from_db(&item);	/* free cached historical fields item.h_* */
 	}
 	DBfree_result(result);
-
-	zbx_vector_uint64_destroy(&itemids);
-
-	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
