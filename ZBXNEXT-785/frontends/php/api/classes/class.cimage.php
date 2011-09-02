@@ -532,7 +532,6 @@ class CImage extends CZBXAPI{
 			);
 		}
 
-
 		// check if icon is used in maps
 		$sql = 'SELECT DISTINCT sm.sysmapid, sm.name'.
 			' FROM sysmaps_elements se, sysmaps sm '.
@@ -562,19 +561,7 @@ class CImage extends CZBXAPI{
 			);
 		}
 
-		// look for first image to update iconid_off field
-		$sql = 'SELECT i.imageid'.
-			' FROM images i'.
-			' WHERE i.imagetype='.IMAGE_TYPE_ICON.
-				' AND '.DBin_node('i.imageid').
-			' ORDER BY i.imageid';
-		$firstImageid = DBfetch(DBselect($sql, 1));
-
-		// reset icon fields to default values, can be safe as only elements with automatic icon selection should be affected
-		// others would cause exception thrown above
-		if ($firstImageid) {
-			DB::update('sysmaps_elements', array('values' => array('iconid_off' => $firstImageid['imageid']), 'where' => array('iconid_off' => $imageids)));
-		}
+		DB::update('sysmaps_elements', array('values' => array('iconid_off' => 0), 'where' => array('iconid_off' => $imageids)));
 		DB::update('sysmaps_elements', array('values' => array('iconid_on' => 0), 'where' => array('iconid_on' => $imageids)));
 		DB::update('sysmaps_elements', array('values' => array('iconid_disabled' => 0), 'where' => array('iconid_disabled' => $imageids)));
 		DB::update('sysmaps_elements', array('values' => array('iconid_maintenance' => 0), 'where' => array('iconid_maintenance' => $imageids)));
