@@ -1278,7 +1278,7 @@ int	zbx_db_is_null(const char *field)
 	if (NULL == field)
 		return SUCCEED;
 #ifdef HAVE_ORACLE
-	if ('\0' == field[0])
+	if ('\0' == *field)
 		return SUCCEED;
 #endif
 	return FAIL;
