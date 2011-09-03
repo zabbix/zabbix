@@ -26,11 +26,8 @@
 #include "zbxmedia.h"
 #include "zbxserver.h"
 #include "zbxself.h"
-#include "zbxexec.h"
 
 #include "alerter.h"
-
-#define	ALARM_ACTION_TIMEOUT	40
 
 extern unsigned char	process_type;
 
@@ -53,19 +50,20 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 {
 	const char	*__function_name = "execute_action";
 
-	int 	res = FAIL;
+	int 	pid, res = FAIL;
+	char	full_path[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): alertid [" ZBX_FS_UI64 "] mediatype [%d]",
 			__function_name, alert->alertid, mediatype->type);
 
 	if (MEDIA_TYPE_EMAIL == mediatype->type)
 	{
-		alarm(ALARM_ACTION_TIMEOUT);
+		alarm(40);
 		res = send_email(mediatype->smtp_server, mediatype->smtp_helo, mediatype->smtp_email,
 				alert->sendto, alert->subject, alert->message, error, max_error_len);
 		alarm(0);
 	}
-#ifdef HAVE_JABBER
+#if defined(HAVE_JABBER)
 	else if (MEDIA_TYPE_JABBER == mediatype->type)
 	{
 		/* Jabber uses its own timeouts */
@@ -86,26 +84,29 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	}
 	else if (MEDIA_TYPE_EXEC == mediatype->type)
 	{
-		char	full_path[MAX_STRING_LEN], *send_to, *subject, *message, *output = NULL;
-
-		send_to = zbx_dyn_escape_string(alert->sendto, "\"\\");
-		subject = zbx_dyn_escape_string(alert->subject, "\"\\");
-		message = zbx_dyn_escape_string(alert->message, "\"\\");
-
-		zbx_snprintf(full_path, sizeof(full_path), "%s/%s \"%s\" \"%s\" \"%s\"",
-				CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path, send_to, subject, message);
-
-		zbx_free(send_to);
-		zbx_free(subject);
-		zbx_free(message);
-
-		if (SUCCEED == (res = zbx_execute(full_path, &output, error, max_error_len, ALARM_ACTION_TIMEOUT)))
+		if (-1 == (pid = zbx_fork()))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", mediatype->exec_path, output);
-			zbx_free(output);
+			zabbix_log(LOG_LEVEL_ERR, "%s(): failed to fork(): %s", __function_name, zbx_strerror(errno));
+		}
+		else if (0 != pid)
+		{
+			waitpid(pid, NULL, 0);
+			res = SUCCEED;
 		}
 		else
-			res = FAIL;
+		{
+			zbx_snprintf(full_path, sizeof(full_path), "%s/%s",
+					CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "before executing [%s]", full_path);
+
+			execl(full_path, mediatype->exec_path, alert->sendto,
+					alert->subject, alert->message, (char *)NULL);
+
+			/* execl() returns only when an error occurs */
+			zabbix_log(LOG_LEVEL_ERR, "error executing [%s]: %s", full_path, zbx_strerror(errno));
+			exit(0);
+		}
 	}
 	else
 	{
@@ -125,6 +126,8 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
  * Purpose: periodically check table alerts and send notifications if needed  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
 void	main_alerter_loop()
@@ -157,33 +160,34 @@ void	main_alerter_loop()
 		{
 			ZBX_STR2UINT64(alert.alertid, row[0]);
 			ZBX_STR2UINT64(alert.mediatypeid, row[1]);
-			alert.sendto = row[2];
-			alert.subject = row[3];
-			alert.message = row[4];
-			alert.status = atoi(row[5]);
+			alert.sendto		= row[2];
+			alert.subject		= row[3];
+			alert.message		= row[4];
+			alert.status		= atoi(row[5]);
 
 			ZBX_STR2UINT64(mediatype.mediatypeid, row[6]);
-			mediatype.type = atoi(row[7]);
-			mediatype.description = row[8];
-			mediatype.smtp_server = row[9];
-			mediatype.smtp_helo = row[10];
-			mediatype.smtp_email = row[11];
-			mediatype.exec_path = row[12];
-			mediatype.gsm_modem = row[13];
-			mediatype.username = row[14];
-			mediatype.passwd = row[15];
+			mediatype.type		= atoi(row[7]);
+			mediatype.description	= row[8];
+			mediatype.smtp_server	= row[9];
+			mediatype.smtp_helo	= row[10];
+			mediatype.smtp_email	= row[11];
+			mediatype.exec_path	= row[12];
+			mediatype.gsm_modem	= row[13];
+			mediatype.username	= row[14];
+			mediatype.passwd	= row[15];
 
-			alert.retries = atoi(row[16]);
+			alert.retries		= atoi(row[16]);
 
 			*error = '\0';
 			res = execute_action(&alert, &mediatype, error, sizeof(error));
 
-			if (SUCCEED == res)
+			if (res == SUCCEED)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Alert ID [" ZBX_FS_UI64 "] was sent successfully",
-						alert.alertid);
+					alert.alertid);
 				DBexecute("update alerts set status=%d,error='' where alertid=" ZBX_FS_UI64,
-						ALERT_STATUS_SENT, alert.alertid);
+					ALERT_STATUS_SENT,
+					alert.alertid);
 			}
 			else
 			{
@@ -193,15 +197,20 @@ void	main_alerter_loop()
 
 				alert.retries++;
 
-				if (ALERT_MAX_RETRIES > alert.retries)
+				if (alert.retries < ALERT_MAX_RETRIES)
 				{
 					DBexecute("update alerts set retries=%d,error='%s' where alertid=" ZBX_FS_UI64,
-							alert.retries, error_esc, alert.alertid);
+						alert.retries,
+						error_esc,
+						alert.alertid);
 				}
 				else
 				{
 					DBexecute("update alerts set status=%d,retries=%d,error='%s' where alertid=" ZBX_FS_UI64,
-							ALERT_STATUS_FAILED, alert.retries, error_esc, alert.alertid);
+						ALERT_STATUS_FAILED,
+						alert.retries,
+						error_esc,
+						alert.alertid);
 				}
 
 				zbx_free(error_esc);
