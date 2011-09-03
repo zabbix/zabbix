@@ -794,7 +794,7 @@ void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
-char	*zbx_dyn_escape_string(const char *src, const char *charlist);
+char	*dyn_escape_param(const char *src);
 int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
 		int delay, const char *flex_intervals, time_t now, int *effective_delay);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
@@ -819,7 +819,7 @@ void	zbx_strarr_free(char **arr);
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define zbx_setproctitle __zbx_zbx_setproctitle
-#endif
+#endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
 #define ZBX_KIBIBYTE		1024
