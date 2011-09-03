@@ -62,7 +62,7 @@ static char* get_param_value(char* params, const char* param_name)
 		/* trim left spaces */
 		for(; *p == ' '; p++);
 
-		/* find '=' */
+		/* find '=' symbol */
 		for(n = p; *n && *n != '\n'; n++)
 		{
 			if(*n == '=')
@@ -86,7 +86,7 @@ static char* get_param_value(char* params, const char* param_name)
 		/* allocate result */
 		if(r)
 		{
-			/* trim right EOL characters */
+			/* trim right EOL symbols */
 			while(*p == '\r' || *p == '\n' || *p == '\0') p--;
 			p++;
 
