@@ -5,7 +5,7 @@ CREATE TABLE help_items (
         key_            varchar(255)            DEFAULT ''      NOT NULL,
         description             varchar(255)            DEFAULT ''      NOT NULL,
         PRIMARY KEY (itemtype,key_)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 insert into help_items values (3,'icmpping[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds.');
 insert into help_items values (3,'icmppingloss[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Returns percentage of lost ICMP ping packets.');

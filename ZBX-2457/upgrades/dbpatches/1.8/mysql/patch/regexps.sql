@@ -3,5 +3,5 @@ CREATE TABLE regexps (
       name            varchar(128)            DEFAULT ''      NOT NULL,
       test_string             blob                    NOT NULL,
       PRIMARY KEY (regexpid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX regexps_1 on regexps (name);
