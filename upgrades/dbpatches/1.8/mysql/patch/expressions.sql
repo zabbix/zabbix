@@ -6,5 +6,5 @@ CREATE TABLE expressions (
       exp_delimiter           varchar(1)              DEFAULT ''      NOT NULL,
       case_sensitive          integer         DEFAULT '0'     NOT NULL,
       PRIMARY KEY (expressionid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX expressions_1 on expressions (regexpid);
