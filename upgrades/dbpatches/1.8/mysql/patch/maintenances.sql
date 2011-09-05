@@ -6,5 +6,5 @@ CREATE TABLE maintenances (
       active_since            integer         DEFAULT '0'     NOT NULL,
       active_till             integer         DEFAULT '0'     NOT NULL,
       PRIMARY KEY (maintenanceid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX maintenances_1 on maintenances (active_since,active_till);
