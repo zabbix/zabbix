@@ -5,7 +5,7 @@ CREATE TABLE sysmaps_link_triggers (
 	drawtype      integer         DEFAULT '0'      NOT NULL,
 	color         varchar(6)      DEFAULT '000000' NOT NULL,
 	PRIMARY KEY (linktriggerid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE UNIQUE INDEX sysmaps_link_triggers_1 on sysmaps_link_triggers (linkid,triggerid);
 update sysmaps_links set color_on='FF0000' where color_on='Red';
 update sysmaps_links set color_on='960000' where color_on='Dark Red';

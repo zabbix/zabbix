@@ -2101,6 +2101,8 @@
 	'S_FRIDAY_SHORT_BIG'=>			'F',
 	'S_SATURDAY_SHORT_BIG'=>			'S',
 	'S_SUNDAY_SHORT_BIG'=>			'S',
+	'S_NOW'=>			'Maintenant',
+	'S_DONE'=>			'Terminé',
 	'S_ZOOM'=>			'Zoom',
 	'S_FIXED_SMALL'=>			'fixe',
 	'S_DYNAMIC_SMALL'=>			'dynamique',

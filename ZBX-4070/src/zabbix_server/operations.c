@@ -125,7 +125,7 @@ static void run_remote_command(char* host_name, char* command)
 		else
 		{
 #endif
-			param = dyn_escape_param(p);
+			param = zbx_dyn_escape_string(p, "\"");
 			item.key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);
 			zbx_free(param);
 
@@ -589,13 +589,13 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				if ('\0' != *host)
 				{
 					/* by host name */
-					make_hostname(host);	/* replace not-allowed symbols */
+					make_hostname(host);	/* replace not-allowed characters */
 					host_unique = DBget_unique_hostname_by_sample(host);
 				}
 				else
 				{
 					/* by ip */
-					make_hostname(row[1]);	/* replace not-allowed symbols */
+					make_hostname(row[1]);	/* replace not-allowed characters */
 					host_unique = DBget_unique_hostname_by_sample(row[1]);
 				}
 

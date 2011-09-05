@@ -3,5 +3,5 @@ CREATE TABLE maintenances_hosts (
       maintenanceid           bigint unsigned         DEFAULT '0'     NOT NULL,
       hostid          bigint unsigned         DEFAULT '0'     NOT NULL,
       PRIMARY KEY (maintenance_hostid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX maintenances_hosts_1 on maintenances_hosts (maintenanceid,hostid);

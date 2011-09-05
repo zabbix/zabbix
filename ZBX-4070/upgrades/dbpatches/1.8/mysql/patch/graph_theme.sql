@@ -16,7 +16,7 @@ CREATE TABLE graph_theme (
       gridview                integer         DEFAULT 1       NOT NULL,
       legendview              integer         DEFAULT 1       NOT NULL,
       PRIMARY KEY (graphthemeid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX graph_theme_1 on graph_theme (description);
 CREATE INDEX graph_theme_2 on graph_theme (theme);
 

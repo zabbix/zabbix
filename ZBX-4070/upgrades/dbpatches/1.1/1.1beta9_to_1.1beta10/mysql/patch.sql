@@ -18,7 +18,7 @@ CREATE TABLE applications (
         KEY             hostid (hostid),
         KEY             templateid (templateid),
         UNIQUE          appname (hostid,name)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 --
 -- Table structure for table 'items_applications'
@@ -28,7 +28,7 @@ CREATE TABLE items_applications (
 	applicationid		int(4)		DEFAULT '0' NOT NULL,
 	itemid			int(4)		DEFAULT '0' NOT NULL,
 	PRIMARY KEY (applicationid,itemid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 
 alter table audit rename auditlog;
@@ -55,7 +55,7 @@ CREATE TABLE help_items (
         key_                    varchar(64)     DEFAULT '' NOT NULL,
         description             varchar(255)    DEFAULT '' NOT NULL,
         PRIMARY KEY (itemtype, key_)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 
 insert into help_items values (3,'icmpping','Checks if server accessible by ICMP ping	0 - ICMP ping fails 1 - ICMP ping successful	One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds.');
