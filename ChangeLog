@@ -205,8 +205,10 @@ Changes for 1.8.8rc1
  - [ZBX-3967] fixed alerter hang on long running alert scripts (Deniss)
  - [ZBX-3970] fixed proxy crash after database connection to postgresql is recovered (Deniss)
  - [ZBX-3175] fixed value type for 'vfs.fs.size[/var,used]' in data.sql (Sasha)
+ - [ZBX-4068] updated French translation; thanks to Joseph Bueno (Richlv)
+ - [ZBX-4066] fixed macros saving in administration (Eduard)
  - [ZBXNEXT-900] added support of {TRIGGER.ID} macro in a trigger url (Vedmak,Sasha)
- - [ZBX-4045] added check for duplicate hosts - if found, configuration syncer logs a warning and exits (rudolfs)
+ - [ZBX-4045] added check for duplicate hosts or proxies - if found, configuration syncer logs a warning and exits (rudolfs)
  - [ZBX-4059] fixed a potential buffer overflow in item parameter parsing (rudolfs)
 
 Changes for 1.8.7
@@ -216,8 +218,9 @@ Changes for 1.8.7
 Changes for 1.8.7rc1
 
  - [ZBXNEXT-898] new trigger actions have "trigger = PROBLEM" and "not in maintenance" conditions by default (Vedmak)
- - [ZBX-4021] fixed item visibility in event then last value is null (Eduard)
+ - [ZBX-4021] fixed item visibility in case when last value is null (Eduard)
  - [ZBX-4052] fixed key macros resolving in item names (Vedmak)
+ - [ZBX-1357] removed outdated translation strings from all translations (Richlv)
  - [ZBX-3998] reload recipient list for database down messages every CacheUpdateFrequency seconds (rudolfs)
  - [ZBX-4034] fixed macros resolving in item names (Vedmak)
  - [ZBX-4044] removed redundant query "SET CHARACTER SET" (asaveljevs,Vedmak)
