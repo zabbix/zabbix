@@ -2169,17 +2169,8 @@ static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, DB_TRIGGER
 		}
 	}
 
-	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() functionids_num:%d", __function_name, functionids->values_num);
 }
-
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	zbx_vector_ptr_t	functions;
-}
-zbx_ifunc_t;
 
 typedef struct
 {
@@ -2192,6 +2183,13 @@ typedef struct
 	zbx_vector_uint64_t	functionids;
 }
 zbx_func_t;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_vector_ptr_t	functions;
+}
+zbx_ifunc_t;
 
 static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_vector_ptr_t *ifuncs,
 		DB_TRIGGER_UPDATE *tr, int tr_num)
@@ -2207,6 +2205,8 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 	zbx_func_t	*func = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __function_name, functionids->values_num);
+
+	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -2275,15 +2275,15 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 {
 	const char	*__function_name = "zbx_evaluate_item_functions";
 
-	DB_RESULT		result;
-	DB_ROW			row;
-	DB_ITEM			item;
-	char			*sql = NULL, value[MAX_BUFFER_LEN];
-	int			sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0, i;
-	zbx_ifunc_t		*ifunc = NULL;
-	zbx_func_t		*func;
-	zbx_uint64_t		*itemids = NULL;
-	unsigned char		host_status;
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_ITEM		item;
+	char		*sql = NULL, value[MAX_BUFFER_LEN];
+	int		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0, i;
+	zbx_ifunc_t	*ifunc = NULL;
+	zbx_func_t	*func;
+	zbx_uint64_t	*itemids = NULL;
+	unsigned char	host_status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d", __function_name, ifuncs->values_num);
 
@@ -2433,8 +2433,7 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, DB_TRIGGE
 			if (NULL == (func = zbx_get_func_by_functionid(ifuncs, functionid)))
 			{
 				tr[i].new_error = zbx_dsprintf(tr[i].new_error, "Could not obtain function"
-						" and item for functionid: " ZBX_FS_UI64,
-						functionid);
+						" and item for functionid: " ZBX_FS_UI64, functionid);
 				tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
 				break;
 			}
@@ -2596,7 +2595,9 @@ void	evaluate_expressions(DB_TRIGGER_UPDATE *tr, int tr_num)
 			tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
 		}
 		else if (0 == cmp_double(expr_result, 0))
+		{
 			tr[i].new_value = TRIGGER_VALUE_FALSE;
+		}
 		else
 			tr[i].new_value = TRIGGER_VALUE_TRUE;
 	}
@@ -2604,8 +2605,10 @@ void	evaluate_expressions(DB_TRIGGER_UPDATE *tr, int tr_num)
 	for (i = 0; i < tr_num; i++)
 	{
 		if (NULL != tr[i].new_error)
+		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s():expression [%s] cannot be evaluated: %s",
 					__function_name, tr[i].expression, tr[i].new_error);
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

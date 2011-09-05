@@ -1,5 +1,6 @@
 Changes for 1.8.8rc1
 
+ - [ZBX-4070] improved performance of handling of trigger functions (Sasha)
  - [ZBX-2457] changed "type" to "ENGINE" in MySQL upgrade patches for MySQL 5.5 compatibility (Richlv)
  - [ZBX-4099] fixed possible crash when processing of functions sum(), min(), max() or diff() in triggers, aggregated checks or calculated items (Sasha)
  - [ZBX-3030] fixed event durations in monitoring (Vedmak,Eduard)
@@ -20,7 +21,6 @@ Changes for 1.8.7
 
 Changes for 1.8.7rc1
 
- - [ZBX-4070] improved performance of handling of trigger functions (Sasha)
  - [ZBXNEXT-898] new trigger actions have "trigger = PROBLEM" and "not in maintenance" conditions by default (Vedmak)
  - [ZBX-4021] fixed item visibility in event when last value is null (Eduard)
  - [ZBX-4052] fixed key macros resolving in item names (Vedmak)
