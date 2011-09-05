@@ -6,5 +6,5 @@ CREATE TABLE auditlog_details (
       oldvalue                blob                    NOT NULL,
       newvalue                blob                    NOT NULL,
       PRIMARY KEY (auditdetailid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX auditlog_details_1 on auditlog_details (auditid);

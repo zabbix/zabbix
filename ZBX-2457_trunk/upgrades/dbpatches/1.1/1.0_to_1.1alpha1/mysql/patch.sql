@@ -5,7 +5,7 @@ CREATE TABLE images (
   image                 longblob            DEFAULT '' NOT NULL,
   PRIMARY KEY (imageid),
   UNIQUE (imagetype, name)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 alter table users add  url			varchar(255)	DEFAULT '' NOT NULL;
 
@@ -48,7 +48,7 @@ CREATE TABLE audit (
   PRIMARY KEY (auditid),
   UNIQUE (userid,clock),
   KEY (clock)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 insert into images values(1,1,"Hub",load_file("Hub.png"));
 insert into images values(2,1,"Hub (small)",load_file("Hub_small.png"));
