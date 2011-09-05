@@ -1295,7 +1295,7 @@ clean:
  ******************************************************************************/
 static int	compare_last_and_prev(DB_ITEM *item, time_t now)
 {
-	int	i;
+	int	i, res;
 	char	**h_value;
 
 	if (NULL != item->h_lastvalue_str[0] && NULL != item->h_lastvalue_str[1])
@@ -1310,6 +1310,8 @@ static int	compare_last_and_prev(DB_ITEM *item, time_t now)
 	if (ITEM_VALUE_TYPE_STR == item->value_type || ITEM_LASTVALUE_LEN > zbx_strlen_utf8(item->lastvalue[0].str))
 		return 0;
 
+	res = 0;	/* if values are no longer in history, consider them equal */
+
 	h_value = DBget_history(item->itemid, item->value_type, ZBX_DB_GET_HIST_VALUE, 0, now, NULL, 2);
 
 	for (i = 0; NULL != h_value[i]; i++)
@@ -1317,14 +1319,12 @@ static int	compare_last_and_prev(DB_ITEM *item, time_t now)
 		if (NULL == item->h_lastvalue_str[i] && ITEM_LASTVALUE_LEN <= zbx_strlen_utf8(h_value[i]))
 			item->h_lastvalue_str[i] = zbx_strdup(NULL, h_value[i]);
 	}
+
+	if (NULL != h_value[0] && NULL != h_value[1])
+		res = strcmp(h_value[0], h_value[1]);
 	DBfree_history(h_value);
 
-	if (NULL != item->h_lastvalue_str[0] && NULL != item->h_lastvalue_str[1])
-		return strcmp(item->h_lastvalue_str[0], item->h_lastvalue_str[1]);
-
-	/* if values are no longer in history, consider them equal */
-
-	return 0;
+	return res;
 }
 
 /******************************************************************************
