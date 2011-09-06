@@ -640,7 +640,7 @@ function __autoload($class_name) {
 
 		// triggers
 		$sql = 'SELECT COUNT(DISTINCT t.triggerid) as cnt'.
-				' FROM triggers t, functions f, items i, hosts h'.
+				' FROM triggers t,functions f,items i,hosts h'.
 				' WHERE t.triggerid=f.triggerid'.
 					' AND f.itemid=i.itemid'.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
@@ -650,19 +650,19 @@ function __autoload($class_name) {
 		$row = DBfetch(DBselect($sql));
 		$status['triggers_count'] = $row['cnt'];
 
-		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_MULT_EVENT_DISABLED));
+		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED));
 		$status['triggers_count_enabled'] = $row['cnt'];
 
-		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_MULT_EVENT_ENABLED));
+		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_DISABLED));
 		$status['triggers_count_disabled'] = $row['cnt'];
 
-		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_MULT_EVENT_DISABLED.' AND t.value='.TRIGGER_VALUE_FALSE));
+		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED.' AND t.value='.TRIGGER_VALUE_FALSE));
 		$status['triggers_count_off'] = $row['cnt'];
 
-		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_MULT_EVENT_DISABLED.' AND t.value='.TRIGGER_VALUE_TRUE));
+		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED.' AND t.value='.TRIGGER_VALUE_TRUE));
 		$status['triggers_count_on'] = $row['cnt'];
 
-		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_MULT_EVENT_DISABLED.' AND t.value='.TRIGGER_VALUE_UNKNOWN));
+		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED.' AND t.value='.TRIGGER_VALUE_UNKNOWN));
 		$status['triggers_count_unknown'] = $row['cnt'];
 
 		// items
@@ -687,6 +687,7 @@ function __autoload($class_name) {
 		$sql = 'SELECT COUNT(hostid) as cnt'.
 				' FROM hosts'.
 				' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
+
 		$row = DBfetch(DBselect($sql));
 		$status['hosts_count'] = $row['cnt'];
 

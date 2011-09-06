@@ -1089,7 +1089,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 	}
 
 	function get_host_by_applicationid($applicationid) {
-		$row = DBfetch(DBselect('SELECT h.* FROM hosts h, applications a WHERE a.hostid=h.hostid AND a.applicationid='.$applicationid));
+		$row = DBfetch(DBselect('SELECT h.* FROM hosts h,applications a WHERE a.hostid=h.hostid AND a.applicationid='.$applicationid));
 		if ($row) {
 			return $row;
 		}
