@@ -49,7 +49,9 @@ static void	DBget_lastsize()
 
 static void	DBupdate_lastsize()
 {
+	DBbegin();
 	DBexecute("update globalvars set snmp_lastsize=%d", trap_lastsize);
+	DBcommit();
 }
 
 /******************************************************************************
@@ -77,7 +79,10 @@ static void	set_item_value(DC_ITEM *item, char *trap, zbx_timespec_t *ts)
 				ts, ITEM_STATUS_ACTIVE, NULL, timestamp, NULL, 0, 0, 0, 0);
 	}
 	else
-		DCadd_nextcheck(item->itemid, ts->sec, value.msg);
+	{
+		dc_add_history(item->itemid, item->value_type, item->flags, NULL,
+				ts, ITEM_STATUS_NOTSUPPORTED, value.msg, 0, NULL, 0, 0, 0, 0);
+	}
 
 	free_result(&value);
 }
@@ -147,7 +152,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	process_trap(char *addr, char *begin, char *end)
+static void	process_trap(const char *addr, char *begin, char *end)
 {
 	zbx_timespec_t	ts;
 	zbx_uint64_t	*interfaceids = NULL;
@@ -187,18 +192,19 @@ static void	parse_traps(char *buffer)
 
 	c = line = buffer;
 
-	DCinit_nextchecks();
-
 	for (; '\0' != *c; c++)
 	{
 		if ('\n' == *c)
 			line = c + 1;
 
-		if (0 != strncmp(c, "ZBXTRAP ", 8))
+		if (0 != strncmp(c, "ZBXTRAP", 7))
 			continue;
 
 		*c = '\0';
-		c += 8;	/* c now points to the address */
+		c += 7;	/* c now points to the delimiter between "ZBXTRAP" and address */
+
+		while ('\0' != *c && NULL == strchr(ZBX_WHITESPACE, *c))
+			c++;
 
 		/* process the previos trap */
 		if (NULL != begin)
@@ -212,7 +218,10 @@ static void	parse_traps(char *buffer)
 		begin = line;
 		addr = c;
 
-		if (NULL == (c = strchr(c, ' ')))
+		while ('\0' != *c && NULL == strchr(ZBX_WHITESPACE, *c))
+			c++;
+
+		if ('\0' == c)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s...]", begin);
 			begin = NULL;
@@ -229,8 +238,6 @@ static void	parse_traps(char *buffer)
 		process_trap(addr, begin, end);
 	else if (NULL == addr)	/* no trap was found */
 		zabbix_log(LOG_LEVEL_WARNING, "invalid trap found [%s]", buffer);
-
-	DCflush_nextchecks();
 }
 
 /******************************************************************************
@@ -395,7 +402,7 @@ void	main_snmptrapper_loop()
 {
 	const char	*__function_name = "main_snmptrapper_loop";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), trapfile [%s]", __function_name, CONFIG_SNMPTRAP_FILE);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __function_name, CONFIG_SNMPTRAP_FILE);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -403,7 +410,7 @@ void	main_snmptrapper_loop()
 
 	DBget_lastsize();
 
-	while (ZBX_IS_RUNNING())
+	for (;;)
 	{
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
