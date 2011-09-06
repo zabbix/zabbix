@@ -73,65 +73,80 @@ fail() {
 [[ "$2" ]] && {
 	TABLES="$2"
 } || {
-TABLES="actions \
+# table ordering follows original schema
+TABLES="slideshows \
+slides \
+drules \
+dchecks \
+httptest \
+httpstep \
+httpstepitem \
+httptestitem \
+services_times \
+actions \
+operations \
+opmessage \
+opmessage_grp \
+opmessage_usr \
+opcommand \
+opcommand_hst \
+opcommand_grp \
+opgroup \
+optemplate \
+opconditions \
 applications \
 conditions \
 config \
-dchecks \
-drules \
-expressions \
 functions \
-globalmacro \
-graph_theme \
 graphs \
+graph_discovery \
 graphs_items \
+graph_theme \
 groups \
 help_items \
-hostmacro \
 hosts \
+interface \
+globalmacro \
+hostmacro \
 hosts_groups \
-hosts_profiles \
-hosts_profiles_ext \
+host_inventory \
 hosts_templates \
-httpstep \
-httpstepitem \
-httptest \
-httptestitem \
 items \
+item_discovery \
 items_applications \
-maintenances \
-maintenances_groups \
-maintenances_hosts \
-maintenances_windows \
 mappings \
 media \
 media_type \
-opconditions \
-operations \
-opmediatypes \
 profiles \
-regexps \
 rights \
+scripts \
 screens \
 screens_items \
-scripts \
 services \
 services_links \
-services_times \
-slides \
-slideshows \
-sysmaps \
-sysmaps_elements \
-sysmaps_link_triggers \
 sysmaps_links \
-timeperiods \
-trigger_depends \
+sysmaps_link_triggers \
+sysmaps_elements \
+sysmap_element_url \
+sysmaps \
+sysmap_url \
 triggers \
+trigger_discovery \
+trigger_depends \
 users \
-users_groups \
 usrgrp \
-valuemaps"
-# nodes \
+users_groups \
+valuemaps \
+maintenances \
+maintenances_hosts \
+maintenances_groups \
+maintenances_windows \
+timeperiods \
+regexps \
+expressions \
+icon_map \
+icon_mapping"
+# nodes \ - after httptestitem in original schema
 }
 
 for TABLE in $TABLES; do
