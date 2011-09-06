@@ -295,7 +295,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 					" ShowHide('div_node_tree', 'table');".
 					' pos.top += 20;'.
 					" \$('div_node_tree').setStyle({top: pos.top+'px'});";
-				$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript); //sdelatj konstatntu!
+				$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript);
 				$button_show_tree->setAttribute('id', 'button_show_tree');
 
 // +++ Create node tree +++
