@@ -3867,7 +3867,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$titles = array('maps' => S_MAP);
 		if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
-			$titles += array('icons' => S_ICON, 'background' => S_BACKGROUND);
+			$titles += array('icons' => _('Icon'), 'background' => _('Background'));
 		}
 
 		foreach($titles as $key => $title){
