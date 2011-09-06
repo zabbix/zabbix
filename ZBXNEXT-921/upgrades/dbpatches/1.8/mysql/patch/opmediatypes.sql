@@ -3,5 +3,5 @@ CREATE TABLE opmediatypes (
       operationid             bigint unsigned         DEFAULT '0'     NOT NULL,
       mediatypeid             bigint unsigned         DEFAULT '0'     NOT NULL,
       PRIMARY KEY (opmediatypeid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE UNIQUE INDEX opmediatypes_1 on opmediatypes (operationid);

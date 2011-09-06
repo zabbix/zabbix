@@ -22,4 +22,4 @@ CREATE TABLE hosts_profiles (
   location              blob            DEFAULT '' NOT NULL,
   notes                 blob            DEFAULT '' NOT NULL,
   PRIMARY KEY (hostid)
-) type=InnoDB;
+) ENGINE=InnoDB;
