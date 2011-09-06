@@ -21,6 +21,10 @@
 /*					ZABBIX MAPS								*/
 /************************************************************/
 
+.sortableRowPlaceholder{
+	height: 18px;
+}
+
 #sysmap_cnt .sysmap_element{
 	position: absolute;
 	z-index: 10;
@@ -78,6 +82,16 @@ table.gridTable tr td{
 	display: inline-block;
 	width: 10px;
 	height: 10px;
+}
+
+div.groupingCaption {
+	padding-left: 5px;
+	background-color: #CED7DF;
+}
+div.groupingContent {
+	border: 2px solid #CED7DF;
+	padding-bottom: 2px;
+	margin-bottom: 2px;
 }
 
 /************************************************************/

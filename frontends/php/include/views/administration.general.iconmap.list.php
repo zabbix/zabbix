@@ -19,15 +19,25 @@
 **/
 ?>
 <?php
-class CIcon extends CSpan {
-	public function __construct($title, $class, $action='') {
-		parent::__construct(SPACE, $class.' menu_icon shadow');
+$table = new CTableInfo();
+$table->setHeader(array(_('Name'), _('Icon map')));
+$table->addItem(BR());
 
-		$this->setAttribute('title', $title);
+foreach ($this->data['iconmaps'] as $iconmap) {
+	$mappings = $iconmap['mappings'];
+	order_result($mappings, 'sortorder');
 
-		if (!empty($action)) {
-			$this->setAttribute('onclick', 'javascript: '.$action);
-		}
+	$row = array();
+	foreach ($mappings as $mapping) {
+		$row[] = $this->data['inventoryList'][$mapping['inventory_link']].':'.
+				$mapping['expression'].SPACE.RARR.SPACE.$this->data['iconList'][$mapping['iconid']];
+		$row[] = BR();
 	}
+	$table->addRow(array(
+			new CLink($iconmap['name'], 'config.php?form=update&iconmapid='.$iconmap['iconmapid'].url_param('config')),
+			$row
+		));
 }
+
+return $table;
 ?>

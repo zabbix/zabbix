@@ -40,5 +40,18 @@ function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // D
 function SDII($msg='SDII') { echo 'DEBUG INFO: '; echo '<pre>'.print_r($msg, true).'</pre>'; echo SBR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
 function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
+function sdff($msg, $fileName = '/tmp/zabbix.log') {
+	$fileStreem = @fopen($fileName, 'a');
+	if (is_array($msg)) {
+		$toImplode = array();
+		foreach ($msg as $key => $value) {
+			$toImplode[] = var_export($key, true).'=>'.var_export($value, true);
+		}
+		@fwrite($fileStreem, 'array('.implode(',', $toImplode).')'."\n\n");
+	} else {
+		@fwrite($fileStreem, var_export($msg, true)."\n\n");
+	}
+	@fclose($fileStreem);
+}
 
 ?>
