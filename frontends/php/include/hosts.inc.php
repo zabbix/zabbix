@@ -19,12 +19,10 @@
 **/
 ?>
 <?php
-	function setHostGroupInternal($groupids, $internal=ZBX_NOT_INTERNAL_GROUP) {
+	function setHostGroupInternal($groupids, $internal = ZBX_NOT_INTERNAL_GROUP) {
 		zbx_value2array($groupids);
 
-		$sql = 'UPDATE groups SET internal='.$internal.' WHERE '.DBcondition('groupid', $groupids);
-		$result = DBexecute($sql);
-	return $result;
+		return DBexecute('UPDATE groups SET internal='.$internal.' WHERE '.DBcondition('groupid', $groupids));
 	}
 
 	/**
@@ -405,111 +403,16 @@
 		}
 
 		return $inventoryFields;
-
-		/*
-		// code below looks at schema and gets field numbers from there
-		// we decided to use hard coded array (above) instead of this approach
-		// uncomment this block to fall back to schema approach (if needed)
-
-		$inventorySchema = DB::getSchema('host_inventory');
-		$inventoryTitles = array(
-			'type' => _('Type'),
-			'type_full' => _('Type (Full details)'),
-			'name' => _('Name'),
-			'alias' => _('Alias'),
-			'os' => _('OS'),
-			'os_full' => _('OS (Full details)'),
-			'os_short' => _('OS (Short)'),
-			'serialno_a' => _('Serial number A'),
-			'serialno_b' => _('Serial number B'),
-			'tag' => _('Tag'),
-			'asset_tag' => _('Asset tag'),
-			'macaddress_a' => _('MAC address A'),
-			'macaddress_b' => _('MAC address B'),
-			'hardware' => _('Hardware'),
-			'hardware_full' => _('Hardware (Full details)'),
-			'software' => _('Software'),
-			'software_full' => _('Software (Full details)'),
-			'software_app_a' => _('Software application A'),
-			'software_app_b' => _('Software application B'),
-			'software_app_c' => _('Software application C'),
-			'software_app_d' => _('Software application D'),
-			'software_app_e' => _('Software application E'),
-			'contact' => _('Contact'),
-			'location' => _('Location'),
-			'location_lat' => _('Location latitude'),
-			'location_lon' => _('Location longitude'),
-			'notes' => _('Notes'),
-			'chassis' => _('Chassis'),
-			'model' => _('Model'),
-			'hw_arch' => _('HW architecture'),
-			'vendor' => _('Vendor'),
-			'contract_number' => _('Contract number'),
-			'installer_name' => _('Installer name'),
-			'deployment_status' => _('Deployment status'),
-			'url_a' => _('URL A'),
-			'url_b' => _('URL B'),
-			'url_c' => _('URL C'),
-			'host_networks' => _('Host networks'),
-			'host_netmask' => _('Host subnet mask'),
-			'host_router' => _('Host router'),
-			'oob_ip' => _('OOB IP address'),
-			'oob_netmask' => _('OOB subnet mask'),
-			'oob_router' => _('OOB router'),
-			'date_hw_purchase' => _('Date HW purchased'),
-			'date_hw_install' => _('Date HW installed'),
-			'date_hw_expiry' => _('Date HW maintenance expires'),
-			'date_hw_decomm' => _('Date HW decommissioned'),
-			'site_address_a' => _('Site address A'),
-			'site_address_b' => _('Site address B'),
-			'site_address_c' => _('Site address C'),
-			'site_city' => _('Site city'),
-			'site_state' => _('Site state / province'),
-			'site_country' => _('Site country'),
-			'site_zip' => _('Site ZIP / postal'),
-			'site_rack' => _('Site rack location'),
-			'site_notes' => _('Site notes'),
-			'poc_1_name' => _('Primary POC name'),
-			'poc_1_email' => _('Primary POC email'),
-			'poc_1_phone_a' => _('Primary POC phone A'),
-			'poc_1_phone_b' => _('Primary POC phone B'),
-			'poc_1_cell' => _('Primary POC cell'),
-			'poc_1_screen' => _('Primary POC screen name'),
-			'poc_1_notes' => _('Primary POC notes'),
-			'poc_2_name' => _('Secondary POC name'),
-			'poc_2_email' => _('Secondary POC email'),
-			'poc_2_phone_a' => _('Secondary POC phone A'),
-			'poc_2_phone_b' => _('Secondary POC phone B'),
-			'poc_2_cell' => _('Secondary POC cell'),
-			'poc_2_screen' => _('Secondary POC screen name'),
-			'poc_2_notes' => _('Secondary POC notes'),
-		);
-		$fieldNo = 0; // field numbering is critical for item linkage with host inventories
-		foreach ($inventorySchema['fields'] as $field_name=>$field){
-			// we are interested in id field
-			if($field['type'] != 'id' && $field_name != 'inventory_mode'){
-				$result[$fieldNo] = array(
-					'db_field' => $field_name,
-					// if no title is defined in getHostInventoryTitles() function for this field, we assume that title is equal to DB field name
-					'title' => isset($inventoryTitles[$field_name]) ? $inventoryTitles[$field_name] : $field_name
-				);
-			}
-			$fieldNo++;
-		}
-
-		return $result;
-		*/
-
 	}
 
 
 	function get_hostgroup_by_groupid($groupid) {
-		$result = DBselect("select * from groups where groupid=".$groupid);
-		$row = DBfetch($result);
+		$row = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.$groupid));
 		if ($row) {
 			return $row;
 		}
 		error(_s('No host groups with groupid "%s".', $groupid));
+
 		return false;
 	}
 
@@ -526,7 +429,7 @@
 					' AND '.DBcondition('i.itemid', $itemids);
 
 		$res = DBselect($sql);
-		while ($row=DBfetch($res)) {
+		while ($row = DBfetch($res)) {
 			$result = true;
 			$hosts[$row['itemid']] = $row;
 		}
@@ -541,20 +444,18 @@
 			unset($hosts);
 		}
 
-	return $result;
+		return $result;
 	}
 
 	function get_host_by_hostid($hostid, $no_error_message = 0) {
-		$sql = 'SELECT * FROM hosts WHERE hostid='.$hostid;
-		$result = DBselect($sql);
-		$row = DBfetch($result);
+		$row = DBfetch(DBselect('SELECT h.* FROM hosts h WHERE h.hostid='.$hostid));
 		if ($row) {
 			return $row;
 		}
 		if ($no_error_message == 0)
 			error(_s('No host with hostid "%s".', $hostid));
 
-	return false;
+		return false;
 	}
 
 	function get_hosts_by_templateid($templateids) {
@@ -564,28 +465,24 @@
 				' WHERE h.hostid=ht.hostid'.
 					' AND '.DBcondition('ht.templateid', $templateids);
 
-	return DBselect($sql);
+		return DBselect($sql);
 	}
-
-// Update Host status
 
 	function update_host_status($hostids, $status) {
 		$res = true;
 		zbx_value2array($hostids);
 
-//		$hosts = array();
-		$sql = 'SELECT *'.
-			' FROM hosts'.
-			' WHERE '.DBcondition('hostid', $hostids).
-				' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
+		$sql = 'SELECT h.*'.
+			' FROM hosts h'.
+			' WHERE '.DBcondition('h.hostid', $hostids).
+				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		$result = DBselect($sql);
-		while ($host=DBfetch($result)) {
+		while ($host = DBfetch($result)) {
 			if ($status != $host['status']) {
-//				$hosts[$host['hostid']] = $host['hostid'];
 				update_trigger_value_to_unknown_by_hostid($host['hostid']);
 				$res = DBexecute('UPDATE hosts SET status='.$status.' WHERE hostid='.$host['hostid']);
 				if ($res) {
-					$host_new = $host;//get_host_by_hostid($host['hostid']);
+					$host_new = $host;
 					$host_new['status'] = $status;
 					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
 				}
@@ -593,20 +490,7 @@
 			}
 		}
 
-/*
-		if (!empty($hosts)) {
-			update_trigger_value_to_unknown_by_hostid($hosts);
-
-			return	DBexecute('UPDATE hosts SET status='.$status.
-							' WHERE '.DBcondition('hostid',$hosts).
-								' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
-						);
-		}
-		else{z
-			return 1;
-		}
-//*/
-	return $res;
+		return $res;
 	}
 
 /*
@@ -621,7 +505,7 @@
  * Comments:
  *
  */
-function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()) {
+function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = array()) {
 	global $USER_DETAILS;
 	global $page;
 
@@ -658,28 +542,34 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()) 
 	$config = select_config();
 
 	$dd_first_entry = $config['dropdown_first_entry'];
-//	if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
-	if ($def_options['allow_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
-	if ($def_options['deny_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
+	if ($def_options['allow_all']) {
+		$dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
+	}
+	if ($def_options['deny_all']) {
+		$dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
+	}
 
 	$result = array('original' => -1, 'selected' => 0, 'groups' => array(), 'groupids' => array());
 	$groups = &$result['groups'];
 	$groupids = &$result['groupids'];
 
-	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)?S_NOT_SELECTED_SMALL:S_ALL_SMALL;
+	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) ? S_NOT_SELECTED_SMALL : S_ALL_SMALL;
 	$groups['0'] = $first_entry;
 
 	$_REQUEST['groupid'] = $result['original'] = get_request('groupid', -1);
 	$_REQUEST['hostid'] = get_request('hostid', -1);
-//-----
+
 	if (is_null($nodeid)) {
-		if (!$def_options['only_current_node']) $nodeid = get_current_nodeid();
-		else $nodeid = get_current_nodeid(false);
+		if (!$def_options['only_current_node']) {
+			$nodeid = get_current_nodeid();
+		}
+		else {
+			$nodeid = get_current_nodeid(false);
+		}
 	}
-//	$nodeid = is_null($nodeid)?get_current_nodeid(!$def_options['only_current_node']):$nodeid;
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid, AVAILABLE_NOCACHE);
 
-// nodes
+	// nodes
 	if (ZBX_DISTRIBUTED) {
 		$def_sql['select'][] = 'n.name as node_name';
 		$def_sql['from'][] = 'nodes n';
@@ -687,7 +577,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()) 
 		$def_sql['order'][] = 'node_name';
 	}
 
-// hosts
+	// hosts
 	if ($def_options['monitored_hosts'])
 		$def_sql['where'][] = 'h.status='.HOST_STATUS_MONITORED;
 	elseif ($def_options['real_hosts'])
@@ -706,7 +596,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()) 
 		$def_sql['where'][] = 'h.hostid=hg.hostid';
 	}
 
-// items
+	// items
 	if ($def_options['with_items']) {
 		$def_sql['from'][] = 'hosts_groups hg';
 
@@ -726,7 +616,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()) 
 		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
 	}
 
-// triggers
+	// triggers
 	if ($def_options['with_triggers']) {
 		$def_sql['from'][] = 'hosts_groups hg';
 
@@ -750,7 +640,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()) 
 										' AND t.status='.TRIGGER_STATUS_ENABLED.')';
 	}
 
-// httptests
+	// httptests
 	if ($def_options['with_httptests']) {
 		$def_sql['from'][] = 'hosts_groups hg';
 
@@ -772,7 +662,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()) 
 									' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 	}
 
-// graphs
+	// graphs
 	if ($def_options['with_graphs']) {
 		$def_sql['from'][] = 'hosts_groups hg';
 
@@ -783,7 +673,6 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()) 
 										' AND i.itemid=gi.itemid)';
 	}
 
-//-----
 	$def_sql['order'][] = 'g.name';
 
 	foreach ($sql as $key => $value) {
@@ -812,7 +701,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()) 
 			' WHERE '.DBcondition('g.groupid',$available_groups).
 				$sql_where.
 			' ORDER BY '.$sql_order;
-//SDI($sql);
+
 	$res = DBselect($sql);
 	while ($group = DBfetch($res)) {
 		$groups[$group['groupid']] = $group['name'];
@@ -822,7 +711,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()) 
 	}
 
 	$profile_groupid = CProfile::get('web.'.$page['menu'].'.groupid');
-//-----
+
 	if ($def_options['do_not_select']) {
 		$result['selected'] = $_REQUEST['groupid'] = 0;
 	}
@@ -867,7 +756,7 @@ return $result;
  * Author:
  *		Artem "Aly" Suharev
  */
-function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sql=array()) {
+function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = null, $sql = array()) {
 	global $USER_DETAILS;
 	global $page;
 
@@ -909,9 +798,15 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	$config = select_config();
 
 	$dd_first_entry = $config['dropdown_first_entry'];
-	if ($def_options['allow_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
-	if ($def_options['deny_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
-	if ($dd_first_entry == ZBX_DROPDOWN_FIRST_ALL) $def_options['select_host_on_group_switch'] = 1;
+	if ($def_options['allow_all']) {
+		$dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
+	}
+	if ($def_options['deny_all']) {
+		$dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
+	}
+	if ($dd_first_entry == ZBX_DROPDOWN_FIRST_ALL) {
+		$def_options['select_host_on_group_switch'] = 1;
+	}
 
 	$result = array('original' => -1, 'selected' => 0, 'hosts' => array(), 'hostids' => array());
 	$hosts = &$result['hosts'];
@@ -934,14 +829,15 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	}
 
 	$_REQUEST['hostid'] = $result['original'] = get_request('hostid', -1);
-//-----
-	if (is_null($nodeid)) {
-		if (!$def_options['only_current_node']) $nodeid = get_current_nodeid();
-		else $nodeid = get_current_nodeid(false);
-	}
 
-//$nodeid = is_null($nodeid)?get_current_nodeid($opt):$nodeid;
-//$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
+	if (is_null($nodeid)) {
+		if (!$def_options['only_current_node']) {
+			$nodeid = get_current_nodeid();
+		}
+		else {
+			$nodeid = get_current_nodeid(false);
+		}
+	}
 
 	if (USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']) {
 			$def_sql['from']['hg'] = 'hosts_groups hg';
@@ -962,7 +858,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 										' AND rr.permission<'.$perm.')';
 	}
 
-// nodes
+	// nodes
 	if (ZBX_DISTRIBUTED) {
 		$def_sql['select'][] = 'n.name';
 		$def_sql['from'][] = 'nodes n';
@@ -970,7 +866,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 		$def_sql['order'][] = 'n.name';
 	}
 
-// hosts
+	// hosts
 	if ($def_options['monitored_hosts'])
 		$def_sql['where'][] = 'h.status='.HOST_STATUS_MONITORED;
 	elseif ($def_options['real_hosts'])
@@ -980,8 +876,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	elseif ($def_options['not_proxy_hosts'])
 		$def_sql['where'][] = 'h.status<>'.HOST_STATUS_PROXY;
 
-
-// items
+	// items
 	if ($def_options['with_items']) {
 		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
 	}
@@ -992,8 +887,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
 	}
 
-
-// triggers
+	// triggers
 	if ($def_options['with_triggers']) {
 		$def_sql['where'][] = 'EXISTS( SELECT i.itemid'.
 									' FROM items i, functions f, triggers t'.
@@ -1011,7 +905,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 										' AND t.status='.TRIGGER_STATUS_ENABLED.')';
 	}
 
-// httptests
+	// httptests
 	if ($def_options['with_httptests']) {
 		$def_sql['where'][] = 'EXISTS( SELECT a.applicationid'.
 								' FROM applications a, httptest ht'.
@@ -1026,14 +920,14 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 									' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 	}
 
-// graphs
+	// graphs
 	if ($def_options['with_graphs']) {
 		$def_sql['where'][] = 'EXISTS( SELECT DISTINCT i.itemid'.
 									' FROM items i, graphs_items gi'.
 									' WHERE i.hostid=h.hostid'.
 										' AND i.itemid=gi.itemid)';
 	}
-//------
+
 	$def_sql['order'][] = 'h.name';
 
 	foreach ($sql as $key => $value) {
@@ -1072,7 +966,6 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 
 	$profile_hostid = CProfile::get('web.'.$page['menu'].'.hostid');
 
-//-----
 	if ($def_options['do_not_select']) {
 		$_REQUEST['hostid'] = $result['selected'] = 0;
 	}
@@ -1081,8 +974,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	}
 	elseif (($def_options['select_first_host']) ||
 			($def_options['select_first_host_if_empty'] && ($_REQUEST['hostid'] == -1) && is_null($profile_hostid)) ||
-			($def_options['select_host_on_group_switch'] && ($_REQUEST['hostid'] != -1) && (bccomp($_REQUEST['hostid'],$result['selected']) != 0)))
-	{
+			($def_options['select_host_on_group_switch'] && ($_REQUEST['hostid'] != -1) && (bccomp($_REQUEST['hostid'], $result['selected']) != 0))) {
 		$first_hostid = next($hostids);
 		reset($hostids);
 
@@ -1106,7 +998,8 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 			$_REQUEST['hostid'] = $result['selected'];
 		}
 	}
-return $result;
+
+	return $result;
 }
 
 /*
@@ -1119,7 +1012,7 @@ return $result;
  * Author:
  *		Aly
  */
-	function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host=true) {
+	function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host = true) {
 		global $page;
 
 		$config = select_config();
@@ -1129,13 +1022,12 @@ return $result;
 		$group_var = 'web.latest.groupid';
 		$host_var = 'web.latest.hostid';
 
-		$_REQUEST['groupid']    = get_request('groupid', CProfile::get($group_var, -1));
-		$_REQUEST['hostid']     = get_request('hostid', CProfile::get($host_var, -1));
+		$_REQUEST['groupid'] = get_request('groupid', CProfile::get($group_var, -1));
+		$_REQUEST['hostid'] = get_request('hostid', CProfile::get($host_var, -1));
 
 		if ($_REQUEST['groupid'] > 0) {
 			if ($_REQUEST['hostid'] > 0) {
-				$sql = 'SELECT groupid FROM hosts_groups WHERE hostid='.$_REQUEST['hostid'].' AND groupid='.$_REQUEST['groupid'];
-				if (!DBfetch(DBselect($sql))) {
+				if (!DBfetch(DBselect('SELECT hg.groupid FROM hosts_groups hg WHERE hg.hostid='.$_REQUEST['hostid'].' AND hg.groupid='.$_REQUEST['groupid']))) {
 					$_REQUEST['hostid'] = 0;
 				}
 			}
@@ -1172,42 +1064,37 @@ return $result;
 		CProfile::update($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
 	}
 
-
-/* APPLICATIONS */
 	function get_application_by_applicationid($applicationid,$no_error_message=0) {
-		$result = DBselect("select * from applications where applicationid=".$applicationid);
-		$row=DBfetch($result);
-		if ($row)
-		{
+		$row = DBfetch(DBselect('SELECT a.* FROM applications a WHERE a.applicationid='.$applicationid));
+		if ($row) {
 			return $row;
 		}
-		if ($no_error_message == 0)
+		if ($no_error_message == 0) {
 			error(S_NO_APPLICATION_WITH." id=[$applicationid]");
-		return	false;
+		}
 
+		return false;
 	}
 
 	function get_applications_by_templateid($applicationid) {
-		return DBselect("select * from applications where templateid=".$applicationid);
+		return DBselect('SELECT a.* FROM applications a WHERE a.templateid='.$applicationid);
 	}
 
 	function get_realhost_by_applicationid($applicationid) {
 		$application = get_application_by_applicationid($applicationid);
-		if ($application["templateid"] > 0)
-			return get_realhost_by_applicationid($application["templateid"]);
+		if ($application['templateid'] > 0)
+			return get_realhost_by_applicationid($application['templateid']);
 
 		return get_host_by_applicationid($applicationid);
 	}
 
 	function get_host_by_applicationid($applicationid) {
-		$sql = "select h.* from hosts h, applications a where a.hostid=h.hostid and a.applicationid=$applicationid";
-		$result = DBselect($sql);
-		$row = DBfetch($result);
-		if ($row)
-		{
+		$row = DBfetch(DBselect('SELECT h.* FROM hosts h, applications a WHERE a.hostid=h.hostid AND a.applicationid='.$applicationid));
+		if ($row) {
 			return $row;
 		}
 		error(S_NO_HOST_WITH." applicationid=[$applicationid]");
+
 		return false;
 	}
 
@@ -1225,9 +1112,15 @@ return $result;
 	 *
 	 */
 	function validate_templates($templateid_list) {
-		if (is_numeric($templateid_list))	return true;
-		if (!is_array($templateid_list))	return false;
-		if (count($templateid_list) < 2)	return true;
+		if (is_numeric($templateid_list)) {
+			return true;
+		}
+		if (!is_array($templateid_list)) {
+			return false;
+		}
+		if (count($templateid_list) < 2) {
+			return true;
+		}
 
 		$result = true;
 
@@ -1258,10 +1151,10 @@ return $result;
 			}
 		}
 
-	return $result;
+		return $result;
 	}
 
-	function getUnlinkableHosts($groupids=null, $hostids=null) {
+	function getUnlinkableHosts($groupids = null, $hostids = null) {
 		zbx_value2array($groupids);
 		zbx_value2array($hostids);
 
@@ -1290,10 +1183,11 @@ return $result;
 		while ($host = DBfetch($res)) {
 			$unlnk_hostids[$host['hostid']] = $host['hostid'];
 		}
-	return $unlnk_hostids;
+
+		return $unlnk_hostids;
 	}
 
-	function getDeletableHostGroups($groupids=null) {
+	function getDeletableHostGroups($groupids = null) {
 		zbx_value2array($groupids);
 
 		$dlt_groupids = array();
@@ -1318,7 +1212,7 @@ return $result;
 			$dlt_groupids[$group['groupid']] = $group['groupid'];
 		}
 
-	return $dlt_groupids;
+		return $dlt_groupids;
 	}
 
 ?>
