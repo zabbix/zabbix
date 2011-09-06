@@ -165,7 +165,7 @@ static void	process_trap(char *addr, char *begin, char *end)
 			ret = SUCCEED;
 	}
 
-	if (FAIL == ret && 1 == *(int *)DCconfig_get_config_data(&i, CONFIG_SNMPTRAP_LOGGING))
+	if (FAIL == ret && 1 == *(unsigned char *)DCconfig_get_config_data(&i, CONFIG_SNMPTRAP_LOGGING))
 		zabbix_log(LOG_LEVEL_WARNING, "unmatched trap received from [%s]: %s", addr, trap);
 
 	zbx_free(interfaceids);
