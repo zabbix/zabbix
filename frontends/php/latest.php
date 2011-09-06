@@ -40,34 +40,29 @@ if(PAGE_TYPE_HTML == $page['type']){
 include_once('include/page_header.php');
 ?>
 <?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//		VAR			     			 TYPE	   OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'apps'=>			array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-		'applicationid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-		'close'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
-		'open'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
-		'groupbyapp'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
+		'apps'=>				array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
+		'applicationid'=>		array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
+		'close'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
+		'open'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
 
-		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
-		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		'groupid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		'hostid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
+		'fullscreen'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
 // filter
-		'select'=>			array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
-		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
-		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
+		'select'=>				array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
+		'show_without_data'=>	array(T_ZBX_INT, O_OPT, NULL,	IN('0,1'),	NULL),
+		'filter_rst'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
+		'filter_set'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		NULL),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favobj'=>				array(T_ZBX_STR, O_OPT, P_ACT,	NULL,		NULL),
+		'favref'=>				array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+		'state'=>				array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
 	);
 
 	check_fields($fields);
-
-// HEADER REQUEST
-	$_REQUEST['select'] = get_request('select',CProfile::get('web.latest.filter.select', ''));
-	CProfile::update('web.latest.filter.select', $_REQUEST['select'], PROFILE_TYPE_STR);
-//----------------
 ?>
 <?php
 /* AJAX */
@@ -75,15 +70,6 @@ include_once('include/page_header.php');
 		if('filter' == $_REQUEST['favobj']){
 			CProfile::update('web.latest.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
-/*
-		else if('refresh' == $_REQUEST['favobj']){
-			switch($_REQUEST['favref']){
-				case ZBX_PAGE_MAIN_HAT:
-					include_once('blocks/latest.page.php');
-					break;
-			}
-		}
-//*/
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
@@ -93,11 +79,22 @@ include_once('include/page_header.php');
 //--------
 
 /* FILTER */
+	if (!isset($_REQUEST['show_without_data'])) {
+		$_REQUEST['show_without_data'] = 0;
+	}
+
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['select'] = '';
+		$_REQUEST['show_without_data'] = 0;
 	}
+
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		CProfile::update('web.latest.filter.select',$_REQUEST['select'], PROFILE_TYPE_STR);
+		CProfile::update('web.latest.filter.show_without_data',$_REQUEST['show_without_data'], PROFILE_TYPE_INT);
+	}
+	else {
+		$_REQUEST['select'] = CProfile::get('web.latest.filter.select', '');
+		$_REQUEST['show_without_data'] = CProfile::get('web.latest.filter.show_without_data', 0);
 	}
 // --------------
 
@@ -110,17 +107,12 @@ include_once('include/page_header.php');
 // 2nd header
 	$r_form = new CForm('get');
 
-//	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
-//	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."',this.form);");
-
 	$options = array(
 		'groups' => array(
 			'monitored_hosts' => 1,
-			'with_historical_items' => 1,
 		),
 		'hosts' => array(
 			'monitored_hosts' => 1,
-			'with_historical_items' => 1,
 		),
 		'hostid' => get_request('hostid', null),
 		'groupid' => get_request('groupid', null),
@@ -144,6 +136,7 @@ include_once('include/page_header.php');
 	$filterForm->setAttribute('id','zbx_filter');
 
 	$filterForm->addRow(_('Show items with name like'), new CTextBox('select',$_REQUEST['select'],20));
+	$filterForm->addRow(_('Show items without data'), new CCheckBox('show_without_data', $_REQUEST['show_without_data'], null, 1));
 
 	$reset = new CButton("filter_rst",S_RESET,'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
@@ -154,9 +147,6 @@ include_once('include/page_header.php');
 //-------
 
 	validate_sort_and_sortorder('i.name',ZBX_SORT_UP);
-
-	$_REQUEST['groupbyapp'] = get_request('groupbyapp',CProfile::get('web.latest.groupbyapp',1));
-	CProfile::update('web.latest.groupbyapp',$_REQUEST['groupbyapp'],PROFILE_TYPE_INT);
 
 	$_REQUEST['apps'] = get_request('apps', array());
 	$apps = zbx_toHash($_REQUEST['apps']);
@@ -176,12 +166,6 @@ include_once('include/page_header.php');
 		$apps = array_slice($apps, -35);
 	}
 
-	/* limit opened application count */
-	// while(count($apps) > 25){
-		// array_shift($apps);
-	// }
-
-	// CProfile::update('web.latest.applications',$apps,PROFILE_TYPE_ARRAY_ID);
 ?>
 <?php
 	if(isset($showAll)){
@@ -252,7 +236,8 @@ include_once('include/page_header.php');
 	$sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 			' FROM items i,items_applications ia'.
 			' WHERE '.DBcondition('ia.applicationid',$db_appids).
-				' AND i.itemid=ia.itemid AND i.lastvalue IS NOT NULL'.
+				' AND i.itemid=ia.itemid'.
+				($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
 				' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
 				' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 			order_by('i.name,i.itemid,i.lastclock');
@@ -386,7 +371,7 @@ include_once('include/page_header.php');
 				$sql_where.
 				' AND h.hostid=i.hostid '.
 				' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
-				' AND '.DBcondition('h.hostid',$available_hosts).
+				' AND '.DBcondition('h.hostid', $available_hosts).
 			' ORDER BY h.name';
 
 	$db_host_res = DBselect($sql);
@@ -406,7 +391,7 @@ include_once('include/page_header.php');
 			' WHERE ia.itemid is NULL '.
 				$sql_where.
 				' AND h.hostid=i.hostid '.
-				' AND i.lastvalue IS NOT NULL '.
+				($_REQUEST['show_without_data'] ? '' : ' AND i.lastvalue IS NOT NULL').
 				' AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.')'.
 				' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 				' AND '.DBcondition('h.hostid', $db_hostids).
