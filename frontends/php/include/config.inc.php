@@ -627,7 +627,8 @@ function __autoload($class_name) {
 	function get_status() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 		$status = array();
-// server
+
+		// server
 		$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
 		if (!$checkport) {
 			clear_messages();
@@ -636,7 +637,8 @@ function __autoload($class_name) {
 		else {
 			$status['zabbix_server'] = S_YES;
 		}
-// triggers
+
+		// triggers
 		$sql = 'SELECT COUNT(DISTINCT t.triggerid) as cnt'.
 				' FROM triggers t, functions f, items i, hosts h'.
 				' WHERE t.triggerid=f.triggerid'.
@@ -645,62 +647,61 @@ function __autoload($class_name) {
 					' AND i.hostid=h.hostid'.
 					' AND h.status='.HOST_STATUS_MONITORED;
 
-		$row=DBfetch(DBselect($sql));
-		$status['triggers_count']=$row['cnt'];
+		$row = DBfetch(DBselect($sql));
+		$status['triggers_count'] = $row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' AND t.status=0'));
-		$status['triggers_count_enabled']=$row['cnt'];
+		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_MULT_EVENT_DISABLED));
+		$status['triggers_count_enabled'] = $row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' AND t.status=1'));
-		$status['triggers_count_disabled']=$row['cnt'];
+		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_MULT_EVENT_ENABLED));
+		$status['triggers_count_disabled'] = $row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' AND t.status=0 AND t.value=0'));
-		$status['triggers_count_off']=$row['cnt'];
+		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_MULT_EVENT_DISABLED.' AND t.value='.TRIGGER_VALUE_FALSE));
+		$status['triggers_count_off'] = $row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' AND t.status=0 AND t.value=1'));
-		$status['triggers_count_on']=$row['cnt'];
+		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_MULT_EVENT_DISABLED.' AND t.value='.TRIGGER_VALUE_TRUE));
+		$status['triggers_count_on'] = $row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' AND t.status=0 AND t.value=2'));
-		$status['triggers_count_unknown']=$row['cnt'];
+		$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_MULT_EVENT_DISABLED.' AND t.value='.TRIGGER_VALUE_UNKNOWN));
+		$status['triggers_count_unknown'] = $row['cnt'];
 
-// items
+		// items
 		$sql = 'SELECT COUNT(DISTINCT i.itemid) as cnt'.
 				' FROM items i, hosts h'.
 				' WHERE i.hostid=h.hostid'.
 					' AND h.status='.HOST_STATUS_MONITORED;
 
-		$row=DBfetch(DBselect($sql));
-		$status['items_count']=$row['cnt'];
+		$row = DBfetch(DBselect($sql));
+		$status['items_count'] = $row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' AND i.status=0'));
-		$status['items_count_monitored']=$row['cnt'];
+		$row = DBfetch(DBselect($sql.' AND i.status='.ITEM_STATUS_ACTIVE));
+		$status['items_count_monitored'] = $row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' AND i.status=1'));
-		$status['items_count_disabled']=$row['cnt'];
+		$row = DBfetch(DBselect($sql.' AND i.status='.ITEM_STATUS_DISABLED));
+		$status['items_count_disabled'] = $row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' AND i.status=3'));
-		$status['items_count_not_supported']=$row['cnt'];
+		$row = DBfetch(DBselect($sql.' AND i.status='.ITEM_STATUS_NOTSUPPORTED));
+		$status['items_count_not_supported'] = $row['cnt'];
 
-// hosts
+		// hosts
 		$sql = 'SELECT COUNT(hostid) as cnt'.
 				' FROM hosts'.
 				' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
-		$row=DBfetch(DBselect($sql));
-		$status['hosts_count']=$row['cnt'];
+		$row = DBfetch(DBselect($sql));
+		$status['hosts_count'] = $row['cnt'];
 
-		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_MONITORED));
-		$status['hosts_count_monitored']=$row['cnt'];
+		$row = DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_MONITORED));
+		$status['hosts_count_monitored'] = $row['cnt'];
 
-		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_NOT_MONITORED));
-		$status['hosts_count_not_monitored']=$row['cnt'];
+		$row = DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_NOT_MONITORED));
+		$status['hosts_count_not_monitored'] = $row['cnt'];
 
-		$row=DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_TEMPLATE));
-		$status['hosts_count_template']=$row['cnt'];
+		$row = DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_TEMPLATE));
+		$status['hosts_count_template'] = $row['cnt'];
 
-// users
-		$row=DBfetch(DBselect('SELECT COUNT(userid) as usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
-		$status['users_count']=$row['usr_cnt'];
-
+		// users
+		$row = DBfetch(DBselect('SELECT COUNT(userid) as usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
+		$status['users_count'] = $row['usr_cnt'];
 
 		$status['users_online'] = 0;
 
@@ -714,7 +715,7 @@ function __autoload($class_name) {
 			if (($session['lastaccess'] + ZBX_USER_ONLINE_TIME) >= time()) $status['users_online']++;
 		}
 
-// Comments: !!! Don't forget sync code with C !!!
+		// Comments: !!! Don't forget sync code with C !!!
 		$sql = 'SELECT sum(1.0/i.delay) as qps'.
 				' FROM items i,hosts h'.
 				' WHERE i.status='.ITEM_STATUS_ACTIVE.
@@ -725,7 +726,7 @@ function __autoload($class_name) {
 
 		$status['qps_total'] = round($row['qps'], 2);
 
-	return $status;
+		return $status;
 	}
 
 	function set_image_header($format=null) {
