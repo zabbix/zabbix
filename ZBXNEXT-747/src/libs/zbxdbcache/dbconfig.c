@@ -313,12 +313,12 @@ ZBX_DC_INTERFACE_ITEM;
 
 typedef struct
 {
+	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
+	zbx_uint64_t	discovery_groupid;
 	int		alert_history;
 	int		event_history;
 	int		refresh_unsupported;
-	zbx_uint64_t	discovery_groupid;
-	int		snmptrap_logging;
-	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
+	unsigned char	snmptrap_logging;
 }
 ZBX_DC_CONFIG_TABLE;
 
@@ -696,7 +696,7 @@ static int	DCsync_config(DB_RESULT result)
 		config->config->event_history = atoi(row[1]);
 		config->config->refresh_unsupported = atoi(row[2]);
 		ZBX_STR2UINT64(config->config->discovery_groupid, row[3]);
-		config->config->snmptrap_logging = atoi(row[4]);
+		config->config->snmptrap_logging = (unsigned char)atoi(row[4]);
 
 		for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
 			DCstrpool_replace(found, &config->config->severity_name[i], row[5 + i]);
@@ -3947,7 +3947,7 @@ void	*DCconfig_get_config_data(void *data, int type)
 			*(zbx_uint64_t *)data = config->config->discovery_groupid;
 			break;
 		case CONFIG_SNMPTRAP_LOGGING:
-			*(int *)data = config->config->snmptrap_logging;
+			*(unsigned char *)data = config->config->snmptrap_logging;
 			break;
 	}
 
