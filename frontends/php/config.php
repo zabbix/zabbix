@@ -34,7 +34,7 @@ include_once('include/page_header.php');
 <?php
 	$fields=array(
 		// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-		'config'=>					array(T_ZBX_INT, O_OPT,	null,	IN('0,3,5,6,7,8,9,10,11,12,13'),	null),
+		'config'=>					array(T_ZBX_INT, O_OPT,	null,	IN('0,3,5,6,7,8,9,10,11,12,13,14'),	null),
 		// other form
 		'alert_history'=>			array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
 		'event_history'=>			array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
@@ -117,17 +117,21 @@ include_once('include/page_header.php');
 		// Trigger displaying options
 		'problem_unack_color' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 		'problem_ack_color' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
-		'ok_unack_color' =>		    array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
-		'ok_ack_color' =>		    array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
+		'ok_unack_color' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
+		'ok_ack_color' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 		'problem_unack_style' =>	array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
 		'problem_ack_style' =>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-		'ok_unack_style' =>		    array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-		'ok_ack_style' =>		    array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-		'ok_period' =>		        array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
-		'blink_period' =>		    array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
+		'ok_unack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
+		'ok_ack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
+		'ok_period' =>				array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
+		'blink_period' =>			array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 
-		'form' =>			        array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form_refresh' =>	        array(T_ZBX_INT, O_OPT,	null,	null,	null)
+		// Icon Maps
+		'iconmapid' => 				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({config})&&({config}==14)&&(((isset({form})&&({form}=="update")))||isset({delete}))'),
+		'iconmap' =>				array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==14)&&isset({save})'),
+
+		'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 ?>
 <?php
@@ -657,23 +661,69 @@ include_once('include/page_header.php');
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 	}
+	// Icon mapping
+	elseif ($_REQUEST['config'] == 14) {
+		if (isset($_REQUEST['save'])) {
+
+			$_REQUEST['iconmap']['mappings'] = isset($_REQUEST['iconmap']['mappings'])
+				? $_REQUEST['iconmap']['mappings']
+				: array();
+
+			$i = 0;
+			foreach ($_REQUEST['iconmap']['mappings'] as $iconmappingid => &$mapping) {
+				$mapping['iconmappingid'] = $iconmappingid;
+				$mapping['sortorder'] = $i++;
+			}
+			unset($mapping);
+
+			if (isset($_REQUEST['iconmapid'])) {
+				$_REQUEST['iconmap']['iconmapid'] = $_REQUEST['iconmapid'];
+				$result = API::IconMap()->update($_REQUEST['iconmap']);
+				$msgOk = _('Icon map updated');
+				$msgErr = _('Cannot update icon map');
+			}
+			else {
+				$result = API::IconMap()->create($_REQUEST['iconmap']);
+				$msgOk = _('Icon map created');
+				$msgErr = _('Cannot create icon map');
+			}
+
+			show_messages($result, $msgOk, $msgErr);
+			if ($result) {
+				unset($_REQUEST['form']);
+			}
+		}
+		elseif (isset($_REQUEST['delete'])) {
+			$result = API::IconMap()->delete($_REQUEST['iconmapid']);
+			if ($result) {
+				unset($_REQUEST['form']);
+			}
+			show_messages($result, _('Icon map deleted'), _('Cannot delete icon map'));
+		}
+		elseif (isset($_REQUEST['clone'])) {
+			unset($_REQUEST['iconmapid']);
+			$_REQUEST['form'] = 'clone';
+		}
+	}
 ?>
 
 <?php
 	$form = new CForm();
+	$form->cleanItems();
 
 	$cmbConfig = new CCombobox('configDropDown', $_REQUEST['config'], 'javascript: redirect("config.php?config="+this.options[this.selectedIndex].value);');
 	$cmbConfig->addItems(array(
 		8 => _('GUI'),
 		0 => _('Housekeeper'),
 		3 => _('Images'),
+		14 => _('Icon mapping'),
 		10 => _('Regular expressions'),
 		11 => _('Macros'),
 		6 => _('Value mapping'),
 		7 => _('Working time'),
 		12 => _('Trigger severities'),
 		13 => _('Trigger displaying options'),
-		5 => _('Other'),
+		5 => _('Other')
 	));
 	$form->addItem($cmbConfig);
 
@@ -687,6 +737,9 @@ include_once('include/page_header.php');
 				break;
 			case 10:
 				$form->addItem(new CSubmit('form', _('New regular expression')));
+				break;
+			case 14:
+				$form->addItem(new CSubmit('form', _('Create icon map')));
 				break;
 		}
 	}
@@ -1086,9 +1139,71 @@ include_once('include/page_header.php');
 		$triggerDisplayingForm = new CView('administration.general.triggerDisplayingOptions.edit', $data);
 		$cnf_wdgt->addItem($triggerDisplayingForm->render());
 	}
+	//////////////////////////////////
+	//  config = 14 // Icon mapping //
+	//////////////////////////////////
+	elseif ($_REQUEST['config'] == 14) {
+		$data = array();
+		$data['form_refresh'] = get_request('form_refresh', 0);
+		$data['iconmapid'] = get_request('iconmapid', null);
 
-	$cnf_wdgt->show();
+		$data['iconList'] = array();
+		$iconList = API::Image()->get(array(
+			'filter'=> array('imagetype'=> IMAGE_TYPE_ICON),
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+		foreach ($iconList as $icon) {
+			$data['iconList'][$icon['imageid']] = $icon['name'];
+		}
 
+		$data['inventoryList'] = array();
+		$inventoryFields = getHostInventories();
+		foreach ($inventoryFields as $field) {
+			$data['inventoryList'][$field['nr']] = $field['title'];
+		}
+
+		if (isset($_REQUEST['form'])) {
+			if ($data['form_refresh'] || ($_REQUEST['form'] === 'clone')) {
+				$data['iconmap'] = get_request('iconmap');
+			}
+			elseif (isset($_REQUEST['iconmapid'])) {
+				$iconMap = API::IconMap()->get(array(
+					'output' => API_OUTPUT_EXTEND,
+					'iconmapids' => $_REQUEST['iconmapid'],
+					'editable' => true,
+					'preservekeys' => true,
+					'selectMappings' => API_OUTPUT_EXTEND,
+				));
+				$data['iconmap'] = reset($iconMap);
+			}
+			else {
+				$firstIcon = reset($iconList);
+				$data['iconmap'] = array(
+					'name' => '',
+					'default_iconid' => $firstIcon['imageid'],
+					'mappings' => array(),
+				);
+			}
+
+			$iconMapView = new CView('administration.general.iconmap.edit', $data);
+		}
+		else {
+			$cnf_wdgt->addHeader(_('Icon mapping'));
+			$data['iconmaps'] = API::IconMap()->get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true,
+				'preservekeys' => true,
+				'selectMappings' => API_OUTPUT_EXTEND,
+			));
+			order_result($data['iconmaps'], 'name');
+			$iconMapView = new CView('administration.general.iconmap.list', $data);
+		}
+
+		$cnf_wdgt->addItem($iconMapView->render());
+	}
+
+$cnf_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>

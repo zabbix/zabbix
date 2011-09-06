@@ -508,16 +508,16 @@ FIELD		|severity_name_2|t_varchar(32)	|'Warning'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_3|t_varchar(32)	|'Average'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_4|t_varchar(32)	|'High'	|NOT NULL	|ZBX_SYNC
 FIELD		|severity_name_5|t_varchar(32)	|'Disaster'|NOT NULL	|ZBX_SYNC
-FIELD		|ok_period	|t_integer	|'1800'	|NOT NULL	|ZBX_SYNC 
-FIELD		|blink_period	|t_integer	|'1800'	|NOT NULL	|ZBX_SYNC 
+FIELD		|ok_period	|t_integer	|'1800'	|NOT NULL	|ZBX_SYNC
+FIELD		|blink_period	|t_integer	|'1800'	|NOT NULL	|ZBX_SYNC
 FIELD		|problem_unack_color|t_varchar(6)|'DC0000'|NOT NULL	|ZBX_SYNC
-FIELD		|problem_ack_color|t_varchar(6)	|'DC0000'|NOT NULL	|ZBX_SYNC 
+FIELD		|problem_ack_color|t_varchar(6)	|'DC0000'|NOT NULL	|ZBX_SYNC
 FIELD		|ok_unack_color	|t_varchar(6)	|'00AA00'|NOT NULL	|ZBX_SYNC
-FIELD		|ok_ack_color	|t_varchar(6)	|'00AA00'|NOT NULL	|ZBX_SYNC   
-FIELD		|problem_unack_style|t_integer	|'1'	|NOT NULL	|ZBX_SYNC 
-FIELD		|problem_ack_style|t_integer	|'1'	|NOT NULL	|ZBX_SYNC 
-FIELD		|ok_unack_style	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC 
-FIELD		|ok_ack_style	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC 
+FIELD		|ok_ack_color	|t_varchar(6)	|'00AA00'|NOT NULL	|ZBX_SYNC
+FIELD		|problem_unack_style|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|problem_ack_style|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|ok_unack_style	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|ok_ack_style	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|	|NOT NULL	|0
@@ -976,11 +976,12 @@ FIELD		|x		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|y		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|iconid_disabled|t_id		|	|NULL		|ZBX_SYNC		|4|images	|imageid	|RESTRICT
 FIELD		|iconid_maintenance|t_id	|	|NULL		|ZBX_SYNC		|5|images	|imageid	|RESTRICT
-FIELD		|elementsubtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
-FIELD		|areatype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
-FIELD		|width		|t_integer	|'200'	|NOT NULL	|ZBX_SYNC 
-FIELD		|height		|t_integer	|'200'	|NOT NULL	|ZBX_SYNC 
-FIELD		|viewtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC 
+FIELD		|elementsubtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|areatype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|width		|t_integer	|'200'	|NOT NULL	|ZBX_SYNC
+FIELD		|height		|t_integer	|'200'	|NOT NULL	|ZBX_SYNC
+FIELD		|viewtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|use_iconmap	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 
 TABLE|sysmap_element_url|sysmapelementurlid|ZBX_SYNC
 FIELD		|sysmapelementurlid|t_id	|	|NOT NULL	|0
@@ -1015,6 +1016,7 @@ FIELD		|label_string_hostgroup|t_varchar(255)|''|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_trigger|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_map|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_string_image|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
+FIELD		|iconmapid	|t_id		|	|NULL		|ZBX_SYNC		|2|icon_map	|		|RESTRICT
 INDEX		|1		|name
 
 TABLE|sysmap_url|sysmapurlid|ZBX_SYNC
@@ -1180,3 +1182,18 @@ FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|listen_port	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|listen_dns	|t_varchar(64)	|''	|NOT NULL	|0
 INDEX		|1		|clock
+
+TABLE|icon_map|iconmapid|ZBX_SYNC
+FIELD		|iconmapid	|t_id		|	|NOT NULL	|0
+FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|default_iconid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|images	|imageid	|RESTRICT
+INDEX		|1		|name
+
+TABLE|icon_mapping|iconmappingid|ZBX_SYNC
+FIELD		|iconmappingid	|t_id		|	|NOT NULL	|0
+FIELD		|iconmapid	|t_id		|	|NOT NULL	|ZBX_SYNC		|1|icon_map
+FIELD		|iconid		|t_id		|	|NOT NULL	|ZBX_SYNC		|2|images	|imageid	|RESTRICT
+FIELD		|inventory_link	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|expression	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|iconmapid
