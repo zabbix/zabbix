@@ -1370,44 +1370,14 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->value_type		= atoi(row[13]);
 
 	if (SUCCEED != DBis_null(row[10]))
-	{
-		item->lastvalue_null[0] = 0;
-		item->lastvalue[0].str = row[10];
-
-		switch (item->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				item->lastvalue[0].dbl = atof(row[10]);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->lastvalue[0].ui64, row[10]);
-				break;
-			default:
-				;
-		}
-	}
+		item->lastvalue[0] = row[10];
 	else
-		item->lastvalue_null[0] = 1;
+		item->lastvalue[0] = NULL;
 
 	if (SUCCEED != DBis_null(row[11]))
-	{
-		item->lastvalue_null[1] = 0;
-		item->lastvalue[1].str = row[11];
-
-		switch (item->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				item->lastvalue[1].dbl = atof(row[11]);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->lastvalue[1].ui64, row[11]);
-				break;
-			default:
-				;
-		}
-	}
+		item->lastvalue[1] = row[11];
 	else
-		item->lastvalue_null[1] = 1;
+		item->lastvalue[1] = NULL;
 
 	ZBX_STR2UINT64(item->hostid, row[12]);
 	item->delta			= atoi(row[14]);
@@ -1415,7 +1385,6 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	if (SUCCEED != DBis_null(row[15]))
 	{
 		item->prevorgvalue_null = 0;
-		item->prevorgvalue.str = row[15];
 
 		switch (item->value_type)
 		{
@@ -1426,7 +1395,8 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 				ZBX_STR2UINT64(item->prevorgvalue.ui64, row[15]);
 				break;
 			default:
-				;
+				item->prevorgvalue.str = row[15];
+				break;
 		}
 	}
 	else
@@ -1448,8 +1418,8 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->data_type			= atoi(row[25]);
 	item->mtime			= atoi(row[26]);
 
-	item->h_lastvalue_str[0] = NULL;
-	item->h_lastvalue_str[1] = NULL;
+	item->h_lastvalue[0] = NULL;
+	item->h_lastvalue[1] = NULL;
 	item->h_lasteventid = NULL;
 	item->h_lastsource = NULL;
 	item->h_lastseverity = NULL;
@@ -1461,8 +1431,8 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 
 void	DBfree_item_from_db(DB_ITEM *item)
 {
-	zbx_free(item->h_lastvalue_str[0]);
-	zbx_free(item->h_lastvalue_str[1]);
+	zbx_free(item->h_lastvalue[0]);
+	zbx_free(item->h_lastvalue[1]);
 	zbx_free(item->h_lasteventid);
 	zbx_free(item->h_lastsource);
 	zbx_free(item->h_lastseverity);

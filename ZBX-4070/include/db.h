@@ -352,8 +352,7 @@ typedef struct
 	int			history;
 	int			trends;
 	int			lastclock;
-	int			lastvalue_null[2];
-	history_value_t		lastvalue[2];
+	char			*lastvalue[2];
 	int			prevorgvalue_null;
 	history_value_t		prevorgvalue;
 	time_t 			lastcheck;
@@ -370,7 +369,7 @@ typedef struct
 
 	char			*error;
 
-	char			*h_lastvalue_str[2];
+	char			*h_lastvalue[2];
 	char			*h_lasteventid;
 	char			*h_lastsource;
 	char			*h_lastseverity;

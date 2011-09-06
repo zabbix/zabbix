@@ -2314,19 +2314,13 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 
 		host_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM]);
 
-		for (i = 0; i < ifuncs->values_num; i++)
-		{
-			ifunc = (zbx_ifunc_t *)ifuncs->values[i];
-
-			if (item.itemid == ifunc->itemid)
-				break;
-		}
-
-		if (i == ifuncs->values_num)
+		if (FAIL == (i = zbx_vector_ptr_bsearch(ifuncs, &item.itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
+
+		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
 
 		for (i = 0; i < ifunc->functions.values_num; i++)
 		{
@@ -2380,7 +2374,7 @@ static zbx_func_t	*zbx_get_func_by_functionid(zbx_vector_ptr_t *ifuncs, zbx_uint
 		{
 			func = (zbx_func_t *)ifunc->functions.values[j];
 
-			if (SUCCEED == zbx_vector_uint64_bsearch(&func->functionids, functionid,
+			if (FAIL != zbx_vector_uint64_bsearch(&func->functionids, functionid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			{
 				return func;
