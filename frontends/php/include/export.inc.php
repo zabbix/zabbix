@@ -694,6 +694,23 @@ class zbxXML{
 					continue; // break if not update exist
 				}
 
+				// icon map
+				if (isset($sysmap['iconmap'])) {
+					$iconMap = API::IconMap()->get(array(
+						'filter' => array('name' => $sysmap['iconmap']),
+						'output' => API_OUTPUT_SHORTEN,
+						'nopermissions' => true,
+						'preservekeys' => true,
+					));
+					$iconMap = reset($iconMap);
+					if (!$iconMap) {
+						$error = _s('Cannot find icon map "%1$s" used in exported map "%2$s".', $sysmap['iconmap'], $sysmap['name']);
+						throw new Exception($error);
+					}
+
+					$sysmap['iconmapid'] = $iconMap['iconmapid'];
+				}
+
 				if(isset($sysmap['backgroundid'])){
 					$image = getImageByIdent($sysmap['backgroundid']);
 

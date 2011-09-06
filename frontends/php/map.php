@@ -324,12 +324,38 @@ if(isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])){
 	$map['links'] = $json->decode($map['links'], true);
 }
 
+
 $nocalculations = get_request('nocalculations', false);
 if($nocalculations){
+	// get default iconmap id to use for elements that use icon map
+	if ($map['iconmapid']) {
+		$iconMaps = API::IconMap()->get(array(
+				'iconmapids' => $map['iconmapid'],
+				'output' => array('default_iconid'),
+				'preservekeys' => true,
+			));
+		$iconMap = reset($iconMaps);
+		$defaultAutoIconId = $iconMap['default_iconid'];
+	}
+
 	$map_info = array();
+
 	foreach($map['selements'] as $selement){
+		// if element use icon map and icon map is set for map, and is host like element, we use default icon map icon
+		if ($map['iconmapid'] && $selement['use_iconmap'] &&
+			(
+				($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) ||
+				($selement['elementtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP && $selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS)
+			)
+		) {
+			$iconid = $defaultAutoIconId;
+		}
+		else {
+			$iconid = $selement['iconid_off'];
+		}
+
 		$map_info[$selement['selementid']] = array(
-			'iconid' => $selement['iconid_off'],
+			'iconid' => $iconid,
 			'icon_type' => SYSMAP_ELEMENT_ICON_OFF,
 		);
 		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE){
@@ -363,7 +389,6 @@ if(!isset($_REQUEST['noselements']) && ($map['markelements'] == 1)){
 	drawMapSelementsMarks($im, $map, $map_info);
 }
 //--
-
 
 show_messages();
 

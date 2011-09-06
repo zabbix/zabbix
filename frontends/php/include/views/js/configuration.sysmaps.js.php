@@ -24,30 +24,34 @@
 				<tr id="subtypeRow">
 					<td><?php echo _('Show'); ?></td>
 					<td>
-						<input id="subtypeHostGroup" type="radio" class="input radio" name="elementsubtype" value="0" checked="checked">
-						<label for="subtypeHostGroup"><?php echo _('Host group'); ?></label>
-						<br />
-						<input id="subtypeHostGroupElements" type="radio" class="input radio" name="elementsubtype" value="1">
-						<label for="subtypeHostGroupElements"><?php echo _('Host group elements'); ?></label>
+						<div class="groupingContent">
+							<input id="subtypeHostGroup" type="radio" class="input radio" name="elementsubtype" value="0" checked="checked">
+							<label for="subtypeHostGroup"><?php echo _('Host group'); ?></label>
+							<br />
+							<input id="subtypeHostGroupElements" type="radio" class="input radio" name="elementsubtype" value="1">
+							<label for="subtypeHostGroupElements"><?php echo _('Host group elements'); ?></label>
+						</div>
 					</td>
 				</tr>
 				<tr id="areaTypeRow">
 					<td><?php echo _('Area type'); ?></td>
 					<td>
-						<input id="areaTypeAuto" type="radio" class="input radio" name="areatype" value="0" checked="checked">
-						<label for="areaTypeAuto"><?php echo _('Fit to map'); ?></label>
-						<br />
-						<input id="areaTypeCustom" type="radio" class="input radio" name="areatype" value="1">
-						<label for="areaTypeCustom"><?php echo _('Custom size'); ?></label>
+						<div class="groupingContent">
+							<input id="areaTypeAuto" type="radio" class="input radio" name="areatype" value="0" checked="checked">
+							<label for="areaTypeAuto"><?php echo _('Fit to map'); ?></label>
+							<br />
+							<input id="areaTypeCustom" type="radio" class="input radio" name="areatype" value="1">
+							<label for="areaTypeCustom"><?php echo _('Custom size'); ?></label>
+						</div>
 					</td>
 				</tr>
 				<tr id="areaSizeRow">
 					<td><?php echo _('Area size'); ?></td>
 					<td>
 						<label for="areaSizeWidth"><?php echo _('Width'); ?></label>
-						<input id="areaSizeWidth" type="text" class="input text" name="width" value="200">
+						<input id="areaSizeWidth" type="text" class="input text" name="width" value="200" size="5">
 						<label for="areaSizeHeight"><?php echo _('Height'); ?></label>
-						<input id="areaSizeHeight" type="text" class="input text" name="height" value="200">
+						<input id="areaSizeHeight" type="text" class="input text" name="height" value="200" size="5">
 					</td>
 				</tr>
 				<tr id="areaPlacingRow">
@@ -75,59 +79,71 @@
 				<tr id="hostGroupSelectRow">
 					<td><?php echo _('Host group'); ?></td>
 					<td>
-						<input readonly="readonly" size="56" id="elementNameHostGroup" name="elementName" class="input">
+						<input readonly="readonly" size="50" id="elementNameHostGroup" name="elementName" class="input">
 						<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHostGroup&srctbl=host_group&srcfld1=groupid&srcfld2=name',450,450)"><?php echo _('Select'); ?></span>
 					</td>
 				</tr>
 				<tr id="hostSelectRow">
 					<td><?php echo _('Host'); ?></td>
 					<td>
-						<input readonly="readonly" size="56" id="elementNameHost" name="elementName" class="input">
+						<input readonly="readonly" size="50" id="elementNameHost" name="elementName" class="input">
 						<span class="link" onclick="PopUp('popup.php?writeonly=1&real_hosts=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHost&srctbl=hosts&srcfld1=hostid&srcfld2=name',450,450)"><?php echo _('Select'); ?></span>
 					</td>
 				</tr>
 				<tr id="triggerSelectRow">
 					<td><?php echo _('Trigger'); ?></td>
 					<td>
-						<input readonly="readonly" size="56" id="elementNameTrigger" name="elementName" class="input">
+						<input readonly="readonly" size="50" id="elementNameTrigger" name="elementName" class="input">
 						<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description',450,450)"><?php echo _('Select'); ?></span>
 					</td>
 				</tr>
 				<tr id="mapSelectRow">
 					<td><?php echo _('Map'); ?></td>
 					<td>
-						<input readonly="readonly" size="56" id="elementNameMap" name="elementName" class="input">
+						<input readonly="readonly" size="50" id="elementNameMap" name="elementName" class="input">
 						<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&excludeids[]=#{sysmapid}',450,450)"><?php echo _('Select'); ?></span>
 					</td>
 				</tr>
+
 				<tr>
-					<td><label for="iconid_off"><?php echo _('Icon (default)'); ?></label></td>
-					<td>
-						<select class="input" name="iconid_off" id="iconid_off"></select>
+					<td colspan="2">
+						<div class="groupingCaption"><?php echo _('Icons'); ?></div>
+						<div class="groupingContent">
+							<table>
+								<tbody>
+								<tr id="useIconMapRow">
+									<td colspan="4">
+										<label for="use_iconmap" id=use_iconmapLabel><?php echo _('Automatic icon selection'); ?></label>
+										<input type="checkbox" name="use_iconmap" id="use_iconmap" class="checkbox" value="1">
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<label for="iconid_off"><?php echo _('Default'); ?></label>
+										<br />
+										<select class="input" name="iconid_off" id="iconid_off"></select>
+									</td>
+									<td id="iconProblemRow">
+										<label for="iconid_on"><?php echo _('Problem'); ?></label>
+										<br />
+										<select class="input" name="iconid_on" id="iconid_on"></select>
+									</td>
+									<td id="iconMainetnanceRow">
+										<label for="iconid_maintenance"><?php echo _('Maintenance'); ?></label>
+										<br />
+										<select class="input" name="iconid_maintenance" id="iconid_maintenance"></select>
+									</td>
+									<td id="iconDisabledRow">
+										<label for="iconid_disabled"><?php echo _('Disabled'); ?></label>
+										<br />
+										<select class="input" name="iconid_disabled" id="iconid_disabled"></select>
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
 					</td>
-				</tr>
-				<tr id="advancedIconsRow">
-					<td><label for="advanced_icons"><?php echo _('Use advanced icons'); ?></label></td>
-					<td><input type="checkbox" name="advanced_icons" id="advanced_icons" class="checkbox"></td>
-				</tr>
-				<tr id="iconProblemRow">
-					<td><label for="iconid_on"><?php echo _('Icon (problem)'); ?></label></td>
-					<td>
-						<select class="input" name="iconid_on" id="iconid_on"></select>
-					</td>
-				</tr>
-				<tr id="iconMainetnanceRow">
-					<td><label for="iconid_maintenance"><?php echo _('Icon (maintenance)'); ?></label></td>
-					<td>
-						<select class="input" name="iconid_maintenance" id="iconid_maintenance"></select>
-					</td>
-				</tr>
-				<tr id="iconDisabledRow">
-					<td><label for="iconid_disabled"><?php echo _('Icon (disabled)'); ?></label></td>
-					<td>
-						<select class="input" name="iconid_disabled" id="iconid_disabled">
-						</select>
-					</td>
+
 				</tr>
 				<tr>
 					<td><label for="x"><?php echo _('Coordinate X'); ?></label></td>
@@ -139,24 +155,24 @@
 				</tr>
 				<tr>
 					<td colspan="2">
-						<fieldset>
-							<legend><?php echo _('Links'); ?></legend>
-							<table class="gridTable">
-								<thead>
-								<tr>
-									<td><?php echo _('Name'); ?></td>
-									<td><?php echo _('URL'); ?></td>
-									<td></td>
-								</tr>
-								</thead>
-								<tbody id="urlContainer"></tbody>
-								<tfoot>
-								<tr>
-									<td colspan="3"><span id="newSelementUrl" class="link_menu"><?php echo _('Add'); ?></span></td>
-								</tr>
-								</tfoot>
-							</table>
-						</fieldset>
+						<div class="groupingCaption"><?php echo _('Links'); ?></div>
+						<div class="groupingContent">
+								<table>
+									<thead>
+									<tr>
+										<td><?php echo _('Name'); ?></td>
+										<td><?php echo _('URL'); ?></td>
+										<td></td>
+									</tr>
+									</thead>
+									<tbody id="urlContainer"></tbody>
+									<tfoot>
+									<tr>
+										<td colspan="3"><span id="newSelementUrl" class="link_menu"><?php echo _('Add'); ?></span></td>
+									</tr>
+									</tfoot>
+								</table>
+						</div>
 					</td>
 				</tr>
 				<tr class="footer">
@@ -294,6 +310,13 @@
 							<option value="3"><?php echo _('Top'); ?></option>
 						</select>
 					</td>
+				</tr>
+				<tr>
+					<td>
+						<input type="checkbox" name="chkbox_use_iconmap" id="chkboxMassUseIconmap" class="checkbox" style="display: inline; ">
+						<label for="chkboxMassUseIconmap"><?php echo _('Automatic icon selection'); ?></label>
+					</td>
+					<td><input type="checkbox" name="use_iconmap" id="massUseIconmap" class="checkbox" value="1" style="display: inline; "></select></td>
 				</tr>
 				<tr>
 					<td>

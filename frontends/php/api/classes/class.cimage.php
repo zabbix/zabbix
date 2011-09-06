@@ -64,7 +64,7 @@ class CImage extends CZBXAPI{
 			'filter'				=> null,
 			'search'				=> null,
 			'searchByAny'			=> null,
-			'startSearch'				=> null,
+			'startSearch'			=> null,
 			'excludeSearch'			=> null,
 			'searchWildcardsEnabled'=> null,
 
@@ -466,6 +466,7 @@ class CImage extends CZBXAPI{
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 						}
 
+						// not unused, db2_bind_param requires variable name as string
 						$variable = $image['image'];
 						if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
@@ -496,44 +497,79 @@ class CImage extends CZBXAPI{
  * Delete images
  *
  * @param array $imageids
- * @return boolean
+ * @return array
  */
-	public function delete($imageids){
-
-
+	public function delete($imageids) {
 		$imageids = zbx_toArray($imageids);
 
-			if(empty($imageids)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty parameters');
+		if (empty($imageids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty parameters'));
+		}
 
-			if(self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-			}
+		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+		}
 
-			$sql = 'SELECT DISTINCT sm.sysmapid, sm.name '.
-				' FROM sysmaps_elements se, sysmaps sm '.
-				' WHERE sm.sysmapid=se.sysmapid '.
-					' AND ('.
-						DBCondition('se.iconid_off',$imageids).
-						' OR '.DBCondition('se.iconid_on',$imageids).
-						' OR '.DBCondition('se.iconid_disabled',$imageids).
-						' OR '.DBCondition('se.iconid_maintenance',$imageids).
-						' OR '.DBCondition('sm.backgroundid',$imageids).
-					')';
-			$db_sysmaps = DBselect($sql);
+		// check if icon is used in icon maps
+		$sql = 'SELECT DISTINCT im.name '.
+			' FROM icon_map im, icon_mapping imp '.
+			' WHERE im.iconmapid=imp.iconmapid '.
+				' AND ('.
+					DBCondition('im.default_iconid', $imageids).
+					' OR '.DBCondition('imp.iconid', $imageids).
+				')';
+		$db_iconmaps = DBselect($sql);
 
-			$used_in_maps = array();
-			while($sysmap = DBfetch($db_sysmaps)){
-				$used_in_maps[] = $sysmap['name'];
-			}
+		$usedInIconmaps = array();
+		while ($iconmap = DBfetch($db_iconmaps)) {
+			$usedInIconmaps[] = $iconmap['name'];
+		}
 
-			if(!empty($used_in_maps))
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-						_n('The image is used in map %2$s', 'The image is used in maps %2$s',
-						count($used_in_maps), '"'.implode('", "', $used_in_maps).'"'));
+		if (!empty($usedInIconmaps)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_n('The image is used in icon map %2$s.', 'The image is used in icon maps %2$s.',
+					count($usedInIconmaps), '"'.implode('", "', $usedInIconmaps).'"')
+			);
+		}
 
-			DB::delete('images', array('imageid' => $imageids));
+		// check if icon is used in maps
+		$sql = 'SELECT DISTINCT sm.sysmapid, sm.name'.
+			' FROM sysmaps_elements se, sysmaps sm '.
+			' WHERE sm.sysmapid=se.sysmapid '.
+				' AND ('.
+					' sm.iconmapid IS NULL'.
+					' OR se.use_iconmap='.SYSMAP_ELEMENT_USE_ICONMAP_OFF.
+				' )'.
+				' AND ('.
+					DBCondition('se.iconid_off', $imageids).
+					' OR '.DBCondition('se.iconid_on', $imageids).
+					' OR '.DBCondition('se.iconid_disabled', $imageids).
+					' OR '.DBCondition('se.iconid_maintenance', $imageids).
+					' OR '.DBCondition('sm.backgroundid', $imageids).
+				')';
+		$db_sysmaps = DBselect($sql);
 
-			return array('imageids' => $imageids);
+		$usedInMaps = array();
+		while ($sysmap = DBfetch($db_sysmaps)) {
+			$usedInMaps[] = $sysmap['name'];
+		}
+
+		if (!empty($usedInMaps)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_n('The image is used in map %2$s.', 'The image is used in maps %2$s.',
+				count($usedInMaps), '"'.implode('", "', $usedInMaps).'"')
+			);
+		}
+
+		DB::update('sysmaps_elements', array('values' => array('iconid_off' => 0), 'where' => array('iconid_off' => $imageids)));
+		DB::update('sysmaps_elements', array('values' => array('iconid_on' => 0), 'where' => array('iconid_on' => $imageids)));
+		DB::update('sysmaps_elements', array('values' => array('iconid_disabled' => 0), 'where' => array('iconid_disabled' => $imageids)));
+		DB::update('sysmaps_elements', array('values' => array('iconid_maintenance' => 0), 'where' => array('iconid_maintenance' => $imageids)));
+
+		DB::delete('images', array('imageid' => $imageids));
+
+		return array('imageids' => $imageids);
 	}
+
 }
 ?>

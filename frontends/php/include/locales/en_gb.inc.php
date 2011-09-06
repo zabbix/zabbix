@@ -1982,5 +1982,6 @@
 	'S_PREVIOUS_PAGE'=>		_('Previous'),
 	'S_NEXT_PAGE'=>			_('Next'),
 	'S_PREVIOUS_EVENTS'=>		_('Previous'),
+	'S_ICONMAP_IS_NOT_ENABLED' => _('Iconmap is not enabled'),
 );
 ?>

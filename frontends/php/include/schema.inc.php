@@ -4622,6 +4622,12 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'use_iconmap' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			),
 		),
 	),
 	'sysmap_element_url' => array(
@@ -4804,6 +4810,13 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
+			),
+			'iconmapid' => array(
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'icon_map',
+				'ref_field' => '',
 			),
 		),
 	),
@@ -5541,6 +5554,68 @@ return array(
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
 				'default' => '',
+			),
+		),
+	),
+	'icon_map' => array(
+		'key' => 'iconmapid',
+		'fields' => array(
+			'iconmapid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			),
+			'name' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+			),
+			'default_iconid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'images',
+				'ref_field' => 'imageid',
+			),
+		),
+	),
+	'icon_mapping' => array(
+		'key' => 'iconmappingid',
+		'fields' => array(
+			'iconmappingid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			),
+			'iconmapid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'icon_map',
+				'ref_field' => 'iconmapid',
+			),
+			'iconid' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'images',
+				'ref_field' => 'imageid',
+			),
+			'inventory_link' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+			),
+			'expression' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+			),
+			'sortorder' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			),
 		),
 	),

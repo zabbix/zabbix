@@ -48,7 +48,7 @@ include_once('include/page_header.php');
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
 
-//ajax
+// ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,	NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  null,	NULL),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,	null),
@@ -65,15 +65,15 @@ include_once('include/page_header.php');
 ?>
 <?php
 // ACTION /////////////////////////////////////////////////////////////////////////////
-	if(isset($_REQUEST['favobj'])){
+	if (isset($_REQUEST['favobj'])) {
 		$json = new CJSON();
-		if('sysmap' == $_REQUEST['favobj']){
+		if ('sysmap' == $_REQUEST['favobj']) {
 			$sysmapid = get_request('sysmapid', 0);
 
-			switch($_REQUEST['action']){
+			switch ($_REQUEST['action']) {
 				case 'save':
 					@ob_start();
-					try{
+					try {
 						DBstart();
 
 						$options = array(
@@ -83,24 +83,24 @@ include_once('include/page_header.php');
 						);
 						$sysmap = API::Map()->get($options);
 						$sysmap = reset($sysmap);
-						if($sysmap === false) throw new Exception(_('Access denied!')."\n\r");
+						if ($sysmap === false) throw new Exception(_('Access denied!')."\n\r");
 
 						$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
 						$sysmapUpdate['sysmapid'] = $sysmapid;
 
 						$result = API::Map()->update($sysmapUpdate);
 
-						if($result !== false)
+						if ($result !== false)
 							print('if(Confirm("'._('Map is saved! Return?').'")){ location.href = "sysmaps.php"; }');
 						else
 							throw new Exception(_('Map save operation failed.')."\n\r");
 
 						DBend(true);
 					}
-					catch(Exception $e){
+					catch (Exception $e) {
 						DBend(false);
 						$msg = array($e->getMessage());
-						foreach(clear_messages() as $errMsg) $msg[] = $errMsg['type'].': '.$errMsg['message'];
+						foreach (clear_messages() as $errMsg) $msg[] = $errMsg['type'].': '.$errMsg['message'];
 
 						ob_clean();
 
@@ -113,7 +113,7 @@ include_once('include/page_header.php');
 		}
 	}
 
-	if(PAGE_TYPE_HTML != $page['type']){
+	if (PAGE_TYPE_HTML != $page['type']) {
 		include_once('include/page_footer.php');
 		exit();
 	}
@@ -126,7 +126,7 @@ include('include/views/js/configuration.sysmaps.js.php');
 
 show_table_header(_('CONFIGURATION OF NETWORK MAPS'));
 
-if(isset($_REQUEST['sysmapid'])){
+if (isset($_REQUEST['sysmapid'])) {
 	$options = array(
 		'sysmapids' => $_REQUEST['sysmapid'],
 		'editable' => true,
@@ -137,7 +137,7 @@ if(isset($_REQUEST['sysmapid'])){
 	);
 	$maps = API::Map()->get($options);
 
-	if(empty($maps)) access_deny();
+	if (empty($maps)) access_deny();
 	else $sysmap = reset($maps);
 }
 
@@ -194,11 +194,11 @@ $save_btn->setAttribute('id', 'sysmap_save');
 $menuRow = array(
 	_s('Map "%s"', $sysmap['name']),
 	SPACE.SPACE,
-	_('Icon') . ' [', $el_add, $el_rmv, ']',
+	_('Icon').' [', $el_add, $el_rmv, ']',
 	SPACE.SPACE,
-	_('Link') . ' [',$cn_add,$cn_rmv,']',
+	_('Link').' [',$cn_add,$cn_rmv,']',
 	SPACE.SPACE,
-	_('Grid') . ' [', $gridShow, '|' , $gridAutoAlign, ']',
+	_('Grid').' [', $gridShow, '|', $gridAutoAlign, ']',
 	SPACE,
 	$gridForm,
 	SPACE.'|'.SPACE,
@@ -226,16 +226,14 @@ $container->Show();
 insert_show_color_picker_javascript();
 
 
-
 add_elementNames($sysmap['selements']);
 
-foreach($sysmap['links'] as &$link){
-	foreach($link['linktriggers'] as $lnum => $linktrigger){
+foreach ($sysmap['links'] as &$link) {
+	foreach ($link['linktriggers'] as $lnum => $linktrigger) {
 		$hosts = get_hosts_by_triggerid($linktrigger['triggerid']);
-		if($host = DBfetch($hosts)){
+		if ($host = DBfetch($hosts)) {
 			$description = $host['name'].':'.expand_trigger_description($linktrigger['triggerid']);
 		}
-
 		$link['linktriggers'][$lnum]['desc_exp'] = $description;
 	}
 	order_result($link['linktriggers'], 'desc_exp');
@@ -249,9 +247,28 @@ while($row = DBfetch($result)){
 	$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);
 }
 
+if ($sysmap['iconmapid']) {
+	$iconMaps = API::IconMap()->get(array(
+		'iconmapids' => $sysmap['iconmapid'],
+		'output' => array('default_iconid'),
+		'preservekeys' => true,
+	));
+	$iconMap = reset($iconMaps);
+	$defaultAutoIconId = $iconMap['default_iconid'];
+}
+else {
+	$defaultAutoIconId = null;
+}
 
-zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.zbx_jsvalue(array('sysmap' => $sysmap, 'iconList' => $iconList), true).');');
+$iconList = array();
+$result = DBselect('SELECT i.imageid, i.name FROM images i WHERE i.imagetype='.IMAGE_TYPE_ICON.' AND '.DBin_node('i.imageid'));
+while ($row = DBfetch($result)) {
+	$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);
+}
 
+zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.zbx_jsvalue(array(
+			'sysmap' => $sysmap, 'iconList' => $iconList, 'defaultAutoIconId' => $defaultAutoIconId), true).');'
+);
 
 include_once('include/page_footer.php');
 ?>
