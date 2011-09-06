@@ -144,83 +144,95 @@ include_once('include/page_header.php');
 	$orig_config = select_config(false, get_current_nodeid(false));
 
 	$result = 0;
-	if($_REQUEST['config']==3){
-// IMAGES ACTIONS
-		if(isset($_REQUEST['save'])){
 
-			$file = isset($_FILES['image']) && $_FILES['image']['name'] != '' ? $_FILES['image'] : null;
-			if(!is_null($file)){
-				if($file['error'] != 0 || $file['size']==0){
-					error(S_INCORRECT_IMAGE);
-					return false;
-				}
+	// Images
+	if ($_REQUEST['config'] == 3) {
+		if (isset($_REQUEST['save'])) {
 
-				if($file['size'] < ZBX_MAX_IMAGE_SIZE){
-					$image = fread(fopen($file['tmp_name'],'r'),filesize($file['tmp_name']));
-				}
-				else{
-					error(S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB);
-					return false;
-				}
-
-				$image = base64_encode($image);
+			if (isset($_REQUEST['imageid'])) {
+				$msg_ok = _('Image updated');
+				$msg_fail = _('Cannot update image');
+			}
+			else {
+				$msg_ok = _('Image added');
+				$msg_fail = _('Cannot add image');
 			}
 
-			if(isset($_REQUEST['imageid'])){
-				$val = array(
-					'imageid' => $_REQUEST['imageid'],
-					'name' => $_REQUEST['name'],
-					'imagetype' => $_REQUEST['imagetype'],
-					'image' => is_null($file) ? null : $image
-				);
-				$result = API::Image()->update($val);
+			try {
+				DBstart();
+				$file = isset($_FILES['image']) && $_FILES['image']['name'] != '' ? $_FILES['image'] : null;
+				if (!is_null($file)) {
+					if ($file['error'] != 0 || $file['size'] == 0) {
+						throw new Exception(_('Incorrect image'));
+					}
+					if ($file['size'] < ZBX_MAX_IMAGE_SIZE) {
+						$image = fread(fopen($file['tmp_name'], 'r'), filesize($file['tmp_name']));
+					}
+					else {
+						throw new Exception(_('Image size must be less than 1MB'));
+					}
 
-				$msg_ok = S_IMAGE_UPDATED;
-				$msg_fail = S_CANNOT_UPDATE_IMAGE;
-				$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
-			}
-			else{
-				if(is_null($file)){
-					error(S_SELECT_IMAGE_TO_DOWNLOAD);
-					return false;
+					$image = base64_encode($image);
 				}
 
-				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
-					access_deny();
+				if (isset($_REQUEST['imageid'])) {
+					$val = array(
+						'imageid' => $_REQUEST['imageid'],
+						'name' => $_REQUEST['name'],
+						'imagetype' => $_REQUEST['imagetype'],
+						'image' => is_null($file) ? null : $image
+					);
+					$result = API::Image()->update($val);
+
+					$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
+				}
+				else {
+					if (is_null($file)) {
+						throw new Exception(_('Select image to download'));
+					}
+					if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+						access_deny();
+					}
+
+					$val = array(
+						'name' => $_REQUEST['name'],
+						'imagetype' => $_REQUEST['imagetype'],
+						'image' => $image
+					);
+					$result = API::Image()->create($val);
+
+					$audit_action = 'Image ['.$_REQUEST['name'].'] added';
 				}
 
-				$val = array(
-					'name' => $_REQUEST['name'],
-					'imagetype' => $_REQUEST['imagetype'],
-					'image' => $image
-				);
-				$result = API::Image()->create($val);
+				if ($result) {
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, $audit_action);
+					unset($_REQUEST['form']);
+				}
 
-				$msg_ok = S_IMAGE_ADDED;
-				$msg_fail = S_CANNOT_ADD_IMAGE;
-				$audit_action = 'Image ['.$_REQUEST['name'].'] added';
+				DBend($result);
+				show_messages($result, $msg_ok, $msg_fail);
 			}
-
-			show_messages($result, $msg_ok, $msg_fail);
-			if($result){
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,$audit_action);
-				unset($_REQUEST['form']);
+			catch (Exception $e) {
+				DBend(false);
+				error($e->getMessage());
+				show_error_message($msg_fail);
 			}
 		}
-		else if(isset($_REQUEST['delete'])&&isset($_REQUEST['imageid'])) {
+		elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
 			$image = get_image_by_imageid($_REQUEST['imageid']);
 
 			$result = API::Image()->delete($_REQUEST['imageid']);
 
-			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
-			if($result){
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,'Image ['.$image['name'].'] deleted');
+			show_messages($result, _('Image deleted'), _('Cannot delete image'));
+			if ($result) {
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, 'Image ['.$image['name'].'] deleted');
 				unset($_REQUEST['form']);
 				unset($image, $_REQUEST['imageid']);
 			}
 		}
 	}
-	else if(isset($_REQUEST['save']) && ($_REQUEST['config'] == 8)){ // GUI
+	// GUI
+	elseif (isset($_REQUEST['save']) && ($_REQUEST['config'] == 8)) {
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
@@ -774,122 +786,39 @@ include_once('include/page_header.php');
 ////////////////////////////
 //  config = 3 // Images  //
 ////////////////////////////
-	elseif($_REQUEST["config"] == 3){
-		if(isset($_REQUEST["form"])){
-			$frmImages = new CFormTable(S_IMAGE, 'config.php', 'post', 'multipart/form-data');
-			$frmImages->setHelp('web.config.images.php');
-			$frmImages->addVar('config', get_request('config',3));
+	elseif ($_REQUEST['config'] == 3) {
+		$data = array();
+		$data['form'] = get_request('form', null);
+		$data['widget'] = &$cnf_wdgt;
 
-			if(isset($_REQUEST['imageid'])){
-				$sql = 'SELECT imageid,imagetype,name '.
-						' FROM images '.
-						' WHERE imageid='.$_REQUEST['imageid'];
-				$result=DBselect($sql);
-				$row=DBfetch($result);
+		if (!empty($data['form'])) {
+			if (!empty($_REQUEST['imageid'])) {
+				$image = DBfetch(DBselect('SELECT i.imagetype, i.name FROM images i WHERE i.imageid = '.$_REQUEST['imageid']));
 
-				$frmImages->setTitle(S_IMAGE.' "'.$row['name'].'"');
-				$frmImages->addVar('imageid', $_REQUEST['imageid']);
+				$data['imageid'] = $_REQUEST['imageid'];
+				$data['imagename'] = $image['name'];
+				$data['imagetype'] = $image['imagetype'];
+			}
+			else {
+				$data['imageid'] = null;
+				$data['imagename'] = get_request('name', '');
+				$data['imagetype'] = get_request('imagetype', 1);
 			}
 
-			if(isset($_REQUEST['imageid']) && !isset($_REQUEST['form_refresh'])){
-				$name		= $row['name'];
-				$imagetype	= $row['imagetype'];
-				$imageid	= $row['imageid'];
-			}
-			else{
-				$name		= get_request('name','');
-				$imagetype	= get_request('imagetype',1);
-				$imageid	= get_request('imageid',0);
-			}
-
-			$frmImages->addRow(S_NAME,new CTextBox('name',$name,64));
-
-			$cmbImg = new CComboBox('imagetype',$imagetype);
-			$cmbImg->addItem(IMAGE_TYPE_ICON,S_ICON);
-			$cmbImg->addItem(IMAGE_TYPE_BACKGROUND,S_BACKGROUND);
-
-			$frmImages->addRow(S_TYPE,$cmbImg);
-
-			$frmImages->addRow(S_UPLOAD,new CFile('image'));
-
-			if($imageid > 0){
-				$frmImages->addRow(S_IMAGE,new CLink(
-					new CImg('imgstore.php?iconid='.$imageid,'no image',null),'image.php?imageid='.$row['imageid']));
-			}
-
-			$frmImages->addItemToBottomRow(new CSubmit('save',S_SAVE));
-			if(isset($_REQUEST['imageid'])){
-				$frmImages->addItemToBottomRow(SPACE);
-				$frmImages->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_IMAGE,
-					url_param('form').url_param('config').url_param('imageid')));
-			}
-
-			$frmImages->addItemToBottomRow(SPACE);
-			$frmImages->addItemToBottomRow(new CButtonCancel(url_param('config')));
-
-			$cnf_wdgt->addItem($frmImages);
+			$imageForm = new CView('administration.general.image.edit', $data);
+			$cnf_wdgt->addItem($imageForm->render());
 		}
-		else{
-			$cnf_wdgt->addItem(BR());
-
-			$imagetype = get_request('imagetype',IMAGE_TYPE_ICON);
-
-			$r_form = new CForm();
-
-			$cmbImg = new CComboBox('imagetype',$imagetype,'submit();');
-			$cmbImg->addItem(IMAGE_TYPE_ICON,S_ICON);
-			$cmbImg->addItem(IMAGE_TYPE_BACKGROUND,S_BACKGROUND);
-
-			$r_form->addItem(S_TYPE.SPACE);
-			$r_form->addItem($cmbImg);
-
-			$cnf_wdgt->addHeader(S_IMAGES_BIG,$r_form);
-
-			$table = new CTable(S_NO_IMAGES_DEFINED, 'header_wide');
-
-			$tr = 0;
-			$row = new CRow();
-
+		else {
+			$data['imagetype'] = get_request('imagetype', IMAGE_TYPE_ICON);
 			$options = array(
-				'filter'=> array('imagetype'=> $imagetype),
+				'filter'=> array('imagetype'=> $data['imagetype']),
 				'output'=> API_OUTPUT_EXTEND,
 				'sortfield'=> 'name'
 			);
-			$images = API::Image()->get($options);
-			foreach($images as $inum => $image){
-				switch($image['imagetype']){
-					case IMAGE_TYPE_ICON:
-						$imagetype = S_ICON;
-						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image');
-					break;
-					case IMAGE_TYPE_BACKGROUND:
-						$imagetype = S_BACKGROUND;
-						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image',200);
-					break;
-					default: $imagetype=S_UNKNOWN;
-				}
+			$data['images'] = API::Image()->get($options);
 
-				$name = new CLink($image['name'],'config.php?form=update'.url_param('config').'&imageid='.$image['imageid']);
-				$action = new CLink($img, 'image.php?imageid='.$image['imageid']);
-
-				$img_td = new CCol();
-				$img_td->setAttribute('align', 'center');
-				$img_td->addItem(array($action, BR(), $name), 'center');
-
-				$row->addItem($img_td);
-				$tr++;
-				if(($tr % 4) == 0){
-					$table->addRow($row);
-					$row = new CRow();
-				}
-			}
-
-			if($tr > 0){
-				while(($tr % 4) != 0){ $tr++; $row->addItem(SPACE);}
-				$table->addRow($row);
-			}
-
-			$cnf_wdgt->addItem($table);
+			$imageForm = new CView('administration.general.image.list', $data);
+			$cnf_wdgt->addItem($imageForm->render());
 		}
 	}
 //////////////////////////////////////

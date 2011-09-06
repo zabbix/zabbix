@@ -310,10 +310,10 @@ class CImage extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
-// Decode BASE64
+				// Decode BASE64
 				$image['image'] = base64_decode($image['image']);
 				if(strlen($image['image']) > ZBX_MAX_IMAGE_SIZE){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB'));
 				}
 
 				$imageid = get_dbid('images','imageid');
