@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# TODO for 2.0:
+# what to do for host_inventory if inventory_mode=1 (automatic) ?
+# items, triggers, graphs... skip if flags=0x04 ! (autocreated)
+
 # This script can be used to create data.sql from a database.
 # It creates sql file that is suitable for importing on top of schema.sql.
 # INSERT statements refer to fields by name to avoid field ordering problems,
