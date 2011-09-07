@@ -1,5 +1,6 @@
 Changes for 1.8.8rc1
 
+ - [ZBX-3676] fixed item selection in bar report (Eduard)
  - [ZBX-4070] improved performance of handling of trigger functions (Sasha)
  - [ZBXNEXT-921] added option to show items without data in latest data (Vedmak)
  - [ZBX-2457] changed "type" to "ENGINE" in MySQL upgrade patches for MySQL 5.5 compatibility (Richlv)
