@@ -2,6 +2,7 @@
 Changes for 1.9.6
 
 New features:
+ - [ZBX-4116] fixed ibm_db2 update patch for help_items table (rudolfs)
  - [ZBXNEXT-895] redesign general->Macros (Eduard)
  - [ZBXNEXT-899] redesign general->Images (Eduard)
  - [ZBXNEXT-785] support of automatic selection of map icon element depending on element type (Vedmak,Eduard)
