@@ -650,8 +650,6 @@
 	'S_MACRO_TOO_LONG'=>				_('Macro name is too long, should not exceed 64 chars.'),
 	'S_MACRO_VALUE_TOO_LONG'=>			_('Macro value is too long, should not exceed 255 chars.'),
 	'S_EMPTY_MACRO_VALUE'=>				_('Empty macro value'),
-	'S_MACROS_UPDATED'=>				_('Macros updated'),
-	'S_CANNOT_UPDATE_MACROS'=>				_('Cannot update macros'),
 	'S_HOST_LIST'=>					_('Hosts list'),
 	'S_IN'=>					_('In'),
 	'S_APPLICATION'=>				_('Application'),
@@ -1631,8 +1629,6 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>_('Unnecessary symbols detected'),
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>_('Not allowed symbols detected after element'),
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>_('Not allowed symbols detected before element'),
-	'S_ARE_YOU_SURE_YOU_WANT_TO_DELETE'=>_('Are you sure you want to delete'),
-	'S_MACROS_ES'=>_('macro(s)'),
 
 //	popup_link_tr.php
 	'S_EDIT_CONNECTOR'=>			_('Edit connector'),
