@@ -4865,7 +4865,7 @@ return array(
 			'expression' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2550,
+				'length' => 255,
 				'default' => '',
 			),
 			'description' => array(
