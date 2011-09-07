@@ -20,7 +20,6 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 #include "sysinfo.h"
 #include "zbxalgo.h"
 #include "zbxserver.h"
@@ -1749,14 +1748,10 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 		continue;
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s", zbx_json_strerror());
-		zabbix_syslog("Invalid discovery data. %s", zbx_json_strerror());
 	}
 exit:
 	if (SUCCEED != ret)
-	{
 		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s", zbx_json_strerror());
-		zabbix_syslog("Invalid discovery data. %s", zbx_json_strerror());
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
@@ -1831,14 +1826,10 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 		continue;
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s", zbx_json_strerror());
-		zabbix_syslog("Invalid auto registration data. %s", zbx_json_strerror());
 	}
 exit:
 	if (SUCCEED != ret)
-	{
 		zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s", zbx_json_strerror());
-		zabbix_syslog("Invalid auto registration data. %s", zbx_json_strerror());
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
@@ -3449,13 +3440,8 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{
-		char	*message = NULL;
-
-		message = zbx_dsprintf(message, "Parameter [" ZBX_FS_UI64 "][%s] became supported",
+		zabbix_log(LOG_LEVEL_WARNING,  "Parameter [" ZBX_FS_UI64 "][%s] became supported",
 				discovery_itemid, zbx_host_key_string(discovery_itemid));
-		zabbix_log(LOG_LEVEL_WARNING, "%s", message);
-		zabbix_syslog("%s", message);
-		zbx_free(message);
 
 		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64,
 				ITEM_STATUS_ACTIVE, discovery_itemid);

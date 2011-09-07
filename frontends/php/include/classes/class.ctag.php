@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-class CTag extends CObject{
+class CTag extends CObject {
 /* private *//*
 	var $tagname;
 	var $attributes = array();
@@ -33,12 +33,12 @@ class CTag extends CObject{
 	var $tag_end;*/
 
 /* public */
-	public function __construct($tagname=NULL, $paired='no', $body=NULL, $class=null){
+	public function __construct($tagname=NULL, $paired='no', $body=NULL, $class=null) {
 		parent::__construct();
 
 		$this->attributes = array();
 
-		if(!is_string($tagname)){
+		if (!is_string($tagname)) {
 			return $this->error('Incorrect tagname for CTag ['.$tagname.']');
 		}
 
@@ -47,10 +47,10 @@ class CTag extends CObject{
 
 		$this->tag_start = $this->tag_end = $this->tag_body_start = $this->tag_body_end = '';
 
-		if(is_null($body)){
+		if (is_null($body)) {
 			$this->tag_end = $this->tag_body_start = '';
 		}
-		else{
+		else {
 			$this->addItem($body);
 		}
 
@@ -61,56 +61,56 @@ class CTag extends CObject{
 	public function showBody(){	echo $this->bodyToString();	}
 	public function showEnd(){		echo $this->endToString();	}
 
-// Do not put new line symbol(\n) before of after html tags,
+// Do not put new line symbol(\n) before or after html tags,
 // it adds spaces in unwanted places
-	public function startToString(){
+	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
-		foreach($this->attributes as $key => $value){
+		foreach ($this->attributes as $key => $value) {
 			$res .= ' '.$key.'="'.zbx_htmlstr($value).'"';
 		}
-		$res .= ($this->paired==='yes')? '>':' />';
+		$res .= ($this->paired === 'yes') ? '>' : ' />';
 
 	return $res;
 	}
 
-	public function bodyToString(){
+	public function bodyToString() {
 		$res = $this->tag_body_start;
 	return $res.parent::toString(false);
 	}
 
-	public function endToString(){
-		$res = ($this->paired==='yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
+	public function endToString() {
+		$res = ($this->paired === 'yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
 		$res .= $this->tag_end;
 	return $res;
 	}
 
-	public function toString($destroy=true){
+	public function toString($destroy = true) {
 		$res  = $this->startToString();
 		$res .= $this->bodyToString();
 		$res .= $this->endToString();
 
-		if($destroy) $this->destroy();
+		if ($destroy) $this->destroy();
 
 	return $res;
 	}
 
-	public function setName($value){
-		if(is_null($value)) return $value;
+	public function setName($value) {
+		if (is_null($value)) return $value;
 
-		if(!is_string($value)){
+		if (!is_string($value)) {
 			return $this->error("Incorrect value for SetName [$value]");
 		}
-	return $this->setAttribute("name",$value);
+	return $this->setAttribute("name", $value);
 	}
 
-	public function getName(){
-		if(isset($this->attributes['name']))
+	public function getName() {
+		if (isset($this->attributes['name']))
 			return $this->attributes['name'];
 	return NULL;
 	}
 
-	public function addClass($cssClass){
-		if(!isset($this->attributes['class']) || zbx_empty($this->attributes['class']))
+	public function addClass($cssClass) {
+		if (!isset($this->attributes['class']) || zbx_empty($this->attributes['class']))
 				$this->attributes['class'] = $cssClass;
 		else
 			$this->attributes['class'] .= ' '.$cssClass;
@@ -119,93 +119,94 @@ class CTag extends CObject{
 	}
 
 // jQuery style alias
-	public function attr($name, $value=null){
-		if(is_null($value))
+	public function attr($name, $value=null) {
+		if (is_null($value))
 			$this->getAttribute($name);
 		else
 			$this->setAttribute($name, $value);
 	}
 
-	public function getAttribute($name){
+	public function getAttribute($name) {
 		$ret = NULL;
-		if(isset($this->attributes[$name]))
+		if (isset($this->attributes[$name]))
 			$ret = $this->attributes[$name];
 
 	return $ret;
 	}
 
-	public function setAttribute($name, $value){
-		if(is_object($value))
+	public function setAttribute($name, $value) {
+		if (is_object($value))
 			$value = unpack_object($value);
 
-		if(!is_null($value))
+		if (!is_null($value))
 			$this->attributes[$name] = $value;
 		else
 			$this->removeAttribute($name);
 	}
 
-	public function removeAttr($name){
+	public function removeAttr($name) {
 		$this->removeAttribute($name);
 	}
 
-	public function removeAttribute($name){
+	public function removeAttribute($name) {
 		unset($this->attributes[$name]);
 	}
 
-	public function addAction($name, $value){
+	public function addAction($name, $value) {
 		$this->setAttribute($name, $value);
 	}
 
-	public function setHint($text, $width='', $class='', $byClick=true, $updateBlinking=false){
-		if(empty($text)) return false;
+	public function setHint($text, $width='', $class='', $byClick=true, $updateBlinking=false) {
+		if (empty($text)) return false;
 
 		encodeValues($text);
 		$text = unpack_object($text);
 
-		// in case there are  OK/PROBLEM statuses in hint, we might want them to blink
+		// if there are OK/PROBLEM statuses in hint, we might want them to blink
 		$blinkUpdate = $updateBlinking ? ' jqBlink.findObjects();' : '';
 
-		$this->addAction('onmouseover',	"javascript: hintBox.showOver(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');".$blinkUpdate);
-		$this->addAction('onmouseout',	"javascript: hintBox.hideOut(event,this);");
-		if($byClick){
-			$this->addAction('onclick',	"javascript: hintBox.onClick(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');".$blinkUpdate);
+		$this->addAction('onmouseover',	"javascript: hintBox.showOver(this,".zbx_jsvalue($text).",'".$width."','".$class."');".$blinkUpdate);
+		$this->addAction('onmouseout',	"javascript: hintBox.hideOut(this);");
+		if ($byClick) {
+			$this->addAction('onclick',	"javascript: hintBox.onClick(this,".zbx_jsvalue($text).",'".$width."','".$class."');".$blinkUpdate);
 		}
+		return true;
 	}
 
-	public function onClick($handle_code){
+	public function onClick($handle_code) {
 		$this->addAction('onclick', $handle_code);
 	}
 
-	public function addStyle($value){
-		if(!isset($this->attributes['style'])) $this->attributes['style'] = '';
+	public function addStyle($value) {
+		if (!isset($this->attributes['style'])) $this->attributes['style'] = '';
 
-		if(isset($value))
-			$this->attributes['style'].= htmlspecialchars(strval($value));
+		if (isset($value))
+			$this->attributes['style'] .= htmlspecialchars(strval($value));
 		else
 			unset($this->attributes['style']);
 	}
 
-	public function setEnabled($value='yes'){
-		if((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value=='on') || $value=='1') || (is_int($value) && $value<>0)){
+	public function setEnabled($value='yes') {
+		if ((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value == 'on') || $value == '1') || (is_int($value) && $value <> 0)){
 			unset($this->attributes['disabled']);
 		}
-		else if((is_string($value) && ($value == 'no' || $value == 'disabled' || $value=='off') || $value=='0') || (is_int($value) && $value==0)){
+		elseif ((is_string($value) && ($value == 'no' || $value == 'disabled' || $value == 'off') || $value == '0') || (is_int($value) && $value == 0)){
 			$this->attributes['disabled'] = 'disabled';
 		}
 	}
 
-	public function error($value){
+	public function error($value) {
 		error('class('.get_class($this).') - '.$value);
 		return 1;
 	}
 
-	public function getForm($method='post', $action=null, $enctype=null){
+	public function getForm($method='post', $action=null, $enctype=null) {
 		$form = new CForm($method, $action, $enctype);
 		$form->addItem($this);
 	return $form;
 	}
 
-	public function setTitle($value='title'){
+	public function setTitle($value='title') {
 		$this->setAttribute('title', $value);
 	}
 }

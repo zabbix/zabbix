@@ -11,7 +11,6 @@ sbin_PROGRAMS = zabbix_proxy
 zabbix_proxy_SOURCES = \
 	servercomms.c servercomms.h \
 	events.c \
-	zlog.c \
 	proxy.c \
 	scripts.c
 

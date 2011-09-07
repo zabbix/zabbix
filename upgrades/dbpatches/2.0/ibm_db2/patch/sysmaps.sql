@@ -94,6 +94,10 @@ ALTER TABLE sysmaps ADD label_string_image varchar(255) WITH DEFAULT '' NOT NULL
 /
 REORG TABLE sysmaps
 /
+ALTER TABLE sysmaps ADD iconmapid bigint NULL
+/
+REORG TABLE sysmaps
+/
 UPDATE sysmaps SET backgroundid=NULL WHERE backgroundid=0
 /
 UPDATE sysmaps SET show_unack=1 WHERE highlight>7 AND highlight<16
@@ -113,4 +117,6 @@ UPDATE sysmaps SET expandproblem=0 WHERE highlight>1 AND highlight<4
 UPDATE sysmaps SET highlight=(highlight-2) WHERE highlight>1
 /
 ALTER TABLE sysmaps ADD CONSTRAINT c_sysmaps_1 FOREIGN KEY (backgroundid) REFERENCES images (imageid)
+/
+ALTER TABLE sysmaps ADD CONSTRAINT c_sysmaps_2 FOREIGN KEY (iconmapid) REFERENCES icon_map (iconmapid)
 /

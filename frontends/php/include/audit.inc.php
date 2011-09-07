@@ -89,35 +89,32 @@
 		return $result;
 	}
 
-	function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $table_name, $values_old, $values_new){
-
-		if($action == AUDIT_ACTION_UPDATE){
-			$values_diff = array();
-			foreach($values_new as $id => $value){
-				if($values_old[$id] !== $value)
+	function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $table_name, $values_old, $values_new) {
+		$values_diff = array();
+		if ($action == AUDIT_ACTION_UPDATE && !empty($values_new)) {
+			foreach ($values_new as $id => $value) {
+				if ($values_old[$id] !== $value) {
 					array_push($values_diff, $id);
+				}
 			}
-
-			if(0 == count($values_diff))
+			if (count($values_diff) == 0) {
 				return true;
+			}
 		}
 
 		$auditid = get_dbid('auditlog', 'auditid');
 
-		if(zbx_strlen($resourcename) > 255)
+		if (zbx_strlen($resourcename) > 255) {
 			$resourcename = zbx_substr($resourcename, 0, 252).'...';
+		}
 
-		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
-		/*SDI(
-			'INSERT INTO auditlog (auditid,userid,clock,ip,action,resourcetype,resourceid,resourcename)'.
-			' values ('.$auditid.','.CWebUser::$data['userid'].','.time().','.zbx_dbstr($ip).
-			','.$action.','.$resourcetype.','.$resourceid.','.zbx_dbstr($resourcename).')');*/
+		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 		$result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,ip,action,resourcetype,resourceid,resourcename)'.
 				' values ('.$auditid.','.CWebUser::$data['userid'].','.time().','.zbx_dbstr($ip).
 				','.$action.','.$resourcetype.','.$resourceid.','.zbx_dbstr($resourcename).')');
 
-		if($result && $action == AUDIT_ACTION_UPDATE){
-			foreach ($values_diff as $id){
+		if ($result && $action == AUDIT_ACTION_UPDATE) {
+			foreach ($values_diff as $id) {
 				$auditdetailid = get_dbid('auditlog_details', 'auditdetailid');
 				$result &= DBexecute('insert into auditlog_details (auditdetailid,auditid,table_name,field_name,oldvalue,newvalue)'.
 						' values ('.$auditdetailid.','.$auditid.','.zbx_dbstr($table_name).','.
@@ -125,8 +122,9 @@
 			}
 		}
 
-		if($result)
+		if ($result) {
 			$result = $auditid;
+		}
 
 		return $result;
 	}
