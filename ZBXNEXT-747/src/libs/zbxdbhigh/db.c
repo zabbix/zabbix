@@ -137,12 +137,12 @@ void	DBbegin()
 
 	rc = zbx_db_begin();
 
-	while (ZBX_DB_DOWN == rc)
+	while (ZBX_DB_OK > rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_DOWN == (rc = zbx_db_begin()))
+		if (ZBX_DB_OK > (rc = zbx_db_begin()))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -167,12 +167,12 @@ void	DBcommit()
 
 	rc = zbx_db_commit();
 
-	while (ZBX_DB_DOWN == rc)
+	while (ZBX_DB_OK > rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_DOWN == (rc = zbx_db_commit()))
+		if (ZBX_DB_OK > (rc = zbx_db_commit()))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -197,12 +197,12 @@ void	DBrollback()
 
 	rc = zbx_db_rollback();
 
-	while (ZBX_DB_DOWN == rc)
+	while (ZBX_DB_OK > rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_DOWN == (rc = zbx_db_rollback()))
+		if (ZBX_DB_OK > (rc = zbx_db_rollback()))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -228,14 +228,12 @@ int	__zbx_DBexecute(const char *fmt, ...)
 
 	rc = zbx_db_vexecute(fmt, args);
 
-	while (ZBX_DB_DOWN == rc)
+	while (ZBX_DB_OK > rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		rc = zbx_db_vexecute(fmt, args);
-
-		if (ZBX_DB_DOWN == rc)
+		if (ZBX_DB_OK > (rc = zbx_db_vexecute(fmt, args)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -301,9 +299,7 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		rc = zbx_db_vselect(fmt, args);
-
-		if ((DB_RESULT)ZBX_DB_DOWN == rc)
+		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_vselect(fmt, args)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -335,9 +331,7 @@ DB_RESULT	DBselectN(const char *query, int n)
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		rc = zbx_db_select_n(query, n);
-
-		if ((DB_RESULT)ZBX_DB_DOWN == rc)
+		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_select_n(query, n)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -556,13 +550,13 @@ void	DBupdate_triggers_status_after_restart()
 				" and h.status in (%d)"
 				" and i.status in (%d)"
 				" and i.type not in (%d,%d)"
-				" and i.key_ not in ('%s','%s')"
+				" and i.key_ not in ('%s')"
 				" and t.status in (%d)"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
-			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
+			SERVER_STATUS_KEY,
 			TRIGGER_STATUS_ENABLED,
 			DBnode_local("t.triggerid"));
 
@@ -773,7 +767,7 @@ int	DBget_queue_count(int from, int to)
 				" and h.status=%d"
 				" and i.status=%d"
 				" and i.value_type not in (%d)"
-				" and i.key_ not in ('%s','%s')"
+				" and i.key_ not in ('%s')"
 				" and ("
 					"i.lastclock is not null"
 					" and i.lastclock<%d"
@@ -789,7 +783,7 @@ int	DBget_queue_count(int from, int to)
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_VALUE_TYPE_LOG,
-			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
+			SERVER_STATUS_KEY,
 			now - from,
 				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
@@ -2178,7 +2172,7 @@ retry:
 	else
 		result = DBselect("%s", sql);
 
-	while (NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
 		if (h_alloc == h_num)
 		{

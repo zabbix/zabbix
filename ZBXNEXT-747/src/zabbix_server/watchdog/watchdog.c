@@ -22,7 +22,6 @@
 #include "db.h"
 #include "zbxdb.h"
 #include "log.h"
-#include "zlog.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "zbxalgo.h"
@@ -206,9 +205,6 @@ void	main_watchdog_loop()
 	int	now, nextsync = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_watchdog_loop()");
-
-	/* disable writing to database in zabbix_syslog() */
-	CONFIG_ENABLE_LOG = 0;
 
 	zbx_vector_ptr_create(&recipients);
 

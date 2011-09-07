@@ -6,5 +6,5 @@ CREATE TABLE node_cksum (
 	cksumtype		integer		DEFAULT '0'	NOT NULL,
 	cksum		text			NOT NULL,
 	sync		char(128)		DEFAULT ''	NOT NULL
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX node_cksum_1 on node_cksum (nodeid,cksumtype,tablename,recordid);

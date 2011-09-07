@@ -89,8 +89,7 @@ img.borderless { border-width: 0; vertical-align: bottom; }
 .delimiter{ font-weight:bold; color:#000; }
 .pointer{}
 .pointer:hover{ cursor: pointer; }
-.move{}
-.move:hover{ cursor: move; }
+.move{ cursor: move; }
 .cell{ padding: 1px 3px; white-space: nowrap; text-align: left; border: 0; height: 20px; }
 table.cell tr td { padding: 1px; white-space: nowrap; text-align: left;}
 
@@ -386,6 +385,7 @@ table.formtable tr td.form_row_r table.calendar tr td{
 	padding-left: 1px;
 	padding-right: 1px;
 }
+
 table.formlongtable{ width: 99%; }
 td.form_row_l_simple {  border-color: #AAAAAA; text-align:	left; white-space: nowrap; word-spacing: 0; width: 50%;}
 td.form_row_r_simple { border-color: #AAAAAA; text-align: left; }

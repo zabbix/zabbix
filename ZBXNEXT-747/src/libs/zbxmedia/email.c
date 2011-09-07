@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "log.h"
-#include "zlog.h"
 #include "comms.h"
 #include "base64.h"
 
@@ -291,10 +290,7 @@ out:
 	zbx_tcp_close(&s);
 close:
 	if ('\0' != *error)
-	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
-		zabbix_syslog("%s", error);
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

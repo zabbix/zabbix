@@ -63,7 +63,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 		goto fail;
 	}
 
-	param = dyn_escape_param(command);
+	param = zbx_dyn_escape_string(command, "\"");
 	item.key = zbx_dsprintf(item.key, "system.run[\"%s\",\"%s\"]", param, NULL == result ? "nowait" : "wait");
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 	zbx_free(param);

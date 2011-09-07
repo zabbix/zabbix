@@ -1007,7 +1007,7 @@ function make_latest_issues($filter = array(), $showStatus=false){
 					);
 
 			if($trigger['url'])
-				$description = new CLink($description, $trigger['url'], null, null, true);
+				$description = new CLink($description, resolveTriggerUrl($trigger), null, null, true);
 			else
 				$description = new CSpan($description,'pointer');
 

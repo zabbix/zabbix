@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -16,19 +17,27 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
+$table = new CTableInfo();
+$table->setHeader(array(_('Name'), _('Icon map')));
+$table->addItem(BR());
 
-#ifndef ZABBIX_ZLOG_H
-#define ZABBIX_ZLOG_H
+foreach ($this->data['iconmaps'] as $iconmap) {
+	$mappings = $iconmap['mappings'];
+	order_result($mappings, 'sortorder');
 
-#include <stdarg.h>
+	$row = array();
+	foreach ($mappings as $mapping) {
+		$row[] = $this->data['inventoryList'][$mapping['inventory_link']].':'.
+				$mapping['expression'].SPACE.RARR.SPACE.$this->data['iconList'][$mapping['iconid']];
+		$row[] = BR();
+	}
+	$table->addRow(array(
+			new CLink($iconmap['name'], 'config.php?form=update&iconmapid='.$iconmap['iconmapid'].url_param('config')),
+			$row
+		));
+}
 
-extern int	CONFIG_ENABLE_LOG;
-
-#ifdef HAVE___VA_ARGS__
-#	define zabbix_syslog(fmt, ...) __zbx_zabbix_syslog(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#else
-#	define zabbix_syslog __zbx_zabbix_syslog
-#endif /* HAVE___VA_ARGS__ */
-void	__zbx_zabbix_syslog(const char *fmt, ...);
-
-#endif
+return $table;
+?>

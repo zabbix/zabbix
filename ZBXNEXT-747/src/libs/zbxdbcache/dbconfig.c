@@ -368,7 +368,6 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem);
 static unsigned int	sync_num = 0;
 
 static const char	*INTERNED_SERVER_STATUS_KEY;
-static const char	*INTERNED_SERVER_ZABBIXLOG_KEY;
 
 static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 				unsigned char item_type, const char *key,
@@ -382,7 +381,7 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 		return;
 	}
 
-	if (INTERNED_SERVER_STATUS_KEY == key || INTERNED_SERVER_ZABBIXLOG_KEY == key)
+	if (INTERNED_SERVER_STATUS_KEY == key)
 	{
 		*poller_type = ZBX_NO_POLLER;
 		return;
@@ -1624,6 +1623,16 @@ static void	DCsync_hosts(DB_RESULT result)
 
 			if (NULL != host_ph)
 			{
+				if (0 == found || sync_num == host_ph->sync_num)
+				{
+					/* duplicate hosts or proxies found */
+
+					zabbix_log(LOG_LEVEL_CRIT, "Error: duplicate %s [%s] found. Exiting...",
+							HOST_STATUS_MONITORED == host_ph->status ? "hosts" : "proxies",
+							host_ph->host);
+					exit(FAIL);
+				}
+
 				host_ph->host_ptr = host;
 				host_ph->sync_num = sync_num;
 			}
@@ -1659,7 +1668,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* update hosts_ph index using new data, if not done already */
 
-		if (update_index)
+		if (1 == update_index)
 		{
 			host_ph_local.proxy_hostid = host->proxy_hostid;
 			host_ph_local.status = host->status;
@@ -2545,6 +2554,7 @@ void	DCsync_configuration()
 
 	FINISH_SYNC;
 
+	DBfree_result(conf_result);
 	DBfree_result(item_result);
 	DBfree_result(trig_result);
 	DBfree_result(tdep_result);
@@ -2909,7 +2919,6 @@ void	init_configuration_cache()
 	zbx_strpool_create(strpool_size);
 
 	INTERNED_SERVER_STATUS_KEY = zbx_strpool_intern(SERVER_STATUS_KEY);
-	INTERNED_SERVER_ZABBIXLOG_KEY = zbx_strpool_intern(SERVER_ZABBIXLOG_KEY);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -3743,7 +3752,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
- * Comments: only used for SERVER_ZABBIXLOG_KEY and SERVER_STATUS_KEY items   *
+ * Comments: only used for SERVER_STATUS_KEY items                            *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)

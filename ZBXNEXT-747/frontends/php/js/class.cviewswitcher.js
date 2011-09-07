@@ -225,8 +225,10 @@ ActionProcessor.prototype = {
 		for(var i=0; i<this.actions.length; i++){
 			var action = this.actions[i];
 
-			for(elementId in action.cond){
-				elementsList[elementId] = true;
+			for(var j=0; j<action.cond.length; j++){
+				for(elementId in action.cond[j]){
+					elementsList[elementId] = true;
+				}
 			}
 		}
 
@@ -269,12 +271,26 @@ ActionProcessor.prototype = {
 	},
 
 	checkConditions: function(conditions){
-		for(var elementId in conditions){
-			if(this.getValue(elementId) !== conditions[elementId]){
-				return false;
+		var elementId,
+			i,
+			ln,
+			failed;
+
+		for(i = 0, ln = conditions.length; i < ln; i++){
+			failed = false;
+
+			for(elementId in conditions[i]){
+				if(this.getValue(elementId) !== conditions[i][elementId]){
+					failed = true;
+					break;
+				}
+			}
+
+			if(!failed){
+				return true;
 			}
 		}
-		return true;
+		return false;
 	},
 
 	process: function(){
@@ -306,6 +322,14 @@ ActionProcessor.prototype = {
 					}
 					else{
 						this.actionDisable(action.value);
+					}
+					break;
+				case 'disable':
+					if(this.checkConditions(action.cond)){
+						this.actionDisable(action.value);
+					}
+					else{
+						this.actionEnable(action.value);
 					}
 					break;
 			}

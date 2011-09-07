@@ -19,180 +19,194 @@
 **/
 ?>
 <?php
-// include JS + templates
 	include('include/views/js/configuration.sysmap.edit.js.php');
-?>
-<?php
+
 	$config = select_config();
 
-	$data = $data;
-	$inputLength = 60;
+	// advanced labels
+	$labelTypes = sysmapElementLabel();
+	$labelTypesLimited = $labelTypes;
+	unset($labelTypesLimited[MAP_LABEL_TYPE_IP]);
+	$labelTypesImage = $labelTypesLimited;
+	unset($labelTypesImage[MAP_LABEL_TYPE_STATUS]);
 
-	$divTabs = new CTabView(array('remember'=>1));
-	if(!isset($_REQUEST['form_refresh']))
-		$divTabs->setSelected(0);
-
-// Sysmap Form
+	// create sysmap form
 	$frmSysmap = new CForm();
 	$frmSysmap->setName('map.edit.php');
 	$frmSysmap->addVar('form', get_request('form', 1));
+	$frmSysmap->addVar('form_refresh', get_request('form_refresh', 0) + 1);
+	if (isset($this->data['sysmapid'])) {
+		$frmSysmap->addVar('sysmapid', $this->data['sysmapid']);
+	}
 
-	$formRefresh = get_request('form_refresh',0);
-	$frmSysmap->addVar('form_refresh', $formRefresh+1);
-
-// HOST WIDGET {
+	// create sysmap
 	$sysmapList = new CFormList('sysmaplist');
+	$sysmapList->addRow(_('Name'), new CTextBox('name', $this->data['name'], 60));
+	$sysmapList->addRow(_('Width'), new CNumericBox('width', $this->data['width'], 5));
+	$sysmapList->addRow(_('Height'), new CNumericBox('height', $this->data['height'], 5));
 
-	if(isset($data['sysmapid'])) $frmSysmap->addVar('sysmapid', $data['sysmapid']);
-
-	$sysmapList->addRow(_('Name'), new CTextBox('name', $data['name'], $inputLength));
-	$sysmapList->addRow(_('Width'), new CNumericBox('width', $data['width'], 5));
-	$sysmapList->addRow(_('Height'), new CNumericBox('height', $data['height'], 5));
-
-	$cmbImg = new CComboBox('backgroundid', $data['backgroundid']);
+	// append background image
+	$cmbImg = new CComboBox('backgroundid', $this->data['backgroundid']);
 	$cmbImg->addItem(0, _('No image'));
-
 	$images = API::Image()->get(array(
 		'filter' => array('imagetype' => 2),
 		'output' => API_OUTPUT_EXTEND,
 	));
 	order_result($images, 'name');
-	foreach($images as $image){
+	foreach ($images as $image) {
 		$cmbImg->addItem(
 			$image['imageid'],
 			get_node_name_by_elid($image['imageid'], null, ': ').$image['name']
 		);
 	}
-
 	$sysmapList->addRow(_('Background image'), $cmbImg);
-	$sysmapList->addRow(_('Icon highlight'), new CCheckBox('highlight', $data['highlight'], null, 1));
-	$sysmapList->addRow(_('Mark elements on trigger status change'), new CCheckBox('markelements', $data['markelements'], null, 1));
-	$sysmapList->addRow(_('Expand single problem'), new CCheckBox('expandproblem', $data['expandproblem'], null, 1));
 
-	$sysmapList->addRow(_('Advanced labels'), new CCheckBox('label_format', $data['label_format'], null, 1));
-	$labelTypes = sysmapElementLabel();
+	// append iconmapping to sysmap
+	$iconMappingComboBox = new CComboBox('iconmapid', $this->data['iconmapid']);
+	$iconMappingComboBox->addItem(0, _('<manual>'));
+	$iconMaps = API::IconMap()->get(array(
+		'output' => array('iconmapid', 'name'),
+		'preservekeys' => true,
+	));
+	order_result($iconMaps, 'name');
+	foreach ($iconMaps as $iconMap) {
+		$iconMappingComboBox->addItem($iconMap['iconmapid'], $iconMap['name']);
+	}
+	$iconMappingsLink = new CLink(_('show icon mappings'), 'config.php?config=14');
+	$iconMappingsLink->setAttribute('target', '_blank');
+	$sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPACE, $iconMappingsLink));
 
-// Advnaced Labels
-	$labelTypesLimited = $labelTypes;
-	unset($labelTypesLimited[MAP_LABEL_TYPE_IP]);
+	// append multiple checkboxs
+	$sysmapList->addRow(_('Icon highlight'), new CCheckBox('highlight', $this->data['highlight'], null, 1));
+	$sysmapList->addRow(_('Mark elements on trigger status change'), new CCheckBox('markelements', $this->data['markelements'], null, 1));
+	$sysmapList->addRow(_('Expand single problem'), new CCheckBox('expandproblem', $this->data['expandproblem'], null, 1));
+	$sysmapList->addRow(_('Advanced labels'), new CCheckBox('label_format', $this->data['label_format'], null, 1));
 
-	$labelTypesImage = $labelTypesLimited;
-	unset($labelTypesImage[MAP_LABEL_TYPE_STATUS]);
-
-// hostgroup
-	$labelTypeHostgroup = new CComboBox('label_type_hostgroup', $data['label_type_hostgroup'], null, $labelTypesLimited);
-	$customLabelHostgroup = new CTextarea('label_string_hostgroup', $data['label_string_hostgroup']);
-	if($data['label_type_hostgroup'] != MAP_LABEL_TYPE_CUSTOM) $customLabelHostgroup->addClass('hidden');
+	// append hostgroup to sysmap
+	$labelTypeHostgroup = new CComboBox('label_type_hostgroup', $this->data['label_type_hostgroup'], null, $labelTypesLimited);
+	$customLabelHostgroup = new CTextarea('label_string_hostgroup', $this->data['label_string_hostgroup']);
+	if ($this->data['label_type_hostgroup'] != MAP_LABEL_TYPE_CUSTOM) {
+		$customLabelHostgroup->addClass('hidden');
+	}
 	$sysmapList->addRow(_('Host group label type'), array($labelTypeHostgroup, BR(), $customLabelHostgroup));
 
-// host
-	$labelTypeHost = new CComboBox('label_type_host', $data['label_type_host'], null, $labelTypes);
-	$customLabelHost = new CTextarea('label_string_host', $data['label_string_host']);
-	if($data['label_type_host'] != MAP_LABEL_TYPE_CUSTOM) $customLabelHost->addClass('hidden');
+	// append host to sysmap
+	$labelTypeHost = new CComboBox('label_type_host', $this->data['label_type_host'], null, $labelTypes);
+	$customLabelHost = new CTextarea('label_string_host', $this->data['label_string_host']);
+	if ($this->data['label_type_host'] != MAP_LABEL_TYPE_CUSTOM) {
+		$customLabelHost->addClass('hidden');
+	}
 	$sysmapList->addRow(_('Host label type'), array($labelTypeHost, BR(), $customLabelHost));
 
-// trigger
-	$labelTypeTrigger = new CComboBox('label_type_trigger', $data['label_type_trigger'], null, $labelTypesLimited);
-	$customLabelTrigger = new CTextarea('label_string_trigger', $data['label_string_trigger']);
-	if($data['label_type_trigger'] != MAP_LABEL_TYPE_CUSTOM) $customLabelTrigger->addClass('hidden');
+	// append trigger to sysmap
+	$labelTypeTrigger = new CComboBox('label_type_trigger', $this->data['label_type_trigger'], null, $labelTypesLimited);
+	$customLabelTrigger = new CTextarea('label_string_trigger', $this->data['label_string_trigger']);
+	if ($this->data['label_type_trigger'] != MAP_LABEL_TYPE_CUSTOM) {
+		$customLabelTrigger->addClass('hidden');
+	}
 	$sysmapList->addRow(_('Trigger label type'), array($labelTypeTrigger, BR(), $customLabelTrigger));
 
-// map
-	$labelTypeMap = new CComboBox('label_type_map', $data['label_type_map'], null, $labelTypesLimited);
-	$customLabelMap = new CTextarea('label_string_map', $data['label_string_map']);
-	if($data['label_type_map'] != MAP_LABEL_TYPE_CUSTOM) $customLabelMap->addClass('hidden');
+	// append map to sysmap
+	$labelTypeMap = new CComboBox('label_type_map', $this->data['label_type_map'], null, $labelTypesLimited);
+	$customLabelMap = new CTextarea('label_string_map', $this->data['label_string_map']);
+	if ($this->data['label_type_map'] != MAP_LABEL_TYPE_CUSTOM) {
+		$customLabelMap->addClass('hidden');
+	}
 	$sysmapList->addRow(_('Map label type'), array($labelTypeMap, BR(), $customLabelMap));
 
-// image
-	$labelTypeImage = new CComboBox('label_type_image', $data['label_type_image'], null, $labelTypesImage);
-	$customLabelImage = new CTextarea('label_string_image', $data['label_string_image']);
-	if($data['label_type_image'] != MAP_LABEL_TYPE_CUSTOM) $customLabelImage->addClass('hidden');
+	// append image to sysmap
+	$labelTypeImage = new CComboBox('label_type_image', $this->data['label_type_image'], null, $labelTypesImage);
+	$customLabelImage = new CTextarea('label_string_image', $this->data['label_string_image']);
+	if ($this->data['label_type_image'] != MAP_LABEL_TYPE_CUSTOM) {
+		$customLabelImage->addClass('hidden');
+	}
 	$sysmapList->addRow(_('Image label type'), array($labelTypeImage, BR(), $customLabelImage));
-// --
 
+	// append icon label to sysmap
 	unset($labelTypes[MAP_LABEL_TYPE_CUSTOM]);
-	$sysmapList->addRow(_('Icon label type'), new CComboBox('label_type', $data['label_type'], null, $labelTypes));
+	$sysmapList->addRow(_('Icon label type'), new CComboBox('label_type', $this->data['label_type'], null, $labelTypes));
 
-	$cmbLocation = new CComboBox('label_location', $data['label_location']);
-	$cmbLocation->addItems(array(0=> _('Bottom'),1=> _('Left'),2=> _('Right'),3=> _('Top')));
-
+	// append icon label location to sysmap
+	$cmbLocation = new CComboBox('label_location', $this->data['label_location']);
+	$cmbLocation->addItems(array(0 => _('Bottom'), 1 => _('Left'), 2 => _('Right'), 3 => _('Top')));
 	$sysmapList->addRow(_('Icon label location'), $cmbLocation);
 
-	$selectShowUnack = new CComboBox('show_unack', $data['show_unack']);
+	// append show unack to sysmap
+	$selectShowUnack = new CComboBox('show_unack', $this->data['show_unack']);
 	$selectShowUnack->addItems(array(
 		EXTACK_OPTION_ALL => _('All'),
 		EXTACK_OPTION_BOTH => _('Separated'),
 		EXTACK_OPTION_UNACK => _('Unacknowledged only'),
 	));
 	$selectShowUnack->setEnabled($config['event_ack_enable']);
-	if(!$config['event_ack_enable']){
+	if (!$config['event_ack_enable']) {
 		$selectShowUnack->setAttribute('title', _('Acknowledging disabled'));
 	}
 	$sysmapList->addRow(_('Problem display'), $selectShowUnack);
 
-	$url_table = new Ctable();
-	$url_table->setHeader(array(_('Name'), _('URL'), _('Element'), SPACE));
-
-	if(empty($data['urls'])){
-		$data['urls'][] = array('name' => '', 'url' => '', 'elementtype' => 0);
+	// create url table
+	$urlTable = new Ctable();
+	$urlTable->setHeader(array(_('Name'), _('URL'), _('Element'), SPACE));
+	if (empty($this->data['urls'])) {
+		$this->data['urls'][] = array('name' => '', 'url' => '', 'elementtype' => 0);
 	}
 	$i = 0;
-	foreach($data['urls'] as $url){
-		$url_label = new CTextBox('urls['.$i.'][name]', $url['name'], 32);
-		$url_link = new CTextBox('urls['.$i.'][url]', $url['url'], 32);
+	foreach ($this->data['urls'] as $url) {
+		$urlLabel = new CTextBox('urls['.$i.'][name]', $url['name'], 32);
+		$urlLink = new CTextBox('urls['.$i.'][url]', $url['url'], 32);
+		$urlEtype = new CCombobox('urls['.$i.'][elementtype]', $url['elementtype']);
+		$urlEtype->addItems(sysmap_element_types());
+		$removeButton = new CSpan(_('Remove'), 'link_menu');
+		$removeButton->addAction('onclick', '$("urlEntry_'.$i.'").remove();');
 
-		$url_etype = new CCombobox('urls['.$i.'][elementtype]', $url['elementtype']);
-		$url_etype->addItems(sysmap_element_types());
-		$rem_button = new CSpan(_('Remove'), 'link_menu');
-		$rem_button->addAction('onclick', '$("urlEntry_'.$i.'").remove();');
+		$urlRow = new CRow(array($urlLabel, $urlLink, $urlEtype, $removeButton));
+		$urlRow->setAttribute('id', 'urlEntry_'.$i);
 
-		$urlRow = new CRow(array($url_label, $url_link, $url_etype, $rem_button));
-		$urlRow->setAttribute('id', 'urlEntry_'.$i.'');
-
-		$url_table->addRow($urlRow);
+		$urlTable->addRow($urlRow);
 		$i++;
 	}
 
-// empty template row {{{
-	$tpl_url_label = new CTextBox('urls[#{id}][name]', '', 32);
-	$tpl_url_label->setAttribute('disabled', 'disabled');
-	$tpl_url_link = new CTextBox('urls[#{id}][url]', '', 32);
-	$tpl_url_link->setAttribute('disabled', 'disabled');
-	$tpl_url_etype = new CCombobox('urls[#{id}][elementtype]');
-	$tpl_url_etype->setAttribute('disabled', 'disabled');
-	$tpl_url_etype->addItems(sysmap_element_types());
-	$tpl_rem_button = new CSpan(_('Remove'), 'link_menu');
-	$tpl_rem_button->addAction('onclick', '$("entry_#{id}").remove();');
+	// append empty template row to url table
+	$tplUrlLabel = new CTextBox('urls[#{id}][name]', '', 32);
+	$tplUrlLabel->setAttribute('disabled', 'disabled');
+	$tplUrlLink = new CTextBox('urls[#{id}][url]', '', 32);
+	$tplUrlLink->setAttribute('disabled', 'disabled');
+	$tplUrlEtype = new CCombobox('urls[#{id}][elementtype]');
+	$tplUrlEtype->setAttribute('disabled', 'disabled');
+	$tplUrlEtype->addItems(sysmap_element_types());
+	$tplRemoveButton = new CSpan(_('Remove'), 'link_menu');
+	$tplRemoveButton->addAction('onclick', '$("entry_#{id}").remove();');
+	$tplUrlRow = new CRow(array($tplUrlLabel, $tplUrlLink, $tplUrlEtype, $tplRemoveButton));
+	$tplUrlRow->addStyle('display: none');
+	$tplUrlRow->setAttribute('id', 'urlEntryTpl');
+	$urlTable->addRow($tplUrlRow);
 
-	$tpl_urlRow = new CRow(array($tpl_url_label, $tpl_url_link, $tpl_url_etype, $tpl_rem_button));
-	$tpl_urlRow->addStyle('display: none');
-	$tpl_urlRow->setAttribute('id', 'urlEntryTpl');
-	$url_table->addRow($tpl_urlRow);
-// }}} empty template row
+	// append "add" button to url table
+	$addButton = new CSpan(_('Add'), 'link_menu');
+	$addButton->addAction('onclick', 'cloneRow("urlEntryTpl", '.$i.')');
+	$addButtonColumn = new CCol($addButton);
+	$addButtonColumn->setColSpan(4);
+	$urlTable->addRow($addButtonColumn);
 
-	$add_button = new CSpan(_('Add'), 'link_menu');
-	$add_button->addAction('onclick', 'cloneRow("urlEntryTpl", '.$i.')');
-	$add_button_col = new CCol($add_button);
-	$add_button_col->setColSpan(4);
-	$url_table->addRow($add_button_col);
+	// append url table to sysmap
+	$sysmapList->addRow(_('Links'), $urlTable);
 
-	$sysmapList->addRow(_('Links'), $url_table);
-
+	// append sysmap to form
+	$divTabs = new CTabView(array('remember' => 1));
+	if (!isset($_REQUEST['form_refresh'])) {
+		$divTabs->setSelected(0);
+	}
 	$divTabs->addTab('sysmapTab', _('Map'), $sysmapList);
-// }
-
-
 	$frmSysmap->addItem($divTabs);
 
-// Footer
+	// footer buttons
 	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
-	if(isset($_REQUEST['sysmapid']) && ($_REQUEST['sysmapid']>0)){
+	if (isset($_REQUEST['sysmapid']) && ($_REQUEST['sysmapid'] > 0)) {
 		$others[] = new CButton('clone', _('Clone'));
 		$others[] = new CButtonDelete(_('Delete network map?'), url_param('form').url_param('sysmapid'));
 	}
 	$others[] = new CButtonCancel();
-
 	$frmSysmap->addItem(makeFormFooter($main, $others));
 
 return $frmSysmap;

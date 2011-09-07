@@ -25,7 +25,6 @@
 #include "log.h"
 #include "../events.h"
 #include "dbcache.h"
-#include "zlog.h"
 #include "zbxserver.h"
 #include "daemon.h"
 #include "zbxself.h"

@@ -110,17 +110,14 @@ static void	add_discovered_host_group(zbx_uint64_t hostid, zbx_uint64_t groupid)
 			" from hosts_groups"
 			" where groupid=" ZBX_FS_UI64
 				" and hostid=" ZBX_FS_UI64,
-			groupid,
-			hostid);
+			groupid, hostid);
 
 	if (NULL == (row = DBfetch(result)))
 	{
 		hostgroupid = DBget_maxid("hosts_groups");
 		DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid)"
 				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				hostgroupid,
-				hostid,
-				groupid);
+				hostgroupid, hostid, groupid);
 	}
 	DBfree_result(result);
 }
@@ -156,8 +153,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 	if (0 == *(zbx_uint64_t *)DCconfig_get_config_data(&groupid, CONFIG_DISCOVERY_GROUPID))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Can't add discovered host:"
-				" Group for discovered hosts is not defined");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host: group for discovered hosts is not defined");
 		return hostid;
 	}
 
@@ -262,8 +258,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					DBexecute("update hosts"
 							" set proxy_hostid=%s"
 							" where hostid=" ZBX_FS_UI64,
-							DBsql_id_ins(proxy_hostid),
-							hostid);
+							DBsql_id_ins(proxy_hostid), hostid);
 				}
 
 				DBadd_interface(hostid, interface_type, 1, row[2], row[3], port);
@@ -320,8 +315,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					DBexecute("update hosts"
 							" set proxy_hostid=%s"
 							" where hostid=" ZBX_FS_UI64,
-							DBsql_id_ins(proxy_hostid),
-							hostid);
+							DBsql_id_ins(proxy_hostid), hostid);
 				}
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[3], port);
