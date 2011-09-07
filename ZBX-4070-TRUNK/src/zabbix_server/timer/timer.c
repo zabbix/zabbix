@@ -59,57 +59,56 @@ static void	process_time_functions()
 
 	DCconfig_get_time_based_triggers(&trigger_info, &trigger_order);
 
-	if (0 != trigger_order.values_num)
+	if (0 == trigger_order.values_num)
+		goto clean;
+
+	evaluate_expressions(&trigger_order);
+
+	DBbegin();
+
+	sql = zbx_malloc(sql, sql_alloc);
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
+	for (i = 0; i < trigger_order.values_num; i++)
 	{
-		DBbegin();
+		trigger = (DC_TRIGGER *)trigger_order.values[i];
 
-		sql = zbx_malloc(sql, sql_alloc);
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
-		for (i = 0; i < trigger_order.values_num; i++)
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
+				trigger->type, trigger->value, trigger->value_flags, trigger->error,
+				trigger->new_value, trigger->new_error, &trigger->timespec, &trigger->add_event,
+				&trigger->value_changed))
 		{
-			trigger = (DC_TRIGGER *)trigger_order.values[i];
-
-			evaluate_expression(trigger->triggerid, &trigger->expression, trigger->timespec.sec,
-					trigger->value, &trigger->new_value, &trigger->new_error);
-
-			if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, trigger->triggerid,
-					trigger->type, trigger->value, trigger->value_flags, trigger->error,
-					trigger->new_value, trigger->new_error, &trigger->timespec, &trigger->add_event,
-					&trigger->value_changed))
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
-			}
-
-			zbx_free(trigger->expression);
-			zbx_free(trigger->new_error);
-
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
-#endif
-
-		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-			DBexecute("%s", sql);
-
-		zbx_free(sql);
-
-		for (i = 0; i < trigger_order.values_num; i++)
-		{
-			trigger = (DC_TRIGGER *)trigger_order.values[i];
-
-			if (1 != trigger->add_event)
-				continue;
-
-			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 		}
 
-		DBcommit();
+		zbx_free(trigger->expression);
+		zbx_free(trigger->new_error);
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
+
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	for (i = 0; i < trigger_order.values_num; i++)
+	{
+		trigger = (DC_TRIGGER *)trigger_order.values[i];
+
+		if (1 != trigger->add_event)
+			continue;
+
+		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+				&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
 	}
 
+	DBcommit();
+clean:
 	zbx_free(trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);
 
