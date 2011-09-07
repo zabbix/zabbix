@@ -2164,7 +2164,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 
 		if (INTERFACE_TYPE_SNMP == interface->type)	/* used only for SNMP traps */
 		{
-			if ('\0' != (interface_snmpaddr_local.addr = interface->ip))
+			if ('\0' != *(interface_snmpaddr_local.addr = interface->ip))
 			{
 				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &interface_snmpaddr_local)))
 				{
@@ -2181,7 +2181,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
 			}
 
-			if ('\0' != (interface_snmpaddr_local.addr = interface->dns))
+			if ('\0' != *(interface_snmpaddr_local.addr = interface->dns))
 			{
 				if (NULL == (interface_snmpaddr = zbx_hashset_search(&config->interface_snmpaddrs, &interface_snmpaddr_local)))
 				{
