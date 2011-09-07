@@ -203,8 +203,10 @@ static void	parse_traps(char *buffer)
 		*c = '\0';
 		c += 7;	/* c now points to the delimiter between "ZBXTRAP" and address */
 
-		while ('\0' != *c && NULL == strchr(ZBX_WHITESPACE, *c))
+		while ('\0' != *c && NULL != strchr(ZBX_WHITESPACE, *c))
 			c++;
+
+		/* c now points to the address */
 
 		/* process the previos trap */
 		if (NULL != begin)
