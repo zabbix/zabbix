@@ -522,38 +522,38 @@ function insert_js_function($fnct_name){
 			insert_js('
 				function addValues(frame, values, submitParent) {
 					var parentDocument = window.opener.document;
-					if(!parentDocument) return close_window();
+					if (!parentDocument) return close_window();
 
-					if(IE){
+					if (IE) {
 						// in internet explorer prototype filters by form name does not work
 						var pForms = parentDocument.body.getElementsByTagName("form");
-						for(i=0; i < pForms.length; i++){
-							if(pForms[i].id === frame){
+						for (i = 0; i < pForms.length; i++) {
+							if (pForms[i].id === frame) {
 								parentDocumentForms = [pForms[i]];
 								break;
 							}
 						}
 					}
-					else{
+					else {
 						var parentDocumentForms = $(parentDocument.body).select("form[name="+frame+"]");
 					}
 
 					var submitParent = submitParent || false;
 
 					var tmpStorage = null;
-					for(var key in values){
-						if(is_null(values[key])) continue;
+					for (var key in values) {
+						if (is_null(values[key])) continue;
 
-						if(parentDocumentForms.length)
-							tmpStorage = $(parentDocumentForms[0].parentNode).select("#"+key).first();
+						if (parentDocumentForms.length)
+							tmpStorage = $(parentDocumentForms[0]).select(\'[name="\'+key+\'"]\').first();
 
-						if(typeof(tmpStorage) == "undefined" || is_null(tmpStorage))
+						if (typeof(tmpStorage) == "undefined" || is_null(tmpStorage))
 							tmpStorage = parentDocument.getElementById(key);
 
 						tmpStorage.value = values[key];
 					}
 
-					if(!is_null(tmpStorage) && submitParent){
+					if (!is_null(tmpStorage) && submitParent) {
 						tmpStorage.form.submit();
 					}
 
