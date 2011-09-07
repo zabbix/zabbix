@@ -172,3 +172,6 @@ insert into help_items values(7,'vm.memory.size[&lt;mode&gt;]','Amount of memory
 insert into help_items values(7,'web.page.get[host,&lt;path&gt;,&lt;port&gt;]','Get content of WEB page. Default path is /');
 insert into help_items values(7,'web.page.perf[host,&lt;path&gt;,&lt;port&gt;]','Get timing of loading full WEB page. Default path is /');
 insert into help_items values(7,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,&lt;regexp&gt;,&lt;length&gt;]','Get first occurence of regexp in WEB page. Default path is /');
+
+insert into help_items values(17,'snmptrap[&lt;regex&gt;]','Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string.');
+insert into help_items values(17,'snmptrap.fallback','Catches all SNMP traps from a corresponding address that were not catched by any of the snmptrap[] items for that interface.');
