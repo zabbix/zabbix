@@ -59,7 +59,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, strlen(CONFIG_EXTERNALSCRIPTS) + strlen(key) + 2,
 			"%s/%s", CONFIG_EXTERNALSCRIPTS, key);
 
-	if (-1 == access(cmd, F_OK | X_OK))
+	if (-1 == access(cmd, X_OK))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s: %s", cmd, zbx_strerror(errno)));
 		goto notsupported;
