@@ -34,7 +34,7 @@ include_once('include/page_header.php');
 <?php
 	$fields=array(
 		// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-		'config'=>					array(T_ZBX_INT, O_OPT,	null,	IN('0,3,5,6,7,8,9,10,11,12,13'),	null),
+		'config'=>					array(T_ZBX_INT, O_OPT,	null,	IN('0,3,5,6,7,8,9,10,11,12,13,14'),	null),
 		// other form
 		'alert_history'=>			array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
 		'event_history'=>			array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
@@ -117,17 +117,21 @@ include_once('include/page_header.php');
 		// Trigger displaying options
 		'problem_unack_color' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 		'problem_ack_color' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
-		'ok_unack_color' =>		    array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
-		'ok_ack_color' =>		    array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
+		'ok_unack_color' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
+		'ok_ack_color' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 		'problem_unack_style' =>	array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
 		'problem_ack_style' =>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-		'ok_unack_style' =>		    array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-		'ok_ack_style' =>		    array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-		'ok_period' =>		        array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
-		'blink_period' =>		    array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
+		'ok_unack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
+		'ok_ack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
+		'ok_period' =>				array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
+		'blink_period' =>			array(T_ZBX_INT, O_OPT,	null,	null,		'isset({config})&&({config}==13)&&isset({save})'),
 
-		'form' =>			        array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form_refresh' =>	        array(T_ZBX_INT, O_OPT,	null,	null,	null)
+		// Icon Maps
+		'iconmapid' => 				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({config})&&({config}==14)&&(((isset({form})&&({form}=="update")))||isset({delete}))'),
+		'iconmap' =>				array(T_ZBX_STR, O_OPT,	null,	null,		'isset({config})&&({config}==14)&&isset({save})'),
+
+		'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 ?>
 <?php
@@ -140,83 +144,95 @@ include_once('include/page_header.php');
 	$orig_config = select_config(false, get_current_nodeid(false));
 
 	$result = 0;
-	if($_REQUEST['config']==3){
-// IMAGES ACTIONS
-		if(isset($_REQUEST['save'])){
 
-			$file = isset($_FILES['image']) && $_FILES['image']['name'] != '' ? $_FILES['image'] : null;
-			if(!is_null($file)){
-				if($file['error'] != 0 || $file['size']==0){
-					error(S_INCORRECT_IMAGE);
-					return false;
-				}
+	// Images
+	if ($_REQUEST['config'] == 3) {
+		if (isset($_REQUEST['save'])) {
 
-				if($file['size'] < ZBX_MAX_IMAGE_SIZE){
-					$image = fread(fopen($file['tmp_name'],'r'),filesize($file['tmp_name']));
-				}
-				else{
-					error(S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB);
-					return false;
-				}
-
-				$image = base64_encode($image);
+			if (isset($_REQUEST['imageid'])) {
+				$msg_ok = _('Image updated');
+				$msg_fail = _('Cannot update image');
+			}
+			else {
+				$msg_ok = _('Image added');
+				$msg_fail = _('Cannot add image');
 			}
 
-			if(isset($_REQUEST['imageid'])){
-				$val = array(
-					'imageid' => $_REQUEST['imageid'],
-					'name' => $_REQUEST['name'],
-					'imagetype' => $_REQUEST['imagetype'],
-					'image' => is_null($file) ? null : $image
-				);
-				$result = API::Image()->update($val);
+			try {
+				DBstart();
+				$file = isset($_FILES['image']) && $_FILES['image']['name'] != '' ? $_FILES['image'] : null;
+				if (!is_null($file)) {
+					if ($file['error'] != 0 || $file['size'] == 0) {
+						throw new Exception(_('Incorrect image'));
+					}
+					if ($file['size'] < ZBX_MAX_IMAGE_SIZE) {
+						$image = fread(fopen($file['tmp_name'], 'r'), filesize($file['tmp_name']));
+					}
+					else {
+						throw new Exception(_('Image size must be less than 1MB'));
+					}
 
-				$msg_ok = S_IMAGE_UPDATED;
-				$msg_fail = S_CANNOT_UPDATE_IMAGE;
-				$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
-			}
-			else{
-				if(is_null($file)){
-					error(S_SELECT_IMAGE_TO_DOWNLOAD);
-					return false;
+					$image = base64_encode($image);
 				}
 
-				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
-					access_deny();
+				if (isset($_REQUEST['imageid'])) {
+					$val = array(
+						'imageid' => $_REQUEST['imageid'],
+						'name' => $_REQUEST['name'],
+						'imagetype' => $_REQUEST['imagetype'],
+						'image' => is_null($file) ? null : $image
+					);
+					$result = API::Image()->update($val);
+
+					$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
+				}
+				else {
+					if (is_null($file)) {
+						throw new Exception(_('Select image to download'));
+					}
+					if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+						access_deny();
+					}
+
+					$val = array(
+						'name' => $_REQUEST['name'],
+						'imagetype' => $_REQUEST['imagetype'],
+						'image' => $image
+					);
+					$result = API::Image()->create($val);
+
+					$audit_action = 'Image ['.$_REQUEST['name'].'] added';
 				}
 
-				$val = array(
-					'name' => $_REQUEST['name'],
-					'imagetype' => $_REQUEST['imagetype'],
-					'image' => $image
-				);
-				$result = API::Image()->create($val);
+				if ($result) {
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, $audit_action);
+					unset($_REQUEST['form']);
+				}
 
-				$msg_ok = S_IMAGE_ADDED;
-				$msg_fail = S_CANNOT_ADD_IMAGE;
-				$audit_action = 'Image ['.$_REQUEST['name'].'] added';
+				DBend($result);
+				show_messages($result, $msg_ok, $msg_fail);
 			}
-
-			show_messages($result, $msg_ok, $msg_fail);
-			if($result){
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,$audit_action);
-				unset($_REQUEST['form']);
+			catch (Exception $e) {
+				DBend(false);
+				error($e->getMessage());
+				show_error_message($msg_fail);
 			}
 		}
-		else if(isset($_REQUEST['delete'])&&isset($_REQUEST['imageid'])) {
+		elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
 			$image = get_image_by_imageid($_REQUEST['imageid']);
 
 			$result = API::Image()->delete($_REQUEST['imageid']);
 
-			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
-			if($result){
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,'Image ['.$image['name'].'] deleted');
+			show_messages($result, _('Image deleted'), _('Cannot delete image'));
+			if ($result) {
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_IMAGE, 'Image ['.$image['name'].'] deleted');
 				unset($_REQUEST['form']);
 				unset($image, $_REQUEST['imageid']);
 			}
 		}
 	}
-	else if(isset($_REQUEST['save']) && ($_REQUEST['config'] == 8)){ // GUI
+	// GUI
+	elseif (isset($_REQUEST['save']) && ($_REQUEST['config'] == 8)) {
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
@@ -531,88 +547,120 @@ include_once('include/page_header.php');
 			}
 		}
 	}
-
-	else if($_REQUEST['config'] == 11){ // Macros
-		if(isset($_REQUEST['save'])){
-			try{
+	// Macros
+	elseif ($_REQUEST['config'] == 11) {
+		if (isset($_REQUEST['save'])) {
+			try {
 				DBstart();
 
+				$globalMacros = API::UserMacro()->get(array('globalmacro' => 1, 'output' => API_OUTPUT_EXTEND));
+				$globalMacros = zbx_toHash($globalMacros, 'macro');
+
 				$newMacros = get_request('macros', array());
-				foreach($newMacros as $mnum => $nmacro){
-					if(zbx_empty($nmacro['value'])) unset($newMacros[$mnum]);
+
+				// remove item from new macros array if name and value is empty
+				foreach ($newMacros as $number => $newMacro) {
+					if (zbx_empty($newMacro['macro']) && zbx_empty($newMacro['value'])) {
+						unset($newMacros[$number]);
+					}
 				}
 
-				$global_macros = API::UserMacro()->get(array(
-					'globalmacro' => 1,
-					'output' => API_OUTPUT_EXTEND
-				));
-				$global_macros = zbx_toHash($global_macros, 'macro');
+				$duplicatedMacros = array();
+				foreach ($newMacros as $number => $newMacro) {
+					// transform macros to uppercase {$aaa} => {$AAA}
+					$newMacros[$number]['macro'] = zbx_strtoupper($newMacro['macro']);
+
+					// search for duplicates items in new macros array
+					foreach ($newMacros as $duplicateNumber => $duplicateNewMacro) {
+						if ($number != $duplicateNumber && $newMacro['macro'] == $duplicateNewMacro['macro']) {
+							$duplicatedMacros[] = '"'.$duplicateNewMacro['macro'].'"';
+						}
+					}
+				}
+
+				// validate duplicates macros
+				if (!empty($duplicatedMacros)) {
+					throw new Exception(_('More than one macro with same name found:').SPACE.implode(', ', array_unique($duplicatedMacros)));
+				}
+
+				// save filtered macro array
+				$_REQUEST['macros'] = $newMacros;
+
+				// update
+				$macrosToUpdate = array();
+				foreach ($newMacros as $number => $newMacro) {
+					if (isset($globalMacros[$newMacro['macro']])) {
+						$macrosToUpdate[] = $newMacro;
+
+						// remove item from new macros array
+						unset($newMacros[$number]);
+					}
+				}
+				if (!empty($macrosToUpdate)) {
+					if (!API::UserMacro()->updateGlobal($macrosToUpdate)) {
+						throw new Exception(_('Cannot update macro'));
+					}
+					foreach ($macrosToUpdate as $macro) {
+						add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $globalMacros[$macro['macro']]['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
+					}
+				}
 
 				$newMacroMacros = zbx_objectValues($newMacros, 'macro');
 				$newMacroMacros = zbx_toHash($newMacroMacros, 'macro');
 
-				// Delete
+				// delete
 				$macrosToDelete = array();
-				foreach($global_macros as $gmacro){
-					if(!isset($newMacroMacros[$gmacro['macro']])){
-						$macrosToDelete[] = $gmacro['macro'];
+				$macrosToUpdate = zbx_toHash($macrosToUpdate, 'macro');
+				foreach ($globalMacros as $globalMacro) {
+					if (empty($newMacroMacros[$globalMacro['macro']]) && empty($macrosToUpdate[$globalMacro['macro']])) {
+						$macrosToDelete[] = $globalMacro['macro'];
+
+						// remove item from new macros array
+						foreach ($newMacros as $number => $newMacro) {
+							if ($newMacro['macro'] == $globalMacro['macro']) {
+								unset($newMacros[$number]);
+								break;
+							}
+						}
 					}
 				}
-
-				// Update
-				$macrosToUpdate = array();
-				foreach($newMacros as $mnum => $nmacro){
-					if(isset($global_macros[$nmacro['macro']])){
-						$macrosToUpdate[] = $nmacro;
-						unset($newMacros[$mnum]);
-					}
-				}
-
-				if(!empty($macrosToDelete)){
-					if(!API::UserMacro()->deleteGlobal($macrosToDelete))
+				if (!empty($macrosToDelete)) {
+					if (!API::UserMacro()->deleteGlobal($macrosToDelete)) {
 						throw new Exception(_('Cannot remove macro'));
+					}
+					foreach ($macrosToDelete as $macro) {
+						add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $globalMacros[$macro]['globalmacroid'], $macro.SPACE.RARR.SPACE.$globalMacros[$macro]['value'], null, null, null);
+					}
 				}
 
-				if(!empty($macrosToUpdate)){
-					if(!API::UserMacro()->updateGlobal($macrosToUpdate))
-						throw new Exception(_('Cannot update macro'));
-				}
+				// create
+				if (!empty($newMacros)) {
+					// mark marcos as new
+					foreach ($newMacros as $number => $macro) {
+						$_REQUEST['macros'][$number]['type'] = 'new';
+					}
 
-				if(!empty($newMacros)){
-					$macrosToAdd = array_values($newMacros);
-					$new_macroids = API::UserMacro()->createGlobal($macrosToAdd);
-					if(!$new_macroids)
-						throw new Exception('Cannot add macro');
-				}
-
-				if(!empty($macrosToAdd)){
-					$new_macros = API::UserMacro()->get(array(
-						'globalmacroids' => $new_macroids['globalmacroids'],
+					$newMacrosIds = API::UserMacro()->createGlobal(array_values($newMacros));
+					if (!$newMacrosIds) {
+						throw new Exception(_('Cannot add macro'));
+					}
+					$newMacrosCreated = API::UserMacro()->get(array(
+						'globalmacroids' => $newMacrosIds['globalmacroids'],
 						'globalmacro' => 1,
 						'output' => API_OUTPUT_EXTEND
 					));
-					$new_macros = zbx_toHash($new_macros, 'globalmacroid');
-					foreach($macrosToDelete as $delm){
-						add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO,
-							$delm['globalmacroid'],
-							$global_macros[$delm['globalmacroid']]['macro'],
-							null,null,null);
-					}
-					foreach($new_macroids['globalmacroids'] as $newid){
-						add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO,
-							$newid,
-							$new_macros[$newid]['macro'],
-							null,null,null);
+					foreach ($newMacrosCreated as $macro) {
+						add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
 					}
 				}
 
 				DBend(true);
-				show_messages(true, S_MACROS_UPDATED, S_CANNOT_UPDATE_MACROS);
+				show_message(_('Macros updated'));
 			}
-			catch(Exception $e){
+			catch (Exception $e) {
 				DBend(false);
 				error($e->getMessage());
-				show_messages(false, S_MACROS_UPDATED, S_CANNOT_UPDATE_MACROS);
+				show_error_message(_('Cannot update macros'));
 			}
 		}
 
@@ -657,23 +705,69 @@ include_once('include/page_header.php');
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 	}
+	// Icon mapping
+	elseif ($_REQUEST['config'] == 14) {
+		if (isset($_REQUEST['save'])) {
+
+			$_REQUEST['iconmap']['mappings'] = isset($_REQUEST['iconmap']['mappings'])
+				? $_REQUEST['iconmap']['mappings']
+				: array();
+
+			$i = 0;
+			foreach ($_REQUEST['iconmap']['mappings'] as $iconmappingid => &$mapping) {
+				$mapping['iconmappingid'] = $iconmappingid;
+				$mapping['sortorder'] = $i++;
+			}
+			unset($mapping);
+
+			if (isset($_REQUEST['iconmapid'])) {
+				$_REQUEST['iconmap']['iconmapid'] = $_REQUEST['iconmapid'];
+				$result = API::IconMap()->update($_REQUEST['iconmap']);
+				$msgOk = _('Icon map updated');
+				$msgErr = _('Cannot update icon map');
+			}
+			else {
+				$result = API::IconMap()->create($_REQUEST['iconmap']);
+				$msgOk = _('Icon map created');
+				$msgErr = _('Cannot create icon map');
+			}
+
+			show_messages($result, $msgOk, $msgErr);
+			if ($result) {
+				unset($_REQUEST['form']);
+			}
+		}
+		elseif (isset($_REQUEST['delete'])) {
+			$result = API::IconMap()->delete($_REQUEST['iconmapid']);
+			if ($result) {
+				unset($_REQUEST['form']);
+			}
+			show_messages($result, _('Icon map deleted'), _('Cannot delete icon map'));
+		}
+		elseif (isset($_REQUEST['clone'])) {
+			unset($_REQUEST['iconmapid']);
+			$_REQUEST['form'] = 'clone';
+		}
+	}
 ?>
 
 <?php
 	$form = new CForm();
+	$form->cleanItems();
 
 	$cmbConfig = new CCombobox('configDropDown', $_REQUEST['config'], 'javascript: redirect("config.php?config="+this.options[this.selectedIndex].value);');
 	$cmbConfig->addItems(array(
 		8 => _('GUI'),
 		0 => _('Housekeeper'),
 		3 => _('Images'),
+		14 => _('Icon mapping'),
 		10 => _('Regular expressions'),
 		11 => _('Macros'),
 		6 => _('Value mapping'),
 		7 => _('Working time'),
 		12 => _('Trigger severities'),
 		13 => _('Trigger displaying options'),
-		5 => _('Other'),
+		5 => _('Other')
 	));
 	$form->addItem($cmbConfig);
 
@@ -687,6 +781,9 @@ include_once('include/page_header.php');
 				break;
 			case 10:
 				$form->addItem(new CSubmit('form', _('New regular expression')));
+				break;
+			case 14:
+				$form->addItem(new CSubmit('form', _('Create icon map')));
 				break;
 		}
 	}
@@ -721,122 +818,39 @@ include_once('include/page_header.php');
 ////////////////////////////
 //  config = 3 // Images  //
 ////////////////////////////
-	elseif($_REQUEST["config"] == 3){
-		if(isset($_REQUEST["form"])){
-			$frmImages = new CFormTable(S_IMAGE, 'config.php', 'post', 'multipart/form-data');
-			$frmImages->setHelp('web.config.images.php');
-			$frmImages->addVar('config', get_request('config',3));
+	elseif ($_REQUEST['config'] == 3) {
+		$data = array();
+		$data['form'] = get_request('form', null);
+		$data['widget'] = &$cnf_wdgt;
 
-			if(isset($_REQUEST['imageid'])){
-				$sql = 'SELECT imageid,imagetype,name '.
-						' FROM images '.
-						' WHERE imageid='.$_REQUEST['imageid'];
-				$result=DBselect($sql);
-				$row=DBfetch($result);
+		if (!empty($data['form'])) {
+			if (!empty($_REQUEST['imageid'])) {
+				$image = DBfetch(DBselect('SELECT i.imagetype, i.name FROM images i WHERE i.imageid = '.$_REQUEST['imageid']));
 
-				$frmImages->setTitle(S_IMAGE.' "'.$row['name'].'"');
-				$frmImages->addVar('imageid', $_REQUEST['imageid']);
+				$data['imageid'] = $_REQUEST['imageid'];
+				$data['imagename'] = $image['name'];
+				$data['imagetype'] = $image['imagetype'];
+			}
+			else {
+				$data['imageid'] = null;
+				$data['imagename'] = get_request('name', '');
+				$data['imagetype'] = get_request('imagetype', 1);
 			}
 
-			if(isset($_REQUEST['imageid']) && !isset($_REQUEST['form_refresh'])){
-				$name		= $row['name'];
-				$imagetype	= $row['imagetype'];
-				$imageid	= $row['imageid'];
-			}
-			else{
-				$name		= get_request('name','');
-				$imagetype	= get_request('imagetype',1);
-				$imageid	= get_request('imageid',0);
-			}
-
-			$frmImages->addRow(S_NAME,new CTextBox('name',$name,64));
-
-			$cmbImg = new CComboBox('imagetype',$imagetype);
-			$cmbImg->addItem(IMAGE_TYPE_ICON,S_ICON);
-			$cmbImg->addItem(IMAGE_TYPE_BACKGROUND,S_BACKGROUND);
-
-			$frmImages->addRow(S_TYPE,$cmbImg);
-
-			$frmImages->addRow(S_UPLOAD,new CFile('image'));
-
-			if($imageid > 0){
-				$frmImages->addRow(S_IMAGE,new CLink(
-					new CImg('imgstore.php?iconid='.$imageid,'no image',null),'image.php?imageid='.$row['imageid']));
-			}
-
-			$frmImages->addItemToBottomRow(new CSubmit('save',S_SAVE));
-			if(isset($_REQUEST['imageid'])){
-				$frmImages->addItemToBottomRow(SPACE);
-				$frmImages->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_IMAGE,
-					url_param('form').url_param('config').url_param('imageid')));
-			}
-
-			$frmImages->addItemToBottomRow(SPACE);
-			$frmImages->addItemToBottomRow(new CButtonCancel(url_param('config')));
-
-			$cnf_wdgt->addItem($frmImages);
+			$imageForm = new CView('administration.general.image.edit', $data);
+			$cnf_wdgt->addItem($imageForm->render());
 		}
-		else{
-			$cnf_wdgt->addItem(BR());
-
-			$imagetype = get_request('imagetype',IMAGE_TYPE_ICON);
-
-			$r_form = new CForm();
-
-			$cmbImg = new CComboBox('imagetype',$imagetype,'submit();');
-			$cmbImg->addItem(IMAGE_TYPE_ICON,S_ICON);
-			$cmbImg->addItem(IMAGE_TYPE_BACKGROUND,S_BACKGROUND);
-
-			$r_form->addItem(S_TYPE.SPACE);
-			$r_form->addItem($cmbImg);
-
-			$cnf_wdgt->addHeader(S_IMAGES_BIG,$r_form);
-
-			$table = new CTable(S_NO_IMAGES_DEFINED, 'header_wide');
-
-			$tr = 0;
-			$row = new CRow();
-
+		else {
+			$data['imagetype'] = get_request('imagetype', IMAGE_TYPE_ICON);
 			$options = array(
-				'filter'=> array('imagetype'=> $imagetype),
+				'filter'=> array('imagetype'=> $data['imagetype']),
 				'output'=> API_OUTPUT_EXTEND,
 				'sortfield'=> 'name'
 			);
-			$images = API::Image()->get($options);
-			foreach($images as $inum => $image){
-				switch($image['imagetype']){
-					case IMAGE_TYPE_ICON:
-						$imagetype = S_ICON;
-						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image');
-					break;
-					case IMAGE_TYPE_BACKGROUND:
-						$imagetype = S_BACKGROUND;
-						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image',200);
-					break;
-					default: $imagetype=S_UNKNOWN;
-				}
+			$data['images'] = API::Image()->get($options);
 
-				$name = new CLink($image['name'],'config.php?form=update'.url_param('config').'&imageid='.$image['imageid']);
-				$action = new CLink($img, 'image.php?imageid='.$image['imageid']);
-
-				$img_td = new CCol();
-				$img_td->setAttribute('align', 'center');
-				$img_td->addItem(array($action, BR(), $name), 'center');
-
-				$row->addItem($img_td);
-				$tr++;
-				if(($tr % 4) == 0){
-					$table->addRow($row);
-					$row = new CRow();
-				}
-			}
-
-			if($tr > 0){
-				while(($tr % 4) != 0){ $tr++; $row->addItem(SPACE);}
-				$table->addRow($row);
-			}
-
-			$cnf_wdgt->addItem($table);
+			$imageForm = new CView('administration.general.image.list', $data);
+			$cnf_wdgt->addItem($imageForm->render());
 		}
 	}
 //////////////////////////////////////
@@ -1010,14 +1024,25 @@ include_once('include/page_header.php');
 /////////////////////////////
 //  config = 11 // Macros  //
 /////////////////////////////
-	elseif($_REQUEST['config'] == 11){
-		$form = new CForm();
-		$tbl = new CTable();
-		$tbl->addRow(get_macros_widget());
-		$tbl->addStyle('width: 50%;');
-		$tbl->addStyle('margin: 0 auto;');
-		$form->addItem($tbl);
-		$cnf_wdgt->addItem($form);
+	elseif ($_REQUEST['config'] == 11) {
+		$data = array();
+		$data['form'] = get_request('form', 1);
+		$data['form_refresh'] = get_request('form_refresh', 0);
+		$data['macros'] = array();
+
+		if ($data['form_refresh']) {
+			$data['macros'] = get_request('macros', array());
+		}
+		else {
+			$data['macros'] = API::UserMacro()->get(array('output' => API_OUTPUT_EXTEND, 'globalmacro' => 1));
+			order_result($data['macros'], 'macro');
+		}
+		if (empty($data['macros'])) {
+			$data['macros'] = array(0 => array('macro' => '', 'value' => ''));
+		}
+
+		$macrosForm = new CView('administration.general.macros.edit', $data);
+		$cnf_wdgt->addItem($macrosForm->render());
 	}
 /////////////////////////////////////////
 //  config = 12 // Trigger severities  //
@@ -1086,9 +1111,71 @@ include_once('include/page_header.php');
 		$triggerDisplayingForm = new CView('administration.general.triggerDisplayingOptions.edit', $data);
 		$cnf_wdgt->addItem($triggerDisplayingForm->render());
 	}
+	//////////////////////////////////
+	//  config = 14 // Icon mapping //
+	//////////////////////////////////
+	elseif ($_REQUEST['config'] == 14) {
+		$data = array();
+		$data['form_refresh'] = get_request('form_refresh', 0);
+		$data['iconmapid'] = get_request('iconmapid', null);
 
-	$cnf_wdgt->show();
+		$data['iconList'] = array();
+		$iconList = API::Image()->get(array(
+			'filter'=> array('imagetype'=> IMAGE_TYPE_ICON),
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+		foreach ($iconList as $icon) {
+			$data['iconList'][$icon['imageid']] = $icon['name'];
+		}
 
+		$data['inventoryList'] = array();
+		$inventoryFields = getHostInventories();
+		foreach ($inventoryFields as $field) {
+			$data['inventoryList'][$field['nr']] = $field['title'];
+		}
+
+		if (isset($_REQUEST['form'])) {
+			if ($data['form_refresh'] || ($_REQUEST['form'] === 'clone')) {
+				$data['iconmap'] = get_request('iconmap');
+			}
+			elseif (isset($_REQUEST['iconmapid'])) {
+				$iconMap = API::IconMap()->get(array(
+					'output' => API_OUTPUT_EXTEND,
+					'iconmapids' => $_REQUEST['iconmapid'],
+					'editable' => true,
+					'preservekeys' => true,
+					'selectMappings' => API_OUTPUT_EXTEND,
+				));
+				$data['iconmap'] = reset($iconMap);
+			}
+			else {
+				$firstIcon = reset($iconList);
+				$data['iconmap'] = array(
+					'name' => '',
+					'default_iconid' => $firstIcon['imageid'],
+					'mappings' => array(),
+				);
+			}
+
+			$iconMapView = new CView('administration.general.iconmap.edit', $data);
+		}
+		else {
+			$cnf_wdgt->addHeader(_('Icon mapping'));
+			$data['iconmaps'] = API::IconMap()->get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true,
+				'preservekeys' => true,
+				'selectMappings' => API_OUTPUT_EXTEND,
+			));
+			order_result($data['iconmaps'], 'name');
+			$iconMapView = new CView('administration.general.iconmap.list', $data);
+		}
+
+		$cnf_wdgt->addItem($iconMapView->render());
+	}
+
+$cnf_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>

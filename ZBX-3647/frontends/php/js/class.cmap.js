@@ -124,6 +124,7 @@ ZABBIX.apps.map = (function(){
 			this.sysmapid = mapdata.sysmap.sysmapid;
 			this.data = mapdata.sysmap;
 			this.iconList = mapdata.iconList;
+			this.defaultAutoIconId = mapdata.defaultAutoIconId
 
 			this.container = jQuery('#' + containerid);
 			if(this.container.length === 0){
@@ -757,7 +758,7 @@ ZABBIX.apps.map = (function(){
 					y: 0,
 					urls: {},
 					elementName: this.sysmap.iconList[0].name, // image name
-					image: this.sysmap.iconList[0].imageid
+					use_iconmap: '1'
 				};
 
 				// generate unique selementid
@@ -805,17 +806,27 @@ ZABBIX.apps.map = (function(){
 			});
 		}
 		Selement.prototype = {
+
+			/**
+			 * Returns element data.
+			 */
 			getData: function(){
 				return this.data;
 			},
 
+			/**
+			 * Updates element fields.
+			 * @param {Object} data
+			 * @param {Boolean} unsetUndefined if true, all fields that are not in data parameter will be removed from element
+			 */
 			update: function(data, unsetUndefined){
 				var	fieldName,
 					dataFelds = [
 						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
-						'height', 'viewtype', 'urls', 'elementName'
+						'height', 'viewtype', 'urls', 'elementName', 'use_iconmap'
 					],
+					fieldsUnsettable = ['iconid_off', 'iconid_on', 'iconid_maintenance', 'iconid_disabled'],
 					i,
 					ln;
 
@@ -827,7 +838,7 @@ ZABBIX.apps.map = (function(){
 					if(typeof data[fieldName] !== 'undefined'){
 						this.data[fieldName] = data[fieldName];
 					}
-					else if(unsetUndefined){
+					else if(unsetUndefined && (fieldsUnsettable.indexOf(fieldName) === -1)){
 						delete this.data[fieldName];
 					}
 				}
@@ -837,8 +848,12 @@ ZABBIX.apps.map = (function(){
 					this.data.elementsubtype = '0';
 				}
 
-				// if we update all data and advanced_icons turned off or element is image, reset advanced iconids
-				if((unsetUndefined && (typeof data.advanced_icons === 'undefined')) || this.data.elementtype === '4'){
+				if(unsetUndefined && typeof this.data.use_iconmap === 'undefined'){
+					this.data.use_iconmap = '0';
+				}
+
+				// if element is image we unset advanced icons
+				if(this.data.elementtype === '4'){
 					this.data.iconid_on = '0';
 					this.data.iconid_maintenance = '0';
 					this.data.iconid_disabled = '0';
@@ -859,6 +874,10 @@ ZABBIX.apps.map = (function(){
 				this.trigger('afterMove', this);
 			},
 
+			/**
+			 * Updates element position.
+			 * @param {Object} coords
+			 */
 			updatePosition: function(coords){
 				this.data.x = coords.x;
 				this.data.y = coords.y;
@@ -867,6 +886,9 @@ ZABBIX.apps.map = (function(){
 				this.trigger('afterMove', this);
 			},
 
+			/**
+			 * Remove element.
+			 */
 			remove: function(){
 				this.domNode.remove();
 				delete this.sysmap.data.selements[this.id];
@@ -877,6 +899,10 @@ ZABBIX.apps.map = (function(){
 				delete this.sysmap.selection.selements[this.id];
 			},
 
+			/**
+			 * Toggle element selection.
+			 * @param {Boolean} state
+			 */
 			toggleSelect: function(state){
 				state = state || !this.selected;
 
@@ -889,6 +915,10 @@ ZABBIX.apps.map = (function(){
 				return this.selected;
 			},
 
+			/**
+			 * Align element to map or map grid.
+			 * @param {Boolean} doAutoAlign if we should align element to grid
+			 */
 			align: function(doAutoAlign){
 				var dims = {
 						height: this.domNode.height(),
@@ -981,14 +1011,30 @@ ZABBIX.apps.map = (function(){
 				}
 			},
 
+			/**
+			 * Updates element icon and height/witdh in case element is area type.
+			 */
 			updateIcon: function(){
 				var oldIconClass = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);
 
-				if(oldIconClass !== null){
+				if (oldIconClass !== null) {
 					this.domNode.removeClass(oldIconClass[0]);
 				}
 
-				this.domNode.addClass('sysmap_iconid_'+this.data.iconid_off);
+
+				if (((this.data.use_iconmap === '1') && (this.sysmap.data.iconmapid !== '0')) &&
+					(
+						(this.data.elementtype === '0') ||
+						(
+							(this.data.elementtype === '3') && (this.data.elementsubtype === '1')
+						)
+					)
+				) {
+					this.domNode.addClass('sysmap_iconid_'+this.sysmap.defaultAutoIconId);
+				}
+				else {
+					this.domNode.addClass('sysmap_iconid_'+this.data.iconid_off);
+				}
 
 				if((this.data.elementtype === '3') && (this.data.elementsubtype === '1')){
 					if(this.data.areatype === '1'){
@@ -1022,6 +1068,11 @@ ZABBIX.apps.map = (function(){
 		Observer.makeObserver(Selement.prototype);
 
 
+		/**
+		 * Form for elements.
+		 * @param {Object} formContainer jQuery object
+		 * @param {Object} sysmap
+		 */
 		function SelementForm(formContainer, sysmap){
 			var formTplData = {
 					sysmapid: sysmap.sysmapid
@@ -1033,61 +1084,82 @@ ZABBIX.apps.map = (function(){
 					{
 						action: 'show',
 						value: '#subtypeRow, #hostGroupSelectRow',
-						cond: {
+						cond: [{
 							elementType: '3'
-						}
+						}]
 					},
 					{
 						action: 'show',
 						value: '#hostSelectRow',
-						cond: {
+						cond: [{
 							elementType: '0'
-						}
+						}]
 					},
 					{
 						action: 'show',
 						value: '#triggerSelectRow',
-						cond: {
+						cond: [{
 							elementType: '2'
-						}
+						}]
 					},
 					{
 						action: 'show',
 						value: '#mapSelectRow',
-						cond: {
+						cond: [{
 							elementType: '1'
-						}
+						}]
 					},
 					{
 						action: 'show',
 						value: '#areaTypeRow, #areaPlacingRow',
-						cond: {
+						cond: [{
 							elementType: '3',
 							subtypeHostGroupElements: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'show',
 						value: '#areaSizeRow',
-						cond: {
+						cond: [{
 							elementType: '3',
 							subtypeHostGroupElements: 'checked',
 							areaTypeCustom: 'checked'
-						}
-					},
-					{
-						action: 'show',
-						value: '#iconProblemRow, #iconMainetnanceRow, #iconDisabledRow',
-						cond: {
-							advanced_icons: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'hide',
-						value: '#advancedIconsRow',
-						cond: {
+						value: '#iconProblemRow, #iconMainetnanceRow, #iconDisabledRow',
+						cond: [{
 							elementType: '4'
-						}
+						}]
+					},
+					{
+						action: 'disable',
+						value: '#iconid_off, #iconid_on, #iconid_maintenance, #iconid_disabled',
+						cond: [
+							{
+								use_iconmap: 'checked',
+								elementType: '0'
+							},
+							{
+								use_iconmap: 'checked',
+								elementType: '3',
+								subtypeHostGroupElements: 'checked'
+							}
+						]
+					},
+					{
+						action: 'show',
+						value: '#useIconMapRow',
+						cond: [
+							{
+								elementType: '0'
+							},
+							{
+								elementType: '3',
+								subtypeHostGroupElements: 'checked'
+							}
+						]
 					}
 				];
 
@@ -1112,21 +1184,42 @@ ZABBIX.apps.map = (function(){
 			jQuery('#elementApply, #elementRemove, #elementClose').button();
 
 
+			if(this.sysmap.data.iconmapid === '0'){
+				jQuery('#use_iconmapLabel')
+					.mouseenter(function(){
+						hintBox.showOver(this, locale['S_ICONMAP_IS_NOT_ENABLED']);
+					})
+					.mouseleave(function(){
+						hintBox.hideOut(this);
+					});
+			}
+
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
 		}
 		SelementForm.prototype = {
+
+			/**
+			 * Shows lement form.
+			 */
 			show: function(){
 				this.formContainer.draggable("option", "handle", '#formDragHandler');
 				this.domNode.toggle(true);
 				this.active = true;
 			},
 
+			/**
+			 * Hides element form.
+			 */
 			hide: function(){
 				this.domNode.toggle(false);
 				this.active = false;
 			},
 
+			/**
+			 * Adds element urls to form.
+			 * @param {Object} urls
+			 */
 			addUrls: function(urls){
 				var tpl = new Template(jQuery('#selementFormUrls').html()),
 					i,
@@ -1149,6 +1242,10 @@ ZABBIX.apps.map = (function(){
 				}
 			},
 
+			/**
+			 * Set form controls with element fields values.
+			 * @param {Object} selement
+			 */
 			setValues: function(selement){
 				var elementName;
 
@@ -1156,17 +1253,30 @@ ZABBIX.apps.map = (function(){
 					jQuery('[name='+elementName+']', this.domNode).val([selement[elementName]]);
 				}
 
-				jQuery('#advanced_icons').attr('checked', (selement.iconid_on != 0) || (selement.iconid_maintenance != 0) || (selement.iconid_disabled != 0));
-
 				// clear urls
 				jQuery('#urlContainer tr').remove();
 				this.addUrls(selement.urls);
 
+				// should be unchecked before action processor
+				if(this.sysmap.data.iconmapid === '0'){
+					jQuery('#use_iconmap')
+						.prop('checked', false);
+				}
+
 				this.actionProcessor.process();
+
+				if(this.sysmap.data.iconmapid === '0'){
+					jQuery('#use_iconmap')
+						.prop('disabled', true);
+				}
 
 				this.updateList(selement.selementid);
 			},
 
+			/**
+			 * Gets form values for element fields.
+			 * @retrurns {Object|Boolean}
+			 */
 			getValues: function(){
 				var values = jQuery('#selementForm').serializeArray(),
 					data = {
@@ -1176,7 +1286,6 @@ ZABBIX.apps.map = (function(){
 					urlPattern = /^url_(\d+)_(name|url)$/,
 					url,
 					urlNames = {};
-
 
 				for(i = 0; i < values.length; i++){
 					url = urlPattern.exec(values[i].name);
@@ -1227,6 +1336,10 @@ ZABBIX.apps.map = (function(){
 				return data;
 			},
 
+			/**
+			 * Updates links list for element.
+			 * @param {String} selementid
+			 */
 			updateList: function(selementid){
 				var links = this.sysmap.getLinksBySelementIds(selementid),
 					rowTpl,
@@ -1301,6 +1414,11 @@ ZABBIX.apps.map = (function(){
 			}
 		};
 
+		/**
+		 * Elements mass update form.
+		 * @param {Object} formContainer jQuery object
+		 * @param {Object} sysmap
+		 */
 		function MassForm(formContainer, sysmap){
 			var i,
 				icon,
@@ -1308,44 +1426,51 @@ ZABBIX.apps.map = (function(){
 					{
 						action: 'enable',
 						value: '#massLabel',
-						cond: {
+						cond: [{
 							chkboxLabel: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'enable',
 						value: '#massLabelLocation',
-						cond: {
+						cond: [{
 							chkboxLabelLocation: 'checked'
-						}
+						}]
+					},
+					{
+						action: 'enable',
+						value: '#massUseIconmap',
+						cond: [{
+							chkboxMassUseIconmap: 'checked'
+						}]
 					},
 					{
 						action: 'enable',
 						value: '#massIconidOff',
-						cond: {
+						cond: [{
 							chkboxMassIconidOff: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'enable',
 						value: '#massIconidOn',
-						cond: {
+						cond: [{
 							chkboxMassIconidOn: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'enable',
 						value: '#massIconidMaintenance',
-						cond: {
+						cond: [{
 							chkboxMassIconidMaintenance: 'checked'
-						}
+						}]
 					},
 					{
 						action: 'enable',
 						value: '#massIconidDisabled',
-						cond: {
+						cond: [{
 							chkboxMassIconidDisabled: 'checked'
-						}
+						}]
 					}
 				];
 
@@ -1373,6 +1498,10 @@ ZABBIX.apps.map = (function(){
 			this.actionProcessor.process();
 		}
 		MassForm.prototype = {
+
+			/**
+			 * Show mass update form.
+			 */
 			show: function(){
 				this.formContainer.draggable("option", "handle", '#massDragHandler');
 				jQuery('#massElementCount').text(this.sysmap.selection.count);
@@ -1381,6 +1510,9 @@ ZABBIX.apps.map = (function(){
 				this.updateList();
 			},
 
+			/**
+			 * Hide mass update form.
+			 */
 			hide: function(){
 				this.domNode.toggle(false);
 				jQuery(':checkbox', this.domNode).prop('checked', false);
@@ -1392,14 +1524,25 @@ ZABBIX.apps.map = (function(){
 				this.actionProcessor.process();
 			},
 
-			getValues: function(){
+			/**
+			 * Get values from mass update form that should be updated in all selected elements.
+			 * @returns {Array}
+			 */
+			getValues: function() {
 				var values = jQuery('#massForm').serializeArray(),
 					data = {},
 					i,
 					ln;
 
-				for(i = 0, ln = values.length; i < ln; i++){
-					if(values[i].name.match(/^chkbox_/) !== null) continue;
+				for (i = 0, ln = values.length; i < ln; i++) {
+					// special case for use iconmap checkbox, because unchecked checkbox is not submitted with form
+					if (values[i].name === 'chkbox_use_iconmap') {
+						data['use_iconmap'] = '0';
+					}
+
+					if (values[i].name.match(/^chkbox_/) !== null) {
+						continue;
+					}
 
 					data[values[i].name] = values[i].value.toString();
 				}
@@ -1407,6 +1550,9 @@ ZABBIX.apps.map = (function(){
 				return data;
 			},
 
+			/**
+			 * Updates list of selected elements in mass update form.
+			 */
 			updateList: function(){
 				var tpl = new Template(jQuery('#mapMassFormListRow').html()),
 					id,
@@ -1459,6 +1605,11 @@ ZABBIX.apps.map = (function(){
 			}
 		};
 
+		/**
+		 * Form for editin links.
+		 * @param {Object} formContainer jQuesry object
+		 * @param {Object} sysmap
+		 */
 		function LinkForm(formContainer, sysmap){
 			this.sysmap = sysmap;
 			this.formContainer = formContainer;
@@ -1470,17 +1621,26 @@ ZABBIX.apps.map = (function(){
 			jQuery('#formLinkApply, #formLinkRemove, #formLinkClose').button();
 		}
 		LinkForm.prototype = {
+			/**
+			 * Show form.
+			 */
 			show: function(){
 				this.domNode.toggle(true);
 				jQuery('#elementApply, #elementRemove').button('disable');
 			},
 
+			/**
+			 * Hide form.
+			 */
 			hide: function(){
 				jQuery('#linksList tr').removeClass('selected');
 				this.domNode.toggle(false);
 				jQuery('#elementApply, #elementRemove').button('enable');
 			},
 
+			/**
+			 * Get form values for link fields.
+			 */
 			getValues: function(){
 				var values = jQuery('#linkForm').serializeArray(),
 					data = {
@@ -1507,6 +1667,10 @@ ZABBIX.apps.map = (function(){
 				return data;
 			},
 
+			/**
+			 * update form controls with values from link.
+			 * @param {Object} link
+			 */
 			setValues: function(link){
 				var selement1,
 					tmp,
@@ -1574,6 +1738,10 @@ ZABBIX.apps.map = (function(){
 				this.addTriggers(link.linktriggers);
 			},
 
+			/**
+			 * Add triggers to link form.
+			 * @param {Object} triggers
+			 */
 			addTriggers: function(triggers){
 				var tpl = new Template(jQuery('#linkTriggerRow').html()),
 					linkTrigger;
@@ -1588,6 +1756,10 @@ ZABBIX.apps.map = (function(){
 				jQuery('.colorpicker', this.domNode).change();
 			},
 
+			/**
+			 * Add new triggers which were selected in popup to trigger list.
+			 * @param {Object} triggers
+			 */
 			addNewTriggers: function(triggers){
 				var tpl = new Template(jQuery('#linkTriggerRow').html()),
 					linkTrigger = {

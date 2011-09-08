@@ -83,6 +83,10 @@ ALTER TABLE sysmaps_elements ADD viewtype integer WITH DEFAULT '0' NOT NULL
 /
 REORG TABLE sysmaps_elements
 /
+ALTER TABLE sysmaps_elements ADD use_iconmap integer WITH DEFAULT '1' NOT NULL
+/
+REORG TABLE sysmaps_elements
+/
 DELETE FROM sysmaps_elements WHERE sysmapid NOT IN (SELECT sysmapid FROM sysmaps)
 /
 UPDATE sysmaps_elements SET iconid_off=NULL WHERE iconid_off=0
