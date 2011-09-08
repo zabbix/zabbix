@@ -8109,7 +8109,6 @@ INSERT INTO items_applications VALUES (978,57,17461);
 INSERT INTO items_applications VALUES (979,57,17462);
 INSERT INTO items_applications VALUES (980,57,17463);
 INSERT INTO items_applications VALUES (981,57,17464);
-INSERT INTO items_applications VALUES (982,57,17465);
 INSERT INTO items_applications VALUES (1070,58,17509);
 INSERT INTO items_applications VALUES (1072,58,17510);
 INSERT INTO items_applications VALUES (1074,58,17511);
