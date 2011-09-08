@@ -685,7 +685,7 @@ function bar_report_form3(){
 	$txtCondVal = new CTextBox('items[0][name]',$description,50,'yes');
 	$btnSelect = new CButton('btn1',S_SELECT,
 			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
-			"&dstfld1=items_0_itemid&dstfld2=items_0_description&".
+			"&dstfld1=items_0_itemid&dstfld2=items_0_name&".
 			"srctbl=items&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
 			'T');
 

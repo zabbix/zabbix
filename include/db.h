@@ -307,39 +307,44 @@ typedef struct
 }
 DB_EVENT;
 
+typedef union
+{
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+}
+history_value_t;
+
 typedef struct
 {
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	hostid;
-	zbx_item_type_t	type;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	zbx_item_type_t		type;
 	zbx_item_data_type_t	data_type;
 	zbx_item_status_t	status;
-	char	*key;
-	char	*host_name;
-	int     history;
-	int	trends;
-	char	*prevorgvalue_str;
-	double	prevorgvalue_dbl;
-	zbx_uint64_t	prevorgvalue_uint64;
-	int	prevorgvalue_null;
-	char	*lastvalue_str;
-	double	lastvalue_dbl;
-	zbx_uint64_t	lastvalue_uint64;
-	int	lastclock;
-	int	lastns;
-	int     lastvalue_null;
-	char	*prevvalue_str;
-	double	prevvalue_dbl;
-	zbx_uint64_t	prevvalue_uint64;
-	int     prevvalue_null;
-	time_t  lastcheck;
+	char			*key;
+	char			*host_name;
+	int			history;
+	int			trends;
+	char			*lastvalue[2];
+	int			prevorgvalue_null;
+	history_value_t		prevorgvalue;
+	int			lastclock;
+	int			lastns;
+	time_t 			lastcheck;
 	zbx_item_value_type_t	value_type;
-	int	delta;
-	int	multiplier;
-	char	*units;
-	char	*formula;
-	zbx_uint64_t	valuemapid;
-	char	*error;
+	int			delta;
+	int			multiplier;
+	char			*units;
+	char			*formula;
+	zbx_uint64_t		valuemapid;
+	char			*error;
+
+	char			*h_lastvalue[2];
+	char			*h_lasteventid;
+	char			*h_lastsource;
+	char			*h_lastseverity;
 }
 DB_ITEM;
 
@@ -347,10 +352,10 @@ typedef struct
 {
 	zbx_uint64_t	mediaid;
 	zbx_uint64_t	mediatypeid;
-	char	*sendto;
-	char	*period;
-	int	active;
-	int	severity;
+	char		*sendto;
+	char		*period;
+	int		active;
+	int		severity;
 }
 DB_MEDIA;
 
@@ -571,6 +576,7 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
+void	DBfree_item_from_db(DB_ITEM *item);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);

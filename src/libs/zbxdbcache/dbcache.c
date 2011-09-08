@@ -76,15 +76,6 @@ ZBX_DC_IDS;
 
 static ZBX_DC_IDS	*ids = NULL;
 
-typedef union
-{
-	double		dbl;
-	zbx_uint64_t	ui64;
-	char		*str;
-	char		*err;
-}
-history_value_t;
-
 typedef struct
 {
 	zbx_uint64_t	itemid;
@@ -818,7 +809,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	}
 
 	if (0 == item_num)
-		goto clean;
+		goto clean_items;
 
 	zbx_hashset_create(&trigger_info, MAX(100, 2 * item_num),
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -828,6 +819,11 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num);
 
+	if (0 == trigger_order.values_num)
+		goto clean_triggers;
+
+	evaluate_expressions(&trigger_order);
+
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 7, "begin\n");
 #endif
@@ -835,9 +831,6 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < trigger_order.values_num; i++)
 	{
 		trigger = (DC_TRIGGER *)trigger_order.values[i];
-
-		evaluate_expression(trigger->triggerid, &trigger->expression, trigger->timespec.sec,
-				trigger->value, &trigger->new_value, &trigger->new_error);
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_allocated, &sql_offset, trigger->triggerid,
 				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->new_value,
@@ -869,10 +862,10 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid, &trigger->timespec,
 				trigger->new_value, trigger->value_changed, 0, 0);
 	}
-
+clean_triggers:
 	zbx_hashset_destroy(&trigger_info);
 	zbx_vector_ptr_destroy(&trigger_order);
-clean:
+clean_items:
 	zbx_free(itemids);
 	zbx_free(timespecs);
 
@@ -923,11 +916,11 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 					zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
 							",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
 
-					if (0 == item->prevorgvalue_null && item->prevorgvalue_dbl <= h->value_orig.dbl &&
+					if (0 == item->prevorgvalue_null && item->prevorgvalue.dbl <= h->value_orig.dbl &&
 							(item->lastclock < h->clock ||
 								(item->lastclock == h->clock && item->lastns < h->ns)))
 					{
-						h->value.dbl = (h->value_orig.dbl - item->prevorgvalue_dbl) /
+						h->value.dbl = (h->value_orig.dbl - item->prevorgvalue.dbl) /
 								((h->clock - item->lastclock) +
 									(double)(h->ns - item->lastns) / 1000000000);
 						h->value.dbl = DBmultiply_value_float(item, h->value.dbl);
@@ -945,9 +938,9 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 					zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
 							",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
 
-					if (0 == item->prevorgvalue_null && item->prevorgvalue_dbl <= h->value_orig.dbl)
+					if (0 == item->prevorgvalue_null && item->prevorgvalue.dbl <= h->value_orig.dbl)
 					{
-						h->value.dbl = h->value_orig.dbl - item->prevorgvalue_dbl;
+						h->value.dbl = h->value_orig.dbl - item->prevorgvalue.dbl;
 						h->value.dbl = DBmultiply_value_float(item, h->value.dbl);
 
 						if (SUCCEED != DBchk_double(h->value.dbl))
@@ -992,11 +985,11 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
 
 					if (0 == item->prevorgvalue_null &&
-							item->prevorgvalue_uint64 <= h->value_orig.ui64 &&
+							item->prevorgvalue.ui64 <= h->value_orig.ui64 &&
 							(item->lastclock < h->clock ||
 								(item->lastclock == h->clock && item->lastns < h->ns)))
 					{
-						h->value.ui64 = (h->value_orig.ui64 - item->prevorgvalue_uint64) /
+						h->value.ui64 = (h->value_orig.ui64 - item->prevorgvalue.ui64) /
 								((h->clock - item->lastclock) +
 									(double)(h->ns - item->lastns) / 1000000000);
 						h->value.ui64 = DBmultiply_value_uint64(item, h->value.ui64);
@@ -1008,9 +1001,9 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 					zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 64,
 							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
 
-					if (0 == item->prevorgvalue_null && item->prevorgvalue_uint64 <= h->value_orig.ui64)
+					if (0 == item->prevorgvalue_null && item->prevorgvalue.ui64 <= h->value_orig.ui64)
 					{
-						h->value.ui64 = h->value_orig.ui64 - item->prevorgvalue_uint64;
+						h->value.ui64 = h->value_orig.ui64 - item->prevorgvalue.ui64;
 						h->value.ui64 = DBmultiply_value_uint64(item, h->value.ui64);
 					}
 					else
@@ -1199,10 +1192,10 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 			switch (h->value_type)
 			{
 				case ITEM_VALUE_TYPE_FLOAT:
-					item.prevorgvalue_dbl = atof(row[3]);
+					item.prevorgvalue.dbl = atof(row[3]);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
-					ZBX_STR2UINT64(item.prevorgvalue_uint64, row[3]);
+					ZBX_STR2UINT64(item.prevorgvalue.ui64, row[3]);
 					break;
 			}
 		}
