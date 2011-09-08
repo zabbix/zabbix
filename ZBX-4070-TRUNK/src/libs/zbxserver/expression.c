@@ -2953,9 +2953,9 @@ empty:
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_expression                                              *
+ * Function: evaluate_expressions                                             *
  *                                                                            *
- * Purpose: evaluate trigger expression                                       *
+ * Purpose: evaluate trigger expressions                                      *
  *                                                                            *
  * Parameters: triggers - [IN] array of DC_TRIGGER structures                 *
  *                                                                            *
