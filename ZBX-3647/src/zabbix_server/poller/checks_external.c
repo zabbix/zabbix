@@ -45,41 +45,16 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
 int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_external";
-	char		key[MAX_STRING_LEN], params[MAX_STRING_LEN], param[MAX_STRING_LEN],
-			error[ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL, *addr_esc, *param_esc;
-	int		n, cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0, ret = NOTSUPPORTED;
+	char		key[MAX_STRING_LEN], params[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX],
+			*cmd = NULL, *buf = NULL, *addr_esc;
+	int		rc, cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0, ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
-	switch (parse_command(item->key, key, sizeof(key), params, sizeof(params)))
+	if (0 == (rc = parse_command(item->key, key, sizeof(key), params, sizeof(params))))
 	{
-		case 0:
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
-			goto notsupported;
-		case 1:	/* key without parameters */
-			*param = '\0';
-			break;
-		case 2:	/* key with parameters */
-			if (0 == (n = num_param(params)))
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
-				goto notsupported;
-			}
-
-			if (1 < n)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters"));
-				goto notsupported;
-			}
-
-			if (0 != get_param(params, 1, param, sizeof(param)))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-				*param = '\0';
-			}
-			break;
-		default:
-			assert(0);
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
+		goto notsupported;
 	}
 
 	cmd = zbx_malloc(cmd, cmd_alloc);
@@ -96,14 +71,30 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, strlen(addr_esc) + 4, " \"%s\"", addr_esc);
 	zbx_free(addr_esc);
 
-	if ('\0' != *param)
+	if (2 == rc)	/* key with parameters */
 	{
-		param_esc = zbx_dyn_escape_string(param, "\"\\");
-		zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, strlen(param_esc) + 4, " \"%s\"", param_esc);
-		zbx_free(param_esc);
-	}
+		int	n;
+		char	param[MAX_STRING_LEN], *param_esc;
 
-	zabbix_log(LOG_LEVEL_CRIT, "%s() '%s'", __function_name, cmd);
+		if (0 == (rc = num_param(params)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
+			goto notsupported;
+		}
+
+		for (n = 1; n <= rc; n++)
+		{
+			if (0 != get_param(params, n, param, sizeof(param)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				*param = '\0';
+			}
+
+			param_esc = zbx_dyn_escape_string(param, "\"\\");
+			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, strlen(param_esc) + 4, " \"%s\"", param_esc);
+			zbx_free(param_esc);
+		}
+	}
 
 	if (SUCCEED == zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT))
 	{
