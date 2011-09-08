@@ -15,6 +15,7 @@ New features:
  - [ZBXNEXT-863] renamed "host profile" to "host inventory" (dimir)
 
 Bug fixes:
+ - [ZBX-3647] fixed parsing of parameter in external scripts, now it works like in normal keys (Sasha)
  - [ZBX-4049] fixed memory leak in configuration syncer (rudolfs)
  - [ZBX-4017] fixed host deletion using api (Vedmak)
  - [ZBX-4029,ZBX-4037] fixed inconsistent and untranslatable strings in frontend and clarified frontend messages (Richlv)

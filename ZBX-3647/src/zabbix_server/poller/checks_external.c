@@ -45,61 +45,79 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
 int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_external";
-	char		*params = NULL, *command = NULL,
-			*p, *pl, *pr = NULL, error[ITEM_ERROR_LEN_MAX],
-			*buf = NULL;
-	int		ret = SUCCEED;
+	char		key[MAX_STRING_LEN], params[MAX_STRING_LEN], param[MAX_STRING_LEN],
+			error[ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL, *addr_esc, *param_esc;
+	int		n, cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0, ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
-	if (NULL != (pl = strchr(item->key, '[')))
+	switch (parse_command(item->key, key, sizeof(key), params, sizeof(params)))
 	{
-		*pl = '\0';
-		params = pl + 1;
+		case 0:
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
+			goto notsupported;
+		case 1:	/* key without parameters */
+			*param = '\0';
+			break;
+		case 2:	/* key with parameters */
+			if (0 == (n = num_param(params)))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
+				goto notsupported;
+			}
 
-		if (NULL != (pr = strchr(params, ']')))
-			*pr = '\0';
-		else
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "External check is not supported."
-						" No closing bracket ']' found."));
-			ret = NOTSUPPORTED;
-			goto exit;
-		}
+			if (1 < n)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters"));
+				goto notsupported;
+			}
+
+			if (0 != get_param(params, 1, param, sizeof(param)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				*param = '\0';
+			}
+			break;
+		default:
+			assert(0);
 	}
 
-	if (NULL != params)
-		command = zbx_dsprintf(command, "%s/%s %s %s",
-				CONFIG_EXTERNALSCRIPTS, item->key, item->interface.addr, params);
-	else
-		command = zbx_dsprintf(command, "%s/%s %s",
-				CONFIG_EXTERNALSCRIPTS, item->key, item->interface.addr);
+	cmd = zbx_malloc(cmd, cmd_alloc);
+	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, strlen(CONFIG_EXTERNALSCRIPTS) + strlen(key) + 2,
+			"%s/%s", CONFIG_EXTERNALSCRIPTS, key);
 
-	if (SUCCEED == zbx_execute(command, &buf, error, sizeof(error), CONFIG_TIMEOUT))
+	if (-1 == access(cmd, F_OK | X_OK))
 	{
-		/* we only care about the first line */
-		if (NULL != (p = strchr(buf, '\n')))
-			*p = '\0';
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s: %s", cmd, zbx_strerror(errno)));
+		goto notsupported;
+	}
 
+	addr_esc = zbx_dyn_escape_string(item->interface.addr, "\"\\");
+	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, strlen(addr_esc) + 4, " \"%s\"", addr_esc);
+	zbx_free(addr_esc);
+
+	if ('\0' != *param)
+	{
+		param_esc = zbx_dyn_escape_string(param, "\"\\");
+		zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, strlen(param_esc) + 4, " \"%s\"", param_esc);
+		zbx_free(param_esc);
+	}
+
+	zabbix_log(LOG_LEVEL_CRIT, "%s() '%s'", __function_name, cmd);
+
+	if (SUCCEED == zbx_execute(cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT))
+	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 
-		if (SUCCEED != set_result_type(result, item->value_type, item->data_type, buf))
-			ret = NOTSUPPORTED;
+		if (SUCCEED == set_result_type(result, item->value_type, item->data_type, buf))
+			ret = SUCCEED;
+
+		zbx_free(buf);
 	}
 	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot execute script: %s", error);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
-		ret = NOTSUPPORTED;
-	}
-
-	zbx_free(buf);
-	zbx_free(command);
-exit:
-	if (NULL != pl)
-		*pl = '[';
-	if (NULL != pr)
-		*pr = ']';
+notsupported:
+	zbx_free(cmd);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
