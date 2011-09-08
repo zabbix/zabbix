@@ -19,17 +19,27 @@
 # Only tables listed are considered for data retrieval, and there is support for
 #  additional finetuning:
 #
-# 1. Blacklist
-#    Blacklist support allows to specify which fields should never be dumped from
-#     the specified tables. This is mostly used to exclude runtime data like last
-#     value, status or error messages. Blacklist entries are specified in
-#     BLACKLISTFILE file. Each line contains space separated:
+# 1. Blacklist by field
+#    Blacklist by field support allows to specify which fields should never be
+#     dumped from the specified tables. This is mostly used to exclude runtime
+#     data like last value, status or error messages. Blacklist entries are
+#     specified in BLACKLISTFILE file. Each line contains space separated:
 #         table field1 field2 field3...
 #
 #    Adding a hash mark (#) in front of the line will indicate that it is a
 #     comment.
 #
-# 2. Filter
+# 2. Blacklist by value
+#    Blacklist by value support allows to exclude rows based on a value of a
+#     specific field. Currently used to exclude low level discovery created
+#     entities. Blacklist entries are specified in BLACKLISTVALFILE file. Each
+#     line contains space separated:
+#         table field value1 value2 value3...
+#
+#    Adding a hash mark (#) in front of the line will indicate that it is a
+#     comment.
+
+# 3. Filter
 #    Filter allows to dump only specific entries from some tables. This is
 #     currently used to dump only interesting entries from the 'profiles' table.
 #    Filter entries are specified in FILTERFILE file. Each line contains space
@@ -41,7 +51,7 @@
 #    Adding a hash mark (#) in front of the line will indicate that it is a
 #     comment.
 #
-# 3. Pre-dump hook
+# 4. Pre-dump hook
 #    Pre-dump hook allows to execute a query right before dumping as specific
 #     table.
 #    Pre-dump hook entries are specified in PREDUMPHOOKFILE file. Each line
@@ -61,6 +71,7 @@ MYSQLLINE="mysql -N $DB"
 TMPFILE=/tmp/data_sql_tmp_dump.sql
 FINALFILE=final_data.sql
 BLACKLISTFILE=data_sql_blacklist.txt
+BLACKLISTVALFILE=data_sql_blacklistbyval.txt
 FILTERFILE=data_sql_filter.txt
 PREDUMPHOOKFILE=data_sql_predumphooks.txt
 >"$FINALFILE"
@@ -163,7 +174,7 @@ for TABLE in $TABLES; do
 		}
 	done < <(echo "show columns from $TABLE;" | $MYSQLLINE -t | awk '{FS="|"}; {print $2,$6}' | strings | awk '{print $1,$2}')
 	[[ "$DIFFERENT_FIELDS" ]] && {
-		# --- blacklist file must have table name, followed by blacklisted fields - all space separated
+		# --- blacklist by field file must have table name, followed by blacklisted fields - all space separated
 		BLACKLIST=$(grep -v ^# "$BLACKLISTFILE" 2>/dev/null | grep $TABLE 2>/dev/null)
 		[[ "$BLACKLIST" ]] && {
 			BLACKFIELDS=$(echo $BLACKLIST | cut -d" " -f2-)
@@ -171,6 +182,18 @@ for TABLE in $TABLES; do
 				DIFFERENT_FIELDS=$(echo $DIFFERENT_FIELDS | sed "s/,${BLACKFIELD}//")
 			done
 		}
+
+		# --- blacklist by value file must have table name, followed by the field to blacklist on, then followed by values to match - all space separated
+		BLACKLISTBYVAL=$(grep -v ^# "$BLACKLISTVALFILE" 2>/dev/null | grep $TABLE 2>/dev/null)
+		[[ "$BLACKLISTBYVAL" ]] && {
+			BLACKLISTBYVALFIELD=$(echo $BLACKLISTBYVAL | cut -d" " -f2)
+			BLACKLISTBYVALVALUES=$(echo $BLACKLISTBYVAL | cut -d" " -f3-)
+			for BLACKLISTBYVALVALUE in $BLACKLISTBYVALVALUES; do
+				FINALBLACKLISTBYVALVALUE="$FINALBLACKLISTBYVALVALUE,$BLACKLISTBYVALVALUE"
+			done
+			FINALBLACKLISTBYVALVALUE="where $BLACKLISTBYVALFIELD not in (${FINALBLACKLISTBYVALVALUE#,})"
+		}
+
 		# --- filter file must have table name, followed by field to filter on, then followed by values to match - all space separated
 		FILTER=$(grep -v ^# "$FILTERFILE" 2>/dev/null | grep $TABLE 2>/dev/null)
 		[[ "$FILTER" ]] && {
