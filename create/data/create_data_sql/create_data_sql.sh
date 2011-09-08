@@ -4,6 +4,18 @@
 # what to do for host_inventory if inventory_mode=1 (automatic) ?
 # items, triggers, graphs... skip if flags=0x04 ! (autocreated)
 
+# select * from graphs_items where graphid not in (select graphid from graphs where flags=4)
+# screens - items, graphs, custom graphs
+# items-applications
+# items-graphs
+# maps - triggers
+# triggers-functions
+# trigger deps - not needed
+# items - graph ymax/min id
+
+# don't add active network discovery or autoreg rules (hosts won't be skipped)
+
+
 # This script can be used to create data.sql from a database.
 # It creates sql file that is suitable for importing on top of schema.sql.
 # INSERT statements refer to fields by name to avoid field ordering problems,
@@ -72,6 +84,7 @@ TMPFILE=/tmp/data_sql_tmp_dump.sql
 FINALFILE=final_data.sql
 BLACKLISTFILE=data_sql_blacklist.txt
 BLACKLISTVALFILE=data_sql_blacklistbyval.txt
+BLACKLISTVALREFFILE=data_sql_blacklistbyval_ref.txt
 FILTERFILE=data_sql_filter.txt
 PREDUMPHOOKFILE=data_sql_predumphooks.txt
 >"$FINALFILE"
@@ -192,6 +205,20 @@ for TABLE in $TABLES; do
 				FINALBLACKLISTBYVALVALUE="$FINALBLACKLISTBYVALVALUE,$BLACKLISTBYVALVALUE"
 			done
 			FINALBLACKLISTBYVALVALUE="where $BLACKLISTBYVALFIELD not in (${FINALBLACKLISTBYVALVALUE#,})"
+		}
+
+		# --- blacklist by referenced value file must have table name, followed by the field to do the lookup, followed by the field to match in the other table, followed by the table do do the lookup in, then followed by the field to blacklist on, then followed by values to match - all space separated
+		BLACKLISTBYVALREF=$(grep -v ^# "$BLACKLISTVALREFFILE" 2>/dev/null | grep $TABLE 2>/dev/null)
+		[[ "$BLACKLISTBYVALREF" ]] && {
+			BLACKLISTBYVALREFFIELD=$(echo $BLACKLISTBYVALREF | cut -d" " -f2)
+			BLACKLISTBYVALREFFIELDMATCH=$(echo $BLACKLISTBYVALREF | cut -d" " -f3)
+			BLACKLISTBYVALREFTABLE=$(echo $BLACKLISTBYVALREF | cut -d" " -f4)
+			BLACKLISTBYVALREFTABLEFIELD=$(echo $BLACKLISTBYVALREF | cut -d" " -f5)
+			BLACKLISTBYVALREFVALUES=$(echo $BLACKLISTBYVALREF | cut -d" " -f6-)
+			for BLACKLISTBYVALREFVALUE in $BLACKLISTBYVALREFVALUES; do
+				FINALBLACKLISTBYVALREFVALUE="$FINALBLACKLISTBYVALREFVALUE,$BLACKLISTBYVALREFVALUE"
+			done
+			FINALBLACKLISTBYVALREFVALUE="where $BLACKLISTBYVALREFFIELD not in (select $BLACKLISTBYVALREFFIELDMATCH from $BLACKLISTBYVALREFTABLE where $BLACKLISTBYVALREFTABLEFIELD in (${FINALBLACKLISTBYVALREFVALUE#,}))"
 		}
 
 		# --- filter file must have table name, followed by field to filter on, then followed by values to match - all space separated
