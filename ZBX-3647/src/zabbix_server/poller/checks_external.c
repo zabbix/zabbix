@@ -39,8 +39,6 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  *                                                                            *
  * Author: Mike Nestor, rewritten by Alexander Vladishev                      *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
@@ -73,18 +71,18 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (2 == rc)	/* key with parameters */
 	{
-		int	n;
+		int	i, n;
 		char	param[MAX_STRING_LEN], *param_esc;
 
-		if (0 == (rc = num_param(params)))
+		if (0 == (n = num_param(params)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Key is badly formatted"));
 			goto notsupported;
 		}
 
-		for (n = 1; n <= rc; n++)
+		for (i = 1; i <= n; i++)
 		{
-			if (0 != get_param(params, n, param, sizeof(param)))
+			if (0 != get_param(params, i, param, sizeof(param)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				*param = '\0';
