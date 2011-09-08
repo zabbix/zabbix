@@ -2,6 +2,7 @@
 Changes for 1.9.6
 
 New features:
+ - [ZBX-4116] fixed ibm_db2 update patch for help_items table (rudolfs)
  - [ZBXNEXT-895] redesign general->Macros (Eduard)
  - [ZBXNEXT-899] redesign general->Images (Eduard)
  - [ZBXNEXT-785] support of automatic selection of map icon element depending on element type (Vedmak,Eduard)
@@ -14,6 +15,7 @@ New features:
  - [ZBXNEXT-863] renamed "host profile" to "host inventory" (dimir)
 
 Bug fixes:
+ - [ZBX-2530] renamed "system.cpu.util" item parameters for solaris from "wait" to "iowait", from "kernel" to "system" (deniss)
  - [ZBX-4049] fixed memory leak in configuration syncer (rudolfs)
  - [ZBX-4017] fixed host deletion using api (Vedmak)
  - [ZBX-4029,ZBX-4037] fixed inconsistent and untranslatable strings in frontend and clarified frontend messages (Richlv)
@@ -202,6 +204,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.8rc1
 
+ - [ZBX-3676] fixed item selection in bar report (Eduard)
  - [ZBX-4070] improved performance of handling of trigger functions (Sasha)
  - [ZBXNEXT-921] added option to show items without data in latest data (Vedmak)
  - [ZBX-2457] changed "type" to "ENGINE" in MySQL upgrade patches for MySQL 5.5 compatibility (Richlv)
