@@ -15,6 +15,7 @@ New features:
  - [ZBXNEXT-863] renamed "host profile" to "host inventory" (dimir)
 
 Bug fixes:
+ - [ZBX-2530] renamed "system.cpu.util" item parameters for solaris from "wait" to "iowait", from "kernel" to "system" (deniss)
  - [ZBX-4049] fixed memory leak in configuration syncer (rudolfs)
  - [ZBX-4017] fixed host deletion using api (Vedmak)
  - [ZBX-4029,ZBX-4037] fixed inconsistent and untranslatable strings in frontend and clarified frontend messages (Richlv)
