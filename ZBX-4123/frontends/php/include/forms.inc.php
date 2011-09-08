@@ -1831,7 +1831,7 @@
 		if($limited)
 			$btnSelect = null;
 		else
-			$btnSelect = new CButton('btn1', S_SELECT,
+			$btnSelect = new CButton('btn1', _('Select'),
 				"return PopUp('popup.php?dstfrm=".$frmItem->getName()."&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype='+jQuery('#type option:selected').val());",
 				'T');
 
