@@ -541,7 +541,7 @@ INSERT INTO items VALUES (10014,0,'','',161,10001,'Free swap space','system.swap
 INSERT INTO items VALUES (10015,0,'','',161,10001,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (10016,0,'','',161,10001,'Number of users connected','system.users.num',60,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (10017,0,'','',161,10001,'Checksum of $1','vfs.file.cksum[/etc/inetd.conf]',600,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','','',0,0,'','','','',0);
-INSERT INTO items VALUES (10018,0,'','',161,10001,'Checksum of $1','vfs.file.cksum[/vmlinuz]',600,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (10018,0,'','',161,10001,'Checksum of $1','vfs.file.cksum[/boot/vmlinuz]',600,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (10019,0,'','',161,10001,'Checksum of $1','vfs.file.cksum[/etc/passwd]',600,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (10020,0,'','',161,10001,'Ping to the server (TCP)','agent.ping',30,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,1,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (10021,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/home,free]',30,7,365,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','',0);
@@ -1951,7 +1951,7 @@ INSERT INTO items VALUES (18484,0,'','',161,10017,'Checksum of $1','vfs.file.cks
 INSERT INTO items VALUES (18485,0,'','',161,10017,'Checksum of $1','vfs.file.cksum[/etc/services]',600,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10040,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (18486,0,'','',161,10017,'Checksum of $1','vfs.file.cksum[/usr/bin/ssh]',600,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10039,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (18487,0,'','',161,10017,'Checksum of $1','vfs.file.cksum[/usr/sbin/sshd]',600,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10038,0,'','','',0,0,'','','','',0);
-INSERT INTO items VALUES (18488,0,'','',161,10017,'Checksum of $1','vfs.file.cksum[/vmlinuz]',600,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10018,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (18488,0,'','',161,10017,'Checksum of $1','vfs.file.cksum[/boot/vmlinuz]',600,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10018,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (18489,0,'','',161,10017,'Free number of inodes on $1','vfs.fs.inode[/,free]',60,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10005,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (18490,0,'','',161,10017,'Free number of inodes on $1 in %','vfs.fs.inode[/,pfree]',30,7,365,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17330,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (18491,0,'','',161,10017,'Total number of inodes on $1','vfs.fs.inode[/,total]',3600,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10062,0,'','','',0,0,'','','','',0);
