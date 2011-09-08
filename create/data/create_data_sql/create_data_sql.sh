@@ -2,14 +2,12 @@
 
 # TODO for 2.0:
 # what to do for host_inventory if inventory_mode=1 (automatic) ?
-# items, triggers, graphs... skip if flags=0x04 ! (autocreated)
 
-# select * from graphs_items where graphid not in (select graphid from graphs where flags=4)
 # screens - items, graphs, custom graphs
-# items-applications
 # items-graphs
 # maps - triggers
 # triggers-functions
+# triggers-functions-items (can't be handled currently)
 # trigger deps - not needed
 # items - graph ymax/min id
 
