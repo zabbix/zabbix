@@ -374,7 +374,7 @@ int	zbx_json_close(struct zbx_json *j)
 {
 	if (1 == j->level)
 	{
-		zbx_set_json_strerror("Can't close top level object");
+		zbx_set_json_strerror("cannot close top level object");
 		return FAIL;
 	}
 
