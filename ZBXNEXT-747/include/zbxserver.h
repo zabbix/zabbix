@@ -46,8 +46,7 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_host,
 		DB_ESCALATION *escalation, char **data, int macro_type, char *error, int maxerrlen);
 
-void	evaluate_expression(zbx_uint64_t triggerid, char **expression, time_t now, unsigned char value,
-		unsigned char *new_value, char **new_error);
+void	evaluate_expressions(zbx_vector_ptr_t *triggers);
 int	evaluate(double *value, char *exp, char *error, int maxerrlen);
 void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row);
 

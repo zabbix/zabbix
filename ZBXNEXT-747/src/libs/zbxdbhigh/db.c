@@ -996,23 +996,20 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
 static int	DBget_escape_string_len(const char *src)
 {
 	const char	*s;
-	int		len = 0;
+	int		len = 1;	/* '\0' */
 
-	len++;	/* '\0' */
-
-	for (s = src; s && *s; s++)
+	for (s = src; NULL != s && '\0' != *s; s++)
 	{
-		if (*s == '\r')
+		if ('\r' == *s)
 			continue;
 
-#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-		if (*s == '\'' || *s == '\\')
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || '\\' == *s)
 #else
-		if (*s == '\'')
+		if ('\'' == *s)
 #endif
-		{
 			len++;
-		}
+
 		len++;
 	}
 
@@ -1035,27 +1032,27 @@ static void	DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
-#	define ZBX_DB_ESC_CH	'\''
-#else
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_ESC_CH	'\\'
+#else
+#	define ZBX_DB_ESC_CH	'\''
 #endif
 	assert(dst);
 
 	len--;	/* '\0' */
 
-	for (s = src, d = dst; s && *s && len; s++)
+	for (s = src, d = dst; NULL != s && '\0' != *s && 0 < len; s++)
 	{
-		if (*s == '\r')
+		if ('\r' == *s)
 			continue;
 
-#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-		if (*s == '\'' || *s == '\\')
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || '\\' == *s)
 #else
-		if (*s == '\'')
+		if ('\'' == *s)
 #endif
 		{
-			if (len < 2)
+			if (2 > len)
 				break;
 #if defined(HAVE_POSTGRESQL)
 			*d++ = *s;
@@ -1108,28 +1105,25 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;
-	int		len = 0;
+	int		len = 1;	/* '\0' */
 
-	len++;	/* '\0' */
-
-	for (s = src; s && *s; s++)
+	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
 	{
-		if (max_src_len <= 0)
-			break;
-
-		if (*s == '\r')
+		if ('\r' == *s)
 			continue;
 
-#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-		if (*s == '\'' || *s == '\\')
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || '\\' == *s)
 #else
-		if (*s == '\'')
+		if ('\'' == *s)
 #endif
-		{
 			len++;
-		}
+
 		len++;
-		max_src_len--;
+
+		/* only UTF-8 characters should reduce a variable max_src_len */
+		if (0x80 != (0xc0 & *s))
+			max_src_len--;
 	}
 
 	dst = zbx_malloc(dst, len);
@@ -1260,74 +1254,38 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->trends = atoi(row[17]);
 	item->value_type = atoi(row[8]);
 
-	if (SUCCEED == DBis_null(row[5]))
-	{
-		item->lastvalue_null = 1;
-	}
+	if (SUCCEED != DBis_null(row[5]))
+		item->lastvalue[0] = row[5];
 	else
-	{
-		item->lastvalue_null = 0;
+		item->lastvalue[0] = NULL;
 
-		switch (item->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				item->lastvalue_dbl = atof(row[5]);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->lastvalue_uint64, row[5]);
-				break;
-			default:
-				item->lastvalue_str = row[5];
-				break;
-		}
-	}
-
-	if (SUCCEED == DBis_null(row[6]))
-	{
-		item->prevvalue_null = 1;
-	}
+	if (SUCCEED != DBis_null(row[6]))
+		item->lastvalue[1] = row[6];
 	else
-	{
-		item->prevvalue_null = 0;
-
-		switch (item->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				item->prevvalue_dbl = atof(row[6]);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->prevvalue_uint64, row[6]);
-				break;
-			default:
-				item->prevvalue_str = row[6];
-				break;
-		}
-	}
+		item->lastvalue[1] = NULL;
 
 	ZBX_STR2UINT64(item->hostid, row[7]);
 	item->delta = atoi(row[9]);
 
-	if (SUCCEED == DBis_null(row[10]))
-	{
-		item->prevorgvalue_null = 1;
-	}
-	else
+	if (SUCCEED != DBis_null(row[10]))
 	{
 		item->prevorgvalue_null = 0;
 
 		switch (item->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				item->prevorgvalue_dbl = atof(row[10]);
+				item->prevorgvalue.dbl = atof(row[10]);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->prevorgvalue_uint64, row[10]);
+				ZBX_STR2UINT64(item->prevorgvalue.ui64, row[10]);
 				break;
 			default:
-				item->prevorgvalue_str = row[10];
+				item->prevorgvalue.str = row[10];
 				break;
 		}
 	}
+	else
+		item->prevorgvalue_null = 1;
 
 	if (SUCCEED == DBis_null(row[11]))
 		item->lastclock = 0;
@@ -1341,6 +1299,21 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	ZBX_DBROW2UINT64(item->valuemapid, row[16]);
 
 	item->data_type = atoi(row[18]);
+
+	item->h_lastvalue[0] = NULL;
+	item->h_lastvalue[1] = NULL;
+	item->h_lasteventid = NULL;
+	item->h_lastsource = NULL;
+	item->h_lastseverity = NULL;
+}
+
+void	DBfree_item_from_db(DB_ITEM *item)
+{
+	zbx_free(item->h_lastvalue[0]);
+	zbx_free(item->h_lastvalue[1]);
+	zbx_free(item->h_lasteventid);
+	zbx_free(item->h_lastsource);
+	zbx_free(item->h_lastseverity);
 }
 
 const ZBX_TABLE *DBget_table(const char *tablename)
@@ -2127,6 +2100,7 @@ retry:
 			break;
 		default:
 			assert(0);
+			break;
 	}
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
@@ -2161,11 +2135,14 @@ retry:
 				default:
 					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 							" order by id desc");
+					break;
 			}
 		}
 		else if (0 != retry)
+		{
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 					" order by itemid,clock desc,ns desc");
+		}
 
 		result = DBselectN(sql, last_n);
 	}
