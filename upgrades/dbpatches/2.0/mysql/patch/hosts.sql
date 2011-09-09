@@ -107,6 +107,18 @@ UPDATE items
 	SET port=''
 	WHERE type NOT IN (1,4,6);		-- SNMPv1, SNMPv2c, SNMPv3
 
+-- add a first parameter {HOST.CONN} for external checks
+
+UPDATE items
+	SET key_ = CONCAT(SUBSTR(key_, 1, INSTR(key_, '[')), '"{HOST.CONN}",', SUBSTR(key_, INSTR(key_, '[') + 1))
+	WHERE type IN (10)	-- EXTERNAL
+		AND INSTR(key_, '[') <> 0;
+
+UPDATE items
+	SET key_ = CONCAT(key_, '["{HOST.CONN}"]')
+	WHERE type IN (10)	-- EXTERNAL
+		AND INSTR(key_, '[') = 0;
+
 ---- Patching table `hosts`
 
 ALTER TABLE hosts MODIFY hostid bigint unsigned NOT NULL,
