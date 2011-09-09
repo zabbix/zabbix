@@ -44,7 +44,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_external";
 	char		key[MAX_STRING_LEN], params[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX],
-			*cmd = NULL, *buf = NULL, *addr_esc;
+			*cmd = NULL, *buf = NULL;
 	int		rc, cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0, ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
@@ -64,10 +64,6 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s: %s", cmd, zbx_strerror(errno)));
 		goto notsupported;
 	}
-
-	addr_esc = zbx_dyn_escape_string(item->interface.addr, "\"\\");
-	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, strlen(addr_esc) + 4, " \"%s\"", addr_esc);
-	zbx_free(addr_esc);
 
 	if (2 == rc)	/* key with parameters */
 	{
