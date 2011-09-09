@@ -16,6 +16,7 @@ New features:
  - [ZBXNEXT-863] renamed "host profile" to "host inventory" (dimir)
 
 Bug fixes:
+ - [ZBX-3647] fixed parsing of parameter in external scripts to work like in normal keys and added support for multiline output (Sasha)
  - [ZBX-2530] renamed "system.cpu.util" item parameters for solaris from "wait" to "iowait", from "kernel" to "system" (deniss)
  - [ZBX-4049] fixed memory leak in configuration syncer (rudolfs)
  - [ZBX-4017] fixed host deletion using api (Vedmak)
