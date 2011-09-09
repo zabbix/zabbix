@@ -549,13 +549,13 @@ void	DBupdate_triggers_status_after_restart()
 				" and f.triggerid=t.triggerid"
 				" and h.status in (%d)"
 				" and i.status in (%d)"
-				" and i.type not in (%d)"
+				" and i.type not in (%d,%d)"
 				" and i.key_ not in ('%s')"
 				" and t.status in (%d)"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
-			ITEM_TYPE_TRAPPER,
+			ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
 			SERVER_STATUS_KEY,
 			TRIGGER_STATUS_ENABLED,
 			DBnode_local("t.triggerid"));
@@ -573,9 +573,9 @@ void	DBupdate_triggers_status_after_restart()
 				" from items i,functions f,triggers t"
 				" where i.itemid=f.itemid"
 					" and f.triggerid=t.triggerid"
-					" and i.type not in (%d)"
+					" and i.type not in (%d,%d)"
 					" and t.triggerid=" ZBX_FS_UI64,
-				ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
 				triggerid);
 
 		min_nextcheck = -1;

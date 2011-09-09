@@ -1636,33 +1636,31 @@
 		$delay_flex_el = array();
 
 
-		//if($type != ITEM_TYPE_TRAPPER){
-			$i = 0;
-			foreach($delay_flex as $val){
-				if(!isset($val['delay']) && !isset($val['period'])) continue;
+		$i = 0;
+		foreach($delay_flex as $val){
+			if(!isset($val['delay']) && !isset($val['period'])) continue;
 
-				array_push($delay_flex_el,
-					array(
-						new CCheckBox('rem_delay_flex['.$i.']', 'no', null,$i),
-						$val['delay'],
-						' sec at ',
-						$val['period']),
-					BR());
-				$frmItem->addVar('delay_flex['.$i.'][delay]', $val['delay']);
-				$frmItem->addVar('delay_flex['.$i.'][period]', $val['period']);
-				foreach($types as $it => $caption) {
-					if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE) continue;
-					zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][delay]');
-					zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][period]');
-					zbx_subarray_push($typeVisibility, $it, 'rem_delay_flex['.$i.']');
-				}
-				$i++;
-				if($i >= 7) break;	/* limit count of intervals
-							 * 7 intervals by 30 symbols = 210 characters
-							 * db storage field is 256
-							 */
+			array_push($delay_flex_el,
+				array(
+					new CCheckBox('rem_delay_flex['.$i.']', 'no', null,$i),
+					$val['delay'],
+					' sec at ',
+					$val['period']),
+				BR());
+			$frmItem->addVar('delay_flex['.$i.'][delay]', $val['delay']);
+			$frmItem->addVar('delay_flex['.$i.'][period]', $val['period']);
+			foreach($types as $it => $caption) {
+				if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE || $it == ITEM_TYPE_SNMPTRAP) continue;
+				zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][delay]');
+				zbx_subarray_push($typeVisibility, $it, 'delay_flex['.$i.'][period]');
+				zbx_subarray_push($typeVisibility, $it, 'rem_delay_flex['.$i.']');
 			}
-		//}
+			$i++;
+			if($i >= 7) break;	/* limit count of intervals
+						 * 7 intervals by 30 symbols = 210 characters
+						 * db storage field is 256
+						 */
+		}
 
 		array_push($delay_flex_el, count($delay_flex_el)==0 ? S_NO_FLEXIBLE_INTERVALS : new CSubmit('del_delay_flex',S_DELETE_SELECTED));
 
@@ -1747,6 +1745,8 @@
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interfaceid');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interface_row');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interfaceid');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interface_row');
+				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interfaceid');
 			}
 		}
 
@@ -1856,13 +1856,6 @@
 					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> ''));
 			}
 		}
-
-/*
-ITEM_TYPE_DB_MONITOR $key = 'db.odbc.select[<unique short description>]'; $params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";
-ITEM_TYPE_SSH $key = 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]'; $params = '';
-ITEM_TYPE_TELNET $key = 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'; $params = '';
-ITEM_TYPE_CALCULATED $key = ''; $params = '';
-//*/
 
 		$cmbAuthType = new CComboBox('authtype', $authtype);
 		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD,S_PASSWORD);
@@ -2018,7 +2011,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$row->setAttribute('id', 'row_delay');
 		$frmItem->addRow($row);
 		foreach($types as $it => $ilabel) {
-			if($it == ITEM_TYPE_TRAPPER) continue;
+			if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_SNMPTRAP) continue;
 			zbx_subarray_push($typeVisibility, $it, 'delay');
 			zbx_subarray_push($typeVisibility, $it, 'row_delay');
 		}
@@ -2039,7 +2032,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmItem->addRow($row);
 
 		foreach($types as $it => $ilabel){
-			if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE) continue;
+			if($it == ITEM_TYPE_TRAPPER || $it == ITEM_TYPE_ZABBIX_ACTIVE || $it == ITEM_TYPE_SNMPTRAP) continue;
 			zbx_subarray_push($typeVisibility, $it, 'row_flex_intervals');
 			zbx_subarray_push($typeVisibility, $it, 'row_new_delay_flex');
 			zbx_subarray_push($typeVisibility, $it, 'new_delay_flex[delay]');
