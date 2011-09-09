@@ -1272,8 +1272,10 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < history_num; i++)
-		if (history[i].value_type == ITEM_VALUE_TYPE_LOG)
+	{
+		if (ITEM_VALUE_TYPE_LOG == history[i].value_type)
 			uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
+	}
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
@@ -1288,11 +1290,12 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 			if (history[j].itemid != ids[i])
 				continue;
 
-			if (history[j].value_type != ITEM_VALUE_TYPE_LOG)
+			if (ITEM_VALUE_TYPE_LOG != history[j].value_type)
 				continue;
 
 			if (lastlogsize < history[j].lastlogsize)
 				lastlogsize = history[j].lastlogsize;
+
 			if (mtime < history[j].mtime)
 				mtime = history[j].mtime;
 		}
@@ -2650,8 +2653,10 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (GET_STR_RESULT(value))
+			{
 				DCadd_history_log(itemid, value->str, ts, timestamp, source,
 						severity, logeventid, lastlogsize, mtime);
+			}
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",

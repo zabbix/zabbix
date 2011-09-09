@@ -230,10 +230,9 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		send_history_last_id(sock, s);
 		return ret;
 	}
-	else	/* Process information sent by zabbix_sender */
+	else
 	{
-		/* Node data exchange? */
-		if (strncmp(s, "Data", 4) == 0)
+		if (0 == strncmp(s, "Data", 4))	/* node data exchange */
 		{
 			node_sync_lock(0);
 
@@ -270,8 +269,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 
 			return ret;
 		}
-		/* Slave node history ? */
-		if (strncmp(s, "History", 7) == 0)
+		else if (0 == strncmp(s, "History", 7))	/* slave node history */
 		{
 			const char	*reply;
 
@@ -284,8 +282,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 
 			return ret;
 		}
-		/* JSON protocol? */
-		else if (SUCCEED == zbx_json_open(s, &jp))
+		else if (SUCCEED == zbx_json_open(s, &jp))	/* JSON protocol */
 		{
 			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value)))
 			{
@@ -347,18 +344,14 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 					ret = node_process_command(sock, s, &jp);
 				}
 				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Unknown request received [%s]",
-							value);
-				}
+					zabbix_log(LOG_LEVEL_WARNING, "unknown request received [%s]", value);
 			}
 			return ret;
 		}
-		/* XML protocol? */
-		else if (*s == '<')
+		else if ('<' == *s)	/* XML protocol */
 		{
-			comms_parse_response(s, av.host_name, sizeof(av.host_name), av.key, sizeof(av.key), value_dec, sizeof(value_dec),
-					lastlogsize, sizeof(lastlogsize), timestamp, sizeof(timestamp),
+			comms_parse_response(s, av.host_name, sizeof(av.host_name), av.key, sizeof(av.key), value_dec,
+					sizeof(value_dec), lastlogsize, sizeof(lastlogsize), timestamp, sizeof(timestamp),
 					source, sizeof(source),	severity, sizeof(severity));
 
 			av.value	= value_dec;

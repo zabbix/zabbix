@@ -47,20 +47,21 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 ---- Patching table `items`
 
 ALTER TABLE ONLY items RENAME COLUMN description TO name;
-ALTER TABLE ONLY items ALTER itemid DROP DEFAULT,
-		       ALTER hostid DROP DEFAULT,
-		       ALTER units TYPE varchar(255),
-		       ALTER templateid DROP DEFAULT,
-		       ALTER templateid DROP NOT NULL,
-		       ALTER valuemapid DROP DEFAULT,
-		       ALTER valuemapid DROP NOT NULL,
-		       ADD lastns integer NULL,
-		       ADD flags integer DEFAULT '0' NOT NULL,
-		       ADD filter varchar(255) DEFAULT '' NOT NULL,
-		       ADD interfaceid bigint NULL,
-		       ADD port varchar(64) DEFAULT '' NOT NULL,
-		       ADD description text DEFAULT '' NOT NULL,
-		       ADD inventory_link integer DEFAULT '0' NOT NULL;
+ALTER TABLE ONLY items
+	ALTER itemid DROP DEFAULT,
+	ALTER hostid DROP DEFAULT,
+	ALTER units TYPE varchar(255),
+	ALTER templateid DROP DEFAULT,
+	ALTER templateid DROP NOT NULL,
+	ALTER valuemapid DROP DEFAULT,
+	ALTER valuemapid DROP NOT NULL,
+	ADD lastns integer NULL,
+	ADD flags integer DEFAULT '0' NOT NULL,
+	ADD filter varchar(255) DEFAULT '' NOT NULL,
+	ADD interfaceid bigint NULL,
+	ADD port varchar(64) DEFAULT '' NOT NULL,
+	ADD description text DEFAULT '' NOT NULL,
+	ADD inventory_link integer DEFAULT '0' NOT NULL;
 
 UPDATE items SET templateid=NULL WHERE templateid=0;
 UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);

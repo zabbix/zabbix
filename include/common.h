@@ -177,7 +177,8 @@ typedef enum
 	ITEM_TYPE_SSH,
 	ITEM_TYPE_TELNET,
 	ITEM_TYPE_CALCULATED,
-	ITEM_TYPE_JMX
+	ITEM_TYPE_JMX,
+	ITEM_TYPE_SNMPTRAP	/* 17 */
 }
 zbx_item_type_t;
 const char	*zbx_host_type_string(zbx_item_type_t item_type);
