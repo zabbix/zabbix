@@ -42,6 +42,8 @@ include_once('include/page_header.php');
 		'refresh_unsupported'=>		array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({config})&&({config}==5)&&isset({save})'),
 		'alert_usrgrpid'=>			array(T_ZBX_INT, O_NO,	null,	DB_ID,				'isset({config})&&({config}==5)&&isset({save})'),
 		'discovery_groupid'=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,				'isset({config})&&({config}==5)&&isset({save})'),
+		'snmptrap_logging'=>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),			null),
+
 
 		// image form
 		'imageid'=>					array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==3)&&(isset({form})&&({form}=="update"))'),
@@ -284,6 +286,7 @@ include_once('include/page_header.php');
 				'work_period' => get_request('work_period'),
 				'alert_usrgrpid' => get_request('alert_usrgrpid'),
 				'discovery_groupid' => get_request('discovery_groupid'),
+				'snmptrap_logging' => (get_request('snmptrap_logging') ? 1 : 0),
 			);
 		$result=update_config($configs);
 
@@ -865,6 +868,7 @@ include_once('include/page_header.php');
 			$data['config']['discovery_groupid'] = get_request('discovery_groupid');
 			$data['config']['alert_usrgrpid'] = get_request('alert_usrgrpid');
 			$data['config']['refresh_unsupported'] = get_request('refresh_unsupported');
+			$data['config']['snmptrap_logging'] = get_request('snmptrap_logging');
 		}
 		else{
 			$data['config'] = select_config(false);

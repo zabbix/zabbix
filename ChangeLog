@@ -2,6 +2,7 @@
 Changes for 1.9.6
 
 New features:
+ - [ZBXNEXT-747] added direct SNMP trap monitoring for snmptrapd and embed perl or SNMPTT (Eduard, rudolfs, Vedmak)
  - [ZBX-4116] fixed ibm_db2 update patch for help_items table (rudolfs)
  - [ZBXNEXT-895] redesign general->Macros (Eduard)
  - [ZBXNEXT-899] redesign general->Images (Eduard)

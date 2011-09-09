@@ -36,6 +36,7 @@ foreach($this->data['alert_usrgrps'] as $usrgrp){
 $otherTab->addRow(_('Refresh unsupported items (in sec)'), new CNumericBox('refresh_unsupported', $this->data['config']['refresh_unsupported'], 5));
 $otherTab->addRow(_('Group for discovered hosts'), $discoveryGroup);
 $otherTab->addRow(_('User group for database down message'), $alertUserGroup);
+$otherTab->addRow(_('Log unmatched SNMP traps'), new CCheckBox('snmptrap_logging', $this->data['config']['snmptrap_logging'], null, 1));
 
 $otherView = new CTabView();
 $otherView->addTab('other', _('Other parameters'), $otherTab);

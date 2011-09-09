@@ -26,7 +26,8 @@ ALTER TABLE ONLY config
 	ADD problem_unack_style integer DEFAULT '1' NOT NULL,
 	ADD problem_ack_style integer DEFAULT '1' NOT NULL,
 	ADD ok_unack_style integer DEFAULT '1' NOT NULL,
-	ADD ok_ack_style integer DEFAULT '1' NOT NULL;
+	ADD ok_ack_style integer DEFAULT '1' NOT NULL,
+	ADD snmptrap_logging integer DEFAULT '1' NOT NULL;
 
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT EXISTS (SELECT 1 FROM usrgrp WHERE usrgrp.usrgrpid=config.alert_usrgrpid);
 UPDATE config SET discovery_groupid=NULL WHERE NOT EXISTS (SELECT 1 FROM groups WHERE groups.groupid=config.discovery_groupid);
