@@ -217,6 +217,14 @@ abstract class CItemGeneral extends CZBXAPI{
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Key does not match <grpmax|grpmin|grpsum|grpavg>["group","key","<last|min|max|avg|sum|count>","numeric param"].'));
 				}
 
+				if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP) {
+					if (strcmp($item['key_'], 'snmptrap.fallback') != 0) {
+						if (!preg_match('/^snmptrap(|\[(.*))$/', $item['key_'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid'));
+						}
+					}
+				}
+
 				if(isset($item['value_type'])){
 					if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be Log for log key.'));
