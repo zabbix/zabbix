@@ -98,7 +98,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hosts_count:%d", __function_name, hosts_count);
 
-	if (-1 == access(CONFIG_FPING_LOCATION, F_OK | X_OK))
+	if (-1 == access(CONFIG_FPING_LOCATION, X_OK))
 	{
 #if !defined(HAVE_IPV6)
 		zbx_snprintf(error, max_error_len, "%s: %s", CONFIG_FPING_LOCATION, zbx_strerror(errno));
@@ -123,7 +123,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	}
 
 #ifdef HAVE_IPV6
-	if (-1 == access(CONFIG_FPING6_LOCATION, F_OK | X_OK))
+	if (-1 == access(CONFIG_FPING6_LOCATION, X_OK))
 	{
 		if (0 == (fping_existence & FPING_EXISTS))
 		{
