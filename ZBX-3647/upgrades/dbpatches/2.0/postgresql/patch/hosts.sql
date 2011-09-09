@@ -105,7 +105,7 @@ UPDATE items
 -- add a first parameter {HOST.CONN} for external checks
 
 UPDATE items
-	SET key_ = SUBSTR(key_, 1, STRPOS(key_, '[')) || '"{HOST.CONN}", ' || SUBSTR(key_, STRPOS(key_, '[') + 1)
+	SET key_ = SUBSTR(key_, 1, STRPOS(key_, '[')) || '"{HOST.CONN}",' || SUBSTR(key_, STRPOS(key_, '[') + 1)
 	WHERE type IN (10)	-- EXTERNAL
 		AND STRPOS(key_, '[') <> 0;
 
