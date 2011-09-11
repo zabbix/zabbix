@@ -381,7 +381,7 @@ $right_col = array();
 						//make_webmon_overview(),
 						CProfile::get('web.dashboard.hats.hat_webovr.state',1)
 						);
-	$web_mon->setHeader(S_WEB_MONITORING,array($refresh_menu));
+	$web_mon->setHeader(_('Web monitoring'), array($refresh_menu));
 	$web_mon->setFooter(new CDiv(SPACE, 'textwhite', 'hat_webovr_footer'));
 
 	$right_col[] = $web_mon;
