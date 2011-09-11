@@ -17,17 +17,12 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+#ifndef ZABBIX_SNMPTRAPPER_H
+#define ZABBIX_SNMPTRAPPER_H
 
-class GeneralInformation
-{
-	public static final String APPLICATION_NAME = "Zabbix Java Proxy";
-	public static final String REVISION_DATE = "9 September 2011";
-	public static final String REVISION = "{ZABBIX_REVISION}";
-	public static final String VERSION = "1.9.6";
+extern char		*CONFIG_SNMPTRAP_FILE;
+extern unsigned char	process_type;
 
-	public static void printVersion()
-	{
-		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
-	}
-}
+void	main_snmptrapper_loop();
+
+#endif

@@ -111,10 +111,8 @@ const char	*zbx_strpool_intern(const char *str)
 
 	if (NULL == record)
 	{
-		record = zbx_hashset_insert_ext(strpool.hashset,
-						str - REFCOUNT_FIELD_SIZE,
-						REFCOUNT_FIELD_SIZE + strlen(str) + 1,
-						REFCOUNT_FIELD_SIZE);
+		record = zbx_hashset_insert_ext(strpool.hashset, str - REFCOUNT_FIELD_SIZE,
+				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE);
 		*(uint32_t *)record = 0;
 	}
 
@@ -147,7 +145,7 @@ void	zbx_strpool_release(const char *str)
 	LOCK_POOL;
 
 	refcount = (uint32_t *)(str - REFCOUNT_FIELD_SIZE);
-	if (--(*refcount) == 0)
+	if (0 == --(*refcount))
 		zbx_hashset_remove(strpool.hashset, str - REFCOUNT_FIELD_SIZE);
 
 	UNLOCK_POOL;

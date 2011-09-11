@@ -248,6 +248,9 @@ src/zabbix_server/proxypoller/Makefile.in
 src/zabbix_server/selfmon/.deps
 src/zabbix_server/selfmon/Makefile
 src/zabbix_server/selfmon/Makefile.in
+src/zabbix_server/snmptrapper/.deps
+src/zabbix_server/snmptrapper/Makefile
+src/zabbix_server/snmptrapper/Makefile.in
 src/zabbix_server/timer/.deps
 src/zabbix_server/timer/Makefile
 src/zabbix_server/timer/Makefile.in

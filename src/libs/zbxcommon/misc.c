@@ -2274,6 +2274,7 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
+		case ITEM_TYPE_SNMPTRAP:
 			return INTERFACE_TYPE_SNMP;
 		case ITEM_TYPE_IPMI:
 			return INTERFACE_TYPE_IPMI;

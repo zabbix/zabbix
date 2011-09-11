@@ -16,6 +16,7 @@ build/win32/project/Makefile_sender_x64 -text
 create/data/create_data_sql/create_data_sql.sh svneol=native#text/x-sh
 create/data/create_data_sql/data_sql_blacklist.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_blacklistbyval.txt -text
+create/data/create_data_sql/data_sql_blacklistbyval_ref.txt -text
 create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
 create/images/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
@@ -331,6 +332,7 @@ misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 misc/init.d/ubuntu/zabbix-agent.conf -text
 misc/init.d/ubuntu/zabbix-server.conf -text
+misc/snmptrap/zabbix_trap_receiver.pl -text
 src/libs/zbxcomms/telnet.c -text
 src/libs/zbxself/Makefile.am -text
 src/libs/zbxsysinfo/linux/hardware.c -text
@@ -343,6 +345,9 @@ src/zabbix_java/lib/org-json-2010-12-28.jar -text
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 src/zabbix_java/tests/junit-4.8.2.jar -text
 src/zabbix_server/selfmon/Makefile.am -text
+src/zabbix_server/snmptrapper/Makefile.am -text
+src/zabbix_server/snmptrapper/snmptrapper.c -text
+src/zabbix_server/snmptrapper/snmptrapper.h -text
 tests/data/README -text
 tests/data/data_test.sql -text
 tests/templates/sqlite3.init -text
@@ -369,3 +374,7 @@ upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/p
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
+upgrades/dbpatches/2.0/ibm_db2/patch/globalvars.sql -text
+upgrades/dbpatches/2.0/mysql/patch/globalvars.sql -text
+upgrades/dbpatches/2.0/oracle/patch/globalvars.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/globalvars.sql -text

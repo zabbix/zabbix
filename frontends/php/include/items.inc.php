@@ -20,81 +20,90 @@
 ?>
 <?php
 
-/*
- * Function: get_item_logtype_description
+/**
+ * Convert windows events type constant in to the string representation
  *
- * Description:
- *	 convert windows events type constant in to the string representation
- *
- * Author:
- *	 Alexander Vladishev
- *
- * Comments:
- *
+ * @param int $logtype
+ * @return string
  */
-	function get_item_logtype_description($logtype){
-		switch ($logtype){
-			case ITEM_LOGTYPE_INFORMATION:		return S_INFORMATION;
-			case ITEM_LOGTYPE_WARNING:		return S_WARNING;
-			case ITEM_LOGTYPE_ERROR:		return S_ERROR;
-			case ITEM_LOGTYPE_FAILURE_AUDIT:	return S_FAILURE_AUDIT;
-			case ITEM_LOGTYPE_SUCCESS_AUDIT:	return S_SUCCESS_AUDIT;
-			default:				return S_UNKNOWN;
-		}
-	}
-
-/*
- * Function: get_item_logtype_style
- *
- * Description:
- *	 convert windows events type constant in to the CSS style name
- *
- * Author:
- *	 Alexander Vladishev
- *
- * Comments:
- *
- */
-	function get_item_logtype_style($logtype){
-		switch($logtype){
-			case ITEM_LOGTYPE_INFORMATION:		return 'information';
-			case ITEM_LOGTYPE_WARNING:		return 'warning';
-			case ITEM_LOGTYPE_ERROR:		return 'high';
-			case ITEM_LOGTYPE_FAILURE_AUDIT:	return 'high';
-			case ITEM_LOGTYPE_SUCCESS_AUDIT:	return 'information';
-			default:				return 'normal';
-		}
-	}
-
-	function item_type2str($type=null){
-		$types = array(
-			ITEM_TYPE_ZABBIX => S_ZABBIX_AGENT,
-			ITEM_TYPE_ZABBIX_ACTIVE => S_ZABBIX_AGENT_ACTIVE,
-			ITEM_TYPE_SIMPLE => S_SIMPLE_CHECK,
-			ITEM_TYPE_SNMPV1 => S_SNMPV1_AGENT,
-			ITEM_TYPE_SNMPV2C => S_SNMPV2_AGENT,
-			ITEM_TYPE_SNMPV3 => S_SNMPV3_AGENT,
-			ITEM_TYPE_INTERNAL => S_ZABBIX_INTERNAL,
-			ITEM_TYPE_TRAPPER => S_ZABBIX_TRAPPER,
-			ITEM_TYPE_AGGREGATE => S_ZABBIX_AGGREGATE,
-			ITEM_TYPE_EXTERNAL => S_EXTERNAL_CHECK,
-			ITEM_TYPE_DB_MONITOR => S_ZABBIX_DATABASE_MONITOR,
-			ITEM_TYPE_IPMI => S_IPMI_AGENT,
-			ITEM_TYPE_SSH => S_SSH_AGENT,
-			ITEM_TYPE_TELNET => S_TELNET_AGENT,
-			ITEM_TYPE_JMX => S_JMX_AGENT,
-			ITEM_TYPE_CALCULATED => S_CALCULATED,
-			ITEM_TYPE_HTTPTEST => S_WEB_MONITORING,
-		);
-
-		if(is_null($type)){
-			return $types;
-		}
-		else if(isset($types[$type]))
-			return $types[$type];
-		else
+function get_item_logtype_description($logtype){
+	switch($logtype){
+		case ITEM_LOGTYPE_INFORMATION:
+			return S_INFORMATION;
+		case ITEM_LOGTYPE_WARNING:
+			return S_WARNING;
+		case ITEM_LOGTYPE_ERROR:
+			return S_ERROR;
+		case ITEM_LOGTYPE_FAILURE_AUDIT:
+			return S_FAILURE_AUDIT;
+		case ITEM_LOGTYPE_SUCCESS_AUDIT:
+			return S_SUCCESS_AUDIT;
+		default:
 			return S_UNKNOWN;
 	}
+}
+
+/**
+ * Convert windows events type constant in to the CSS style name
+ *
+ * @param int $logtype
+ * @return string
+ */
+function get_item_logtype_style($logtype){
+	switch($logtype){
+		case ITEM_LOGTYPE_INFORMATION:
+			return 'information';
+		case ITEM_LOGTYPE_WARNING:
+			return 'warning';
+		case ITEM_LOGTYPE_ERROR:
+			return 'high';
+		case ITEM_LOGTYPE_FAILURE_AUDIT:
+			return 'high';
+		case ITEM_LOGTYPE_SUCCESS_AUDIT:
+			return 'information';
+		default:
+			return 'normal';
+	}
+}
+
+/**
+ * Get item type string name by item type number, or array of all item types if null passed
+ *
+ * @param int|null $type
+ * @return array|string
+ */
+function item_type2str($type = null){
+	$types = array(
+		ITEM_TYPE_ZABBIX => _('Zabbix agent'),
+		ITEM_TYPE_ZABBIX_ACTIVE => _('Zabbix agent (active)'),
+		ITEM_TYPE_SIMPLE => _('Simple check'),
+		ITEM_TYPE_SNMPV1 => _('SNMPv1 agent'),
+		ITEM_TYPE_SNMPV2C => _('SNMPv2 agent'),
+		ITEM_TYPE_SNMPV3 => _('SNMPv3 agent'),
+		ITEM_TYPE_SNMPTRAP => _('SNMP trap'),
+		ITEM_TYPE_INTERNAL => _('Zabbix internal'),
+		ITEM_TYPE_TRAPPER => _('Zabbix trapper'),
+		ITEM_TYPE_AGGREGATE => _('Zabbix aggregate'),
+		ITEM_TYPE_EXTERNAL => _('External check'),
+		ITEM_TYPE_DB_MONITOR => _('Database monitor'),
+		ITEM_TYPE_IPMI => _('IPMI agent'),
+		ITEM_TYPE_SSH => _('SSH agent'),
+		ITEM_TYPE_TELNET => _('TELNET agent'),
+		ITEM_TYPE_JMX => _('JMX agent'),
+		ITEM_TYPE_CALCULATED => _('Calculated'),
+		ITEM_TYPE_HTTPTEST => _('Web monitoring'),
+	);
+
+	if(is_null($type)){
+		return $types;
+	}
+	else if(isset($types[$type])){
+		return $types[$type];
+	}
+	else{
+		return _('Unknown');
+	}
+}
 
 	function item_value_type2str($type=null){
 		$types = array(
@@ -183,6 +192,7 @@
 			case ITEM_TYPE_SNMPV1: $type = INTERFACE_TYPE_SNMP; break;
 			case ITEM_TYPE_SNMPV2C: $type = INTERFACE_TYPE_SNMP; break;
 			case ITEM_TYPE_SNMPV3: $type = INTERFACE_TYPE_SNMP; break;
+			case ITEM_TYPE_SNMPTRAP: $type = INTERFACE_TYPE_SNMP; break;
 			case ITEM_TYPE_IPMI: $type = INTERFACE_TYPE_IPMI; break;
 			case ITEM_TYPE_JMX: $type = INTERFACE_TYPE_JMX; break;
 			case ITEM_TYPE_ZABBIX:
