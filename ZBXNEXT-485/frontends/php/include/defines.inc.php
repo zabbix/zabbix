@@ -733,7 +733,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)');	/* !!! Don't forget sync code with C !!! */
 
 	// use isKeyChar() function if you need to check only one symbol
-	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_,.-]+)');	/* !!! Don't forget sync code with C !!! */
+	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_.-]+)');	/* !!! Don't forget sync code with C !!! */
 
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
