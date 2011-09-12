@@ -542,15 +542,39 @@ function insert_js_function($fnct_name){
 
 					var tmpStorage = null;
 					for (var key in values) {
-						if (is_null(values[key])) continue;
+						if (is_null(values[key])) {
+							continue;
+						}
 
-						if (parentDocumentForms.length)
-							tmpStorage = $(parentDocumentForms[0]).select(\'[name="\'+key+\'"]\').first();
+						if (parentDocumentForms.length) {
+							elementStorage = null;
 
-						if (typeof(tmpStorage) == "undefined" || is_null(tmpStorage))
-							tmpStorage = parentDocument.getElementById(key);
+							// search element by id
+							try {
+								elementStorage = $(parentDocumentForms[0].parentNode).select("#"+key);
+							} catch(e) {
+							}
 
-						tmpStorage.value = values[key];
+							// search element by "name" attribute
+							if (is_null(elementStorage)) {
+								try {
+									elementStorage = $(parentDocumentForms[0].parentNode).select(\'[name="\'+key+\'"]\');
+								} catch(e) {
+								}
+							}
+
+							if (!is_null(elementStorage)) {
+								tmpStorage = elementStorage.first();
+							}
+
+							if (is_null(tmpStorage)) {
+								tmpStorage = parentDocument.getElementById(key);
+							}
+
+							if (!is_null(tmpStorage)) {
+								tmpStorage.value = values[key];
+							}
+						}
 					}
 
 					if (!is_null(tmpStorage) && submitParent) {
