@@ -320,7 +320,7 @@
 					$frmUser->addVar('change_password', $change_password);
 			}
 			else{
-				$passwd_but = new CSubmit('change_password', S_CHANGE_PASSWORD);
+				$passwd_but = new CSubmit('change_password', _('Change password'));
 				if($alias == ZBX_GUEST_USER){
 					$passwd_but->setAttribute('disabled','disabled');
 				}

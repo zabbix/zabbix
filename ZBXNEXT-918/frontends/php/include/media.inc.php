@@ -22,11 +22,11 @@
 
 	function media_type2str($type=null){
 		$media_types = array(
-			MEDIA_TYPE_EMAIL => S_EMAIL,
-			MEDIA_TYPE_EXEC => S_SCRIPT,
-			MEDIA_TYPE_SMS => S_SMS,
-			MEDIA_TYPE_JABBER => S_JABBER,
-			MEDIA_TYPE_EZ_TEXTING => S_EZ_TEXTING,
+			MEDIA_TYPE_EMAIL => _('Email'),
+			MEDIA_TYPE_EXEC => _('Script'),
+			MEDIA_TYPE_SMS => _('SMS'),
+			MEDIA_TYPE_JABBER => _('Jabber'),
+			MEDIA_TYPE_EZ_TEXTING => _('Ez Texting'),
 		);
 
 		if(is_null($type)){

@@ -354,17 +354,6 @@
 	'S_CONFIGURATION_OF_ZABBIX_BIG'=>		_('CONFIGURATION OF ZABBIX'),
 	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
-	'S_ADDED_NEW_MEDIA_TYPE'=>			_('Added new media type'),
-	'S_NEW_MEDIA_TYPE_WAS_NOT_ADDED'=>		_('New media type was not added'),
-	'S_MEDIA_TYPE_UPDATED'=>			_('Media type updated'),
-	'S_MEDIA_TYPE_WAS_NOT_UPDATED'=>		_('Media type was not updated'),
-	'S_MEDIA_TYPE_DELETED'=>			_('Media type deleted'),
-	'S_MEDIA_TYPE_WAS_NOT_DELETED'=>		_('Media type was not deleted'),
-	'S_SMTP_SERVER'=>				_('SMTP server'),
-	'S_SMTP_HELO'=>					_('SMTP helo'),
-	'S_SMTP_EMAIL'=>				_('SMTP email'),
-	'S_SCRIPT_NAME'=>				_('Script name'),
-	'S_DELETE_SELECTED_MEDIA'=>			_('Delete selected media?'),
 	'S_DELETE_SELECTED_IMAGE'=>			_('Delete selected image?'),
 	'S_MEDIA_TYPES'=>				_('Media types'),
 	'S_DEFAULT'=>					_('Default'),
@@ -381,12 +370,8 @@
 	'S_IMAGE_UPDATED'=>				_('Image updated'),
 	'S_CANNOT_UPDATE_IMAGE'=>			_('Cannot update image'),
 	'S_OTHER'=>					_('Other'),
-	'S_CREATE_MEDIA_TYPE'=>				_('Create media type'),
 	'S_NOTHING_TO_DO'=>				_('Nothing to do'),
 	'S_INCORRECT_WORK_PERIOD'=>			_('Incorrect work period'),
-	'S_EZ_TEXTING_USA' => _('USA (160 characters)'),
-	'S_EZ_TEXTING_CANADA' => _('Canada (136 characters)'),
-	'S_MESSAGE_TEXT_LIMIT' => _('Message text limit'),
 
 	'S_REGULAR_EXPRESSION'=>			_('Regular expression'),
 	'S_EXPRESSION'=>				_('Expression'),
@@ -413,10 +398,6 @@
 	'S_DELETE_REGULAR_EXPRESSION_Q'=>		_('Delete regular expression?'),
 
 	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		_('Value maps are used to create a mapping between numeric values and string representations'),
-
-// media_types.php
-	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		_('Delete selected media types?'),
-	'S_COMMERCIAL' => _('Commercial'),
 
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),
@@ -816,14 +797,7 @@
 	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
 	'S_ACTIVE'=>						_('Active'),
 	'S_NOT_SUPPORTED'=>					_('Not supported'),
-	'S_EMAIL'=>						_('Email'),
-	'S_JABBER'=>						_('Jabber'),
-	'S_JABBER_IDENTIFIER'=>					_('Jabber identifier'),
-	'S_SMS'=>						_('SMS'),
 	'S_SCRIPT'=>						_('Script'),
-	'S_EZ_TEXTING'=>						_('Ez Texting'),
-	'S_USERNAME'=>						_('Username'),
-	'S_GSM_MODEM'=>						_('GSM modem'),
 	'S_UNITS'=>						_('Units'),
 	'S_UPDATE_INTERVAL_IN_SEC'=>				_('Update interval (in sec)'),
 	'S_KEEP_HISTORY_IN_DAYS'=>				_('Keep history (in days)'),
@@ -1021,8 +995,6 @@
 	'S_MAPS_DATE_FORMAT'=>	_('Y.m.d H:i:s'),
 
 //	media.php
-	'S_CONFIGURATION_OF_MEDIA_TYPES_BIG'=>	_('CONFIGURATION OF MEDIA TYPES'),
-	'S_MEDIA_TYPES_BIG'=>			_('MEDIA TYPES'),
 	'S_MEDIA'=>				_('Media'),
 	'S_SEND_TO'=>				_('Send to'),
 	'S_WHEN_ACTIVE'=>			_('When active'),
@@ -1509,7 +1481,6 @@
 	'S_DENY'=>					_('Deny'),
 	'S_HIDE'=>					_('Hide'),
 	'S_PASSWORD'=>					_('Password'),
-	'S_CHANGE_PASSWORD'=>				_('Change password'),
 	'S_PASSWORD_ONCE_AGAIN'=>			_('Password (once again)'),
 	'S_URL_AFTER_LOGIN'=>				_('URL (after login)'),
 	'S_AUTO_LOGOUT'=>				_('Auto-logout (min 90 seconds)'),
