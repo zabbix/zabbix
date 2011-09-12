@@ -2170,7 +2170,7 @@ int	is_key_char(char c)
 	if (c >= 'a' && c <= 'z')
 		return SUCCEED;
 
-	if (c == '.' || c == ',' || c == '_' || c == '-')
+	if (c == '.' || c == '_' || c == '-')
 		return SUCCEED;
 
 	if (c >= 'A' && c <= 'Z')
