@@ -522,12 +522,12 @@ function insert_js_function($fnct_name){
 			insert_js('
 				function addValues(frame, values, submitParent) {
 					var parentDocument = window.opener.document;
-					if (!parentDocument) return close_window();
+					if(!parentDocument) return close_window();
 
 					if (IE) {
 						// in internet explorer prototype filters by form name does not work
 						var pForms = parentDocument.body.getElementsByTagName("form");
-						for (i = 0; i < pForms.length; i++) {
+						for (i=0; i < pForms.length; i++) {
 							if (pForms[i].id === frame) {
 								parentDocumentForms = [pForms[i]];
 								break;
@@ -538,7 +538,7 @@ function insert_js_function($fnct_name){
 						var parentDocumentForms = $(parentDocument.body).select("form[name="+frame+"]");
 					}
 
-					var submitParent = submitParent || false;
+					submitParent = submitParent || false;
 
 					var tmpStorage = null;
 					for (var key in values) {
@@ -547,34 +547,14 @@ function insert_js_function($fnct_name){
 						}
 
 						if (parentDocumentForms.length) {
-							elementStorage = null;
-
-							// search element by id
-							try {
-								elementStorage = $(parentDocumentForms[0].parentNode).select("#"+key);
-							} catch(e) {
-							}
-
-							// search element by "name" attribute
-							if (is_null(elementStorage)) {
-								try {
-									elementStorage = $(parentDocumentForms[0].parentNode).select(\'[name="\'+key+\'"]\');
-								} catch(e) {
-								}
-							}
-
-							if (!is_null(elementStorage)) {
-								tmpStorage = elementStorage.first();
-							}
-
-							if (is_null(tmpStorage)) {
-								tmpStorage = parentDocument.getElementById(key);
-							}
-
-							if (!is_null(tmpStorage)) {
-								tmpStorage.value = values[key];
-							}
+							tmpStorage = $(parentDocumentForms[0].parentNode).select("#"+key).first();
 						}
+
+						if (typeof(tmpStorage) == "undefined" || is_null(tmpStorage)) {
+							tmpStorage = parentDocument.getElementById(key);
+						}
+
+						tmpStorage.value = values[key];
 					}
 
 					if (!is_null(tmpStorage) && submitParent) {
