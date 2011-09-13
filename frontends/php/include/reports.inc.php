@@ -654,7 +654,6 @@ function bar_report_form3(){
 					);
 
 	$reportForm->addRow(S_PERIOD, $reporttimetab);
-//-----------
 
 	$scale = new CComboBox('scaletype', $scaletype);
 		$scale->addItem(TIMEPERIOD_TYPE_HOURLY, S_HOURLY);
@@ -672,7 +671,7 @@ function bar_report_form3(){
 		$avgcmb->addItem(TIMEPERIOD_TYPE_YEARLY,	S_YEARLY);
 	$reportForm->addRow(S_AVERAGE_BY, $avgcmb);
 
-// ITEMS
+	// items
 	$itemid = 0;
 	$description = '';
 	if(count($items) && ($items[0]['itemid'] > 0)){
@@ -680,12 +679,16 @@ function bar_report_form3(){
 		$description = get_item_by_itemid($itemid);
 		$description = itemName($description);
 	}
-	$reportForm->addVar('items[0][itemid]',$itemid);
 
-	$txtCondVal = new CTextBox('items[0][name]',$description,50,'yes');
-	$btnSelect = new CButton('btn1',S_SELECT,
+	$itemidVar = new CVar('items[0][itemid]', $itemid, 'items_0_itemid');
+	$reportForm->addItem($itemidVar);
+
+	$txtCondVal = new CTextBox('items[0][description]',$description,50,'yes');
+	$txtCondVal->setAttribute('id', 'items_0_description');
+
+	$btnSelect = new CButton('btn1', S_SELECT,
 			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
-			"&dstfld1=items_0_itemid&dstfld2=items_0_name&".
+			"&dstfld1=items_0_itemid&dstfld2=items_0_description&".
 			"srctbl=items&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
 			'T');
 
@@ -704,15 +707,12 @@ function bar_report_form3(){
 		$paletteTypeCmb->addItem(2, S_BRIGHTEN);
 
 	$reportForm->addRow(S_PALETTE , array($paletteCmb,$paletteTypeCmb));
-//--------------
-
-
 	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
 
-	$reset = new CButton('reset',S_RESET);
+	$reset = new CButton('reset', S_RESET);
 	$reset->setType('reset');
 	$reportForm->addItemToBottomRow($reset);
 
-return $reportForm;
+	return $reportForm;
 }
 ?>
