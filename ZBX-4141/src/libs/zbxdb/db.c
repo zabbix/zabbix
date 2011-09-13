@@ -488,11 +488,11 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
  *                                                                            *
  * Function: zbx_db_begin                                                     *
  *                                                                            *
- * Purpose: Start transaction                                                 *
+ * Purpose: start transaction                                                 *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing if DB does not support transactions                   *
+ * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_begin()
@@ -539,11 +539,11 @@ int	zbx_db_begin()
  *                                                                            *
  * Function: zbx_db_commit                                                    *
  *                                                                            *
- * Purpose: Commit transaction                                                *
+ * Purpose: commit transaction                                                *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing if DB does not support transactions                   *
+ * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_commit()
@@ -587,11 +587,11 @@ int	zbx_db_commit()
  *                                                                            *
  * Function: zbx_db_rollback                                                  *
  *                                                                            *
- * Purpose: Rollback transaction                                              *
+ * Purpose: rollback transaction                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing if DB does not support transactions                   *
+ * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_rollback()
