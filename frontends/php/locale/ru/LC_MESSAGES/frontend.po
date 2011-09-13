@@ -3,14 +3,15 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-02 12:56+0300\n"
-"PO-Revision-Date: 2011-08-13 13:09+0200\n"
-"Last-Translator: dotneft <dotneft@gmail.com>\n"
+"PO-Revision-Date: 2011-09-08 11:00+0200\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -344,7 +345,7 @@ msgstr "Добавить в"
 
 #: include/actions.inc.php:478 include/forms.inc.php:2236
 msgid "Add to host group"
-msgstr ""
+msgstr "Добавить в группу узлов сети"
 
 #: include/actions.inc.php:293 include/views/configuration.action.edit.php:732
 msgid "Add to host groups"
@@ -517,11 +518,11 @@ msgstr "Вы уверены, что хотите удалить"
 
 #: include/views/js/configuration.sysmaps.js.php:45
 msgid "Area size"
-msgstr ""
+msgstr "Размер области"
 
 #: include/views/js/configuration.sysmaps.js.php:35
 msgid "Area type"
-msgstr ""
+msgstr "Тип области"
 
 #: include/locales/en_gb.inc.php:846
 msgid "As is"
@@ -902,7 +903,7 @@ msgstr "Не удалось добавить узел сети"
 
 #: api/classes/class.chost.php:1824
 msgid "Cannot add host group."
-msgstr ""
+msgstr "Не удалось добавить группу узлов сети."
 
 #: include/locales/en_gb.inc.php:378
 msgid "Cannot add image"
@@ -918,7 +919,7 @@ msgstr "Не удалось добавить макрос"
 
 #: api/classes/class.chost.php:1945
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Не удалось добавить макрос."
 
 #: include/locales/en_gb.inc.php:584
 msgid "Cannot add maintenance"
@@ -986,7 +987,7 @@ msgstr "Невозможно добавить пользователя. Оба �
 
 #: api/classes/class.cusergroup.php:363
 msgid "Cannot add users."
-msgstr ""
+msgstr "Не удалось добавить пользователей."
 
 #: include/locales/en_gb.inc.php:349
 msgid "Cannot add value map"
@@ -1010,7 +1011,7 @@ msgstr "Не удалось создать другое подключение �
 
 #: discoveryconf.php:125
 msgid "Cannot create discovery rule"
-msgstr ""
+msgstr "Не удалось создать правило обнаружения"
 
 #: include/export.inc.php:822
 #, php-format
@@ -1057,7 +1058,7 @@ msgstr "Не удалось удалить узел сети"
 
 #: api/classes/class.chost.php:1833
 msgid "Cannot delete host group."
-msgstr ""
+msgstr "Не удалось удалить группу узлов сети."
 
 #: include/locales/en_gb.inc.php:380
 msgid "Cannot delete image"
@@ -1101,7 +1102,7 @@ msgstr "Не удалось обновить сценарий"
 
 #: include/locales/en_gb.inc.php:1210
 msgid "Cannot delete screen"
-msgstr ""
+msgstr "Не удалось удалить комплексный экран"
 
 #: scripts.php:142 scripts.php:159
 msgid "Cannot delete script"
@@ -1241,7 +1242,7 @@ msgstr "Не удалось выполнить выход."
 
 #: api/classes/class.chost.php:1732
 msgid "Cannot mass update host name."
-msgstr ""
+msgstr "Не удалось массово обновить имя узла сети."
 
 #: api/classes/class.ctemplate.php:1375
 msgid "Cannot mass update template name"
@@ -1249,7 +1250,7 @@ msgstr "Не удалось произвести массовое обновле
 
 #: api/classes/class.chost.php:1722
 msgid "Cannot mass update visible host name."
-msgstr ""
+msgstr "Не удалось массово обновить видимое имя узла сети."
 
 #: api/classes/class.ctemplate.php:1348
 msgid "Cannot mass update visible template name"
@@ -1281,7 +1282,7 @@ msgstr "Не удалось удалить макрос"
 
 #: api/classes/class.chost.php:1929
 msgid "Cannot remove macro."
-msgstr ""
+msgstr "Не удалось удалить макрос."
 
 #: include/locales/en_gb.inc.php:1903
 msgid "Cannot rename guest user"
@@ -1369,7 +1370,7 @@ msgstr "Не удалось обновить группу"
 
 #: api/classes/class.cusergroup.php:395
 msgid "Cannot update group."
-msgstr ""
+msgstr "Не удалось обновить группу."
 
 #: hosts.php:455 include/locales/en_gb.inc.php:687
 msgid "Cannot update host"
@@ -1397,7 +1398,7 @@ msgstr "Не удалось обновить макрос"
 
 #: api/classes/class.chost.php:1936
 msgid "Cannot update macro."
-msgstr ""
+msgstr "Не удалось обновить макрос."
 
 #: include/locales/en_gb.inc.php:666
 msgid "Cannot update macros"
@@ -1809,7 +1810,7 @@ msgstr "Создать"
 
 #: actionconf.php:342
 msgid "Create action"
-msgstr ""
+msgstr "Создать действие"
 
 #: include/locales/en_gb.inc.php:672
 msgid "Create application"
@@ -1817,11 +1818,11 @@ msgstr "Создать группу элементов данных"
 
 #: include/locales/en_gb.inc.php:527
 msgid "Create graph"
-msgstr ""
+msgstr "Создать график"
 
 #: include/locales/en_gb.inc.php:1518
 msgid "Create group"
-msgstr ""
+msgstr "Создать группу"
 
 #: config.php:683
 msgid "Create image"
@@ -1829,7 +1830,7 @@ msgstr "Создать изображение"
 
 #: include/locales/en_gb.inc.php:860
 msgid "Create item"
-msgstr ""
+msgstr "Создать элемент данных"
 
 #: include/locales/en_gb.inc.php:592
 msgid "Create maintenance period"

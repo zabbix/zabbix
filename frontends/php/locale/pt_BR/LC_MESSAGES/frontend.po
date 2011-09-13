@@ -3,15 +3,15 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-02 12:56+0300\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"PO-Revision-Date: 2011-09-09 14:49+0200\n"
+"Last-Translator: Tiago <tbsoares@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
-"Language: pt\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Country: BRAZIL\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: include/page_header.php:461
@@ -29,18 +29,20 @@ msgstr ""
 #: include/profiles.inc.php:262
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
 msgstr ""
+"\"Gatilhos piscam na mudança de estado\" é necessário ser \"0\" ou um inteiro "
+"positivo."
 
 #: include/func.inc.php:374
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d dia, "
+msgstr[1] "%1$d dias, "
 
 #: chart4.php:87 chart5.php:90
 #, php-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (ano %2$s)"
 
 #: include/blocks.inc.php:1054
 #, php-format
@@ -53,8 +55,8 @@ msgstr[1] ""
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d dispositivo"
+msgstr[1] "%d dispositivos"
 
 #: include/locales/en_gb.inc.php:281
 msgid "&"
@@ -70,11 +72,11 @@ msgstr "' não aceita parâmetros."
 
 #: include/views/configuration.action.edit.php:434
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - indefinidamente)"
 
 #: include/views/configuration.action.edit.php:441
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr ""
+msgstr "(mínimo de 60 segundos, 0 - usar a ação padrão)"
 
 #: include/locales/en_gb.inc.php:94
 msgid "(no proxy)"
@@ -134,7 +136,7 @@ msgstr "AÇÕES"
 
 #: include/locales/en_gb.inc.php:244
 msgid "ALARM ACKNOWLEDGES"
-msgstr "VISTOS DADOS EM ALARMES"
+msgstr "ALARMES RECONHECIDOS"
 
 #: include/locales/en_gb.inc.php:280
 #: include/views/configuration.action.edit.php:129
@@ -145,7 +147,7 @@ msgstr "E"
 #: include/views/configuration.action.edit.php:128
 #: include/views/configuration.action.edit.php:842
 msgid "AND / OR"
-msgstr "E/OU"
+msgstr "E / OU"
 
 #: include/locales/en_gb.inc.php:671
 msgid "APPLICATIONS"
@@ -153,11 +155,11 @@ msgstr "APLICAÇÃO"
 
 #: include/locales/en_gb.inc.php:1555
 msgid "AUDIT ACTIONS"
-msgstr "AUDITORIA de AÇÕES"
+msgstr "AUDITORIA DE AÇÕES"
 
 #: include/locales/en_gb.inc.php:1554
 msgid "AUDIT LOGS"
-msgstr "AUDITORIA de LOGS"
+msgstr "AUDITORIA DE LOGS"
 
 #: include/locales/en_gb.inc.php:1113
 msgid "AVAILABILITY REPORT"
@@ -165,16 +167,16 @@ msgstr "RELATÓRIO DE DISPONIBILIDADE"
 
 #: include/locales/en_gb.inc.php:1328
 msgid "Acceptable SLA (in %)"
-msgstr "SLA  aceitável (em %)"
+msgstr "SLA aceitável (em %)"
 
 #: sysmap.php:86
 msgid "Access denied!"
-msgstr ""
+msgstr "Acesso negado!"
 
 #: api/classes/class.cuser.php:924
 #, php-format
 msgid "Account is blocked for %s seconds"
-msgstr ""
+msgstr "Conta bloqueada por %s segundos"
 
 #: include/actions.inc.php:180 include/locales/en_gb.inc.php:1442
 #: include/views/configuration.action.edit.php:904
@@ -203,11 +205,11 @@ msgstr "Visto"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Eventos OK vistados"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Eventos PROBLEM vistados"
 
 #: include/locales/en_gb.inc.php:239
 msgid "Acknowledges"
@@ -215,7 +217,7 @@ msgstr "Vistos"
 
 #: include/views/configuration.sysmap.edit.php:129
 msgid "Acknowledging disabled"
-msgstr ""
+msgstr "Visto desabiitado"
 
 #: include/locales/en_gb.inc.php:1556
 #: include/views/configuration.action.edit.php:74
@@ -229,17 +231,19 @@ msgstr "Ação"
 #: api/classes/class.caction.php:900 api/classes/class.caction.php:919
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr ""
+msgstr "Ação \"%s\" existente."
 
 #: api/classes/class.caction.php:794 api/classes/class.caction.php:894
 #, php-format
 msgid "Action \"%s\" has incorrect value for \"esc_period\" (minimum 60 seconds)."
 msgstr ""
+"Ação \"%s\" possui um valor incorreto para \"esc_period\" (mínimo de 60 "
+"segundos)."
 
 #: api/classes/class.caction.php:949
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr ""
+msgstr "Ação \"%s\" não possui operações definidas."
 
 #: actionconf.php:157
 msgid "Action added"
@@ -263,7 +267,7 @@ msgstr "Ações"
 
 #: hosts.php:1004 include/locales/en_gb.inc.php:78
 msgid "Activate selected"
-msgstr "Ativar selecionado(s)"
+msgstr "Ativar selecionado"
 
 #: include/locales/en_gb.inc.php:1672
 msgid "Activate selected applications?"
@@ -275,7 +279,7 @@ msgstr "Ativar hosts selecionados"
 
 #: hosts.php:1005
 msgid "Activate selected hosts?"
-msgstr ""
+msgstr "Ativar hosts selecionados?"
 
 #: include/discovery.inc.php:119 include/locales/en_gb.inc.php:443
 #: include/locales/en_gb.inc.php:817
@@ -321,7 +325,7 @@ msgstr "Adicionar elemento"
 
 #: include/actions.inc.php:269 include/actions.inc.php:474
 msgid "Add host"
-msgstr "Adicionar servidor"
+msgstr "Adicionar host"
 
 #: sysmap.php:155
 msgid "Add link"
@@ -329,11 +333,11 @@ msgstr "Adicionar link"
 
 #: include/locales/en_gb.inc.php:901
 msgid "Add prototype"
-msgstr ""
+msgstr "Adicionar protótipo"
 
 #: include/locales/en_gb.inc.php:1967
 msgid "Add service"
-msgstr ""
+msgstr "Adicionar serviço"
 
 #: include/locales/en_gb.inc.php:1520
 msgid "Add to"
@@ -341,11 +345,11 @@ msgstr "Adicionar a"
 
 #: include/actions.inc.php:478 include/forms.inc.php:2236
 msgid "Add to host group"
-msgstr ""
+msgstr "Adicionar ao grupo de hosts"
 
 #: include/actions.inc.php:293 include/views/configuration.action.edit.php:732
 msgid "Add to host groups"
-msgstr ""
+msgstr "Adicionar aos grupos de host"
 
 #: include/locales/en_gb.inc.php:1559
 msgid "Added"

@@ -1,4 +1,10 @@
 --------------------------------------------------------------------------------
+Changes for 1.9.7
+
+New features:
+ - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
+
+--------------------------------------------------------------------------------
 Changes for 1.9.6
 
 New features:
