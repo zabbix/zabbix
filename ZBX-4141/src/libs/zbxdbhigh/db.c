@@ -118,12 +118,12 @@ void	DBbegin()
 
 	rc = zbx_db_begin();
 
-	while (ZBX_DB_OK > rc)
+	while (ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_OK > (rc = zbx_db_begin()))
+		if (ZBX_DB_DOWN == (rc = zbx_db_begin()))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -148,12 +148,12 @@ void	DBcommit()
 
 	rc = zbx_db_commit();
 
-	while (ZBX_DB_OK > rc)
+	while (ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_OK > (rc = zbx_db_commit()))
+		if (ZBX_DB_DOWN == (rc = zbx_db_commit()))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -178,12 +178,12 @@ void	DBrollback()
 
 	rc = zbx_db_rollback();
 
-	while (ZBX_DB_OK > rc)
+	while (ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_OK > (rc = zbx_db_rollback()))
+		if (ZBX_DB_DOWN == (rc = zbx_db_rollback()))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
@@ -209,12 +209,12 @@ int	__zbx_DBexecute(const char *fmt, ...)
 
 	rc = zbx_db_vexecute(fmt, args);
 
-	while (ZBX_DB_OK > rc)
+	while (ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_OK > (rc = zbx_db_vexecute(fmt, args)))
+		if (ZBX_DB_DOWN == (rc = zbx_db_vexecute(fmt, args)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
 			sleep(10);
