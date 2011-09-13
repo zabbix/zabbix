@@ -574,27 +574,28 @@ function insert_js_function($fnct_name){
 							}
 						}
 					}
-					else {
-						var parentDocumentForms = jQuery("form[name="+frame+"]", parentDocument.body);
+					else{
+						var parentDocumentForms = $(parentDocument.body).select("form[name="+frame+"]");
 					}
-
-					if (!parentDocumentForms.length) {
-						return close_window();
-					}
+					var submitParent = submitParent || false;
 
 					var frmStorage = null;
-					for (var key in values) {
-						if (is_null(values[key])) {
-							continue;
-						}
-						frmStorage = jQuery("#"+key, parentDocumentForms);
-						jQuery(frmStorage).val(values[key]);
+					for(var key in values){
+						if(is_null(values[key])) continue;
+
+						if(parentDocumentForms.length > 0)
+							frmStorage = jQuery(parentDocumentForms[0]).find("#"+key).get(0);
+
+						if(typeof(frmStorage) == "undefined" || is_null(frmStorage))
+							frmStorage = parentDocument.getElementById(key);
+
+						frmStorage.value = values[key];
 					}
 
-					var submitParent = submitParent || false;
-					if (!is_null(frmStorage) && submitParent) {
+					if(!is_null(frmStorage) && submitParent){
 						frmStorage.form.submit();
 					}
+
 					close_window();
 				}');
 		break;
