@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-13 12:13+0300\n"
-"PO-Revision-Date: 2011-09-12 12:12+0200\n"
+"PO-Revision-Date: 2011-09-13 11:58+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -1040,7 +1040,7 @@ msgstr "マップ\"%s\"を作成できません。"
 #: api/classes/class.cusermedia.php:425 api/classes/class.cuser.php:406
 #, php-format
 msgid "Cannot delete %1$s internal user \"%2$s\", try disabling that user."
-msgstr "内部ユーザ%1$sを削除できません。ユーザを無効にします"
+msgstr "%1$sインターナルユーザ\"%2$s\"を削除できません。ユーザを無効にします。"
 
 #: actionconf.php:175
 msgid "Cannot delete action"
@@ -3767,7 +3767,7 @@ msgstr "ホスト\"%s\"を削除しました"
 #: include/export.inc.php:916
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr "ホスト\"$s\"は\"IPMIを使用\"にチェックが入っていますが、\"IPMI IP\"にIPアドレスが入力されていません。IPMIインターフェースとしてホストのIPを利用します。"
+msgstr "ホスト\"%s\"は\"IPMIを使用\"にチェックが入っていますが、\"IPMI IP\"にIPアドレスが入力されていません。IPMIインターフェースとしてホストのIPを利用します。"
 
 #: include/screens.inc.php:723
 msgid "Host (ascending)"
