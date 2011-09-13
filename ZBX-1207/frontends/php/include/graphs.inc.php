@@ -298,15 +298,15 @@
  * @param bool $error if false error won't be thrown when item does not exists
  * @return array|bool
  */
-function get_same_graphitems_for_host($gitems, $dest_hostid, $error=true) {
+function get_same_graphitems_for_host($gitems, $dest_hostid, $error = true) {
 	$result = array();
 
 	foreach ($gitems as $gitem) {
-		$sql = 'SELECT src.itemid, dest.key_'.
-				' FROM items src, items dest'.
-				' WHERE dest.itemid='.$gitem['itemid'].
-					' AND src.key_=dest.key_'.
-					' AND src.hostid='.$dest_hostid;
+		$sql = 'SELECT dest.itemid,src.key_'.
+				' FROM items dest,items src'.
+				' WHERE dest.key_=src.key_'.
+					' AND dest.hostid='.$dest_hostid.
+					' AND src.itemid='.$gitem['itemid'];
 		$db_item = DBfetch(DBselect($sql));
 
 		if ($db_item) {
@@ -335,7 +335,7 @@ function get_same_graphitems_for_host($gitems, $dest_hostid, $error=true) {
  * @param $hostid
  * @return array|bool
  */
-function copy_graph_to_host($graphid, $hostid){
+function copy_graph_to_host($graphid, $hostid) {
 	$graphs = API::Graph()->get(array(
 		'graphids' => $graphid,
 		'output' => API_OUTPUT_EXTEND,
@@ -345,9 +345,9 @@ function copy_graph_to_host($graphid, $hostid){
 
 	$new_gitems = get_same_graphitems_for_host($graph['gitems'], $hostid);
 
-	if(!$new_gitems){
+	if (!$new_gitems) {
 		$host = get_host_by_hostid($hostid);
-		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph["name"], $host['host']));
+		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
 		return false;
 	}
 
