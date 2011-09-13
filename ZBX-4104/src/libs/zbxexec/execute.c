@@ -348,9 +348,6 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	else
 		ret = SUCCEED;
 
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
-
 	if (FAIL == ret)
 		goto close;
 
@@ -364,11 +361,14 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 	{
 		_ftime(&current_time);
 		if (0 < (timeout -= zbx_get_timediff_ms(&start_time, &current_time)) &&
-				WAIT_TIMEOUT == WaitForSingleObject(job, timeout))
+				WAIT_TIMEOUT == WaitForSingleObject(pi.hProcess, timeout))
 		{
 			ret = TIMEOUT_ERROR;
 		}
 	}
+
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
 close:
 	if (NULL != job)
 	{
