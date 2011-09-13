@@ -728,12 +728,8 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 // PREG
 	define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
 
-	define('ZBX_PREG_SPACES', '(\s+){0,1}');
 	define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 	define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)');	/* !!! Don't forget sync code with C !!! */
-
-	// use isKeyChar() function if you need to check only one symbol
-	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_.-]+)');	/* !!! Don't forget sync code with C !!! */
 
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
@@ -747,14 +743,8 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 	define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 
-
-	define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(?(?=,)('.ZBX_PREG_PARAMS.'){0,1}|(\['.ZBX_PREG_PARAMS.'\]){0,1}))');
-	// define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
-
-
 	define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
 
-	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
 	define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 	define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
 	define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
