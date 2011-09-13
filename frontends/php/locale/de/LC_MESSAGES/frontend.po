@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-13 12:13+0300\n"
-"PO-Revision-Date: 2011-09-07 07:44+0200\n"
+"PO-Revision-Date: 2011-09-13 12:12+0200\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
@@ -278,7 +278,7 @@ msgstr "Aktiviere ausgewählte Applikationen?"
 
 #: include/locales/en_gb.inc.php:80
 msgid "Activate selected hosts"
-msgstr "Aktiviere ausgewählte Hosts "
+msgstr "Aktiviere ausgewählte Hosts"
 
 #: hosts.php:1005
 msgid "Activate selected hosts?"
