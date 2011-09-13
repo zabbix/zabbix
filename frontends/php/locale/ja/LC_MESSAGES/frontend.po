@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-02 12:56+0300\n"
-"PO-Revision-Date: 2011-09-02 11:35+0200\n"
+"PO-Revision-Date: 2011-09-12 12:12+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -20,7 +20,7 @@ msgstr "回のログイン失敗がログに記録されています。最後の
 
 #: include/page_header.php:463
 msgid " on "
-msgstr ""
+msgstr "on"
 
 #: include/profiles.inc.php:257
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -338,7 +338,7 @@ msgstr "次に追加"
 
 #: include/actions.inc.php:478 include/forms.inc.php:2236
 msgid "Add to host group"
-msgstr ""
+msgstr "ホストグループに追加"
 
 #: include/actions.inc.php:293 include/views/configuration.action.edit.php:732
 msgid "Add to host groups"
@@ -896,7 +896,7 @@ msgstr "ホストを追加できません"
 
 #: api/classes/class.chost.php:1824
 msgid "Cannot add host group."
-msgstr ""
+msgstr "ホストグループを追加できません"
 
 #: include/locales/en_gb.inc.php:378
 msgid "Cannot add image"
@@ -912,7 +912,7 @@ msgstr "マクロを追加できません"
 
 #: api/classes/class.chost.php:1945
 msgid "Cannot add macro."
-msgstr ""
+msgstr "マクロを追加できません"
 
 #: include/locales/en_gb.inc.php:584
 msgid "Cannot add maintenance"
@@ -980,7 +980,7 @@ msgstr "ユーザを追加できません。パスワードが一致していま
 
 #: api/classes/class.cusergroup.php:363
 msgid "Cannot add users."
-msgstr ""
+msgstr "ユーザを追加できません"
 
 #: include/locales/en_gb.inc.php:349
 msgid "Cannot add value map"
@@ -1014,7 +1014,7 @@ msgstr "マップ\"%s\"を作成できません。"
 #: api/classes/class.cusermedia.php:425 api/classes/class.cuser.php:406
 #, php-format
 msgid "Cannot delete %1$s internal user \"%2$s\", try disabling that user."
-msgstr ""
+msgstr "内部ユーザ%1$sを削除できません。ユーザを無効にします"
 
 #: actionconf.php:175
 msgid "Cannot delete action"
@@ -1051,7 +1051,7 @@ msgstr "ホストを削除できません"
 
 #: api/classes/class.chost.php:1833
 msgid "Cannot delete host group."
-msgstr ""
+msgstr "ホストグループを削除できません"
 
 #: include/locales/en_gb.inc.php:380
 msgid "Cannot delete image"
@@ -1059,7 +1059,7 @@ msgstr "イメージを削除できません"
 
 #: api/classes/class.chost.php:1958
 msgid "Cannot delete inventory."
-msgstr ""
+msgstr "インベントリを削除できません"
 
 #: include/locales/en_gb.inc.php:789
 msgid "Cannot delete item"
@@ -1095,7 +1095,7 @@ msgstr "シナリオを削除できません"
 
 #: include/locales/en_gb.inc.php:1210
 msgid "Cannot delete screen"
-msgstr ""
+msgstr "スクリーンを削除できません"
 
 #: scripts.php:142 scripts.php:159
 msgid "Cannot delete script"
@@ -1235,7 +1235,7 @@ msgstr "ログアウトできません。"
 
 #: api/classes/class.chost.php:1732
 msgid "Cannot mass update host name."
-msgstr ""
+msgstr "ホスト名を一括更新できません"
 
 #: api/classes/class.ctemplate.php:1375
 msgid "Cannot mass update template name"
@@ -1243,7 +1243,7 @@ msgstr "テンプレート名を一括更新できません"
 
 #: api/classes/class.chost.php:1722
 msgid "Cannot mass update visible host name."
-msgstr ""
+msgstr "ホストの表示名は一括更新できません。"
 
 #: api/classes/class.ctemplate.php:1348
 msgid "Cannot mass update visible template name"
@@ -1275,7 +1275,7 @@ msgstr "マクロを削除できません"
 
 #: api/classes/class.chost.php:1929
 msgid "Cannot remove macro."
-msgstr ""
+msgstr "マクロを削除できません"
 
 #: include/locales/en_gb.inc.php:1903
 msgid "Cannot rename guest user"
@@ -1363,7 +1363,7 @@ msgstr "グループを更新できません"
 
 #: api/classes/class.cusergroup.php:395
 msgid "Cannot update group."
-msgstr ""
+msgstr "グループを更新できません"
 
 #: hosts.php:455 include/locales/en_gb.inc.php:687
 msgid "Cannot update host"
@@ -1391,7 +1391,7 @@ msgstr "マクロを更新できません"
 
 #: api/classes/class.chost.php:1936
 msgid "Cannot update macro."
-msgstr ""
+msgstr "マクロを更新できません"
 
 #: include/locales/en_gb.inc.php:666
 msgid "Cannot update macros"
@@ -1520,7 +1520,7 @@ msgstr ""
 
 #: include/views/js/configuration.discovery.js.php:26
 msgid "Check type"
-msgstr ""
+msgstr "チェックのタイプ"
 
 #: discoveryconf.php:249 include/views/configuration.discovery.edit.php:84
 msgid "Checks"
@@ -1528,7 +1528,7 @@ msgstr "チェック"
 
 #: api/classes/class.cdrule.php:565
 msgid "Checks should be unique."
-msgstr ""
+msgstr "チェックは重複できません"
 
 #: include/locales/en_gb.inc.php:227
 msgid "Child"
@@ -1540,12 +1540,12 @@ msgstr "中国語 (CN)"
 
 #: api/classes/class.ctemplate.php:1802
 msgid "Circular link cannot be created"
-msgstr ""
+msgstr "循環するリンクは作成できません"
 
 #: api/classes/class.cmapelement.php:553
 #, php-format
 msgid "Circular link cannot be created for map element \"%s\"."
-msgstr ""
+msgstr "マップのアイコン\"%s\"に循環するリンクは作成できません"
 
 #: include/locales/en_gb.inc.php:1567
 msgid "Clear"
@@ -1585,7 +1585,7 @@ msgstr "閉じる"
 
 #: include/views/js/configuration.action.edit.js.php:293
 msgid "Close currently opened remote command details without saving?"
-msgstr ""
+msgstr "現在開いているリモートコマンドの詳細を保存しないで閉じますか？"
 
 #: include/locales/en_gb.inc.php:481
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:26
@@ -1783,7 +1783,7 @@ msgstr "選択したトリガーをコピーしますか？"
 #: api/classes/class.cuser.php:988
 #, php-format
 msgid "Correct login [%s]"
-msgstr ""
+msgstr "ユーザ[%s]のログイン"
 
 #: include/locales/en_gb.inc.php:1843
 msgid "Could not save image!"
@@ -1803,7 +1803,7 @@ msgstr "作成"
 
 #: actionconf.php:342
 msgid "Create action"
-msgstr ""
+msgstr "アクションの作成"
 
 #: include/locales/en_gb.inc.php:672
 msgid "Create application"
@@ -2080,7 +2080,7 @@ msgstr "日付"
 
 #: include/hosts.inc.php:280
 msgid "Date HW decommissioned"
-msgstr ""
+msgstr "ハードウェアの使用期限"
 
 #: include/hosts.inc.php:270
 msgid "Date HW installed"
@@ -2212,7 +2212,7 @@ msgstr "条件式を削除しますか？"
 
 #: include/forms.inc.php:2239
 msgid "Delete from host group"
-msgstr ""
+msgstr "グループから削除"
 
 #: include/locales/en_gb.inc.php:522
 msgid "Delete graph?"
@@ -2240,7 +2240,7 @@ msgstr "メンテナンス期間を削除しますか？"
 
 #: include/views/configuration.sysmap.edit.php:192
 msgid "Delete network map?"
-msgstr ""
+msgstr "ネットワークマップを削除しますか？"
 
 #: include/locales/en_gb.inc.php:413
 msgid "Delete regular expression?"
@@ -2739,12 +2739,12 @@ msgstr "ドロップダウンの1つ目の項目"
 #: api/classes/class.chost.php:1365
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
-msgstr ""
+msgstr "ホストが重複しています。同じホスト名\"%s\"を持つホスト設定がすでに存在しています。"
 
 #: api/classes/class.chost.php:1396
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
-msgstr ""
+msgstr "ホスト名が重複しています。同じホストの表示名\"%s\"を持つホストがすでに存在しています。"
 
 #: api/classes/class.cmap.php:579
 #, php-format
@@ -2825,7 +2825,7 @@ msgstr "サービスの変更"
 
 #: include/locales/en_gb.inc.php:884
 msgid "Edit trigger"
-msgstr ""
+msgstr "トリガーの変更"
 
 #: include/locales/en_gb.inc.php:183
 #: include/views/configuration.sysmap.edit.php:134
@@ -2861,7 +2861,7 @@ msgstr "入力パラメータが空白です"
 
 #: api/classes/class.chost.php:2117
 msgid "Empty input parameter."
-msgstr ""
+msgstr "入力パラメータが空白です"
 
 #: api/classes/class.cdrule.php:427
 msgid "Empty input."
@@ -2897,7 +2897,7 @@ msgstr "選択したグループのデバッグモードを有効にしますか
 
 #: include/views/administration.general.gui.edit.php:37
 msgid "Enable event acknowledges"
-msgstr ""
+msgstr "イベントの障害対応コメントを有効"
 
 #: include/actions.inc.php:275 include/actions.inc.php:476
 msgid "Enable host"
@@ -2971,7 +2971,7 @@ msgstr "サービス時間のエラー"
 
 #: include/locales/en_gb.inc.php:1545
 msgid "Error description"
-msgstr ""
+msgstr "説明のエラー"
 
 #: api/classes/class.citemgeneral.php:194
 #, php-format
@@ -3236,7 +3236,7 @@ msgstr "第1週"
 
 #: include/views/js/configuration.sysmaps.js.php:38
 msgid "Fit to map"
-msgstr ""
+msgstr "マップに合わせる"
 
 #: include/locales/en_gb.inc.php:526
 msgid "Fixed"
@@ -3330,7 +3330,7 @@ msgstr "GUIアクセスを更新しました"
 
 #: include/locales/en_gb.inc.php:1576
 msgid "GUI messaging"
-msgstr ""
+msgstr "GUIメッセージング"
 
 #: include/menu.inc.php:209
 msgid "General"
@@ -3339,7 +3339,7 @@ msgstr "一般設定"
 #: include/classes/class.cbar.php:725 include/classes/class.cchart.php:2183
 #, php-format
 msgid "Generated in %s sec"
-msgstr ""
+msgstr "Generated in %s sec"
 
 #: include/locales/en_gb.inc.php:1587
 msgid "German (DE)"
@@ -3367,7 +3367,7 @@ msgstr "グローバルスクリプト"
 
 #: popup.php:135
 msgid "Global scripts"
-msgstr ""
+msgstr "グローバルスクリプト"
 
 #: actionconf.php:504 hosts.php:1017 include/locales/en_gb.inc.php:1615
 #: include/views/administration.script.list.php:107
@@ -3451,21 +3451,21 @@ msgstr "グラフ名"
 #: api/classes/class.ctemplate.php:2058
 #, php-format
 msgid "Graph prototype [%1$s] unlinked."
-msgstr ""
+msgstr "グラフのプロトタイプ[%1$s]のリンクを削除しました"
 
 #: api/classes/class.cgraphprototype.php:1036
 #, php-format
 msgid "Graph prototype [%s] deleted."
-msgstr ""
+msgstr "グラフのプロトタイプ[%1$s]を削除しました"
 
 #: api/classes/class.cgraphprototype.php:1129
 msgid "Graph prototype must have at least one prototype"
-msgstr ""
+msgstr "グラフプロトタイプは少なくとも1つ以上のプロトタイプを設定する必要があります"
 
 #: include/views/configuration.host.edit.php:404
 #: include/views/configuration.template.edit.php:331
 msgid "Graph prototypes"
-msgstr ""
+msgstr "グラフプロトタイプ"
 
 #: include/locales/en_gb.inc.php:533
 msgid "Graph sum"
@@ -3482,13 +3482,13 @@ msgstr "グラフを更新しました"
 #: api/classes/class.cgraph.php:1119
 #, php-format
 msgid "Graph with name \"%1$s\" already exists"
-msgstr ""
+msgstr "\"%1$s\"の名前を持つグラフがすでに存在します"
 
 #: api/classes/class.cgraph.php:850 api/classes/class.cgraph.php:871
 #: api/classes/class.cgraphprototype.php:839
 #: api/classes/class.cgraphprototype.php:860
 msgid "Graph with same name but other type exist"
-msgstr ""
+msgstr "同じ名前で異なるタイプのグラフが存在します"
 
 #: hosts.php:765 hosts.php:849 include/locales/en_gb.inc.php:684
 #: include/menu.inc.php:67 include/views/configuration.host.edit.php:314
@@ -3516,12 +3516,12 @@ msgstr "グループ"
 #: api/classes/class.chostgroup.php:742
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because it is used in a global script."
-msgstr ""
+msgstr "グローバルスクリプトに利用されているためグループ\"%s\"を削除できません"
 
 #: api/classes/class.chostgroup.php:728
 #, php-format
 msgid "Group \"%s\" cannot be deleted, because some hosts depend on it."
-msgstr ""
+msgstr "ホストが所属しているためグループ\"%s\"を削除できません"
 
 #: include/locales/en_gb.inc.php:1468
 msgid "Group added"
@@ -3545,7 +3545,7 @@ msgstr "グループを更新しました"
 
 #: hostinventoriesoverview.php:80
 msgid "Grouping by"
-msgstr ""
+msgstr "次によるグルーピング"
 
 #: include/locales/en_gb.inc.php:705
 #: include/views/configuration.host.edit.php:173
@@ -3578,11 +3578,11 @@ msgstr "ホストグループ"
 
 #: hostinventories.php:84
 msgid "HOST INVENTORIES"
-msgstr ""
+msgstr "ホストインベントリ"
 
 #: hostinventoriesoverview.php:61
 msgid "HOST INVENTORY OVERVIEW"
-msgstr ""
+msgstr "ホストインベントリの概要"
 
 #: hostinventoriesoverview.php:81 hostinventories.php:94 hosts_mon.php:120
 #: hosts_mon.php:125 hosts.php:723
@@ -3601,11 +3601,11 @@ msgstr "HTTP認証"
 #: include/discovery.inc.php:73
 #: include/views/js/configuration.discovery.js.php:133
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: include/hosts.inc.php:195
 msgid "HW architecture"
-msgstr ""
+msgstr "ハードウェアアーキテクチャ"
 
 #: include/hosts.inc.php:115
 msgid "Hardware"
@@ -3613,7 +3613,7 @@ msgstr "ハードウェア"
 
 #: include/hosts.inc.php:120
 msgid "Hardware (Full details)"
-msgstr ""
+msgstr "ハードウェア (詳細)"
 
 #: include/locales/en_gb.inc.php:1225
 #: include/views/configuration.sysmap.edit.php:50
@@ -3704,21 +3704,23 @@ msgstr "ホスト"
 #: api/classes/class.cproxy.php:368 api/classes/class.ctemplate.php:1042
 #, php-format
 msgid "Host \"%s\" already exists."
-msgstr ""
+msgstr "ホスト\"%s\"はすでに存在しています"
 
 #: api/classes/class.chost.php:2240
 #, php-format
 msgid "Host \"%s\" deleted."
-msgstr ""
+msgstr "ホスト\"%s\"を削除しました"
 
 #: include/export.inc.php:899
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr ""
+"ホスト\"$s\"は\"IPMIを使用\"にチェックが入っていますが、\"IPMI "
+"IP\"にIPアドレスが入力されていません。IPMIインターフェースとしてホストのIPを利用します。"
 
 #: include/screens.inc.php:723
 msgid "Host (ascending)"
-msgstr ""
+msgstr "ホスト(昇順)"
 
 #: include/actions.inc.php:52
 msgid "Host IP"
@@ -3726,7 +3728,7 @@ msgstr "ホストのIPアドレス"
 
 #: include/forms.inc.php:3838
 msgid "Host Inventory"
-msgstr ""
+msgstr "ホストインベントリ"
 
 #: include/views/administration.script.list.php:46
 msgid "Host access"
@@ -3760,11 +3762,11 @@ msgstr "ホストグループ"
 
 #: include/views/js/configuration.sysmaps.js.php:31
 msgid "Host group elements"
-msgstr ""
+msgstr "ホストグループ内のホスト"
 
 #: include/views/configuration.sysmap.edit.php:86
 msgid "Host group label type"
-msgstr ""
+msgstr "ホストグループのラベルタイプ"
 
 #: include/locales/en_gb.inc.php:731 include/menu.inc.php:144
 #: include/views/administration.script.edit.php:89 popup.php:57 popup.php:117
@@ -3773,19 +3775,19 @@ msgstr "ホストグループ"
 
 #: include/locales/en_gb.inc.php:656
 msgid "Host interface"
-msgstr ""
+msgstr "ホストインターフェース"
 
 #: include/locales/en_gb.inc.php:1607
 msgid "Host inventories"
-msgstr ""
+msgstr "ホストインベントリ"
 
 #: include/views/configuration.host.edit.php:592
 msgid "Host inventory"
-msgstr ""
+msgstr "ホストインベントリ"
 
 #: include/locales/en_gb.inc.php:1610
 msgid "Host inventory overview"
-msgstr ""
+msgstr "ホストインベントリの概要"
 
 #: include/locales/en_gb.inc.php:1794
 msgid "Host key does not exist."
@@ -3793,11 +3795,11 @@ msgstr "ホストのキーが存在しません"
 
 #: include/views/configuration.sysmap.edit.php:92
 msgid "Host label type"
-msgstr ""
+msgstr "ホストのラベルタイプ"
 
 #: include/views/configuration.host.massupdate.php:40
 msgid "Host mass update"
-msgstr ""
+msgstr "ホストの一括更新"
 
 #: include/actions.inc.php:61 include/views/configuration.host.edit.php:157
 msgid "Host name"
@@ -3805,15 +3807,15 @@ msgstr "ホスト名"
 
 #: include/hosts.inc.php:235
 msgid "Host networks"
-msgstr ""
+msgstr "ホストネットワーク"
 
 #: include/hosts.inc.php:245
 msgid "Host router"
-msgstr ""
+msgstr "ホストルータ"
 
 #: include/locales/en_gb.inc.php:1290
 msgid "Host screens"
-msgstr ""
+msgstr "ホストスクリーン"
 
 #: include/locales/en_gb.inc.php:1043
 msgid "Host status"
@@ -3825,7 +3827,7 @@ msgstr "ホストのステータスを更新しました"
 
 #: include/hosts.inc.php:240
 msgid "Host subnet mask"
-msgstr ""
+msgstr "ホストのサブネットマスク"
 
 #: include/actions.inc.php:40
 msgid "Host template"
@@ -3833,12 +3835,12 @@ msgstr "ホストテンプレート"
 
 #: include/locales/en_gb.inc.php:1271
 msgid "Host time"
-msgstr ""
+msgstr "ホスト時間"
 
 #: api/classes/class.chost.php:1577 api/classes/class.chost.php:1582
 #: api/classes/class.chost.php:1587 api/classes/class.chost.php:1596
 msgid "Host update failed."
-msgstr ""
+msgstr "ホストの更新に失敗しました"
 
 #: hosts.php:454
 msgid "Host updated"
@@ -3847,13 +3849,13 @@ msgstr "ホストを更新しました"
 #: api/classes/class.chost.php:1423 api/classes/class.ctemplate.php:1396
 #, php-format
 msgid "Host with the same name \"%s\" already exists."
-msgstr ""
+msgstr "同じホスト名\"%s\"を持つホストがすでに存在します"
 
 #: api/classes/class.chost.php:1429 api/classes/class.ctemplate.php:1052
 #: api/classes/class.ctemplate.php:1369
 #, php-format
 msgid "Host with the same visible name \"%s\" already exists."
-msgstr ""
+msgstr "同じホストの表示名\"%s\"を持つホストがすでに存在します"
 
 #: include/locales/en_gb.inc.php:680 include/menu.inc.php:52
 #: include/menu.inc.php:104 include/menu.inc.php:152 popup.php:45
@@ -3886,7 +3888,7 @@ msgstr "ホストの位置"
 
 #: hosts.php:423
 msgid "Hosts updated"
-msgstr ""
+msgstr "ホストを更新しました"
 
 #: include/locales/en_gb.inc.php:1139
 msgid "Hour"
@@ -3911,7 +3913,7 @@ msgstr "ハンガリー語 (HU)"
 #: include/locales/en_gb.inc.php:104
 #: include/views/js/configuration.discovery.js.php:134
 msgid "ICMP ping"
-msgstr ""
+msgstr "ICMP ping"
 
 #: include/locales/en_gb.inc.php:520
 msgid "ID"
@@ -3938,7 +3940,7 @@ msgstr "IPアドレス"
 
 #: api/classes/class.chostinterface.php:508
 msgid "IP and DNS cannot be empty for host interface."
-msgstr ""
+msgstr "ホストインターフェースのIPとDNSは必須項目です"
 
 #: discoveryconf.php:247 include/views/configuration.discovery.edit.php:58
 msgid "IP range"
@@ -3946,7 +3948,7 @@ msgstr "IPアドレスの範囲"
 
 #: api/classes/class.cdrule.php:438
 msgid "IP range cannot be empty."
-msgstr ""
+msgstr "IPレンジは必須項目です"
 
 #: include/locales/en_gb.inc.php:657
 #: include/views/administration.script.edit.php:47
@@ -3954,7 +3956,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:641
 #: include/views/configuration.host.edit.php:461
 msgid "IPMI"
-msgstr ""
+msgstr "IPMI"
 
 #: include/locales/en_gb.inc.php:809
 msgid "IPMI agent"
@@ -4047,7 +4049,7 @@ msgstr "アイコン (不明)"
 
 #: include/views/configuration.sysmap.edit.php:68
 msgid "Icon highlight"
-msgstr ""
+msgstr "アイコンのハイライト"
 
 #: include/views/configuration.sysmap.edit.php:119
 msgid "Icon label location"
@@ -4080,7 +4082,7 @@ msgstr "イメージを削除しました"
 
 #: include/views/configuration.sysmap.edit.php:110
 msgid "Image label type"
-msgstr ""
+msgstr "イメージラベルのタイプ"
 
 #: include/locales/en_gb.inc.php:1846
 msgid "Image size must be less than 1MB"
@@ -4104,7 +4106,7 @@ msgstr "インポート"
 
 #: hosts.php:294 screenconf.php:135 sysmaps.php:154 templates.php:264
 msgid "Import failed"
-msgstr ""
+msgstr "インポートに失敗しました"
 
 #: include/locales/en_gb.inc.php:184
 msgid "Import file"
@@ -4112,7 +4114,7 @@ msgstr "インポートするファイル"
 
 #: include/locales/en_gb.inc.php:975
 msgid "Import map"
-msgstr ""
+msgstr "マップのインポート"
 
 #: include/locales/en_gb.inc.php:1246
 msgid "Import screen"
@@ -4120,12 +4122,12 @@ msgstr "スクリーンのインポート"
 
 #: hosts.php:294 screenconf.php:135 sysmaps.php:154 templates.php:264
 msgid "Imported successfully"
-msgstr ""
+msgstr "インポートに成功しました"
 
 #: hostinventories.php:184
 #, php-format
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
-msgstr ""
+msgstr "インベントリフィールド\"%s\"が存在しないためフィルタが行えません。"
 
 #: include/locales/en_gb.inc.php:1284
 msgid "Impossible to remove last row and column"
@@ -4160,183 +4162,183 @@ msgstr "含める"
 #: api/classes/class.cmap.php:615 api/classes/class.cmap.php:620
 #, php-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"のラベルタイプの値%1$sが正しくありません。"
 
 #: include/actions.inc.php:673
 #, php-format
 msgid "Incorrect IP \"%s\"."
-msgstr ""
+msgstr "IPアドレス\"%s\"が正しくありません。"
 
 #: api/classes/class.cdrule.php:441
 #, php-format
 msgid "Incorrect IP range \"%s\"."
-msgstr ""
+msgstr "IPアドレスの範囲\"%s\"が正しくありません"
 
 #: include/locales/en_gb.inc.php:1848
 msgid "Incorrect Image"
-msgstr "間違ったイメージ"
+msgstr "イメージが正しくありません"
 
 #: api/classes/class.cdrule.php:503
 #: include/views/js/configuration.discovery.js.php:319
 msgid "Incorrect SNMP OID."
-msgstr ""
+msgstr "SNMP OIDの値が正しくありません。"
 
 #: api/classes/class.cdrule.php:500
 #: include/views/js/configuration.discovery.js.php:316
 msgid "Incorrect SNMP community."
-msgstr ""
+msgstr "SNMPコミュニティの値が正しくありません。"
 
 #: api/classes/class.caction.php:1666
 msgid "Incorrect action condition discovery check."
-msgstr ""
+msgstr "アクションの実行条件のディスカバリチェックの値が正しくありません。"
 
 #: api/classes/class.caction.php:1676
 msgid "Incorrect action condition discovery status."
-msgstr ""
+msgstr "アクションの実行条件のディスカバリのステータスの値が正しくありません。"
 
 #: api/classes/class.caction.php:1699
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to this host group."
-msgstr ""
+msgstr "アクションの実行条件のホストグループの値が正しくありません。ホストグループが存在しないか、アクセス権限がありません。"
 
 #: api/classes/class.caction.php:1701
 msgid "Incorrect action condition host. Host does not exist or you have no access to this host."
-msgstr ""
+msgstr "アクションの実行条件のホストの値が正しくありません。ホストが存在しないか、アクセス権限がありません。"
 
 #: api/classes/class.caction.php:1661
 #, php-format
 msgid "Incorrect action condition ip \"%s\"."
-msgstr ""
+msgstr "アクションの実行条件のIPアドレス\"%s\"が正しくありません。"
 
 #: api/classes/class.caction.php:1656
 #, php-format
 msgid "Incorrect action condition period \"%s\"."
-msgstr ""
+msgstr "アクションの実行条件の期間\"%s\"が正しくありません。"
 
 #: api/classes/class.caction.php:1671
 #, php-format
 msgid "Incorrect action condition port \"%s\"."
-msgstr ""
+msgstr "アクションの実行条件のポート\"%s\"が正しくありません。"
 
 #: api/classes/class.caction.php:1703
 msgid "Incorrect action condition template. Template does not exist or you have no access to this template."
-msgstr ""
+msgstr "アクションの実行条件のテンプレートの値が正しくありません。テンプレートが存在しないか、アクセス権限がありません。"
 
 #: api/classes/class.caction.php:1705
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to this trigger."
-msgstr ""
+msgstr "アクションの実行条件のトリガーの値が正しくありません。トリガーが存在しないか、アクセス権限がありません。"
 
 #: api/classes/class.caction.php:1694
 msgid "Incorrect action condition type."
-msgstr ""
+msgstr "アクションの実行条件のタイプの値が正しくありません"
 
 #: api/classes/class.caction.php:941
 msgid "Incorrect action conditionid"
-msgstr ""
+msgstr "アクションの実行条件のIDの値が正しくありません"
 
 #: api/classes/class.caction.php:1546
 msgid "Incorrect action operation command type."
-msgstr ""
+msgstr "実行するアクションのコマンドタイプの値が正しくありません。"
 
 #: api/classes/class.caction.php:1722
 msgid "Incorrect action operation condition acknowledge type."
-msgstr ""
+msgstr "実行するアクションの障害対応コメントのタイプが正しくありません。"
 
 #: api/classes/class.caction.php:1726
 msgid "Incorrect action operation condition type."
-msgstr ""
+msgstr "実行するアクションの実行条件のタイプが正しくありません。"
 
 #: api/classes/class.caction.php:1473
 msgid "Incorrect action operation escalation period."
-msgstr ""
+msgstr "実行するアクションのエスカレーションの期間の値が正しくありません。"
 
 #: api/classes/class.caction.php:1463 api/classes/class.caction.php:1467
 msgid "Incorrect action operation escalation step values."
-msgstr ""
+msgstr "実行するアクションのエスカレーションステップの値が正しくありません。"
 
 #: api/classes/class.caction.php:1618
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
-msgstr ""
+msgstr "実行するアクションのホストグループの値が正しくありません。ホストグループが存在しないか、アクセス権がありません。"
 
 #: api/classes/class.caction.php:1620
 msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
-msgstr ""
+msgstr "実行するアクションのホストの値が正しくありません。ホストが存在しないか、アクセス権がありません。"
 
 #: api/classes/class.caction.php:1552 api/classes/class.caction.php:1555
 #, php-format
 msgid "Incorrect action operation port \"%s\"."
-msgstr ""
+msgstr "実行するアクションのポート\"%s\"が正しくありません。"
 
 #: api/classes/class.caction.php:1613
 msgid "Incorrect action operation type."
-msgstr ""
+msgstr "実行するアクションのタイプが正しくありません。"
 
 #: api/classes/class.caction.php:1624
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
-msgstr ""
+msgstr "実行するアクションのユーザグループが正しくありません。グループが存在しないか、アクセス権がありません。"
 
 #: api/classes/class.caction.php:1622
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
-msgstr ""
+msgstr "実行するアクションのユーザが正しくありません。ユーザが存在しないか、アクセス権がありません。"
 
 #: api/classes/class.caction.php:966
 msgid "Incorrect action operationid"
-msgstr ""
+msgstr "実行するアクションのIDが正しくありません"
 
 #: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1737
 msgid "Incorrect arguments passed to function"
-msgstr "設定項目が間違っています"
+msgstr "入力項目が正しくありません"
 
 #: api/classes/class.chostinterface.php:504
 msgid "Incorrect arguments passed to method."
-msgstr ""
+msgstr "入力項目が正しくありません。"
 
 #: include/locales/en_gb.inc.php:1851
 msgid "Incorrect characters used for Node name"
-msgstr "ノード名に間違った文字列が使用されています"
+msgstr "ノード名に不正な文字列が使用されています"
 
 #: api/classes/class.cproxy.php:360
 #, php-format
 msgid "Incorrect characters used for Proxy name \"%s\"."
-msgstr ""
+msgstr "プロキシ名\"%s\"に不正な文字列が使用されています。"
 
 #: api/classes/class.ctemplate.php:1033
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
-msgstr ""
+msgstr "テンプレート名[%1$s]に不正な文字列が使用されています"
 
 #: api/classes/class.chost.php:1361 api/classes/class.chost.php:1728
 #, php-format
 msgid "Incorrect characters used for host name \"%s\"."
-msgstr ""
+msgstr "ホスト名\"%s\"に不正な文字列が使用されています。"
 
 #: api/classes/class.ctemplate.php:1401
 #, php-format
 msgid "Incorrect characters used for template name \"%s\"."
-msgstr ""
+msgstr "テンプレート名\"%s\"に不正な文字列が使用されています。"
 
 #: include/actions.inc.php:716
 msgid "Incorrect condition type"
-msgstr "不正なコンディションタイプ"
+msgstr "実行条件のタイプの値が正しくありません"
 
 #: api/classes/class.cdrule.php:445
 msgid "Incorrect delay."
-msgstr ""
+msgstr "間隔の値が正しくありません。"
 
 #: include/locales/en_gb.inc.php:1408
 msgid "Incorrect dependency"
-msgstr "不正な依存関係"
+msgstr "依存関係の値が正しくありません"
 
 #: include/actions.inc.php:679
 msgid "Incorrect discovery check."
-msgstr ""
+msgstr "ディスカバリチェックの値が正しくありません。"
 
 #: include/actions.inc.php:691 include/actions.inc.php:697
 msgid "Incorrect discovery status."
-msgstr ""
+msgstr "ディスカバリステータスの値が正しくありません。"
 
 #: include/locales/en_gb.inc.php:402
 msgid "Incorrect expression"
-msgstr "誤った正規表現"
+msgstr "正規表現の値が正しくありません"
 
 #: include/db.inc.php:1307 include/db.inc.php:1344
 #, php-format
@@ -4368,7 +4370,7 @@ msgstr ""
 #: api/classes/class.cscreen.php:527
 #, php-format
 msgid "Incorrect host group ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素のホストグループID\"%s\"が正しくありません。"
 
 #: include/actions.inc.php:617
 msgid "Incorrect host group."

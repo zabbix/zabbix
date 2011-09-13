@@ -1,41 +1,42 @@
+# qix <qix@the-wired.net>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-02 12:56+0300\n"
-"PO-Revision-Date: 2011-01-25 00:12+0200\n"
+"PO-Revision-Date: 2011-09-06 20:30+0200\n"
 "Last-Translator: qix <qix@the-wired.net>\n"
-"Language-Team: Zabbix <info@zabbix.com>\n"
+"Language-Team: Dutch Translation Team\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Virtaal 0.6.1\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: include/page_header.php:461
 msgid " failed login attempts logged. Last failed attempt was from "
-msgstr ""
+msgstr " mislukte login pogingen. De laatste poging was vanaf "
 
 #: include/page_header.php:463
 msgid " on "
-msgstr ""
+msgstr " op "
 
 #: include/profiles.inc.php:257
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr ""
+msgstr "\"Laat triggers met status OK zien\" moet \"0\" of meer zijn. "
 
 #: include/profiles.inc.php:262
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr ""
+msgstr "\"Triggers laten knipperen op status verandering\" moet \"0\" of meer zijn."
 
 #: include/func.inc.php:374
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d dag, "
+msgstr[1] "%1$d dagen, "
 
 #: chart4.php:87 chart5.php:90
 #, php-format
@@ -46,15 +47,15 @@ msgstr "%1$s (jaar %2$s)"
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%2$d van %1$d probleem wordt getoond"
+msgstr[1] "%2$d van %1$d problemen worden getoond"
 
 #: discovery.php:241
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d device"
+msgstr[1] "%d devices"
 
 #: include/locales/en_gb.inc.php:281
 msgid "&"
@@ -70,11 +71,11 @@ msgstr "' accepteert geen parameters."
 
 #: include/views/configuration.action.edit.php:434
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - oneindig)"
 
 #: include/views/configuration.action.edit.php:441
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr ""
+msgstr "(minimaal 60 seconden, 0 - gebruik standaard waarde van de actie)"
 
 #: include/locales/en_gb.inc.php:94
 msgid "(no proxy)"
@@ -86,7 +87,7 @@ msgstr "(selecteer eerst een host)"
 
 #: include/screens.inc.php:819 popup.php:1696 popup.php:1699
 msgid "- all groups -"
-msgstr ""
+msgstr "- alle groepen -"
 
 #: include/locales/en_gb.inc.php:465
 msgid "- other -"
@@ -169,12 +170,12 @@ msgstr "Accepteerbare SLA (in %)"
 
 #: sysmap.php:86
 msgid "Access denied!"
-msgstr ""
+msgstr "Toegang geweigerd!"
 
 #: api/classes/class.cuser.php:924
 #, php-format
 msgid "Account is blocked for %s seconds"
-msgstr ""
+msgstr "Account is geblokkeerd voor %s seconden"
 
 #: include/actions.inc.php:180 include/locales/en_gb.inc.php:1442
 #: include/views/configuration.action.edit.php:904
@@ -199,15 +200,15 @@ msgstr "Bevestiging status"
 
 #: include/locales/en_gb.inc.php:1441
 msgid "Acknowledged"
-msgstr "Bevestiging"
+msgstr "Bevestigd"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Bevestigde gebeurtenissen met status OK"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Bevestigde gebeurtenissen met status Probleem"
 
 #: include/locales/en_gb.inc.php:239
 msgid "Acknowledges"
@@ -215,7 +216,7 @@ msgstr "Bevestigingen"
 
 #: include/views/configuration.sysmap.edit.php:129
 msgid "Acknowledging disabled"
-msgstr ""
+msgstr "Bevestigen is uitgeschakeld"
 
 #: include/locales/en_gb.inc.php:1556
 #: include/views/configuration.action.edit.php:74
@@ -229,17 +230,19 @@ msgstr "Actie"
 #: api/classes/class.caction.php:900 api/classes/class.caction.php:919
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr ""
+msgstr "Actie \"%s\" bestaat reeds."
 
 #: api/classes/class.caction.php:794 api/classes/class.caction.php:894
 #, php-format
 msgid "Action \"%s\" has incorrect value for \"esc_period\" (minimum 60 seconds)."
 msgstr ""
+"Actie \"%s\" heeft een onjuiste waarde voor \"esc_period\" (minimaal 60 "
+"seconden)."
 
 #: api/classes/class.caction.php:949
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr ""
+msgstr "Actie \"%s\" heeft geen handelingen gedefinieerd."
 
 #: actionconf.php:157
 msgid "Action added"
@@ -275,7 +278,7 @@ msgstr "Geselecteerde hosts activeren"
 
 #: hosts.php:1005
 msgid "Activate selected hosts?"
-msgstr ""
+msgstr "Geselecteerde hosts activeren?"
 
 #: include/discovery.inc.php:119 include/locales/en_gb.inc.php:443
 #: include/locales/en_gb.inc.php:817
@@ -333,7 +336,7 @@ msgstr "Prototype toevoegen"
 
 #: include/locales/en_gb.inc.php:1967
 msgid "Add service"
-msgstr ""
+msgstr "Service toevoegen"
 
 #: include/locales/en_gb.inc.php:1520
 msgid "Add to"
@@ -341,11 +344,11 @@ msgstr "Toevoegen aan"
 
 #: include/actions.inc.php:478 include/forms.inc.php:2236
 msgid "Add to host group"
-msgstr ""
+msgstr "Aan host groep toevoegen"
 
 #: include/actions.inc.php:293 include/views/configuration.action.edit.php:732
 msgid "Add to host groups"
-msgstr ""
+msgstr "Aan host groepen toevoegen"
 
 #: include/locales/en_gb.inc.php:1559
 msgid "Added"
@@ -373,11 +376,11 @@ msgstr "Beheer"
 
 #: include/views/configuration.sysmap.edit.php:72
 msgid "Advanced labels"
-msgstr ""
+msgstr "Geavanceerde labels"
 
 #: include/locales/en_gb.inc.php:1040
 msgid "Age"
-msgstr "Leeftijd"
+msgstr "Doorlooptijd"
 
 #: include/locales/en_gb.inc.php:1449
 msgid "Age less than"
@@ -386,7 +389,7 @@ msgstr "Leeftijd minder dan"
 #: overview.php:124
 #, php-format
 msgid "Age less than %s"
-msgstr ""
+msgstr "Doorlooptijd minder dan %s "
 
 #: include/locales/en_gb.inc.php:166
 #: include/views/administration.script.list.php:76 popup.php:1835
@@ -443,7 +446,7 @@ msgstr "Iedere"
 
 #: include/locales/en_gb.inc.php:395
 msgid "Any character string included"
-msgstr "Iedere karakter string meegenomen"
+msgstr "Iedere character string meegenomen"
 
 #: include/actions.inc.php:59 include/locales/en_gb.inc.php:669
 msgid "Application"
@@ -475,7 +478,7 @@ msgstr "Applicatie verwijderd"
 
 #: api/rpc/class.cjsonrpc.php:185
 msgid "Application error."
-msgstr ""
+msgstr "Applicatie fout."
 
 #: include/locales/en_gb.inc.php:673
 msgid "Application updated"
@@ -506,7 +509,7 @@ msgstr "April"
 
 #: include/classes/class.cbuttonqmessage.php:49
 msgid "Are you sure you want perform this action?"
-msgstr ""
+msgstr "Weet je zeker dat je deze actie uit wilt voeren?"
 
 #: include/locales/en_gb.inc.php:1646
 msgid "Are you sure you want to delete"
@@ -514,11 +517,11 @@ msgstr "Bevestig om te verwijderen"
 
 #: include/views/js/configuration.sysmaps.js.php:45
 msgid "Area size"
-msgstr ""
+msgstr "Grootte van het gebied"
 
 #: include/views/js/configuration.sysmaps.js.php:35
 msgid "Area type"
-msgstr ""
+msgstr "Type van het gebied"
 
 #: include/locales/en_gb.inc.php:846
 msgid "As is"
@@ -530,7 +533,7 @@ msgstr "Als platte tekst"
 
 #: include/hosts.inc.php:100
 msgid "Asset tag"
-msgstr ""
+msgstr "Asset nummer"
 
 #: include/locales/en_gb.inc.php:625
 msgid "At"
@@ -584,7 +587,7 @@ msgstr "Automatisch afmelden (min. 90 seconden)"
 #: include/views/configuration.host.edit.php:534
 #: include/views/configuration.host.massupdate.php:218
 msgid "Automatic"
-msgstr ""
+msgstr "Automatisch"
 
 #: hosts.php:770 include/locales/en_gb.inc.php:733 popup.php:446
 msgid "Availability"
@@ -654,7 +657,7 @@ msgstr "Zwart en Blauw"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:28
 msgid "Blinking"
-msgstr ""
+msgstr "Knipperend"
 
 #: include/locales/en_gb.inc.php:1526
 msgid "Blocked"
@@ -668,7 +671,7 @@ msgstr "Vette lijn"
 
 #: include/locales/en_gb.inc.php:836
 msgid "Boolean"
-msgstr ""
+msgstr "Booleaans"
 
 #: include/locales/en_gb.inc.php:995
 #: include/views/configuration.sysmap.edit.php:117
@@ -683,7 +686,7 @@ msgstr "Lichter maken"
 
 #: include/locales/en_gb.inc.php:248
 msgid "Bulk acknowledge"
-msgstr "Bulk bevestigen"
+msgstr "In bulk bevestigen"
 
 #: include/locales/en_gb.inc.php:1115
 msgid "By host"
@@ -771,7 +774,7 @@ msgstr "CONFIGURATIE VAN TRIGGERS"
 
 #: include/locales/en_gb.inc.php:1490
 msgid "CONFIGURATION OF USERS AND USER GROUPS"
-msgstr "CONFIGURATIE VAN GEBRUIKERS AND GROEPEN"
+msgstr "CONFIGURATIE VAN GEBRUIKERS EN GROEPEN"
 
 #: include/locales/en_gb.inc.php:149
 msgid "CONFIGURATION OF WEB MONITORING"
@@ -899,7 +902,7 @@ msgstr "Kan host niet toevoegen"
 
 #: api/classes/class.chost.php:1824
 msgid "Cannot add host group."
-msgstr ""
+msgstr "Kan host groep niet toevoegen."
 
 #: include/locales/en_gb.inc.php:378
 msgid "Cannot add image"
@@ -915,7 +918,7 @@ msgstr "Kan macro niet toevoegen"
 
 #: api/classes/class.chost.php:1945
 msgid "Cannot add macro."
-msgstr ""
+msgstr "Kan macro niet toevoegen."
 
 #: include/locales/en_gb.inc.php:584
 msgid "Cannot add maintenance"
@@ -959,7 +962,7 @@ msgstr "Kan script niet toevoegen"
 
 #: include/locales/en_gb.inc.php:1316
 msgid "Cannot add service"
-msgstr "kan dienst niet toevoegen"
+msgstr "Kan service niet toevoegen"
 
 #: include/locales/en_gb.inc.php:1295
 msgid "Cannot add slideshow"
@@ -971,7 +974,7 @@ msgstr "Kan template niet toevoegen"
 
 #: include/locales/en_gb.inc.php:1377
 msgid "Cannot add trigger"
-msgstr "Kan trekker niet toevoegen"
+msgstr "Kan trigger niet toevoegen"
 
 #: include/locales/en_gb.inc.php:1459
 msgid "Cannot add user"
@@ -983,7 +986,7 @@ msgstr "Kan gebruiker niet toevoegen. Beide wachtwoorden moeten hetzelfde zijn."
 
 #: api/classes/class.cusergroup.php:363
 msgid "Cannot add users."
-msgstr ""
+msgstr "Kan gebruikers niet toevoegen."
 
 #: include/locales/en_gb.inc.php:349
 msgid "Cannot add value map"
@@ -1003,21 +1006,23 @@ msgstr "Kan de items niet kopieren"
 
 #: include/db.inc.php:45
 msgid "Cannot create another database connection."
-msgstr ""
+msgstr "Kan geen andere database verbinding opzetten."
 
 #: discoveryconf.php:125
 msgid "Cannot create discovery rule"
-msgstr ""
+msgstr "Kan discovery regel niet aanmaken"
 
 #: include/export.inc.php:822
 #, php-format
 msgid "Cannot create map \"%s\"."
-msgstr ""
+msgstr "Kan de map \"%s\" niet aanmaken."
 
 #: api/classes/class.cusermedia.php:425 api/classes/class.cuser.php:406
 #, php-format
 msgid "Cannot delete %1$s internal user \"%2$s\", try disabling that user."
 msgstr ""
+"Kan interne %1$s gebruiker \"%2$s\" niet verwijderen, probeer de gebruiker "
+"eerst te deactiveren."
 
 #: actionconf.php:175
 msgid "Cannot delete action"
@@ -1054,7 +1059,7 @@ msgstr "Kan host niet verwijderen"
 
 #: api/classes/class.chost.php:1833
 msgid "Cannot delete host group."
-msgstr ""
+msgstr "Kan host groep niet verwijderen."
 
 #: include/locales/en_gb.inc.php:380
 msgid "Cannot delete image"
@@ -1062,7 +1067,7 @@ msgstr "Kan afbeelding niet verwijderen"
 
 #: api/classes/class.chost.php:1958
 msgid "Cannot delete inventory."
-msgstr ""
+msgstr "Kan inventarisatie niet verwijderen"
 
 #: include/locales/en_gb.inc.php:789
 msgid "Cannot delete item"
@@ -1098,7 +1103,7 @@ msgstr "Kan scenario niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1210
 msgid "Cannot delete screen"
-msgstr ""
+msgstr "Kan scherm niet verwijderen"
 
 #: scripts.php:142 scripts.php:159
 msgid "Cannot delete script"
@@ -1108,19 +1113,22 @@ msgstr "Kan script niet verwijderen"
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
 msgstr ""
+"Kan de scripts niet verwijderen. Het script \"%1$s\" wordt gebruikt in een "
+"handeling voor actie \"%2$s\"."
 
 #: api/classes/class.cscript.php:520
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr ""
+"Kan de scripts niet verwijderen. Het script met scriptid \"%s\" bestaat niet."
 
 #: actionconf.php:324
 msgid "Cannot delete selected actions"
-msgstr ""
+msgstr "Kan de geslecteerde acties niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1318
 msgid "Cannot delete service"
-msgstr "Kan dienst niet verwijderen"
+msgstr "Kan service niet verwijderen"
 
 #: include/locales/en_gb.inc.php:1297
 msgid "Cannot delete slideshow"
@@ -1175,7 +1183,7 @@ msgstr "Kan host niet vinden"
 #: api/classes/class.cdiscoveryrule.php:883 api/classes/class.citem.php:1234
 #, php-format
 msgid "Cannot find host interface on host \"%1$s\" for item key \"%2$s\"."
-msgstr ""
+msgstr "Kan interface op host \"%1$s\" niet vinden voor item key \"%2$s\"."
 
 #: include/locales/en_gb.inc.php:1002
 msgid "Cannot find hostgroup"
@@ -1203,30 +1211,32 @@ msgstr "Kan trigger niet vinden"
 
 #: include/locales/en_gb.inc.php:1365
 msgid "Cannot format Tree. Check logic structure in service links"
-msgstr "Kan boom niet opbouwen. Bekijk de logische structuur van de dienst koppelingen"
+msgstr ""
+"Kan boom niet opbouwen. Bekijk de logische structuur van de service "
+"koppelingen"
 
 #: api/classes/class.ctemplate.php:1416
 msgid "Cannot have empty visible template name"
-msgstr ""
+msgstr "Template naam mag niet leeg zijn"
 
 #: api/classes/class.ctrigger.php:1499 api/classes/class.ctrigger.php:1590
 #: api/classes/class.ctriggerprototype.php:1339
-#, php-format
+#, php-format, fuzzy
 msgid "Cannot implode expression \"%s\"."
-msgstr ""
+msgstr "Kan expressie \"%s\" niet imploderen."
 
 #: include/classes/class.cview.php:108
-#, php-format
+#, php-format, fuzzy
 msgid "Cannot include view file \"%s\"."
-msgstr ""
+msgstr "Kan view bestand \"%s\" niet invoegen."
 
 #: include/locales/en_gb.inc.php:1833
 msgid "Cannot link hardlinked service."
-msgstr "Kan vast gekoppelde service niet koppelen"
+msgstr "Kan vast hardlinked service niet koppelen."
 
 #: include/locales/en_gb.inc.php:1834
 msgid "Cannot link service to itself."
-msgstr "Kan dienst niet aan zichzelf koppelen"
+msgstr "Kan service niet aan zichzelf koppelen"
 
 #: include/locales/en_gb.inc.php:769
 msgid "Cannot link template"
@@ -1234,43 +1244,44 @@ msgstr "Kan template niet ontkoppelen"
 
 #: api/classes/class.cuser.php:888
 msgid "Cannot logout."
-msgstr ""
+msgstr "Kan niet uitloggen."
 
 #: api/classes/class.chost.php:1732
 msgid "Cannot mass update host name."
-msgstr ""
+msgstr "Kan hostnaam niet in bulk bijwerken."
 
 #: api/classes/class.ctemplate.php:1375
 msgid "Cannot mass update template name"
-msgstr "Kan de sjabloon naam niet in bulk bijwerken"
+msgstr "Kan de sjabloonnaam niet in bulk bijwerken"
 
 #: api/classes/class.chost.php:1722
 msgid "Cannot mass update visible host name."
-msgstr ""
+msgstr "Kan de hostnaam niet in bulk bijwerken."
 
 #: api/classes/class.ctemplate.php:1348
 msgid "Cannot mass update visible template name"
-msgstr ""
+msgstr "Kan de templatenaam niet in bulk bijwerken"
 
 #: api/classes/class.ctemplate.php:1672
-#, php-format
+#, php-format, fuzzy
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr ""
+msgstr "Kan dubbele template IDs niet verwerken bij koppelen: %s."
 
 #: include/db.inc.php:1337
-#, php-format
+#, php-format, fuzzy
 msgid "Cannot perform delete statement on table \"%s\" without where condition."
 msgstr ""
+"Kan gegevens niet uit de tabel \"%s\" verwijderen zonder een where conditie."
 
 #: include/db.inc.php:1292
-#, php-format
+#, php-format, fuzzy
 msgid "Cannot perform update statement on table \"%s\" without values."
-msgstr ""
+msgstr "Kan geen 'update' bewerking op tabel \"%s\" uitvoeren zonder waarden. "
 
 #: include/db.inc.php:1301
-#, php-format
+#, php-format, fuzzy
 msgid "Cannot perform update statement on table \"%s\" without where condition."
-msgstr ""
+msgstr "Kan geen 'update' bewerking op tabel \"%s\" uitvoeren where conditie."
 
 #: config.php:573
 msgid "Cannot remove macro"
@@ -1278,19 +1289,20 @@ msgstr "Kan macro niet verwijderen"
 
 #: api/classes/class.chost.php:1929
 msgid "Cannot remove macro."
-msgstr ""
+msgstr "Kan macro niet verwijderen."
 
 #: include/locales/en_gb.inc.php:1903
 msgid "Cannot rename guest user"
-msgstr "Kan gast gebruiker niet hernoemen"
+msgstr "Kan guest gebruiker niet hernoemen"
 
 #: api/classes/class.cdrule.php:453
 msgid "Cannot save discovery rule without checks."
-msgstr ""
+msgstr "Kan de discovery regel niet opslaan zonder checks."
 
 #: api/classes/class.chostinterface.php:486
+#, fuzzy
 msgid "Cannot switch host for interface"
-msgstr ""
+msgstr "Kan niet van host wisselen voor de interface"
 
 #: include/locales/en_gb.inc.php:1483
 msgid "Cannot unblock users"
@@ -1366,7 +1378,7 @@ msgstr "Kan groep niet bijwerken"
 
 #: api/classes/class.cusergroup.php:395
 msgid "Cannot update group."
-msgstr ""
+msgstr "Kan groep niet bijwerken."
 
 #: hosts.php:455 include/locales/en_gb.inc.php:687
 msgid "Cannot update host"
@@ -1378,7 +1390,7 @@ msgstr "Kan host status niet bijwerken"
 
 #: hosts.php:435
 msgid "Cannot update hosts"
-msgstr ""
+msgstr "Kan hosts niet bijwerken"
 
 #: include/locales/en_gb.inc.php:382
 msgid "Cannot update image"
@@ -1394,7 +1406,7 @@ msgstr "Kan macro niet bijwerken"
 
 #: api/classes/class.chost.php:1936
 msgid "Cannot update macro."
-msgstr ""
+msgstr "Kan macros niet bijwerken."
 
 #: include/locales/en_gb.inc.php:666
 msgid "Cannot update macros"
@@ -1407,7 +1419,7 @@ msgstr "Kan onderhoud niet bijwerken"
 #: include/export.inc.php:813
 #, php-format
 msgid "Cannot update map \"%s\"."
-msgstr ""
+msgstr "Kan kaart \"%s\" niet aanmaken."
 
 #: include/locales/en_gb.inc.php:984
 msgid "Cannot update network map"
@@ -1439,11 +1451,11 @@ msgstr "Kan script niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1314
 msgid "Cannot update service"
-msgstr "Kan dienst niet bijwerken"
+msgstr "Kan service niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1293
 msgid "Cannot update slideshow"
-msgstr ""
+msgstr "Kan de slideshow niet bijwerken"
 
 #: actionconf.php:315 trigger_prototypes.php:255 triggers.php:295
 msgid "Cannot update status"
@@ -1451,11 +1463,11 @@ msgstr "kan status niet bijwerken"
 
 #: include/locales/en_gb.inc.php:754
 msgid "Cannot update template"
-msgstr ""
+msgstr "Kan template niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1387
 msgid "Cannot update trigger"
-msgstr "Kan trekker niet bijwerken"
+msgstr "Kan trigger niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1466
 msgid "Cannot update user"
@@ -1471,7 +1483,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:347
 msgid "Cannot update value map"
-msgstr "Kan map waarde niet bijwerken"
+msgstr "Kan value map niet bijwerken"
 
 #: include/locales/en_gb.inc.php:1621
 msgid "Caption"
@@ -1671,7 +1683,7 @@ msgstr "Configuratie"
 
 #: include/locales/en_gb.inc.php:1311
 msgid "Configuration of IT services"
-msgstr ""
+msgstr "Configuration van IT services"
 
 #: include/locales/en_gb.inc.php:148
 msgid "Configuration of Web monitoring"
@@ -1699,7 +1711,7 @@ msgstr "Configuratie van items"
 
 #: include/locales/en_gb.inc.php:956
 msgid "Configuration of network maps"
-msgstr "CONFIGURATIE VAN NETWERK MAPPEN"
+msgstr "CONFIGURATIE VAN NETWERK KAARTEN"
 
 #: include/locales/en_gb.inc.php:1204
 msgid "Configuration of screens"
@@ -1711,7 +1723,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1370
 msgid "Configuration of triggers"
-msgstr "Configuratie van Trekkers"
+msgstr "Configuratie van triggers"
 
 #: include/locales/en_gb.inc.php:355
 msgid "Configuration updated"
@@ -1834,7 +1846,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:974
 msgid "Create map"
-msgstr ""
+msgstr "Maak kaart"
 
 #: include/locales/en_gb.inc.php:384
 msgid "Create media type"
@@ -1877,8 +1889,9 @@ msgid "Create user"
 msgstr ""
 
 #: config.php:686
+#, fuzzy
 msgid "Create value map"
-msgstr "Maak waarde afbeelding"
+msgstr "Maak value map"
 
 #: include/locales/en_gb.inc.php:1759
 msgid "Critical error"
@@ -1925,11 +1938,13 @@ msgstr ""
 
 #: include/views/administration.general.triggerSeverity.edit.php:26
 msgid "Custom severity"
-msgstr ""
+msgstr "Custom severity"
 
 #: include/views/administration.general.triggerSeverity.edit.php:67
 msgid "Custom severity names affect all locales and require manual translation!"
 msgstr ""
+"Zelf bedachte severity namen beinvloeden alle locales vereisen handmatige "
+"vertaling!"
 
 #: include/views/js/configuration.sysmaps.js.php:41
 msgid "Custom size"
@@ -2243,7 +2258,7 @@ msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:192
 msgid "Delete network map?"
-msgstr ""
+msgstr "Netwerk kaart verwijderen?"
 
 #: include/locales/en_gb.inc.php:413
 msgid "Delete regular expression?"
@@ -2336,7 +2351,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:980
 msgid "Delete selected maps?"
-msgstr ""
+msgstr "Geselecteerde kaarten verwijderen?"
 
 #: include/locales/en_gb.inc.php:418
 msgid "Delete selected media types?"
@@ -2372,7 +2387,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1970
 msgid "Delete selected services?"
-msgstr ""
+msgstr "Verwijder geselecteerde services?"
 
 #: include/locales/en_gb.inc.php:1231
 msgid "Delete selected slideshows?"
@@ -2395,15 +2410,18 @@ msgid "Delete selected users?"
 msgstr ""
 
 #: config.php:904
+#, fuzzy
 msgid "Delete selected value mapping?"
-msgstr ""
+msgstr "Geselecteerde value mapping verwijderen?"
 
 #: config.php:901
-#, php-format
+#, php-format, fuzzy
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] ""
+"Geselecteerde value mapping verwijderen? Het wordt gebruikt voor %d item!"
 msgstr[1] ""
+"Geselecteerde value mapping verwijderen? Het wordt gebruikt voor %d items!"
 
 #: include/locales/en_gb.inc.php:728
 msgid "Delete selected with linked elements"
@@ -2411,7 +2429,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1969
 msgid "Delete service"
-msgstr ""
+msgstr "Verwijder service"
 
 #: include/locales/en_gb.inc.php:1298
 msgid "Delete slideshow?"
@@ -2660,7 +2678,7 @@ msgstr ""
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:105
 msgid "Display OK triggers for"
-msgstr ""
+msgstr "Laat triggers met status OK zien voor"
 
 #: include/locales/en_gb.inc.php:1617
 msgid "Displaying"
@@ -2763,7 +2781,7 @@ msgstr ""
 #: include/profiles.inc.php:281
 #, php-format
 msgid "Duplicate severity name \"%s\"."
-msgstr ""
+msgstr "Dubbele severity name \"%s\"."
 
 #: api/classes/class.cuser.php:422
 #, php-format
@@ -3171,7 +3189,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1065
 msgid "Favourite maps"
-msgstr ""
+msgstr "Favoriete kaarten"
 
 #: include/locales/en_gb.inc.php:1066
 msgid "Favourite screens"
@@ -3240,7 +3258,7 @@ msgstr ""
 
 #: include/views/js/configuration.sysmaps.js.php:38
 msgid "Fit to map"
-msgstr ""
+msgstr "Passend in kaart"
 
 #: include/locales/en_gb.inc.php:526
 msgid "Fixed"
@@ -3928,7 +3946,7 @@ msgstr "AFBEELDINGEN"
 #: include/locales/en_gb.inc.php:102
 #: include/views/js/configuration.discovery.js.php:135
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: include/locales/en_gb.inc.php:698 popup.php:446
 msgid "IP"
@@ -3986,11 +4004,11 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1353
 msgid "IT SERVICES"
-msgstr "IT DIENSTEN"
+msgstr "IT SERVICES"
 
 #: include/locales/en_gb.inc.php:1130
 msgid "IT SERVICES AVAILABILITY REPORT"
-msgstr "IT DIENSTEN BESCHIKBAARHEIDS REPORT"
+msgstr "IT SERVICES BESCHIKBAARHEIDS REPORT"
 
 #: include/locales/en_gb.inc.php:1309
 msgid "IT service"
@@ -3999,7 +4017,7 @@ msgstr ""
 #: include/locales/en_gb.inc.php:1310 include/menu.inc.php:86
 #: include/menu.inc.php:195
 msgid "IT services"
-msgstr "IT Diensten"
+msgstr "IT services"
 
 #: include/locales/en_gb.inc.php:1129
 msgid "IT services availability report"
@@ -4116,15 +4134,15 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:975
 msgid "Import map"
-msgstr ""
+msgstr "Importeer kaart"
 
 #: include/locales/en_gb.inc.php:1246
 msgid "Import screen"
-msgstr ""
+msgstr "Importeer scherm"
 
 #: hosts.php:294 screenconf.php:135 sysmaps.php:154 templates.php:264
 msgid "Imported successfully"
-msgstr ""
+msgstr "Import is geslaagd"
 
 #: hostinventories.php:184
 #, php-format
@@ -4348,8 +4366,9 @@ msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$
 msgstr ""
 
 #: api/classes/class.cmap.php:564
+#, fuzzy
 msgid "Incorrect fields for sysmap"
-msgstr ""
+msgstr "Foutieve velden voor sysmap"
 
 #: api/classes/class.ctrigger.php:1231
 msgid "Incorrect fields for trigger"
@@ -4451,17 +4470,17 @@ msgstr ""
 #: api/classes/class.cscreen.php:572
 #, php-format
 msgid "Incorrect map ID \"%s\" provided for screen element."
-msgstr ""
+msgstr "Verkeerd map ID \"%S\" voor scherm element gegeven."
 
 #: api/classes/class.cmap.php:588
 #, php-format
 msgid "Incorrect map height value for map \"%s\"."
-msgstr ""
+msgstr "Foutieve hoogte ingesteld voor kaart \"%s\"."
 
 #: api/classes/class.cmap.php:585
 #, php-format
 msgid "Incorrect map width value for map \"%s\"."
-msgstr ""
+msgstr "Foutieve breedte ingesteld voor kaart \"%s\"."
 
 #: include/locales/en_gb.inc.php:1853
 msgid "Incorrect node type"
@@ -4958,27 +4977,30 @@ msgstr "Bewaar trends (in dagen)"
 #: include/views/js/configuration.discovery.js.php:249 popup.php:1062
 #: popup.php:1070
 msgid "Key"
-msgstr "Sleutel"
+msgstr "Key"
 
 #: api/classes/class.citemkey.php:62
 msgid "Key cannot be empty."
-msgstr ""
+msgstr "Key mag niet leeg zijn."
 
 #: api/classes/class.citemgeneral.php:217
 msgid "Key does not match <grpmax|grpmin|grpsum|grpavg>[\"group\",\"key\",\"<last|min|max|avg|sum|count>\",\"numeric param\"]."
 msgstr ""
+"Key voldoet niet aan de notatie <grpmax|grpmin|grpsum|grpavg>[\"group\",\"key\","
+"\"<last|min|max|avg|sum|count>\",\"numeric param\"]."
 
 #: include/locales/en_gb.inc.php:1655
+#, fuzzy
 msgid "Keyword"
-msgstr ""
+msgstr "Keyword"
 
 #: include/locales/en_gb.inc.php:1709
 msgid "Kilo"
-msgstr ""
+msgstr "Kilo"
 
 #: include/locales/en_gb.inc.php:1589
 msgid "Korean (KO)"
-msgstr ""
+msgstr "Koreaans (KO)"
 
 #: include/locales/en_gb.inc.php:462
 msgid "LATEST DATA"
@@ -4987,39 +5009,40 @@ msgstr "LAATSTE DATA"
 #: authentication.php:144 include/locales/en_gb.inc.php:96
 #: include/views/js/configuration.discovery.js.php:137
 msgid "LDAP"
-msgstr ""
+msgstr "LDAP"
 
 #: include/locales/en_gb.inc.php:453
 msgid "LDAP Authentication"
-msgstr ""
+msgstr "LDAP Authenticatie"
 
 #: authentication.php:167
 msgid "LDAP login successful."
-msgstr ""
+msgstr "Succesvol met LDAP ingelogd."
 
 #: authentication.php:167
 msgid "LDAP login was not successful."
-msgstr ""
+msgstr "Login met LDAP niet geslaagd."
 
 #: authentication.php:143
 msgid "LDAP updated."
-msgstr ""
+msgstr "LDAP is bijgewerkt."
 
 #: authentication.php:147
 msgid "LDAP was not updated."
-msgstr ""
+msgstr "LDAP is niet bijgewerkt."
 
 #: include/locales/en_gb.inc.php:196
 msgid "LOCAL"
-msgstr ""
+msgstr "LOCAL"
 
 #: include/locales/en_gb.inc.php:268
 msgid "LOGS"
-msgstr ""
+msgstr "LOGS"
 
 #: include/locales/en_gb.inc.php:928
+#, fuzzy
 msgid "LOST"
-msgstr ""
+msgstr "LOST"
 
 #: include/locales/en_gb.inc.php:947 include/maps.inc.php:64
 #: include/views/js/configuration.sysmaps.js.php:62
@@ -5044,23 +5067,23 @@ msgstr "Laatst"
 
 #: include/locales/en_gb.inc.php:1046
 msgid "Last 20 issues"
-msgstr ""
+msgstr "Laatste 20 meldingen"
 
 #: include/locales/en_gb.inc.php:1361
 msgid "Last 24 hours"
-msgstr ""
+msgstr "Laaste 24 uur"
 
 #: include/locales/en_gb.inc.php:1363
 msgid "Last 30 days"
-msgstr ""
+msgstr "Laaste 30 dagen"
 
 #: include/locales/en_gb.inc.php:1364
 msgid "Last 365 days"
-msgstr ""
+msgstr "Laatste 365 dagen"
 
 #: include/locales/en_gb.inc.php:1362
 msgid "Last 7 days"
-msgstr ""
+msgstr "Laaste 7 dagen"
 
 #: include/locales/en_gb.inc.php:1439
 msgid "Last change"
@@ -5068,7 +5091,7 @@ msgstr "Laatste verandering"
 
 #: include/screens.inc.php:721
 msgid "Last change (descending)"
-msgstr ""
+msgstr "Laatste wijziging (aflopend)"
 
 #: include/locales/en_gb.inc.php:937
 msgid "Last check"
@@ -5076,27 +5099,29 @@ msgstr "Laatste controle"
 
 #: include/locales/en_gb.inc.php:543
 msgid "Last hour graph"
-msgstr "Laatste uur grafiek"
+msgstr "Grafiek voor het laatste uur"
 
 #: include/locales/en_gb.inc.php:545
 msgid "Last month graph"
-msgstr ""
+msgstr "Grafiek voor de laatste maand"
 
 #: include/locales/en_gb.inc.php:1395
+#, fuzzy
 msgid "Last of"
-msgstr ""
+msgstr "Laatste van"
 
 #: include/locales/en_gb.inc.php:741
+#, fuzzy
 msgid "Last seen (age)"
-msgstr ""
+msgstr "Voor het laatst gezien (doorlooptijd)"
 
 #: include/locales/en_gb.inc.php:938
 msgid "Last value"
-msgstr "Laatste waardes"
+msgstr "Laatste waarde"
 
 #: include/locales/en_gb.inc.php:544
 msgid "Last week graph"
-msgstr ""
+msgstr "Grafiek van de laatste week"
 
 #: include/locales/en_gb.inc.php:1937 include/menu.inc.php:47
 msgid "Latest data"
@@ -5108,7 +5133,7 @@ msgstr "Laatste gebeurtenissen"
 
 #: include/locales/en_gb.inc.php:1590
 msgid "Latvian (LV)"
-msgstr "Latvian (LV)"
+msgstr "Lets (LV)"
 
 #: include/locales/en_gb.inc.php:489
 #: include/views/configuration.sysmap.edit.php:117
@@ -5119,46 +5144,52 @@ msgstr "Links"
 
 #: include/locales/en_gb.inc.php:531
 msgid "Legend"
-msgstr ""
+msgstr "Legenda"
 
 #: include/locales/en_gb.inc.php:306
 #: include/views/js/configuration.sysmaps.js.php:204
 #: include/views/js/configuration.sysmaps.js.php:364
 msgid "Line"
-msgstr ""
+msgstr "Lijn"
 
 #: include/locales/en_gb.inc.php:946 sysmap.php:199
 msgid "Link"
-msgstr "Link"
+msgstr "Koppeling"
 
 #: include/locales/en_gb.inc.php:709
 msgid "Link additional templates"
-msgstr ""
+msgstr "Additionele templates koppelen"
 
 #: include/locales/en_gb.inc.php:976
 #: include/views/js/configuration.sysmaps.js.php:221
+#, fuzzy
 msgid "Link indicators"
-msgstr ""
+msgstr "Koppelings indicatoren"
 
 #: api/classes/class.cmap.php:650
 #, php-format
 msgid "Link name should be unique for map \"%s\"."
-msgstr ""
+msgstr "Naam van de koppeling moet uniek zijn voor de kaart \"%s\"."
 
 #: api/classes/class.cmap.php:662
 #, php-format
 msgid "Link selementid1 field is pointing to non existant map selement ID \"%1$s\" for map \"%2$s\" ."
 msgstr ""
+"De koppeling selementid1 verwijst naar een niet bestaand selement ID \"%1$s\" "
+"voor de kaart \"%2$s\"."
 
 #: api/classes/class.cmap.php:665
 #, php-format
 msgid "Link selementid2 field is pointing to non existant map selement ID \"%1$s\" for map \"%2$s\" ."
 msgstr ""
+"De koppeling selementid2 verwijst naar een niet bestaand selement ID \"%1$s\" "
+"voor de kaart \"%2$s\"."
 
 #: api/classes/class.cmap.php:647
 #, php-format
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
+"De koppeling in kaart \"%s\" moet voorzien zijn van \"naam\" en \"url\" velden. "
 
 #: include/locales/en_gb.inc.php:955
 #: include/views/js/configuration.sysmaps.js.php:180
@@ -5167,45 +5198,45 @@ msgstr "Link status indicator"
 
 #: include/actions.inc.php:480
 msgid "Link to template"
-msgstr ""
+msgstr "Koppel aan template"
 
 #: include/actions.inc.php:313
 msgid "Link to templates"
-msgstr ""
+msgstr "Koppel aan templates"
 
 #: include/locales/en_gb.inc.php:1329
 msgid "Link to trigger?"
-msgstr "Link naar Trekker?"
+msgstr "Koppel aan trigger?"
 
 #: include/views/configuration.action.edit.php:767
 msgid "Link with templates"
-msgstr ""
+msgstr "Koppel aan templates"
 
 #: include/locales/en_gb.inc.php:755
 msgid "Linked templates"
-msgstr ""
+msgstr "Gekoppelde templates"
 
 #: include/locales/en_gb.inc.php:756
 msgid "Linked to"
-msgstr ""
+msgstr "Gekoppeld aan"
 
 #: include/locales/en_gb.inc.php:945
 #: include/views/configuration.sysmap.edit.php:179
 #: include/views/js/configuration.sysmaps.js.php:143
 msgid "Links"
-msgstr ""
+msgstr "Koppelingen"
 
 #: include/locales/en_gb.inc.php:918
 msgid "List"
-msgstr ""
+msgstr "Lijst"
 
 #: include/classes/class.clist.php:32
 msgid "List is empty"
-msgstr ""
+msgstr "Lijst is leeg"
 
 #: include/locales/en_gb.inc.php:1052
 msgid "Loading..."
-msgstr ""
+msgstr "Laden..."
 
 #: include/locales/en_gb.inc.php:548
 msgid "Local"
@@ -5221,11 +5252,11 @@ msgstr "Locatie"
 
 #: include/hosts.inc.php:170
 msgid "Location latitude"
-msgstr ""
+msgstr "Locatie latitude"
 
 #: include/hosts.inc.php:175
 msgid "Location longitude"
-msgstr ""
+msgstr "Locatie longitude"
 
 #: include/locales/en_gb.inc.php:844
 msgid "Log"
@@ -5237,7 +5268,7 @@ msgstr "Log tijd formaat"
 
 #: include/classes/class.cserverinfo.php:44
 msgid "Logged in as"
-msgstr ""
+msgstr "Ingelogd als"
 
 #: include/locales/en_gb.inc.php:1935 include/menu.inc.php:246
 #: include/page_header.php:247
@@ -5246,210 +5277,216 @@ msgstr "Login"
 
 #: include/views/general.login.php:80
 msgid "Login as Guest"
-msgstr ""
+msgstr "Login in als Guest"
 
 #: api/classes/class.cuser.php:979
 #, php-format
 msgid "Login failed [%s]"
-msgstr ""
+msgstr "Login mislukt [%s]"
 
 #: api/classes/class.cuser.php:860 api/classes/class.cuser.php:875
 #: api/classes/class.cuser.php:917
 msgid "Login name or password is incorrect"
-msgstr ""
+msgstr "Loginnaam of password is niet juist"
 
 #: include/locales/en_gb.inc.php:1936 include/page_header.php:244
 msgid "Logout"
-msgstr ""
+msgstr "Log uit"
 
 #: include/locales/en_gb.inc.php:267
 msgid "Logs"
-msgstr ""
+msgstr "Logs"
 
 #: include/locales/en_gb.inc.php:109
 msgid "Lost"
-msgstr ""
+msgstr "Lost"
 
 #: include/locales/en_gb.inc.php:1710 include/locales/en_gb.inc.php:1948
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: include/locales/en_gb.inc.php:1152 include/locales/en_gb.inc.php:1172
 msgid "M Y"
-msgstr ""
+msgstr "M Y"
 
 #: hostinventories.php:166 include/hosts.inc.php:105
 msgid "MAC address A"
-msgstr ""
+msgstr "MAC adres A"
 
 #: include/hosts.inc.php:110
 msgid "MAC address B"
-msgstr ""
+msgstr "MAC adres B"
 
 #: include/locales/en_gb.inc.php:963
 msgid "MAINTENANCE"
-msgstr ""
+msgstr "ONDERHOUD"
 
 #: include/locales/en_gb.inc.php:589
 msgid "MAINTENANCE PERIODS"
-msgstr ""
+msgstr "ONDERHOUDS PERIODEN"
 
 #: include/locales/en_gb.inc.php:972
 msgid "MAPS"
-msgstr "MAPPEN"
+msgstr "KAARTEN"
 
 #: include/locales/en_gb.inc.php:714
 msgid "MD2"
-msgstr ""
+msgstr "MD2"
 
 #: include/locales/en_gb.inc.php:715
 msgid "MD5"
-msgstr ""
+msgstr "MD5"
 
 #: include/locales/en_gb.inc.php:1025
 msgid "MEDIA TYPES"
-msgstr ""
+msgstr "MEDIA TYPEN"
 
 #: include/locales/en_gb.inc.php:1696
 msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
 msgstr ""
+"GEHEUGEN LIMIET BEREIKT! Profileren was gestopt om geheugen te besparen ten "
+"behoeve van het verwerken van scripts."
 
 #: include/locales/en_gb.inc.php:1178
 msgid "MOST BUSY TRIGGERS TOP 100"
-msgstr "MEEST ACTIVE TREKKERS TOP 100"
+msgstr "MEEST ACTIVE TRIGGERS TOP 100"
 
 #: include/locales/en_gb.inc.php:660
 msgid "Macro"
-msgstr ""
+msgstr "Macro"
 
 #: include/locales/en_gb.inc.php:662
 msgid "Macro name is too long, should not exceed 64 chars."
 msgstr ""
+"Macronaam is te lang, deze mag de limiet van 64 karakters niet "
+"overschrijden."
 
 #: include/locales/en_gb.inc.php:663
 msgid "Macro value is too long, should not exceed 255 chars."
 msgstr ""
+"Macro waarde is te groot, deze mag de limiet van 255 karakters niet "
+"overschrijden."
 
 #: config.php:671 include/locales/en_gb.inc.php:659
 #: include/views/configuration.host.edit.php:502
 msgid "Macros"
-msgstr ""
+msgstr "Macros"
 
 #: include/locales/en_gb.inc.php:665
 msgid "Macros updated"
-msgstr ""
+msgstr "Macros zijn bijgewerkt"
 
 #: include/locales/en_gb.inc.php:574 include/menu.inc.php:170
 msgid "Maintenance"
-msgstr ""
+msgstr "Onderhoud"
 
 #: api/classes/class.cmaintenance.php:509
 #: api/classes/class.cmaintenance.php:605
 #, php-format
 msgid "Maintenance \"%s\" already exists."
-msgstr ""
+msgstr "Onderhoud \"%s\" bestaat reeds."
 
 #: include/locales/en_gb.inc.php:575
 msgid "Maintenance added"
-msgstr ""
+msgstr "Onderhoud toegevoegd"
 
 #: include/locales/en_gb.inc.php:577
 msgid "Maintenance deleted"
-msgstr ""
+msgstr "Onderhoud verwijderd"
 
 #: include/locales/en_gb.inc.php:588
 msgid "Maintenance period length"
-msgstr ""
+msgstr "Onderhouds duur"
 
 #: include/actions.inc.php:47
 msgid "Maintenance status"
-msgstr ""
+msgstr "Onderhouds status"
 
 #: include/locales/en_gb.inc.php:593
 msgid "Maintenance type"
-msgstr ""
+msgstr "Onderhouds type"
 
 #: include/locales/en_gb.inc.php:576
 msgid "Maintenance updated"
-msgstr ""
+msgstr "Onderhoud bijgewerkt"
 
 #: include/db.inc.php:1180
 #, php-format
 msgid "Mandatory field \"%1$s\" is missing in table \"%2$s\"."
-msgstr ""
+msgstr "Verplicht veld \"%1$s\" is niet gevonden in tabel \"%2$s\"."
 
 #: include/views/configuration.host.edit.php:525
 #: include/views/configuration.host.massupdate.php:217
 msgid "Manual"
-msgstr ""
+msgstr "Handmatig"
 
 #: index.php:49
 msgid "Manual Logout"
-msgstr ""
+msgstr "Handmatig uitloggen"
 
 #: include/locales/en_gb.inc.php:1253
 #: include/views/configuration.sysmap.edit.php:181
 #: include/views/js/configuration.sysmaps.js.php:17
 #: include/views/js/configuration.sysmaps.js.php:97
 msgid "Map"
-msgstr "Map"
+msgstr "Kaart"
 
 #: sysmap.php:195
 #, php-format
 msgid "Map \"%s\""
-msgstr ""
+msgstr "Kaart \"%s\""
 
 #: include/export.inc.php:825
 #, php-format
 msgid "Map \"%s\" created."
-msgstr ""
+msgstr "Kaart \"%s\" aangemaakt."
 
 #: include/export.inc.php:816
 #, php-format
 msgid "Map \"%s\" updated."
-msgstr ""
+msgstr "Kaart \"%s\" bijgewerkt."
 
 #: include/locales/en_gb.inc.php:969
 msgid "Map elements"
-msgstr ""
+msgstr "Kaart elementen"
 
 #: sysmap.php:94
 msgid "Map is saved! Return?"
-msgstr ""
+msgstr "Kaart is opgeslagen! Wil je terugkeren?"
 
 #: include/views/configuration.sysmap.edit.php:104
 msgid "Map label type"
-msgstr ""
+msgstr "Kaart label type"
 
 #: sysmap.php:96
 msgid "Map save operation failed."
-msgstr ""
+msgstr "Opslaan van kaart is mislukt."
 
 #: api/classes/class.cmap.php:681
 #, php-format
 msgid "Map with name \"%s\" already exists"
-msgstr ""
+msgstr "Kaart met de naam \"%s\" bestaat reeds"
 
 #: include/views/administration.general.valuemapping.edit.php:44
 msgid "Mapping"
-msgstr "Afbeelding"
+msgstr "Mapping"
 
 #: include/locales/en_gb.inc.php:1932 include/menu.inc.php:77
 #: include/menu.inc.php:188 popup.php:101
 msgid "Maps"
-msgstr "Mappen"
+msgstr "Kaarten"
 
 #: include/locales/en_gb.inc.php:54
 msgid "Mar"
-msgstr ""
+msgstr "Mrt"
 
 #: include/locales/en_gb.inc.php:67 include/locales/en_gb.inc.php:629
 msgid "March"
-msgstr ""
+msgstr "Maart"
 
 #: include/views/configuration.sysmap.edit.php:69
 msgid "Mark elements on trigger status change"
-msgstr ""
+msgstr "Markeer elementen bij status wijziging van een trigger"
 
 #: include/locales/en_gb.inc.php:558
 msgid "Mark others"
@@ -5461,70 +5498,70 @@ msgstr "Markeer geselecteerde"
 
 #: hosts.php:1002 include/locales/en_gb.inc.php:867
 msgid "Mass update"
-msgstr ""
+msgstr "Bulk bijwerken"
 
 #: include/views/js/configuration.sysmaps.js.php:263
 msgid "Mass update elements"
-msgstr ""
+msgstr "Elementen in bulk bijwerken"
 
 #: include/locales/en_gb.inc.php:887
 msgid "Mass update selected items?"
-msgstr ""
+msgstr "Geselecteerde items in bulk bijwerken?"
 
 #: include/locales/en_gb.inc.php:1416
 msgid "Mass update selected triggers?"
-msgstr ""
+msgstr "Geslecteerde triggers in bulk bijwerken?"
 
 #: include/locales/en_gb.inc.php:228
 msgid "Master"
-msgstr ""
+msgstr "Master"
 
 #: include/locales/en_gb.inc.php:226
 msgid "Master node"
-msgstr ""
+msgstr "Master node"
 
 #: include/locales/en_gb.inc.php:1852
 msgid "Master node already exists"
-msgstr ""
+msgstr "Master node bestaat reeds"
 
 #: include/locales/en_gb.inc.php:338
 #: include/views/administration.general.gui.edit.php:36
 msgid "Max count of elements to show inside table cell"
-msgstr ""
+msgstr "Het maximum aantal elementen wat in een cell getoond wordt"
 
 #: include/views/administration.general.gui.edit.php:39
 msgid "Max count of events per trigger to show"
-msgstr ""
+msgstr "Maximum aantal getoonde gebeurtenissen per trigger"
 
 #: include/locales/en_gb.inc.php:1050
 msgid "Maximize"
-msgstr ""
+msgstr "Maximalizeer"
 
 #: api/classes/class.cuser.php:429
 #, php-format
 msgid "Maximum alias length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Maximale alias grootte is %2$d karakters, \"%3$s\" is %1$d karakter."
+msgstr[1] "Maximale alias grootte is %2$d karakters, \"%3$s\" is %1$d karakters."
 
 #: api/classes/class.chost.php:1351
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Maximale hostnaam grootte is %2$d karakters, \"%3$s\" is %1$d karakter."
+msgstr[1] "Maximale hostnaam grootte is %2$d karakters, \"%3$s\" is %1$d karakters."
 
 #: api/classes/class.chost.php:1386
 #, php-format
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Maximale hostnaam grootte is %2$d karakters, \"%3$s\" is %1$d karakter."
+msgstr[1] "Maximale hostnaam grootte is %2$d karakters, \"%3$s\" is %1$d karakters."
 
 #: include/locales/en_gb.inc.php:56 include/locales/en_gb.inc.php:69
 #: include/locales/en_gb.inc.php:631
 msgid "May"
-msgstr ""
+msgstr "Mei"
 
 #: include/locales/en_gb.inc.php:1026
 msgid "Media"
@@ -5536,7 +5573,7 @@ msgstr "Media type"
 
 #: include/locales/en_gb.inc.php:1911
 msgid "Media type already exists:"
-msgstr ""
+msgstr "Media type bestaan reeds:"
 
 #: include/locales/en_gb.inc.php:361
 msgid "Media type deleted"
@@ -5560,11 +5597,11 @@ msgstr "Media types"
 
 #: include/locales/en_gb.inc.php:1912
 msgid "Media types used by action:"
-msgstr ""
+msgstr "Media types in gebruik door een actie:"
 
 #: include/locales/en_gb.inc.php:1711
 msgid "Mega"
-msgstr ""
+msgstr "Mega"
 
 #: include/locales/en_gb.inc.php:1494
 msgid "Members"
@@ -5572,15 +5609,15 @@ msgstr "Leden"
 
 #: include/locales/en_gb.inc.php:1689
 msgid "Memory limit"
-msgstr ""
+msgstr "Geheugen limiet"
 
 #: include/locales/en_gb.inc.php:1690
 msgid "Memory usage"
-msgstr ""
+msgstr "Geheugen gebruik"
 
 #: include/locales/en_gb.inc.php:1048
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #: acknow.php:190 auditacts.php:151 auditacts.php:213
 #: include/actions.inc.php:329 include/actions.inc.php:338
@@ -5592,39 +5629,39 @@ msgstr "Bericht"
 
 #: include/locales/en_gb.inc.php:269
 msgid "Message actions"
-msgstr ""
+msgstr "Bericht acties"
 
 #: include/locales/en_gb.inc.php:389
 msgid "Message text limit"
-msgstr ""
+msgstr "Text limiet voor bericht"
 
 #: include/locales/en_gb.inc.php:1578
 msgid "Message timeout"
-msgstr ""
+msgstr "Bericht timeout"
 
 #: include/locales/en_gb.inc.php:1573
 msgid "Messages"
-msgstr ""
+msgstr "Berichten"
 
 #: api/rpc/class.cjsonrpc.php:173
 msgid "Method not found."
-msgstr ""
+msgstr "Methode niet gevonden."
 
 #: include/locales/en_gb.inc.php:1705
 msgid "Micro"
-msgstr ""
+msgstr "Micro"
 
 #: include/locales/en_gb.inc.php:1282
 msgid "Middle"
-msgstr "midden"
+msgstr "Midden"
 
 #: include/locales/en_gb.inc.php:1707
 msgid "Milli"
-msgstr ""
+msgstr "Milli"
 
 #: include/locales/en_gb.inc.php:1379
 msgid "Min severity"
-msgstr ""
+msgstr "Min severity"
 
 #: include/locales/en_gb.inc.php:1860
 msgid "Minimal version of PHP is"
@@ -5706,7 +5743,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1177
 msgid "Most busy triggers top 100"
-msgstr "Meest actieve trekkers top 100"
+msgstr "Meest actieve triggers top 100"
 
 #: include/locales/en_gb.inc.php:1569
 msgid "Move"
@@ -6411,7 +6448,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1095
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
-msgstr "Aantal Trekkers (geactiveerd/gedeactiveerd)[problemen/onbekend/ok]"
+msgstr "Aantal triggers (geactiveerd/gedeactiveerd)[problemen/onbekend/ok]"
 
 #: include/locales/en_gb.inc.php:1101
 msgid "Number of users (online)"
@@ -7496,7 +7533,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1431
 msgid "STATUS OF TRIGGERS"
-msgstr "STATUS VAN TREKKERS"
+msgstr "STATUS VAN TRIGGERS"
 
 #: include/locales/en_gb.inc.php:140
 msgid "STATUS OF WEB MONITORING"
@@ -7840,11 +7877,11 @@ msgstr "Server time"
 
 #: include/actions.inc.php:71 include/locales/en_gb.inc.php:1354
 msgid "Service"
-msgstr "Diensten"
+msgstr "Service"
 
 #: include/locales/en_gb.inc.php:1315
 msgid "Service added"
-msgstr "Dienst toegevoegd"
+msgstr "Service toegevoegd"
 
 #: include/locales/en_gb.inc.php:1832
 msgid "Service cannot be parent and child at the same time."
@@ -7852,7 +7889,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1317
 msgid "Service deleted"
-msgstr "Dienst verwijderd"
+msgstr "Service verwijderd"
 
 #: include/actions.inc.php:54
 msgid "Service port"
@@ -7868,7 +7905,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1312
 msgid "Service updated"
-msgstr "Dienst bijgewerkt"
+msgstr "Service bijgewerkt"
 
 #: include/locales/en_gb.inc.php:1355
 msgid "Services"
@@ -7884,15 +7921,15 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1378 popup.php:857
 msgid "Severity"
-msgstr "Ernstheid"
+msgstr "Severity"
 
 #: include/screens.inc.php:722
 msgid "Severity (descending)"
-msgstr ""
+msgstr "Severity (aflopend)"
 
 #: include/profiles.inc.php:276
 msgid "Severity name cannot be empty."
-msgstr ""
+msgstr "Severity naam mag niet leeg zijn."
 
 #: include/locales/en_gb.inc.php:1114
 #: include/views/js/configuration.sysmaps.js.php:25
@@ -7953,7 +7990,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:529
 msgid "Show triggers"
-msgstr "Toon Trekkers"
+msgstr "Toon triggers"
 
 #: include/locales/en_gb.inc.php:1435
 msgid "Show unacknowledged"
@@ -8205,7 +8242,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1430
 msgid "Status of triggers"
-msgstr "Status van trekkers"
+msgstr "Status van triggers"
 
 #: include/maps.inc.php:67
 msgid "Status only"
@@ -8332,7 +8369,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1424
 msgid "TRIGGER COMMENTS"
-msgstr "TREKKER OPMERKINGEN"
+msgstr "TRIGGER OPMERKINGEN"
 
 #: include/locales/en_gb.inc.php:910
 msgid "TRIGGER PROTOTYPES OF"
@@ -8340,7 +8377,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1438
 msgid "TRIGGERS"
-msgstr "Trekkers"
+msgstr "TRIGGERS"
 
 #: include/locales/en_gb.inc.php:292
 msgid "TRUE"
@@ -8642,7 +8679,7 @@ msgstr "Trends Opgeslagen"
 #: include/views/js/configuration.sysmaps.js.php:18
 #: include/views/js/configuration.sysmaps.js.php:90
 msgid "Trigger"
-msgstr "Trekker"
+msgstr "Trigger"
 
 #: api/classes/class.ctrigger.php:1581
 #, php-format
@@ -8695,15 +8732,15 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1376
 msgid "Trigger added"
-msgstr "Trekker toegevoegd"
+msgstr "Trigger toegevoegd"
 
 #: include/locales/en_gb.inc.php:1423
 msgid "Trigger comments"
-msgstr "Trekker opmerkingen"
+msgstr "Trigger opmerkingen"
 
 #: include/locales/en_gb.inc.php:1374
 msgid "Trigger deleted"
-msgstr "Trekker verwijderd"
+msgstr "Trigger verwijderd"
 
 #: include/locales/en_gb.inc.php:1407
 msgid "Trigger dependencies"
@@ -8762,15 +8799,15 @@ msgstr ""
 
 #: include/actions.inc.php:45 include/locales/en_gb.inc.php:257
 msgid "Trigger severity"
-msgstr "Trekker ernstheid"
+msgstr "Trigger severity"
 
 #: include/locales/en_gb.inc.php:1386
 msgid "Trigger updated"
-msgstr "Trekker bijgewerkt"
+msgstr "trigger bijgewerkt"
 
 #: include/actions.inc.php:44
 msgid "Trigger value"
-msgstr "Trekker waarde"
+msgstr "trigger waarde"
 
 #: api/classes/class.ctrigger.php:1706 api/classes/class.ctrigger.php:1740
 #: api/classes/class.ctriggerprototype.php:1509
@@ -8784,19 +8821,19 @@ msgstr ""
 #: include/views/configuration.template.edit.php:226
 #: include/views/js/configuration.sysmaps.js.php:225 popup.php:61
 msgid "Triggers"
-msgstr "Trekkers"
+msgstr "triggers"
 
 #: include/locales/en_gb.inc.php:1096
 msgid "Triggers (e/d)[p/u/o]"
-msgstr "Trekkers (e/d)[p/o/ok]"
+msgstr "Triggers (e/d)[p/o/ok]"
 
 #: include/locales/en_gb.inc.php:1372
 msgid "Triggers deleted"
-msgstr "Trekkers verwijderd"
+msgstr "Triggers verwijderd"
 
 #: include/locales/en_gb.inc.php:1260
 msgid "Triggers info"
-msgstr "Trekkers info"
+msgstr "Triggers info"
 
 #: include/locales/en_gb.inc.php:1406
 msgid "Triggers massupdate"
@@ -8804,7 +8841,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1263
 msgid "Triggers overview"
-msgstr "Trekkers overzicht"
+msgstr "Triggers overzicht"
 
 #: include/locales/en_gb.inc.php:1448
 msgid "Triggers status"
@@ -8816,7 +8853,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1062
 msgid "Triggers with severity"
-msgstr ""
+msgstr "Triggers met severity"
 
 #: queue.php:289
 msgid "Truncated"
@@ -9106,7 +9143,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1031
 msgid "Use if severity"
-msgstr "Gebruiks als ernstheid"
+msgstr "Gebruiks als severity"
 
 #: media_types.php:262
 msgid "Used in actions"
@@ -9466,64 +9503,66 @@ msgstr ""
 
 #: api/classes/class.cmapelement.php:812
 msgid "Wrong fields for linktrigger"
-msgstr ""
+msgstr "Verkeerde velden voor linktrigger"
 
 #: api/classes/class.cmapelement.php:855
 msgid "Wrong fields for linktrigger delete"
-msgstr ""
+msgstr "Verkeerder velden voor linktrigger verwijdering"
 
 #: api/classes/class.cmapelement.php:832
+#, fuzzy
 msgid "Wrong fields for linktrigger update"
-msgstr ""
+msgstr "Verkeerde velden voor linktrigger bijwerking"
 
 #: api/classes/class.cmapelement.php:590
 msgid "Wrong fields for map link"
-msgstr ""
+msgstr "Verkeerder velden voor koppeling"
 
 #: include/locales/en_gb.inc.php:1909
 msgid "Wrong fields for media type"
-msgstr ""
+msgstr "Verkeerde velden voor media type"
 
 #: api/classes/class.cscreen.php:618
 #, php-format
 msgid "Wrong fields for screen [ %s ]"
-msgstr ""
+msgstr "Verkeerde velden voor scherm [ %s ]"
 
 #: api/classes/class.cscreen.php:756 api/classes/class.cscreen.php:795
 #: api/classes/class.cscreen.php:832
 msgid "Wrong fields for screen items"
-msgstr ""
+msgstr "Verkeerde velden voor scherm items"
 
 #: api/classes/class.cscript.php:400
 msgid "Wrong fields for script"
-msgstr ""
+msgstr "Verkeerde velden voor script"
 
 #: api/classes/class.ctriggerprototype.php:1099
 #: api/classes/class.ctriggerprototype.php:1168
 msgid "Wrong fields for trigger"
-msgstr ""
+msgstr "Verkeerde velden voor triggers"
 
 #: api/classes/class.cuser.php:373
 #, php-format
 msgid "Wrong fields for user \"%s\"."
-msgstr ""
+msgstr "Verkeerde velden voor gebruiker \"%s\"."
 
 #: api/classes/class.cusermedia.php:391
 #, php-format
 msgid "Wrong fields for user media \"%s\"."
-msgstr ""
+msgstr "Verkeerd veld voor user media \"%s\"."
 
 #: include/locales/en_gb.inc.php:661
 msgid "Wrong macro"
-msgstr ""
+msgstr "Verkeerde macro"
 
 #: include/locales/en_gb.inc.php:1905
 msgid "Wrong period ["
-msgstr ""
+msgstr "Verkeerde periode ["
 
 #: include/locales/en_gb.inc.php:991
+#, fuzzy
 msgid "Wrong type of arguments passed to function"
-msgstr ""
+msgstr "Verkeerd argument type aan functie doorgegeven"
 
 #: include/locales/en_gb.inc.php:949
 msgid "X"
@@ -9531,7 +9570,7 @@ msgstr "X"
 
 #: include/locales/en_gb.inc.php:1945
 msgid "XML file contains errors"
-msgstr ""
+msgstr "XML bestand bevat fouten"
 
 #: include/locales/en_gb.inc.php:1151 include/locales/en_gb.inc.php:1171
 #: include/locales/en_gb.inc.php:1722
@@ -9540,7 +9579,7 @@ msgstr "Y"
 
 #: include/locales/en_gb.inc.php:524
 msgid "Y axis MAX value"
-msgstr "Y lijn MAX waarde"
+msgstr "Y-as MAX waarde"
 
 #: include/locales/en_gb.inc.php:523
 msgid "Y axis MIN value"
@@ -9552,24 +9591,24 @@ msgstr "Y lijn zijde"
 
 #: include/locales/en_gb.inc.php:569 include/locales/en_gb.inc.php:570
 msgid "Y-m-d H:i:s"
-msgstr ""
+msgstr "Y-m-d H:i:s"
 
 #: include/locales/en_gb.inc.php:220 include/locales/en_gb.inc.php:568
 #: include/locales/en_gb.inc.php:571
 msgid "Y.M.d H:i:s"
-msgstr ""
+msgstr "Y.M.d H:i:s"
 
 #: include/locales/en_gb.inc.php:1126
 msgid "Y.m.d"
-msgstr ""
+msgstr "Y.m.d"
 
 #: include/locales/en_gb.inc.php:1125
 msgid "Y.m.d H:i"
-msgstr ""
+msgstr "Y.m.d H:i"
 
 #: include/locales/en_gb.inc.php:1021 include/locales/en_gb.inc.php:1724
 msgid "Y.m.d H:i:s"
-msgstr ""
+msgstr "Y.m.d H:i:s"
 
 #: include/locales/en_gb.inc.php:1145
 msgid "Year"
@@ -9585,106 +9624,115 @@ msgstr "Ja"
 
 #: include/locales/en_gb.inc.php:1723
 msgid "Yotta"
-msgstr ""
+msgstr "Yotta"
 
 #: include/forms.inc.php:391
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr ""
+"Je kunt een aantal talen niet selecteren omdat de locales hiervoor ontbreken "
+"op de webserver."
 
 #: api/classes/class.cuser.php:461
 #, php-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
-msgstr ""
+msgstr "Je mag de rechten van de gebruiker \"%s\" niet aanpassen."
 
 #: include/locales/en_gb.inc.php:1920
 msgid "You are not logged in."
-msgstr ""
+msgstr "Je bent niet ingelogd."
 
 #: include/locales/en_gb.inc.php:1625
 msgid "You can not switch hosts for current selection"
-msgstr ""
+msgstr "Je kan niet van host wisselen voor de huidige selectie"
 
 #: include/locales/en_gb.inc.php:1786
+#, fuzzy
 msgid "You can not use template hosts in mixed expressions."
-msgstr ""
+msgstr "Je kan geen template hosts gebruiken in een gemengde uitdrukking."
 
 #: include/locales/en_gb.inc.php:1917
+#, fuzzy
 msgid "You cannot view this URL as a"
-msgstr ""
+msgstr "Ja kan dit URL niet bekijken als een"
 
 #: include/views/js/configuration.action.edit.js.php:266
 msgid "You did not specify host for operation."
-msgstr ""
+msgstr "Je hebt geen host opgegeven voor de handeling."
 
 #: include/views/js/configuration.action.edit.js.php:253
 msgid "You did not specify host group for operation."
-msgstr ""
+msgstr "Je hebt geen host groep opgegeven voor deze handeling."
 
 #: api/classes/class.caction.php:1579
 #, php-format
 msgid "You did not specify targets for action operation command \"%s\"."
-msgstr ""
+msgstr "Je hebt geen doel opgegeven voor het commando \"%s\"."
 
 #: api/classes/class.caction.php:1577
-#, php-format
+#, php-format, fuzzy
 msgid "You did not specify targets for action operation global script \"%s\"."
-msgstr ""
+msgstr "Je hebt geen doel opgegeven voor het globale script \"%s\"."
 
 #: api/classes/class.chost.php:1623
 msgid "You do not have enough rights for operation."
-msgstr ""
+msgstr "Je hebt onvoldoende rechten voor deze handeling."
 
 #: include/locales/en_gb.inc.php:1942
 msgid "You do not have permission to perform this operation"
-msgstr ""
+msgstr "Je hebt niet voldoende rechten om deze handeling uit te voeren."
 
 #: api/classes/class.cusermedia.php:419
 msgid "You do not have permissions or user media does not exist."
-msgstr ""
+msgstr "Je hebt onvoldoende rechten of de user media bestaat niet."
 
 #: api/classes/class.cusermedia.php:397
 msgid "You do not have permissions to create user medias."
-msgstr ""
+msgstr "Je hebt onvoldoende rechten om user media aan te maken."
 
 #: api/classes/class.cuser.php:379
 msgid "You do not have permissions to create users."
-msgstr ""
+msgstr "Je hebt onvoldoende rechten om gebruikers aan te maken."
 
 #: api/classes/class.cuser.php:400
 msgid "You do not have permissions to delete user or user does not exist."
 msgstr ""
+"Je hebt onvoldoende rechten om de gebruiker te verwijderen of de gebruiker "
+"bestaat niet."
 
 #: api/classes/class.cuser.php:397
 msgid "You do not have permissions to delete users."
-msgstr ""
+msgstr "Je hebt onvoldoende rechten om gebruikers te verwijderen."
 
 #: api/classes/class.cusermedia.php:409 api/classes/class.cuser.php:389
 msgid "You do not have permissions to update other users."
-msgstr ""
+msgstr "Je hebt onvoldoende rechten om andere gebruikers bij te werken."
 
 #: api/classes/class.cusermedia.php:403
 msgid "You do not have permissions to update user media or user media does not exist."
 msgstr ""
+"Je hebt onvoldoende rechten om de user media bij te werken of de user media "
+"bestaat niet."
 
 #: api/classes/class.cusermedia.php:413
 msgid "You do not have permissions to update user medias."
-msgstr ""
+msgstr "Je hebt onvoldoende rechten om de user media bij te werken."
 
 #: api/classes/class.cuser.php:385
 msgid "You do not have permissions to update user or user does not exist."
 msgstr ""
+"Je hebt onvoldoende rechten om bij te werken of de gebruiker bestaat niet."
 
 #: include/locales/en_gb.inc.php:1918
 msgid "You must login to view this page."
-msgstr ""
+msgstr "Je moet inloggen om deze pagina te bekijken."
 
 #: include/locales/en_gb.inc.php:422
 msgid "Your setup is not configured for distributed monitoring"
-msgstr ""
+msgstr "Je setup is niet geconfigureerd for gedistribueerde monitoring"
 
 #: include/locales/en_gb.inc.php:1720
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: include/locales/en_gb.inc.php:1604
 msgid "ZABBIX"
@@ -9692,28 +9740,28 @@ msgstr "ZABBIX"
 
 #: include/locales/en_gb.inc.php:470
 msgid "Zabbix"
-msgstr ""
+msgstr "Zabbix"
 
 #: include/page_footer.php:109 include/views/general.login.php:50
 #, php-format
 msgid "Zabbix %s Copyright 2001-2011 by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %s Copyright 2001-2011 - Zabbix SIA"
 
 #: include/locales/en_gb.inc.php:1454
 msgid "Zabbix Admin"
-msgstr ""
+msgstr "Zabbix Beheerder"
 
 #: include/locales/en_gb.inc.php:455
 msgid "Zabbix Internal authentication"
-msgstr ""
+msgstr "Zabbix Interne Authenticatie"
 
 #: include/locales/en_gb.inc.php:1455
 msgid "Zabbix Super Admin"
-msgstr ""
+msgstr "Zabbix Super Beheerder"
 
 #: include/locales/en_gb.inc.php:1453
 msgid "Zabbix User"
-msgstr ""
+msgstr "Zabbix Gebruiker"
 
 #: include/locales/en_gb.inc.php:800
 #: include/views/administration.script.edit.php:54
@@ -9729,11 +9777,11 @@ msgstr "ZABBIX agent (actief)"
 
 #: include/locales/en_gb.inc.php:813
 msgid "Zabbix aggregate"
-msgstr "ZABBIX gezamenlijk"
+msgstr "ZABBIX aggregate"
 
 #: include/locales/en_gb.inc.php:1391
 msgid "Zabbix has received an incorrect request"
-msgstr ""
+msgstr "Zabbix heeft een foutief verzoek ontvangen"
 
 #: include/locales/en_gb.inc.php:807
 msgid "Zabbix internal"
@@ -9741,79 +9789,79 @@ msgstr "ZABBIX intern"
 
 #: include/locales/en_gb.inc.php:214
 msgid "Zabbix is temporarily unavailable"
-msgstr ""
+msgstr "Zabbix is tijdelijk niet beschikbaar"
 
 #: include/classes/class.cserverinfo.php:45 include/setup.inc.php:312
 #: include/views/administration.script.edit.php:55
 #: include/views/configuration.action.edit.php:660
 #: include/views/js/configuration.action.edit.js.php:123
 msgid "Zabbix server"
-msgstr ""
+msgstr "Zabbix server"
 
 #: include/locales/en_gb.inc.php:1054
 msgid "Zabbix server ip or port is not set!"
-msgstr ""
+msgstr "Zabbix server ip of port is niet ingevoerd!"
 
 #: include/locales/en_gb.inc.php:1092
 msgid "Zabbix server is running"
-msgstr "Zabbix Server Actief"
+msgstr "Zabbix server is actief"
 
 #: include/setup.inc.php:314
 msgid "Zabbix server name"
-msgstr ""
+msgstr "Zabbix server naam"
 
 #: include/setup.inc.php:313
 msgid "Zabbix server port"
-msgstr ""
+msgstr "Zabbix server poort"
 
 #: include/locales/en_gb.inc.php:803
 msgid "Zabbix trapper"
-msgstr "ZABBIX trapper"
+msgstr "Zabbix trapper"
 
 #: include/locales/en_gb.inc.php:1721
 msgid "Zetta"
-msgstr ""
+msgstr "Zetta"
 
 #: include/locales/en_gb.inc.php:1959
 msgid "Zoom"
-msgstr ""
+msgstr "Zoom"
 
 #: include/locales/en_gb.inc.php:1811
 msgid "[H:i:s]"
-msgstr ""
+msgstr "[H:i:s]"
 
 #: include/locales/en_gb.inc.php:1924
 msgid "[Wrong value for day of week:"
-msgstr ""
+msgstr "[Verkeerde waarde voor de dag van de week:"
 
 #: include/locales/en_gb.inc.php:1922
 msgid "[Wrong value for month:"
-msgstr ""
+msgstr "[Verkeerde waarde voor de maand:"
 
 #: include/locales/en_gb.inc.php:567
 msgid "[Y.M.d H:i:s]"
-msgstr ""
+msgstr "[Y.M.d H:i:s]"
 
 #: include/locales/en_gb.inc.php:1906 include/locales/en_gb.inc.php:1923
 #: include/locales/en_gb.inc.php:1925
 msgid "]"
-msgstr ""
+msgstr "]"
 
 #: include/locales/en_gb.inc.php:1160
 msgid "add"
-msgstr ""
+msgstr "toevoegen"
 
 #: include/locales/en_gb.inc.php:506
 msgid "add graph items first"
-msgstr ""
+msgstr "voeg eerst graph items toe"
 
 #: include/locales/en_gb.inc.php:1744
 msgid "added"
-msgstr ""
+msgstr "toegevoegd"
 
 #: include/locales/en_gb.inc.php:1729
 msgid "affects only filtered data!"
-msgstr ""
+msgstr "beinvloed alleen gefilterde data!"
 
 #: include/locales/en_gb.inc.php:464
 msgid "all"
@@ -9821,26 +9869,26 @@ msgstr "alle"
 
 #: include/locales/en_gb.inc.php:1564
 msgid "already exists"
-msgstr ""
+msgstr "bestaat reeds"
 
 #: include/locales/en_gb.inc.php:1738
 msgid "already exists for host"
-msgstr ""
+msgstr "bestaat reeds voor host"
 
 #: include/locales/en_gb.inc.php:1753
 msgid "already linked to host"
-msgstr ""
+msgstr "reeds aan host gekoppeld"
 
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:119
 #: include/views/configuration.action.edit.php:825
 #: include/views/configuration.action.edit.php:832
 msgid "and"
-msgstr ""
+msgstr "en"
 
 #: include/locales/en_gb.inc.php:1756
 msgid "and can't be deleted"
-msgstr ""
+msgstr "en kan niet worden verwijderd"
 
 #: include/locales/en_gb.inc.php:562
 msgid "as Blue"
@@ -9856,7 +9904,7 @@ msgstr "als Rood"
 
 #: include/locales/en_gb.inc.php:1781
 msgid "available only for items with value types"
-msgstr ""
+msgstr "Alleen beschikbaar voor items met value types"
 
 #: include/locales/en_gb.inc.php:492
 msgid "avg"
@@ -9864,23 +9912,23 @@ msgstr "gmd"
 
 #: include/locales/en_gb.inc.php:1878
 msgid "configure PHP with"
-msgstr ""
+msgstr "configureer PHP met"
 
 #: include/locales/en_gb.inc.php:1767
 msgid "contains Multibyte chars"
-msgstr ""
+msgstr "bevat Multibyte karakters"
 
 #: include/locales/en_gb.inc.php:86
 msgid "created"
-msgstr ""
+msgstr "aangemaakt"
 
 #: include/locales/en_gb.inc.php:1887
 msgid "ctype module"
-msgstr ""
+msgstr "ctype module"
 
 #: include/func.inc.php:409 include/locales/en_gb.inc.php:32
 msgid "d"
-msgstr ""
+msgstr "d"
 
 #: include/locales/en_gb.inc.php:1153 include/locales/en_gb.inc.php:1173
 #: include/locales/en_gb.inc.php:1829
@@ -9890,7 +9938,7 @@ msgstr "d M Y"
 #: include/locales/en_gb.inc.php:1154 include/locales/en_gb.inc.php:1159
 #: include/locales/en_gb.inc.php:1174
 msgid "d M Y H:i"
-msgstr ""
+msgstr "d M Y H:i"
 
 #: include/locales/en_gb.inc.php:26 include/locales/en_gb.inc.php:118
 #: include/locales/en_gb.inc.php:121 include/locales/en_gb.inc.php:142
@@ -9908,100 +9956,103 @@ msgstr "d M H:i:s"
 
 #: include/locales/en_gb.inc.php:1119 include/locales/en_gb.inc.php:1122
 msgid "d.M"
-msgstr ""
+msgstr "d.M"
 
 #: include/locales/en_gb.inc.php:323 include/locales/en_gb.inc.php:328
 msgid "d.m"
-msgstr ""
+msgstr "d.m"
 
 #: include/locales/en_gb.inc.php:324 include/locales/en_gb.inc.php:325
 #: include/locales/en_gb.inc.php:327
 msgid "d.m H:i"
-msgstr ""
+msgstr "d.m H:i"
 
 #: include/locales/en_gb.inc.php:331
 msgid "d.m.Y H:i"
-msgstr ""
+msgstr "d.m.Y H:i"
 
 #: include/locales/en_gb.inc.php:200
 msgid "d.m.y"
-msgstr ""
+msgstr "d.m.y"
 
 #: include/locales/en_gb.inc.php:1825
 msgid "day"
-msgstr ""
+msgstr "dag"
 
 #: include/locales/en_gb.inc.php:1700
 msgid "days"
-msgstr ""
+msgstr "dagen"
 
 #: include/setup.inc.php:299
 msgid "default"
-msgstr ""
+msgstr "standaard"
 
 #: include/locales/en_gb.inc.php:1940
 msgid "does not exist"
-msgstr ""
+msgstr "bestaat niet"
 
 #: include/locales/en_gb.inc.php:1961
 msgid "dynamic"
-msgstr ""
+msgstr "dynamisch"
 
 #: include/views/js/configuration.sysmaps.js.php:264
 msgid "elements"
-msgstr ""
+msgstr "elementen"
 
 #: include/locales/en_gb.inc.php:861
 msgid "elements copy to ..."
-msgstr ""
+msgstr "elementen kopieren naar ...."
 
 #: api/classes/class.caction.php:1458
 msgid "esc_step_from and esc_step_to must be set together."
-msgstr ""
+msgstr "esc_step_from en esc_step_to moeten samen gezet worden."
 
 #: include/locales/en_gb.inc.php:1824
+#, fuzzy
 msgid "every"
-msgstr ""
+msgstr "elke"
 
 #: hostinventories.php:123
 msgid "exactly"
-msgstr ""
+msgstr "exact"
 
 #: include/locales/en_gb.inc.php:302
 msgid "executed"
-msgstr ""
+msgstr "uitgevoerd"
 
 #: include/locales/en_gb.inc.php:1960
+#, fuzzy
 msgid "fixed"
-msgstr ""
+msgstr "opgelost"
 
 #: include/locales/en_gb.inc.php:1780
 msgid "for function"
-msgstr ""
+msgstr "vor functie"
 
 #: include/locales/en_gb.inc.php:1778
 msgid "for host"
-msgstr ""
+msgstr "voor host"
 
 #: include/locales/en_gb.inc.php:1616
 msgid "found"
-msgstr ""
+msgstr "gevonden"
 
 #: include/func.inc.php:416 include/locales/en_gb.inc.php:33
+#, fuzzy
 msgid "h"
-msgstr ""
+msgstr "h"
 
 #: include/locales/en_gb.inc.php:1755
 msgid "has been deleted from the system"
-msgstr ""
+msgstr "is verwijderd van het systeem"
 
 #: api/classes/class.cmap.php:594
 msgid "host"
-msgstr ""
+msgstr "host"
 
 #: api/classes/class.cmap.php:593
 msgid "host group"
-msgstr ""
+msgstr "host groep"
 
 #: include/locales/en_gb.inc.php:1013
 msgid "http://www.zabbix.com"
@@ -10009,135 +10060,144 @@ msgstr "http://www.zabbix.com"
 
 #: api/classes/class.cmap.php:591
 msgid "icon"
-msgstr ""
+msgstr "icoon"
 
 #: api/classes/class.cmap.php:597
 msgid "image"
-msgstr ""
+msgstr "afbeelding"
 
 #: api/classes/class.cimage.php:337 api/classes/class.cimage.php:343
 #: include/actions.inc.php:27
 msgid "in"
-msgstr ""
+msgstr "in"
 
 #: api/classes/class.citemkey.php:202
 #, php-format
 msgid "incorrect syntax near '%1$s'"
-msgstr ""
+msgstr "incorrecte syntax bij '%1$s'"
 
 #: api/classes/class.citemkey.php:261
 #, php-format
 msgid "incorrect syntax near '%1$s' at position %2$d"
-msgstr ""
+msgstr "Foutieve syntax bij %1$s' op position %2$d"
 
 #: api/classes/class.citemkey.php:214 api/classes/class.citemkey.php:252
 #: api/classes/class.citemkey.php:298
 #, php-format
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
 msgstr ""
+"incorrect gebruik van een bracket symbol. '%s' is gevonden na de laatstet "
+"bracket."
 
 #: include/locales/en_gb.inc.php:1862
 msgid "is a minimal PHP memory limitation"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1867
+#, fuzzy
 msgid "is a minimal limitation on execution time of PHP scripts"
-msgstr ""
+msgstr "is de minimal limitation op PHP script execution times."
 
 #: include/locales/en_gb.inc.php:1868
+#, fuzzy
 msgid "is a minimal limitation on input parse time for PHP scripts"
-msgstr ""
+msgstr "is de minimal limitation op PHP script input parse times."
 
 #: include/locales/en_gb.inc.php:1162
 msgid "is a wrong time format. Should be from 00:00 to 24:00."
-msgstr ""
+msgstr "is een foutieve tijdsnotatie. Deze moet van 00:00 tot 24:00 zijn."
 
 #: include/locales/en_gb.inc.php:1747
 msgid "is internal and can not be deleted"
-msgstr ""
+msgstr "is intern en kan niet verwijderd worden"
 
 #: include/locales/en_gb.inc.php:1770
 msgid "is mandatory"
-msgstr ""
+msgstr "is verplicht"
 
 #: include/locales/en_gb.inc.php:1890
+#, fuzzy
 msgid "is minimum for PHP upload filesize"
-msgstr ""
+msgstr "is het minimum voor een PHP file upload"
 
 #: include/locales/en_gb.inc.php:1864
+#, fuzzy
 msgid "is minimum size of PHP post"
-msgstr ""
+msgstr "is de minimale grootte van een PHP post"
 
 #: include/locales/en_gb.inc.php:1761
 msgid "is not IP range"
-msgstr ""
+msgstr "is geen IP reeks"
 
 #: include/locales/en_gb.inc.php:1762
 msgid "is not PORT range"
-msgstr ""
+msgstr "is geen PORT reeks"
 
 #: include/locales/en_gb.inc.php:1769
 msgid "is not a colour"
-msgstr ""
+msgstr "is geen kleur"
 
 #: include/locales/en_gb.inc.php:1784
 msgid "is not a float or counter or macro for function"
-msgstr ""
+msgstr "is geen float, counter of macro functie"
 
 #: include/locales/en_gb.inc.php:1783
 msgid "is not a float or macro for function"
-msgstr ""
+msgstr "is geen float of macro functie"
 
 #: include/locales/en_gb.inc.php:1765
 msgid "is not double"
-msgstr ""
+msgstr "is geen double"
 
 #: include/locales/en_gb.inc.php:1764
 msgid "is not integer"
-msgstr ""
+msgstr "is geen integer"
 
 #: include/locales/en_gb.inc.php:1763
 msgid "is not integer range"
-msgstr ""
+msgstr "is geen integer reeks"
 
 #: include/locales/en_gb.inc.php:1766
 msgid "is not string"
-msgstr ""
+msgstr "is geen string"
 
 #: include/locales/en_gb.inc.php:1157 include/locales/en_gb.inc.php:1158
+#, fuzzy
 msgid "l H:i"
-msgstr ""
+msgstr "l H:i"
 
 #: include/locales/en_gb.inc.php:494
+#, fuzzy
 msgid "last"
-msgstr ""
+msgstr "laatste"
 
 #: include/locales/en_gb.inc.php:1885
 msgid "libxml module"
-msgstr ""
+msgstr "libxml module"
 
 #: hostinventories.php:122 include/actions.inc.php:25
 #: include/locales/en_gb.inc.php:284
+#, fuzzy
 msgid "like"
-msgstr ""
+msgstr "als"
 
 #: include/func.inc.php:402 include/func.inc.php:423
 #: include/locales/en_gb.inc.php:30 include/locales/en_gb.inc.php:34
 #: include/locales/en_gb.inc.php:1706
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: include/locales/en_gb.inc.php:1647
 msgid "macro(s)"
-msgstr ""
+msgstr "macro(s)"
 
 #: include/actions.inc.php:136 include/views/configuration.action.edit.php:229
 msgid "maintenance"
-msgstr ""
+msgstr "onderhoud"
 
 #: api/classes/class.cmap.php:596
 msgid "map"
-msgstr ""
+msgstr "kaart"
 
 #: include/locales/en_gb.inc.php:493
 msgid "max"
@@ -10145,7 +10205,7 @@ msgstr "max"
 
 #: include/locales/en_gb.inc.php:259
 msgid "max value"
-msgstr ""
+msgstr "max. waarde"
 
 #: include/locales/en_gb.inc.php:491
 msgid "min"
@@ -10153,43 +10213,45 @@ msgstr "min"
 
 #: include/locales/en_gb.inc.php:260
 msgid "min value"
-msgstr ""
+msgstr "min. waarde"
 
 #: include/func.inc.php:382 include/func.inc.php:433
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: include/locales/en_gb.inc.php:1768
+#, fuzzy
 msgid "multibyte chars are restricted"
-msgstr ""
+msgstr "multibyte karakters zijn beperkt"
 
 #: include/locales/en_gb.inc.php:1771
 msgid "must be missing"
-msgstr ""
+msgstr "moet niet aanwezig zijn"
 
 #: include/locales/en_gb.inc.php:452
 msgid "must be valid"
-msgstr ""
+msgstr "moet geldig zijn"
 
 #: include/locales/en_gb.inc.php:1702
 msgid "n"
-msgstr ""
+msgstr "n"
 
 #: include/locales/en_gb.inc.php:1870
+#, fuzzy
 msgid "no"
-msgstr ""
+msgstr "geen"
 
 #: include/locales/en_gb.inc.php:189
 msgid "no data"
-msgstr ""
+msgstr "geen data"
 
 #: include/actions.inc.php:30
 msgid "not in"
-msgstr ""
+msgstr "niet in"
 
 #: include/actions.inc.php:26
 msgid "not like"
-msgstr ""
+msgstr "niet als"
 
 #: include/locales/en_gb.inc.php:1109
 msgid "not running"
@@ -10197,7 +10259,7 @@ msgstr "Niet lopende"
 
 #: hostinventoriesoverview.php:66 include/locales/en_gb.inc.php:466
 msgid "not selected"
-msgstr ""
+msgstr "niet geselecteerd"
 
 #: auditacts.php:208 include/actions.inc.php:804 include/actions.inc.php:868
 #: include/actions.inc.php:926 include/actions.inc.php:992
@@ -10206,23 +10268,23 @@ msgstr "Niet verzonden"
 
 #: include/locales/en_gb.inc.php:1962
 msgid "now"
-msgstr ""
+msgstr "nu"
 
 #: include/locales/en_gb.inc.php:131 include/locales/en_gb.inc.php:1053
 msgid "of"
-msgstr ""
+msgstr "of"
 
 #: include/locales/en_gb.inc.php:1826
 msgid "of every"
-msgstr ""
+msgstr "van iedere"
 
 #: include/locales/en_gb.inc.php:1823
 msgid "on"
-msgstr ""
+msgstr "op"
 
 #: include/locales/en_gb.inc.php:1874
 msgid "option in"
-msgstr ""
+msgstr "optie in"
 
 #: include/locales/en_gb.inc.php:283
 #: include/views/configuration.action.edit.php:115
@@ -10230,36 +10292,38 @@ msgstr ""
 #: include/views/configuration.action.edit.php:828
 #: include/views/configuration.action.edit.php:831
 msgid "or"
-msgstr ""
+msgstr "of"
 
 #: include/locales/en_gb.inc.php:1975
 msgid "other"
-msgstr ""
+msgstr "andere"
 
 #: include/locales/en_gb.inc.php:1886
 msgid "php-xml module is not installed"
-msgstr ""
+msgstr "php-xml module is niet geinstalleerd"
 
 #: include/classes/class.cserverinfo.php:40
 msgid "r"
-msgstr ""
+msgstr "r"
 
 #: include/classes/class.cserverinfo.php:42
 msgid "refresh now"
-msgstr ""
+msgstr "ververs nu"
 
 #: include/locales/en_gb.inc.php:1683
 msgid "refreshed every"
-msgstr ""
+msgstr "ververs elke"
 
 #: include/locales/en_gb.inc.php:337
 #: include/views/administration.general.gui.edit.php:34
+#, fuzzy
 msgid "remember selected"
-msgstr ""
+msgstr "onthoud geslecteerden"
 
 #: include/locales/en_gb.inc.php:1308
+#, fuzzy
 msgid "root"
-msgstr ""
+msgstr "wortel"
 
 #: include/locales/en_gb.inc.php:1108
 msgid "running"
@@ -10267,18 +10331,18 @@ msgstr "Lopende"
 
 #: include/func.inc.php:382 include/func.inc.php:428
 msgid "s"
-msgstr ""
+msgstr "s"
 
 #: include/locales/en_gb.inc.php:541
 msgid "sec"
-msgstr ""
+msgstr "sec"
 
 #: include/locales/en_gb.inc.php:540
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:105
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:111
 #: include/views/configuration.action.edit.php:50
 msgid "seconds"
-msgstr ""
+msgstr "seconden"
 
 #: include/locales/en_gb.inc.php:301
 msgid "sent"
@@ -10286,65 +10350,68 @@ msgstr "Verzonden"
 
 #: include/locales/en_gb.inc.php:1730
 msgid "show value mappings"
-msgstr ""
+msgstr "laat value mappings zien"
 
 #: api/classes/class.ctemplate.php:1668
 #, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
-msgstr ""
+msgstr "template ID \"%1$s\" is %2$s keer verwerkt"
 
 #: include/locales/en_gb.inc.php:132
+#, fuzzy
 msgid "to"
-msgstr ""
+msgstr "tot"
 
 #: include/locales/en_gb.inc.php:1788
+#, fuzzy
 msgid "to host"
-msgstr ""
+msgstr "naar host"
 
 #: api/classes/class.cmap.php:595
 msgid "trigger"
-msgstr ""
+msgstr "trigger"
 
 #: include/locales/en_gb.inc.php:1739
 msgid "updated"
-msgstr ""
+msgstr "bijgewerkt"
 
 #: include/locales/en_gb.inc.php:1749
 msgid "used by scenario"
-msgstr ""
+msgstr "gebruikt in scenario"
 
 #: include/locales/en_gb.inc.php:1005
 msgid "used in exported map"
-msgstr ""
+msgstr "gebruikt in geexporteerde kaart"
 
 #: include/locales/en_gb.inc.php:1250
 msgid "used in exported screen"
-msgstr ""
+msgstr "gebruikt in geexporteerd scherm"
 
 #: include/locales/en_gb.inc.php:31
 msgid "w"
-msgstr ""
+msgstr "w"
 
 #: include/locales/en_gb.inc.php:1828
 msgid "week"
-msgstr ""
+msgstr "week"
 
 #: include/locales/en_gb.inc.php:1827
 msgid "weeks"
-msgstr ""
+msgstr "weken"
 
 #: include/locales/en_gb.inc.php:1816
+#, fuzzy
 msgid "with template host cannot contain items from other hosts."
-msgstr ""
+msgstr "met template host can geen items bevatten van andere hosts."
 
 #: include/func.inc.php:395 include/locales/en_gb.inc.php:29
 msgid "y"
-msgstr ""
+msgstr "y"
 
 #: include/locales/en_gb.inc.php:1871
 msgid "yes"
-msgstr ""
+msgstr "Ja"
 
 #: include/locales/en_gb.inc.php:1704
 msgid "µ"
-msgstr ""
+msgstr "µ"
