@@ -529,7 +529,7 @@ int	zbx_db_begin()
 	rc = zbx_db_execute("%s", "begin;");
 #endif
 
-	if (rc < ZBX_DB_OK)	/* ZBX_DB_FAIL | ZBX_DB_DOWN */
+	if (ZBX_DB_DOWN == rc)
 		txn_level--;
 
 	return rc;
@@ -577,7 +577,7 @@ int	zbx_db_commit()
 	php_sem_release(&sqlite_access);
 #endif
 
-	if (rc >= ZBX_DB_OK)	/* ZBX_DB_OK or number of changes */
+	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
 		txn_level--;
 
 	return rc;
@@ -625,7 +625,7 @@ int	zbx_db_rollback()
 	php_sem_release(&sqlite_access);
 #endif
 
-	if (rc >= ZBX_DB_OK)	/* ZBX_DB_OK or number of changes */
+	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
 		txn_level--;
 
 	return rc;
@@ -800,8 +800,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		zabbix_errlog(ERR_Z3005, 0, "result is NULL", sql);
 		ret = (CONNECTION_OK == PQstatus(conn) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
-
-	if (PGRES_COMMAND_OK != PQresultStatus(result))
+	else if (PGRES_COMMAND_OK != PQresultStatus(result))
 	{
 		error = zbx_dsprintf(error, "%s:%s",
 				PQresStatus(PQresultStatus(result)),
