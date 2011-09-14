@@ -142,7 +142,7 @@
 	}
 
 	function is_service_hardlinked($serviceid) {
-		$row = DBfetch(DBselect('SELECT count(sl.*) as cnt FROM services_links sl WHERE sl.servicedownid='.$serviceid.' and sl.soft=0'));
+		$row = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM services_links sl WHERE sl.servicedownid='.$serviceid.' and sl.soft=0'));
 		if ($row && $row['cnt'] > 0) {
 			return true;
 		}
@@ -229,7 +229,7 @@
 			return null;
 		}
 
-		$result = DBselect('SELECT max(s.serviceid) as serviceid'.
+		$result = DBselect('SELECT MAX(s.serviceid) as serviceid'.
 							' FROM services s,services_links sl'.
 							' WHERE s.serviceid=sl.serviceupid'.
 								' AND NOT s.triggerid IS NULL'.
@@ -288,7 +288,7 @@
 	}
 
 	function get_last_service_value($serviceid, $clock) {
-		$row = DBfetch(DBselect('SELECT count(sa.*) as cnt,max(sa.clock) as maxx FROM service_alarms sa WHERE sa.serviceid='.$serviceid.' and sa.clock<='.$clock));
+		$row = DBfetch(DBselect('SELECT COUNT(*) as cnt,MAX(sa.clock) as maxx FROM service_alarms sa WHERE sa.serviceid='.$serviceid.' and sa.clock<='.$clock));
 		if ($row && $row['cnt'] > 0) {
 			$result2 = DBselect('SELECT sa.value FROM service_alarms sa WHERE sa.serviceid='.$serviceid.' and sa.clock='.$row['maxx']);
 
