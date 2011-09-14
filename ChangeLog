@@ -4,6 +4,9 @@ Changes for 1.9.7
 New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
+Bug fixes:
+ - [ZBX-3400] fixed calculation of graph header font size, Zabbix will decrease it to fit graph width (Alexei)
+
 --------------------------------------------------------------------------------
 Changes for 1.9.6
 
