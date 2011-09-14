@@ -880,7 +880,7 @@ class CItem extends CItemGeneral{
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
-	protected function createReal(&$items){
+	protected function createReal(&$items) {
 		foreach ($items as $item) {
 			$itemsExists = API::Item()->get(array(
 				'output' => API_OUTPUT_SHORTEN,
@@ -898,13 +898,17 @@ class CItem extends CItemGeneral{
 		$itemids = DB::insert('items', $items);
 
 		$itemApplications = array();
-		foreach($items as $key => $item){
+		foreach ($items as $key => $item) {
 			$items[$key]['itemid'] = $itemids[$key];
 
-			if(!isset($item['applications'])) continue;
+			if (!isset($item['applications'])) {
+				continue;
+			}
 
-			foreach($item['applications'] as $appid){
-				if($appid == 0) continue;
+			foreach ($item['applications'] as $appid) {
+				if ($appid == 0) {
+					continue;
+				}
 
 				$itemApplications[] = array(
 					'applicationid' => $appid,
@@ -913,7 +917,7 @@ class CItem extends CItemGeneral{
 			}
 		}
 
-		if(!empty($itemApplications)){
+		if (!empty($itemApplications)) {
 			DB::insert('items_applications', $itemApplications);
 		}
 
@@ -924,7 +928,7 @@ class CItem extends CItemGeneral{
 			'selectHosts' => array('host'),
 			'nopermissions' => 1
 		));
-		foreach($itemHosts as $item){
+		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
 			info(S_ITEM." [".$host['host'].':'.$item['key_']."] ".S_CREATED_SMALL);
 		}
