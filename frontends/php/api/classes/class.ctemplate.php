@@ -1874,6 +1874,28 @@ COpt::memoryPick();
 		}
 
 /* TRIGGERS {{{ */
+		// check that all triggers on templates that we unlink, don't have items from another templates
+		$sql = 'SELECT DISTINCT t.triggerid,t.description'.
+				' FROM triggers t, functions f, items i'.
+				' WHERE f.triggerid=t.triggerid'.
+				' AND i.itemid=f.itemid'.
+				' AND '.DBCondition('i.hostid', $templateids).
+				' AND EXISTS ('.
+					' SELECT ff.triggerid'.
+					' FROM functions ff, items ii'.
+					' WHERE ff.triggerid=t.triggerid'.
+						' AND ii.itemid=ff.itemid'.
+						' AND '.DBCondition('ii.hostid', $templateids, true).
+				' )'.
+				' AND t.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
+		if ($db_trigger = DBfetch(DBSelect($sql))) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot unlink trigger "%s", it has items from template that is left linked to host.', $db_trigger['description'])
+			);
+		}
+
+
 		$sql_from = 'triggers t';
 		$sql_where = ' EXISTS ('.
 				' SELECT ff.triggerid'.
