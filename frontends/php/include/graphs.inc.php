@@ -291,82 +291,71 @@
 		return	false;
 	}
 
-/*
- * Function: get_same_graphitems_for_host
- *
- * Description:
- *     Replace items for specified host
- *
- * Author:
- *     Eugene Grigorjev
- *
- * Comments: !!! Don't forget sync code with C !!!
- * Only PHP:
- *		$error= true : rise Error if item doesn't exist (error generated), false: special processing (NO error generated)
+/**
+ * Replace items for specified host.
+ * @param $gitems
+ * @param $dest_hostid
+ * @param bool $error if false error won't be thrown when item does not exists
+ * @return array|bool
  */
-	function get_same_graphitems_for_host($gitems, $dest_hostid, $error=true){
-		$result = array();
+function get_same_graphitems_for_host($gitems, $dest_hostid, $error = true) {
+	$result = array();
 
-		foreach($gitems as $gitem){
-			$sql = 'SELECT src.itemid, dest.key_ '.
-					' FROM items src, items dest '.
-					' WHERE dest.itemid='.$gitem['itemid'].
-						' AND src.key_=dest.key_ '.
-						' AND src.hostid='.$dest_hostid;
-			$db_item = DBfetch(DBselect($sql));
-			if (!$db_item && $error){
-				$item = get_item_by_itemid($gitem['itemid']);
-				$host = get_host_by_hostid($dest_hostid);
-				error(S_MISSING_KEY.SPACE.'"'.$item['key_'].'"'.SPACE.S_FOR_HOST_SMALL.SPACE.'"'.$host['host'].'"');
-				return false;
-			}
-			else if(!$db_item){
-				continue;
-//				$gitem['itemid'] = 0;
-			}
-			else{
-				$gitem['itemid'] = $db_item['itemid'];
-				$gitem['key_'] = $db_item['key_'];
-			}
+	foreach ($gitems as $gitem) {
+		$sql = 'SELECT dest.itemid,src.key_'.
+				' FROM items dest,items src'.
+				' WHERE dest.key_=src.key_'.
+					' AND dest.hostid='.$dest_hostid.
+					' AND src.itemid='.$gitem['itemid'];
+		$db_item = DBfetch(DBselect($sql));
 
-			$result[] = $gitem;
+		if ($db_item) {
+			$gitem['itemid'] = $db_item['itemid'];
+			$gitem['key_'] = $db_item['key_'];
 		}
-
-		return $result;
-	}
-
-/*
- * Function: copy_graph_to_host
- *
- * Description:
- *     Copy specified graph to the specified host
- *
- * Author:
- *     Aly
- *
- */
-	function copy_graph_to_host($graphid, $hostid){
-		$graphs = API::Graph()->get(array(
-			'graphids' => $graphid,
-			'output' => API_OUTPUT_EXTEND,
-			'selectGraphItems' => API_OUTPUT_EXTEND
-		));
-		$graph = reset($graphs);
-		$gitems = $graph['gitems'];
-
-		$new_gitems = get_same_graphitems_for_host($gitems, $hostid);
-		if(empty($new_gitems)){
-			$host = get_host_by_hostid($hostid);
-			info(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
+		elseif ($error) {
+			$item = get_item_by_itemid($gitem['itemid']);
+			$host = get_host_by_hostid($dest_hostid);
+			error(_s('Missing key "%1$s" for host "%2$s".', $item['key_'], $host['host']));
 			return false;
 		}
+		else {
+			continue;
+		}
 
-		$graph['gitems'] = $new_gitems;
-
-		$result = API::Graph()->create($graph);
+		$result[] = $gitem;
+	}
 
 	return $result;
+}
+
+/**
+ * Copy specified graph to specified host.
+ * @param $graphid
+ * @param $hostid
+ * @return array|bool
+ */
+function copy_graph_to_host($graphid, $hostid) {
+	$graphs = API::Graph()->get(array(
+		'graphids' => $graphid,
+		'output' => API_OUTPUT_EXTEND,
+		'selectGraphItems' => API_OUTPUT_EXTEND
+	));
+	$graph = reset($graphs);
+
+	$new_gitems = get_same_graphitems_for_host($graph['gitems'], $hostid);
+
+	if (!$new_gitems) {
+		$host = get_host_by_hostid($hostid);
+		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
+		return false;
 	}
+
+	$graph['gitems'] = $new_gitems;
+	$result = API::Graph()->create($graph);
+
+	return $result;
+}
 
 	function navigation_bar_calc($idx=null, $idx2=0, $update=false){
 //SDI($_REQUEST['stime']);
