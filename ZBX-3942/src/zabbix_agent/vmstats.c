@@ -25,6 +25,7 @@
 
 #define XINTFRAC	((double)_system_configuration.Xint / (double)_system_configuration.Xfrac)
 
+static long		hz = -1;
 static int		last_clock = 0;
 /* --- kthr --- */
 static zbx_uint64_t	last_runque = 0;		/* length of the run queue (processes ready) */
@@ -79,6 +80,9 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 
 	now = (int)time(NULL);
 
+	if (-1 == hz)
+		hz = sysconf(_SC_CLK_TCK);
+
 	/* retrieve the metrics
 	 * Upon successful completion, the number of structures filled is returned.
 	 * If unsuccessful, a value of -1 is returned and the errno global variable is set */
@@ -109,7 +113,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 	}
 
 	if (0 == last_clock)
-		last_clock = (int)((double)cpustats.lbolt / 100);
+		last_clock = (int)((double)cpustats.lbolt / hz);
 
 	if (now > last_clock)
 	{
