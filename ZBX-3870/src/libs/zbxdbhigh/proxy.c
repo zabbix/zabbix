@@ -830,7 +830,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Failed to update proxy");
+		zabbix_log(LOG_LEVEL_ERR, "Failed to update local proxy cofiguration copy");
 		while (NULL != data->table_name)
 		{
 			prev_data = data->prev_table_delete_data;
