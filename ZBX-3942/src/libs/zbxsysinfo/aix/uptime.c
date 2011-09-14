@@ -31,7 +31,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	{
 		hertz = sysconf(_SC_CLK_TCK);
 
-		/* make sure we do not devide by 0 */
+		/* make sure we do not divide by 0 */
 		assert(hertz);
 	}
 
