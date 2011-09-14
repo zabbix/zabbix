@@ -295,7 +295,7 @@
  * Replace items for specified host.
  * @param $gitems
  * @param $dest_hostid
- * @param bool $error if false error won't be thrown when item does not exists
+ * @param bool $error if false error won't be thrown when item does not exist
  * @return array|bool
  */
 function get_same_graphitems_for_host($gitems, $dest_hostid, $error = true) {

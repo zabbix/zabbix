@@ -49,7 +49,7 @@ class GlobalRegExp {
 				' FROM regexps r'.
 				' WHERE r.name='.zbx_dbstr($regExp);
 			if (!DBfetch(DBselect($sql))) {
-				throw new Exception('Global expression does not exists', self::ERROR_REGEXP_NOT_EXISTS);
+				throw new Exception('Global expression does not exist', self::ERROR_REGEXP_NOT_EXISTS);
 			}
 		}
 
@@ -80,7 +80,7 @@ class GlobalRegExp {
 
 				if (empty(self::$_cachedExpressions[$regExp])) {
 					unset(self::$_cachedExpressions[$regExp]);
-					throw new Exception('Does not exists', self::ERROR_REGEXP_NOT_EXISTS);
+					throw new Exception('Does not exist', self::ERROR_REGEXP_NOT_EXISTS);
 				}
 			}
 
