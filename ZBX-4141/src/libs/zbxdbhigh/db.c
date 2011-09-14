@@ -105,14 +105,14 @@ void	DBinit()
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_txn_operation                                             *
+ * Function: DBtxn_operation                                                  *
  *                                                                            *
  * Purpose: helper function to loop transaction operation while DB is down    *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_db_txn_operation(int (*txn_operation)())
+static void	DBtxn_operation(int (*txn_operation)())
 {
 	int	rc;
 
@@ -137,14 +137,14 @@ static void	zbx_db_txn_operation(int (*txn_operation)())
  *                                                                            *
  * Purpose: start a transaction                                               *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBbegin()
 {
-	zbx_db_txn_operation(zbx_db_begin);
+	DBtxn_operation(zbx_db_begin);
 }
 
 /******************************************************************************
@@ -153,14 +153,14 @@ void	DBbegin()
  *                                                                            *
  * Purpose: commit a transaction                                              *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBcommit()
 {
-	zbx_db_txn_operation(zbx_db_commit);
+	DBtxn_operation(zbx_db_commit);
 }
 
 /******************************************************************************
@@ -169,14 +169,14 @@ void	DBcommit()
  *                                                                            *
  * Purpose: rollback a transaction                                            *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBrollback()
 {
-	zbx_db_txn_operation(zbx_db_rollback);
+	DBtxn_operation(zbx_db_rollback);
 }
 
 /******************************************************************************
