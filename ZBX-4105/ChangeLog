@@ -4,6 +4,9 @@ Changes for 1.9.7
 New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
+Bug fixes:
+ - [ZBX-4105] fixed removal of host groups in configuration of dashboard, thanks to Pustovalov Alexey (Alexei)
+
 --------------------------------------------------------------------------------
 Changes for 1.9.6
 

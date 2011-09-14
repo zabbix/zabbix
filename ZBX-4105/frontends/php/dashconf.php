@@ -194,7 +194,7 @@ include_once('include/page_header.php');
 		$addButton = new CButton('add', S_ADD, "return PopUp('popup_right.php?dstfrm=" . $dashForm->getName() . "&permission=" . PERM_READ_WRITE . "',450,450);");
 		$addButton->setEnabled($filterEnable);
 
-		$delButton = new CButton('delete', S_DELETE_SELECTED);
+		$delButton = new CSubmit('delete', _('Delete selected'));
 		$delButton->setEnabled($filterEnable);
 
 		$dashList->addRow(
