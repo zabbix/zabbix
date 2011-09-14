@@ -1,0 +1,29 @@
+#!/sbin/runscript
+#
+# Zabbix server start/stop script.
+#
+# Written by A. Tophofen
+NAME=zabbix_server
+PATH=/bin:/usr/bin:/sbin:/usr/sbin:/home/zabbix/bin
+DAEMON=/home/zabbix/bin/${NAME}
+DESC="Zabbix server"
+PID=/home/zabbix/lock/$NAME.pid
+
+opts="${opts} reload"
+
+depend() {
+	need net
+}
+
+start() {
+	ebegin "Starting $DESC: $NAME"
+	start-stop-daemon --start --pidfile $PID \
+		--exec $DAEMON
+	eend
+}
+stop() {
+	ebegin "Stopping $DESC: $NAME"
+	start-stop-daemon --stop --pidfile $PID \
+		--exec $DAEMON
+	eend
+}
