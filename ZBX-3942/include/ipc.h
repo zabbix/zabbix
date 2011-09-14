@@ -22,7 +22,7 @@
 
 #if defined(_WINDOWS)
 #	error "This module allowed only for Unix OS"
-#endif /* _WINDOWS */
+#endif
 
 #define ZBX_IPC_CONFIG_ID	'g'
 #define ZBX_IPC_HISTORY_ID	'h'

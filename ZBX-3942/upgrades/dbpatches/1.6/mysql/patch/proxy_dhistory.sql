@@ -9,5 +9,5 @@ CREATE TABLE proxy_dhistory (
         value           varchar(255)            DEFAULT '0'     NOT NULL,
         status          integer         DEFAULT '0'     NOT NULL,
         PRIMARY KEY (id)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX proxy_dhistory_1 on proxy_dhistory (clock);
