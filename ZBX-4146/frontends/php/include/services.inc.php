@@ -28,7 +28,7 @@
 		}
 
 		if (is_null($triggerid) || $triggerid == 0) {
-			$triggerid = 'null';
+			$triggerid = 'NULL';
 		}
 
 		$serviceid = get_dbid('services', 'serviceid');
@@ -102,7 +102,7 @@
 		}
 
 		if (is_null($triggerid) || $triggerid == 0) {
-			$triggerid = 'null';
+			$triggerid = 'NULL';
 		}
 
 		$result = DBexecute('UPDATE services'.
@@ -225,7 +225,7 @@
 	 */
 	function clear_parents_from_trigger($serviceid = 0) {
 		if ($serviceid != 0) {
-			DBexecute('UPDATE services SET triggerid=null WHERE serviceid='.$serviceid);
+			DBexecute('UPDATE services SET triggerid=NULL WHERE serviceid='.$serviceid);
 			return null;
 		}
 
@@ -235,7 +235,7 @@
 								' AND NOT s.triggerid IS NULL'.
 							' GROUP BY s.serviceid');
 		while ($row = DBfetch($result)) {
-			DBexecute('UPDATE services SET triggerid=null WHERE serviceid='.$row['serviceid']);
+			DBexecute('UPDATE services SET triggerid=NULL WHERE serviceid='.$row['serviceid']);
 		}
 	}
 
