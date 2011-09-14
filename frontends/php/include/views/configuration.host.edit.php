@@ -274,7 +274,7 @@
 				$triggersList[$hostTrigger['triggerid']] = $hostTrigger['description'];
 			}
 
-			if(!empty($hostTriggers)){
+			if(!empty($triggersList)){
 				order_result($triggersList);
 
 				$listBox = new CListBox('triggers', null, 8);
@@ -305,13 +305,16 @@
 
 				$graphsList[$hostGraph['graphid']] = $hostGraph['name'];
 			}
-			order_result($graphsList);
 
-			$listBox = new CListBox('graphs', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($graphsList);
+			if (!empty($graphsList)) {
+				order_result($graphsList);
 
-			$hostList->addRow(_('Graphs'), $listBox);
+				$listBox = new CListBox('graphs', null, 8);
+				$listBox->setAttribute('disabled', 'disabled');
+				$listBox->addItems($graphsList);
+
+				$hostList->addRow(_('Graphs'), $listBox);
+			}
 		}
 
 // Discovery rules
