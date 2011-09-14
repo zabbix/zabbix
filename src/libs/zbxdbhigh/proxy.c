@@ -786,19 +786,15 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 		zbx_strlcpy(data->table_name, buf, strlen(buf) + 1);
 		data->records = NULL;
 		data->count = 0;
+		data->prev_table_delete_data = prev_data;
+		prev_data = data;
 
 		ret = process_proxyconfig_table(jp_data, buf, &jp_obj, &data->records, &data->count);
-		if (SUCCEED != ret)
-			break;
-
-		data->prev_table_delete_data = prev_data;
-
-		prev_data = data;
 	}
 
 	delete_sql = zbx_malloc(delete_sql, delete_sql_alloc * sizeof(char));
 
-	while (NULL != data->table_name)
+	while ((NULL != data->table_name) && (SUCCEED <= ret))
 	{
 		if (0 < data->count)
 		{
@@ -813,25 +809,40 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 					"delete from %s where", table->table);
 			DBadd_condition_alloc(&delete_sql, &delete_sql_alloc, &delete_sql_offset, table->recid,
 					data->records, data->count);
-			DBexecute("%s", delete_sql);
+
+			ret = DBexecute("%s", delete_sql);
 		}
 		prev_data = data->prev_table_delete_data;
 
 		zbx_free(data->records);
 		zbx_free(data->table_name);
 		zbx_free(data);
+
 		data = prev_data;
 	}
 
 	zbx_free(delete_sql);
 
-	if (SUCCEED == ret)
+	if (SUCCEED <= ret)
 	{
 		DBcommit();
 		DCsync_configuration();
 	}
 	else
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Failed to update proxy");
+		while (NULL != data->table_name)
+		{
+			prev_data = data->prev_table_delete_data;
+
+			zbx_free(data->records);
+			zbx_free(data->table_name);
+			zbx_free(data);
+
+			data = prev_data;
+		}
 		DBrollback();
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
