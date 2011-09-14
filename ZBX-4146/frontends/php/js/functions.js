@@ -332,7 +332,7 @@ function swapNodesNames(n1,n2){
 return false;
 }
 
-function closeform(page) {
+function closeForm(page) {
 	try {
 		// set header confirmation message to opener
 		var msg = IE ? document.getElementById('page_msg').innerText : document.getElementById('page_msg').textContent;
@@ -341,8 +341,14 @@ function closeform(page) {
 	catch(e) {
 		zbx_throw(e);
 	}
-	// close current popup after 1s, wait when opener window is refreshed (IE7 issue)
-	window.setTimeout(function(){window.self.close()}, 1000);
+
+	if (IE) {
+		// close current popup after 1s, wait when opener window is refreshed (IE7 issue)
+		window.setTimeout(function() {window.self.close()}, 1000);
+	}
+	else {
+		window.self.close();
+	}
 }
 
 function add_keyword(bt_type){
