@@ -105,7 +105,7 @@ class CTemplate extends CZBXAPI{
 
 			$dbTable = DB::getSchema('hosts');
 			$sql_parts['select']['hostid'] = 'h.hostid';
-			foreach($options['output'] as $key => $field){
+			foreach($options['output'] as $field){
 				if($field == 'templateid') continue;
 
 				if(isset($dbTable['fields'][$field]))
@@ -532,7 +532,7 @@ Copt::memoryPick();
 
 					if(isset($template['parentTemplates']) && is_array($template['parentTemplates'])) {
 						$count = array();
-						foreach($template['parentTemplates'] as $hnum => $parentTemplate){
+						foreach($template['parentTemplates'] as $parentTemplate){
 							if(!is_null($options['limitSelects'])){
 								if(!isset($count[$parentTemplate['templateid']])) $count[$parentTemplate['templateid']] = 0;
 								$count[$parentTemplate['hostid']]++;
@@ -1706,7 +1706,7 @@ COpt::memoryPick();
 		}
 
 		// CHECK TEMPLATE TRIGGERS DEPENDENCIES
-		foreach($templateids as $tnum => $templateid){
+		foreach($templateids as $templateid){
 			$triggerids = array();
 			$db_triggers = get_triggers_by_hostid($templateid);
 			while($trigger = DBfetch($db_triggers)){
@@ -1748,8 +1748,8 @@ COpt::memoryPick();
 
 		// add template linkages, if problems rollback later
 		foreach($targetids as $targetid){
-			foreach($templateids as $tnum => $templateid){
-				foreach($linked as $lnum => $link){
+			foreach($templateids as $templateid){
+				foreach($linked as $link){
 					if(isset($link[$targetid]) && (bccomp($link[$targetid],$templateid) == 0)) continue 2;
 				}
 
@@ -1804,10 +1804,9 @@ COpt::memoryPick();
 		}
 
 		foreach($targetids as $targetid){
-			foreach($templateids as $tnum => $templateid){
-				foreach($linked as $lnum => $link){
-					if(isset($link[$targetid]) && (bccomp($link[$targetid],$templateid) == 0)){
-						unset($linked[$lnum]);
+			foreach($templateids as $templateid){
+				foreach($linked as $link){
+					if(isset($link[$targetid]) && (bccomp($link[$targetid], $templateid) == 0)){
 						continue 2;
 					}
 				}
@@ -1831,7 +1830,15 @@ COpt::memoryPick();
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
+			}
 
+			// we do linkage in two separate loops because for triggers you need all items already created on host
+			foreach($templateids as $templateid){
+				foreach($linked as $link){
+					if(isset($link[$targetid]) && (bccomp($link[$targetid], $templateid) == 0)){
+						continue 2;
+					}
+				}
 				API::Trigger()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid

@@ -1212,8 +1212,6 @@ function utf8RawUrlDecode($source){
 		if(empty($trigExpr->expressions)) return null;
 
 		$usedItems = array();
-
-		$cuted = 0;
 		foreach($trigExpr->expressions as $exprPart){
 			if(zbx_empty($exprPart['item'])) continue;
 
@@ -1244,12 +1242,11 @@ function utf8RawUrlDecode($source){
 				if(!DBexecute($sql)) return null;
 				else $usedItems[$exprPart['expression']] = $functionid;
 			}
-//SDI("BEFORE: $expr");
+
 			$expr = str_replace($exprPart['expression'], '{'.$usedItems[$exprPart['expression']].'}', $expr);
-//SDI("AFTER: $expr");
 		}
 
-	return $expr;
+		return $expr;
 	}
 
 // Update Trigger status
