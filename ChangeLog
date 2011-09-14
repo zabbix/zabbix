@@ -2,6 +2,7 @@
 Changes for 1.9.7
 
 New features:
+ - [ZBXNEXT-966] update jQuery to 1.6.4 (Eduard)
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 --------------------------------------------------------------------------------
