@@ -332,17 +332,15 @@ function swapNodesNames(n1,n2){
 return false;
 }
 
-function closeform(page){
-	var msg="";
-	try{
-		msg = (IE)?(document.getElementById('page_msg').innerText):(document.getElementById('page_msg').textContent);
-		opener.location.replace(page+'?msg='+encodeURI(msg));
+function closeform(page) {
+	try {
+		var msg = IE ? document.getElementById('page_msg').innerText : document.getElementById('page_msg').textContent;
+		window.opener.location.replace(page + '?msg=' + encodeURI(msg));
 	}
-	catch(e){
+	catch(e) {
 		zbx_throw(e);
 	}
-
-self.close();
+	window.setTimeout(function(){window.self.close()}, 1000);
 }
 
 function add_keyword(bt_type){
