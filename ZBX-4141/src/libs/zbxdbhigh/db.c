@@ -81,7 +81,7 @@ int	DBconnect(int flag)
 			exit(FAIL);
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in " ZBX_DB_WAIT_DOWN " seconds.");
+		zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in %d seconds.", ZBX_DB_WAIT_DOWN);
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
 
@@ -125,7 +125,7 @@ static void	zbx_db_txn_operation(int (*txn_operation)())
 
 		if (ZBX_DB_DOWN == (rc = txn_operation()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in " ZBX_DB_WAIT_DOWN " seconds.");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
@@ -204,7 +204,7 @@ int	__zbx_DBexecute(const char *fmt, ...)
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_vexecute(fmt, args)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in " ZBX_DB_WAIT_DOWN " seconds.");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
@@ -270,7 +270,7 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 
 		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_vselect(fmt, args)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in " ZBX_DB_WAIT_DOWN " seconds.");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
@@ -302,7 +302,7 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_select_n(query, n)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in " ZBX_DB_WAIT_DOWN " seconds.");
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
