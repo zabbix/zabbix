@@ -185,6 +185,38 @@ UPDATE items
 		AND INSTR(key_, '[') = 0
 /
 
+-- convert simple check keys to a new form
+
+UPDATE items
+	SET key_ = 'net.tcp.service[' || key_ || ']'
+	WHERE type IN (3)	-- SIMPLE
+		AND key_ IN ('ftp','http','imap','ldap','nntp','ntp','pop','smtp','ssh')
+/
+
+UPDATE items
+	SET key_ = 'net.tcp.service[' || SUBSTR(key_, 1, INSTR(key_, ',') - 1) || ',' || SUBSTR(key_, INSTR(key_, ',')) || ']'
+	WHERE type IN (3)	-- SIMPLE
+		AND (key_ LIKE 'ftp,%' OR key_ LIKE 'http,%' OR key_ LIKE 'imap,%' OR key_ LIKE 'ldap,%'
+			OR key_ LIKE 'nntp,%' OR key_ LIKE 'ntp,%' OR key_ LIKE 'pop,%' OR key_ LIKE 'smtp,%'
+			OR key_ LIKE 'ssh,%' OR key_ LIKE 'tcp,%')
+/
+
+UPDATE items
+	SET key_ = 'net.tcp.service.perf[' || SUBSTR(key_, 1, INSTR(key_, '_') - 1) || ']'
+	WHERE type IN (3)	-- SIMPLE
+		AND key_ IN ('ftp_perf','http_perf','imap_perf','ldap_perf','nntp_perf',
+			'ntp_perf','pop_perf','smtp_perf','ssh_perf')
+/
+
+UPDATE items
+	SET key_ = 'net.tcp.service.perf[' || SUBSTR(key_, 1, INSTR(key_, ',') - 1) || ',' || SUBSTR(key_, INSTR(key_, ',')) || ']'
+	WHERE type IN (3)	-- SIMPLE
+		AND (key_ LIKE 'ftp_perf,%' OR key_ LIKE 'http_perf,%' OR key_ LIKE 'imap_perf,%'
+			OR key_ LIKE 'ldap_perf,%' OR key_ LIKE 'nntp_perf,%' OR key_ LIKE 'ntp_perf,%'
+			OR key_ LIKE 'pop_perf,%' OR key_ LIKE 'smtp_perf,%' OR key_ LIKE 'ssh_perf,%'
+			OR key_ LIKE 'tcp_perf,%')
+/
+
 ---- Patching table `hosts`
 
 ALTER TABLE hosts ALTER COLUMN hostid SET WITH DEFAULT NULL
