@@ -23,7 +23,7 @@ require_once('include/config.inc.php');
 require_once('include/media.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = 'S_MEDIA_TYPES';
+$page['title'] = _('Media types');
 $page['file'] = 'media_types.php';
 $page['hist_arg'] = array();
 
@@ -35,9 +35,9 @@ include_once('include/page_header.php');
 		// VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 		// media form
 		'mediatypeids' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'mediatypeid' =>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID, '(isset({form})&&({form}=="edit"))'),
+		'mediatypeid' =>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID, 'isset({form})&&({form}=="edit")'),
 		'type' =>			array(T_ZBX_INT, O_OPT, NULL,	IN(implode(',', array_keys(media_type2str()))), '(isset({save}))'),
-		'description' =>	array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY, '(isset({save}))'),
+		'description' =>	array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY, 'isset({save})'),
 		'smtp_server' =>	array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY, 'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
 		'smtp_helo' =>		array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY, 'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
 		'smtp_email' =>		array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY, 'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
@@ -55,7 +55,7 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description',ZBX_SORT_UP);
+	validate_sort_and_sortorder('description', ZBX_SORT_UP);
 ?>
 <?php
 	$mediatypeid = get_request('mediatypeid');
@@ -84,12 +84,12 @@ include_once('include/page_header.php');
 			$action = AUDIT_ACTION_UPDATE;
 			$mediatype['mediatypeid'] = $mediatypeid;
 			$result = API::Mediatype()->update($mediatype);
-			show_messages($result, _('Media type updated'), _('Media type was not updated'));
+			show_messages($result, _('Media type updated'), _('Cannot update media type'));
 		}
 		else {
 			$action = AUDIT_ACTION_ADD;
 			$result = API::Mediatype()->create($mediatype);
-			show_messages($result, _('Added new media type'), _('New media type was not added'));
+			show_messages($result, _('Media type added'), _('Cannot add media type'));
 		}
 
 		if ($result) {
@@ -107,7 +107,7 @@ include_once('include/page_header.php');
 			if ($result) {
 				unset($_REQUEST['form']);
 			}
-			show_messages($result, _('Media type deleted'), _('Media type was not deleted'));
+			show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
 		}
 	}
 
@@ -138,7 +138,7 @@ include_once('include/page_header.php');
 			$data['password'] = $mediatype['passwd'];
 		}
 		else {
-			$data['type'] = get_request('type', 0);
+			$data['type'] = get_request('type', MEDIA_TYPE_EMAIL);
 			$data['description'] = get_request('description', '');
 			$data['smtp_server'] = get_request('smtp_server', 'localhost');
 			$data['smtp_helo'] = get_request('smtp_helo', 'localhost');

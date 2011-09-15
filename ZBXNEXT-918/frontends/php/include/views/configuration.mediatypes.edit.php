@@ -105,7 +105,7 @@ if (empty($this->data['mediatypeid'])) {
 	$mediaTypeForm->addItem(makeFormFooter(array($saveButton), array(new CButtonCancel(url_param('config')))));
 }
 else {
-	$mediaTypeForm->addItem(makeFormFooter(array($saveButton), array(new CButtonDelete(_('Delete selected media?'), url_param('form').url_param('mediatypeid').url_param('config')), new CButtonCancel(url_param('config')))));
+	$mediaTypeForm->addItem(makeFormFooter(array($saveButton), array(new CButtonDelete(_('Delete selected media type?'), url_param('form').url_param('mediatypeid').url_param('config')), new CButtonCancel(url_param('config')))));
 }
 
 // append form to widget

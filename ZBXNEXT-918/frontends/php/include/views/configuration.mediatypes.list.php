@@ -40,9 +40,9 @@ $mediaTypeForm->setName('frm_media_types');
 $mediaTypeTable = new CTableInfo(_('No media types defined'));
 $mediaTypeTable->setHeader(array(
 	new CCheckBox('all_media_types', null, "checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"),
-	make_sorting_header(_('Description'),'description'),
-	make_sorting_header(_('Type'),'type'),
-	make_sorting_header(_('Used in actions'),'usedInActions'),
+	make_sorting_header(_('Description'), 'description'),
+	make_sorting_header(_('Type'), 'type'),
+	make_sorting_header(_('Used in actions'), 'usedInActions'),
 	_('Details')
 ));
 

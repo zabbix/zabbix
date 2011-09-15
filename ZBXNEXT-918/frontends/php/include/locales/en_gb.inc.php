@@ -355,7 +355,6 @@
 	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
 	'S_DELETE_SELECTED_IMAGE'=>			_('Delete selected image?'),
-	'S_MEDIA_TYPES'=>				_('Media types'),
 	'S_DEFAULT'=>					_('Default'),
 	'S_IMAGE'=>					_('Image'),
 	'S_IMAGES_BIG'=>				_('IMAGES'),
