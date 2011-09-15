@@ -494,7 +494,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 	if (NULL == (table = DBget_table(tablename)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid table name \"%s\"", tablename);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid table name \"%s\"", tablename);
 		goto exit;
 	}
 
@@ -552,7 +552,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	{
 		if (NULL == (fields[field_count] = DBget_field(table, buf)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid field name \"%s\"", buf);
+			zabbix_log(LOG_LEVEL_WARNING, "invalid field name \"%s\"", buf);
 			goto db_error;
 		}
 
@@ -625,7 +625,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 			if (f == field_count)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
+				zabbix_log(LOG_LEVEL_WARNING, "invalid number of fields \"%.*s\"",
 						jp_row.end - jp_row.start + 1, jp_row.start);
 				goto db_error;
 			}
@@ -640,7 +640,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			{
 				if (0 != (fields[f]->flags & ZBX_NOTNULL))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "Column '%s' cannot be null", fields[f]->name);
+					zabbix_log(LOG_LEVEL_WARNING, "column '%s' cannot be null", fields[f]->name);
 					goto db_error;
 				}
 
@@ -670,7 +670,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 		if (f != field_count)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
+			zabbix_log(LOG_LEVEL_WARNING, "invalid number of fields \"%.*s\"",
 					jp_row.end - jp_row.start + 1, jp_row.start);
 			goto db_error;
 		}
@@ -800,7 +800,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 		{
 			if (NULL == (table = DBget_table(data->table_name)))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Invalid table name \"%s\"", prev_data->table_name);
+				zabbix_log(LOG_LEVEL_WARNING, "invalid table name \"%s\"", prev_data->table_name);
 				break;
 			}
 
@@ -830,7 +830,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Failed to update local proxy cofiguration copy");
+		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy cofiguration copy");
 		while (NULL != data->table_name)
 		{
 			prev_data = data->prev_table_delete_data;
@@ -1039,7 +1039,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	/* "data" tag lists the hosts */
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Received invalid host availability data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid host availability data. %s", zbx_json_strerror());
 		goto exit;
 	}
 
@@ -1058,7 +1058,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	{
 		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid host availability data. %s", zbx_json_strerror());
+			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data. %s", zbx_json_strerror());
 			continue;
 		}
 
@@ -1129,14 +1129,14 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid host availability data. %s", zbx_json_strerror());
+			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data. %s", zbx_json_strerror());
 			sql_offset = tmp_offset;
 			continue;
 		}
 
 		if (SUCCEED != is_uint64(tmp, &hostid) || 1 == no_data)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid host availability data.");
+			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data.");
 			sql_offset = tmp_offset;
 			continue;
 		}
@@ -1467,7 +1467,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		if (ITEM_TYPE_TRAPPER == item.type && 0 == proxy_hostid &&
 				FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Process data failed: %s", zbx_tcp_strerror());
+			zabbix_log(LOG_LEVEL_WARNING, "process data failed: %s", zbx_tcp_strerror());
 			continue;
 		}
 
@@ -1502,7 +1502,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			}
 			else if (ISSET_MSG(&agent))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
+				zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
 
 				dc_add_history(item.itemid, item.value_type, item.flags, NULL, &values[i].ts,
@@ -1807,11 +1807,11 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 
 		continue;
 json_parse_error:
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data. %s", zbx_json_strerror());
 	}
 exit:
 	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data. %s", zbx_json_strerror());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
@@ -1885,11 +1885,11 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 
 		continue;
 json_parse_error:
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data. %s", zbx_json_strerror());
 	}
 exit:
 	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data. %s", zbx_json_strerror());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
@@ -3431,7 +3431,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 		ZBX_DBROW2UINT64(interfaceid, row[11]);
 	}
 	else
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
 	DBfree_result(result);
 
 	if (0 == hostid)
@@ -3500,7 +3500,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{
-		zabbix_log(LOG_LEVEL_WARNING,  "Parameter [" ZBX_FS_UI64 "][%s] became supported",
+		zabbix_log(LOG_LEVEL_WARNING,  "parameter [" ZBX_FS_UI64 "][%s] became supported",
 				discovery_itemid, zbx_host_key_string(discovery_itemid));
 
 		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64,
