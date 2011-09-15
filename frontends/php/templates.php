@@ -441,7 +441,7 @@ include_once('include/page_header.php');
 	/**
 	 * Delete
 	 */
-	else if(isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])){
+	elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 		DBstart();
 
 		$go_result = true;
@@ -449,13 +449,14 @@ include_once('include/page_header.php');
 			'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
 			'hosts' => array()
 		));
-		if($result)
+		if ($result) {
 			$result = API::Template()->delete($_REQUEST['templateid']);
+		}
 
 		$result = DBend($result);
 
-		show_messages($result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
-		if($result){
+		show_messages($result, _('Template deleted'), _('Cannot delete template'));
+		if ($result) {
 			unset($_REQUEST['form']);
 			unset($_REQUEST['templateid']);
 		}
@@ -472,7 +473,7 @@ include_once('include/page_header.php');
 
 		$result = DBend($result);
 
-		show_messages($result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
+		show_messages($result, _('Template deleted'), _('Cannot delete template'));
 		if($result){
 			unset($_REQUEST['form']);
 			unset($_REQUEST['templateid']);
@@ -497,7 +498,7 @@ include_once('include/page_header.php');
 
 		$go_result = DBend($go_result);
 
-		show_messages($go_result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
+		show_messages($go_result, _('Template deleted'), _('Cannot delete template'));
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
