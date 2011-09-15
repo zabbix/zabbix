@@ -253,13 +253,16 @@ class CGraphDraw{
 
 // Calculate largest font size that can fit graph header
 // TODO: font size must be dynamic in other parts of the graph as well, like legend, timeline, etc
-		for($fontsize = 11; $fontsize > 7; $fontsize--)
-		{
-			$dims = imageTextSize( $fontsize, 0, $str );
+		for ($fontsize = 11; $fontsize > 7; $fontsize--) {
+			$dims = imageTextSize($fontsize, 0, $str);
 			$x = $this->fullSizeX/2-($dims['width']/2);
 // Most important information must be displayed, period can be out of the graph
-			if($x < 2)	$x = 2;
-			if($dims['width'] <= $this->fullSizeX) break;
+			if ($x < 2) {
+				$x = 2;
+			}
+			if ($dims['width'] <= $this->fullSizeX) {
+				break;
+			}
 		}
 
 		imageText($this->im, $fontsize, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
