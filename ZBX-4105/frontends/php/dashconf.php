@@ -186,7 +186,7 @@ include_once('include/page_header.php');
 		$lstGroups = new CListBox('del_groups[]', null, 15);
 		$lstGroups->setAttribute('style', 'width: 200px;');
 		foreach ($groups as $gnum => $group) {
-			$lstGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], true, ':') . $group['name']);
+			$lstGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], true, ':').$group['name']);
 		}
 
 		if (!$filterEnable) {
