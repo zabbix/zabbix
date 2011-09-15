@@ -1876,13 +1876,13 @@ COpt::memoryPick();
 /* TRIGGERS {{{ */
 		// check that all triggers on templates that we unlink, don't have items from another templates
 		$sql = 'SELECT DISTINCT t.triggerid,t.description'.
-				' FROM triggers t, functions f, items i'.
+				' FROM triggers t,functions f,items i'.
 				' WHERE f.triggerid=t.triggerid'.
 				' AND i.itemid=f.itemid'.
 				' AND '.DBCondition('i.hostid', $templateids).
 				' AND EXISTS ('.
 					' SELECT ff.triggerid'.
-					' FROM functions ff, items ii'.
+					' FROM functions ff,items ii'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND ii.itemid=ff.itemid'.
 						' AND '.DBCondition('ii.hostid', $templateids, true).
