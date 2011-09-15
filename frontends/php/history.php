@@ -367,7 +367,7 @@ include_once('include/page_header.php');
 				$row = array(nbsp(zbx_date2str(S_HISTORY_LOG_ITEM_DATE_FORMAT, $data['clock'])));
 
 				if($fewItems)
-					$row[] = $host['hostname'].':'.itemName($item);
+					$row[] = $host['name'].':'.itemName($item);
 
 				if($logItem){
 					$row[] = ($data['timestamp'] == 0) ? '-' : zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT, $data['timestamp']);

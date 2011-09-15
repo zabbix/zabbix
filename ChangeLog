@@ -5,6 +5,9 @@ New features:
  - [ZBXNEXT-966] update jQuery to 1.6.4 (Eduard)
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
+Bug fixes:
+ - [ZBX-3939] fixed warning messages when looking at the history of several selected log items (Alexei)
+
 --------------------------------------------------------------------------------
 Changes for 1.9.6
 
