@@ -25,7 +25,6 @@
 
 #define XINTFRAC	((double)_system_configuration.Xint / (double)_system_configuration.Xfrac)
 
-static long		hertz = 0;
 static int		last_clock = 0;
 /* --- kthr --- */
 static zbx_uint64_t	last_runque = 0;		/* length of the run queue (processes ready) */
@@ -61,6 +60,18 @@ static zbx_uint64_t	last_xfers = 0;			/* total number of transfers to/from disk 
 static zbx_uint64_t	last_wblks = 0;			/* 512 bytes blocks written to all disks */
 static zbx_uint64_t	last_rblks = 0;			/* 512 bytes blocks read from all disks */
 
+/******************************************************************************
+ *                                                                            *
+ * Function: update_vmstat                                                    *
+ *                                                                            *
+ * Purpose: update vmstat values at most once per second                      *
+ *                                                                            *
+ * Parameters: vmstat - a structure containing vmstat data                    *
+ *                                                                            *
+ * Comments: on first iteration only save last data, on second - set vmstat   *
+ *           data and indicate that it is available                           *
+ *                                                                            *
+ ******************************************************************************/
 static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 {
 #if defined(HAVE_LIBPERFSTAT)
@@ -79,14 +90,6 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 #endif	/* _AIXVERSION_530 */
 
 	now = (int)time(NULL);
-
-	if (0 == hertz)
-	{
-		hertz = sysconf(_SC_CLK_TCK);
-
-		/* make sure we do not divide by 0 */
-		assert(hertz);
-	}
 
 	/* retrieve the metrics
 	 * Upon successful completion, the number of structures filled is returned.
@@ -117,10 +120,20 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		return;
 	}
 
+	/* set static vmstat values */
 	if (0 == last_clock)
-		last_clock = (int)((double)cpustats.lbolt / hertz);
+	{
+#ifdef _AIXVERSION_530
+		vmstat->shared_enabled = (unsigned char)lparstats.type.b.shared_enabled;
+		vmstat->pool_util_authority = (unsigned char)lparstats.type.b.pool_util_authority;
+#endif
+#ifdef HAVE_AIXOSLEVEL_520004
+		vmstat->aix52stats = 1;
+#endif
+	}
 
-	if (now > last_clock)
+	/* update dynamic vmstat values after first iteration (at most once per second) */
+	if (0 < last_clock && now > last_clock)
 	{
 		/* --- kthr --- */
 		vmstat->kthr_r = (double)(cpustats.runque - last_runque) / (double)(now - last_clock);
@@ -245,18 +258,10 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 									   active if they have been accessed */
 #endif
 		vmstat->mem_fre = (zbx_uint64_t)memstats.real_free;	/* free real memory (in 4KB pages) */
-	}
 
-	if (0 == vmstat->data_available)
-	{
-#ifdef _AIXVERSION_530
-		vmstat->shared_enabled = (unsigned char)lparstats.type.b.shared_enabled;
-		vmstat->pool_util_authority = (unsigned char)lparstats.type.b.pool_util_authority;
-#endif
-#ifdef HAVE_AIXOSLEVEL_520004
-		vmstat->aix52stats = 1;
-#endif
-		vmstat->data_available = 1;
+		/* indicate that vmstat data is available */
+		if (0 == vmstat->data_available)
+			vmstat->data_available = 1;
 	}
 
 	/* saving last values */
