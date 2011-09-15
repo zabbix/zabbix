@@ -439,18 +439,16 @@ include_once('include/page_header.php');
 		unset($_REQUEST['save']);
 	}
 	/**
-	 * Delete, delete_and_clear
+	 * Delete
 	 */
-	else if((isset($_REQUEST['delete']) || isset($_REQUEST['delete_and_clear'])) && isset($_REQUEST['templateid'])){
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])){
 		DBstart();
 
 		$go_result = true;
-		if(isset($_REQUEST['delete'])){
-			$result = API::Template()->massUpdate(array(
-				'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
-				'hosts' => array()
-			));
-		}
+		$result = API::Template()->massUpdate(array(
+			'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
+			'hosts' => array()
+		));
 		if($result)
 			$result = API::Template()->delete($_REQUEST['templateid']);
 
@@ -458,7 +456,24 @@ include_once('include/page_header.php');
 
 		show_messages($result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
 		if($result){
-/*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$host['host'].']');*/
+			unset($_REQUEST['form']);
+			unset($_REQUEST['templateid']);
+		}
+		unset($_REQUEST['delete']);
+	}
+	/**
+	 * Delete_and_clear
+	 */
+	else if(isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])){
+		DBstart();
+
+		$go_result = true;
+		$result = API::Template()->delete($_REQUEST['templateid']);
+
+		$result = DBend($result);
+
+		show_messages($result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
+		if($result){
 			unset($_REQUEST['form']);
 			unset($_REQUEST['templateid']);
 		}
