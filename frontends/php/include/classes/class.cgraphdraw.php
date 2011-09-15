@@ -241,22 +241,23 @@ class CGraphDraw{
 	return $str;
 	}
 
-	public function drawHeader(){
-		if(!isset($this->header)){
-			$str=$this->items[0]['hostname'].': '.$this->items[0]['name'];
+	public function drawHeader() {
+		if (!isset($this->header)) {
+			$str = $this->items[0]['hostname'].': '.$this->items[0]['name'];
 		}
-		else{
-			$str=$this->header;
+		else {
+			$str = $this->header;
 		}
 
-		$str.=$this->period2str($this->period);
+		$str .= $this->period2str($this->period);
 
-// Calculate largest font size that can fit graph header
-// TODO: font size must be dynamic in other parts of the graph as well, like legend, timeline, etc
+		// Calculate largest font size that can fit graph header
+		// TODO: font size must be dynamic in other parts of the graph as well, like legend, timeline, etc
 		for ($fontsize = 11; $fontsize > 7; $fontsize--) {
 			$dims = imageTextSize($fontsize, 0, $str);
-			$x = $this->fullSizeX/2-($dims['width']/2);
-// Most important information must be displayed, period can be out of the graph
+			$x = $this->fullSizeX / 2 - ($dims['width'] / 2);
+
+			// Most important information must be displayed, period can be out of the graph
 			if ($x < 2) {
 				$x = 2;
 			}
