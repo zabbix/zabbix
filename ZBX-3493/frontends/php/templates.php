@@ -465,7 +465,7 @@ include_once('include/page_header.php');
 	/**
 	 * Delete_and_clear
 	 */
-	else if(isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])){
+	elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) {
 		DBstart();
 
 		$go_result = true;
@@ -474,7 +474,7 @@ include_once('include/page_header.php');
 		$result = DBend($result);
 
 		show_messages($result, _('Template deleted'), _('Cannot delete template'));
-		if($result){
+		if ($result) {
 			unset($_REQUEST['form']);
 			unset($_REQUEST['templateid']);
 		}
