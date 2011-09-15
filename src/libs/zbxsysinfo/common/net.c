@@ -110,68 +110,7 @@ int	NET_TCP_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return ret;
 }
 
-#ifndef _WINDOWS
-#ifdef HAVE_RES_QUERY
-
-#ifndef C_IN
-#	define C_IN	ns_c_in
-#endif	/* C_IN */
-
-#ifndef T_ANY
-#	define T_ANY	ns_t_any
-#endif
-#ifndef T_A
-#	define T_A	ns_t_a
-#endif
-#ifndef T_NS
-#	define T_NS	ns_t_ns
-#endif	/* T_NS */
-#ifndef T_MD
-#	define T_MD	ns_t_md
-#endif	/* T_MD */
-#ifndef T_MF
-#	define T_MF	ns_t_mf
-#endif	/* T_MF */
-#ifndef T_CNAME
-#	define T_CNAME	ns_t_cname
-#endif	/* T_CNAME */
-#ifndef T_SOA
-#	define T_SOA	ns_t_soa
-#endif	/* T_SOA */
-#ifndef T_MB
-#	define T_MB	ns_t_mb
-#endif	/* T_MB */
-#ifndef T_MG
-#	define T_MG	ns_t_mg
-#endif	/* T_MG */
-#ifndef T_MR
-#	define T_MR	ns_t_mr
-#endif	/* T_MR */
-#ifndef T_NULL
-#	define T_NULL	ns_t_null
-#endif	/* T_NULL */
-#ifndef T_WKS
-#	define T_WKS	ns_t_wks
-#endif	/* T_WKS */
-#ifndef T_PTR
-#	define T_PTR	ns_t_ptr
-#endif	/* T_PTR */
-#ifndef T_HINFO
-#	define T_HINFO	ns_t_hinfo
-#endif	/* T_HINFO */
-#ifndef T_MINFO
-#	define T_MINFO	ns_t_minfo
-#endif	/* T_MINFO */
-#ifndef T_MX
-#	define T_MX	ns_t_mx
-#endif	/* T_MX */
-#ifndef T_TXT
-#	define T_TXT	ns_t_txt
-#endif	/* T_TXT */
-#ifndef T_SRV
-#	define T_SRV	ns_t_srv
-#endif	/* T_SRV */
-
+#if !defined(_WINDOWS) && defined(HAVE_RES_QUERY)
 static char	*decode_type(int q_type)
 {
 	static char	buf[16];
@@ -213,9 +152,7 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 
 	return buffer;
 }
-
-#endif /* HAVE_RES_QUERY */
-#endif /* not _WINDOWS */
+#endif /* !defined(_WINDOWS) && defined(HAVE_RES_QUERY) */
 
 int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
