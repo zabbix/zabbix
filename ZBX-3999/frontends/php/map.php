@@ -170,7 +170,7 @@ class CCanvas{
 	}
 }
 
-class CMapPainter{
+class CMapPainter {
 
 	protected $canvas;
 	protected $mapData;
@@ -199,13 +199,13 @@ class CMapPainter{
 		$this->mapData = $mapData;
 	}
 
-	public function paint(){
+	public function paint() {
 
 		$this->paintBackground();
 		$this->paintTitle();
 		$this->paintGrid();
 
-		if($this->options['map']['drawAreas']){
+		if ($this->options['map']['drawAreas']) {
 			$this->paintAreas();
 		}
 
@@ -214,9 +214,8 @@ class CMapPainter{
 		return $this->canvas->getCanvas();
 	}
 
-	protected function paintBorder(){
-		if($this->options['map']['border'])
-		{
+	protected function paintBorder() {
+		if ($this->options['map']['border']) {
 			$this->canvas->drawBorder($this->options['map']['borderColor']);
 		}
 	}
