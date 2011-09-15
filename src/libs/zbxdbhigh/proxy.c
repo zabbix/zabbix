@@ -95,16 +95,12 @@ static ZBX_HISTORY_TABLE areg = {
  *                                                                            *
  * Function: get_proxy_id                                                     *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
  * Parameters: host - [IN] require size 'HOST_HOST_LEN_MAX'                   *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int max_error_len)
@@ -154,15 +150,7 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
  *                                                                            *
  * Function: update_proxy_lastaccess                                          *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	update_proxy_lastaccess(const zbx_uint64_t hostid)
@@ -176,13 +164,7 @@ void	update_proxy_lastaccess(const zbx_uint64_t hostid)
  *                                                                            *
  * Purpose: prepare proxy configuration data                                  *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
@@ -319,13 +301,7 @@ static void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid,
  *                                                                            *
  * Purpose: prepare proxy configuration data                                  *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
@@ -732,13 +708,7 @@ exit:
  *                                                                            *
  * Purpose: update configuration                                              *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	process_proxyconfig(struct zbx_json_parse *jp_data)
@@ -746,22 +716,21 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	struct delete_data
 	{
 		zbx_uint64_t		*records;
-		int					count;
-		char				*table_name;
+		int			count;
+		char			*table_name;
 		struct delete_data	*prev_table_delete_data;
 	};
 
-	const char				*__function_name = "process_proxyconfig";
-	char					buf[MAX_STRING_LEN];
-	size_t					len = sizeof(buf);
-	const char				*p = NULL;
+	const char		*__function_name = "process_proxyconfig";
+	char			buf[MAX_STRING_LEN];
+	size_t			len = sizeof(buf);
+	const char		*p = NULL;
 	struct zbx_json_parse	jp_obj;
-	int						ret = SUCCEED;
-	struct delete_data		*prev_data = NULL;
-	struct delete_data		*data;
-	char 					*delete_sql = NULL;
-	int 					delete_sql_alloc = 512, delete_sql_offset = 0;
-	const ZBX_TABLE			*table = NULL;
+	int			ret = SUCCEED;
+	struct delete_data	*prev_data = NULL, *data;
+	char 			*delete_sql = NULL;
+	int 			delete_sql_alloc = 512, delete_sql_offset = 0;
+	const ZBX_TABLE		*table = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -775,7 +744,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	{
 		if (FAIL == zbx_json_brackets_open(p, &jp_obj))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process table \"%s\". %s", buf, zbx_json_strerror());
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process table \"%s\": %s", buf, zbx_json_strerror());
 			ret = FAIL;
 			break;
 		}
@@ -851,16 +820,10 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
  *                                                                            *
  * Function: get_host_availability_data                                       *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	get_host_availability_data(struct zbx_json *j)
@@ -1016,13 +979,7 @@ int	get_host_availability_data(struct zbx_json *j)
  *                                                                            *
  * Purpose: update proxy hosts availability                                   *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	process_host_availability(struct zbx_json_parse *jp)
@@ -1039,7 +996,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	/* "data" tag lists the hosts */
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "received invalid host availability data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
 		goto exit;
 	}
 
@@ -1058,7 +1015,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	{
 		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data. %s", zbx_json_strerror());
+			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
 			continue;
 		}
 
@@ -1129,14 +1086,14 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data. %s", zbx_json_strerror());
+			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
 			sql_offset = tmp_offset;
 			continue;
 		}
 
 		if (SUCCEED != is_uint64(tmp, &hostid) || 1 == no_data)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data.");
+			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data");
 			sql_offset = tmp_offset;
 			continue;
 		}
@@ -1165,15 +1122,7 @@ exit:
  *                                                                            *
  * Function: proxy_get_lastid                                                 *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	proxy_get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
@@ -1202,15 +1151,7 @@ static void	proxy_get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
  *                                                                            *
  * Function: proxy_set_lastid                                                 *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	proxy_set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t lastid)
@@ -1267,15 +1208,7 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
  *                                                                            *
  * Function: proxy_get_history_data                                           *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
@@ -1431,11 +1364,7 @@ void	calc_timestamp(char *line, int *timestamp, char *format)
  *             value_num    - [IN] number of elements in array                *
  *             processed    - [OUT] number of processed elements              *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
@@ -1535,14 +1464,10 @@ static void	clean_agent_values(AGENT_VALUE *values, int value_num)
  *                                                                            *
  * Purpose: process values sent by proxies, active agents and senders         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev, Alexei Vladishev                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
@@ -1687,13 +1612,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
  *                                                                            *
  * Purpose: update discovery data, received from proxy                        *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	process_dhis_data(struct zbx_json_parse *jp)
@@ -1807,11 +1726,11 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 
 		continue;
 json_parse_error:
-		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 	}
 exit:
 	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
@@ -1822,13 +1741,7 @@ exit:
  *                                                                            *
  * Purpose: update auto-registration data, received from proxy                *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
@@ -1885,11 +1798,11 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 
 		continue;
 json_parse_error:
-		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 	}
 exit:
 	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
@@ -1903,11 +1816,7 @@ exit:
  * Parameters:  itemid - item identificator from database                     *
  *              appids - result buffer                                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBget_applications_by_itemid(zbx_uint64_t itemid,
@@ -1944,8 +1853,6 @@ static void	DBget_applications_by_itemid(zbx_uint64_t itemid,
  * Return value: pointer to expanded expression                               *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char *expression,
@@ -2019,8 +1926,6 @@ static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char 
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	DBlld_compare_triggers(zbx_uint64_t triggerid1, const char *expression1,
 		zbx_uint64_t triggerid2, const char *expression2, struct zbx_json_parse *jp_row)
@@ -2088,15 +1993,7 @@ static int	DBlld_compare_trigger_items(zbx_uint64_t triggerid, struct zbx_json_p
  *                                                                            *
  * Function: DBlld_get_item                                                   *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
@@ -2160,8 +2057,6 @@ static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid, const char *description_proto,
@@ -2472,13 +2367,7 @@ out:
  *                                                                            *
  * Purpose: add or update triggers for discovered items                       *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
@@ -2551,8 +2440,6 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, const char *name_proto,
@@ -2831,13 +2718,7 @@ out:
  *                                                                            *
  * Purpose: add or update items for discovered items                          *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
@@ -2971,13 +2852,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
  *                                                                            *
  * Purpose: add or update graph                                               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
@@ -3292,11 +3167,7 @@ out:
  *             agent   - [IN] discovery item identificator from database      *
  *             jp_data - [IN] received data                                   *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
@@ -3381,11 +3252,7 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
  *                                     from database                          *
  *             value            - [IN] received value from agent              *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
