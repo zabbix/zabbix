@@ -316,7 +316,7 @@ include_once('include/page_header.php');
 <?php
 /************ ACTIONS FOR HOSTS ****************/
 // UNLINK HOST
-	if ((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))) {
+	if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
 		if (isset($_REQUEST['unlink'])) {
