@@ -48,8 +48,6 @@ static int	shm_id;
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	zbx_get_cpu_num()
 {
@@ -130,10 +128,6 @@ return_one:
  *                                                                            *
  * Purpose: Allocate memory for collector                                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Unix version allocates memory as shared.                         *
@@ -196,10 +190,6 @@ void	init_collector_data()
  *                                                                            *
  * Purpose: Free memory allocated for collector                               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Unix version allocated memory as shared.                         *
@@ -207,7 +197,7 @@ void	init_collector_data()
  ******************************************************************************/
 void	free_collector_data()
 {
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 	zbx_free(collector);
 #else
 	if (NULL == collector)
@@ -226,13 +216,7 @@ void	free_collector_data()
  *                                                                            *
  * Purpose: Collect system information                                        *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)

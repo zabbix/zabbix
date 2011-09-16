@@ -258,8 +258,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		vmstat->mem_fre = (zbx_uint64_t)memstats.real_free;	/* free real memory (in 4KB pages) */
 
 		/* indicate that vmstat data is available */
-		if (0 == vmstat->data_available)
-			vmstat->data_available = 1;
+		vmstat->data_available = 1;
 	}
 
 	/* saving last values */
