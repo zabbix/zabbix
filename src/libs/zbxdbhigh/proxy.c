@@ -450,10 +450,10 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
  *                                                                            *
  ******************************************************************************/
 static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tablename,
-		struct zbx_json_parse *jp_obj, zbx_uint64_t **delete_records, int *delete_record_num)
+		struct zbx_json_parse *jp_obj, zbx_uint64_t **delete_ids, int *delete_num)
 {
 	const char		*__function_name = "process_proxyconfig_table";
-	int			f, field_count, insert, is_null, ret = FAIL;
+	int			i, f, field_count, insert, is_null, ret = FAIL;
 	const ZBX_TABLE		*table = NULL;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
@@ -686,8 +686,12 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			goto db_error;
 
 	uint64_array_remove(old, &old_num, new, new_num);
-	*delete_records = old;
-	*delete_record_num = old_num;
+
+	/* entries need to be deleted in reverse order */
+	*delete_num = old_num;
+	*delete_ids = zbx_malloc(*delete_ids, *delete_num * sizeof(zbx_uint64_t));
+	for (i = *delete_num - 1; 0 <= i; i--)
+		(*delete_ids)[i] = old[old_num - 1 - i];
 
 	ret = SUCCEED;
 json_error:
@@ -696,6 +700,7 @@ json_error:
 db_error:
 	zbx_free(sql);
 	zbx_free(new);
+	zbx_free(old);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -713,12 +718,11 @@ exit:
  ******************************************************************************/
 void	process_proxyconfig(struct zbx_json_parse *jp_data)
 {
-	struct delete_data
+	struct table_ids
 	{
-		zbx_uint64_t		*records;
-		int			count;
-		char			*table_name;
-		struct delete_data	*prev_table_delete_data;
+		char		*table_name;
+		zbx_uint64_t	*ids;
+		int		id_num;
 	};
 
 	const char		*__function_name = "process_proxyconfig";
@@ -726,18 +730,19 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	size_t			len = sizeof(buf);
 	const char		*p = NULL;
 	struct zbx_json_parse	jp_obj;
-	int			ret = SUCCEED;
-	struct delete_data	*prev_data = NULL, *data;
+	int			i, ret = SUCCEED;
+
+	struct table_ids	*delete_ids;
+	zbx_vector_ptr_t	table_order;
+	const ZBX_TABLE		*table = NULL;
 	char 			*delete_sql = NULL;
 	int 			delete_sql_alloc = 512, delete_sql_offset = 0;
-	const ZBX_TABLE		*table = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	DBbegin();
+	zbx_vector_ptr_create(&table_order);
 
-	prev_data = zbx_malloc(prev_data, sizeof(struct delete_data));
-	prev_data->table_name = NULL;
+	DBbegin();
 
 	/* iterate the tables (lines 2, 22 and 25 in T1) */
 	while (NULL != (p = zbx_json_pair_next(jp_data, p, buf, len)) && SUCCEED == ret)
@@ -748,28 +753,27 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 			ret = FAIL;
 			break;
 		}
-		data = NULL;
-		data = zbx_malloc(data, sizeof(struct delete_data));
-		data->table_name = NULL;
-		data->table_name = zbx_malloc((void*)data->table_name, strlen(buf) + 1);
-		zbx_strlcpy(data->table_name, buf, strlen(buf) + 1);
-		data->records = NULL;
-		data->count = 0;
-		data->prev_table_delete_data = prev_data;
-		prev_data = data;
 
-		ret = process_proxyconfig_table(jp_data, buf, &jp_obj, &data->records, &data->count);
+		delete_ids = zbx_malloc(NULL, sizeof(struct table_ids));
+		delete_ids->ids = NULL;
+		delete_ids->id_num = 0;
+		delete_ids->table_name = zbx_strdup(NULL, buf);
+		zbx_vector_ptr_append(&table_order, delete_ids);
+
+		ret = process_proxyconfig_table(jp_data, buf, &jp_obj, &delete_ids->ids, &delete_ids->id_num);
 	}
 
 	delete_sql = zbx_malloc(delete_sql, delete_sql_alloc * sizeof(char));
 
-	while ((NULL != data->table_name) && (SUCCEED <= ret))
+	for (i = table_order.values_num - 1; 0 <= i; i--)
 	{
-		if (0 < data->count)
+		delete_ids = table_order.values[i];
+
+		if (SUCCEED == ret && 0 < delete_ids->id_num)
 		{
-			if (NULL == (table = DBget_table(data->table_name)))
+			if (NULL == (table = DBget_table(delete_ids->table_name)))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "invalid table name \"%s\"", prev_data->table_name);
+				zabbix_log(LOG_LEVEL_WARNING, "invalid table name \"%s\"", delete_ids->table_name);
 				break;
 			}
 
@@ -777,22 +781,21 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 			zbx_snprintf_alloc(&delete_sql, &delete_sql_alloc, &delete_sql_offset, 128,
 					"delete from %s where", table->table);
 			DBadd_condition_alloc(&delete_sql, &delete_sql_alloc, &delete_sql_offset, table->recid,
-					data->records, data->count);
+					delete_ids->ids, delete_ids->id_num);
 
-			ret = DBexecute("%s", delete_sql);
+			if (ZBX_DB_OK > DBexecute("%s", delete_sql))
+				ret = FAIL;
 		}
-		prev_data = data->prev_table_delete_data;
 
-		zbx_free(data->records);
-		zbx_free(data->table_name);
-		zbx_free(data);
-
-		data = prev_data;
+		zbx_free(delete_ids->ids);
+		zbx_free(delete_ids->table_name);
+		zbx_free(delete_ids);
 	}
 
 	zbx_free(delete_sql);
+	zbx_vector_ptr_destroy(&table_order);
 
-	if (SUCCEED <= ret)
+	if (SUCCEED == ret)
 	{
 		DBcommit();
 		DCsync_configuration();
@@ -800,16 +803,6 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	else
 	{
 		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy cofiguration copy");
-		while (NULL != data->table_name)
-		{
-			prev_data = data->prev_table_delete_data;
-
-			zbx_free(data->records);
-			zbx_free(data->table_name);
-			zbx_free(data);
-
-			data = prev_data;
-		}
 		DBrollback();
 	}
 
