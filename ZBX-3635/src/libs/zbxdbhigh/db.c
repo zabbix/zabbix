@@ -27,6 +27,8 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 
+#define ZBX_DB_WAIT_DOWN	10
+
 /***************************************************************/
 /* ID structure: NNNSSSDDDDDDDDDDD, where                      */
 /*      NNN - nodeid (to which node the ID belongs to)         */
@@ -98,8 +100,8 @@ int	DBconnect(int flag)
 			exit(FAIL);
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in 10 seconds.");
-		zbx_sleep(10);
+		zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in %d seconds.", ZBX_DB_WAIT_DOWN);
+		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, err);
@@ -122,32 +124,46 @@ void	DBinit()
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBtxn_operation                                                  *
+ *                                                                            *
+ * Purpose: helper function to loop transaction operation while DB is down    *
+ *                                                                            *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBtxn_operation(int (*txn_operation)())
+{
+	int	rc;
+
+	rc = txn_operation();
+
+	while (ZBX_DB_DOWN == rc)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = txn_operation()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBbegin                                                          *
  *                                                                            *
  * Purpose: start a transaction                                               *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBbegin()
 {
-	int	rc;
-
-	rc = zbx_db_begin();
-
-	while (ZBX_DB_OK > rc)
-	{
-		DBclose();
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-		if (ZBX_DB_OK > (rc = zbx_db_begin()))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
-		}
-	}
+	DBtxn_operation(zbx_db_begin);
 }
 
 /******************************************************************************
@@ -156,28 +172,14 @@ void	DBbegin()
  *                                                                            *
  * Purpose: commit a transaction                                              *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBcommit()
 {
-	int	rc;
-
-	rc = zbx_db_commit();
-
-	while (ZBX_DB_OK > rc)
-	{
-		DBclose();
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-		if (ZBX_DB_OK > (rc = zbx_db_commit()))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
-		}
-	}
+	DBtxn_operation(zbx_db_commit);
 }
 
 /******************************************************************************
@@ -186,28 +188,14 @@ void	DBcommit()
  *                                                                            *
  * Purpose: rollback a transaction                                            *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBrollback()
 {
-	int	rc;
-
-	rc = zbx_db_rollback();
-
-	while (ZBX_DB_OK > rc)
-	{
-		DBclose();
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-		if (ZBX_DB_OK > (rc = zbx_db_rollback()))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
-		}
-	}
+	DBtxn_operation(zbx_db_rollback);
 }
 
 /******************************************************************************
@@ -228,15 +216,15 @@ int	__zbx_DBexecute(const char *fmt, ...)
 
 	rc = zbx_db_vexecute(fmt, args);
 
-	while (ZBX_DB_OK > rc)
+	while (ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_OK > (rc = zbx_db_vexecute(fmt, args)))
+		if (ZBX_DB_DOWN == (rc = zbx_db_vexecute(fmt, args)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
 
@@ -301,8 +289,8 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 
 		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_vselect(fmt, args)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
 
@@ -333,8 +321,8 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_select_n(query, n)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
 
