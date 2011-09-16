@@ -105,7 +105,7 @@ class CTemplate extends CZBXAPI{
 
 			$dbTable = DB::getSchema('hosts');
 			$sql_parts['select']['hostid'] = 'h.hostid';
-			foreach($options['output'] as $field){
+			foreach ($options['output'] as $field) {
 				if($field == 'templateid') continue;
 
 				if(isset($dbTable['fields'][$field]))
@@ -532,7 +532,7 @@ Copt::memoryPick();
 
 					if(isset($template['parentTemplates']) && is_array($template['parentTemplates'])) {
 						$count = array();
-						foreach($template['parentTemplates'] as $parentTemplate){
+						foreach ($template['parentTemplates'] as $parentTemplate) {
 							if(!is_null($options['limitSelects'])){
 								if(!isset($count[$parentTemplate['templateid']])) $count[$parentTemplate['templateid']] = 0;
 								$count[$parentTemplate['hostid']]++;
@@ -1706,7 +1706,7 @@ COpt::memoryPick();
 		}
 
 		// CHECK TEMPLATE TRIGGERS DEPENDENCIES
-		foreach($templateids as $templateid){
+		foreach ($templateids as $templateid) {
 			$triggerids = array();
 			$db_triggers = get_triggers_by_hostid($templateid);
 			while($trigger = DBfetch($db_triggers)){
@@ -1747,10 +1747,12 @@ COpt::memoryPick();
 		}
 
 		// add template linkages, if problems rollback later
-		foreach($targetids as $targetid){
-			foreach($templateids as $templateid){
-				foreach($linked as $link){
-					if(isset($link[$targetid]) && (bccomp($link[$targetid],$templateid) == 0)) continue 2;
+		foreach ($targetids as $targetid) {
+			foreach ($templateids as $templateid) {
+				foreach ($linked as $link) {
+					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
+						continue 2;
+					}
 				}
 
 				$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
@@ -1803,10 +1805,10 @@ COpt::memoryPick();
 			}
 		}
 
-		foreach($targetids as $targetid){
-			foreach($templateids as $templateid){
-				foreach($linked as $link){
-					if(isset($link[$targetid]) && (bccomp($link[$targetid], $templateid) == 0)){
+		foreach ($targetids as $targetid) {
+			foreach ($templateids as $templateid) {
+				foreach ($linked as $link) {
+					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
 						continue 2;
 					}
 				}
@@ -1833,9 +1835,9 @@ COpt::memoryPick();
 			}
 
 			// we do linkage in two separate loops because for triggers you need all items already created on host
-			foreach($templateids as $templateid){
-				foreach($linked as $link){
-					if(isset($link[$targetid]) && (bccomp($link[$targetid], $templateid) == 0)){
+			foreach ($templateids as $templateid) {
+				foreach ($linked as $link) {
+					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
 						continue 2;
 					}
 				}
@@ -1875,20 +1877,20 @@ COpt::memoryPick();
 
 /* TRIGGERS {{{ */
 		// check that all triggers on templates that we unlink, don't have items from another templates
-		$sql = 'SELECT DISTINCT t.triggerid,t.description'.
+		$sql = 'SELECT DISTINCT t.description'.
 				' FROM triggers t,functions f,items i'.
-				' WHERE f.triggerid=t.triggerid'.
-				' AND i.itemid=f.itemid'.
-				' AND '.DBCondition('i.hostid', $templateids).
-				' AND EXISTS ('.
-					' SELECT ff.triggerid'.
-					' FROM functions ff,items ii'.
-					' WHERE ff.triggerid=t.triggerid'.
-						' AND ii.itemid=ff.itemid'.
-						' AND '.DBCondition('ii.hostid', $templateids, true).
-				' )'.
-				' AND t.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
-		if ($db_trigger = DBfetch(DBSelect($sql))) {
+				' WHERE t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND '.DBCondition('i.hostid', $templateids).
+					' AND EXISTS ('.
+						' SELECT ff.triggerid'.
+						' FROM functions ff,items ii'.
+						' WHERE ff.itemid=ii.itemid'.
+							' AND ff.triggerid=t.triggerid'.
+							' AND '.DBCondition('ii.hostid', $templateids, true).
+					' )'.
+					' AND t.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
+		if ($db_trigger = DBfetch(DBSelect($sql, 1))) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
 				_s('Cannot unlink trigger "%s", it has items from template that is left linked to host.', $db_trigger['description'])
