@@ -2048,32 +2048,33 @@ function update_template_dependencies_for_host($hostid, $templateid) {
 	$tpl_triggerids = array();
 	$sql = 'SELECT DISTINCT t.triggerid,t.templateid'.
 			' FROM triggers t,functions f,items i'.
-			' WHERE i.hostid='.$hostid.
+			' WHERE t.triggerid=f.triggerid'.
 				' AND f.itemid=i.itemid'.
-				' AND f.triggerid=t.triggerid'.
-				' AND t.templateid IN ('.
-					' SELECT tt.triggerid'.
+				' AND i.hostid='.$hostid.
+				' AND EXISTS ('.
+					'SELECT 1'.
 					' FROM triggers tt,functions ff,items ii'.
-					' WHERE ii.hostid='.$templateid.
+					' WHERE tt.triggerid=ff.triggerid'.
 						' AND ff.itemid=ii.itemid'.
-						' AND ff.triggerid=tt.triggerid'.
-				' )';
+						' AND ii.hostid='.$templateid.
+						' AND tt.triggerid=t.templateid'.
+				')';
 	$result = DBselect($sql);
-	while ($trigger = DBfetch($result)) {
-		delete_dependencies_by_triggerid($trigger['triggerid']);
-		$tpl_triggerids[$trigger['templateid']] = $trigger['triggerid'];
+	while ($row = DBfetch($result)) {
+		delete_dependencies_by_triggerid($row['triggerid']);
+		$tpl_triggerids[$row['templateid']] = $row['triggerid'];
 	}
 
-	$sql = 'SELECT DISTINCT td.*'.
+	$sql = 'SELECT DISTINCT td.triggerid_down,td.triggerid_up'.
 			' FROM items i,functions f,triggers t,trigger_depends td'.
-			' WHERE i.hostid='.$hostid.
-				' AND f.itemid=i.itemid'.
-				' AND t.triggerid=f.triggerid'.
-				' AND ( (td.triggerid_up=t.templateid) OR (td.triggerid_down=t.templateid) )';
+			' WHERE i.itemid=f.itemid'.
+				' AND f.triggerid=t.triggerid'.
+				' AND t.templateid IN (td.triggerid_up,td.triggerid_down)'.
+				' AND i.hostid='.$hostid;
 	$result = DBselect($sql);
-	while ($dependency = DBfetch($result)) {
-		if (isset($tpl_triggerids[$dependency['triggerid_down']]) && isset($tpl_triggerids[$dependency['triggerid_up']])) {
-			insert_dependency($tpl_triggerids[$dependency['triggerid_down']], $tpl_triggerids[$dependency['triggerid_up']]);
+	while ($row = DBfetch($result)) {
+		if (isset($tpl_triggerids[$row['triggerid_down']]) && isset($tpl_triggerids[$row['triggerid_up']])) {
+			insert_dependency($tpl_triggerids[$row['triggerid_down']], $tpl_triggerids[$row['triggerid_up']]);
 		}
 	}
 }
