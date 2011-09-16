@@ -21,12 +21,12 @@
 #include "sysinfo.h"
 #include "stats.h"
 
-#define ZBX_WAIT_VMSTAT_DATA	2	/* seconds to wait for vmstat data to become available */
+#define ZBX_MAX_WAIT_VMSTAT	2	/* maximum seconds to wait for vmstat data on the first call */
 
 int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	section[16], type[8];
-	int	nparams, wait = ZBX_WAIT_VMSTAT_DATA;
+	int	nparams, wait = ZBX_MAX_WAIT_VMSTAT;
 
 	if (!VMSTAT_COLLECTOR_STARTED(collector))
 	{
@@ -34,15 +34,14 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		return SYSINFO_RET_FAIL;
 	}
 
-	/* if vmstat is disabled enable it and wait for the first data */
-	if (0 == collector->vmstat.enabled)
+	/* if vmstat data is not available yet wait for collector to gather it */
+	if (0 == collector->vmstat.data_available)
 	{
 		collector->vmstat.enabled = 1;
 
-		/* wait till vmstat data is available */
 		while (wait--)
 		{
-			sleep(1);
+			zbx_sleep(1);
 			if (1 == collector->vmstat.data_available)
 				break;
 		}

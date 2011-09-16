@@ -120,7 +120,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		return;
 	}
 
-	/* set static vmstat values */
+	/* set static vmstat values on first iteration, dynamic on next iterations (at most once per second) */
 	if (0 == last_clock)
 	{
 #ifdef _AIXVERSION_530
@@ -131,9 +131,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		vmstat->aix52stats = 1;
 #endif
 	}
-
-	/* update dynamic vmstat values after first iteration (at most once per second) */
-	if (0 < last_clock && now > last_clock)
+	else if (now > last_clock)
 	{
 		/* --- kthr --- */
 		vmstat->kthr_r = (double)(cpustats.runque - last_runque) / (double)(now - last_clock);
