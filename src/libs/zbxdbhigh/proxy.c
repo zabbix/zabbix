@@ -453,7 +453,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		struct zbx_json_parse *jp_obj, zbx_uint64_t **delete_ids, int *delete_num)
 {
 	const char		*__function_name = "process_proxyconfig_table";
-	int			i, f, field_count, insert, is_null, ret = FAIL;
+	int			f, field_count, insert, is_null, ret = FAIL;
 	const ZBX_TABLE		*table = NULL;
 	const ZBX_FIELD		*fields[ZBX_MAX_FIELDS];
 	struct zbx_json_parse	jp_data, jp_row;
@@ -690,8 +690,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	/* entries need to be deleted in reverse order */
 	*delete_num = old_num;
 	*delete_ids = zbx_malloc(*delete_ids, *delete_num * sizeof(zbx_uint64_t));
-	for (i = *delete_num - 1; 0 <= i; i--)
-		(*delete_ids)[i] = old[old_num - 1 - i];
+	memcpy(*delete_ids, old, *delete_num * sizeof(zbx_uint64_t));
 
 	ret = SUCCEED;
 json_error:
@@ -735,8 +734,8 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	struct table_ids	*delete_ids;
 	zbx_vector_ptr_t	table_order;
 	const ZBX_TABLE		*table = NULL;
-	char 			*delete_sql = NULL;
-	int 			delete_sql_alloc = 512, delete_sql_offset = 0;
+	char 			*sql = NULL;
+	int 			sql_alloc = 512, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -755,15 +754,15 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 		}
 
 		delete_ids = zbx_malloc(NULL, sizeof(struct table_ids));
+		delete_ids->table_name = zbx_strdup(NULL, buf);
 		delete_ids->ids = NULL;
 		delete_ids->id_num = 0;
-		delete_ids->table_name = zbx_strdup(NULL, buf);
 		zbx_vector_ptr_append(&table_order, delete_ids);
 
 		ret = process_proxyconfig_table(jp_data, buf, &jp_obj, &delete_ids->ids, &delete_ids->id_num);
 	}
 
-	delete_sql = zbx_malloc(delete_sql, delete_sql_alloc * sizeof(char));
+	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
 
 	for (i = table_order.values_num - 1; 0 <= i; i--)
 	{
@@ -777,13 +776,12 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 				break;
 			}
 
-			delete_sql_offset = 0;
-			zbx_snprintf_alloc(&delete_sql, &delete_sql_alloc, &delete_sql_offset, 128,
-					"delete from %s where", table->table);
-			DBadd_condition_alloc(&delete_sql, &delete_sql_alloc, &delete_sql_offset, table->recid,
+			sql_offset = 0;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "delete from %s where", table->table);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid,
 					delete_ids->ids, delete_ids->id_num);
 
-			if (ZBX_DB_OK > DBexecute("%s", delete_sql))
+			if (ZBX_DB_OK > DBexecute("%s", sql))
 				ret = FAIL;
 		}
 
@@ -792,7 +790,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 		zbx_free(delete_ids);
 	}
 
-	zbx_free(delete_sql);
+	zbx_free(sql);
 	zbx_vector_ptr_destroy(&table_order);
 
 	if (SUCCEED == ret)
