@@ -450,7 +450,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
  *                                                                            *
  ******************************************************************************/
 static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tablename,
-		struct zbx_json_parse *jp_obj, zbx_uint64_t **delete_ids, int *delete_num)
+		struct zbx_json_parse *jp_obj, zbx_uint64_t **del, int *del_num)
 {
 	const char		*__function_name = "process_proxyconfig_table";
 	int			f, field_count, insert, is_null, ret = FAIL;
@@ -459,10 +459,10 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	struct zbx_json_parse	jp_data, jp_row;
 	char			buf[MAX_STRING_LEN], *esc;
 	const char		*p, *pf;
-	zbx_uint64_t		recid, *new = NULL, *old = NULL;
-	int			new_alloc = 100, new_num = 0, old_alloc = 100, old_num = 0;
+	zbx_uint64_t		recid, *new = NULL;
+	int			new_alloc = 100, new_num = 0, del_alloc = 100;
 	char			*sql = NULL;
-	int			sql_alloc = 4096, sql_offset;
+	int			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset;
 	DB_RESULT		result;
 	DB_ROW			row;
 
@@ -475,14 +475,14 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	}
 
 	new = zbx_malloc(new, new_alloc * sizeof(zbx_uint64_t));
-	old = zbx_malloc(old, old_alloc * sizeof(zbx_uint64_t));
-	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+	*del = zbx_malloc(*del, del_alloc * sizeof(zbx_uint64_t));
+	sql = zbx_malloc(sql, sql_alloc);
 
 	result = DBselect("select %s from %s", table->recid, table->table);
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(recid, row[0]);
-		uint64_array_add(&old, &old_alloc, &old_num, recid, 64);
+		uint64_array_add(del, &del_alloc, del_num, recid, 64);
 	}
 	DBfree_result(result);
 
@@ -560,7 +560,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	sql_offset = 0;
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
 #endif
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the entries (lines 9, 14 and 19 in T1) */
@@ -574,7 +574,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 		/* check whether we need to insert a new entry or update an existing */
 		ZBX_STR2UINT64(recid, buf);
-		insert = (SUCCEED == uint64_array_exists(old, old_num, recid) ? 0 : 1);
+		insert = (SUCCEED == uint64_array_exists(*del, *del_num, recid) ? 0 : 1);
 		uint64_array_add(&new, &new_alloc, &new_num, recid, 64);
 
 		if (0 != insert)
@@ -662,35 +662,22 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 					table->recid, recid);
 		}
 
-		if (ZBX_MAX_SQL_SIZE < sql_offset)
-		{
-#ifdef HAVE_ORACLE
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
-			if (ZBX_DB_OK > DBexecute("%s", sql))
-				goto db_error;
-
-			sql_offset = 0;
-#ifdef HAVE_ORACLE
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
-		}
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			goto db_error;
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			goto db_error;
 
-	uint64_array_remove(old, &old_num, new, new_num);
+	uint64_array_remove(*del, del_num, new, new_num);
 
-	/* entries need to be deleted in reverse order */
-	*delete_num = old_num;
-	*delete_ids = zbx_malloc(*delete_ids, *delete_num * sizeof(zbx_uint64_t));
-	memcpy(*delete_ids, old, *delete_num * sizeof(zbx_uint64_t));
+	del_alloc = *del_num;
+	*del = zbx_realloc(*del, del_alloc * sizeof(zbx_uint64_t));
 
 	ret = SUCCEED;
 json_error:
@@ -699,7 +686,6 @@ json_error:
 db_error:
 	zbx_free(sql);
 	zbx_free(new);
-	zbx_free(old);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -999,7 +985,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	DBbegin();
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
 #endif
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the host entries */
@@ -1096,7 +1082,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
@@ -2177,7 +2163,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
 #endif
 
 	if (0 != new_triggerid)
@@ -2309,7 +2295,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
 	if (SUCCEED == res)
@@ -2556,7 +2542,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
 #endif
 
 	if (0 == new_itemid)
@@ -2683,7 +2669,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	zbx_free(appids);
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
@@ -3010,7 +2996,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
 #endif
 
 	if (0 != new_graphid)
@@ -3131,7 +3117,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 	DBexecute("%s", sql);
 out:
