@@ -506,26 +506,31 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 		}
 		else
 		{
-			if (status == STAT_SUCCESS)
+			conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+			running = 0;
+
+			if (STAT_SUCCESS == status)
 			{
 				zbx_snprintf(err, MAX_STRING_LEN, "SNMP error [%s]",
 						snmp_errstring(response->errstat));
-				running = 0;
 				ret = NOTSUPPORTED;
 			}
-			else if (status == STAT_TIMEOUT)
+			else if (STAT_ERROR == status)
 			{
-				conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+				zbx_snprintf(err, MAX_STRING_LEN, "Could not connect to [%s:%d]",
+						conn, item->snmp_port);
+				ret = NETWORK_ERROR;
+			}
+			else if (STAT_TIMEOUT == status)
+			{
 				zbx_snprintf(err, MAX_STRING_LEN, "Timeout while connecting to [%s:%d]",
 						conn, item->snmp_port);
-				running = 0;
 				ret = NETWORK_ERROR;
 			}
 			else
 			{
 				zbx_snprintf(err, MAX_STRING_LEN, "SNMP error [%d]",
 						status);
-				running = 0;
 				ret = NOTSUPPORTED;
 			}
 		}
@@ -648,7 +653,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 		}
 		else if (STAT_ERROR == status)
 		{
-			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Failed to connect to [%s:%d]",
+			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Could not connect to [%s:%d]",
 					conn, item->snmp_port));
 			ret = NETWORK_ERROR;
 		}

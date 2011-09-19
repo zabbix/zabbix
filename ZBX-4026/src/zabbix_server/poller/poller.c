@@ -427,7 +427,7 @@ static void	activate_host(DC_ITEM *item, int now)
 
 static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 {
-	const char	*__function_name = "activate_host";
+	const char	*__function_name = "deactivate_host";
 	char		sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
 	int		offset = 0, *errors_from, *disable_until;
 	unsigned char	*available;
