@@ -222,7 +222,7 @@ else {
 }
 
 // render view
-$authenticationView = new CView('configuration.authentication.edit', $data);
+$authenticationView = new CView('administration.authentication.edit', $data);
 $authenticationView->render();
 $authenticationView->show();
 
