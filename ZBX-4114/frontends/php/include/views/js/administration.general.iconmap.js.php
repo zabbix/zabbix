@@ -9,9 +9,9 @@
 			});
 		}
 
-		jQuery("#iconMapTable tbody").sortable({
+		jQuery("#iconMapTable").sortable({
 			disabled: (jQuery("#iconMapTable tr.sortable").length <= 1),
-			items: 'tr.sortable',
+			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
 			containment: 'parent',
