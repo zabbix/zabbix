@@ -319,19 +319,7 @@
 		$header_hosts = API::Host()->get($header_host_opt);
 
 		if(!$header_host = reset($header_hosts)){
-			$header_host = array(
-				'hostid' => 0,
-				'name' => ($current == 'host') ? S_NEW_HOST : _('New template'),
-				'status' => ($current == 'host') ? HOST_STATUS_NOT_MONITORED : HOST_STATUS_TEMPLATE,
-				'available' => HOST_AVAILABLE_UNKNOWN,
-				'screens' => 0,
-				'items' => 0,
-				'graphs' => 0,
-				'triggers' => 0,
-				'applications' => 0,
-				'discoveries' => 0,
-				'proxy_hostid' => 0
-			);
+			return null;
 		}
 
 
