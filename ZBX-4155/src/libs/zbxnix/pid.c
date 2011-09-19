@@ -28,7 +28,7 @@ static int	fdpid = -1;
 
 int	create_pid_file(const char *pidfile)
 {
-	int		fd;
+	int		fd, errnum;
 	struct stat	buf;
 	struct flock	fl;
 
@@ -43,15 +43,19 @@ int	create_pid_file(const char *pidfile)
 	{
 		if (-1 == (fd = open(pidfile, O_WRONLY | O_APPEND)))
 		{
-			zbx_error("cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
-			zabbix_log(LOG_LEVEL_CRIT, "cannot open PID file [%s]: %s", pidfile, zbx_strerror(errno));
+			errnum = errno;
+			zbx_error("cannot open PID file [%s]: %s", pidfile, zbx_strerror(errnum));
+			zabbix_log(LOG_LEVEL_CRIT, "cannot open PID file [%s]: %s", pidfile, zbx_strerror(errnum));
 			return FAIL;
 		}
 
-		if (-1 == fcntl(fd, F_SETLK, &fl) && EAGAIN == errno)
+		if (-1 == fcntl(fd, F_SETLK, &fl))
 		{
-			zbx_error("File [%s] exists and is locked. Is this process already running?", pidfile);
-			zabbix_log(LOG_LEVEL_CRIT, "File [%s] exists and is locked. Is this process already running?", pidfile);
+			errnum = errno;
+			zbx_error("Is this process already running? Could not lock PID file [%s]: %s",
+					pidfile, zbx_strerror(errnum));
+			zabbix_log(LOG_LEVEL_CRIT, "Is this process already running? Could not lock PID file [%s]: %s",
+					pidfile, zbx_strerror(errnum));
 			close(fd);
 			return FAIL;
 		}
@@ -61,8 +65,9 @@ int	create_pid_file(const char *pidfile)
 	/* open pid file */
 	if (NULL == (fpid = fopen(pidfile, "w")))
 	{
-		zbx_error("cannot create PID file [%s]: %s", pidfile, zbx_strerror(errno));
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create PID file [%s]: %s", pidfile, zbx_strerror(errno));
+		errnum = errno;
+		zbx_error("cannot create PID file [%s]: %s", pidfile, zbx_strerror(errnum));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create PID file [%s]: %s", pidfile, zbx_strerror(errnum));
 		return FAIL;
 	}
 
