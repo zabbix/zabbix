@@ -559,7 +559,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	snmp_add_null_var(pdu, anOID, anOID_len);
 
 	status = snmp_synch_response(ss, pdu, &response);
-	zabbix_log(LOG_LEVEL_DEBUG, "Status send [%d]", status);
+	zabbix_log(LOG_LEVEL_DEBUG, "snmp_synch_response() returned [%d]", status);
 
 	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
 	{
@@ -638,15 +638,22 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	}
 	else
 	{
-		if (status == STAT_SUCCESS)
+		conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+
+		if (STAT_SUCCESS == status)
 		{
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error [%s]",
 					snmp_errstring(response->errstat)));
 			ret = NOTSUPPORTED;
 		}
-		else if (status == STAT_TIMEOUT)
+		else if (STAT_ERROR == status)
 		{
-			conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Failed to connect to [%s:%d]",
+					conn, item->snmp_port));
+			ret = NETWORK_ERROR;
+		}
+		else if (STAT_TIMEOUT == status)
+		{
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [%s:%d]",
 					conn, item->snmp_port));
 			ret = NETWORK_ERROR;
@@ -771,6 +778,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
 				__function_name,
 				zbx_result_string(ret));
+
 		return ret;
 	}
 
@@ -779,14 +787,14 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 	switch (num)
 	{
 	case 0:
-		zabbix_log(LOG_LEVEL_DEBUG, "Standard processing");
+		zabbix_log(LOG_LEVEL_DEBUG, "standard processing");
 		snmp_normalize(oid_normalized, item->snmp_oid, sizeof(oid_normalized));
 		ret = get_snmp(ss, item, oid_normalized, value);
 		break;
 	case 3:
 		do
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Special processing");
+			zabbix_log(LOG_LEVEL_DEBUG, "special processing");
 
 			if (get_key_param(item->snmp_oid, 1, method, MAX_STRING_LEN) != 0
 				|| get_key_param(item->snmp_oid, 2, oid_index, MAX_STRING_LEN) != 0
