@@ -156,8 +156,7 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 
 int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#if !defined(_WINDOWS)
-#ifdef HAVE_RES_QUERY
+#if !defined(_WINDOWS) && defined(HAVE_RES_QUERY)
 	int		res;
 	char		ip[MAX_STRING_LEN];
 	char		zone[MAX_STRING_LEN];
@@ -210,18 +209,14 @@ int	NET_TCP_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
 
 	return SYSINFO_RET_OK;
-#else /* HAVE_RES_QUERY is not defined */
+#else
 	return SYSINFO_RET_FAIL;
-#endif /* ifdef HAVE_RES_QUERY */
-#else /* _WINDOWS is defined */
-	return SYSINFO_RET_FAIL;
-#endif /* if !defined(_WINDOWS) */
+#endif	/* !defined(_WINDOWS) && defined(HAVE_RES_QUERY) */
 }
 
 int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifndef _WINDOWS
-#ifdef HAVE_RES_QUERY
+#if !defined(_WINDOWS) && defined(HAVE_RES_QUERY)
 	typedef struct resolv_querytype_s {
 		char	*name;
 		int	type;
@@ -501,10 +496,7 @@ int	NET_TCP_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_
 	SET_TEXT_RESULT(result, strdup(buffer));
 
 	return SYSINFO_RET_OK;
-#else /* HAVE_RES_QUERY is not defined */
+#else
 	return SYSINFO_RET_FAIL;
-#endif /* ifdef HAVE_RES_QUERY */
-#else /* _WINDOWS is defined */
-	return SYSINFO_RET_FAIL;
-#endif /* ifndef _WINDOWS */
+#endif	/* !defined(_WINDOWS) && defined(HAVE_RES_QUERY) */
 }
