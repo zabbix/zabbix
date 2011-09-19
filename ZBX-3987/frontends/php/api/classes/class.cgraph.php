@@ -91,15 +91,15 @@ class CGraph extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-
-		if(is_array($options['output'])){
+		if (is_array($options['output'])) {
 			unset($sql_parts['select']['graphs']);
 
 			$dbTable = DB::getSchema('graphs');
 			$sql_parts['select']['graphid'] = 'g.graphid';
-			foreach($options['output'] as $field){
-				if(isset($dbTable['fields'][$field]))
+			foreach ($options['output'] as $field) {
+				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'g.'.$field;
+				}
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
