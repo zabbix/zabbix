@@ -1359,7 +1359,6 @@
 	'S_DEPENDS_ON'=>			_('Depends on'),
 	'S_DEPENDENT'=>				_('Dependent'),
 	'S_URL'=>				_('URL'),
-	'S_INVALID_URL_PARAMS'=>		_('Zabbix has received an incorrect request'),
 	'S_CREATE_TRIGGER'=>			_('Create trigger'),
 	'S_INSERT'=>				_('Insert'),
 	'S_SECONDS'=>				_('Seconds'),
@@ -1651,7 +1650,6 @@
 
 // page_header.php
 	'S_REFRESHED_EVERY_SMALL'=>		_('refreshed every'),
-	'S_PAGE_RECEIVED_INCORRECT_DATA'=>	_('Page received incorrect data'),
 
 //	copt.inc.php
 	'S_STATS_FOR'=>			_('Stats for'),
@@ -1724,22 +1722,6 @@
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		_('Host'),
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		_('has been deleted from the system'),
 	'S_AND_CANT_BE_DELETED' => _('and can\'t be deleted'),
-
-//	validate.inc.php
-	'S_CRITICAL_ERROR'=>				_('Critical error'),
-	'S_FIELD'=>					_('Field'),
-	'S_IS_NOT_IP_RANGE_SMALL'=>			_('is not IP range'),
-	'S_IS_NOT_PORT_RANGE_SMALL'=>			_('is not PORT range'),
-	'S_IS_NOT_INTEGER_RANGE_SMALL'=>		_('is not integer range'),
-	'S_IS_NOT_INTEGER_SMALL'=>			_('is not integer'),
-	'S_IS_NOT_DOUBLE_SMALL'=>			_('is not double'),
-	'S_IS_NOT_STRING_SMALL'=>			_('is not string'),
-	'S_CONTAINS_MULTIBYTE_CHARS_SMALL'=>		_('contains Multibyte chars'),
-	'S_MULTIBYTE_CHARS_ARE_RESTRICTED_SMALL'=>	_('multibyte chars are restricted'),
-	'S_IS_NOT_A_COLOUR_SMALL'=>			_('is not a colour'),
-	'S_IS_MANDATORY_SMALL'=>			_('is mandatory'),
-	'S_MUST_BE_MISSING_SMALL'=>			_('must be missing'),
-	'S_OPERATION_CANNOT_PERFORMED_UNAUTH_REQUEST'=>	_('Operation cannot be performed due to unauthorized request'),
 
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					_('No trigger with'),

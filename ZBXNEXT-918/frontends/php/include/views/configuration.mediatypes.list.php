@@ -48,7 +48,7 @@ $mediaTypeTable->setHeader(array(
 
 // append data to table
 foreach ($this->data['mediatypes'] as $mediatype) {
-	switch ($mediatype['type']) {
+	switch ($mediatype['typeid']) {
 		case MEDIA_TYPE_EMAIL:
 			$details =
 			_('SMTP server').': "'.$mediatype['smtp_server'].'", '.
@@ -83,13 +83,15 @@ foreach ($this->data['mediatypes'] as $mediatype) {
 	else {
 		$actionLinks = '-';
 	}
+	$actionColumn = new CCol($actionLinks);
+	$actionColumn->setAttribute('style', 'white-space: normal;');
 
 	// append row
 	$mediaTypeTable->addRow(array(
 		new CCheckBox('mediatypeids['.$mediatype['mediatypeid'].']', null, null, $mediatype['mediatypeid']),
 		new CLink($mediatype['description'], '?form=edit&mediatypeid='.$mediatype['mediatypeid']),
-		media_type2str($mediatype['type']),
-		$actionLinks,
+		media_type2str($mediatype['typeid']),
+		$actionColumn,
 		$details
 	));
 }
