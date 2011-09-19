@@ -96,7 +96,8 @@ class CGraph extends CZBXAPI{
 			unset($sql_parts['select']['graphs']);
 
 			$dbTable = DB::getSchema('graphs');
-			foreach($options['output'] as $key => $field){
+			$sql_parts['select']['graphid'] = 'g.graphid';
+			foreach($options['output'] as $field){
 				if(isset($dbTable['fields'][$field]))
 					$sql_parts['select'][$field] = 'g.'.$field;
 			}
