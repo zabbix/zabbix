@@ -9,17 +9,19 @@
 			});
 		}
 
-		jQuery("#iconMapTable").sortable({
+		jQuery("#iconMapTable tbody").sortable({
 			disabled: (jQuery("#iconMapTable tr.sortable").length <= 1),
-			items: 'tbody tr.sortable',
+			items: 'tr.sortable',
 			axis: 'y',
 			cursor: 'move',
 			containment: 'parent',
-			placeholder: 'sortableRowPlaceholder',
 			handle: 'span.ui-icon-arrowthick-2-n-s',
 			tolerance: 'pointer',
 			opacity: 0.6,
-			update: recalculateSortOrder
+			update: recalculateSortOrder,
+			start: function(e, ui) {
+				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+			}
 		});
 
 		jQuery("#iconMapTable tbody").delegate('input.removeMapping', 'click', function() {
