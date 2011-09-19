@@ -2,9 +2,12 @@
 Changes for 1.9.7
 
 New features:
- - [ZBX-1207] fixed host full clone with custom graphs (Vedmak)
  - [ZBXNEXT-966] update jQuery to 1.6.4 (Eduard)
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+ - [ZBX-3786] fixed incorrect inheritance of items when template is linked to another template linked to host (Vedmak)
+ - [ZBX-1207] fixed host full clone with custom graphs (Vedmak)
 
 --------------------------------------------------------------------------------
 Changes for 1.9.6
