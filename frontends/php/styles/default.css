@@ -346,6 +346,7 @@ table.formtable {
 	white-space: nowrap;
 }
 table.formtable tr td {
+	border: 0;
 	padding: 0 5px;
 	height: 24px;
 	word-spacing: 0;
