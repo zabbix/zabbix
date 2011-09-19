@@ -653,7 +653,6 @@
 	'S_ITEMS_COPIED'=>				_('Items copied'),
 	'S_CANNOT_COPY_ITEMS'=>				_('Cannot copy items'),
 	'S_CANNOT_UPDATE_HOST'=>			_('Cannot update host'),
-	'S_CANNOT_UPDATE'=>				_('Cannot update'),
 	'S_HOST_STATUS_UPDATED'=>			_('Host status updated'),
 	'S_HOST_GROUPS_BIG'=>				_('HOST GROUPS'),
 	'S_NO_HOST_GROUPS_DEFINED'=>			_('No host groups defined.'),

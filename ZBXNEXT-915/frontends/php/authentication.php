@@ -31,7 +31,7 @@ include_once('include/page_header.php');
 <?php
 $fields = array(
 	//	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'config'=>					array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1,2'),	NULL), // 0 - internal, 1- LDAP, 2 - HTTP
+	'config'=>					array(T_ZBX_INT, O_OPT,	NULL,	IN(ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP.','.ZBX_AUTH_HTTP),	NULL),
 	// LDAP form
 	'ldap_host'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
 	'ldap_port'=>				array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535), 'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
@@ -148,7 +148,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 }
 elseif ($_REQUEST['config'] == ZBX_AUTH_HTTP) {
 	if (isset($_REQUEST['save'])) {
-		$result = DBfetch(DBselect('SELECT COUNT(g.usrgrpid) as cnt_usrgrp FROM usrgrp g WHERE g.gui_access='.GROUP_GUI_ACCESS_INTERNAL));
+		$result = DBfetch(DBselect('SELECT COUNT(g.usrgrpid) AS cnt_usrgrp FROM usrgrp g WHERE g.gui_access='.GROUP_GUI_ACCESS_INTERNAL));
 		if ($result['cnt_usrgrp'] > 0) {
 			info(_n('There is %1$d group with Internal GUI access.', 'There are %1$d groups with Internal GUI access.', $result['cnt_usrgrp']));
 		}
@@ -172,7 +172,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_HTTP) {
 		// update config
 		if (update_config($config)) {
 			CProfile::update('web.authentication.config', $_REQUEST['config'], PROFILE_TYPE_INT);
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed to HTTP'));
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed to HTTP'));
 			show_message(_('Authentication method changed to HTTP'));
 			$isAuthenticationTypeChanged = false;
 		}
@@ -206,10 +206,10 @@ switch ($data['config']) {
 
 if (get_user_auth($USER_DETAILS['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
 	$data['usr_test'] = new CComboBox('user', $USER_DETAILS['alias']);
-	$sql = 'SELECT u.alias, u.userid '.
-				' FROM users u '.
+	$sql = 'SELECT u.alias,u.userid'.
+				' FROM users u'.
 				' WHERE '.DBin_node('u.userid').
-				' ORDER BY alias ASC';
+				' ORDER BY alias';
 	$result = DBselect($sql);
 	while ($db_user = Dbfetch($result)) {
 		if (check_perm2login($db_user['userid']) && check_perm2system($db_user['userid'])) {
