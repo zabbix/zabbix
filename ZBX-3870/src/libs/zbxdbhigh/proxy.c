@@ -750,6 +750,10 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
 
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
+
 	for (i = table_order.values_num - 1; 0 <= i; i--)
 	{
 		delete_ids = table_order.values[i];
@@ -762,18 +766,28 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 				break;
 			}
 
-			sql_offset = 0;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "delete from %s where", table->table);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid,
 					delete_ids->ids, delete_ids->id_num);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 
-			if (ZBX_DB_OK > DBexecute("%s", sql))
-				ret = FAIL;
+			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 		zbx_free(delete_ids->ids);
 		zbx_free(delete_ids->table_name);
 		zbx_free(delete_ids);
+	}
+
+	if (SUCCEED == ret)
+	{
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
+
+		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+			if (ZBX_DB_OK > DBexecute("%s", sql))
+				ret = FAIL;
 	}
 
 	zbx_free(sql);
