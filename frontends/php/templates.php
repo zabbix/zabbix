@@ -524,7 +524,9 @@ include_once('include/page_header.php');
 			$template_wdgt->addItem(import_host_form(true));
 		}
 		else{
-			$template_wdgt->addItem(get_header_host_table(get_request('templateid',0), 'template'));
+			if ($tplid = get_request('templateid', false)) {
+				$template_wdgt->addItem(get_header_host_table($tplid));
+			}
 
 			$templateForm = new CView('configuration.template.edit');
 			$template_wdgt->addItem($templateForm->render());
