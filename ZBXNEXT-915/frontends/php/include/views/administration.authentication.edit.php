@@ -42,15 +42,27 @@ $authenticationFormList->addRow(_('Default authentication'), new CDiv($configTyp
 
 // append LDAP fields to form list
 if ($this->data['config'] == ZBX_AUTH_LDAP) {
+	if (!empty($this->data['user_list'])) {
+		$userComboBox = new CComboBox('user', $this->data['user']);
+		foreach ($this->data['user_list'] as $user) {
+			if (check_perm2login($user['userid']) && check_perm2system($user['userid'])) {
+				$userComboBox->addItem($user['alias'], $user['alias']);
+			}
+		}
+	}
+	else {
+		$userComboBox = new CTextBox('user', $this->data['user'], null, 'yes');
+	}
+
 	$authenticationFormList->addRow(_('LDAP host'), new CTextBox('ldap_host', $this->data['config_data']['ldap_host'], 64));
 	$authenticationFormList->addRow(_('Port'), new CNumericBox('ldap_port', $this->data['config_data']['ldap_port'], 5));
-	$authenticationFormList->addRow(_('Base DN'), new CTextBox('ldap_base_dn',$this->data['config_data']['ldap_base_dn'],64));
-	$authenticationFormList->addRow(_('Search attribute'), new CTextBox('ldap_search_attribute', empty($this->data['config_data']['ldap_search_attribute']) ? 'uid' : $this->data['config_data']['ldap_search_attribute']));
+	$authenticationFormList->addRow(_('Base DN'), new CTextBox('ldap_base_dn',$this->data['config_data']['ldap_base_dn'], 64));
+	$authenticationFormList->addRow(_('Search attribute'), new CTextBox('ldap_search_attribute', !empty($this->data['config_data']['ldap_search_attribute']) ? $this->data['config_data']['ldap_search_attribute'] : 'uid', 64, 'no', 128));
 	$authenticationFormList->addRow(_('Bind DN'), new CTextBox('ldap_bind_dn', $this->data['config_data']['ldap_bind_dn'], 64));
-	$authenticationFormList->addRow(_('Bind password'), new CPassBox('ldap_bind_password', $this->data['config_data']['ldap_bind_password']));
+	$authenticationFormList->addRow(_('Bind password'), new CPassBox('ldap_bind_password', $this->data['config_data']['ldap_bind_password'], 128));
 	$authenticationFormList->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']');
-	$authenticationFormList->addRow(_('Login'), $this->data['usr_test']);
-	$authenticationFormList->addRow(_('User password'), new CPassBox('user_password'));
+	$authenticationFormList->addRow(_('Login'), $userComboBox);
+	$authenticationFormList->addRow(_('User password'), new CPassBox('user_password', $this->data['user_password']));
 }
 
 // append form list to tab

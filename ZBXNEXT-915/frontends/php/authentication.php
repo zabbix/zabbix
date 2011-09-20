@@ -31,24 +31,23 @@ include_once('include/page_header.php');
 <?php
 $fields = array(
 	//	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'config'=>					array(T_ZBX_INT, O_OPT,	NULL,	IN(ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP.','.ZBX_AUTH_HTTP),	NULL),
+	'config'=>					array(T_ZBX_INT, O_OPT,	null,	IN(ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP.','.ZBX_AUTH_HTTP),	null),
 	// LDAP form
-	'ldap_host'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_port'=>				array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535), 'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_base_dn'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_bind_dn'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_bind_password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_search_attribute'=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'user'=>					array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({test}))'),
-	'user_password'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({test}))'),
-	// action
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-	'test'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL)
+	'ldap_host'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'ldap_port'=>				array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535), 'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'ldap_base_dn'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'ldap_bind_dn'=>			array(T_ZBX_STR, O_OPT,	null,	null,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'ldap_bind_password'=>		array(T_ZBX_STR, O_OPT,	null,	null,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'ldap_search_attribute'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'user'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({test}))'),
+	'user_password'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({test}))'),
+	// actions
+	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'test'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null)
 );
+check_fields($fields);
 ?>
 <?php
-check_fields($fields);
-
 if (!isset($_REQUEST['config'])) {
 	$_REQUEST['config'] = CProfile::get('web.authentication.config', ZBX_AUTH_INTERNAL);
 }
@@ -132,6 +131,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 	elseif (isset($_REQUEST['test'])) {
 		foreach ($config as $id => $value) {
 			if (isset($_REQUEST[$id])) {
+				$config[$id] = $_REQUEST[$id];
 				$ldap_cnf[str_replace('ldap_', '', $id)] = $_REQUEST[$id];
 			}
 		}
@@ -189,7 +189,11 @@ show_messages();
 $data['config'] = $_REQUEST['config'];
 $data['config_data'] = $config;
 $data['is_authentication_type_changed'] = $isAuthenticationTypeChanged;
+$data['user'] = get_request('user', $USER_DETAILS['alias']);
+$data['user_password'] = get_request('user_password', '');
+$data['user_list'] = null;
 
+// get tab title
 switch ($data['config']) {
 	case ZBX_AUTH_INTERNAL:
 		$data['tab_title'] = _('Zabbix internal authentication');
@@ -204,21 +208,13 @@ switch ($data['config']) {
 		$data['tab_title'] = '';
 }
 
+// get user list
 if (get_user_auth($USER_DETAILS['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
-	$data['usr_test'] = new CComboBox('user', $USER_DETAILS['alias']);
 	$sql = 'SELECT u.alias,u.userid'.
 				' FROM users u'.
 				' WHERE '.DBin_node('u.userid').
 				' ORDER BY alias';
-	$result = DBselect($sql);
-	while ($db_user = Dbfetch($result)) {
-		if (check_perm2login($db_user['userid']) && check_perm2system($db_user['userid'])) {
-			$data['usr_test']->addItem($db_user['alias'], $db_user['alias']);
-		}
-	}
-}
-else {
-	$data['usr_test'] = new CTextBox('user', $USER_DETAILS['alias'], null, 'yes');
+	$data['user_list'] = DBfetchArray(DBselect($sql));
 }
 
 // render view
