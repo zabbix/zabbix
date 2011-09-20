@@ -6,6 +6,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4080] fixed host header info shown for creation form (Vedmak)
  - [ZBX-3987] fixed errors when change host in Monitoring->Graphs (Vedmak)
  - [ZBX-4114] fixed icon maps form height on dragging (Vedmak)
  - [ZBX-4101] fixed excess borders in screen cell configuration form (Vedmak)
