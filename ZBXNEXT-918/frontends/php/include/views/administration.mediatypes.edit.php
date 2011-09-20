@@ -66,13 +66,12 @@ elseif ($this->data['type'] == MEDIA_TYPE_JABBER || $this->data['type'] == MEDIA
 	// create password field
 	if (!empty($this->data['mediatypeid']) && !empty($this->data['password'])) {
 		$passwordButton = new CButton('chPass_btn', _('Change password'), 'this.style.display="none"; $("password").enable().show().focus();');
-		$passwordBox = new CPassBox('password', '', 30);
-		$passwordBox->setAttribute('disabled', 'disabled');
+		$passwordBox = new CPassBox('password', $this->data['password'], 255);
 		$passwordBox->addStyle('display: none;');
 		$passwordField = array($passwordButton, $passwordBox);
 	}
 	else {
-		$passwordField = new CPassBox('password', '', 30);
+		$passwordField = new CPassBox('password', '', 255);
 	}
 
 	// append password field to form list

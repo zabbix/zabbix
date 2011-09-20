@@ -149,7 +149,7 @@ if (!empty($data['form'])) {
 	}
 
 	// render view
-	$mediaTypeView = new CView('configuration.mediatypes.edit', $data);
+	$mediaTypeView = new CView('administration.mediatypes.edit', $data);
 	$mediaTypeView->render();
 	$mediaTypeView->show();
 }
@@ -193,7 +193,7 @@ else {
 	$data['paging'] = getPagingLine($data['mediatypes']);
 
 	// render view
-	$mediaTypeView = new CView('configuration.mediatypes.list', $data);
+	$mediaTypeView = new CView('administration.mediatypes.list', $data);
 	$mediaTypeView->render();
 	$mediaTypeView->show();
 }
