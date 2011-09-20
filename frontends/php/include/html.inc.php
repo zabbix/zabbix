@@ -375,6 +375,10 @@ function get_header_host_table($hostid, $current = null){
 		$list->addItem(array(_('Availability').': ', $available));
 	}
 
+	if (isset($elements['applications'])) {
+		$list->addItem(array(new CLink(_('Applications'), 'applications.php?hostid='.$header_host['hostid']),
+			' ('.$header_host['applications'].')'));
+	}
 	if (isset($elements['items'])) {
 		$list->addItem(array(new CLink(_('Items'), 'items.php?hostid='.$header_host['hostid']),
 			' ('.$header_host['items'].')'));
@@ -387,15 +391,11 @@ function get_header_host_table($hostid, $current = null){
 		$list->addItem(array(new CLink(_('Graphs'), 'graphs.php?hostid='.$header_host['hostid']),
 			' ('.$header_host['graphs'] . ')'));
 	}
-	if (isset($elements['applications'])) {
-		$list->addItem(array(new CLink(_('Applications'), 'applications.php?hostid='.$header_host['hostid']),
-			' ('.$header_host['applications'].')'));
-	}
 	if (isset($elements['discoveries'])) {
 		$list->addItem(array(new CLink(_('Discovery'), 'host_discovery.php?hostid='.$header_host['hostid']),
 			' ('.$header_host['discoveries'].')'));
 	}
-	if (($header_host['status'] == HOST_STATUS_TEMPLATE) && isset($elements['screens'])) {
+	if ($header_host['status'] == HOST_STATUS_TEMPLATE && isset($elements['screens'])) {
 		$list->addItem(array(new CLink(_('Screens'), 'screenconf.php?templateid='.$header_host['hostid']),
 			' ('.$header_host['screens'] . ')'));
 	}
