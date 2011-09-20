@@ -1983,7 +1983,7 @@ Copt::memoryPick();
 								$inventoryLinksOnHosts[$hinv['hostid']][$inventoryFields[$hinv['inventory_link']]['db_field']] = true;
 							}
 							else {
-								$inventoryLinksOnHosts[$hinv['hostid']] = array($inventoryFields[$hinv['inventory_link']]['db_field']=>true);
+								$inventoryLinksOnHosts[$hinv['hostid']] = array($inventoryFields[$hinv['inventory_link']]['db_field'] => true);
 							}
 						}
 					}
@@ -1993,7 +1993,7 @@ Copt::memoryPick();
 					foreach ($hostids as $hostid) {
 						$inventoriesToSave[$hostid] = $updateInventory;
 						$inventoriesToSave[$hostid]['hostid'] = $hostid;
-						foreach ($updateInventory as $inventoryName) {
+						foreach ($updateInventory as $inventoryName => $hinv) {
 							if (isset($inventoryLinksOnHosts[$hostid][$inventoryName])) {
 								unset($inventoriesToSave[$hostid][$inventoryName]);
 							}
