@@ -253,7 +253,7 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 			break;
 	}
 
-	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+	conn = (item->host.useip == 1 ? item->host.ip : item->host.dns);
 
 #ifdef HAVE_IPV6
 	if (SUCCEED != get_address_family(conn, &family, err, MAX_STRING_LEN))
@@ -445,6 +445,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response():%d", __function_name, status);
 
 		/* process response */
 		if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
@@ -506,7 +507,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 		}
 		else
 		{
-			conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+			conn = (item->host.useip == 1 ? item->host.ip : item->host.dns);
 			running = 0;
 
 			if (STAT_SUCCESS == status)
@@ -554,7 +555,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	struct variable_list	*vars;
 	int			status, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(oid:%s)", __function_name, snmp_oid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:%s", __function_name, snmp_oid);
 
 	init_result(value);
 
@@ -564,7 +565,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	snmp_add_null_var(pdu, anOID, anOID_len);
 
 	status = snmp_synch_response(ss, pdu, &response);
-	zabbix_log(LOG_LEVEL_DEBUG, "snmp_synch_response() returned [%d]", status);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response():%d", __function_name, status);
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
@@ -646,7 +647,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	}
 	else
 	{
-		conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+		conn = (item->host.useip == 1 ? item->host.ip : item->host.dns);
 
 		if (STAT_SUCCESS == status)
 		{
@@ -768,7 +769,6 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 	char	err[MAX_STRING_LEN];
 	int	idx;
 	char	*pl;
-	int	num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' oid:'%s'",
 			__function_name, item->key_orig, item->snmp_oid);
@@ -790,9 +790,7 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 		return ret;
 	}
 
-	num = num_key_param(item->snmp_oid);
-
-	switch (num)
+	switch (num_key_param(item->snmp_oid))
 	{
 	case 0:
 		zabbix_log(LOG_LEVEL_DEBUG, "standard processing");

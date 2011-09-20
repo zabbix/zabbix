@@ -480,7 +480,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 	if (SUCCEED != DCconfig_deactivate_host(item, now))
 		return;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "errors_from=%d available=%d", *errors_from, *available);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from, *available);
 
 	DBbegin();
 
