@@ -31,7 +31,7 @@ $mediaTypeForm->addVar('mediatypeid', $this->data['mediatypeid']);
 
 // create form list
 $mediaTypeFormList = new CFormList('mediaTypeFormList');
-$mediaTypeFormList->addRow(_('Description'), new CTextBox('description', $this->data['description'], 30, 'no', 100));
+$mediaTypeFormList->addRow(_('Description'), new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDART_SIZE, 'no', 100));
 
 // append type to form list
 $cmbType = new CComboBox('type', $this->data['type'], 'submit()');
@@ -52,35 +52,35 @@ $mediaTypeFormList->addRow(_('Type'), $cmbTypeRow);
 
 // append others fields to form list
 if ($this->data['type'] == MEDIA_TYPE_EMAIL) {
-	$mediaTypeFormList->addRow(_('SMTP server'), new CTextBox('smtp_server', $this->data['smtp_server'], 30));
-	$mediaTypeFormList->addRow(_('SMTP helo'), new CTextBox('smtp_helo', $this->data['smtp_helo'], 30));
-	$mediaTypeFormList->addRow(_('SMTP email'), new CTextBox('smtp_email', $this->data['smtp_email'], 30));
+	$mediaTypeFormList->addRow(_('SMTP server'), new CTextBox('smtp_server', $this->data['smtp_server'], ZBX_TEXTBOX_STANDART_SIZE));
+	$mediaTypeFormList->addRow(_('SMTP helo'), new CTextBox('smtp_helo', $this->data['smtp_helo'], ZBX_TEXTBOX_STANDART_SIZE));
+	$mediaTypeFormList->addRow(_('SMTP email'), new CTextBox('smtp_email', $this->data['smtp_email'], ZBX_TEXTBOX_STANDART_SIZE));
 }
 elseif ($this->data['type'] == MEDIA_TYPE_SMS) {
-	$mediaTypeFormList->addRow(_('GSM modem'), new CTextBox('gsm_modem', $this->data['gsm_modem'], 50));
+	$mediaTypeFormList->addRow(_('GSM modem'), new CTextBox('gsm_modem', $this->data['gsm_modem'], ZBX_TEXTBOX_STANDART_SIZE));
 }
 elseif ($this->data['type'] == MEDIA_TYPE_EXEC) {
-	$mediaTypeFormList->addRow(_('Script name'), new CTextBox('exec_path', $this->data['exec_path'], 50));
+	$mediaTypeFormList->addRow(_('Script name'), new CTextBox('exec_path', $this->data['exec_path'], ZBX_TEXTBOX_STANDART_SIZE));
 }
 elseif ($this->data['type'] == MEDIA_TYPE_JABBER || $this->data['type'] == MEDIA_TYPE_EZ_TEXTING) {
 	// create password field
 	if (!empty($this->data['mediatypeid']) && !empty($this->data['password'])) {
 		$passwordButton = new CButton('chPass_btn', _('Change password'), 'this.style.display="none"; $("password").enable().show().focus();');
-		$passwordBox = new CPassBox('password', $this->data['password'], 255);
+		$passwordBox = new CPassBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE);
 		$passwordBox->addStyle('display: none;');
 		$passwordField = array($passwordButton, $passwordBox);
 	}
 	else {
-		$passwordField = new CPassBox('password', '', 255);
+		$passwordField = new CPassBox('password', '', ZBX_TEXTBOX_SMALL_SIZE);
 	}
 
 	// append password field to form list
 	if ($this->data['type'] == MEDIA_TYPE_JABBER) {
-		$mediaTypeFormList->addRow(_('Jabber identifier'), new CTextBox('username', $this->data['username'], 30));
+		$mediaTypeFormList->addRow(_('Jabber identifier'), new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_STANDART_SIZE));
 		$mediaTypeFormList->addRow(_('Password'), $passwordField);
 	}
 	else {
-		$mediaTypeFormList->addRow(_('Username'), new CTextBox('username', $this->data['username'], 30));
+		$mediaTypeFormList->addRow(_('Username'), new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_STANDART_SIZE));
 		$mediaTypeFormList->addRow(_('Password'), $passwordField);
 		$limitCb = new CComboBox('exec_path', $this->data['exec_path']);
 		$limitCb->addItems(array(
