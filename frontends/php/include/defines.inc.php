@@ -742,7 +742,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 //--
 
-	define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]+)');
+	define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 	define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 
 	define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
