@@ -436,7 +436,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 	anOID_len = rootOID_len;
 
 	running = 1;
-	while (running)
+	while (1 == running)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: snmp_pdu_create()", __function_name);
 
@@ -447,7 +447,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 		status = snmp_synch_response(ss, pdu, &response);
 
 		/* process response */
-		if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
+		if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 		{
 			for (vars = response->variables; vars && running; vars = vars->next_variable)
 			{
@@ -470,11 +470,11 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 				else
 				{
 					/* verify if OIDs are increasing */
-					if (vars->type != SNMP_ENDOFMIBVIEW && vars->type != SNMP_NOSUCHOBJECT &&
-							vars->type != SNMP_NOSUCHINSTANCE)
+					if (SNMP_ENDOFMIBVIEW != vars->type && SNMP_NOSUCHOBJECT != vars->type &&
+							SNMP_NOSUCHINSTANCE != vars->type)
 					{
 						/* not an exception value */
-						if (snmp_oid_compare(anOID, anOID_len, vars->name, vars->name_length) >= 0)
+						if (0 <= snmp_oid_compare(anOID, anOID_len, vars->name, vars->name_length))
 						{
 							zbx_snprintf(err, MAX_STRING_LEN, "OID not increasing.");
 							ret = NOTSUPPORTED;
@@ -566,7 +566,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	status = snmp_synch_response(ss, pdu, &response);
 	zabbix_log(LOG_LEVEL_DEBUG, "snmp_synch_response() returned [%d]", status);
 
-	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
+	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
 		for (vars = response->variables; vars; vars = vars->next_variable)
 		{
@@ -575,7 +575,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 			zabbix_log(LOG_LEVEL_DEBUG, "AV loop OID [%s] Type [0x%02X] '%s'",
 					snmp_oid, vars->type, temp);
 
-			if (vars->type == ASN_OCTET_STR)
+			if (ASN_OCTET_STR == vars->type)
 			{
 				if (0 == strncmp(temp, "STRING: ", 8))
 					ptemp = temp + 8;
@@ -586,22 +586,22 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 				if (SUCCEED != set_result_type(value, item->value_type, item->data_type, ptemp))
 					ret = NOTSUPPORTED;
 			}
-			else if (vars->type == ASN_UINTEGER || vars->type == ASN_COUNTER ||
+			else if (ASN_UINTEGER == vars->type || ASN_COUNTER == vars->type
 #ifdef OPAQUE_SPECIAL_TYPES
-					vars->type == ASN_UNSIGNED64 ||
+					|| ASN_UNSIGNED64 == vars->type
 #endif
-					vars->type == ASN_TIMETICKS || vars->type == ASN_GAUGE)
+					|| ASN_TIMETICKS == vars->type || ASN_GAUGE == vars->type)
 			{
 				SET_UI64_RESULT(value, (unsigned long)*vars->val.integer);
 			}
-			else if (vars->type == ASN_COUNTER64)
+			else if (ASN_COUNTER64 == vars->type)
 			{
 				SET_UI64_RESULT(value, (((zbx_uint64_t)vars->val.counter64->high) << 32) +
 						(zbx_uint64_t)vars->val.counter64->low);
 			}
-			else if (vars->type == ASN_INTEGER ||
+			else if (ASN_INTEGER == vars->type
 #ifdef OPAQUE_SPECIAL_TYPES
-					vars->type == ASN_INTEGER64
+					|| ASN_INTEGER64 == vars->type
 #endif
 					)
 			{
@@ -612,16 +612,16 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 					SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer);
 			}
 #ifdef OPAQUE_SPECIAL_TYPES
-			else if (vars->type == ASN_FLOAT)
+			else if (ASN_FLOAT == vars->type)
 			{
 				SET_DBL_RESULT(value, *vars->val.floatVal);
 			}
-			else if (vars->type == ASN_DOUBLE)
+			else if (ASN_DOUBLE == vars->type)
 			{
 				SET_DBL_RESULT(value, *vars->val.doubleVal);
 			}
 #endif
-			else if (vars->type == ASN_IPADDRESS)
+			else if (ASN_IPADDRESS == vars->type)
 			{
 				SET_STR_RESULT(value, zbx_dsprintf(NULL, "%d.%d.%d.%d",
 						vars->val.string[0],
