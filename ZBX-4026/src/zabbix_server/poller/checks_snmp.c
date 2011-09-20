@@ -586,11 +586,14 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 				if (SUCCEED != set_result_type(value, item->value_type, item->data_type, ptemp))
 					ret = NOTSUPPORTED;
 			}
-			else if (ASN_UINTEGER == vars->type || ASN_COUNTER == vars->type
 #ifdef OPAQUE_SPECIAL_TYPES
-					|| ASN_UNSIGNED64 == vars->type
+			else if (ASN_UINTEGER == vars->type || ASN_COUNTER == vars->type ||
+					ASN_TIMETICKS == vars->type || ASN_GAUGE == vars->type ||
+					ASN_UNSIGNED64 == vars->type)
+#else
+			else if (ASN_UINTEGER == vars->type || ASN_COUNTER == vars->type ||
+					ASN_TIMETICKS == vars->type || ASN_GAUGE == vars->type)
 #endif
-					|| ASN_TIMETICKS == vars->type || ASN_GAUGE == vars->type)
 			{
 				SET_UI64_RESULT(value, (unsigned long)*vars->val.integer);
 			}
@@ -599,11 +602,11 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 				SET_UI64_RESULT(value, (((zbx_uint64_t)vars->val.counter64->high) << 32) +
 						(zbx_uint64_t)vars->val.counter64->low);
 			}
-			else if (ASN_INTEGER == vars->type
 #ifdef OPAQUE_SPECIAL_TYPES
-					|| ASN_INTEGER64 == vars->type
+			else if (ASN_INTEGER == vars->type || ASN_INTEGER64 == vars->type)
+#else
+			else if (ASN_INTEGER == vars->type)
 #endif
-					)
 			{
 				/* Negative integer values are converted to double */
 				if (*vars->val.integer < 0)
