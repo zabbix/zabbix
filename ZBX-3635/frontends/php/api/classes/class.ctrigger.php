@@ -1244,7 +1244,7 @@ COpt::memoryPick();
 			elseif ($delete) {
 				if ($dbTriggers[$trigger['triggerid']]['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot delete templated trigger [%s:%s]', $dbTriggers[$trigger['triggerid']]['description'], explode_exp($dbTriggers[$trigger['triggerid']]['expression']))
+						_s('Cannot delete templated trigger [%1$s:%2$s]', $dbTriggers[$trigger['triggerid']]['description'], explode_exp($dbTriggers[$trigger['triggerid']]['expression']))
 					);
 				}
 
@@ -1302,15 +1302,17 @@ COpt::memoryPick();
 					'preservekeys' => true
 				));
 				$hosts = zbx_toHash($hosts, 'host');
+				$hostsStatusFlags = 0x0;
 				foreach ($expressionData->data['hosts'] as $host) {
 					if (!isset($hosts[$host])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect trigger expression. Host "%s" does not exist or you have no access to this host.', $host));
 					}
 
-					if (isset($status) && $status != $hosts[$host]['status'] && ($status == HOST_STATUS_TEMPLATE || $hosts[$host]['status'] == HOST_STATUS_TEMPLATE)) {
+					// find out if both templates and hosts are referenced in expression
+					$hostsStatusFlags |= ($hosts[$host]['status'] == HOST_STATUS_TEMPLATE) ? 0x1 : 0x2;
+					if ($hostsStatusFlags == 0x3) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect trigger expression. Trigger expression elements shouldn\'t belong to a template and a host simultaneously.'));
 					}
-					$status = $hosts[$host]['status'];
 				}
 			}
 
@@ -1517,7 +1519,7 @@ COpt::memoryPick();
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(_s('Trigger [%s:%s] created.', $trigger['description'], $trigger['expression']));
+			info(_s('Trigger [%1$s:%2$s] created.', $trigger['description'], $trigger['expression']));
 		}
 
 		$this->validateDependencies($triggers);
@@ -1904,7 +1906,6 @@ COpt::memoryPick();
 	 * @return bool
 	 */
 	protected function validateItems($trigger) {
-// {T1:i1.last(34)}|{T2:i2.last(0)}
 		$trigExpr = new CTriggerExpression(array('expression' => $trigger['expression']));
 
 		$hosts = array();

@@ -1673,6 +1673,7 @@ COpt::memoryPick();
 			);
 		}
 
+
 		// check if any templates linked to targets have more than one unique item key/application
 		foreach($targetids as $targetid){
 			$linkedTpls = $this->get(array(
@@ -1684,7 +1685,7 @@ COpt::memoryPick();
 
 			$sql = 'SELECT key_, count(itemid) as cnt '.
 				' FROM items '.
-				' WHERE '.DBcondition('hostid',$allids).
+				' WHERE '.DBcondition('hostid', $allids).
 				' GROUP BY key_ '.
 				' HAVING count(itemid) > 1';
 			$res = DBselect($sql);
@@ -1695,7 +1696,7 @@ COpt::memoryPick();
 
 			$sql = 'SELECT name, count(applicationid) as cnt '.
 				' FROM applications '.
-				' WHERE '.DBcondition('hostid',$allids).
+				' WHERE '.DBcondition('hostid', $allids).
 				' GROUP BY name '.
 				' HAVING count(applicationid) > 1';
 			$res = DBselect($sql);
@@ -1713,15 +1714,18 @@ COpt::memoryPick();
 				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
 			}
 
-			$sql = 'SELECT DISTINCT h.host '.
-					' FROM trigger_depends td, functions f, items i, hosts h '.
-					' WHERE ('.DBcondition('td.triggerid_down', $triggerids).' AND f.triggerid=td.triggerid_up) '.
-						' AND i.itemid=f.itemid '.
-						' AND h.hostid=i.hostid '.
+			$sql = 'SELECT DISTINCT h.host'.
+					' FROM trigger_depends td,functions f,items i,hosts h'.
+					' WHERE ('.
+							DBcondition('td.triggerid_down', $triggerids).
+							' AND f.triggerid=td.triggerid_up'.
+						' )'.
+						' AND i.itemid=f.itemid'.
+						' AND h.hostid=i.hostid'.
 						' AND '.DBcondition('h.hostid', $templateids, true).
 						' AND h.status='.HOST_STATUS_TEMPLATE;
 
-			if($db_dephost = DBfetch(DBselect($sql))){
+			if ($db_dephost = DBfetch(DBselect($sql))) {
 				$options = array(
 					'templateids' => $templateid,
 					'output'=> API_OUTPUT_EXTEND
@@ -1742,7 +1746,7 @@ COpt::memoryPick();
 				' WHERE '.DBcondition('hostid', $targetids).
 					' AND '.DBcondition('templateid', $templateids);
 		$linked_db = DBselect($sql);
-		while($pair = DBfetch($linked_db)){
+		while ($pair = DBfetch($linked_db)) {
 			$linked[] = array($pair['hostid'] => $pair['templateid']);
 		}
 
@@ -1759,8 +1763,36 @@ COpt::memoryPick();
 				$sql = 'INSERT INTO hosts_templates VALUES ('. implode(', ', $values) .')';
 				$result = DBexecute($sql);
 
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBError');
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBError');
+				}
 			}
+		}
+
+		// check if all template triggers
+		$sql = 'SELECT DISTINCT h.host'.
+				' FROM functions f,items i,triggers t,hosts h'.
+				' WHERE f.itemid=i.itemid'.
+					' AND f.triggerid=t.triggerid'.
+					' AND i.hostid=h.hostid'.
+					' AND NOT EXISTS ('.
+						' SELECT 1'.
+						' FROM hosts_templates ht'.
+						' WHERE ht.templateid=i.hostid'.
+							' AND '.DBcondition('ht.hostid', $targetids).
+					' )'.
+					' AND EXISTS ('.
+						' SELECT 1'.
+						' FROM functions ff,items ii,triggers tt'.
+						' WHERE ff.itemid=ii.itemid'.
+							' AND ff.triggerid=t.triggerid'.
+							' AND '.DBcondition('ii.hostid', $templateids).
+					' )';
+		if ($dbNotLinkedTpl = DBfetch(DBSelect($sql, 1))) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Trigger has items from template "%s" that is not linked to host.', $dbNotLinkedTpl['host'])
+			);
 		}
 
 		// CHECK CIRCULAR LINKAGE
