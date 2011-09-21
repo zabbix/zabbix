@@ -213,7 +213,7 @@ LPTSTR	get_counter_name(DWORD pdhIndex)
 		else
 		{
 			zabbix_log(LOG_LEVEL_ERR, "PdhLookupPerfNameByIndex failed: %s",
-					strerror_from_system(GetLastError()));
+					strerror_from_module(GetLastError(), L"PDH.DLL"));
 			zbx_free(counterName);
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():FAIL", __function_name);
 			return L"UnknownPerformanceCounter";
