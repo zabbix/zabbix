@@ -32,7 +32,7 @@ include_once('include/page_header.php');
 $fields = array(
 	//	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	'config'=>					array(T_ZBX_INT, O_OPT,	null,	IN(ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP.','.ZBX_AUTH_HTTP),	null),
-	// LDAP form
+	// LDAP
 	'ldap_host'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
 	'ldap_port'=>				array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535), 'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
 	'ldap_base_dn'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
@@ -43,7 +43,7 @@ $fields = array(
 	'user_password'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({test}))'),
 	// actions
 	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
-	'test'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null)
+	'test'=>					array(T_ZBX_STR, O_OPT, P_SYS, null, null)
 );
 check_fields($fields);
 ?>
