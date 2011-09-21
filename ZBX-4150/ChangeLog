@@ -1,6 +1,6 @@
 Changes for 1.8.8rc3
 
- - [ZBX-4150] fixed processing of quoted function parameters in calculated items (Sasha)
+ - [ZBX-4150] fixed processing of quoted function parameters (Sasha)
 
 Changes for 1.8.8rc2
 

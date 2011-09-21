@@ -1426,6 +1426,13 @@ int	num_param(const char *p)
  ******************************************************************************/
 int	get_param(const char *p, int num, char *buf, size_t max_len)
 {
+#define ZBX_ASSIGN_PARAM				\
+{							\
+	if (buf_i == max_len)				\
+		return 1;	/* buffer overflow */	\
+	buf[buf_i++] = *p;				\
+}
+
 	int	state;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
 	int	array, idx = 1, buf_i = 0;
 
@@ -1436,12 +1443,6 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 
 	for (state = 0, array = 0; '\0' != *p && idx <= num; p++)
 	{
-#define ZBX_ASSIGN_PARAM	{							\
-					if (buf_i == max_len)				\
-						return 1;	/* buffer overflow */	\
-					buf[buf_i++] = *p;				\
-				}
-
 		switch (state)
 		{
 			/* init state */
@@ -1526,8 +1527,8 @@ int	get_param(const char *p, int num, char *buf, size_t max_len)
 
 		if (idx > num)
 			break;
-#undef ZBX_ASSIGN_PARAM
 	}
+#undef ZBX_ASSIGN_PARAM
 
 	/* missing terminating '"' character */
 	if (1 == state)
