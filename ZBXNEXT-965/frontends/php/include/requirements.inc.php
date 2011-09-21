@@ -152,7 +152,7 @@
 			'required' => $required,
 			'recommended' => $recommended,
 			'result' => $req,
-			'error' => $required.SPACE.S_SEC_SMALL.SPACE.S_IS_A_MINIMAL_LIMITATION_EXECTUTION_TIME_SMALL
+			'error' => $required.SPACE._('sec').SPACE.S_IS_A_MINIMAL_LIMITATION_EXECTUTION_TIME_SMALL
 		);
 
 		return $result;
@@ -180,7 +180,7 @@
 			'required' => $required,
 			'recommended' => $recommended,
 			'result' => $req,
-			'error' => $required.SPACE.S_SEC_SMALL.SPACE.S_IS_A_MINIMAL_LIMITATION_INPUT_PARSE_TIME_SMALL
+			'error' => $required.SPACE._('sec').SPACE.S_IS_A_MINIMAL_LIMITATION_INPUT_PARSE_TIME_SMALL
 		);
 
 		return $result;

@@ -1,0 +1,69 @@
+<?php
+/*
+** ZABBIX
+** Copyright (C) 2000-2011 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
+?>
+<?php $sessionid = get_cookie('zbx_sessionid'); ?>
+<!doctype html>
+<html>
+<head>
+	<title><?php echo $page_title; ?></title>
+	<meta name="Author" content="ZABBIX SIA" />
+	<meta charset="utf-8" />
+	<link rel="shortcut icon" href="images/general/zabbix.ico" />
+	<link rel="stylesheet" type="text/css" href="css.css" />
+</head>
+<body class="originalblue browserwarningBG">
+	<div style="display: table; position: absolute; height: 99%; width: 99%;">
+	<div class="vertical-middle">
+		<div class="browserwarningForm">
+			<div style="position: relative;">
+				<div style="position: absolute; top: 28px; left: 18px;" class="loginLogo"></div>
+				<div style="position: absolute; top: 42px; left: 215px;" class="browserwarningCaution">CAUTION! You are using the out-of-date browser</div>
+				<div style="position: absolute; top: 90px; left: 50px; width: 510px;">
+					Zabbix frontend is built on the advanced, modern technologies and does not support old browsers.<br/>
+					It is insistently recommended to you to choose and establish any of modern browsers.<br/>
+					It is free of charge and also will take only some minutes.
+				</div>
+				<div style="position: absolute; top: 180px; left: 55px;" class="browserwarningLogoChrome"></div>
+				<div style="position: absolute; top: 255px; left: 55px; text-align: center;" class="browserwarningLink">Google Chrome<br/><a href="http://www.google.com/chrome" target="_blank">Download page</a></div>
+				<div style="position: absolute; top: 180px; left: 160px;" class="browserwarningLogoFirefox"></div>
+				<div style="position: absolute; top: 255px; left: 160px; text-align: center;" class="browserwarningLink">Mozilla Firefox<br/><a href="http://www.mozilla.org/firefox" target="_blank">Download page</a></div>
+				<div style="position: absolute; top: 180px; left: 265px;" class="browserwarningLogoIE"></div>
+				<div style="position: absolute; top: 255px; left: 265px; text-align: center;" class="browserwarningLink">Internet Explorer<br/><a href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie" target="_blank">Download page</a></div>
+				<div style="position: absolute; top: 180px; left: 375px;" class="browserwarningLogoOpera"></div>
+				<div style="position: absolute; top: 255px; left: 375px; text-align: center;" class="browserwarningLink">Opera browser<br/><a href="http://www.opera.com" target="_blank">Download page</a></div>
+				<div style="position: absolute; top: 180px; left: 480px;" class="browserwarningLogoSafari"></div>
+				<div style="position: absolute; top: 255px; left: 480px; text-align: center;" class="browserwarningLink">Apple Safari<br/><a href="http://www.apple.com/safari/download" target="_blank">Download page</a></div>
+				<div style="position: absolute; top: 310px; left: 50px; width: 510px; font-size: 16px; font-weight: bold;">
+					Why it is necessary to change old browser to another?
+				</div>
+				<div style="position: absolute; top: 335px; left: 50px; width: 510px;">
+					New browsers commonly come with new technologies implementation, increasing page rendering speed, better privacy settings and so on.. Also whey resolve security and functional issues, that is the important reason to keep you browser up to date.
+				</div>
+				<div style="position: absolute; top: 420px; left: 23px;" class="browserwarningCopyright">
+					<a href="http://www.zabbix.com"><?php echo _s('Zabbix %s Copyright 2001-2011 by Zabbix SIA', ZABBIX_VERSION); ?></a>
+				</div>
+				<div style="position: absolute; top: 410px; left: 400px;" class="browserwarningLink"><a href="index.php?browserwarning_ignore=yes">Continue despite this warning</a> ></div>
+			</div>
+		</div>
+	</div>
+	</div>
+	</div>
+</body>
+</html>
