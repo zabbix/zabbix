@@ -146,6 +146,7 @@ if (!empty($data['form'])) {
 		$data['exec_path'] = get_request('exec_path', '');
 		$data['gsm_modem'] = get_request('gsm_modem', '/dev/ttyS0');
 		$data['username'] = get_request('username', ($data['type'] == MEDIA_TYPE_EZ_TEXTING) ? 'username' : 'user@server');
+		$data['password'] = get_request('password', '');
 	}
 
 	// render view
