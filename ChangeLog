@@ -219,6 +219,10 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.8rc3
+
+ - [ZBX-4150] fixed processing of quoted function parameters (Sasha)
+
 Changes for 1.8.8rc2
 
  - [ZBX-4141] fixed possible cycling of server/proxy processes after unsuccessful execution of SQL statement (Sasha)
