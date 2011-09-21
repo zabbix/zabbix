@@ -23,9 +23,9 @@
 #include "zbxdb.h"
 #include "log.h"
 
-/* Transaction level. Must be 1 for all queries. */
-static int	txn_level = 0;
+static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
 static int	txn_init = 0;
+static int	txn_error = 0;	/* failed transaction */
 
 #if defined(HAVE_IBM_DB2)
 static zbx_ibm_db2_handle_t	ibm_db2;
@@ -366,7 +366,7 @@ void	zbx_create_sqlite3_mutex(const char *dbname)
 {
 	if (ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
 	{
-		zbx_error("unable to create mutex for sqlite");
+		zbx_error("cannot create mutex for sqlite");
 		exit(FAIL);
 	}
 }
@@ -522,7 +522,7 @@ int	zbx_db_begin()
 #elif defined(HAVE_SQLITE3)
 	if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock"
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock"
 				" on SQLite database.");
 		assert(0);
 	}
@@ -530,7 +530,10 @@ int	zbx_db_begin()
 #endif
 
 	if (ZBX_DB_DOWN == rc)
+	{
 		txn_level--;
+		txn_error = 0;
+	}
 
 	return rc;
 }
@@ -555,6 +558,14 @@ int	zbx_db_commit()
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: commit without transaction."
 				" Please report it to Zabbix Team.");
 		assert(0);
+	}
+
+	/* commit called on failed transaction, do a rollback instead */
+	if (1 == txn_error)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
+
+		return zbx_db_rollback();
 	}
 
 #if defined(HAVE_IBM_DB2)
@@ -596,7 +607,7 @@ int	zbx_db_commit()
  ******************************************************************************/
 int	zbx_db_rollback()
 {
-	int	rc = ZBX_DB_OK;
+	int	rc = ZBX_DB_OK, last_txn_error;
 
 	if (0 == txn_level)
 	{
@@ -604,6 +615,11 @@ int	zbx_db_rollback()
 				" Please report it to Zabbix Team.");
 		assert(0);
 	}
+
+	last_txn_error = txn_error;
+
+	/* allow rollback of failed transaction */
+	txn_error = 0;
 
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_ROLLBACK)))
@@ -627,6 +643,9 @@ int	zbx_db_rollback()
 
 	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
 		txn_level--;
+	else
+		/* in case of DB down we will repeat this operation */
+		txn_error = last_txn_error;
 
 	return rc;
 }
@@ -662,6 +681,13 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
+
+	/* ignore SQL statements within failed transaction */
+	if (1 == txn_error)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "ignore query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
+		return ZBX_DB_FAIL;
+	}
 
 	if (0 == txn_init && 0 == txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
@@ -818,7 +844,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 #elif defined(HAVE_SQLITE3)
 	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: unable to create lock on SQLite database");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite database");
 		exit(FAIL);
 	}
 
@@ -861,6 +887,13 @@ lbl_exec:
 			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
+	/* if SQL statement failed within a transaction mark transaction as failed */
+	if (ZBX_DB_FAIL == ret && 0 < txn_level)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "sql query [%s] failed, setting transaction as failed", sql);
+		txn_error = 1;
+	}
+
 	zbx_free(sql);
 
 	return ret;
@@ -898,6 +931,13 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
+
+	/* ignore SQL statements within failed transaction */
+	if (1 == txn_error)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "ignore query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
+		return NULL;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
@@ -1109,7 +1149,7 @@ error:
 #elif defined(HAVE_SQLITE3)
 	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: unable to create lock on SQLite database");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite database");
 		exit(FAIL);
 	}
 
@@ -1152,7 +1192,15 @@ lbl_get_table:
 			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
+	/* if SQL statement failed within a transaction mark transaction as failed */
+	if (NULL == result && 0 < txn_level)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "sql query [%s] failed, setting transaction as failed", sql);
+		txn_error = 1;
+	}
+
 	zbx_free(sql);
+
 	return result;
 }
 
