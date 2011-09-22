@@ -304,10 +304,11 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 		zbx_json_close(j);
 	}
 	DBfree_result(result);
+
+	zbx_json_close(j);	/* data */
 skip_data:
 	zbx_free(sql);
 
-	zbx_json_close(j);	/* data */
 	zbx_json_close(j);	/* table->table */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
