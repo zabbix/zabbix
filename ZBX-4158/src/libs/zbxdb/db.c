@@ -366,7 +366,7 @@ void	zbx_create_sqlite3_mutex(const char *dbname)
 {
 	if (ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
 	{
-		zbx_error("cannot create mutex for sqlite");
+		zbx_error("cannot create mutex for SQLite3");
 		exit(FAIL);
 	}
 }
@@ -522,18 +522,14 @@ int	zbx_db_begin()
 #elif defined(HAVE_SQLITE3)
 	if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock"
-				" on SQLite database.");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
 		assert(0);
 	}
 	rc = zbx_db_execute("%s", "begin;");
 #endif
 
 	if (ZBX_DB_DOWN == rc)
-	{
 		txn_level--;
-		txn_error = 0;
-	}
 
 	return rc;
 }
@@ -560,11 +556,9 @@ int	zbx_db_commit()
 		assert(0);
 	}
 
-	/* commit called on failed transaction, do a rollback instead */
 	if (1 == txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
-
 		return zbx_db_rollback();
 	}
 
@@ -644,8 +638,7 @@ int	zbx_db_rollback()
 	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
 		txn_level--;
 	else
-		/* in case of DB down we will repeat this operation */
-		txn_error = last_txn_error;
+		txn_error = last_txn_error;	/* in case of DB down we will repeat this operation */
 
 	return rc;
 }
@@ -682,15 +675,14 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	/* ignore SQL statements within failed transaction */
-	if (1 == txn_error)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ignore query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
-		return ZBX_DB_FAIL;
-	}
-
 	if (0 == txn_init && 0 == txn_level)
 		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
+
+	if (1 == txn_error)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
+		return ZBX_DB_FAIL;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
@@ -844,7 +836,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 #elif defined(HAVE_SQLITE3)
 	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite database");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
 		exit(FAIL);
 	}
 
@@ -887,10 +879,9 @@ lbl_exec:
 			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
-	/* if SQL statement failed within a transaction mark transaction as failed */
 	if (ZBX_DB_FAIL == ret && 0 < txn_level)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "sql query [%s] failed, setting transaction as failed", sql);
+		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
 		txn_error = 1;
 	}
 
@@ -932,10 +923,9 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	/* ignore SQL statements within failed transaction */
 	if (1 == txn_error)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ignore query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
 		return NULL;
 	}
 
@@ -1149,7 +1139,7 @@ error:
 #elif defined(HAVE_SQLITE3)
 	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite database");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
 		exit(FAIL);
 	}
 
@@ -1192,10 +1182,9 @@ lbl_get_table:
 			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
-	/* if SQL statement failed within a transaction mark transaction as failed */
 	if (NULL == result && 0 < txn_level)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "sql query [%s] failed, setting transaction as failed", sql);
+		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
 		txn_error = 1;
 	}
 
