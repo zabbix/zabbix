@@ -865,7 +865,6 @@
 //	sysmap.php
 	'S_HIDDEN'=>			_('Hidden'),
 	'S_SHOWN'=>				_('Shown'),
-	'S_UPPER_LEVEL_MAPS'=>	_('Upper level maps'),
 	'S_LINKS'=>				_('Links'),
 	'S_LINK'=>				_('Link'),
 	'S_LABEL'=>				_('Label'),
@@ -940,7 +939,6 @@
 
 //	maps.php
 	'S_NETWORK_MAPS'=>		_('Network maps'),
-	'S_NETWORK_MAPS_BIG'=>		_('NETWORK MAPS'),
 	'S_LABEL_LOCATION'=>		_('Label location'),
 	'S_MAPS_DATE_FORMAT'=>	_('Y.m.d H:i:s'),
 
@@ -1430,6 +1428,7 @@
 	'S_READ_WRITE'=>				_('Read-write'),
 	'S_DENY'=>					_('Deny'),
 	'S_HIDE'=>					_('Hide'),
+	'S_CHANGE_PASSWORD'=>				_('Change password'),
 	'S_PASSWORD_ONCE_AGAIN'=>			_('Password (once again)'),
 	'S_PASSWORD'=>			_('Password'),
 	'S_URL_AFTER_LOGIN'=>				_('URL (after login)'),
