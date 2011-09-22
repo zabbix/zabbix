@@ -280,128 +280,130 @@
 	}
 
 /**
-* returns Ctable object with host header
-*
-* {@source}
-* @access public
-* @static
-* @version 1
+* Create CDiv with host/template information and references to it's elements
 *
 * @param string $hostid
-* @param array $elemnts [items, triggers, graphs, applications]
+* @param string $current elements that reference should not be added to
 * @return object
 */
-	function get_header_host_table($hostid, $current=null){
-		$elements = array(
-			'items' => 'items',
-			'triggers' => 'triggers',
-			'graphs' => 'graphs',
-			'applications' => 'applications',
-			'screens' => 'screens',
-			'discoveries' => 'discoveries'
-		);
-
-		if(!is_null($current))
-			unset($elements[$current]);
-
-		$header_host_opt = array(
-			'hostids' => $hostid,
-			'output' => API_OUTPUT_EXTEND,
-			'templated_hosts' => 1,
-		);
-		if(isset($elements['items'])) $header_host_opt['selectItems'] = API_OUTPUT_COUNT;
-		if(isset($elements['triggers'])) $header_host_opt['selectTriggers'] = API_OUTPUT_COUNT;
-		if(isset($elements['graphs'])) $header_host_opt['selectGraphs'] = API_OUTPUT_COUNT;
-		if(isset($elements['applications'])) $header_host_opt['selectApplications'] = API_OUTPUT_COUNT;
-		if(isset($elements['screens'])) $header_host_opt['selectScreens'] = API_OUTPUT_COUNT;
-		if(isset($elements['discoveries'])) $header_host_opt['selectDiscoveries'] = API_OUTPUT_COUNT;
-
-		$header_hosts = API::Host()->get($header_host_opt);
-
-		if(!$header_host = reset($header_hosts)){
-			$header_host = array(
-				'hostid' => 0,
-				'name' => ($current == 'host') ? S_NEW_HOST : _('New template'),
-				'status' => ($current == 'host') ? HOST_STATUS_NOT_MONITORED : HOST_STATUS_TEMPLATE,
-				'available' => HOST_AVAILABLE_UNKNOWN,
-				'screens' => 0,
-				'items' => 0,
-				'graphs' => 0,
-				'triggers' => 0,
-				'applications' => 0,
-				'discoveries' => 0,
-				'proxy_hostid' => 0
-			);
-		}
-
-
-		$description = array();
-		if($header_host['proxy_hostid']){
-			$proxy = get_host_by_hostid($header_host['proxy_hostid']);
-			$description[] = $proxy['host'].':';
-		}
-		$description[] = $header_host['name'];
-
-		$list = new CList(null, 'objectlist');
-
-		if($header_host['status'] == HOST_STATUS_TEMPLATE)
-			$list->addItem(array('&laquo; ', new CLink(S_TEMPLATE_LIST, 'templates.php?templateid='.$header_host['hostid'].url_param('groupid'))));
-		else
-			$list->addItem(array('&laquo; ', new CLink(S_HOST_LIST, 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid'))));
-
-
-		$tbl_header_host = new CDiv(null, 'objectgroup ui-widget-content ui-corner-all');
-		if($header_host['status'] == HOST_STATUS_TEMPLATE){
-			$list->addItem(array(bold(S_TEMPLATE.': '), new CLink($description, 'templates.php?form=update&templateid='.$header_host['hostid'])));
-		}
-		else{
-			switch($header_host['status']){
-				case HOST_STATUS_MONITORED:
-					$status = new CSpan(S_MONITORED, 'off');
-					break;
-				case HOST_STATUS_NOT_MONITORED:
-					$status = new CSpan(S_NOT_MONITORED, 'on');
-					break;
-				default:
-					$status = S_UNKNOWN;
-			}
-
-			if($header_host['available'] == HOST_AVAILABLE_TRUE)
-				$available = new CSpan(S_AVAILABLE, 'off');
-			else if($header_host['available'] == HOST_AVAILABLE_FALSE)
-				$available = new CSpan(S_NOT_AVAILABLE, 'on');
-			else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
-				$available = new CSpan(S_UNKNOWN, 'unknown');
-
-			$list->addItem(array(bold(S_HOST.': '), new CLink($description, 'hosts.php?form=update&hostid='.$header_host['hostid'])));
-			$list->addItem($status);
-			$list->addItem(array(S_AVAILABILITY.': ', $available));
-		}
-
-		if(isset($elements['items'])){
-			$list->addItem(array(new CLink(S_ITEMS, 'items.php?hostid='.$header_host['hostid']),' ('.$header_host['items'].')'));
-		}
-		if(isset($elements['triggers'])){
-			$list->addItem(array(new CLink(S_TRIGGERS, 'triggers.php?hostid='.$header_host['hostid']),' ('.$header_host['triggers'].')'));
-		}
-		if(isset($elements['graphs'])){
-			$list->addItem(array(new CLink(S_GRAPHS, 'graphs.php?hostid='.$header_host['hostid']),' ('.$header_host['graphs'].')'));
-		}
-		if(isset($elements['applications'])){
-			$list->addItem(array(new CLink(S_APPLICATIONS, 'applications.php?hostid='.$header_host['hostid']),' ('.$header_host['applications'].')'));
-		}
-		if(isset($elements['discoveries'])){
-			$list->addItem(array(new CLink(S_DISCOVERY, 'host_discovery.php?hostid='.$header_host['hostid']),' ('.$header_host['discoveries'].')'));
-		}
-		if($header_host['status'] == HOST_STATUS_TEMPLATE){
-			if(isset($elements['screens'])){
-				$list->addItem(array(new CLink(S_SCREENS, 'screenconf.php?templateid='.$header_host['hostid']), ' ('.$header_host['screens'].')'));
-			}
-		}
-
-		$tbl_header_host->addItem($list);
-		return $tbl_header_host;
+function get_header_host_table($hostid, $current = null){
+	$elements = array(
+		'items' => 'items',
+		'triggers' => 'triggers',
+		'graphs' => 'graphs',
+		'applications' => 'applications',
+		'screens' => 'screens',
+		'discoveries' => 'discoveries'
+	);
+	if (!is_null($current)) {
+		unset($elements[$current]);
 	}
+
+
+	$header_host_opt = array(
+		'hostids' => $hostid,
+		'output' => array('hostid', 'name', 'status', 'proxy_hostid', 'available'),
+		'templated_hosts' => true,
+	);
+	if (isset($elements['items'])) {
+		$header_host_opt['selectItems'] = API_OUTPUT_COUNT;
+	}
+	if (isset($elements['triggers'])) {
+		$header_host_opt['selectTriggers'] = API_OUTPUT_COUNT;
+	}
+	if (isset($elements['graphs'])) {
+		$header_host_opt['selectGraphs'] = API_OUTPUT_COUNT;
+	}
+	if (isset($elements['applications'])) {
+		$header_host_opt['selectApplications'] = API_OUTPUT_COUNT;
+	}
+	if (isset($elements['screens'])) {
+		$header_host_opt['selectScreens'] = API_OUTPUT_COUNT;
+	}
+	if (isset($elements['discoveries'])) {
+		$header_host_opt['selectDiscoveries'] = API_OUTPUT_COUNT;
+	}
+	$header_hosts = API::Host()->get($header_host_opt);
+	$header_host = reset($header_hosts);
+
+
+	$list = new CList(null, 'objectlist');
+
+	if ($header_host['status'] == HOST_STATUS_TEMPLATE) {
+		$list->addItem(array('&laquo; ', new CLink(_('Template list'), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid'))));
+	}
+	else {
+		$list->addItem(array('&laquo; ', new CLink(_('Host list'), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid'))));
+	}
+
+
+	$description = '';
+	if ($header_host['proxy_hostid']) {
+		$proxy = get_host_by_hostid($header_host['proxy_hostid']);
+		$description .= $proxy['host'].':';
+	}
+	$description .= $header_host['name'];
+
+	if ($header_host['status'] == HOST_STATUS_TEMPLATE) {
+		$list->addItem(array(bold(_('Template').': '), new CLink($description, 'templates.php?form=update&templateid='.$header_host['hostid'])));
+	}
+	else {
+		switch ($header_host['status']) {
+			case HOST_STATUS_MONITORED:
+				$status = new CSpan(_('Monitored'), 'off');
+				break;
+			case HOST_STATUS_NOT_MONITORED:
+				$status = new CSpan(_('Not monitored'), 'on');
+				break;
+			default:
+				$status = _('Unknown');
+				break;
+		}
+
+		if ($header_host['available'] == HOST_AVAILABLE_TRUE) {
+			$available = new CSpan(_('Available'), 'off');
+		}
+		elseif ($header_host['available'] == HOST_AVAILABLE_FALSE) {
+			$available = new CSpan(_('Not available'), 'on');
+		}
+		elseif ($header_host['available'] == HOST_AVAILABLE_UNKNOWN) {
+			$available = new CSpan(_('Unknown'), 'unknown');
+		}
+
+		$list->addItem(array(bold(_('Host').': '), new CLink($description, 'hosts.php?form=update&hostid='.$header_host['hostid'])));
+		$list->addItem($status);
+		$list->addItem(array(_('Availability').': ', $available));
+	}
+
+	if (isset($elements['applications'])) {
+		$list->addItem(array(new CLink(_('Applications'), 'applications.php?hostid='.$header_host['hostid']),
+			' ('.$header_host['applications'].')'));
+	}
+	if (isset($elements['items'])) {
+		$list->addItem(array(new CLink(_('Items'), 'items.php?hostid='.$header_host['hostid']),
+			' ('.$header_host['items'].')'));
+	}
+	if (isset($elements['triggers'])) {
+		$list->addItem(array(new CLink(_('Triggers'), 'triggers.php?hostid='.$header_host['hostid']),
+			' ('.$header_host['triggers'] . ')'));
+	}
+	if (isset($elements['graphs'])) {
+		$list->addItem(array(new CLink(_('Graphs'), 'graphs.php?hostid='.$header_host['hostid']),
+			' ('.$header_host['graphs'] . ')'));
+	}
+	if (isset($elements['discoveries'])) {
+		$list->addItem(array(new CLink(_('Discovery'), 'host_discovery.php?hostid='.$header_host['hostid']),
+			' ('.$header_host['discoveries'].')'));
+	}
+	if ($header_host['status'] == HOST_STATUS_TEMPLATE && isset($elements['screens'])) {
+		$list->addItem(array(new CLink(_('Screens'), 'screenconf.php?templateid='.$header_host['hostid']),
+			' ('.$header_host['screens'] . ')'));
+	}
+
+	$tbl_header_host = new CDiv($list, 'objectgroup ui-widget-content ui-corner-all');
+
+	return $tbl_header_host;
+}
 
 
 	function makeFormFooter($main, $other=array()){
