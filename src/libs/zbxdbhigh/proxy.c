@@ -222,11 +222,14 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, " from %s t", table->table);
 
-	if (0 == strcmp(table->table, "globalmacro"))
+	if (SUCCEED == str_in_list("globalmacro,regexps,expressions,config", table->table, ','))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
-				" where 1=1" DB_NODE,
-				DBnode_local("t.globalmacroid"));
+		char	*field_name;
+
+		field_name = zbx_dsprintf(NULL, "t.%s", table->recid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " where 1=1" DB_NODE, DBnode_local(field_name));
+
+		zbx_free(field_name);
 	}
 	else if (SUCCEED == str_in_list("hosts,interface,hosts_templates,hostmacro", table->table, ','))
 	{
@@ -268,29 +271,11 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 					" and r.status=%d",
 				proxy_hostid, DRULE_STATUS_MONITORED);
 	}
-	if (0 == strcmp(table->table, "regexps"))
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
-				" where 1=1" DB_NODE,
-				DBnode_local("t.regexpid"));
-	}
-	if (0 == strcmp(table->table, "expressions"))
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
-				" where 1=1" DB_NODE,
-				DBnode_local("t.expressionid"));
-	}
 	else if (0 == strcmp(table->table, "groups"))
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 				",config r where t.groupid=r.discovery_groupid" DB_NODE,
 				DBnode_local("r.configid"));
-	}
-	else if (0 == strcmp(table->table, "config"))
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
-				" where 1=1" DB_NODE,
-				DBnode_local("t.configid"));
 	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, " order by t.%s", table->recid);
