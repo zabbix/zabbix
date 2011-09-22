@@ -109,7 +109,7 @@ class cItemKey{
 		}
 
 		if ($this->keyIdHasComma) {
-			// +1 becuse cuurentByte point to ','
+			// +1 because currentByte points to ','
 			$keyParam = substr($this->key, $this->currentByte + 1);
 
 			if (!preg_match('/^\d*$/', $keyParam) && !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $keyParam)) {
