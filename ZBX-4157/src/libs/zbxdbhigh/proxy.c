@@ -242,7 +242,10 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	}
 	else if (0 == strcmp(table->table, "hosts_templates"))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " where%s", 0 == hostids_num ? " 0=1" : "");
+		if (0 == hostids_num)
+			goto skip_data;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, " where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid", hostids, hostids_num);
 	}
 	else if (0 == strcmp(table->table, "drules"))
@@ -262,7 +265,10 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	}
 	else if (0 == strcmp(table->table, "hostmacro"))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " where%s", 0 == hostids_num ? " 0=1" : "");
+		if (0 == hostids_num)
+			goto skip_data;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, " where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid", hostids, hostids_num);
 	}
 
@@ -271,8 +277,6 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	zbx_json_addarray(j, "data");
 
 	result = DBselect("%s", sql);
-
-	zbx_free(sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -300,6 +304,8 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 		zbx_json_close(j);
 	}
 	DBfree_result(result);
+skip_data:
+	zbx_free(sql);
 
 	zbx_json_close(j);	/* data */
 	zbx_json_close(j);	/* table->table */
