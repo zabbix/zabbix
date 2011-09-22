@@ -330,38 +330,19 @@ define('ITEM_VALUE_TYPE_TEXT',		4);
 define('ITEM_DATA_TYPE_DECIMAL',		0);
 define('ITEM_DATA_TYPE_OCTAL',			1);
 define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
-define('ITEM_DATA_TYPE_BOOLEAN',	3);
+define('ITEM_DATA_TYPE_BOOLEAN',		3);
 
-<<<<<<< .working
-	define('SYSMAP_ELEMENT_USE_ICONMAP_ON', 1);
-	define('SYSMAP_ELEMENT_USE_ICONMAP_OFF', 0);
+define('SYSMAP_ELEMENT_USE_ICONMAP_ON', 	1);
+define('SYSMAP_ELEMENT_USE_ICONMAP_OFF', 	0);
 
-	define('ZBX_ICON_PREVIEW_HEIGHT', 24);
-	define('ZBX_ICON_PREVIEW_WIDTH', 24);
+define('ZBX_ICON_PREVIEW_HEIGHT', 	24);
+define('ZBX_ICON_PREVIEW_WIDTH', 	24);
 
-	define('ITEM_TYPE_ZABBIX',			0);
-	define('ITEM_TYPE_SNMPV1',			1);
-	define('ITEM_TYPE_TRAPPER',			2);
-	define('ITEM_TYPE_SIMPLE',			3);
-	define('ITEM_TYPE_SNMPV2C',			4);
-	define('ITEM_TYPE_INTERNAL',		5);
-	define('ITEM_TYPE_SNMPV3',			6);
-	define('ITEM_TYPE_ZABBIX_ACTIVE',	7);
-	define('ITEM_TYPE_AGGREGATE',		8);
-	define('ITEM_TYPE_HTTPTEST',		9);
-	define('ITEM_TYPE_EXTERNAL',		10);
-	define('ITEM_TYPE_DB_MONITOR',		11);
-	define('ITEM_TYPE_IPMI',			12);
-	define('ITEM_TYPE_SSH',				13);
-	define('ITEM_TYPE_TELNET',			14);
-	define('ITEM_TYPE_CALCULATED',		15);
-	define('ITEM_TYPE_JMX',			16);
-=======
 define('ITEM_STATUS_ACTIVE',		0);
 define('ITEM_STATUS_DISABLED',		1);
 define('ITEM_STATUS_NOTSUPPORTED',	3);
->>>>>>> .merge-right.r21827
-	define('ITEM_TYPE_SNMPTRAP',			17);
+
+define('ITEM_TYPE_SNMPTRAP',			17);
 
 define('ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV',	0);
 define('ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV',		1);
