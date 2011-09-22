@@ -99,7 +99,7 @@ PDH_STATUS	zbx_PdhCollectQueryData(const char *function, const char *counterpath
 
 	if (ERROR_SUCCESS != (pdh_status = PdhCollectQueryData(query)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot collect data \"%s\": %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot collect data '%s': %s",
 				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
@@ -116,7 +116,7 @@ PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpa
 		if (ERROR_SUCCESS == pdh_status)
 			pdh_status = value->CStatus;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot get counter value \"%s\": %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot get counter value '%s': %s",
 				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
@@ -168,7 +168,7 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 		if (ERROR_SUCCESS == pdh_status)
 			pdh_status = counterValue.CStatus;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot calculate counter value \"%s\": %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot calculate counter value '%s': %s",
 				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 	else
@@ -244,14 +244,14 @@ int	check_counter_path(char *counterPath)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot get required buffer size for counter path \"%s\": %s",
+		zabbix_log(LOG_LEVEL_ERR, "cannot get required buffer size for counter path '%s': %s",
 				counterPath, strerror_from_module(status, L"PDH.DLL"));
 		goto clean;
 	}
 
 	if (ERROR_SUCCESS != (status = PdhParseCounterPath(wcounterPath, cpe, &dwSize, 0)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot parse counter path \"%s\": %s",
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse counter path '%s': %s",
 				counterPath, strerror_from_module(status, L"PDH.DLL"));
 		goto clean;
 	}
@@ -269,7 +269,7 @@ int	check_counter_path(char *counterPath)
 		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, cpe, counterPath))
 			goto clean;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "counter path converted to \"%s\"", counterPath);
+		zabbix_log(LOG_LEVEL_DEBUG, "counter path converted to '%s'", counterPath);
 	}
 
 	ret = SUCCEED;
