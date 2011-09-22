@@ -64,7 +64,7 @@ elseif ($this->data['type'] == MEDIA_TYPE_EXEC) {
 }
 elseif ($this->data['type'] == MEDIA_TYPE_JABBER || $this->data['type'] == MEDIA_TYPE_EZ_TEXTING) {
 	// create password field
-	if (!empty($this->data['mediatypeid']) && !empty($this->data['password'])) {
+	if (!empty($this->data['password'])) {
 		$passwordButton = new CButton('chPass_btn', _('Change password'), 'this.style.display="none"; $("password").enable().show().focus();');
 		$passwordBox = new CPassBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE);
 		$passwordBox->addStyle('display: none;');
