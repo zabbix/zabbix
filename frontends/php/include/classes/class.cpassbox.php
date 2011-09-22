@@ -20,8 +20,9 @@
 ?>
 <?php
 class CPassBox extends CInput {
-	public function __construct($name = 'password', $value = '', $maxlength = 255) {
+	public function __construct($name = 'password', $value = '', $size = 50, $maxlength = 255) {
 		parent::__construct('password', $name, $value);
+		$this->setAttribute('size', $size);
 		$this->setAttribute('maxlength', $maxlength);
 	}
 }
