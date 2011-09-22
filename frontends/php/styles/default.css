@@ -78,8 +78,6 @@ form { margin: 0 }
 .img{ border: 1px black; }
 img.top { vertical-align:text-top; }
 img.bottom { vertical-align:text-bottom; }
-img.borderless { border-width: 0; vertical-align: bottom; }
-
 
 .vert{ width:1px;}
 .rarr{ font-size: 16px; }

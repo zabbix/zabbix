@@ -2,6 +2,7 @@
 Changes for 1.9.7
 
 New features:
+ - [ZBX-3999] fixed map border (Alex,Sasha,Eduard)
  - [ZBXNEXT-918] redesign Administration->Media types (Eduard)
  - [ZBXNEXT-915] redesign Administration->Authentication (Eduard)
  - [ZBXNEXT-966] update jQuery to 1.6.4 (Eduard)
