@@ -175,15 +175,15 @@ int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGEN
 	int		cpu_count = 0;
 	double		swt_count = 0.0;
 
-	if (NULL != (kc = kstat_open())
+	if (NULL != (kc = kstat_open()))
 	{
 		k = kc->kc_chain;
 		while (NULL != k)
 		{
 			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
 			{
-				cpu = (cpu_stat_t*) k->ks_data;
-				swt_count += (double) cpu->cpu_sysinfo.pswitch;
+				cpu = (cpu_stat_t *)k->ks_data;
+				swt_count += (double)cpu->cpu_sysinfo.pswitch;
 				cpu_count += 1;
 			}
 			k = k->ks_next;
@@ -207,15 +207,15 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	int		cpu_count = 0;
 	double		intr_count = 0.0;
 
-	if (NULL != (kc = kstat_open())
+	if (NULL != (kc = kstat_open()))
 	{
 		k = kc->kc_chain;
 		while (NULL != k)
 		{
 			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
 			{
-				cpu = (cpu_stat_t*) k->ks_data;
-				intr_count += (double) cpu->cpu_sysinfo.intr;
+				cpu = (cpu_stat_t *)k->ks_data;
+				intr_count += (double)cpu->cpu_sysinfo.intr;
 				cpu_count += 1;
 			}
 			k = k->ks_next;

@@ -31,7 +31,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || ('\0' == *tmp || 0 == strcmp(tmp, "online"))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "online"))
 		name = _SC_NPROCESSORS_ONLN;
 	else if (0 == strcmp(tmp, "max"))
 		name = _SC_NPROCESSORS_CONF;
