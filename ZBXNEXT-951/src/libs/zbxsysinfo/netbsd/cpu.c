@@ -23,22 +23,16 @@
 
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_FUNCTION_SYSCTL_HW_NCPU
-	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
+#ifdef HAVE_FUNCTION_SYSCTL_HW_NCPU	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
+	char	tmp[16];
 	size_t	len;
 	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
-	char	mode[MAX_STRING_LEN];
 
-	if (num_param(param) > 1)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, mode, sizeof(mode)))
-		*mode = '\0';
-
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "online");
-
-	if (0 != strcmp(mode, "online"))
+	/* only "online" (default) for parameter "type" is supported */
+	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "online", sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
 
 	len = sizeof(ncpu);
@@ -51,13 +45,12 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
-#endif /* HAVE_FUNCTION_SYSCTL_HW_NCPU */
+#endif
 }
 
 int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#if defined(HAVE_UVM_UVMEXP2)
-	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
+#ifdef HAVE_UVM_UVMEXP2	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
 	int			mib[] = {CTL_VM, VM_UVMEXP2};
 	size_t			len;
 	struct uvmexp_sysctl	v;
@@ -72,13 +65,12 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
-#endif /* HAVE_UVM_UVMEXP2 */
+#endif
 }
 
 int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#if defined(HAVE_UVM_UVMEXP2)
-	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
+#ifdef HAVE_UVM_UVMEXP2	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
 	int			mib[] = {CTL_VM, VM_UVMEXP2};
 	size_t			len;
 	struct uvmexp_sysctl	v;
@@ -93,7 +85,7 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
-#endif /* HAVE_UVM_UVMEXP2 */
+#endif
 }
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -101,21 +93,15 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char	tmp[16];
 	int	cpu_num, mode, state;
 
-	if (num_param(param) > 3)
+	if (3 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "all"))	/* default parameter */
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
 	else if (1 > (cpu_num = atoi(tmp) + 1))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "user"))	/* default parameter */
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "user"))
 		state = ZBX_CPU_STATE_USER;
 	else if (0 == strcmp(tmp, "nice"))
 		state = ZBX_CPU_STATE_NICE;
@@ -126,10 +112,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
+	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		mode = ZBX_AVG1;
 	else if (0 == strcmp(tmp, "avg5"))
 		mode = ZBX_AVG5;
@@ -143,24 +126,23 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 static int	get_cpuload(double *load1, double *load5, double *load15)
 {
-#ifdef HAVE_GETLOADAVG
-	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
+#ifdef HAVE_GETLOADAVG	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
 	double	load[3];
 
 	if (-1 == getloadavg(load, 3))
 		return SYSINFO_RET_FAIL;
 
-	if (load1)
+	if (NULL != load1)
 		*load1 = load[0];
-	if (load5)
+	if (NULL != load5)
 		*load5 = load[1];
-	if (load15)
+	if (NULL != load15)
 		*load15 = load[2];
 
 	return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
-#endif /* HAVE_GETLOADAVG */
+#endif
 }
 
 static int	SYSTEM_CPU_LOAD1(AGENT_RESULT *result)
@@ -201,41 +183,32 @@ static int	SYSTEM_CPU_LOAD15(AGENT_RESULT *result)
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	MODE_FUNCTION fl[] =
+	static MODE_FUNCTION fl[] =
 	{
 		{"avg1",	SYSTEM_CPU_LOAD1},
 		{"avg5",	SYSTEM_CPU_LOAD5},
 		{"avg15",	SYSTEM_CPU_LOAD15},
-		{0,		0}
+		{NULL,		NULL}
 	};
 
-	char	cpuname[MAX_STRING_LEN],
-		mode[MAX_STRING_LEN];
+	char	tmp[16];
 	int	i;
 
-	if (num_param(param) > 2)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, cpuname, sizeof(cpuname)))
-		*cpuname = '\0';
-
-	/* default parameter */
-	if (*cpuname == '\0')
-		zbx_snprintf(cpuname, sizeof(cpuname), "all");
-
-	if (0 != strncmp(cpuname, "all", sizeof(cpuname)))
+	/* only "all" (default) for parameter "cpu" is supported */
+	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp)
+		zbx_snprintf(tmp, sizeof(tmp), "avg1");
 
-	/* default parameter */
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "avg1");
-
-	for (i = 0; fl[i].mode != 0; i++)
-		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
+	for (i = 0; NULL != fl[i].mode; i++)
+	{
+		if (0 == strncmp(tmp, fl[i].mode, sizeof(tmp)))
 			return (fl[i].function)(result);
+	}
 
 	return SYSINFO_RET_FAIL;
 }

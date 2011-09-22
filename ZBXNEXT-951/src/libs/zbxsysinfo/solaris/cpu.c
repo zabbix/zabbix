@@ -23,19 +23,16 @@
 
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	mode[8];
+	char	tmp[16];
 	int	name;
 	long	ncpu;
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, mode, sizeof(mode)))
-		*mode = '\0';
-
-	if ('\0' == *mode || 0 == strcmp(mode, "online"))	/* default parameter */
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "online"))
 		name = _SC_NPROCESSORS_ONLN;
-	else if (0 == strcmp(mode, "max"))
+	else if (0 == strcmp(tmp, "max"))
 		name = _SC_NPROCESSORS_CONF;
 	else
 		return SYSINFO_RET_FAIL;
@@ -51,23 +48,17 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[16];
-	int	cpu_num, mode, state;
+	int	cpu_num, state, mode;
 
-	if (num_param(param) > 3)
+	if (3 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "all"))	/* default parameter */
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
 	else if (1 > (cpu_num = atoi(tmp) + 1))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "user"))	/* default parameter */
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "user"))
 		state = ZBX_CPU_STATE_USER;
 	else if (0 == strcmp(tmp, "wait"))
 		state = ZBX_CPU_STATE_IOWAIT;
@@ -78,10 +69,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
+	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		mode = ZBX_AVG1;
 	else if (0 == strcmp(tmp, "avg5"))
 		mode = ZBX_AVG5;
@@ -132,50 +120,39 @@ static int	get_kstat_system_misc(char *s, int *value)
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+	char	tmp[16];
 #if defined(HAVE_GETLOADAVG)
 	double	load[3];
 #elif defined(HAVE_KSTAT_H)
 	char	*key;
 	int	value;
 #endif
-	char	tmp[MAX_STRING_LEN];
 
-	if (num_param(param) > 2)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+	/* only "all" (default) for parameter "cpu" is supported */
+	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
-
-	if ('\0' != *tmp && 0 != strcmp(tmp, "all"))	/* default parameter */
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
 
 #if defined(HAVE_GETLOADAVG)
 	if (-1 == getloadavg(load, 3))
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
-	{
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		SET_DBL_RESULT(result, load[0]);
-	}
-	else if ('\0' == *tmp || 0 == strcmp(tmp, "avg5"))
-	{
+	else if (0 == strcmp(tmp, "avg5"))
 		SET_DBL_RESULT(result, load[1]);
-	}
-	else if ('\0' == *tmp || 0 == strcmp(tmp, "avg15"))
-	{
+	else if (0 == strcmp(tmp, "avg15"))
 		SET_DBL_RESULT(result, load[2]);
-	}
 	else
 		return SYSINFO_RET_FAIL;
 #elif defined(HAVE_KSTAT_H)
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		key = "avenrun_1min";
-	else if ('\0' == *tmp || 0 == strcmp(tmp, "avg5"))
+	else if (0 == strcmp(tmp, "avg5"))
 		key = "avenrun_5min";
-	else if ('\0' == *tmp || 0 == strcmp(tmp, "avg15"))
+	else if (0 == strcmp(tmp, "avg15"))
 		key = "avenrun_15min";
 	else
 		return SYSINFO_RET_FAIL;
@@ -183,7 +160,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (FAIL == get_kstat_system_misc(key, &value))
 		return SYSINFO_RET_FAIL;
 
-	SET_DBL_RESULT(result, (double)value/FSCALE);
+	SET_DBL_RESULT(result, (double)value / FSCALE);
 #else
 	return SYSINFO_RET_FAIL;
 #endif
@@ -195,19 +172,15 @@ int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGEN
 	kstat_ctl_t	*kc;
 	kstat_t		*k;
 	cpu_stat_t	*cpu;
+	int		cpu_count = 0;
+	double		swt_count = 0.0;
 
-	int	cpu_count = 0;
-	double	swt_count = 0.0;
-
-	kc = kstat_open();
-
-	if(kc != NULL)
+	if (NULL != (kc = kstat_open())
 	{
 		k = kc->kc_chain;
-		while (k != NULL)
+		while (NULL != k)
 		{
-			if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
-					(kstat_read(kc, k, NULL) != -1) )
+			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
 			{
 				cpu = (cpu_stat_t*) k->ks_data;
 				swt_count += (double) cpu->cpu_sysinfo.pswitch;
@@ -218,7 +191,7 @@ int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGEN
 		kstat_close(kc);
 	}
 
-	if(cpu_count == 0)
+	if (0 == cpu_count)
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, swt_count);
@@ -231,19 +204,15 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	kstat_ctl_t	*kc;
 	kstat_t		*k;
 	cpu_stat_t	*cpu;
+	int		cpu_count = 0;
+	double		intr_count = 0.0;
 
-	int	cpu_count = 0;
-	double	intr_count = 0.0;
-
-	kc = kstat_open();
-
-	if(kc != NULL)
+	if (NULL != (kc = kstat_open())
 	{
 		k = kc->kc_chain;
-		while (k != NULL)
+		while (NULL != k)
 		{
-			if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
-					(kstat_read(kc, k, NULL) != -1) )
+			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
 			{
 				cpu = (cpu_stat_t*) k->ks_data;
 				intr_count += (double) cpu->cpu_sysinfo.intr;
@@ -254,7 +223,7 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		kstat_close(kc);
 	}
 
-	if(cpu_count == 0)
+	if (0 == cpu_count)
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, intr_count);

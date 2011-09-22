@@ -194,7 +194,7 @@ static void	free_perf_counter_list()
  *           interval must be less than or equal to counter->interval         *
  *                                                                            *
  ******************************************************************************/
-double	compute_average_value(const char *function, PERF_COUNTER_DATA *counter, int interval)
+double	compute_average_value(PERF_COUNTER_DATA *counter, int interval)
 {
 	double	sum = 0;
 	int	i, j, count;
