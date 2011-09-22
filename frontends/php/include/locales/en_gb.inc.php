@@ -351,27 +351,11 @@
 	'S_CONFIGURATION_OF_ZABBIX_BIG'=>		_('CONFIGURATION OF ZABBIX'),
 	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
-	'S_ADDED_NEW_MEDIA_TYPE'=>			_('Added new media type'),
-	'S_NEW_MEDIA_TYPE_WAS_NOT_ADDED'=>		_('New media type was not added'),
-	'S_MEDIA_TYPE_UPDATED'=>			_('Media type updated'),
-	'S_MEDIA_TYPE_WAS_NOT_UPDATED'=>		_('Media type was not updated'),
-	'S_MEDIA_TYPE_DELETED'=>			_('Media type deleted'),
-	'S_MEDIA_TYPE_WAS_NOT_DELETED'=>		_('Media type was not deleted'),
-	'S_SMTP_SERVER'=>				_('SMTP server'),
-	'S_SMTP_HELO'=>					_('SMTP helo'),
-	'S_SMTP_EMAIL'=>				_('SMTP email'),
-	'S_SCRIPT_NAME'=>				_('Script name'),
-	'S_DELETE_SELECTED_MEDIA'=>			_('Delete selected media?'),
-	'S_MEDIA_TYPES'=>				_('Media types'),
 	'S_DEFAULT'=>					_('Default'),
 	'S_IMAGE'=>					_('Image'),
 	'S_OTHER'=>					_('Other'),
-	'S_CREATE_MEDIA_TYPE'=>				_('Create media type'),
 	'S_NOTHING_TO_DO'=>				_('Nothing to do'),
 	'S_INCORRECT_WORK_PERIOD'=>			_('Incorrect work period'),
-	'S_EZ_TEXTING_USA' => _('USA (160 characters)'),
-	'S_EZ_TEXTING_CANADA' => _('Canada (136 characters)'),
-	'S_MESSAGE_TEXT_LIMIT' => _('Message text limit'),
 
 	'S_REGULAR_EXPRESSION'=>			_('Regular expression'),
 	'S_EXPRESSION'=>				_('Expression'),
@@ -398,10 +382,6 @@
 	'S_DELETE_REGULAR_EXPRESSION_Q'=>		_('Delete regular expression?'),
 
 	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		_('Value maps are used to create a mapping between numeric values and string representations'),
-
-// media_types.php
-	'S_DELETE_SELECTED_MEDIATYPES_Q'=>		_('Delete selected media types?'),
-	'S_COMMERCIAL' => _('Commercial'),
 
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),
@@ -767,14 +747,7 @@
 	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
 	'S_ACTIVE'=>						_('Active'),
 	'S_NOT_SUPPORTED'=>					_('Not supported'),
-	'S_EMAIL'=>						_('Email'),
-	'S_JABBER'=>						_('Jabber'),
-	'S_JABBER_IDENTIFIER'=>					_('Jabber identifier'),
-	'S_SMS'=>						_('SMS'),
 	'S_SCRIPT'=>						_('Script'),
-	'S_EZ_TEXTING'=>						_('Ez Texting'),
-	'S_USERNAME'=>						_('Username'),
-	'S_GSM_MODEM'=>						_('GSM modem'),
 	'S_UNITS'=>						_('Units'),
 	'S_UPDATE_INTERVAL_IN_SEC'=>				_('Update interval (in sec)'),
 	'S_KEEP_HISTORY_IN_DAYS'=>				_('Keep history (in days)'),
@@ -972,8 +945,6 @@
 	'S_MAPS_DATE_FORMAT'=>	_('Y.m.d H:i:s'),
 
 //	media.php
-	'S_CONFIGURATION_OF_MEDIA_TYPES_BIG'=>	_('CONFIGURATION OF MEDIA TYPES'),
-	'S_MEDIA_TYPES_BIG'=>			_('MEDIA TYPES'),
 	'S_MEDIA'=>				_('Media'),
 	'S_SEND_TO'=>				_('Send to'),
 	'S_WHEN_ACTIVE'=>			_('When active'),
@@ -1339,7 +1310,6 @@
 	'S_DEPENDS_ON'=>			_('Depends on'),
 	'S_DEPENDENT'=>				_('Dependent'),
 	'S_URL'=>				_('URL'),
-	'S_INVALID_URL_PARAMS'=>		_('Zabbix has received an incorrect request'),
 	'S_CREATE_TRIGGER'=>			_('Create trigger'),
 	'S_INSERT'=>				_('Insert'),
 	'S_SECONDS'=>				_('Seconds'),
@@ -1460,7 +1430,6 @@
 	'S_READ_WRITE'=>				_('Read-write'),
 	'S_DENY'=>					_('Deny'),
 	'S_HIDE'=>					_('Hide'),
-	'S_CHANGE_PASSWORD'=>				_('Change password'),
 	'S_PASSWORD_ONCE_AGAIN'=>			_('Password (once again)'),
 	'S_PASSWORD'=>			_('Password'),
 	'S_URL_AFTER_LOGIN'=>				_('URL (after login)'),
@@ -1630,7 +1599,6 @@
 
 // page_header.php
 	'S_REFRESHED_EVERY_SMALL'=>		_('refreshed every'),
-	'S_PAGE_RECEIVED_INCORRECT_DATA'=>	_('Page received incorrect data'),
 
 //	copt.inc.php
 	'S_STATS_FOR'=>			_('Stats for'),
@@ -1703,22 +1671,6 @@
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		_('Host'),
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		_('has been deleted from the system'),
 	'S_AND_CANT_BE_DELETED' => _('and can\'t be deleted'),
-
-//	validate.inc.php
-	'S_CRITICAL_ERROR'=>				_('Critical error'),
-	'S_FIELD'=>					_('Field'),
-	'S_IS_NOT_IP_RANGE_SMALL'=>			_('is not IP range'),
-	'S_IS_NOT_PORT_RANGE_SMALL'=>			_('is not PORT range'),
-	'S_IS_NOT_INTEGER_RANGE_SMALL'=>		_('is not integer range'),
-	'S_IS_NOT_INTEGER_SMALL'=>			_('is not integer'),
-	'S_IS_NOT_DOUBLE_SMALL'=>			_('is not double'),
-	'S_IS_NOT_STRING_SMALL'=>			_('is not string'),
-	'S_CONTAINS_MULTIBYTE_CHARS_SMALL'=>		_('contains Multibyte chars'),
-	'S_MULTIBYTE_CHARS_ARE_RESTRICTED_SMALL'=>	_('multibyte chars are restricted'),
-	'S_IS_NOT_A_COLOUR_SMALL'=>			_('is not a colour'),
-	'S_IS_MANDATORY_SMALL'=>			_('is mandatory'),
-	'S_MUST_BE_MISSING_SMALL'=>			_('must be missing'),
-	'S_OPERATION_CANNOT_PERFORMED_UNAUTH_REQUEST'=>	_('Operation cannot be performed due to unauthorized request'),
 
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					_('No trigger with'),
