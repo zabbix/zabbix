@@ -85,7 +85,6 @@ class cItemKey{
 			// checking for something like telnet,1023[]
 			if($this->key[$this->currentByte] == ','){
 				$this->keyIdHasComma = true;
-				break;
 			}
 		}
 		if($this->currentByte == 0){ // no key id
@@ -109,24 +108,17 @@ class cItemKey{
 			return;
 		}
 
-		if ($this->keyIdHasComma) {
-			// +1 becuse cuurentByte point to ','
-			$keyParam = substr($this->key, $this->currentByte + 1);
-
-			if (!preg_match('/^\d+$/', $keyParam) && !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $keyParam)) {
-				$this->isValid = false;
-				$this->error = S_INCORRECT_SIMPLE_CHECK_PARAMETER;
-				return;
-			}
-			else {
-				return;
-			}
-		}
-
 		// invalid symbol instead of '[', which would be the beginning of params
 		if($this->key[$this->currentByte] != '['){
 			$this->isValid = false;
 			$this->error = S_NO_ITEM_KEY_PROVIDED;
+			return;
+		}
+
+		// simple check key with [] parameters is invalid
+		if($this->keyIdHasComma){
+			$this->isValid = false;
+			$this->error = S_SIMPLE_CHECK_KEY_CANNOT_CONTAIN;
 			return;
 		}
 
