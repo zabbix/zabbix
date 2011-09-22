@@ -242,13 +242,22 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 				ITEM_TYPE_SSH, ITEM_TYPE_TELNET);
 	}
-	else if (0 == strcmp(table->table, "hosts_templates"))
+	else if (SUCCEED == str_in_list("hosts_templates,hostmacro", table->table, ','))
 	{
 		if (0 == hostids_num)
 			goto skip_data;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, " where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid", hostids, hostids_num);
+	}
+	else if (SUCCEED == str_in_list("globalmacro,regexps,expressions", table->table, ','))
+	{
+		char	*field_name;
+
+		field_name = zbx_dsprintf(NULL, "t.%s", table->recid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " where 1=1" DB_NODE, DBnode_local(field_name));
+
+		zbx_free(field_name);
 	}
 	else if (0 == strcmp(table->table, "drules"))
 	{
@@ -264,14 +273,6 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 					" and r.proxy_hostid=" ZBX_FS_UI64
 					" and r.status=%d",
 				proxy_hostid, DRULE_STATUS_MONITORED);
-	}
-	else if (0 == strcmp(table->table, "hostmacro"))
-	{
-		if (0 == hostids_num)
-			goto skip_data;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, " where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid", hostids, hostids_num);
 	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, " order by t.%s", table->recid);
@@ -427,9 +428,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 
 	zbx_free(hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", j->buffer);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() json:'%s'", __function_name, j->buffer);
 }
 
 /******************************************************************************
