@@ -1507,7 +1507,6 @@ COpt::memoryPick();
 			info(_s('Trigger [%1$s:%2$s] created.', $trigger['description'], $trigger['expression']));
 		}
 
-
 		$this->validateDependencies($triggers);
 
 		foreach ($triggers as $trigger) {
@@ -1520,7 +1519,6 @@ COpt::memoryPick();
 				}
 			}
 		}
-
 	}
 
 	protected function updateReal($triggers){
