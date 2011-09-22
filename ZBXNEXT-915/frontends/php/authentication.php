@@ -43,7 +43,7 @@ $fields = array(
 	'user_password'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({test}))'),
 	// actions
 	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
-	'test'=>					array(T_ZBX_STR, O_OPT, P_SYS, null, null)
+	'test'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null)
 );
 check_fields($fields);
 ?>
@@ -55,17 +55,14 @@ if (!isset($_REQUEST['config'])) {
 $config = select_config();
 $isAuthenticationTypeChanged = ($config['authentication_type'] != $_REQUEST['config']) ? true : false;
 
+foreach ($config as $id => $value) {
+	if (isset($_REQUEST[$id])) {
+		$config[$id] = $_REQUEST[$id];
+	}
+}
+
 if ($_REQUEST['config'] == ZBX_AUTH_INTERNAL) {
 	if (isset($_REQUEST['save'])) {
-		// remove field from others athentication types
-		foreach ($config as $id => $value) {
-			if (isset($_REQUEST[$id])) {
-				$config[$id] = $_REQUEST[$id];
-			}
-			else {
-				unset($config[$id]);
-			}
-		}
 		$config['authentication_type'] = $_REQUEST['config'];
 
 		// reset all sessions
@@ -86,18 +83,14 @@ if ($_REQUEST['config'] == ZBX_AUTH_INTERNAL) {
 	}
 }
 elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
+	foreach ($config as $id => $value) {
+		if (isset($_REQUEST[$id])) {
+			$ldap_cnf[str_replace('ldap_', '', $id)] = $_REQUEST[$id];
+		}
+	}
+
 	if (isset($_REQUEST['save'])) {
 		try {
-			// remove field from others athentication types
-			foreach ($config as $id => $value) {
-				if (isset($_REQUEST[$id])) {
-					$config[$id] = $_REQUEST[$id];
-					$ldap_cnf[str_replace('ldap_', '', $id)] = $_REQUEST[$id];
-				}
-				else {
-					unset($config[$id]);
-				}
-			}
 			$config['authentication_type'] = $_REQUEST['config'];
 
 			// check login/password
@@ -129,13 +122,6 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 		}
 	}
 	elseif (isset($_REQUEST['test'])) {
-		foreach ($config as $id => $value) {
-			if (isset($_REQUEST[$id])) {
-				$config[$id] = $_REQUEST[$id];
-				$ldap_cnf[str_replace('ldap_', '', $id)] = $_REQUEST[$id];
-			}
-		}
-
 		// check login/password
 		$result = API::User()->ldapLogin(array(
 			'user' => get_request('user', $USER_DETAILS['alias']),
@@ -148,21 +134,13 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 }
 elseif ($_REQUEST['config'] == ZBX_AUTH_HTTP) {
 	if (isset($_REQUEST['save'])) {
+		$config['authentication_type'] = $_REQUEST['config'];
+
+		// get groups wich use this authentication method
 		$result = DBfetch(DBselect('SELECT COUNT(g.usrgrpid) AS cnt_usrgrp FROM usrgrp g WHERE g.gui_access='.GROUP_GUI_ACCESS_INTERNAL));
 		if ($result['cnt_usrgrp'] > 0) {
 			info(_n('There is %1$d group with Internal GUI access.', 'There are %1$d groups with Internal GUI access.', $result['cnt_usrgrp']));
 		}
-
-		// remove field from others athentication types
-		foreach ($config as $id => $value) {
-			if (isset($_REQUEST[$id])) {
-				$config[$id] = $_REQUEST[$id];
-			}
-			else{
-				unset($config[$id]);
-			}
-		}
-		$config['authentication_type'] = $_REQUEST['config'];
 
 		// reset all sessions
 		if ($isAuthenticationTypeChanged) {
