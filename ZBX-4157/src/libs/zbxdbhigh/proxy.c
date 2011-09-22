@@ -213,6 +213,8 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	zbx_json_close(j);	/* fields */
 
+	zbx_json_addarray(j, "data");
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, " from %s t", table->table);
 
 	if (0 == strcmp(table->table, "hosts"))
@@ -274,8 +276,6 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, " order by t.%s", table->recid);
 
-	zbx_json_addarray(j, "data");
-
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
@@ -304,11 +304,10 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 		zbx_json_close(j);
 	}
 	DBfree_result(result);
-
-	zbx_json_close(j);	/* data */
 skip_data:
 	zbx_free(sql);
 
+	zbx_json_close(j);	/* data */
 	zbx_json_close(j);	/* table->table */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
