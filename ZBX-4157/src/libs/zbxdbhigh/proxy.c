@@ -184,7 +184,7 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 		zbx_uint64_t *hostids, int hostids_num)
 {
 	const char	*__function_name = "get_proxyconfig_table";
-	char		*sql = NULL, field_name[128];
+	char		*sql = NULL;
 	int		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, f, fld;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -252,8 +252,12 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	}
 	else if (SUCCEED == str_in_list("globalmacro,regexps,expressions", table->table, ','))
 	{
-		zbx_snprintf(field_name, sizeof(field_name), "t.%s", table->recid);
+		char	*field_name;
+
+		field_name = zbx_dsprintf(NULL, "t.%s", table->recid);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " where 1=1" DB_NODE, DBnode_local(field_name));
+
+		zbx_free(field_name);
 	}
 	else if (0 == strcmp(table->table, "drules"))
 	{
@@ -424,9 +428,7 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 
 	zbx_free(hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", j->buffer);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() json:'%s'", __function_name, j->buffer);
 }
 
 /******************************************************************************
