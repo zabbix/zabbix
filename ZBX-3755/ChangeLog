@@ -2,13 +2,14 @@
 Changes for 1.9.7
 
 New features:
- - [ZBX-3999] fixed map border (Alex,Sasha,Eduard)
  - [ZBXNEXT-918] redesign Administration->Media types (Eduard)
  - [ZBXNEXT-915] redesign Administration->Authentication (Eduard)
  - [ZBXNEXT-966] update jQuery to 1.6.4 (Eduard)
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-3755] fixed latest values in cloned items (Sasha)
+ - [ZBX-3999] fixed map border (Alex,Sasha,Eduard)
  - [ZBX-3946] fixed errors when create trigger with dependencies (Vedmak)
  - [ZBX-3921] fixed change link shown for maps in slide show (Vedmak)
  - [ZBX-4082] fixed error in Monitoring->Triggers when acknowledges are disabled (Vedmak)
