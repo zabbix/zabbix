@@ -684,14 +684,10 @@ switch($itemType) {
 				}
 			}
 
-			$go_result = false;
 			DBstart();
-			foreach($_REQUEST['group_itemid'] as $item_id)
-				foreach($hosts_ids as $host_id){
-					$go_result |= copy_item_to_host($item_id, $host_id);
-				}
-
+			$go_result = copyItemsToHosts($_REQUEST['group_itemid'], $hosts_ids);
 			$go_result = DBend($go_result);
+
 			show_messages($go_result, S_ITEMS_COPIED, S_CANNOT_COPY_ITEMS);
 			$_REQUEST['go'] = 'none2';
 		}

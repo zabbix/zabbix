@@ -566,7 +566,7 @@ include_once('include/page_header.php');
 
 // FULL CLONE {{{
 			if ($clone_hostid && ($_REQUEST['form'] == 'full_clone')) {
-				if (!copy_applications($clone_hostid, $hostid)) {
+				if (!copyApplications($clone_hostid, $hostid)) {
 					throw new Exception();
 				}
 

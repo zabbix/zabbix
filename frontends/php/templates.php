@@ -402,7 +402,9 @@ include_once('include/page_header.php');
 			// Full clone
 			if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
 
-				if(!copy_applications($clone_templateid, $templateid)) throw new Exception();
+				if (!copyApplications($clone_templateid, $templateid)) {
+					throw new Exception();
+				}
 
 				if(!copyItems($clone_templateid, $templateid)) throw new Exception();
 
