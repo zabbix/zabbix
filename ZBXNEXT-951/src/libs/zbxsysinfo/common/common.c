@@ -87,27 +87,28 @@ static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT
 	return SYSINFO_RET_FAIL;
 }
 
-int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *result)
+double	getPROC(char *file, int lineno, int fieldno)
 {
 #ifdef	HAVE_PROC
 	FILE	*f;
 	char	*t, c[MAX_STRING_LEN];
 	int	i;
-	double	value = 0;
+	double	value;
 
 	if (NULL == (f = fopen(file, "r")))
-		return SYSINFO_RET_FAIL;
+		return -1;
 
 	for (i = 1; i <= lineno; i++)
 	{
 		if (NULL == fgets(c, sizeof(c), f))
 		{
 			zbx_fclose(f);
-			return SYSINFO_RET_FAIL;
+			return -1;
 		}
 	}
 
 	t = (char *)strtok(c, " ");
+
 	for (i = 2; i <= fieldno; i++)
 	{
 		t = (char *)strtok(NULL, " ");
@@ -115,12 +116,10 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 
 	zbx_fclose(f);
 
-	sscanf(t, "%lf", &value);
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
+	if (1 == sscanf(t, "%lf", &value))
+		return value;
 #else
-	return SYSINFO_RET_FAIL;
+	return -1;
 #endif
 }
 

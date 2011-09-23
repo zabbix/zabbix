@@ -21,6 +21,43 @@
 #include "sysinfo.h"
 #include "stats.h"
 
+static int	get_cpu_num()
+{
+#ifdef HAVE_FUNCTION_SYSCTL_HW_NCPU
+	size_t	len;
+	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
+
+	len = sizeof(ncpu);
+
+	if (-1 == sysctl(mib, 2, &ncpu, &len, NULL, 0))
+		return -1;
+
+	return ncpu;
+#else
+	return -1;
+#endif
+}
+
+int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	tmp[16];
+	int	cpu_num;
+
+	if (1 < num_param(param))
+		return SYSINFO_RET_FAIL;
+
+	/* only "online" (default) for parameter "type" is supported */
+	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "online", sizeof(tmp)))
+		return SYSINFO_RET_FAIL;
+
+	if (-1 == (cpu_num = get_cpu_num()))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, cpu_num);
+
+	return SYSINFO_RET_OK;
+}
+
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[16];
@@ -57,221 +94,109 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return get_cpustat(result, cpu_num, state, mode);
 }
 
-#ifdef HAVE_KNLIST_H
-static int getloadavg_kmem(double loadavg[], int nelem)
+static int	get_system_load(int mode)
 {
+#if defined(HAVE_GETLOADAVG)
+	double	load[3];
+
+	if (mode >= getloadavg(load, 3))
+		return -1;
+
+	return load[mode];
+#elif defined(HAVE_SYS_PSTAT_H)
+	struct	pst_dynamic	dyn;
+
+	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
+		return -1;
+
+	if (ZBX_AVG1 == mode)
+		return dyn.psd_avg_1_min;
+
+	if (ZBX_AVG5 == mode)
+		return dyn.psd_avg_5_min;
+
+	return dyn.psd_avg_15_min;
+#elif defined(HAVE_PROC_LOADAVG)
+	return	getPROC("/proc/loadavg", 1, mode + 1);
+#elif defined(HAVE_KSTAT_H)
+	static const char	*keys =
+	{
+		"avenrun_1min",
+		"avenrun_5min",
+		"avenrun_15min"
+	};
+
+	static kstat_ctl_t	*kc = NULL;
+	kstat_t			*ks;
+	kstat_named_t		*kn;
+
+	if (!kc && !(kc = kstat_open()))
+		return -1;
+
+	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) || -1 == kstat_read(kc, ks, 0) ||
+		!(kn = kstat_data_lookup(ks, keys[mode])))
+	{
+		return -1;
+	}
+
+	return ((double)kn->value.ul) / 256.0;
+#elif defined(HAVE_KNLIST_H)
 	struct nlist	nl;
-	int		kmem, i;
-	long		avenrun[3];
+	int		kmem;
+	long		load[3];
 
 	nl.n_name = "avenrun";
 	nl.n_value = 0;
 
 	if (knlist(&nl, 1, sizeof(nl)))
-		return FAIL;
+		return -1;
 
 	if (0 >= (kmem = open("/dev/kmem", 0, 0)))
-		return FAIL;
+		return -1;
 
-	if (pread(kmem, avenrun, sizeof(avenrun), nl.n_value) < sizeof(avenrun))
-		return FAIL;
+	if (pread(kmem, load, sizeof(load), nl.n_value) < sizeof(load))
+		return -1;
 
-	for (i = 0; i < nelem; i++)
-	{
-		loadavg[i] = (double) avenrun[i] / 65535;
-	}
-
-	return SUCCEED;
-}
-#endif
-
-static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#if defined(HAVE_GETLOADAVG)
-	double	load[3];
-
-	if (0 >= getloadavg(load, 3))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, load[0]);
-
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_SYS_PSTAT_H)
-	struct	pst_dynamic dyn;
-
-	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, dyn.psd_avg_1_min);
-
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_PROC_LOADAVG)
-	return	getPROC("/proc/loadavg", 1, 1, flags, result);
-#elif defined(HAVE_KSTAT_H)
-	static kstat_ctl_t	*kc = NULL;
-	kstat_t			*ks;
-	kstat_named_t		*kn;
-
-	if (!kc && !(kc = kstat_open()))
-		return SYSINFO_RET_FAIL;
-
-	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) || -1 == kstat_read(kc, ks, 0) ||
-		!(kn = kstat_data_lookup(ks, "avenrun_1min")))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	SET_DBL_RESULT(result, ((double)kn->value.ul) / 256.0);
-
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_KNLIST_H)
-	double loadavg[3];
-
-	if (FAIL == getloadavg_kmem(loadavg, 3))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, loadavg[0]);
-
-	return SYSINFO_RET_OK;
+	return (double) load[mode] / 65535;
 #else
-	return SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#if defined(HAVE_GETLOADAVG)
-	double	load[3];
-
-	if (1 >= getloadavg(load, 3))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, load[1]);
-
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_SYS_PSTAT_H)
-	struct pst_dynamic	dyn;
-
-	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, dyn.psd_avg_5_min);
-
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_PROC_LOADAVG)
-	return	getPROC("/proc/loadavg", 1, 2, flags, result);
-#elif defined(HAVE_KSTAT_H)
-	static kstat_ctl_t	*kc = NULL;
-	kstat_t			*ks;
-	kstat_named_t		*kn;
-
-	if (!kc && !(kc = kstat_open()))
-		return SYSINFO_RET_FAIL;
-
-	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) || -1 == kstat_read(kc, ks, 0) ||
-		!(kn = kstat_data_lookup(ks, "avenrun_5min")))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	SET_DBL_RESULT(result, ((double)kn->value.ul) / 256.0);
-
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_KNLIST_H)
-	double loadavg[3];
-
-	if (FAIL == getloadavg_kmem(loadavg,3))
-		return STSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, loadavg[1]);
-
-	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#if defined(HAVE_GETLOADAVG)
-	double	load[3];
-
-	if (2 >= getloadavg(load, 3))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, load[2]);
-
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_SYS_PSTAT_H)
-	struct pst_dynamic	dyn;
-
-	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, dyn.psd_avg_15_min);
-
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_PROC_LOADAVG)
-	return	getPROC("/proc/loadavg", 1, 3, flags, result);
-#elif defined(HAVE_KSTAT_H)
-	static kstat_ctl_t	*kc = NULL;
-	kstat_t			*ks;
-	kstat_named_t		*kn;
-
-	if (!kc && !(kc = kstat_open()))
-		return SYSINFO_RET_FAIL;
-
-	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) || -1 == kstat_read(kc, ks, 0) ||
-		!(kn = kstat_data_lookup(ks, "avenrun_15min")))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	SET_DBL_RESULT(result, ((double)kn->value.ul) / 256.0);
-
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_KNLIST_H)
-	double loadavg[3];
-
-	if (FAIL == getloadavg_kmem(loadavg,3))
-		return STSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, loadavg[2]);
-
-	return SYSINFO_RET_OK;
-#else
-	return	SYSINFO_RET_FAIL;
+	return -1;
 #endif
 }
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	static MODE_FUNCTION fl[] =
-	{
-		{"avg1",	SYSTEM_CPU_LOAD1},
-		{"avg5",	SYSTEM_CPU_LOAD5},
-		{"avg15",	SYSTEM_CPU_LOAD15},
-		{NULL,		NULL}
-	};
-
 	char	tmp[16];
-	int	i;
+	int	mode, per_cpu = 1, cpu_num;
+	double	value;
 
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	/* only "online" (default) for parameter "type" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "online", sizeof(tmp)))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strncmp(tmp, "all", sizeof(tmp)))
+		per_cpu = 0;
+	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp)
-		zbx_snprintf(tmp, sizeof(tmp), "avg1");
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+		mode = ZBX_AVG1;
+	else if (0 == strcmp(tmp, "avg5"))
+		mode = ZBX_AVG5;
+	else if (0 == strcmp(tmp, "avg15"))
+		mode = ZBX_AVG15;
+	else
+		return SYSINFO_RET_FAIL;
 
-	for (i = 0; NULL != fl[i].mode; i++)
+	if (-1 == (value = get_system_load(mode)))
+		return SYSINFO_RET_FAIL;
+
+	if (1 == per_cpu)
 	{
-		if (0 == strncmp(tmp, fl[i].mode, sizeof(tmp)))
-			return (fl[i].function)(cmd, param, flags, result);
+		if (0 >= (cpu_num = get_cpu_num()))
+			return SYSINFO_RET_FAIL;
+		value = value / cpu_num;
 	}
 
-	return SYSINFO_RET_FAIL;
+	SET_DBL_RESULT(result, value);
+
+	return SYSINFO_RET_OK;
 }
