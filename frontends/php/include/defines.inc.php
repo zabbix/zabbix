@@ -719,7 +719,7 @@ define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
 define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[KMGTsmhdw]{0,1})');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
-define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]+)');
+define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(?(?=,)('.ZBX_PREG_PARAMS.'){0,1}|(\['.ZBX_PREG_PARAMS.'\]){0,1}))');
