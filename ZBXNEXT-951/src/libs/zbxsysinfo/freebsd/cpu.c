@@ -149,14 +149,15 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 #ifdef HAVE_GETLOADAVG	/* FreeBSD 4.2 i386; FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
 	char	tmp[16];
-	int	mode;
-	double	load[ZBX_AVG_COUNT];
+	int	mode, per_cpu = 1, cpu_num;
+	double	load[ZBX_AVG_COUNT], value;
 
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	/* only "all" (default) for parameter "cpu" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strncmp(tmp, "all", sizeof(tmp)))
+		per_cpu = 0;
+	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
@@ -171,7 +172,16 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (mode >= getloadavg(load, 3))
 		return SYSINFO_RET_FAIL;
 
-	SET_DBL_RESULT(result, load[mode]);
+	value = load[mode];
+
+	if (1 == per_cpu)
+	{
+		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
+			return SYSINFO_RET_FAIL;
+		value = value / cpu_num;
+	}
+
+	SET_DBL_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
 #else

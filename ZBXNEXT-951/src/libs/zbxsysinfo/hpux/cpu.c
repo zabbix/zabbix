@@ -86,12 +86,14 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char			tmp[16];
 	struct pst_dynamic	dyn;
 	double			value;
+	int			per_cpu = 1;
 
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	/* only "all" (default) for parameter "cpu" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strncmp(tmp, "all", sizeof(tmp)))
+		per_cpu = 0;
+	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
 
 	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
@@ -105,6 +107,13 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		value = dyn.psd_avg_15_min;
 	else
 		return SYSINFO_RET_FAIL;
+
+	if (1 == per_cpu)
+	{
+		if (0 >= psd.psd_proc_cnt)
+			return SYSINFO_RET_FAIL;
+		value = value / psd.psd_proc_cnt;
+	}
 
 	SET_DBL_RESULT(result, value);
 

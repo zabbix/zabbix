@@ -21,10 +21,18 @@
 #include "sysinfo.h"
 #include "stats.h"
 
+static int	get_cpu_num()
+{
+	SYSTEM_INFO	sysInfo;
+
+	GetSystemInfo(&sysInfo);
+
+	return (int)sysInfo.dwNumberOfProcessors;
+}
+
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char		tmp[16];
-	SYSTEM_INFO	sysInfo;
+	char	tmp[16];
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -33,9 +41,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "online", sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
 
-	GetSystemInfo(&sysInfo);
-
-	SET_UI64_RESULT(result, sysInfo.dwNumberOfProcessors);
+	SET_UI64_RESULT(result, get_cpu_num());
 
 	return SYSINFO_RET_OK;
 }
@@ -85,6 +91,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	tmp[16];
 	double	value;
+	int	per_cpu = 1, cpu_num;
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
@@ -95,8 +102,9 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	/* only "all" (default) for parameter "cpu" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strncmp(tmp, "all", sizeof(tmp)))
+		per_cpu = 0;
+	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
 
 	if (PERF_COUNTER_ACTIVE != collector->cpus.queue_counter->status)
@@ -110,6 +118,13 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		value = compute_average_value(collector->cpus.queue_counter, USE_DEFAULT_INTERVAL);
 	else
 		return SYSINFO_RET_FAIL;
+
+	if (1 == per_cpu)
+	{
+		if (0 >= (cpu_num = get_cpu_num()))
+			return SYSINFO_RET_FAIL;
+		value = value / cpu_num;
+	}
 
 	SET_DBL_RESULT(result, value);
 

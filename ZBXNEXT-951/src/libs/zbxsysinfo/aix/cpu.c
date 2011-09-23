@@ -88,14 +88,16 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 #	define SBITS 16
 #endif
 	char			tmp[16];
-	int			mode;
+	int			mode, per_cpu = 1;
 	perfstat_cpu_total_t	ps_cpu_total;
+	double			value;
 
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	/* only "all" (default) for parameter "cpu" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strncmp(tmp, "all", sizeof(tmp)))
+		per_cpu = 0;
+	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
@@ -110,7 +112,16 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
 		return SYSINFO_RET_FAIL;
 
-	SET_DBL_RESULT(result, (double)ps_cpu_total.loadavg[mode] / (1 << SBITS));
+	value = (double)ps_cpu_total.loadavg[mode] / (1 << SBITS);
+
+	if (1 == per_cpu)
+	{
+		if (0 >= ps_cpu_total.ncpus)
+			return SYSINFO_RET_FAIL;
+		value = value / ps_cpu_total.ncpus;
+	}
+
+	SET_DBL_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
 #else

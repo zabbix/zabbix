@@ -98,7 +98,7 @@ static int	get_kstat_system_misc(char *key, int *value)
 	if (-1 == kstat_read(kc, ksp, NULL))
 		goto close;
 
-	if (NULL == (kn = (kstat_named_t*)kstat_data_lookup(ksp, key)))
+	if (NULL == (kn = (kstat_named_t *)kstat_data_lookup(ksp, key)))
 		goto close;
 
 	*value = kn->value.ul;
@@ -114,19 +114,22 @@ close:
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[16];
+	double	value;
+	int	per_cpu = 1, cpu_num;
 #if defined(HAVE_GETLOADAVG)
 	int	mode;
 	double	load[ZBX_AVG_COUNT];
 #elif defined(HAVE_KSTAT_H)
 	char	*key;
-	int	value;
+	int	load;
 #endif
 
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	/* only "all" (default) for parameter "cpu" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strncmp(tmp, "all", sizeof(tmp)))
+		per_cpu = 0;
+	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
 
 #if defined(HAVE_GETLOADAVG)
@@ -142,7 +145,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (mode >= getloadavg(load, 3))
 		return SYSINFO_RET_FAIL;
 
-	SET_DBL_RESULT(result, load[mode]);
+	value = load[mode];
 #elif defined(HAVE_KSTAT_H)
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		key = "avenrun_1min";
@@ -153,13 +156,22 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (FAIL == get_kstat_system_misc(key, &value))
+	if (FAIL == get_kstat_system_misc(key, &load))
 		return SYSINFO_RET_FAIL;
 
-	SET_DBL_RESULT(result, (double)value / FSCALE);
+	value = (double)load / FSCALE;
 #else
 	return SYSINFO_RET_FAIL;
 #endif
+	if (1 == per_cpu)
+	{
+		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
+			return SYSINFO_RET_FAIL;
+		value = value / cpu_num;
+	}
+
+	SET_DBL_RESULT(result, value);
+
 	return SYSINFO_RET_OK;
 }
 
