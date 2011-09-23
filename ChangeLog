@@ -9,6 +9,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-3618] extended allowed syntax for host interface dns names (Vedmak)
  - [ZBX-3946] fixed errors when create trigger with dependencies (Vedmak)
  - [ZBX-3921] fixed change link shown for maps in slide show (Vedmak)
  - [ZBX-4082] fixed error in Monitoring->Triggers when acknowledges are disabled (Vedmak)
