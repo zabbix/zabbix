@@ -9,6 +9,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-3400] fixed calculation of graph header font size, Zabbix will decrease it to fit graph width (Alexei)
  - [ZBX-4105] fixed removal of host groups in configuration of dashboard, thanks to Pustovalov Alexey (Alexei)
  - [ZBX-3939] fixed warning messages when looking at the history of several selected log items (Alexei)
  - [ZBX-3493] fixed warnings when removing and clearing a template (Alexei)
