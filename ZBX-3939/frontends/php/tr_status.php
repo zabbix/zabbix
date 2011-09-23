@@ -597,7 +597,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 			$statusSpan,
 			$trigger['value'],
 			$trigger['lastchange'],
-			$trigger['event_count'] == 0
+			$config['event_ack_enable'] ? $trigger['event_count'] == 0 : false
 		);
 
 		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);

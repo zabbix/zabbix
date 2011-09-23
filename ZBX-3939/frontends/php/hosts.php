@@ -565,31 +565,40 @@ include_once('include/page_header.php');
 			}
 
 // FULL CLONE {{{
-			if($clone_hostid && ($_REQUEST['form'] == 'full_clone')){
-				if(!copy_applications($clone_hostid, $hostid)) throw new Exception();
-// Host items
-				if(!copyItems($clone_hostid, $hostid)) throw new Exception();
-// Host triggers
-				if(!copy_triggers($clone_hostid, $hostid)) throw new Exception();
-// Host graphs
+			if ($clone_hostid && ($_REQUEST['form'] == 'full_clone')) {
+				if (!copy_applications($clone_hostid, $hostid)) {
+					throw new Exception();
+				}
+
+				if (!copyItems($clone_hostid, $hostid)) {
+					throw new Exception();
+				}
+
+				if (!copy_triggers($clone_hostid, $hostid)) {
+					throw new Exception();
+				}
+
 				$options = array(
 					'hostids' => $clone_hostid,
 					'selectItems' => API_OUTPUT_EXTEND,
 					'output' => API_OUTPUT_EXTEND,
 					'inherited' => false,
-					'selectHosts' => API_OUTPUT_SHORTEN,
+					'selectHosts' => API_OUTPUT_REFER,
 					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 				);
 				$graphs = API::Graph()->get($options);
 				foreach($graphs as $gnum => $graph){
-					if(count($graph['hosts']) > 1)
+					if (count($graph['hosts']) > 1) {
 						continue;
+					}
 
-					if (httpitemExists($graph['items']))
+					if (httpitemExists($graph['items'])) {
 						continue;
+					}
 
-					if(!copy_graph_to_host($graph['graphid'], $hostid))
+					if(!copy_graph_to_host($graph['graphid'], $hostid)) {
 						throw new Exception();
+					}
 				}
 			}
 // }}} FULL CLONE
@@ -705,7 +714,9 @@ include_once('include/page_header.php');
 		if($_REQUEST['form'] == S_IMPORT)
 			$hosts_wdgt->addItem(import_host_form());
 		else{
-			$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'host'));
+			if ($hostid = get_request('hostid', 0)) {
+				$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
+			}
 
 			$hostForm = new CView('configuration.host.edit');
 			$hosts_wdgt->addItem($hostForm->render());

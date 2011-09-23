@@ -78,8 +78,6 @@ form { margin: 0 }
 .img{ border: 1px black; }
 img.top { vertical-align:text-top; }
 img.bottom { vertical-align:text-bottom; }
-img.borderless { border-width: 0; vertical-align: bottom; }
-
 
 .vert{ width:1px;}
 .rarr{ font-size: 16px; }
@@ -178,7 +176,7 @@ form .thin .input{ height: 14px; }
 div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #FFAA33;}
 div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #DD7711; }
 
-.select{ cursor: pointer; margin: 1px 2px; }
+.select{ cursor: pointer; margin: 1px 2px 1px 1px; }
 .selectShorten{ width: 200px; }
 
 .radio{ margin: 2px 2px; vertical-align: top; }
@@ -187,7 +185,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .listInfo{ width: 100%; display: table; }
 
 /******************* BUTTONS *********************/
-.button{ border: 1px solid #808080; vertical-align: top; margin: 1px 2px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
+.button{ border: 1px solid #808080; vertical-align: top; margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
 .button:hover{ text-decoration: underline; border-color: black; cursor: pointer; }
 
 .link_menu{
@@ -346,6 +344,7 @@ table.formtable {
 	white-space: nowrap;
 }
 table.formtable tr td {
+	border: 0;
 	padding: 0 5px;
 	height: 24px;
 	word-spacing: 0;
