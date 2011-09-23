@@ -880,8 +880,8 @@ class CItem extends CItemGeneral{
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
-	protected function createReal(&$items){
-		foreach($items as $key => $item){
+	protected function createReal(&$items) {
+		foreach ($items as $item) {
 			$itemsExists = API::Item()->get(array(
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array(
@@ -890,21 +890,25 @@ class CItem extends CItemGeneral{
 				),
 				'nopermissions' => 1
 			));
-			foreach($itemsExists as $inum => $itemExists){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Item with key "'.$item['key_'].'" already exists on given host.');
+			if (!empty($itemsExists)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%s" already exists on given host.', $item['key_']));
 			}
 		}
 
 		$itemids = DB::insert('items', $items);
 
 		$itemApplications = array();
-		foreach($items as $key => $item){
+		foreach ($items as $key => $item) {
 			$items[$key]['itemid'] = $itemids[$key];
 
-			if(!isset($item['applications'])) continue;
+			if (!isset($item['applications'])) {
+				continue;
+			}
 
-			foreach($item['applications'] as $anum => $appid){
-				if($appid == 0) continue;
+			foreach ($item['applications'] as $appid) {
+				if ($appid == 0) {
+					continue;
+				}
 
 				$itemApplications[] = array(
 					'applicationid' => $appid,
@@ -913,7 +917,7 @@ class CItem extends CItemGeneral{
 			}
 		}
 
-		if(!empty($itemApplications)){
+		if (!empty($itemApplications)) {
 			DB::insert('items_applications', $itemApplications);
 		}
 
@@ -924,7 +928,7 @@ class CItem extends CItemGeneral{
 			'selectHosts' => array('host'),
 			'nopermissions' => 1
 		));
-		foreach($itemHosts as $item){
+		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
 			info(S_ITEM." [".$host['host'].':'.$item['key_']."] ".S_CREATED_SMALL);
 		}
@@ -1160,7 +1164,9 @@ class CItem extends CItemGeneral{
 	}
 
 	protected function inherit($items, $hostids=null){
-		if(empty($items)) return true;
+		if (empty($items)) {
+			return true;
+		}
 
 		$chdHosts = API::Host()->get(array(
 			'output' => array('hostid', 'host', 'status'),
@@ -1171,14 +1177,16 @@ class CItem extends CItemGeneral{
 			'nopermissions' => true,
 			'templated_hosts' => true
 		));
-		if(empty($chdHosts)) return true;
+		if (empty($chdHosts)) {
+			return true;
+		}
 
 		$insertItems = array();
 		$updateItems = array();
 		$inheritedItems = array();
-		foreach($chdHosts as $hostid => $host){
+		foreach ($chdHosts as $hostid => $host) {
 			$interfaceids = array();
-			foreach($host['interfaces'] as $interface){
+			foreach ($host['interfaces'] as $interface) {
 				if($interface['main'] == 1)
 					$interfaceids[$interface['type']] = $interface['interfaceid'];
 			}
@@ -1187,9 +1195,10 @@ class CItem extends CItemGeneral{
 
 // skip items not from parent templates of current host
 			$parentItems = array();
-			foreach($items as $inum => $item){
-				if(isset($templateids[$item['hostid']]))
+			foreach ($items as $inum => $item) {
+				if (isset($templateids[$item['hostid']])) {
 					$parentItems[$inum] = $item;
+				}
 			}
 //----
 
@@ -1219,7 +1228,7 @@ class CItem extends CItemGeneral{
 					if($exItem['flags'] != ZBX_FLAG_DISCOVERY_NORMAL){
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
-					else if(($exItem['templateid'] > 0) && (bccomp($exItem['templateid'],$item['itemid']) != 0)){
+					else if(($exItem['templateid'] > 0) && (bccomp($exItem['templateid'], $item['itemid']) != 0)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
 					}
 				}
@@ -1252,27 +1261,25 @@ class CItem extends CItemGeneral{
 //--
 				if($exItem){
 					$newItem['itemid'] = $exItem['itemid'];
-					$inheritedItems[] = $newItem;
-
 					$updateItems[] = $newItem;
 				}
 				else{
-					$inheritedItems[] = $newItem;
 					$insertItems[] = $newItem;
 				}
 			}
 		}
 
-		if(!zbx_empty($insertItems)){
+		if (!zbx_empty($insertItems)) {
 			self::validateInventoryLinks($insertItems, false); // false means 'create'
-		$this->createReal($insertItems);
+			$this->createReal($insertItems);
 		}
 
-		if(!zbx_empty($updateItems)){
+		if (!zbx_empty($updateItems)) {
 			self::validateInventoryLinks($updateItems, true); // true means 'update'
-		$this->updateReal($updateItems);
+			$this->updateReal($updateItems);
 		}
 
+		$inheritedItems = array_merge($updateItems, $insertItems);
 		$this->inherit($inheritedItems);
 	}
 
