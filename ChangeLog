@@ -9,6 +9,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4105] fixed removal of host groups in configuration of dashboard, thanks to Pustovalov Alexey (Alexei)
  - [ZBX-3939] fixed warning messages when looking at the history of several selected log items (Alexei)
  - [ZBX-3493] fixed warnings when removing and clearing a template (Alexei)
  - [ZBX-4143] fixed cases with upgrade patch sometimes attempting to reference tables that were not created yet (Richlv, Sasha)
