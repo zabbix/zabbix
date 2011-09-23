@@ -9,6 +9,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-3493] fixed warnings when removing and clearing a template (Alexei)
  - [ZBX-4143] fixed cases with upgrade patch sometimes attempting to reference tables that were not created yet (Richlv, Sasha)
  - [ZBX-3618] extended allowed syntax for host interface dns names (Vedmak)
  - [ZBX-3946] fixed errors when create trigger with dependencies (Vedmak)
