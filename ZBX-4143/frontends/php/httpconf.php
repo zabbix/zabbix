@@ -454,7 +454,7 @@ include_once('include/page_header.php');
 		$cmbAuth = new CComboBox('authentication', $authentication, 'submit();');
 		$cmbAuth->addItems(httptest_authentications());
 
-		$form->addRow(S_AUTHENTICATION, $cmbAuth);
+		$form->addRow(_('Authentication'), $cmbAuth);
 		if(in_array($authentication, array(HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM))){
 			$form->addRow(S_USER, new CTextBox('http_user', $http_user, 32));
 			$form->addRow(S_PASSWORD, new CTextBox('http_password', $http_password, 40));
