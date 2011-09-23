@@ -21,7 +21,7 @@
 <!doctype html>
 <html>
 <head>
-	<title><?php echo $page_title; ?></title>
+	<title>WARNING! You are using an out-of-date browser.</title>
 	<meta name="Author" content="Zabbix SIA" />
 	<meta charset="utf-8" />
 	<link rel="shortcut icon" href="images/general/zabbix.ico" />
