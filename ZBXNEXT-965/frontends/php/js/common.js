@@ -662,14 +662,3 @@ function openPage(start) {
 	location.href = lnk.getUrl();
 	return false;
 }
-
-function ScaleChartToParentElement(obj_name) {
-	var obj = document.getElementsByName(obj_name);
-	if (obj.length <= 0) {
-		throw "Can't find objects with name [" + obj_name +"]";
-	}
-
-	for (var i = obj.length - 1; i >= 0; i--) {
-		obj[i].src += '&width=' + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
-	}
-}
