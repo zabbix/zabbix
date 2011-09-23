@@ -33,11 +33,11 @@
 		<div class="browserwarningForm">
 			<div style="position: relative;">
 				<div style="position: absolute; top: 28px; left: 18px;" class="loginLogo"></div>
-				<div style="position: absolute; top: 42px; left: 215px;" class="browserwarningCaution">CAUTION! You are using the out-of-date browser</div>
+				<div style="position: absolute; top: 42px; left: 215px;" class="browserwarningCaution">WARNING! You are using an out-of-date browser.</div>
 				<div style="position: absolute; top: 90px; left: 50px; width: 510px;">
-					Zabbix frontend is built on the advanced, modern technologies and does not support old browsers.<br/>
-					It is insistently recommended to you to choose and establish any of modern browsers.<br/>
-					It is free of charge and also will take only some minutes.
+					Zabbix frontend is built on the advanced, modern technologies and does not support old browsers.
+					It is highly recommended that you choose and install any of the modern browsers.
+					It is free of charge and only takes a couple of minutes.
 				</div>
 				<div style="position: absolute; top: 180px; left: 55px;" class="browserwarningLogoChrome"></div>
 				<div style="position: absolute; top: 255px; left: 55px; text-align: center;" class="browserwarningLink">Google Chrome<br/><a href="http://www.google.com/chrome" target="_blank">Download page</a></div>
@@ -50,15 +50,15 @@
 				<div style="position: absolute; top: 180px; left: 480px;" class="browserwarningLogoSafari"></div>
 				<div style="position: absolute; top: 255px; left: 480px; text-align: center;" class="browserwarningLink">Apple Safari<br/><a href="http://www.apple.com/safari/download" target="_blank">Download page</a></div>
 				<div style="position: absolute; top: 310px; left: 50px; width: 510px; font-size: 16px; font-weight: bold;">
-					Why it is necessary to change old browser to another?
+					Why is it necessary to change an old browser to a modern one?
 				</div>
 				<div style="position: absolute; top: 335px; left: 50px; width: 510px;">
-					New browsers commonly come with new technologies implementation, increasing page rendering speed, better privacy settings and so on.. Also whey resolve security and functional issues, that is the important reason to keep you browser up to date.
+					New browsers usually come with support for new technologies, increasing page rendering speed, better privacy settings and so on. They also resolve security and functional issues, that is the important reason to keep your browser up to date.
 				</div>
 				<div style="position: absolute; top: 420px; left: 23px;" class="browserwarningCopyright">
 					<a href="http://www.zabbix.com"><?php echo _s('Zabbix %s Copyright 2001-2011 by Zabbix SIA', ZABBIX_VERSION); ?></a>
 				</div>
-				<div style="position: absolute; top: 410px; left: 400px;" class="browserwarningLink"><a href="index.php?browserwarning_ignore=yes">Continue despite this warning</a> ></div>
+				<div style="position: absolute; top: 410px; left: 400px;" class="browserwarningLink"><a href="index.php?browserwarning_ignore=yes">Continue despite this warning</a> &raquo;</div>
 			</div>
 		</div>
 	</div>
