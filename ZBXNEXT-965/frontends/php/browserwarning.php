@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+require_once('include/defines.inc.php');
 require_once('include/classes/class.cview.php');
 
 $browserWarningForm = new CView('general.browserwarning');
