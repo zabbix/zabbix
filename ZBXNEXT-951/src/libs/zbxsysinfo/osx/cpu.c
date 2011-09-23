@@ -57,7 +57,6 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return get_cpustat(result, cpu_num, state, mode);
 }
 
-/* AIX CPU info */
 #ifdef HAVE_KNLIST_H
 static int getloadavg_kmem(double loadavg[], int nelem)
 {
@@ -104,9 +103,10 @@ static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, 
 		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, dyn.psd_avg_1_min);
+
 	return SYSINFO_RET_OK;
 #elif defined(HAVE_PROC_LOADAVG)
-	return	getPROC("/proc/loadavg",1,1, flags, result);
+	return	getPROC("/proc/loadavg", 1, 1, flags, result);
 #elif defined(HAVE_KSTAT_H)
 	static kstat_ctl_t	*kc = NULL;
 	kstat_t			*ks;
@@ -116,12 +116,12 @@ static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, 
 		return SYSINFO_RET_FAIL;
 
 	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) || -1 == kstat_read(kc, ks, 0) ||
-		!(kn = kstat_data_lookup(ks,"avenrun_1min")))
+		!(kn = kstat_data_lookup(ks, "avenrun_1min")))
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0);
+	SET_DBL_RESULT(result, ((double)kn->value.ul) / 256.0);
 
 	return SYSINFO_RET_OK;
 #elif defined(HAVE_KNLIST_H)
@@ -159,7 +159,7 @@ static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, 
 
 	return SYSINFO_RET_OK;
 #elif defined(HAVE_PROC_LOADAVG)
-	return	getPROC("/proc/loadavg",1,2, flags, result);
+	return	getPROC("/proc/loadavg", 1, 2, flags, result);
 #elif defined(HAVE_KSTAT_H)
 	static kstat_ctl_t	*kc = NULL;
 	kstat_t			*ks;
@@ -169,12 +169,12 @@ static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, 
 		return SYSINFO_RET_FAIL;
 
 	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) || -1 == kstat_read(kc, ks, 0) ||
-		!(kn = kstat_data_lookup(ks,"avenrun_5min")))
+		!(kn = kstat_data_lookup(ks, "avenrun_5min")))
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0);
+	SET_DBL_RESULT(result, ((double)kn->value.ul) / 256.0);
 
 	return SYSINFO_RET_OK;
 #elif defined(HAVE_KNLIST_H)
@@ -212,7 +212,7 @@ static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags,
 
 	return SYSINFO_RET_OK;
 #elif defined(HAVE_PROC_LOADAVG)
-	return	getPROC("/proc/loadavg",1,3, flags, result);
+	return	getPROC("/proc/loadavg", 1, 3, flags, result);
 #elif defined(HAVE_KSTAT_H)
 	static kstat_ctl_t	*kc = NULL;
 	kstat_t			*ks;
@@ -222,12 +222,12 @@ static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags,
 		return SYSINFO_RET_FAIL;
 
 	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) || -1 == kstat_read(kc, ks, 0) ||
-		!(kn = kstat_data_lookup(ks,"avenrun_15min")))
+		!(kn = kstat_data_lookup(ks, "avenrun_15min")))
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0);
+	SET_DBL_RESULT(result, ((double)kn->value.ul) / 256.0);
 
 	return SYSINFO_RET_OK;
 #elif defined(HAVE_KNLIST_H)
@@ -248,8 +248,8 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	static MODE_FUNCTION fl[] =
 	{
-		{"avg1" ,	SYSTEM_CPU_LOAD1},
-		{"avg5" ,	SYSTEM_CPU_LOAD5},
+		{"avg1",	SYSTEM_CPU_LOAD1},
+		{"avg5",	SYSTEM_CPU_LOAD5},
 		{"avg15",	SYSTEM_CPU_LOAD15},
 		{NULL,		NULL}
 	};

@@ -91,7 +91,7 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[16];
-	int	cpu_num, mode, state;
+	int	cpu_num, state, mode;
 
 	if (3 < num_param(param))
 		return SYSINFO_RET_FAIL;

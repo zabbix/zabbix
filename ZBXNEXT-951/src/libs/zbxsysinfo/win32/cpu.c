@@ -61,13 +61,13 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			return SYSINFO_RET_FAIL;
 
 	/* only "system" (default) for parameter "type" is supported */
-	if (0 == get_param(param, 2, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "system"))
+	if (0 == get_param(param, 2, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "system", sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
 
 	if (PERF_COUNTER_ACTIVE != collector->cpus.cpu_counter[cpu_num]->status)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp) || '\0' == *tmp || 0 == strcmp(tmp, "avg1")))
+	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		value = compute_average_value(collector->cpus.cpu_counter[cpu_num], 1 * SEC_PER_MIN);
 	else if (0 == strcmp(tmp, "avg5"))
 		value = compute_average_value(collector->cpus.cpu_counter[cpu_num], 5 * SEC_PER_MIN);
@@ -102,7 +102,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (PERF_COUNTER_ACTIVE != collector->cpus.queue_counter->status)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp) || '\0' == *tmp || 0 == strcmp(tmp, "avg1")))
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		value = compute_average_value(collector->cpus.queue_counter, 1 * SEC_PER_MIN);
 	else if (0 == strcmp(tmp, "avg5"))
 		value = compute_average_value(collector->cpus.queue_counter, 5 * SEC_PER_MIN);

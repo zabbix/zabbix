@@ -53,7 +53,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		return SYSINFO_RET_FAIL;
 
 	/* only "online" (default) for parameter "type" is supported */
-	if (0 == get_param(param, 1, type, sizeof(type)) && '\0' != *type && 0 != strcmp(type, "online"))
+	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "online", sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
 
 	len = sizeof(ncpu);
@@ -147,7 +147,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	/* FreeBSD 4.2 i386; FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+#ifdef HAVE_GETLOADAVG	/* FreeBSD 4.2 i386; FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
 	char	tmp[16];
 	int	mode;
 	double	load[ZBX_AVG_COUNT];
@@ -168,14 +168,13 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-#ifdef HAVE_GETLOADAVG
 	if (mode >= getloadavg(load, 3))
 		return SYSINFO_RET_FAIL;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
 
 	SET_DBL_RESULT(result, load[mode]);
 
 	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
 }

@@ -41,7 +41,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	return SYSINFO_RET_OK;
 #else
- 	return SYSINFO_RET_FAIL;
+	return SYSINFO_RET_FAIL;
 #endif
 }
 
@@ -145,8 +145,8 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	static MODE_FUNCTION fl[] =
 	{
-		{"avg1" ,	SYSTEM_CPU_LOAD1},
-		{"avg5" ,	SYSTEM_CPU_LOAD5},
+		{"avg1",	SYSTEM_CPU_LOAD1},
+		{"avg5",	SYSTEM_CPU_LOAD5},
 		{"avg15",	SYSTEM_CPU_LOAD15},
 		{NULL,		NULL}
 	};

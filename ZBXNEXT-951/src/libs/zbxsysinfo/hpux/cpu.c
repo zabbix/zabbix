@@ -34,7 +34,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "online", sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
 
-	if ( -1 == pstat_getdynamic(&psd, sizeof(psd), 1, 0) )
+	if (-1 == pstat_getdynamic(&psd, sizeof(psd), 1, 0))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, psd.psd_proc_cnt);
@@ -130,8 +130,8 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		{NULL,		NULL}
 	};
 
-	char tmp[16];
-	int i;
+	char	tmp[16];
+	int	i;
 
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
