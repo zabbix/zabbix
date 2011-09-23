@@ -27,7 +27,7 @@ require_once('include/forms.inc.php');
 $page['title'] = 'S_CONFIGURATION_OF_DISCOVERY';
 $page['file'] = 'host_discovery.php';
 $page['scripts'] = array('class.cviewswitcher.js');
-$page['hist_arg'] = array();
+$page['hist_arg'] = array('hostid');
 
 include_once('include/page_header.php');
 ?>
