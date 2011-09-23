@@ -241,22 +241,32 @@ class CGraphDraw{
 	return $str;
 	}
 
-	public function drawHeader(){
-		if(!isset($this->header)){
-			$str=$this->items[0]['hostname'].': '.$this->items[0]['name'];
+	public function drawHeader() {
+		if (!isset($this->header)) {
+			$str = $this->items[0]['hostname'].': '.$this->items[0]['name'];
 		}
-		else{
-			$str=$this->header;
+		else {
+			$str = $this->header;
 		}
 
-		$str.=$this->period2str($this->period);
+		$str .= $this->period2str($this->period);
 
-		$fontnum = 11;
-		if(($this->sizeX < 500) && ($this->type == GRAPH_TYPE_NORMAL || $this->type == GRAPH_TYPE_BAR)) $fontnum = 8;
-		$dims = imageTextSize( $fontnum, 0, $str );
-		$x = $this->fullSizeX/2-($dims['width']/2);
+		// Calculate largest font size that can fit graph header
+		// TODO: font size must be dynamic in other parts of the graph as well, like legend, timeline, etc
+		for ($fontsize = 11; $fontsize > 7; $fontsize--) {
+			$dims = imageTextSize($fontsize, 0, $str);
+			$x = $this->fullSizeX / 2 - ($dims['width'] / 2);
 
-		imagetext($this->im, $fontnum, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
+			// Most important information must be displayed, period can be out of the graph
+			if ($x < 2) {
+				$x = 2;
+			}
+			if ($dims['width'] <= $this->fullSizeX) {
+				break;
+			}
+		}
+
+		imageText($this->im, $fontsize, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
 	}
 
 	public function setHeader($header){
