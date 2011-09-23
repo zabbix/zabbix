@@ -185,7 +185,6 @@
 	'S_PREVIEW'=>				_('Preview'),
 	'S_BACK_BIG'=>				_('BACK'),
 	'S_NO_DATA_SMALL'=>			_('no data'),
-	'S_NO_DATA_BIG'=>			_('NO DATA'),
 	'S_RULES'=>				_('Rules'),
 	'S_EXISTING'=>				_('Existing'),
 	'S_MISSING'=>				_('Missing'),
@@ -605,14 +604,12 @@
 //	hosts.php
 	'S_HOST_INTERFACE' =>			_('Host interface'),
 	'S_IPMI'=>			_('IPMI'),
-	'S_NEW_HOST' =>					_('New host'),
 	'S_MACROS'=>					_('Macros'),
 	'S_MACRO'=>					_('Macro'),
 	'S_WRONG_MACRO'=>				_('Wrong macro'),
 	'S_MACRO_TOO_LONG'=>				_('Macro name is too long, should not exceed 64 chars.'),
 	'S_MACRO_VALUE_TOO_LONG'=>			_('Macro value is too long, should not exceed 255 chars.'),
 	'S_EMPTY_MACRO_VALUE'=>				_('Empty macro value'),
-	'S_HOST_LIST'=>					_('Hosts list'),
 	'S_IN'=>					_('In'),
 	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
@@ -694,7 +691,6 @@
 	'S_JMX' =>						_('JMX'),
 
 // templates.php
-	'S_TEMPLATE_LIST'=>			_('Templates list'),
 	'S_TEMPLATE_ADDED'=>			_('New template added'),
 	'S_CANNOT_ADD_TEMPLATE'=>		_('Cannot add template'),
 	'S_TEMPLATE_UPDATED'=>			_('Template updated'),
@@ -1428,7 +1424,6 @@
 	'S_READ_WRITE'=>				_('Read-write'),
 	'S_DENY'=>					_('Deny'),
 	'S_HIDE'=>					_('Hide'),
-	'S_CHANGE_PASSWORD'=>				_('Change password'),
 	'S_PASSWORD_ONCE_AGAIN'=>			_('Password (once again)'),
 	'S_PASSWORD'=>			_('Password'),
 	'S_URL_AFTER_LOGIN'=>				_('URL (after login)'),
@@ -1714,7 +1709,6 @@
 	'S_NO_GRAPH_WITH'=>					_('No graph item with'),
 	'S_MISSING_ITEMS_FOR_GRAPH'=>				_('Missing items for graph'),
 	'S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL'=>_('with template host cannot contain items from other hosts.'),
-	'S_SKIPPED_COPYING_OF_GRAPH'=>				_('Skipped copying of graph'),
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	_('Unable to select configuration'),
