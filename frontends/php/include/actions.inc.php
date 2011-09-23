@@ -186,7 +186,7 @@ function condition_value2str($conditiontype, $value){
 			return _('Unknown');
 			break;
 	}
-	return '"'.$str_val.'"';
+	return '"'.htmlentities($str_val, ENT_NOQUOTES, 'UTF-8').'"';
 }
 
 function get_condition_desc($conditiontype, $operator, $value){
