@@ -105,7 +105,7 @@ switch ($page['type']) {
 		}
 		$page_title = defined($page['title']) ? constant($page['title']) : $page['title'];
 		if (ZBX_DISTRIBUTED) {
-			if (isset($ZBX_VIEWED_NODES) && ($ZBX_VIEWED_NODES['selected'] == 0)) { // aLL selected
+			if (isset($ZBX_VIEWED_NODES) && ($ZBX_VIEWED_NODES['selected'] == 0)) { // all selected
 				$page_title .= ' ('.S_ALL_NODES.') ';
 			}
 			elseif (!empty($ZBX_NODES)) {
@@ -131,7 +131,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 <html>
 	<head>
 		<title><?php echo $page_title; ?></title>
-		<meta name="Author" content="ZABBIX SIA" />
+		<meta name="Author" content="Zabbix SIA" />
 		<meta charset="utf-8" />
 		<link rel="shortcut icon" href="images/general/zabbix.ico" />
 		<link rel="stylesheet" type="text/css" href="css.css" />
@@ -196,7 +196,7 @@ if (empty($browserwarning_ignore)) {
 	}
 ?>
 </head>
-<body class="<?php print($bodyCSS); ?>" >
+<body class="<?php echo $bodyCSS; ?>" >
 <?php
 }
 
@@ -236,7 +236,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 	$page_header_r_col = array($help, '|', $support, '|', $printview);
 
-	if (CWebUser::$data['alias']!=ZBX_GUEST_USER) {
+	if (CWebUser::$data['alias'] != ZBX_GUEST_USER) {
 		$page_header_r_col[] = array('|');
 		array_push($page_header_r_col, new CLink(_('Profile'), 'profile.php', 'small_font', null, 'nosid'), '|');
 
@@ -280,7 +280,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		insert_js_function('check_all');
 
 		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
-		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); //remove parent nodes
+		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); // remove parent nodes
 
 		if (!empty($available_nodes)) {
 
@@ -310,7 +310,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			$combo_check_all = new CCheckbox('check_all_nodes', null, "javascript : check_all('node_form', this.checked);");
 
 			$node_tree = array();
-			$node_tree[0] = array('id' => 0, 'caption' => _('All'), 'combo_select_node' => $combo_check_all, 'parentid' => 0); //root
+			$node_tree[0] = array('id' => 0, 'caption' => _('All'), 'combo_select_node' => $combo_check_all, 'parentid' => 0); // root
 
 			foreach ($available_nodes as $num => $node) {
 				$checked = isset($ZBX_VIEWED_NODES['nodeids'][$node['nodeid']]);

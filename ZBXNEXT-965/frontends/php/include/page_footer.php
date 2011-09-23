@@ -30,7 +30,7 @@ if (!isset($ZBX_PAGE_POST_JS)) {
 }
 
 if (!defined('PAGE_HEADER_LOADED')) {
-	define ('PAGE_HEADER_LOADED', 1);
+	define('PAGE_HEADER_LOADED', 1);
 }
 
 // history
@@ -45,9 +45,9 @@ if (!defined('ZBX_PAGE_NO_MENU') && $page['file'] != 'profile.php') {
 
 CProfile::flush();
 
-// end transactions if havn't been
+// end transactions if they have not been closed already
 if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
-	error(_('Transaction has not been closed. Aborting..'));
+	error(_('Transaction has not been closed. Aborting...'));
 	DBend(false);
 }
 
@@ -65,28 +65,28 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	$post_script .= 'var page_refresh = null;'."\n";
 
 	if (isset($JS_TRANSLATE)) {
-		$post_script .='var newLocale = '.zbx_jsvalue($JS_TRANSLATE)."\n";
-		$post_script .='var locale = (typeof(locale) == "undefined" ? {} : locale);'."\n";
-		$post_script .='for(key in newLocale){locale[key] = newLocale[key];}'."\n";
+		$post_script .= 'var newLocale = '.zbx_jsvalue($JS_TRANSLATE)."\n";
+		$post_script .= 'var locale = (typeof(locale) == "undefined" ? {} : locale);'."\n";
+		$post_script .= 'for(key in newLocale){locale[key] = newLocale[key];}'."\n";
 	}
 	$post_script .= 'jQuery(document).ready(function(){'."\n";
 
 	if (isset($ZBX_PAGE_POST_JS)) {
 		foreach ($ZBX_PAGE_POST_JS as $num => $script) {
-			$post_script .=$script."\n";
+			$post_script .= $script."\n";
 		}
 	}
 
 	if (defined('ZBX_PAGE_DO_REFRESH') && CWebUser::$data['refresh']) {
-		$post_script.= 'PageRefresh.init('.(CWebUser::$data['refresh'] * 1000).');'."\n";
+		$post_script .= 'PageRefresh.init('.(CWebUser::$data['refresh'] * 1000).');'."\n";
 	}
 
-	$post_script.= 'cookie.init();'."\n";
-	$post_script.= 'chkbxRange.init();'."\n";
-	$post_script.= 'var screenCSS = null;'."\n";
-	$post_script.= 'if(jQuery(window).width()<1024) screenCSS = "handheld.css";'."\n";
-	$post_script.= 'if(!is_null(screenCSS)) jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\'+screenCSS+\'" />\');';
-	$post_script.='});'."\n";
+	$post_script .= 'cookie.init();'."\n";
+	$post_script .= 'chkbxRange.init();'."\n";
+	$post_script .= 'var screenCSS = null;'."\n";
+	$post_script .= 'if(jQuery(window).width()<1024) screenCSS = "handheld.css";'."\n";
+	$post_script .= 'if(!is_null(screenCSS)) jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\'+screenCSS+\'" />\');';
+	$post_script .= '});'."\n";
 
 	if (!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')) {
 		$table = new CTable(null, 'textwhite bold maxwidth ui-widget-header ui-corner-all page_footer');

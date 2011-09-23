@@ -118,12 +118,13 @@ function SDJ(obj, name) {
 		if (typeof(obj[key]) == name) {
 			continue;
 		}
-		debug+=key+': '+obj[key]+' ('+typeof(obj[key])+')'+'\n';
+		debug += key + ': ' + obj[key] + ' (' + typeof(obj[key]) + ')' + '\n';
 	}
 	SDI(debug);
 }
 
-// Alpha-Betic sorting
+// functions below should be sorted alphabetically
+
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
 
@@ -150,7 +151,7 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document) {
 
 	if (s_formname) {
 		if (!(form = o_document.forms[s_formname])) {
-			throw "Missing form with name '"+s_formname+"'.";
+			throw "Missing form with name '" + s_formname + "'.";
 		}
 	}
 	else if (o_el) {
@@ -322,18 +323,18 @@ function getDimensions(obj, trueSide) {
 
 	if (!is_null(obj) && typeof(obj.offsetParent) != 'undefined') {
 		var dim = {
-			'left':		parseInt(obj.style.left,10),
-			'top':		parseInt(obj.style.top,10),
-			'right':	parseInt(obj.style.right,10),
-			'bottom':	parseInt(obj.style.bottom,10),
-			'width':	parseInt(obj.style.width,10),
-			'height':	parseInt(obj.style.height,10)
+			'left':		parseInt(obj.style.left, 10),
+			'top':		parseInt(obj.style.top, 10),
+			'right':	parseInt(obj.style.right, 10),
+			'bottom':	parseInt(obj.style.bottom, 10),
+			'width':	parseInt(obj.style.width, 10),
+			'height':	parseInt(obj.style.height, 10)
 		};
 
-		if (!is_number(dim.top)) dim.top = parseInt(obj.offsetTop,10);
-		if (!is_number(dim.left)) dim.left = parseInt(obj.offsetLeft,10);
-		if (!is_number(dim.width)) dim.width = parseInt(obj.offsetWidth,10);
-		if (!is_number(dim.height)) dim.height = parseInt(obj.offsetHeight,10);
+		if (!is_number(dim.top)) dim.top = parseInt(obj.offsetTop, 10);
+		if (!is_number(dim.left)) dim.left = parseInt(obj.offsetLeft, 10);
+		if (!is_number(dim.width)) dim.width = parseInt(obj.offsetWidth, 10);
+		if (!is_number(dim.height)) dim.height = parseInt(obj.offsetHeight, 10);
 
 		if (!trueSide) {
 			dim.right = dim.left + dim.width;
@@ -427,7 +428,7 @@ function get_cursor_position(e) {
 function get_scroll_pos() {
 	var scrOfX = 0, scrOfY = 0;
 	// netscape compliant
-	if (typeof( window.pageYOffset ) == 'number' ) {
+	if (typeof(window.pageYOffset) == 'number') {
 		scrOfY = window.pageYOffset;
 		scrOfX = window.pageXOffset;
 	}
@@ -452,7 +453,7 @@ function insertInElement(element_name, text, tagName) {
 		var elems = document.getElementsByName(element_name);
 	}
 
-	for (var key=0; key < elems.length; key++) {
+	for (var key = 0; key < elems.length; key++) {
 		if (typeof(elems[key]) != 'undefined' && !is_null(elems[key])) {
 			$(elems[key]).update(text);
 		}
@@ -469,7 +470,7 @@ function openWinCentered(loc, winname, iwidth, iheight, params) {
 		params = ', ' + params;
 	}
 
-	var WinObjReferer = window.open(loc, winname, 'width='+iwidth+',height='+iheight+',top='+tp+',left='+lf+params);
+	var WinObjReferer = window.open(loc, winname, 'width=' + iwidth + ',height=' + iheight + ',top=' + tp + ',left=' + lf + params);
 	WinObjReferer.focus();
 }
 
@@ -484,9 +485,9 @@ function PopUp(url, width, height, form_name) {
 		form_name = 'zbx_popup';
 	}
 	var left = (screen.width - (width + 150)) / 2;
-	var top = (screen.height - (height + 150)) /2;
+	var top = (screen.height - (height + 150)) / 2;
 
-	var popup = window.open(url, form_name, 'width=' + width +',height=' + height + ',top='+ top +',left='+ left + ',resizable=yes,scrollbars=yes,location=no,menubar=no');
+	var popup = window.open(url, form_name, 'width=' + width + ',height=' + height + ',top=' + top + ',left=' + left + ',resizable=yes,scrollbars=yes,location=no,menubar=no');
 	popup.focus();
 	return false;
 }
@@ -662,13 +663,13 @@ function openPage(start) {
 	return false;
 }
 
-function ScaleChartToParenElement(obj_name) {
+function ScaleChartToParentElement(obj_name) {
 	var obj = document.getElementsByName(obj_name);
 	if (obj.length <= 0) {
 		throw "Can't find objects with name [" + obj_name +"]";
 	}
 
-	for (var i = obj.length-1; i >= 0; i--) {
+	for (var i = obj.length - 1; i >= 0; i--) {
 		obj[i].src += '&width=' + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
 	}
 }

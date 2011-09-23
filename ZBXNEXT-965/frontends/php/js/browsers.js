@@ -33,6 +33,7 @@ var MC = (agt.indexOf('mac') != -1);
 function checkBrowser() {
 	if (OP) alert('Opera');
 	if (IE) alert('IE');
+	if (IE6) alert('IE6');
 	if (IE7) alert('IE7');
 	if (IE8) alert('IE8');
 	if (IE9) alert('IE9');
@@ -41,6 +42,6 @@ function checkBrowser() {
 	if (WK) alert('Apple Webkit');
 	if (KQ) alert('Konqueror');
 	if (MC) alert('Mac');
-	if (GK) alert('FireFox');
+	if (GK) alert('Firefox');
 	return 0;
 }
