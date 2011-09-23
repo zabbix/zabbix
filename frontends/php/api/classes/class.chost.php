@@ -1977,13 +1977,13 @@ Copt::memoryPick();
 					// gathering links to array: 'hostid'=>array('inventory_name_1'=>true, 'inventory_name_2'=>true)
 					$inventoryLinksOnHosts = array();
 					$inventoryFields = getHostInventories();
-					foreach ($itemsToInventories as $pr) {
-						if ($pr['inventory_link'] != 0) { // 0 means 'no link'
-							if (isset($inventoryLinksOnHosts[$pr['hostid']])) {
-								$inventoryLinksOnHosts[$pr['hostid']][$inventoryFields[$pr['inventory_link']]['db_field']] = true;
+					foreach ($itemsToInventories as $hinv) {
+						if ($hinv['inventory_link'] != 0) { // 0 means 'no link'
+							if (isset($inventoryLinksOnHosts[$hinv['hostid']])) {
+								$inventoryLinksOnHosts[$hinv['hostid']][$inventoryFields[$hinv['inventory_link']]['db_field']] = true;
 							}
 							else {
-								$inventoryLinksOnHosts[$pr['hostid']] = array($inventoryFields[$pr['inventory_link']]['db_field']=>true);
+								$inventoryLinksOnHosts[$hinv['hostid']] = array($inventoryFields[$hinv['inventory_link']]['db_field'] => true);
 							}
 						}
 					}
@@ -1993,7 +1993,7 @@ Copt::memoryPick();
 					foreach ($hostids as $hostid) {
 						$inventoriesToSave[$hostid] = $updateInventory;
 						$inventoriesToSave[$hostid]['hostid'] = $hostid;
-						foreach ($updateInventory as $inventoryName=>$pr) {
+						foreach ($updateInventory as $inventoryName => $hinv) {
 							if (isset($inventoryLinksOnHosts[$hostid][$inventoryName])) {
 								unset($inventoriesToSave[$hostid][$inventoryName]);
 							}
