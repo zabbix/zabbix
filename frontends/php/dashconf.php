@@ -174,7 +174,7 @@ include_once('include/page_header.php');
 
 	$dashList->addRow(S_HOST_GROUPS, $cmbGroups);
 
-	if($grpswitch == 1){
+	if ($grpswitch == 1) {
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
 			'groupids' => $groupids,
@@ -185,20 +185,22 @@ include_once('include/page_header.php');
 
 		$lstGroups = new CListBox('del_groups[]', null, 15);
 		$lstGroups->setAttribute('style', 'width: 200px;');
-		foreach($groups as $gnum => $group){
-			$lstGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], true, ':') . $group['name']);
+		foreach ($groups as $gnum => $group) {
+			$lstGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], true, ':').$group['name']);
 		}
 
-		if(!$filterEnable) $lstGroups->setAttribute('disabled', 'disabled');
+		if (!$filterEnable) {
+			$lstGroups->setAttribute('disabled', 'disabled');
+		}
 
-		$addButton = new CButton('add', S_ADD, "return PopUp('popup_right.php?dstfrm=" . $dashForm->getName() . "&permission=" . PERM_READ_WRITE . "',450,450);");
+		$addButton = new CButton('add', _('Add'), "return PopUp('popup_right.php?dstfrm=".$dashForm->getName()."&permission=".PERM_READ_WRITE."',450,450);");
 		$addButton->setEnabled($filterEnable);
 
-		$delButton = new CButton('delete', S_DELETE_SELECTED);
+		$delButton = new CSubmit('delete', _('Delete selected'));
 		$delButton->setEnabled($filterEnable);
 
 		$dashList->addRow(
-			S_GROUPS,
+			_('Groups'),
 			array($lstGroups, BR(), $addButton, $delButton)
 		);
 	}
