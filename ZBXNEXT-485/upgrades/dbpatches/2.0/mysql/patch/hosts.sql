@@ -121,31 +121,55 @@ UPDATE items
 
 -- convert simple check keys to a new form
 
-UPDATE items
-	SET key_ = CONCAT('net.tcp.service[', key_, ']')
-	WHERE type IN (3)	-- SIMPLE
-		AND key_ IN ('ftp','http','imap','ldap','nntp','ntp','pop','smtp','ssh');
+DELIMITER $
+CREATE FUNCTION zbx_convert_simple_checks(v_itemid bigint unsigned, v_hostid bigint unsigned, v_key varchar(255))
+RETURNS varchar(255)
+LANGUAGE SQL
+BEGIN
+	DECLARE new_key varchar(255);
+	DECLARE pos integer;
 
-UPDATE items
-	SET key_ = CONCAT('net.tcp.service[', SUBSTR(key_, 1, INSTR(key_, ',') - 1), ',', SUBSTR(key_, INSTR(key_, ',')), ']')
+	SET new_key = 'net.tcp.service';
+	SET pos = INSTR(v_key, '_perf');
+	IF 0 <> pos THEN
+		SET new_key = CONCAT(new_key, '.perf');
+		SET v_key = CONCAT(SUBSTR(v_key, 1, pos - 1), SUBSTR(v_key, pos + 5));
+	END IF;
+	SET new_key = CONCAT(new_key, '[');
+	SET pos = INSTR(v_key, ',');
+	IF 0 <> pos THEN
+		SET new_key = CONCAT(new_key, SUBSTR(v_key, 1, pos - 1));
+		SET v_key = SUBSTR(v_key, pos);
+	ELSE
+		SET new_key = CONCAT(new_key, v_key);
+		SET v_key = '';
+	END IF;
+	IF 0 <> LENGTH(v_key) THEN
+		SET new_key = CONCAT(new_key, ',', v_key);
+	END IF;
+
+	WHILE 0 != (SELECT COUNT(*) FROM items WHERE hostid = v_hostid AND key_ = CONCAT(new_key, ']')) DO
+		SET new_key = CONCAT(new_key, ' ');
+	END WHILE;
+
+	RETURN CONCAT(new_key, ']');
+END$
+DELIMITER ;
+
+UPDATE items SET key_ = zbx_convert_simple_checks(itemid, hostid, key_)
 	WHERE type IN (3)	-- SIMPLE
-		AND (key_ LIKE 'ftp,%' OR key_ LIKE 'http,%' OR key_ LIKE 'imap,%' OR key_ LIKE 'ldap,%'
+		AND (key_ IN ('ftp','http','imap','ldap','nntp','ntp','pop','smtp','ssh',
+			'ftp_perf','http_perf', 'imap_perf','ldap_perf','nntp_perf','ntp_perf','pop_perf',
+			'smtp_perf','ssh_perf')
+			OR key_ LIKE 'ftp,%' OR key_ LIKE 'http,%' OR key_ LIKE 'imap,%' OR key_ LIKE 'ldap,%'
 			OR key_ LIKE 'nntp,%' OR key_ LIKE 'ntp,%' OR key_ LIKE 'pop,%' OR key_ LIKE 'smtp,%'
-			OR key_ LIKE 'ssh,%' OR key_ LIKE 'tcp,%');
-
-UPDATE items
-	SET key_ = CONCAT('net.tcp.service.perf[', SUBSTR(key_, 1, INSTR(key_, '_') - 1), ']')
-	WHERE type IN (3)	-- SIMPLE
-		AND key_ IN ('ftp_perf','http_perf','imap_perf','ldap_perf','nntp_perf',
-			'ntp_perf','pop_perf','smtp_perf','ssh_perf');
-
-UPDATE items
-	SET key_ = CONCAT('net.tcp.service.perf[', SUBSTR(key_, 1, INSTR(key_, ',') - 1), ',', SUBSTR(key_, INSTR(key_, ',')), ']')
-	WHERE type IN (3)	-- SIMPLE
-		AND (key_ LIKE 'ftp_perf,%' OR key_ LIKE 'http_perf,%' OR key_ LIKE 'imap_perf,%'
+			OR key_ LIKE 'ssh,%' OR key_ LIKE 'tcp,%'
+			OR key_ LIKE 'ftp_perf,%' OR key_ LIKE 'http_perf,%' OR key_ LIKE 'imap_perf,%'
 			OR key_ LIKE 'ldap_perf,%' OR key_ LIKE 'nntp_perf,%' OR key_ LIKE 'ntp_perf,%'
 			OR key_ LIKE 'pop_perf,%' OR key_ LIKE 'smtp_perf,%' OR key_ LIKE 'ssh_perf,%'
 			OR key_ LIKE 'tcp_perf,%');
+
+DROP FUNCTION zbx_convert_simple_checks;
 
 ---- Patching table `hosts`
 
