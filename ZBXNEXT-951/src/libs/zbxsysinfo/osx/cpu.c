@@ -90,7 +90,7 @@ static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, 
 #if defined(HAVE_GETLOADAVG)
 	double	load[3];
 
-	if (-1 == getloadavg(load, 3))
+	if (0 >= getloadavg(load, 3))
 		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, load[0]);
@@ -143,7 +143,7 @@ static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, 
 #if defined(HAVE_GETLOADAVG)
 	double	load[3];
 
-	if (-1 == getloadavg(load, 3))
+	if (1 >= getloadavg(load, 3))
 		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, load[1]);
@@ -196,7 +196,7 @@ static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags,
 #if defined(HAVE_GETLOADAVG)
 	double	load[3];
 
-	if (-1 == getloadavg(load, 3))
+	if (2 >= getloadavg(load, 3))
 		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, load[2]);

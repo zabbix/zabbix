@@ -124,75 +124,12 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return get_cpustat(result, cpu_num, state, mode);
 }
 
-static int	get_cpuload(double *load1, double *load5, double *load15)
-{
-#ifdef HAVE_GETLOADAVG	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
-	double	load[3];
-
-	if (-1 == getloadavg(load, 3))
-		return SYSINFO_RET_FAIL;
-
-	if (NULL != load1)
-		*load1 = load[0];
-	if (NULL != load5)
-		*load5 = load[1];
-	if (NULL != load15)
-		*load15 = load[2];
-
-	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	SYSTEM_CPU_LOAD1(AGENT_RESULT *result)
-{
-	double	value;
-
-	if (SYSINFO_RET_OK != get_cpuload(&value, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	SYSTEM_CPU_LOAD5(AGENT_RESULT *result)
-{
-	double	value;
-
-	if (SYSINFO_RET_OK != get_cpuload(NULL, &value, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	SYSTEM_CPU_LOAD15(AGENT_RESULT *result)
-{
-	double	value;
-
-	if (SYSINFO_RET_OK != get_cpuload(NULL, NULL, &value))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	static MODE_FUNCTION fl[] =
-	{
-		{"avg1",	SYSTEM_CPU_LOAD1},
-		{"avg5",	SYSTEM_CPU_LOAD5},
-		{"avg15",	SYSTEM_CPU_LOAD15},
-		{NULL,		NULL}
-	};
-
+#ifdef HAVE_GETLOADAVG	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
 	char	tmp[16];
-	int	i;
+	int	mode;
+	double	load[ZBX_AVG_COUNT];
 
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -201,14 +138,22 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp)
-		zbx_snprintf(tmp, sizeof(tmp), "avg1");
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+		mode = ZBX_AVG1;
+	else if (0 == strcmp(tmp, "avg5"))
+		mode = ZBX_AVG5;
+	else if (0 == strcmp(tmp, "avg15"))
+		mode = ZBX_AVG15;
+	else
+		return SYSINFO_RET_FAIL;
 
-	for (i = 0; NULL != fl[i].mode; i++)
-	{
-		if (0 == strncmp(tmp, fl[i].mode, sizeof(tmp)))
-			return (fl[i].function)(result);
-	}
+	if (mode >= getloadavg(load, 3))
+		return SYSINFO_RET_FAIL;
 
+	SET_DBL_RESULT(result, load[mode]);
+
+	return SYSINFO_RET_OK;
+#else
 	return SYSINFO_RET_FAIL;
+#endif
 }

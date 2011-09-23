@@ -82,39 +82,32 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 }
 
 #ifdef HAVE_KSTAT_H
-static int	get_kstat_system_misc(char *s, int *value)
+static int	get_kstat_system_misc(char *key, int *value)
 {
 	kstat_ctl_t	*kc;
-	kstat_t		*kp;
+	kstat_t		*ksp;
 	kstat_named_t	*kn = NULL;
-	int		n, i;
+	int		ret = FAIL;
 
 	if (NULL == (kc = kstat_open()))
-		return FAIL;
+		return ret;
 
-	if (NULL == (kp = kstat_lookup(kc, "unix", 0, "system_misc")))
-	{
-		kstat_close(kc);
-		return FAIL;
-	}
+	if (NULL == (ksp = kstat_lookup(kc, "unix", 0, "system_misc")))
+		goto close;
 
-	if (-1 == kstat_read(kc, kp, NULL))
-	{
-		kstat_close(kc);
-		return FAIL;
-	}
+	if (-1 == kstat_read(kc, ksp, NULL))
+		goto close;
 
-	if (NULL == (kn = (kstat_named_t*)kstat_data_lookup(kp, s)))
-	{
-		kstat_close(kc);
-		return FAIL;
-	}
-
-	kstat_close(kc);
+	if (NULL == (kn = (kstat_named_t*)kstat_data_lookup(ksp, key)))
+		goto close;
 
 	*value = kn->value.ul;
 
-	return SUCCEED;
+	ret =  SUCCEED;
+close:
+	kstat_close(kc);
+
+	return ret;
 }
 #endif
 
@@ -122,7 +115,8 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	tmp[16];
 #if defined(HAVE_GETLOADAVG)
-	double	load[3];
+	int	mode;
+	double	load[ZBX_AVG_COUNT];
 #elif defined(HAVE_KSTAT_H)
 	char	*key;
 	int	value;
@@ -136,17 +130,19 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 #if defined(HAVE_GETLOADAVG)
-	if (-1 == getloadavg(load, 3))
-		return SYSINFO_RET_FAIL;
-
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
-		SET_DBL_RESULT(result, load[0]);
+		mode = ZBX_AVG1;
 	else if (0 == strcmp(tmp, "avg5"))
-		SET_DBL_RESULT(result, load[1]);
+		mode = ZBX_AVG5;
 	else if (0 == strcmp(tmp, "avg15"))
-		SET_DBL_RESULT(result, load[2]);
+		mode = ZBX_AVG15;
 	else
 		return SYSINFO_RET_FAIL;
+
+	if (mode >= getloadavg(load, 3))
+		return SYSINFO_RET_FAIL;
+
+	SET_DBL_RESULT(result, load[mode]);
 #elif defined(HAVE_KSTAT_H)
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		key = "avenrun_1min";

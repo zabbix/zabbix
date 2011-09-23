@@ -81,57 +81,11 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return get_cpustat(result, cpu_num, state, mode);
 }
 
-static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	struct pst_dynamic	dyn;
-
-	if (-1 != pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
-	{
-		SET_DBL_RESULT(result, dyn.psd_avg_1_min);
-		return SYSINFO_RET_OK;
-	}
-
-	return SYSINFO_RET_FAIL;
-}
-
-static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	struct pst_dynamic	dyn;
-
-	if (-1 != pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
-	{
-		SET_DBL_RESULT(result, dyn.psd_avg_5_min);
-		return SYSINFO_RET_OK;
-	}
-
-	return SYSINFO_RET_FAIL;
-}
-
-static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	struct pst_dynamic	dyn;
-
-	if (-1 != pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
-	{
-		SET_DBL_RESULT(result, dyn.psd_avg_15_min);
-		return SYSINFO_RET_OK;
-	}
-
-	return SYSINFO_RET_FAIL;
-}
-
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	static MODE_FUNCTION fl[] =
-	{
-		{"avg1" ,	SYSTEM_CPU_LOAD1},
-		{"avg5" ,	SYSTEM_CPU_LOAD5},
-		{"avg15",	SYSTEM_CPU_LOAD15},
-		{NULL,		NULL}
-	};
-
-	char	tmp[16];
-	int	i;
+	char			tmp[16];
+	struct pst_dynamic	dyn;
+	double			value;
 
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -140,14 +94,19 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp)
-		zbx_snprintf(tmp, sizeof(tmp), "avg1");
+	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
+		return SYSINFO_RET_FAIL;
 
-	for (i = 0; NULL != fl[i].mode; i++)
-	{
-		if (0 == strncmp(tmp, fl[i].mode, sizeof(tmp)))
-			return (fl[i].function)(cmd, param, flags, result);
-	}
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+		value = dyn.psd_avg_1_min;
+	else if (0 == strcmp(tmp, "avg5"))
+		value = dyn.psd_avg_5_min;
+	else if (0 == strcmp(tmp, "avg15"))
+		value = dyn.psd_avg_15_min;
+	else
+		return SYSINFO_RET_FAIL;
 
-	return SYSINFO_RET_FAIL;
+	SET_DBL_RESULT(result, value);
+
+	return SYSINFO_RET_OK;
 }

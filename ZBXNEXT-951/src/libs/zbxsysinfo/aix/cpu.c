@@ -81,78 +81,15 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return get_cpustat(result, cpu_num, state, mode);
 }
 
-static int	get_cpuload(double *load1, double *load5, double *load15)
+int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBPERFSTAT
-	perfstat_cpu_total_t	ps_cpu_total;
 #if !defined(SBITS)
 #	define SBITS 16
 #endif
-
-	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
-		return SYSINFO_RET_FAIL;
-
-	if (NULL != load1)
-		*load1 = (double)ps_cpu_total.loadavg[0] / (1 << SBITS);
-	if (NULL != load5)
-		*load5 = (double)ps_cpu_total.loadavg[1] / (1 << SBITS);
-	if (NULL != load15)
-		*load15 = (double)ps_cpu_total.loadavg[2] / (1 << SBITS);
-
-	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	double	value;
-
-	if (SYSINFO_RET_OK != get_cpuload(&value, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	double	value;
-
-	if (SYSINFO_RET_OK != get_cpuload(NULL, &value, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	double	value;
-
-	if (SYSINFO_RET_OK != get_cpuload(NULL, NULL, &value))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	static MODE_FUNCTION fl[] =
-	{
-		{"avg1",	SYSTEM_CPU_LOAD1},
-		{"avg5",	SYSTEM_CPU_LOAD5},
-		{"avg15",	SYSTEM_CPU_LOAD15},
-		{NULL,		NULL}
-	};
-
-	char	tmp[16];
-	int	i;
+	char			tmp[16];
+	int			mode;
+	perfstat_cpu_total_t	ps_cpu_total;
 
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -161,16 +98,24 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp)
-		zbx_snprintf(tmp, sizeof(tmp), "avg1");
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+		mode = ZBX_AVG1;
+	else if (0 == strcmp(tmp, "avg5"))
+		mode = ZBX_AVG5;
+	else if (0 == strcmp(tmp, "avg15"))
+		mode = ZBX_AVG15;
+	else
+		return SYSINFO_RET_FAIL;
 
-	for (i = 0; NULL != fl[i].mode; i++)
-	{
-		if (0 == strncmp(tmp, fl[i].mode, sizeof(tmp)))
-			return (fl[i].function)(cmd, param, flags, result);
-	}
+	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
+		return SYSINFO_RET_FAIL;
 
+	SET_DBL_RESULT(result, (double)ps_cpu_total.loadavg[mode] / (1 << SBITS));
+
+	return SYSINFO_RET_OK;
+#else
 	return SYSINFO_RET_FAIL;
+#endif
 }
 
 int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
