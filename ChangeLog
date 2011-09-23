@@ -227,6 +227,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.8rc3
 
+ - [ZBX-1909] fixed keyparser to allow keys like "key,{$USERMACRO}" (Vedmak)
  - [ZBX-4157] fixed possible truncating of queries while preparing a configuration data for sending to a proxy (Sasha)
  - [ZBX-4150] fixed processing of quoted function parameters (Sasha)
 
@@ -242,6 +243,7 @@ Changes for 1.8.8rc1
  - [ZBXNEXT-921] added option to show items without data in latest data (Vedmak)
  - [ZBX-2457] changed "type" to "ENGINE" in MySQL upgrade patches for MySQL 5.5 compatibility (Richlv)
  - [ZBX-4099] fixed possible crash when processing of functions sum(), min(), max() or diff() in triggers, aggregated checks or calculated items (Sasha)
+ - [ZBX-3030] fixed event durations in monitoring (Vedmak,Eduard)
  - [ZBXNEXT-902] changed API search wildcard from "%" to "*" (Vedmak,Eduard)
  - [ZBX-3967] fixed alerter hang on long running alert scripts (Deniss)
  - [ZBX-3970] fixed proxy crash after database connection to postgresql is recovered (Deniss)
