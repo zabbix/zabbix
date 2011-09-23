@@ -238,6 +238,7 @@ frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/class.globalregexp.php -text
+frontends/php/include/views/administration.authentication.edit.php -text
 frontends/php/include/views/administration.general.gui.edit.php -text
 frontends/php/include/views/administration.general.housekeeper.edit.php -text
 frontends/php/include/views/administration.general.image.edit.php -text
@@ -249,6 +250,8 @@ frontends/php/include/views/administration.general.regularexpressions.list.php -
 frontends/php/include/views/administration.general.valuemapping.edit.php -text
 frontends/php/include/views/administration.general.valuemapping.list.php -text
 frontends/php/include/views/administration.general.workingtime.edit.php -text
+frontends/php/include/views/administration.mediatypes.edit.php -text
+frontends/php/include/views/administration.mediatypes.list.php -text
 frontends/php/include/views/js/administration.general.macros.js.php -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
@@ -374,7 +377,3 @@ upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/p
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
-upgrades/dbpatches/2.0/ibm_db2/patch/globalvars.sql -text
-upgrades/dbpatches/2.0/mysql/patch/globalvars.sql -text
-upgrades/dbpatches/2.0/oracle/patch/globalvars.sql -text
-upgrades/dbpatches/2.0/postgresql/patch/globalvars.sql -text
