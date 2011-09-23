@@ -697,8 +697,6 @@
 	'S_CANNOT_UPDATE_TEMPLATE'=>		_('Cannot update template'),
 	'S_LINKED_TEMPLATES'=>			_('Linked templates'),
 	'S_LINKED_TO'=>				_('Linked to'),
-	'S_TEMPLATE_DELETED'=>			_('Template deleted'),
-	'S_CANNOT_DELETE_TEMPLATE'=>		_('Cannot delete template'),
 	'S_DELETE_AND_CLEAR'=>			_('Delete and clear'),
 	'S_DELETE_SELECTED_TEMPLATES_Q'=>	_('Delete selected templates?'),
 	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>_('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
