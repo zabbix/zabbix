@@ -108,7 +108,7 @@ class CDCheck extends CZBXAPI{
 
 			if(!$nodeCheck){
 				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('ds.dcheckid', $nodeids);
+				$sql_parts['where'][] = DBin_node('dc.dcheckid', $nodeids);
 			}
 		}
 
@@ -438,6 +438,53 @@ Copt::memoryPick();
 		}
 
 	return $result;
+	}
+
+	/**
+	 * Check if user has read permissions for discovery checks.
+	 *
+	 * @param array $ids
+	 * @return bool
+	 */
+	public function isReadable(array $ids) {
+		if (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'dcheckids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+	/**
+	 * Check if user has write permissions for discovery checks.
+	 *
+	 * @param array $ids
+	 * @return bool
+	 */
+	public function isWritable(array $ids) {
+		if (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'dcheckids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
 	}
 }
 ?>
