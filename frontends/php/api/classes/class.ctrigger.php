@@ -1484,18 +1484,18 @@ COpt::memoryPick();
 			return array('triggerids' => zbx_objectValues($triggersData, 'triggerid'));
 	}
 
-	protected function createReal(&$triggers){
+	protected function createReal(&$triggers) {
 		$triggers = zbx_toArray($triggers);
 
 		$triggerids = DB::insert('triggers', $triggers);
 
-		foreach($triggers as $tnum => $trigger){
+		foreach ($triggers as $tnum => $trigger) {
 			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
 
 			addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
 			$expression = implode_exp($trigger['expression'], $triggerid);
-			if(is_null($expression)){
+			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
 
@@ -1507,20 +1507,18 @@ COpt::memoryPick();
 			info(_s('Trigger [%1$s:%2$s] created.', $trigger['description'], $trigger['expression']));
 		}
 
-
 		$this->validateDependencies($triggers);
 
-		foreach($triggers as $tnum => $trigger){
-			if (isset($trigger['dependencies'])){
-				foreach($trigger['dependencies'] as $triggerid_up){
-					DB::insert('trigger_depends', array(
-						'triggerid_down' => $triggerid,
+		foreach ($triggers as $trigger) {
+			if (isset($trigger['dependencies'])) {
+				foreach ($trigger['dependencies'] as $triggerid_up) {
+					DB::insert('trigger_depends', array(array(
+						'triggerid_down' => $trigger['triggerid'],
 						'triggerid_up' => $triggerid_up
-					));
+					)));
 				}
 			}
 		}
-
 	}
 
 	protected function updateReal($triggers){
