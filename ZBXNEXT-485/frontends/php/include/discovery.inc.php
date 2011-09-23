@@ -56,10 +56,10 @@
 	function discovery_check_type2str($type=null){
 		$discovery_types = array(
 			SVC_SSH => S_SSH,
-			SVC_LDAP => S_LDAP,
+			SVC_LDAP => _('LDAP'),
 			SVC_SMTP => S_SMTP,
 			SVC_FTP => S_FTP,
-			SVC_HTTP => S_HTTP,
+			SVC_HTTP => _('HTTP'),
 			SVC_POP => S_POP,
 			SVC_NNTP => S_NNTP,
 			SVC_IMAP => S_IMAP,

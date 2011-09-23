@@ -40,7 +40,6 @@ $fields=array(
 
 	'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3"),	NULL),
 	'grid'=>			array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,500),	NULL),
-	'border'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),		NULL),
 	'base64image'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),		NULL),
 );
 
@@ -171,7 +170,7 @@ class CCanvas{
 	}
 }
 
-class CMapPainter{
+class CMapPainter {
 
 	protected $canvas;
 	protected $mapData;
@@ -181,6 +180,7 @@ class CMapPainter{
 		$this->options = array(
 			'map' => array(
 				'bgColor' => 'white',
+				'borderColor' => 'black',
 				'titleColor' => 'darkred',
 				'border' => true,
 				'drawAreas' => true,
@@ -199,17 +199,25 @@ class CMapPainter{
 		$this->mapData = $mapData;
 	}
 
-	public function paint(){
+	public function paint() {
 
 		$this->paintBackground();
 		$this->paintTitle();
 		$this->paintGrid();
 
-		if($this->options['map']['drawAreas']){
+		if ($this->options['map']['drawAreas']) {
 			$this->paintAreas();
 		}
 
+		$this->paintBorder();
+
 		return $this->canvas->getCanvas();
+	}
+
+	protected function paintBorder() {
+		if ($this->options['map']['border']) {
+			$this->canvas->drawBorder($this->options['map']['borderColor']);
+		}
 	}
 
 	protected function paintBackground(){
