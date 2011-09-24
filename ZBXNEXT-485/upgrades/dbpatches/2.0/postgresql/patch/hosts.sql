@@ -134,14 +134,14 @@ BEGIN
 	new_key := new_key || '[';
 	pos := STRPOS(old_key, ',');
 	IF 0 <> pos THEN
-		new_key := new_key || SUBSTR(old_key, 1, pos - 1);
-		old_key := SUBSTR(old_key, pos);
+		new_key := new_key || '"' || SUBSTR(old_key, 1, pos - 1) || '"';
+		old_key := SUBSTR(old_key, pos + 1);
 	ELSE
-		new_key := new_key || old_key;
+		new_key := new_key || '"' || old_key || '"';
 		old_key := '';
 	END IF;
 	IF 0 <> LENGTH(old_key) THEN
-		new_key := new_key || ',' || old_key;
+		new_key := new_key || ',,"' || old_key || '"';
 	END IF;
 
 	WHILE 0 != (SELECT COUNT(*) FROM items WHERE hostid = v_hostid AND key_ = new_key || ']') LOOP

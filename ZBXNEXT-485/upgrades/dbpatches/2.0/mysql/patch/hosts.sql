@@ -138,14 +138,14 @@ BEGIN
 	SET new_key = CONCAT(new_key, '[');
 	SET pos = INSTR(v_key, ',');
 	IF 0 <> pos THEN
-		SET new_key = CONCAT(new_key, SUBSTR(v_key, 1, pos - 1));
-		SET v_key = SUBSTR(v_key, pos);
+		SET new_key = CONCAT(new_key, '"', SUBSTR(v_key, 1, pos - 1), '"');
+		SET v_key = SUBSTR(v_key, pos + 1);
 	ELSE
-		SET new_key = CONCAT(new_key, v_key);
+		SET new_key = CONCAT(new_key, '"', v_key, '"');
 		SET v_key = '';
 	END IF;
 	IF 0 <> LENGTH(v_key) THEN
-		SET new_key = CONCAT(new_key, ',', v_key);
+		SET new_key = CONCAT(new_key, ',,"', v_key, '"');
 	END IF;
 
 	WHILE 0 != (SELECT COUNT(*) FROM items WHERE hostid = v_hostid AND key_ = CONCAT(new_key, ']')) DO
