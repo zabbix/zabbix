@@ -322,7 +322,7 @@ function item_type2str($type = null){
 					}
 
 					if (!isset($srcItem['interfaceid'])) {
-						error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $srcItem['name'], $srcItem['key_'], $dstHost['host']));
+						error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
 						return false;
 					}
 				}
@@ -370,7 +370,7 @@ function item_type2str($type = null){
 				}
 
 				if (!isset($srcItem['interfaceid'])) {
-					error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $srcItem['name'], $srcItem['key_'], $dstHost['host']));
+					error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
 					return false;
 				}
 			}
