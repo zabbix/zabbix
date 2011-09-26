@@ -1697,6 +1697,7 @@ class CAction extends CZBXAPI {
 		$hostIdsAll = array();
 		$discoveryRuleIdsAll = array();
 		$discoveryCheckIdsAll = array();
+		$proxyIdsAll = array();
 
 		$discoveryCheckTypes = discovery_check_type2str();
 		$discoveryObjectStatuses = discovery_object_status2str();
@@ -1725,6 +1726,10 @@ class CAction extends CZBXAPI {
 
 				case CONDITION_TYPE_DCHECK:
 					$discoveryCheckIdsAll[$condition['value']] = $condition['value'];
+					break;
+
+				case CONDITION_TYPE_PROXY:
+					$proxyIdsAll[$condition['value']] = $condition['value'];
 					break;
 
 				case CONDITION_TYPE_TIME_PERIOD:
@@ -1757,13 +1762,14 @@ class CAction extends CZBXAPI {
 					}
 					break;
 
+				case CONDITION_TYPE_MAINTENANCE:
+					// maintenance condition has no value...
+					break;
 				case CONDITION_TYPE_TRIGGER_NAME:
 				case CONDITION_TYPE_TRIGGER_VALUE:
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
-				case CONDITION_TYPE_MAINTENANCE:
 				case CONDITION_TYPE_NODE:
 				case CONDITION_TYPE_DOBJECT:
-				case CONDITION_TYPE_PROXY:
 				case CONDITION_TYPE_DUPTIME:
 				case CONDITION_TYPE_DVALUE:
 				case CONDITION_TYPE_APPLICATION:
@@ -1796,6 +1802,9 @@ class CAction extends CZBXAPI {
 		}
 		if (!API::DCheck()->isWritable($discoveryCheckIdsAll)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.'));
+		}
+		if (!API::Proxy()->isWritable($proxyIdsAll)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition proxy. Proxy does not exist or you have no access to it.'));
 		}
 
 		return true;
