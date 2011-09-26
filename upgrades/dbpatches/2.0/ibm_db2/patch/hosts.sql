@@ -234,7 +234,7 @@ INSERT INTO t_keys
 		WHERE key_ LIKE 'net.tcp.service[%'
 /
 
-UPDATE items SET key2 = zbx_convert_simple_checks(itemid, hostid, key_)
+UPDATE items SET key_ = zbx_convert_simple_checks(itemid, hostid, key_)
 	WHERE type IN (3)	-- SIMPLE
 		AND (key_ IN ('ftp','http','imap','ldap','nntp','ntp','pop','smtp','ssh',
 			'ftp_perf','http_perf', 'imap_perf','ldap_perf','nntp_perf','ntp_perf','pop_perf',
