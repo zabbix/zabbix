@@ -367,9 +367,10 @@ include_once('include/page_header.php');
 // }}} INVENTORIES
 
 			$newgroup = array();
-			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
-				$result = API::HostGroup()->create(array('name' => $_REQUEST['newgroup']));
-				if($result === false) throw new Exception();
+			if (isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])) {
+				if (!$result = API::HostGroup()->create(array('name' => $_REQUEST['newgroup']))) {
+					throw new Exception();
+				}
 
 				$newgroup = array('groupid' => reset($result['groupids']), 'name' => $_REQUEST['newgroup']);
 			}
@@ -497,9 +498,8 @@ include_once('include/page_header.php');
 			DBstart();
 
 			// create new group
-			if(!zbx_empty($_REQUEST['newgroup'])){
-				$newGroup = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
-				if(!$newGroup){
+			if (!zbx_empty($_REQUEST['newgroup'])) {
+				if (!$newGroup = API::HostGroup()->create(array('name' => $_REQUEST['newgroup']))) {
 					throw new Exception();
 				}
 				$groups[] = reset($newGroup['groupids']);
