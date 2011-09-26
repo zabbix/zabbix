@@ -223,19 +223,17 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			if (!isset($new_operation['opconditions'])) {
 				$new_operation['opconditions'] = array();
 			}
-			if (!str_in_array($new_opcondition,$new_operation['opconditions'])) {
-				array_push($new_operation['opconditions'],$new_opcondition);
+			if (!str_in_array($new_opcondition, $new_operation['opconditions'])) {
+				array_push($new_operation['opconditions'], $new_opcondition);
 			}
 
 			$_REQUEST['new_operation'] = $new_operation;
 
 			unset($_REQUEST['new_opcondition']);
-
 		}
 		catch (APIException $e) {
 			error($e->getMessage());
 		}
-
 	}
 	elseif (isset($_REQUEST['del_opcondition']) && isset($_REQUEST['g_opconditionid'])) {
 		$new_operation = get_request('new_operation', array());
@@ -412,7 +410,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				),
 			);
 		}
-
 
 		$actionForm = new CView('configuration.action.edit', $action);
 		$action_wdgt->addItem($actionForm->render());
