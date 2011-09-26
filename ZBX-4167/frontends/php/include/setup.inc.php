@@ -172,18 +172,13 @@ JS;
 				SPACE
 			));
 
-			$reqs = check_php_requirements();
-			foreach($reqs as $req){
-
+			$reqs = FrontendSetup::i()->checkRequirements();
+			foreach ($reqs as $req) {
 				$result = null;
-				if(!is_null($req['recommended']) && ($req['result'] == 1)){
-					$result = new CSpan(S_OK, 'orange');
-				}
-				else if((!is_null($req['recommended']) && ($req['result'] == 2))
-					|| (is_null($req['recommended']) && ($req['result'] == 1))){
+				if ($req['result']) {
 					$result = new CSpan(S_OK, 'green');
 				}
-				else if($req['result'] == 0){
+				else {
 					$result = new CSpan(S_FAIL, 'link_menu fail');
 					$result->setHint($req['error']);
 				}
@@ -193,7 +188,6 @@ JS;
 						$req['name'], 'header'),
 						$req['current'],
 						$req['required'] ? $req['required'] : SPACE,
-						$req['recommended'] ? $req['recommended'] : SPACE,
 						$result
 					),
 					$req['result'] ? SPACE : 'fail');

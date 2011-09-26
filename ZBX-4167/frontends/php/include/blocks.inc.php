@@ -23,7 +23,6 @@ require_once('include/graphs.inc.php');
 require_once('include/screens.inc.php');
 require_once('include/maps.inc.php');
 require_once('include/users.inc.php');
-require_once('include/requirements.inc.php');
 
 
 // Author: Aly
@@ -789,7 +788,8 @@ function make_status_of_zbx(){
 
 // CHECK REQUIREMENTS {{{
 	if(CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN){
-		$reqs = check_php_requirements();
+
+		$reqs = FrontendSetup::i()->checkRequirements();
 		foreach($reqs as $req){
 			if($req['result'] == false){
 				$table->addRow(array(
