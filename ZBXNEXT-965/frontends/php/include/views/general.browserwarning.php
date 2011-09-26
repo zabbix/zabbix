@@ -39,16 +39,16 @@
 					It is highly recommended that you choose and install a modern browser.
 					It is free of charge and only takes a couple of minutes.
 				</div>
-				<a href="http://www.google.com/chrome" target="_blank"><div style="position: absolute; top: 180px; left: 55px;" class="browserwarningLogoChrome"></div></a>
-				<div style="position: absolute; top: 255px; left: 55px; text-align: center;" class="browserwarningLink">Google Chrome<br/><a href="http://www.google.com/chrome" target="_blank">Download page</a></div>
-				<a href="http://www.mozilla.org/firefox" target="_blank"><div style="position: absolute; top: 180px; left: 160px;" class="browserwarningLogoFirefox"></div></a>
-				<div style="position: absolute; top: 255px; left: 160px; text-align: center;" class="browserwarningLink">Mozilla Firefox<br/><a href="http://www.mozilla.org/firefox" target="_blank">Download page</a></div>
-				<a href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie" target="_blank"><div style="position: absolute; top: 180px; left: 265px;" class="browserwarningLogoIE"></div></a>
-				<div style="position: absolute; top: 255px; left: 265px; text-align: center;" class="browserwarningLink">Internet Explorer<br/><a href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie" target="_blank">Download page</a></div>
-				<a href="http://www.opera.com/download" target="_blank"><div style="position: absolute; top: 180px; left: 375px;" class="browserwarningLogoOpera"></div></a>
-				<div style="position: absolute; top: 255px; left: 375px; text-align: center;" class="browserwarningLink">Opera browser<br/><a href="http://www.opera.com/download" target="_blank">Download page</a></div>
-				<a href="http://www.apple.com/safari/download" target="_blank"><div style="position: absolute; top: 180px; left: 480px;" class="browserwarningLogoSafari"></div></a>
-				<div style="position: absolute; top: 255px; left: 480px; text-align: center;" class="browserwarningLink">Apple Safari<br/><a href="http://www.apple.com/safari/download" target="_blank">Download page</a></div>
+				<a href="http://www.google.com/chrome" target="_blank"><div style="position: absolute; top: 175px; left: 55px;" class="browserwarningLogoChrome"></div></a>
+				<div style="position: absolute; top: 252px; left: 55px; text-align: center;" class="browserwarningLink">Google Chrome<br/><a href="http://www.google.com/chrome" target="_blank">Download page</a></div>
+				<a href="http://www.mozilla.org/firefox" target="_blank"><div style="position: absolute; top: 175px; left: 160px;" class="browserwarningLogoFirefox"></div></a>
+				<div style="position: absolute; top: 252px; left: 160px; text-align: center;" class="browserwarningLink">Mozilla Firefox<br/><a href="http://www.mozilla.org/firefox" target="_blank">Download page</a></div>
+				<a href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie" target="_blank"><div style="position: absolute; top: 175px; left: 265px;" class="browserwarningLogoIE"></div></a>
+				<div style="position: absolute; top: 252px; left: 265px; text-align: center;" class="browserwarningLink">Internet Explorer<br/><a href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie" target="_blank">Download page</a></div>
+				<a href="http://www.opera.com/download" target="_blank"><div style="position: absolute; top: 175px; left: 375px;" class="browserwarningLogoOpera"></div></a>
+				<div style="position: absolute; top: 252px; left: 375px; text-align: center;" class="browserwarningLink">Opera browser<br/><a href="http://www.opera.com/download" target="_blank">Download page</a></div>
+				<a href="http://www.apple.com/safari/download" target="_blank"><div style="position: absolute; top: 175px; left: 480px;" class="browserwarningLogoSafari"></div></a>
+				<div style="position: absolute; top: 252px; left: 480px; text-align: center;" class="browserwarningLink">Apple Safari<br/><a href="http://www.apple.com/safari/download" target="_blank">Download page</a></div>
 				<div style="position: absolute; top: 310px; left: 50px; width: 510px; font-size: 16px; font-weight: bold;">
 					Why is it recommended to upgrade the web browser?
 				</div>
@@ -58,7 +58,7 @@
 				<div style="position: absolute; top: 420px; left: 23px;" class="browserwarningCopyright">
 					<a href="http://www.zabbix.com">Zabbix <?php echo ZABBIX_VERSION; ?> Copyright 2001-2011 by Zabbix SIA</a>
 				</div>
-				<div style="position: absolute; top: 410px; left: 400px;" class="browserwarningLink"><a href="index.php?browserwarning_ignore=yes">Continue despite this warning</a> &raquo;</div>
+				<div style="position: absolute; top: 400px; left: 400px;" class="browserwarningLink"><a href="index.php?browserwarning_ignore=yes">Continue despite this warning</a> &raquo;</div>
 			</div>
 		</div>
 	</div>
