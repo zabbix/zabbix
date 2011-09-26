@@ -21,7 +21,6 @@
 <?php
 require_once('include/config.inc.php');
 require_once('include/setup.inc.php');
-require_once('include/requirements.inc.php');
 
 /* ******** */
 
