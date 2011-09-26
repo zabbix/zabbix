@@ -119,31 +119,76 @@ UPDATE items
 
 -- convert simple check keys to a new form
 
-UPDATE items
-	SET key_ = 'net.tcp.service[' || key_ || ']'
-	WHERE type IN (3)	-- SIMPLE
-		AND key_ IN ('ftp','http','imap','ldap','nntp','ntp','pop','smtp','ssh');
+CREATE FUNCTION zbx_key_exists(v_hostid IN number, new_key IN nvarchar2)
+	RETURN number IS key_exists number(10);
+	BEGIN
+		SELECT COUNT(*) INTO key_exists FROM items WHERE hostid = v_hostid AND key_ = new_key;
+		RETURN key_exists;
+	END;
+/
 
-UPDATE items
-	SET key_ = 'net.tcp.service[' || SUBSTR(key_, 1, INSTR(key_, ',') - 1) || ',' || SUBSTR(key_, INSTR(key_, ',')) || ']'
-	WHERE type IN (3)	-- SIMPLE
-		AND (key_ LIKE 'ftp,%' OR key_ LIKE 'http,%' OR key_ LIKE 'imap,%' OR key_ LIKE 'ldap,%'
-			OR key_ LIKE 'nntp,%' OR key_ LIKE 'ntp,%' OR key_ LIKE 'pop,%' OR key_ LIKE 'smtp,%'
-			OR key_ LIKE 'ssh,%' OR key_ LIKE 'tcp,%');
+DECLARE
+	v_itemid number(20);
+	v_hostid number(20);
+	v_key nvarchar2(255);
+	new_key nvarchar2(255);
+	pos number(10);
 
-UPDATE items
-	SET key_ = 'net.tcp.service.perf[' || SUBSTR(key_, 1, INSTR(key_, '_') - 1) || ']'
-	WHERE type IN (3)	-- SIMPLE
-		AND key_ IN ('ftp_perf','http_perf','imap_perf','ldap_perf','nntp_perf',
-			'ntp_perf','pop_perf','smtp_perf','ssh_perf');
+	CURSOR i_cur IS
+		SELECT itemid,hostid,key_
+			FROM items
+			WHERE type IN (3)	-- SIMPLE
+				AND (key_ IN ('ftp','http','imap','ldap','nntp','ntp','pop','smtp','ssh',
+					'ftp_perf','http_perf', 'imap_perf','ldap_perf','nntp_perf','ntp_perf','pop_perf',
+					'smtp_perf','ssh_perf')
+					OR key_ LIKE 'ftp,%' OR key_ LIKE 'http,%' OR key_ LIKE 'imap,%' OR key_ LIKE 'ldap,%'
+					OR key_ LIKE 'nntp,%' OR key_ LIKE 'ntp,%' OR key_ LIKE 'pop,%' OR key_ LIKE 'smtp,%'
+					OR key_ LIKE 'ssh,%' OR key_ LIKE 'tcp,%'
+					OR key_ LIKE 'ftp_perf,%' OR key_ LIKE 'http_perf,%' OR key_ LIKE 'imap_perf,%'
+					OR key_ LIKE 'ldap_perf,%' OR key_ LIKE 'nntp_perf,%' OR key_ LIKE 'ntp_perf,%'
+					OR key_ LIKE 'pop_perf,%' OR key_ LIKE 'smtp_perf,%' OR key_ LIKE 'ssh_perf,%'
+					OR key_ LIKE 'tcp_perf,%');
+BEGIN
+	OPEN i_cur;
 
-UPDATE items
-	SET key_ = 'net.tcp.service.perf[' || SUBSTR(key_, 1, INSTR(key_, ',') - 1) || ',' || SUBSTR(key_, INSTR(key_, ',')) || ']'
-	WHERE type IN (3)	-- SIMPLE
-		AND (key_ LIKE 'ftp_perf,%' OR key_ LIKE 'http_perf,%' OR key_ LIKE 'imap_perf,%'
-			OR key_ LIKE 'ldap_perf,%' OR key_ LIKE 'nntp_perf,%' OR key_ LIKE 'ntp_perf,%'
-			OR key_ LIKE 'pop_perf,%' OR key_ LIKE 'smtp_perf,%' OR key_ LIKE 'ssh_perf,%'
-			OR key_ LIKE 'tcp_perf,%');
+	LOOP
+		FETCH i_cur INTO v_itemid, v_hostid, v_key;
+
+		EXIT WHEN i_cur%NOTFOUND;
+
+		new_key := 'net.tcp.service';
+		pos := INSTR(v_key, '_perf');
+		IF 0 <> pos THEN
+			new_key := new_key || '.perf';
+			v_key := SUBSTR(v_key, 1, pos - 1) || SUBSTR(v_key, pos + 5);
+		END IF;
+		new_key := new_key || '[';
+		pos := INSTR(v_key, ',');
+		IF 0 <> pos THEN
+			new_key := new_key || '"' || SUBSTR(v_key, 1, pos - 1) || '"';
+			v_key := SUBSTR(v_key, pos + 1);
+		ELSE
+			new_key := new_key || '"' || v_key || '"';
+			v_key := '';
+		END IF;
+		IF 0 <> LENGTH(v_key) THEN
+			new_key := new_key || ',,"' || v_key || '"';
+		END IF;
+
+		WHILE 0 <> zbx_key_exists(v_hostid, new_key || ']') LOOP
+			new_key := new_key || ' ';
+		END LOOP;
+
+		new_key := new_key || ']';
+
+		UPDATE items SET key_ = new_key WHERE itemid = v_itemid;
+	END LOOP;
+
+	CLOSE i_cur;
+END;
+/
+
+DROP FUNCTION zbx_key_exists;
 
 ---- Patching table `hosts`
 
