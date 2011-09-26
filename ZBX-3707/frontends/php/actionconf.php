@@ -376,12 +376,13 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$esc_period	= get_request('esc_period');
 		}
 
-		if(isset($action['actionid']) && !isset($_REQUEST['form_refresh'])){
+		if (isset($action['actionid']) && !isset($_REQUEST['form_refresh'])) {
 			sortOperations($action['operations']);
 		}
-		else{
-			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period']))
+		else {
+			if (isset($_REQUEST['escalation']) && 0 == $_REQUEST['esc_period']) {
 				$_REQUEST['esc_period'] = 3600;
+			}
 
 			$action['name'] = get_request('name');
 			$action['eventsource'] = get_request('eventsource');
@@ -393,8 +394,12 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$action['recovery_msg'] = get_request('recovery_msg',0);
 			$action['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
 			$action['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG);
+			$action['conditions'] = get_request('conditions', array());
+			$action['operations'] = get_request('operations', array());
+		}
 
-			$action['conditions'] = get_request('conditions', array(
+		if (!isset($action['actionid']) && !isset($_REQUEST['form_refresh'])) {
+			$action['conditions'] = array(
 				array(
 					'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
 					'operator' => CONDITION_OPERATOR_EQUAL,
@@ -405,9 +410,9 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					'operator' => CONDITION_OPERATOR_NOT_IN,
 					'value' => '',
 				),
-			));
-			$action['operations'] = get_request('operations', array());
+			);
 		}
+
 
 		$actionForm = new CView('configuration.action.edit', $action);
 		$action_wdgt->addItem($actionForm->render());
