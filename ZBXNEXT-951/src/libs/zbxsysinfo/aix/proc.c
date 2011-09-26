@@ -20,6 +20,10 @@
 #include "common.h"
 #include "sysinfo.h"
 
+#if !defined(HAVE_SYS_PROCFS_H)
+#	include "../common/common.h"
+#endif
+
 #define DO_SUM 0
 #define DO_MAX 1
 #define DO_MIN 2

@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "../common/common.h"
 
 static struct ifmibdata	ifmd;
 

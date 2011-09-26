@@ -118,9 +118,8 @@ double	getPROC(char *file, int lineno, int fieldno)
 
 	if (1 == sscanf(t, "%lf", &value))
 		return value;
-#else
-	return -1;
 #endif
+	return -1;
 }
 
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

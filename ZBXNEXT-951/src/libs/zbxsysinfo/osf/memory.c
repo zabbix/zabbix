@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "../common/common.h"
 
 static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {

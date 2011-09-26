@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "../common/common.h"
 
 static int	get_kstat_named_field(const char *name, const char *field, kstat_named_t *returned_data)
 {
