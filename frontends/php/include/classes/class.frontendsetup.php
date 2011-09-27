@@ -84,7 +84,7 @@ class FrontendSetup {
 	}
 
 	/**
-	 * Checks for minimal required PHP version.
+	 * Checks for minimum required PHP version.
 	 *
 	 * @return array
 	 */
@@ -94,14 +94,14 @@ class FrontendSetup {
 			'current' => phpversion(),
 			'required' => self::MIN_PHP_VERSION,
 			'result' => version_compare(phpversion(), self::MIN_PHP_VERSION, '>='),
-			'error' => _s('Minimal required PHP version is %s', self::MIN_PHP_VERSION)
+			'error' => _s('Minimum required PHP version is %s', self::MIN_PHP_VERSION)
 		);
 
 		return $result;
 	}
 
 	/**
-	 * Checks for minimal PHP memory limit.
+	 * Checks for minimum PHP memory limit.
 	 *
 	 * @return array
 	 */
@@ -113,14 +113,14 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_MEMORY_LIMIT),
 			'result' => str2mem($current) >= self::MIN_PHP_MEMORY_LIMIT,
-			'error' => _s('%s is a minimal PHP memory limitation', mem2str(self::MIN_PHP_MEMORY_LIMIT))
+			'error' => _s('Minimum PHP memory limitation is %s (configuration parameter "memory_limit")', mem2str(self::MIN_PHP_MEMORY_LIMIT))
 		);
 
 		return $result;
 	}
 
 	/**
-	 * Checks for minimal PHP post max size.
+	 * Checks for minimum PHP post max size.
 	 *
 	 * @return array
 	 */
@@ -132,14 +132,14 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_POST_MAX_SIZE),
 			'result' => str2mem($current) >= self::MIN_PHP_POST_MAX_SIZE,
-			'error' => _s('%s is a minimum size of PHP post', mem2str(self::MIN_PHP_POST_MAX_SIZE))
+			'error' => _s('Minimum size of PHP post is %s (configuration parameter "post_max_size")', mem2str(self::MIN_PHP_POST_MAX_SIZE))
 		);
 
 		return $result;
 	}
 
 	/**
-	 * Checks for minimal PHP upload max filesize.
+	 * Checks for minimum PHP upload max filesize.
 	 *
 	 * @return array
 	 */
@@ -151,14 +151,14 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE),
 			'result' => str2mem($current) >= self::MIN_PHP_UPLOAD_MAX_FILESIZE,
-			'error' => _s('%s is minimal for PHP upload filesize', mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE))
+			'error' => _s('Minimum for PHP upload filesize is %s (configuration parameter "upload_max_filesize")', mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE))
 		);
 
 		return $result;
 	}
 
 	/**
-	 * Checks for minimal PHP max execution time.
+	 * Checks for minimum PHP max execution time.
 	 *
 	 * @return array
 	 */
@@ -170,14 +170,14 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => self::MIN_PHP_MAX_EXECUTION_TIME,
 			'result' => $current >= self::MIN_PHP_MAX_EXECUTION_TIME,
-			'error' => _s('%s is a minimal limitation on execution time of PHP scripts', self::MIN_PHP_MAX_EXECUTION_TIME)
+			'error' => _s('Minimum limitation on execution time of PHP scripts is %s (configuration parameter "max_execution_time")', self::MIN_PHP_MAX_EXECUTION_TIME)
 		);
 
 		return $result;
 	}
 
 	/**
-	 * Checks for minimal PHP max input time.
+	 * Checks for minimum PHP max input time.
 	 *
 	 * @return array
 	 */
@@ -189,7 +189,7 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => self::MIN_PHP_MAX_INPUT_TIME,
 			'result' => $current >= self::MIN_PHP_MAX_INPUT_TIME,
-			'error' => _s('%s is a minimal limitation on input parse time for PHP scripts', self::MIN_PHP_MAX_INPUT_TIME)
+			'error' => _s('Minimum limitation on input parse time for PHP scripts is %s (configuration parameter "max_input_time")', self::MIN_PHP_MAX_INPUT_TIME)
 		);
 
 		return $result;
@@ -208,7 +208,7 @@ class FrontendSetup {
 			'current' => $current ? $current : _('no'),
 			'required' => null,
 			'result' => !empty($current),
-			'error' => _('Time zone for PHP is not set please set "date.timezone" in php.ini')
+			'error' => _('Time zone for PHP is not set (configuration parameter "date.timezone")')
 		);
 
 		return $result;
@@ -284,7 +284,7 @@ class FrontendSetup {
 			'current' => empty($current) ? _('no') : new CSpan($current),
 			'required' => null,
 			'result' => !empty($current),
-			'error' => _('Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]')
+			'error' => _('At least one of MySQL, PostgreSQL, Oracle, SQLite3 or DB2 should be supported')
 		);
 
 		return $result;
@@ -312,7 +312,7 @@ class FrontendSetup {
 			'current' => $current ? _('yes') : _('no'),
 			'required' => null,
 			'result' => $current,
-			'error' => _('Requires bcmath module [configure PHP with --enable-bcmath]')
+			'error' => _('PHP bcmath module missing (PHP configuration parameter --enable-bcmath)')
 		);
 
 		return $result;
@@ -331,7 +331,7 @@ class FrontendSetup {
 			'current' => $current ? _('yes') : _('no'),
 			'required' => null,
 			'result' => $current,
-			'error' => _('Requires mbstring module [configure PHP with --enable-mbstring]')
+			'error' => _('PHP mbstring module missing (PHP configuration parameter --enable-mbstring)')
 		);
 
 		return $result;
@@ -350,14 +350,14 @@ class FrontendSetup {
 			'current' => $current ? _('yes') : _('no'),
 			'required' => null,
 			'result' => $current,
-			'error' => _('Requires sockets module [configure PHP with --enable-sockets]')
+			'error' => _('PHP sockets module missing (PHP configuration parameter --enable-sockets)')
 		);
 
 		return $result;
 	}
 
 	/**
-	 * Checks for PHP gd extension.
+	 * Checks for PHP GD extension.
 	 *
 	 * @return array
 	 */
@@ -372,18 +372,18 @@ class FrontendSetup {
 		}
 
 		$result = array(
-			'name' => _('PHP gd'),
+			'name' => _('PHP GD'),
 			'current' => $current,
 			'required' => self::MIN_PHP_GD_VERSION,
 			'result' => version_compare($current, self::MIN_PHP_GD_VERSION, '>='),
-			'error' => _('The gd extension is not loaded')
+			'error' => _('PHP GD module missing (PHP configuration parameter --with-gd)')
 		);
 
 		return $result;
 	}
 
 	/**
-	 * Checks for PHP gd png support.
+	 * Checks for PHP GD PNG support.
 	 *
 	 * @return array
 	 */
@@ -397,11 +397,11 @@ class FrontendSetup {
 		}
 
 		$result = array(
-			'name' => _('PHP gd png support'),
+			'name' => _('PHP GD PNG support'),
 			'current' => $current ? _('yes') : _('no'),
 			'required' => null,
 			'result' => $current,
-			'error' => _('Requires image generation support [PNG]')
+			'error' => _('PHP GD PNG image generation support missing')
 		);
 
 		return $result;
@@ -420,7 +420,7 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => self::MIN_PHP_LIBXML_VERSION,
 			'result' => version_compare($current, self::MIN_PHP_LIBXML_VERSION, '>='),
-			'error' => _('PHP libxml extension is not installed')
+			'error' => _('PHP libxml module missing')
 		);
 
 		return $result;
@@ -449,7 +449,7 @@ class FrontendSetup {
 			'current' => $current ? _('yes') : _('no'),
 			'required' => null,
 			'result' => $current,
-			'error' => _('Requires ctype module [configure PHP with --enable-ctype]')
+			'error' => _('PHP ctype module missing (PHP configuration parameter --enable-ctype)')
 		);
 
 		return $result;
@@ -469,7 +469,7 @@ class FrontendSetup {
 			'current' => $current ? _('yes') : _('no'),
 			'required' => null,
 			'result' => $current,
-			'error' => _('Requires session module [configure PHP with --enable-session]')
+			'error' => _('PHP session module missing (PHP configuration parameter --enable-session)')
 		);
 
 		return $result;
@@ -488,7 +488,7 @@ class FrontendSetup {
 			'current' => $current ? _('yes') : _('no'),
 			'required' => null,
 			'result' => $current,
-			'error' => _('Requires gettext module [configure PHP with --enable-gettext]')
+			'error' => _('PHP gettext module missing (PHP configuration parameter --enable-gettext)')
 		);
 
 		return $result;
