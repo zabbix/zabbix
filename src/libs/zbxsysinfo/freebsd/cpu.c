@@ -21,52 +21,44 @@
 #include "sysinfo.h"
 #include "stats.h"
 
-int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	get_cpu_num(int online)
 {
 #if defined(_SC_NPROCESSORS_ONLN)	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	if (1 == online)
+		return sysconf(_SC_NPROCESSORS_ONLN);
+
+	return sysconf(_SC_NPROCESSORS_CONF);
+#elif defined(HAVE_FUNCTION_SYSCTL_HW_NCPU)	/* FreeBSD 4.2 i386; FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	size_t	len;
+	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
+
+	len = sizeof(ncpu);
+
+	if (1 == online && -1 != sysctl(mib, 2, &ncpu, &len, NULL, 0))
+		return ncpu;
+#endif
+	return -1;
+}
+
+int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
 	char	tmp[16];
-	int	name;
-	long	ncpu;
+	int	online = 0, ncpu;
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "online"))
-		name = _SC_NPROCESSORS_ONLN;
-	else if (0 == strcmp(tmp, "max"))
-		name = _SC_NPROCESSORS_CONF;
-	else
+		online = 1;
+	else if (0 != strcmp(tmp, "max"))
 		return SYSINFO_RET_FAIL;
 
-	if (-1 == (ncpu = sysconf(name)))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, ncpu);
-
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_FUNCTION_SYSCTL_HW_NCPU)	/* FreeBSD 4.2 i386; FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
-	char	tmp[16];
-	size_t	len;
-	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
-
-	if (1 < num_param(param))
-		return SYSINFO_RET_FAIL;
-
-	/* only "online" (default) for parameter "type" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "online"))
-		return SYSINFO_RET_FAIL;
-
-	len = sizeof(ncpu);
-
-	if (0 != sysctl(mib, 2, &ncpu, &len, NULL, 0))
+	if (-1 == (ncpu = get_cpu_num(online)))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, ncpu);
 
 	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
 }
 
 int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -176,7 +168,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (1 == per_cpu)
 	{
-		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
+		if (0 >= (cpu_num = get_cpu_num(1)))
 			return SYSINFO_RET_FAIL;
 		value /= cpu_num;
 	}

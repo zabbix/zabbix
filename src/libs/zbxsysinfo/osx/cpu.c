@@ -141,24 +141,6 @@ static double	get_system_load(int mode)
 	}
 
 	return (double)kn->value.ul / 256;
-#elif defined(HAVE_KNLIST_H)
-	struct nlist	nl;
-	int		kmem;
-	long		load[3];
-
-	nl.n_name = "avenrun";
-	nl.n_value = 0;
-
-	if (-1 == knlist(&nl, 1, sizeof(nl)))
-		return -1;
-
-	if (0 >= (kmem = open("/dev/kmem", 0, 0)))
-		return -1;
-
-	if (pread(kmem, load, sizeof(load), nl.n_value) < sizeof(load))
-		return -1;
-
-	return (double)load[mode] / 65535;
 #else
 	return -1;
 #endif
