@@ -113,7 +113,7 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_MEMORY_LIMIT),
 			'result' => str2mem($current) >= self::MIN_PHP_MEMORY_LIMIT,
-			'error' => _s('Minimum PHP memory limitation is %s (configuration parameter "memory_limit")', mem2str(self::MIN_PHP_MEMORY_LIMIT))
+			'error' => _s('Minimum PHP memory limit is %s (configuration parameter "memory_limit")', mem2str(self::MIN_PHP_MEMORY_LIMIT))
 		);
 
 		return $result;
@@ -170,7 +170,7 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => self::MIN_PHP_MAX_EXECUTION_TIME,
 			'result' => $current >= self::MIN_PHP_MAX_EXECUTION_TIME,
-			'error' => _s('Minimum limitation on execution time of PHP scripts is %s (configuration parameter "max_execution_time")', self::MIN_PHP_MAX_EXECUTION_TIME)
+			'error' => _s('Minimum limit on execution time of PHP scripts is %s (configuration parameter "max_execution_time")', self::MIN_PHP_MAX_EXECUTION_TIME)
 		);
 
 		return $result;
@@ -189,7 +189,7 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => self::MIN_PHP_MAX_INPUT_TIME,
 			'result' => $current >= self::MIN_PHP_MAX_INPUT_TIME,
-			'error' => _s('Minimum limitation on input parse time for PHP scripts is %s (configuration parameter "max_input_time")', self::MIN_PHP_MAX_INPUT_TIME)
+			'error' => _s('Minimum limit on input parse time for PHP scripts is %s (configuration parameter "max_input_time")', self::MIN_PHP_MAX_INPUT_TIME)
 		);
 
 		return $result;
@@ -284,7 +284,7 @@ class FrontendSetup {
 			'current' => empty($current) ? _('no') : new CSpan($current),
 			'required' => null,
 			'result' => !empty($current),
-			'error' => _('At least one of MySQL, PostgreSQL, Oracle, SQLite3 or DB2 should be supported')
+			'error' => _('At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported')
 		);
 
 		return $result;
