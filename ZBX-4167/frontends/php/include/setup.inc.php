@@ -147,7 +147,7 @@
 			}
 
 			$action = <<<JS
-if(this.checked) {
+if (this.checked) {
 	$("next_1").writeAttribute('disabled', false);
 }
 else {
