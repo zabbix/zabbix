@@ -136,22 +136,27 @@
 				'You may cancel installation at any time by clicking "Cancel" button'), 'text');
 		}
 
-		function stage1(){
+		function stage1() {
 			$LICENCE_FILE = 'conf/COPYING';
 
 			$this->DISABLE_NEXT_BUTTON = true;
 
-			$license = 'Missing licence file. See GPL licence.';
-			if(file_exists($LICENCE_FILE))
-				$license = zbx_nl2br(nbsp(file_get_contents($LICENCE_FILE)));
+			$licence_contents = 'Missing licence file. See GPL licence.';
+			if (file_exists($LICENCE_FILE)) {
+				$licence_contents = zbx_nl2br(nbsp(file_get_contents($LICENCE_FILE)));
+			}
 
 			$action = <<<JS
-if(this.checked) $("next_1").writeAttribute('disabled', false);
-else $("next_1").writeAttribute('disabled', 'disabled');
+if(this.checked) {
+	$("next_1").writeAttribute('disabled', false);
+}
+else {
+	$("next_1").writeAttribute('disabled', 'disabled');
+}
 JS;
 
 			return array(
-				new CDiv(new CSpan($license), 'licence'),
+				new CDiv(new CSpan($licence_contents), 'licence'),
 				BR(),
 				new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel(_('I agree'), 'agree')), 'maxwidth center')
 			);
