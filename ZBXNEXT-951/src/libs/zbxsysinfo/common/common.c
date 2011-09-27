@@ -89,7 +89,7 @@ static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT
 
 double	getPROC(char *file, int lineno, int fieldno)
 {
-#ifdef	HAVE_PROC
+#ifdef HAVE_PROC
 	FILE	*f;
 	char	*t, c[MAX_STRING_LEN];
 	int	i;

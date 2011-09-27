@@ -48,7 +48,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		return SYSINFO_RET_FAIL;
 
 	/* only "online" (default) for parameter "type" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "online", sizeof(tmp)))
+	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "online"))
 		return SYSINFO_RET_FAIL;
 
 	if (-1 == (cpu_num = get_cpu_num()))
@@ -105,7 +105,7 @@ static double	get_system_load(int mode)
 
 	return load[mode];
 #elif defined(HAVE_SYS_PSTAT_H)
-	struct	pst_dynamic	dyn;
+	struct pst_dynamic	dyn;
 
 	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
 		return -1;
@@ -120,7 +120,7 @@ static double	get_system_load(int mode)
 #elif defined(HAVE_PROC_LOADAVG)
 	return getPROC("/proc/loadavg", 1, mode + 1);
 #elif defined(HAVE_KSTAT_H)
-	static const char	*keys =
+	static const char	*keys[] =
 	{
 		"avenrun_1min",
 		"avenrun_5min",
@@ -131,16 +131,16 @@ static double	get_system_load(int mode)
 	kstat_t			*ks;
 	kstat_named_t		*kn;
 
-	if (!kc && !(kc = kstat_open()))
+	if (NULL == kc && NULL == (kc = kstat_open()))
 		return -1;
 
-	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) || -1 == kstat_read(kc, ks, 0) ||
-		!(kn = kstat_data_lookup(ks, keys[mode])))
+	if (NULL == (ks = kstat_lookup(kc, "unix", 0, "system_misc")) || -1 == kstat_read(kc, ks, 0) ||
+			NULL == (kn = kstat_data_lookup(ks, keys[mode])))
 	{
 		return -1;
 	}
 
-	return ((double)kn->value.ul) / 256.0;
+	return (double)kn->value.ul / 256;
 #elif defined(HAVE_KNLIST_H)
 	struct nlist	nl;
 	int		kmem;
@@ -149,7 +149,7 @@ static double	get_system_load(int mode)
 	nl.n_name = "avenrun";
 	nl.n_value = 0;
 
-	if (knlist(&nl, 1, sizeof(nl)))
+	if (-1 == knlist(&nl, 1, sizeof(nl)))
 		return -1;
 
 	if (0 >= (kmem = open("/dev/kmem", 0, 0)))
@@ -173,7 +173,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strncmp(tmp, "all", sizeof(tmp)))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		per_cpu = 0;
 	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
@@ -194,7 +194,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	{
 		if (0 >= (cpu_num = get_cpu_num()))
 			return SYSINFO_RET_FAIL;
-		value = value / cpu_num;
+		value /= cpu_num;
 	}
 
 	SET_DBL_RESULT(result, value);

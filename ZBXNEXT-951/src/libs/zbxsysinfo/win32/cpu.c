@@ -38,7 +38,7 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		return SYSINFO_RET_FAIL;
 
 	/* only "online" (default) for parameter "type" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "online", sizeof(tmp)))
+	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "online"))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, get_cpu_num());
@@ -64,10 +64,10 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
 	else if (1 > (cpu_num = atoi(tmp) + 1) || cpu_num > collector->cpus.count)
-			return SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 
 	/* only "system" (default) for parameter "type" is supported */
-	if (0 == get_param(param, 2, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "system", sizeof(tmp)))
+	if (0 == get_param(param, 2, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "system"))
 		return SYSINFO_RET_FAIL;
 
 	if (PERF_COUNTER_ACTIVE != collector->cpus.cpu_counter[cpu_num]->status)
@@ -102,7 +102,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strncmp(tmp, "all", sizeof(tmp)))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		per_cpu = 0;
 	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
@@ -123,7 +123,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	{
 		if (0 >= (cpu_num = get_cpu_num()))
 			return SYSINFO_RET_FAIL;
-		value = value / cpu_num;
+		value /= cpu_num;
 	}
 
 	SET_DBL_RESULT(result, value);

@@ -103,7 +103,7 @@ static int	get_kstat_system_misc(char *key, int *value)
 
 	*value = kn->value.ul;
 
-	ret =  SUCCEED;
+	ret = SUCCEED;
 close:
 	kstat_close(kc);
 
@@ -127,7 +127,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strncmp(tmp, "all", sizeof(tmp)))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		per_cpu = 0;
 	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
@@ -167,7 +167,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	{
 		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
 			return SYSINFO_RET_FAIL;
-		value = value / cpu_num;
+		value /= cpu_num;
 	}
 
 	SET_DBL_RESULT(result, value);
@@ -186,6 +186,7 @@ int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGEN
 	if (NULL != (kc = kstat_open()))
 	{
 		k = kc->kc_chain;
+
 		while (NULL != k)
 		{
 			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
@@ -194,8 +195,10 @@ int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGEN
 				swt_count += (double)cpu->cpu_sysinfo.pswitch;
 				cpu_count += 1;
 			}
+
 			k = k->ks_next;
 		}
+
 		kstat_close(kc);
 	}
 
@@ -218,6 +221,7 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (NULL != (kc = kstat_open()))
 	{
 		k = kc->kc_chain;
+
 		while (NULL != k)
 		{
 			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
@@ -226,8 +230,10 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
 				intr_count += (double)cpu->cpu_sysinfo.intr;
 				cpu_count += 1;
 			}
+
 			k = k->ks_next;
 		}
+
 		kstat_close(kc);
 	}
 

@@ -29,11 +29,11 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	/* only "all" (default) for parameter "cpu" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
+	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "all"))
 		return SYSINFO_RET_FAIL;
 
 	/* only "avg1" (default) for parameter "mode" is supported */
-	if (0 == get_param(param, 3, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "avg1", sizeof(tmp)))
+	if (0 == get_param(param, 3, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "avg1"))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "user"))
@@ -56,7 +56,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	/* only "all" (default) for parameter "cpu" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strncmp(tmp, "all", sizeof(tmp)))
+	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "all"))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))

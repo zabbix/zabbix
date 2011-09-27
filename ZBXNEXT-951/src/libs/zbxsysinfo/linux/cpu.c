@@ -98,7 +98,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strncmp(tmp, "all", sizeof(tmp)))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		per_cpu = 0;
 	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
@@ -121,7 +121,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	{
 		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
 			return SYSINFO_RET_FAIL;
-		value = value / cpu_num;
+		value /= cpu_num;
 	}
 
 	SET_DBL_RESULT(result, value);
