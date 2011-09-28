@@ -58,46 +58,6 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef HAVE_UVM_UVMEXP2	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
-	int			mib[] = {CTL_VM, VM_UVMEXP2};
-	size_t			len;
-	struct uvmexp_sysctl	v;
-
-	len = sizeof(struct uvmexp_sysctl);
-
-	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, v.intrs);
-
-	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
-}
-
-int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef HAVE_UVM_UVMEXP2	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
-	int			mib[] = {CTL_VM, VM_UVMEXP2};
-	size_t			len;
-	struct uvmexp_sysctl	v;
-
-	len = sizeof(struct uvmexp_sysctl);
-
-	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, v.swtch);
-
-	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
-}
-
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[16];
@@ -171,6 +131,46 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	}
 
 	SET_DBL_RESULT(result, value);
+
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
+}
+
+int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifdef HAVE_UVM_UVMEXP2	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
+	int			mib[] = {CTL_VM, VM_UVMEXP2};
+	size_t			len;
+	struct uvmexp_sysctl	v;
+
+	len = sizeof(struct uvmexp_sysctl);
+
+	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, v.swtch);
+
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
+}
+
+int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifdef HAVE_UVM_UVMEXP2	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
+	int			mib[] = {CTL_VM, VM_UVMEXP2};
+	size_t			len;
+	struct uvmexp_sysctl	v;
+
+	len = sizeof(struct uvmexp_sysctl);
+
+	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, v.intrs);
 
 	return SYSINFO_RET_OK;
 #else
