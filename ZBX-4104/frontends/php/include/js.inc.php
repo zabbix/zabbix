@@ -538,17 +538,19 @@ function insert_js_function($fnct_name){
 						var parentDocumentForms = $(parentDocument.body).select("form[name="+frame+"]");
 					}
 
-					var submitParent = submitParent || false;
+					submitParent = submitParent || false;
 
 					var tmpStorage = null;
 					for (var key in values) {
 						if (is_null(values[key])) continue;
 
-						if (parentDocumentForms.length)
-							tmpStorage = $(parentDocumentForms[0]).select(\'[name="\'+key+\'"]\').first();
+						if (parentDocumentForms.length) {
+							tmpStorage = $(parentDocumentForms[0].parentNode).select("#"+key).first();
+						}
 
-						if (typeof(tmpStorage) == "undefined" || is_null(tmpStorage))
+						if (typeof(tmpStorage) == "undefined" || is_null(tmpStorage)) {
 							tmpStorage = parentDocument.getElementById(key);
+						}
 
 						tmpStorage.value = values[key];
 					}
