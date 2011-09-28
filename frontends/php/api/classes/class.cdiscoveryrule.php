@@ -877,15 +877,25 @@ COpt::memoryPick();
 				if(($host['status'] == HOST_STATUS_TEMPLATE) || !isset($item['type'])){
 					unset($item['interfaceid']);
 				}
-				else if(isset($item['type']) && ($item['type'] != $exItem['type'])){
-					if($type = $this->itemTypeInterface($item['type'])){
-						if(!isset($interfaceids[$type]))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $exItem['key_']));
+				elseif (isset($item['type']) && $item['type'] != $exItem['type']) {
+					$type = $this->itemTypeInterface($item['type']);
 
-						$item['interfaceid'] = $interfaceids[$type];
+					if ($type == INTERFACE_TYPE_ANY) {
+						foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {
+							if (isset($interfaceids[$itype])) {
+								$item['interfaceid'] = $interfaceids[$itype];
+								break;
+							}
+						}
 					}
-					else{
+					elseif ($type === false) {
 						$item['interfaceid'] = 0;
+					}
+					else {
+						if (!isset($interfaceids[$type])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], is_null($exItem['key_']) ? $item['key_'] : $exItem['key_']));
+						}
+						$item['interfaceid'] = $interfaceids[$type];
 					}
 				}
 

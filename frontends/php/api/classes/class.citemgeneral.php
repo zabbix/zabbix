@@ -92,15 +92,6 @@ abstract class CItemGeneral extends CZBXAPI{
 	 * @return void
 	 */
 	protected function checkInput(array &$items, $update=false) {
-		// interfaces
-		$interfaceids = zbx_objectValues($items, 'interfaceid');
-		$interfaces = API::HostInterface()->get(array(
-			'output' => array('interfaceid', 'hostid', 'type'),
-			'interfaceids' => $interfaceids,
-			'nopermissions' => true,
-			'preservekeys' => true
-		));
-
 		// permissions
 		if ($update) {
 			$item_db_fields = array('itemid' => null);
@@ -131,6 +122,14 @@ abstract class CItemGeneral extends CZBXAPI{
 				'preservekeys' => true
 			));
 		}
+
+		// interfaces
+		$interfaces = API::HostInterface()->get(array(
+			'output' => array('interfaceid', 'hostid', 'type'),
+			'hostids' => zbx_objectValues($dbHosts, 'hostid'),
+			'nopermissions' => true,
+			'preservekeys' => true
+		));
 
 		foreach ($items as $inum => &$item) {
 			$fullItem = $items[$inum];
@@ -180,16 +179,14 @@ abstract class CItemGeneral extends CZBXAPI{
 
 
 			$itemInterfaceType = $this->itemTypeInterface($fullItem['type']);
-			if ($itemInterfaceType && $dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE
+			if ($itemInterfaceType !== false && $dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE
 				&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD
 			) {
-				if (isset($item['interfaceid'])) {
-					if (!isset($interfaces[$item['interfaceid']]) || bccomp($interfaces[$item['interfaceid']]['hostid'], $item['hostid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses Host interface from non parent host'));
-					}
-					if ($interfaces[$item['interfaceid']]['type'] != $itemInterfaceType) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
-					}
+				if (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses Host interface from non parent host'));
+				}
+				if ($itemInterfaceType !== INTERFACE_TYPE_ANY && $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
 				}
 			}
 			else {
@@ -295,12 +292,13 @@ abstract class CItemGeneral extends CZBXAPI{
 			case ITEM_TYPE_IPMI:
 				return INTERFACE_TYPE_IPMI;
 			case ITEM_TYPE_ZABBIX:
+				return INTERFACE_TYPE_AGENT;
 			case ITEM_TYPE_SIMPLE:
 			case ITEM_TYPE_EXTERNAL:
 			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:
-				return INTERFACE_TYPE_AGENT;
+				return INTERFACE_TYPE_ANY;
 			case ITEM_TYPE_JMX:
 				return INTERFACE_TYPE_JMX;
 			default:
