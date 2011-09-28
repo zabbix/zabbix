@@ -61,44 +61,6 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#if defined(HAVE_FUNCTION_SYSCTLBYNAME)	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
-	u_int	v_intr;
-	size_t	len;
-
-	len = sizeof(v_intr);
-
-	if (0 != sysctlbyname("vm.stats.sys.v_intr", &v_intr, &len, NULL, 0))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, v_intr);
-
-	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
-}
-
-int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#if defined(HAVE_FUNCTION_SYSCTLBYNAME)	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
-	u_int	v_swtch;
-	size_t	len;
-
-	len = sizeof(v_swtch);
-
-	if (0 != sysctlbyname("vm.stats.sys.v_swtch", &v_swtch, &len, NULL, 0))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, v_swtch);
-
-	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
-}
-
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[16];
@@ -139,7 +101,6 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_GETLOADAVG	/* FreeBSD 4.2 i386; FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
 	char	tmp[16];
 	int	mode, per_cpu = 1, cpu_num;
 	double	load[ZBX_AVG_COUNT], value;
@@ -174,6 +135,41 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	}
 
 	SET_DBL_RESULT(result, value);
+
+	return SYSINFO_RET_OK;
+}
+
+int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#if defined(HAVE_FUNCTION_SYSCTLBYNAME)	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	u_int	v_swtch;
+	size_t	len;
+
+	len = sizeof(v_swtch);
+
+	if (0 != sysctlbyname("vm.stats.sys.v_swtch", &v_swtch, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, v_swtch);
+
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
+}
+
+int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#if defined(HAVE_FUNCTION_SYSCTLBYNAME)	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
+	u_int	v_intr;
+	size_t	len;
+
+	len = sizeof(v_intr);
+
+	if (0 != sysctlbyname("vm.stats.sys.v_intr", &v_intr, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, v_intr);
 
 	return SYSINFO_RET_OK;
 #else

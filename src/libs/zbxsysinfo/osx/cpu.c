@@ -94,86 +94,11 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return get_cpustat(result, cpu_num, state, mode);
 }
 
-static double	get_system_load(int mode)
-{
-#if defined(HAVE_GETLOADAVG)
-	double	load[3];
-
-	if (mode >= getloadavg(load, 3))
-		return -1;
-
-	return load[mode];
-#elif defined(HAVE_SYS_PSTAT_H)
-	struct pst_dynamic	dyn;
-
-	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
-		return -1;
-
-	if (ZBX_AVG1 == mode)
-		return dyn.psd_avg_1_min;
-
-	if (ZBX_AVG5 == mode)
-		return dyn.psd_avg_5_min;
-
-	return dyn.psd_avg_15_min;
-#elif defined(HAVE_PROC_LOADAVG)
-	FILE	*f;
-	char	*c, buf[MAX_STRING_LEN];
-	double	value;
-
-	if (NULL == (f = fopen("/proc/loadavg", "r")))
-		return -1;
-
-	if (NULL == fgets(buf, sizeof(buf), f))
-	{
-		zbx_fclose(f);
-		return -1;
-	}
-
-	zbx_fclose(f);
-
-	c = strtok(buf, " ");
-
-	while (0 < mode--)
-		c = (char *)strtok(NULL, " ");
-
-	if (1 != sscanf(c, "%lf", &value))
-		return -1;
-
-	return value;
-
-#elif defined(HAVE_KSTAT_H)
-	static const char	*keys[] =
-	{
-		"avenrun_1min",
-		"avenrun_5min",
-		"avenrun_15min"
-	};
-
-	static kstat_ctl_t	*kc = NULL;
-	kstat_t			*ks;
-	kstat_named_t		*kn;
-
-	if (NULL == kc && NULL == (kc = kstat_open()))
-		return -1;
-
-	if (NULL == (ks = kstat_lookup(kc, "unix", 0, "system_misc")) || -1 == kstat_read(kc, ks, 0) ||
-			NULL == (kn = kstat_data_lookup(ks, keys[mode])))
-	{
-		return -1;
-	}
-
-	return (double)kn->value.ul / 256;
-#else
-	return -1;
-#endif
-}
-
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[16];
 	int	mode, per_cpu = 1, cpu_num;
-	double	value;
+	double	load[ZBX_AVG_COUNT], value;
 
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -192,8 +117,10 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (-1 == (value = get_system_load(mode)))
+	if (mode >= getloadavg(load, 3))
 		return SYSINFO_RET_FAIL;
+
+	value = load[mode];
 
 	if (1 == per_cpu)
 	{
