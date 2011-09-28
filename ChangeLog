@@ -1,5 +1,6 @@
 Changes for 1.8.9rc1
 
+ - [ZBX-4177] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
  - [ZBX-4085] fixed compilation issues for OS X Leopard (rudolfs)
 
 Changes for 1.8.8
