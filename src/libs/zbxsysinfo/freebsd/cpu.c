@@ -21,7 +21,7 @@
 #include "sysinfo.h"
 #include "stats.h"
 
-int	get_cpu_num(int online)
+static int	get_cpu_num(int online)
 {
 #if defined(_SC_NPROCESSORS_ONLN)	/* FreeBSD 6.2 i386; FreeBSD 7.0 i386 */
 	if (1 == online)
