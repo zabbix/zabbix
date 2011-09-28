@@ -696,87 +696,43 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 	}
 
-	public function acknowledge($data){
-
-
+	public function acknowledge($data) {
 		$eventids = isset($data['eventids']) ? zbx_toArray($data['eventids']) : array();
 		$eventids = zbx_toHash($eventids);
 
-// PERMISSIONS {{{
-			$options = array(
-				'eventids' => $eventids,
-				'output' => API_OUTPUT_EXTEND,
-				'selectTriggers' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
+		// PERMISSIONS {{{
+		$options = array(
+			'eventids' => $eventids,
+			'output' => API_OUTPUT_REFER,
+			'preservekeys' => 1
+		);
+		$allowedEvents = $this->get($options);
+		foreach ($eventids as $eventid) {
+			if (!isset($allowedEvents[$eventid])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+			}
+		}
+		// }}} PERMISSIONS
+
+		$sql = 'UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids);
+		if (!DBexecute($sql)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		}
+
+		$time = time();
+		$dataInsert = array();
+		foreach ($eventids as $eventid) {
+			$dataInsert[] = array(
+				'userid' => self::$userData['userid'],
+				'eventid' => $eventid,
+				'clock' => $time,
+				'message'=> $data['message']
 			);
-			$allowedEvents = $this->get($options);
-			foreach($eventids as $num => $eventid){
-				if(!isset($allowedEvents[$eventid])){
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-				}
-			}
-// }}} PERMISSIONS
+		}
 
-			foreach($allowedEvents as $aenum => $event){
-				$trig = reset($event['triggers']);
-				if(!(($trig['type'] == TRIGGER_MULT_EVENT_ENABLED) && ($event['value'] == TRIGGER_VALUE_TRUE))){
+		DB::insert('acknowledges', $dataInsert);
 
-					$val = ($event['value'] == TRIGGER_VALUE_TRUE ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE);
-
-					$sql = ' SELECT eventid, object, objectid '.
-						' FROM events '.
-						' WHERE eventid < '.$event['eventid'].
-						' AND objectid = '.$event['objectid'].
-						' AND value = '.$val.
-						' AND object = '.EVENT_OBJECT_TRIGGER.
-						' ORDER BY object desc, objectid desc, eventid DESC';
-					$first = DBfetch(DBselect($sql, 1));
-					$first_sql = $first ? ' AND e.eventid > '.$first['eventid'] : '';
-
-
-					$sql = ' SELECT eventid, object, objectid'.
-						' FROM events'.
-						' WHERE eventid > '.$event['eventid'].
-						' AND objectid = '.$event['objectid'].
-						' AND value = '.$val.
-						' AND object = '.EVENT_OBJECT_TRIGGER.
-						' ORDER BY object ASC, objectid ASC, eventid ASC';
-					$last = DBfetch(DBselect($sql, 1));
-					$last_sql = $last ? ' AND e.eventid < '.$last['eventid'] : '';
-
-
-					$sql = 'SELECT e.eventid'.
-						' FROM events e'.
-						' WHERE e.objectid = '.$event['objectid'].
-							' AND e.value = '. ($val ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE).
-							$first_sql.
-							$last_sql;
-
-					$db_events = DBselect($sql);
-					while($eventid = DBfetch($db_events)){
-						$eventids[$eventid['eventid']] = $eventid['eventid'];
-					}
-				}
-			}
-
-			$sql = 'UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids);
-			if(!DBexecute($sql)) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
-			$time = time();
-			$dataInsert = array();
-			foreach($eventids as $enum => $eventid){
-				$dataInsert[] = array(
-					'userid' => self::$userData['userid'],
-					'eventid' => $eventid,
-					'clock' => $time,
-					'message'=> $data['message']
-				);
-			}
-
-			DB::insert('acknowledges', $dataInsert);
-
-			return array('eventids' => array_values($eventids));
+		return array('eventids' => array_values($eventids));
 	}
-
 }
 ?>
