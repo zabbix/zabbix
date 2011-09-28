@@ -95,16 +95,12 @@ static ZBX_HISTORY_TABLE areg = {
  *                                                                            *
  * Function: get_proxy_id                                                     *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
  * Parameters: host - [IN] require size 'HOST_HOST_LEN_MAX'                   *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int max_error_len)
@@ -154,15 +150,7 @@ int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, ch
  *                                                                            *
  * Function: update_proxy_lastaccess                                          *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	update_proxy_lastaccess(const zbx_uint64_t hostid)
@@ -176,13 +164,7 @@ void	update_proxy_lastaccess(const zbx_uint64_t hostid)
  *                                                                            *
  * Purpose: prepare proxy configuration data                                  *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
@@ -379,13 +361,7 @@ static void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid,
  *                                                                            *
  * Purpose: prepare proxy configuration data                                  *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
@@ -449,7 +425,8 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tablename, struct zbx_json_parse *jp_obj)
+static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tablename,
+		struct zbx_json_parse *jp_obj, zbx_uint64_t **del, int *del_num)
 {
 	const char		*__function_name = "process_proxyconfig_table";
 	int			f, field_count, insert, is_null, ret = FAIL;
@@ -458,10 +435,10 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	struct zbx_json_parse	jp_data, jp_row;
 	char			buf[MAX_STRING_LEN], *esc;
 	const char		*p, *pf;
-	zbx_uint64_t		recid, *new = NULL, *old = NULL;
-	int			new_alloc = 100, new_num = 0, old_alloc = 100, old_num = 0;
-	char			*sql = NULL, *sq2 = NULL;
-	int			sql_alloc = 4096, sql_offset, sq2_alloc = 512, sq2_offset;
+	zbx_uint64_t		recid, *new = NULL;
+	int			new_alloc = 100, new_num = 0, del_alloc = 100;
+	char			*sql = NULL;
+	int			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset;
 	DB_RESULT		result;
 	DB_ROW			row;
 
@@ -469,20 +446,19 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 	if (NULL == (table = DBget_table(tablename)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid table name \"%s\"", tablename);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid table name \"%s\"", tablename);
 		goto exit;
 	}
 
 	new = zbx_malloc(new, new_alloc * sizeof(zbx_uint64_t));
-	old = zbx_malloc(old, old_alloc * sizeof(zbx_uint64_t));
-	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
-	sq2 = zbx_malloc(sq2, sq2_alloc * sizeof(char));
+	*del = zbx_malloc(*del, del_alloc * sizeof(zbx_uint64_t));
+	sql = zbx_malloc(sql, sql_alloc);
 
 	result = DBselect("select %s from %s", table->recid, table->table);
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(recid, row[0]);
-		uint64_array_add(&old, &old_alloc, &old_num, recid, 64);
+		uint64_array_add(del, &del_alloc, del_num, recid, 64);
 	}
 	DBfree_result(result);
 
@@ -528,7 +504,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	{
 		if (NULL == (fields[field_count] = DBget_field(table, buf)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid field name \"%s\"", buf);
+			zabbix_log(LOG_LEVEL_WARNING, "invalid field name \"%s\"", buf);
 			goto db_error;
 		}
 
@@ -560,7 +536,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	sql_offset = 0;
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
 #endif
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the entries (lines 9, 14 and 19 in T1) */
@@ -574,7 +550,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 		/* check whether we need to insert a new entry or update an existing */
 		ZBX_STR2UINT64(recid, buf);
-		insert = (SUCCEED == uint64_array_exists(old, old_num, recid) ? 0 : 1);
+		insert = (SUCCEED == uint64_array_exists(*del, *del_num, recid) ? 0 : 1);
 		uint64_array_add(&new, &new_alloc, &new_num, recid, 64);
 
 		if (0 != insert)
@@ -601,7 +577,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 			if (f == field_count)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
+				zabbix_log(LOG_LEVEL_WARNING, "invalid number of fields \"%.*s\"",
 						jp_row.end - jp_row.start + 1, jp_row.start);
 				goto db_error;
 			}
@@ -616,7 +592,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			{
 				if (0 != (fields[f]->flags & ZBX_NOTNULL))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "Column '%s' cannot be null", fields[f]->name);
+					zabbix_log(LOG_LEVEL_WARNING, "column '%s' cannot be null", fields[f]->name);
 					goto db_error;
 				}
 
@@ -646,7 +622,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 		if (f != field_count)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid number of fields \"%.*s\"",
+			zabbix_log(LOG_LEVEL_WARNING, "invalid number of fields \"%.*s\"",
 					jp_row.end - jp_row.start + 1, jp_row.start);
 			goto db_error;
 		}
@@ -662,49 +638,30 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 					table->recid, recid);
 		}
 
-		if (ZBX_MAX_SQL_SIZE < sql_offset)
-		{
-#ifdef HAVE_ORACLE
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
-			if (ZBX_DB_OK > DBexecute("%s", sql))
-				goto db_error;
-
-			sql_offset = 0;
-#ifdef HAVE_ORACLE
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
-		}
-	}
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
-
-	uint64_array_remove(old, &old_num, new, new_num);
-
-	if (0 < old_num)
-	{
-		sq2_offset = 0;
-		zbx_snprintf_alloc(&sq2, &sq2_alloc, &sq2_offset, 128, "delete from %s where", table->table);
-		DBadd_condition_alloc(&sq2, &sq2_alloc, &sq2_offset, table->recid, old, old_num);
-		if (ZBX_DB_OK > DBexecute("%s", sq2))
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 			goto db_error;
 	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			goto db_error;
+
+	uint64_array_remove(*del, del_num, new, new_num);
+
+	del_alloc = *del_num;
+	*del = zbx_realloc(*del, del_alloc * sizeof(zbx_uint64_t));
 
 	ret = SUCCEED;
 json_error:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot process table \"%s\": %s", tablename, zbx_json_strerror());
 db_error:
-	zbx_free(sq2);
 	zbx_free(sql);
 	zbx_free(new);
-	zbx_free(old);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -717,25 +674,34 @@ exit:
  *                                                                            *
  * Purpose: update configuration                                              *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	process_proxyconfig(struct zbx_json_parse *jp_data)
 {
+	struct table_ids
+	{
+		char		*table_name;
+		zbx_uint64_t	*ids;
+		int		id_num;
+	};
+
 	const char		*__function_name = "process_proxyconfig";
 	char			buf[MAX_STRING_LEN];
 	size_t			len = sizeof(buf);
 	const char		*p = NULL;
 	struct zbx_json_parse	jp_obj;
-	int			ret = SUCCEED;
+	int			i, ret = SUCCEED;
+
+	struct table_ids	*delete_ids;
+	zbx_vector_ptr_t	table_order;
+	const ZBX_TABLE		*table = NULL;
+	char 			*sql = NULL;
+	int 			sql_alloc = 512, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&table_order);
 
 	DBbegin();
 
@@ -744,21 +710,75 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	{
 		if (FAIL == zbx_json_brackets_open(p, &jp_obj))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process table \"%s\". %s", buf, zbx_json_strerror());
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process table \"%s\": %s", buf, zbx_json_strerror());
 			ret = FAIL;
 			break;
 		}
 
-		ret = process_proxyconfig_table(jp_data, buf, &jp_obj);
+		delete_ids = zbx_malloc(NULL, sizeof(struct table_ids));
+		delete_ids->table_name = zbx_strdup(NULL, buf);
+		delete_ids->ids = NULL;
+		delete_ids->id_num = 0;
+		zbx_vector_ptr_append(&table_order, delete_ids);
+
+		ret = process_proxyconfig_table(jp_data, buf, &jp_obj, &delete_ids->ids, &delete_ids->id_num);
 	}
 
-	if (ret == SUCCEED)
+	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
+
+	for (i = table_order.values_num - 1; 0 <= i; i--)
+	{
+		delete_ids = table_order.values[i];
+
+		if (SUCCEED == ret && 0 < delete_ids->id_num)
+		{
+			if (NULL == (table = DBget_table(delete_ids->table_name)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "invalid table name \"%s\"", delete_ids->table_name);
+				break;
+			}
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "delete from %s where", table->table);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid,
+					delete_ids->ids, delete_ids->id_num);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+
+			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		zbx_free(delete_ids->ids);
+		zbx_free(delete_ids->table_name);
+		zbx_free(delete_ids);
+	}
+
+	if (SUCCEED == ret)
+	{
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
+
+		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+			if (ZBX_DB_OK > DBexecute("%s", sql))
+				ret = FAIL;
+	}
+
+	zbx_free(sql);
+	zbx_vector_ptr_destroy(&table_order);
+
+	if (SUCCEED == ret)
 	{
 		DBcommit();
 		DCsync_configuration();
 	}
 	else
+	{
+		zabbix_log(LOG_LEVEL_ERR, "failed to update local proxy cofiguration copy");
 		DBrollback();
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -767,16 +787,10 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
  *                                                                            *
  * Function: get_host_availability_data                                       *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	get_host_availability_data(struct zbx_json *j)
@@ -932,13 +946,7 @@ int	get_host_availability_data(struct zbx_json *j)
  *                                                                            *
  * Purpose: update proxy hosts availability                                   *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	process_host_availability(struct zbx_json_parse *jp)
@@ -955,7 +963,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	/* "data" tag lists the hosts */
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Received invalid host availability data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
 		goto exit;
 	}
 
@@ -967,14 +975,14 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	DBbegin();
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
 #endif
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the host entries */
 	{
 		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid host availability data. %s", zbx_json_strerror());
+			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
 			continue;
 		}
 
@@ -1045,14 +1053,14 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid host availability data. %s", zbx_json_strerror());
+			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
 			sql_offset = tmp_offset;
 			continue;
 		}
 
 		if (SUCCEED != is_uint64(tmp, &hostid) || 1 == no_data)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Invalid host availability data.");
+			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data");
 			sql_offset = tmp_offset;
 			continue;
 		}
@@ -1064,7 +1072,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
@@ -1081,15 +1089,7 @@ exit:
  *                                                                            *
  * Function: proxy_get_lastid                                                 *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	proxy_get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
@@ -1118,15 +1118,7 @@ static void	proxy_get_lastid(const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
  *                                                                            *
  * Function: proxy_set_lastid                                                 *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	proxy_set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t lastid)
@@ -1183,15 +1175,7 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
  *                                                                            *
  * Function: proxy_get_history_data                                           *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
@@ -1347,11 +1331,7 @@ void	calc_timestamp(char *line, int *timestamp, char *format)
  *             value_num    - [IN] number of elements in array                *
  *             processed    - [OUT] number of processed elements              *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
@@ -1383,7 +1363,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		if (ITEM_TYPE_TRAPPER == item.type && 0 == proxy_hostid &&
 				FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Process data failed: %s", zbx_tcp_strerror());
+			zabbix_log(LOG_LEVEL_WARNING, "process data failed: %s", zbx_tcp_strerror());
 			continue;
 		}
 
@@ -1418,7 +1398,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			}
 			else if (ISSET_MSG(&agent))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
+				zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
 
 				dc_add_history(item.itemid, item.value_type, item.flags, NULL, &values[i].ts,
@@ -1451,14 +1431,10 @@ static void	clean_agent_values(AGENT_VALUE *values, int value_num)
  *                                                                            *
  * Purpose: process values sent by proxies, active agents and senders         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexander Vladishev, Alexei Vladishev                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
@@ -1603,13 +1579,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
  *                                                                            *
  * Purpose: update discovery data, received from proxy                        *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	process_dhis_data(struct zbx_json_parse *jp)
@@ -1723,11 +1693,11 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 
 		continue;
 json_parse_error:
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 	}
 exit:
 	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
@@ -1738,13 +1708,7 @@ exit:
  *                                                                            *
  * Purpose: update auto-registration data, received from proxy                *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
@@ -1801,11 +1765,11 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 
 		continue;
 json_parse_error:
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 	}
 exit:
 	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid auto registration data. %s", zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 }
@@ -1819,11 +1783,7 @@ exit:
  * Parameters:  itemid - item identificator from database                     *
  *              appids - result buffer                                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBget_applications_by_itemid(zbx_uint64_t itemid,
@@ -1860,8 +1820,6 @@ static void	DBget_applications_by_itemid(zbx_uint64_t itemid,
  * Return value: pointer to expanded expression                               *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char *expression,
@@ -1935,8 +1893,6 @@ static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char 
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	DBlld_compare_triggers(zbx_uint64_t triggerid1, const char *expression1,
 		zbx_uint64_t triggerid2, const char *expression2, struct zbx_json_parse *jp_row)
@@ -2004,15 +1960,7 @@ static int	DBlld_compare_trigger_items(zbx_uint64_t triggerid, struct zbx_json_p
  *                                                                            *
  * Function: DBlld_get_item                                                   *
  *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
@@ -2076,8 +2024,6 @@ static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid, const char *description_proto,
@@ -2207,7 +2153,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
 #endif
 
 	if (0 != new_triggerid)
@@ -2339,7 +2285,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
 	if (SUCCEED == res)
@@ -2388,13 +2334,7 @@ out:
  *                                                                            *
  * Purpose: add or update triggers for discovered items                       *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
@@ -2467,8 +2407,6 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, const char *name_proto,
@@ -2594,7 +2532,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
 #endif
 
 	if (0 == new_itemid)
@@ -2721,7 +2659,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	zbx_free(appids);
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
@@ -2747,13 +2685,7 @@ out:
  *                                                                            *
  * Purpose: add or update items for discovered items                          *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
@@ -2887,13 +2819,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
  *                                                                            *
  * Purpose: add or update graph                                               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
@@ -3060,7 +2986,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
 #endif
 
 	if (0 != new_graphid)
@@ -3181,7 +3107,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 	DBexecute("%s", sql);
 out:
@@ -3208,11 +3134,7 @@ out:
  *             agent   - [IN] discovery item identificator from database      *
  *             jp_data - [IN] received data                                   *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
@@ -3297,11 +3219,7 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
  *                                     from database                          *
  *             value            - [IN] received value from agent              *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
@@ -3347,7 +3265,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 		ZBX_DBROW2UINT64(interfaceid, row[11]);
 	}
 	else
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
 	DBfree_result(result);
 
 	if (0 == hostid)
@@ -3416,7 +3334,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{
-		zabbix_log(LOG_LEVEL_WARNING,  "Parameter [" ZBX_FS_UI64 "][%s] became supported",
+		zabbix_log(LOG_LEVEL_WARNING,  "parameter [" ZBX_FS_UI64 "][%s] became supported",
 				discovery_itemid, zbx_host_key_string(discovery_itemid));
 
 		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64,
