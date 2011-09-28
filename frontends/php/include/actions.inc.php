@@ -186,6 +186,7 @@ function condition_value2str($conditiontype, $value){
 			return _('Unknown');
 			break;
 	}
+
 	return '"'.$str_val.'"';
 }
 
@@ -604,122 +605,6 @@ function get_operators_by_conditiontype($conditiontype){
 
 	return array();
 }
-
-function validate_condition($conditiontype, $value){
-	switch($conditiontype){
-		case CONDITION_TYPE_HOST_GROUP:
-			$groups = API::HostGroup()->get(array(
-				'groupids' => $value,
-				'output' => API_OUTPUT_SHORTEN,
-				'nodeids' => get_current_nodeid(true),
-			));
-			if(empty($groups)){
-				error(_('Incorrect host group.'));
-				return false;
-			}
-			break;
-		case CONDITION_TYPE_HOST_TEMPLATE:
-			$templates = API::Template()->get(array(
-				'templateids' => $value,
-				'output' => API_OUTPUT_SHORTEN,
-				'nodeids' => get_current_nodeid(true),
-			));
-			if(empty($templates)){
-				error(_('Incorrect template.'));
-				return false;
-			}
-			break;
-		case CONDITION_TYPE_TRIGGER:
-			$triggers = API::Trigger()->get(array(
-				'triggerids' => $value,
-				'output' => API_OUTPUT_SHORTEN,
-				'nodeids' => get_current_nodeid(true),
-			));
-			if(empty($triggers)){
-				error(_('Incorrect trigger.'));
-				return false;
-			}
-			break;
-		case CONDITION_TYPE_HOST:
-			$hosts = API::Host()->get(array(
-				'hostids' => $value,
-				'output' => API_OUTPUT_SHORTEN,
-				'nodeids' => get_current_nodeid(true),
-			));
-			if(empty($hosts)){
-				error(_('Incorrect host.'));
-				return false;
-			}
-			break;
-		case CONDITION_TYPE_PROXY:
-			$proxyes = API::Proxy()->get(array(
-				'proxyids' => $value,
-				'output' => API_OUTPUT_SHORTEN,
-				'nodeids' => get_current_nodeid(true),
-			));
-			if(empty($proxyes)){
-				error(_('Incorrect proxy.'));
-				return false;
-			}
-			break;
-		case CONDITION_TYPE_TIME_PERIOD:
-			if( !validate_period($value) ){
-				error(_s('Incorrect period "%s".', $value));
-				return false;
-			}
-			break;
-		case CONDITION_TYPE_DHOST_IP:
-			if( !validate_ip_range($value) ){
-				error(_s('Incorrect IP "%s".', $value));
-				return false;
-			}
-			break;
-		case CONDITION_TYPE_DSERVICE_TYPE:
-			if(S_UNKNOWN == discovery_check_type2str($value)){
-				error(_('Incorrect discovery check.'));
-				return false;
-			}
-			break;
-		case CONDITION_TYPE_DSERVICE_PORT:
-			if( !validate_port_list($value) ){
-				error(_s('Incorrect port "%s".', $value));
-				return false;
-			}
-			break;
-		case CONDITION_TYPE_DSTATUS:
-			if( S_UNKNOWN == discovery_object_status2str($value) ){
-				error(_('Incorrect discovery status.'));
-				return false;
-			}
-			break;
-		case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-			if(S_UNKNOWN == condition_value2str($conditiontype, $value)){
-				error(_('Incorrect discovery status.'));
-				return false;
-			}
-			break;
-
-		case CONDITION_TYPE_TRIGGER_NAME:
-		case CONDITION_TYPE_TRIGGER_VALUE:
-		case CONDITION_TYPE_TRIGGER_SEVERITY:
-		case CONDITION_TYPE_MAINTENANCE:
-		case CONDITION_TYPE_NODE:
-		case CONDITION_TYPE_DRULE:
-		case CONDITION_TYPE_DCHECK:
-		case CONDITION_TYPE_DOBJECT:
-		case CONDITION_TYPE_DUPTIME:
-		case CONDITION_TYPE_DVALUE:
-		case CONDITION_TYPE_APPLICATION:
-		case CONDITION_TYPE_HOST_NAME:
-			break;
-		default:
-			error(_('Incorrect condition type'));
-			return false;
-			break;
-	}
-	return true;
-}
-
 
 function count_operations_delay($operations, $def_period=0){
 	$delays = array(0,0);

@@ -2214,7 +2214,7 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
 			;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:'%s'", __function_name, value);
 }
 
 /******************************************************************************

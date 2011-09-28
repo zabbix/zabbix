@@ -1,1 +1,1 @@
--- see host_inventory.sql
+-- See host_inventory.sql
