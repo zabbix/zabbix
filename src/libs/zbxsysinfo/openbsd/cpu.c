@@ -150,9 +150,9 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 
 	SET_UI64_RESULT(result, v.swtch);
 
-	return	SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 #else
-	return	SYSINFO_RET_FAIL;
+	return SYSINFO_RET_FAIL;
 #endif
 }
 
@@ -170,8 +170,8 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 
 	SET_UI64_RESULT(result, v.intrs);
 
-	return	SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 #else
-	return	SYSINFO_RET_FAIL;
+	return SYSINFO_RET_FAIL;
 #endif
 }
