@@ -24,8 +24,6 @@
 
 extern ZBX_METRIC	parameters_common[];
 
-double	getPROC(char *file, int lineno, int fieldno);
-
 int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	EXECUTE_DBL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);

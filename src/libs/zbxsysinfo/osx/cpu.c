@@ -20,7 +20,6 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "stats.h"
-#include "../common/common.h"
 
 static int	get_cpu_num()
 {
@@ -118,7 +117,31 @@ static double	get_system_load(int mode)
 
 	return dyn.psd_avg_15_min;
 #elif defined(HAVE_PROC_LOADAVG)
-	return getPROC("/proc/loadavg", 1, mode + 1);
+	FILE	*f;
+	char	*c, buf[MAX_STRING_LEN];
+	double	value;
+
+	if (NULL == (f = fopen("/proc/loadavg", "r")))
+		return -1;
+
+	if (NULL == fgets(buf, sizeof(buf), f))
+	{
+		zbx_fclose(f);
+		return -1;
+	}
+
+	zbx_fclose(f);
+
+	c = strtok(buf, " ");
+
+	while (0 < mode--)
+		c = (char *)strtok(NULL, " ");
+
+	if (1 != sscanf(c, "%lf", &value))
+		return -1;
+
+	return value;
+
 #elif defined(HAVE_KSTAT_H)
 	static const char	*keys[] =
 	{
