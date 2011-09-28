@@ -237,6 +237,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4104] fixed handle handling when executing scripts in Windows (rudolfs)
  - [ZBX-4091] removed unneeded linking for binaries (rudolfs)
  - [ZBX-4155] fixed .pid file locking not to allow multiple instances (rudolfs)
  - [ZBX-4056] fixed memory read access violation in Windows performance counters (rudolfs)
