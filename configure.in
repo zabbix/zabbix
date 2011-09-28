@@ -1244,13 +1244,6 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${OPENIPMI_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${OPENIPMI_LIBS}"
-
-	AC_SUBST(SERVER_LDFLAGS)
-	AC_SUBST(SERVER_LIBS)
-
-	AC_SUBST(PROXY_LDFLAGS)
-	AC_SUBST(PROXY_LIBS)
-
 fi
 
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
