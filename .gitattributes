@@ -237,6 +237,7 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/class.frontendsetup.php -text
 frontends/php/include/classes/class.globalregexp.php -text
 frontends/php/include/views/administration.authentication.edit.php -text
 frontends/php/include/views/administration.general.gui.edit.php -text
