@@ -281,7 +281,7 @@ FIELD		|port		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|dcheckid	|t_id		|	|NOT NULL	|0			|-|dchecks
+FIELD		|dcheckid	|t_id		|	|NULL		|0			|-|dchecks
 FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|0
 INDEX		|1		|clock
 
