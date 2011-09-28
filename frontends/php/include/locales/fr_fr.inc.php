@@ -2142,7 +2142,6 @@
 	'S_KEY_CANNOT_BE_EMPTY'=>			'La clé ne peut pas être vide',
 	'S_NO_KEY_ID_PROVIDED'=>			'Pas d\'identificat de clé fourni.',
 	'S_NO_ITEM_KEY_PROVIDED'=>			'Format de clé d\'élément invalide.',
-	'S_SIMPLE_CHECK_KEY_CANNOT_CONTAIN'=>			'Une clé de vérification simple ne peut pas avoir de paramètres entre [].',
 	'S_INCORRECT_SYNTAX_NEAR'=>			'syntaxe incorrecte près de \'%1$s\' à la position %2$d',
 	'S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS'=>			'Usage incorrect des crochets. \'%s\' trouvé après le crochet final.',
 	'S_INVALID_KEY_FORMAT'=>			'Format de clé invalide',
