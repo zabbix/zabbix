@@ -121,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"26 July 2011"
-#define	ZABBIX_VERSION		"1.9.6"
+#define	ZABBIX_REVDATE		"9 September 2011"
+#define	ZABBIX_VERSION		"1.9.7"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -177,7 +177,8 @@ typedef enum
 	ITEM_TYPE_SSH,
 	ITEM_TYPE_TELNET,
 	ITEM_TYPE_CALCULATED,
-	ITEM_TYPE_JMX
+	ITEM_TYPE_JMX,
+	ITEM_TYPE_SNMPTRAP	/* 17 */
 }
 zbx_item_type_t;
 const char	*zbx_host_type_string(zbx_item_type_t item_type);
@@ -787,12 +788,12 @@ void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
 void	lrtrim_spaces(char *c);
 void	del_zeroes(char *s);
-int	get_param(const char *param, int num, char *buf, int maxlen);
+int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
 void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
-int	get_key_param(char *param, int num, char *buf, int maxlen);
+int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
 int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,

@@ -16,6 +16,7 @@ build/win32/project/Makefile_sender_x64 -text
 create/data/create_data_sql/create_data_sql.sh svneol=native#text/x-sh
 create/data/create_data_sql/data_sql_blacklist.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_blacklistbyval.txt -text
+create/data/create_data_sql/data_sql_blacklistbyval_ref.txt -text
 create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
 create/images/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
@@ -236,7 +237,9 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/class.frontendsetup.php -text
 frontends/php/include/classes/class.globalregexp.php -text
+frontends/php/include/views/administration.authentication.edit.php -text
 frontends/php/include/views/administration.general.gui.edit.php -text
 frontends/php/include/views/administration.general.housekeeper.edit.php -text
 frontends/php/include/views/administration.general.image.edit.php -text
@@ -248,6 +251,8 @@ frontends/php/include/views/administration.general.regularexpressions.list.php -
 frontends/php/include/views/administration.general.valuemapping.edit.php -text
 frontends/php/include/views/administration.general.valuemapping.list.php -text
 frontends/php/include/views/administration.general.workingtime.edit.php -text
+frontends/php/include/views/administration.mediatypes.edit.php -text
+frontends/php/include/views/administration.mediatypes.list.php -text
 frontends/php/include/views/js/administration.general.macros.js.php -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
@@ -331,6 +336,7 @@ misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 misc/init.d/ubuntu/zabbix-agent.conf -text
 misc/init.d/ubuntu/zabbix-server.conf -text
+misc/snmptrap/zabbix_trap_receiver.pl -text
 src/libs/zbxcomms/telnet.c -text
 src/libs/zbxself/Makefile.am -text
 src/libs/zbxsysinfo/linux/hardware.c -text
@@ -343,6 +349,9 @@ src/zabbix_java/lib/org-json-2010-12-28.jar -text
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 src/zabbix_java/tests/junit-4.8.2.jar -text
 src/zabbix_server/selfmon/Makefile.am -text
+src/zabbix_server/snmptrapper/Makefile.am -text
+src/zabbix_server/snmptrapper/snmptrapper.c -text
+src/zabbix_server/snmptrapper/snmptrapper.h -text
 tests/data/README -text
 tests/data/data_test.sql -text
 tests/templates/sqlite3.init -text

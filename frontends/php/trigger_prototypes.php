@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_TRIGGERS';
 $page['file'] = 'trigger_prototypes.php';
-$page['hist_arg'] = array('hostid','groupid');
+$page['hist_arg'] = array('parent_discoveryid');
 
 include_once('include/page_header.php');
 

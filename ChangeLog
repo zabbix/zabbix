@@ -1,7 +1,40 @@
 --------------------------------------------------------------------------------
+Changes for 1.9.7
+
+New features:
+ - [ZBX-3870] fixed data deletion order in proxy configuration synchronization (deniss,rudolfs)
+ - [ZBX-4167] updated requirements screen for frontend (Vedmak)
+ - [ZBX-3999] fixed map border (Alex,Sasha,Eduard)
+ - [ZBXNEXT-918] redesign Administration->Media types (Eduard)
+ - [ZBXNEXT-915] redesign Administration->Authentication (Eduard)
+ - [ZBXNEXT-966] update jQuery to 1.6.4 (Eduard)
+ - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+ - [ZBX-3707] fixed possible empty action conditions (Vedmak)
+ - [ZBX-4171] fixed server crash in add_value_suffix() under DebugLevel=4 (asaveljevs)
+ - [ZBX-3930] fixed errors when return to some specific screens from profile screen (Vedmak)
+ - [ZBX-3400] fixed calculation of graph header font size, Zabbix will decrease it to fit graph width (Alexei)
+ - [ZBX-4105] fixed removal of host groups in configuration of dashboard, thanks to Pustovalov Alexey (Alexei)
+ - [ZBX-3939] fixed warning messages when looking at the history of several selected log items (Alexei)
+ - [ZBX-3493] fixed warnings when removing and clearing a template (Alexei)
+ - [ZBX-4143] fixed cases with upgrade patch sometimes attempting to reference tables that were not created yet (Richlv, Sasha)
+ - [ZBX-3618] extended allowed syntax for host interface dns names (Vedmak)
+ - [ZBX-3946] fixed errors when create trigger with dependencies (Vedmak)
+ - [ZBX-3921] fixed change link shown for maps in slide show (Vedmak)
+ - [ZBX-4082] fixed error in Monitoring->Triggers when acknowledges are disabled (Vedmak)
+ - [ZBX-4080] fixed host header info shown for creation form (Vedmak)
+ - [ZBX-3987] fixed errors when change host in Monitoring->Graphs (Vedmak)
+ - [ZBX-4114] fixed icon maps form height on dragging (Vedmak)
+ - [ZBX-4101] fixed excess borders in screen cell configuration form (Vedmak)
+ - [ZBX-3786] fixed incorrect inheritance of items when template is linked to another template linked to host (Vedmak)
+ - [ZBX-1207] fixed host full clone with custom graphs (Vedmak)
+
+--------------------------------------------------------------------------------
 Changes for 1.9.6
 
 New features:
+ - [ZBXNEXT-747] added direct SNMP trap monitoring for snmptrapd and embed perl or SNMPTT (Eduard, rudolfs, Vedmak)
  - [ZBX-4116] fixed ibm_db2 update patch for help_items table (rudolfs)
  - [ZBXNEXT-895] redesign general->Macros (Eduard)
  - [ZBXNEXT-899] redesign general->Images (Eduard)
@@ -15,6 +48,8 @@ New features:
  - [ZBXNEXT-863] renamed "host profile" to "host inventory" (dimir)
 
 Bug fixes:
+ - [ZBX-3647] fixed parsing of parameter in external scripts to work like in normal keys and added support for multiline output (Sasha)
+ - [ZBX-2530] renamed "system.cpu.util" item parameters for solaris from "wait" to "iowait", from "kernel" to "system" (deniss)
  - [ZBX-4049] fixed memory leak in configuration syncer (rudolfs)
  - [ZBX-4017] fixed host deletion using api (Vedmak)
  - [ZBX-4029,ZBX-4037] fixed inconsistent and untranslatable strings in frontend and clarified frontend messages (Richlv)
@@ -201,12 +236,38 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.9rc1
+
+ - [ZBX-4104] fixed handle handling when executing scripts in Windows (rudolfs)
+ - [ZBX-4091] removed unneeded linking for binaries (rudolfs)
+ - [ZBX-4155] fixed .pid file locking not to allow multiple instances (rudolfs)
+ - [ZBX-4056] fixed memory read access violation in Windows performance counters (rudolfs)
+ - [ZBX-4177] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
+ - [ZBX-4085] fixed compilation issues for OS X Leopard (rudolfs)
+
+Changes for 1.8.8
+
+1.8.8rc3 was released as 1.8.8 without any changes
+
+Changes for 1.8.8rc3
+
+ - [ZBX-1909] fixed keyparser to allow keys like "key,{$USERMACRO}" (Vedmak)
+ - [ZBX-4157] fixed possible truncating of queries while preparing a configuration data for sending to a proxy (Sasha)
+ - [ZBX-4150] fixed processing of quoted function parameters (Sasha)
+
+Changes for 1.8.8rc2
+
+ - [ZBX-4141] fixed possible cycling of server/proxy processes after unsuccessful execution of SQL statement (Sasha)
+ - [ZBX-4135] fixed item selection in trigger expression (Eduard)
+
 Changes for 1.8.8rc1
 
  - [ZBX-3676] fixed item selection in bar report (Eduard)
+ - [ZBX-4070] improved performance of handling of trigger functions (Sasha)
  - [ZBXNEXT-921] added option to show items without data in latest data (Vedmak)
  - [ZBX-2457] changed "type" to "ENGINE" in MySQL upgrade patches for MySQL 5.5 compatibility (Richlv)
  - [ZBX-4099] fixed possible crash when processing of functions sum(), min(), max() or diff() in triggers, aggregated checks or calculated items (Sasha)
+ - [ZBX-3030] fixed event durations in monitoring (Vedmak,Eduard)
  - [ZBXNEXT-902] changed API search wildcard from "%" to "*" (Vedmak,Eduard)
  - [ZBX-3967] fixed alerter hang on long running alert scripts (Deniss)
  - [ZBX-3970] fixed proxy crash after database connection to postgresql is recovered (Deniss)

@@ -112,7 +112,7 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
 		{
 			/* delete item */
 			memmove(&nextchecks[i], &nextchecks[i + 1], sz * (nextcheck_num - (i + 1)));
-			nextcheck_num --;
+			nextcheck_num--;
 		}
 		else
 			return;
@@ -142,7 +142,7 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, time_t now, const char *error_msg)
  *                                                                            *
  * Purpose: update triggers to UNKNOWN and generate events                    *
  *                                                                            *
- * Author: Alexander Vladishev, Dmitry Borovikov, Aleksandrs Saveljevs        *
+ * Author: Alexander Vladishev, Dmitry Borovikov                              *
  *                                                                            *
  ******************************************************************************/
 void	DCflush_nextchecks()

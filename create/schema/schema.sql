@@ -518,6 +518,11 @@ FIELD		|problem_unack_style|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|problem_ack_style|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|ok_unack_style	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|ok_ack_style	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|snmptrap_logging|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+
+TABLE|globalvars|globalvarid|0
+FIELD		|globalvarid	|t_id		|	|NOT NULL	|0
+FIELD		|snmp_lastsize	|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|	|NOT NULL	|0
