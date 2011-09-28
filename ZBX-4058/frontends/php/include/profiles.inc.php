@@ -218,9 +218,9 @@ return $row;
 function update_config($configs){
 	$update = array();
 
-	if(isset($configs['work_period']) && !is_null($configs['work_period'])){
-		if(!validate_period($configs['work_period'])){
-			error(S_INCORRECT_WORK_PERIOD);
+	if (isset($configs['work_period']) && !is_null($configs['work_period'])) {
+		if (!validate_period($configs['work_period'])) {
+			error(_s('Incorrect working time: %s', $configs['work_period']));
 			return false;
 		}
 	}
