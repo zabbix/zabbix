@@ -58,7 +58,7 @@
 		}
 
 		$auth_user_type[GROUP_GUI_ACCESS_SYSTEM]	= S_SYSTEM_DEFAULT;
-		$auth_user_type[GROUP_GUI_ACCESS_INTERNAL]	= S_INTERNAL_S;
+		$auth_user_type[GROUP_GUI_ACCESS_INTERNAL]	= _('Internal');
 		$auth_user_type[GROUP_GUI_ACCESS_DISABLED]	= S_DISABLED;
 
 		if(isset($auth_user_type[$auth_type]))

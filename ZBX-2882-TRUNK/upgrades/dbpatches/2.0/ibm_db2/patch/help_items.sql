@@ -333,3 +333,8 @@ INSERT INTO help_items VALUES (7,'web.page.perf[host,&lt;path&gt;,&lt;port&gt;]'
 /
 INSERT INTO help_items VALUES (7,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,&lt;regexp&gt;,&lt;length&gt;]','Get first occurence of regexp in WEB page. Default path is /')
 /
+
+INSERT INTO help_items VALUES(17,'snmptrap[&lt;regex&gt;]','Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string.')
+/
+INSERT INTO help_items VALUES(17,'snmptrap.fallback','Catches all SNMP traps from a corresponding address that were not catched by any of the snmptrap[] items for that interface.')
+/

@@ -46,19 +46,20 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 
 ---- Patching table `items`
 
-ALTER TABLE items CHANGE COLUMN description name VARCHAR(255) NOT NULL DEFAULT '',
-		  MODIFY itemid bigint unsigned NOT NULL,
-		  MODIFY hostid bigint unsigned NOT NULL,
-		  MODIFY units varchar(255) DEFAULT '' NOT NULL,
-		  MODIFY templateid bigint unsigned NULL,
-		  MODIFY valuemapid bigint unsigned NULL,
-		  ADD lastns integer NULL,
-		  ADD flags integer DEFAULT '0' NOT NULL,
-		  ADD filter varchar(255) DEFAULT '' NOT NULL,
-		  ADD interfaceid bigint unsigned NULL,
-		  ADD port varchar(64) DEFAULT '' NOT NULL,
-		  ADD description text NOT NULL,
-		  ADD inventory_link integer DEFAULT '0' NOT NULL;
+ALTER TABLE items
+	CHANGE COLUMN description name VARCHAR(255) NOT NULL DEFAULT '',
+	MODIFY itemid bigint unsigned NOT NULL,
+	MODIFY hostid bigint unsigned NOT NULL,
+	MODIFY units varchar(255) DEFAULT '' NOT NULL,
+	MODIFY templateid bigint unsigned NULL,
+	MODIFY valuemapid bigint unsigned NULL,
+	ADD lastns integer NULL,
+	ADD flags integer DEFAULT '0' NOT NULL,
+	ADD filter varchar(255) DEFAULT '' NOT NULL,
+	ADD interfaceid bigint unsigned NULL,
+	ADD port varchar(64) DEFAULT '' NOT NULL,
+	ADD description text NOT NULL,
+	ADD inventory_link integer DEFAULT '0' NOT NULL;
 
 UPDATE items SET templateid=NULL WHERE templateid=0;
 CREATE TEMPORARY TABLE tmp_items_itemid (itemid bigint unsigned PRIMARY KEY);
@@ -105,6 +106,18 @@ UPDATE items
 UPDATE items
 	SET port=''
 	WHERE type NOT IN (1,4,6);		-- SNMPv1, SNMPv2c, SNMPv3
+
+-- add a first parameter {HOST.CONN} for external checks
+
+UPDATE items
+	SET key_ = CONCAT(SUBSTR(key_, 1, INSTR(key_, '[')), '"{HOST.CONN}",', SUBSTR(key_, INSTR(key_, '[') + 1))
+	WHERE type IN (10)	-- EXTERNAL
+		AND INSTR(key_, '[') <> 0;
+
+UPDATE items
+	SET key_ = CONCAT(key_, '["{HOST.CONN}"]')
+	WHERE type IN (10)	-- EXTERNAL
+		AND INSTR(key_, '[') = 0;
 
 ---- Patching table `hosts`
 

@@ -27,6 +27,8 @@
 #include "dbcache.h"
 #include "zbxalgo.h"
 
+#define ZBX_DB_WAIT_DOWN	10
+
 /***************************************************************/
 /* ID structure: NNNSSSDDDDDDDDDDD, where                      */
 /*      NNN - nodeid (to which node the ID belongs to)         */
@@ -98,8 +100,8 @@ int	DBconnect(int flag)
 			exit(FAIL);
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in 10 seconds.");
-		zbx_sleep(10);
+		zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in %d seconds.", ZBX_DB_WAIT_DOWN);
+		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, err);
@@ -122,32 +124,46 @@ void	DBinit()
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBtxn_operation                                                  *
+ *                                                                            *
+ * Purpose: helper function to loop transaction operation while DB is down    *
+ *                                                                            *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBtxn_operation(int (*txn_operation)())
+{
+	int	rc;
+
+	rc = txn_operation();
+
+	while (ZBX_DB_DOWN == rc)
+	{
+		DBclose();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		if (ZBX_DB_DOWN == (rc = txn_operation()))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBbegin                                                          *
  *                                                                            *
  * Purpose: start a transaction                                               *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBbegin()
 {
-	int	rc;
-
-	rc = zbx_db_begin();
-
-	while (ZBX_DB_OK > rc)
-	{
-		DBclose();
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-		if (ZBX_DB_OK > (rc = zbx_db_begin()))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
-		}
-	}
+	DBtxn_operation(zbx_db_begin);
 }
 
 /******************************************************************************
@@ -156,28 +172,14 @@ void	DBbegin()
  *                                                                            *
  * Purpose: commit a transaction                                              *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBcommit()
 {
-	int	rc;
-
-	rc = zbx_db_commit();
-
-	while (ZBX_DB_OK > rc)
-	{
-		DBclose();
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-		if (ZBX_DB_OK > (rc = zbx_db_commit()))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
-		}
-	}
+	DBtxn_operation(zbx_db_commit);
 }
 
 /******************************************************************************
@@ -186,28 +188,14 @@ void	DBcommit()
  *                                                                            *
  * Purpose: rollback a transaction                                            *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Vladimir Levijev                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 void	DBrollback()
 {
-	int	rc;
-
-	rc = zbx_db_rollback();
-
-	while (ZBX_DB_OK > rc)
-	{
-		DBclose();
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-		if (ZBX_DB_OK > (rc = zbx_db_rollback()))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
-		}
-	}
+	DBtxn_operation(zbx_db_rollback);
 }
 
 /******************************************************************************
@@ -228,15 +216,15 @@ int	__zbx_DBexecute(const char *fmt, ...)
 
 	rc = zbx_db_vexecute(fmt, args);
 
-	while (ZBX_DB_OK > rc)
+	while (ZBX_DB_DOWN == rc)
 	{
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		if (ZBX_DB_OK > (rc = zbx_db_vexecute(fmt, args)))
+		if (ZBX_DB_DOWN == (rc = zbx_db_vexecute(fmt, args)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
 
@@ -301,8 +289,8 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 
 		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_vselect(fmt, args)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
 
@@ -333,8 +321,8 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_select_n(query, n)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds.");
-			sleep(10);
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
 		}
 	}
 
@@ -549,13 +537,13 @@ void	DBupdate_triggers_status_after_restart()
 				" and f.triggerid=t.triggerid"
 				" and h.status in (%d)"
 				" and i.status in (%d)"
-				" and i.type not in (%d)"
+				" and i.type not in (%d,%d)"
 				" and i.key_ not in ('%s')"
 				" and t.status in (%d)"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
-			ITEM_TYPE_TRAPPER,
+			ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
 			SERVER_STATUS_KEY,
 			TRIGGER_STATUS_ENABLED,
 			DBnode_local("t.triggerid"));
@@ -573,9 +561,9 @@ void	DBupdate_triggers_status_after_restart()
 				" from items i,functions f,triggers t"
 				" where i.itemid=f.itemid"
 					" and f.triggerid=t.triggerid"
-					" and i.type not in (%d)"
+					" and i.type not in (%d,%d)"
 					" and t.triggerid=" ZBX_FS_UI64,
-				ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
 				triggerid);
 
 		min_nextcheck = -1;
@@ -996,23 +984,20 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
 static int	DBget_escape_string_len(const char *src)
 {
 	const char	*s;
-	int		len = 0;
+	int		len = 1;	/* '\0' */
 
-	len++;	/* '\0' */
-
-	for (s = src; s && *s; s++)
+	for (s = src; NULL != s && '\0' != *s; s++)
 	{
-		if (*s == '\r')
+		if ('\r' == *s)
 			continue;
 
-#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-		if (*s == '\'' || *s == '\\')
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || '\\' == *s)
 #else
-		if (*s == '\'')
+		if ('\'' == *s)
 #endif
-		{
 			len++;
-		}
+
 		len++;
 	}
 
@@ -1035,27 +1020,27 @@ static void	DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
 	char		*d;
-#if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
-#	define ZBX_DB_ESC_CH	'\''
-#else
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_ESC_CH	'\\'
+#else
+#	define ZBX_DB_ESC_CH	'\''
 #endif
 	assert(dst);
 
 	len--;	/* '\0' */
 
-	for (s = src, d = dst; s && *s && len; s++)
+	for (s = src, d = dst; NULL != s && '\0' != *s && 0 < len; s++)
 	{
-		if (*s == '\r')
+		if ('\r' == *s)
 			continue;
 
-#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-		if (*s == '\'' || *s == '\\')
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || '\\' == *s)
 #else
-		if (*s == '\'')
+		if ('\'' == *s)
 #endif
 		{
-			if (len < 2)
+			if (2 > len)
 				break;
 #if defined(HAVE_POSTGRESQL)
 			*d++ = *s;
@@ -1108,28 +1093,25 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;
-	int		len = 0;
+	int		len = 1;	/* '\0' */
 
-	len++;	/* '\0' */
-
-	for (s = src; s && *s; s++)
+	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
 	{
-		if (max_src_len <= 0)
-			break;
-
-		if (*s == '\r')
+		if ('\r' == *s)
 			continue;
 
-#if !defined(HAVE_IBM_DB2) && !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-		if (*s == '\'' || *s == '\\')
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || '\\' == *s)
 #else
-		if (*s == '\'')
+		if ('\'' == *s)
 #endif
-		{
 			len++;
-		}
+
 		len++;
-		max_src_len--;
+
+		/* only UTF-8 characters should reduce a variable max_src_len */
+		if (0x80 != (0xc0 & *s))
+			max_src_len--;
 	}
 
 	dst = zbx_malloc(dst, len);
@@ -1260,74 +1242,38 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->trends = atoi(row[17]);
 	item->value_type = atoi(row[8]);
 
-	if (SUCCEED == DBis_null(row[5]))
-	{
-		item->lastvalue_null = 1;
-	}
+	if (SUCCEED != DBis_null(row[5]))
+		item->lastvalue[0] = row[5];
 	else
-	{
-		item->lastvalue_null = 0;
+		item->lastvalue[0] = NULL;
 
-		switch (item->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				item->lastvalue_dbl = atof(row[5]);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->lastvalue_uint64, row[5]);
-				break;
-			default:
-				item->lastvalue_str = row[5];
-				break;
-		}
-	}
-
-	if (SUCCEED == DBis_null(row[6]))
-	{
-		item->prevvalue_null = 1;
-	}
+	if (SUCCEED != DBis_null(row[6]))
+		item->lastvalue[1] = row[6];
 	else
-	{
-		item->prevvalue_null = 0;
-
-		switch (item->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				item->prevvalue_dbl = atof(row[6]);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->prevvalue_uint64, row[6]);
-				break;
-			default:
-				item->prevvalue_str = row[6];
-				break;
-		}
-	}
+		item->lastvalue[1] = NULL;
 
 	ZBX_STR2UINT64(item->hostid, row[7]);
 	item->delta = atoi(row[9]);
 
-	if (SUCCEED == DBis_null(row[10]))
-	{
-		item->prevorgvalue_null = 1;
-	}
-	else
+	if (SUCCEED != DBis_null(row[10]))
 	{
 		item->prevorgvalue_null = 0;
 
 		switch (item->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				item->prevorgvalue_dbl = atof(row[10]);
+				item->prevorgvalue.dbl = atof(row[10]);
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->prevorgvalue_uint64, row[10]);
+				ZBX_STR2UINT64(item->prevorgvalue.ui64, row[10]);
 				break;
 			default:
-				item->prevorgvalue_str = row[10];
+				item->prevorgvalue.str = row[10];
 				break;
 		}
 	}
+	else
+		item->prevorgvalue_null = 1;
 
 	if (SUCCEED == DBis_null(row[11]))
 		item->lastclock = 0;
@@ -1341,6 +1287,21 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	ZBX_DBROW2UINT64(item->valuemapid, row[16]);
 
 	item->data_type = atoi(row[18]);
+
+	item->h_lastvalue[0] = NULL;
+	item->h_lastvalue[1] = NULL;
+	item->h_lasteventid = NULL;
+	item->h_lastsource = NULL;
+	item->h_lastseverity = NULL;
+}
+
+void	DBfree_item_from_db(DB_ITEM *item)
+{
+	zbx_free(item->h_lastvalue[0]);
+	zbx_free(item->h_lastvalue[1]);
+	zbx_free(item->h_lasteventid);
+	zbx_free(item->h_lastsource);
+	zbx_free(item->h_lastseverity);
 }
 
 const ZBX_TABLE *DBget_table(const char *tablename)
@@ -1795,9 +1756,11 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
  * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  ******************************************************************************/
-void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
+int	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
 {
-	if (*sql_offset > ZBX_MAX_SQL_SIZE)
+	int	ret = SUCCEED;
+
+	if (ZBX_MAX_SQL_SIZE < *sql_offset)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		if (',' == (*sql)[*sql_offset - 1])
@@ -1809,12 +1772,15 @@ void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
 #ifdef HAVE_ORACLE
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 6, "end;\n");
 #endif
-		DBexecute("%s", *sql);
+		if (ZBX_DB_OK > DBexecute("%s", *sql))
+			ret = FAIL;
 		*sql_offset = 0;
 #ifdef HAVE_ORACLE
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 7, "begin\n");
 #endif
 	}
+
+	return ret;
 }
 
 /******************************************************************************
@@ -2127,6 +2093,7 @@ retry:
 			break;
 		default:
 			assert(0);
+			break;
 	}
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
@@ -2161,11 +2128,14 @@ retry:
 				default:
 					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 							" order by id desc");
+					break;
 			}
 		}
 		else if (0 != retry)
+		{
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 					" order by itemid,clock desc,ns desc");
+		}
 
 		result = DBselectN(sql, last_n);
 	}

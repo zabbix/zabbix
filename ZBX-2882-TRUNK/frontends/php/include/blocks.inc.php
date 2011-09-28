@@ -23,7 +23,6 @@ require_once('include/graphs.inc.php');
 require_once('include/screens.inc.php');
 require_once('include/maps.inc.php');
 require_once('include/users.inc.php');
-require_once('include/requirements.inc.php');
 
 
 // Author: Aly
@@ -788,10 +787,11 @@ function make_status_of_zbx(){
 
 
 // CHECK REQUIREMENTS {{{
-	if(CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN){
-		$reqs = check_php_requirements();
-		foreach($reqs as $req){
-			if($req['result'] == false){
+	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+
+		$reqs = FrontendSetup::i()->checkRequirements();
+		foreach ($reqs as $req) {
+			if ($req['result'] == false) {
 				$table->addRow(array(
 					new CSpan($req['name'], 'red'),
 					new CSpan($req['current'], 'red'),
@@ -800,7 +800,7 @@ function make_status_of_zbx(){
 			}
 		}
 	}
-// }}}CHECK REQUIREMENTS
+// }}} CHECK REQUIREMENTS
 
 	$script = new CJSScript(get_js("jQuery('#hat_stszbx_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
