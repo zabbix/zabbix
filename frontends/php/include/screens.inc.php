@@ -1431,6 +1431,10 @@ require_once('include/js.inc.php');
 
 						$cmbGroup = new CComboBox('tr_groupid', $groupid, 'submit()');
 						$cmbHosts = new CComboBox('tr_hostid', $hostid, 'submit()');
+						if ($editmode == 1) {
+							$cmbGroup->attr('disabled', 'disabled');
+							$cmbHosts->attr('disabled', 'disabled');
+						}
 
 						$cmbGroup->addItem(0, S_ALL_SMALL);
 						$cmbHosts->addItem(0, S_ALL_SMALL);
@@ -1455,7 +1459,7 @@ require_once('include/js.inc.php');
 					}
 
 					$item = new CUIWidget('hat_htstatus', make_latest_issues($params, true));
-					$item->setHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE, $tr_form));
+					$item->setDoubleHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE), $tr_form);
 					$item = array($item);
 
 					if ($editmode == 1) {
@@ -1530,6 +1534,10 @@ require_once('include/js.inc.php');
 
 						$cmbGroup = new CComboBox('tr_groupid', $groupid, 'submit()');
 						$cmbHosts = new CComboBox('tr_hostid', $hostid, 'submit()');
+						if ($editmode == 1) {
+							$cmbGroup->attr('disabled', 'disabled');
+							$cmbHosts->attr('disabled', 'disabled');
+						}
 
 						$cmbGroup->addItem(0, S_ALL_SMALL);
 						$cmbHosts->addItem(0, S_ALL_SMALL);
@@ -1560,7 +1568,7 @@ require_once('include/js.inc.php');
 					}
 
 					$item = new CUIWidget('hat_trstatus', make_latest_issues($params, true));
-					$item->setHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE, $tr_form));
+					$item->setDoubleHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE), $tr_form);
 					$item = array($item);
 
 					if ($editmode == 1) {
