@@ -10,6 +10,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-3707] fixed possible empty action conditions (Vedmak)
  - [ZBX-4171] fixed server crash in add_value_suffix() under DebugLevel=4 (asaveljevs)
  - [ZBX-3930] fixed errors when return to some specific screens from profile screen (Vedmak)
  - [ZBX-3400] fixed calculation of graph header font size, Zabbix will decrease it to fit graph width (Alexei)
