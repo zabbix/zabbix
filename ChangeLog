@@ -2,6 +2,7 @@
 Changes for 1.9.7
 
 New features:
+ - [ZBX-3870] fixed data deletion order in proxy configuration synchronization (deniss,rudolfs)
  - [ZBX-4167] updated requirements screen for frontend (Vedmak)
  - [ZBX-3999] fixed map border (Alex,Sasha,Eduard)
  - [ZBXNEXT-918] redesign Administration->Media types (Eduard)
@@ -10,6 +11,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-2882] fixed wrong item vfs.file.cksum[/vmlinuz] for some templates (Sasha)
  - [ZBX-3707] fixed possible empty action conditions (Vedmak)
  - [ZBX-4171] fixed server crash in add_value_suffix() under DebugLevel=4 (asaveljevs)
  - [ZBX-3930] fixed errors when return to some specific screens from profile screen (Vedmak)
@@ -235,6 +237,19 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.9rc1
+
+ - [ZBX-4104] fixed handle handling when executing scripts in Windows (rudolfs)
+ - [ZBX-4091] removed unneeded linking for binaries (rudolfs)
+ - [ZBX-4155] fixed .pid file locking not to allow multiple instances (rudolfs)
+ - [ZBX-4056] fixed memory read access violation in Windows performance counters (rudolfs)
+ - [ZBX-4177] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
+ - [ZBX-4085] fixed compilation issues for OS X Leopard (rudolfs)
+
+Changes for 1.8.8
+
+1.8.8rc3 was released as 1.8.8 without any changes
+
 Changes for 1.8.8rc3
 
  - [ZBX-1909] fixed keyparser to allow keys like "key,{$USERMACRO}" (Vedmak)

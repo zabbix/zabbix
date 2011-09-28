@@ -86,10 +86,11 @@ static void	proxy_update_host(DB_DRULE *drule, const char *ip, const char *dns, 
 
 	ip_esc = DBdyn_escape_string_len(ip, INTERFACE_IP_LEN);
 	dns_esc = DBdyn_escape_string_len(dns, INTERFACE_DNS_LEN);
-
+zabbix_log(LOG_LEVEL_ERR, "bef (%d," ZBX_FS_UI64 ",-1,'%s','%s',%d)", now, drule->druleid, ip_esc, dns_esc, status);
 	DBexecute("insert into proxy_dhistory (clock,druleid,type,ip,dns,status)"
 			" values (%d," ZBX_FS_UI64 ",-1,'%s','%s',%d)",
 			now, drule->druleid, ip_esc, dns_esc, status);
+zabbix_log(LOG_LEVEL_ERR, "aft");
 
 	zbx_free(dns_esc);
 	zbx_free(ip_esc);
