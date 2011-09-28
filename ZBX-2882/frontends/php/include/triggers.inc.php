@@ -2038,51 +2038,46 @@ function utf8RawUrlDecode($source){
 	return DBexecute('UPDATE triggers SET dep_level=dep_level+1 WHERE triggerid='.$triggerid_up);
 	}
 
-/*
- * Function: update_trigger_dependencies_for_host
- *
- * Description:
- *	 Update template triggers dependencies
- *
- * Author:
- *	 Artem 'Aly' Suharev
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
+/**
+ * Update template triggers dependencies.
+ * @param $hostid
+ * @param $templateid
+ * @return void
  */
- 	function update_template_dependencies_for_host($hostid){
+function update_template_dependencies_for_host($hostid, $templateid) {
+	$tpl_triggerids = array();
+	$sql = 'SELECT DISTINCT t.triggerid,t.templateid'.
+			' FROM triggers t,functions f,items i'.
+			' WHERE t.triggerid=f.triggerid'.
+				' AND f.itemid=i.itemid'.
+				' AND i.hostid='.$hostid.
+				' AND EXISTS ('.
+					'SELECT 1'.
+					' FROM triggers tt,functions ff,items ii'.
+					' WHERE tt.triggerid=ff.triggerid'.
+						' AND ff.itemid=ii.itemid'.
+						' AND ii.hostid='.$templateid.
+						' AND tt.triggerid=t.templateid'.
+				')';
+	$result = DBselect($sql);
+	while ($row = DBfetch($result)) {
+		delete_dependencies_by_triggerid($row['triggerid']);
+		$tpl_triggerids[$row['templateid']] = $row['triggerid'];
+	}
 
-		$tpl_triggerids = array();
-
-		$sql = 'SELECT DISTINCT t.triggerid, t.templateid '.
-							' FROM triggers t, functions f, items i '.
-							' WHERE i.hostid='.$hostid.
-								' AND f.itemid=i.itemid '.
-								' AND f.triggerid=t.triggerid '.
-								' AND t.templateid > 0';
-		$result = DBselect($sql);
-		while($trigger = DBfetch($result)){
-			if($trigger['templateid'] > 0){
-				delete_dependencies_by_triggerid($trigger['triggerid']);
-				$tpl_triggerids[$trigger['templateid']] = $trigger['triggerid'];
-			}
-		}
-
-		$sql = 'SELECT DISTINCT td.* '.
-				' FROM items i, functions f, triggers t, trigger_depends td '.
-				' WHERE i.hostid='.$hostid.
-					' AND f.itemid=i.itemid '.
-					' AND t.triggerid=f.triggerid '.
-					' AND ( (td.triggerid_up=t.templateid) OR (td.triggerid_down=t.templateid) )';
-		$result = DBselect($sql);
-		while($dependency = DBfetch($result)){
-			if(isset($tpl_triggerids[$dependency['triggerid_down']]) &&
-				isset($tpl_triggerids[$dependency['triggerid_up']]))
-			{
-				insert_dependency($tpl_triggerids[$dependency['triggerid_down']],$tpl_triggerids[$dependency['triggerid_up']]);
-			}
+	$sql = 'SELECT DISTINCT td.triggerid_down,td.triggerid_up'.
+			' FROM items i,functions f,triggers t,trigger_depends td'.
+			' WHERE i.itemid=f.itemid'.
+				' AND f.triggerid=t.triggerid'.
+				' AND t.templateid IN (td.triggerid_up,td.triggerid_down)'.
+				' AND i.hostid='.$hostid;
+	$result = DBselect($sql);
+	while ($row = DBfetch($result)) {
+		if (isset($tpl_triggerids[$row['triggerid_down']]) && isset($tpl_triggerids[$row['triggerid_up']])) {
+			insert_dependency($tpl_triggerids[$row['triggerid_down']], $tpl_triggerids[$row['triggerid_up']]);
 		}
 	}
+}
 
 	function replace_triggers_depenedencies($new_triggerids){
 		$old_triggerids = array_keys($new_triggerids);
@@ -2417,36 +2412,21 @@ function utf8RawUrlDecode($source){
 	return TRUE;
 	}
 
-/*
- * Function: copy_template_triggers
- *
- * Description:
- *	 Copy triggers from template
- *
- * Author:
- *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
+/**
+ * Copy triggers from template.
+ * @param $hostid
+ * @param $templateid
+ * @param bool $copy_mode
+ * @return void
  */
-	function copy_template_triggers($hostid, $templateid = null, $copy_mode = false){
-		if(null == $templateid){
-			$templateid = array_keys(get_templates_by_hostid($hostid));
-		}
-
-		if(is_array($templateid)){
-			foreach($templateid as $id)
-				copy_template_triggers($hostid, $id, $copy_mode); // attention recursion
-			return;
-		}
-
-		$triggers = get_triggers_by_hostid($templateid);
-		while($trigger = DBfetch($triggers)){
-			copy_trigger_to_host($trigger['triggerid'], $hostid, $copy_mode);
-		}
-
-		update_template_dependencies_for_host($hostid);
+function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
+	$triggers = get_triggers_by_hostid($templateid);
+	while ($trigger = DBfetch($triggers)) {
+		copy_trigger_to_host($trigger['triggerid'], $hostid, $copy_mode);
 	}
+
+	update_template_dependencies_for_host($hostid, $templateid);
+}
 
 
 /*
