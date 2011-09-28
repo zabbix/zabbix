@@ -237,6 +237,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4056] fixed memory read access violation in Windows performance counters (rudolfs)
  - [ZBX-4177] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
  - [ZBX-4085] fixed compilation issues for OS X Leopard (rudolfs)
 
