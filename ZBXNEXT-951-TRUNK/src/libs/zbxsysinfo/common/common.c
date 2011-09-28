@@ -90,41 +90,6 @@ static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT
 	return SYSINFO_RET_FAIL;
 }
 
-double	getPROC(char *file, int lineno, int fieldno)
-{
-#ifdef HAVE_PROC
-	FILE	*f;
-	char	*t, c[MAX_STRING_LEN];
-	int	i;
-	double	value;
-
-	if (NULL == (f = fopen(file, "r")))
-		return -1;
-
-	for (i = 1; i <= lineno; i++)
-	{
-		if (NULL == fgets(c, sizeof(c), f))
-		{
-			zbx_fclose(f);
-			return -1;
-		}
-	}
-
-	t = (char *)strtok(c, " ");
-
-	for (i = 2; i <= fieldno; i++)
-	{
-		t = (char *)strtok(NULL, " ");
-	}
-
-	zbx_fclose(f);
-
-	if (1 == sscanf(t, "%lf", &value))
-		return value;
-#endif
-	return -1;
-}
-
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	SET_UI64_RESULT(result, 1);
