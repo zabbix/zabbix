@@ -1,3 +1,7 @@
+Changes for 1.8.9rc1
+
+ - [ZBX-4085] fixed compilation issues for OS X Leopard (rudolfs)
+
 Changes for 1.8.8rc3
 
  - [ZBX-1909] fixed keyparser to allow keys like "key,{$USERMACRO}" (Vedmak)
