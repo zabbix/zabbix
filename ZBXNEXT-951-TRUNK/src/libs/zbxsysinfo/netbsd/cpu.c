@@ -96,7 +96,6 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_GETLOADAVG	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
 	char	tmp[16];
 	int	mode, per_cpu = 1, cpu_num;
 	double	load[ZBX_AVG_COUNT], value;
@@ -133,9 +132,6 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	SET_DBL_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
 }
 
 int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
