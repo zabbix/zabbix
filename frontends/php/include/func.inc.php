@@ -46,24 +46,9 @@ function jsRedirect($url,$timeout=null){
 function get_request($name, $def=NULL){
 	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
 }
-
-function inarr_isset($keys, $array=null){
-	if(is_null($array)) $array =& $_REQUEST;
-
-	if(is_array($keys)){
-		foreach($keys as $id => $key){
-			if( !isset($array[$key]) )
-				return false;
-		}
-		return true;
-	}
-
-	return isset($array[$keys]);
-}
 /************ END REQUEST ************/
 
 /************ COOKIES ************/
-
 function get_cookie($name, $default_value=null){
 	if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
 return $default_value;
@@ -323,10 +308,6 @@ function zbx_num2bitstr($num,$rev=false){
 	}
 
 return $strbin;
-}
-
-function empty2null($var){
-	return ($var == "") ? null : $var;
 }
 
 function str2mem($val){
