@@ -867,7 +867,7 @@ class CAction extends CZBXAPI {
 			}
 		}
 
-		$this->validateConditions($conditions);
+		self::validateConditions($conditions);
 		$this->addConditions($conditions);
 
 		$this->validateOperations($operations);
@@ -956,7 +956,7 @@ class CAction extends CZBXAPI {
 
 			if (isset($action['conditions'])) {
 				$conditionsDb = isset($updActions[$action['actionid']]['conditions']) ? $updActions[$action['actionid']]['conditions'] : array();
-				$this->validateConditions($action['conditions']);
+				self::validateConditions($action['conditions']);
 
 				foreach ($action['conditions'] as $condition) {
 					$condition['actionid'] = $action['actionid'];
@@ -1407,7 +1407,7 @@ class CAction extends CZBXAPI {
 				zbx_array_push($operation['opconditions'], array('operationid' => $operation['operationid']));
 			}
 
-			$this->validateOperationConditions($operation['opconditions']);
+			self::validateOperationConditions($operation['opconditions']);
 
 			$diff = zbx_array_diff($operation['opconditions'], $operationDb['opconditions'], 'opconditionid');
 			$opconditionsCreate = array_merge($opconditionsCreate, $diff['first']);
@@ -1681,13 +1681,23 @@ class CAction extends CZBXAPI {
 		return true;
 	}
 
-	public function validateConditions($conditions) {
+	/**
+	 * Validate conditions.
+	 *
+	 * @static
+	 * @param $conditions
+	 * @return bool
+	 */
+	public static function validateConditions($conditions) {
 		$conditions = zbx_toArray($conditions);
 
 		$hostGroupIdsAll = array();
 		$templateIdsAll = array();
 		$triggerIdsAll = array();
 		$hostIdsAll = array();
+		$discoveryRuleIdsAll = array();
+		$discoveryCheckIdsAll = array();
+		$proxyIdsAll = array();
 
 		$discoveryCheckTypes = discovery_check_type2str();
 		$discoveryObjectStatuses = discovery_object_status2str();
@@ -1697,78 +1707,118 @@ class CAction extends CZBXAPI {
 				case CONDITION_TYPE_HOST_GROUP:
 					$hostGroupIdsAll[$condition['value']] = $condition['value'];
 					break;
+
 				case CONDITION_TYPE_HOST_TEMPLATE:
 					$templateIdsAll[$condition['value']] = $condition['value'];
 					break;
+
 				case CONDITION_TYPE_TRIGGER:
 					$triggerIdsAll[$condition['value']] = $condition['value'];
 					break;
+
 				case CONDITION_TYPE_HOST:
 					$hostIdsAll[$condition['value']] = $condition['value'];
 					break;
+
+				case CONDITION_TYPE_DRULE:
+					$discoveryRuleIdsAll[$condition['value']] = $condition['value'];
+					break;
+
+				case CONDITION_TYPE_DCHECK:
+					$discoveryCheckIdsAll[$condition['value']] = $condition['value'];
+					break;
+
+				case CONDITION_TYPE_PROXY:
+					$proxyIdsAll[$condition['value']] = $condition['value'];
+					break;
+
 				case CONDITION_TYPE_TIME_PERIOD:
 					if (!validate_period($condition['value'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action condition period "%s".', $condition['value']));
 					}
 					break;
+
 				case CONDITION_TYPE_DHOST_IP:
 					if (!validate_ip_range($condition['value'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action condition ip "%s".', $condition['value']));
 					}
 					break;
+
 				case CONDITION_TYPE_DSERVICE_TYPE:
 					if (!isset($discoveryCheckTypes[$condition['value']])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition discovery check.'));
 					}
 					break;
+
 				case CONDITION_TYPE_DSERVICE_PORT:
 					if (!validate_port_list($condition['value'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action condition port "%s".', $condition['value']));
 					}
 					break;
+
 				case CONDITION_TYPE_DSTATUS:
 					if (!isset($discoveryObjectStatuses[$condition['value']])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition discovery status.'));
 					}
 					break;
+
+				case CONDITION_TYPE_MAINTENANCE:
+					// maintenance condition has no value...
+					break;
 				case CONDITION_TYPE_TRIGGER_NAME:
 				case CONDITION_TYPE_TRIGGER_VALUE:
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
-				case CONDITION_TYPE_MAINTENANCE:
 				case CONDITION_TYPE_NODE:
-				case CONDITION_TYPE_DRULE:
-				case CONDITION_TYPE_DCHECK:
 				case CONDITION_TYPE_DOBJECT:
-				case CONDITION_TYPE_PROXY:
 				case CONDITION_TYPE_DUPTIME:
 				case CONDITION_TYPE_DVALUE:
 				case CONDITION_TYPE_APPLICATION:
 				case CONDITION_TYPE_HOST_NAME:
+					if (zbx_empty($condition['value'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty action condition.'));
+					}
 					break;
+
 				default:
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition type.'));
+					break;
 			}
 		}
 
 		if (!API::HostGroup()->isWritable($hostGroupIdsAll)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition host group. Host group does not exist or you have no access to this host group.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition host group. Host group does not exist or you have no access to it.'));
 		}
 		if (!API::Host()->isWritable($hostIdsAll)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition host. Host does not exist or you have no access to this host.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition host. Host does not exist or you have no access to it.'));
 		}
 		if (!API::Template()->isWritable($templateIdsAll)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition template. Template does not exist or you have no access to this template.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition template. Template does not exist or you have no access to it.'));
 		}
 		if (!API::Trigger()->isWritable($triggerIdsAll)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition trigger. Trigger does not exist or you have no access to this trigger.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition trigger. Trigger does not exist or you have no access to it.'));
+		}
+		if (!API::DRule()->isWritable($discoveryRuleIdsAll)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it.'));
+		}
+		if (!API::DCheck()->isWritable($discoveryCheckIdsAll)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.'));
+		}
+		if (!API::Proxy()->isWritable($proxyIdsAll)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action condition proxy. Proxy does not exist or you have no access to it.'));
 		}
 
 		return true;
 	}
 
-	public function validateOperationConditions($conditions) {
+	/**
+	 * Validate operation conditions.
+	 *
+	 * @static
+	 * @param $conditions
+	 * @return bool
+	 */
+	public static function validateOperationConditions($conditions) {
 		$conditions = zbx_toArray($conditions);
-
 		$ackStatuses = array(
 			EVENT_ACKNOWLEDGED => 1,
 			EVENT_NOT_ACKNOWLEDGED => 1
@@ -1781,10 +1831,13 @@ class CAction extends CZBXAPI {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation condition acknowledge type.'));
 					}
 					break;
+
 				default:
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation condition type.'));
+					break;
 			}
 		}
+
 		return true;
 	}
 }
