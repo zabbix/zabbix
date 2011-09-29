@@ -1634,13 +1634,16 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 			goto json_parse_error;
 		ZBX_STR2UINT64(drule.druleid, tmp);
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DCHECK, tmp, sizeof(tmp)))
-			goto json_parse_error;
-		ZBX_STR2UINT64(dcheck.dcheckid, tmp);
-
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TYPE, tmp, sizeof(tmp)))
 			goto json_parse_error;
 		dcheck.type = atoi(tmp);
+
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DCHECK, tmp, sizeof(tmp)))
+			goto json_parse_error;
+		if ('\0' != *tmp)
+			ZBX_STR2UINT64(dcheck.dcheckid, tmp);
+		else if (-1 != dcheck.type)
+			goto json_parse_error;
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 			goto json_parse_error;
@@ -1685,7 +1688,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, dcheck.key_, value);
 
 		DBbegin();
-		if (dcheck.type == -1)
+		if (-1 == dcheck.type)
 			discovery_update_host(&dhost, ip, status, itemtime);
 		else
 			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
