@@ -447,8 +447,7 @@ include_once('include/page_header.php');
 				$regexpid = $_REQUEST['regexpid'];
 				if (!get_regexp_by_regexpid($regexpid)) {
 					$result = false;
-					error(_(('Regular expression does not exists.')));
-
+					error(_('Regular expression does not exist.'));
 				}
 				else {
 					delete_expressions_by_regexpid($_REQUEST['regexpid']);
