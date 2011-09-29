@@ -21,9 +21,7 @@
 <?php
 
 $workingTimeTab = new CFormList('scriptsTab');
-$periodTextBox = new CTextBox('work_period', $this->data['config']['work_period'], 35);
-$periodTextBox->addStyle('text-align: right;');
-$workingTimeTab->addRow(_('Working time'), $periodTextBox);
+$workingTimeTab->addRow(_('Working time'), new CTextBox('work_period', $this->data['config']['work_period'], 35));
 
 $workingTimeView = new CTabView();
 $workingTimeView->addTab('workingTime', _('Working time'), $workingTimeTab);
