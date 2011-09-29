@@ -2890,9 +2890,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmTrig->addItemToBottomRow(SPACE);
 		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
 
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
-
 		$script = "function addPopupValues(list){
 						if(!isset('object', list)) return false;
 

@@ -28,7 +28,7 @@
 
 	$page['file'] = 'tr_status.php';
 	$page['title'] = 'S_STATUS_OF_TRIGGERS';
-	$page['scripts'] = array('effects.js');
+	$page['scripts'] = array();
 	$page['hist_arg'] = array('groupid', 'hostid');
 	$page['scripts'] = array('class.cswitcher.js');
 
@@ -715,12 +715,6 @@ include_once('include/page_header.php');
 
 	zbx_add_post_js('blink.init();');
 	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
-
-	$jsmenu = new CPUMenu(null, 170);
-	$jsmenu->InsertJavaScript();
-
-?>
-<?php
 
 include_once('include/page_footer.php');
 

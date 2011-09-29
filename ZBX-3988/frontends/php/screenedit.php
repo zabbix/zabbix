@@ -28,7 +28,7 @@ require_once('include/blocks.inc.php');
 $page['title'] = 'S_CONFIGURATION_OF_SCREENS';
 $page['file'] = 'screenedit.php';
 $page['hist_arg'] = array('screenid');
-$page['scripts'] = array('effects.js','dragdrop.js','class.cscreen.js','class.calendar.js','gtlc.js');
+$page['scripts'] = array('class.cscreen.js','class.calendar.js','gtlc.js');
 
 include_once('include/page_header.php');
 
@@ -79,7 +79,7 @@ include_once('include/page_header.php');
 <?php
 	$trigg_wdgt = new CWidget();
 	$trigg_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREEN_BIG);
-	
+
 	//show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
 
 	$options = array(
@@ -91,10 +91,10 @@ include_once('include/page_header.php');
 	if(empty($screens)) access_deny();
 
 	$screen = reset($screens);
-	
+
 	$trigg_wdgt->addHeader($screen['name']);
 	$trigg_wdgt->addItem(BR());
-	
+
 	if(isset($_REQUEST['save'])){
 		if(!isset($_REQUEST['elements'])) $_REQUEST['elements'] = 0;
 
@@ -204,14 +204,14 @@ include_once('include/page_header.php');
 						' AND x='.$sw_pos[1].
 						' AND screenid='.$screen['screenid'];
 			$fitem = DBfetch(DBselect($sql));
-			
+
 			$sql = 'SELECT screenitemid, colspan, rowspan '.
 					' FROM screens_items '.
 					' WHERE y='.$sw_pos[2].
 						' AND x='.$sw_pos[3].
 						' AND screenid='.$screen['screenid'];
 			$sitem = DBfetch(DBselect($sql));
-			
+
 			if($fitem){
 				DBexecute('UPDATE screens_items '.
 							' SET y='.$sw_pos[2].',x='.$sw_pos[3].
@@ -221,7 +221,7 @@ include_once('include/page_header.php');
 								' AND x='.$sw_pos[1].
 								' AND screenid='.$screen['screenid'].
 								' AND screenitemid='.$fitem['screenitemid']);
-								
+
 			}
 
 			if($sitem){
