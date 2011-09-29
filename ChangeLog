@@ -12,6 +12,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4166] fixed error in dashboard when configured to show unacknowledged only (Vedmak)
  - [ZBX-4003] fixed error when try to use not existing host group as group for discovered hosts (Vedmak)
  - [ZBX-2882] fixed wrong item vfs.file.cksum[/vmlinuz] for some templates (Sasha)
  - [ZBX-3707] fixed possible empty action conditions (Vedmak)
