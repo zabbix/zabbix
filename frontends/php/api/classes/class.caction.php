@@ -942,16 +942,18 @@ class CAction extends CZBXAPI {
 		$operationsCreate = $operationsUpdate = $operationidsDelete = array();
 		$conditionsCreate = $conditionsUpdate = $conditionidsDelete = array();
 		foreach ($actions as $action) {
-			$options = array(
-				'filter' => array('name' => $action['name']),
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => 1,
-				'nopermissions' => true,
-				'preservekeys' => true
-			);
-			$action_exists = $this->get($options);
-			if (($action_exist = reset($action_exists)) && (bccomp($action_exist['actionid'], $action['actionid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
+			if (isset($action['name'])) {
+				$options = array(
+					'filter' => array('name' => $action['name']),
+					'output' => API_OUTPUT_SHORTEN,
+					'editable' => 1,
+					'nopermissions' => true,
+					'preservekeys' => true
+				);
+				$action_exists = $this->get($options);
+				if (($action_exist = reset($action_exists)) && (bccomp($action_exist['actionid'], $action['actionid']) != 0)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
+				}
 			}
 
 			if (isset($action['conditions'])) {
