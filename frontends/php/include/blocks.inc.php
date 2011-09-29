@@ -277,7 +277,7 @@ function make_system_status($filter){
 // }}} SELECT TRIGGERS
 
 
-	foreach($groups as $gnum => $group){
+	foreach($groups as $group){
 		$group_row = new CRow();
 		if(is_show_all_nodes())
 			$group_row->addItem(get_node_name_by_elid($group['groupid']));
@@ -356,9 +356,10 @@ function make_system_status($filter){
 					}
 //----
 
+					$trigger['hostname'] = $trigger['hosts'][0]['name'];
 					$table_inf_unack->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
-						$trigger['host'],
+						$trigger['hostname'],
 						new CCol($trigger['description'], getSeverityStyle($trigger['priority'])),
 						zbx_date2age($event['clock']),
 						$unknown,
@@ -490,15 +491,15 @@ function make_hoststat_summary($filter){
 	$highest_severity = array();
 	$highest_severity2 = array();
 
-	foreach($triggers as $tnum => $trigger){
-		foreach($trigger['hosts'] as $thnum => $trigger_host){
+	foreach($triggers as $trigger){
+		foreach($trigger['hosts'] as $trigger_host){
 			if(!isset($hosts[$trigger_host['hostid']])) continue;
 			else $host = $hosts[$trigger_host['hostid']];
 
 			if($filter['extAck'] && isset($hosts_with_unack_triggers[$host['hostid']])){
 				if(!isset($lastUnack_host_list[$host['hostid']])){
 					$lastUnack_host_list[$host['hostid']] = array();
-					$lastUnack_host_list[$host['hostid']]['host'] = $host['host'];
+					$lastUnack_host_list[$host['hostid']]['host'] = $host['name'];
 					$lastUnack_host_list[$host['hostid']]['hostid'] = $host['hostid'];
 					$lastUnack_host_list[$host['hostid']]['severities'] = array();
 					$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_DISASTER] = 0;
