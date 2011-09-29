@@ -889,32 +889,41 @@ COpt::memoryPick();
 			$this->deleteSelements($selementsToDelete);
 
 		// Links
-		if (!empty($linksToAdd)) {
-
+		if (!empty($linksToAdd) || !empty($linksToUpdate)) {
 			$mapVirtSelements = array();
-			foreach ($newSelementIds['selementids'] as $snum => $selementid)
+			foreach ($newSelementIds['selementids'] as $snum => $selementid) {
 				$mapVirtSelements[$selementsToAdd[$snum]['selementid']] = $selementid;
+			}
 
-			foreach ($selementsToUpdate as $selement)
+			foreach ($selementsToUpdate as $selement) {
 				$mapVirtSelements[$selement['selementid']] = $selement['selementid'];
+			}
 
 			foreach ($linksToAdd as $lnum => $link){
-				$linksToAdd[$lnum]['selementid1'] = $mapVirtSelements[$linksToAdd[$lnum]['selementid1']];
-				$linksToAdd[$lnum]['selementid2'] = $mapVirtSelements[$linksToAdd[$lnum]['selementid2']];
+				$linksToAdd[$lnum]['selementid1'] = $mapVirtSelements[$link['selementid1']];
+				$linksToAdd[$lnum]['selementid2'] = $mapVirtSelements[$link['selementid2']];
+			}
+
+			foreach ($linksToUpdate as $lnum => $link){
+				$linksToUpdate[$lnum]['selementid1'] = $mapVirtSelements[$link['selementid1']];
+				$linksToUpdate[$lnum]['selementid2'] = $mapVirtSelements[$link['selementid2']];
 			}
 
 			unset($mapVirtSelements);
 		}
 
 		$newLinkIds = $updLinkIds = array('linkids' => array());
-		if (!empty($linksToAdd))
+		if (!empty($linksToAdd)) {
 			$newLinkIds = $this->createLinks($linksToAdd);
+		}
 
-		if (!empty($linksToUpdate))
+		if (!empty($linksToUpdate)) {
 			$updLinkIds = $this->updateLinks($linksToUpdate);
+		}
 
-		if (!empty($linksToDelete))
+		if (!empty($linksToDelete)) {
 			$this->deleteLinks($linksToDelete);
+		}
 
 		// linkTriggers
 		$linkTriggersToDelete = $linkTriggersToUpdate = $linkTriggersToAdd = array();
