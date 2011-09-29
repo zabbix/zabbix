@@ -15,7 +15,7 @@ INSERT INTO help_items VALUES (3,'icmppingloss[&lt;ip&gt;,&lt;count&gt;,&lt;inte
 /
 INSERT INTO help_items VALUES (3,'icmppingsec[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;,&lt;type&gt;]','Returns ICMP ping response time in seconds. Example: 0.02')
 /
-INSERT INTO help_items VALUES (3,'net.tcp.service[service,&lt;ip&gt;,&lt;port&gt;]','Check if service server is running and accepting connections. 0 - service is down, 1 - service is running. If &lt;ip&gt; is missing, IP or DNS name is taken from host definition. If &lt;port&gt; is missing, default service port is used.')
+INSERT INTO help_items VALUES (3,'net.tcp.service[service,&lt;ip&gt;,&lt;port&gt;]','Check if service is available. 0 - service is down, 1 - service is running. If &lt;ip&gt; is missing, IP or DNS name is taken from host definition. If &lt;port&gt; is missing, default service port is used.')
 /
 INSERT INTO help_items VALUES (3,'net.tcp.service.perf[service,&lt;ip&gt;,&lt;port&gt;]','Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If &lt;ip&gt; is missing, IP or DNS name is taken from host definition. If &lt;port&gt; is missing, default service port is used.')
 /
@@ -84,7 +84,7 @@ INSERT INTO help_items VALUES (0,'net.tcp.listen[port]','Checks if this port is 
 /
 INSERT INTO help_items VALUES (0,'net.tcp.port[&lt;ip&gt;, port]','Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]')
 /
-INSERT INTO help_items VALUES (0,'net.tcp.service[service &lt;,ip&gt; &lt;,port&gt;]','Check if service server is running and accepting connections. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
+INSERT INTO help_items VALUES (0,'net.tcp.service[service &lt;,ip&gt; &lt;,port&gt;]','Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
 /
 INSERT INTO help_items VALUES (0,'net.tcp.service.perf[service &lt;,ip&gt; &lt;,port&gt;]','Check performance of service &quot;service&quot;. 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.')
 /
@@ -207,7 +207,7 @@ INSERT INTO help_items VALUES (7,'net.tcp.listen[port]','Checks if this port is 
 /
 INSERT INTO help_items VALUES (7,'net.tcp.port[&lt;ip&gt;, port]','Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]')
 /
-INSERT INTO help_items VALUES (7,'net.tcp.service[service &lt;,ip&gt; &lt;,port&gt;]','Check if service server is running and accepting connections. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
+INSERT INTO help_items VALUES (7,'net.tcp.service[service &lt;,ip&gt; &lt;,port&gt;]','Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
 /
 INSERT INTO help_items VALUES (7,'net.tcp.service.perf[service &lt;,ip&gt; &lt;,port&gt;]','Check performance of service &quot;service&quot;. 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.')
 /

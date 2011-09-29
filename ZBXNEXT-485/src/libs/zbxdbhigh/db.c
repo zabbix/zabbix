@@ -1756,9 +1756,11 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
  * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  ******************************************************************************/
-void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
+int	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
 {
-	if (*sql_offset > ZBX_MAX_SQL_SIZE)
+	int	ret = SUCCEED;
+
+	if (ZBX_MAX_SQL_SIZE < *sql_offset)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		if (',' == (*sql)[*sql_offset - 1])
@@ -1770,12 +1772,15 @@ void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
 #ifdef HAVE_ORACLE
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 6, "end;\n");
 #endif
-		DBexecute("%s", *sql);
+		if (ZBX_DB_OK > DBexecute("%s", *sql))
+			ret = FAIL;
 		*sql_offset = 0;
 #ifdef HAVE_ORACLE
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 7, "begin\n");
 #endif
 	}
+
+	return ret;
 }
 
 /******************************************************************************

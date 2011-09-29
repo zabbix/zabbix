@@ -327,7 +327,7 @@ include_once('include/page_header.php');
 	else if($templated_hosts){
 		$options['hosts']['templated_hosts'] = true;
 
-// TODO: inconsistancy in "templated_hosts" parameter for host and host group
+// TODO: inconsistency in "templated_hosts" parameter for host and host group
 //		$options['groups']['templated_hosts'] = true;
 	}
 	else{

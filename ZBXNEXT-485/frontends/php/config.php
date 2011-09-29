@@ -425,7 +425,7 @@ include_once('include/page_header.php');
 		}
 	}
 	else if($_REQUEST['config'] == 10){
-		if(inarr_isset(array('clone','regexpid'))){
+		if (isset($_REQUEST['clone']) && isset($_REQUEST['regexpid'])) {
 			unset($_REQUEST['regexpid']);
 			$_REQUEST['form'] = 'clone';
 		}
@@ -504,7 +504,7 @@ include_once('include/page_header.php');
 				unset($_REQUEST['regexpid']);
 			}
 		}
-		else if(inarr_isset(array('add_expression','new_expression'))){
+		elseif (isset($_REQUEST['add_expression']) && isset($_REQUEST['new_expression'])) {
 			$new_expression = $_REQUEST['new_expression'];
 
 			if(!isset($new_expression['case_sensitive']))		$new_expression['case_sensitive'] = 0;
@@ -533,13 +533,13 @@ include_once('include/page_header.php');
 				unset($_REQUEST['new_expression']);
 			}
 		}
-		else if(inarr_isset(array('delete_expression','g_expressionid'))){
+		elseif (isset($_REQUEST['delete_expression']) && isset($_REQUEST['g_expressionid'])) {
 			$_REQUEST['expressions'] = get_request('expressions',array());
 			foreach($_REQUEST['g_expressionid'] as $val){
 				unset($_REQUEST['expressions'][$val]);
 			}
 		}
-		else if(inarr_isset(array('edit_expressionid'))){
+		elseif (isset($_REQUEST['edit_expressionid'])) {
 			$_REQUEST['edit_expressionid'] = array_keys($_REQUEST['edit_expressionid']);
 			$edit_expressionid = $_REQUEST['edit_expressionid'] = array_pop($_REQUEST['edit_expressionid']);
 			$_REQUEST['expressions'] = get_request('expressions',array());

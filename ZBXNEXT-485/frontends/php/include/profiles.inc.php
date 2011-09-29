@@ -218,15 +218,27 @@ return $row;
 function update_config($configs){
 	$update = array();
 
-	if(isset($configs['work_period']) && !is_null($configs['work_period'])){
-		if(!validate_period($configs['work_period'])){
+	if (isset($configs['work_period'])) {
+		if (!validate_period($configs['work_period'])) {
 			error(S_INCORRECT_WORK_PERIOD);
 			return false;
 		}
 	}
-	if(isset($configs['alert_usrgrpid']) && !is_null($configs['alert_usrgrpid'])){
-		if(($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
+	if (isset($configs['alert_usrgrpid'])) {
+		if (($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
 			error(_('Incorrect user group.'));
+			return false;
+		}
+	}
+
+	if (isset($configs['discovery_groupid'])) {
+		$groupid = API::HostGroup()->get(array(
+			'groupids' => $configs['discovery_groupid'],
+			'output' => API_OUTPUT_SHORTEN,
+			'preservekeys' => true
+		));
+		if (empty($groupid)) {
+			error(_('Incorrect host group.'));
 			return false;
 		}
 	}
