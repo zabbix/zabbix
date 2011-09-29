@@ -12,6 +12,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4106] fixed layout of "Status of host triggers" screen element (Vedmak)
  - [ZBX-4061] fixed errors when try to delete already deleted regular expression (Vedmak)
  - [ZBX-4058] fixed working time updating in Administration->Gneral->Working time (Vedmak)
  - [ZBX-4060] fixed error when save map with link updated to connect new element (Vedmak)
