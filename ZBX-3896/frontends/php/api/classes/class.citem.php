@@ -1038,7 +1038,7 @@ class CItem extends CItemGeneral{
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 					}
 					if($del_items[$itemid]['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated item.');
 					}
 				}
 			}
@@ -1072,7 +1072,7 @@ class CItem extends CItemGeneral{
 
 			if(!empty($del_graphs)){
 				$result = API::Graph()->delete($del_graphs, true);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph'));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph.'));
 			}
 //--
 
@@ -1085,7 +1085,7 @@ class CItem extends CItemGeneral{
 			if (!empty($triggers)) {
 				$result = API::Trigger()->delete(array_keys($triggers), true);
 				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger.'));
 				}
 			}
 
