@@ -83,7 +83,7 @@ require_once('include/views/js/configuration.action.edit.js.php');
 // group conditions by type
 	$condElements = new CTable(_('No conditions defined.'), 'formElementTable');
 
-	$i=0;
+	$i = 0;
 	$grouped_conditions = array();
 	foreach($data['conditions'] as $id => $condition){
 		if(!isset($condition['conditiontype'])) $condition['conditiontype'] = 0;

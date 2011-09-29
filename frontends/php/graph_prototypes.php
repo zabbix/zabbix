@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_GRAPHS';
 $page['file'] = 'graph_prototypes.php';
-$page['hist_arg'] = array();
+$page['hist_arg'] = array('parent_discoveryid');
 $page['scripts'] = array();
 
 include_once('include/page_header.php');

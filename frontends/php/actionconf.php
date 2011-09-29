@@ -112,19 +112,20 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	CProfile::update('web.actionconf.eventsource',$_REQUEST['eventsource'], PROFILE_TYPE_INT);
 ?>
 <?php
-	if(inarr_isset(array('clone','actionid'))){
+	if (isset($_REQUEST['clone']) && isset($_REQUEST['actionid'])) {
 		unset($_REQUEST['actionid']);
 		$_REQUEST['form'] = 'clone';
 	}
-	else if(isset($_REQUEST['cancel_new_operation'])){
+	elseif (isset($_REQUEST['cancel_new_operation'])) {
 		unset($_REQUEST['new_operation']);
 	}
-	else if(isset($_REQUEST['cancel_new_opcondition'])){
+	elseif (isset($_REQUEST['cancel_new_opcondition'])) {
 		unset($_REQUEST['new_opcondition']);
 	}
-	else if(isset($_REQUEST['save'])){
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+	elseif (isset($_REQUEST['save'])) {
+		if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 			access_deny();
+		}
 
 		$action = array(
 			'name'				=> get_request('name'),
@@ -141,24 +142,25 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			'operations'		=> get_request('operations', array()),
 		);
 
-		foreach($action['operations'] as $anum => $op){
-			if(isset($op['opmessage']) && !isset($op['opmessage']['default_msg']))
+		foreach ($action['operations'] as $anum => $op) {
+			if (isset($op['opmessage']) && !isset($op['opmessage']['default_msg'])) {
 				$action['operations'][$anum]['opmessage']['default_msg'] = 0;
+			}
 		}
 		DBstart();
-		if(isset($_REQUEST['actionid'])){
+		if (isset($_REQUEST['actionid'])) {
 			$action['actionid']= $_REQUEST['actionid'];
 
 			$result = API::Action()->update($action);
 			show_messages($result, _('Action updated'), _('Cannot update action'));
 		}
-		else{
+		else {
 			$result = API::Action()->create($action);
 			show_messages($result, _('Action added'), _('Cannot add action'));
 		}
 
 		$result = DBend($result);
-		if($result){
+		if($result) {
 			add_audit(!isset($_REQUEST['actionid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_ACTION,
 				_('Name').': '.$_REQUEST['name']);
@@ -166,73 +168,83 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			unset($_REQUEST['form']);
 		}
 	}
-	else if(inarr_isset(array('delete','actionid'))){
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+	elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
+		if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 			access_deny();
+		}
 
 		$result = API::Action()->delete($_REQUEST['actionid']);
 
 		show_messages($result, _('Action deleted'), _('Cannot delete action'));
-		if($result){
+		if ($result) {
 			unset($_REQUEST['form']);
 			unset($_REQUEST['actionid']);
 		}
 	}
-	else if(inarr_isset(array('add_condition', 'new_condition'))){
+	elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
 		$new_condition = $_REQUEST['new_condition'];
 
-		if(!isset($new_condition['value'])) $new_condition['value'] = '';
-
-		if(validate_condition($new_condition['conditiontype'], $new_condition['value'])){
+		try {
+			CAction::validateConditions($new_condition);
 			$_REQUEST['conditions'] = get_request('conditions', array());
 
 			$exists = false;
-			foreach($_REQUEST['conditions'] as $condition){
-				if(($new_condition['conditiontype'] === $condition['conditiontype'])
+			foreach ($_REQUEST['conditions'] as $condition) {
+				if (($new_condition['conditiontype'] === $condition['conditiontype'])
 					&& ($new_condition['operator'] === $condition['operator'])
 					&& ($new_condition['value'] === $condition['value'])
-				){
+				) {
 					$exists = true;
 					break;
 				}
 			}
 
-			if(!$exists){
-				array_push($_REQUEST['conditions'],$new_condition);
+			if (!$exists) {
+				array_push($_REQUEST['conditions'], $new_condition);
 			}
 		}
+		catch (APIException $e) {
+			error($e->getMessage());
+		}
 	}
-	else if(inarr_isset(array('del_condition','g_conditionid'))){
-		$_REQUEST['conditions'] = get_request('conditions',array());
-		foreach($_REQUEST['g_conditionid'] as $condition){
+	elseif (isset($_REQUEST['del_condition']) && isset($_REQUEST['g_conditionid'])) {
+		$_REQUEST['conditions'] = get_request('conditions', array());
+		foreach ($_REQUEST['g_conditionid'] as $condition) {
 			unset($_REQUEST['conditions'][$condition]);
 		}
 	}
-	else if(inarr_isset(array('add_opcondition','new_opcondition'))){
+	elseif (isset($_REQUEST['add_opcondition']) && isset($_REQUEST['new_opcondition'])) {
 		$new_opcondition = $_REQUEST['new_opcondition'];
 
-		if( validate_condition($new_opcondition['conditiontype'],$new_opcondition['value']) ){
-			$new_operation = get_request('new_operation',array());
-			if(!isset($new_operation['opconditions'])) $new_operation['opconditions'] = array();
+		try {
+			CAction::validateOperationConditions($new_condition);
+			$new_operation = get_request('new_operation', array());
 
-			if(!str_in_array($new_opcondition,$new_operation['opconditions']))
-				array_push($new_operation['opconditions'],$new_opcondition);
+			if (!isset($new_operation['opconditions'])) {
+				$new_operation['opconditions'] = array();
+			}
+			if (!str_in_array($new_opcondition, $new_operation['opconditions'])) {
+				array_push($new_operation['opconditions'], $new_opcondition);
+			}
 
 			$_REQUEST['new_operation'] = $new_operation;
 
 			unset($_REQUEST['new_opcondition']);
 		}
+		catch (APIException $e) {
+			error($e->getMessage());
+		}
 	}
-	else if(inarr_isset(array('del_opcondition','g_opconditionid'))){
-		$new_operation = get_request('new_operation',array());
+	elseif (isset($_REQUEST['del_opcondition']) && isset($_REQUEST['g_opconditionid'])) {
+		$new_operation = get_request('new_operation', array());
 
-		foreach($_REQUEST['g_opconditionid'] as $condition){
+		foreach ($_REQUEST['g_opconditionid'] as $condition) {
 			unset($new_operation['opconditions'][$condition]);
 		}
 
 		$_REQUEST['new_operation'] = $new_operation;
 	}
-	else if(inarr_isset(array('add_operation','new_operation'))){
+	elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) {
 		$new_operation = $_REQUEST['new_operation'];
 		$result = true;
 
@@ -270,14 +282,14 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			unset($_REQUEST['new_operation']);
 		}
 	}
-	else if(inarr_isset(array('del_operation','g_operationid'))){
+	elseif (isset($_REQUEST['del_operation']) && isset($_REQUEST['g_operationid'])) {
 		$_REQUEST['operations'] = get_request('operations',array());
 		foreach($_REQUEST['g_operationid'] as $condition){
 			unset($_REQUEST['operations'][$condition]);
 		}
 		sortOperations($_REQUEST['operations']);
 	}
-	else if(inarr_isset(array('edit_operationid'))){
+	elseif (isset($_REQUEST['edit_operationid'])) {
 		$_REQUEST['edit_operationid'] = array_keys($_REQUEST['edit_operationid']);
 		$edit_operationid = $_REQUEST['edit_operationid'] = array_pop($_REQUEST['edit_operationid']);
 		$_REQUEST['operations'] = get_request('operations', array());
@@ -289,7 +301,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		}
 	}
 // ------ GO ------
-	else if(str_in_array($_REQUEST['go'], array('activate','disable')) && isset($_REQUEST['g_actionid'])){
+	elseif (str_in_array($_REQUEST['go'], array('activate','disable')) && isset($_REQUEST['g_actionid'])) {
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
@@ -316,7 +328,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] '.$status_name);
 		}
 	}
-	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_actionid'])){
+	elseif (($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_actionid'])) {
 		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
@@ -324,7 +336,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		show_messages($go_result,_('Selected actions deleted'), _('Cannot delete selected actions'));
 	}
 
-	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+	if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 		$url = new CUrl();
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
@@ -362,12 +374,13 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$esc_period	= get_request('esc_period');
 		}
 
-		if(isset($action['actionid']) && !isset($_REQUEST['form_refresh'])){
+		if (isset($action['actionid']) && !isset($_REQUEST['form_refresh'])) {
 			sortOperations($action['operations']);
 		}
-		else{
-			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period']))
+		else {
+			if (isset($_REQUEST['escalation']) && 0 == $_REQUEST['esc_period']) {
 				$_REQUEST['esc_period'] = 3600;
+			}
 
 			$action['name'] = get_request('name');
 			$action['eventsource'] = get_request('eventsource');
@@ -379,8 +392,12 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$action['recovery_msg'] = get_request('recovery_msg',0);
 			$action['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
 			$action['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG);
+			$action['conditions'] = get_request('conditions', array());
+			$action['operations'] = get_request('operations', array());
+		}
 
-			$action['conditions'] = get_request('conditions', array(
+		if (!isset($action['actionid']) && !isset($_REQUEST['form_refresh'])) {
+			$action['conditions'] = array(
 				array(
 					'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
 					'operator' => CONDITION_OPERATOR_EQUAL,
@@ -391,8 +408,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					'operator' => CONDITION_OPERATOR_NOT_IN,
 					'value' => '',
 				),
-			));
-			$action['operations'] = get_request('operations', array());
+			);
 		}
 
 		$actionForm = new CView('configuration.action.edit', $action);

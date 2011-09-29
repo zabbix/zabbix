@@ -1154,9 +1154,6 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${JABBER_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${JABBER_LIBS}"
 
-	PROXY_LDFLAGS="${PROXY_LDFLAGS}"
-	PROXY_LIBS="${PROXY_LIBS}"
-
 	dnl Checking for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
 	if test "x$want_curl" = "xyes"; then
@@ -1169,8 +1166,14 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	fi
 
 	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
-	LIBS="${LIBS} ${LIBCURL_LIBS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${LIBCURL_LDFLAGS}"
+	SERVER_LIBS="${SERVER_LIBS} ${LIBCURL_LIBS}"
+
+	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${LIBCURL_LDFLAGS}"
+	PROXY_LIBS="${PROXY_LIBS} ${LIBCURL_LIBS}"
+
+	AGENT_LDFLAGS="${AGENT_LDFLAGS} ${LIBCURL_LDFLAGS}"
+	AGENT_LIBS="${AGENT_LIBS} ${LIBCURL_LIBS}"
 
 	have_odbc="no"
 
@@ -1287,13 +1290,6 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${OPENIPMI_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${OPENIPMI_LIBS}"
-
-	AC_SUBST(SERVER_LDFLAGS)
-	AC_SUBST(SERVER_LIBS)
-
-	AC_SUBST(PROXY_LDFLAGS)
-	AC_SUBST(PROXY_LIBS)
-
 fi
 
 if test "$java" = "yes"; then
@@ -1319,7 +1315,9 @@ if test "x$want_ldap" = "xyes"; then
 	fi
 fi
 CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${LDAP_LDFLAGS}"
+SERVER_LDFLAGS="${SERVER_LDFLAGS} ${LDAP_LDFLAGS}"
+PROXY_LDFLAGS="${PROXY_LDFLAGS} ${LDAP_LDFLAGS}"
+AGENT_LDFLAGS="${AGENT_LDFLAGS} ${LDAP_LDFLAGS}"
 
 found_iconv="no"
 dnl Check for libiconv [by default - skip]
@@ -1333,6 +1331,15 @@ LIBS="${LIBS} ${ICONV_LIBS}"
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
+
+AC_SUBST(SERVER_LDFLAGS)
+AC_SUBST(SERVER_LIBS)
+
+AC_SUBST(PROXY_LDFLAGS)
+AC_SUBST(PROXY_LIBS)
+
+AC_SUBST(AGENT_LDFLAGS)
+AC_SUBST(AGENT_LIBS)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1559,8 +1566,8 @@ echo "
 if test "x$agent" != "xno"; then
 
 echo "  Agent details:
-    Linker flags:          ${LDFLAGS}
-    Libraries:             ${LIBS}"
+    Linker flags:          ${LDFLAGS} ${AGENT_LDFLAGS}
+    Libraries:             ${LIBS} ${AGENT_LIBS}"
 
 fi
 
