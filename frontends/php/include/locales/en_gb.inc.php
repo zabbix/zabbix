@@ -354,7 +354,6 @@
 	'S_IMAGE'=>					_('Image'),
 	'S_OTHER'=>					_('Other'),
 	'S_NOTHING_TO_DO'=>				_('Nothing to do'),
-	'S_INCORRECT_WORK_PERIOD'=>			_('Incorrect work period'),
 
 	'S_REGULAR_EXPRESSION'=>			_('Regular expression'),
 	'S_EXPRESSION'=>				_('Expression'),
