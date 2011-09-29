@@ -905,9 +905,8 @@ COpt::memoryPick();
 			}
 
 			foreach ($linksToUpdate as $lnum => $link){
-					$linksToUpdate[$lnum]['selementid1'] = $mapVirtSelements[$link['selementid1']];
-
-					$linksToUpdate[$lnum]['selementid2'] = $mapVirtSelements[$link['selementid2']];
+				$linksToUpdate[$lnum]['selementid1'] = $mapVirtSelements[$link['selementid1']];
+				$linksToUpdate[$lnum]['selementid2'] = $mapVirtSelements[$link['selementid2']];
 			}
 
 			unset($mapVirtSelements);
