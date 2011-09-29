@@ -21,7 +21,7 @@
 <?php
 
 $workingTimeTab = new CFormList('scriptsTab');
-$workingTimeTab->addRow(_('Working time'), new CTextBox('work_period', $this->data['config']['work_period'], 35));
+$workingTimeTab->addRow(_('Working time'), new CTextBox('work_period', $this->data['config']['work_period'], ZBX_TEXTBOX_STANDART_SIZE));
 
 $workingTimeView = new CTabView();
 $workingTimeView->addTab('workingTime', _('Working time'), $workingTimeTab);
