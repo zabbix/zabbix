@@ -45,3 +45,12 @@ function checkBrowser() {
 	if (GK) alert('Firefox');
 	return 0;
 }
+
+/*
+ * Redirect outdated browser to warning page
+ */
+if (document.cookie.indexOf('browserwarning_ignore') < 0) {
+	if (IE6 || IE7 || true) {
+		window.location.replace('browserwarning.php');
+	}
+}

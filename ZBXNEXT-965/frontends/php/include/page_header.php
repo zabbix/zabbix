@@ -172,17 +172,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
 <![endif]-->
 <script type="text/javascript" src="js/browsers.js"></script>
-<?php
-// redirect out-of-date browser to warning page
-$browserwarning_ignore = get_cookie('browserwarning_ignore');
-if (empty($browserwarning_ignore)) {
-	echo '<script type="text/javascript">
-			if (IE6 || IE7 || true) {
-				window.location.replace(\'browserwarning.php\');
-			}
-		</script>';
-}
-?>
 <script type="text/javascript">var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
 	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'];
