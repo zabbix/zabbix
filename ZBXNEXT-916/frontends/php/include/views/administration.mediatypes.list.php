@@ -28,7 +28,7 @@ $mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'), $createForm);
 
 // header
 $numRows = new CDiv();
-$numRows->setAttribute('name','numrows');
+$numRows->setAttribute('name', 'numrows');
 $mediaTypeWidget->addHeader(_('Media types'));
 $mediaTypeWidget->addHeader($numRows);
 

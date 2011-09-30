@@ -714,7 +714,7 @@ include_once('include/page_header.php');
 		$form->setName('usrgrpform');
 		$form->setAttribute('id', 'usrgrps');
 
-		$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
+		$table = new CTableInfo(_('No user groups defined.'));
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox("all_usrgrps", NULL, "javascript: checkAll('".$form->getName()."', 'all_usrgrps','usrgrps');") : null),
 			S_NAME
@@ -769,12 +769,12 @@ include_once('include/page_header.php');
 		$form->setName('userform');
 		$form->setAttribute('id', 'users');
 
-		$table = new CTableInfo(S_NO_USERS_DEFINED);
+		$table = new CTableInfo(_('No users defined.'));
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox("all_users", NULL, "javascript: checkAll('".$form->getName()."', 'all_users','users');") : null),
-			S_ALIAS,
-			S_NAME,
-			S_SURNAME
+			_('Alias'),
+			_('Name'),
+			_('Surname')
 		));
 
 
