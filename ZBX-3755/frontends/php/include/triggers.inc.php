@@ -1913,23 +1913,6 @@ function utf8RawUrlDecode($source){
 		}
 	}
 
-	function replace_triggers_depenedencies($new_triggerids){
-		$old_triggerids = array_keys($new_triggerids);
-
-		$deps = array();
-		$res = DBselect('SELECT * FROM trigger_depends WHERE '.DBcondition('triggerid_up',$old_triggerids));
-		while($db_dep = DBfetch($res)){
-			$deps[$db_dep['triggerid_up']] = $db_dep['triggerid_down'];
-		}
-
-		delete_dependencies_by_triggerid($deps);
-
-		foreach($new_triggerids as $old_triggerid => $newtriggerid){
-			if(isset($deps[$old_triggerid]))
-				insert_dependency($deps[$old_triggerid], $newtriggerid);
-		}
-	}
-
 /******************************************************************************
  *																			*
  * Comments: !!! Don't forget sync code with C !!!							*
