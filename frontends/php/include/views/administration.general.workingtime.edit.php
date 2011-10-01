@@ -21,14 +21,14 @@
 <?php
 
 $workingTimeTab = new CFormList('scriptsTab');
-$workingTimeTab->addRow(_('Working time'), new CNumericBox('work_period', $this->data['config']['work_period'], 35));
+$workingTimeTab->addRow(_('Working time'), new CTextBox('work_period', $this->data['config']['work_period'], ZBX_TEXTBOX_STANDARD_SIZE));
 
 $workingTimeView = new CTabView();
 $workingTimeView->addTab('workingTime', _('Working time'), $workingTimeTab);
 
 $workingTimeForm = new CForm();
 $workingTimeForm->setName('workingTimeForm');
-//$workingTimeForm->setHelp('web.config.workperiod.php');
+
 $workingTimeForm->addVar('form', $this->data['form']);
 $workingTimeForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $workingTimeForm->addVar('config', get_request('config', 7));

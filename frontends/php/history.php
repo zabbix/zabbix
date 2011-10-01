@@ -366,10 +366,11 @@ include_once('include/page_header.php');
 
 				$row = array(nbsp(zbx_date2str(S_HISTORY_LOG_ITEM_DATE_FORMAT, $data['clock'])));
 
-				if($fewItems)
-					$row[] = $host['hostname'].':'.itemName($item);
+				if ($fewItems) {
+					$row[] = $host['name'].':'.itemName($item);
+				}
 
-				if($logItem){
+				if ($logItem) {
 					$row[] = ($data['timestamp'] == 0) ? '-' : zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT, $data['timestamp']);
 
 					// if this is a eventLog item, showing additional info

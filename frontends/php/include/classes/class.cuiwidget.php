@@ -71,6 +71,19 @@ class CUIWidget extends CDiv{
 		return $this->_header;
 	}
 
+	public function setDoubleHeader($left, $right) {
+		$this->_header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header '.$this->css_class);
+
+		$left = new CDiv($left);
+		$left->addStyle('float: left;');
+		$right = new CDiv($right);
+		$right->addStyle('float: right;');
+
+		$this->_header->addItem(array($left, $right));
+
+		return $this->_header;
+	}
+
 	public function setFooter($footer, $right=false){
 		$this->_footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right ? ' right' : ' left'));
 
