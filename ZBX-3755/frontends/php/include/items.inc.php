@@ -302,6 +302,12 @@ function item_type2str($type = null){
 		);
 		$srcItems = API::Item()->get($options);
 
+		foreach ($srcItems as &$srcItem) {
+			if ($srcItem['status'] == ITEM_STATUS_NOTSUPPORTED) {
+				$srcItem['status'] = ITEM_STATUS_ACTIVE;
+			}
+		}
+
 		$options = array(
 			'output' => array('hostid', 'host', 'status'),
 			'selectInterfaces' => array('interfaceid', 'type', 'main'),
@@ -349,6 +355,12 @@ function item_type2str($type = null){
 			'selectApplications' => API_OUTPUT_REFER
 		);
 		$srcItems = API::Item()->get($options);
+
+		foreach ($srcItems as &$srcItem) {
+			if ($srcItem['status'] == ITEM_STATUS_NOTSUPPORTED) {
+				$srcItem['status'] = ITEM_STATUS_ACTIVE;
+			}
+		}
 
 		$options = array(
 			'output' => array('hostid', 'host', 'status'),
