@@ -425,27 +425,34 @@ include_once('include/page_header.php');
 		}
 	}
 	else if($_REQUEST['config'] == 10){
-		if(inarr_isset(array('clone','regexpid'))){
+		if (isset($_REQUEST['clone']) && isset($_REQUEST['regexpid'])) {
 			unset($_REQUEST['regexpid']);
 			$_REQUEST['form'] = 'clone';
 		}
 		else if(isset($_REQUEST['cancel_new_expression'])){
 			unset($_REQUEST['new_expression']);
 		}
-		else if(isset($_REQUEST['save'])){
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+		elseif (isset($_REQUEST['save'])) {
+			if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 				access_deny();
+			}
 
-			$regexp = array('name' => $_REQUEST['rename'],
-						'test_string' => $_REQUEST['test_string']
-					);
+			$regexp = array(
+				'name' => $_REQUEST['rename'],
+				'test_string' => $_REQUEST['test_string']
+			);
 
 			DBstart();
-			if(isset($_REQUEST['regexpid'])){
-				$regexpid=$_REQUEST['regexpid'];
-
-				delete_expressions_by_regexpid($_REQUEST['regexpid']);
-				$result = update_regexp($regexpid, $regexp);
+			if (isset($_REQUEST['regexpid'])) {
+				$regexpid = $_REQUEST['regexpid'];
+				if (!get_regexp_by_regexpid($regexpid)) {
+					$result = false;
+					error(_('Regular expression does not exist.'));
+				}
+				else {
+					delete_expressions_by_regexpid($_REQUEST['regexpid']);
+					$result = update_regexp($regexpid, $regexp);
+				}
 
 				$msg1 = S_REGULAR_EXPRESSION_UPDATED;
 				$msg2 = S_CANNOT_UPDATE_REGULAR_EXPRESSION;
@@ -457,9 +464,9 @@ include_once('include/page_header.php');
 				$msg2 = S_CANNOT_ADD_REGULAR_EXPRESSION;
 			}
 
-			if($result){
+			if ($result) {
 				$expressions = get_request('expressions', array());
-				foreach($expressions as $id => $expression){
+				foreach ($expressions as $id => $expression) {
 					$expressionid = add_expression($regexpid,$expression);
 				}
 			}
@@ -468,8 +475,8 @@ include_once('include/page_header.php');
 
 			show_messages($result,$msg1,$msg2);
 
-			if($result){ // result - OK
-				add_audit(!isset($_REQUEST['regexpid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE,
+			if ($result) { // result - OK
+				add_audit(!isset($_REQUEST['regexpid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
 					AUDIT_RESOURCE_REGEXP,
 					S_NAME.': '.$_REQUEST['rename']);
 
@@ -504,7 +511,7 @@ include_once('include/page_header.php');
 				unset($_REQUEST['regexpid']);
 			}
 		}
-		else if(inarr_isset(array('add_expression','new_expression'))){
+		elseif (isset($_REQUEST['add_expression']) && isset($_REQUEST['new_expression'])) {
 			$new_expression = $_REQUEST['new_expression'];
 
 			if(!isset($new_expression['case_sensitive']))		$new_expression['case_sensitive'] = 0;
@@ -533,13 +540,13 @@ include_once('include/page_header.php');
 				unset($_REQUEST['new_expression']);
 			}
 		}
-		else if(inarr_isset(array('delete_expression','g_expressionid'))){
+		elseif (isset($_REQUEST['delete_expression']) && isset($_REQUEST['g_expressionid'])) {
 			$_REQUEST['expressions'] = get_request('expressions',array());
 			foreach($_REQUEST['g_expressionid'] as $val){
 				unset($_REQUEST['expressions'][$val]);
 			}
 		}
-		else if(inarr_isset(array('edit_expressionid'))){
+		elseif (isset($_REQUEST['edit_expressionid'])) {
 			$_REQUEST['edit_expressionid'] = array_keys($_REQUEST['edit_expressionid']);
 			$edit_expressionid = $_REQUEST['edit_expressionid'] = array_pop($_REQUEST['edit_expressionid']);
 			$_REQUEST['expressions'] = get_request('expressions',array());
