@@ -53,7 +53,7 @@ $usersForm->setName('userForm');
 // create users table
 $usersTable = new CTableInfo(_('No users defined.'));
 $usersTable->setHeader(array(
-	new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."','all_users','group_userid');"),
+	new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');"),
 	make_sorting_header(_('Alias'), 'alias'),
 	make_sorting_header(_('Name'), 'name'),
 	make_sorting_header(_('Surname'), 'surname'),
@@ -133,7 +133,7 @@ foreach ($this->data['users'] as $user) {
 	));
 }
 
-// append GO buttons
+// append Go buttons
 $goComboBox = new CComboBox('go');
 
 $goOption = new CComboItem('unblock', _('Unblock selected'));
