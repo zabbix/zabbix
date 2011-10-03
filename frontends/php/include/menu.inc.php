@@ -84,7 +84,7 @@ $ZBX_MENU = array(
 				array(
 						'url'=>'srv_status.php',
 						'label'=>_('IT services'),
-						'forse_disable_all_nodes' => true,
+						'force_disable_all_nodes' => true,
 						'sub_pages'=>array('report3.php','report7.php','chart_sla.php','chart5.php')
 					),
 				array('url'=>'vtext.php'),
@@ -137,7 +137,7 @@ $ZBX_MENU = array(
 			'user_type'		=> USER_TYPE_ZABBIX_ADMIN,
 			'node_perm'		=> PERM_READ_LIST,
 			'default_page_id'	=> 0,
-			'forse_disable_all_nodes'=> true,
+			'force_disable_all_nodes'=> true,
 			'pages'=>array(
 				array(
 						'url'=>'hostgroups.php',
@@ -202,7 +202,7 @@ $ZBX_MENU = array(
 			'user_type'		=> USER_TYPE_SUPER_ADMIN,
 			'node_perm'		=> PERM_READ_WRITE,
 			'default_page_id'	=> 1,
-			'forse_disable_all_nodes'=> true,
+			'force_disable_all_nodes'=> true,
 			'pages'=>array(
 				array(
 						'url'=>'config.php',
@@ -247,7 +247,7 @@ $ZBX_MENU = array(
 			'user_type'		=> 	0,
 			'default_page_id'	=> 0,
 			'hide_node_selection' => 1,
-			'forse_disable_all_nodes'=> true,
+			'force_disable_all_nodes'=> true,
 			'pages'=>array(
 				array('url'=>'index.php','sub_pages'=>array('profile.php', 'popup_media.php'))
 				)
@@ -328,7 +328,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 		}
 
 		if($page_exists && !defined('ZBX_NOT_ALLOW_ALL_NODES') &&
-			(isset($menu['forse_disable_all_nodes']) || isset($sub_page['forse_disable_all_nodes'])))
+			(isset($menu['force_disable_all_nodes']) || isset($sub_page['force_disable_all_nodes'])))
 		{
 			define('ZBX_NOT_ALLOW_ALL_NODES', 1);
 		}
@@ -366,7 +366,7 @@ function zbx_define_menu_restrictions($page, $ZBX_MENU){
 	foreach($ZBX_MENU as $sid => $section){
 		foreach($section['pages'] as $pid => $menu_page) {
 			if (($menu_page['url'] == $page['file']) || (isset($menu_page['sub_pages']) && str_in_array($page['file'], $menu_page['sub_pages']))) {
-				if(isset($section['forse_disable_all_nodes']) && !defined('ZBX_NOT_ALLOW_ALL_NODES')) {
+				if(isset($section['force_disable_all_nodes']) && !defined('ZBX_NOT_ALLOW_ALL_NODES')) {
 					define('ZBX_NOT_ALLOW_ALL_NODES', 1);
 				}
 				if(isset($section['hide_node_selection']) && !defined('ZBX_HIDE_NODE_SELECTION')) {
