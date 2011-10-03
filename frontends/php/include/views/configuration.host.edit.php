@@ -268,8 +268,9 @@
 			$triggersList = array();
 
 			foreach($hostTriggers as $hostTrigger){
-				if (httpitemExists($hostTrigger['items']))
+				if (httpItemExists($hostTrigger['items'])) {
 					continue;
+				}
 
 				$triggersList[$hostTrigger['triggerid']] = $hostTrigger['description'];
 			}
@@ -300,8 +301,9 @@
 				if(count($hostGraph['hosts']) > 1)
 					continue;
 
-				if (httpitemExists($hostGraph['items']))
+				if (httpItemExists($hostGraph['items'])) {
 					continue;
+				}
 
 				$graphsList[$hostGraph['graphid']] = $hostGraph['name'];
 			}
