@@ -988,7 +988,6 @@ class CItem extends CItemGeneral{
 		$result = DB::update('items', $data);
 		if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-
 		$itemApplications = $aids = array();
 		foreach($items as $key => $item){
 			if(!isset($item['applications'])) continue;
@@ -1018,7 +1017,6 @@ class CItem extends CItemGeneral{
 			$host = reset($item['hosts']);
 			info(S_ITEM." [".$host['host'].':'.$item['key_']."] ".S_UPDATED_SMALL);
 		}
-
 	}
 
 	/**
@@ -1191,7 +1189,7 @@ class CItem extends CItemGeneral{
 		return true;
 	}
 
-	protected function inherit ($items, $hostids=null) {
+	protected function inherit($items, $hostids=null) {
 		if (empty($items)) {
 			return true;
 		}
