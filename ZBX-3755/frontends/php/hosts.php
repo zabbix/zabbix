@@ -574,7 +574,7 @@ include_once('include/page_header.php');
 					throw new Exception();
 				}
 
-				if (!copy_triggers($clone_hostid, $hostid)) {
+				if (!copyTriggers($clone_hostid, $hostid)) {
 					throw new Exception();
 				}
 
@@ -592,7 +592,7 @@ include_once('include/page_header.php');
 						continue;
 					}
 
-					if (httpitemExists($graph['items'])) {
+					if (httpItemExists($graph['items'])) {
 						continue;
 					}
 

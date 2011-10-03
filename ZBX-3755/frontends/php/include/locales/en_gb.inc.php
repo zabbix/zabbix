@@ -626,8 +626,6 @@
 	'S_ITEMS_BIG'=>					_('ITEMS'),
 	'S_TRIGGERS'=>					_('Triggers'),
 	'S_GRAPHS'=>					_('Graphs'),
-	'S_ITEMS_COPIED'=>				_('Items copied'),
-	'S_CANNOT_COPY_ITEMS'=>				_('Cannot copy items'),
 	'S_CANNOT_UPDATE_HOST'=>			_('Cannot update host'),
 	'S_HOST_STATUS_UPDATED'=>			_('Host status updated'),
 	'S_HOST_GROUPS_BIG'=>				_('HOST GROUPS'),

@@ -1353,7 +1353,7 @@ function item_type2str($type = null){
 	}
 
 /*
- * Function: httpitemExists
+ * Function: httpItemExists
  *
  * Description:
  *     Function returns true if http items exists in the $items array.
@@ -1365,10 +1365,12 @@ function item_type2str($type = null){
  * Comments:
  *
  */
-	function httpitemExists($items){
-		foreach($items as $item)
-			if ($item['type'] == ITEM_TYPE_HTTPTEST)
+	function httpItemExists($items) {
+		foreach ($items as $item) {
+			if ($item['type'] == ITEM_TYPE_HTTPTEST) {
 				return true;
+			}
+		}
 
 		return false;
 	}
