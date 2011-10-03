@@ -194,7 +194,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			if ((isset($item['port']) && !zbx_empty($item['port']))
-				&& !((zbx_ctype_digit($item['port']) && $item['port'] > 0 && $item['port'] < 65535)
+				&& !((zbx_ctype_digit($item['port']) && $item['port'] >= 0 && $item['port'] <= 65535)
 				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $item['port']))
 			) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
