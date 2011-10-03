@@ -37,18 +37,12 @@ $fields = array(
 	'reconnect' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535), null),
 	'enter' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'autologin' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'request' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'browserwarning_ignore' => array(T_ZBX_STR, O_OPT, null, null,	null)
+	'request' =>		array(T_ZBX_STR, O_OPT, null,	null,		null)
 );
 check_fields($fields);
 ?>
 <?php
 $sessionid = get_cookie('zbx_sessionid');
-
-// remember browser warning ignoring
-if (isset($_REQUEST['browserwarning_ignore'])) {
-	zbx_setcookie('browserwarning_ignore', 'Y');
-}
 
 if (isset($_REQUEST['reconnect']) && isset($sessionid)) {
 	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));

@@ -58,7 +58,7 @@
 				<div style="position: absolute; top: 420px; left: 23px;" class="browserwarningCopyright">
 					<a href="http://www.zabbix.com">Zabbix <?php echo ZABBIX_VERSION; ?> Copyright 2001-2011 by Zabbix SIA</a>
 				</div>
-				<div style="position: absolute; top: 400px; left: 400px;" class="browserwarningLink"><a href="index.php?browserwarning_ignore=yes">Continue despite this warning</a> &raquo;</div>
+				<div style="position: absolute; top: 400px; left: 400px;" class="browserwarningLink"><a href="index.php" onClick="javascript: document.cookie='browserwarning_ignore=yes';">Continue despite this warning</a> &raquo;</div>
 			</div>
 		</div>
 	</div>
