@@ -1243,7 +1243,7 @@ class CItem extends CItemGeneral{
 				else if(isset($item['type']) && ($item['type'] != $exItem['type'])){
 					if($type = $this->itemTypeInterface($item['type'])){
 						if(!isset($interfaceids[$type]))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], is_null($exItem['key_']) ? $item['key_'] : $exItem['key_']));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
 
 						$item['interfaceid'] = $interfaceids[$type];
 					}

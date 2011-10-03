@@ -870,7 +870,7 @@ COpt::memoryPick();
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					else if(($exItem['templateid'] > 0) && (bccomp($exItem['templateid'], $item['itemid']) != 0)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $exItem['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
 					}
 				}
 
@@ -880,7 +880,7 @@ COpt::memoryPick();
 				else if(isset($item['type']) && ($item['type'] != $exItem['type'])){
 					if($type = $this->itemTypeInterface($item['type'])){
 						if(!isset($interfaceids[$type]))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $exItem['key_']));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for disovery rule key "%2$s".', $host['host'], $item['key_']));
 
 						$item['interfaceid'] = $interfaceids[$type];
 					}
