@@ -189,10 +189,14 @@ typedef enum
 	INTERFACE_TYPE_AGENT,
 	INTERFACE_TYPE_SNMP,
 	INTERFACE_TYPE_IPMI,
-	INTERFACE_TYPE_JMX
+	INTERFACE_TYPE_JMX,
+	INTERFACE_TYPE_ANY = 255
 }
 zbx_interface_type_t;
 const char	*zbx_interface_type_string(zbx_interface_type_t type);
+
+#define INTERFACE_TYPE_COUNT	4	/* number of interface types */
+extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
 #define ZBX_FLAG_DISCOVERY		0x01	/* low-level discovery rule */
 #define ZBX_FLAG_DISCOVERY_CHILD	0x02	/* low-level discovery proto-item, proto-trigger or proto-graph */
