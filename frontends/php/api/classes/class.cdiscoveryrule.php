@@ -809,8 +809,16 @@ COpt::memoryPick();
 		return true;
 	}
 
-	protected function inherit($items, $hostids=null){
-		if(empty($items)) return true;
+	/**
+	 * Inherit discovery rules to child hosts/templates.
+	 * @param array $items
+	 * @param null|array $hostids array of hostids which discovery rules should be inherited to
+	 * @return bool
+	 */
+	protected function inherit(array $items, $hostids=null) {
+		if (empty($items)) {
+			return true;
+		}
 
 		$chdHosts = API::Host()->get(array(
 			'templateids' => zbx_objectValues($items, 'hostid'),
@@ -821,27 +829,30 @@ COpt::memoryPick();
 			'nopermissions' => true,
 			'templated_hosts' => true
 		));
-		if(empty($chdHosts)) return true;
+		if (empty($chdHosts)) {
+			return true;
+		}
 
 		$insertItems = array();
 		$updateItems = array();
 		$inheritedItems = array();
-		foreach($chdHosts as $hostid => $host){
+		foreach ($chdHosts as $hostid => $host) {
 			$interfaceids = array();
-			foreach($host['interfaces'] as $interface){
-				if($interface['main'] == 1)
+			foreach ($host['interfaces'] as $interface) {
+				if ($interface['main'] == 1) {
 					$interfaceids[$interface['type']] = $interface['interfaceid'];
+				}
 			}
 
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
 // skip items not from parent templates of current host
 			$parentItems = array();
-			foreach($items as $itemid => $item){
-				if(isset($templateids[$item['hostid']]))
+			foreach ($items as $itemid => $item) {
+				if (isset($templateids[$item['hostid']])) {
 					$parentItems[$itemid] = $item;
+				}
 			}
-//----
 
 // check existing items to decide insert or update
 			$exItems = $this->get(array(
@@ -854,37 +865,38 @@ COpt::memoryPick();
 			$exItemsKeys = zbx_toHash($exItems, 'key_');
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
 
-			foreach($parentItems as $item){
+			foreach ($parentItems as $item) {
 				$exItem = null;
 
 // update by tempalteid
-				if(isset($exItemsTpl[$item['itemid']])){
+				if (isset($exItemsTpl[$item['itemid']])) {
 					$exItem = $exItemsTpl[$item['itemid']];
 				}
 
 // update by key
-				if(isset($item['key_']) && isset($exItemsKeys[$item['key_']])){
+				if (isset($exItemsKeys[$item['key_']])) {
 					$exItem = $exItemsKeys[$item['key_']];
 
-					if($exItem['flags'] != ZBX_FLAG_DISCOVERY){
+					if ($exItem['flags'] != ZBX_FLAG_DISCOVERY) {
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
-					else if(($exItem['templateid'] > 0) && (bccomp($exItem['templateid'], $item['itemid']) != 0)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $exItem['key_']));
+					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
 					}
 				}
 
-				if(($host['status'] == HOST_STATUS_TEMPLATE) || !isset($item['type'])){
+				if ($host['status'] == HOST_STATUS_TEMPLATE || !isset($item['type'])) {
 					unset($item['interfaceid']);
 				}
-				else if(isset($item['type']) && ($item['type'] != $exItem['type'])){
-					if($type = $this->itemTypeInterface($item['type'])){
-						if(!isset($interfaceids[$type]))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $exItem['key_']));
+				elseif (isset($item['type']) && $item['type'] != $exItem['type']) {
+					if ($type = $this->itemTypeInterface($item['type'])) {
+						if (!isset($interfaceids[$type])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for discovery rule key "%2$s".', $host['host'], $item['key_']));
+						}
 
 						$item['interfaceid'] = $interfaceids[$type];
 					}
-					else{
+					else {
 						$item['interfaceid'] = 0;
 					}
 				}
@@ -895,18 +907,18 @@ COpt::memoryPick();
 				$newItem['templateid'] = $item['itemid'];
 
 // setting item application
-				if(isset($item['applications'])){
+				if (isset($item['applications'])) {
 					$newItem['applications'] = get_same_applications_for_host($item['applications'], $host['hostid']);
 				}
 //--
 
-				if($exItem){
+				if ($exItem) {
 					$newItem['itemid'] = $exItem['itemid'];
 					$inheritedItems[] = $newItem;
 
 					$updateItems[] = $newItem;
 				}
-				else{
+				else {
 					$inheritedItems[] = $newItem;
 					$newItem['flags'] = ZBX_FLAG_DISCOVERY;
 					$insertItems[] = $newItem;

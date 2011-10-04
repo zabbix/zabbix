@@ -188,51 +188,49 @@ abstract class CItemGeneral extends CZBXAPI{
 				if($item['value_type'] != ITEM_VALUE_TYPE_UINT64) $item['data_type'] = 0;
 			}
 
-			if(isset($item['key_'])){
-				$itemKey = new CItemKey($item['key_']);
-				if(!$itemKey->isValid()){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: %s', $itemKey->getError()));
+			$itemKey = new CItemKey($item['key_']);
+			if (!$itemKey->isValid()) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Error in item key: "%s".', $itemKey->getError()));
+			}
+
+			if(isset($item['type'])){
+				if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
+					($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
+					($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]') ||
+					($item['type'] == ITEM_TYPE_JMX && $item['key_'] == 'jmx[<object name>,<attribute name>]'))
+				{
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
 				}
 
-				if(isset($item['type'])){
-					if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
-						($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
-						($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]') ||
-						($item['type'] == ITEM_TYPE_JMX && $item['key_'] == 'jmx[<object name>,<attribute name>]'))
-					{
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
-					}
-
-					if(isset($item['delay']) && isset($item['delay_flex'])){
-						$res = calculate_item_nextcheck(0, 0, $item['type'], $item['delay'], $item['delay_flex'], time());
-						if($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Item will not be refreshed. Please enter a correct update interval.'));
-						}
+				if(isset($item['delay']) && isset($item['delay_flex'])){
+					$res = calculate_item_nextcheck(0, 0, $item['type'], $item['delay'], $item['delay_flex'], time());
+					if($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item will not be refreshed. Please enter a correct update interval.'));
 					}
 				}
+			}
 
-				if($fullItem['type'] == ITEM_TYPE_AGGREGATE){
-					// grpfunc['group','key','itemfunc','numeric param']
-					if(!preg_match('/^(grpmax|grpmin|grpsum|grpavg)(\[\"(.*)\"\,\"(.*)\"\,\"(last|min|max|avg|sum|count)\"\,\"[0-9]+\"\])$/ui', $item['key_'], $arr))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Key does not match <grpmax|grpmin|grpsum|grpavg>["group","key","<last|min|max|avg|sum|count>","numeric param"].'));
-				}
+			if($fullItem['type'] == ITEM_TYPE_AGGREGATE){
+				// grpfunc['group','key','itemfunc','numeric param']
+				if(!preg_match('/^(grpmax|grpmin|grpsum|grpavg)(\[\"(.*)\"\,\"(.*)\"\,\"(last|min|max|avg|sum|count)\"\,\"[0-9]+\"\])$/ui', $item['key_'], $arr))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Key does not match <grpmax|grpmin|grpsum|grpavg>["group","key","<last|min|max|avg|sum|count>","numeric param"].'));
+			}
 
-				if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP) {
-					if (strcmp($item['key_'], 'snmptrap.fallback') != 0) {
-						if (!preg_match('/^snmptrap(|\[(.*))$/', $item['key_'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid'));
-						}
+			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP) {
+				if (strcmp($item['key_'], 'snmptrap.fallback') != 0) {
+					if (!preg_match('/^snmptrap(|\[(.*))$/', $item['key_'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid'));
 					}
 				}
+			}
 
-				if(isset($item['value_type'])){
-					if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be Log for log key.'));
-					}
+			if(isset($item['value_type'])){
+				if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be Log for log key.'));
+				}
 
-					if(isset($item['type']) && ($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Value type must be Float for aggregate items.'));
-					}
+				if(isset($item['type']) && ($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Value type must be Float for aggregate items.'));
 				}
 			}
 		}
