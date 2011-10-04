@@ -246,10 +246,14 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
+	const char	*__function_name = "activate_host";
 	char		sql[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
 	int		offset = 0, *errors_from, *disable_until;
 	unsigned char	*available;
 	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
+			__function_name, item->host.hostid, item->itemid, item->type);
 
 	switch (item->type)
 	{
@@ -334,14 +338,20 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 	DBbegin();
 	DBexecute("%s", sql);
 	DBcommit();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
+	const char	*__function_name = "deactivate_host";
 	char		sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
 	int		offset = 0, *errors_from, *disable_until;
 	unsigned char	*available;
 	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
+			__function_name, item->host.hostid, item->itemid, item->type);
 
 	switch (item->type)
 	{
@@ -393,6 +403,8 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 	if (SUCCEED != DCconfig_deactivate_host(item, ts->sec))
 		return;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from, *available);
 
 	DBbegin();
 
@@ -454,6 +466,8 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 	if ('\0' != *error_msg)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
