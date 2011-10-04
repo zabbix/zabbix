@@ -183,7 +183,6 @@
 	'S_IMPORT'=>				_('Import'),
 	'S_EXPORT_SELECTED'=>		_('Export selected'),
 	'S_PREVIEW'=>				_('Preview'),
-	'S_BACK_BIG'=>				_('BACK'),
 	'S_NO_DATA_SMALL'=>			_('no data'),
 	'S_RULES'=>				_('Rules'),
 	'S_EXISTING'=>				_('Existing'),
@@ -323,9 +322,6 @@
 	'S_CCHARTS_TIMELINE_MAINPERIOD_FULL_DAY_TIME_FORMAT'=>	_('d.m H:i'),
 	'S_CCHARTS_TIMELINE_MAINPERIOD_MONTHDAYS_FORMAT'=>	_('d.m'),
 
-//	class.cuser.php
-	'S_CUSER_ERROR_DATE_FORMAT'=>				_('d.m.Y H:i'),
-
 // Colours
 
 //	config.php
@@ -354,7 +350,6 @@
 	'S_IMAGE'=>					_('Image'),
 	'S_OTHER'=>					_('Other'),
 	'S_NOTHING_TO_DO'=>				_('Nothing to do'),
-	'S_INCORRECT_WORK_PERIOD'=>			_('Incorrect work period'),
 
 	'S_REGULAR_EXPRESSION'=>			_('Regular expression'),
 	'S_EXPRESSION'=>				_('Expression'),
@@ -487,7 +482,6 @@
 
 //	history.php
 	'S_SECONDS_SMALL'=>			_('seconds'),
-	'S_SEC_SMALL'=>				_('sec'),
 	'S_SELECT_ROWS_WITH_VALUE_LIKE'=>	_('Select rows with value like'),
 	'S_LAST_HOUR_GRAPH'=>			_('Last hour graph'),
 	'S_LAST_WEEK_GRAPH'=>			_('Last week graph'),
@@ -1234,10 +1228,7 @@
 	'S_STATUS_CALCULATION'=>		_('Status calculation'),
 	'S_STATUS_CALCULATION_ALGORITHM'=>	_('Status calculation algorithm'),
 	'S_NONE'=>				_('None'),
-	'S_PROBLEM_IF_AT_LEAST_ONE'=>		_('Problem, if at least one child has a problem'),
-	'S_PROBLEM_IF_ALL'=>			_('Problem, if all children have problems'),
 	'S_SOFT'=>				_('Soft'),
-	'S_DO_NOT_CALCULATE'=>			_('Do not calculate'),
 	'S_CALCULATE_SLA'=>			_('Calculate SLA'),
 	'S_ACCEPTABLE_SLA_IN_PERCENT'=>		_('Acceptable SLA (in %)'),
 	'S_LINK_TO_TRIGGER_Q'=>			_('Link to trigger?'),
@@ -1590,7 +1581,6 @@
 	'S_NO_ELEMENTS_SELECTED'=>	_('No elements selected!'),
 
 // page_header.php
-	'S_REFRESHED_EVERY_SMALL'=>		_('refreshed every'),
 
 //	copt.inc.php
 	'S_STATS_FOR'=>			_('Stats for'),
@@ -1689,9 +1679,6 @@
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	_('\' does not accept parameters.'),
 	'S_WRONG_DEPENDENCY_ERROR' =>	_('Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.'),
 
-//	page_footer.php
-	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	_('Transaction has not been closed. Aborting..'),
-
 //	maps.inc.php
 	'S_SUBMAP'=>			_('Submap'),
 
@@ -1720,14 +1707,6 @@
 	'S_WEEK_SMALL'=>			_('week'),
 	'S_MAINTENANCES_SCHEDULE_DATE_FORMAT'=>	_('d M Y'),
 
-//	services.inc.php
-	'S_SERVICE_CANNOT_BE_PARENT_AND_CHILD_AT_THE_SAME_TIME'=>	_('Service cannot be parent and child at the same time.'),
-	'S_CANNOT_LINK_HARDLINKED_SERVICE'=>			_('Cannot link hardlinked service.'),
-	'S_CANNOT_LINK_SERVICE_TO_ITSELF'=>			_('Cannot link service to itself.'),
-	'S_NO_SERVICE_WITH'=>					_('No service with'),
-	'S_NO_SERVICE_LINKAGE_WITH'=>				_('No service linkage with'),
-	'S_UNKNOWN_CALC_ALGORITHM_OF_SERVICE_STATUS'=>		_('Unknown calculation algorithm of service status'),
-
 //	perm.inc.php
 	'S_INCORRECT_USER_DATA_IN'=>		_('Incorrect user data in'),
 
@@ -1743,44 +1722,6 @@
 	'S_NODE_WITH_SAME_ID_ALREADY_EXISTS'=>			_('Node with same ID already exists'),
 	'S_UNABLE_TO_REMOVE_LOCAL_NODE'=>			_('Unable to remove local node'),
 	'S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE'=>	_('Please be aware that database still contains data related to the deleted Node'),
-
-//     requirements.inc.php
-	'S_PHP_VERSION' => _('PHP version'),
-	'S_MINIMAL_VERSION_OF_PHP_IS' => _('Minimal version of PHP is'),
-	'S_PHP_MEMORY_LIMIT' => _('PHP memory limit'),
-	'S_IS_A_MINIMAL_PHP_MEMORY_LIMITATION_SMALL' => _('is a minimal PHP memory limitation'),
-	'S_PHP_POST_MAX_SIZE' => _('PHP post max size'),
-	'S_IS_A_MINIMUM_SIZE_OF_PHP_POST_SMALL' => _('is minimum size of PHP post'),
-	'S_PHP_MAX_EXECUTION_TIME' => _('PHP max execution time'),
-	'S_PHP_MAX_INPUT_TIME' => _('PHP max input time'),
-	'S_IS_A_MINIMAL_LIMITATION_EXECTUTION_TIME_SMALL' => _('is a minimal limitation on execution time of PHP scripts'),
-	'S_IS_A_MINIMAL_LIMITATION_INPUT_PARSE_TIME_SMALL' => _('is a minimal limitation on input parse time for PHP scripts'),
-	'S_PHP_TIMEZONE' => _('PHP timezone'),
-	'S_NO_SMALL' => _('no'),
-	'S_YES_SMALL' => _('yes'),
-	'S_TIMEZONE_FOR_PHP_IS_NOT_SET' => _('Timezone for PHP is not set'),
-	'S_PLEASE_SET' => _('Please set'),
-	'S_OPTION_IN_SMALL' => _('option in'),
-	'S_PHP_DATABASES_SUPPORT' => _('PHP databases support'),
-	'S_REQUIRES_ANY_DATABASE_SUPPORT' => _('Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]'),
-	'S_REQUIRES_BCMATH_MODULE' => _('Requires bcmath module'),
-	'S_CONFIGURE_PHP_WITH_SMALL' => _('configure PHP with'),
-	'S_REQUIRES_MB_STRING_MODULE' => _('Requires mb string module'),
-	'S_PHP_SOCKETS' => _('PHP Sockets'),
-	'S_REQUIRED_SOCKETS_MODULE' => _('Required Sockets module'),
-	'S_THE_GD_EXTENSION_IS_NOT_LOADED' => _('The GD extension is not loaded.'),
-	'S_GD_PNG_SUPPORT' => _('GD PNG Support'),
-	'S_REQUIRES_IMAGES_GENERATION_SUPPORT' => _('Requires images generation support'),
-	'S_LIBXML_MODULE' => _('libxml module'),
-	'S_PHPXML_MODULE_IS_NOT_INSTALLED' => _('php-xml module is not installed'),
-	'S_CTYPE_MODULE' => _('ctype module'),
-	'S_REQUIRES_CTYPE_MODULE' => _('Requires ctype module'),
-	'S_PHP_UPLOAD_MAX_FILESIZE' => _('PHP upload max filesize'),
-	'S_IS_MINIMAL_FOR_PHP_ULOAD_FILESIZE_SMALL' => _('is minimum for PHP upload filesize'),
-	'S_SESSION_MODULE' => _('PHP Session'),
-	'S_REQUIRED_SESSION_MODULE' => _('Required Session module'),
-	'S_PHP_GETTEXT' => _('PHP gettext'),
-	'S_REQUIRED_GETTEXT_MODULE' => _('Required gettext module'),
 
 //	class.cuser.php
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS'=>	_('Only Zabbix Admins can add user Medias'),
