@@ -248,6 +248,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4146] fixed page refreshing after adding new IT service (Eduard)
  - [ZBX-4176] fixed API action.update required parameters (Vedmak)
  - [ZBX-4104] fixed handle handling when executing scripts in Windows (rudolfs)
  - [ZBX-4091] removed unneeded linking for binaries (rudolfs)
