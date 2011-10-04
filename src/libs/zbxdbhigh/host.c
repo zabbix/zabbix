@@ -2648,13 +2648,13 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 				interfaceid = 0;
 				break;
 			case INTERFACE_TYPE_ANY:
-				for (i = 0; i < INTERFACE_TYPE_COUNT; i++)
+				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
 				{
-					if (0 != interfaceids[INTERFACE_TYPE_PRIORITY[i]])
+					if (0 != interfaceids[INTERFACE_TYPE_PRIORITY[i] - 1])
 						break;
 				}
 
-				interfaceid = interfaceids[INTERFACE_TYPE_PRIORITY[i]];
+				interfaceid = interfaceids[INTERFACE_TYPE_PRIORITY[i] - 1];
 
 				break;
 			default:
