@@ -117,7 +117,7 @@
 		}
 	}
 
-	function get_current_nodeid($forse_all_nodes = null, $perm = null){
+	function get_current_nodeid($force_all_nodes = null, $perm = null){
 		global $ZBX_CURRENT_NODEID, $ZBX_AVAILABLE_NODES, $ZBX_VIEWED_NODES;
 		if(!isset($ZBX_CURRENT_NODEID)) {
 // frontend error!!!
@@ -128,7 +128,7 @@
 		if(!is_null($perm)){
 			return get_accessible_nodes_by_user(CWebUser::$data, $perm, PERM_RES_IDS_ARRAY, $ZBX_AVAILABLE_NODES);
 		}
-		else if(is_null($forse_all_nodes)){
+		else if(is_null($force_all_nodes)){
 			if($ZBX_VIEWED_NODES['selected'] == 0) {
 				$result = $ZBX_VIEWED_NODES['nodeids'];
 			}
@@ -139,7 +139,7 @@
 			if(empty($result)) $result = CWebUser::$data['node']['nodeid'];
 			if(empty($result)) $result = $ZBX_CURRENT_NODEID;
 		}
-		else if($forse_all_nodes) {
+		else if($force_all_nodes) {
 			$result = $ZBX_AVAILABLE_NODES;
 		}
 		else {
@@ -199,10 +199,10 @@
 	return $result;
 	}
 
-	function get_node_name_by_elid($id_val, $forse_with_all_nodes = null, $delimiter = ''){
+	function get_node_name_by_elid($id_val, $force_with_all_nodes = null, $delimiter = ''){
 		global $ZBX_NODES, $ZBX_VIEWED_NODES;
 
-		if($forse_with_all_nodes === false || (is_null($forse_with_all_nodes) && ($ZBX_VIEWED_NODES['selected'] != 0))) {
+		if($force_with_all_nodes === false || (is_null($force_with_all_nodes) && ($ZBX_VIEWED_NODES['selected'] != 0))) {
 			return null;
 		}
 

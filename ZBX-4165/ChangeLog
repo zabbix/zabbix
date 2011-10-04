@@ -2,6 +2,7 @@
 Changes for 1.9.7
 
 New features:
+ - [ZBXNEXT-965] added redirect to a special warning page when user browser is not supported by Zabbix (Eduard)
  - [ZBX-4165] fixed failing insert into proxy_dhistory queries on the proxy side (rudolfs)
  - [ZBX-3870] fixed data deletion order in proxy configuration synchronization (deniss,rudolfs)
  - [ZBX-4167] updated requirements screen for frontend (Vedmak)
@@ -12,6 +13,11 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-3896] fixed broken triggers after removed item that is used in trigger (Vedmak)
+ - [ZBX-4106] fixed layout of "Status of host triggers" screen element (Vedmak)
+ - [ZBX-4061] fixed errors when try to delete already deleted regular expression (Vedmak)
+ - [ZBX-4058] fixed working time updating in Administration->Gneral->Working time (Vedmak)
+ - [ZBX-4060] fixed error when save map with link updated to connect new element (Vedmak)
  - [ZBX-4166] fixed error in dashboard when configured to show unacknowledged only (Vedmak)
  - [ZBX-4003] fixed error when try to use not existing host group as group for discovered hosts (Vedmak)
  - [ZBX-2882] fixed wrong item vfs.file.cksum[/vmlinuz] for some templates (Sasha)
@@ -242,6 +248,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4176] fixed API action.update required parameters (Vedmak)
  - [ZBX-4104] fixed handle handling when executing scripts in Windows (rudolfs)
  - [ZBX-4091] removed unneeded linking for binaries (rudolfs)
  - [ZBX-4155] fixed .pid file locking not to allow multiple instances (rudolfs)
