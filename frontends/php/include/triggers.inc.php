@@ -553,11 +553,6 @@ function getSeverityCell($severity, $text=null, $force_normal=false){
 	return $trigger;
 	}
 
-	function get_triggers_by_templateid($triggerids){
-		zbx_value2array($triggerids);
-	return DBselect('SELECT * FROM triggers WHERE '.DBcondition('templateid',$triggerids));
-	}
-
 /*
  * Function: utf8RawUrlDecode
  *
@@ -1119,29 +1114,80 @@ function utf8RawUrlDecode($source){
 	return $expr;
 	}
 
-// Update Trigger status
-	function update_trigger_status($triggerids,$status){
-		zbx_value2array($triggerids);
-
-// first update status for child triggers
-		$upd_chd_triggers = array();
-		$db_chd_triggers = get_triggers_by_templateid($triggerids);
-		while($db_chd_trigger = DBfetch($db_chd_triggers)){
-			$upd_chd_triggers[$db_chd_trigger['triggerid']] = $db_chd_trigger['triggerid'];
+	function getChildTriggersByTemplateId(&$triggerIds) {
+		if (empty($triggerIds)) {
+			return;
 		}
 
-		if(!empty($upd_chd_triggers)){
-			update_trigger_status($upd_chd_triggers,$status);
+		$childTriggerIds = array();
+
+		$result = DBselect('SELECT t.triggerid FROM triggers t WHERE '.DBcondition('t.templateid', $triggerIds));
+		while ($row = DBfetch($result)) {
+			$childTriggerIds[] = $row['triggerid'];
 		}
 
-		DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
+		getChildTriggersByTemplateId($childTriggerIds);
 
-		if($status != TRIGGER_STATUS_ENABLED){
-			addEvent($triggerids, TRIGGER_VALUE_UNKNOWN);
-			DBexecute('UPDATE triggers SET value_flags='.TRIGGER_VALUE_FLAG_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids).' AND value_flags='.TRIGGER_VALUE_FLAG_NORMAL);
+		$triggerIds = array_merge($triggerIds, $childTriggerIds);
+	}
+
+	// Update Trigger status
+	function updateTriggerStatus($triggerIds, $status) {
+		zbx_value2array($triggerIds);
+
+		getChildTriggersByTemplateId($triggerIds);
+
+		$oldStatus = ($status == TRIGGER_STATUS_ENABLED ? TRIGGER_STATUS_DISABLED : TRIGGER_STATUS_ENABLED);
+		$statusTriggerIds = array();
+
+		$result = DBselect(
+			'SELECT t.triggerid'.
+				' FROM triggers t'.
+				' WHERE t.status='.$oldStatus.
+					' AND '.DBcondition('t.triggerid', $triggerIds)
+		);
+		while ($row = DBfetch($result)) {
+			$statusTriggerIds[] = $row['triggerid'];
 		}
 
-	return true;
+		if (!empty($statusTriggerIds)) {
+			DB::update('triggers', array(
+				'values' => array('status' => $status),
+				'where' => array('triggerid' => $statusTriggerIds)
+			));
+
+			if ($status == TRIGGER_STATUS_DISABLED) {
+				$valueTriggerIds = array();
+
+				$result = DBselect(
+					'SELECT t.triggerid'.
+						' FROM triggers t,functions f,items i,hosts h'.
+						' WHERE t.triggerid=f.triggerid'.
+							' AND f.itemid=i.itemid'.
+							' AND i.hostid=h.hostid'.
+							' AND '.DBcondition('t.triggerid', $statusTriggerIds).
+							' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL.
+							' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
+				);
+				while ($row = DBfetch($result)) {
+					$valueTriggerIds[] = $row['triggerid'];
+				}
+
+				if (!empty($valueTriggerIds)) {
+					DB::update('triggers', array(
+						'values' => array(
+							'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
+							'error' => _s('Trigger status became "%s"', _('Disabled'))
+						),
+						'where' => array('triggerid' => $valueTriggerIds)
+					));
+
+					addEvent($valueTriggerIds, TRIGGER_VALUE_UNKNOWN);
+				}
+			}
+		}
+
+		return true;
 	}
 
 	/*
@@ -1437,48 +1483,56 @@ function utf8RawUrlDecode($source){
 	return $description;
 	}
 
-	function update_trigger_value_to_unknown_by_hostid($hostids){
-		zbx_value2array($hostids);
+	function updateTriggerValueToUnknownByHostId($hostIds) {
+		zbx_value2array($hostIds);
 
-		$triggers = array();
-		$result = DBselect('SELECT DISTINCT t.triggerid '.
-			' FROM items i,triggers t,functions f '.
-			' WHERE f.triggerid=t.triggerid '.
-				' AND f.itemid=i.itemid '.
-				' AND '.DBcondition('i.hostid',$hostids));
+		$triggerIds = array();
+		$result = DBselect(
+			'SELECT DISTINCT t.triggerid'.
+				' FROM hosts h,items i,functions f,triggers t'.
+				' WHERE h.hostid=i.hostid'.
+					' AND i.itemid=f.itemid'.
+					' AND f.triggerid=t.triggerid'.
+					' AND '.DBcondition('h.hostid', $hostIds).
+					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+					' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL
+		);
+		while ($row = DBfetch($result)) {
+			$triggerIds[] = $row['triggerid'];
+		}
 
-		$now = time();
-		while($row=DBfetch($result)){
-			$triggers[$row['triggerid']] = $row['triggerid'];
-		}
-		if(!empty($triggers)){
-// returns updated triggers
-			$triggers = addEvent($triggers,TRIGGER_VALUE_UNKNOWN,$now);
+		if (!empty($triggerIds)) {
+			DB::update('triggers', array(
+				'values' => array(
+					'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
+					'error' => _('Host status became "Not monitored"')
+				),
+				'where' => array('triggerid' => $triggerIds)
+			));
+
+			addEvent($triggerIds, TRIGGER_VALUE_UNKNOWN);
 		}
 
-		if(!empty($triggers)){
-			DBexecute('UPDATE triggers SET value_flags='.TRIGGER_VALUE_FLAG_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggers).' AND value_flags='.TRIGGER_VALUE_FLAG_NORMAL);
-		}
-	return true;
+		return true;
 	}
 
-	function addEvent($triggerids, $value){
+	function addEvent($triggerids, $value) {
 		zbx_value2array($triggerids);
 
+		$now = time();
 		$events = array();
-		foreach($triggerids as $tnum => $triggerid){
+		foreach ($triggerids as $triggerid) {
 			$events[] = array(
-				'source'		=> EVENT_SOURCE_TRIGGERS,
-				'object'		=> EVENT_OBJECT_TRIGGER,
-				'objectid'		=> $triggerid,
-				'clock'			=> time(),
-				'value'			=> $value,
-				'acknowledged'	=> 0
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'objectid' => $triggerid,
+				'clock' => $now,
+				'value' => $value,
+				'acknowledged' => 0
 			);
 		}
-		$eventids = API::Event()->create($events);
 
-	return $eventids;
+		return API::Event()->create($events);
 	}
 
 	function check_right_on_trigger_by_expression($permission,$expression){
