@@ -232,7 +232,7 @@ include_once('include/page_header.php');
 		}
 
 		DBstart();
-		$go_result = update_trigger_status($triggerids, $status);
+		$go_result = updateTriggerStatus($triggerids, $status);
 
 		if($go_result){
 			foreach($triggers as $tnum => $trigger){

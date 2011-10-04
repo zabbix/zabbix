@@ -1799,7 +1799,7 @@ Copt::memoryPick();
 		}
 
 		if (isset($updateStatus)) {
-			update_host_status($hostids, $updateStatus);
+			updateHostStatus($hostids, $updateStatus);
 		}
 
 // }}} UPDATE HOSTS PROPERTIES

@@ -637,7 +637,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['chstatus']) && isset($_REQUEST['hostid'])){
 
 		DBstart();
-			$result = update_host_status($_REQUEST['hostid'], $_REQUEST['chstatus']);
+			$result = updateHostStatus($_REQUEST['hostid'], $_REQUEST['chstatus']);
 		$result = DBend($result);
 
 		show_messages($result, _('Host status updated'), _('Cannot update host status'));
@@ -665,7 +665,7 @@ include_once('include/page_header.php');
 		$act_hosts = available_hosts($hosts, 1);
 
 		DBstart();
-		$go_result = update_host_status($act_hosts, $status);
+		$go_result = updateHostStatus($act_hosts, $status);
 		$go_result = DBend($go_result);
 
 		show_messages($go_result, _('Host status updated'), _('Cannot update host status'));
