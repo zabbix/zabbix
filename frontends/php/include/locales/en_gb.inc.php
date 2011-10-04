@@ -1228,10 +1228,7 @@
 	'S_STATUS_CALCULATION'=>		_('Status calculation'),
 	'S_STATUS_CALCULATION_ALGORITHM'=>	_('Status calculation algorithm'),
 	'S_NONE'=>				_('None'),
-	'S_PROBLEM_IF_AT_LEAST_ONE'=>		_('Problem, if at least one child has a problem'),
-	'S_PROBLEM_IF_ALL'=>			_('Problem, if all children have problems'),
 	'S_SOFT'=>				_('Soft'),
-	'S_DO_NOT_CALCULATE'=>			_('Do not calculate'),
 	'S_CALCULATE_SLA'=>			_('Calculate SLA'),
 	'S_ACCEPTABLE_SLA_IN_PERCENT'=>		_('Acceptable SLA (in %)'),
 	'S_LINK_TO_TRIGGER_Q'=>			_('Link to trigger?'),
@@ -1709,14 +1706,6 @@
 	'S_WEEKS_SMALL'=>			_('weeks'),
 	'S_WEEK_SMALL'=>			_('week'),
 	'S_MAINTENANCES_SCHEDULE_DATE_FORMAT'=>	_('d M Y'),
-
-//	services.inc.php
-	'S_SERVICE_CANNOT_BE_PARENT_AND_CHILD_AT_THE_SAME_TIME'=>	_('Service cannot be parent and child at the same time.'),
-	'S_CANNOT_LINK_HARDLINKED_SERVICE'=>			_('Cannot link hardlinked service.'),
-	'S_CANNOT_LINK_SERVICE_TO_ITSELF'=>			_('Cannot link service to itself.'),
-	'S_NO_SERVICE_WITH'=>					_('No service with'),
-	'S_NO_SERVICE_LINKAGE_WITH'=>				_('No service linkage with'),
-	'S_UNKNOWN_CALC_ALGORITHM_OF_SERVICE_STATUS'=>		_('Unknown calculation algorithm of service status'),
 
 //	perm.inc.php
 	'S_INCORRECT_USER_DATA_IN'=>		_('Incorrect user data in'),
