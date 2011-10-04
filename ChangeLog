@@ -2,6 +2,7 @@
 Changes for 1.9.7
 
 New features:
+ - [ZBXNEXT-965] added redirect to a special warning page when user browser is not supported by Zabbix (Eduard)
  - [ZBX-4165] fixed failing insert into proxy_dhistory queries on the proxy side (rudolfs)
  - [ZBX-3870] fixed data deletion order in proxy configuration synchronization (deniss,rudolfs)
  - [ZBX-4167] updated requirements screen for frontend (Vedmak)
