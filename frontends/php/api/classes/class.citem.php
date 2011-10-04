@@ -30,7 +30,7 @@ class CItem extends CItemGeneral{
 	}
 
 /**
- * Get items data
+ * Get items data.
  *
  * @param array $options
  * @param array $options['itemids']
@@ -45,6 +45,7 @@ class CItem extends CItemGeneral{
  * @param string $options['pattern']
  * @param int $options['limit']
  * @param string $options['order']
+ *
  * @return array|int item data as array or false if error
  */
 	public function get($options=array()){
@@ -807,13 +808,14 @@ class CItem extends CItemGeneral{
 	}
 
 	/**
- * Get itemid by host.name and item.key
- *
- * @param array $item_data
- * @param array $item_data['key_']
- * @param array $item_data['hostid']
- * @return int|boolean
- */
+	 * Get itemid by host.name and item.key.
+	 *
+	 * @param array $item_data
+	 * @param array $item_data['key_']
+	 * @param array $item_data['hostid']
+	 *
+	 * @return int|bool
+	 */
 	public function getObjects($itemData){
 		$options = array(
 			'filter' => $itemData,
@@ -831,7 +833,14 @@ class CItem extends CItemGeneral{
 	return $result;
 	}
 
-	public function exists($object){
+	/**
+	 * Check if item exists.
+	 *
+	 * @param array $object
+	 *
+	 * @return bool
+	 */
+	public function exists(array $object){
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
 			'webitems' => 1,
@@ -853,8 +862,14 @@ class CItem extends CItemGeneral{
 	return !empty($objs);
 	}
 
-	protected function checkInput(&$items, $update=false){
-		foreach($items as $inum => $item){
+	/**
+	 * Items data validation.
+	 *
+	 * @param array $items
+	 * @param bool $update checks for updating items
+	 */
+	protected function checkInput(array &$items, $update=false) {
+		foreach ($items as $inum => $item) {
 			$items[$inum]['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
 		// validate if everything is ok with 'item->inventory fields' linkage
@@ -863,11 +878,12 @@ class CItem extends CItemGeneral{
 	}
 
 	/**
- * Add item
- *
- * @param array $items
- * @return array|boolean
- */
+	 * Create item.
+	 *
+	 * @param $items
+	 *
+	 * @return array
+	 */
 	public function create($items){
 		$items = zbx_toArray($items);
 
@@ -880,7 +896,12 @@ class CItem extends CItemGeneral{
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
-	protected function createReal(&$items) {
+	/**
+	 * Create item.
+	 *
+	 * @param array $items
+	 */
+	protected function createReal(array &$items) {
 		foreach ($items as $item) {
 			$itemsExists = API::Item()->get(array(
 				'output' => API_OUTPUT_SHORTEN,
@@ -934,6 +955,13 @@ class CItem extends CItemGeneral{
 		}
 	}
 
+	/**
+	 * Update items.
+	 *
+	 * @param $items
+	 *
+	 * @return void
+	 */
 	protected function updateReal($items){
 		$items = zbx_toArray($items);
 
@@ -959,7 +987,6 @@ class CItem extends CItemGeneral{
 		}
 		$result = DB::update('items', $data);
 		if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
 
 		$itemApplications = $aids = array();
 		foreach($items as $key => $item){
@@ -990,33 +1017,32 @@ class CItem extends CItemGeneral{
 			$host = reset($item['hosts']);
 			info(S_ITEM." [".$host['host'].':'.$item['key_']."] ".S_UPDATED_SMALL);
 		}
-
 	}
 
 	/**
- * Update item
- *
- * @param array $items
- * @return boolean
- */
+	 * Update item
+	 *
+	 * @param array $items
+	 * @return boolean
+	 */
 	public function update($items){
 		$items = zbx_toArray($items);
 
-			$this->checkInput($items, true);
+		$this->checkInput($items, true);
 
-			$this->updateReal($items);
+		$this->updateReal($items);
 
-			$this->inherit($items);
+		$this->inherit($items);
 
-			return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
 	/**
- * Delete items
- *
- * @param array $itemids
- * @return
- */
+	 * Delete items
+	 *
+	 * @param array $itemids
+	 * @return
+	 */
 	public function delete($itemids, $nopermissions=false){
 			if(empty($itemids))
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
@@ -1247,15 +1273,24 @@ class CItem extends CItemGeneral{
 					unset($item['interfaceid']);
 				}
 				elseif (isset($item['type']) && $item['type'] != $exItem['type']) {
-					if ($type = $this->itemTypeInterface($item['type'])) {
-						if (!isset($interfaceids[$type])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
-						}
+					$type = $this->itemTypeInterface($item['type']);
 
-						$item['interfaceid'] = $interfaceids[$type];
+					if ($type == INTERFACE_TYPE_ANY) {
+						foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {
+							if (isset($interfaceids[$itype])) {
+								$item['interfaceid'] = $interfaceids[$itype];
+								break;
+							}
+						}
+					}
+					elseif ($type === false) {
+						$item['interfaceid'] = 0;
 					}
 					else {
-						$item['interfaceid'] = 0;
+						if (!isset($interfaceids[$type])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], is_null($exItem['key_']) ? $item['key_'] : $exItem['key_']));
+						}
+						$item['interfaceid'] = $interfaceids[$type];
 					}
 				}
 
