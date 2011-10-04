@@ -432,20 +432,27 @@ include_once('include/page_header.php');
 		else if(isset($_REQUEST['cancel_new_expression'])){
 			unset($_REQUEST['new_expression']);
 		}
-		else if(isset($_REQUEST['save'])){
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+		elseif (isset($_REQUEST['save'])) {
+			if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 				access_deny();
+			}
 
-			$regexp = array('name' => $_REQUEST['rename'],
-						'test_string' => $_REQUEST['test_string']
-					);
+			$regexp = array(
+				'name' => $_REQUEST['rename'],
+				'test_string' => $_REQUEST['test_string']
+			);
 
 			DBstart();
-			if(isset($_REQUEST['regexpid'])){
-				$regexpid=$_REQUEST['regexpid'];
-
-				delete_expressions_by_regexpid($_REQUEST['regexpid']);
-				$result = update_regexp($regexpid, $regexp);
+			if (isset($_REQUEST['regexpid'])) {
+				$regexpid = $_REQUEST['regexpid'];
+				if (!get_regexp_by_regexpid($regexpid)) {
+					$result = false;
+					error(_('Regular expression does not exist.'));
+				}
+				else {
+					delete_expressions_by_regexpid($_REQUEST['regexpid']);
+					$result = update_regexp($regexpid, $regexp);
+				}
 
 				$msg1 = S_REGULAR_EXPRESSION_UPDATED;
 				$msg2 = S_CANNOT_UPDATE_REGULAR_EXPRESSION;
@@ -457,9 +464,9 @@ include_once('include/page_header.php');
 				$msg2 = S_CANNOT_ADD_REGULAR_EXPRESSION;
 			}
 
-			if($result){
+			if ($result) {
 				$expressions = get_request('expressions', array());
-				foreach($expressions as $id => $expression){
+				foreach ($expressions as $id => $expression) {
 					$expressionid = add_expression($regexpid,$expression);
 				}
 			}
@@ -468,8 +475,8 @@ include_once('include/page_header.php');
 
 			show_messages($result,$msg1,$msg2);
 
-			if($result){ // result - OK
-				add_audit(!isset($_REQUEST['regexpid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE,
+			if ($result) { // result - OK
+				add_audit(!isset($_REQUEST['regexpid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
 					AUDIT_RESOURCE_REGEXP,
 					S_NAME.': '.$_REQUEST['rename']);
 

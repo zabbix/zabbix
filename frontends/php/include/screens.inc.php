@@ -790,41 +790,34 @@ require_once('include/js.inc.php');
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 		}
-		else if(($resourcetype == SCREEN_RESOURCE_HOSTS_INFO) || ($resourcetype == SCREEN_RESOURCE_TRIGGERS_INFO)){
+		elseif ($resourcetype == SCREEN_RESOURCE_HOSTS_INFO || $resourcetype == SCREEN_RESOURCE_TRIGGERS_INFO){
 // HOSTS info
 			$caption = '';
-			$id=0;
+			$id = 0;
 
-			$available_groups = get_accessible_groups_by_user(CWebUser::$data,PERM_READ_ONLY);
-			if(remove_nodes_from_id($resourceid) > 0){
-				$sql = 'SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
-						' FROM hosts_groups hg, groups g '.
-							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-						' WHERE '.DBcondition('g.groupid',$available_groups).
-							' AND g.groupid='.$resourceid;
-				$result=DBselect($sql);
-				while($row=DBfetch($result)){
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name'].$row['name'];
+			if (remove_nodes_from_id($resourceid) > 0) {
+				$groups = API::HostGroup()->get(array(
+					'groupids' => $resourceid,
+					'nodeids' => get_current_nodeid(true),
+					'output' => array('name'),
+					'preservekeys' => true
+				));
+				if ($group = reset($groups)) {
+					$caption = get_node_name_by_elid($resourceid, true, ': ').$group['name'];
 					$id = $resourceid;
 				}
 			}
-			else if(remove_nodes_from_id($resourceid)==0){
-				$result=DBselect('SELECT DISTINCT n.name as node_name '.
-						' FROM nodes n '.
-						' WHERE n.nodeid='.id2nodeid($resourceid));
-
-				while($row=DBfetch($result)){
-					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-					$caption = $row['node_name']._('- all groups -');
+			elseif (remove_nodes_from_id($resourceid) == 0) {
+				if ($nodeName = get_node_name_by_elid($resourceid, true, ': ')) {
+					$caption = $nodeName._('- all groups -');
 					$id = $resourceid;
 				}
 			}
 
-			$form->addVar('resourceid',$id);
+			$form->addVar('resourceid', $id);
 
-			$textfield = new CTextbox('caption',$caption,60,'yes');
-			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=host_group_scr&srcfld1=groupid&srcfld2=name',480,450);");
+			$textfield = new CTextbox('caption', $caption, 60, 'yes');
+			$selectbtn = new CButton('select', S_SELECT, "javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=host_group_scr&srcfld1=groupid&srcfld2=name',480,450);");
 
 			$form->addRow(S_GROUP,array($textfield,SPACE,$selectbtn));
 		}
@@ -1431,6 +1424,10 @@ require_once('include/js.inc.php');
 
 						$cmbGroup = new CComboBox('tr_groupid', $groupid, 'submit()');
 						$cmbHosts = new CComboBox('tr_hostid', $hostid, 'submit()');
+						if ($editmode == 1) {
+							$cmbGroup->attr('disabled', 'disabled');
+							$cmbHosts->attr('disabled', 'disabled');
+						}
 
 						$cmbGroup->addItem(0, S_ALL_SMALL);
 						$cmbHosts->addItem(0, S_ALL_SMALL);
@@ -1455,7 +1452,7 @@ require_once('include/js.inc.php');
 					}
 
 					$item = new CUIWidget('hat_htstatus', make_latest_issues($params, true));
-					$item->setHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE, $tr_form));
+					$item->setDoubleHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE), $tr_form);
 					$item = array($item);
 
 					if ($editmode == 1) {
@@ -1530,6 +1527,10 @@ require_once('include/js.inc.php');
 
 						$cmbGroup = new CComboBox('tr_groupid', $groupid, 'submit()');
 						$cmbHosts = new CComboBox('tr_hostid', $hostid, 'submit()');
+						if ($editmode == 1) {
+							$cmbGroup->attr('disabled', 'disabled');
+							$cmbHosts->attr('disabled', 'disabled');
+						}
 
 						$cmbGroup->addItem(0, S_ALL_SMALL);
 						$cmbHosts->addItem(0, S_ALL_SMALL);
@@ -1560,7 +1561,7 @@ require_once('include/js.inc.php');
 					}
 
 					$item = new CUIWidget('hat_trstatus', make_latest_issues($params, true));
-					$item->setHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE, $tr_form));
+					$item->setDoubleHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE), $tr_form);
 					$item = array($item);
 
 					if ($editmode == 1) {
