@@ -1,5 +1,6 @@
 Changes for 1.8.9rc1
 
+ - [ZBX-4026] fixed disabling SNMP host when unreachable (dimir)
  - [ZBX-3942] fixed agent's collector to not gather perfstat data on AIX unless it is requested (dimir)
  - [ZBX-4087] fixed error message when processing configuration file (dimir)
  - [ZBX-4158] fixed DB transaction processing, stop and abort on error (dimir)
