@@ -53,7 +53,7 @@ class testFormMap extends CWebTest
 			array('40x40', 1, 0),
 			array('50x50', 1, 0),
 			array('75x75', 1, 0),
-			array('100x100', 1, 0),
+			array('100x100', 1, 0)
 		);
 	}
 
@@ -79,7 +79,7 @@ class testFormMap extends CWebTest
 
 		// checking if appropriate value for grid size is selected
 		$this->assertTrue(
-			$this->getSelectedValue('gridsize') == $db_map['grid_size'].'x'.$db_map['grid_size'],
+			$this->getSelectedValue('gridsize') == $db_map['grid_size'],
 			'Chuck Norris: I was expecting to see '.$db_map['grid_size'].' selected, but saw '.$this->getSelectedValue('gridsize')
 		);
 
@@ -136,8 +136,8 @@ class testFormMap extends CWebTest
 
 		// checking if all options remain as they were set
 		$this->assertTrue(
-			$this->getSelectedValue('gridsize') == $gridSize,
-			'Chuck Norris: When returning to map after update, I was expecting to see '.$db_map['grid_size'].' selected, but saw '.$this->getSelectedValue('gridsize')
+			$this->getSelectedValue('gridsize') == substr($gridSize, 0, strpos($gridSize, 'x')),
+			'Chuck Norris: When returning to map after update, I was expecting to see '.substr($gridSize, 0, strpos($gridSize, 'x')).' selected, but saw '.$this->getSelectedValue('gridsize')
 		);
 
 		if($showGrid){
