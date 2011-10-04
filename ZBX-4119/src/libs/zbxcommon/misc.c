@@ -2280,8 +2280,14 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 			return INTERFACE_TYPE_IPMI;
 		case ITEM_TYPE_JMX:
 			return INTERFACE_TYPE_JMX;
+		case ITEM_TYPE_SIMPLE:
+		case ITEM_TYPE_EXTERNAL:
+		case ITEM_TYPE_DB_MONITOR:
+		case ITEM_TYPE_SSH:
+		case ITEM_TYPE_TELNET:
+			return INTERFACE_TYPE_ANY;
 		default:
-			return INTERFACE_TYPE_AGENT;
+			return INTERFACE_TYPE_UNKNOWN;
 	}
 }
 
