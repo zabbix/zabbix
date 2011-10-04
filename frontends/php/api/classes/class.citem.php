@@ -1166,7 +1166,13 @@ class CItem extends CItemGeneral{
 		return true;
 	}
 
-	protected function inherit($items, $hostids=null){
+	/**
+	 * Inherit items to child hosts/templates.
+	 * @param array $items
+	 * @param null|array $hostids array of hostids which items should be inherited to
+	 * @return bool
+	 */
+	protected function inherit(array $items, $hostids=null) {
 		if (empty($items)) {
 			return true;
 		}
@@ -1186,12 +1192,12 @@ class CItem extends CItemGeneral{
 
 		$insertItems = array();
 		$updateItems = array();
-		$inheritedItems = array();
 		foreach ($chdHosts as $hostid => $host) {
 			$interfaceids = array();
 			foreach ($host['interfaces'] as $interface) {
-				if($interface['main'] == 1)
+				if ($interface['main'] == 1) {
 					$interfaceids[$interface['type']] = $interface['interfaceid'];
+				}
 			}
 
 			$templateids = zbx_toHash($host['templates'], 'templateid');
@@ -1216,38 +1222,39 @@ class CItem extends CItemGeneral{
 			$exItemsKeys = zbx_toHash($exItems, 'key_');
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
 
-			foreach($parentItems as $item){
+			foreach ($parentItems as $item) {
 				$exItem = null;
 
 // update by templateid
-				if(isset($exItemsTpl[$item['itemid']])){
+				if (isset($exItemsTpl[$item['itemid']])) {
 					$exItem = $exItemsTpl[$item['itemid']];
 				}
 
 // update by key
-				if(isset($item['key_']) && isset($exItemsKeys[$item['key_']])){
+				if (isset($exItemsKeys[$item['key_']])) {
 					$exItem = $exItemsKeys[$item['key_']];
 
-					if($exItem['flags'] != ZBX_FLAG_DISCOVERY_NORMAL){
+					if ($exItem['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
-					else if(($exItem['templateid'] > 0) && (bccomp($exItem['templateid'], $item['itemid']) != 0)){
+					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid'] != 0)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
 					}
 				}
 
 
-				if(($host['status'] == HOST_STATUS_TEMPLATE) || !isset($item['type'])){
+				if ($host['status'] == HOST_STATUS_TEMPLATE || !isset($item['type'])) {
 					unset($item['interfaceid']);
 				}
-				else if(isset($item['type']) && ($item['type'] != $exItem['type'])){
-					if($type = $this->itemTypeInterface($item['type'])){
-						if(!isset($interfaceids[$type]))
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], is_null($exItem['key_']) ? $item['key_'] : $exItem['key_']));
+				elseif (isset($item['type']) && $item['type'] != $exItem['type']) {
+					if ($type = $this->itemTypeInterface($item['type'])) {
+						if (!isset($interfaceids[$type])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
+						}
 
 						$item['interfaceid'] = $interfaceids[$type];
 					}
-					else{
+					else {
 						$item['interfaceid'] = 0;
 					}
 				}
@@ -1258,15 +1265,15 @@ class CItem extends CItemGeneral{
 				$newItem['templateid'] = $item['itemid'];
 
 // setting item application
-				if(isset($item['applications'])){
+				if (isset($item['applications'])) {
 					$newItem['applications'] = get_same_applications_for_host($item['applications'], $host['hostid']);
 				}
 //--
-				if($exItem){
+				if ($exItem) {
 					$newItem['itemid'] = $exItem['itemid'];
 					$updateItems[] = $newItem;
 				}
-				else{
+				else {
 					$insertItems[] = $newItem;
 				}
 			}

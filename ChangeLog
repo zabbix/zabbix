@@ -14,6 +14,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-3745] fixed error message when link template with discovery rule to host that does not have needed interface (Vedmak)
  - [ZBX-3896] fixed broken triggers after removed item that is used in trigger (Vedmak)
  - [ZBX-4106] fixed layout of "Status of host triggers" screen element (Vedmak)
  - [ZBX-4061] fixed errors when try to delete already deleted regular expression (Vedmak)
