@@ -1,6 +1,6 @@
 DELETE FROM proxy_dhistory WHERE druleid NOT IN (SELECT druleid FROM drules)
 /
-DELETE FROM proxy_dhistory WHERE dcheckid>0 AND dcheckid NOT IN (SELECT dcheckid FROM dchecks)
+DELETE FROM proxy_dhistory WHERE dcheckid<>0 AND dcheckid NOT IN (SELECT dcheckid FROM dchecks)
 /
 ALTER TABLE proxy_dhistory ALTER COLUMN druleid SET WITH DEFAULT NULL
 /
