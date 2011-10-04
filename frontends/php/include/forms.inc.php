@@ -1831,9 +1831,8 @@
 		if($limited)
 			$btnSelect = null;
 		else
-			$btnSelect = new CButton('btn1',S_SELECT,
-				"return PopUp('popup.php?dstfrm=".$frmItem->getName().
-				"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=".$type."');",
+			$btnSelect = new CButton('btn1', _('Select'),
+				"return PopUp('popup.php?dstfrm=".$frmItem->getName()."&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype='+jQuery('#type option:selected').val());",
 				'T');
 
 		$frmItem->addRow(S_KEY, array(new CTextBox('key',$key,40,$limited), $btnSelect));
