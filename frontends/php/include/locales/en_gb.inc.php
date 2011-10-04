@@ -183,7 +183,6 @@
 	'S_IMPORT'=>				_('Import'),
 	'S_EXPORT_SELECTED'=>		_('Export selected'),
 	'S_PREVIEW'=>				_('Preview'),
-	'S_BACK_BIG'=>				_('BACK'),
 	'S_NO_DATA_SMALL'=>			_('no data'),
 	'S_RULES'=>				_('Rules'),
 	'S_EXISTING'=>				_('Existing'),
@@ -322,9 +321,6 @@
 	'S_CCHARTS_TIMELINE_MAINPERIOD_HOURS_FORMAT'=>		_('H:i'),
 	'S_CCHARTS_TIMELINE_MAINPERIOD_FULL_DAY_TIME_FORMAT'=>	_('d.m H:i'),
 	'S_CCHARTS_TIMELINE_MAINPERIOD_MONTHDAYS_FORMAT'=>	_('d.m'),
-
-//	class.cuser.php
-	'S_CUSER_ERROR_DATE_FORMAT'=>				_('d.m.Y H:i'),
 
 // Colours
 
@@ -486,7 +482,6 @@
 
 //	history.php
 	'S_SECONDS_SMALL'=>			_('seconds'),
-	'S_SEC_SMALL'=>				_('sec'),
 	'S_SELECT_ROWS_WITH_VALUE_LIKE'=>	_('Select rows with value like'),
 	'S_LAST_HOUR_GRAPH'=>			_('Last hour graph'),
 	'S_LAST_WEEK_GRAPH'=>			_('Last week graph'),
@@ -1589,7 +1584,6 @@
 	'S_NO_ELEMENTS_SELECTED'=>	_('No elements selected!'),
 
 // page_header.php
-	'S_REFRESHED_EVERY_SMALL'=>		_('refreshed every'),
 
 //	copt.inc.php
 	'S_STATS_FOR'=>			_('Stats for'),
@@ -1687,9 +1681,6 @@
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	_('Function \''),
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	_('\' does not accept parameters.'),
 	'S_WRONG_DEPENDENCY_ERROR' =>	_('Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.'),
-
-//	page_footer.php
-	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	_('Transaction has not been closed. Aborting..'),
 
 //	maps.inc.php
 	'S_SUBMAP'=>			_('Submap'),
