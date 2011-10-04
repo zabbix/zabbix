@@ -188,6 +188,7 @@
 
 		<div id="mapLinksContainer" style="max-height: 128px; overflow-y: scroll; overflow-x: hidden; display: none;">
 			<table class="tableinfo">
+				<caption><?php echo _('Connectors'); ?></caption>
 				<thead>
 				<tr class="header">
 					<td></td>
