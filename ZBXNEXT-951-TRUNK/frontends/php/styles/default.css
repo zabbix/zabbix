@@ -456,8 +456,7 @@ table.tableinfo tr.vertical_header td { padding: 5px 0 5px 5px; margin: 0; white
 table.tableinfo tr.vertical_header td.left { text-align: left; }
 table.tableinfo tr.vertical_header td.hover_grey:hover{ cursor: pointer; }
 table.tableinfo tr.footer td { vertical-align: middle; padding-right: 5px; padding-left: 5px; }
-table.tableinfo tr > td:first-child{width: 1%;}
-table.tableinfo tr >/**/ td:first-child{ width: 1px;}
+table.tableinfo tr > td:first-child { width: 1px; }
 table.tableinfo tr td.wraptext { white-space:normal; }
 table.tableinfo tr td.message { text-align: center;}
 table.tableinfo tr td.pre { white-space: pre;}
@@ -658,7 +657,7 @@ table.requirements tr td{ white-space: nowrap; padding-left: 5px; padding-right:
 /********** <FILTER> ************/
 table.filter{ width: 100%; background-color: #FFFFFF; border-collapse: collapse; }
 table.filter tr > td:first-child{ width: 1%; white-space: nowrap; }
-table.filter tr >/**/ td:first-child{ width: 1px; }
+table.filter tr > td:first-child{ width: 1px; }
 table.filter tr td {line-height: 20px; height: 26px; vertical-align: bottom; border: 1px dotted silver; padding-left: 6px; padding-right: 4px;}
 
 table.filter_config{ width: 100%; background-color: #FFFFFF; border-collapse: collapse;}
@@ -684,7 +683,6 @@ table.header_wide tr.next td.header_l{ background:none; text-align: left; height
 table.header_wide tr.next td.header_r{ background:none; text-align: right; height: 20px; padding-right: 5px; border-width: 0; }
 
 /* Suggest */
-
 table.suggest{ width: 100%; margin: 0; border-spacing: 0; background-color: #FEFEFE; }
 table.suggest tr{ background-color: #FEFEFE; }
 table.suggest tr.highlight{ background-color: #AACCFF; }
@@ -697,10 +695,27 @@ table.suggest tr td{ text-align: left; padding-left: 4px; line-height: 2.2em; fo
 .dservice_disabled { background: #A00F0F; }
 /********** END OF DISCOVERY STATUS *********/
 
+/* login */
 .loginBG{ background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
 .loginForm{ margin: auto; padding: 15px; height: 260px; width: 582px; background: url(../images/general/login/background.png) no-repeat; *position: relative; *top: -50%; }
 .loginLogo{ height: 53px; width: 163px; background: url(../images/general/login/logo.png) no-repeat; }
 
-.vertical-middle {width: 100%; display: table-cell; vertical-align: middle; *position: absolute; *top: 50%;}
+/* browserwarning */
+.browserwarningBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
+.browserwarningForm { margin: auto; font-size: 12px; height: 465px; width: 610px; background: url(../images/general/browserwarning/background.png) no-repeat; *position: relative; *top: -50%; }
+.browserwarningLogoChrome { height: 70px; width: 70px; background: url(../images/general/browserwarning/chrome.png) no-repeat; }
+.browserwarningLogoFirefox { height: 70px; width: 70px; background: url(../images/general/browserwarning/firefox.png) no-repeat; }
+.browserwarningLogoIE { height: 70px; width: 70px; background: url(../images/general/browserwarning/ie.png) no-repeat; }
+.browserwarningLogoOpera { height: 70px; width: 70px; background: url(../images/general/browserwarning/opera.png) no-repeat; }
+.browserwarningLogoSafari { height: 70px; width: 70px; background: url(../images/general/browserwarning/safari.png) no-repeat; }
+.browserwarningCaution {
+	padding: 3px 3px 2px; width: 340px; background: #CC3333;
+	color: #ffffff; font-size: 12px; font-weight: bold; text-align: center;
+	-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
+}
+.browserwarningLink, .browserwarningLink a { color: #7FA2C4; font-size: 10px; font-weight: bold; }
+.browserwarningLink a:hover { color: #647F9A; }
+.browserwarningCopyright, .browserwarningCopyright a { color: #B1B1B1; font-size: 10px; text-decoration: none; }
+.browserwarningCopyright a:hover { text-decoration: underline; }
 
-
+.vertical-middle { width: 100%; display: table-cell; vertical-align: middle; *position: absolute; *top: 50%; }

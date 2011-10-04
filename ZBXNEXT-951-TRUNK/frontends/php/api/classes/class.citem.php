@@ -1038,7 +1038,7 @@ class CItem extends CItemGeneral{
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 					}
 					if($del_items[$itemid]['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated item.');
 					}
 				}
 			}
@@ -1072,7 +1072,7 @@ class CItem extends CItemGeneral{
 
 			if(!empty($del_graphs)){
 				$result = API::Graph()->delete($del_graphs, true);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph'));
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph.'));
 			}
 //--
 
@@ -1082,9 +1082,12 @@ class CItem extends CItemGeneral{
 				'nopermissions' => true,
 				'preservekeys' => true,
 			));
-			if(!empty($triggers))
-				DB::delete('triggers', array('triggerid' => zbx_objectValues($triggers, 'triggerid')));
-
+			if (!empty($triggers)) {
+				$result = API::Trigger()->delete(array_keys($triggers), true);
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete trigger.'));
+				}
+			}
 
 			$itemids_condition = array('itemid'=>$itemids);
 			DB::delete('screens_items', array(
@@ -1109,7 +1112,7 @@ class CItem extends CItemGeneral{
 				'history',
 			);
 			$insert = array();
-			foreach($itemids as $id => $itemid){
+			foreach($itemids as $itemid){
 				foreach($item_data_tables as $table){
 					$insert[] = array(
 						'tablename' => $table,
@@ -1282,8 +1285,6 @@ class CItem extends CItemGeneral{
 		$inheritedItems = array_merge($updateItems, $insertItems);
 		$this->inherit($inheritedItems);
 	}
-
-
 
 	/**
 	 * Check, if items that are about to be inserted or updated violate the rule:
