@@ -25,6 +25,7 @@ $userGroupsWidget = new CWidget();
 
 // append page header to widget
 $createForm = new CForm('get');
+$createForm->cleanItems();
 $configurationComboBox = new CComboBox('config', 'usergrps.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 $configurationComboBox->addItem('usergrps.php', _('User groups'));
 $configurationComboBox->addItem('users.php', _('Users'));

@@ -98,6 +98,16 @@ if (isset($_REQUEST['save'])) {
 	}
 }
 /*
+ * Delete
+ */
+elseif (isset($_REQUEST['delete']) && !empty($mediatypeid)) {
+	$result = API::Mediatype()->delete($_REQUEST['mediatypeid']);
+	if ($result) {
+		unset($_REQUEST['form']);
+	}
+	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
+}
+/*
 * Go - delete
 */
 elseif ($_REQUEST['go'] == 'delete') {

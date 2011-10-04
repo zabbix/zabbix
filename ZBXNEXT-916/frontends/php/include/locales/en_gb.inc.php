@@ -1372,7 +1372,6 @@
 	'S_CHANGE_PASSWORD'=>				_('Change password'),
 	'S_PASSWORD_ONCE_AGAIN'=>			_('Password (once again)'),
 	'S_PASSWORD'=>			_('Password'),
-	'S_NO_ACCESSIBLE_RESOURCES'=>			_('No accessible resources'),
 	'S_ADD_TO'=>					_('Add to'),
 	'S_REMOVE_FROM'=>				_('Remove from'),
 

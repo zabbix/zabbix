@@ -182,7 +182,7 @@
 
 	function getUserFormData($userid, $isProfile = false) {
 		$config = select_config();
-		$data['is_profile'] = $isProfile;
+		$data = array('is_profile' => $isProfile);
 
 		// get title
 		if (isset($userid)) {
@@ -429,7 +429,7 @@
 				}
 			}
 
-			$table = new CTable('S_NO_ACCESSIBLE_RESOURCES', 'right_table');
+			$table = new CTable(_('No accessible resources'), 'right_table');
 			if (!$isHeaderDisplayed) {
 				$table->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
 				$isHeaderDisplayed = true;
