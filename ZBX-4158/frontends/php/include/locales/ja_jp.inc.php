@@ -2140,7 +2140,6 @@
 	'S_KEY_CANNOT_BE_EMPTY'=>			'キーは必須の設定項目です。',
 	'S_NO_KEY_ID_PROVIDED'=>			'キーのidが設定されていません。',
 	'S_NO_ITEM_KEY_PROVIDED'=>			'アイテムのキーが設定されていません。',
-	'S_SIMPLE_CHECK_KEY_CANNOT_CONTAIN'=>			'シンプルチェックのキーは[]内にパラメータを設定することができません。',
 	'S_INCORRECT_SYNTAX_NEAR'=>			'間違った書式 \'%1$s\' が %2$d 付近に見つかりました',
 	'S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS'=>			'ブラケットの利用方法が間違っています。最後のブラケットの後に \'%s\' が存在します。',
 	'S_INVALID_KEY_FORMAT'=>			'キーのフォーマットが間違っています',
