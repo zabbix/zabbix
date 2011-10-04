@@ -251,6 +251,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4026] fixed disabling SNMP host when unreachable (dimir)
  - [ZBX-3257] fixed item type auto selection in item key popup (Eduard)
  - [ZBX-3942] fixed agent's collector to not gather perfstat data on AIX unless it is requested (dimir)
  - [ZBX-4087] fixed error message when processing configuration file (dimir)
