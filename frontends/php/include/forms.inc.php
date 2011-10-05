@@ -1569,7 +1569,7 @@
 
 		$frmItem->addRow(S_KEEP_HISTORY_IN_DAYS, array(
 			new CNumericBox('history',$history,8),
-			(!isset($_REQUEST['itemid'])) ? null :
+			(!isset($_REQUEST['itemid']) || $parent_discoveryid) ? null :
 				new CButtonQMessage('del_history',S_CLEAR_HISTORY,S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q)
 			));
 
