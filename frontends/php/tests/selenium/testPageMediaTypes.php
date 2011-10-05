@@ -43,8 +43,8 @@ class testPageMediaTypes extends CWebTest{
 		if($mediatype['type'] == MEDIA_TYPE_JABBER) $this->ok('Jabber');
 		if($mediatype['type'] == MEDIA_TYPE_SMS) $this->ok('SMS');
 		if($mediatype['type'] == MEDIA_TYPE_EZ_TEXTING) $this->ok('Ez Texting');
-//		$this->dropdown_select('go', 'Delete selected');
-		$this->button_click('delete');
+		$this->dropdown_select('go', 'Delete selected');
+//		$this->button_click('delete');
 	}
 
 	/**
@@ -90,18 +90,16 @@ class testPageMediaTypes extends CWebTest{
 
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
-		$this->checkbox_select("mediatypeids_$id");
-//		Now it is button_click()
-//		$this->dropdown_select('go', 'Delete selected');
-//		$this->button_click('goButton');
-		$this->button_click('delete');
+		$this->checkbox_select("mediatypeids[$id]");
+		$this->dropdown_select('go', 'Delete selected');
+		$this->button_click('goButton');
 
 		$this->getConfirmation();
 		$this->wait();
 		$this->assertTitle('Media types');
 		if($used_by_operations){
 			$this->nok('Media type deleted');
-			$this->ok('Media type was not deleted');
+			$this->ok('Cannot delete media type');
 			$this->ok('Media types used by action');
 		}
 		else{
