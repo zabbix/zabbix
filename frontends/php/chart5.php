@@ -55,7 +55,7 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$start_time = time(NULL);
+	$start_time = microtime(true);
 
 	$sizeX=900;
 	$sizeY=300;
@@ -196,8 +196,10 @@ SDI($y2);
 
 	imagestringup($im,0,imagesx($im)-10,imagesy($im)-50, 'http://www.zabbix.com', $gray);
 
-	$end_time=time(NULL);
-	imagestring($im, 0,imagesx($im)-100,imagesy($im)-12,'Generated in '.($end_time-$start_time).' sec', $gray);
+	$str = sprintf('%0.2f', microtime(true) - $start_time);
+	$str = _s('Generated in %s sec', $str);
+	$strSize = imageTextSize(6, 0, $str);
+	imageText($im, 6, 0, imagesx($im) - $strSize['width'] - 5, imagesy($im) - 5, $gray, $str);
 
 	ImageOut($im);
 	imagedestroy($im);
