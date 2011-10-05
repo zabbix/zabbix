@@ -48,16 +48,16 @@ $fields = array(
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	// form
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS, null, null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null, null, null)
 );
-
 check_fields($fields);
 validate_sort_and_sortorder('description', ZBX_SORT_UP);
-
 ?>
 <?php
+$_REQUEST['go'] = get_request('go', 'none');
 $mediatypeid = get_request('mediatypeid');
 
 /*
@@ -100,15 +100,29 @@ if (isset($_REQUEST['save'])) {
 /*
  * Delete
  */
-elseif (!empty($_REQUEST['delete'])) {
-	$deleteids = !empty($_REQUEST['mediatypeids']) ? $_REQUEST['mediatypeids'] : $mediatypeid;
-	if (!empty($deleteids)) {
-		$result = API::Mediatype()->delete($deleteids);
-		if ($result) {
-			unset($_REQUEST['form']);
-		}
-		show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
+elseif (isset($_REQUEST['delete']) && !empty($mediatypeid)) {
+	$result = API::Mediatype()->delete($_REQUEST['mediatypeid']);
+	if ($result) {
+		unset($_REQUEST['form']);
 	}
+	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
+}
+/*
+* Go - delete
+*/
+elseif ($_REQUEST['go'] == 'delete') {
+	$mediatypeids = get_request('mediatypeids', array());
+	$go_result = API::Mediatype()->delete($mediatypeids);
+	if ($go_result) {
+		unset($_REQUEST['form']);
+	}
+	show_messages($go_result, _('Media type deleted'), _('Cannot delete media type'));
+}
+
+if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+	$url = new CUrl();
+	$path = $url->getPath();
+	insert_js('cookie.eraseArray("'.$path.'")');
 }
 
 /*

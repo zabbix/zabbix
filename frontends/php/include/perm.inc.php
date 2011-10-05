@@ -21,8 +21,8 @@
 <?php
 
 function permission2str($group_permission){
-	$str_perm[PERM_READ_WRITE]	= S_READ_WRITE;
-	$str_perm[PERM_READ_ONLY]	= S_READ_ONLY;
+	$str_perm[PERM_READ_WRITE]	= _('Read-write');
+	$str_perm[PERM_READ_ONLY]	= _('Read only');
 	$str_perm[PERM_DENY]		= S_DENY;
 
 	if(isset($str_perm[$group_permission]))
