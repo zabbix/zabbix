@@ -461,7 +461,7 @@ switch($itemType) {
 		}
 		$frmItem->addRow(S_TYPE, $cmbType);
 
-		// Key
+// Key
 		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
 
 // SNMP OID
