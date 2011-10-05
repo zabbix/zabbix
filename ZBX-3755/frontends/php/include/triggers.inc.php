@@ -649,7 +649,7 @@ function utf8RawUrlDecode($source){
 				}
 				else {
 					if (count($srcTrigger['hosts']) > 1) {
-						error(_s('Cannot copy trigger "%1$s:%2$s" having multiple hosts in an expression.', $srcTrigger['description'], explode_exp($srcTrigger['expression'])));
+						error(_s('Cannot copy trigger "%1$s:%2$s", because it has multiple hosts in the expression.', $srcTrigger['description'], explode_exp($srcTrigger['expression'])));
 						return false;
 					}
 					$host = $srcTrigger['hosts'][0]['host'];
@@ -1494,7 +1494,7 @@ function utf8RawUrlDecode($source){
 					' AND i.itemid=f.itemid'.
 					' AND f.triggerid=t.triggerid'.
 					' AND '.DBcondition('h.hostid', $hostIds).
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL
 		);
 		while ($row = DBfetch($result)) {

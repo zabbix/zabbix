@@ -315,7 +315,7 @@ include_once('include/page_header.php');
 			}
 
 			DBstart();
-			$go_result = copyTriggersToHosts(get_request('hostid', null), $_REQUEST['g_triggerid'], $hosts_ids);
+			$go_result = copyTriggersToHosts(get_request('hostid', 0), $_REQUEST['g_triggerid'], $hosts_ids);
 			$go_result = DBend($go_result);
 
 			show_messages($go_result, _('Trigger added'), _('Cannot add trigger'));
