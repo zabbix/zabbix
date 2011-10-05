@@ -903,8 +903,13 @@ else {
 
 		$search = array();
 		foreach ($options['search'] as $field => $pattern) {
-			if (!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
-			if ($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
+			if (!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) {
+				continue;
+			}
+			if ($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR
+				&& $tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_TEXT) {
+				continue;
+			}
 
 			// escaping parameter that is about to be used in LIKE statement
 			$pattern = str_replace("!", "!!", $pattern);
