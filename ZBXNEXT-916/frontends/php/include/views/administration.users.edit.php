@@ -293,23 +293,23 @@ if (isset($userMediaFormList)) {
 }
 if (!$this->data['is_profile']) {
 	/*
-	 * Rights tab
+	 * Permissions tab
 	 */
-	$rightsFormList = new CFormList('rightsFormList');
+	$permissionsFormList = new CFormList('permissionsFormList');
 	if (isset($this->data['userid']) && bccomp($USER_DETAILS['userid'], $this->data['userid']) == 0) {
 		$userForm->addVar('user_type', $this->data['user_type']);
-		$rightsFormList->addRow(_('User type'), new CSpan(user_type2str($this->data['user_type'])));
+		$permissionsFormList->addRow(_('User type'), new CSpan(user_type2str($this->data['user_type'])));
 	}
 	else {
 		$userTypeComboBox = new CComboBox('user_type', $this->data['user_type'], 'submit();');
 		$userTypeComboBox->addItem(USER_TYPE_ZABBIX_USER, user_type2str(USER_TYPE_ZABBIX_USER));
 		$userTypeComboBox->addItem(USER_TYPE_ZABBIX_ADMIN, user_type2str(USER_TYPE_ZABBIX_ADMIN));
 		$userTypeComboBox->addItem(USER_TYPE_SUPER_ADMIN, user_type2str(USER_TYPE_SUPER_ADMIN));
-		$rightsFormList->addRow(_('User type'), $userTypeComboBox);
+		$permissionsFormList->addRow(_('User type'), $userTypeComboBox);
 	}
-	$rightsFormList = getRightsFormList($this->data['user_rights'], $this->data['user_type'], $rightsFormList);
-	$rightsFormList->addInfo(_('Permissions can be assigned for user groups only.'));
-	$userTab->addTab('rightsTab', _('Rights'), $rightsFormList);
+	$permissionsFormList = getPermissionsFormList($this->data['user_rights'], $this->data['user_type'], $permissionsFormList);
+	$permissionsFormList->addInfo(_('Permissions can be assigned for user groups only.'));
+	$userTab->addTab('permissionsTab', _('Permissions'), $permissionsFormList);
 }
 if (isset($userMessagingFormList)) {
 	$userTab->addTab('messagingTab', _('Messaging'), $userMessagingFormList);

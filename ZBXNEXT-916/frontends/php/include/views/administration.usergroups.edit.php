@@ -71,13 +71,13 @@ else {
 $userGroupFormList->addRow(_('Debug mode'), new CCheckBox('debug_mode', $this->data['debug_mode'], null, 1));
 
 /*
- * Rights tab
+ * Permissions tab
  */
-$rightsFormList = new CFormList('userGroupFormList');
+$permissionsFormList = new CFormList('permissionsFormList');
 
-// append rights table to form list
-$rightsTable = new CTable(_('No rights defined.'), 'right_table');
-$rightsTable->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
+// append permissions table to form list
+$permissionsTable = new CTable(_('No permissions defined.'), 'right_table');
+$permissionsTable->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
 
 $lstWrite = new CListBox('right_to_del[read_write][]', null, 20);
 $lstRead = new CListBox('right_to_del[read_only][]', null, 20);
@@ -95,8 +95,8 @@ foreach ($this->data['group_rights'] as $id => $rights) {
 	}
 }
 
-$rightsTable->addRow(array(new CCol($lstWrite, 'read_write'), new CCol($lstRead, 'read_only'), new CCol($lstDeny, 'deny')));
-$rightsTable->addRow(array(
+$permissionsTable->addRow(array(new CCol($lstWrite, 'read_write'), new CCol($lstRead, 'read_only'), new CCol($lstDeny, 'deny')));
+$permissionsTable->addRow(array(
 	array(
 		new CButton('add_read_write', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ_WRITE."',450,450);"),
 		new CSubmit('del_read_write', _('Delete selected'))
@@ -110,8 +110,9 @@ $rightsTable->addRow(array(
 		new CSubmit('del_deny', _('Delete selected'))
 	)
 ));
-$rightsFormList->addRow(_('Rights'), $rightsTable);
-$rightsFormList = getRightsFormList($this->data['group_rights'], null, $rightsFormList);
+$permissionsFormList->addRow(_('Composing permissions'), $permissionsTable);
+$permissionsFormList->addRow(_('Calculated permissions'), '');
+$permissionsFormList = getPermissionsFormList($this->data['group_rights'], null, $permissionsFormList);
 
 // append form lists to tab
 $userGroupTab = new CTabView(array('remember' => 1));
@@ -119,7 +120,7 @@ $userGroupTab->addTab('userGroupTab', _('User group'), $userGroupFormList);
 if (!$this->data['form_refresh']) {
 	$userGroupTab->setSelected(0);
 }
-$userGroupTab->addTab('rightsTab', _('Rights'), $rightsFormList);
+$userGroupTab->addTab('permissionsTab', _('Permissions'), $permissionsFormList);
 
 // append tab to form
 $userGroupForm->addItem($userGroupTab);

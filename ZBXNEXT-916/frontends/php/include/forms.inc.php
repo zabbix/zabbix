@@ -326,7 +326,7 @@
 		return $data;
 	}
 
-	function getRightsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX_USER, $rightsFormList = null) {
+	function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX_USER, $rightsFormList = null) {
 		// nodes
 		if (ZBX_DISTRIBUTED) {
 			$lists['node']['label']		= _('Nodes');
