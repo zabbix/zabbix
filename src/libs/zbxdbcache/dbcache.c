@@ -1143,7 +1143,7 @@ notsupported:
 		}
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 32, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
+	zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 48, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 }
 
 /******************************************************************************
