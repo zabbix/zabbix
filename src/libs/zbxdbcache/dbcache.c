@@ -1061,7 +1061,7 @@ notsupported:
 		}
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 32, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
+	zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 48, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
 }
 
 static void	DCadd_update_inventory_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY *h, unsigned char inventory_link)
