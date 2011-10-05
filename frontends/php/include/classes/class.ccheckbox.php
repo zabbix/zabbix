@@ -19,22 +19,19 @@
 **/
 ?>
 <?php
-class CCheckBox extends CInput{
-/* public */
-	public function __construct($name='checkbox',$checked='no',$action=null,$value='yes'){
+class CCheckBox extends CInput {
+	public function __construct($name = 'checkbox', $checked = 'no', $action = null, $value = 'yes') {
 		parent::__construct('checkbox', $name, $value, 'checkbox pointer');
-
 		$this->setAttribute('onclick', $action);
 		$this->setChecked($checked);
 	}
 
-	public function setChecked($value='yes'){
-		if(($value === true) || (is_numeric($value) && ($value!=0)) || (is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1'))
+	public function setChecked($value = 'yes') {
+		if ($value === true || (is_numeric($value) && $value != 0) || (is_string($value) && ($value == 'yes' || $value == 'checked' || $value == 'on') || $value == '1')) {
 			return $this->attributes['checked'] = 'checked';
-
+		}
 		$this->removeAttribute('checked');
 		return $this;
 	}
-
 }
 ?>

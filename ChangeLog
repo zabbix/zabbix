@@ -2,6 +2,7 @@
 Changes for 1.9.7
 
 New features:
+ - [ZBXNEXT-916] redesign Administration->Users, Users groups, User Profile (Eduard)
  - [ZBXNEXT-951] added possibility to calculate CPU load per processor: system.cpu.load[percpu,avgX] (rudolfs)
  - [ZBXNEXT-965] added redirect to a special warning page when user browser is not supported by Zabbix (Eduard)
  - [ZBX-4165] fixed failing insert into proxy_dhistory queries on the proxy side (rudolfs)
