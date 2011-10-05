@@ -235,7 +235,11 @@ void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, si
 	);
 
 	if (NULL != ptr)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "[file:%s,line:%d] zbx_calloc: allocated [%p, %p)",
+				filename, line, ptr, ptr + nmemb * size);
 		return ptr;
+	}
 
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_calloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
@@ -276,7 +280,11 @@ void    *zbx_malloc2(const char *filename, int line, void *old, size_t size)
 	);
 
 	if (NULL != ptr)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "[file:%s,line:%d] zbx_malloc: allocated [%p, %p)",
+				filename, line, ptr, ptr + size);
 		return ptr;
+	}
 
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_malloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
@@ -308,7 +316,11 @@ void    *zbx_realloc2(const char *filename, int line, void *old, size_t size)
 	);
 
 	if (NULL != ptr)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "[file:%s,line:%d] zbx_realloc: allocated [%p, %p)",
+				filename, line, ptr, ptr + size);
 		return ptr;
+	}
 
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_realloc: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)size);
@@ -327,7 +339,11 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
 		;
 
 	if (NULL != ptr)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "[file:%s,line:%d] zbx_strdup2: allocated [%p, %p)",
+				filename, line, ptr, ptr + strlen(str) + 1);
 		return ptr;
+	}
 
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_strdup: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)(strlen(str) + 1));
