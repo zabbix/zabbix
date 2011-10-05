@@ -15,6 +15,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-3165] fixed layout of item prototypes form (Vedmak)
  - [ZBX-3342] fixed translation of graphs "Generated in x sec" stamps (Vedmak)
  - [ZBX-3926] fixed "Hide/Show selected" filter in history of log items (Vedmak)
  - [ZBX-4119] fixed items like simple check require agent interface on host, now any interface is enough (asaveljevs, Vedmak)
