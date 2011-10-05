@@ -180,58 +180,52 @@
 		$form->show();
 	}
 
-// Insert form for User
-	function getUserForm($userid, $profile=0){
-		global $ZBX_LOCALES;
-		global $USER_DETAILS;
-
+	function getUserFormData($userid, $isProfile = false) {
 		$config = select_config();
+		$data = array('is_profile' => $isProfile);
 
-		$frm_title = S_USER;
-		if(isset($userid)){
-/*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
-			$options = array(
-					'userids' => $userid,
-					'output' => API_OUTPUT_EXTEND
-				);
-			if($profile) $options['nodeids'] = id2nodeid($userid);
-
-			$users = API::User()->get($options);
-			$user = reset($users);
-
-			$frm_title = S_USER.' "'.$user['alias'].'"';
-		}
-
-		if(isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))){
-			$alias		= $user['alias'];
-			$name		= $user['name'];
-			$surname	= $user['surname'];
-			$password1	= null;
-			$password2	= null;
-			$url		= $user['url'];
-			$autologin	= $user['autologin'];
-			$autologout	= $user['autologout'];
-			$lang		= $user['lang'];
-			$theme		= $user['theme'];
-			$refresh	= $user['refresh'];
-			$rows_per_page	= $user['rows_per_page'];
-			$user_type	= $user['type'];
-
-			if($autologout > 0) $_REQUEST['autologout'] = $autologout;
-
-			$user_groups	= array();
-			$user_medias	= array();
-
+		// get title
+		if (isset($userid)) {
 			$options = array(
 				'userids' => $userid,
-				'output' => API_OUTPUT_SHORTEN
+				'output' => API_OUTPUT_EXTEND
 			);
-			$user_groups = API::UserGroup()->get($options);
-			$user_groups = zbx_objectValues($user_groups, 'usrgrpid');
-			$user_groups = zbx_toHash($user_groups);
+			if ($data['is_profile']) {
+				$options['nodeids'] = id2nodeid($userid);
+			}
+			$users = API::User()->get($options);
+			$user = reset($users);
+			$data['title'] = _('User').' "'.$user['alias'].'"';
+		}
+		else {
+			$data['title'] = _('User');
+		}
 
+		$data['auth_type'] = isset($userid) ? get_user_system_auth($userid) : $config['authentication_type'];
+
+		if (isset($userid) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))) {
+			$data['alias']			= $user['alias'];
+			$data['name']			= $user['name'];
+			$data['surname']		= $user['surname'];
+			$data['password1']		= null;
+			$data['password2']		= null;
+			$data['url']			= $user['url'];
+			$data['autologin']		= $user['autologin'];
+			$data['autologout']		= $user['autologout'];
+			$data['lang']			= $user['lang'];
+			$data['theme']			= $user['theme'];
+			$data['refresh']		= $user['refresh'];
+			$data['rows_per_page']	= $user['rows_per_page'];
+			$data['user_type']		= $user['type'];
+			$data['messages'] 		= getMessageSettings();
+
+			$userGroups = API::UserGroup()->get(array('userids' => $userid, 'output' => API_OUTPUT_SHORTEN));
+			$userGroup = zbx_objectValues($userGroups, 'usrgrpid');
+			$data['user_groups']	= zbx_toHash($userGroup);
+
+			$user_medias = array();
 			$db_medias = DBselect('SELECT m.* FROM media m WHERE m.userid='.$userid);
-			while($db_media = DBfetch($db_medias)){
+			while ($db_media = DBfetch($db_medias)) {
 				$user_medias[] = array(
 					'mediaid' => $db_media['mediaid'],
 					'mediatypeid' => $db_media['mediatypeid'],
@@ -241,675 +235,209 @@
 					'active' => $db_media['active']
 				);
 			}
+			$data['user_medias'] = $user_medias;
 
-			$messages = getMessageSettings();
+			if ($data['autologout'] > 0) {
+				$_REQUEST['autologout'] = $data['autologout'];
+			}
 		}
-		else{
-			$alias		= get_request('alias','');
-			$name		= get_request('name','');
-			$surname	= get_request('surname','');
-			$password1	= get_request('password1', '');
-			$password2	= get_request('password2', '');
-			$url		= get_request('url','');
+		else {
+			$data['alias']			= get_request('alias', '');
+			$data['name']			= get_request('name', '');
+			$data['surname']		= get_request('surname', '');
+			$data['password1']		= get_request('password1', '');
+			$data['password2']		= get_request('password2', '');
+			$data['url']			= get_request('url', '');
+			$data['autologin']		= get_request('autologin', 0);
+			$data['autologout']		= get_request('autologout', 90);
+			$data['lang']			= get_request('lang', 'en_gb');
+			$data['theme']			= get_request('theme', 'default.css');
+			$data['refresh']		= get_request('refresh', 30);
+			$data['rows_per_page']	= get_request('rows_per_page', 50);
+			$data['user_type']		= get_request('user_type', USER_TYPE_ZABBIX_USER);;
+			$data['user_groups']	= get_request('user_groups', array());
+			$data['change_password']= get_request('change_password', null);
+			$data['user_medias']	= get_request('user_medias', array());
 
-			$autologin	= get_request('autologin',0);
-			$autologout	= get_request('autologout',90);
-
-			$lang		= get_request('lang','en_gb');
-			$theme		= get_request('theme','default.css');
-			$refresh	= get_request('refresh',30);
-			$rows_per_page	= get_request('rows_per_page',50);
-
-			$user_type		= get_request('user_type',USER_TYPE_ZABBIX_USER);;
-			$user_groups		= get_request('user_groups',array());
-			$change_password	= get_request('change_password', null);
-			$user_medias		= get_request('user_medias', array());
-
-
-			$messages = get_request('messages', array());
-
-			if(!isset($messages['enabled'])) $messages['enabled'] = 0;
-			if(!isset($messages['sounds.recovery'])) $messages['sounds.recovery'] = 0;
-			if(!isset($messages['triggers.recovery'])) $messages['triggers.recovery'] = 0;
-			if(!isset($messages['triggers.severities'])) $messages['triggers.severities'] = array();
-
-			$pMsgs = getMessageSettings();
-			$messages = array_merge($pMsgs, $messages);
-
+			// set messages
+			$data['messages'] 		= get_request('messages', array());
+			if (!isset($data['messages']['enabled'])) {
+				$data['messages']['enabled'] = 0;
+			}
+			if (!isset($data['messages']['sounds.recovery'])) {
+				$data['messages']['sounds.recovery'] = 0;
+			}
+			if (!isset($data['messages']['triggers.recovery'])) {
+				$data['messages']['triggers.recovery'] = 0;
+			}
+			if (!isset($data['messages']['triggers.severities'])) {
+				$data['messages']['triggers.severities'] = array();
+			}
+			$data['messages'] = array_merge(getMessageSettings(), $data['messages']);
 		}
 
-		if($autologin || !isset($_REQUEST['autologout'])) $autologout = 0;
-		else if(isset($_REQUEST['autologout']) && ($autologout < 90)) $autologout = 90;
+		// set autologout
+		if ($data['autologin'] || !isset($_REQUEST['autologout'])) {
+			$data['autologout'] = 0;
+		}
+		elseif (isset($_REQUEST['autologout']) && $data['autologout'] < 90) {
+			$data['autologout'] = 90;
+		}
 
-		$perm_details	= get_request('perm_details',0);
-
-		$media_types = array();
+		// set media types
+		$data['media_types'] = array();
 		$media_type_ids = array();
-		foreach($user_medias as $one_media) $media_type_ids[$one_media['mediatypeid']] = 1;
-
-		if(count($media_type_ids) > 0){
-			$sql = 'SELECT mt.mediatypeid, mt.description '.
-				' FROM media_type mt '.
-				' WHERE mt.mediatypeid IN ('.implode(',',array_keys($media_type_ids)).')';
-			$db_media_types = DBselect($sql);
-			while($db_media_type = DBfetch($db_media_types)){
-				$media_types[$db_media_type['mediatypeid']] = $db_media_type['description'];
+		foreach ($data['user_medias'] as $media) {
+			$media_type_ids[$media['mediatypeid']] = 1;
+		}
+		if (count($media_type_ids) > 0) {
+			$db_media_types = DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE mt.mediatypeid IN ('.implode(',', array_keys($media_type_ids)).')');
+			while ($db_media_type = DBfetch($db_media_types)) {
+				$data['media_types'][$db_media_type['mediatypeid']] = $db_media_type['description'];
 			}
 		}
 
-		$frmUser = new CFormTable($frm_title);
-		$frmUser->setName('user_form');
-		$frmUser->setHelp('web.users.php');
-		$frmUser->addVar('config',get_request('config',0));
+		// set user rights
+		if (!$data['is_profile']) {
+			$data['groups'] = API::UserGroup()->get(array('usrgrpids' => $data['user_groups'], 'output' => API_OUTPUT_EXTEND));
+			order_result($data['groups'], 'name');
 
-		if(isset($userid))	$frmUser->addVar('userid',$userid);
-
-		if($profile==0){
-			$frmUser->addRow(S_ALIAS,	new CTextBox('alias',$alias,40));
-			$frmUser->addRow(S_NAME,	new CTextBox('name',$name,40));
-			$frmUser->addRow(S_SURNAME,	new CTextBox('surname',$surname,40));
-		}
-
-		$auth_type = isset($userid) ? get_user_system_auth($userid) : $config['authentication_type'];
-
-		if(ZBX_AUTH_INTERNAL == $auth_type){
-			if(!isset($userid) || isset($change_password)){
-				$frmUser->addRow(S_PASSWORD,	new CPassBox('password1',$password1,20));
-				$frmUser->addRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox('password2',$password2,20));
-				if(isset($change_password))
-					$frmUser->addVar('change_password', $change_password);
+			$group_ids = array_values($data['user_groups']);
+			if (count($group_ids) == 0) {
+				$group_ids = array(-1);
 			}
-			else{
-				$passwd_but = new CSubmit('change_password', _('Change password'));
-				if($alias == ZBX_GUEST_USER){
-					$passwd_but->setAttribute('disabled','disabled');
+			$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.DBcondition('r.groupid', $group_ids));
+
+			$tmp_permitions = array();
+			while ($db_right = DBfetch($db_rights)) {
+				if (isset($tmp_permitions[$db_right['id']])) {
+					$tmp_permitions[$db_right['id']] = min($tmp_permitions[$db_right['id']], $db_right['permission']);
 				}
-				$frmUser->addRow(S_PASSWORD, $passwd_but);
-			}
-		}
-
-		if($profile==0){
-			$frmUser->addVar('user_groups',$user_groups);
-
-			if(isset($userid) && (bccomp($USER_DETAILS['userid'], $userid)==0)){
-				$frmUser->addVar('user_type',$user_type);
-			}
-			else{
-				$cmbUserType = new CComboBox('user_type', $user_type, $perm_details ? 'submit();' : null);
-				$cmbUserType->addItem(USER_TYPE_ZABBIX_USER,	user_type2str(USER_TYPE_ZABBIX_USER));
-				$cmbUserType->addItem(USER_TYPE_ZABBIX_ADMIN,	user_type2str(USER_TYPE_ZABBIX_ADMIN));
-				$cmbUserType->addItem(USER_TYPE_SUPER_ADMIN,	user_type2str(USER_TYPE_SUPER_ADMIN));
-				$frmUser->addRow(S_USER_TYPE, $cmbUserType);
-			}
-
-			$lstGroups = new CListBox('user_groups_to_del[]', null, 10);
-			$lstGroups->attributes['style'] = 'width: 320px';
-
-			$options = array(
-				'usrgrpids' => $user_groups,
-				'output' => API_OUTPUT_EXTEND
-			);
-			$groups = API::UserGroup()->get($options);
-			order_result($groups, 'name');
-			foreach($groups as $num => $group){
-				$lstGroups->addItem($group['usrgrpid'], $group['name']);
-			}
-
-			$frmUser->addRow(S_GROUPS,
-				array(
-					$lstGroups,
-					BR(),
-					new CButton('add_group',S_ADD,
-						'return PopUp("popup_usrgrp.php?dstfrm='.$frmUser->getName().
-						'&list_name=user_groups_to_del[]&var_name=user_groups",450, 450);'),
-					SPACE,
-					(count($user_groups) > 0)?new CSubmit('del_user_group',S_DELETE_SELECTED):null
-				));
-		}
-
-
-// preparing the list of possible interface languages
-		$cmbLang = new CComboBox('lang',$lang);
-		$languages_unable_set = 0;
-		foreach($ZBX_LOCALES as $loc_id => $loc_name){
-// checking if this locale exists in the system. The only way of doing it is to try and set one
-			$locale_exists = setlocale(LC_ALL, zbx_locale_variants($loc_id)) || $loc_id == 'en_GB' ? 'yes' : 'no';
-
-			$selected = ($loc_id == $USER_DETAILS['lang']) ? true : null;
-			$cmbLang->addItem($loc_id, $loc_name, $selected, $locale_exists);
-
-			if($locale_exists != 'yes')
-				$languages_unable_set++;
-		}
-// restoring original locale
-		setlocale(LC_ALL, zbx_locale_variants($USER_DETAILS['lang']));
-
-// Numeric Locale to default
-		setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
-
-// if some languages can't be set, showing a warning about that
-		$lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
-
-		$frmUser->addRow(S_LANGUAGE, array($cmbLang, new CSpan($lang_hint, 'red wrap')));
-
-		$cmbTheme = new CComboBox('theme',$theme);
-			$cmbTheme->addItem(ZBX_DEFAULT_CSS,S_SYSTEM_DEFAULT);
-			$cmbTheme->addItem('css_ob.css',S_ORIGINAL_BLUE);
-			$cmbTheme->addItem('css_bb.css',S_BLACK_AND_BLUE);
-			$cmbTheme->addItem('css_od.css',S_DARK_ORANGE);
-
-		$frmUser->addRow(S_THEME, $cmbTheme);
-
-		$script = "javascript:
-			var autologout = document.getElementById('autologout');
-			if(this.checked) autologout.disabled = false;
-			else autologout.disabled = true;";
-
-		$autologoutCheckBox = new CCheckBox('autologout_visible', ($autologout == 0) ? 'no' : 'yes', $script);
-
-		$autologoutTextBox = new CNumericBox("autologout", ($autologout == 0) ? '90' : $autologout, 4);
-// if autologout is disabled
-		if($autologout == 0)
-			$autologoutTextBox->setAttribute('disabled','disabled');
-
-
-		$frmUser->addRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
-		$frmUser->addRow(S_SCREEN_REFRESH,	new CNumericBox('refresh',$refresh,4));
-
-		$frmUser->addRow(S_ROWS_PER_PAGE,	new CNumericBox('rows_per_page',$rows_per_page,6));
-		$frmUser->addRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
-
-// view Media Settings for users above "User" +++
-		if(uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
-			$frmUser->addVar('user_medias', $user_medias);
-
-			$media_table = new CTableInfo(S_NO_MEDIA_DEFINED);
-			foreach($user_medias as $id => $one_media){
-				if(!isset($one_media['active']) || $one_media['active']==0){
-					$status = new CLink(S_ENABLED,'#','enabled');
-					$status->onClick('return create_var("'.$frmUser->getName().'","disable_media",'.$id.', true);');
+				else {
+					$tmp_permitions[$db_right['id']] = $db_right['permission'];
 				}
-				else{
-					$status = new CLink(S_DISABLED,'#','disabled');
-					$status->onClick('return create_var("'.$frmUser->getName().'","enable_media",'.$id.', true);');
-				}
-
-				$media_url = '?dstfrm='.$frmUser->getName().
-								'&media='.$id.
-								'&mediatypeid='.$one_media['mediatypeid'].
-								'&sendto='.urlencode($one_media['sendto']).
-								'&period='.$one_media['period'].
-								'&severity='.$one_media['severity'].
-								'&active='.$one_media['active'];
-
-				$media_table->addRow(array(
-					new CCheckBox('user_medias_to_del['.$id.']',null,null,$id),
-					new CSpan($media_types[$one_media['mediatypeid']], 'nowrap'),
-					new CSpan($one_media['sendto'], 'nowrap'),
-					new CSpan($one_media['period'], 'nowrap'),
-					media_severity2str($one_media['severity']),
-					$status,
-					new CButton('edit_media',_('Edit'),'javascript: return PopUp("popup_media.php'.$media_url.'",550,400);','link_menu'))
-				);
 			}
 
-			$frmUser->addRow(
-				S_MEDIA,
-				array($media_table,
-					new CButton('add_media',_('Add'),'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->getName().'",550,400);', 'link_menu'),
-					SPACE,SPACE,
-					(count($user_medias) > 0) ? new CSubmit('del_user_media',_('Delete selected'),null,'link_menu') : null
-				));
-		}
-
-
-		if(0 == $profile){
-			$frmUser->addVar('perm_details', $perm_details);
-
-			$link = new CSpan($perm_details?S_HIDE:S_SHOW ,'link');
-			$link->onClick("return create_var('".$frmUser->getName()."','perm_details',".($perm_details ? 0 : 1).", true);");
-			$resources_list = array(
-				S_RIGHTS_OF_RESOURCES,
-				SPACE.'(',$link,')'
-				);
-			$frmUser->addSpanRow($resources_list,'right_header');
-
-			if($perm_details){
-				$group_ids = array_values($user_groups);
-				if(count($group_ids) == 0) $group_ids = array(-1);
-				$db_rights = DBselect('SELECT * FROM rights r WHERE '.DBcondition('r.groupid',$group_ids));
-
-				$tmp_perm = array();
-				while($db_right = DBfetch($db_rights)){
-					if(isset($tmp_perm[$db_right['id']])){
-						$tmp_perm[$db_right['id']] = min($tmp_perm[$db_right['id']],$db_right['permission']);
-					}
-					else{
-						$tmp_perm[$db_right['id']] = $db_right['permission'];
-					}
-				}
-
-				$user_rights = array();
-				foreach($tmp_perm as $id => $perm){
-					array_push($user_rights, array(
-						'id'		=> $id,
-						'permission'	=> $perm
-						));
-				}
-//SDI($user_rights);
-//SDI($user_type);
-				$frmUser->addSpanRow(get_rights_of_elements_table($user_rights, $user_type));
+			$data['user_rights'] = array();
+			foreach ($tmp_permitions as $id => $permition) {
+				array_push($data['user_rights'], array('id' => $id, 'permission' => $permition));
 			}
 		}
-
-		if($profile){
-			$msgVisibility = array('1' => array(
-					'messages[timeout]',
-					'messages[sounds.repeat]',
-					'messages[sounds.recovery]',
-					'messages[triggers.recovery]',
-					'timeout_row',
-					'repeat_row',
-					'triggers_row',
-				)
-			);
-
-			$frmUser->addRow(S_GUI_MESSAGING, new CCheckBox('messages[enabled]', $messages['enabled'], null, 1));
-
-			$newRow = $frmUser->addRow(S_MESSAGE_TIMEOUT.SPACE.'('.S_SECONDS_SMALL.')', new CNumericBox("messages[timeout]", $messages['timeout'], 5));
-			$newRow->setAttribute('id', 'timeout_row');
-
-			$repeatSound = new CComboBox('messages[sounds.repeat]', $messages['sounds.repeat'], 'javascript: if(IE) submit();');
-			$repeatSound->setAttribute('id', 'messages[sounds.repeat]');
-			$repeatSound->addItem(1, S_ONCE);
-			$repeatSound->addItem(10, '10 '.S_SECONDS);
-			$repeatSound->addItem(-1, S_MESSAGE_TIMEOUT);
-
-			$newRow = $frmUser->addRow(S_PLAY_SOUND, $repeatSound);
-			$newRow->setAttribute('id', 'repeat_row');
-
-// trigger sounds
-			$severities = array(
-				TRIGGER_SEVERITY_NOT_CLASSIFIED,
-				TRIGGER_SEVERITY_INFORMATION,
-				TRIGGER_SEVERITY_WARNING,
-				TRIGGER_SEVERITY_AVERAGE,
-				TRIGGER_SEVERITY_HIGH,
-				TRIGGER_SEVERITY_DISASTER
-			);
-
-			$zbxSounds = getSounds();
-			$triggers = new CTable('', 'invisible');
-
-			$soundList = new CComboBox('messages[sounds.recovery]', $messages['sounds.recovery']);
-			foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);
-
-			$resolved = array(
-				new CCheckBox('messages[triggers.recovery]', $messages['triggers.recovery'], null, 1),
-				S_RECOVERY,
-				$soundList,
-				new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds.recovery]');"),
-				new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();')
-			);
-
-			$triggers->addRow($resolved);
-
-			foreach($severities as $snum => $severity){
-				$soundList = new CComboBox('messages[sounds.'.$severity.']', $messages['sounds.'.$severity]);
-				foreach($zbxSounds as $filename => $file) $soundList->addItem($file, $filename);
-
-				$triggers->addRow(array(
-					new CCheckBox('messages[triggers.severities]['.$severity.']', isset($messages['triggers.severities'][$severity]), null, 1),
-					getSeverityCaption($severity),
-					$soundList,
-					new CButton('start', S_PLAY, "javascript: testUserSound('messages[sounds.".$severity."]');"),
-					new CButton('stop', S_STOP, 'javascript: AudioList.stopAll();')
-				));
-
-
-				zbx_subarray_push($msgVisibility, 1, 'messages[triggers.severities]['.$severity.']');
-				zbx_subarray_push($msgVisibility, 1, 'messages[sounds.'.$severity.']');
-			}
-
-			$newRow = $frmUser->addRow(S_TRIGGER_SEVERITY, $triggers);
-			$newRow->setAttribute('id', 'triggers_row');
-
-			zbx_add_post_js("var userMessageSwitcher = new CViewSwitcher('messages_enabled', 'click', ".zbx_jsvalue($msgVisibility, true).");");
-			zbx_add_post_js("jQuery('#messages_enabled').bind('click',function() {
-								if (this.checked
-										&& !jQuery(\"input[id='messages_triggers.recovery']\").is(':checked')
-										&& !jQuery(\"input[id='messages_triggers.severities_0']\").is(':checked')
-										&& !jQuery(\"input[id='messages_triggers.severities_1']\").is(':checked')
-										&& !jQuery(\"input[id='messages_triggers.severities_2']\").is(':checked')
-										&& !jQuery(\"input[id='messages_triggers.severities_3']\").is(':checked')
-										&& !jQuery(\"input[id='messages_triggers.severities_4']\").is(':checked')
-										&& !jQuery(\"input[id='messages_triggers.severities_5']\").is(':checked')) {
-									jQuery(\"input[id='messages_triggers.recovery']\").attr('checked', true);
-									jQuery(\"input[id='messages_triggers.severities_0']\").attr('checked', true);
-									jQuery(\"input[id='messages_triggers.severities_1']\").attr('checked', true);
-									jQuery(\"input[id='messages_triggers.severities_2']\").attr('checked', true);
-									jQuery(\"input[id='messages_triggers.severities_3']\").attr('checked', true);
-									jQuery(\"input[id='messages_triggers.severities_4']\").attr('checked', true);
-									jQuery(\"input[id='messages_triggers.severities_5']\").attr('checked', true);
-								}
-							});");
- 		}
-
-		$frmUser->addItemToBottomRow(new CSubmit('save',S_SAVE));
-		if(isset($userid) && ($profile == 0)){
-			$frmUser->addItemToBottomRow(SPACE);
-			$delete_b = new CButtonDelete(S_DELETE_SELECTED_USER_Q,url_param("form").url_param("config").url_param("userid"));
-			if(bccomp($USER_DETAILS['userid'],$userid) == 0){
-				$delete_b->setAttribute('disabled','disabled');
-			}
-
-			$frmUser->addItemToBottomRow($delete_b);
-		}
-		$frmUser->addItemToBottomRow(SPACE);
-		$frmUser->addItemToBottomRow(new CButtonCancel(url_param("config")));
-
-	return $frmUser;
+		return $data;
 	}
 
-// Insert form for User Groups
-	function insert_usergroups_form(){
-		$frm_title = S_USER_GROUP;
+	function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX_USER, $rightsFormList = null) {
+		// nodes
+		if (ZBX_DISTRIBUTED) {
+			$lists['node']['label']		= _('Nodes');
+			$lists['node']['read_write']= new CListBox('nodes_write', null, 10);
+			$lists['node']['read_only']	= new CListBox('nodes_read', null, 10);
+			$lists['node']['deny']		= new CListBox('nodes_deny', null, 10);
 
-		if(isset($_REQUEST['usrgrpid'])){
-			$usrgrp	= API::UserGroup()->get(array(
-				'usrgrpids' => $_REQUEST['usrgrpid'],
-				'output' => API_OUTPUT_EXTEND
-			));
-			$usrgrp = reset($usrgrp);
-
-			$frm_title	= S_USER_GROUP.' "'.$usrgrp['name'].'"';
-		}
-
-		if(isset($_REQUEST['usrgrpid']) && !isset($_REQUEST['form_refresh'])){
-			$name	= $usrgrp['name'];
-
-			$users_status = $usrgrp['users_status'];
-			$gui_access = $usrgrp['gui_access'];
-			$debug_mode = $usrgrp['debug_mode'];
-
-			$group_users = array();
-			$sql = 'SELECT DISTINCT u.userid '.
-						' FROM users u,users_groups ug '.
-						' WHERE u.userid=ug.userid '.
-							' AND ug.usrgrpid='.$_REQUEST['usrgrpid'];
-
-			$db_users=DBselect($sql);
-
-			while($db_user=DBfetch($db_users))
-				$group_users[$db_user['userid']] = $db_user['userid'];
-
-			$group_rights = array();
-			$sql = 'SELECT r.*, n.name as node_name, g.name as name '.
-					' FROM groups g '.
-						' LEFT JOIN rights r on r.id=g.groupid '.
-						' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('g.groupid').
-					' WHERE r.groupid='.$_REQUEST['usrgrpid'];
-
-			$db_rights = DBselect($sql);
-			while($db_right = DBfetch($db_rights)){
-				if(!empty($db_right['node_name']))
-					$db_right['name'] = $db_right['node_name'].':'.$db_right['name'];
-
-				$group_rights[$db_right['id']] = array(
-					'permission'	=> $db_right['permission'],
-					'name'		=> $db_right['name'],
-					'id'		=> $db_right['id']
-				);
-			}
-		}
-		else{
-			$name			= get_request('gname','');
-			$users_status	= get_request('users_status',GROUP_STATUS_ENABLED);
-			$gui_access	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);
-			$debug_mode	= get_request('debug_mode',GROUP_DEBUG_MODE_DISABLED);
-			$group_users	= get_request('group_users',array());
-			$group_rights	= get_request('group_rights',array());
-		}
-		$perm_details = get_request('perm_details', 0);
-
-		order_result($group_rights, 'name');
-
-		$frmUserG = new CFormTable($frm_title,'usergrps.php');
-		$frmUserG->setHelp('web.users.groups.php');
-
-		if(isset($_REQUEST['usrgrpid'])){
-			$frmUserG->addVar('usrgrpid',$_REQUEST['usrgrpid']);
-		}
-
-		$grName = new CTextBox('gname',$name,49);
-		$grName->attributes['style'] = 'width: 280px';
-		$frmUserG->addRow(S_GROUP_NAME,$grName);
-
-		$frmUserG->addVar('group_rights', $group_rights);
-
-/////////////////
-
-// create table header +
-
-	$selusrgrp = get_request('selusrgrp', 0);
-	$cmbGroups = new CComboBox('selusrgrp', $selusrgrp, 'submit()');
-	$cmbGroups->addItem(0,S_ALL_S);
-
-	$sql = 'SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' ORDER BY name';
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbGroups->addItem($row['usrgrpid'], $row['name']);
-	}
-// -
-
-// create user twinbox +
-	$user_tb = new CTweenBox($frmUserG, 'group_users', $group_users, 10);
-
-	$sql_from = '';
-	$sql_where = '';
-	if($selusrgrp > 0) {
-		$sql_from = ', users_groups g ';
-		$sql_where = ' AND u.userid=g.userid AND g.usrgrpid='.$selusrgrp;
-	}
-	$sql = 'SELECT DISTINCT u.userid, u.alias '.
-			' FROM users u '.$sql_from.
-			' WHERE '.DBcondition('u.userid', $group_users).
-			' OR ('.DBin_node('u.userid').
-				$sql_where.
-			' ) ORDER BY u.alias';
-	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$user_tb->addItem($row['userid'], $row['alias']);
-	}
-
-	$frmUserG->addRow(S_USERS, $user_tb->get(S_IN.SPACE.S_GROUP,array(S_OTHER.SPACE.S_GROUPS.SPACE.'|'.SPACE, $cmbGroups)));
-// -
-
-/////////////////
-/*
-		$lstUsers = new CListBox('group_users_to_del[]');
-		$lstUsers->attributes['style'] = 'width: 280px';
-
-		foreach($group_users as $userid => $alias){
-			$lstUsers->addItem($userid,	$alias);
-		}
-
-		$frmUserG->addRow(S_USERS,
-			array(
-				$lstUsers,
-				BR(),
-				new CSubmit('add_user',S_ADD,
-					"return PopUp('popup_users.php?dstfrm=".$frmUserG->getName().
-					"&list_name=group_users_to_del[]&var_name=group_users',600,300);"),
-				(count($group_users) > 0) ? new CSubmit('del_group_user',S_DELETE_SELECTED) : null
-			));
-*/
-/////////////////
-
-		$granted = true;
-		if(isset($_REQUEST['usrgrpid'])){
-			$granted = granted2update_group($_REQUEST['usrgrpid']);
-		}
-
-		if($granted){
-			$cmbGUI = new CComboBox('gui_access',$gui_access);
-			$cmbGUI->addItem(GROUP_GUI_ACCESS_SYSTEM,user_auth_type2str(GROUP_GUI_ACCESS_SYSTEM));
-			$cmbGUI->addItem(GROUP_GUI_ACCESS_INTERNAL,user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL));
-			$cmbGUI->addItem(GROUP_GUI_ACCESS_DISABLED,user_auth_type2str(GROUP_GUI_ACCESS_DISABLED));
-			$frmUserG->addRow(S_GUI_ACCESS, $cmbGUI);
-
-			$cmbStat = new CComboBox('users_status',$users_status);
-			$cmbStat->addItem(GROUP_STATUS_ENABLED,S_ENABLED);
-			$cmbStat->addItem(GROUP_STATUS_DISABLED,S_DISABLED);
-
-			$frmUserG->addRow(S_USERS_STATUS, $cmbStat);
-
-		}
-		else{
-			$frmUserG->addVar('gui_access',$gui_access);
-			$frmUserG->addRow(S_GUI_ACCESS, new CSpan(user_auth_type2str($gui_access),'green'));
-
-			$frmUserG->addVar('users_status',GROUP_STATUS_ENABLED);
-			$frmUserG->addRow(S_USERS_STATUS, new CSpan(S_ENABLED,'green'));
-		}
-
-		$cmbDebug = new CComboBox('debug_mode', $debug_mode);
-		$cmbDebug->addItem(GROUP_DEBUG_MODE_ENABLED, S_ENABLED);
-		$cmbDebug->addItem(GROUP_DEBUG_MODE_DISABLED, S_DISABLED);
-		$frmUserG->addRow(S_DEBUG_MODE, $cmbDebug);
-
-
-		$table_Rights = new CTable(S_NO_RIGHTS_DEFINED,'right_table');
-
-		$lstWrite = new CListBox('right_to_del[read_write][]'	,null	,20);
-		$lstRead  = new CListBox('right_to_del[read_only][]'	,null	,20);
-		$lstDeny  = new CListBox('right_to_del[deny][]'			,null	,20);
-
-		foreach($group_rights as $id => $element_data){
-			if($element_data['permission'] == PERM_DENY)			$lstDeny->addItem($id, $element_data['name']);
-			else if($element_data['permission'] == PERM_READ_ONLY)	$lstRead->addItem($id, $element_data['name']);
-			else if($element_data['permission'] == PERM_READ_WRITE)	$lstWrite->addItem($id, $element_data['name']);
-		}
-
-		$table_Rights->setHeader(array(S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
-		$table_Rights->addRow(array(new CCol($lstWrite,'read_write'), new CCol($lstRead,'read_only'), new CCol($lstDeny,'deny')));
-		$table_Rights->addRow(array(
-			array(new CButton('add_read_write',S_ADD,
-					"return PopUp('popup_right.php?dstfrm=".$frmUserG->getName().
-					"&permission=".PERM_READ_WRITE."',450,450);"),
-				new CSubmit('del_read_write',S_DELETE_SELECTED)),
-			array(	new CButton('add_read_only',S_ADD,
-					"return PopUp('popup_right.php?dstfrm=".$frmUserG->getName().
-					"&permission=".PERM_READ_ONLY."',450,450);"),
-				new CSubmit('del_read_only',S_DELETE_SELECTED)),
-			array(new CButton('add_deny',S_ADD,
-					"return PopUp('popup_right.php?dstfrm=".$frmUserG->getName().
-					"&permission=".PERM_DENY."',450,450);"),
-				new CSubmit('del_deny',S_DELETE_SELECTED))
-			));
-
-		$frmUserG->addRow(S_RIGHTS,$table_Rights);
-
-		$frmUserG->addVar('perm_details', $perm_details);
-
-		$link = new CSpan($perm_details?S_HIDE:S_SHOW,'link');
-		$link->onClick("return create_var('".$frmUserG->getName()."','perm_details',".($perm_details ? 0 : 1).", true);");
-		$resources_list = array(
-			S_RIGHTS_OF_RESOURCES,
-			SPACE.'(',$link,')'
-			);
-		$frmUserG->addSpanRow($resources_list,'right_header');
-
-		if($perm_details){
-			$frmUserG->addSpanRow(get_rights_of_elements_table($group_rights));
-		}
-
-		$frmUserG->addItemToBottomRow(new CSubmit('save',S_SAVE));
-		if(isset($_REQUEST['usrgrpid'])){
-			$frmUserG->addItemToBottomRow(SPACE);
-			$frmUserG->addItemToBottomRow(new CButtonDelete('Delete selected group?',
-				url_param('form').url_param('usrgrpid')));
-		}
-		$frmUserG->addItemToBottomRow(SPACE);
-		$frmUserG->addItemToBottomRow(new CButtonCancel());
-
-		return($frmUserG);
-	}
-
-	function get_rights_of_elements_table($rights=array(),$user_type=USER_TYPE_ZABBIX_USER){
-		$table = new CTable('S_NO_ACCESSIBLE_RESOURCES', 'right_table');
-		$table->setHeader(array(SPACE, S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
-
-		if(ZBX_DISTRIBUTED){
-			$lst['node']['label']		= S_NODES;
-			$lst['node']['read_write']	= new CListBox('nodes_write',null	,10);
-			$lst['node']['read_only']	= new CListBox('nodes_read'	,null	,10);
-			$lst['node']['deny']		= new CListBox('nodes_deny'	,null	,10);
+			$lists['node']['read_write']->setAttribute('style', 'background: #EBEFF2;');
+			$lists['node']['read_only']->setAttribute('style', 'background: #EBEFF2;');
+			$lists['node']['deny']->setAttribute('style', 'background: #EBEFF2;');
 
 			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY);
-			foreach($nodes as $node){
-				switch($node['permission']){
-					case PERM_READ_ONLY:	$list_name='read_only';		break;
-					case PERM_READ_WRITE:	$list_name='read_write';	break;
-					default:		$list_name='deny';		break;
+			foreach ($nodes as $node) {
+				switch($node['permission']) {
+					case PERM_READ_ONLY:
+						$list_name = 'read_only';
+						break;
+					case PERM_READ_WRITE:
+						$list_name = 'read_write';
+						break;
+					default:
+						$list_name = 'deny';
 				}
-				$lst['node'][$list_name]->addItem($node['nodeid'],$node['name']);
+				$lists['node'][$list_name]->addItem($node['nodeid'], $node['name']);
 			}
 			unset($nodes);
 		}
 
-		$lst['group']['label']		= S_HOST_GROUPS;
-		$lst['group']['read_write']	= new CListBox('groups_write'	,null	,15);
-		$lst['group']['read_only']	= new CListBox('groups_read'	,null	,15);
-		$lst['group']['deny']		= new CListBox('groups_deny'	,null	,15);
+		// group
+		$lists['group']['label']		= _('Host groups');
+		$lists['group']['read_write']	= new CListBox('groups_write', null, 15);
+		$lists['group']['read_only']	= new CListBox('groups_read', null, 15);
+		$lists['group']['deny']			= new CListBox('groups_deny', null, 15);
+
+		$lists['group']['read_write']->setAttribute('style', 'background: #EBEFF2;');
+		$lists['group']['read_only']->setAttribute('style', 'background: #EBEFF2;');
+		$lists['group']['deny']->setAttribute('style', 'background: #EBEFF2;');
 
 		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
-		foreach($groups as $group){
-			switch($group['permission']){
+		foreach ($groups as $group) {
+			switch($group['permission']) {
 				case PERM_READ_ONLY:
-					$list_name='read_only';
+					$list_name = 'read_only';
 					break;
 				case PERM_READ_WRITE:
-					$list_name='read_write';
+					$list_name = 'read_write';
 					break;
 				default:
-					$list_name='deny';
+					$list_name = 'deny';
 			}
-			$lst['group'][$list_name]->addItem($group['groupid'], (empty($group['node_name']) ? '' : $group['node_name'].':' ).$group['name']);
+			$lists['group'][$list_name]->addItem($group['groupid'], (empty($group['node_name']) ? '' : $group['node_name'].':' ).$group['name']);
 		}
 		unset($groups);
 
-		$lst['host']['label']		= S_HOSTS;
-		$lst['host']['read_write']	= new CListBox('hosts_write'	,null	,15);
-		$lst['host']['read_only']	= new CListBox('hosts_read'	,null	,15);
-		$lst['host']['deny']		= new CListBox('hosts_deny'	,null	,15);
+		// host
+		$lists['host']['label']		= _('Hosts');
+		$lists['host']['read_write']= new CListBox('hosts_write', null, 15);
+		$lists['host']['read_only']	= new CListBox('hosts_read', null, 15);
+		$lists['host']['deny']		= new CListBox('hosts_deny', null, 15);
+
+		$lists['host']['read_write']->setAttribute('style', 'background: #EBEFF2;');
+		$lists['host']['read_only']->setAttribute('style', 'background: #EBEFF2;');
+		$lists['host']['deny']->setAttribute('style', 'background: #EBEFF2;');
 
 		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_RES_DATA_ARRAY, get_current_nodeid(true));
 
-		foreach($hosts as $host){
-			switch($host['permission']){
-				case PERM_READ_ONLY:	$list_name='read_only';		break;
-				case PERM_READ_WRITE:	$list_name='read_write';	break;
-				default:		$list_name='deny';		break;
+		foreach ($hosts as $host) {
+			switch($host['permission']) {
+				case PERM_READ_ONLY:
+					$list_name = 'read_only';
+					break;
+				case PERM_READ_WRITE:
+					$list_name = 'read_write';
+					break;
+				default:
+					$list_name = 'deny';
 			}
-			if(HOST_STATUS_PROXY_ACTIVE == $host['status'] || HOST_STATUS_PROXY_PASSIVE == $host['status'] ){
+			if (HOST_STATUS_PROXY_ACTIVE == $host['status'] || HOST_STATUS_PROXY_PASSIVE == $host['status']) {
 				$host['host_name'] = $host['host'];
 			}
-			$lst['host'][$list_name]->addItem($host['hostid'], (empty($host['node_name']) ? '' : $host['node_name'].':' ).$host['host_name']);
+			$lists['host'][$list_name]->addItem($host['hostid'], (empty($host['node_name']) ? '' : $host['node_name'].':' ).$host['host_name']);
 		}
 		unset($hosts);
 
-		foreach($lst as $name => $lists){
+		// display
+		if (empty($rightsFormList)) {
+			$rightsFormList = new CFormList('rightsFormList');
+		}
+		$isHeaderDisplayed = false;
+		foreach ($lists as $list) {
+			$sLabel = '';
 			$row = new CRow();
-			foreach($lists as $class => $list_obj){
-				$row->addItem(new CCol($list_obj, $class));
+			foreach ($list as $class => $item) {
+				if (is_string($item)) {
+					$sLabel = $item;
+				}
+				else {
+					$row->addItem(new CCol($item, $class));
+				}
+			}
+
+			$table = new CTable(_('No accessible resources'), 'right_table');
+			if (!$isHeaderDisplayed) {
+				$table->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
+				$isHeaderDisplayed = true;
 			}
 			$table->addRow($row);
+			$rightsFormList->addRow($sLabel, $table);
 		}
-		unset($lst);
-
-		return $table;
+		return $rightsFormList;
 	}
 
 /* ITEMS FILTER functions { --->>> */

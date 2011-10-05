@@ -336,7 +336,7 @@ function __autoload($class_name) {
 			$url = urlencode($req->toString());
 			$footer = new CCol(
 				array(
-					new CButton('login', S_LOGIN, "javascript: document.location = 'index.php?request=$url';"),
+					new CButton('login', _('Login'), "javascript: document.location = 'index.php?request=$url';"),
 					new CButton('back', S_CANCEL, 'javascript: window.history.back();')
 				),
 				'left');

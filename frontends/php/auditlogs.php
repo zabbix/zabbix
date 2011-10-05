@@ -141,7 +141,7 @@ include_once('include/page_header.php');
 
 	$cmbAction = new CComboBox('action',$_REQUEST['action']);
 		$cmbAction->addItem(-1,S_ALL_S);
-		$cmbAction->addItem(AUDIT_ACTION_LOGIN,		S_LOGIN);
+		$cmbAction->addItem(AUDIT_ACTION_LOGIN,		_('Login'));
 		$cmbAction->addItem(AUDIT_ACTION_LOGOUT,	S_LOGOUT);
 		$cmbAction->addItem(AUDIT_ACTION_ADD,		S_ADD);
 		$cmbAction->addItem(AUDIT_ACTION_UPDATE,	S_UPDATE);
@@ -229,7 +229,7 @@ include_once('include/page_header.php');
 			case AUDIT_ACTION_ADD:		$action = S_ADDED; break;
 			case AUDIT_ACTION_UPDATE:	$action = S_UPDATED; break;
 			case AUDIT_ACTION_DELETE:	$action = S_DELETED; break;
-			case AUDIT_ACTION_LOGIN:	$action = S_LOGIN;	break;
+			case AUDIT_ACTION_LOGIN:	$action = _('Login');	break;
 			case AUDIT_ACTION_LOGOUT:	$action = S_LOGOUT; break;
 			case AUDIT_ACTION_ENABLE:	$action = S_ENABLED; break;
 			case AUDIT_ACTION_DISABLE:	$action = S_DISABLED; break;
