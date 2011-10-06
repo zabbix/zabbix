@@ -19,41 +19,39 @@
 **/
 ?>
 <?php
-class CList extends CTag{
-public $emptyList;
+class CList extends CTag {
+	public $emptyList;
 
-	public function __construct($value=NULL,$class=NULL){
-		parent::__construct('ul','yes');
+	public function __construct($value = null, $class = null) {
+		parent::__construct('ul', 'yes');
 		$this->tag_end = '';
 		$this->addItem($value);
 		$this->addClass($class);
 
-		if(is_null($value)){
+		if (is_null($value)) {
 			$this->addItem(_('List is empty'), 'empty');
 			$this->emptyList = true;
 		}
 	}
 
-	public function prepareItem($value=NULL,$class=null){
-		if(!is_null($value)){
-			$value = new CListItem($value,$class);
+	public function prepareItem($value = null, $class = null, $id = null) {
+		if (!is_null($value)) {
+			$value = new CListItem($value, $class, $id);
 		}
 		return $value;
 	}
 
-	public function addItem($value,$class=null){
-		if(!is_null($value) && $this->emptyList){
+	public function addItem($value, $class = null, $id = null) {
+		if (!is_null($value) && $this->emptyList) {
 			$this->emptyList = false;
 			$this->items = array();
 		}
 
-		if(is_array($value)){
-			parent::addItem($this->prepareItem($value,$class));
-			//foreach($value as $el)
-				//parent::addItem($this->prepareItem($el,$class));
+		if (is_array($value)) {
+			parent::addItem($this->prepareItem($value, $class, $id));
 		}
-		else{
-			parent::addItem($this->prepareItem($value,$class));
+		else {
+			parent::addItem($this->prepareItem($value, $class, $id));
 		}
 	}
 }

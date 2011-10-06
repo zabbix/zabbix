@@ -163,7 +163,7 @@ class testFormMediaType extends CWebTest{
 		switch($used_by_operations){
 			case true:
 				$this->nok('Media type deleted');
-				$this->ok('Media type was not deleted');
+				$this->ok('Cannot delete media type');
 				$this->ok('Media types used by action');
 			break;
 			case false:

@@ -344,7 +344,7 @@ switch($itemType) {
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm('get');
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
-		$form->addItem(new CSubmit('form', S_CREATE_PROTOTYPE));
+		$form->addItem(new CSubmit('form', _('Create item')));
 	}
 	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEM_PROTOTYPES_BIG, $form);
 

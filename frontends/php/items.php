@@ -667,39 +667,36 @@ switch($itemType) {
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_ITEMS_DISABLED, null);
 	}
-	else if(isset($_REQUEST['copy']) && isset($_REQUEST['group_itemid']) && ($_REQUEST['go'] == 'copy_to')){
-		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
-			if(0 == $_REQUEST['copy_type']){ /* hosts */
+	elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_itemid'])) {
+		if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
+			if ($_REQUEST['copy_type'] == 0) {	// hosts
 				$hosts_ids = $_REQUEST['copy_targetid'];
 			}
-			else{ /* groups */
+			else {	// groups
 				$hosts_ids = array();
 				$group_ids = $_REQUEST['copy_targetid'];
 
-				$db_hosts = DBselect('SELECT DISTINCT h.hostid '.
-					' FROM hosts h, hosts_groups hg'.
-					' WHERE h.hostid=hg.hostid '.
-						' AND '.DBcondition('hg.groupid',$group_ids));
-				while($db_host = DBfetch($db_hosts)){
-					array_push($hosts_ids, $db_host['hostid']);
+				$db_hosts = DBselect(
+					'SELECT DISTINCT h.hostid'.
+						' FROM hosts h,hosts_groups hg'.
+						' WHERE h.hostid=hg.hostid'.
+							' AND '.DBcondition('hg.groupid', $group_ids)
+				);
+				while ($db_host = DBfetch($db_hosts)) {
+					$hosts_ids[] = $db_host['hostid'];
 				}
 			}
 
-			$go_result = false;
 			DBstart();
-			foreach($_REQUEST['group_itemid'] as $item_id)
-				foreach($hosts_ids as $host_id){
-					$go_result |= copy_item_to_host($item_id, $host_id);
-				}
-
+			$go_result = copyItemsToHosts($_REQUEST['group_itemid'], $hosts_ids);
 			$go_result = DBend($go_result);
-			show_messages($go_result, S_ITEMS_COPIED, S_CANNOT_COPY_ITEMS);
+
+			show_messages($go_result, _('Items copied'), _('Cannot copy items'));
 			$_REQUEST['go'] = 'none2';
 		}
-		else{
-			error(S_NO_TARGET_SELECTED);
+		else {
+			show_error_message(_('No target selected'));
 		}
-		show_messages();
 	}
 	else if(($_REQUEST['go'] == 'clean_history') && isset($_REQUEST['group_itemid'])){
 		// clean history for selected items
