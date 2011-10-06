@@ -14,6 +14,7 @@ New features:
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4151] fixed timer crash due to heap memory corruption (asaveljevs)
  - [ZBX-3755] fixed latest values in cloned items (Sasha)
  - [ZBX-3165] fixed layout of item prototypes form (Vedmak)
  - [ZBX-3342] fixed translation of graphs "Generated in x sec" stamps (Vedmak)
