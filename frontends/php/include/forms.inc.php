@@ -2042,6 +2042,7 @@
 		$frmCopy = new CFormTable(count($group_itemid).' '.S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT,null,'post',null,'go');
 		$frmCopy->setHelp('web.items.copyto.php');
 		$frmCopy->addVar($elements_array_name, $group_itemid);
+		$frmCopy->addVar('hostid', get_request('hostid', 0));
 
 		$cmbCopyType = new CComboBox('copy_type',$copy_type,'submit()');
 		$cmbCopyType->addItem(0,S_HOSTS);
