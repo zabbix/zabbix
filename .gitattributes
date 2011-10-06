@@ -107,6 +107,12 @@ frontends/php/images/general/bar/left.png -text
 frontends/php/images/general/bar/left_arr.png -text
 frontends/php/images/general/bar/right.png -text
 frontends/php/images/general/bar/right_arr.png -text
+frontends/php/images/general/browserwarning/background.png -text
+frontends/php/images/general/browserwarning/chrome.png -text
+frontends/php/images/general/browserwarning/firefox.png -text
+frontends/php/images/general/browserwarning/ie.png -text
+frontends/php/images/general/browserwarning/opera.png -text
+frontends/php/images/general/browserwarning/safari.png -text
 frontends/php/images/general/bttn/arrowdown.png -text
 frontends/php/images/general/bttn/arrowleft.png -text
 frontends/php/images/general/bttn/arrowright.png -text
@@ -386,7 +392,3 @@ upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/p
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
-upgrades/dbpatches/2.0/ibm_db2/patch/globalvars.sql -text
-upgrades/dbpatches/2.0/mysql/patch/globalvars.sql -text
-upgrades/dbpatches/2.0/oracle/patch/globalvars.sql -text
-upgrades/dbpatches/2.0/postgresql/patch/globalvars.sql -text

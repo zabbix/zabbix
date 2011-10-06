@@ -44,7 +44,7 @@ int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_
 		{
 			if (PERF_COUNTER_ACTIVE == perfs->status)
 			{
-				SET_DBL_RESULT(result, compute_average_value(__function_name, perfs, USE_DEFAULT_INTERVAL));
+				SET_DBL_RESULT(result, compute_average_value(perfs, USE_DEFAULT_INTERVAL));
 				ret = SYSINFO_RET_OK;
 			}
 
@@ -108,7 +108,7 @@ int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 				if (PERF_COUNTER_ACTIVE != perfs->status)
 					break;
 
-				SET_DBL_RESULT(result, compute_average_value(__function_name, perfs, USE_DEFAULT_INTERVAL));
+				SET_DBL_RESULT(result, compute_average_value(perfs, USE_DEFAULT_INTERVAL));
 				ret = SYSINFO_RET_OK;
 				goto clean;
 			}

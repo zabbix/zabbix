@@ -189,10 +189,14 @@ typedef enum
 	INTERFACE_TYPE_AGENT,
 	INTERFACE_TYPE_SNMP,
 	INTERFACE_TYPE_IPMI,
-	INTERFACE_TYPE_JMX
+	INTERFACE_TYPE_JMX,
+	INTERFACE_TYPE_ANY = 255
 }
 zbx_interface_type_t;
 const char	*zbx_interface_type_string(zbx_interface_type_t type);
+
+#define INTERFACE_TYPE_COUNT	4	/* number of interface types */
+extern const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT];
 
 #define ZBX_FLAG_DISCOVERY		0x01	/* low-level discovery rule */
 #define ZBX_FLAG_DISCOVERY_CHILD	0x02	/* low-level discovery proto-item, proto-trigger or proto-graph */
@@ -788,12 +792,12 @@ void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
 void	lrtrim_spaces(char *c);
 void	del_zeroes(char *s);
-int	get_param(const char *param, int num, char *buf, int maxlen);
+int	get_param(const char *param, int num, char *buf, size_t max_len);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
 void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
-int	get_key_param(char *param, int num, char *buf, int maxlen);
+int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
 int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
