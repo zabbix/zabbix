@@ -608,28 +608,27 @@ COpt::memoryPick();
  * @param array $groups['name']
  * @return array
  */
-	public function create($groups){
-
+	public function create($groups) {
 		$groups = zbx_toArray($groups);
 		$insert = array();
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create HostGroups');
+		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create host groups.');
+		}
+
+		foreach ($groups as $group) {
+			if (!is_array($group) || !isset($group['name']) || empty($group['name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter "name".');
+			}
+			if ($this->exists(array('name' => $group['name']))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Host group "'.$group['name'].'" already exists.');
 			}
 
-			foreach($groups as $num => $group){
-				if(!is_array($group) || !isset($group['name']) || empty($group['name'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ name ]');
-				}
-				if($this->exists(array('name' => $group['name']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
-				}
+			$insert[] = $group;
+		}
+		$groupids = DB::insert('groups', $insert);
 
-				$insert[] = $group;
-			}
-			$groupids = DB::insert('groups', $insert);
-
-			return array('groupids' => $groupids);
+		return array('groupids' => $groupids);
 	}
 
 /**

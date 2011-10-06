@@ -2575,11 +2575,21 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type)
 			return "IPMI";
 		case INTERFACE_TYPE_JMX:
 			return "JMX";
+		case INTERFACE_TYPE_ANY:
+			return "any";
 		case INTERFACE_TYPE_UNKNOWN:
 		default:
 			return "unknown";
 	}
 }
+
+const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
+{
+	INTERFACE_TYPE_AGENT,
+	INTERFACE_TYPE_SNMP,
+	INTERFACE_TYPE_JMX,
+	INTERFACE_TYPE_IPMI
+};
 
 const char	*zbx_result_string(int result)
 {

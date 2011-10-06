@@ -185,20 +185,27 @@ function item_type2str($type = null){
 	return true;
 	}
 
-	function getInterfaceTypeByItem($item){
-		if(!isset($item['type'])) return null;
-
-		switch($item['type']){
-			case ITEM_TYPE_SNMPV1: $type = INTERFACE_TYPE_SNMP; break;
-			case ITEM_TYPE_SNMPV2C: $type = INTERFACE_TYPE_SNMP; break;
-			case ITEM_TYPE_SNMPV3: $type = INTERFACE_TYPE_SNMP; break;
-			case ITEM_TYPE_SNMPTRAP: $type = INTERFACE_TYPE_SNMP; break;
-			case ITEM_TYPE_IPMI: $type = INTERFACE_TYPE_IPMI; break;
-			case ITEM_TYPE_JMX: $type = INTERFACE_TYPE_JMX; break;
+	function getInterfaceTypeByItem($type) {
+		switch ($type) {
+			case ITEM_TYPE_SNMPV1:
+			case ITEM_TYPE_SNMPV2C:
+			case ITEM_TYPE_SNMPV3:
+			case ITEM_TYPE_SNMPTRAP:
+				return INTERFACE_TYPE_SNMP;
+			case ITEM_TYPE_IPMI:
+				return INTERFACE_TYPE_IPMI;
+			case ITEM_TYPE_JMX:
+				return INTERFACE_TYPE_JMX;
 			case ITEM_TYPE_ZABBIX:
-			default: $type = INTERFACE_TYPE_AGENT;
+			case ITEM_TYPE_SIMPLE:
+			case ITEM_TYPE_EXTERNAL:
+			case ITEM_TYPE_DB_MONITOR:
+			case ITEM_TYPE_SSH:
+			case ITEM_TYPE_TELNET:
+				return INTERFACE_TYPE_AGENT;
 		}
-	return $type;
+
+		return INTERFACE_TYPE_UNKNOWN;
 	}
 
 // Delete Item definition from selected group
@@ -286,108 +293,121 @@ function item_type2str($type = null){
 	return $result;
 	}
 
-	function copy_item_to_host($itemid, $hostid){
-		$db_tmp_item = get_item_by_itemid_limited($itemid);
-		$applications = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item['itemid']),$hostid);
+	function copyItemsToHosts($srcItemIds, $dstHostIds) {
+		$options = array(
+			'itemids' => $srcItemIds,
+			'output' => array('type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port', 'description', 'inventory_link'),
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+			'selectApplications' => API_OUTPUT_REFER
+		);
+		$srcItems = API::Item()->get($options);
 
-		$hosts = API::Host()->get(array(
+		foreach ($srcItems as &$srcItem) {
+			if ($srcItem['status'] == ITEM_STATUS_NOTSUPPORTED) {
+				$srcItem['status'] = ITEM_STATUS_ACTIVE;
+			}
+		}
+
+		$options = array(
 			'output' => array('hostid', 'host', 'status'),
-			'selectInterfaces' => API_OUTPUT_EXTEND,
-			'hostids' => $hostid,
+			'selectInterfaces' => array('interfaceid', 'type', 'main'),
+			'hostids' => $dstHostIds,
 			'preservekeys' => 1,
 			'nopermissions' => 1,
 			'templated_hosts' => 1
-		));
-		if(empty($hosts)) return false;
-		$host = reset($hosts);
+		);
+		$dstHosts = API::Host()->get($options);
 
-		unset($db_tmp_item['interfaceid']);
-		if($host['status'] != HOST_STATUS_TEMPLATE){
-			$type = getInterfaceTypeByItem($db_tmp_item);
-			foreach($host['interfaces'] as $hinum => $interface){
-				if(($interface['type'] == $type) && ($interface['main'] == 1)){
-					$db_tmp_item['interfaceid'] = $interface['interfaceid'];
+		foreach ($dstHosts as $dstHost) {
+			foreach ($srcItems as &$srcItem) {
+				if ($dstHost['status'] != HOST_STATUS_TEMPLATE && INTERFACE_TYPE_UNKNOWN != ($type = getInterfaceTypeByItem($srcItem['type']))) {
+					foreach ($dstHost['interfaces'] as $interface) {
+						if ($interface['type'] == $type && $interface['main'] == 1) {
+							$srcItem['interfaceid'] = $interface['interfaceid'];
+						}
+					}
+
+					if (!isset($srcItem['interfaceid'])) {
+						error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
+						return false;
+					}
 				}
+
+				unset($srcItem['itemid']);
+				$srcItem['hostid'] = $dstHost['hostid'];
+				$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHost['hostid']);
 			}
 
-			if(!isset($db_tmp_item['interfaceid'])){
-				error('Cannot find needed host interface on ['.$host['host'].']');
+			if (!API::Item()->create($srcItems)) {
 				return false;
 			}
 		}
 
-		$db_tmp_item['hostid'] = $hostid;
-		$db_tmp_item['applications'] = $applications;
-		$db_tmp_item['templateid'] = 0;
+		return true;
+	}
 
-		$result = API::Item()->create($db_tmp_item);
-
-	return $result;
-}
-
-	function copyItems($srcid, $destid){
-		$result = true;
-
+	function copyItems($srcHostId, $dstHostId) {
 		$options = array(
-			'hostids' => $srcid,
-			'output' => API_OUTPUT_EXTEND,
+			'hostids' => $srcHostId,
+			'output' => array('type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'filter', 'port', 'description', 'inventory_link'),
 			'inherited' => false,
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-			'selectApplications' => API_OUTPUT_REFER,
+			'selectApplications' => API_OUTPUT_REFER
 		);
 		$srcItems = API::Item()->get($options);
 
-		foreach($srcItems as $item){
+		foreach ($srcItems as &$srcItem) {
+			if ($srcItem['status'] == ITEM_STATUS_NOTSUPPORTED) {
+				$srcItem['status'] = ITEM_STATUS_ACTIVE;
+			}
+		}
 
-			$hosts = API::Host()->get(array(
-				'output' => array('hostid', 'host', 'status'),
-				'selectInterfaces' => API_OUTPUT_EXTEND,
-				'hostids' => $destid,
-				'preservekeys' => 1,
-				'nopermissions' => 1,
-				'templated_hosts' => 1
-			));
-			$host = reset($hosts);
+		$options = array(
+			'output' => array('hostid', 'host', 'status'),
+			'selectInterfaces' => array('interfaceid', 'type', 'main'),
+			'hostids' => $dstHostId,
+			'preservekeys' => 1,
+			'nopermissions' => 1,
+			'templated_hosts' => 1
+		);
+		$dstHosts = API::Host()->get($options);
+		$dstHost = reset($dstHosts);
 
-			unset($item['interfaceid']);
-			if($host['status'] != HOST_STATUS_TEMPLATE){
-				$type = getInterfaceTypeByItem($item);
-				foreach($host['interfaces'] as $hinum => $interface){
-					if(($interface['type'] == $type) && ($interface['main'] == 1)){
-						$item['interfaceid'] = $interface['interfaceid'];
+		foreach ($srcItems as &$srcItem) {
+			if ($dstHost['status'] != HOST_STATUS_TEMPLATE && INTERFACE_TYPE_UNKNOWN != ($type = getInterfaceTypeByItem($srcItem['type']))) {
+				foreach ($dstHost['interfaces'] as $interface) {
+					if ($interface['type'] == $type && $interface['main'] == 1) {
+						$srcItem['interfaceid'] = $interface['interfaceid'];
 					}
 				}
 
-				if(!isset($item['interfaceid'])){
-					error(_s('Item [%1$s:%2$s] cannot find interface on host [%3$s]', $item['name'], $item['key_'], $host['host']));
+				if (!isset($srcItem['interfaceid'])) {
+					error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
 					return false;
 				}
 			}
 
-			$item['hostid'] = $destid;
-			$item['applications'] = get_same_applications_for_host(zbx_objectValues($item['applications'], 'applicationid'), $destid);
-			$item['templateid'] = 0;
-
-			$result = API::Item()->create($item);
-			if(!$result) break;
+			unset($srcItem['itemid']);
+			$srcItem['hostid'] = $dstHostId;
+			$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHostId);
 		}
 
-		return $result;
+		return API::Item()->create($srcItems);
 	}
 
-	function copy_applications($srcid, $destid){
+	function copyApplications($srcHostId, $dstHostId) {
 		$options = array(
-			'hostids' => $srcid,
+			'hostids' => $srcHostId,
 			'output' => API_OUTPUT_EXTEND,
-			'inherited' => false,
+			'inherited' => false
 		);
 		$apps_to_clone = API::Application()->get($options);
-		foreach($apps_to_clone as $num => $app){
-			$app['hostid'] = $destid;
-			unset($app['applicationid']);
-			$apps_to_clone[$num] = $app;
-		}
 
+		foreach ($apps_to_clone as &$app) {
+			unset($app['applicationid']);
+			unset($app['templateid']);
+			$app['hostid'] = $dstHostId;
+		}
 		return API::Application()->create($apps_to_clone);
 	}
 
@@ -1333,7 +1353,7 @@ function item_type2str($type = null){
 	}
 
 /*
- * Function: httpitemExists
+ * Function: httpItemExists
  *
  * Description:
  *     Function returns true if http items exists in the $items array.
@@ -1345,10 +1365,12 @@ function item_type2str($type = null){
  * Comments:
  *
  */
-	function httpitemExists($items){
-		foreach($items as $item)
-			if ($item['type'] == ITEM_TYPE_HTTPTEST)
+	function httpItemExists($items) {
+		foreach ($items as $item) {
+			if ($item['type'] == ITEM_TYPE_HTTPTEST) {
 				return true;
+			}
+		}
 
 		return false;
 	}

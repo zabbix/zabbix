@@ -230,6 +230,7 @@ define('INTERFACE_PRIMARY',		1);
 define('INTERFACE_USE_DNS',		0);
 define('INTERFACE_USE_IP',		1);
 
+define('INTERFACE_TYPE_ANY',		-1);
 define('INTERFACE_TYPE_UNKNOWN',	0);
 define('INTERFACE_TYPE_AGENT',		1);
 define('INTERFACE_TYPE_SNMP',		2);
@@ -811,7 +812,7 @@ define('SEC_PER_MONTH', (30*SEC_PER_DAY));
 define('SEC_PER_YEAR', 	(365*SEC_PER_DAY));
 
 // input fields
-define('ZBX_TEXTBOX_STANDART_SIZE', 50);
+define('ZBX_TEXTBOX_STANDARD_SIZE', 50);
 define('ZBX_TEXTBOX_SMALL_SIZE', 25);
 
 // if magic quotes on, then get rid of them

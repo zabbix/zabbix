@@ -19,50 +19,46 @@
 **/
 ?>
 <?php
-class CForm extends CTag{
-	public function __construct($method='post', $action=NULL, $enctype=NULL){
-		parent::__construct('form','yes');
+class CForm extends CTag {
+	public function __construct($method = 'post', $action = null, $enctype = null) {
+		parent::__construct('form', 'yes');
 		$this->setMethod($method);
 		$this->setAction($action);
 		$this->setEnctype($enctype);
+		$this->setAttribute('accept-charset', 'utf-8');
 
-		$this->setAttribute('accept-charset','utf-8');
-
-		if(isset($_COOKIE['zbx_sessionid']))
-			$this->addVar('sid', substr($_COOKIE['zbx_sessionid'],16,16));
-
-		$this->addVar('form_refresh',get_request('form_refresh',0)+1);
+		if (isset($_COOKIE['zbx_sessionid'])) {
+			$this->addVar('sid', substr($_COOKIE['zbx_sessionid'], 16, 16));
+		}
+		$this->addVar('form_refresh', get_request('form_refresh', 0) + 1);
 	}
 
-	public function setMethod($value='post'){
+	public function setMethod($value = 'post') {
 		return $this->attributes['method'] = $value;
 	}
 
-	public function setAction($value){
+	public function setAction($value) {
 		global $page;
-
-		if(is_null($value)){
-			$value = isset($page['file'])?$page['file']:'#';
+		if (is_null($value)) {
+			$value = isset($page['file']) ? $page['file'] : '#';
 		}
-
-	return $this->attributes['action'] = $value;
+		return $this->attributes['action'] = $value;
 	}
 
-	public function setEnctype($value=NULL){
-		if(is_null($value)){
+	public function setEnctype($value = null) {
+		if (is_null($value)) {
 			return $this->removeAttribute('enctype');
 		}
-		else if(!is_string($value)){
+		elseif (!is_string($value)) {
 			return $this->error('Incorrect value for SetEnctype ['.$value.']');
 		}
-
-	return $this->setAttribute('enctype',$value);
+		return $this->setAttribute('enctype',$value);
 	}
 
-	public function addVar($name, $value, $id=null){
-		if(empty($value) && $value != 0)	return $value;
-
-		return $this->addItem(new CVar($name, $value, $id));
+	public function addVar($name, $value, $id = null) {
+		if (!is_null($value)) {
+			return $this->addItem(new CVar($name, $value, $id));
+		}
 	}
 }
 ?>

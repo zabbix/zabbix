@@ -625,7 +625,7 @@ class CBar extends CGraphDraw{
 	}
 
 	public function draw(){
-		$start_time=getmicrotime();
+		$start_time = microtime(true);
 		set_image_header();
 
 		$this->column = uint_in_array($this->type, array(GRAPH_TYPE_COLUMN, GRAPH_TYPE_COLUMN_STACKED));
@@ -721,8 +721,10 @@ class CBar extends CGraphDraw{
 			}
 		}
 
-		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
-		imagestring($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12, _s("Generated in %s sec", $str), $this->GetColor('Gray'));
+		$str = sprintf('%0.2f', microtime(true) - $start_time);
+		$str = _s("Generated in %s sec", $str);
+		$strSize = imageTextSize(6, 0, $str);
+		imageText($this->im, 6, 0, $this->fullSizeX - $strSize['width'] - 5, $this->fullSizeY - 5, $this->getColor('Gray'), $str);
 
 		unset($this->items, $this->data);
 
