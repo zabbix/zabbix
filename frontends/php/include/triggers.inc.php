@@ -1505,7 +1505,7 @@ function utf8RawUrlDecode($source){
 			DB::update('triggers', array(
 				'values' => array(
 					'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
-					'error' => _('Host status became "Not monitored"')
+					'error' => _s('Host status became "%s"', _('Not monitored'))
 				),
 				'where' => array('triggerid' => $triggerIds)
 			));

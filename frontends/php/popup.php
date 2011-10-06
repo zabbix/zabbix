@@ -465,11 +465,11 @@ include_once('include/page_header.php');
 			$name->attr('id', 'spanid'.$host['hostid']);
 
 			if($host['status'] == HOST_STATUS_MONITORED)
-				$status = new CSpan(S_MONITORED,'off');
+				$status = new CSpan(_('Monitored'), 'off');
 			else if($host['status'] == HOST_STATUS_NOT_MONITORED)
-				$status = new CSpan(S_NOT_MONITORED,'on');
+				$status = new CSpan(_('Not monitored'), 'on');
 			else
-				$status=S_UNKNOWN;
+				$status = S_UNKNOWN;
 
 			$interface = reset($host['interfaces']);
 

@@ -227,8 +227,8 @@
 //----------
 
 	$cmbStatus = new CComboBox('status',$status);
-	$cmbStatus->addItem(HOST_STATUS_MONITORED,	_('Monitored'));
-	$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED,	_('Not monitored'));
+	$cmbStatus->addItem(HOST_STATUS_MONITORED, _('Monitored'));
+	$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED, _('Not monitored'));
 
 	$hostList->addRow(_('Status'),$cmbStatus);
 
