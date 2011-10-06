@@ -272,7 +272,7 @@ include_once('include/page_header.php');
 		}
 
 		DBstart();
-		$go_result = update_trigger_status($triggerids, $status);
+		$go_result = updateTriggerStatus($triggerids, $status);
 
 		if($go_result){
 			foreach($triggers as $tnum => $trigger){
@@ -294,51 +294,38 @@ include_once('include/page_header.php');
 		$go_result = DBend($go_result);
 		show_messages($go_result, _('Status updated'), _('Cannot update status'));
 	}
-	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])){
-		if(isset($_REQUEST['copy_targetid']) && ($_REQUEST['copy_targetid'] > 0) && isset($_REQUEST['copy_type'])){
-			if(0 == $_REQUEST['copy_type']){ /* hosts */
+	elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])) {
+		if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
+			if ($_REQUEST['copy_type'] == 0) {	// hosts
 				$hosts_ids = $_REQUEST['copy_targetid'];
 			}
-			else{
-// groups
+			else {	// groups
 				$hosts_ids = array();
 				$group_ids = $_REQUEST['copy_targetid'];
 
-				$sql = 'SELECT DISTINCT h.hostid '.
-					' FROM hosts h, hosts_groups hg'.
-					' WHERE h.hostid=hg.hostid '.
-						' AND '.DBcondition('hg.groupid',$group_ids);
-				$db_hosts = DBselect($sql);
-				while($db_host = DBfetch($db_hosts)){
-					array_push($hosts_ids, $db_host['hostid']);
+				$db_hosts = DBselect(
+					'SELECT DISTINCT h.hostid'.
+						' FROM hosts h,hosts_groups hg'.
+						' WHERE h.hostid=hg.hostid'.
+							' AND '.DBcondition('hg.groupid', $group_ids)
+				);
+				while ($db_host = DBfetch($db_hosts)) {
+					$hosts_ids[] = $db_host['hostid'];
 				}
 			}
-
-			$go_result = false;
-			$new_triggerids = array();
 
 			DBstart();
-			foreach($hosts_ids as $num => $host_id){
-				foreach($_REQUEST['g_triggerid'] as $tnum => $trigger_id){
-					$newtrigid = copy_trigger_to_host($trigger_id, $host_id, true);
-
-					$new_triggerids[$trigger_id] = $newtrigid;
-					$go_result |= (bool) $newtrigid;
-				}
-
-//				replace_triggers_depenedencies($new_triggerids);
-			}
-
+			$go_result = copyTriggersToHosts(get_request('hostid', 0), $_REQUEST['g_triggerid'], $hosts_ids);
 			$go_result = DBend($go_result);
+
+			show_messages($go_result, _('Trigger added'), _('Cannot add trigger'));
 			$_REQUEST['go'] = 'none2';
 		}
-		else{
-			error('No target selection.');
-			$go_result = false;
+		else {
+			show_error_message(_('No target selected'));
 		}
-		show_messages($go_result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
-	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
+	elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
 		$go_result = API::Trigger()->delete($_REQUEST['g_triggerid']);
 		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}

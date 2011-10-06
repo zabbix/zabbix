@@ -46,24 +46,9 @@ function jsRedirect($url,$timeout=null){
 function get_request($name, $def=NULL){
 	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
 }
-
-function inarr_isset($keys, $array=null){
-	if(is_null($array)) $array =& $_REQUEST;
-
-	if(is_array($keys)){
-		foreach($keys as $id => $key){
-			if( !isset($array[$key]) )
-				return false;
-		}
-		return true;
-	}
-
-	return isset($array[$keys]);
-}
 /************ END REQUEST ************/
 
 /************ COOKIES ************/
-
 function get_cookie($name, $default_value=null){
 	if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
 return $default_value;
@@ -252,11 +237,6 @@ function zbx_date2age($start_date, $end_date = 0, $utime = false){
 	return convertUnitsS(abs($end_date - $start_date));
 }
 
-function getmicrotime(){
-	list($usec, $sec) = explode(" ",microtime());
-	return ((float)$usec + (float)$sec);
-}
-
 function zbxDateToTime($strdate){
 	if(6 == sscanf($strdate, '%04d%02d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes, $seconds))
 		return mktime($hours,$minutes,$seconds,$month,$date,$year);
@@ -323,10 +303,6 @@ function zbx_num2bitstr($num,$rev=false){
 	}
 
 return $strbin;
-}
-
-function empty2null($var){
-	return ($var == "") ? null : $var;
 }
 
 function str2mem($val){

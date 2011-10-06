@@ -98,14 +98,14 @@ include_once('include/page_header.php');
 <?php
 /************ MAINTENANCE ****************/
 
-	if(inarr_isset(array('clone','maintenanceid'))){
+	if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
 		unset($_REQUEST['maintenanceid']);
 		$_REQUEST['form'] = 'clone';
 	}
-	else if(isset($_REQUEST['cancel_new_timeperiod'])){
+	elseif (isset($_REQUEST['cancel_new_timeperiod'])) {
 		unset($_REQUEST['new_timeperiod']);
 	}
-	else if(isset($_REQUEST['save'])){
+	elseif (isset($_REQUEST['save'])) {
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
@@ -171,7 +171,7 @@ include_once('include/page_header.php');
 			unset($_REQUEST['maintenanceid']);
 		}
 	}
-	else if(inarr_isset(array('add_timeperiod','new_timeperiod'))){
+	elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])) {
 		$new_timeperiod = $_REQUEST['new_timeperiod'];
 
 		$new_timeperiod['start_date'] = zbxDateToTime($new_timeperiod['start_date']);
@@ -288,13 +288,13 @@ include_once('include/page_header.php');
 			unset($_REQUEST['new_timeperiod']);
 		}
 	}
-	else if(inarr_isset(array('del_timeperiod','g_timeperiodid'))){
+	elseif (isset($_REQUEST['del_timeperiod']) && isset($_REQUEST['g_timeperiodid'])) {
 		$_REQUEST['timeperiods'] = get_request('timeperiods',array());
 		foreach($_REQUEST['g_timeperiodid'] as $val){
 			unset($_REQUEST['timeperiods'][$val]);
 		}
 	}
-	else if(inarr_isset(array('edit_timeperiodid'))){
+	elseif (isset($_REQUEST['edit_timeperiodid'])) {
 		$_REQUEST['edit_timeperiodid'] = array_keys($_REQUEST['edit_timeperiodid']);
 		$edit_timeperiodid = $_REQUEST['edit_timeperiodid'] = array_pop($_REQUEST['edit_timeperiodid']);
 		$_REQUEST['timeperiods'] = get_request('timeperiods',array());

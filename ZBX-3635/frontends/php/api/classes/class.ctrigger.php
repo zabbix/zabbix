@@ -1222,7 +1222,7 @@ COpt::memoryPick();
 				'expression' => null,
 				'error' => 'Trigger just added. No status update so far.',
 				'value'	=> TRIGGER_VALUE_FALSE,
-				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
+				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN
 			);
 		}
 
@@ -1527,14 +1527,13 @@ COpt::memoryPick();
 		foreach ($triggers as $trigger) {
 			if (isset($trigger['dependencies'])) {
 				foreach ($trigger['dependencies'] as $triggerid_up) {
-					DB::insert('trigger_depends', array(
-						'triggerid_down' => $triggerid,
+					DB::insert('trigger_depends', array(array(
+						'triggerid_down' => $trigger['triggerid'],
 						'triggerid_up' => $triggerid_up
-					));
+					)));
 				}
 			}
 		}
-
 	}
 
 	protected function updateReal($triggers){

@@ -327,7 +327,7 @@ include_once('include/page_header.php');
 	else if($templated_hosts){
 		$options['hosts']['templated_hosts'] = true;
 
-// TODO: inconsistancy in "templated_hosts" parameter for host and host group
+// TODO: inconsistency in "templated_hosts" parameter for host and host group
 //		$options['groups']['templated_hosts'] = true;
 	}
 	else{
@@ -465,11 +465,11 @@ include_once('include/page_header.php');
 			$name->attr('id', 'spanid'.$host['hostid']);
 
 			if($host['status'] == HOST_STATUS_MONITORED)
-				$status = new CSpan(S_MONITORED,'off');
+				$status = new CSpan(_('Monitored'), 'off');
 			else if($host['status'] == HOST_STATUS_NOT_MONITORED)
-				$status = new CSpan(S_NOT_MONITORED,'on');
+				$status = new CSpan(_('Not monitored'), 'on');
 			else
-				$status=S_UNKNOWN;
+				$status = S_UNKNOWN;
 
 			$interface = reset($host['interfaces']);
 
@@ -714,7 +714,7 @@ include_once('include/page_header.php');
 		$form->setName('usrgrpform');
 		$form->setAttribute('id', 'usrgrps');
 
-		$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
+		$table = new CTableInfo(_('No user groups defined.'));
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox("all_usrgrps", NULL, "javascript: checkAll('".$form->getName()."', 'all_usrgrps','usrgrps');") : null),
 			S_NAME
@@ -769,12 +769,12 @@ include_once('include/page_header.php');
 		$form->setName('userform');
 		$form->setAttribute('id', 'users');
 
-		$table = new CTableInfo(S_NO_USERS_DEFINED);
+		$table = new CTableInfo(_('No users defined.'));
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox("all_users", NULL, "javascript: checkAll('".$form->getName()."', 'all_users','users');") : null),
-			S_ALIAS,
-			S_NAME,
-			S_SURNAME
+			_('Alias'),
+			_('Name'),
+			_('Surname')
 		));
 
 

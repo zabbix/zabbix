@@ -50,7 +50,7 @@ include_once('include/page_header.php');
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);
 
-	$start_time = time(NULL);
+	$start_time = microtime(true);
 
 	$sizeX		= 900;
 	$sizeY		= 300;
@@ -174,8 +174,12 @@ include_once('include/page_header.php');
 
 	imagestringup($im,0,imagesx($im)-10,imagesy($im)-50, 'http://www.zabbix.com', $gray);
 
-	$end_time=time(NULL);
-	imagestring($im, 0,imagesx($im)-100,imagesy($im)-12,'Generated in '.($end_time-$start_time).' sec', $gray);
+
+	$str = sprintf('%0.2f', microtime(true) - $start_time);
+	$str = _s('Generated in %s sec', $str);
+	$strSize = imageTextSize(6, 0, $str);
+	imageText($im, 6, 0, imagesx($im) - $strSize['width'] - 5, imagesy($im) - 5, $gray, $str);
+
 
 	ImageOut($im);
 	imagedestroy($im);

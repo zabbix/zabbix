@@ -401,12 +401,17 @@ include_once('include/page_header.php');
 
 			// Full clone
 			if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
+				if (!copyApplications($clone_templateid, $templateid)) {
+					throw new Exception();
+				}
 
-				if(!copy_applications($clone_templateid, $templateid)) throw new Exception();
+				if (!copyItems($clone_templateid, $templateid)) {
+					throw new Exception();
+				}
 
-				if(!copyItems($clone_templateid, $templateid)) throw new Exception();
-
-				if(!copy_triggers($clone_templateid, $templateid)) throw new Exception();
+				if (!copyTriggers($clone_templateid, $templateid)) {
+					throw new Exception();
+				}
 
 				// Host graphs
 				$options = array(
@@ -439,26 +444,42 @@ include_once('include/page_header.php');
 		unset($_REQUEST['save']);
 	}
 	/**
-	 * Delete, delete_and_clear
+	 * Delete
 	 */
-	else if((isset($_REQUEST['delete']) || isset($_REQUEST['delete_and_clear'])) && isset($_REQUEST['templateid'])){
+	elseif (isset($_REQUEST['delete']) && isset($_REQUEST['templateid'])) {
 		DBstart();
 
 		$go_result = true;
-		if(isset($_REQUEST['delete'])){
-			$result = API::Template()->massUpdate(array(
-				'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
-				'hosts' => array()
-			));
-		}
-		if($result)
+		$result = API::Template()->massUpdate(array(
+			'templates' => zbx_toObject($_REQUEST['templateid'], 'templateid'),
+			'hosts' => array()
+		));
+		if ($result) {
 			$result = API::Template()->delete($_REQUEST['templateid']);
+		}
 
 		$result = DBend($result);
 
-		show_messages($result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
-		if($result){
-/*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$host['host'].']');*/
+		show_messages($result, _('Template deleted'), _('Cannot delete template'));
+		if ($result) {
+			unset($_REQUEST['form']);
+			unset($_REQUEST['templateid']);
+		}
+		unset($_REQUEST['delete']);
+	}
+	/**
+	 * Delete_and_clear
+	 */
+	elseif (isset($_REQUEST['delete_and_clear']) && isset($_REQUEST['templateid'])) {
+		DBstart();
+
+		$go_result = true;
+		$result = API::Template()->delete($_REQUEST['templateid']);
+
+		$result = DBend($result);
+
+		show_messages($result, _('Template deleted'), _('Cannot delete template'));
+		if ($result) {
 			unset($_REQUEST['form']);
 			unset($_REQUEST['templateid']);
 		}
@@ -482,7 +503,7 @@ include_once('include/page_header.php');
 
 		$go_result = DBend($go_result);
 
-		show_messages($go_result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
+		show_messages($go_result, _('Template deleted'), _('Cannot delete template'));
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
@@ -524,7 +545,9 @@ include_once('include/page_header.php');
 			$template_wdgt->addItem(import_host_form(true));
 		}
 		else{
-			$template_wdgt->addItem(get_header_host_table(get_request('templateid',0), 'template'));
+			if ($templateid = get_request('templateid', 0)) {
+				$template_wdgt->addItem(get_header_host_table($templateid));
+			}
 
 			$templateForm = new CView('configuration.template.edit');
 			$template_wdgt->addItem($templateForm->render());

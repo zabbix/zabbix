@@ -23,7 +23,6 @@ require_once('include/graphs.inc.php');
 require_once('include/screens.inc.php');
 require_once('include/maps.inc.php');
 require_once('include/users.inc.php');
-require_once('include/requirements.inc.php');
 
 
 // Author: Aly
@@ -278,7 +277,7 @@ function make_system_status($filter){
 // }}} SELECT TRIGGERS
 
 
-	foreach($groups as $gnum => $group){
+	foreach($groups as $group){
 		$group_row = new CRow();
 		if(is_show_all_nodes())
 			$group_row->addItem(get_node_name_by_elid($group['groupid']));
@@ -357,9 +356,10 @@ function make_system_status($filter){
 					}
 //----
 
+					$trigger['hostname'] = $trigger['hosts'][0]['name'];
 					$table_inf_unack->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
-						$trigger['host'],
+						$trigger['hostname'],
 						new CCol($trigger['description'], getSeverityStyle($trigger['priority'])),
 						zbx_date2age($event['clock']),
 						$unknown,
@@ -491,15 +491,15 @@ function make_hoststat_summary($filter){
 	$highest_severity = array();
 	$highest_severity2 = array();
 
-	foreach($triggers as $tnum => $trigger){
-		foreach($trigger['hosts'] as $thnum => $trigger_host){
+	foreach($triggers as $trigger){
+		foreach($trigger['hosts'] as $trigger_host){
 			if(!isset($hosts[$trigger_host['hostid']])) continue;
 			else $host = $hosts[$trigger_host['hostid']];
 
 			if($filter['extAck'] && isset($hosts_with_unack_triggers[$host['hostid']])){
 				if(!isset($lastUnack_host_list[$host['hostid']])){
 					$lastUnack_host_list[$host['hostid']] = array();
-					$lastUnack_host_list[$host['hostid']]['host'] = $host['host'];
+					$lastUnack_host_list[$host['hostid']]['host'] = $host['name'];
 					$lastUnack_host_list[$host['hostid']]['hostid'] = $host['hostid'];
 					$lastUnack_host_list[$host['hostid']]['severities'] = array();
 					$lastUnack_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_DISASTER] = 0;
@@ -788,10 +788,11 @@ function make_status_of_zbx(){
 
 
 // CHECK REQUIREMENTS {{{
-	if(CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN){
-		$reqs = check_php_requirements();
-		foreach($reqs as $req){
-			if($req['result'] == false){
+	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+
+		$reqs = FrontendSetup::i()->checkRequirements();
+		foreach ($reqs as $req) {
+			if ($req['result'] == false) {
 				$table->addRow(array(
 					new CSpan($req['name'], 'red'),
 					new CSpan($req['current'], 'red'),
@@ -800,7 +801,7 @@ function make_status_of_zbx(){
 			}
 		}
 	}
-// }}}CHECK REQUIREMENTS
+// }}} CHECK REQUIREMENTS
 
 	$script = new CJSScript(get_js("jQuery('#hat_stszbx_footer').html('"._s('Updated: %s',zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT))."')"));
 
@@ -812,10 +813,9 @@ return new CDiv(array($table, $script));
  * Create and return a DIV with latest problem triggers
  * @author Aly
  * @param array $filter
- * @param bool $showStatus
  * @return CDiv
  */
-function make_latest_issues($filter = array(), $showStatus=false){
+function make_latest_issues(array $filter = array()) {
 	$config = select_config();
 
 	$options = array(
@@ -1020,22 +1020,10 @@ function make_latest_issues($filter = array(), $showStatus=false){
 				true // update blinking
 			);
 
-			if($showStatus){
-				$statusSpan = new CSpan(trigger_value2str($event['value']));
-				// add colors and blinking to span depending on configuration and trigger parameters
-				addTriggerValueStyle(
-					$statusSpan,
-					$event['value'],
-					$event['clock'],
-					$event['acknowledged']
-				);
-			}
-
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
 				$host,
 				$description,
-				$showStatus ? $statusSpan : null,
 				$clock,
 				zbx_date2age($event['clock']),
 				$unknown,

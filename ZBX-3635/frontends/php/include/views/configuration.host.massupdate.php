@@ -88,8 +88,8 @@ $frmHost->addRow(array(
 //----------
 
 $cmbStatus = new CComboBox('status', $status);
-$cmbStatus->addItem(HOST_STATUS_MONITORED,	S_MONITORED);
-$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
+$cmbStatus->addItem(HOST_STATUS_MONITORED, _('Monitored'));
+$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED, _('Not monitored'));
 
 $frmHost->addRow(array(
 	new CVisibilityBox('visible[status]', isset($visible['status']), 'status', _('Original')),

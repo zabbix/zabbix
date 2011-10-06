@@ -109,21 +109,22 @@ include_once('include/page_header.php');
 				$result = API::HostGroup()->massUpdate($data);
 			}
 			$result = DBend($result);
-			if($result){
+			if ($result) {
 				$group = reset($groups);
 				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'], 'groups', array('name' => $old_group['name']), array('name' => $group['name']));
 			}
 
-			$msg_ok = S_GROUP_UPDATED;
-			$msg_fail = S_CANNOT_UPDATE_GROUP;
+			$msg_ok = _('Group updated');
+			$msg_fail = _('Cannot update group');
 		}
-		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+		else {
+			if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 				access_deny();
+			}
 
 			DBstart();
 			$result = API::HostGroup()->create(array('name' => $_REQUEST['gname']));
-			if($result){
+			if ($result) {
 				$options = array(
 					'groupids' => $result['groupids'],
 					'output' => API_OUTPUT_EXTEND
@@ -145,8 +146,8 @@ include_once('include/page_header.php');
 
 			$result = DBend($result);
 
-			$msg_ok		= S_GROUP_ADDED;
-			$msg_fail	= S_CANNOT_ADD_GROUP;
+			$msg_ok = _('Group added');
+			$msg_fail = _('Cannot add group');
 		}
 
 		show_messages($result, $msg_ok, $msg_fail);
@@ -160,7 +161,7 @@ include_once('include/page_header.php');
 		$result = API::HostGroup()->delete($_REQUEST['groupid']);
 		$result = DBend($result);
 
-		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+		show_messages($result, _('Group deleted'), _('Cannot delete group'));
 
 		if($result){
 			unset($_REQUEST['form']);
@@ -172,7 +173,7 @@ include_once('include/page_header.php');
 		$groups = get_request('groups', array());
 		$go_result = API::HostGroup()->delete($groups);
 
-		show_messages($go_result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+		show_messages($go_result, _('Group deleted'), _('Cannot delete group'));
 	}
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable'))){
 
@@ -220,7 +221,7 @@ include_once('include/page_header.php');
 	}
 	else{
 		$frmForm = new CForm();
-		$frmForm->addItem(new CSubmit('form', S_CREATE_GROUP));
+		$frmForm->addItem(new CSubmit('form', _('Create group')));
 	}
 
 	$groups_wdgt = new CWidget();
@@ -258,7 +259,7 @@ include_once('include/page_header.php');
 			$frmHostG->addVar('groupid', $groupid);
 		}
 
-		$frmHostG->addRow(S_GROUP_NAME, new CTextBox('gname', $group_name, 48));
+		$frmHostG->addRow(_('Group name'), new CTextBox('gname', $group_name, 48));
 
 // select all possible groups
 		$params = array(
@@ -373,7 +374,7 @@ include_once('include/page_header.php');
 			new CCheckBox('all_groups', NULL, "checkAll('".$form->getName()."','all_groups','groups');"),
 			make_sorting_header(S_NAME, 'name'),
 			' # ',
-			S_MEMBERS
+			_('Members')
 		));
 
 		$sortfield = getPageSortField('name');

@@ -775,14 +775,19 @@ else {
 			$nodes = zbx_toArray($nodes);
 		}
 
-		$sql = '';
-		foreach ($nodes as $nnum => $nodeid) {
-			$sql.= '('.$id_name.'  BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999)';
-			$sql.= ' OR ';
+		if (count($nodes) == 1) {
+			$sql = $id_name.' BETWEEN '.$nodes[0].'00000000000000 AND '.$nodes[0].'99999999999999';
+		}
+		else {
+			$sql = '';
+			foreach ($nodes as $nodeid) {
+				$sql .= '('.$id_name.' BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999) OR ';
+			}
+
+			$sql = '('.rtrim($sql, ' OR ').')';
 		}
 
-		$sql = '('.trim($sql, 'OR ').')';
-	return $sql;
+		return $sql;
 	}
 
 	function in_node($id_var, $nodes = null) {
@@ -898,8 +903,13 @@ else {
 
 		$search = array();
 		foreach ($options['search'] as $field => $pattern) {
-			if (!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
-			if ($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
+			if (!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) {
+				continue;
+			}
+			if ($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR
+				&& $tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_TEXT) {
+				continue;
+			}
 
 			// escaping parameter that is about to be used in LIKE statement
 			$pattern = str_replace("!", "!!", $pattern);
