@@ -12,8 +12,12 @@
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg value="--enable-agent"/>
 			<arg value="--with-libcurl"/>
+			<arg value="--prefix=${builddir}"/>
 		</exec>
-		<exec executable="make" dir="${builddir}" failonerror="on"/>
+		<exec executable="make" dir="${builddir}" failonerror="on">
+			<arg value="-j4"/>
+			<arg value="install"/>
+		</exec>
 	</target>
 
 	<target name="buildserver">
@@ -28,7 +32,9 @@
 			<arg value="--with-libcurl"/>
 			<arg value="--with-jabber"/>
 		</exec>
-		<exec executable="make" dir="${builddir}" failonerror="on"/>
+		<exec executable="make" dir="${builddir}" failonerror="on">
+			<arg value="-j4"/>
+		</exec>
 	</target>
 
 	<target name="buildproxy">
@@ -43,7 +49,9 @@
 			<arg value="--with-libcurl"/>
 			<arg value="--with-jabber"/>
 		</exec>
-		<exec executable="make" dir="${builddir}" failonerror="on"/>
+		<exec executable="make" dir="${builddir}" failonerror="on">
+			<arg value="-j4"/>
+		</exec>
 	</target>
 
 	<target name="init-common">
@@ -59,6 +67,7 @@
 			<arg line="dbschema"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on">
+			<arg value="-j4"/>
 			<arg line="dist"/>
 		</exec>
 	</target>
@@ -147,6 +156,13 @@
 		</exec>
 	</target>
 
+	<target name="runagent" depends="buildagent">
+		<!-- Execute Agent with default config file -->
+		<exec executable="zabbix_agentd" dir="${builddir}/sbin" failonerror="on">
+			<arg line="--config=${builddir}/conf/zabbix_agentd.conf"/>
+		</exec>
+	</target>
+
 	<target name="init-mysql" depends="init-common">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
@@ -188,15 +204,15 @@
 		</delete>
 	</target>
 
-	<target name="gui">
+	<target name="test-all">
 		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=${builddir}/frontends/php/tests/bootstrap.php all.php"/>
 		</exec>
 	</target>
 
-	<target name="build-mysql" depends="clean,init-mysql,buildagent,buildproxy,buildserver,gui" />
-	<target name="build-postgresql" depends="clean,init-postgresql,buildagent,buildproxy,buildserver,gui" />
-	<target name="build-sqlite3" depends="clean,init-sqlite3,buildagent,buildproxy,buildserver,gui" />
+	<target name="build-mysql" depends="clean,init-mysql,buildagent,buildproxy,buildserver,runagent,test-all" />
+	<target name="build-postgresql" depends="clean,init-postgresql,buildagent,buildproxy,buildserver,runagent,test-all" />
+	<target name="build-sqlite3" depends="clean,init-sqlite3,buildagent,buildproxy,buildserver,runagent,test-all" />
 
 	<!-- Default target -->
 	<target name="build" depends="build-mysql,build-postgresql" />
