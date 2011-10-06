@@ -21,7 +21,7 @@
 <?php
 require_once(dirname(__FILE__).'/testMetrics.php');
 
-class GeneralTests
+class AgentTests
 {
 	public static function suite()
 	{
