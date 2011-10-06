@@ -174,57 +174,45 @@ void	free_result(AGENT_RESULT *result)
  */
 int	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len)
 {
-	char	*pl, *pr;
-	size_t	sz;
+	const char	*pl, *pr;
+	size_t		sz;
 
-	pl = strchr(command, '[');
-	pr = strrchr(command, ']');
-
-	if (pl > pr)
-		return 0;
-
-	if (NULL != pl && NULL == pr)
-		return 0;
-
-	if (NULL == pl && NULL != pr)
-		return 0;
-
-	if (NULL == pl && NULL == pr) /* simple check? */
-	{
-		if (NULL != (pl = strchr(command, ',')))
-		{
-			for (pr = pl + 1; '\0' != *pr; pr++);
-		}
-	}
+	for (pl = command; SUCCEED == is_key_char(*pl); pl++)
+		;
 
 	if (NULL != cmd)
 	{
-		if (NULL != pl)
-		{
-			if (cmd_max_len < (sz = (size_t)(pl - command) + 1))
-				sz = cmd_max_len;
-			memcpy(cmd, command, sz - 1);
-			cmd[sz - 1] = '\0';
-		}
-		else
-			zbx_strlcpy(cmd, command, cmd_max_len);
+		if (cmd_max_len <= (sz = (size_t)(pl - command)))
+			return 0;
+
+		memcpy(cmd, command, sz);
+		cmd[sz] = '\0';
 	}
 
-	if (NULL != param)
-		*param = '\0';
-
-	if (NULL != pl && NULL != pr)
+	if ('\0' == *pl)	/* no parameters specified */
 	{
 		if (NULL != param)
-		{
-			if (param_max_len < (sz = (size_t)(pr - pl)))
-				sz = param_max_len;
-			memcpy(param, pl + 1, sz - 1);
-			param[sz - 1] = '\0';
-		}
-	}
-	else
+			*param = '\0';
 		return 1;
+	}
+
+	if ('[' != *pl)		/* unsupported character */
+		return 0;
+
+	for (pr = ++pl; '\0' != *pr; pr++)
+		;
+
+	if (']' != *--pr)
+		return 0;
+
+	if (NULL != param)
+	{
+		if (param_max_len <= (sz = (size_t)(pr - pl)))
+			return 0;
+
+		memcpy(param, pl, sz);
+		param[sz] = '\0';
+	}
 
 	return 2;
 }
@@ -348,7 +336,6 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
-	char	*p;
 	int	i = 0;
 
 	int	(*function)() = NULL;
@@ -359,7 +346,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	char	usr_param[MAX_STRING_LEN];
 
 	char	usr_command[MAX_STRING_LEN];
-	int	usr_command_len;
 
 	char	param[MAX_STRING_LEN], error[MAX_STRING_LEN];
 
@@ -369,14 +355,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	*error = '\0';
 
 	alias_expand(in_command, usr_command, sizeof(usr_command));
-
-	usr_command_len = (int)strlen(usr_command);
-
-	for (p = usr_command + usr_command_len - 1; p > usr_command && NULL != strchr(ZBX_WHITESPACE, *p); --p)
-		;
-
-	if (NULL != strchr(ZBX_WHITESPACE, p[1]))
-		p[1] = '\0';
 
 	if (0 != parse_command(usr_command, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param)))
 	{
@@ -390,21 +368,20 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 	}
 
-	param[0] = '\0';
+	*param = '\0';
 
 	if (NULL != function)
 	{
 		if (0 != (commands[i].flags & CF_USEUPARAM))
 		{
-			if (0 != (flags & PROCESS_TEST) &&
-					0 != (flags & PROCESS_USE_TEST_PARAM) &&
+			if (0 != (flags & PROCESS_TEST) && 0 != (flags & PROCESS_USE_TEST_PARAM) &&
 					NULL != commands[i].test_param)
 			{
 				zbx_strlcpy(usr_param, commands[i].test_param, sizeof(usr_param));
 			}
 		}
 		else
-			usr_param[0] = '\0';
+			*usr_param = '\0';
 
 		if (NULL != commands[i].main_param)
 		{
