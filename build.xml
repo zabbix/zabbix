@@ -210,9 +210,9 @@
 		</exec>
 	</target>
 
-	<target name="build-mysql" depends="clean,buildagent,buildproxy,buildserver,runagent,init-mysql,test-all" />
-	<target name="build-postgresql" depends="clean,buildagent,buildproxy,buildserver,runagent,init-postgresql,test-all" />
-	<target name="build-sqlite3" depends="clean,buildagent,buildproxy,buildserver,runagent,init-sqlite3,test-all" />
+	<target name="build-mysql" depends="clean,init-mysql,buildagent,buildproxy,buildserver,runagent,test-all" />
+	<target name="build-postgresql" depends="clean,init-postgresql,buildagent,buildproxy,buildserver,runagent,test-all" />
+	<target name="build-sqlite3" depends="clean,init-sqlite3,buildagent,buildproxy,buildserver,runagent,test-all" />
 
 	<!-- Default target -->
 	<target name="build" depends="build-mysql,build-postgresql" />
