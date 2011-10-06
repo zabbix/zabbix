@@ -148,7 +148,7 @@ class testMetrics extends CZabbixTest
 	public function testMetrics_remoteGet($metric, $type, $pattern, $range_from, $range_to)
 	{
 		$agent_ip = "127.0.0.1";
-		$binary = "/home/hudson/public_html/".PHPUNIT_URL."/zabbix_get";
+		$binary = "/home/hudson/public_html/".PHPUNIT_URL."/bin/zabbix_get";
 
 		$cmd = "$binary -s $agent_ip -k '$metric'";
 
