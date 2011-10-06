@@ -23,19 +23,16 @@
 
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	mode[8];
+	char	tmp[16];
 	int	name;
 	long	ncpu;
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, mode, sizeof(mode)))
-		*mode = '\0';
-
-	if ('\0' == *mode || 0 == strcmp(mode, "online"))	/* default parameter */
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "online"))
 		name = _SC_NPROCESSORS_ONLN;
-	else if (0 == strcmp(mode, "max"))
+	else if (0 == strcmp(tmp, "max"))
 		name = _SC_NPROCESSORS_CONF;
 	else
 		return SYSINFO_RET_FAIL;
@@ -51,23 +48,17 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[16];
-	int	cpu_num, mode, state;
+	int	cpu_num, state, mode;
 
-	if (num_param(param) > 3)
+	if (3 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "all"))	/* default parameter */
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
-	else if (1 > (cpu_num = atoi(tmp) + 1))
+	else if (SUCCEED != is_uint(tmp) || 1 > (cpu_num = atoi(tmp) + 1))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "user"))	/* default parameter */
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "user"))
 		state = ZBX_CPU_STATE_USER;
 	else if (0 == strcmp(tmp, "iowait"))
 		state = ZBX_CPU_STATE_IOWAIT;
@@ -78,10 +69,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
+	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		mode = ZBX_AVG1;
 	else if (0 == strcmp(tmp, "avg5"))
 		mode = ZBX_AVG5;
@@ -94,99 +82,96 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 }
 
 #ifdef HAVE_KSTAT_H
-static int	get_kstat_system_misc(char *s, int *value)
+static int	get_kstat_system_misc(char *key, int *value)
 {
 	kstat_ctl_t	*kc;
-	kstat_t		*kp;
+	kstat_t		*ksp;
 	kstat_named_t	*kn = NULL;
-	int		n, i;
+	int		ret = FAIL;
 
 	if (NULL == (kc = kstat_open()))
-		return FAIL;
+		return ret;
 
-	if (NULL == (kp = kstat_lookup(kc, "unix", 0, "system_misc")))
-	{
-		kstat_close(kc);
-		return FAIL;
-	}
+	if (NULL == (ksp = kstat_lookup(kc, "unix", 0, "system_misc")))
+		goto close;
 
-	if (-1 == kstat_read(kc, kp, NULL))
-	{
-		kstat_close(kc);
-		return FAIL;
-	}
+	if (-1 == kstat_read(kc, ksp, NULL))
+		goto close;
 
-	if (NULL == (kn = (kstat_named_t*)kstat_data_lookup(kp, s)))
-	{
-		kstat_close(kc);
-		return FAIL;
-	}
-
-	kstat_close(kc);
+	if (NULL == (kn = (kstat_named_t *)kstat_data_lookup(ksp, key)))
+		goto close;
 
 	*value = kn->value.ul;
 
-	return SUCCEED;
+	ret = SUCCEED;
+close:
+	kstat_close(kc);
+
+	return ret;
 }
 #endif
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+	char	tmp[16];
+	double	value;
+	int	per_cpu = 1, cpu_num;
 #if defined(HAVE_GETLOADAVG)
-	double	load[3];
+	int	mode;
+	double	load[ZBX_AVG_COUNT];
 #elif defined(HAVE_KSTAT_H)
 	char	*key;
-	int	value;
+	int	load;
 #endif
-	char	tmp[MAX_STRING_LEN];
 
-	if (num_param(param) > 2)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+		per_cpu = 0;
+	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
-
-	if ('\0' != *tmp && 0 != strcmp(tmp, "all"))	/* default parameter */
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
 
 #if defined(HAVE_GETLOADAVG)
-	if (-1 == getloadavg(load, 3))
-		return SYSINFO_RET_FAIL;
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
-	{
-		SET_DBL_RESULT(result, load[0]);
-	}
-	else if ('\0' == *tmp || 0 == strcmp(tmp, "avg5"))
-	{
-		SET_DBL_RESULT(result, load[1]);
-	}
-	else if ('\0' == *tmp || 0 == strcmp(tmp, "avg15"))
-	{
-		SET_DBL_RESULT(result, load[2]);
-	}
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+		mode = ZBX_AVG1;
+	else if (0 == strcmp(tmp, "avg5"))
+		mode = ZBX_AVG5;
+	else if (0 == strcmp(tmp, "avg15"))
+		mode = ZBX_AVG15;
 	else
 		return SYSINFO_RET_FAIL;
+
+	if (mode >= getloadavg(load, 3))
+		return SYSINFO_RET_FAIL;
+
+	value = load[mode];
 #elif defined(HAVE_KSTAT_H)
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		key = "avenrun_1min";
-	else if ('\0' == *tmp || 0 == strcmp(tmp, "avg5"))
+	else if (0 == strcmp(tmp, "avg5"))
 		key = "avenrun_5min";
-	else if ('\0' == *tmp || 0 == strcmp(tmp, "avg15"))
+	else if (0 == strcmp(tmp, "avg15"))
 		key = "avenrun_15min";
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (FAIL == get_kstat_system_misc(key, &value))
+	if (FAIL == get_kstat_system_misc(key, &load))
 		return SYSINFO_RET_FAIL;
 
-	SET_DBL_RESULT(result, (double)value/FSCALE);
+	value = (double)load / FSCALE;
 #else
 	return SYSINFO_RET_FAIL;
 #endif
+	if (1 == per_cpu)
+	{
+		if (0 >= (cpu_num = sysconf(_SC_NPROCESSORS_ONLN)))
+			return SYSINFO_RET_FAIL;
+		value /= cpu_num;
+	}
+
+	SET_DBL_RESULT(result, value);
+
 	return SYSINFO_RET_OK;
 }
 
@@ -195,30 +180,29 @@ int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGEN
 	kstat_ctl_t	*kc;
 	kstat_t		*k;
 	cpu_stat_t	*cpu;
+	int		cpu_count = 0;
+	double		swt_count = 0.0;
 
-	int	cpu_count = 0;
-	double	swt_count = 0.0;
-
-	kc = kstat_open();
-
-	if(kc != NULL)
+	if (NULL != (kc = kstat_open()))
 	{
 		k = kc->kc_chain;
-		while (k != NULL)
+
+		while (NULL != k)
 		{
-			if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
-					(kstat_read(kc, k, NULL) != -1) )
+			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
 			{
-				cpu = (cpu_stat_t*) k->ks_data;
-				swt_count += (double) cpu->cpu_sysinfo.pswitch;
+				cpu = (cpu_stat_t *)k->ks_data;
+				swt_count += (double)cpu->cpu_sysinfo.pswitch;
 				cpu_count += 1;
 			}
+
 			k = k->ks_next;
 		}
+
 		kstat_close(kc);
 	}
 
-	if(cpu_count == 0)
+	if (0 == cpu_count)
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, swt_count);
@@ -231,30 +215,29 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	kstat_ctl_t	*kc;
 	kstat_t		*k;
 	cpu_stat_t	*cpu;
+	int		cpu_count = 0;
+	double		intr_count = 0.0;
 
-	int	cpu_count = 0;
-	double	intr_count = 0.0;
-
-	kc = kstat_open();
-
-	if(kc != NULL)
+	if (NULL != (kc = kstat_open()))
 	{
 		k = kc->kc_chain;
-		while (k != NULL)
+
+		while (NULL != k)
 		{
-			if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
-					(kstat_read(kc, k, NULL) != -1) )
+			if (0 == strncmp(k->ks_name, "cpu_stat", 8) && -1 != kstat_read(kc, k, NULL))
 			{
-				cpu = (cpu_stat_t*) k->ks_data;
-				intr_count += (double) cpu->cpu_sysinfo.intr;
+				cpu = (cpu_stat_t *)k->ks_data;
+				intr_count += (double)cpu->cpu_sysinfo.intr;
 				cpu_count += 1;
 			}
+
 			k = k->ks_next;
 		}
+
 		kstat_close(kc);
 	}
 
-	if(cpu_count == 0)
+	if (0 == cpu_count)
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, intr_count);
