@@ -158,7 +158,7 @@
 
 	<target name="runagent" depends="buildagent">
 		<!-- Execute Agent with default config file -->
-		<exec executable="zabbix_agentd" dir="${builddir}/sbin" failonerror="on">
+		<exec executable="${builddir}/zabbix_agentd" dir="${builddir}/sbin" failonerror="on">
 			<arg line="--config=${builddir}/conf/zabbix_agentd.conf"/>
 		</exec>
 	</target>
