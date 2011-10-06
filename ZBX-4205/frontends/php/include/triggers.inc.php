@@ -1497,31 +1497,6 @@ function utf8RawUrlDecode($source){
 						' WHERE '.DBcondition('triggerid',$triggerids));
 	}
 
-// Update Trigger status
-	function update_trigger_status($triggerids,$status){
-		zbx_value2array($triggerids);
-
-// first update status for child triggers
-		$upd_chd_triggers = array();
-		$db_chd_triggers = get_triggers_by_templateid($triggerids);
-		while($db_chd_trigger = DBfetch($db_chd_triggers)){
-			$upd_chd_triggers[$db_chd_trigger['triggerid']] = $db_chd_trigger['triggerid'];
-		}
-
-		if(!empty($upd_chd_triggers)){
-			update_trigger_status($upd_chd_triggers,$status);
-		}
-
-		DBexecute('UPDATE triggers SET status='.$status.' WHERE '.DBcondition('triggerid',$triggerids));
-
-		if($status != TRIGGER_STATUS_ENABLED){
-			addEvent($triggerids, TRIGGER_VALUE_UNKNOWN);
-			DBexecute('UPDATE triggers SET lastchange='.time().', value='.TRIGGER_VALUE_UNKNOWN.' WHERE '.DBcondition('triggerid',$triggerids).' AND value<>'.TRIGGER_VALUE_UNKNOWN);
-		}
-
-	return true;
-	}
-
 	/*
 	 * Function: extract_numbers
 	 *
