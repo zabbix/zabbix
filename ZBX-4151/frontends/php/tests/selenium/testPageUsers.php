@@ -41,7 +41,7 @@ class testPageUsers extends CWebTest
 
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 		$this->ok('Displaying');
-		$this->ok(array('Alias','Name','Surname','User type','Groups','Is online?','Login','GUI access','Debug mode','Status'));
+		$this->ok(array('Alias','Name','Surname','User type','Groups','Is online?','Login','Frontend access','Debug mode','Status'));
 		$this->ok(array($user['alias'],$user['name'],$user['surname']));
 		$this->dropdown_select('go','Unblock selected');
 		$this->dropdown_select('go','Delete selected');

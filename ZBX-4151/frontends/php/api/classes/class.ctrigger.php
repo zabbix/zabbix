@@ -1220,7 +1220,8 @@ COpt::memoryPick();
 				'description' => null,
 				'expression' => null,
 				'error' => 'Trigger just added. No status update so far.',
-				'value'	=> 2,
+				'value'	=> TRIGGER_VALUE_FALSE,
+				'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN
 			);
 		}
 
