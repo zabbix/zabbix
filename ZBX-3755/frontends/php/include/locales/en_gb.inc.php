@@ -638,8 +638,6 @@
 	'S_DNS'=>					_('DNS'),
 	'S_IP'=>					_('IP'),
 	'S_PORT'=>					_('Port'),
-	'S_MONITORED'=>					_('Monitored'),
-	'S_NOT_MONITORED'=>				_('Not monitored'),
 	'S_TEMPLATE'=>					_('Template'),
 	'S_DELETED'=>					_('Deleted'),
 	'S_UNKNOWN'=>					_('Unknown'),
@@ -1663,9 +1661,7 @@
 
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					_('No trigger with'),
-	'S_INCORRECT_USAGE_OF_QUOTES'=>				_('Incorrect usage of quotes'),
 	'S_EXPRESSION_CANNOT_BE_EMPTY'=>			_('Expression cannot be empty'),
-	'S_FOR_HOST_SMALL'=>					_('for host'),
 	'S_INCORRECT_VALUE_TYPE'=>				_('Incorrect value type'),
 	'S_FOR_FUNCTION_SMALL'=>				_('for function'),
 	'S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL'=>	_('available only for items with value types'),
@@ -1674,9 +1670,6 @@
 	'S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL'=>	_('is not a float or counter or macro for function'),
 	'S_INCORRECT_TRIGGER_EXPRESSION'=>			_('Incorrect trigger expression'),
 	'S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR'=>		_('You can not use template hosts in mixed expressions.'),
-	'S_ADDED_TRIGGER'=>					_('Added trigger'),
-	'S_TO_HOST_SMALL'=>					_('to host'),
-	'S_MISSING_KEY'=>					_('Missing key'),
 	'S_INCORRECT_FUNCTION_IS_USED'=>			_('Incorrect function is used'),
 	'S_0_OR_1'=>						_('0 or 1'),
 	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	_('At least one item must be present in the trigger expression.'),
@@ -1684,7 +1677,6 @@
 	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		_('Host key does not exist.'),
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	_('Function \''),
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	_('\' does not accept parameters.'),
-	'S_WRONG_DEPENDENCY_ERROR' =>	_('Error adding dependencies. Following dependencies are not allowed: 1) from a host trigger to a template trigger; 2) from a template trigger to a host trigger; 3) between template triggers, where templates have links to other templates.'),
 
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	_('Transaction has not been closed. Aborting..'),
