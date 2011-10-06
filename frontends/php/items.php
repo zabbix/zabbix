@@ -370,7 +370,7 @@ switch($itemType) {
 		$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 		array_push($_REQUEST['delay_flex'],$_REQUEST['new_delay_flex']);
 	}
-	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
+	elseif(isset($_REQUEST['delete'])&&isset($_REQUEST['itemid'])){
 		$result = false;
 		if($item = get_item_by_itemid($_REQUEST['itemid'])){
 			$result = API::Item()->delete($_REQUEST['itemid']);
@@ -385,94 +385,95 @@ switch($itemType) {
 		unset($_REQUEST['itemid']);
 		$_REQUEST['form'] = 'clone';
 	}
-	else if(isset($_REQUEST['save']) && ($_REQUEST['form_hostid'] > 0)){
-		$delay_flex = get_request('delay_flex',array());
+	elseif (isset($_REQUEST['save']) && $_REQUEST['form_hostid'] > 0) {
+		$delay_flex = get_request('delay_flex', array());
 		$db_delay_flex = '';
-		foreach($delay_flex as $num => $val){
+		foreach($delay_flex as $num => $val) {
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		}
-		$db_delay_flex = trim($db_delay_flex,';');
+		$db_delay_flex = trim($db_delay_flex, ';');
 
 
-		$applications = get_request('applications',array());
+		$applications = get_request('applications', array());
 		$fapp = reset($applications);
-		if($fapp == 0) array_shift($applications);
+		if ($fapp == 0) {
+			array_shift($applications);
+		}
 
 		DBstart();
 
-		if(!zbx_empty($_REQUEST['new_application'])){
+		if (!zbx_empty($_REQUEST['new_application'])) {
 			$new_appid = API::Application()->create(array(
 				'name' => $_REQUEST['new_application'],
 				'hostid' => $_REQUEST['form_hostid']
 			));
-			if($new_appid){
+			if ($new_appid) {
 				$new_appid = reset($new_appid['applicationids']);
 				$applications[$new_appid] = $new_appid;
 			}
 		}
 
 		$item = array(
-			'name'	=> get_request('name'),
-			'description'	=> get_request('description'),
-			'key_'			=> get_request('key'),
-			'hostid'		=> get_request('form_hostid'),
-			'interfaceid'	=> get_request('interfaceid', 0),
-			'delay'			=> get_request('delay'),
-			'history'		=> get_request('history'),
-			'status'		=> get_request('status'),
-			'type'			=> get_request('type'),
-			'snmp_community'=> get_request('snmp_community'),
-			'snmp_oid'		=> get_request('snmp_oid'),
-			'value_type'	=> get_request('value_type'),
-			'trapper_hosts'	=> get_request('trapper_hosts'),
-			'port'		=> get_request('port'),
-			'units'			=> get_request('units'),
-			'multiplier'	=> get_request('multiplier', 0),
-			'delta'			=> get_request('delta'),
-			'snmpv3_securityname'	=> get_request('snmpv3_securityname'),
-			'snmpv3_securitylevel'	=> get_request('snmpv3_securitylevel'),
-			'snmpv3_authpassphrase'	=> get_request('snmpv3_authpassphrase'),
-			'snmpv3_privpassphrase'	=> get_request('snmpv3_privpassphrase'),
-			'formula'			=> get_request('formula'),
-			'trends'			=> get_request('trends'),
-			'logtimefmt'		=> get_request('logtimefmt'),
-			'valuemapid'		=> get_request('valuemapid'),
-			'delay_flex'		=> $db_delay_flex,
-			'authtype'		=> get_request('authtype'),
-			'username'		=> get_request('username'),
-			'password'		=> get_request('password'),
-			'publickey'		=> get_request('publickey'),
-			'privatekey'		=> get_request('privatekey'),
-			'params'			=> get_request('params'),
-			'ipmi_sensor'		=> get_request('ipmi_sensor'),
-			'data_type'		=> get_request('data_type'),
+			'name' => get_request('name'),
+			'description' => get_request('description'),
+			'key_' => get_request('key'),
+			'hostid' => get_request('form_hostid'),
+			'interfaceid' => get_request('interfaceid', 0),
+			'delay' => get_request('delay'),
+			'history' => get_request('history'),
+			'status' => get_request('status'),
+			'type' => get_request('type'),
+			'snmp_community' => get_request('snmp_community'),
+			'snmp_oid' => get_request('snmp_oid'),
+			'value_type' => get_request('value_type'),
+			'trapper_hosts' => get_request('trapper_hosts'),
+			'port' => get_request('port'),
+			'units' => get_request('units'),
+			'multiplier' => get_request('multiplier', 0),
+			'delta' => get_request('delta'),
+			'snmpv3_securityname' => get_request('snmpv3_securityname'),
+			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
+			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
+			'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
+			'formula' => get_request('formula'),
+			'trends' => get_request('trends'),
+			'logtimefmt' => get_request('logtimefmt'),
+			'valuemapid' => get_request('valuemapid'),
+			'delay_flex' => $db_delay_flex,
+			'authtype' => get_request('authtype'),
+			'username' => get_request('username'),
+			'password' => get_request('password'),
+			'publickey' => get_request('publickey'),
+			'privatekey' => get_request('privatekey'),
+			'params' => get_request('params'),
+			'ipmi_sensor' => get_request('ipmi_sensor'),
+			'data_type' => get_request('data_type'),
 			'applications' => $applications,
 			'inventory_link' => get_request('inventory_link'),
 		);
 
-		if(isset($_REQUEST['itemid'])){
+		if (isset($_REQUEST['itemid'])) {
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
 			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
 
-			foreach($item as $field => $value){
-				if($item[$field] == $db_item[$field]) unset($item[$field]);
+			foreach ($item as $field => $value) {
+				if ($item[$field] == $db_item[$field]) {
+					unset($item[$field]);
+				}
 			}
 
 			$item['itemid'] = $_REQUEST['itemid'];
 			$result = API::Item()->update($item);
 
-			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
+			show_messages($result, _('Item updated'), _('Cannot update item'));
 		}
-		else{
+		else {
 			$result = API::Item()->create($item);
-			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
+			show_messages($result, _('Item added'), _('Cannot add item'));
 		}
 
 		$result = DBend($result);
-		if($result){
-/*			$host = get_host_by_hostid($_REQUEST['hostid']);
-
-			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM.' ['.$_REQUEST['key'].'] ['.$itemid.'] '.S_HOST.' ['.$host['host'].']');*/
+		if ($result) {
 			unset($_REQUEST['itemid']);
 			unset($_REQUEST['form']);
 		}

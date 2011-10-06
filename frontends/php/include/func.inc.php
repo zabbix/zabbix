@@ -237,11 +237,6 @@ function zbx_date2age($start_date, $end_date = 0, $utime = false){
 	return convertUnitsS(abs($end_date - $start_date));
 }
 
-function getmicrotime(){
-	list($usec, $sec) = explode(" ",microtime());
-	return ((float)$usec + (float)$sec);
-}
-
 function zbxDateToTime($strdate){
 	if(6 == sscanf($strdate, '%04d%02d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes, $seconds))
 		return mktime($hours,$minutes,$seconds,$month,$date,$year);
