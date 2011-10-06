@@ -19,6 +19,8 @@
 **/
 ?>
 <?php
+zbx_add_post_js('chkbxRange.pageGoName = "mediatypeids";');
+
 $mediaTypeWidget = new CWidget();
 
 // create new media type button
@@ -28,13 +30,13 @@ $mediaTypeWidget->addPageHeader(_('CONFIGURATION OF MEDIA TYPES'), $createForm);
 
 // header
 $numRows = new CDiv();
-$numRows->setAttribute('name','numrows');
+$numRows->setAttribute('name', 'numrows');
 $mediaTypeWidget->addHeader(_('Media types'));
 $mediaTypeWidget->addHeader($numRows);
 
 // create form
 $mediaTypeForm = new CForm();
-$mediaTypeForm->setName('frm_media_types');
+$mediaTypeForm->setName('mediaTypesForm');
 
 // create table
 $mediaTypeTable = new CTableInfo(_('No media types defined'));
@@ -96,8 +98,17 @@ foreach ($this->data['mediatypes'] as $mediatype) {
 	));
 }
 
+// create go button
+$goComboBox = new CComboBox('go');
+$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption->setAttribute('confirm', _('Delete selected media types?'));
+$goComboBox->addItem($goOption);
+
+$goButton = new CSubmit('goButton', _('Go'));
+$goButton->setAttribute('id', 'goButton');
+
 // append table to form
-$mediaTypeForm->addItem(array($this->data['paging'], $mediaTypeTable, $this->data['paging'], get_table_header(array(new CButtonQMessage('delete', _('Delete selected'), _('Delete selected media types?'))))));
+$mediaTypeForm->addItem(array($this->data['paging'], $mediaTypeTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $mediaTypeWidget->addItem($mediaTypeForm);

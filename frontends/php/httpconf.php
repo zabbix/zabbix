@@ -561,7 +561,7 @@ include_once('include/page_header.php');
 			$tblSteps->addRow(array(
 				(new CCheckBox('sel_step[]',null,null,$stepid)),
 				$name,
-				$s['timeout'].SPACE.S_SEC_SMALL,
+				$s['timeout'].SPACE._('sec'),
 				$url,
 				$s['required'],
 				$s['status_codes'],

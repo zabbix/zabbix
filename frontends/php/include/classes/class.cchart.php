@@ -1986,7 +1986,7 @@ class CChart extends CGraphDraw{
 	}
 
 	public function draw(){
-		$start_time=getmicrotime();
+		$start_time = microtime(true);
 
 		set_image_header();
 
@@ -2173,19 +2173,12 @@ class CChart extends CGraphDraw{
 
 		$this->drawLogo();
 
-		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
-
-// if we get chart from config by get method
-		$datafrom = '';
-		if(isset($this->dataFrom))
-			$datafrom = 'Data from '.$this->dataFrom.'. ';
-
-		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,$datafrom._s('Generated in %s sec', $str), $this->getColor('Gray'));
+		$str = sprintf('%0.2f', microtime(true) - $start_time);
+		$str = _s('Data from %1$s. Generated in %2$s sec', $this->dataFrom, $str);
+		$strSize = imageTextSize(6, 0, $str);
+		imageText($this->im, 6, 0, $this->fullSizeX - $strSize['width'] - 5, $this->fullSizeY - 5, $this->getColor('Gray'), $str);
 
 		unset($this->items, $this->data);
-
-//debug info
-//		show_messages();
 
 		ImageOut($this->im);
 	}

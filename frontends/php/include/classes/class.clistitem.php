@@ -19,12 +19,15 @@
 **/
 ?>
 <?php
-class CListItem extends CTag{
-	public function __construct($value,$class=null){
-		parent::__construct('li','yes');
+class CListItem extends CTag {
+	public function __construct($value, $class = null, $id = null) {
+		parent::__construct('li', 'yes');
 
-		$this->addClass($class);
 		$this->addItem($value);
+		$this->addClass($class);
+		if (!empty($id)) {
+			$this->setAttribute('id', $id);
+		}
 	}
 }
 ?>

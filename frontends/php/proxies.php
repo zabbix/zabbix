@@ -142,7 +142,7 @@
 				$old_status = $db_host['status'];
 				if($old_status == $status) continue;
 
-				$go_result &= update_host_status($db_host['hostid'], $status);
+				$go_result &= updateHostStatus($db_host['hostid'], $status);
 				if(!$go_result) continue;
 
 /*				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,'Old status ['.$old_status.'] '.'New status ['.$status.'] ['.$db_host['hostid'].']');*/

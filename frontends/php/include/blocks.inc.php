@@ -813,10 +813,9 @@ return new CDiv(array($table, $script));
  * Create and return a DIV with latest problem triggers
  * @author Aly
  * @param array $filter
- * @param bool $showStatus
  * @return CDiv
  */
-function make_latest_issues($filter = array(), $showStatus=false){
+function make_latest_issues(array $filter = array()) {
 	$config = select_config();
 
 	$options = array(
@@ -1021,22 +1020,10 @@ function make_latest_issues($filter = array(), $showStatus=false){
 				true // update blinking
 			);
 
-			if($showStatus){
-				$statusSpan = new CSpan(trigger_value2str($event['value']));
-				// add colors and blinking to span depending on configuration and trigger parameters
-				addTriggerValueStyle(
-					$statusSpan,
-					$event['value'],
-					$event['clock'],
-					$event['acknowledged']
-				);
-			}
-
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
 				$host,
 				$description,
-				$showStatus ? $statusSpan : null,
 				$clock,
 				zbx_date2age($event['clock']),
 				$unknown,
