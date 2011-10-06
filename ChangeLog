@@ -8,13 +8,13 @@ New features:
  - [ZBX-4165] fixed failing insert into proxy_dhistory queries on the proxy side (rudolfs)
  - [ZBX-3870] fixed data deletion order in proxy configuration synchronization (deniss,rudolfs)
  - [ZBX-4167] updated requirements screen for frontend (Vedmak)
- - [ZBX-3999] fixed map border (Alex,Sasha,Eduard)
  - [ZBXNEXT-918] redesign Administration->Media types (Eduard)
  - [ZBXNEXT-915] redesign Administration->Authentication (Eduard)
  - [ZBXNEXT-966] update jQuery to 1.6.4 (Eduard)
  - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-3755] fixed latest values in cloned items (Sasha)
  - [ZBX-3165] fixed layout of item prototypes form (Vedmak)
  - [ZBX-3342] fixed translation of graphs "Generated in x sec" stamps (Vedmak)
  - [ZBX-3926] fixed "Hide/Show selected" filter in history of log items (Vedmak)
@@ -37,6 +37,7 @@ Bug fixes:
  - [ZBX-3493] fixed warnings when removing and clearing a template (Alexei)
  - [ZBX-4143] fixed cases with upgrade patch sometimes attempting to reference tables that were not created yet (Richlv, Sasha)
  - [ZBX-3618] extended allowed syntax for host interface dns names (Vedmak)
+ - [ZBX-3999] fixed map border (Alex,Sasha,Eduard)
  - [ZBX-3946] fixed errors when create trigger with dependencies (Vedmak)
  - [ZBX-3921] fixed change link shown for maps in slide show (Vedmak)
  - [ZBX-4082] fixed error in Monitoring->Triggers when acknowledges are disabled (Vedmak)
