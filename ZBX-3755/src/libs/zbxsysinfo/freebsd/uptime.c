@@ -58,8 +58,6 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	long          hz;
 	long          secs;
 
-	hz = sysconf(_SC_CLK_TCK);
-
 	/* open kstat */
 	kc = kstat_open();
 	if (0 == kc)
@@ -79,6 +77,12 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 	}
 	kn = (kstat_named_t*)kstat_data_lookup(kp, "clk_intr");
+
+	hz = sysconf(_SC_CLK_TCK);
+
+	/* make sure we do not divide by 0 */
+	assert(hz);
+
 	secs = kn->value.ul / hz;
 
 	/* close kstat */

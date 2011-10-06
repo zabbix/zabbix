@@ -48,8 +48,6 @@ static int	shm_id;
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static int	zbx_get_cpu_num()
 {
@@ -130,10 +128,6 @@ return_one:
  *                                                                            *
  * Purpose: Allocate memory for collector                                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Unix version allocates memory as shared.                         *
@@ -183,11 +177,11 @@ void	init_collector_data()
 
 	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
 	collector->cpus.count = cpu_count;
+#endif	/* _WINDOWS */
+
 #ifdef _AIX
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
 #endif
-
-#endif	/* _WINDOWS */
 }
 
 /******************************************************************************
@@ -196,10 +190,6 @@ void	init_collector_data()
  *                                                                            *
  * Purpose: Free memory allocated for collector                               *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Unix version allocated memory as shared.                         *
@@ -207,19 +197,15 @@ void	init_collector_data()
  ******************************************************************************/
 void	free_collector_data()
 {
-#if defined (_WINDOWS)
-
+#ifdef _WINDOWS
 	zbx_free(collector);
-
-#else	/* not _WINDOWS */
-
+#else
 	if (NULL == collector)
 		return;
 
 	if (-1 == shmctl(shm_id, IPC_RMID, 0))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for collector: %s", zbx_strerror(errno));
-
-#endif	/* _WINDOWS */
+#endif
 
 	collector = NULL;
 }
@@ -230,13 +216,7 @@ void	free_collector_data()
  *                                                                            *
  * Purpose: Collect system information                                        *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)
@@ -263,7 +243,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #endif
 		collect_stats_diskdevices(&(collector->diskdevices));
 #ifdef _AIX
-		collect_vmstat_data(&collector->vmstat);
+		if (1 == collector->vmstat.enabled)
+			collect_vmstat_data(&collector->vmstat);
 #endif
 		zbx_setproctitle("collector [sleeping for 1 seconds]");
 		zbx_sleep(1);

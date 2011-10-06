@@ -435,7 +435,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, char *OID, cha
 	anOID_len = rootOID_len;
 
 	running = 1;
-	while (running)
+	while (1 == running)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: snmp_pdu_create()", __function_name);
 
@@ -444,9 +444,10 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, char *OID, cha
 
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response():%d", __function_name, status);
 
 		/* process response */
-		if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
+		if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 		{
 			for (vars = response->variables; vars && running; vars = vars->next_variable)
 			{
@@ -469,11 +470,11 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, char *OID, cha
 				else
 				{
 					/* verify if OIDs are increasing */
-					if (vars->type != SNMP_ENDOFMIBVIEW && vars->type != SNMP_NOSUCHOBJECT &&
-							vars->type != SNMP_NOSUCHINSTANCE)
+					if (SNMP_ENDOFMIBVIEW != vars->type && SNMP_NOSUCHOBJECT != vars->type &&
+							SNMP_NOSUCHINSTANCE != vars->type)
 					{
 						/* not an exception value */
-						if (snmp_oid_compare(anOID, anOID_len, vars->name, vars->name_length) >= 0)
+						if (0 <= snmp_oid_compare(anOID, anOID_len, vars->name, vars->name_length))
 						{
 							zbx_snprintf(err, MAX_STRING_LEN, "OID not increasing.");
 							ret = NOTSUPPORTED;
@@ -505,25 +506,30 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, char *OID, cha
 		}
 		else
 		{
-			if (status == STAT_SUCCESS)
+			running = 0;
+
+			if (STAT_SUCCESS == status)
 			{
 				zbx_snprintf(err, MAX_STRING_LEN, "SNMP error [%s]",
 						snmp_errstring(response->errstat));
-				running = 0;
 				ret = NOTSUPPORTED;
 			}
-			else if (status == STAT_TIMEOUT)
+			else if (STAT_ERROR == status)
+			{
+				zbx_snprintf(err, MAX_STRING_LEN, "Could not connect to [[%s]:%d]",
+						item->interface.addr, (int)item->interface.port);
+				ret = NETWORK_ERROR;
+			}
+			else if (STAT_TIMEOUT == status)
 			{
 				zbx_snprintf(err, MAX_STRING_LEN, "Timeout while connecting to [[%s]:%d]",
 						item->interface.addr, (int)item->interface.port);
-				running = 0;
 				ret = NETWORK_ERROR;
 			}
 			else
 			{
 				zbx_snprintf(err, MAX_STRING_LEN, "SNMP error [%d]",
 						status);
-				running = 0;
 				ret = NOTSUPPORTED;
 			}
 		}
@@ -547,10 +553,10 @@ static int	snmp_set_value(const char *snmp_oid, struct variable_list *vars, DC_I
 
 	memset(temp, '\0', sizeof(temp));
 	snprint_value(temp, sizeof(temp) - 1, vars->name, vars->name_length, vars);
-	zabbix_log(LOG_LEVEL_DEBUG, "AV loop OID [%s] Type [0x%02X] '%s'",
-			snmp_oid, vars->type, temp);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() AV loop OID [%s] Type [0x%02X] '%s'",
+			__function_name, snmp_oid, vars->type, temp);
 
-	if (vars->type == ASN_OCTET_STR)
+	if (ASN_OCTET_STR == vars->type)
 	{
 		if (0 == strncmp(temp, "STRING: ", 8))
 			ptemp = temp + 8;
@@ -561,42 +567,44 @@ static int	snmp_set_value(const char *snmp_oid, struct variable_list *vars, DC_I
 		if (SUCCEED != set_result_type(value, item->value_type, item->data_type, ptemp))
 			ret = NOTSUPPORTED;
 	}
-	else if (vars->type == ASN_UINTEGER || vars->type == ASN_COUNTER ||
 #ifdef OPAQUE_SPECIAL_TYPES
-			vars->type == ASN_UNSIGNED64 ||
+	else if (ASN_UINTEGER == vars->type || ASN_COUNTER == vars->type || ASN_UNSIGNED64 == vars->type ||
+			ASN_TIMETICKS == vars->type || ASN_GAUGE == vars->type)
+#else
+	else if (vars->type == ASN_UINTEGER || vars->type == ASN_COUNTER ||
+			ASN_TIMETICKS == vars->type || ASN_GAUGE == vars->type)
 #endif
-			vars->type == ASN_TIMETICKS || vars->type == ASN_GAUGE)
 	{
 		SET_UI64_RESULT(value, (unsigned long)*vars->val.integer);
 	}
-	else if (vars->type == ASN_COUNTER64)
+	else if (ASN_COUNTER64 == vars->type)
 	{
 		SET_UI64_RESULT(value, (((zbx_uint64_t)vars->val.counter64->high) << 32) +
 				(zbx_uint64_t)vars->val.counter64->low);
 	}
-	else if (vars->type == ASN_INTEGER ||
 #ifdef OPAQUE_SPECIAL_TYPES
-			vars->type == ASN_INTEGER64
+	else if (ASN_INTEGER == vars->type || ASN_INTEGER64 == vars->type)
+#else
+	else if (ASN_INTEGER == vars->type)
 #endif
-			)
 	{
 		/* Negative integer values are converted to double */
-		if (*vars->val.integer < 0)
+		if (0 > *vars->val.integer)
 			SET_DBL_RESULT(value, (double)*vars->val.integer);
 		else
 			SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
-	else if (vars->type == ASN_FLOAT)
+	else if (ASN_FLOAT == vars->type)
 	{
 		SET_DBL_RESULT(value, *vars->val.floatVal);
 	}
-	else if (vars->type == ASN_DOUBLE)
+	else if (ASN_DOUBLE == vars->type)
 	{
 		SET_DBL_RESULT(value, *vars->val.doubleVal);
 	}
 #endif
-	else if (vars->type == ASN_IPADDRESS)
+	else if (ASN_IPADDRESS == vars->type)
 	{
 		SET_STR_RESULT(value, zbx_dsprintf(NULL, "%d.%d.%d.%d",
 				vars->val.string[0],
@@ -789,7 +797,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	struct variable_list	*vars;
 	int			status, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(oid:%s)", __function_name, snmp_oid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:%s", __function_name, snmp_oid);
 
 	init_result(value);
 
@@ -799,9 +807,9 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	snmp_add_null_var(pdu, anOID, anOID_len);
 
 	status = snmp_synch_response(ss, pdu, &response);
-	zabbix_log(LOG_LEVEL_DEBUG, "Status send [%d]", status);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response():%d", __function_name, status);
 
-	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
+	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
 		for (vars = response->variables; vars; vars = vars->next_variable)
 		{
@@ -811,13 +819,19 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	}
 	else
 	{
-		if (status == STAT_SUCCESS)
+		if (STAT_SUCCESS == status)
 		{
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error [%s]",
 					snmp_errstring(response->errstat)));
 			ret = NOTSUPPORTED;
 		}
-		else if (status == STAT_TIMEOUT)
+		else if (STAT_ERROR == status)
+		{
+			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Could not connect to [[%s]:%d]",
+					item->interface.addr, (int)item->interface.port));
+			ret = NETWORK_ERROR;
+		}
+		else if (STAT_TIMEOUT == status)
 		{
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [[%s]:%d]",
 					item->interface.addr, (int)item->interface.port));

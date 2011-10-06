@@ -521,11 +521,12 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 		tresult = DBselect(
 				"select type,interfaceid"
 				" from interface"
-				" where type in (%d,%d,%d,%d)"
+				" where hostid=" ZBX_FS_UI64
+					" and type in (%d,%d,%d,%d)"
 					" and main=1"
 					DB_NODE,
-				INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX,
-				DBnode_local("interfaceid"));
+				hostid, INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP,
+				INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX, DBnode_local("interfaceid"));
 
 		while (NULL != (trow = DBfetch(tresult)))
 		{
@@ -547,7 +548,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 			type = (unsigned char)atoi(trow[0]);
 			type = get_interface_type_by_item_type(type);
 
-			if (0 == interfaceids[type - 1])
+			if (INTERFACE_TYPE_ANY != type && 0 == interfaceids[type - 1])
 			{
 				res = FAIL;
 				zbx_snprintf(error, max_error_len, "Cannot find %s host interface",
@@ -2567,7 +2568,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	zbx_uint64_t	*appids = NULL, *protoids = NULL;
 	int		appids_alloc = 0, appids_num,
 			protoids_alloc = 0, protoids_num = 0;
-	unsigned char	flags, type;
+	unsigned char	flags, type, itype;
 	zbx_uint64_t	interfaceids[4], interfaceid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2577,11 +2578,12 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	result = DBselect(
 			"select type,interfaceid"
 			" from interface"
-			" where type in (%d,%d,%d,%d)"
+			" where hostid=" ZBX_FS_UI64
+				" and type in (%d,%d,%d,%d)"
 				" and main=1"
 				DB_NODE,
-			INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX,
-			DBnode_local("interfaceid"));
+			hostid, INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP,
+			INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX, DBnode_local("interfaceid"));
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2640,17 +2642,23 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		filter_esc			= DBdyn_escape_string(row[32]);
 		description_esc			= DBdyn_escape_string(row[33]);
 
-		switch (type)
+		switch (itype = get_interface_type_by_item_type(type))
 		{
-			case ITEM_TYPE_TRAPPER:
-			case ITEM_TYPE_INTERNAL:
-			case ITEM_TYPE_ZABBIX_ACTIVE:
-			case ITEM_TYPE_AGGREGATE:
-			case ITEM_TYPE_CALCULATED:
+			case INTERFACE_TYPE_UNKNOWN:
 				interfaceid = 0;
 				break;
+			case INTERFACE_TYPE_ANY:
+				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
+				{
+					if (0 != interfaceids[INTERFACE_TYPE_PRIORITY[i] - 1])
+						break;
+				}
+
+				interfaceid = interfaceids[INTERFACE_TYPE_PRIORITY[i] - 1];
+
+				break;
 			default:
-				interfaceid = interfaceids[get_interface_type_by_item_type(type) - 1];
+				interfaceid = interfaceids[itype - 1];
 		}
 
 		if (SUCCEED != (DBis_null(row[35])))

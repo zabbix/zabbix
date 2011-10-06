@@ -276,18 +276,18 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 int	USER_PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PERF_COUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-#endif /* _WINDOWS */
+#endif
 
 #ifdef _AIX
 int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-#endif	/* _AIX */
+#endif
 
 typedef struct
 {
@@ -295,13 +295,5 @@ typedef struct
 	int		(*function)();
 }
 MODE_FUNCTION;
-
-typedef struct
-{
-	const char	*type;
-	const char	*mode;
-	int		(*function)();
-}
-TYPE_MODE_FUNCTION;
 
 #endif

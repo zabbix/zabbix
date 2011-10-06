@@ -2,6 +2,9 @@
 Changes for 1.9.7
 
 New features:
+ - [ZBXNEXT-916] redesign Administration->Users, Users groups, User Profile (Eduard)
+ - [ZBXNEXT-951] added possibility to calculate CPU load per processor: system.cpu.load[percpu,avgX] (rudolfs)
+ - [ZBXNEXT-965] added redirect to a special warning page when user browser is not supported by Zabbix (Eduard)
  - [ZBX-4165] fixed failing insert into proxy_dhistory queries on the proxy side (rudolfs)
  - [ZBX-3870] fixed data deletion order in proxy configuration synchronization (deniss,rudolfs)
  - [ZBX-4167] updated requirements screen for frontend (Vedmak)
@@ -12,6 +15,12 @@ New features:
 
 Bug fixes:
  - [ZBX-3755] fixed latest values in cloned items (Sasha)
+ - [ZBX-3165] fixed layout of item prototypes form (Vedmak)
+ - [ZBX-3342] fixed translation of graphs "Generated in x sec" stamps (Vedmak)
+ - [ZBX-3926] fixed "Hide/Show selected" filter in history of log items (Vedmak)
+ - [ZBX-4119] fixed items like simple check require agent interface on host, now any interface is enough (asaveljevs, Vedmak)
+ - [ZBX-3745] fixed error message when link template with discovery rule to host that does not have needed interface (Vedmak)
+ - [ZBX-3896] fixed broken triggers after removed item that is used in trigger (Vedmak)
  - [ZBX-4106] fixed layout of "Status of host triggers" screen element (Vedmak)
  - [ZBX-4061] fixed errors when try to delete already deleted regular expression (Vedmak)
  - [ZBX-4058] fixed working time updating in Administration->Gneral->Working time (Vedmak)
@@ -247,6 +256,13 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4194] fixed SQL query errors in distributed environment with three digit node numbers (asaveljevs)
+ - [ZBX-3257] fixed item type auto selection in item key popup (Eduard)
+ - [ZBX-4026] fixed disabling SNMP host when unreachable (dimir)
+ - [ZBX-3942] fixed agent's collector to not gather perfstat data on AIX unless it is requested (dimir)
+ - [ZBX-4087] fixed error message when processing configuration file (dimir)
+ - [ZBX-4158] fixed DB transaction processing, stop and abort on error (dimir)
+ - [ZBX-4146] fixed page refreshing after adding new IT service (Eduard)
  - [ZBX-4176] fixed API action.update required parameters (Vedmak)
  - [ZBX-4104] fixed handle handling when executing scripts in Windows (rudolfs)
  - [ZBX-4091] removed unneeded linking for binaries (rudolfs)
