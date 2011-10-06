@@ -19,23 +19,15 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/general/GeneralTests.php');
-require_once(dirname(__FILE__).'/agent/AgentTests.php');
-require_once(dirname(__FILE__).'/api/ApiTests.php');
-require_once(dirname(__FILE__).'/api_json/ApiJsonTests.php');
-require_once(dirname(__FILE__).'/selenium/SeleniumTests.php');
+require_once(dirname(__FILE__).'/testMetrics.php');
 
-class All
+class GeneralTests
 {
 	public static function suite()
 	{
-		$suite = new PHPUnit_Framework_TestSuite('Project');
+		$suite = new PHPUnit_Framework_TestSuite('general');
 
-		$suite->addTest(GeneralTests::suite());
-		$suite->addTest(AgentTests::suite());
-		$suite->addTest(ApiTests::suite());
-		$suite->addTest(ApiJsonTests::suite());
-		$suite->addTest(SeleniumTests::suite());
+		$suite->addTestSuite('testMetrics');
 
 		return $suite;
 	}
