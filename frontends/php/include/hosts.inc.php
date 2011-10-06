@@ -468,29 +468,36 @@
 		return DBselect($sql);
 	}
 
-	function update_host_status($hostids, $status) {
+	function updateHostStatus($hostids, $status) {
 		$res = true;
 		zbx_value2array($hostids);
 
-		$sql = 'SELECT h.*'.
-			' FROM hosts h'.
-			' WHERE '.DBcondition('h.hostid', $hostids).
-				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
-		$result = DBselect($sql);
+		$hostIds = array();
+		$oldStatus = ($status == HOST_STATUS_MONITORED ? HOST_STATUS_NOT_MONITORED : HOST_STATUS_MONITORED);
+
+		$result = DBselect(
+			'SELECT h.hostid,h.host,h.status'.
+				' FROM hosts h'.
+				' WHERE '.DBcondition('h.hostid', $hostids).
+					' AND h.status='.$oldStatus
+		);
 		while ($host = DBfetch($result)) {
-			if ($status != $host['status']) {
-				update_trigger_value_to_unknown_by_hostid($host['hostid']);
-				$res = DBexecute('UPDATE hosts SET status='.$status.' WHERE hostid='.$host['hostid']);
-				if ($res) {
-					$host_new = $host;
-					$host_new['status'] = $status;
-					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
-				}
-				info(S_UPDATED_STATUS_OF_HOST.' "'.$host['host'].'"');
+			if ($status == HOST_STATUS_NOT_MONITORED) {
+				updateTriggerValueToUnknownByHostId($host['hostid']);
 			}
+
+			$hostIds[] = $host['hostid'];
+
+			$host_new = $host;
+			$host_new['status'] = $status;
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
+			info(S_UPDATED_STATUS_OF_HOST.' "'.$host['host'].'"');
 		}
 
-		return $res;
+		return DB::update('hosts', array(
+			'values' => array('status' => $status),
+			'where' => array('hostid' => $hostIds)
+		));
 	}
 
 /*

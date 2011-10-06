@@ -27,7 +27,7 @@ require_once('include/forms.inc.php');
 $page['title'] = 'S_CONFIGURATION_OF_DISCOVERY';
 $page['file'] = 'host_discovery.php';
 $page['scripts'] = array('class.cviewswitcher.js');
-$page['hist_arg'] = array();
+$page['hist_arg'] = array('hostid');
 
 include_once('include/page_header.php');
 ?>
@@ -450,9 +450,6 @@ switch($itemType) {
 // Name
 		$frmItem->addRow(_('Name'), new CTextBox('name', $name, 40, $limited));
 
-// Key
-		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
-
 // Type
 		if($limited){
 			$cmbType = new CTextBox('typename', item_type2str($type), 40, 'yes');
@@ -463,6 +460,9 @@ switch($itemType) {
 			$cmbType->addItems($types);
 		}
 		$frmItem->addRow(S_TYPE, $cmbType);
+
+// Key
+		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
 
 // SNMP OID
 		$frmItem->addRow(S_SNMP_OID, new CTextBox('snmp_oid',$snmp_oid,40,$limited), null, 'row_snmp_oid');
