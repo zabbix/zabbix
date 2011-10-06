@@ -46,7 +46,7 @@ class testPageItems extends CWebTest{
 		$this->assertTitle('Configuration of items');
 		$this->ok('CONFIGURATION OF ITEMS');
 		$this->ok('Displaying');
-		$this->ok('Hosts list');
+		$this->ok('Host list');
 		// Header
 		$this->ok(array('Wizard', 'Name', 'Triggers', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Status', 'Applications', 'Error'));
 		// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
