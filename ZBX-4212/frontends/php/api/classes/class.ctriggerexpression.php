@@ -416,6 +416,7 @@ private $allowed;
 					else if($symbol == ','){
 						$this->currExpr['params']['count']++;
 						$this->currExpr['params']['comma']++;
+						$this->currExpr['params']['item'][$this->currExpr['params']['count']] = '';
 						$this->currExpr['params']['quoteClose'] = false;
 					}
 					else{
