@@ -20,7 +20,6 @@
 ?>
 <?php
 require_once(dirname(__FILE__).'/general/GeneralTests.php');
-require_once(dirname(__FILE__).'/agent/AgentTests.php');
 require_once(dirname(__FILE__).'/api/ApiTests.php');
 require_once(dirname(__FILE__).'/api_json/ApiJsonTests.php');
 require_once(dirname(__FILE__).'/selenium/SeleniumTests.php');
@@ -32,7 +31,6 @@ class All
 		$suite = new PHPUnit_Framework_TestSuite('Project');
 
 		$suite->addTest(GeneralTests::suite());
-		$suite->addTest(AgentTests::suite());
 		$suite->addTest(ApiTests::suite());
 		$suite->addTest(ApiJsonTests::suite());
 		$suite->addTest(SeleniumTests::suite());
