@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-08 00:55+0300\n"
-"PO-Revision-Date: 2011-09-08 11:00+0200\n"
+"POT-Creation-Date: 2011-10-08 01:04+0300\n"
+"PO-Revision-Date: 2011-10-07 23:45+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -133,7 +133,7 @@ msgstr "500 последних значений"
 
 #: include/views/configuration.sysmap.edit.php:66
 msgid "<manual>"
-msgstr ""
+msgstr "<вручную>"
 
 #: actionconf.php:431 auditacts.php:110
 msgid "ACTIONS"
@@ -168,7 +168,7 @@ msgstr "ЖУРНАЛ АУДИТА"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "AUTHENTICATION TO ZABBIX"
-msgstr ""
+msgstr "АУТЕНТИФИКАЦИЯ В ZABBIX"
 
 #: include/locales/en_gb.inc.php:1008
 msgid "AVAILABILITY REPORT"
@@ -214,11 +214,11 @@ msgstr "Подтверждено"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Подтвержденные события ОК"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Подтвержденные события ПРОБЛЕМА"
 
 #: include/locales/en_gb.inc.php:235
 msgid "Acknowledges"
@@ -351,7 +351,7 @@ msgstr "Добавить прототип"
 
 #: include/locales/en_gb.inc.php:1695
 msgid "Add service"
-msgstr ""
+msgstr "Добавить услугу"
 
 #: include/locales/en_gb.inc.php:1355
 msgid "Add to"
@@ -359,7 +359,7 @@ msgstr "Добавить в"
 
 #: maps.php:73
 msgid "Add to Favourites"
-msgstr ""
+msgstr "Добавить в Избранное"
 
 #: include/actions.inc.php:479 include/forms.inc.php:1756
 msgid "Add to host group"
@@ -400,7 +400,7 @@ msgstr "Возраст менее чем"
 #: overview.php:124
 #, php-format
 msgid "Age less than %s"
-msgstr ""
+msgstr "Возраст менее чем %s"
 
 #: include/locales/en_gb.inc.php:164
 #: include/views/administration.script.list.php:76 popup.php:1835
@@ -593,15 +593,15 @@ msgstr "Метод аутентификации"
 
 #: authentication.php:153 authentication.php:154
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Метод аутентификации изменен на HTTP"
 
 #: authentication.php:116 authentication.php:117
 msgid "Authentication method changed to LDAP"
-msgstr ""
+msgstr "Метод аутентификации изменен на LDAP"
 
 #: authentication.php:76 authentication.php:77
 msgid "Authentication method changed to Zabbix internal"
-msgstr ""
+msgstr "Метод аутентификации изменен на внутренний Zabbix"
 
 #: authentication.php:24
 msgid "Authentication to Zabbix"
@@ -5472,13 +5472,13 @@ msgstr "Имя ссылки должно быть уникальным для к
 
 #: api/classes/class.cmap.php:681
 #, php-format
-msgid "Link selementid1 field is pointing to non existant map selement ID \"%1$s\" for map \"%2$s\" ."
-msgstr "Поле связи selementid1 указывает на не существующий ID элемента карты сети \"%1$s\" для карты сети \"%2$s\" ."
+msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
+msgstr ""
 
 #: api/classes/class.cmap.php:684
 #, php-format
-msgid "Link selementid2 field is pointing to non existant map selement ID \"%1$s\" for map \"%2$s\" ."
-msgstr "Поле связи selementid2 указывает на не существующий ID элемента карты сети \"%1$s\" для карты сети \"%2$s\" ."
+msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
+msgstr ""
 
 #: api/classes/class.cmap.php:667
 #, php-format

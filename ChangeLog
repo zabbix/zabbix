@@ -11,7 +11,7 @@ New features:
  - [ZBXNEXT-918] redesign Administration->Media types (Eduard)
  - [ZBXNEXT-915] redesign Administration->Authentication (Eduard)
  - [ZBXNEXT-966] update jQuery to 1.6.4 (Eduard)
- - [ZBX-1357] updated Dutch, German, Japanese, Russian, and Ukrainian translations; thanks to Zabbix translators (Richlv)
+ - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
  - [ZBX-4151] fixed timer crash due to heap memory corruption (asaveljevs)
