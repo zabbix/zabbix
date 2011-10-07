@@ -1311,7 +1311,7 @@ COpt::memoryPick();
 					// find out if both templates and hosts are referenced in expression
 					$hostsStatusFlags |= ($hosts[$host]['status'] == HOST_STATUS_TEMPLATE) ? 0x1 : 0x2;
 					if ($hostsStatusFlags == 0x3) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect trigger expression. Trigger expression elements shouldn\'t belong to a template and a host simultaneously.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously.'));
 					}
 				}
 			}
@@ -1564,7 +1564,7 @@ COpt::memoryPick();
 
 				$expression_changed = true;
 				$expression_full = $trigger['expression'];
-				$trigger['error'] = _('Trigger expression updated. No status update so far.');
+				$trigger['error'] = 'Trigger expression updated. No status update so far.';
 			}
 
 			if($description_changed || $expression_changed){
@@ -1899,7 +1899,7 @@ COpt::memoryPick();
 	}
 
 	/**
-	 * Check if all templates trigger belongs to, are linked to same hosts.
+	 * Check if all templates trigger belongs to are linked to same hosts.
 	 * @throws APIException
 	 * @param $trigger
 	 * @return bool
@@ -1939,7 +1939,7 @@ COpt::memoryPick();
 				if (array_diff($compareLinks, $linkedTo) || array_diff($linkedTo, $compareLinks)) {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
-						_s('Trigger "%s" belongs to templates which linkages differ.', $trigger['description'])
+						_s('Trigger "%s" belongs to templates with different linkages.', $trigger['description'])
 					);
 				}
 			}
