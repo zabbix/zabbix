@@ -312,8 +312,8 @@ include_once('include/page_header.php');
 
 		if ($_REQUEST['go'] == 'activate') {
 			$status = TRIGGER_STATUS_ENABLED;
-			$statusOld = array('status'=>TRIGGER_STATUS_DISABLED);
-			$statusNew = array('status'=>TRIGGER_STATUS_ENABLED);
+			$statusOld = array('status' => TRIGGER_STATUS_DISABLED);
+			$statusNew = array('status' => TRIGGER_STATUS_ENABLED);
 		}
 		else {
 			$status = TRIGGER_STATUS_DISABLED;
