@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-08 00:55+0300\n"
+"POT-Creation-Date: 2011-10-08 01:04+0300\n"
 "PO-Revision-Date: 2011-09-13 15:40+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Dutch Translation Team\n"
@@ -5476,13 +5476,13 @@ msgstr "Naam van de koppeling moet uniek zijn voor de kaart \"%s\"."
 
 #: api/classes/class.cmap.php:681
 #, php-format
-msgid "Link selementid1 field is pointing to non existant map selement ID \"%1$s\" for map \"%2$s\" ."
-msgstr "De koppeling selementid1 verwijst naar een niet bestaand selement ID \"%1$s\" voor de kaart \"%2$s\"."
+msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
+msgstr ""
 
 #: api/classes/class.cmap.php:684
 #, php-format
-msgid "Link selementid2 field is pointing to non existant map selement ID \"%1$s\" for map \"%2$s\" ."
-msgstr "De koppeling selementid2 verwijst naar een niet bestaand selement ID \"%1$s\" voor de kaart \"%2$s\"."
+msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
+msgstr ""
 
 #: api/classes/class.cmap.php:667
 #, php-format

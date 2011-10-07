@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-08 00:55+0300\n"
+"POT-Creation-Date: 2011-10-08 01:04+0300\n"
 "PO-Revision-Date: 2011-05-01 15:27+0200\n"
 "Last-Translator: gde <gde@cosmogol.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -5489,12 +5489,12 @@ msgstr "nom de lien devrait être unique pour la carte \"%s\"."
 
 #: api/classes/class.cmap.php:681
 #, php-format
-msgid "Link selementid1 field is pointing to non existant map selement ID \"%1$s\" for map \"%2$s\" ."
+msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr ""
 
 #: api/classes/class.cmap.php:684
 #, php-format
-msgid "Link selementid2 field is pointing to non existant map selement ID \"%1$s\" for map \"%2$s\" ."
+msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr ""
 
 #: api/classes/class.cmap.php:667
