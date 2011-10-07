@@ -1769,7 +1769,7 @@ COpt::memoryPick();
 			}
 		}
 
-		// check if all template triggers
+		// check if all trigger templates are linked to host
 		$sql = 'SELECT DISTINCT h.host'.
 				' FROM functions f,items i,triggers t,hosts h'.
 				' WHERE f.itemid=i.itemid'.
