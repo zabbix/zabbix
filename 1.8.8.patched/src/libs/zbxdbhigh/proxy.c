@@ -52,6 +52,7 @@ static ZBX_HISTORY_TABLE ht = {
 		{"h.host",	ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"i.key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"p.clock",	ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"p.ns",	ZBX_PROTO_TAG_NS,		ZBX_JSON_TYPE_INT,	NULL},
 		{"p.timestamp",	ZBX_PROTO_TAG_LOGTIMESTAMP,	ZBX_JSON_TYPE_INT,	"0"},
 		{"p.source",	ZBX_PROTO_TAG_LOGSOURCE,	ZBX_JSON_TYPE_STRING,	""},
 		{"p.severity",	ZBX_PROTO_TAG_LOGSEVERITY,	ZBX_JSON_TYPE_INT,	"0"},
@@ -1327,7 +1328,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 		if (HOST_MAINTENANCE_STATUS_ON == item.host.maintenance_status &&
 				MAINTENANCE_TYPE_NODATA == item.host.maintenance_type &&
-				item.host.maintenance_from <= values[i].clock)
+				item.host.maintenance_from <= values[i].ts.sec)
 			continue;
 
 		if (ITEM_TYPE_INTERNAL == item.type || ITEM_TYPE_AGGREGATE == item.type || ITEM_TYPE_CALCULATED == item.type)
@@ -1345,7 +1346,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
 		{
-			dc_add_history(item.itemid, item.value_type, NULL, values[i].clock,
+			dc_add_history(item.itemid, item.value_type, NULL, &values[i].ts,
 					ITEM_STATUS_NOTSUPPORTED, values[i].value, 0, NULL, 0, 0, 0, 0);
 
 			if (NULL != processed)
@@ -1364,7 +1365,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				if (NULL != values[i].source)
 					zbx_replace_invalid_utf8(values[i].source);
 
-				dc_add_history(item.itemid, item.value_type, &agent, values[i].clock,
+				dc_add_history(item.itemid, item.value_type, &agent, &values[i].ts,
 						ITEM_STATUS_ACTIVE, NULL, values[i].timestamp, values[i].source,
 						values[i].severity, values[i].logeventid, values[i].lastlogsize,
 						values[i].mtime);
@@ -1377,7 +1378,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 				zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s",
 						item.host.host, item.key_orig, agent.msg);
 
-				dc_add_history(item.itemid, item.value_type, NULL, values[i].clock,
+				dc_add_history(item.itemid, item.value_type, NULL, &values[i].ts,
 						ITEM_STATUS_NOTSUPPORTED, agent.msg, 0, NULL, 0, 0, 0, 0);
 			}
 			else
@@ -1427,19 +1428,36 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	char			tmp[MAX_BUFFER_LEN];
 	int			ret = FAIL, processed = 0, value_num = 0, total_num = 0;
 	double			sec;
-	time_t			now, proxy_timediff = 0;
+	zbx_timespec_t		ts, proxy_timediff;
 	static AGENT_VALUE	*values = NULL, *av;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	now = time(NULL);
 	sec = zbx_time();
+
+	zbx_timespec(&ts);
+	proxy_timediff.sec = 0;
+	proxy_timediff.ns = 0;
 
 	if (NULL == values)
 		values = zbx_malloc(values, VALUES_MAX * sizeof(AGENT_VALUE));
 
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
-		proxy_timediff = now - atoi(tmp);
+	{
+		proxy_timediff.sec = ts.sec - atoi(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NS, tmp, sizeof(tmp)))
+		{
+			proxy_timediff.ns = ts.ns - atoi(tmp);
+
+			if (proxy_timediff.ns < 0)
+			{
+				proxy_timediff.sec--;
+				proxy_timediff.ns += 1000000000;
+			}
+		}
+	}
+
 
 	/* "data" tag lists the item keys */
 	if (NULL == (p = zbx_json_pair_by_name(jp, ZBX_PROTO_TAG_DATA)))
@@ -1460,9 +1478,24 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		memset(av, 0, sizeof(AGENT_VALUE));
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
-			av->clock = atoi(tmp) + proxy_timediff;
+		{
+			av->ts.sec = atoi(tmp) + proxy_timediff.sec;
+
+			if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_NS, tmp, sizeof(tmp)))
+			{
+				av->ts.ns = atoi(tmp) + proxy_timediff.ns;
+
+				if (av->ts.ns > 999999999)
+				{
+					av->ts.sec++;
+					av->ts.ns -= 1000000000;
+				}
+			}
+			else
+				av->ts.ns = -1;
+		}
 		else
-			av->clock = now;
+			zbx_timespec(&av->ts);
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, av->host_name, sizeof(av->host_name)))
 			continue;

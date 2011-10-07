@@ -92,7 +92,7 @@ static void	process_time_functions()
 		tr_last->error = zbx_strdup(NULL, row[3]);
 		tr_last->new_error = NULL;
 		tr_last->expression = zbx_strdup(NULL, row[4]);
-		tr_last->lastchange = time(NULL);
+		zbx_timespec(&tr_last->timespec);
 	}
 	DBfree_result(result);
 
@@ -114,7 +114,7 @@ static void	process_time_functions()
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
 				tr_last->type, tr_last->value, tr_last->error, tr_last->new_value, tr_last->new_error,
-				tr_last->lastchange, &tr_last->add_event))
+				&tr_last->timespec, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 		}
@@ -143,7 +143,7 @@ static void	process_time_functions()
 			continue;
 
 		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-				tr_last->lastchange, tr_last->new_value, 0, 0);
+				&tr_last->timespec, tr_last->new_value, 0, 0);
 	}
 
 	DBcommit();
@@ -452,6 +452,10 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
 	int		value_before, value_inside, value_after;
+	zbx_timespec_t	ts;
+
+	ts.sec = maintenance_to;
+	ts.ns = 0;
 
 	result = DBselect(
 			"select distinct t.triggerid"
@@ -476,7 +480,7 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 			continue;
 
 		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
-				maintenance_to, value_after, 0, 1);
+				&ts, value_after, 0, 1);
 	}
 	DBfree_result(result);
 }
