@@ -1,3 +1,28 @@
+Changes for 1.8.9rc1
+
+ - [ZBX-4194] fixed SQL query errors in distributed environment with three digit node numbers (asaveljevs)
+ - [ZBX-3257] fixed item type auto selection in item key popup (Eduard)
+ - [ZBX-4026] fixed disabling SNMP host when unreachable (dimir)
+ - [ZBX-3942] fixed agent's collector to not gather perfstat data on AIX unless it is requested (dimir)
+ - [ZBX-4087] fixed error message when processing configuration file (dimir)
+ - [ZBX-4158] fixed DB transaction processing, stop and abort on error (dimir)
+ - [ZBX-4146] fixed page refreshing after adding new IT service (Eduard)
+ - [ZBX-4176] fixed API action.update required parameters (Vedmak)
+ - [ZBX-2882] fixed wrong item vfs.file.cksum[/vmlinuz] for some templates (Sasha)
+ - [ZBX-4072] improved performance of acknowledge of events (Sasha)
+ - [ZBX-3829] fixed trigger dependency removed after template linked to host (Vedmak)
+ - [ZBX-4131] fixed incorrect page shown after login (Vedmak)
+ - [ZBX-4104] fixed handle handling when executing scripts in Windows (rudolfs)
+ - [ZBX-4091] removed unneeded linking for binaries (rudolfs)
+ - [ZBX-4155] fixed .pid file locking not to allow multiple instances (rudolfs)
+ - [ZBX-4056] fixed memory read access violation in Windows performance counters (rudolfs)
+ - [ZBX-4177] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
+ - [ZBX-4085] fixed compilation issues for OS X Leopard (rudolfs)
+
+Changes for 1.8.8
+
+1.8.8rc3 was released as 1.8.8 without any changes
+
 Changes for 1.8.8rc3
 
  - [ZBX-1909] fixed keyparser to allow keys like "key,{$USERMACRO}" (Vedmak)
