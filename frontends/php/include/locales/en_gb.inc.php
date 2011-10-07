@@ -800,7 +800,6 @@
 	'S_ITEM_PROTOTYPES_OF_BIG' => _('ITEM PROTOTYPES OF'),
 	'S_ADD_PROTOTYPE' => _('Add prototype'),
 	'S_SELECT_PROTOTYPE' => _('Select prototype'),
-	'S_CREATE_PROTOTYPE' => _('Create prototype'),
 	'S_ITEM_PROTOTYPE' => _('Item prototype'),
 
 	'S_CONFIGURATION_OF_GRAPHS_PROTOTYPES_BIG' => _('CONFIGURATION OF GRAPH PROTOTYPES'),
@@ -1350,7 +1349,6 @@
 	'S_DEBUG'=>					_('Debug'),
 	'S_DENY'=>					_('Deny'),
 	'S_HIDE'=>					_('Hide'),
-	'S_PASSWORD_ONCE_AGAIN'=>			_('Password (once again)'),
 	'S_PASSWORD'=>			_('Password'),
 	'S_ADD_TO'=>					_('Add to'),
 	'S_REMOVE_FROM'=>				_('Remove from'),
