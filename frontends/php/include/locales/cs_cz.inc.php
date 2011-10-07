@@ -1579,9 +1579,6 @@
 
 
 //	services.php
-	'S_AVERAGE_PROBLEM'=>			'Střední problém',
-	'S_SERIOUS_PROBLEM'=>			'Vážný problém',
-	'S_MINOR_PROBLEM'=>			'Menší problém',
 	'S_ROOT_SMALL'=>			'kořen',
 	'S_IT_SERVICE'=>			'Služba IT',
 	'S_IT_SERVICES'=>			'Služby IT',
