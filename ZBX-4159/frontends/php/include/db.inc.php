@@ -833,17 +833,17 @@ else {
 		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 0;
 //------
 		$nodeid = get_current_nodeid(false);
-		$tableSchema = self::getSchema($table);
+		$tableSchema = DB::getSchema($table);
 
 		$found = false;
 		do{
-			if ($tableSchema['type'] == self::TABLE_TYPE_HISTORY) {
+			if ($tableSchema['type'] == DB::TABLE_TYPE_HISTORY) {
 				$min = bcmul($nodeid, '100000000000000');
-				$max = bcadd(bcmul($nodeid, '100000000000000'), '99999999999999', 0);
+				$max = bcadd(bcmul($nodeid, '100000000000000'), '99999999999999');
 			}
 			else {
-				$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'), 0);
-				$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999', 0);
+				$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
+				$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
 			}
 
 			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
@@ -1071,14 +1071,12 @@ else {
 
 			if ($tableSchema['type'] == self::TABLE_TYPE_HISTORY) {
 				$min = bcmul($nodeid, '100000000000000');
-				$max = bcadd(bcmul($nodeid, '100000000000000'), '99999999999999', 0);
+				$max = bcadd(bcmul($nodeid, '100000000000000'), '99999999999999');
 			}
 			else {
-				$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'), 0);
-				$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999', 0);
+				$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
+				$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
 			}
-
-
 
 			$sql = 'SELECT nextid '.
 				' FROM ids '.
