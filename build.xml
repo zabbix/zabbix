@@ -166,7 +166,7 @@
 			<arg line="-uroot -e 'drop database if exists ${dbname};'"/>
 		</exec>
 		<exec executable="mysql" failonerror="on">
-			<arg line="-uroot -e 'create database ${dbname};'"/>
+			<arg line="-uroot -e 'create database ${dbname} character set utf8;'"/>
 		</exec>
 		<exec executable="mysql" input="${builddir}/create/schema/mysql.sql" failonerror="on">
 			<arg line="-uroot ${dbname}"/>
