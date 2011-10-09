@@ -2131,7 +2131,7 @@ double	str2double(const char *str)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: in host name allowed characters: '0-9a-zA-Z. _-]'                *
+ * Comments: in host name allowed characters: '0-9a-zA-Z. _-'                 *
  *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
@@ -2161,7 +2161,7 @@ int	is_hostname_char(char c)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: in key allowed characters: '0-9a-zA-Z.,_-]'                      *
+ * Comments: in key allowed characters: '0-9a-zA-Z._-'                        *
  *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
