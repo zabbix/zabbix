@@ -68,7 +68,7 @@ function set_zbx_locales(){
 		'ja_JP'=>  S_JAPANESE_JP,
 		'lv_LV'=>  S_LATVIAN_LV,
 		'pl_PL'=>  S_POLISH_PL,
-		'pt_BR'=>  S_PORTUGUESE_PT,
+		'pt_BR'=>  _('Brazilian Portuguese (PT_BR)'),
 		'ru_RU'=>  S_RUSSIAN_RU,
 		'sk_SK'=>  _('Slovak (SK)'),
 		'es_ES'=>  S_SPANISH_ES,
