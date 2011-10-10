@@ -715,6 +715,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 			break;
 		}
 
+<<<<<<< .mine
 		delete_ids = zbx_malloc(NULL, sizeof(struct table_ids));
 		delete_ids->table_name = zbx_strdup(NULL, buf);
 		delete_ids->ids = NULL;
@@ -764,12 +765,70 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			if (ZBX_DB_OK > DBexecute("%s", sql))
 				ret = FAIL;
+=======
+		delete_ids = zbx_malloc(NULL, sizeof(struct table_ids));
+		delete_ids->table_name = zbx_strdup(NULL, buf);
+		delete_ids->ids = NULL;
+		delete_ids->id_num = 0;
+		zbx_vector_ptr_append(&table_order, delete_ids);
+
+		ret = process_proxyconfig_table(jp_data, buf, &jp_obj, &delete_ids->ids, &delete_ids->id_num);
+>>>>>>> .r22051
+	}
+
+<<<<<<< .mine
+	zbx_free(sql);
+	zbx_vector_ptr_destroy(&table_order);
+
+	if (SUCCEED == ret)
+=======
+	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
+
+	for (i = table_order.values_num - 1; 0 <= i; i--)
+	{
+		delete_ids = table_order.values[i];
+
+		if (SUCCEED == ret && 0 < delete_ids->id_num)
+		{
+			if (NULL == (table = DBget_table(delete_ids->table_name)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "invalid table name \"%s\"", delete_ids->table_name);
+				break;
+			}
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "delete from %s where", table->table);
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid,
+					delete_ids->ids, delete_ids->id_num);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+
+			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		zbx_free(delete_ids->ids);
+		zbx_free(delete_ids->table_name);
+		zbx_free(delete_ids);
+	}
+
+	if (SUCCEED == ret)
+	{
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
+
+		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+			if (ZBX_DB_OK > DBexecute("%s", sql))
+				ret = FAIL;
 	}
 
 	zbx_free(sql);
 	zbx_vector_ptr_destroy(&table_order);
 
 	if (SUCCEED == ret)
+>>>>>>> .r22051
 	{
 		DBcommit();
 		DCsync_configuration();
