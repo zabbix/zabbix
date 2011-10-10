@@ -7294,7 +7294,7 @@ msgid "Port range"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1401
-msgid "Brazilian Portuguese (PT_BR)"
+msgid "Portuguese (pt_BR)"
 msgstr "Português Brasileiro (PT_BR)"
 
 #: include/locales/en_gb.inc.php:1463

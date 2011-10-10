@@ -7299,7 +7299,7 @@ msgid "Port range"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1401
-msgid "Portuguese (PT)"
+msgid "Portuguese (pt_BR)"
 msgstr "Protugāļu (PT)"
 
 #: include/locales/en_gb.inc.php:1463
