@@ -158,6 +158,10 @@
 		<exec executable="killall" failonerror="off">
 			<arg line="zabbix_agentd"/>
 		</exec>
+		<!-- Sleep for 2 seconds -->
+		<exec executable="sleep" failonerror="off">
+			<arg line="2"/>
+		</exec>
 		<!-- Execute Agent with default config file -->
 		<exec executable="${builddir}/sbin/zabbix_agentd" dir="${builddir}/sbin" failonerror="on">
 			<arg line="--config=${builddir}/conf/zabbix_agentd.conf"/>
@@ -221,9 +225,9 @@
 		</exec>
 	</target>
 
-	<target name="build-mysql" depends="clean,init-mysql,buildagent,buildproxy,buildserver,runagent,test-frontend" />
-	<target name="build-postgresql" depends="clean,init-postgresql,buildagent,buildproxy,buildserver,runagent,test-frontend" />
-	<target name="build-sqlite3" depends="clean,init-sqlite3,buildagent,buildproxy,buildserver,runagent,test-frontend" />
+	<target name="build-mysql" depends="clean,init-mysql,buildagent,buildproxy,buildserver,test-frontend" />
+	<target name="build-postgresql" depends="clean,init-postgresql,buildagent,buildproxy,buildserver,test-frontend" />
+	<target name="build-sqlite3" depends="clean,init-sqlite3,buildagent,buildproxy,buildserver,test-frontend" />
 
 	<!-- Default target -->
 	<target name="build" depends="build-mysql,build-postgresql" />
