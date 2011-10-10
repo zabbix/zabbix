@@ -19,54 +19,53 @@
 **/
 ?>
 <?php
-class CVar{
+class CVar {
 	public $var_container;
 	public $var_name;
 	public $element_id;
 
-	public function __construct($name, $value=null, $id=null){
+	public function __construct($name, $value = null, $id = null) {
 		$this->var_container = array();
 		$this->var_name = $name;
 		$this->element_id = $id;
 		$this->setValue($value);
 	}
 
-	public function setValue($value){
+	public function setValue($value) {
 		$this->var_container = array();
-
-		if(is_null($value)) return;
-
+		if (is_null($value)) {
+			return;
+		}
 		$this->parseValue($this->var_name, $value);
 	}
 
-	public function parseValue($name, $value){
-		if(is_array($value)){
-			foreach($value as $key => $item){
-				if( is_null($item) ) continue;
+	public function parseValue($name, $value) {
+		if (is_array($value)) {
+			foreach ($value as $key => $item) {
+				if (is_null($item)) {
+					continue;
+				}
 				$this->parseValue($name.'['.$key.']', $item);
 			}
-			return;
+			return null;
 		}
-
-		if(strpos($value, "\n") === false){
+		if (strpos($value, "\n") === false) {
 			$hiddenVar = new CInput('hidden', $name, zbx_htmlstr($value), null, $this->element_id);
 			$hiddenVar->removeAttribute('class');
 		}
-		else{
+		else {
 			$hiddenVar = new CTextArea($name, $value);
-			$hiddenVar->setAttribute('class','hidden');
+			$hiddenVar->setAttribute('class', 'hidden');
 		}
-
 		$this->var_container[] = $hiddenVar;
 	}
 
-	public function toString(){
+	public function toString() {
 		$res = '';
-
-		foreach($this->var_container as $item){
+		foreach ($this->var_container as $item) {
 			$res .= $item->toString();
 		}
-	return $res;
+		return $res;
 	}
 }
 ?>

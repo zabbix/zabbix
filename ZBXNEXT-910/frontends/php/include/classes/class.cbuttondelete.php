@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-class CButtonDelete extends CButtonQMessage{
-	public function __construct($msg=NULL, $vars=NULL, $class=null){
-		parent::__construct('delete',S_DELETE,$msg,$vars,$class);
+class CButtonDelete extends CButtonQMessage {
+	public function __construct($msg = null, $vars = null, $class = null) {
+		parent::__construct('delete', _('Delete'), $msg, $vars, $class);
 	}
 }
 ?>

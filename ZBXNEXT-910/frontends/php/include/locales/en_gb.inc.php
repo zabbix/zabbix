@@ -307,8 +307,6 @@
 	'S_CUSTOM_GRAPHS'=>			_('Custom graphs'),
 	'S_GRAPHS_BIG'=>			_('GRAPHS'),
 	'S_PERIOD'=>				_('Period'),
-	'S_FULLSCREEN'=>			_('Fullscreen'),
-	'S_VIEW'=>				_('View'),
 
 //	class.cchart.php
 	'S_CCHARTS_TIMELINE_HOURS_FORMAT'=>			_('H:i'),
@@ -328,7 +326,6 @@
 	'S_MAX_IN_TABLE' =>				_('Max count of elements to show inside table cell'),
 	'S_DEFAULT_THEME'=>				_('Default theme'),
 	'S_EVENT_ACKNOWLEDGES'=>			_('Event acknowledges'),
-	'S_DAYS'=>					_('Days'),
 	'S_SHOW_EVENTS_MAX'=>				_('Show events max'),
 	'S_CANNNOT_UPDATE_VALUE_MAP'=>			_('Cannot update value map'),
 	'S_VALUE_MAP_ADDED'=>				_('Value map added'),
@@ -507,56 +504,11 @@
 	'S_HISTORY_ITEM_DATE_FORMAT'=>		_('Y.M.d H:i:s'),
 
 // maintenance.php
-	'S_MAINTENANCE'=>				_('Maintenance'),
-	'S_MAINTENANCE_ADDED'=>			_('Maintenance added'),
 	'S_MAINTENANCE_UPDATED'=>		_('Maintenance updated'),
-	'S_MAINTENANCE_DELETED'=>		_('Maintenance deleted'),
-	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>_('Delete selected maintenance periods?'),
-	'S_GROUP_OR_HOST_NEEDED' => _('At least one host or group should be selected'),
-
-	'S_HOSTS_IN_MAINTENANCE'=>		_('Hosts in maintenance'),
-	'S_GROUPS_IN_MAINTENANCE'=>		_('Groups in maintenance'),
-
-	'S_CANNOT_ADD_MAINTENANCE'=>		_('Cannot add maintenance'),
-	'S_CANNOT_UPDATE_MAINTENANCE'=>		_('Cannot update maintenance'),
-	'S_CANNOT_DELETE_MAINTENANCE'=>		_('Cannot delete maintenance'),
-
-	'S_MAINTENANCE_PERIOD_LENGTH'=>		_('Maintenance period length'),
-	'S_MAINTENANCE_PERIODS_BIG'=>		_('MAINTENANCE PERIODS'),
-	'S_NEW_MAINTENANCE_PERIOD'=>		_('New maintenance period'),
-	'S_EDIT_MAINTENANCE_PERIOD'=>		_('Edit maintenance period'),
-	'S_CREATE_MAINTENANCE_PERIOD'=>		_('Create maintenance period'),
-	'S_MAINTENANCE_TYPE'=>			_('Maintenance type'),
-	'S_EXPIRED'=>				_('Expired'),
-	'S_APPROACHING'=>				_('Approaching'),
-
-	'S_WITH_DATA_COLLECTION'=>		_('With data collection'),
-	'S_NO_DATA_COLLECTION'=>		_('No data collection'),
-
 	'S_NORMAL_MAINTENANCE'=>		_('Normal maintenance'),
 	'S_NO_DATA_MAINTENANCE'=>		_('No data maintenance'),
 
-	'S_DELETE_MAINTENANCE_PERIOD_Q'=>	_('Delete maintenance period?'),
-
-	'S_ACTIVE_SINCE'=>			_('Active since'),
-	'S_ACTIVE_TILL'=>			_('Active till'),
-	'S_PERIOD_TYPE'=>			_('Period type'),
-
-	'S_SCHEDULE'=>				_('Schedule'),
-
 	'S_DATE'=>				_('Date'),
-	'S_ONE_TIME_ONLY'=>			_('One time only'),
-
-	'S_DAY_OF_WEEK'=>			_('Day of week'),
-	'S_DAY_OF_MONTH'=>			_('Day of month'),
-
-	'S_EVERY_DAY_S'=>			_('Every day(s)'),
-	'S_EVERY_WEEK_S'=>			_('Every week(s)'),
-
-	'S_FIRST'=>				_('First'),
-	'S_SECOND'=>				_('Second'),
-	'S_THIRD'=>				_('Third'),
-	'S_FOURTH'=>				_('Fourth'),
 
 	'S_AT'=>				_('At'),
 
@@ -572,13 +524,6 @@
 	'S_OCTOBER'=>				_('October'),
 	'S_NOVEMBER'=>				_('November'),
 	'S_DECEMBER'=>				_('December'),
-
-	'S_INCORRECT_MAINTENANCE_PERIOD'=>		_('Incorrect maintenance period'),
-	'S_INCORRECT_MAINTENANCE_DATE'=>		_('Incorrect maintenance date'),
-	'S_INCORRECT_MAINTENANCE_DAY_PERIOD'=>		_('Incorrect maintenance day period'),
-	'S_INCORRECT_MAINTENANCE_WEEK_PERIOD'=>		_('Incorrect maintenance week period'),
-	'S_INCORRECT_MAINTENANCE_MONTH_PERIOD'=>	_('Incorrect maintenance month period'),
-	'S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK'=>	_('Incorrect maintenance days of week'),
 
 // hostgroups.php
 	'S_CONFIGURATION_OF_GROUPS'=>		_('CONFIGURATION OF HOST GROUPS'),
@@ -946,8 +891,6 @@
 	'S_FAVOURITES'=>			_('Favourites'),
 	'S_MENU'=>				_('Menu'),
 	'S_RESET'=>				_('Reset'),
-	'S_MAXIMIZE'=>				_('Maximize'),
-	'S_MINIMIZE'=>				_('Minimize'),
 	'S_LOADING_P'=>				_('Loading...'),
 	'S_OF' => _('of'),
 	'S_ZABBIX_SERVER_IP_OR_PORT_IS_NOT_SET' => _('Zabbix server ip or port is not set!'),
@@ -980,7 +923,6 @@
 //	queue.php
 	'S_TOTAL'=>				_('Total'),
 	'S_COUNT'=>				_('Count'),
-	'S_5_MINUTES'=>				_('5 minutes'),
 	'S_QUEUE_NODES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
 //	report1.php
@@ -1036,9 +978,7 @@
 	'S_PERCENTAGE'=>				_('Percentage'),
 	'S_SLA'=>					_('SLA'),
 	'S_HOUR'=>					_('Hour'),
-	'S_HOURS'=>					_('Hours'),
 	'S_MINUTE'=>					_('Minute'),
-	'S_MINUTES'=>					_('Minutes'),
 	'S_DAY'=>					_('Day'),
 	'S_MONTH'=>					_('Month'),
 	'S_YEAR'=>					_('Year'),
@@ -1506,7 +1446,6 @@
 
 // 	func.inc.php
 	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	_('Incorrect type of asort_by_key'),
-	'S_DAYS_SMALL'=>			_('days'),
 	'S_B'=>			_('B'),
 	'S_N_SMALL'=>	_('n'),
 	'S_NANO'=>		_('Nano'),
@@ -1607,15 +1546,6 @@
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	_('Unable to select configuration'),
 
-//	maintenances.inc.php
-	'S_ON_SMALL'=>				_('on'),
-	'S_EVERY_SMALL'=>			_('every'),
-	'S_DAY_SMALL'=>				_('day'),
-	'S_OF_EVERY_SMALL'=>			_('of every'),
-	'S_WEEKS_SMALL'=>			_('weeks'),
-	'S_WEEK_SMALL'=>			_('week'),
-	'S_MAINTENANCES_SCHEDULE_DATE_FORMAT'=>	_('d M Y'),
-
 //	perm.inc.php
 	'S_INCORRECT_USER_DATA_IN'=>		_('Incorrect user data in'),
 
@@ -1653,11 +1583,6 @@
 	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>_('Only Super Admins can delete media types'),
 
 //	config.inc.php
-	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		_('You cannot view this URL as a'),
-	'S_CONFIG_ERROR_YOU_MUST_LOGIN'=>			_('You must login to view this page.'),
-	'S_CONFIG_NOT_LOGGED_IN_NOTE'=>				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.'),
-	'S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD'=>		_('You are not logged in.'),
-	'S_CONFIG_ERROR_HEAD'=>					_('ERROR'),
 	'S_CONFIG_WARNING_WRONG_MONTH_PART1'=>			_('[Wrong value for month:'),
 	'S_CONFIG_WARNING_WRONG_MONTH_PART2'=>			_(']'),
 	'S_CONFIG_WARNING_WRONG_DOW_PART1'=>			_('[Wrong value for day of week:'),
