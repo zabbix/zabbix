@@ -326,7 +326,11 @@ frontends/php/styles/originalblue/images/ui-icons_469bdd_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_5481ab_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
+frontends/php/tests/agent.php -text
+frontends/php/tests/agent/AgentTests.php -text
+frontends/php/tests/agent/testMetrics.php -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/frontend.php -text
 include/telnet.h -text
 m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text

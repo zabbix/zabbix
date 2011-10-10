@@ -820,11 +820,19 @@ else {
 		if (($DB['TYPE'] == ZBX_DB_POSTGRESQL) && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_NO_FAILED_SQLS']) return 0;
 //------
 		$nodeid = get_current_nodeid(false);
+		$tableSchema = DB::getSchema($table);
 
 		$found = false;
-		do {
-			$min=bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'), 0);
-			$max=bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999', 0);
+		do{
+			if ($tableSchema['type'] == DB::TABLE_TYPE_HISTORY) {
+				$min = bcmul($nodeid, '100000000000000');
+				$max = bcadd(bcmul($nodeid, '100000000000000'), '99999999999999');
+			}
+			else {
+				$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
+				$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
+			}
+
 			$dbSelect = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 
 			if (!$dbSelect) return false;
@@ -1086,6 +1094,9 @@ if (isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']) {
 		const RESERVEIDS_ERROR = 2;
 		const SCHEMA_ERROR = 3;
 
+		const TABLE_TYPE_CONFIG = 1;
+		const TABLE_TYPE_HISTORY = 2;
+
 		const FIELD_TYPE_INT = 'int';
 		const FIELD_TYPE_CHAR = 'char';
 		const FIELD_TYPE_ID = 'id';
@@ -1104,11 +1115,17 @@ if (isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']) {
 			global $ZBX_LOCALNODEID, $DB;
 
 			$nodeid = get_current_nodeid(false);
-			$id_name = self::getSchema($table);
-			$id_name = $id_name['key'];
+			$tableSchema = self::getSchema($table);
+			$id_name = $tableSchema['key'];
 
-			$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'), 0);
-			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999', 0);
+			if ($tableSchema['type'] == self::TABLE_TYPE_HISTORY) {
+				$min = bcmul($nodeid, '100000000000000');
+				$max = bcadd(bcmul($nodeid, '100000000000000'), '99999999999999');
+			}
+			else {
+				$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
+				$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
+			}
 
 			$sql = 'SELECT nextid'.
 				' FROM ids'.
