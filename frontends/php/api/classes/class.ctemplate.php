@@ -1783,7 +1783,7 @@ COpt::memoryPick();
 					' )'.
 					' AND EXISTS ('.
 						' SELECT 1'.
-						' FROM functions ff,items ii,triggers tt'.
+						' FROM functions ff,items ii'.
 						' WHERE ff.itemid=ii.itemid'.
 							' AND ff.triggerid=t.triggerid'.
 							' AND '.DBcondition('ii.hostid', $templateids).
