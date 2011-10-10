@@ -1691,10 +1691,19 @@ COpt::memoryPick();
 				$newTrigger['dependencies'] = replace_template_dependencies($trigger['dependencies'], $chd_host['hostid']);
 
 			$newTrigger['templateid'] = $trigger['triggerid'];
-
 			$newTrigger['expression'] = $trigger['expression'];
-			foreach ($triggerTemplates as $triggerTemplate) {
-				$newTrigger['expression'] = str_replace('{'.$triggerTemplate['host'].':', '{'.$chd_host['host'].':', $newTrigger['expression']);
+
+			$expressionData = new CTriggerExpression($trigger);
+
+			// replace template separately in each expression, only in beginning (host part)
+			foreach ($expressionData->expressions as $expr) {
+				$newExpr = '';
+				foreach ($triggerTemplates as $triggerTemplate) {
+					$newExpr = preg_replace('/^{'.$triggerTemplate['host'].':/', '{'.$chd_host['host'].':', $expr['expression']);
+				}
+				if (!empty($newExpr)) {
+					$newTrigger['expression'] = str_replace($expr['expression'], $newExpr, $newTrigger['expression']);
+				}
 			}
 
 // check if templated trigger exists
