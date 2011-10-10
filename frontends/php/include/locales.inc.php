@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-function init_mbstrings(){
+function init_mbstrings() {
 	$res = true;
 
 	$res &= mbstrings_available();
@@ -30,11 +30,11 @@ function init_mbstrings(){
 	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 	$res &= (ini_get('mbstring.detect_order') == 'UTF-8, ISO-8859-1, JIS, SJIS');
 
-	if($res) define('ZBX_MBSTRINGS_ENABLED', true);
-return $res;
+	if ($res) define('ZBX_MBSTRINGS_ENABLED', true);
+	return $res;
 }
 
-function mbstrings_available(){
+function mbstrings_available() {
 	return (function_exists('mb_strlen')
 			&& function_exists('mb_strtoupper')
 			&& function_exists('mb_strpos')
@@ -42,18 +42,18 @@ function mbstrings_available(){
 }
 
 // Translate global array $TRANSLATION into constants
-function process_locales(){
+function process_locales() {
 	global $TRANSLATION;
 //SDI(count($TRANSLATION).' : '.$TRANSLATION['S_HTML_CHARSET']);
-	if(isset($TRANSLATION) && is_array($TRANSLATION)){
-		foreach($TRANSLATION as $const=>$label){
-			if(!defined($const)) define($const,$label);
+	if (isset($TRANSLATION) && is_array($TRANSLATION)) {
+		foreach ($TRANSLATION as $const=>$label) {
+			if (!defined($const)) define($const, $label);
 		}
 	}
 	unset($GLOBALS['TRANSLATION']);
 }
 
-function set_zbx_locales(){
+function set_zbx_locales() {
 	global $ZBX_LOCALES;
 	$ZBX_LOCALES = array(
 		'en_GB'=>  S_ENGLISH_GB,
@@ -85,15 +85,15 @@ function set_zbx_locales(){
  * @param string $language in format 'ru_RU', 'en_EN' and so on
  * @return array a list of possible locale names
  */
-function zbx_locale_variants($language){
-	if(stristr($_SERVER['SERVER_SOFTWARE'], 'win32') !== false)
+function zbx_locale_variants($language) {
+	if (stristr($_SERVER['SERVER_SOFTWARE'], 'win32') !== false)
 		$result = zbx_locale_variants_win($language);
 	else
 		$result = zbx_locale_variants_unix($language);
-return $result;
+	return $result;
 }
 
-function zbx_locale_variants_unix($language){
+function zbx_locale_variants_unix($language) {
 	$postfixes = array(
 		'',
 		'.utf8',
@@ -135,13 +135,13 @@ function zbx_locale_variants_unix($language){
 	);
 
 	$result = array();
-	foreach($postfixes as $postfix){
+	foreach ($postfixes as $postfix) {
 		$result[] = $language.$postfix;
 	}
-return $result;
+	return $result;
 }
 
-function zbx_locale_variants_win($language){
+function zbx_locale_variants_win($language) {
 // windows locales are written like language[_country[.charset]]
 	$winLanguageName = array(
 		'en_gb'=>  'english',
@@ -168,6 +168,6 @@ function zbx_locale_variants_win($language){
 
 	$result = array($winLang);
 
-return $result;
+	return $result;
 }
 ?>
