@@ -143,6 +143,7 @@ function zbx_locale_variants_unix($language) {
 
 function zbx_locale_variants_win($language) {
 // windows locales are written like language[_country[.charset]]
+// for a list of supported languages see http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
 	$winLanguageName = array(
 		'en_gb'=>  'english',
 		'zh_cn'=>  'chinese',
@@ -156,7 +157,7 @@ function zbx_locale_variants_win($language) {
 		'ja_jp'=>  'japanese',
 		'lv_lv'=>  'latvian',
 		'pl_pl'=>  'polish',
-		'pt_br'=>  'portuguese',
+		'pt_br'=>  'portuguese-brazil',
 		'ru_ru'=>  'russian',
 		'sk_sk'=>  'slovak',
 		'es_es'=>  'spanish',
