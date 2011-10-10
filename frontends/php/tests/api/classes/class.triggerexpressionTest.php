@@ -85,7 +85,10 @@ class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
 			array('{host:key[a,,"b",,[c,d,,"e",],,f]].count(1,,"b",3)}',false),
 
 			array('{abcdefghijklmnopqrstuvwxyz. _-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890:key.diff()}',true),
-			array('{host:abcdefghijklmnopqrstuvwxyz.,_-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.diff()}',true),
+			array('{host:abcdefghijklmnopqrstuvwxyz._-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.diff()}',true),
+			array('{host:,.diff()}',false),
+			array('{host:;.diff()}',false),
+			array('{host::.diff()}',false),
 			array('{host:.diff()}',false),
 			array('{:key.diff()}',false),
 			array('{host:key.()}',false),

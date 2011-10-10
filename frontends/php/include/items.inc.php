@@ -1343,10 +1343,10 @@ function item_type2str($type = null){
  * @param string $char
  * @return bool
  */
-	function isKeyIdChar($char){
+	function isKeyIdChar($char) {
 		return (
 			($char >= 'a' && $char <= 'z')
-			|| ($char == '.' || $char == ',' || $char == '_' || $char == '-')
+			|| $char == '.' || $char == '_' || $char == '-'
 			|| ($char >= 'A' && $char <= 'Z')
 			|| ($char >= '0' && $char <= '9')
 		);

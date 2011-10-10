@@ -96,7 +96,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #endif
 
 	if (NULL == last_ts)
-		last_ts = zbx_malloc(last_ts, sizeof(zbx_timespec_t));
+		last_ts = zbx_calloc(last_ts, 1, sizeof(zbx_timespec_t));
 
 #ifdef _WINDOWS
 	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
@@ -2131,7 +2131,7 @@ double	str2double(const char *str)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: in host name allowed characters: '0-9a-zA-Z. _-]'                *
+ * Comments: in host name allowed characters: '0-9a-zA-Z. _-'                 *
  *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
@@ -2161,7 +2161,7 @@ int	is_hostname_char(char c)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: in key allowed characters: '0-9a-zA-Z.,_-]'                      *
+ * Comments: in key allowed characters: '0-9a-zA-Z._-'                        *
  *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
@@ -2170,7 +2170,7 @@ int	is_key_char(char c)
 	if (c >= 'a' && c <= 'z')
 		return SUCCEED;
 
-	if (c == '.' || c == ',' || c == '_' || c == '-')
+	if (c == '.' || c == '_' || c == '-')
 		return SUCCEED;
 
 	if (c >= 'A' && c <= 'Z')
