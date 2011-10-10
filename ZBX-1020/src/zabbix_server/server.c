@@ -361,7 +361,7 @@ static void	zbx_load_config()
 #endif
 
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, SYSCONFDIR "/externalscripts");
 
 	if (0 == CONFIG_NODEID)
 		CONFIG_NODEWATCHER_FORKS = 0;
@@ -446,7 +446,7 @@ int	main(int argc, char **argv)
 	}
 
 	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = zbx_strdup(CONFIG_FILE, "/etc/zabbix/zabbix_server.conf");
+		CONFIG_FILE = zbx_strdup(CONFIG_FILE, SYSCONFDIR "/zabbix_server.conf");
 
 	/* required for simple checks */
 	init_metrics();
