@@ -272,16 +272,14 @@ include_once('include/page_header.php');
 		// get updated triggers with additional data
 		$options = array(
 			'triggerids' => $triggerIdsToUpdate,
-			'output' => array('triggerid', 'description'),
+			'output' => array('triggerid', 'description', 'expression'),
 			'preservekeys' => true,
-			'selectHosts' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
 		);
 		$triggers = API::TriggerPrototype()->get($options);
 		foreach ($triggers as $triggerid => $trigger) {
-			$host = reset($trigger['hosts']);
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $triggerid,
-					$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
+					$trigger['description'].':'.explode_exp($trigger['expression']), 'triggers', $statusOld, $statusNew);
 		}
 
 		$go_result = DBend($go_result);

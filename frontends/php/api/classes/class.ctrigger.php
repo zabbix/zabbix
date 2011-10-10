@@ -1612,6 +1612,11 @@ COpt::memoryPick();
 			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression']);
 			$trigger['expression'] = $expression;
 			info(_s('Trigger [%1$s:%2$s] updated.', $trigger['description'], $expression));
+
+			if (isset($trigger['status'])) {
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'],
+						$trigger['description'].':'.$expression, 'triggers', array('status' => $dbTrigger['status']), array('status' => $trigger['status']));
+			}
 		}
 		unset($trigger);
 
