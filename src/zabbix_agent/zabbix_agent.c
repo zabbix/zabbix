@@ -58,7 +58,7 @@ void	child_signal_handler(int sig)
 	exit(FAIL);
 }
 
-static char	DEFAULT_CONFIG_FILE[] = "/etc/zabbix/zabbix_agent.conf";
+static char	DEFAULT_CONFIG_FILE[] = SYSCONFDIR "/zabbix_agent.conf";
 
 /******************************************************************************
  *                                                                            *
