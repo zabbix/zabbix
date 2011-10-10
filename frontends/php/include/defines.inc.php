@@ -712,10 +712,8 @@ define('REGEXP_EXCLUDE',1);
 
 // preg
 define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
-define('ZBX_PREG_SPACES', '(\s+){0,1}');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
-define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_,.-]+)'); // !!! Don't forget sync code with C !!!
 define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
 define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[KMGTsmhdw]{0,1})');
@@ -723,9 +721,7 @@ define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(?(?=,)('.ZBX_PREG_PARAMS.'){0,1}|(\['.ZBX_PREG_PARAMS.'\]){0,1}))');
 define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
-define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
 define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
