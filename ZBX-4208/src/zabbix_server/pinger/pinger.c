@@ -175,7 +175,7 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr, int *count,
 		int *interval, int *size, int *timeout, icmppingsec_type_t *type, char *error, int max_error_len)
 {
-	char	cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
+	char	cmd[16], params[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	int	num_params;
 
 	if (0 == parse_command(key, cmd, sizeof(cmd), params, sizeof(params)))
