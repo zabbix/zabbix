@@ -163,7 +163,6 @@
 	'S_NEW_INSTALLATION_BIG'=>		_('NEW INSTALLATION'),
 	'S_INSTALLATION_UPDATE'=>		_('Installation/Update'),
 	'S_ZABBIX_IS_UNAVAILABLE'=>		_('Zabbix is temporarily unavailable'),
-	'S_REQUIRE_MB_STRING_MODULE'=>		_('Multibyte String module required to run FrontEnd'),
 
 //	actions.inc.php
 	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -209,7 +208,6 @@
 	'S_MAX_VALUE_SMALL'=>			_('max value'),
 	'S_MIN_VALUE_SMALL'=>			_('min value'),
 	'S_CONDITION'=>				_('Condition'),
-	'S_NEW'=>				_('New'),
 	'S_EVENT_ACKNOWLEDGED'=>		_('Event acknowledged'),
 
 //	actions.php
@@ -459,13 +457,10 @@
 	'S_HISTORY_ITEM_DATE_FORMAT'=>		_('Y.M.d H:i:s'),
 
 // maintenance.php
-	'S_MAINTENANCE_UPDATED'=>		_('Maintenance updated'),
 	'S_NORMAL_MAINTENANCE'=>		_('Normal maintenance'),
 	'S_NO_DATA_MAINTENANCE'=>		_('No data maintenance'),
 
 	'S_DATE'=>				_('Date'),
-
-	'S_AT'=>				_('At'),
 
 	'S_JANUARY'=>				_('January'),
 	'S_FEBRUARY'=>				_('February'),
@@ -932,8 +927,6 @@
 	'S_PROBLEMS'=>					_('Problems'),
 	'S_PERCENTAGE'=>				_('Percentage'),
 	'S_SLA'=>					_('SLA'),
-	'S_HOUR'=>					_('Hour'),
-	'S_MINUTE'=>					_('Minute'),
 	'S_DAY'=>					_('Day'),
 	'S_MONTH'=>					_('Month'),
 	'S_YEAR'=>					_('Year'),
@@ -972,7 +965,6 @@
 	'S_TRIGGERS_TOP_100_BIG'=>		_('MOST BUSY TRIGGERS TOP 100'),
 	'S_NUMBER_OF_STATUS_CHANGES'=>		_('Number of status changes'),
 	'S_WEEK'=>				_('Week'),
-	'S_LAST'=>				_('Last'),
 
 //	report6.php
 	'S_BAR_REPORTS'=>			_('Bar reports'),
@@ -1248,7 +1240,6 @@
 	'S_DEBUG'=>					_('Debug'),
 	'S_DENY'=>					_('Deny'),
 	'S_HIDE'=>					_('Hide'),
-	'S_PASSWORD_ONCE_AGAIN'=>			_('Password (once again)'),
 	'S_PASSWORD'=>			_('Password'),
 	'S_ADD_TO'=>					_('Add to'),
 	'S_REMOVE_FROM'=>				_('Remove from'),
@@ -1399,16 +1390,7 @@
 	'S_MEMORY_LIMIT_REACHED'=>	_('MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing.'),
 
 // 	func.inc.php
-	'S_B'=>			_('B'),
-	'S_N_SMALL'=>	_('n'),
-	'S_NANO'=>		_('Nano'),
-	'S_K'=>			_('K'),
-	'S_M'=>			_('M'),
-	'S_G'=>			_('G'),
-	'S_T'=>			_('T'),
-	'S_P'=>			_('P'),
 	'S_E'=>			_('E'),
-	'S_Z'=>			_('Z'),
 	'S_Y'=>			_('Y'),
 
 //	forms.inc.php
