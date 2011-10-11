@@ -43,7 +43,7 @@ $maintenanceForm->addVar('active_since', date('YmdHis', $this->data['active_sinc
 $maintenanceForm->addVar('active_till', date('YmdHis', $this->data['active_till']));
 
 $calendarIcon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
-$calendarIcon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["mntc_active_since"].clndr.clndrshow(pos.top, pos.left);');
+$calendarIcon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["mntc_active_since"].clndr.clndrshow(pos.top, pos.left); CLNDR["mntc_active_till"].clndr.clndrhide(); ');
 $maintenanceFormList->addRow(_('Active since'), array(
 	new CNumericBox('mntc_since_day', (($this->data['active_since'] > 0) ? date('d', $this->data['active_since']) : ''), 2), '/',
 	new CNumericBox('mntc_since_month', (($this->data['active_since'] > 0) ? date('m', $this->data['active_since']) : ''), 2), '/',
@@ -54,7 +54,7 @@ $maintenanceFormList->addRow(_('Active since'), array(
 ));
 zbx_add_post_js('create_calendar(null, ["mntc_since_day", "mntc_since_month", "mntc_since_year", "mntc_since_hour", "mntc_since_minute"], "mntc_active_since", "active_since");');
 
-$calendarIcon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["mntc_active_till"].clndr.clndrshow(pos.top, pos.left);');
+$calendarIcon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["mntc_active_till"].clndr.clndrshow(pos.top, pos.left); CLNDR["mntc_active_since"].clndr.clndrhide(); ');
 $maintenanceFormList->addRow(_('Active till'), array(
 	new CNumericBox('mntc_till_day', (($this->data['active_till'] > 0) ? date('d', $this->data['active_till']) : ''), 2), '/',
 	new CNumericBox('mntc_till_month', (($this->data['active_till'] > 0) ? date('m', $this->data['active_till']) : ''), 2), '/',
