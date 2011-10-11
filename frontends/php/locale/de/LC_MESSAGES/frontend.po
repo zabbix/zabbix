@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-11 22:11+0300\n"
-"PO-Revision-Date: 2011-09-24 20:36+0200\n"
+"POT-Creation-Date: 2011-10-11 22:24+0300\n"
+"PO-Revision-Date: 2011-10-10 18:41+0200\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
@@ -4641,23 +4641,23 @@ msgstr ""
 
 #: api/classes/class.caction.php:1600
 msgid "Incorrect action operation command type."
-msgstr ""
+msgstr "Falscher Kommando-Typ für Aktions-Operation."
 
 #: api/classes/class.caction.php:1833
 msgid "Incorrect action operation condition acknowledge type."
-msgstr ""
+msgstr "Falscher Bestätigungstyp für Aktions-Operation."
 
 #: api/classes/class.caction.php:1838
 msgid "Incorrect action operation condition type."
-msgstr ""
+msgstr "Falscher Bedingungs-Typ für Aktions-Operation."
 
 #: api/classes/class.caction.php:1528
 msgid "Incorrect action operation escalation period."
-msgstr ""
+msgstr "Falsche Eskalations-Periode für Aktions-Operation."
 
 #: api/classes/class.caction.php:1518 api/classes/class.caction.php:1522
 msgid "Incorrect action operation escalation step values."
-msgstr ""
+msgstr "Falscher Eskalationsstufenwert für Aktions-Operation."
 
 #: api/classes/class.caction.php:1671
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
@@ -4670,11 +4670,11 @@ msgstr ""
 #: api/classes/class.caction.php:1606 api/classes/class.caction.php:1610
 #, php-format
 msgid "Incorrect action operation port \"%s\"."
-msgstr ""
+msgstr "Falscher Port \"%s\" für Aktions-Operation."
 
 #: api/classes/class.caction.php:1666
 msgid "Incorrect action operation type."
-msgstr ""
+msgstr "Falscher Typ für Aktions-Operation."
 
 #: api/classes/class.caction.php:1680
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
@@ -4682,11 +4682,11 @@ msgstr ""
 
 #: api/classes/class.caction.php:1677
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
-msgstr ""
+msgstr "Falscher Benutzer für Aktions-Operation. Benutzer existiert nicht oder Sie haben keinen Zugriff auf ihn."
 
 #: api/classes/class.caction.php:999
 msgid "Incorrect action operationid"
-msgstr ""
+msgstr "Falsche action operationid"
 
 #: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1522
 msgid "Incorrect arguments passed to function"
@@ -6376,22 +6376,23 @@ msgid "No applications defined."
 msgstr "Keine Applikation definiert."
 
 #: api/classes/class.caction.php:1565
-#, fuzzy, php-format
+#, php-format
 msgid "No authentication type specified for action operation command \"%s\"."
-msgstr "Kein Authentifizierungs-Typ festgelegt für Aktion."
+msgstr "Kein Authentifizierungs-Typ festgelegt für Kommando \"%s\" in Aktions-Operation."
 
 #: api/classes/class.caction.php:1569 api/classes/class.caction.php:1583
 #, php-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr ""
+msgstr "Kein Authentifizierungs-Benutzername festgelegt für Kommando \"%s\" in Aktions-Operation."
 
+# Kommando/Befehl?
 #: api/classes/class.caction.php:1552
 msgid "No command specified for action operation."
-msgstr ""
+msgstr "Kein Kommando festgelegt für Aktions-Operation."
 
 #: api/classes/class.caction.php:1547
 msgid "No command type specified for action operation."
-msgstr ""
+msgstr "Kein Kommando-Typ festgelegt für Aktions-Operation."
 
 #: include/views/configuration.action.edit.php:84
 #: include/views/configuration.action.edit.php:787
@@ -6446,7 +6447,7 @@ msgstr "Keine Ereignisse zu bestätigen"
 #: api/classes/class.caction.php:1560
 #, php-format
 msgid "No execution target specified for action operation command \"%s\"."
-msgstr ""
+msgstr "Kein Ziel festgelegt für das Ausführen des Kommandos \"%s\" der Aktions-Operation."
 
 #: include/locales/en_gb.inc.php:772
 msgid "No flexible intervals"
@@ -6616,7 +6617,7 @@ msgstr "Keine Berechtigungen für dieses bestimmte Objekt oder es existiert nich
 #: api/classes/class.caction.php:1577
 #, php-format
 msgid "No private key file specified for action operation command \"%s\"."
-msgstr ""
+msgstr "Keine Datei mit privatem Schlüssel festgelegt für das Kommando \"%s\" der Aktions-Operation."
 
 #: include/locales/en_gb.inc.php:623
 msgid "No proxies defined."
@@ -6629,11 +6630,11 @@ msgstr "Kein Proxy"
 #: api/classes/class.caction.php:1574
 #, php-format
 msgid "No public key file specified for action operation command \"%s\"."
-msgstr ""
+msgstr "Keine Datei mit öffentlichem Schlüssel festgelegt für das Kommando \"%s\" der Aktions-Operation."
 
 #: api/classes/class.caction.php:1539
 msgid "No recipients for action operation message."
-msgstr ""
+msgstr "Keine Empfänger für die Nachricht der Aktions-Operation."
 
 #: include/locales/en_gb.inc.php:1112
 msgid "No resources defined."
@@ -6649,7 +6650,7 @@ msgstr "Keine Übersichtstafeln definiert."
 
 #: api/classes/class.caction.php:1588
 msgid "No script specified for action operation command."
-msgstr ""
+msgstr "Kein Skript festgelegt für das Kommando der Aktions-Operation."
 
 #: include/views/administration.script.list.php:37 popup.php:1782
 msgid "No scripts defined."
@@ -10330,7 +10331,7 @@ msgstr ""
 
 #: api/classes/class.chost.php:1622
 msgid "You do not have enough rights for operation."
-msgstr ""
+msgstr "Berechtigungen reichen nicht für Operation."
 
 #: include/locales/en_gb.inc.php:1651
 msgid "You do not have permission to perform this operation"
