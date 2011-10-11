@@ -30,7 +30,7 @@ class CNumericBox extends CInput {
 				($allowempty ? ' if(this.value.length==0 || this.value==null) this.value = \'\'; else ' : '').
 				' if(isNaN(parseInt(this.value,10))) this.value = 0; '.
 				' else this.value = parseInt(this.value,10);'
-			);
+		);
 	}
 }
 ?>

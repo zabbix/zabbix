@@ -51,11 +51,11 @@ class CLink extends CTag {
 				$this->sid = isset($_COOKIE['zbx_sessionid']) ? substr($_COOKIE['zbx_sessionid'], 16, 16) : null;
 			}
 			if (!is_null($this->sid)) {
-				if (zbx_strstr($value,'&') !== false || zbx_strstr($value,'?') !== false) {
-					$value.= '&sid='.$this->sid;
+				if (zbx_strstr($value, '&') !== false || zbx_strstr($value, '?') !== false) {
+					$value .= '&sid='.$this->sid;
 				}
 				else {
-					$value.= '?sid='.$this->sid;
+					$value .= '?sid='.$this->sid;
 				}
 			}
 			$url = $value;

@@ -30,7 +30,7 @@ class CButtonCancel extends CButton {
 	public function setVars($value = null) {
 		$url = '?cancel=1';
 		if (!is_null($value)) {
-			$url.= $value;
+			$url .= $value;
 		}
 		$uri = new Curl($url);
 		$url = $uri->getUrl();

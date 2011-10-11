@@ -3009,13 +3009,13 @@
 
 		// daysofweek
 		$dayofweek = '';
-		$dayofweek .= (!isset($new_timeperiod['dayofweek_mo'])) ? '0' : '1';
-		$dayofweek .= (!isset($new_timeperiod['dayofweek_tu'])) ? '0' : '1';
-		$dayofweek .= (!isset($new_timeperiod['dayofweek_we'])) ? '0' : '1';
-		$dayofweek .= (!isset($new_timeperiod['dayofweek_th'])) ? '0' : '1';
-		$dayofweek .= (!isset($new_timeperiod['dayofweek_fr'])) ? '0' : '1';
-		$dayofweek .= (!isset($new_timeperiod['dayofweek_sa'])) ? '0' : '1';
-		$dayofweek .= (!isset($new_timeperiod['dayofweek_su'])) ? '0' : '1';
+		$dayofweek .= !isset($new_timeperiod['dayofweek_mo']) ? '0' : '1';
+		$dayofweek .= !isset($new_timeperiod['dayofweek_tu']) ? '0' : '1';
+		$dayofweek .= !isset($new_timeperiod['dayofweek_we']) ? '0' : '1';
+		$dayofweek .= !isset($new_timeperiod['dayofweek_th']) ? '0' : '1';
+		$dayofweek .= !isset($new_timeperiod['dayofweek_fr']) ? '0' : '1';
+		$dayofweek .= !isset($new_timeperiod['dayofweek_sa']) ? '0' : '1';
+		$dayofweek .= !isset($new_timeperiod['dayofweek_su']) ? '0' : '1';
 		if (isset($new_timeperiod['dayofweek'])) {
 			$dayofweek = zbx_num2bitstr($new_timeperiod['dayofweek'], true);
 		}
@@ -3030,18 +3030,18 @@
 
 		// months
 		$month = '';
-		$month .= (!isset($new_timeperiod['month_jan'])) ? '0' : '1';
-		$month .= (!isset($new_timeperiod['month_feb'])) ? '0' : '1';
-		$month .= (!isset($new_timeperiod['month_mar'])) ? '0' : '1';
-		$month .= (!isset($new_timeperiod['month_apr'])) ? '0' : '1';
-		$month .= (!isset($new_timeperiod['month_may'])) ? '0' : '1';
-		$month .= (!isset($new_timeperiod['month_jun'])) ? '0' : '1';
-		$month .= (!isset($new_timeperiod['month_jul'])) ? '0' : '1';
-		$month .= (!isset($new_timeperiod['month_aug'])) ? '0' : '1';
-		$month .= (!isset($new_timeperiod['month_sep'])) ? '0' : '1';
-		$month .= (!isset($new_timeperiod['month_oct'])) ? '0' : '1';
-		$month .= (!isset($new_timeperiod['month_nov'])) ? '0' : '1';
-		$month .= (!isset($new_timeperiod['month_dec'])) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_jan']) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_feb']) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_mar']) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_apr']) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_may']) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_jun']) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_jul']) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_aug']) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_sep']) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_oct']) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_nov']) ? '0' : '1';
+		$month .= !isset($new_timeperiod['month_dec']) ? '0' : '1';
 		if (isset($new_timeperiod['month'])) {
 			$month = zbx_num2bitstr($new_timeperiod['month'], true);
 		}
@@ -3201,15 +3201,15 @@
 
 			$start_date = zbxDateToTime($new_timeperiod['start_date']);
 			$filtertimetab->addRow(array(
-				new CNumericBox('new_timeperiod_day', (($start_date > 0) ? date('d', $start_date) : ''), 2),
+				new CNumericBox('new_timeperiod_day', ($start_date > 0) ? date('d', $start_date) : '', 2),
 				'/',
-				new CNumericBox('new_timeperiod_month', (($start_date > 0) ? date('m', $start_date) : ''), 2),
+				new CNumericBox('new_timeperiod_month', ($start_date > 0) ? date('m', $start_date) : '', 2),
 				'/',
-				new CNumericBox('new_timeperiod_year', (($start_date > 0) ? date('Y', $start_date) : ''), 4),
+				new CNumericBox('new_timeperiod_year', ($start_date > 0) ? date('Y', $start_date) : '', 4),
 				SPACE,
-				new CNumericBox('new_timeperiod_hour', (($start_date > 0) ? date('H', $start_date) : ''), 2),
+				new CNumericBox('new_timeperiod_hour', ($start_date > 0) ? date('H', $start_date) : '', 2),
 				':',
-				new CNumericBox('new_timeperiod_minute', (($start_date > 0) ? date('i', $start_date) : ''), 2),
+				new CNumericBox('new_timeperiod_minute', ($start_date > 0) ? date('i', $start_date) : '', 2),
 				$clndr_icon
 			));
 			zbx_add_post_js('create_calendar(null, ["new_timeperiod_day", "new_timeperiod_month", "new_timeperiod_year", "new_timeperiod_hour", "new_timeperiod_minute"], "new_timeperiod_date", "new_timeperiod_start_date");');
@@ -3250,6 +3250,7 @@
 		$td->setAttribute('colspan', '3');
 		$td->setAttribute('style', 'text-align: right;');
 		$tblPeriod->setFooter($td);
+
 		return $tblPeriod;
 	}
 
