@@ -1315,18 +1315,17 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*buf = NULL;
-	int		buf_offset, buf_allocated = 1024;
+	size_t		buf_alloc = ZBX_KIBIBYTE, buf_offset = 0;
 	int		status, esc_step;
 	time_t		now;
 	zbx_uint64_t	userid;
 
-	buf = zbx_malloc(buf, buf_allocated);
-	buf_offset = 0;
+	buf = zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
 	if (escalation != NULL && escalation->eventid == event->eventid)
 	{
-		zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 64,
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"Problem started: %s %s Age: %s\n",
 				zbx_date2str(event->clock),
 				zbx_time2str(event->clock),
@@ -1340,7 +1339,7 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 		if (NULL != (row = DBfetch(result)))
 		{
 			now = (time_t)atoi(row[0]);
-			zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 64,
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 					"Problem started: %s %s Age: %s\n",
 					zbx_date2str(now),
 					zbx_time2str(now),
@@ -1365,9 +1364,9 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 		ZBX_DBROW2UINT64(userid, row[6]);
 
 		if (esc_step != 0)
-			zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 16, "%d. ", esc_step);
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%d. ", esc_step);
 
-		zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 256,
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"%s %s %-11s %s %s \"%s\" %s\n",
 				zbx_date2str(now),
 				zbx_time2str(now),
@@ -1384,7 +1383,7 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 	if (escalation != NULL && escalation->r_eventid == event->eventid)
 	{
 		now = (time_t)event->clock;
-		zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 64,
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"Problem ended: %s %s\n",
 				zbx_date2str(now),
 				zbx_time2str(now));
@@ -1419,7 +1418,7 @@ static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*buf = NULL;
-	int		buf_offset, buf_allocated = 1024;
+	size_t		buf_alloc = ZBX_KIBIBYTE, buf_offset = 0;
 	time_t		now;
 	zbx_uint64_t	userid;
 
@@ -1429,8 +1428,7 @@ static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
 		return SUCCEED;
 	}
 
-	buf = zbx_malloc(buf, buf_allocated);
-	buf_offset = 0;
+	buf = zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
 	result = DBselect("select clock,userid,message"
@@ -1443,7 +1441,7 @@ static int	get_event_ack_history(DB_EVENT *event, char **replace_to)
 		now = atoi(row[0]);
 		ZBX_STR2UINT64(userid, row[1]);
 
-		zbx_snprintf_alloc(&buf, &buf_allocated, &buf_offset, 256,
+		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"%s %s \"%s\"\n%s\n\n",
 				zbx_date2str(now),
 				zbx_time2str(now),
@@ -2612,7 +2610,8 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 	DB_ROW		row;
 	DC_TRIGGER	*tr;
 	char		*sql = NULL;
-	int		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0, i;
+	size_t		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		i;
 	zbx_uint64_t	itemid, triggerid, functionid;
 	zbx_ifunc_t	*ifunc = NULL;
 	zbx_func_t	*func = NULL;
@@ -2623,13 +2622,13 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 75,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select itemid,triggerid,function,parameter,functionid"
 			" from functions"
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "functionid",
 			functionids->values, functionids->values_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 57,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			" order by itemid,triggerid,function,parameter,functionid");
 
 	result = DBselect("%s", sql);
@@ -2692,7 +2691,8 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 	DB_ROW		row;
 	DB_ITEM		item;
 	char		*sql = NULL, value[MAX_BUFFER_LEN];
-	int		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0, i;
+	size_t		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		i;
 	zbx_ifunc_t	*ifunc = NULL;
 	zbx_func_t	*func;
 	zbx_uint64_t	*itemids = NULL;
@@ -2707,7 +2707,6 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 		itemids[i] = ((zbx_ifunc_t *)ifuncs->values[i])->itemid;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			49 + sizeof(ZBX_SQL_ITEM_FIELDS) + sizeof(ZBX_SQL_ITEM_TABLES),
 			"select %s,h.status"
 			" from %s"
 			" where i.hostid=h.hostid"
@@ -2804,7 +2803,8 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, zbx_vecto
 
 	DC_TRIGGER	*tr;
 	char		*out = NULL, *br, *bl;
-	int		out_alloc = TRIGGER_EXPRESSION_LEN_MAX, out_offset = 0, i;
+	size_t		out_alloc = TRIGGER_EXPRESSION_LEN_MAX, out_offset = 0;
+	int		i;
 	zbx_uint64_t	functionid;
 	zbx_func_t	*func;
 

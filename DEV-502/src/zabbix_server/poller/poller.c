@@ -86,16 +86,14 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	DC_TRIGGER	*tr = NULL, *trigger;
 	int		tr_alloc = 0, tr_num = 0;
 	char		*sql = NULL;
-	int		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 	char		failed_type_buf[8];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* determine failed item type */
 	switch (type)
@@ -211,16 +209,14 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->new_value, reason,
 				&trigger->timespec, &trigger->add_event, &trigger->value_changed))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 	DBfree_result(result);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);

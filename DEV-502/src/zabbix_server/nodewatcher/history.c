@@ -98,8 +98,9 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*data = NULL, *tmp = NULL;
-	int		data_allocated = 1024*1024, tmp_allocated = 4096, tmp_offset, data_offset, f, fld, len;
-	int		data_found = 0;
+	size_t		data_alloc = ZBX_MEBIBYTE, data_offset,
+			tmp_alloc = 4 * ZBX_KIBIBYTE, tmp_offset;
+	int		data_found = 0, f, fld;
 	zbx_uint64_t	lastid;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_history_table_data()");
@@ -109,11 +110,11 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 
 	DBbegin();
 
-	data = zbx_malloc(data, data_allocated);
-	tmp = zbx_malloc(tmp, tmp_allocated);
+	data = zbx_malloc(data, data_alloc);
+	tmp = zbx_malloc(tmp, tmp_alloc);
 
 	data_offset = 0;
-	zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "History%c%d%c%d%c%s",
+	zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "History%c%d%c%d%c%s",
 		ZBX_DM_DELIMITER, CONFIG_NODEID,
 		ZBX_DM_DELIMITER, nodeid,
 		ZBX_DM_DELIMITER, table->table);
@@ -124,28 +125,26 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 
 	tmp_offset = 0;
 	if (table->flags & ZBX_HISTORY_SYNC) {
-		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 128, "select %s,",
-			table->recid);
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "select %s,", table->recid);
 	} else { /* ZBX_HISTORY */
-		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 16, "select ");
+		zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "select ");
 	}
 
 	for (f = 0; table->fields[f].name != 0; f++) {
 		if ((table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
 			continue;
 
-		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 128, "%s,",
-			table->fields[f].name);
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "%s,", table->fields[f].name);
 	}
 	tmp_offset--;
 
 	if (table->flags & ZBX_HISTORY_SYNC) {
-		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 1024, " from %s where nodeid=%d order by %s",
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, " from %s where nodeid=%d order by %s",
 			table->table,
 			nodeid,
 			table->recid);
 	} else { /* ZBX_HISTORY */
-		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 1024, " from %s where %s>"ZBX_FS_UI64
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, " from %s where %s>"ZBX_FS_UI64
 			DB_NODE " order by %s",
 			table->table,
 			table->recid,
@@ -165,7 +164,7 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 		else
 			fld = 0;
 
-		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 2, "\n");
+		zbx_chrcpy_alloc(&data, &data_alloc, &data_offset, '\n');
 
 		for (f = 0; NULL != table->fields[f].name; f++)
 		{
@@ -179,21 +178,19 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 			{
 				if (SUCCEED == DBis_null(row[fld]))
 				{
-					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 6, "NULL%c",
+					zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "NULL%c",
 							ZBX_DM_DELIMITER);
 				}
 				else
 				{
-					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s%c",
+					zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "%s%c",
 							row[fld], ZBX_DM_DELIMITER);
 				}
 			}
 			else
 			{ /* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT */
-				len = (int)strlen(row[fld]);
-				len = zbx_binary2hex((u_char *)row[fld], len, &tmp, &tmp_allocated);
-				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, len + 8, "%s%c",
-						tmp, ZBX_DM_DELIMITER);
+				zbx_binary2hex((u_char *)row[fld], strlen(row[fld]), &tmp, &tmp_alloc);
+				zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "%s%c", tmp, ZBX_DM_DELIMITER);
 			}
 			fld++;
 		}
