@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-11 22:11+0300\n"
-"PO-Revision-Date: 2011-10-07 23:45+0200\n"
-"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
+"POT-Creation-Date: 2011-10-11 22:24+0300\n"
+"PO-Revision-Date: 2011-10-11 19:42+0200\n"
+"Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -626,12 +626,12 @@ msgstr "Автоматически"
 
 #: include/views/configuration.sysmap.edit.php:77
 msgid "Automatic icon mapping"
-msgstr ""
+msgstr "Автоматическое назначение иконок"
 
 #: include/views/js/configuration.sysmaps.js.php:116
 #: include/views/js/configuration.sysmaps.js.php:317
 msgid "Automatic icon selection"
-msgstr ""
+msgstr "Автоматический выбор иконки"
 
 #: hosts.php:781 include/html.inc.php:375 include/locales/en_gb.inc.php:659
 #: popup.php:446
@@ -695,7 +695,7 @@ msgstr "Привязанный DN"
 
 #: include/views/administration.authentication.edit.php:62
 msgid "Bind password"
-msgstr ""
+msgstr "Пароль подключения (Bind password)"
 
 #: include/views/administration.general.gui.edit.php:25
 #: include/views/administration.users.edit.php:114
@@ -987,7 +987,7 @@ msgstr "Не удалось добавить обслуживание"
 
 #: media_types.php:92
 msgid "Cannot add media type"
-msgstr ""
+msgstr "Не удалось добавить способ оповещения"
 
 #: include/locales/en_gb.inc.php:457
 msgid "Cannot add more than one item with type \"Graph sum\""
@@ -1059,15 +1059,15 @@ msgstr "Не удалось добавить преобразование зна
 
 #: authentication.php:121
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "Не удалось изменить метод аутентификации на LDAP"
 
 #: authentication.php:81
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr ""
+msgstr "Не удалось изменить метод аутентификации на внутренний Zabbix"
 
 #: authentication.php:158
 msgid "Cannot changed authentication method to HTTP"
-msgstr ""
+msgstr "Не удалось изменить метод аутентификации на HTTP"
 
 #: include/locales/en_gb.inc.php:706
 msgid "Cannot clear history"
@@ -1096,12 +1096,12 @@ msgstr "Не удалось создать правило обнаружения
 
 #: config.php:742
 msgid "Cannot create icon map"
-msgstr ""
+msgstr "Не удалось создать назначение иконки"
 
 #: api/classes/class.ciconmap.php:280 api/classes/class.ciconmap.php:340
 #, php-format
 msgid "Cannot create icon maps with identical name \"%s\"."
-msgstr ""
+msgstr "Не удалось создать назначение иконок с одинаковым именем \"%s\"."
 
 #: include/export.inc.php:839
 #, php-format
@@ -1136,7 +1136,7 @@ msgstr "Не удалось удалить прототип графика"
 
 #: api/classes/class.citem.php:1101
 msgid "Cannot delete graph."
-msgstr ""
+msgstr "Не удалось удалить график."
 
 #: include/locales/en_gb.inc.php:455
 msgid "Cannot delete graphs"
@@ -1156,7 +1156,7 @@ msgstr "Не удалось удалить группу узлов сети."
 
 #: config.php:755
 msgid "Cannot delete icon map"
-msgstr ""
+msgstr "Не удалось удалить назначение иконки"
 
 #: config.php:228
 msgid "Cannot delete image"
@@ -1180,7 +1180,7 @@ msgstr "Не удалось удалить обслуживание"
 
 #: media_types.php:108 media_types.php:119
 msgid "Cannot delete media type"
-msgstr ""
+msgstr "Не удалось удалить способ оповещения"
 
 #: include/locales/en_gb.inc.php:869
 msgid "Cannot delete network map"

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-11 22:11+0300\n"
-"PO-Revision-Date: 2011-10-07 13:06+0200\n"
+"POT-Creation-Date: 2011-10-11 22:24+0300\n"
+"PO-Revision-Date: 2011-10-10 23:11+0200\n"
 "Last-Translator: Pawel <pawel.jarosz@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -16,7 +16,7 @@ msgstr ""
 
 #: include/page_header.php:452
 msgid " failed login attempts logged. Last failed attempt was from "
-msgstr "nie udane próby logowania. Ostatnia nie udana próba logowania była z"
+msgstr "nieudane próby logowania. Ostatnia nieudana próba logowania była z"
 
 #: include/page_header.php:454
 msgid " on "
@@ -8811,7 +8811,7 @@ msgstr "KOMENTARZE DO WYZWALACZA"
 
 #: include/locales/en_gb.inc.php:809
 msgid "TRIGGER PROTOTYPES OF"
-msgstr ""
+msgstr "PROTOTYPY WYZWALACZY DLA"
 
 #: include/locales/en_gb.inc.php:1326
 msgid "TRIGGERS"
@@ -8891,34 +8891,34 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:678
 msgid "Template updated"
-msgstr ""
+msgstr "Wzór zaktualizowany"
 
 #: include/locales/en_gb.inc.php:1537
 msgid "Template with application"
-msgstr ""
+msgstr "Wzór z aplikacją"
 
 #: include/locales/en_gb.inc.php:1536
 msgid "Template with item key"
-msgstr ""
+msgstr "Wzór z kluczem dotyczącym elementu."
 
 #: api/classes/class.chost.php:1438 api/classes/class.ctemplate.php:1391
 #, php-format
 msgid "Template with the same name \"%s\" already exists."
-msgstr ""
+msgstr "Wzór o tej samej nazwie \"%s\" już istnieje."
 
 #: api/classes/class.chost.php:1444 api/classes/class.ctemplate.php:1048
 #: api/classes/class.ctemplate.php:1364
 #, php-format
 msgid "Template with the same visible name \"%s\" already exists."
-msgstr ""
+msgstr "Wzór z tą samą widoczną nazwą \"%s\" już istnieje."
 
 #: include/locales/en_gb.inc.php:776
 msgid "Templated item"
-msgstr ""
+msgstr "Klucz zawarty we wzorze"
 
 #: include/locales/en_gb.inc.php:697
 msgid "Templated items"
-msgstr ""
+msgstr "Element zawarty we wzorze"
 
 #: hosts.php:779 include/locales/en_gb.inc.php:689 include/menu.inc.php:166
 #: include/views/configuration.host.edit.php:435 popup.php:36
@@ -8932,7 +8932,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1501
 msgid "Tera"
-msgstr ""
+msgstr "Tera"
 
 #: include/locales/en_gb.inc.php:357
 #: include/views/administration.authentication.edit.php:88
@@ -9018,23 +9018,23 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1569
 msgid "This screen-column is not empty"
-msgstr ""
+msgstr "Ta ekranowa kolumna nie jest pusta"
 
 #: include/locales/en_gb.inc.php:1568
 msgid "This screen-row is not empty"
-msgstr ""
+msgstr "Ten rekord ekranu nie jest pusty"
 
 #: include/locales/en_gb.inc.php:1248
 msgid "This week"
-msgstr ""
+msgstr "Ten tydzień"
 
 #: include/locales/en_gb.inc.php:1249
 msgid "This year"
-msgstr ""
+msgstr "Ten rok"
 
 #: include/locales/en_gb.inc.php:40
 msgid "Thu"
-msgstr ""
+msgstr "Czw"
 
 #: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1238
 msgid "Thursday"
@@ -9054,7 +9054,7 @@ msgstr "Okres"
 
 #: include/locales/en_gb.inc.php:1284
 msgid "Time shift"
-msgstr ""
+msgstr "Zmiana czasu"
 
 #: include/locales/en_gb.inc.php:1161
 msgid "Time type"
@@ -9090,12 +9090,12 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:1298
 msgid "Toggle input method"
-msgstr ""
+msgstr "Przełączanie metod wprowadzania"
 
 #: api/classes/class.cproxy.php:355
 #, php-format
 msgid "Too many interfaces provided for proxy \"%s\"."
-msgstr ""
+msgstr "Zbyt wiele interfejsów zapewnionych dla proxy \"%s\"."
 
 #: include/locales/en_gb.inc.php:894
 #: include/views/configuration.sysmap.edit.php:131
@@ -9180,12 +9180,12 @@ msgstr ""
 #: api/classes/class.ctriggerprototype.php:1540
 #, php-format
 msgid "Trigger [%1$s] already exists on [%2$s]"
-msgstr ""
+msgstr "Wyzwalacz [%1$s] już istnieje w [%2$s]"
 
 #: api/classes/class.ctriggerprototype.php:1212
 #, php-format
 msgid "Trigger [%1$s] does not have item prototype."
-msgstr ""
+msgstr "Wyzwalacz [%1$s] nie posiada prototypu elementu."
 
 #: include/locales/en_gb.inc.php:1266 triggers.php:390
 msgid "Trigger added"
@@ -9219,15 +9219,15 @@ msgstr ""
 
 #: api/classes/class.ctriggerprototype.php:1095
 msgid "Trigger just added. No status update so far."
-msgstr ""
+msgstr "Wyzwalacz niedawno dodany. Póki co brak aktualnego statusu."
 
 #: include/views/configuration.sysmap.edit.php:107
 msgid "Trigger label type"
-msgstr ""
+msgstr "Typ etykiety wyzwalacza"
 
 #: include/actions.inc.php:43
 msgid "Trigger name"
-msgstr ""
+msgstr "Nazwa wyzwalacza"
 
 #: include/audit.inc.php:34
 msgid "Trigger prototype"
@@ -9241,22 +9241,22 @@ msgstr ""
 #: api/classes/class.ctriggerprototype.php:1314
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] deleted."
-msgstr ""
+msgstr "Prototyp wyzwalacza [%1$s:%2$s] skasowany."
 
 #: api/classes/class.ctemplate.php:1930
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] unlinked."
-msgstr ""
+msgstr "Prototyp wyzwalacza [%1$s:%2$s] odwiązany."
 
 #: include/views/configuration.host.edit.php:385
 #: include/views/configuration.template.edit.php:310
 msgid "Trigger prototypes"
-msgstr ""
+msgstr "Prototypy wyzwalacza"
 
 #: config.php:778
 #: include/views/administration.general.triggerSeverity.edit.php:70
 msgid "Trigger severities"
-msgstr ""
+msgstr "Istotność wyzwalacza"
 
 #: include/actions.inc.php:45 include/views/administration.users.edit.php:245
 msgid "Trigger severity"
@@ -9545,7 +9545,7 @@ msgstr "Uaktualnij"
 
 #: include/forms.inc.php:1758
 msgid "Update in host group"
-msgstr ""
+msgstr "Aktualizacja w grupie stacji"
 
 #: include/locales/en_gb.inc.php:719
 msgid "Update interval"
@@ -9927,17 +9927,17 @@ msgstr "WWW"
 
 #: include/locales/en_gb.inc.php:777
 msgid "Web item"
-msgstr ""
+msgstr "Element webowy"
 
 #: api/classes/class.cwebcheck.php:584 api/classes/class.cwebcheck.php:680
 #, php-format
 msgid "Web item [%s] created."
-msgstr ""
+msgstr "Element webowy [%s] został utworzony."
 
 #: api/classes/class.cwebcheck.php:643
 #, php-format
 msgid "Web item with key [%s] already exists."
-msgstr ""
+msgstr "Element webowy z kluczem [%s] już istnieje."
 
 #: dashboard.php:384 include/items.inc.php:94
 msgid "Web monitoring"
@@ -10045,20 +10045,20 @@ msgstr ""
 
 #: api/classes/class.cmapelement.php:832
 msgid "Wrong fields for linktrigger update"
-msgstr ""
+msgstr "Złe pola dla zaktualizowania przypisanego wyzwalacza"
 
 #: api/classes/class.cmapelement.php:590
 msgid "Wrong fields for map link"
-msgstr ""
+msgstr "Złe pola dla połączenia mapy"
 
 #: include/locales/en_gb.inc.php:1619
 msgid "Wrong fields for media type"
-msgstr ""
+msgstr "Złe pola dla typów mediów"
 
 #: api/classes/class.cscreen.php:618
 #, php-format
 msgid "Wrong fields for screen [ %s ]"
-msgstr ""
+msgstr "Złe pola dla ekranu [ %s ]"
 
 #: api/classes/class.cscreen.php:756 api/classes/class.cscreen.php:795
 #: api/classes/class.cscreen.php:832
@@ -10067,17 +10067,17 @@ msgstr ""
 
 #: api/classes/class.cscript.php:400
 msgid "Wrong fields for script"
-msgstr ""
+msgstr "Złe pola dla skryptu"
 
 #: api/classes/class.ctriggerprototype.php:1099
 #: api/classes/class.ctriggerprototype.php:1168
 msgid "Wrong fields for trigger"
-msgstr ""
+msgstr "Złe pola dla wyzwalacza"
 
 #: api/classes/class.cuser.php:373
 #, php-format
 msgid "Wrong fields for user \"%s\"."
-msgstr ""
+msgstr "Złe pola dla użytkownika \"%s\"."
 
 #: api/classes/class.cusermedia.php:391
 #, php-format
@@ -10123,24 +10123,24 @@ msgstr "Strona osi Y"
 
 #: include/locales/en_gb.inc.php:505 include/locales/en_gb.inc.php:506
 msgid "Y-m-d H:i:s"
-msgstr ""
+msgstr "R-m-d G:m:s"
 
 #: include/locales/en_gb.inc.php:216 include/locales/en_gb.inc.php:504
 #: include/locales/en_gb.inc.php:507
 msgid "Y.M.d H:i:s"
-msgstr ""
+msgstr "R.M.d G:m:s"
 
 #: include/locales/en_gb.inc.php:1020
 msgid "Y.m.d"
-msgstr ""
+msgstr "R.m.d"
 
 #: include/locales/en_gb.inc.php:1019
 msgid "Y.m.d H:i"
-msgstr ""
+msgstr "R.m.d G:m"
 
 #: include/locales/en_gb.inc.php:918 include/locales/en_gb.inc.php:1510
 msgid "Y.m.d H:i:s"
-msgstr ""
+msgstr "R.m.d G:m:s"
 
 #: include/locales/en_gb.inc.php:1039
 msgid "Year"
@@ -10200,11 +10200,11 @@ msgstr "Nie sprecyzowałeś celów dla operacji akcji w komendzie \"%s\"."
 #: api/classes/class.caction.php:1634
 #, php-format
 msgid "You did not specify targets for action operation global script \"%s\"."
-msgstr ""
+msgstr "Nie określiłeś celu dla akcji globalnego skryptu operacji \"%s\"."
 
 #: api/classes/class.chost.php:1622
 msgid "You do not have enough rights for operation."
-msgstr ""
+msgstr "Nie masz wystarczających praw do tej operacji."
 
 #: include/locales/en_gb.inc.php:1651
 msgid "You do not have permission to perform this operation"
@@ -10352,7 +10352,7 @@ msgstr "Zbliżenie"
 
 #: include/locales/en_gb.inc.php:1571
 msgid "[H:i:s]"
-msgstr ""
+msgstr "[G:m:s]"
 
 #: include/locales/en_gb.inc.php:1634
 msgid "[Wrong value for day of week:"
@@ -10428,7 +10428,7 @@ msgstr "jako Czerwone"
 
 #: include/locales/en_gb.inc.php:1548
 msgid "available only for items with value types"
-msgstr ""
+msgstr "dostępny tylko dla elementów z typami wartości"
 
 #: include/locales/en_gb.inc.php:430
 msgid "avg"
@@ -10590,11 +10590,11 @@ msgstr ""
 #: api/classes/class.citemkey.php:280
 #, php-format
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
-msgstr ""
+msgstr "nieprawidłowe użycie symboli nawiasów. '%s' znaleziony po zamknięciu nawiasu."
 
 #: include/locales/en_gb.inc.php:1056
 msgid "is a wrong time format. Should be from 00:00 to 24:00."
-msgstr ""
+msgstr "jest złym formatem czasu. Forma powinna być 00:00 do 24:00."
 
 #: include/locales/en_gb.inc.php:1532
 msgid "is internal and can not be deleted"
@@ -10629,11 +10629,11 @@ msgstr "m"
 
 #: include/views/administration.general.macros.edit.php:69
 msgid "macro(s)"
-msgstr ""
+msgstr "makro(a)"
 
 #: include/actions.inc.php:136 include/views/configuration.action.edit.php:229
 msgid "maintenance"
-msgstr ""
+msgstr "konserwacja"
 
 #: api/classes/class.cmap.php:616
 msgid "map"
@@ -10665,7 +10665,7 @@ msgstr "musi być ważnym użytkownikiem LDAP"
 
 #: include/locales/en_gb.inc.php:1488
 msgid "n"
-msgstr ""
+msgstr "n"
 
 #: include/classes/class.frontendsetup.php:208
 #: include/classes/class.frontendsetup.php:284
@@ -10790,15 +10790,15 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:130
 msgid "to"
-msgstr ""
+msgstr "dla"
 
 #: api/classes/class.cmap.php:615
 msgid "trigger"
-msgstr ""
+msgstr "wyzwalacz"
 
 #: include/classes/class.frontendsetup.php:371
 msgid "unknown"
-msgstr ""
+msgstr "nieznany"
 
 #: include/locales/en_gb.inc.php:1524
 msgid "updated"
@@ -10806,11 +10806,11 @@ msgstr "zaktualizowane"
 
 #: include/locales/en_gb.inc.php:1534
 msgid "used by scenario"
-msgstr ""
+msgstr "w użyciu przez scenariusz"
 
 #: include/locales/en_gb.inc.php:903
 msgid "used in exported map"
-msgstr ""
+msgstr "użyty w wyeksportowanej mapie"
 
 #: include/locales/en_gb.inc.php:1143
 msgid "used in exported screen"
@@ -10830,7 +10830,7 @@ msgstr "tygodnie"
 
 #: include/locales/en_gb.inc.php:1576
 msgid "with template host cannot contain items from other hosts."
-msgstr ""
+msgstr "wzór nie może posiadać elementów zawierających się w innym wzorze."
 
 #: include/func.inc.php:371 include/locales/en_gb.inc.php:29
 msgid "y"
