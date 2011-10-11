@@ -1653,8 +1653,8 @@ msgid "Child"
 msgstr "子"
 
 #: include/locales/en_gb.inc.php:1405
-msgid "Chinese (CN)"
-msgstr "中国語 (CN)"
+msgid "Chinese (zh_CN)"
+msgstr "中国語 (zh_CN)"
 
 #: api/classes/class.ctemplate.php:1802
 msgid "Circular link cannot be created"
@@ -2119,8 +2119,8 @@ msgid "Custom slides"
 msgstr "カスタムスライド"
 
 #: include/locales/en_gb.inc.php:1410
-msgid "Czech (CZ)"
-msgstr "チェコ語 (CZ)"
+msgid "Czech (cs_CZ)"
+msgstr "チェコ語 (cs_CZ)"
 
 #: include/locales/en_gb.inc.php:315
 msgid "D"
@@ -2989,8 +2989,8 @@ msgid "Duration"
 msgstr "継続期間"
 
 #: include/locales/en_gb.inc.php:1406
-msgid "Dutch (NL)"
-msgstr "オランダ語 (NL)"
+msgid "Dutch (nl_NL)"
+msgstr "オランダ語 (nl_NL)"
 
 #: include/locales/en_gb.inc.php:1123
 msgid "Dynamic item"
@@ -3184,8 +3184,8 @@ msgid "End of"
 msgstr "End of"
 
 #: include/locales/en_gb.inc.php:1394
-msgid "English (GB)"
-msgstr "英語 (GB)"
+msgid "English (en_GB)"
+msgstr "英語 (en_GB)"
 
 #: include/locales/en_gb.inc.php:293 include/locales/en_gb.inc.php:1444
 #: popup.php:139
@@ -3490,8 +3490,8 @@ msgid "Fourth"
 msgstr "第4週"
 
 #: include/locales/en_gb.inc.php:1395
-msgid "French (FR)"
-msgstr "フランス語 (FR)"
+msgid "French (fr_FR)"
+msgstr "フランス語 (fr_FR)"
 
 #: include/locales/en_gb.inc.php:41
 msgid "Fri"
@@ -3573,8 +3573,8 @@ msgid "Generated in %s sec"
 msgstr "Generated in %s sec"
 
 #: include/locales/en_gb.inc.php:1396
-msgid "German (DE)"
-msgstr "ドイツ語 (DE)"
+msgid "German (de_DE)"
+msgstr "ドイツ語 (de_DE)"
 
 #: include/locales/en_gb.inc.php:884
 msgid "Get selected elements FAILED."
@@ -4150,8 +4150,8 @@ msgid "Housekeeper"
 msgstr "データの保存期間"
 
 #: include/locales/en_gb.inc.php:1407
-msgid "Hungarian (HU)"
-msgstr "ハンガリー語 (HU)"
+msgid "Hungarian (hu_HU)"
+msgstr "ハンガリー語 (hu_HU)"
 
 #: include/setup.inc.php:161
 msgid "I agree"
@@ -5030,8 +5030,8 @@ msgid "It is not possible to search by user password"
 msgstr "ユーザのパスワードによる検索は行えません"
 
 #: include/locales/en_gb.inc.php:1397
-msgid "Italian (IT)"
-msgstr "イタリア語 (IT)"
+msgid "Italian (it_IT)"
+msgstr "イタリア語 (it_IT)"
 
 #: include/locales/en_gb.inc.php:749
 msgid "Item"
@@ -5241,8 +5241,8 @@ msgid "January"
 msgstr "1月"
 
 #: include/locales/en_gb.inc.php:1404
-msgid "Japanese (JP)"
-msgstr "日本語 (JP)"
+msgid "Japanese (ja_JP)"
+msgstr "日本語 (ja_JP)"
 
 #: include/locales/en_gb.inc.php:58
 msgid "Jul"
@@ -5295,8 +5295,8 @@ msgid "Kilo"
 msgstr "キロ"
 
 #: include/locales/en_gb.inc.php:1398
-msgid "Korean (KO)"
-msgstr "韓国語 (KO)"
+msgid "Korean (ko_KR)"
+msgstr "韓国語 (ko_KR)"
 
 #: include/locales/en_gb.inc.php:400
 msgid "LATEST DATA"
@@ -5422,8 +5422,8 @@ msgid "Latest events"
 msgstr "最新のイベント"
 
 #: include/locales/en_gb.inc.php:1399
-msgid "Latvian (LV)"
-msgstr "ラトビア語 (LV)"
+msgid "Latvian (lv_LV)"
+msgstr "ラトビア語 (lv_LV)"
 
 #: include/locales/en_gb.inc.php:427
 #: include/views/configuration.sysmap.edit.php:131
@@ -7266,8 +7266,8 @@ msgid "Please select two elements"
 msgstr "2つの要素を選択してください"
 
 #: include/locales/en_gb.inc.php:1408
-msgid "Polish (PL)"
-msgstr "ポーランド語 (PL)"
+msgid "Polish (pl_PL)"
+msgstr "ポーランド語 (pl_PL)"
 
 #: include/locales/en_gb.inc.php:628
 #: include/views/administration.authentication.edit.php:58
@@ -7285,8 +7285,8 @@ msgid "Port range"
 msgstr "ポートの範囲"
 
 #: include/locales/en_gb.inc.php:1401
-msgid "Portuguese (PT)"
-msgstr "ポルトガル語 (PT)"
+msgid "Portuguese (pt_BR)"
+msgstr "ポルトガル語 (pt_BR)"
 
 #: include/locales/en_gb.inc.php:1463
 msgid "Position"
@@ -7788,8 +7788,8 @@ msgid "Run remote commands on hosts"
 msgstr "複数ホストでリモートコマンドを実行"
 
 #: include/locales/en_gb.inc.php:1400
-msgid "Russian (RU)"
-msgstr "ロシア語 (RU)"
+msgid "Russian (ru_RU)"
+msgstr "ロシア語 (ru_RU)"
 
 #: include/locales/en_gb.inc.php:1681 include/locales/en_gb.inc.php:1682
 msgid "S"
@@ -8547,8 +8547,8 @@ msgid "Slideshow updated"
 msgstr "スライドショーを更新しました"
 
 #: include/locales.inc.php:73
-msgid "Slovak (SK)"
-msgstr "スロバキア語 (SK)"
+msgid "Slovak (sk_SK)"
+msgstr "スロバキア語 (sk_SK)"
 
 #: include/locales/en_gb.inc.php:1391
 msgid "Snooze"
@@ -8611,8 +8611,8 @@ msgid "Source"
 msgstr "ソース"
 
 #: include/locales/en_gb.inc.php:1402
-msgid "Spanish (ES)"
-msgstr "スペイン語(ES)"
+msgid "Spanish (es_ES)"
+msgstr "スペイン語(es_ES)"
 
 #: api/classes/class.caction.php:1596
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
@@ -8763,8 +8763,8 @@ msgid "Surname"
 msgstr "名字"
 
 #: include/locales/en_gb.inc.php:1403
-msgid "Swedish (SE)"
-msgstr "スウェーデン語 (SE)"
+msgid "Swedish (sv_SE)"
+msgstr "スウェーデン語 (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all current sessions! Continue?"
@@ -9420,8 +9420,8 @@ msgid "UTF-8"
 msgstr "UTF-8"
 
 #: include/locales/en_gb.inc.php:1409
-msgid "Ukrainian (UA)"
-msgstr "ウクライナ語 (UA)"
+msgid "Ukrainian (uk_UA)"
+msgstr "ウクライナ語 (uk_UA)"
 
 #: include/locales/en_gb.inc.php:1622
 msgid "Unable to remove local node"
