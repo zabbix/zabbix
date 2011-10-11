@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-function init_mbstrings(){
+function init_mbstrings() {
 	$res = true;
 
 	$res &= mbstrings_available();
@@ -30,11 +30,11 @@ function init_mbstrings(){
 	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 	$res &= (ini_get('mbstring.detect_order') == 'UTF-8, ISO-8859-1, JIS, SJIS');
 
-	if($res) define('ZBX_MBSTRINGS_ENABLED', true);
-return $res;
+	if ($res) define('ZBX_MBSTRINGS_ENABLED', true);
+	return $res;
 }
 
-function mbstrings_available(){
+function mbstrings_available() {
 	return (function_exists('mb_strlen')
 			&& function_exists('mb_strtoupper')
 			&& function_exists('mb_strpos')
@@ -42,39 +42,39 @@ function mbstrings_available(){
 }
 
 // Translate global array $TRANSLATION into constants
-function process_locales(){
+function process_locales() {
 	global $TRANSLATION;
 //SDI(count($TRANSLATION).' : '.$TRANSLATION['S_HTML_CHARSET']);
-	if(isset($TRANSLATION) && is_array($TRANSLATION)){
-		foreach($TRANSLATION as $const=>$label){
-			if(!defined($const)) define($const,$label);
+	if (isset($TRANSLATION) && is_array($TRANSLATION)) {
+		foreach ($TRANSLATION as $const=>$label) {
+			if (!defined($const)) define($const, $label);
 		}
 	}
 	unset($GLOBALS['TRANSLATION']);
 }
 
-function set_zbx_locales(){
+function set_zbx_locales() {
 	global $ZBX_LOCALES;
 	$ZBX_LOCALES = array(
-		'en_GB'=>  S_ENGLISH_GB,
-		'zh_CN'=>  S_CHINESE_CN,
-		'cs_CZ'=>  S_CZECH_CZ,
-		'nl_NL'=>  S_DUTCH_NL,
-		'fr_FR'=>  S_FRENCH_FR,
-		'de_DE'=>  S_GERMAN_DE,
-		'hu_HU'=>  S_HUNGARIAN_HU,
-		'it_IT'=>  S_ITALIAN_IT,
-		'ko_KR'=>  S_KOREAN_KR,
-		'ja_JP'=>  S_JAPANESE_JP,
-		'lv_LV'=>  S_LATVIAN_LV,
-		'pl_PL'=>  S_POLISH_PL,
-		'pt_BR'=>  S_PORTUGUESE_PT,
-		'ru_RU'=>  S_RUSSIAN_RU,
-		'sk_SK'=>  _('Slovak (SK)'),
-		'es_ES'=>  S_SPANISH_ES,
-		'sv_SE'=>  S_SWEDISH_SE,
-//		'tr_TR'=>  _('Turkish (TR)'),
-		'uk_UA'=>  S_UKRAINIAN_UA,
+		'en_GB'=>  _('English (en_GB)'),
+		'zh_CN'=>  _('Chinese (zh_CN)'),
+		'cs_CZ'=>  _('Czech (cs_CZ)'),
+		'nl_NL'=>  _('Dutch (nl_NL)'),
+		'fr_FR'=>  _('French (fr_FR)'),
+		'de_DE'=>  _('German (de_DE)'),
+		'hu_HU'=>  _('Hungarian (hu_HU)'),
+		'it_IT'=>  _('Italian (it_IT)'),
+		'ko_KR'=>  _('Korean (ko_KR)'),
+		'ja_JP'=>  _('Japanese (ja_JP)'),
+		'lv_LV'=>  _('Latvian (lv_LV)'),
+		'pl_PL'=>  _('Polish (pl_PL)'),
+		'pt_BR'=>  _('Portuguese (pt_BR)'),
+		'ru_RU'=>  _('Russian (ru_RU)'),
+		'sk_SK'=>  _('Slovak (sk_SK)'),
+		'es_ES'=>  _('Spanish (es_ES)'),
+		'sv_SE'=>  _('Swedish (sv_SE)'),
+//		'tr_TR'=>  _('Turkish (tr_TR)'),
+		'uk_UA'=>  _('Ukrainian (uk_UA)'),
 	);
 }
 
@@ -85,15 +85,15 @@ function set_zbx_locales(){
  * @param string $language in format 'ru_RU', 'en_EN' and so on
  * @return array a list of possible locale names
  */
-function zbx_locale_variants($language){
-	if(stristr($_SERVER['SERVER_SOFTWARE'], 'win32') !== false)
+function zbx_locale_variants($language) {
+	if (stristr($_SERVER['SERVER_SOFTWARE'], 'win32') !== false)
 		$result = zbx_locale_variants_win($language);
 	else
 		$result = zbx_locale_variants_unix($language);
-return $result;
+	return $result;
 }
 
-function zbx_locale_variants_unix($language){
+function zbx_locale_variants_unix($language) {
 	$postfixes = array(
 		'',
 		'.utf8',
@@ -135,14 +135,15 @@ function zbx_locale_variants_unix($language){
 	);
 
 	$result = array();
-	foreach($postfixes as $postfix){
+	foreach ($postfixes as $postfix) {
 		$result[] = $language.$postfix;
 	}
-return $result;
+	return $result;
 }
 
-function zbx_locale_variants_win($language){
+function zbx_locale_variants_win($language) {
 // windows locales are written like language[_country[.charset]]
+// for a list of supported languages see http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
 	$winLanguageName = array(
 		'en_gb'=>  'english',
 		'zh_cn'=>  'chinese',
@@ -168,6 +169,6 @@ function zbx_locale_variants_win($language){
 
 	$result = array($winLang);
 
-return $result;
+	return $result;
 }
 ?>
