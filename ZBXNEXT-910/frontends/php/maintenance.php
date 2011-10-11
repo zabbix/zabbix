@@ -117,11 +117,11 @@ elseif (isset($_REQUEST['save'])) {
 
 	$isValid = true;
 	if (empty($active_since)) {
-		error(_s('"%s" must be between 1.1.1970-1.1.2038', _('Active since')));
+		error(_s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active since')));
 		$isValid = false;
 	}
 	if (empty($active_till)) {
-		error(_s('"%s" must be between 1.1.1970-1.1.2038', _('Active till')));
+		error(_s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active till')));
 		$isValid = false;
 	}
 
@@ -242,7 +242,7 @@ elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])
 		info(_('Incorrect maintenance period'));
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME && $new_timeperiod['start_date'] < 1) {
-		error(_('Incorrect maintenance date'));
+		error(_('Incorrect maintenance date must be between 1970.01.01 and 2038.01.18'));
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY && $new_timeperiod['every'] < 1) {
 		info(_('Incorrect maintenance day period'));

@@ -239,7 +239,7 @@ function zbxDateToTime($strdate) {
 }
 
 function validateMaxTime($time) {
-	if ($time > 2145909600) {
+	if ($time > 2147464800) { // 2038.01.19 00:00
 		return true;
 	} else {
 		return false;

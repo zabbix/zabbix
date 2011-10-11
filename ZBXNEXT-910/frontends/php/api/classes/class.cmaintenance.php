@@ -513,17 +513,17 @@ class CMaintenance extends CZBXAPI {
 
 				// validate maintenance active since
 				if (validateMaxTime($maintenance['active_since'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1.1.1970-1.1.2038', _('Active since')));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active since')));
 				}
 
 				// validate maintenance active till
 				if (validateMaxTime($maintenance['active_till'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1.1.1970-1.1.2038', _('Active till')));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active till')));
 				}
 
 				// validate maintenance active interval
 				if ($maintenance['active_since'] > $maintenance['active_till']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance active since cannot be bigger then active till.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance active since cannot be bigger than active till.'));
 				}
 
 				$insert[$mnum] = $maintenance;
@@ -621,17 +621,17 @@ class CMaintenance extends CZBXAPI {
 
 			// validate maintenance active since
 			if (validateMaxTime($maintenance['active_since'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1.1.1970-1.1.2038', _('Active since')));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active since')));
 			}
 
 			// validate maintenance active till
 			if (validateMaxTime($maintenance['active_till'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1.1.1970-1.1.2038', _('Active till')));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active till')));
 			}
 
 			// validate maintenance active interval
 			if ($maintenance['active_since'] > $maintenance['active_till']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance active since cannot be bigger then active till.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance active since cannot be bigger than active till.'));
 			}
 
 			$hostids = array_merge($hostids, $maintenance['hostids']);
