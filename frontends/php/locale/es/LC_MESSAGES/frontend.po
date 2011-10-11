@@ -1655,8 +1655,8 @@ msgid "Child"
 msgstr "Remoto"
 
 #: include/locales/en_gb.inc.php:1405
-msgid "Chinese (CN)"
-msgstr "Chino (CN)"
+msgid "Chinese (zh_CN)"
+msgstr "Chino (zh_CN)"
 
 #: api/classes/class.ctemplate.php:1802
 msgid "Circular link cannot be created"
@@ -2121,7 +2121,7 @@ msgid "Custom slides"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1410
-msgid "Czech (CZ)"
+msgid "Czech (cs_CZ)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:315
@@ -2992,8 +2992,8 @@ msgid "Duration"
 msgstr "Duración"
 
 #: include/locales/en_gb.inc.php:1406
-msgid "Dutch (NL)"
-msgstr "Holandés (NL)"
+msgid "Dutch (nl_NL)"
+msgstr "Holandés (nl_NL)"
 
 #: include/locales/en_gb.inc.php:1123
 msgid "Dynamic item"
@@ -3187,8 +3187,8 @@ msgid "End of"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1394
-msgid "English (GB)"
-msgstr "Inglés (GB)"
+msgid "English (en_GB)"
+msgstr "Inglés (en_GB)"
 
 #: include/locales/en_gb.inc.php:293 include/locales/en_gb.inc.php:1444
 #: popup.php:139
@@ -3493,8 +3493,8 @@ msgid "Fourth"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1395
-msgid "French (FR)"
-msgstr "Francés (FR)"
+msgid "French (fr_FR)"
+msgstr "Francés (fr_FR)"
 
 #: include/locales/en_gb.inc.php:41
 msgid "Fri"
@@ -3576,8 +3576,8 @@ msgid "Generated in %s sec"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1396
-msgid "German (DE)"
-msgstr "Alemán(DE)"
+msgid "German (de_DE)"
+msgstr "Alemán(de_DE)"
 
 #: include/locales/en_gb.inc.php:884
 msgid "Get selected elements FAILED."
@@ -4153,7 +4153,7 @@ msgid "Housekeeper"
 msgstr "Caducidad para acciones y eventos"
 
 #: include/locales/en_gb.inc.php:1407
-msgid "Hungarian (HU)"
+msgid "Hungarian (hu_HU)"
 msgstr ""
 
 #: include/setup.inc.php:161
@@ -5033,8 +5033,8 @@ msgid "It is not possible to search by user password"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1397
-msgid "Italian (IT)"
-msgstr "Italiano (IT)"
+msgid "Italian (it_IT)"
+msgstr "Italiano (it_IT)"
 
 #: include/locales/en_gb.inc.php:749
 msgid "Item"
@@ -5244,8 +5244,8 @@ msgid "January"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1404
-msgid "Japanese (JP)"
-msgstr "Japonés (JP)"
+msgid "Japanese (ja_JP)"
+msgstr "Japonés (ja_JP)"
 
 #: include/locales/en_gb.inc.php:58
 msgid "Jul"
@@ -5298,7 +5298,7 @@ msgid "Kilo"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1398
-msgid "Korean (KO)"
+msgid "Korean (ko_KR)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:400
@@ -5425,8 +5425,8 @@ msgid "Latest events"
 msgstr "Últimos eventos"
 
 #: include/locales/en_gb.inc.php:1399
-msgid "Latvian (LV)"
-msgstr "Letón (LV)"
+msgid "Latvian (lv_LV)"
+msgstr "Letón (lv_LV)"
 
 #: include/locales/en_gb.inc.php:427
 #: include/views/configuration.sysmap.edit.php:131
@@ -7272,7 +7272,7 @@ msgid "Please select two elements"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1408
-msgid "Polish (PL)"
+msgid "Polish (pl_PL)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:628
@@ -7291,7 +7291,7 @@ msgid "Port range"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1401
-msgid "Portuguese (PT)"
+msgid "Portuguese (pt_BR)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1463
@@ -7794,8 +7794,8 @@ msgid "Run remote commands on hosts"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1400
-msgid "Russian (RU)"
-msgstr "Ruso (RU)"
+msgid "Russian (ru_RU)"
+msgstr "Ruso (ru_RU)"
 
 #: include/locales/en_gb.inc.php:1681 include/locales/en_gb.inc.php:1682
 msgid "S"
@@ -8553,7 +8553,7 @@ msgid "Slideshow updated"
 msgstr "Diapositiva actualizada"
 
 #: include/locales.inc.php:73
-msgid "Slovak (SK)"
+msgid "Slovak (sk_SK)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1391
@@ -8617,8 +8617,8 @@ msgid "Source"
 msgstr "Orígen"
 
 #: include/locales/en_gb.inc.php:1402
-msgid "Spanish (ES)"
-msgstr "Español (ES)"
+msgid "Spanish (es_ES)"
+msgstr "Español (es_ES)"
 
 #: api/classes/class.caction.php:1596
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
@@ -8769,8 +8769,8 @@ msgid "Surname"
 msgstr "Apellido"
 
 #: include/locales/en_gb.inc.php:1403
-msgid "Swedish (SE)"
-msgstr "Sueco (SE)"
+msgid "Swedish (sv_SE)"
+msgstr "Sueco (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all current sessions! Continue?"
@@ -9429,7 +9429,7 @@ msgid "UTF-8"
 msgstr "UTF-8"
 
 #: include/locales/en_gb.inc.php:1409
-msgid "Ukrainian (UA)"
+msgid "Ukrainian (uk_UA)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1622

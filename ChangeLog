@@ -13,6 +13,7 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4208] fixed Brazilian Portuguese being reported as just Portuguese in locale code (Richlv)
  - [ZBX-4151] fixed timer crash due to heap memory corruption (asaveljevs)
  - [ZBX-3755] fixed latest values in cloned items (Sasha)
  - [ZBX-3165] fixed layout of item prototypes form (Vedmak)
