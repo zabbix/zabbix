@@ -94,7 +94,7 @@
 		$values_diff = array();
 		if ($action == AUDIT_ACTION_UPDATE && !empty($values_new)) {
 			foreach ($values_new as $id => $value) {
-				if ($values_old[$id] != $value) {
+				if ($values_old[$id] !== $value) {
 					array_push($values_diff, $id);
 				}
 			}
