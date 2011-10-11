@@ -1700,6 +1700,9 @@ COpt::memoryPick();
 				$newExpr = '';
 				foreach ($triggerTemplates as $triggerTemplate) {
 					$newExpr = preg_replace('/^{'.$triggerTemplate['host'].':/', '{'.$chd_host['host'].':', $expr['expression']);
+					if (strcmp($newExpr, $expr['expression']) != 0) {
+						break;
+					}
 				}
 				if (!empty($newExpr)) {
 					$newTrigger['expression'] = str_replace($expr['expression'], $newExpr, $newTrigger['expression']);

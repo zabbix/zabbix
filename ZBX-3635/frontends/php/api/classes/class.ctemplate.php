@@ -1770,11 +1770,13 @@ COpt::memoryPick();
 		}
 
 		// check if all trigger templates are linked to host
+		// we try to find template that is not linked to hosts ($targetids) and exists trigger that has template from ($templateids)
 		$sql = 'SELECT DISTINCT h.host'.
 				' FROM functions f,items i,triggers t,hosts h'.
 				' WHERE f.itemid=i.itemid'.
 					' AND f.triggerid=t.triggerid'.
 					' AND i.hostid=h.hostid'.
+					' AND h.status='.HOST_STATUS_TEMPLATE.
 					' AND NOT EXISTS ('.
 						' SELECT 1'.
 						' FROM hosts_templates ht'.
