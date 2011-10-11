@@ -1312,7 +1312,7 @@ COpt::memoryPick();
 // TODO: REMOVE info
 			foreach($del_triggers as $triggerid => $trigger){
 				info(_s('Trigger prototype [%1$s:%2$s] deleted.', $trigger['description'], explode_exp($trigger['expression'])));
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 			}
 
 
@@ -1433,8 +1433,8 @@ COpt::memoryPick();
 			));
 
 			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
-			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression']);
-			info(_s('Trigger prototype [%1$s:%2$s] updated.', $description, $expression));
+			$expression = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
+			info(_s('Trigger prototype "%1$s:%2$s" updated.', $description, $expression));
 		}
 		unset($trigger);
 	}
