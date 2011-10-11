@@ -460,6 +460,7 @@ class CMaintenance extends CZBXAPI {
 				$groupids = array_merge($groupids, $maintenance['groupids']);
 			}
 
+			// validate hosts & groups
 			if (empty($hostids) && empty($groupids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('At least one host or group should be selected'));
 			}
@@ -505,9 +506,24 @@ class CMaintenance extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
 				}
 
-				// checking whether a maintenance with this name already exists
+				// validate if maintenance name already exists
 				if ($this->exists(array('name' => $maintenance['name']))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%s" already exists.', $maintenance['name']));
+				}
+
+				// validate maintenance active since
+				if (validateMaxTime($maintenance['active_since'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1.1.1970-1.1.2038', _('Active since')));
+				}
+
+				// validate maintenance active till
+				if (validateMaxTime($maintenance['active_till'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1.1.1970-1.1.2038', _('Active till')));
+				}
+
+				// validate maintenance active interval
+				if ($maintenance['active_since'] > $maintenance['active_till']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance active since cannot be bigger then active till.'));
 				}
 
 				$insert[$mnum] = $maintenance;
@@ -568,11 +584,12 @@ class CMaintenance extends CZBXAPI {
 	public function update($maintenances) {
 		$maintenances = zbx_toArray($maintenances);
 		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
+
+		// validate maintenance permissions
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 		}
 
-		// maintenance permissions
 		$hostids = array();
 		$groupids = array();
 		$options = array(
@@ -584,32 +601,49 @@ class CMaintenance extends CZBXAPI {
 			'preservekeys' => 1
 		);
 		$updMaintenances = $this->get($options);
+
 		foreach ($maintenances as $maintenance) {
 			if (!isset($updMaintenances[$maintenance['maintenanceid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 			}
 
-			// checking whether a maintenance with this name already exists
-			// first, getting all maintenances with the same name as this
+			// Checking whether a maintenance with this name already exists. First, getting all maintenances with the same name as this
 			$received_maintenaces = API::Maintenance()->get(array(
-				'filter' => array('name'=>$maintenance['name'])
+				'filter' => array('name' => $maintenance['name'])
 			));
-			// now going though a result, to find records with different id than our object
+
+			// validate if maintenance name already exists
 			foreach ($received_maintenaces as $r_maintenace) {
 				if (bccomp($r_maintenace['maintenanceid'], $maintenance['maintenanceid']) != 0) {
-					// error! Maintenance with this name already exists
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Maintenance "%s" already exists.', $maintenance['name']));
 				}
 			}
+
+			// validate maintenance active since
+			if (validateMaxTime($maintenance['active_since'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1.1.1970-1.1.2038', _('Active since')));
+			}
+
+			// validate maintenance active till
+			if (validateMaxTime($maintenance['active_till'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1.1.1970-1.1.2038', _('Active till')));
+			}
+
+			// validate maintenance active interval
+			if ($maintenance['active_since'] > $maintenance['active_till']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance active since cannot be bigger then active till.'));
+			}
+
 			$hostids = array_merge($hostids, $maintenance['hostids']);
 			$groupids = array_merge($groupids, $maintenance['groupids']);
 		}
 
+		// validate hosts & groups
 		if (empty($hostids) && empty($groupids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('At least one host or group should be selected'));
 		}
 
-		// hosts permissions
+		// validate hosts permissions
 		$options = array(
 			'hostids' => $hostids,
 			'editable' => 1,
@@ -622,7 +656,7 @@ class CMaintenance extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 			}
 		}
-		// groups permissions
+		// validate groups permissions
 		$options = array(
 			'groupids' => $groupids,
 			'editable' => 1,
@@ -642,21 +676,23 @@ class CMaintenance extends CZBXAPI {
 		$insert_timeperiods = array();
 		foreach ($maintenances as $mnum => $maintenance) {
 			$db_fields = array(
-				'maintenanceid' => null,
+				'maintenanceid' => null
 			);
+
+			// validate fields
 			if (!check_db_fields($db_fields, $maintenance)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
 			}
 
 			$update[$mnum] = array(
 				'values' => $maintenance,
-				'where' => array('maintenanceid'=>$maintenance['maintenanceid'])
+				'where' => array('maintenanceid' => $maintenance['maintenanceid'])
 			);
 
 			// getting current time periods
 			$timeperiodids = $timeperiods = array();
 			$sql = 'SELECT tp.* '.
-					' FROM timeperiods tp, maintenances_windows mw '.
+					' FROM timeperiods tp,maintenances_windows mw '.
 					' WHERE '.DBcondition('mw.maintenanceid', array($maintenance['maintenanceid'])).
 						' AND tp.timeperiodid=mw.timeperiodid ';
 			$db_timeperiods = DBselect($sql);

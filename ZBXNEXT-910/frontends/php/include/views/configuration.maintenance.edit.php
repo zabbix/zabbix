@@ -165,7 +165,6 @@ else {
 	));
 }
 
-show_messages();
 $maintenanceWidget->addItem($maintenanceForm);
 return $maintenanceWidget;
 ?>
