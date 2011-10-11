@@ -1691,8 +1691,8 @@ msgid "Child"
 msgstr "Remote"
 
 #: include/locales/en_gb.inc.php:1405
-msgid "Chinese (CN)"
-msgstr "Chinesisch (CN)"
+msgid "Chinese (zh_CN)"
+msgstr "Chinesisch (zh_CN)"
 
 #: api/classes/class.ctemplate.php:1802
 msgid "Circular link cannot be created"
@@ -2161,8 +2161,8 @@ msgid "Custom slides"
 msgstr "Benutzerdefinierte Seite"
 
 #: include/locales/en_gb.inc.php:1410
-msgid "Czech (CZ)"
-msgstr "Tschechisch (CZ)"
+msgid "Czech (cs_CZ)"
+msgstr "Tschechisch (cs_CZ)"
 
 #: include/locales/en_gb.inc.php:315
 msgid "D"
@@ -3042,8 +3042,8 @@ msgid "Duration"
 msgstr "Dauer"
 
 #: include/locales/en_gb.inc.php:1406
-msgid "Dutch (NL)"
-msgstr "Niederländisch (NL)"
+msgid "Dutch (nl_NL)"
+msgstr "Niederländisch (nl_NL)"
 
 #: include/locales/en_gb.inc.php:1123
 msgid "Dynamic item"
@@ -3239,8 +3239,8 @@ msgid "End of"
 msgstr "Ende von"
 
 #: include/locales/en_gb.inc.php:1394
-msgid "English (GB)"
-msgstr "Englisch (GB)"
+msgid "English (en_GB)"
+msgstr "Englisch (en_GB)"
 
 #: include/locales/en_gb.inc.php:293 include/locales/en_gb.inc.php:1444
 #: popup.php:139
@@ -3548,8 +3548,8 @@ msgid "Fourth"
 msgstr "Vierten"
 
 #: include/locales/en_gb.inc.php:1395
-msgid "French (FR)"
-msgstr "Französisch (FR)"
+msgid "French (fr_FR)"
+msgstr "Französisch (fr_FR)"
 
 #: include/locales/en_gb.inc.php:41
 msgid "Fri"
@@ -3633,8 +3633,8 @@ msgid "Generated in %s sec"
 msgstr "Hergestellt in %s s"
 
 #: include/locales/en_gb.inc.php:1396
-msgid "German (DE)"
-msgstr "Deutsch (DE)"
+msgid "German (de_DE)"
+msgstr "Deutsch (de_DE)"
 
 #: include/locales/en_gb.inc.php:884
 msgid "Get selected elements FAILED."
@@ -4218,8 +4218,8 @@ msgid "Housekeeper"
 msgstr "Systembereinigung"
 
 #: include/locales/en_gb.inc.php:1407
-msgid "Hungarian (HU)"
-msgstr "Ungarisch (HU)"
+msgid "Hungarian (hu_HU)"
+msgstr "Ungarisch (hu_HU)"
 
 #: include/setup.inc.php:161
 msgid "I agree"
@@ -5104,8 +5104,8 @@ msgid "It is not possible to search by user password"
 msgstr "Es ist nicht möglich, mit dem Benutzer-Passwort zu suchen"
 
 #: include/locales/en_gb.inc.php:1397
-msgid "Italian (IT)"
-msgstr "Italienisch (IT)"
+msgid "Italian (it_IT)"
+msgstr "Italienisch (it_IT)"
 
 #: include/locales/en_gb.inc.php:749
 msgid "Item"
@@ -5316,8 +5316,8 @@ msgid "January"
 msgstr "Januar"
 
 #: include/locales/en_gb.inc.php:1404
-msgid "Japanese (JP)"
-msgstr "Japanisch (JP)"
+msgid "Japanese (ja_JP)"
+msgstr "Japanisch (ja_JP)"
 
 #: include/locales/en_gb.inc.php:58
 msgid "Jul"
@@ -5370,8 +5370,8 @@ msgid "Kilo"
 msgstr "Kilo"
 
 #: include/locales/en_gb.inc.php:1398
-msgid "Korean (KO)"
-msgstr "Koreanisch (KO)"
+msgid "Korean (ko_KR)"
+msgstr "Koreanisch (ko_KR)"
 
 #: include/locales/en_gb.inc.php:400
 msgid "LATEST DATA"
@@ -5500,8 +5500,8 @@ msgid "Latest events"
 msgstr "Aktuelle Ereignisse"
 
 #: include/locales/en_gb.inc.php:1399
-msgid "Latvian (LV)"
-msgstr "Lettisch (LV)"
+msgid "Latvian (lv_LV)"
+msgstr "Lettisch (lv_LV)"
 
 #: include/locales/en_gb.inc.php:427
 #: include/views/configuration.sysmap.edit.php:131
@@ -7371,8 +7371,8 @@ msgid "Please select two elements"
 msgstr "Bitte zwei Elemente auswählen"
 
 #: include/locales/en_gb.inc.php:1408
-msgid "Polish (PL)"
-msgstr "Polnisch (PL)"
+msgid "Polish (pl_PL)"
+msgstr "Polnisch (pl_PL)"
 
 #: include/locales/en_gb.inc.php:628
 #: include/views/administration.authentication.edit.php:58
@@ -7390,8 +7390,8 @@ msgid "Port range"
 msgstr "Port-Bereich"
 
 #: include/locales/en_gb.inc.php:1401
-msgid "Portuguese (PT)"
-msgstr "Portugiesisch (PT)"
+msgid "Portuguese (pt_BR)"
+msgstr "Portugiesisch (pt_BR)"
 
 #: include/locales/en_gb.inc.php:1463
 msgid "Position"
@@ -7898,8 +7898,8 @@ msgid "Run remote commands on hosts"
 msgstr "Befehle ausführen auf Hosts"
 
 #: include/locales/en_gb.inc.php:1400
-msgid "Russian (RU)"
-msgstr "Russisch (RU)"
+msgid "Russian (ru_RU)"
+msgstr "Russisch (ru_RU)"
 
 #: include/locales/en_gb.inc.php:1681 include/locales/en_gb.inc.php:1682
 msgid "S"
@@ -8672,8 +8672,8 @@ msgid "Slideshow updated"
 msgstr "Vorführung aktualisiert"
 
 #: include/locales.inc.php:73
-msgid "Slovak (SK)"
-msgstr "Slovakisch (SK)"
+msgid "Slovak (sk_SK)"
+msgstr "Slovakisch (sk_SK)"
 
 #: include/locales/en_gb.inc.php:1391
 #, fuzzy
@@ -8738,8 +8738,8 @@ msgid "Source"
 msgstr "Quelle"
 
 #: include/locales/en_gb.inc.php:1402
-msgid "Spanish (ES)"
-msgstr "Spanisch (ES)"
+msgid "Spanish (es_ES)"
+msgstr "Spanisch (es_ES)"
 
 #: api/classes/class.caction.php:1596
 #, fuzzy
@@ -8892,8 +8892,8 @@ msgid "Surname"
 msgstr "Nachname"
 
 #: include/locales/en_gb.inc.php:1403
-msgid "Swedish (SE)"
-msgstr "Schwedisch (SE)"
+msgid "Swedish (sv_SE)"
+msgstr "Schwedisch (sv_SE)"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Switching authentication method will reset all current sessions! Continue?"
@@ -9556,8 +9556,8 @@ msgid "UTF-8"
 msgstr "UTF-8"
 
 #: include/locales/en_gb.inc.php:1409
-msgid "Ukrainian (UA)"
-msgstr "Ukrainisch (UA)"
+msgid "Ukrainian (uk_UA)"
+msgstr "Ukrainisch (uk_UA)"
 
 #: include/locales/en_gb.inc.php:1622
 msgid "Unable to remove local node"

@@ -1656,7 +1656,7 @@ msgid "Child"
 msgstr "Alt"
 
 #: include/locales/en_gb.inc.php:1405
-msgid "Chinese (CN)"
+msgid "Chinese (zh_CN)"
 msgstr ""
 
 #: api/classes/class.ctemplate.php:1802
@@ -2122,7 +2122,7 @@ msgid "Custom slides"
 msgstr "Özel slaytlar"
 
 #: include/locales/en_gb.inc.php:1410
-msgid "Czech (CZ)"
+msgid "Czech (cs_CZ)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:315
@@ -2993,7 +2993,7 @@ msgid "Duration"
 msgstr "Süre"
 
 #: include/locales/en_gb.inc.php:1406
-msgid "Dutch (NL)"
+msgid "Dutch (nl_NL)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1123
@@ -3188,7 +3188,7 @@ msgid "End of"
 msgstr "Sonu"
 
 #: include/locales/en_gb.inc.php:1394
-msgid "English (GB)"
+msgid "English (en_GB)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:293 include/locales/en_gb.inc.php:1444
@@ -3494,7 +3494,7 @@ msgid "Fourth"
 msgstr "Dördüncü"
 
 #: include/locales/en_gb.inc.php:1395
-msgid "French (FR)"
+msgid "French (fr_FR)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:41
@@ -3577,7 +3577,7 @@ msgid "Generated in %s sec"
 msgstr "%s sn'de oluşturuldu"
 
 #: include/locales/en_gb.inc.php:1396
-msgid "German (DE)"
+msgid "German (de_DE)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:884
@@ -4154,7 +4154,7 @@ msgid "Housekeeper"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1407
-msgid "Hungarian (HU)"
+msgid "Hungarian (hu_HU)"
 msgstr ""
 
 #: include/setup.inc.php:161
@@ -5034,7 +5034,7 @@ msgid "It is not possible to search by user password"
 msgstr "Kullanıcı parolasına göre arama mümkün değil"
 
 #: include/locales/en_gb.inc.php:1397
-msgid "Italian (IT)"
+msgid "Italian (it_IT)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:749
@@ -5245,7 +5245,7 @@ msgid "January"
 msgstr "Ocak"
 
 #: include/locales/en_gb.inc.php:1404
-msgid "Japanese (JP)"
+msgid "Japanese (ja_JP)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:58
@@ -5299,7 +5299,7 @@ msgid "Kilo"
 msgstr "Kilo"
 
 #: include/locales/en_gb.inc.php:1398
-msgid "Korean (KO)"
+msgid "Korean (ko_KR)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:400
@@ -5426,7 +5426,7 @@ msgid "Latest events"
 msgstr "Son Olaylar"
 
 #: include/locales/en_gb.inc.php:1399
-msgid "Latvian (LV)"
+msgid "Latvian (lv_LV)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:427
@@ -7273,7 +7273,7 @@ msgid "Please select two elements"
 msgstr "Lütfen iki eleman seçiniz"
 
 #: include/locales/en_gb.inc.php:1408
-msgid "Polish (PL)"
+msgid "Polish (pl_PL)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:628
@@ -7292,7 +7292,7 @@ msgid "Port range"
 msgstr "Port aralığı"
 
 #: include/locales/en_gb.inc.php:1401
-msgid "Portuguese (PT)"
+msgid "Portuguese (pt_BR)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1463
@@ -7795,7 +7795,7 @@ msgid "Run remote commands on hosts"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1400
-msgid "Russian (RU)"
+msgid "Russian (ru_RU)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1681 include/locales/en_gb.inc.php:1682
@@ -8554,7 +8554,7 @@ msgid "Slideshow updated"
 msgstr "Slayt gösterisi güncellendi"
 
 #: include/locales.inc.php:73
-msgid "Slovak (SK)"
+msgid "Slovak (sk_SK)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1391
@@ -8618,7 +8618,7 @@ msgid "Source"
 msgstr "Kaynak"
 
 #: include/locales/en_gb.inc.php:1402
-msgid "Spanish (ES)"
+msgid "Spanish (es_ES)"
 msgstr ""
 
 #: api/classes/class.caction.php:1596
@@ -8770,7 +8770,7 @@ msgid "Surname"
 msgstr "Soyad"
 
 #: include/locales/en_gb.inc.php:1403
-msgid "Swedish (SE)"
+msgid "Swedish (sv_SE)"
 msgstr ""
 
 #: include/views/administration.authentication.edit.php:78
@@ -9430,7 +9430,7 @@ msgid "UTF-8"
 msgstr "UTF-8"
 
 #: include/locales/en_gb.inc.php:1409
-msgid "Ukrainian (UA)"
+msgid "Ukrainian (uk_UA)"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:1622
