@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-08 01:04+0300\n"
+"POT-Creation-Date: 2011-10-11 22:11+0300\n"
 "PO-Revision-Date: 2011-09-24 20:36+0200\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -64,11 +64,11 @@ msgstr[1] "%d Geräte"
 msgid "&"
 msgstr "&"
 
-#: include/locales/en_gb.inc.php:1449
+#: include/locales/en_gb.inc.php:1430
 msgid "'"
 msgstr "'"
 
-#: include/locales/en_gb.inc.php:1579
+#: include/locales/en_gb.inc.php:1560
 msgid "' does not accept parameters."
 msgstr "' akzeptiert keine Parameter."
 
@@ -100,7 +100,7 @@ msgstr "- andere -"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[MASSENBESTÄTIGUNG]----"
 
-#: include/locales/en_gb.inc.php:1574
+#: include/locales/en_gb.inc.php:1555
 msgid "0 or 1"
 msgstr "0 oder 1"
 
@@ -120,7 +120,7 @@ msgstr "30 Sekunden"
 msgid "3D view"
 msgstr "3D-Ansicht"
 
-#: include/locales/en_gb.inc.php:979 queue.php:163 queue.php:226
+#: include/locales/en_gb.inc.php:978 queue.php:163 queue.php:226
 msgid "5 minutes"
 msgstr "5 Minuten"
 
@@ -160,11 +160,11 @@ msgstr "UND / ODER"
 msgid "APPLICATIONS"
 msgstr "APPLIKATIONEN"
 
-#: include/locales/en_gb.inc.php:1375
+#: include/locales/en_gb.inc.php:1373
 msgid "AUDIT ACTIONS"
 msgstr "AUDIT-AKTIONEN"
 
-#: include/locales/en_gb.inc.php:1374
+#: include/locales/en_gb.inc.php:1372
 msgid "AUDIT LOGS"
 msgstr "AUDIT-PROTOKOLLE"
 
@@ -172,11 +172,11 @@ msgstr "AUDIT-PROTOKOLLE"
 msgid "AUTHENTICATION TO ZABBIX"
 msgstr "ZABBIX-AUTHENTIFIZIERUNG"
 
-#: include/locales/en_gb.inc.php:1008
+#: include/locales/en_gb.inc.php:1007
 msgid "AVAILABILITY REPORT"
 msgstr "VERFÜGBARKEITSBERICHT"
 
-#: include/locales/en_gb.inc.php:1219
+#: include/locales/en_gb.inc.php:1218
 msgid "Acceptable SLA (in %)"
 msgstr "SLA-Toleranzwert (in Prozent)"
 
@@ -189,7 +189,7 @@ msgstr "Zugriff verweigert!"
 msgid "Account is blocked for %s seconds"
 msgstr "Zugang ist blockiert für %s Sekunden"
 
-#: include/actions.inc.php:180 include/locales/en_gb.inc.php:1331
+#: include/actions.inc.php:180 include/locales/en_gb.inc.php:1330
 #: include/views/configuration.action.edit.php:904
 msgid "Ack"
 msgstr "Bestätigt"
@@ -206,11 +206,11 @@ msgstr "Bestätigung hinzugefügt"
 msgid "Acknowledge alarm by"
 msgstr "Alarm wurde bestätigt von"
 
-#: include/locales/en_gb.inc.php:1333
+#: include/locales/en_gb.inc.php:1332
 msgid "Acknowledge status"
 msgstr "Bestätigungs-Status"
 
-#: include/locales/en_gb.inc.php:1330
+#: include/locales/en_gb.inc.php:1329
 msgid "Acknowledged"
 msgstr "bestätigt"
 
@@ -230,7 +230,7 @@ msgstr "Bestätigungen"
 msgid "Acknowledging disabled"
 msgstr "Bestätigungen deaktiviert"
 
-#: include/locales/en_gb.inc.php:1376
+#: include/locales/en_gb.inc.php:1374
 #: include/views/configuration.action.edit.php:74
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:332
@@ -278,7 +278,7 @@ msgstr "Aktionen"
 msgid "Activate selected"
 msgstr "Aktiviere Ausgewählte"
 
-#: include/locales/en_gb.inc.php:1479
+#: include/locales/en_gb.inc.php:1460
 msgid "Activate selected applications?"
 msgstr "Aktiviere ausgewählte Applikationen?"
 
@@ -304,7 +304,7 @@ msgid "Active till"
 msgstr "Aktiv bis"
 
 #: dashconf.php:196 include/forms.inc.php:3669
-#: include/locales/en_gb.inc.php:1316
+#: include/locales/en_gb.inc.php:1315
 #: include/views/administration.general.iconmap.edit.php:111
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.general.valuemapping.edit.php:50
@@ -351,11 +351,11 @@ msgstr "Füge Verbindung hinzu"
 msgid "Add prototype"
 msgstr "Prototyp hinzufügen"
 
-#: include/locales/en_gb.inc.php:1695
+#: include/locales/en_gb.inc.php:1676
 msgid "Add service"
 msgstr "Dienst hinzufügen"
 
-#: include/locales/en_gb.inc.php:1355
+#: include/locales/en_gb.inc.php:1353
 msgid "Add to"
 msgstr "Hinzufügen zu"
 
@@ -371,7 +371,7 @@ msgstr "Zu Host-Gruppe hinzufügen"
 msgid "Add to host groups"
 msgstr "Zu Systemgruppen hinzufügen"
 
-#: include/locales/en_gb.inc.php:1379
+#: include/locales/en_gb.inc.php:1377
 msgid "Added"
 msgstr "Hinzugefügt"
 
@@ -392,11 +392,11 @@ msgstr "Administration"
 msgid "Advanced labels"
 msgstr "Aufwendigere Beschriftung"
 
-#: include/locales/en_gb.inc.php:935
+#: include/locales/en_gb.inc.php:934
 msgid "Age"
 msgstr "Alter"
 
-#: include/locales/en_gb.inc.php:1338
+#: include/locales/en_gb.inc.php:1337
 msgid "Age less than"
 msgstr "Jünger als"
 
@@ -427,7 +427,7 @@ msgstr "Alias"
 msgid "Align icons"
 msgstr "Symbole ausrichten"
 
-#: include/locales/en_gb.inc.php:401 include/locales/en_gb.inc.php:962
+#: include/locales/en_gb.inc.php:401 include/locales/en_gb.inc.php:961
 #: include/nodes.inc.php:163 include/page_header.php:302
 #: include/views/administration.general.gui.edit.php:30
 #: include/views/administration.script.edit.php:75
@@ -445,7 +445,7 @@ msgstr "Alle"
 msgid "All groups"
 msgstr "Alle Gruppen"
 
-#: include/locales/en_gb.inc.php:906
+#: include/locales/en_gb.inc.php:905
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr "Alle Links sollten Angaben für \"Name\" und \"URL\" haben"
 
@@ -457,7 +457,7 @@ msgstr "Alle Knoten"
 msgid "Allowed hosts"
 msgstr "Zugelassene Systeme"
 
-#: include/locales/en_gb.inc.php:1334
+#: include/locales/en_gb.inc.php:1333
 msgid "Any"
 msgstr "Jeden"
 
@@ -506,7 +506,7 @@ msgstr "Applikation aktualisiert"
 msgid "Applications"
 msgstr "Applikationen"
 
-#: include/locales/en_gb.inc.php:867
+#: include/locales/en_gb.inc.php:866
 #: include/views/js/configuration.sysmaps.js.php:180
 #: include/views/js/configuration.sysmaps.js.php:261
 #: include/views/js/configuration.sysmaps.js.php:352
@@ -549,7 +549,7 @@ msgstr ""
 msgid "As is"
 msgstr "unverändert"
 
-#: include/locales/en_gb.inc.php:1148
+#: include/locales/en_gb.inc.php:1147
 msgid "As plain text"
 msgstr "als Klartext"
 
@@ -565,7 +565,7 @@ msgstr "Um"
 msgid "At least one host or group should be selected"
 msgstr "Zumindest ein Host oder eine Gruppe sollte ausgewählt sein"
 
-#: include/locales/en_gb.inc.php:1575
+#: include/locales/en_gb.inc.php:1556
 msgid "At least one item must be present in the trigger expression."
 msgstr "Zumindest ein Element muss in einem Auslöser-Ausdruck stehen."
 
@@ -573,7 +573,7 @@ msgstr "Zumindest ein Element muss in einem Auslöser-Ausdruck stehen."
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1373 include/menu.inc.php:260
+#: include/locales/en_gb.inc.php:1371 include/menu.inc.php:260
 msgid "Audit"
 msgstr "Aktivitäten"
 
@@ -645,7 +645,7 @@ msgstr ""
 msgid "Availability"
 msgstr "Verfügbarkeit"
 
-#: include/locales/en_gb.inc.php:1007 include/menu.inc.php:134
+#: include/locales/en_gb.inc.php:1006 include/menu.inc.php:134
 msgid "Availability report"
 msgstr "Verfügbarkeitsanalyse"
 
@@ -658,7 +658,7 @@ msgstr "Verfügbar"
 msgid "Average"
 msgstr "Durchschnitt"
 
-#: include/locales/en_gb.inc.php:1087
+#: include/locales/en_gb.inc.php:1086
 msgid "Average by"
 msgstr "Durchschnitt über"
 
@@ -668,7 +668,7 @@ msgstr "Durchschnitt über"
 msgid "Axis side"
 msgstr "Achsenseite"
 
-#: include/locales/en_gb.inc.php:1506
+#: include/locales/en_gb.inc.php:1487
 msgid "B"
 msgstr "B"
 
@@ -687,7 +687,7 @@ msgid "Background image"
 msgstr "Hintergrundbild"
 
 # Diagramm oder Report?
-#: include/locales/en_gb.inc.php:1079 include/menu.inc.php:142
+#: include/locales/en_gb.inc.php:1078 include/menu.inc.php:142
 #, fuzzy
 msgid "Bar reports"
 msgstr "Säulendiagramm"
@@ -732,7 +732,7 @@ msgstr "fette Linie"
 msgid "Boolean"
 msgstr "Boolesch"
 
-#: include/locales/en_gb.inc.php:894
+#: include/locales/en_gb.inc.php:893
 #: include/views/configuration.sysmap.edit.php:131
 #: include/views/js/configuration.sysmaps.js.php:73
 #: include/views/js/configuration.sysmaps.js.php:307
@@ -740,7 +740,7 @@ msgstr "Boolesch"
 msgid "Bottom"
 msgstr "unten"
 
-#: include/locales/en_gb.inc.php:1090
+#: include/locales/en_gb.inc.php:1089
 msgid "Brighten"
 msgstr "Aufhellen"
 
@@ -748,11 +748,11 @@ msgstr "Aufhellen"
 msgid "Bulk acknowledge"
 msgstr "Massenbestätigung"
 
-#: include/locales/en_gb.inc.php:1010
+#: include/locales/en_gb.inc.php:1009
 msgid "By host"
 msgstr "Nach System"
 
-#: include/locales/en_gb.inc.php:1011
+#: include/locales/en_gb.inc.php:1010
 msgid "By trigger template"
 msgstr "Nach Auslöservorlage"
 
@@ -769,7 +769,7 @@ msgstr "KONFIGURATION VON APPLIKATIONEN"
 msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr "KONFIGURATION DER DISCOVERY-REGELN"
 
-#: include/locales/en_gb.inc.php:806
+#: include/locales/en_gb.inc.php:805
 #, fuzzy
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr "KONFIGURATION DER GRAPHEN-PROTOTPYEN"
@@ -813,11 +813,11 @@ msgstr "KONFIGURATION DER KNOTEN"
 msgid "CONFIGURATION OF PROXIES"
 msgstr "KONFIGURATION DER PROXYS"
 
-#: include/locales/en_gb.inc.php:1110
+#: include/locales/en_gb.inc.php:1109
 msgid "CONFIGURATION OF SCREEN"
 msgstr "EINSTELLUNGEN ZU ÜBERSICHTTAFEL"
 
-#: include/locales/en_gb.inc.php:1098
+#: include/locales/en_gb.inc.php:1097
 msgid "CONFIGURATION OF SCREENS"
 msgstr "KONFIGURATION VON ÜBERSICHTSTAFELN"
 
@@ -825,16 +825,16 @@ msgstr "KONFIGURATION VON ÜBERSICHTSTAFELN"
 msgid "CONFIGURATION OF SCRIPTS"
 msgstr "KONFIGURATION DER SKRIPTS"
 
-#: include/locales/en_gb.inc.php:1130
+#: include/locales/en_gb.inc.php:1129
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr "KONFIGURATION DER VORFÜHRUNG"
 
-#: include/locales/en_gb.inc.php:809
+#: include/locales/en_gb.inc.php:808
 #, fuzzy
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
 msgstr "KONFIGURATION DER AUSLÖSER-PROTOTPYEN"
 
-#: include/locales/en_gb.inc.php:1262
+#: include/locales/en_gb.inc.php:1261
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "KONFIGURATION VON AUSLÖSERN"
 
@@ -859,7 +859,7 @@ msgstr "KONFIGURATION DER WEB-ÜBERWACHUNG"
 msgid "CONFIGURATION OF ZABBIX"
 msgstr "ZABBIX-KONFIGURATION"
 
-#: include/locales/en_gb.inc.php:1218
+#: include/locales/en_gb.inc.php:1217
 msgid "Calculate SLA"
 msgstr "SLA berechnen"
 
@@ -876,11 +876,11 @@ msgstr ""
 msgid "Callback"
 msgstr "Rückruf"
 
-#: include/locales/en_gb.inc.php:1702
+#: include/locales/en_gb.inc.php:1683
 msgid "Can not create new element"
 msgstr "Kann kein neues Element erstellen"
 
-#: include/locales/en_gb.inc.php:1701
+#: include/locales/en_gb.inc.php:1682
 msgid "Can not find objects with name"
 msgstr "Kann keine Objekte mit dem Namen finden"
 
@@ -888,15 +888,15 @@ msgstr "Kann keine Objekte mit dem Namen finden"
 msgid "Can't add group"
 msgstr "Kann Gruppe nicht hinzufügen"
 
-#: include/locales/en_gb.inc.php:1629
+#: include/locales/en_gb.inc.php:1610
 msgid "Can't delete user medias"
 msgstr "Kann Benutzer-Medien nicht löschen"
 
-#: include/locales/en_gb.inc.php:1669
+#: include/locales/en_gb.inc.php:1650
 msgid "Can't format Tree"
 msgstr "Kann Baum nicht formatieren"
 
-#: include/locales/en_gb.inc.php:1631
+#: include/locales/en_gb.inc.php:1612
 #, fuzzy
 msgid "Can't insert user medias"
 msgstr "Kann Benutzer-Medien nicht einfügen"
@@ -905,7 +905,7 @@ msgstr "Kann Benutzer-Medien nicht einfügen"
 msgid "Can't link template"
 msgstr "Kann Vorlage nicht verbinden"
 
-#: include/locales/en_gb.inc.php:1367
+#: include/locales/en_gb.inc.php:1365
 msgid "Can't read script response, check connection"
 msgstr "Kann Befehlsergebnis nicht empfangen, Verbindung prüfen!"
 
@@ -921,7 +921,7 @@ msgstr "Kann Makro nicht entfernen"
 msgid "Can't remove macros"
 msgstr "Kann Makros nicht entfernen"
 
-#: include/locales/en_gb.inc.php:1366
+#: include/locales/en_gb.inc.php:1364
 msgid "Can't send command, check connection"
 msgstr "Kann Befehl nicht senden, Verbindung prüfen!"
 
@@ -933,7 +933,7 @@ msgstr "Kann Gruppen nicht trennen"
 msgid "Can't unlink template"
 msgstr "Kann Vorlage nicht trennen"
 
-#: include/locales/en_gb.inc.php:1630
+#: include/locales/en_gb.inc.php:1611
 msgid "Can't update user medias"
 msgstr "Kann Benutzer-Medien nicht aktualisieren"
 
@@ -941,7 +941,7 @@ msgstr "Kann Benutzer-Medien nicht aktualisieren"
 msgid "Canada (136 characters)"
 msgstr "Kanada (136 Zeichen)"
 
-#: include/forms.inc.php:3670 include/locales/en_gb.inc.php:928
+#: include/forms.inc.php:3670 include/locales/en_gb.inc.php:927
 #: include/views/configuration.action.edit.php:865
 #: include/views/configuration.action.edit.php:913
 #: include/views/js/administration.general.triggerDisplayingOptions.js.php:55
@@ -1015,11 +1015,11 @@ msgstr "Kann Medientyp nicht hinzufügen"
 msgid "Cannot add more than one item with type \"Graph sum\""
 msgstr "Kann kein weiteres Element mit dem Typ \"Graph Summe\" hinzufügen"
 
-#: include/locales/en_gb.inc.php:881
+#: include/locales/en_gb.inc.php:880
 msgid "Cannot add network map"
 msgstr "Kann Netzwerkkarte nicht hinzufügen"
 
-#: include/locales/en_gb.inc.php:1547
+#: include/locales/en_gb.inc.php:1528
 msgid "Cannot add new application"
 msgstr "Kann keine neue Applikation hinzufügen"
 
@@ -1027,7 +1027,7 @@ msgstr "Kann keine neue Applikation hinzufügen"
 msgid "Cannot add node"
 msgstr "Kann Knoten nicht hinzufügen"
 
-#: include/locales/en_gb.inc.php:1344
+#: include/locales/en_gb.inc.php:1343
 msgid "Cannot add proxy"
 msgstr "Proxy konnte nicht hinzugefügt werden"
 
@@ -1039,7 +1039,7 @@ msgstr "Kann Regular Expression nicht hinzufügen"
 msgid "Cannot add scenario"
 msgstr "Szenario konnte nicht hinzugefügt werden"
 
-#: include/locales/en_gb.inc.php:1101
+#: include/locales/en_gb.inc.php:1100
 msgid "Cannot add screen"
 msgstr "Übersichtstafel konnte nicht hinzugefügt werden"
 
@@ -1047,11 +1047,11 @@ msgstr "Übersichtstafel konnte nicht hinzugefügt werden"
 msgid "Cannot add script"
 msgstr "Konnte Skript nicht hinzufügen"
 
-#: include/locales/en_gb.inc.php:1210
+#: include/locales/en_gb.inc.php:1209
 msgid "Cannot add service"
 msgstr "Kann Dienst nicht hinzufügen"
 
-#: include/locales/en_gb.inc.php:1189
+#: include/locales/en_gb.inc.php:1188
 msgid "Cannot add slideshow"
 msgstr "Kann Slideshow nicht hinzufügen"
 
@@ -1059,7 +1059,7 @@ msgstr "Kann Slideshow nicht hinzufügen"
 msgid "Cannot add template"
 msgstr "Kann Vorlage nicht hinzufügen"
 
-#: include/locales/en_gb.inc.php:1268 triggers.php:321
+#: include/locales/en_gb.inc.php:1267 triggers.php:390
 msgid "Cannot add trigger"
 msgstr "Kann Auslöser nicht hinzufügen"
 
@@ -1207,7 +1207,7 @@ msgstr "Kann Wartung nicht löschen"
 msgid "Cannot delete media type"
 msgstr "Kann Medien-Typ nicht löschen"
 
-#: include/locales/en_gb.inc.php:870
+#: include/locales/en_gb.inc.php:869
 msgid "Cannot delete network map"
 msgstr "Kann Netzwerkplan nicht löschen"
 
@@ -1215,7 +1215,7 @@ msgstr "Kann Netzwerkplan nicht löschen"
 msgid "Cannot delete node"
 msgstr "Kann Knoten nicht löschen"
 
-#: include/locales/en_gb.inc.php:1348
+#: include/locales/en_gb.inc.php:1347
 msgid "Cannot delete proxy"
 msgstr "Kann Proxy nicht löschen"
 
@@ -1227,7 +1227,7 @@ msgstr "Kann Regular Expression nicht löschen"
 msgid "Cannot delete scenario"
 msgstr "Kann Szenario nicht löschen"
 
-#: include/locales/en_gb.inc.php:1105
+#: include/locales/en_gb.inc.php:1104
 msgid "Cannot delete screen"
 msgstr "Kann Übersichtstafel nicht löschen"
 
@@ -1249,11 +1249,11 @@ msgstr "Kann Skript nicht löschen. Es existiert kein Skript mit scriptid \"%s\"
 msgid "Cannot delete selected actions"
 msgstr "Kann die augewählte Aktion nicht löschen"
 
-#: include/locales/en_gb.inc.php:1212
+#: include/locales/en_gb.inc.php:1211
 msgid "Cannot delete service"
 msgstr "Kann Dienst nicht löschen"
 
-#: include/locales/en_gb.inc.php:1191
+#: include/locales/en_gb.inc.php:1190
 msgid "Cannot delete slideshow"
 msgstr "Kann Slideshow nicht löschen"
 
@@ -1275,7 +1275,7 @@ msgstr "Element stammt aus Vorlage und kann daher nicht gelöscht werden"
 msgid "Cannot delete templated trigger [%1$s:%2$s]"
 msgstr "Auslöser [%1$s:%2$s] stammt aus Vorlage und kann daher nicht gelöscht werden"
 
-#: include/locales/en_gb.inc.php:1266
+#: include/locales/en_gb.inc.php:1265
 msgid "Cannot delete trigger"
 msgstr "Kann Auslöser nicht löschen"
 
@@ -1283,7 +1283,7 @@ msgstr "Kann Auslöser nicht löschen"
 msgid "Cannot delete trigger."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1264
+#: include/locales/en_gb.inc.php:1263
 msgid "Cannot delete triggers"
 msgstr "Kann Auslöser nicht löschen"
 
@@ -1295,15 +1295,15 @@ msgstr "Kann Benutzer nicht löschen"
 msgid "Cannot delete value map"
 msgstr "Kann Wertezuordnung nicht löschen"
 
-#: include/locales/en_gb.inc.php:898
+#: include/locales/en_gb.inc.php:897
 msgid "Cannot find background image"
 msgstr "Kann Hintergrundbild nicht finden"
 
-#: include/locales/en_gb.inc.php:1142
+#: include/locales/en_gb.inc.php:1141
 msgid "Cannot find graph"
 msgstr "Kann Graphen nicht finden"
 
-#: include/locales/en_gb.inc.php:900
+#: include/locales/en_gb.inc.php:899
 msgid "Cannot find host"
 msgstr "Kann Host nicht finden"
 
@@ -1313,7 +1313,7 @@ msgstr "Kann Host nicht finden"
 msgid "Cannot find host interface on host \"%1$s\" for item key \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:901
+#: include/locales/en_gb.inc.php:900
 msgid "Cannot find hostgroup"
 msgstr "Kann Hostgruppe nicht finden"
 
@@ -1322,27 +1322,27 @@ msgstr "Kann Hostgruppe nicht finden"
 msgid "Cannot find icon map \"%1$s\" used in exported map \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:897
+#: include/locales/en_gb.inc.php:896
 msgid "Cannot find image"
 msgstr "Kann Bild nicht finden"
 
-#: include/locales/en_gb.inc.php:1143
+#: include/locales/en_gb.inc.php:1142
 msgid "Cannot find item"
 msgstr "Kann Element nicht finden"
 
-#: include/locales/en_gb.inc.php:902
+#: include/locales/en_gb.inc.php:901
 msgid "Cannot find map"
 msgstr "Kann Karte nicht finden"
 
-#: include/locales/en_gb.inc.php:903
+#: include/locales/en_gb.inc.php:902
 msgid "Cannot find screen"
 msgstr "Kann Ansichtstafel nicht finden"
 
-#: include/locales/en_gb.inc.php:899
+#: include/locales/en_gb.inc.php:898
 msgid "Cannot find trigger"
 msgstr "Kann Auslöser nicht finden"
 
-#: include/locales/en_gb.inc.php:1256
+#: include/locales/en_gb.inc.php:1255
 msgid "Cannot format Tree. Check logic structure in service links"
 msgstr "Kann Baum nicht formatieren. Logische Struktur in den Diensten prüfen"
 
@@ -1398,17 +1398,17 @@ msgstr "Massen-Update für sichtbaren Vorlagen-Namen nicht möglich"
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr ""
 
-#: include/db.inc.php:1358
+#: include/db.inc.php:1375
 #, php-format
 msgid "Cannot perform delete statement on table \"%s\" without where condition."
 msgstr "Delete-Statement in Tabelle \"%s\" nicht ohne Where-Klausel möglich."
 
-#: include/db.inc.php:1313
+#: include/db.inc.php:1330
 #, php-format
 msgid "Cannot perform update statement on table \"%s\" without values."
 msgstr "Update-Statement in Tabelle \"%s\" nicht ohne Werte möglich."
 
-#: include/db.inc.php:1322
+#: include/db.inc.php:1339
 #, php-format
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "Update-Statement in Tabelle \"%s\" nicht ohne Where-Klausel möglich."
@@ -1421,7 +1421,7 @@ msgstr "Kann Makro nicht entfernen"
 msgid "Cannot remove macro."
 msgstr "Kann Makro nicht entfernen."
 
-#: include/locales/en_gb.inc.php:1632
+#: include/locales/en_gb.inc.php:1613
 msgid "Cannot rename guest user"
 msgstr "Kann Gast-Benutzer nicht umbenennen"
 
@@ -1477,7 +1477,7 @@ msgstr "Kann Aktion nicht aktualisieren"
 msgid "Cannot update application"
 msgstr "Kann Applikation nicht aktualisieren"
 
-#: include/locales/en_gb.inc.php:1315
+#: include/locales/en_gb.inc.php:1314
 msgid "Cannot update comment"
 msgstr "Kann Kommentar nicht aktualisieren"
 
@@ -1554,7 +1554,7 @@ msgstr "Kann Karte \"%s\" nicht aktualisieren."
 msgid "Cannot update media type"
 msgstr "Kann Medientyp nicht aktualisieren"
 
-#: include/locales/en_gb.inc.php:883
+#: include/locales/en_gb.inc.php:882
 msgid "Cannot update network map"
 msgstr "Kann Netzwerk-Plan nicht aktualisieren"
 
@@ -1562,7 +1562,7 @@ msgstr "Kann Netzwerk-Plan nicht aktualisieren"
 msgid "Cannot update node"
 msgstr "Kann Knoten nicht aktualisieren"
 
-#: include/locales/en_gb.inc.php:1346
+#: include/locales/en_gb.inc.php:1345
 msgid "Cannot update proxy"
 msgstr "Kann Proxy nicht aktualisieren"
 
@@ -1574,7 +1574,7 @@ msgstr "Kann Regular Expression nicht aktualisieren"
 msgid "Cannot update scenario"
 msgstr "Kann Szenario nicht aktualisieren"
 
-#: include/locales/en_gb.inc.php:1103
+#: include/locales/en_gb.inc.php:1102
 msgid "Cannot update screen"
 msgstr "Kann Übersichtstafel nicht aktualisieren"
 
@@ -1582,15 +1582,15 @@ msgstr "Kann Übersichtstafel nicht aktualisieren"
 msgid "Cannot update script"
 msgstr "Kann Skript nicht aktualisieren"
 
-#: include/locales/en_gb.inc.php:1208
+#: include/locales/en_gb.inc.php:1207
 msgid "Cannot update service"
 msgstr "Kann Dienst nicht aktualisieren"
 
-#: include/locales/en_gb.inc.php:1187
+#: include/locales/en_gb.inc.php:1186
 msgid "Cannot update slideshow"
 msgstr "Kann Slideshow nicht aktualisieren"
 
-#: actionconf.php:327 trigger_prototypes.php:255 triggers.php:295
+#: actionconf.php:327 trigger_prototypes.php:288 triggers.php:364
 msgid "Cannot update status"
 msgstr "Kann Status nicht aktualisieren"
 
@@ -1598,7 +1598,7 @@ msgstr "Kann Status nicht aktualisieren"
 msgid "Cannot update template"
 msgstr "Kann Vorlage nicht aktualisieren"
 
-#: include/locales/en_gb.inc.php:1278
+#: include/locales/en_gb.inc.php:1277
 msgid "Cannot update trigger"
 msgstr "Kann Auslöser nicht aktualisieren"
 
@@ -1621,7 +1621,7 @@ msgstr "Kann Status des Benutzers nicht aktualisieren"
 msgid "Cannot update value map"
 msgstr "Wertezuordnung konnte nicht aktualisiert werden"
 
-#: include/locales/en_gb.inc.php:1430
+#: include/locales/en_gb.inc.php:1411
 msgid "Caption"
 msgstr "Bildunterschrift"
 
@@ -1629,12 +1629,12 @@ msgstr "Bildunterschrift"
 msgid "Case sensitive"
 msgstr "Groß- und Kleinschreibung beachten"
 
-#: include/locales/en_gb.inc.php:1172
+#: include/locales/en_gb.inc.php:1171
 #, fuzzy
 msgid "Centre"
 msgstr "Zentrum"
 
-#: include/locales/en_gb.inc.php:1276
+#: include/locales/en_gb.inc.php:1275
 msgid "Change"
 msgstr "Ändern"
 
@@ -1663,7 +1663,7 @@ msgstr "Gehäuse"
 msgid "Check already exists."
 msgstr "Prüfungen existiert bereits."
 
-#: include/locales/en_gb.inc.php:1448
+#: include/locales/en_gb.inc.php:1429
 msgid "Check expression part starting from '"
 msgstr "Prüfen Sie die Expression beginnend bei '"
 
@@ -1690,7 +1690,7 @@ msgstr "Prüfungen sollten einzigartig sein."
 msgid "Child"
 msgstr "Remote"
 
-#: include/locales/en_gb.inc.php:1405
+#: include/locales.inc.php:60
 msgid "Chinese (zh_CN)"
 msgstr "Chinesisch (zh_CN)"
 
@@ -1703,7 +1703,7 @@ msgstr "Keine zirkuläre Verbindung möglich"
 msgid "Circular link cannot be created for map element \"%s\"."
 msgstr "Keine zirkuläre Verbindung möglich für Karten-Element \"%s\"."
 
-#: include/locales/en_gb.inc.php:1387
+#: include/locales/en_gb.inc.php:1385
 msgid "Clear"
 msgstr "Leeren"
 
@@ -1719,11 +1719,11 @@ msgstr "Lösche Verlauf der Auswahl"
 msgid "Clear when unlinking"
 msgstr "Leeren, wenn getrennt wird"
 
-#: include/locales/en_gb.inc.php:1156
+#: include/locales/en_gb.inc.php:1155
 msgid "Clock"
 msgstr "Uhr"
 
-#: include/locales/en_gb.inc.php:1224
+#: include/locales/en_gb.inc.php:1223
 #: include/views/administration.general.iconmap.edit.php:139
 #: include/views/administration.script.edit.php:119
 #: include/views/configuration.action.edit.php:929
@@ -1734,7 +1734,7 @@ msgstr "Uhr"
 msgid "Clone"
 msgstr "Kopieren"
 
-#: include/locales/en_gb.inc.php:1362
+#: include/locales/en_gb.inc.php:1360
 #: include/views/js/configuration.sysmaps.js.php:182
 #: include/views/js/configuration.sysmaps.js.php:263
 #: include/views/js/configuration.sysmaps.js.php:354
@@ -1752,7 +1752,7 @@ msgstr ""
 msgid "Colour"
 msgstr "Farbe"
 
-#: include/locales/en_gb.inc.php:877
+#: include/locales/en_gb.inc.php:876
 #: include/views/js/configuration.sysmaps.js.php:228
 msgid "Colour (OK)"
 msgstr "Farbe (OK)"
@@ -1761,19 +1761,19 @@ msgstr "Farbe (OK)"
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr "Farb-Angabe falsch: Erwarte hexadekadischen Farb-Code (6 Stellen)."
 
-#: include/locales/en_gb.inc.php:1150
+#: include/locales/en_gb.inc.php:1149
 msgid "Column span"
 msgstr "Spaltenabstand"
 
-#: include/locales/en_gb.inc.php:1106
+#: include/locales/en_gb.inc.php:1105
 msgid "Columns"
 msgstr "Spalten"
 
-#: include/locales/en_gb.inc.php:1475
+#: include/locales/en_gb.inc.php:1456
 msgid "Combined result"
 msgstr "Kombiniertes Ergebnis"
 
-#: include/locales/en_gb.inc.php:1360
+#: include/locales/en_gb.inc.php:1358
 #: include/views/administration.script.edit.php:66
 msgid "Command"
 msgstr "Befehl"
@@ -1794,11 +1794,11 @@ msgstr "Befehl kann nicht leer sein."
 msgid "Commands"
 msgstr "Befehle"
 
-#: include/locales/en_gb.inc.php:1314
+#: include/locales/en_gb.inc.php:1313
 msgid "Comment updated"
 msgstr "Kommentar aktualisiert"
 
-#: include/locales/en_gb.inc.php:1329
+#: include/locales/en_gb.inc.php:1328
 msgid "Comments"
 msgstr "Kommentare"
 
@@ -1806,7 +1806,7 @@ msgstr "Kommentare"
 msgid "Commercial"
 msgstr "Kommerziell"
 
-#: include/locales/en_gb.inc.php:1082
+#: include/locales/en_gb.inc.php:1081
 msgid "Compare values for multiple periods"
 msgstr "Vergleiche Werte für mehrere Zeiträume"
 
@@ -1828,7 +1828,7 @@ msgstr "Voraussetzungen"
 msgid "Configuration"
 msgstr "Konfiguration"
 
-#: include/locales/en_gb.inc.php:1205
+#: include/locales/en_gb.inc.php:1204
 msgid "Configuration of IT services"
 msgstr "Konfiguration von IT-Diensten"
 
@@ -1856,19 +1856,19 @@ msgstr "Konfiguration von Graphen"
 msgid "Configuration of items"
 msgstr "Konfiguration von Elementen"
 
-#: include/locales/en_gb.inc.php:855
+#: include/locales/en_gb.inc.php:854
 msgid "Configuration of network maps"
 msgstr "Konfiguration von Netzwerkplänen"
 
-#: include/locales/en_gb.inc.php:1099
+#: include/locales/en_gb.inc.php:1098
 msgid "Configuration of screens"
 msgstr "Konfiguration von Übersichtstafeln"
 
-#: include/locales/en_gb.inc.php:1131
+#: include/locales/en_gb.inc.php:1130
 msgid "Configuration of slideshows"
 msgstr "Konfiguration von Slideshows"
 
-#: include/locales/en_gb.inc.php:1261
+#: include/locales/en_gb.inc.php:1260
 msgid "Configuration of triggers"
 msgstr "Konfiguration von Auslösern"
 
@@ -1880,7 +1880,7 @@ msgstr "Konfiguration aktualisiert"
 msgid "Configuration was not updated"
 msgstr "Konfiguration konnte nicht aktualisiert werden"
 
-#: include/locales/en_gb.inc.php:954
+#: include/locales/en_gb.inc.php:953
 msgid "Configure"
 msgstr "Konfigurieren"
 
@@ -1904,7 +1904,7 @@ msgstr "Verbunden als '%1$s'"
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr "Verbunden als '%1$s' von '%2$s'"
 
-#: include/locales/en_gb.inc.php:861
+#: include/locales/en_gb.inc.php:860
 msgid "Connectors"
 msgstr "VERBINDUNGEN"
 
@@ -1916,12 +1916,12 @@ msgstr "Kontakt"
 msgid "Contract number"
 msgstr "Vertragsnummer"
 
-#: include/locales/en_gb.inc.php:858
+#: include/locales/en_gb.inc.php:857
 #: include/views/js/configuration.sysmaps.js.php:149
 msgid "Coordinate X"
 msgstr "X-Koordinate"
 
-#: include/locales/en_gb.inc.php:859
+#: include/locales/en_gb.inc.php:858
 #: include/views/js/configuration.sysmaps.js.php:153
 msgid "Coordinate Y"
 msgstr "Y-Koordinate"
@@ -1938,7 +1938,7 @@ msgstr "Kopiere ausgewählte Elemente?"
 msgid "Copy selected to ..."
 msgstr "Kopiere Ausgewählte zu ..."
 
-#: include/locales/en_gb.inc.php:1306
+#: include/locales/en_gb.inc.php:1305
 msgid "Copy selected triggers?"
 msgstr "Kopiere ausgewählte Auslöser?"
 
@@ -1947,20 +1947,20 @@ msgstr "Kopiere ausgewählte Auslöser?"
 msgid "Correct login [%s]"
 msgstr "Richtige Anmeldung [%s]"
 
-#: include/locales/en_gb.inc.php:1613
+#: include/locales/en_gb.inc.php:1594
 msgid "Could not save image!"
 msgstr "Konnte Bild nicht speichern!"
 
 # Zähler?
-#: include/locales/en_gb.inc.php:978
+#: include/locales/en_gb.inc.php:977
 msgid "Count"
 msgstr "Gesamt"
 
-#: include/locales/en_gb.inc.php:1134
+#: include/locales/en_gb.inc.php:1133
 msgid "Count of slides"
 msgstr "Anzahl der Seiten"
 
-#: include/locales/en_gb.inc.php:1060
+#: include/locales/en_gb.inc.php:1059
 msgid "Create"
 msgstr "Erzeugen"
 
@@ -1996,17 +1996,13 @@ msgstr "Erstelle Element"
 msgid "Create maintenance period"
 msgstr "Erstelle Wartungszeitraum"
 
-#: include/locales/en_gb.inc.php:873
+#: include/locales/en_gb.inc.php:872
 msgid "Create map"
 msgstr "Erstelle Karte"
 
 #: include/views/administration.mediatypes.list.php:28
 msgid "Create media type"
 msgstr "Erstelle Medientyp"
-
-#: include/locales/en_gb.inc.php:803
-msgid "Create prototype"
-msgstr "Erstelle Prototyp"
 
 #: include/locales/en_gb.inc.php:665
 msgid "Create proxy"
@@ -2020,7 +2016,7 @@ msgstr "Erstelle Regel"
 msgid "Create scenario"
 msgstr "Erstelle Szenario"
 
-#: include/locales/en_gb.inc.php:1120
+#: include/locales/en_gb.inc.php:1119
 msgid "Create screen"
 msgstr "Erstelle Übersichtstafel"
 
@@ -2028,11 +2024,11 @@ msgstr "Erstelle Übersichtstafel"
 msgid "Create script"
 msgstr "Skript erstellen"
 
-#: include/locales/en_gb.inc.php:1121
+#: include/locales/en_gb.inc.php:1120
 msgid "Create slide show"
 msgstr "Erstelle Vorführung"
 
-#: include/locales/en_gb.inc.php:1282 include/locales/en_gb.inc.php:1693
+#: include/locales/en_gb.inc.php:1281 include/locales/en_gb.inc.php:1674
 msgid "Create trigger"
 msgstr "Auslöser erstellen"
 
@@ -2135,7 +2131,7 @@ msgstr "Benutzerdefinierte Beschriftung für Elemente des Typs \"%1$s\" darf nic
 msgid "Custom multiplier"
 msgstr "Benutzerdefinierter Multiplikator"
 
-#: include/locales/en_gb.inc.php:1182
+#: include/locales/en_gb.inc.php:1181
 msgid "Custom screens"
 msgstr "Benutzerdefinierte Übersichtstafeln"
 
@@ -2156,11 +2152,11 @@ msgstr "Alle Übersetzungen nutzen die benutzerdefinierten Schweregrade. Sie mü
 msgid "Custom size"
 msgstr "Benutzerdefinierte Größe"
 
-#: include/locales/en_gb.inc.php:1198
+#: include/locales/en_gb.inc.php:1197
 msgid "Custom slides"
 msgstr "Benutzerdefinierte Seite"
 
-#: include/locales/en_gb.inc.php:1410
+#: include/locales.inc.php:61
 msgid "Czech (cs_CZ)"
 msgstr "Tschechisch (cs_CZ)"
 
@@ -2168,7 +2164,7 @@ msgstr "Tschechisch (cs_CZ)"
 msgid "D"
 msgstr "D"
 
-#: include/locales/en_gb.inc.php:953
+#: include/locales/en_gb.inc.php:952
 msgid "DASHBOARD CONFIGURATION"
 msgstr "KONFIGURATION DER ÜBERSICHTSSEITE"
 
@@ -2176,11 +2172,11 @@ msgstr "KONFIGURATION DER ÜBERSICHTSSEITE"
 msgid "DETAILS OF SCENARIO"
 msgstr "DETAILS DES SZENARIOS"
 
-#: include/locales/en_gb.inc.php:1272
+#: include/locales/en_gb.inc.php:1271
 msgid "DISABLED"
 msgstr "DEAKTIVIERT"
 
-#: include/locales/en_gb.inc.php:827
+#: include/locales/en_gb.inc.php:826
 msgid "DISCOVERED"
 msgstr "ENTDECKT"
 
@@ -2188,7 +2184,7 @@ msgstr "ENTDECKT"
 msgid "DISCOVERY"
 msgstr "DISCOVERY"
 
-#: include/locales/en_gb.inc.php:1433
+#: include/locales/en_gb.inc.php:1414
 msgid "DISCOVERY RULES"
 msgstr "DISCOVERY-REGELN"
 
@@ -2205,11 +2201,11 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "DNS-Name"
 
-#: include/locales/en_gb.inc.php:826
+#: include/locales/en_gb.inc.php:825
 msgid "DOWN"
 msgstr "RUNTER"
 
-#: include/locales/en_gb.inc.php:1042
+#: include/locales/en_gb.inc.php:1041
 msgid "Daily"
 msgstr "Täglich"
 
@@ -2218,19 +2214,19 @@ msgstr "Täglich"
 msgid "Dark orange"
 msgstr "Dunkles Orange"
 
-#: include/locales/en_gb.inc.php:1089
+#: include/locales/en_gb.inc.php:1088
 msgid "Darken"
 msgstr "Abdunkeln"
 
-#: include/locales/en_gb.inc.php:933 include/menu.inc.php:32
+#: include/locales/en_gb.inc.php:932 include/menu.inc.php:32
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: include/locales/en_gb.inc.php:952
+#: include/locales/en_gb.inc.php:951
 msgid "Dashboard configuration"
 msgstr "Übersichtsseiten-Konfiguration"
 
-#: include/locales/en_gb.inc.php:958
+#: include/locales/en_gb.inc.php:957
 msgid "Dashboard filter"
 msgstr "Filter der Übersichtsseite"
 
@@ -2241,7 +2237,7 @@ msgstr "Filter der Übersichtsseite"
 msgid "Dashed line"
 msgstr "Gestrichelte Linie"
 
-#: include/locales/en_gb.inc.php:971
+#: include/locales/en_gb.inc.php:970
 msgid "Data"
 msgstr "Wert"
 
@@ -2250,7 +2246,7 @@ msgstr "Wert"
 msgid "Data from %1$s. Generated in %2$s sec"
 msgstr "Daten von %1$s. Hergestellt in %2$s Sek."
 
-#: include/locales/en_gb.inc.php:1158
+#: include/locales/en_gb.inc.php:1157
 msgid "Data overview"
 msgstr "Datenübersicht"
 
@@ -2319,7 +2315,7 @@ msgstr "Ende der HW-Wartung"
 msgid "Date HW purchased"
 msgstr "HW-Anschaffungsdatum"
 
-#: include/locales/en_gb.inc.php:1038
+#: include/locales/en_gb.inc.php:1037
 msgid "Day"
 msgstr "Tag"
 
@@ -2335,7 +2331,7 @@ msgstr "Tag der Woche"
 msgid "Days"
 msgstr "Tage"
 
-#: include/locales/en_gb.inc.php:1350
+#: include/locales/en_gb.inc.php:1349
 msgid "Debug"
 msgstr "Debug"
 
@@ -2386,11 +2382,11 @@ msgstr "Standardbetreff"
 msgid "Default theme"
 msgstr "Standard-Thema"
 
-#: include/locales/en_gb.inc.php:1369
+#: include/locales/en_gb.inc.php:1367
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
 msgstr "Das in \"include/defines.inc.php\" definierte ZBX_SCRIPT_BYTES_LIMIT wurde erreicht. Sie können versuchen den Wert zu erhöhen"
 
-#: include/locales/en_gb.inc.php:1368
+#: include/locales/en_gb.inc.php:1366
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
 msgstr "Das in \"include/defines.inc.php\" definierte ZBX_SCRIPT_TIMEOUT wurde erreicht. Sie können versuchen den Wert zu erhöhen."
 
@@ -2407,11 +2403,11 @@ msgstr "Verzögerung (Sekunden)"
 msgid "Delayed by"
 msgstr "Verzögert durch"
 
-#: include/forms.inc.php:3608 include/locales/en_gb.inc.php:1223
+#: include/forms.inc.php:3608 include/locales/en_gb.inc.php:1222
 msgid "Delete"
 msgstr "Löschen"
 
-#: include/locales/en_gb.inc.php:888
+#: include/locales/en_gb.inc.php:887
 #, fuzzy
 msgid "Delete Links between selected elements?"
 msgstr "Lösche Verbindung zwischen den ausgewählten Elementen?"
@@ -2436,7 +2432,7 @@ msgstr "Aktuelle Aktion löschen?"
 msgid "Delete discovery rule?"
 msgstr "Discovery-Regel löschen?"
 
-#: include/locales/en_gb.inc.php:1464
+#: include/locales/en_gb.inc.php:1445
 msgid "Delete expression?"
 msgstr "Ausdruck löschen?"
 
@@ -2460,11 +2456,11 @@ msgstr "Verlauf ausgewählter Elemente löschen?"
 msgid "Delete icon map?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1586
+#: include/locales/en_gb.inc.php:1567
 msgid "Delete it?"
 msgstr "Wirklich löschen?"
 
-#: include/locales/en_gb.inc.php:1465
+#: include/locales/en_gb.inc.php:1446
 msgid "Delete keyword?"
 msgstr "Schlüsselwort löschen?"
 
@@ -2485,7 +2481,7 @@ msgstr "Regular Expression löschen?"
 msgid "Delete scenario?"
 msgstr "Szenario löschen?"
 
-#: include/locales/en_gb.inc.php:1109
+#: include/locales/en_gb.inc.php:1108
 msgid "Delete screen?"
 msgstr "Übersichtstafel löschen?"
 
@@ -2520,7 +2516,7 @@ msgstr "Ausgewählte Web-Szenarios löschen?"
 msgid "Delete selected actions?"
 msgstr "Ausgewählte Aktionen löschen?"
 
-#: include/locales/en_gb.inc.php:1481
+#: include/locales/en_gb.inc.php:1462
 msgid "Delete selected applications?"
 msgstr "Ausgewählte Applikationen löschen?"
 
@@ -2528,7 +2524,7 @@ msgstr "Ausgewählte Applikationen löschen?"
 msgid "Delete selected discovery rules?"
 msgstr "Ausgewählte Discovery-Regeln löschen?"
 
-#: include/locales/en_gb.inc.php:886
+#: include/locales/en_gb.inc.php:885
 msgid "Delete selected elements?"
 msgstr "Ausgewählte Elemente löschen?"
 
@@ -2565,7 +2561,7 @@ msgstr "Ausgewählte Systeme löschen?"
 msgid "Delete selected image?"
 msgstr "Ausgewählte Bilder löschen?"
 
-#: include/locales/en_gb.inc.php:1535
+#: include/locales/en_gb.inc.php:1516
 msgid "Delete selected item?"
 msgstr "Ausgewähltes Element löschen?"
 
@@ -2577,7 +2573,7 @@ msgstr "Ausgewählte Elemente löschen?"
 msgid "Delete selected maintenance periods?"
 msgstr "Ausgewählte Wartungszeiträume löschen?"
 
-#: include/locales/en_gb.inc.php:879
+#: include/locales/en_gb.inc.php:878
 msgid "Delete selected maps?"
 msgstr "Ausgewählte Karten löschen?"
 
@@ -2613,11 +2609,11 @@ msgstr "Ausgewählte Übersichtstafeln löschen?"
 msgid "Delete selected scripts?"
 msgstr "Ausgewählte Skripts löschen?"
 
-#: include/locales/en_gb.inc.php:1698
+#: include/locales/en_gb.inc.php:1679
 msgid "Delete selected services?"
 msgstr "Ausgewählte Dienste löschen?"
 
-#: include/locales/en_gb.inc.php:1125
+#: include/locales/en_gb.inc.php:1124
 msgid "Delete selected slideshows?"
 msgstr "Ausgewählte Slideshows löschen?"
 
@@ -2625,7 +2621,7 @@ msgstr "Ausgewählte Slideshows löschen?"
 msgid "Delete selected templates?"
 msgstr "Ausgewählte Vorlagen löschen?"
 
-#: include/locales/en_gb.inc.php:1307
+#: include/locales/en_gb.inc.php:1306
 msgid "Delete selected triggers?"
 msgstr "Ausgewählte Auslöser löschen?"
 
@@ -2652,11 +2648,11 @@ msgstr[1] "Ausgewählte Wertezuordnung löschen? Die Elemente %d verwenden sie!"
 msgid "Delete selected with linked elements"
 msgstr "Ausgewählte und verbundene Elemente gelöscht"
 
-#: include/locales/en_gb.inc.php:1697
+#: include/locales/en_gb.inc.php:1678
 msgid "Delete service"
 msgstr "Dienst löschen"
 
-#: include/locales/en_gb.inc.php:1192
+#: include/locales/en_gb.inc.php:1191
 msgid "Delete slideshow?"
 msgstr "Vorführung löschen?"
 
@@ -2664,11 +2660,11 @@ msgstr "Vorführung löschen?"
 msgid "Delete template?"
 msgstr "Vorlage löschen?"
 
-#: include/locales/en_gb.inc.php:1478
+#: include/locales/en_gb.inc.php:1459
 msgid "Delete this application?"
 msgstr "Diese Applikation löschen?"
 
-#: include/locales/en_gb.inc.php:1538
+#: include/locales/en_gb.inc.php:1519
 msgid "Delete trigger?"
 msgstr "Auslöser löschen?"
 
@@ -2689,16 +2685,16 @@ msgstr "Delta (nur Änderung)"
 msgid "Delta (speed per second)"
 msgstr "Delta (pro Sekunde)"
 
-#: include/forms.inc.php:434 include/locales/en_gb.inc.php:1351
+#: include/forms.inc.php:434 include/locales/en_gb.inc.php:1350
 #: include/views/administration.usergroups.edit.php:80
 msgid "Deny"
 msgstr "Verweigern"
 
-#: include/locales/en_gb.inc.php:1280
+#: include/locales/en_gb.inc.php:1279
 msgid "Dependent"
 msgstr "ABHÄNGIGKEIT"
 
-#: include/locales/en_gb.inc.php:1279 popup.php:904
+#: include/locales/en_gb.inc.php:1278 popup.php:904
 msgid "Depends on"
 msgstr "hängt ab von"
 
@@ -2715,7 +2711,7 @@ msgstr "Einsatzbereitschaft"
 msgid "Description"
 msgstr "Beschreibung"
 
-#: include/locales/en_gb.inc.php:1377
+#: include/locales/en_gb.inc.php:1375
 #: include/views/administration.mediatypes.list.php:48
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:332 queue.php:50
@@ -2734,11 +2730,11 @@ msgstr "Gerät"
 msgid "Device uniqueness criteria"
 msgstr "Eindeutigkeitsmerkmal des Gerätes"
 
-#: include/locales/en_gb.inc.php:1124
+#: include/locales/en_gb.inc.php:1123
 msgid "Dimension (cols x rows)"
 msgstr "Ma&szlig;e (Spalte x Zeile)"
 
-#: include/locales/en_gb.inc.php:1274
+#: include/locales/en_gb.inc.php:1273
 msgid "Disable"
 msgstr "Deaktiviere"
 
@@ -2777,7 +2773,7 @@ msgstr "Ausgewählte Web-Szenarios deaktivieren?"
 msgid "Disable selected actions?"
 msgstr "Ausgewählte Aktionen deaktivieren?"
 
-#: include/locales/en_gb.inc.php:1480
+#: include/locales/en_gb.inc.php:1461
 msgid "Disable selected applications?"
 msgstr "Ausgewählte Applikationen deaktivieren?"
 
@@ -2805,13 +2801,12 @@ msgstr "Ausgewählte Hosts deaktivieren?"
 msgid "Disable selected items?"
 msgstr "Ausgewählte Elemente deaktivieren?"
 
-#: include/locales/en_gb.inc.php:1304
+#: include/locales/en_gb.inc.php:1303
 msgid "Disable selected triggers?"
 msgstr "Ausgewählte Auslöser deaktivieren?"
 
 #: actionconf.php:487 include/discovery.inc.php:120
-#: include/locales/en_gb.inc.php:1271 include/triggers.inc.php:1180
-#: include/users.inc.php:59
+#: include/locales/en_gb.inc.php:1270 include/users.inc.php:59
 #: include/views/administration.usergroups.list.php:62
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
@@ -2925,20 +2920,20 @@ msgstr "Discovery-Status"
 msgid "Display OK triggers for"
 msgstr "OK-Auslöser zeigen"
 
-#: include/locales/en_gb.inc.php:1426
+#: include/locales/en_gb.inc.php:1407
 #, fuzzy
 msgid "Displaying"
 msgstr "Zeige an"
 
-#: include/locales/en_gb.inc.php:1081
+#: include/locales/en_gb.inc.php:1080
 msgid "Distribution of values for multiple items"
 msgstr "Verteilung der Werte für mehrere Elemente"
 
-#: include/locales/en_gb.inc.php:1080
+#: include/locales/en_gb.inc.php:1079
 msgid "Distribution of values for multiple periods"
 msgstr "Verteilung der Werte für mehrere Zeiträume"
 
-#: include/locales/en_gb.inc.php:1536
+#: include/locales/en_gb.inc.php:1517
 #, fuzzy
 msgid "Do"
 msgstr "Los"
@@ -2963,11 +2958,11 @@ msgstr "Verlauf löschen nach (in Tagen)"
 msgid "Do not keep trends older than (in days)"
 msgstr "Trend löschen nach (in Tagen)"
 
-#: include/locales/en_gb.inc.php:1694
+#: include/locales/en_gb.inc.php:1675
 msgid "Do you wish to replace the conditional expression?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1684
+#: include/locales/en_gb.inc.php:1665
 #, fuzzy
 msgid "Done"
 msgstr "Erledigt"
@@ -2993,7 +2988,7 @@ msgstr "Download-Geschwindigkeit für Szenario '%s'"
 msgid "Download speed for step '%1$s' of scenario '%2$s'"
 msgstr "Download-Geschwindigkeit für Schritt '%1$s' in Szenario '%2$s'"
 
-#: include/locales/en_gb.inc.php:111 include/locales/en_gb.inc.php:1227
+#: include/locales/en_gb.inc.php:111 include/locales/en_gb.inc.php:1226
 msgid "Downtime"
 msgstr "Downtime"
 
@@ -3041,31 +3036,31 @@ msgstr "Benutzer-Alias bereits vorhanden \"%s\"."
 msgid "Duration"
 msgstr "Dauer"
 
-#: include/locales/en_gb.inc.php:1406
+#: include/locales.inc.php:62
 msgid "Dutch (nl_NL)"
 msgstr "Niederländisch (nl_NL)"
 
-#: include/locales/en_gb.inc.php:1123
+#: include/locales/en_gb.inc.php:1122
 msgid "Dynamic item"
 msgstr "Dynamisches Element"
 
-#: include/locales/en_gb.inc.php:1523
+#: include/locales/en_gb.inc.php:1504
 msgid "E"
 msgstr "E"
 
-#: include/locales/en_gb.inc.php:1650
+#: include/locales/en_gb.inc.php:1631
 msgid "ERROR"
 msgstr "FEHLER"
 
-#: include/locales/en_gb.inc.php:1660
+#: include/locales/en_gb.inc.php:1641
 msgid "EVENTS"
 msgstr "EREIGNISSE"
 
-#: include/locales/en_gb.inc.php:907
+#: include/locales/en_gb.inc.php:906
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Jede URL sollte einzigartig sein. Bitte überprüfen Sie, dass nur eine URL existiert namens"
 
-#: include/forms.inc.php:3596 include/locales/en_gb.inc.php:1122
+#: include/forms.inc.php:3596 include/locales/en_gb.inc.php:1121
 #: include/views/administration.users.edit.php:163
 #: include/views/configuration.action.edit.php:367
 #: include/views/configuration.action.edit.php:373
@@ -3073,11 +3068,11 @@ msgstr "Jede URL sollte einzigartig sein. Bitte überprüfen Sie, dass nur eine 
 msgid "Edit"
 msgstr "Ändern"
 
-#: include/locales/en_gb.inc.php:1457
+#: include/locales/en_gb.inc.php:1438
 msgid "Edit connector"
 msgstr "Verbindung bearbeiten"
 
-#: include/locales/en_gb.inc.php:1422
+#: include/locales/en_gb.inc.php:1403
 msgid "Edit hosts"
 msgstr "Hosts bearbeiten"
 
@@ -3085,12 +3080,12 @@ msgstr "Hosts bearbeiten"
 msgid "Edit maintenance period"
 msgstr "Wartungszeitraum bearbeiten"
 
-#: include/locales/en_gb.inc.php:865
+#: include/locales/en_gb.inc.php:864
 #: include/views/js/configuration.sysmaps.js.php:8
 msgid "Edit map element"
 msgstr "Kartenelement bearbeiten"
 
-#: include/locales/en_gb.inc.php:1696
+#: include/locales/en_gb.inc.php:1677
 msgid "Edit service"
 msgstr "Dienst bearbeiten"
 
@@ -3116,7 +3111,7 @@ msgstr ""
 msgid "Email"
 msgstr "E-Mail"
 
-#: include/locales/en_gb.inc.php:1431
+#: include/locales/en_gb.inc.php:1412
 msgid "Empty"
 msgstr "Leer"
 
@@ -3153,11 +3148,11 @@ msgstr "Leerer Makro Wert"
 msgid "Empty parameters"
 msgstr "Parameter leer"
 
-#: include/locales/en_gb.inc.php:1370
+#: include/locales/en_gb.inc.php:1368
 msgid "Empty response received"
 msgstr "Leere Antwort erhalten"
 
-#: include/locales/en_gb.inc.php:1275
+#: include/locales/en_gb.inc.php:1274
 msgid "Enable"
 msgstr "Aktiviere"
 
@@ -3218,11 +3213,11 @@ msgstr "Ausgewählte Host-Gruppen aktivieren?"
 msgid "Enable selected items?"
 msgstr "Ausgewählte Elemente aktivieren?"
 
-#: include/locales/en_gb.inc.php:1303
+#: include/locales/en_gb.inc.php:1302
 msgid "Enable selected triggers?"
 msgstr "Ausgewählte Auslöser aktivieren?"
 
-#: actionconf.php:492 include/locales/en_gb.inc.php:1273
+#: actionconf.php:492 include/locales/en_gb.inc.php:1272
 #: include/views/administration.usergroups.edit.php:69
 #: include/views/administration.usergroups.list.php:61
 #: include/views/administration.usergroups.list.php:83
@@ -3234,24 +3229,24 @@ msgstr "Ausgewählte Auslöser aktivieren?"
 msgid "Enabled"
 msgstr "Aktiviert"
 
-#: include/locales/en_gb.inc.php:1500
+#: include/locales/en_gb.inc.php:1481
 msgid "End of"
 msgstr "Ende von"
 
-#: include/locales/en_gb.inc.php:1394
+#: include/locales.inc.php:59
 msgid "English (en_GB)"
 msgstr "Englisch (en_GB)"
 
-#: include/locales/en_gb.inc.php:293 include/locales/en_gb.inc.php:1444
+#: include/locales/en_gb.inc.php:293 include/locales/en_gb.inc.php:1425
 #: popup.php:139
 msgid "Error"
 msgstr "Fehler"
 
-#: include/locales/en_gb.inc.php:1056
+#: include/locales/en_gb.inc.php:1055
 msgid "Error adding service time"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1365
+#: include/locales/en_gb.inc.php:1363
 msgid "Error description"
 msgstr "Fehlerbeschreibung"
 
@@ -3260,7 +3255,7 @@ msgstr "Fehlerbeschreibung"
 msgid "Error in item key: \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:816
+#: include/locales/en_gb.inc.php:815
 msgid "Event"
 msgstr "Ereignis"
 
@@ -3276,15 +3271,15 @@ msgstr "Ereignis bestätigt"
 msgid "Event acknowledges"
 msgstr "Ereignisbestätigungen"
 
-#: include/locales/en_gb.inc.php:914
+#: include/locales/en_gb.inc.php:913
 msgid "Event acknowledging disabled"
 msgstr "Ereignisbestätigungen deaktiviert"
 
-#: include/locales/en_gb.inc.php:817
+#: include/locales/en_gb.inc.php:816
 msgid "Event details"
 msgstr "Ereignisdetails"
 
-#: include/locales/en_gb.inc.php:1293
+#: include/locales/en_gb.inc.php:1292
 msgid "Event generation"
 msgstr "Ereigniserzeugung"
 
@@ -3292,7 +3287,7 @@ msgstr "Ereigniserzeugung"
 msgid "Event source"
 msgstr "Auslöserquelle"
 
-#: include/locales/en_gb.inc.php:1659 include/menu.inc.php:61
+#: include/locales/en_gb.inc.php:1640 include/menu.inc.php:61
 msgid "Events"
 msgstr "Ereignisse"
 
@@ -3304,11 +3299,11 @@ msgstr "Jeden Tag"
 msgid "Every week(s)"
 msgstr "Jede Woche"
 
-#: include/locales/en_gb.inc.php:1524
+#: include/locales/en_gb.inc.php:1505
 msgid "Exa"
 msgstr "Exa"
 
-#: include/locales/en_gb.inc.php:1461
+#: include/locales/en_gb.inc.php:1442
 msgid "Exclude"
 msgstr "Ausschließen"
 
@@ -3317,7 +3312,7 @@ msgstr "Ausschließen"
 msgid "Execute"
 msgstr "Ausführen"
 
-#: include/locales/en_gb.inc.php:1614
+#: include/locales/en_gb.inc.php:1595
 msgid "Execute SQL error"
 msgstr "Fehler beim SQL-Ausführen"
 
@@ -3377,15 +3372,15 @@ msgstr "Exportieren als CSV"
 msgid "Expression"
 msgstr "Ausdruck"
 
-#: include/locales/en_gb.inc.php:1446
+#: include/locales/en_gb.inc.php:1427
 msgid "Expression Syntax Error"
 msgstr "Ausdruck hat Syntax-Fehler"
 
-#: include/locales/en_gb.inc.php:1469
+#: include/locales/en_gb.inc.php:1450
 msgid "Expression Variable Elements"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1564
+#: include/locales/en_gb.inc.php:1545
 msgid "Expression cannot be empty"
 msgstr "Ausdruck darf nicht leer sein"
 
@@ -3407,7 +3402,7 @@ msgstr "Externe Überprüfung"
 msgid "Ez Texting"
 msgstr "Ez Texting"
 
-#: include/locales/en_gb.inc.php:1680
+#: include/locales/en_gb.inc.php:1661
 msgid "F"
 msgstr "F"
 
@@ -3449,19 +3444,19 @@ msgstr "Vorlage konnte nicht aktualisiert werden"
 msgid "Failure Audit"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:959
+#: include/locales/en_gb.inc.php:958
 msgid "Favourite graphs"
 msgstr "Lieblings-Graphen"
 
-#: include/locales/en_gb.inc.php:960
+#: include/locales/en_gb.inc.php:959
 msgid "Favourite maps"
 msgstr "Lieblings-Karten"
 
-#: include/locales/en_gb.inc.php:961
+#: include/locales/en_gb.inc.php:960
 msgid "Favourite screens"
 msgstr "Lieblings-Übersichtskarten"
 
-#: include/locales/en_gb.inc.php:942
+#: include/locales/en_gb.inc.php:941
 msgid "Favourites"
 msgstr "Favoriten"
 
@@ -3510,7 +3505,7 @@ msgstr "Filter"
 msgid "Filter by host group"
 msgstr "Nach Host-Gruppe filtern"
 
-#: include/locales/en_gb.inc.php:1326
+#: include/locales/en_gb.inc.php:1325
 msgid "Filter by name"
 msgstr "Nach Namen filtern"
 
@@ -3518,7 +3513,7 @@ msgstr "Nach Namen filtern"
 msgid "Finish"
 msgstr "Beenden"
 
-#: include/locales/en_gb.inc.php:556 include/locales/en_gb.inc.php:1709
+#: include/locales/en_gb.inc.php:556 include/locales/en_gb.inc.php:1690
 msgid "First"
 msgstr "Ersten"
 
@@ -3547,7 +3542,7 @@ msgstr "Formel"
 msgid "Fourth"
 msgstr "Vierten"
 
-#: include/locales/en_gb.inc.php:1395
+#: include/locales.inc.php:63
 msgid "French (fr_FR)"
 msgstr "Französisch (fr_FR)"
 
@@ -3555,11 +3550,11 @@ msgstr "Französisch (fr_FR)"
 msgid "Fri"
 msgstr "Fr"
 
-#: include/locales/en_gb.inc.php:49 include/locales/en_gb.inc.php:1240
+#: include/locales/en_gb.inc.php:49 include/locales/en_gb.inc.php:1239
 msgid "Friday"
 msgstr "Freitag"
 
-#: include/locales/en_gb.inc.php:1026
+#: include/locales/en_gb.inc.php:1025
 #: include/views/configuration.action.edit.php:429
 msgid "From"
 msgstr "Von"
@@ -3580,7 +3575,7 @@ msgid "Frontend messaging"
 msgstr ""
 
 # Das heißt nicht überall gleich.
-#: include/locales/en_gb.inc.php:1225
+#: include/locales/en_gb.inc.php:1224
 #: include/views/configuration.host.edit.php:607
 #, fuzzy
 msgid "Full clone"
@@ -3594,15 +3589,15 @@ msgstr "Vollbild"
 msgid "Function"
 msgstr "Funktion"
 
-#: include/locales/en_gb.inc.php:1578
+#: include/locales/en_gb.inc.php:1559
 msgid "Function '"
 msgstr "Funktion '"
 
-#: include/locales/en_gb.inc.php:1517
+#: include/locales/en_gb.inc.php:1498
 msgid "G"
 msgstr "G"
 
-#: include/locales/en_gb.inc.php:813
+#: include/locales/en_gb.inc.php:812
 msgid "GRAPH PROTOTYPES OF"
 msgstr "GRAPHEN-PROTOTYP VON"
 
@@ -3632,11 +3627,11 @@ msgstr "Allgemein"
 msgid "Generated in %s sec"
 msgstr "Hergestellt in %s s"
 
-#: include/locales/en_gb.inc.php:1396
+#: include/locales.inc.php:64
 msgid "German (de_DE)"
 msgstr "Deutsch (de_DE)"
 
-#: include/locales/en_gb.inc.php:884
+#: include/locales/en_gb.inc.php:883
 msgid "Get selected elements FAILED."
 msgstr "GET des ausgewählten Elemts schlug fehl."
 
@@ -3644,11 +3639,11 @@ msgstr "GET des ausgewählten Elemts schlug fehl."
 msgid "Get support"
 msgstr "Support"
 
-#: include/locales/en_gb.inc.php:1518
+#: include/locales/en_gb.inc.php:1499
 msgid "Giga"
 msgstr "Giga"
 
-#: include/locales/en_gb.inc.php:1473
+#: include/locales/en_gb.inc.php:1454
 msgid "Given expression is not a macro"
 msgstr "Übergebene Expression ist kein Makro"
 
@@ -3660,7 +3655,7 @@ msgstr "Globales Skript"
 msgid "Global scripts"
 msgstr "Globale Skripts"
 
-#: actionconf.php:520 hosts.php:1028 include/locales/en_gb.inc.php:1424
+#: actionconf.php:520 hosts.php:1028 include/locales/en_gb.inc.php:1405
 #: include/views/administration.mediatypes.list.php:107
 #: include/views/administration.script.list.php:107
 #: include/views/administration.usergroups.list.php:153
@@ -3668,7 +3663,7 @@ msgstr "Globale Skripts"
 msgid "Go"
 msgstr "Los"
 
-#: include/locales/en_gb.inc.php:847
+#: include/locales/en_gb.inc.php:846
 msgid "Go to"
 msgstr "Gehe zu"
 
@@ -3730,7 +3725,7 @@ msgstr "Graph hinzugefügt"
 msgid "Graph deleted"
 msgstr "Graph gelöscht"
 
-#: include/locales/en_gb.inc.php:1382
+#: include/locales/en_gb.inc.php:1380
 msgid "Graph element"
 msgstr "Graphelement"
 
@@ -3738,7 +3733,7 @@ msgstr "Graphelement"
 msgid "Graph item"
 msgstr "Graphen Element"
 
-#: include/locales/en_gb.inc.php:1117
+#: include/locales/en_gb.inc.php:1116
 msgid "Graph name"
 msgstr "Name des Graphs"
 
@@ -3865,11 +3860,11 @@ msgstr "H.i"
 msgid "H:i"
 msgstr "H:i"
 
-#: include/locales/en_gb.inc.php:1440
+#: include/locales/en_gb.inc.php:1421
 msgid "H:i:s"
 msgstr "H:i:s"
 
-#: include/locales/en_gb.inc.php:820
+#: include/locales/en_gb.inc.php:819
 msgid "HISTORY OF EVENTS"
 msgstr "EREIGNISVERLAUF"
 
@@ -3917,7 +3912,7 @@ msgstr "Hardware"
 msgid "Hardware (Full details)"
 msgstr "Hardware (Alle Details)"
 
-#: include/locales/en_gb.inc.php:1119
+#: include/locales/en_gb.inc.php:1118
 #: include/views/configuration.sysmap.edit.php:46
 #: include/views/js/configuration.sysmaps.js.php:53
 msgid "Height"
@@ -3931,15 +3926,15 @@ msgstr "Hilfe"
 msgid "Hexadecimal"
 msgstr "Hexadekadisch"
 
-#: include/locales/en_gb.inc.php:842 sysmap.php:164
+#: include/locales/en_gb.inc.php:841 sysmap.php:164
 msgid "Hidden"
 msgstr "Versteckt"
 
-#: include/locales/en_gb.inc.php:1352
+#: include/locales/en_gb.inc.php:1351
 msgid "Hide"
 msgstr "Ausblenden"
 
-#: include/locales/en_gb.inc.php:1323
+#: include/locales/en_gb.inc.php:1322
 msgid "Hide all"
 msgstr "Alles ausblenden"
 
@@ -3947,7 +3942,7 @@ msgstr "Alles ausblenden"
 msgid "Hide disabled scenarios"
 msgstr "Deaktivierte Szenarios ausblenden"
 
-#: include/locales/en_gb.inc.php:1288
+#: include/locales/en_gb.inc.php:1287
 msgid "Hide disabled triggers"
 msgstr "Deaktivierte Auslöser ausblenden"
 
@@ -3964,7 +3959,7 @@ msgstr "Hoch"
 msgid "History"
 msgstr "Verlauf"
 
-#: include/locales/en_gb.inc.php:1116
+#: include/locales/en_gb.inc.php:1115
 msgid "History and simple graphs"
 msgstr "Verlauf und einfache Graphen"
 
@@ -3976,24 +3971,24 @@ msgstr "Verlauf gelöscht"
 msgid "History clearing can take a long time. Continue?"
 msgstr "Es dauert eine Weile, den Verlauf zu löschen. Fortfahren?"
 
-#: include/locales/en_gb.inc.php:1159
+#: include/locales/en_gb.inc.php:1158
 msgid "History of actions"
 msgstr "Aktionsverlauf"
 
-#: include/locales/en_gb.inc.php:1160
+#: include/locales/en_gb.inc.php:1159
 msgid "History of events"
 msgstr "Ereignisverlauf"
 
-#: include/locales/en_gb.inc.php:1169
+#: include/locales/en_gb.inc.php:1168
 msgid "Horizontal"
 msgstr "Horizontal"
 
-#: include/locales/en_gb.inc.php:1171
+#: include/locales/en_gb.inc.php:1170
 msgid "Horizontal align"
 msgstr "Horizontale Ausrichtung"
 
 #: hostinventories.php:159 include/actions.inc.php:42 include/html.inc.php:373
-#: include/locales/en_gb.inc.php:624 include/locales/en_gb.inc.php:1558
+#: include/locales/en_gb.inc.php:624 include/locales/en_gb.inc.php:1539
 #: include/views/configuration.host.edit.php:58
 #: include/views/configuration.host.edit.php:413
 #: include/views/js/configuration.action.edit.js.php:86
@@ -4047,7 +4042,7 @@ msgstr "Anzahl der Hosts"
 msgid "Host deleted"
 msgstr "System gelöscht"
 
-#: include/locales/en_gb.inc.php:1576
+#: include/locales/en_gb.inc.php:1557
 msgid "Host does not exist."
 msgstr "Host existiert nicht."
 
@@ -4079,7 +4074,7 @@ msgstr "Systemgruppen"
 msgid "Host interface"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1416
+#: include/locales/en_gb.inc.php:1397
 msgid "Host inventories"
 msgstr ""
 
@@ -4087,12 +4082,12 @@ msgstr ""
 msgid "Host inventory"
 msgstr "Host-Inventar"
 
-#: include/locales/en_gb.inc.php:1419
+#: include/locales/en_gb.inc.php:1400
 #, fuzzy
 msgid "Host inventory overview"
 msgstr "Überblick über Host-Inventar"
 
-#: include/locales/en_gb.inc.php:1577
+#: include/locales/en_gb.inc.php:1558
 msgid "Host key does not exist."
 msgstr "Host-Schlüssel existiert nicht."
 
@@ -4120,15 +4115,15 @@ msgstr "Netzwerk des Hosts"
 msgid "Host router"
 msgstr "Router des Hosts"
 
-#: include/locales/en_gb.inc.php:1184
+#: include/locales/en_gb.inc.php:1183
 msgid "Host screens"
 msgstr "Host-Anzeigetafeln"
 
-#: include/locales/en_gb.inc.php:938
+#: include/locales/en_gb.inc.php:937
 msgid "Host status"
 msgstr "Host-Status"
 
-#: include/triggers.inc.php:1508
+#: include/triggers.inc.php:1432
 #, php-format
 msgid "Host status became \"%s\""
 msgstr ""
@@ -4145,7 +4140,7 @@ msgstr "Subnetz-Maske des Hosts"
 msgid "Host template"
 msgstr "Systemvorlage"
 
-#: include/locales/en_gb.inc.php:1165
+#: include/locales/en_gb.inc.php:1164
 msgid "Host time"
 msgstr "Host-Zeit"
 
@@ -4176,7 +4171,7 @@ msgstr "Es existiert bereits ein Host mit dem selben sichtbaren Namen: \"%s\"."
 msgid "Hosts"
 msgstr "Systeme"
 
-#: include/locales/en_gb.inc.php:999
+#: include/locales/en_gb.inc.php:998
 msgid "Hosts (m/n/t)"
 msgstr "Systeme (ü/nü/v)"
 
@@ -4188,11 +4183,11 @@ msgstr "Hosts und Vorlagen"
 msgid "Hosts in maintenance"
 msgstr "Hosts in Wartung"
 
-#: include/locales/en_gb.inc.php:1153
+#: include/locales/en_gb.inc.php:1152
 msgid "Hosts info"
 msgstr "Systemübersicht"
 
-#: include/locales/en_gb.inc.php:970
+#: include/locales/en_gb.inc.php:969
 msgid "Hosts location"
 msgstr "Systemstandort"
 
@@ -4201,15 +4196,15 @@ msgstr "Systemstandort"
 msgid "Hosts updated"
 msgstr "Aktualisierte Hosts"
 
-#: include/locales/en_gb.inc.php:1034
+#: include/locales/en_gb.inc.php:1033
 msgid "Hour"
 msgstr "Stunde"
 
-#: include/locales/en_gb.inc.php:1041
+#: include/locales/en_gb.inc.php:1040
 msgid "Hourly"
 msgstr "Stündlich"
 
-#: include/locales/en_gb.inc.php:1035
+#: include/locales/en_gb.inc.php:1034
 msgid "Hours"
 msgstr "Stunden"
 
@@ -4217,7 +4212,7 @@ msgstr "Stunden"
 msgid "Housekeeper"
 msgstr "Systembereinigung"
 
-#: include/locales/en_gb.inc.php:1407
+#: include/locales.inc.php:65
 msgid "Hungarian (hu_HU)"
 msgstr "Ungarisch (hu_HU)"
 
@@ -4294,26 +4289,26 @@ msgstr "IPMI-Sensor"
 msgid "IPMI username"
 msgstr "IPMI-Benutzername"
 
-#: include/locales/en_gb.inc.php:1244
+#: include/locales/en_gb.inc.php:1243
 msgid "IT SERVICES"
 msgstr "IT-DIENSTE"
 
 # Bericht/Analyse
-#: include/locales/en_gb.inc.php:1025
+#: include/locales/en_gb.inc.php:1024
 #, fuzzy
 msgid "IT SERVICES AVAILABILITY REPORT"
 msgstr "VERFÜGBARKEITSANALYSE DER IT-DIENSTE"
 
-#: include/locales/en_gb.inc.php:1203
+#: include/locales/en_gb.inc.php:1202
 msgid "IT service"
 msgstr "IT-Dienst"
 
-#: include/locales/en_gb.inc.php:1204 include/menu.inc.php:85
+#: include/locales/en_gb.inc.php:1203 include/menu.inc.php:85
 #: include/menu.inc.php:219
 msgid "IT services"
 msgstr "IT-Dienste"
 
-#: include/locales/en_gb.inc.php:1024
+#: include/locales/en_gb.inc.php:1023
 msgid "IT services availability report"
 msgstr "Dienste Verfügbarkeitsanalyse"
 
@@ -4332,31 +4327,31 @@ msgstr "ELEMENTE"
 msgid "Icon"
 msgstr "Symbol"
 
-#: include/locales/en_gb.inc.php:850
+#: include/locales/en_gb.inc.php:849
 msgid "Icon (OK)"
 msgstr "Symbol (OK)"
 
-#: include/locales/en_gb.inc.php:866
+#: include/locales/en_gb.inc.php:865
 #: include/views/js/configuration.sysmaps.js.php:324
 msgid "Icon (default)"
 msgstr "Symbol (Standard)"
 
-#: include/locales/en_gb.inc.php:853
+#: include/locales/en_gb.inc.php:852
 #: include/views/js/configuration.sysmaps.js.php:345
 msgid "Icon (disabled)"
 msgstr "Symbol (deaktiviert)"
 
-#: include/locales/en_gb.inc.php:852
+#: include/locales/en_gb.inc.php:851
 #: include/views/js/configuration.sysmaps.js.php:338
 msgid "Icon (maintenance)"
 msgstr "Symbol (in Wartung)"
 
-#: include/locales/en_gb.inc.php:849
+#: include/locales/en_gb.inc.php:848
 #: include/views/js/configuration.sysmaps.js.php:331
 msgid "Icon (problem)"
 msgstr "Symbol (Problem)"
 
-#: include/locales/en_gb.inc.php:851
+#: include/locales/en_gb.inc.php:850
 msgid "Icon (unknown)"
 msgstr "Symbol (unbekannt)"
 
@@ -4447,7 +4442,7 @@ msgstr ""
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1713
+#: include/locales/en_gb.inc.php:1694
 msgid "Iconmap is not enabled"
 msgstr ""
 
@@ -4459,7 +4454,7 @@ msgstr "Symbole"
 msgid "Idle till"
 msgstr "Leerlauf bis"
 
-#: include/locales/en_gb.inc.php:1648
+#: include/locales/en_gb.inc.php:1629
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Fragen Sie bitte ihren Administrator um die nötigen Berechtigungen, falls Sie meinen, dass Sie diese Meldung nicht sehen sollten."
 
@@ -4511,11 +4506,11 @@ msgstr "Import fehlgeschlagen"
 msgid "Import file"
 msgstr "Datei importieren"
 
-#: include/locales/en_gb.inc.php:874
+#: include/locales/en_gb.inc.php:873
 msgid "Import map"
 msgstr "Importiere Karte"
 
-#: include/locales/en_gb.inc.php:1140
+#: include/locales/en_gb.inc.php:1139
 msgid "Import screen"
 msgstr "Importiere Übersichtstafel"
 
@@ -4529,7 +4524,7 @@ msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr "Filtern nach Inventar-Feld \"%s\" nicht möglich; es existiert nicht."
 
 # Zeile und Reihe einheitlich?
-#: include/locales/en_gb.inc.php:1178
+#: include/locales/en_gb.inc.php:1177
 msgid "Impossible to remove last row and column"
 msgstr "Kann letzte Reihe und Spalte nicht entfernen"
 
@@ -4559,7 +4554,7 @@ msgstr "In Wartung"
 msgid "In progress"
 msgstr "In Bearbeitung"
 
-#: include/locales/en_gb.inc.php:1460
+#: include/locales/en_gb.inc.php:1441
 #, fuzzy
 msgid "Include"
 msgstr "Beinhalte"
@@ -4693,7 +4688,7 @@ msgstr ""
 msgid "Incorrect action operationid"
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1541
+#: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1522
 msgid "Incorrect arguments passed to function"
 msgstr "Der Funktion wurden falsche Argumente übergeben"
 
@@ -4701,7 +4696,7 @@ msgstr "Der Funktion wurden falsche Argumente übergeben"
 msgid "Incorrect arguments passed to method."
 msgstr "Methode erhielt falsche Argumente."
 
-#: include/locales/en_gb.inc.php:1618
+#: include/locales/en_gb.inc.php:1599
 msgid "Incorrect characters used for Node name"
 msgstr "Unzulässige Zeichen in Knoten-Name"
 
@@ -4729,7 +4724,7 @@ msgstr "Unzulässige Zeichen im Vorlagen-Namen \"%s\"."
 msgid "Incorrect delay."
 msgstr "Unzulässige Verzögerung."
 
-#: include/locales/en_gb.inc.php:1297
+#: include/locales/en_gb.inc.php:1296
 msgid "Incorrect dependency"
 msgstr "Falsche Abhängigkeit"
 
@@ -4737,7 +4732,7 @@ msgstr "Falsche Abhängigkeit"
 msgid "Incorrect expression"
 msgstr "Ungültiger Ausdruck"
 
-#: include/db.inc.php:1328 include/db.inc.php:1365
+#: include/db.inc.php:1345 include/db.inc.php:1382
 #, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Falsches Feld \"%1$s\" Name oder Wert in Where-Klausel für Tabelle \"%2$s\"."
@@ -4750,7 +4745,7 @@ msgstr ""
 msgid "Incorrect fields for trigger"
 msgstr "Falsche Felder für Auslöser"
 
-#: include/locales/en_gb.inc.php:1573
+#: include/locales/en_gb.inc.php:1554
 msgid "Incorrect function is used"
 msgstr "Falsche Funktion verwendet"
 
@@ -4815,7 +4810,7 @@ msgstr "Falscher Schlüssel: "
 msgid "Incorrect key: %s"
 msgstr "Falscher Schlüssel: %s"
 
-#: include/locales/en_gb.inc.php:1537
+#: include/locales/en_gb.inc.php:1518
 msgid "Incorrect list of items."
 msgstr "Fehlerhafte Liste von Elementen."
 
@@ -4858,7 +4853,7 @@ msgstr "Kartenhöhe-Wert falsch für Karte \"%s\"."
 msgid "Incorrect map width value for map \"%s\"."
 msgstr "Kartenbreite-Wert falsch für Karte \"%s\"."
 
-#: include/locales/en_gb.inc.php:1620
+#: include/locales/en_gb.inc.php:1601
 msgid "Incorrect node type"
 msgstr "Falscher Knoten-Typ"
 
@@ -4920,11 +4915,11 @@ msgstr "Falsche Ansichtstafel-ID \"%s\" angegeben für Element der Ansichtstafel
 msgid "Incorrect status."
 msgstr "Falscher Status."
 
-#: include/locales/en_gb.inc.php:1484 include/locales/en_gb.inc.php:1633
+#: include/locales/en_gb.inc.php:1465 include/locales/en_gb.inc.php:1614
 msgid "Incorrect time period"
 msgstr "Falscher Zeitraum"
 
-#: include/locales/en_gb.inc.php:1571
+#: include/locales/en_gb.inc.php:1552
 msgid "Incorrect trigger expression"
 msgstr "Falscher Auslöser-Ausdruck"
 
@@ -4933,11 +4928,11 @@ msgstr "Falscher Auslöser-Ausdruck"
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr "Falscher Auslöser-Ausdruck. Host \"%s\" existiert nicht or Sie haben keinen Zugriff auf ihn."
 
-#: include/locales/en_gb.inc.php:1504
+#: include/locales/en_gb.inc.php:1485
 msgid "Incorrect type of asort_by_key"
 msgstr "Falscher Typ von \"asort_by_key\""
 
-#: include/locales/en_gb.inc.php:1610
+#: include/locales/en_gb.inc.php:1591
 msgid "Incorrect user data in"
 msgstr "Falsche Benutzerdaten in"
 
@@ -4945,22 +4940,22 @@ msgstr "Falsche Benutzerdaten in"
 msgid "Incorrect user group."
 msgstr "Falsche Benutzergruppe."
 
-#: include/db.inc.php:1240
+#: include/db.inc.php:1257
 #, php-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
 msgstr "Falscher Wert \"%1$s\" für das Gleitkomma-Feld \"%2$s\"."
 
-#: include/db.inc.php:1235
+#: include/db.inc.php:1252
 #, php-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgstr "Falscher Wert \"%1$s\" für das Ganzzahl-Feld \"%2$s\"."
 
-#: include/db.inc.php:1230
+#: include/db.inc.php:1247
 #, php-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "Falscher Wert \"%1$s\" für das vorzeichenlose Ganzzahl-Feld \"%2$s\"."
 
-#: include/db.inc.php:1212
+#: include/db.inc.php:1229
 #, php-format
 msgid "Incorrect value \"NULL\" for NOT NULL field \"%s\"."
 msgstr "Falscher Wert \"NULL\" für das NOT-NULL-Feld \"%s\"."
@@ -4970,7 +4965,7 @@ msgstr "Falscher Wert \"NULL\" für das NOT-NULL-Feld \"%s\"."
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr "Falscher Wert für setMessage(): \"%s\"."
 
-#: include/locales/en_gb.inc.php:1565
+#: include/locales/en_gb.inc.php:1546
 msgid "Incorrect value type"
 msgstr "Falscher Datentyp"
 
@@ -4988,11 +4983,11 @@ msgstr "Info"
 msgid "Information"
 msgstr "Information"
 
-#: include/locales/en_gb.inc.php:1283
+#: include/locales/en_gb.inc.php:1282
 msgid "Insert"
 msgstr "Einfügen"
 
-#: include/locales/en_gb.inc.php:1300
+#: include/locales/en_gb.inc.php:1299
 msgid "Insert macro"
 msgstr "Makro einfügen"
 
@@ -5058,7 +5053,8 @@ msgstr "Ungültiges JSON. Beim Parsen am Server trat ein Fehler auf."
 msgid "Invalid Request."
 msgstr "Ungültige Abfrage."
 
-#: api/classes/class.citemkey.php:114 api/classes/class.citemkey.php:312
+#: api/classes/class.citemkey.php:86 api/classes/class.citemkey.php:108
+#: api/classes/class.citemkey.php:294
 msgid "Invalid item key format."
 msgstr "Ungültiges Format für Elementen-Schlüssel."
 
@@ -5091,7 +5087,7 @@ msgstr ""
 msgid "Is online?"
 msgstr "Online?"
 
-#: include/locales/en_gb.inc.php:936
+#: include/locales/en_gb.inc.php:935
 msgid "Issue"
 msgstr "Problem"
 
@@ -5103,7 +5099,7 @@ msgstr "Es ist nicht möglich, nach dem Benutzer-Passwort zu filtern"
 msgid "It is not possible to search by user password"
 msgstr "Es ist nicht möglich, mit dem Benutzer-Passwort zu suchen"
 
-#: include/locales/en_gb.inc.php:1397
+#: include/locales.inc.php:66
 msgid "Italian (it_IT)"
 msgstr "Italienisch (it_IT)"
 
@@ -5157,7 +5153,7 @@ msgstr "Element gelöscht"
 msgid "Item does not exist"
 msgstr "Element existiert nicht"
 
-#: include/locales/en_gb.inc.php:804
+#: include/locales/en_gb.inc.php:803
 msgid "Item prototype"
 msgstr "Elementen-Prototyp"
 
@@ -5239,7 +5235,7 @@ msgstr "Element mit Schlüssel [%s] existiert bereits"
 msgid "Items"
 msgstr "Elemente"
 
-#: include/locales/en_gb.inc.php:994
+#: include/locales/en_gb.inc.php:993
 msgid "Items (m/d/n)"
 msgstr "Elemente (m/d/n)"
 
@@ -5315,7 +5311,7 @@ msgstr "Jan"
 msgid "January"
 msgstr "Januar"
 
-#: include/locales/en_gb.inc.php:1404
+#: include/locales.inc.php:68
 msgid "Japanese (ja_JP)"
 msgstr "Japanisch (ja_JP)"
 
@@ -5335,7 +5331,7 @@ msgstr "Jun"
 msgid "June"
 msgstr "Juni"
 
-#: include/locales/en_gb.inc.php:1513
+#: include/locales/en_gb.inc.php:1494
 msgid "K"
 msgstr "K"
 
@@ -5353,7 +5349,7 @@ msgstr "Trend speichern (in Tagen)"
 msgid "Key"
 msgstr "Schlüssel"
 
-#: api/classes/class.citemkey.php:62
+#: api/classes/class.citemkey.php:58
 msgid "Key cannot be empty."
 msgstr "Schlüssel kann nicht leer sein."
 
@@ -5361,15 +5357,15 @@ msgstr "Schlüssel kann nicht leer sein."
 msgid "Key does not match <grpmax|grpmin|grpsum|grpavg>[\"group\",\"key\",\"<last|min|max|avg|sum|count>\",\"numeric param\"]."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1462
+#: include/locales/en_gb.inc.php:1443
 msgid "Keyword"
 msgstr "Schlüsselwort"
 
-#: include/locales/en_gb.inc.php:1514
+#: include/locales/en_gb.inc.php:1495
 msgid "Kilo"
 msgstr "Kilo"
 
-#: include/locales/en_gb.inc.php:1398
+#: include/locales.inc.php:67
 msgid "Korean (ko_KR)"
 msgstr "Koreanisch (ko_KR)"
 
@@ -5409,19 +5405,19 @@ msgstr "LOCAL"
 msgid "LOGS"
 msgstr "LOGS"
 
-#: include/locales/en_gb.inc.php:828
+#: include/locales/en_gb.inc.php:827
 #, fuzzy
 msgid "LOST"
 msgstr "VERLOREN"
 
-#: include/locales/en_gb.inc.php:846 include/maps.inc.php:64
+#: include/locales/en_gb.inc.php:845 include/maps.inc.php:64
 #: include/views/js/configuration.sysmaps.js.php:66
 #: include/views/js/configuration.sysmaps.js.php:209
 #: include/views/js/configuration.sysmaps.js.php:296
 msgid "Label"
 msgstr "Beschriftung"
 
-#: include/locales/en_gb.inc.php:918
+#: include/locales/en_gb.inc.php:917
 #: include/views/js/configuration.sysmaps.js.php:70
 #: include/views/js/configuration.sysmaps.js.php:303
 msgid "Label location"
@@ -5431,31 +5427,31 @@ msgstr "Beschriftungsposition"
 msgid "Language"
 msgstr "Sprache"
 
-#: include/locales/en_gb.inc.php:1076 include/locales/en_gb.inc.php:1708
+#: include/locales/en_gb.inc.php:1075 include/locales/en_gb.inc.php:1689
 msgid "Last"
 msgstr "Zeitraum"
 
-#: include/locales/en_gb.inc.php:941
+#: include/locales/en_gb.inc.php:940
 msgid "Last 20 issues"
 msgstr "Letzten 20 Probleme"
 
-#: include/locales/en_gb.inc.php:1252
+#: include/locales/en_gb.inc.php:1251
 msgid "Last 24 hours"
 msgstr "Letzten 24 Stunden"
 
-#: include/locales/en_gb.inc.php:1254
+#: include/locales/en_gb.inc.php:1253
 msgid "Last 30 days"
 msgstr "Letzten 30 Tage"
 
-#: include/locales/en_gb.inc.php:1255
+#: include/locales/en_gb.inc.php:1254
 msgid "Last 365 days"
 msgstr "Letzten 365 Tage"
 
-#: include/locales/en_gb.inc.php:1253
+#: include/locales/en_gb.inc.php:1252
 msgid "Last 7 days"
 msgstr "Letzten 7 Tage"
 
-#: include/locales/en_gb.inc.php:1328
+#: include/locales/en_gb.inc.php:1327
 msgid "Last change"
 msgstr "Letzte Änderung"
 
@@ -5463,7 +5459,7 @@ msgstr "Letzte Änderung"
 msgid "Last change (descending)"
 msgstr "Letzte Änderung (absteigend)"
 
-#: include/locales/en_gb.inc.php:837
+#: include/locales/en_gb.inc.php:836
 msgid "Last check"
 msgstr "Letzte Überprüfung"
 
@@ -5475,7 +5471,7 @@ msgstr "Graph für die letzte Stunde"
 msgid "Last month graph"
 msgstr "Graph für den letzten Monat"
 
-#: include/locales/en_gb.inc.php:1284
+#: include/locales/en_gb.inc.php:1283
 msgid "Last of"
 msgstr "Letzten"
 
@@ -5483,7 +5479,7 @@ msgstr "Letzten"
 msgid "Last seen (age)"
 msgstr "Zuletzt gesehen vor"
 
-#: include/locales/en_gb.inc.php:838
+#: include/locales/en_gb.inc.php:837
 msgid "Last value"
 msgstr "Aktueller Wert"
 
@@ -5491,15 +5487,15 @@ msgstr "Aktueller Wert"
 msgid "Last week graph"
 msgstr "Graph für die letzte Woche"
 
-#: include/locales/en_gb.inc.php:1665 include/menu.inc.php:46
+#: include/locales/en_gb.inc.php:1646 include/menu.inc.php:46
 msgid "Latest data"
 msgstr "Aktuelle Daten"
 
-#: include/locales/en_gb.inc.php:819
+#: include/locales/en_gb.inc.php:818
 msgid "Latest events"
 msgstr "Aktuelle Ereignisse"
 
-#: include/locales/en_gb.inc.php:1399
+#: include/locales.inc.php:69
 msgid "Latvian (lv_LV)"
 msgstr "Lettisch (lv_LV)"
 
@@ -5520,7 +5516,7 @@ msgstr "Legende"
 msgid "Line"
 msgstr "Linie"
 
-#: include/locales/en_gb.inc.php:845 sysmap.php:199
+#: include/locales/en_gb.inc.php:844 sysmap.php:199
 msgid "Link"
 msgstr "Verbindung"
 
@@ -5528,7 +5524,7 @@ msgstr "Verbindung"
 msgid "Link additional templates"
 msgstr "Verbinde mit zusätzlichen Vorlagen"
 
-#: include/locales/en_gb.inc.php:875
+#: include/locales/en_gb.inc.php:874
 #: include/views/js/configuration.sysmaps.js.php:237
 msgid "Link indicators"
 msgstr "Verbindungsauslöser"
@@ -5553,7 +5549,7 @@ msgstr ""
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:854
+#: include/locales/en_gb.inc.php:853
 #: include/views/js/configuration.sysmaps.js.php:196
 msgid "Link status indicator"
 msgstr "Link-Status-Kennzeichen"
@@ -5566,7 +5562,7 @@ msgstr "Verbinden mit Vorlage"
 msgid "Link to templates"
 msgstr "Verbinden mit Vorlagen"
 
-#: include/locales/en_gb.inc.php:1220
+#: include/locales/en_gb.inc.php:1219
 msgid "Link to trigger?"
 msgstr "Mit Auslöser verbinden?"
 
@@ -5582,13 +5578,13 @@ msgstr "Verbundene Vorlagen"
 msgid "Linked to"
 msgstr "Verbunden mit"
 
-#: include/locales/en_gb.inc.php:844
+#: include/locales/en_gb.inc.php:843
 #: include/views/configuration.sysmap.edit.php:192
 #: include/views/js/configuration.sysmaps.js.php:158
 msgid "Links"
 msgstr "Verbindungen"
 
-#: include/locales/en_gb.inc.php:818
+#: include/locales/en_gb.inc.php:817
 msgid "List"
 msgstr "Liste"
 
@@ -5596,7 +5592,7 @@ msgstr "Liste"
 msgid "List is empty"
 msgstr "Liste ist leer"
 
-#: include/locales/en_gb.inc.php:947
+#: include/locales/en_gb.inc.php:946
 msgid "Loading..."
 msgstr "Lade ..."
 
@@ -5604,7 +5600,7 @@ msgstr "Lade ..."
 msgid "Local"
 msgstr "Lokal"
 
-#: include/locales/en_gb.inc.php:1164
+#: include/locales/en_gb.inc.php:1163
 msgid "Local time"
 msgstr "Lokalzeit"
 
@@ -5659,7 +5655,7 @@ msgstr "Anmeldung fehlgeschlagen [%s]"
 msgid "Login name or password is incorrect"
 msgstr "Login-Name oder Passwort falsch"
 
-#: include/locales/en_gb.inc.php:1664 include/page_header.php:242
+#: include/locales/en_gb.inc.php:1645 include/page_header.php:242
 msgid "Logout"
 msgstr "Abmelden"
 
@@ -5671,11 +5667,11 @@ msgstr "Logs"
 msgid "Lost"
 msgstr "Verloren"
 
-#: include/locales/en_gb.inc.php:1515 include/locales/en_gb.inc.php:1676
+#: include/locales/en_gb.inc.php:1496 include/locales/en_gb.inc.php:1657
 msgid "M"
 msgstr "M"
 
-#: include/locales/en_gb.inc.php:1047 include/locales/en_gb.inc.php:1067
+#: include/locales/en_gb.inc.php:1046 include/locales/en_gb.inc.php:1066
 msgid "M Y"
 msgstr "M Y"
 
@@ -5687,7 +5683,7 @@ msgstr "MAC-Adresse A"
 msgid "MAC address B"
 msgstr "MAC-Adresse B"
 
-#: include/locales/en_gb.inc.php:862
+#: include/locales/en_gb.inc.php:861
 msgid "MAINTENANCE"
 msgstr "IN WARTUNG"
 
@@ -5695,7 +5691,7 @@ msgstr "IN WARTUNG"
 msgid "MAINTENANCE PERIODS"
 msgstr "WARTUNGSZEITRÄUME"
 
-#: include/locales/en_gb.inc.php:871
+#: include/locales/en_gb.inc.php:870
 msgid "MAPS"
 msgstr "PLÄNE"
 
@@ -5707,12 +5703,12 @@ msgstr "MD2"
 msgid "MD5"
 msgstr "MD5"
 
-#: include/locales/en_gb.inc.php:1501
+#: include/locales/en_gb.inc.php:1482
 #, fuzzy
 msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
 msgstr "SPEICHERLIMIT ERREICHT! ..."
 
-#: include/locales/en_gb.inc.php:1073
+#: include/locales/en_gb.inc.php:1072
 msgid "MOST BUSY TRIGGERS TOP 100"
 msgstr "TOP-100-AUSLÖSER"
 
@@ -5774,7 +5770,7 @@ msgstr "Wartungsart"
 msgid "Maintenance updated"
 msgstr "Wartung aktualisiert"
 
-#: include/db.inc.php:1201
+#: include/db.inc.php:1218
 #, fuzzy, php-format
 msgid "Mandatory field \"%1$s\" is missing in table \"%2$s\"."
 msgstr "Pflichtfeld \"%1$s\" fehlt in Table \"%2$s\"."
@@ -5788,7 +5784,7 @@ msgstr "Händisch"
 msgid "Manual Logout"
 msgstr "Händische Abmelden"
 
-#: include/locales/en_gb.inc.php:1147
+#: include/locales/en_gb.inc.php:1146
 #: include/views/configuration.sysmap.edit.php:199
 #: include/views/js/configuration.sysmaps.js.php:17
 #: include/views/js/configuration.sysmaps.js.php:101
@@ -5810,7 +5806,7 @@ msgstr "Karte \"%s\" erstellt."
 msgid "Map \"%s\" updated."
 msgstr "Karte \"%s\" aktualisiert."
 
-#: include/locales/en_gb.inc.php:868
+#: include/locales/en_gb.inc.php:867
 msgid "Map elements"
 msgstr "Kartenelemente"
 
@@ -5839,7 +5835,7 @@ msgstr "Zuordnung"
 msgid "Mappings"
 msgstr "Zuordnungen"
 
-#: include/locales/en_gb.inc.php:1661 include/menu.inc.php:76
+#: include/locales/en_gb.inc.php:1642 include/menu.inc.php:76
 #: include/menu.inc.php:210 popup.php:101
 msgid "Maps"
 msgstr "Pläne"
@@ -5876,7 +5872,7 @@ msgstr ""
 msgid "Mass update selected items?"
 msgstr "Massenupdate ausgewählter Elemente?"
 
-#: include/locales/en_gb.inc.php:1305
+#: include/locales/en_gb.inc.php:1304
 msgid "Mass update selected triggers?"
 msgstr "Massenaktualisierung der ausgewählten Auslöser?"
 
@@ -5888,7 +5884,7 @@ msgstr "Master"
 msgid "Master node"
 msgstr "Hauptknoten"
 
-#: include/locales/en_gb.inc.php:1619
+#: include/locales/en_gb.inc.php:1600
 msgid "Master node already exists"
 msgstr "Hauptknoten existiert bereits"
 
@@ -5901,7 +5897,7 @@ msgstr "Max Anzahl der anzuzeigenden Elemente einer Tabellenzelle"
 msgid "Max count of events per trigger to show"
 msgstr "Maximal anzeigbare Anzahl von Ereignissen pro Auslöser"
 
-#: include/locales/en_gb.inc.php:945
+#: include/locales/en_gb.inc.php:944
 msgid "Maximize"
 msgstr "Maximieren"
 
@@ -5931,14 +5927,14 @@ msgstr[1] "Sichtbarer Host-Name darf höchstens %2$d Zeichen lang sein. \"%3$s\"
 msgid "May"
 msgstr "Mai"
 
-#: include/locales/en_gb.inc.php:922
+#: include/locales/en_gb.inc.php:921
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.users.edit.php:167
 #: include/views/administration.users.edit.php:292
 msgid "Media"
 msgstr "Medium"
 
-#: include/locales/en_gb.inc.php:1381
+#: include/locales/en_gb.inc.php:1379
 msgid "Media type"
 msgstr "Medientyp"
 
@@ -5946,7 +5942,7 @@ msgstr "Medientyp"
 msgid "Media type added"
 msgstr "Medientyp hinzufügen"
 
-#: include/locales/en_gb.inc.php:1640
+#: include/locales/en_gb.inc.php:1621
 msgid "Media type already exists:"
 msgstr "Medientyp existiert bereits:"
 
@@ -5963,11 +5959,11 @@ msgstr "Medientyp aktualisiert"
 msgid "Media types"
 msgstr "Medientypen"
 
-#: include/locales/en_gb.inc.php:1641
+#: include/locales/en_gb.inc.php:1622
 msgid "Media types used by action:"
 msgstr "Medientyp wird verwendet von Aktion:"
 
-#: include/locales/en_gb.inc.php:1516
+#: include/locales/en_gb.inc.php:1497
 msgid "Mega"
 msgstr "Mega"
 
@@ -5975,15 +5971,15 @@ msgstr "Mega"
 msgid "Members"
 msgstr "Mitglieder"
 
-#: include/locales/en_gb.inc.php:1494
+#: include/locales/en_gb.inc.php:1475
 msgid "Memory limit"
 msgstr "Speicher-Limit"
 
-#: include/locales/en_gb.inc.php:1495
+#: include/locales/en_gb.inc.php:1476
 msgid "Memory usage"
 msgstr "Benutzter Speicher"
 
-#: include/locales/en_gb.inc.php:943
+#: include/locales/en_gb.inc.php:942
 msgid "Menu"
 msgstr "Menü"
 
@@ -6012,7 +6008,7 @@ msgstr "Auszeit für Nachricht"
 msgid "Message timeout (seconds)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1392
+#: include/locales/en_gb.inc.php:1390
 msgid "Messages"
 msgstr "Nachrichten"
 
@@ -6024,24 +6020,24 @@ msgstr ""
 msgid "Method not found."
 msgstr "Methode nicht gefunden."
 
-#: include/locales/en_gb.inc.php:1510
+#: include/locales/en_gb.inc.php:1491
 msgid "Micro"
 msgstr "Mikro"
 
-#: include/locales/en_gb.inc.php:1176
+#: include/locales/en_gb.inc.php:1175
 #, fuzzy
 msgid "Middle"
 msgstr "mittig"
 
-#: include/locales/en_gb.inc.php:1512
+#: include/locales/en_gb.inc.php:1493
 msgid "Milli"
 msgstr "Milli"
 
-#: include/locales/en_gb.inc.php:1270
+#: include/locales/en_gb.inc.php:1269
 msgid "Min severity"
 msgstr "Minimale Priorität"
 
-#: include/locales/en_gb.inc.php:946
+#: include/locales/en_gb.inc.php:945
 msgid "Minimize"
 msgstr "Minimieren"
 
@@ -6075,11 +6071,11 @@ msgstr ""
 msgid "Minimum size of PHP post is %s (configuration parameter \"post_max_size\")"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1036
+#: include/locales/en_gb.inc.php:1035
 msgid "Minute"
 msgstr "Minute"
 
-#: include/locales/en_gb.inc.php:1037
+#: include/locales/en_gb.inc.php:1036
 msgid "Minutes"
 msgstr "Minuten"
 
@@ -6087,7 +6083,7 @@ msgstr "Minuten"
 msgid "Missing"
 msgstr "Fehlt"
 
-#: include/locales/en_gb.inc.php:1594
+#: include/locales/en_gb.inc.php:1575
 #, fuzzy
 msgid "Missing items for graph"
 msgstr "Fehlende Elemente in Graph"
@@ -6097,7 +6093,7 @@ msgstr "Fehlende Elemente in Graph"
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr "Schlüssel \"%1$s\" fehlt für Host \"%2$s\"."
 
-#: include/locales/en_gb.inc.php:1568
+#: include/locales/en_gb.inc.php:1549
 msgid "Missing mandatory parameter for function"
 msgstr "Fehlender Pflicht-Parameter für Funktion"
 
@@ -6113,7 +6109,7 @@ msgstr "Modell"
 msgid "Mon"
 msgstr "Mo"
 
-#: include/locales/en_gb.inc.php:45 include/locales/en_gb.inc.php:1236
+#: include/locales/en_gb.inc.php:45 include/locales/en_gb.inc.php:1235
 msgid "Monday"
 msgstr "Montag"
 
@@ -6136,11 +6132,11 @@ msgstr "Überwachter Host"
 msgid "Monitoring"
 msgstr "Überwachung"
 
-#: include/locales/en_gb.inc.php:1039
+#: include/locales/en_gb.inc.php:1038
 msgid "Month"
 msgstr "Monat"
 
-#: include/locales/en_gb.inc.php:1044
+#: include/locales/en_gb.inc.php:1043
 msgid "Monthly"
 msgstr "Monatlich"
 
@@ -6152,11 +6148,11 @@ msgstr "Mehr als 10 Minuten"
 msgid "More than one macro with same name found:"
 msgstr "Mehr als ein Makro mit diesem Namen gefunden:"
 
-#: include/locales/en_gb.inc.php:1072
+#: include/locales/en_gb.inc.php:1071
 msgid "Most busy triggers top 100"
 msgstr "Top-100-Auslöser"
 
-#: include/locales/en_gb.inc.php:1388
+#: include/locales/en_gb.inc.php:1386
 #, fuzzy
 msgid "Move"
 msgstr "Verschiebe"
@@ -6165,11 +6161,11 @@ msgstr "Verschiebe"
 msgid "Multibyte String module required to run FrontEnd"
 msgstr "Es wird ein MultiByte String-Modul benötigt, um das Frontend zu starten"
 
-#: include/locales/en_gb.inc.php:1286
+#: include/locales/en_gb.inc.php:1285
 msgid "Multiple PROBLEM events"
 msgstr "Mehrere PROBLEM Ereignisse"
 
-#: include/locales/en_gb.inc.php:1390
+#: include/locales/en_gb.inc.php:1388
 msgid "Mute"
 msgstr "Stumm"
 
@@ -6194,7 +6190,7 @@ msgstr "KEINE DATEN"
 msgid "NODES"
 msgstr "KNOTEN"
 
-#: include/locales/en_gb.inc.php:1064
+#: include/locales/en_gb.inc.php:1063
 msgid "NOTIFICATIONS"
 msgstr "BENACHRICHTIGUNGEN"
 
@@ -6205,7 +6201,7 @@ msgstr "NTLM-Authentifizierung"
 #: actionconf.php:166 actionconf.php:441 discoveryconf.php:246
 #: disc_prototypes.php:376 host_discovery.php:451 hostinventories.php:161
 #: hosts.php:772 include/forms.inc.php:560 include/forms.inc.php:1281
-#: include/hosts.inc.php:58 include/locales/en_gb.inc.php:1349
+#: include/hosts.inc.php:58 include/locales/en_gb.inc.php:1348
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
 #: include/views/administration.general.image.edit.php:35
@@ -6229,27 +6225,27 @@ msgstr "NTLM-Authentifizierung"
 msgid "Name"
 msgstr "Name"
 
-#: include/locales/en_gb.inc.php:1508
+#: include/locales/en_gb.inc.php:1489
 msgid "Nano"
 msgstr "Nano"
 
-#: include/locales/en_gb.inc.php:880
+#: include/locales/en_gb.inc.php:879
 msgid "Network map added"
 msgstr "Netzwerkkarte hinzugefügt"
 
-#: include/locales/en_gb.inc.php:869
+#: include/locales/en_gb.inc.php:868
 msgid "Network map deleted"
 msgstr "Netzwerkkarte gelöscht"
 
-#: include/locales/en_gb.inc.php:882
+#: include/locales/en_gb.inc.php:881
 msgid "Network map updated"
 msgstr "Netzwerkkarte aktualisiert"
 
-#: include/locales/en_gb.inc.php:917
+#: include/locales/en_gb.inc.php:916
 msgid "Network maps"
 msgstr "Netzwerkpläne"
 
-#: include/locales/en_gb.inc.php:1332
+#: include/locales/en_gb.inc.php:1331
 msgid "Never"
 msgstr "Niemals"
 
@@ -6269,11 +6265,11 @@ msgstr "Neue Anwendung"
 msgid "New condition"
 msgstr "Neue Bedingung"
 
-#: include/locales/en_gb.inc.php:1291
+#: include/locales/en_gb.inc.php:1290
 msgid "New dependency"
 msgstr "Neue Abhängigkeit"
 
-#: include/locales/en_gb.inc.php:891
+#: include/locales/en_gb.inc.php:890
 msgid "New element"
 msgstr "Neues Element"
 
@@ -6307,7 +6303,7 @@ msgstr "Neuer Wartungszeitraum"
 msgid "New mapping"
 msgstr "Neue Zuordnung"
 
-#: include/locales/en_gb.inc.php:925
+#: include/locales/en_gb.inc.php:924
 msgid "New media"
 msgstr "Neues Medium"
 
@@ -6319,11 +6315,11 @@ msgstr "Neuer Knoten"
 msgid "New regular expression"
 msgstr "Neue Regular Expression"
 
-#: include/locales/en_gb.inc.php:1231
+#: include/locales/en_gb.inc.php:1230
 msgid "New service time"
 msgstr "Neue Servicezeit"
 
-#: include/locales/en_gb.inc.php:1137
+#: include/locales/en_gb.inc.php:1136
 msgid "New slide"
 msgstr "Neue Seite"
 
@@ -6331,7 +6327,7 @@ msgstr "Neue Seite"
 msgid "New template added"
 msgstr "Neue Vorlage hinzugefügt"
 
-#: include/locales/en_gb.inc.php:201 include/locales/en_gb.inc.php:1711
+#: include/locales/en_gb.inc.php:201 include/locales/en_gb.inc.php:1692
 msgid "Next"
 msgstr "Weiter"
 
@@ -6339,7 +6335,7 @@ msgstr "Weiter"
 msgid "Next check"
 msgstr "Nächster Lauf"
 
-#: include/forms.inc.php:3595 include/locales/en_gb.inc.php:1002
+#: include/forms.inc.php:3595 include/locales/en_gb.inc.php:1001
 #: include/views/administration.users.list.php:79
 #: include/views/administration.users.list.php:82
 msgid "No"
@@ -6355,7 +6351,7 @@ msgstr "Kein Feld \"ymax_type\" für Graph \"%s\""
 msgid "No \"ymin_type\" field for graph \"%s\""
 msgstr "Kein Feld \"ymin_type\" für Graph \"%s\""
 
-#: include/locales/en_gb.inc.php:1207
+#: include/locales/en_gb.inc.php:1206
 msgid "No IT services defined."
 msgstr "Keine IT-Dienste defniert."
 
@@ -6371,7 +6367,7 @@ msgstr "Keine Aktion definiert."
 msgid "No actions found"
 msgstr "Keine Aktionen gefunden"
 
-#: include/locales/en_gb.inc.php:1554
+#: include/locales/en_gb.inc.php:1535
 msgid "No application with"
 msgstr "Keine Applikation mit"
 
@@ -6410,7 +6406,7 @@ msgstr "Ohne Datensammlung"
 msgid "No data maintenance"
 msgstr "Wartung ohne Datensammlung"
 
-#: include/locales/en_gb.inc.php:1290
+#: include/locales/en_gb.inc.php:1289
 msgid "No dependencies defined."
 msgstr "Keine Abhängigkeiten definiert."
 
@@ -6431,15 +6427,15 @@ msgstr "Keine Discoveryregeln definiert"
 msgid "No discovery rules defined."
 msgstr "Keine Discoveryregeln definiert."
 
-#: include/locales/en_gb.inc.php:1487
+#: include/locales/en_gb.inc.php:1468
 msgid "No elements selected!"
 msgstr "Kein Element gewählt!"
 
-#: include/locales/en_gb.inc.php:1445
+#: include/locales/en_gb.inc.php:1426
 msgid "No errors found"
 msgstr "Keine Fehler gefunden"
 
-#: include/locales/en_gb.inc.php:821
+#: include/locales/en_gb.inc.php:820
 msgid "No events found"
 msgstr "Keine Ereignisse gefunden"
 
@@ -6456,7 +6452,7 @@ msgstr ""
 msgid "No flexible intervals"
 msgstr "Keine flexiblen Intervalle"
 
-#: include/locales/en_gb.inc.php:1593
+#: include/locales/en_gb.inc.php:1574
 msgid "No graph item with"
 msgstr "Kein Graphen-Element mit"
 
@@ -6491,7 +6487,7 @@ msgstr "Keine Host-Gruppen definiert."
 msgid "No host groups with groupid \"%s\"."
 msgstr "Keine Host-Gruppen mit groupid \"%s\"."
 
-#: include/locales/en_gb.inc.php:1552
+#: include/locales/en_gb.inc.php:1533
 msgid "No host with"
 msgstr "Kein Host mit"
 
@@ -6545,11 +6541,11 @@ msgstr ""
 msgid "No item prototypes defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1544
+#: include/locales/en_gb.inc.php:1525
 msgid "No item with"
 msgstr "Kein Element mit"
 
-#: include/locales/en_gb.inc.php:1432
+#: include/locales/en_gb.inc.php:1413
 msgid "No items"
 msgstr "Keine Elemente"
 
@@ -6557,11 +6553,7 @@ msgstr "Keine Elemente"
 msgid "No items defined."
 msgstr "Keine Elemente definiert."
 
-#: api/classes/class.citemkey.php:92
-msgid "No key id provided."
-msgstr "Keine Schlüssel-ID übergeben."
-
-#: include/locales/en_gb.inc.php:889
+#: include/locales/en_gb.inc.php:888
 msgid "No links"
 msgstr "Keine Verbindungen"
 
@@ -6570,7 +6562,7 @@ msgstr "Keine Verbindungen"
 msgid "No mapping defined."
 msgstr "Keine Zuordnung definiert."
 
-#: include/locales/en_gb.inc.php:872 maps.php:124
+#: include/locales/en_gb.inc.php:871 maps.php:124
 msgid "No maps defined."
 msgstr "Keine Karten definiert."
 
@@ -6603,11 +6595,11 @@ msgstr "Keine Berechtigung für Auslöser \"%s\""
 msgid "No permissions defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1672
+#: include/locales/en_gb.inc.php:1653
 msgid "No permissions for map"
 msgstr "Keine Berechtigung für Karte"
 
-#: include/locales/en_gb.inc.php:1671
+#: include/locales/en_gb.inc.php:1652
 msgid "No permissions for screen"
 msgstr "Keine Berechtigung für Übersichtstafel"
 
@@ -6643,15 +6635,15 @@ msgstr ""
 msgid "No recipients for action operation message."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1113
+#: include/locales/en_gb.inc.php:1112
 msgid "No resources defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1585
+#: include/locales/en_gb.inc.php:1566
 msgid "No rows in screen"
 msgstr "Keine Zeilen in Ansichtstafel"
 
-#: include/locales/en_gb.inc.php:1108
+#: include/locales/en_gb.inc.php:1107
 msgid "No screens defined."
 msgstr "Keine Übersichtstafeln definiert."
 
@@ -6671,15 +6663,15 @@ msgstr ""
 msgid "No service with"
 msgstr "Kein Dienst mit"
 
-#: include/locales/en_gb.inc.php:1133
+#: include/locales/en_gb.inc.php:1132
 msgid "No slide shows defined."
 msgstr "Keine Vorführungen definiert."
 
-#: include/locales/en_gb.inc.php:1135
+#: include/locales/en_gb.inc.php:1134
 msgid "No slides defined."
 msgstr "Keine Seiten definiert."
 
-#: include/locales/en_gb.inc.php:474 items.php:698 triggers.php:325
+#: include/locales/en_gb.inc.php:474 items.php:698 triggers.php:394
 msgid "No target selected"
 msgstr "Kein Ziel ausgewählt"
 
@@ -6687,19 +6679,19 @@ msgstr "Kein Ziel ausgewählt"
 msgid "No templates defined."
 msgstr "Keine Vorlagen definiert."
 
-#: include/locales/en_gb.inc.php:1229
+#: include/locales/en_gb.inc.php:1228
 msgid "No times defined."
 msgstr "Keine Zeiten definiert."
 
-#: include/locales/en_gb.inc.php:1259
+#: include/locales/en_gb.inc.php:1258
 msgid "No trigger"
 msgstr "Keine Auslöser"
 
-#: include/locales/en_gb.inc.php:1563
+#: include/locales/en_gb.inc.php:1544
 msgid "No trigger with"
 msgstr "Kein Auslöser mit"
 
-#: include/locales/en_gb.inc.php:1260 popup.php:852
+#: include/locales/en_gb.inc.php:1259 popup.php:852
 msgid "No triggers defined."
 msgstr "Keine Auslöser definiert."
 
@@ -6729,7 +6721,7 @@ msgstr "Knoten gelöscht"
 msgid "Node updated"
 msgstr "Knoten aktualisiert"
 
-#: include/locales/en_gb.inc.php:1621
+#: include/locales/en_gb.inc.php:1602
 msgid "Node with same ID already exists"
 msgstr "Knoten mit derselben ID existiert bereits"
 
@@ -6738,7 +6730,7 @@ msgid "Nodes"
 msgstr "Knoten"
 
 #: include/forms.inc.php:1678 include/locales/en_gb.inc.php:640
-#: include/locales/en_gb.inc.php:1216
+#: include/locales/en_gb.inc.php:1215
 #: include/views/administration.general.gui.edit.php:29
 #: include/views/administration.general.other.edit.php:31
 msgid "None"
@@ -6764,15 +6756,15 @@ msgstr "Unbestätigt"
 msgid "Not Templated items"
 msgstr "Keine Elemente aus Vorlagen"
 
-#: include/locales/en_gb.inc.php:1453
+#: include/locales/en_gb.inc.php:1434
 msgid "Not allowed symbols detected after element"
 msgstr "Nicht zulässige Symbole nach einem Element gefunden"
 
-#: include/locales/en_gb.inc.php:1454
+#: include/locales/en_gb.inc.php:1435
 msgid "Not allowed symbols detected before element"
 msgstr "Nicht zulässige Symbole vor einem Element gefunden"
 
-#: include/locales/en_gb.inc.php:1450
+#: include/locales/en_gb.inc.php:1431
 msgid "Not allowed symbols or sequence of symbols in expression element detected"
 msgstr "Nicht zulässige Symbole oder Abschnitte in einer Expression gefunden"
 
@@ -6780,7 +6772,7 @@ msgstr "Nicht zulässige Symbole oder Abschnitte in einer Expression gefunden"
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Nicht erlaubt, Passwort für Benutzer \"guest\" zu setzen."
 
-#: include/locales/en_gb.inc.php:1451
+#: include/locales/en_gb.inc.php:1432
 msgid "Not allowed value detected in element"
 msgstr "Unzulässiger Wert in einem Element gefunden"
 
@@ -6804,7 +6796,7 @@ msgstr "Nicht klassifiziert"
 msgid "Not connected"
 msgstr "Nicht angemeldet"
 
-#: hosts.php:896 include/html.inc.php:356 include/triggers.inc.php:1508
+#: hosts.php:896 include/html.inc.php:356 include/triggers.inc.php:1432
 #: include/views/configuration.host.edit.php:231
 #: include/views/configuration.host.massupdate.php:92 popup.php:470
 msgid "Not monitored"
@@ -6814,7 +6806,7 @@ msgstr "Nicht überwacht"
 msgid "Not supported"
 msgstr "Nicht unterstützt"
 
-#: include/locales/en_gb.inc.php:1232
+#: include/locales/en_gb.inc.php:1231
 msgid "Note"
 msgstr "Notiz"
 
@@ -6830,7 +6822,7 @@ msgstr "Nichts"
 msgid "Nothing to do"
 msgstr "Nichts zu tun"
 
-#: include/locales/en_gb.inc.php:1065
+#: include/locales/en_gb.inc.php:1064
 msgid "Notification report"
 msgstr "Benachrichtigungs-Report"
 
@@ -6846,19 +6838,19 @@ msgstr "Nov"
 msgid "November"
 msgstr "November"
 
-#: include/locales/en_gb.inc.php:1683
+#: include/locales/en_gb.inc.php:1664
 msgid "Now"
 msgstr "Jetzt"
 
-#: include/locales/en_gb.inc.php:998
+#: include/locales/en_gb.inc.php:997
 msgid "Number of hosts (monitored/not monitored/templates)"
 msgstr "Anzahl der Systeme (überwacht/nicht überwacht/Vorlagen)"
 
-#: include/locales/en_gb.inc.php:993
+#: include/locales/en_gb.inc.php:992
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "Anzahl der Elemente (überwacht/nicht überwacht/nicht unterstützt)"
 
-#: include/locales/en_gb.inc.php:1074
+#: include/locales/en_gb.inc.php:1073
 msgid "Number of status changes"
 msgstr "Anzahl der Statusänderungen"
 
@@ -6866,11 +6858,11 @@ msgstr "Anzahl der Statusänderungen"
 msgid "Number of steps"
 msgstr "Anzahl der Schritte"
 
-#: include/locales/en_gb.inc.php:990
+#: include/locales/en_gb.inc.php:989
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
 msgstr "Anzahl der Auslöser (aktiviert/deaktiviert)[problem/unbekannt/ok]"
 
-#: include/locales/en_gb.inc.php:996
+#: include/locales/en_gb.inc.php:995
 msgid "Number of users (online)"
 msgstr "Anzahl der Benutzer (online)"
 
@@ -6890,7 +6882,7 @@ msgstr "Numerisch (kein Vorzeichen)"
 msgid "OEM"
 msgstr "OEM"
 
-#: include/locales/en_gb.inc.php:910 include/setup.inc.php:181
+#: include/locales/en_gb.inc.php:909 include/setup.inc.php:181
 #: include/setup.inc.php:215 include/setup.inc.php:257
 #: include/setup.inc.php:393
 msgid "OK"
@@ -6931,7 +6923,7 @@ msgstr "Betriebssystem (Alle Details)"
 msgid "OS (Short)"
 msgstr "Betriebssystem (kurz)"
 
-#: include/locales/en_gb.inc.php:969
+#: include/locales/en_gb.inc.php:968
 msgid "OVERVIEW"
 msgstr "ÜBERSICHT"
 
@@ -6951,7 +6943,7 @@ msgstr "Oktober"
 msgid "Off"
 msgstr "Aus"
 
-#: include/locales/en_gb.inc.php:1028
+#: include/locales/en_gb.inc.php:1027
 #: include/views/administration.users.list.php:90
 msgid "Ok"
 msgstr "Ok"
@@ -6972,7 +6964,7 @@ msgstr "Einmal"
 msgid "One time only"
 msgstr "Einmalig"
 
-#: include/locales/en_gb.inc.php:1228
+#: include/locales/en_gb.inc.php:1227
 msgid "One-time downtime"
 msgstr "Einmalige Downtime"
 
@@ -6980,12 +6972,12 @@ msgstr "Einmalige Downtime"
 msgid "Only Super Admins can add user groups."
 msgstr "Nur Super-Admins können Benutzergruppen ergänzen."
 
-#: include/locales/en_gb.inc.php:1642
+#: include/locales/en_gb.inc.php:1623
 #, fuzzy
 msgid "Only Super Admins can create media types"
 msgstr "Nur Super-Admins können Medientypen erstellen"
 
-#: include/locales/en_gb.inc.php:1643
+#: include/locales/en_gb.inc.php:1624
 msgid "Only Super Admins can delete media types"
 msgstr "Nur Super-Admins können Medientypen löschen"
 
@@ -6998,15 +6990,15 @@ msgstr "Nur Super-Admins können Benutzergruppen löschen."
 msgid "Only Super Admins can update user groups."
 msgstr "Nur Super-Admins können Benutzergruppen aktualisieren."
 
-#: include/locales/en_gb.inc.php:1626
+#: include/locales/en_gb.inc.php:1607
 msgid "Only Zabbix Admins can add user Medias"
 msgstr "Nur Super-Admins können Medien hinzufügen"
 
-#: include/locales/en_gb.inc.php:1628
+#: include/locales/en_gb.inc.php:1609
 msgid "Only Zabbix Admins can change user Medias"
 msgstr "Nur Super-Admins können Benutzer-Medien ändern"
 
-#: include/locales/en_gb.inc.php:1627
+#: include/locales/en_gb.inc.php:1608
 msgid "Only Zabbix Admins can remove user Medias"
 msgstr "Nur Zabbix-Admins können Medien entfernen"
 
@@ -7015,7 +7007,7 @@ msgstr "Nur Zabbix-Admins können Medien entfernen"
 msgid "Only characters are allowed"
 msgstr "Nur Buchstaben erlaubt"
 
-#: include/locales/en_gb.inc.php:995
+#: include/locales/en_gb.inc.php:994
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Nur Elemente, die mit aktiven Hosts verbunden sind, werden gezählt"
 
@@ -7028,7 +7020,7 @@ msgstr "Nur eine Prüfung kann einzigartig sein."
 msgid "Only super admins can create icon maps."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:992
+#: include/locales/en_gb.inc.php:991
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Nur Auslöser, die mit aktiven Hosts und aktiven Elementen verbunden sind, werden gezählt"
 
@@ -7102,7 +7094,7 @@ msgstr ""
 msgid "Other parameters"
 msgstr "Weitere Einstellungen"
 
-#: include/locales/en_gb.inc.php:968 include/menu.inc.php:37
+#: include/locales/en_gb.inc.php:967 include/menu.inc.php:37
 #: include/menu.inc.php:114 popup.php:113 queue.php:48
 msgid "Overview"
 msgstr "Übersicht"
@@ -7111,11 +7103,11 @@ msgstr "Übersicht"
 msgid "Overview by proxy"
 msgstr "Übersicht nach Proxy"
 
-#: include/locales/en_gb.inc.php:1521
+#: include/locales/en_gb.inc.php:1502
 msgid "P"
 msgstr "P"
 
-#: include/locales/en_gb.inc.php:934
+#: include/locales/en_gb.inc.php:933
 msgid "PERSONAL DASHBOARD"
 msgstr "PERSÖNLICHES DASHBOARD"
 
@@ -7234,7 +7226,7 @@ msgstr "PHP-Version"
 msgid "POP"
 msgstr "POP"
 
-#: include/locales/en_gb.inc.php:911
+#: include/locales/en_gb.inc.php:910
 msgid "PROBLEM"
 msgstr "PROBLEM"
 
@@ -7246,7 +7238,7 @@ msgstr "PROXIES"
 msgid "Page received incorrect data"
 msgstr "Seite erhielt inkorrekte Daten"
 
-#: include/locales/en_gb.inc.php:1088
+#: include/locales/en_gb.inc.php:1087
 msgid "Palette"
 msgstr "Palette"
 
@@ -7254,11 +7246,11 @@ msgstr "Palette"
 msgid "Parameter"
 msgstr "Parameter"
 
-#: include/locales/en_gb.inc.php:1213
+#: include/locales/en_gb.inc.php:1212
 msgid "Parent service"
 msgstr "Eltern-Dienst"
 
-#: include/locales/en_gb.inc.php:1615
+#: include/locales/en_gb.inc.php:1596
 msgid "Parse SQL error"
 msgstr "SQL-Parsing-Fehler"
 
@@ -7270,7 +7262,7 @@ msgstr "Parsing-Fehler"
 msgid "Passive"
 msgstr "Passiv"
 
-#: include/locales/en_gb.inc.php:1354 include/setup.inc.php:245
+#: include/locales/en_gb.inc.php:1352 include/setup.inc.php:245
 #: include/views/administration.mediatypes.edit.php:80
 #: include/views/administration.mediatypes.edit.php:84
 #: include/views/administration.users.edit.php:57
@@ -7282,12 +7274,11 @@ msgstr "Passiv"
 msgid "Password"
 msgstr "Kennwort"
 
-#: include/locales/en_gb.inc.php:1353
 #: include/views/administration.users.edit.php:58
 msgid "Password (once again)"
 msgstr "Kennwort (nochmal)"
 
-#: include/locales/en_gb.inc.php:1639
+#: include/locales/en_gb.inc.php:1620
 msgid "Password required for media type"
 msgstr "Passwort benötigt für Medientypen"
 
@@ -7295,7 +7286,7 @@ msgstr "Passwort benötigt für Medientypen"
 msgid "Password should not be empty"
 msgstr "Das Passwort sollte nicht leer sein"
 
-#: include/locales/en_gb.inc.php:1032
+#: include/locales/en_gb.inc.php:1031
 msgid "Percentage"
 msgstr "Prozentsatz"
 
@@ -7329,7 +7320,7 @@ msgstr ""
 msgid "Permissions can be assigned for user groups only."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1522
+#: include/locales/en_gb.inc.php:1503
 msgid "Peta"
 msgstr "Peta"
 
@@ -7341,7 +7332,7 @@ msgstr "Torte"
 msgid "Placing algorithm"
 msgstr "Platzierungs-Algorithmus"
 
-#: include/locales/en_gb.inc.php:1149 popup.php:105
+#: include/locales/en_gb.inc.php:1148 popup.php:105
 msgid "Plain text"
 msgstr "Klartext"
 
@@ -7354,7 +7345,7 @@ msgstr "Abspielen"
 msgid "Play sound"
 msgstr "Geräusch abspielen"
 
-#: include/locales/en_gb.inc.php:1623
+#: include/locales/en_gb.inc.php:1604
 msgid "Please be aware that database still contains data related to the deleted Node"
 msgstr "Die Datenbank enthält noch Daten, die sich auf den gelöschten Knoten beziehen"
 
@@ -7366,11 +7357,11 @@ msgstr ""
 msgid "Please enter confirmation text."
 msgstr "Bitte Bestätigungs-Text eingeben."
 
-#: include/locales/en_gb.inc.php:887
+#: include/locales/en_gb.inc.php:886
 msgid "Please select two elements"
 msgstr "Bitte zwei Elemente auswählen"
 
-#: include/locales/en_gb.inc.php:1408
+#: include/locales.inc.php:70
 msgid "Polish (pl_PL)"
 msgstr "Polnisch (pl_PL)"
 
@@ -7389,11 +7380,11 @@ msgstr ""
 msgid "Port range"
 msgstr "Port-Bereich"
 
-#: include/locales/en_gb.inc.php:1401
+#: include/locales.inc.php:71
 msgid "Portuguese (pt_BR)"
 msgstr "Portugiesisch (pt_BR)"
 
-#: include/locales/en_gb.inc.php:1463
+#: include/locales/en_gb.inc.php:1444
 msgid "Position"
 msgstr "Position"
 
@@ -7408,8 +7399,8 @@ msgstr "Stelle"
 msgid "Preview"
 msgstr "Vorschau"
 
-#: include/locales/en_gb.inc.php:200 include/locales/en_gb.inc.php:1710
-#: include/locales/en_gb.inc.php:1712
+#: include/locales/en_gb.inc.php:200 include/locales/en_gb.inc.php:1691
+#: include/locales/en_gb.inc.php:1693
 msgid "Previous"
 msgstr "Zurück"
 
@@ -7458,17 +7449,17 @@ msgstr ""
 msgid "Probably php-ldap module is missing"
 msgstr "PHP-LDAP-Modul fehlt womöglich"
 
-#: include/locales/en_gb.inc.php:1030
+#: include/locales/en_gb.inc.php:1029
 #: include/views/js/configuration.sysmaps.js.php:127
 msgid "Problem"
 msgstr "Problem"
 
-#: include/locales/en_gb.inc.php:965
+#: include/locales/en_gb.inc.php:964
 #: include/views/configuration.sysmap.edit.php:145
 msgid "Problem display"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1393
+#: include/locales/en_gb.inc.php:1391
 msgid "Problem on"
 msgstr "Problem auf"
 
@@ -7480,7 +7471,7 @@ msgstr "Problem, wenn alle Kind-Dienste Probleme haben"
 msgid "Problem, if at least one child has a problem"
 msgstr "Problem, wenn mindestens ein Kind-Dienst Probleme hat"
 
-#: include/locales/en_gb.inc.php:1031
+#: include/locales/en_gb.inc.php:1030
 msgid "Problems"
 msgstr "Probleme"
 
@@ -7500,11 +7491,11 @@ msgstr "Proxies"
 msgid "Proxy"
 msgstr "Proxy"
 
-#: include/locales/en_gb.inc.php:1343
+#: include/locales/en_gb.inc.php:1342
 msgid "Proxy added"
 msgstr "Proxy hinzugefügt"
 
-#: include/locales/en_gb.inc.php:1347
+#: include/locales/en_gb.inc.php:1346
 msgid "Proxy deleted"
 msgstr "Proxy gelöscht"
 
@@ -7516,7 +7507,7 @@ msgstr "Modus"
 msgid "Proxy name"
 msgstr "Name des Proxys"
 
-#: include/locales/en_gb.inc.php:1345
+#: include/locales/en_gb.inc.php:1344
 msgid "Proxy updated"
 msgstr "Proxy aktualisiert"
 
@@ -7534,11 +7525,11 @@ msgstr "Datei mit öffentlichem Schlüssel"
 msgid "QUEUE OF ITEMS TO BE UPDATED"
 msgstr "WARTESCHLANGE FÜR UPDATE VON ELEMENTEN"
 
-#: include/locales/en_gb.inc.php:1658 include/menu.inc.php:265
+#: include/locales/en_gb.inc.php:1639 include/menu.inc.php:265
 msgid "Queue"
 msgstr "Warteschlange"
 
-#: include/locales/en_gb.inc.php:983
+#: include/locales/en_gb.inc.php:982
 msgid "REPORT"
 msgstr "BERICHT"
 
@@ -7561,7 +7552,7 @@ msgstr "Nur lesen"
 msgid "Read-write"
 msgstr "Lesen/Schreiben"
 
-#: include/locales/en_gb.inc.php:1247
+#: include/locales/en_gb.inc.php:1246
 msgid "Reason"
 msgstr "Grund"
 
@@ -7649,7 +7640,7 @@ msgstr "Mich merken für 30 Tage"
 msgid "Remote command"
 msgstr "Entfernter Befehl"
 
-#: include/locales/en_gb.inc.php:1233
+#: include/locales/en_gb.inc.php:1232
 #: include/views/administration.general.iconmap.edit.php:69
 #: include/views/administration.general.iconmap.edit.php:105
 #: include/views/configuration.sysmap.edit.php:159
@@ -7673,7 +7664,7 @@ msgstr "Entfernen"
 msgid "Remove element"
 msgstr "Entferne Element"
 
-#: include/locales/en_gb.inc.php:1356
+#: include/locales/en_gb.inc.php:1354
 msgid "Remove from"
 msgstr "Löschen von"
 
@@ -7703,7 +7694,7 @@ msgstr "Entferne Verbindung"
 msgid "Remove selected"
 msgstr "Lösche Ausgewählte"
 
-#: include/locales/en_gb.inc.php:1301
+#: include/locales/en_gb.inc.php:1300
 msgid "Replace"
 msgstr "Ersetzen"
 
@@ -7711,11 +7702,11 @@ msgstr "Ersetzen"
 msgid "Replace linked templates"
 msgstr "Ersetze verbundene Vorlagen"
 
-#: include/locales/en_gb.inc.php:1662
+#: include/locales/en_gb.inc.php:1643
 msgid "Report"
 msgstr "Bericht"
 
-#: include/locales/en_gb.inc.php:1663 include/menu.inc.php:122
+#: include/locales/en_gb.inc.php:1644 include/menu.inc.php:122
 msgid "Reports"
 msgstr "Berichte"
 
@@ -7743,11 +7734,11 @@ msgstr "Nötige Host-Berechtigungen"
 msgid "Required performance (vps)"
 msgstr "Benötigte Leistung (Werte/s)"
 
-#: include/locales/en_gb.inc.php:1000
+#: include/locales/en_gb.inc.php:999
 msgid "Required server performance, new values per second"
 msgstr "Benötigte Serverperformance, neue Werte pro Sekunde"
 
-#: hosts.php:746 include/locales/en_gb.inc.php:944
+#: hosts.php:746 include/locales/en_gb.inc.php:943
 msgid "Reset"
 msgstr "Zurücksetzen"
 
@@ -7772,12 +7763,12 @@ msgstr "Bestätigung zurücksetzen"
 msgid "Reset defaults"
 msgstr "Standardwerte zurücksetzen"
 
-#: include/locales/en_gb.inc.php:1029
+#: include/locales/en_gb.inc.php:1028
 #, fuzzy
 msgid "Resolved"
 msgstr "Wiederhergestellt"
 
-#: include/locales/en_gb.inc.php:1112
+#: include/locales/en_gb.inc.php:1111
 msgid "Resource"
 msgstr "Bereich"
 
@@ -7799,7 +7790,7 @@ msgstr "Antwortzeit"
 msgid "Response time for step '%1$s' of scenario '%2$s'"
 msgstr "Reaktionszeit für Schritt '%1$s' in Szenario '%2$s'"
 
-#: include/locales/en_gb.inc.php:1361
+#: include/locales/en_gb.inc.php:1359
 msgid "Result"
 msgstr "Ergebnis"
 
@@ -7811,7 +7802,7 @@ msgstr "Ergebnis ist FALSCH"
 msgid "Result is TRUE"
 msgstr "Ergebnis ist WAHR"
 
-#: include/locales/en_gb.inc.php:1474
+#: include/locales/en_gb.inc.php:1455
 msgid "Result type"
 msgstr "Ergebnistyp"
 
@@ -7827,7 +7818,7 @@ msgstr "Wiederholen"
 msgid "Return"
 msgstr "Zurück"
 
-#: include/locales/en_gb.inc.php:1173
+#: include/locales/en_gb.inc.php:1172
 #: include/views/configuration.sysmap.edit.php:131
 #: include/views/js/configuration.sysmaps.js.php:75
 #: include/views/js/configuration.sysmaps.js.php:309
@@ -7835,11 +7826,11 @@ msgstr "Zurück"
 msgid "Right"
 msgstr "Recht"
 
-#: include/locales/en_gb.inc.php:1151
+#: include/locales/en_gb.inc.php:1150
 msgid "Row span"
 msgstr "Zeilenabstand"
 
-#: include/locales/en_gb.inc.php:1107
+#: include/locales/en_gb.inc.php:1106
 msgid "Rows"
 msgstr "Zeilen"
 
@@ -7897,11 +7888,11 @@ msgstr "Befehl ausführen auf Host-Gruppe"
 msgid "Run remote commands on hosts"
 msgstr "Befehle ausführen auf Hosts"
 
-#: include/locales/en_gb.inc.php:1400
+#: include/locales.inc.php:72
 msgid "Russian (ru_RU)"
 msgstr "Russisch (ru_RU)"
 
-#: include/locales/en_gb.inc.php:1681 include/locales/en_gb.inc.php:1682
+#: include/locales/en_gb.inc.php:1662 include/locales/en_gb.inc.php:1663
 msgid "S"
 msgstr "S"
 
@@ -7909,11 +7900,11 @@ msgstr "S"
 msgid "SCENARIOS"
 msgstr "SZENARIOS"
 
-#: include/locales/en_gb.inc.php:1183 screens.php:179 screens.php:219
+#: include/locales/en_gb.inc.php:1182 screens.php:179 screens.php:219
 msgid "SCREENS"
 msgstr "ANSICHTSTAFELN"
 
-#: include/locales/en_gb.inc.php:1364
+#: include/locales/en_gb.inc.php:1362
 msgid "SCRIPT ERROR"
 msgstr "SKRIPT-FEHLER"
 
@@ -7921,7 +7912,7 @@ msgstr "SKRIPT-FEHLER"
 msgid "SCRIPTS"
 msgstr "SKRIPTE"
 
-#: include/locales/en_gb.inc.php:1423
+#: include/locales/en_gb.inc.php:1404
 msgid "SEARCH"
 msgstr "SUCHE"
 
@@ -7929,11 +7920,11 @@ msgstr "SUCHE"
 msgid "SERVER"
 msgstr "SERVER"
 
-#: include/locales/en_gb.inc.php:1033
+#: include/locales/en_gb.inc.php:1032
 msgid "SLA"
 msgstr "SLA"
 
-#: include/locales/en_gb.inc.php:1132
+#: include/locales/en_gb.inc.php:1131
 msgid "SLIDE SHOWS"
 msgstr "VORFÜHRUNGEN"
 
@@ -8032,20 +8023,20 @@ msgstr "SNMPv3-Sicherheitsstufe"
 msgid "SNMPv3 security name"
 msgstr "SNMPv3-Sicherheitsname"
 
-#: include/locales/en_gb.inc.php:1497
+#: include/locales/en_gb.inc.php:1478
 msgid "SQL executes count"
 msgstr "Anzahl der SQL-Executes"
 
-#: include/locales/en_gb.inc.php:1498
+#: include/locales/en_gb.inc.php:1479
 #, fuzzy
 msgid "SQL requests count"
 msgstr "Anzahl der SQL-Requests"
 
-#: include/locales/en_gb.inc.php:1496
+#: include/locales/en_gb.inc.php:1477
 msgid "SQL selects count"
 msgstr "Anzahl der SQL-Selects"
 
-#: include/db.inc.php:1288 include/db.inc.php:1336 include/db.inc.php:1372
+#: include/db.inc.php:1305 include/db.inc.php:1353 include/db.inc.php:1389
 #, php-format
 msgid "SQL statement execution has failed \"%s\""
 msgstr "SQL-Statement konnte nicht ausgeführt werden \"%s\""
@@ -8064,7 +8055,7 @@ msgstr "SSH-Agent"
 msgid "STATUS OF DISCOVERY"
 msgstr "STATUS VON DISCOVERY"
 
-#: include/locales/en_gb.inc.php:1320
+#: include/locales/en_gb.inc.php:1319
 msgid "STATUS OF TRIGGERS"
 msgstr "STATUS DES AUSLÖSERS"
 
@@ -8072,7 +8063,7 @@ msgstr "STATUS DES AUSLÖSERS"
 msgid "STATUS OF WEB MONITORING"
 msgstr "STATUS DER WEBÜBERWACHUNG"
 
-#: include/locales/en_gb.inc.php:985
+#: include/locales/en_gb.inc.php:984
 msgid "STATUS OF ZABBIX"
 msgstr "STATUS"
 
@@ -8080,11 +8071,11 @@ msgstr "STATUS"
 msgid "Sat"
 msgstr "Sa"
 
-#: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1241
+#: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1240
 msgid "Saturday"
 msgstr "Samstag"
 
-#: include/forms.inc.php:3669 include/locales/en_gb.inc.php:927
+#: include/forms.inc.php:3669 include/locales/en_gb.inc.php:926
 #: include/views/administration.authentication.edit.php:76
 #: include/views/administration.general.gui.edit.php:50
 #: include/views/administration.general.housekeeper.edit.php:37
@@ -8111,7 +8102,7 @@ msgstr "Samstag"
 msgid "Save"
 msgstr "Speichern"
 
-#: include/locales/en_gb.inc.php:1086
+#: include/locales/en_gb.inc.php:1085
 msgid "Scale"
 msgstr "Skalierung"
 
@@ -8170,41 +8161,41 @@ msgstr "Szenarios"
 msgid "Schedule"
 msgstr "Zeitplanung"
 
-#: include/locales/en_gb.inc.php:1097
+#: include/locales/en_gb.inc.php:1096
 msgid "Screen"
 msgstr "Übersichtstafel"
 
-#: include/locales/en_gb.inc.php:1100
+#: include/locales/en_gb.inc.php:1099
 msgid "Screen added"
 msgstr "Übersichtstafel hinzugefügt"
 
-#: include/locales/en_gb.inc.php:1111
+#: include/locales/en_gb.inc.php:1110
 msgid "Screen cell configuration"
 msgstr "Zelleneinstellung"
 
-#: include/locales/en_gb.inc.php:1104
+#: include/locales/en_gb.inc.php:1103
 msgid "Screen deleted"
 msgstr "Übersichtstafel gelöscht"
 
-#: include/locales/en_gb.inc.php:1179
+#: include/locales/en_gb.inc.php:1178
 msgid "Screen should contain at least one row and column"
 msgstr "Übersichtstafel muss mindestens eine Reihe oder Spalte beinhalten"
 
-#: include/locales/en_gb.inc.php:1102
+#: include/locales/en_gb.inc.php:1101
 msgid "Screen updated"
 msgstr "Übersichtstafel aktualisiert"
 
-#: include/locales/en_gb.inc.php:1195
+#: include/locales/en_gb.inc.php:1194
 #, php-format
 msgid "Screen with id \"%d\" does not exist"
 msgstr "Übersichtstafel mit id \"%d\" existiert nicht"
 
-#: include/locales/en_gb.inc.php:1194
+#: include/locales/en_gb.inc.php:1193
 #, php-format
 msgid "Screen with name \"%s\" does not exist"
 msgstr "Übersichtstafel mit name \"%s\" existiert nicht"
 
-#: include/html.inc.php:399 include/locales/en_gb.inc.php:1096
+#: include/html.inc.php:399 include/locales/en_gb.inc.php:1095
 #: include/menu.inc.php:71 include/menu.inc.php:201 popup.php:85 popup.php:109
 msgid "Screens"
 msgstr "Übersichtstafeln"
@@ -8245,7 +8236,7 @@ msgstr "Skript aktualisiert"
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr "Skript mit scriptid \"%s\" existiert nicht."
 
-#: include/blocks.inc.php:922 include/locales/en_gb.inc.php:1359
+#: include/blocks.inc.php:922 include/locales/en_gb.inc.php:1357
 #: include/maps.inc.php:173 include/menu.inc.php:256 report5.php:137
 #: tr_status.php:553
 msgid "Scripts"
@@ -8260,7 +8251,7 @@ msgstr "Suchen"
 msgid "Search attribute"
 msgstr "Suchattribute"
 
-#: include/locales/en_gb.inc.php:1427
+#: include/locales/en_gb.inc.php:1408
 msgid "Search pattern is empty"
 msgstr "Suchmuster ist leer"
 
@@ -8305,7 +8296,7 @@ msgstr ""
 msgid "Seconds"
 msgstr "Sekunden"
 
-#: include/forms.inc.php:1362 include/locales/en_gb.inc.php:1339
+#: include/forms.inc.php:1362 include/locales/en_gb.inc.php:1338
 #: include/page_header.php:326 include/views/configuration.action.edit.php:173
 #: include/views/configuration.action.edit.php:183
 #: include/views/configuration.action.edit.php:193
@@ -8340,7 +8331,7 @@ msgstr "Wähle Prototyp"
 msgid "Select rows with value like"
 msgstr "Zeilen auswählen mit Wert wie"
 
-#: include/locales/en_gb.inc.php:955
+#: include/locales/en_gb.inc.php:954
 msgid "Selected"
 msgstr "Ausgewählte"
 
@@ -8352,11 +8343,11 @@ msgstr "Ausgewählte Aktionen gelöscht"
 msgid "Selected elements"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1085
+#: include/locales/en_gb.inc.php:1084
 msgid "Selected groups"
 msgstr "Ausgewählte Gruppen"
 
-#: include/locales/en_gb.inc.php:1084
+#: include/locales/en_gb.inc.php:1083
 msgid "Selected hosts"
 msgstr "Ausgewählte Hosts"
 
@@ -8376,7 +8367,7 @@ msgstr "Schicke Nachricht an Benutzer"
 msgid "Send only to"
 msgstr "Schicke nur an"
 
-#: include/locales/en_gb.inc.php:923
+#: include/locales/en_gb.inc.php:922
 msgid "Send to"
 msgstr "Empfänger"
 
@@ -8392,7 +8383,7 @@ msgstr "Schicke an Benutzer"
 msgid "Sep"
 msgstr "Sep"
 
-#: include/locales/en_gb.inc.php:964
+#: include/locales/en_gb.inc.php:963
 #: include/views/configuration.sysmap.edit.php:138
 #, fuzzy
 msgid "Separated"
@@ -8415,19 +8406,19 @@ msgstr "Seriennummer B"
 msgid "Server"
 msgstr "System"
 
-#: include/locales/en_gb.inc.php:1155
+#: include/locales/en_gb.inc.php:1154
 msgid "Server info"
 msgstr "Serverstatus"
 
-#: include/locales/en_gb.inc.php:1163
+#: include/locales/en_gb.inc.php:1162
 msgid "Server time"
 msgstr "Systemzeit"
 
-#: include/actions.inc.php:71 include/locales/en_gb.inc.php:1245
+#: include/actions.inc.php:71 include/locales/en_gb.inc.php:1244
 msgid "Service"
 msgstr "Dienst"
 
-#: include/locales/en_gb.inc.php:1209
+#: include/locales/en_gb.inc.php:1208
 msgid "Service added"
 msgstr "Dienst hinzugefügt"
 
@@ -8436,7 +8427,7 @@ msgstr "Dienst hinzugefügt"
 msgid "Service cannot be parent and child at the same time."
 msgstr "Dienst kann nicht gleichzeitig Kind und Eltern ..."
 
-#: include/locales/en_gb.inc.php:1211
+#: include/locales/en_gb.inc.php:1210
 msgid "Service deleted"
 msgstr "Dienst gelöscht"
 
@@ -8444,7 +8435,7 @@ msgstr "Dienst gelöscht"
 msgid "Service port"
 msgstr "Serviceport"
 
-#: include/locales/en_gb.inc.php:1230
+#: include/locales/en_gb.inc.php:1229
 msgid "Service times"
 msgstr "Servicezeiten"
 
@@ -8452,11 +8443,11 @@ msgstr "Servicezeiten"
 msgid "Service type"
 msgstr "Servicetyp"
 
-#: include/locales/en_gb.inc.php:1206
+#: include/locales/en_gb.inc.php:1205
 msgid "Service updated"
 msgstr "Dienst aktualisiert"
 
-#: include/locales/en_gb.inc.php:1246
+#: include/locales/en_gb.inc.php:1245
 msgid "Services"
 msgstr "Dienste"
 
@@ -8464,11 +8455,11 @@ msgstr "Dienste"
 msgid "Session terminated, re-login, please."
 msgstr "Sitzung beendet, bitte neu anmelden."
 
-#: include/locales/en_gb.inc.php:892
+#: include/locales/en_gb.inc.php:891
 msgid "Set trigger"
 msgstr "Setze Auslöser"
 
-#: include/locales/en_gb.inc.php:1269 popup.php:857
+#: include/locales/en_gb.inc.php:1268 popup.php:857
 msgid "Severity"
 msgstr "Priorität"
 
@@ -8482,7 +8473,7 @@ msgstr "Priorität (absteigend)"
 msgid "Severity name cannot be empty."
 msgstr "Prioriäts-Name darf nicht leer sein."
 
-#: include/locales/en_gb.inc.php:1009
+#: include/locales/en_gb.inc.php:1008
 #: include/views/js/configuration.sysmaps.js.php:25
 msgid "Show"
 msgstr "anzeigen"
@@ -8493,7 +8484,7 @@ msgstr "anzeigen"
 msgid "Show all"
 msgstr "Alle Alarme"
 
-#: include/locales/en_gb.inc.php:1325
+#: include/locales/en_gb.inc.php:1324
 msgid "Show details"
 msgstr "Details einblenden"
 
@@ -8501,7 +8492,7 @@ msgstr "Details einblenden"
 msgid "Show disabled scenarios"
 msgstr "Deaktivierte Szenarios einblenden"
 
-#: include/locales/en_gb.inc.php:1287
+#: include/locales/en_gb.inc.php:1286
 msgid "Show disabled triggers"
 msgstr "Deaktivierte Auslöser einblenden"
 
@@ -8515,11 +8506,11 @@ msgstr "Alle Ereignisse anzeigen"
 msgid "Show events not older than (in days)"
 msgstr "Zeige Ereignisse jünger als (Tage)"
 
-#: include/locales/en_gb.inc.php:972
+#: include/locales/en_gb.inc.php:971
 msgid "Show graph of item"
 msgstr "Graph des Elements zeigen"
 
-#: include/locales/en_gb.inc.php:956
+#: include/locales/en_gb.inc.php:955
 msgid "Show hosts in maintenance"
 msgstr "Zeige Hosts in Wartung"
 
@@ -8536,7 +8527,7 @@ msgstr ""
 msgid "Show legend"
 msgstr "Zeige Legende"
 
-#: include/locales/en_gb.inc.php:1152
+#: include/locales/en_gb.inc.php:1151
 msgid "Show lines"
 msgstr "Zeilen anzeigen"
 
@@ -8544,7 +8535,7 @@ msgstr "Zeilen anzeigen"
 msgid "Show selected"
 msgstr "Auswahl anzeigen"
 
-#: include/locales/en_gb.inc.php:1138
+#: include/locales/en_gb.inc.php:1137
 msgid "Show text as HTML"
 msgstr "Zeige Text als HTML"
 
@@ -8552,7 +8543,7 @@ msgstr "Zeige Text als HTML"
 msgid "Show triggers"
 msgstr "Auslöser zeigen"
 
-#: include/locales/en_gb.inc.php:1324
+#: include/locales/en_gb.inc.php:1323
 msgid "Show unacknowledged"
 msgstr "Nicht bestätigte anzeigen"
 
@@ -8564,7 +8555,7 @@ msgstr "Unbekannte Ereignisse anzeigen"
 msgid "Show value"
 msgstr "Wert anzeigen"
 
-#: include/locales/en_gb.inc.php:973
+#: include/locales/en_gb.inc.php:972
 msgid "Show values of item"
 msgstr "Werte des Elements zeigen"
 
@@ -8572,7 +8563,7 @@ msgstr "Werte des Elements zeigen"
 msgid "Show working time"
 msgstr "Arbeitszeit anzeigen"
 
-#: include/locales/en_gb.inc.php:843 sysmap.php:164
+#: include/locales/en_gb.inc.php:842 sysmap.php:164
 #, fuzzy
 msgid "Shown"
 msgstr "Angezeigt"
@@ -8589,15 +8580,11 @@ msgstr "Einfach"
 msgid "Simple check"
 msgstr "Einfache Prüfung"
 
-#: api/classes/class.citemkey.php:121
-msgid "Simple check key cannot have parameters in []."
-msgstr "Schlüssel für eine einfache Prüfung darf keine Parameter in [] haben."
-
-#: include/locales/en_gb.inc.php:1114 popup.php:97
+#: include/locales/en_gb.inc.php:1113 popup.php:97
 msgid "Simple graph"
 msgstr "Einfacher Graph"
 
-#: include/locales/en_gb.inc.php:1115
+#: include/locales/en_gb.inc.php:1114
 msgid "Simple graphs"
 msgstr "Einfache Graphen"
 
@@ -8643,31 +8630,31 @@ msgstr "Bundesland"
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1129
+#: include/locales/en_gb.inc.php:1128
 msgid "Slide show"
 msgstr "Vorführung"
 
-#: include/locales/en_gb.inc.php:1128 popup.php:89
+#: include/locales/en_gb.inc.php:1127 popup.php:89
 msgid "Slide shows"
 msgstr "Vorführung"
 
-#: include/locales/en_gb.inc.php:1136 include/menu.inc.php:206
+#: include/locales/en_gb.inc.php:1135 include/menu.inc.php:206
 msgid "Slides"
 msgstr "Seiten"
 
-#: include/locales/en_gb.inc.php:1188
+#: include/locales/en_gb.inc.php:1187
 msgid "Slideshow added"
 msgstr "Vorführung hinzugefügt"
 
-#: include/locales/en_gb.inc.php:1190
+#: include/locales/en_gb.inc.php:1189
 msgid "Slideshow deleted"
 msgstr "Vorführung gelöscht"
 
-#: include/locales/en_gb.inc.php:1127
+#: include/locales/en_gb.inc.php:1126
 msgid "Slideshow must contain slides"
 msgstr "Slideshow muss Seiten enthalten"
 
-#: include/locales/en_gb.inc.php:1186
+#: include/locales/en_gb.inc.php:1185
 msgid "Slideshow updated"
 msgstr "Vorführung aktualisiert"
 
@@ -8675,12 +8662,12 @@ msgstr "Vorführung aktualisiert"
 msgid "Slovak (sk_SK)"
 msgstr "Slovakisch (sk_SK)"
 
-#: include/locales/en_gb.inc.php:1391
+#: include/locales/en_gb.inc.php:1389
 #, fuzzy
 msgid "Snooze"
 msgstr "Dösen"
 
-#: include/locales/en_gb.inc.php:1217
+#: include/locales/en_gb.inc.php:1216
 msgid "Soft"
 msgstr "variabel"
 
@@ -8725,7 +8712,7 @@ msgstr "sortiert nach"
 msgid "Sort order (0->100)"
 msgstr "Sortierreihenfolge (0->100)"
 
-#: include/locales/en_gb.inc.php:1221
+#: include/locales/en_gb.inc.php:1220
 msgid "Sort order (0->999)"
 msgstr "Sortierreihenfolge (0->999)"
 
@@ -8737,7 +8724,7 @@ msgstr "Sortiere Auslöser nach"
 msgid "Source"
 msgstr "Quelle"
 
-#: include/locales/en_gb.inc.php:1402
+#: include/locales.inc.php:74
 msgid "Spanish (es_ES)"
 msgstr "Spanisch (es_ES)"
 
@@ -8762,7 +8749,7 @@ msgstr "Standard-Element"
 msgid "State"
 msgstr "Status"
 
-#: include/locales/en_gb.inc.php:1492
+#: include/locales/en_gb.inc.php:1473
 msgid "Stats for"
 msgstr "Statistik für"
 
@@ -8775,11 +8762,11 @@ msgstr "Statistik für"
 msgid "Status"
 msgstr "Status"
 
-#: include/locales/en_gb.inc.php:1214
+#: include/locales/en_gb.inc.php:1213
 msgid "Status calculation"
 msgstr "Statusberechnung"
 
-#: include/locales/en_gb.inc.php:1215
+#: include/locales/en_gb.inc.php:1214
 msgid "Status calculation algorithm"
 msgstr "Berechnungsalgorithmus"
 
@@ -8791,7 +8778,7 @@ msgstr "Status-Codes"
 msgid "Status of Web monitoring"
 msgstr "Status der Webüberwachung"
 
-#: include/locales/en_gb.inc.php:984 include/menu.inc.php:129
+#: include/locales/en_gb.inc.php:983 include/menu.inc.php:129
 msgid "Status of Zabbix"
 msgstr "Status"
 
@@ -8799,15 +8786,15 @@ msgstr "Status"
 msgid "Status of discovery"
 msgstr "Status von Discovery"
 
-#: include/locales/en_gb.inc.php:1322
+#: include/locales/en_gb.inc.php:1321
 msgid "Status of host triggers"
 msgstr "Status der Auslöser des Hosts"
 
-#: include/locales/en_gb.inc.php:1321
+#: include/locales/en_gb.inc.php:1320
 msgid "Status of hostgroup triggers"
 msgstr "Status der Auslöser der Hostgruppe"
 
-#: include/locales/en_gb.inc.php:1319
+#: include/locales/en_gb.inc.php:1318
 msgid "Status of triggers"
 msgstr "Status des Auslösers"
 
@@ -8815,7 +8802,7 @@ msgstr "Status des Auslösers"
 msgid "Status only"
 msgstr "Status"
 
-#: actionconf.php:327 trigger_prototypes.php:255 triggers.php:295
+#: actionconf.php:327 trigger_prototypes.php:288 triggers.php:364
 msgid "Status updated"
 msgstr "Status aktualisiert"
 
@@ -8852,11 +8839,11 @@ msgstr "Wert speichern"
 msgid "Straight"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1167
+#: include/locales/en_gb.inc.php:1166
 msgid "Style"
 msgstr "Stil"
 
-#: include/locales/en_gb.inc.php:1532
+#: include/locales/en_gb.inc.php:1513
 msgid "Subfilter"
 msgstr "Unterfilter"
 
@@ -8866,7 +8853,7 @@ msgstr "Unterfilter"
 msgid "Subject"
 msgstr "Betreff"
 
-#: include/locales/en_gb.inc.php:1582
+#: include/locales/en_gb.inc.php:1563
 msgid "Submap"
 msgstr "Unter-Karte"
 
@@ -8878,7 +8865,7 @@ msgstr ""
 msgid "Sun"
 msgstr "So"
 
-#: include/locales/en_gb.inc.php:44 include/locales/en_gb.inc.php:1235
+#: include/locales/en_gb.inc.php:44 include/locales/en_gb.inc.php:1234
 msgid "Sunday"
 msgstr "Sonntag"
 
@@ -8891,7 +8878,7 @@ msgstr "Unterstützung"
 msgid "Surname"
 msgstr "Nachname"
 
-#: include/locales/en_gb.inc.php:1403
+#: include/locales.inc.php:75
 msgid "Swedish (sv_SE)"
 msgstr "Schwedisch (sv_SE)"
 
@@ -8907,12 +8894,12 @@ msgstr "Standard"
 msgid "System error."
 msgstr "Systemfehler."
 
-#: include/locales/en_gb.inc.php:937
+#: include/locales/en_gb.inc.php:936
 msgid "System status"
 msgstr "Systemstatus"
 
-#: include/locales/en_gb.inc.php:1519 include/locales/en_gb.inc.php:1677
-#: include/locales/en_gb.inc.php:1679
+#: include/locales/en_gb.inc.php:1500 include/locales/en_gb.inc.php:1658
+#: include/locales/en_gb.inc.php:1660
 #, fuzzy
 msgid "T"
 msgstr "D"
@@ -8934,15 +8921,15 @@ msgstr "VORLAGEN"
 msgid "TOTAL"
 msgstr "GESAMT"
 
-#: include/locales/en_gb.inc.php:1313
+#: include/locales/en_gb.inc.php:1312
 msgid "TRIGGER COMMENTS"
 msgstr "AUSLÖSER-KOMMENTARE"
 
-#: include/locales/en_gb.inc.php:810
+#: include/locales/en_gb.inc.php:809
 msgid "TRIGGER PROTOTYPES OF"
 msgstr "AUSLÖSER-PROTOTYP VON"
 
-#: include/locales/en_gb.inc.php:1327
+#: include/locales/en_gb.inc.php:1326
 msgid "TRIGGERS"
 msgstr "AUSLÖSER"
 
@@ -8950,7 +8937,7 @@ msgstr "AUSLÖSER"
 msgid "TRUE"
 msgstr "WAHR"
 
-#: include/db.inc.php:1169
+#: include/db.inc.php:1186
 #, php-format
 msgid "Table \"%s\" does not exist."
 msgstr "Tabelle \"%s\" existiert nicht."
@@ -9022,11 +9009,11 @@ msgstr "Vorlagen-Auslöser"
 msgid "Template updated"
 msgstr "Vorlage aktualisiert"
 
-#: include/locales/en_gb.inc.php:1556
+#: include/locales/en_gb.inc.php:1537
 msgid "Template with application"
 msgstr "Vorlage mit Applikationen"
 
-#: include/locales/en_gb.inc.php:1555
+#: include/locales/en_gb.inc.php:1536
 msgid "Template with item key"
 msgstr "Vorlage mit Element-Schlüssel"
 
@@ -9059,7 +9046,7 @@ msgstr "Vorlagen"
 msgid "Templates [%1$s] unlinked from hosts [%2$s]."
 msgstr "Vorlagen [%1$s] getrennt von Hosts [%2$s]."
 
-#: include/locales/en_gb.inc.php:1520
+#: include/locales/en_gb.inc.php:1501
 msgid "Tera"
 msgstr "Tera"
 
@@ -9076,7 +9063,7 @@ msgstr "Authentifizierung testen"
 msgid "Test confirmation"
 msgstr "Test-Bestätigung"
 
-#: include/locales/en_gb.inc.php:1468
+#: include/locales/en_gb.inc.php:1449
 msgid "Test data"
 msgstr "Testdaten"
 
@@ -9115,7 +9102,7 @@ msgstr "Das empfangene JSON ist keine gültige JSON-RPC-Anfrage."
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1289
+#: include/locales/en_gb.inc.php:1288
 msgid "The trigger depends on"
 msgstr "Der Auslöser hängt ab von"
 
@@ -9139,23 +9126,23 @@ msgstr "Dritten"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr "Dieses Feld wird automatisch befüllt aus dem Element \"%s\"."
 
-#: include/locales/en_gb.inc.php:1251
+#: include/locales/en_gb.inc.php:1250
 msgid "This month"
 msgstr "Diesen Monat"
 
-#: include/locales/en_gb.inc.php:1588
+#: include/locales/en_gb.inc.php:1569
 msgid "This screen-column is not empty"
 msgstr "Diese Übersichtstafel-Spalte ist nicht leer"
 
-#: include/locales/en_gb.inc.php:1587
+#: include/locales/en_gb.inc.php:1568
 msgid "This screen-row is not empty"
 msgstr "Diese Übersichtstafel-Zeile ist nicht leer"
 
-#: include/locales/en_gb.inc.php:1249
+#: include/locales/en_gb.inc.php:1248
 msgid "This week"
 msgstr "Diese Woche"
 
-#: include/locales/en_gb.inc.php:1250
+#: include/locales/en_gb.inc.php:1249
 msgid "This year"
 msgstr "Dieses Jahr"
 
@@ -9163,11 +9150,11 @@ msgstr "Dieses Jahr"
 msgid "Thu"
 msgstr "Do"
 
-#: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1239
+#: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1238
 msgid "Thursday"
 msgstr "Donnerstag"
 
-#: include/locales/en_gb.inc.php:1027
+#: include/locales/en_gb.inc.php:1026
 msgid "Till"
 msgstr "Bis"
 
@@ -9179,11 +9166,11 @@ msgstr "Zeit"
 msgid "Time period"
 msgstr "Zeitspanne"
 
-#: include/locales/en_gb.inc.php:1285
+#: include/locales/en_gb.inc.php:1284
 msgid "Time shift"
 msgstr "Zeitverschiebung"
 
-#: include/locales/en_gb.inc.php:1162
+#: include/locales/en_gb.inc.php:1161
 msgid "Time type"
 msgstr "Zeittyp"
 
@@ -9211,11 +9198,11 @@ msgstr "Titel"
 msgid "To"
 msgstr "Bis"
 
-#: include/locales/en_gb.inc.php:1248
+#: include/locales/en_gb.inc.php:1247
 msgid "Today"
 msgstr "Heute"
 
-#: include/locales/en_gb.inc.php:1299
+#: include/locales/en_gb.inc.php:1298
 msgid "Toggle input method"
 msgstr "Wechsel der Eingabemethode"
 
@@ -9224,22 +9211,22 @@ msgstr "Wechsel der Eingabemethode"
 msgid "Too many interfaces provided for proxy \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:895
+#: include/locales/en_gb.inc.php:894
 #: include/views/configuration.sysmap.edit.php:131
 #: include/views/js/configuration.sysmaps.js.php:76
 #: include/views/js/configuration.sysmaps.js.php:310
 msgid "Top"
 msgstr "oben"
 
-#: include/locales/en_gb.inc.php:977 queue.php:289
+#: include/locales/en_gb.inc.php:976 queue.php:289
 msgid "Total"
 msgstr "Summe"
 
-#: include/locales/en_gb.inc.php:1493
+#: include/locales/en_gb.inc.php:1474
 msgid "Total time"
 msgstr "Gesamtzeit"
 
-#: include/locales/en_gb.inc.php:1499
+#: include/locales/en_gb.inc.php:1480
 msgid "Total time spent on SQL"
 msgstr "Gesamtzeit für SQL"
 
@@ -9256,15 +9243,20 @@ msgstr "Transport-Fehler."
 msgid "Trends"
 msgstr "Trends"
 
-#: include/locales/en_gb.inc.php:989
+#: include/locales/en_gb.inc.php:988
 msgid "Trends stored"
 msgstr "gespeicherte Trends"
 
-#: include/actions.inc.php:41 include/locales/en_gb.inc.php:1222
+#: include/actions.inc.php:41 include/locales/en_gb.inc.php:1221
 #: include/views/js/configuration.sysmaps.js.php:18
 #: include/views/js/configuration.sysmaps.js.php:94
 msgid "Trigger"
 msgstr "Auslöser"
+
+#: api/classes/class.ctrigger.php:1613
+#, php-format
+msgid "Trigger \"%1$s:%2$s\" updated."
+msgstr ""
 
 #: api/classes/class.ctrigger.php:1580
 #, php-format
@@ -9298,12 +9290,7 @@ msgstr "Auslöser [%1$s:%2$s] hat keinen Elementen-Protoyp."
 msgid "Trigger [%1$s:%2$s] unlinked."
 msgstr "Auslöser [%1$s:%2$s] getrennt."
 
-#: api/classes/class.ctrigger.php:1614
-#, php-format
-msgid "Trigger [%1$s:%2$s] updated."
-msgstr "Auslöser [%1$s:%2$s] aktualisiert."
-
-#: api/classes/class.ctrigger.php:1701 api/classes/class.ctrigger.php:1736
+#: api/classes/class.ctrigger.php:1700 api/classes/class.ctrigger.php:1735
 #: api/classes/class.ctriggerprototype.php:1505
 #: api/classes/class.ctriggerprototype.php:1540
 #, php-format
@@ -9315,19 +9302,19 @@ msgstr "Auslöser [%1$s] existiert bereits auf [%2$s]"
 msgid "Trigger [%1$s] does not have item prototype."
 msgstr "Auslöser [%1$s] hat keinen Elementen-Protoyp."
 
-#: include/locales/en_gb.inc.php:1267 triggers.php:321
+#: include/locales/en_gb.inc.php:1266 triggers.php:390
 msgid "Trigger added"
 msgstr "Auslöser hinzugefügt"
 
-#: include/locales/en_gb.inc.php:1312
+#: include/locales/en_gb.inc.php:1311
 msgid "Trigger comments"
 msgstr "Auslöser Kommentare"
 
-#: include/locales/en_gb.inc.php:1265
+#: include/locales/en_gb.inc.php:1264
 msgid "Trigger deleted"
 msgstr "Auslöser wurde gelöscht"
 
-#: include/locales/en_gb.inc.php:1296
+#: include/locales/en_gb.inc.php:1295
 msgid "Trigger dependencies"
 msgstr "Auslöserabhängigkeiten"
 
@@ -9336,7 +9323,7 @@ msgstr "Auslöserabhängigkeiten"
 msgid "Trigger displaying options"
 msgstr "Auslöser-Anzeige"
 
-#: include/locales/en_gb.inc.php:1309
+#: include/locales/en_gb.inc.php:1308
 msgid "Trigger form"
 msgstr ""
 
@@ -9358,6 +9345,15 @@ msgstr ""
 msgid "Trigger name"
 msgstr "Auslöser-Name"
 
+#: include/audit.inc.php:34
+msgid "Trigger prototype"
+msgstr ""
+
+#: api/classes/class.ctriggerprototype.php:1437
+#, php-format
+msgid "Trigger prototype \"%1$s:%2$s\" updated."
+msgstr ""
+
 #: api/classes/class.ctriggerprototype.php:1314
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] deleted."
@@ -9367,11 +9363,6 @@ msgstr "Auslöser-Prototyp [%1$s:%2$s] gelöscht."
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] unlinked."
 msgstr "Auslöser-Prototyp [%1$s:%2$s] getrennt."
-
-#: api/classes/class.ctriggerprototype.php:1437
-#, php-format
-msgid "Trigger prototype [%1$s:%2$s] updated."
-msgstr "Auslöser-Prototyp [%1$s:%2$s] aktualisiert."
 
 #: include/views/configuration.host.edit.php:385
 #: include/views/configuration.template.edit.php:310
@@ -9387,12 +9378,7 @@ msgstr "Auslöser-Schwere"
 msgid "Trigger severity"
 msgstr "Auslöserpriorität"
 
-#: include/triggers.inc.php:1180
-#, php-format
-msgid "Trigger status became \"%s\""
-msgstr ""
-
-#: include/locales/en_gb.inc.php:1277
+#: include/locales/en_gb.inc.php:1276
 msgid "Trigger updated"
 msgstr "Auslöser aktualisiert"
 
@@ -9400,7 +9386,7 @@ msgstr "Auslöser aktualisiert"
 msgid "Trigger value"
 msgstr "Auslöserwert"
 
-#: api/classes/class.ctrigger.php:1705 api/classes/class.ctrigger.php:1739
+#: api/classes/class.ctrigger.php:1704 api/classes/class.ctrigger.php:1738
 #: api/classes/class.ctriggerprototype.php:1509
 #: api/classes/class.ctriggerprototype.php:1543
 msgid "Trigger with same name but other type exists"
@@ -9414,27 +9400,27 @@ msgstr "Es existiert ein anderer Auslöser mit gleichem Namen aber anderen Typs"
 msgid "Triggers"
 msgstr "Auslöser"
 
-#: include/locales/en_gb.inc.php:991
+#: include/locales/en_gb.inc.php:990
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Auslöser (a/d)[p/u/o]"
 
-#: include/locales/en_gb.inc.php:1263
+#: include/locales/en_gb.inc.php:1262
 msgid "Triggers deleted"
 msgstr "Auslöser wurden gelöscht"
 
-#: include/locales/en_gb.inc.php:1154
+#: include/locales/en_gb.inc.php:1153
 msgid "Triggers info"
 msgstr "Auslöser-Übersicht"
 
-#: include/locales/en_gb.inc.php:1295
+#: include/locales/en_gb.inc.php:1294
 msgid "Triggers massupdate"
 msgstr "Massenaktualisierung (Auslöser)"
 
-#: include/locales/en_gb.inc.php:1157
+#: include/locales/en_gb.inc.php:1156
 msgid "Triggers overview"
 msgstr "Auslöser"
 
-#: include/locales/en_gb.inc.php:1337
+#: include/locales/en_gb.inc.php:1336
 msgid "Triggers status"
 msgstr "Auslöser-Status"
 
@@ -9442,7 +9428,7 @@ msgstr "Auslöser-Status"
 msgid "Triggers top 100"
 msgstr "Top-100-Auslöser"
 
-#: include/locales/en_gb.inc.php:957
+#: include/locales/en_gb.inc.php:956
 msgid "Triggers with severity"
 msgstr "Auslöser mit Gewichtung"
 
@@ -9454,11 +9440,11 @@ msgstr ""
 msgid "Tue"
 msgstr "Di"
 
-#: include/locales/en_gb.inc.php:46 include/locales/en_gb.inc.php:1237
+#: include/locales/en_gb.inc.php:46 include/locales/en_gb.inc.php:1236
 msgid "Tuesday"
 msgstr "Dienstag"
 
-#: include/locales/en_gb.inc.php:885
+#: include/locales/en_gb.inc.php:884
 msgid "Two elements should be selected"
 msgstr "Zwei Elemente müssen ausgewählt werden"
 
@@ -9487,7 +9473,7 @@ msgstr "Typ"
 msgid "Type (Full details)"
 msgstr "Typ (Alle Details)"
 
-#: include/locales/en_gb.inc.php:876
+#: include/locales/en_gb.inc.php:875
 #: include/views/js/configuration.sysmaps.js.php:217
 msgid "Type (OK)"
 msgstr "Typ (OK)"
@@ -9513,7 +9499,7 @@ msgstr "Typen"
 msgid "UNKNOWN"
 msgstr "UNBEKANNT"
 
-#: include/locales/en_gb.inc.php:825
+#: include/locales/en_gb.inc.php:824
 msgid "UP"
 msgstr "RAUF"
 
@@ -9521,7 +9507,7 @@ msgstr "RAUF"
 msgid "UPDATE"
 msgstr "UPDATE"
 
-#: include/locales/en_gb.inc.php:1281
+#: include/locales/en_gb.inc.php:1280
 #: include/views/configuration.sysmap.edit.php:149
 #: include/views/js/configuration.sysmaps.js.php:164
 msgid "URL"
@@ -9555,19 +9541,19 @@ msgstr "BENUTZERPROFIL"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales/en_gb.inc.php:1409
+#: include/locales.inc.php:77
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainisch (uk_UA)"
 
-#: include/locales/en_gb.inc.php:1622
+#: include/locales/en_gb.inc.php:1603
 msgid "Unable to remove local node"
 msgstr "Der lokale Knoten kann nicht entfernt werden"
 
-#: include/locales/en_gb.inc.php:1598
+#: include/locales/en_gb.inc.php:1579
 msgid "Unable to select configuration"
 msgstr "Kann Konfiguration nicht auswählen"
 
-#: include/locales/en_gb.inc.php:913
+#: include/locales/en_gb.inc.php:912
 #, fuzzy
 msgid "Unacknowledged"
 msgstr "Unbestätigt"
@@ -9580,7 +9566,7 @@ msgstr "Unbestätigte OK-Ereignisse"
 msgid "Unacknowledged PROBLEM events"
 msgstr "Unbestätigte PROBLEM-Ereignisse"
 
-#: include/locales/en_gb.inc.php:963
+#: include/locales/en_gb.inc.php:962
 #: include/views/configuration.sysmap.edit.php:139
 msgid "Unacknowledged only"
 msgstr "Nur Unbestätigte"
@@ -9593,7 +9579,7 @@ msgstr "Entsperre Ausgewählte"
 msgid "Unblock selected users?"
 msgstr "Entsperre Ausgewählte Benutzer?"
 
-#: include/locales/en_gb.inc.php:1447
+#: include/locales/en_gb.inc.php:1428
 msgid "Unexpected end of element"
 msgstr "unerwartetes Ende des Elements"
 
@@ -9611,7 +9597,7 @@ msgstr "Einheit"
 msgid "Unknown"
 msgstr "unbekannt"
 
-#: include/locales/en_gb.inc.php:1378
+#: include/locales/en_gb.inc.php:1376
 msgid "Unknown action"
 msgstr "Unbekannte Aktion"
 
@@ -9619,15 +9605,15 @@ msgstr "Unbekannte Aktion"
 msgid "Unknown calculation algorithm of service status"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1472
+#: include/locales/en_gb.inc.php:1453
 msgid "Unknown host item, no such item in selected host"
 msgstr "Unbekanntes Hostelement, Host hat kein solches Element"
 
-#: include/locales/en_gb.inc.php:1471
+#: include/locales/en_gb.inc.php:1452
 msgid "Unknown host, no such host present in system"
 msgstr "Unbekannter Host, kein solch Host im System gefunden"
 
-#: include/locales/en_gb.inc.php:1383
+#: include/locales/en_gb.inc.php:1381
 msgid "Unknown resource"
 msgstr "unbekannte Ressource"
 
@@ -9635,7 +9621,7 @@ msgstr "unbekannte Ressource"
 msgid "Unknown value type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1470
+#: include/locales/en_gb.inc.php:1451
 msgid "Unknown variable type, testing not available"
 msgstr "Unbekannter Variablentyp, testen nicht möglich"
 
@@ -9658,11 +9644,11 @@ msgstr "Verbindung mit Vorlage entfernen"
 msgid "Unlink from templates"
 msgstr "Verbindung mit Vorlagen entfernen"
 
-#: include/locales/en_gb.inc.php:1389
+#: include/locales/en_gb.inc.php:1387
 msgid "Unmute"
 msgstr "Ton an"
 
-#: include/locales/en_gb.inc.php:1452
+#: include/locales/en_gb.inc.php:1433
 msgid "Unnecessary symbols detected"
 msgstr "Überflüssige Symbole gefunden"
 
@@ -9693,7 +9679,7 @@ msgid "Update item for the graph"
 msgstr "Aktualisiere Element für den Graphen"
 
 #. GETTEXT: r is date format string as described in http://php.net/date
-#: include/classes/class.cserverinfo.php:40 include/locales/en_gb.inc.php:1380
+#: include/classes/class.cserverinfo.php:40 include/locales/en_gb.inc.php:1378
 msgid "Updated"
 msgstr "Aktualisiert"
 
@@ -9717,7 +9703,7 @@ msgstr "Hochladen"
 msgid "Upper level maps"
 msgstr "Übergeordnete Karten"
 
-#: include/locales/en_gb.inc.php:110 include/locales/en_gb.inc.php:1226
+#: include/locales/en_gb.inc.php:110 include/locales/en_gb.inc.php:1225
 msgid "Uptime"
 msgstr "Uptime"
 
@@ -9725,7 +9711,7 @@ msgstr "Uptime"
 msgid "Uptime/Downtime"
 msgstr "Uptime/Downtime"
 
-#: include/locales/en_gb.inc.php:878
+#: include/locales/en_gb.inc.php:877
 msgid "Use advanced icons"
 msgstr "Benutze erweitete Symbole"
 
@@ -9733,7 +9719,7 @@ msgstr "Benutze erweitete Symbole"
 msgid "Use custom multiplier"
 msgstr "Verwende eigenen Multiplikator"
 
-#: include/locales/en_gb.inc.php:926
+#: include/locales/en_gb.inc.php:925
 msgid "Use if severity"
 msgstr "Benutzen bei Schwere"
 
@@ -9742,7 +9728,7 @@ msgid "Used in actions"
 msgstr "Benutzt in Aktion"
 
 #: include/forms.inc.php:198 include/forms.inc.php:201
-#: include/locales/en_gb.inc.php:648 include/locales/en_gb.inc.php:1342
+#: include/locales/en_gb.inc.php:648 include/locales/en_gb.inc.php:1341
 #: include/setup.inc.php:244 include/views/administration.users.edit.php:287
 msgid "User"
 msgstr "Benutzer"
@@ -9856,7 +9842,7 @@ msgstr "Benutzername"
 msgid "Users"
 msgstr "Benutzer"
 
-#: include/locales/en_gb.inc.php:997
+#: include/locales/en_gb.inc.php:996
 msgid "Users (online)"
 msgstr "Benutzer (online)"
 
@@ -9874,7 +9860,7 @@ msgstr "Status des Benutzers aktualisiert"
 msgid "Users unblocked"
 msgstr "Benutzer entsperrt"
 
-#: include/locales/en_gb.inc.php:986
+#: include/locales/en_gb.inc.php:985
 #: include/views/administration.general.macros.edit.php:32
 #: include/views/administration.general.macros.edit.php:45
 #: include/views/js/administration.general.macros.js.php:47
@@ -9896,17 +9882,17 @@ msgstr "Wert \"%1$s\" ist unzulässig für Parameter \"grid_show\". Zur Wahl ste
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "Wert \"%1$s\" ist unzulässig für Parameter \"grid_show\". Zur Wahl stehen: \"%2$s\" and \"%3$s\""
 
-#: include/db.inc.php:1223
+#: include/db.inc.php:1240
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Wert \"%1$s\" ist zu lang für Feld \"%2$s\" - %3$d Zeichen. Die erlaubte Länge beträgt %4$d Zeichen."
 
-#: include/db.inc.php:1249
+#: include/db.inc.php:1266
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr "Wert \"%1$s\" ist zu lang für Feld \"%2$s\" - %3$d Zeichen. Die erlaubte Länge beträgt 2048 Zeichen."
 
-#: config.php:390 config.php:404 include/audit.inc.php:37
+#: config.php:390 config.php:404 include/audit.inc.php:38
 #: include/views/administration.general.valuemapping.list.php:28
 msgid "Value map"
 msgstr "Wertezuordnung"
@@ -9936,11 +9922,11 @@ msgstr "Wertetabellen werden benutzt um einen Zusammenhang zwischen Werten und T
 msgid "Value type must be Float for aggregate items."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:974
+#: include/locales/en_gb.inc.php:973
 msgid "Values"
 msgstr "Values"
 
-#: include/locales/en_gb.inc.php:988
+#: include/locales/en_gb.inc.php:987
 msgid "Values stored"
 msgstr "gespeicherte Werte"
 
@@ -9952,11 +9938,11 @@ msgstr "Variablen"
 msgid "Vendor"
 msgstr "Anbieter"
 
-#: include/locales/en_gb.inc.php:1168
+#: include/locales/en_gb.inc.php:1167
 msgid "Vertical"
 msgstr "vertikal"
 
-#: include/locales/en_gb.inc.php:1175
+#: include/locales/en_gb.inc.php:1174
 msgid "Vertical align"
 msgstr "Vertikale Ausrichtung"
 
@@ -9978,7 +9964,7 @@ msgstr "Sichtbarer Name"
 msgid "Visible name cannot be empty if host name is missing."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1678
+#: include/locales/en_gb.inc.php:1659
 #, fuzzy
 msgid "W"
 msgstr "M"
@@ -10053,7 +10039,7 @@ msgid "Warning. Incorrect value for field \"%s\"."
 msgstr "Warnung. Falscher Wert für Feld \"%s\"."
 
 # "remember"?
-#: include/locales/en_gb.inc.php:1706
+#: include/locales/en_gb.inc.php:1687
 #, fuzzy
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "Die maximale Anzahl möglicher Elementen wurde leider erreicht."
@@ -10088,24 +10074,24 @@ msgstr "Web-Prüfungen müssen zumindest einen Schritt haben."
 msgid "Wed"
 msgstr "Mi"
 
-#: include/locales/en_gb.inc.php:47 include/locales/en_gb.inc.php:1238
+#: include/locales/en_gb.inc.php:47 include/locales/en_gb.inc.php:1237
 msgid "Wednesday"
 msgstr "Mittwoch"
 
-#: include/locales/en_gb.inc.php:1075
+#: include/locales/en_gb.inc.php:1074
 msgid "Week"
 msgstr "Woche"
 
-#: include/locales/en_gb.inc.php:1043
+#: include/locales/en_gb.inc.php:1042
 msgid "Weekly"
 msgstr "wöchentlich"
 
-#: include/locales/en_gb.inc.php:924
+#: include/locales/en_gb.inc.php:923
 #, fuzzy
 msgid "When active"
 msgstr "Gültigkeitszeitraum"
 
-#: include/locales/en_gb.inc.php:1118
+#: include/locales/en_gb.inc.php:1117
 #: include/views/configuration.sysmap.edit.php:45
 #: include/views/js/configuration.sysmaps.js.php:51
 msgid "Width"
@@ -10115,11 +10101,11 @@ msgstr "Breite"
 msgid "With data collection"
 msgstr "Mit Datensammlung"
 
-#: include/locales/en_gb.inc.php:1336
+#: include/locales/en_gb.inc.php:1335
 msgid "With last event unacknowledged"
 msgstr "Mit unbestätigtem letztem Ereignis"
 
-#: include/locales/en_gb.inc.php:940
+#: include/locales/en_gb.inc.php:939
 msgid "With problems"
 msgstr "Mit Problemen"
 
@@ -10127,11 +10113,11 @@ msgstr "Mit Problemen"
 msgid "With triggers"
 msgstr "Mit Auslöser"
 
-#: include/locales/en_gb.inc.php:1335
+#: include/locales/en_gb.inc.php:1334
 msgid "With unacknowledged events"
 msgstr "Mit unbestätigten Ereignissen"
 
-#: include/locales/en_gb.inc.php:939
+#: include/locales/en_gb.inc.php:938
 msgid "Without problems"
 msgstr "Ohne Probleme"
 
@@ -10189,7 +10175,7 @@ msgstr ""
 msgid "Wrong fields for map link"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1638
+#: include/locales/en_gb.inc.php:1619
 msgid "Wrong fields for media type"
 msgstr "Falsche Felder für Medien-Typ"
 
@@ -10227,24 +10213,24 @@ msgstr "Falsche Felder für Benutzer-Medium \"%s\"."
 msgid "Wrong macro"
 msgstr "Falsches Makro"
 
-#: include/locales/en_gb.inc.php:1634
+#: include/locales/en_gb.inc.php:1615
 msgid "Wrong period ["
 msgstr "Falsche Zeitspanne ["
 
-#: include/locales/en_gb.inc.php:890
+#: include/locales/en_gb.inc.php:889
 msgid "Wrong type of arguments passed to function"
 msgstr "Falsches Argument an Funktion übergeben"
 
-#: include/locales/en_gb.inc.php:848
+#: include/locales/en_gb.inc.php:847
 msgid "X"
 msgstr "X"
 
-#: include/locales/en_gb.inc.php:1673
+#: include/locales/en_gb.inc.php:1654
 msgid "XML file contains errors"
 msgstr "XML-Datei enthält Fehler"
 
-#: include/locales/en_gb.inc.php:1046 include/locales/en_gb.inc.php:1066
-#: include/locales/en_gb.inc.php:1527
+#: include/locales/en_gb.inc.php:1045 include/locales/en_gb.inc.php:1065
+#: include/locales/en_gb.inc.php:1508
 msgid "Y"
 msgstr "Y"
 
@@ -10270,32 +10256,32 @@ msgstr ""
 msgid "Y.M.d H:i:s"
 msgstr "Y.M.d H:i:s"
 
-#: include/locales/en_gb.inc.php:1021
+#: include/locales/en_gb.inc.php:1020
 msgid "Y.m.d"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1020
+#: include/locales/en_gb.inc.php:1019
 msgid "Y.m.d H:i"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:919 include/locales/en_gb.inc.php:1529
+#: include/locales/en_gb.inc.php:918 include/locales/en_gb.inc.php:1510
 msgid "Y.m.d H:i:s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1040
+#: include/locales/en_gb.inc.php:1039
 msgid "Year"
 msgstr "Jahr"
 
-#: include/locales/en_gb.inc.php:1045
+#: include/locales/en_gb.inc.php:1044
 msgid "Yearly"
 msgstr "jährlich"
 
-#: include/forms.inc.php:3595 include/locales/en_gb.inc.php:1001
+#: include/forms.inc.php:3595 include/locales/en_gb.inc.php:1000
 #: include/views/administration.users.list.php:78
 msgid "Yes"
 msgstr "Ja"
 
-#: include/locales/en_gb.inc.php:1528
+#: include/locales/en_gb.inc.php:1509
 msgid "Yotta"
 msgstr "Yotta"
 
@@ -10308,19 +10294,19 @@ msgstr "Sie können einige der Sprachen nicht auswählen, weil die nötige Local
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Sie dürfen die Privilegien für Benutzer \"%s\" nicht ändern."
 
-#: include/locales/en_gb.inc.php:1649
+#: include/locales/en_gb.inc.php:1630
 msgid "You are not logged in."
 msgstr "Sie sind nicht angemeldet."
 
-#: include/locales/en_gb.inc.php:1434
+#: include/locales/en_gb.inc.php:1415
 msgid "You can not switch hosts for current selection"
 msgstr "Host wechseln nicht möglich mit der aktuellen Auswahl"
 
-#: include/locales/en_gb.inc.php:1572
+#: include/locales/en_gb.inc.php:1553
 msgid "You can not use template hosts in mixed expressions."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1646
+#: include/locales/en_gb.inc.php:1627
 msgid "You cannot view this URL as a"
 msgstr "Sie können diese URL nicht zeigen als ein"
 
@@ -10346,7 +10332,7 @@ msgstr ""
 msgid "You do not have enough rights for operation."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1670
+#: include/locales/en_gb.inc.php:1651
 msgid "You do not have permission to perform this operation"
 msgstr "Sie haben keine Berechtigung, diese Operation durchzuführen"
 
@@ -10386,7 +10372,7 @@ msgstr "Sie haben keine Berechtigung, Benutzer-Medien zu aktualisieren."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "Sie haben entweder keine Berechtigung, Benutzer zu aktualisieren, oder der Benutzer existiert nicht."
 
-#: include/locales/en_gb.inc.php:1647
+#: include/locales/en_gb.inc.php:1628
 msgid "You must login to view this page."
 msgstr "Sie müssen sich anmelden um diese Seite sehen zu können."
 
@@ -10394,11 +10380,11 @@ msgstr "Sie müssen sich anmelden um diese Seite sehen zu können."
 msgid "Your setup is not configured for distributed monitoring"
 msgstr "Kein verteiltes Monitoring konfiguriert"
 
-#: include/locales/en_gb.inc.php:1525
+#: include/locales/en_gb.inc.php:1506
 msgid "Z"
 msgstr "Z"
 
-#: include/locales/en_gb.inc.php:1413
+#: include/locales/en_gb.inc.php:1394
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
@@ -10462,11 +10448,11 @@ msgstr "Zabbix ist vorübergehend nicht erreichbar"
 msgid "Zabbix server"
 msgstr "Zabbix-Server"
 
-#: include/locales/en_gb.inc.php:949
+#: include/locales/en_gb.inc.php:948
 msgid "Zabbix server ip or port is not set!"
 msgstr "IP-Adresse oder Port nicht gesetzt für Zabbix-Server!"
 
-#: include/locales/en_gb.inc.php:987
+#: include/locales/en_gb.inc.php:986
 msgid "Zabbix server is running"
 msgstr "Zabbix Server ist aktiviert"
 
@@ -10483,23 +10469,23 @@ msgstr "Zabbix-Server-Port"
 msgid "Zabbix trapper"
 msgstr "Zabbix trapper"
 
-#: include/locales/en_gb.inc.php:1526
+#: include/locales/en_gb.inc.php:1507
 msgid "Zetta"
 msgstr "Zetta"
 
-#: include/locales/en_gb.inc.php:1687
+#: include/locales/en_gb.inc.php:1668
 msgid "Zoom"
 msgstr "Zoomen"
 
-#: include/locales/en_gb.inc.php:1590
+#: include/locales/en_gb.inc.php:1571
 msgid "[H:i:s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1653
+#: include/locales/en_gb.inc.php:1634
 msgid "[Wrong value for day of week:"
 msgstr "[Falscher Wert für Wochentag:"
 
-#: include/locales/en_gb.inc.php:1651
+#: include/locales/en_gb.inc.php:1632
 msgid "[Wrong value for month:"
 msgstr "[Falscher Wert für Monat:"
 
@@ -10508,12 +10494,12 @@ msgid "[Y.M.d H:i:s]"
 msgstr ""
 
 # Was hat es damit auf sich?
-#: include/locales/en_gb.inc.php:1635 include/locales/en_gb.inc.php:1652
-#: include/locales/en_gb.inc.php:1654
+#: include/locales/en_gb.inc.php:1616 include/locales/en_gb.inc.php:1633
+#: include/locales/en_gb.inc.php:1635
 msgid "]"
 msgstr "]"
 
-#: include/locales/en_gb.inc.php:1055
+#: include/locales/en_gb.inc.php:1054
 #, fuzzy
 msgid "add"
 msgstr "hinzufügen"
@@ -10522,12 +10508,12 @@ msgstr "hinzufügen"
 msgid "add graph items first"
 msgstr "füge erst ein Element hinzu"
 
-#: include/locales/en_gb.inc.php:1548
+#: include/locales/en_gb.inc.php:1529
 #, fuzzy
 msgid "added"
 msgstr "hinzugefügt"
 
-#: include/locales/en_gb.inc.php:1533
+#: include/locales/en_gb.inc.php:1514
 msgid "affects only filtered data!"
 msgstr "betrifft nur gefilterte Daten!"
 
@@ -10535,15 +10521,15 @@ msgstr "betrifft nur gefilterte Daten!"
 msgid "all"
 msgstr "alle"
 
-#: include/locales/en_gb.inc.php:1384
+#: include/locales/en_gb.inc.php:1382
 msgid "already exists"
 msgstr "wird bereits verwendet"
 
-#: include/locales/en_gb.inc.php:1542
+#: include/locales/en_gb.inc.php:1523
 msgid "already exists for host"
 msgstr "existiert bereits für Host"
 
-#: include/locales/en_gb.inc.php:1557
+#: include/locales/en_gb.inc.php:1538
 msgid "already linked to host"
 msgstr "schon verbunden mit Host"
 
@@ -10554,7 +10540,7 @@ msgstr "schon verbunden mit Host"
 msgid "and"
 msgstr "und"
 
-#: include/locales/en_gb.inc.php:1560
+#: include/locales/en_gb.inc.php:1541
 msgid "and can't be deleted"
 msgstr "und kann nicht gelöscht werden"
 
@@ -10570,7 +10556,7 @@ msgstr "als Grün"
 msgid "as Red"
 msgstr "als Rot"
 
-#: include/locales/en_gb.inc.php:1567
+#: include/locales/en_gb.inc.php:1548
 msgid "available only for items with value types"
 msgstr "nur verfügbar für Elemente mit Datentyp"
 
@@ -10587,13 +10573,13 @@ msgstr "erstellt"
 msgid "d"
 msgstr "d"
 
-#: include/locales/en_gb.inc.php:1048 include/locales/en_gb.inc.php:1068
-#: include/locales/en_gb.inc.php:1607
+#: include/locales/en_gb.inc.php:1047 include/locales/en_gb.inc.php:1067
+#: include/locales/en_gb.inc.php:1588
 msgid "d M Y"
 msgstr "d M Y"
 
-#: include/locales/en_gb.inc.php:1049 include/locales/en_gb.inc.php:1054
-#: include/locales/en_gb.inc.php:1069
+#: include/locales/en_gb.inc.php:1048 include/locales/en_gb.inc.php:1053
+#: include/locales/en_gb.inc.php:1068
 msgid "d M Y H:i"
 msgstr ""
 
@@ -10601,18 +10587,18 @@ msgstr ""
 #: include/locales/en_gb.inc.php:119 include/locales/en_gb.inc.php:140
 #: include/locales/en_gb.inc.php:141 include/locales/en_gb.inc.php:214
 #: include/locales/en_gb.inc.php:215 include/locales/en_gb.inc.php:245
-#: include/locales/en_gb.inc.php:248 include/locales/en_gb.inc.php:822
-#: include/locales/en_gb.inc.php:823 include/locales/en_gb.inc.php:824
-#: include/locales/en_gb.inc.php:831 include/locales/en_gb.inc.php:832
-#: include/locales/en_gb.inc.php:833 include/locales/en_gb.inc.php:834
-#: include/locales/en_gb.inc.php:839 include/locales/en_gb.inc.php:980
-#: include/locales/en_gb.inc.php:1093 include/locales/en_gb.inc.php:1437
-#: include/locales/en_gb.inc.php:1441 include/locales/en_gb.inc.php:1589
+#: include/locales/en_gb.inc.php:248 include/locales/en_gb.inc.php:821
+#: include/locales/en_gb.inc.php:822 include/locales/en_gb.inc.php:823
+#: include/locales/en_gb.inc.php:830 include/locales/en_gb.inc.php:831
+#: include/locales/en_gb.inc.php:832 include/locales/en_gb.inc.php:833
+#: include/locales/en_gb.inc.php:838 include/locales/en_gb.inc.php:979
+#: include/locales/en_gb.inc.php:1092 include/locales/en_gb.inc.php:1418
+#: include/locales/en_gb.inc.php:1422 include/locales/en_gb.inc.php:1570
 #, fuzzy
 msgid "d M Y H:i:s"
 msgstr "d M H:i:s"
 
-#: include/locales/en_gb.inc.php:1014 include/locales/en_gb.inc.php:1017
+#: include/locales/en_gb.inc.php:1013 include/locales/en_gb.inc.php:1016
 msgid "d.M"
 msgstr "d.M"
 
@@ -10634,11 +10620,11 @@ msgstr "d.m Y H:i"
 msgid "d.m.y"
 msgstr "d.m.y"
 
-#: include/locales/en_gb.inc.php:1603
+#: include/locales/en_gb.inc.php:1584
 msgid "day"
 msgstr "Tag"
 
-#: include/locales/en_gb.inc.php:1505
+#: include/locales/en_gb.inc.php:1486
 msgid "days"
 msgstr "Tage"
 
@@ -10646,11 +10632,11 @@ msgstr "Tage"
 msgid "default"
 msgstr "Standard"
 
-#: include/locales/en_gb.inc.php:1668
+#: include/locales/en_gb.inc.php:1649
 msgid "does not exist"
 msgstr "existiert nicht"
 
-#: include/locales/en_gb.inc.php:1689
+#: include/locales/en_gb.inc.php:1670
 msgid "dynamic"
 msgstr "dynamisch"
 
@@ -10666,7 +10652,7 @@ msgstr "Elemente kopieren nach ..."
 msgid "esc_step_from and esc_step_to must be set together."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1602
+#: include/locales/en_gb.inc.php:1583
 #, fuzzy
 msgid "every"
 msgstr "jeden"
@@ -10680,15 +10666,15 @@ msgstr "genau"
 msgid "executed"
 msgstr "ausgeführt"
 
-#: include/locales/en_gb.inc.php:1688
+#: include/locales/en_gb.inc.php:1669
 msgid "fixed"
 msgstr "fest"
 
-#: include/locales/en_gb.inc.php:1566
+#: include/locales/en_gb.inc.php:1547
 msgid "for function"
 msgstr "für Funktion"
 
-#: include/locales/en_gb.inc.php:1425
+#: include/locales/en_gb.inc.php:1406
 msgid "found"
 msgstr "gefunden"
 
@@ -10696,7 +10682,7 @@ msgstr "gefunden"
 msgid "h"
 msgstr "h"
 
-#: include/locales/en_gb.inc.php:1559
+#: include/locales/en_gb.inc.php:1540
 msgid "has been deleted from the system"
 msgstr "wurde vom System gelöscht"
 
@@ -10708,7 +10694,7 @@ msgstr "Host"
 msgid "host group"
 msgstr "Host-Gruppe"
 
-#: include/locales/en_gb.inc.php:912
+#: include/locales/en_gb.inc.php:911
 msgid "http://www.zabbix.com"
 msgstr "http://www.zabbix.com"
 
@@ -10725,39 +10711,39 @@ msgstr "Bild"
 msgid "in"
 msgstr "in"
 
-#: api/classes/class.citemkey.php:202
+#: api/classes/class.citemkey.php:187
 #, php-format
 msgid "incorrect syntax near '%1$s'"
 msgstr "Falsche Syntax in der Nähe von '%1$s'"
 
-#: api/classes/class.citemkey.php:261
+#: api/classes/class.citemkey.php:244
 #, php-format
 msgid "incorrect syntax near '%1$s' at position %2$d"
 msgstr "Falsche Syntax in der Nähe von '%1$s' an der Position %2$d"
 
-#: api/classes/class.citemkey.php:214 api/classes/class.citemkey.php:252
-#: api/classes/class.citemkey.php:298
+#: api/classes/class.citemkey.php:199 api/classes/class.citemkey.php:235
+#: api/classes/class.citemkey.php:280
 #, php-format
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
 msgstr "Klammer-Symbole falsch verwendet. Nach der letzten Klammer steht '%s'."
 
-#: include/locales/en_gb.inc.php:1057
+#: include/locales/en_gb.inc.php:1056
 msgid "is a wrong time format. Should be from 00:00 to 24:00."
 msgstr "ist ein falsches Datumsformat. Gültig ist 00:00 bis 24:00."
 
-#: include/locales/en_gb.inc.php:1551
+#: include/locales/en_gb.inc.php:1532
 msgid "is internal and can not be deleted"
 msgstr "ist intern und kann nicht gelöscht werden"
 
-#: include/locales/en_gb.inc.php:1570
+#: include/locales/en_gb.inc.php:1551
 msgid "is not a float or counter or macro for function"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1569
+#: include/locales/en_gb.inc.php:1550
 msgid "is not a float or macro for function"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1052 include/locales/en_gb.inc.php:1053
+#: include/locales/en_gb.inc.php:1051 include/locales/en_gb.inc.php:1052
 msgid "l H:i"
 msgstr ""
 
@@ -10772,7 +10758,7 @@ msgstr "like"
 
 #: include/func.inc.php:378 include/func.inc.php:399
 #: include/locales/en_gb.inc.php:30 include/locales/en_gb.inc.php:34
-#: include/locales/en_gb.inc.php:1511
+#: include/locales/en_gb.inc.php:1492
 msgid "m"
 msgstr "m"
 
@@ -10812,7 +10798,7 @@ msgstr "ms"
 msgid "must be a valid LDAP user"
 msgstr "muss ein gültiger LDAP-Benutzer sein"
 
-#: include/locales/en_gb.inc.php:1507
+#: include/locales/en_gb.inc.php:1488
 #, fuzzy
 msgid "n"
 msgstr "n"
@@ -10842,7 +10828,7 @@ msgstr "not in"
 msgid "not like"
 msgstr "not like"
 
-#: include/locales/en_gb.inc.php:1004
+#: include/locales/en_gb.inc.php:1003
 msgid "not running"
 msgstr "nicht aktiv"
 
@@ -10855,20 +10841,20 @@ msgstr "nicht ausgewählt"
 msgid "not sent"
 msgstr "nicht gesendet"
 
-#: include/locales/en_gb.inc.php:1690
+#: include/locales/en_gb.inc.php:1671
 msgid "now"
 msgstr "jetzt"
 
-#: include/locales/en_gb.inc.php:129 include/locales/en_gb.inc.php:948
+#: include/locales/en_gb.inc.php:129 include/locales/en_gb.inc.php:947
 msgid "of"
 msgstr "von"
 
-#: include/locales/en_gb.inc.php:1604
+#: include/locales/en_gb.inc.php:1585
 #, fuzzy
 msgid "of every"
 msgstr "jeder"
 
-#: include/locales/en_gb.inc.php:1601
+#: include/locales/en_gb.inc.php:1582
 #, fuzzy
 msgid "on"
 msgstr "an"
@@ -10881,7 +10867,7 @@ msgstr "an"
 msgid "or"
 msgstr "oder"
 
-#: include/locales/en_gb.inc.php:1703
+#: include/locales/en_gb.inc.php:1684
 msgid "other"
 msgstr "andere"
 
@@ -10903,12 +10889,12 @@ msgstr "aktualisieren alle"
 msgid "remember selected"
 msgstr "Auswahl merken"
 
-#: include/locales/en_gb.inc.php:1202
+#: include/locales/en_gb.inc.php:1201
 msgid "root"
 msgstr "root"
 
 # läuft
-#: include/locales/en_gb.inc.php:1003
+#: include/locales/en_gb.inc.php:1002
 msgid "running"
 msgstr "läuft"
 
@@ -10934,7 +10920,7 @@ msgstr "gesendet"
 msgid "show icon mappings"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1534
+#: include/locales/en_gb.inc.php:1515
 #, fuzzy
 msgid "show value mappings"
 msgstr "Wert-Zuordnung zeigen"
@@ -10956,19 +10942,19 @@ msgstr "Auslöser"
 msgid "unknown"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1543
+#: include/locales/en_gb.inc.php:1524
 msgid "updated"
 msgstr "aktualisiert"
 
-#: include/locales/en_gb.inc.php:1553
+#: include/locales/en_gb.inc.php:1534
 msgid "used by scenario"
 msgstr "benutzt von Szenario"
 
-#: include/locales/en_gb.inc.php:904
+#: include/locales/en_gb.inc.php:903
 msgid "used in exported map"
 msgstr "benutzt in exportierter Karte"
 
-#: include/locales/en_gb.inc.php:1144
+#: include/locales/en_gb.inc.php:1143
 msgid "used in exported screen"
 msgstr "benutzt in exportierter Übersichtstafel"
 
@@ -10976,15 +10962,15 @@ msgstr "benutzt in exportierter Übersichtstafel"
 msgid "w"
 msgstr "w"
 
-#: include/locales/en_gb.inc.php:1606
+#: include/locales/en_gb.inc.php:1587
 msgid "week"
 msgstr "Woche"
 
-#: include/locales/en_gb.inc.php:1605
+#: include/locales/en_gb.inc.php:1586
 msgid "weeks"
 msgstr "Wochen"
 
-#: include/locales/en_gb.inc.php:1595
+#: include/locales/en_gb.inc.php:1576
 #, fuzzy
 msgid "with template host cannot contain items from other hosts."
 msgstr "Mit Vorlage kann der Host keine Elemente anderer Host enthalten."
@@ -11003,6 +10989,6 @@ msgstr "y"
 msgid "yes"
 msgstr "Ja"
 
-#: include/locales/en_gb.inc.php:1509
+#: include/locales/en_gb.inc.php:1490
 msgid "µ"
 msgstr "µ"
