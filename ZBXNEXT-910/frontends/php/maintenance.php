@@ -242,7 +242,7 @@ elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])
 		info(_('Incorrect maintenance period'));
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME && $new_timeperiod['start_date'] < 1) {
-		error(_('Incorrect maintenance date must be between 1970.01.01 and 2038.01.18'));
+		error(_('Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18'));
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY && $new_timeperiod['every'] < 1) {
 		info(_('Incorrect maintenance day period'));
