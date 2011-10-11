@@ -42,7 +42,7 @@ static size_t	WRITEFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userdat
 		page.data = zbx_malloc(page.data, page.allocated);
 	}
 
-	zbx_snprintf_alloc(&page.data, &page.allocated, &page.offset, MAX(8096, r_size), "%s", ptr);
+	zbx_strncpy_alloc(&page.data, &page.allocated, &page.offset, ptr, r_size);
 
 	return r_size;
 }

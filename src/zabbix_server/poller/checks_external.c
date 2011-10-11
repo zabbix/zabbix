@@ -45,7 +45,8 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	const char	*__function_name = "get_value_external";
 	char		key[MAX_STRING_LEN], params[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX],
 			*cmd = NULL, *buf = NULL;
-	int		rc, cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0, ret = NOTSUPPORTED;
+	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
+	int		rc, ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
@@ -56,8 +57,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	cmd = zbx_malloc(cmd, cmd_alloc);
-	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, strlen(CONFIG_EXTERNALSCRIPTS) + strlen(key) + 2,
-			"%s/%s", CONFIG_EXTERNALSCRIPTS, key);
+	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, "%s/%s", CONFIG_EXTERNALSCRIPTS, key);
 
 	if (-1 == access(cmd, X_OK))
 	{
@@ -85,7 +85,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 			}
 
 			param_esc = zbx_dyn_escape_string(param, "\"\\");
-			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, strlen(param_esc) + 4, " \"%s\"", param_esc);
+			zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " \"%s\"", param_esc);
 			zbx_free(param_esc);
 		}
 	}

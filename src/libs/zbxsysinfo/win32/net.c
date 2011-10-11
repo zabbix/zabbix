@@ -325,7 +325,8 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 {
 	DWORD		dwSize, dwRetVal, i, j;
 	char		*buf = NULL;
-	int		buf_alloc = 512, buf_offset = 0, ret = SYSINFO_RET_FAIL;
+	size_t		buf_alloc = 512, buf_offset = 0;
+	int		ret = SYSINFO_RET_FAIL;
 	/* variables used for GetIfTable and GetIfEntry */
 	MIB_IFTABLE	*pIfTable = NULL;
 	MIB_IFROW	pIfRow;
@@ -384,27 +385,27 @@ int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 				continue;
 			}
 
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, 32,
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 					"%-25s", get_if_type_string(pIfRow.dwType));
 
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, 16,
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 					" %-8s", get_if_adminstatus_string(pIfRow.dwAdminStatus));
 
 			for (j = 0; j < pIPAddrTable->dwNumEntries; j++)
 				if (pIPAddrTable->table[j].dwIndex == pIfRow.dwIndex)
 				{
 					in_addr.S_un.S_addr = pIPAddrTable->table[j].dwAddr;
-					zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, 17,
+					zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 							" %-15s", inet_ntoa(in_addr));
 					break;
 				}
 
 			if (j == pIPAddrTable->dwNumEntries)
-				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, 3, " -");
+				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, " -");
 
 			wdescr = zbx_acp_to_unicode(pIfRow.bDescr);
 			utf8_descr = zbx_unicode_to_utf8(wdescr);
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, strlen(utf8_descr) + 3, " %s\n", utf8_descr);
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s\n", utf8_descr);
 			zbx_free(utf8_descr);
 			zbx_free(wdescr);
 		}
