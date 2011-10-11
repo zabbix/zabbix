@@ -1433,8 +1433,8 @@ COpt::memoryPick();
 			));
 
 			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
-			$expression = isset($trigger['expression']) ? $trigger['expression'] : explode_exp($dbTrigger['expression']);
-			info(_s('Trigger prototype [%1$s:%2$s] updated.', $description, $expression));
+			$expression = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
+			info(_s('Trigger prototype "%1$s:%2$s" updated.', $description, $expression));
 		}
 		unset($trigger);
 	}
