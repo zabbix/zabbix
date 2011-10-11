@@ -75,7 +75,6 @@ ZBX_DC_ITEM_HK
 	zbx_uint64_t	hostid;
 	const char	*key;			/* interned; key[ITEM_KEY_LEN_MAX];					*/
 	ZBX_DC_ITEM	*item_ptr;
-	unsigned int	sync_num;
 };
 
 ZBX_DC_SNMPITEM
@@ -175,7 +174,6 @@ ZBX_DC_HOST_PH
 	zbx_uint64_t	proxy_hostid;
 	const char	*host;			/* interned; host[HOST_HOST_LEN_MAX];					*/
 	ZBX_DC_HOST	*host_ptr;
-	unsigned int	sync_num;
 	unsigned char	status;
 };
 
@@ -213,8 +211,6 @@ ZBX_DC_CONFIG
 static ZBX_DC_CONFIG	*config = NULL;
 static ZBX_MUTEX	config_lock;
 static zbx_mem_info_t	*config_mem;
-
-static unsigned int	sync_num = 0;
 
 static const char	*INTERNED_SERVER_STATUS_KEY;
 static const char	*INTERNED_SERVER_ZABBIXLOG_KEY;
@@ -544,15 +540,15 @@ static void	DCsync_items(DB_RESULT result)
 
 		update_index = 0;
 
-		if (!(found && item->hostid == hostid && 0 == strcmp(item->key, row[6])))
+		if (0 == found || item->hostid != hostid || 0 != strcmp(item->key, row[6]))
 		{
-			if (found)
+			if (1 == found)
 			{
 				item_hk_local.hostid = item->hostid;
 				item_hk_local.key = item->key;
 				item_hk = zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-				if (sync_num != item_hk->sync_num)
+				if (item == item_hk->item_ptr)
 				{
 					zbx_strpool_release(item_hk->key);
 					zbx_hashset_remove(&config->items_hk, &item_hk_local);
@@ -564,10 +560,7 @@ static void	DCsync_items(DB_RESULT result)
 			item_hk = zbx_hashset_search(&config->items_hk, &item_hk_local);
 
 			if (NULL != item_hk)
-			{
 				item_hk->item_ptr = item;
-				item_hk->sync_num = sync_num;
-			}
 			else
 				update_index = 1;
 		}
@@ -582,16 +575,15 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* update items_hk index using new data, if not done already */
 
-		if (update_index)
+		if (1 == update_index)
 		{
 			item_hk_local.hostid = item->hostid;
 			item_hk_local.key = zbx_strpool_acquire(item->key);
 			item_hk_local.item_ptr = item;
-			item_hk_local.sync_num = sync_num;
 			zbx_hashset_insert(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK));
 		}
 
-		if (!found)
+		if (0 == found)
 		{
 			item->location = ZBX_LOC_NOWHERE;
 			item->poller_type = ZBX_NO_POLLER;
@@ -932,7 +924,7 @@ static void	DCsync_items(DB_RESULT result)
 		item_hk_local.key = item->key;
 		item_hk = zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-		if (sync_num != item_hk->sync_num)
+		if (item == item_hk->item_ptr)
 		{
 			zbx_strpool_release(item_hk->key);
 			zbx_hashset_remove(&config->items_hk, &item_hk_local);
@@ -1001,7 +993,7 @@ static void	DCsync_hosts(DB_RESULT result)
 				host_ph_local.host = host->host;
 				host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
 
-				if (sync_num != host_ph->sync_num)
+				if (NULL != host_ph && host == host_ph->host_ptr)	/* see ZBX-4045 for NULL check */
 				{
 					zbx_strpool_release(host_ph->host);
 					zbx_hashset_remove(&config->hosts_ph, &host_ph_local);
@@ -1014,20 +1006,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
 
 			if (NULL != host_ph)
-			{
-				if (0 == found || sync_num == host_ph->sync_num)
-				{
-					/* duplicate hosts or proxies found */
-
-					zabbix_log(LOG_LEVEL_CRIT, "Error: duplicate %s [%s] found. Exiting...",
-							HOST_STATUS_MONITORED == host_ph->status ? "hosts" : "proxies",
-							host_ph->host);
-					exit(FAIL);
-				}
-
 				host_ph->host_ptr = host;
-				host_ph->sync_num = sync_num;
-			}
 			else
 				update_index = 1;
 		}
@@ -1083,11 +1062,10 @@ static void	DCsync_hosts(DB_RESULT result)
 			host_ph_local.status = host->status;
 			host_ph_local.host = zbx_strpool_acquire(host->host);
 			host_ph_local.host_ptr = host;
-			host_ph_local.sync_num = sync_num;
 			zbx_hashset_insert(&config->hosts_ph, &host_ph_local, sizeof(ZBX_DC_HOST_PH));
 		}
 
-		if (update_queue)
+		if (1 == update_queue)
 			DCupdate_proxy_queue(host);
 
 		/* IPMI hosts */
@@ -1154,7 +1132,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		host_ph_local.host = host->host;
 		host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
 
-		if (sync_num != host_ph->sync_num)
+		if (NULL != host_ph && host == host_ph->host_ptr)	/* see ZBX-4045 for NULL check */
 		{
 			zbx_strpool_release(host_ph->host);
 			zbx_hashset_remove(&config->hosts_ph, &host_ph_local);
@@ -1228,8 +1206,6 @@ void	DCsync_configuration()
 
 	LOCK_CACHE;
 
-	sync_num++;
-
 	sec = zbx_time();
 	DCsync_items(item_result);
 	DCsync_hosts(host_result);
@@ -1237,7 +1213,6 @@ void	DCsync_configuration()
 
 	strpool = zbx_strpool_info();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync_num   : %u", __function_name, sync_num);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name, isec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() host sql   : " ZBX_FS_DBL " sec.", __function_name, hsec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync lock  : " ZBX_FS_DBL " sec.", __function_name, ssec);
@@ -2375,12 +2350,12 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 
 	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
 	{
-		if (0x01 & update_nextcheck)
+		if (0 != (0x01 & update_nextcheck))
 		{
 			dc_host->snmp_disable_until = (int)calculate_proxy_nextcheck(
 					dc_host->hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
 		}
-		if (0x02 & update_nextcheck)
+		if (0 != (0x02 & update_nextcheck))
 		{
 			dc_host->ipmi_disable_until = (int)calculate_proxy_nextcheck(
 					dc_host->hostid, CONFIG_PROXYDATA_FREQUENCY, now);
