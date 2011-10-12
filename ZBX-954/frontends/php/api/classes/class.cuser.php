@@ -932,7 +932,7 @@ Copt::memoryPick();
 
 
 		$sql = 'SELECT MAX(g.gui_access) as gui_access'.
-			' FROM usrgrp g, users_groups ug'.
+			' FROM usrgrp g,users_groups ug'.
 			' WHERE ug.userid='.$userInfo['userid'].
 				' AND g.usrgrpid=ug.usrgrpid';
 		$db_access = DBfetch(DBselect($sql));
