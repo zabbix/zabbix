@@ -66,5 +66,5 @@ CONF_INCLUDE_DIRS = \
 
 install-data-hook:
 	for dir in $(CONF_INCLUDE_DIRS); do \
-		test -d $(CONF_INCLUDE_DIRS) || mkdir -p $(CONF_INCLUDE_DIRS); \
+		test -d $$dir || $(MKDIR_P) $(CONF_INCLUDE_DIRS); \
 	done

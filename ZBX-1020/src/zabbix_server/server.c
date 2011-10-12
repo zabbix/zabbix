@@ -361,7 +361,7 @@ static void	zbx_load_config()
 #endif
 
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, SYSCONFDIR "/externalscripts");
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATAROOTDIR "/zabbix/externalscripts");
 
 	if (0 == CONFIG_NODEID)
 		CONFIG_NODEWATCHER_FORKS = 0;
