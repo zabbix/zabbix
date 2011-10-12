@@ -219,12 +219,12 @@ zbx_graph_item_type;
 #define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;\n")
 
 #define	ZBX_SQL_STRCMP		"%s%s%s"
-#define	ZBX_SQL_STRVAL_EQ(str)	str[0] != '\0' ? "='"  : "",			\
-				str[0] != '\0' ? str   : " is null",		\
-				str[0] != '\0' ? "'"   : ""
-#define	ZBX_SQL_STRVAL_NE(str)	str[0] != '\0' ? "<>'" : "",			\
-				str[0] != '\0' ? str   : " is not null",	\
-				str[0] != '\0' ? "'"   : ""
+#define	ZBX_SQL_STRVAL_EQ(str)	'\0' != *str ? "='"  : "",		\
+				'\0' != *str ? str   : " is null",	\
+				'\0' != *str ? "'"   : ""
+#define	ZBX_SQL_STRVAL_NE(str)	'\0' != *str ? "<>'" : "",		\
+				'\0' != *str ? str   : " is not null",	\
+				'\0' != *str ? "'"   : ""
 #else
 #define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)
 #define	DBend_multiple_update(sql, sql_alloc, sql_offset)

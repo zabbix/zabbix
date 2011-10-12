@@ -136,10 +136,7 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 	return res;
 error:
 	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
-		CONFIG_NODEID,
-		sender_nodeid,
-		nodeid,
-		data);
+		CONFIG_NODEID, sender_nodeid, nodeid, data);
 fail:
 	buffer_offset= 0;
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, "FAIL");
@@ -255,7 +252,6 @@ static int	process_record(char **sql, size_t *sql_alloc, size_t *sql_offset, int
 		const char *record, int lastrecord)
 {
 	const char	*r;
-	size_t		len;
 	int		f, res = FAIL;
 	char		*value_esc;
 
@@ -286,7 +282,7 @@ static int	process_record(char **sql, size_t *sql_alloc, size_t *sql_offset, int
 		if (NULL == r)
 			goto error;
 
-		len = zbx_get_next_field(&r, &buffer, &buffer_alloc, ZBX_DM_DELIMITER);
+		zbx_get_next_field(&r, &buffer, &buffer_alloc, ZBX_DM_DELIMITER);
 
 		if (table->fields[f].type == ZBX_TYPE_INT ||
 				table->fields[f].type == ZBX_TYPE_UINT ||
@@ -302,6 +298,8 @@ static int	process_record(char **sql, size_t *sql_alloc, size_t *sql_offset, int
 			else
 			{
 #ifdef HAVE_POSTGRESQL
+				size_t	len;
+
 				len = zbx_hex2binary(buffer);
 				zbx_pg_escape_bytea((u_char *)buffer, len, &tmp, &tmp_alloc);
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "'%s',", tmp);
@@ -347,10 +345,7 @@ static int	process_record(char **sql, size_t *sql_alloc, size_t *sql_offset, int
 	return res;
 error:
 	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
-		CONFIG_NODEID,
-		sender_nodeid,
-		nodeid,
-		record);
+		CONFIG_NODEID, sender_nodeid, nodeid, record);
 
 	return FAIL;
 }
@@ -375,7 +370,6 @@ static int	process_items(char **sql, size_t *sql_alloc, size_t *sql_offset, int 
 		const char *record, int lastrecord)
 {
 	const char	*r;
-	size_t		len;
 	int		f, res = FAIL;
 	zbx_uint64_t	itemid = 0;
 	char		*value_esc;
@@ -398,7 +392,7 @@ static int	process_items(char **sql, size_t *sql_alloc, size_t *sql_offset, int 
 		if (NULL == r)
 			goto error;
 
-		len = zbx_get_next_field(&r, &buffer, &buffer_alloc, ZBX_DM_DELIMITER);
+		zbx_get_next_field(&r, &buffer, &buffer_alloc, ZBX_DM_DELIMITER);
 
 		if (0 == strcmp(table->fields[f].name, "itemid"))
 			ZBX_STR2UINT64(itemid, buffer);
@@ -457,10 +451,7 @@ static int	process_items(char **sql, size_t *sql_alloc, size_t *sql_offset, int 
 	return res;
 error:
 	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
-		CONFIG_NODEID,
-		sender_nodeid,
-		nodeid,
-		record);
+		CONFIG_NODEID, sender_nodeid, nodeid, record);
 
 	return FAIL;
 }
@@ -564,18 +555,13 @@ int	node_history(char *data, size_t datalen)
 			if (NULL == table)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Invalid received data: unknown tablename \"%s\"",
-					CONFIG_NODEID,
-					buffer);
+					CONFIG_NODEID, buffer);
 				res = FAIL;
 			}
 			if (NULL != newline)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received %s from node %d for node %d datalen " ZBX_FS_SIZE_T,
-					CONFIG_NODEID,
-					buffer,
-					sender_nodeid,
-					nodeid,
-					(zbx_fs_size_t)datalen);
+					CONFIG_NODEID, buffer, sender_nodeid, nodeid, (zbx_fs_size_t)datalen);
 			}
 			firstline = 0;
 			sql1_offset = 0;

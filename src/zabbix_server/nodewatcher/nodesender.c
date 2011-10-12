@@ -563,14 +563,15 @@ char	*DMget_config_data(int nodeid, int dest_nodetype)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int update_checksums(int nodeid, int synked_nodetype, int synked, const char *tablename, const zbx_uint64_t id, char *fields)
+int	update_checksums(int nodeid, int synked_nodetype, int synked, const char *tablename,
+		const zbx_uint64_t id, char *fields)
 {
 	const char	*__function_name = "update_checksums";
 	char		*r[2], *d[2], sync[129], *s;
 	char		c[2], sql[2][256];
-	char		cksum[32*64+32], *ck;
+	char		cksum[32 * 64 + 32], *ck;
 	char		*exsql = NULL;
-	size_t		exsql_alloc = 65536, exsql_offset = 0;
+	size_t		exsql_alloc = 64 * ZBX_KIBIBYTE, exsql_offset = 0;
 	int		cksumtype;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -588,12 +589,15 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 	c[0] = synked == SUCCEED ? '1' : ' ';	/* for new and updated records */
 	c[1] = synked == SUCCEED ? '2' : ' ';	/* for deleted records */
 
-	if (NULL != tablename) {
+	if (NULL != tablename)
+	{
 		zbx_snprintf(sql[0], sizeof(sql[0]), " and curr.tablename='%s' and curr.recordid=" ZBX_FS_UI64,
 			tablename, id);
 		zbx_snprintf(sql[1], sizeof(sql[1]), " and prev.tablename='%s' and prev.recordid=" ZBX_FS_UI64,
 			tablename, id);
-	} else {
+	}
+	else
+	{
 		*sql[0] = '\0';
 		*sql[1] = '\0';
 	}
