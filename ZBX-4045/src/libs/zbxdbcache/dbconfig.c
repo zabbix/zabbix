@@ -1870,7 +1870,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 				gmacro_m_local.macro = gmacro->macro;
 				gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
 
-				if (gmacro == gmacro_m->gmacro_ptr)
+				if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
 				{
 					zbx_strpool_release(gmacro_m->macro);
 					zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
@@ -1915,7 +1915,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 		gmacro_m_local.macro = gmacro->macro;
 		gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
 
-		if (gmacro == gmacro_m->gmacro_ptr)
+		if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
 		{
 			zbx_strpool_release(gmacro_m->macro);
 			zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
@@ -2095,8 +2095,11 @@ static void	DCsync_interfaces(DB_RESULT result)
 				interface_ht_local.type = interface->type;
 				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
 
-				if (interface == interface_ht->interface_ptr)
+				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
+				{
+					/* see ZBX-4045 for NULL check in the conditional */
 					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
+				}
 			}
 
 			if (1 == main_)
@@ -2190,8 +2193,11 @@ static void	DCsync_interfaces(DB_RESULT result)
 				interface_ht_local.type = interface->type;
 				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
 
-				if (interface == interface_ht->interface_ptr)
+				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
+				{
+					/* see ZBX-4045 for NULL check in the conditional */
 					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
+				}
 			}
 
 			zbx_strpool_release(interface->ip);
