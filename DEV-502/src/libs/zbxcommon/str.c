@@ -238,7 +238,7 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
  * Function: zbx_strncpy_alloc, zbx_strcpy_alloc, zbx_chrcpy_alloc            *
  *                                                                            *
  * Purpose: If there is no '\0' byte among the first n bytes of src,          *
- *          then all n bytes will be placed placed into the dest buffer.      *
+ *          then all n bytes will be placed into the dest buffer.             *
  *          In other case only strlen() bytes will be placed there.           *
  *          Add zero character at the end of string.                          *
  *          Reallocs memory if not enough.                                    *
