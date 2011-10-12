@@ -27,7 +27,10 @@ done
 
 echo "Generating SQL files"
 
+cat images_oracle_start.txt > $imagefile_oracle
+
 imagecount=$(ls $outputdir/*.png | wc -l)
+
 for imagefile in $outputdir/*.png; do
 	((imagesdone++))
 	imagename=$(basename ${imagefile%.png})
@@ -35,6 +38,8 @@ for imagefile in $outputdir/*.png; do
 	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',0x$(hexdump -ve '"" 1/1 "%02X"' "$imagefile"));" >> $imagefile_mysql
 	# ----- PostgreSQL
 	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',decode('$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")','hex'));" >> $imagefile_pgsql
+	# ----- Oracle
+	echo -e "\tLOAD_IMAGE($imagesdone,1,'$imagename','$imagefile');" >> $imagefile_oracle
 	# ----- SQLite
 	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename','$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")');" >> $imagefile_sqlite3
 	# ----- DB2
@@ -42,4 +47,5 @@ for imagefile in $outputdir/*.png; do
 
 	echo -n "$[$imagesdone*100/$imagecount]% "
 done
+cat images_oracle_end.txt >> $imagefile_oracle 
 echo
