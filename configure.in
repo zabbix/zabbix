@@ -939,9 +939,6 @@ dnl *         Checks for options given on the command line          *
 dnl *                                                               *
 dnl *****************************************************************
 
-test ${sysconfdir} = '${prefix}/etc' && sysconfdir="/etc/zabbix"
-AC_DEFINE_UNQUOTED([SYSCONFDIR], "${sysconfdir}", [Directory containing configuration files.])
-
 AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries],
 [case "${enableval}" in
   yes) LDFLAGS="${LDFLAGS} -static" ;;
