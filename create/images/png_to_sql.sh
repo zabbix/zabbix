@@ -32,13 +32,13 @@ for imagefile in $outputdir/*.png; do
 	((imagesdone++))
 	imagename=$(basename ${imagefile%.png})
 	# ----- MySQL
-	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagecount,1,'$imagename',0x$(hexdump -ve '"" 1/1 "%02X"' "$imagefile"));" >> $imagefile_mysql
+	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',0x$(hexdump -ve '"" 1/1 "%02X"' "$imagefile"));" >> $imagefile_mysql
 	# ----- PostgreSQL
-	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagecount,1,'$imagename',decode('$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")','hex'));" >> $imagefile_pgsql
+	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',decode('$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")','hex'));" >> $imagefile_pgsql
 	# ----- SQLite
-	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagecount,1,'$imagename','$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")');" >> $imagefile_sqlite3
+	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename','$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")');" >> $imagefile_sqlite3
 	# ----- DB2
-	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagecount,1,'$imagename',blob(x'$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")'));" >> $imagefile_db2
+	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',blob(x'$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")'));" >> $imagefile_db2
 
 	echo -n "$[$imagesdone*100/$imagecount]% "
 done
