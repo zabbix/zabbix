@@ -176,14 +176,14 @@ int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 {
 	va_list	args;
-	size_t	availbl_len, written_len;
+	size_t	avail_len, written_len;
 retry:
 	va_start(args, fmt);
 
-	availbl_len = *alloc_len - *offset;
-	written_len = zbx_vsnprintf(*str + *offset, availbl_len, fmt, args);
+	avail_len = *alloc_len - *offset;
+	written_len = zbx_vsnprintf(*str + *offset, avail_len, fmt, args);
 
-	if (written_len == availbl_len - 1)
+	if (written_len == avail_len - 1)
 	{
 		*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
