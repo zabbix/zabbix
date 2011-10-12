@@ -57,9 +57,10 @@ zabbix_proxy_LDFLAGS = \
 
 zabbix_proxy_CFLAGS = \
 	-DZABBIX_DAEMON \
-	-DSYSCONFDIR="\"@sysconfdir@\""
+	-DSYSCONFDIR="\"@sysconfdir@\"" \
+	-DDATAROOTDIR="\"@datarootdir@\""
 
 CONF_INCLUDE_DIR = "@sysconfdir@/zabbix_proxy.conf.d"
 
 install-data-hook:
-	test -d $(CONF_INCLUDE_DIR) || mkdir -p $(CONF_INCLUDE_DIR)
+	test -d $(CONF_INCLUDE_DIR) || $(MKDIR_P) $(CONF_INCLUDE_DIR)
