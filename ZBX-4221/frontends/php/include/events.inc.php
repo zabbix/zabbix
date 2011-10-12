@@ -328,7 +328,11 @@ function make_small_eventlist($eventid, $trigger_data){
 		'limit' => 20,
 	);
 	$events = CEvent::get($options);
-	morder_result($events, array('clock', 'eventid'), ZBX_SORT_DOWN);
+	$sortFields = array(
+		array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
+		array('field' => 'eventid', 'order' => ZBX_SORT_DOWN),
+	);
+	ArraySorter::sort($events, $sortFields);
 
 	$nextEvent = get_next_event($curevent);
 

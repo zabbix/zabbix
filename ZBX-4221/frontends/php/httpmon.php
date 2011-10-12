@@ -202,7 +202,7 @@ include_once('include/page_header.php');
 //SDI($sql);
 	$db_httptests_res = DBselect($sql);
 	while($httptest_data = DBfetch($db_httptests_res)){
-		$httptest_data['step_cout'] = null;
+		$httptest_data['step_count'] = null;
 		$db_apps[$httptest_data['applicationid']]['scenarios_cnt']++;
 
 		$db_httptests[$httptest_data['httptestid']] = $httptest_data;
@@ -216,7 +216,7 @@ include_once('include/page_header.php');
 //SDI($sql);
 	$httpstep_res = DBselect($sql);
 	while($step_cout = DBfetch($httpstep_res)){
-		$db_httptests[$step_cout['httptestid']]['step_cout'] = $step_cout['cnt'];
+		$db_httptests[$step_cout['httptestid']]['step_count'] = $step_cout['cnt'];
 	}
 
 	$tab_rows = array();
@@ -238,7 +238,7 @@ include_once('include/page_header.php');
 
 		if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
 			$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstep']);
-			$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '.S_OF_SMALL.' '.$httptest_data['step_cout'].']';
+			$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '.S_OF_SMALL.' '.$httptest_data['step_count'].']';
 
 			$status['msg'] = S_IN_PROGRESS;
 			$status['style'] = 'orange';
@@ -249,7 +249,7 @@ include_once('include/page_header.php');
 			if($httptest_data['lastfailedstep'] > 0){
 				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
 				$status['msg'] = S_FAILED_ON.' "'.$step_data['name'].'" '.
-					'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$httptest_data['step_cout'].'] '.
+					'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$httptest_data['step_count'].'] '.
 					SPACE.S_ERROR.': '.$httptest_data['error'];
 				$status['style'] = 'disabled';
 			}
@@ -268,7 +268,7 @@ include_once('include/page_header.php');
 			is_show_all_nodes()?SPACE:NULL,
 			($_REQUEST['hostid']>0)?NULL:SPACE,
 			array(str_repeat(SPACE,6), $name),
-			$httptest_data['step_cout'],
+			$httptest_data['step_count'],
 			$state,
 			$lastcheck,
 			new CSpan($status['msg'], $status['style'])
