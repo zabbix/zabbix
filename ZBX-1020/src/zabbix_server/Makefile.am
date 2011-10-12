@@ -77,3 +77,8 @@ zabbix_server_LDFLAGS = \
 zabbix_server_CFLAGS = \
 	-DZABBIX_DAEMON \
 	-DSYSCONFDIR="\"@sysconfdir@\""
+
+CONF_INCLUDE_DIR = "@sysconfdir@/zabbix_server.conf.d"
+
+install-data-hook:
+	test -d $(CONF_INCLUDE_DIR) || mkdir -p $(CONF_INCLUDE_DIR)
