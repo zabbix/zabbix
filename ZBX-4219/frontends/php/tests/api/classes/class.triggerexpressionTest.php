@@ -791,6 +791,9 @@ class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
 			array('{host:key["{HOSTNAME1}",{HOSTNAME2}].str()}', true),
 			array('{host:key[].str("{HOSTNAME1}",{HOSTNAME2})}', false),
 			array('{host:key[].count(1,"{HOSTNAME1}",{HOSTNAME2})}', true),
+			array('{host:key["{HOS.HOST}",{HOS.HOST}].str()}', true),
+			array('{host:key[].str("{HOST.HOST}",{HOST.HOST})}', false),
+			array('{host:key[].count(1,"{HOSTNAME1}",{HOSTNAME2})}', true),
 			array('{host:key[].str()}=-1=--2=---3=----4=-----5', false),
 			array('{host:key[].str()}=-1=--2=---3=----4=-----5', false),
 	// by Aleksandrs (January 6, 2011)

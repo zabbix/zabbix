@@ -1204,15 +1204,15 @@ function utf8RawUrlDecode($source){
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if(isset($functionid)) {
-						$sql = 'SELECT DISTINCT h.host'.
+						$sql = 'SELECT DISTINCT h.name'.
 								' FROM functions f,items i,hosts h'.
 								' WHERE f.itemid=i.itemid'.
 									' AND i.hostid=h.hostid'.
 									' AND f.functionid='.$functionid;
 						$host = DBfetch(DBselect($sql));
-						if(is_null($host['host']))
-							$host['host'] = $macro;
-						$description = str_replace($macro, $host['host'], $description);
+						if(is_null($host['name']))
+							$host['name'] = $macro;
+						$description = str_replace($macro, $host['name'], $description);
 					}
 				}
 			}
