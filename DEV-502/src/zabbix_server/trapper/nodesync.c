@@ -150,13 +150,12 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 	char		*dsql = NULL,
 			*isql = NULL, *ifld = NULL, *ival = NULL,
 			*usql = NULL, *ufld = NULL;
-	size_t		dsql_alloc = 4096, dsql_offset = 0, dtmp_offset = 0,
-			isql_alloc = 4096, isql_offset = 0,
-			ifld_alloc = 4096, ifld_offset = 0,
-			ival_alloc = 4096, ival_offset = 0,
-			usql_alloc = 4096, usql_offset = 0,
-			ufld_alloc = 4096, ufld_offset = 0,
-			len;
+	size_t		dsql_alloc = 4 * ZBX_KIBIBYTE, dsql_offset = 0, dtmp_offset = 0,
+			isql_alloc = 4 * ZBX_KIBIBYTE, isql_offset = 0,
+			ifld_alloc = 4 * ZBX_KIBIBYTE, ifld_offset = 0,
+			ival_alloc = 4 * ZBX_KIBIBYTE, ival_offset = 0,
+			usql_alloc = 4 * ZBX_KIBIBYTE, usql_offset = 0,
+			ufld_alloc = 4 * ZBX_KIBIBYTE, ufld_offset = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -486,7 +485,7 @@ static void	process_checksum(int nodeid, char *data, int sender_nodetype)
 			{
 				/* field name */
 				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
-	
+
 				zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "%s,", buf);
 			}
 			if (tmp_offset != 0)

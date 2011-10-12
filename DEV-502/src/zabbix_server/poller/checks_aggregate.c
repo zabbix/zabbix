@@ -106,7 +106,7 @@ static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num
 		esc = DBdyn_escape_string(group);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s'", esc);
-		
+
 		if (n != num)
 			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
 

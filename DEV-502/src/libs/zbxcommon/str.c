@@ -86,13 +86,16 @@ void	usage()
  ******************************************************************************/
 void	help()
 {
-	const char **p = help_message;
+	const char	**p = help_message;
 
 	app_title();
 	printf("\n");
+
 	usage();
 	printf("\n");
-	while (*p) printf("%s\n", *p++);
+
+	while (NULL != *p)
+		printf("%s\n", *p++);
 }
 
 /******************************************************************************
@@ -108,30 +111,18 @@ void	help()
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-/* #define ZBX_STDERR_FILE "zbx_errors.log" */
 void	__zbx_zbx_error(const char *fmt, ...)
 {
 	va_list	args;
-	FILE	*f;
-
-#if defined(ZBX_STDERR_FILE)
-	f = fopen(ZBX_STDERR_FILE, "a+");
-#else
-	f = stderr;
-#endif
 
 	va_start(args, fmt);
 
-	fprintf(f, "%s [%li]: ", progname, zbx_get_thread_id());
-	vfprintf(f, fmt, args);
-	fprintf(f, "\n");
-	fflush(f);
+	fprintf(stderr, "%s [%li]: ", progname, zbx_get_thread_id());
+	vfprintf(stderr, fmt, args);
+	fprintf(stderr, "\n");
+	fflush(stderr);
 
 	va_end(args);
-
-#if defined(ZBX_STDERR_FILE)
-	zbx_fclose(f);
-#endif
 }
 
 /******************************************************************************
@@ -179,7 +170,7 @@ int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
 void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
@@ -244,10 +235,10 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strncpy_alloc, zbx_strcpy_alloc, zbx_crrcpy_alloc            *
+ * Function: zbx_strncpy_alloc, zbx_strcpy_alloc, zbx_chrcpy_alloc            *
  *                                                                            *
  * Purpose: If there is no '\0' byte among the first n bytes of src,          *
- *          the all n bytes will be placed placed into the dest buffer.       *
+ *          then all n bytes will be placed placed into the dest buffer.      *
  *          In other case only strlen() bytes will be placed there.           *
  *          Add zero character at the end of string.                          *
  *          Reallocs memory if not enough.                                    *
@@ -256,7 +247,7 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
  *             alloc_len - [IN/OUT] already allocated memory                  *
  *             offset    - [IN/OUT] offset for writing                        *
  *             src       - [IN] copied string                                 *
- *             n         - [IN] amount of bytes, that will be copied          *
+ *             n         - [IN] maximum number of bytes to copy               *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -274,6 +265,7 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 
 	for (i = 0; i < n && '\0' != src[i]; i++)
 		(*str)[(*offset)++] = src[i];
+
 	(*str)[*offset] = '\0';
 }
 
@@ -1905,12 +1897,14 @@ size_t	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *o
 {
 	const u_char	*i = input;
 	char		*o;
-	size_t		len = (ilen * 2) + 1;
+	size_t		len;
 
 	assert(input);
 	assert(output);
 	assert(*output);
 	assert(olen);
+
+	len = 2 * ilen + 1;
 
 	if (*olen < len)
 	{

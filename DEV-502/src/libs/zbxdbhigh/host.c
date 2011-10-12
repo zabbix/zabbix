@@ -88,7 +88,6 @@ static int	validate_template(zbx_uint64_t *templateids, int templateids_num, cha
 				" from items"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids, templateids_num);
-
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				" group by key_"
 				" having count(*)>1");
@@ -137,7 +136,6 @@ static int	validate_template(zbx_uint64_t *templateids, int templateids_num, cha
 					" from graphs"
 					" where");
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", ids, ids_num);
-
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 					" group by name"
 					" having count(*)>1");
