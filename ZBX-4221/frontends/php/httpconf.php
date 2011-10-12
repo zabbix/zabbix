@@ -79,9 +79,9 @@ include_once('include/page_header.php');
 	$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 0));
 
 	check_fields($fields);
-	validate_sort_and_sortorder('wt.name',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-	$_REQUEST['go'] = get_request('go','none');
+	$_REQUEST['go'] = get_request('go', 'none');
 ?>
 <?php
 	$showdisabled = get_request('showdisabled', 0);
@@ -189,14 +189,6 @@ include_once('include/page_header.php');
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		/*
-		$delay_flex = get_request('delay_flex',array());
-		$db_delay_flex = '';
-		foreach($delay_flex as $val)
-			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
-		$db_delay_flex = trim($db_delay_flex,';');
-		// for future use */
-
 		if($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE){
 			$http_user = htmlspecialchars($_REQUEST['http_user']);
 			$http_password = htmlspecialchars($_REQUEST['http_password']);
@@ -365,13 +357,13 @@ include_once('include/page_header.php');
 	$http_wdgt = new CWidget();
 	$http_wdgt->addPageHeader(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form_button);
 
-	$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
-	if(isset($_REQUEST['form'])&&isset($_REQUEST['hostid']) && DBfetch($db_hosts)){
+	if (isset($_REQUEST['form']) && isset($_REQUEST['hostid']) && $_REQUEST['hostid']) {
 		$form = new CFormTable(S_SCENARIO);
 		$form->setName('form_scenario');
 
-		if($_REQUEST['groupid'] > 0)
+		if($_REQUEST['groupid'] > 0) {
 			$form->addVar('groupid', $_REQUEST['groupid']);
+		}
 		$form->addVar('hostid', $_REQUEST['hostid']);
 
 		if(isset($_REQUEST['httptestid'])){
@@ -620,7 +612,6 @@ include_once('include/page_header.php');
 			$db_appids[$db_app['applicationid']] = $db_app['applicationid'];
 		}
 
-
 		$db_httptests = array();
 		$sql = 'SELECT wt.*,a.name as application,h.host,h.hostid'.
 			' FROM httptest wt'.
@@ -645,11 +636,15 @@ include_once('include/page_header.php');
 			$db_httptests[$step_count['httptestid']]['step_count'] = $step_count['cnt'];
 		}
 
-		ArraySorter::sort($db_httptests, array('application', array('field' => getPageSortField('host'), 'order' => getPageSortOrder())));
+		order_result($db_httptests, getPageSortField('host'), getPageSortOrder());
 
 		$tab_rows = array();
 		foreach ($db_httptests as $httptestid => $httptest_data) {
 			$db_app = $db_apps[$httptest_data['applicationid']];
+
+			if (!isset($tab_rows[$db_app['applicationid']])) {
+				$tab_rows[$db_app['applicationid']] = array();
+			}
 
 			if(!uint_in_array($db_app['applicationid'], $_REQUEST['applications']) && !isset($show_all_apps)) {
 				continue;
@@ -660,9 +655,7 @@ include_once('include/page_header.php');
 				'&go='.($httptest_data['status'] ? 'activate' : 'disable'),
 				httptest_status2style($httptest_data['status'])));
 
-			if (!isset($tab_rows[$db_app['applicationid']])) {
-				$tab_rows[$db_app['applicationid']] = array();
-			}
+
 			$tab_rows[$db_app['applicationid']][] = array(
 				new CCheckBox('group_httptestid['.$httptest_data['httptestid'].']', null, null, $httptest_data['httptestid']),
 				is_show_all_nodes() ? SPACE : NULL,

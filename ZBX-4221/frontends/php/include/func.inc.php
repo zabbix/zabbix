@@ -886,6 +886,10 @@ class ArraySorter {
 	 */
 	protected static function compare($a, $b) {
 		foreach (self::$fields as $field) {
+			if (!(isset($a[$field['field']]) && isset($b[$field['field']]))) {
+				return 0;
+			}
+
 			if ($a[$field['field']] != $b[$field['field']]) {
 				if ($field['order'] == ZBX_SORT_UP) {
 					return strnatcasecmp($a[$field['field']], $b[$field['field']]);
