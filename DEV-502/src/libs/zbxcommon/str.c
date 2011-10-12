@@ -141,12 +141,10 @@ void	__zbx_zbx_error(const char *fmt, ...)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
+size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...)
 {
-	int	written_len;
+	size_t	written_len;
 	va_list	args;
-
-	assert(str);
 
 	va_start(args, fmt);
 	written_len = zbx_vsnprintf(str, count, fmt, args);
@@ -2333,7 +2331,8 @@ char	*zbx_dyn_escape_string(const char *src, const char *charlist)
 
 char	*zbx_age2str(int age)
 {
-	int		days, hours, minutes, offset;
+	size_t		offset;
+	int		days, hours, minutes;
 	static char	buffer[32];
 
 	days = (int)((double)age / SEC_PER_DAY);

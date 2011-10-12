@@ -24,7 +24,7 @@ static char	data_static[ZBX_MAX_B64_LEN];
 /* Get DATA from <tag>DATA</tag> */
 int xml_get_data_dyn(const char *xml, const char *tag, char **data)
 {
-	int	len;
+	size_t	len;
 	char	*start, *end;
 	size_t	sz;
 

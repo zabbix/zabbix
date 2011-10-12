@@ -1162,7 +1162,8 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
 static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
 {
 	const char	*__function_name = "proxy_get_history_data";
-	int		offset = 0, f, records = 0;
+	size_t		offset = 0;
+	int		f, records = 0;
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;

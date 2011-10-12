@@ -940,7 +940,8 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
  ******************************************************************************/
 char	*collapse_ipv6(char *str, size_t str_len)
 {
-	int		i, c = 0, m = 0, idx = -1, idx2 = -1, offset = 0;
+	size_t		offset = 0;
+	int		i, c = 0, m = 0, idx = -1, idx2 = -1;
 	unsigned int	j[8];
 
 	if (8 != sscanf(str, "%x:%x:%x:%x:%x:%x:%x:%x", &j[0], &j[1], &j[2], &j[3], &j[4], &j[5], &j[6], &j[7]))

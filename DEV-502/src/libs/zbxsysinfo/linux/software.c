@@ -84,7 +84,8 @@ static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
 
 static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages, const char *manager)
 {
-	int	i, offset = 0;
+	size_t	offset = 0;
+	int	i;
 
 	if (NULL != manager)
 		offset += zbx_snprintf(buffer + offset, size - offset, "[%s] ", manager);
@@ -116,7 +117,8 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int			ret = SYSINFO_RET_FAIL, show_pm, offset = 0, i;
+	size_t			offset = 0;
+	int			ret = SYSINFO_RET_FAIL, show_pm, i;
 	char			buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN], manager[MAX_STRING_LEN],
 				tmp[MAX_STRING_LEN], *buf = NULL, *package;
 	zbx_vector_str_t	packages;

@@ -244,7 +244,8 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "activate_host";
 	char		sql[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
-	int		offset = 0, *errors_from, *disable_until;
+	size_t		offset = 0;
+	int		*errors_from, *disable_until;
 	unsigned char	*available;
 	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
 
@@ -315,8 +316,7 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
 
 		*available = HOST_AVAILABLE_TRUE;
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
-				fld_available, *available);
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,", fld_available, *available);
 
 		if (available == &item->host.available)
 			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, ts);
@@ -324,12 +324,8 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 
 	*errors_from = 0;
 	*disable_until = 0;
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-			"%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
-			fld_errors_from, *errors_from,
-			fld_disable_until, *disable_until,
-			fld_error,
-			item->host.hostid);
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
+			fld_errors_from, *errors_from, fld_disable_until, *disable_until, fld_error, item->host.hostid);
 
 	DBbegin();
 	DBexecute("%s", sql);
@@ -342,7 +338,8 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 {
 	const char	*__function_name = "deactivate_host";
 	char		sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
-	int		offset = 0, *errors_from, *disable_until;
+	size_t		offset = 0;
+	int		*errors_from, *disable_until;
 	unsigned char	*available;
 	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
 
@@ -415,8 +412,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 		*errors_from = ts->sec;
 		*disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
-				fld_errors_from, *errors_from);
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,", fld_errors_from, *errors_from);
 	}
 	else
 	{
@@ -448,8 +444,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 			}
 
 			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s='%s',",
-					fld_error, error_esc);
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s='%s',", fld_error, error_esc);
 			zbx_free(error_esc);
 		}
 	}
