@@ -3,7 +3,6 @@
 # A script to generate SQL from PNG images
 
 # todo :
-# add support for other databases;
 # integrate in make dist;
 # generate an sql of old images as well
 # generate importable xml out of a bunch of png images
