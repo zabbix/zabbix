@@ -1769,8 +1769,9 @@ COpt::memoryPick();
 			}
 		}
 
-		// check if all trigger templates are linked to host
-		// we try to find template that is not linked to hosts ($targetids) and exists trigger that has template from ($templateids)
+		// check if all trigger templates are linked to host.
+		// we try to find template that is not linked to hosts ($targetids)
+		// and exists trigger which reference that template and template from ($templateids)
 		$sql = 'SELECT DISTINCT h.host'.
 				' FROM functions f,items i,triggers t,hosts h'.
 				' WHERE f.itemid=i.itemid'.
