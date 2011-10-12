@@ -53,4 +53,9 @@ zabbix_agentd_LDADD = $(agents_ldadd)
 zabbix_agentd_LDFLAGS = \
 	@AGENT_LDFLAGS@
 
-zabbix_agentd_CFLAGS = -DZABBIX_DAEMON
+zabbix_agentd_CFLAGS = \
+	-DZABBIX_DAEMON \
+	-DSYSCONFDIR="\"@sysconfdir@\""
+
+zabbix_agent_CFLAGS = \
+	-DSYSCONFDIR="\"@sysconfdir@\""
