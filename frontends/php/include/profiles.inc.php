@@ -315,7 +315,7 @@ function update_config($configs){
 		return NULL;
 	}
 
-return	DBexecute('UPDATE CONFIG SET '.implode(',', $update).' WHERE '.DBin_node('configid', false));
+return	DBexecute('UPDATE config SET '.implode(',', $update).' WHERE '.DBin_node('configid', false));
 }
 /************ END CONFIG **************/
 
