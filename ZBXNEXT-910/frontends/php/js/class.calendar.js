@@ -33,7 +33,6 @@ function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid) {
 
 calendar.prototype = {
 	id: null,					// personal ID
-	dt: new CDate(),			// Date object on load time
 	cdt: new CDate(),			// Date object of current(viewed) date
 	sdt: new CDate(),			// Date object of a selected date
 	month: 0,					// represents month number
@@ -41,7 +40,6 @@ calendar.prototype = {
 	day: 1,						// represents days
 	hour: 12,					// hours
 	minute: 00,					// minutes
-	timestamp: 0,				// selected date in unix timestamp
 	clndr_calendar: null,		// html obj of calendar
 	clndr_minute: null,			// html from obj
 	clndr_hour: null,			// html from obj
@@ -527,7 +525,7 @@ calendar.prototype = {
 	daysInFeb: function(year) {
 		// February has 29 days in any year evenly divisible by four,
 		// EXCEPT for centurial years which are not also divisible by 400.
-		return (((year % 4 == 0) && ( (!(year % 100 == 0)) || (year % 400 == 0))) ? 29 : 28 );
+		return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28;
 	},
 
 	daysInMonth: function(m, y) {
@@ -563,7 +561,7 @@ calendar.prototype = {
 			prev_days = 6;
 		}
 		if(prev_days > 0) {
-			this.cdt.setTime(this.cdt.getTime() - (prev_days * 86400000));
+			this.cdt.setTime(this.cdt.getTime() - prev_days * 86400000);
 		}
 
 		for (var y = 0; y < 6; y++) {
@@ -581,16 +579,16 @@ calendar.prototype = {
 					td.addClassName('grey');
 				}
 
-				if ((this.sdt.getFullYear() == this.cdt.getFullYear())
-						&& (this.sdt.getMonth() == this.cdt.getMonth())
-						&& (this.sdt.getDate() == this.cdt.getDate())) {
+				if (this.sdt.getFullYear() == this.cdt.getFullYear()
+						&& this.sdt.getMonth() == this.cdt.getMonth()
+						&& this.sdt.getDate() == this.cdt.getDate()) {
 					td.addClassName('selected');
 					this.clndr_selectedday = td;
 				}
 
 				addListener(td, 'click', this.setday.bindAsEventListener(this, this.cdt.getDate(), this.cdt.getMonth(), this.cdt.getFullYear()));
 				td.appendChild(document.createTextNode(this.cdt.getDate()));
-				this.cdt.setTime(this.cdt.getTime() + (86400000)); // + 1day
+				this.cdt.setTime(this.cdt.getTime() + 86400000); // + 1day
 			}
 		}
 	},

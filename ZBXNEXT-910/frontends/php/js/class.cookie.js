@@ -25,7 +25,7 @@ var cookie = {
 		var allCookies = document.cookie.split('; ');
 		for (var i = 0; i < allCookies.length; i++) {
 			var cookiePair = allCookies[i].split('=');
-			if (cookiePair[0].indexOf('cb_') > -1 && cookiePair[0].indexOf('cb_'+page) == -1) {
+			if (cookiePair[0].indexOf('cb_') > -1 && cookiePair[0].indexOf('cb_' + page) == -1) {
 				this.erase(cookiePair[0]);
 			}
 			else {
@@ -37,7 +37,7 @@ var cookie = {
 	create: function(name, value, days) {
 		if (typeof(days) != 'undefined') {
 			var date = new Date();
-			date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+			date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
 			var expires = '; expires=' + date.toGMTString();
 		}
 		else {
