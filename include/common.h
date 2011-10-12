@@ -853,7 +853,7 @@ double	zbx_current_time();
 #	define zbx_snprintf_alloc __zbx_zbx_snprintf_alloc
 #endif
 void	__zbx_zbx_error(const char *fmt, ...);
-int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
+size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
 void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...);
 
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);

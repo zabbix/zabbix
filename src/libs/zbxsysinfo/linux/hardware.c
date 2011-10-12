@@ -247,7 +247,7 @@ static zbx_uint64_t	get_cpu_max_freq(int cpu_num)
 
 static int	print_freq(char *buffer, int size, int filter, int cpu, zbx_uint64_t maxfreq, zbx_uint64_t curfreq)
 {
-	int	offset = 0;
+	size_t	offset = 0;
 
 	if (HW_CPU_SHOW_MAXFREQ == filter && FAIL != maxfreq)
 	{
@@ -386,7 +386,8 @@ int	SYSTEM_HW_DEVICES(const char *cmd, const char *param, unsigned flags, AGENT_
 
 int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int			ret = SYSINFO_RET_FAIL, offset, s, i, show_names;
+	size_t			offset;
+	int			ret = SYSINFO_RET_FAIL, s, i, show_names;
 	char			*p, regex[MAX_STRING_LEN], address[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	struct ifreq		*ifr;
 	struct ifconf		ifc;

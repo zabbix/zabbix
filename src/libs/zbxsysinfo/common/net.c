@@ -174,7 +174,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
-	int		res, type, retrans, retry, i, offset = 0, ret = SYSINFO_RET_FAIL;
+	size_t		offset = 0;
+	int		res, type, retrans, retry, i, ret = SYSINFO_RET_FAIL;
 	char		ip[MAX_STRING_LEN], zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	struct in_addr	inaddr;
 
