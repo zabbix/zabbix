@@ -464,7 +464,7 @@ class CMaintenance extends CZBXAPI {
 
 		// validate hosts & groups
 		if (empty($hostids) && empty($groupids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('At least one host or group should be selected'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected'));
 		}
 
 		// hosts permissions
@@ -526,6 +526,11 @@ class CMaintenance extends CZBXAPI {
 			// validate maintenance active interval
 			if ($maintenance['active_since'] > $maintenance['active_till']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance active since cannot be bigger than active till.'));
+			}
+
+			// validate timeperiods
+			if (empty($maintenance['timeperiods'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created'));
 			}
 
 			$insert[$mnum] = $maintenance;
@@ -636,13 +641,18 @@ class CMaintenance extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Maintenance active since cannot be bigger than active till.'));
 			}
 
+			// validate timeperiods
+			if (empty($maintenance['timeperiods'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created'));
+			}
+
 			$hostids = array_merge($hostids, $maintenance['hostids']);
 			$groupids = array_merge($groupids, $maintenance['groupids']);
 		}
 
 		// validate hosts & groups
 		if (empty($hostids) && empty($groupids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('At least one host or group should be selected'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one host or group should be selected'));
 		}
 
 		// validate hosts permissions
