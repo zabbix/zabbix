@@ -36,14 +36,11 @@
 
 		'new_nodeid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,			'isset({save})'),
 		'name'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({save})'),
-		'timezone'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(-12,+13),	'isset({save})'),
 		'ip'=>				array(T_ZBX_IP,	 O_OPT,	null,	null,			'isset({save})'),
 		'node_type'=>		array(T_ZBX_INT, O_OPT,	null,
 			IN(ZBX_NODE_CHILD.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),		'isset({save})&&!isset({nodeid})'),
 		'masterid' => 		array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
 		'port'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,65535),	'isset({save})'),
-		'slave_history'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
-		'slave_trends'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
 /* actions */
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -70,8 +67,7 @@
 			$audit_action = AUDIT_ACTION_UPDATE;
 			DBstart();
 			$result = update_node($_REQUEST['nodeid'],
-				$_REQUEST['name'], $_REQUEST['timezone'], $_REQUEST['ip'], $_REQUEST['port'],
-				$_REQUEST['slave_history'], $_REQUEST['slave_trends']);
+				$_REQUEST['name'], $_REQUEST['ip'], $_REQUEST['port']);
 			$result = DBend($result);
 			$nodeid = $_REQUEST['nodeid'];
 			show_messages($result, S_NODE_UPDATED, S_CANNOT_UPDATE_NODE);
@@ -82,8 +78,8 @@
 			$_REQUEST['masterid'] = isset($_REQUEST['masterid']) ? $_REQUEST['masterid'] : null;
 			DBstart();
 			$nodeid = add_node($_REQUEST['new_nodeid'],
-				$_REQUEST['name'], $_REQUEST['timezone'], $_REQUEST['ip'], $_REQUEST['port'],
-				$_REQUEST['slave_history'], $_REQUEST['slave_trends'], $_REQUEST['node_type'], $_REQUEST['masterid']);
+				$_REQUEST['name'], $_REQUEST['ip'], $_REQUEST['port'],
+				$_REQUEST['node_type'], $_REQUEST['masterid']);
 			$result = DBend($nodeid);
 			show_messages($result, S_NODE_ADDED, S_CANNOT_ADD_NODE);
 		}
@@ -148,22 +144,16 @@
 			if(isset($_REQUEST['nodeid']) && !isset($_REQUEST['form_refresh'])){
 				$new_nodeid = $node_data['nodeid'];
 				$name = $node_data['name'];
-				$timezone = $node_data['timezone'];
 				$ip = $node_data['ip'];
 				$port = $node_data['port'];
-				$slave_history = $node_data['slave_history'];
-				$slave_trends = $node_data['slave_trends'];
 				$masterid = $node_data['masterid'];
 				$node_type = detect_node_type($node_data);
 			}
 			else{
 				$new_nodeid = get_request('new_nodeid', 0);
 				$name = get_request('name', '');
-				$timezone = get_request('timezone', 0);
 				$ip = get_request('ip', '127.0.0.1');
 				$port = get_request('port', 10051);
-				$slave_history = get_request('slave_history', 90);
-				$slave_trends = get_request('slave_trends', 365);
 				$node_type = get_request('node_type', ZBX_NODE_CHILD);
 				$masterid = get_request('masterid', get_current_nodeid(false));
 			}
@@ -203,15 +193,8 @@
 				$frmNode->addRow(S_MASTER_NODE, $master_cb);
 			}
 
-			$cmbTimeZone = new CComboBox('timezone', $timezone);
-			for($i = -12; $i <= 13; $i++){
-				$cmbTimeZone->addItem($i, 'GMT'.sprintf('%+03d:00', $i));
-			}
-			$frmNode->addRow(S_TIME_ZONE, $cmbTimeZone);
 			$frmNode->addRow(S_IP, new CTextBox('ip', $ip, 15));
 			$frmNode->addRow(S_PORT, new CNumericBox('port', $port, 5));
-			$frmNode->addRow(S_DO_NOT_KEEP_HISTORY_OLDER_THAN, new CNumericBox('slave_history', $slave_history, 6));
-			$frmNode->addRow(S_DO_NOT_KEEP_TRENDS_OLDER_THAN, new CNumericBox('slave_trends', $slave_trends, 6));
 
 
 			$frmNode->addItemToBottomRow(new CSubmit('save', S_SAVE));
@@ -232,13 +215,12 @@
 			$table->setHeader(array(
 				make_sorting_header(S_ID, 'n.nodeid'),
 				make_sorting_header(S_NAME, 'n.name'),
-				make_sorting_header(S_TIME_ZONE, 'n.timezone'),
 				make_sorting_header(S_IP.':'.S_PORT, 'n.ip')
 			));
 
 			$sql = 'SELECT n.* '.
 					' FROM nodes n'.
-					order_by('n.nodeid,n.name,n.timezone,n.ip','n.masterid');
+					order_by('n.nodeid,n.name,n.ip','n.masterid');
 			$db_nodes = DBselect($sql);
 
 			while($node = DBfetch($db_nodes)){
@@ -247,7 +229,6 @@
 					array(
 						get_node_path($node['masterid']),
 						new CLink(($node['nodetype'] ? new CSpan($node['name'], 'bold') : $node['name']), '?&form=update&nodeid='.$node['nodeid'])),
-					new CSpan('GMT'.sprintf('%+03d:00', $node['timezone']), $node['nodetype'] ? 'bold' : null),
 					new CSpan($node['ip'].':'.$node['port'],
 					$node['nodetype'] ? 'bold' : null)
 				));

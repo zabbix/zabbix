@@ -254,7 +254,7 @@
 		return $result;
 	}
 
-	function add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type, $masterid){
+	function add_node($new_nodeid, $name, $ip, $port, $node_type, $masterid) {
 		global $ZBX_LOCMASTERID, $ZBX_LOCALNODEID;
 
 //		if(!eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
@@ -287,9 +287,9 @@
 		}
 
 		$nodetype = 0;
-		$sql = 'INSERT INTO nodes (nodeid,name,timezone,ip,port,slave_history,slave_trends, nodetype,masterid) '.
-			' VALUES ('.$new_nodeid.','.zbx_dbstr($name).','.$timezone.','.zbx_dbstr($ip).','.$port.','.$slave_history.','.
-			$slave_trends.','.$nodetype.','.zero2null($masterid).')';
+		$sql = 'INSERT INTO nodes (nodeid,name,ip,port,nodetype,masterid)'.
+			' VALUES ('.$new_nodeid.','.zbx_dbstr($name).','.zbx_dbstr($ip).','.$port.','.
+			$nodetype.','.zero2null($masterid).')';
 		$result = DBexecute($sql);
 
 		if($result && $node_type == ZBX_NODE_MASTER){
@@ -300,7 +300,7 @@
 	return ($result ? $new_nodeid : $result);
 	}
 
-	function update_node($nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends){
+	function update_node($nodeid, $name, $ip, $port) {
 //		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 		if(!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name)){
 			error(S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME);
@@ -308,8 +308,7 @@
 		}
 
 		$result = DBexecute('UPDATE nodes SET name='.zbx_dbstr($name).','.
-			'timezone='.$timezone.',ip='.zbx_dbstr($ip).',port='.$port.','.
-			'slave_history='.$slave_history.',slave_trends='.$slave_trends.
+			'ip='.zbx_dbstr($ip).',port='.$port.
 			' WHERE nodeid='.$nodeid);
 	return $result;
 	}
