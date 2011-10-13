@@ -78,7 +78,11 @@ require_once('include/views/js/configuration.action.edit.js.php');
 	$conditionList = new CFormList('conditionlist');
 	$allowedConditions = get_conditions_by_eventsource($data['eventsource']);
 
-	morder_result($data['conditions'], array('conditiontype','operator'), ZBX_SORT_DOWN);
+	$sortFields = array(
+		array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
+		array('field' => 'operator', 'order' => ZBX_SORT_DOWN)
+	);
+	ArraySorter::sort($data['conditions'], $sortFields);
 
 // group conditions by type
 	$condElements = new CTable(_('No conditions defined.'), 'formElementTable');

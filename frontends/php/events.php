@@ -580,7 +580,11 @@ include_once('include/page_header.php');
 					'nopermissions' => 1
 				);
 				$events = API::Event()->get($options);
-				order_result($events, array('clock','ns'), ZBX_SORT_DOWN);
+				$sortFields = array(
+					array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
+					array('field' => 'ns', 'order' => ZBX_SORT_DOWN)
+				);
+				ArraySorter::sort($data['conditions'], $sortFields);
 
 				$csv_disabled = zbx_empty($events);
 

@@ -141,7 +141,7 @@ FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|0
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'10051'|NOT NULL	|0
 FIELD		|nodetype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|masterid	|t_integer	|	|NULL		|0			|1|nodes		|nodeid
+FIELD		|masterid	|t_integer	|	|NULL		|0			|1|nodes		|nodeid	|RESTRICT
 
 TABLE|node_cksum||0
 FIELD		|nodeid		|t_integer	|	|NOT NULL	|0			|1|nodes
