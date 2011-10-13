@@ -155,7 +155,7 @@ var chkbxRange = {
 	startbox:		null,	// start checkbox obj
 	startbox_name:	null,	// start checkbox name
 	chkboxes:		{},		// ckbx list
-	pageGoName:		null,	// wich checkboxes should be counted by Go button
+	pageGoName:		null,	// which checkboxes should be counted by Go button
 	pageGoCount:	0,		// selected checkboxes
 	selected_ids:	{},		// ids of selected checkboxes
 	goButton:		null,
