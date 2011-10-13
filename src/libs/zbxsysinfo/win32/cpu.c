@@ -21,59 +21,36 @@
 #include "sysinfo.h"
 #include "stats.h"
 
-int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	get_cpu_num()
 {
 	SYSTEM_INFO	sysInfo;
-	char		mode[128];
+
+	GetSystemInfo(&sysInfo);
+
+	return (int)sysInfo.dwNumberOfProcessors;
+}
+
+int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	tmp[16];
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, mode, sizeof(mode)))
-		*mode = '\0';
-
-	/* only 'online' parameter supported */
-	if ('\0' != *mode && 0 != strcmp(mode, "online"))
+	/* only "online" (default) for parameter "type" is supported */
+	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "online"))
 		return SYSINFO_RET_FAIL;
 
-	GetSystemInfo(&sysInfo);
-
-	SET_UI64_RESULT(result, sysInfo.dwNumberOfProcessors);
+	SET_UI64_RESULT(result, get_cpu_num());
 
 	return SYSINFO_RET_OK;
 }
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	const char	*__function_name = "SYSTEM_CPU_UTIL";
-	char		tmp[32];
-	int		cpu_num;
-	double		value;
-
-	if (3 < num_param(param))
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
-		cpu_num = 0;
-	else
-	{
-		cpu_num = atoi(tmp) + 1;
-		if (1 > cpu_num || cpu_num > collector->cpus.count)
-			return SYSINFO_RET_FAIL;
-	}
-
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	/* only 'system' parameter supported */
-	if ('\0' != *tmp && 0 != strcmp(tmp, "system"))
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
-		*tmp = '\0';
+	char	tmp[16];
+	int	cpu_num;
+	double	value;
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
@@ -81,15 +58,27 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_OK;
 	}
 
+	if (3 < num_param(param))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+		cpu_num = 0;
+	else if (SUCCEED != is_uint(tmp) || 1 > (cpu_num = atoi(tmp) + 1) || cpu_num > collector->cpus.count)
+		return SYSINFO_RET_FAIL;
+
+	/* only "system" (default) for parameter "type" is supported */
+	if (0 == get_param(param, 2, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "system"))
+		return SYSINFO_RET_FAIL;
+
 	if (PERF_COUNTER_ACTIVE != collector->cpus.cpu_counter[cpu_num]->status)
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))
-		value = compute_average_value(__function_name, collector->cpus.cpu_counter[cpu_num], 1 * SEC_PER_MIN);
+	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+		value = compute_average_value(collector->cpus.cpu_counter[cpu_num], 1 * SEC_PER_MIN);
 	else if (0 == strcmp(tmp, "avg5"))
-		value = compute_average_value(__function_name, collector->cpus.cpu_counter[cpu_num], 5 * SEC_PER_MIN);
+		value = compute_average_value(collector->cpus.cpu_counter[cpu_num], 5 * SEC_PER_MIN);
 	else if (0 == strcmp(tmp, "avg15"))
-		value = compute_average_value(__function_name, collector->cpus.cpu_counter[cpu_num], USE_DEFAULT_INTERVAL);
+		value = compute_average_value(collector->cpus.cpu_counter[cpu_num], USE_DEFAULT_INTERVAL);
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -100,22 +89,9 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	const char	*__function_name = "SYSTEM_CPU_LOAD";
-	char		cpuname[10], mode[10];
-	double		value;
-
-	if (2 < num_param(param))
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 1, cpuname, sizeof(cpuname)))
-		*cpuname = '\0';
-
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
-
-	/* only 'all' parameter supported */
-	if ('\0' != *cpuname && 0 != strcmp(cpuname, "all"))
-		return SYSINFO_RET_FAIL;
+	char	tmp[16];
+	double	value;
+	int	per_cpu = 1, cpu_num;
 
 	if (!CPU_COLLECTOR_STARTED(collector))
 	{
@@ -123,17 +99,32 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_OK;
 	}
 
+	if (2 < num_param(param))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+		per_cpu = 0;
+	else if (0 != strcmp(tmp, "percpu"))
+		return SYSINFO_RET_FAIL;
+
 	if (PERF_COUNTER_ACTIVE != collector->cpus.queue_counter->status)
 		return SYSINFO_RET_FAIL;
 
-	if ('\0' == *mode || 0 == strcmp(mode, "avg1"))
-		value = compute_average_value(__function_name, collector->cpus.queue_counter, 1 * SEC_PER_MIN);
-	else if (0 == strcmp(mode, "avg5"))
-		value = compute_average_value(__function_name, collector->cpus.queue_counter, 5 * SEC_PER_MIN);
-	else if (0 == strcmp(mode, "avg15"))
-		value = compute_average_value(__function_name, collector->cpus.queue_counter, USE_DEFAULT_INTERVAL);
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+		value = compute_average_value(collector->cpus.queue_counter, 1 * SEC_PER_MIN);
+	else if (0 == strcmp(tmp, "avg5"))
+		value = compute_average_value(collector->cpus.queue_counter, 5 * SEC_PER_MIN);
+	else if (0 == strcmp(tmp, "avg15"))
+		value = compute_average_value(collector->cpus.queue_counter, USE_DEFAULT_INTERVAL);
 	else
 		return SYSINFO_RET_FAIL;
+
+	if (1 == per_cpu)
+	{
+		if (0 >= (cpu_num = get_cpu_num()))
+			return SYSINFO_RET_FAIL;
+		value /= cpu_num;
+	}
 
 	SET_DBL_RESULT(result, value);
 

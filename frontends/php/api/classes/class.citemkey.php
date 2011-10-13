@@ -28,18 +28,14 @@
  *      echo $itemKey->getKeyId(); // test.key
  *      print_r($itemKey->parameters()); // array('a', 'b', 'c')
  */
-class CItemKey{
+class CItemKey {
 
 	private $key;
 
 	// variables required for parsing
-	private $currentByte = 0;
-	private $nestLevel;
-	private $state;
-	private $currParamNo;
-	private $keyIdHasComma = false; // this is required, because key ids with "," cannot have params (simple checks)
-	// key info (is available after parsing)
 	private $keyByteCnt;
+	private $currentByte;
+	// key info (is available after parsing)
 	private $isValid = true;        // let's hope for the best :)
 	private $error = '';            // if key is invalid
 	private $parameters = array();  // array of key parameters
@@ -49,7 +45,7 @@ class CItemKey{
 	 * Parse key and determine if it is valid
 	 * @param string $key
 	 */
-	public function __construct($key){
+	public function __construct($key) {
 
 		$this->key = $key;
 
@@ -57,14 +53,14 @@ class CItemKey{
 		$this->keyByteCnt = strlen($this->key);
 
 		// checking if key is empty
-		if($this->keyByteCnt == 0){
+		if ($this->keyByteCnt == 0) {
 			$this->isValid = false;
-			$this->error = _("Key cannot be empty.");
+			$this->error = _('Key cannot be empty.');
 		}
-		else{
+		else {
 			// getting key id out of the key
 			$this->parseKeyId();
-			if($this->isValid){
+			if ($this->isValid) {
 				// and parameters ($currentByte now points to start of parameters)
 				$this->parseKeyParameters();
 			}
@@ -76,22 +72,20 @@ class CItemKey{
 	 * Get the key id and put $currentByte after it
 	 * @return void
 	 */
-	private function parseKeyId(){
+	private function parseKeyId() {
 		// checking every byte, one by one, until first 'not key_id' char is reached
-		for($this->currentByte = 0; $this->currentByte < $this->keyByteCnt; $this->currentByte++) {
-			if(!isKeyIdChar($this->key[$this->currentByte])) {
+		for ($this->currentByte = 0; $this->currentByte < $this->keyByteCnt; $this->currentByte++) {
+			if (!isKeyIdChar($this->key[$this->currentByte])) {
 				break; // $this->currentByte now points to a first 'not a key name' char
 			}
-			// checking for something like telnet,1023[]
-			if($this->key[$this->currentByte] == ','){
-				$this->keyIdHasComma = true;
-			}
 		}
-		if($this->currentByte == 0){ // no key id
+
+		// checking if key is empty
+		if ($this->currentByte == 0) {
 			$this->isValid = false;
-			$this->error = _("No key id provided.");
+			$this->error = _('Invalid item key format.');
 		}
-		else{
+		else {
 			$this->keyId = substr($this->key, 0, $this->currentByte);
 		}
 	}
@@ -101,160 +95,149 @@ class CItemKey{
 	 * Parse key parameters and put them into $this->parameters array
 	 * @return void
 	 */
-	private function parseKeyParameters(){
+	private function parseKeyParameters() {
 
 		// no parameters?
-		if($this->currentByte == $this->keyByteCnt){
+		if ($this->currentByte == $this->keyByteCnt) {
 			return;
 		}
 
 		// invalid symbol instead of '[', which would be the beginning of params
-		if($this->key[$this->currentByte] != '['){
+		if ($this->key[$this->currentByte] != '[') {
 			$this->isValid = false;
 			$this->error = _('Invalid item key format.');
 			return;
 		}
 
-		// simple check key with [] parameters is invalid
-		if($this->keyIdHasComma){
-			$this->isValid = false;
-			$this->error = _('Simple check key cannot have parameters in [].');
-			return;
-		}
-
 		// let the parsing begin!
-		$this->state = 0;   // 0 - initial
-							// 1 - inside quoted param
-							// 2 - inside unquoted param
-		$this->nestLevel = 0;
-		$this->currParamNo = 0;
-		$this->parameters[$this->currParamNo] = '';
+		$state = 0;	// 0 - initial
+					// 1 - inside quoted param
+					// 2 - inside unquoted param
+		$nestLevel = 0;
+		$currParamNo = 0;
+		$this->parameters[$currParamNo] = '';
 
 		// for every byte, starting after '['
-		for($this->currentByte++; $this->currentByte < $this->keyByteCnt; $this->currentByte++) {
-			switch($this->state){
-				// initial state
-				case 0:
-					if($this->key[$this->currentByte] == ',') {
-						if($this->nestLevel == 0){
-							$this->currParamNo++;
-							$this->parameters[$this->currParamNo] = '';
+		for ($this->currentByte++; $this->currentByte < $this->keyByteCnt; $this->currentByte++) {
+			switch($state) {
+				case 0:	// initial state
+					if ($this->key[$this->currentByte] == ',') {
+						if ($nestLevel == 0) {
+							$currParamNo++;
+							$this->parameters[$currParamNo] = '';
 						}
-						else{
-							$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+						else {
+							$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 						}
 					}
 					// Zapcat: '][' is treated as ','
-					else if($this->key[$this->currentByte] == ']' && isset($this->key[$this->currentByte+1]) && $this->key[$this->currentByte+1] == '[' && $this->nestLevel == 0) {
-						$this->currParamNo++;
-						$this->parameters[$this->currParamNo] = '';
+					else if ($this->key[$this->currentByte] == ']' && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == '[' && $nestLevel == 0) {
+						$currParamNo++;
+						$this->parameters[$currParamNo] = '';
 						$this->currentByte++;
 					}
 					// entering quotes
-					else if($this->key[$this->currentByte] == '"') {
-						$this->state = 1;
+					else if ($this->key[$this->currentByte] == '"') {
+						$state = 1;
 						// in key[["a"]] param is "a"
-						if($this->nestLevel > 0){
-							$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+						if ($nestLevel > 0) {
+							$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 						}
 					}
 					// next nesting level
-					else if($this->key[$this->currentByte] == '[') {
-						if($this->nestLevel > 0){
-							$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+					else if ($this->key[$this->currentByte] == '[') {
+						if ($nestLevel > 0) {
+							$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 						}
-						$this->nestLevel++;
+						$nestLevel++;
 					}
 					// one of the nested sets ended
-					else if($this->key[$this->currentByte] == ']' && $this->nestLevel > 0) {
+					else if ($this->key[$this->currentByte] == ']' && $nestLevel > 0) {
 
-						$this->nestLevel--;
+						$nestLevel--;
 
-						if($this->nestLevel > 0){
-							$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+						if ($nestLevel > 0) {
+							$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 						}
 
 						// skipping spaces
-						while(isset($this->key[$this->currentByte+1]) && $this->key[$this->currentByte+1] == ' ') {
+						while (isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == ' ') {
 							$this->currentByte++;
-							if($this->nestLevel > 0){
-								$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+							if ($nestLevel > 0) {
+								$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 							}
 						}
 						// all nestings are closed correctly
-						if ($this->nestLevel == 0 && isset($this->key[$this->currentByte+1]) && $this->key[$this->currentByte+1] == ']' && !isset($this->key[$this->currentByte+2])) {
+						if ($nestLevel == 0 && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == ']' && !isset($this->key[$this->currentByte + 2])) {
 							return;
 						}
 
-						if(
-							!isset($this->key[$this->currentByte+1])
-							|| $this->key[$this->currentByte+1] != ','
+						if (
+							!isset($this->key[$this->currentByte + 1]) || $this->key[$this->currentByte + 1] != ','
 							&& !(
-								$this->nestLevel > 0
-								&& isset($this->key[$this->currentByte+1])
-								&& $this->key[$this->currentByte+1] == ']'
+								$nestLevel > 0
+								&& isset($this->key[$this->currentByte + 1])
+								&& $this->key[$this->currentByte + 1] == ']'
 							)
 							// Zapcat - '][' is the same as ','
-							&& $this->key[$this->currentByte+1] != ']'
-							&& $this->key[$this->currentByte+2] != '['
-						){
+							&& $this->key[$this->currentByte + 1] != ']'
+							&& $this->key[$this->currentByte + 2] != '['
+						) {
 							$this->isValid = false;
 							$this->error = sprintf(_('incorrect syntax near \'%1$s\''), $this->key[$this->currentByte]);
 							return;
 						}
 					}
 					// looks like we have reached final ']'
-					else if($this->key[$this->currentByte] == ']' && $this->nestLevel == 0) {
-						if (!isset($this->key[$this->currentByte+1])){
+					else if ($this->key[$this->currentByte] == ']' && $nestLevel == 0) {
+						if (!isset($this->key[$this->currentByte + 1])) {
 							return;
 						}
 
 						// nothing else is allowed after final ']'
 						$this->isValid = false;
-						$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte+1]);
+						$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte + 1]);
 						return;
 					}
-					else if($this->key[$this->currentByte] != ' ') {
-						$this->state = 2;
+					else if ($this->key[$this->currentByte] != ' ') {
+						$state = 2;
 						// this is a first symbol of unquoted param
-						$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+						$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 					}
-					else if($this->nestLevel > 0){
-						$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+					else if ($nestLevel > 0) {
+						$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 					}
+					break;
 
-				break;
-
-				// quoted
-				case 1:
+				case 1:	// quoted
 					// ending quote is reached
-					if($this->key[$this->currentByte] == '"' && $this->key[$this->currentByte-1] != '\\'){
+					if ($this->key[$this->currentByte] == '"' && $this->key[$this->currentByte - 1] != '\\') {
 						// skipping spaces
-						while(isset($this->key[$this->currentByte+1]) && $this->key[$this->currentByte+1] == ' ') {
+						while (isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == ' ') {
 							$this->currentByte++;
-							if($this->nestLevel > 0){
-								$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+							if ($nestLevel > 0) {
+								$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 							}
 						}
 
 						// Zapcat
-						if($this->nestLevel == 0 && isset($this->key[$this->currentByte+1]) && isset($this->key[$this->currentByte+2]) && $this->key[$this->currentByte+1] == ']' && $this->key[$this->currentByte+2] == '['){
-							$this->state = 0;
+						if ($nestLevel == 0 && isset($this->key[$this->currentByte + 1]) && isset($this->key[$this->currentByte + 2]) && $this->key[$this->currentByte + 1] == ']' && $this->key[$this->currentByte + 2] == '[') {
+							$state = 0;
 							break;
 						}
 
-						if ($this->nestLevel == 0 && isset($this->key[$this->currentByte+1]) && $this->key[$this->currentByte+1] == ']' && !isset($this->key[$this->currentByte+2])){
+						if ($nestLevel == 0 && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == ']' && !isset($this->key[$this->currentByte + 2])) {
 							return;
 						}
-						else if($this->nestLevel == 0 && $this->key[$this->currentByte+1] == ']' && isset($this->key[$this->currentByte+2])){
+						else if ($nestLevel == 0 && $this->key[$this->currentByte + 1] == ']' && isset($this->key[$this->currentByte + 2])) {
 							// nothing else is allowed after final ']'
 							$this->isValid = false;
-							$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte+1]);
+							$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte + 1]);
 							return;
 						}
 
-						if ((!isset($this->key[$this->currentByte+1]) || $this->key[$this->currentByte+1] != ',') //if next symbol is not ','
-							&& !($this->nestLevel != 0 && isset($this->key[$this->currentByte+1]) && $this->key[$this->currentByte+1] == ']'))
+						if ((!isset($this->key[$this->currentByte + 1]) || $this->key[$this->currentByte + 1] != ',')	// if next symbol is not ','
+							&& !($nestLevel != 0 && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == ']'))
 						{
 							// nothing else is allowed after final ']'
 							$this->isValid = false;
@@ -263,47 +246,46 @@ class CItemKey{
 						}
 
 						// in key[["a"]] param is "a"
-						if($this->nestLevel > 0){
-							$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+						if ($nestLevel > 0) {
+							$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 						}
 
-						$this->state = 0;
+						$state = 0;
 					}
 					//escaped quote (\")
-					else if($this->key[$this->currentByte] == '\\' && isset($this->key[$this->currentByte+1]) && $this->key[$this->currentByte+1] == '"') {
-						if($this->nestLevel > 0){
-							$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+					else if ($this->key[$this->currentByte] == '\\' && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == '"') {
+						if ($nestLevel > 0) {
+							$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 						}
 					}
-					else{
-						$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+					else {
+						$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 					}
-				break;
+					break;
 
-				// unquoted
-				case 2:
+				case 2:	// unquoted
 					// Zapcat
-					if($this->nestLevel == 0 && $this->key[$this->currentByte] == ']' && isset($this->key[$this->currentByte+1]) && $this->key[$this->currentByte+1] =='[' ){
+					if ($nestLevel == 0 && $this->key[$this->currentByte] == ']' && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] =='[' ) {
 						$this->currentByte--;
-						$this->state = 0;
+						$state = 0;
 					}
-					else if($this->key[$this->currentByte] == ',' || ($this->key[$this->currentByte] == ']' && $this->nestLevel > 0)) {
+					else if ($this->key[$this->currentByte] == ',' || ($this->key[$this->currentByte] == ']' && $nestLevel > 0)) {
 						$this->currentByte--;
-						$this->state = 0;
+						$state = 0;
 					}
-					else if($this->key[$this->currentByte] == ']' && $this->nestLevel == 0) {
-						if (isset($this->key[$this->currentByte+1])){
+					else if ($this->key[$this->currentByte] == ']' && $nestLevel == 0) {
+						if (isset($this->key[$this->currentByte + 1])) {
 							// nothing else is allowed after final ']'
 							$this->isValid = false;
-							$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte+1]);
+							$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte + 1]);
 							return;
 						}
 						else {
 							return;
 						}
 					}
-					else{
-						$this->parameters[$this->currParamNo] .= $this->key[$this->currentByte];
+					else {
+						$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 					}
 				break;
 			}
@@ -317,7 +299,7 @@ class CItemKey{
 	 * Is key valid?
 	 * @return bool
 	 */
-	public function isValid(){
+	public function isValid() {
 		return $this->isValid;
 	}
 
@@ -326,7 +308,7 @@ class CItemKey{
 	 * Get the error if key is invalid
 	 * @return string
 	 */
-	public function getError(){
+	public function getError() {
 		return $this->error;
 	}
 
@@ -335,7 +317,7 @@ class CItemKey{
 	 * Get the list of key parameters
 	 * @return array
 	 */
-	public function getParameters(){
+	public function getParameters() {
 		return $this->parameters;
 	}
 
@@ -344,7 +326,7 @@ class CItemKey{
 	 * Get the key id (first part of the key)
 	 * @return string
 	 */
-	public function getKeyId(){
+	public function getKeyId() {
 		return $this->keyId;
 	}
 }

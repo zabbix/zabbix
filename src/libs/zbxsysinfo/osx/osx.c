@@ -34,6 +34,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"proc.num",		CF_USEUPARAM,	PROC_NUM,		0,	"inetd,,"},
 	{"proc.mem",		CF_USEUPARAM,	PROC_MEM,		0,	"inetd,,"},
 
+	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		0,	"online"},
 	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	0,	"all,user,avg1"},
 	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	0,	"all,avg1"},
 

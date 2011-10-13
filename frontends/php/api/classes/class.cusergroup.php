@@ -342,7 +342,7 @@ class CUserGroup extends CZBXAPI{
 				}
 
 				if($this->exists(array('name' => $usrgrp['name'], 'nodeids' => get_current_nodeid(false)))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_USER_GROUP.' [ '.$usrgrp['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('User group').' [ '.$usrgrp['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 				$insert[$gnum] = $usrgrp;
 			}
@@ -418,7 +418,7 @@ class CUserGroup extends CZBXAPI{
 					if((($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
 							|| ($usrgrp['users_status'] == GROUP_STATUS_DISABLED))
 							&& uint_in_array(self::$userData['userid'], $userids)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_USER_CANNOT_CHANGE_STATUS);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change status of himself'));
 					}
 				}
 
@@ -523,7 +523,7 @@ class CUserGroup extends CZBXAPI{
 					if((($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
 							|| ($usrgrp['users_status'] == GROUP_STATUS_DISABLED))
 							&& uint_in_array(self::$userData['userid'], $userids)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_USER_CANNOT_CHANGE_STATUS);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change status of himself'));
 					}
 				}
 

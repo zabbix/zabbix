@@ -678,10 +678,10 @@ COpt::memoryPick();
 
 				foreach ($map['links'] as $link) {
 					if (!isset($mapSelements[$link['selementid1']]))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Link selementid1 field is pointing to non existant map selement ID "%1$s" for map "%2$s" .', $link['selementid1'], $dbMap['name']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Link selementid1 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".', $link['selementid1'], $dbMap['name']));
 
 					if (!isset($mapSelements[$link['selementid2']]))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Link selementid2 field is pointing to non existant map selement ID "%1$s" for map "%2$s" .', $link['selementid2'], $dbMap['name']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Link selementid2 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".', $link['selementid2'], $dbMap['name']));
 				}
 			}
 		}

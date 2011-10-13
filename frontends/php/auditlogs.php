@@ -41,7 +41,7 @@ include_once('include/page_header.php');
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
 // filter
 		'action'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1,6),	NULL),
-		'resourcetype'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1,30),	NULL),
+		'resourcetype'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1,31),	NULL),
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 		'alias' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
@@ -141,7 +141,7 @@ include_once('include/page_header.php');
 
 	$cmbAction = new CComboBox('action',$_REQUEST['action']);
 		$cmbAction->addItem(-1,S_ALL_S);
-		$cmbAction->addItem(AUDIT_ACTION_LOGIN,		S_LOGIN);
+		$cmbAction->addItem(AUDIT_ACTION_LOGIN,		_('Login'));
 		$cmbAction->addItem(AUDIT_ACTION_LOGOUT,	S_LOGOUT);
 		$cmbAction->addItem(AUDIT_ACTION_ADD,		S_ADD);
 		$cmbAction->addItem(AUDIT_ACTION_UPDATE,	S_UPDATE);
@@ -229,7 +229,7 @@ include_once('include/page_header.php');
 			case AUDIT_ACTION_ADD:		$action = S_ADDED; break;
 			case AUDIT_ACTION_UPDATE:	$action = S_UPDATED; break;
 			case AUDIT_ACTION_DELETE:	$action = S_DELETED; break;
-			case AUDIT_ACTION_LOGIN:	$action = S_LOGIN;	break;
+			case AUDIT_ACTION_LOGIN:	$action = _('Login');	break;
 			case AUDIT_ACTION_LOGOUT:	$action = S_LOGOUT; break;
 			case AUDIT_ACTION_ENABLE:	$action = S_ENABLED; break;
 			case AUDIT_ACTION_DISABLE:	$action = S_DISABLED; break;

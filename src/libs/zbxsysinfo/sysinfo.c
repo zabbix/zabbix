@@ -174,57 +174,48 @@ void	free_result(AGENT_RESULT *result)
  */
 int	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len)
 {
-	char	*pl, *pr;
-	size_t	sz;
+	const char	*pl, *pr;
+	size_t		sz;
 
-	pl = strchr(command, '[');
-	pr = strrchr(command, ']');
+	for (pl = command; SUCCEED == is_key_char(*pl); pl++)
+		;
 
-	if (pl > pr)
+	if (pl == command)
 		return 0;
-
-	if (NULL != pl && NULL == pr)
-		return 0;
-
-	if (NULL == pl && NULL != pr)
-		return 0;
-
-	if (NULL == pl && NULL == pr) /* simple check? */
-	{
-		if (NULL != (pl = strchr(command, ',')))
-		{
-			for (pr = pl + 1; '\0' != *pr; pr++);
-		}
-	}
 
 	if (NULL != cmd)
 	{
-		if (NULL != pl)
-		{
-			if (cmd_max_len < (sz = (size_t)(pl - command) + 1))
-				sz = cmd_max_len;
-			memcpy(cmd, command, sz - 1);
-			cmd[sz - 1] = '\0';
-		}
-		else
-			zbx_strlcpy(cmd, command, cmd_max_len);
+		if (cmd_max_len <= (sz = (size_t)(pl - command)))
+			return 0;
+
+		memcpy(cmd, command, sz);
+		cmd[sz] = '\0';
 	}
 
-	if (NULL != param)
-		*param = '\0';
-
-	if (NULL != pl && NULL != pr)
+	if ('\0' == *pl)	/* no parameters specified */
 	{
 		if (NULL != param)
-		{
-			if (param_max_len < (sz = (size_t)(pr - pl)))
-				sz = param_max_len;
-			memcpy(param, pl + 1, sz - 1);
-			param[sz - 1] = '\0';
-		}
-	}
-	else
+			*param = '\0';
 		return 1;
+	}
+
+	if ('[' != *pl)		/* unsupported character */
+		return 0;
+
+	for (pr = ++pl; '\0' != *pr; pr++)
+		;
+
+	if (']' != *--pr)
+		return 0;
+
+	if (NULL != param)
+	{
+		if (param_max_len <= (sz = (size_t)(pr - pl)))
+			return 0;
+
+		memcpy(param, pl, sz);
+		param[sz] = '\0';
+	}
 
 	return 2;
 }
@@ -348,130 +339,72 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
-	char	*p;
-	int	i = 0;
+	int		rc;
+	char		usr_cmd[MAX_STRING_LEN];
+	char		usr_param[MAX_STRING_LEN];
+	char		usr_command[MAX_STRING_LEN];
+	char		param[MAX_STRING_LEN], error[MAX_STRING_LEN];
 
-	int	(*function)() = NULL;
-	int	ret = SUCCEED;
-	int	err = SYSINFO_RET_OK;
-
-	char	usr_cmd[MAX_STRING_LEN];
-	char	usr_param[MAX_STRING_LEN];
-
-	char	usr_command[MAX_STRING_LEN];
-	int	usr_command_len;
-
-	char	param[MAX_STRING_LEN], error[MAX_STRING_LEN];
+	ZBX_METRIC	*command = NULL;
 
 	assert(result);
 	init_result(result);
 
-	*error = '\0';
+	if (0 != (flags & PROCESS_TEST))
+		printf("%-*s", 45, in_command);
 
 	alias_expand(in_command, usr_command, sizeof(usr_command));
 
-	usr_command_len = (int)strlen(usr_command);
+	if (0 == (rc = parse_command(usr_command, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param))))
+		goto notsupported;
 
-	for (p = usr_command + usr_command_len - 1; p > usr_command && NULL != strchr(ZBX_WHITESPACE, *p); --p)
-		;
-
-	if (NULL != strchr(ZBX_WHITESPACE, p[1]))
-		p[1] = '\0';
-
-	if (0 != parse_command(usr_command, usr_cmd, sizeof(usr_cmd), usr_param, sizeof(usr_param)))
+	for (command = commands; NULL != command->key; command++)
 	{
-		for (i = 0; NULL != commands[i].key; i++)
-		{
-			if (0 == strcmp(commands[i].key, usr_cmd))
-			{
-				function = commands[i].function;
-				break;
-			}
-		}
+		if (0 == strcmp(command->key, usr_cmd))
+			break;
 	}
 
-	param[0] = '\0';
-
-	if (NULL != function)
+	if (NULL != command->key)
 	{
-		if (0 != (commands[i].flags & CF_USEUPARAM))
+		if (0 != (command->flags & CF_USEUPARAM))
 		{
-			if (0 != (flags & PROCESS_TEST) &&
-					0 != (flags & PROCESS_USE_TEST_PARAM) &&
-					NULL != commands[i].test_param)
-			{
-				zbx_strlcpy(usr_param, commands[i].test_param, sizeof(usr_param));
-			}
+			if (0 != (flags & PROCESS_USE_TEST_PARAM) && NULL != command->test_param)
+				strscpy(usr_param, command->test_param);
 		}
-		else
-			usr_param[0] = '\0';
+		else if (2 == rc)
+			goto notsupported;
 
-		if (NULL != commands[i].main_param)
+		*param = '\0';
+		*error = '\0';
+
+		if (NULL != command->main_param)
 		{
-			if (0 != (commands[i].flags & CF_USEUPARAM))
+			if (0 != (command->flags & CF_USEUPARAM))
 			{
-				err = replace_param(commands[i].main_param, usr_param,
-						param, sizeof(param), error, sizeof(error));
+				if (FAIL == replace_param(command->main_param, usr_param,
+						param, sizeof(param), error, sizeof(error)))
+				{
+					if ('\0' != *error)
+						zabbix_log(LOG_LEVEL_WARNING, "item [%s] error: %s", in_command, error);
+					goto notsupported;
+				}
 			}
 			else
-				zbx_strlcpy(param, commands[i].main_param, sizeof(param));
+				strscpy(param, command->main_param);
 		}
 		else
-			zbx_strlcpy(param, usr_param, sizeof(param));
+			strscpy(param, usr_param);
 
-		if (FAIL != err)
-		{
-			err = function(usr_command, param, flags, result);
-
-			if (SYSINFO_RET_FAIL == err)
-				err = NOTSUPPORTED;
-		}
-		else
-		{
-			err = NOTSUPPORTED;
-			if ('\0' != *error)
-				zabbix_log(LOG_LEVEL_WARNING, "item [%s] error: %s", in_command, error);
-		}
+		if (SYSINFO_RET_OK != command->function(usr_command, param, flags, result))
+			goto notsupported;
 	}
 	else
-		err = NOTSUPPORTED;
+		goto notsupported;
 
-	if (0 != (flags & PROCESS_TEST))
-	{
-		printf("%s", usr_cmd);
-
-		if (0 != (commands[i].flags & CF_USEUPARAM))
-		{
-			printf("[%s]", usr_param);
-			i = 2 + (int)strlen(usr_param);
-		}
-		else
-			i = 0;
-
-		i += (int)strlen(usr_cmd);
-
-#define COLUMN_2_X 45	/* max space count */
-		i = (i > COLUMN_2_X ? 1 : COLUMN_2_X - i);
-
-		printf("%-*.*s", i, i, " ");	/* print spaces */
-	}
-
-	if (NOTSUPPORTED == err)
-	{
-		if (!ISSET_MSG(result))
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_NOTSUPPORTED"));
-
-		ret = NOTSUPPORTED;
-	}
-	else if (TIMEOUT_ERROR == err)
-	{
-		if (!ISSET_MSG(result))
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_ERROR"));
-
-		ret = TIMEOUT_ERROR;
-	}
-
-	return ret;
+	return SUCCEED;
+notsupported:
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_NOTSUPPORTED"));
+	return NOTSUPPORTED;
 }
 
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)

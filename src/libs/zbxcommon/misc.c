@@ -96,7 +96,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #endif
 
 	if (NULL == last_ts)
-		last_ts = zbx_malloc(last_ts, sizeof(zbx_timespec_t));
+		last_ts = zbx_calloc(last_ts, 1, sizeof(zbx_timespec_t));
 
 #ifdef _WINDOWS
 	if (TRUE == (rc = QueryPerformanceFrequency(&tickPerSecond)))
@@ -109,11 +109,11 @@ void	zbx_timespec(zbx_timespec_t *ts)
 
 			if (0 == boottime)
 				boottime = (int)(time(NULL) - tick.QuadPart);
-	
+
 			ts->sec = (int)(tick.QuadPart + boottime);
 		}
 	}
-	
+
 	if (TRUE != rc)
 	{
 		struct _timeb   tb;
@@ -469,7 +469,7 @@ static int	get_current_delay(int delay, const char *flex_intervals, time_t now)
 		if (2 == sscanf(s, "%d/%29[^;]s", &flex_delay, flex_period))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d sec at %s", flex_delay, flex_period);
-			
+
 			if (flex_delay < current_delay && SUCCEED == check_time_period(flex_period, now))
 				current_delay = flex_delay;
 		}
@@ -479,7 +479,7 @@ static int	get_current_delay(int delay, const char *flex_intervals, time_t now)
 		if (NULL == delim)
 			break;
 	}
-	
+
 	if (SEC_PER_YEAR == current_delay)
 		return delay;
 
@@ -530,7 +530,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 			flag = (6 == sscanf(s, "%d/%d,%d:%d-%d:%d", &delay, &d1, &h1, &m1, &h2, &m2));
 			d2 = d1;
 		}
-		
+
 		if (0 != flag)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d/%d-%d,%d:%d-%d:%d", delay, d1, d2, h1, m1, h2, m2);
@@ -1410,7 +1410,7 @@ int	is_uint_prefix(const char *c)
 
 	while (c[i]==' ') /* trim left spaces */
 		i++;
-	
+
 	if (!isdigit(c[i]))
 		return FAIL;
 	else
@@ -1471,12 +1471,12 @@ int	is_uint(const char *c)
 
 #if defined(_WINDOWS)
 int	_wis_uint(const wchar_t *wide_string)
-{	
+{
 	const wchar_t	*wide_char = wide_string;
-	
+
 	if (L'\0' == *wide_char)
 		return FAIL;
-		
+
 	while (L'\0' != *wide_char)
 	{
 		if (0 != iswdigit(*wide_char))
@@ -1486,7 +1486,7 @@ int	_wis_uint(const wchar_t *wide_string)
 		}
 		return FAIL;
 	}
-	
+
 	return SUCCEED;
 }
 #endif
@@ -1514,7 +1514,7 @@ int	is_int_prefix(const char *c)
 
 	if (c[i]=='-' || c[i]=='+')
 		i++;
-	
+
 	if (!isdigit(c[i]))
 		return FAIL;
 
@@ -2131,7 +2131,7 @@ double	str2double(const char *str)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: in host name allowed characters: '0-9a-zA-Z. _-]'                *
+ * Comments: in host name allowed characters: '0-9a-zA-Z. _-'                 *
  *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
@@ -2161,7 +2161,7 @@ int	is_hostname_char(char c)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: in key allowed characters: '0-9a-zA-Z.,_-]'                      *
+ * Comments: in key allowed characters: '0-9a-zA-Z._-'                        *
  *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
@@ -2170,7 +2170,7 @@ int	is_key_char(char c)
 	if (c >= 'a' && c <= 'z')
 		return SUCCEED;
 
-	if (c == '.' || c == ',' || c == '_' || c == '-')
+	if (c == '.' || c == '_' || c == '-')
 		return SUCCEED;
 
 	if (c >= 'A' && c <= 'Z')
@@ -2280,8 +2280,14 @@ unsigned char	get_interface_type_by_item_type(unsigned char type)
 			return INTERFACE_TYPE_IPMI;
 		case ITEM_TYPE_JMX:
 			return INTERFACE_TYPE_JMX;
+		case ITEM_TYPE_SIMPLE:
+		case ITEM_TYPE_EXTERNAL:
+		case ITEM_TYPE_DB_MONITOR:
+		case ITEM_TYPE_SSH:
+		case ITEM_TYPE_TELNET:
+			return INTERFACE_TYPE_ANY;
 		default:
-			return INTERFACE_TYPE_AGENT;
+			return INTERFACE_TYPE_UNKNOWN;
 	}
 }
 

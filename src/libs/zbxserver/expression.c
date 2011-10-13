@@ -672,15 +672,9 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
 #define ZBX_REQUEST_HOST_CONN		3
 static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int request)
 {
-#define MAX_INTERFACE_COUNT	4
 	DB_RESULT	result;
 	DB_ROW		row;
-	unsigned char	type, useip, pr, last_pr = MAX_INTERFACE_COUNT,
-			priority[MAX_INTERFACE_COUNT] = {
-					INTERFACE_TYPE_AGENT,
-					INTERFACE_TYPE_SNMP,
-					INTERFACE_TYPE_JMX,
-					INTERFACE_TYPE_IPMI};
+	unsigned char	type, useip, pr, last_pr = INTERFACE_TYPE_COUNT;
 	int		ret = FAIL;
 
 	result = DBselect(
@@ -695,7 +689,7 @@ static int	DBget_interface_value_by_hostid(zbx_uint64_t hostid, char **replace_t
 	{
 		type = (unsigned char)atoi(row[0]);
 
-		for (pr = 0; pr < MAX_INTERFACE_COUNT && priority[pr] != type; pr++)
+		for (pr = 0; INTERFACE_TYPE_COUNT > pr && INTERFACE_TYPE_PRIORITY[pr] != type; pr++)
 			;
 
 		if (pr >= last_pr)
