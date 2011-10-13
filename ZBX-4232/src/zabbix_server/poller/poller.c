@@ -355,7 +355,7 @@ static void	activate_host(DC_ITEM *item, int now)
 			fld_available = "available";
 			fld_disable_until = "disable_until";
 			fld_error = "error";
-			type = "Zabbix";
+			type = "Zabbix agent";
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -393,9 +393,17 @@ static void	activate_host(DC_ITEM *item, int now)
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
 
-	if (HOST_AVAILABLE_TRUE != *available)
+	if (HOST_AVAILABLE_TRUE == *available)
 	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "Enabling %s host [%s]",
+		zbx_snprintf(error_msg, sizeof(error_msg), "%s checks on host [%s]: connection restored",
+				type, item->host.host);
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
+		zabbix_syslog("%s", error_msg);
+	}
+	else if (HOST_AVAILABLE_TRUE != *available)
+	{
+		zbx_snprintf(error_msg, sizeof(error_msg), "enabling %s checks on host [%s]",
 				type, item->host.host);
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
@@ -447,7 +455,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 			fld_available = "available";
 			fld_disable_until = "disable_until";
 			fld_error = "error";
-			type = "Zabbix";
+			type = "Zabbix agent";
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -488,11 +496,11 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
 
-	/* First error */
+	/* first error */
 	if (0 == *errors_from)
 	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "%s Host [%s] item [%s]: first network error, wait for %d seconds",
-				type, item->host.host, item->key_orig, CONFIG_UNREACHABLE_DELAY);
+		zbx_snprintf(error_msg, sizeof(error_msg), "%s item [%s] on host [%s] failed: first network error, wait for %d seconds",
+				type, item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
 
 		*errors_from = now;
 		*disable_until = now + CONFIG_UNREACHABLE_DELAY;
@@ -504,8 +512,8 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 		if (now - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
 		{
 			/* still unavailable, but won't change status to UNAVAILABLE yet */
-			zbx_snprintf(error_msg, sizeof(error_msg), "%s Host [%s] item [%s]: another network error, wait for %d seconds",
-					type, item->host.host, item->key_orig, CONFIG_UNREACHABLE_DELAY);
+			zbx_snprintf(error_msg, sizeof(error_msg), "%s item [%s] on host [%s] failed: another network error, wait for %d seconds",
+					type, item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
 
 			*disable_until = now + CONFIG_UNREACHABLE_DELAY;
 		}
@@ -515,7 +523,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 
 			if (HOST_AVAILABLE_FALSE != *available)
 			{
-				zbx_snprintf(error_msg, sizeof(error_msg), "Disabling %s host [%s]",
+				zbx_snprintf(error_msg, sizeof(error_msg), "temporarily disabling %s checks on host [%s]: host unavailable",
 						type, item->host.host);
 
 				*available = HOST_AVAILABLE_FALSE;
