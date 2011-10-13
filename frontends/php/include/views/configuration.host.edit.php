@@ -74,7 +74,7 @@
 			'preserveKeys' => true,
 		));
 
-		morder_result($dbHost['interfaces'], array('type', 'interfaceid'));
+		ArraySorter::sort($dbHost['interfaces'], array('type', 'interfaceid'));
 
 		$frm_title	.= SPACE.' ['.$dbHost['host'].']';
 		$original_templates = $dbHost['parentTemplates'];
