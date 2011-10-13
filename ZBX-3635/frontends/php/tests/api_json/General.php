@@ -34,7 +34,7 @@ class API_JSON_General extends CZabbixTest
 			"auth":"<incorrect auth>",
 			"id":2
 		}';
-		$result = $this->api_call_raw($json, &$debug);
+		$result = $this->api_call_raw($json, $debug);
 
 		$this->assertTrue(isset($result['error']),"Chuck Norris: 'auth' must be verified if given. Always! $debug");
 	}

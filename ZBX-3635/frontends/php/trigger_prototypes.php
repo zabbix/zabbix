@@ -207,54 +207,87 @@ include_once('include/page_header.php');
 
 		$go_result = $result;
 	}
-	else if(str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])){
+	elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])) {
+		$go_result = true;
 
-		$options = array(
-			'triggerids' => $_REQUEST['g_triggerid'],
-			'editable' => 1,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_EXTEND
-		);
-
-		$triggers = API::Trigger()->get($options);
-		$triggerids = zbx_objectValues($triggers, 'triggerid');
-
-		if(($_REQUEST['go'] == 'activate')){
+		if ($_REQUEST['go'] == 'activate') {
 			$status = TRIGGER_STATUS_ENABLED;
-			$status_old = array('status'=>0);
-			$status_new = array('status'=>1);
+			$statusOld = array('status' => TRIGGER_STATUS_DISABLED);
+			$statusNew = array('status' => TRIGGER_STATUS_ENABLED);
 		}
 		else {
 			$status = TRIGGER_STATUS_DISABLED;
-			$status_old = array('status'=>1);
-			$status_new = array('status'=>0);
+			$statusOld = array('status' => TRIGGER_STATUS_ENABLED);
+			$statusNew = array('status' => TRIGGER_STATUS_DISABLED);
 		}
 
 		DBstart();
-		$go_result = updateTriggerStatus($triggerids, $status);
 
-		if($go_result){
-			foreach($triggers as $tnum => $trigger){
-				$serv_status = (isset($_REQUEST['group_enable']))?get_service_status_of_trigger($trigger['triggerid']):0;
+		// get requested triggers with permission check
+		$options = array(
+			'triggerids' => $_REQUEST['g_triggerid'],
+			'editable' => true,
+			'output' => array('triggerid', 'status'),
+			'preservekeys' => true
+		);
+		$triggers = API::TriggerPrototype()->get($options);
 
-				update_services($trigger['triggerid'], $serv_status); // updating status to all services by the dependency
+		// triggerids to gather child triggers
+		$childTriggerIds = array_keys($triggers);
 
-				$host = reset($trigger['hosts']);
-				add_audit_ext(AUDIT_ACTION_UPDATE,
-								AUDIT_RESOURCE_TRIGGER,
-								$trigger['triggerid'],
-								$host['host'].':'.$trigger['description'],
-								'triggers',
-								$status_old,
-								$status_new);
+		// triggerids which status must be changed
+		$triggerIdsToUpdate = array();
+		foreach ($triggers as $triggerid => $trigger){
+			if ($trigger['status'] != $status) {
+				$triggerIdsToUpdate[] = $triggerid;
 			}
+		}
+
+
+		do {
+			// gather all triggerids which status should be changed including child triggers
+			$options = array(
+				'filter' => array('templateid' => $childTriggerIds),
+				'output' => array('triggerid', 'status'),
+				'preservekeys' => true,
+				'nopermissions' => true
+			);
+			$triggers = API::TriggerPrototype()->get($options);
+
+			$childTriggerIds = array_keys($triggers);
+
+			foreach ($triggers as $triggerid => $trigger) {
+				if ($trigger['status'] != $status) {
+					$triggerIdsToUpdate[] = $triggerid;
+				}
+			}
+
+		} while (!empty($childTriggerIds));
+
+		DB::update('triggers', array(
+			'values' => array('status' => $status),
+			'where' => array('triggerid' => $triggerIdsToUpdate)
+		));
+
+		// get updated triggers with additional data
+		$options = array(
+			'triggerids' => $triggerIdsToUpdate,
+			'output' => array('triggerid', 'description'),
+			'preservekeys' => true,
+			'selectHosts' => API_OUTPUT_EXTEND,
+			'nopermissions' => true
+		);
+		$triggers = API::TriggerPrototype()->get($options);
+		foreach ($triggers as $triggerid => $trigger) {
+			$host = reset($trigger['hosts']);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $triggerid,
+					$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
 		}
 
 		$go_result = DBend($go_result);
 		show_messages($go_result, _('Status updated'), _('Cannot update status'));
 	}
-	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
+	elseif (($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])) {
 		$go_result = API::TriggerPrototype()->delete($_REQUEST['g_triggerid']);
 		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
