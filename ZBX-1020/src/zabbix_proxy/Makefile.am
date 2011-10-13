@@ -60,9 +60,11 @@ zabbix_proxy_CFLAGS = \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
 	-DDATAROOTDIR="\"@datarootdir@\""
 
-INSTALL_INCLUDE_DIR = "$(DESTDIR)@sysconfdir@/zabbix_proxy.conf.d"
-INSTALL_EXSCRIPTS_DIR = "$(DESTDIR)@datarootdir@/zabbix/externalscripts"
+PROXY_CONFIG = "zabbix_proxy.conf"
+INCLUDE_DIR = "$(DESTDIR)@sysconfdir@/$(PROXY_CONFIG).d"
+EXSCRIPTS_DIR = "$(DESTDIR)@datarootdir@/zabbix/externalscripts"
 
 install-data-hook:
-	test -d $(INSTALL_INCLUDE_DIR) || $(MKDIR_P) $(INSTALL_INCLUDE_DIR)
-	test -d $(INSTALL_EXSCRIPTS_DIR) || $(MKDIR_P) $(INSTALL_EXSCRIPTS_DIR)
+	test -d $(INCLUDE_DIR) || $(MKDIR_P) $(INCLUDE_DIR)
+	test -d $(EXSCRIPTS_DIR) || $(MKDIR_P) $(EXSCRIPTS_DIR)
+	test -f "$(DESTDIR)@sysconfdir@/$(PROXY_CONFIG)" || cp ../../conf/$(PROXY_CONFIG) "$(DESTDIR)@sysconfdir@"
