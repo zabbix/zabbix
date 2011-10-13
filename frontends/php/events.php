@@ -483,7 +483,12 @@
 					'nopermissions' => true
 				);
 				$events = CEvent::get($options);
-				morder_result($events, array('clock', 'eventid'), ZBX_SORT_DOWN);
+
+				$sortFields = array(
+					array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
+					array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
+				);
+				ArraySorter::sort($events, $sortFields);
 
 				$triggersOptions = array(
 					'triggerids' => zbx_objectValues($events, 'objectid'),

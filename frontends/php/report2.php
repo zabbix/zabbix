@@ -221,9 +221,8 @@ include_once('include/page_header.php');
 			}
 		}
 
-
 		$triggers = CTrigger::get($options);
-		morder_result($triggers, array('host', 'description'));
+		ArraySorter::sort($triggers, array('host', 'description'));
 
 		$table = new CTableInfo();
 		$table->setHeader(array(
