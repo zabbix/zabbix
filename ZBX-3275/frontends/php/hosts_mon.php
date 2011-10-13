@@ -219,7 +219,7 @@ include_once('include/page_header.php');
 	foreach($hosts as $num => $host){
 		$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 			' ('.$host['applications'].')');
-		$items = array(new CLink(S_ITEMS, 'latest.php?filter_set=1&hostid='.$host['hostid']),
+		$items = array(new CLink(S_ITEMS, 'latest.php?filter_rst=1&hostid='.$host['hostid']),
 			' ('.$host['items'].')');
 		$triggers = array(new CLink(S_TRIGGERS, 'tr_status.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 			' ('.$host['triggers'].')');
