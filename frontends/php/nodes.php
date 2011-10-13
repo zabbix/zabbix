@@ -69,7 +69,7 @@
 		if(isset($_REQUEST['nodeid'])){
 			$audit_action = AUDIT_ACTION_UPDATE;
 			DBstart();
-			$result = update_node($_REQUEST['nodeid'], $_REQUEST['new_nodeid'],
+			$result = update_node($_REQUEST['nodeid'],
 				$_REQUEST['name'], $_REQUEST['timezone'], $_REQUEST['ip'], $_REQUEST['port'],
 				$_REQUEST['slave_history'], $_REQUEST['slave_trends']);
 			$result = DBend($result);
@@ -170,7 +170,12 @@
 
 
 			$frmNode->addRow(S_NAME, new CTextBox('name', $name, 40));
-			$frmNode->addRow(S_ID, new CNumericBox('new_nodeid', $new_nodeid, 10));
+			if(isset($_REQUEST['nodeid'])){
+				$frmNode->addRow(S_ID, new CNumericBox('new_nodeid', $new_nodeid, 10, 'yes'));
+			}
+			else{
+				$frmNode->addRow(S_ID, new CNumericBox('new_nodeid', $new_nodeid, 10));
+			}
 
 			if(isset($_REQUEST['nodeid'])){
 				$cmbNodeType = new CTextBox('node_type_name', node_type2str($node_type), null, 'yes');

@@ -144,7 +144,7 @@ FIELD		|port		|t_integer	|'10051'|NOT NULL	|0
 FIELD		|slave_history	|t_integer	|'30'	|NOT NULL	|0
 FIELD		|slave_trends	|t_integer	|'365'	|NOT NULL	|0
 FIELD		|nodetype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|masterid	|t_integer	|	|NULL		|0			|1|nodes		|nodeid
+FIELD		|masterid	|t_integer	|	|NULL		|0			|1|nodes		|nodeid	|RESTRICT
 
 TABLE|node_cksum||0
 FIELD		|nodeid		|t_integer	|	|NOT NULL	|0			|1|nodes

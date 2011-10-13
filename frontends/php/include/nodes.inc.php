@@ -300,14 +300,14 @@
 	return ($result ? $new_nodeid : $result);
 	}
 
-	function update_node($nodeid,$new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends){
+	function update_node($nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends){
 //		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 		if(!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name)){
 			error(S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME);
 			return false;
 		}
 
-		$result = DBexecute('UPDATE nodes SET nodeid='.$new_nodeid.',name='.zbx_dbstr($name).','.
+		$result = DBexecute('UPDATE nodes SET name='.zbx_dbstr($name).','.
 			'timezone='.$timezone.',ip='.zbx_dbstr($ip).',port='.$port.','.
 			'slave_history='.$slave_history.',slave_trends='.$slave_trends.
 			' WHERE nodeid='.$nodeid);
@@ -328,8 +328,8 @@
 			$result = (
 				// DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
 					// " values ($housekeeperid,'nodes','nodeid',$nodeid)") &&
-				DBexecute('delete from nodes where nodeid='.$nodeid) &&
-				DBexecute('update nodes set masterid=NULL where masterid='.$nodeid)
+				DBexecute('update nodes set masterid=NULL where masterid='.$nodeid) &&
+				DBexecute('delete from nodes where nodeid='.$nodeid)
 				);
 			error(S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE);
 		}
