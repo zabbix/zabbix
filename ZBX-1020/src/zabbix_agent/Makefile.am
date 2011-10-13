@@ -60,11 +60,11 @@ zabbix_agentd_CFLAGS = \
 zabbix_agent_CFLAGS = \
 	-DSYSCONFDIR="\"@sysconfdir@\""
 
-CONF_INCLUDE_DIRS = \
-	"@sysconfdir@/zabbix_agent.conf.d" \
-	"@sysconfdir@/zabbix_agentd.conf.d"
+INSTALL_INCLUDE_DIRS = \
+	"$(DESTDIR)@sysconfdir@/zabbix_agent.conf.d" \
+	"$(DESTDIR)@sysconfdir@/zabbix_agentd.conf.d"
 
 install-data-hook:
-	for dir in $(CONF_INCLUDE_DIRS); do \
-		test -d $$dir || $(MKDIR_P) $(CONF_INCLUDE_DIRS); \
+	for dir in $(INSTALL_INCLUDE_DIRS); do \
+		test -d $$dir || $(MKDIR_P) $$dir; \
 	done

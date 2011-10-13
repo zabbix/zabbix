@@ -79,9 +79,9 @@ zabbix_server_CFLAGS = \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
 	-DDATAROOTDIR="\"@datarootdir@\""
 
-CONF_INCLUDE_DIR = "@sysconfdir@/zabbix_server.conf.d"
-EXTERNAL_SCRIPTS_DIR = "@datarootdir@/zabbix/externalscripts"
+INSTALL_INCLUDE_DIR = "$(DESTDIR)@sysconfdir@/zabbix_server.conf.d"
+INSTALL_EXSCRIPTS_DIR = "$(DESTDIR)@datarootdir@/zabbix/externalscripts"
 
 install-data-hook:
-	test -d $(CONF_INCLUDE_DIR) 	|| $(MKDIR_P) $(CONF_INCLUDE_DIR)
-	test -d $(EXTERNAL_SCRIPTS_DIR) || $(MKDIR_P) $(EXTERNAL_SCRIPTS_DIR)
+	test -d $(INSTALL_INCLUDE_DIR) || $(MKDIR_P) $(INSTALL_INCLUDE_DIR)
+	test -d $(INSTALL_EXSCRIPTS_DIR) || $(MKDIR_P) $(INSTALL_EXSCRIPTS_DIR)
