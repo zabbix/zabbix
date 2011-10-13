@@ -192,16 +192,16 @@ include_once('include/page_header.php');
 	$db_httptests = array();
 	$db_httptestids = array();
 
-	$sql = 'SELECT wt.*,a.name as application, h.host,h.hostid '.
-		' FROM httptest wt '.
-			' LEFT JOIN applications a on wt.applicationid=a.applicationid '.
-			' LEFT JOIN hosts h on h.hostid=a.hostid '.
-		' WHERE '.DBcondition('a.applicationid',$db_appids).
-			' AND wt.status <> 1 '.
-		order_by('wt.name','h.host');
-//SDI($sql);
+	$sql = 'SELECT wt.*,a.name as application,h.host,h.hostid'.
+			' FROM httptest wt,applications a,hosts h'.
+			' WHERE wt.applicationid=a.applicationid'.
+				' AND a.hostid=h.hostid'.
+				' AND '.DBcondition('a.applicationid', $db_appids).
+				' AND wt.status<>1'.
+			order_by('wt.name', 'h.host');
+
 	$db_httptests_res = DBselect($sql);
-	while($httptest_data = DBfetch($db_httptests_res)){
+	while ($httptest_data = DBfetch($db_httptests_res)) {
 		$httptest_data['step_count'] = null;
 		$db_apps[$httptest_data['applicationid']]['scenarios_cnt']++;
 
@@ -213,7 +213,7 @@ include_once('include/page_header.php');
 			' FROM httpstep hs'.
 			' WHERE '.DBcondition('hs.httptestid',$db_httptestids).
 			' GROUP BY hs.httptestid';
-//SDI($sql);
+
 	$httpstep_res = DBselect($sql);
 	while($step_cout = DBfetch($httpstep_res)){
 		$db_httptests[$step_cout['httptestid']]['step_count'] = $step_cout['cnt'];

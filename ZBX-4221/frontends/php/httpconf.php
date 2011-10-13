@@ -591,7 +591,6 @@ include_once('include/page_header.php');
 			make_sorting_header(S_STATUS,'status')));
 
 		$db_apps = array();
-		$db_appids = array();
 
 		$http_wdgt->addItem(BR());
 
@@ -609,16 +608,15 @@ include_once('include/page_header.php');
 			$db_app['scenarios_cnt'] = 0;
 
 			$db_apps[$db_app['applicationid']] = $db_app;
-			$db_appids[$db_app['applicationid']] = $db_app['applicationid'];
 		}
 
 		$db_httptests = array();
-		$sql = 'SELECT wt.*,a.name as application,h.host,h.hostid'.
-			' FROM httptest wt'.
-				' LEFT JOIN applications a on wt.applicationid=a.applicationid'.
-				' LEFT JOIN hosts h on h.hostid=a.hostid'.
-			' WHERE '.DBcondition('a.applicationid', $db_appids).
-				($showdisabled == 0 ? ' AND wt.status <> 1' : '');
+		$sql = 'SELECT wt.*,a.name AS application,h.host,h.hostid'.
+				' FROM httptest wt,applications a,hosts h'.
+				' WHERE wt.applicationid=a.applicationid'.
+					' AND a.hostid=h.hostid'.
+					' AND '.DBcondition('a.applicationid', array_keys($db_apps)).
+					($showdisabled == 0 ? ' AND wt.status='.HTTPTEST_STATUS_ACTIVE : '');
 		$db_httptests_res = DBselect($sql);
 		while ($httptest_data = DBfetch($db_httptests_res)) {
 			$db_apps[$httptest_data['applicationid']]['scenarios_cnt']++;
@@ -627,7 +625,7 @@ include_once('include/page_header.php');
 			$db_httptests[$httptest_data['httptestid']] = $httptest_data;
 		}
 
-		$sql = 'SELECT hs.httptestid,COUNT(hs.httpstepid) as cnt'.
+		$sql = 'SELECT hs.httptestid,COUNT(hs.httpstepid) AS cnt'.
 				' FROM httpstep hs'.
 				' WHERE '.DBcondition('hs.httptestid', array_keys($db_httptests)).
 				' GROUP BY hs.httptestid';

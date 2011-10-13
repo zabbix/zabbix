@@ -950,7 +950,7 @@ function order_by($def, $allways='') {
 	}
 
 	if (!empty($allways)) {
-		$orderString .= $sortField === null ? '' : ',';
+		$orderString .= ($sortField === null) ? '' : ',';
 		$orderString .= $allways;
 	}
 

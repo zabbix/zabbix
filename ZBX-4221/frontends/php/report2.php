@@ -221,7 +221,6 @@ include_once('include/page_header.php');
 			}
 		}
 
-
 		$triggers = CTrigger::get($options);
 		ArraySorter::sort($triggers, array('host', 'description'));
 

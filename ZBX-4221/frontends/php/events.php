@@ -486,7 +486,7 @@
 
 				$sortFields = array(
 					array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
-					array('field' => 'eventid', 'order' => ZBX_SORT_DOWN),
+					array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
 				);
 				ArraySorter::sort($events, $sortFields);
 

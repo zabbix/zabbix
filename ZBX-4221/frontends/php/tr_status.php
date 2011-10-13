@@ -395,9 +395,7 @@ include_once('include/page_header.php');
 			'nopermissions' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'time_from' => time() - ($config['event_expire'] * 86400),
-			'time_till' => time(),
-			'sortfield' => 'eventid',
-			'sortorder' => ZBX_SORT_DOWN,
+			'time_till' => time()
 		);
 
 		switch($show_events){
@@ -409,9 +407,10 @@ include_once('include/page_header.php');
 			break;
 		}
 		$events = CEvent::get($ev_options);
+
 		$sortFields = array(
 			array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
-			array('field' => 'eventid', 'order' => ZBX_SORT_DOWN),
+			array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
 		);
 		ArraySorter::sort($events, $sortFields);
 
