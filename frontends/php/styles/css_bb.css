@@ -182,6 +182,9 @@ table.tableinfo{
 	color: #FFFFFF;
 	background-color: #001C31;
 }
+table.tableinfo caption {
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+}
 
 table.tableinfo tr td {
 }

@@ -149,6 +149,9 @@ table.tableinfo{
 	color: #DFDFDF;
 	background-color: #1F1F1F;
 }
+table.tableinfo caption {
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
+}
 
 table.tableinfo tr td {
 }
