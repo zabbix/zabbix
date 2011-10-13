@@ -563,7 +563,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 			$maint_span = null;
 			if($trigger_host['maintenance_status']){
-				$text = $trigger_host['maintenance_type'] ? S_NO_DATA_MAINTENANCE : S_NORMAL_MAINTENANCE;
+				$text = $trigger_host['maintenance_type'] ? _('Maintenance without data collection') : _('Maintenance with data collection');
 				$text = ' ['.$text.']';
 				$maint_span = new CSpan($text, 'orange pointer');
 

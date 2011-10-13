@@ -456,10 +456,6 @@
 	'S_HISTORY_PLAINTEXT_DATE_FORMAT'=>	_('Y-m-d H:i:s'),
 	'S_HISTORY_ITEM_DATE_FORMAT'=>		_('Y.M.d H:i:s'),
 
-// maintenance.php
-	'S_NORMAL_MAINTENANCE'=>		_('Normal maintenance'),
-	'S_NO_DATA_MAINTENANCE'=>		_('No data maintenance'),
-
 	'S_DATE'=>				_('Date'),
 
 	'S_JANUARY'=>				_('January'),
