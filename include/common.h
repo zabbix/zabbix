@@ -879,7 +879,7 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 #endif
 char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...);
 char	*zbx_strdcat(char *dest, const char *src);
-char	* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
+char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
