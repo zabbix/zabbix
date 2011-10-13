@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-08 01:04+0300\n"
+"POT-Creation-Date: 2011-10-11 22:11+0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -62,11 +62,11 @@ msgstr[2] ""
 msgid "&"
 msgstr "&"
 
-#: include/locales/en_gb.inc.php:1449
+#: include/locales/en_gb.inc.php:1430
 msgid "'"
 msgstr "'"
 
-#: include/locales/en_gb.inc.php:1579
+#: include/locales/en_gb.inc.php:1560
 msgid "' does not accept parameters."
 msgstr "' nepřijímá žádné argumenty."
 
@@ -98,7 +98,7 @@ msgstr "- ostatní -"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[HROMADNÉ POTVRZENÍ]----"
 
-#: include/locales/en_gb.inc.php:1574
+#: include/locales/en_gb.inc.php:1555
 msgid "0 or 1"
 msgstr "0 nebo 1"
 
@@ -118,7 +118,7 @@ msgstr "30 sekund"
 msgid "3D view"
 msgstr "3D pohled"
 
-#: include/locales/en_gb.inc.php:979 queue.php:163 queue.php:226
+#: include/locales/en_gb.inc.php:978 queue.php:163 queue.php:226
 msgid "5 minutes"
 msgstr "5 minut"
 
@@ -157,11 +157,11 @@ msgstr "A / NEBO"
 msgid "APPLICATIONS"
 msgstr "APLIKACE"
 
-#: include/locales/en_gb.inc.php:1375
+#: include/locales/en_gb.inc.php:1373
 msgid "AUDIT ACTIONS"
 msgstr "AKCE AUDITU"
 
-#: include/locales/en_gb.inc.php:1374
+#: include/locales/en_gb.inc.php:1372
 msgid "AUDIT LOGS"
 msgstr "ZÁZNAMY AUDITU"
 
@@ -169,11 +169,11 @@ msgstr "ZÁZNAMY AUDITU"
 msgid "AUTHENTICATION TO ZABBIX"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1008
+#: include/locales/en_gb.inc.php:1007
 msgid "AVAILABILITY REPORT"
 msgstr "PROTOKOL DOSTUPNOSTI"
 
-#: include/locales/en_gb.inc.php:1219
+#: include/locales/en_gb.inc.php:1218
 msgid "Acceptable SLA (in %)"
 msgstr "Přípustná SLA [%]"
 
@@ -186,7 +186,7 @@ msgstr ""
 msgid "Account is blocked for %s seconds"
 msgstr ""
 
-#: include/actions.inc.php:180 include/locales/en_gb.inc.php:1331
+#: include/actions.inc.php:180 include/locales/en_gb.inc.php:1330
 #: include/views/configuration.action.edit.php:904
 msgid "Ack"
 msgstr "Potvrzeno"
@@ -203,11 +203,11 @@ msgstr "Potvrzení bylo přidáno"
 msgid "Acknowledge alarm by"
 msgstr "Potvrdit alarm -"
 
-#: include/locales/en_gb.inc.php:1333
+#: include/locales/en_gb.inc.php:1332
 msgid "Acknowledge status"
 msgstr "Stav potvrzení"
 
-#: include/locales/en_gb.inc.php:1330
+#: include/locales/en_gb.inc.php:1329
 msgid "Acknowledged"
 msgstr "Potvrzený"
 
@@ -227,7 +227,7 @@ msgstr "Potvrzení"
 msgid "Acknowledging disabled"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1376
+#: include/locales/en_gb.inc.php:1374
 #: include/views/configuration.action.edit.php:74
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:332
@@ -275,7 +275,7 @@ msgstr "Akce"
 msgid "Activate selected"
 msgstr "Povolit vybrané"
 
-#: include/locales/en_gb.inc.php:1479
+#: include/locales/en_gb.inc.php:1460
 msgid "Activate selected applications?"
 msgstr "Povolit vybrané aplikace?"
 
@@ -301,7 +301,7 @@ msgid "Active till"
 msgstr "Aktivní do"
 
 #: dashconf.php:196 include/forms.inc.php:3669
-#: include/locales/en_gb.inc.php:1316
+#: include/locales/en_gb.inc.php:1315
 #: include/views/administration.general.iconmap.edit.php:111
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.general.valuemapping.edit.php:50
@@ -348,11 +348,11 @@ msgstr "Přidat odkaz"
 msgid "Add prototype"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1695
+#: include/locales/en_gb.inc.php:1676
 msgid "Add service"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1355
+#: include/locales/en_gb.inc.php:1353
 msgid "Add to"
 msgstr "Přidat do"
 
@@ -368,7 +368,7 @@ msgstr ""
 msgid "Add to host groups"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1379
+#: include/locales/en_gb.inc.php:1377
 msgid "Added"
 msgstr "Přidáno"
 
@@ -388,11 +388,11 @@ msgstr "Administrace"
 msgid "Advanced labels"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:935
+#: include/locales/en_gb.inc.php:934
 msgid "Age"
 msgstr "Stáří"
 
-#: include/locales/en_gb.inc.php:1338
+#: include/locales/en_gb.inc.php:1337
 msgid "Age less than"
 msgstr "Stáří méně než"
 
@@ -423,7 +423,7 @@ msgstr "Alias"
 msgid "Align icons"
 msgstr "zarovnat ikony"
 
-#: include/locales/en_gb.inc.php:401 include/locales/en_gb.inc.php:962
+#: include/locales/en_gb.inc.php:401 include/locales/en_gb.inc.php:961
 #: include/nodes.inc.php:163 include/page_header.php:302
 #: include/views/administration.general.gui.edit.php:30
 #: include/views/administration.script.edit.php:75
@@ -441,7 +441,7 @@ msgstr "vše"
 msgid "All groups"
 msgstr "Všechny skupiny"
 
-#: include/locales/en_gb.inc.php:906
+#: include/locales/en_gb.inc.php:905
 msgid "All links should have \"Name\" and \"URL\" specified"
 msgstr ""
 
@@ -453,7 +453,7 @@ msgstr "Všechny uzly"
 msgid "Allowed hosts"
 msgstr "Povolení hostitelé"
 
-#: include/locales/en_gb.inc.php:1334
+#: include/locales/en_gb.inc.php:1333
 msgid "Any"
 msgstr "Jakýkoliv"
 
@@ -502,7 +502,7 @@ msgstr "Aplikace byla aktualizována"
 msgid "Applications"
 msgstr "Aplikace"
 
-#: include/locales/en_gb.inc.php:867
+#: include/locales/en_gb.inc.php:866
 #: include/views/js/configuration.sysmaps.js.php:180
 #: include/views/js/configuration.sysmaps.js.php:261
 #: include/views/js/configuration.sysmaps.js.php:352
@@ -541,7 +541,7 @@ msgstr ""
 msgid "As is"
 msgstr "Ponechat stejné"
 
-#: include/locales/en_gb.inc.php:1148
+#: include/locales/en_gb.inc.php:1147
 msgid "As plain text"
 msgstr "Jako prostý text"
 
@@ -557,7 +557,7 @@ msgstr "V"
 msgid "At least one host or group should be selected"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1575
+#: include/locales/en_gb.inc.php:1556
 msgid "At least one item must be present in the trigger expression."
 msgstr "Výraz spouštěče musí obsahovat alespoň jednu položku."
 
@@ -565,7 +565,7 @@ msgstr "Výraz spouštěče musí obsahovat alespoň jednu položku."
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1373 include/menu.inc.php:260
+#: include/locales/en_gb.inc.php:1371 include/menu.inc.php:260
 msgid "Audit"
 msgstr "Audit"
 
@@ -637,7 +637,7 @@ msgstr ""
 msgid "Availability"
 msgstr "Dostupnost"
 
-#: include/locales/en_gb.inc.php:1007 include/menu.inc.php:134
+#: include/locales/en_gb.inc.php:1006 include/menu.inc.php:134
 msgid "Availability report"
 msgstr "Protokol dostupnosti"
 
@@ -650,7 +650,7 @@ msgstr "Dostupný"
 msgid "Average"
 msgstr "Střední"
 
-#: include/locales/en_gb.inc.php:1087
+#: include/locales/en_gb.inc.php:1086
 msgid "Average by"
 msgstr "Průměry"
 
@@ -658,7 +658,7 @@ msgstr "Průměry"
 msgid "Axis side"
 msgstr "Strana osy"
 
-#: include/locales/en_gb.inc.php:1506
+#: include/locales/en_gb.inc.php:1487
 msgid "B"
 msgstr "B"
 
@@ -676,7 +676,7 @@ msgstr "Pozadí"
 msgid "Background image"
 msgstr "Obrázek na pozadí"
 
-#: include/locales/en_gb.inc.php:1079 include/menu.inc.php:142
+#: include/locales/en_gb.inc.php:1078 include/menu.inc.php:142
 msgid "Bar reports"
 msgstr "Sloupcové grafy"
 
@@ -719,14 +719,14 @@ msgstr "Tučná čára"
 msgid "Boolean"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:894
+#: include/locales/en_gb.inc.php:893
 #: include/views/configuration.sysmap.edit.php:131
 #: include/views/js/configuration.sysmaps.js.php:73
 #: include/views/js/configuration.sysmaps.js.php:307
 msgid "Bottom"
 msgstr "dole"
 
-#: include/locales/en_gb.inc.php:1090
+#: include/locales/en_gb.inc.php:1089
 msgid "Brighten"
 msgstr "Světlejší"
 
@@ -734,11 +734,11 @@ msgstr "Světlejší"
 msgid "Bulk acknowledge"
 msgstr "Hromadné potvrzení"
 
-#: include/locales/en_gb.inc.php:1010
+#: include/locales/en_gb.inc.php:1009
 msgid "By host"
 msgstr "Podle hostitele"
 
-#: include/locales/en_gb.inc.php:1011
+#: include/locales/en_gb.inc.php:1010
 msgid "By trigger template"
 msgstr "Podle šablony spouštěče"
 
@@ -754,7 +754,7 @@ msgstr "NASTAVENÍ APLIKACÍ"
 msgid "CONFIGURATION OF DISCOVERY RULES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:806
+#: include/locales/en_gb.inc.php:805
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
 msgstr ""
 
@@ -795,11 +795,11 @@ msgstr "NASTAVENÍ UZLŮ"
 msgid "CONFIGURATION OF PROXIES"
 msgstr "NASTAVENÍ PROXY"
 
-#: include/locales/en_gb.inc.php:1110
+#: include/locales/en_gb.inc.php:1109
 msgid "CONFIGURATION OF SCREEN"
 msgstr "NASTAVENÍ OBRAZOVKY"
 
-#: include/locales/en_gb.inc.php:1098
+#: include/locales/en_gb.inc.php:1097
 msgid "CONFIGURATION OF SCREENS"
 msgstr "NASTAVENÍ OBRAZOVEK"
 
@@ -807,15 +807,15 @@ msgstr "NASTAVENÍ OBRAZOVEK"
 msgid "CONFIGURATION OF SCRIPTS"
 msgstr "NASTAVENÍ SKRIPTŮ"
 
-#: include/locales/en_gb.inc.php:1130
+#: include/locales/en_gb.inc.php:1129
 msgid "CONFIGURATION OF SLIDE SHOWS"
 msgstr "NASTAVENÍ PREZENTACÍ"
 
-#: include/locales/en_gb.inc.php:809
+#: include/locales/en_gb.inc.php:808
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1262
+#: include/locales/en_gb.inc.php:1261
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "NASTAVENÍ SPOUŠTĚČŮ"
 
@@ -840,7 +840,7 @@ msgstr "NASTAVENÍ SLEDOVÁNÍ WEBŮ"
 msgid "CONFIGURATION OF ZABBIX"
 msgstr "NASTAVENÍ ZABBIXE"
 
-#: include/locales/en_gb.inc.php:1218
+#: include/locales/en_gb.inc.php:1217
 msgid "Calculate SLA"
 msgstr "Vypočítat SLA"
 
@@ -856,11 +856,11 @@ msgstr ""
 msgid "Callback"
 msgstr "callback"
 
-#: include/locales/en_gb.inc.php:1702
+#: include/locales/en_gb.inc.php:1683
 msgid "Can not create new element"
 msgstr "Nelze vytvořit nový element"
 
-#: include/locales/en_gb.inc.php:1701
+#: include/locales/en_gb.inc.php:1682
 msgid "Can not find objects with name"
 msgstr "Nelze najít žádné objekty se jménem"
 
@@ -868,15 +868,15 @@ msgstr "Nelze najít žádné objekty se jménem"
 msgid "Can't add group"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1629
+#: include/locales/en_gb.inc.php:1610
 msgid "Can't delete user medias"
 msgstr "Nelze smazat media uživatele"
 
-#: include/locales/en_gb.inc.php:1669
+#: include/locales/en_gb.inc.php:1650
 msgid "Can't format Tree"
 msgstr "Nelze naformátovat navigační strom"
 
-#: include/locales/en_gb.inc.php:1631
+#: include/locales/en_gb.inc.php:1612
 msgid "Can't insert user medias"
 msgstr "Nelze přidat média uživatele"
 
@@ -884,7 +884,7 @@ msgstr "Nelze přidat média uživatele"
 msgid "Can't link template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1367
+#: include/locales/en_gb.inc.php:1365
 msgid "Can't read script response, check connection"
 msgstr "Nepodařilo se přečíst odpověď skriptu, zkontrolujte spojení"
 
@@ -900,7 +900,7 @@ msgstr ""
 msgid "Can't remove macros"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1366
+#: include/locales/en_gb.inc.php:1364
 msgid "Can't send command, check connection"
 msgstr "Nepodařilo se poslat příkaz, zkontrolujte spojení"
 
@@ -912,7 +912,7 @@ msgstr ""
 msgid "Can't unlink template"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1630
+#: include/locales/en_gb.inc.php:1611
 msgid "Can't update user medias"
 msgstr "Nelze aktualizovat média uživatele"
 
@@ -920,7 +920,7 @@ msgstr "Nelze aktualizovat média uživatele"
 msgid "Canada (136 characters)"
 msgstr ""
 
-#: include/forms.inc.php:3670 include/locales/en_gb.inc.php:928
+#: include/forms.inc.php:3670 include/locales/en_gb.inc.php:927
 #: include/views/configuration.action.edit.php:865
 #: include/views/configuration.action.edit.php:913
 #: include/views/js/administration.general.triggerDisplayingOptions.js.php:55
@@ -992,11 +992,11 @@ msgstr ""
 msgid "Cannot add more than one item with type \"Graph sum\""
 msgstr "Nelze přidat další položku typu \"souhrn grafu\""
 
-#: include/locales/en_gb.inc.php:881
+#: include/locales/en_gb.inc.php:880
 msgid "Cannot add network map"
 msgstr "Nelze přidat síťovou mapu"
 
-#: include/locales/en_gb.inc.php:1547
+#: include/locales/en_gb.inc.php:1528
 msgid "Cannot add new application"
 msgstr "Nelze přidat novou aplikaci"
 
@@ -1004,7 +1004,7 @@ msgstr "Nelze přidat novou aplikaci"
 msgid "Cannot add node"
 msgstr "Nelze přidat uzel"
 
-#: include/locales/en_gb.inc.php:1344
+#: include/locales/en_gb.inc.php:1343
 msgid "Cannot add proxy"
 msgstr "Nelze přidat proxy"
 
@@ -1016,7 +1016,7 @@ msgstr "Nelze přidat regulární výraz"
 msgid "Cannot add scenario"
 msgstr "Nelze přidat scénář"
 
-#: include/locales/en_gb.inc.php:1101
+#: include/locales/en_gb.inc.php:1100
 msgid "Cannot add screen"
 msgstr "Nelze přidat obrazovku"
 
@@ -1024,11 +1024,11 @@ msgstr "Nelze přidat obrazovku"
 msgid "Cannot add script"
 msgstr "Nelze přidat skript"
 
-#: include/locales/en_gb.inc.php:1210
+#: include/locales/en_gb.inc.php:1209
 msgid "Cannot add service"
 msgstr "Nelze přidat službu"
 
-#: include/locales/en_gb.inc.php:1189
+#: include/locales/en_gb.inc.php:1188
 msgid "Cannot add slideshow"
 msgstr "Nelze přidat prezentaci"
 
@@ -1036,7 +1036,7 @@ msgstr "Nelze přidat prezentaci"
 msgid "Cannot add template"
 msgstr "Nelze přidat šablonu"
 
-#: include/locales/en_gb.inc.php:1268 triggers.php:321
+#: include/locales/en_gb.inc.php:1267 triggers.php:390
 msgid "Cannot add trigger"
 msgstr "Nelze přidat spouštěč"
 
@@ -1181,7 +1181,7 @@ msgstr "Nelze smazat servisní okno"
 msgid "Cannot delete media type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:870
+#: include/locales/en_gb.inc.php:869
 msgid "Cannot delete network map"
 msgstr "Nelze smazat síťovou mapu"
 
@@ -1189,7 +1189,7 @@ msgstr "Nelze smazat síťovou mapu"
 msgid "Cannot delete node"
 msgstr "Nelze smazat uzel"
 
-#: include/locales/en_gb.inc.php:1348
+#: include/locales/en_gb.inc.php:1347
 msgid "Cannot delete proxy"
 msgstr "Nelze smazat proxy"
 
@@ -1201,7 +1201,7 @@ msgstr "Nelze smazat regulární výraz"
 msgid "Cannot delete scenario"
 msgstr "Nelze smazat scénář"
 
-#: include/locales/en_gb.inc.php:1105
+#: include/locales/en_gb.inc.php:1104
 msgid "Cannot delete screen"
 msgstr ""
 
@@ -1223,11 +1223,11 @@ msgstr ""
 msgid "Cannot delete selected actions"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1212
+#: include/locales/en_gb.inc.php:1211
 msgid "Cannot delete service"
 msgstr "Nelze smazat službu"
 
-#: include/locales/en_gb.inc.php:1191
+#: include/locales/en_gb.inc.php:1190
 msgid "Cannot delete slideshow"
 msgstr "Nelze smazat prezentaci"
 
@@ -1249,7 +1249,7 @@ msgstr ""
 msgid "Cannot delete templated trigger [%1$s:%2$s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1266
+#: include/locales/en_gb.inc.php:1265
 msgid "Cannot delete trigger"
 msgstr "Nelze smazat spouštěč"
 
@@ -1257,7 +1257,7 @@ msgstr "Nelze smazat spouštěč"
 msgid "Cannot delete trigger."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1264
+#: include/locales/en_gb.inc.php:1263
 msgid "Cannot delete triggers"
 msgstr "Nelze smazat spouštěče"
 
@@ -1269,15 +1269,15 @@ msgstr "Nelze smazat uživatele"
 msgid "Cannot delete value map"
 msgstr "Nelze smazat mapu hodnot"
 
-#: include/locales/en_gb.inc.php:898
+#: include/locales/en_gb.inc.php:897
 msgid "Cannot find background image"
 msgstr "Nelze najít obrázek na pozadí"
 
-#: include/locales/en_gb.inc.php:1142
+#: include/locales/en_gb.inc.php:1141
 msgid "Cannot find graph"
 msgstr "Nelze najít graf"
 
-#: include/locales/en_gb.inc.php:900
+#: include/locales/en_gb.inc.php:899
 msgid "Cannot find host"
 msgstr "Nelze najít hostitele"
 
@@ -1287,7 +1287,7 @@ msgstr "Nelze najít hostitele"
 msgid "Cannot find host interface on host \"%1$s\" for item key \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:901
+#: include/locales/en_gb.inc.php:900
 msgid "Cannot find hostgroup"
 msgstr "Nelze najít skupinu hostitelů"
 
@@ -1296,27 +1296,27 @@ msgstr "Nelze najít skupinu hostitelů"
 msgid "Cannot find icon map \"%1$s\" used in exported map \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:897
+#: include/locales/en_gb.inc.php:896
 msgid "Cannot find image"
 msgstr "Nelze najít obrázek"
 
-#: include/locales/en_gb.inc.php:1143
+#: include/locales/en_gb.inc.php:1142
 msgid "Cannot find item"
 msgstr "Nelze najít položku"
 
-#: include/locales/en_gb.inc.php:902
+#: include/locales/en_gb.inc.php:901
 msgid "Cannot find map"
 msgstr "Nelze najít mapu"
 
-#: include/locales/en_gb.inc.php:903
+#: include/locales/en_gb.inc.php:902
 msgid "Cannot find screen"
 msgstr "Nelze najít obrazovku"
 
-#: include/locales/en_gb.inc.php:899
+#: include/locales/en_gb.inc.php:898
 msgid "Cannot find trigger"
 msgstr "Nelze najít spouštěč"
 
-#: include/locales/en_gb.inc.php:1256
+#: include/locales/en_gb.inc.php:1255
 msgid "Cannot format Tree. Check logic structure in service links"
 msgstr "Nelze naformátovat navigační strom. Zkontrolujte logiku propojení služeb"
 
@@ -1372,17 +1372,17 @@ msgstr ""
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr ""
 
-#: include/db.inc.php:1358
+#: include/db.inc.php:1375
 #, php-format
 msgid "Cannot perform delete statement on table \"%s\" without where condition."
 msgstr ""
 
-#: include/db.inc.php:1313
+#: include/db.inc.php:1330
 #, php-format
 msgid "Cannot perform update statement on table \"%s\" without values."
 msgstr ""
 
-#: include/db.inc.php:1322
+#: include/db.inc.php:1339
 #, php-format
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
@@ -1395,7 +1395,7 @@ msgstr ""
 msgid "Cannot remove macro."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1632
+#: include/locales/en_gb.inc.php:1613
 msgid "Cannot rename guest user"
 msgstr "Nelze přejmenovat uživatele guest"
 
@@ -1451,7 +1451,7 @@ msgstr "Nelze upravit akci"
 msgid "Cannot update application"
 msgstr "Nelze upravit aplikaci"
 
-#: include/locales/en_gb.inc.php:1315
+#: include/locales/en_gb.inc.php:1314
 msgid "Cannot update comment"
 msgstr "Nelze upravit komentář"
 
@@ -1528,7 +1528,7 @@ msgstr ""
 msgid "Cannot update media type"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:883
+#: include/locales/en_gb.inc.php:882
 msgid "Cannot update network map"
 msgstr "Nelze upravit síťovou mapu"
 
@@ -1536,7 +1536,7 @@ msgstr "Nelze upravit síťovou mapu"
 msgid "Cannot update node"
 msgstr "Nelze upravit uzel"
 
-#: include/locales/en_gb.inc.php:1346
+#: include/locales/en_gb.inc.php:1345
 msgid "Cannot update proxy"
 msgstr "Nelze upravit proxy"
 
@@ -1548,7 +1548,7 @@ msgstr "Nelze upravit regulární výraz"
 msgid "Cannot update scenario"
 msgstr "Nelze upravit scénář"
 
-#: include/locales/en_gb.inc.php:1103
+#: include/locales/en_gb.inc.php:1102
 msgid "Cannot update screen"
 msgstr "Nelze upravit obrazovku"
 
@@ -1556,15 +1556,15 @@ msgstr "Nelze upravit obrazovku"
 msgid "Cannot update script"
 msgstr "Nelze upravit skript"
 
-#: include/locales/en_gb.inc.php:1208
+#: include/locales/en_gb.inc.php:1207
 msgid "Cannot update service"
 msgstr "Nelze upravit službu"
 
-#: include/locales/en_gb.inc.php:1187
+#: include/locales/en_gb.inc.php:1186
 msgid "Cannot update slideshow"
 msgstr ""
 
-#: actionconf.php:327 trigger_prototypes.php:255 triggers.php:295
+#: actionconf.php:327 trigger_prototypes.php:288 triggers.php:364
 msgid "Cannot update status"
 msgstr "Nelze upravit stav"
 
@@ -1572,7 +1572,7 @@ msgstr "Nelze upravit stav"
 msgid "Cannot update template"
 msgstr "Nelze upravit šablonu"
 
-#: include/locales/en_gb.inc.php:1278
+#: include/locales/en_gb.inc.php:1277
 msgid "Cannot update trigger"
 msgstr "Nelze upravit spouštěč"
 
@@ -1592,7 +1592,7 @@ msgstr "Nelze aktualizovat stav uživatele"
 msgid "Cannot update value map"
 msgstr "Nelze aktualizovat mapu hodnot"
 
-#: include/locales/en_gb.inc.php:1430
+#: include/locales/en_gb.inc.php:1411
 msgid "Caption"
 msgstr "Popisek"
 
@@ -1600,11 +1600,11 @@ msgstr "Popisek"
 msgid "Case sensitive"
 msgstr "Rozlišovat velikost"
 
-#: include/locales/en_gb.inc.php:1172
+#: include/locales/en_gb.inc.php:1171
 msgid "Centre"
 msgstr "Střed"
 
-#: include/locales/en_gb.inc.php:1276
+#: include/locales/en_gb.inc.php:1275
 msgid "Change"
 msgstr "Změna"
 
@@ -1633,7 +1633,7 @@ msgstr ""
 msgid "Check already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1448
+#: include/locales/en_gb.inc.php:1429
 msgid "Check expression part starting from '"
 msgstr "Zkontrolujte část výrazu od '"
 
@@ -1657,7 +1657,7 @@ msgstr ""
 msgid "Child"
 msgstr "Vzdálený"
 
-#: include/locales/en_gb.inc.php:1405
+#: include/locales.inc.php:60
 msgid "Chinese (zh_CN)"
 msgstr "Čínsky (zh_CN)"
 
@@ -1670,7 +1670,7 @@ msgstr ""
 msgid "Circular link cannot be created for map element \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1387
+#: include/locales/en_gb.inc.php:1385
 msgid "Clear"
 msgstr ""
 
@@ -1686,11 +1686,11 @@ msgstr "Pročistit historii vybraných"
 msgid "Clear when unlinking"
 msgstr "Pročistit při odpojování"
 
-#: include/locales/en_gb.inc.php:1156
+#: include/locales/en_gb.inc.php:1155
 msgid "Clock"
 msgstr "Hodiny"
 
-#: include/locales/en_gb.inc.php:1224
+#: include/locales/en_gb.inc.php:1223
 #: include/views/administration.general.iconmap.edit.php:139
 #: include/views/administration.script.edit.php:119
 #: include/views/configuration.action.edit.php:929
@@ -1700,7 +1700,7 @@ msgstr "Hodiny"
 msgid "Clone"
 msgstr "Vytvořit kopii"
 
-#: include/locales/en_gb.inc.php:1362
+#: include/locales/en_gb.inc.php:1360
 #: include/views/js/configuration.sysmaps.js.php:182
 #: include/views/js/configuration.sysmaps.js.php:263
 #: include/views/js/configuration.sysmaps.js.php:354
@@ -1718,7 +1718,7 @@ msgstr ""
 msgid "Colour"
 msgstr "Barva"
 
-#: include/locales/en_gb.inc.php:877
+#: include/locales/en_gb.inc.php:876
 #: include/views/js/configuration.sysmaps.js.php:228
 msgid "Colour (OK)"
 msgstr "Barva (OK)"
@@ -1727,19 +1727,19 @@ msgstr "Barva (OK)"
 msgid "Colour is not correct: expecting hexadecimal colour code (6 symbols)."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1150
+#: include/locales/en_gb.inc.php:1149
 msgid "Column span"
 msgstr "Rozsah sloupců"
 
-#: include/locales/en_gb.inc.php:1106
+#: include/locales/en_gb.inc.php:1105
 msgid "Columns"
 msgstr "Sloupce"
 
-#: include/locales/en_gb.inc.php:1475
+#: include/locales/en_gb.inc.php:1456
 msgid "Combined result"
 msgstr "Kombinovaný výsledek"
 
-#: include/locales/en_gb.inc.php:1360
+#: include/locales/en_gb.inc.php:1358
 #: include/views/administration.script.edit.php:66
 msgid "Command"
 msgstr "Příkaz"
@@ -1760,11 +1760,11 @@ msgstr ""
 msgid "Commands"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1314
+#: include/locales/en_gb.inc.php:1313
 msgid "Comment updated"
 msgstr "Komentář byl aktualizován"
 
-#: include/locales/en_gb.inc.php:1329
+#: include/locales/en_gb.inc.php:1328
 msgid "Comments"
 msgstr "Komentáře"
 
@@ -1772,7 +1772,7 @@ msgstr "Komentáře"
 msgid "Commercial"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1082
+#: include/locales/en_gb.inc.php:1081
 msgid "Compare values for multiple periods"
 msgstr "Porovnání hodnot pro časové období"
 
@@ -1794,7 +1794,7 @@ msgstr "Podmínky"
 msgid "Configuration"
 msgstr "Nastavení"
 
-#: include/locales/en_gb.inc.php:1205
+#: include/locales/en_gb.inc.php:1204
 msgid "Configuration of IT services"
 msgstr "Nastavení IT služeb"
 
@@ -1822,19 +1822,19 @@ msgstr "Nastavení grafů"
 msgid "Configuration of items"
 msgstr "Nastavení položek"
 
-#: include/locales/en_gb.inc.php:855
+#: include/locales/en_gb.inc.php:854
 msgid "Configuration of network maps"
 msgstr "Nastavení síťových map"
 
-#: include/locales/en_gb.inc.php:1099
+#: include/locales/en_gb.inc.php:1098
 msgid "Configuration of screens"
 msgstr "Nastavení obrazovek"
 
-#: include/locales/en_gb.inc.php:1131
+#: include/locales/en_gb.inc.php:1130
 msgid "Configuration of slideshows"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1261
+#: include/locales/en_gb.inc.php:1260
 msgid "Configuration of triggers"
 msgstr "Nastavení spouštěčů"
 
@@ -1846,7 +1846,7 @@ msgstr "Nastavení bylo aktualizováno"
 msgid "Configuration was not updated"
 msgstr "Nastavení nebylo aktualizováno"
 
-#: include/locales/en_gb.inc.php:954
+#: include/locales/en_gb.inc.php:953
 msgid "Configure"
 msgstr "Nastavit"
 
@@ -1870,7 +1870,7 @@ msgstr ""
 msgid "Connected as '%1$s' from '%2$s'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:861
+#: include/locales/en_gb.inc.php:860
 msgid "Connectors"
 msgstr "Spojnice"
 
@@ -1882,12 +1882,12 @@ msgstr "Kontakt"
 msgid "Contract number"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:858
+#: include/locales/en_gb.inc.php:857
 #: include/views/js/configuration.sysmaps.js.php:149
 msgid "Coordinate X"
 msgstr "Souřadnice X"
 
-#: include/locales/en_gb.inc.php:859
+#: include/locales/en_gb.inc.php:858
 #: include/views/js/configuration.sysmaps.js.php:153
 msgid "Coordinate Y"
 msgstr "Souřadnice Y"
@@ -1904,7 +1904,7 @@ msgstr "Zkopírovat vybrané položky?"
 msgid "Copy selected to ..."
 msgstr "Kopírovat vybrané do ..."
 
-#: include/locales/en_gb.inc.php:1306
+#: include/locales/en_gb.inc.php:1305
 msgid "Copy selected triggers?"
 msgstr "Zkopírovat vybrané spouštěče?"
 
@@ -1913,19 +1913,19 @@ msgstr "Zkopírovat vybrané spouštěče?"
 msgid "Correct login [%s]"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1613
+#: include/locales/en_gb.inc.php:1594
 msgid "Could not save image!"
 msgstr "Nepodařilo se uložit obrázek!"
 
-#: include/locales/en_gb.inc.php:978
+#: include/locales/en_gb.inc.php:977
 msgid "Count"
 msgstr "Počet"
 
-#: include/locales/en_gb.inc.php:1134
+#: include/locales/en_gb.inc.php:1133
 msgid "Count of slides"
 msgstr "Počet slajdů"
 
-#: include/locales/en_gb.inc.php:1060
+#: include/locales/en_gb.inc.php:1059
 msgid "Create"
 msgstr "Vytvořit"
 
@@ -1961,16 +1961,12 @@ msgstr ""
 msgid "Create maintenance period"
 msgstr "Vytvořit servisní okno"
 
-#: include/locales/en_gb.inc.php:873
+#: include/locales/en_gb.inc.php:872
 msgid "Create map"
 msgstr ""
 
 #: include/views/administration.mediatypes.list.php:28
 msgid "Create media type"
-msgstr ""
-
-#: include/locales/en_gb.inc.php:803
-msgid "Create prototype"
 msgstr ""
 
 #: include/locales/en_gb.inc.php:665
@@ -1985,7 +1981,7 @@ msgstr "Vytvořit pravidlo"
 msgid "Create scenario"
 msgstr "Vytvořit scénář"
 
-#: include/locales/en_gb.inc.php:1120
+#: include/locales/en_gb.inc.php:1119
 msgid "Create screen"
 msgstr ""
 
@@ -1993,11 +1989,11 @@ msgstr ""
 msgid "Create script"
 msgstr "Vytvořit skript"
 
-#: include/locales/en_gb.inc.php:1121
+#: include/locales/en_gb.inc.php:1120
 msgid "Create slide show"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1282 include/locales/en_gb.inc.php:1693
+#: include/locales/en_gb.inc.php:1281 include/locales/en_gb.inc.php:1674
 msgid "Create trigger"
 msgstr ""
 
@@ -2099,7 +2095,7 @@ msgstr ""
 msgid "Custom multiplier"
 msgstr "Vlastní multiplikátor"
 
-#: include/locales/en_gb.inc.php:1182
+#: include/locales/en_gb.inc.php:1181
 msgid "Custom screens"
 msgstr "Vlastní obrazovky"
 
@@ -2119,11 +2115,11 @@ msgstr ""
 msgid "Custom size"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1198
+#: include/locales/en_gb.inc.php:1197
 msgid "Custom slides"
 msgstr "Vlastní prezentace"
 
-#: include/locales/en_gb.inc.php:1410
+#: include/locales.inc.php:61
 msgid "Czech (cs_CZ)"
 msgstr "Česky (cs_CZ)"
 
@@ -2131,7 +2127,7 @@ msgstr "Česky (cs_CZ)"
 msgid "D"
 msgstr "D"
 
-#: include/locales/en_gb.inc.php:953
+#: include/locales/en_gb.inc.php:952
 msgid "DASHBOARD CONFIGURATION"
 msgstr "NASTAVENÍ ŘÍDÍCÍHO PANELU"
 
@@ -2139,11 +2135,11 @@ msgstr "NASTAVENÍ ŘÍDÍCÍHO PANELU"
 msgid "DETAILS OF SCENARIO"
 msgstr "DETAILY SCÉNÁŘE"
 
-#: include/locales/en_gb.inc.php:1272
+#: include/locales/en_gb.inc.php:1271
 msgid "DISABLED"
 msgstr "ZAKÁZÁNO"
 
-#: include/locales/en_gb.inc.php:827
+#: include/locales/en_gb.inc.php:826
 msgid "DISCOVERED"
 msgstr ""
 
@@ -2151,7 +2147,7 @@ msgstr ""
 msgid "DISCOVERY"
 msgstr "PRŮZKUM"
 
-#: include/locales/en_gb.inc.php:1433
+#: include/locales/en_gb.inc.php:1414
 msgid "DISCOVERY RULES"
 msgstr "PRAVIDLA PRO PRŮZKUM"
 
@@ -2168,11 +2164,11 @@ msgstr "DNS"
 msgid "DNS name"
 msgstr "Jméno DNS"
 
-#: include/locales/en_gb.inc.php:826
+#: include/locales/en_gb.inc.php:825
 msgid "DOWN"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1042
+#: include/locales/en_gb.inc.php:1041
 msgid "Daily"
 msgstr "denně"
 
@@ -2181,19 +2177,19 @@ msgstr "denně"
 msgid "Dark orange"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1089
+#: include/locales/en_gb.inc.php:1088
 msgid "Darken"
 msgstr "Tmavší"
 
-#: include/locales/en_gb.inc.php:933 include/menu.inc.php:32
+#: include/locales/en_gb.inc.php:932 include/menu.inc.php:32
 msgid "Dashboard"
 msgstr "Řídící panel"
 
-#: include/locales/en_gb.inc.php:952
+#: include/locales/en_gb.inc.php:951
 msgid "Dashboard configuration"
 msgstr "Nastavení řídícího panelu"
 
-#: include/locales/en_gb.inc.php:958
+#: include/locales/en_gb.inc.php:957
 msgid "Dashboard filter"
 msgstr "Filtr řídících panelů"
 
@@ -2203,7 +2199,7 @@ msgstr "Filtr řídících panelů"
 msgid "Dashed line"
 msgstr "Čárkovaná čára"
 
-#: include/locales/en_gb.inc.php:971
+#: include/locales/en_gb.inc.php:970
 msgid "Data"
 msgstr "Data"
 
@@ -2212,7 +2208,7 @@ msgstr "Data"
 msgid "Data from %1$s. Generated in %2$s sec"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1158
+#: include/locales/en_gb.inc.php:1157
 msgid "Data overview"
 msgstr "Přehled dat"
 
@@ -2281,7 +2277,7 @@ msgstr ""
 msgid "Date HW purchased"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1038
+#: include/locales/en_gb.inc.php:1037
 msgid "Day"
 msgstr "Den"
 
@@ -2297,7 +2293,7 @@ msgstr "Den v týdnu"
 msgid "Days"
 msgstr "dní"
 
-#: include/locales/en_gb.inc.php:1350
+#: include/locales/en_gb.inc.php:1349
 msgid "Debug"
 msgstr "Ladící výstup"
 
@@ -2348,11 +2344,11 @@ msgstr "Výchozí předmět"
 msgid "Default theme"
 msgstr "Výchozí téma"
 
-#: include/locales/en_gb.inc.php:1369
+#: include/locales/en_gb.inc.php:1367
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value"
 msgstr "Byl dosažen limit čtení definovaný konstantou ZBX_SCRIPT_BYTES_LIMIT (v \"include/defines.inc.php\"). Můžete zkusit tuto hodnotu zvětšit."
 
-#: include/locales/en_gb.inc.php:1368
+#: include/locales/en_gb.inc.php:1366
 msgid "Defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value"
 msgstr "Vypršel čas definovaný konstantou ZBX_SCRIPT_TIMEOUT (v \"include/defines.inc.php\"). Můžete zkusit tuto hodnotu zzvětšit."
 
@@ -2369,11 +2365,11 @@ msgstr ""
 msgid "Delayed by"
 msgstr "Zpožděno o"
 
-#: include/forms.inc.php:3608 include/locales/en_gb.inc.php:1223
+#: include/forms.inc.php:3608 include/locales/en_gb.inc.php:1222
 msgid "Delete"
 msgstr "Smazat"
 
-#: include/locales/en_gb.inc.php:888
+#: include/locales/en_gb.inc.php:887
 msgid "Delete Links between selected elements?"
 msgstr "Smazat spojnice mezi vybranými prvky?"
 
@@ -2397,7 +2393,7 @@ msgstr ""
 msgid "Delete discovery rule?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1464
+#: include/locales/en_gb.inc.php:1445
 msgid "Delete expression?"
 msgstr "Smazat výraz?"
 
@@ -2421,11 +2417,11 @@ msgstr "Smazat historii vybraných položek?"
 msgid "Delete icon map?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1586
+#: include/locales/en_gb.inc.php:1567
 msgid "Delete it?"
 msgstr "Smazat?"
 
-#: include/locales/en_gb.inc.php:1465
+#: include/locales/en_gb.inc.php:1446
 msgid "Delete keyword?"
 msgstr "Smazat klíčové slovo?"
 
@@ -2445,7 +2441,7 @@ msgstr "Smazat regulární výraz?"
 msgid "Delete scenario?"
 msgstr "Smazat scénář?"
 
-#: include/locales/en_gb.inc.php:1109
+#: include/locales/en_gb.inc.php:1108
 msgid "Delete screen?"
 msgstr "Smazat obrazovku?"
 
@@ -2479,7 +2475,7 @@ msgstr "Smazat vybrané scénáře?"
 msgid "Delete selected actions?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1481
+#: include/locales/en_gb.inc.php:1462
 msgid "Delete selected applications?"
 msgstr "Smazat vybrané aplikace?"
 
@@ -2487,7 +2483,7 @@ msgstr "Smazat vybrané aplikace?"
 msgid "Delete selected discovery rules?"
 msgstr "Smazat vybrané průzkumy?"
 
-#: include/locales/en_gb.inc.php:886
+#: include/locales/en_gb.inc.php:885
 msgid "Delete selected elements?"
 msgstr "Smazat vybrané prvky?"
 
@@ -2524,7 +2520,7 @@ msgstr "Smazat vybrané hostitele?"
 msgid "Delete selected image?"
 msgstr "Smazat vybraný obrázek?"
 
-#: include/locales/en_gb.inc.php:1535
+#: include/locales/en_gb.inc.php:1516
 msgid "Delete selected item?"
 msgstr "Smazat vybranou položku?"
 
@@ -2536,7 +2532,7 @@ msgstr "Smazat vybrané položky?"
 msgid "Delete selected maintenance periods?"
 msgstr "Smazat vybraná servisní okna?"
 
-#: include/locales/en_gb.inc.php:879
+#: include/locales/en_gb.inc.php:878
 msgid "Delete selected maps?"
 msgstr "Smazat vybrané mapy?"
 
@@ -2572,11 +2568,11 @@ msgstr ""
 msgid "Delete selected scripts?"
 msgstr "Smazat vybrané skripty?"
 
-#: include/locales/en_gb.inc.php:1698
+#: include/locales/en_gb.inc.php:1679
 msgid "Delete selected services?"
 msgstr "Smazat vybrané služby?"
 
-#: include/locales/en_gb.inc.php:1125
+#: include/locales/en_gb.inc.php:1124
 msgid "Delete selected slideshows?"
 msgstr "Smazat vybrané prezentace?"
 
@@ -2584,7 +2580,7 @@ msgstr "Smazat vybrané prezentace?"
 msgid "Delete selected templates?"
 msgstr "Smazat vybrané šablony?"
 
-#: include/locales/en_gb.inc.php:1307
+#: include/locales/en_gb.inc.php:1306
 msgid "Delete selected triggers?"
 msgstr "Smazat vybrané spouštěče?"
 
@@ -2612,11 +2608,11 @@ msgstr[2] ""
 msgid "Delete selected with linked elements"
 msgstr "Smazat vybrané včetně připojených položek"
 
-#: include/locales/en_gb.inc.php:1697
+#: include/locales/en_gb.inc.php:1678
 msgid "Delete service"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1192
+#: include/locales/en_gb.inc.php:1191
 msgid "Delete slideshow?"
 msgstr "Smazat prezentaci?"
 
@@ -2624,11 +2620,11 @@ msgstr "Smazat prezentaci?"
 msgid "Delete template?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1478
+#: include/locales/en_gb.inc.php:1459
 msgid "Delete this application?"
 msgstr "Smazat tuto aplikaci?"
 
-#: include/locales/en_gb.inc.php:1538
+#: include/locales/en_gb.inc.php:1519
 msgid "Delete trigger?"
 msgstr "Smazat spouštěč?"
 
@@ -2649,16 +2645,16 @@ msgstr "Rozdíl (změna)"
 msgid "Delta (speed per second)"
 msgstr "Rozdíl (rychlost za sekundu)"
 
-#: include/forms.inc.php:434 include/locales/en_gb.inc.php:1351
+#: include/forms.inc.php:434 include/locales/en_gb.inc.php:1350
 #: include/views/administration.usergroups.edit.php:80
 msgid "Deny"
 msgstr "Zakázat"
 
-#: include/locales/en_gb.inc.php:1280
+#: include/locales/en_gb.inc.php:1279
 msgid "Dependent"
 msgstr "Závisející"
 
-#: include/locales/en_gb.inc.php:1279 popup.php:904
+#: include/locales/en_gb.inc.php:1278 popup.php:904
 msgid "Depends on"
 msgstr "Závisí na:"
 
@@ -2674,7 +2670,7 @@ msgstr ""
 msgid "Description"
 msgstr "Popis"
 
-#: include/locales/en_gb.inc.php:1377
+#: include/locales/en_gb.inc.php:1375
 #: include/views/administration.mediatypes.list.php:48
 #: include/views/configuration.action.edit.php:329
 #: include/views/configuration.action.edit.php:332 queue.php:50
@@ -2693,11 +2689,11 @@ msgstr "Zařízení"
 msgid "Device uniqueness criteria"
 msgstr "Jedinečný identifikátor zařízení"
 
-#: include/locales/en_gb.inc.php:1124
+#: include/locales/en_gb.inc.php:1123
 msgid "Dimension (cols x rows)"
 msgstr "Rozměr (soupce x řádky)"
 
-#: include/locales/en_gb.inc.php:1274
+#: include/locales/en_gb.inc.php:1273
 msgid "Disable"
 msgstr "Zakázat"
 
@@ -2735,7 +2731,7 @@ msgstr "Zakázat vybrané webové scénáře?"
 msgid "Disable selected actions?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1480
+#: include/locales/en_gb.inc.php:1461
 msgid "Disable selected applications?"
 msgstr "Zakázat vybrané aplikace?"
 
@@ -2763,13 +2759,12 @@ msgstr "Zakázat vybrané hostitele?"
 msgid "Disable selected items?"
 msgstr "Zakázat vybrané položky?"
 
-#: include/locales/en_gb.inc.php:1304
+#: include/locales/en_gb.inc.php:1303
 msgid "Disable selected triggers?"
 msgstr "Zakázat vybrané spouštěče?"
 
 #: actionconf.php:487 include/discovery.inc.php:120
-#: include/locales/en_gb.inc.php:1271 include/triggers.inc.php:1180
-#: include/users.inc.php:59
+#: include/locales/en_gb.inc.php:1270 include/users.inc.php:59
 #: include/views/administration.usergroups.list.php:62
 #: include/views/administration.usergroups.list.php:84
 #: include/views/administration.usergroups.list.php:88
@@ -2883,19 +2878,19 @@ msgstr "Stav průzkumu"
 msgid "Display OK triggers for"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1426
+#: include/locales/en_gb.inc.php:1407
 msgid "Displaying"
 msgstr "Zobrazuji"
 
-#: include/locales/en_gb.inc.php:1081
+#: include/locales/en_gb.inc.php:1080
 msgid "Distribution of values for multiple items"
 msgstr "Rozložení hodnot pro více časových období"
 
-#: include/locales/en_gb.inc.php:1080
+#: include/locales/en_gb.inc.php:1079
 msgid "Distribution of values for multiple periods"
 msgstr "Rozložení hodnot pro časové období"
 
-#: include/locales/en_gb.inc.php:1536
+#: include/locales/en_gb.inc.php:1517
 msgid "Do"
 msgstr "Do"
 
@@ -2919,11 +2914,11 @@ msgstr "Smazat historii starší než x dní"
 msgid "Do not keep trends older than (in days)"
 msgstr "Smazat trendy starší než x dní"
 
-#: include/locales/en_gb.inc.php:1694
+#: include/locales/en_gb.inc.php:1675
 msgid "Do you wish to replace the conditional expression?"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1684
+#: include/locales/en_gb.inc.php:1665
 msgid "Done"
 msgstr ""
 
@@ -2948,7 +2943,7 @@ msgstr ""
 msgid "Download speed for step '%1$s' of scenario '%2$s'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:111 include/locales/en_gb.inc.php:1227
+#: include/locales/en_gb.inc.php:111 include/locales/en_gb.inc.php:1226
 msgid "Downtime"
 msgstr "Downtime"
 
@@ -2995,31 +2990,31 @@ msgstr ""
 msgid "Duration"
 msgstr "Trvání"
 
-#: include/locales/en_gb.inc.php:1406
+#: include/locales.inc.php:62
 msgid "Dutch (nl_NL)"
 msgstr "Nizozemsky (nl_NL)"
 
-#: include/locales/en_gb.inc.php:1123
+#: include/locales/en_gb.inc.php:1122
 msgid "Dynamic item"
 msgstr "Dynamická položka"
 
-#: include/locales/en_gb.inc.php:1523
+#: include/locales/en_gb.inc.php:1504
 msgid "E"
 msgstr "E"
 
-#: include/locales/en_gb.inc.php:1650
+#: include/locales/en_gb.inc.php:1631
 msgid "ERROR"
 msgstr "CHYBA"
 
-#: include/locales/en_gb.inc.php:1660
+#: include/locales/en_gb.inc.php:1641
 msgid "EVENTS"
 msgstr "UDÁLOSTI"
 
-#: include/locales/en_gb.inc.php:907
+#: include/locales/en_gb.inc.php:906
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
-#: include/forms.inc.php:3596 include/locales/en_gb.inc.php:1122
+#: include/forms.inc.php:3596 include/locales/en_gb.inc.php:1121
 #: include/views/administration.users.edit.php:163
 #: include/views/configuration.action.edit.php:367
 #: include/views/configuration.action.edit.php:373
@@ -3027,11 +3022,11 @@ msgstr ""
 msgid "Edit"
 msgstr "Upravit"
 
-#: include/locales/en_gb.inc.php:1457
+#: include/locales/en_gb.inc.php:1438
 msgid "Edit connector"
 msgstr "Upravit spojnici"
 
-#: include/locales/en_gb.inc.php:1422
+#: include/locales/en_gb.inc.php:1403
 msgid "Edit hosts"
 msgstr "Upravit hostitele"
 
@@ -3039,12 +3034,12 @@ msgstr "Upravit hostitele"
 msgid "Edit maintenance period"
 msgstr "Upravit servisní okno"
 
-#: include/locales/en_gb.inc.php:865
+#: include/locales/en_gb.inc.php:864
 #: include/views/js/configuration.sysmaps.js.php:8
 msgid "Edit map element"
 msgstr "Upravit prvek mapy"
 
-#: include/locales/en_gb.inc.php:1696
+#: include/locales/en_gb.inc.php:1677
 msgid "Edit service"
 msgstr ""
 
@@ -3070,7 +3065,7 @@ msgstr ""
 msgid "Email"
 msgstr "E-mail"
 
-#: include/locales/en_gb.inc.php:1431
+#: include/locales/en_gb.inc.php:1412
 msgid "Empty"
 msgstr "Prázdný"
 
@@ -3105,11 +3100,11 @@ msgstr "Prázdná hodnota makra"
 msgid "Empty parameters"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1370
+#: include/locales/en_gb.inc.php:1368
 msgid "Empty response received"
 msgstr "Byla přijata prázdná odpověď"
 
-#: include/locales/en_gb.inc.php:1275
+#: include/locales/en_gb.inc.php:1274
 msgid "Enable"
 msgstr "Povolit"
 
@@ -3170,11 +3165,11 @@ msgstr ""
 msgid "Enable selected items?"
 msgstr "Povolit vybrané položky?"
 
-#: include/locales/en_gb.inc.php:1303
+#: include/locales/en_gb.inc.php:1302
 msgid "Enable selected triggers?"
 msgstr "Povolit vybrané spouštěče?"
 
-#: actionconf.php:492 include/locales/en_gb.inc.php:1273
+#: actionconf.php:492 include/locales/en_gb.inc.php:1272
 #: include/views/administration.usergroups.edit.php:69
 #: include/views/administration.usergroups.list.php:61
 #: include/views/administration.usergroups.list.php:83
@@ -3186,24 +3181,24 @@ msgstr "Povolit vybrané spouštěče?"
 msgid "Enabled"
 msgstr "Povoleno"
 
-#: include/locales/en_gb.inc.php:1500
+#: include/locales/en_gb.inc.php:1481
 msgid "End of"
 msgstr "Konec"
 
-#: include/locales/en_gb.inc.php:1394
+#: include/locales.inc.php:59
 msgid "English (en_GB)"
 msgstr "Anglicky (en_GB)"
 
-#: include/locales/en_gb.inc.php:293 include/locales/en_gb.inc.php:1444
+#: include/locales/en_gb.inc.php:293 include/locales/en_gb.inc.php:1425
 #: popup.php:139
 msgid "Error"
 msgstr "Chyba"
 
-#: include/locales/en_gb.inc.php:1056
+#: include/locales/en_gb.inc.php:1055
 msgid "Error adding service time"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1365
+#: include/locales/en_gb.inc.php:1363
 msgid "Error description"
 msgstr ""
 
@@ -3212,7 +3207,7 @@ msgstr ""
 msgid "Error in item key: \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:816
+#: include/locales/en_gb.inc.php:815
 msgid "Event"
 msgstr "Událost"
 
@@ -3228,15 +3223,15 @@ msgstr "Událost potvrzena"
 msgid "Event acknowledges"
 msgstr "Potvrzování událostí"
 
-#: include/locales/en_gb.inc.php:914
+#: include/locales/en_gb.inc.php:913
 msgid "Event acknowledging disabled"
 msgstr "Potvrzování událostí zakázáno"
 
-#: include/locales/en_gb.inc.php:817
+#: include/locales/en_gb.inc.php:816
 msgid "Event details"
 msgstr "Detaily události"
 
-#: include/locales/en_gb.inc.php:1293
+#: include/locales/en_gb.inc.php:1292
 msgid "Event generation"
 msgstr "Generování události"
 
@@ -3244,7 +3239,7 @@ msgstr "Generování události"
 msgid "Event source"
 msgstr "Zdroj události"
 
-#: include/locales/en_gb.inc.php:1659 include/menu.inc.php:61
+#: include/locales/en_gb.inc.php:1640 include/menu.inc.php:61
 msgid "Events"
 msgstr "Události"
 
@@ -3256,11 +3251,11 @@ msgstr "Perioda dní"
 msgid "Every week(s)"
 msgstr "Perioda týdnů"
 
-#: include/locales/en_gb.inc.php:1524
+#: include/locales/en_gb.inc.php:1505
 msgid "Exa"
 msgstr "exa"
 
-#: include/locales/en_gb.inc.php:1461
+#: include/locales/en_gb.inc.php:1442
 msgid "Exclude"
 msgstr "Vyjma"
 
@@ -3269,7 +3264,7 @@ msgstr "Vyjma"
 msgid "Execute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1614
+#: include/locales/en_gb.inc.php:1595
 msgid "Execute SQL error"
 msgstr "Chyba spuštění SQL"
 
@@ -3328,15 +3323,15 @@ msgstr ""
 msgid "Expression"
 msgstr "Výraz"
 
-#: include/locales/en_gb.inc.php:1446
+#: include/locales/en_gb.inc.php:1427
 msgid "Expression Syntax Error"
 msgstr "Chyba syntaxe výrazu"
 
-#: include/locales/en_gb.inc.php:1469
+#: include/locales/en_gb.inc.php:1450
 msgid "Expression Variable Elements"
 msgstr "Proměnné výrazu"
 
-#: include/locales/en_gb.inc.php:1564
+#: include/locales/en_gb.inc.php:1545
 msgid "Expression cannot be empty"
 msgstr "Výraz nemůže být prázdný"
 
@@ -3358,7 +3353,7 @@ msgstr "Vnější kontrola"
 msgid "Ez Texting"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1680
+#: include/locales/en_gb.inc.php:1661
 msgid "F"
 msgstr "pá"
 
@@ -3399,19 +3394,19 @@ msgstr ""
 msgid "Failure Audit"
 msgstr "Neúspěšný audit"
 
-#: include/locales/en_gb.inc.php:959
+#: include/locales/en_gb.inc.php:958
 msgid "Favourite graphs"
 msgstr "Oblíbené grafy"
 
-#: include/locales/en_gb.inc.php:960
+#: include/locales/en_gb.inc.php:959
 msgid "Favourite maps"
 msgstr "Oblíbené mapy"
 
-#: include/locales/en_gb.inc.php:961
+#: include/locales/en_gb.inc.php:960
 msgid "Favourite screens"
 msgstr "Oblíbené obrazovky"
 
-#: include/locales/en_gb.inc.php:942
+#: include/locales/en_gb.inc.php:941
 msgid "Favourites"
 msgstr "Oblíbené"
 
@@ -3460,7 +3455,7 @@ msgstr "Filtr"
 msgid "Filter by host group"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1326
+#: include/locales/en_gb.inc.php:1325
 msgid "Filter by name"
 msgstr "Filtrovat podle jména"
 
@@ -3468,7 +3463,7 @@ msgstr "Filtrovat podle jména"
 msgid "Finish"
 msgstr "Dokončit"
 
-#: include/locales/en_gb.inc.php:556 include/locales/en_gb.inc.php:1709
+#: include/locales/en_gb.inc.php:556 include/locales/en_gb.inc.php:1690
 msgid "First"
 msgstr "první"
 
@@ -3496,7 +3491,7 @@ msgstr "Vzorec"
 msgid "Fourth"
 msgstr "čtvrtý"
 
-#: include/locales/en_gb.inc.php:1395
+#: include/locales.inc.php:63
 msgid "French (fr_FR)"
 msgstr "Francouzsky (fr_FR)"
 
@@ -3504,11 +3499,11 @@ msgstr "Francouzsky (fr_FR)"
 msgid "Fri"
 msgstr "pá"
 
-#: include/locales/en_gb.inc.php:49 include/locales/en_gb.inc.php:1240
+#: include/locales/en_gb.inc.php:49 include/locales/en_gb.inc.php:1239
 msgid "Friday"
 msgstr "pátek"
 
-#: include/locales/en_gb.inc.php:1026
+#: include/locales/en_gb.inc.php:1025
 #: include/views/configuration.action.edit.php:429
 msgid "From"
 msgstr "Od"
@@ -3528,7 +3523,7 @@ msgstr ""
 msgid "Frontend messaging"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1225
+#: include/locales/en_gb.inc.php:1224
 #: include/views/configuration.host.edit.php:607
 msgid "Full clone"
 msgstr "Vytvořit úplnou kopii"
@@ -3541,15 +3536,15 @@ msgstr "Celá obrazovka"
 msgid "Function"
 msgstr "Funkce"
 
-#: include/locales/en_gb.inc.php:1578
+#: include/locales/en_gb.inc.php:1559
 msgid "Function '"
 msgstr "Funkce '"
 
-#: include/locales/en_gb.inc.php:1517
+#: include/locales/en_gb.inc.php:1498
 msgid "G"
 msgstr "G"
 
-#: include/locales/en_gb.inc.php:813
+#: include/locales/en_gb.inc.php:812
 msgid "GRAPH PROTOTYPES OF"
 msgstr ""
 
@@ -3579,11 +3574,11 @@ msgstr "Obecné"
 msgid "Generated in %s sec"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1396
+#: include/locales.inc.php:64
 msgid "German (de_DE)"
 msgstr "Německy (de_DE)"
 
-#: include/locales/en_gb.inc.php:884
+#: include/locales/en_gb.inc.php:883
 msgid "Get selected elements FAILED."
 msgstr "Get selected elements FAILED."
 
@@ -3591,11 +3586,11 @@ msgstr "Get selected elements FAILED."
 msgid "Get support"
 msgstr "Podpora"
 
-#: include/locales/en_gb.inc.php:1518
+#: include/locales/en_gb.inc.php:1499
 msgid "Giga"
 msgstr "giga"
 
-#: include/locales/en_gb.inc.php:1473
+#: include/locales/en_gb.inc.php:1454
 msgid "Given expression is not a macro"
 msgstr "Zadaný výraz není makro"
 
@@ -3607,7 +3602,7 @@ msgstr ""
 msgid "Global scripts"
 msgstr ""
 
-#: actionconf.php:520 hosts.php:1028 include/locales/en_gb.inc.php:1424
+#: actionconf.php:520 hosts.php:1028 include/locales/en_gb.inc.php:1405
 #: include/views/administration.mediatypes.list.php:107
 #: include/views/administration.script.list.php:107
 #: include/views/administration.usergroups.list.php:153
@@ -3615,7 +3610,7 @@ msgstr ""
 msgid "Go"
 msgstr "Proveď"
 
-#: include/locales/en_gb.inc.php:847
+#: include/locales/en_gb.inc.php:846
 msgid "Go to"
 msgstr ""
 
@@ -3677,7 +3672,7 @@ msgstr "Graf byl přidán"
 msgid "Graph deleted"
 msgstr "Graf byl smazán"
 
-#: include/locales/en_gb.inc.php:1382
+#: include/locales/en_gb.inc.php:1380
 msgid "Graph element"
 msgstr "Prvek grafu"
 
@@ -3685,7 +3680,7 @@ msgstr "Prvek grafu"
 msgid "Graph item"
 msgstr "Položka grafu"
 
-#: include/locales/en_gb.inc.php:1117
+#: include/locales/en_gb.inc.php:1116
 msgid "Graph name"
 msgstr "Název grafu"
 
@@ -3808,11 +3803,11 @@ msgstr "H.i"
 msgid "H:i"
 msgstr "G:i"
 
-#: include/locales/en_gb.inc.php:1440
+#: include/locales/en_gb.inc.php:1421
 msgid "H:i:s"
 msgstr "G:i:s"
 
-#: include/locales/en_gb.inc.php:820
+#: include/locales/en_gb.inc.php:819
 msgid "HISTORY OF EVENTS"
 msgstr "HISTORIE UDÁLOSTÍ"
 
@@ -3860,7 +3855,7 @@ msgstr "Hardware"
 msgid "Hardware (Full details)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1119
+#: include/locales/en_gb.inc.php:1118
 #: include/views/configuration.sysmap.edit.php:46
 #: include/views/js/configuration.sysmaps.js.php:53
 msgid "Height"
@@ -3874,15 +3869,15 @@ msgstr "Nápověda"
 msgid "Hexadecimal"
 msgstr "Šestnáctkový"
 
-#: include/locales/en_gb.inc.php:842 sysmap.php:164
+#: include/locales/en_gb.inc.php:841 sysmap.php:164
 msgid "Hidden"
 msgstr "skryta"
 
-#: include/locales/en_gb.inc.php:1352
+#: include/locales/en_gb.inc.php:1351
 msgid "Hide"
 msgstr "Skrýt"
 
-#: include/locales/en_gb.inc.php:1323
+#: include/locales/en_gb.inc.php:1322
 msgid "Hide all"
 msgstr "Skrýt vše"
 
@@ -3890,7 +3885,7 @@ msgstr "Skrýt vše"
 msgid "Hide disabled scenarios"
 msgstr "Skrýt zakázané scénáře"
 
-#: include/locales/en_gb.inc.php:1288
+#: include/locales/en_gb.inc.php:1287
 msgid "Hide disabled triggers"
 msgstr "Skrýt zakázané spouštěče"
 
@@ -3907,7 +3902,7 @@ msgstr "Závažný"
 msgid "History"
 msgstr "Historie"
 
-#: include/locales/en_gb.inc.php:1116
+#: include/locales/en_gb.inc.php:1115
 msgid "History and simple graphs"
 msgstr ""
 
@@ -3919,24 +3914,24 @@ msgstr "Historie byla pročištěna"
 msgid "History clearing can take a long time. Continue?"
 msgstr "Pročištění historie může chvíli trvat. Pokračovat?"
 
-#: include/locales/en_gb.inc.php:1159
+#: include/locales/en_gb.inc.php:1158
 msgid "History of actions"
 msgstr "Historie akcí"
 
-#: include/locales/en_gb.inc.php:1160
+#: include/locales/en_gb.inc.php:1159
 msgid "History of events"
 msgstr "Historie událostí"
 
-#: include/locales/en_gb.inc.php:1169
+#: include/locales/en_gb.inc.php:1168
 msgid "Horizontal"
 msgstr "Vodorovný"
 
-#: include/locales/en_gb.inc.php:1171
+#: include/locales/en_gb.inc.php:1170
 msgid "Horizontal align"
 msgstr "Vodorovné zarovnání"
 
 #: hostinventories.php:159 include/actions.inc.php:42 include/html.inc.php:373
-#: include/locales/en_gb.inc.php:624 include/locales/en_gb.inc.php:1558
+#: include/locales/en_gb.inc.php:624 include/locales/en_gb.inc.php:1539
 #: include/views/configuration.host.edit.php:58
 #: include/views/configuration.host.edit.php:413
 #: include/views/js/configuration.action.edit.js.php:86
@@ -3989,7 +3984,7 @@ msgstr "Počet hostitelů"
 msgid "Host deleted"
 msgstr "Hostitel byl smazán"
 
-#: include/locales/en_gb.inc.php:1576
+#: include/locales/en_gb.inc.php:1557
 msgid "Host does not exist."
 msgstr "Hostitel neexistuje."
 
@@ -4021,7 +4016,7 @@ msgstr "Skupina hostitelů"
 msgid "Host interface"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1416
+#: include/locales/en_gb.inc.php:1397
 msgid "Host inventories"
 msgstr ""
 
@@ -4029,11 +4024,11 @@ msgstr ""
 msgid "Host inventory"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1419
+#: include/locales/en_gb.inc.php:1400
 msgid "Host inventory overview"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1577
+#: include/locales/en_gb.inc.php:1558
 msgid "Host key does not exist."
 msgstr "Klíč hostitele neexistuje."
 
@@ -4061,15 +4056,15 @@ msgstr ""
 msgid "Host router"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1184
+#: include/locales/en_gb.inc.php:1183
 msgid "Host screens"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:938
+#: include/locales/en_gb.inc.php:937
 msgid "Host status"
 msgstr "Stav hostitele"
 
-#: include/triggers.inc.php:1508
+#: include/triggers.inc.php:1432
 #, php-format
 msgid "Host status became \"%s\""
 msgstr ""
@@ -4086,7 +4081,7 @@ msgstr ""
 msgid "Host template"
 msgstr "Šablona hostitele"
 
-#: include/locales/en_gb.inc.php:1165
+#: include/locales/en_gb.inc.php:1164
 msgid "Host time"
 msgstr ""
 
@@ -4116,7 +4111,7 @@ msgstr ""
 msgid "Hosts"
 msgstr "Hostitelé"
 
-#: include/locales/en_gb.inc.php:999
+#: include/locales/en_gb.inc.php:998
 msgid "Hosts (m/n/t)"
 msgstr "Hostitelé (sl/nesl/šab/zak)"
 
@@ -4128,11 +4123,11 @@ msgstr "Hostitelé a šablony"
 msgid "Hosts in maintenance"
 msgstr "Hostitelé v servisním okně"
 
-#: include/locales/en_gb.inc.php:1153
+#: include/locales/en_gb.inc.php:1152
 msgid "Hosts info"
 msgstr "Informace o hostiteli"
 
-#: include/locales/en_gb.inc.php:970
+#: include/locales/en_gb.inc.php:969
 msgid "Hosts location"
 msgstr "Umístění hostitelů"
 
@@ -4140,15 +4135,15 @@ msgstr "Umístění hostitelů"
 msgid "Hosts updated"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1034
+#: include/locales/en_gb.inc.php:1033
 msgid "Hour"
 msgstr "Hodina"
 
-#: include/locales/en_gb.inc.php:1041
+#: include/locales/en_gb.inc.php:1040
 msgid "Hourly"
 msgstr "hodinově"
 
-#: include/locales/en_gb.inc.php:1035
+#: include/locales/en_gb.inc.php:1034
 msgid "Hours"
 msgstr "hodin"
 
@@ -4156,7 +4151,7 @@ msgstr "hodin"
 msgid "Housekeeper"
 msgstr "Údržba databáze"
 
-#: include/locales/en_gb.inc.php:1407
+#: include/locales.inc.php:65
 msgid "Hungarian (hu_HU)"
 msgstr "Maďarsky (hu_HU)"
 
@@ -4232,24 +4227,24 @@ msgstr "IPMI senzor"
 msgid "IPMI username"
 msgstr "IPMI uživatelské jméno"
 
-#: include/locales/en_gb.inc.php:1244
+#: include/locales/en_gb.inc.php:1243
 msgid "IT SERVICES"
 msgstr "SLUŽBY IT"
 
-#: include/locales/en_gb.inc.php:1025
+#: include/locales/en_gb.inc.php:1024
 msgid "IT SERVICES AVAILABILITY REPORT"
 msgstr "PROTOKOL DOSTUPNOSTI IT SLUŽEB"
 
-#: include/locales/en_gb.inc.php:1203
+#: include/locales/en_gb.inc.php:1202
 msgid "IT service"
 msgstr "Služba IT"
 
-#: include/locales/en_gb.inc.php:1204 include/menu.inc.php:85
+#: include/locales/en_gb.inc.php:1203 include/menu.inc.php:85
 #: include/menu.inc.php:219
 msgid "IT services"
 msgstr "Služby IT"
 
-#: include/locales/en_gb.inc.php:1024
+#: include/locales/en_gb.inc.php:1023
 msgid "IT services availability report"
 msgstr "Protokol dostupnosti IT služeb"
 
@@ -4268,31 +4263,31 @@ msgstr "POLOŽKY"
 msgid "Icon"
 msgstr "Ikona"
 
-#: include/locales/en_gb.inc.php:850
+#: include/locales/en_gb.inc.php:849
 msgid "Icon (OK)"
 msgstr "Ikona (OK)"
 
-#: include/locales/en_gb.inc.php:866
+#: include/locales/en_gb.inc.php:865
 #: include/views/js/configuration.sysmaps.js.php:324
 msgid "Icon (default)"
 msgstr "Ikona (výchozí)"
 
-#: include/locales/en_gb.inc.php:853
+#: include/locales/en_gb.inc.php:852
 #: include/views/js/configuration.sysmaps.js.php:345
 msgid "Icon (disabled)"
 msgstr "Ikona (zakázáno)"
 
-#: include/locales/en_gb.inc.php:852
+#: include/locales/en_gb.inc.php:851
 #: include/views/js/configuration.sysmaps.js.php:338
 msgid "Icon (maintenance)"
 msgstr "Ikona (údržba)"
 
-#: include/locales/en_gb.inc.php:849
+#: include/locales/en_gb.inc.php:848
 #: include/views/js/configuration.sysmaps.js.php:331
 msgid "Icon (problem)"
 msgstr "Ikona (problém)"
 
-#: include/locales/en_gb.inc.php:851
+#: include/locales/en_gb.inc.php:850
 msgid "Icon (unknown)"
 msgstr "Ikona (neznámý)"
 
@@ -4383,7 +4378,7 @@ msgstr ""
 msgid "Icon mapping entry \"%1$s\" against \"%2$s\" already exists."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1713
+#: include/locales/en_gb.inc.php:1694
 msgid "Iconmap is not enabled"
 msgstr ""
 
@@ -4395,7 +4390,7 @@ msgstr ""
 msgid "Idle till"
 msgstr "Neaktivní do"
 
-#: include/locales/en_gb.inc.php:1648
+#: include/locales/en_gb.inc.php:1629
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Pokud si myslíte, že tato zpráva je špatně, prosím kontaktuje vašeho administrátora pro přidělení potřebných oprávnění."
 
@@ -4447,11 +4442,11 @@ msgstr ""
 msgid "Import file"
 msgstr "Importovat soubor"
 
-#: include/locales/en_gb.inc.php:874
+#: include/locales/en_gb.inc.php:873
 msgid "Import map"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1140
+#: include/locales/en_gb.inc.php:1139
 msgid "Import screen"
 msgstr "Importovat obrazovku"
 
@@ -4464,7 +4459,7 @@ msgstr ""
 msgid "Impossible to filter by inventory field \"%s\", which does not exist."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1178
+#: include/locales/en_gb.inc.php:1177
 msgid "Impossible to remove last row and column"
 msgstr "Nelze odebrat poslední řádek a sloupec"
 
@@ -4494,7 +4489,7 @@ msgstr "Probíhá údržba"
 msgid "In progress"
 msgstr "Probíhá"
 
-#: include/locales/en_gb.inc.php:1460
+#: include/locales/en_gb.inc.php:1441
 msgid "Include"
 msgstr "Včetně"
 
@@ -4627,7 +4622,7 @@ msgstr ""
 msgid "Incorrect action operationid"
 msgstr ""
 
-#: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1541
+#: api/classes/class.cwebcheck.php:365 include/locales/en_gb.inc.php:1522
 msgid "Incorrect arguments passed to function"
 msgstr "Funkci byly předány neplatné argumenty"
 
@@ -4635,7 +4630,7 @@ msgstr "Funkci byly předány neplatné argumenty"
 msgid "Incorrect arguments passed to method."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1618
+#: include/locales/en_gb.inc.php:1599
 msgid "Incorrect characters used for Node name"
 msgstr "Pro název uzlu jsou použity neplatné znaky"
 
@@ -4663,7 +4658,7 @@ msgstr ""
 msgid "Incorrect delay."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1297
+#: include/locales/en_gb.inc.php:1296
 msgid "Incorrect dependency"
 msgstr "Neplatná závislost"
 
@@ -4671,7 +4666,7 @@ msgstr "Neplatná závislost"
 msgid "Incorrect expression"
 msgstr "Neplatný výraz"
 
-#: include/db.inc.php:1328 include/db.inc.php:1365
+#: include/db.inc.php:1345 include/db.inc.php:1382
 #, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr ""
@@ -4684,7 +4679,7 @@ msgstr ""
 msgid "Incorrect fields for trigger"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1573
+#: include/locales/en_gb.inc.php:1554
 msgid "Incorrect function is used"
 msgstr "Není použita platná funkce"
 
@@ -4749,7 +4744,7 @@ msgstr ""
 msgid "Incorrect key: %s"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1537
+#: include/locales/en_gb.inc.php:1518
 msgid "Incorrect list of items."
 msgstr "Neplatný seznam položek."
 
@@ -4792,7 +4787,7 @@ msgstr ""
 msgid "Incorrect map width value for map \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1620
+#: include/locales/en_gb.inc.php:1601
 msgid "Incorrect node type"
 msgstr "Neplatný typ uzlu"
 
@@ -4854,11 +4849,11 @@ msgstr ""
 msgid "Incorrect status."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1484 include/locales/en_gb.inc.php:1633
+#: include/locales/en_gb.inc.php:1465 include/locales/en_gb.inc.php:1614
 msgid "Incorrect time period"
 msgstr "Neplatné časové období"
 
-#: include/locales/en_gb.inc.php:1571
+#: include/locales/en_gb.inc.php:1552
 msgid "Incorrect trigger expression"
 msgstr "Neplatný výraz spouštěče"
 
@@ -4867,11 +4862,11 @@ msgstr "Neplatný výraz spouštěče"
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1504
+#: include/locales/en_gb.inc.php:1485
 msgid "Incorrect type of asort_by_key"
 msgstr "Neplatný typ asort_by_key"
 
-#: include/locales/en_gb.inc.php:1610
+#: include/locales/en_gb.inc.php:1591
 msgid "Incorrect user data in"
 msgstr "Neplatná uživatelská data v"
 
@@ -4879,22 +4874,22 @@ msgstr "Neplatná uživatelská data v"
 msgid "Incorrect user group."
 msgstr ""
 
-#: include/db.inc.php:1240
+#: include/db.inc.php:1257
 #, php-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
 msgstr ""
 
-#: include/db.inc.php:1235
+#: include/db.inc.php:1252
 #, php-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgstr ""
 
-#: include/db.inc.php:1230
+#: include/db.inc.php:1247
 #, php-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr ""
 
-#: include/db.inc.php:1212
+#: include/db.inc.php:1229
 #, php-format
 msgid "Incorrect value \"NULL\" for NOT NULL field \"%s\"."
 msgstr ""
@@ -4904,7 +4899,7 @@ msgstr ""
 msgid "Incorrect value for setMessage(): \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1565
+#: include/locales/en_gb.inc.php:1546
 msgid "Incorrect value type"
 msgstr "Neplatný typ hodnoty"
 
@@ -4922,11 +4917,11 @@ msgstr ""
 msgid "Information"
 msgstr "Informační"
 
-#: include/locales/en_gb.inc.php:1283
+#: include/locales/en_gb.inc.php:1282
 msgid "Insert"
 msgstr "Vložit"
 
-#: include/locales/en_gb.inc.php:1300
+#: include/locales/en_gb.inc.php:1299
 msgid "Insert macro"
 msgstr "Vložit makro"
 
@@ -4991,7 +4986,8 @@ msgstr ""
 msgid "Invalid Request."
 msgstr ""
 
-#: api/classes/class.citemkey.php:114 api/classes/class.citemkey.php:312
+#: api/classes/class.citemkey.php:86 api/classes/class.citemkey.php:108
+#: api/classes/class.citemkey.php:294
 msgid "Invalid item key format."
 msgstr ""
 
@@ -5024,7 +5020,7 @@ msgstr ""
 msgid "Is online?"
 msgstr "Je přihlášený?"
 
-#: include/locales/en_gb.inc.php:936
+#: include/locales/en_gb.inc.php:935
 msgid "Issue"
 msgstr "Problém"
 
@@ -5036,7 +5032,7 @@ msgstr ""
 msgid "It is not possible to search by user password"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1397
+#: include/locales.inc.php:66
 msgid "Italian (it_IT)"
 msgstr "Italsky (it_IT)"
 
@@ -5090,7 +5086,7 @@ msgstr "Položka byla smazána"
 msgid "Item does not exist"
 msgstr "Položka neexistuje"
 
-#: include/locales/en_gb.inc.php:804
+#: include/locales/en_gb.inc.php:803
 msgid "Item prototype"
 msgstr ""
 
@@ -5172,7 +5168,7 @@ msgstr ""
 msgid "Items"
 msgstr "Položky"
 
-#: include/locales/en_gb.inc.php:994
+#: include/locales/en_gb.inc.php:993
 msgid "Items (m/d/n)"
 msgstr "Položky (sl/nesl/nep)[šab]"
 
@@ -5247,7 +5243,7 @@ msgstr "led"
 msgid "January"
 msgstr "leden"
 
-#: include/locales/en_gb.inc.php:1404
+#: include/locales.inc.php:68
 msgid "Japanese (ja_JP)"
 msgstr "Japonsky (ja_JP)"
 
@@ -5267,7 +5263,7 @@ msgstr "čer"
 msgid "June"
 msgstr "červen"
 
-#: include/locales/en_gb.inc.php:1513
+#: include/locales/en_gb.inc.php:1494
 msgid "K"
 msgstr "k"
 
@@ -5285,7 +5281,7 @@ msgstr "Ponechat trendy [dny]"
 msgid "Key"
 msgstr "Klíč"
 
-#: api/classes/class.citemkey.php:62
+#: api/classes/class.citemkey.php:58
 msgid "Key cannot be empty."
 msgstr ""
 
@@ -5293,15 +5289,15 @@ msgstr ""
 msgid "Key does not match <grpmax|grpmin|grpsum|grpavg>[\"group\",\"key\",\"<last|min|max|avg|sum|count>\",\"numeric param\"]."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1462
+#: include/locales/en_gb.inc.php:1443
 msgid "Keyword"
 msgstr "Klíčové slovo"
 
-#: include/locales/en_gb.inc.php:1514
+#: include/locales/en_gb.inc.php:1495
 msgid "Kilo"
 msgstr "kilo"
 
-#: include/locales/en_gb.inc.php:1398
+#: include/locales.inc.php:67
 msgid "Korean (ko_KR)"
 msgstr "Korejsky (ko_KR)"
 
@@ -5339,18 +5335,18 @@ msgstr ""
 msgid "LOGS"
 msgstr "LOGOVACÍ SOUBORY"
 
-#: include/locales/en_gb.inc.php:828
+#: include/locales/en_gb.inc.php:827
 msgid "LOST"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:846 include/maps.inc.php:64
+#: include/locales/en_gb.inc.php:845 include/maps.inc.php:64
 #: include/views/js/configuration.sysmaps.js.php:66
 #: include/views/js/configuration.sysmaps.js.php:209
 #: include/views/js/configuration.sysmaps.js.php:296
 msgid "Label"
 msgstr "Popisek"
 
-#: include/locales/en_gb.inc.php:918
+#: include/locales/en_gb.inc.php:917
 #: include/views/js/configuration.sysmaps.js.php:70
 #: include/views/js/configuration.sysmaps.js.php:303
 msgid "Label location"
@@ -5360,31 +5356,31 @@ msgstr "Umístění popisku"
 msgid "Language"
 msgstr "Jazyk"
 
-#: include/locales/en_gb.inc.php:1076 include/locales/en_gb.inc.php:1708
+#: include/locales/en_gb.inc.php:1075 include/locales/en_gb.inc.php:1689
 msgid "Last"
 msgstr "poslední"
 
-#: include/locales/en_gb.inc.php:941
+#: include/locales/en_gb.inc.php:940
 msgid "Last 20 issues"
 msgstr "Posledních 20 problémů"
 
-#: include/locales/en_gb.inc.php:1252
+#: include/locales/en_gb.inc.php:1251
 msgid "Last 24 hours"
 msgstr "Posledních 24 hodin"
 
-#: include/locales/en_gb.inc.php:1254
+#: include/locales/en_gb.inc.php:1253
 msgid "Last 30 days"
 msgstr "Posledních 30 dní"
 
-#: include/locales/en_gb.inc.php:1255
+#: include/locales/en_gb.inc.php:1254
 msgid "Last 365 days"
 msgstr "Posledních 365 dní"
 
-#: include/locales/en_gb.inc.php:1253
+#: include/locales/en_gb.inc.php:1252
 msgid "Last 7 days"
 msgstr "Posledních 7 dní"
 
-#: include/locales/en_gb.inc.php:1328
+#: include/locales/en_gb.inc.php:1327
 msgid "Last change"
 msgstr "Poslední změna"
 
@@ -5392,7 +5388,7 @@ msgstr "Poslední změna"
 msgid "Last change (descending)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:837
+#: include/locales/en_gb.inc.php:836
 msgid "Last check"
 msgstr "Poslední kontrola"
 
@@ -5404,7 +5400,7 @@ msgstr "Graf za poslední hodinu"
 msgid "Last month graph"
 msgstr "Graf za poslední měsíc"
 
-#: include/locales/en_gb.inc.php:1284
+#: include/locales/en_gb.inc.php:1283
 msgid "Last of"
 msgstr "Posledních"
 
@@ -5412,7 +5408,7 @@ msgstr "Posledních"
 msgid "Last seen (age)"
 msgstr "Poslední kontakt (stáří)"
 
-#: include/locales/en_gb.inc.php:838
+#: include/locales/en_gb.inc.php:837
 msgid "Last value"
 msgstr "Poslední hodnota"
 
@@ -5420,15 +5416,15 @@ msgstr "Poslední hodnota"
 msgid "Last week graph"
 msgstr "Graf za minulý týden"
 
-#: include/locales/en_gb.inc.php:1665 include/menu.inc.php:46
+#: include/locales/en_gb.inc.php:1646 include/menu.inc.php:46
 msgid "Latest data"
 msgstr "Poslední hodnoty"
 
-#: include/locales/en_gb.inc.php:819
+#: include/locales/en_gb.inc.php:818
 msgid "Latest events"
 msgstr "Poslední události"
 
-#: include/locales/en_gb.inc.php:1399
+#: include/locales.inc.php:69
 msgid "Latvian (lv_LV)"
 msgstr "Litevsky (lv_LV)"
 
@@ -5449,7 +5445,7 @@ msgstr "Legenda"
 msgid "Line"
 msgstr "Čára"
 
-#: include/locales/en_gb.inc.php:845 sysmap.php:199
+#: include/locales/en_gb.inc.php:844 sysmap.php:199
 msgid "Link"
 msgstr "Spojnice"
 
@@ -5457,7 +5453,7 @@ msgstr "Spojnice"
 msgid "Link additional templates"
 msgstr "Připojit další šablony"
 
-#: include/locales/en_gb.inc.php:875
+#: include/locales/en_gb.inc.php:874
 #: include/views/js/configuration.sysmaps.js.php:237
 msgid "Link indicators"
 msgstr "Ukazatel stavu spojnice"
@@ -5482,7 +5478,7 @@ msgstr ""
 msgid "Link should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:854
+#: include/locales/en_gb.inc.php:853
 #: include/views/js/configuration.sysmaps.js.php:196
 msgid "Link status indicator"
 msgstr "Ukazatel stavu spojnice"
@@ -5495,7 +5491,7 @@ msgstr "Připojit šablonu"
 msgid "Link to templates"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1220
+#: include/locales/en_gb.inc.php:1219
 msgid "Link to trigger?"
 msgstr "Připojit spouštěč?"
 
@@ -5511,13 +5507,13 @@ msgstr "Připojené šablony"
 msgid "Linked to"
 msgstr "Připojené k"
 
-#: include/locales/en_gb.inc.php:844
+#: include/locales/en_gb.inc.php:843
 #: include/views/configuration.sysmap.edit.php:192
 #: include/views/js/configuration.sysmaps.js.php:158
 msgid "Links"
 msgstr "Odkazy"
 
-#: include/locales/en_gb.inc.php:818
+#: include/locales/en_gb.inc.php:817
 msgid "List"
 msgstr "Seznam"
 
@@ -5525,7 +5521,7 @@ msgstr "Seznam"
 msgid "List is empty"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:947
+#: include/locales/en_gb.inc.php:946
 msgid "Loading..."
 msgstr "Nahrávám..."
 
@@ -5533,7 +5529,7 @@ msgstr "Nahrávám..."
 msgid "Local"
 msgstr "Místní"
 
-#: include/locales/en_gb.inc.php:1164
+#: include/locales/en_gb.inc.php:1163
 msgid "Local time"
 msgstr "Místní čas"
 
@@ -5586,7 +5582,7 @@ msgstr ""
 msgid "Login name or password is incorrect"
 msgstr "Neplatné přihlašovací jméno nebo heslo"
 
-#: include/locales/en_gb.inc.php:1664 include/page_header.php:242
+#: include/locales/en_gb.inc.php:1645 include/page_header.php:242
 msgid "Logout"
 msgstr "Odhlásit"
 
@@ -5598,11 +5594,11 @@ msgstr "Logovací soubory"
 msgid "Lost"
 msgstr "Ztracené"
 
-#: include/locales/en_gb.inc.php:1515 include/locales/en_gb.inc.php:1676
+#: include/locales/en_gb.inc.php:1496 include/locales/en_gb.inc.php:1657
 msgid "M"
 msgstr "M"
 
-#: include/locales/en_gb.inc.php:1047 include/locales/en_gb.inc.php:1067
+#: include/locales/en_gb.inc.php:1046 include/locales/en_gb.inc.php:1066
 msgid "M Y"
 msgstr "F Y"
 
@@ -5614,7 +5610,7 @@ msgstr ""
 msgid "MAC address B"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:862
+#: include/locales/en_gb.inc.php:861
 msgid "MAINTENANCE"
 msgstr "ÚDRŽBA"
 
@@ -5622,7 +5618,7 @@ msgstr "ÚDRŽBA"
 msgid "MAINTENANCE PERIODS"
 msgstr "SERVISNÍ OKNA"
 
-#: include/locales/en_gb.inc.php:871
+#: include/locales/en_gb.inc.php:870
 msgid "MAPS"
 msgstr "MAPY"
 
@@ -5634,11 +5630,11 @@ msgstr "MD2"
 msgid "MD5"
 msgstr "MD5"
 
-#: include/locales/en_gb.inc.php:1501
+#: include/locales/en_gb.inc.php:1482
 msgid "MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing."
 msgstr "OMEZENÍ PAMĚTI DOSAŽENO! Profilování bylo zastaveno, aby se ušetřila paměť pro zpracování skriptů."
 
-#: include/locales/en_gb.inc.php:1073
+#: include/locales/en_gb.inc.php:1072
 msgid "MOST BUSY TRIGGERS TOP 100"
 msgstr "NEJAKTIVNĚJŠÍ SPOUŠTĚČE TOP 100"
 
@@ -5700,7 +5696,7 @@ msgstr "Typ servisního okna"
 msgid "Maintenance updated"
 msgstr "Servisní okno bylo aktualizováno"
 
-#: include/db.inc.php:1201
+#: include/db.inc.php:1218
 #, php-format
 msgid "Mandatory field \"%1$s\" is missing in table \"%2$s\"."
 msgstr ""
@@ -5714,7 +5710,7 @@ msgstr ""
 msgid "Manual Logout"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1147
+#: include/locales/en_gb.inc.php:1146
 #: include/views/configuration.sysmap.edit.php:199
 #: include/views/js/configuration.sysmaps.js.php:17
 #: include/views/js/configuration.sysmaps.js.php:101
@@ -5736,7 +5732,7 @@ msgstr ""
 msgid "Map \"%s\" updated."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:868
+#: include/locales/en_gb.inc.php:867
 msgid "Map elements"
 msgstr "Prvky mapy"
 
@@ -5765,7 +5761,7 @@ msgstr "Mapování"
 msgid "Mappings"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1661 include/menu.inc.php:76
+#: include/locales/en_gb.inc.php:1642 include/menu.inc.php:76
 #: include/menu.inc.php:210 popup.php:101
 msgid "Maps"
 msgstr "Mapy"
@@ -5802,7 +5798,7 @@ msgstr ""
 msgid "Mass update selected items?"
 msgstr "Hromadně aktualizovat vybrané položky?"
 
-#: include/locales/en_gb.inc.php:1305
+#: include/locales/en_gb.inc.php:1304
 msgid "Mass update selected triggers?"
 msgstr "Hromadně aktualizovat vybrané spouštěče?"
 
@@ -5814,7 +5810,7 @@ msgstr "Hlavní"
 msgid "Master node"
 msgstr "Hlavní uzel"
 
-#: include/locales/en_gb.inc.php:1619
+#: include/locales/en_gb.inc.php:1600
 msgid "Master node already exists"
 msgstr "Hlavní uzel již existuje"
 
@@ -5827,7 +5823,7 @@ msgstr "Největší zobrazovaný počet položek v tabulce"
 msgid "Max count of events per trigger to show"
 msgstr "Největší zobrazovaný počet událostí spouštěče"
 
-#: include/locales/en_gb.inc.php:945
+#: include/locales/en_gb.inc.php:944
 msgid "Maximize"
 msgstr "Maximalizovat"
 
@@ -5860,14 +5856,14 @@ msgstr[2] ""
 msgid "May"
 msgstr "kvě"
 
-#: include/locales/en_gb.inc.php:922
+#: include/locales/en_gb.inc.php:921
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.users.edit.php:167
 #: include/views/administration.users.edit.php:292
 msgid "Media"
 msgstr "Média"
 
-#: include/locales/en_gb.inc.php:1381
+#: include/locales/en_gb.inc.php:1379
 msgid "Media type"
 msgstr "Typ média"
 
@@ -5875,7 +5871,7 @@ msgstr "Typ média"
 msgid "Media type added"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1640
+#: include/locales/en_gb.inc.php:1621
 msgid "Media type already exists:"
 msgstr ""
 
@@ -5892,11 +5888,11 @@ msgstr "Typ média byl aktualizován"
 msgid "Media types"
 msgstr "Typy médií"
 
-#: include/locales/en_gb.inc.php:1641
+#: include/locales/en_gb.inc.php:1622
 msgid "Media types used by action:"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1516
+#: include/locales/en_gb.inc.php:1497
 msgid "Mega"
 msgstr "mega"
 
@@ -5904,15 +5900,15 @@ msgstr "mega"
 msgid "Members"
 msgstr "Členové"
 
-#: include/locales/en_gb.inc.php:1494
+#: include/locales/en_gb.inc.php:1475
 msgid "Memory limit"
 msgstr "Omezení paměti"
 
-#: include/locales/en_gb.inc.php:1495
+#: include/locales/en_gb.inc.php:1476
 msgid "Memory usage"
 msgstr "Využití paměti"
 
-#: include/locales/en_gb.inc.php:943
+#: include/locales/en_gb.inc.php:942
 msgid "Menu"
 msgstr "Menu"
 
@@ -5940,7 +5936,7 @@ msgstr ""
 msgid "Message timeout (seconds)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1392
+#: include/locales/en_gb.inc.php:1390
 msgid "Messages"
 msgstr ""
 
@@ -5952,23 +5948,23 @@ msgstr ""
 msgid "Method not found."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1510
+#: include/locales/en_gb.inc.php:1491
 msgid "Micro"
 msgstr "mikro"
 
-#: include/locales/en_gb.inc.php:1176
+#: include/locales/en_gb.inc.php:1175
 msgid "Middle"
 msgstr "Střed"
 
-#: include/locales/en_gb.inc.php:1512
+#: include/locales/en_gb.inc.php:1493
 msgid "Milli"
 msgstr "mili"
 
-#: include/locales/en_gb.inc.php:1270
+#: include/locales/en_gb.inc.php:1269
 msgid "Min severity"
 msgstr "Závažnost minimálně"
 
-#: include/locales/en_gb.inc.php:946
+#: include/locales/en_gb.inc.php:945
 msgid "Minimize"
 msgstr "Minimalizovat"
 
@@ -6002,11 +5998,11 @@ msgstr ""
 msgid "Minimum size of PHP post is %s (configuration parameter \"post_max_size\")"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1036
+#: include/locales/en_gb.inc.php:1035
 msgid "Minute"
 msgstr "Minuta"
 
-#: include/locales/en_gb.inc.php:1037
+#: include/locales/en_gb.inc.php:1036
 msgid "Minutes"
 msgstr "minut"
 
@@ -6014,7 +6010,7 @@ msgstr "minut"
 msgid "Missing"
 msgstr "Chybějící"
 
-#: include/locales/en_gb.inc.php:1594
+#: include/locales/en_gb.inc.php:1575
 msgid "Missing items for graph"
 msgstr "Chybí položky grafu"
 
@@ -6023,7 +6019,7 @@ msgstr "Chybí položky grafu"
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1568
+#: include/locales/en_gb.inc.php:1549
 msgid "Missing mandatory parameter for function"
 msgstr "Chybí povinný parametr funkce"
 
@@ -6039,7 +6035,7 @@ msgstr ""
 msgid "Mon"
 msgstr "po"
 
-#: include/locales/en_gb.inc.php:45 include/locales/en_gb.inc.php:1236
+#: include/locales/en_gb.inc.php:45 include/locales/en_gb.inc.php:1235
 msgid "Monday"
 msgstr "pondělí"
 
@@ -6062,11 +6058,11 @@ msgstr "Sledovaný hostitel"
 msgid "Monitoring"
 msgstr "Sledování"
 
-#: include/locales/en_gb.inc.php:1039
+#: include/locales/en_gb.inc.php:1038
 msgid "Month"
 msgstr "Měsíc"
 
-#: include/locales/en_gb.inc.php:1044
+#: include/locales/en_gb.inc.php:1043
 msgid "Monthly"
 msgstr "měsíčně"
 
@@ -6078,11 +6074,11 @@ msgstr "Více jak 10 minut"
 msgid "More than one macro with same name found:"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1072
+#: include/locales/en_gb.inc.php:1071
 msgid "Most busy triggers top 100"
 msgstr "Nejaktivnější spouštěče TOP 100"
 
-#: include/locales/en_gb.inc.php:1388
+#: include/locales/en_gb.inc.php:1386
 msgid "Move"
 msgstr ""
 
@@ -6090,11 +6086,11 @@ msgstr ""
 msgid "Multibyte String module required to run FrontEnd"
 msgstr "Modul pro podporu vícebajtového kódování je nutný k běhu frontendu"
 
-#: include/locales/en_gb.inc.php:1286
+#: include/locales/en_gb.inc.php:1285
 msgid "Multiple PROBLEM events"
 msgstr "opakování události"
 
-#: include/locales/en_gb.inc.php:1390
+#: include/locales/en_gb.inc.php:1388
 msgid "Mute"
 msgstr ""
 
@@ -6119,7 +6115,7 @@ msgstr ""
 msgid "NODES"
 msgstr "UZLY"
 
-#: include/locales/en_gb.inc.php:1064
+#: include/locales/en_gb.inc.php:1063
 msgid "NOTIFICATIONS"
 msgstr "ZPRÁVY"
 
@@ -6130,7 +6126,7 @@ msgstr ""
 #: actionconf.php:166 actionconf.php:441 discoveryconf.php:246
 #: disc_prototypes.php:376 host_discovery.php:451 hostinventories.php:161
 #: hosts.php:772 include/forms.inc.php:560 include/forms.inc.php:1281
-#: include/hosts.inc.php:58 include/locales/en_gb.inc.php:1349
+#: include/hosts.inc.php:58 include/locales/en_gb.inc.php:1348
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
 #: include/views/administration.general.image.edit.php:35
@@ -6154,27 +6150,27 @@ msgstr ""
 msgid "Name"
 msgstr "Jméno"
 
-#: include/locales/en_gb.inc.php:1508
+#: include/locales/en_gb.inc.php:1489
 msgid "Nano"
 msgstr "nano"
 
-#: include/locales/en_gb.inc.php:880
+#: include/locales/en_gb.inc.php:879
 msgid "Network map added"
 msgstr "Síťová mapa byla přidána"
 
-#: include/locales/en_gb.inc.php:869
+#: include/locales/en_gb.inc.php:868
 msgid "Network map deleted"
 msgstr "Síťová mapa byla smazána"
 
-#: include/locales/en_gb.inc.php:882
+#: include/locales/en_gb.inc.php:881
 msgid "Network map updated"
 msgstr "Síťová mapa byla aktualizována"
 
-#: include/locales/en_gb.inc.php:917
+#: include/locales/en_gb.inc.php:916
 msgid "Network maps"
 msgstr "Síťové mapy"
 
-#: include/locales/en_gb.inc.php:1332
+#: include/locales/en_gb.inc.php:1331
 msgid "Never"
 msgstr "Nikdy"
 
@@ -6194,11 +6190,11 @@ msgstr "Nová aplikace"
 msgid "New condition"
 msgstr "Nová podmínka"
 
-#: include/locales/en_gb.inc.php:1291
+#: include/locales/en_gb.inc.php:1290
 msgid "New dependency"
 msgstr "Nová závislost"
 
-#: include/locales/en_gb.inc.php:891
+#: include/locales/en_gb.inc.php:890
 msgid "New element"
 msgstr "Nový prvek"
 
@@ -6232,7 +6228,7 @@ msgstr "Nové servisní okno"
 msgid "New mapping"
 msgstr "Nové mapování"
 
-#: include/locales/en_gb.inc.php:925
+#: include/locales/en_gb.inc.php:924
 msgid "New media"
 msgstr "Nové médium"
 
@@ -6244,11 +6240,11 @@ msgstr "Nový uzel"
 msgid "New regular expression"
 msgstr "Nový regulární výraz"
 
-#: include/locales/en_gb.inc.php:1231
+#: include/locales/en_gb.inc.php:1230
 msgid "New service time"
 msgstr "Nový servisní čas"
 
-#: include/locales/en_gb.inc.php:1137
+#: include/locales/en_gb.inc.php:1136
 msgid "New slide"
 msgstr "Nový slajd"
 
@@ -6256,7 +6252,7 @@ msgstr "Nový slajd"
 msgid "New template added"
 msgstr "Šablona byla přidána"
 
-#: include/locales/en_gb.inc.php:201 include/locales/en_gb.inc.php:1711
+#: include/locales/en_gb.inc.php:201 include/locales/en_gb.inc.php:1692
 msgid "Next"
 msgstr "Další"
 
@@ -6264,7 +6260,7 @@ msgstr "Další"
 msgid "Next check"
 msgstr "Příští kontrola"
 
-#: include/forms.inc.php:3595 include/locales/en_gb.inc.php:1002
+#: include/forms.inc.php:3595 include/locales/en_gb.inc.php:1001
 #: include/views/administration.users.list.php:79
 #: include/views/administration.users.list.php:82
 msgid "No"
@@ -6280,7 +6276,7 @@ msgstr ""
 msgid "No \"ymin_type\" field for graph \"%s\""
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1207
+#: include/locales/en_gb.inc.php:1206
 msgid "No IT services defined."
 msgstr ""
 
@@ -6296,7 +6292,7 @@ msgstr ""
 msgid "No actions found"
 msgstr "Nenalezeny žádné akce"
 
-#: include/locales/en_gb.inc.php:1554
+#: include/locales/en_gb.inc.php:1535
 msgid "No application with"
 msgstr "Neexistuje aplikace s"
 
@@ -6335,7 +6331,7 @@ msgstr "bez sběru dat"
 msgid "No data maintenance"
 msgstr "Servisní okno bez sběru dat"
 
-#: include/locales/en_gb.inc.php:1290
+#: include/locales/en_gb.inc.php:1289
 msgid "No dependencies defined."
 msgstr ""
 
@@ -6356,15 +6352,15 @@ msgstr "Není definováno žádné pravidlo pro průzkum"
 msgid "No discovery rules defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1487
+#: include/locales/en_gb.inc.php:1468
 msgid "No elements selected!"
 msgstr "Nejsou vybrané žádné položky!"
 
-#: include/locales/en_gb.inc.php:1445
+#: include/locales/en_gb.inc.php:1426
 msgid "No errors found"
 msgstr "Nenalezeny žádné chyby"
 
-#: include/locales/en_gb.inc.php:821
+#: include/locales/en_gb.inc.php:820
 msgid "No events found"
 msgstr "Nenalezeny žádné události"
 
@@ -6381,7 +6377,7 @@ msgstr ""
 msgid "No flexible intervals"
 msgstr "Žádné proměnné intervaly"
 
-#: include/locales/en_gb.inc.php:1593
+#: include/locales/en_gb.inc.php:1574
 msgid "No graph item with"
 msgstr "Neexistuje položka grafu s"
 
@@ -6416,7 +6412,7 @@ msgstr ""
 msgid "No host groups with groupid \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1552
+#: include/locales/en_gb.inc.php:1533
 msgid "No host with"
 msgstr "Neexistuje hostitel s"
 
@@ -6470,11 +6466,11 @@ msgstr ""
 msgid "No item prototypes defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1544
+#: include/locales/en_gb.inc.php:1525
 msgid "No item with"
 msgstr "Neexistuje položka s"
 
-#: include/locales/en_gb.inc.php:1432
+#: include/locales/en_gb.inc.php:1413
 msgid "No items"
 msgstr "Žádné položky"
 
@@ -6482,11 +6478,7 @@ msgstr "Žádné položky"
 msgid "No items defined."
 msgstr ""
 
-#: api/classes/class.citemkey.php:92
-msgid "No key id provided."
-msgstr ""
-
-#: include/locales/en_gb.inc.php:889
+#: include/locales/en_gb.inc.php:888
 msgid "No links"
 msgstr "Nejsou definovány žádné spojnice"
 
@@ -6494,7 +6486,7 @@ msgstr "Nejsou definovány žádné spojnice"
 msgid "No mapping defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:872 maps.php:124
+#: include/locales/en_gb.inc.php:871 maps.php:124
 msgid "No maps defined."
 msgstr ""
 
@@ -6527,11 +6519,11 @@ msgstr ""
 msgid "No permissions defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1672
+#: include/locales/en_gb.inc.php:1653
 msgid "No permissions for map"
 msgstr "Nemáte oprávnění k mapě"
 
-#: include/locales/en_gb.inc.php:1671
+#: include/locales/en_gb.inc.php:1652
 msgid "No permissions for screen"
 msgstr "Nemáte oprávnění k obrazovce"
 
@@ -6566,15 +6558,15 @@ msgstr ""
 msgid "No recipients for action operation message."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1113
+#: include/locales/en_gb.inc.php:1112
 msgid "No resources defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1585
+#: include/locales/en_gb.inc.php:1566
 msgid "No rows in screen"
 msgstr "Neexistují žádné řádky pro obrazovku"
 
-#: include/locales/en_gb.inc.php:1108
+#: include/locales/en_gb.inc.php:1107
 msgid "No screens defined."
 msgstr ""
 
@@ -6594,15 +6586,15 @@ msgstr "Neexistuje propojení služby s"
 msgid "No service with"
 msgstr "Neexistuje služba s"
 
-#: include/locales/en_gb.inc.php:1133
+#: include/locales/en_gb.inc.php:1132
 msgid "No slide shows defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1135
+#: include/locales/en_gb.inc.php:1134
 msgid "No slides defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:474 items.php:698 triggers.php:325
+#: include/locales/en_gb.inc.php:474 items.php:698 triggers.php:394
 msgid "No target selected"
 msgstr "Není vybrán cíl"
 
@@ -6610,19 +6602,19 @@ msgstr "Není vybrán cíl"
 msgid "No templates defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1229
+#: include/locales/en_gb.inc.php:1228
 msgid "No times defined."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1259
+#: include/locales/en_gb.inc.php:1258
 msgid "No trigger"
 msgstr "Není spouštěč"
 
-#: include/locales/en_gb.inc.php:1563
+#: include/locales/en_gb.inc.php:1544
 msgid "No trigger with"
 msgstr "Neexistuje spouštěč s"
 
-#: include/locales/en_gb.inc.php:1260 popup.php:852
+#: include/locales/en_gb.inc.php:1259 popup.php:852
 msgid "No triggers defined."
 msgstr ""
 
@@ -6652,7 +6644,7 @@ msgstr "Uzel byl smazán"
 msgid "Node updated"
 msgstr "Uzel byl aktualizován"
 
-#: include/locales/en_gb.inc.php:1621
+#: include/locales/en_gb.inc.php:1602
 msgid "Node with same ID already exists"
 msgstr "Uzel se stejným ID již existuje"
 
@@ -6661,7 +6653,7 @@ msgid "Nodes"
 msgstr "Uzly"
 
 #: include/forms.inc.php:1678 include/locales/en_gb.inc.php:640
-#: include/locales/en_gb.inc.php:1216
+#: include/locales/en_gb.inc.php:1215
 #: include/views/administration.general.gui.edit.php:29
 #: include/views/administration.general.other.edit.php:31
 msgid "None"
@@ -6687,15 +6679,15 @@ msgstr "Nepotvrzeno"
 msgid "Not Templated items"
 msgstr "Položky bez šablony"
 
-#: include/locales/en_gb.inc.php:1453
+#: include/locales/en_gb.inc.php:1434
 msgid "Not allowed symbols detected after element"
 msgstr "Za elementem byly zjištěny nepovolené znaky"
 
-#: include/locales/en_gb.inc.php:1454
+#: include/locales/en_gb.inc.php:1435
 msgid "Not allowed symbols detected before element"
 msgstr "Před elementem byly zjištěny nepovolené znaky"
 
-#: include/locales/en_gb.inc.php:1450
+#: include/locales/en_gb.inc.php:1431
 msgid "Not allowed symbols or sequence of symbols in expression element detected"
 msgstr "Ve výrazu byly zjištěny nepovolené znaky nebo posloupnost znaků"
 
@@ -6703,7 +6695,7 @@ msgstr "Ve výrazu byly zjištěny nepovolené znaky nebo posloupnost znaků"
 msgid "Not allowed to set password for user \"guest\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1451
+#: include/locales/en_gb.inc.php:1432
 msgid "Not allowed value detected in element"
 msgstr "V elementu byla zjištěna nepovolená hodnota"
 
@@ -6724,7 +6716,7 @@ msgstr "Neurčeno"
 msgid "Not connected"
 msgstr "Nepřihlášený"
 
-#: hosts.php:896 include/html.inc.php:356 include/triggers.inc.php:1508
+#: hosts.php:896 include/html.inc.php:356 include/triggers.inc.php:1432
 #: include/views/configuration.host.edit.php:231
 #: include/views/configuration.host.massupdate.php:92 popup.php:470
 msgid "Not monitored"
@@ -6734,7 +6726,7 @@ msgstr "Nesledován"
 msgid "Not supported"
 msgstr "Nepodporováno"
 
-#: include/locales/en_gb.inc.php:1232
+#: include/locales/en_gb.inc.php:1231
 msgid "Note"
 msgstr "Poznámka"
 
@@ -6750,7 +6742,7 @@ msgstr "Nic"
 msgid "Nothing to do"
 msgstr "Není co dělat"
 
-#: include/locales/en_gb.inc.php:1065
+#: include/locales/en_gb.inc.php:1064
 msgid "Notification report"
 msgstr "Protokol zpráv"
 
@@ -6766,19 +6758,19 @@ msgstr "lis"
 msgid "November"
 msgstr "listopad"
 
-#: include/locales/en_gb.inc.php:1683
+#: include/locales/en_gb.inc.php:1664
 msgid "Now"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:998
+#: include/locales/en_gb.inc.php:997
 msgid "Number of hosts (monitored/not monitored/templates)"
 msgstr "Počet hostitelů (sledovaných/nesledovaných/vzorů)"
 
-#: include/locales/en_gb.inc.php:993
+#: include/locales/en_gb.inc.php:992
 msgid "Number of items (monitored/disabled/not supported)"
 msgstr "Počet položek (sledovaných/nesledovaných/nepodporovaných)"
 
-#: include/locales/en_gb.inc.php:1074
+#: include/locales/en_gb.inc.php:1073
 msgid "Number of status changes"
 msgstr "Počet změn stavu"
 
@@ -6786,11 +6778,11 @@ msgstr "Počet změn stavu"
 msgid "Number of steps"
 msgstr "Počet kroků"
 
-#: include/locales/en_gb.inc.php:990
+#: include/locales/en_gb.inc.php:989
 msgid "Number of triggers (enabled/disabled)[problem/unknown/ok]"
 msgstr "Počet spouštěčů (povolených/zakázaných)[spuštěných/neznámých/nespuštěných]"
 
-#: include/locales/en_gb.inc.php:996
+#: include/locales/en_gb.inc.php:995
 msgid "Number of users (online)"
 msgstr "Počet uživatelů (přihlášených)"
 
@@ -6810,7 +6802,7 @@ msgstr "Číslo (unsigned)"
 msgid "OEM"
 msgstr "OEM"
 
-#: include/locales/en_gb.inc.php:910 include/setup.inc.php:181
+#: include/locales/en_gb.inc.php:909 include/setup.inc.php:181
 #: include/setup.inc.php:215 include/setup.inc.php:257
 #: include/setup.inc.php:393
 msgid "OK"
@@ -6850,7 +6842,7 @@ msgstr ""
 msgid "OS (Short)"
 msgstr "OS (krátce)"
 
-#: include/locales/en_gb.inc.php:969
+#: include/locales/en_gb.inc.php:968
 msgid "OVERVIEW"
 msgstr "PŘEHLED"
 
@@ -6870,7 +6862,7 @@ msgstr "říjen"
 msgid "Off"
 msgstr "Off"
 
-#: include/locales/en_gb.inc.php:1028
+#: include/locales/en_gb.inc.php:1027
 #: include/views/administration.users.list.php:90
 msgid "Ok"
 msgstr "Ok"
@@ -6891,7 +6883,7 @@ msgstr ""
 msgid "One time only"
 msgstr "pouze jednou"
 
-#: include/locales/en_gb.inc.php:1228
+#: include/locales/en_gb.inc.php:1227
 msgid "One-time downtime"
 msgstr "Jednorázový downtime"
 
@@ -6899,11 +6891,11 @@ msgstr "Jednorázový downtime"
 msgid "Only Super Admins can add user groups."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1642
+#: include/locales/en_gb.inc.php:1623
 msgid "Only Super Admins can create media types"
 msgstr "Pouze Super Admini můžou vytvářet typy médií"
 
-#: include/locales/en_gb.inc.php:1643
+#: include/locales/en_gb.inc.php:1624
 msgid "Only Super Admins can delete media types"
 msgstr "Pouze Super Admini můžou mazat typy médií"
 
@@ -6916,15 +6908,15 @@ msgstr ""
 msgid "Only Super Admins can update user groups."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1626
+#: include/locales/en_gb.inc.php:1607
 msgid "Only Zabbix Admins can add user Medias"
 msgstr "Pouze Zabbix Admini můžou přidávat média uživatelům"
 
-#: include/locales/en_gb.inc.php:1628
+#: include/locales/en_gb.inc.php:1609
 msgid "Only Zabbix Admins can change user Medias"
 msgstr "Pouze Zabbix Admini můžou měnit média uživatelům"
 
-#: include/locales/en_gb.inc.php:1627
+#: include/locales/en_gb.inc.php:1608
 msgid "Only Zabbix Admins can remove user Medias"
 msgstr "Pouze Zabbix Admini můžou mazat média uživatelům"
 
@@ -6932,7 +6924,7 @@ msgstr "Pouze Zabbix Admini můžou mazat média uživatelům"
 msgid "Only characters are allowed"
 msgstr "Povoleny jsou pouze tisknutelné znaky"
 
-#: include/locales/en_gb.inc.php:995
+#: include/locales/en_gb.inc.php:994
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Počítány jsou pouze položky přiřazené k povoleným hostitelům"
 
@@ -6944,7 +6936,7 @@ msgstr ""
 msgid "Only super admins can create icon maps."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:992
+#: include/locales/en_gb.inc.php:991
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Počítány jsou pouze spouštěče přiřazené k povoleným hostitelům a závisející na povolených položkách"
 
@@ -7016,7 +7008,7 @@ msgstr ""
 msgid "Other parameters"
 msgstr "Další parametry"
 
-#: include/locales/en_gb.inc.php:968 include/menu.inc.php:37
+#: include/locales/en_gb.inc.php:967 include/menu.inc.php:37
 #: include/menu.inc.php:114 popup.php:113 queue.php:48
 msgid "Overview"
 msgstr "Přehled"
@@ -7025,11 +7017,11 @@ msgstr "Přehled"
 msgid "Overview by proxy"
 msgstr "Přehled podle proxy"
 
-#: include/locales/en_gb.inc.php:1521
+#: include/locales/en_gb.inc.php:1502
 msgid "P"
 msgstr "P"
 
-#: include/locales/en_gb.inc.php:934
+#: include/locales/en_gb.inc.php:933
 msgid "PERSONAL DASHBOARD"
 msgstr "ŘÍDÍCÍ PANEL"
 
@@ -7142,7 +7134,7 @@ msgstr "PHP - verze"
 msgid "POP"
 msgstr "POP"
 
-#: include/locales/en_gb.inc.php:911
+#: include/locales/en_gb.inc.php:910
 msgid "PROBLEM"
 msgstr "PROBLÉM"
 
@@ -7154,7 +7146,7 @@ msgstr "PROXY"
 msgid "Page received incorrect data"
 msgstr "Byla přijata neplatná data"
 
-#: include/locales/en_gb.inc.php:1088
+#: include/locales/en_gb.inc.php:1087
 msgid "Palette"
 msgstr "Barevná paleta"
 
@@ -7162,11 +7154,11 @@ msgstr "Barevná paleta"
 msgid "Parameter"
 msgstr "Parametr"
 
-#: include/locales/en_gb.inc.php:1213
+#: include/locales/en_gb.inc.php:1212
 msgid "Parent service"
 msgstr "Nadřazená služba"
 
-#: include/locales/en_gb.inc.php:1615
+#: include/locales/en_gb.inc.php:1596
 msgid "Parse SQL error"
 msgstr "Chyba zpracování SQL"
 
@@ -7178,7 +7170,7 @@ msgstr ""
 msgid "Passive"
 msgstr "Pasivní"
 
-#: include/locales/en_gb.inc.php:1354 include/setup.inc.php:245
+#: include/locales/en_gb.inc.php:1352 include/setup.inc.php:245
 #: include/views/administration.mediatypes.edit.php:80
 #: include/views/administration.mediatypes.edit.php:84
 #: include/views/administration.users.edit.php:57
@@ -7190,12 +7182,11 @@ msgstr "Pasivní"
 msgid "Password"
 msgstr "Heslo"
 
-#: include/locales/en_gb.inc.php:1353
 #: include/views/administration.users.edit.php:58
 msgid "Password (once again)"
 msgstr "Heslo (ověření)"
 
-#: include/locales/en_gb.inc.php:1639
+#: include/locales/en_gb.inc.php:1620
 msgid "Password required for media type"
 msgstr ""
 
@@ -7203,7 +7194,7 @@ msgstr ""
 msgid "Password should not be empty"
 msgstr "Heslo nemůže být prázdné"
 
-#: include/locales/en_gb.inc.php:1032
+#: include/locales/en_gb.inc.php:1031
 msgid "Percentage"
 msgstr "Procenta"
 
@@ -7237,7 +7228,7 @@ msgstr ""
 msgid "Permissions can be assigned for user groups only."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1522
+#: include/locales/en_gb.inc.php:1503
 msgid "Peta"
 msgstr "peta"
 
@@ -7249,7 +7240,7 @@ msgstr "Koláčový"
 msgid "Placing algorithm"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1149 popup.php:105
+#: include/locales/en_gb.inc.php:1148 popup.php:105
 msgid "Plain text"
 msgstr "Prostý text"
 
@@ -7262,7 +7253,7 @@ msgstr ""
 msgid "Play sound"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1623
+#: include/locales/en_gb.inc.php:1604
 msgid "Please be aware that database still contains data related to the deleted Node"
 msgstr "Uvědomte si, prosím, že databáze stále obsahuje data vztažená ke smazanému uzlu"
 
@@ -7274,11 +7265,11 @@ msgstr ""
 msgid "Please enter confirmation text."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:887
+#: include/locales/en_gb.inc.php:886
 msgid "Please select two elements"
 msgstr "Vyberte, prosím, dva prvky"
 
-#: include/locales/en_gb.inc.php:1408
+#: include/locales.inc.php:70
 msgid "Polish (pl_PL)"
 msgstr "Polsky (pl_PL)"
 
@@ -7297,11 +7288,11 @@ msgstr ""
 msgid "Port range"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1401
+#: include/locales.inc.php:71
 msgid "Portuguese (pt_BR)"
 msgstr "Portugalsky (pt_BR)"
 
-#: include/locales/en_gb.inc.php:1463
+#: include/locales/en_gb.inc.php:1444
 msgid "Position"
 msgstr "Pozice"
 
@@ -7316,8 +7307,8 @@ msgstr "POST"
 msgid "Preview"
 msgstr "Náhled"
 
-#: include/locales/en_gb.inc.php:200 include/locales/en_gb.inc.php:1710
-#: include/locales/en_gb.inc.php:1712
+#: include/locales/en_gb.inc.php:200 include/locales/en_gb.inc.php:1691
+#: include/locales/en_gb.inc.php:1693
 msgid "Previous"
 msgstr "Předchozí"
 
@@ -7366,17 +7357,17 @@ msgstr ""
 msgid "Probably php-ldap module is missing"
 msgstr "Modul php-ldap pravděpodobně chybí"
 
-#: include/locales/en_gb.inc.php:1030
+#: include/locales/en_gb.inc.php:1029
 #: include/views/js/configuration.sysmaps.js.php:127
 msgid "Problem"
 msgstr "Problém"
 
-#: include/locales/en_gb.inc.php:965
+#: include/locales/en_gb.inc.php:964
 #: include/views/configuration.sysmap.edit.php:145
 msgid "Problem display"
 msgstr "Zobrazit problémy"
 
-#: include/locales/en_gb.inc.php:1393
+#: include/locales/en_gb.inc.php:1391
 msgid "Problem on"
 msgstr ""
 
@@ -7388,7 +7379,7 @@ msgstr "problém, když všechny podřazené mají problém"
 msgid "Problem, if at least one child has a problem"
 msgstr "problém, když alespoň jeden podřazený má problém"
 
-#: include/locales/en_gb.inc.php:1031
+#: include/locales/en_gb.inc.php:1030
 msgid "Problems"
 msgstr "Problémy"
 
@@ -7408,11 +7399,11 @@ msgstr "Proxy"
 msgid "Proxy"
 msgstr "Proxy"
 
-#: include/locales/en_gb.inc.php:1343
+#: include/locales/en_gb.inc.php:1342
 msgid "Proxy added"
 msgstr "Proxy byla přidána"
 
-#: include/locales/en_gb.inc.php:1347
+#: include/locales/en_gb.inc.php:1346
 msgid "Proxy deleted"
 msgstr "Proxy byla smazána"
 
@@ -7424,7 +7415,7 @@ msgstr "Mód proxy"
 msgid "Proxy name"
 msgstr "Název proxy"
 
-#: include/locales/en_gb.inc.php:1345
+#: include/locales/en_gb.inc.php:1344
 msgid "Proxy updated"
 msgstr "Proxy byla aktualizována"
 
@@ -7442,11 +7433,11 @@ msgstr "Soubor s veřejným klíčem"
 msgid "QUEUE OF ITEMS TO BE UPDATED"
 msgstr "FRONTA POLOŽEK K AKTUALIZACI"
 
-#: include/locales/en_gb.inc.php:1658 include/menu.inc.php:265
+#: include/locales/en_gb.inc.php:1639 include/menu.inc.php:265
 msgid "Queue"
 msgstr "Fronta"
 
-#: include/locales/en_gb.inc.php:983
+#: include/locales/en_gb.inc.php:982
 msgid "REPORT"
 msgstr "PROTOKOL"
 
@@ -7469,7 +7460,7 @@ msgstr "Pouze čtení"
 msgid "Read-write"
 msgstr "Čtení a zápis"
 
-#: include/locales/en_gb.inc.php:1247
+#: include/locales/en_gb.inc.php:1246
 msgid "Reason"
 msgstr "Důvod"
 
@@ -7557,7 +7548,7 @@ msgstr ""
 msgid "Remote command"
 msgstr "Vzdálený příkaz"
 
-#: include/locales/en_gb.inc.php:1233
+#: include/locales/en_gb.inc.php:1232
 #: include/views/administration.general.iconmap.edit.php:69
 #: include/views/administration.general.iconmap.edit.php:105
 #: include/views/configuration.sysmap.edit.php:159
@@ -7581,7 +7572,7 @@ msgstr "Odstranit"
 msgid "Remove element"
 msgstr "Odstranit prvek"
 
-#: include/locales/en_gb.inc.php:1356
+#: include/locales/en_gb.inc.php:1354
 msgid "Remove from"
 msgstr "Odebrat z"
 
@@ -7611,7 +7602,7 @@ msgstr "Odstranit spojnici"
 msgid "Remove selected"
 msgstr "Odstranit vybrané"
 
-#: include/locales/en_gb.inc.php:1301
+#: include/locales/en_gb.inc.php:1300
 msgid "Replace"
 msgstr "Nahradit"
 
@@ -7619,11 +7610,11 @@ msgstr "Nahradit"
 msgid "Replace linked templates"
 msgstr "Nahradit propojené šablony"
 
-#: include/locales/en_gb.inc.php:1662
+#: include/locales/en_gb.inc.php:1643
 msgid "Report"
 msgstr "Protokol"
 
-#: include/locales/en_gb.inc.php:1663 include/menu.inc.php:122
+#: include/locales/en_gb.inc.php:1644 include/menu.inc.php:122
 msgid "Reports"
 msgstr "Protokoly"
 
@@ -7651,11 +7642,11 @@ msgstr ""
 msgid "Required performance (vps)"
 msgstr "Požadovaný výkon (hodnoty/sekundu)"
 
-#: include/locales/en_gb.inc.php:1000
+#: include/locales/en_gb.inc.php:999
 msgid "Required server performance, new values per second"
 msgstr "Požadovaný výkon serveru - nové hodnoty za sekundu"
 
-#: hosts.php:746 include/locales/en_gb.inc.php:944
+#: hosts.php:746 include/locales/en_gb.inc.php:943
 msgid "Reset"
 msgstr "Reset"
 
@@ -7679,11 +7670,11 @@ msgstr ""
 msgid "Reset defaults"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1029
+#: include/locales/en_gb.inc.php:1028
 msgid "Resolved"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1112
+#: include/locales/en_gb.inc.php:1111
 msgid "Resource"
 msgstr "Zdroj"
 
@@ -7705,7 +7696,7 @@ msgstr "Odezva"
 msgid "Response time for step '%1$s' of scenario '%2$s'"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1361
+#: include/locales/en_gb.inc.php:1359
 msgid "Result"
 msgstr "Výsledek"
 
@@ -7717,7 +7708,7 @@ msgstr "Výsledek je NEPRAVDA"
 msgid "Result is TRUE"
 msgstr "Výsledek je PRAVDA"
 
-#: include/locales/en_gb.inc.php:1474
+#: include/locales/en_gb.inc.php:1455
 msgid "Result type"
 msgstr "Typ výsledku"
 
@@ -7733,18 +7724,18 @@ msgstr "Znovu zkusit"
 msgid "Return"
 msgstr "Zpět"
 
-#: include/locales/en_gb.inc.php:1173
+#: include/locales/en_gb.inc.php:1172
 #: include/views/configuration.sysmap.edit.php:131
 #: include/views/js/configuration.sysmaps.js.php:75
 #: include/views/js/configuration.sysmaps.js.php:309
 msgid "Right"
 msgstr "vpravo"
 
-#: include/locales/en_gb.inc.php:1151
+#: include/locales/en_gb.inc.php:1150
 msgid "Row span"
 msgstr "Rozsah řádků"
 
-#: include/locales/en_gb.inc.php:1107
+#: include/locales/en_gb.inc.php:1106
 msgid "Rows"
 msgstr "Řádky"
 
@@ -7800,11 +7791,11 @@ msgstr ""
 msgid "Run remote commands on hosts"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1400
+#: include/locales.inc.php:72
 msgid "Russian (ru_RU)"
 msgstr "Rusky (ru_RU)"
 
-#: include/locales/en_gb.inc.php:1681 include/locales/en_gb.inc.php:1682
+#: include/locales/en_gb.inc.php:1662 include/locales/en_gb.inc.php:1663
 msgid "S"
 msgstr "so"
 
@@ -7812,11 +7803,11 @@ msgstr "so"
 msgid "SCENARIOS"
 msgstr "SCÉNÁŘ"
 
-#: include/locales/en_gb.inc.php:1183 screens.php:179 screens.php:219
+#: include/locales/en_gb.inc.php:1182 screens.php:179 screens.php:219
 msgid "SCREENS"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1364
+#: include/locales/en_gb.inc.php:1362
 msgid "SCRIPT ERROR"
 msgstr "CHYBA SKRIPTU"
 
@@ -7824,7 +7815,7 @@ msgstr "CHYBA SKRIPTU"
 msgid "SCRIPTS"
 msgstr "SKRIPTY"
 
-#: include/locales/en_gb.inc.php:1423
+#: include/locales/en_gb.inc.php:1404
 msgid "SEARCH"
 msgstr "HLEDAT"
 
@@ -7832,11 +7823,11 @@ msgstr "HLEDAT"
 msgid "SERVER"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1033
+#: include/locales/en_gb.inc.php:1032
 msgid "SLA"
 msgstr "SLA"
 
-#: include/locales/en_gb.inc.php:1132
+#: include/locales/en_gb.inc.php:1131
 msgid "SLIDE SHOWS"
 msgstr "PREZENTACE"
 
@@ -7932,19 +7923,19 @@ msgstr "SNMPv3 úroveň zabezpečení"
 msgid "SNMPv3 security name"
 msgstr "SNMPv3 security name"
 
-#: include/locales/en_gb.inc.php:1497
+#: include/locales/en_gb.inc.php:1478
 msgid "SQL executes count"
 msgstr "Počet SQL execute"
 
-#: include/locales/en_gb.inc.php:1498
+#: include/locales/en_gb.inc.php:1479
 msgid "SQL requests count"
 msgstr "Počet SQL požadavků"
 
-#: include/locales/en_gb.inc.php:1496
+#: include/locales/en_gb.inc.php:1477
 msgid "SQL selects count"
 msgstr "Počet SQL select"
 
-#: include/db.inc.php:1288 include/db.inc.php:1336 include/db.inc.php:1372
+#: include/db.inc.php:1305 include/db.inc.php:1353 include/db.inc.php:1389
 #, php-format
 msgid "SQL statement execution has failed \"%s\""
 msgstr ""
@@ -7963,7 +7954,7 @@ msgstr "SSH agent"
 msgid "STATUS OF DISCOVERY"
 msgstr "STAV PRŮZKUMU"
 
-#: include/locales/en_gb.inc.php:1320
+#: include/locales/en_gb.inc.php:1319
 msgid "STATUS OF TRIGGERS"
 msgstr "STAV SPOUŠTĚČŮ"
 
@@ -7971,7 +7962,7 @@ msgstr "STAV SPOUŠTĚČŮ"
 msgid "STATUS OF WEB MONITORING"
 msgstr "STAV SLEDOVÁNÍ WEBŮ"
 
-#: include/locales/en_gb.inc.php:985
+#: include/locales/en_gb.inc.php:984
 msgid "STATUS OF ZABBIX"
 msgstr "STAV ZABBIXE"
 
@@ -7979,11 +7970,11 @@ msgstr "STAV ZABBIXE"
 msgid "Sat"
 msgstr "so"
 
-#: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1241
+#: include/locales/en_gb.inc.php:50 include/locales/en_gb.inc.php:1240
 msgid "Saturday"
 msgstr "sobota"
 
-#: include/forms.inc.php:3669 include/locales/en_gb.inc.php:927
+#: include/forms.inc.php:3669 include/locales/en_gb.inc.php:926
 #: include/views/administration.authentication.edit.php:76
 #: include/views/administration.general.gui.edit.php:50
 #: include/views/administration.general.housekeeper.edit.php:37
@@ -8010,7 +8001,7 @@ msgstr "sobota"
 msgid "Save"
 msgstr "Uložit"
 
-#: include/locales/en_gb.inc.php:1086
+#: include/locales/en_gb.inc.php:1085
 msgid "Scale"
 msgstr "Měřítko"
 
@@ -8069,41 +8060,41 @@ msgstr "Scénáře"
 msgid "Schedule"
 msgstr "Termín"
 
-#: include/locales/en_gb.inc.php:1097
+#: include/locales/en_gb.inc.php:1096
 msgid "Screen"
 msgstr "Obrazovka"
 
-#: include/locales/en_gb.inc.php:1100
+#: include/locales/en_gb.inc.php:1099
 msgid "Screen added"
 msgstr "Obrazovka byla přidána"
 
-#: include/locales/en_gb.inc.php:1111
+#: include/locales/en_gb.inc.php:1110
 msgid "Screen cell configuration"
 msgstr "Nastavení buňky obrazovky"
 
-#: include/locales/en_gb.inc.php:1104
+#: include/locales/en_gb.inc.php:1103
 msgid "Screen deleted"
 msgstr "Obrazovka byla smazána"
 
-#: include/locales/en_gb.inc.php:1179
+#: include/locales/en_gb.inc.php:1178
 msgid "Screen should contain at least one row and column"
 msgstr "Obrazovka musí obsahovat alespoň jeden řádek a jeden sloupec"
 
-#: include/locales/en_gb.inc.php:1102
+#: include/locales/en_gb.inc.php:1101
 msgid "Screen updated"
 msgstr "Obrazovka byla aktualizována"
 
-#: include/locales/en_gb.inc.php:1195
+#: include/locales/en_gb.inc.php:1194
 #, php-format
 msgid "Screen with id \"%d\" does not exist"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1194
+#: include/locales/en_gb.inc.php:1193
 #, php-format
 msgid "Screen with name \"%s\" does not exist"
 msgstr ""
 
-#: include/html.inc.php:399 include/locales/en_gb.inc.php:1096
+#: include/html.inc.php:399 include/locales/en_gb.inc.php:1095
 #: include/menu.inc.php:71 include/menu.inc.php:201 popup.php:85 popup.php:109
 msgid "Screens"
 msgstr "Obrazovky"
@@ -8144,7 +8135,7 @@ msgstr "Skript byl aktualizován"
 msgid "Script with scriptid \"%s\" does not exist."
 msgstr ""
 
-#: include/blocks.inc.php:922 include/locales/en_gb.inc.php:1359
+#: include/blocks.inc.php:922 include/locales/en_gb.inc.php:1357
 #: include/maps.inc.php:173 include/menu.inc.php:256 report5.php:137
 #: tr_status.php:553
 msgid "Scripts"
@@ -8159,7 +8150,7 @@ msgstr "Hledat"
 msgid "Search attribute"
 msgstr "Hledaný atribut"
 
-#: include/locales/en_gb.inc.php:1427
+#: include/locales/en_gb.inc.php:1408
 msgid "Search pattern is empty"
 msgstr "Vyhledávací vzor je prázdný"
 
@@ -8204,7 +8195,7 @@ msgstr ""
 msgid "Seconds"
 msgstr "sekund"
 
-#: include/forms.inc.php:1362 include/locales/en_gb.inc.php:1339
+#: include/forms.inc.php:1362 include/locales/en_gb.inc.php:1338
 #: include/page_header.php:326 include/views/configuration.action.edit.php:173
 #: include/views/configuration.action.edit.php:183
 #: include/views/configuration.action.edit.php:193
@@ -8239,7 +8230,7 @@ msgstr ""
 msgid "Select rows with value like"
 msgstr "Vybrat řádky s hodnotou jako"
 
-#: include/locales/en_gb.inc.php:955
+#: include/locales/en_gb.inc.php:954
 msgid "Selected"
 msgstr "vybrané"
 
@@ -8251,11 +8242,11 @@ msgstr ""
 msgid "Selected elements"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1085
+#: include/locales/en_gb.inc.php:1084
 msgid "Selected groups"
 msgstr "Vybrané skupiny"
 
-#: include/locales/en_gb.inc.php:1084
+#: include/locales/en_gb.inc.php:1083
 msgid "Selected hosts"
 msgstr "Vybraní hostitelé"
 
@@ -8275,7 +8266,7 @@ msgstr ""
 msgid "Send only to"
 msgstr "Poslat pouze na"
 
-#: include/locales/en_gb.inc.php:923
+#: include/locales/en_gb.inc.php:922
 msgid "Send to"
 msgstr "Poslat na"
 
@@ -8291,7 +8282,7 @@ msgstr ""
 msgid "Sep"
 msgstr "zář"
 
-#: include/locales/en_gb.inc.php:964
+#: include/locales/en_gb.inc.php:963
 #: include/views/configuration.sysmap.edit.php:138
 msgid "Separated"
 msgstr "Separated"
@@ -8313,19 +8304,19 @@ msgstr ""
 msgid "Server"
 msgstr "Server"
 
-#: include/locales/en_gb.inc.php:1155
+#: include/locales/en_gb.inc.php:1154
 msgid "Server info"
 msgstr "Server info"
 
-#: include/locales/en_gb.inc.php:1163
+#: include/locales/en_gb.inc.php:1162
 msgid "Server time"
 msgstr "Čas na serveru"
 
-#: include/actions.inc.php:71 include/locales/en_gb.inc.php:1245
+#: include/actions.inc.php:71 include/locales/en_gb.inc.php:1244
 msgid "Service"
 msgstr "Služba"
 
-#: include/locales/en_gb.inc.php:1209
+#: include/locales/en_gb.inc.php:1208
 msgid "Service added"
 msgstr "Služba byla přidána"
 
@@ -8333,7 +8324,7 @@ msgstr "Služba byla přidána"
 msgid "Service cannot be parent and child at the same time."
 msgstr "Služba nemůže být nadřazená i podřazená zároveň."
 
-#: include/locales/en_gb.inc.php:1211
+#: include/locales/en_gb.inc.php:1210
 msgid "Service deleted"
 msgstr "Služba byla smazána"
 
@@ -8341,7 +8332,7 @@ msgstr "Služba byla smazána"
 msgid "Service port"
 msgstr "Port služby"
 
-#: include/locales/en_gb.inc.php:1230
+#: include/locales/en_gb.inc.php:1229
 msgid "Service times"
 msgstr "Servisní časy"
 
@@ -8349,11 +8340,11 @@ msgstr "Servisní časy"
 msgid "Service type"
 msgstr "Typ služby"
 
-#: include/locales/en_gb.inc.php:1206
+#: include/locales/en_gb.inc.php:1205
 msgid "Service updated"
 msgstr "Služba byla aktualizována"
 
-#: include/locales/en_gb.inc.php:1246
+#: include/locales/en_gb.inc.php:1245
 msgid "Services"
 msgstr "Služby"
 
@@ -8361,11 +8352,11 @@ msgstr "Služby"
 msgid "Session terminated, re-login, please."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:892
+#: include/locales/en_gb.inc.php:891
 msgid "Set trigger"
 msgstr "Set trigger"
 
-#: include/locales/en_gb.inc.php:1269 popup.php:857
+#: include/locales/en_gb.inc.php:1268 popup.php:857
 msgid "Severity"
 msgstr "Závažnost"
 
@@ -8377,7 +8368,7 @@ msgstr ""
 msgid "Severity name cannot be empty."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1009
+#: include/locales/en_gb.inc.php:1008
 #: include/views/js/configuration.sysmaps.js.php:25
 msgid "Show"
 msgstr "Zobrazit"
@@ -8386,7 +8377,7 @@ msgstr "Zobrazit"
 msgid "Show all"
 msgstr "Zobrazit vše"
 
-#: include/locales/en_gb.inc.php:1325
+#: include/locales/en_gb.inc.php:1324
 msgid "Show details"
 msgstr "Zobrazit detaily"
 
@@ -8394,7 +8385,7 @@ msgstr "Zobrazit detaily"
 msgid "Show disabled scenarios"
 msgstr "Zobrazit zakázané scénáře"
 
-#: include/locales/en_gb.inc.php:1287
+#: include/locales/en_gb.inc.php:1286
 msgid "Show disabled triggers"
 msgstr "Zobrazit zakázané spouštěče"
 
@@ -8406,11 +8397,11 @@ msgstr "Největší počet zobrazovaných událostí"
 msgid "Show events not older than (in days)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:972
+#: include/locales/en_gb.inc.php:971
 msgid "Show graph of item"
 msgstr "Zobrazit graf položky"
 
-#: include/locales/en_gb.inc.php:956
+#: include/locales/en_gb.inc.php:955
 msgid "Show hosts in maintenance"
 msgstr "Zobrazit hostitele v servisním okně"
 
@@ -8426,7 +8417,7 @@ msgstr ""
 msgid "Show legend"
 msgstr "Zobrazit legendu"
 
-#: include/locales/en_gb.inc.php:1152
+#: include/locales/en_gb.inc.php:1151
 msgid "Show lines"
 msgstr "Zobrazit řádků"
 
@@ -8434,7 +8425,7 @@ msgstr "Zobrazit řádků"
 msgid "Show selected"
 msgstr "Zobrazit vybrané"
 
-#: include/locales/en_gb.inc.php:1138
+#: include/locales/en_gb.inc.php:1137
 msgid "Show text as HTML"
 msgstr "Zobrazit text jako HTML"
 
@@ -8442,7 +8433,7 @@ msgstr "Zobrazit text jako HTML"
 msgid "Show triggers"
 msgstr "Zobrazit spouštěče"
 
-#: include/locales/en_gb.inc.php:1324
+#: include/locales/en_gb.inc.php:1323
 msgid "Show unacknowledged"
 msgstr "Zobrazit nepotvrzené"
 
@@ -8454,7 +8445,7 @@ msgstr ""
 msgid "Show value"
 msgstr "Ukázat hodnotu"
 
-#: include/locales/en_gb.inc.php:973
+#: include/locales/en_gb.inc.php:972
 msgid "Show values of item"
 msgstr "Zobrazit hodnoty položky"
 
@@ -8462,7 +8453,7 @@ msgstr "Zobrazit hodnoty položky"
 msgid "Show working time"
 msgstr "Zobrazit praconí dobu"
 
-#: include/locales/en_gb.inc.php:843 sysmap.php:164
+#: include/locales/en_gb.inc.php:842 sysmap.php:164
 msgid "Shown"
 msgstr "zobrazena"
 
@@ -8478,15 +8469,11 @@ msgstr "Jednoduchý"
 msgid "Simple check"
 msgstr "Jednoduchá kontrola"
 
-#: api/classes/class.citemkey.php:121
-msgid "Simple check key cannot have parameters in []."
-msgstr ""
-
-#: include/locales/en_gb.inc.php:1114 popup.php:97
+#: include/locales/en_gb.inc.php:1113 popup.php:97
 msgid "Simple graph"
 msgstr "Jednoduchý graf"
 
-#: include/locales/en_gb.inc.php:1115
+#: include/locales/en_gb.inc.php:1114
 msgid "Simple graphs"
 msgstr "Jednoduché grafy"
 
@@ -8531,31 +8518,31 @@ msgstr ""
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1129
+#: include/locales/en_gb.inc.php:1128
 msgid "Slide show"
 msgstr "Prezentace"
 
-#: include/locales/en_gb.inc.php:1128 popup.php:89
+#: include/locales/en_gb.inc.php:1127 popup.php:89
 msgid "Slide shows"
 msgstr "Prezentace"
 
-#: include/locales/en_gb.inc.php:1136 include/menu.inc.php:206
+#: include/locales/en_gb.inc.php:1135 include/menu.inc.php:206
 msgid "Slides"
 msgstr "Slajdy"
 
-#: include/locales/en_gb.inc.php:1188
+#: include/locales/en_gb.inc.php:1187
 msgid "Slideshow added"
 msgstr "Prezentace byla přidána"
 
-#: include/locales/en_gb.inc.php:1190
+#: include/locales/en_gb.inc.php:1189
 msgid "Slideshow deleted"
 msgstr "Prezentace byla smazána"
 
-#: include/locales/en_gb.inc.php:1127
+#: include/locales/en_gb.inc.php:1126
 msgid "Slideshow must contain slides"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1186
+#: include/locales/en_gb.inc.php:1185
 msgid "Slideshow updated"
 msgstr "Prezentace byla aktualizována"
 
@@ -8563,11 +8550,11 @@ msgstr "Prezentace byla aktualizována"
 msgid "Slovak (sk_SK)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1391
+#: include/locales/en_gb.inc.php:1389
 msgid "Snooze"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1217
+#: include/locales/en_gb.inc.php:1216
 msgid "Soft"
 msgstr "Soft"
 
@@ -8611,7 +8598,7 @@ msgstr "Řadit podle"
 msgid "Sort order (0->100)"
 msgstr "Řazení (0->100)"
 
-#: include/locales/en_gb.inc.php:1221
+#: include/locales/en_gb.inc.php:1220
 msgid "Sort order (0->999)"
 msgstr "Řazení (0->999)"
 
@@ -8623,7 +8610,7 @@ msgstr ""
 msgid "Source"
 msgstr "Zdroj"
 
-#: include/locales/en_gb.inc.php:1402
+#: include/locales.inc.php:74
 msgid "Spanish (es_ES)"
 msgstr "Španělsky (es_ES)"
 
@@ -8647,7 +8634,7 @@ msgstr ""
 msgid "State"
 msgstr "Stav"
 
-#: include/locales/en_gb.inc.php:1492
+#: include/locales/en_gb.inc.php:1473
 msgid "Stats for"
 msgstr "Statistika pro"
 
@@ -8660,11 +8647,11 @@ msgstr "Statistika pro"
 msgid "Status"
 msgstr "Stav"
 
-#: include/locales/en_gb.inc.php:1214
+#: include/locales/en_gb.inc.php:1213
 msgid "Status calculation"
 msgstr "Výpočet stavu"
 
-#: include/locales/en_gb.inc.php:1215
+#: include/locales/en_gb.inc.php:1214
 msgid "Status calculation algorithm"
 msgstr "Algoritmus výpočtu stavu"
 
@@ -8676,7 +8663,7 @@ msgstr "Návratové hodnoty"
 msgid "Status of Web monitoring"
 msgstr "Stav sledování webů"
 
-#: include/locales/en_gb.inc.php:984 include/menu.inc.php:129
+#: include/locales/en_gb.inc.php:983 include/menu.inc.php:129
 msgid "Status of Zabbix"
 msgstr "Stav ZABBIXe"
 
@@ -8684,15 +8671,15 @@ msgstr "Stav ZABBIXe"
 msgid "Status of discovery"
 msgstr "Stav průzkumu"
 
-#: include/locales/en_gb.inc.php:1322
+#: include/locales/en_gb.inc.php:1321
 msgid "Status of host triggers"
 msgstr "Stav spouštěčů hostitele"
 
-#: include/locales/en_gb.inc.php:1321
+#: include/locales/en_gb.inc.php:1320
 msgid "Status of hostgroup triggers"
 msgstr "Stav spouštěčů skupiny"
 
-#: include/locales/en_gb.inc.php:1319
+#: include/locales/en_gb.inc.php:1318
 msgid "Status of triggers"
 msgstr "Stav spouštěčů"
 
@@ -8700,7 +8687,7 @@ msgstr "Stav spouštěčů"
 msgid "Status only"
 msgstr "Pouze stav"
 
-#: actionconf.php:327 trigger_prototypes.php:255 triggers.php:295
+#: actionconf.php:327 trigger_prototypes.php:288 triggers.php:364
 msgid "Status updated"
 msgstr "Stav byl aktualizován"
 
@@ -8736,11 +8723,11 @@ msgstr "Uložit hodnotu"
 msgid "Straight"
 msgstr "Straight"
 
-#: include/locales/en_gb.inc.php:1167
+#: include/locales/en_gb.inc.php:1166
 msgid "Style"
 msgstr "Styl"
 
-#: include/locales/en_gb.inc.php:1532
+#: include/locales/en_gb.inc.php:1513
 msgid "Subfilter"
 msgstr "Rozšiřující filtr"
 
@@ -8750,7 +8737,7 @@ msgstr "Rozšiřující filtr"
 msgid "Subject"
 msgstr "Předmět"
 
-#: include/locales/en_gb.inc.php:1582
+#: include/locales/en_gb.inc.php:1563
 msgid "Submap"
 msgstr ""
 
@@ -8762,7 +8749,7 @@ msgstr "Úspěšný audit"
 msgid "Sun"
 msgstr "ne"
 
-#: include/locales/en_gb.inc.php:44 include/locales/en_gb.inc.php:1235
+#: include/locales/en_gb.inc.php:44 include/locales/en_gb.inc.php:1234
 msgid "Sunday"
 msgstr "neděle"
 
@@ -8775,7 +8762,7 @@ msgstr ""
 msgid "Surname"
 msgstr "Příjmení"
 
-#: include/locales/en_gb.inc.php:1403
+#: include/locales.inc.php:75
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
@@ -8791,12 +8778,12 @@ msgstr "Výchozí nastavení"
 msgid "System error."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:937
+#: include/locales/en_gb.inc.php:936
 msgid "System status"
 msgstr "Stav systému"
 
-#: include/locales/en_gb.inc.php:1519 include/locales/en_gb.inc.php:1677
-#: include/locales/en_gb.inc.php:1679
+#: include/locales/en_gb.inc.php:1500 include/locales/en_gb.inc.php:1658
+#: include/locales/en_gb.inc.php:1660
 msgid "T"
 msgstr "T"
 
@@ -8817,15 +8804,15 @@ msgstr "ŠABLONY"
 msgid "TOTAL"
 msgstr "CELKEM"
 
-#: include/locales/en_gb.inc.php:1313
+#: include/locales/en_gb.inc.php:1312
 msgid "TRIGGER COMMENTS"
 msgstr "KOMENTÁŘE KE SPOUŠTĚČI"
 
-#: include/locales/en_gb.inc.php:810
+#: include/locales/en_gb.inc.php:809
 msgid "TRIGGER PROTOTYPES OF"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1327
+#: include/locales/en_gb.inc.php:1326
 msgid "TRIGGERS"
 msgstr "SPOUŠTĚČE"
 
@@ -8833,7 +8820,7 @@ msgstr "SPOUŠTĚČE"
 msgid "TRUE"
 msgstr "PRAVDA"
 
-#: include/db.inc.php:1169
+#: include/db.inc.php:1186
 #, php-format
 msgid "Table \"%s\" does not exist."
 msgstr ""
@@ -8905,11 +8892,11 @@ msgstr ""
 msgid "Template updated"
 msgstr "Šablona byla aktualizována"
 
-#: include/locales/en_gb.inc.php:1556
+#: include/locales/en_gb.inc.php:1537
 msgid "Template with application"
 msgstr "Šablona s aplikací"
 
-#: include/locales/en_gb.inc.php:1555
+#: include/locales/en_gb.inc.php:1536
 msgid "Template with item key"
 msgstr "Šablona s klíčem položky"
 
@@ -8942,7 +8929,7 @@ msgstr "Šablony"
 msgid "Templates [%1$s] unlinked from hosts [%2$s]."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1520
+#: include/locales/en_gb.inc.php:1501
 msgid "Tera"
 msgstr "tera"
 
@@ -8959,7 +8946,7 @@ msgstr ""
 msgid "Test confirmation"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1468
+#: include/locales/en_gb.inc.php:1449
 msgid "Test data"
 msgstr "Testovací data"
 
@@ -8999,7 +8986,7 @@ msgstr ""
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1289
+#: include/locales/en_gb.inc.php:1288
 msgid "The trigger depends on"
 msgstr "Spouštěč závisí na"
 
@@ -9024,23 +9011,23 @@ msgstr "třetí"
 msgid "This field is automatically populated by item \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1251
+#: include/locales/en_gb.inc.php:1250
 msgid "This month"
 msgstr "Tento měsíc"
 
-#: include/locales/en_gb.inc.php:1588
+#: include/locales/en_gb.inc.php:1569
 msgid "This screen-column is not empty"
 msgstr "Tento sloupec obrazovky není prázdný"
 
-#: include/locales/en_gb.inc.php:1587
+#: include/locales/en_gb.inc.php:1568
 msgid "This screen-row is not empty"
 msgstr "Tento řádek obrazovky není prázdný"
 
-#: include/locales/en_gb.inc.php:1249
+#: include/locales/en_gb.inc.php:1248
 msgid "This week"
 msgstr "Tento týden"
 
-#: include/locales/en_gb.inc.php:1250
+#: include/locales/en_gb.inc.php:1249
 msgid "This year"
 msgstr "Tento rok"
 
@@ -9048,11 +9035,11 @@ msgstr "Tento rok"
 msgid "Thu"
 msgstr "čt"
 
-#: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1239
+#: include/locales/en_gb.inc.php:48 include/locales/en_gb.inc.php:1238
 msgid "Thursday"
 msgstr "čtvrtek"
 
-#: include/locales/en_gb.inc.php:1027
+#: include/locales/en_gb.inc.php:1026
 msgid "Till"
 msgstr "Do"
 
@@ -9064,11 +9051,11 @@ msgstr "Čas"
 msgid "Time period"
 msgstr "Časové období"
 
-#: include/locales/en_gb.inc.php:1285
+#: include/locales/en_gb.inc.php:1284
 msgid "Time shift"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1162
+#: include/locales/en_gb.inc.php:1161
 msgid "Time type"
 msgstr "Druh času"
 
@@ -9096,11 +9083,11 @@ msgstr "Titulek"
 msgid "To"
 msgstr "Do"
 
-#: include/locales/en_gb.inc.php:1248
+#: include/locales/en_gb.inc.php:1247
 msgid "Today"
 msgstr "Dnes"
 
-#: include/locales/en_gb.inc.php:1299
+#: include/locales/en_gb.inc.php:1298
 msgid "Toggle input method"
 msgstr "změnit způsob zadávání"
 
@@ -9109,22 +9096,22 @@ msgstr "změnit způsob zadávání"
 msgid "Too many interfaces provided for proxy \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:895
+#: include/locales/en_gb.inc.php:894
 #: include/views/configuration.sysmap.edit.php:131
 #: include/views/js/configuration.sysmaps.js.php:76
 #: include/views/js/configuration.sysmaps.js.php:310
 msgid "Top"
 msgstr "nahoře"
 
-#: include/locales/en_gb.inc.php:977 queue.php:289
+#: include/locales/en_gb.inc.php:976 queue.php:289
 msgid "Total"
 msgstr "Celkem"
 
-#: include/locales/en_gb.inc.php:1493
+#: include/locales/en_gb.inc.php:1474
 msgid "Total time"
 msgstr "Celkový čas"
 
-#: include/locales/en_gb.inc.php:1499
+#: include/locales/en_gb.inc.php:1480
 msgid "Total time spent on SQL"
 msgstr "Celkový čas pro SQL"
 
@@ -9140,15 +9127,20 @@ msgstr ""
 msgid "Trends"
 msgstr "Trendy"
 
-#: include/locales/en_gb.inc.php:989
+#: include/locales/en_gb.inc.php:988
 msgid "Trends stored"
 msgstr "Trends stored"
 
-#: include/actions.inc.php:41 include/locales/en_gb.inc.php:1222
+#: include/actions.inc.php:41 include/locales/en_gb.inc.php:1221
 #: include/views/js/configuration.sysmaps.js.php:18
 #: include/views/js/configuration.sysmaps.js.php:94
 msgid "Trigger"
 msgstr "Spouštěč"
+
+#: api/classes/class.ctrigger.php:1613
+#, php-format
+msgid "Trigger \"%1$s:%2$s\" updated."
+msgstr ""
 
 #: api/classes/class.ctrigger.php:1580
 #, php-format
@@ -9182,12 +9174,7 @@ msgstr ""
 msgid "Trigger [%1$s:%2$s] unlinked."
 msgstr ""
 
-#: api/classes/class.ctrigger.php:1614
-#, php-format
-msgid "Trigger [%1$s:%2$s] updated."
-msgstr ""
-
-#: api/classes/class.ctrigger.php:1701 api/classes/class.ctrigger.php:1736
+#: api/classes/class.ctrigger.php:1700 api/classes/class.ctrigger.php:1735
 #: api/classes/class.ctriggerprototype.php:1505
 #: api/classes/class.ctriggerprototype.php:1540
 #, php-format
@@ -9199,19 +9186,19 @@ msgstr ""
 msgid "Trigger [%1$s] does not have item prototype."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1267 triggers.php:321
+#: include/locales/en_gb.inc.php:1266 triggers.php:390
 msgid "Trigger added"
 msgstr "Spouštěč byl přidán"
 
-#: include/locales/en_gb.inc.php:1312
+#: include/locales/en_gb.inc.php:1311
 msgid "Trigger comments"
 msgstr "Komentáře ke spouštěči"
 
-#: include/locales/en_gb.inc.php:1265
+#: include/locales/en_gb.inc.php:1264
 msgid "Trigger deleted"
 msgstr "Spouštěč byl smazán"
 
-#: include/locales/en_gb.inc.php:1296
+#: include/locales/en_gb.inc.php:1295
 msgid "Trigger dependencies"
 msgstr "Závislosti spouštěče"
 
@@ -9220,7 +9207,7 @@ msgstr "Závislosti spouštěče"
 msgid "Trigger displaying options"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1309
+#: include/locales/en_gb.inc.php:1308
 msgid "Trigger form"
 msgstr ""
 
@@ -9241,6 +9228,15 @@ msgstr ""
 msgid "Trigger name"
 msgstr ""
 
+#: include/audit.inc.php:34
+msgid "Trigger prototype"
+msgstr ""
+
+#: api/classes/class.ctriggerprototype.php:1437
+#, php-format
+msgid "Trigger prototype \"%1$s:%2$s\" updated."
+msgstr ""
+
 #: api/classes/class.ctriggerprototype.php:1314
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] deleted."
@@ -9249,11 +9245,6 @@ msgstr ""
 #: api/classes/class.ctemplate.php:1930
 #, php-format
 msgid "Trigger prototype [%1$s:%2$s] unlinked."
-msgstr ""
-
-#: api/classes/class.ctriggerprototype.php:1437
-#, php-format
-msgid "Trigger prototype [%1$s:%2$s] updated."
 msgstr ""
 
 #: include/views/configuration.host.edit.php:385
@@ -9270,12 +9261,7 @@ msgstr ""
 msgid "Trigger severity"
 msgstr "Závažnost spouštěče"
 
-#: include/triggers.inc.php:1180
-#, php-format
-msgid "Trigger status became \"%s\""
-msgstr ""
-
-#: include/locales/en_gb.inc.php:1277
+#: include/locales/en_gb.inc.php:1276
 msgid "Trigger updated"
 msgstr "Spouštěč byl aktualizován"
 
@@ -9283,7 +9269,7 @@ msgstr "Spouštěč byl aktualizován"
 msgid "Trigger value"
 msgstr "Hodnota spouštěče"
 
-#: api/classes/class.ctrigger.php:1705 api/classes/class.ctrigger.php:1739
+#: api/classes/class.ctrigger.php:1704 api/classes/class.ctrigger.php:1738
 #: api/classes/class.ctriggerprototype.php:1509
 #: api/classes/class.ctriggerprototype.php:1543
 msgid "Trigger with same name but other type exists"
@@ -9297,27 +9283,27 @@ msgstr ""
 msgid "Triggers"
 msgstr "Spouštěče"
 
-#: include/locales/en_gb.inc.php:991
+#: include/locales/en_gb.inc.php:990
 msgid "Triggers (e/d)[p/u/o]"
 msgstr "Spouštěče (pov/zak)[A/?/N]"
 
-#: include/locales/en_gb.inc.php:1263
+#: include/locales/en_gb.inc.php:1262
 msgid "Triggers deleted"
 msgstr "Spouštěče byly smazány"
 
-#: include/locales/en_gb.inc.php:1154
+#: include/locales/en_gb.inc.php:1153
 msgid "Triggers info"
 msgstr "Informace o spouštěčích"
 
-#: include/locales/en_gb.inc.php:1295
+#: include/locales/en_gb.inc.php:1294
 msgid "Triggers massupdate"
 msgstr "Hromadná aktualizace spouštěčů"
 
-#: include/locales/en_gb.inc.php:1157
+#: include/locales/en_gb.inc.php:1156
 msgid "Triggers overview"
 msgstr "Přehled spouštěčů"
 
-#: include/locales/en_gb.inc.php:1337
+#: include/locales/en_gb.inc.php:1336
 msgid "Triggers status"
 msgstr "Stav spouštěče"
 
@@ -9325,7 +9311,7 @@ msgstr "Stav spouštěče"
 msgid "Triggers top 100"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:957
+#: include/locales/en_gb.inc.php:956
 msgid "Triggers with severity"
 msgstr "Spouštěče se závažností"
 
@@ -9337,11 +9323,11 @@ msgstr "zkráceno"
 msgid "Tue"
 msgstr "út"
 
-#: include/locales/en_gb.inc.php:46 include/locales/en_gb.inc.php:1237
+#: include/locales/en_gb.inc.php:46 include/locales/en_gb.inc.php:1236
 msgid "Tuesday"
 msgstr "úterý"
 
-#: include/locales/en_gb.inc.php:885
+#: include/locales/en_gb.inc.php:884
 msgid "Two elements should be selected"
 msgstr "Musí být vybrané dva prvky"
 
@@ -9370,7 +9356,7 @@ msgstr "Typ"
 msgid "Type (Full details)"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:876
+#: include/locales/en_gb.inc.php:875
 #: include/views/js/configuration.sysmaps.js.php:217
 msgid "Type (OK)"
 msgstr "Typ (OK)"
@@ -9396,7 +9382,7 @@ msgstr "Typy"
 msgid "UNKNOWN"
 msgstr "NEZNÁMÝ"
 
-#: include/locales/en_gb.inc.php:825
+#: include/locales/en_gb.inc.php:824
 msgid "UP"
 msgstr ""
 
@@ -9404,7 +9390,7 @@ msgstr ""
 msgid "UPDATE"
 msgstr "AKTUALIZOVAT"
 
-#: include/locales/en_gb.inc.php:1281
+#: include/locales/en_gb.inc.php:1280
 #: include/views/configuration.sysmap.edit.php:149
 #: include/views/js/configuration.sysmaps.js.php:164
 msgid "URL"
@@ -9438,19 +9424,19 @@ msgstr "PROFIL UŽIVATELE"
 msgid "UTF-8"
 msgstr "UTF-8"
 
-#: include/locales/en_gb.inc.php:1409
+#: include/locales.inc.php:77
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrajinsky (uk_UA)"
 
-#: include/locales/en_gb.inc.php:1622
+#: include/locales/en_gb.inc.php:1603
 msgid "Unable to remove local node"
 msgstr "Nelze odebrat místní uzel"
 
-#: include/locales/en_gb.inc.php:1598
+#: include/locales/en_gb.inc.php:1579
 msgid "Unable to select configuration"
 msgstr "Nepodařilo se načíst nastavení"
 
-#: include/locales/en_gb.inc.php:913
+#: include/locales/en_gb.inc.php:912
 msgid "Unacknowledged"
 msgstr "Nepotvrzené"
 
@@ -9462,7 +9448,7 @@ msgstr ""
 msgid "Unacknowledged PROBLEM events"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:963
+#: include/locales/en_gb.inc.php:962
 #: include/views/configuration.sysmap.edit.php:139
 msgid "Unacknowledged only"
 msgstr "pouze nepotvrzené"
@@ -9475,7 +9461,7 @@ msgstr "Odblokovat vybrané"
 msgid "Unblock selected users?"
 msgstr "Odblokovat vybrané uživatele?"
 
-#: include/locales/en_gb.inc.php:1447
+#: include/locales/en_gb.inc.php:1428
 msgid "Unexpected end of element"
 msgstr "Neočekávaný konec elementu"
 
@@ -9493,7 +9479,7 @@ msgstr "Jednotky"
 msgid "Unknown"
 msgstr "Neznámý"
 
-#: include/locales/en_gb.inc.php:1378
+#: include/locales/en_gb.inc.php:1376
 msgid "Unknown action"
 msgstr "Neznámá akce"
 
@@ -9501,15 +9487,15 @@ msgstr "Neznámá akce"
 msgid "Unknown calculation algorithm of service status"
 msgstr "Neznámý algoritmus výpočtu stavu služby"
 
-#: include/locales/en_gb.inc.php:1472
+#: include/locales/en_gb.inc.php:1453
 msgid "Unknown host item, no such item in selected host"
 msgstr "Zadaná položka ve vybraném hostiteli neexistuje"
 
-#: include/locales/en_gb.inc.php:1471
+#: include/locales/en_gb.inc.php:1452
 msgid "Unknown host, no such host present in system"
 msgstr "Zadaný hostitel v systému neexistuje"
 
-#: include/locales/en_gb.inc.php:1383
+#: include/locales/en_gb.inc.php:1381
 msgid "Unknown resource"
 msgstr "Neznámý zdroj"
 
@@ -9517,7 +9503,7 @@ msgstr "Neznámý zdroj"
 msgid "Unknown value type"
 msgstr "Neznámý typ hodnoty"
 
-#: include/locales/en_gb.inc.php:1470
+#: include/locales/en_gb.inc.php:1451
 msgid "Unknown variable type, testing not available"
 msgstr "Neznámý typ proměnné, testování není dostupné"
 
@@ -9539,11 +9525,11 @@ msgstr "Odpojit od šablony"
 msgid "Unlink from templates"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1389
+#: include/locales/en_gb.inc.php:1387
 msgid "Unmute"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1452
+#: include/locales/en_gb.inc.php:1433
 msgid "Unnecessary symbols detected"
 msgstr "Byly zjištěny nadbytečné znaky"
 
@@ -9573,7 +9559,7 @@ msgid "Update item for the graph"
 msgstr "Aktualizovat položku grafu"
 
 #. GETTEXT: r is date format string as described in http://php.net/date
-#: include/classes/class.cserverinfo.php:40 include/locales/en_gb.inc.php:1380
+#: include/classes/class.cserverinfo.php:40 include/locales/en_gb.inc.php:1378
 msgid "Updated"
 msgstr "Aktualizováno"
 
@@ -9597,7 +9583,7 @@ msgstr "Upload"
 msgid "Upper level maps"
 msgstr "Upper level maps"
 
-#: include/locales/en_gb.inc.php:110 include/locales/en_gb.inc.php:1226
+#: include/locales/en_gb.inc.php:110 include/locales/en_gb.inc.php:1225
 msgid "Uptime"
 msgstr "Uptime"
 
@@ -9605,7 +9591,7 @@ msgstr "Uptime"
 msgid "Uptime/Downtime"
 msgstr "Uptime/Downtime"
 
-#: include/locales/en_gb.inc.php:878
+#: include/locales/en_gb.inc.php:877
 msgid "Use advanced icons"
 msgstr "Použít více ikon"
 
@@ -9613,7 +9599,7 @@ msgstr "Použít více ikon"
 msgid "Use custom multiplier"
 msgstr "Použít vlastní multiplikátor"
 
-#: include/locales/en_gb.inc.php:926
+#: include/locales/en_gb.inc.php:925
 msgid "Use if severity"
 msgstr "Použít pro závažnost"
 
@@ -9622,7 +9608,7 @@ msgid "Used in actions"
 msgstr ""
 
 #: include/forms.inc.php:198 include/forms.inc.php:201
-#: include/locales/en_gb.inc.php:648 include/locales/en_gb.inc.php:1342
+#: include/locales/en_gb.inc.php:648 include/locales/en_gb.inc.php:1341
 #: include/setup.inc.php:244 include/views/administration.users.edit.php:287
 msgid "User"
 msgstr "Uživatel"
@@ -9736,7 +9722,7 @@ msgstr ""
 msgid "Users"
 msgstr "Uživatelé"
 
-#: include/locales/en_gb.inc.php:997
+#: include/locales/en_gb.inc.php:996
 msgid "Users (online)"
 msgstr "Uživatelé (online)"
 
@@ -9754,7 +9740,7 @@ msgstr "Stav uživatelů byl aktualizován"
 msgid "Users unblocked"
 msgstr "Uživatelé odblokováni"
 
-#: include/locales/en_gb.inc.php:986
+#: include/locales/en_gb.inc.php:985
 #: include/views/administration.general.macros.edit.php:32
 #: include/views/administration.general.macros.edit.php:45
 #: include/views/js/administration.general.macros.js.php:47
@@ -9776,17 +9762,17 @@ msgstr ""
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr ""
 
-#: include/db.inc.php:1223
+#: include/db.inc.php:1240
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr ""
 
-#: include/db.inc.php:1249
+#: include/db.inc.php:1266
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr ""
 
-#: config.php:390 config.php:404 include/audit.inc.php:37
+#: config.php:390 config.php:404 include/audit.inc.php:38
 #: include/views/administration.general.valuemapping.list.php:28
 msgid "Value map"
 msgstr "Mapa hodnot"
@@ -9816,11 +9802,11 @@ msgstr "Mapy hodnot se používají k převedení číselných hodnot na text"
 msgid "Value type must be Float for aggregate items."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:974
+#: include/locales/en_gb.inc.php:973
 msgid "Values"
 msgstr "Hodnoty"
 
-#: include/locales/en_gb.inc.php:988
+#: include/locales/en_gb.inc.php:987
 msgid "Values stored"
 msgstr "Hodnoty uloženy"
 
@@ -9832,11 +9818,11 @@ msgstr "Proměnné"
 msgid "Vendor"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1168
+#: include/locales/en_gb.inc.php:1167
 msgid "Vertical"
 msgstr "Svislý"
 
-#: include/locales/en_gb.inc.php:1175
+#: include/locales/en_gb.inc.php:1174
 msgid "Vertical align"
 msgstr "Svislé zarovnání"
 
@@ -9857,7 +9843,7 @@ msgstr ""
 msgid "Visible name cannot be empty if host name is missing."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1678
+#: include/locales/en_gb.inc.php:1659
 msgid "W"
 msgstr "st"
 
@@ -9930,7 +9916,7 @@ msgstr ""
 msgid "Warning. Incorrect value for field \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1706
+#: include/locales/en_gb.inc.php:1687
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
 msgstr "We are sorry, the maximum possible number of elements to remember has been reached."
 
@@ -9964,23 +9950,23 @@ msgstr ""
 msgid "Wed"
 msgstr "st"
 
-#: include/locales/en_gb.inc.php:47 include/locales/en_gb.inc.php:1238
+#: include/locales/en_gb.inc.php:47 include/locales/en_gb.inc.php:1237
 msgid "Wednesday"
 msgstr "středa"
 
-#: include/locales/en_gb.inc.php:1075
+#: include/locales/en_gb.inc.php:1074
 msgid "Week"
 msgstr "Týden"
 
-#: include/locales/en_gb.inc.php:1043
+#: include/locales/en_gb.inc.php:1042
 msgid "Weekly"
 msgstr "týdně"
 
-#: include/locales/en_gb.inc.php:924
+#: include/locales/en_gb.inc.php:923
 msgid "When active"
 msgstr "Kdy je aktivní"
 
-#: include/locales/en_gb.inc.php:1118
+#: include/locales/en_gb.inc.php:1117
 #: include/views/configuration.sysmap.edit.php:45
 #: include/views/js/configuration.sysmaps.js.php:51
 msgid "Width"
@@ -9990,11 +9976,11 @@ msgstr "Šířka"
 msgid "With data collection"
 msgstr "se sběrem dat"
 
-#: include/locales/en_gb.inc.php:1336
+#: include/locales/en_gb.inc.php:1335
 msgid "With last event unacknowledged"
 msgstr "S poslední událostí nepotvrzenou"
 
-#: include/locales/en_gb.inc.php:940
+#: include/locales/en_gb.inc.php:939
 msgid "With problems"
 msgstr "S problémy"
 
@@ -10002,11 +9988,11 @@ msgstr "S problémy"
 msgid "With triggers"
 msgstr "Se spouštěči"
 
-#: include/locales/en_gb.inc.php:1335
+#: include/locales/en_gb.inc.php:1334
 msgid "With unacknowledged events"
 msgstr "S nepotvrzenými událostmi"
 
-#: include/locales/en_gb.inc.php:939
+#: include/locales/en_gb.inc.php:938
 msgid "Without problems"
 msgstr "Bez problémů"
 
@@ -10064,7 +10050,7 @@ msgstr ""
 msgid "Wrong fields for map link"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1638
+#: include/locales/en_gb.inc.php:1619
 msgid "Wrong fields for media type"
 msgstr "Nesprávně zadaná pole pro typ média"
 
@@ -10101,24 +10087,24 @@ msgstr ""
 msgid "Wrong macro"
 msgstr "Neplatné makro"
 
-#: include/locales/en_gb.inc.php:1634
+#: include/locales/en_gb.inc.php:1615
 msgid "Wrong period ["
 msgstr "Neplatné odbobí aktivity média ["
 
-#: include/locales/en_gb.inc.php:890
+#: include/locales/en_gb.inc.php:889
 msgid "Wrong type of arguments passed to function"
 msgstr "Funkci byly předané nesprávné typy argumentů"
 
-#: include/locales/en_gb.inc.php:848
+#: include/locales/en_gb.inc.php:847
 msgid "X"
 msgstr "X"
 
-#: include/locales/en_gb.inc.php:1673
+#: include/locales/en_gb.inc.php:1654
 msgid "XML file contains errors"
 msgstr "XML soubor obsahuje chyby"
 
-#: include/locales/en_gb.inc.php:1046 include/locales/en_gb.inc.php:1066
-#: include/locales/en_gb.inc.php:1527
+#: include/locales/en_gb.inc.php:1045 include/locales/en_gb.inc.php:1065
+#: include/locales/en_gb.inc.php:1508
 msgid "Y"
 msgstr "Y"
 
@@ -10143,32 +10129,32 @@ msgstr "Y-m-d H:i:s"
 msgid "Y.M.d H:i:s"
 msgstr "j. M Y G:i:s"
 
-#: include/locales/en_gb.inc.php:1021
+#: include/locales/en_gb.inc.php:1020
 msgid "Y.m.d"
 msgstr "j. n. Y"
 
-#: include/locales/en_gb.inc.php:1020
+#: include/locales/en_gb.inc.php:1019
 msgid "Y.m.d H:i"
 msgstr "j. n. Y G:i"
 
-#: include/locales/en_gb.inc.php:919 include/locales/en_gb.inc.php:1529
+#: include/locales/en_gb.inc.php:918 include/locales/en_gb.inc.php:1510
 msgid "Y.m.d H:i:s"
 msgstr "Y.m.d H:i:s"
 
-#: include/locales/en_gb.inc.php:1040
+#: include/locales/en_gb.inc.php:1039
 msgid "Year"
 msgstr "Rok"
 
-#: include/locales/en_gb.inc.php:1045
+#: include/locales/en_gb.inc.php:1044
 msgid "Yearly"
 msgstr "ročně"
 
-#: include/forms.inc.php:3595 include/locales/en_gb.inc.php:1001
+#: include/forms.inc.php:3595 include/locales/en_gb.inc.php:1000
 #: include/views/administration.users.list.php:78
 msgid "Yes"
 msgstr "Ano"
 
-#: include/locales/en_gb.inc.php:1528
+#: include/locales/en_gb.inc.php:1509
 msgid "Yotta"
 msgstr "yotta"
 
@@ -10181,19 +10167,19 @@ msgstr ""
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1649
+#: include/locales/en_gb.inc.php:1630
 msgid "You are not logged in."
 msgstr "Nejste přihlášen(a)."
 
-#: include/locales/en_gb.inc.php:1434
+#: include/locales/en_gb.inc.php:1415
 msgid "You can not switch hosts for current selection"
 msgstr "You can not switch hosts for current selection"
 
-#: include/locales/en_gb.inc.php:1572
+#: include/locales/en_gb.inc.php:1553
 msgid "You can not use template hosts in mixed expressions."
 msgstr "Nelze použít hostitele ze šablon ve smíšených výrazech."
 
-#: include/locales/en_gb.inc.php:1646
+#: include/locales/en_gb.inc.php:1627
 msgid "You cannot view this URL as a"
 msgstr "Tuto stránku nemůžete prohlížet jako"
 
@@ -10219,7 +10205,7 @@ msgstr ""
 msgid "You do not have enough rights for operation."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1670
+#: include/locales/en_gb.inc.php:1651
 msgid "You do not have permission to perform this operation"
 msgstr "Nemáte oprávnění k provedení této operace"
 
@@ -10259,7 +10245,7 @@ msgstr ""
 msgid "You do not have permissions to update user or user does not exist."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1647
+#: include/locales/en_gb.inc.php:1628
 msgid "You must login to view this page."
 msgstr "Pro zobrazení této stránky musíte být přihlášen(a)."
 
@@ -10267,11 +10253,11 @@ msgstr "Pro zobrazení této stránky musíte být přihlášen(a)."
 msgid "Your setup is not configured for distributed monitoring"
 msgstr "Váš systém není nastavený pro distribuovaný monitoring"
 
-#: include/locales/en_gb.inc.php:1525
+#: include/locales/en_gb.inc.php:1506
 msgid "Z"
 msgstr "Z"
 
-#: include/locales/en_gb.inc.php:1413
+#: include/locales/en_gb.inc.php:1394
 msgid "ZABBIX"
 msgstr "ZABBIX"
 
@@ -10335,11 +10321,11 @@ msgstr "ZABBIX je dočasně nedostupný"
 msgid "Zabbix server"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:949
+#: include/locales/en_gb.inc.php:948
 msgid "Zabbix server ip or port is not set!"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:987
+#: include/locales/en_gb.inc.php:986
 msgid "Zabbix server is running"
 msgstr "ZABBIX server běží"
 
@@ -10355,23 +10341,23 @@ msgstr ""
 msgid "Zabbix trapper"
 msgstr "Zabbix zachytávač"
 
-#: include/locales/en_gb.inc.php:1526
+#: include/locales/en_gb.inc.php:1507
 msgid "Zetta"
 msgstr "zetta"
 
-#: include/locales/en_gb.inc.php:1687
+#: include/locales/en_gb.inc.php:1668
 msgid "Zoom"
 msgstr "Zvětšení"
 
-#: include/locales/en_gb.inc.php:1590
+#: include/locales/en_gb.inc.php:1571
 msgid "[H:i:s]"
 msgstr "[G:i:s]"
 
-#: include/locales/en_gb.inc.php:1653
+#: include/locales/en_gb.inc.php:1634
 msgid "[Wrong value for day of week:"
 msgstr "[Neplatná hodnota pro den v týdnu:"
 
-#: include/locales/en_gb.inc.php:1651
+#: include/locales/en_gb.inc.php:1632
 msgid "[Wrong value for month:"
 msgstr "[Neplatná hodnota pro měsíc:"
 
@@ -10379,12 +10365,12 @@ msgstr "[Neplatná hodnota pro měsíc:"
 msgid "[Y.M.d H:i:s]"
 msgstr "[j. M Y G:i:s]"
 
-#: include/locales/en_gb.inc.php:1635 include/locales/en_gb.inc.php:1652
-#: include/locales/en_gb.inc.php:1654
+#: include/locales/en_gb.inc.php:1616 include/locales/en_gb.inc.php:1633
+#: include/locales/en_gb.inc.php:1635
 msgid "]"
 msgstr "]"
 
-#: include/locales/en_gb.inc.php:1055
+#: include/locales/en_gb.inc.php:1054
 msgid "add"
 msgstr "přidat"
 
@@ -10392,11 +10378,11 @@ msgstr "přidat"
 msgid "add graph items first"
 msgstr "přidat nejdříve položky grafu"
 
-#: include/locales/en_gb.inc.php:1548
+#: include/locales/en_gb.inc.php:1529
 msgid "added"
 msgstr "přidáno"
 
-#: include/locales/en_gb.inc.php:1533
+#: include/locales/en_gb.inc.php:1514
 msgid "affects only filtered data!"
 msgstr "ovlivní pouze filtrovaná data!"
 
@@ -10404,15 +10390,15 @@ msgstr "ovlivní pouze filtrovaná data!"
 msgid "all"
 msgstr "vše"
 
-#: include/locales/en_gb.inc.php:1384
+#: include/locales/en_gb.inc.php:1382
 msgid "already exists"
 msgstr "již existuje"
 
-#: include/locales/en_gb.inc.php:1542
+#: include/locales/en_gb.inc.php:1523
 msgid "already exists for host"
 msgstr "již pro hostitele existuje"
 
-#: include/locales/en_gb.inc.php:1557
+#: include/locales/en_gb.inc.php:1538
 msgid "already linked to host"
 msgstr "je již propojená s hostitelem"
 
@@ -10423,7 +10409,7 @@ msgstr "je již propojená s hostitelem"
 msgid "and"
 msgstr "a"
 
-#: include/locales/en_gb.inc.php:1560
+#: include/locales/en_gb.inc.php:1541
 msgid "and can't be deleted"
 msgstr ""
 
@@ -10439,7 +10425,7 @@ msgstr "zeleně"
 msgid "as Red"
 msgstr "červeně"
 
-#: include/locales/en_gb.inc.php:1567
+#: include/locales/en_gb.inc.php:1548
 msgid "available only for items with value types"
 msgstr "je dostupná pouze pro položky s hodnotami typu"
 
@@ -10455,13 +10441,13 @@ msgstr ""
 msgid "d"
 msgstr "d"
 
-#: include/locales/en_gb.inc.php:1048 include/locales/en_gb.inc.php:1068
-#: include/locales/en_gb.inc.php:1607
+#: include/locales/en_gb.inc.php:1047 include/locales/en_gb.inc.php:1067
+#: include/locales/en_gb.inc.php:1588
 msgid "d M Y"
 msgstr "j. M Y"
 
-#: include/locales/en_gb.inc.php:1049 include/locales/en_gb.inc.php:1054
-#: include/locales/en_gb.inc.php:1069
+#: include/locales/en_gb.inc.php:1048 include/locales/en_gb.inc.php:1053
+#: include/locales/en_gb.inc.php:1068
 msgid "d M Y H:i"
 msgstr "j. M Y G:i"
 
@@ -10469,17 +10455,17 @@ msgstr "j. M Y G:i"
 #: include/locales/en_gb.inc.php:119 include/locales/en_gb.inc.php:140
 #: include/locales/en_gb.inc.php:141 include/locales/en_gb.inc.php:214
 #: include/locales/en_gb.inc.php:215 include/locales/en_gb.inc.php:245
-#: include/locales/en_gb.inc.php:248 include/locales/en_gb.inc.php:822
-#: include/locales/en_gb.inc.php:823 include/locales/en_gb.inc.php:824
-#: include/locales/en_gb.inc.php:831 include/locales/en_gb.inc.php:832
-#: include/locales/en_gb.inc.php:833 include/locales/en_gb.inc.php:834
-#: include/locales/en_gb.inc.php:839 include/locales/en_gb.inc.php:980
-#: include/locales/en_gb.inc.php:1093 include/locales/en_gb.inc.php:1437
-#: include/locales/en_gb.inc.php:1441 include/locales/en_gb.inc.php:1589
+#: include/locales/en_gb.inc.php:248 include/locales/en_gb.inc.php:821
+#: include/locales/en_gb.inc.php:822 include/locales/en_gb.inc.php:823
+#: include/locales/en_gb.inc.php:830 include/locales/en_gb.inc.php:831
+#: include/locales/en_gb.inc.php:832 include/locales/en_gb.inc.php:833
+#: include/locales/en_gb.inc.php:838 include/locales/en_gb.inc.php:979
+#: include/locales/en_gb.inc.php:1092 include/locales/en_gb.inc.php:1418
+#: include/locales/en_gb.inc.php:1422 include/locales/en_gb.inc.php:1570
 msgid "d M Y H:i:s"
 msgstr "j. M Y G:i:s"
 
-#: include/locales/en_gb.inc.php:1014 include/locales/en_gb.inc.php:1017
+#: include/locales/en_gb.inc.php:1013 include/locales/en_gb.inc.php:1016
 msgid "d.M"
 msgstr "j. M"
 
@@ -10500,11 +10486,11 @@ msgstr "j.n.Y G:i"
 msgid "d.m.y"
 msgstr "d.m.y"
 
-#: include/locales/en_gb.inc.php:1603
+#: include/locales/en_gb.inc.php:1584
 msgid "day"
 msgstr "den"
 
-#: include/locales/en_gb.inc.php:1505
+#: include/locales/en_gb.inc.php:1486
 msgid "days"
 msgstr "dní"
 
@@ -10512,11 +10498,11 @@ msgstr "dní"
 msgid "default"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1668
+#: include/locales/en_gb.inc.php:1649
 msgid "does not exist"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1689
+#: include/locales/en_gb.inc.php:1670
 msgid "dynamic"
 msgstr "dynamický"
 
@@ -10532,7 +10518,7 @@ msgstr "prvků kopírovat do ..."
 msgid "esc_step_from and esc_step_to must be set together."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1602
+#: include/locales/en_gb.inc.php:1583
 msgid "every"
 msgstr "každé"
 
@@ -10544,15 +10530,15 @@ msgstr ""
 msgid "executed"
 msgstr "vykonáno"
 
-#: include/locales/en_gb.inc.php:1688
+#: include/locales/en_gb.inc.php:1669
 msgid "fixed"
 msgstr "pevný"
 
-#: include/locales/en_gb.inc.php:1566
+#: include/locales/en_gb.inc.php:1547
 msgid "for function"
 msgstr "pro funkci"
 
-#: include/locales/en_gb.inc.php:1425
+#: include/locales/en_gb.inc.php:1406
 msgid "found"
 msgstr "nalezených"
 
@@ -10560,7 +10546,7 @@ msgstr "nalezených"
 msgid "h"
 msgstr "h"
 
-#: include/locales/en_gb.inc.php:1559
+#: include/locales/en_gb.inc.php:1540
 msgid "has been deleted from the system"
 msgstr "byl smazán ze systému"
 
@@ -10572,7 +10558,7 @@ msgstr ""
 msgid "host group"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:912
+#: include/locales/en_gb.inc.php:911
 msgid "http://www.zabbix.com"
 msgstr "http://www.zabbix.com"
 
@@ -10589,39 +10575,39 @@ msgstr ""
 msgid "in"
 msgstr "mezi"
 
-#: api/classes/class.citemkey.php:202
+#: api/classes/class.citemkey.php:187
 #, php-format
 msgid "incorrect syntax near '%1$s'"
 msgstr ""
 
-#: api/classes/class.citemkey.php:261
+#: api/classes/class.citemkey.php:244
 #, php-format
 msgid "incorrect syntax near '%1$s' at position %2$d"
 msgstr ""
 
-#: api/classes/class.citemkey.php:214 api/classes/class.citemkey.php:252
-#: api/classes/class.citemkey.php:298
+#: api/classes/class.citemkey.php:199 api/classes/class.citemkey.php:235
+#: api/classes/class.citemkey.php:280
 #, php-format
 msgid "incorrect usage of bracket symbols. '%s' found after final bracket."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1057
+#: include/locales/en_gb.inc.php:1056
 msgid "is a wrong time format. Should be from 00:00 to 24:00."
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1551
+#: include/locales/en_gb.inc.php:1532
 msgid "is internal and can not be deleted"
 msgstr "je interní a nemůže být smazána"
 
-#: include/locales/en_gb.inc.php:1570
+#: include/locales/en_gb.inc.php:1551
 msgid "is not a float or counter or macro for function"
 msgstr "není float, makro nebo čítač pro funkci"
 
-#: include/locales/en_gb.inc.php:1569
+#: include/locales/en_gb.inc.php:1550
 msgid "is not a float or macro for function"
 msgstr "není float nebo makro pro funkci"
 
-#: include/locales/en_gb.inc.php:1052 include/locales/en_gb.inc.php:1053
+#: include/locales/en_gb.inc.php:1051 include/locales/en_gb.inc.php:1052
 msgid "l H:i"
 msgstr "l G:i"
 
@@ -10636,7 +10622,7 @@ msgstr "jako"
 
 #: include/func.inc.php:378 include/func.inc.php:399
 #: include/locales/en_gb.inc.php:30 include/locales/en_gb.inc.php:34
-#: include/locales/en_gb.inc.php:1511
+#: include/locales/en_gb.inc.php:1492
 msgid "m"
 msgstr "M"
 
@@ -10676,7 +10662,7 @@ msgstr "ms"
 msgid "must be a valid LDAP user"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1507
+#: include/locales/en_gb.inc.php:1488
 msgid "n"
 msgstr "n"
 
@@ -10704,7 +10690,7 @@ msgstr "mimo"
 msgid "not like"
 msgstr "ne jako"
 
-#: include/locales/en_gb.inc.php:1004
+#: include/locales/en_gb.inc.php:1003
 msgid "not running"
 msgstr "neběží"
 
@@ -10717,19 +10703,19 @@ msgstr "nevybráno"
 msgid "not sent"
 msgstr "neposláno"
 
-#: include/locales/en_gb.inc.php:1690
+#: include/locales/en_gb.inc.php:1671
 msgid "now"
 msgstr "nyní"
 
-#: include/locales/en_gb.inc.php:129 include/locales/en_gb.inc.php:948
+#: include/locales/en_gb.inc.php:129 include/locales/en_gb.inc.php:947
 msgid "of"
 msgstr "z"
 
-#: include/locales/en_gb.inc.php:1604
+#: include/locales/en_gb.inc.php:1585
 msgid "of every"
 msgstr "každého"
 
-#: include/locales/en_gb.inc.php:1601
+#: include/locales/en_gb.inc.php:1582
 msgid "on"
 msgstr "v"
 
@@ -10741,7 +10727,7 @@ msgstr "v"
 msgid "or"
 msgstr "nebo"
 
-#: include/locales/en_gb.inc.php:1703
+#: include/locales/en_gb.inc.php:1684
 msgid "other"
 msgstr "other"
 
@@ -10762,11 +10748,11 @@ msgstr "aktualizováno každých"
 msgid "remember selected"
 msgstr "pamatovat vybranou"
 
-#: include/locales/en_gb.inc.php:1202
+#: include/locales/en_gb.inc.php:1201
 msgid "root"
 msgstr "kořen"
 
-#: include/locales/en_gb.inc.php:1003
+#: include/locales/en_gb.inc.php:1002
 msgid "running"
 msgstr "běží"
 
@@ -10792,7 +10778,7 @@ msgstr "posláno"
 msgid "show icon mappings"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1534
+#: include/locales/en_gb.inc.php:1515
 msgid "show value mappings"
 msgstr "zobrazit mapování hodnot"
 
@@ -10813,19 +10799,19 @@ msgstr ""
 msgid "unknown"
 msgstr ""
 
-#: include/locales/en_gb.inc.php:1543
+#: include/locales/en_gb.inc.php:1524
 msgid "updated"
 msgstr "aktualizovaný"
 
-#: include/locales/en_gb.inc.php:1553
+#: include/locales/en_gb.inc.php:1534
 msgid "used by scenario"
 msgstr "použita scénářem"
 
-#: include/locales/en_gb.inc.php:904
+#: include/locales/en_gb.inc.php:903
 msgid "used in exported map"
 msgstr " - použito v exportované mapě"
 
-#: include/locales/en_gb.inc.php:1144
+#: include/locales/en_gb.inc.php:1143
 msgid "used in exported screen"
 msgstr "- použito v exportované obrazovce"
 
@@ -10833,15 +10819,15 @@ msgstr "- použito v exportované obrazovce"
 msgid "w"
 msgstr "t"
 
-#: include/locales/en_gb.inc.php:1606
+#: include/locales/en_gb.inc.php:1587
 msgid "week"
 msgstr "týden"
 
-#: include/locales/en_gb.inc.php:1605
+#: include/locales/en_gb.inc.php:1586
 msgid "weeks"
 msgstr "týdny"
 
-#: include/locales/en_gb.inc.php:1595
+#: include/locales/en_gb.inc.php:1576
 msgid "with template host cannot contain items from other hosts."
 msgstr ""
 
@@ -10859,6 +10845,6 @@ msgstr "r"
 msgid "yes"
 msgstr "ano"
 
-#: include/locales/en_gb.inc.php:1509
+#: include/locales/en_gb.inc.php:1490
 msgid "µ"
 msgstr "µ"
