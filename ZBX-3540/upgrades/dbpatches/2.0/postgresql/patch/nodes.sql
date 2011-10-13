@@ -6,4 +6,4 @@ ALTER TABLE ONLY nodes
 	DROP COLUMN slave_history,
 	DROP COLUMN slave_trends;
 UPDATE nodes SET masterid=NULL WHERE masterid=0;
-ALTER TABLE ONLY nodes ADD CONSTRAINT c_nodes_1 FOREIGN KEY (masterid) REFERENCES nodes (nodeid) ON DELETE CASCADE;
+ALTER TABLE ONLY nodes ADD CONSTRAINT c_nodes_1 FOREIGN KEY (masterid) REFERENCES nodes (nodeid);
