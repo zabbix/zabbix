@@ -52,7 +52,7 @@ class testMetrics extends CZabbixTest
 
 
 			array('agent.ping',				TYPE_UINT,	'/1/',					1,	1),
-			array('agent.ping[]',				TYPE_UINT,	'/1/',					1,	1),
+			array('agent.ping[]',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
 			array('agent.version',			TYPE_ANY,	'/[1-9]\.[0-9]\.[0-9]/',-1,	-1),
 			array('kernel.maxfiles',	TYPE_UINT,	'',		-1,	-1),
 			array('kernel.maxproc',	TYPE_UINT,	'',		-1,	-1),
@@ -258,9 +258,9 @@ class testMetrics extends CZabbixTest
 			array('system.cpu.util[all,user,wrong_param]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
 			array('system.hostname[]',	TYPE_ANY,	'/hudson/',		-1,	-1),
 			array('system.hostname[wrong_parameter]',	TYPE_ANY,	'/hudson/',		-1,	-1),
-			array('eventlog[system]',	TYPE_ANY,	ZBX_ACTIVE_ONLY,		-1,	-1),
-			array('log[logfile]',	TYPE_ANY,	ZBX_ACTIVE_ONLY,		-1,	-1),
-			array('logrt[logfile]',	TYPE_ANY,	ZBX_ACTIVE_ONLY,		-1,	-1),
+			array('eventlog[system]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
+			array('log[logfile]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
+			array('logrt[logfile]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
 			array('net.if.collisions[lo]',	TYPE_UINT,	'',		-1,	-1),
 			array('net.if.collisions[eth0]',	TYPE_UINT,	'',		-1,	-1),
 			array('net.if.collisions[eth1]',	TYPE_UINT,	'',		-1,	-1),

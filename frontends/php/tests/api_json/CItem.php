@@ -65,7 +65,7 @@ class API_JSON_Item extends CZabbixTest
 				"interfaceid"  => "10017",
 				"inventory_link" => $inventoryFieldNr
 			),
-			&$debug
+			$debug
 		);
 
 		if($successExpected){
