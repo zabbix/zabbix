@@ -568,12 +568,6 @@ return array(
 				'length' => 64,
 				'default' => '0',
 			),
-			'timezone' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
 			'ip' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -585,18 +579,6 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '10051',
-			),
-			'slave_history' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '30',
-			),
-			'slave_trends' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '365',
 			),
 			'nodetype' => array(
 				'null' => false,

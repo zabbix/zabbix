@@ -138,11 +138,8 @@ UNIQUE		|httptestitem_1	|httptestid,itemid
 TABLE|nodes|nodeid|
 FIELD		|nodeid		|t_integer	|	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|0
-FIELD		|timezone	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'10051'|NOT NULL	|0
-FIELD		|slave_history	|t_integer	|'30'	|NOT NULL	|0
-FIELD		|slave_trends	|t_integer	|'365'	|NOT NULL	|0
 FIELD		|nodetype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|masterid	|t_integer	|	|NULL		|0			|1|nodes		|nodeid	|RESTRICT
 
