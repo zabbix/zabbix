@@ -261,6 +261,7 @@ New features:
 Changes for 1.8.9rc1
 
  - [ZBX-4145] fixed images import script for PostgreSQL 9.1 and above (dimir)
+ - [ZBX-4045] removed the check for duplicate hosts, made the server survive the situation instead (asaveljevs,Sasha)
  - [ZBX-4159] fixed frontend incorrectly handle new ids for history tables in distributed setup (Vedmak)
  - [ZBX-4216] fixed weekdays in Brazilian Portuguese translation; thanks to Ricardo Santos (Richlv)
  - [ZBX-4205] fixed trigger status change not logged in audit for inherited triggers (Vedmak)
