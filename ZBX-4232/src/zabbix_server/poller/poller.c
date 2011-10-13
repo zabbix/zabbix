@@ -491,8 +491,8 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 	/* First error */
 	if (0 == *errors_from)
 	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "%s Host [%s]: first network error, wait for %d seconds",
-				type, item->host.host, CONFIG_UNREACHABLE_DELAY);
+		zbx_snprintf(error_msg, sizeof(error_msg), "%s Host [%s] item [%s]: first network error, wait for %d seconds",
+				type, item->host.host, item->key_orig, CONFIG_UNREACHABLE_DELAY);
 
 		*errors_from = now;
 		*disable_until = now + CONFIG_UNREACHABLE_DELAY;
@@ -504,8 +504,8 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 		if (now - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
 		{
 			/* still unavailable, but won't change status to UNAVAILABLE yet */
-			zbx_snprintf(error_msg, sizeof(error_msg), "%s Host [%s]: another network error, wait for %d seconds",
-					type, item->host.host, CONFIG_UNREACHABLE_DELAY);
+			zbx_snprintf(error_msg, sizeof(error_msg), "%s Host [%s] item [%s]: another network error, wait for %d seconds",
+					type, item->host.host, item->key_orig, CONFIG_UNREACHABLE_DELAY);
 
 			*disable_until = now + CONFIG_UNREACHABLE_DELAY;
 		}
