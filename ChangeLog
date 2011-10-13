@@ -13,6 +13,7 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4209] fixed warning in latest data when navigating from monitoring->hosts page (Alexei)
  - [ZBX-4208] fixed Brazilian Portuguese being reported as just Portuguese in locale code (Richlv)
  - [ZBX-4151] fixed timer crash due to heap memory corruption (asaveljevs)
  - [ZBX-3755] fixed latest values in cloned items (Sasha)
@@ -259,6 +260,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4145] fixed images import script for PostgreSQL 9.1 and above (dimir)
  - [ZBX-4045] removed the check for duplicate hosts, made the server survive the situation instead (asaveljevs,Sasha)
  - [ZBX-4159] fixed frontend incorrectly handle new ids for history tables in distributed setup (Vedmak)
  - [ZBX-4216] fixed weekdays in Brazilian Portuguese translation; thanks to Ricardo Santos (Richlv)
