@@ -225,9 +225,9 @@ class CUser extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
-				FROM '.$sql_from.'
-				WHERE '.DBin_node('u.userid', $nodeids).
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
+				' FROM '.$sql_from.
+				' WHERE '.DBin_node('u.userid', $nodeids).
 				$sql_where.
 				$sql_order;
 //SDI($sql);
@@ -292,11 +292,11 @@ Copt::memoryPick();
 				$result[$userid] += array('gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
 			}
 
-			$sql = 'SELECT ug.userid,  MAX(g.gui_access) as gui_access,
-						MAX(g.debug_mode) as debug_mode, MAX(g.users_status) as users_status'.
-					' FROM usrgrp g, users_groups ug '.
+			$sql = 'SELECT ug.userid,MAX(g.gui_access) as gui_access,'.
+					' MAX(g.debug_mode) as debug_mode,MAX(g.users_status) as users_status'.
+					' FROM usrgrp g,users_groups ug'.
 					' WHERE '.DBcondition('ug.userid', $userids).
-						' AND g.usrgrpid=ug.usrgrpid '.
+						' AND g.usrgrpid=ug.usrgrpid'.
 					' GROUP BY ug.userid';
 			$access = DBselect($sql);
 			while($useracc = DBfetch($access)){
@@ -618,7 +618,7 @@ Copt::memoryPick();
 					if(isset($groupsUserIn[$groupid])) continue;
 
 					$users_groups_id = get_dbid('users_groups', 'id');
-					$sql = 'INSERT INTO users_groups (id, usrgrpid, userid)'.
+					$sql = 'INSERT INTO users_groups (id,usrgrpid,userid)'.
 							' VALUES ('.$users_groups_id.','.$groupid.','.$user['userid'].')';
 
 					if(!DBexecute($sql))
@@ -650,8 +650,8 @@ Copt::memoryPick();
 
 // delete action operation msg
 		$operationids = array();
-		$sql = 'SELECT DISTINCT om.operationid '.
-				' FROM opmessage_usr om '.
+		$sql = 'SELECT DISTINCT om.operationid'.
+				' FROM opmessage_usr om'.
 				' WHERE '.DBcondition('om.userid', $userids);
 		$dbOperations = DBselect($sql);
 		while($dbOperation = DBfetch($dbOperations))
@@ -661,8 +661,8 @@ Copt::memoryPick();
 
 // delete empty operations
 		$delOperationids = array();
-		$sql = 'SELECT DISTINCT o.operationid '.
-				' FROM operations o '.
+		$sql = 'SELECT DISTINCT o.operationid'.
+				' FROM operations o'.
 				' WHERE '.DBcondition('o.operationid', $operationids).
 					' AND NOT EXISTS(SELECT om.opmessage_usrid FROM opmessage_usr om WHERE om.operationid=o.operationid)';
 		$dbOperations = DBselect($sql);
@@ -713,7 +713,7 @@ Copt::memoryPick();
 
 					$mediaid = get_dbid('media','mediaid');
 
-					$sql='INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period) '.
+					$sql='INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
 							' VALUES ('.$mediaid.','.$user['userid'].','.$media['mediatypeid'].','.
 										zbx_dbstr($media['sendto']).','.$media['active'].','.$media['severity'].','.
 										zbx_dbstr($media['period']).')';
@@ -775,8 +775,8 @@ Copt::memoryPick();
 			$del_medias = array();
 
 			$userids = zbx_objectValues($users, 'userid');
-			$sql = 'SELECT m.mediaid '.
-					' FROM media m '.
+			$sql = 'SELECT m.mediaid'.
+					' FROM media m'.
 					' WHERE '.DBcondition('userid', $userids);
 			$result = DBselect($sql);
 			while($media = DBfetch($result)){
@@ -809,7 +809,7 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_PERIOD_PART1.' '.$media['period'].' '.S_CUSER_ERROR_WRONG_PERIOD_PART2);
 				}
 
-				$sql = 'UPDATE media '.
+				$sql = 'UPDATE media'.
 						' SET mediatypeid='.$media['mediatypeid'].','.
 							' sendto='.zbx_dbstr($media['sendto']).','.
 							' active='.$media['active'].','.
@@ -863,8 +863,8 @@ Copt::memoryPick();
 	private function dbLogin($user){
 		global $ZBX_LOCALNODEID;
 
-		$sql = 'SELECT u.userid '.
-				' FROM users u '.
+		$sql = 'SELECT u.userid'.
+				' FROM users u'.
 				' WHERE u.alias='.zbx_dbstr($user['user']).
 					' AND u.passwd='.zbx_dbstr(md5($user['password'])).
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
@@ -878,8 +878,8 @@ Copt::memoryPick();
 	public function logout($sessionid){
 		global $ZBX_LOCALNODEID;
 
-		$sql = 'SELECT s.* '.
-			' FROM sessions s '.
+		$sql = 'SELECT s.*'.
+			' FROM sessions s'.
 			' WHERE s.sessionid='.zbx_dbstr($sessionid).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
 				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID);
@@ -907,8 +907,8 @@ Copt::memoryPick();
 		$name = $user['user'];
 		$password = md5($user['password']);
 
-		$sql = 'SELECT u.userid, u.attempt_failed, u.attempt_clock, u.attempt_ip'.
-				' FROM users u '.
+		$sql = 'SELECT u.userid,u.attempt_failed,u.attempt_clock,u.attempt_ip'.
+				' FROM users u'.
 				' WHERE u.alias='.zbx_dbstr($name);
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
@@ -931,10 +931,10 @@ Copt::memoryPick();
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 
 
-		$sql = 'SELECT MAX(g.gui_access) as gui_access '.
-			' FROM usrgrp g, users_groups ug '.
+		$sql = 'SELECT MAX(g.gui_access) as gui_access'.
+			' FROM usrgrp g,users_groups ug'.
 			' WHERE ug.userid='.$userInfo['userid'].
-				' AND g.usrgrpid=ug.usrgrpid ';
+				' AND g.usrgrpid=ug.usrgrpid';
 		$db_access = DBfetch(DBselect($sql));
 		if(!zbx_empty($db_access['gui_access']))
 			$guiAccess = $db_access['gui_access'];
@@ -969,7 +969,7 @@ Copt::memoryPick();
 					: $_SERVER['REMOTE_ADDR'];
 			$userInfo['attempt_failed']++;
 
-			$sql = 'UPDATE users '.
+			$sql = 'UPDATE users'.
 					' SET attempt_failed='.$userInfo['attempt_failed'].','.
 						' attempt_clock='.time().','.
 						' attempt_ip='.zbx_dbstr($ip).
@@ -1009,8 +1009,8 @@ Copt::memoryPick();
 		global $ZBX_LOCALNODEID;
 
 		$time = time();
-		$sql = 'SELECT u.userid, u.autologout, s.lastaccess '.
-				' FROM sessions s, users u'.
+		$sql = 'SELECT u.userid,u.autologout,s.lastaccess'.
+				' FROM sessions s,users u'.
 				' WHERE s.sessionid='.zbx_dbstr($sessionid).
 					' AND s.status='.ZBX_SESSION_ACTIVE.
 					' AND s.userid=u.userid'.
@@ -1032,10 +1032,10 @@ Copt::memoryPick();
 			DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE userid='.$userInfo['userid'].' AND sessionid='.zbx_dbstr($sessionid));
 		}
 
-		$sql = 'SELECT MAX(g.gui_access) as gui_access '.
-			' FROM usrgrp g, users_groups ug '.
+		$sql = 'SELECT MAX(g.gui_access) as gui_access'.
+			' FROM usrgrp g,users_groups ug'.
 			' WHERE ug.userid='.$userInfo['userid'].
-				' AND g.usrgrpid=ug.usrgrpid ';
+				' AND g.usrgrpid=ug.usrgrpid';
 		$db_access = DBfetch(DBselect($sql));
 		if(!zbx_empty($db_access['gui_access']))
 			$guiAccess = $db_access['gui_access'];
@@ -1055,18 +1055,18 @@ Copt::memoryPick();
 		global $ZBX_LOCALNODEID;
 		global $ZBX_NODES;
 
-		$sql = 'SELECT u.userid, u.alias, u.name, u.surname, u.url, u.autologin, u.autologout, u.lang, u.refresh, u.type,'.
-				' u.theme, u.attempt_failed, u.attempt_ip, u.attempt_clock, u.rows_per_page'.
+		$sql = 'SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type,'.
+				' u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page'.
 				' FROM users u'.
 				' WHERE u.userid='.$userid;
 		$userData = DBfetch(DBselect($sql));
 
 
-		$sql = 'SELECT ug.userid '.
-			' FROM usrgrp g, users_groups ug '.
-			' WHERE ug.userid = '.$userid.
-				' AND g.usrgrpid = ug.usrgrpid '.
-				' AND g.debug_mode = '.GROUP_DEBUG_MODE_ENABLED;
+		$sql = 'SELECT ug.userid'.
+			' FROM usrgrp g,users_groups ug'.
+			' WHERE ug.userid='.$userid.
+				' AND g.usrgrpid=ug.usrgrpid'.
+				' AND g.debug_mode='.GROUP_DEBUG_MODE_ENABLED;
 		$userData['debug_mode'] = (bool) DBfetch(DBselect($sql));
 
 
