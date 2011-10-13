@@ -2331,14 +2331,13 @@ char	*zbx_dyn_escape_string(const char *src, const char *charlist)
 
 char	*zbx_age2str(int age)
 {
-	size_t		offset;
+	size_t		offset = 0;
 	int		days, hours, minutes;
 	static char	buffer[32];
 
 	days = (int)((double)age / SEC_PER_DAY);
 	hours = (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
 	minutes	= (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
-	offset = 0;
 
 	if (days)
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
