@@ -16,3 +16,5 @@ libzbxpoller_a_SOURCES = \
 	checks_java.c checks_java.h \
 	checks_calculated.c checks_calculated.h \
 	poller.c poller.h
+
+libzbxpoller_a_CFLAGS = -I@top_srcdir@/src/libs/zbxsysinfo/simple

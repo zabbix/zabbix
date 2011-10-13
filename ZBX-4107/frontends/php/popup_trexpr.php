@@ -41,7 +41,7 @@
 		'#' => 'NOT');
 
 	$metrics = array(
-		PARAM_TYPE_SECONDS => S_SECONDS,
+		PARAM_TYPE_SECONDS => _('Seconds'),
 		PARAM_TYPE_COUNTS => S_COUNT);
 
 	$param1_sec_count = array(
@@ -503,7 +503,7 @@ if(form){
 					}
 						else if($pf['M'] == PARAM_TYPE_SECONDS){
 						$form->addVar('paramtype', PARAM_TYPE_SECONDS);
-						$cmbParamType = S_SECONDS;
+						$cmbParamType = _('Seconds');
 					}
 						else if($pf['M'] == PARAM_TYPE_COUNTS){
 							$form->addVar('paramtype', PARAM_TYPE_COUNTS);
@@ -512,11 +512,11 @@ if(form){
 					}
 				else{
 						$form->addVar('paramtype', PARAM_TYPE_SECONDS);
-						$cmbParamType = S_SECONDS;
+						$cmbParamType = _('Seconds');
 					}
 				}
 				else if(1 == $pid){
-					$cmbParamType = S_SECONDS;
+					$cmbParamType = _('Seconds');
 				}
 				else{
 					$cmbParamType = null;

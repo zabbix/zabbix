@@ -39,6 +39,7 @@ class API_JSON_Host extends CZabbixTest
 			array(
 				array(
 				'host' => 'Host to test dup ids 1',
+				'name' => 'Host visible to test dup ids 1',
 				'interfaces'=> array(
 						array(
 							"type" => 1,
@@ -60,6 +61,7 @@ class API_JSON_Host extends CZabbixTest
 			array(
 				array(
 				'host' => 'Host to test dup ids 2',
+				'name' => 'Host visible to test dup ids 2',
 				'interfaces'=> array(
 						array(
 							"type" => 1,
@@ -82,6 +84,7 @@ class API_JSON_Host extends CZabbixTest
 			array(
 				array(
 				'host' => 'Host to test dup ids 3',
+				'name' => 'Host visible to test dup ids 3',
 				'interfaces'=> array(
 						array(
 							"type" => 1,
@@ -116,7 +119,7 @@ class API_JSON_Host extends CZabbixTest
 		$result = $this->api_acall(
 			'host.exists',
 			array('host'=>$name),
-			&$debug
+			$debug
 		);
 
 		$this->assertTrue(!array_key_exists('error', $result),"Chuck Norris: Exists method returned an error. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
@@ -138,7 +141,7 @@ class API_JSON_Host extends CZabbixTest
 		$result = $this->api_acall(
 			'host.create',
 			$request,
-			&$debug
+			$debug
 		);
 
 		if($successExpected){
@@ -213,7 +216,7 @@ class API_JSON_Host extends CZabbixTest
 		$result = $this->api_acall(
 			'host.get',
 			$request,
-			&$debug
+			$debug
 		);
 
 		$this->assertFalse(

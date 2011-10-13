@@ -28,9 +28,9 @@ class testPageEvents extends CWebTest
 	{
 		$this->login('events.php');
 
+		$this->dropdown_select_wait('source','Trigger');
 		$this->dropdown_select_wait('groupid','all');
 		$this->dropdown_select_wait('hostid','all');
-		$this->dropdown_select_wait('source','Trigger');
 
 		$this->assertTitle('Latest events');
 		$this->ok('HISTORY OF EVENTS');

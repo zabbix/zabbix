@@ -248,97 +248,153 @@ include_once('include/page_header.php');
 
 		$go_result = $result;
 	}
-	else if(str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])){
+	elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])) {
+		$go_result = true;
 
-		$options = array(
-			'triggerids' => $_REQUEST['g_triggerid'],
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_EXTEND
-		);
-
-		$triggers = API::Trigger()->get($options);
-		$triggerids = zbx_objectValues($triggers, 'triggerid');
-
-		if(($_REQUEST['go'] == 'activate')){
+		if ($_REQUEST['go'] == 'activate') {
 			$status = TRIGGER_STATUS_ENABLED;
-			$status_old = array('status'=>1);
-			$status_new = array('status'=>0);
+			$statusOld = array('status' => TRIGGER_STATUS_DISABLED);
+			$statusNew = array('status' => TRIGGER_STATUS_ENABLED);
 		}
 		else {
 			$status = TRIGGER_STATUS_DISABLED;
-			$status_old = array('status'=>0);
-			$status_new = array('status'=>1);
+			$statusOld = array('status' => TRIGGER_STATUS_ENABLED);
+			$statusNew = array('status' => TRIGGER_STATUS_DISABLED);
 		}
 
 		DBstart();
-		$go_result = update_trigger_status($triggerids, $status);
 
-		if($go_result){
-			foreach($triggers as $tnum => $trigger){
-				$serv_status = (isset($_REQUEST['group_enable']))?get_service_status_of_trigger($trigger['triggerid']):0;
+		// get requested triggers with permission check
+		$options = array(
+			'triggerids' => $_REQUEST['g_triggerid'],
+			'editable' => true,
+			'output' => array('triggerid', 'status'),
+			'preservekeys' => true
+		);
+		$triggers = API::Trigger()->get($options);
 
-				update_services($trigger['triggerid'], $serv_status); // updating status to all services by the dependency
+		// triggerids to gather child triggers
+		$childTriggerIds = array_keys($triggers);
 
-				$host = reset($trigger['hosts']);
-				add_audit_ext(AUDIT_ACTION_UPDATE,
-								AUDIT_RESOURCE_TRIGGER,
-								$trigger['triggerid'],
-								$host['host'].':'.$trigger['description'],
-								'triggers',
-								$status_old,
-								$status_new);
+		// triggerids which status must be changed
+		$triggerIdsToUpdate = array();
+		foreach ($triggers as $triggerid => $trigger){
+			if ($trigger['status'] != $status) {
+				$triggerIdsToUpdate[] = $triggerid;
 			}
+		}
+
+
+		do {
+			// gather all triggerids which status should be changed including child triggers
+			$options = array(
+				'filter' => array('templateid' => $childTriggerIds),
+				'output' => array('triggerid', 'status'),
+				'preservekeys' => true,
+				'nopermissions' => true
+			);
+			$triggers = API::Trigger()->get($options);
+
+			$childTriggerIds = array_keys($triggers);
+
+			foreach ($triggers as $triggerid => $trigger) {
+				if ($trigger['status'] != $status) {
+					$triggerIdsToUpdate[] = $triggerid;
+				}
+			}
+
+		} while (!empty($childTriggerIds));
+
+		DB::update('triggers', array(
+			'values' => array('status' => $status),
+			'where' => array('triggerid' => $triggerIdsToUpdate)
+		));
+
+		// if disable trigger, unknown event must be created
+		if ($status == TRIGGER_STATUS_DISABLED) {
+			$valueTriggerIds = array();
+			$result = DBselect(
+				'SELECT t.triggerid'.
+						' FROM triggers t,functions f,items i,hosts h'.
+						' WHERE t.triggerid=f.triggerid'.
+						' AND f.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND '.DBcondition('t.triggerid', $triggerIdsToUpdate).
+						' AND t.value_flags='.TRIGGER_VALUE_FLAG_NORMAL.
+						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
+			);
+			while ($row = DBfetch($result)) {
+				$valueTriggerIds[] = $row['triggerid'];
+			}
+
+			if (!empty($valueTriggerIds)) {
+				DB::update('triggers', array(
+					'values' => array(
+						'value_flags' => TRIGGER_VALUE_FLAG_UNKNOWN,
+						'error' => 'Trigger status became "Disabled"'
+					),
+					'where' => array('triggerid' => $valueTriggerIds)
+				));
+
+				addEvent($valueTriggerIds, TRIGGER_VALUE_UNKNOWN);
+			}
+		}
+
+		// get updated triggers with additional data
+		$options = array(
+			'triggerids' => $triggerIdsToUpdate,
+			'output' => array('triggerid', 'description'),
+			'preservekeys' => true,
+			'selectHosts' => API_OUTPUT_EXTEND,
+			'nopermissions' => true
+		);
+		$triggers = API::Trigger()->get($options);
+		foreach ($triggers as $triggerid => $trigger) {
+			$servStatus = (isset($_REQUEST['activate'])) ? get_service_status_of_trigger($triggerid) : 0;
+
+			// updating status to all services by the dependency
+			update_services($trigger['triggerid'], $servStatus);
+
+			$host = reset($trigger['hosts']);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid,
+				$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
 		}
 
 		$go_result = DBend($go_result);
 		show_messages($go_result, _('Status updated'), _('Cannot update status'));
 	}
-	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])){
-		if(isset($_REQUEST['copy_targetid']) && ($_REQUEST['copy_targetid'] > 0) && isset($_REQUEST['copy_type'])){
-			if(0 == $_REQUEST['copy_type']){ /* hosts */
+	elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])) {
+		if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {
+			if ($_REQUEST['copy_type'] == 0) {	// hosts
 				$hosts_ids = $_REQUEST['copy_targetid'];
 			}
-			else{
-// groups
+			else {	// groups
 				$hosts_ids = array();
 				$group_ids = $_REQUEST['copy_targetid'];
 
-				$sql = 'SELECT DISTINCT h.hostid '.
-					' FROM hosts h, hosts_groups hg'.
-					' WHERE h.hostid=hg.hostid '.
-						' AND '.DBcondition('hg.groupid',$group_ids);
-				$db_hosts = DBselect($sql);
-				while($db_host = DBfetch($db_hosts)){
-					array_push($hosts_ids, $db_host['hostid']);
+				$db_hosts = DBselect(
+					'SELECT DISTINCT h.hostid'.
+						' FROM hosts h,hosts_groups hg'.
+						' WHERE h.hostid=hg.hostid'.
+							' AND '.DBcondition('hg.groupid', $group_ids)
+				);
+				while ($db_host = DBfetch($db_hosts)) {
+					$hosts_ids[] = $db_host['hostid'];
 				}
 			}
-
-			$go_result = false;
-			$new_triggerids = array();
 
 			DBstart();
-			foreach($hosts_ids as $num => $host_id){
-				foreach($_REQUEST['g_triggerid'] as $tnum => $trigger_id){
-					$newtrigid = copy_trigger_to_host($trigger_id, $host_id, true);
-
-					$new_triggerids[$trigger_id] = $newtrigid;
-					$go_result |= (bool) $newtrigid;
-				}
-
-//				replace_triggers_depenedencies($new_triggerids);
-			}
-
+			$go_result = copyTriggersToHosts(get_request('hostid', 0), $_REQUEST['g_triggerid'], $hosts_ids);
 			$go_result = DBend($go_result);
+
+			show_messages($go_result, _('Trigger added'), _('Cannot add trigger'));
 			$_REQUEST['go'] = 'none2';
 		}
-		else{
-			error('No target selection.');
-			$go_result = false;
+		else {
+			show_error_message(_('No target selected'));
 		}
-		show_messages($go_result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
-	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
+	elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['g_triggerid'])) {
 		$go_result = API::Trigger()->delete($_REQUEST['g_triggerid']);
 		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}

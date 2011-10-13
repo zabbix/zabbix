@@ -3468,9 +3468,9 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 	DC_TRIGGER		*trigger;
 	const char		*p, *q;
 
-	*trigger_info = zbx_malloc(*trigger_info, config->time_triggers.values_num * sizeof(DC_TRIGGER));
-
 	LOCK_CACHE;
+
+	*trigger_info = zbx_malloc(*trigger_info, config->time_triggers.values_num * sizeof(DC_TRIGGER));
 
 	for (i = 0; i < config->time_triggers.values_num; i++)
 	{

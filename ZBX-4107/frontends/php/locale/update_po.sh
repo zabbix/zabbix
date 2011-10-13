@@ -37,5 +37,5 @@ for translation in */LC_MESSAGES/frontend.po; do
 	echo -ne "$translation\t"
 	# setting output file to /dev/null so that unneeded messages.mo file
 	# is not created
-	msgfmt -c --statistics -o /dev/null $translation
+	msgfmt --use-fuzzy -c --statistics -o /dev/null $translation
 done
