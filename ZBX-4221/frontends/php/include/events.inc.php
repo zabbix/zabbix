@@ -322,9 +322,9 @@ function make_small_eventlist($eventid, $trigger_data){
 		'triggerids' => $trigger_data['triggerid'],
 		'time_till' => $curevent['clock'],
 		'output' => API_OUTPUT_EXTEND,
-		'nopermissions' => true,
 		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
+		'nopermissions' => true,
 		'limit' => 20
 	);
 	$events = CEvent::get($options);
