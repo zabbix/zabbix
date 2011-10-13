@@ -107,8 +107,8 @@
 
 				<tr>
 					<td colspan="2">
-						<div class="groupingCaption"><?php echo _('Icons'); ?></div>
-						<div class="groupingContent">
+						<fieldset>
+							<legend><?php echo _('Icons'); ?></legend>
 							<table>
 								<tbody>
 								<tr id="useIconMapRow">
@@ -141,10 +141,10 @@
 								</tr>
 								</tbody>
 							</table>
-						</div>
+						</fieldset>
 					</td>
-
 				</tr>
+
 				<tr>
 					<td><label for="x"><?php echo _('Coordinate X'); ?></label></td>
 					<td><input id="x" maxlength="5" value="0" size="5" name="x" class="input"></td>
@@ -153,26 +153,27 @@
 					<td><label for="y"><?php echo _('Coordinate Y'); ?></label></td>
 					<td><input maxlength="5" value="0" size="5" id="y" name="y" class="input"></td>
 				</tr>
+
 				<tr>
 					<td colspan="2">
-						<div class="groupingCaption"><?php echo _('Links'); ?></div>
-						<div class="groupingContent">
-								<table>
-									<thead>
-									<tr>
-										<td><?php echo _('Name'); ?></td>
-										<td><?php echo _('URL'); ?></td>
-										<td></td>
-									</tr>
-									</thead>
-									<tbody id="urlContainer"></tbody>
-									<tfoot>
-									<tr>
-										<td colspan="3"><span id="newSelementUrl" class="link_menu"><?php echo _('Add'); ?></span></td>
-									</tr>
-									</tfoot>
-								</table>
-						</div>
+						<fieldset>
+							<legend><?php echo _('URLs'); ?></legend>
+							<table>
+								<thead>
+								<tr>
+									<td><?php echo _('Name'); ?></td>
+									<td><?php echo _('URL'); ?></td>
+									<td></td>
+								</tr>
+								</thead>
+								<tbody id="urlContainer"></tbody>
+								<tfoot>
+								<tr>
+									<td colspan="3"><span id="newSelementUrl" class="link_menu"><?php echo _('Add'); ?></span></td>
+								</tr>
+								</tfoot>
+							</table>
+						</fieldset>
 					</td>
 				</tr>
 				<tr class="footer">
@@ -188,7 +189,7 @@
 
 		<div id="mapLinksContainer" style="max-height: 128px; overflow-y: scroll; overflow-x: hidden; display: none;">
 			<table class="tableinfo">
-				<caption><?php echo _('Connectors'); ?></caption>
+				<caption><?php echo _('Links'); ?></caption>
 				<thead>
 				<tr class="header">
 					<td></td>
