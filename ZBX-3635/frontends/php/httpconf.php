@@ -79,9 +79,9 @@ include_once('include/page_header.php');
 	$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 0));
 
 	check_fields($fields);
-	validate_sort_and_sortorder('wt.name',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-	$_REQUEST['go'] = get_request('go','none');
+	$_REQUEST['go'] = get_request('go', 'none');
 ?>
 <?php
 	$showdisabled = get_request('showdisabled', 0);
@@ -392,13 +392,13 @@ include_once('include/page_header.php');
 	$http_wdgt = new CWidget();
 	$http_wdgt->addPageHeader(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form_button);
 
-	$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
-	if(isset($_REQUEST['form'])&&isset($_REQUEST['hostid']) && DBfetch($db_hosts)){
+	if (isset($_REQUEST['form']) && isset($_REQUEST['hostid']) && $_REQUEST['hostid']) {
 		$form = new CFormTable(S_SCENARIO);
 		$form->setName('form_scenario');
 
-		if($_REQUEST['groupid'] > 0)
+		if($_REQUEST['groupid'] > 0) {
 			$form->addVar('groupid', $_REQUEST['groupid']);
+		}
 		$form->addVar('hostid', $_REQUEST['hostid']);
 
 		if(isset($_REQUEST['httptestid'])){
@@ -619,150 +619,115 @@ include_once('include/page_header.php');
 		$table->setHeader(array(
 			new CCheckBox('all_httptests',null, "checkAll('".$form->getName()."','all_httptests','group_httptestid');"),
 			is_show_all_nodes() ? make_sorting_header(S_NODE,'h.hostid') : null,
-			($_REQUEST['hostid']==0) ? make_sorting_header(S_HOST,'h.host'):NULL,
-			make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
+			($_REQUEST['hostid']==0) ? make_sorting_header(S_HOST,'host'):NULL,
+			make_sorting_header(array($link, SPACE, S_NAME),'name'),
 			S_NUMBER_OF_STEPS,
 			S_UPDATE_INTERVAL,
-			make_sorting_header(S_STATUS,'wt.status')));
-
-		$any_app_exist = false;
+			make_sorting_header(S_STATUS,'status')));
 
 		$db_apps = array();
-		$db_appids = array();
 
-/* sorting
-		order_page_result($applications, 'name');
-
-// PAGING UPPER
-		$paging = getPagingLine($applications);
-		$http_wdgt->addItem($paging);
-//-------*/
 		$http_wdgt->addItem(BR());
 
-
 		$sql_where = '';
-		if($_REQUEST['hostid']>0){
+		if ($_REQUEST['hostid'] > 0) {
 			$sql_where = ' AND h.hostid='.$_REQUEST['hostid'];
 		}
 
-		$sql = 'SELECT DISTINCT h.name as hostname,h.hostid,a.* '.
-				' FROM applications a,hosts h '.
-				' WHERE a.hostid=h.hostid '.
+		$sql = 'SELECT DISTINCT h.name as hostname,a.* '.
+				' FROM applications a,hosts h'.
+				' WHERE a.hostid=h.hostid'.
 					$sql_where.
-					' AND '.DBcondition('h.hostid',$available_hosts).
-				order_by('a.applicationid,h.name,h.hostid','a.name');
+					' AND '.DBcondition('h.hostid', $available_hosts);
 		$db_app_res = DBselect($sql);
-		while($db_app = DBfetch($db_app_res)){
+		while ($db_app = DBfetch($db_app_res)) {
 			$db_app['scenarios_cnt'] = 0;
 
 			$db_apps[$db_app['applicationid']] = $db_app;
-			$db_appids[$db_app['applicationid']] = $db_app['applicationid'];
 		}
-
 
 		$db_httptests = array();
-		$db_httptestids = array();
-
-		$sql = 'SELECT wt.*,a.name as application, h.name as hostname,h.hostid '.
-			' FROM httptest wt '.
-				' LEFT JOIN applications a on wt.applicationid=a.applicationid '.
-				' LEFT JOIN hosts h on h.hostid=a.hostid '.
-			' WHERE '.DBcondition('a.applicationid',$db_appids).
-				($showdisabled==0?' AND wt.status <> 1':'').
-			order_by('wt.name,wt.status','h.name');
-//SDI($sql);
+		$sql = 'SELECT wt.*,a.name AS application,h.name as hostname,h.hostid'.
+				' FROM httptest wt,applications a,hosts h'.
+				' WHERE wt.applicationid=a.applicationid'.
+					' AND a.hostid=h.hostid'.
+					' AND '.DBcondition('a.applicationid', array_keys($db_apps)).
+					($showdisabled == 0 ? ' AND wt.status='.HTTPTEST_STATUS_ACTIVE : '');
 		$db_httptests_res = DBselect($sql);
-		while($httptest_data = DBfetch($db_httptests_res)){
-			$httptest_data['step_cout'] = null;
+		while ($httptest_data = DBfetch($db_httptests_res)) {
 			$db_apps[$httptest_data['applicationid']]['scenarios_cnt']++;
 
+			$httptest_data['step_count'] = null;
 			$db_httptests[$httptest_data['httptestid']] = $httptest_data;
-			$db_httptestids[$httptest_data['httptestid']] = $httptest_data['httptestid'];
 		}
 
-		$sql = 'SELECT hs.httptestid, COUNT(hs.httpstepid) as cnt '.
+		$sql = 'SELECT hs.httptestid,COUNT(hs.httpstepid) AS cnt'.
 				' FROM httpstep hs'.
-				' WHERE '.DBcondition('hs.httptestid',$db_httptestids).
+				' WHERE '.DBcondition('hs.httptestid', array_keys($db_httptests)).
 				' GROUP BY hs.httptestid';
-//SDI($sql);
 		$httpstep_res = DBselect($sql);
-		while($step_cout = DBfetch($httpstep_res)){
-			$db_httptests[$step_cout['httptestid']]['step_cout'] = $step_cout['cnt'];
+		while ($step_count = DBfetch($httpstep_res)) {
+			$db_httptests[$step_count['httptestid']]['step_count'] = $step_count['cnt'];
 		}
+
+		order_result($db_httptests, getPageSortField('host'), getPageSortOrder());
 
 		$tab_rows = array();
-		foreach($db_httptests as $httptestid => $httptest_data){
-			$db_app = &$db_apps[$httptest_data['applicationid']];
+		foreach ($db_httptests as $httptestid => $httptest_data) {
+			$db_app = $db_apps[$httptest_data['applicationid']];
 
-			if(!isset($tab_rows[$db_app['applicationid']])) $tab_rows[$db_app['applicationid']] = array();
-			$app_rows = &$tab_rows[$db_app['applicationid']];
+			if (!isset($tab_rows[$db_app['applicationid']])) {
+				$tab_rows[$db_app['applicationid']] = array();
+			}
 
-			if(!uint_in_array($db_app['applicationid'],$_REQUEST['applications']) && !isset($show_all_apps)) continue;
+			if(!uint_in_array($db_app['applicationid'], $_REQUEST['applications']) && !isset($show_all_apps)) {
+				continue;
+			}
 
-			$name = array();
-			array_push($name, new CLink($httptest_data['name'],'?form=update'.
-									'&httptestid='.$httptest_data['httptestid'].
-									'&hostid='.$db_app['hostid'].
-									url_param('groupid'),
-								NULL));
-
-			$status=new CCol(new CLink(httptest_status2str($httptest_data['status']),
-					'?group_httptestid[]='.$httptest_data['httptestid'].
-					'&go='.($httptest_data['status']?'activate':'disable'),
-					httptest_status2style($httptest_data['status'])));
+			$status = new CCol(new CLink(httptest_status2str($httptest_data['status']),
+				'?group_httptestid[]='.$httptest_data['httptestid'].
+				'&go='.($httptest_data['status'] ? 'activate' : 'disable'),
+				httptest_status2style($httptest_data['status'])));
 
 
-			$chkBox = new CCheckBox('group_httptestid['.$httptest_data['httptestid'].']',null,null,$httptest_data['httptestid']);
-
-			$step_cout = DBfetch(DBselect('select count(*) as cnt from httpstep where httptestid='.$httptest_data['httptestid']));
-			$step_cout = $step_cout['cnt'];
-
-			array_push($app_rows,
-				new CRow(array(
-					$chkBox,
-					is_show_all_nodes()?SPACE:NULL,
-					($_REQUEST['hostid']>0) ? null : $db_app['hostname'],
-					$name,
-					$step_cout,
-					$httptest_data['delay'],
-					$status
-				)));
+			$tab_rows[$db_app['applicationid']][] = array(
+				new CCheckBox('group_httptestid['.$httptest_data['httptestid'].']', null, null, $httptest_data['httptestid']),
+				is_show_all_nodes() ? SPACE : NULL,
+				($_REQUEST['hostid'] > 0) ? null : $db_app['hostname'],
+				new CLink($httptest_data['name'], '?form=update'.'&httptestid='.$httptest_data['httptestid'].
+						'&hostid='.$db_app['hostid'].url_param('groupid')),
+				$httptest_data['step_count'],
+				$httptest_data['delay'],
+				$status
+			);
 		}
-		unset($app_rows);
-		unset($db_app);
 
-		foreach($tab_rows as $appid => $app_rows){
-			$db_app = &$db_apps[$appid];
+		foreach ($tab_rows as $appid => $app_rows) {
+			$db_app = $db_apps[$appid];
 
-			if(uint_in_array($db_app['applicationid'],$_REQUEST['applications']) || isset($show_all_apps))
+			if (uint_in_array($db_app['applicationid'],$_REQUEST['applications']) || isset($show_all_apps)) {
 				$link = new CLink(new CImg('images/general/opened.gif'),
 					'?close=1&applicationid='.$db_app['applicationid'].
-					url_param('groupid').url_param('hostid').url_param('applications').
-					url_param('select'));
-			else
+							url_param('groupid').url_param('hostid').url_param('applications').url_param('select'));
+			}
+			else {
 				$link = new CLink(new CImg('images/general/closed.gif'),
 					'?open=1&applicationid='.$db_app['applicationid'].
-					url_param('groupid').url_param('hostid').url_param('applications').
-					url_param('select'));
+							url_param('groupid').url_param('hostid').url_param('applications').url_param('select'));
+			}
 
-			$col = new CCol(array($link,SPACE,bold($db_app['name']),SPACE.'('.$db_app['scenarios_cnt'].SPACE.S_SCENARIOS.')'));
+			$col = new CCol(array($link, SPACE, bold($db_app['name']), SPACE.'('.$db_app['scenarios_cnt'].SPACE.S_SCENARIOS.')'));
 			$col->setColSpan(6);
 
 			$table->addRow(array(
-					get_node_name_by_elid($db_app['applicationid']),
-					$col
-				));
+				get_node_name_by_elid($db_app['applicationid']),
+				$col
+			));
 
-			$any_app_exist = true;
-
-			foreach($app_rows as $row)
+			foreach ($app_rows as $row) {
 				$table->addRow($row);
+			}
 		}
-
-// PAGING FOOTER
-//		$table->addRow(new CCol($paging));
-//		$http_wdgt->addItem($paging);
-//---------
 
 //----- GO ------
 		$goBox = new CComboBox('go');
