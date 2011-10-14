@@ -245,7 +245,7 @@ static zbx_uint64_t	get_cpu_max_freq(int cpu_num)
 	return freq;
 }
 
-static int	print_freq(char *buffer, int size, int filter, int cpu, zbx_uint64_t maxfreq, zbx_uint64_t curfreq)
+static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_uint64_t maxfreq, zbx_uint64_t curfreq)
 {
 	size_t	offset = 0;
 
@@ -451,7 +451,6 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 	}
 
 	offset = 0;
-	*buffer = '\0';
 
 	if (0 != addresses.values_num)
 	{
@@ -465,9 +464,10 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", addresses.values[i]);
 			zbx_free(addresses.values[i]);
 		}
-
-		zbx_rtrim(buffer + offset - 2, ", ");
+		offset -= 2;
 	}
+
+	buffer[offset] = '\0';
 
 	if (SYSINFO_RET_OK == ret)
 		SET_STR_RESULT(result, zbx_strdup(NULL, buffer));

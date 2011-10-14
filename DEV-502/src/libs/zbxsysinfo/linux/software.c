@@ -82,7 +82,7 @@ static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
 	return SUCCEED;
 }
 
-static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages, const char *manager)
+static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
 {
 	size_t	offset = 0;
 	int	i;
@@ -105,8 +105,9 @@ static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages, co
 		packages->values_num = 0;
 
 		offset -= 2;
-		buffer[offset] = '\0';
 	}
+
+	buffer[offset] = '\0';
 
 	return offset;
 }
