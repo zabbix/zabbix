@@ -464,6 +464,7 @@ int     SYSTEM_HW_MACADDR(const char *cmd, const char *param, unsigned flags, AG
 			offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%s, ", addresses.values[i]);
 			zbx_free(addresses.values[i]);
 		}
+
 		offset -= 2;
 	}
 
