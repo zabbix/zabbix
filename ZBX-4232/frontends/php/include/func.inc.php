@@ -850,54 +850,59 @@ function zbx_rksort(&$array, $flags=NULL){
 }
 
 
-// used only in morder_result
-function sortSub($array, $sortorder){
-	$result = array();
+/**
+ * Class for sorting array by multiple fields.
+ * When PHP 5.3+ arraives to Zabbix should be changed to function with closure.
+ */
+class ArraySorter {
+	protected static $fields;
 
-	$keys = array_keys($array);
-	natcasesort($keys);
+	private function __construct() {}
 
-
-	if($sortorder != ZBX_SORT_UP)
-		$keys = array_reverse($keys);
-
-	foreach($keys as $key){
-		$tst = reset($array[$key]);
-		if(isset($tst[0]) && !is_array($tst[0])){
-			$array[$key] = sortSub($array[$key], $sortorder);
+	/**
+	 * Sort array by multiple fields
+	 * @static
+	 * @param array $array array to sort passed by reference
+	 * @param array $fields fields to sort, can be either string with field name or array with 'field' and 'order' keys
+	 */
+	public static function sort(array &$array, array $fields) {
+		foreach ($fields as $fid => $field) {
+			if (!is_array($field)) {
+				$fields[$fid] = array('field' => $field, 'order' => ZBX_SORT_UP);
+			}
 		}
+		self::$fields = $fields;
 
-		foreach($array[$key] as $id){
-			$result[] = $id;
-		}
+		uasort($array, array('self', 'compare'));
 	}
-	return $result;
+
+	/**
+	 * Method to be used as callback for uasort function in sort method.
+	 *
+	 * @static
+	 * @param $a
+	 * @param $b
+	 * @return int
+	 */
+	protected static function compare($a, $b) {
+		foreach (self::$fields as $field) {
+			if (!(isset($a[$field['field']]) && isset($b[$field['field']]))) {
+				return 0;
+			}
+
+			if ($a[$field['field']] != $b[$field['field']]) {
+				if ($field['order'] == ZBX_SORT_UP) {
+					return strnatcasecmp($a[$field['field']], $b[$field['field']]);
+				}
+				else {
+					return strnatcasecmp($b[$field['field']], $a[$field['field']]);
+				}
+			}
+		}
+
+		return 0;
+	}
 }
-
-function morder_result(&$array, $sortfields, $sortorder=ZBX_SORT_UP){
-	$tmp = array();
-	$result = array();
-
-	foreach($array as $key => $el){
-		unset($pointer);
-		$pointer =& $tmp;
-		foreach($sortfields as $f){
-			if(!isset($pointer[$el[$f]])) $pointer[$el[$f]] = array();
-			$pointer =& $pointer[$el[$f]];
-		}
-		$pointer[] = $key;
-	}
-
-	$order = sortSub($tmp, $sortorder);
-
-	foreach($order as $key){
-		$result[$key] = $array[$key];
-	}
-
-	$array = $result;
-	return true;
-}
-
 
 function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
 	if(empty($data)) return false;
@@ -925,23 +930,32 @@ function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
 		$data[$key] = $tmp[$key];
 	}
 
-return true;
+	return true;
 }
 
-function order_by($def,$allways=''){
+function order_by($def, $allways='') {
 	global $page;
 
-	if(!empty($allways)) $allways = ','.$allways;
-	$sortable = explode(',',$def);
+	$orderString = '';
 
-	$tabfield = get_request('sort',CProfile::get('web.'.$page["file"].'.sort',null));
+	$sortField = get_request('sort', CProfile::get('web.'.$page['file'].'.sort', null));
+	$sortable = explode(',', $def);
+	if (!str_in_array($sortField, $sortable)) {
+		$sortField = null;
+	}
 
-	if(is_null($tabfield)) return ' ORDER BY '.$def.$allways;
-	if(!str_in_array($tabfield,$sortable)) return ' ORDER BY '.$def.$allways;
+	if ($sortField !== null) {
+		$sortOrder = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+		$orderString .= $sortField.' '.$sortOrder;
+	}
 
-	$sortorder = get_request('sortorder',CProfile::get('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
+	if (!empty($allways)) {
+		$orderString .= ($sortField === null) ? '' : ',';
+		$orderString .= $allways;
+	}
 
-return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
+	$orderString = empty($orderString) ? '' : ' ORDER BY '.$orderString;
+	return $orderString;
 }
 /************* END SORT *************/
 
