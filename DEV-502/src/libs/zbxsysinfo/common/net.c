@@ -448,8 +448,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	if (NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res)
 		return SYSINFO_RET_FAIL;
 
-	*buffer = '\0';
-
 	msg_end = answer.buffer + res;
 
 	num_answers = ntohs(answer.h.ancount);
