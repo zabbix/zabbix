@@ -82,8 +82,10 @@ zabbix_server_CFLAGS = \
 SERVER_CONFIG = "zabbix_server.conf"
 INCLUDE_DIR = "$(DESTDIR)@sysconfdir@/$(SERVER_CONFIG).d"
 EXSCRIPTS_DIR = "$(DESTDIR)@datarootdir@/zabbix/externalscripts"
+ALSCRIPTS_DIR = "$(DESTDIR)@datarootdir@/zabbix/alertscripts"
 
 install-data-hook:
 	test -d $(INCLUDE_DIR) || $(MKDIR_P) $(INCLUDE_DIR)
 	test -d $(EXSCRIPTS_DIR) || $(MKDIR_P) $(EXSCRIPTS_DIR)
+	test -d $(ALSCRIPTS_DIR) || $(MKDIR_P) $(ALSCRIPTS_DIR)
 	test -f "$(DESTDIR)@sysconfdir@/$(SERVER_CONFIG)" || cp ../../conf/$(SERVER_CONFIG) "$(DESTDIR)@sysconfdir@"
