@@ -88,35 +88,33 @@ function zbx_set_post_cookie($name, $value, $time = null) {
 /************* DATE *************/
 function getMonthCaption($num) {
 	switch ($num) {
-		case 1: $month = _('January'); break;
-		case 2: $month = _('February'); break;
-		case 3: $month = _('March'); break;
-		case 4: $month = _('April'); break;
-		case 5: $month = _('May'); break;
-		case 6: $month = _('June'); break;
-		case 7: $month = _('July'); break;
-		case 8: $month = _('August'); break;
-		case 9: $month = _('September'); break;
-		case 10: $month = _('October'); break;
-		case 11: $month = _('November'); break;
-		case 12: $month = _('December'); break;
-		default: $month = _s('[Wrong value for month: "%s" ]', $num);
+		case 1: return _('January');
+		case 2: return _('February');
+		case 3: return _('March');
+		case 4: return _('April');
+		case 5: return _('May');
+		case 6: return _('June');
+		case 7: return _('July');
+		case 8: return _('August');
+		case 9: return _('September');
+		case 10: return _('October');
+		case 11: return _('November');
+		case 12: return _('December');
 	}
-	return $month;
+	return _s('[Wrong value for month: "%s" ]', $num);
 }
 
 function getDayOfWeekCaption($num) {
 	switch ($num) {
-		case 1: $day = _('Monday'); break;
-		case 2: $day = _('Tuesday'); break;
-		case 3: $day = _('Wednesday'); break;
-		case 4: $day = _('Thursday'); break;
-		case 5: $day = _('Friday'); break;
-		case 6: $day = _('Saturday'); break;
-		case 7: $day = _('Sunday'); break;
-		default: $day = _s('[Wrong value for day: "%s" ]', $num);
+		case 1: return _('Monday');
+		case 2: return _('Tuesday');
+		case 3: return _('Wednesday');
+		case 4: return _('Thursday');
+		case 5: return _('Friday');
+		case 6: return _('Saturday');
+		case 7: return _('Sunday');
 	}
-	return $day;
+	return _s('[Wrong value for day: "%s" ]', $num);
 }
 
 // Convert timestamp to string representation. Retun 'Never' if 0.
@@ -138,7 +136,8 @@ function zbx_date2str($format, $value = null) {
 			3 => _('Wed'),
 			4 => _('Thu'),
 			5 => _('Fri'),
-			6 => _('Sat'));
+			6 => _('Sat')
+		);
 	}
 
 	if (!is_array($weekdaynameslong)) {
@@ -149,7 +148,8 @@ function zbx_date2str($format, $value = null) {
 			3 => _('Wednesday'),
 			4 => _('Thursday'),
 			5 => _('Friday'),
-			6 => _('Saturday'));
+			6 => _('Saturday')
+		);
 	}
 
 	if (!is_array($months)) {
@@ -165,7 +165,8 @@ function zbx_date2str($format, $value = null) {
 			9 => _('Sep'),
 			10 => _('Oct'),
 			11 => _('Nov'),
-			12 => _('Dec'));
+			12 => _('Dec')
+		);
 	}
 
 	if (!is_array($monthslong)) {
@@ -181,7 +182,8 @@ function zbx_date2str($format, $value = null) {
 			9 => _('September'),
 			10 => _('October'),
 			11 => _('November'),
-			12 => _('December'));
+			12 => _('December')
+		);
 	}
 
 	$rplcs = array(
@@ -195,7 +197,7 @@ function zbx_date2str($format, $value = null) {
 	$part = '';
 	$length = zbx_strlen($format);
 	for ($i = 0; $i < $length; $i++) {
-		$pchar = $i > 0 ? zbx_substr($format, $i - 1, 1) : '';
+		$pchar = ($i > 0) ? zbx_substr($format, $i - 1, 1) : '';
 		$char = zbx_substr($format, $i, 1);
 
 		if ($pchar != '\\' && isset($rplcs[$char])) {
@@ -241,7 +243,8 @@ function zbxDateToTime($strdate) {
 function validateMaxTime($time) {
 	if ($time > 2147464800) { // 2038.01.19 00:00
 		return true;
-	} else {
+	}
+	else {
 		return false;
 	}
 }
@@ -361,7 +364,7 @@ function convertUnitsUptime($value) {
 
 function convertUnitsS($value) {
 	if (floor(abs($value) * 1000) == 0) {
-		$value = ($value == 0 ? '0'._('s') : '< 1'._('ms'));
+		$value = ($value == 0) ? '0'._('s') : '< 1'._('ms');
 		return $value;
 	}
 
@@ -558,7 +561,7 @@ function zbx_empty($value) {
 	if (is_array($value) && empty($value)) {
 		return true;
 	}
-	if (is_string($value) && ($value === '')) {
+	if (is_string($value) && $value === '') {
 		return true;
 	}
 	return false;
@@ -570,7 +573,7 @@ function zbx_is_int($var) {
 	}
 
 	if (is_string($var)) {
-		if (ctype_digit($var) || (strcmp(intval($var), $var) == 0)) {
+		if (ctype_digit($var) || strcmp(intval($var), $var) == 0) {
 			return true;
 		}
 	}
@@ -1402,7 +1405,7 @@ function getPagingLine(&$items, $autotrim = true) {
 		$endPage = $cnt_pages;
 	}
 
-	$startPage = ($endPage > $view_pages) ? ($endPage - $view_pages + 1) : 1;
+	$startPage = ($endPage > $view_pages) ? $endPage - $view_pages + 1 : 1;
 
 	$pageline = array();
 
@@ -1443,7 +1446,7 @@ function getPagingLine(&$items, $autotrim = true) {
 
 		array_pop($pageline);
 
-		if ($crnt_page <  $cnt_pages) {
+		if ($crnt_page < $cnt_pages) {
 			$pagespan = new CSpan(_('Next').' >', 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage('.($crnt_page * $rows_per_page).');');
 
