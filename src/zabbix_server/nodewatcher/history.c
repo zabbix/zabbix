@@ -42,15 +42,17 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int get_history_lastid(int master_nodeid, int nodeid, const ZBX_TABLE *table, zbx_uint64_t *lastid)
+static int	get_history_lastid(int master_nodeid, int nodeid, const ZBX_TABLE *table, zbx_uint64_t *lastid)
 {
+	const char	*__function_name = "get_history_lastid";
 	zbx_sock_t	sock;
 	char		data[MAX_STRING_LEN], *answer;
 	int		res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_history_lastid()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED == connect_to_node(master_nodeid, &sock)) {
+	if (SUCCEED == connect_to_node(master_nodeid, &sock))
+	{
 		zbx_snprintf(data, sizeof(data), "ZBX_GET_HISTORY_LAST_ID%c%d%c%d\n%s%c%s",
 			ZBX_DM_DELIMITER, CONFIG_NODEID,
 			ZBX_DM_DELIMITER, nodeid,
@@ -62,11 +64,10 @@ static int get_history_lastid(int master_nodeid, int nodeid, const ZBX_TABLE *ta
 		if (FAIL == recv_data_from_node(master_nodeid, &sock, &answer))
 			goto disconnect;
 
-		if (0 == strncmp(answer, "FAIL", 4)) {
-			zabbix_log( LOG_LEVEL_ERR, "NODE %d: get_history_lastid() FAIL from node %d for node %d",
-				CONFIG_NODEID,
-				master_nodeid,
-				nodeid);
+		if (0 == strncmp(answer, "FAIL", 4))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "NODE %d: %s() FAIL from node %d for node %d",
+				CONFIG_NODEID, __function_name, master_nodeid, nodeid);
 			goto disconnect;
 		}
 
@@ -75,6 +76,9 @@ static int get_history_lastid(int master_nodeid, int nodeid, const ZBX_TABLE *ta
 disconnect:
 		disconnect_node(&sock);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
 	return res;
 }
 
@@ -95,69 +99,60 @@ disconnect:
  ******************************************************************************/
 static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid, int nodeid)
 {
+	const char	*__function_name = "process_history_table_data";
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*data = NULL, *tmp = NULL;
-	int		data_allocated = 1024*1024, tmp_allocated = 4096, tmp_offset, data_offset, f, fld, len;
-	int		data_found = 0;
+	size_t		data_alloc = ZBX_MEBIBYTE, data_offset = 0,
+			tmp_alloc = 4 * ZBX_KIBIBYTE, tmp_offset = 0;
+	int		data_found = 0, f, fld;
 	zbx_uint64_t	lastid;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_history_table_data()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if ((table->flags & ZBX_HISTORY) && FAIL == get_history_lastid(master_nodeid, nodeid, table, &lastid))
+	if (0 != (table->flags & ZBX_HISTORY) && FAIL == get_history_lastid(master_nodeid, nodeid, table, &lastid))
 		return;
 
 	DBbegin();
 
-	data = zbx_malloc(data, data_allocated);
-	tmp = zbx_malloc(tmp, tmp_allocated);
+	data = zbx_malloc(data, data_alloc);
+	tmp = zbx_malloc(tmp, tmp_alloc);
 
-	data_offset = 0;
-	zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "History%c%d%c%d%c%s",
+	zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "History%c%d%c%d%c%s",
 		ZBX_DM_DELIMITER, CONFIG_NODEID,
 		ZBX_DM_DELIMITER, nodeid,
 		ZBX_DM_DELIMITER, table->table);
 
-	/* Do not send history for current node if CONFIG_NODE_NOHISTORY is set */
-/*	if ((CONFIG_NODE_NOHISTORY != 0) && (CONFIG_NODEID == nodeid))
-		goto exit;*/
+	if (0 != (table->flags & ZBX_HISTORY_SYNC))
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "select %s,", table->recid);
+	else	/* ZBX_HISTORY */
+		zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "select ");
 
-	tmp_offset = 0;
-	if (table->flags & ZBX_HISTORY_SYNC) {
-		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 128, "select %s,",
-			table->recid);
-	} else { /* ZBX_HISTORY */
-		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 16, "select ");
-	}
-
-	for (f = 0; table->fields[f].name != 0; f++) {
-		if ((table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
+	for (f = 0; NULL != table->fields[f].name; f++)
+	{
+		if (0 != (table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
 			continue;
 
-		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 128, "%s,",
-			table->fields[f].name);
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "%s,", table->fields[f].name);
 	}
 	tmp_offset--;
 
-	if (table->flags & ZBX_HISTORY_SYNC) {
-		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 1024, " from %s where nodeid=%d order by %s",
-			table->table,
-			nodeid,
-			table->recid);
-	} else { /* ZBX_HISTORY */
-		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 1024, " from %s where %s>"ZBX_FS_UI64
-			DB_NODE " order by %s",
-			table->table,
-			table->recid,
-			lastid,
-			DBnode(table->recid, nodeid),
-			table->recid);
+	if (0 != (table->flags & ZBX_HISTORY_SYNC))
+	{
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, " from %s where nodeid=%d order by %s",
+			table->table, nodeid, table->recid);
+	}
+	else	/* ZBX_HISTORY */
+	{
+		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, " from %s where %s>" ZBX_FS_UI64 DB_NODE " order by %s",
+			table->table, table->recid, lastid, DBnode(table->recid, nodeid), table->recid);
 	}
 
 	result = DBselectN(tmp, 10000);
+
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (table->flags & ZBX_HISTORY_SYNC)
+		if (0 != (table->flags & ZBX_HISTORY_SYNC))
 		{
 			ZBX_STR2UINT64(lastid, row[0]);
 			fld = 1;
@@ -165,38 +160,38 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 		else
 			fld = 0;
 
-		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 2, "\n");
+		zbx_chrcpy_alloc(&data, &data_alloc, &data_offset, '\n');
 
 		for (f = 0; NULL != table->fields[f].name; f++)
 		{
-			if ((table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
+			if (0 != (table->flags & ZBX_HISTORY_SYNC) && 0 == (table->fields[f].flags & ZBX_HISTORY_SYNC))
 				continue;
 
-			if (table->fields[f].type == ZBX_TYPE_INT ||
-					table->fields[f].type == ZBX_TYPE_UINT ||
-					table->fields[f].type == ZBX_TYPE_ID ||
-					table->fields[f].type == ZBX_TYPE_FLOAT)
+			if (ZBX_TYPE_INT == table->fields[f].type ||
+					ZBX_TYPE_UINT == table->fields[f].type ||
+					ZBX_TYPE_ID == table->fields[f].type ||
+					ZBX_TYPE_FLOAT == table->fields[f].type)
 			{
 				if (SUCCEED == DBis_null(row[fld]))
 				{
-					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 6, "NULL%c",
+					zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "NULL%c",
 							ZBX_DM_DELIMITER);
 				}
 				else
 				{
-					zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s%c",
+					zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "%s%c",
 							row[fld], ZBX_DM_DELIMITER);
 				}
 			}
-			else
-			{ /* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT */
-				len = (int)strlen(row[fld]);
-				len = zbx_binary2hex((u_char *)row[fld], len, &tmp, &tmp_allocated);
-				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, len + 8, "%s%c",
-						tmp, ZBX_DM_DELIMITER);
+			else	/* ZBX_TYPE_CHAR ZBX_TYPE_BLOB ZBX_TYPE_TEXT */
+			{
+				zbx_binary2hex((u_char *)row[fld], strlen(row[fld]), &tmp, &tmp_alloc);
+				zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "%s%c", tmp, ZBX_DM_DELIMITER);
 			}
+
 			fld++;
 		}
+
 		data_offset--;
 		data_found = 1;
 	}
@@ -204,13 +199,12 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 
 	data[data_offset] = '\0';
 
-	if (1 == data_found && SUCCEED == send_to_node(table->table, master_nodeid, nodeid, data)) {
-		if (table->flags & ZBX_HISTORY_SYNC) {
-			DBexecute("delete from %s where nodeid=%d and %s<="ZBX_FS_UI64,
-				table->table,
-				nodeid,
-				table->recid,
-				lastid);
+	if (1 == data_found && SUCCEED == send_to_node(table->table, master_nodeid, nodeid, data))
+	{
+		if (0 != (table->flags & ZBX_HISTORY_SYNC))
+		{
+			DBexecute("delete from %s where nodeid=%d and %s<=" ZBX_FS_UI64,
+				table->table, nodeid, table->recid, lastid);
 		}
 	}
 
@@ -218,6 +212,8 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 
 	zbx_free(tmp);
 	zbx_free(data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -237,22 +233,23 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
  ******************************************************************************/
 static void	process_history_tables(int master_nodeid, int nodeid)
 {
-	int	t, start;
+	const char	*__function_name = "process_history_tables";
+	int		t, start;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_history_tables()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	start = time(NULL);
 
-	for (t = 0; tables[t].table != 0; t++)
+	for (t = 0; NULL != tables[t].table; t++)
 	{
-		if (tables[t].flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC))
+		if (0 != (tables[t].flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC)))
 			process_history_table_data(&tables[t], master_nodeid, nodeid);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "NODE %d: Spent %d seconds for node %d in process_history_tables",
-		CONFIG_NODEID,
-		time(NULL) - start,
-		nodeid);
+		CONFIG_NODEID, time(NULL) - start, nodeid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -272,24 +269,28 @@ static void	process_history_tables(int master_nodeid, int nodeid)
  ******************************************************************************/
 void	main_historysender()
 {
+	const char	*__function_name = "main_historysender";
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		master_nodeid, nodeid;
+	int		nodeid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In main_historysender()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	master_nodeid = CONFIG_MASTER_NODEID;
-	if (0 == master_nodeid)
+	if (0 == CONFIG_MASTER_NODEID)
 		return;
 
 	result = DBselect("select nodeid from nodes");
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		nodeid = atoi(row[0]);
+
 		if (SUCCEED == is_master_node(CONFIG_NODEID, nodeid))
 			continue;
 
-		process_history_tables(master_nodeid, nodeid);
+		process_history_tables(CONFIG_MASTER_NODEID, nodeid);
 	}
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

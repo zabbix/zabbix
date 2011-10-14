@@ -215,14 +215,20 @@ zbx_graph_item_type;
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
 #ifdef HAVE_ORACLE
+#define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "begin\n")
+#define	DBend_multiple_update(sql, sql_alloc, sql_offset)	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "end;\n")
+
 #define	ZBX_SQL_STRCMP		"%s%s%s"
-#define	ZBX_SQL_STRVAL_EQ(str)	str[0] != '\0' ? "='"  : "",			\
-				str[0] != '\0' ? str   : " is null",		\
-				str[0] != '\0' ? "'"   : ""
-#define	ZBX_SQL_STRVAL_NE(str)	str[0] != '\0' ? "<>'" : "",			\
-				str[0] != '\0' ? str   : " is not null",	\
-				str[0] != '\0' ? "'"   : ""
+#define	ZBX_SQL_STRVAL_EQ(str)	'\0' != *str ? "='"  : "",		\
+				'\0' != *str ? str   : " is null",	\
+				'\0' != *str ? "'"   : ""
+#define	ZBX_SQL_STRVAL_NE(str)	'\0' != *str ? "<>'" : "",		\
+				'\0' != *str ? str   : " is not null",	\
+				'\0' != *str ? "'"   : ""
 #else
+#define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)
+#define	DBend_multiple_update(sql, sql_alloc, sql_offset)
+
 #define	ZBX_SQL_STRCMP		"%s'%s'"
 #define	ZBX_SQL_STRVAL_EQ(str)	"=", str
 #define	ZBX_SQL_STRVAL_NE(str)	"<>", str
@@ -560,7 +566,7 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBremove_escalation(zbx_uint64_t escalationid);
 void	DBupdate_triggers_status_after_restart();
-int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_uint64_t triggerid,
+int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
 		unsigned char type, int value, int value_flags, const char *error, int new_value, const char *new_error,
 		const zbx_timespec_t *ts, unsigned char *add_event, unsigned char *value_changed);
 int	DBget_row_count(const char *table_name);
@@ -600,7 +606,7 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 void	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
-void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num);
+void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num);
 
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
@@ -612,7 +618,7 @@ zbx_uint64_t	DBmultiply_value_uint64(DB_ITEM *item, zbx_uint64_t value);
 
 void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns, unsigned short port, int now);
 void	DBproxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port);
-int	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset);
+int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*DBget_unique_hostname_by_sample(const char *host_name_sample);
 
 char	*DBsql_id_cmp(zbx_uint64_t id);

@@ -197,7 +197,7 @@ void	DCflush_nextchecks()
 		objectid_clock_t;
 
 		char			*sql = NULL;
-		int			sql_alloc = 4096, sql_offset = 0;
+		size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 		objectid_clock_t 	*events = NULL;
 		int			events_alloc, events_num = 0;
 		zbx_uint64_t		events_maxid;
@@ -211,9 +211,7 @@ void	DCflush_nextchecks()
 
 		DBbegin();
 
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < trigger_order.values_num; i++)
 		{
@@ -225,7 +223,7 @@ void	DCflush_nextchecks()
 						TRIGGER_VALUE_FLAG_UNKNOWN, trigger->new_error);
 
 				error_esc = DBdyn_escape_string_len(trigger->new_error, TRIGGER_ERROR_LEN);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128 + strlen(error_esc),
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"update triggers"
 						" set value_flags=%d,"
 							"lastchange=%d,"
@@ -251,7 +249,7 @@ void	DCflush_nextchecks()
 		{
 			events_maxid = DBget_maxid("events");
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into events (eventid,source,object,objectid,clock,value,value_changed)"
 					" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d);\n",
 					events_maxid,
@@ -265,9 +263,7 @@ void	DCflush_nextchecks()
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);

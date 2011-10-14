@@ -347,7 +347,7 @@ DB_RESULT	DBselectN(const char *query, int n)
  * Comments: do not update value if there are dependencies with value PROBLEM *
  *                                                                            *
  ******************************************************************************/
-int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_uint64_t triggerid,
+int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
 		unsigned char type, int value, int value_flags, const char *error, int new_value, const char *new_error,
 		const zbx_timespec_t *ts, unsigned char *add_event, unsigned char *value_changed)
 {
@@ -414,21 +414,20 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 				*sql = zbx_malloc(*sql, *sql_alloc);
 			}
 
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 42, "update triggers set lastchange=%d",
-					ts->sec);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update triggers set lastchange=%d", ts->sec);
 
 			if (value != new_value)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 18, ",value=%d", new_value);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",value=%d", new_value);
 
 			if (value_flags != new_value_flags)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 24, ",value_flags=%d", new_value_flags);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",value_flags=%d", new_value_flags);
 
 			if (NULL == new_error)
 			{
 				DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, "");
 
 				if ('\0' != *error)
-					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 10, ",error=''");
+					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ",error=''");
 			}
 			else
 			{
@@ -437,13 +436,12 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 				if (0 != strcmp(error, new_error))
 				{
 					new_error_esc = DBdyn_escape_string_len(new_error, TRIGGER_ERROR_LEN);
-					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 10 + strlen(new_error_esc),
-							",error='%s'", new_error_esc);
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",error='%s'", new_error_esc);
 					zbx_free(new_error_esc);
 				}
 			}
 
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 38, " where triggerid=" ZBX_FS_UI64, triggerid);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where triggerid=" ZBX_FS_UI64, triggerid);
 
 			*add_event = 1;
 
@@ -469,7 +467,7 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 			}
 
 			new_error_esc = DBdyn_escape_string_len(new_error, TRIGGER_ERROR_LEN);
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 66 + strlen(new_error_esc),
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 					"update triggers"
 					" set error='%s'"
 					" where triggerid=" ZBX_FS_UI64,
@@ -490,7 +488,7 @@ static void	DBupdate_trigger_value(zbx_uint64_t triggerid, unsigned char type, i
 {
 	const char	*__function_name = "DBupdate_trigger_value";
 	char		*sql = NULL;
-	int		sql_alloc = 0, sql_offset = 0;
+	size_t		sql_alloc = 0, sql_offset = 0;
 	unsigned char	add_event, value_changed;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1457,7 +1455,7 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	return ret2 - num + 1;
 }
 
-void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num)
+void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num)
 {
 #define MAX_EXPRESSIONS	950
 	int	i;
@@ -1465,9 +1463,9 @@ void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const ch
 	if (0 == num)
 		return;
 
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, " ");
+	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
 	if (MAX_EXPRESSIONS < num)
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, "(");
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
 	for (i = 0; i < num; i++)
 	{
@@ -1476,19 +1474,19 @@ void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const ch
 			if (0 != i)
 			{
 				(*sql_offset)--;
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 8, ") or ");
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or ");
 			}
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 128, "%s in (", fieldname);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
 		}
 
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 128, ZBX_FS_UI64 ",", values[i]);
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[i]);
 	}
 
 	(*sql_offset)--;
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, ")");
+	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 	if (MAX_EXPRESSIONS < num)
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, ")");
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 }
 
 static char	buf_string[640];
@@ -1756,7 +1754,7 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
  * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  ******************************************************************************/
-int	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
+int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	int	ret = SUCCEED;
 
@@ -1766,18 +1764,16 @@ int	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
 		if (',' == (*sql)[*sql_offset - 1])
 		{
 			(*sql_offset)--;
-			zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 3, ";\n");
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
 #endif
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 6, "end;\n");
-#endif
+		DBend_multiple_update(sql, sql_alloc, sql_offset);
+
 		if (ZBX_DB_OK > DBexecute("%s", *sql))
 			ret = FAIL;
 		*sql_offset = 0;
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 7, "begin\n");
-#endif
+
+		DBbegin_multiple_update(sql, sql_alloc, sql_offset);
 	}
 
 	return ret;
