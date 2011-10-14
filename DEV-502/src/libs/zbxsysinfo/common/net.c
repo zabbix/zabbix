@@ -449,7 +449,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 		return SYSINFO_RET_FAIL;
 
 	*buffer = '\0';
-	offset = 0;
 
 	msg_end = answer.buffer + res;
 
@@ -652,7 +651,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 #endif	/* _WINDOWS */
 
-	zbx_rtrim(buffer + MAX(offset - 1, 0), "\n");
+	if (0 != offset)
+		buffer[--offset] = '\0';
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	ret = SYSINFO_RET_OK;
