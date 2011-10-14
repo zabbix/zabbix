@@ -93,7 +93,6 @@ typedef struct
 	zbx_uint64_t	hostid;
 	const char	*key;
 	ZBX_DC_ITEM	*item_ptr;
-	unsigned int	sync_num;
 }
 ZBX_DC_ITEM_HK;
 
@@ -210,7 +209,6 @@ typedef struct
 	zbx_uint64_t	proxy_hostid;
 	const char	*host;
 	ZBX_DC_HOST	*host_ptr;
-	unsigned int	sync_num;
 	unsigned char	status;
 }
 ZBX_DC_HOST_PH;
@@ -253,7 +251,6 @@ typedef struct
 {
 	const char	*macro;
 	ZBX_DC_GMACRO	*gmacro_ptr;
-	unsigned int	sync_num;
 }
 ZBX_DC_GMACRO_M;
 
@@ -271,7 +268,6 @@ typedef struct
 	zbx_uint64_t	hostid;
 	const char	*macro;
 	ZBX_DC_HMACRO	*hmacro_ptr;
-	unsigned int	sync_num;
 }
 ZBX_DC_HMACRO_HM;
 
@@ -292,7 +288,6 @@ typedef struct
 {
 	zbx_uint64_t		hostid;
 	ZBX_DC_INTERFACE	*interface_ptr;
-	unsigned int		sync_num;
 	unsigned char		type;
 }
 ZBX_DC_INTERFACE_HT;
@@ -364,8 +359,6 @@ static ZBX_MUTEX	config_lock;
 static zbx_mem_info_t	*config_mem;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
-
-static unsigned int	sync_num = 0;
 
 static const char	*INTERNED_SERVER_STATUS_KEY;
 
@@ -779,7 +772,7 @@ static void	DCsync_items(DB_RESULT result)
 				item_hk_local.key = item->key;
 				item_hk = zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-				if (sync_num != item_hk->sync_num)
+				if (item == item_hk->item_ptr)
 				{
 					zbx_strpool_release(item_hk->key);
 					zbx_hashset_remove(&config->items_hk, &item_hk_local);
@@ -791,10 +784,7 @@ static void	DCsync_items(DB_RESULT result)
 			item_hk = zbx_hashset_search(&config->items_hk, &item_hk_local);
 
 			if (NULL != item_hk)
-			{
 				item_hk->item_ptr = item;
-				item_hk->sync_num = sync_num;
-			}
 			else
 				update_index = 1;
 		}
@@ -839,7 +829,6 @@ static void	DCsync_items(DB_RESULT result)
 			item_hk_local.hostid = item->hostid;
 			item_hk_local.key = zbx_strpool_acquire(item->key);
 			item_hk_local.item_ptr = item;
-			item_hk_local.sync_num = sync_num;
 			zbx_hashset_insert(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK));
 		}
 
@@ -1235,7 +1224,7 @@ static void	DCsync_items(DB_RESULT result)
 		item_hk_local.key = item->key;
 		item_hk = zbx_hashset_search(&config->items_hk, &item_hk_local);
 
-		if (sync_num != item_hk->sync_num)
+		if (item == item_hk->item_ptr)
 		{
 			zbx_strpool_release(item_hk->key);
 			zbx_hashset_remove(&config->items_hk, &item_hk_local);
@@ -1609,7 +1598,7 @@ static void	DCsync_hosts(DB_RESULT result)
 				host_ph_local.host = host->host;
 				host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
 
-				if (sync_num != host_ph->sync_num)
+				if (NULL != host_ph && host == host_ph->host_ptr)	/* see ZBX-4045 for NULL check */
 				{
 					zbx_strpool_release(host_ph->host);
 					zbx_hashset_remove(&config->hosts_ph, &host_ph_local);
@@ -1622,20 +1611,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
 
 			if (NULL != host_ph)
-			{
-				if (0 == found || sync_num == host_ph->sync_num)
-				{
-					/* duplicate hosts or proxies found */
-
-					zabbix_log(LOG_LEVEL_CRIT, "Error: duplicate %s [%s] found. Exiting...",
-							HOST_STATUS_MONITORED == host_ph->status ? "hosts" : "proxies",
-							host_ph->host);
-					exit(FAIL);
-				}
-
 				host_ph->host_ptr = host;
-				host_ph->sync_num = sync_num;
-			}
 			else
 				update_index = 1;
 		}
@@ -1674,7 +1650,6 @@ static void	DCsync_hosts(DB_RESULT result)
 			host_ph_local.status = host->status;
 			host_ph_local.host = zbx_strpool_acquire(host->host);
 			host_ph_local.host_ptr = host;
-			host_ph_local.sync_num = sync_num;
 			zbx_hashset_insert(&config->hosts_ph, &host_ph_local, sizeof(ZBX_DC_HOST_PH));
 		}
 
@@ -1774,7 +1749,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		host_ph_local.host = host->host;
 		host_ph = zbx_hashset_search(&config->hosts_ph, &host_ph_local);
 
-		if (sync_num != host_ph->sync_num)
+		if (NULL != host_ph && host == host_ph->host_ptr)	/* see ZBX-4045 for NULL check */
 		{
 			zbx_strpool_release(host_ph->host);
 			zbx_hashset_remove(&config->hosts_ph, &host_ph_local);
@@ -1895,7 +1870,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 				gmacro_m_local.macro = gmacro->macro;
 				gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
 
-				if (sync_num != gmacro_m->sync_num)
+				if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
 				{
 					zbx_strpool_release(gmacro_m->macro);
 					zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
@@ -1906,10 +1881,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 			gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
 
 			if (NULL != gmacro_m)
-			{
 				gmacro_m->gmacro_ptr = gmacro;
-				gmacro_m->sync_num = sync_num;
-			}
 			else
 				update_index = 1;
 		}
@@ -1921,11 +1893,10 @@ static void	DCsync_gmacros(DB_RESULT result)
 
 		/* update gmacros_m index using new data, if not done already */
 
-		if (update_index)
+		if (1 == update_index)
 		{
 			gmacro_m_local.macro = zbx_strpool_acquire(gmacro->macro);
 			gmacro_m_local.gmacro_ptr = gmacro;
-			gmacro_m_local.sync_num = sync_num;
 			zbx_hashset_insert(&config->gmacros_m, &gmacro_m_local, sizeof(ZBX_DC_GMACRO_M));
 		}
 	}
@@ -1944,7 +1915,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 		gmacro_m_local.macro = gmacro->macro;
 		gmacro_m = zbx_hashset_search(&config->gmacros_m, &gmacro_m_local);
 
-		if (sync_num != gmacro_m->sync_num)
+		if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
 		{
 			zbx_strpool_release(gmacro_m->macro);
 			zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
@@ -2002,7 +1973,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 				hmacro_hm_local.macro = hmacro->macro;
 				hmacro_hm = zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local);
 
-				if (sync_num != hmacro_hm->sync_num)
+				if (hmacro == hmacro_hm->hmacro_ptr)
 				{
 					zbx_strpool_release(hmacro_hm->macro);
 					zbx_hashset_remove(&config->hmacros_hm, &hmacro_hm_local);
@@ -2014,10 +1985,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 			hmacro_hm = zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local);
 
 			if (NULL != hmacro_hm)
-			{
 				hmacro_hm->hmacro_ptr = hmacro;
-				hmacro_hm->sync_num = sync_num;
-			}
 			else
 				update_index = 1;
 		}
@@ -2030,12 +1998,11 @@ static void	DCsync_hmacros(DB_RESULT result)
 
 		/* update hmacros_hm index using new data, if not done already */
 
-		if (update_index)
+		if (1 == update_index)
 		{
 			hmacro_hm_local.hostid = hmacro->hostid;
 			hmacro_hm_local.macro = zbx_strpool_acquire(hmacro->macro);
 			hmacro_hm_local.hmacro_ptr = hmacro;
-			hmacro_hm_local.sync_num = sync_num;
 			zbx_hashset_insert(&config->hmacros_hm, &hmacro_hm_local, sizeof(ZBX_DC_HMACRO_HM));
 		}
 	}
@@ -2055,7 +2022,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 		hmacro_hm_local.macro = hmacro->macro;
 		hmacro_hm = zbx_hashset_search(&config->hmacros_hm, &hmacro_hm_local);
 
-		if (sync_num != hmacro_hm->sync_num)
+		if (hmacro == hmacro_hm->hmacro_ptr)
 		{
 			zbx_strpool_release(hmacro_hm->macro);
 			zbx_hashset_remove(&config->hmacros_hm, &hmacro_hm_local);
@@ -2128,8 +2095,11 @@ static void	DCsync_interfaces(DB_RESULT result)
 				interface_ht_local.type = interface->type;
 				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
 
-				if (sync_num != interface_ht->sync_num)
+				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
+				{
+					/* see ZBX-4045 for NULL check in the conditional */
 					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
+				}
 			}
 
 			if (1 == main_)
@@ -2139,10 +2109,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
 
 				if (NULL != interface_ht)
-				{
 					interface_ht->interface_ptr = interface;
-					interface_ht->sync_num = sync_num;
-				}
 				else
 					update_index = 1;
 			}
@@ -2165,7 +2132,6 @@ static void	DCsync_interfaces(DB_RESULT result)
 			interface_ht_local.hostid = interface->hostid;
 			interface_ht_local.type = interface->type;
 			interface_ht_local.interface_ptr = interface;
-			interface_ht_local.sync_num = sync_num;
 			zbx_hashset_insert(&config->interfaces_ht, &interface_ht_local, sizeof(ZBX_DC_INTERFACE_HT));
 		}
 
@@ -2227,8 +2193,11 @@ static void	DCsync_interfaces(DB_RESULT result)
 				interface_ht_local.type = interface->type;
 				interface_ht = zbx_hashset_search(&config->interfaces_ht, &interface_ht_local);
 
-				if (sync_num != interface_ht->sync_num)
+				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
+				{
+					/* see ZBX-4045 for NULL check in the conditional */
 					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
+				}
 			}
 
 			zbx_strpool_release(interface->ip);
@@ -2440,8 +2409,6 @@ void	DCsync_configuration()
 
 	START_SYNC;
 
-	sync_num++;
-
 	sec = zbx_time();
 	DCsync_config(conf_result);
 	DCsync_items(item_result);
@@ -2457,7 +2424,6 @@ void	DCsync_configuration()
 
 	strpool = zbx_strpool_info();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync_num   : %u", __function_name, sync_num);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sync config: " ZBX_FS_DBL " sec.", __function_name, csec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() item sql   : " ZBX_FS_DBL " sec.", __function_name, isec);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() trig sql   : " ZBX_FS_DBL " sec.", __function_name, tsec);
@@ -4505,12 +4471,12 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck)
 
 	if (NULL != (dc_proxy = zbx_hashset_search(&config->proxies, &hostid)))
 	{
-		if (0x01 & update_nextcheck)
+		if (0 != (0x01 & update_nextcheck))
 		{
 			dc_proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
 					hostid, CONFIG_PROXYCONFIG_FREQUENCY, now);
 		}
-		if (0x02 & update_nextcheck)
+		if (0 != (0x02 & update_nextcheck))
 		{
 			dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
 					hostid, CONFIG_PROXYDATA_FREQUENCY, now);

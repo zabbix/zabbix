@@ -192,17 +192,17 @@ include_once('include/page_header.php');
 	$db_httptests = array();
 	$db_httptestids = array();
 
-	$sql = 'SELECT wt.*,a.name as application, h.name as hostname,h.hostid '.
-		' FROM httptest wt '.
-			' LEFT JOIN applications a on wt.applicationid=a.applicationid '.
-			' LEFT JOIN hosts h on h.hostid=a.hostid '.
-		' WHERE '.DBcondition('a.applicationid',$db_appids).
-			' AND wt.status <> 1 '.
-		order_by('wt.name','h.host');
-//SDI($sql);
+	$sql = 'SELECT wt.*,a.name as application,h.name as hostname,h.hostid'.
+			' FROM httptest wt,applications a,hosts h'.
+			' WHERE wt.applicationid=a.applicationid'.
+				' AND a.hostid=h.hostid'.
+				' AND '.DBcondition('a.applicationid', $db_appids).
+				' AND wt.status<>1'.
+			order_by('wt.name', 'h.host');
+
 	$db_httptests_res = DBselect($sql);
-	while($httptest_data = DBfetch($db_httptests_res)){
-		$httptest_data['step_cout'] = null;
+	while ($httptest_data = DBfetch($db_httptests_res)) {
+		$httptest_data['step_count'] = null;
 		$db_apps[$httptest_data['applicationid']]['scenarios_cnt']++;
 
 		$db_httptests[$httptest_data['httptestid']] = $httptest_data;
@@ -213,10 +213,10 @@ include_once('include/page_header.php');
 			' FROM httpstep hs'.
 			' WHERE '.DBcondition('hs.httptestid',$db_httptestids).
 			' GROUP BY hs.httptestid';
-//SDI($sql);
+
 	$httpstep_res = DBselect($sql);
 	while($step_cout = DBfetch($httpstep_res)){
-		$db_httptests[$step_cout['httptestid']]['step_cout'] = $step_cout['cnt'];
+		$db_httptests[$step_cout['httptestid']]['step_count'] = $step_cout['cnt'];
 	}
 
 	$tab_rows = array();
@@ -238,7 +238,7 @@ include_once('include/page_header.php');
 
 		if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
 			$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstep']);
-			$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '.S_OF_SMALL.' '.$httptest_data['step_cout'].']';
+			$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '.S_OF_SMALL.' '.$httptest_data['step_count'].']';
 
 			$status['msg'] = S_IN_PROGRESS;
 			$status['style'] = 'orange';
@@ -249,7 +249,7 @@ include_once('include/page_header.php');
 			if($httptest_data['lastfailedstep'] > 0){
 				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
 				$status['msg'] = S_FAILED_ON.' "'.$step_data['name'].'" '.
-					'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$httptest_data['step_cout'].'] '.
+					'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$httptest_data['step_count'].'] '.
 					SPACE.S_ERROR.': '.$httptest_data['error'];
 				$status['style'] = 'disabled';
 			}
@@ -268,7 +268,7 @@ include_once('include/page_header.php');
 			is_show_all_nodes()?SPACE:NULL,
 			($_REQUEST['hostid']>0)?NULL:SPACE,
 			array(str_repeat(SPACE,6), $name),
-			$httptest_data['step_cout'],
+			$httptest_data['step_count'],
 			$state,
 			$lastcheck,
 			new CSpan($status['msg'], $status['style'])
