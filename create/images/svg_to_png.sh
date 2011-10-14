@@ -23,6 +23,8 @@ for svgfile in $elementdir/*.svg; do
 	((elementfilesdone++))
 	svgfilemod=$(stat -c "%Y" "$svgfile")
 	for size in 24 48 64 96 128; do
+		# rackmountable device icons don't make much sense below size 64
+		[[ "$svgfile" =~ Rackmountable_.* || "$svgfile" =~ Zabbix_server_.* ]] && [ "$size" -lt "64" ] && continue
 		pngoutfile="$outputdir/$(basename ${svgfile%.svg}) ($size).png"
 		[[ "$(stat -c "%Y" "$pngoutfile" 2>/dev/null)" -lt "$svgfilemod" ]] && {
 			# if png file modification time is older than svg file modification time
