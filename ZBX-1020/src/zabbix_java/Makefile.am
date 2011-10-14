@@ -28,14 +28,14 @@ class:
 	mkdir -p class/tests
 
 install: all
-	mkdir -p $(sbindir)/zabbix_java/bin
-	mkdir -p $(sbindir)/zabbix_java/lib
-	cp startup.sh shutdown.sh $(sbindir)/zabbix_java
-	if test ! -f $(sbindir)/zabbix_java/settings.sh; then cp settings.sh $(sbindir)/zabbix_java; fi
-	cp $(ZJP) $(sbindir)/zabbix_java/bin
-	cp lib/*.jar $(sbindir)/zabbix_java/lib
-	if test ! -f $(sbindir)/zabbix_java/lib/logback.xml; then cp lib/logback.xml $(sbindir)/zabbix_java/lib; fi
-	if test ! -f $(sbindir)/zabbix_java/lib/logback-console.xml; then cp lib/logback-console.xml $(sbindir)/zabbix_java/lib; fi
+	mkdir -p "$(sbindir)/zabbix_java/bin"
+	mkdir -p "$(sbindir)/zabbix_java/lib"
+	cp startup.sh shutdown.sh "$(sbindir)/zabbix_java"
+	if test ! -f "$(sbindir)/zabbix_java/settings.sh"; then cp settings.sh "$(sbindir)/zabbix_java"; fi
+	cp $(ZJP) "$(sbindir)/zabbix_java/bin"
+	cp lib/*.jar "$(sbindir)/zabbix_java/lib"
+	if test ! -f "$(sbindir)/zabbix_java/lib/logback.xml"; then cp lib/logback.xml "$(sbindir)/zabbix_java/lib"; fi
+	if test ! -f "$(sbindir)/zabbix_java/lib/logback-console.xml"; then cp lib/logback-console.xml "$(sbindir)/zabbix_java/lib"; fi
 
 clean:
 	rm -f $(ZJP)
