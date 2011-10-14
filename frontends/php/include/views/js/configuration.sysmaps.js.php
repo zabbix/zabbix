@@ -187,15 +187,15 @@
 			</table>
 		</form>
 
-		<div id="mapLinksContainer" style="max-height: 128px; overflow-y: scroll; overflow-x: hidden; display: none;">
+		<div id="mapLinksContainer" style="border: 1px solid #AAA; max-height: 128px; overflow-y: scroll; overflow-x: hidden; display: none;">
 			<table class="tableinfo">
-				<caption><?php echo _('Links'); ?></caption>
+				<caption><?php echo _('Edit element links'); ?></caption>
 				<thead>
 				<tr class="header">
 					<td></td>
 					<td><?php echo _('Element type'); ?></td>
 					<td><?php echo _('Element name'); ?></td>
-					<td><?php echo _('Link status indicator'); ?></td>
+					<td><?php echo _('Link indicators'); ?></td>
 				</tr>
 				</thead>
 				<tbody id=linksList></tbody>
@@ -230,7 +230,7 @@
 					<td><label for="color"><?php echo _('Colour (OK)'); ?></label></td>
 					<td>
 						<input maxlength="6" size="7" id="color" name="color" class="input colorpicker">
-						<div id="lbl_color" class="pointer colorpickerLabel">&nbsp;</div>
+						<div id="lbl_color" class="pointer colorpickerLabel">&nbsp;&nbsp;&nbsp;</div>
 					</td>
 				</tr>
 				<tr>
@@ -394,7 +394,7 @@
 		</td>
 		<td>
 			<input maxlength="6" value="#{color}" size="7" id="linktrigger_#{linktriggerid}_color" name="linktrigger_#{linktriggerid}_color" class="input colorpicker">
-			<div id="lbl_linktrigger_#{linktriggerid}_color" class="pointer colorpickerLabel">&nbsp;</div>
+			<div id="lbl_linktrigger_#{linktriggerid}_color" class="pointer colorpickerLabel">&nbsp;&nbsp;&nbsp;</div>
 		</td>
 		<td>
 			<span class="link_menu triggerRemove" data-linktriggerid="#{linktriggerid}""><?php echo _('Remove'); ?></span>
