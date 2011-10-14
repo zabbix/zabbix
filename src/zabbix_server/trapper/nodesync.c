@@ -26,9 +26,9 @@
 #include "../nodewatcher/nodewatcher.h"
 
 static char	*buf = NULL, *tmp = NULL;
-static int	buf_alloc = 128, tmp_alloc = 16;
+static size_t	buf_alloc = 128, tmp_alloc = 16;
 
-static void	make_delete_sql(char **sql, int *sql_alloc, int *sql_offset,
+static void	make_delete_sql(char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const ZBX_TABLE *table, zbx_uint64_t *ids, int *ids_num)
 {
 	if (NULL == table)
@@ -37,14 +37,11 @@ static void	make_delete_sql(char **sql, int *sql_alloc, int *sql_offset,
 	if (0 == *ids_num)
 		return;
 
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 19 + ZBX_TABLENAME_LEN,
-			"delete from %s where",
-			table->table);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "delete from %s where", table->table);
 
-	DBadd_condition_alloc(sql, sql_alloc, sql_offset,
-			table->recid, ids, *ids_num);
+	DBadd_condition_alloc(sql, sql_alloc, sql_offset, table->recid, ids, *ids_num);
 
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 3, ";\n");
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 
 	DBexecute_overflowed_sql(sql, sql_alloc, sql_offset);
 
@@ -74,15 +71,13 @@ static void	process_deleted_records(int nodeid, char *data, int sender_nodetype)
 	zbx_uint64_t	recid, *ids = NULL;
 	int		ids_alloc = 0, ids_num = 0;
 	char		*sql = NULL;
-	int		sql_alloc = 4096, sql_offset = 0;
+	size_t		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (r = data; '\0' != *r;)
 	{
@@ -119,9 +114,7 @@ next:
 
 	make_delete_sql(&sql, &sql_alloc, &sql_offset, table, ids, &ids_num);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -150,19 +143,19 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 {
 	const char	*__function_name = "process_updated_records";
 	char		*r, *lf, *value_esc;
-	int		len, op, dnum;
+	int		op, dnum;
 	const ZBX_TABLE	*table = NULL;
 	const ZBX_FIELD	*field = NULL;
 	zbx_uint64_t	recid;
 	char		*dsql = NULL,
 			*isql = NULL, *ifld = NULL, *ival = NULL,
 			*usql = NULL, *ufld = NULL;
-	int		dsql_alloc = 4096, dsql_offset = 0, dtmp_offset = 0,
-			isql_alloc = 4096, isql_offset = 0,
-			ifld_alloc = 4096, ifld_offset = 0,
-			ival_alloc = 4096, ival_offset = 0,
-			usql_alloc = 4096, usql_offset = 0,
-			ufld_alloc = 4096, ufld_offset = 0;
+	size_t		dsql_alloc = 4 * ZBX_KIBIBYTE, dsql_offset = 0, dtmp_offset = 0,
+			isql_alloc = 4 * ZBX_KIBIBYTE, isql_offset = 0,
+			ifld_alloc = 4 * ZBX_KIBIBYTE, ifld_offset = 0,
+			ival_alloc = 4 * ZBX_KIBIBYTE, ival_offset = 0,
+			usql_alloc = 4 * ZBX_KIBIBYTE, usql_offset = 0,
+			ufld_alloc = 4 * ZBX_KIBIBYTE, ufld_offset = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -176,9 +169,9 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 	ufld = zbx_malloc(ufld, ufld_alloc);
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 7, "begin\n");
-	zbx_snprintf_alloc(&isql, &isql_alloc, &isql_offset, 7, "begin\n");
-	zbx_snprintf_alloc(&usql, &usql_alloc, &usql_offset, 7, "begin\n");
+	DBbegin_multiple_update(&dsql, &dsql_alloc, &dsql_offset);
+	DBbegin_multiple_update(&isql, &isql_alloc, &isql_offset);
+	DBbegin_multiple_update(&usql, &usql_alloc, &usql_offset);
 #endif
 
 	for (r = data; '\0' != *r;)
@@ -230,14 +223,14 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 
 			if (op == NODE_CONFIGLOG_OP_ADD && NULL != table->uniq)
 			{
-				zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 20 + ZBX_TABLENAME_LEN,
+				zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset,
 						"delete from %s where ", table->table);
 			}
 
 			while (NULL != r)
 			{
 				/* field name */
-				len = zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 
 				if (NULL == (field = DBget_field(table, buf)))
 				{
@@ -247,21 +240,21 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 				}
 
 				if (NODE_CONFIGLOG_OP_UPDATE == op)
-					zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset, len + 2, "%s=", buf);
+					zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset, "%s=", buf);
 				else	/* NODE_CONFIGLOG_OP_ADD */
-					zbx_snprintf_alloc(&ifld, &ifld_alloc, &ifld_offset, len + 2, "%s,", buf);
+					zbx_snprintf_alloc(&ifld, &ifld_alloc, &ifld_offset, "%s,", buf);
 
 				/* value type (ignored) */
 				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 
-				len = zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
 
 				if (0 == strcmp(buf, "NULL"))
 				{
 					if (NODE_CONFIGLOG_OP_UPDATE == op)
-						zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset, 6, "NULL,");
+						zbx_strcpy_alloc(&ufld, &ufld_alloc, &ufld_offset, "NULL,");
 					else	/* NODE_CONFIGLOG_OP_ADD */
-						zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset, 6, "NULL,");
+						zbx_strcpy_alloc(&ival, &ival_alloc, &ival_offset, "NULL,");
 					continue;
 				}
 
@@ -275,10 +268,9 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 								NULL != field->fk_table &&
 								0 == strcmp(table->table, field->fk_table))
 						{
-							zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-									ZBX_FIELDNAME_LEN + len + 3, "%s=%s,", field->name, buf);
-							zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-									6, "NULL,");
+							zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset, "%s=%s,",
+									field->name, buf);
+							zbx_strcpy_alloc(&ival, &ival_alloc, &ival_offset, "NULL,");
 							break;
 						}
 					case ZBX_TYPE_INT:
@@ -286,16 +278,15 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 					case ZBX_TYPE_FLOAT:
 						if (NODE_CONFIGLOG_OP_UPDATE == op)
 							zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-									len + 2, "%s,", buf);
+									"%s,", buf);
 						else	/* NODE_CONFIGLOG_OP_ADD */
 						{
 							zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-									len + 2, "%s,", buf);
+									"%s,", buf);
 
 							if (NULL != table->uniq && SUCCEED == str_in_list(table->uniq, field->name, ','))
 							{
 								zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset,
-										ZBX_FIELDNAME_LEN + len + 3,
 										"%s=%s and ", field->name, buf);
 								dnum++;
 							}
@@ -305,50 +296,49 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 						if ('\0' == *buf)
 						{
 							if (NODE_CONFIGLOG_OP_UPDATE == op)
-								zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-										4, "'',");
+								zbx_strcpy_alloc(&ufld, &ufld_alloc, &ufld_offset, "'',");
 							else	/* NODE_CONFIGLOG_OP_ADD */
-								zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-										4, "'',");
+								zbx_strcpy_alloc(&ival, &ival_alloc, &ival_offset, "'',");
 						}
 						else
 						{
 #if defined(HAVE_POSTGRESQL)
+							size_t	len;
+
 							len = zbx_hex2binary(buf);
-							len = zbx_pg_escape_bytea((u_char *)buf, len, &tmp, &tmp_alloc);
+							zbx_pg_escape_bytea((u_char *)buf, len, &tmp, &tmp_alloc);
+
 							if (NODE_CONFIGLOG_OP_UPDATE == op)
 								zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-										len + 4, "'%s',", tmp);
+										"'%s',", tmp);
 							else	/* NODE_CONFIGLOG_OP_ADD */
 								zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-										len + 4, "'%s',", tmp);
+										"'%s',", tmp);
 #else
 							if (NODE_CONFIGLOG_OP_UPDATE == op)
 								zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-										len + 4, "0x%s,", buf);
+										"0x%s,", buf);
 							else	/* NODE_CONFIGLOG_OP_ADD */
 								zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-										len + 4, "0x%s,", buf);
+										"0x%s,", buf);
 #endif
 						}
 						break;
 					default:	/* ZBX_TYPE_TEXT, ZBX_TYPE_CHAR */
 						zbx_hex2binary(buf);
 						value_esc = DBdyn_escape_string(buf);
-						len = strlen(value_esc);
 
 						if (NODE_CONFIGLOG_OP_UPDATE == op)
 							zbx_snprintf_alloc(&ufld, &ufld_alloc, &ufld_offset,
-									len + 4, "'%s',", value_esc);
+									"'%s',", value_esc);
 						else	/* NODE_CONFIGLOG_OP_ADD */
 						{
 							zbx_snprintf_alloc(&ival, &ival_alloc, &ival_offset,
-									len + 4, "'%s',", value_esc);
+									"'%s',", value_esc);
 
 							if (NULL != table->uniq && SUCCEED == str_in_list(table->uniq, field->name, ','))
 							{
 								zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset,
-										ZBX_FIELDNAME_LEN + len + 3,
 										"%s='%s' and ", field->name, value_esc);
 								dnum++;
 							}
@@ -369,7 +359,7 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 				}
 
 				dsql_offset -= 5;
-				zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 3, ";\n");
+				zbx_strcpy_alloc(&dsql, &dsql_alloc, &dsql_offset, ";\n");
 			}
 
 			if (0 != ifld_offset)
@@ -378,7 +368,6 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 				ival[--ival_offset] = '\0';
 
 				zbx_snprintf_alloc(&isql, &isql_alloc, &isql_offset,
-						50 + ZBX_TABLENAME_LEN + ZBX_FIELDNAME_LEN + ifld_offset + ival_offset,
 						"insert into %s (%s,%s) values (" ZBX_FS_UI64 ",%s);\n",
 						table->table, table->recid, ifld, recid, ival);
 			}
@@ -388,18 +377,16 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 				ufld[--ufld_offset] = '\0';
 
 				zbx_snprintf_alloc(&usql, &usql_alloc, &usql_offset,
-						42 + ZBX_TABLENAME_LEN + ZBX_FIELDNAME_LEN + ufld_offset,
 						"update %s set %s where %s=" ZBX_FS_UI64 ";\n",
 						table->table, ufld, table->recid, recid);
 			}
 
 			if (dsql_offset > ZBX_MAX_SQL_SIZE || isql_offset > ZBX_MAX_SQL_SIZE || usql_offset > ZBX_MAX_SQL_SIZE)
 			{
-#ifdef HAVE_ORACLE
-				zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 6, "end;\n");
-				zbx_snprintf_alloc(&isql, &isql_alloc, &isql_offset, 6, "end;\n");
-				zbx_snprintf_alloc(&usql, &usql_alloc, &usql_offset, 6, "end;\n");
-#endif
+				DBend_multiple_update(&dsql, &dsql_alloc, &dsql_offset);
+				DBend_multiple_update(&isql, &isql_alloc, &isql_offset);
+				DBend_multiple_update(&usql, &usql_alloc, &usql_offset);
+
 				if (dsql_offset > 16)
 					DBexecute("%s", dsql);
 				if (isql_offset > 16)
@@ -411,9 +398,9 @@ static void	process_updated_records(int nodeid, char *data, int sender_nodetype)
 				isql_offset = 0;
 				usql_offset = 0;
 #ifdef HAVE_ORACLE
-				zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 7, "begin\n");
-				zbx_snprintf_alloc(&isql, &isql_alloc, &isql_offset, 7, "begin\n");
-				zbx_snprintf_alloc(&usql, &usql_alloc, &usql_offset, 7, "begin\n");
+				DBbegin_multiple_update(&dsql, &dsql_alloc, &dsql_offset);
+				DBbegin_multiple_update(&isql, &isql_alloc, &isql_offset);
+				DBbegin_multiple_update(&usql, &usql_alloc, &usql_offset);
 #endif
 			}
 		}
@@ -427,11 +414,9 @@ next:
 			break;
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&dsql, &dsql_alloc, &dsql_offset, 6, "end;\n");
-	zbx_snprintf_alloc(&isql, &isql_alloc, &isql_offset, 6, "end;\n");
-	zbx_snprintf_alloc(&usql, &usql_alloc, &usql_offset, 6, "end;\n");
-#endif
+	DBend_multiple_update(&dsql, &dsql_alloc, &dsql_offset);
+	DBend_multiple_update(&isql, &isql_alloc, &isql_offset);
+	DBend_multiple_update(&usql, &usql_alloc, &usql_offset);
 
 	if (dsql_offset > 16)
 		DBexecute("%s", dsql);
@@ -469,7 +454,7 @@ static void	process_checksum(int nodeid, char *data, int sender_nodetype)
 {
 	const char	*__function_name = "process_checksum";
 	char		*r, *lf;
-	int		len, tmp_offset;
+	size_t		tmp_offset;
 	const ZBX_TABLE	*table = NULL;
 	zbx_uint64_t	recid;
 
@@ -502,9 +487,9 @@ static void	process_checksum(int nodeid, char *data, int sender_nodetype)
 			while (NULL != r)
 			{
 				/* field name */
-				len = zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
-	
-				zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, len + 2, "%s,", buf);
+				zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);
+
+				zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "%s,", buf);
 			}
 			if (tmp_offset != 0)
 				tmp[--tmp_offset] = '\0';

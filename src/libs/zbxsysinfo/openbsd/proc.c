@@ -83,7 +83,8 @@ retry:
 
 static void	collect_args(char **argv, int argc, char **args, size_t *args_alloc)
 {
-	int	i, args_offset, len;
+	int	i;
+	size_t	args_offset = 0;
 
 	if (0 == *args_alloc)
 	{
@@ -91,12 +92,8 @@ static void	collect_args(char **argv, int argc, char **args, size_t *args_alloc)
 		*args = zbx_malloc(*args, *args_alloc);
 	}
 
-	args_offset = 0;
 	for (i = 0; i < argc; i++)
-	{
-		len = (int)(strlen(argv[i]) + 2/* ' '+'\0' */);
-		zbx_snprintf_alloc(args, (int *)args_alloc, &args_offset, len, "%s ", argv[i]);
-	}
+		zbx_snprintf_alloc(args, args_alloc, &args_offset, "%s ", argv[i]);
 
 	if (0 != args_offset)
 		args_offset--; /* ' ' */

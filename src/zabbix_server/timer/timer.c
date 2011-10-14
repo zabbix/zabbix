@@ -48,7 +48,8 @@ static void	process_time_functions()
 {
 	const char		*__function_name = "process_time_functions";
 	char			*sql = NULL;
-	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0, i;
+	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			i;
 	DC_TRIGGER		*trigger;
 	DC_TRIGGER		*trigger_info = NULL;
 	zbx_vector_ptr_t	trigger_order;
@@ -67,9 +68,9 @@ static void	process_time_functions()
 	DBbegin();
 
 	sql = zbx_malloc(sql, sql_alloc);
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 	for (i = 0; i < trigger_order.values_num; i++)
 	{
 		trigger = (DC_TRIGGER *)trigger_order.values[i];
@@ -79,7 +80,7 @@ static void	process_time_functions()
 				trigger->new_value, trigger->new_error, &trigger->timespec, &trigger->add_event,
 				&trigger->value_changed))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 
 		zbx_free(trigger->expression);
@@ -87,9 +88,8 @@ static void	process_time_functions()
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
-#endif
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -468,7 +468,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
-	int		sql_alloc = 1024, sql_offset;
+	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset;
 	maintenance_t	*maintenances = NULL, *m;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -486,7 +486,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 				hm[i].host_maintenance_type != hm[i].maintenance_type || hm[i].host_maintenance_from == 0)
 		{
 			sql_offset = 0;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update hosts"
 					" set maintenanceid=" ZBX_FS_UI64 ","
 						"maintenance_status=%d,"
@@ -496,12 +496,12 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 					hm[i].maintenance_type);
 
 			if (hm[i].host_maintenance_from == 0)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-						",maintenance_from=%d",
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",maintenance_from=%d",
 						hm[i].maintenance_from);
+			}
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-					" where hostid=" ZBX_FS_UI64,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64,
 					hm[i].hostid);
 
 			DBexecute("%s", sql);
@@ -514,7 +514,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 	}
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hostid,maintenance_type,maintenance_from"
 			" from hosts"
 			" where status=%d"
@@ -524,7 +524,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 
 	if (NULL != ids && 0 != ids_num)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 16, " and not");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", ids, ids_num);
 	}
 
@@ -549,7 +549,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 	DBfree_result(result);
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"update hosts"
 			" set maintenanceid=null,"
 				"maintenance_status=%d,"

@@ -86,16 +86,14 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	DC_TRIGGER	*tr = NULL, *trigger;
 	int		tr_alloc = 0, tr_num = 0;
 	char		*sql = NULL;
-	int		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 	char		failed_type_buf[8];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* determine failed item type */
 	switch (type)
@@ -211,16 +209,14 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				trigger->type, trigger->value, trigger->value_flags, trigger->error, trigger->new_value, reason,
 				&trigger->timespec, &trigger->add_event, &trigger->value_changed))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 	DBfree_result(result);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -248,7 +244,8 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "activate_host";
 	char		sql[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
-	int		offset = 0, *errors_from, *disable_until;
+	size_t		offset = 0;
+	int		*errors_from, *disable_until;
 	unsigned char	*available;
 	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
 
@@ -319,8 +316,7 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
 
 		*available = HOST_AVAILABLE_TRUE;
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
-				fld_available, *available);
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,", fld_available, *available);
 
 		if (available == &item->host.available)
 			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, ts);
@@ -328,12 +324,8 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 
 	*errors_from = 0;
 	*disable_until = 0;
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-			"%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
-			fld_errors_from, *errors_from,
-			fld_disable_until, *disable_until,
-			fld_error,
-			item->host.hostid);
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
+			fld_errors_from, *errors_from, fld_disable_until, *disable_until, fld_error, item->host.hostid);
 
 	DBbegin();
 	DBexecute("%s", sql);
@@ -346,7 +338,8 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 {
 	const char	*__function_name = "deactivate_host";
 	char		sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
-	int		offset = 0, *errors_from, *disable_until;
+	size_t		offset = 0;
+	int		*errors_from, *disable_until;
 	unsigned char	*available;
 	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error;
 
@@ -419,8 +412,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 		*errors_from = ts->sec;
 		*disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
-				fld_errors_from, *errors_from);
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,", fld_errors_from, *errors_from);
 	}
 	else
 	{
@@ -452,8 +444,7 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 			}
 
 			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s='%s',",
-					fld_error, error_esc);
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s='%s',", fld_error, error_esc);
 			zbx_free(error_esc);
 		}
 	}
