@@ -87,6 +87,7 @@ table.gridTable tr td{
 fieldset {
 	border: 1px solid gray;
 	margin-bottom: 2px;
+	padding: 2px;
 }
 fieldset legend{
 	margin: 0.2em 0.5em;
