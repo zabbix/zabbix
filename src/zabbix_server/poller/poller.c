@@ -308,9 +308,16 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
 
-	if (HOST_AVAILABLE_TRUE != *available)
+	if (HOST_AVAILABLE_TRUE == *available)
 	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "Enabling %s host [%s]",
+		zbx_snprintf(error_msg, sizeof(error_msg), "resuming %s checks on host [%s]: connection restored",
+				zbx_host_type_string(item->type), item->host.host);
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
+	}
+	else if (HOST_AVAILABLE_TRUE != *available)
+	{
+		zbx_snprintf(error_msg, sizeof(error_msg), "enabling %s checks on host [%s]: host became available",
 				zbx_host_type_string(item->type), item->host.host);
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
@@ -407,8 +414,9 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 	if (0 == *errors_from)
 	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "%s host [%s]: first network error, wait for %d seconds",
-				zbx_host_type_string(item->type), item->host.host, CONFIG_UNREACHABLE_DELAY);
+		zbx_snprintf(error_msg, sizeof(error_msg), "%s item [%s] on host [%s] failed:"
+				" first network error, wait for %d seconds",
+				zbx_host_type_string(item->type), item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
 
 		*errors_from = ts->sec;
 		*disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
@@ -418,8 +426,9 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 	{
 		if (ts->sec - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
 		{
-			zbx_snprintf(error_msg, sizeof(error_msg), "%s host [%s]: another network error, wait for %d seconds",
-					zbx_host_type_string(item->type), item->host.host, CONFIG_UNREACHABLE_DELAY);
+			zbx_snprintf(error_msg, sizeof(error_msg), "%s item [%s] on host [%s] failed:"
+					" another network error, wait for %d seconds",
+					zbx_host_type_string(item->type), item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
 
 			*disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
 		}
@@ -429,7 +438,8 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 			if (HOST_AVAILABLE_FALSE != *available)
 			{
-				zbx_snprintf(error_msg, sizeof(error_msg), "Disabling %s host [%s]",
+				zbx_snprintf(error_msg, sizeof(error_msg), "temporarily disabling %s checks on host [%s]:"
+						" host unavailable",
 						zbx_host_type_string(item->type), item->host.host);
 
 				*available = HOST_AVAILABLE_FALSE;
@@ -440,7 +450,8 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 				if (available == &item->host.available)
 					update_key_status(item->host.hostid, HOST_AVAILABLE_FALSE, ts);
 
-				update_triggers_status_to_unknown(item->host.hostid, item->type, ts, "Agent is unavailable.");
+				update_triggers_status_to_unknown(item->host.hostid, item->type, ts,
+						"Agent is unavailable.");
 			}
 
 			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);

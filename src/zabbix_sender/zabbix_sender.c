@@ -137,7 +137,7 @@ static int	check_response(char *response)
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN];
 	char			info[MAX_STRING_LEN];
-	int			ret = SUCCEED;
+	int			ret;
 
 	ret = zbx_json_open(response, &jp);
 
@@ -158,7 +158,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	ZBX_THREAD_SENDVAL_ARGS	*sentdval_args;
 	zbx_sock_t		sock;
 	char			*answer = NULL;
-	int			tcp_ret = FAIL, ret = FAIL;
+	int			tcp_ret, ret = FAIL;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);

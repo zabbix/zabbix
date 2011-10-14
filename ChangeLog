@@ -264,6 +264,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4232] fixed unclear log messages when checks are temporarily enabled/disabled (dimir)
  - [ZBX-4221] fixed sorting by host in Configuration->Web (Vedmak)
  - [ZBX-4198] fixed items filter when filter by host name with multiple spaces (Vedmak)
  - [ZBX-4145] fixed images import script for PostgreSQL 9.1 and above (dimir)
