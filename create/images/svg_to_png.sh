@@ -13,8 +13,19 @@ pngcrushlog=pngcrush.log.txt
 pngcrushbin=pngcrush
 elementdir=elements
 pngcrushoutput=pngcrushoutput.txt
+inkscapelog=inkscape.log.txt
+
+crushpng() {
+			$pngcrushbin -brute -reduce -e .2.png "$1" >> $pngcrushoutput || exit 1
+			echo "$1 : $(echo "$(stat -c %s "${1%png}2.png")/$(stat -c %s "${1}")*100" | bc -l)" >> $pngcrushlog
+			mv "${1%png}2.png" "$1"
+}
 
 mkdir -p "$outputdir"
+
+> "$pngcrushoutput"
+> "$pngcrushoutput"
+> "$inkscapelog"
 
 svgelementcount=$(ls $elementdir | wc -l)
 
@@ -37,11 +48,9 @@ for svgfile in $elementdir/*.svg; do
 			} || {
 				dimension=height
 			}
-			inkscape --without-gui --export-$dimension=$size $svgfile --export-png="$pngoutfile" >> inkscape.log.txt || exit 1
+			inkscape --without-gui --export-$dimension=$size $svgfile --export-png="$pngoutfile" >> "$inkscapelog" || exit 1
 			echo -n " compress..."
-			$pngcrushbin -brute -reduce -e .2.png "$pngoutfile" >> $pngcrushoutput || exit 1
-			echo "$pngoutfile : $(echo "$(stat -c %s "${pngoutfile%png}2.png")/$(stat -c %s "${pngoutfile}")*100" | bc -l)" >> $pngcrushlog
-			mv "${pngoutfile%png}2.png" "$pngoutfile"
+			crushpng "$pngoutfile"
 		} || {
 			echo -n " skip $size..."
 		}
