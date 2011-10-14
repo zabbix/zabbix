@@ -79,13 +79,14 @@ table.gridTable tr td{
 
 .colorpickerLabel{
 	border: 1px solid black;
-	display: inline-block;
+	display: inline;
 	width: 10px;
 	height: 10px;
 }
 
 fieldset {
 	border: 1px solid gray;
+	margin-bottom: 2px;
 }
 fieldset legend{
 	margin: 0.2em 0.5em;

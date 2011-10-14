@@ -840,7 +840,7 @@
 //	sysmap.php
 	'S_HIDDEN'=>			_('Hidden'),
 	'S_SHOWN'=>				_('Shown'),
-	'S_LINKS'=>				_('Links'),
+	'S_URLS'=>				_('URLs'),
 	'S_LINK'=>				_('Link'),
 	'S_LABEL'=>				_('Label'),
 	'S_GO_TO'=>				_('Go to'),
