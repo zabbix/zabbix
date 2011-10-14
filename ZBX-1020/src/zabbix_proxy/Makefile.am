@@ -65,6 +65,6 @@ INCLUDE_DIR = "$(DESTDIR)@sysconfdir@/$(PROXY_CONFIG).d"
 EXSCRIPTS_DIR = "$(DESTDIR)@datarootdir@/zabbix/externalscripts"
 
 install-data-hook:
-	test -d $(INCLUDE_DIR) || $(MKDIR_P) $(INCLUDE_DIR)
-	test -d $(EXSCRIPTS_DIR) || $(MKDIR_P) $(EXSCRIPTS_DIR)
+	$(MKDIR_P) $(INCLUDE_DIR)
+	$(MKDIR_P) $(EXSCRIPTS_DIR)
 	test -f "$(DESTDIR)@sysconfdir@/$(PROXY_CONFIG)" || cp ../../conf/$(PROXY_CONFIG) "$(DESTDIR)@sysconfdir@"

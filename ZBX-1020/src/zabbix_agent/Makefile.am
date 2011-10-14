@@ -66,7 +66,7 @@ AGENT_INCLUDE_DIR = "$(DESTDIR)@sysconfdir@/$(AGENT_CONFIG).d"
 AGENTD_INCLUDE_DIR = "$(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG).d"
 
 install-data-hook:
-	test -d $(AGENT_INCLUDE_DIR) || $(MKDIR_P) $(AGENT_INCLUDE_DIR)
-	test -d $(AGENTD_INCLUDE_DIR) || $(MKDIR_P) $(AGENTD_INCLUDE_DIR)
+	$(MKDIR_P) $(AGENT_INCLUDE_DIR)
+	$(MKDIR_P) $(AGENTD_INCLUDE_DIR)
 	test -f "$(DESTDIR)@sysconfdir@/$(AGENT_CONFIG)" || cp ../../conf/$(AGENT_CONFIG) "$(DESTDIR)@sysconfdir@"
 	test -f "$(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG)" || cp ../../conf/$(AGENTD_CONFIG) "$(DESTDIR)@sysconfdir@"
