@@ -911,7 +911,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 {
 #define ZBX_BUF_LEN	ZBX_STAT_BUF_LEN * 8
 	ssize_t		nbytes, left, read_bytes, total_bytes;
-	int		allocated, offset;
+	size_t		allocated, offset;
 	zbx_uint64_t	expected_len;
 
 	ZBX_TCP_START();
@@ -1001,10 +1001,9 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 
 			/* fill dynamic buffer */
 			while (read_bytes < expected_len &&
-					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat) - 1)))
+					ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat))))
 			{
-				s->buf_stat[nbytes] = '\0';
-				zbx_snprintf_alloc(&(s->buf_dyn), &allocated, &offset, sizeof(s->buf_stat), "%s", s->buf_stat);
+				zbx_strncpy_alloc(&s->buf_dyn, &allocated, &offset, s->buf_stat, nbytes);
 				read_bytes += nbytes;
 
 				if (0 != (flags & ZBX_TCP_READ_UNTIL_CLOSE))

@@ -188,7 +188,7 @@ static void	process_trap(const char *addr, char *begin, char *end)
  ******************************************************************************/
 static void	parse_traps(char *buffer)
 {
-	char	*c, *line, *begin = NULL, *end = NULL, *addr;
+	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL;
 
 	c = line = buffer;
 

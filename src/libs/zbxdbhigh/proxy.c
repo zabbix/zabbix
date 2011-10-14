@@ -172,7 +172,8 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 {
 	const char	*__function_name = "get_proxyconfig_table";
 	char		*sql = NULL;
-	int		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, f, fld;
+	size_t		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		f, fld;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -184,7 +185,7 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "select t.%s", table->recid);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select t.%s", table->recid);
 
 	zbx_json_addstring(j, NULL, table->recid, ZBX_JSON_TYPE_STRING);
 
@@ -193,7 +194,7 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 		if (0 == (table->fields[f].flags & ZBX_PROXY))
 			continue;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, ",t.%s", table->fields[f].name);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",t.%s", table->fields[f].name);
 
 		zbx_json_addstring(j, NULL, table->fields[f].name, ZBX_JSON_TYPE_STRING);
 	}
@@ -202,14 +203,14 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 
 	zbx_json_addarray(j, "data");
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, " from %s t", table->table);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s t", table->table);
 
 	if (SUCCEED == str_in_list("globalmacro,regexps,expressions,config", table->table, ','))
 	{
 		char	*field_name;
 
 		field_name = zbx_dsprintf(NULL, "t.%s", table->recid);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " where 1=1" DB_NODE, DBnode_local(field_name));
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where 1=1" DB_NODE, DBnode_local(field_name));
 
 		zbx_free(field_name);
 	}
@@ -218,12 +219,12 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 		if (0 == hostids_num)
 			goto skip_data;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, " where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid", hostids, hostids_num);
 	}
 	else if (0 == strcmp(table->table, "items"))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				",hosts r where t.hostid=r.hostid"
 					" and r.proxy_hostid=" ZBX_FS_UI64
 					" and r.status in (%d,%d)"
@@ -240,14 +241,14 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	}
 	else if (0 == strcmp(table->table, "drules"))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" where t.proxy_hostid=" ZBX_FS_UI64
 					" and t.status=%d",
 				proxy_hostid, DRULE_STATUS_MONITORED);
 	}
 	else if (0 == strcmp(table->table, "dchecks"))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				",drules r where t.druleid=r.druleid"
 					" and r.proxy_hostid=" ZBX_FS_UI64
 					" and r.status=%d",
@@ -255,12 +256,12 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	}
 	else if (0 == strcmp(table->table, "groups"))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				",config r where t.groupid=r.discovery_groupid" DB_NODE,
 				DBnode_local("r.configid"));
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, " order by t.%s", table->recid);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by t.%s", table->recid);
 
 	result = DBselect("%s", sql);
 
@@ -307,7 +308,7 @@ static void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid,
 	zbx_uint64_t	hostid, *ids = NULL;
 	int		ids_alloc = 0, ids_num = 0;
 	char		*sql = NULL;
-	int		sql_alloc = 512, sql_offset;
+	size_t		sql_alloc = 512, sql_offset;
 
 	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
 
@@ -331,7 +332,7 @@ static void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid,
 	while (0 != ids_num)
 	{
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 45,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select templateid"
 				" from hosts_templates"
 				" where");
@@ -438,7 +439,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	zbx_uint64_t		recid, *new = NULL;
 	int			new_alloc = 100, new_num = 0, del_alloc = 100;
 	char			*sql = NULL;
-	int			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset;
+	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset;
 	DB_RESULT		result;
 	DB_ROW			row;
 
@@ -535,9 +536,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	p = NULL;
 	sql_offset = 0;
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the entries (lines 9, 14 and 19 in T1) */
 	{
@@ -555,20 +554,20 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 		if (0 != insert)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "insert into %s (", table->table);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "insert into %s (", table->table);
 
 			for (f = 0; f < field_count; f++)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "%s,", fields[f]->name);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s,", fields[f]->name);
 
 			sql_offset--;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, ") values (" ZBX_FS_UI64 ",", recid);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ") values (" ZBX_FS_UI64 ",", recid);
 		}
 		else if (1 == field_count)	/* only primary key given, no update needed */
 		{
 			continue;
 		}
 		else
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "update %s set ", table->table);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table->table);
 
 		f = 1;
 		while (NULL != (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), &is_null)))
@@ -583,10 +582,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			}
 
 			if (0 == insert)
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FIELDNAME_LEN + 2,
-						"%s=", fields[f]->name);
-			}
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s=", fields[f]->name);
 
 			if (0 != is_null)
 			{
@@ -596,7 +592,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 					goto db_error;
 				}
 
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "null,");
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "null,");
 			}
 			else
 			{
@@ -606,13 +602,11 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 					case ZBX_TYPE_UINT:
 					case ZBX_TYPE_ID:
 					case ZBX_TYPE_FLOAT:
-						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(buf) + 2,
-								"%s,", buf);
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s,", buf);
 						break;
 					default:
 						esc = DBdyn_escape_string(buf);
-						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(esc) + 4,
-								"'%s',", esc);
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s',", esc);
 						zbx_free(esc);
 				}
 			}
@@ -630,11 +624,11 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 		sql_offset--;
 		if (0 != insert)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 4, ");\n");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ");\n");
 		}
 		else
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " where %s=" ZBX_FS_UI64 ";\n",
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=" ZBX_FS_UI64 ";\n",
 					table->recid, recid);
 		}
 
@@ -642,9 +636,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			goto db_error;
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		if (ZBX_DB_OK > DBexecute("%s", sql))
@@ -697,7 +689,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 	zbx_vector_ptr_t	table_order;
 	const ZBX_TABLE		*table = NULL;
 	char 			*sql = NULL;
-	int 			sql_alloc = 512, sql_offset = 0;
+	size_t 			sql_alloc = 512, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -726,9 +718,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = table_order.values_num - 1; 0 <= i; i--)
 	{
@@ -742,10 +732,10 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 				break;
 			}
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "delete from %s where", table->table);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", table->table);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid,
 					delete_ids->ids, delete_ids->id_num);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
@@ -757,9 +747,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 
 	if (SUCCEED == ret)
 	{
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
-#endif
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			if (ZBX_DB_OK > DBexecute("%s", sql))
@@ -956,7 +944,8 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	struct zbx_json_parse	jp_data, jp_row;
 	const char		*p = NULL;
 	char			tmp[HOST_ERROR_LEN_MAX], *sql = NULL, *error_esc;
-	int			sql_alloc = 4096, sql_offset = 0, tmp_offset, no_data;
+	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int			tmp_offset, no_data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -974,9 +963,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 	DBbegin();
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the host entries */
 	{
@@ -989,37 +976,36 @@ void	process_host_availability(struct zbx_json_parse *jp)
 		tmp_offset = sql_offset;
 		no_data = 1;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32, "update hosts set ");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32, "available=%d,", atoi(tmp));
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,", atoi(tmp));
 			no_data = 0;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32, "snmp_available=%d,", atoi(tmp));
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,", atoi(tmp));
 			no_data = 0;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32, "ipmi_available=%d,", atoi(tmp));
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,", atoi(tmp));
 			no_data = 0;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_AVAILABLE, tmp, sizeof(tmp)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32, "jmx_available=%d,", atoi(tmp));
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,", atoi(tmp));
 			no_data = 0;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp)))
 		{
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(error_esc) + 16,
-					"error='%s',", error_esc);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "error='%s',", error_esc);
 			zbx_free(error_esc);
 			no_data = 0;
 		}
@@ -1027,8 +1013,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_SNMP_ERROR, tmp, sizeof(tmp)))
 		{
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(error_esc) + 16,
-					"snmp_error='%s',", error_esc);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_error='%s',", error_esc);
 			zbx_free(error_esc);
 			no_data = 0;
 		}
@@ -1036,8 +1021,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IPMI_ERROR, tmp, sizeof(tmp)))
 		{
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(error_esc) + 16,
-					"ipmi_error='%s',", error_esc);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_error='%s',", error_esc);
 			zbx_free(error_esc);
 			no_data = 0;
 		}
@@ -1045,8 +1029,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_JMX_ERROR, tmp, sizeof(tmp)))
 		{
 			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, strlen(error_esc) + 16,
-					"jmx_error='%s',", error_esc);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_error='%s',", error_esc);
 			zbx_free(error_esc);
 			no_data = 0;
 		}
@@ -1066,14 +1049,12 @@ void	process_host_availability(struct zbx_json_parse *jp)
 		}
 
 		sql_offset--;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 40, " where hostid=" ZBX_FS_UI64 ";\n", hostid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n", hostid);
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -1181,7 +1162,8 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid)
 static int	proxy_get_history_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zbx_uint64_t *lastid)
 {
 	const char	*__function_name = "proxy_get_history_data";
-	int		offset = 0, f, records = 0;
+	size_t		offset = 0;
+	int		f, records = 0;
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1832,10 +1814,9 @@ static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char 
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		search[23], *expr = NULL, *old_expr,
+	char		search[MAX_ID_LEN + 2], *expr = NULL, *old_expr,
 			*key = NULL, *replace = NULL;
-	size_t		sz_h, sz_k, sz_f, sz_p;
-	int		replace_alloc = 1024, replace_offset;
+	size_t		replace_alloc = 128, replace_offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, expression);
 
@@ -1857,14 +1838,10 @@ static char	*DBlld_expand_trigger_expression(zbx_uint64_t triggerid, const char 
 		if (NULL != jp_row && 0 != (ZBX_FLAG_DISCOVERY_CHILD & (unsigned char)atoi(row[5])))
 			substitute_discovery_macros(&key, jp_row);
 
-		sz_h = strlen(row[1]);
-		sz_k = strlen(key);
-		sz_f = strlen(row[3]);
-		sz_p = strlen(row[4]);
 		replace_offset = 0;
 
 		zbx_snprintf(search, sizeof(search), "{%s}", row[0]);
-		zbx_snprintf_alloc(&replace, &replace_alloc, &replace_offset, sz_h + sz_k + sz_f + sz_p + 7,
+		zbx_snprintf_alloc(&replace, &replace_alloc, &replace_offset,
 				"{%s:%s.%s(%s)}", row[1], key, row[3], row[4]);
 
 		old_expr = expr;
@@ -2043,7 +2020,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 			*description_proto_esc, *error_esc;
 	int		update_expression = 1, res = SUCCEED;
 	char		*sql = NULL;
-	int		sql_alloc = 1024, sql_offset = 0;
+	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
 			jp_row->end - jp_row->start + 1, jp_row->start);
@@ -2121,7 +2098,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 	sql = zbx_malloc(sql, sql_alloc);
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 + strlen(description_esc),
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct t.triggerid,t.expression"
 			" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
@@ -2131,7 +2108,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 			hostid, description_esc);
 
 	if (0 != new_triggerid)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and t.triggerid<>" ZBX_FS_UI64,
 				new_triggerid);
 
@@ -2155,15 +2132,11 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 		goto out;
 
 	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_triggerid)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 +
-				strlen(description_esc) +
-				strlen(comments_esc) + strlen(url_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update triggers"
 				" set description='%s',"
 					"priority=%d,"
@@ -2176,7 +2149,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 				comments_esc, url_esc, (int)type,
 				ZBX_FLAG_DISCOVERY_CREATED, new_triggerid);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(description_proto_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update trigger_discovery"
 				" set name='%s'"
 				" where triggerid=" ZBX_FS_UI64
@@ -2185,7 +2158,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 
 		if (1 == update_expression)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 + strlen(description_proto_esc),
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"delete from functions"
 					" where triggerid=" ZBX_FS_UI64 ";\n",
 					new_triggerid);
@@ -2198,8 +2171,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 
 		error_esc = DBdyn_escape_string("Trigger just added. No status update so far.");
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(description_esc) +
-				strlen(comments_esc) + strlen(url_esc) + strlen(error_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
 						"comments,url,type,value,value_flags,flags,error)"
@@ -2210,7 +2182,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 					TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN,
 					ZBX_FLAG_DISCOVERY_CREATED, error_esc);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(description_proto_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into trigger_discovery"
 					" (triggerdiscoveryid,triggerid,parent_triggerid,name)"
 				" values"
@@ -2253,8 +2225,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 			function_esc = DBdyn_escape_string(row[2]);
 			parameter_esc = DBdyn_escape_string(row[3]);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 +
-					strlen(function_esc) + strlen(parameter_esc),
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into functions"
 					" (functionid,itemid,triggerid,function,parameter)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ","
@@ -2277,7 +2248,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 
 			expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128 + strlen(expression_esc),
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update triggers set expression='%s' where triggerid=" ZBX_FS_UI64 ";\n",
 					expression_esc, new_triggerid);
 
@@ -2287,9 +2258,7 @@ static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_trigger
 		zbx_free(new_expression);
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == res)
 		DBexecute("%s", sql);
@@ -2433,8 +2402,8 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 			*name = NULL, *name_esc,
 			*snmp_oid = NULL, *snmp_oid_esc,
 			*sql = NULL;
-	int		sql_offset = 0, sql_alloc = 16384,
-			i, res = SUCCEED;
+	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		i, res = SUCCEED;
 	zbx_uint64_t	*appids = NULL, *rmids = NULL;
 	int		appids_alloc = 0, appids_num,
 			rmids_alloc = 0, rmids_num;
@@ -2505,7 +2474,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	sql = zbx_malloc(sql, sql_alloc);
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select itemid"
 			" from items"
 			" where hostid=" ZBX_FS_UI64
@@ -2513,7 +2482,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 			hostid, key_esc);
 
 	if (0 != new_itemid)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and itemid<>" ZBX_FS_UI64,
 				new_itemid);
 
@@ -2534,16 +2503,14 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	DBget_applications_by_itemid(parent_itemid, &appids, &appids_alloc, &appids_num);
 
 	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 == new_itemid)
 	{
 		new_itemid = DBget_maxid("items");
 		itemdiscoveryid = DBget_maxid("item_discovery");
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into items"
 					" (itemid,name,key_,hostid,type,value_type,data_type,"
 					"delay,delay_flex,history,trends,status,trapper_hosts,units,"
@@ -2566,7 +2533,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 				snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc, publickey_esc,
 				privatekey_esc, description_esc, interfaceid, ZBX_FLAG_DISCOVERY_CREATED);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(key_proto_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into item_discovery"
 					" (itemdiscoveryid,itemid,parent_itemid,key_)"
 				" values"
@@ -2577,7 +2544,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	{
 		DBget_applications_by_itemid(new_itemid, &rmids, &rmids_alloc, &rmids_num);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update items"
 					" set name='%s',"
 					"key_='%s',"
@@ -2621,7 +2588,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 				snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc, publickey_esc,
 				privatekey_esc, description_esc, interfaceid, ZBX_FLAG_DISCOVERY_CREATED, new_itemid);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(key_proto_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update item_discovery"
 				" set key_='%s'"
 				" where itemid=" ZBX_FS_UI64
@@ -2632,14 +2599,13 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 
 		if (0 != rmids_num)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 160,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"delete from items_applications"
 					" where itemid=" ZBX_FS_UI64
 						" and",
 					new_itemid);
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"applicationid", rmids, rmids_num);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", rmids, rmids_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 	}
 
@@ -2649,7 +2615,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 
 		for (i = 0; i < appids_num; i++)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 160,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into items_applications"
 					" (itemappid,itemid,applicationid)"
 					" values"
@@ -2661,9 +2627,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	zbx_free(rmids);
 	zbx_free(appids);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -2838,11 +2802,11 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 	const char		*__function_name = "DBlld_update_graph";
 
 	char			*sql = NULL, *key = NULL, *color_esc;
-	int			sql_alloc = 1024, sql_offset, i;
+	size_t			sql_alloc = 1024, sql_offset;
 	ZBX_GRAPH_ITEMS		*gitems = NULL, *chd_gitems = NULL;
 	int			gitems_alloc = 0, gitems_num = 0,
 				chd_gitems_alloc = 0, chd_gitems_num = 0,
-				res = SUCCEED;
+				res = SUCCEED, i;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		new_graphid = 0, graphdiscoveryid;
@@ -2906,7 +2870,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 	sql = zbx_malloc(sql, sql_alloc);
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct g.graphid"
 			" from graphs g,graphs_items gi,items i"
 			" where g.graphid=gi.graphid"
@@ -2916,9 +2880,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 			hostid, name_esc);
 
 	if (0 != new_graphid)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-				" and g.graphid<>" ZBX_FS_UI64,
-				new_graphid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and g.graphid<>" ZBX_FS_UI64, new_graphid);
 
 	result = DBselect("%s", sql);
 
@@ -2934,7 +2896,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 		goto out;
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select 0,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,"
 				"gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt,i.flags"
 			" from graphs_items gi,items i"
@@ -2962,7 +2924,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 		ZBX_GRAPH_ITEMS	*gitem;
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select gi.gitemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,"
 					"gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt,i.flags"
 				" from graphs_items gi,items i"
@@ -2988,13 +2950,11 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 	}
 
 	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_graphid)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update graphs"
 				" set name='%s',"
 					"width=%d,"
@@ -3021,7 +2981,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid),
 				ZBX_FLAG_DISCOVERY_CREATED, new_graphid);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(name_proto_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update graph_discovery"
 				" set name='%s'"
 				" where graphid=" ZBX_FS_UI64
@@ -3033,7 +2993,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 		new_graphid = DBget_maxid("graphs");
 		graphdiscoveryid = DBget_maxid("graph_discovery");
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into graphs"
 					" (graphid,name,width,height,yaxismin,yaxismax,show_work_period,"
 					"show_triggers,graphtype,show_legend,show_3d,percent_left,"
@@ -3048,7 +3008,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 				percent_left, percent_right, (int)ymin_type, (int)ymax_type,
 				DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid), ZBX_FLAG_DISCOVERY_CREATED);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256 + strlen(name_proto_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into graph_discovery"
 					" (graphdiscoveryid,graphid,parent_graphid,name)"
 				" values"
@@ -3062,7 +3022,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 
 		if (0 != gitems[i].gitemid)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update graphs_items"
 					" set drawtype=%d,"
 						"sortorder=%d,"
@@ -3085,7 +3045,7 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 		{
 			gitems[i].gitemid = DBget_maxid("graphs_items");
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into graphs_items"
 						" (gitemid,graphid,itemid,drawtype,sortorder,color,"
 						"yaxisside,calc_fnc,type,periods_cnt)"
@@ -3103,15 +3063,14 @@ static int	DBlld_update_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid,
 
 	for (i = 0; i < chd_gitems_num; i++)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"delete from graphs_items"
 				" where gitemid=" ZBX_FS_UI64 ";\n",
 				chd_gitems[i].gitemid);
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 	DBexecute("%s", sql);
 out:
 	zbx_free(key);

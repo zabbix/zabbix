@@ -45,10 +45,9 @@ static int	validate_template(zbx_uint64_t *templateids, int templateids_num, cha
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
-	int		sql_offset, sql_alloc = 256,
-			ret = SUCCEED;
+	size_t		sql_alloc = 256, sql_offset;
 	zbx_uint64_t	*ids = NULL, id;
-	int		ids_alloc = 0, ids_num;
+	int		ids_alloc = 0, ids_num, ret = SUCCEED;
 
 	if (templateids_num < 2)
 		return ret;
@@ -59,15 +58,12 @@ static int	validate_template(zbx_uint64_t *templateids, int templateids_num, cha
 	if (SUCCEED == ret)
 	{
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select name,count(*)"
 				" from applications"
 				" where");
-
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"hostid", templateids, templateids_num);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids, templateids_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				" group by name"
 				" having count(*)>1");
 
@@ -87,15 +83,12 @@ static int	validate_template(zbx_uint64_t *templateids, int templateids_num, cha
 	if (SUCCEED == ret)
 	{
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select key_,count(*)"
 				" from items"
 				" where");
-
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"hostid", templateids, templateids_num);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids, templateids_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				" group by key_"
 				" having count(*)>1");
 
@@ -116,14 +109,12 @@ static int	validate_template(zbx_uint64_t *templateids, int templateids_num, cha
 	{
 		/* select all linked graphs */
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct gi.graphid"
 				" from graphs_items gi,items i"
 				" where gi.itemid=i.itemid"
 					" and");
-
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"i.hostid", templateids, templateids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids, templateids_num);
 
 		result = DBselect("%s", sql);
 
@@ -140,15 +131,12 @@ static int	validate_template(zbx_uint64_t *templateids, int templateids_num, cha
 		if (ids_num > 1)
 		{
 			sql_offset = 0;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 					"select name,count(*)"
 					" from graphs"
 					" where");
-
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-					"graphid", ids, ids_num);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", ids, ids_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 					" group by name"
 					" having count(*)>1");
 
@@ -396,7 +384,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 	DB_ROW		trow;
 	DB_ROW		hrow;
 	char		*sql = NULL, *name_esc;
-	int		sql_offset, sql_alloc = 256;
+	size_t		sql_alloc = 256, sql_offset;
 	ZBX_GRAPH_ITEMS *gitems = NULL, *chd_gitems = NULL;
 	int		gitems_alloc = 0, gitems_num = 0,
 			chd_gitems_alloc = 0, chd_gitems_num = 0, res;
@@ -423,7 +411,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 		t_flags = (unsigned char)atoi(trow[2]);
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select 0,0,i.key_,gi.drawtype,gi.sortorder,"
 					"gi.color,gi.yaxisside,gi.calc_fnc,"
 					"gi.type,gi.periods_cnt,i.flags"
@@ -465,7 +453,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 			}
 
 			sql_offset = 0;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"select gi.gitemid,i.itemid,i.key_,"
 						"gi.drawtype,gi.sortorder,"
 						"gi.color,gi.yaxisside,"
@@ -947,73 +935,17 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
 static void	DBdelete_services_by_triggerids(zbx_uint64_t *triggerids, int triggerids_num)
 {
 	char	*sql = NULL;
-	int	sql_alloc = 256, sql_offset = 0;
+	size_t	sql_alloc = 256, sql_offset = 0;
 
 	if (0 == triggerids_num)
 		return;
 
-/*	-- CASCADE DELETE
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	serviceid;
-	char		*sql = NULL;
-	int		sql_offset = 0, sql_alloc = 256;
-
 	sql = zbx_malloc(sql, sql_alloc);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
-
-	result = DBselect(
-			"select serviceid"
-			" from services"
-			" where triggerid=" ZBX_FS_UI64,
-			triggerid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(serviceid, row[0]);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-				"delete from service_alarms"
-				" where serviceid=" ZBX_FS_UI64 ";\n",
-				serviceid);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-				"delete from services_links"
-				" where servicedownid=" ZBX_FS_UI64
-					" or serviceupid=" ZBX_FS_UI64 ";\n",
-				serviceid, serviceid);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-				"delete from services"
-				" where serviceid=" ZBX_FS_UI64 ";\n",
-				serviceid);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-				"delete from services_times"
-				" where serviceid=" ZBX_FS_UI64 ";\n",
-				serviceid);
-	}
-	DBfree_result(result);
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
-
-	if (sql_offset > 16)
-		DBexecute("%s", sql);
-
-	zbx_free(sql);
-*/
-	sql = zbx_malloc(sql, sql_alloc);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from services"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"triggerid", triggerids, triggerids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids, triggerids_num);
 
 	DBexecute("%s", sql);
 
@@ -1021,46 +953,6 @@ static void	DBdelete_services_by_triggerids(zbx_uint64_t *triggerids, int trigge
 
 	DBupdate_services_status_all();
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: DBdelete_sysmaps_element                                         *
- *                                                                            *
- * Purpose: delete specified map element                                      *
- *                                                                            *
- * Parameters: selementid - map element identificator from database           *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
- *                                                                            *
- ******************************************************************************/
-/*	-- CASCADE DELETE
-static void	DBdelete_sysmaps_element(zbx_uint64_t selementid)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	linkid;
-
-	result = DBselect(
-			"select linkid"
-			" from sysmaps_links"
-			" where " ZBX_FS_UI64 " in (selementid1,selementid2)",
-			selementid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(linkid, row[0]);
-		DBexecute("delete from sysmaps_links where linkid=" ZBX_FS_UI64, linkid);
-		DBexecute("delete from sysmaps_link_triggers where linkid=" ZBX_FS_UI64, linkid);
-	}
-	DBfree_result(result);
-
-	DBexecute("delete from sysmaps_elements where selementid=" ZBX_FS_UI64, selementid);
-}
-*/
 
 /******************************************************************************
  *                                                                            *
@@ -1080,40 +972,19 @@ static void	DBdelete_sysmaps_element(zbx_uint64_t selementid)
 static void	DBdelete_sysmaps_elements(int elementtype, zbx_uint64_t *elementids, int elementids_num)
 {
 	char	*sql = NULL;
-	int	sql_alloc = 256, sql_offset = 0;
+	size_t	sql_alloc = 256, sql_offset = 0;
 
 	if (0 == elementids_num)
 		return;
 
-/*	-- CASCADE DELETE
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	selementid;
-
-	result = DBselect(
-			"select distinct selementid"
-			" from sysmaps_elements"
-			" where elementtype=%d"
-				" and elementid=" ZBX_FS_UI64,
-			elementtype, elementid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(selementid, row[0]);
-
-		DBdelete_sysmaps_element(selementid);
-	}
-	DBfree_result(result);
-*/
 	sql = zbx_malloc(sql, sql_alloc);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from sysmaps_elements"
 			" where elementtype=%d"
 				" and",
 			elementtype);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"elementid", elementids, elementids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "elementid", elementids, elementids_num);
 
 	DBexecute("%s", sql);
 
@@ -1173,7 +1044,8 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, int *triggerids_num)
 {
 	char		*sql = NULL;
-	int		sql_alloc = 256, sql_offset, num, i;
+	size_t		sql_alloc = 256, sql_offset;
+	int		num, i;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
@@ -1187,12 +1059,11 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
 	{
 		num = *triggerids_num;
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select triggerid"
 				" from trigger_discovery"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"parent_triggerid", *triggerids, *triggerids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid", *triggerids, *triggerids_num);
 
 		result = DBselect("%s", sql);
 
@@ -1212,54 +1083,24 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
 		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, (*triggerids)[i]);
 
 	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from trigger_depends"
-			" where triggerid_down=" ZBX_FS_UI64 ";\n",
-			triggerid);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from trigger_depends"
-			" where triggerid_up=" ZBX_FS_UI64 ";\n",
-			triggerid);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from functions"
-			" where triggerid=" ZBX_FS_UI64 ";\n",
-			triggerid);
-*/
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from events"
 			" where source=%d"
 				" and object=%d"
 				" and",
 			EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"objectid", *triggerids, *triggerids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "objectid", *triggerids, *triggerids_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from sysmaps_link_triggers"
-			" where triggerid=" ZBX_FS_UI64 ";\n",
-			triggerid);
-*/
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from triggers"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"triggerid", *triggerids, *triggerids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", *triggerids, *triggerids_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
@@ -1290,7 +1131,7 @@ static void	DBdelete_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num)
 	zbx_uint64_t	*triggerids = NULL, triggerid;
 	int		triggerids_alloc = 0, triggerids_num = 0;
 	char		*sql = NULL;
-	int		sql_offset = 0, sql_alloc = 512;
+	size_t		sql_alloc = 512, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemids_num:%d",
 			__function_name, itemids_num);
@@ -1300,12 +1141,11 @@ static void	DBdelete_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num)
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct triggerid"
 			" from functions"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"itemid", itemids, itemids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
 
 	result = DBselect("%s", sql);
 
@@ -1344,7 +1184,8 @@ static void	DBdelete_history_by_itemids(zbx_uint64_t *itemids, int itemids_num)
 {
 	const char	*__function_name = "DBdelete_history_by_itemids";
 	char		*sql = NULL;
-	int		sql_offset = 0, sql_alloc = 65536, i;
+	size_t		sql_alloc = 64 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		i;
 #define	sql_st	"insert into housekeeper (housekeeperid,tablename,field,value)"	\
 		" values (" ZBX_FS_UI64 ",'%s','itemid'," ZBX_FS_UI64 ");\n"
 	zbx_uint64_t	housekeeperid;
@@ -1357,28 +1198,24 @@ static void	DBdelete_history_by_itemids(zbx_uint64_t *itemids, int itemids_num)
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	housekeeperid = DBget_maxid_num("housekeeper", 7 * itemids_num);
 
 	for (i = 0; i < itemids_num; i++)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192, sql_st, housekeeperid++, "history", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192, sql_st, housekeeperid++, "history_str", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192, sql_st, housekeeperid++, "history_uint", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192, sql_st, housekeeperid++, "history_log", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192, sql_st, housekeeperid++, "history_text", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192, sql_st, housekeeperid++, "trends", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192, sql_st, housekeeperid++, "trends_uint", itemids[i]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "history", itemids[i]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "history_str", itemids[i]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "history_uint", itemids[i]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "history_log", itemids[i]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "history_text", itemids[i]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "trends", itemids[i]);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "trends_uint", itemids[i]);
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -1408,7 +1245,8 @@ static void	DBdelete_graphs(zbx_uint64_t **graphids, int *graphids_alloc, int *g
 {
 	const char	*__function_name = "DBdelete_graphs";
 	char		*sql = NULL;
-	int		sql_alloc = 256, sql_offset, num;
+	size_t		sql_alloc = 256, sql_offset;
+	int		num;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	graphid;
@@ -1421,16 +1259,15 @@ static void	DBdelete_graphs(zbx_uint64_t **graphids, int *graphids_alloc, int *g
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	do /* add child graphs (auto-created) */
+	do	/* add child graphs (auto-created) */
 	{
 		num = *graphids_num;
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select graphid"
 				" from graph_discovery"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"parent_graphid", *graphids, *graphids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid", *graphids, *graphids_num);
 
 		result = DBselect("%s", sql);
 
@@ -1444,39 +1281,24 @@ static void	DBdelete_graphs(zbx_uint64_t **graphids, int *graphids_alloc, int *g
 	while (num != *graphids_num);
 
 	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete graph */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from screens_items"
 			" where resourcetype=%d"
 				" and",
 			SCREEN_RESOURCE_GRAPH);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"resourceid", *graphids, *graphids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", *graphids, *graphids_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-			"delete from graphs_items"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"graphid", graphids, graphids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
-*/
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from graphs"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"graphid", *graphids, *graphids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", *graphids, *graphids_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
@@ -1505,13 +1327,13 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
 {
 	const char	*__function_name = "DBdelete_items";
 	char		*sql = NULL;
-	int		sql_alloc = 256, sql_offset, num;
+	size_t		sql_alloc = 256, sql_offset;
+	int		num;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	itemid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemids_num:%d",
-			__function_name, *itemids_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemids_num:%d", __function_name, *itemids_num);
 
 	if (0 == *itemids_num)
 		return;
@@ -1522,12 +1344,11 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
 	{
 		num = *itemids_num;
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select itemid"
 				" from item_discovery"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"parent_itemid", *itemids, *itemids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid", *itemids, *itemids_num);
 
 		result = DBselect("%s", sql);
 
@@ -1544,59 +1365,34 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
 	DBdelete_history_by_itemids(*itemids, *itemids_num);
 
 	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-/* delete from screens_items */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+	/* delete from screens_items */
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from screens_items"
 				" where resourcetype in (%d,%d)"
 					" and",
 			SCREEN_RESOURCE_PLAIN_TEXT,
 			SCREEN_RESOURCE_SIMPLE_GRAPH);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"resourceid", *itemids, *itemids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", *itemids, *itemids_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-/* delete from graphs_items */
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-			"delete from graphs_items where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"itemid", itemids, itemids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
-*/
-
-/* delete from items_applications */
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-			"delete from items_applications where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"itemid", itemids, itemids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
-*/
-
-/* delete from profiles */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+	/* delete from profiles */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from profiles"
 			" where idx='web.favorite.graphids'"
 				" and source='itemid'"
 				" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"value_id", *itemids, *itemids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", *itemids, *itemids_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-/* delete from items */
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
+	/* delete from items */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from items where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"itemid", *itemids, *itemids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", *itemids, *itemids_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
@@ -1627,28 +1423,26 @@ static void	DBdelete_httptests(zbx_uint64_t *htids, int htids_num)
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
-	int		sql_offset, sql_alloc = 256;
+	size_t		sql_alloc = 256, sql_offset;
 	zbx_uint64_t	httpstepid, itemid;
 	zbx_uint64_t	*hsids = NULL, *itemids = NULL;
 	int		hsids_alloc = 0, hsids_num = 0,
 			itemids_alloc = 0, itemids_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() htids_num:%d",
-			__function_name, htids_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() htids_num:%d", __function_name, htids_num);
 
 	if (0 == htids_num)
 		return;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-/* httpstep's */
+	/* httpsteps */
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select httpstepid"
 			" from httpstep"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"httptestid", htids, htids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", htids, htids_num);
 
 	result = DBselect("%s", sql);
 
@@ -1659,14 +1453,13 @@ static void	DBdelete_httptests(zbx_uint64_t *htids, int htids_num)
 	}
 	DBfree_result(result);
 
-/* httpstepitem's */
+	/* httpstepitems */
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select itemid"
 			" from httpstepitem"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"httpstepid", hsids, hsids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid", hsids, hsids_num);
 
 	result = DBselect("%s", sql);
 
@@ -1680,12 +1473,11 @@ static void	DBdelete_httptests(zbx_uint64_t *htids, int htids_num)
 
 /* httptestitem's */
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select itemid"
 			" from httptestitem"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"httptestid", htids, htids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", htids, htids_num);
 
 	result = DBselect("%s", sql);
 
@@ -1698,50 +1490,9 @@ static void	DBdelete_httptests(zbx_uint64_t *htids, int htids_num)
 	DBfree_result(result);
 
 	sql_offset = 0;
-/*	-- CASCADE DELETE
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
-*/
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
-			"delete from httptest where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"httptestid", htids, htids_num);
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
-*/
-
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
-			"delete from httpstep where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"httptestid", htids, htids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
-*/
-
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
-			"delete from httpstepitem where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"httpstepid", hsids, hsids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
-*/
-
-/*	-- CASCADE DELETE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
-			"delete from httptestitem where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"httptestid", htids, htids_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
-*/
-
-/*	-- CASCADE DELETE
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
-*/
-
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httptest where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", htids, htids_num);
 	DBexecute("%s", sql);
 
 	DBdelete_items(&itemids, &itemids_alloc, &itemids_num);
@@ -1773,7 +1524,7 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
-	int		sql_offset, sql_alloc = 256;
+	size_t		sql_alloc = 256, sql_offset = 0;
 	zbx_uint64_t	*ids = NULL, applicationid;
 	int		ids_alloc = 0, ids_num = 0;
 
@@ -1782,13 +1533,11 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select applicationid,name"
 			" from httptest"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-			"applicationid", applicationids, applicationids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids, applicationids_num);
 
 	result = DBselect("%s", sql);
 
@@ -1805,39 +1554,24 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 	uint64_array_remove(applicationids, &applicationids_num, ids, ids_num);
 
 	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != applicationids_num)
 	{
-/*		-- CASCADE DELETE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-				"delete from items_applications where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
 				"applicationid", applicationids, applicationids_num);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
-*/
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-				"delete from applications where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"applicationid", applicationids, applicationids_num);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
 	if (0 != ids_num)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
-				"update applications set templateid=null where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"applicationid", ids, ids_num);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update applications set templateid=null where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", ids, ids_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
@@ -2065,7 +1799,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
-	int		sql_alloc = 256, sql_offset = 0;
+	size_t		sql_alloc = 256, sql_offset = 0;
 	zbx_uint64_t	itemid,	h_triggerid, functionid;
 	char		*old_expression = NULL,
 			*new_expression = NULL,
@@ -2081,9 +1815,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	description_esc = DBdyn_escape_string(description);
 
@@ -2106,7 +1838,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 			continue;
 
 		/* link not linked trigger with same description and expression */
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update triggers"
 				" set templateid=" ZBX_FS_UI64 ","
 					"flags=%d"
@@ -2129,9 +1861,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 		comments_esc = DBdyn_escape_string(comments);
 		url_esc = DBdyn_escape_string(url);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 +
-				strlen(description_esc) +
-				strlen(comments_esc) + strlen(url_esc),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
 						"comments,url,type,value,value_flags,templateid,flags)"
@@ -2170,7 +1900,6 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 				parameter_esc = DBdyn_escape_string(row[3]);
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						160 + strlen(function_esc) + strlen(parameter_esc),
 						"insert into functions"
 						" (functionid,itemid,triggerid,function,parameter)"
 						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ","
@@ -2201,7 +1930,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 		{
 			expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 96 + strlen(expression_esc),
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update triggers set expression='%s' where triggerid=" ZBX_FS_UI64 ";\n",
 					expression_esc, *new_triggerid);
 
@@ -2213,9 +1942,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 	else
 		*new_triggerid = 0;
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -2253,7 +1980,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
 			triggerid_down, triggerid_up,
 			triggerdepid;
 	char		*sql = NULL;
-	int		sql_alloc = 512, sql_offset;
+	size_t		sql_alloc = 512, sql_offset;
 
 	if (0 == trids_num)
 		return SUCCEED;
@@ -2263,7 +1990,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
 	hst_triggerids = zbx_malloc(hst_triggerids, alloc * sizeof(zbx_uint64_t));
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select triggerid,templateid"
 			" from triggers"
 			" where");
@@ -2290,7 +2017,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
 	DBfree_result(result);
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct td.triggerid_down,td.triggerid_up"
 			" from triggers t,trigger_depends td"
 			" where t.templateid in (td.triggerid_up,td.triggerid_down)"
@@ -2300,9 +2027,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
 	result = DBselect("%s", sql);
 
 	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2324,7 +2049,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
 		{
 			triggerdepid = DBget_maxid("trigger_depends");
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 160,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into trigger_depends"
 					" (triggerdepid,triggerid_down,triggerid_up)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ");\n",
@@ -2333,9 +2058,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
 	}
 	DBfree_result(result);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -2370,7 +2093,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	zbx_uint64_t	*graphids = NULL, graphid, hosttemplateid = 0;
 	int		graphids_alloc = 0, graphids_num = 0;
 	char		*sql = NULL;
-	int		sql_alloc = 256, sql_offset;
+	size_t		sql_alloc = 256, sql_offset;
 
 	result = DBselect("select hosttemplateid from hosts_templates"
 			" where hostid=" ZBX_FS_UI64
@@ -2413,12 +2136,11 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		sql = zbx_malloc(sql, sql_alloc);
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct graphid"
 				" from graphs_items"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"graphid", graphids, graphids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", graphids, graphids_num);
 
 		result = DBselect("%s", sql);
 
@@ -2467,8 +2189,8 @@ static int	DBcopy_template_applications(zbx_uint64_t hostid,
 	zbx_uint64_t	template_applicationid, applicationid;
 	char		*name_esc;
 	char		*sql = NULL;
-	int		sql_offset = 0, sql_alloc = 1024,
-			res = SUCCEED;
+	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	int		res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2483,9 +2205,7 @@ static int	DBcopy_template_applications(zbx_uint64_t hostid,
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2495,7 +2215,7 @@ static int	DBcopy_template_applications(zbx_uint64_t hostid,
 		{
 			ZBX_STR2UINT64(applicationid, row[2]);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update applications"
 					" set templateid=" ZBX_FS_UI64
 					" where applicationid=" ZBX_FS_UI64 ";\n",
@@ -2508,7 +2228,7 @@ static int	DBcopy_template_applications(zbx_uint64_t hostid,
 
 			name_esc = DBdyn_escape_string(row[1]);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 512,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into applications"
 						" (applicationid,hostid,name,templateid)"
 					" values"
@@ -2520,9 +2240,7 @@ static int	DBcopy_template_applications(zbx_uint64_t hostid,
 	}
 	DBfree_result(result);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -2563,8 +2281,8 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 			*snmpv3_privpassphrase_esc, *username_esc, *password_esc,
 			*publickey_esc, *privatekey_esc, *filter_esc, *description_esc;
 	char		*sql = NULL;
-	int		sql_offset = 0, sql_alloc = 16384,
-			i, res = SUCCEED;
+	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
+	int		i, res = SUCCEED;
 	zbx_uint64_t	*appids = NULL, *protoids = NULL;
 	int		appids_alloc = 0, appids_num,
 			protoids_alloc = 0, protoids_num = 0;
@@ -2611,9 +2329,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -2665,7 +2381,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		{
 			ZBX_STR2UINT64(itemid, row[35]);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update items"
 						" set name='%s',"
 						"type=%d,"
@@ -2746,7 +2462,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 
 			key_esc = DBdyn_escape_string(row[2]);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into items"
 						" (itemid,name,key_,hostid,type,value_type,data_type,"
 						"delay,delay_flex,history,trends,status,trapper_hosts,units,"
@@ -2837,7 +2553,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 
 			for (i = 0; i < appids_num; i++)
 			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 160,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"insert into items_applications"
 						" (itemappid,itemid,applicationid)"
 						" values"
@@ -2850,9 +2566,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	}
 	DBfree_result(result);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -2862,28 +2576,24 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		zbx_uint64_t	itemdiscoveryid;
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 160,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select i.itemid,r.itemid"
 				" from items i,item_discovery id,items r"
 				" where i.templateid=id.itemid"
 					" and id.parent_itemid=r.templateid"
-					" and"
-				);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"i.itemid", protoids, protoids_num);
+					" and");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", protoids, protoids_num);
 
 		result = DBselect("%s", sql);
 
 		sql_offset = 0;
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			itemdiscoveryid = DBget_maxid("item_discovery");
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 160,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into item_discovery"
 						" (itemdiscoveryid,itemid,parent_itemid)"
 					" values"
@@ -2894,9 +2604,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		}
 		DBfree_result(result);
 
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
@@ -3059,7 +2767,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 			i, res = SUCCEED;
 	zbx_uint64_t	hst_graphid, hst_gitemid;
 	char		*sql = NULL, *name_esc, *color_esc;
-	int		sql_alloc = 1024, sql_offset;
+	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3068,7 +2776,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 	name_esc = DBdyn_escape_string(name);
 
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 320,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select 0,dst.itemid,dst.key_,gi.drawtype,gi.sortorder,"
 				"gi.color,gi.yaxisside,gi.calc_fnc,"
 				"gi.type,gi.periods_cnt,i.flags"
@@ -3099,7 +2807,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 		ZBX_STR2UINT64(hst_graphid, row[0]);
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select gi.gitemid,i.itemid,i.key_,gi.drawtype,"
 					"gi.sortorder,gi.color,gi.yaxisside,"
 					"gi.calc_fnc,gi.type,gi.periods_cnt,i.flags"
@@ -3119,9 +2827,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 	DBfree_result(result);
 
 	sql_offset = 0;
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (GRAPH_YAXIS_TYPE_ITEM_VALUE == ymin_type)
 		ymin_itemid = DBget_same_itemid(hostid, ymin_itemid);
@@ -3135,7 +2841,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 
 	if (0 != hst_graphid)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update graphs"
 				" set name='%s',"
 					"width=%d,"
@@ -3167,7 +2873,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 		{
 			color_esc = DBdyn_escape_string(gitems[i].color);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update graphs_items"
 					" set drawtype=%d,"
 						"sortorder=%d,"
@@ -3193,7 +2899,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 	{
 		hst_graphid = DBget_maxid("graphs");
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into graphs"
 				" (graphid,name,width,height,yaxismin,yaxismax,templateid,"
 				"show_work_period,show_triggers,graphtype,show_legend,"
@@ -3214,7 +2920,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 		{
 			color_esc = DBdyn_escape_string(gitems[i].color);
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into graphs_items (gitemid,graphid,itemid,drawtype,"
 					"sortorder,color,yaxisside,calc_fnc,type,periods_cnt)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64
@@ -3231,9 +2937,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 
 	zbx_free(name_esc);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -3441,10 +3145,10 @@ int	DBdelete_host(zbx_uint64_t hostid)
 	zbx_uint64_t	*graphids = NULL, *itemids = NULL,
 			*htids = NULL;
 	char		*sql = NULL;
+	size_t		sql_alloc = 128, sql_offset = 0;
 	int		graphids_alloc = 0, graphids_num = 0,
 			itemids_alloc = 0, itemids_num = 0,
-			htids_alloc = 0, htids_num = 0,
-			sql_alloc = 128, sql_offset = 0;
+			htids_alloc = 0, htids_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -3506,12 +3210,11 @@ int	DBdelete_host(zbx_uint64_t hostid)
 	if (graphids_num != 0)
 	{
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct graphid"
 				" from graphs_items"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
-				"graphid", graphids, graphids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", graphids, graphids_num);
 
 		result = DBselect("%s", sql);
 

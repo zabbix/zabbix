@@ -21,12 +21,15 @@
 
 static char	data_static[ZBX_MAX_B64_LEN];
 
-/* Get DATA from <tag>DATA</tag> */
-int xml_get_data_dyn(const char *xml, const char *tag, char **data)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get DATA from <tag>DATA</tag>                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	xml_get_data_dyn(const char *xml, const char *tag, char **data)
 {
-	int	len;
+	size_t	len, sz;
 	char	*start, *end;
-	size_t	sz;
 
 	sz = sizeof(data_static);
 
@@ -44,7 +47,7 @@ int xml_get_data_dyn(const char *xml, const char *tag, char **data)
 	start += len;
 	len = end - start;
 
-	if (len > (int)sz - 1)
+	if (len > sz - 1)
 		*data = zbx_malloc(*data, len + 1);
 	else
 		*data = data_static;

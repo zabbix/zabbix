@@ -381,7 +381,7 @@ char *zbx_strerror(int errnum)
 char *strerror_from_system(unsigned long error)
 {
 #ifdef _WINDOWS
-	int		offset = 0;
+	size_t		offset = 0;
 	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
 	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! Not thread-safe for Win32 */
 
@@ -409,7 +409,7 @@ char *strerror_from_system(unsigned long error)
 #ifdef _WINDOWS
 char	*strerror_from_module(unsigned long error, LPCTSTR module)
 {
-	int		offset = 0;
+	size_t		offset = 0;
 	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
 	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];	/* !!! Attention: static !!! not thread-safe for Win32 */
 	char		*strings[2];
