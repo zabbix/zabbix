@@ -721,7 +721,7 @@ class CMaintenance extends CZBXAPI {
 			else {
 				foreach ($maintenance['timeperiods'] as $i => $currentTimePeriod) {
 					// if records are not completely identical
-					if($currentTimePeriod['timeperiod_type'] != $timeperiods[$i]['timeperiod_type']
+					if ($currentTimePeriod['timeperiod_type'] != $timeperiods[$i]['timeperiod_type']
 							|| $currentTimePeriod['every'] != $timeperiods[$i]['every']
 							|| $currentTimePeriod['month'] != $timeperiods[$i]['month']
 							|| $currentTimePeriod['dayofweek'] != $timeperiods[$i]['dayofweek']
@@ -772,7 +772,7 @@ class CMaintenance extends CZBXAPI {
 		$insertHosts = array();
 		$insertGroups = array();
 
-		foreach ($maintenances as $mnum => $maintenance) {
+		foreach ($maintenances as $maintenance) {
 			// putting apart those host<->maintenance connections that should be inserted, deleted and not changed
 			// $hostDiff['first'] - new hosts, that should be inserted
 			// $hostDiff['second'] - hosts, that should be deleted
@@ -844,10 +844,9 @@ class CMaintenance extends CZBXAPI {
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => true
 			);
-			$del_maintenances = $this->get($options);
-
-			foreach ($maintenanceids as $snum => $maintenanceid) {
-				if (!isset($del_maintenances[$maintenanceid])) {
+			$maintenances = $this->get($options);
+			foreach ($maintenanceids as $maintenanceid) {
+				if (!isset($maintenances[$maintenanceid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 				}
 			}
@@ -863,6 +862,18 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			$mid_cond = array('maintenanceid' => $maintenanceids);
+
+			// remove maintenanceid from hosts table
+			$options = array(
+				'maintenanceids' => $maintenanceids,
+				'real_hosts' => 1,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$hosts = API::Host()->get($options);
+			foreach ($hosts as $host) {
+				DBexecute('UPDATE hosts h SET h.maintenanceid=null WHERE h.hostid='.$host['hostid']);
+			}
+
 			DB::delete('timeperiods', array('timeperiodid' => $timeperiodids));
 			DB::delete('maintenances_windows', $mid_cond);
 			DB::delete('maintenances_hosts', $mid_cond);
