@@ -584,7 +584,7 @@ include_once('include/page_header.php');
 					array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
 					array('field' => 'ns', 'order' => ZBX_SORT_DOWN)
 				);
-				ArraySorter::sort($data['conditions'], $sortFields);
+				ArraySorter::sort($events, $sortFields);
 
 				$csv_disabled = zbx_empty($events);
 
