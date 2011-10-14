@@ -399,8 +399,6 @@ require_once('include/views/js/general.script.confirm.js.php');
 			'select_acknowledges' => API_OUTPUT_COUNT,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),
-			'sortfield' => 'eventid',
-			'sortorder' => ZBX_SORT_DOWN,
 			'nopermissions' => true,
 			//'limit' => $config['event_show_max']
 		);
@@ -415,7 +413,11 @@ require_once('include/views/js/general.script.confirm.js.php');
 		}
 
 		$events = API::Event()->get($ev_options);
-		order_result($events, 'clock', ZBX_SORT_DOWN);
+		$sortFields = array(
+			array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
+			array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
+		);
+		ArraySorter::sort($events, $sortFields);
 
 		foreach($events as $enum => $event){
 			$triggers[$event['objectid']]['events'][] = $event;
