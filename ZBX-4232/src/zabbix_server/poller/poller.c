@@ -395,7 +395,7 @@ static void	activate_host(DC_ITEM *item, int now)
 
 	if (HOST_AVAILABLE_TRUE == *available)
 	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "%s checks on host [%s]: connection restored",
+		zbx_snprintf(error_msg, sizeof(error_msg), "resuming %s checks on host [%s]: connection restored",
 				type, item->host.host);
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
@@ -403,7 +403,7 @@ static void	activate_host(DC_ITEM *item, int now)
 	}
 	else if (HOST_AVAILABLE_TRUE != *available)
 	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "enabling %s checks on host [%s]",
+		zbx_snprintf(error_msg, sizeof(error_msg), "enabling %s checks on host [%s]: host bacame available",
 				type, item->host.host);
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
