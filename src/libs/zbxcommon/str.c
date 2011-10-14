@@ -2475,7 +2475,7 @@ const char	*zbx_host_type_string(zbx_item_type_t item_type)
 	switch (item_type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			return "Zabbix";
+			return "Zabbix agent";
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
 		case ITEM_TYPE_SNMPv3:
