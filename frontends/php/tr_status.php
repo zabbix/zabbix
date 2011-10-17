@@ -555,7 +555,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 				$menus = "[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 			}
 
-			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+			$menus.= "[".zbx_jsvalue(S_URLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger_host['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 			$menus = rtrim($menus,',');

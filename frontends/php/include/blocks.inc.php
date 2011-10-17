@@ -935,7 +935,7 @@ function make_latest_issues(array $filter = array()) {
 			$thosts_cache[$hinventory['hostid']] = $hinventory;
 		}
 
-		$menus.= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+		$menus.= "['"._('Go to')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=".$group['groupid'].'&hostid='.$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		if(!empty($hinventory['inventory']))
 			$menus.= "['".S_HOST_INVENTORIES."',\"javascript: redirect('hostinventories.php?hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
