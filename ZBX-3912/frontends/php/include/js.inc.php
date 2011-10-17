@@ -291,10 +291,10 @@ function insert_javascript_for_visibilitybox() {
 				obj = [document.getElementById(obj_name)];
 			}
 			if (obj.length <= 0 || is_null(obj[0])) {
-				throw "'._('Can not find objects with name').' [" + obj_name +"]";
+				throw "'._('Cannot find objects with name').' [" + obj_name +"]";
 			}
 
-			for (i = obj.length-1; i >= 0; i--) {
+			for (i = obj.length - 1; i >= 0; i--) {
 				if (replace_to && replace_to != "") {
 					if (obj[i].originalObject) {
 						var old_obj = obj[i].originalObject;
@@ -308,7 +308,7 @@ function insert_javascript_for_visibilitybox() {
 							new_obj.setAttribute("id", obj[i].id);
 						}
 						catch(e) {
-							throw "'._('Can not create new element').'";
+							throw "'._('Cannot create new element').'";
 						}
 						new_obj.style.textDecoration = "none";
 						new_obj.innerHTML = replace_to;
@@ -349,7 +349,7 @@ function alert($msg) {
 
 function insert_js_function($fnct_name) {
 	switch ($fnct_name) {
-		case 'add_item_variable' :
+		case 'add_item_variable':
 			insert_js('
 				function add_item_variable(s_formname, x_value) {
 					if (add_variable(null, "itemid[" + x_value + "]", x_value, s_formname, window.opener.document)) {
