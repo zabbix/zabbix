@@ -1693,7 +1693,6 @@ COpt::memoryPick();
 			$newTrigger['expression'] = $trigger['expression'];
 
 			$expressionData = new CTriggerExpression($trigger);
-
 			// replace template separately in each expression, only in beginning (host part)
 			foreach ($expressionData->expressions as $expr) {
 				$newExpr = '';
