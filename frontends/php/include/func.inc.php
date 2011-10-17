@@ -19,297 +19,295 @@
 **/
 ?>
 <?php
-
 /************ REQUEST ************/
-function redirect($url){
+function redirect($url) {
 	zbx_flush_post_cookies();
-
 	$curl = new Curl($url);
 	$curl->setArgument('sid', null);
 	header('Location: '.$curl->getUrl());
 	exit();
 }
 
-function jsRedirect($url,$timeout=null){
+function jsRedirect($url, $timeout = null) {
 	zbx_flush_post_cookies();
 
 	$script = '';
-	if( is_numeric($timeout) ) {
-		$script.='setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
+	if (is_numeric($timeout)) {
+		$script .= 'setTimeout(\'window.location="'.$url.'"\','.($timeout * 1000).')';
 	}
 	else {
-		$script.='window.location.replace("'.$url.'");';
+		$script .= 'window.location.replace("'.$url.'");';
 	}
 	insert_js($script);
 }
 
-function get_request($name, $def=NULL){
+function get_request($name, $def = null) {
 	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
 }
-/************ END REQUEST ************/
 
 /************ COOKIES ************/
-function get_cookie($name, $default_value=null){
-	if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
-return $default_value;
+function get_cookie($name, $default_value = null) {
+	if (isset($_COOKIE[$name])) {
+		return $_COOKIE[$name];
+	}
+	return $default_value;
 }
 
-function zbx_setcookie($name, $value, $time=null){
-	setcookie($name, $value, isset($time) ? $time : (0));
+function zbx_setcookie($name, $value, $time = null) {
+	setcookie($name, $value, isset($time) ? $time : 0);
 	$_COOKIE[$name] = $value;
 }
 
-function zbx_unsetcookie($name){
+function zbx_unsetcookie($name) {
 	zbx_setcookie($name, null, -99999);
 	unset($_COOKIE[$name]);
 }
 
-function zbx_flush_post_cookies($unset=false){
+function zbx_flush_post_cookies($unset = false) {
 	global $ZBX_PAGE_COOKIES;
 
-	if(isset($ZBX_PAGE_COOKIES)){
-		foreach($ZBX_PAGE_COOKIES as $cookie){
-			if($unset)
+	if (isset($ZBX_PAGE_COOKIES)) {
+		foreach ($ZBX_PAGE_COOKIES as $cookie) {
+			if ($unset) {
 				zbx_unsetcookie($cookie[0]);
-			else
+			}
+			else {
 				zbx_setcookie($cookie[0], $cookie[1], $cookie[2]);
+			}
 		}
 		unset($ZBX_PAGE_COOKIES);
 	}
 }
 
-function zbx_set_post_cookie($name, $value, $time=null){
+function zbx_set_post_cookie($name, $value, $time = null) {
 	global $ZBX_PAGE_COOKIES;
 
-	$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time)?$time:0);
+	$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : 0);
 }
-
-/************ END COOKIES ************/
 
 /************* DATE *************/
-function getMonthCaption($num){
-	switch($num){
-		case 1: $month = S_JANUARY; break;
-		case 2: $month = S_FEBRUARY; break;
-		case 3: $month = S_MARCH; break;
-		case 4: $month = S_APRIL; break;
-		case 5: $month = S_MAY; break;
-		case 6: $month = S_JUNE; break;
-		case 7: $month = S_JULY; break;
-		case 8: $month = S_AUGUST; break;
-		case 9: $month = S_SEPTEMBER; break;
-		case 10: $month = S_OCTOBER; break;
-		case 11: $month = S_NOVEMBER; break;
-		case 12: $month = S_DECEMBER; break;
-		default: $month = S_CONFIG_WARNING_WRONG_MONTH_PART1.SPACE.$num.SPACE.S_CONFIG_WARNING_WRONG_MONTH_PART2;
+function getMonthCaption($num) {
+	switch ($num) {
+		case 1: return _('January');
+		case 2: return _('February');
+		case 3: return _('March');
+		case 4: return _('April');
+		case 5: return _('May');
+		case 6: return _('June');
+		case 7: return _('July');
+		case 8: return _('August');
+		case 9: return _('September');
+		case 10: return _('October');
+		case 11: return _('November');
+		case 12: return _('December');
 	}
-
-return $month;
+	return _s('[Wrong value for month: "%s" ]', $num);
 }
 
-function getDayOfWeekCaption($num){
-	switch($num){
-		case 1: $day = S_MONDAY; break;
-		case 2: $day = S_TUESDAY; break;
-		case 3: $day = S_WEDNESDAY; break;
-		case 4: $day = S_THURSDAY; break;
-		case 5: $day = S_FRIDAY; break;
-		case 6: $day = S_SATURDAY; break;
-		case 7: $day = S_SUNDAY; break;
-		default: $day = S_CONFIG_WARNING_WRONG_DOW_PART1.SPACE.$num.SPACE.S_CONFIG_WARNING_WRONG_DOW_PART2;
+function getDayOfWeekCaption($num) {
+	switch ($num) {
+		case 1: return _('Monday');
+		case 2: return _('Tuesday');
+		case 3: return _('Wednesday');
+		case 4: return _('Thursday');
+		case 5: return _('Friday');
+		case 6: return _('Saturday');
+		case 7: return _('Sunday');
 	}
-
-return $day;
+	return _s('[Wrong value for day: "%s" ]', $num);
 }
-/* function:
- *	zbx_date2str
- *
- * description:
- *	Convert timestamp to string representation. Retun 'Never' if 0.
- *
- * author: Alexei Vladishev
- */
-function zbx_date2str($format, $value = null){
+
+// Convert timestamp to string representation. Retun 'Never' if 0.
+function zbx_date2str($format, $value = null) {
 	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
 
-	if(is_null($value)) $value = time();
-	else if(!$value) return S_NEVER;
+	if (is_null($value)) {
+		$value = time();
+	}
+	elseif (!$value) {
+		return _('Never');
+	}
 
-	if(!is_array($weekdaynames)) {
+	if (!is_array($weekdaynames)) {
 		$weekdaynames = array(
-					0 => S_WEEKDAY_SUNDAY_SHORT,
-					1 => S_WEEKDAY_MONDAY_SHORT,
-					2 => S_WEEKDAY_TUESDAY_SHORT,
-					3 => S_WEEKDAY_WEDNESDAY_SHORT,
-					4 => S_WEEKDAY_THURSDAY_SHORT,
-					5 => S_WEEKDAY_FRIDAY_SHORT,
-					6 => S_WEEKDAY_SATURDAY_SHORT);
+			0 => _('Sun'),
+			1 => _('Mon'),
+			2 => _('Tue'),
+			3 => _('Wed'),
+			4 => _('Thu'),
+			5 => _('Fri'),
+			6 => _('Sat')
+		);
 	}
 
-	if(!is_array($weekdaynameslong)) {
+	if (!is_array($weekdaynameslong)) {
 		$weekdaynameslong = array(
-					0 => S_WEEKDAY_SUNDAY_LONG,
-					1 => S_WEEKDAY_MONDAY_LONG,
-					2 => S_WEEKDAY_TUESDAY_LONG,
-					3 => S_WEEKDAY_WEDNESDAY_LONG,
-					4 => S_WEEKDAY_THURSDAY_LONG,
-					5 => S_WEEKDAY_FRIDAY_LONG,
-					6 => S_WEEKDAY_SATURDAY_LONG);
+			0 => _('Sunday'),
+			1 => _('Monday'),
+			2 => _('Tuesday'),
+			3 => _('Wednesday'),
+			4 => _('Thursday'),
+			5 => _('Friday'),
+			6 => _('Saturday')
+		);
 	}
 
-	if(!is_array($months)) {
+	if (!is_array($months)) {
 		$months = array(
-				1 => S_MONTH_JANUARY_SHORT,
-				2 => S_MONTH_FEBRUARY_SHORT,
-				3 => S_MONTH_MARCH_SHORT,
-				4 => S_MONTH_APRIL_SHORT,
-				5 => S_MONTH_MAY_SHORT,
-				6 => S_MONTH_JUNE_SHORT,
-				7 => S_MONTH_JULY_SHORT,
-				8 => S_MONTH_AUGUST_SHORT,
-				9 => S_MONTH_SEPTEMBER_SHORT,
-				10 => S_MONTH_OCTOBER_SHORT,
-				11 => S_MONTH_NOVEMBER_SHORT,
-				12 => S_MONTH_DECEMBER_SHORT);
+			1 => _('Jan'),
+			2 => _('Feb'),
+			3 => _('Mar'),
+			4 => _('Apr'),
+			5 => _('May'),
+			6 => _('Jun'),
+			7 => _('Jul'),
+			8 => _('Aug'),
+			9 => _('Sep'),
+			10 => _('Oct'),
+			11 => _('Nov'),
+			12 => _('Dec')
+		);
 	}
 
-	if(!is_array($monthslong)) {
+	if (!is_array($monthslong)) {
 		$monthslong = array(
-					1 => S_MONTH_JANUARY_LONG,
-					2 => S_MONTH_FEBRUARY_LONG,
-					3 => S_MONTH_MARCH_LONG,
-					4 => S_MONTH_APRIL_LONG,
-					5 => S_MONTH_MAY_LONG,
-					6 => S_MONTH_JUNE_LONG,
-					7 => S_MONTH_JULY_LONG,
-					8 => S_MONTH_AUGUST_LONG,
-					9 => S_MONTH_SEPTEMBER_LONG,
-					10 => S_MONTH_OCTOBER_LONG,
-					11 => S_MONTH_NOVEMBER_LONG,
-					12 => S_MONTH_DECEMBER_LONG);
+			1 => _('January'),
+			2 => _('February'),
+			3 => _('March'),
+			4 => _('April'),
+			5 => _('May'),
+			6 => _('June'),
+			7 => _('July'),
+			8 => _('August'),
+			9 => _('September'),
+			10 => _('October'),
+			11 => _('November'),
+			12 => _('December')
+		);
 	}
 
 	$rplcs = array(
-		'l' => $weekdaynameslong[date('w',$value)],
-		'F' => $monthslong[date('n',$value)],
-		'D' => $weekdaynames[date('w',$value)],
-		'M' => $months[date('n',$value)]
+		'l' => $weekdaynameslong[date('w', $value)],
+		'F' => $monthslong[date('n', $value)],
+		'D' => $weekdaynames[date('w', $value)],
+		'M' => $months[date('n', $value)]
 	);
 
 	$output = '';
 	$part = '';
 	$length = zbx_strlen($format);
-	for($i = 0; $i < $length; $i++) {
-		$pchar = $i > 0 ? zbx_substr($format, $i-1, 1) : '';
+	for ($i = 0; $i < $length; $i++) {
+		$pchar = ($i > 0) ? zbx_substr($format, $i - 1, 1) : '';
 		$char = zbx_substr($format, $i, 1);
 
-		if(($pchar != '\\') && isset($rplcs[$char])) {
+		if ($pchar != '\\' && isset($rplcs[$char])) {
 			$output .= (zbx_strlen($part) ? date($part, $value) : '').$rplcs[$char];
 			$part = '';
 		}
-		else{
+		else {
 			$part .= $char;
 		}
 	}
-
 	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
-
-return $output;
+	return $output;
 }
 
-/* function:
- *	zbx_date2age
- *
- * description:
- *	Calculate and convert timestamp to string representation.
- *
- * author: Aly
- */
-function zbx_date2age($start_date, $end_date = 0, $utime = false){
-	if(!$utime){
+// calculate and convert timestamp to string representation
+function zbx_date2age($start_date, $end_date = 0, $utime = false) {
+	if (!$utime) {
 		$start_date = date('U', $start_date);
-		if($end_date)
+		if ($end_date) {
 			$end_date = date('U', $end_date);
-		else
+		}
+		else {
 			$end_date = time();
+		}
 	}
-
 	return convertUnitsS(abs($end_date - $start_date));
 }
 
-function zbxDateToTime($strdate){
-	if(6 == sscanf($strdate, '%04d%02d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes, $seconds))
-		return mktime($hours,$minutes,$seconds,$month,$date,$year);
-	else
+function zbxDateToTime($strdate) {
+	if (6 == sscanf($strdate, '%04d%02d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes, $seconds)) {
+		return mktime($hours, $minutes, $seconds, $month, $date, $year);
+	}
+	else {
 		return time();
+	}
 }
-/************* END DATE *************/
+
+function validateMaxTime($time) {
+	if ($time > 2147464800) { // 2038.01.19 00:00
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 
 /*************** CONVERTING ******************/
-function rgb2hex($color){
+function rgb2hex($color) {
 	$HEX = array(
 		dechex($color[0]),
 		dechex($color[1]),
 		dechex($color[2])
 	);
-
-	foreach($HEX as $id => $value){
-		if(zbx_strlen($value) != 2) $HEX[$id] = '0'.$value;
+	foreach ($HEX as $id => $value) {
+		if (zbx_strlen($value) != 2) {
+			$HEX[$id] = '0'.$value;
+		}
 	}
-
-return $HEX[0].$HEX[1].$HEX[2];
+	return $HEX[0].$HEX[1].$HEX[2];
 }
 
-function hex2rgb($color){
-	if($color[0] == '#') $color = substr($color, 1);
-
-	if(zbx_strlen($color) == 6){
-		list($r, $g, $b) = array($color[0].$color[1],
-								 $color[2].$color[3],
-								 $color[4].$color[5]);
+function hex2rgb($color) {
+	if ($color[0] == '#') {
+		$color = substr($color, 1);
 	}
-	else if(zbx_strlen($color) == 3){
+
+	if (zbx_strlen($color) == 6) {
+		list($r, $g, $b) = array($color[0].$color[1], $color[2].$color[3], $color[4].$color[5]);
+	}
+	elseif (zbx_strlen($color) == 3) {
 		list($r, $g, $b) = array($color[0].$color[0], $color[1].$color[1], $color[2].$color[2]);
 	}
-	else{
+	else {
 		return false;
 	}
 
-	$r = hexdec($r);
-	$g = hexdec($g);
-	$b = hexdec($b);
-
-return array($r, $g, $b);
+	return array(hexdec($r), hexdec($g), hexdec($b));
 }
 
-function zbx_num2bitstr($num,$rev=false){
-	if(!is_numeric($num)) return 0;
+function zbx_num2bitstr($num, $rev = false) {
+	if (!is_numeric($num)) {
+		return 0;
+	}
 
 	$sbin = 0;
 	$strbin = '';
 
 	$len = 32;
-	if($num > 2147483647) $len = 64;
+	if ($num > 2147483647) {
+		$len = 64;
+	}
 
-	for($i=0;$i<$len;$i++){
-		$sbin= 1 << $i;
-		$bit = ($sbin & $num)? '1':'0';
-		if($rev){
-			$strbin.=$bit;
+	for ($i = 0; $i < $len; $i++) {
+		$sbin = 1 << $i;
+		$bit = ($sbin & $num) ? '1' : '0';
+		if ($rev) {
+			$strbin .= $bit;
 		}
-		else{
+		else {
 			$strbin = $bit.$strbin;
 		}
 	}
-
-return $strbin;
+	return $strbin;
 }
 
-function str2mem($val){
+function str2mem($val) {
 	$val = trim($val);
 	$last = zbx_strtolower(zbx_substr($val, -1, 1));
 
-	switch($last){
+	switch ($last) {
 		// The 'G' modifier is available since PHP 5.1.0
 		case 'g':
 			$val *= 1024;
@@ -318,24 +316,30 @@ function str2mem($val){
 		case 'k':
 			$val *= 1024;
 	}
-
 	return $val;
 }
 
-function mem2str($size){
-	$prefix = S_B;
-	if($size > 1048576) {	$size = $size/1048576;	$prefix = S_M; }
-	elseif($size > 1024) {	$size = $size/1024;	$prefix = S_K; }
+function mem2str($size) {
+	$prefix = _('B');
+	if ($size > 1048576) {
+		$size = $size / 1048576;
+		$prefix = _('M');
+	}
+	elseif ($size > 1024) {
+		$size = $size / 1024;
+		$prefix = _('K');
+	}
 	return round($size, 6).$prefix;
 }
 
-function convertUnitsUptime($value){
-	if(($secs = round($value)) < 0){
+function convertUnitsUptime($value) {
+	if (($secs = round($value)) < 0) {
 		$value = '-';
 		$secs = -$secs;
 	}
-	else
+	else {
 		$value = '';
+	}
 
 	$days = floor($secs / SEC_PER_DAY);
 	$secs -= $days * SEC_PER_DAY;
@@ -346,164 +350,179 @@ function convertUnitsUptime($value){
 	$mins = floor($secs / SEC_PER_MIN);
 	$secs -= $mins * SEC_PER_MIN;
 
-	if($days != 0)
+	if ($days != 0) {
 		$value .= _n('%1$d day, ', '%1$d days, ', $days);
+	}
 	$value .= sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
-
 	return $value;
 }
 
-function convertUnitsS($value){
-	if(floor(abs($value) * 1000) == 0){
-		$value = ($value == 0 ? '0'._('s') : '< 1'._('ms'));
+function convertUnitsS($value) {
+	if (floor(abs($value) * 1000) == 0) {
+		$value = ($value == 0) ? '0'._('s') : '< 1'._('ms');
 		return $value;
 	}
 
-	if(($secs = round($value * 1000) / 1000) < 0){
+	if (($secs = round($value * 1000) / 1000) < 0) {
 		$value = '-';
 		$secs = -$secs;
 	}
-	else
+	else {
 		$value = '';
+	}
 	$n_unit = 0;
 
-	if(($n = floor($secs / SEC_PER_YEAR)) != 0){
+	if (($n = floor($secs / SEC_PER_YEAR)) != 0) {
 		$value .= $n._('y').' ';
 		$secs -= $n * SEC_PER_YEAR;
-		if (0 == $n_unit)
+		if (0 == $n_unit) {
 			$n_unit = 4;
+		}
 	}
 
-	if(($n = floor($secs / SEC_PER_MONTH)) != 0){
+	if (($n = floor($secs / SEC_PER_MONTH)) != 0) {
 		$value .= $n._('m').' ';
 		$secs -= $n * SEC_PER_MONTH;
-		if (0 == $n_unit)
+		if (0 == $n_unit) {
 			$n_unit = 3;
+		}
 	}
 
-	if(($n = floor($secs / SEC_PER_DAY)) != 0){
+	if (($n = floor($secs / SEC_PER_DAY)) != 0) {
 		$value .= $n._('d').' ';
 		$secs -= $n * SEC_PER_DAY;
-		if (0 == $n_unit)
+		if (0 == $n_unit) {
 			$n_unit = 2;
+		}
 	}
 
-	if($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0){
+	if ($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0) {
 		$value .= $n._('h').' ';
 		$secs -= $n * SEC_PER_HOUR;
-		if (0 == $n_unit)
+		if (0 == $n_unit) {
 			$n_unit = 1;
+		}
 	}
 
-	if($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0){
+	if ($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0) {
 		$value .= $n._('m').' ';
 		$secs -= $n * SEC_PER_MIN;
 	}
 
-	if($n_unit < 2 && ($n = floor($secs)) != 0){
+	if ($n_unit < 2 && ($n = floor($secs)) != 0) {
 		$value .= $n._('s').' ';
 		$secs -= $n;
 	}
 
-	if($n_unit < 1 && ($n = round($secs * 1000)) != 0)
+	if ($n_unit < 1 && ($n = round($secs * 1000)) != 0) {
 		$value .= $n._('ms');
+	}
 
 	return rtrim($value);
 }
 
-// convert:
-function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
-
-// Special processing for unix timestamps
-	if($units == 'unixtime'){
-		$ret=zbx_date2str(S_FUNCT_UNIXTIMESTAMP_DATE_FORMAT,$value);
-		return $ret;
+function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
+	// special processing for unix timestamps
+	if ($units == 'unixtime') {
+		return zbx_date2str(_('Y.m.d H:i:s'), $value);
 	}
-//Special processing of uptime
-	if($units == 'uptime'){
+
+	// special processing of uptime
+	if ($units == 'uptime') {
 		return convertUnitsUptime($value);
 	}
-// Special processing for seconds
-	if($units == 's'){
+
+	// special processing for seconds
+	if ($units == 's') {
 		return convertUnitsS($value);
 	}
 
-// Any other unit
-//-------------------
-// black list wich do not require units metrics..
-	$blackList = array('%','ms','rpm','RPM');
+	// any other unit
+	// black list wich do not require units metrics..
+	$blackList = array('%', 'ms', 'rpm', 'RPM');
 
-	if(in_array($units, $blackList) || (zbx_empty($units) && (($convert == ITEM_CONVERT_WITH_UNITS) || ($value < 1)))){
-		if(abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD)
+	if (in_array($units, $blackList) || (zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS || $value < 1))) {
+		if (abs($value) >= ZBX_UNITS_ROUNDOFF_THRESHOLD) {
 			$value = round($value, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+		}
 		$value = sprintf('%.'.ZBX_UNITS_ROUNDOFF_LOWER_LIMIT.'f', $value);
-
-		$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
+		$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U', '$1$2$3', $value);
 		$value = rtrim($value, '.');
 
-		if(zbx_empty($units)) return $value;
-		else return $value.' '.$units;
+		if (zbx_empty($units)) {
+			return $value;
+		}
+		else {
+			return $value.' '.$units;
+		}
 	}
 
-	switch($units){
+	switch ($units) {
 		case 'Bps':
 		case 'B':
-			$step=1024;
-			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
+			$step = 1024;
+			$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
 			break;
 		case 'b':
 		case 'bps':
-			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
+			$convert = $convert ? $convert : ITEM_CONVERT_NO_UNITS;
 		default:
 			$step = 1000;
 	}
 
-// INIT intervals
+	// init intervals
 	static $digitUnits;
-	if(is_null($digitUnits)) $digitUnits = array();
+	if (is_null($digitUnits)) {
+		$digitUnits = array();
+	}
 
-	if(!isset($digitUnits[$step])){
+	if (!isset($digitUnits[$step])) {
 		$digitUnits[$step] = array(
-//				array('pow'=>-3, 'short'=>S_N_SMALL, 'long'=>S_NANO),
-				array('pow'=>-2, 'short'=>S_U_MICRO, 'long'=>S_MICRO),
-				array('pow'=>-1, 'short'=>S_M_SMALL, 'long'=>S_MILLI),
-				array('pow'=>0, 'short'=>'', 'long'=>''),
-				array('pow'=>1, 'short'=>S_K, 'long'=>S_KILO),
-				array('pow'=>2, 'short'=>S_M, 'long'=>S_MEGA),
-				array('pow'=>3, 'short'=>S_G, 'long'=>S_GIGA),
-				array('pow'=>4, 'short'=>S_T, 'long'=>S_TERA),
-				array('pow'=>5, 'short'=>S_P, 'long'=>S_PETA),
-				array('pow'=>6, 'short'=>S_E, 'long'=>S_EXA),
-				array('pow'=>7, 'short'=>S_Z, 'long'=>S_ZETTA),
-				array('pow'=>8, 'short'=>S_Y, 'long'=>S_YOTTA)
-			);
+			array('pow' => -2, 'short' => _('µ'), 'long' => _('Micro')),
+			array('pow' => -1, 'short' => _('m'), 'long' => _('Milli')),
+			array('pow' => 0, 'short' => '', 'long' => ''),
+			array('pow' => 1, 'short' => _('K'), 'long' => _('Kilo')),
+			array('pow' => 2, 'short' => _('M'), 'long' => _('Mega')),
+			array('pow' => 3, 'short' => _('G'), 'long' => _('Giga')),
+			array('pow' => 4, 'short' => _('T'), 'long' => _('Tera')),
+			array('pow' => 5, 'short' => _('P'), 'long' => _('Peta')),
+			array('pow' => 6, 'short' => _('E'), 'long' => _('Exa')),
+			array('pow' => 7, 'short' => _('Z'), 'long' => _('Zetta')),
+			array('pow' => 8, 'short' => _('Y'), 'long' => _('Yotta'))
+		);
 
-		foreach($digitUnits[$step] as $dunit => $data){
-// skip mili & micro for values without units
+		foreach ($digitUnits[$step] as $dunit => $data) {
+			// skip mili & micro for values without units
 			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
 	}
-//---
 
-	if($value < 0) $abs = bcmul($value, '-1');
-	else $abs = $value;
-
-	$valUnit = array('pow'=>0, 'short'=>'', 'long'=>'', 'value'=>$value);
-	if(($abs > 999) || ($abs < 0.001)){
-		foreach($digitUnits[$step] as $dnum => $data){
-			if(bccomp($abs, $data['value']) > -1) $valUnit = $data;
-			else break;
-		}
-
-		if(round($valUnit['value'], 6) > 0){
-			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']), 6);
-		}
-		else
-			$valUnit['value'] = 0;
+	if ($value < 0) {
+		$abs = bcmul($value, '-1');
+	}
+	else {
+		$abs = $value;
 	}
 
-//------
-	switch($convert){
+	$valUnit = array('pow' => 0, 'short' => '', 'long' => '', 'value' => $value);
+	if ($abs > 999 || $abs < 0.001) {
+		foreach ($digitUnits[$step] as $dnum => $data) {
+			if (bccomp($abs, $data['value']) > -1) {
+				$valUnit = $data;
+			}
+			else {
+				break;
+			}
+		}
+		if (round($valUnit['value'], 6) > 0) {
+			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']), 6);
+		}
+		else {
+			$valUnit['value'] = 0;
+		}
+	}
+
+	switch ($convert) {
 		case 0: $units = trim($units);
 		case 1: $desc = $valUnit['short']; break;
 		case 2: $desc = $valUnit['long']; break;
@@ -512,48 +531,57 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 	$value = rtrim($value, '.');
 
-return sprintf('%s %s%s', $value, $desc, $units);
+	return sprintf('%s %s%s', $value, $desc, $units);
 }
 
-/*************** END CONVERTING ******************/
-
-
 /************* ZBX MISC *************/
-function zbx_avg($values){
+function zbx_avg($values) {
 	zbx_value2array($values);
-
 	$sum = 0;
-	foreach($values as $num => $value){
+	foreach ($values as $value) {
 		$sum = bcadd($sum, $value);
 	}
-
-return bcdiv($sum, count($values));
+	return bcdiv($sum, count($values));
 }
 
 // accepts parametr as integer either
-function zbx_ctype_digit($x){
+function zbx_ctype_digit($x) {
 	return ctype_digit(strval($x));
 }
 
-function zbx_empty($value){
-	if(is_null($value)) return true;
-	if(is_array($value) && empty($value)) return true;
-	if(is_string($value) && ($value === '')) return true;
-return false;
+function zbx_empty($value) {
+	if (is_null($value)) {
+		return true;
+	}
+	if (is_array($value) && empty($value)) {
+		return true;
+	}
+	if (is_string($value) && $value === '') {
+		return true;
+	}
+	return false;
 }
 
-function zbx_is_int($var){
-	if(is_int($var)) return true;
+function zbx_is_int($var) {
+	if (is_int($var)) {
+		return true;
+	}
 
-	if(is_string($var))
-		if(ctype_digit($var) || (strcmp(intval($var), $var) == 0)) return true;
-	else
-		if(($var>0) && zbx_ctype_digit($var)) return true;
+	if (is_string($var)) {
+		if (ctype_digit($var) || strcmp(intval($var), $var) == 0) {
+			return true;
+		}
+	}
+	else {
+		if ($var > 0 && zbx_ctype_digit($var)) {
+			return true;
+		}
+	}
 
-return preg_match("/^\-?\d{1,20}+$/", $var);
+	return preg_match("/^\-?\d{1,20}+$/", $var);
 }
 
-function zbx_array_diff($primary, $secondary, $field){
+function zbx_array_diff($primary, $secondary, $field) {
 	$fields1 = zbx_objectValues($primary, $field);
 	$fields2 = zbx_objectValues($secondary, $field);
 
@@ -569,28 +597,32 @@ function zbx_array_diff($primary, $secondary, $field){
 		'both' => array()
 	);
 
-	foreach($primary as $array){
-		if(!isset($array[$field]))
+	foreach ($primary as $array) {
+		if (!isset($array[$field])) {
 			$result['first'][] = $array;
-		else if(isset($first[$array[$field]]))
+		}
+		elseif (isset($first[$array[$field]])) {
 			$result['first'][] = $array;
-		else
+		}
+		else {
 			$result['both'][$array[$field]] = $array;
+		}
 	}
 
-	foreach($secondary as $array){
-		if(!isset($array[$field]))
+	foreach ($secondary as $array) {
+		if (!isset($array[$field])) {
 			$result['second'][] = $array;
-		else if(isset($second[$array[$field]]))
+		}
+		elseif (isset($second[$array[$field]])) {
 			$result['second'][] = $array;
+		}
 	}
-
 	return $result;
 }
 
-function zbx_array_push(&$array, $add){
-	foreach($array as $key => $value){
-		foreach($add as $newKey => $newValue){
+function zbx_array_push(&$array, $add) {
+	foreach ($array as $key => $value) {
+		foreach ($add as $newKey => $newValue) {
 			$array[$key][$newKey] = $newValue;
 		}
 	}
@@ -610,10 +642,10 @@ function zbx_array_push(&$array, $add){
  * @param array $array
  * @return array
  */
-function zbx_arrayFindDuplicates(array $array){
+function zbx_arrayFindDuplicates(array $array) {
 	$countValues = array_count_values($array); // counting occurrences of every value in array
-	foreach($countValues as $value => $count){
-		if($count <= 1){
+	foreach ($countValues as $value => $count) {
+		if ($count <= 1) {
 			unset($countValues[$value]);
 		}
 	}
@@ -621,192 +653,183 @@ function zbx_arrayFindDuplicates(array $array){
 	return $countValues;
 }
 
-// STRING FUNCTIONS {{{
-if(!function_exists('zbx_stripslashes')){
-function zbx_stripslashes($value){
-	if(is_array($value)){
-		foreach($value as $id => $data){
-			$value[$id] = zbx_stripslashes($data);
+/************* STRING *************/
+if (!function_exists('zbx_stripslashes')) {
+	function zbx_stripslashes($value) {
+		if (is_array($value)) {
+			foreach ($value as $id => $data) {
+				$value[$id] = zbx_stripslashes($data);
+			}
 		}
+		elseif (is_string($value)) {
+			$value = stripslashes($value);
+		}
+		return $value;
 	}
-	else if(is_string($value)){
-		$value = stripslashes($value);
-	}
-
-return $value;
-}
 }
 
-function zbx_nl2br($str){
+function zbx_nl2br($str) {
 	$str_res = array();
-	$str_arr = explode("\n",$str);
-	foreach($str_arr as $id => $str_line){
-		array_push($str_res,$str_line,BR());
+	$str_arr = explode("\n", $str);
+	foreach ($str_arr as $id => $str_line) {
+		array_push($str_res, $str_line, BR());
 	}
-return $str_res;
+	return $str_res;
 }
 
-function zbx_htmlstr($str){
-	return str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'), $str);
+function zbx_htmlstr($str) {
+	return str_replace(array('<', '>', '"'), array('&lt;', '&gt;', '&quot;'), $str);
 }
 
-function zbx_formatDomId($value){
-	return str_replace(array('[',']'),array('_',''), $value);
+function zbx_formatDomId($value) {
+	return str_replace(array('[',']'), array('_', ''), $value);
 }
 
-function zbx_strlen($str){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
+function zbx_strlen($str) {
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		return mb_strlen($str);
 	}
-	else{
+	else {
 		return strlen($str);
 	}
-
-/*
-	$zbx_strlen = strlen($zbx_strlen);
-
-	$reallen = 0;
-	$fbin= 1 << 7;
-	$sbin= 1 << 6;
-
-// check first byte for 11xxxxxx or 0xxxxxxx
-	for($i=0; $i < $zbx_strlen; $i++){
-		if(((ord($str[$i]) & $fbin) && (ord($str[$i]) & $sbin)) || !(ord($str[$i]) & $fbin)) $reallen++;
-	}
-
-return $reallen;
-//*/
 }
 
-function zbx_strstr($haystack, $needle){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
+function zbx_strstr($haystack, $needle) {
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		$pos = mb_strpos($haystack, $needle);
-		if($pos !== false){
+		if ($pos !== false) {
 			return mb_substr($haystack, $pos);
 		}
-		else return false;
+		else {
+			return false;
+		}
 	}
-	else{
+	else {
 		return strstr($haystack, $needle);
 	}
 }
 
-function zbx_stristr($haystack, $needle){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
+function zbx_stristr($haystack, $needle) {
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		$haystack_B = mb_strtoupper($haystack);
 		$needle = mb_strtoupper($needle);
 
 		$pos = mb_strpos($haystack_B, $needle);
-		if($pos !== false){
+		if ($pos !== false) {
 			$pos = mb_substr($haystack, $pos);
 		}
 		return $pos;
 	}
-	else{
+	else {
 		return stristr($haystack, $needle);
 	}
 }
 
-function zbx_substring($haystack, $start, $end=null){
-	if(!is_null($end) && ($end < $start)) return '';
+function zbx_substring($haystack, $start, $end = null) {
+	if (!is_null($end) && $end < $start) {
+		return '';
+	}
 
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
-		if(is_null($end))
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
+		if (is_null($end)) {
 			$result = mb_substr($haystack, $start);
-		else
+		}
+		else {
 			$result = mb_substr($haystack, $start, ($end - $start));
-	}
-	else{
-		if(is_null($end))
-			$result = substr($haystack, $start);
-		else
-			$result = substr($haystack, $start, ($end - $start));
-	}
-
-	return $result;
-}
-
-function zbx_substr($string, $start, $length=null){
-
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
-		if(is_null($length))
-			$result = mb_substr($string, $start);
-		else
-			$result = mb_substr($string, $start, $length);
-	}
-	else{
-		if(is_null($length))
-			$result = substr($string, $start);
-		else
-			$result = substr($string, $start, $length);
-	}
-
-	return $result;
-}
-
-function zbx_str_revert($str){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
-		$result = '';
-
-		$stop = mb_strlen($str);
-		for($idx=0; $idx<$stop; $idx++){
-			$result = mb_substr($str, $idx, 1) . $result;
 		}
 	}
-	else{
-		$result = strrev($str);
+	else {
+		if (is_null($end)) {
+			$result = substr($haystack, $start);
+		}
+		else {
+			$result = substr($haystack, $start, ($end - $start));
+		}
 	}
-
 	return $result;
 }
 
-function zbx_strtoupper($str){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
+function zbx_substr($string, $start, $length = null) {
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
+		if (is_null($length)) {
+			$result = mb_substr($string, $start);
+		}
+		else {
+			$result = mb_substr($string, $start, $length);
+		}
+	}
+	else {
+		if (is_null($length)) {
+			$result = substr($string, $start);
+		}
+		else {
+			$result = substr($string, $start, $length);
+		}
+	}
+	return $result;
+}
+
+function zbx_str_revert($str) {
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
+		$result = '';
+		$stop = mb_strlen($str);
+		for ($idx = 0; $idx < $stop; $idx++) {
+			$result = mb_substr($str, $idx, 1).$result;
+		}
+	}
+	else {
+		$result = strrev($str);
+	}
+	return $result;
+}
+
+function zbx_strtoupper($str) {
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		return mb_strtoupper($str);
 	}
-	else{
+	else {
 		return strtoupper($str);
 	}
 }
 
-function zbx_strtolower($str){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
+function zbx_strtolower($str) {
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		return mb_strtolower($str);
 	}
-	else{
+	else {
 		return strtolower($str);
 	}
 }
 
-function zbx_strpos($haystack, $needle, $offset=0){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
+function zbx_strpos($haystack, $needle, $offset = 0) {
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		return mb_strpos($haystack, $needle, $offset);
 	}
-	else{
+	else {
 		return strpos($haystack, $needle, $offset);
 	}
 }
 
-function zbx_stripos($haystack, $needle, $offset=0){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
+function zbx_stripos($haystack, $needle, $offset = 0) {
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		return mb_stripos($haystack, $needle, $offset);
 	}
-	else{
+	else {
 		return stripos($haystack, $needle, $offset);
 	}
 }
 
-function zbx_strrpos($haystack, $needle){
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
+function zbx_strrpos($haystack, $needle) {
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		return mb_strrpos($haystack, $needle);
 	}
-	else{
+	else {
 		return strrpos($haystack, $needle);
 	}
 }
 
 function zbx_substr_replace($string, $replacement, $start, $length = null) {
-	if(defined('ZBX_MBSTRINGS_ENABLED')){
+	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		$string_length = mb_strlen($string);
 
 		if ($start < 0) {
@@ -834,32 +857,30 @@ function zbx_substr_replace($string, $replacement, $start, $length = null) {
 	}
 }
 
-// }}} STRING FUNCTIONS
-
-
-// {{{ ARRAY FUNCTIONS
 /************* SELECT *************/
-function selectByPattern(&$table, $column, $pattern, $limit){
+function selectByPattern(&$table, $column, $pattern, $limit) {
 	$chunk_size = $limit;
 
 	$rsTable = array();
-	foreach($table as $num => $row){
-		if(zbx_strtoupper($row[$column]) == zbx_strtoupper($pattern))
-			$rsTable = array($num=>$row) + $rsTable;
-		else if($limit > 0)
+	foreach ($table as $num => $row) {
+		if (zbx_strtoupper($row[$column]) == zbx_strtoupper($pattern)) {
+			$rsTable = array($num => $row) + $rsTable;
+		}
+		elseif ($limit > 0) {
 			$rsTable[$num] = $row;
-		else
+		}
+		else {
 			continue;
-
+		}
 		$limit--;
 	}
 
-	if(!empty($rsTable)){
+	if (!empty($rsTable)) {
 		$rsTable = array_chunk($rsTable, $chunk_size, true);
 		$rsTable = $rsTable[0];
 	}
 
-return $rsTable;
+	return $rsTable;
 }
 
 /************* SORT *************/
@@ -877,36 +898,26 @@ function natksort(&$array) {
 	return true;
 }
 
-function asort_by_key(&$array, $key){
-	if(!is_array($array)) {
-		error(S_INCORRECT_TYPE_OF_ASORT_BY_KEY);
+function asort_by_key(&$array, $key) {
+	if (!is_array($array)) {
+		error(_('Incorrect type of asort_by_key'));
 		return array();
 	}
-
 	$key = htmlspecialchars($key);
 	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-return $array;
-}
-
-
-/* function:
- *	zbx_rksort
- *
- * description:
- *	Recursively sort an array by key
- *
- * author: Eugene Grigorjev
- */
-function zbx_rksort(&$array, $flags=NULL){
-	if(is_array($array)){
-		foreach($array as $id => $data)
-			zbx_rksort($array[$id]);
-
-		ksort($array,$flags);
-	}
 	return $array;
 }
 
+// Recursively sort an array by key
+function zbx_rksort(&$array, $flags = null) {
+	if (is_array($array)) {
+		foreach ($array as $id => $data) {
+			zbx_rksort($array[$id]);
+		}
+		ksort($array, $flags);
+	}
+	return $array;
+}
 
 /**
  * Class for sorting array by multiple fields.
@@ -930,7 +941,6 @@ class ArraySorter {
 			}
 		}
 		self::$fields = $fields;
-
 		uasort($array, array('self', 'compare'));
 	}
 
@@ -957,41 +967,46 @@ class ArraySorter {
 				}
 			}
 		}
-
 		return 0;
 	}
 }
 
-function order_result(&$data, $sortfield=null, $sortorder=ZBX_SORT_UP){
-	if(empty($data)) return false;
+function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
+	if (empty($data)) {
+		return false;
+	}
 
-	if(is_null($sortfield)){
+	if (is_null($sortfield)) {
 		natcasesort($data);
-		if($sortorder != ZBX_SORT_UP)
+		if ($sortorder != ZBX_SORT_UP) {
 			$data = array_reverse($data, true);
+		}
 		return true;
 	}
 
 	$sort = array();
-	foreach($data as $key => $arr){
-		if(!isset($arr[$sortfield])) return false;
+	foreach ($data as $key => $arr) {
+		if (!isset($arr[$sortfield])) {
+			return false;
+		}
 		$sort[$key] = $arr[$sortfield];
 	}
 	natcasesort($sort);
 
-	if($sortorder != ZBX_SORT_UP)
+	if ($sortorder != ZBX_SORT_UP) {
 		$sort = array_reverse($sort, true);
+	}
 
 	$tmp = $data;
 	$data = array();
-	foreach($sort as $key => $val){
+	foreach ($sort as $key => $val) {
 		$data[$key] = $tmp[$key];
 	}
 
 	return true;
 }
 
-function order_by($def, $allways='') {
+function order_by($def, $allways = '') {
 	global $page;
 
 	$orderString = '';
@@ -1015,372 +1030,374 @@ function order_by($def, $allways='') {
 	$orderString = empty($orderString) ? '' : ' ORDER BY '.$orderString;
 	return $orderString;
 }
-/************* END SORT *************/
 
-function unsetExcept(&$array, $allowedFields){
-	foreach($array as $key => $value){
-		if(!isset($allowedFields[$key])) unset($array[$key]);
+function unsetExcept(&$array, $allowedFields) {
+	foreach($array as $key => $value) {
+		if (!isset($allowedFields[$key])) {
+			unset($array[$key]);
+		}
 	}
 }
 
-function zbx_implodeHash($glue1, $glue2, $hash){
-	if(is_null($glue2)) $glue2 = $glue1;
+function zbx_implodeHash($glue1, $glue2, $hash) {
+	if (is_null($glue2)) {
+		$glue2 = $glue1;
+	}
 	$str = '';
-
-	foreach($hash as $key => $value){
-		if(!empty($str)) $str.= $glue2;
+	foreach ($hash as $key => $value) {
+		if (!empty($str)) {
+			$str.= $glue2;
+		}
 		$str.= $key.$glue1.$value;
 	}
-
-return $str;
+	return $str;
 }
 
-// This function will preserve keys!!!
-// author: Aly
-function zbx_array_merge(){
+// preserve keys
+function zbx_array_merge() {
 	$args = func_get_args();
-
 	$result = array();
-	foreach($args as &$array){
-		if(!is_array($array)) return false;
-
-		foreach($array as $key => $value){
+	foreach ($args as &$array) {
+		if (!is_array($array)) {
+			return false;
+		}
+		foreach ($array as $key => $value) {
 			$result[$key] = $value;
 		}
 	}
-
-return $result;
+	return $result;
 }
 
-function uint_in_array($needle,$haystack){
-	foreach($haystack as $id => $value)
-		if(bccomp($needle,$value) == 0) return true;
-
-return false;
+function uint_in_array($needle, $haystack) {
+	foreach ($haystack as $id => $value) {
+		if (bccomp($needle, $value) == 0) {
+			return true;
+		}
+	}
+	return false;
 }
 
-function zbx_uint_array_intersect(&$array1, &$array2){
+function zbx_uint_array_intersect(&$array1, &$array2) {
 	$result = array();
-	foreach($array1 as $key => $value)
-		if(uint_in_array($value, $array2)) $result[$key] = $value;
-return $result;
+	foreach ($array1 as $key => $value) {
+		if (uint_in_array($value, $array2)) {
+			$result[$key] = $value;
+		}
+	}
+	return $result;
 }
 
-function str_in_array($needle,$haystack,$strict=false){
-	if(is_array($needle)){
-		return in_array($needle,$haystack,$strict);
+function str_in_array($needle, $haystack, $strict = false) {
+	if (is_array($needle)) {
+		return in_array($needle, $haystack, $strict);
 	}
-	else if($strict){
-		foreach($haystack as $id => $value)
-			if($needle === $value) return true;
+	elseif ($strict) {
+		foreach ($haystack as $id => $value) {
+			if ($needle === $value) {
+				return true;
+			}
+		}
 	}
-	else{
-		foreach($haystack as $id => $value)
-			if(strcmp($needle,$value) == 0) return true;
+	else {
+		foreach ($haystack as $id => $value) {
+			if (strcmp($needle, $value) == 0) {
+				return true;
+			}
+		}
 	}
-return false;
+	return false;
 }
 
-function zbx_value2array(&$values){
-	if(!is_array($values) && !is_null($values)){
+function zbx_value2array(&$values) {
+	if (!is_array($values) && !is_null($values)) {
 		$tmp = array();
-
-		if(is_object($values))
+		if (is_object($values)) {
 			$tmp[] = $values;
-		else
+		}
+		else {
 			$tmp[$values] = $values;
-
+		}
 		$values = $tmp;
 	}
 }
 
 // creates chain of relation parent -> childs, for all chain levels
-function createParentToChildRelation(&$chain, $link, $parentField, $childField){
-	if(!isset($chain[$link[$parentField]]))
+function createParentToChildRelation(&$chain, $link, $parentField, $childField) {
+	if (!isset($chain[$link[$parentField]])) {
 		$chain[$link[$parentField]] = array();
+	}
 
 	$chain[$link[$parentField]][$link[$childField]] = $link[$childField];
-	if(isset($chain[$link[$childField]])){
+	if (isset($chain[$link[$childField]])) {
 		$chain[$link[$parentField]] = zbx_array_merge($chain[$link[$parentField]], $chain[$link[$childField]]);
 	}
 }
 
-// fuunction: zbx_toHash
 // object or array of objects to hash
-// author: Aly
-function zbx_toHash(&$value, $field=null){
-	if(is_null($value)) return $value;
+function zbx_toHash(&$value, $field = null) {
+	if (is_null($value)) {
+		return $value;
+	}
 	$result = array();
 
-	if(!is_array($value)){
+	if (!is_array($value)) {
 		$result = array($value => $value);
 	}
-	else if(isset($value[$field])){
+	elseif (isset($value[$field])) {
 		$result[$value[$field]] = $value;
 	}
-	else{
-		foreach($value as $key => $val){
-			if(!is_array($val)){
+	else {
+		foreach ($value as $key => $val) {
+			if (!is_array($val)) {
 				$result[$val] = $val;
 			}
-			else if(isset($val[$field])){
+			elseif (isset($val[$field])) {
 				$result[$val[$field]] = $val;
 			}
 		}
 	}
-
-return $result;
+	return $result;
 }
 
-// fuunction: zbx_toObject
 // Value or Array to Object or Array of objects
-// author: Aly
-function zbx_toObject(&$value, $field){
-	if(is_null($value)) return $value;
+function zbx_toObject(&$value, $field) {
+	if (is_null($value)) {
+		return $value;
+	}
 	$result = array();
 
-// Value or Array to Object or Array of objects
-	if(!is_array($value)){
+	// Value or Array to Object or Array of objects
+	if (!is_array($value)) {
 		$result = array(array($field => $value));
 	}
-	else if(!isset($value[$field])){
-		foreach($value as $key => $val){
-			if(!is_array($val)){
+	elseif (!isset($value[$field])) {
+		foreach ($value as $key => $val) {
+			if (!is_array($val)) {
 				$result[] = array($field => $val);
 			}
 		}
 	}
-
-return $result;
+	return $result;
 }
 
-// function: zbx_toArray
-// author: Aly
-function zbx_toArray($value){
-	if(is_null($value)) return $value;
+function zbx_toArray($value) {
+	if (is_null($value)) {
+		return $value;
+	}
 	$result = array();
 
-	if(!is_array($value)){
+	if (!is_array($value)) {
 		$result = array($value);
 	}
-	else{
-// reset() is needed to move internal array pointer to the beginning of the array
+	else {
+		// reset() is needed to move internal array pointer to the beginning of the array
 		reset($value);
 
-		if(zbx_ctype_digit(key($value)))
+		if (zbx_ctype_digit(key($value))) {
 			$result = array_values($value);
-		else if(!empty($value))
+		}
+		elseif (!empty($value)) {
 			$result = array($value);
+		}
 	}
-
-return $result;
+	return $result;
 }
 
-// fuunction: zbx_objectFields
 // value OR object OR array of objects TO an array
-// author: Aly
-function zbx_objectValues(&$value, $field){
-	if(is_null($value)) return $value;
+function zbx_objectValues(&$value, $field) {
+	if (is_null($value)) {
+		return $value;
+	}
 	$result = array();
 
-	if(!is_array($value)){
+	if (!is_array($value)) {
 		$result = array($value);
 	}
-	else if(isset($value[$field])){
+	elseif (isset($value[$field])) {
 		$result = array($value[$field]);
 	}
-	else{
-		foreach($value as $key => $val){
-			if(!is_array($val)){
+	else {
+		foreach ($value as $key => $val) {
+			if (!is_array($val)) {
 				$result[] = $val;
 			}
-			else if(isset($val[$field])){
+			elseif (isset($val[$field])) {
 				$result[] = $val[$field];
 			}
 		}
 	}
-
-return $result;
+	return $result;
 }
 
-function zbx_cleanHashes(&$value){
-	if(is_array($value)){
-// reset() is needed to move internal array pointer to the beginning of the array
+function zbx_cleanHashes(&$value) {
+	if (is_array($value)) {
+		// reset() is needed to move internal array pointer to the beginning of the array
 		reset($value);
-		if(zbx_ctype_digit(key($value)))
+		if (zbx_ctype_digit(key($value))) {
 			$value = array_values($value);
+		}
 	}
-
-return $value;
+	return $value;
 }
 
-function zbx_toCSV($values){
+function zbx_toCSV($values) {
 	$csv = '';
-
 	$glue = '","';
-	foreach($values as $row){
-		if(!is_array($row)) $row = array($row);
-		foreach($row as $num => $value){
-			if(is_null($value)) unset($row[$num]);
-			else $row[$num] = str_replace('"', '""', $value);
+	foreach ($values as $row) {
+		if (!is_array($row)) {
+			$row = array($row);
 		}
-
+		foreach ($row as $num => $value) {
+			if (is_null($value)) {
+				unset($row[$num]);
+			}
+			else {
+				$row[$num] = str_replace('"', '""', $value);
+			}
+		}
 		$csv .= '"'.implode($glue, $row).'"'."\n";
 	}
-
-return $csv;
+	return $csv;
 }
 
-// }}} ARRAY FUNCTION
-function zbx_array_mintersect($keys, $array){
+function zbx_array_mintersect($keys, $array) {
 	$result = array();
 
-	foreach($keys as $field){
-		if(is_array($field)){
-			foreach($field as $sub_field){
-				if(isset($array[$sub_field])){
+	foreach ($keys as $field) {
+		if (is_array($field)) {
+			foreach ($field as $sub_field) {
+				if (isset($array[$sub_field])) {
 					$result[$sub_field] = $array[$sub_field];
 					break;
 				}
 			}
 		}
-		else if(isset($array[$field])){
+		elseif (isset($array[$field])) {
 			$result[$field] = $array[$field];
 		}
 	}
 	return $result;
 }
 
-function zbx_str2links($text){
-// $value = preg_replace('#(https?|ftp|file)://[^\n\t\r ]+#u', '<a href="$0">$0</a>', $value);
+function zbx_str2links($text) {
 	$result = array();
-	if(empty($text)) return $result;
-
+	if (empty($text)) {
+		return $result;
+	}
 	preg_match_all('#https?://[^\n\t\r ]+#u', $text, $matches, PREG_OFFSET_CAPTURE);
 
 	$start = 0;
-	foreach($matches[0] as $match){
-		$result[] = zbx_substr($text, $start, $match[1]-$start);
+	foreach ($matches[0] as $match) {
+		$result[] = zbx_substr($text, $start, $match[1] - $start);
 		$result[] = new CLink($match[0], $match[0], null, null, true);
 		$start = $match[1] + zbx_strlen($match[0]);
 	}
-
 	$result[] = zbx_substr($text, $start, zbx_strlen($text));
 	return $result;
 }
 
 function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
-	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = array();
+	if (!isset($mainArray[$sIndex])) {
+		$mainArray[$sIndex] = array();
+	}
 	$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
 }
-/************* END ZBX MISC *************/
 
 /*************** PAGE SORTING ******************/
-	/* function:
-	 *      validate_sort_and_sortorder
-	 *
-	 * description:
-	 *      Checking,setting AND saving sort params
-	 *
-	 * author: Aly
-	 */
-	function validate_sort_and_sortorder($sort=NULL,$sortorder=ZBX_SORT_UP){
-		global $page;
+// checking, setting AND saving sort params
+function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP) {
+	global $page;
 
-		$_REQUEST['sort'] = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$sort));
-		$_REQUEST['sortorder'] = get_request('sortorder',CProfile::get('web.'.$page['file'].'.sortorder',$sortorder));
+	$_REQUEST['sort'] = get_request('sort', CProfile::get('web.'.$page['file'].'.sort', $sort));
+	$_REQUEST['sortorder'] = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $sortorder));
 
-		if(!is_null($_REQUEST['sort'])){
-			$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i','',$_REQUEST['sort']);
-			CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
-		}
-
-		if(!str_in_array($_REQUEST['sortorder'],array(ZBX_SORT_DOWN,ZBX_SORT_UP)))
-			$_REQUEST['sortorder'] = ZBX_SORT_UP;
-
-		CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
+	if (!is_null($_REQUEST['sort'])) {
+		$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i', '', $_REQUEST['sort']);
+		CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
 	}
 
-/* function:
- *      make_sorting_header
- *
- * description:
- *      Creates header col for sorting in table header
- *
- * author: Aly
- */
-	function make_sorting_header($obj,$tabfield,$url=''){
-		global $page;
+	if (!str_in_array($_REQUEST['sortorder'], array(ZBX_SORT_DOWN, ZBX_SORT_UP))) {
+		$_REQUEST['sortorder'] = ZBX_SORT_UP;
+	}
 
-		$sortorder = (($_REQUEST['sort'] == $tabfield) && ($_REQUEST['sortorder'] == ZBX_SORT_UP))?ZBX_SORT_DOWN:ZBX_SORT_UP;
+	CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
+}
 
-		$link = new Curl($url);
-		if(empty($url)) $link->formatGetArguments();
-		$link->setArgument('sort', $tabfield);
-		$link->setArgument('sortorder', $sortorder);
+// creates header col for sorting in table header
+function make_sorting_header($obj, $tabfield, $url = '') {
+	global $page;
 
-		$url = $link->getUrl();
+	$sortorder = ($_REQUEST['sort'] == $tabfield && $_REQUEST['sortorder'] == ZBX_SORT_UP) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
-		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
-			$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');";
+	$link = new Curl($url);
+	if (empty($url)) {
+		$link->formatGetArguments();
+	}
+	$link->setArgument('sort', $tabfield);
+	$link->setArgument('sortorder', $sortorder);
+
+	$url = $link->getUrl();
+
+	if ($page['type'] != PAGE_TYPE_HTML && defined('ZBX_PAGE_MAIN_HAT')) {
+		$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');";
+	}
+	else {
+		$script = "javascript: redirect('".$url."');";
+	}
+
+	zbx_value2array($obj);
+	$div = new CDiv();
+	$div->setAttribute('style', 'float:left;');
+
+	foreach ($obj as $enum => $el) {
+		if (is_object($el) || $el === SPACE) {
+			$div->addItem($el);
 		}
-		else{
-			$script = "javascript: redirect('".$url."');";
+		else {
+			$div->addItem(new CSpan($el, 'underline'));
 		}
+	}
+	$div->addItem(SPACE);
 
-		zbx_value2array($obj);
-		$div = new CDiv();
-		$div->setAttribute('style', 'float:left;');
-
-		foreach($obj as $enum => $el){
-			if(is_object($el) || ($el === SPACE)) $div->addItem($el);
-			else $div->addItem(new CSpan($el, 'underline'));
+	$img = null;
+	if (isset($_REQUEST['sort']) && $tabfield == $_REQUEST['sort']) {
+		if ($sortorder == ZBX_SORT_UP) {
+			$img = new CDiv(SPACE, 'icon_sortdown');
 		}
-		$div->addItem(SPACE);
-
-		$img = null;
-		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
-			if($sortorder == ZBX_SORT_UP) $img = new CDiv(SPACE,'icon_sortdown');
-			else $img = new CDiv(SPACE,'icon_sortup');
-
-			$img->setAttribute('style','float: left;');
+		else {
+			$img = new CDiv(SPACE, 'icon_sortup');
 		}
-
-		$col = new CCol(array($div, $img), 'nowrap hover_grey');
-		$col->setAttribute('onclick', $script);
-
+		$img->setAttribute('style', 'float: left;');
+	}
+	$col = new CCol(array($div, $img), 'nowrap hover_grey');
+	$col->setAttribute('onclick', $script);
 	return $col;
-	}
+}
 
-	function getPageSortField($def){
-		global $page;
-		$tabfield = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$def));
+function getPageSortField($def) {
+	global $page;
+	return get_request('sort', CProfile::get('web.'.$page['file'].'.sort', $def));
+}
 
-	return $tabfield;
-	}
-
-	function getPageSortOrder($def=ZBX_SORT_UP){
-		global $page;
-		$sortorder = get_request('sortorder',CProfile::get('web.'.$page['file'].'.sortorder',$def));
-
-	return $sortorder;
-	}
-/*************** END PAGE SORTING ******************/
+function getPageSortOrder($def = ZBX_SORT_UP) {
+	global $page;
+	return get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', $def));
+}
 
 /************* PAGING *************/
-function getPagingLine(&$items, $autotrim=true){
+function getPagingLine(&$items, $autotrim = true) {
 	global $page;
 	$config = select_config();
 
 	$search_limit = '';
-	if($config['search_limit'] < count($items)){
+	if ($config['search_limit'] < count($items)) {
 		array_pop($items);
 		$search_limit = '+';
 	}
 
 	$start = get_request('start', null);
 
-	if(is_null($start)){
+	if (is_null($start)) {
 		$last_page = CProfile::get('web.paging.lastpage');
 		$start = ($last_page == $page['file']) ? CProfile::get('web.paging.start', 0) : 0;
 	}
@@ -1390,57 +1407,66 @@ function getPagingLine(&$items, $autotrim=true){
 	$cnt_items = count($items);
 	$cnt_pages = ceil($cnt_items / $rows_per_page);
 
-	if($cnt_items < $start) $start = 0;
+	if ($cnt_items < $start) {
+		$start = 0;
+	}
 	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
 	CProfile::update('web.paging.start', $start, PROFILE_TYPE_INT);
 
-	if($cnt_pages < 1) $cnt_pages = 1;
+	if ($cnt_pages < 1) {
+		$cnt_pages = 1;
+	}
 
 	$crnt_page = floor($start / $rows_per_page) + 1;
 
-	if($autotrim){
+	if ($autotrim) {
 		$items = array_slice($items, $start, $rows_per_page, true);
 	}
 
-// Viewed pages (better to use not odd)
+	// viewed pages (better to use not odd)
 	$view_pages = 11;
 
-	$endPage = $crnt_page + floor($view_pages/2);
-	if($endPage < $view_pages) $endPage = $view_pages;
-	if($endPage > $cnt_pages) $endPage = $cnt_pages;
+	$endPage = $crnt_page + floor($view_pages / 2);
+	if ($endPage < $view_pages) {
+		$endPage = $view_pages;
+	}
+	if ($endPage > $cnt_pages) {
+		$endPage = $cnt_pages;
+	}
 
-	$startPage = ($endPage > $view_pages)?($endPage - $view_pages + 1):1;
+	$startPage = ($endPage > $view_pages) ? $endPage - $view_pages + 1 : 1;
 
-// Page line
 	$pageline = array();
 
 	$table = BR();
-	if($cnt_pages > 1){
-		if($startPage > 1){
-			$pagespan = new CSpan('<< '.S_FIRST_PAGE, 'darklink');
+	if ($cnt_pages > 1) {
+		if ($startPage > 1) {
+			$pagespan = new CSpan('<< '._('First'), 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage(0);');
 
 			$pageline[] = $pagespan;
 			$pageline[] = '&nbsp;&nbsp;';
 		}
 
-		if($crnt_page > 1){
-			$pagespan = new CSpan('< '.S_PREVIOUS_PAGE, 'darklink');
-			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($crnt_page-2) * $rows_per_page).');');
+		if ($crnt_page > 1) {
+			$pagespan = new CSpan('< '._('Previous'), 'darklink');
+			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($crnt_page - 2) * $rows_per_page).');');
 
 			$pageline[] = $pagespan;
 			$pageline[] = ' | ';
 		}
 
-		for($p=$startPage; $p <= $cnt_pages; $p++){
-			if($p > $endPage)	break;
+		for ($p = $startPage; $p <= $cnt_pages; $p++) {
+			if ($p > $endPage) {
+				break;
+			}
 
-			if($p == $crnt_page){
+			if ($p == $crnt_page) {
 				$pagespan = new CSpan($p, 'bold textcolorstyles');
 			}
-			else{
+			else {
 				$pagespan = new CSpan($p, 'darklink');
-				$pagespan->setAttribute('onclick', 'javascript: openPage('.(($p-1) * $rows_per_page).');');
+				$pagespan->setAttribute('onclick', 'javascript: openPage('.(($p - 1) * $rows_per_page).');');
 			}
 
 			$pageline[] = $pagespan;
@@ -1449,17 +1475,17 @@ function getPagingLine(&$items, $autotrim=true){
 
 		array_pop($pageline);
 
-		if($crnt_page <  $cnt_pages){
-			$pagespan = new CSpan(S_NEXT_PAGE.' >', 'darklink');
+		if ($crnt_page < $cnt_pages) {
+			$pagespan = new CSpan(_('Next').' >', 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage('.($crnt_page * $rows_per_page).');');
 
 			$pageline[] = ' | ';
 			$pageline[] = $pagespan;
 		}
 
-		if($p < $cnt_pages){
-			$pagespan = new CSpan(S_LAST_PAGE.' >>', 'darklink');
-			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($cnt_pages-1) * $rows_per_page).');');
+		if ($p < $cnt_pages) {
+			$pagespan = new CSpan(_('Last').' >>', 'darklink');
+			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($cnt_pages - 1) * $rows_per_page).');');
 
 			$pageline[] = '&nbsp;&nbsp;';
 			$pageline[] = $pagespan;
@@ -1468,139 +1494,141 @@ function getPagingLine(&$items, $autotrim=true){
 		$table = new CTable(null, 'paging');
 		$table ->addRow(new CCol($pageline));
 	}
-// Table view
 
 	$view_from_page = ($crnt_page-1) * $rows_per_page + 1;
 
 	$view_till_page = $crnt_page * $rows_per_page;
-	if($view_till_page > $cnt_items) $view_till_page = $cnt_items;
-
-	$page_view = array();
-	$page_view[] = S_DISPLAYING.SPACE;
-	if($cnt_items > 0){
-		$page_view[] = new CSpan($view_from_page,'info');
-		$page_view[] = SPACE.S_TO_SMALL.SPACE;
+	if ($view_till_page > $cnt_items) {
+		$view_till_page = $cnt_items;
 	}
 
-	$page_view[] = new CSpan($view_till_page,'info');
-	$page_view[] = SPACE.S_OF_SMALL.SPACE;
-	$page_view[] = new CSpan($cnt_items,'info');
+	$page_view = array();
+	$page_view[] = _('Displaying').SPACE;
+	if ($cnt_items > 0) {
+		$page_view[] = new CSpan($view_from_page, 'info');
+		$page_view[] = SPACE._('to').SPACE;
+	}
+
+	$page_view[] = new CSpan($view_till_page, 'info');
+	$page_view[] = SPACE._('of').SPACE;
+	$page_view[] = new CSpan($cnt_items, 'info');
 	$page_view[] = $search_limit;
-	$page_view[] = SPACE.S_FOUND_SMALL;
+	$page_view[] = SPACE._('found');
 
 	$page_view = new CSpan($page_view);
 
 	zbx_add_post_js('insertInElement("numrows",'.zbx_jsvalue($page_view->toString()).',"div");');
 
-return $table;
+	return $table;
 }
 
 /************* DYNAMIC REFRESH *************/
-function add_doll_objects($ref_tab, $pmid='mainpage'){
+function add_doll_objects($ref_tab, $pmid = 'mainpage') {
 	$upd_script = array();
-	foreach($ref_tab as $id => $doll){
+	foreach ($ref_tab as $id => $doll) {
 		$upd_script[$doll['id']] = format_doll_init($doll);
 	}
-
 	zbx_add_post_js('initPMaster('.zbx_jsvalue($pmid).','.zbx_jsvalue($upd_script).');');
 }
 
-function format_doll_init($doll){
-	$args = array('frequency' => 60,
-					'url' => '',
-					'counter' => 0,
-					'darken' => 0,
-					'params' => array()
-				);
+function format_doll_init($doll) {
+	$args = array(
+		'frequency' => 60,
+		'url' => '',
+		'counter' => 0,
+		'darken' => 0,
+		'params' => array()
+	);
 
-	foreach($args as $key => $def){
-		if(isset($doll[$key])) $obj[$key] = $doll[$key];
-		else $obj[$key] = $def;
+	foreach ($args as $key => $def) {
+		if (isset($doll[$key])) {
+			$obj[$key] = $doll[$key];
+		}
+		else {
+			$obj[$key] = $def;
+		}
 	}
 
-	$obj['url'].= (zbx_empty($obj['url'])? '?':'&').'output=html';
-
+	$obj['url'].= (zbx_empty($obj['url']) ? '?' : '&').'output=html';
 	$obj['params']['favobj'] = 'hat';
 	$obj['params']['favref'] = $doll['id'];
 	$obj['params']['action'] = 'refresh';
-
-return $obj;
+	return $obj;
 }
 
-function get_update_doll_script($pmasterid, $dollid, $key, $value=''){
-	$script = 'PMasters['.zbx_jsvalue($pmasterid).'].dolls['.zbx_jsvalue($dollid).'].'.$key.'('.zbx_jsvalue($value).');';
-return $script;
+function get_update_doll_script($pmasterid, $dollid, $key, $value = '') {
+	return 'PMasters['.zbx_jsvalue($pmasterid).'].dolls['.zbx_jsvalue($dollid).'].'.$key.'('.zbx_jsvalue($value).');';
 }
 
-function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$submenu, $menu_type=1){
-
-	if($menu_type == 1){
-		$intervals = array('10'=>10, '30'=>30, '60'=>60, '120'=>120, '600'=>600, '900'=>900);
-		$title = S_REFRESH_TIME_IN_SECONDS;
+function make_refresh_menu($pmid, $dollid, $cur_interval, $params = null, &$menu, &$submenu, $menu_type = 1) {
+	if ($menu_type == 1) {
+		$intervals = array('10' => 10, '30' => 30, '60' => 60, '120' => 120, '600' => 600, '900' => 900);
+		$title = _('Refresh time in seconds');
 	}
-	else if($menu_type == 2){
-		$intervals = array('x0.25'=>0.25, 'x0.5'=>0.5, 'x1'=>1, 'x1.5'=>1.5, 'x2'=>2, 'x3'=>3, 'x4'=>4, 'x5'=>5);
-		$title = S_REFRESH_TIME_MULTIPLIER;
+	elseif ($menu_type == 2) {
+		$intervals = array('x0.25' => 0.25, 'x0.5' => 0.5, 'x1' => 1, 'x1.5' => 1.5, 'x2' => 2, 'x3' => 3, 'x4' => 4, 'x5' => 5);
+		$title = _('Refresh time multiplier');
 	}
 
-	$menu['menu_'.$dollid][] = array($title, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+	$menu['menu_'.$dollid][] = array($title, null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader')));
 
-	foreach($intervals as $key => $value){
+	foreach ($intervals as $key => $value) {
 		$menu['menu_'.$dollid][] = array(
 			$key,
 			'javascript: setRefreshRate('.zbx_jsvalue($pmid).','.zbx_jsvalue($dollid).','.$value.','.zbx_jsvalue($params).');'.
 			'void(0);',
 			null,
-			array('outer' => ($value == $cur_interval)? 'pum_b_submenu':'pum_o_submenu', 'inner'=>array('pum_i_submenu')
+			array('outer' => ($value == $cur_interval) ? 'pum_b_submenu' : 'pum_o_submenu', 'inner' => array('pum_i_submenu')
 		));
 	}
 	$submenu['menu_'.$dollid][] = array();
 }
 
-/************* END REFRESH *************/
-
-
 /************* MATH *************/
-
 function bcfloor($number) {
 	if (strpos($number, '.') !== false) {
-		if (($tmp = preg_replace('/\.0+$/', '', $number)) !== $number)
+		if (($tmp = preg_replace('/\.0+$/', '', $number)) !== $number) {
 			$number = $tmp;
-		else if ($number[0] != '-')
+		}
+		elseif ($number[0] != '-') {
 			$number = bcadd($number, 0, 0);
-		else
+		}
+		else {
 			$number = bcsub($number, 1, 0);
+		}
 	}
 	return $number == '-0' ? '0' : $number;
 }
 
 function bcceil($number) {
 	if (strpos($number, '.') !== false) {
-		if (($tmp = preg_replace('/\.0+$/', '', $number)) !== $number)
+		if (($tmp = preg_replace('/\.0+$/', '', $number)) !== $number) {
 			$number = $tmp;
-		else if ($number[0] != '-')
+		}
+		elseif ($number[0] != '-') {
 			$number = bcadd($number, 1, 0);
-		else
+		}
+		else {
 			$number = bcsub($number, 0, 0);
+		}
 	}
 	return $number == '-0' ? '0' : $number;
 }
 
 function bcround($number, $precision = 0) {
 	if (strpos($number, '.') !== false) {
-		if ($number[0] != '-')
+		if ($number[0] != '-') {
 			$number = bcadd($number, '0.' . str_repeat('0', $precision) . '5', $precision);
-		else
+		}
+		else {
 			$number = bcsub($number, '0.' . str_repeat('0', $precision) . '5', $precision);
+		}
 	}
-	else if ($precision != 0) {
+	elseif ($precision != 0) {
 		$number .= '.' . str_repeat('0', $precision);
 	}
-	// According to bccomp(), '-0.0' does not equal '-0'. However, '0.0' and '0' are equal.
+	// according to bccomp(), '-0.0' does not equal '-0'. However, '0.0' and '0' are equal.
 	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
 	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
 }
-
-/************* END MATH *************/
-
 ?>

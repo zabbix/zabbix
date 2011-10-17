@@ -52,7 +52,7 @@ class CForm extends CTag {
 		elseif (!is_string($value)) {
 			return $this->error('Incorrect value for SetEnctype ['.$value.']');
 		}
-		return $this->setAttribute('enctype',$value);
+		return $this->setAttribute('enctype', $value);
 	}
 
 	public function addVar($name, $value, $id = null) {

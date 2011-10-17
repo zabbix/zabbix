@@ -203,9 +203,9 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 	$ev_select = new CComboBox('show_events', $_REQUEST['show_events']);
 	$ev_select->addItem(EVENTS_OPTION_NOEVENT, S_HIDE_ALL);
-	$ev_select->addItem(EVENTS_OPTION_ALL, S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
+	$ev_select->addItem(EVENTS_OPTION_ALL, S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?_('Days'):S_DAY).')');
 	if($config['event_ack_enable']){
-		$ev_select->addItem(EVENTS_OPTION_NOT_ACK, S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
+		$ev_select->addItem(EVENTS_OPTION_NOT_ACK, S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?_('Days'):S_DAY).')');
 	}
 	$filterForm->addRow(S_EVENTS, $ev_select);
 
@@ -230,7 +230,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$cbd = new CCheckBox('status_change', $_REQUEST['status_change'], $action, 1);
 	$cbd->addStyle('vertical-align: middle;');
 
-	$spand = new CSpan(S_DAYS_SMALL);
+	$spand = new CSpan(_('days'));
 	$spand->addStyle('vertical-align: middle;');
 	$filterForm->addRow(S_AGE_LESS_THAN, array(
 		$cbd,
@@ -565,7 +565,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 			$maint_span = null;
 			if($trigger_host['maintenance_status']){
-				$text = $trigger_host['maintenance_type'] ? S_NO_DATA_MAINTENANCE : S_NORMAL_MAINTENANCE;
+				$text = $trigger_host['maintenance_type'] ? _('Maintenance without data collection') : _('Maintenance with data collection');
 				$text = ' ['.$text.']';
 				$maint_span = new CSpan($text, 'orange pointer');
 

@@ -2,6 +2,8 @@
 Changes for 1.9.7
 
 New features:
+ - [ZBXNEXT-429] make range select work in a more intutive fashion (Eduard)
+ - [ZBXNEXT-910] redesign Administration->Maintenance (Eduard)
  - [ZBX-4222] added more clear labels 'Escalation period' and 'Default escalation period' in configuration of actions (Alexei)
  - [ZBXNEXT-485] improved simple checks key syntax as in other item keys (Sasha)
  - [ZBXNEXT-916] redesign Administration->Users, Users groups, User Profile (Eduard)
@@ -14,6 +16,7 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4132] fixed checkbox cookie work (Eduard)
  - [ZBX-3635] fixed situation when templated trigger can reference items from another template not linked to a host (Vedmak)
  - [ZBX-4107] fixed map element configuration form layout (Vedmak)
  - [ZBX-4219] replaced {HOSTNAME} by {HOST.NAME} in data.sql (Alexei)

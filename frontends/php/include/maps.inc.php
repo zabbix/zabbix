@@ -819,7 +819,7 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		}
 		$info['info']['maintenance'] = array(
-			'msg' => $i['maintenance'].' '.S_MAINTENANCE,
+			'msg' => $i['maintenance'].' '._('Maintenance'),
 			'color' => $colors['Orange'],
 		);
 		$has_status = true;
@@ -908,7 +908,7 @@ function getMapsInfo($selement, $i, $show_unack) {
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		}
 		$info['info']['maintenance'] = array(
-			'msg' => $i['maintenance'].' '.S_MAINTENANCE,
+			'msg' => $i['maintenance'].' '._('Maintenance'),
 			'color' => $colors['Orange'],
 		);
 		$has_status = true;
