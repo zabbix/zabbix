@@ -19,28 +19,29 @@
 **/
 ?>
 <?php
-class CCol extends CTag{
-	public function __construct($item=NULL,$class=NULL){
-		parent::__construct('td','yes');
-
+class CCol extends CTag {
+	public function __construct($item = null, $class = null) {
+		parent::__construct('td', 'yes');
 		$this->addItem($item);
 		$this->setAttribute('class', $class);
 	}
 
-	public function setAlign($value){
+	public function setAlign($value) {
 		return $this->attributes['align'] = $value;
 	}
 
-	public function setRowSpan($value){
+	public function setRowSpan($value) {
 		return $this->attributes['rowspan'] = strval($value);
 	}
 
-	public function setColSpan($value){
+	public function setColSpan($value) {
 		return $this->attributes['colspan'] =strval($value);
 	}
 
-	public function setWidth($value){
-		if(is_string($value))$this->setAttribute('width',$value);
+	public function setWidth($value) {
+		if (is_string($value)) {
+			$this->setAttribute('width', $value);
+		}
 	}
 }
 ?>

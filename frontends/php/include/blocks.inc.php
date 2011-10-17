@@ -965,7 +965,7 @@ function make_latest_issues(array $filter = array()) {
 			$maintenance = reset($maintenances);
 
 			$text = $maintenance['name'];
-			$text.=' ['.($trigger_host['maintenance_type'] ? S_NO_DATA_MAINTENANCE : S_NORMAL_MAINTENANCE).']';
+			$text.=' ['.($trigger_host['maintenance_type'] ? _('Maintenance without data collection') : _('Maintenance with data collection')).']';
 		}
 
 		$host = new CSpan($trigger['hostname'], $style.' pointer');

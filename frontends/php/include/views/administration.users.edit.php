@@ -296,15 +296,16 @@ if (!$this->data['is_profile']) {
 	 * Permissions tab
 	 */
 	$permissionsFormList = new CFormList('permissionsFormList');
+
+	$userTypeComboBox = new CComboBox('user_type', $this->data['user_type'], 'submit();');
+	$userTypeComboBox->addItem(USER_TYPE_ZABBIX_USER, user_type2str(USER_TYPE_ZABBIX_USER));
+	$userTypeComboBox->addItem(USER_TYPE_ZABBIX_ADMIN, user_type2str(USER_TYPE_ZABBIX_ADMIN));
+	$userTypeComboBox->addItem(USER_TYPE_SUPER_ADMIN, user_type2str(USER_TYPE_SUPER_ADMIN));
 	if (isset($this->data['userid']) && bccomp($USER_DETAILS['userid'], $this->data['userid']) == 0) {
-		$userForm->addVar('user_type', $this->data['user_type']);
-		$permissionsFormList->addRow(_('User type'), new CSpan(user_type2str($this->data['user_type'])));
+		$userTypeComboBox->setEnabled('disabled');
+		$permissionsFormList->addRow(_('User type'), array($userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))));
 	}
 	else {
-		$userTypeComboBox = new CComboBox('user_type', $this->data['user_type'], 'submit();');
-		$userTypeComboBox->addItem(USER_TYPE_ZABBIX_USER, user_type2str(USER_TYPE_ZABBIX_USER));
-		$userTypeComboBox->addItem(USER_TYPE_ZABBIX_ADMIN, user_type2str(USER_TYPE_ZABBIX_ADMIN));
-		$userTypeComboBox->addItem(USER_TYPE_SUPER_ADMIN, user_type2str(USER_TYPE_SUPER_ADMIN));
 		$permissionsFormList->addRow(_('User type'), $userTypeComboBox);
 	}
 	$permissionsFormList = getPermissionsFormList($this->data['user_rights'], $this->data['user_type'], $permissionsFormList);

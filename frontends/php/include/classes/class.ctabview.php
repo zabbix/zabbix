@@ -24,75 +24,80 @@
  * Produces Zabbix object for more comfortable usage of jQuery tabbed view
  * @author Aly
  */
-class CTabView extends CDiv{
+class CTabView extends CDiv {
 	protected $id = 'tabs';
 	protected $tabs = array();
 	protected $headers = array();
-
 	protected $selectedTab = null;
 	protected $rememberTab = false;
 
-	public function __construct($data = array()){
-		if(isset($data['id'])) $this->id = $data['id'];
-		if(isset($data['remember'])) $this->setRemember($data['remember']);
-		if(isset($data['selected'])) $this->setSelected($data['selected']);
-
+	public function __construct($data = array()) {
+		if (isset($data['id'])) {
+			$this->id = $data['id'];
+		}
+		if (isset($data['remember'])) {
+			$this->setRemember($data['remember']);
+		}
+		if (isset($data['selected'])) {
+			$this->setSelected($data['selected']);
+		}
 		parent::__construct();
 		$this->attr('id', zbx_formatDomId($this->id));
 		$this->attr('class', 'min-width hidden');
 	}
 
-	public function setRemember($remember){
+	public function setRemember($remember) {
 		$this->rememberTab = $remember;
 	}
 
-	public function setSelected($selected){
+	public function setSelected($selected) {
 		$this->selectedTab = $selected;
 	}
 
-	public function addTab($id, $header, $body){
+	public function addTab($id, $header, $body) {
 		$this->headers[$id] = $header;
-
 		$this->tabs[$id] = new CDiv($body);
 		$this->tabs[$id]->attr('id', zbx_formatDomId($id));
 	}
 
-	public static function setFooter($main, $others){
-
+	public static function setFooter($main, $others) {// TODO
 	}
 
-	public function toString($destroy=true){
-		if(count($this->tabs) == 1){
+	public function toString($destroy = true) {
+		if (count($this->tabs) == 1) {
 			$this->setAttribute('class', 'min-width ui-tabs ui-widget ui-widget-content ui-corner-all widget');
 
 			$header = reset($this->headers);
 			$header = new CDiv($header);
 			$header->addClass('ui-corner-all ui-widget-header header');
+			$header->setAttribute('id', 'tab_'.key($this->headers));
 			$this->addItem($header);
-
 
 			$tab = reset($this->tabs);
 			$tab->addClass('ui-tabs ui-tabs-panel ui-widget ui-widget-content ui-corner-all widget');
 			$this->addItem($tab);
 		}
-		else{
+		else {
 			$headersList = new CList();
-			foreach($this->headers as $id => $header){
-				$headersList->addItem(new CLink($header, '#'.$id, null, null, false));
+			foreach ($this->headers as $id => $header) {
+				$tabLink = new CLink($header, '#'.$id, null, null, false);
+				$tabLink->setAttribute('id', 'tab_'.$id);
+				$headersList->addItem($tabLink);
 			}
 
 			$this->addItem($headersList);
 			$this->addItem($this->tabs);
 
 			$options = array();
-			if(!is_null($this->selectedTab))
+			if (!is_null($this->selectedTab)) {
 				$options['selected'] = $this->selectedTab;
-			if(!is_null($this->rememberTab) && ($this->rememberTab > 0))
+			}
+			if (!is_null($this->rememberTab) && ($this->rememberTab > 0)) {
 				$options['cookie'] = array('expires' => $this->rememberTab);
+			}
 
 			zbx_add_post_js('jQuery(function() { jQuery( "#'.$this->id.'" ).tabs('.zbx_jsvalue($options, true).').show(); });');
 		}
-
 		return parent::toString($destroy);
 	}
 }

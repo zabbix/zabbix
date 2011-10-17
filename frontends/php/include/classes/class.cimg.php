@@ -19,21 +19,18 @@
 **/
 ?>
 <?php
-class CImg extends CTag{
-
-	public function __construct($src,$name=NULL,$width=NULL,$height=NULL,$class=NULL){
-		parent::__construct('img','no');
-
-		$this->tag_start= '';
+class CImg extends CTag {
+	public function __construct($src, $name = null, $width = null, $height = null, $class = null) {
+		parent::__construct('img', 'no');
+		$this->tag_start = '';
 		$this->tag_end = '';
 		$this->tag_body_start = '';
 		$this->tag_body_end = '';
-
-		if(is_null($name))
-			$name='image';
-
-		$this->setAttribute('border',0);
-		$this->setAttribute('alt',$name);
+		if (is_null($name)) {
+			$name = 'image';
+		}
+		$this->setAttribute('border', 0);
+		$this->setAttribute('alt', $name);
 		$this->setName($name);
 		$this->setAltText($name);
 		$this->setSrc($src);
@@ -42,48 +39,53 @@ class CImg extends CTag{
 		$this->setAttribute('class', $class);
 	}
 
-	public function setSrc($value){
-		if(!is_string($value)){
+	public function setSrc($value) {
+		if (!is_string($value)) {
 			return $this->error('Incorrect value for SetSrc ['.$value.']');
 		}
-	return $this->setAttribute('src',$value);
+		return $this->setAttribute('src', $value);
 	}
 
-	public function setAltText($value=NULL){
-		if(!is_string($value)){
+	public function setAltText($value = null) {
+		if (!is_string($value)) {
 			return $this->error('Incorrect value for SetText ['.$value.']');
 		}
-	return $this->setAttribute('alt',$value);
+		return $this->setAttribute('alt', $value);
 	}
 
-	public function setMap($value=NULL){
-		if(is_null($value))
+	public function setMap($value = null) {
+		if (is_null($value)) {
 			$this->deleteOption('usemap');
-
-		if(!is_string($value)){
+		}
+		if (!is_string($value)) {
 			return $this->error('Incorrect value for SetMap ['.$value.']');
 		}
-
-		$value = '#'.ltrim($value,'#');
-	return $this->setAttribute('usemap',$value);
+		$value = '#'.ltrim($value, '#');
+		return $this->setAttribute('usemap', $value);
 	}
 
-	public function SetWidth($value=NULL){
-		if(is_null($value))
+	public function setWidth($value = null) {
+		if (is_null($value)) {
 			return $this->removeAttribute('width');
-		else if(is_numeric($value)||is_int($value))
+		}
+		elseif (is_numeric($value) || is_int($value)) {
 			return $this->setAttribute('width',$value);
-		else
+		}
+		else {
 			return $this->error('Incorrect value for SetWidth ['.$value.']');
+		}
 	}
 
-	public function setHeight($value=NULL){
-		if(is_null($value))
+	public function setHeight($value = null) {
+		if (is_null($value)) {
 			return $this->removeAttribute('height');
-		else if(is_numeric($value)||is_int($value))
-			return $this->setAttribute('height',$value);
-		else
+		}
+		elseif (is_numeric($value) || is_int($value)) {
+			return $this->setAttribute('height', $value);
+		}
+		else {
 			return $this->error('Incorrect value for SetHeight ['.$value.']');
+		}
 	}
 }
 ?>

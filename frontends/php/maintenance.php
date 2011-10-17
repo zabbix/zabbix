@@ -24,686 +24,455 @@ require_once('include/hosts.inc.php');
 require_once('include/maintenances.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = 'S_MAINTENANCE';
+$page['title'] = _('Maintenance');
 $page['file'] = 'maintenance.php';
-$page['hist_arg'] = array('groupid','hostid');
+$page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.calendar.js');
 
 include_once('include/page_header.php');
 ?>
 <?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-/* ARRAYS */
-		'hosts'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groups'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'hostids'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groupids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'hostid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groupid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-
-// maintenance
-		'maintenanceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
-		'maintenanceids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
-		'mname'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({save})'),
-		'maintenance_type'=>	array(T_ZBX_INT, O_OPT,	null,	null,		'isset({save})'),
-
-		'description'=>			array(T_ZBX_STR, O_OPT,	NULL,	null,		'isset({save})'),
-
-		'active_since'=>		array(T_ZBX_STR, O_OPT,  null, 	NOT_EMPTY,	'isset({save})'),
-		'active_till'=>			array(T_ZBX_STR, O_OPT,  null, 	NOT_EMPTY,	'isset({save})'),
-
-		'new_timeperiod'=>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'),
-
-		'timeperiods'=>			array(T_ZBX_STR, O_OPT, null,	null, null),
-		'g_timeperiodid'=>		array(null,		 O_OPT, null,	null, null),
-
-		'edit_timeperiodid'=>	array(null,		 O_OPT, P_ACT,	DB_ID, null),
-		'twb_groupid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-
-// actions
-		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
-// form actions
-		'add_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, 	null, null),
-		'del_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel_new_timeperiod'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-
-		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
-/* other */
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
-	);
-
-	check_fields($fields);
-	validate_sort_and_sortorder('name',ZBX_SORT_UP);
-
-	$_REQUEST['go'] = get_request('go','none');
-
-// PERMISSIONS
-	if(get_request('groupid', 0) > 0){
-		$groupids = available_groups($_REQUEST['groupid'], 1);
-		if(empty($groupids)) access_deny();
-	}
-
-	if(get_request('hostid', 0) > 0){
-		$hostids = available_hosts($_REQUEST['hostid'], 1);
-		if(empty($hostids)) access_deny();
-	}
+//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'hosts' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'groups' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'hostids' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'groupids' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'hostid' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'groupid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	// maintenance
+	'maintenanceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
+	'maintenanceids' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 		null),
+	'mname' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
+	'maintenance_type' =>		array(T_ZBX_INT, O_OPT, null,	null,		'isset({save})'),
+	'description' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
+	'active_since' =>			array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({save})'),
+	'active_till' =>			array(T_ZBX_STR, O_OPT, null, 	NOT_EMPTY,	'isset({save})'),
+	'new_timeperiod' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'),
+	'timeperiods' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'g_timeperiodid' =>			array(null,		 O_OPT, null,	null,		null),
+	'edit_timeperiodid' =>		array(null,		 O_OPT, P_ACT,	DB_ID,		null),
+	'twb_groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	// actions
+	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'add_timeperiod' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'del_timeperiod' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'cancel_new_timeperiod' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'clone' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'cancel' =>					array(T_ZBX_STR, O_OPT, P_SYS,		 null,	null),
+	// form
+	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'form_refresh' =>			array(T_ZBX_STR, O_OPT, null,	null,		null)
+);
+check_fields($fields);
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 ?>
 <?php
-/************ MAINTENANCE ****************/
+$_REQUEST['go'] = get_request('go', 'none');
 
-	if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
-		unset($_REQUEST['maintenanceid']);
-		$_REQUEST['form'] = 'clone';
+// permissions
+if (get_request('groupid', 0) > 0) {
+	$groupids = available_groups($_REQUEST['groupid'], 1);
+	if (empty($groupids)) {
+		access_deny();
 	}
-	elseif (isset($_REQUEST['cancel_new_timeperiod'])) {
-		unset($_REQUEST['new_timeperiod']);
+}
+if (get_request('hostid', 0) > 0) {
+	$hostids = available_hosts($_REQUEST['hostid'], 1);
+	if (empty($hostids)) {
+		access_deny();
 	}
-	elseif (isset($_REQUEST['save'])) {
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-			access_deny();
+}
+/*
+ * Clone
+ */
+if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
+	unset($_REQUEST['maintenanceid']);
+	$_REQUEST['form'] = 'clone';
+}
+elseif (isset($_REQUEST['cancel_new_timeperiod'])) {
+	unset($_REQUEST['new_timeperiod']);
+}
+/*
+ * Save
+ */
+elseif (isset($_REQUEST['save'])) {
+	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+		access_deny();
+	}
 
+	if (isset($_REQUEST['maintenanceid'])) {
+		$msg1 = _('Maintenance updated');
+		$msg2 = _('Cannot update maintenance');
+	}
+	else {
+		$msg1 = _('Maintenance added');
+		$msg2 = _('Cannot add maintenance');
+	}
+
+	$active_since = zbxDateToTime(get_request('active_since', date('YmdHis')));
+	$active_till = zbxDateToTime(get_request('active_till'));
+
+	$isValid = true;
+	if (empty($active_since)) {
+		error(_s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active since')));
+		$isValid = false;
+	}
+	if (empty($active_till)) {
+		error(_s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active till')));
+		$isValid = false;
+	}
+
+	if ($isValid) {
 		$maintenance = array(
 			'name' => $_REQUEST['mname'],
 			'maintenance_type' => $_REQUEST['maintenance_type'],
-			'description'=>	$_REQUEST['description'],
-			'active_since'=> zbxDateToTime(get_request('active_since', date('YmdHis'))),
-			'active_till' => zbxDateToTime(get_request('active_till', 0)),
+			'description' => $_REQUEST['description'],
+			'active_since' => $active_since,
+			'active_till' => $active_till,
 			'timeperiods' => get_request('timeperiods', array()),
 			'hostids' => get_request('hostids', array()),
-			'groupids' => get_request('groupids', array()),
+			'groupids' => get_request('groupids', array())
 		);
 
-		if(isset($_REQUEST['maintenanceid'])){
+		if (isset($_REQUEST['maintenanceid'])) {
 			$maintenance['maintenanceid'] = $_REQUEST['maintenanceid'];
-
 			$result = API::Maintenance()->update($maintenance);
-
-			$msg1 = S_MAINTENANCE_UPDATED;
-			$msg2 = S_CANNOT_UPDATE_MAINTENANCE;
 		}
-		else{
+		else {
 			$result = API::Maintenance()->create($maintenance);
-
-			$msg1 = S_MAINTENANCE_ADDED;
-			$msg2 = S_CANNOT_ADD_MAINTENANCE;
 		}
 
-		show_messages($result,$msg1,$msg2);
-
-		if($result){ // result - OK
-			add_audit(!isset($_REQUEST['maintenanceid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE,
-				AUDIT_RESOURCE_MAINTENANCE,
-				S_NAME.': '.$_REQUEST['mname']);
-
+		if ($result) {
+			add_audit(!isset($_REQUEST['maintenanceid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, _('Name').': '.$_REQUEST['mname']);
 			unset($_REQUEST['form']);
 		}
+		show_messages($result, $msg1, $msg2);
+	} else {
+		show_error_message($msg2);
 	}
-	else if(isset($_REQUEST['delete']) || ($_REQUEST['go'] == 'delete')){
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
+}
+/*
+ * Delete
+ */
+elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
+	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+		access_deny();
+	}
 
-		$maintenanceids = get_request('maintenanceid', array());
-		if(isset($_REQUEST['maintenanceids']))
-			$maintenanceids = $_REQUEST['maintenanceids'];
+	$maintenanceids = get_request('maintenanceid', array());
+	if (isset($_REQUEST['maintenanceids'])) {
+		$maintenanceids = $_REQUEST['maintenanceids'];
+	}
 
-		zbx_value2array($maintenanceids);
+	zbx_value2array($maintenanceids);
 
-		$maintenances = array();
-		foreach($maintenanceids as $id => $maintenanceid){
-			$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
+	$maintenances = array();
+	foreach ($maintenanceids as $id => $maintenanceid) {
+		$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
+	}
+
+	$go_result = API::Maintenance()->delete($maintenanceids);
+	if ($go_result) {
+		foreach ($maintenances as $maintenanceid => $maintenance) {
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, 'Id ['.$maintenanceid.'] '._('Name').' ['.$maintenance['name'].']');
 		}
+		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
+	}
+	show_messages($go_result, _('Maintenance deleted'), _('Cannot delete maintenance'));
+}
+elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])) {
+	$new_timeperiod = $_REQUEST['new_timeperiod'];
+	$new_timeperiod['start_date'] = zbxDateToTime($new_timeperiod['start_date']);
 
-		$go_result = API::Maintenance()->delete($maintenanceids);
+	// start time
+	$new_timeperiod['start_time'] = ($new_timeperiod['hour'] * 3600) + ($new_timeperiod['minute'] * 60);
 
-		show_messages($go_result,S_MAINTENANCE_DELETED,S_CANNOT_DELETE_MAINTENANCE);
-		if($go_result){
-			foreach($maintenances as $maintenanceid => $maintenance){
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAINTENANCE,'Id ['.$maintenanceid.'] '.S_NAME.' ['.$maintenance['name'].']');
-			}
+	// period
+	$new_timeperiod['period'] = ($new_timeperiod['period_days'] * 86400) + ($new_timeperiod['period_hours'] * 3600) + ($new_timeperiod['period_minutes'] * 60);
 
-			unset($_REQUEST['form']);
-			unset($_REQUEST['maintenanceid']);
+	// days of week
+	if (!isset($new_timeperiod['dayofweek'])) {
+		$dayofweek =  (!isset($new_timeperiod['dayofweek_su'])) ? '0' : '1';
+		$dayofweek .= (!isset($new_timeperiod['dayofweek_sa'])) ? '0' : '1';
+		$dayofweek .= (!isset($new_timeperiod['dayofweek_fr'])) ? '0' : '1';
+		$dayofweek .= (!isset($new_timeperiod['dayofweek_th'])) ? '0' : '1';
+		$dayofweek .= (!isset($new_timeperiod['dayofweek_we'])) ? '0' : '1';
+		$dayofweek .= (!isset($new_timeperiod['dayofweek_tu'])) ? '0' : '1';
+		$dayofweek .= (!isset($new_timeperiod['dayofweek_mo'])) ? '0' : '1';
+		$new_timeperiod['dayofweek'] = bindec($dayofweek);
+	}
+
+	// months
+	if (!isset($new_timeperiod['month'])) {
+		$month =  (!isset($new_timeperiod['month_dec'])) ? '0' : '1';
+		$month .= (!isset($new_timeperiod['month_nov'])) ? '0' : '1';
+		$month .= (!isset($new_timeperiod['month_oct'])) ? '0' : '1';
+		$month .= (!isset($new_timeperiod['month_sep'])) ? '0' : '1';
+		$month .= (!isset($new_timeperiod['month_aug'])) ? '0' : '1';
+		$month .= (!isset($new_timeperiod['month_jul'])) ? '0' : '1';
+		$month .= (!isset($new_timeperiod['month_jun'])) ? '0' : '1';
+		$month .= (!isset($new_timeperiod['month_may'])) ? '0' : '1';
+		$month .= (!isset($new_timeperiod['month_apr'])) ? '0' : '1';
+		$month .= (!isset($new_timeperiod['month_mar'])) ? '0' : '1';
+		$month .= (!isset($new_timeperiod['month_feb'])) ? '0' : '1';
+		$month .= (!isset($new_timeperiod['month_jan'])) ? '0' : '1';
+		$new_timeperiod['month'] = bindec($month);
+	}
+
+	if ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
+		if ($new_timeperiod['month_date_type'] > 0) {
+			$new_timeperiod['day'] = 0;
+		}
+		else {
+			$new_timeperiod['every'] = 0;
+			$new_timeperiod['dayofweek'] = 0;
 		}
 	}
-	elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])) {
-		$new_timeperiod = $_REQUEST['new_timeperiod'];
 
-		$new_timeperiod['start_date'] = zbxDateToTime($new_timeperiod['start_date']);
+	$_REQUEST['timeperiods'] = get_request('timeperiods', array());
 
-// START TIME
-		$new_timeperiod['start_time'] = ($new_timeperiod['hour'] * 3600) + ($new_timeperiod['minute'] * 60);
-
-// PERIOD
-		$new_timeperiod['period'] = ($new_timeperiod['period_days'] * 86400) + ($new_timeperiod['period_hours'] * 3600) +
-				($new_timeperiod['period_minutes'] * 60);
-
-// DAYSOFWEEK
-		if(!isset($new_timeperiod['dayofweek'])){
-			$dayofweek = '';
-
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_su']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_sa']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_fr']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_th']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_we']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_tu']))?'0':'1';
-			$dayofweek .= (!isset($new_timeperiod['dayofweek_mo']))?'0':'1';
-
-			$new_timeperiod['dayofweek'] = bindec($dayofweek);
+	$result = false;
+	if ($new_timeperiod['period'] < 300) {
+		info(_('Incorrect maintenance period (minimum 5 minutes)'));
+	}
+	elseif ($new_timeperiod['hour'] > 23 || $new_timeperiod['minute'] > 59) {
+		info(_('Incorrect maintenance period'));
+	}
+	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME && $new_timeperiod['start_date'] < 1) {
+		error(_('Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18'));
+	}
+	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY && $new_timeperiod['every'] < 1) {
+		info(_('Incorrect maintenance day period'));
+	}
+	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
+		if ($new_timeperiod['every'] < 1) {
+			info(_('Incorrect maintenance week period'));
 		}
-//--
-
-// MONTHS
-		if(!isset($new_timeperiod['month'])){
-			$month = '';
-
-			$month .= (!isset($new_timeperiod['month_dec']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_nov']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_oct']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_sep']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_aug']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_jul']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_jun']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_may']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_apr']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_mar']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_feb']))?'0':'1';
-			$month .= (!isset($new_timeperiod['month_jan']))?'0':'1';
-
-			$new_timeperiod['month'] = bindec($month);
+		elseif ($new_timeperiod['dayofweek'] < 1) {
+			info(_('Incorrect maintenance days of week'));
 		}
-//--
-
-		if($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY){
-			if($new_timeperiod['month_date_type'] > 0){
-				$new_timeperiod['day'] = 0;
-			}
-			else{
-				$new_timeperiod['every'] = 0;
-				$new_timeperiod['dayofweek'] = 0;
-			}
-		}
-
-		$_REQUEST['timeperiods'] = get_request('timeperiods',array());
-
-		$result = false;
-		if($new_timeperiod['period'] < 300) {	/* 5 min */
-			info(S_INCORRECT_MAINTENANCE_PERIOD.' ('.S_MIN_SMALL.SPACE.S_5_MINUTES.')');
-		}
-		else if(($new_timeperiod['hour'] > 23) || ($new_timeperiod['minute'] > 59)){
-			info(S_INCORRECT_MAINTENANCE_PERIOD);
-		}
-		else if(($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) && ($new_timeperiod['start_date'] < 1)){
-			info(S_INCORRECT_MAINTENANCE_DATE);
-		}
-		else if(($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) && ($new_timeperiod['every'] < 1)){
-			info(S_INCORRECT_MAINTENANCE_DAY_PERIOD);
-		}
-		else if($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY){
-			if($new_timeperiod['every'] < 1){
-				info(S_INCORRECT_MAINTENANCE_WEEK_PERIOD);
-			}
-			else if($new_timeperiod['dayofweek'] < 1){
-				info(S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK);
-			}
-			else{
-				$result = true;
-			}
-		}
-		else if($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY){
-			if($new_timeperiod['month'] < 1){
-				info(S_INCORRECT_MAINTENANCE_MONTH_PERIOD);
-			}
-			else if(($new_timeperiod['day'] == 0) && ($new_timeperiod['dayofweek'] < 1)){
-				info(S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK);
-			}
-			else if((($new_timeperiod['day'] < 1) || ($new_timeperiod['day'] > 31)) && ($new_timeperiod['dayofweek'] == 0)){
-				info(S_INCORRECT_MAINTENANCE_DATE);
-			}
-			else{
-				$result = true;
-			}
-		}
-		else{
+		else {
 			$result = true;
 		}
-
-		if($result){
-			if(!isset($new_timeperiod['id'])){
-				if(!str_in_array($new_timeperiod,$_REQUEST['timeperiods']))
-					array_push($_REQUEST['timeperiods'],$new_timeperiod);
-			}
-			else{
-				$id = $new_timeperiod['id'];
-				unset($new_timeperiod['id']);
-				$_REQUEST['timeperiods'][$id] = $new_timeperiod;
-			}
-
-			unset($_REQUEST['new_timeperiod']);
+	}
+	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
+		if ($new_timeperiod['month'] < 1) {
+			info(_('Incorrect maintenance month period'));
+		}
+		elseif ($new_timeperiod['day'] == 0 && $new_timeperiod['dayofweek'] < 1) {
+			info(_('Incorrect maintenance days of week'));
+		}
+		elseif (($new_timeperiod['day'] < 1 || $new_timeperiod['day'] > 31) && $new_timeperiod['dayofweek'] == 0) {
+			info(_('Incorrect maintenance date'));
+		}
+		else {
+			$result = true;
 		}
 	}
-	elseif (isset($_REQUEST['del_timeperiod']) && isset($_REQUEST['g_timeperiodid'])) {
-		$_REQUEST['timeperiods'] = get_request('timeperiods',array());
-		foreach($_REQUEST['g_timeperiodid'] as $val){
-			unset($_REQUEST['timeperiods'][$val]);
-		}
+	else {
+		$result = true;
 	}
-	elseif (isset($_REQUEST['edit_timeperiodid'])) {
-		$_REQUEST['edit_timeperiodid'] = array_keys($_REQUEST['edit_timeperiodid']);
-		$edit_timeperiodid = $_REQUEST['edit_timeperiodid'] = array_pop($_REQUEST['edit_timeperiodid']);
-		$_REQUEST['timeperiods'] = get_request('timeperiods',array());
+	show_messages();
 
-		if(isset($_REQUEST['timeperiods'][$edit_timeperiodid])){
-			$_REQUEST['new_timeperiod'] = $_REQUEST['timeperiods'][$edit_timeperiodid];
-			$_REQUEST['new_timeperiod']['id'] = $edit_timeperiodid;
-			$_REQUEST['new_timeperiod']['start_date'] = date('YmdHis', $_REQUEST['timeperiods'][$edit_timeperiodid]['start_date']);
-		}
-	}
-
-	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
-	}
-
-
-	$options = array(
-		'groups' => array(
-			'editable' => 1,
-		),
-		'groupid' => get_request('groupid', null),
-	);
-	$pageFilter = new CPageFilter($options);
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-
-
-	$frmForm = new CForm('get');
-
-	if(!isset($_REQUEST['form'])){
-		$frmForm->addItem(new CSubmit('form',S_CREATE_MAINTENANCE_PERIOD));
-	}
-
-	$maintenance_wdgt = new CWidget();
-	$maintenance_wdgt->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'), $frmForm);
-?>
-<?php
-	if(isset($_REQUEST['form'])){
-		$frmMaintenance = new CForm();
-		$frmMaintenance->setName(S_MAINTENANCE);
-		$frmMaintenance->addVar('form', get_request('form', 1));
-		$frmMaintenance->addVar('form_refresh', get_request('form_refresh',0)+1);
-
-		if(isset($_REQUEST['maintenanceid']))
-			$frmMaintenance->addVar('maintenanceid', $_REQUEST['maintenanceid']);
-
-		$left_tab = new CTable();
-
-// MAINTENANCE FORM {{{
-		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
-			$options = array(
-				'editable' => 1,
-				'maintenanceids' => $_REQUEST['maintenanceid'],
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$maintenance = API::Maintenance()->get($options);
-			$maintenance = reset($maintenance);
-
-			$mname				= $maintenance['name'];
-			$maintenance_type	= $maintenance['maintenance_type'];
-			$active_since		= $maintenance['active_since'];
-			$active_till		= $maintenance['active_till'];
-			$description		= $maintenance['description'];
-		}
-		else{
-			$mname				= get_request('mname', '');
-			$maintenance_type	= get_request('maintenance_type', 0);
-			$active_since		= zbxDateToTime(get_request('active_since', date('YmdHis')));
-			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHis', time()+86400)));
-			$description		= get_request('description', '');
-		}
-		$tblMntc = new CTable(null, 'formElementTable');
-
-		$tblMntc->addRow(array(S_NAME, new CTextBox('mname', $mname, 50)));
-
-		$cmbType =  new CComboBox('maintenance_type', $maintenance_type);
-		$cmbType->addItem(MAINTENANCE_TYPE_NORMAL, S_WITH_DATA_COLLECTION);
-		$cmbType->addItem(MAINTENANCE_TYPE_NODATA, S_NO_DATA_COLLECTION);
-		$tblMntc->addRow(array(S_MAINTENANCE_TYPE, $cmbType));
-
-		$tblMntc->addItem(new Cvar('active_since', date('YmdHis', $active_since)));
-		$tblMntc->addItem(new Cvar('active_till', date('YmdHis', $active_till)));
-
-		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-
-		$clndr_icon->addAction('onclick', 'javascript: var pos = getPosition(this); '.
-			'pos.top+=10; pos.left+=16; CLNDR["mntc_active_since"].clndr.clndrshow(pos.top,pos.left);');
-		zbx_add_post_js('create_calendar(null, ["mntc_since_day","mntc_since_month","mntc_since_year",'.
-			'"mntc_since_hour","mntc_since_minute"],"mntc_active_since","active_since");');
-		$tblMntc->addRow(array(S_ACTIVE_SINCE,array(
-			new CNumericBox('mntc_since_day',(($active_since>0)?date('d',$active_since):''),2),	'/',
-			new CNumericBox('mntc_since_month',(($active_since>0)?date('m',$active_since):''),2), '/',
-			new CNumericBox('mntc_since_year',(($active_since>0)?date('Y',$active_since):''),4), SPACE,
-			new CNumericBox('mntc_since_hour',(($active_since>0)?date('H',$active_since):''),2), ':',
-			new CNumericBox('mntc_since_minute',(($active_since>0)?date('i',$active_since):''),2),
-			$clndr_icon
-		)));
-
-
-		$clndr_icon->addAction('onclick','javascript: var pos = getPosition(this); '.
-			'pos.top+=10; pos.left+=16; CLNDR["mntc_active_till"].clndr.clndrshow(pos.top,pos.left);');
-		zbx_add_post_js('create_calendar(null,["mntc_till_day","mntc_till_month","mntc_till_year",'.
-			'"mntc_till_hour","mntc_till_minute"],"mntc_active_till","active_till");');
-		$tblMntc->addRow(array(S_ACTIVE_TILL, array(
-			new CNumericBox('mntc_till_day',(($active_till>0)?date('d',$active_till):''),2), '/',
-			new CNumericBox('mntc_till_month',(($active_till>0)?date('m',$active_till):''),2), '/',
-			new CNumericBox('mntc_till_year',(($active_till>0)?date('Y',$active_till):''),4), SPACE,
-			new CNumericBox('mntc_till_hour',(($active_till>0)?date('H',$active_till):''),2), ':',
-			new CNumericBox('mntc_till_minute',(($active_till>0)?date('i',$active_till):''),2),
-			$clndr_icon
-		)));
-
-		$tblMntc->addRow(array(S_DESCRIPTION, new CTextArea('description', $description,66,5)));
-
-
-		$footer = array(new CSubmit('save', S_SAVE));
-		if(isset($_REQUEST['maintenanceid'])){
-			$footer[] = new CSubmit('clone',S_CLONE);
-			$footer[] = new CButtonDelete(S_DELETE_MAINTENANCE_PERIOD_Q, url_param('form').url_param('maintenanceid'));
-		}
-		$footer[] = new CButtonCancel();
-
-		$left_tab->addRow(new CFormElement(S_MAINTENANCE, $tblMntc, $footer));
-// }}} MAINTENANCE FORM
-
-
-// MAINTENANCE PERIODS {{{
-		$tblPeriod = new CTableInfo();
-
-		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
-			$timeperiods = array();
-			$sql = 'SELECT DISTINCT mw.maintenanceid, tp.* '.
-					' FROM timeperiods tp, maintenances_windows mw '.
-					' WHERE mw.maintenanceid='.$_REQUEST['maintenanceid'].
-						' AND tp.timeperiodid=mw.timeperiodid '.
-					' ORDER BY tp.timeperiod_type ASC';
-			$db_timeperiods = DBselect($sql);
-			while($timeperiod = DBfetch($db_timeperiods)){
-				$timeperiods[] = $timeperiod;
+	if ($result) {
+		if (!isset($new_timeperiod['id'])) {
+			if (!str_in_array($new_timeperiod, $_REQUEST['timeperiods'])) {
+				array_push($_REQUEST['timeperiods'], $new_timeperiod);
 			}
 		}
-		else{
-			$timeperiods = get_request('timeperiods', array());
+		else {
+			$id = $new_timeperiod['id'];
+			unset($new_timeperiod['id']);
+			$_REQUEST['timeperiods'][$id] = $new_timeperiod;
 		}
+		unset($_REQUEST['new_timeperiod']);
+	}
+}
+elseif (isset($_REQUEST['del_timeperiod']) && isset($_REQUEST['g_timeperiodid'])) {
+	$_REQUEST['timeperiods'] = get_request('timeperiods', array());
+	foreach ($_REQUEST['g_timeperiodid'] as $val) {
+		unset($_REQUEST['timeperiods'][$val]);
+	}
+}
+elseif (isset($_REQUEST['edit_timeperiodid'])) {
+	$_REQUEST['edit_timeperiodid'] = array_keys($_REQUEST['edit_timeperiodid']);
+	$edit_timeperiodid = $_REQUEST['edit_timeperiodid'] = array_pop($_REQUEST['edit_timeperiodid']);
+	$_REQUEST['timeperiods'] = get_request('timeperiods', array());
 
-		$tblPeriod->setHeader(array(
-			new CCheckBox('all_periods',null,'checkAll("'.S_PERIOD.'","all_periods","g_timeperiodid");'),
-			S_PERIOD_TYPE,
-			S_SCHEDULE,
-			S_PERIOD,
-			S_ACTION
-		));
+	if (isset($_REQUEST['timeperiods'][$edit_timeperiodid])) {
+		$_REQUEST['new_timeperiod'] = $_REQUEST['timeperiods'][$edit_timeperiodid];
+		$_REQUEST['new_timeperiod']['id'] = $edit_timeperiodid;
+		$_REQUEST['new_timeperiod']['start_date'] = date('YmdHis', $_REQUEST['timeperiods'][$edit_timeperiodid]['start_date']);
+	}
+}
 
-		foreach($timeperiods as $id => $timeperiod){
-			$tblPeriod->addRow(array(
-				new CCheckBox('g_timeperiodid[]', 'no', null, $id),
-				timeperiod_type2str($timeperiod['timeperiod_type']),
-				new CCol(shedule2str($timeperiod), 'wraptext'),
-				zbx_date2age(0,$timeperiod['period']),
-				new CSubmit('edit_timeperiodid['.$id.']', S_EDIT)
-			));
+if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
+	$url = new CUrl();
+	$path = $url->getPath();
+	insert_js('cookie.eraseArray("'.$path.'")');
+}
 
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][timeperiod_type]', $timeperiod['timeperiod_type']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][every]', $timeperiod['every']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][month]', $timeperiod['month']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][dayofweek]', $timeperiod['dayofweek']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][day]', $timeperiod['day']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][start_time]', $timeperiod['start_time']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][start_date]', $timeperiod['start_date']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][period]', $timeperiod['period']));
-		}
+$options = array(
+	'groups' => array('editable' => 1),
+	'groupid' => get_request('groupid', null)
+);
+$pageFilter = new CPageFilter($options);
+$_REQUEST['groupid'] = $pageFilter->groupid;
 
-		$footer = array();
-		if(!isset($_REQUEST['new_timeperiod'])){
-			$footer[] = new CSubmit('new_timeperiod', S_NEW);
-		}
-		if($tblPeriod->ItemsCount() > 0 ){
-			$footer[] = new CSubmit('del_timeperiod', S_DELETE_SELECTED);
-		}
+/*
+ * Display
+ */
+$data = array('form' => get_request('form'));
+if (!empty($data['form'])) {
+	$data['maintenanceid'] = get_request('maintenanceid');
+	$data['form_refresh'] = get_request('form_refresh', 0);
 
-		$left_tab->addRow(new CFormElement(S_MAINTENANCE, $tblPeriod, $footer));
-// }}} MAINTENANCE PERIODS
-
-		if(isset($_REQUEST['new_timeperiod'])){
-			$new_timeperiod = $_REQUEST['new_timeperiod'];
-
-			$left_tab->addRow(create_hat(
-					(is_array($new_timeperiod) && isset($new_timeperiod['id']))?S_EDIT_MAINTENANCE_PERIOD:S_NEW_MAINTENANCE_PERIOD,
-					get_timeperiod_form(),//nulls
-					null,
-					'hat_new_timeperiod'
-				));
-		}
-
-		$right_tab = new CTable();
-
-// MAINTENANCE HOSTS {{{
+	if (!empty($data['maintenanceid']) && !isset($_REQUEST['form_refresh'])) {
+		// get maintenance
 		$options = array(
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'maintenanceids' => $data['maintenanceid'],
+			'output' => API_OUTPUT_EXTEND
+		);
+		$maintenance = API::Maintenance()->get($options);
+		$maintenance = reset($maintenance);
+		$data['mname'] = $maintenance['name'];
+		$data['maintenance_type'] = $maintenance['maintenance_type'];
+		$data['active_since'] = $maintenance['active_since'];
+		$data['active_till'] = $maintenance['active_till'];
+		$data['description'] = $maintenance['description'];
+
+		// get time periods
+		$data['timeperiods'] = array();
+		$sql = 'SELECT DISTINCT mw.maintenanceid,tp.*'.
+				' FROM timeperiods tp,maintenances_windows mw'.
+				' WHERE mw.maintenanceid='.$data['maintenanceid'].
+					' AND tp.timeperiodid=mw.timeperiodid'.
+				' ORDER BY tp.timeperiod_type,tp.start_date';
+		$db_timeperiods = DBselect($sql);
+		while ($timeperiod = DBfetch($db_timeperiods)) {
+			$data['timeperiods'][] = $timeperiod;
+		}
+
+		// get hosts
+		$options = array(
+			'maintenanceids' => $data['maintenanceid'],
 			'real_hosts' => true,
-			'preservekeys' => true
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true
 		);
-		$all_groups = API::HostGroup()->get($options);
-		order_result($all_groups, 'name');
+		$data['hostids'] = API::Host()->get($options);
+		$data['hostids'] = zbx_objectValues($data['hostids'], 'hostid');
 
-		$twb_groupid = get_request('twb_groupid', 0);
-		if(!isset($all_groups[$twb_groupid])){
-			$twb_group = reset($all_groups);
-			$twb_groupid = $twb_group['groupid'];
-		}
-
-		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
-		foreach($all_groups as $group){
-			$cmbGroups->addItem($group['groupid'], $group['name']);
-		}
-
-		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
-			$hostids = API::Host()->get(array(
-				'maintenanceids' => $_REQUEST['maintenanceid'],
-				'real_hosts' => 1,
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => 1,
-			));
-			$hostids = zbx_objectValues($hostids, 'hostid');
-		}
-		else{
-			$hostids = get_request('hostids', array());
-		}
-
-		$host_tb = new CTweenBox($frmMaintenance, 'hostids', $hostids, 10);
-
-		// hosts from selected twb group
+		// get groupids
 		$options = array(
-			'output' => API_OUTPUT_EXTEND,
-			'real_hosts' => 1,
-			'editable' => 1,
-			'groupids' => $twb_groupid,
+			'maintenanceids' => $data['maintenanceid'],
+			'real_hosts' => true,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true
 		);
-		$hosts = API::Host()->get($options);
-
-		// selected hosts
-		$options = array(
-			'output' => API_OUTPUT_EXTEND,
-			'real_hosts' => 1,
-			'editable' => 1,
-			'hostids' => $hostids,
-		);
-		$hosts_selected = API::Host()->get($options);
-
-		$hosts = array_merge($hosts, $hosts_selected);
-		$hosts = zbx_toHash($hosts, 'hostid');
-		order_result($hosts, 'name');
-
-		foreach($hosts as $host){
-			$host_tb->addItem($host['hostid'], $host['name']);
-		}
-
-		$tblHlink = new CTable(null, 'formElementTable');
-		$tblHlink->addRow($host_tb->Get(S_IN.SPACE.S_MAINTENANCE, array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
-
-		$right_tab->addRow(new CFormElement(S_HOSTS_IN_MAINTENANCE, $tblHlink));
-// }}} MAINTENANCE HOSTS
-
-
-// MAINTENANCE GROUPS {{{
-		$tblGlink = new CTable(null, 'formElementTable');
-
-		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
-			$groupids = API::HostGroup()->get(array(
-				'maintenanceids' => $_REQUEST['maintenanceid'],
-				'real_hosts' => 1,
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => 1,
-			));
-			$groupids = zbx_objectValues($groupids, 'groupid');
-		}
-		else{
-			$groupids = get_request('groupids', array());
-		}
-
-		$group_tb = new CTweenBox($frmMaintenance, 'groupids', $groupids, 10);
-
-		foreach($all_groups as $group){
-			$group_tb->addItem($group['groupid'], $group['name']);
-		}
-
-		$tblGlink->addRow($group_tb->Get(S_IN.SPACE.S_MAINTENANCE, S_OTHER.SPACE.S_GROUPS));
-
-		$right_tab->addRow(new CFormElement(S_GROUPS_IN_MAINTENANCE, $tblGlink));
-// }}} MAINTENANCE GROUPS
-
-		$td_l = new CCol($left_tab);
-		$td_l->setAttribute('valign','top');
-
-		$td_r = new CCol($right_tab);
-		$td_r->setAttribute('valign','top');
-
-		$outer_table = new CTable();
-		$outer_table->addRow(array($td_l, $td_r));
-
-		$frmMaintenance->additem($outer_table);
-
-		show_messages();
-		$maintenance_wdgt->addItem($frmMaintenance);
+		$data['groupids'] = API::HostGroup()->get($options);
+		$data['groupids'] = zbx_objectValues($data['groupids'], 'groupid');
 	}
-	else{
-// Table HEADER
-		$form = new CForm('get');
-		$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
+	else {
+		$data['mname'] = get_request('mname', '');
+		$data['maintenance_type'] = get_request('maintenance_type', 0);
+		$data['active_since'] = zbxDateToTime(get_request('active_since', date('YmdHis')));
+		$data['active_till'] = zbxDateToTime(get_request('active_till', date('YmdHis', time() + 86400)));
+		$data['description'] = get_request('description', '');
+		$data['timeperiods'] = get_request('timeperiods', array());
+		$data['hostids'] = get_request('hostids', array());
+		$data['groupids'] = get_request('groupids', array());
+	}
 
-		$numrows = new CDiv();
-		$numrows->setAttribute('name','numrows');
+	// get groups
+	$options = array(
+		'editable' => true,
+		'output' => array('groupid', 'name'),
+		'real_hosts' => true,
+		'preservekeys' => true
+	);
+	$data['all_groups'] = API::HostGroup()->get($options);
+	order_result($data['all_groups'], 'name');
 
-		$maintenance_wdgt->addHeader(S_MAINTENANCE_PERIODS_BIG, $form);
-		$maintenance_wdgt->addHeader($numrows);
-// ----
+	$data['twb_groupid'] = get_request('twb_groupid', 0);
+	if (!isset($data['all_groups'][$data['twb_groupid']])) {
+		$twb_groupid = reset($data['all_groups']);
+		$data['twb_groupid'] = $twb_groupid['groupid'];
+	}
 
-		$sortfield = getPageSortField('name');
-		$sortorder = getPageSortOrder();
-		$options = array(
+	// get hosts from selected twb group
+	$options = array(
+		'output' => array('hostid', 'name'),
+		'real_hosts' => 1,
+		'editable' => 1,
+		'groupids' => $data['twb_groupid']
+	);
+	$data['hosts'] = API::Host()->get($options);
+
+	// selected hosts
+	$options = array(
+		'output' => array('hostid', 'name'),
+		'real_hosts' => 1,
+		'editable' => 1,
+		'hostids' => $data['hostids']
+	);
+	$hosts_selected = API::Host()->get($options);
+	$data['hosts'] = array_merge($data['hosts'], $hosts_selected);
+	$data['hosts'] = zbx_toHash($data['hosts'], 'hostid');
+	order_result($data['hosts'], 'name');
+
+	// render view
+	$maintenanceView = new CView('configuration.maintenance.edit', $data);
+	$maintenanceView->render();
+	$maintenanceView->show();
+}
+else {
+	// get maintenances
+	$sortfield = getPageSortField('name');
+	$sortorder = getPageSortOrder();
+	$options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
-		);
-		if($pageFilter->groupsSelected){
-			if($pageFilter->groupid > 0)
-				$options['groupids'] = $pageFilter->groupid;
-			else
-				$options['groupids'] = array_keys($pageFilter->groups);
+			'limit' => $config['search_limit'] + 1
+	);
+	if ($pageFilter->groupsSelected) {
+		if ($pageFilter->groupid > 0) {
+			$options['groupids'] = $pageFilter->groupid;
 		}
-		else{
-			$options['groupids'] = array();
+		else {
+			$options['groupids'] = array_keys($pageFilter->groups);
 		}
-
-		$maintenances = API::Maintenance()->get($options);
-
-		$form = new CForm();
-		$form->setName('maintenances');
-
-		$table = new CTableInfo();
-		$table->setHeader(array(
-			new CCheckBox('all_maintenances',NULL,"checkAll('".$form->GetName()."','all_maintenances','maintenanceids');"),
-			make_sorting_header(S_NAME,'name'),
-			make_sorting_header(S_TYPE,'maintenance_type'),
-			make_sorting_header(S_STATUS,'status'),
-			S_DESCRIPTION
-		));
-
-		foreach($maintenances as $mnum => $maintenance){
-			if($maintenance['active_till'] < time())
-				$maintenances[$mnum]['status'] = MAINTENANCE_STATUS_EXPIRED;
-			else if($maintenance['active_since'] > time())
-				$maintenances[$mnum]['status'] = MAINTENANCE_STATUS_APPROACH;
-			else
-				$maintenances[$mnum]['status'] = MAINTENANCE_STATUS_ACTIVE;
-		}
-		order_result($maintenances, $sortfield, $sortorder);
-		$paging = getPagingLine($maintenances);
-
-		foreach($maintenances as $mnum => $maintenance){
-			$maintenanceid = $maintenance['maintenanceid'];
-
-			switch($maintenance['status']){
-				case MAINTENANCE_STATUS_EXPIRED:
-					$mnt_status = new CSpan(S_EXPIRED,'red');
-					break;
-				case MAINTENANCE_STATUS_APPROACH:
-					$mnt_status = new CSpan(S_APPROACHING,'blue');
-					break;
-				case MAINTENANCE_STATUS_ACTIVE:
-					$mnt_status = new CSpan(S_ACTIVE,'green');
-					break;
-			}
-
-			$table->addRow(array(
-				new CCheckBox('maintenanceids['.$maintenanceid.']',NULL,NULL,$maintenanceid),
-				new CLink($maintenance['name'],'maintenance.php?form=update&maintenanceid='.$maintenanceid.'#form'),
-				$maintenance['maintenance_type']?S_NO_DATA_COLLECTION:S_WITH_DATA_COLLECTION,
-				$mnt_status,
-				$maintenance['description']
-			));
-		}
-
-// goBox
-		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q);
-		$goBox->addItem($goOption);
-
-		// goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO.' (0)');
-		$goButton->setAttribute('id','goButton');
-
-		zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
-
-		$footer = get_table_header(array($goBox, $goButton));
-
-		$form->addItem(array($paging,$table,$paging,$footer));
-
-		$maintenance_wdgt->addItem($form);
 	}
+	else {
+		$options['groupids'] = array();
+	}
+	$data['maintenances'] = API::Maintenance()->get($options);
+	foreach ($data['maintenances'] as $number => $maintenance) {
+		if ($maintenance['active_till'] < time()) {
+			$data['maintenances'][$number]['status'] = MAINTENANCE_STATUS_EXPIRED;
+		}
+		elseif ($maintenance['active_since'] > time()) {
+			$data['maintenances'][$number]['status'] = MAINTENANCE_STATUS_APPROACH;
+		}
+		else {
+			$data['maintenances'][$number]['status'] = MAINTENANCE_STATUS_ACTIVE;
+		}
+	}
+	order_result($data['maintenances'], $sortfield, $sortorder);
+	$data['paging'] = getPagingLine($data['maintenances']);
+	$data['pageFilter'] = $pageFilter;
 
-	$maintenance_wdgt->show();
-
+	// render view
+	$maintenanceView = new CView('configuration.maintenance.list', $data);
+	$maintenanceView->render();
+	$maintenanceView->show();
+}
 
 include_once('include/page_footer.php');
-
 ?>
