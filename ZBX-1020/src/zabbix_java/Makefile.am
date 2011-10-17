@@ -13,7 +13,7 @@ ZJP = bin/zabbix-java-proxy-$(VERSION).jar
 LIB = lib/org-json-2010-12-28.jar:lib/logback-core-0.9.27.jar:lib/logback-classic-0.9.27.jar:lib/slf4j-api-1.6.1.jar
 JUNIT = tests/junit-4.8.2.jar
 
-ZJP_DEST = "$(DESTDIR)$(sbindir)/zabbix_java"
+ZJP_DEST = $(DESTDIR)$(sbindir)/zabbix_java
 
 all: $(ZJP)
 
