@@ -626,7 +626,7 @@ function get_status() {
 	}
 
 	// triggers
-	$sql = 'SELECT COUNT(DISTINCT t.triggerid) as cnt'.
+	$sql = 'SELECT COUNT(DISTINCT t.triggerid) AS cnt'.
 			' FROM triggers t,functions f,items i,hosts h'.
 			' WHERE t.triggerid=f.triggerid'.
 				' AND f.itemid=i.itemid'.
@@ -653,8 +653,8 @@ function get_status() {
 	$status['triggers_count_unknown'] = $row['cnt'];
 
 	// items
-	$sql = 'SELECT COUNT(DISTINCT i.itemid) as cnt'.
-			' FROM items i, hosts h'.
+	$sql = 'SELECT COUNT(i.itemid) AS cnt'.
+			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
 				' AND h.status='.HOST_STATUS_MONITORED;
 
@@ -671,7 +671,7 @@ function get_status() {
 	$status['items_count_not_supported'] = $row['cnt'];
 
 	// hosts
-	$sql = 'SELECT COUNT(hostid) as cnt'.
+	$sql = 'SELECT COUNT(hostid) AS cnt'.
 			' FROM hosts'.
 			' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 

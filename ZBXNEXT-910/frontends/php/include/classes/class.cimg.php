@@ -22,7 +22,7 @@
 class CImg extends CTag {
 	public function __construct($src, $name = null, $width = null, $height = null, $class = null) {
 		parent::__construct('img', 'no');
-		$this->tag_start= '';
+		$this->tag_start = '';
 		$this->tag_end = '';
 		$this->tag_body_start = '';
 		$this->tag_body_end = '';

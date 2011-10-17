@@ -245,14 +245,14 @@ function get_icon($name, $params = array()) {
 		case 'favourite':
 			if (infavorites($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = new CIcon(
-					_('Remove from').' '._('Favourites'),
+					_('Remove from favourites'),
 					'iconminus',
 					'rm4favorites("'.$params['elname'].'","'.$params['elid'].'", 0);'
 				);
 			}
 			else{
 				$icon = new CIcon(
-					_('Add to').' '._('Favourites'),
+					_('Add to favourites'),
 					'iconplus',
 					'add2favorites("'.$params['elname'].'","'.$params['elid'].'");'
 				);
@@ -263,7 +263,7 @@ function get_icon($name, $params = array()) {
 			$url = new Curl();
 			$url->setArgument('fullscreen', $params['fullscreen'] ? '0' : '1');
 			$icon = new CIcon(
-				$_REQUEST['fullscreen'] ? _('Normal').' '._('View') : _('Fullscreen'),
+				$_REQUEST['fullscreen'] ? _('Normal view') : _('Fullscreen'),
 				'fullscreen',
 				"document.location = '".$url->getUrl()."';"
 			);

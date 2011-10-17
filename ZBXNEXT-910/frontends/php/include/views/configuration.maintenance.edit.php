@@ -85,7 +85,7 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 		new CCheckBox('g_timeperiodid[]', 'no', null, $id),
 		timeperiod_type2str($timeperiod['timeperiod_type']),
 		new CCol(shedule2str($timeperiod), 'wraptext'),
-		zbx_date2age(0,$timeperiod['period']),
+		zbx_date2age(0, $timeperiod['period']),
 		new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu')
 	));
 	$maintenanceForm->addVar('timeperiods['.$id.'][timeperiod_type]', $timeperiod['timeperiod_type']);

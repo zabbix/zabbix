@@ -333,7 +333,7 @@ if (!empty($data['form'])) {
 	if (!empty($data['maintenanceid']) && !isset($_REQUEST['form_refresh'])) {
 		// get maintenance
 		$options = array(
-			'editable' => 1,
+			'editable' => true,
 			'maintenanceids' => $data['maintenanceid'],
 			'output' => API_OUTPUT_EXTEND
 		);
@@ -351,7 +351,7 @@ if (!empty($data['form'])) {
 				' FROM timeperiods tp,maintenances_windows mw'.
 				' WHERE mw.maintenanceid='.$data['maintenanceid'].
 					' AND tp.timeperiodid=mw.timeperiodid'.
-				' ORDER BY tp.start_date ASC';
+				' ORDER BY tp.start_date';
 		$db_timeperiods = DBselect($sql);
 		while ($timeperiod = DBfetch($db_timeperiods)) {
 			$data['timeperiods'][] = $timeperiod;
@@ -360,9 +360,9 @@ if (!empty($data['form'])) {
 		// get hosts
 		$options = array(
 			'maintenanceids' => $data['maintenanceid'],
-			'real_hosts' => 1,
+			'real_hosts' => true,
 			'output' => API_OUTPUT_SHORTEN,
-			'editable' => 1
+			'editable' => true
 		);
 		$data['hostids'] = API::Host()->get($options);
 		$data['hostids'] = zbx_objectValues($data['hostids'], 'hostid');
@@ -370,9 +370,9 @@ if (!empty($data['form'])) {
 		// get groupids
 		$options = array(
 			'maintenanceids' => $data['maintenanceid'],
-			'real_hosts' => 1,
+			'real_hosts' => true,
 			'output' => API_OUTPUT_SHORTEN,
-			'editable' => 1
+			'editable' => true
 		);
 		$data['groupids'] = API::HostGroup()->get($options);
 		$data['groupids'] = zbx_objectValues($data['groupids'], 'groupid');
@@ -391,7 +391,7 @@ if (!empty($data['form'])) {
 	// get groups
 	$options = array(
 		'editable' => true,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('groupid', 'name'),
 		'real_hosts' => true,
 		'preservekeys' => true
 	);
@@ -406,7 +406,7 @@ if (!empty($data['form'])) {
 
 	// get hosts from selected twb group
 	$options = array(
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('hostid', 'name'),
 		'real_hosts' => 1,
 		'editable' => 1,
 		'groupids' => $data['twb_groupid']
@@ -415,7 +415,7 @@ if (!empty($data['form'])) {
 
 	// selected hosts
 	$options = array(
-		'output' => API_OUTPUT_EXTEND,
+		'output' => array('hostid', 'name'),
 		'real_hosts' => 1,
 		'editable' => 1,
 		'hostids' => $data['hostids']

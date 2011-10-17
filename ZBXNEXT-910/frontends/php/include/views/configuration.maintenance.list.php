@@ -67,7 +67,7 @@ foreach ($this->data['maintenances'] as $maintenance) {
 
 	$maintenanceTable->addRow(array(
 		new CCheckBox('maintenanceids['.$maintenanceid.']', null, null, $maintenanceid),
-		new CLink($maintenance['name'],'maintenance.php?form=update&maintenanceid='.$maintenanceid.'#form'),
+		new CLink($maintenance['name'], 'maintenance.php?form=update&maintenanceid='.$maintenanceid.'#form'),
 		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
 		$maintenanceStatus,
 		$maintenance['description']

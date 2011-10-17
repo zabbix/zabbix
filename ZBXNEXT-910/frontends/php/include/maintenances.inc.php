@@ -30,21 +30,15 @@ function get_maintenance_by_maintenanceid($maintenanceid) {
 function timeperiod_type2str($timeperiod_type) {
 	switch ($timeperiod_type) {
 		case TIMEPERIOD_TYPE_ONETIME:
-			$str = _('One time only');
-			break;
+			return _('One time only');
 		case TIMEPERIOD_TYPE_DAILY:
-			$str = _('Daily');
-			break;
+			return _('Daily');
 		case TIMEPERIOD_TYPE_WEEKLY:
-			$str = _('Weekly');
-			break;
+			return _('Weekly');
 		case TIMEPERIOD_TYPE_MONTHLY:
-			$str = _('Monthly');
-			break;
-		default:
-			$str = _('Unknown');
+			return _('Monthly');
 	}
-	return $str;
+	return _('Unknown');
 }
 
 function shedule2str($timeperiod) {
@@ -72,9 +66,9 @@ function shedule2str($timeperiod) {
 		for ($i = 0; $i < $length; $i++) {
 			if ($dayofweek[$i] == 1) {
 				if (!zbx_empty($days)) {
-					$days .=', ';
+					$days .= ', ';
 				}
-				$days .= getDayOfWeekCaption($i+1);
+				$days .= getDayOfWeekCaption($i + 1);
 			}
 		}
 		$str.= _('every').SPACE.$days.SPACE._('of every').SPACE.(($timeperiod['every'] > 1) ? $timeperiod['every'].SPACE._('weeks') : _('week'));

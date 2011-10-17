@@ -30,7 +30,7 @@ class CComboBox extends CTag {
 		$this->attr('class', 'input select');
 		$this->attr('size', 1);
 		$this->value = $value;
-		$this->attr('onchange',$action);
+		$this->attr('onchange', $action);
 		if (is_array($items)) {
 			$this->addItems($items);
 		}
@@ -57,7 +57,7 @@ class CComboBox extends CTag {
 	}
 
 	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes') {
-		if (is_object($value) && (zbx_strtolower(get_class($value)) == 'ccomboitem')) {
+		if (is_object($value) && zbx_strtolower(get_class($value)) == 'ccomboitem') {
 			parent::addItem($value);
 		}
 		else {
