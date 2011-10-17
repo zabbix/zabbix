@@ -351,7 +351,7 @@ if (!empty($data['form'])) {
 				' FROM timeperiods tp,maintenances_windows mw'.
 				' WHERE mw.maintenanceid='.$data['maintenanceid'].
 					' AND tp.timeperiodid=mw.timeperiodid'.
-				' ORDER BY tp.start_date';
+				' ORDER BY tp.timeperiod_type,tp.start_date';
 		$db_timeperiods = DBselect($sql);
 		while ($timeperiod = DBfetch($db_timeperiods)) {
 			$data['timeperiods'][] = $timeperiod;
