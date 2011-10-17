@@ -1,0 +1,178 @@
+PROGNAME = ..\..\..\bin\win32\zabbix_agentd.exe
+CC = cl.exe /nologo
+LINKER = link.exe /NOLOGO
+RC = rc.exe
+MC = mc.exe
+MT = mt.exe
+MESSAGES_H = messages.h
+INCS = /I .\ /I ..\include /I ..\..\..\include /I ..\..\..\src\zabbix_agent
+CFLAGS = $(INCS) /O2 /Ob1 /GF /FD /EHsc /MT /Gy /W3 /c /TC /D _WINDOWS /D _CONSOLE /D UNICODE /D _UNICODE /D NDEBUG /D WIN32 /D HAVE_WINLDAP_H /D HAVE_ASSERT_H /D ZABBIX_SERVICE /D WITH_COMMON_METRICS /D WITH_SPECIFIC_METRICS /D WITH_SIMPLE_METRICS /D "_VC80_UPGRADE=0x0600" /D HAVE_IPV6
+RESOURCE_H  = resource.res
+OBJS  = ..\..\..\src\libs\zbxcommon\alias.o ..\..\..\src\libs\zbxcommon\comms.o ..\..\..\src\libs\zbxcommon\gnuregex.o ..\..\..\src\libs\zbxcommon\misc.o ..\..\..\src\libs\zbxcommon\regexp.o ..\..\..\src\libs\zbxcommon\str.o ..\..\..\src\libs\zbxcommon\xml.o ..\..\..\src\libs\zbxcommon\zbxgetopt.o ..\..\..\src\libs\zbxcommon\file.o ..\..\..\src\libs\zbxcomms\comms.o ..\..\..\src\libs\zbxconf\cfg.o ..\..\..\src\libs\zbxcrypto\base64.o ..\..\..\src\libs\zbxcrypto\md5.o ..\..\..\src\libs\zbxjson\json.o ..\..\..\src\libs\zbxlog\log.o ..\..\..\src\libs\zbxsys\mutexs.o ..\..\..\src\libs\zbxsys\symbols.o ..\..\..\src\libs\zbxsys\threads.o ..\..\..\src\libs\zbxexec\execute.o ..\..\..\src\libs\zbxsysinfo\common\common.o ..\..\..\src\libs\zbxsysinfo\common\file.o ..\..\..\src\libs\zbxsysinfo\common\http.o ..\..\..\src\libs\zbxsysinfo\common\net.o ..\..\..\src\libs\zbxsysinfo\common\system.o ..\..\..\src\libs\zbxsysinfo\simple\ntp.o ..\..\..\src\libs\zbxsysinfo\simple\simple.o ..\..\..\src\libs\zbxsysinfo\win32\cpu.o ..\..\..\src\libs\zbxsysinfo\win32\diskio.o ..\..\..\src\libs\zbxsysinfo\win32\diskspace.o ..\..\..\src\libs\zbxsysinfo\win32\memory.o ..\..\..\src\libs\zbxsysinfo\win32\net.o ..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o ..\..\..\src\libs\zbxsysinfo\win32\proc.o ..\..\..\src\libs\zbxsysinfo\win32\services.o ..\..\..\src\libs\zbxsysinfo\win32\swap.o ..\..\..\src\libs\zbxsysinfo\win32\uptime.o ..\..\..\src\libs\zbxsysinfo\win32\win32.o ..\..\..\src\libs\zbxsysinfo\sysinfo.o ..\..\..\src\libs\zbxwin32\perfmon.o ..\..\..\src\libs\zbxwin32\service.o ..\..\..\src\zabbix_agent\active.o ..\..\..\src\zabbix_agent\cpustat.o ..\..\..\src\zabbix_agent\diskdevices.o ..\..\..\src\zabbix_agent\eventlog.o ..\..\..\src\zabbix_agent\listener.o ..\..\..\src\zabbix_agent\logfiles.o ..\..\..\src\zabbix_agent\perfstat.o ..\..\..\src\zabbix_agent\stats.o ..\..\..\src\zabbix_agent\zabbix_agentd.o ..\..\..\src\zabbix_agent\zbxconf.o
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib
+LFLAGS = /INCREMENTAL:NO /MANIFEST /MANIFESTFILE:"zabbix_agentd.exe.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /PDB:"zabbix_agentd.pdb" /SUBSYSTEM:CONSOLE /DYNAMICBASE:NO /MACHINE:X86
+
+all: $(PROGNAME)
+
+clean:
+	del $(OBJS) $(RESOURCE_H) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin zabbix_agentd.exe.manifest
+
+$(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_H)
+	$(LINKER) $(OBJS) $(RESOURCE_H) /OUT:$(PROGNAME) $(LFLAGS) $(LIBS)
+	$(MT) /outputresource:"$(PROGNAME);#1" /manifest zabbix_agentd.exe.manifest /nologo
+
+$(MESSAGES_H): messages.mc
+	$(MC) -U -h ".\\" -r ".\\" messages.mc
+
+$(RESOURCE_H): resource.rc
+	$(RC) /d "NDEBUG" /d "_VC80_UPGRADE=0x0600" /l 0x419 /fo"$(RESOURCE_H)" resource.rc
+	
+..\..\..\src\libs\zbxcommon\alias.o: ..\..\..\src\libs\zbxcommon\alias.c
+	$(CC) ..\..\..\src\libs\zbxcommon\alias.c /Fo"..\..\..\src\libs\zbxcommon\alias.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcommon\comms.o: ..\..\..\src\libs\zbxcommon\comms.c
+	$(CC) ..\..\..\src\libs\zbxcommon\comms.c /Fo"..\..\..\src\libs\zbxcommon\comms.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcommon\gnuregex.o: ..\..\..\src\libs\zbxcommon\gnuregex.c
+	$(CC) ..\..\..\src\libs\zbxcommon\gnuregex.c /Fo"..\..\..\src\libs\zbxcommon\gnuregex.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcommon\misc.o: ..\..\..\src\libs\zbxcommon\misc.c
+	$(CC) ..\..\..\src\libs\zbxcommon\misc.c /Fo"..\..\..\src\libs\zbxcommon\misc.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcommon\regexp.o: ..\..\..\src\libs\zbxcommon\regexp.c
+	$(CC) ..\..\..\src\libs\zbxcommon\regexp.c /Fo"..\..\..\src\libs\zbxcommon\regexp.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcommon\str.o: ..\..\..\src\libs\zbxcommon\str.c
+	$(CC) ..\..\..\src\libs\zbxcommon\str.c /Fo"..\..\..\src\libs\zbxcommon\str.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcommon\xml.o: ..\..\..\src\libs\zbxcommon\xml.c
+	$(CC) ..\..\..\src\libs\zbxcommon\xml.c /Fo"..\..\..\src\libs\zbxcommon\xml.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcommon\zbxgetopt.o: ..\..\..\src\libs\zbxcommon\zbxgetopt.c
+	$(CC) ..\..\..\src\libs\zbxcommon\zbxgetopt.c /Fo"..\..\..\src\libs\zbxcommon\zbxgetopt.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcommon\file.o: ..\..\..\src\libs\zbxcommon\file.c
+	$(CC) ..\..\..\src\libs\zbxcommon\file.c /Fo"..\..\..\src\libs\zbxcommon\file.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcomms\comms.o: ..\..\..\src\libs\zbxcomms\comms.c
+	$(CC) ..\..\..\src\libs\zbxcomms\comms.c /Fo"..\..\..\src\libs\zbxcomms\comms.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxconf\cfg.o: ..\..\..\src\libs\zbxconf\cfg.c
+	$(CC) ..\..\..\src\libs\zbxconf\cfg.c /Fo"..\..\..\src\libs\zbxconf\cfg.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcrypto\base64.o: ..\..\..\src\libs\zbxcrypto\base64.c
+	$(CC) ..\..\..\src\libs\zbxcrypto\base64.c /Fo"..\..\..\src\libs\zbxcrypto\base64.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcrypto\md5.o: ..\..\..\src\libs\zbxcrypto\md5.c
+	$(CC) ..\..\..\src\libs\zbxcrypto\md5.c /Fo"..\..\..\src\libs\zbxcrypto\md5.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxjson\json.o: ..\..\..\src\libs\zbxjson\json.c
+	$(CC) ..\..\..\src\libs\zbxjson\json.c /Fo"..\..\..\src\libs\zbxjson\json.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxlog\log.o: ..\..\..\src\libs\zbxlog\log.c
+	$(CC) ..\..\..\src\libs\zbxlog\log.c /Fo"..\..\..\src\libs\zbxlog\log.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsys\mutexs.o: ..\..\..\src\libs\zbxsys\mutexs.c
+	$(CC) ..\..\..\src\libs\zbxsys\mutexs.c /Fo"..\..\..\src\libs\zbxsys\mutexs.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsys\symbols.o: ..\..\..\src\libs\zbxsys\symbols.c
+	$(CC) ..\..\..\src\libs\zbxsys\symbols.c /Fo"..\..\..\src\libs\zbxsys\symbols.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsys\threads.o: ..\..\..\src\libs\zbxsys\threads.c
+	$(CC) ..\..\..\src\libs\zbxsys\threads.c /Fo"..\..\..\src\libs\zbxsys\threads.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxexec\execute.o: ..\..\..\src\libs\zbxexec\execute.c
+	$(CC) ..\..\..\src\libs\zbxexec\execute.c /Fo"..\..\..\src\libs\zbxexec\execute.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\common\common.o: ..\..\..\src\libs\zbxsysinfo\common\common.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\common\common.c /Fo"..\..\..\src\libs\zbxsysinfo\common\common.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\common\file.o: ..\..\..\src\libs\zbxsysinfo\common\file.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\common\file.c /Fo"..\..\..\src\libs\zbxsysinfo\common\file.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\common\http.o: ..\..\..\src\libs\zbxsysinfo\common\http.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\common\http.c /Fo"..\..\..\src\libs\zbxsysinfo\common\http.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\common\net.o: ..\..\..\src\libs\zbxsysinfo\common\net.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\common\net.c /Fo"..\..\..\src\libs\zbxsysinfo\common\net.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\common\system.o: ..\..\..\src\libs\zbxsysinfo\common\system.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\common\system.c /Fo"..\..\..\src\libs\zbxsysinfo\common\system.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\simple\ntp.o: ..\..\..\src\libs\zbxsysinfo\simple\ntp.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\simple\ntp.c /Fo"..\..\..\src\libs\zbxsysinfo\simple\ntp.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\simple\simple.o: ..\..\..\src\libs\zbxsysinfo\simple\simple.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\simple\simple.c /Fo"..\..\..\src\libs\zbxsysinfo\simple\simple.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\cpu.o: ..\..\..\src\libs\zbxsysinfo\win32\cpu.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\cpu.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\cpu.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\diskio.o: ..\..\..\src\libs\zbxsysinfo\win32\diskio.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\diskio.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\diskio.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\diskspace.o: ..\..\..\src\libs\zbxsysinfo\win32\diskspace.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\diskspace.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\diskspace.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\memory.o: ..\..\..\src\libs\zbxsysinfo\win32\memory.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\memory.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\memory.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\net.o: ..\..\..\src\libs\zbxsysinfo\win32\net.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\net.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\net.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o: ..\..\..\src\libs\zbxsysinfo\win32\pdhmon.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\pdhmon.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\proc.o: ..\..\..\src\libs\zbxsysinfo\win32\proc.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\proc.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\proc.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\services.o: ..\..\..\src\libs\zbxsysinfo\win32\services.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\services.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\services.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\swap.o: ..\..\..\src\libs\zbxsysinfo\win32\swap.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\swap.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\swap.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\uptime.o: ..\..\..\src\libs\zbxsysinfo\win32\uptime.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\uptime.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\uptime.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\win32\win32.o: ..\..\..\src\libs\zbxsysinfo\win32\win32.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\win32\win32.c /Fo"..\..\..\src\libs\zbxsysinfo\win32\win32.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\sysinfo.o: ..\..\..\src\libs\zbxsysinfo\sysinfo.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\sysinfo.c /Fo"..\..\..\src\libs\zbxsysinfo\sysinfo.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxwin32\perfmon.o: ..\..\..\src\libs\zbxwin32\perfmon.c
+	$(CC) ..\..\..\src\libs\zbxwin32\perfmon.c /Fo"..\..\..\src\libs\zbxwin32\perfmon.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxwin32\service.o: ..\..\..\src\libs\zbxwin32\service.c
+	$(CC) ..\..\..\src\libs\zbxwin32\service.c /Fo"..\..\..\src\libs\zbxwin32\service.o" $(CFLAGS)
+
+..\..\..\src\zabbix_agent\active.o: ..\..\..\src\zabbix_agent\active.c
+	$(CC) ..\..\..\src\zabbix_agent\active.c /Fo"..\..\..\src\zabbix_agent\active.o" $(CFLAGS)
+
+..\..\..\src\zabbix_agent\cpustat.o: ..\..\..\src\zabbix_agent\cpustat.c
+	$(CC) ..\..\..\src\zabbix_agent\cpustat.c /Fo"..\..\..\src\zabbix_agent\cpustat.o" $(CFLAGS)
+
+..\..\..\src\zabbix_agent\diskdevices.o: ..\..\..\src\zabbix_agent\diskdevices.c
+	$(CC) ..\..\..\src\zabbix_agent\diskdevices.c /Fo"..\..\..\src\zabbix_agent\diskdevices.o" $(CFLAGS)
+
+..\..\..\src\zabbix_agent\eventlog.o: ..\..\..\src\zabbix_agent\eventlog.c
+	$(CC) ..\..\..\src\zabbix_agent\eventlog.c /Fo"..\..\..\src\zabbix_agent\eventlog.o" $(CFLAGS)
+
+..\..\..\src\zabbix_agent\listener.o: ..\..\..\src\zabbix_agent\listener.c
+	$(CC) ..\..\..\src\zabbix_agent\listener.c /Fo"..\..\..\src\zabbix_agent\listener.o" $(CFLAGS)
+
+..\..\..\src\zabbix_agent\logfiles.o: ..\..\..\src\zabbix_agent\logfiles.c
+	$(CC) ..\..\..\src\zabbix_agent\logfiles.c /Fo"..\..\..\src\zabbix_agent\logfiles.o" $(CFLAGS)
+
+..\..\..\src\zabbix_agent\perfstat.o: ..\..\..\src\zabbix_agent\perfstat.c
+	$(CC) ..\..\..\src\zabbix_agent\perfstat.c /Fo"..\..\..\src\zabbix_agent\perfstat.o" $(CFLAGS)
+
+..\..\..\src\zabbix_agent\stats.o: ..\..\..\src\zabbix_agent\stats.c
+	$(CC) ..\..\..\src\zabbix_agent\stats.c /Fo"..\..\..\src\zabbix_agent\stats.o" $(CFLAGS)
+
+..\..\..\src\zabbix_agent\zabbix_agentd.o: ..\..\..\src\zabbix_agent\zabbix_agentd.c
+	$(CC) ..\..\..\src\zabbix_agent\zabbix_agentd.c /Fo"..\..\..\src\zabbix_agent\zabbix_agentd.o" $(CFLAGS)
+
+..\..\..\src\zabbix_agent\zbxconf.o: ..\..\..\src\zabbix_agent\zbxconf.c
+	$(CC) ..\..\..\src\zabbix_agent\zbxconf.c /Fo"..\..\..\src\zabbix_agent\zbxconf.o" $(CFLAGS)
