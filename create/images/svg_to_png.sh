@@ -28,7 +28,7 @@ svgtopng() {
 	pngoutfile="$outputdir/$(basename ${1%.svg}) (${3:-$2}).png"
 	[[ "$(stat -c "%Y" "$pngoutfile" 2>/dev/null)" -lt "$svgfilemod" ]] && {
 		# if png file modification time is older than svg file modification time
-		echo -n " to $size..."
+		echo -n " to $2..."
 		# we have to query image dimensions first, because export dimensions are used "as-is", resulting in a square rackmountable server, for example
 		# inkscape option --query-all could be used, but it's not fully clear which layer is supposed to be "whole image"
 		# crudely dropping decimal part, bash fails on it
