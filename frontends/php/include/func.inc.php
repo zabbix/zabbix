@@ -805,6 +805,35 @@ function zbx_strrpos($haystack, $needle){
 	}
 }
 
+function zbx_substr_replace($string, $replacement, $start, $length = null) {
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		$string_length = mb_strlen($string);
+
+		if ($start < 0) {
+			$start = max(0, $string_length + $start);
+		}
+		elseif ($start > $string_length) {
+			$start = $string_length;
+		}
+
+		if ($length < 0) {
+			$length = max(0, $string_length - $start + $length);
+		}
+		elseif ($length === null || $length > $string_length) {
+			$length = $string_length;
+		}
+
+		if (($start + $length) > $string_length) {
+			$length = $string_length - $start;
+		}
+
+		return mb_substr($string, 0, $start) . $replacement . mb_substr($string, $start + $length, $string_length - $start - $length);
+	}
+	else {
+		return substr_replace($string, $replacement, $start, $length);
+	}
+}
+
 // }}} STRING FUNCTIONS
 
 
