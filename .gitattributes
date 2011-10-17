@@ -266,6 +266,8 @@ frontends/php/include/views/administration.usergroups.edit.php -text
 frontends/php/include/views/administration.usergroups.list.php -text
 frontends/php/include/views/administration.users.edit.php -text
 frontends/php/include/views/administration.users.list.php -text
+frontends/php/include/views/configuration.maintenance.edit.php -text
+frontends/php/include/views/configuration.maintenance.list.php -text
 frontends/php/include/views/general.browserwarning.php -text
 frontends/php/include/views/js/administration.general.macros.js.php -text
 frontends/php/include/views/js/administration.users.edit.js.php -text
