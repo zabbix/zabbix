@@ -870,12 +870,10 @@ class CMaintenance extends CZBXAPI {
 				'filter' => array('maintenanceid' => $maintenanceids)
 			);
 			$hosts = API::Host()->get($options);
-			foreach ($hosts as $host) {
-				DB::update('hosts', array(
-					'values' => array('maintenanceid' => 0),
-					'where' => array('hostid' => $host['hostid'])
-				));
-			}
+			DB::update('hosts', array(
+				'values' => array('maintenanceid' => 0),
+				'where' => array('hostid' => zbx_objectValues($hosts, 'hostid'))
+			));
 
 			DB::delete('timeperiods', array('timeperiodid' => $timeperiodids));
 			DB::delete('maintenances_windows', $mid_cond);
