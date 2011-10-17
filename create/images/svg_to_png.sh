@@ -24,7 +24,8 @@ crushpng() {
 }
 
 svgtopng() {
-	pngoutfile="$outputdir/$(basename ${1%.svg}) ($2).png"
+	# 3rd parameter allows to override "reported" size; if missing, actual size is used
+	pngoutfile="$outputdir/$(basename ${1%.svg}) (${3:-$2}).png"
 	[[ "$(stat -c "%Y" "$pngoutfile" 2>/dev/null)" -lt "$svgfilemod" ]] && {
 		# if png file modification time is older than svg file modification time
 		echo -n " to $size..."
@@ -68,7 +69,7 @@ rackimages=([64]=66 [96]=99 [128]=132)
 
 echo -n "Converting Rack_42.svg"
 for rackimagesize in "${!rackimages[@]}"; do
-	svgtopng "equipment_rack/Rack_42.svg" "${rackimages[$rackimagesize]}"
+	svgtopng "equipment_rack/Rack_42.svg" "${rackimages[$rackimagesize]}" "$rackimagesize"
 done
 
 echo
