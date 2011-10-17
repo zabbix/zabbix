@@ -381,13 +381,52 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$eventsource	= get_request('eventsource');
 			$esc_period	= get_request('esc_period',0);
 			$status		= get_request('status');
-			$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
-			$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG);
 			$recovery_msg	= get_request('recovery_msg',0);
 			$r_shortdata	= get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
 			$r_longdata	= get_request('r_longdata', ACTION_DEFAULT_MSG);
 
 			if(!$esc_period) unset($_REQUEST['escalation']);
+
+			if (isset($_REQUEST['actionid']) && isset($_REQUEST['form_refresh'])) {
+				$def_shortdata	= get_request('def_shortdata');
+				$def_longdata	= get_request('def_longdata');
+			}
+			else {
+				if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+					$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
+					$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG_TRIGGER);
+
+					if (strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_AUTOREG) == 0 || strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_DISCOVERY) == 0) {
+						$def_shortdata = ACTION_DEFAULT_SUBJ_TRIGGER;
+					}
+					if (strcmp($def_longdata, ACTION_DEFAULT_MSG_AUTOREG) == 0 || strcmp($def_longdata, ACTION_DEFAULT_MSG_DISCOVERY) == 0) {
+						$def_longdata = ACTION_DEFAULT_MSG_TRIGGER;
+					}
+				}
+				elseif ($eventsource == EVENT_SOURCE_DISCOVERY) {
+					$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_SUBJ_DISCOVERY);
+					$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG_DISCOVERY);
+
+					if (strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_AUTOREG) == 0 || strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_TRIGGER) == 0) {
+						$def_shortdata = ACTION_DEFAULT_SUBJ_DISCOVERY;
+					}
+					if (strcmp($def_longdata, ACTION_DEFAULT_MSG_AUTOREG) == 0 || strcmp($def_longdata, ACTION_DEFAULT_MSG_TRIGGER) == 0) {
+						$def_longdata = ACTION_DEFAULT_MSG_DISCOVERY;
+					}
+				}
+				elseif ($eventsource == EVENT_SOURCE_AUTO_REGISTRATION) {
+					$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_SUBJ_AUTOREG);
+					$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
+
+					if (strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_DISCOVERY) == 0 || strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_TRIGGER) == 0) {
+						$def_shortdata = ACTION_DEFAULT_SUBJ_AUTOREG;
+					}
+					if (strcmp($def_longdata, ACTION_DEFAULT_MSG_DISCOVERY) == 0 || strcmp($def_longdata, ACTION_DEFAULT_MSG_TRIGGER) == 0) {
+						$def_longdata = ACTION_DEFAULT_MSG_AUTOREG;
+					}
+				}
+			}
+
 		}
 
 		$tblAct->addRow(array(S_NAME, new CTextBox('name', $name, 50)));
@@ -891,6 +930,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				$new_operation = array();
 				$new_operation['default_msg'] = 1;
 			}
+
 			if(!isset($new_operation['operationtype']))	$new_operation['operationtype']	= OPERATION_TYPE_MESSAGE;
 			if(!isset($new_operation['object']))		$new_operation['object']	= OPERATION_OBJECT_GROUP;
 			if(!isset($new_operation['objectid']))		$new_operation['objectid']	= 0;
@@ -1059,6 +1099,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 					$tblNewOperation->addRow(array(S_REMOTE_COMMAND,
 						new CTextArea('new_operation[longdata]', $new_operation['longdata'], 77, 7)));
+
+					$tblNewOperation->addRow(array(S_DEFAULT_MESSAGE, new CVar('new_operation[default_msg]', $new_operation['default_msg'], null, 1)));
 					break;
 				case OPERATION_TYPE_HOST_ADD:
 				case OPERATION_TYPE_HOST_REMOVE:
@@ -1068,6 +1110,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					$tblOper->addItem(new CVar('new_operation[objectid]', 0));
 					$tblOper->addItem(new CVar('new_operation[shortdata]', ''));
 					$tblOper->addItem(new CVar('new_operation[longdata]', ''));
+					$tblNewOperation->addRow(array(S_DEFAULT_MESSAGE, new CVar('new_operation[default_msg]', $new_operation['default_msg'], null, 1)));
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
@@ -1087,6 +1130,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 								'&srctbl=host_group&srcfld1=groupid&srcfld2=name' .
 								'",450,450)','T')
 					)));
+					$tblNewOperation->addRow(array(S_DEFAULT_MESSAGE, new CVar('new_operation[default_msg]', $new_operation['default_msg'], null, 1)));
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
@@ -1107,6 +1151,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 										'&srctbl=host_templates&srcfld1=hostid&srcfld2=host' .
 										'",450,450)','T')
 					)));
+					$tblNewOperation->addRow(array(S_DEFAULT_MESSAGE, new CVar('new_operation[default_msg]', $new_operation['default_msg'], null, 1)));
 					break;
 			}
 
