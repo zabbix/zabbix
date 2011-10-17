@@ -865,13 +865,16 @@ class CMaintenance extends CZBXAPI {
 
 			// remove maintenanceid from hosts table
 			$options = array(
-				'maintenanceids' => $maintenanceids,
-				'real_hosts' => 1,
-				'output' => API_OUTPUT_SHORTEN
+				'real_hosts' => true,
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array('maintenanceid' => $maintenanceids)
 			);
 			$hosts = API::Host()->get($options);
 			foreach ($hosts as $host) {
-				DBexecute('UPDATE hosts h SET h.maintenanceid=null WHERE h.hostid='.$host['hostid']);
+				DB::update('hosts', array(
+					'values' => array('maintenanceid' => 0),
+					'where' => array('hostid' => $host['hostid'])
+				));
 			}
 
 			DB::delete('timeperiods', array('timeperiodid' => $timeperiodids));
