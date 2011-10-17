@@ -1489,11 +1489,6 @@
 	'S_DELETE_SERVICE'=>				_('Delete service'),
 	'S_DELETE_SELECTED_SERVICES_Q'=>		_('Delete selected services?'),
 
-//	js.inc.php
-	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	_('Can not find objects with name'),
-	'S_CANNOT_CREATE_NEW_ELEMENT'=>		_('Can not create new element'),
-	'S_OTHER_SMALL'=>			_('other'),
-
 // class.cookie.js
 	'S_MAX_COOKIE_SIZE_REACHED'=>		_('We are sorry, the maximum possible number of elements to remember has been reached.'),
 
