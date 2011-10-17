@@ -1115,9 +1115,9 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 notsupported:
 	if (ITEM_STATUS_NOTSUPPORTED == h->status)
 	{
-		if (ITEM_STATUS_NOTSUPPORTED != item->status)
+		if (ITEM_STATUS_NOTSUPPORTED != item->status && ITEM_STATUS_DISABLED != item->status)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became not supported: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "item [%s] became not supported: %s",
 					zbx_host_key_string(h->itemid), h->value_orig.err);
 
 			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 20, ",status=%d", (int)h->status);
@@ -1137,7 +1137,7 @@ notsupported:
 	{
 		if (ITEM_STATUS_NOTSUPPORTED == item->status)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became supported", zbx_host_key_string(item->itemid));
+			zabbix_log(LOG_LEVEL_WARNING, "item [%s] became supported", zbx_host_key_string(item->itemid));
 
 			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 32, ",status=%d,error=''", (int)h->status);
 		}
