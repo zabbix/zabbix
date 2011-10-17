@@ -8,10 +8,12 @@
 
 # depends on inkscape, pngcrush, awk
 
-outputdir=output_png
-pngcrushlog=pngcrush.log.txt
 pngcrushbin=pngcrush
+
+outputdir=output_png
 elementdir=elements
+
+pngcrushlog=pngcrush.log.txt
 pngcrushoutput=pngcrushoutput.txt
 inkscapelog=inkscape.log.txt
 
@@ -24,7 +26,7 @@ crushpng() {
 mkdir -p "$outputdir"
 
 > "$pngcrushoutput"
-> "$pngcrushoutput"
+> "$pngcrushlog"
 > "$inkscapelog"
 
 svgelementcount=$(ls $elementdir | wc -l)
