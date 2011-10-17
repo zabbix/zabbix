@@ -42,7 +42,6 @@ class testPageActionsAutoregistration extends CWebTest
 // eventsource is used for a hidden field, so it does not work. See above: ?eventsource=0 is used instead
 //		$this->dropdown_select('eventsource','Auto registration');
 
-		$this->ok('CONFIGURATION OF ACTIONS');
 		$this->ok('Event source');
 		$this->ok('Displaying');
 		// Header
@@ -78,7 +77,6 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->assertTitle('Configuration of actions');
 		$this->ok('Action updated');
 		$this->ok("$name");
-		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$this->assertEquals($oldHashAction,DBhash($sql1),"Chuck Norris: Action update changed data in table 'actions'.");
 		$this->assertEquals($oldHashOperations,DBhash($sql2),"Chuck Norris: Action update changed data in table 'operations'");
@@ -153,7 +151,6 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->assertTitle('Configuration of actions');
 		$this->ok('Status updated');
 		$this->ok('Disabled');
-		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid and status=1";
 		$this->assertEquals(1,DBcount($sql));
@@ -187,7 +184,6 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->assertTitle('Configuration of actions');
 		$this->ok('Status updated');
 		$this->ok('Enabled');
-		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid and status=0";
 		$this->assertEquals(1,DBcount($sql));
@@ -222,7 +218,6 @@ class testPageActionsAutoregistration extends CWebTest
 
 		$this->assertTitle('Configuration of actions');
 		$this->ok('Selected actions deleted');
-		$this->ok('CONFIGURATION OF ACTIONS');
 
 		$sql="select * from actions where actionid=$actionid";
 		$this->assertEquals(0,DBcount($sql));
