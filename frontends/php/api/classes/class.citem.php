@@ -1263,7 +1263,7 @@ class CItem extends CItemGeneral{
 					if ($exItem['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
-					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid'] != 0)) {
+					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
 					}
 				}
