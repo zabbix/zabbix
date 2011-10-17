@@ -14,6 +14,7 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4107] fixed map element configuration form layout (Vedmak)
  - [ZBX-4219] replaced {HOSTNAME} by {HOST.NAME} in data.sql (Alexei)
  - [ZBX-3540] removed unused node properties: timezone, history keeping, trend keeping (Alexei)
  - [ZBX-3275] fixed deleting of master node, it shouldn't delete other nodes (Alexei)
