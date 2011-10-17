@@ -840,55 +840,32 @@
 //	sysmap.php
 	'S_HIDDEN'=>			_('Hidden'),
 	'S_SHOWN'=>				_('Shown'),
-	'S_LINKS'=>				_('Links'),
-	'S_LINK'=>				_('Link'),
+	'S_URLS'=>				_('URLs'),
 	'S_LABEL'=>				_('Label'),
 	'S_GO_TO'=>				_('Go to'),
 	'S_X'=>					_('X'),
-	'S_ICON_PROBLEM'=>			_('Icon (problem)'),
-	'S_ICON_OK'=>				_('Icon (OK)'),
-	'S_ICON_UNKNOWN'=>			_('Icon (unknown)'),
-	'S_ICON_MAINTENANCE'=>			_('Icon (maintenance)'),
-	'S_ICON_DISABLED'=>			_('Icon (disabled)'),
-	'S_LINK_STATUS_INDICATOR'=>		_('Link status indicator'),
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	_('Configuration of network maps'),
 	'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
 
-	'S_COORDINATE_X'=>			_('Coordinate X'),
-	'S_COORDINATE_Y'=>			_('Coordinate Y'),
-
-	'S_CONNECTORS'=>			_('Connectors'),
 	'S_MAINTENANCE_BIG'=>			_('MAINTENANCE'),
 
 //	sysmaps.php
-	'S_EDIT_MAP_ELEMENT'=>			_('Edit map element'),
-	'S_ICON_DEFAULT'=>			_('Icon (default)'),
-	'S_APPLY'=>					_('Apply'),
-	'S_MAP_ELEMENTS'=>			_('Map elements'),
 	'S_MAP_DELETED'=>			_('Network map deleted'),
 	'S_CANNOT_DELETE_MAP'=>			_('Cannot delete network map'),
 	'S_MAPS_BIG'=>					_('MAPS'),
 	'S_NO_MAPS_DEFINED'=>			_('No maps defined.'),
 	'S_CREATE_MAP'=>				_('Create map'),
 	'S_IMPORT_MAP'=>				_('Import map'),
-	'S_LINK_INDICATORS'=>			_('Link indicators'),
-	'S_TYPE_OK'=>					_('Type (OK)'),
-	'S_COLOR_OK'=>					_('Colour (OK)'),
-	'S_USE_ADVANCED_ICONS'=>		_('Use advanced icons'),
 	'S_DELETE_SELECTED_MAPS_Q'=>		_('Delete selected maps?'),
 	'S_MAP_ADDED'=>					_('Network map added'),
 	'S_CANNOT_ADD_MAP'=>			_('Cannot add network map'),
 	'S_MAP_UPDATED'=>				_('Network map updated'),
 	'S_CANNOT_UPDATE_MAP'=>			_('Cannot update network map'),
-	'S_GET_SELEMENTS_FAILED'=>			_('Get selected elements FAILED.'),
 	'S_TWO_ELEMENTS_SHOULD_BE_SELECTED'=>		_('Two elements should be selected'),
 	'S_DELETE_SELECTED_ELEMENTS_Q'=>		_('Delete selected elements?'),
 	'S_PLEASE_SELECT_TWO_ELEMENTS'=>		_('Please select two elements'),
-	'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'=>	_('Delete Links between selected elements?'),
-	'S_NO_LINKS'=>					_('No links'),
-	'S_WRONG_TYPE_OF_ARGUMENTS_PASSED_TO_FUNCTION'=>_('Wrong type of arguments passed to function'),
+	'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'=>	_('Delete links between selected elements?'),
 	'S_NEW_ELEMENT'=>				_('New element'),
-	'S_SET_TRIGGER'=>				_('Set trigger'),
 
 	'S_BOTTOM'=>					_('Bottom'),
 	'S_TOP'=>						_('Top'),
@@ -914,7 +891,6 @@
 
 //	maps.php
 	'S_NETWORK_MAPS'=>		_('Network maps'),
-	'S_LABEL_LOCATION'=>		_('Label location'),
 	'S_MAPS_DATE_FORMAT'=>	_('Y.m.d H:i:s'),
 
 //	media.php
@@ -1433,9 +1409,6 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>_('Unnecessary symbols detected'),
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>_('Not allowed symbols detected after element'),
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>_('Not allowed symbols detected before element'),
-
-//	popup_link_tr.php
-	'S_EDIT_CONNECTOR'=>			_('Edit connector'),
 
 //	tr_logform.php
 	'S_INCLUDE_S'=>		_('Include'),

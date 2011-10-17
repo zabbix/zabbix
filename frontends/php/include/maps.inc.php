@@ -193,7 +193,7 @@ function getActionMapBySysmap($sysmap) {
 
 		if (!empty($db_element['urls'])) {
 			order_result($db_element['urls'], 'name');
-			$menus .= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+			$menus .= "['".S_URLS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			foreach ($db_element['urls'] as $url) {
 				$menus .= "[".zbx_jsvalue($url['name']).",".zbx_jsvalue($url['url']).", 'nosid'],";
 			}
