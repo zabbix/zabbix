@@ -347,13 +347,17 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	$action_wdgt = new CWidget();
 
 /* header */
-	$form = new CForm('get');
-	$form->cleanItems();
-	$form->addVar('eventsource', $_REQUEST['eventsource']);
-	if(!isset($_REQUEST['form'])){
-		$form->addItem(new CSubmit('form', _('Create action')));
+	if (!isset($_REQUEST['form'])) {
+		$formActions = new CForm('get');
+		$formActions->cleanItems();
+		$formActions->addVar('eventsource', $_REQUEST['eventsource']);
+		$buttons = new CDiv(array(
+			new CSubmit('form', _('Create action'))
+		));
+		$buttons->useJQueryStyle();
+		$formActions->addItem($buttons);
 	}
-	$action_wdgt->addPageHeader(_('CONFIGURATION OF ACTIONS'), $form);
+
 
 	if(isset($_REQUEST['form'])){
 		$action = null;
@@ -429,7 +433,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$numrows->setAttribute('name', 'numrows');
 
 		$action_wdgt->addHeader(_('ACTIONS'), $form);
-		$action_wdgt->addHeader($numrows);
+		$action_wdgt->addHeader($numrows, $formActions);
 
 // table
 		$form = new CForm();
