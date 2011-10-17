@@ -1247,17 +1247,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		item.trends = atoi(row[8]);
 		item.error = row[9];
 
-		if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
-		{
-			item.delta = ITEM_STORE_AS_IS;
-			h->keep_history = 1;
-			h->keep_trends = 0;
-		}
-		else
-		{
-			h->keep_history = (unsigned char)(item.history ? 1 : 0);
-			h->keep_trends = (unsigned char)(item.trends ? 1 : 0);
-		}
+		h->keep_history = (unsigned char)(item.history ? 1 : 0);
+		h->keep_trends = (unsigned char)(item.trends ? 1 : 0);
 
 		DCadd_update_item_sql(&sql_offset, &item, h);
 
