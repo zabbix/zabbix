@@ -139,8 +139,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*buffer = NULL;
-	int		buffer_alloc = 2048;
-	int		buffer_offset = 0;
+	size_t		buffer_alloc = 2 * ZBX_KIBIBYTE, buffer_offset = 0;
 	int		res = FAIL, refresh_unsupported;
 	zbx_uint64_t	hostid;
 	char		error[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
@@ -169,7 +168,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	buffer = zbx_malloc(buffer, buffer_alloc);
 
 	buffer_offset = 0;
-	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 1024,
+	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			"select i.key_,i.delay,i.lastlogsize from items i,hosts h"
 			" where i.hostid=h.hostid and h.status=%d and i.type=%d and h.hostid=" ZBX_FS_UI64
 			" and h.proxy_hostid is null",
@@ -179,13 +178,13 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 
 	if (0 != *(int *)DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED))
 	{
-		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 256,
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				" and (i.status=%d or (i.status=%d and i.lastclock+%d<=%d))",
 				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 				refresh_unsupported, time(NULL));
 	}
 	else
-		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 256, " and i.status=%d", ITEM_STATUS_ACTIVE);
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, " and i.status=%d", ITEM_STATUS_ACTIVE);
 
 	result = DBselect("%s", buffer);
 
@@ -200,17 +199,16 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[0]);
 
-		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 512, "%s:%s:%s\n",
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, "%s:%s:%s\n",
 				row[0],		/* item key */
 				row[1],		/* item delay */
 				row[2]);	/* item lastlogsize */
 	}
 	DBfree_result(result);
 
-	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 512, "ZBX_EOF\n");
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, "ZBX_EOF\n");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]",
-			buffer);
+	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buffer);
 
 	alarm(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send_raw(sock, buffer))
@@ -283,8 +281,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	int		regexp_num = 0, n;
 
 	char		*sql = NULL;
-	int		sql_alloc = 2048;
-	int		sql_offset;
+	size_t		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_list_of_active_checks_json()");
 
@@ -310,8 +307,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	name_esc = DBdyn_escape_string(host);
 
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 1024,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select i.key_,i.delay,i.lastlogsize,i.mtime"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid and h.status=%d and i.type=%d and h.hostid=" ZBX_FS_UI64
@@ -322,13 +318,13 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	if (0 != *(int *)DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and (i.status=%d or (i.status=%d and i.lastclock+%d<=%d))",
 				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 				refresh_unsupported, time(NULL));
 	}
 	else
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " and i.status=%d", ITEM_STATUS_ACTIVE);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and i.status=%d", ITEM_STATUS_ACTIVE);
 
 	zbx_free(name_esc);
 
@@ -418,20 +414,22 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_REGEXP);
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 512,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select r.name,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
-				" from regexps r,expressions e where r.regexpid=e.regexpid and r.name in (");
+				" from regexps r,expressions e"
+				" where r.regexpid=e.regexpid"
+					" and r.name in (");
 
 		for (n = 0; n < regexp_num; n++)
 		{
 			name_esc = DBdyn_escape_string(regexp[n]);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 512, "%s'%s'",
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s'%s'",
 					n == 0 ? "" : ",",
 					name_esc);
 			zbx_free(name_esc);
 			zbx_free(regexp[n]);
 		}
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, ")");
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
 		result = DBselect("%s", sql);
 		while (NULL != (row = DBfetch(result)))

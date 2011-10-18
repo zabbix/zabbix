@@ -107,7 +107,7 @@ int	VFS_FILE_CONTENTS(const char *cmd, const char *param, unsigned flags, AGENT_
 {
 	char		filename[MAX_STRING_LEN], encoding[32];
 	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
-	int		contents_alloc = 512, contents_offset = 0;
+	size_t		contents_alloc = 512, contents_offset = 0;
 	int		nbytes, flen, f = -1, ret = SYSINFO_RET_FAIL;
 	struct stat	stat_buf;
 	double		ts;

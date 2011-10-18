@@ -63,7 +63,7 @@ class API_JSON_User extends CZabbixTest
 		$result = $this->api_acall(
 			'map.create',
 			$maps,
-			&$debug
+			$debug
 		);
 
 		$this->assertTrue(!array_key_exists('error', $result),"Chuck Norris: Failed to create map through JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
@@ -82,7 +82,7 @@ class API_JSON_User extends CZabbixTest
 				array(
 					'filter' => array('name' => $map['name'])
 				),
-				&$debug
+				$debug
 			);
 			$map_api = reset($result['result']);
 			$this->assertTrue(array_key_exists('sysmapid', $map_api),"Chuck Norris: Chuck Norris: Map was just inserted but I failed to fetch it's id using JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));

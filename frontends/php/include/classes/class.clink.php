@@ -19,34 +19,44 @@
 **/
 ?>
 <?php
-class CLink extends CTag{
-protected $sid = null;
+class CLink extends CTag {
+	protected $sid = null;
 
-	public function __construct($item=NULL,$url=NULL,$class=NULL,$action=NULL, $nosid=NULL){
-		parent::__construct('a','yes');
+	public function __construct($item = null, $url = null, $class = null, $action = null, $nosid = null) {
+		parent::__construct('a', 'yes');
 
-		$this->tag_start= '';
+		$this->tag_start = '';
 		$this->tag_end = '';
 		$this->tag_body_start = '';
 		$this->tag_body_end = '';
 		$this->nosid = $nosid;
 
-		if(!is_null($class))	$this->setAttribute('class', $class);
-		if(!is_null($item))		$this->addItem($item);
-		if(!is_null($url))		$this->setUrl($url);
-		if(!is_null($action))	$this->setAttribute('onclick', $action);
+		if (!is_null($class)) {
+			$this->setAttribute('class', $class);
+		}
+		if (!is_null($item)) {
+			$this->addItem($item);
+		}
+		if (!is_null($url)) {
+			$this->setUrl($url);
+		}
+		if (!is_null($action)) {
+			$this->setAttribute('onclick', $action);
+		}
 	}
 
-	public function setUrl($value){
-		if(is_null($this->nosid)) {
-			if(is_null($this->sid)) $this->sid = isset($_COOKIE['zbx_sessionid']) ? substr($_COOKIE['zbx_sessionid'],16,16) : null;
-
-			if(!is_null($this->sid)){
-				if((zbx_strstr($value,'&') !== false) || (zbx_strstr($value,'?') !== false)) $value.= '&sid='.$this->sid;
-				else $value.= '?sid='.$this->sid;
-
-//				$uri = new Curl($value);
-//				$url = $uri->getUrl();
+	public function setUrl($value) {
+		if (is_null($this->nosid)) {
+			if (is_null($this->sid)) {
+				$this->sid = isset($_COOKIE['zbx_sessionid']) ? substr($_COOKIE['zbx_sessionid'], 16, 16) : null;
+			}
+			if (!is_null($this->sid)) {
+				if (zbx_strstr($value, '&') !== false || zbx_strstr($value, '?') !== false) {
+					$value .= '&sid='.$this->sid;
+				}
+				else {
+					$value .= '?sid='.$this->sid;
+				}
 			}
 			$url = $value;
 		}
@@ -56,18 +66,20 @@ protected $sid = null;
 		$this->setAttribute('href', $url);
 	}
 
-	public function getUrl(){
-		if(isset($this->attributes['href']))
+	public function getUrl() {
+		if (isset($this->attributes['href'])) {
 			return $this->attributes['href'];
-		else
+		}
+		else {
 			return null;
+		}
 	}
 
-	public function setTarget($value=NULL){
-		if(is_null($value)){
+	public function setTarget($value = null) {
+		if (is_null($value)) {
 			unset($this->attributes['target']);
 		}
-		else{
+		else {
 			$this->attributes['target'] = $value;
 		}
 	}

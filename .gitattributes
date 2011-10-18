@@ -62,6 +62,8 @@ create/images/elements/Zabbix_server_2D.svg -text svneol=native#image/svg%2Bxml
 create/images/elements/Zabbix_server_3D.svg -text svneol=native#image/svg%2Bxml
 create/images/equipment_rack/Rack_42.svg -text svneol=native#image/svg%2Bxml
 create/images/equipment_rack/Rack_42_with_door.svg -text svneol=native#image/svg%2Bxml
+create/images/images_oracle_end.txt -text
+create/images/images_oracle_start.txt -text
 create/images/old_images/Hub.png -text svneol=unset#image/png
 create/images/old_images/Hub_small.png -text svneol=unset#image/png
 create/images/old_images/Network.png -text svneol=unset#image/png
@@ -264,6 +266,8 @@ frontends/php/include/views/administration.usergroups.edit.php -text
 frontends/php/include/views/administration.usergroups.list.php -text
 frontends/php/include/views/administration.users.edit.php -text
 frontends/php/include/views/administration.users.list.php -text
+frontends/php/include/views/configuration.maintenance.edit.php -text
+frontends/php/include/views/configuration.maintenance.list.php -text
 frontends/php/include/views/general.browserwarning.php -text
 frontends/php/include/views/js/administration.general.macros.js.php -text
 frontends/php/include/views/js/administration.users.edit.js.php -text

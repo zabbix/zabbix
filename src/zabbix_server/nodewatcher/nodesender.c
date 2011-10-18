@@ -49,27 +49,26 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 	const char	*__function_name = "calculate_checksums";
 
 	char	*sql = NULL;
-	int	sql_allocated = 2048, sql_offset;
+	size_t	sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
 	int	t, f, res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_allocated);
-	sql_offset = 0;
+	sql = zbx_malloc(sql, sql_alloc);
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from node_cksum"
 			" where nodeid=%d"
 				" and cksumtype=%d",
 			nodeid, NODE_CKSUM_TYPE_NEW);
 
 	if (NULL != tablename)
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and tablename='%s'",
 				tablename);
 
 	if (0 != id)
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and recordid=" ZBX_FS_UI64,
 				id);
 
@@ -86,12 +85,12 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 			continue;
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into node_cksum (nodeid,tablename,recordid,cksumtype,cksum)"
 				" select %d,'%s',%s,%d,",
 				nodeid, tables[t].table, tables[t].recid, NODE_CKSUM_TYPE_NEW);
 #ifdef HAVE_MYSQL
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 16, "concat_ws(',',");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "concat_ws(',',");
 #endif
 
 		for (f = 0; NULL != tables[t].fields[f].name; f++)
@@ -108,22 +107,21 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 					case ZBX_TYPE_ID:
 					case ZBX_TYPE_INT:
 					case ZBX_TYPE_UINT:
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 1,
-								"%s", field->name);
+						zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, field->name);
 						break;
 					case ZBX_TYPE_FLOAT:
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 20,
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 								"md5(cast(%s as char))", field->name);
 						break;
 					default:
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 6,
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 								"md5(%s)", field->name);
 						break;
 				}
 			}
 			else
 			{
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 31,
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"case when %s is null then 'NULL'", field->name);
 
 				switch (field->type)
@@ -131,23 +129,23 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 					case ZBX_TYPE_ID:
 					case ZBX_TYPE_INT:
 					case ZBX_TYPE_UINT:
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 25,
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 								" else cast(%s as char) end", field->name);
 						break;
 					case ZBX_TYPE_FLOAT:
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 30,
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 								" else md5(cast(%s as char)) end", field->name);
 						break;
 					default:
-						zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, ZBX_FIELDNAME_LEN + 16,
+						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 								" else md5(%s) end", field->name);
 						break;
 				}
 			}
 #ifdef HAVE_MYSQL
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 2, ",");
+			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ',');
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "||','||");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "||','||");
 #endif
 		}
 
@@ -156,19 +154,19 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 		{
 #ifdef HAVE_MYSQL
 			sql_offset--;
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 2, ")");
+			zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 #else
 			sql_offset -= 7;
 #endif
 		}
 
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" from %s where 1=1" DB_NODE,
 				tables[t].table, DBnode(tables[t].recid, nodeid));
 
 		if (0 != id)
 		{
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					" and %s=" ZBX_FS_UI64,
 					tables[t].recid, id);
 		}
@@ -201,7 +199,7 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
  *                                                                            *
  ******************************************************************************/
 static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE *table,
-		char **data, int *data_alloc, int *data_offset)
+		char **data, size_t *data_alloc, size_t *data_offset)
 {
 #define ZBX_REC_UPDATED	'1'
 #define ZBX_REC_DELETED	'2'
@@ -213,14 +211,14 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 
 	char	*hex = NULL, *sql = NULL, sync[129], *s,
 		*curr_cksum, *d_curr_cksum, *prev_cksum, *d_prev_cksum;
-	int	sql_offset = 0;
-	int	hex_allocated = 1024, sql_allocated = 8 * 1024;
-	int	f, j, rowlen;
+	size_t	sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
+	size_t	hex_alloc = ZBX_KIBIBYTE, rowlen;
+	int	f, j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [table:'%s']", __function_name, table->table);
 
-	hex = zbx_malloc(hex, hex_allocated);
-	sql = zbx_malloc(sql, sql_allocated);
+	hex = zbx_malloc(hex, hex_alloc);
+	sql = zbx_malloc(sql, sql_alloc);
 
 	result = DBselect(
 			/* Find new records */
@@ -276,7 +274,7 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 			if ((dest_nodetype == ZBX_NODE_SLAVE && sync[0] != ZBX_REC_DELETED) ||
 					(dest_nodetype == ZBX_NODE_MASTER && sync[1] != ZBX_REC_DELETED))
 			{
-				zbx_snprintf_alloc(data, data_alloc, data_offset, 128, "\n%s%c%s%c%d",
+				zbx_snprintf_alloc(data, data_alloc, data_offset, "\n%s%c%s%c%d",
 						table->table, ZBX_DM_DELIMITER, row[0], ZBX_DM_DELIMITER,
 						NODE_CONFIGLOG_OP_DELETE);
 			}
@@ -289,7 +287,7 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 		f = 0;
 
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "select ");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select ");
 
 		do
 		{
@@ -309,12 +307,12 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 					(dest_nodetype == ZBX_NODE_MASTER && s[1] != ZBX_REC_UPDATED) ||
 					0 != strcmp(prev_cksum, curr_cksum))
 			{
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "%s,",
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%s,",
 						table->fields[f].name);
 
 				if (table->fields[f].type == ZBX_TYPE_BLOB)
 				{
-					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "length(%s),",
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "length(%s),",
 							table->fields[f].name);
 				}
 			}
@@ -343,14 +341,14 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 			continue;
 
 		sql_offset--;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, " from %s where %s=%s",
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s where %s=%s",
 				table->table, table->recid, row[0]);
 
 		result2 = DBselect("%s", sql);
 		if (NULL == (row2 = DBfetch(result2)))
 			goto out;
 
-		zbx_snprintf_alloc(data, data_alloc, data_offset, 128, "\n%s%c%s%c%d",
+		zbx_snprintf_alloc(data, data_alloc, data_offset, "\n%s%c%s%c%d",
 				table->table, ZBX_DM_DELIMITER, row[0], ZBX_DM_DELIMITER,
 				NODE_CONFIGLOG_OP_UPDATE);
 
@@ -378,7 +376,7 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 					(dest_nodetype == ZBX_NODE_MASTER && s[1] != ZBX_REC_UPDATED) ||
 					0 != strcmp(prev_cksum, curr_cksum))
 			{
-				zbx_snprintf_alloc(data, data_alloc, data_offset, 128, "%c%s%c%d%c",
+				zbx_snprintf_alloc(data, data_alloc, data_offset, "%c%s%c%d%c",
 						ZBX_DM_DELIMITER, table->fields[f].name,
 						ZBX_DM_DELIMITER, table->fields[f].type,
 						ZBX_DM_DELIMITER);
@@ -386,23 +384,23 @@ static void	DMcollect_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE 
 				/* Fieldname, type, value */
 				if (SUCCEED == DBis_null(row2[j]))
 				{
-					zbx_snprintf_alloc(data, data_alloc, data_offset, 5, "NULL");
+					zbx_strcpy_alloc(data, data_alloc, data_offset, "NULL");
 				}
 				else if (table->fields[f].type == ZBX_TYPE_INT ||
 					table->fields[f].type == ZBX_TYPE_UINT ||
 					table->fields[f].type == ZBX_TYPE_ID ||
 					table->fields[f].type == ZBX_TYPE_FLOAT)
 				{
-					zbx_snprintf_alloc(data, data_alloc, data_offset, 128, "%s", row2[j]);
+					zbx_strcpy_alloc(data, data_alloc, data_offset, row2[j]);
 				}
 				else
 				{
 					if (table->fields[f].type == ZBX_TYPE_BLOB)
-						rowlen = atoi(row2[j + 1]);
+						rowlen = (size_t)atoi(row2[j + 1]);
 					else
 						rowlen = strlen(row2[j]);
-					rowlen = zbx_binary2hex((u_char *)row2[j], rowlen, &hex, &hex_allocated);
-					zbx_snprintf_alloc(data, data_alloc, data_offset, rowlen + 1, "%s", hex);
+					zbx_binary2hex((u_char *)row2[j], rowlen, &hex, &hex_alloc);
+					zbx_strcpy_alloc(data, data_alloc, data_offset, hex);
 				}
 
 				if (table->fields[f].type == ZBX_TYPE_BLOB)
@@ -458,8 +456,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	DMget_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE *table,
-		char **data, int *data_alloc, int *data_offset,
-		char **ptbls, int *ptbls_alloc, int *ptbls_offset)
+		char **data, size_t *data_alloc, size_t *data_offset,
+		char **ptbls, size_t *ptbls_alloc, size_t *ptbls_offset)
 {
 	const char	*__function_name = "DMget_table_data";
 
@@ -472,7 +470,7 @@ static int	DMget_table_data(int nodeid, int dest_nodetype, const ZBX_TABLE *tabl
 	if (SUCCEED == str_in_list(*ptbls, table->table, ','))
 		return SUCCEED;
 
-	zbx_snprintf_alloc(ptbls, ptbls_alloc, ptbls_offset, ZBX_TABLENAME_LEN + 2, "%s%s",
+	zbx_snprintf_alloc(ptbls, ptbls_alloc, ptbls_offset, "%s%s",
 			*ptbls_offset ? "," : "", table->table);
 
 	for (f = 0; NULL != table->fields[f].name; f++)
@@ -518,9 +516,9 @@ char	*DMget_config_data(int nodeid, int dest_nodetype)
 	const char	*__function_name = "DMget_config_data";
 
 	char		*ptbls = NULL;	/* list of processed tables */
-	int		ptbls_alloc = 1024, ptbls_offset = 0;
+	size_t		ptbls_alloc = ZBX_KIBIBYTE, ptbls_offset = 0;
 	char		*data = NULL;
-	int		data_alloc = 1024, data_offset = 0;
+	size_t		data_alloc = ZBX_KIBIBYTE, data_offset = 0;
 	int		t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [node:%d] [dest_nodetype:%s]", __function_name,
@@ -529,7 +527,7 @@ char	*DMget_config_data(int nodeid, int dest_nodetype)
 	ptbls = zbx_malloc(ptbls, ptbls_alloc);
 	data = zbx_malloc(data, data_alloc);
 
-	zbx_snprintf_alloc(&data, &data_alloc, &data_offset, 16, "Data%c%d%c%d",
+	zbx_snprintf_alloc(&data, &data_alloc, &data_offset, "Data%c%d%c%d",
 			ZBX_DM_DELIMITER, CONFIG_NODEID, ZBX_DM_DELIMITER, nodeid);
 
 	for (t = 0; NULL != tables[t].table; t++)
@@ -565,14 +563,16 @@ char	*DMget_config_data(int nodeid, int dest_nodetype)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int update_checksums(int nodeid, int synked_nodetype, int synked, const char *tablename, const zbx_uint64_t id, char *fields)
+int	update_checksums(int nodeid, int synked_nodetype, int synked, const char *tablename,
+		const zbx_uint64_t id, char *fields)
 {
 	const char	*__function_name = "update_checksums";
 	char		*r[2], *d[2], sync[129], *s;
 	char		c[2], sql[2][256];
-	char		cksum[32*64+32], *ck;
+	char		cksum[32 * 64 + 32], *ck;
 	char		*exsql = NULL;
-	int		exsql_alloc = 65536, exsql_offset = 0, cksumtype;
+	size_t		exsql_alloc = 64 * ZBX_KIBIBYTE, exsql_offset = 0;
+	int		cksumtype;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		f;
@@ -584,19 +584,20 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 
 	DBbegin();
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset, 8, "begin\n");
-#endif
+	DBbegin_multiple_update(&exsql, &exsql_alloc, &exsql_offset);
 
 	c[0] = synked == SUCCEED ? '1' : ' ';	/* for new and updated records */
 	c[1] = synked == SUCCEED ? '2' : ' ';	/* for deleted records */
 
-	if (NULL != tablename) {
+	if (NULL != tablename)
+	{
 		zbx_snprintf(sql[0], sizeof(sql[0]), " and curr.tablename='%s' and curr.recordid=" ZBX_FS_UI64,
 			tablename, id);
 		zbx_snprintf(sql[1], sizeof(sql[1]), " and prev.tablename='%s' and prev.recordid=" ZBX_FS_UI64,
 			tablename, id);
-	} else {
+	}
+	else
+	{
 		*sql[0] = '\0';
 		*sql[1] = '\0';
 	}
@@ -672,7 +673,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 			if ((0 == CONFIG_MASTER_NODEID || s[1] == c[1]) &&
 					(CONFIG_NODEID == nodeid || s[0] == c[1]))
 			{
-				zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset, 256,
+				zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset,
 						"delete from node_cksum"
 						" where nodeid=%d"
 							" and cksumtype=%d"
@@ -762,7 +763,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 				0 != strcmp(row[4], sync) || 0 != strcmp(row[2], row[3]))
 		{
 			cksumtype = (DBis_null(row[2]) == SUCCEED) ? NODE_CKSUM_TYPE_NEW : NODE_CKSUM_TYPE_OLD;
-			zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset, 2560,
+			zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset,
 					"update node_cksum"
 					" set cksumtype=%d,"
 						"cksum='%s',"
@@ -779,9 +780,7 @@ int update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 	}
 	DBfree_result(result);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&exsql, &exsql_alloc, &exsql_offset, 8, "end;\n");
-#endif
+	DBend_multiple_update(&exsql, &exsql_alloc, &exsql_offset);
 
 	if (exsql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", exsql);

@@ -316,17 +316,20 @@ include_once('include/page_header.php');
 <?php
 /************ ACTIONS FOR HOSTS ****************/
 // UNLINK HOST
-	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
+	if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
-		if(isset($_REQUEST['unlink'])){
+		if (isset($_REQUEST['unlink'])) {
 			$unlink_templates = array_keys($_REQUEST['unlink']);
 		}
-		else{
+		else {
 			$unlink_templates = array_keys($_REQUEST['unlink_and_clear']);
-			$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'], $unlink_templates);
+			$_REQUEST['clear_templates'] = array_merge($_REQUEST['clear_templates'], $unlink_templates);
 		}
-		foreach($unlink_templates as $id) unset($_REQUEST['templates'][$id]);
+
+		foreach ($unlink_templates as $id) {
+			unset($_REQUEST['templates'][$id]);
+		}
 	}
 // CLONE HOST
 	else if(isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])){

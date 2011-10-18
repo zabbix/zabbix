@@ -182,7 +182,7 @@ class API_JSON_User extends CZabbixTest
 		$result = $this->api_call(
 			'user.authenticate',
 			$data,
-			&$debug);
+			$debug);
 		if($expect)
 		{
 			$this->assertTrue(isset($result['result']),"$debug");
@@ -213,7 +213,7 @@ class API_JSON_User extends CZabbixTest
 		$result = $this->api_acall(
 			'user.create',
 			array($user),
-			&$debug
+			$debug
 		);
 
 		// checking result

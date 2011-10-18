@@ -93,6 +93,15 @@ table.formtable tr.new td{
 	background-color: #777777;
 }
 
+table.gridTable thead tr td{
+	background-color: #3f3f3f;
+}
+table.gridTable tfoot tr td{
+	background-color: #3f3f3f;
+}
+table.gridTable tbody tr td{
+	background-color: #3f3f3f;
+}
 
 td.form_row_l_simple { /* left cell simple */
 	border-color: #222222;
@@ -148,6 +157,9 @@ table.filter .subfilter_active{
 table.tableinfo{
 	color: #DFDFDF;
 	background-color: #1F1F1F;
+}
+table.tableinfo caption {
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 table.tableinfo tr td {

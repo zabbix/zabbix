@@ -50,7 +50,7 @@ static int	housekeeping_process_log()
 	DB_ROW		row;
 	int		deleted;
 	char		*sql = NULL;
-	int		sql_alloc = 512, sql_offset = 0;
+	size_t		sql_alloc = 512, sql_offset = 0;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc = 0, ids_num = 0;
 
@@ -148,7 +148,7 @@ static int	housekeeping_process_log()
 	{
 		sql = zbx_malloc(sql, sql_alloc);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32, "delete from housekeeper where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from housekeeper where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "housekeeperid", ids, ids_num);
 
 		DBexecute("%s", sql);

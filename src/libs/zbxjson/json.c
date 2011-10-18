@@ -1008,7 +1008,7 @@ int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
  ******************************************************************************/
 int	zbx_json_brackets_by_name(struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out)
 {
-	const char	*p = NULL;
+	const char	*p;
 
 	if (NULL == (p = zbx_json_pair_by_name(jp, name)))
 		return FAIL;

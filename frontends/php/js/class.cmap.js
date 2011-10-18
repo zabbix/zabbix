@@ -18,13 +18,13 @@
 **/
 
 var ZABBIX = ZABBIX || {};
-ZABBIX.namespace = function(namespace){
+ZABBIX.namespace = function(namespace) {
 	var parts = namespace.split('.'),
 		parent = this,
 		i;
 
-	for(i = 0; i < parts.length; i++){
-		if(typeof parent[parts[i]] === "undefined") {
+	for (i = 0; i < parts.length; i++) {
+		if (typeof parent[parts[i]] === 'undefined') {
 			parent[parts[i]] = {};
 		}
 		parent = parent[parts[i]];
@@ -33,23 +33,23 @@ ZABBIX.namespace = function(namespace){
 };
 
 ZABBIX.namespace('classes.Observer');
-ZABBIX.classes.Observer = (function(){
-	"use strict";
+ZABBIX.classes.Observer = (function() {
+	'use strict';
 
-	var Observer = function(){
+	var Observer = function() {
 		this.listeners = {}
 	};
 	Observer.prototype = {
 		constructor: ZABBIX.classes.Observer,
 
-		bind: function(event, callback){
+		bind: function(event, callback) {
 			var i;
 
-			if(typeof callback === 'function'){
+			if (typeof callback === 'function') {
 				event = ('' + event).toLowerCase().split(/\s+/);
 
-				for(i = 0; i < event.length; i++){
-					if(this.listeners[event[i]] === void(0)){
+				for (i = 0; i < event.length; i++) {
+					if (this.listeners[event[i]] === void(0)) {
 						this.listeners[event[i]] = [];
 					}
 					this.listeners[event[i]].push(callback);
@@ -58,19 +58,19 @@ ZABBIX.classes.Observer = (function(){
 			return this;
 		},
 
-		trigger: function(event, target){
+		trigger: function(event, target) {
 			event = event.toLowerCase();
-			var	handlers = this.listeners[event] || [],
+			var handlers = this.listeners[event] || [],
 				i;
 
-			if(handlers.length){
+			if (handlers.length) {
 				event = jQuery.Event(event);
-				for(i = 0; i < handlers.length; i++){
-					try{
-						if(handlers[i](event, target) === false || event.isDefaultPrevented()){
+				for (i = 0; i < handlers.length; i++) {
+					try {
+						if (handlers[i](event, target) === false || event.isDefaultPrevented()) {
 							break;
 						}
-					}catch(ex){
+					} catch(ex) {
 						window.console && window.console.log && window.console.log(ex);
 					}
 				}
@@ -79,31 +79,28 @@ ZABBIX.classes.Observer = (function(){
 		}
 	};
 
-	Observer.makeObserver = function(object){
+	Observer.makeObserver = function(object) {
 		var i;
 
-		for(i in Observer.prototype){
-			if(Observer.prototype.hasOwnProperty(i) && typeof Observer.prototype[i] === "function"){
+		for (i in Observer.prototype) {
+			if (Observer.prototype.hasOwnProperty(i) && typeof Observer.prototype[i] === 'function') {
 				object[i] = Observer.prototype[i];
 			}
 		}
 		object.listeners = {};
 	};
-
 	return Observer;
 }());
 
-
 ZABBIX.namespace('apps.map');
-ZABBIX.apps.map = (function(){
-	"use strict";
+ZABBIX.apps.map = (function() {
+	'use strict';
 
 	// dependencies
 	var Observer = ZABBIX.classes.Observer;
 
-	function createMap(containerid, mapdata){
-
-		var CMap = function(containerid, mapdata){
+	function createMap(containerid, mapdata) {
+		var CMap = function(containerid, mapdata) {
 			var selementid,
 				linkid,
 				setContainer;
@@ -117,17 +114,14 @@ ZABBIX.apps.map = (function(){
 				selements: {} // selected elements { elementid: elementid, ... }
 			};
 			this.currentLinkId = '0'; // linkid of currently edited link
-
 			this.allLinkTriggerIds = {};
-
-
 			this.sysmapid = mapdata.sysmap.sysmapid;
 			this.data = mapdata.sysmap;
 			this.iconList = mapdata.iconList;
 			this.defaultAutoIconId = mapdata.defaultAutoIconId
 
 			this.container = jQuery('#' + containerid);
-			if(this.container.length === 0){
+			if (this.container.length === 0) {
 				this.container = jQuery(document.body);
 			}
 			this.container.css({
@@ -135,27 +129,26 @@ ZABBIX.apps.map = (function(){
 				height: this.data.height + 'px'
 			});
 
-			if(IE){
+			if (IE) {
 				this.container.css({
 					'background-color': 'blue',
 					filter: 'alpha(opacity=0)'
 				});
 			}
 
-			if(IE || GK){
+			if (IE || GK) {
 				this.base64image = false;
 				this.mapimg = jQuery('#sysmap_img');
-
 				this.container.css('position', 'absolute');
 
 				// resize div on window resize
-				setContainer = function(){
+				setContainer = function() {
 					var sysmap_pn = this.mapimg.position(),
 						sysmapHeight = this.mapimg.height(),
 						sysmapWidth = this.mapimg.width(),
 						container_pn = this.container.position();
 
-					if((container_pn.top !== sysmap_pn.top) || (container_pn.left !== sysmap_pn.left) || (this.container.height() !== sysmapHeight) || (this.container.width() !== sysmapWidth)){
+					if (container_pn.top !== sysmap_pn.top || container_pn.left !== sysmap_pn.left || this.container.height() !== sysmapHeight || this.container.width() !== sysmapWidth) {
 						this.container.css({
 							top: sysmap_pn.top + 'px',
 							left: sysmap_pn.left + 'px',
@@ -167,17 +160,16 @@ ZABBIX.apps.map = (function(){
 				jQuery(window).resize(jQuery.proxy(setContainer, this));
 				this.mapimg.load(jQuery.proxy(setContainer, this));
 			}
-			else{
+			else {
 				this.container.css('position', 'relative');
 				this.base64image = true;
 				jQuery('#sysmap_img').remove();
 			}
 
-
-			for(selementid in this.data.selements){
+			for (selementid in this.data.selements) {
 				this.selements[selementid] = new Selement(this, this.data.selements[selementid]);
 			}
-			for(linkid in this.data.links){
+			for (linkid in this.data.links) {
 				this.links[linkid] = new Link(this, this.data.links[linkid]);
 			}
 
@@ -194,7 +186,6 @@ ZABBIX.apps.map = (function(){
 					containment: [0,0,3200,3200]
 				});
 
-
 			this.updateImage();
 			this.form = new SelementForm(this.formContainer, this);
 			this.massForm = new MassForm(this.formContainer, this);
@@ -203,18 +194,18 @@ ZABBIX.apps.map = (function(){
 
 			// initialize SELECTABLE
 			this.container.selectable({
-				start: jQuery.proxy(function(event){
+				start: jQuery.proxy(function(event) {
 					if(!event.ctrlKey){
 						this.clearSelection();
 					}
 				}, this),
-				stop: jQuery.proxy(function(event){
+				stop: jQuery.proxy(function(event) {
 					var selected = jQuery('.ui-selected', this.container),
 						ids = [],
 						i,
 						ln;
 
-					for(i = 0, ln = selected.length; i < ln; i++){
+					for (i = 0, ln = selected.length; i < ln; i++) {
 						ids.push(jQuery(selected[i]).data('id'));
 
 						// remove ui-selected class, to not confuse next selection
@@ -225,36 +216,36 @@ ZABBIX.apps.map = (function(){
 			});
 		};
 		CMap.prototype = {
-			save: function(){
+			save: function() {
 				var url = new Curl(location.href);
 				jQuery.ajax({
-					url: url.getPath() + '?output=ajax' + '&sid=' + url.getArgument('sid'),
-					type: "post",
+					url: url.getPath() + '?output=ajax&sid=' + url.getArgument('sid'),
+					type: 'post',
 					data: {
-						favobj: "sysmap",
-						action: "save",
+						favobj: 'sysmap',
+						action: 'save',
 						sysmapid: this.sysmapid,
 						sysmap: Object.toJSON(this.data) // TODO: remove prototype method
 					},
-					error: function(){
+					error: function() {
 						throw new Error('Cannot save map.');
 					}
 				});
 			},
 
-			updateImage: function(){
+			updateImage: function() {
 				var url = new Curl(),
-					urlText = 'map.php' + '?sid=' + url.getArgument('sid'),
+					urlText = 'map.php?sid=' + url.getArgument('sid'),
 					ajaxRequest;
 
 				// is image is updating, set reupdate flag and exit
-				if(this.imageUpdating === true){
+				if (this.imageUpdating === true) {
 					this.reupdateImage = true;
 					return;
 				}
 
 				// grid
-				if(this.data.grid_show === '1'){
+				if (this.data.grid_show === '1') {
 					urlText += '&grid=' + this.data.grid_size;
 				}
 
@@ -272,53 +263,49 @@ ZABBIX.apps.map = (function(){
 						links: Object.toJSON(this.data.links),
 						base64image: (this.base64image ? 1 : 0)
 					},
-					success: jQuery.proxy(function(data){
-						if(this.base64image){
+					success: jQuery.proxy(function(data) {
+						if (this.base64image) {
 							this.container.css({
-								'background-image': 'url("data:image/png;base64,'+data.result+'")',
+								'background-image': 'url("data:image/png;base64,' + data.result + '")',
 								width: this.data.width + 'px',
 								height: this.data.height + 'px'
 							});
 						}
-						else{
+						else {
 							this.mapimg.attr('src', 'imgstore.php?imageid=' + data.result);
 						}
-
 						this.imageUpdating = false;
 					}, this),
-					error: function(jqXHR, textStatus, errorThrown){
+					error: function(jqXHR, textStatus, errorThrown) {
 						window.console && window.console.log && window.console.log(jqXHR, textStatus, errorThrown);
 						alert('Map image update failed');
 					}
 				});
 
-
-				jQuery.when(ajaxRequest).always(jQuery.proxy(function(){
-					if(this.reupdateImage === true){
+				jQuery.when(ajaxRequest).always(jQuery.proxy(function() {
+					if (this.reupdateImage === true) {
 						this.reupdateImage = false;
 						this.updateImage();
 					}
 				}, this));
 			},
 
-			// ---------- ELEMENTS ------------------------------------------------------------------------------------
-			deleteSelectedElements: function(){
+			// ---------- ELEMENTS -------------
+			deleteSelectedElements: function() {
 				var selementid;
 
-				if(this.selection.count && confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])){
-					for(selementid in this.selection.selements){
+				if (this.selection.count && confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])) {
+					for (selementid in this.selection.selements) {
 						this.selements[selementid].remove();
 						this.removeLinksBySelementId(selementid);
 					}
-
 					this.toggleForm();
 					this.updateImage();
 				}
-
 			},
 
-			// CONNECTORS
-			removeLinks: function(){
+			// connectors
+			removeLinks: function() {
 				var selementid1 = null,
 					selementid2 = null,
 					selementid,
@@ -326,119 +313,113 @@ ZABBIX.apps.map = (function(){
 					i,
 					ln;
 
-				if(this.selection.count !== 2){
+				if (this.selection.count !== 2) {
 					alert(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
 					return false;
 				}
 
-				for(selementid in this.selection.selements){
-					if(selementid1 === null){
+				for (selementid in this.selection.selements) {
+					if (selementid1 === null) {
 						selementid1 = selementid;
 					}
-					else{
+					else {
 						selementid2 = selementid;
 					}
 				}
 
 				linkids = this.getLinksBySelementIds(selementid1, selementid2);
-				if(linkids.length === 0){
+				if (linkids.length === 0) {
 					return false;
 				}
 
-
-				if(confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])){
-					for(i = 0, ln = linkids.length; i < ln; i++){
+				if (confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])) {
+					for (i = 0, ln = linkids.length; i < ln; i++) {
 						this.links[linkids[i]].remove();
 					}
-
 					this.linkForm.hide();
 					this.updateImage();
 				}
 			},
 
-			removeLinksBySelementId: function(selementid){
+			removeLinksBySelementId: function(selementid) {
 				var linkids = this.getLinksBySelementIds(selementid),
 					i,
 					ln;
 
-				for(i = 0, ln = linkids.length; i < ln; i++){
+				for (i = 0, ln = linkids.length; i < ln; i++) {
 					this.links[linkids[i]].remove();
 				}
 			},
 
-			getLinksBySelementIds: function(selementid1, selementid2){
+			getLinksBySelementIds: function(selementid1, selementid2) {
 				var links = [],
 					linkid;
 
-				if(typeof(selementid2) === 'undefined'){
+				if (typeof(selementid2) === 'undefined') {
 					selementid2 = null;
 				}
 
-
-				for(linkid in this.data.links){
-					if(selementid2 === null){
-						if((this.data.links[linkid].selementid1 === selementid1) || (this.data.links[linkid].selementid2 === selementid1)){
+				for (linkid in this.data.links) {
+					if (selementid2 === null) {
+						if (this.data.links[linkid].selementid1 === selementid1 || this.data.links[linkid].selementid2 === selementid1) {
 							links.push(linkid);
 						}
 					}
-					else{
-						if((this.data.links[linkid].selementid1 === selementid1) && (this.data.links[linkid].selementid2 === selementid2)){
+					else {
+						if (this.data.links[linkid].selementid1 === selementid1 && this.data.links[linkid].selementid2 === selementid2) {
 							links.push(linkid);
 						}
-						else if((this.data.links[linkid].selementid1 === selementid2) && (this.data.links[linkid].selementid2 === selementid1)){
+						else if (this.data.links[linkid].selementid1 === selementid2 && this.data.links[linkid].selementid2 === selementid1) {
 							links.push(linkid);
 						}
 					}
 				}
-
 				return links;
 			},
 
-			//--------------------------------------------------------------------------------
-
-			bindActions: function(){
+			bindActions: function() {
 				var that = this;
 
 				// MAP PANEL EVENTS
 				// change grid size
-				jQuery('#gridsize').change(function(){
+				jQuery('#gridsize').change(function() {
 					var value = jQuery(this).val();
-					if(that.data.grid_size !== value){
+					if (that.data.grid_size !== value) {
 						that.data.grid_size = value;
 						that.updateImage();
 					}
 				});
 
 				// toggle autoalign
-				jQuery('#gridautoalign').click(function(){
+				jQuery('#gridautoalign').click(function() {
 					that.data.grid_align = that.data.grid_align === '1' ? '0' : '1';
 					jQuery(this).html(that.data.grid_align === '1' ? locale['S_ON'] : locale['S_OFF']);
 				});
 
 				// toggle grid visibility
-				jQuery('#gridshow').click(function(){
+				jQuery('#gridshow').click(function() {
 					that.data.grid_show = that.data.grid_show === '1' ? '0' : '1';
 					jQuery(this).html(that.data.grid_show === '1' ? locale['S_SHOWN'] : locale['S_HIDDEN']);
 					that.updateImage();
 				});
 
 				// perform align all
-				jQuery('#gridalignall').click(function(){
+				jQuery('#gridalignall').click(function() {
 					var selementid;
-					for(selementid in that.selements){
+					for (selementid in that.selements) {
 						that.selements[selementid].align(true);
 					}
 					that.updateImage();
 				});
 
 				// save map
-				jQuery('#sysmap_save').click(function(){
+				jQuery('#sysmap_save').click(function() {
 					that.save();
 				});
 
 				// add element
-				jQuery('#selementAdd').click(function(){
-					if(typeof that.iconList[0] === 'undefined'){
+				jQuery('#selementAdd').click(function() {
+					if (typeof that.iconList[0] === 'undefined') {
 						alert(locale['S_NO_IMAGES']);
 						return;
 					}
@@ -451,10 +432,10 @@ ZABBIX.apps.map = (function(){
 				jQuery('#selementRemove').click(jQuery.proxy(this.deleteSelectedElements, this));
 
 				// add link
-				jQuery('#linkAdd').click(function(){
+				jQuery('#linkAdd').click(function() {
 					var link;
 
-					if(that.selection.count !== 2){
+					if (that.selection.count !== 2) {
 						alert(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
 						return false;
 					}
@@ -464,70 +445,72 @@ ZABBIX.apps.map = (function(){
 				});
 
 				// remove link
-				jQuery('#linkRemove').click(function(){
+				jQuery('#linkRemove').click(function() {
 					that.removeLinks();
 				});
 
 
 				// SELEMENTS EVENTS
 				// delegate selements icons clicks
-				jQuery(this.container).delegate('.sysmap_element', 'click', function(event){
+				jQuery(this.container).delegate('.sysmap_element', 'click', function(event) {
 					that.selectElements([jQuery(this).data('id')], event.ctrlKey);
 				});
 
 
 				// FORM EVENTS
 				// when change elementType, we clear elementnames and elementid
-				jQuery('#elementType').change(function(){
+				jQuery('#elementType').change(function() {
 					jQuery('input[name=elementName]').val('');
 					jQuery('#elementid').val('0');
 				});
 
-				jQuery('#elementClose').click(function(){
+				jQuery('#elementClose').click(function() {
 					that.clearSelection();
 					that.toggleForm();
 				});
 				jQuery('#elementRemove').click(jQuery.proxy(this.deleteSelectedElements, this));
-				jQuery('#elementApply').click(jQuery.proxy(function(){
-					if(this.selection.count !== 1) throw 'Try to single update element, when more than one selected.';
+				jQuery('#elementApply').click(jQuery.proxy(function() {
+					if (this.selection.count !== 1) {
+						throw 'Try to single update element, when more than one selected.';
+					}
 					var values = this.form.getValues();
-					if(values){
-						for(var selementid in this.selection.selements){
+					if (values) {
+						for (var selementid in this.selection.selements) {
 							this.selements[selementid].update(values, true);
 						}
 					}
-
 				}, this));
-				jQuery('#newSelementUrl').click(jQuery.proxy(function(){
+
+				jQuery('#newSelementUrl').click(jQuery.proxy(function() {
 					this.form.addUrls();
 				}, this));
 
-				jQuery('#x, #y', this.form.domNode).change(function(){
+				jQuery('#x, #y', this.form.domNode).change(function() {
 					var value = parseInt(this.value, 10);
 					this.value = isNaN(value) || (value < 0) ? 0 : value;
 				});
-				jQuery('#areaSizeWidth, #areaSizeHeight', this.form.domNode).change(function(){
+				jQuery('#areaSizeWidth, #areaSizeHeight', this.form.domNode).change(function() {
 					var value = parseInt(this.value, 10);
 					this.value = isNaN(value) || (value < 10) ? 10 : value;
 				});
 
 				// mass update form
-				jQuery('#massClose').click(function(){
+				jQuery('#massClose').click(function() {
 					that.clearSelection();
 					that.toggleForm();
 				});
 				jQuery('#massRemove').click(jQuery.proxy(this.deleteSelectedElements, this));
-				jQuery('#massApply').click(jQuery.proxy(function(){
+				jQuery('#massApply').click(jQuery.proxy(function() {
 					var values = this.massForm.getValues();
-					if(values){
-						for(var selementid in this.selection.selements){
+					if (values) {
+						for (var selementid in this.selection.selements) {
 							this.selements[selementid].update(values);
 						}
 					}
 				}, this));
 
 				// open link form
-				jQuery('#linksList').delegate('.openlink', 'click', function(){
+				jQuery('#linksList').delegate('.openlink', 'click', function() {
 					that.currentLinkId = jQuery(this).data('linkid');
 					jQuery('#linksList tr').removeClass('selected');
 					jQuery(this).parent().parent().addClass('selected');
@@ -537,104 +520,97 @@ ZABBIX.apps.map = (function(){
 				});
 
 				// link form
-				jQuery('#formLinkRemove').click(function(){
+				jQuery('#formLinkRemove').click(function() {
 					that.links[that.currentLinkId].remove();
-					for(var selementid in that.selection.selements){
+					for (var selementid in that.selection.selements) {
 						that.form.updateList(selementid);
 					}
 					that.linkForm.hide();
 					that.updateImage();
 				});
-				jQuery('#formLinkApply').click(function(){
+				jQuery('#formLinkApply').click(function() {
 					var linkData = that.linkForm.getValues();
 					that.links[that.currentLinkId].update(linkData)
 				});
-				jQuery('#formLinkClose').click(function(){
+				jQuery('#formLinkClose').click(function() {
 					that.linkForm.hide();
 				});
 
-				this.linkForm.domNode.delegate('.triggerRemove', 'click', function(){
+				this.linkForm.domNode.delegate('.triggerRemove', 'click', function() {
 					var triggerid,
 						tid = jQuery(this).data('linktriggerid').toString();
 
-					jQuery('#linktrigger_'+tid).remove();
-					for(triggerid in that.linkForm.triggerids){
-
-						if(that.linkForm.triggerids[triggerid] === tid){
+					jQuery('#linktrigger_' + tid).remove();
+					for (triggerid in that.linkForm.triggerids) {
+						if (that.linkForm.triggerids[triggerid] === tid) {
 							delete that.linkForm.triggerids[triggerid];
 						}
 					}
 				});
 
 				// changes for color inputs
-				this.linkForm.domNode.delegate('.colorpicker', 'change', function(){
+				this.linkForm.domNode.delegate('.colorpicker', 'change', function() {
 					var id = jQuery(this).attr('id');
 					set_color_by_name(id, this.value);
 				});
-				this.linkForm.domNode.delegate('.colorpickerLabel', 'click', function(){
+				this.linkForm.domNode.delegate('.colorpickerLabel', 'click', function() {
 					var id = jQuery(this).attr('id');
 					var input = id.match(/^lbl_(.+)$/);
 					show_color_picker(input[1]);
 				});
-
 			},
 
-			clearSelection: function(){
+			clearSelection: function() {
 				var id;
-
-				for(id in this.selection.selements){
+				for (id in this.selection.selements) {
 					this.selection.count--;
 					this.selements[id].toggleSelect(false);
 					delete this.selection.selements[id];
 				}
 			},
 
-			selectElements: function(ids, addSelection){
-				var i,
-					ln;
+			selectElements: function(ids, addSelection) {
+				var i, ln;
 
-				if(!addSelection){
+				if (!addSelection) {
 					this.clearSelection();
 				}
 
-				for(i = 0, ln = ids.length; i < ln; i++){
+				for (i = 0, ln = ids.length; i < ln; i++) {
 					var selementid = ids[i];
 					var selected = this.selements[selementid].toggleSelect();
-					if(selected){
+					if (selected) {
 						this.selection.count++;
 						this.selection.selements[selementid] = selementid;
 					}
-					else{
+					else {
 						this.selection.count--;
 						delete this.selection.selements[selementid];
 					}
 				}
-
 				this.toggleForm();
 			},
 
-			toggleForm: function(){
+			toggleForm: function() {
 				var selementid;
-
 				this.linkForm.hide();
-				if(this.selection.count == 0){
+				if (this.selection.count == 0) {
 					this.form.hide();
 					this.massForm.hide();
 				}
-				else if(this.selection.count == 1){
-					for(selementid in this.selection.selements){
+				else if (this.selection.count == 1) {
+					for (selementid in this.selection.selements) {
 						this.form.setValues(this.selements[selementid].getData());
 					}
 					this.massForm.hide();
 					this.form.show();
 				}
-				else{
+				else {
 					this.form.hide();
 					this.massForm.show();
 				}
 			}
 		};
-
 
 		/**
 		 * Creates a new Link
@@ -646,15 +622,11 @@ ZABBIX.apps.map = (function(){
 		 * @param {Object} sysmap Map object
 		 * @param {Object} [linkData] link data from db
 		 */
-		function Link(sysmap, linkData){
-			var linkid,
-				selementid,
-				lnktrigger;
-
+		function Link(sysmap, linkData) {
+			var linkid, selementid, lnktrigger;
 			this.sysmap = sysmap;
 
-
-			if(!linkData){
+			if (!linkData) {
 				linkData = {
 					label:			'',
 					selementid1:	null,
@@ -664,21 +636,23 @@ ZABBIX.apps.map = (function(){
 					color:			'00CC00'
 				};
 
-				for(selementid in this.sysmap.selection.selements){
-					if(linkData.selementid1 === null)
+				for (selementid in this.sysmap.selection.selements) {
+					if (linkData.selementid1 === null) {
 						linkData.selementid1 = selementid;
-					else
+					}
+					else {
 						linkData.selementid2 = selementid;
+					}
 				}
 
 				// generate unique linkid
-				do{
+				do {
 					linkid = Math.floor(Math.random() * 10000000).toString();
-				} while(typeof this.sysmap.data.links[linkid] !== 'undefined');
+				} while (typeof this.sysmap.data.links[linkid] !== 'undefined');
 				linkData.linkid = linkid;
 			}
-			else{
-				if(jQuery.isArray(linkData.linktriggers)){
+			else {
+				if (jQuery.isArray(linkData.linktriggers)) {
 					linkData.linktriggers = {};
 				}
 			}
@@ -686,7 +660,7 @@ ZABBIX.apps.map = (function(){
 			this.data = linkData;
 			this.id = this.data.linkid;
 
-			for(lnktrigger in this.data.linktriggers){
+			for (lnktrigger in this.data.linktriggers) {
 				this.sysmap.allLinkTriggerIds[lnktrigger.triggerid] = true;
 			}
 
@@ -698,23 +672,21 @@ ZABBIX.apps.map = (function(){
 			 * Updades values in property data
 			 * @param {Object} data
 			 */
-			update: function(data){
+			update: function(data) {
 				var key;
 
-				for(key in data){
+				for (key in data) {
 					this.data[key] = data[key];
 				}
-
 				this.trigger('afterUpdate', this);
 			},
 
 			/**
 			 * Removes Link object, delete all reference to it
 			 */
-			remove: function(){
+			remove: function() {
 				delete this.sysmap.data.links[this.id];
 				delete this.sysmap.links[this.id];
-
 				this.trigger('afterRemove', this);
 			},
 
@@ -722,12 +694,11 @@ ZABBIX.apps.map = (function(){
 			 * Gets Link data
 			 * @returns {Object}
 			 */
-			getData: function(){
+			getData: function() {
 				return this.data;
 			}
 		};
 		Observer.makeObserver(Link.prototype);
-
 
 		/**
 		 * @class Creates a new Selement
@@ -740,14 +711,12 @@ ZABBIX.apps.map = (function(){
 		 * @param {Object} sysmap reference to Map object
 		 * @param {Object} selementData element db values
 		 */
-		function Selement(sysmap, selementData){
+		function Selement(sysmap, selementData) {
 			var selementid;
-
 			this.sysmap = sysmap;
 			this.selected = false;
 
-
-			if(!selementData){
+			if (!selementData) {
 				selementData = {
 					elementtype: '4', // image
 					elementid: 0,
@@ -762,23 +731,22 @@ ZABBIX.apps.map = (function(){
 				};
 
 				// generate unique selementid
-				do{
+				do {
 					selementid = Math.floor(Math.random() * 10000000).toString();
-				} while(typeof this.sysmap.data.selements[selementid] !== 'undefined');
+				} while (typeof this.sysmap.data.selements[selementid] !== 'undefined');
 				selementData.selementid = selementid;
 			}
-			else{
-				if(jQuery.isArray(selementData.urls)){
+			else {
+				if (jQuery.isArray(selementData.urls)) {
 					selementData.urls = {};
 				}
 			}
 
 			this.data = selementData;
-
 			this.id = this.data.selementid;
+
 			// assign by reference
 			this.sysmap.data.selements[this.id] = this.data;
-
 
 			// create dom
 			this.domNode = jQuery('<div></div>')
@@ -786,12 +754,11 @@ ZABBIX.apps.map = (function(){
 				.addClass('pointer sysmap_element')
 				.data('id', this.id);
 
-
 			this.domNode.draggable({
 				containment: 'parent',
 				opacity: 0.5,
 				helper: 'clone',
-				stop: jQuery.proxy(function(event, data){
+				stop: jQuery.proxy(function(event, data) {
 					this.updatePosition({
 						x: parseInt(data.position.left, 10),
 						y: parseInt(data.position.top, 10)
@@ -802,15 +769,14 @@ ZABBIX.apps.map = (function(){
 			this.updateIcon();
 			this.domNode.css({
 				top: this.data.y + 'px',
-				left: this.data.x + 'px',
+				left: this.data.x + 'px'
 			});
 		}
 		Selement.prototype = {
-
 			/**
 			 * Returns element data.
 			 */
-			getData: function(){
+			getData: function() {
 				return this.data;
 			},
 
@@ -819,7 +785,7 @@ ZABBIX.apps.map = (function(){
 			 * @param {Object} data
 			 * @param {Boolean} unsetUndefined if true, all fields that are not in data parameter will be removed from element
 			 */
-			update: function(data, unsetUndefined){
+			update: function(data, unsetUndefined) {
 				var	fieldName,
 					dataFelds = [
 						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
@@ -833,43 +799,42 @@ ZABBIX.apps.map = (function(){
 				unsetUndefined = unsetUndefined || false;
 
 				// update elements fields, if not massupdate, remove fields that are not in new values
-				for(i = 0, ln = dataFelds.length; i < ln; i++){
+				for (i = 0, ln = dataFelds.length; i < ln; i++) {
 					fieldName = dataFelds[i];
-					if(typeof data[fieldName] !== 'undefined'){
+					if (typeof data[fieldName] !== 'undefined') {
 						this.data[fieldName] = data[fieldName];
 					}
-					else if(unsetUndefined && (fieldsUnsettable.indexOf(fieldName) === -1)){
+					else if (unsetUndefined && (fieldsUnsettable.indexOf(fieldName) === -1)) {
 						delete this.data[fieldName];
 					}
 				}
 
 				// if elementsubtype is not set, it should be 0
-				if(unsetUndefined && typeof this.data.elementsubtype === 'undefined'){
+				if (unsetUndefined && typeof this.data.elementsubtype === 'undefined') {
 					this.data.elementsubtype = '0';
 				}
 
-				if(unsetUndefined && typeof this.data.use_iconmap === 'undefined'){
+				if (unsetUndefined && typeof this.data.use_iconmap === 'undefined') {
 					this.data.use_iconmap = '0';
 				}
 
 				// if element is image we unset advanced icons
-				if(this.data.elementtype === '4'){
+				if (this.data.elementtype === '4') {
 					this.data.iconid_on = '0';
 					this.data.iconid_maintenance = '0';
 					this.data.iconid_disabled = '0';
 				}
 
 				// if image element, set elementName to image name
-				if(this.data.elementtype === '4'){
-					for(i = 0, ln = this.sysmap.iconList.length; i < ln; i++){
-						if(this.sysmap.iconList[i].imageid === this.data.iconid_off){
+				if (this.data.elementtype === '4') {
+					for (i = 0, ln = this.sysmap.iconList.length; i < ln; i++) {
+						if (this.sysmap.iconList[i].imageid === this.data.iconid_off) {
 							this.data.elementName = this.sysmap.iconList[i].name;
 						}
 					}
 				}
 
 				this.updateIcon();
-
 				this.align(false);
 				this.trigger('afterMove', this);
 			},
@@ -878,10 +843,9 @@ ZABBIX.apps.map = (function(){
 			 * Updates element position.
 			 * @param {Object} coords
 			 */
-			updatePosition: function(coords){
+			updatePosition: function(coords) {
 				this.data.x = coords.x;
 				this.data.y = coords.y;
-
 				this.align();
 				this.trigger('afterMove', this);
 			},
@@ -889,13 +853,14 @@ ZABBIX.apps.map = (function(){
 			/**
 			 * Remove element.
 			 */
-			remove: function(){
+			remove: function() {
 				this.domNode.remove();
 				delete this.sysmap.data.selements[this.id];
 				delete this.sysmap.selements[this.id];
 
-				if(typeof this.sysmap.selection.selements[this.id] !== 'undefined')
+				if (typeof this.sysmap.selection.selements[this.id] !== 'undefined') {
 					this.sysmap.selection.count--;
+				}
 				delete this.sysmap.selection.selements[this.id];
 			},
 
@@ -903,15 +868,15 @@ ZABBIX.apps.map = (function(){
 			 * Toggle element selection.
 			 * @param {Boolean} state
 			 */
-			toggleSelect: function(state){
+			toggleSelect: function(state) {
 				state = state || !this.selected;
-
 				this.selected = state;
-				if(this.selected)
+				if (this.selected) {
 					this.domNode.addClass('selected');
-				else
+				}
+				else {
 					this.domNode.removeClass('selected');
-
+				}
 				return this.selected;
 			},
 
@@ -919,7 +884,7 @@ ZABBIX.apps.map = (function(){
 			 * Align element to map or map grid.
 			 * @param {Boolean} doAutoAlign if we should align element to grid
 			 */
-			align: function(doAutoAlign){
+			align: function(doAutoAlign) {
 				var dims = {
 						height: this.domNode.height(),
 						width: this.domNode.width()
@@ -936,29 +901,28 @@ ZABBIX.apps.map = (function(){
 					realign = false;
 
 				// if 'fit to map' area coords are 0 always
-				if((this.data.elementsubtype === '1') && (this.data.areatype === '0')){
+				if (this.data.elementsubtype === '1' && this.data.areatype === '0') {
 					newX = 0;
 					newY = 0;
 				}
 				// if autoalign is off
-				else if((doAutoAlign === false) || (typeof doAutoAlign === 'undefined' && (this.sysmap.data.grid_align == '0'))){
-					if((x + dims.width) > this.sysmap.data.width){
+				else if (doAutoAlign === false || (typeof doAutoAlign === 'undefined' && this.sysmap.data.grid_align == '0')) {
+					if ((x + dims.width) > this.sysmap.data.width) {
 						newX = this.sysmap.data.width - dims.width;
 					}
-					if((y + dims.height) > this.sysmap.data.height){
+					if ((y + dims.height) > this.sysmap.data.height) {
 						newY = this.sysmap.data.height - dims.height;
 					}
-
-					if(newX < 0){
+					if (newX < 0) {
 						newX = 0;
 						newWidth = this.sysmap.data.width;
 					}
-					if(newY < 0){
+					if (newY < 0) {
 						newY = 0;
 						newHeight = this.sysmap.data.height;
 					}
 				}
-				else{
+				else {
 					newX = x + shiftX;
 					newY = y + shiftY;
 
@@ -968,25 +932,24 @@ ZABBIX.apps.map = (function(){
 					newX += Math.round(gridSize / 2) - shiftX;
 					newY += Math.round(gridSize / 2) - shiftY;
 
-					while((newX + dims.width) > this.sysmap.data.width){
+					while ((newX + dims.width) > this.sysmap.data.width) {
 						newX -= gridSize;
 					}
-					while((newY + dims.height) > this.sysmap.data.height){
+					while ((newY + dims.height) > this.sysmap.data.height) {
 						newY -= gridSize;
 					}
-
-					while(newX < 0){
+					while (newX < 0) {
 						newX += gridSize;
 					}
-					while(newY < 0){
+					while (newY < 0) {
 						newY += gridSize;
 					}
 
-					if((newX + dims.width) > this.sysmap.data.width){
+					if ((newX + dims.width) > this.sysmap.data.width) {
 						newWidth = this.sysmap.data.width - newX * 2;
 						realign = true;
 					}
-					if((newY + dims.height) > this.sysmap.data.height){
+					if ((newY + dims.height) > this.sysmap.data.height) {
 						newHeight = this.sysmap.data.height - newY * 2;
 						realign = true;
 					}
@@ -994,7 +957,7 @@ ZABBIX.apps.map = (function(){
 
 				this.data.y = newY;
 				this.data.x = newX;
-				if(this.data.elementsubtype === '1'){
+				if (this.data.elementsubtype === '1') {
 					this.data.width = newWidth;
 					this.data.height = newHeight;
 				}
@@ -1006,7 +969,7 @@ ZABBIX.apps.map = (function(){
 					height: newHeight
 				});
 
-				if(realign){
+				if (realign) {
 					this.align(doAutoAlign);
 				}
 			},
@@ -1014,30 +977,22 @@ ZABBIX.apps.map = (function(){
 			/**
 			 * Updates element icon and height/witdh in case element is area type.
 			 */
-			updateIcon: function(){
+			updateIcon: function() {
 				var oldIconClass = this.domNode.get(0).className.match(/sysmap_iconid_\d+/);
-
 				if (oldIconClass !== null) {
 					this.domNode.removeClass(oldIconClass[0]);
 				}
 
-
-				if (((this.data.use_iconmap === '1') && (this.sysmap.data.iconmapid !== '0')) &&
-					(
-						(this.data.elementtype === '0') ||
-						(
-							(this.data.elementtype === '3') && (this.data.elementsubtype === '1')
-						)
-					)
-				) {
-					this.domNode.addClass('sysmap_iconid_'+this.sysmap.defaultAutoIconId);
+				if ((this.data.use_iconmap === '1' && this.sysmap.data.iconmapid !== '0')
+						&& (this.data.elementtype === '0' || (this.data.elementtype === '3' && this.data.elementsubtype === '1'))) {
+					this.domNode.addClass('sysmap_iconid_' + this.sysmap.defaultAutoIconId);
 				}
 				else {
-					this.domNode.addClass('sysmap_iconid_'+this.data.iconid_off);
+					this.domNode.addClass('sysmap_iconid_' + this.data.iconid_off);
 				}
 
-				if((this.data.elementtype === '3') && (this.data.elementsubtype === '1')){
-					if(this.data.areatype === '1'){
+				if (this.data.elementtype === '3' && this.data.elementsubtype === '1') {
+					if (this.data.areatype === '1') {
 						this.domNode
 							.css({
 								width: this.data.width + 'px',
@@ -1045,7 +1000,7 @@ ZABBIX.apps.map = (function(){
 							})
 							.addClass('selementArea');
 					}
-					else{
+					else {
 						this.domNode
 							.css({
 								width: this.sysmap.data.width + 'px',
@@ -1053,9 +1008,8 @@ ZABBIX.apps.map = (function(){
 							})
 							.addClass('selementArea');
 					}
-
 				}
-				else{
+				else {
 					this.domNode
 						.css({
 							width: '',
@@ -1067,13 +1021,12 @@ ZABBIX.apps.map = (function(){
 		};
 		Observer.makeObserver(Selement.prototype);
 
-
 		/**
 		 * Form for elements.
 		 * @param {Object} formContainer jQuery object
 		 * @param {Object} sysmap
 		 */
-		function SelementForm(formContainer, sysmap){
+		function SelementForm(formContainer, sysmap) {
 			var formTplData = {
 					sysmapid: sysmap.sysmapid
 				},
@@ -1163,7 +1116,6 @@ ZABBIX.apps.map = (function(){
 					}
 				];
 
-
 			this.active = false;
 			this.sysmap = sysmap;
 			this.formContainer = formContainer;
@@ -1172,7 +1124,7 @@ ZABBIX.apps.map = (function(){
 			this.domNode = jQuery(tpl.evaluate(formTplData)).appendTo(formContainer);
 
 			// populate icons selects
-			for(i in this.sysmap.iconList){
+			for (i in this.sysmap.iconList) {
 				icon = this.sysmap.iconList[i];
 				jQuery('#iconid_off, #iconid_on, #iconid_maintenance, #iconid_disabled')
 					.append('<option value="' + icon.imageid + '">' + icon.name + '</option>');
@@ -1183,13 +1135,12 @@ ZABBIX.apps.map = (function(){
 			// apply jQuery UI elements
 			jQuery('#elementApply, #elementRemove, #elementClose').button();
 
-
-			if(this.sysmap.data.iconmapid === '0'){
+			if (this.sysmap.data.iconmapid === '0') {
 				jQuery('#use_iconmapLabel')
-					.mouseenter(function(){
+					.mouseenter(function() {
 						hintBox.showOver(this, locale['S_ICONMAP_IS_NOT_ENABLED']);
 					})
-					.mouseleave(function(){
+					.mouseleave(function() {
 						hintBox.hideOut(this);
 					});
 			}
@@ -1198,12 +1149,11 @@ ZABBIX.apps.map = (function(){
 			this.actionProcessor.process();
 		}
 		SelementForm.prototype = {
-
 			/**
 			 * Shows lement form.
 			 */
-			show: function(){
-				this.formContainer.draggable("option", "handle", '#formDragHandler');
+			show: function() {
+				this.formContainer.draggable('option', 'handle', '#formDragHandler');
 				this.domNode.toggle(true);
 				this.active = true;
 			},
@@ -1211,7 +1161,7 @@ ZABBIX.apps.map = (function(){
 			/**
 			 * Hides element form.
 			 */
-			hide: function(){
+			hide: function() {
 				this.domNode.toggle(false);
 				this.active = false;
 			},
@@ -1220,24 +1170,23 @@ ZABBIX.apps.map = (function(){
 			 * Adds element urls to form.
 			 * @param {Object} urls
 			 */
-			addUrls: function(urls){
+			addUrls: function(urls) {
 				var tpl = new Template(jQuery('#selementFormUrls').html()),
 					i,
 					url;
 
-				if((typeof urls === 'undefined') || jQuery.isEmptyObject(urls)){
+				if (typeof urls === 'undefined' || jQuery.isEmptyObject(urls)) {
 					urls = {empty: {}};
 				}
 
-				for(i in urls){
+				for (i in urls) {
 					url = urls[i];
 
 					// generate unique urlid
 					url.selementurlid = jQuery('#urlContainer tr[id^=urlrow]').length;
-					while(jQuery('#urlrow_'+url.selementurlid).length){
+					while (jQuery('#urlrow_' + url.selementurlid).length) {
 						url.selementurlid++;
 					}
-
 					jQuery(tpl.evaluate(url)).appendTo('#urlContainer');
 				}
 			},
@@ -1246,11 +1195,10 @@ ZABBIX.apps.map = (function(){
 			 * Set form controls with element fields values.
 			 * @param {Object} selement
 			 */
-			setValues: function(selement){
+			setValues: function(selement) {
 				var elementName;
-
-				for(elementName in selement){
-					jQuery('[name='+elementName+']', this.domNode).val([selement[elementName]]);
+				for (elementName in selement) {
+					jQuery('[name=' + elementName + ']', this.domNode).val([selement[elementName]]);
 				}
 
 				// clear urls
@@ -1258,16 +1206,14 @@ ZABBIX.apps.map = (function(){
 				this.addUrls(selement.urls);
 
 				// should be unchecked before action processor
-				if(this.sysmap.data.iconmapid === '0'){
-					jQuery('#use_iconmap')
-						.prop('checked', false);
+				if (this.sysmap.data.iconmapid === '0') {
+					jQuery('#use_iconmap').prop('checked', false);
 				}
 
 				this.actionProcessor.process();
 
-				if(this.sysmap.data.iconmapid === '0'){
-					jQuery('#use_iconmap')
-						.prop('disabled', true);
+				if (this.sysmap.data.iconmapid === '0') {
+					jQuery('#use_iconmap').prop('disabled', true);
 				}
 
 				this.updateList(selement.selementid);
@@ -1277,7 +1223,7 @@ ZABBIX.apps.map = (function(){
 			 * Gets form values for element fields.
 			 * @retrurns {Object|Boolean}
 			 */
-			getValues: function(){
+			getValues: function() {
 				var values = jQuery('#selementForm').serializeArray(),
 					data = {
 						urls: {}
@@ -1287,40 +1233,38 @@ ZABBIX.apps.map = (function(){
 					url,
 					urlNames = {};
 
-				for(i = 0; i < values.length; i++){
+				for (i = 0; i < values.length; i++) {
 					url = urlPattern.exec(values[i].name);
-					if(url !== null){
-						if(typeof data.urls[url[1]] === 'undefined'){
+					if (url !== null) {
+						if (typeof data.urls[url[1]] === 'undefined') {
 							data.urls[url[1]] = {};
 						}
 						data.urls[url[1]][url[2]] = values[i].value.toString();
 					}
-					else{
+					else {
 						data[values[i].name] = values[i].value.toString();
 					}
 				}
 
-
-				for(i in data.urls){
-					if((data.urls[i].name === '') && (data.urls[i].url === '')){
+				for (i in data.urls) {
+					if (data.urls[i].name === '' && data.urls[i].url === '') {
 						delete data.urls[i];
 						continue;
 					}
 
-					if((data.urls[i].name === '') || (data.urls[i].url === '')){
+					if (data.urls[i].name === '' || data.urls[i].url === '') {
 						alert(locale['S_INCORRECT_ELEMENT_MAP_LINK']);
 						return false;
 					}
 
-					if(typeof urlNames[data.urls[i].name] !== 'undefined'){
+					if (typeof urlNames[data.urls[i].name] !== 'undefined') {
 						alert(locale['S_EACH_URL_SHOULD_HAVE_UNIQUE'] + " '" + data.urls[i].name + "'.");
 						return false;
 					}
 					urlNames[data.urls[i].name] = 1;
 				}
 
-
-				if((data.elementid === '0') && (data.elementtype !== '4')){
+				if (data.elementid === '0' && data.elementtype !== '4') {
 					switch(data.elementtype){
 						case '0': alert('Host is not selected.');
 							return false;
@@ -1332,7 +1276,6 @@ ZABBIX.apps.map = (function(){
 							return false;
 					}
 				}
-
 				return data;
 			},
 
@@ -1340,7 +1283,7 @@ ZABBIX.apps.map = (function(){
 			 * Updates links list for element.
 			 * @param {String} selementid
 			 */
-			updateList: function(selementid){
+			updateList: function(selementid) {
 				var links = this.sysmap.getLinksBySelementIds(selementid),
 					rowTpl,
 					list,
@@ -1353,21 +1296,19 @@ ZABBIX.apps.map = (function(){
 					linktrigger,
 					linktriggers;
 
-				if(links.length){
+				if (links.length) {
 					jQuery('#mapLinksContainer').toggle(true);
 					jQuery('#linksList').empty();
 
 					rowTpl = new Template(jQuery('#mapLinksRow').html());
 
 					list = [];
-					for(i = 0, ln = links.length; i < ln; i++){
+					for (i = 0, ln = links.length; i < ln; i++) {
 						link = this.sysmap.links[links[i]].data;
-
 						linkedSelementid = (selementid == link.selementid1) ? link.selementid2 : link.selementid1;
 						element = this.sysmap.selements[linkedSelementid];
-
 						elementTypeText = '';
-						switch(element.data.elementtype){
+						switch (element.data.elementtype) {
 							case '0': elementTypeText = locale['S_HOST']; break;
 							case '1': elementTypeText = locale['S_MAP']; break;
 							case '2': elementTypeText = locale['S_TRIGGER']; break;
@@ -1376,7 +1317,7 @@ ZABBIX.apps.map = (function(){
 						}
 
 						linktriggers = [];
-						for(linktrigger in link.linktriggers){
+						for (linktrigger in link.linktriggers) {
 							linktriggers.push(link.linktriggers[linktrigger].desc_exp);
 						}
 
@@ -1389,26 +1330,33 @@ ZABBIX.apps.map = (function(){
 					}
 
 					// sort by elementtype and then by element name
-					list.sort(function(a, b){
-						if(a.elementType < b.elementType){ return -1; }
-						if(a.elementType > b.elementType){ return 1; }
-						if(a.elementType == b.elementType){
+					list.sort(function(a, b) {
+						if (a.elementType < b.elementType) {
+							return -1;
+						}
+						if (a.elementType > b.elementType) {
+							return 1;
+						}
+						if (a.elementType == b.elementType) {
 							var elementTypeA = a.elementName.toLowerCase();
 							var elementTypeB = b.elementName.toLowerCase();
 
-							if(elementTypeA < elementTypeB){ return -1; }
-							if(elementTypeA > elementTypeB){ return 1; }
+							if (elementTypeA < elementTypeB) {
+								return -1;
+							}
+							if (elementTypeA > elementTypeB) {
+								return 1;
+							}
 						}
 						return 0;
 					});
-					for(i = 0, ln = list.length; i < ln; i++){
+					for (i = 0, ln = list.length; i < ln; i++) {
 						jQuery(rowTpl.evaluate(list[i])).appendTo('#linksList');
 					}
-
 					jQuery('#linksList tr:nth-child(odd)').addClass('odd_row');
 					jQuery('#linksList tr:nth-child(even)').addClass('even_row');
 				}
-				else{
+				else {
 					jQuery('#mapLinksContainer').toggle(false);
 				}
 			}
@@ -1419,7 +1367,7 @@ ZABBIX.apps.map = (function(){
 		 * @param {Object} formContainer jQuery object
 		 * @param {Object} sysmap
 		 */
-		function MassForm(formContainer, sysmap){
+		function MassForm(formContainer, sysmap) {
 			var i,
 				icon,
 				formActions = [
@@ -1483,7 +1431,7 @@ ZABBIX.apps.map = (function(){
 
 
 			// populate icons selects
-			for(i in this.sysmap.iconList){
+			for (i in this.sysmap.iconList) {
 				icon = this.sysmap.iconList[i];
 				jQuery('#massIconidOff, #massIconidOn, #massIconidMaintenance, #massIconidDisabled')
 					.append('<option value="' + icon.imageid + '">' + icon.name + '</option>');
@@ -1498,25 +1446,23 @@ ZABBIX.apps.map = (function(){
 			this.actionProcessor.process();
 		}
 		MassForm.prototype = {
-
 			/**
 			 * Show mass update form.
 			 */
-			show: function(){
-				this.formContainer.draggable("option", "handle", '#massDragHandler');
+			show: function() {
+				this.formContainer.draggable('option', 'handle', '#massDragHandler');
 				jQuery('#massElementCount').text(this.sysmap.selection.count);
 				this.domNode.toggle(true);
-
 				this.updateList();
 			},
 
 			/**
 			 * Hide mass update form.
 			 */
-			hide: function(){
+			hide: function() {
 				this.domNode.toggle(false);
 				jQuery(':checkbox', this.domNode).prop('checked', false);
-				jQuery('select', this.domNode).each(function(){
+				jQuery('select', this.domNode).each(function() {
 					var select = jQuery(this);
 					select.val(jQuery('option:first', select).val());
 				});
@@ -1539,21 +1485,18 @@ ZABBIX.apps.map = (function(){
 					if (values[i].name === 'chkbox_use_iconmap') {
 						data['use_iconmap'] = '0';
 					}
-
 					if (values[i].name.match(/^chkbox_/) !== null) {
 						continue;
 					}
-
 					data[values[i].name] = values[i].value.toString();
 				}
-
 				return data;
 			},
 
 			/**
 			 * Updates list of selected elements in mass update form.
 			 */
-			updateList: function(){
+			updateList: function() {
 				var tpl = new Template(jQuery('#mapMassFormListRow').html()),
 					id,
 					list = [],
@@ -1563,10 +1506,9 @@ ZABBIX.apps.map = (function(){
 					ln;
 
 				jQuery('#massList').empty();
-				for(id in this.sysmap.selection.selements){
+				for (id in this.sysmap.selection.selements) {
 					element = this.sysmap.selements[id];
-
-					switch(element.data.elementtype){
+					switch (element.data.elementtype) {
 						case '0': elementTypeText = locale['S_HOST']; break;
 						case '1': elementTypeText = locale['S_MAP']; break;
 						case '2': elementTypeText = locale['S_TRIGGER']; break;
@@ -1580,26 +1522,34 @@ ZABBIX.apps.map = (function(){
 				}
 
 				// sort by element type and then by element name
-				list.sort(function(a, b){
+				list.sort(function(a, b) {
 					var elementTypeA = a.elementType.toLowerCase(),
 						elementTypeB = b.elementType.toLowerCase(),
 						elementNameA,
 						elementNameB;
 
-					if(elementTypeA < elementTypeB){ return -1; }
-					if(elementTypeA > elementTypeB){ return 1; }
+					if (elementTypeA < elementTypeB) {
+						return -1;
+					}
+					if (elementTypeA > elementTypeB) {
+						return 1;
+					}
 
 					elementNameA = a.elementName.toLowerCase();
 					elementNameB = b.elementName.toLowerCase();
-					if(elementNameA < elementNameB){ return -1; }
-					if(elementNameA > elementNameB){ return 1; }
+
+					if (elementNameA < elementNameB) {
+						return -1;
+					}
+					if (elementNameA > elementNameB) {
+						return 1;
+					}
 
 					return 0;
 				});
-				for(i = 0, ln = list.length; i < ln; i++){
+				for (i = 0, ln = list.length; i < ln; i++) {
 					jQuery(tpl.evaluate(list[i])).appendTo('#massList');
 				}
-
 				jQuery('#massList tr:nth-child(odd)').addClass('odd_row');
 				jQuery('#massList tr:nth-child(even)').addClass('even_row');
 			}
@@ -1610,11 +1560,10 @@ ZABBIX.apps.map = (function(){
 		 * @param {Object} formContainer jQuesry object
 		 * @param {Object} sysmap
 		 */
-		function LinkForm(formContainer, sysmap){
+		function LinkForm(formContainer, sysmap) {
 			this.sysmap = sysmap;
 			this.formContainer = formContainer;
 			this.triggerids = {};
-
 			this.domNode = jQuery('#linkForm');
 
 			// apply jQuery UI elements
@@ -1624,7 +1573,7 @@ ZABBIX.apps.map = (function(){
 			/**
 			 * Show form.
 			 */
-			show: function(){
+			show: function() {
 				this.domNode.toggle(true);
 				jQuery('#elementApply, #elementRemove').button('disable');
 			},
@@ -1632,7 +1581,7 @@ ZABBIX.apps.map = (function(){
 			/**
 			 * Hide form.
 			 */
-			hide: function(){
+			hide: function() {
 				jQuery('#linksList tr').removeClass('selected');
 				this.domNode.toggle(false);
 				jQuery('#elementApply, #elementRemove').button('enable');
@@ -1641,7 +1590,7 @@ ZABBIX.apps.map = (function(){
 			/**
 			 * Get form values for link fields.
 			 */
-			getValues: function(){
+			getValues: function() {
 				var values = jQuery('#linkForm').serializeArray(),
 					data = {
 						linktriggers: {}
@@ -1651,19 +1600,18 @@ ZABBIX.apps.map = (function(){
 					linkTriggerPattern = /^linktrigger_(\d+)_(triggerid|linktriggerid|drawtype|color|desc_exp)$/,
 					linkTrigger;
 
-				for(i = 0, ln = values.length; i < ln; i++){
+				for (i = 0, ln = values.length; i < ln; i++) {
 					linkTrigger = linkTriggerPattern.exec(values[i].name);
-					if(linkTrigger !== null){
-						if(typeof data.linktriggers[linkTrigger[1]] === 'undefined'){
+					if (linkTrigger !== null) {
+						if (typeof data.linktriggers[linkTrigger[1]] === 'undefined') {
 							data.linktriggers[linkTrigger[1]] = {};
 						}
 						data.linktriggers[linkTrigger[1]][linkTrigger[2]] = values[i].value.toString();
 					}
-					else{
+					else {
 						data[values[i].name] = values[i].value.toString();
 					}
 				}
-
 				return data;
 			},
 
@@ -1671,7 +1619,7 @@ ZABBIX.apps.map = (function(){
 			 * update form controls with values from link.
 			 * @param {Object} link
 			 */
-			setValues: function(link){
+			setValues: function(link) {
 				var selement1,
 					tmp,
 					selementid,
@@ -1685,11 +1633,12 @@ ZABBIX.apps.map = (function(){
 					ln;
 
 				// get currenlty selected element
-				for(selementid in this.sysmap.selection.selements){
+				for (selementid in this.sysmap.selection.selements) {
 					selement1 = this.sysmap.selements[selementid];
 				}
+
 				// make that selementi1 always equal to selected element and selementid2 to connected
-				if(selement1.id !== link.selementid1){
+				if (selement1.id !== link.selementid1) {
 					tmp = link.selementid1;
 					link.selementid1 = selement1.id;
 					link.selementid2 = tmp;
@@ -1699,18 +1648,20 @@ ZABBIX.apps.map = (function(){
 				jQuery('#selementid2').empty();
 
 				// sort by type
-				for(selementid in this.sysmap.selements){
+				for (selementid in this.sysmap.selements) {
 					selement = this.sysmap.selements[selementid];
-					if(selement.id == link.selementid1) continue;
+					if (selement.id == link.selementid1) {
+						continue;
+					}
 
-					if(optgroups[selement.data.elementtype] === void(0)){
+					if (optgroups[selement.data.elementtype] === void(0)) {
 						optgroups[selement.data.elementtype] = [];
 					}
 					optgroups[selement.data.elementtype].push(selement);
 				}
 
-				for(optgroupType in optgroups){
-					switch(optgroupType){
+				for (optgroupType in optgroups) {
+					switch (optgroupType) {
 						case '0': optgroupLabel = locale['S_HOST']; break;
 						case '1': optgroupLabel = locale['S_MAP']; break;
 						case '2': optgroupLabel = locale['S_TRIGGER']; break;
@@ -1718,18 +1669,16 @@ ZABBIX.apps.map = (function(){
 						case '4': optgroupLabel = locale['S_IMAGE']; break;
 					}
 
-					optgroupDom = jQuery('<optgroup label="'+optgroupLabel+'"></optgroup>');
-					for(i = 0, ln = optgroups[optgroupType].length; i < ln; i++){
+					optgroupDom = jQuery('<optgroup label="' + optgroupLabel + '"></optgroup>');
+					for (i = 0, ln = optgroups[optgroupType].length; i < ln; i++) {
 						optgroupDom.append('<option value="' + optgroups[optgroupType][i].id + '">' + optgroups[optgroupType][i].data.elementName + '</option>')
 					}
-
 					jQuery('#selementid2').append(optgroupDom);
 				}
 
-
 				// set values for form elements
-				for(elementName in link){
-					jQuery('[name='+elementName+']', this.domNode).val(link[elementName]);
+				for (elementName in link) {
+					jQuery('[name=' + elementName + ']', this.domNode).val(link[elementName]);
 				}
 
 				// clear triggers
@@ -1742,16 +1691,14 @@ ZABBIX.apps.map = (function(){
 			 * Add triggers to link form.
 			 * @param {Object} triggers
 			 */
-			addTriggers: function(triggers){
+			addTriggers: function(triggers) {
 				var tpl = new Template(jQuery('#linkTriggerRow').html()),
 					linkTrigger;
 
-				for(linkTrigger in triggers){
+				for (linkTrigger in triggers) {
 					this.triggerids[triggers[linkTrigger].triggerid] = linkTrigger;
-
 					jQuery(tpl.evaluate(triggers[linkTrigger])).appendTo('#linkTriggerscontainer');
-
-					jQuery('#linktrigger_'+triggers[linkTrigger].linktriggerid+'_drawtype').val(triggers[linkTrigger].drawtype);
+					jQuery('#linktrigger_' + triggers[linkTrigger].linktriggerid + '_drawtype').val(triggers[linkTrigger].drawtype);
 				}
 				jQuery('.colorpicker', this.domNode).change();
 			},
@@ -1760,7 +1707,7 @@ ZABBIX.apps.map = (function(){
 			 * Add new triggers which were selected in popup to trigger list.
 			 * @param {Object} triggers
 			 */
-			addNewTriggers: function(triggers){
+			addNewTriggers: function(triggers) {
 				var tpl = new Template(jQuery('#linkTriggerRow').html()),
 					linkTrigger = {
 						color: 'DD0000'
@@ -1769,26 +1716,23 @@ ZABBIX.apps.map = (function(){
 					i,
 					ln;
 
-
-				for(i = 0, ln = triggers.length; i < ln; i++){
-					if(typeof this.triggerids[triggers[i].triggerid] !== 'undefined'){
+				for (i = 0, ln = triggers.length; i < ln; i++) {
+					if (typeof this.triggerids[triggers[i].triggerid] !== 'undefined') {
 						continue;
 					}
 
-					do{
+					do {
 						linktriggerid = Math.floor(Math.random() * 10000000).toString();
-					}while(typeof this.sysmap.allLinkTriggerIds[linktriggerid] !== 'undefined');
+					} while (typeof this.sysmap.allLinkTriggerIds[linktriggerid] !== 'undefined');
 
 					// store linktriggerid to generate every time unique one
 					this.sysmap.allLinkTriggerIds[linktriggerid] = true;
 
 					// store triggerid to forbid selecting same trigger twice
 					this.triggerids[triggers[i].triggerid] = linktriggerid;
-
 					linkTrigger.linktriggerid = linktriggerid;
 					linkTrigger.desc_exp = triggers[i].description;
 					linkTrigger.triggerid = triggers[i].triggerid;
-
 					jQuery(tpl.evaluate(linkTrigger)).appendTo('#linkTriggerscontainer');
 				}
 				jQuery('.colorpicker', this.domNode).change();
@@ -1797,32 +1741,31 @@ ZABBIX.apps.map = (function(){
 
 		var sysmap = new CMap(containerid, mapdata);
 
-		Selement.prototype.bind('afterMove', function(event, element){
-			if((sysmap.selection.count === 1) && (sysmap.selection.selements[element.id]) !== void(0)){
+		Selement.prototype.bind('afterMove', function(event, element) {
+			if (sysmap.selection.count === 1 && sysmap.selection.selements[element.id] !== void(0)) {
 				jQuery('#x').val(element.data.x);
 				jQuery('#y').val(element.data.y);
 
-				if(typeof element.data.width !== 'undefined'){
+				if (typeof element.data.width !== 'undefined') {
 					jQuery('#areaSizeWidth').val(element.data.width);
 				}
-				if(typeof element.data.height !== 'undefined'){
+				if (typeof element.data.height !== 'undefined') {
 					jQuery('#areaSizeHeight').val(element.data.height);
 				}
 			}
 			sysmap.updateImage();
 		});
 
-		Link.prototype.bind('afterUpdate', function(){
+		Link.prototype.bind('afterUpdate', function() {
 			sysmap.updateImage();
 		});
 
-		Link.prototype.bind('afterRemove', function(){
-			if(sysmap.form.active){
-				for(var selementid in sysmap.selection.selements){
+		Link.prototype.bind('afterRemove', function() {
+			if (sysmap.form.active) {
+				for (var selementid in sysmap.selection.selements) {
 					sysmap.form.updateList(selementid);
 				}
 			}
-
 			sysmap.linkForm.hide();
 		});
 
@@ -1831,9 +1774,10 @@ ZABBIX.apps.map = (function(){
 
 	return {
 		object: null,
-		run: function(containerid, mapdata){
-			if(this.object !== null) throw new Error('Map has already been run.');
-
+		run: function(containerid, mapdata) {
+			if (this.object !== null) {
+				throw new Error('Map has already been run.');
+			}
 			this.object = createMap(containerid, mapdata);
 		}
 	}
@@ -1847,8 +1791,8 @@ ZABBIX.apps.map = (function(){
  * @param {String} list.object name of objects which we returned
  * @param {Array} list.values list of link triggers
  */
-function addPopupValues(list){
-	if(list.object === 'linktrigger'){
+function addPopupValues(list) {
+	if (list.object === 'linktrigger') {
 		ZABBIX.apps.map.object.linkForm.addNewTriggers(list.values);
 	}
 }
