@@ -24,14 +24,14 @@ ITEM: array(name, url, param, css, submenu1, submenu2, ... , submenuN)
 	name:		text
 	url:		text (url for href perameter)
 	param:		array(tw => t_val, sb => s_val)
-	tw:			target parameter
-	t_val:		one of '_blank', '_parent', '_self', '_top'
-	sb:			text for statusbar)
-	s_val:		text
+		tw:			target parameter
+		t_val:		one of '_blank', '_parent', '_self', '_top'
+		sb:			text for statusbar)
+		s_val:		text
 	css:		array(outer => cssarray, inner => cssarray)
-	outer:		style for outer div element
-	inner:		style for inner link element with text
-	cssarray:	array(normal, mouseover, mousedown)
+		outer:		style for outer div element
+		cssarray:	array(normal, mouseover, mousedown)
+		inner:		style for inner link element with text
 	submen1-N:	list of subitems
 **********************************************************/
 class CPUMenu {
