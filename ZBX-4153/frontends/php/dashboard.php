@@ -124,8 +124,8 @@ if (isset($_REQUEST['favobj'])) {
 
 	if ('set_rf_rate' == $_REQUEST['favobj']) {
 		if (str_in_array($_REQUEST['favref'], array('hat_syssum', 'hat_stszbx', 'hat_lastiss', 'hat_webovr', 'hat_dscvry', 'hat_hoststat'))) {
-			CProfile::update('web.dahsboard.rf_rate.'.$_REQUEST['favref'], $_REQUEST['favcnt'], PROFILE_TYPE_INT);
-			$_REQUEST['favcnt'] = CProfile::get('web.dahsboard.rf_rate.'.$_REQUEST['favref'], 60);
+			CProfile::update('web.dashboard.rf_rate.'.$_REQUEST['favref'], $_REQUEST['favcnt'], PROFILE_TYPE_INT);
+			$_REQUEST['favcnt'] = CProfile::get('web.dashboard.rf_rate.'.$_REQUEST['favref'], 60);
 
 			echo get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $_REQUEST['favcnt'])
 				.get_update_doll_script('mainpage', $_REQUEST['favref'], 'stopDoll')
@@ -239,12 +239,12 @@ make_graph_menu($menu, $submenu);
 make_sysmap_menu($menu, $submenu);
 make_screen_menu($menu, $submenu);
 
-make_refresh_menu('mainpage', 'hat_syssum', CProfile::get('web.dahsboard.rf_rate.hat_syssum', 60), null, $menu, $submenu);
-make_refresh_menu('mainpage', 'hat_hoststat', CProfile::get('web.dahsboard.rf_rate.hat_hoststat', 60), null, $menu, $submenu);
-make_refresh_menu('mainpage', 'hat_stszbx', CProfile::get('web.dahsboard.rf_rate.hat_stszbx', 60), null, $menu, $submenu);
-make_refresh_menu('mainpage', 'hat_lastiss', CProfile::get('web.dahsboard.rf_rate.hat_lastiss', 60), null, $menu, $submenu);
-make_refresh_menu('mainpage', 'hat_webovr', CProfile::get('web.dahsboard.rf_rate.hat_webovr', 60), null, $menu, $submenu);
-make_refresh_menu('mainpage', 'hat_dscvry', CProfile::get('web.dahsboard.rf_rate.hat_dscvry', 60), null, $menu, $submenu);
+make_refresh_menu('mainpage', 'hat_syssum', CProfile::get('web.dashboard.rf_rate.hat_syssum', 60), null, $menu, $submenu);
+make_refresh_menu('mainpage', 'hat_hoststat', CProfile::get('web.dashboard.rf_rate.hat_hoststat', 60), null, $menu, $submenu);
+make_refresh_menu('mainpage', 'hat_stszbx', CProfile::get('web.dashboard.rf_rate.hat_stszbx', 60), null, $menu, $submenu);
+make_refresh_menu('mainpage', 'hat_lastiss', CProfile::get('web.dashboard.rf_rate.hat_lastiss', 60), null, $menu, $submenu);
+make_refresh_menu('mainpage', 'hat_webovr', CProfile::get('web.dashboard.rf_rate.hat_webovr', 60), null, $menu, $submenu);
+make_refresh_menu('mainpage', 'hat_dscvry', CProfile::get('web.dashboard.rf_rate.hat_dscvry', 60), null, $menu, $submenu);
 
 insert_js('var page_menu='.zbx_jsvalue($menu).";\n".'var page_submenu='.zbx_jsvalue($submenu).";\n");
 
@@ -276,11 +276,11 @@ $leftColumn[] = $fav_maps;
 
 // refresh tab
 $refresh_tab = array(
-	array('id' => 'hat_syssum', 'frequency' => CProfile::get('web.dahsboard.rf_rate.hat_syssum', 120)),
-	array('id' => 'hat_stszbx', 'frequency' => CProfile::get('web.dahsboard.rf_rate.hat_stszbx', 120)),
-	array('id' => 'hat_lastiss', 'frequency'  => CProfile::get('web.dahsboard.rf_rate.hat_lastiss', 60)),
-	array('id' => 'hat_webovr', 'frequency'  => CProfile::get('web.dahsboard.rf_rate.hat_webovr', 60)),
-	array('id' => 'hat_hoststat', 'frequency'  => CProfile::get('web.dahsboard.rf_rate.hat_hoststat', 60))
+	array('id' => 'hat_syssum', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_syssum', 120)),
+	array('id' => 'hat_stszbx', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_stszbx', 120)),
+	array('id' => 'hat_lastiss', 'frequency'  => CProfile::get('web.dashboard.rf_rate.hat_lastiss', 60)),
+	array('id' => 'hat_webovr', 'frequency'  => CProfile::get('web.dashboard.rf_rate.hat_webovr', 60)),
+	array('id' => 'hat_hoststat', 'frequency'  => CProfile::get('web.dashboard.rf_rate.hat_hoststat', 60))
 );
 
 /*
@@ -328,7 +328,7 @@ $rightColumn[] = $web_mon;
 // discovery info
 $drules = DBfetch(DBselect('SELECT COUNT(d.druleid) AS cnt FROM drules d WHERE '.DBin_node('d.druleid').' AND d.status='.DRULE_STATUS_ACTIVE));
 if ($drules['cnt'] > 0 && check_right_on_discovery(PERM_READ_ONLY)) {
-	$refresh_tab[] = array('id' => 'hat_dscvry', 'frequency' => CProfile::get('web.dahsboard.rf_rate.hat_dscvry', 60));
+	$refresh_tab[] = array('id' => 'hat_dscvry', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_dscvry', 60));
 	$refresh_menu = get_icon('menu', array('menu' => 'hat_dscvry'));
 	$dcvr_mon = new CUIWidget('hat_dscvry', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_dscvry.state', 1));
 	$dcvr_mon->setHeader(_('Discovery status'), array($refresh_menu));
