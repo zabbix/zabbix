@@ -1210,7 +1210,7 @@ COpt::memoryPick();
 					$trigger['status'],
 					$trigger['comments'],
 					$trigger['url'],
-					array(),
+					null,
 					$trigger['templateid']
 				);
 
