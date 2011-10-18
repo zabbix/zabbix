@@ -16,6 +16,7 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-1020] added support for --sysconfdir, changed default installation directories (dimir)
  - [ZBX-3912] fixed popup object selection for IE (Eduard)
  - [ZBX-4132] fixed checkbox cookie work (Eduard)
  - [ZBX-3635] fixed situation when templated trigger can reference items from another template not linked to a host (Vedmak)
