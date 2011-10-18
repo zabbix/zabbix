@@ -388,14 +388,13 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			if(!$esc_period) unset($_REQUEST['escalation']);
 
 			if (isset($_REQUEST['actionid']) && isset($_REQUEST['form_refresh'])) {
-				$def_shortdata	= get_request('def_shortdata');
-				$def_longdata	= get_request('def_longdata');
-
+				$def_shortdata = get_request('def_shortdata');
+				$def_longdata = get_request('def_longdata');
 			}
 			else {
 				if ($eventsource == EVENT_SOURCE_TRIGGERS) {
-					$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
-					$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG_TRIGGER);
+					$def_shortdata = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
+					$def_longdata = get_request('def_longdata', ACTION_DEFAULT_MSG_TRIGGER);
 
 					if ((strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_AUTOREG) == 0 && strcmp(str_replace("\r", '', $def_longdata), ACTION_DEFAULT_MSG_AUTOREG) == 0)
 							|| (strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_DISCOVERY) == 0 && strcmp(str_replace("\r", '', $def_longdata), ACTION_DEFAULT_MSG_DISCOVERY) == 0))
@@ -405,8 +404,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					}
 				}
 				elseif ($eventsource == EVENT_SOURCE_DISCOVERY) {
-					$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_SUBJ_DISCOVERY);
-					$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG_DISCOVERY);
+					$def_shortdata = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_DISCOVERY);
+					$def_longdata = get_request('def_longdata', ACTION_DEFAULT_MSG_DISCOVERY);
 
 					if ((strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_AUTOREG) == 0  && strcmp(str_replace("\r", '', $def_longdata), ACTION_DEFAULT_MSG_AUTOREG) == 0)
 							|| (strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_TRIGGER) == 0 && strcmp(str_replace("\r", '', $def_longdata), ACTION_DEFAULT_MSG_TRIGGER) == 0))
@@ -416,8 +415,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					}
 				}
 				elseif ($eventsource == EVENT_SOURCE_AUTO_REGISTRATION) {
-					$def_shortdata	= get_request('def_shortdata', ACTION_DEFAULT_SUBJ_AUTOREG);
-					$def_longdata	= get_request('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
+					$def_shortdata = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_AUTOREG);
+					$def_longdata = get_request('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
 
 					if ((strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_DISCOVERY) == 0 && strcmp(str_replace("\r", '', $def_longdata), ACTION_DEFAULT_MSG_DISCOVERY) == 0)
 							|| (strcmp($def_shortdata, ACTION_DEFAULT_SUBJ_TRIGGER) == 0 && strcmp(str_replace("\r", '', $def_longdata), ACTION_DEFAULT_MSG_TRIGGER) == 0)) {
@@ -426,7 +425,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					}
 				}
 			}
-
 		}
 
 		$tblAct->addRow(array(S_NAME, new CTextBox('name', $name, 50)));
@@ -945,10 +943,10 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			if ($new_operation['operationtype'] == OPERATION_TYPE_MESSAGE) {
 				if ($eventsource == EVENT_SOURCE_TRIGGERS) {
 					if(!isset($new_operation['shortdata'])) {
-						$new_operation['shortdata']	= ACTION_DEFAULT_SUBJ_TRIGGER;
+						$new_operation['shortdata'] = ACTION_DEFAULT_SUBJ_TRIGGER;
 					}
 					if(!isset($new_operation['longdata'])) {
-						$new_operation['longdata']	= ACTION_DEFAULT_MSG_TRIGGER;
+						$new_operation['longdata'] = ACTION_DEFAULT_MSG_TRIGGER;
 					}
 
 					if ($new_operation['longdata'] == '' || (strcmp($new_operation['shortdata'], ACTION_DEFAULT_SUBJ_AUTOREG) == 0 && strcmp(str_replace("\r", '', $new_operation['longdata']), ACTION_DEFAULT_MSG_AUTOREG) == 0)
@@ -960,10 +958,10 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				}
 				elseif ($eventsource == EVENT_SOURCE_DISCOVERY) {
 					if(!isset($new_operation['shortdata'])) {
-						$new_operation['shortdata']	= ACTION_DEFAULT_SUBJ_DISCOVERY;
+						$new_operation['shortdata'] = ACTION_DEFAULT_SUBJ_DISCOVERY;
 					}
 					if(!isset($new_operation['longdata'])) {
-						$new_operation['longdata']	= ACTION_DEFAULT_MSG_DISCOVERY;
+						$new_operation['longdata'] = ACTION_DEFAULT_MSG_DISCOVERY;
 					}
 
 					if ($new_operation['longdata'] == '' || (strcmp($new_operation['shortdata'], ACTION_DEFAULT_SUBJ_AUTOREG) == 0  && strcmp(str_replace("\r", '', $new_operation['longdata']), ACTION_DEFAULT_MSG_AUTOREG) == 0)
@@ -975,10 +973,10 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				}
 				elseif ($eventsource == EVENT_SOURCE_AUTO_REGISTRATION) {
 					if(!isset($new_operation['shortdata'])) {
-						$new_operation['shortdata']	= ACTION_DEFAULT_SUBJ_AUTOREG;
+						$new_operation['shortdata'] = ACTION_DEFAULT_SUBJ_AUTOREG;
 					}
 					if(!isset($new_operation['longdata'])) {
-						$new_operation['longdata']	= ACTION_DEFAULT_MSG_AUTOREG;
+						$new_operation['longdata'] = ACTION_DEFAULT_MSG_AUTOREG;
 					}
 
 					if ($new_operation['longdata'] == '' || (strcmp($new_operation['shortdata'], ACTION_DEFAULT_SUBJ_DISCOVERY) == 0 && strcmp(str_replace("\r", '', $new_operation['longdata']), ACTION_DEFAULT_MSG_DISCOVERY) == 0)
