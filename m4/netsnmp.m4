@@ -22,8 +22,7 @@ AC_DEFUN([LIBNETSNMP_CHECK_CONFIG],
   _libnetsnmp_config="no"
 
   AC_ARG_WITH(net-snmp,
-[
-What SNMP package do you want to use (please select only one):
+[What SNMP package do you want to use (please select only one):
 AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		[use NET-SNMP package @<:@default=no@:>@, optionally specify path to net-snmp-config])
 	],[ if test "$withval" = "no"; then
@@ -132,5 +131,4 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
   AC_SUBST(SNMP_CFLAGS)
   AC_SUBST(SNMP_LDFLAGS)
   AC_SUBST(SNMP_LIBS)
-
 ])dnl

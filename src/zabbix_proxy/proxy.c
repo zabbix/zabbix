@@ -248,7 +248,7 @@ static void	zbx_set_defaults()
 #endif
 
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, "/etc/zabbix/externalscripts");
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATAROOTDIR "/zabbix/externalscripts");
 
 	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
 		CONFIG_HEARTBEAT_FORKS = 0;
@@ -503,7 +503,7 @@ int	main(int argc, char **argv)
 	}
 
 	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = zbx_strdup(CONFIG_FILE, "/etc/zabbix/zabbix_proxy.conf");
+		CONFIG_FILE = zbx_strdup(CONFIG_FILE, SYSCONFDIR "/zabbix_proxy.conf");
 
 	/* required for simple checks */
 	init_metrics();

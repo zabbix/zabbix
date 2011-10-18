@@ -1,4 +1,4 @@
-dnl 
+dnl
 dnl Zabbix
 dnl Copyright (C) 2000-2011 Zabbix SIA
 dnl
@@ -95,7 +95,7 @@ AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
 #ifdef HAVE_NET_IF_H
 #  include <net/if.h>
 #endif
-]) 
+])
 AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -108,7 +108,7 @@ AC_CHECK_HEADERS(sys/swap.h, [], [], [
 #ifdef HAVE_SYS_PARAM_H
 #  include <sys/param.h>
 #endif
-]) 
+])
 AC_CHECK_HEADERS(sys/ucontext.h, [], [], [
 #ifdef HAVE_SIGNAL_H
 #  include <signal.h>
@@ -166,7 +166,7 @@ AC_TRY_COMPILE([
 #include <sys/socket.h>
 ],[socklen_t s;],
 AC_MSG_RESULT(yes),
-[AC_DEFINE(socklen_t, int, [Define socklen_t type])
+[AC_DEFINE(socklen_t, int, [Define socklen_t type.])
 AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING(for actual socklen_t parameter type in socket functions)
@@ -192,7 +192,7 @@ for arg2 in "struct sockaddr" void; do
 done
 if test "x$zbx_socklen_t" != "x"; then
   AC_MSG_RESULT($zbx_socklen_t)
-  AC_DEFINE_UNQUOTED(ZBX_SOCKLEN_T, $zbx_socklen_t, [Define actual socklen_t parameter type in socket functions])
+  AC_DEFINE_UNQUOTED(ZBX_SOCKLEN_T, $zbx_socklen_t, [Define actual socklen_t parameter type in socket functions.])
 else
   AC_MSG_RESULT(leaving undefined)
 fi
@@ -218,7 +218,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 
@@ -256,7 +256,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 
@@ -294,7 +294,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 
@@ -588,7 +588,7 @@ AC_TRY_LINK(
 	seteuid(0);
 	setegid(0);
 ],
-AC_DEFINE(HAVE_FUNCTION_SETEUID,1,[Define to 1 if functions 'seteuid' and 'setegid' exists.])
+AC_DEFINE(HAVE_FUNCTION_SETEUID,1,[Define to 1 if functions 'seteuid' and 'setegid' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -614,7 +614,7 @@ AC_TRY_LINK(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 ],
@@ -634,7 +634,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 #include <unistd.h>
@@ -665,7 +665,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 ],
@@ -692,7 +692,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 ],
@@ -719,7 +719,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 ],
@@ -1382,11 +1382,11 @@ linux*)
         kernel=`uname -r`
 
         case "${kernel}" in
-             2.6.*) 
+             2.6.*)
         	    AC_MSG_RESULT([2.6 family (${kernel})])
         	    AC_DEFINE([KERNEL_2_6], 1, [Define to 1 if you are using Linux 2.6.x])
         	    ;;
-             2.4.*) 
+             2.4.*)
         	    AC_MSG_RESULT([2.4 family (${kernel})])
         	    AC_DEFINE([KERNEL_2_4], 1, [Define to 1 if you are using Linux 2.4.x])
         	    ;;
