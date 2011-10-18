@@ -617,7 +617,7 @@ class CTrigger extends CZBXAPI{
 			// do select without limit, truncate result and then slice excess data
 			if (!is_null($options['skipDependent']) || !is_null($options['withLastEventUnacknowledged'])) {
 				$postLimit = $options['limit'];
-				$sql_parts['limit'] = '';
+				$sql_parts['limit'] = null;
 			}
 			else {
 				$sql_parts['limit'] = $options['limit'];
