@@ -748,11 +748,11 @@ function make_status_of_zbx() {
 	$table->addRow(array(
 		_('Zabbix server is running'),
 		new CSpan($status['zabbix_server'], ($status['zabbix_server'] == _('Yes') ? 'off' : 'on')),
-		isset($ZBX_SERVER, $ZBX_SERVER_PORT) ? $ZBX_SERVER.':'.$ZBX_SERVER_PORT : _('Zabbix server ip or port is not set!')
+		isset($ZBX_SERVER, $ZBX_SERVER_PORT) ? $ZBX_SERVER.':'.$ZBX_SERVER_PORT : _('Zabbix server IP or port is not set!')
 	));
 	$title = new CSpan(_('Number of hosts (monitored/not monitored/templates)'));
 	$title->setAttribute('title', 'asdad');
-	$table->addRow(array(_('Number of hosts (monitored/not monitored/templates)') ,$status['hosts_count'],
+	$table->addRow(array(_('Number of hosts (monitored/not monitored/templates)'), $status['hosts_count'],
 		array(
 			new CSpan($status['hosts_count_monitored'], 'off'), ' / ',
 			new CSpan($status['hosts_count_not_monitored'], 'on'), ' / ',

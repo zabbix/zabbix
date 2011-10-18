@@ -318,7 +318,7 @@ $lastiss->setHeader(_('Last 20 issues'), array($refresh_menu));
 $lastiss->setFooter(new CDiv(SPACE, 'textwhite', 'hat_lastiss_footer'));
 $rightColumn[] = $lastiss;
 
-// web monioring
+// web monitoring
 $refresh_menu = get_icon('menu', array('menu' => 'hat_webovr'));
 $web_mon = new CUIWidget('hat_webovr', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_webovr.state', 1));
 $web_mon->setHeader(_('Web monitoring'), array($refresh_menu));
