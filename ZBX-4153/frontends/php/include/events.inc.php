@@ -244,7 +244,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 			$event['acknowledged']
 		);
 
-		$ack = getEventAckState($event);
+		$ack = getEventAckState($event, false, false);
 
 		$table->addRow(array(
 			zbx_date2str(_('d M Y H:i:s'), $event['clock']),
@@ -257,7 +257,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 	return $table;
 }
 
-function getEventAckState($event, $extBackurl = false) {
+function getEventAckState($event, $extBackurl = false, $isLink = true) {
 	$config = select_config();
 	global $page;
 
@@ -269,24 +269,34 @@ function getEventAckState($event, $extBackurl = false) {
 		return SPACE;
 	}
 
-	if ($extBackurl) {
-		$backurl = '&backurl='.$page['file'];
-	}
-	else {
-		$backurl = '';
-	}
-
-	if ($event['acknowledged'] == 0) {
-		$ack = new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl, 'disabled');
-	}
-	else {
-		$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl, 'enabled');
-		$ackLinkHints = make_acktab_by_eventid($event);
-		if (!empty($ackLinkHints)) {
-			$ackLink->setHint($ackLinkHints, '', '', false);
+	if ($isLink) {
+		if ($extBackurl) {
+			$backurl = '&backurl='.$page['file'];
+		}
+		else {
+			$backurl = '';
 		}
 
-		$ack = array($ackLink, ' ('.(is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges']).')');
+		if ($event['acknowledged'] == 0) {
+			$ack = new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl, 'disabled');
+		}
+		else {
+			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl, 'enabled');
+			$ackLinkHints = make_acktab_by_eventid($event);
+			if (!empty($ackLinkHints)) {
+				$ackLink->setHint($ackLinkHints, '', '', false);
+			}
+
+			$ack = array($ackLink, ' ('.(is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges']).')');
+		}
+	}
+	else {
+		if ($event['acknowledged'] == 0) {
+			$ack = new CSpan(_('No'), 'on');
+		}
+		else {
+			$ack = array(new CSpan(_('Yes'), 'off'), ' ('.(is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges']).')');
+		}
 	}
 	return $ack;
 }
