@@ -24,7 +24,9 @@ crushpng() {
 }
 
 svgtopng() {
+	# parameters : svg, size, reported size, dimension
 	# 3rd parameter allows to override "reported" size; if missing, actual size is used
+	# 4th parameter allows to override width/height detection
 	pngoutfile="$outputdir/$(basename ${1%.svg}) (${3:-$2}).png"
 	[[ "$(stat -c "%Y" "$pngoutfile" 2>/dev/null)" -lt "$svgfilemod" ]] && {
 		# if png file modification time is older than svg file modification time
@@ -32,12 +34,16 @@ svgtopng() {
 		# we have to query image dimensions first, because export dimensions are used "as-is", resulting in a square rackmountable server, for example
 		# inkscape option --query-all could be used, but it's not fully clear which layer is supposed to be "whole image"
 		# crudely dropping decimal part, bash fails on it
-		[[ "$(inkscape --without-gui --query-width $1 | cut -d. -f1)" -gt "$(inkscape --without-gui --query-height $1 | cut -d. -f1)" ]] && {
-			dimension=width
+		[[ "$4" ]] && {
+			dimension=$4
 		} || {
-			dimension=height
+			[[ "$(inkscape --without-gui --query-width $1 | cut -d. -f1)" -gt "$(inkscape --without-gui --query-height $1 | cut -d. -f1)" ]] && {
+				dimension=width
+			} || {
+				dimension=height
+			}
 		}
-		inkscape --without-gui --export-$dimension=$size $1 --export-png="$pngoutfile" >> "$inkscapelog" || exit 1
+		inkscape --without-gui --export-$dimension=$2 $1 --export-png="$pngoutfile" >> "$inkscapelog" || exit 1
 		echo -n " compress..."
 		crushpng "$pngoutfile"
 	} || {
@@ -69,9 +75,16 @@ rackimages=([64]=66 [96]=99 [128]=132)
 
 echo -n "Converting Rack_42.svg"
 for rackimagesize in "${!rackimages[@]}"; do
-	svgtopng "equipment_rack/Rack_42.svg" "${rackimages[$rackimagesize]}" "$rackimagesize"
+	svgtopng "equipment_rack/Rack_42.svg" "${rackimages[$rackimagesize]}" "$rackimagesize" "width"
 done
+echo
 
+rackwithdoorimages=([64]=98 [96]=147 [128]=197)
+
+echo -n "Converting Rack_42_with_door.svg"
+for rackwithdoorimagesize in "${!rackwithdoorimages[@]}"; do
+	svgtopng "equipment_rack/Rack_42_with_door.svg" "${rackwithdoorimages[$rackwithdoorimagesize]}" "$rackwithdoorimagesize" "width"
+done
 echo
 
 [[ -s "$pngcrushlog" ]] && {
