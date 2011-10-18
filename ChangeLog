@@ -271,6 +271,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-3743] fixed no triggers returned when api trigger.get is called with "limit" and "withLastEventUnacknowledged" options (Vedmak))
+ - [ZBX-4203] fixed api trigger.update method removes dependencies (Vedmak)
  - [ZBX-4232] fixed unclear log messages when checks are temporarily enabled/disabled (dimir)
  - [ZBX-4221] fixed sorting by host in Configuration->Web (Vedmak)
  - [ZBX-4198] fixed items filter when filter by host name with multiple spaces (Vedmak)
