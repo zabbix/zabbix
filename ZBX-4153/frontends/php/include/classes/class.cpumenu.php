@@ -20,13 +20,13 @@
 ?>
 <?php
 /*********************** ITEM ARRAY ***********************
-ITEM: array(name, url, param, css, submenu1, submenu2, ... , submenuN)
+ITEM: array(name, url, param, css, submenu1, submenu2, ..., submenuN)
 	name:		text
-	url:		text (url for href perameter)
+	url:		text (url for href parameter)
 	param:		array(tw => t_val, sb => s_val)
 		tw:			target parameter
 		t_val:		one of '_blank', '_parent', '_self', '_top'
-		sb:			text for statusbar)
+		sb:			text for statusbar
 		s_val:		text
 	css:		array(outer => cssarray, inner => cssarray)
 		outer:		style for outer div element
