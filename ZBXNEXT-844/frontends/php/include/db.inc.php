@@ -833,11 +833,19 @@ else {
 		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 0;
 //------
 		$nodeid = get_current_nodeid(false);
+		$tableSchema = DB::getSchema($table);
 
 		$found = false;
 		do{
-			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'));
-			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
+			if ($tableSchema['type'] == DB::TABLE_TYPE_HISTORY) {
+				$min = bcmul($nodeid, '100000000000000');
+				$max = bcadd(bcmul($nodeid, '100000000000000'), '99999999999999');
+			}
+			else {
+				$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
+				$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
+			}
+
 			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 			if(!is_resource($db_select)) return false;
 			$row = DBfetch($db_select);
@@ -912,41 +920,43 @@ else {
 	}
 
 
-	function zbx_db_search($table, $options, &$sql_parts){
+	function zbx_db_search($table, $options, &$sql_parts) {
 		list($table, $tableShort) = explode(' ', $table);
 
 		$tableSchema = DB::getSchema($table);
-		if(!$tableSchema) info('Error in search request for table ['.$table.']');
+		if (!$tableSchema) info('Error in search request for table ['.$table.']');
 
-		$start = is_null($options['startSearch'])?'%':'';
-		$exclude = is_null($options['excludeSearch'])?'':' NOT ';
+		$start = is_null($options['startSearch']) ? '%' : '';
+		$exclude = is_null($options['excludeSearch']) ? '' : ' NOT ';
 
 		$search = array();
-		foreach($options['search'] as $field => $pattern){
-			if(!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
-			if($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
+		foreach ($options['search'] as $field => $pattern) {
+			if (!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
+			if ($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
 
 			// escaping parameter that is about to be used in LIKE statement
-			if(empty($options['searchWildcardsEnabled'])){
-				$pattern = str_replace("!", "!!", $pattern);
-				$pattern = str_replace("%", "!%", $pattern);
-				$pattern = str_replace("_", "!_", $pattern);
+			$pattern = str_replace("!", "!!", $pattern);
+			$pattern = str_replace("%", "!%", $pattern);
+			$pattern = str_replace("_", "!_", $pattern);
 
+			if (empty($options['searchWildcardsEnabled'])) {
 				$search[$field] =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
 					zbx_dbstr($start.zbx_strtoupper($pattern).'%').
 					" ESCAPE '!'";
 			}
-			else{
+			else {
+				$pattern = str_replace("*", "%", $pattern);
 				$search[$field] =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
-					zbx_dbstr(zbx_strtoupper($pattern));
+					zbx_dbstr(zbx_strtoupper($pattern)).
+					" ESCAPE '!'";
 			}
 		}
 
-		if(!empty($search)) $sql_parts['where']['search'] = '( '.implode(' OR ', $search).' )';
+		if (!empty($search)) $sql_parts['where']['search'] = '( '.implode(' OR ', $search).' )';
 	}
 
 
@@ -1036,6 +1046,9 @@ else {
 		const DBEXECUTE_ERROR = 1;
 		const RESERVEIDS_ERROR = 2;
 
+		const TABLE_TYPE_CONFIG = 1;
+		const TABLE_TYPE_HISTORY = 2;
+
 		const FIELD_TYPE_INT = 'int';
 		const FIELD_TYPE_CHAR = 'char';
 		const FIELD_TYPE_ID = 'id';
@@ -1053,11 +1066,17 @@ else {
 			global $ZBX_LOCALNODEID;
 
 			$nodeid = get_current_nodeid(false);
-			$id_name = self::getSchema($table);
-			$id_name = $id_name['key'];
+			$tableSchema = self::getSchema($table);
+			$id_name = $tableSchema['key'];
 
-			$min = bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000'), 0);
-			$max = bcadd(bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999', 0);
+			if ($tableSchema['type'] == self::TABLE_TYPE_HISTORY) {
+				$min = bcmul($nodeid, '100000000000000');
+				$max = bcadd(bcmul($nodeid, '100000000000000'), '99999999999999');
+			}
+			else {
+				$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
+				$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
+			}
 
 			$sql = 'SELECT nextid '.
 				' FROM ids '.

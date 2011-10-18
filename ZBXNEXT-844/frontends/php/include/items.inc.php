@@ -1108,10 +1108,15 @@
 
 			if($ItemKey->isValid()){
 				$keyParameters = $ItemKey->getParameters();
-				// according to zabbix docs we must replace $1 to $9 macros with item key parameters
-				for($paramNo = 9; $paramNo > 0; $paramNo--){
-					$replaceTo = isset($keyParameters[$paramNo - 1]) ? $keyParameters[$paramNo - 1] : '';
-					$name = str_replace('$'.$paramNo, $replaceTo, $name);
+
+				$searchOffset = 0;
+				while(preg_match('/\$[1-9]/', $name, $matches, PREG_OFFSET_CAPTURE, $searchOffset)){
+					// matches[0][0] - matched param, [1] - second character of it
+					$paramNumber = $matches[0][0][1] - 1;
+					$replaceString = isset($keyParameters[$paramNumber]) ? $keyParameters[$paramNumber] : '';
+
+					$name = substr_replace($name, $replaceString, $matches[0][1], 2);
+					$searchOffset = $matches[0][1] + strlen($replaceString);
 				}
 			}
 		}
@@ -1765,7 +1770,7 @@
 	function isKeyIdChar($char){
 		return (
 			($char >= 'a' && $char <= 'z')
-			|| ($char == '.' || $char == ',' || $char == '_' || $char == '-')
+			|| ($char == '.' || $char == '_' || $char == '-')
 			|| ($char >= 'A' && $char <= 'Z')
 			|| ($char >= '0' && $char <= '9')
 		);

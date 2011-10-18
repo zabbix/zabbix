@@ -781,37 +781,40 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 		$form->show();
 	}
-	else if($srctbl == 'items'){
+
+	// items
+	elseif ($srctbl == 'items') {
 		$form = new CForm();
 		$form->setName('itemform');
 		$form->setAttribute('id', 'items');
 
-		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
-
-		insert_js_function('addSelectedValues');
-		insert_js_function('addValues');
-		insert_js_function('addValue');
-
-		if($multiselect)
+		if ($multiselect) {
 			$header = array(
-				($hostid>0)?null:S_HOST,
-				array(new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
+				($hostid > 0) ? null : S_HOST,
+				array(new CCheckBox('all_items', NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
 				S_KEY,
 				S_TYPE,
 				S_TYPE_OF_INFORMATION,
 				S_STATUS
 			);
-		else
+		}
+		else {
 			$header = array(
-				($hostid>0)?null:S_HOST,
+				($hostid > 0) ? null : S_HOST,
 				S_DESCRIPTION,
 				S_KEY,
 				S_TYPE,
 				S_TYPE_OF_INFORMATION,
 				S_STATUS
 			);
+		}
 
+		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 		$table->setHeader($header);
+
+		insert_js_function('addSelectedValues');
+		insert_js_function('addValues');
+		insert_js_function('addValue');
 
 		$options = array(
 			'nodeids' => $nodeid,
@@ -820,53 +823,42 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND
 		);
-		if(is_null($hostid)) $options['groupids'] = $groupid;
-		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
-		if(!is_null($value_types)) $options['filter']['value_type'] = $value_types;
+		if (is_null($hostid)) $options['groupids'] = $groupid;
+		if (!is_null($writeonly)) $options['editable'] = 1;
+		if (!is_null($templated)) $options['templated'] = $templated;
+		if (!is_null($value_types)) $options['filter']['value_type'] = $value_types;
 
 		$items = CItem::get($options);
 		order_result($items, 'description', ZBX_SORT_UP);
 
-		foreach($items as $tnum => $row){
+		foreach ($items as $tnum => $row) {
 			$host = reset($row['hosts']);
 			$row['host'] = $host['host'];
-
 			$row['description'] = item_description($row);
-			$description = new CLink($row['description'],'#');
-
+			$description = new CLink($row['description'], '#');
 			$row['description'] = $row['host'].':'.$row['description'];
 
-			if($multiselect){
-				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
-			}
-			else{
-				$values = array(
-					$dstfld1 => $row[$srcfld1],
-					$dstfld2 => $row[$srcfld2],
-				);
-
-//if we need to submit parent window
-				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).', '.($submitParent?'true':'false').'); return false;';
-			}
-
-			$description->setAttribute('onclick', $js_action);
-
-			if($multiselect){
+			if ($multiselect) {
+				$description->setAttribute('onclick', "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");");
 				$description = new CCol(array(new CCheckBox('items['.zbx_jsValue($row[$srcfld1]).']', NULL, NULL, $row['itemid']), $description));
+			}
+			else {
+				// if we need to submit parent window
+				$values = array ($dstfld1 => $row[$srcfld1], $dstfld2 => $row[$srcfld2]);
+				$description->setAttribute('onclick', 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).', '.($submitParent ? 'true' : 'false').'); return false;');
 			}
 
 			$table->addRow(array(
-				($hostid>0)?null:$row['host'],
+				($hostid > 0) ? null : $row['host'],
 				$description,
 				$row['key_'],
 				item_type2str($row['type']),
 				item_value_type2str($row['value_type']),
 				new CSpan(item_status2str($row['status']),item_status2style($row['status']))
-				));
+			));
 		}
 
-		if($multiselect){
+		if ($multiselect) {
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
 			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
@@ -893,7 +885,7 @@ include_once('include/page_header.php');
 		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$apps = CApplication::get($options);
-		morder_result($apps, array('host', 'name'));
+		ArraySorter::sort($apps, array('host', 'name'));
 
 		foreach($apps as $app){
 			$name = new CSpan($app['name'], 'link');

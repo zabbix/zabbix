@@ -134,17 +134,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 		zabbix_syslog("Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
 	}
 
-	/* remove formatting symbols from the end of the result */
+	/* remove formatting characters from the end of the result */
 	/* so it could be checked by "is_uint64" and "is_double" functions */
 	/* when we try to get "int" or "float" values from "string" result */
 	if (ISSET_STR(result))
-	{
 		zbx_rtrim(result->str, " \r\n");
-	}
+
 	if (ISSET_TEXT(result))
-	{
 		zbx_rtrim(result->text, " \r\n");
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
@@ -338,10 +335,14 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 static void	activate_host(DC_ITEM *item, int now)
 {
+	const char	*__function_name = "activate_host";
 	char		sql[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
 	int		offset = 0, *errors_from, *disable_until;
 	unsigned char	*available;
 	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error, *type;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
+			__function_name, item->host.hostid, item->itemid, item->type);
 
 	switch (item->type)
 	{
@@ -354,7 +355,7 @@ static void	activate_host(DC_ITEM *item, int now)
 			fld_available = "available";
 			fld_disable_until = "disable_until";
 			fld_error = "error";
-			type = "Zabbix";
+			type = "Zabbix agent";
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -392,9 +393,17 @@ static void	activate_host(DC_ITEM *item, int now)
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
 
-	if (HOST_AVAILABLE_TRUE != *available)
+	if (HOST_AVAILABLE_TRUE == *available)
 	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "Enabling %s host [%s]",
+		zbx_snprintf(error_msg, sizeof(error_msg), "resuming %s checks on host [%s]: connection restored",
+				type, item->host.host);
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
+		zabbix_syslog("%s", error_msg);
+	}
+	else if (HOST_AVAILABLE_TRUE != *available)
+	{
+		zbx_snprintf(error_msg, sizeof(error_msg), "enabling %s checks on host [%s]: host became available",
 				type, item->host.host);
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
@@ -405,7 +414,7 @@ static void	activate_host(DC_ITEM *item, int now)
 				fld_available, *available);
 
 		if (available == &item->host.available)
-			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, now); /* 0 */
+			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, now);
 	}
 
 	*errors_from = 0;
@@ -420,14 +429,20 @@ static void	activate_host(DC_ITEM *item, int now)
 	DBbegin();
 	DBexecute("%s", sql);
 	DBcommit();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 {
+	const char	*__function_name = "deactivate_host";
 	char		sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
 	int		offset = 0, *errors_from, *disable_until;
 	unsigned char	*available;
 	const char	*fld_errors_from, *fld_available, *fld_disable_until, *fld_error, *type;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
+			__function_name, item->host.hostid, item->itemid, item->type);
 
 	switch (item->type)
 	{
@@ -440,7 +455,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 			fld_available = "available";
 			fld_disable_until = "disable_until";
 			fld_error = "error";
-			type = "Zabbix";
+			type = "Zabbix agent";
 			break;
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -473,17 +488,20 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 	if (SUCCEED != DCconfig_deactivate_host(item, now))
 		return;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from, *available);
+
 	DBbegin();
 
 	*error_msg = '\0';
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");
 
-	/* First error */
+	/* first error */
 	if (0 == *errors_from)
 	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "%s Host [%s]: first network error, wait for %d seconds",
-				type, item->host.host, CONFIG_UNREACHABLE_DELAY);
+		zbx_snprintf(error_msg, sizeof(error_msg), "%s item [%s] on host [%s] failed:"
+				" first network error, wait for %d seconds",
+				type, item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
 
 		*errors_from = now;
 		*disable_until = now + CONFIG_UNREACHABLE_DELAY;
@@ -494,9 +512,10 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 	{
 		if (now - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
 		{
-			/* Still unavailable, but won't change status to UNAVAILABLE yet */
-			zbx_snprintf(error_msg, sizeof(error_msg), "%s Host [%s]: another network error, wait for %d seconds",
-					type, item->host.host, CONFIG_UNREACHABLE_DELAY);
+			/* still unavailable, but won't change status to UNAVAILABLE yet */
+			zbx_snprintf(error_msg, sizeof(error_msg), "%s item [%s] on host [%s] failed:"
+					" another network error, wait for %d seconds",
+					type, item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
 
 			*disable_until = now + CONFIG_UNREACHABLE_DELAY;
 		}
@@ -506,7 +525,8 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 
 			if (HOST_AVAILABLE_FALSE != *available)
 			{
-				zbx_snprintf(error_msg, sizeof(error_msg), "Disabling %s host [%s]",
+				zbx_snprintf(error_msg, sizeof(error_msg), "temporarily disabling %s checks on host [%s]:"
+						" host unavailable",
 						type, item->host.host);
 
 				*available = HOST_AVAILABLE_FALSE;
@@ -515,9 +535,10 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 						fld_available, *available);
 
 				if (available == &item->host.available)
-					update_key_status(item->host.hostid, HOST_AVAILABLE_FALSE, now); /* 2 */
+					update_key_status(item->host.hostid, HOST_AVAILABLE_FALSE, now);
 
-				update_triggers_status_to_unknown(item->host.hostid, item->type, now, "Agent is unavailable.");
+				update_triggers_status_to_unknown(item->host.hostid, item->type, now,
+						"Agent is unavailable.");
 			}
 
 			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
@@ -538,6 +559,8 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error_msg);
 		zabbix_syslog("%s", error_msg);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************

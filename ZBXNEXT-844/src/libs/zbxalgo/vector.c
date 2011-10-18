@@ -99,9 +99,25 @@ void	zbx_vector_ ## __id ## _remove_noorder(zbx_vector_ ## __id ## _t *vector, i
 														\
 void	zbx_vector_ ## __id ## _sort(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
 {														\
-	if (0 != vector->values_num)										\
+	if (2 <= vector->values_num)										\
 	{													\
 		qsort(vector->values, vector->values_num, sizeof(__type), compare_func);			\
+	}													\
+}														\
+														\
+void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
+{														\
+	if (2 <= vector->values_num)										\
+	{													\
+		int	i, j = 1;										\
+														\
+		for (i = 1; i < vector->values_num; i++)							\
+		{												\
+			if (0 != compare_func(&vector->values[i - 1], &vector->values[i]))			\
+				vector->values[j++] = vector->values[i];					\
+		}												\
+														\
+		vector->values_num = j;										\
 	}													\
 }														\
 														\

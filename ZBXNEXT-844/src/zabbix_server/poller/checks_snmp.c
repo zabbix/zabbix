@@ -253,7 +253,7 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 			break;
 	}
 
-	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+	conn = (item->host.useip == 1 ? item->host.ip : item->host.dns);
 
 #ifdef HAVE_IPV6
 	if (SUCCEED != get_address_family(conn, &family, err, MAX_STRING_LEN))
@@ -436,7 +436,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 	anOID_len = rootOID_len;
 
 	running = 1;
-	while (running)
+	while (1 == running)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: snmp_pdu_create()", __function_name);
 
@@ -445,9 +445,10 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response():%d", __function_name, status);
 
 		/* process response */
-		if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
+		if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 		{
 			for (vars = response->variables; vars && running; vars = vars->next_variable)
 			{
@@ -470,11 +471,11 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 				else
 				{
 					/* verify if OIDs are increasing */
-					if (vars->type != SNMP_ENDOFMIBVIEW && vars->type != SNMP_NOSUCHOBJECT &&
-							vars->type != SNMP_NOSUCHINSTANCE)
+					if (SNMP_ENDOFMIBVIEW != vars->type && SNMP_NOSUCHOBJECT != vars->type &&
+							SNMP_NOSUCHINSTANCE != vars->type)
 					{
 						/* not an exception value */
-						if (snmp_oid_compare(anOID, anOID_len, vars->name, vars->name_length) >= 0)
+						if (0 <= snmp_oid_compare(anOID, anOID_len, vars->name, vars->name_length))
 						{
 							zbx_snprintf(err, MAX_STRING_LEN, "OID not increasing.");
 							ret = NOTSUPPORTED;
@@ -506,26 +507,31 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 		}
 		else
 		{
-			if (status == STAT_SUCCESS)
+			conn = (item->host.useip == 1 ? item->host.ip : item->host.dns);
+			running = 0;
+
+			if (STAT_SUCCESS == status)
 			{
 				zbx_snprintf(err, MAX_STRING_LEN, "SNMP error [%s]",
 						snmp_errstring(response->errstat));
-				running = 0;
 				ret = NOTSUPPORTED;
 			}
-			else if (status == STAT_TIMEOUT)
+			else if (STAT_ERROR == status)
 			{
-				conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+				zbx_snprintf(err, MAX_STRING_LEN, "Could not connect to [%s:%d]",
+						conn, item->snmp_port);
+				ret = NETWORK_ERROR;
+			}
+			else if (STAT_TIMEOUT == status)
+			{
 				zbx_snprintf(err, MAX_STRING_LEN, "Timeout while connecting to [%s:%d]",
 						conn, item->snmp_port);
-				running = 0;
 				ret = NETWORK_ERROR;
 			}
 			else
 			{
 				zbx_snprintf(err, MAX_STRING_LEN, "SNMP error [%d]",
 						status);
-				running = 0;
 				ret = NOTSUPPORTED;
 			}
 		}
@@ -549,7 +555,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	struct variable_list	*vars;
 	int			status, ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(oid:%s)", __function_name, snmp_oid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() oid:%s", __function_name, snmp_oid);
 
 	init_result(value);
 
@@ -559,9 +565,9 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	snmp_add_null_var(pdu, anOID, anOID_len);
 
 	status = snmp_synch_response(ss, pdu, &response);
-	zabbix_log(LOG_LEVEL_DEBUG, "Status send [%d]", status);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response():%d", __function_name, status);
 
-	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
+	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
 		for (vars = response->variables; vars; vars = vars->next_variable)
 		{
@@ -570,7 +576,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 			zabbix_log(LOG_LEVEL_DEBUG, "AV loop OID [%s] Type [0x%02X] '%s'",
 					snmp_oid, vars->type, temp);
 
-			if (vars->type == ASN_OCTET_STR)
+			if (ASN_OCTET_STR == vars->type)
 			{
 				if (0 == strncmp(temp, "STRING: ", 8))
 					ptemp = temp + 8;
@@ -581,24 +587,27 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 				if (SUCCEED != set_result_type(value, item->value_type, item->data_type, ptemp))
 					ret = NOTSUPPORTED;
 			}
-			else if (vars->type == ASN_UINTEGER || vars->type == ASN_COUNTER ||
 #ifdef OPAQUE_SPECIAL_TYPES
-					vars->type == ASN_UNSIGNED64 ||
+			else if (ASN_UINTEGER == vars->type || ASN_COUNTER == vars->type ||
+					ASN_TIMETICKS == vars->type || ASN_GAUGE == vars->type ||
+					ASN_UNSIGNED64 == vars->type)
+#else
+			else if (ASN_UINTEGER == vars->type || ASN_COUNTER == vars->type ||
+					ASN_TIMETICKS == vars->type || ASN_GAUGE == vars->type)
 #endif
-					vars->type == ASN_TIMETICKS || vars->type == ASN_GAUGE)
 			{
 				SET_UI64_RESULT(value, (unsigned long)*vars->val.integer);
 			}
-			else if (vars->type == ASN_COUNTER64)
+			else if (ASN_COUNTER64 == vars->type)
 			{
 				SET_UI64_RESULT(value, (((zbx_uint64_t)vars->val.counter64->high) << 32) +
 						(zbx_uint64_t)vars->val.counter64->low);
 			}
-			else if (vars->type == ASN_INTEGER ||
 #ifdef OPAQUE_SPECIAL_TYPES
-					vars->type == ASN_INTEGER64
+			else if (ASN_INTEGER == vars->type || ASN_INTEGER64 == vars->type)
+#else
+			else if (ASN_INTEGER == vars->type)
 #endif
-					)
 			{
 				/* Negative integer values are converted to double */
 				if (*vars->val.integer < 0)
@@ -607,16 +616,16 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 					SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer);
 			}
 #ifdef OPAQUE_SPECIAL_TYPES
-			else if (vars->type == ASN_FLOAT)
+			else if (ASN_FLOAT == vars->type)
 			{
 				SET_DBL_RESULT(value, *vars->val.floatVal);
 			}
-			else if (vars->type == ASN_DOUBLE)
+			else if (ASN_DOUBLE == vars->type)
 			{
 				SET_DBL_RESULT(value, *vars->val.doubleVal);
 			}
 #endif
-			else if (vars->type == ASN_IPADDRESS)
+			else if (ASN_IPADDRESS == vars->type)
 			{
 				SET_STR_RESULT(value, zbx_dsprintf(NULL, "%d.%d.%d.%d",
 						vars->val.string[0],
@@ -638,15 +647,22 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	}
 	else
 	{
-		if (status == STAT_SUCCESS)
+		conn = (item->host.useip == 1 ? item->host.ip : item->host.dns);
+
+		if (STAT_SUCCESS == status)
 		{
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "SNMP error [%s]",
 					snmp_errstring(response->errstat)));
 			ret = NOTSUPPORTED;
 		}
-		else if (status == STAT_TIMEOUT)
+		else if (STAT_ERROR == status)
 		{
-			conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Could not connect to [%s:%d]",
+					conn, item->snmp_port));
+			ret = NETWORK_ERROR;
+		}
+		else if (STAT_TIMEOUT == status)
+		{
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [%s:%d]",
 					conn, item->snmp_port));
 			ret = NETWORK_ERROR;
@@ -753,7 +769,6 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 	char	err[MAX_STRING_LEN];
 	int	idx;
 	char	*pl;
-	int	num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' oid:'%s'",
 			__function_name, item->key_orig, item->snmp_oid);
@@ -771,22 +786,21 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
 				__function_name,
 				zbx_result_string(ret));
+
 		return ret;
 	}
 
-	num = num_key_param(item->snmp_oid);
-
-	switch (num)
+	switch (num_key_param(item->snmp_oid))
 	{
 	case 0:
-		zabbix_log(LOG_LEVEL_DEBUG, "Standard processing");
+		zabbix_log(LOG_LEVEL_DEBUG, "standard processing");
 		snmp_normalize(oid_normalized, item->snmp_oid, sizeof(oid_normalized));
 		ret = get_snmp(ss, item, oid_normalized, value);
 		break;
 	case 3:
 		do
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Special processing");
+			zabbix_log(LOG_LEVEL_DEBUG, "special processing");
 
 			if (get_key_param(item->snmp_oid, 1, method, MAX_STRING_LEN) != 0
 				|| get_key_param(item->snmp_oid, 2, oid_index, MAX_STRING_LEN) != 0

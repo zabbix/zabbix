@@ -415,8 +415,6 @@ void	del_zeroes(char *s)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_rtrim(char *str, const char *charlist)
 {
@@ -443,8 +441,6 @@ int	zbx_rtrim(char *str, const char *charlist)
  * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_ltrim(char *str, const char *charlist)
@@ -479,8 +475,6 @@ void	zbx_ltrim(char *str, const char *charlist)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 void	zbx_remove_chars(register char *str, const char *charlist)
 {
@@ -490,8 +484,10 @@ void	zbx_remove_chars(register char *str, const char *charlist)
 		return;
 
 	for (p = str; '\0' != *p; p++)
+	{
 		if (NULL == strchr(charlist, *p))
 			*str++ = *p;
+	}
 
 	*str = '\0';
 }
@@ -603,8 +599,6 @@ void	compress_signs(char *str)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 void	rtrim_spaces(char *c)
 {
@@ -632,8 +626,6 @@ void	rtrim_spaces(char *c)
  * Return value: string without left spaces                                   *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	ltrim_spaces(char *c)
@@ -670,8 +662,6 @@ void	ltrim_spaces(char *c)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 void	lrtrim_spaces(char *c)
 {
@@ -707,8 +697,6 @@ void	lrtrim_spaces(char *c)
  * Returns strlen(src); if retval >= siz, truncation occurred.                *
  *                                                                            *
  * Author: Todd C. Miller <Todd.Miller@courtesan.com>                         *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
@@ -752,8 +740,6 @@ size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
  * If retval >= siz, truncation occurred.                                     *
  *                                                                            *
  * Author: Todd C. Miller <Todd.Miller@courtesan.com>                         *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz)
@@ -937,8 +923,6 @@ char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_check_hostname(const char *hostname)
 {
@@ -973,8 +957,6 @@ int	zbx_check_hostname(const char *hostname)
  *               or FAIL and pointer to incorrect char                        *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	parse_host(char **exp, char **host)
@@ -1017,8 +999,6 @@ int	parse_host(char **exp, char **host)
  *               or FAIL and pointer to incorrect char                        *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	parse_key(char **exp, char **key)
@@ -1183,8 +1163,6 @@ succeed:
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	parse_function(char **exp, char **func, char **params)
 {
@@ -1304,8 +1282,6 @@ error:
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	parse_host_key(char *exp, char **host, char **key)
 {
@@ -1344,7 +1320,7 @@ int	parse_host_key(char *exp, char **host, char **key)
  * Purpose: calculate count of parameters from parameter list (param)         *
  *                                                                            *
  * Parameters:                                                                *
- * 	param  - parameter list                                               *
+ *      param  - parameter list                                               *
  *                                                                            *
  * Return value: count of parameters                                          *
  *                                                                            *
@@ -1434,13 +1410,13 @@ int	num_param(const char *p)
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- * 	param  - parameter list                                               *
- *      num    - requested parameter index                                    *
- *      buf    - pointer of output buffer                                     *
- *      maxlen - size of output buffer                                        *
+ *      param   - parameter list                                              *
+ *      num     - requested parameter index                                   *
+ *      buf     - pointer of output buffer                                    *
+ *      max_len - size of output buffer                                       *
  *                                                                            *
  * Return value:                                                              *
- *      1 - requested parameter missing                                       *
+ *      1 - requested parameter missing or buffer overflow                    *
  *      0 - requested parameter found (value - 'buf' can be empty string)     *
  *                                                                            *
  * Author: Eugene Grigorjev, rewritten by Alexei Vladishev                    *
@@ -1448,104 +1424,118 @@ int	num_param(const char *p)
  * Comments:  delimeter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_param(const char *p, int num, char *buf, int maxlen)
+int	get_param(const char *p, int num, char *buf, size_t max_len)
 {
-/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	state, array, idx = 1, buf_i = 0;
+#define ZBX_ASSIGN_PARAM				\
+{							\
+	if (buf_i == max_len)				\
+		return 1;	/* buffer overflow */	\
+	buf[buf_i++] = *p;				\
+}
 
-	*buf = '\0';
+	int	state;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+	int	array, idx = 1, buf_i = 0;
 
-	for (state = 0, array = 0; '\0' != *p && idx <= num && buf_i < maxlen; p++)
+	if (0 == max_len)
+		return 1;	/* buffer overflow */
+
+	max_len--;	/* '\0' */
+
+	for (state = 0, array = 0; '\0' != *p && idx <= num; p++)
 	{
-		switch (state) {
-		/* Init state */
-		case 0:
-			if (',' == *p)
-			{
-				if (0 == array)
-					idx++;
+		switch (state)
+		{
+			/* init state */
+			case 0:
+				if (',' == *p)
+				{
+					if (0 == array)
+						idx++;
+					else if (idx == num)
+						ZBX_ASSIGN_PARAM;
+				}
+				else if ('"' == *p)
+				{
+					state = 1;
+					if (0 != array && idx == num)
+						ZBX_ASSIGN_PARAM;
+				}
+				else if ('[' == *p)
+				{
+					if (0 != array && idx == num)
+						ZBX_ASSIGN_PARAM;
+					array++;
+				}
+				else if (']' == *p && 0 != array)
+				{
+					array--;
+					if (0 != array && idx == num)
+						ZBX_ASSIGN_PARAM;
+
+					/* skip spaces */
+					while (' ' == p[1])
+						p++;
+
+					if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+						return 1;	/* incorrect syntax */
+				}
+				else if (' ' != *p)
+				{
+					if (idx == num)
+						ZBX_ASSIGN_PARAM;
+					state = 2;
+				}
+				break;
+			case 1:
+				/* quoted */
+
+				if ('"' == *p)
+				{
+					if (0 != array && idx == num)
+						ZBX_ASSIGN_PARAM;
+
+					/* skip spaces */
+					while (' ' == p[1])
+						p++;
+
+					if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+						return 1;	/* incorrect syntax */
+
+					state = 0;
+				}
+				else if ('\\' == *p && '"' == p[1] && 0 == array)
+				{
+					p++;
+					if (idx == num)
+						ZBX_ASSIGN_PARAM;
+				}
 				else if (idx == num)
-					buf[buf_i++] = *p;
-			}
-			else if ('"' == *p)
-			{
-				state = 1;
-				if (0 != array && idx == num)
-					buf[buf_i++] = *p;
-			}
-			else if ('[' == *p)
-			{
-				if (0 != array && idx == num)
-					buf[buf_i++] = *p;
-				array++;
-			}
-			else if (']' == *p && 0 != array)
-			{
-				array--;
-				if (0 != array && idx == num)
-					buf[buf_i++] = *p;
+					ZBX_ASSIGN_PARAM;
+				break;
+			case 2:
+				/* unquoted */
 
-				/* skip spaces */
-				while (' ' == p[1])
-					p++;
-
-				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
-					return 1;	/* incorrect syntax */
-			}
-			else if (' ' != *p)
-			{
-				if (idx == num)
-					buf[buf_i++] = *p;
-				state = 2;
-			}
-			break;
-		/* Quoted */
-		case 1:
-			if ('"' == *p)
-			{
-				if (0 != array && idx == num)
-					buf[buf_i++] = *p;
-
-				/* skip spaces */
-				while (' ' == p[1])
-					p++;
-
-				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
-					return 1;	/* incorrect syntax */
-
-				state = 0;
-			}
-			else if ('\\' == *p && '"' == p[1] && 0 == array)
-			{
-				p++;
-				if (idx == num)
-					buf[buf_i++] = *p;
-			}
-			else if (idx == num)
-				buf[buf_i++] = *p;
-			break;
-		/* Unquoted */
-		case 2:
-			if (',' == *p || (']' == *p && 0 != array))
-			{
-				p--;
-				state = 0;
-			}
-			else if (idx == num)
-				buf[buf_i++] = *p;
-			break;
+				if (',' == *p || (']' == *p && 0 != array))
+				{
+					p--;
+					state = 0;
+				}
+				else if (idx == num)
+					ZBX_ASSIGN_PARAM;
+				break;
 		}
 
 		if (idx > num)
 			break;
 	}
+#undef ZBX_ASSIGN_PARAM
 
 	/* missing terminating '"' character */
-	if (state == 1)
+	if (1 == state)
 		return 1;
 
 	/* missing terminating ']' character */
-	if (array != 0)
+	if (0 != array)
 		return 1;
 
 	buf[buf_i] = '\0';
@@ -1691,7 +1681,7 @@ static int	get_param_len(const char *p, int num, size_t *sz)
  * Purpose: return parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- * 	p   - [IN] parameter list                                             *
+ *      p   - [IN] parameter list                                             *
  *      num - [IN] requested parameter index                                  *
  *                                                                            *
  * Return value:                                                              *
@@ -1727,7 +1717,7 @@ char	*get_param_dyn(const char *p, int num)
  * Purpose: remove parameter by index (num) from parameter list (param)       *
  *                                                                            *
  * Parameters:                                                                *
- * 	param  - parameter list                                               *
+ *      param  - parameter list                                               *
  *      num    - requested parameter index                                    *
  *                                                                            *
  * Return value:                                                              *
@@ -1787,7 +1777,7 @@ void	remove_param(char *p, int num)
  *          delimited by blanks                                               *
  *                                                                            *
  * Parameters:                                                                *
- * 	p       - [IN] parameter list, delimited by blanks (' ' or '\t')      *
+ *      p       - [IN] parameter list, delimited by blanks (' ' or '\t')      *
  *      buf     - [OUT] output buffer                                         *
  *      bufsize - [IN] output buffer size                                     *
  *                                                                            *
@@ -1881,14 +1871,12 @@ const char	*get_string(const char *p, char *buf, size_t bufsize)
  * Purpose: convert parameter c (0-15) to hexadecimal value ('0'-'f')         *
  *                                                                            *
  * Parameters:                                                                *
- * 	c - number 0-15                                                       *
+ *      c - number 0-15                                                       *
  *                                                                            *
  * Return value:                                                              *
  *      '0'-'f'                                                               *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 char	zbx_num2hex(u_char c)
@@ -1906,14 +1894,12 @@ char	zbx_num2hex(u_char c)
  * Purpose: convert hexit c ('0'-'9''a'-'f') to number (0-15)                 *
  *                                                                            *
  * Parameters:                                                                *
- * 	c - char ('0'-'9''a'-'f')                                             *
+ *      c - char ('0'-'9''a'-'f')                                             *
  *                                                                            *
  * Return value:                                                              *
  *      0-15                                                                  *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 u_char	zbx_hex2num(char c)
@@ -1931,16 +1917,14 @@ u_char	zbx_hex2num(char c)
  * Purpose: convert binary buffer input to hexadecimal string                 *
  *                                                                            *
  * Parameters:                                                                *
- * 	input - binary data                                                   *
- *	ilen - binary data length                                             *
- *	output - pointer to output buffer                                     *
- *	olen - output buffer length                                           *
+ *      input - binary data                                                   *
+ *      ilen - binary data length                                             *
+ *      output - pointer to output buffer                                     *
+ *      olen - output buffer length                                           *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen)
@@ -1977,14 +1961,12 @@ int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen)
  * Purpose: convert hexadecimal string to binary buffer                       *
  *                                                                            *
  * Parameters:                                                                *
- * 	io - hexadecimal string                                               *
+ *      io - hexadecimal string                                               *
  *                                                                            *
  * Return value:                                                              *
- *	size of buffer                                                        *
+ *      size of buffer                                                        *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_hex2binary(char *io)
@@ -2013,21 +1995,19 @@ int	zbx_hex2binary(char *io)
  * Purpose: converts from binary string to the null terminated escaped string *
  *                                                                            *
  * Transformations:                                                           *
- *	'\0' [0x00] -> \\ooo (ooo is an octal number)                         *
- *	'\'' [0x37] -> \'                                                     *
- *	'\\' [0x5c] -> \\\\                                                   *
- *	<= 0x1f || >= 0x7f -> \\ooo                                           *
+ *      '\0' [0x00] -> \\ooo (ooo is an octal number)                         *
+ *      '\'' [0x37] -> \'                                                     *
+ *      '\\' [0x5c] -> \\\\                                                   *
+ *      <= 0x1f || >= 0x7f -> \\ooo                                           *
  *                                                                            *
  * Parameters:                                                                *
- *	input - null terminated hexadecimal string                            *
- *	output - pointer to buffer                                            *
- *	olen - size of returned buffer                                        *
+ *      input - null terminated hexadecimal string                            *
+ *      output - pointer to buffer                                            *
+ *      olen - size of returned buffer                                        *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
@@ -2102,17 +2082,15 @@ int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
  * Purpose: converts the null terminated string into binary buffer            *
  *                                                                            *
  * Transformations:                                                           *
- *	\ooo == a byte whose value = ooo (ooo is an octal number)             *
- *	\x   == x (x is any character)                                        *
+ *      \ooo == a byte whose value = ooo (ooo is an octal number)             *
+ *      \x   == x (x is any character)                                        *
  *                                                                            *
  * Parameters:                                                                *
- *	io - null terminated string                                           *
+ *      io - null terminated string                                           *
  *                                                                            *
  * Return value: length of the binary buffer                                  *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_pg_unescape_bytea(u_char *io)
@@ -2168,8 +2146,6 @@ int	zbx_pg_unescape_bytea(u_char *io)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_get_next_field(const char **line, char **output, int *olen, char separator)
 {
@@ -2220,8 +2196,6 @@ int	zbx_get_next_field(const char **line, char **output, int *olen, char separat
  *                                                                            *
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	str_in_list(const char *list, const char *value, char delimiter)
 {
@@ -2255,10 +2229,10 @@ int	str_in_list(const char *list, const char *value, char delimiter)
  *          to be used for keys: key[param1,param2]                           *
  *                                                                            *
  * Parameters:                                                                *
- * 	param  - parameter list                                               *
- *      num    - requested parameter index                                    *
- *      buf    - pointer of output buffer                                     *
- *      maxlen - size of output buffer                                        *
+ *      param   - parameter list                                              *
+ *      num     - requested parameter index                                   *
+ *      buf     - pointer of output buffer                                    *
+ *      max_len - size of output buffer                                       *
  *                                                                            *
  * Return value:                                                              *
  *      1 - requested parameter missing                                       *
@@ -2269,7 +2243,7 @@ int	str_in_list(const char *list, const char *value, char delimiter)
  * Comments:  delimeter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_key_param(char *param, int num, char *buf, int maxlen)
+int	get_key_param(char *param, int num, char *buf, size_t max_len)
 {
 	int	ret;
 	char	*pl, *pr;
@@ -2281,7 +2255,7 @@ int	get_key_param(char *param, int num, char *buf, int maxlen)
 		return 1;
 
 	*pr = '\0';
-	ret = get_param(pl + 1, num, buf, maxlen);
+	ret = get_param(pl + 1, num, buf, max_len);
 	*pr = ']';
 
 	return ret;
@@ -2295,7 +2269,7 @@ int	get_key_param(char *param, int num, char *buf, int maxlen)
  *          to be used for keys: key[param1,param2]                           *
  *                                                                            *
  * Parameters:                                                                *
- * 	param  - parameter list                                               *
+ *      param  - parameter list                                               *
  *                                                                            *
  * Return value: count of parameters                                          *
  *                                                                            *
@@ -2327,28 +2301,26 @@ int	num_key_param(char *param)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_escape_param_len                                             *
+ * Function: zbx_get_escape_string_len                                        *
  *                                                                            *
- * Purpose: calculate size of buffer for escaped string                       *
+ * Purpose: calculate the required size for the escaped string                *
  *                                                                            *
- * Parameters: src - [IN] source string                                       *
+ * Parameters: src - [IN] null terminated source string                       *
+ *             charlist - [IN] null terminated to-be-escaped character list   *
  *                                                                            *
- * Return value: size of escaped string                                       *
+ * Return value: size of the escaped string                                   *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-static size_t	get_escape_param_len(const char *src)
+static size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
 {
 	size_t	sz = 1;	/* '\0' */
 
-	for (; '\0' != *src; src++)
+	for (; '\0' != *src; src++, sz++)
 	{
-		if ('"' == *src)
+		if (NULL != strchr(charlist, *src))
 			sz++;
-		sz++;
 	}
 
 	return sz;
@@ -2356,32 +2328,32 @@ static size_t	get_escape_param_len(const char *src)
 
 /******************************************************************************
  *                                                                            *
- * Function: dyn_escape_param                                                 *
+ * Function: zbx_dyn_escape_string                                            *
  *                                                                            *
- * Purpose: escaping source string for using in quoted key parameters         *
+ * Purpose: escape characters in the source string                            *
  *                                                                            *
- * Parameters: src - [IN] source string                                       *
+ * Parameters: src - [IN] null terminated source string                       *
+ *             charlist - [IN] null terminated to-be-escaped character list   *
  *                                                                            *
- * Return value: escaped string                                               *
+ * Return value: the escaped string                                           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-char	*dyn_escape_param(const char *src)
+char	*zbx_dyn_escape_string(const char *src, const char *charlist)
 {
 	size_t	sz;
 	char	*d, *dst = NULL;
 
-	sz = get_escape_param_len(src);
+	sz = zbx_get_escape_string_len(src, charlist);
 
-	dst = malloc(sz);
+	dst = zbx_malloc(dst, sz);
 
 	for (d = dst; '\0' != *src; src++)
 	{
-		if ('"' == *src)
+		if (NULL != strchr(charlist, *src))
 			*d++ = '\\';
+
 		*d++ = *src;
 	}
 
@@ -2927,8 +2899,6 @@ int	zbx_strlen_utf8(const char *text)
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 char	*zbx_replace_utf8(const char *text)
 {
@@ -2984,8 +2954,6 @@ bad:
  * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_replace_invalid_utf8(char *text)
@@ -3257,8 +3225,6 @@ void	zbx_strarr_add(char ***arr, const char *entry)
  * Return value:                                                              *
  *                                                                            *
  * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_strarr_free(char **arr)

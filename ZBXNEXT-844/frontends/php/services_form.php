@@ -167,7 +167,7 @@ if(isset($_REQUEST['saction'])){
 		show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 	if($result){
-		zbx_add_post_js("closeform('services.php');");
+		zbx_add_post_js("closeForm('services.php');");
 		include_once('include/page_footer.php');
 	}
 }

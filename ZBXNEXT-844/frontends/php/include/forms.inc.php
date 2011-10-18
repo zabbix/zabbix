@@ -1788,9 +1788,8 @@
 		if(isset($limited))
 			$btnSelect = null;
 		else
-			$btnSelect = new CButton('btn1',S_SELECT,
-				"return PopUp('popup.php?dstfrm=".$frmItem->getName().
-				"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=".$type."');",
+			$btnSelect = new CButton('btn1', S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmItem->getName()."&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype='+$('type')[$('type').selectedIndex].value);",
 				'T');
 
 		$frmItem->addRow(S_KEY, array(new CTextBox('key',$key,40,$limited), $btnSelect));
@@ -5297,6 +5296,7 @@ JAVASCRIPT;
 				text1.className = "biginput";
 				text1.setAttribute("size",30);
 				text1.setAttribute("placeholder","{$MACRO}");
+				text1.setAttribute("style", "text-transform:uppercase;");
 				td2.appendChild(text1);
 				td2.appendChild(document.createTextNode(" "));
 
@@ -5328,16 +5328,30 @@ JAVASCRIPT;
 		foreach($macros as $macroid => $macro){
 			$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30);
 			$text1->setAttribute('placeholder', '{$MACRO}');
+			$text1->setAttribute('style', 'text-transform:uppercase;');
 			$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40);
 			$text2->setAttribute('placeholder', '<'.S_VALUE.'>');
 			$span = new CSpan(RARR);
 			$span->addStyle('vertical-align:top;');
+			$checkbox = new CCheckBox();
+			if (empty($macro['macro']) || (!empty($macro['type']) && $macro['type'] == 'new')) {
+				$checkbox->setAttribute('value', 'no');
+			}
 
-			$macros_tbl->addRow(array(new CCheckBox(), $text1, $span, $text2));
+			$macros_tbl->addRow(array($checkbox, $text1, $span, $text2));
 		}
 
-
-		$script = '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); if (typeof(deleted_macro_cnt) == \'undefined\') deleted_macro_cnt=1; else deleted_macro_cnt++; });';
+		$script = '	$$("#tbl_macros input:checked").each(function(obj) {
+						$(obj.parentNode.parentNode).remove();
+						if ($(obj).value == \'yes\') {
+							if (typeof(deleted_macro_cnt) == \'undefined\') {
+								deleted_macro_cnt = 1;
+							}
+							else {
+								deleted_macro_cnt++;
+							}
+						}
+					});';
 		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED, $script);
 		$delete_btn->setType('button');
 

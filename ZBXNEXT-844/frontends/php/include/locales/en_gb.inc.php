@@ -838,6 +838,7 @@
 	'S_MACRO_TOO_LONG'=>				'Macro name is too long, should not exceed 64 chars.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Macro value is too long, should not exceed 255 chars.',
 	'S_EMPTY_MACRO_VALUE'=>				'Empty macro value',
+	'S_DUPLICATED_MACRO_FOUND'=>		'More than one macro with same name found:',
 	'S_MACROS_UPDATED'=>				'Macros updated',
 	'S_CANNOT_UPDATE_MACROS'=>				'Cannot update macros',
 	'S_CANNOT_ADD_MACRO'=>				'Cannot add macro',
@@ -1149,6 +1150,7 @@
 	'S_UPDATE_EXISTING_NON_LINKED_ITEMS'=>			'update existing non linked items',
 	'S_COPY'=>						'Copy',
 	'S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE'=>			'Show items with description like',
+	'S_SHOW_ITEMS_WITHOUT_DATA'=>				'Show items without data',
 	'S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q'=>	'History clearing can take a long time. Continue?',
 	'S_MASS_UPDATE'=>					'Mass update',
 	'S_SEARCH'=>						'Search',
@@ -1636,9 +1638,6 @@
 
 
 //	services.php
-	'S_AVERAGE_PROBLEM'=>			'Average problem',
-	'S_SERIOUS_PROBLEM'=>			'Serious problem',
-	'S_MINOR_PROBLEM'=>			'Minor problem',
 	'S_ROOT_SMALL'=>			'root',
 	'S_IT_SERVICE'=>			'IT service',
 	'S_IT_SERVICES'=>			'IT services',
@@ -2479,7 +2478,7 @@
 	'S_KEY_CANNOT_BE_EMPTY' => 'Key cannot be empty.',
 	'S_NO_KEY_ID_PROVIDED' => 'No key id provided.',
 	'S_NO_ITEM_KEY_PROVIDED' => 'Invalid item key format.',
-	'S_SIMPLE_CHECK_KEY_CANNOT_CONTAIN' => 'Simple check key cannot have parameters in [].',
+	'S_INCORRECT_SIMPLE_CHECK_PARAMETER' => 'Incorrect simple check parameter.',
 	'S_INCORRECT_SYNTAX_NEAR' => 'Incorrect syntax near \'%1$s\'',
 	'S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS' => 'Incorrect usage of bracket symbols. \'%s\' found after final bracket.',
 	'S_INVALID_KEY_FORMAT' => 'Invalid item key format.',
