@@ -19,6 +19,7 @@ create/data/create_data_sql/data_sql_blacklistbyval.txt -text
 create/data/create_data_sql/data_sql_blacklistbyval_ref.txt -text
 create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
+create/images/README.dev -text
 create/images/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
 create/images/elements/Crypto-router.svg -text svneol=native#image/svg%2Bxml
 create/images/elements/Crypto-router_symbol.svg -text svneol=native#image/svg%2Bxml
@@ -74,6 +75,7 @@ create/images/old_images/Phone.png -text svneol=unset#image/png
 create/images/old_images/Phone_small.png -text svneol=unset#image/png
 create/images/old_images/Printer.png -text svneol=unset#image/png
 create/images/old_images/Printer_small.png -text svneol=unset#image/png
+create/images/old_images/README -text
 create/images/old_images/Router.png -text svneol=unset#image/png
 create/images/old_images/Router_small.png -text svneol=unset#image/png
 create/images/old_images/Satellite.png -text svneol=unset#image/png
