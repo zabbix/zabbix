@@ -237,8 +237,6 @@ var chkbxRange = {
 				}
 
 				if (flag) {
-					this.startbox = null;
-					this.startbox_name = null;
 					this.setGo();
 					return true;
 				}
@@ -250,8 +248,6 @@ var chkbxRange = {
 							}
 
 							if (obj.name == chkbx_list[i].name) {
-								this.startbox = null;
-								this.startbox_name = null;
 								this.setGo();
 								return true;
 							}
@@ -265,11 +261,8 @@ var chkbxRange = {
 			}
 			this.setGo();
 		}
-		else {
-			this.startbox = obj;
-			this.startbox_name = obj_name;
-		}
-
+		this.startbox = obj;
+		this.startbox_name = obj_name;
 	},
 
 	checkAll: function(name, value) {
@@ -349,14 +342,14 @@ var chkbxRange = {
 		}
 	},
 
-	submitGo: function(e) {
+	submitGo: function(e){
 		e = e || window.event;
 
 		if (this.pageGoCount > 0) {
 			var goSelect = $('go');
 			var confirmText = goSelect.options[goSelect.selectedIndex].getAttribute('confirm');
 
-			if (!confirm(confirmText)) {
+			if (!is_null(confirmText) && !confirm(confirmText)) {
 				Event.stop(e);
 				return false;
 			}
