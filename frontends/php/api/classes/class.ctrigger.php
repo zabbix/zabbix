@@ -611,8 +611,17 @@ class CTrigger extends CZBXAPI{
 		}
 
 // limit
-		if(zbx_ctype_digit($options['limit']) && $options['limit']){
-			$sql_parts['limit'] = $options['limit'];
+		$postLimit = false;
+		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
+			// to make limit work correctly with truncating filters (skipDependent, withLastEventUnacknowledged)
+			// do select without limit, truncate result and then slice excess data
+			if (!is_null($options['skipDependent']) || !is_null($options['withLastEventUnacknowledged'])) {
+				$postLimit = $options['limit'];
+				$sql_parts['limit'] = '';
+			}
+			else {
+				$sql_parts['limit'] = $options['limit'];
+			}
 		}
 //---------------
 
@@ -787,6 +796,12 @@ Copt::memoryPick();
 				}
 
 			}
+		}
+
+		// limit selected triggers after result set is truncated by previous filters (skipDependent, withLastEventUnacknowledged)
+		if ($postLimit) {
+			$result = array_slice($result, 0, $postLimit, true);
+			$triggerids = array_slice($triggerids, 0, $postLimit, true);
 		}
 
 // Adding Objects
