@@ -355,7 +355,7 @@ include_once('include/page_header.php');
 	//		$screen = get_slideshow($elementid, 0);
 	//		$element = get_screen($screen['screenid'],2,$effectiveperiod);
 
-			$slides_wdgt->addItem(new CSpan(S_LOADING_P, 'textcolorstyles'));
+			$slides_wdgt->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
 
 
 			$jsmenu = new CPUMenu(null, 170);

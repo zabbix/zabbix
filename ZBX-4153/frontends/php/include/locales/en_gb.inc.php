@@ -84,9 +84,6 @@
 
 //	dicoveryconf.php
 	'S_CREATED_SMALL' => _('created'),
-	'S_DISCOVERY_STATUS'=>			_('Discovery status'),
-
-
 	'S_DISCOVERY_RULE'=>			_('Discovery rule'),
 	'S_DISCOVERY'=>				_('Discovery'),
 	'S_CONFIGURATION_OF_DISCOVERY'=>	_('Configuration of discovery'),
@@ -244,9 +241,6 @@
 	'S_BULK_ACKNOWLEDGE'=>			_('Bulk acknowledge'),
 	'S_ACKNOWLEDGE_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
-//	acknow.inc.php
-	'S_ACKNOWINC_BY_EVENTS_DATE_FORMAT'=>	_('d M Y H:i:s'),
-
 //	actionconf.php
 	'S_CONFIGURATION_OF_ACTIONS'=>		_('Configuration of actions'),
 	'S_FILTER'=>				_('Filter'),
@@ -281,7 +275,6 @@
 	'S_SHOW_ALL'=>				_('Show all'),
 	'S_TIME'=>				_('Time'),
 	'S_STATUS'=>				_('Status'),
-	'S_DURATION'=>				_('Duration'),
 	'S_TRUE_BIG'=>				_('TRUE'),
 	'S_FALSE_BIG'=>				_('FALSE'),
 	'S_UNKNOWN_BIG'=>			_('UNKNOWN'),
@@ -827,9 +820,6 @@
 	'S_LOST_BIG'=>		_('LOST'),
 
 //	events.inc.php
-	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			_('d M Y H:i:s'),
-	'S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT'=>		_('d M Y H:i:s'),
-	'S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT'=>		_('d M Y H:i:s'),
 	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	latest.php
@@ -905,35 +895,21 @@
 //	Menu
 
 //	dashboard.php
-	'S_DASHBOARD'=>				_('Dashboard'),
-	'S_DASHBOARD_BIG'=>			_('PERSONAL DASHBOARD'),
 	'S_AGE'=>				_('Age'),
-	'S_ISSUE'=>				_('Issue'),
-	'S_SYSTEM_STATUS'=>			_('System status'),
-	'S_HOST_STATUS_STATUS'=>			_('Host status'),
-	'S_WITHOUT_PROBLEMS' =>				_('Without problems'),
-	'S_WITH_PROBLEMS' =>				_('With problems'),
-	'S_LAST_20_ISSUES'=>			_('Last 20 issues'),
 	'S_FAVOURITES'=>			_('Favourites'),
 	'S_MENU'=>				_('Menu'),
 	'S_RESET'=>				_('Reset'),
 	'S_MAXIMIZE'=>				_('Maximize'),
 	'S_MINIMIZE'=>				_('Minimize'),
-	'S_LOADING_P'=>				_('Loading...'),
 	'S_OF' => _('of'),
-	'S_ZABBIX_SERVER_IP_OR_PORT_IS_NOT_SET' => _('Zabbix server ip or port is not set!'),
 
 // dashconf.php
 	'S_DASHBOARD_CONFIGURATION' =>	_('Dashboard configuration'),
 	'S_DASHBOARD_CONFIGURATION_BIG' =>	_('DASHBOARD CONFIGURATION'),
-	'S_CONFIGURE' => _('Configure'),
 	'S_SELECTED' => _('Selected'),
 	'S_SHOW_HOSTS_IN_MAINTENANCE' => _('Show hosts in maintenance'),
 	'S_TRIGGERS_WITH_SEVERITY' => _('Triggers with severity'),
 	'S_DASHBOARD_FILTER' => _('Dashboard filter'),
-	'S_FAVOURITE_GRAPHS' => _('Favourite graphs'),
-	'S_FAVOURITE_MAPS' => _('Favourite maps'),
-	'S_FAVOURITE_SCREENS' => _('Favourite screens'),
 	'S_O_ALL' => _('All'),
 	'S_O_UNACKNOWLEDGED_ONLY' => _('Unacknowledged only'),
 	'S_O_SEPARATED' => _('Separated'),
@@ -959,20 +935,12 @@
 	'S_STATUS_OF_ZABBIX'=>			_('Status of Zabbix'),
 	'S_STATUS_OF_ZABBIX_BIG'=>		_('STATUS OF ZABBIX'),
 	'S_VALUE'=>				_('Value'),
-	'S_ZABBIX_SERVER_IS_RUNNING'=>		_('Zabbix server is running'),
 	'S_VALUES_STORED'=>			_('Values stored'),
 	'S_TRENDS_STORED'=>			_('Trends stored'),
-	'S_NUMBER_OF_TRIGGERS'=>		_('Number of triggers (enabled/disabled)[problem/unknown/ok]'),
 	'S_NUMBER_OF_TRIGGERS_SHORT'=>		_('Triggers (e/d)[p/u/o]'),
-	'S_NUMBER_OF_TRIGGERS_TOOLTIP'=>	_('Only triggers assigned to enabled hosts and depending on enabled items are counted'),
-	'S_NUMBER_OF_ITEMS'=>			_('Number of items (monitored/disabled/not supported)'),
 	'S_NUMBER_OF_ITEMS_SHORT'=>		_('Items (m/d/n)'),
-	'S_NUMBER_OF_ITEMS_TOOLTIP'=>		_('Only items assigned to enabled hosts are counted'),
-	'S_NUMBER_OF_USERS'=>			_('Number of users (online)'),
 	'S_NUMBER_OF_USERS_SHORT'=>		_('Users (online)'),
-	'S_NUMBER_OF_HOSTS'=>			_('Number of hosts (monitored/not monitored/templates)'),
 	'S_NUMBER_OF_HOSTS_SHORT'=>		_('Hosts (m/n/t)'),
-	'S_REQUIRED_SERVER_PERFORMANCE_NVPS'=>	_('Required server performance, new values per second'),
 	'S_YES'=>				_('Yes'),
 	'S_NO'=>				_('No'),
 	'S_RUNNING'=>				_('running'),
@@ -1300,9 +1268,7 @@
 	'S_SHOW_DETAILS'=>			_('Show details'),
 	'S_FILTER_BY_NAME'=>				_('Filter by name'),
 	'S_TRIGGERS_BIG'=>			_('TRIGGERS'),
-	'S_LAST_CHANGE'=>			_('Last change'),
 	'S_COMMENTS'=>				_('Comments'),
-	'S_ACKNOWLEDGED'=>			_('Acknowledged'),
 	'S_ACK'=>				_('Ack'),
 	'S_NEVER'=>				_('Never'),
 	'S_ACKNOWLEDGE_STATUS' => _('Acknowledge status'),
@@ -1369,9 +1335,6 @@
 //	index.php
 	'S_ZABBIX_BIG'=>			_('ZABBIX'),
 
-//	hostinventories.php
-	'S_HOST_INVENTORIES'=>			_('Host inventories'),
-
 //	hostinventoriesoverview.php
 	'S_HOST_INVENTORY_OVERVIEW'=>	_('Host inventory overview'),
 
@@ -1392,10 +1355,6 @@
 
 //	popup_period.php
 	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
-
-//	blocks.inc.php
-	'S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT'=>		_('H:i:s'),
-	'S_BLOCKS_LATEST_ISSUES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
 //	forms.inc.php
 	'S_EXPRESSION_PART_ERROR'=>			_('Error'),
