@@ -263,7 +263,6 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 #ifdef HAVE_ORACLE
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 7, "begin\n");
 #endif
-
 #ifdef HAVE_MULTIROW_INSERT
 		begin_history_sql(sql, sql_allocated, sql_offset, table);
 #endif
@@ -352,9 +351,9 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 #endif
 		if (ZBX_DB_OK <= DBexecute("%s", *sql))
 			res = SUCCEED;
-		(*sql_offset) = 0;
+		*sql_offset = 0;
 
-		if (0 != lastrecord && 0 != ack_eventids->values_num)
+		if (SUCCEED == res && 0 != lastrecord && 0 != acknowledges && 0 != ack_eventids->values_num)
 		{
 			zbx_vector_uint64_sort(ack_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_vector_uint64_uniq(ack_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -366,9 +365,9 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 			DBadd_condition_alloc(sql, sql_allocated, sql_offset,
 					"eventid", ack_eventids->values, ack_eventids->values_num);
 
-			if (ZBX_DB_OK <= DBexecute("%s", *sql))
-				res = SUCCEED;
-			(*sql_offset) = 0;
+			if (ZBX_DB_OK > DBexecute("%s", *sql))
+				res = FAIL;
+			*sql_offset = 0;
 		}
 	}
 	else
@@ -487,7 +486,7 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 #endif
 		if (DBexecute("%s", *sql) >= ZBX_DB_OK)
 			res = SUCCEED;
-		(*sql_offset) = 0;
+		*sql_offset = 0;
 	}
 	else
 		res = SUCCEED;
@@ -567,7 +566,7 @@ int	node_history(char *data, size_t datalen)
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* nodeid */
 			nodeid=atoi(buffer);
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* tablename */
-			
+
 			if (FAIL == is_direct_slave_node(sender_nodeid))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data from node %d"
@@ -618,11 +617,7 @@ int	node_history(char *data, size_t datalen)
 			if (NULL != newline)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received %s from node %d for node %d datalen " ZBX_FS_SIZE_T,
-					CONFIG_NODEID,
-					buffer,
-					sender_nodeid,
-					nodeid,
-					(zbx_fs_size_t)datalen);
+					CONFIG_NODEID, buffer, sender_nodeid, nodeid, (zbx_fs_size_t)datalen);
 			}
 			firstline = 0;
 			sql1_offset = 0;
@@ -637,11 +632,20 @@ int	node_history(char *data, size_t datalen)
 			}
 			else
 			{
-				res = process_record(&sql1, &sql1_allocated, &sql1_offset, sender_nodeid, nodeid, table, r, newline ? 0 : 1, acknowledges, &ack_eventids);
+				res = process_record(&sql1, &sql1_allocated, &sql1_offset, sender_nodeid,
+						nodeid, table, r, newline ? 0 : 1, acknowledges, &ack_eventids);
+
 				if (SUCCEED == res && 0 != history)
-					res = process_items(&sql2, &sql2_allocated, &sql2_offset, sender_nodeid, nodeid, table, r, newline ? 0 : 1);
+				{
+					res = process_items(&sql2, &sql2_allocated, &sql2_offset, sender_nodeid,
+							nodeid, table, r, newline ? 0 : 1);
+				}
+
 				if (SUCCEED == res && NULL != table_sync && 0 != CONFIG_MASTER_NODEID)
-					res = process_record(&sql3, &sql3_allocated, &sql3_offset, sender_nodeid, nodeid, table_sync, r, newline ? 0 : 1, 0, NULL);
+				{
+					res = process_record(&sql3, &sql3_allocated, &sql3_offset, sender_nodeid,
+							nodeid, table_sync, r, newline ? 0 : 1, 0, NULL);
+				}
 			}
 		}
 
