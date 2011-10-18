@@ -1145,7 +1145,7 @@ include_once('include/page_header.php');
 		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$apps = API::Application()->get($options);
-		morder_result($apps, array('host', 'name'));
+		ArraySorter::sort($apps, array('host', 'name'));
 
 		foreach($apps as $app){
 			$name = new CSpan($app['name'], 'link');

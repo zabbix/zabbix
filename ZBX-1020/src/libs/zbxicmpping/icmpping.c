@@ -80,10 +80,10 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	FILE		*f;
 	char		*c, *c2, params[64];
 	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN];
-	int		i;
+	size_t		offset;
 	ZBX_FPING_HOST	*host;
 	double		sec;
-	int 		ret = NOTSUPPORTED;
+	int 		i, ret = NOTSUPPORTED;
 
 #ifdef HAVE_IPV6
 	int		family;
@@ -137,13 +137,13 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		fping_existence |= FPING6_EXISTS;
 #endif	/* HAVE_IPV6 */
 
-	i = zbx_snprintf(params, sizeof(params), "-q -C%d", count);
+	offset = zbx_snprintf(params, sizeof(params), "-q -C%d", count);
 	if (0 != interval)
-		i += zbx_snprintf(params + i, sizeof(params) - i, " -p%d", interval);
+		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -p%d", interval);
 	if (0 != size)
-		i += zbx_snprintf(params + i, sizeof(params) - i, " -b%d", size);
+		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -b%d", size);
 	if (0 != timeout)
-		i += zbx_snprintf(params + i, sizeof(params) - i, " -t%d", timeout);
+		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -t%d", timeout);
 
 #ifdef HAVE_IPV6
 	strscpy(params6, params);
@@ -157,7 +157,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			if (0 == source_ip_checked)
 				get_source_ip_option(CONFIG_FPING_LOCATION, &source_ip_option, &source_ip_checked);
 			if (NULL != source_ip_option)
-				zbx_snprintf(params + i, sizeof(params) - i, " %s%s", source_ip_option, CONFIG_SOURCE_IP);
+				zbx_snprintf(params + offset, sizeof(params) - offset,
+						" %s%s", source_ip_option, CONFIG_SOURCE_IP);
 		}
 
 		if (0 != (fping_existence & FPING6_EXISTS))
@@ -165,13 +166,15 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			if (0 == source_ip6_checked)
 				get_source_ip_option(CONFIG_FPING6_LOCATION, &source_ip6_option, &source_ip6_checked);
 			if (NULL != source_ip6_option)
-				zbx_snprintf(params6 + i, sizeof(params6) - i, " %s%s", source_ip6_option, CONFIG_SOURCE_IP);
+				zbx_snprintf(params6 + offset, sizeof(params6) - offset,
+						" %s%s", source_ip6_option, CONFIG_SOURCE_IP);
 		}
 #else
 		if (0 == source_ip_checked)
 			get_source_ip_option(CONFIG_FPING_LOCATION, &source_ip_option, &source_ip_checked);
 		if (NULL != source_ip_option)
-			zbx_snprintf(params + i, sizeof(params) - i, " %s%s", source_ip_option, CONFIG_SOURCE_IP);
+			zbx_snprintf(params + offset, sizeof(params) - offset,
+					" %s%s", source_ip_option, CONFIG_SOURCE_IP);
 #endif	/* HAVE_IPV6 */
 	}
 
@@ -208,13 +211,15 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	}
 	else
 	{
-		i = 0;
+		offset = 0;
 
 		if (0 != (fping_existence & FPING_EXISTS))
-			i += zbx_snprintf(tmp + i, sizeof(tmp) - i, "%s %s 2>&1 <%s;", CONFIG_FPING_LOCATION, params, filename);
+			offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
+					"%s %s 2>&1 <%s;", CONFIG_FPING_LOCATION, params, filename);
 
 		if (0 != (fping_existence & FPING6_EXISTS))
-			i += zbx_snprintf(tmp + i, sizeof(tmp) - i, "%s %s 2>&1 <%s;", CONFIG_FPING6_LOCATION, params6, filename);
+			zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
+					"%s %s 2>&1 <%s;", CONFIG_FPING6_LOCATION, params6, filename);
 	}
 #else
 	zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s", CONFIG_FPING_LOCATION, params, filename);

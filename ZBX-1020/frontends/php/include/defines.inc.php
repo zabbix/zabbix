@@ -181,6 +181,7 @@ define('AUDIT_RESOURCE_MAINTENANCE',	27);
 define('AUDIT_RESOURCE_REGEXP',			28);
 define('AUDIT_RESOURCE_MACRO',			29);
 define('AUDIT_RESOURCE_TEMPLATE',		30);
+define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE', 31);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -814,6 +815,7 @@ define('SEC_PER_YEAR', 	(365*SEC_PER_DAY));
 // input fields
 define('ZBX_TEXTBOX_STANDARD_SIZE', 50);
 define('ZBX_TEXTBOX_SMALL_SIZE', 25);
+define('ZBX_TEXTAREA_STANDARD_SIZE', 47);
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {

@@ -31,7 +31,7 @@ class API_JSON_APIInfo extends CZabbixTest
 		$result = $this->api_acall(
 			'apiinfo.version',
 			array(),
-			&$debug);
+			$debug);
 
 		$this->assertTrue(isset($result['result']),"$debug");
 		$this->assertSame($result['result'],"1.2");
@@ -42,7 +42,7 @@ class API_JSON_APIInfo extends CZabbixTest
 		$result = $this->api_call(
 			'apiinfo.version',
 			array(),
-			&$debug);
+			$debug);
 
 		$this->assertTrue(isset($result['result']),"$debug");
 		$this->assertSame($result['result'],"1.2");
@@ -56,7 +56,7 @@ class API_JSON_APIInfo extends CZabbixTest
 			"params":[],
 			"id":2
 		}';
-		$result = $this->api_call_raw($json, &$debug);
+		$result = $this->api_call_raw($json, $debug);
 
 		$this->assertTrue(isset($result['result']),"$debug");
 	}

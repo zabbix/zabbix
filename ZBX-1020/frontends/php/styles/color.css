@@ -71,6 +71,7 @@ a.on:hover 		{ color:#CC7777; }
 a.on:active 	{ color:#DC0000; }
 
 table.tableinfo { color: #1f1f1f; background-color: #FFF; }
+table.tableinfo caption { background-color: #CED7DF; }
 table.tableinfo tr.header td { background-color:#CED7DF; }
 table.tableinfo tr.header td.hover_grey { background-color:#BFCBD5; }
 table.tableinfo tr.header td.hover_grey:hover { color: #000000; background-color:#B3BCD7; }

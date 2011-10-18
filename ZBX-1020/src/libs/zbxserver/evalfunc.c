@@ -1973,7 +1973,8 @@ static void	add_value_suffix_uptime(char *value, size_t max_len)
 	const char	*__function_name = "add_value_suffix_uptime";
 
 	double	secs, days;
-	int	hours, mins, offset = 0;
+	size_t	offset = 0;
+	int	hours, mins;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2022,7 +2023,8 @@ static void	add_value_suffix_s(char *value, size_t max_len)
 	const char	*__function_name = "add_value_suffix_s";
 
 	double	secs, n;
-	int	n_unit = 0, offset = 0;
+	size_t	offset = 0;
+	int	n_unit = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 

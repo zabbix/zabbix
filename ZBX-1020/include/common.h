@@ -806,14 +806,14 @@ time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
 u_char	zbx_hex2num(char c);
-int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen);
-int     zbx_hex2binary(char *io);
+size_t	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *olen);
+size_t	zbx_hex2binary(char *io);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
 #ifdef HAVE_POSTGRESQL
-int	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen);
-int	zbx_pg_unescape_bytea(u_char *io);
+size_t	zbx_pg_escape_bytea(const u_char *input, size_t ilen, char **output, size_t *olen);
+size_t	zbx_pg_unescape_bytea(u_char *io);
 #endif
-int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
+size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char separator);
 int	str_in_list(const char *list, const char *value, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
 void	zbx_strarr_init(char ***arr);
@@ -845,21 +845,22 @@ double	zbx_current_time();
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #	define zbx_snprintf(str, count, fmt, ...) __zbx_zbx_snprintf(str, count, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
-#	define zbx_snprintf_alloc(str, alloc_len, offset, max_len, fmt, ...) \
-       			__zbx_zbx_snprintf_alloc(str, alloc_len, offset, max_len, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define zbx_snprintf_alloc(str, alloc_len, offset, fmt, ...) \
+       			__zbx_zbx_snprintf_alloc(str, alloc_len, offset, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define zbx_error __zbx_zbx_error
 #	define zbx_snprintf __zbx_zbx_snprintf
 #	define zbx_snprintf_alloc __zbx_zbx_snprintf_alloc
 #endif
 void	__zbx_zbx_error(const char *fmt, ...);
-int	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
-void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...);
+size_t	__zbx_zbx_snprintf(char *str, size_t count, const char *fmt, ...);
+void	__zbx_zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...);
 
-int	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
+size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 
-void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src);
-void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src);
+void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
+void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
+void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
@@ -878,7 +879,7 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 #endif
 char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...);
 char	*zbx_strdcat(char *dest, const char *src);
-char	* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
+char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...);
 
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
