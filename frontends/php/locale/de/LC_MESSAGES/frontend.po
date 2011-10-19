@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-19 11:49+0300\n"
-"PO-Revision-Date: 2011-10-10 18:41+0200\n"
+"POT-Creation-Date: 2011-10-19 11:56+0300\n"
+"PO-Revision-Date: 2011-10-12 12:18+0200\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
@@ -5438,7 +5438,7 @@ msgstr "LDAP-Authentifizierung"
 
 #: include/views/administration.authentication.edit.php:57
 msgid "LDAP host"
-msgstr ""
+msgstr "LDAP-Server"
 
 #: authentication.php:132
 msgid "LDAP login successful."
@@ -7509,7 +7509,7 @@ msgstr ""
 
 #: api/classes/class.cuser.php:852
 msgid "Probably php-ldap module is missing"
-msgstr "PHP-LDAP-Modul fehlt womöglich"
+msgstr "php-ldap-Modul fehlt womöglich"
 
 #: include/locales/en_gb.inc.php:893
 #: include/views/js/configuration.sysmaps.js.php:127

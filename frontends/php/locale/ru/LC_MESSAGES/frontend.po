@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-19 11:49+0300\n"
-"PO-Revision-Date: 2011-10-11 19:42+0200\n"
+"POT-Creation-Date: 2011-10-19 11:56+0300\n"
+"PO-Revision-Date: 2011-10-19 05:42+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -593,7 +593,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:287
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "По крайней мере один из MySQL, PostgreSQL, Oracle, SQLite3 или IBM DB2 должен поддерживаться"
 
 #: include/locales/en_gb.inc.php:1229 include/menu.inc.php:260
 msgid "Audit"
@@ -643,7 +643,7 @@ msgstr "Авторегистрация"
 
 #: include/views/administration.users.edit.php:124
 msgid "Auto-login"
-msgstr ""
+msgstr "Авто-вход"
 
 #: include/views/administration.users.edit.php:125
 msgid "Auto-logout (min 90 seconds)"
@@ -849,11 +849,11 @@ msgstr "НАСТРОЙКА ТРИГГЕРОВ"
 
 #: include/views/administration.users.edit.php:30
 msgid "CONFIGURATION OF USER"
-msgstr ""
+msgstr "НАСТРОЙКА ПОЛЬЗОВАТЕЛЯ"
 
 #: include/views/administration.usergroups.edit.php:23
 msgid "CONFIGURATION OF USER GROUP"
-msgstr ""
+msgstr "НАСТРОЙКА ГРУППЫ ПОЛЬЗОВАТЕЛЯ"
 
 #: include/views/administration.usergroups.list.php:33
 #: include/views/administration.users.list.php:33
@@ -878,7 +878,7 @@ msgstr "Вычисляемое"
 
 #: include/views/administration.usergroups.edit.php:114
 msgid "Calculated permissions"
-msgstr ""
+msgstr "Результирующие права доступа"
 
 #: include/locales/en_gb.inc.php:538
 msgid "Callback"
@@ -1105,7 +1105,7 @@ msgstr "Не удалось скопировать элементы"
 #: include/triggers.inc.php:652
 #, php-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Не удалось скопировать триггер \"%1$s:%2$s\", потому что он содержит несколько узлов сети в выражении."
 
 #: include/db.inc.php:45
 msgid "Cannot create another database connection."
@@ -1189,7 +1189,7 @@ msgstr "Не удалось удалить изображение"
 
 #: api/classes/class.chost.php:1955
 msgid "Cannot delete inventory."
-msgstr ""
+msgstr "Не удалось удалить инвентарные данные."
 
 #: include/locales/en_gb.inc.php:603
 msgid "Cannot delete item"
@@ -1281,7 +1281,7 @@ msgstr "Не удалось удалить триггер"
 
 #: api/classes/class.citem.php:1114
 msgid "Cannot delete trigger."
-msgstr ""
+msgstr "Не удалось удалить триггер."
 
 #: include/locales/en_gb.inc.php:1122
 msgid "Cannot delete triggers"
@@ -1320,7 +1320,7 @@ msgstr "Не удалось найти группу узлов сети"
 #: include/export.inc.php:707
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Не удалось найти назначение иконки \"%1$s\" используемой в экспортируемой карте сети \"%2$s\"."
 
 #: include/locales/en_gb.inc.php:764
 msgid "Cannot find image"
@@ -1500,7 +1500,7 @@ msgstr "Не удалось обновить правило обнаружени
 
 #: usergrps.php:225
 msgid "Cannot update frontend access"
-msgstr ""
+msgstr "Не удалось обновить доступ к веб-интерфейсу"
 
 #: include/locales/en_gb.inc.php:401
 msgid "Cannot update graph"
@@ -1528,7 +1528,7 @@ msgstr "Не удалось обновить узлы сети"
 
 #: config.php:737
 msgid "Cannot update icon map"
-msgstr ""
+msgstr "Не удалось обновить назначение иконки"
 
 #: config.php:156 include/export.inc.php:670
 msgid "Cannot update image"
@@ -1561,7 +1561,7 @@ msgstr "Не удалось обновить карту сети \"%s\"."
 
 #: media_types.php:87
 msgid "Cannot update media type"
-msgstr ""
+msgstr "Не удалось обновить способ оповещения"
 
 #: include/locales/en_gb.inc.php:754
 msgid "Cannot update network map"
@@ -1703,7 +1703,7 @@ msgstr "Закольцовывающая ссылка не может быть �
 #: api/classes/class.cmapelement.php:553
 #, php-format
 msgid "Circular link cannot be created for map element \"%s\"."
-msgstr ""
+msgstr "Закольцовывающая связь не может быть создана для элемента карты сети \"%s\"."
 
 #: include/locales/en_gb.inc.php:1243
 msgid "Clear"
@@ -1813,7 +1813,7 @@ msgstr "Сравнение значений для нескольких пери
 
 #: include/views/administration.usergroups.edit.php:113
 msgid "Composing permissions"
-msgstr ""
+msgstr "Компоновка прав доступа"
 
 #: include/locales/en_gb.inc.php:210
 msgid "Condition"
@@ -1976,7 +1976,7 @@ msgstr "Создать группу"
 
 #: config.php:796
 msgid "Create icon map"
-msgstr ""
+msgstr "Создать назначение иконки"
 
 #: config.php:787
 msgid "Create image"
@@ -1992,15 +1992,15 @@ msgstr "Создать период обслуживания"
 
 #: include/locales/en_gb.inc.php:748
 msgid "Create map"
-msgstr ""
+msgstr "Создать карту сети"
 
 #: include/views/administration.mediatypes.list.php:28
 msgid "Create media type"
-msgstr ""
+msgstr "Создать способ оповещения"
 
 #: include/locales/en_gb.inc.php:556
 msgid "Create proxy"
-msgstr ""
+msgstr "Создать прокси"
 
 #: include/locales/en_gb.inc.php:51
 msgid "Create rule"
@@ -2012,7 +2012,7 @@ msgstr "Создать сценарий"
 
 #: include/locales/en_gb.inc.php:978
 msgid "Create screen"
-msgstr ""
+msgstr "Создать комплексный экран"
 
 #: include/views/administration.script.list.php:25
 msgid "Create script"
@@ -2020,7 +2020,7 @@ msgstr "Создать скрипт"
 
 #: include/locales/en_gb.inc.php:979
 msgid "Create slide show"
-msgstr ""
+msgstr "Создать слайд шоу"
 
 #: include/locales/en_gb.inc.php:1140 include/locales/en_gb.inc.php:1485
 msgid "Create trigger"
@@ -2028,7 +2028,7 @@ msgstr "Создать триггер для журнала"
 
 #: include/views/administration.users.list.php:32
 msgid "Create user"
-msgstr ""
+msgstr "Создать пользователя"
 
 #: config.php:790
 msgid "Create value map"
@@ -2037,57 +2037,57 @@ msgstr "Создать преобразование значения"
 #: include/validate.inc.php:453
 #, php-format
 msgid "Critical error. Field [%1$s] contains Multibyte chars"
-msgstr ""
+msgstr "Критическая ошибка. Поле [%1$s] содержит Мультибайтовые символы"
 
 #: include/validate.inc.php:514
 #, php-format
 msgid "Critical error. Field [%1$s] is mandatory"
-msgstr ""
+msgstr "Критическая ошибка. Поле [%1$s] является обязательным"
 
 #: include/validate.inc.php:359
 #, php-format
 msgid "Critical error. Field [%1$s] is not IP"
-msgstr ""
+msgstr "Критическая ошибка. Поле [%1$s] не является IP адресом"
 
 #: include/validate.inc.php:373
 #, php-format
 msgid "Critical error. Field [%1$s] is not IP range"
-msgstr ""
+msgstr "Критическая ошибка. Поле [%1$s] не является диапазоном IP адресов"
 
 #: include/validate.inc.php:396
 #, php-format
 msgid "Critical error. Field [%1$s] is not PORT range"
-msgstr ""
+msgstr "Критическая ошибка. Поле [%1$s] не является диапазоном портов"
 
 #: include/validate.inc.php:465
 #, php-format
 msgid "Critical error. Field [%1$s] is not a colour"
-msgstr ""
+msgstr "Критическая ошибка. Поле [%1$s] не является цветом"
 
 #: include/validate.inc.php:431
 #, php-format
 msgid "Critical error. Field [%1$s] is not double"
-msgstr ""
+msgstr "Критическая ошибка. Поле [%1$s] не является дробным числом"
 
 #: include/validate.inc.php:420
 #, php-format
 msgid "Critical error. Field [%1$s] is not integer"
-msgstr ""
+msgstr "Критическая ошибка. Поле [%1$s] не является целым числом"
 
 #: include/validate.inc.php:407
 #, php-format
 msgid "Critical error. Field [%1$s] is not integer range"
-msgstr ""
+msgstr "Критическая ошибка. Поле [%1$s] не является диапазоном целых чисел"
 
 #: include/validate.inc.php:442
 #, php-format
 msgid "Critical error. Field [%1$s] is not string"
-msgstr ""
+msgstr "Критическая ошибка. Поле [%1$s] не является строкой"
 
 #: include/validate.inc.php:531
 #, php-format
 msgid "Critical error. Field [%1$s] must be missing"
-msgstr ""
+msgstr "Критическая ошибка. Поле [%1$s] должно быть пропущено"
 
 #: include/validate.inc.php:567
 #, php-format
@@ -2105,7 +2105,7 @@ msgstr "Текущая нода"
 
 #: include/setup.inc.php:173
 msgid "Current value"
-msgstr ""
+msgstr "Текущее значение"
 
 #: include/locales/en_gb.inc.php:260
 msgid "Custom graphs"
@@ -2142,7 +2142,7 @@ msgstr "Имена пользовательских важностей влия�
 
 #: include/views/js/configuration.sysmaps.js.php:44
 msgid "Custom size"
-msgstr ""
+msgstr "Пользовательский размер"
 
 #: include/locales/en_gb.inc.php:1056
 msgid "Custom slides"
@@ -2294,7 +2294,7 @@ msgstr "Дата"
 
 #: include/hosts.inc.php:278
 msgid "Date HW decommissioned"
-msgstr ""
+msgstr "Дата списания HW"
 
 #: include/hosts.inc.php:268
 msgid "Date HW installed"
@@ -2400,7 +2400,7 @@ msgstr "Задержка (секунд)"
 
 #: queue.php:247
 msgid "Delayed by"
-msgstr "Отложить"
+msgstr "Задерживается на"
 
 #: include/classes/class.cbuttondelete.php:24 include/forms.inc.php:3570
 #: include/locales/en_gb.inc.php:1081
@@ -2433,7 +2433,7 @@ msgstr "Удалить выражение?"
 
 #: include/forms.inc.php:1759
 msgid "Delete from host group"
-msgstr ""
+msgstr "Удалить из группы узлов сети"
 
 #: include/locales/en_gb.inc.php:410
 msgid "Delete graph?"
@@ -2449,7 +2449,7 @@ msgstr "Удалить историю выбранных элементов да
 
 #: include/views/administration.general.iconmap.edit.php:140
 msgid "Delete icon map?"
-msgstr ""
+msgstr "Удалить назначение иконки?"
 
 #: include/locales/en_gb.inc.php:1398
 msgid "Delete it?"
@@ -2469,7 +2469,7 @@ msgstr "Удалить период обслуживания?"
 
 #: include/views/configuration.sysmap.edit.php:207
 msgid "Delete network map?"
-msgstr ""
+msgstr "Удалить карту сети?"
 
 #: include/locales/en_gb.inc.php:320
 msgid "Delete regular expression?"
@@ -2546,7 +2546,7 @@ msgstr "Удалить выбранные группы?"
 
 #: include/locales/en_gb.inc.php:479
 msgid "Delete selected host groups?"
-msgstr ""
+msgstr "Удалить выбранные группы узлов сети?"
 
 #: include/locales/en_gb.inc.php:545
 msgid "Delete selected host?"
@@ -2578,11 +2578,11 @@ msgstr "Удалить выбранные карты?"
 
 #: include/views/administration.mediatypes.edit.php:107
 msgid "Delete selected media type?"
-msgstr ""
+msgstr "Удалить выбранный способ оповещения?"
 
 #: include/views/administration.mediatypes.list.php:104
 msgid "Delete selected media types?"
-msgstr "Удалить выбранные способы оповещений?"
+msgstr "Удалить выбранные типы оповещений?"
 
 #: include/locales/en_gb.inc.php:333
 msgid "Delete selected node?"
@@ -2650,7 +2650,7 @@ msgstr "Удалить выбранное с присоединенными эл
 
 #: include/locales/en_gb.inc.php:1489
 msgid "Delete service"
-msgstr ""
+msgstr "Удалить услугу"
 
 #: include/locales/en_gb.inc.php:1050
 msgid "Delete slideshow?"
@@ -2787,7 +2787,7 @@ msgstr "Отключить выбранные группы?"
 
 #: include/locales/en_gb.inc.php:478
 msgid "Disable selected host groups?"
-msgstr ""
+msgstr "Деактивировать выбранные группы узлов сети?"
 
 #: include/locales/en_gb.inc.php:39
 msgid "Disable selected hosts"
@@ -2862,7 +2862,7 @@ msgstr "Правило обнаружения"
 #: api/classes/class.cdiscoveryrule.php:884
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" already exists, inherited from another template."
-msgstr ""
+msgstr "Правило обнаружения \"%1$s:%2$s\" уже существует, унаследовано от другого шаблона."
 
 #: api/classes/class.cdiscoveryrule.php:776
 #, php-format
@@ -2877,7 +2877,7 @@ msgstr "Правило обнаружения [%1$s:%2$s] отсоединено
 #: api/classes/class.cdrule.php:603 api/classes/class.cdrule.php:671
 #, php-format
 msgid "Discovery rule [%s] already exists"
-msgstr ""
+msgstr "Правило обнаружения [%s] уже существует"
 
 #: discoveryconf.php:124 host_discovery.php:250
 msgid "Discovery rule created"
@@ -2902,7 +2902,7 @@ msgstr "Правила обнаружения активированы"
 
 #: discoveryconf.php:173
 msgid "Discovery rules deleted"
-msgstr ""
+msgstr "Правила обнаружения удалены"
 
 #: host_discovery.php:266
 msgid "Discovery rules disabled"
@@ -2910,7 +2910,7 @@ msgstr "Правила обнаружения отключены"
 
 #: discoveryconf.php:162
 msgid "Discovery rules updated"
-msgstr ""
+msgstr "Правила обнаружения обновлены"
 
 #: include/actions.inc.php:55 include/locales/en_gb.inc.php:45
 msgid "Discovery status"
@@ -2918,7 +2918,7 @@ msgstr "Состояние обнаружения"
 
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:105
 msgid "Display OK triggers for"
-msgstr ""
+msgstr "Отображать триггеры ОК для"
 
 #: include/func.inc.php:1506 include/locales/en_gb.inc.php:1265
 msgid "Displaying"
@@ -2962,7 +2962,7 @@ msgstr "Вы хотите заменить условие выражения?"
 
 #: include/locales/en_gb.inc.php:1476
 msgid "Done"
-msgstr ""
+msgstr "Готово"
 
 #: include/locales/en_gb.inc.php:255
 #: include/views/js/configuration.sysmaps.js.php:224
@@ -3001,12 +3001,12 @@ msgstr "Первая запись в списке"
 #: api/classes/class.chost.php:1364
 #, php-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
-msgstr ""
+msgstr "Дубликат узла сети. Узел сети с таким же именем \"%s\" уже существует в данных."
 
 #: api/classes/class.chost.php:1395
 #, php-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
-msgstr ""
+msgstr "Дубликат узла сети. Узел сети с таким же видимым именем \"%s\" уже существует в данных."
 
 #: api/classes/class.cmap.php:599
 #, php-format
@@ -3084,11 +3084,11 @@ msgstr "Изменить элемент карты"
 
 #: include/locales/en_gb.inc.php:1488
 msgid "Edit service"
-msgstr ""
+msgstr "Изменить услугу"
 
 #: include/locales/en_gb.inc.php:675
 msgid "Edit trigger"
-msgstr ""
+msgstr "Изменить триггер"
 
 #: include/locales/en_gb.inc.php:138
 #: include/views/configuration.sysmap.edit.php:149
@@ -3101,7 +3101,7 @@ msgstr "Название элемента"
 
 #: include/views/js/configuration.sysmaps.js.php:196
 msgid "Element type"
-msgstr ""
+msgstr "Тип элемента"
 
 #: include/media.inc.php:24
 #: include/views/administration.mediatypes.edit.php:39
@@ -3114,7 +3114,7 @@ msgstr "Пусто"
 
 #: api/classes/class.caction.php:1780
 msgid "Empty action condition."
-msgstr ""
+msgstr "Пустое условие действия."
 
 #: api/classes/class.caction.php:1485 api/classes/class.capplication.php:663
 #: api/classes/class.cdiscoveryrule.php:686 api/classes/class.cgraph.php:985
@@ -3129,7 +3129,7 @@ msgstr "Входной параметр пустой"
 
 #: api/classes/class.chost.php:2115
 msgid "Empty input parameter."
-msgstr ""
+msgstr "Входной параметр пустой."
 
 #: api/classes/class.cdrule.php:427
 msgid "Empty input."
@@ -3165,7 +3165,7 @@ msgstr "Включить режим отладки для выбранных г�
 
 #: include/views/administration.general.gui.edit.php:37
 msgid "Enable event acknowledges"
-msgstr ""
+msgstr "Активировать подтверждение событий"
 
 #: include/actions.inc.php:276 include/actions.inc.php:477
 msgid "Enable host"
@@ -3186,7 +3186,7 @@ msgstr "Активировать выбранное"
 
 #: include/locales/en_gb.inc.php:131
 msgid "Enable selected WEB scenarios?"
-msgstr "Включить выбранные Веб сценарии?"
+msgstr "Активировать выбранные Веб сценарии?"
 
 #: actionconf.php:513
 msgid "Enable selected actions?"
@@ -3194,23 +3194,23 @@ msgstr "Активировать выбранные действия?"
 
 #: discoveryconf.php:297
 msgid "Enable selected discovery rules?"
-msgstr "Включить выбранные правила обнаружения?"
+msgstr "Активировать выбранные правила обнаружения?"
 
 #: include/views/administration.usergroups.list.php:134
 msgid "Enable selected groups?"
-msgstr "Включить выбранные группы?"
+msgstr "Активировать выбранные группы?"
 
 #: include/locales/en_gb.inc.php:477
 msgid "Enable selected host groups?"
-msgstr ""
+msgstr "Активировать выбранные группы узлов сети?"
 
 #: include/locales/en_gb.inc.php:676
 msgid "Enable selected items?"
-msgstr "Включить выбранные элементы данных?"
+msgstr "Активировать выбранные элементы данных?"
 
 #: include/locales/en_gb.inc.php:1161
 msgid "Enable selected triggers?"
-msgstr "Включить выбранные триггеры?"
+msgstr "Активировать выбранные триггеры?"
 
 #: actionconf.php:496 include/locales/en_gb.inc.php:1131
 #: include/views/administration.usergroups.edit.php:69
@@ -3243,12 +3243,12 @@ msgstr "Ошибка при добавлении времени сервиса"
 
 #: include/locales/en_gb.inc.php:1221
 msgid "Error description"
-msgstr ""
+msgstr "Ошибка в описании"
 
 #: api/classes/class.citemgeneral.php:215
 #, php-format
 msgid "Error in item key: \"%s\"."
-msgstr ""
+msgstr "Ошибка в ключе элемента данных: \"%s\"."
 
 #: include/views/configuration.action.edit.php:442
 msgid "Escalation period"
@@ -3520,7 +3520,7 @@ msgstr "Первый"
 
 #: include/views/js/configuration.sysmaps.js.php:41
 msgid "Fit to map"
-msgstr ""
+msgstr "Вписать в карту сети"
 
 #: include/locales/en_gb.inc.php:414
 msgid "Fixed"
@@ -3566,15 +3566,15 @@ msgstr "От"
 #: include/views/administration.usergroups.list.php:53
 #: include/views/administration.users.list.php:65
 msgid "Frontend access"
-msgstr ""
+msgstr "Доступ к веб-интерфейсу"
 
 #: usergrps.php:225
 msgid "Frontend access updated"
-msgstr ""
+msgstr "Доступ к веб-интерфейсу обновлен"
 
 #: include/views/administration.users.edit.php:181
 msgid "Frontend messaging"
-msgstr ""
+msgstr "Сообщения в веб-интерфейсе"
 
 #: include/locales/en_gb.inc.php:1083
 #: include/views/configuration.host.edit.php:607
@@ -3868,11 +3868,11 @@ msgstr "ГРУППЫ УЗЛОВ СЕТИ"
 
 #: hostinventories.php:84
 msgid "HOST INVENTORIES"
-msgstr ""
+msgstr "ИНВЕНТАРНЫЕ ДАННЫЕ УЗЛА СЕТИ"
 
 #: hostinventoriesoverview.php:61
 msgid "HOST INVENTORY OVERVIEW"
-msgstr ""
+msgstr "ОБЗОР ИНВЕНТАРНЫХ ДАННЫХ УЗЛА СЕТИ"
 
 #: hostinventoriesoverview.php:81 hostinventories.php:94 hosts_mon.php:120
 #: hosts_mon.php:125 hosts.php:737
@@ -3887,7 +3887,7 @@ msgstr "HTTP"
 
 #: authentication.php:183
 msgid "HTTP authentication"
-msgstr ""
+msgstr "HTTP аутентификация"
 
 #: include/discovery.inc.php:73
 #: include/views/js/configuration.discovery.js.php:133
@@ -9738,7 +9738,7 @@ msgstr "Пользователь удален"
 #: include/views/administration.usergroups.edit.php:119
 #: include/views/administration.users.list.php:43
 msgid "User group"
-msgstr "Группе пользователей"
+msgstr "Группа пользователей"
 
 #: api/classes/class.cusergroup.php:659
 #, php-format
