@@ -1451,6 +1451,8 @@ require_once('include/js.inc.php');
 						}
 					}
 
+					$params['screenid'] = $screen['screenid'];
+
 					$item = new CUIWidget('hat_htstatus', make_latest_issues($params, true));
 					$item->setDoubleHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE), $tr_form);
 					$item = array($item);
@@ -1560,6 +1562,8 @@ require_once('include/js.inc.php');
 						}
 					}
 
+					$params['screenid'] = $screen['screenid'];
+
 					$item = new CUIWidget('hat_trstatus', make_latest_issues($params, true));
 					$item->setDoubleHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE), $tr_form);
 					$item = array($item);
@@ -1575,7 +1579,8 @@ require_once('include/js.inc.php');
 						'maintenance' => null,
 						'severity' => null,
 						'limit' => null,
-						'extAck' => 0
+						'extAck' => 0,
+						'screenid' => $screen['screenid']
 					);
 
 					$item = new CUIWidget('hat_syssum', make_system_status($params));

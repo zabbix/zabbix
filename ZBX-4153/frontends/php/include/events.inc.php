@@ -257,7 +257,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 	return $table;
 }
 
-function getEventAckState($event, $extBackurl = false, $isLink = true) {
+function getEventAckState($event, $isBackurl = false, $isLink = true, $params = array()) {
 	$config = select_config();
 	global $page;
 
@@ -270,18 +270,23 @@ function getEventAckState($event, $extBackurl = false, $isLink = true) {
 	}
 
 	if ($isLink) {
-		if ($extBackurl) {
+		if ($isBackurl) {
 			$backurl = '&backurl='.$page['file'];
 		}
 		else {
 			$backurl = '';
 		}
 
+		$additionalParams = '';
+		foreach ($params as $key => $value) {
+			$additionalParams .= '&'.$key.'='.$value;
+		}
+
 		if ($event['acknowledged'] == 0) {
-			$ack = new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl, 'disabled');
+			$ack = new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, 'disabled');
 		}
 		else {
-			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl, 'enabled');
+			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, 'enabled');
 			$ackLinkHints = make_acktab_by_eventid($event);
 			if (!empty($ackLinkHints)) {
 				$ackLink->setHint($ackLinkHints, '', '', false);

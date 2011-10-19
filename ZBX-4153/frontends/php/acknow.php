@@ -40,6 +40,7 @@ $fields = array(
 	'eventid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'triggers' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 	'triggerid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+	'screenid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 	'events' =>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 	'message' =>		array(T_ZBX_STR, O_OPT,	null,	$bulk ? null : NOT_EMPTY, 'isset({save})||isset({saveandreturn})'),
 	'backurl' =>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
@@ -58,6 +59,9 @@ if (isset($_REQUEST['cancel'])) {
 	ob_end_clean();
 	if ($_REQUEST['backurl'] == 'tr_events.php') {
 		redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid']);
+	}
+	elseif ($_REQUEST['backurl'] == 'screenedit.php') {
+		redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid'].'&screenid='.$_REQUEST['screenid']);
 	}
 	else {
 		redirect($_REQUEST['backurl']);
@@ -123,6 +127,9 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		if ($_REQUEST['backurl'] == 'tr_events.php') {
 			redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid']);
 		}
+		elseif ($_REQUEST['backurl'] == 'screenedit.php') {
+			redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid'].'&screenid='.$_REQUEST['screenid']);
+		}
 		else {
 			redirect($_REQUEST['backurl']);
 		}
@@ -176,6 +183,11 @@ if ($_REQUEST['backurl'] == 'tr_events.php') {
 	$frmMsg->addVar('eventid', $_REQUEST['eventid']);
 	$frmMsg->addVar('triggerid', $_REQUEST['triggerid']);
 }
+if ($_REQUEST['backurl'] == 'screenedit.php') {
+	$frmMsg->addVar('eventid', $_REQUEST['eventid']);
+	$frmMsg->addVar('triggerid', $_REQUEST['triggerid']);
+	$frmMsg->addVar('screenid', $_REQUEST['screenid']);
+}
 
 if (isset($_REQUEST['eventid'])) {
 	$frmMsg->addVar('eventid', $_REQUEST['eventid']);
@@ -194,7 +206,7 @@ elseif (isset($_REQUEST['events'])) {
 $frmMsg->addRow(_('Message'), new CTextArea('message', '', 80, 6));
 $frmMsg->addItemToBottomRow(new CSubmit('saveandreturn', $btn_txt2));
 $bulk ? '' : $frmMsg->addItemToBottomRow(new CSubmit('save', $btn_txt));
-$frmMsg->addItemToBottomRow(new CButtonCancel(url_param('backurl').url_param('eventid').url_param('triggerid')));
+$frmMsg->addItemToBottomRow(new CButtonCancel(url_param('backurl').url_param('eventid').url_param('triggerid').url_param('screenid')));
 $frmMsg->show(false);
 
 include_once('include/page_footer.php');

@@ -1035,7 +1035,6 @@
 	'S_ROWS'=>				_('Rows'),
 	'S_NO_SCREENS_DEFINED'=>		_('No screens defined.'),
 	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
-	'S_CONFIGURATION_OF_SCREEN_BIG'=>	_('CONFIGURATION OF SCREEN'),
 	'S_SCREEN_CELL_CONFIGURATION'=>		_('Screen cell configuration'),
 	'S_RESOURCE'=>					_('Resource'),
 	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
@@ -1103,11 +1102,7 @@
 	'S_VERTICAL_ALIGN'=>			_('Vertical align'),
 	'S_MIDDLE'=>				_('Middle'),
 
-	'S_CANNOT_REMOVE_ROW_OR_COLUMN'=>			_('Impossible to remove last row and column'),
-	'S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COLUMN'=>				_('Screen should contain at least one row and column'),
-
 //	screens.php
-	'S_CUSTOM_SCREENS'=>			_('Custom screens'),
 	'S_SCREENS_BIG'=>				_('SCREENS'),
 	'S_HOST_SCREENS'=>				_('Host screens'),
 
@@ -1119,7 +1114,6 @@
 	'S_CANNOT_DELETE_SLIDESHOW'=>	_('Cannot delete slideshow'),
 	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
 
-	'S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST' => _('Screen with name "%s" does not exist'),
 	'S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST' => _('Screen with id "%d" does not exist'),
 
 // slides.php

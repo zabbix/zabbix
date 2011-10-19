@@ -159,6 +159,11 @@ function make_favorite_maps() {
 function make_system_status($filter) {
 	$config = select_config();
 
+	$ackParams = array();
+	if (!empty($filter['screenid'])) {
+		$ackParams['screenid'] = $filter['screenid'];
+	}
+
 	$table = new CTableInfo();
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Node') : null,
@@ -290,7 +295,7 @@ function make_system_status($filter) {
 
 				foreach ($data['triggers'] as $trigger) {
 					$event = $trigger['event'];
-					$ack = getEventAckState($event, true);
+					$ack = getEventAckState($event, true, true, $ackParams);
 
 					if (isset($event['eventid'])) {
 						$actions = get_event_actions_status($event['eventid']);
@@ -334,7 +339,7 @@ function make_system_status($filter) {
 
 				foreach ($data['triggers_unack'] as $trigger) {
 					$event = $trigger['event'];
-					$ack = getEventAckState($event, true);
+					$ack = getEventAckState($event, true, true, $ackParams);
 
 					if (isset($event['eventid'])) {
 						$actions = get_event_actions_status($event['eventid']);
@@ -808,6 +813,11 @@ function make_status_of_zbx() {
 function make_latest_issues(array $filter = array()) {
 	$config = select_config();
 
+	$ackParams = array();
+	if (!empty($filter['screenid'])) {
+		$ackParams['screenid'] = $filter['screenid'];
+	}
+
 	$options = array(
 		'groupids' => $filter['groupids'],
 		'monitored' => 1,
@@ -970,7 +980,7 @@ function make_latest_issues(array $filter = array()) {
 		);
 		$events = API::Event()->get($options);
 		if ($event = reset($events)) {
-			$ack = getEventAckState($event, true);
+			$ack = getEventAckState($event, true, true, $ackParams);
 			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])), ZBX_FLAG_EVENT);
 
 			// actions
