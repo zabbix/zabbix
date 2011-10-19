@@ -55,7 +55,7 @@ extern unsigned char	daemon_type;
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
 
 static int		ZBX_HISTORY_SIZE = 0;
-int			ZBX_SYNC_MAX = 1000;	/* Must be less than ZBX_HISTORY_SIZE */
+int			ZBX_SYNC_MAX = 1000;	/* must be less than ZBX_HISTORY_SIZE */
 static int		ZBX_ITEMIDS_SIZE = 0;
 
 #define ZBX_IDS_SIZE	8
@@ -296,7 +296,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			table_name = "trends_uint";
 			break;
 		default:
-			zbx_error("Unsupported value type for trends");
+			zbx_error("unsupported value type for trends");
 			assert(0);
 	}
 
@@ -784,7 +784,7 @@ static void	DCsync_trends()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d",
 			__function_name, cache->trends_num);
 
-	zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data...");
+	zabbix_log(LOG_LEVEL_WARNING, "syncing trends data...");
 
 	LOCK_TRENDS;
 
@@ -802,7 +802,7 @@ static void	DCsync_trends()
 
 	DBcommit();
 
-	zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data... done.");
+	zabbix_log(LOG_LEVEL_WARNING, "syncing trends data done");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1117,7 +1117,7 @@ notsupported:
 	{
 		if (ITEM_STATUS_NOTSUPPORTED != item->status)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became not supported: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "item [%s] became not supported: %s",
 					zbx_host_key_string(h->itemid), h->value_orig.err);
 
 			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 20, ",status=%d", (int)h->status);
@@ -1137,7 +1137,7 @@ notsupported:
 	{
 		if (ITEM_STATUS_NOTSUPPORTED == item->status)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Item [%s] became supported", zbx_host_key_string(item->itemid));
+			zabbix_log(LOG_LEVEL_WARNING, "item [%s] became supported", zbx_host_key_string(item->itemid));
 
 			zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 32, ",status=%d,error=''", (int)h->status);
 		}
@@ -1162,36 +1162,38 @@ notsupported:
  ******************************************************************************/
 static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
-	const char	*__function_name = "DCmass_update_items";
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_ITEM		item;
-	int		sql_offset = 0, i;
-	ZBX_DC_HISTORY	*h;
-	zbx_uint64_t	*ids = NULL;
-	int		ids_alloc, ids_num = 0;
+	const char		*__function_name = "DCmass_update_items";
+	DB_RESULT		result;
+	DB_ROW			row;
+	DB_ITEM			item;
+	int			sql_offset = 0, i;
+	ZBX_DC_HISTORY		*h;
+	zbx_vector_uint64_t	ids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ids_alloc = history_num;
-	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
+	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, history_num);
 
 	for (i = 0; i < history_num; i++)
-		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
+		zbx_vector_uint64_append(&ids, history[i].itemid);
+
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
 			"select itemid,status,lastclock,prevorgvalue,delta,multiplier,formula,history,trends,error"
 			" from items"
-			" where");
+			" where status in (%d,%d)"
+				" and",
+			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED);
 
-	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
+	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids.values, ids.values_num);
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 20, " order by itemid");
 
-	zbx_free(ids);
-
 	result = DBselect("%s", sql);
 
+	ids.values_num = 0;	/* item ids that are not disabled and not deleted in DB */
 	sql_offset = 0;
 
 #ifdef HAVE_ORACLE
@@ -1201,6 +1203,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(item.itemid, row[0]);
+
+		zbx_vector_uint64_append(&ids, item.itemid);
 
 		h = NULL;
 
@@ -1247,23 +1251,23 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		item.trends = atoi(row[8]);
 		item.error = row[9];
 
-		if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
-		{
-			item.delta = ITEM_STORE_AS_IS;
-			h->keep_history = 1;
-			h->keep_trends = 0;
-		}
-		else
-		{
-			h->keep_history = (unsigned char)(item.history ? 1 : 0);
-			h->keep_trends = (unsigned char)(item.trends ? 1 : 0);
-		}
+		h->keep_history = (0 != item.history ? 1 : 0);
+		h->keep_trends = (0 != item.trends ? 1 : 0);
 
 		DCadd_update_item_sql(&sql_offset, &item, h);
 
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 	}
 	DBfree_result(result);
+
+	/* disable processing of deleted and disabled history items by setting value_null */
+	for (i = 0; i < history_num; i++)
+	{
+		if (FAIL == zbx_vector_uint64_bsearch(&ids, history[i].itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			history[i].value_null = 1;
+	}
+
+	zbx_vector_uint64_destroy(&ids);
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
@@ -2135,7 +2139,7 @@ int	DCsync_history(int sync_type)
 
 	if (ZBX_SYNC_FULL == sync_type)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data...");
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 		now = time(NULL);
 		cache->itemids_num = 0;
 	}
@@ -2321,7 +2325,7 @@ int	DCsync_history(int sync_type)
 
 		if (ZBX_SYNC_FULL == sync_type && time(NULL) - now >= 10)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Syncing history data... " ZBX_FS_DBL "%%",
+			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)total_num / (cache->history_num + total_num) * 100);
 			now = time(NULL);
 		}
@@ -2329,7 +2333,7 @@ int	DCsync_history(int sync_type)
 	while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
 finish:
 	if (ZBX_SYNC_FULL == sync_type)
-		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data... done.");
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 
 	return total_num;
 }
@@ -2521,7 +2525,7 @@ retry:
 	{
 		if (text_len > CONFIG_TEXT_CACHE_SIZE)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for text cache");
+			zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for text cache");
 			exit(-1);
 		}
 
@@ -2551,6 +2555,8 @@ retry:
 		f -= ZBX_HISTORY_SIZE;
 	history = &cache->history[f];
 	history->num = 1;
+	history->keep_history = 0;
+	history->keep_trends = 0;
 
 	cache->history_num++;
 
@@ -2774,7 +2780,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT 
 						severity, logeventid, lastlogsize, mtime);
 			break;
 		default:
-			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
+			zabbix_log(LOG_LEVEL_ERR, "unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
 					value_type, itemid);
 	}
 }
@@ -2811,25 +2817,25 @@ void	init_database_cache()
 			-1 == (history_text_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_TEXT_ID)) ||
 			-1 == (trend_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_TREND_ID)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot create IPC keys for history and trend caches");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC keys for history and trend caches");
 		exit(FAIL);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
 	{
-		zbx_error("Unable to create mutex for history cache");
+		zbx_error("cannot create mutex for history cache");
 		exit(FAIL);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
 	{
-		zbx_error("Unable to create mutex for trend cache");
+		zbx_error("cannot create mutex for trend cache");
 		exit(FAIL);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
 	{
-		zbx_error("Unable to create mutex for id cache");
+		zbx_error("cannot create mutex for id cache");
 		exit(FAIL);
 	}
 
@@ -3013,7 +3019,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 	if (i == ZBX_IDS_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for ids");
+		zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for ids");
 		exit(-1);
 	}
 
