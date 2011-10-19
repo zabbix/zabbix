@@ -608,21 +608,21 @@ COpt::memoryPick();
  * @param array $groups['name']
  * @return array
  */
-	public function create($groups){
+	public function create($groups) {
 
 		$groups = zbx_toArray($groups);
 		$insert = array();
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create HostGroups');
+			if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create host groups.'));
 			}
 
-			foreach($groups as $num => $group){
-				if(!is_array($group) || !isset($group['name']) || empty($group['name'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ name ]');
+			foreach ($groups as $num => $group) {
+				if (!is_array($group) || !isset($group['name']) || empty($group['name'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter "name".'));
 				}
-				if($this->exists(array('name' => $group['name']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
+				if ($this->exists(array('name' => $group['name']))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group "'.$group['name'].'" already exists.');
 				}
 
 				$insert[] = $group;
@@ -640,12 +640,12 @@ COpt::memoryPick();
  * @param array $groups[0]['groupid'], ...
  * @return boolean
  */
-	public function update($groups){
+	public function update($groups) {
 		$groups = zbx_toArray($groups);
 		$groupids = zbx_objectValues($groups, 'groupid');
 
-			if(empty($groups)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
+			if (empty($groups)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter.');
 			}
 
 // permissions
@@ -656,8 +656,8 @@ COpt::memoryPick();
 				'preservekeys' => 1
 			);
 			$upd_groups = $this->get($options);
-			foreach($groups as $gnum => $group){
-				if(!isset($upd_groups[$group['groupid']])){
+			foreach ($groups as $gnum => $group) {
+				if (!isset($upd_groups[$group['groupid']])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
@@ -674,9 +674,9 @@ COpt::memoryPick();
 			$groupsNames = $this->get($options);
 			$groupsNames = zbx_toHash($groupsNames, 'name');
 
-			foreach($groups as $num => $group){
-				if(isset($group['name']) && isset($groupsNames[$group['name']]) && (bccomp($groupsNames[$group['name']]['groupid'],$group['groupid']) != 0)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
+			foreach ($groups as $num => $group) {
+				if (isset($group['name']) && isset($groupsNames[$group['name']]) && (bccomp($groupsNames[$group['name']]['groupid'], $group['groupid']) != 0)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group "'.$group['name'].'" already exists.'));
 				}
 
 // prevents updating several groups with same name
@@ -684,7 +684,7 @@ COpt::memoryPick();
 //---
 
 				$sql = 'UPDATE groups SET name='.zbx_dbstr($group['name']).' WHERE groupid='.$group['groupid'];
-				if(!DBexecute($sql)){
+				if (!DBexecute($sql)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 				}
 
@@ -699,8 +699,8 @@ COpt::memoryPick();
  * @param array $groupids
  * @return boolean
  */
-	public function delete($groupids){
-			if(empty($groupids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+	public function delete($groupids) {
+			if (empty($groupids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 			$groupids = zbx_toArray($groupids);
 
@@ -711,8 +711,8 @@ COpt::memoryPick();
 				'preservekeys' => 1
 			);
 			$del_groups = $this->get($options);
-			foreach($groupids as $groupid){
-				if(!isset($del_groups[$groupid])){
+			foreach ($groupids as $groupid) {
+				if (!isset($del_groups[$groupid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}

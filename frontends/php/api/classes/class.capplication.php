@@ -658,9 +658,9 @@ COpt::memoryPick();
  * @param array $data['items']
  * @return boolean
  */
-	public function massAdd($data){
+	public function massAdd($data) {
 
-			if(empty($data['applications'])) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if (empty($data['applications'])) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 			$applications = zbx_toArray($data['applications']);
 			$items = zbx_toArray($data['items']);
@@ -675,8 +675,8 @@ COpt::memoryPick();
 				'preservekeys' => 1,
 			);
 			$allowed_applications = $this->get($app_options);
-			foreach($applications as $anum => $application){
-				if(!isset($allowed_applications[$application['applicationid']])){
+			foreach ($applications as $anum => $application) {
+				if (!isset($allowed_applications[$application['applicationid']])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
@@ -688,8 +688,8 @@ COpt::memoryPick();
 				'preservekeys' => 1
 			);
 			$allowed_items = API::Item()->get($item_options);
-			foreach($items as $num => $item){
-				if(!isset($allowed_items[$item['itemid']])){
+			foreach ($items as $num => $item) {
+				if (!isset($allowed_items[$item['itemid']])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
