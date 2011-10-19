@@ -24,6 +24,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "zbxalgo.h"
 
 #include "../events.h"
 #include "../nodewatcher/nodecomms.h"
@@ -246,8 +247,9 @@ static void	begin_history_sql(char **sql, int *sql_allocated, int *sql_offset, c
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int sender_nodeid, int nodeid, const ZBX_TABLE *table,
-		const char *record, int lastrecord)
+static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int sender_nodeid, int nodeid,
+		const ZBX_TABLE *table, const char *record, int lastrecord, int acknowledges,
+		zbx_vector_uint64_t *ack_eventids)
 {
 	const char	*r;
 	int		f, len;
@@ -256,12 +258,11 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_record()");
 
-	if (*sql_offset == 0)
+	if (0 == *sql_offset)
 	{
 #ifdef HAVE_ORACLE
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 7, "begin\n");
 #endif
-
 #ifdef HAVE_MULTIROW_INSERT
 		begin_history_sql(sql, sql_allocated, sql_offset, table);
 #endif
@@ -273,8 +274,7 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 
 	zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 2, "(");
 	if (0 != (table->flags & ZBX_HISTORY_SYNC))
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 16, "%d,",
-				nodeid);
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 16, "%d,", nodeid);
 
 	for (r = record, f = 0; table->fields[f].name != 0; f++)
 	{
@@ -285,6 +285,14 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 			goto error;
 
 		len = zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
+
+		if (0 != acknowledges && 0 == strcmp(table->fields[f].name, "eventid"))
+		{
+			zbx_uint64_t	eventid;
+
+			ZBX_STR2UINT64(eventid, buffer);
+			zbx_vector_uint64_append(ack_eventids, eventid);
+		}
 
 		if (table->fields[f].type == ZBX_TYPE_INT ||
 				table->fields[f].type == ZBX_TYPE_UINT ||
@@ -332,19 +340,35 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 	zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 4, ");\n");
 #endif
 
-	if (lastrecord || *sql_offset > ZBX_MAX_SQL_SIZE)
+	if (0 != lastrecord || *sql_offset > ZBX_MAX_SQL_SIZE)
 	{
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 6, "end;\n");
-#endif
-
 #ifdef HAVE_MULTIROW_INSERT
 		(*sql_offset)--;
 		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 4, ";\n");
 #endif
-		if (DBexecute("%s", *sql) >= ZBX_DB_OK)
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 6, "end;\n");
+#endif
+		if (ZBX_DB_OK <= DBexecute("%s", *sql))
 			res = SUCCEED;
-		(*sql_offset) = 0;
+		*sql_offset = 0;
+
+		if (SUCCEED == res && 0 != lastrecord && 0 != acknowledges && 0 != ack_eventids->values_num)
+		{
+			zbx_vector_uint64_sort(ack_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_uniq(ack_eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+			zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 64,
+					"update events"
+					" set acknowledged=1"
+					" where");
+			DBadd_condition_alloc(sql, sql_allocated, sql_offset,
+					"eventid", ack_eventids->values, ack_eventids->values_num);
+
+			if (ZBX_DB_OK > DBexecute("%s", *sql))
+				res = FAIL;
+			*sql_offset = 0;
+		}
 	}
 	else
 		res = SUCCEED;
@@ -352,10 +376,7 @@ static int	process_record(char **sql, int *sql_allocated, int *sql_offset, int s
 	return res;
 error:
 	zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
-		CONFIG_NODEID,
-		sender_nodeid,
-		nodeid,
-		record);
+			CONFIG_NODEID, sender_nodeid, nodeid, record);
 
 	return FAIL;
 }
@@ -465,7 +486,7 @@ static int	process_items(char **sql, int *sql_allocated, int *sql_offset, int se
 #endif
 		if (DBexecute("%s", *sql) >= ZBX_DB_OK)
 			res = SUCCEED;
-		(*sql_offset) = 0;
+		*sql_offset = 0;
 	}
 	else
 		res = SUCCEED;
@@ -499,16 +520,18 @@ error:
  ******************************************************************************/
 int	node_history(char *data, size_t datalen)
 {
-	const char	*r;
-	char		*newline = NULL;
-	char		*pos;
-	int		sender_nodeid = 0, nodeid = 0, firstline = 1, events = 0, history = 0;
-	const ZBX_TABLE	*table_sync = NULL, *table = NULL;
-	int		res = SUCCEED;
+	const char		*r;
+	char			*newline = NULL;
+	char			*pos;
+	int			sender_nodeid = 0, nodeid = 0, firstline = 1, events = 0, history = 0, acknowledges = 0;
+	const ZBX_TABLE		*table_sync = NULL, *table = NULL;
+	int			res = SUCCEED;
 
-	char		*sql1 = NULL, *sql2 = NULL, *sql3 = NULL;
-	int		sql1_allocated, sql2_allocated, sql3_allocated;
-	int		sql1_offset, sql2_offset, sql3_offset;
+	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL;
+	int			sql1_allocated, sql2_allocated, sql3_allocated;
+	int			sql1_offset, sql2_offset, sql3_offset;
+
+	zbx_vector_uint64_t	ack_eventids;
 
 	assert(data);
 
@@ -526,6 +549,8 @@ int	node_history(char *data, size_t datalen)
 	sql3 = zbx_malloc(sql3, sql3_allocated);
 	tmp = zbx_malloc(tmp, tmp_allocated);
 
+	zbx_vector_uint64_create(&ack_eventids);
+
 	DBbegin();
 
 	for (r = data; *r != '\0' && res == SUCCEED;)
@@ -541,7 +566,7 @@ int	node_history(char *data, size_t datalen)
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* nodeid */
 			nodeid=atoi(buffer);
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* tablename */
-			
+
 			if (FAIL == is_direct_slave_node(sender_nodeid))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data from node %d"
@@ -571,27 +596,28 @@ int	node_history(char *data, size_t datalen)
 				}
 			}
 
-			if (NULL != table && 0 == strcmp(table->table, "events"))
-				events = 1;
-
-			if (NULL != table && 0 == strncmp(table->table, "history", 7))
-				history = 1;
-
 			if (NULL == table)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Invalid received data: unknown tablename \"%s\"",
-					CONFIG_NODEID,
-					buffer);
+						CONFIG_NODEID, buffer);
 				res = FAIL;
 			}
+			else
+			{
+				if (0 == strcmp(table->table, "events"))
+					events = 1;
+
+				if (0 == strncmp(table->table, "history", 7))
+					history = 1;
+
+				if (0 == strcmp(table->table, "acknowledges"))
+					acknowledges = 1;
+			}
+
 			if (NULL != newline)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received %s from node %d for node %d datalen " ZBX_FS_SIZE_T,
-					CONFIG_NODEID,
-					buffer,
-					sender_nodeid,
-					nodeid,
-					(zbx_fs_size_t)datalen);
+						CONFIG_NODEID, buffer, sender_nodeid, nodeid, (zbx_fs_size_t)datalen);
 			}
 			firstline = 0;
 			sql1_offset = 0;
@@ -606,11 +632,20 @@ int	node_history(char *data, size_t datalen)
 			}
 			else
 			{
-				res = process_record(&sql1, &sql1_allocated, &sql1_offset, sender_nodeid, nodeid, table, r, newline ? 0 : 1);
+				res = process_record(&sql1, &sql1_allocated, &sql1_offset, sender_nodeid,
+						nodeid, table, r, newline ? 0 : 1, acknowledges, &ack_eventids);
+
 				if (SUCCEED == res && 0 != history)
-					res = process_items(&sql2, &sql2_allocated, &sql2_offset, sender_nodeid, nodeid, table, r, newline ? 0 : 1);
+				{
+					res = process_items(&sql2, &sql2_allocated, &sql2_offset, sender_nodeid,
+							nodeid, table, r, newline ? 0 : 1);
+				}
+
 				if (SUCCEED == res && NULL != table_sync && 0 != CONFIG_MASTER_NODEID)
-					res = process_record(&sql3, &sql3_allocated, &sql3_offset, sender_nodeid, nodeid, table_sync, r, newline ? 0 : 1);
+				{
+					res = process_record(&sql3, &sql3_allocated, &sql3_offset, sender_nodeid,
+							nodeid, table_sync, r, newline ? 0 : 1, 0, NULL);
+				}
 			}
 		}
 
@@ -627,6 +662,8 @@ int	node_history(char *data, size_t datalen)
 		DBcommit();
 	else
 		DBrollback();
+
+	zbx_vector_uint64_destroy(&ack_eventids);
 
 	zbx_free(tmp);
 	zbx_free(sql1);
