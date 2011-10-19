@@ -1162,55 +1162,49 @@ notsupported:
  ******************************************************************************/
 static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
-	const char	*__function_name = "DCmass_update_items";
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_ITEM		item;
-	int		sql_offset = 0, i, j, found;
-	ZBX_DC_HISTORY	*h;
-	zbx_uint64_t	*ids = NULL;
-	int		ids_alloc, ids_num = 0;
+	const char		*__function_name = "DCmass_update_items";
+	DB_RESULT		result;
+	DB_ROW			row;
+	DB_ITEM			item;
+	int			sql_offset = 0, i;
+	ZBX_DC_HISTORY		*h;
+	zbx_vector_uint64_t	ids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ids_alloc = history_num;
-	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
+	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, history_num);
 
 	for (i = 0; i < history_num; i++)
-		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
+		zbx_vector_uint64_append(&ids, history[i].itemid);
+
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
 			"select itemid,status,lastclock,prevorgvalue,delta,multiplier,formula,history,trends,error"
 			" from items"
-			" where status<>%d"
-			" and", ITEM_STATUS_DISABLED);
+			" where status in (%d,%d)"
+				" and",
+			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED);
 
-	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
+	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids.values, ids.values_num);
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 20, " order by itemid");
 
-	zbx_free(ids);
-
 	result = DBselect("%s", sql);
 
+	ids.values_num = 0;	/* item ids that are not disabled and not deleted in DB */
 	sql_offset = 0;
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
 #endif
 
-	/* item ids that are not disabled in DB */
-	ids_num = 0;
-	ids_alloc = 32;
-	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
-
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(item.itemid, row[0]);
 
-		ids[ids_num++] = item.itemid;
-		if (0 == ids_num % ids_alloc)
-			ids = zbx_realloc(ids, ids_alloc * (ids_num / ids_alloc + 1) * sizeof(zbx_uint64_t));
+		zbx_vector_uint64_append(&ids, item.itemid);
 
 		h = NULL;
 
@@ -1257,8 +1251,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		item.trends = atoi(row[8]);
 		item.error = row[9];
 
-		h->keep_history = (unsigned char)(item.history ? 1 : 0);
-		h->keep_trends = (unsigned char)(item.trends ? 1 : 0);
+		h->keep_history = (0 != item.history ? 1 : 0);
+		h->keep_trends = (0 != item.trends ? 1 : 0);
 
 		DCadd_update_item_sql(&sql_offset, &item, h);
 
@@ -1269,20 +1263,11 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	/* disable processing of deleted and disabled history items by setting value_null */
 	for (i = 0; i < history_num; i++)
 	{
-		found = 0;
-		for (j = 0; j < ids_num; j++)
-		{
-			if (history[i].itemid == ids[j])
-			{
-				found = 1;
-				break;
-			}
-		}
-
-		if (0 == found)
+		if (FAIL == zbx_vector_uint64_bsearch(&ids, history[i].itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			history[i].value_null = 1;
 	}
-	zbx_free(ids);
+
+	zbx_vector_uint64_destroy(&ids);
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
