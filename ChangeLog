@@ -271,6 +271,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-3441] fixed server to not process items that are disabled or removed (dimir,Sasha)
  - [ZBX-4249] fixed trigger wizard "insert macro" action break expression (Vedmak)
  - [ZBX-2490] fixed acknowledge flag for events, acknowledged on a child node (Sasha)
  - [ZBX-3743] fixed no triggers returned when api trigger.get is called with "limit" and "withLastEventUnacknowledged" options (Vedmak))
