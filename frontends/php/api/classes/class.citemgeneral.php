@@ -291,7 +291,6 @@ abstract class CItemGeneral extends CZBXAPI{
 				return INTERFACE_TYPE_AGENT;
 			case ITEM_TYPE_SIMPLE:
 			case ITEM_TYPE_EXTERNAL:
-			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:
 				return INTERFACE_TYPE_ANY;
