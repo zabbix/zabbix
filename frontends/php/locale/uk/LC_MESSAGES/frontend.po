@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-19 11:49+0300\n"
-"PO-Revision-Date: 2011-09-01 22:51+0200\n"
+"POT-Creation-Date: 2011-10-19 11:56+0300\n"
+"PO-Revision-Date: 2011-10-18 02:11+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -2962,7 +2962,7 @@ msgstr "Ви дійсно хочете замінити умовний вира�
 
 #: include/locales/en_gb.inc.php:1476
 msgid "Done"
-msgstr ""
+msgstr "Готово"
 
 #: include/locales/en_gb.inc.php:255
 #: include/views/js/configuration.sysmaps.js.php:224
@@ -9735,7 +9735,7 @@ msgstr "Користувача видалено"
 #: include/views/administration.usergroups.edit.php:119
 #: include/views/administration.users.list.php:43
 msgid "User group"
-msgstr "Групі користувачів"
+msgstr "Група користувачів"
 
 #: api/classes/class.cusergroup.php:659
 #, php-format
