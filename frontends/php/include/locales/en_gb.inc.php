@@ -170,9 +170,6 @@
 	'S_EVENT_ACTION_CMDS_DATE_FORMAT'=>	_('Y.M.d H:i:s'),
 
 //	node.php
-	'S_TIME_ZONE'=>				_('Time zone'),
-	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>	_('Do not keep history older than (in days)'),
-	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>	_('Do not keep trends older than (in days)'),
 	'S_MASTER_NODE'=>			_('Master node'),
 	'S_CHILD'=>				_('Child'),
 	'S_MASTER'=>				_('Master'),
