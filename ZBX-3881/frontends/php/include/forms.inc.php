@@ -1137,6 +1137,10 @@
 
 			if(!$limited || !isset($_REQUEST['form_refresh'])){
 				$delay		= $item_data['delay'];
+				if (($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_SNMPTRAP) && $delay == 0) {
+					$delay = 30;
+				}
+
 				$history	= $item_data['history'];
 				$status		= $item_data['status'];
 				$delta		= $item_data['delta'];
