@@ -1787,7 +1787,7 @@
 		$frmItem->addVar('group_itemid', $itemids);
 
 		$description = get_request('description', '');
-		$delay		= get_request('delay'		,30);
+		$delay = get_request('delay', ZBX_ITEM_DELAY_DEFAULT);
 		$history	= get_request('history'		,90);
 		$status		= get_request('status'		,0);
 		$type		= get_request('type'		,0);
