@@ -69,7 +69,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		zbx_rtrim(buf, " \r\n");
 		zbx_ltrim(buf, " ");
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Get value from agent result: '%s'", buf);
+		zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", buf);
 
 		if (0 == strcmp(buf, "ZBX_NOTSUPPORTED"))
 		{
