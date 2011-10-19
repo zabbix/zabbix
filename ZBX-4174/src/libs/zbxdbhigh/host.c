@@ -527,9 +527,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 				"select distinct type"
 				" from items"
 				" where hostid=" ZBX_FS_UI64
-					" and type not in (%d,%d,%d,%d,%d)",
+					" and type not in (%d,%d,%d,%d,%d,%d)",
 				templateid, ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL,
-				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_CALCULATED);
+				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE,
+				ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED);
 
 		while (SUCCEED == res && NULL != (trow = DBfetch(tresult)))
 		{
