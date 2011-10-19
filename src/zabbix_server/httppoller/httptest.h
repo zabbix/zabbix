@@ -23,8 +23,8 @@
 typedef struct
 {
 	char	*data;
-	int	allocated;
-	int	offset;
+	size_t	allocated;
+	size_t	offset;
 }
 ZBX_HTTPPAGE;
 

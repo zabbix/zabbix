@@ -1,37 +1,32 @@
 <?php
-// get language translations {{{
+// get language translations
 require_once('include/gettextwrapper.inc.php');
 require_once('include/js.inc.php');
 require_once('include/locales.inc.php');
 
 // if we must provide language constants on language different from English
-if(isset($_GET['lang'])){
-	if(function_exists('bindtextdomain')){
-		//initializing gettext translations depending on language selected by user
+if (isset($_GET['lang'])) {
+	if (function_exists('bindtextdomain')) {
+		// initializing gettext translations depending on language selected by user
 		$locales = zbx_locale_variants($_GET['lang']);
-
-		foreach($locales as $locale){
+		foreach ($locales as $locale) {
 			putenv('LC_ALL='.$locale);
 			putenv('LANG='.$locale);
 			putenv('LANGUAGE='.$locale);
-
-			if(setlocale(LC_ALL, $locale)){
+			if (setlocale(LC_ALL, $locale)) {
 				break;
 			}
 		}
-
 		bindtextdomain('frontend', 'locale');
 		bind_textdomain_codeset('frontend', 'UTF-8');
 		textdomain('frontend');
 	}
-	// Numeric Locale to default
-	setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
+	// numeric Locale to default
+	setLocale(LC_NUMERIC, array('en', 'en_US', 'en_US.UTF-8', 'English_United States.1252'));
 }
 
 require_once('include/locales/en_gb.inc.php');
 $translations = $TRANSLATION;
-
-// }}} get language translations
 
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = array(
@@ -44,8 +39,7 @@ $availableJScripts = array(
 	'functions.js' => '',
 	'main.js' => '',
 	'dom.js' => '',
-
-// classes
+	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
@@ -61,12 +55,12 @@ $availableJScripts = array(
 	'class.rpc.js' => '',
 	'class.pmaster.js' => '',
 	'class.cviewswitcher.js' => '',
-// templates
-	'sysmap.tpl.js' => 'templates/',
+	// templates
+	'sysmap.tpl.js' => 'templates/'
 );
 
 $tranStrings = array(
-	'gtlc.js' => array('S_ALL_S', 'S_ZOOM', 'S_FIXED_SMALL','S_DYNAMIC_SMALL', 'S_NOW_SMALL', 'S_YEAR_SHORT',
+	'gtlc.js' => array('S_ALL_S', 'S_ZOOM', 'S_FIXED_SMALL', 'S_DYNAMIC_SMALL', 'S_NOW_SMALL', 'S_YEAR_SHORT',
 		'S_MONTH_SHORT', 'S_WEEK_SHORT', 'S_DAY_SHORT', 'S_HOUR_SHORT', 'S_MINUTE_SHORT'
 	),
 	'functions.js' => array('DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q', 'S_INSERT_MACRO', 'S_ADD_SERVICE',
@@ -78,29 +72,19 @@ $tranStrings = array(
 		'S_TUESDAY_SHORT_BIG', 'S_WEDNESDAY_SHORT_BIG', 'S_THURSDAY_SHORT_BIG', 'S_FRIDAY_SHORT_BIG',
 		'S_SATURDAY_SHORT_BIG', 'S_SUNDAY_SHORT_BIG', 'S_TIME', 'S_NOW', 'S_DONE'
 	),
-	'class.cmap.js' => array('S_ON','S_OFF','S_HIDDEN','S_SHOWN','S_EDIT_MAP_ELEMENT','S_ERROR',
-		'S_TYPE','S_LABEL','S_GET_SELEMENTS_FAILED','S_SHOW','S_HIDE',
-		'S_LABEL_LOCATION','S_HOST', 'S_MAP','S_TRIGGER','S_SELECT', 'S_HOST_GROUP','S_IMAGE','S_ICON_OK',
-		'S_ICON_PROBLEM','S_ICON_UNKNOWN', 'S_ICON_MAINTENANCE','S_ICON_DISABLED','S_ICON_DEFAULT',
-		'S_COORDINATE_X','S_COORDINATE_Y', 'S_URL','S_BOTTOM','S_TOP','S_LEFT','S_RIGHT','S_DEFAULT',
-		'S_APPLY','S_REMOVE','S_CLOSE','S_PLEASE_SELECT_TWO_ELEMENTS','S_MAP_ELEMENTS','S_CONNECTORS',
-		'S_ELEMENT','S_LINK_STATUS_INDICATOR', 'S_LINK','S_EDIT_CONNECTOR','S_TRIGGERS','S_COLOR',
-		'S_ADD','S_TYPE_OK','S_COLOR_OK','S_LINK_INDICATORS', 'S_DESCRIPTION', 'S_NAME',
-		'S_LINE','S_BOLD_LINE','S_DOT','S_DASHED_LINE','S_USE_ADVANCED_ICONS',
-		'S_WRONG_TYPE_OF_ARGUMENTS_PASSED_TO_FUNCTION', 'S_TWO_ELEMENTS_SHOULD_BE_SELECTED',
-		'S_DELETE_SELECTED_ELEMENTS_Q', 'S_PLEASE_SELECT_TWO_ELEMENTS','S_LINK','S_LINKS','S_NO_LINKS', 'S_NEW_ELEMENT',
-		'S_SELECT','S_SET_TRIGGER', 'S_INCORRECT_ELEMENT_MAP_LINK', 'S_EACH_URL_SHOULD_HAVE_UNIQUE', 'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q',
-		'S_NO_IMAGES', 'S_ICONMAP_IS_NOT_ENABLED'
+	'class.cmap.js' => array('S_ON', 'S_OFF', 'S_HIDDEN', 'S_SHOWN', 'S_ERROR', 'S_TYPE', 'S_LABEL', 'S_SHOW', 'S_HIDE',
+		'S_HOST', 'S_MAP', 'S_TRIGGER', 'S_SELECT', 'S_HOST_GROUP', 'S_IMAGE', 'S_URL', 'S_URLS', 'S_BOTTOM', 'S_TOP',
+		'S_LEFT', 'S_RIGHT', 'S_DEFAULT', 'S_REMOVE', 'S_CLOSE', 'S_PLEASE_SELECT_TWO_ELEMENTS', 'S_ELEMENT', 'S_TRIGGERS',
+		'S_COLOR', 'S_ADD', 'S_DESCRIPTION', 'S_NAME', 'S_LINE', 'S_BOLD_LINE', 'S_DOT', 'S_DASHED_LINE', 'S_TWO_ELEMENTS_SHOULD_BE_SELECTED',
+		'S_DELETE_SELECTED_ELEMENTS_Q', 'S_PLEASE_SELECT_TWO_ELEMENTS', 'S_NEW_ELEMENT', 'S_SELECT', 'S_INCORRECT_ELEMENT_MAP_LINK',
+		'S_EACH_URL_SHOULD_HAVE_UNIQUE', 'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q', 'S_NO_IMAGES', 'S_ICONMAP_IS_NOT_ENABLED'
 	),
-	'class.cmessages.js' => array('S_MUTE','S_UNMUTE','S_MESSAGES','S_CLEAR','S_SNOOZE','S_MOVE'
-	),
-	'class.cookie.js' => array('S_MAX_COOKIE_SIZE_REACHED'
-	),
-	'main.js' => array('S_CLOSE', 'S_NO_ELEMENTS_SELECTED','S_INTERFACES',
-	)
+	'class.cmessages.js' => array('S_MUTE', 'S_UNMUTE', 'S_MESSAGES', 'S_CLEAR', 'S_SNOOZE', 'S_MOVE'),
+	'class.cookie.js' => array('S_MAX_COOKIE_SIZE_REACHED'),
+	'main.js' => array('S_CLOSE', 'S_NO_ELEMENTS_SELECTED', 'S_INTERFACES')
 );
 
-if(empty($_GET['files'])){
+if (empty($_GET['files'])) {
 	$files = array(
 		'prototype.js',
 		'jquery.js',
@@ -118,29 +102,28 @@ if(empty($_GET['files'])){
 		'functions.js'
 	);
 }
-else{
+else {
 	$files = $_GET['files'];
 }
 
-
 $js = 'if(typeof(locale) == "undefined") var locale = {};'."\n";
-foreach($files as $file){
-	if(isset($tranStrings[$file])){
-		foreach($tranStrings[$file] as $str){
+foreach ($files as $file) {
+	if (isset($tranStrings[$file])) {
+		foreach ($tranStrings[$file] as $str) {
 			$js .= "locale['".$str."'] = ".zbx_jsvalue($translations[$str]).";";
 		}
 	}
 }
 
-foreach($files as $file){
-	if(isset($availableJScripts[$file]))
+foreach ($files as $file) {
+	if (isset($availableJScripts[$file])) {
 		$js .= file_get_contents('js/'.$availableJScripts[$file].$file)."\n";
+	}
 }
-
 
 $jsLength = strlen($js);
 $ETag = md5($jsLength);
-if(isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $ETag){
+if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $ETag) {
 	header('HTTP/1.1 304 Not Modified');
 	header('ETag: '.$ETag);
 	exit();
@@ -148,7 +131,7 @@ if(isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $E
 
 header('Content-type: text/javascript; charset=UTF-8');
 // breaks if "zlib.output_compression = On"
-//	header('Content-length: '.$jsLength);
+// header('Content-length: '.$jsLength);
 header('Cache-Control: public, must-revalidate');
 header('ETag: '.$ETag);
 

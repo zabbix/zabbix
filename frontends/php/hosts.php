@@ -316,17 +316,20 @@ include_once('include/page_header.php');
 <?php
 /************ ACTIONS FOR HOSTS ****************/
 // UNLINK HOST
-	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
+	if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
-		if(isset($_REQUEST['unlink'])){
+		if (isset($_REQUEST['unlink'])) {
 			$unlink_templates = array_keys($_REQUEST['unlink']);
 		}
-		else{
+		else {
 			$unlink_templates = array_keys($_REQUEST['unlink_and_clear']);
-			$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'], $unlink_templates);
+			$_REQUEST['clear_templates'] = array_merge($_REQUEST['clear_templates'], $unlink_templates);
 		}
-		foreach($unlink_templates as $id) unset($_REQUEST['templates'][$id]);
+
+		foreach ($unlink_templates as $id) {
+			unset($_REQUEST['templates'][$id]);
+		}
 	}
 // CLONE HOST
 	else if(isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])){
@@ -367,9 +370,10 @@ include_once('include/page_header.php');
 // }}} INVENTORIES
 
 			$newgroup = array();
-			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
-				$result = API::HostGroup()->create(array('name' => $_REQUEST['newgroup']));
-				if($result === false) throw new Exception();
+			if (isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])) {
+				if (!$result = API::HostGroup()->create(array('name' => $_REQUEST['newgroup']))) {
+					throw new Exception();
+				}
 
 				$newgroup = array('groupid' => reset($result['groupids']), 'name' => $_REQUEST['newgroup']);
 			}
@@ -497,9 +501,8 @@ include_once('include/page_header.php');
 			DBstart();
 
 			// create new group
-			if(!zbx_empty($_REQUEST['newgroup'])){
-				$newGroup = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
-				if(!$newGroup){
+			if (!zbx_empty($_REQUEST['newgroup'])) {
+				if (!$newGroup = API::HostGroup()->create(array('name' => $_REQUEST['newgroup']))) {
 					throw new Exception();
 				}
 				$groups[] = reset($newGroup['groupids']);
@@ -566,7 +569,7 @@ include_once('include/page_header.php');
 
 // FULL CLONE {{{
 			if ($clone_hostid && ($_REQUEST['form'] == 'full_clone')) {
-				if (!copy_applications($clone_hostid, $hostid)) {
+				if (!copyApplications($clone_hostid, $hostid)) {
 					throw new Exception();
 				}
 
@@ -574,7 +577,7 @@ include_once('include/page_header.php');
 					throw new Exception();
 				}
 
-				if (!copy_triggers($clone_hostid, $hostid)) {
+				if (!copyTriggers($clone_hostid, $hostid)) {
 					throw new Exception();
 				}
 
@@ -592,7 +595,7 @@ include_once('include/page_header.php');
 						continue;
 					}
 
-					if (httpitemExists($graph['items'])) {
+					if (httpItemExists($graph['items'])) {
 						continue;
 					}
 
@@ -637,7 +640,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['chstatus']) && isset($_REQUEST['hostid'])){
 
 		DBstart();
-			$result = update_host_status($_REQUEST['hostid'], $_REQUEST['chstatus']);
+			$result = updateHostStatus($_REQUEST['hostid'], $_REQUEST['chstatus']);
 		$result = DBend($result);
 
 		show_messages($result, _('Host status updated'), _('Cannot update host status'));
@@ -665,7 +668,7 @@ include_once('include/page_header.php');
 		$act_hosts = available_hosts($hosts, 1);
 
 		DBstart();
-		$go_result = update_host_status($act_hosts, $status);
+		$go_result = updateHostStatus($act_hosts, $status);
 		$go_result = DBend($go_result);
 
 		show_messages($go_result, _('Host status updated'), _('Cannot update host status'));

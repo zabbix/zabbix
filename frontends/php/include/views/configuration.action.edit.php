@@ -47,7 +47,7 @@ require_once('include/views/js/configuration.action.edit.js.php');
 	$actionList->addRow(_('Name'), new CTextBox('name', $data['name'], $inputLength));
 
 	if(EVENT_SOURCE_TRIGGERS == $data['eventsource']){
-		$actionList->addRow(_('Period (minimum 60 seconds)'), array(new CNumericBox('esc_period', $data['esc_period'], 6, 'no'), ' ('._('seconds').')'));
+		$actionList->addRow(_('Default escalation period (minimum 60 seconds)'), array(new CNumericBox('esc_period', $data['esc_period'], 6, 'no'), ' ('._('seconds').')'));
 	}
 	else{
 		$frmAction->addVar('esc_period', 0);
@@ -78,12 +78,16 @@ require_once('include/views/js/configuration.action.edit.js.php');
 	$conditionList = new CFormList('conditionlist');
 	$allowedConditions = get_conditions_by_eventsource($data['eventsource']);
 
-	morder_result($data['conditions'], array('conditiontype','operator'), ZBX_SORT_DOWN);
+	$sortFields = array(
+		array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
+		array('field' => 'operator', 'order' => ZBX_SORT_DOWN)
+	);
+	ArraySorter::sort($data['conditions'], $sortFields);
 
 // group conditions by type
 	$condElements = new CTable(_('No conditions defined.'), 'formElementTable');
 
-	$i=0;
+	$i = 0;
 	$grouped_conditions = array();
 	foreach($data['conditions'] as $id => $condition){
 		if(!isset($condition['conditiontype'])) $condition['conditiontype'] = 0;
@@ -435,7 +439,7 @@ require_once('include/views/js/configuration.action.edit.js.php');
 			));
 
 			$tblStep->addRow(array(
-				_('Period'),
+				_('Escalation period'),
 				new CCol(array(
 					new CNumericBox('new_operation[esc_period]', $new_operation['esc_period'], 5),
 					_('(minimum 60 seconds, 0 - use action default)')))

@@ -19,20 +19,21 @@
 **/
 ?>
 <?php
-class CButtonCancel extends CButton{
-	public function __construct($vars=NULL, $action=NULL, $class=null){
-		parent::__construct('cancel',S_CANCEL, $action, $class);
-
-		if(is_null($action)) $this->setVars($vars);
+class CButtonCancel extends CButton {
+	public function __construct($vars = null, $action = null, $class = null) {
+		parent::__construct('cancel', _('Cancel'), $action, $class);
+		if (is_null($action)) {
+			$this->setVars($vars);
+		}
 	}
 
-	public function setVars($value=NULL){
+	public function setVars($value = null) {
 		$url = '?cancel=1';
-		if(!is_null($value)) $url.= $value;
-
+		if (!is_null($value)) {
+			$url .= $value;
+		}
 		$uri = new Curl($url);
 		$url = $uri->getUrl();
-
 		return $this->setAttribute('onclick', "javascript: return redirect('".$url."');");
 	}
 }

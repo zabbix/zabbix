@@ -1,4 +1,4 @@
-dnl 
+dnl
 dnl Zabbix
 dnl Copyright (C) 2000-2011 Zabbix SIA
 dnl
@@ -95,7 +95,7 @@ AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
 #ifdef HAVE_NET_IF_H
 #  include <net/if.h>
 #endif
-]) 
+])
 AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -108,7 +108,7 @@ AC_CHECK_HEADERS(sys/swap.h, [], [], [
 #ifdef HAVE_SYS_PARAM_H
 #  include <sys/param.h>
 #endif
-]) 
+])
 AC_CHECK_HEADERS(sys/ucontext.h, [], [], [
 #ifdef HAVE_SIGNAL_H
 #  include <signal.h>
@@ -166,7 +166,7 @@ AC_TRY_COMPILE([
 #include <sys/socket.h>
 ],[socklen_t s;],
 AC_MSG_RESULT(yes),
-[AC_DEFINE(socklen_t, int, [Define socklen_t type])
+[AC_DEFINE(socklen_t, int, [Define socklen_t type.])
 AC_MSG_RESULT(no)])
 
 AC_MSG_CHECKING(for actual socklen_t parameter type in socket functions)
@@ -192,7 +192,7 @@ for arg2 in "struct sockaddr" void; do
 done
 if test "x$zbx_socklen_t" != "x"; then
   AC_MSG_RESULT($zbx_socklen_t)
-  AC_DEFINE_UNQUOTED(ZBX_SOCKLEN_T, $zbx_socklen_t, [Define actual socklen_t parameter type in socket functions])
+  AC_DEFINE_UNQUOTED(ZBX_SOCKLEN_T, $zbx_socklen_t, [Define actual socklen_t parameter type in socket functions.])
 else
   AC_MSG_RESULT(leaving undefined)
 fi
@@ -218,7 +218,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 
@@ -256,7 +256,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 
@@ -294,7 +294,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 
@@ -588,7 +588,7 @@ AC_TRY_LINK(
 	seteuid(0);
 	setegid(0);
 ],
-AC_DEFINE(HAVE_FUNCTION_SETEUID,1,[Define to 1 if functions 'seteuid' and 'setegid' exists.])
+AC_DEFINE(HAVE_FUNCTION_SETEUID,1,[Define to 1 if functions 'seteuid' and 'setegid' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -614,7 +614,7 @@ AC_TRY_LINK(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 ],
@@ -634,7 +634,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 #include <unistd.h>
@@ -665,7 +665,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 ],
@@ -692,7 +692,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 ],
@@ -719,7 +719,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 ],
@@ -1154,9 +1154,6 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${JABBER_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${JABBER_LIBS}"
 
-	PROXY_LDFLAGS="${PROXY_LDFLAGS}"
-	PROXY_LIBS="${PROXY_LIBS}"
-
 	dnl Checking for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
 	if test "x$want_curl" = "xyes"; then
@@ -1169,8 +1166,14 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	fi
 
 	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
-	LIBS="${LIBS} ${LIBCURL_LIBS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${LIBCURL_LDFLAGS}"
+	SERVER_LIBS="${SERVER_LIBS} ${LIBCURL_LIBS}"
+
+	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${LIBCURL_LDFLAGS}"
+	PROXY_LIBS="${PROXY_LIBS} ${LIBCURL_LIBS}"
+
+	AGENT_LDFLAGS="${AGENT_LDFLAGS} ${LIBCURL_LDFLAGS}"
+	AGENT_LIBS="${AGENT_LIBS} ${LIBCURL_LIBS}"
 
 	have_odbc="no"
 
@@ -1287,13 +1290,6 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${OPENIPMI_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${OPENIPMI_LIBS}"
-
-	AC_SUBST(SERVER_LDFLAGS)
-	AC_SUBST(SERVER_LIBS)
-
-	AC_SUBST(PROXY_LDFLAGS)
-	AC_SUBST(PROXY_LIBS)
-
 fi
 
 if test "$java" = "yes"; then
@@ -1319,7 +1315,9 @@ if test "x$want_ldap" = "xyes"; then
 	fi
 fi
 CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${LDAP_LDFLAGS}"
+SERVER_LDFLAGS="${SERVER_LDFLAGS} ${LDAP_LDFLAGS}"
+PROXY_LDFLAGS="${PROXY_LDFLAGS} ${LDAP_LDFLAGS}"
+AGENT_LDFLAGS="${AGENT_LDFLAGS} ${LDAP_LDFLAGS}"
 
 found_iconv="no"
 dnl Check for libiconv [by default - skip]
@@ -1333,6 +1331,15 @@ LIBS="${LIBS} ${ICONV_LIBS}"
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
+
+AC_SUBST(SERVER_LDFLAGS)
+AC_SUBST(SERVER_LIBS)
+
+AC_SUBST(PROXY_LDFLAGS)
+AC_SUBST(PROXY_LIBS)
+
+AC_SUBST(AGENT_LDFLAGS)
+AC_SUBST(AGENT_LIBS)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1375,11 +1382,11 @@ linux*)
         kernel=`uname -r`
 
         case "${kernel}" in
-             2.6.*) 
+             2.6.*)
         	    AC_MSG_RESULT([2.6 family (${kernel})])
         	    AC_DEFINE([KERNEL_2_6], 1, [Define to 1 if you are using Linux 2.6.x])
         	    ;;
-             2.4.*) 
+             2.4.*)
         	    AC_MSG_RESULT([2.4 family (${kernel})])
         	    AC_DEFINE([KERNEL_2_4], 1, [Define to 1 if you are using Linux 2.4.x])
         	    ;;
@@ -1559,8 +1566,8 @@ echo "
 if test "x$agent" != "xno"; then
 
 echo "  Agent details:
-    Linker flags:          ${LDFLAGS}
-    Libraries:             ${LIBS}"
+    Linker flags:          ${LDFLAGS} ${AGENT_LDFLAGS}
+    Libraries:             ${LIBS} ${AGENT_LIBS}"
 
 fi
 

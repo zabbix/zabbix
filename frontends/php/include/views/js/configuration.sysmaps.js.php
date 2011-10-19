@@ -107,8 +107,8 @@
 
 				<tr>
 					<td colspan="2">
-						<div class="groupingCaption"><?php echo _('Icons'); ?></div>
-						<div class="groupingContent">
+						<fieldset>
+							<legend><?php echo _('Icons'); ?></legend>
 							<table>
 								<tbody>
 								<tr id="useIconMapRow">
@@ -141,10 +141,10 @@
 								</tr>
 								</tbody>
 							</table>
-						</div>
+						</fieldset>
 					</td>
-
 				</tr>
+
 				<tr>
 					<td><label for="x"><?php echo _('Coordinate X'); ?></label></td>
 					<td><input id="x" maxlength="5" value="0" size="5" name="x" class="input"></td>
@@ -153,26 +153,27 @@
 					<td><label for="y"><?php echo _('Coordinate Y'); ?></label></td>
 					<td><input maxlength="5" value="0" size="5" id="y" name="y" class="input"></td>
 				</tr>
+
 				<tr>
 					<td colspan="2">
-						<div class="groupingCaption"><?php echo _('Links'); ?></div>
-						<div class="groupingContent">
-								<table>
-									<thead>
-									<tr>
-										<td><?php echo _('Name'); ?></td>
-										<td><?php echo _('URL'); ?></td>
-										<td></td>
-									</tr>
-									</thead>
-									<tbody id="urlContainer"></tbody>
-									<tfoot>
-									<tr>
-										<td colspan="3"><span id="newSelementUrl" class="link_menu"><?php echo _('Add'); ?></span></td>
-									</tr>
-									</tfoot>
-								</table>
-						</div>
+						<fieldset>
+							<legend><?php echo _('URLs'); ?></legend>
+							<table>
+								<thead>
+								<tr>
+									<td><?php echo _('Name'); ?></td>
+									<td><?php echo _('URL'); ?></td>
+									<td></td>
+								</tr>
+								</thead>
+								<tbody id="urlContainer"></tbody>
+								<tfoot>
+								<tr>
+									<td colspan="3"><span id="newSelementUrl" class="link_menu"><?php echo _('Add'); ?></span></td>
+								</tr>
+								</tfoot>
+							</table>
+						</fieldset>
 					</td>
 				</tr>
 				<tr class="footer">
@@ -186,14 +187,15 @@
 			</table>
 		</form>
 
-		<div id="mapLinksContainer" style="max-height: 128px; overflow-y: scroll; overflow-x: hidden; display: none;">
+		<div id="mapLinksContainer" style="border: 1px solid #AAA; max-height: 128px; overflow-y: scroll; overflow-x: hidden; display: none;">
 			<table class="tableinfo">
+				<caption><?php echo _('Edit element links'); ?></caption>
 				<thead>
 				<tr class="header">
 					<td></td>
 					<td><?php echo _('Element type'); ?></td>
 					<td><?php echo _('Element name'); ?></td>
-					<td><?php echo _('Link status indicator'); ?></td>
+					<td><?php echo _('Link indicators'); ?></td>
 				</tr>
 				</thead>
 				<tbody id=linksList></tbody>
@@ -228,7 +230,7 @@
 					<td><label for="color"><?php echo _('Colour (OK)'); ?></label></td>
 					<td>
 						<input maxlength="6" size="7" id="color" name="color" class="input colorpicker">
-						<div id="lbl_color" class="pointer colorpickerLabel">&nbsp;</div>
+						<div id="lbl_color" class="pointer colorpickerLabel">&nbsp;&nbsp;&nbsp;</div>
 					</td>
 				</tr>
 				<tr>
@@ -392,7 +394,7 @@
 		</td>
 		<td>
 			<input maxlength="6" value="#{color}" size="7" id="linktrigger_#{linktriggerid}_color" name="linktrigger_#{linktriggerid}_color" class="input colorpicker">
-			<div id="lbl_linktrigger_#{linktriggerid}_color" class="pointer colorpickerLabel">&nbsp;</div>
+			<div id="lbl_linktrigger_#{linktriggerid}_color" class="pointer colorpickerLabel">&nbsp;&nbsp;&nbsp;</div>
 		</td>
 		<td>
 			<span class="link_menu triggerRemove" data-linktriggerid="#{linktriggerid}""><?php echo _('Remove'); ?></span>

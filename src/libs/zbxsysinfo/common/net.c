@@ -174,7 +174,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
 #if defined(HAVE_RES_QUERY) || defined(_WINDOWS)
 
-	int		res, type, retrans, retry, i, offset = 0, ret = SYSINFO_RET_FAIL;
+	size_t		offset = 0;
+	int		res, type, retrans, retry, i, ret = SYSINFO_RET_FAIL;
 	char		ip[MAX_STRING_LEN], zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	struct in_addr	inaddr;
 
@@ -447,9 +448,6 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	if (NOERROR != hp->rcode || 0 == ntohs(hp->ancount) || -1 == res)
 		return SYSINFO_RET_FAIL;
 
-	*buffer = '\0';
-	offset = 0;
-
 	msg_end = answer.buffer + res;
 
 	num_answers = ntohs(answer.h.ancount);
@@ -651,7 +649,8 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 #endif	/* _WINDOWS */
 
-	zbx_rtrim(buffer + MAX(offset - 1, 0), "\n");
+	if (0 != offset)
+		buffer[--offset] = '\0';
 
 	SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	ret = SYSINFO_RET_OK;

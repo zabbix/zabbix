@@ -117,7 +117,7 @@
 		}
 	}
 
-	function get_current_nodeid($forse_all_nodes = null, $perm = null){
+	function get_current_nodeid($force_all_nodes = null, $perm = null){
 		global $ZBX_CURRENT_NODEID, $ZBX_AVAILABLE_NODES, $ZBX_VIEWED_NODES;
 		if(!isset($ZBX_CURRENT_NODEID)) {
 // frontend error!!!
@@ -128,7 +128,7 @@
 		if(!is_null($perm)){
 			return get_accessible_nodes_by_user(CWebUser::$data, $perm, PERM_RES_IDS_ARRAY, $ZBX_AVAILABLE_NODES);
 		}
-		else if(is_null($forse_all_nodes)){
+		else if(is_null($force_all_nodes)){
 			if($ZBX_VIEWED_NODES['selected'] == 0) {
 				$result = $ZBX_VIEWED_NODES['nodeids'];
 			}
@@ -139,7 +139,7 @@
 			if(empty($result)) $result = CWebUser::$data['node']['nodeid'];
 			if(empty($result)) $result = $ZBX_CURRENT_NODEID;
 		}
-		else if($forse_all_nodes) {
+		else if($force_all_nodes) {
 			$result = $ZBX_AVAILABLE_NODES;
 		}
 		else {
@@ -199,10 +199,10 @@
 	return $result;
 	}
 
-	function get_node_name_by_elid($id_val, $forse_with_all_nodes = null, $delimiter = ''){
+	function get_node_name_by_elid($id_val, $force_with_all_nodes = null, $delimiter = ''){
 		global $ZBX_NODES, $ZBX_VIEWED_NODES;
 
-		if($forse_with_all_nodes === false || (is_null($forse_with_all_nodes) && ($ZBX_VIEWED_NODES['selected'] != 0))) {
+		if($force_with_all_nodes === false || (is_null($force_with_all_nodes) && ($ZBX_VIEWED_NODES['selected'] != 0))) {
 			return null;
 		}
 
@@ -254,7 +254,7 @@
 		return $result;
 	}
 
-	function add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type, $masterid){
+	function add_node($new_nodeid, $name, $ip, $port, $node_type, $masterid) {
 		global $ZBX_LOCMASTERID, $ZBX_LOCALNODEID;
 
 //		if(!eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
@@ -287,9 +287,9 @@
 		}
 
 		$nodetype = 0;
-		$sql = 'INSERT INTO nodes (nodeid,name,timezone,ip,port,slave_history,slave_trends, nodetype,masterid) '.
-			' VALUES ('.$new_nodeid.','.zbx_dbstr($name).','.$timezone.','.zbx_dbstr($ip).','.$port.','.$slave_history.','.
-			$slave_trends.','.$nodetype.','.zero2null($masterid).')';
+		$sql = 'INSERT INTO nodes (nodeid,name,ip,port,nodetype,masterid)'.
+			' VALUES ('.$new_nodeid.','.zbx_dbstr($name).','.zbx_dbstr($ip).','.$port.','.
+			$nodetype.','.zero2null($masterid).')';
 		$result = DBexecute($sql);
 
 		if($result && $node_type == ZBX_NODE_MASTER){
@@ -300,16 +300,15 @@
 	return ($result ? $new_nodeid : $result);
 	}
 
-	function update_node($nodeid,$new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends){
+	function update_node($nodeid, $name, $ip, $port) {
 //		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 		if(!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name)){
 			error(S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME);
 			return false;
 		}
 
-		$result = DBexecute('UPDATE nodes SET nodeid='.$new_nodeid.',name='.zbx_dbstr($name).','.
-			'timezone='.$timezone.',ip='.zbx_dbstr($ip).',port='.$port.','.
-			'slave_history='.$slave_history.',slave_trends='.$slave_trends.
+		$result = DBexecute('UPDATE nodes SET name='.zbx_dbstr($name).','.
+			'ip='.zbx_dbstr($ip).',port='.$port.
 			' WHERE nodeid='.$nodeid);
 	return $result;
 	}
@@ -328,8 +327,8 @@
 			$result = (
 				// DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
 					// " values ($housekeeperid,'nodes','nodeid',$nodeid)") &&
-				DBexecute('delete from nodes where nodeid='.$nodeid) &&
-				DBexecute('update nodes set masterid=NULL where masterid='.$nodeid)
+				DBexecute('update nodes set masterid=NULL where masterid='.$nodeid) &&
+				DBexecute('delete from nodes where nodeid='.$nodeid)
 				);
 			error(S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE);
 		}

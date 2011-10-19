@@ -15,45 +15,9 @@ INSERT INTO help_items VALUES (3,'icmppingloss[&lt;ip&gt;,&lt;count&gt;,&lt;inte
 /
 INSERT INTO help_items VALUES (3,'icmppingsec[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;,&lt;type&gt;]','Returns ICMP ping response time in seconds. Example: 0.02')
 /
-INSERT INTO help_items VALUES (3,'ftp&lt;,port&gt;','Checks if FTP server is running and accepting connections. 0 - FTP server is down. 1 - FTP server is running.')
+INSERT INTO help_items VALUES (3,'net.tcp.service[service,&lt;ip&gt;,&lt;port&gt;]','Check if service is available. 0 - service is down, 1 - service is running. If &lt;ip&gt; is missing, IP or DNS name is taken from host definition. If &lt;port&gt; is missing, default service port is used.')
 /
-INSERT INTO help_items VALUES (3,'http&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections. 0 - HTTP server is down. 1 - HTTP server is running.')
-/
-INSERT INTO help_items VALUES (3,'imap&lt;,port&gt;','Checks if IMAP server is running and accepting connections. 0 - IMAP server is down. 1 - IMAP server is running.')
-/
-INSERT INTO help_items VALUES (3,'ldap&lt;,port&gt;','Checks if LDAP server is running and accepting connections. 0 - LDAP server is down. 1 - LDAP server is running.')
-/
-INSERT INTO help_items VALUES (3,'nntp&lt;,port&gt;','Checks if NNTP server is running and accepting connections. 0 - NNTP server is down. 1 - NNTP server is running.')
-/
-INSERT INTO help_items VALUES (3,'ntp&lt;,port&gt;','Checks if NTP server is running and accepting connections. 0 - NTP server is down. 1 - NTP server is running.')
-/
-INSERT INTO help_items VALUES (3,'pop&lt;,port&gt;','Checks if POP server is running and accepting connections. 0 - POP server is down. 1 - POP server is running.')
-/
-INSERT INTO help_items VALUES (3,'smtp&lt;,port&gt;','Checks if SMTP server is running and accepting connections. 0 - SMTP server is down. 1 - SMTP server is running.')
-/
-INSERT INTO help_items VALUES (3,'ssh&lt;,port&gt;','Checks if SSH server is running and accepting connections. 0 - SSH server is down. 1 - SSH server is running.')
-/
-INSERT INTO help_items VALUES (3,'tcp,port','Checks if TCP service is running and accepting connections on port. 0 - the service on the port is down. 1 - the service is running.')
-/
-INSERT INTO help_items VALUES (3,'ftp_perf&lt;,port&gt;','Checks if FTP server is running and accepting connections. 0 - FTP server is down. Otherwise, number of seconds spent connecting to FTP server.')
-/
-INSERT INTO help_items VALUES (3,'http_perf&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections. 0 - HTTP server is down. Otherwise, number of seconds spent connecting to HTTP server.')
-/
-INSERT INTO help_items VALUES (3,'imap_perf&lt;,port&gt;','Checks if IMAP server is running and accepting connections. 0 - IMAP server is down. Otherwise, number of seconds spent connecting to IMAP server.')
-/
-INSERT INTO help_items VALUES (3,'ldap_perf&lt;,port&gt;','Checks if LDAP server is running and accepting connections. 0 - LDAP server is down. Otherwise, number of seconds spent connecting to LDAP server.')
-/
-INSERT INTO help_items VALUES (3,'nntp_perf&lt;,port&gt;','Checks if NNTP server is running and accepting connections. 0 - NNTP server is down. Otherwise, number of seconds spent connecting to NNTP server.')
-/
-INSERT INTO help_items VALUES (3,'ntp_perf&lt;,port&gt;','Checks if NTP server is running and accepting connections. 0 - NTP server is down. Otherwise, number of seconds spent connecting to NTP server.')
-/
-INSERT INTO help_items VALUES (3,'pop_perf&lt;,port&gt;','Checks if POP server is running and accepting connections. 0 - POP server is down. Otherwise, number of milliseconds spent connecting to POP server.')
-/
-INSERT INTO help_items VALUES (3,'smtp_perf&lt;,port&gt;','Checks if SMTP server is running and accepting connections. 0 - SMTP server is down. Otherwise, number of seconds spent connecting to SMTP server.')
-/
-INSERT INTO help_items VALUES (3,'ssh_perf&lt;,port&gt;','Checks if SSH server is running and accepting connections. 0 - SSH server is down. Otherwise, number of seconds spent connecting to SSH server.')
-/
-INSERT INTO help_items VALUES (3,'tcp_perf,port','Checks if TCP service is running and accepting connections on port. 0 - the service on the port is down. Otherwise, number of seconds spent connecting to TCP service.')
+INSERT INTO help_items VALUES (3,'net.tcp.service.perf[service,&lt;ip&gt;,&lt;port&gt;]','Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If &lt;ip&gt; is missing, IP or DNS name is taken from host definition. If &lt;port&gt; is missing, default service port is used.')
 /
 
 INSERT INTO help_items VALUES (5,'zabbix[boottime]','Startup time of Zabbix server, Unix timestamp.')
@@ -120,7 +84,7 @@ INSERT INTO help_items VALUES (0,'net.tcp.listen[port]','Checks if this port is 
 /
 INSERT INTO help_items VALUES (0,'net.tcp.port[&lt;ip&gt;, port]','Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]')
 /
-INSERT INTO help_items VALUES (0,'net.tcp.service[service &lt;,ip&gt; &lt;,port&gt;]','Check if service server is running and accepting connections. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
+INSERT INTO help_items VALUES (0,'net.tcp.service[service &lt;,ip&gt; &lt;,port&gt;]','Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
 /
 INSERT INTO help_items VALUES (0,'net.tcp.service.perf[service &lt;,ip&gt; &lt;,port&gt;]','Check performance of service &quot;service&quot;. 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.')
 /
@@ -243,7 +207,7 @@ INSERT INTO help_items VALUES (7,'net.tcp.listen[port]','Checks if this port is 
 /
 INSERT INTO help_items VALUES (7,'net.tcp.port[&lt;ip&gt;, port]','Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]')
 /
-INSERT INTO help_items VALUES (7,'net.tcp.service[service &lt;,ip&gt; &lt;,port&gt;]','Check if service server is running and accepting connections. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
+INSERT INTO help_items VALUES (7,'net.tcp.service[service &lt;,ip&gt; &lt;,port&gt;]','Check if service is available. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].')
 /
 INSERT INTO help_items VALUES (7,'net.tcp.service.perf[service &lt;,ip&gt; &lt;,port&gt;]','Check performance of service &quot;service&quot;. 0 - service is down, sec - number of seconds spent on connection to the service. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.')
 /

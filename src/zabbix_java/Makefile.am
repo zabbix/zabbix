@@ -13,6 +13,8 @@ ZJP = bin/zabbix-java-proxy-$(VERSION).jar
 LIB = lib/org-json-2010-12-28.jar:lib/logback-core-0.9.27.jar:lib/logback-classic-0.9.27.jar:lib/slf4j-api-1.6.1.jar
 JUNIT = tests/junit-4.8.2.jar
 
+ZJP_DEST = $(DESTDIR)$(sbindir)/zabbix_java
+
 all: $(ZJP)
 
 $(ZJP): class src/com/zabbix/proxy/*.java
@@ -24,18 +26,18 @@ test: class
 	java -classpath class/tests:$(LIB):$(ZJP):$(JUNIT) com.zabbix.proxy.AllTestRunner
 
 class:
-	mkdir -p class/src
-	mkdir -p class/tests
+	$(MKDIR_P) class/src
+	$(MKDIR_P) class/tests
 
 install: all
-	mkdir -p $(sbindir)/zabbix_java/bin
-	mkdir -p $(sbindir)/zabbix_java/lib
-	cp startup.sh shutdown.sh $(sbindir)/zabbix_java
-	if test ! -f $(sbindir)/zabbix_java/settings.sh; then cp settings.sh $(sbindir)/zabbix_java; fi
-	cp $(ZJP) $(sbindir)/zabbix_java/bin
-	cp lib/*.jar $(sbindir)/zabbix_java/lib
-	if test ! -f $(sbindir)/zabbix_java/lib/logback.xml; then cp lib/logback.xml $(sbindir)/zabbix_java/lib; fi
-	if test ! -f $(sbindir)/zabbix_java/lib/logback-console.xml; then cp lib/logback-console.xml $(sbindir)/zabbix_java/lib; fi
+	$(MKDIR_P) "$(ZJP_DEST)/bin"
+	$(MKDIR_P) "$(ZJP_DEST)/lib"
+	cp startup.sh shutdown.sh "$(ZJP_DEST)"
+	if test ! -f "$(ZJP_DEST)/settings.sh"; then cp settings.sh "$(ZJP_DEST)"; fi
+	cp $(ZJP) "$(ZJP_DEST)/bin"
+	cp lib/*.jar "$(ZJP_DEST)/lib"
+	if test ! -f "$(ZJP_DEST)/lib/logback.xml"; then cp lib/logback.xml "$(ZJP_DEST)/lib"; fi
+	if test ! -f "$(ZJP_DEST)/lib/logback-console.xml"; then cp lib/logback-console.xml "$(ZJP_DEST)/lib"; fi
 
 clean:
 	rm -f $(ZJP)

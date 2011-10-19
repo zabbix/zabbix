@@ -591,6 +591,9 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 			// UTF8 chars
 			array('ГУГЛ', false),
 			array('', false),
+			array(',telnet', false),
+			array('telnet,', false),
+			array('telnet,1023', false),
 			array('telnet,1023[]', false),
 			array('[]', false)
 		);

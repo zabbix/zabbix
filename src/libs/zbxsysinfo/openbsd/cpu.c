@@ -21,101 +21,57 @@
 #include "sysinfo.h"
 #include "stats.h"
 
-int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	get_cpu_num()
 {
-#ifdef HAVE_FUNCTION_SYSCTL_HW_NCPU
-	/* OpenBSD 4.2,4.3 i386 */
+#ifdef HAVE_FUNCTION_SYSCTL_HW_NCPU	/* OpenBSD 4.2,4.3 i386 */
 	size_t	len;
 	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
-	char	mode[MAX_STRING_LEN];
-
-	if (num_param(param) > 1)
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 1, mode, sizeof(mode)))
-		*mode = '\0';
-
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "online");
-
-	if (0 != strcmp(mode, "online"))
-		return SYSINFO_RET_FAIL;
 
 	len = sizeof(ncpu);
 
-	if (0 != sysctl(mib, 2, &ncpu, &len, NULL, 0))
+	if (-1 == sysctl(mib, 2, &ncpu, &len, NULL, 0))
+		return -1;
+
+	return ncpu;
+#else
+	return -1;
+#endif
+}
+
+int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	tmp[16];
+	int	cpu_num;
+
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, ncpu);
+	/* only "online" (default) for parameter "type" is supported */
+	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "online"))
+		return SYSINFO_RET_FAIL;
+
+	if (-1 == (cpu_num = get_cpu_num()))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, cpu_num);
 
 	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif /* HAVE_FUNCTION_SYSCTL_HW_NCPU */
-}
-
-int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#if defined(HAVE_UVM_UVMEXP)
-	/* OpenBSD 4.2 i386 */
-	int		mib[] = {CTL_VM, VM_UVMEXP};
-	size_t		len;
-	struct uvmexp	v;
-
-	len = sizeof(struct uvmexp);
-
-	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, v.intrs);
-
-	return	SYSINFO_RET_OK;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif /* HAVE_UVM_UVMEXP2 */
-}
-
-int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#if defined(HAVE_UVM_UVMEXP)
-	/* OpenBSD 4.2 i386 */
-	int		mib[] = {CTL_VM, VM_UVMEXP};
-	size_t		len;
-	struct uvmexp	v;
-
-	len = sizeof(struct uvmexp);
-
-	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, v.swtch);
-
-	return	SYSINFO_RET_OK;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif /* HAVE_UVM_UVMEXP2 */
 }
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[16];
-	int	cpu_num, mode, state;
+	int	cpu_num, state, mode;
 
-	if (num_param(param) > 3)
+	if (3 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "all"))	/* default parameter */
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
 		cpu_num = 0;
-	else if (1 > (cpu_num = atoi(tmp) + 1))
+	else if (SUCCEED != is_uint(tmp) || 1 > (cpu_num = atoi(tmp) + 1))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "user"))	/* default parameter */
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "user"))
 		state = ZBX_CPU_STATE_USER;
 	else if (0 == strcmp(tmp, "nice"))
 		state = ZBX_CPU_STATE_NICE;
@@ -128,10 +84,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
+	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		mode = ZBX_AVG1;
 	else if (0 == strcmp(tmp, "avg5"))
 		mode = ZBX_AVG5;
@@ -145,24 +98,19 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	/* OpenBSD 3.9 i386; OpenBSD 4.3 i386 */
-	char	tmp[32];
-	int	mode;
-	double	load[ZBX_AVG_COUNT];
+	char	tmp[16];
+	int	mode, per_cpu = 1, cpu_num;
+	double	load[ZBX_AVG_COUNT], value;
 
-	if (num_param(param) > 2)
+	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' != *tmp && 0 != strcmp(tmp, "all"))	/* default parameter */
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
+		per_cpu = 0;
+	else if (0 != strcmp(tmp, "percpu"))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
-		*tmp = '\0';
-
-	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
 		mode = ZBX_AVG1;
 	else if (0 == strcmp(tmp, "avg5"))
 		mode = ZBX_AVG5;
@@ -171,14 +119,59 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
-#ifdef HAVE_GETLOADAVG
 	if (mode >= getloadavg(load, 3))
 		return SYSINFO_RET_FAIL;
-#else
-	return SYSINFO_RET_FAIL;
-#endif	/* HAVE_GETLOADAVG */
 
-	SET_DBL_RESULT(result, load[mode]);
+	value = load[mode];
+
+	if (1 == per_cpu)
+	{
+		if (0 >= (cpu_num = get_cpu_num()))
+			return SYSINFO_RET_FAIL;
+		value /= cpu_num;
+	}
+
+	SET_DBL_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
+}
+
+int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifdef HAVE_UVM_UVMEXP	/* OpenBSD 4.2 i386 */
+	int		mib[] = {CTL_VM, VM_UVMEXP};
+	size_t		len;
+	struct uvmexp	v;
+
+	len = sizeof(struct uvmexp);
+
+	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, v.swtch);
+
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
+}
+
+int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifdef HAVE_UVM_UVMEXP	/* OpenBSD 4.2 i386 */
+	int		mib[] = {CTL_VM, VM_UVMEXP};
+	size_t		len;
+	struct uvmexp	v;
+
+	len = sizeof(struct uvmexp);
+
+	if (0 != sysctl(mib, 2, &v, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, v.intrs);
+
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
 }
