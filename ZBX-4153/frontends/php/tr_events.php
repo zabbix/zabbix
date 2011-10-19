@@ -106,7 +106,7 @@ $left_col = array();
 
 // tr details
 $triggerDetails = new CUIWidget('hat_triggerdetails', make_trigger_details($trigger));
-$triggerDetails->setHeader(('Event source details'));
+$triggerDetails->setHeader(_('Event source details'));
 $left_col[] = $triggerDetails;
 
 // event details
@@ -135,7 +135,7 @@ $right_col[] = $actions_cmd;
 
 // event history
 $events_histry = new CUIWidget('hat_eventlist', make_small_eventlist($event), CProfile::get('web.tr_events.hats.hat_eventlist.state', 1));
-$events_histry->setHeader(_('Events list [previous 20]'));
+$events_histry->setHeader(_('Event list [previous 20]'));
 $right_col[] = $events_histry;
 
 $leftDiv = new CDiv($left_col, 'column');

@@ -137,7 +137,7 @@ echo SBR;
 
 if ($bulk) {
 	$title = _('Acknowledge alarm by');
-	$btn_txt2 = _('Acknowledge').' '._('&').' '._('Return');
+	$btn_txt2 = _('Acknowledge and return');
 }
 else {
 	$db_acks = get_acknowledges_by_eventid($_REQUEST['eventid']);
@@ -161,12 +161,12 @@ else {
 	if ($event_acknowledged) {
 		$title = _('Add comment by');
 		$btn_txt = _('Save');
-		$btn_txt2 = _('Save').' '._('&').' '._('Return');
+		$btn_txt2 = _('Save and return');
 	}
 	else {
 		$title = _('Acknowledge alarm by');
 		$btn_txt = _('Acknowledge');
-		$btn_txt2 = _('Acknowledge').' '._('&').' '._('Return');
+		$btn_txt2 = _('Acknowledge and return');
 	}
 }
 
