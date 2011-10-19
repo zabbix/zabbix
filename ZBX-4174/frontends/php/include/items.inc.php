@@ -186,7 +186,7 @@ function item_type2str($type = null){
 	}
 
 	function getInterfaceTypeByItem($type) {
-		switch ($type) {
+		switch($type){
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
 			case ITEM_TYPE_SNMPV3:
@@ -194,18 +194,18 @@ function item_type2str($type = null){
 				return INTERFACE_TYPE_SNMP;
 			case ITEM_TYPE_IPMI:
 				return INTERFACE_TYPE_IPMI;
-			case ITEM_TYPE_JMX:
-				return INTERFACE_TYPE_JMX;
 			case ITEM_TYPE_ZABBIX:
+				return INTERFACE_TYPE_AGENT;
 			case ITEM_TYPE_SIMPLE:
 			case ITEM_TYPE_EXTERNAL:
-			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:
-				return INTERFACE_TYPE_AGENT;
+				return INTERFACE_TYPE_ANY;
+			case ITEM_TYPE_JMX:
+				return INTERFACE_TYPE_JMX;
+			default:
+				return false;
 		}
-
-		return INTERFACE_TYPE_UNKNOWN;
 	}
 
 // Delete Item definition from selected group
@@ -319,17 +319,31 @@ function item_type2str($type = null){
 		$dstHosts = API::Host()->get($options);
 
 		foreach ($dstHosts as $dstHost) {
+			$interfaceids = array();
+			foreach ($dstHost['interfaces'] as $interface) {
+				if ($interface['main'] == 1) {
+					$interfaceids[$interface['type']] = $interface['interfaceid'];
+				}
+			}
+
 			foreach ($srcItems as &$srcItem) {
-				if ($dstHost['status'] != HOST_STATUS_TEMPLATE && INTERFACE_TYPE_UNKNOWN != ($type = getInterfaceTypeByItem($srcItem['type']))) {
-					foreach ($dstHost['interfaces'] as $interface) {
-						if ($interface['type'] == $type && $interface['main'] == 1) {
-							$srcItem['interfaceid'] = $interface['interfaceid'];
+				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
+					$type = getInterfaceTypeByItem($srcItem['type']);
+
+					if ($type == INTERFACE_TYPE_ANY) {
+						foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {
+							if (isset($interfaceids[$itype])) {
+								$srcItem['interfaceid'] = $interfaceids[$itype];
+								break;
+							}
 						}
 					}
-
-					if (!isset($srcItem['interfaceid'])) {
-						error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
-						return false;
+					elseif ($type !== false) {
+						if (!isset($interfaceids[$type])) {
+							error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
+							return false;
+						}
+						$srcItem['interfaceid'] = $interfaceids[$type];
 					}
 				}
 
@@ -373,17 +387,31 @@ function item_type2str($type = null){
 		$dstHosts = API::Host()->get($options);
 		$dstHost = reset($dstHosts);
 
+		$interfaceids = array();
+		foreach ($dstHost['interfaces'] as $interface) {
+			if ($interface['main'] == 1) {
+				$interfaceids[$interface['type']] = $interface['interfaceid'];
+			}
+		}
+
 		foreach ($srcItems as &$srcItem) {
-			if ($dstHost['status'] != HOST_STATUS_TEMPLATE && INTERFACE_TYPE_UNKNOWN != ($type = getInterfaceTypeByItem($srcItem['type']))) {
-				foreach ($dstHost['interfaces'] as $interface) {
-					if ($interface['type'] == $type && $interface['main'] == 1) {
-						$srcItem['interfaceid'] = $interface['interfaceid'];
+			if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
+				$type = getInterfaceTypeByItem($srcItem['type']);
+
+				if ($type == INTERFACE_TYPE_ANY) {
+					foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {
+						if (isset($interfaceids[$itype])) {
+							$srcItem['interfaceid'] = $interfaceids[$itype];
+							break;
+						}
 					}
 				}
-
-				if (!isset($srcItem['interfaceid'])) {
-					error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
-					return false;
+				elseif ($type !== false) {
+					if (!isset($interfaceids[$type])) {
+						error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
+						return false;
+					}
+					$srcItem['interfaceid'] = $interfaceids[$type];
 				}
 			}
 
