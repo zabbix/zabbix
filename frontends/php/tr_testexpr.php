@@ -79,7 +79,7 @@ include_once('include/page_header.php');
 			if(substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN){
 				$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, zbx_strlen($validation) - COMBO_PATTERN_LENGTH - 4));
 
-				$control = new CComboBox($fname, $macrosData[$macrosId]['cValue']);
+				$control = new CComboBox($fname, $macrosData[$exprPart['expression']]);
 				foreach ($vals as $v) $control->addItem($v, $v);
 			}
 			else

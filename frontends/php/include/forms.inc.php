@@ -2351,26 +2351,26 @@
 			array_push($row, BR());
 			if(empty($outline)){
 
-				$tmpbtn = new CButton('add_expression', S_ADD, "");
+				$tmpbtn = new CSubmit('add_expression', S_ADD, "");
 				if($limited=='yes'){
 					$tmpbtn->setAttribute('disabled', 'disabled');
 				}
 				array_push($row, $tmpbtn);
 			}
 			else{
-				$tmpbtn = new CButton('and_expression', S_AND_BIG, "");
+				$tmpbtn = new CSubmit('and_expression', S_AND_BIG, "");
 				if($limited=='yes'){
 					$tmpbtn->setAttribute('disabled', 'disabled');
 				}
 				array_push($row, $tmpbtn);
 
-				$tmpbtn = new CButton('or_expression', S_OR_BIG, "");
+				$tmpbtn = new CSubmit('or_expression', S_OR_BIG, "");
 				if($limited=='yes'){
 					$tmpbtn->setAttribute('disabled', 'disabled');
 				}
 				array_push($row, $tmpbtn);
 
-				$tmpbtn = new CButton('replace_expression', S_REPLACE, "");
+				$tmpbtn = new CSubmit('replace_expression', S_REPLACE, "");
 				if($limited=='yes'){
 					$tmpbtn->setAttribute('disabled', 'disabled');
 				}
