@@ -55,7 +55,7 @@ extern unsigned char	daemon_type;
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
 
 static int		ZBX_HISTORY_SIZE = 0;
-int			ZBX_SYNC_MAX = 1000;	/* Must be less than ZBX_HISTORY_SIZE */
+int			ZBX_SYNC_MAX = 1000;	/* must be less than ZBX_HISTORY_SIZE */
 static int		ZBX_ITEMIDS_SIZE = 0;
 
 #define ZBX_IDS_SIZE	8
@@ -296,7 +296,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			table_name = "trends_uint";
 			break;
 		default:
-			zbx_error("Unsupported value type for trends");
+			zbx_error("unsupported value type for trends");
 			assert(0);
 	}
 
@@ -784,7 +784,7 @@ static void	DCsync_trends()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d",
 			__function_name, cache->trends_num);
 
-	zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data...");
+	zabbix_log(LOG_LEVEL_WARNING, "syncing trends data...");
 
 	LOCK_TRENDS;
 
@@ -802,7 +802,7 @@ static void	DCsync_trends()
 
 	DBcommit();
 
-	zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data... done.");
+	zabbix_log(LOG_LEVEL_WARNING, "syncing trends data done");
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1166,7 +1166,7 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
-	int		sql_offset = 0, i;
+	int		sql_offset = 0, i, j, found;
 	ZBX_DC_HISTORY	*h;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc, ids_num = 0;
@@ -1182,7 +1182,8 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
 			"select itemid,status,lastclock,prevorgvalue,delta,multiplier,formula,history,trends,error"
 			" from items"
-			" where");
+			" where status<>%d"
+			" and", ITEM_STATUS_DISABLED);
 
 	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
 
@@ -1198,9 +1199,18 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
 #endif
 
+	/* item ids that are not disabled in DB */
+	ids_num = 0;
+	ids_alloc = 32;
+	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(item.itemid, row[0]);
+
+		ids[ids_num++] = item.itemid;
+		if (0 == ids_num % ids_alloc)
+			ids = zbx_realloc(ids, ids_alloc * (ids_num / ids_alloc + 1) * sizeof(zbx_uint64_t));
 
 		h = NULL;
 
@@ -1255,6 +1265,24 @@ static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 	}
 	DBfree_result(result);
+
+	/* disable processing of deleted and disabled history items by setting value_null */
+	for (i = 0; i < history_num; i++)
+	{
+		found = 0;
+		for (j = 0; j < ids_num; j++)
+		{
+			if (history[i].itemid == ids[j])
+			{
+				found = 1;
+				break;
+			}
+		}
+
+		if (0 == found)
+			history[i].value_null = 1;
+	}
+	zbx_free(ids);
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
@@ -2126,7 +2154,7 @@ int	DCsync_history(int sync_type)
 
 	if (ZBX_SYNC_FULL == sync_type)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data...");
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 		now = time(NULL);
 		cache->itemids_num = 0;
 	}
@@ -2312,7 +2340,7 @@ int	DCsync_history(int sync_type)
 
 		if (ZBX_SYNC_FULL == sync_type && time(NULL) - now >= 10)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Syncing history data... " ZBX_FS_DBL "%%",
+			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)total_num / (cache->history_num + total_num) * 100);
 			now = time(NULL);
 		}
@@ -2320,7 +2348,7 @@ int	DCsync_history(int sync_type)
 	while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (skipped_clock != 0 && skipped_clock < max_delay));
 finish:
 	if (ZBX_SYNC_FULL == sync_type)
-		zabbix_log(LOG_LEVEL_WARNING, "Syncing history data... done.");
+		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 
 	return total_num;
 }
@@ -2512,7 +2540,7 @@ retry:
 	{
 		if (text_len > CONFIG_TEXT_CACHE_SIZE)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for text cache");
+			zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for text cache");
 			exit(-1);
 		}
 
@@ -2767,7 +2795,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT 
 						severity, logeventid, lastlogsize, mtime);
 			break;
 		default:
-			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
+			zabbix_log(LOG_LEVEL_ERR, "unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
 					value_type, itemid);
 	}
 }
@@ -2804,25 +2832,25 @@ void	init_database_cache()
 			-1 == (history_text_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_TEXT_ID)) ||
 			-1 == (trend_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_TREND_ID)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot create IPC keys for history and trend caches");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC keys for history and trend caches");
 		exit(FAIL);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
 	{
-		zbx_error("Unable to create mutex for history cache");
+		zbx_error("cannot create mutex for history cache");
 		exit(FAIL);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
 	{
-		zbx_error("Unable to create mutex for trend cache");
+		zbx_error("cannot create mutex for trend cache");
 		exit(FAIL);
 	}
 
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
 	{
-		zbx_error("Unable to create mutex for id cache");
+		zbx_error("cannot create mutex for id cache");
 		exit(FAIL);
 	}
 
@@ -3006,7 +3034,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 	if (i == ZBX_IDS_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for ids");
+		zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for ids");
 		exit(-1);
 	}
 
