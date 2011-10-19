@@ -481,6 +481,9 @@ class CStringParser {
 	}
 
 	private function validateFatal() {
+		return true;
+
+		/*
 		if(count($this->levelData) == 1) return true;
 
 		$this->errors[] = Array('errorCode' => 1,
@@ -489,6 +492,7 @@ class CStringParser {
 					'errEnd' => mb_strlen($this->expression)-1);
 
 		return false;
+		*/
 	}
 
 	private function validate(&$parent, &$levelData, $index) {
