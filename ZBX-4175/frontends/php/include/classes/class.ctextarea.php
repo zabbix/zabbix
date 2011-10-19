@@ -19,40 +19,37 @@
 **/
 ?>
 <?php
-class CTextArea extends CTag{
-/* public */
-	public function __construct($name='textarea',$value='', $cols=77, $rows=7, $readonly=false){
-		parent::__construct('textarea','yes');
+class CTextArea extends CTag {
+	public function __construct($name = 'textarea', $value = '', $cols = 77, $rows = 7, $readonly = false) {
+		parent::__construct('textarea', 'yes');
 		$this->attributes['class'] = 'input textarea';
-
 		$this->attr('id', zbx_formatDomId($name));
 		$this->attr('name', $name);
 		$this->attr('rows', $rows);
 		$this->attr('cols', $cols);
-
 		$this->setReadonly($readonly);
-
 		$this->addItem($value);
 	}
 
-	public function setReadonly($value=true){
-		if($value)
+	public function setReadonly($value = true) {
+		if ($value) {
 			$this->attributes['readonly'] = 'readonly';
-		else
+		}
+		else {
 			$this->removeAttribute('readonly');
+		}
 	}
 
-	public function setValue($value=''){
+	public function setValue($value = '') {
 		return $this->addItem($value);
 	}
 
-	public function setRows($value){
+	public function setRows($value) {
 		return $this->attributes['rows'] = $value;
 	}
 
-	public function setCols($value){
+	public function setCols($value) {
 		return $this->attributes['cols'] = $value;
-
 	}
 }
 ?>

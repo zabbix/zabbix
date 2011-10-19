@@ -193,7 +193,7 @@ function getActionMapBySysmap($sysmap) {
 
 		if (!empty($db_element['urls'])) {
 			order_result($db_element['urls'], 'name');
-			$menus .= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+			$menus .= "['".S_URLS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			foreach ($db_element['urls'] as $url) {
 				$menus .= "[".zbx_jsvalue($url['name']).",".zbx_jsvalue($url['url']).", 'nosid'],";
 			}
@@ -819,7 +819,7 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		}
 		$info['info']['maintenance'] = array(
-			'msg' => $i['maintenance'].' '.S_MAINTENANCE,
+			'msg' => $i['maintenance'].' '._('Maintenance'),
 			'color' => $colors['Orange'],
 		);
 		$has_status = true;
@@ -908,7 +908,7 @@ function getMapsInfo($selement, $i, $show_unack) {
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		}
 		$info['info']['maintenance'] = array(
-			'msg' => $i['maintenance'].' '.S_MAINTENANCE,
+			'msg' => $i['maintenance'].' '._('Maintenance'),
 			'color' => $colors['Orange'],
 		);
 		$has_status = true;

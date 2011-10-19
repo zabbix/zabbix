@@ -78,7 +78,7 @@ void	alias_list_free()
 	aliasList = NULL;
 }
 
-void	alias_expand(const char *orig, char *expanded, int exp_buf_len)
+void	alias_expand(const char *orig, char *expanded, size_t exp_buf_len)
 {
 	ALIAS	*alias;
 

@@ -19,85 +19,80 @@
 **/
 ?>
 <?php
-class CComboBox extends CTag{
+class CComboBox extends CTag {
 	public $value;
 
-	public function __construct($name='combobox', $value=null, $action=null, $items=null){
+	public function __construct($name = 'combobox', $value = null, $action = null, $items = null) {
 		parent::__construct('select', 'yes');
 		$this->tag_end = '';
-
 		$this->attr('id', zbx_formatDomId($name));
 		$this->attr('name', $name);
-
 		$this->attr('class', 'input select');
 		$this->attr('size', 1);
-
 		$this->value = $value;
-		$this->attr('onchange',$action);
-
-		if(is_array($items)) $this->addItems($items);
+		$this->attr('onchange', $action);
+		if (is_array($items)) {
+			$this->addItems($items);
+		}
 	}
 
-	public function setValue($value=NULL){
+	public function setValue($value = null) {
 		$this->value = $value;
 	}
 
-	public function addItems($items){
-		foreach($items as $value => $caption){
+	public function addItems($items) {
+		foreach ($items as $value => $caption) {
 			$selected = (int) ($value == $this->value);
 			parent::addItem(new CComboItem($value, $caption, $selected));
 		}
 	}
 
-	public function addItemsInGroup($label, $items){
+	public function addItemsInGroup($label, $items) {
 		$group = new COptGroup($label);
-		foreach($items as $value => $caption){
+		foreach ($items as $value => $caption) {
 			$selected = (int) ($value == $this->value);
 			$group->addItem(new CComboItem($value, $caption, $selected));
 		}
 		parent::addItem($group);
 	}
 
-
-	public function addItem($value, $caption='', $selected=NULL, $enabled='yes'){
-		if(is_object($value) && (zbx_strtolower(get_class($value)) == 'ccomboitem')){
+	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes') {
+		if (is_object($value) && zbx_strtolower(get_class($value)) == 'ccomboitem') {
 			parent::addItem($value);
 		}
-		else{
+		else {
 			$title = false;
-
-			if(zbx_strlen($caption) > 44){
+			if (zbx_strlen($caption) > 44) {
 				$this->setAttribute('class', $this->getAttribute('class').' selectShorten');
 				$title = true;
 			}
-
-			if(is_null($selected)){
+			if (is_null($selected)) {
 				$selected = 'no';
-				if(is_array($this->value)) {
-					if(str_in_array($value,$this->value))
+				if (is_array($this->value)) {
+					if (str_in_array($value,$this->value)) {
 						$selected = 'yes';
+					}
 				}
-				else if(strcmp($value,$this->value) == 0){
+				elseif (strcmp($value,$this->value) == 0) {
 					$selected = 'yes';
 				}
 			}
-			else{
+			else {
 				$selected = 'yes';
 			}
-
 			$citem = new CComboItem($value, $caption, $selected, $enabled);
-			if($title) $citem->setTitle($caption);
+			if ($title) {
+				$citem->setTitle($caption);
+			}
 			parent::addItem($citem);
 		}
 	}
 }
 
-class COptGroup extends CTag{
-	public function __construct($label){
+class COptGroup extends CTag {
+	public function __construct($label) {
 		parent::__construct('optgroup', 'yes');
-
 		$this->setAttribute('label', $label);
 	}
 }
-
 ?>

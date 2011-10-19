@@ -136,28 +136,33 @@
 				'You may cancel installation at any time by clicking "Cancel" button'), 'text');
 		}
 
-		function stage1(){
+		function stage1() {
 			$LICENCE_FILE = 'conf/COPYING';
 
 			$this->DISABLE_NEXT_BUTTON = true;
 
-			$license = 'Missing licence file. See GPL licence.';
-			if(file_exists($LICENCE_FILE))
-				$license = zbx_nl2br(nbsp(file_get_contents($LICENCE_FILE)));
+			$licence_contents = 'Missing licence file. See GPL licence.';
+			if (file_exists($LICENCE_FILE)) {
+				$licence_contents = zbx_nl2br(nbsp(file_get_contents($LICENCE_FILE)));
+			}
 
 			$action = <<<JS
-if(this.checked) $("next_1").writeAttribute('disabled', false);
-else $("next_1").writeAttribute('disabled', 'disabled');
+if (this.checked) {
+	$("next_1").writeAttribute('disabled', false);
+}
+else {
+	$("next_1").writeAttribute('disabled', 'disabled');
+}
 JS;
 
 			return array(
-				new CDiv(new CSpan($license), 'licence'),
+				new CDiv(new CSpan($licence_contents), 'licence'),
 				BR(),
-				new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel('I agree', 'agree')), 'maxwidth center')
+				new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel(_('I agree'), 'agree')), 'maxwidth center')
 			);
 		}
 
-		function stage2(){
+		function stage2() {
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
 
@@ -165,26 +170,18 @@ JS;
 
 			$table->addRow(array(
 				SPACE,
-				new CCol('Current value', 'header'),
-				new CCol('Required', 'header'),
-				new CCol('Recommended', 'header'),
-				SPACE,
-				SPACE
+				new CCol(_('Current value'), 'header'),
+				new CCol(_('Required'), 'header')
 			));
 
-			$reqs = check_php_requirements();
-			foreach($reqs as $req){
-
+			$reqs = FrontendSetup::i()->checkRequirements();
+			foreach ($reqs as $req) {
 				$result = null;
-				if(!is_null($req['recommended']) && ($req['result'] == 1)){
-					$result = new CSpan(S_OK, 'orange');
+				if ($req['result']) {
+					$result = new CSpan(_('OK'), 'green');
 				}
-				else if((!is_null($req['recommended']) && ($req['result'] == 2))
-					|| (is_null($req['recommended']) && ($req['result'] == 1))){
-					$result = new CSpan(S_OK, 'green');
-				}
-				else if($req['result'] == 0){
-					$result = new CSpan(S_FAIL, 'link_menu fail');
+				else {
+					$result = new CSpan(_('Fail'), 'link_menu fail');
 					$result->setHint($req['error']);
 				}
 
@@ -193,7 +190,6 @@ JS;
 						$req['name'], 'header'),
 						$req['current'],
 						$req['required'] ? $req['required'] : SPACE,
-						$req['recommended'] ? $req['recommended'] : SPACE,
 						$result
 					),
 					$req['result'] ? SPACE : 'fail');
@@ -201,22 +197,22 @@ JS;
 				$final_result &= (bool) $req['result'];
 			}
 
-			if(!$final_result){
+			if (!$final_result) {
 				$this->DISABLE_NEXT_BUTTON = true;
 
-				$this->addVar('trouble',true);
+				$this->addVar('trouble', true);
 
 				$final_result = array(
-					new CSpan(S_FAIL,'fail'),
+					new CSpan(_('Fail'), 'fail'),
 					BR(), BR(),
-					'Please correct all issues and press "Retry" button',
+					_('Please correct all issues and press "Retry" button'),
 					BR(), BR(),
-					new CSubmit('retry', S_RETRY)
+					new CSubmit('retry', _('Retry'))
 					);
 			}
-			else{
+			else {
 				$this->DISABLE_NEXT_BUTTON = false;
-				$final_result = new CSpan(S_OK,'ok');
+				$final_result = new CSpan(_('OK'), 'ok');
 			}
 
 			return array($table, BR(), $final_result);
@@ -258,7 +254,7 @@ JS;
 				BR(),BR(),
 				$table,
 				BR(),
-				!$this->DISABLE_NEXT_BUTTON ? new CSpan(S_OK, 'ok') :  new CSpan(S_FAIL, 'fail'),
+				!$this->DISABLE_NEXT_BUTTON ? new CSpan(_('OK'), 'ok') :  new CSpan(_('Fail'), 'fail'),
 				BR(),
 				new  CSubmit('retry', 'Test connection')
 				);
@@ -394,8 +390,8 @@ JS;
 			$table->setAlign('center');
 
 			$table->addRow(array('Configuration file: ', $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) ?
-				new CSpan(S_OK,'ok') :
-				new CSpan(S_FAIL,'fail')
+				new CSpan(_('OK'), 'ok') :
+				new CSpan(_('Fail'), 'fail')
 			));
 
 			return array(

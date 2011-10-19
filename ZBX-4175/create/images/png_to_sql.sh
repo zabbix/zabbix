@@ -3,7 +3,6 @@
 # A script to generate SQL from PNG images
 
 # todo :
-# add support for other databases;
 # integrate in make dist;
 # generate an sql of old images as well
 # generate importable xml out of a bunch of png images
@@ -27,19 +26,25 @@ done
 
 echo "Generating SQL files"
 
-# for pgsql something like '"\\\\" 1/1 "%_c"' could be used
-# but it also precedes printing characters with double backslashes and prints out things like \r instead of their octal values
+cat images_oracle_start.txt > $imagefile_oracle
 
 imagecount=$(ls $outputdir/*.png | wc -l)
+
 for imagefile in $outputdir/*.png; do
 	((imagesdone++))
 	imagename=$(basename ${imagefile%.png})
 	# ----- MySQL
-	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagecount,1,'$imagename',0x$(hexdump -ve '"" 1/1 "%02X"' "$imagefile"));" >> $imagefile_mysql
+	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',0x$(hexdump -ve '"" 1/1 "%02X"' "$imagefile"));" >> $imagefile_mysql
+	# ----- PostgreSQL
+	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',decode('$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")','hex'));" >> $imagefile_pgsql
+	# ----- Oracle
+	echo -e "\tLOAD_IMAGE($imagesdone,1,'$imagename','$imagefile');" >> $imagefile_oracle
 	# ----- SQLite
-	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagecount,1,'$imagename','$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")');" >> $imagefile_sqlite3
+	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename','$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")');" >> $imagefile_sqlite3
 	# ----- DB2
-	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagecount,1,'$imagename',blob(x'$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")'));" >> $imagefile_db2
+	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',blob(x'$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")'));" >> $imagefile_db2
+
 	echo -n "$[$imagesdone*100/$imagecount]% "
 done
+cat images_oracle_end.txt >> $imagefile_oracle 
 echo

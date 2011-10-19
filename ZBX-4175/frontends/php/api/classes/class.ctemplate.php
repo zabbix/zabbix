@@ -105,7 +105,7 @@ class CTemplate extends CZBXAPI{
 
 			$dbTable = DB::getSchema('hosts');
 			$sql_parts['select']['hostid'] = 'h.hostid';
-			foreach($options['output'] as $key => $field){
+			foreach ($options['output'] as $field) {
 				if($field == 'templateid') continue;
 
 				if(isset($dbTable['fields'][$field]))
@@ -532,7 +532,7 @@ Copt::memoryPick();
 
 					if(isset($template['parentTemplates']) && is_array($template['parentTemplates'])) {
 						$count = array();
-						foreach($template['parentTemplates'] as $hnum => $parentTemplate){
+						foreach ($template['parentTemplates'] as $parentTemplate) {
 							if(!is_null($options['limitSelects'])){
 								if(!isset($count[$parentTemplate['templateid']])) $count[$parentTemplate['templateid']] = 0;
 								$count[$parentTemplate['hostid']]++;
@@ -1673,6 +1673,7 @@ COpt::memoryPick();
 			);
 		}
 
+
 		// check if any templates linked to targets have more than one unique item key/application
 		foreach($targetids as $targetid){
 			$linkedTpls = $this->get(array(
@@ -1684,7 +1685,7 @@ COpt::memoryPick();
 
 			$sql = 'SELECT key_, count(itemid) as cnt '.
 				' FROM items '.
-				' WHERE '.DBcondition('hostid',$allids).
+				' WHERE '.DBcondition('hostid', $allids).
 				' GROUP BY key_ '.
 				' HAVING count(itemid) > 1';
 			$res = DBselect($sql);
@@ -1695,7 +1696,7 @@ COpt::memoryPick();
 
 			$sql = 'SELECT name, count(applicationid) as cnt '.
 				' FROM applications '.
-				' WHERE '.DBcondition('hostid',$allids).
+				' WHERE '.DBcondition('hostid', $allids).
 				' GROUP BY name '.
 				' HAVING count(applicationid) > 1';
 			$res = DBselect($sql);
@@ -1706,22 +1707,25 @@ COpt::memoryPick();
 		}
 
 		// CHECK TEMPLATE TRIGGERS DEPENDENCIES
-		foreach($templateids as $tnum => $templateid){
+		foreach ($templateids as $templateid) {
 			$triggerids = array();
 			$db_triggers = get_triggers_by_hostid($templateid);
 			while($trigger = DBfetch($db_triggers)){
 				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
 			}
 
-			$sql = 'SELECT DISTINCT h.host '.
-					' FROM trigger_depends td, functions f, items i, hosts h '.
-					' WHERE ('.DBcondition('td.triggerid_down', $triggerids).' AND f.triggerid=td.triggerid_up) '.
-						' AND i.itemid=f.itemid '.
-						' AND h.hostid=i.hostid '.
+			$sql = 'SELECT DISTINCT h.host'.
+					' FROM trigger_depends td,functions f,items i,hosts h'.
+					' WHERE ('.
+							DBcondition('td.triggerid_down', $triggerids).
+							' AND f.triggerid=td.triggerid_up'.
+						' )'.
+						' AND i.itemid=f.itemid'.
+						' AND h.hostid=i.hostid'.
 						' AND '.DBcondition('h.hostid', $templateids, true).
 						' AND h.status='.HOST_STATUS_TEMPLATE;
 
-			if($db_dephost = DBfetch(DBselect($sql))){
+			if ($db_dephost = DBfetch(DBselect($sql))) {
 				$options = array(
 					'templateids' => $templateid,
 					'output'=> API_OUTPUT_EXTEND
@@ -1742,23 +1746,56 @@ COpt::memoryPick();
 				' WHERE '.DBcondition('hostid', $targetids).
 					' AND '.DBcondition('templateid', $templateids);
 		$linked_db = DBselect($sql);
-		while($pair = DBfetch($linked_db)){
+		while ($pair = DBfetch($linked_db)) {
 			$linked[] = array($pair['hostid'] => $pair['templateid']);
 		}
 
 		// add template linkages, if problems rollback later
-		foreach($targetids as $targetid){
-			foreach($templateids as $tnum => $templateid){
-				foreach($linked as $lnum => $link){
-					if(isset($link[$targetid]) && (bccomp($link[$targetid],$templateid) == 0)) continue 2;
+		foreach ($targetids as $targetid) {
+			foreach ($templateids as $templateid) {
+				foreach ($linked as $link) {
+					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
+						continue 2;
+					}
 				}
 
 				$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
 				$sql = 'INSERT INTO hosts_templates VALUES ('. implode(', ', $values) .')';
 				$result = DBexecute($sql);
 
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBError');
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBError');
+				}
 			}
+		}
+
+		// check if all trigger templates are linked to host.
+		// we try to find template that is not linked to hosts ($targetids)
+		// and exists trigger which reference that template and template from ($templateids)
+		$sql = 'SELECT DISTINCT h.host'.
+				' FROM functions f,items i,triggers t,hosts h'.
+				' WHERE f.itemid=i.itemid'.
+					' AND f.triggerid=t.triggerid'.
+					' AND i.hostid=h.hostid'.
+					' AND h.status='.HOST_STATUS_TEMPLATE.
+					' AND NOT EXISTS ('.
+						' SELECT 1'.
+						' FROM hosts_templates ht'.
+						' WHERE ht.templateid=i.hostid'.
+							' AND '.DBcondition('ht.hostid', $targetids).
+					' )'.
+					' AND EXISTS ('.
+						' SELECT 1'.
+						' FROM functions ff,items ii'.
+						' WHERE ff.itemid=ii.itemid'.
+							' AND ff.triggerid=t.triggerid'.
+							' AND '.DBcondition('ii.hostid', $templateids).
+					' )';
+		if ($dbNotLinkedTpl = DBfetch(DBSelect($sql, 1))) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Trigger has items from template "%s" that is not linked to host.', $dbNotLinkedTpl['host'])
+			);
 		}
 
 		// CHECK CIRCULAR LINKAGE
@@ -1803,11 +1840,10 @@ COpt::memoryPick();
 			}
 		}
 
-		foreach($targetids as $targetid){
-			foreach($templateids as $tnum => $templateid){
-				foreach($linked as $lnum => $link){
-					if(isset($link[$targetid]) && (bccomp($link[$targetid],$templateid) == 0)){
-						unset($linked[$lnum]);
+		foreach ($targetids as $targetid) {
+			foreach ($templateids as $templateid) {
+				foreach ($linked as $link) {
+					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
 						continue 2;
 					}
 				}
@@ -1831,7 +1867,15 @@ COpt::memoryPick();
 					'hostids' => $targetid,
 					'templateids' => $templateid
 				));
+			}
 
+			// we do linkage in two separate loops because for triggers you need all items already created on host
+			foreach ($templateids as $templateid) {
+				foreach ($linked as $link) {
+					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
+						continue 2;
+					}
+				}
 				API::Trigger()->syncTemplates(array(
 					'hostids' => $targetid,
 					'templateids' => $templateid
@@ -1867,6 +1911,28 @@ COpt::memoryPick();
 		}
 
 /* TRIGGERS {{{ */
+		// check that all triggers on templates that we unlink, don't have items from another templates
+		$sql = 'SELECT DISTINCT t.description'.
+				' FROM triggers t,functions f,items i'.
+				' WHERE t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND '.DBCondition('i.hostid', $templateids).
+					' AND EXISTS ('.
+						' SELECT ff.triggerid'.
+						' FROM functions ff,items ii'.
+						' WHERE ff.itemid=ii.itemid'.
+							' AND ff.triggerid=t.triggerid'.
+							' AND '.DBCondition('ii.hostid', $templateids, true).
+					' )'.
+					' AND t.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
+		if ($db_trigger = DBfetch(DBSelect($sql, 1))) {
+			self::exception(
+				ZBX_API_ERROR_PARAMETERS,
+				_s('Cannot unlink trigger "%s", it has items from template that is left linked to host.', $db_trigger['description'])
+			);
+		}
+
+
 		$sql_from = 'triggers t';
 		$sql_where = ' EXISTS ('.
 				' SELECT ff.triggerid'.

@@ -28,9 +28,9 @@ class testPageEvents extends CWebTest
 	{
 		$this->login('events.php');
 
+		$this->dropdown_select_wait('source','Trigger');
 		$this->dropdown_select_wait('groupid','all');
 		$this->dropdown_select_wait('hostid','all');
-		$this->dropdown_select_wait('source','Trigger');
 
 		$this->assertTitle('Latest events');
 		$this->ok('HISTORY OF EVENTS');
@@ -40,7 +40,7 @@ class testPageEvents extends CWebTest
 		$this->ok('Filter');
 		$this->ok('Displaying');
 		// table header
-		if(0 == DBcount('select * from events where source='.EVENT_SOURCE_TRIGGERS)){
+		if(0 == DBcount('select * from events where value_changed=1 and source='.EVENT_SOURCE_TRIGGERS)){
 			$this->ok('No events found');
 		}
 		else{

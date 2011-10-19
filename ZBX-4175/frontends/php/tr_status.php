@@ -203,9 +203,9 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 	$ev_select = new CComboBox('show_events', $_REQUEST['show_events']);
 	$ev_select->addItem(EVENTS_OPTION_NOEVENT, S_HIDE_ALL);
-	$ev_select->addItem(EVENTS_OPTION_ALL, S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
+	$ev_select->addItem(EVENTS_OPTION_ALL, S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?_('Days'):S_DAY).')');
 	if($config['event_ack_enable']){
-		$ev_select->addItem(EVENTS_OPTION_NOT_ACK, S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
+		$ev_select->addItem(EVENTS_OPTION_NOT_ACK, S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?_('Days'):S_DAY).')');
 	}
 	$filterForm->addRow(S_EVENTS, $ev_select);
 
@@ -230,7 +230,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$cbd = new CCheckBox('status_change', $_REQUEST['status_change'], $action, 1);
 	$cbd->addStyle('vertical-align: middle;');
 
-	$spand = new CSpan(S_DAYS_SMALL);
+	$spand = new CSpan(_('days'));
 	$spand->addStyle('vertical-align: middle;');
 	$filterForm->addRow(S_AGE_LESS_THAN, array(
 		$cbd,
@@ -399,8 +399,6 @@ require_once('include/views/js/general.script.confirm.js.php');
 			'select_acknowledges' => API_OUTPUT_COUNT,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),
-			'sortfield' => 'eventid',
-			'sortorder' => ZBX_SORT_DOWN,
 			'nopermissions' => true,
 			//'limit' => $config['event_show_max']
 		);
@@ -415,7 +413,11 @@ require_once('include/views/js/general.script.confirm.js.php');
 		}
 
 		$events = API::Event()->get($ev_options);
-		order_result($events, 'clock', ZBX_SORT_DOWN);
+		$sortFields = array(
+			array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
+			array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
+		);
+		ArraySorter::sort($events, $sortFields);
 
 		foreach($events as $enum => $event){
 			$triggers[$event['objectid']]['events'][] = $event;
@@ -553,7 +555,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 				$menus = "[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 			}
 
-			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+			$menus.= "[".zbx_jsvalue(S_URLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger_host['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 			$menus = rtrim($menus,',');
@@ -563,7 +565,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 			$maint_span = null;
 			if($trigger_host['maintenance_status']){
-				$text = $trigger_host['maintenance_type'] ? S_NO_DATA_MAINTENANCE : S_NORMAL_MAINTENANCE;
+				$text = $trigger_host['maintenance_type'] ? _('Maintenance without data collection') : _('Maintenance with data collection');
 				$text = ' ['.$text.']';
 				$maint_span = new CSpan($text, 'orange pointer');
 

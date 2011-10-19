@@ -206,33 +206,32 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 	return SYSINFO_RET_OK;
 }
 
-static int	check_service(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, int perf)
+int	check_service(const char *params, const char *default_addr, AGENT_RESULT *result, int perf)
 {
 	unsigned short	port = 0;
 	char		service[16], ip[64], str_port[8];
 	int		value_int, ret = SYSINFO_RET_FAIL;
 	double		check_time;
 
-	assert(result);
-
-	init_result(result);
-
 	check_time = zbx_time();
 
-	if (3 < num_param(param))
+	if (3 < num_param(params))
 		return ret;
 
-	if (0 != get_param(param, 1, service, sizeof(service)))
+	if (0 != get_param(params, 1, service, sizeof(service)))
 		return ret;
 
-	if (0 != get_param(param, 2, ip, sizeof(ip)) || '\0' == *ip)
-		strscpy(ip, "127.0.0.1");
+	if (0 != get_param(params, 2, ip, sizeof(ip)) || '\0' == *ip)
+		strscpy(ip, default_addr);
 
-	if (0 != get_param(param, 3, str_port, sizeof(str_port)))
+	if (0 != get_param(params, 3, str_port, sizeof(str_port)))
 		*str_port = '\0';
 
 	if ('\0' != *str_port && FAIL == is_ushort(str_port, &port))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid \"port\" parameter"));
 		return ret;
+	}
 
 	if (0 == strcmp(service, "ssh"))
 	{
@@ -253,7 +252,7 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 			port = ZBX_DEFAULT_LDAP_PORT;
 		ret = check_ldap(ip, port, CONFIG_TIMEOUT, &value_int);
 	}
-#endif	/* HAVE_LDAP */
+#endif
 	else if (0 == strcmp(service, "smtp"))
 	{
 		if ('\0' == *str_port)
@@ -293,7 +292,10 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 	else if (0 == strcmp(service, "tcp"))
 	{
 		if ('\0' == *str_port)
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Required \"port\" parameter missing"));
 			return ret;
+		}
 		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
 	}
 #ifdef HAVE_LIBCURL
@@ -303,7 +305,7 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 			port = ZBX_DEFAULT_HTTPS_PORT;
 		ret = check_https(ip, port, CONFIG_TIMEOUT, &value_int);
 	}
-#endif	/* HAVE_LIBCURL */
+#endif
 	else if (0 == strcmp(service, "telnet"))
 	{
 		if ('\0' == *str_port)
@@ -348,10 +350,10 @@ static int	check_service(const char *cmd, const char *param, unsigned flags, AGE
 
 int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return check_service(cmd, param, flags, result, 0);
+	return check_service(param, "127.0.0.1", result, 0);
 }
 
 int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return check_service(cmd, param, flags, result, 1);
+	return check_service(param, "127.0.0.1", result, 1);
 }
