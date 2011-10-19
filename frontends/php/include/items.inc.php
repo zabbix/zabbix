@@ -26,8 +26,8 @@
  * @param int $logtype
  * @return string
  */
-function get_item_logtype_description($logtype){
-	switch($logtype){
+function get_item_logtype_description($logtype) {
+	switch ($logtype) {
 		case ITEM_LOGTYPE_INFORMATION:
 			return S_INFORMATION;
 		case ITEM_LOGTYPE_WARNING:
@@ -49,8 +49,8 @@ function get_item_logtype_description($logtype){
  * @param int $logtype
  * @return string
  */
-function get_item_logtype_style($logtype){
-	switch($logtype){
+function get_item_logtype_style($logtype) {
+	switch ($logtype) {
 		case ITEM_LOGTYPE_INFORMATION:
 			return 'information';
 		case ITEM_LOGTYPE_WARNING:
@@ -158,15 +158,16 @@ function item_type2str($type = null){
 			return S_UNKNOWN;
 	}
 
-	function item_status2style($status){
-		switch($status){
-			case ITEM_STATUS_ACTIVE:	$status = 'off';	break;
-			case ITEM_STATUS_DISABLED:	$status = 'on';		break;
+	function item_status2style($status) {
+		switch ($status) {
+			case ITEM_STATUS_ACTIVE:
+				return 'off';
+			case ITEM_STATUS_DISABLED:
+				return 'on';
 			case ITEM_STATUS_NOTSUPPORTED:
 			default:
-				$status = 'unknown';	break;
+				return 'unknown';
 		}
-	return $status;
 	}
 
 	function update_item_in_group($groupid,$itemid,$item){
@@ -186,7 +187,7 @@ function item_type2str($type = null){
 	}
 
 	function getInterfaceTypeByItem($type) {
-		switch($type){
+		switch ($type) {
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
 			case ITEM_TYPE_SNMPV3:
