@@ -629,34 +629,33 @@ class CUserGroup extends CZBXAPI{
  * @param array $usrgrpids
  * @return boolean
  */
-	public function delete($usrgrpids){
-
+	public function delete($usrgrpids) {
 
 		$usrgrpids = zbx_toArray($usrgrpids);
 		$dbUsrgrps = $this->get(array(
-			'output' => array('usrgrpid','name'),
+			'output' => array('usrgrpid', 'name'),
 			'usrgrpids' => $usrgrpids,
 			'preservekeys' => true
 		));
 
-		if(empty($usrgrpids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+		if (empty($usrgrpids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				//GETTEXT: Api exception
+			if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+				// GETTEXT: API exception
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete user groups.'));
 			}
 
 			// check, if this user group is used in one of the scripts. If so, it cannot be deleted
 			$dbScripts = API::Script()->get(array(
-				'output' => array('scriptid','name','usrgrpid'),
+				'output' => array('scriptid', 'name', 'usrgrpid'),
 				'usrgrpids' => $usrgrpids,
 				'nopermissions' => true
 			));
-			if(!empty($dbScripts)){
-				foreach($dbScripts as $snum => $script){
-					if($script['usrgrpid'] == 0) continue;
+			if (!empty($dbScripts)) {
+				foreach ($dbScripts as $snum => $script) {
+					if ($script['usrgrpid'] == 0) continue;
 
-					self::exception(ZBX_API_ERROR_PARAMETERS,_s('User group "%1$s" is used in script "%2$s".', $dbUsrgrps[$script['usrgrpid']]['name'], $script['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%1$s" is used in script "%2$s".', $dbUsrgrps[$script['usrgrpid']]['name'], $script['name']));
 				}
 			}
 

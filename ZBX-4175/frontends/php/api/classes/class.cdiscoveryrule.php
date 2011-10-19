@@ -681,9 +681,9 @@ COpt::memoryPick();
  * @param array $ruleids
  * @return
  */
-	public function delete($ruleids, $nopermissions=false){
+	public function delete($ruleids, $nopermissions=false) {
 
-			if(empty($ruleids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if (empty($ruleids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 			$ruleids = zbx_toHash($ruleids);
 
@@ -696,12 +696,12 @@ COpt::memoryPick();
 			$del_rules = $this->get($options);
 
 // TODO: remove $nopermissions hack
-			if(!$nopermissions){
-				foreach($ruleids as $ruleid){
-					if(!isset($del_rules[$ruleid])){
+			if (!$nopermissions) {
+				foreach ($ruleids as $ruleid) {
+					if (!isset($del_rules[$ruleid])) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 					}
-					if($del_rules[$ruleid]['templateid'] != 0){
+					if ($del_rules[$ruleid]['templateid'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete templated items'));
 					}
 				}
@@ -710,14 +710,14 @@ COpt::memoryPick();
 // get child discovery rules
 			$parent_itemids = $ruleids;
 			$child_ruleids = array();
-			do{
-				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
+			do {
+				$db_items = DBselect('SELECT itemid FROM items WHERE '.DBcondition('templateid', $parent_itemids));
 				$parent_itemids = array();
-				while($db_item = DBfetch($db_items)){
+				while ($db_item = DBfetch($db_items)) {
 					$parent_itemids[$db_item['itemid']] = $db_item['itemid'];
 					$child_ruleids[$db_item['itemid']] = $db_item['itemid'];
 				}
-			}while(!empty($parent_itemids));
+			} while (!empty($parent_itemids));
 
 			$options = array(
 				'output' => API_OUTPUT_EXTEND,

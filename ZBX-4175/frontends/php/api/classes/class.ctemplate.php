@@ -1134,9 +1134,9 @@ COpt::memoryPick();
  * @param array $templateids['templateids']
  * @return boolean
  */
-	public function delete($templateids){
+	public function delete($templateids) {
 
-			if(empty($templateids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if (empty($templateids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 			$templateids = zbx_toArray($templateids);
 
@@ -1147,8 +1147,8 @@ COpt::memoryPick();
 				'preservekeys' => 1
 			);
 			$del_templates = $this->get($options);
-			foreach($templateids as $templateid){
-				if(!isset($del_templates[$templateid])){
+			foreach ($templateids as $templateid) {
+				if (!isset($del_templates[$templateid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
@@ -1163,7 +1163,7 @@ COpt::memoryPick();
 				'preservekeys' => 1
 			));
 
-			if(!empty($delItems))
+			if (!empty($delItems))
 				API::Item()->delete(array_keys($delItems), true);
 
 
