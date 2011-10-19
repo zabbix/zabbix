@@ -290,7 +290,7 @@ function make_system_status($filter) {
 
 				foreach ($data['triggers'] as $trigger) {
 					$event = $trigger['event'];
-					$ack = getEventAckState($event);
+					$ack = getEventAckState($event, true);
 
 					if (isset($event['eventid'])) {
 						$actions = get_event_actions_status($event['eventid']);
@@ -313,7 +313,7 @@ function make_system_status($filter) {
 						new CCol($trigger['description'], getSeverityStyle($trigger['priority'])),
 						zbx_date2age($event['clock']),
 						$unknown,
-						$config['event_ack_enable'] ? new CCol($ack, 'center') : null,
+						$config['event_ack_enable'] ? $ack : null,
 						$actions
 					));
 				}
@@ -328,13 +328,13 @@ function make_system_status($filter) {
 					_('Issue'),
 					_('Age'),
 					_('Info'),
-					($config['event_ack_enable']) ? _('Ack') : null,
+					$config['event_ack_enable'] ? _('Ack') : null,
 					_('Actions')
 				));
 
 				foreach ($data['triggers_unack'] as $trigger) {
 					$event = $trigger['event'];
-					$ack = getEventAckState($event);
+					$ack = getEventAckState($event, true);
 
 					if (isset($event['eventid'])) {
 						$actions = get_event_actions_status($event['eventid']);
@@ -357,7 +357,7 @@ function make_system_status($filter) {
 						new CCol($trigger['description'], getSeverityStyle($trigger['priority'])),
 						zbx_date2age($event['clock']),
 						$unknown,
-						$config['event_ack_enable'] ? new CCol($ack, 'center') : null,
+						$config['event_ack_enable'] ? $ack : null,
 						$actions
 					));
 				}

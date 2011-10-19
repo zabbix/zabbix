@@ -247,7 +247,7 @@ include_once('include/page_header.php');
 		$r_form->addItem(array(SPACE.S_SOURCE.SPACE, $cmbSource));
 	}
 
-	$events_wdgt->addHeader(S_EVENTS_BIG, $r_form);
+	$events_wdgt->addHeader(_('EVENTS'), $r_form);
 
 
 

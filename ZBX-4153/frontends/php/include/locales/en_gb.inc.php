@@ -228,18 +228,8 @@
 	'S_SELECT_NODES'=>			_('Select Nodes'),
 
 //	acknow.php
-	'S_NO_EVENTS_TO_ACKNOWLEDGE'=>		_('No events to acknowledge'),
-	'S_ACKNOWLEDGES'=>			_('Acknowledges'),
 	'S_ACKNOWLEDGE'=>			_('Acknowledge'),
-	'S_RETURN'=>				_('Return'),
-	'S_ACKNOWLEDGE_ALARM_BY'=>		_('Acknowledge alarm by'),
-	'S_ADD_COMMENT_BY'=>			_('Add comment by'),
-	'S_ALARM_ACKNOWLEDGES_BIG'=>		_('ALARM ACKNOWLEDGES'),
-	'S_ACKNOWLEDGE_ADDED'=>			_('Acknowledge added'),
-	'S_CANNOT_ACKNOWLEDGE_EVENT'=>		_('Cannot acknowledge event'),
-	'S_SYS_BULK_ACKNOWLEDGE'=>		_('----[BULK ACKNOWLEDGE]----'),
 	'S_BULK_ACKNOWLEDGE'=>			_('Bulk acknowledge'),
-	'S_ACKNOWLEDGE_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
 //	actionconf.php
 	'S_CONFIGURATION_OF_ACTIONS'=>		_('Configuration of actions'),
@@ -249,14 +239,11 @@
 	'S_MIN_VALUE_SMALL'=>			_('min value'),
 	'S_CONDITION'=>				_('Condition'),
 	'S_NEW'=>				_('New'),
-	'S_EVENT_ACKNOWLEDGED'=>		_('Event acknowledged'),
 
 //	actions.php
 	'S_ACTIONS'=>				_('Actions'),
 	'S_LOGS'=>				_('Logs'),
 	'S_LOGS_BIG'=>				_('LOGS'),
-	'S_MESSAGE_ACTIONS'=>			_('Message actions'),
-	'S_COMMAND_ACTIONS'=>			_('Command actions'),
 	'S_DELAY'=>				_('Delay'),
 	'S_ON_BIG'=>				_('ON'),
 	'S_ON'=>					_('On'),
@@ -265,7 +252,6 @@
 	'S_INFORMATION'=>			_('Information'),
 	'S_WARNING'=>				_('Warning'),
 	'S_AND_BIG'=>				_('AND'),
-	'S_AND_SYMB'=>				_('&'),
 	'S_OR_BIG'=>				_('OR'),
 	'S_OR'=>				_('or'),
 	'S_LIKE_SMALL'=>			_('like'),
@@ -806,7 +792,6 @@
 
 //	events.php
 	'S_EVENT'=>				_('Event'),
-	'S_EVENT_DETAILS'=>			_('Event details'),
 	'S_LIST'=>				_('List'),
 	'S_LATEST_EVENTS'=>			_('Latest events'),
 	'S_HISTORY_OF_EVENTS_BIG'=>		_('HISTORY OF EVENTS'),
@@ -1570,7 +1555,6 @@
 
 	'S_QUEUE'=>				_('Queue'),
 	'S_EVENTS'=>				_('Events'),
-	'S_EVENTS_BIG'=>			_('EVENTS'),
 	'S_MAPS'=>				_('Maps'),
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
@@ -1622,7 +1606,6 @@
 	'S_FIRST_PAGE'=>		_('First'),
 	'S_PREVIOUS_PAGE'=>		_('Previous'),
 	'S_NEXT_PAGE'=>			_('Next'),
-	'S_PREVIOUS_EVENTS'=>		_('Previous'),
 	'S_ICONMAP_IS_NOT_ENABLED' => _('Iconmap is not enabled'),
 );
 ?>
