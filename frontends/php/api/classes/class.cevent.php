@@ -541,26 +541,36 @@ Copt::memoryPick();
 			}
 		}
 
-// adding acknowledges
-		if(!is_null($options['select_acknowledges'])){
-			if(is_array($options['select_acknowledges']) || str_in_array($options['select_acknowledges'], $subselects_allowed_outputs)){
-				$sql = 'SELECT a.*, u.alias '.
-					' FROM acknowledges a '.
-						' LEFT JOIN users u ON u.userid=a.userid '.
-					' WHERE '.DBcondition('a.eventid', $eventids).
-					' ORDER BY a.clock DESC';
+		// adding acknowledges
+		if (!is_null($options['select_acknowledges'])) {
+			if (is_array($options['select_acknowledges']) || str_in_array($options['select_acknowledges'], $subselects_allowed_outputs)) {
+				$sql = 'SELECT a.*,u.alias'.
+						' FROM acknowledges a'.
+							' LEFT JOIN users u ON u.userid=a.userid'.
+						' WHERE '.DBcondition('a.eventid', $eventids).
+						' ORDER BY a.clock DESC';
 				$res = DBselect($sql);
-				while($ack = DBfetch($res)){
+				while ($ack = DBfetch($res)) {
 					$result[$ack['eventid']]['acknowledges'][] = $ack;
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['select_acknowledges']){
-				$sql = 'SELECT COUNT(a.acknowledgeid) as rowscount, a.eventid '.
-					' FROM acknowledges a '.
-					' WHERE '.DBcondition('a.eventid', $eventids).
-					' GROUP BY a.eventid';
+			elseif ($options['select_acknowledges'] == API_OUTPUT_COUNT) {
+				$sql = 'SELECT COUNT(a.acknowledgeid) as rowscount,a.eventid'.
+						' FROM acknowledges a'.
+						' WHERE '.DBcondition('a.eventid', $eventids).
+						' GROUP BY a.eventid';
 				$res = DBselect($sql);
-				while($ack = DBfetch($res)){
+				while ($ack = DBfetch($res)) {
+					$result[$ack['eventid']]['acknowledges'] = $ack['rowscount'];
+				}
+			}
+			elseif ($options['select_acknowledges'] == API_OUTPUT_EXTEND){
+				$sql = 'SELECT a.*'.
+						' FROM acknowledges a'.
+						' WHERE '.DBcondition('a.eventid', $eventids).
+						' ORDER BY a.clock DESC';
+				$res = DBselect($sql);
+				while ($ack = DBfetch($res)) {
 					$result[$ack['eventid']]['acknowledges'] = $ack['rowscount'];
 				}
 			}

@@ -16,6 +16,7 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4153] fixed links to acknowledge and returning back to requester page (Eduard)
  - [ZBX-4174] made database monitor items not require interface (asaveljevs, Vedmak)
  - [ZBX-3881] fixed delay being set to 0 when changing item type from trapper to agent in item update form (Vedmak)
  - [ZBX-1020] added support for --sysconfdir, changed default installation directories (dimir)
