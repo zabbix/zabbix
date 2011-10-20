@@ -63,6 +63,9 @@ if (isset($_REQUEST['cancel'])) {
 	elseif ($_REQUEST['backurl'] == 'screenedit.php') {
 		redirect($_REQUEST['backurl'].'?screenid='.$_REQUEST['screenid']);
 	}
+	elseif ($_REQUEST['backurl'] == 'screens.php') {
+		redirect($_REQUEST['backurl'].'?elementid='.$_REQUEST['screenid']);
+	}
 	else {
 		redirect($_REQUEST['backurl']);
 	}
@@ -130,6 +133,9 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		elseif ($_REQUEST['backurl'] == 'screenedit.php') {
 			redirect($_REQUEST['backurl'].'?screenid='.$_REQUEST['screenid']);
 		}
+		elseif ($_REQUEST['backurl'] == 'screens.php') {
+			redirect($_REQUEST['backurl'].'?elementid='.$_REQUEST['screenid']);
+		}
 		else {
 			redirect($_REQUEST['backurl']);
 		}
@@ -183,7 +189,7 @@ if ($_REQUEST['backurl'] == 'tr_events.php') {
 	$frmMsg->addVar('eventid', $_REQUEST['eventid']);
 	$frmMsg->addVar('triggerid', $_REQUEST['triggerid']);
 }
-if ($_REQUEST['backurl'] == 'screenedit.php') {
+elseif ($_REQUEST['backurl'] == 'screenedit.php' || $_REQUEST['backurl'] == 'screens.php') {
 	$frmMsg->addVar('screenid', $_REQUEST['screenid']);
 }
 
