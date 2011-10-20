@@ -444,7 +444,29 @@ switch($itemType) {
 
 				$sbIntereaces->addItem($interface['interfaceid'], $caption);
 			}
-			$frmItem->addRow(S_HOST_INTERFACE, $sbIntereaces);
+			$frmItem->addRow(S_HOST_INTERFACE, $sbIntereaces, null, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interfaceid');
 		}
 
 // Name

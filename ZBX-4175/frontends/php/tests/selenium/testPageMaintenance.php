@@ -42,7 +42,7 @@ class testPageMaintenance extends CWebTest
 		$this->ok('CONFIGURATION OF MAINTENANCE PERIODS');
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
-		$this->ok(array('Name','Type','Status','Description'));
+		$this->ok(array('Name','Type','State','Description'));
 		$this->ok($maintenance['name']);
 		if($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)	$this->ok('With data collection');
 		if($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA)	$this->ok('No data collection');

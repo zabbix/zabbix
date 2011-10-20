@@ -272,7 +272,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$whow_hide_all->setAttribute('id', $switcherName);
 	}
 	else{
-		$whow_hide_all = NULL;
+		$whow_hide_all = null;
 	}
 
 	$table->setHeader(array(
@@ -281,10 +281,10 @@ require_once('include/views/js/general.script.confirm.js.php');
 		make_sorting_header(S_SEVERITY, 'priority'),
 		S_STATUS,
 		S_INFO,
-		make_sorting_header(S_LAST_CHANGE, 'lastchange'),
+		make_sorting_header(_('Last change'), 'lastchange'),
 		S_AGE,
-		$show_event_col ? S_DURATION : NULL,
-		$config['event_ack_enable'] ? S_ACKNOWLEDGED : NULL,
+		$show_event_col ? _('Duration') : null,
+		$config['event_ack_enable'] ? _('Acknowledged') : null,
 		is_show_all_nodes() ? S_NODE : null,
 		S_HOST,
 		make_sorting_header(S_NAME, 'description'),
@@ -607,10 +607,10 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){
-				$to_ack = new CCol(array(new CLink(S_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'].'&backurl='.$page['file'], 'on'), ' ('.$trigger['event_count'].')'));
+				$to_ack = new CCol(array(new CLink(_('Acknowledge'), 'acknow.php?triggers[]='.$trigger['triggerid'].'&backurl='.$page['file'], 'on'), ' ('.$trigger['event_count'].')'));
 			}
 			else{
-				$to_ack = new CCol(S_ACKNOWLEDGED, 'off');
+				$to_ack = new CCol(_('Acknowledged'), 'off');
 			}
 		}
 		else{
@@ -678,7 +678,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 				$statusSpan = new CCol($eventStatusSpan);
 				$statusSpan->setColSpan(2);
 
-				$ack = getEventAckState($row_event);
+				$ack = getEventAckState($row_event, true);
 
 				if(($row_event['acknowledged'] == 0) && ($row_event['value'] == TRIGGER_VALUE_TRUE)){
 					$ack_cb = new CCheckBox('events['.$row_event['eventid'].']', 'no', NULL, $row_event['eventid']);
