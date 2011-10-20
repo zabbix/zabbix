@@ -1656,7 +1656,8 @@ function utf8RawUrlDecode($source){
 						$event = get_last_event_by_triggerid($trhosts[$hostname]['triggerid']);
 						if ($event) {
 							if (!empty($params['screenid'])) {
-								$ack_menu = array(S_ACKNOWLEDGE, 'acknow.php?eventid='.$event['eventid'].'&screenid='.$params['screenid'].'&backurl=screenedit.php');
+								global $page;
+								$ack_menu = array(S_ACKNOWLEDGE, 'acknow.php?eventid='.$event['eventid'].'&screenid='.$params['screenid'].'&backurl='.$page['file']);
 							}
 							else {
 								$ack_menu = array(S_ACKNOWLEDGE, 'acknow.php?eventid='.$event['eventid'].'&backurl=overview.php', array('tw'=>'_blank'));
