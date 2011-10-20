@@ -23,16 +23,16 @@
 </td>
 <td>
 	<div id="interface_type_#{interfaceid}" class="jqueryinputset">
-		<input type="radio" id="radio_agent_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_AGENT);?>" #{*checked_agent} />
+		<input type="radio" id="radio_agent_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_AGENT);?>" #{*checked_agent} #{lock}/>
 		<label for="radio_agent_#{interfaceid}"><?php print(S_AGENT);?></label>
 
-		<input type="radio" id="radio_snmp_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_SNMP);?>" #{*checked_snmp} />
+		<input type="radio" id="radio_snmp_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_SNMP);?>" #{*checked_snmp} #{lock} />
 		<label for="radio_snmp_#{interfaceid}"><?php print(S_SNMP);?></label>
 
-		<input type="radio" id="radio_jmx_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_JMX);?>" #{*checked_jmx} />
+		<input type="radio" id="radio_jmx_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_JMX);?>" #{*checked_jmx} #{lock} />
 		<label for="radio_jmx_#{interfaceid}"><?php print(S_JMX);?></label>
 
-		<input type="radio" id="radio_ipmi_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_IPMI);?>" #{*checked_ipmi} />
+		<input type="radio" id="radio_ipmi_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_IPMI);?>" #{*checked_ipmi} #{lock} />
 		<label for="radio_ipmi_#{interfaceid}"><?php print(S_IPMI);?></label>
 	</div>
 </td>
@@ -96,23 +96,30 @@ function addInterfaceRow(hostInterface){
 		}
 	}
 
+	if (hostInterface.locked) {
+		hostInterface.lock = 'disabled="disabled"';
+	}
+
 	jQuery("#hostIterfacesFooter").before(tpl.evaluate(hostInterface));
-	jQuery("#hostInterfaceRow_"+hostInterface.interfaceid)
-		.find("div.jqueryinputset").buttonset().end()
-		.find("#interface_type_"+hostInterface.interfaceid).find("label")
-			.click({"hostInterface": hostInterface}, function(event){
-				var portInput = jQuery("#port_"+event.data.hostInterface.interfaceid)[0];
 
-				if(empty(portInput.value) || !(portInput.value == "10050" || portInput.value == "161" || portInput.value == "623" || portInput.value == "12345")) return true;
+	if (!hostInterface.locked) {
+		jQuery("#hostInterfaceRow_"+hostInterface.interfaceid)
+			.find("div.jqueryinputset").buttonset().end()
+			.find("#interface_type_"+hostInterface.interfaceid).find("label")
+				.click({"hostInterface": hostInterface}, function(event){
+					var portInput = jQuery("#port_"+event.data.hostInterface.interfaceid)[0];
 
-				var interfaceTypeId = event.currentTarget.htmlFor.toLowerCase();
-				switch(true){
-					case (interfaceTypeId.indexOf('agent') > -1): portInput.value = "10050"; break;
-					case (interfaceTypeId.indexOf('snmp') > -1): portInput.value = "161"; break;
-					case (interfaceTypeId.indexOf('ipmi') > -1): portInput.value = "623"; break;
-					case (interfaceTypeId.indexOf('jmx') > -1): portInput.value = "12345"; break;
-				}
-			}).end();
+					if(empty(portInput.value) || !(portInput.value == "10050" || portInput.value == "161" || portInput.value == "623" || portInput.value == "12345")) return true;
+
+					var interfaceTypeId = event.currentTarget.htmlFor.toLowerCase();
+					switch(true){
+						case (interfaceTypeId.indexOf('agent') > -1): portInput.value = "10050"; break;
+						case (interfaceTypeId.indexOf('snmp') > -1): portInput.value = "161"; break;
+						case (interfaceTypeId.indexOf('ipmi') > -1): portInput.value = "623"; break;
+						case (interfaceTypeId.indexOf('jmx') > -1): portInput.value = "12345"; break;
+					}
+				}).end();
+	}
 }
 
 function removeInterfaceRow(hostInterfaceId){
