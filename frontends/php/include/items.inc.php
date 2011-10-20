@@ -186,29 +186,6 @@ function item_type2str($type = null){
 	return true;
 	}
 
-	function getInterfaceTypeByItem($type) {
-		switch ($type) {
-			case ITEM_TYPE_SNMPV1:
-			case ITEM_TYPE_SNMPV2C:
-			case ITEM_TYPE_SNMPV3:
-			case ITEM_TYPE_SNMPTRAP:
-				return INTERFACE_TYPE_SNMP;
-			case ITEM_TYPE_IPMI:
-				return INTERFACE_TYPE_IPMI;
-			case ITEM_TYPE_ZABBIX:
-				return INTERFACE_TYPE_AGENT;
-			case ITEM_TYPE_SIMPLE:
-			case ITEM_TYPE_EXTERNAL:
-			case ITEM_TYPE_SSH:
-			case ITEM_TYPE_TELNET:
-				return INTERFACE_TYPE_ANY;
-			case ITEM_TYPE_JMX:
-				return INTERFACE_TYPE_JMX;
-			default:
-				return false;
-		}
-	}
-
 // Delete Item definition from selected group
 	function delete_item_from_group($groupid,$itemid){
 		if(!isset($itemid)){
@@ -329,7 +306,7 @@ function item_type2str($type = null){
 
 			foreach ($srcItems as &$srcItem) {
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
-					$type = getInterfaceTypeByItem($srcItem['type']);
+					$type = CItem::itemTypeInterface($srcItem['type']);
 
 					if ($type == INTERFACE_TYPE_ANY) {
 						foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {
@@ -397,7 +374,7 @@ function item_type2str($type = null){
 
 		foreach ($srcItems as &$srcItem) {
 			if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
-				$type = getInterfaceTypeByItem($srcItem['type']);
+				$type = CItem::itemTypeInterface($srcItem['type']);
 
 				if ($type == INTERFACE_TYPE_ANY) {
 					foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {

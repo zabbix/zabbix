@@ -1273,7 +1273,7 @@ class CItem extends CItemGeneral{
 					unset($item['interfaceid']);
 				}
 				elseif (isset($item['type']) && $item['type'] != $exItem['type']) {
-					$type = $this->itemTypeInterface($item['type']);
+					$type = self::itemTypeInterface($item['type']);
 
 					if ($type == INTERFACE_TYPE_ANY) {
 						foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {
