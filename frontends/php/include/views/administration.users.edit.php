@@ -304,6 +304,7 @@ if (!$this->data['is_profile']) {
 	if (isset($this->data['userid']) && bccomp($USER_DETAILS['userid'], $this->data['userid']) == 0) {
 		$userTypeComboBox->setEnabled('disabled');
 		$permissionsFormList->addRow(_('User type'), array($userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))));
+		$userForm->addVar('user_type', $this->data['user_type']);
 	}
 	else {
 		$permissionsFormList->addRow(_('User type'), $userTypeComboBox);
