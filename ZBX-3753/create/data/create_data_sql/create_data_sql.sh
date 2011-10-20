@@ -73,6 +73,12 @@
 #     this time.
 #    Adding a hash mark (#) in front of the line will indicate that it is a
 #     comment.
+#
+# 5. Extra clause
+#    Extra clause may be added for a specific table. Extra clauses are specified
+#     in EXTRACLAUSEFILE file.
+#    Adding a hash mark (#) in front of the line will indicate that it is a
+#     comment.
 
 # Do not make configuration changes to the database while running this script.
 
@@ -84,6 +90,7 @@ BLACKLISTFILE=data_sql_blacklist.txt
 BLACKLISTVALFILE=data_sql_blacklistbyval.txt
 BLACKLISTVALREFFILE=data_sql_blacklistbyval_ref.txt
 FILTERFILE=data_sql_filter.txt
+EXTRACLAUSEFILE=data_sql_extraclause.txt
 PREDUMPHOOKFILE=data_sql_predumphooks.txt
 >"$FINALFILE"
 
@@ -104,11 +111,10 @@ TABLES="slideshows \
 slides \
 drules \
 dchecks \
-httptest \
-httpstep \
-httpstepitem \
-httptestitem \
 services_times \
+users \
+hosts \
+groups \
 actions \
 operations \
 opmessage \
@@ -120,24 +126,29 @@ opcommand_grp \
 opgroup \
 optemplate \
 opconditions \
-applications \
 conditions \
+usrgrp \
 config \
+triggers \
+valuemaps \
+interface \
+items \
 functions \
 graphs \
 graph_discovery \
 graphs_items \
 graph_theme \
-groups \
 help_items \
-hosts \
-interface \
+applications \
+httptest \
+httpstep \
+httpstepitem \
+httptestitem \
 globalmacro \
 hostmacro \
 hosts_groups \
 host_inventory \
 hosts_templates \
-items \
 item_discovery \
 items_applications \
 mappings \
@@ -152,17 +163,13 @@ services \
 services_links \
 sysmaps_links \
 sysmaps_link_triggers \
+sysmaps \
 sysmaps_elements \
 sysmap_element_url \
-sysmaps \
 sysmap_url \
-triggers \
 trigger_discovery \
 trigger_depends \
-users \
-usrgrp \
 users_groups \
-valuemaps \
 maintenances \
 maintenances_hosts \
 maintenances_groups \
@@ -229,6 +236,10 @@ for TABLE in $TABLES; do
 			done
 			FINALFILTER="where ${FINALFILTER# or }"
 		}
+
+		# --- extra clause file must have table name, followed by the clause itself (like ODRER BY), space separated
+		EXTRACLAUSE=$(grep -v ^# "$EXTRACLAUSEFILE" 2>/dev/null | grep $TABLE 2>/dev/null | cut -d" " -f2-)
+
 		echo "
 --
 -- Dumping data for table \`$TABLE\`
@@ -245,7 +256,7 @@ for TABLE in $TABLES; do
 			unset HOOKLINE
 		}
 
-		echo "select ${DIFFERENT_FIELDS#,} from $TABLE $FINALFILTER into outfile '$TMPFILE' \
+		echo "select ${DIFFERENT_FIELDS#,} from $TABLE $FINALFILTER $EXTRACLAUSE into outfile '$TMPFILE' \
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY \"'\";" | $MYSQLLINE || fail "select failed"
 
 		# "into outfile" does not replace newlines with \r\n, thus we just replace them with sed
