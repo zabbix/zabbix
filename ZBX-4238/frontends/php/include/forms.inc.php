@@ -1267,8 +1267,6 @@
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interfaceid');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interface_row');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'interfaceid');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interface_row');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interfaceid');
 				zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interface_row');
