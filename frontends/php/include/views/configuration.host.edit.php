@@ -70,7 +70,7 @@
 		$dbHost['interfaces'] = API::HostInterface()->get(array(
 			'hostids' => $dbHost['hostid'],
 			'output' => API_OUTPUT_EXTEND,
-			'selectItems' => API_OUTPUT_COUNT,
+			'selectItems' => API_OUTPUT_EXTEND,
 			'preserveKeys' => true,
 		));
 
@@ -80,14 +80,24 @@
 		$original_templates = $dbHost['parentTemplates'];
 		$original_templates = zbx_toHash($original_templates, 'templateid');
 
-		if(!empty($interfaces)){
-			foreach($interfaces as $hinum => $interface){
+		if (!empty($interfaces)) {
+			foreach ($interfaces as $hinum => $interface) {
 				$interfaces[$hinum]['items'] = 0;
 
-				if($interface['new'] == 'create') continue;
-				if(!isset($dbHost['interfaces'][$interface['interfaceid']])) continue;
+				if ($interface['new'] == 'create' || !isset($dbHost['interfaces'][$interface['interfaceid']])) {
+					continue;
+				}
 
-				$interfaces[$hinum]['items'] = $dbHost['interfaces'][$interface['interfaceid']]['items'];
+				$interfaces[$hinum]['items'] = count($dbHost['interfaces'][$interface['interfaceid']]['items']);
+				$locked = false;
+				foreach ($dbHost['interfaces'][$interface['interfaceid']]['items'] as $item) {
+					$itemInterfaceType = CItem::itemTypeInterface($item['type']);
+					if (!($itemInterfaceType === false && $itemInterfaceType === INTERFACE_TYPE_ANY)) {
+						$locked = true;
+						break;
+					}
+				}
+				$interfaces[$hinum]['locked'] = $locked;
 			}
 		}
 

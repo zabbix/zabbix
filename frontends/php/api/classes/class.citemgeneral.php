@@ -278,7 +278,7 @@ abstract class CItemGeneral extends CZBXAPI{
 		}
 	}
 
-	protected function itemTypeInterface($itemType){
+	public static function itemTypeInterface($itemType){
 		switch($itemType){
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
