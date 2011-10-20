@@ -2386,7 +2386,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 		int delay, const char *delay_flex_esc, int history, int trends, unsigned char status,
 		const char *trapper_hosts_esc, const char *units_esc, int multiplier, int delta,
 		const char *formula_esc, const char *logtimefmt_esc, zbx_uint64_t valuemapid,
-		const char *params_esc, const char *ipmi_sensor_esc, const char *snmp_community_esc,
+		const char *params_proto, const char *ipmi_sensor_esc, const char *snmp_community_esc,
 		const char *snmp_oid_proto, const char *port_esc, const char *snmpv3_securityname_esc,
 		unsigned char snmpv3_securitylevel, const char *snmpv3_authpassphrase_esc,
 		const char *snmpv3_privpassphrase_esc, unsigned char authtype, const char *username_esc,
@@ -2401,6 +2401,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	char		*key = NULL, *key_esc, *key_proto_esc,
 			*name = NULL, *name_esc,
 			*snmp_oid = NULL, *snmp_oid_esc,
+			*params = NULL, *params_esc,
 			*sql = NULL;
 	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 	int		i, res = SUCCEED;
@@ -2423,6 +2424,16 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	snmp_oid = zbx_strdup(snmp_oid, snmp_oid_proto);
 	substitute_discovery_macros(&snmp_oid, jp_row);
 	snmp_oid_esc = DBdyn_escape_string(snmp_oid);
+
+	if (ITEM_TYPE_DB_MONITOR == type || ITEM_TYPE_SSH == type ||
+			ITEM_TYPE_TELNET == type || ITEM_TYPE_CALCULATED == type)
+	{
+		params = zbx_strdup(params, params_proto);
+		substitute_discovery_macros(&params, jp_row);
+		params_esc = DBdyn_escape_string(params);
+	}
+	else
+		params_esc = DBdyn_escape_string(params_proto);
 
 	result = DBselect(
 			"select distinct i.itemid"
@@ -2633,6 +2644,7 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 		DBexecute("%s", sql);
 out:
 	zbx_free(sql);
+	zbx_free(params_esc);
 	zbx_free(snmp_oid_esc);
 	zbx_free(snmp_oid);
 	zbx_free(name_esc);
@@ -2692,7 +2704,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 	{
 		zbx_uint64_t	itemid, valuemapid;
 		char		*delay_flex_esc, *trapper_hosts_esc, *units_esc, *formula_esc,
-				*logtimefmt_esc, *params_esc, *ipmi_sensor_esc, *username_esc,
+				*logtimefmt_esc, *ipmi_sensor_esc, *username_esc,
 				*password_esc, *publickey_esc, *privatekey_esc, *description_esc;
 
 		ZBX_STR2UINT64(itemid, row[0]);
@@ -2703,7 +2715,6 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		units_esc		= DBdyn_escape_string(row[13]);
 		formula_esc		= DBdyn_escape_string(row[16]);
 		logtimefmt_esc		= DBdyn_escape_string(row[17]);
-		params_esc		= DBdyn_escape_string(row[19]);
 		ipmi_sensor_esc		= DBdyn_escape_string(row[20]);
 		username_esc		= DBdyn_escape_string(row[23]);
 		password_esc		= DBdyn_escape_string(row[24]);
@@ -2742,7 +2753,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 					formula_esc,
 					logtimefmt_esc,
 					valuemapid,
-					params_esc,
+					row[19],			/* params */
 					ipmi_sensor_esc,
 					snmp_community_esc,
 					row[21],			/* snmp_oid */
@@ -2768,7 +2779,6 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		zbx_free(password_esc);
 		zbx_free(username_esc);
 		zbx_free(ipmi_sensor_esc);
-		zbx_free(params_esc);
 		zbx_free(logtimefmt_esc);
 		zbx_free(formula_esc);
 		zbx_free(units_esc);

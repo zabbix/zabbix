@@ -17,6 +17,7 @@ create/data/create_data_sql/create_data_sql.sh svneol=native#text/x-sh
 create/data/create_data_sql/data_sql_blacklist.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_blacklistbyval.txt -text
 create/data/create_data_sql/data_sql_blacklistbyval_ref.txt -text
+create/data/create_data_sql/data_sql_extraclause.txt -text
 create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
 create/images/README.dev -text
