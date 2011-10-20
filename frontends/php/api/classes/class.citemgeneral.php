@@ -169,7 +169,7 @@ abstract class CItemGeneral extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
 
-				if (!isset($item['interfaceid']) && $this->itemTypeInterface($item['type'])
+				if (!isset($item['interfaceid']) && self::itemTypeInterface($item['type'])
 					&& $dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE
 					&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD
 				) {
@@ -178,7 +178,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 
-			$itemInterfaceType = $this->itemTypeInterface($fullItem['type']);
+			$itemInterfaceType = self::itemTypeInterface($fullItem['type']);
 			if ($itemInterfaceType !== false && $dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE
 				&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD
 			) {
@@ -278,7 +278,7 @@ abstract class CItemGeneral extends CZBXAPI{
 		}
 	}
 
-	protected function itemTypeInterface($itemType){
+	public static function itemTypeInterface($itemType){
 		switch($itemType){
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
@@ -291,7 +291,6 @@ abstract class CItemGeneral extends CZBXAPI{
 				return INTERFACE_TYPE_AGENT;
 			case ITEM_TYPE_SIMPLE:
 			case ITEM_TYPE_EXTERNAL:
-			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:
 				return INTERFACE_TYPE_ANY;
