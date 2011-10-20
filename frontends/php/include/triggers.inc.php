@@ -1540,7 +1540,7 @@ function utf8RawUrlDecode($source){
  * Comments: !!! Don't forget sync code with C !!!
  *
  */
-	function get_triggers_overview($hostids,$view_style=null){
+	function get_triggers_overview($hostids, $view_style = null, $params = array()) {
 
 		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
@@ -1611,7 +1611,7 @@ function utf8RawUrlDecode($source){
 			foreach($triggers as $descr => $trhosts){
 				$table_row = array(nbsp($descr));
 				foreach($hosts as $hostname){
-					$table_row = get_trigger_overview_cells($table_row,$trhosts,$hostname);
+					$table_row = get_trigger_overview_cells($table_row, $trhosts, $hostname, $params);
 				}
 				$table->addRow($table_row);
 			}
@@ -1627,7 +1627,7 @@ function utf8RawUrlDecode($source){
 			foreach($hosts as $hostname){
 				$table_row = array(nbsp($hostname));
 				foreach($triggers as $descr => $trhosts){
-					$table_row=get_trigger_overview_cells($table_row,$trhosts,$hostname);
+					$table_row = get_trigger_overview_cells($table_row, $trhosts, $hostname, $params);
 				}
 				$table->addRow($table_row);
 			}
@@ -1635,7 +1635,7 @@ function utf8RawUrlDecode($source){
 	return $table;
 	}
 
-	function get_trigger_overview_cells(&$table_row,&$trhosts,&$hostname){
+	function get_trigger_overview_cells(&$table_row, &$trhosts, &$hostname, $params = array()) {
 		$css_class = NULL;
 		$config = select_config();
 
@@ -1651,12 +1651,14 @@ function utf8RawUrlDecode($source){
 
 					if($config['event_ack_enable'] == 1){
 						$event = get_last_event_by_triggerid($trhosts[$hostname]['triggerid']);
-						if($event){
-							$ack_menu = array(
-											S_ACKNOWLEDGE,
-											'acknow.php?eventid='.$event['eventid'].'&backurl=overview.php',
-											array('tw'=>'_blank')
-										);
+						if ($event) {
+							if (!empty($params['screenid'])) {
+								global $page;
+								$ack_menu = array(_('Acknowledge'), 'acknow.php?eventid='.$event['eventid'].'&screenid='.$params['screenid'].'&backurl='.$page['file']);
+							}
+							else {
+								$ack_menu = array(_('Acknowledge'), 'acknow.php?eventid='.$event['eventid'].'&backurl=overview.php', array('tw'=>'_blank'));
+							}
 
 							if(1 == $event['acknowledged'])
 								$ack = new CImg('images/general/tick.png','ack');
