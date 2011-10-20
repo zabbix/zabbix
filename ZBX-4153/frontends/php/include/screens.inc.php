@@ -1692,7 +1692,7 @@ require_once('include/js.inc.php');
 						$hostids[$tmp_host['hostid']] = $tmp_host['hostid'];
 					}
 
-					$item = array(get_triggers_overview($hostids, $style));
+					$item = array(get_triggers_overview($hostids, $style, array('screenid' => $screen['screenid'])));
 					if ($editmode == 1) {
 						array_push($item, new CLink(S_CHANGE, $action));
 					}
