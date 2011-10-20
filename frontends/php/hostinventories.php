@@ -23,7 +23,7 @@ require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = 'S_HOST_INVENTORIES';
+$page['title'] = _('Host inventories');
 $page['file'] = 'hostinventories.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 
