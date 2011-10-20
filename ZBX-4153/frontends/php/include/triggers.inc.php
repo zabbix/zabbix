@@ -1657,10 +1657,10 @@ function utf8RawUrlDecode($source){
 						if ($event) {
 							if (!empty($params['screenid'])) {
 								global $page;
-								$ack_menu = array(S_ACKNOWLEDGE, 'acknow.php?eventid='.$event['eventid'].'&screenid='.$params['screenid'].'&backurl='.$page['file']);
+								$ack_menu = array(_('Acknowledge'), 'acknow.php?eventid='.$event['eventid'].'&screenid='.$params['screenid'].'&backurl='.$page['file']);
 							}
 							else {
-								$ack_menu = array(S_ACKNOWLEDGE, 'acknow.php?eventid='.$event['eventid'].'&backurl=overview.php', array('tw'=>'_blank'));
+								$ack_menu = array(_('Acknowledge'), 'acknow.php?eventid='.$event['eventid'].'&backurl=overview.php', array('tw'=>'_blank'));
 							}
 
 							if(1 == $event['acknowledged'])

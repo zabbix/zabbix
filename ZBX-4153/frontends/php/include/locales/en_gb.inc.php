@@ -228,7 +228,6 @@
 	'S_SELECT_NODES'=>			_('Select Nodes'),
 
 //	acknow.php
-	'S_ACKNOWLEDGE'=>			_('Acknowledge'),
 	'S_BULK_ACKNOWLEDGE'=>			_('Bulk acknowledge'),
 
 //	actionconf.php
