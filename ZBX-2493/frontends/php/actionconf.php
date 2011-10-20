@@ -1151,7 +1151,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					$tblNewOperation->addRow(array(S_REMOTE_COMMAND,
 						new CTextArea('new_operation[longdata]', $new_operation['longdata'], 77, 7)));
 
-					$tblNewOperation->addRow(array(S_DEFAULT_MESSAGE, new CVar('new_operation[default_msg]', $new_operation['default_msg'], null, 1)));
+					$frmAction->addVar('new_operation[default_msg]', $new_operation['default_msg']);
 					break;
 				case OPERATION_TYPE_HOST_ADD:
 				case OPERATION_TYPE_HOST_REMOVE:
@@ -1161,7 +1161,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					$tblOper->addItem(new CVar('new_operation[objectid]', 0));
 					$tblOper->addItem(new CVar('new_operation[shortdata]', ''));
 					$tblOper->addItem(new CVar('new_operation[longdata]', ''));
-					$tblNewOperation->addRow(array(S_DEFAULT_MESSAGE, new CVar('new_operation[default_msg]', $new_operation['default_msg'], null, 1)));
+					$frmAction->addVar('new_operation[default_msg]', $new_operation['default_msg']);
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
@@ -1181,7 +1181,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 								'&srctbl=host_group&srcfld1=groupid&srcfld2=name' .
 								'",450,450)','T')
 					)));
-					$tblNewOperation->addRow(array(S_DEFAULT_MESSAGE, new CVar('new_operation[default_msg]', $new_operation['default_msg'], null, 1)));
+					$frmAction->addVar('new_operation[default_msg]', $new_operation['default_msg']);
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
@@ -1202,7 +1202,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 										'&srctbl=host_templates&srcfld1=hostid&srcfld2=host' .
 										'",450,450)','T')
 					)));
-					$tblNewOperation->addRow(array(S_DEFAULT_MESSAGE, new CVar('new_operation[default_msg]', $new_operation['default_msg'], null, 1)));
+					$frmAction->addVar('new_operation[default_msg]', $new_operation['default_msg']);
 					break;
 			}
 
