@@ -42,7 +42,7 @@ require_once('include/js.inc.php');
 			SCREEN_RESOURCE_SIMPLE_GRAPH => S_SIMPLE_GRAPH,
 			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS => S_STATUS_OF_HOSTGROUP_TRIGGERS,
 			SCREEN_RESOURCE_HOST_TRIGGERS => S_STATUS_OF_HOST_TRIGGERS,
-			SCREEN_RESOURCE_SYSTEM_STATUS => S_SYSTEM_STATUS,
+			SCREEN_RESOURCE_SYSTEM_STATUS => _('System status'),
 			SCREEN_RESOURCE_TRIGGERS_INFO => S_TRIGGERS_INFO,
 			SCREEN_RESOURCE_TRIGGERS_OVERVIEW => S_TRIGGERS_OVERVIEW,
 			SCREEN_RESOURCE_URL => S_URL,
@@ -1451,6 +1451,8 @@ require_once('include/js.inc.php');
 						}
 					}
 
+					$params['screenid'] = $screen['screenid'];
+
 					$item = new CUIWidget('hat_htstatus', make_latest_issues($params, true));
 					$item->setDoubleHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE), $tr_form);
 					$item = array($item);
@@ -1560,6 +1562,8 @@ require_once('include/js.inc.php');
 						}
 					}
 
+					$params['screenid'] = $screen['screenid'];
+
 					$item = new CUIWidget('hat_trstatus', make_latest_issues($params, true));
 					$item->setDoubleHeader(array(S_STATUS_OF_TRIGGERS_BIG, SPACE, zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT), SPACE), $tr_form);
 					$item = array($item);
@@ -1575,12 +1579,13 @@ require_once('include/js.inc.php');
 						'maintenance' => null,
 						'severity' => null,
 						'limit' => null,
-						'extAck' => 0
+						'extAck' => 0,
+						'screenid' => $screen['screenid']
 					);
 
 					$item = new CUIWidget('hat_syssum', make_system_status($params));
 					$item->setHeader(S_STATUS_OF_ZABBIX, SPACE);
-					$item->setFooter(_s('Updated: %s', zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT)));
+					$item->setFooter(_s('Updated: %s', zbx_date2str(_('H:i:s'))));
 
 					$item = array($item);
 
@@ -1687,7 +1692,7 @@ require_once('include/js.inc.php');
 						$hostids[$tmp_host['hostid']] = $tmp_host['hostid'];
 					}
 
-					$item = array(get_triggers_overview($hostids, $style));
+					$item = array(get_triggers_overview($hostids, $style, array('screenid' => $screen['screenid'])));
 					if ($editmode == 1) {
 						array_push($item, new CLink(S_CHANGE, $action));
 					}
