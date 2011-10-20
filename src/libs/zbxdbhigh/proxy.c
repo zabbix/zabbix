@@ -2753,7 +2753,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 					formula_esc,
 					logtimefmt_esc,
 					valuemapid,
-					row[19],			/* params_esc */
+					row[19],			/* params */
 					ipmi_sensor_esc,
 					snmp_community_esc,
 					row[21],			/* snmp_oid */
