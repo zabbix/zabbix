@@ -2425,7 +2425,8 @@ static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, co
 	substitute_discovery_macros(&snmp_oid, jp_row);
 	snmp_oid_esc = DBdyn_escape_string(snmp_oid);
 
-	if (ITEM_TYPE_CALCULATED == type)
+	if (ITEM_TYPE_DB_MONITOR == type || ITEM_TYPE_SSH == type ||
+			ITEM_TYPE_TELNET == type || ITEM_TYPE_CALCULATED == type)
 	{
 		params = zbx_strdup(params, params_proto);
 		substitute_discovery_macros(&params, jp_row);
