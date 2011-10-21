@@ -2,6 +2,7 @@
 Changes for 1.9.7
 
 New features:
+ - [ZBX-1346] add example user parameter to monitor mail queue length from mailq (Richlv)
  - [ZBXNEXT-429] make range select work in a more intutive fashion (Eduard)
  - [ZBXNEXT-910] redesign Administration->Maintenance (Eduard)
  - [ZBX-4222] added more clear labels 'Escalation period' and 'Default escalation period' in configuration of actions (Alexei)
