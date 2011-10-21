@@ -179,6 +179,7 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 		{
 			zbx_json_addobject(&j, NULL);
 			zbx_json_addstring(&j, "{#FSNAME}", mt->mnt_dir, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#FSTYPE}", mt->mnt_type, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 
