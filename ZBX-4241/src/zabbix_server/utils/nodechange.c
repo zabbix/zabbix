@@ -487,6 +487,8 @@ int	change_nodeid(int old_id, int new_id)
 
 	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)", new_id);
 
+	DBexecute("delete from ids where nodeid=0");
+
 	DBcommit();
 
 	DBclose();
