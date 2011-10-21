@@ -645,7 +645,7 @@ COpt::memoryPick();
 		$groupids = zbx_objectValues($groups, 'groupid');
 
 			if (empty($groups)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter.');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 			}
 
 // permissions
@@ -676,7 +676,7 @@ COpt::memoryPick();
 
 			foreach ($groups as $num => $group) {
 				if (isset($group['name']) && isset($groupsNames[$group['name']]) && (bccomp($groupsNames[$group['name']]['groupid'], $group['groupid']) != 0)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group "'.$group['name'].'" already exists.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%s" already exists.', $group['name']));
 				}
 
 // prevents updating several groups with same name
