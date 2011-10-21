@@ -622,7 +622,7 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter "name".'));
 				}
 				if ($this->exists(array('name' => $group['name']))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host group "'.$group['name'].'" already exists.');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%s" already exists.', $group['name']));
 				}
 
 				$insert[] = $group;
