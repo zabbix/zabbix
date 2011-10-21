@@ -102,7 +102,7 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
-	char		line[MAX_STRING_LEN], *p, *mpoint;
+	char		line[MAX_STRING_LEN], *p, *mpoint, *mtype;
 	FILE		*f;
 	struct zbx_json	j;
 
@@ -114,18 +114,26 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		while (NULL != fgets(line, sizeof(line), f))
 		{
-			if (NULL == (p = strstr(line, " ")))
+			if (NULL == (p = strchr(line, ' ')))
 				continue;
 
 			mpoint = ++p;
 
-			if (NULL == (p = strstr(mpoint, " ")))
+			if (NULL == (p = strchr(mpoint, ' ')))
+				continue;
+
+			*p = '\0';
+
+			mtype = ++p;
+
+			if (NULL == (p = strchr(mtype, ' ')))
 				continue;
 
 			*p = '\0';
 
 			zbx_json_addobject(&j, NULL);
 			zbx_json_addstring(&j, "{#FSNAME}", mpoint, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#FSTYPE}", mtype, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 
@@ -136,7 +144,7 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	zbx_json_close(&j);
 
-	SET_STR_RESULT(result, strdup(j.buffer));
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 	zbx_json_free(&j);
 
