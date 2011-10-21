@@ -590,7 +590,7 @@ class CUserMacro extends CZBXAPI{
 		$globalmacros = zbx_toArray($globalmacros);
 
 			if(empty($globalmacros))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter.');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 // permissions + existance
 			$options = array(
