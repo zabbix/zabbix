@@ -393,7 +393,7 @@ int	change_nodeid(int old_id, int new_id)
 		return FAIL;
 	}
 
-	if (0 > new_id || 999 < new_id)
+	if (1 > new_id || new_id > 999)
 	{
 		printf("Node ID must be in range of 1-999.\n");
 		return FAIL;
@@ -419,7 +419,9 @@ int	change_nodeid(int old_id, int new_id)
 			{
 				if (0 == strcmp(special_convs[s].table_name, tables[i].table) &&
 						0 == strcmp(special_convs[s].field_name, tables[i].fields[j].name))
+				{
 					break;
+				}
 			}
 
 			if (NULL != special_convs[s].table_name)
