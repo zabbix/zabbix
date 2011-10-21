@@ -436,7 +436,8 @@ define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\
 		"Device DNS: {DISCOVERY.DEVICE.DNS}\nDevice status: {DISCOVERY.DEVICE.STATUS}\n".
 		"Device uptime: {DISCOVERY.DEVICE.UPTIME}\n\nDevice service name: {DISCOVERY.SERVICE.NAME}\n".
 		"Device service port: {DISCOVERY.SERVICE.PORT}\nDevice service status: {DISCOVERY.SERVICE.STATUS}\n".
-		"Device service uptime: {DISCOVERY.SERVICE.UPTIME}");
+		"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
+);
 
 define('ACTION_STATUS_ENABLED',		0);
 define('ACTION_STATUS_DISABLED',	1);
