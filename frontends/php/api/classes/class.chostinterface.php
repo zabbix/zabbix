@@ -663,16 +663,16 @@ Copt::memoryPick();
  * @param array $Interfaceids[1, ...] Interface ID to delete
  * @return array|boolean
  */
-	public function delete($interfaceids){
+	public function delete($interfaceids) {
 
-			if(empty($interfaceids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if (empty($interfaceids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 			$interfaceids = zbx_toArray($interfaceids);
 			$interfaces = zbx_toObject($interfaceids, 'interfaceid');
 
 			$this->checkInput($interfaces,__FUNCTION__);
 
-			DB::delete('interface', array('interfaceid'=>$interfaceids));
+			DB::delete('interface', array('interfaceid' => $interfaceids));
 
 // auto seting main interfaces
 			$this->setMainInterfaces($interfaces);
@@ -680,13 +680,13 @@ Copt::memoryPick();
 			return array('interfaceids' => $interfaceids);
 	}
 
-	public function massAdd($data){
+	public function massAdd($data) {
 		$interfaces = zbx_toArray($data['interfaces']);
 		$hosts = zbx_toArray($data['hosts']);
 
 			$insertData = array();
-			foreach($interfaces as $inum => $interface){
-				foreach($hosts as $hnum => $host){
+			foreach ($interfaces as $inum => $interface) {
+				foreach ($hosts as $hnum => $host) {
 					$newInterface = $interface;
 					$newInterface['hostid'] = $host['hostid'];
 

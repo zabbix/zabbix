@@ -1226,10 +1226,10 @@ COpt::memoryPick();
  * @param array $triggerids array with trigger ids
  * @return array
  */
-	public function delete($triggerids, $nopermissions=false){
+	public function delete($triggerids, $nopermissions=false) {
 		$triggerids = zbx_toArray($triggerids);
 
-			if(empty($triggerids)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
+			if (empty($triggerids)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter.');
 
 			$options = array(
 				'triggerids' => $triggerids,
@@ -1240,13 +1240,13 @@ COpt::memoryPick();
 			$del_triggers = $this->get($options);
 
 // TODO: remove $nopermissions hack
-			if(!$nopermissions){
-				foreach($triggerids as $gnum => $triggerid){
-					if(!isset($del_triggers[$triggerid])){
+			if (!$nopermissions) {
+				foreach ($triggerids as $gnum => $triggerid) {
+					if (!isset($del_triggers[$triggerid])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 					}
 
-					if($del_triggers[$triggerid]['templateid'] != 0){
+					if ($del_triggers[$triggerid]['templateid'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							sprintf(_('Cannot delete templated trigger [%1$s:%2$s]'),
 								$del_triggers[$triggerid]['description'],
@@ -1258,14 +1258,14 @@ COpt::memoryPick();
 
 // get child triggers
 			$parent_triggerids = $triggerids;
-			do{
-				$db_items = DBselect('SELECT triggerid FROM triggers WHERE ' . DBcondition('templateid', $parent_triggerids));
+			do {
+				$db_items = DBselect('SELECT triggerid FROM triggers WHERE '.DBcondition('templateid', $parent_triggerids));
 				$parent_triggerids = array();
-				while($db_trigger = DBfetch($db_items)){
+				while ($db_trigger = DBfetch($db_items)) {
 					$parent_triggerids[] = $db_trigger['triggerid'];
 					$triggerids[$db_trigger['triggerid']] = $db_trigger['triggerid'];
 				}
-			} while(!empty($parent_triggerids));
+			} while (!empty($parent_triggerids));
 
 
 // select all triggers which are deleted (include childs)

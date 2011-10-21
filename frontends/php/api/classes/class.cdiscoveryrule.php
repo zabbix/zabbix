@@ -533,7 +533,7 @@ COpt::memoryPick();
 	}
 
 /**
- * Add DIscoveryRule
+ * Add DiscoveryRule
  *
  * @param array $items
  * @return array|boolean
@@ -658,7 +658,7 @@ COpt::memoryPick();
 	}
 
 /**
- * Update DIscoveryRule
+ * Update DiscoveryRule
  *
  * @param array $items
  * @return boolean
@@ -675,108 +675,107 @@ COpt::memoryPick();
 			return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
-/**
- * Delete DIscoveryRules
- *
- * @param array $ruleids
- * @return
- */
-	public function delete($ruleids, $nopermissions=false){
+	/**
+	 * Delete DiscoveryRules
+	 *
+	 * @param array $ruleids
+	 * @return
+	 */
+	public function delete($ruleids, $nopermissions = false) {
+		if (empty($ruleids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
 
-			if(empty($ruleids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+		$ruleids = zbx_toHash($ruleids);
 
-			$ruleids = zbx_toHash($ruleids);
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'itemids' => $ruleids,
+			'editable' => true,
+			'preservekeys' => true,
+		);
+		$del_rules = $this->get($options);
 
-			$options = array(
-				'output' => API_OUTPUT_EXTEND,
-				'itemids' => $ruleids,
-				'editable' => true,
-				'preservekeys' => true,
-			);
-			$del_rules = $this->get($options);
-
-// TODO: remove $nopermissions hack
-			if(!$nopermissions){
-				foreach($ruleids as $ruleid){
-					if(!isset($del_rules[$ruleid])){
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
-					}
-					if($del_rules[$ruleid]['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete templated items'));
-					}
+		// TODO: remove $nopermissions hack
+		if (!$nopermissions) {
+			foreach ($ruleids as $ruleid) {
+				if (!isset($del_rules[$ruleid])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+				}
+				if ($del_rules[$ruleid]['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete templated items'));
 				}
 			}
+		}
 
-// get child discovery rules
-			$parent_itemids = $ruleids;
-			$child_ruleids = array();
-			do{
-				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
-				$parent_itemids = array();
-				while($db_item = DBfetch($db_items)){
-					$parent_itemids[$db_item['itemid']] = $db_item['itemid'];
-					$child_ruleids[$db_item['itemid']] = $db_item['itemid'];
-				}
-			}while(!empty($parent_itemids));
-
-			$options = array(
-				'output' => API_OUTPUT_EXTEND,
-				'itemids' => $child_ruleids,
-				'nopermissions' => true,
-				'preservekeys' => true,
-			);
-			$del_rules_childs = $this->get($options);
-
-			$del_rules = array_merge($del_rules, $del_rules_childs);
-			$ruleids = array_merge($ruleids, $child_ruleids);
-
-
-			$iprototypeids = array();
-			$sql = 'SELECT i.itemid'.
-			 		' FROM item_discovery id, items i'.
-			 		' WHERE i.itemid=id.itemid'.
-			 			' AND '.DBcondition('parent_itemid', $ruleids);
-			$db_items = DBselect($sql);
-			while($item = DBfetch($db_items)){
-				$iprototypeids[$item['itemid']] = $item['itemid'];
+		// get child discovery rules
+		$parent_itemids = $ruleids;
+		$child_ruleids = array();
+		do {
+			$db_items = DBselect('SELECT itemid FROM items WHERE '.DBcondition('templateid', $parent_itemids));
+			$parent_itemids = array();
+			while ($db_item = DBfetch($db_items)) {
+				$parent_itemids[$db_item['itemid']] = $db_item['itemid'];
+				$child_ruleids[$db_item['itemid']] = $db_item['itemid'];
 			}
-			if(!empty($iprototypeids)){
-				if(!API::Itemprototype()->delete($iprototypeids, true))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete discovery rule'));
+		} while (!empty($parent_itemids));
+
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'itemids' => $child_ruleids,
+			'nopermissions' => true,
+			'preservekeys' => true
+		);
+		$del_rules_childs = $this->get($options);
+
+		$del_rules = array_merge($del_rules, $del_rules_childs);
+		$ruleids = array_merge($ruleids, $child_ruleids);
+
+		$iprototypeids = array();
+		$sql = 'SELECT i.itemid'.
+				' FROM item_discovery id, items i'.
+				' WHERE i.itemid=id.itemid'.
+					' AND '.DBcondition('parent_itemid', $ruleids);
+		$db_items = DBselect($sql);
+		while ($item = DBfetch($db_items)) {
+			$iprototypeids[$item['itemid']] = $item['itemid'];
+		}
+		if (!empty($iprototypeids)) {
+			if (!API::Itemprototype()->delete($iprototypeids, true)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete discovery rule'));
 			}
+		}
 
-			DB::delete('items', array('itemid'=>$ruleids));
+		DB::delete('items', array('itemid' => $ruleids));
 
-
-// HOUSEKEEPER {{{
-			$item_data_tables = array(
-				'trends',
-				'trends_uint',
-				'history_text',
-				'history_log',
-				'history_uint',
-				'history_str',
-				'history',
-			);
-			$insert = array();
-			foreach($ruleids as $id => $ruleid){
-				foreach($item_data_tables as $table){
-					$insert[] = array(
-						'tablename' => $table,
-						'field' => 'itemid',
-						'value' => $ruleid,
-					);
-				}
+		// housekeeper
+		$item_data_tables = array(
+			'trends',
+			'trends_uint',
+			'history_text',
+			'history_log',
+			'history_uint',
+			'history_str',
+			'history',
+		);
+		$insert = array();
+		foreach ($ruleids as $id => $ruleid) {
+			foreach ($item_data_tables as $table) {
+				$insert[] = array(
+					'tablename' => $table,
+					'field' => 'itemid',
+					'value' => $ruleid
+				);
 			}
-			DB::insert('housekeeper', $insert);
-// }}} HOUSEKEEPER
+		}
+		DB::insert('housekeeper', $insert);
 
-// TODO: remove info from API
-			foreach($del_rules as $item){
-				info(_s('Discovery rule [%1$s:%2$s] deleted.', $item['name'], $item['key_']));
-			}
+		// TODO: remove info from API
+		foreach ($del_rules as $item) {
+			info(_s('Discovery rule [%1$s:%2$s] deleted.', $item['name'], $item['key_']));
+		}
 
-			return array('ruleids' => $ruleids);
+		return array('ruleids' => $ruleids);
 	}
 
 	public function syncTemplates($data){

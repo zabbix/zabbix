@@ -428,7 +428,7 @@ class CIconMap extends CZBXAPI {
 		$iconmapids = zbx_toArray($iconmapids);
 
 		if (empty($iconmapids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 		if (!$this->isWritable($iconmapids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));

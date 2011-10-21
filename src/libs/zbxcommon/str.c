@@ -2626,7 +2626,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 		case SVC_SNMPv3:
 			return "SNMPv3 agent";
 		case SVC_ICMPPING:
-			return "ICMP Ping";
+			return "ICMP ping";
 		default:
 			return "unknown";
 	}
