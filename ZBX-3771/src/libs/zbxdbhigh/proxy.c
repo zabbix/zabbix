@@ -2367,20 +2367,6 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	char		*key;
-	char		*name;
-	char		*snmp_oid;
-	char		*params;
-	zbx_uint64_t	*new_appids;
-	zbx_uint64_t	*del_appids;
-	int		new_appids_num;
-	int		del_appids_num;
-}
-zbx_lld_item_t;
-
 /******************************************************************************
  *                                                                            *
  * Function: DBlld_update_item                                                *
@@ -2395,6 +2381,20 @@ zbx_lld_item_t;
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	char		*key;
+	char		*name;
+	char		*snmp_oid;
+	char		*params;
+	zbx_uint64_t	*new_appids;
+	zbx_uint64_t	*del_appids;
+	int		new_appids_num;
+	int		del_appids_num;
+}
+zbx_lld_item_t;
+
 static int	DBlld_update_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		const char *name_proto, const char *key_proto, unsigned char type, const char *params_proto,
 		const char *snmp_oid_proto, struct zbx_json_parse *jp_row, char **error)
