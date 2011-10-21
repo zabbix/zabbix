@@ -679,8 +679,8 @@ class CAction extends CZBXAPI {
 
 			// get OPERATION_TYPE_MESSAGE data
 			if (!empty($opmessage)) {
-				$sql = 'SELECT operationid,default_msg,subject,message,mediatypeid'.
-						' FROM opmessage'.
+				$sql = 'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
+						' FROM opmessage o'.
 						' WHERE '.DBcondition('operationid', $opmessage);
 				$db_opmessages = DBselect($sql);
 				while ($db_opmessage = DBfetch($db_opmessages)) {
@@ -689,16 +689,16 @@ class CAction extends CZBXAPI {
 					$operations[$db_opmessage['operationid']]['opmessage'] = $db_opmessage;
 				}
 
-				$sql = 'SELECT operationid,usrgrpid'.
-						' FROM opmessage_grp'.
+				$sql = 'SELECT og.operationid,og.usrgrpid'.
+						' FROM opmessage_grp og'.
 						' WHERE '.DBcondition('operationid', $opmessage);
 				$db_opmessage_grp = DBselect($sql);
 				while ($opmessage_grp = DBfetch($db_opmessage_grp)) {
 					$operations[$opmessage_grp['operationid']]['opmessage_grp'][] = $opmessage_grp;
 				}
 
-				$sql = 'SELECT operationid,userid'.
-						' FROM opmessage_usr'.
+				$sql = 'SELECT ou.operationid,ou.userid'.
+						' FROM opmessage_usr ou'.
 						' WHERE '.DBcondition('operationid', $opmessage);
 				$db_opmessage_usr = DBselect($sql);
 				while ($opmessage_usr = DBfetch($db_opmessage_usr)) {
@@ -708,8 +708,8 @@ class CAction extends CZBXAPI {
 
 			// get OPERATION_TYPE_COMMAND data
 			if (!empty($opcommand)) {
-				$sql = 'SELECT *'.
-						' FROM opcommand'.
+				$sql = 'SELECT o.*'.
+						' FROM opcommand o'.
 						' WHERE '.DBcondition('operationid', $opcommand);
 				$db_opcommands = DBselect($sql);
 				while ($db_opcommand = DBfetch($db_opcommands)) {
@@ -718,16 +718,16 @@ class CAction extends CZBXAPI {
 					$operations[$db_opcommand['operationid']]['opcommand'] = $db_opcommand;
 				}
 
-				$sql = 'SELECT opcommand_hstid,operationid,hostid'.
-						' FROM opcommand_hst'.
+				$sql = 'SELECT oh.opcommand_hstid,oh.operationid,oh.hostid'.
+						' FROM opcommand_hst oh'.
 						' WHERE '.DBcondition('operationid', $opcommand);
 				$db_opcommand_hst = DBselect($sql);
 				while ($opcommand_hst = DBfetch($db_opcommand_hst)) {
 					$operations[$opcommand_hst['operationid']]['opcommand_hst'][] = $opcommand_hst;
 				}
 
-				$sql = 'SELECT opcommand_grpid,operationid,groupid'.
-						' FROM opcommand_grp'.
+				$sql = 'SELECT og.opcommand_grpid,og.operationid,og.groupid'.
+						' FROM opcommand_grp og'.
 						' WHERE '.DBcondition('operationid', $opcommand);
 				$db_opcommand_grp = DBselect($sql);
 				while ($opcommand_grp = DBfetch($db_opcommand_grp)) {
@@ -737,8 +737,8 @@ class CAction extends CZBXAPI {
 
 			// get OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE data
 			if (!empty($opgroup)) {
-				$sql = 'SELECT operationid,groupid'.
-						' FROM opgroup'.
+				$sql = 'SELECT o.operationid,o.groupid'.
+						' FROM opgroup o'.
 						' WHERE '.DBcondition('operationid', $opgroup);
 				$db_opgroup = DBselect($sql);
 				while ($opgroup = DBfetch($db_opgroup)) {
@@ -751,8 +751,8 @@ class CAction extends CZBXAPI {
 
 			// get OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE data
 			if (!empty($optemplate)) {
-				$sql = 'SELECT operationid,templateid'.
-						' FROM optemplate'.
+				$sql = 'SELECT o.operationid,o.templateid'.
+						' FROM optemplate o'.
 						' WHERE '.DBcondition('operationid', $optemplate);
 				$db_optemplate = DBselect($sql);
 				while ($optemplate = DBfetch($db_optemplate)) {
