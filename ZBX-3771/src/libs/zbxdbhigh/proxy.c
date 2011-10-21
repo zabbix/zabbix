@@ -2662,6 +2662,8 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 					params_proto, snmp_oid_proto, &jp_row, error);
 		}
 
+		zbx_vector_ptr_sort(&items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
 		for (i = 0; i < items.values_num; i++)
 		{
 			item = (zbx_lld_item_t *)items.values[i];
@@ -2718,7 +2720,6 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 			if (0 == item->itemid)
 			{
 				item->itemid = itemid++;
-
 #ifndef HAVE_MULTIROW_INSERT
 				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_items_sql);
 #endif
@@ -2727,7 +2728,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 							"%d,'%s',%d,%d,%d,'%s','%s',%d,%d,'%s','%s',%s,'%s','%s',"
 							"'%s','%s','%s','%s',%d,'%s','%s',%d,'%s','%s','%s',"
 							"'%s','%s'," ZBX_FS_UI64 ",%d)%s",
-						itemid, name_esc, key_esc, hostid, (int)type, (int)value_type,
+						item->itemid, name_esc, key_esc, hostid, (int)type, (int)value_type,
 						(int)data_type, delay, delay_flex_esc, history, trends, (int)status,
 						trapper_hosts_esc, units_esc, multiplier, delta, formula_esc,
 						logtimefmt_esc, DBsql_id_ins(valuemapid), params_esc, ipmi_sensor_esc,
@@ -2742,9 +2743,8 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 #endif
 				zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')%s",
-						itemdiscoveryid, itemid, parent_itemid, key_proto_esc, row_dl);
+						itemdiscoveryid, item->itemid, parent_itemid, key_proto_esc, row_dl);
 
-				itemid++;
 				itemdiscoveryid++;
 			}
 			else
