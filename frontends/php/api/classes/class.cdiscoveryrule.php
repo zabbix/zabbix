@@ -533,7 +533,7 @@ COpt::memoryPick();
 	}
 
 /**
- * Add DIscoveryRule
+ * Add DiscoveryRule
  *
  * @param array $items
  * @return array|boolean
@@ -658,7 +658,7 @@ COpt::memoryPick();
 	}
 
 /**
- * Update DIscoveryRule
+ * Update DiscoveryRule
  *
  * @param array $items
  * @return boolean
@@ -676,7 +676,7 @@ COpt::memoryPick();
 	}
 
 	/**
-	 * Delete DIscoveryRules
+	 * Delete DiscoveryRules
 	 *
 	 * @param array $ruleids
 	 * @return
