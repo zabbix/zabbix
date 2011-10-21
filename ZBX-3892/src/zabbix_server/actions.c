@@ -88,6 +88,8 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		zbx_uint64_t	hostid, triggerid;
 
+		zabbix_log(LOG_LEVEL_WARNING, "VL: %s() condition: host template", __function_name);
+
 		ZBX_STR2UINT64(condition_value, condition->value);
 
 		switch (condition->operator)
@@ -98,6 +100,19 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 
 				do
 				{
+					char	sql[256];
+
+					zbx_snprintf(sql, sizeof(sql),
+							"select distinct i.hostid,t.templateid"
+							" from items i,functions f,triggers t"
+							" where i.itemid=f.itemid"
+								" and f.triggerid=t.templateid"
+								" and t.triggerid=" ZBX_FS_UI64,
+							triggerid);
+
+					zabbix_log(LOG_LEVEL_WARNING, "VL: %s() [%s]", __function_name, sql);
+
+					/*
 					result = DBselect(
 							"select distinct i.hostid,t.templateid"
 							" from items i,functions f,triggers t"
@@ -105,6 +120,7 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 								" and f.triggerid=t.templateid"
 								" and t.triggerid=" ZBX_FS_UI64,
 							triggerid);
+					*/
 
 					if (NULL != (row = DBfetch(result)))
 					{
@@ -291,7 +307,7 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	else if (CONDITION_TYPE_MAINTENANCE == condition->conditiontype)
 	{
 		switch (condition->operator)
-{
+		{
 			case CONDITION_OPERATOR_IN:
 				result = DBselect(
 						"select count(*)"
