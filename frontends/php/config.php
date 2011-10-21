@@ -636,7 +636,7 @@ include_once('include/page_header.php');
 				}
 				if (!empty($macrosToDelete)) {
 					if (!API::UserMacro()->deleteGlobal($macrosToDelete)) {
-						throw new Exception(_('Cannot remove macro'));
+						throw new Exception(_('Cannot remove macro.'));
 					}
 					foreach ($macrosToDelete as $macro) {
 						add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $globalMacros[$macro]['globalmacroid'], $macro.SPACE.RARR.SPACE.$globalMacros[$macro]['value'], null, null, null);
