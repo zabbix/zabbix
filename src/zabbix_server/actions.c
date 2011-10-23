@@ -88,8 +88,6 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		zbx_uint64_t	hostid, triggerid;
 
-		zabbix_log(LOG_LEVEL_WARNING, "VL: %s() condition: host template", __function_name);
-
 		ZBX_STR2UINT64(condition_value, condition->value);
 
 		switch (condition->operator)
@@ -100,27 +98,17 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 
 				do
 				{
-					char	sql[256];
-
-					zbx_snprintf(sql, sizeof(sql),
-							"select distinct i.hostid,t.templateid"
-							" from items i,functions f,triggers t"
-							" where i.itemid=f.itemid"
-								" and f.triggerid=t.templateid"
-								" and t.triggerid=" ZBX_FS_UI64,
-							triggerid);
-
-					zabbix_log(LOG_LEVEL_WARNING, "VL: %s() [%s]", __function_name, sql);
-
-					/*
 					result = DBselect(
-							"select distinct i.hostid,t.templateid"
-							" from items i,functions f,triggers t"
+							"select distinct i.hostid,t2.templateid"
+							" from items i,functions f,triggers t,triggers t2,"
+								"trigger_discovery d"
 							" where i.itemid=f.itemid"
-								" and f.triggerid=t.templateid"
+								" and f.triggerid=t2.templateid"
+								" and (t.triggerid=d.triggerid "
+									" and t2.triggerid=d.parent_triggerid"
+									" or t.triggerid=t2.triggerid)"
 								" and t.triggerid=" ZBX_FS_UI64,
 							triggerid);
-					*/
 
 					if (NULL != (row = DBfetch(result)))
 					{
