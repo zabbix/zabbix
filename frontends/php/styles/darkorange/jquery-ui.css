@@ -82,7 +82,7 @@
 .darkorange .ui-state-error-text, .darkorange .ui-widget-content .ui-state-error-text, .darkorange .ui-widget-header .ui-state-error-text { color: #111111; }
 .darkorange .ui-priority-primary, .darkorange .ui-widget-content .ui-priority-primary, .darkorange .ui-widget-header .ui-priority-primary { font-weight: bold; }
 .darkorange .ui-priority-secondary, .darkorange .ui-widget-content .ui-priority-secondary,  .ui-widget-header .ui-priority-secondary { opacity: .7; filter:Alpha(Opacity=70); font-weight: normal; }
-.darkorange .ui-state-disabled, .darkorange .ui-widget-content .ui-state-disabled, .darkorange .ui-widget-header .ui-state-disabled { opacity: .35; filter:Alpha(Opacity=35); background-image: none; }
+.darkorange .ui-state-disabled, .darkorange .ui-widget-content .ui-state-disabled, .darkorange .ui-widget-header .ui-state-disabled { opacity: .5; filter:Alpha(Opacity=50); background-image: none; }
 
 /* Icons
 ----------------------------------*/

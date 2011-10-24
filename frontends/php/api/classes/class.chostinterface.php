@@ -296,10 +296,10 @@ class CHostInterface extends CZBXAPI{
 				else{
 					if(!isset($result[$interface['interfaceid']])) $result[$interface['interfaceid']] = array();
 
-					if(!is_null($options['selectHosts']) && !isset($result[$interface['hostid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$interface['interfaceid']]['hosts'])){
 						$result[$interface['interfaceid']]['hosts'] = array();
 					}
-					if(!is_null($options['selectItems']) && !isset($result[$interface['hostid']]['items'])){
+					if(!is_null($options['selectItems']) && !isset($result[$interface['interfaceid']]['items'])){
 						$result[$interface['interfaceid']]['items'] = array();
 					}
 
@@ -374,7 +374,7 @@ Copt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
