@@ -275,7 +275,7 @@ static int	validate_inventory_links(zbx_uint64_t hostid, zbx_uint64_t templateid
 }
 
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems,
-		int *gitems_alloc, int *gitems_num)
+		size_t *gitems_alloc, size_t *gitems_num)
 {
 	const char	*__function_name = "DBget_graphitems";
 	DB_RESULT	result;
@@ -386,8 +386,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 	char		*sql = NULL, *name_esc;
 	size_t		sql_alloc = 256, sql_offset;
 	ZBX_GRAPH_ITEMS *gitems = NULL, *chd_gitems = NULL;
-	int		gitems_alloc = 0, gitems_num = 0,
-			chd_gitems_alloc = 0, chd_gitems_num = 0, res;
+	size_t		gitems_alloc = 0, gitems_num = 0,
+			chd_gitems_alloc = 0, chd_gitems_num = 0;
+	int		res;
 	zbx_uint64_t	graphid;
 	unsigned char	t_flags, h_flags, type;
 	zbx_uint64_t	interfaceids[4];
@@ -2763,9 +2764,9 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 	DB_RESULT	result;
 	DB_ROW		row;
 	ZBX_GRAPH_ITEMS *gitems = NULL, *chd_gitems = NULL;
-	int		gitems_alloc = 0, gitems_num = 0,
-			chd_gitems_alloc = 0, chd_gitems_num = 0,
-			i, res = SUCCEED;
+	size_t		gitems_alloc = 0, gitems_num = 0,
+			chd_gitems_alloc = 0, chd_gitems_num = 0;
+	int		i, res = SUCCEED;
 	zbx_uint64_t	hst_graphid, hst_gitemid;
 	char		*sql = NULL, *name_esc, *color_esc;
 	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset;
