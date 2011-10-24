@@ -160,11 +160,23 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return SYSINFO_RET_FAIL;
 }
 
+static const char	*zbx_get_vfs_name_by_type(int type)
+{
+	extern struct vfs_ent	*getvfsbytype(int type);
+
+	struct vfs_ent	*vfs;
+	static char	*vfs_names[MNT_AIXLAST + 1] = {};
+
+	if (NULL == vfs_names[type] && NULL != (vfs = getvfsbytype(type)))
+		vfs_names[type] = zbx_strdup(vfs_names[type], vfs->vfsent_name);
+
+	return NULL != vfs_names[type] ? vfs_names[type] : "unknown";
+}
+
 int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int		rc, sz, i, ret = SYSINFO_RET_FAIL;
 	struct vmount	*vm = NULL;
-	struct vfs_ent	*ve;
 	struct zbx_json	j;
 
 	/* check how many bytes to allocate for the mounted filesystems */
@@ -185,17 +197,11 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	for (i = 0; i < rc; i++)
 	{
 		zbx_json_addobject(&j, NULL);
-
 		zbx_json_addstring(&j, "{#FSNAME}", (char *)vm + vm->vmt_data[VMT_STUB].vmt_off, ZBX_JSON_TYPE_STRING);
-
-		if (NULL != (ve = getvfsbytype(vm->vmt_gfstype)))
-			zbx_json_addstring(&j, "{#FSTYPE}", ve->vfsent_name, ZBX_JSON_TYPE_STRING);
-		else
-			zbx_json_addstring(&j, "{#FSTYPE}", "unknown", ZBX_JSON_TYPE_STRING);
-
+		zbx_json_addstring(&j, "{#FSTYPE}", zbx_get_vfs_name_by_type(vm->vmt_gfstype), ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 
-		/* goto the next vmount structure */
+		/* go to the next vmount structure */
 		vm = (struct vmount *)((char *)vm + vm->vmt_length);
 	}
 
