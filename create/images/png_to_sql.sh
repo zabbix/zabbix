@@ -9,7 +9,7 @@
 
 # depends on hexdump
 
-outputdir=output_png
+outputdir=${1:-png}
 
 imagefile_mysql=images_mysql.sql
 imagefile_pgsql=images_postgresql.sql
