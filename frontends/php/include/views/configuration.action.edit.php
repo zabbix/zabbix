@@ -464,10 +464,20 @@ require_once('include/views/js/configuration.action.edit.js.php');
 					$new_operation['opmessage_usr'] = array();
 					$new_operation['opmessage'] = array(
 						'default_msg' => 1,
-						'subject' => '{TRIGGER.NAME}: {STATUS}',
-						'message' => '{TRIGGER.NAME}: {STATUS}',
-						'mediatypeid' => 0,
+						'mediatypeid' => 0
 					);
+					if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+						$new_operation['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_TRIGGER;
+						$new_operation['opmessage']['message'] = ACTION_DEFAULT_MSG_TRIGGER;
+					}
+					elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {
+						$new_operation['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_DISCOVERY;
+						$new_operation['opmessage']['message'] = ACTION_DEFAULT_MSG_DISCOVERY;
+					}
+					elseif ($data['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION) {
+						$new_operation['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_AUTOREG;
+						$new_operation['opmessage']['message'] = ACTION_DEFAULT_MSG_AUTOREG;
+					}
 				}
 
 				if(!isset($new_operation['opmessage']['default_msg']))
