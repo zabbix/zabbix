@@ -21,51 +21,13 @@ create/data/create_data_sql/data_sql_extraclause.txt -text
 create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
 create/images/README.dev -text
-create/images/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Crypto-router.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Crypto-router_symbol.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Disk_array_2D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Disk_array_3D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Firewall.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/House.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Hub.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/IP_PBX.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/IP_PBX_symbol.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Modem.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Network.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Network_adapter.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Notebook.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/PBX.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Phone.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Printer.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Rackmountable_1U_server_2D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Rackmountable_1U_server_3D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Rackmountable_2U_server_2D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Rackmountable_2U_server_3D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Rackmountable_3U_server_2D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Rackmountable_3U_server_3D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Rackmountable_4U_server_2D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Rackmountable_4U_server_3D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Rackmountable_5U_server_2D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Rackmountable_5U_server_3D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Router.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Router_symbol.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/SAN.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Satellite.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Satellite_antenna.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Server.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Switch.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/UPS.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/UPS_rackmountable_2D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/UPS_rackmountable_3D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Video_terminal.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Workstation.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Zabbix_server_2D.svg -text svneol=native#image/svg%2Bxml
-create/images/elements/Zabbix_server_3D.svg -text svneol=native#image/svg%2Bxml
-create/images/equipment_rack/Rack_42.svg -text svneol=native#image/svg%2Bxml
-create/images/equipment_rack/Rack_42_with_door.svg -text svneol=native#image/svg%2Bxml
+create/images/images_ibm_db2.sql -text
+create/images/images_mysql.sql -text
+create/images/images_oracle.sql -text
 create/images/images_oracle_end.txt -text
 create/images/images_oracle_start.txt -text
+create/images/images_postgresql.sql -text
+create/images/images_sqlite3.sql -text
 create/images/old_images/Hub.png -text svneol=unset#image/png
 create/images/old_images/Hub_small.png -text svneol=unset#image/png
 create/images/old_images/Network.png -text svneol=unset#image/png
@@ -88,6 +50,49 @@ create/images/old_images/UPS_small.png -text svneol=unset#image/png
 create/images/old_images/Workstation.png -text svneol=unset#image/png
 create/images/old_images/Workstation_small.png -text svneol=unset#image/png
 create/images/png_to_sql.sh -text
+create/images/source/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Crypto-router.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Crypto-router_symbol.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Disk_array_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Disk_array_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Firewall.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/House.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Hub.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/IP_PBX.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/IP_PBX_symbol.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Modem.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Network.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Network_adapter.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Notebook.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/PBX.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Phone.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Printer.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Rackmountable_1U_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Rackmountable_1U_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Rackmountable_2U_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Rackmountable_2U_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Rackmountable_3U_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Rackmountable_3U_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Rackmountable_4U_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Rackmountable_4U_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Rackmountable_5U_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Rackmountable_5U_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Router.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Router_symbol.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/SAN.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Satellite.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Satellite_antenna.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Server.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Switch.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/UPS.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/UPS_rackmountable_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/UPS_rackmountable_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Video_terminal.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Workstation.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Zabbix_server_2D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/elements/Zabbix_server_3D.svg -text svneol=native#image/svg%2Bxml
+create/images/source/equipment_rack/Rack_42.svg -text svneol=native#image/svg%2Bxml
+create/images/source/equipment_rack/Rack_42_with_door.svg -text svneol=native#image/svg%2Bxml
 create/images/svg_to_png.sh svneol=native#text/x-sh
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
