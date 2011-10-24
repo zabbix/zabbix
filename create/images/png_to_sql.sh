@@ -46,5 +46,5 @@ for imagefile in $outputdir/*.png; do
 
 	echo -n "$[$imagesdone*100/$imagecount]% "
 done
-cat images_oracle_end.txt >> $imagefile_oracle 
+cat images_oracle_end.txt >> $imagefile_oracle
 echo
