@@ -21,8 +21,8 @@ create/data/create_data_sql/data_sql_extraclause.txt -text
 create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
 create/images/README.dev -text
-create/images/images_oracle_end.txt -text
-create/images/images_oracle_start.txt -text
+create/images/images_oracle_end.txt svneol=native#text/plain
+create/images/images_oracle_start.txt svneol=native#text/plain
 create/images/old_images/Hub.png -text svneol=unset#image/png
 create/images/old_images/Hub_small.png -text svneol=unset#image/png
 create/images/old_images/Network.png -text svneol=unset#image/png
@@ -44,193 +44,194 @@ create/images/old_images/UPS.png -text svneol=unset#image/png
 create/images/old_images/UPS_small.png -text svneol=unset#image/png
 create/images/old_images/Workstation.png -text svneol=unset#image/png
 create/images/old_images/Workstation_small.png -text svneol=unset#image/png
-create/images/png/Cloud[!!-~](128).png -text
-create/images/png/Cloud[!!-~](24).png -text
-create/images/png/Cloud[!!-~](48).png -text
-create/images/png/Cloud[!!-~](64).png -text
-create/images/png/Cloud[!!-~](96).png -text
-create/images/png/Crypto-router[!!-~](128).png -text
-create/images/png/Crypto-router[!!-~](24).png -text
-create/images/png/Crypto-router[!!-~](48).png -text
-create/images/png/Crypto-router[!!-~](64).png -text
-create/images/png/Crypto-router[!!-~](96).png -text
-create/images/png/Crypto-router_symbol[!!-~](128).png -text
-create/images/png/Crypto-router_symbol[!!-~](24).png -text
-create/images/png/Crypto-router_symbol[!!-~](48).png -text
-create/images/png/Crypto-router_symbol[!!-~](64).png -text
-create/images/png/Crypto-router_symbol[!!-~](96).png -text
-create/images/png/Disk_array_2D[!!-~](128).png -text
-create/images/png/Disk_array_2D[!!-~](24).png -text
-create/images/png/Disk_array_2D[!!-~](48).png -text
-create/images/png/Disk_array_2D[!!-~](64).png -text
-create/images/png/Disk_array_2D[!!-~](96).png -text
-create/images/png/Disk_array_3D[!!-~](128).png -text
-create/images/png/Disk_array_3D[!!-~](24).png -text
-create/images/png/Disk_array_3D[!!-~](48).png -text
-create/images/png/Disk_array_3D[!!-~](64).png -text
-create/images/png/Disk_array_3D[!!-~](96).png -text
-create/images/png/Firewall[!!-~](128).png -text
-create/images/png/Firewall[!!-~](24).png -text
-create/images/png/Firewall[!!-~](48).png -text
-create/images/png/Firewall[!!-~](64).png -text
-create/images/png/Firewall[!!-~](96).png -text
-create/images/png/House[!!-~](128).png -text
-create/images/png/House[!!-~](24).png -text
-create/images/png/House[!!-~](48).png -text
-create/images/png/House[!!-~](64).png -text
-create/images/png/House[!!-~](96).png -text
-create/images/png/Hub[!!-~](128).png -text
-create/images/png/Hub[!!-~](24).png -text
-create/images/png/Hub[!!-~](48).png -text
-create/images/png/Hub[!!-~](64).png -text
-create/images/png/Hub[!!-~](96).png -text
-create/images/png/IP_PBX[!!-~](128).png -text
-create/images/png/IP_PBX[!!-~](24).png -text
-create/images/png/IP_PBX[!!-~](48).png -text
-create/images/png/IP_PBX[!!-~](64).png -text
-create/images/png/IP_PBX[!!-~](96).png -text
-create/images/png/IP_PBX_symbol[!!-~](128).png -text
-create/images/png/IP_PBX_symbol[!!-~](24).png -text
-create/images/png/IP_PBX_symbol[!!-~](48).png -text
-create/images/png/IP_PBX_symbol[!!-~](64).png -text
-create/images/png/IP_PBX_symbol[!!-~](96).png -text
-create/images/png/Modem[!!-~](128).png -text
-create/images/png/Modem[!!-~](24).png -text
-create/images/png/Modem[!!-~](48).png -text
-create/images/png/Modem[!!-~](64).png -text
-create/images/png/Modem[!!-~](96).png -text
-create/images/png/Network[!!-~](128).png -text
-create/images/png/Network[!!-~](24).png -text
-create/images/png/Network[!!-~](48).png -text
-create/images/png/Network[!!-~](64).png -text
-create/images/png/Network[!!-~](96).png -text
-create/images/png/Network_adapter[!!-~](128).png -text
-create/images/png/Network_adapter[!!-~](24).png -text
-create/images/png/Network_adapter[!!-~](48).png -text
-create/images/png/Network_adapter[!!-~](64).png -text
-create/images/png/Network_adapter[!!-~](96).png -text
-create/images/png/Notebook[!!-~](128).png -text
-create/images/png/Notebook[!!-~](24).png -text
-create/images/png/Notebook[!!-~](48).png -text
-create/images/png/Notebook[!!-~](64).png -text
-create/images/png/Notebook[!!-~](96).png -text
-create/images/png/PBX[!!-~](128).png -text
-create/images/png/PBX[!!-~](24).png -text
-create/images/png/PBX[!!-~](48).png -text
-create/images/png/PBX[!!-~](64).png -text
-create/images/png/PBX[!!-~](96).png -text
-create/images/png/Phone[!!-~](128).png -text
-create/images/png/Phone[!!-~](24).png -text
-create/images/png/Phone[!!-~](48).png -text
-create/images/png/Phone[!!-~](64).png -text
-create/images/png/Phone[!!-~](96).png -text
-create/images/png/Printer[!!-~](128).png -text
-create/images/png/Printer[!!-~](24).png -text
-create/images/png/Printer[!!-~](48).png -text
-create/images/png/Printer[!!-~](64).png -text
-create/images/png/Printer[!!-~](96).png -text
-create/images/png/Rack_42[!!-~](128).png -text
-create/images/png/Rack_42[!!-~](64).png -text
-create/images/png/Rack_42[!!-~](96).png -text
-create/images/png/Rack_42_with_door[!!-~](128).png -text
-create/images/png/Rack_42_with_door[!!-~](64).png -text
-create/images/png/Rack_42_with_door[!!-~](96).png -text
-create/images/png/Rackmountable_1U_server_2D[!!-~](128).png -text
-create/images/png/Rackmountable_1U_server_2D[!!-~](64).png -text
-create/images/png/Rackmountable_1U_server_2D[!!-~](96).png -text
-create/images/png/Rackmountable_1U_server_3D[!!-~](128).png -text
-create/images/png/Rackmountable_1U_server_3D[!!-~](64).png -text
-create/images/png/Rackmountable_1U_server_3D[!!-~](96).png -text
-create/images/png/Rackmountable_2U_server_2D[!!-~](128).png -text
-create/images/png/Rackmountable_2U_server_2D[!!-~](64).png -text
-create/images/png/Rackmountable_2U_server_2D[!!-~](96).png -text
-create/images/png/Rackmountable_2U_server_3D[!!-~](128).png -text
-create/images/png/Rackmountable_2U_server_3D[!!-~](64).png -text
-create/images/png/Rackmountable_2U_server_3D[!!-~](96).png -text
-create/images/png/Rackmountable_3U_server_2D[!!-~](128).png -text
-create/images/png/Rackmountable_3U_server_2D[!!-~](64).png -text
-create/images/png/Rackmountable_3U_server_2D[!!-~](96).png -text
-create/images/png/Rackmountable_3U_server_3D[!!-~](128).png -text
-create/images/png/Rackmountable_3U_server_3D[!!-~](64).png -text
-create/images/png/Rackmountable_3U_server_3D[!!-~](96).png -text
-create/images/png/Rackmountable_4U_server_2D[!!-~](128).png -text
-create/images/png/Rackmountable_4U_server_2D[!!-~](64).png -text
-create/images/png/Rackmountable_4U_server_2D[!!-~](96).png -text
-create/images/png/Rackmountable_4U_server_3D[!!-~](128).png -text
-create/images/png/Rackmountable_4U_server_3D[!!-~](64).png -text
-create/images/png/Rackmountable_4U_server_3D[!!-~](96).png -text
-create/images/png/Rackmountable_5U_server_2D[!!-~](128).png -text
-create/images/png/Rackmountable_5U_server_2D[!!-~](64).png -text
-create/images/png/Rackmountable_5U_server_2D[!!-~](96).png -text
-create/images/png/Rackmountable_5U_server_3D[!!-~](128).png -text
-create/images/png/Rackmountable_5U_server_3D[!!-~](64).png -text
-create/images/png/Rackmountable_5U_server_3D[!!-~](96).png -text
-create/images/png/Router[!!-~](128).png -text
-create/images/png/Router[!!-~](24).png -text
-create/images/png/Router[!!-~](48).png -text
-create/images/png/Router[!!-~](64).png -text
-create/images/png/Router[!!-~](96).png -text
-create/images/png/Router_symbol[!!-~](128).png -text
-create/images/png/Router_symbol[!!-~](24).png -text
-create/images/png/Router_symbol[!!-~](48).png -text
-create/images/png/Router_symbol[!!-~](64).png -text
-create/images/png/Router_symbol[!!-~](96).png -text
-create/images/png/SAN[!!-~](128).png -text
-create/images/png/SAN[!!-~](24).png -text
-create/images/png/SAN[!!-~](48).png -text
-create/images/png/SAN[!!-~](64).png -text
-create/images/png/SAN[!!-~](96).png -text
-create/images/png/Satellite[!!-~](128).png -text
-create/images/png/Satellite[!!-~](24).png -text
-create/images/png/Satellite[!!-~](48).png -text
-create/images/png/Satellite[!!-~](64).png -text
-create/images/png/Satellite[!!-~](96).png -text
-create/images/png/Satellite_antenna[!!-~](128).png -text
-create/images/png/Satellite_antenna[!!-~](24).png -text
-create/images/png/Satellite_antenna[!!-~](48).png -text
-create/images/png/Satellite_antenna[!!-~](64).png -text
-create/images/png/Satellite_antenna[!!-~](96).png -text
-create/images/png/Server[!!-~](128).png -text
-create/images/png/Server[!!-~](24).png -text
-create/images/png/Server[!!-~](48).png -text
-create/images/png/Server[!!-~](64).png -text
-create/images/png/Server[!!-~](96).png -text
-create/images/png/Switch[!!-~](128).png -text
-create/images/png/Switch[!!-~](24).png -text
-create/images/png/Switch[!!-~](48).png -text
-create/images/png/Switch[!!-~](64).png -text
-create/images/png/Switch[!!-~](96).png -text
-create/images/png/UPS[!!-~](128).png -text
-create/images/png/UPS[!!-~](24).png -text
-create/images/png/UPS[!!-~](48).png -text
-create/images/png/UPS[!!-~](64).png -text
-create/images/png/UPS[!!-~](96).png -text
-create/images/png/UPS_rackmountable_2D[!!-~](128).png -text
-create/images/png/UPS_rackmountable_2D[!!-~](24).png -text
-create/images/png/UPS_rackmountable_2D[!!-~](48).png -text
-create/images/png/UPS_rackmountable_2D[!!-~](64).png -text
-create/images/png/UPS_rackmountable_2D[!!-~](96).png -text
-create/images/png/UPS_rackmountable_3D[!!-~](128).png -text
-create/images/png/UPS_rackmountable_3D[!!-~](24).png -text
-create/images/png/UPS_rackmountable_3D[!!-~](48).png -text
-create/images/png/UPS_rackmountable_3D[!!-~](64).png -text
-create/images/png/UPS_rackmountable_3D[!!-~](96).png -text
-create/images/png/Video_terminal[!!-~](128).png -text
-create/images/png/Video_terminal[!!-~](24).png -text
-create/images/png/Video_terminal[!!-~](48).png -text
-create/images/png/Video_terminal[!!-~](64).png -text
-create/images/png/Video_terminal[!!-~](96).png -text
-create/images/png/Workstation[!!-~](128).png -text
-create/images/png/Workstation[!!-~](24).png -text
-create/images/png/Workstation[!!-~](48).png -text
-create/images/png/Workstation[!!-~](64).png -text
-create/images/png/Workstation[!!-~](96).png -text
-create/images/png/Zabbix_server_2D[!!-~](128).png -text
-create/images/png/Zabbix_server_2D[!!-~](64).png -text
-create/images/png/Zabbix_server_2D[!!-~](96).png -text
-create/images/png/Zabbix_server_3D[!!-~](128).png -text
-create/images/png/Zabbix_server_3D[!!-~](64).png -text
-create/images/png/Zabbix_server_3D[!!-~](96).png -text
+create/images/png/Cloud[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Cloud[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Cloud[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Cloud[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Cloud[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Crypto-router[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Crypto-router[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Crypto-router[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Crypto-router[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Crypto-router[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Crypto-router_symbol[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Crypto-router_symbol[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Crypto-router_symbol[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Crypto-router_symbol[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Crypto-router_symbol[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Disk_array_2D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Disk_array_2D[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Disk_array_2D[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Disk_array_2D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Disk_array_2D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Disk_array_3D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Disk_array_3D[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Disk_array_3D[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Disk_array_3D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Disk_array_3D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Firewall[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Firewall[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Firewall[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Firewall[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Firewall[!!-~](96).png -text svneol=unset#image/png
+create/images/png/House[!!-~](128).png -text svneol=unset#image/png
+create/images/png/House[!!-~](24).png -text svneol=unset#image/png
+create/images/png/House[!!-~](48).png -text svneol=unset#image/png
+create/images/png/House[!!-~](64).png -text svneol=unset#image/png
+create/images/png/House[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Hub[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Hub[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Hub[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Hub[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Hub[!!-~](96).png -text svneol=unset#image/png
+create/images/png/IP_PBX[!!-~](128).png -text svneol=unset#image/png
+create/images/png/IP_PBX[!!-~](24).png -text svneol=unset#image/png
+create/images/png/IP_PBX[!!-~](48).png -text svneol=unset#image/png
+create/images/png/IP_PBX[!!-~](64).png -text svneol=unset#image/png
+create/images/png/IP_PBX[!!-~](96).png -text svneol=unset#image/png
+create/images/png/IP_PBX_symbol[!!-~](128).png -text svneol=unset#image/png
+create/images/png/IP_PBX_symbol[!!-~](24).png -text svneol=unset#image/png
+create/images/png/IP_PBX_symbol[!!-~](48).png -text svneol=unset#image/png
+create/images/png/IP_PBX_symbol[!!-~](64).png -text svneol=unset#image/png
+create/images/png/IP_PBX_symbol[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Modem[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Modem[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Modem[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Modem[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Modem[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Network[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Network[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Network[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Network[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Network[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Network_adapter[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Network_adapter[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Network_adapter[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Network_adapter[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Network_adapter[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Notebook[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Notebook[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Notebook[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Notebook[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Notebook[!!-~](96).png -text svneol=unset#image/png
+create/images/png/PBX[!!-~](128).png -text svneol=unset#image/png
+create/images/png/PBX[!!-~](24).png -text svneol=unset#image/png
+create/images/png/PBX[!!-~](48).png -text svneol=unset#image/png
+create/images/png/PBX[!!-~](64).png -text svneol=unset#image/png
+create/images/png/PBX[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Phone[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Phone[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Phone[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Phone[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Phone[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Printer[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Printer[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Printer[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Printer[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Printer[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rack_42[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rack_42[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rack_42[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rack_42_with_door[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rack_42_with_door[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rack_42_with_door[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rackmountable_1U_server_2D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rackmountable_1U_server_2D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rackmountable_1U_server_2D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rackmountable_1U_server_3D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rackmountable_1U_server_3D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rackmountable_1U_server_3D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rackmountable_2U_server_2D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rackmountable_2U_server_2D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rackmountable_2U_server_2D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rackmountable_2U_server_3D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rackmountable_2U_server_3D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rackmountable_2U_server_3D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rackmountable_3U_server_2D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rackmountable_3U_server_2D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rackmountable_3U_server_2D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rackmountable_3U_server_3D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rackmountable_3U_server_3D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rackmountable_3U_server_3D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rackmountable_4U_server_2D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rackmountable_4U_server_2D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rackmountable_4U_server_2D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rackmountable_4U_server_3D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rackmountable_4U_server_3D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rackmountable_4U_server_3D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rackmountable_5U_server_2D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rackmountable_5U_server_2D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rackmountable_5U_server_2D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Rackmountable_5U_server_3D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Rackmountable_5U_server_3D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Rackmountable_5U_server_3D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Router[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Router[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Router[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Router[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Router[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Router_symbol[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Router_symbol[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Router_symbol[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Router_symbol[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Router_symbol[!!-~](96).png -text svneol=unset#image/png
+create/images/png/SAN[!!-~](128).png -text svneol=unset#image/png
+create/images/png/SAN[!!-~](24).png -text svneol=unset#image/png
+create/images/png/SAN[!!-~](48).png -text svneol=unset#image/png
+create/images/png/SAN[!!-~](64).png -text svneol=unset#image/png
+create/images/png/SAN[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Satellite[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Satellite[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Satellite[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Satellite[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Satellite[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Satellite_antenna[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Satellite_antenna[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Satellite_antenna[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Satellite_antenna[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Satellite_antenna[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Server[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Server[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Server[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Server[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Server[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Switch[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Switch[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Switch[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Switch[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Switch[!!-~](96).png -text svneol=unset#image/png
+create/images/png/UPS[!!-~](128).png -text svneol=unset#image/png
+create/images/png/UPS[!!-~](24).png -text svneol=unset#image/png
+create/images/png/UPS[!!-~](48).png -text svneol=unset#image/png
+create/images/png/UPS[!!-~](64).png -text svneol=unset#image/png
+create/images/png/UPS[!!-~](96).png -text svneol=unset#image/png
+create/images/png/UPS_rackmountable_2D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/UPS_rackmountable_2D[!!-~](24).png -text svneol=unset#image/png
+create/images/png/UPS_rackmountable_2D[!!-~](48).png -text svneol=unset#image/png
+create/images/png/UPS_rackmountable_2D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/UPS_rackmountable_2D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/UPS_rackmountable_3D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/UPS_rackmountable_3D[!!-~](24).png -text svneol=unset#image/png
+create/images/png/UPS_rackmountable_3D[!!-~](48).png -text svneol=unset#image/png
+create/images/png/UPS_rackmountable_3D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/UPS_rackmountable_3D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Video_terminal[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Video_terminal[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Video_terminal[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Video_terminal[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Video_terminal[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Workstation[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Workstation[!!-~](24).png -text svneol=unset#image/png
+create/images/png/Workstation[!!-~](48).png -text svneol=unset#image/png
+create/images/png/Workstation[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Workstation[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Zabbix_server_2D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Zabbix_server_2D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Zabbix_server_2D[!!-~](96).png -text svneol=unset#image/png
+create/images/png/Zabbix_server_3D[!!-~](128).png -text svneol=unset#image/png
+create/images/png/Zabbix_server_3D[!!-~](64).png -text svneol=unset#image/png
+create/images/png/Zabbix_server_3D[!!-~](96).png -text svneol=unset#image/png
+create/images/png_to_sql.sh svneol=native#text/x-sh
 create/images/source/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
 create/images/source/elements/Crypto-router.svg -text svneol=native#image/svg%2Bxml
 create/images/source/elements/Crypto-router_symbol.svg -text svneol=native#image/svg%2Bxml
