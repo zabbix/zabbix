@@ -41,17 +41,17 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const char *old_exp, char *new_exp)
+static int	convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const char *old_exp, char *new_exp)
 {
-	int		i;
-	char		id[MAX_STRING_LEN];
-	enum		state_t {NORMAL, ID} state = NORMAL;
-	char		*p, *p_id = NULL;
-	zbx_uint64_t	tmp;
+	int				i;
+	char				id[MAX_STRING_LEN];
+	enum state_t {NORMAL, ID}	state = NORMAL;
+	char				*p, *p_id = NULL;
+	zbx_uint64_t			tmp;
 
 	p = new_exp;
 
-	for (i = 0; 0 != old_exp[i]; i++)
+	for (i = 0; '\0' != old_exp[i]; i++)
 	{
 		if (ID == state)
 		{
@@ -64,15 +64,12 @@ static int convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const
 				*p++ = old_exp[i];
 			}
 			else
-			{
-				p_id[0] = old_exp[i];
-				p_id++;
-			}
+				*p_id++ = old_exp[i];
 		}
 		else if ('{' == old_exp[i])
 		{
 			state = ID;
-			memset(id,0,MAX_STRING_LEN);
+			memset(id, 0, MAX_STRING_LEN);
 			p_id = id;
 			*p++ = old_exp[i];
 		}
@@ -99,7 +96,7 @@ static int convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int convert_triggers_expression(int old_id, int new_id)
+static int	convert_triggers_expression(int old_id, int new_id)
 {
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
@@ -114,7 +111,7 @@ static int convert_triggers_expression(int old_id, int new_id)
 	}
 
 	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
-	if (r_table->flags & ZBX_SYNC)
+	if (0 != (r_table->flags & ZBX_SYNC))
 		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
 
 	result = DBselect("select expression,triggerid from triggers");
@@ -150,17 +147,15 @@ static int convert_triggers_expression(int old_id, int new_id)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int convert_profiles(int old_id, int new_id, const char *field_name)
+static int	convert_profiles(int old_id, int new_id, const char *field_name)
 {
 	zbx_uint64_t	prefix;
 
-	prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id + (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
+	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id +
+		(zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
 
 	DBexecute("update profiles set %s=%s+" ZBX_FS_UI64 " where %s>0",
-			field_name,
-			field_name,
-			prefix,
-			field_name);
+			field_name, field_name, prefix, field_name);
 
 	return SUCCEED;
 }
@@ -181,7 +176,8 @@ static int convert_profiles(int old_id, int new_id, const char *field_name)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int convert_special_field(int old_id, int new_id, const char *table_name, const char *field_name, const char *type_field_name,
+static int	convert_special_field(int old_id, int new_id, const char *table_name,
+		const char *field_name, const char *type_field_name,
 		const char *rel_table_name, int type)
 {
 	zbx_uint64_t	prefix;
@@ -194,17 +190,11 @@ static int convert_special_field(int old_id, int new_id, const char *table_name,
 	}
 
 	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
-	if (r_table->flags & ZBX_SYNC)
+	if (0 != (r_table->flags & ZBX_SYNC))
 		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
 
 	DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s=%d and %s>0",
-			table_name,
-			field_name,
-			field_name,
-			prefix,
-			type_field_name,
-			type,
-			field_name);
+			table_name, field_name, field_name, prefix, type_field_name, type, field_name);
 
 	return SUCCEED;
 }
@@ -225,7 +215,7 @@ static int convert_special_field(int old_id, int new_id, const char *table_name,
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int convert_condition_values(int old_id, int new_id, const char *rel_table_name, int type)
+static int	convert_condition_values(int old_id, int new_id, const char *rel_table_name, int type)
 {
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
@@ -239,9 +229,9 @@ static int convert_condition_values(int old_id, int new_id, const char *rel_tabl
 		return FAIL;
 	}
 
-	prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
-	if (r_table->flags & ZBX_SYNC)
-		prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
+	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
+	if (0 != (r_table->flags & ZBX_SYNC))
+		prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
 
 	result = DBselect("select conditionid,value"
 			" from conditions"
@@ -255,8 +245,7 @@ static int convert_condition_values(int old_id, int new_id, const char *rel_tabl
 		DBexecute("update conditions"
 			" set value='" ZBX_FS_UI64 "'"
 			" where conditionid=%s",
-			value,
-			row[0]);
+			value, row[0]);
 	}
 	DBfree_result(result);
 
@@ -291,7 +280,7 @@ int	change_nodeid(int old_id, int new_id)
 		struct conv_t	convs[32];
 	};
 
-	struct special_conv_t special_convs[]=
+	struct special_conv_t	special_convs[] =
 	{
 		{"sysmaps_elements",	"elementid",	"elementtype",
 			{
@@ -373,7 +362,7 @@ int	change_nodeid(int old_id, int new_id)
 		{NULL}
 	};
 
-	struct conv_t condition_convs[]=
+	struct conv_t	condition_convs[] =
 	{
 		{"groups",	CONDITION_TYPE_HOST_GROUP},
 		{"hosts",	CONDITION_TYPE_HOST},
@@ -391,13 +380,13 @@ int	change_nodeid(int old_id, int new_id)
 
 	if (0 != old_id)
 	{
-		printf("Conversion from non-zero node id is not supported.\n");
+		printf("Conversion from non-zero node ID is not supported.\n");
 		return FAIL;
 	}
 
-	if (999 < new_id || 0 > new_id)
+	if (1 > new_id || new_id > 999)
 	{
-		printf("Node ID must be in range of 0-999.\n");
+		printf("Node ID must be in range of 1-999.\n");
 		return FAIL;
 	}
 
@@ -440,9 +429,9 @@ int	change_nodeid(int old_id, int new_id)
 			{
 				for (t = 0; NULL != special_convs[s].convs[t].rel; t++)
 				{
-					convert_special_field(old_id, new_id, special_convs[s].table_name, special_convs[s].field_name,
-							special_convs[s].type_field_name, special_convs[s].convs[t].rel,
-							special_convs[s].convs[t].type);
+					convert_special_field(old_id, new_id, special_convs[s].table_name,
+							special_convs[s].field_name, special_convs[s].type_field_name,
+							special_convs[s].convs[t].rel, special_convs[s].convs[t].type);
 				}
 				continue;
 			}
@@ -454,7 +443,7 @@ int	change_nodeid(int old_id, int new_id)
 			{
 				prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 
-				if (tables[i].flags & ZBX_SYNC)
+				if (0 != (tables[i].flags & ZBX_SYNC))
 					prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
 			}
 			else if (NULL != tables[i].fields[j].fk_table)	/* relations */
@@ -468,7 +457,7 @@ int	change_nodeid(int old_id, int new_id)
 
 				prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
 
-				if (r_table->flags & ZBX_SYNC)
+				if (0 != (r_table->flags & ZBX_SYNC))
 					prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
 			}
 			else if (0 == strcmp("profiles", tables[i].table))	/* special processing for table 'profiles' */
@@ -499,8 +488,9 @@ int	change_nodeid(int old_id, int new_id)
 	for (i = 0; NULL != condition_convs[i].rel; i++)
 		convert_condition_values(old_id, new_id, condition_convs[i].rel, condition_convs[i].type);
 
-	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)",
-			new_id);
+	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)", new_id);
+
+	DBexecute("delete from ids where nodeid=0");
 
 	printf(" done.\nCreating foreign keys ");
 	fflush(stdout);
