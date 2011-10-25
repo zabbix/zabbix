@@ -1139,6 +1139,10 @@ Copt::memoryPick();
 				if(CTemplate::exists(array('host' => $host['host']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
+				// check if the DNS name is set
+				if(empty($host['dns']) && !$host['useip']){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST_NO_DNS);
+				}
 
 
 				$hostid = get_dbid('hosts', 'hostid');
