@@ -63,6 +63,7 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+	TCHAR		fsName[MAX_PATH + 1];
 	LPTSTR		buffer = NULL, p;
 	char		*utf8;
 	DWORD		dwSize;
@@ -90,13 +91,22 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	for (p = buffer, sz = wcslen(p); sz > 0; p += sz + 1, sz = wcslen(p))
 	{
-		utf8 = zbx_unicode_to_utf8(p);
-
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
-		zbx_json_close(&j);
 
+		utf8 = zbx_unicode_to_utf8(p);
+		zbx_json_addstring(&j, "{#FSNAME}", utf8, ZBX_JSON_TYPE_STRING);
 		zbx_free(utf8);
+
+		if (TRUE == GetVolumeInformation(p, NULL, 0, NULL, NULL, NULL, fsName, sizeof(fsName) / sizeof(TCHAR)))
+		{
+			utf8 = zbx_unicode_to_utf8(fsName);
+			zbx_json_addstring(&j, "{#FSTYPE}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+		}
+		else
+			zbx_json_addstring(&j, "{#FSTYPE}", "UNKNOWN", ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&j);
 	}
 
 	zbx_free(buffer);
