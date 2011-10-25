@@ -1985,296 +1985,6 @@ static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
 	return res;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DBlld_update_trigger                                             *
- *                                                                            *
- * Purpose: copy specified trigger to host                                    *
- *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             parent_triggerid - trigger identificator from database         *
- *             description_proto - trigger description                        *
- *             expression - trigger expression                                *
- *             status - trigger status                                        *
- *             type - trigger type                                            *
- *             priority - trigger priority                                    *
- *             comments - trigger comments                                    *
- *             url - trigger url                                              *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-static int	DBlld_update_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid, const char *description_proto,
-		const char *expression, unsigned char status, unsigned char type, unsigned char priority,
-		const char *comments, const char *url, struct zbx_json_parse *jp_row, char **error)
-{
-	const char	*__function_name = "DBlld_update_trigger";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	new_triggerid = 0, h_itemid, h_triggerid, functionid, triggerdiscoveryid;
-	char		search[23], replace[23], *description = NULL,
-			*description_esc, *comments_esc, *url_esc,
-			*description_proto_esc, *error_esc;
-	int		update_expression = 1, res = SUCCEED;
-	char		*sql = NULL;
-	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
-			jp_row->end - jp_row->start + 1, jp_row->start);
-
-	description = zbx_strdup(description, description_proto);
-	substitute_discovery_macros(&description, jp_row);
-	description_esc = DBdyn_escape_string(description);
-	description_proto_esc = DBdyn_escape_string(description_proto);
-	comments_esc = DBdyn_escape_string(comments);
-	url_esc = DBdyn_escape_string(url);
-
-	result = DBselect(
-			"select distinct t.triggerid,t.expression"
-			" from triggers t,trigger_discovery td"
-			" where t.triggerid=td.triggerid"
-				" and td.parent_triggerid=" ZBX_FS_UI64
-				" and t.description='%s'",
-			parent_triggerid, description_esc);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(h_triggerid, row[0]);
-
-		if (SUCCEED != DBlld_compare_triggers(parent_triggerid, expression, h_triggerid, row[1], jp_row))
-			continue;
-
-		update_expression = 0;
-		new_triggerid = h_triggerid;
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() new_triggerid:" ZBX_FS_UI64,
-				__function_name, new_triggerid);
-	}
-	DBfree_result(result);
-
-	if (0 == new_triggerid)
-	{
-		result = DBselect(
-				"select distinct t.triggerid,td.name,t.description"
-				" from triggers t,trigger_discovery td"
-				" where t.triggerid=td.triggerid"
-					" and td.parent_triggerid=" ZBX_FS_UI64,
-				parent_triggerid);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			char	*old_name = NULL;
-
-			ZBX_STR2UINT64(h_triggerid, row[0]);
-
-			old_name = zbx_strdup(old_name, row[1]);
-			substitute_discovery_macros(&old_name, jp_row);
-
-			if (0 == strcmp(old_name, row[2]))
-			{
-				if (SUCCEED == DBlld_compare_triggers(parent_triggerid, expression, h_triggerid, row[1], jp_row))
-				{
-					update_expression = 0;
-					new_triggerid = h_triggerid;
-				}
-				else if (SUCCEED == DBlld_compare_trigger_items(h_triggerid, jp_row))
-					new_triggerid = h_triggerid;
-			}
-
-			zbx_free(old_name);
-
-			if (0 != new_triggerid)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() new_triggerid:" ZBX_FS_UI64,
-						__function_name, new_triggerid);
-				break;
-			}
-		}
-		DBfree_result(result);
-	}
-
-	sql = zbx_malloc(sql, sql_alloc);
-
-	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct t.triggerid,t.expression"
-			" from triggers t,functions f,items i"
-			" where t.triggerid=f.triggerid"
-				" and f.itemid=i.itemid"
-				" and i.hostid=" ZBX_FS_UI64
-				" and t.description='%s'",
-			hostid, description_esc);
-
-	if (0 != new_triggerid)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				" and t.triggerid<>" ZBX_FS_UI64,
-				new_triggerid);
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(h_triggerid, row[0]);
-
-		if (SUCCEED != DBlld_compare_triggers(parent_triggerid, expression, h_triggerid, row[1], jp_row))
-			continue;
-
-		*error = zbx_strdcatf(*error, "Cannot %s trigger [%s]: trigger already exists\n",
-				0 != new_triggerid ? "update" : "create", description);
-		res = FAIL;
-		break;
-	}
-	DBfree_result(result);
-
-	if (FAIL == res)
-		goto out;
-
-	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (0 != new_triggerid)
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update triggers"
-				" set description='%s',"
-					"priority=%d,"
-					"comments='%s',"
-					"url='%s',"
-					"type=%d,"
-					"flags=%d"
-				" where triggerid=" ZBX_FS_UI64 ";\n",
-				description_esc, (int)priority,
-				comments_esc, url_esc, (int)type,
-				ZBX_FLAG_DISCOVERY_CREATED, new_triggerid);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update trigger_discovery"
-				" set name='%s'"
-				" where triggerid=" ZBX_FS_UI64
-					" and parent_triggerid=" ZBX_FS_UI64 ";\n",
-				description_proto_esc, new_triggerid, parent_triggerid);
-
-		if (1 == update_expression)
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"delete from functions"
-					" where triggerid=" ZBX_FS_UI64 ";\n",
-					new_triggerid);
-		}
-	}
-	else
-	{
-		new_triggerid = DBget_maxid("triggers");
-		triggerdiscoveryid = DBget_maxid("trigger_discovery");
-
-		error_esc = DBdyn_escape_string("Trigger just added. No status update so far.");
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into triggers"
-					" (triggerid,description,priority,status,"
-						"comments,url,type,value,value_flags,flags,error)"
-					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
-						"'%s','%s',%d,%d,%d,%d,'%s');\n",
-					new_triggerid, description_esc, (int)priority,
-					(int)status, comments_esc, url_esc, (int)type,
-					TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN,
-					ZBX_FLAG_DISCOVERY_CREATED, error_esc);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into trigger_discovery"
-					" (triggerdiscoveryid,triggerid,parent_triggerid,name)"
-				" values"
-					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s');\n",
-				triggerdiscoveryid, new_triggerid, parent_triggerid, description_proto_esc);
-
-		zbx_free(error_esc);
-	}
-
-	if (1 == update_expression)
-	{
-		char	*new_expression = NULL;
-
-		new_expression = zbx_strdup(new_expression, expression);
-
-		result = DBselect(
-				"select f.itemid,f.functionid,f.function,f.parameter,i.key_,i.flags"
-				" from functions f,items i"
-				" where f.itemid=i.itemid"
-					" and f.triggerid=" ZBX_FS_UI64,
-				parent_triggerid);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			char	*function_esc, *parameter_esc, *old_expression;
-
-			if (0 != (ZBX_FLAG_DISCOVERY_CHILD & (unsigned char)atoi(row[5])))
-			{
-				if (FAIL == (res = DBlld_get_item(hostid, row[4], jp_row, &h_itemid)))
-					break;
-			}
-			else
-				ZBX_STR2UINT64(h_itemid, row[0]);
-
-			functionid = DBget_maxid("functions");
-
-			zbx_snprintf(search, sizeof(search), "{%s}", row[1]);
-			zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}", functionid);
-
-			function_esc = DBdyn_escape_string(row[2]);
-			parameter_esc = DBdyn_escape_string(row[3]);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into functions"
-					" (functionid,itemid,triggerid,function,parameter)"
-					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ","
-						ZBX_FS_UI64 ",'%s','%s');\n",
-					functionid, h_itemid, new_triggerid,
-					function_esc, parameter_esc);
-
-			old_expression = new_expression;
-			new_expression = string_replace(old_expression, search, replace);
-
-			zbx_free(old_expression);
-			zbx_free(parameter_esc);
-			zbx_free(function_esc);
-		}
-		DBfree_result(result);
-
-		if (SUCCEED == res)
-		{
-			char	*expression_esc;
-
-			expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update triggers set expression='%s' where triggerid=" ZBX_FS_UI64 ";\n",
-					expression_esc, new_triggerid);
-
-			zbx_free(expression_esc);
-		}
-
-		zbx_free(new_expression);
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == res)
-		DBexecute("%s", sql);
-out:
-	zbx_free(sql);
-	zbx_free(url_esc);
-	zbx_free(comments_esc);
-	zbx_free(description_proto_esc);
-	zbx_free(description_esc);
-	zbx_free(description);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
-}
-
 static int	DBlld_check_record(struct zbx_json_parse *jp_row, const char *f_macro,
 		const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
 {
@@ -2302,6 +2012,447 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBlld_make_trigger                                               *
+ *                                                                            *
+ * Purpose: copy specified trigger to host                                    *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             parent_triggerid - trigger identificator from database         *
+ *             description_proto - trigger description                        *
+ *             expression - trigger expression                                *
+ *             status - trigger status                                        *
+ *             type - trigger type                                            *
+ *             priority - trigger priority                                    *
+ *             comments_esc - trigger comments                                *
+ *             url_esc - trigger url                                          *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+typedef struct
+{
+	zbx_uint64_t		triggerid;
+	char			*description;
+	char			*expression;
+	unsigned char		update_expression;
+	zbx_vector_ptr_t	functions;
+}
+zbx_lld_trigger_t;
+
+typedef struct
+{
+	zbx_uint64_t	functionid;
+	zbx_uint64_t	itemid;
+	char		*function;
+	char		*parameter;
+}
+zbx_lld_function_t;
+
+static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid, zbx_vector_ptr_t *triggers,
+		const char *description_proto, const char *expression, struct zbx_json_parse *jp_row, char **error)
+{
+	const char		*__function_name = "DBlld_make_trigger";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*description_esc, *sql = NULL;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	zbx_lld_trigger_t	*trigger;
+	zbx_lld_function_t	*function;
+	zbx_uint64_t		h_triggerid;
+	int			i, res = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
+			jp_row->end - jp_row->start + 1, jp_row->start);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	trigger = zbx_calloc(NULL, 1, sizeof(zbx_lld_trigger_t));
+	trigger->update_expression = 1;
+	zbx_vector_ptr_create(&trigger->functions);
+	trigger->description = zbx_strdup(NULL, description_proto);
+	substitute_discovery_macros(&trigger->description, jp_row);
+
+	description_esc = DBdyn_escape_string(trigger->description);
+
+	result = DBselect(
+			"select distinct t.triggerid,t.expression"
+			" from triggers t,trigger_discovery td"
+			" where t.triggerid=td.triggerid"
+				" and td.parent_triggerid=" ZBX_FS_UI64
+				" and t.description='%s'",
+			parent_triggerid, description_esc);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(h_triggerid, row[0]);
+
+		if (SUCCEED != DBlld_compare_triggers(parent_triggerid, expression, h_triggerid, row[1], jp_row))
+			continue;
+
+		trigger->update_expression = 0;
+		trigger->triggerid = h_triggerid;
+	}
+	DBfree_result(result);
+
+	if (0 == trigger->triggerid)
+	{
+		result = DBselect(
+				"select distinct t.triggerid,td.name,t.description"
+				" from triggers t,trigger_discovery td"
+				" where t.triggerid=td.triggerid"
+					" and td.parent_triggerid=" ZBX_FS_UI64,
+				parent_triggerid);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			char	*old_name = NULL;
+
+			ZBX_STR2UINT64(h_triggerid, row[0]);
+
+			old_name = zbx_strdup(old_name, row[1]);
+			substitute_discovery_macros(&old_name, jp_row);
+
+			if (0 == strcmp(old_name, row[2]))
+			{
+				if (SUCCEED == DBlld_compare_triggers(parent_triggerid, expression, h_triggerid, row[1], jp_row))
+				{
+					trigger->update_expression = 0;
+					trigger->triggerid = h_triggerid;
+				}
+				else if (SUCCEED == DBlld_compare_trigger_items(h_triggerid, jp_row))
+					trigger->triggerid = h_triggerid;
+			}
+
+			zbx_free(old_name);
+
+			if (0 != trigger->triggerid)
+				break;
+		}
+		DBfree_result(result);
+	}
+
+	sql_offset = 0;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct t.triggerid,t.expression"
+			" from triggers t,functions f,items i"
+			" where t.triggerid=f.triggerid"
+				" and f.itemid=i.itemid"
+				" and i.hostid=" ZBX_FS_UI64
+				" and t.description='%s'",
+			hostid, description_esc);
+
+	if (0 != trigger->triggerid)
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" and t.triggerid<>" ZBX_FS_UI64,
+				trigger->triggerid);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(h_triggerid, row[0]);
+
+		if (SUCCEED != DBlld_compare_triggers(parent_triggerid, expression, h_triggerid, row[1], jp_row))
+			continue;
+
+		*error = zbx_strdcatf(*error, "Cannot %s trigger [%s]: trigger already exists\n",
+				0 != trigger->triggerid ? "update" : "create", trigger->description);
+		res = FAIL;
+		break;
+	}
+	DBfree_result(result);
+
+	if (FAIL == res)
+		goto out;
+
+	if (1 == trigger->update_expression)
+	{
+		trigger->expression = zbx_strdup(NULL, expression);
+
+		result = DBselect(
+				"select f.itemid,f.functionid,f.function,f.parameter,i.key_,i.flags"
+				" from functions f,items i"
+				" where f.itemid=i.itemid"
+					" and f.triggerid=" ZBX_FS_UI64,
+				parent_triggerid);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			function = zbx_malloc(NULL, sizeof(zbx_lld_function_t));
+			ZBX_STR2UINT64(function->functionid, row[1]);
+			function->function = zbx_strdup(NULL, row[2]);
+			function->parameter = zbx_strdup(NULL, row[3]);
+			zbx_vector_ptr_append(&trigger->functions, function);
+
+			if (0 != (ZBX_FLAG_DISCOVERY_CHILD & (unsigned char)atoi(row[5])))
+			{
+				if (FAIL == (res = DBlld_get_item(hostid, row[4], jp_row, &function->itemid)))
+					break;
+			}
+			else
+				ZBX_STR2UINT64(function->itemid, row[0]);
+		}
+		DBfree_result(result);
+	}
+
+	if (FAIL == res)
+		goto out;
+
+	zbx_vector_ptr_append(triggers, trigger);
+out:
+	if (FAIL == res)
+	{
+		for (i = 0; i < trigger->functions.values_num; i++)
+		{
+			function = (zbx_lld_function_t *)trigger->functions.values[i];
+
+			zbx_free(function->function);
+			zbx_free(function->parameter);
+			zbx_free(function);
+		}
+		zbx_vector_ptr_destroy(&trigger->functions);
+
+		zbx_free(trigger->expression);
+		zbx_free(trigger->description);
+		zbx_free(trigger);
+	}
+
+	zbx_free(description_esc);
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+
+	return res;
+}
+
+static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status, unsigned char type,
+		unsigned char priority, const char *comments_esc, const char *url_esc, zbx_uint64_t parent_triggerid,
+		const char *description_proto_esc)
+{
+	int			i, j, new_triggers = 0, new_functions = 0;
+	zbx_lld_trigger_t	*trigger;
+	zbx_lld_function_t	*function;
+	zbx_uint64_t		triggerid = 0, triggerdiscoveryid = 0, functionid = 0;
+	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *sql5 = NULL,
+				*description_esc, *error_esc;
+	size_t			sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
+				sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
+				sql3_alloc = 2 * ZBX_KIBIBYTE, sql3_offset = 0,
+				sql4_alloc = 8 * ZBX_KIBIBYTE, sql4_offset = 0,
+				sql5_alloc = 2 * ZBX_KIBIBYTE, sql5_offset = 0;
+	const char		*ins_triggers_sql =
+				"insert into triggers"
+				" (triggerid,description,priority,status,"
+					"comments,url,type,value,value_flags,flags,error)"
+				" values ";
+	const char		*ins_trigger_discovery_sql =
+				"insert into trigger_discovery"
+				" (triggerdiscoveryid,triggerid,parent_triggerid,name)"
+				" values ";
+	const char		*ins_functions_sql =
+				"insert into functions"
+				" (functionid,itemid,triggerid,function,parameter)"
+				" values ";
+#ifdef HAVE_MULTIROW_INSERT
+	const char		*row_dl = ",";
+#else
+	const char		*row_dl = ";\n";
+#endif
+
+	for (i = 0; i < triggers->values_num; i++)
+	{
+		trigger = (zbx_lld_trigger_t *)triggers->values[i];
+
+		if (0 == trigger->triggerid)
+			new_triggers++;
+
+		new_functions += trigger->functions.values_num;
+	}
+
+	if (0 != new_triggers)
+	{
+		triggerid = DBget_maxid_num("triggers", new_triggers);
+		triggerdiscoveryid = DBget_maxid_num("trigger_discovery", new_triggers);
+
+		sql1 = zbx_malloc(sql1, sql1_alloc);
+		sql2 = zbx_malloc(sql2, sql2_alloc);
+		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_triggers_sql);
+		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_trigger_discovery_sql);
+#endif
+		error_esc = DBdyn_escape_string("Trigger just added. No status update so far.");
+	}
+
+	if (0 != new_functions)
+	{
+		functionid = DBget_maxid_num("functions", new_functions);
+
+		sql3 = zbx_malloc(sql3, sql3_alloc);
+		sql5 = zbx_malloc(sql5, sql5_alloc);
+		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
+		DBbegin_multiple_update(&sql5, &sql5_alloc, &sql5_offset);
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_functions_sql);
+#endif
+	}
+
+	if (new_triggers < triggers->values_num)
+	{
+		sql4 = zbx_malloc(sql4, sql4_alloc);
+		DBbegin_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+	}
+
+	for (i = 0; i < triggers->values_num; i++)
+	{
+		trigger = (zbx_lld_trigger_t *)triggers->values[i];
+
+		description_esc = DBdyn_escape_string(trigger->description);
+
+		if (0 == trigger->triggerid)
+		{
+			trigger->triggerid = triggerid++;
+
+#ifndef HAVE_MULTIROW_INSERT
+			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_triggers_sql);
+#endif
+			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+					"(" ZBX_FS_UI64 ",'%s',%d,%d,'%s','%s',%d,%d,%d,%d,'%s')%s",
+					trigger->triggerid, description_esc, (int)priority, (int)status, comments_esc,
+					url_esc, (int)type, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN,
+					ZBX_FLAG_DISCOVERY_CREATED, error_esc, row_dl);
+
+#ifndef HAVE_MULTIROW_INSERT
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_trigger_discovery_sql);
+#endif
+			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
+					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')%s",
+					triggerdiscoveryid, trigger->triggerid, parent_triggerid,
+					description_proto_esc, row_dl);
+
+			triggerdiscoveryid++;
+		}
+		else
+		{
+			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					"update triggers"
+					" set description='%s',"
+						"priority=%d,"
+						"comments='%s',"
+						"url='%s',"
+						"type=%d,"
+						"flags=%d"
+					" where triggerid=" ZBX_FS_UI64 ";\n",
+					description_esc, (int)priority,
+					comments_esc, url_esc, (int)type,
+					ZBX_FLAG_DISCOVERY_CREATED, trigger->triggerid);
+
+			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					"update trigger_discovery"
+					" set name='%s'"
+					" where triggerid=" ZBX_FS_UI64
+						" and parent_triggerid=" ZBX_FS_UI64 ";\n",
+					description_proto_esc, trigger->triggerid, parent_triggerid);
+
+			if (1 == trigger->update_expression)
+			{
+				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+						"delete from functions"
+						" where triggerid=" ZBX_FS_UI64 ";\n",
+						trigger->triggerid);
+			}
+		}
+
+		if (1 == trigger->update_expression)
+		{
+			char	*old_expression, search[23], replace[23],
+				*function_esc, *parameter_esc, *expression_esc;
+
+			for (j = 0; j < trigger->functions.values_num; j++)
+			{
+				function = (zbx_lld_function_t *)trigger->functions.values[j];
+
+				zbx_snprintf(search, sizeof(search), "{" ZBX_FS_UI64 "}", function->functionid);
+				zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}", functionid);
+
+				old_expression = trigger->expression;
+				trigger->expression = string_replace(old_expression, search, replace);
+				zbx_free(old_expression);
+
+				function_esc = DBdyn_escape_string(function->function);
+				parameter_esc = DBdyn_escape_string(function->parameter);
+
+#ifndef HAVE_MULTIROW_INSERT
+				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_functions_sql);
+#endif
+				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
+						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s')%s",
+						functionid, function->itemid, trigger->triggerid,
+						function_esc, parameter_esc, row_dl);
+
+				zbx_free(parameter_esc);
+				zbx_free(function_esc);
+
+				functionid++;
+			}
+
+			expression_esc = DBdyn_escape_string_len(trigger->expression, TRIGGER_EXPRESSION_LEN);
+
+			zbx_snprintf_alloc(&sql5, &sql5_alloc, &sql5_offset,
+					"update triggers set expression='%s' where triggerid=" ZBX_FS_UI64 ";\n",
+					expression_esc, trigger->triggerid);
+
+			zbx_free(expression_esc);
+		}
+
+		zbx_free(description_esc);
+	}
+
+	if (0 != new_triggers)
+	{
+#ifdef HAVE_MULTIROW_INSERT
+		sql1_offset--;
+		sql2_offset--;
+		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ";\n");
+		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
+#endif
+		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+		DBexecute("%s", sql1);
+		DBexecute("%s", sql2);
+		zbx_free(sql1);
+		zbx_free(sql2);
+		zbx_free(error_esc);
+	}
+
+	if (0 != new_functions)
+	{
+#ifdef HAVE_MULTIROW_INSERT
+		sql3_offset--;
+		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ";\n");
+#endif
+		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
+		DBend_multiple_update(&sql5, &sql5_alloc, &sql5_offset);
+		DBexecute("%s", sql3);
+		DBexecute("%s", sql5);
+		zbx_free(sql3);
+		zbx_free(sql5);
+	}
+
+	if (new_triggers < triggers->values_num)
+	{
+		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+		DBexecute("%s", sql4);
+		zbx_free(sql4);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBlld_update_triggers                                            *
  *                                                                            *
  * Purpose: add or update triggers for discovered items                       *
@@ -2315,13 +2466,18 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 {
 	const char		*__function_name = "DBlld_update_triggers";
 
-	DB_RESULT		result;
-	DB_ROW			row;
 	struct zbx_json_parse	jp_row;
 	const char		*p;
-	zbx_uint64_t		triggerid;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_ptr_t	triggers;
+	zbx_lld_trigger_t	*trigger;
+	zbx_lld_function_t	*function;
+	int			i, j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_ptr_create(&triggers);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,"
@@ -2335,7 +2491,20 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(triggerid, row[0]);
+		zbx_uint64_t	parent_triggerid;
+		const char	*description_proto, *expression;
+		char		*description_proto_esc, *comments_esc, *url_esc;
+		unsigned char	status, type, priority;
+
+		ZBX_STR2UINT64(parent_triggerid, row[0]);
+		description_proto = row[1];
+		description_proto_esc = DBdyn_escape_string(description_proto);
+		expression = row[2];
+		status = (unsigned char)atoi(row[3]);
+		type = (unsigned char)atoi(row[4]);
+		priority = (unsigned char)atoi(row[5]);
+		comments_esc = DBdyn_escape_string(row[6]);
+		url_esc = DBdyn_escape_string(row[7]);
 
 		p = NULL;
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
@@ -2350,19 +2519,42 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
 				continue;
 
-			DBlld_update_trigger(hostid, triggerid,
-					row[1],				/* description */
-					row[2],				/* expression */
-					(unsigned char)atoi(row[3]),	/* status */
-					(unsigned char)atoi(row[4]),	/* type */
-					(unsigned char)atoi(row[5]),	/* priority */
-					row[6],				/* comments */
-					row[7],				/* url */
-					&jp_row,
-					error);
+			DBlld_make_trigger(hostid, parent_triggerid, &triggers, description_proto, expression,
+					&jp_row, error);
 		}
+
+		zbx_vector_ptr_sort(&triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+		DBlld_save_triggers(&triggers, status, type, priority, comments_esc, url_esc, parent_triggerid,
+				description_proto_esc);
+
+		zbx_free(url_esc);
+		zbx_free(comments_esc);
+		zbx_free(description_proto_esc);
+
+		for (i = 0; i < triggers.values_num; i++)
+		{
+			trigger = (zbx_lld_trigger_t *)triggers.values[i];
+
+			for (j = 0; j < trigger->functions.values_num; j++)
+			{
+				function = (zbx_lld_function_t *)trigger->functions.values[j];
+
+				zbx_free(function->function);
+				zbx_free(function->parameter);
+				zbx_free(function);
+			}
+			zbx_vector_ptr_destroy(&trigger->functions);
+
+			zbx_free(trigger->expression);
+			zbx_free(trigger->description);
+			zbx_free(trigger);
+		}
+		triggers.values_num = 0;
 	}
 	DBfree_result(result);
+
+	zbx_vector_ptr_destroy(&triggers);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
