@@ -98,6 +98,23 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 
 				do
 				{
+					/* use parent trigger ID for generated triggers */
+					result = DBselect(
+							"select parent_triggerid"
+							" from trigger_discovery"
+							" where triggerid=" ZBX_FS_UI64,
+							triggerid);
+
+					if (NULL != (row = DBfetch(result)))
+					{
+						ZBX_STR2UINT64(triggerid, row[0]);
+
+						zabbix_log(LOG_LEVEL_DEBUG, "%s() check host template condition,"
+								" selecting parent triggerid:" ZBX_FS_UI64,
+								__function_name, triggerid);
+					}
+					DBfree_result(result);
+
 					result = DBselect(
 							"select distinct i.hostid,t.templateid"
 							" from items i,functions f,triggers t"
