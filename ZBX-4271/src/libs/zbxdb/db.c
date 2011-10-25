@@ -670,7 +670,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	char		*error = NULL;
 #endif
 
-	if (CONFIG_LOG_SLOW_QUERIES)
+	if (0 != CONFIG_LOG_SLOW_QUERIES)
 		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
@@ -681,7 +681,8 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	if (1 == txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
-		return ZBX_DB_FAIL;
+		ret = ZBX_DB_FAIL;
+		goto clean;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
@@ -872,7 +873,7 @@ lbl_exec:
 		php_sem_release(&sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
-	if (CONFIG_LOG_SLOW_QUERIES)
+	if (0 != CONFIG_LOG_SLOW_QUERIES)
 	{
 		sec = zbx_time() - sec;
 		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
@@ -884,7 +885,7 @@ lbl_exec:
 		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
 		txn_error = 1;
 	}
-
+clean:
 	zbx_free(sql);
 
 	return ret;
@@ -918,7 +919,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	char		*error = NULL;
 #endif
 
-	if (CONFIG_LOG_SLOW_QUERIES)
+	if (0 != CONFIG_LOG_SLOW_QUERIES)
 		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
@@ -926,7 +927,7 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	if (1 == txn_error)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
-		return NULL;
+		goto clean;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
@@ -1175,7 +1176,7 @@ lbl_get_table:
 		php_sem_release(&sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
-	if (CONFIG_LOG_SLOW_QUERIES)
+	if (0 != CONFIG_LOG_SLOW_QUERIES)
 	{
 		sec = zbx_time() - sec;
 		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
@@ -1187,7 +1188,7 @@ lbl_get_table:
 		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
 		txn_error = 1;
 	}
-
+clean:
 	zbx_free(sql);
 
 	return result;
