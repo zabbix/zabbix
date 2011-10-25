@@ -2145,9 +2145,7 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 			hostid, description_esc);
 
 	if (0 != trigger->triggerid)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				" and t.triggerid<>" ZBX_FS_UI64,
-				trigger->triggerid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and t.triggerid<>" ZBX_FS_UI64, trigger->triggerid);
 
 	result = DBselect("%s", sql);
 
@@ -2585,6 +2583,43 @@ typedef struct
 }
 zbx_lld_item_t;
 
+int	DBlld_item_exists(zbx_uint64_t hostid, zbx_uint64_t itemid, const char *key, zbx_vector_ptr_t *items)
+{
+	char		*key_esc, *sql = NULL;
+	size_t		sql_alloc = 256, sql_offset = 0;
+	DB_RESULT	result;
+	int		i, res = FAIL;
+
+	for (i = 0; i < items->values_num; i++)
+	{
+		if (0 == strcmp(key, ((zbx_lld_item_t *)items->values[i])->key))
+			return SUCCEED;
+	}
+
+	sql = zbx_malloc(sql, sql_alloc);
+	key_esc = DBdyn_escape_string(key);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select itemid"
+			" from items"
+			" where hostid=" ZBX_FS_UI64
+				" and key_='%s'",
+			hostid, key_esc);
+	if (0 != itemid)
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and itemid<>" ZBX_FS_UI64, itemid);
+
+	result = DBselect("%s", sql);
+
+	if (NULL != DBfetch(result))
+		res = SUCCEED;
+	DBfree_result(result);
+
+	zbx_free(key_esc);
+	zbx_free(sql);
+
+	return res;
+}
+
 static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_vector_ptr_t *items,
 		const char *name_proto, const char *key_proto, unsigned char type, const char *params_proto,
 		const char *snmp_oid_proto, struct zbx_json_parse *jp_row, char **error)
@@ -2593,16 +2628,13 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*key_esc, *sql = NULL;
-	size_t		sql_alloc = 256, sql_offset = 0;
+	char		*key_esc;
 	int		new_appids_alloc = 0, del_appids_alloc = 0,
 			res = SUCCEED;
 	zbx_lld_item_t	*item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() jp_row:'%.*s'", __function_name,
 			jp_row->end - jp_row->start + 1, jp_row->start);
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	item = zbx_calloc(NULL, 1, sizeof(zbx_lld_item_t));
 	item->key = zbx_strdup(NULL, key_proto);
@@ -2649,28 +2681,13 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 		DBfree_result(result);
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select itemid"
-			" from items"
-			" where hostid=" ZBX_FS_UI64
-				" and key_='%s'",
-			hostid, key_esc);
-
-	if (0 != item->itemid)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and itemid<>" ZBX_FS_UI64, item->itemid);
-
-	result = DBselect("%s", sql);
-
-	if (NULL != (row = DBfetch(result)))
+	if (SUCCEED == DBlld_item_exists(hostid, item->itemid, item->key, items))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s item [%s]: item already exists\n",
 				0 != item->itemid ? "update" : "create", item->key);
 		res = FAIL;
-	}
-	DBfree_result(result);
-
-	if (FAIL == res)
 		goto out;
+	}
 
 	item->name = zbx_strdup(NULL, name_proto);
 	substitute_discovery_macros(&item->name, jp_row);
@@ -2693,7 +2710,8 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 	{
 		DBget_applications_by_itemid(item->itemid, &item->del_appids, &del_appids_alloc, &item->del_appids_num);
 
-		uint64_array_remove_both(item->new_appids, &item->new_appids_num, item->del_appids, &item->del_appids_num);
+		uint64_array_remove_both(item->new_appids, &item->new_appids_num,
+				item->del_appids, &item->del_appids_num);
 	}
 out:
 	if (FAIL == res)
@@ -2703,7 +2721,6 @@ out:
 	}
 
 	zbx_free(key_esc);
-	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
@@ -3115,6 +3132,46 @@ typedef struct
 }
 zbx_lld_graph_t;
 
+static int	DBlld_graph_exists(zbx_uint64_t hostid, zbx_uint64_t graphid, const char *name, zbx_vector_ptr_t *graphs)
+{
+	char		*name_esc, *sql = NULL;
+	size_t		sql_alloc = 256, sql_offset = 0;
+	DB_RESULT	result;
+	int		i, res = FAIL;
+
+	for (i = 0; i < graphs->values_num; i++)
+	{
+		if (0 == strcmp(name, ((zbx_lld_graph_t *)graphs->values[i])->name))
+			return SUCCEED;
+	}
+
+	sql = zbx_malloc(sql, sql_alloc);
+	name_esc = DBdyn_escape_string(name);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct g.graphid"
+			" from graphs g,graphs_items gi,items i"
+			" where g.graphid=gi.graphid"
+				" and gi.itemid=i.itemid"
+				" and i.hostid=" ZBX_FS_UI64
+				" and g.name='%s'",
+			hostid, name_esc);
+
+	if (0 != graphid)
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and g.graphid<>" ZBX_FS_UI64, graphid);
+
+	result = DBselect("%s", sql);
+
+	if (NULL != DBfetch(result))
+		res = SUCCEED;
+	DBfree_result(result);
+
+	zbx_free(name_esc);
+	zbx_free(sql);
+
+	return res;
+}
+
 static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs,
 		const char *name_proto, ZBX_GRAPH_ITEMS *gitems_proto, int gitems_proto_num,
 		struct zbx_json_parse *jp_row, char **error)
@@ -3179,30 +3236,13 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 		DBfree_result(result);
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct g.graphid"
-			" from graphs g,graphs_items gi,items i"
-			" where g.graphid=gi.graphid"
-				" and gi.itemid=i.itemid"
-				" and i.hostid=" ZBX_FS_UI64
-				" and g.name='%s'",
-			hostid, name_esc);
-
-	if (0 != graph->graphid)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and g.graphid<>" ZBX_FS_UI64, graph->graphid);
-
-	result = DBselect("%s", sql);
-
-	if (NULL != (row = DBfetch(result)))
+	if (SUCCEED == DBlld_graph_exists(hostid, graph->graphid, graph->name, graphs))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s graph [%s]: graph already exists\n",
 				0 != graph->graphid ? "update" : "create", graph->name);
 		res = FAIL;
-	}
-	DBfree_result(result);
-
-	if (FAIL == res)
 		goto out;
+	}
 
 	if (0 != gitems_proto_num)
 	{
