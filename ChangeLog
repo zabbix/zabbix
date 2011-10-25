@@ -277,6 +277,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4241] added truncation of "ids" table to the database conversion procedure (asaveljevs)
  - [ZBX-2493] improved default messages for actions (Vedmak)
  - [ZBX-2931] fixed dns and ip fields, item statuses and trigger values for default templates (Sasha,asaveljevs)
  - [ZBX-2361] fixed item keys in the default template "Template_Netscreen_25" (Sasha)
