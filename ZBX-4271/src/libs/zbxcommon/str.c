@@ -779,7 +779,7 @@ size_t	zbx_strlcat(char *dst, const char *src, size_t siz)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:  required free allocated string with function 'zbx_free'         *
+ * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
@@ -824,7 +824,7 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:  required free allocated string with function 'zbx_free'         *
+ * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
 char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
@@ -851,8 +851,8 @@ char	*__zbx_zbx_dsprintf(char *dest, const char *f, ...)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:  required free allocated string with function 'zbx_free'         *
- *            zbx_strdcat(NULL,"") must return "", not NULL!                  *
+ * Comments: returns a pointer to allocated memory                            *
+ *           zbx_strdcat(NULL, "") will return "", not NULL!                  *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_strdcat(char *dest, const char *src)
@@ -889,8 +889,7 @@ char	*zbx_strdcat(char *dest, const char *src)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:  required free allocated string with function 'zbx_free'         *
- *            zbx_strdcat(NULL,"") must return "", not NULL!                  *
+ * Comments: returns a pointer to allocated memory                            *
  *                                                                            *
  ******************************************************************************/
 char	*__zbx_zbx_strdcatf(char *dest, const char *f, ...)
