@@ -70,15 +70,15 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					sig, get_signal_name(sig),
 					CHECKED_FIELD(siginfo, si_pid),
 					CHECKED_FIELD(siginfo, si_uid),
-					CHECKED_FIELD(siginfo, si_value.ZBX_SIGVAL_INT));
+					CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
 #ifdef HAVE_SIGQUEUE
 			if (!PARENT_PROCESS)
 			{
 				extern void	zbx_sigusr_handler(zbx_task_t task);
 
-				zbx_sigusr_handler(CHECKED_FIELD(siginfo, si_value.ZBX_SIGVAL_INT));
+				zbx_sigusr_handler(CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
 			}
-			else if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_value.ZBX_SIGVAL_INT))
+			else if (ZBX_TASK_CONFIG_CACHE_RELOAD == CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT))
 			{
 				extern unsigned char	daemon_type;
 
@@ -92,7 +92,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					union sigval	s;
 					extern pid_t	*threads;
 
-					s.ZBX_SIGVAL_INT = ZBX_TASK_CONFIG_CACHE_RELOAD;
+					s.ZBX_SIVAL_INT = ZBX_TASK_CONFIG_CACHE_RELOAD;
 
 					/* threads[0] is configuration syncer (it is set in proxy.c and server.c) */
 					if (-1 != sigqueue(threads[0], SIGUSR1, s))
@@ -296,7 +296,7 @@ int	zbx_sigusr_send(zbx_task_t task)
 	{
 		union sigval	s;
 
-		s.ZBX_SIGVAL_INT = task;
+		s.ZBX_SIVAL_INT = task;
 
 		if (-1 != sigqueue(pid, SIGUSR1, s))
 		{
