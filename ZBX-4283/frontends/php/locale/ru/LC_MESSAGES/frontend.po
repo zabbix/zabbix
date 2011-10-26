@@ -488,8 +488,8 @@ msgstr "Группа элементов данных"
 #: api/classes/class.capplication.php:552
 #: api/classes/class.capplication.php:576
 #, php-format
-msgid "Application [%1$s:%2$s] updated."
-msgstr "Группа элементов данных [%1$s:%2$s] обновлена."
+msgid "Application \"%1$s:%2$s\" updated."
+msgstr "Группа элементов данных \"%1$s:%2$s\" обновлена."
 
 #: api/classes/class.capplication.php:647
 #, php-format
