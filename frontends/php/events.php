@@ -247,7 +247,7 @@ include_once('include/page_header.php');
 		$r_form->addItem(array(SPACE.S_SOURCE.SPACE, $cmbSource));
 	}
 
-	$events_wdgt->addHeader(S_EVENTS_BIG, $r_form);
+	$events_wdgt->addHeader(_('EVENTS'), $r_form);
 
 
 
@@ -511,7 +511,7 @@ include_once('include/page_header.php');
 				S_DESCRIPTION,
 				S_STATUS,
 				S_SEVERITY,
-				S_DURATION,
+				_('Duration'),
 				($config['event_ack_enable'])?S_ACK:NULL,
 				S_ACTIONS
 			));
@@ -524,7 +524,7 @@ include_once('include/page_header.php');
 					S_DESCRIPTION,
 					S_STATUS,
 					S_SEVERITY,
-					S_DURATION,
+					_('Duration'),
 					($config['event_ack_enable'])?S_ACK:NULL,
 					S_ACTIONS
 				);
@@ -615,7 +615,7 @@ include_once('include/page_header.php');
 					// actions
 					$actions = get_event_actions_status($event['eventid']);
 
-					$ack = getEventAckState($event);
+					$ack = getEventAckState($event, true);
 
 					$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
 

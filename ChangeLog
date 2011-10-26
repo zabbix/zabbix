@@ -2,6 +2,7 @@
 Changes for 1.9.7
 
 New features:
+ - [ZBX-1346] add example user parameter to monitor mail queue length from mailq (Richlv)
  - [ZBXNEXT-429] make range select work in a more intutive fashion (Eduard)
  - [ZBXNEXT-910] redesign Administration->Maintenance (Eduard)
  - [ZBX-4222] added more clear labels 'Escalation period' and 'Default escalation period' in configuration of actions (Alexei)
@@ -16,7 +17,12 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
- - [ZBX-3881] fixed delay is set to 0 when change item type from trapper to agent in item upfate form (Vedmak)
+ - [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (Vedmak)
+ - [ZBX-3753] fixed possibility to remove host interface that is in use (Vedmak)
+ - [ZBX-4238] fixed resolving of discovery macros in 'Formula' field for calculated items, 'Executed script' for SSH and Telnet items and 'Additional parameters' for Database monitor items (Sasha)
+ - [ZBX-4153] fixed links to acknowledge and returning back to requester page (Eduard)
+ - [ZBX-4174] made database monitor items not require interface (asaveljevs, Vedmak)
+ - [ZBX-3881] fixed delay being set to 0 when changing item type from trapper to agent in item update form (Vedmak)
  - [ZBX-1020] added support for --sysconfdir, changed default installation directories (dimir)
  - [ZBX-3912] fixed popup object selection for IE (Eduard)
  - [ZBX-4132] fixed checkbox cookie work (Eduard)
@@ -272,6 +278,10 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4241] added truncation of "ids" table to the database conversion procedure (asaveljevs)
+ - [ZBX-2493] improved default messages for actions (Vedmak)
+ - [ZBX-2931] fixed dns and ip fields, item statuses and trigger values for default templates (Sasha,asaveljevs)
+ - [ZBX-2361] fixed item keys in the default template "Template_Netscreen_25" (Sasha)
  - [ZBX-3441] fixed server to not process items that are disabled or removed (dimir,Sasha)
  - [ZBX-4249] fixed trigger wizard "insert macro" action break expression (Vedmak)
  - [ZBX-2490] fixed acknowledge flag for events, acknowledged on a child node (Sasha)

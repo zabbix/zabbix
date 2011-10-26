@@ -9,7 +9,7 @@
 
 # depends on hexdump
 
-outputdir=output_png
+outputdir=${1:-png}
 
 imagefile_mysql=images_mysql.sql
 imagefile_pgsql=images_postgresql.sql
@@ -46,5 +46,5 @@ for imagefile in $outputdir/*.png; do
 
 	echo -n "$[$imagesdone*100/$imagecount]% "
 done
-cat images_oracle_end.txt >> $imagefile_oracle 
+cat images_oracle_end.txt >> $imagefile_oracle
 echo
