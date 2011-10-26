@@ -2037,7 +2037,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				1 => S_DELTA_SPEED_PER_SECOND,
 				2 => S_DELTA_SIMPLE_CHANGE
 			);
-			$cmbDelta = new CTextBox('delta', $deltaOptions[$delta], null, 'yes');
+			$cmbDelta = new CTextBox('delta_name', $deltaOptions[$delta], null, 'yes');
 		}
 		else {
 			$cmbDelta= new CComboBox('delta',$delta);
