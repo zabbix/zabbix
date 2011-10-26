@@ -13,6 +13,8 @@ build/win32/project/Makefile_get -text
 build/win32/project/Makefile_get_x64 -text
 build/win32/project/Makefile_sender -text
 build/win32/project/Makefile_sender_x64 -text
+create/bin/export_data.sh -text
+create/bin/gen_data.pl -text
 create/data/create_data_sql/create_data_sql.sh svneol=native#text/x-sh
 create/data/create_data_sql/data_sql_blacklist.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_blacklistbyval.txt -text
@@ -276,6 +278,8 @@ create/images/source/elements/Zabbix_server_3D.svg -text svneol=native#image/svg
 create/images/source/equipment_rack/Rack_42.svg -text svneol=native#image/svg%2Bxml
 create/images/source/equipment_rack/Rack_42_with_door.svg -text svneol=native#image/svg%2Bxml
 create/images/svg_to_png.sh svneol=native#text/x-sh
+create/src/data.tmpl -text
+database/Makefile.am -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
