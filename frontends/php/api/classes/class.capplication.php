@@ -558,7 +558,7 @@ COpt::memoryPick();
 		foreach ($applications as $application) {
 			$update[] = array(
 				'values' => $application,
-				'where'=> array('applicationid' => $application['applicationid'])
+				'where' => array('applicationid' => $application['applicationid'])
 			);
 		}
 		DB::update('applications', $update);
