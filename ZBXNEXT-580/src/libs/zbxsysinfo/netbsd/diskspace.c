@@ -163,7 +163,7 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int		i, rc, ret = SYSINFO_RET_FAIL;
-	struct statfs	*mntbuf;
+	struct statvfs	*mntbuf;
 	struct zbx_json	j;
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
