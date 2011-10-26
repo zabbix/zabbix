@@ -58,11 +58,11 @@ zabbix_proxy_LDFLAGS = \
 zabbix_proxy_CFLAGS = \
 	-DZABBIX_DAEMON \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
-	-DDATAROOTDIR="\"@datarootdir@\""
+	-DDATADIR="\"@datadir@\""
 
 PROXY_CONFIG = zabbix_proxy.conf
 INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(PROXY_CONFIG).d
-EXSCRIPTS_DIR = $(DESTDIR)@datarootdir@/zabbix/externalscripts
+EXSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/externalscripts
 
 install-data-hook:
 	$(MKDIR_P) "$(INCLUDE_DIR)"
