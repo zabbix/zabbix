@@ -23,16 +23,16 @@
 </td>
 <td>
 	<div id="interface_type_#{interfaceid}" class="jqueryinputset">
-		<input type="radio" id="radio_agent_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_AGENT);?>" #{*checked_agent} #{lock}/>
+		<input type="radio" id="radio_agent_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_AGENT);?>" #{*checked_agent} #{*lock_agent}/>
 		<label for="radio_agent_#{interfaceid}"><?php print(S_AGENT);?></label>
 
-		<input type="radio" id="radio_snmp_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_SNMP);?>" #{*checked_snmp} #{lock} />
+		<input type="radio" id="radio_snmp_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_SNMP);?>" #{*checked_snmp} #{*lock_snmp} />
 		<label for="radio_snmp_#{interfaceid}"><?php print(S_SNMP);?></label>
 
-		<input type="radio" id="radio_jmx_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_JMX);?>" #{*checked_jmx} #{lock} />
+		<input type="radio" id="radio_jmx_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_JMX);?>" #{*checked_jmx} #{*lock_jmx} />
 		<label for="radio_jmx_#{interfaceid}"><?php print(S_JMX);?></label>
 
-		<input type="radio" id="radio_ipmi_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_IPMI);?>" #{*checked_ipmi} #{lock} />
+		<input type="radio" id="radio_ipmi_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_IPMI);?>" #{*checked_ipmi} #{*lock_ipmi} />
 		<label for="radio_ipmi_#{interfaceid}"><?php print(S_IPMI);?></label>
 	</div>
 </td>
@@ -97,7 +97,24 @@ function addInterfaceRow(hostInterface){
 	}
 
 	if (hostInterface.locked) {
-		hostInterface.lock = 'disabled="disabled"';
+		hostInterface.lock_snmp = 'disabled="disabled"';
+		hostInterface.lock_agent = 'disabled="disabled"';
+		hostInterface.lock_jmx = 'disabled="disabled"';
+		hostInterface.lock_ipmi = 'disabled="disabled"';
+		switch (hostInterface.type.toString()) {
+			case '<?php print(INTERFACE_TYPE_SNMP);?>':
+				hostInterface.lock_snmp = '';
+				break;
+			case '<?php print(INTERFACE_TYPE_IPMI);?>':
+				hostInterface.lock_ipmi = '';
+				break;
+			case '<?php print(INTERFACE_TYPE_JMX);?>':
+				hostInterface.lock_jmx = '';
+				break;
+			case '<?php print(INTERFACE_TYPE_AGENT);?>':
+				hostInterface.lock_agent = '';
+				break;
+		}
 	}
 
 	jQuery("#hostIterfacesFooter").before(tpl.evaluate(hostInterface));
