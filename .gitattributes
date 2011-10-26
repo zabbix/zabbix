@@ -232,7 +232,7 @@ create/images/png/Zabbix_server_3D[!!-~](128).png -text svneol=unset#image/png
 create/images/png/Zabbix_server_3D[!!-~](64).png -text svneol=unset#image/png
 create/images/png/Zabbix_server_3D[!!-~](96).png -text svneol=unset#image/png
 create/images/png_to_sql.sh svneol=native#text/x-sh
-create/images/png_to_xml.sh -text
+create/images/png_to_xml.sh svneol=native#text/x-sh
 create/images/source/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
 create/images/source/elements/Crypto-router.svg -text svneol=native#image/svg%2Bxml
 create/images/source/elements/Crypto-router_symbol.svg -text svneol=native#image/svg%2Bxml
