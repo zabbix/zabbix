@@ -528,7 +528,7 @@ include_once('include/page_header.php');
 				$name,
 				$s['timeout'].SPACE.S_SEC_SMALL,
 				$url,
-				$s['required'],
+				htmlspecialchars($s['required']),
 				$s['status_codes'],
 				array($up, isset($up) && isset($down) ? SPACE : null, $down)
 				));
