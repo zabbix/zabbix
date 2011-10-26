@@ -17,6 +17,7 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (Vedmak)
  - [ZBX-3753] fixed possibility to remove host interface that is in use (Vedmak)
  - [ZBX-4238] fixed resolving of discovery macros in 'Formula' field for calculated items, 'Executed script' for SSH and Telnet items and 'Additional parameters' for Database monitor items (Sasha)
  - [ZBX-4153] fixed links to acknowledge and returning back to requester page (Eduard)
