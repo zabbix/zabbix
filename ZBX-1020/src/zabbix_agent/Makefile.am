@@ -60,13 +60,13 @@ zabbix_agentd_CFLAGS = \
 zabbix_agent_CFLAGS = \
 	-DSYSCONFDIR="\"@sysconfdir@\""
 
-AGENT_CONFIG = "zabbix_agent.conf"
-AGENTD_CONFIG = "zabbix_agentd.conf"
-AGENT_INCLUDE_DIR = "$(DESTDIR)@sysconfdir@/$(AGENT_CONFIG).d"
-AGENTD_INCLUDE_DIR = "$(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG).d"
+AGENT_CONFIG = zabbix_agent.conf
+AGENTD_CONFIG = zabbix_agentd.conf
+AGENT_INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(AGENT_CONFIG).d
+AGENTD_INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG).d
 
 install-data-hook:
-	$(MKDIR_P) $(AGENT_INCLUDE_DIR)
-	$(MKDIR_P) $(AGENTD_INCLUDE_DIR)
-	test -f "$(DESTDIR)@sysconfdir@/$(AGENT_CONFIG)" || cp ../../conf/$(AGENT_CONFIG) "$(DESTDIR)@sysconfdir@"
-	test -f "$(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG)" || cp ../../conf/$(AGENTD_CONFIG) "$(DESTDIR)@sysconfdir@"
+	$(MKDIR_P) "$(AGENT_INCLUDE_DIR)"
+	$(MKDIR_P) "$(AGENTD_INCLUDE_DIR)"
+	test -f "$(DESTDIR)@sysconfdir@/$(AGENT_CONFIG)" || cp "../../conf/$(AGENT_CONFIG)" "$(DESTDIR)@sysconfdir@"
+	test -f "$(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG)" || cp "../../conf/$(AGENTD_CONFIG)" "$(DESTDIR)@sysconfdir@"
