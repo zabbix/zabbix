@@ -1074,14 +1074,8 @@ Copt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 // BASIC VALIDATION {{{
 			foreach($hosts as $hnum => $host){
-				// CHECK IF HOSTS HAVE AT LEAST 1 GROUP
-				if(empty($host['groups'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_NO_GROUPS_FOR_HOST, $host['host']));
-				}
-				// Check if host name isn't longer then 64 chars
-				if(zbx_strlen($host['host']) > 64){
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_HOST_NAME_MUST_BE_LONGER, 64, $host['host'], zbx_strlen($host['host'])));
-				}
+				// validate host
+				self::validate($host);
 				$hosts[$hnum]['groups'] = zbx_toArray($hosts[$hnum]['groups']);
 
 				foreach($hosts[$hnum]['groups'] as $gnum => $group){
@@ -1089,7 +1083,6 @@ Copt::memoryPick();
 				}
 			}
 // }}}
-
 
 // PERMISSIONS {{{
 			$upd_groups = CHostGroup::get(array(
@@ -1103,47 +1096,9 @@ Copt::memoryPick();
 			}
 // }}} PERMISSIONS
 
-
 			foreach($hosts as $num => $host){
-				$host_db_fields = array(
-					'host' => null,
-					'port' => 0,
-					'status' => 0,
-					'useip' => 0,
-					'dns' => '',
-					'ip' => '0.0.0.0',
-					'proxy_hostid' => 0,
-					'useipmi' => 0,
-					'ipmi_ip' => '',
-					'ipmi_port' => 623,
-					'ipmi_authtype' => 0,
-					'ipmi_privilege' => 0,
-					'ipmi_username' => '',
-					'ipmi_password' => '',
-				);
 
-				if(!check_db_fields($host_db_fields, $host)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for host [ '.$host['host'].' ]');
-				}
-
-				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
-				}
-				if(!empty($host['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $host['dns'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for DNS [ '.$host['dns'].' ]');
-				}
-
-				if(self::exists(array('host' => $host['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-				if(CTemplate::exists(array('host' => $host['host']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-				// check if the DNS name is set
-				if(empty($host['dns']) && !$host['useip']){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST_NO_DNS);
-				}
-
+				self::validate($host);
 
 				$hostid = get_dbid('hosts', 'hostid');
 				$hostids[] = $hostid;
@@ -1259,6 +1214,9 @@ Copt::memoryPick();
 			);
 			$upd_hosts = self::get($options);
 			foreach($hosts as $gnum => $host){
+				// validate host
+				self::validate($host);
+
 				if(!isset($upd_hosts[$host['hostid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_YOU_DO_NOT_HAVE_ENOUGH_RIGHTS);
 				}
@@ -1268,7 +1226,7 @@ Copt::memoryPick();
 				$tmp = $host;
 				$host['hosts'] = $tmp;
 
-				$result = self::massUpdate($host);
+				$result = self::massUpdate($host, false);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, S_HOST_UPDATE_FAILED);
 			}
 
@@ -1371,14 +1329,24 @@ Copt::memoryPick();
  * @param int $hosts['fields']['ipmi_privilege'] IPMI privilege. OPTIONAL
  * @param string $hosts['fields']['ipmi_username'] IPMI username. OPTIONAL
  * @param string $hosts['fields']['ipmi_password'] IPMI password. OPTIONAL
+ *
+ * @param boolean $validate If set to false, input will not be validated
+ *
  * @return boolean
  */
-	public static function massUpdate($data){
+	public static function massUpdate($data, $validate = true){
 		$hosts = zbx_toArray($data['hosts']);
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		try{
 			self::BeginTransaction(__METHOD__);
+
+			// validate data
+			if ($validate){
+				$fields = array_keys($data);
+				unset($fields[array_search('hosts', $fields)]);
+				self::validate($data, $fields);
+			}
 
 			$options = array(
 				'hostids' => $hostids,
@@ -1393,12 +1361,6 @@ Copt::memoryPick();
 				}
 			}
 
-// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
-			if(isset($data['groups']) && empty($data['groups'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'No groups for hosts');
-			}
-// }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
-
 
 // UPDATE HOSTS PROPERTIES {{{
 			if(isset($data['host'])){
@@ -1407,30 +1369,6 @@ Copt::memoryPick();
 				}
 
 				$cur_host = reset($hosts);
-
-				$options = array(
-					'filter' => array(
-						'host' => $cur_host['host']),
-					'output' => API_OUTPUT_SHORTEN,
-					'editable' => 1,
-					'nopermissions' => 1
-				);
-				$host_exists = self::get($options);
-				$host_exist = reset($host_exists);
-				if($host_exist && ($host_exist['hostid'] != $cur_host['hostid'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-
-//can't add host with the same name as existing template
-				if(CTemplate::exists(array('host' => $cur_host['host'])))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$cur_host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-			}
-
-			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ '.$data['host'].' ]');
-			}
-			if(isset($data['dns']) && !empty($data['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $data['dns'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for DNS [ '.$data['dns'].' ]');
 			}
 
 			$sql_set = array();
@@ -1804,6 +1742,98 @@ Copt::memoryPick();
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
+	}
+
+
+	/**
+	 * Validates a host expression.
+	 *
+	 * if the $fields parameters is passed, it will only validate the given fields.
+	 *
+	 * {@source}
+	 * @access private
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param array $host The host expression to validate
+	 * @param array $fields An array of field names to be validated
+	 *
+	 * @return boolean
+	 */
+	private static function validate(array $host, array $fields = array())
+	{
+		// don't perform field checks if we're udpating only selected fields
+		if (!$fields)
+		{
+			$host_db_fields = array(
+				'host' => null,
+				'port' => 0,
+				'status' => 0,
+				'useip' => 0,
+				'dns' => '',
+				'ip' => '0.0.0.0',
+				'proxy_hostid' => 0,
+				'useipmi' => 0,
+				'ipmi_ip' => '',
+				'ipmi_port' => 623,
+				'ipmi_authtype' => 0,
+				'ipmi_privilege' => 0,
+				'ipmi_username' => '',
+				'ipmi_password' => '',
+			);
+
+			if (!check_db_fields($host_db_fields, $host)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for host [ '.$host['host'].' ]');
+			}
+
+			// validate all fields
+			$fields = array_keys($host_db_fields);
+			$fields[] = 'groups';
+		}
+
+		if (in_array('host', $fields) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
+		}
+		// Check if host name isn't longer then 64 chars
+		if (in_array('host', $fields) && zbx_strlen($host['host']) > 64){
+			self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_HOST_NAME_MUST_BE_LONGER, 64, $host['host'], zbx_strlen($host['host'])));
+		}
+		if (in_array('dns', $fields) && !empty($host['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $host['dns'])){
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for DNS [ '.$host['dns'].' ]');
+		}
+		// check if the DNS name is set
+		if (in_array('dns', $fields) && empty($host['dns']) && !$host['useip']){
+			self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST_NO_DNS);
+		}
+		// CHECK IF HOSTS HAVE AT LEAST 1 GROUP
+		if (in_array('groups', $fields) && empty($host['groups'])){
+			$error = (isset($host['host'])) ? sprintf(S_NO_GROUPS_FOR_HOST, $host['host']) : S_NO_GROUPS_FOR_HOSTS;
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		// check if a different host with the same name exists
+		if (isset($host['host']))
+		{
+			$options = array(
+				'filter' => array(
+					'host' => $host['host']),
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+				'nopermissions' => 1
+			);
+			$host_exists = self::get($options);
+			$host_exist = reset($host_exists);
+			if ($host_exist && (!isset($host['hostid']) || $host_exist['hostid'] != $host['hostid'])){
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+			}
+		}
+
+		if (in_array('host', $fields) && CTemplate::exists(array('host' => $host['host']))){
+			self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+		}
+
+		return true;
 	}
 
 }
