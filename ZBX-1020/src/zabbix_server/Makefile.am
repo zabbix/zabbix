@@ -77,12 +77,12 @@ zabbix_server_LDFLAGS = \
 zabbix_server_CFLAGS = \
 	-DZABBIX_DAEMON \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
-	-DDATAROOTDIR="\"@datarootdir@\""
+	-DDATADIR="\"@datadir@\""
 
 SERVER_CONFIG = zabbix_server.conf
 INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(SERVER_CONFIG).d
-EXSCRIPTS_DIR = $(DESTDIR)@datarootdir@/zabbix/externalscripts
-ALSCRIPTS_DIR = $(DESTDIR)@datarootdir@/zabbix/alertscripts
+EXSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/externalscripts
+ALSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/alertscripts
 
 install-data-hook:
 	$(MKDIR_P) "$(INCLUDE_DIR)"
