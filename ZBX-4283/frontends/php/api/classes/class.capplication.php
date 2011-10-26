@@ -549,7 +549,7 @@ COpt::memoryPick();
 		));
 		foreach($applications_created as $application_created){
 			$host = reset($application_created['hosts']);
-			info(_s('Application [%1$s:%2$s] updated.', $host['host'], $application_created['name']));
+			info(_s('Application "%1$s:%2$s" created.', $host['host'], $application_created['name']));
 		}
 	}
 
