@@ -314,15 +314,19 @@ include_once('include/page_header.php');
 			$db_hosts = CHost::get($options);
 
 			DBstart();
+			$success = true;
 			foreach($_REQUEST['group_graphid'] as $gnum => $graph_id){
 				foreach($db_hosts as $hnum => $host){
 					$go_result &= (bool) copy_graph_to_host($graph_id, $host['hostid'], true);
 
+					if (!$go_result){
+						$success = false;
+					}
 				}
 			}
 			$go_result = DBend($go_result);
 
-			show_messages($go_result, S_GRAPHS_COPIED, S_CANNOT_COPY_GRAPHS);
+			show_messages(($go_result && $success), S_GRAPHS_COPIED, S_CANNOT_COPY_GRAPHS);
 			$_REQUEST['go'] = 'none2';
 		}
 		else{

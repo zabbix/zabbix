@@ -923,6 +923,8 @@
 		else{
 			$host = get_host_by_hostid($hostid);
 			info(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$db_graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
+
+			$result = false;
 		}
 
 	return $result;
