@@ -682,13 +682,11 @@ COpt::memoryPick();
  * @param array $items
  * @return boolean
  */
-	public function update($items){
+	public function update($items) {
 		$items = zbx_toArray($items);
 
 			$this->checkInput($items, true);
-
 			$this->updateReal($items);
-
 			$this->inherit($items);
 
 			return array('itemids' => zbx_objectValues($items, 'itemid'));
@@ -700,9 +698,9 @@ COpt::memoryPick();
  * @param array $ruleids
  * @return
  */
-	public function delete($prototypeids, $nopermissions=false){
+	public function delete($prototypeids, $nopermissions=false) {
 
-			if(empty($prototypeids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if (empty($prototypeids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 			$prototypeids = zbx_toHash($prototypeids);
 
@@ -715,12 +713,12 @@ COpt::memoryPick();
 			$del_itemPrototypes = $this->get($options);
 
 // TODO: remove $nopermissions hack
-			if(!$nopermissions){
-				foreach($prototypeids as $prototypeid){
-					if(!isset($del_itemPrototypes[$prototypeid])){
+			if (!$nopermissions) {
+				foreach ($prototypeids as $prototypeid) {
+					if (!isset($del_itemPrototypes[$prototypeid])) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 					}
-					if($del_itemPrototypes[$prototypeid]['templateid'] != 0){
+					if ($del_itemPrototypes[$prototypeid]['templateid'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
 					}
 				}

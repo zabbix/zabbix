@@ -454,10 +454,10 @@ class CUserMacro extends CZBXAPI{
  * @param array $hostmacroids['hostmacroids']
  * @return boolean
  */
-	public function deleteHostMacro($hostmacroids){
+	public function deleteHostMacro($hostmacroids) {
 		$hostmacroids = zbx_toArray($hostmacroids);
 
-			if(empty($hostmacroids))
+			if (empty($hostmacroids))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostmacroids ]');
 
 // permissions + existance
@@ -469,14 +469,14 @@ class CUserMacro extends CZBXAPI{
 			);
 			$db_hmacros = $this->get($options);
 
-			foreach($hostmacroids as $hmnum => $hostmacroid){
-				if(!isset($db_hmacros[$hostmacroid]))
+			foreach ($hostmacroids as $hmnum => $hostmacroid) {
+				if (!isset($db_hmacros[$hostmacroid]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 //--------
 
 			$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostmacroid', $hostmacroids);
-			if(!DBExecute($sql))
+			if (!DBExecute($sql))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 			return array('hostmacroids' => $hostmacroids);
@@ -590,7 +590,7 @@ class CUserMacro extends CZBXAPI{
 		$globalmacros = zbx_toArray($globalmacros);
 
 			if(empty($globalmacros))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 // permissions + existance
 			$options = array(

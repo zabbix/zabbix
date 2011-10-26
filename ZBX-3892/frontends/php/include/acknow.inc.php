@@ -19,35 +19,38 @@
 **/
 ?>
 <?php
-
-function get_last_event_by_triggerid($triggerid){
-	$event_data = DBfetch(DBselect('SELECT * '.
-				' FROM events '.
-				' WHERE objectid='.$triggerid.
-					' and object='.EVENT_OBJECT_TRIGGER.
-				' ORDER BY objectid desc, object desc, eventid desc', 1));
-	if(!$event_data)
-		return FALSE;
-return $event_data;
-}
-
-function get_acknowledges_by_eventid($eventid){
-	return DBselect("SELECT a.*, u.alias FROM acknowledges a LEFT JOIN users u ON u.userid=a.userid  WHERE a.eventid=$eventid");
-}
-
-function make_acktab_by_eventid($event){
-	$table = new CTableInfo();
-	$table->SetHeader(array(S_TIME,S_USER, S_COMMENTS));
-
-	$acknowledges = $event['acknowledges'];
-	foreach($acknowledges as $anum => $ack){
-		$table->addRow(array(
-			zbx_date2str(S_ACKNOWINC_BY_EVENTS_DATE_FORMAT,$ack['clock']),
-			$ack['alias'],
-			new CCol(zbx_nl2br($ack['message']),'wraptext')
-		));
+function get_last_event_by_triggerid($triggerid) {
+	$event_data = DBfetch(DBselect('SELECT e.*'.
+									' FROM events e'.
+									' WHERE e.objectid='.$triggerid.
+										' AND e.object='.EVENT_OBJECT_TRIGGER.
+									' ORDER BY e.objectid DESC,e.object DESC,e.eventid DESC', 1));
+	if (!$event_data) {
+		return false;
 	}
+	return $event_data;
+}
 
-return $table;
+function get_acknowledges_by_eventid($eventid) {
+	return DBselect('SELECT a.*,u.alias FROM acknowledges a LEFT JOIN users u ON u.userid=a.userid WHERE a.eventid='.$eventid);
+}
+
+function make_acktab_by_eventid($event) {
+	if (!empty($event['acknowledges']) && is_array($event['acknowledges'])) {
+		$table = new CTableInfo();
+		$table->setHeader(array(_('Time'), _('User'), _('Comments')));
+
+		foreach ($event['acknowledges'] as $ack) {
+			$table->addRow(array(
+				zbx_date2str(_('d M Y H:i:s'), $ack['clock']),
+				$ack['alias'],
+				new CCol(zbx_nl2br($ack['message']), 'wraptext')
+			));
+		}
+		return $table;
+	}
+	else {
+		return null;
+	}
 }
 ?>

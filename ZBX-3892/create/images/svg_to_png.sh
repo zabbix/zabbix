@@ -3,15 +3,14 @@
 # A script to convert SVG into multiple sizes of PNG and compress them with pngcrush
 
 # todo :
-# integrate in make dist;
 # figure out how to auto-scale rack images
 
 # depends on inkscape, pngcrush, awk
 
 pngcrushbin=pngcrush
 
-outputdir=output_png
-elementdir=elements
+outputdir=${1:-png}
+elementdir=source/elements
 
 pngcrushlog=pngcrush.log.txt
 pngcrushoutput=pngcrushoutput.txt
@@ -71,11 +70,13 @@ for svgfile in $elementdir/*.svg; do
 	echo "[$[$elementfilesdone*100/$svgelementcount]%]"
 done
 
+# rack images for now are converted with a fixed ratio
+
 rackimages=([64]=66 [96]=99 [128]=132)
 
 echo -n "Converting Rack_42.svg"
 for rackimagesize in "${!rackimages[@]}"; do
-	svgtopng "equipment_rack/Rack_42.svg" "${rackimages[$rackimagesize]}" "$rackimagesize" "width"
+	svgtopng "source/equipment_rack/Rack_42.svg" "${rackimages[$rackimagesize]}" "$rackimagesize" "width"
 done
 echo
 
@@ -83,7 +84,7 @@ rackwithdoorimages=([64]=98 [96]=147 [128]=197)
 
 echo -n "Converting Rack_42_with_door.svg"
 for rackwithdoorimagesize in "${!rackwithdoorimages[@]}"; do
-	svgtopng "equipment_rack/Rack_42_with_door.svg" "${rackwithdoorimages[$rackwithdoorimagesize]}" "$rackwithdoorimagesize" "width"
+	svgtopng "source/equipment_rack/Rack_42_with_door.svg" "${rackwithdoorimages[$rackwithdoorimagesize]}" "$rackwithdoorimagesize" "width"
 done
 echo
 

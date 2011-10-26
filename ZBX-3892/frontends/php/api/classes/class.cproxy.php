@@ -470,9 +470,9 @@ class CProxy extends CZBXAPI{
  * @param array $proxies[0, ...]['hostid'] Host ID to delete
  * @return array|boolean
  */
-	public function delete($proxies){
+	public function delete($proxies) {
 
-		if(empty($proxies)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+		if (empty($proxies)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 		$proxies = zbx_toArray($proxies);
 		$proxyids = zbx_objectValues($proxies, 'proxyid');
@@ -484,20 +484,20 @@ class CProxy extends CZBXAPI{
 
 // conditions
 
-		$sql = 'SELECT DISTINCT actionid '.
-				' FROM conditions '.
+		$sql = 'SELECT DISTINCT actionid'.
+				' FROM conditions'.
 				' WHERE conditiontype='.CONDITION_TYPE_PROXY.
-					' AND '.DBcondition('value',$proxyids);
+					' AND '.DBcondition('value', $proxyids);
 		$db_actions = DBselect($sql);
-		while($db_action = DBfetch($db_actions)){
+		while ($db_action = DBfetch($db_actions)) {
 			$actionids[$db_action['actionid']] = $db_action['actionid'];
 		}
 
-		if(!empty($actionids)){
+		if (!empty($actionids)) {
 			$update = array();
 			$update[] = array(
 				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid'=>$actionids)
+				'where' => array('actionid' => $actionids)
 			);
 			DB::update('actions', $update);
 		}
