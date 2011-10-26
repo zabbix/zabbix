@@ -193,7 +193,7 @@ then
   ./configure $config_param 2>> WARNINGS 
   if [ "x$?" = "x0" ]
   then
-    ./create/schema/gen.pl c 2>> WARNINGS > ./include/dbsync.h
+    ./create/schema/gen_schema.pl c 2>> WARNINGS > ./include/dbsync.h
     if [ "x$?" = "x0" ]
     then
       configure_is_ok=1
