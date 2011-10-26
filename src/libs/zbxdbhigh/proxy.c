@@ -1846,18 +1846,18 @@ static char	*DBlld_expand_trigger_expression(const char *expression, zbx_vector_
 
 		zbx_strncpy_alloc(&expr, &expr_alloc, &expr_offset, br, bl - br);
 
-		bl++;
-
 		if (NULL == (br = strchr(bl, '}')))
 		{
 			zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, bl);
 			break;
 		}
 
+		bl++;
+
 		if (SUCCEED != is_uint64_n(bl, br - bl, &functionid) || FAIL == (i = zbx_vector_ptr_bsearch(
 				functions, &functionid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
-			br = bl;
+			br = bl - 1;
 			continue;
 		}
 
