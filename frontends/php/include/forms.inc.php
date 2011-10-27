@@ -1898,7 +1898,6 @@ ITEM_TYPE_TELNET $key = 'telnet.run[<unique short description>,<ip>,<port>,<enco
 ITEM_TYPE_CALCULATED $key = ''; $params = '';
 //*/
 
-
 		if(isset($limited)){
 			$frmItem->addVar('value_type', $value_type);
 			$cmbValType = new CTextBox('value_type_name', item_value_type2str($value_type), 40, 'yes');
@@ -1940,23 +1939,19 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_units');
 
 		$mltpbox = Array();
-		if(isset($limited)){
+		if (isset($limited)) {
 			$frmItem->addVar('multiplier', $multiplier);
 
 			$mcb = new CCheckBox('multiplier', $multiplier == 1 ? 'yes':'no');
 			$mcb->setAttribute('disabled', 'disabled');
 			$mltpbox[] = $mcb;
-			if($multiplier){
-				$mltpbox[] = SPACE;
-				$ctb = new CTextBox('formula', $formula, 10, 1);
-				$ctb->setAttribute('style', 'text-align: right;');
-				$mltpbox[] = $ctb;
-			}
-			else{
-				$frmItem->addVar('formula', $formula);
-			}
+
+			$mltpbox[] = SPACE;
+			$ctb = new CTextBox('formula', $formula, 10, 1);
+			$ctb->setAttribute('style', 'text-align: right;');
+			$mltpbox[] = $ctb;
 		}
-		else{
+		else {
 			$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.disabled = !this.checked;', 1);
 			$mltpbox[] = SPACE;
 			$ctb = new CTextBox('formula', $formula, 10);
@@ -2032,11 +2027,20 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_LOG, 'logtimefmt');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_LOG, 'row_logtimefmt');
 
-		$cmbDelta= new CComboBox('delta',$delta);
-		$cmbDelta->addItem(0,S_AS_IS);
-		$cmbDelta->addItem(1,S_DELTA_SPEED_PER_SECOND);
-		$cmbDelta->addItem(2,S_DELTA_SIMPLE_CHANGE);
-
+		$deltaOptions = array(
+			0 => S_AS_IS,
+			1 => S_DELTA_SPEED_PER_SECOND,
+			2 => S_DELTA_SIMPLE_CHANGE
+		);
+		// delta row
+		if ($limited) {
+			$frmItem->addVar('delta', $delta);
+			$cmbDelta = new CTextBox('delta_name', $deltaOptions[$delta], null, 'yes');
+		}
+		else {
+			$cmbDelta= new CComboBox('delta', $delta);
+			$cmbDelta->addItems($deltaOptions);
+		}
 		$row = new CRow(array(new CCol(S_STORE_VALUE,'form_row_l'), new CCol($cmbDelta,'form_row_r')));
 		$row->setAttribute('id', 'row_delta');
 		$frmItem->addRow($row);
