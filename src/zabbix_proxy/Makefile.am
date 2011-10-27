@@ -49,11 +49,11 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
-	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
-	@PROXY_LIBS@
+	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a
 
-zabbix_proxy_LDFLAGS = \
-	@PROXY_LDFLAGS@
+zabbix_proxy_LDADD += @PROXY_LIBS@
+
+zabbix_proxy_LDFLAGS = @PROXY_LDFLAGS@
 
 zabbix_proxy_CFLAGS = \
 	-DZABBIX_DAEMON \
