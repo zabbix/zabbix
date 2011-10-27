@@ -319,7 +319,7 @@ include_once('include/page_header.php');
 				foreach($db_hosts as $hnum => $host){
 					$go_result &= (bool) copy_graph_to_host($graph_id, $host['hostid'], true);
 
-					if (!$go_result){
+					if (!$go_result) {
 						$success = false;
 					}
 				}
