@@ -326,7 +326,7 @@ function bar_report_form(){
 					$items_table,
 					new CButton('add_item',S_ADD,
 						"return PopUp('popup_bitem.php?config=1&dstfrm=".$reportForm->getName().
-						"',550,400,'graph_item_form');"),
+						"',800,400,'graph_item_form');"),
 					$delete_button
 				));
 	unset($items_table, $delete_button);
