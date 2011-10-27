@@ -1,9 +1,18 @@
 --------------------------------------------------------------------------------
+Changes for 1.9.8
+
+New features:
+
+Bug fixes:
+ - [ZBX-4283] fixed template creation being reported as an update (Richlv)
+ - [ZBX-3749] escaped HTML entities in the web step "required" field (pavels)
+
+--------------------------------------------------------------------------------
 Changes for 1.9.7
 
 New features:
  - [ZBX-1346] add example user parameter to monitor mail queue length from mailq (Richlv)
- - [ZBXNEXT-429] make range select work in a more intutive fashion (Eduard)
+ - [ZBXNEXT-429] make range select work in a more intuitive fashion (Eduard)
  - [ZBXNEXT-910] redesign Administration->Maintenance (Eduard)
  - [ZBX-4222] added more clear labels 'Escalation period' and 'Default escalation period' in configuration of actions (Alexei)
  - [ZBXNEXT-485] improved simple checks key syntax as in other item keys (Sasha)
@@ -17,8 +26,6 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
- - [ZBX-4283] fixed template creation being reported as an update (Richlv)
- - [ZBX-3749] escapes HTML entities in the web step "required" field (pavels)
  - [ZBX-3892] added support for low-level discovery template to action condition check (dimir)
  - [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (Vedmak)
  - [ZBX-3753] fixed possibility to remove host interface that is in use (Vedmak)
@@ -46,7 +53,7 @@ Bug fixes:
  - [ZBX-3896] fixed broken triggers after removed item that is used in trigger (Vedmak)
  - [ZBX-4106] fixed layout of "Status of host triggers" screen element (Vedmak)
  - [ZBX-4061] fixed errors when try to delete already deleted regular expression (Vedmak)
- - [ZBX-4058] fixed working time updating in Administration->Gneral->Working time (Vedmak)
+ - [ZBX-4058] fixed working time updating in Administration->General->Working time (Vedmak)
  - [ZBX-4060] fixed error when save map with link updated to connect new element (Vedmak)
  - [ZBX-4166] fixed error in dashboard when configured to show unacknowledged only (Vedmak)
  - [ZBX-4003] fixed error when try to use not existing host group as group for discovered hosts (Vedmak)
@@ -61,7 +68,7 @@ Bug fixes:
  - [ZBX-3939] fixed warning messages when looking at the history of several selected log items (Alexei)
  - [ZBX-3493] fixed warnings when removing and clearing a template (Alexei)
  - [ZBX-4143] fixed cases with upgrade patch sometimes attempting to reference tables that were not created yet (Richlv, Sasha)
- - [ZBX-3618] extended allowed syntax for host interface dns names (Vedmak)
+ - [ZBX-3618] extended allowed syntax for host interface DNS names (Vedmak)
  - [ZBX-3999] fixed map border (Alex,Sasha,Eduard)
  - [ZBX-3946] fixed errors when create trigger with dependencies (Vedmak)
  - [ZBX-3921] fixed change link shown for maps in slide show (Vedmak)
