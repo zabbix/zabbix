@@ -790,7 +790,7 @@ include_once('include/page_header.php');
 
 		if ($multiselect) {
 			$header = array(
-				($hostid > 0) ? null : S_HOST,
+				$pageFilter->hostsAll ? S_HOST : null,
 				array(new CCheckBox('all_items', NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
 				S_KEY,
 				S_TYPE,
@@ -800,7 +800,7 @@ include_once('include/page_header.php');
 		}
 		else {
 			$header = array(
-				($hostid > 0) ? null : S_HOST,
+				$pageFilter->hostsAll ? S_HOST : null,
 				S_DESCRIPTION,
 				S_KEY,
 				S_TYPE,
@@ -818,12 +818,16 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'hostids' => $hostid,
 			'webitems' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND
 		);
-		if (is_null($hostid)) $options['groupids'] = $groupid;
+		if ($pageFilter->hostsAll) {
+			$options['hostids'] = array_keys($pageFilter->hosts);
+		}
+		else {
+			$options['hostids'] = $pageFilter->hostid;
+		}
 		if (!is_null($writeonly)) $options['editable'] = 1;
 		if (!is_null($templated)) $options['templated'] = $templated;
 		if (!is_null($value_types)) $options['filter']['value_type'] = $value_types;
