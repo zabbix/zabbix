@@ -197,6 +197,28 @@ else
   AC_MSG_RESULT(leaving undefined)
 fi
 
+AC_MSG_CHECKING(for integer field name in union sigval of struct siginfo_t)
+zbx_sival_int=
+for field in sival_int sigval_int; do
+  AC_TRY_COMPILE([
+#ifdef HAVE_SIGNAL_H
+#  include <signal.h>
+#endif
+  ],[
+    siginfo_t siginfo;
+    siginfo.si_value.$field = 0;
+  ],[
+    zbx_sival_int="$field"
+    break
+  ])
+done
+if test "x$zbx_sival_int" != "x"; then
+  AC_MSG_RESULT($zbx_sival_int)
+  AC_DEFINE_UNQUOTED(ZBX_SIVAL_INT, $zbx_sival_int, [Define integer field name in union 'sigval' of struct 'siginfo_t'])
+else
+  AC_MSG_ERROR(Unable to find integer field name in union sigval of struct siginfo_t)
+fi
+
 AC_MSG_CHECKING(for union semun)
 AC_TRY_COMPILE(
 [

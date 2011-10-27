@@ -17,6 +17,7 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-3892] added support for low-level discovery template to action condition check (dimir)
  - [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (Vedmak)
  - [ZBX-3753] fixed possibility to remove host interface that is in use (Vedmak)
  - [ZBX-4238] fixed resolving of discovery macros in 'Formula' field for calculated items, 'Executed script' for SSH and Telnet items and 'Additional parameters' for Database monitor items (Sasha)
@@ -278,6 +279,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4178] fixed compilation on FreeBSD: union has no member named `sival_int' (asaveljevs)
  - [ZBX-4241] added truncation of "ids" table to the database conversion procedure (asaveljevs)
  - [ZBX-2493] improved default messages for actions (Vedmak)
  - [ZBX-2931] fixed dns and ip fields, item statuses and trigger values for default templates (Sasha,asaveljevs)
@@ -285,7 +287,7 @@ Changes for 1.8.9rc1
  - [ZBX-3441] fixed server to not process items that are disabled or removed (dimir,Sasha)
  - [ZBX-4249] fixed trigger wizard "insert macro" action break expression (Vedmak)
  - [ZBX-2490] fixed acknowledge flag for events, acknowledged on a child node (Sasha)
- - [ZBX-3743] fixed no triggers returned when api trigger.get is called with "limit" and "withLastEventUnacknowledged" options (Vedmak))
+ - [ZBX-3743] fixed no triggers returned when api trigger.get is called with "limit" and "withLastEventUnacknowledged" options (Vedmak)
  - [ZBX-4203] fixed api trigger.update method removes dependencies (Vedmak)
  - [ZBX-4232] fixed unclear log messages when checks are temporarily enabled/disabled (dimir)
  - [ZBX-4221] fixed sorting by host in Configuration->Web (Vedmak)
