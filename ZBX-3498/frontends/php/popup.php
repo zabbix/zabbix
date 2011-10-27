@@ -940,15 +940,8 @@ include_once('include/page_header.php');
 
 		$table->setHeader($header);
 
-		// fetch used host ids
-		$hosts = CHost::get(array(
-			'filter' => array('status' => HOST_STATUS_MONITORED),
-			'output' => API_OUTPUT_SHORTEN
-		));
-		$hostid = zbx_objectValues($hosts, 'hostid');
-
 		$options = array(
-			'hostids' => $hostid,
+			'hostids' => array_keys($pageFilter->hosts),
 			'output' => API_OUTPUT_EXTEND,
 			'nodeids' => $nodeid,
 			'select_hosts' => API_OUTPUT_EXTEND
@@ -1050,16 +1043,9 @@ include_once('include/page_header.php');
 
 		$table->setHeader($header);
 
-		// fetch used host ids
-		$hosts = CHost::get(array(
-			'filter' => array('status' => HOST_STATUS_MONITORED),
-			'output' => API_OUTPUT_SHORTEN
-		));
-		$hostid = zbx_objectValues($hosts, 'hostid');
-
 		$options = array(
 			'nodeids' => $nodeid,
-			'hostids' => $hostid,
+			'hostids' => array_keys($pageFilter->hosts),
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'webitems' => true,

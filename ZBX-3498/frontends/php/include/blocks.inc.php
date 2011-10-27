@@ -1185,6 +1185,7 @@ function make_graph_menu(&$menu,&$submenu){
 					'&srcfld1=graphid'.
 					'&reference=graphid'.
 					'&real_hosts=1'.
+					'&monitored_hosts=1'.
 					"&multiselect=1',800,450);".
 				"void(0);",
 				null,
@@ -1197,6 +1198,7 @@ function make_graph_menu(&$menu,&$submenu){
 					'&srcfld1=itemid'.
 					'&real_hosts=1'.
 					'&reference=itemid'.
+					'&monitored_hosts=1'.
 					"&multiselect=1',800,450);".
 				"void(0);",
 				null,
