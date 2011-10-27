@@ -488,8 +488,8 @@ msgstr "Rādītāju grupa"
 #: api/classes/class.capplication.php:552
 #: api/classes/class.capplication.php:576
 #, php-format
-msgid "Application [%1$s:%2$s] updated."
-msgstr "Rādītāju grupa [%1$s:%2$s] atjaunota."
+msgid "Application \"%1$s:%2$s\" updated."
+msgstr "Rādītāju grupa \"%1$s:%2$s\" atjaunota."
 
 #: api/classes/class.capplication.php:647
 #, php-format
