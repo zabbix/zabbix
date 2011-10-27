@@ -1939,7 +1939,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_units');
 
 		$mltpbox = Array();
-		if (isset($limited)){
+		if (isset($limited)) {
 			$frmItem->addVar('multiplier', $multiplier);
 
 			$mcb = new CCheckBox('multiplier', $multiplier == 1 ? 'yes':'no');
@@ -2030,7 +2030,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_LOG, 'row_logtimefmt');
 
 		// delta row
-		if ($limited){
+		if ($limited) {
 			$frmItem->addVar('delta', $delta);
 			$deltaOptions = array(
 				0 => S_AS_IS,
