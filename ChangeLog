@@ -279,6 +279,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4178] fixed compilation on FreeBSD: union has no member named `sival_int' (asaveljevs)
  - [ZBX-4241] added truncation of "ids" table to the database conversion procedure (asaveljevs)
  - [ZBX-2493] improved default messages for actions (Vedmak)
  - [ZBX-2931] fixed dns and ip fields, item statuses and trigger values for default templates (Sasha,asaveljevs)
@@ -286,7 +287,7 @@ Changes for 1.8.9rc1
  - [ZBX-3441] fixed server to not process items that are disabled or removed (dimir,Sasha)
  - [ZBX-4249] fixed trigger wizard "insert macro" action break expression (Vedmak)
  - [ZBX-2490] fixed acknowledge flag for events, acknowledged on a child node (Sasha)
- - [ZBX-3743] fixed no triggers returned when api trigger.get is called with "limit" and "withLastEventUnacknowledged" options (Vedmak))
+ - [ZBX-3743] fixed no triggers returned when api trigger.get is called with "limit" and "withLastEventUnacknowledged" options (Vedmak)
  - [ZBX-4203] fixed api trigger.update method removes dependencies (Vedmak)
  - [ZBX-4232] fixed unclear log messages when checks are temporarily enabled/disabled (dimir)
  - [ZBX-4221] fixed sorting by host in Configuration->Web (Vedmak)
