@@ -113,11 +113,13 @@ include_once('include/page_header.php');
 		}
 	}
 
-
-	if(!(isset($_REQUEST['sysmapid']) && isset($maps[$_REQUEST['sysmapid']]))){
+	if (!isset($_REQUEST['sysmapid']) && !$maps) {
+		show_error_message(S_NO_MAPS_DEFINED);
+	}
+	elseif (!(isset($_REQUEST['sysmapid']) && isset($maps[$_REQUEST['sysmapid']]))) {
 		show_error_message(S_NO_PERMISSIONS_OR_MAP_DOES_NOT_EXIST);
 	}
-	else{
+	else {
 		$map_wdgt = new CWidget('hat_maps');
 		$table = new CTable(S_NO_MAPS_DEFINED, 'map');
 
