@@ -428,7 +428,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		_res.nsaddr_list[0].sin_addr = inaddr;
 		_res.nsaddr_list[0].sin_family = AF_INET;
-		_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);
+		_res.nsaddr_list[0].sin_port = htons(ZBX_DEFAULT_DNS_PORT);
 		_res.nscount = 1;
 	}
 
