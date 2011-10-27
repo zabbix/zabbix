@@ -1074,8 +1074,6 @@ Copt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 // BASIC VALIDATION {{{
 			foreach($hosts as $hnum => $host){
-				// validate host
-				self::validate($host);
 				$hosts[$hnum]['groups'] = zbx_toArray($hosts[$hnum]['groups']);
 
 				foreach($hosts[$hnum]['groups'] as $gnum => $group){
@@ -1096,8 +1094,7 @@ Copt::memoryPick();
 			}
 // }}} PERMISSIONS
 
-			foreach($hosts as $num => $host){
-
+			foreach($hosts as $host){
 				self::validate($host);
 
 				$hostid = get_dbid('hosts', 'hostid');
@@ -1213,20 +1210,17 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 			$upd_hosts = self::get($options);
-			foreach($hosts as $gnum => $host){
-				// validate host
-				self::validate($host);
-
+			foreach($hosts as $host){
 				if(!isset($upd_hosts[$host['hostid']])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_YOU_DO_NOT_HAVE_ENOUGH_RIGHTS);
 				}
 			}
 
-			foreach($hosts as $num => $host){
+			foreach($hosts as $host){
 				$tmp = $host;
 				$host['hosts'] = $tmp;
 
-				$result = self::massUpdate($host, false);
+				$result = self::massUpdate($host);
 				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, S_HOST_UPDATE_FAILED);
 			}
 
@@ -1330,11 +1324,9 @@ Copt::memoryPick();
  * @param string $hosts['fields']['ipmi_username'] IPMI username. OPTIONAL
  * @param string $hosts['fields']['ipmi_password'] IPMI password. OPTIONAL
  *
- * @param boolean $validate If set to false, input will not be validated
- *
  * @return boolean
  */
-	public static function massUpdate($data, $validate = true){
+	public static function massUpdate($data){
 		$hosts = zbx_toArray($data['hosts']);
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
@@ -1342,11 +1334,9 @@ Copt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 			// validate data
-			if ($validate) {
-				$fields = array_keys($data);
-				unset($fields[array_search('hosts', $fields)]);
-				self::validate($data, $fields);
-			}
+			$fields = array_keys($data);
+			unset($fields[array_search('hosts', $fields)]);
+			self::validate($data, $fields);
 
 			$options = array(
 				'hostids' => $hostids,
