@@ -955,7 +955,7 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 		$header = array(
-			($hostid>0)?null:S_HOST,
+			$pageFilter->hostsAll ? S_HOST : null,
 			($multiselect ? new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');") : null),
 			_('Name'),
 			S_KEY,
@@ -968,7 +968,6 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'groupids' => $groupid,
 			'hostids' => $hostid,
 			'webitems' => true,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
@@ -976,14 +975,10 @@ include_once('include/page_header.php');
 			'selectHosts' => array('hostid','name'),
 			'preservekeys' => true
 		);
-
 		if(!is_null($normal_only)) $options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated) && $templated == 1) $options['templated'] = $templated;
 		if(!is_null($value_types)) $options['filter']['value_type'] = $value_types;
-
-// host can't have id=0. This option made hosts dissapear from list
-		if ($options['hostids'] == 0) unset($options['hostids']);
 
 		$items = API::Item()->get($options);
 		order_result($items, 'name', ZBX_SORT_UP);
