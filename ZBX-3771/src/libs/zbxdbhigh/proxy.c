@@ -1952,7 +1952,7 @@ static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() Cannot find item [%s] on the host",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find item [%s] on the host",
 				__function_name, key);
 		res = FAIL;
 	}
@@ -2011,7 +2011,7 @@ static void	DBlld_get_trigger_functions(zbx_uint64_t triggerid, struct zbx_json_
 		function->flags = (unsigned char)atoi(row[6]);
 		zbx_vector_ptr_append(functions, function);
 
-		if (NULL != jp_row && 0 != (ZBX_FLAG_DISCOVERY_CHILD & function->flags))
+		if (NULL != jp_row && 0 != (function->flags & ZBX_FLAG_DISCOVERY_CHILD))
 			substitute_discovery_macros(&function->key, jp_row);
 	}
 	DBfree_result(result);
@@ -2096,7 +2096,7 @@ typedef struct
 }
 zbx_lld_trigger_t;
 
-static int	DBlld_triger_exists(zbx_uint64_t hostid, zbx_uint64_t triggerid, const char *description,
+static int	DBlld_trigger_exists(zbx_uint64_t hostid, zbx_uint64_t triggerid, const char *description,
 		const char *full_expression, zbx_vector_ptr_t *triggers)
 {
 	char			*description_esc, *sql = NULL;
@@ -2264,10 +2264,10 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 		DBfree_result(result);
 	}
 
-	if (SUCCEED == DBlld_triger_exists(hostid, trigger->triggerid, trigger->description,
+	if (SUCCEED == DBlld_trigger_exists(hostid, trigger->triggerid, trigger->description,
 			trigger->full_expression, triggers))
 	{
-		*error = zbx_strdcatf(*error, "Cannot %s trigger [%s]: trigger already exists\n",
+		*error = zbx_strdcatf(*error, "cannot %s trigger [%s]: trigger already exists\n",
 				0 != trigger->triggerid ? "update" : "create", trigger->description);
 		res = FAIL;
 		goto out;
@@ -2455,7 +2455,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 
 		if (1 == trigger->update_expression)
 		{
-			char	*old_expression, search[23], replace[23],
+			char	*old_expression, search[MAX_ID_LEN + 2], replace[MAX_ID_LEN + 2],
 				*function_esc, *parameter_esc, *expression_esc;
 
 			for (j = 0; j < trigger->functions.values_num; j++)
@@ -2568,7 +2568,7 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 			"select distinct t.triggerid,t.description,t.expression,"
 				"t.status,t.type,t.priority,t.comments,t.url"
 			" from triggers t,functions f,items i,item_discovery d"
-			" where f.triggerid=t.triggerid"
+			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
 				" and i.itemid=d.itemid"
 				" and d.parent_itemid=" ZBX_FS_UI64,
@@ -2763,7 +2763,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 
 	if (SUCCEED == DBlld_item_exists(hostid, item->itemid, item->key, items))
 	{
-		*error = zbx_strdcatf(*error, "Cannot %s item [%s]: item already exists\n",
+		*error = zbx_strdcatf(*error, "cannot %s item [%s]: item already exists\n",
 				0 != item->itemid ? "update" : "create", item->key);
 		res = FAIL;
 		goto out;
@@ -3007,7 +3007,9 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 #endif
 			zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
 					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")%s",
-					itemappid++, item->itemid, item->new_appids[j], row_dl);
+					itemappid, item->itemid, item->new_appids[j], row_dl);
+
+			itemappid++;
 		}
 
 		zbx_free(params_esc);
@@ -3317,7 +3319,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 
 	if (SUCCEED == DBlld_graph_exists(hostid, graph->graphid, graph->name, graphs))
 	{
-		*error = zbx_strdcatf(*error, "Cannot %s graph [%s]: graph already exists\n",
+		*error = zbx_strdcatf(*error, "cannot %s graph [%s]: graph already exists\n",
 				0 != graph->graphid ? "update" : "create", graph->name);
 		res = FAIL;
 		goto out;
@@ -3335,6 +3337,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 		for (i = 0; i < graph->gitems_num; i++)
 		{
 			gitem = &graph->gitems[i];
+
 			if (0 != (ZBX_FLAG_DISCOVERY_CHILD & gitem->flags))
 			{
 				if (FAIL == (res = DBlld_get_item(hostid, gitem->key, jp_row, &gitem->itemid)))
@@ -3842,7 +3845,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
-		error = zbx_dsprintf(error, "Value should be JSON object");
+		error = zbx_dsprintf(error, "value should be JSON object");
 		goto error;
 	}
 
@@ -3850,7 +3853,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
  *                     ^-------------------------------------------^
  */	if (SUCCEED != zbx_json_brackets_by_name(&jp, discovery_key, &jp_data))
 	{
-		error = zbx_dsprintf(error, "Wrong data in JSON object");
+		error = zbx_dsprintf(error, "wrong data in JSON object");
 		goto error;
 	}
 
@@ -3899,7 +3902,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{
-		zabbix_log(LOG_LEVEL_WARNING,  "parameter [" ZBX_FS_UI64 "][%s] became supported",
+		zabbix_log(LOG_LEVEL_WARNING,  "discovery rule [" ZBX_FS_UI64 "][%s] became supported",
 				discovery_itemid, zbx_host_key_string(discovery_itemid));
 
 		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64,
@@ -3918,15 +3921,15 @@ error:
 
 	DBcommit();
 clean:
-	zbx_free(port_esc);
 	zbx_free(error);
 	zbx_free(db_error);
 	zbx_free(snmpv3_privpassphrase_esc);
 	zbx_free(snmpv3_authpassphrase_esc);
 	zbx_free(snmpv3_securityname_esc);
+	zbx_free(port_esc);
 	zbx_free(snmp_community_esc);
-	zbx_free(discovery_key);
 	zbx_free(filter);
+	zbx_free(discovery_key);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
