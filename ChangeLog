@@ -1,5 +1,6 @@
 Changes for 1.8.9rc1
 
+ - [ZBX-3402] disables "store value" overriding for host items inherited from templates (pavels)
  - [ZBX-4201] fixed template items included in bar reports (Vedmak)
  - [ZBX-4178] fixed compilation on FreeBSD: union has no member named `sival_int' (asaveljevs)
  - [ZBX-4241] added truncation of "ids" table to the database conversion procedure (asaveljevs)
