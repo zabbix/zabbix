@@ -17,6 +17,7 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-4283] fixed template creation being reported as an update (Richlv)
  - [ZBX-3749] escapes HTML entities in the web step "required" field (pavels)
  - [ZBX-3892] added support for low-level discovery template to action condition check (dimir)
  - [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (Vedmak)
