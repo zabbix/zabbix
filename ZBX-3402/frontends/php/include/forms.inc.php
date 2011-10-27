@@ -1946,10 +1946,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$mcb->setAttribute('disabled', 'disabled');
 			$mltpbox[] = $mcb;
 
-			$frmItem->addVar('formula', $formula);
-
 			$mltpbox[] = SPACE;
-			$ctb = new CTextBox('formula_name', $formula, 10, 1);
+			$ctb = new CTextBox('formula', $formula, 10, 1);
 			$ctb->setAttribute('style', 'text-align: right;');
 			$mltpbox[] = $ctb;
 		}
@@ -2029,21 +2027,19 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_LOG, 'logtimefmt');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_LOG, 'row_logtimefmt');
 
+		$deltaOptions = array(
+			0 => S_AS_IS,
+			1 => S_DELTA_SPEED_PER_SECOND,
+			2 => S_DELTA_SIMPLE_CHANGE
+		);
 		// delta row
 		if ($limited) {
 			$frmItem->addVar('delta', $delta);
-			$deltaOptions = array(
-				0 => S_AS_IS,
-				1 => S_DELTA_SPEED_PER_SECOND,
-				2 => S_DELTA_SIMPLE_CHANGE
-			);
 			$cmbDelta = new CTextBox('delta_name', $deltaOptions[$delta], null, 'yes');
 		}
 		else {
-			$cmbDelta= new CComboBox('delta',$delta);
-			$cmbDelta->addItem(0,S_AS_IS);
-			$cmbDelta->addItem(1,S_DELTA_SPEED_PER_SECOND);
-			$cmbDelta->addItem(2,S_DELTA_SIMPLE_CHANGE);
+			$cmbDelta= new CComboBox('delta', $delta);
+			$cmbDelta->addItems($deltaOptions);
 		}
 		$row = new CRow(array(new CCol(S_STORE_VALUE,'form_row_l'), new CCol($cmbDelta,'form_row_r')));
 		$row->setAttribute('id', 'row_delta');
