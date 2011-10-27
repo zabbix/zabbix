@@ -1949,7 +1949,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$frmItem->addVar('formula', $formula);
 
 			$mltpbox[] = SPACE;
-			$ctb = new CTextBox('formula', $formula, 10, 1);
+			$ctb = new CTextBox('formula_name', $formula, 10, 1);
 			$ctb->setAttribute('style', 'text-align: right;');
 			$mltpbox[] = $ctb;
 		}
