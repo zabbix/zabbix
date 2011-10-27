@@ -1342,7 +1342,7 @@ Copt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 
 			// validate data
-			if ($validate){
+			if ($validate) {
 				$fields = array_keys($data);
 				unset($fields[array_search('hosts', $fields)]);
 				self::validate($data, $fields);
@@ -1764,8 +1764,7 @@ Copt::memoryPick();
 	private static function validate(array $host, array $fields = array())
 	{
 		// don't perform field checks if we're udpating only selected fields
-		if (!$fields)
-		{
+		if (!$fields) {
 			$host_db_fields = array(
 				'host' => null,
 				'port' => 0,
@@ -1783,7 +1782,7 @@ Copt::memoryPick();
 				'ipmi_password' => '',
 			);
 
-			if (!check_db_fields($host_db_fields, $host)){
+			if (!check_db_fields($host_db_fields, $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for host [ '.$host['host'].' ]');
 			}
 
@@ -1792,29 +1791,28 @@ Copt::memoryPick();
 			$fields[] = 'groups';
 		}
 
-		if (in_array('host', $fields) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
+		if (in_array('host', $fields) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
 		}
 		// Check if host name isn't longer then 64 chars
-		if (in_array('host', $fields) && zbx_strlen($host['host']) > 64){
+		if (in_array('host', $fields) && zbx_strlen($host['host']) > 64) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_HOST_NAME_MUST_BE_LONGER, 64, $host['host'], zbx_strlen($host['host'])));
 		}
-		if (in_array('dns', $fields) && !empty($host['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $host['dns'])){
+		if (in_array('dns', $fields) && !empty($host['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $host['dns'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for DNS [ '.$host['dns'].' ]');
 		}
 		// check if the DNS name is set
-		if (in_array('dns', $fields) && empty($host['dns']) && !$host['useip']){
+		if (in_array('dns', $fields) && empty($host['dns']) && !$host['useip']) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST_NO_DNS);
 		}
 		// CHECK IF HOSTS HAVE AT LEAST 1 GROUP
-		if (in_array('groups', $fields) && empty($host['groups'])){
+		if (in_array('groups', $fields) && empty($host['groups'])) {
 			$error = (isset($host['host'])) ? sprintf(S_NO_GROUPS_FOR_HOST, $host['host']) : S_NO_GROUPS_FOR_HOSTS;
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		// check if a different host with the same name exists
-		if (isset($host['host']))
-		{
+		if (isset($host['host'])) {
 			$options = array(
 				'filter' => array(
 					'host' => $host['host']),
@@ -1824,12 +1822,12 @@ Copt::memoryPick();
 			);
 			$host_exists = self::get($options);
 			$host_exist = reset($host_exists);
-			if ($host_exist && (!isset($host['hostid']) || $host_exist['hostid'] != $host['hostid'])){
+			if ($host_exist && (!isset($host['hostid']) || $host_exist['hostid'] != $host['hostid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 		}
 
-		if (in_array('host', $fields) && CTemplate::exists(array('host' => $host['host']))){
+		if (in_array('host', $fields) && CTemplate::exists(array('host' => $host['host']))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 		}
 
