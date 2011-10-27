@@ -17,6 +17,7 @@ New features:
  - [ZBX-1357] updated Brazilian Portuguese, Dutch, German, Japanese, Polish, Russian, Slovak and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+ - [ZBX-3749] escapes HTML entities in the web step "required" field (pavels)
  - [ZBX-3892] added support for low-level discovery template to action condition check (dimir)
  - [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (Vedmak)
  - [ZBX-3753] fixed possibility to remove host interface that is in use (Vedmak)
