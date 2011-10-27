@@ -975,7 +975,7 @@ AC_ARG_ENABLE(server,[  --enable-server         Turn on build of Zabbix server],
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-server]) ;;
 esac],
 [server=no])
-AM_CONDITIONAL(SERVER, test x$server = xyes)
+AM_CONDITIONAL(SERVER, test "x$server" = "xyes")
 
 AC_ARG_ENABLE(proxy,[  --enable-proxy          Turn on build of Zabbix proxy],
 [case "${enableval}" in
@@ -984,7 +984,7 @@ AC_ARG_ENABLE(proxy,[  --enable-proxy          Turn on build of Zabbix proxy],
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-proxy]) ;;
 esac],
 [proxy=no])
-AM_CONDITIONAL(PROXY, test x$proxy = xyes)
+AM_CONDITIONAL(PROXY, test "x$proxy" = "xyes")
 
 AC_ARG_ENABLE(agent,[  --enable-agent          Turn on build of Zabbix agent and client utilities],
 [case "${enableval}" in
@@ -993,7 +993,7 @@ AC_ARG_ENABLE(agent,[  --enable-agent          Turn on build of Zabbix agent and
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-agent]) ;;
 esac],
 [agent=no])
-AM_CONDITIONAL(AGENT, test x$agent = xyes)
+AM_CONDITIONAL(AGENT, test "x$agent" = "xyes")
 
 AC_ARG_ENABLE(java,[  --enable-java           Turn on build of Zabbix Java proxy],
 [case "${enableval}" in
@@ -1002,7 +1002,7 @@ AC_ARG_ENABLE(java,[  --enable-java           Turn on build of Zabbix Java proxy
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-java]) ;;
 esac],
 [java=no])
-AM_CONDITIONAL(JAVA, test x$java = xyes)
+AM_CONDITIONAL(JAVA, test "x$java" = "xyes")
 
 AC_ARG_ENABLE(ipv6,[  --enable-ipv6           Turn on support of IPv6],
 [case "${enableval}" in
@@ -1223,7 +1223,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		fi
 	fi
 
-	if test x$have_odbc != xno; then
+	if test "x$have_odbc" != "xno"; then
 
 		ODBC_CFLAGS="${IODBC_CFLAGS} ${UNIXODBC_CFLAGS}"
 		ODBC_LDFLAGS="${IODBC_LDFLAGS} ${UNIXODBC_LDFLAGS}"
@@ -1464,6 +1464,20 @@ esac
 
 AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
 AC_SUBST(ARCH)
+
+dnl *****************************************************************
+dnl *                                                               *
+dnl *                         Other checks                          *
+dnl *                                                               *
+dnl *****************************************************************
+
+dnl Automake 1.8 to 1.9.6 sets mkdir_p macro (lower-cased).
+if test "x${MKDIR_P}" == "x"; then
+        if test "x${mkdir_p}" == "x"; then
+                AC_MSG_ERROR([No suitable "mkdir -p" candidate found.])
+        fi
+        AC_SUBST([MKDIR_P], ${mkdir_p})
+fi
 
 dnl *****************************************************************
 dnl *                                                               *
