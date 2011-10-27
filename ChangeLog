@@ -282,6 +282,9 @@ New features:
 Changes for 1.8.9rc1
 
  - [ZBX-4264] fixed zabbix_agent compilation problem on HP-UX (dimir)
+ - [ZBX-3504] added a text notification in the maps section when no maps are defined (pavels)
+ - [ZBX-3749] escaped HTML entities in the web step "required" field (pavels)
+ - [ZBX-3402] disabled "store value" overriding for host items inherited from templates (pavels)
  - [ZBX-4201] fixed template items included in bar reports (Vedmak)
  - [ZBX-4178] fixed compilation on FreeBSD: union has no member named `sival_int' (asaveljevs)
  - [ZBX-4241] added truncation of "ids" table to the database conversion procedure (asaveljevs)
@@ -291,8 +294,8 @@ Changes for 1.8.9rc1
  - [ZBX-3441] fixed server to not process items that are disabled or removed (dimir,Sasha)
  - [ZBX-4249] fixed trigger wizard "insert macro" action break expression (Vedmak)
  - [ZBX-2490] fixed acknowledge flag for events, acknowledged on a child node (Sasha)
- - [ZBX-3743] fixed no triggers returned when api trigger.get is called with "limit" and "withLastEventUnacknowledged" options (Vedmak)
- - [ZBX-4203] fixed api trigger.update method removes dependencies (Vedmak)
+ - [ZBX-3743] fixed no triggers returned when API trigger.get is called with "limit" and "withLastEventUnacknowledged" options (Vedmak)
+ - [ZBX-4203] fixed API trigger.update method removes dependencies (Vedmak)
  - [ZBX-4232] fixed unclear log messages when checks are temporarily enabled/disabled (dimir)
  - [ZBX-4221] fixed sorting by host in Configuration->Web (Vedmak)
  - [ZBX-4198] fixed items filter when filter by host name with multiple spaces (Vedmak)
