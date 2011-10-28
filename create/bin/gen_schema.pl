@@ -233,7 +233,7 @@ sub process_table
 
 	if ($output{"type"} eq "code")
 	{
-		if($flags eq "")
+		if ($flags eq "")
 		{
 			$flags="0";
 		}
@@ -241,11 +241,11 @@ sub process_table
 		for ($flags)
 		{
 			# do not output ZBX_DATA, remove it
-			s/ZBX_DATA//g;
-			s/[,]+$//g;
-			s/^[,]+//g;
-			s/[,]+/ \| /g;
-			s/^$/0/g;
+			s/ZBX_DATA//;
+			s/,+$//;
+			s/^,+//;
+			s/,+/ \| /g;
+			s/^$/0/;
 		}
 
 		print "\t{\"${table_name}\",\t\"${pkey}\",\t${flags},\n\t\t{\n";
@@ -293,11 +293,11 @@ sub process_field
 		for ($flags)
 		{
 			# do not output ZBX_NODATA, remove it
-			s/ZBX_NODATA//g;
-			s/[,]+$//g;
-			s/^[,]+//g;
-			s/[,]+/ \| /g;
-			s/^$/0/g;
+			s/ZBX_NODATA//;
+			s/,+$//;
+			s/^,+//;
+			s/,+/ \| /g;
+			s/^$/0/;
 		}
 
 		if ($null eq "NOT NULL")
