@@ -29,6 +29,7 @@
 #include "zbxserver.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "zbxalgo.h"
 
 #include "timer.h"
 
@@ -131,19 +132,41 @@ static void	process_time_functions()
 
 	zbx_free(sql);
 
-	for (i = 0; i < tr_num; i++)
+	if (0 < tr_num)
 	{
-		tr_last = &tr[i];
+		zbx_uint64_t    id, ids_num = 0;
 
-		zbx_free(tr_last->error);
-		zbx_free(tr_last->new_error);
-		zbx_free(tr_last->expression);
+		for (i = 0; i < tr_num; i++)
+		{
+			tr_last = &tr[i];
 
-		if (1 != tr_last->add_event)
-			continue;
+			zbx_free(tr_last->error);
+			zbx_free(tr_last->new_error);
+			zbx_free(tr_last->expression);
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-				tr_last->lastchange, tr_last->new_value, 0, 0);
+			if (1 != tr_last->add_event)
+				continue;
+
+			ids_num++;
+		}
+
+		if (0 < ids_num)
+		{
+			id = DBget_maxid_num("events", ids_num);
+
+			for (i = 0; i < tr_num; i++)
+			{
+				tr_last = &tr[i];
+
+				if (1 != tr_last->add_event)
+					continue;
+
+				zabbix_log(LOG_LEVEL_WARNING, "VL %s() id:" ZBX_FS_UI64, __function_name, id);
+
+				process_event(id++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+						tr_last->lastchange, tr_last->new_value, 0, 0);
+			}
+		}
 	}
 
 	DBcommit();
@@ -448,10 +471,11 @@ out:
  ******************************************************************************/
 static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maintenance_to)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	triggerid;
-	int		value_before, value_inside, value_after;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		triggerid;
+	int			value_before, value_inside, value_after, i;
+	zbx_vector_uint64_t	event_ids;
 
 	result = DBselect(
 			"select distinct t.triggerid"
@@ -465,20 +489,12 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 			ITEM_STATUS_ACTIVE,
 			hostid);
 
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(triggerid, row[0]);
+	zbx_vector_uint64_create(&event_ids);
 
-		get_trigger_values(triggerid, maintenance_from, maintenance_to,
-				&value_before, &value_inside, &value_after);
+	TODO!!!!!
 
-		if (value_before == value_inside && value_inside == value_after)
-			continue;
-
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
-				maintenance_to, value_after, 0, 1);
-	}
 	DBfree_result(result);
+	zbx_vector_uint64_destroy(&event_ids);
 }
 
 static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)

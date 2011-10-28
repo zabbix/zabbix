@@ -311,19 +311,23 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* begin..end; is a must in case of ORACLE */
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
 
 	if (0 != tr_num)
 	{
+		zbx_uint64_t	id;
+
+		id = DBget_maxid_num("events", tr_num);
+
 		for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
 		{
 			if (1 != tr_last->add_event)
 				continue;
 
-			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+			process_event(id++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
 					tr_last->lastchange, tr_last->new_value, 0, 0);
 		}
 	}

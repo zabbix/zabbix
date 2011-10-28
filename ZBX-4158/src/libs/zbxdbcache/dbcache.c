@@ -935,23 +935,31 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
-	for (i = 0; i < tr_num; i++)
+	if (0 < tr_num)
 	{
-		tr_last = &tr[i];
+		zbx_uint64_t    id;
 
-		zbx_free(tr_last->error);
-		zbx_free(tr_last->new_error);
-		zbx_free(tr_last->expression);
+		id = DBget_maxid_num("events", tr_num);
 
-		if (0 == tr_last->lastchange)
-			continue;
+		for (i = 0; i < tr_num; i++)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "VL %s(): id:" ZBX_FS_UI64, __function_name, id);
 
-		if (1 != tr_last->add_event)
-			continue;
+			tr_last = &tr[i];
 
-		/* processing event */
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-				tr_last->lastchange, tr_last->new_value, 0, 0);
+			zbx_free(tr_last->error);
+			zbx_free(tr_last->new_error);
+			zbx_free(tr_last->expression);
+
+			if (0 == tr_last->lastchange)
+				continue;
+
+			if (1 != tr_last->add_event)
+				continue;
+
+			process_event(id++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, tr_last->new_value, 0, 0);
+		}
 	}
 clean:
 	zbx_free(tr);
