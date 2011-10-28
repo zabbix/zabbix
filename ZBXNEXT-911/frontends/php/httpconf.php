@@ -61,7 +61,6 @@ $fields = array(
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'del_sel_step' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,	null,		null)
@@ -130,14 +129,7 @@ foreach ($_REQUEST['applications'] as $application) {
 	add2favorites('web.httpconf.applications', $application);
 }
 
-if (isset($_REQUEST['del_sel_step']) && isset($_REQUEST['sel_step']) && is_array($_REQUEST['sel_step'])) {
-	foreach ($_REQUEST['sel_step'] as $sid) {
-		if (isset($_REQUEST['steps'][$sid])) {
-			unset($_REQUEST['steps'][$sid]);
-		}
-	}
-}
-elseif (isset($_REQUEST['new_httpstep'])) {
+if (isset($_REQUEST['new_httpstep'])) {
 	$_REQUEST['steps'] = get_request('steps', array());
 	array_push($_REQUEST['steps'], $_REQUEST['new_httpstep']);
 }

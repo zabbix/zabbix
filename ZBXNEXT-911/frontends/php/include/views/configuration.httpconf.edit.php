@@ -19,6 +19,8 @@
 **/
 ?>
 <?php
+require_once('include/views/js/configuration.httpconf.edit.js.php');
+
 $httpWidget = new CWidget();
 $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'));
 
@@ -104,22 +106,23 @@ $agentComboBox->addItemsInGroup(_('Others'), array(
 $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 // append status to form list
-$httpFormList->addRow(_('Status'), new CCheckBox('status', $this->data['status'] ? (!isset($_REQUEST['httptestid']) ? 1 : 0) : 1, null, 1)); // invert status 0 - enable, 1 - disable
+$httpFormList->addRow(_('Enabled'), new CCheckBox('status', $this->data['status'] ? (!isset($_REQUEST['httptestid']) ? 1 : 0) : 1, null, 1)); // invert status 0 - enable, 1 - disable
 $httpFormList->addRow(_('Variables'), new CTextArea('macros', $this->data['macros'], ZBX_TEXTAREA_STANDARD_SIZE, 5));
 
 /*
  * Step tab
  */
 $httpStepFormList = new CFormList('httpFormList');
-$stepsTable = new CTableInfo();
+$stepsTable = new CTable(_('No steps defined.'), 'formElementTable');
+$stepsTable->setAttribute('style', 'min-width:500px;');
 $stepsTable->setHeader(array(
-	new CCheckBox('all_steps', null, 'checkAll("'.$httpForm->getName().'", "all_steps", "sel_step");'),
 	_('Name'),
 	_('Timeout'),
 	_('URL'),
 	_('Required'),
 	_('Status'),
-	_('Sort')
+	_('Sort'),
+	_('Action')
 ));
 
 if (count($this->data['steps']) > 0) {
@@ -173,22 +176,27 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$url = $step['url'];
 	}
 
-	$stepsTable->addRow(array(
-		new CCheckBox('sel_step[]', null, null, $stepid),
+	$row = new CRow(array(
 		$name,
 		$step['timeout'].SPACE._('sec'),
 		$url,
 		$step['required'],
 		$step['status_codes'],
-		array($up, isset($up) && isset($down) ? SPACE : null, $down)
+		array($up, isset($up) && isset($down) ? SPACE : null, $down),
+		new CButton('remove', _('Remove'), 'javascript: removeHttpStep(\''.$stepid.'\');', 'link_menu')
 	));
+	$row->setAttribute('id', 'steps_'.$stepid);
+	$stepsTable->addRow($row);
 }
-$httpStepFormList->addRow(_('Steps'), array(
-	count($this->data['steps']) > 0 ? array($stepsTable, BR()) : null,
-	new CButton('add_step', _('Add'), 'return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'", 600, 390);', 'link_menu'),
-	SPACE,
-	count($this->data['steps']) > 0 ? new CSubmit('del_sel_step', _('Delete selected'), null, 'link_menu') : null
-));
+
+$httpStepFormList->addRow(
+	_('Steps'),
+	new CDiv(array(
+		$stepsTable,
+		new CButton('add_step', _('Add'), 'return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'", 600, 390);', 'link_menu')
+	),
+	'objectgroup inlineblock border_dotted ui-corner-all')
+);
 
 // append tabs to form
 $httpTab = new CTabView(array('remember' => true));
