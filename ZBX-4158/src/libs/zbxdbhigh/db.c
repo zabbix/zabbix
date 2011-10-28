@@ -1448,9 +1448,6 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 {
-	if (0 == strcmp(tablename, "events"))
-		return DCget_nextid_shared(tablename);
-
 	if (0 == strcmp(tablename, "history_log") ||
 			0 == strcmp(tablename, "history_text") ||
 			0 == strcmp(tablename, "dservices") ||
