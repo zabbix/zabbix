@@ -1446,21 +1446,7 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 	return NULL;
 }
 
-zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
-{
-	if (0 == strcmp(tablename, "history_log") ||
-			0 == strcmp(tablename, "history_text") ||
-			0 == strcmp(tablename, "dservices") ||
-			0 == strcmp(tablename, "dhosts") ||
-			0 == strcmp(tablename, "alerts") ||
-			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host"))
-		return DCget_nextid(tablename, num);
-
-	return DBget_nextid(tablename, num);
-}
-
-zbx_uint64_t	DBget_nextid(const char *tablename, int num)
+static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 {
 	const char	*__function_name = "DBget_nextid";
 	DB_RESULT	result;
@@ -1568,6 +1554,20 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			__function_name, ret2 - num + 1, table->table, table->recid);
 
 	return ret2 - num + 1;
+}
+
+zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
+{
+	if (0 == strcmp(tablename, "history_log") ||
+			0 == strcmp(tablename, "history_text") ||
+			0 == strcmp(tablename, "dservices") ||
+			0 == strcmp(tablename, "dhosts") ||
+			0 == strcmp(tablename, "alerts") ||
+			0 == strcmp(tablename, "escalations") ||
+			0 == strcmp(tablename, "autoreg_host"))
+		return DCget_nextid(tablename, num);
+
+	return DBget_nextid(tablename, num);
 }
 
 void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num)
