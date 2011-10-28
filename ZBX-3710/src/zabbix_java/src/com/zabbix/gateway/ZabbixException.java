@@ -17,34 +17,29 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
-import org.junit.*;
-import static org.junit.Assert.*;
+import java.util.Formatter;
 
-public class IntegerValidatorTest
+class ZabbixException extends Exception
 {
-	@Test
-	public void testCorrectValidation()
+	public ZabbixException(String message)
 	{
-		InputValidator validator = new IntegerValidator(3, 7);
-
-		assertFalse(validator.validate(Integer.valueOf(2)));
-		assertTrue(validator.validate(Integer.valueOf(3)));
-		assertTrue(validator.validate(Integer.valueOf(5)));
-		assertTrue(validator.validate(Integer.valueOf(7)));
-		assertFalse(validator.validate(Integer.valueOf(8)));
+		super(message);
 	}
 
-	@Test
-	public void testMinimumInterval()
+	public ZabbixException(String message, Object... args)
 	{
-		new IntegerValidator(5, 5);
+		this(new Formatter().format(message, args).toString());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testInvalidInterval()
+	public ZabbixException(String message, Throwable cause)
 	{
-		new IntegerValidator(7, 3);
+		super(message, cause);
+	}
+
+	public ZabbixException(Throwable cause)
+	{
+		super(cause);
 	}
 }
