@@ -217,7 +217,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$new_opcondition = $_REQUEST['new_opcondition'];
 
 		try {
-			CAction::validateOperationConditions($new_condition);
+			CAction::validateOperationConditions($new_opcondition);
 			$new_operation = get_request('new_operation', array());
 
 			if (!isset($new_operation['opconditions'])) {
