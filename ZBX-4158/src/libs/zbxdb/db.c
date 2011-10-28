@@ -24,7 +24,7 @@
 #include "log.h"
 
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
-static int	txn_init = 0;
+static int	txn_init = 0;	/* connecting to db */
 static int	txn_error = 0;	/* failed transaction */
 
 #if defined(HAVE_IBM_DB2)
