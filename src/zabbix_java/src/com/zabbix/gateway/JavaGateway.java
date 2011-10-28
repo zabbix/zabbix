@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -26,9 +26,9 @@ import java.util.concurrent.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JavaProxy
+public class JavaGateway
 {
-	private static final Logger logger = LoggerFactory.getLogger(JavaProxy.class);
+	private static final Logger logger = LoggerFactory.getLogger(JavaGateway.class);
 
 	public static void main(String[] args)
 	{
@@ -43,13 +43,13 @@ public class JavaProxy
 			System.exit(1);
 		}
 
-		logger.info("Zabbix Java Proxy {} (revision {}) has started", GeneralInformation.VERSION, GeneralInformation.REVISION);
+		logger.info("Zabbix Java Gateway {} (revision {}) has started", GeneralInformation.VERSION, GeneralInformation.REVISION);
 
 		Thread shutdownHook = new Thread()
 		{
 			public void run()
 			{
-				logger.info("Zabbix Java Proxy {} (revision {}) has stopped", GeneralInformation.VERSION, GeneralInformation.REVISION);
+				logger.info("Zabbix Java Gateway {} (revision {}) has stopped", GeneralInformation.VERSION, GeneralInformation.REVISION);
 			}
 		};
 

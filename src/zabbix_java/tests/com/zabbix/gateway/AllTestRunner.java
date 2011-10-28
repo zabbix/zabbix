@@ -17,9 +17,21 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
-interface PostInputValidator
+public class AllTestRunner
 {
-	public void execute(Object value);
+	public static void main(String[] args)
+	{
+		String[] testClasses = new String[]
+		{
+			"IntegerValidatorTest",
+			"ZabbixItemTest"
+		};
+
+		for (int i = 0; i < testClasses.length; i++)
+			testClasses[i] = ConfigurationManager.getPackage() + "." + testClasses[i];
+
+		org.junit.runner.JUnitCore.main(testClasses);
+	}
 }
