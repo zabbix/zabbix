@@ -24,18 +24,18 @@ cat > data.tmpl.new <<EOL
 
 EOL
 
-for table in `grep TABLE schema.tmpl|grep ZBX_DATA|awk -F'|' '{print $2}'`; do
+for table in `grep TABLE schema.tmpl | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
 	echo "TABLE |$table" >> data.tmpl.new
 	fields=""
 	# get list of all fields
 	for i in `seq 1 1000`; do
-		line=`grep -v ZBX_NODATA schema.tmpl|grep -A $i "TABLE|$table|"|tail -1|grep FIELD`
+		line=`grep -v ZBX_NODATA schema.tmpl | grep -A $i "TABLE|$table|" | tail -1 | grep FIELD`
 		[ -z "$line" ] && break
-		field=`echo $line|awk -F'|' '{print $2}'`
+		field=`echo $line | awk -F'|' '{print $2}'`
 		fields="$fields,$field"
 	done
 	# remove first comma
-	fields=`echo $fields|cut -c2-`
+	fields=`echo $fields | cut -c2-`
 	echo "select $fields from $table" | mysql -t -uroot $dbname | grep -v '^+' | sed -e 's/ | /|/g' -e '1,1s/^| /FIELDS|/g' -e '2,$s/^| /ROW   |/g' -e 's/ |$/|/g' >> data.tmpl.new
 	echo "" >> data.tmpl.new
 done

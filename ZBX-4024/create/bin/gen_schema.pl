@@ -21,7 +21,7 @@ use utf8;
 use Switch;
 use File::Basename;
 
-$file = dirname($0)."/../src/schema.tmpl";	# Name the file
+$file = dirname($0)."/../src/schema.tmpl";	# name the file
 
 local $state;
 local $output;
@@ -33,54 +33,29 @@ local $fkeys, $fkeys_prefix, $fkeys_suffix;
 local $fkeys_drop;
 local $uniq;
 
-%mysql=(
-	"database"	=>	"mysql",
-	"type"		=>	"sql",
-	"before"	=>	"",
-	"after"		=>	"",
-	"table_options"	=>	" ENGINE=InnoDB",
-	"t_bigint"	=>	"bigint unsigned",
-	"t_id"		=>	"bigint unsigned",
-	"t_integer"	=>	"integer",
-	"t_time"	=>	"integer",
-	"t_nanosec"	=>	"integer",
-# It does not work for MySQL 3.x and <4.x (4.11?)
-#	"t_serial"	=>	"serial",
-	"t_serial"	=>	"bigint unsigned",
-	"t_double"	=>	"double(16,4)",
-	"t_varchar"	=>	"varchar",
-	"t_char"	=>	"char",
-	"t_image"	=>	"longblob",
-	"t_history_log"	=>	"text",
-	"t_history_text"=>	"text",
-	"t_blob"	=>	"blob",
-	"t_text"	=>	"text",
-	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"
-);
-
-%c=(	"type"		=>	"code",
+%c = (
+	"type"		=>	"code",
 	"database"	=>	"",
 	"after"		=>	"\t{0}\n};\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
-	"t_id"		=>	"ZBX_TYPE_ID",
-	"t_integer"	=>	"ZBX_TYPE_INT",
-	"t_time"	=>	"ZBX_TYPE_INT",
-	"t_nanosec"	=>	"ZBX_TYPE_INT",
-	"t_serial"	=>	"ZBX_TYPE_UINT",
-	"t_double"	=>	"ZBX_TYPE_FLOAT",
-	"t_varchar"	=>	"ZBX_TYPE_CHAR",
+	"t_blob"	=>	"ZBX_TYPE_BLOB",
 	"t_char"	=>	"ZBX_TYPE_CHAR",
-	"t_image"	=>	"ZBX_TYPE_BLOB",
+	"t_cksum_text"	=>	"ZBX_TYPE_TEXT",
+	"t_double"	=>	"ZBX_TYPE_FLOAT",
 	"t_history_log"	=>	"ZBX_TYPE_TEXT",
 	"t_history_text"=>	"ZBX_TYPE_TEXT",
-	"t_blob"	=>	"ZBX_TYPE_BLOB",
-	"t_text"	=>	"ZBX_TYPE_TEXT",
+	"t_id"		=>	"ZBX_TYPE_ID",
+	"t_image"	=>	"ZBX_TYPE_BLOB",
+	"t_integer"	=>	"ZBX_TYPE_INT",
 	"t_item_param"	=>	"ZBX_TYPE_TEXT",
-	"t_cksum_text"	=>	"ZBX_TYPE_TEXT"
+	"t_nanosec"	=>	"ZBX_TYPE_INT",
+	"t_serial"	=>	"ZBX_TYPE_UINT",
+	"t_text"	=>	"ZBX_TYPE_TEXT",
+	"t_time"	=>	"ZBX_TYPE_INT",
+	"t_varchar"	=>	"ZBX_TYPE_CHAR"
 );
 
-$c{"before"}="/*
+$c{"before"} = "/*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
 **
@@ -102,97 +77,124 @@ $c{"before"}="/*
 #include \"common.h\"
 #include \"dbschema.h\"
 
-const ZBX_TABLE	tables[]={
+const ZBX_TABLE\ttables[] = {
 ";
 
-%oracle=("t_bigint"	=>	"number(20)",
-	"database"	=>	"oracle",
-	"before"	=>	"",
-	"after"		=>	"",
+%ibm_db2 = (
 	"type"		=>	"sql",
-	"t_id"		=>	"number(20)",
-	"t_integer"	=>	"number(10)",
-	"t_time"	=>	"number(10)",
-	"t_nanosec"	=>	"number(10)",
-	"t_serial"	=>	"number(20)",
-	"t_double"	=>	"number(20,4)",
-	"t_varchar"	=>	"nvarchar2",
-	"t_char"	=>	"nvarchar2",
-	"t_image"	=>	"blob",
-	"t_history_log"	=>	"nclob",
-	"t_history_text"=>	"nclob",
-	"t_blob"	=>	"nvarchar2(2048)",
-	"t_text"	=>	"nclob",
-	"t_item_param"	=>	"nvarchar2(2048)",
-	"t_cksum_text"	=>	"nclob"
-);
-
-%ibm_db2=("t_bigint"	=>	"bigint",
 	"database"	=>	"ibm_db2",
 	"before"	=>	"",
 	"after"		=>	"",
-	"type"		=>	"sql",
 	"t_bigint"	=>	"bigint",
-	"t_id"		=>	"bigint",
-	"t_integer"	=>	"integer",
-	"t_serial"	=>	"bigint",
-	"t_double"	=>	"decfloat(16)",
-	"t_varchar"	=>	"varchar",
+	"t_blob"	=>	"varchar(2048)",
 	"t_char"	=>	"varchar",
-	"t_image"	=>	"blob",
+	"t_cksum_text"	=>	"varchar(2048)",
+	"t_double"	=>	"decfloat(16)",
 	"t_history_log"	=>	"varchar(2048)",
 	"t_history_text"=>	"varchar(2048)",
-	"t_time"	=>	"integer",
-	"t_nanosec"	=>	"integer",
-	"t_blob"	=>	"varchar(2048)",
-	"t_text"	=>	"varchar(2048)",
+	"t_id"		=>	"bigint",
+	"t_image"	=>	"blob",
+	"t_integer"	=>	"integer",
 	"t_item_param"	=>	"varchar(2048)",
-	"t_cksum_text"	=>	"varchar(2048)"
+	"t_nanosec"	=>	"integer",
+	"t_serial"	=>	"bigint",
+	"t_text"	=>	"varchar(2048)",
+	"t_time"	=>	"integer",
+	"t_varchar"	=>	"varchar"
 );
 
-%postgresql=("t_bigint"	=>	"numeric(20)",
+%mysql = (
+	"type"		=>	"sql",
+	"database"	=>	"mysql",
+	"before"	=>	"",
+	"after"		=>	"",
+	"table_options"	=>	" ENGINE=InnoDB",
+	"t_bigint"	=>	"bigint unsigned",
+	"t_blob"	=>	"blob",
+	"t_char"	=>	"char",
+	"t_cksum_text"	=>	"text",
+	"t_double"	=>	"double(16,4)",
+	"t_history_log"	=>	"text",
+	"t_history_text"=>	"text",
+	"t_id"		=>	"bigint unsigned",
+	"t_image"	=>	"longblob",
+	"t_integer"	=>	"integer",
+	"t_item_param"	=>	"text",
+	"t_nanosec"	=>	"integer",
+	"t_serial"	=>	"bigint unsigned",
+	"t_text"	=>	"text",
+	"t_time"	=>	"integer",
+	"t_varchar"	=>	"varchar"
+);
+
+%oracle = (
+	"type"		=>	"sql",
+	"database"	=>	"oracle",
+	"before"	=>	"",
+	"after"		=>	"",
+	"t_bigint"	=>	"number(20)",
+	"t_blob"	=>	"nvarchar2(2048)",
+	"t_char"	=>	"nvarchar2",
+	"t_cksum_text"	=>	"nclob",
+	"t_double"	=>	"number(20,4)",
+	"t_history_log"	=>	"nclob",
+	"t_history_text"=>	"nclob",
+	"t_id"		=>	"number(20)",
+	"t_image"	=>	"blob",
+	"t_integer"	=>	"number(10)",
+	"t_item_param"	=>	"nvarchar2(2048)",
+	"t_nanosec"	=>	"number(10)",
+	"t_serial"	=>	"number(20)",
+	"t_text"	=>	"nclob",
+	"t_time"	=>	"number(10)",
+	"t_varchar"	=>	"nvarchar2"
+);
+
+%postgresql = (
+	"type"		=>	"sql",
 	"database"	=>	"postgresql",
 	"before"	=>	"",
 	"after"		=>	"",
-	"type"		=>	"sql",
 	"table_options"	=>	" with OIDS",
-	"t_id"		=>	"bigint",
-	"t_integer"	=>	"integer",
-	"t_serial"	=>	"serial",
-	"t_double"	=>	"numeric(16,4)",
-	"t_varchar"	=>	"varchar",
+	"t_bigint"	=>	"numeric(20)",
+	"t_blob"	=>	"text",
 	"t_char"	=>	"char",
-	"t_image"	=>	"bytea",
+	"t_cksum_text"	=>	"text",
+	"t_double"	=>	"numeric(16,4)",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
-	"t_time"	=>	"integer",
-	"t_nanosec"	=>	"integer",
-	"t_blob"	=>	"text",
-	"t_text"	=>	"text",
+	"t_id"		=>	"bigint",
+	"t_image"	=>	"bytea",
+	"t_integer"	=>	"integer",
 	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"
+	"t_nanosec"	=>	"integer",
+	"t_serial"	=>	"serial",
+	"t_text"	=>	"text",
+	"t_time"	=>	"integer",
+	"t_varchar"	=>	"varchar"
 );
 
-%sqlite3=("t_bigint"	=>	"bigint",
+%sqlite3 = (
+	"type"		=>	"sql",
 	"database"	=>	"sqlite3",
 	"before"	=>	"",
 	"after"		=>	"",
-	"type"		=>	"sql",
-	"t_id"		=>	"bigint",
-	"t_integer"	=>	"integer",
-	"t_time"	=>	"integer",
-	"t_nanosec"	=>	"integer",
-	"t_serial"	=>	"integer",
-	"t_double"	=>	"double(16,4)",
-	"t_varchar"	=>	"varchar",
+	"t_bigint"	=>	"bigint",
+	"t_blob"	=>	"blob",
 	"t_char"	=>	"char",
-	"t_image"	=>	"longblob",
+	"t_cksum_text"	=>	"text",
+	"t_double"	=>	"double(16,4)",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
-	"t_blob"	=>	"blob",
-	"t_text"	=>	"text",
+	"t_id"		=>	"bigint",
+	"t_image"	=>	"longblob",
+	"t_integer"	=>	"integer",
 	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"
+	"t_nanosec"	=>	"integer",
+	"t_serial"	=>	"integer",
+	"t_text"	=>	"text",
+	"t_time"	=>	"integer",
+	"t_varchar"	=>	"varchar"
 );
 
 sub rtrim($)
@@ -261,7 +263,7 @@ sub process_table
 
 sub process_field
 {
-	local $line=$_[0];
+	local $line = $_[0];
 
 	newstate("field");
 
@@ -352,10 +354,12 @@ sub process_field
 
 		if ($default ne "")
 		{
-			if ($output{"database"} eq "ibm_db2"){
+			if ($output{"database"} eq "ibm_db2")
+			{
 				$default = "WITH DEFAULT $default";
 			}
-			else{
+			else
+			{
 				$default = "DEFAULT $default";
 			}
 		}
@@ -370,9 +374,12 @@ sub process_field
 			}
 		}
 
-		if($output{"database"} eq "ibm_db2"){
+		if ($output{"database"} eq "ibm_db2")
+		{
 			@text_fields = ('blob');
-			if(grep /$output{$type_short}/, @text_fields){
+
+			if (grep /$output{$type_short}/, @text_fields)
+			{
 				$default="";
 			}
 		}
@@ -412,7 +419,7 @@ sub process_field
 				$sequences = "${sequences}SELECT ${table_name}_seq.nextval INTO :new.id FROM dual;${eol}\n";
 				$sequences = "${sequences}END;${eol}\n/${eol}\n";
 			}
-			elsif($output{"database"} eq "ibm_db2")
+			elsif ($output{"database"} eq "ibm_db2")
 			{
 				$row="$row\tGENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)";
 			}
@@ -504,8 +511,8 @@ sub process_index
 
 sub usage
 {
-	printf "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite3]\n";
-	printf "The script generates Zabbix SQL schemas and C code for different database engines.\n";
+	print "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite3]\n";
+	print "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
 
@@ -596,27 +603,27 @@ sub main
 		$szcol3 = 0;
 		$szcol4 = 0;
 		$sql_suffix="\";\n";
-		$fkeys_prefix = "const char *const db_schema_fkeys[] = {\n";
+		$fkeys_prefix = "const char\t*const db_schema_fkeys[] = {\n";
 		$fkeys_suffix = "\tNULL\n};\n";
-		$fkeys_drop_prefix = "const char *const db_schema_fkeys_drop[] = {\n";
+		$fkeys_drop_prefix = "const char\t*const db_schema_fkeys_drop[] = {\n";
 
-		print "\n#ifdef HAVE_MYSQL\nconst char *const db_schema= \"\\\n";
-		%output = %mysql;
-		process();
-		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif HAVE_ORACLE\nconst char *const db_schema= \"\\\n";
-		%output = %oracle;
-		process();
-		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif HAVE_IBM_DB2\nconst char *const db_schema= \"\\\n";
+		print "\n#if defined(HAVE_IBM_DB2)\nconst char\t*const db_schema = \"\\\n";
 		%output = %ibm_db2;
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif HAVE_POSTGRESQL\nconst char *const db_schema= \"\\\n";
+		print "#elif defined(HAVE_MYSQL)\nconst char\t*const db_schema = \"\\\n";
+		%output = %mysql;
+		process();
+		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
+		print "#elif defined(HAVE_ORACLE)\nconst char\t*const db_schema = \"\\\n";
+		%output = %oracle;
+		process();
+		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
+		print "#elif defined(HAVE_POSTGRESQL)\nconst char\t*const db_schema = \"\\\n";
 		%output = %postgresql;
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
-		print "#elif HAVE_SQLITE3\nconst char *const db_schema= \"\\\n";
+		print "#elif defined(HAVE_SQLITE3)\nconst char\t*const db_schema = \"\\\n";
 		%output = %sqlite3;
 		process();
 		print $fkeys_drop_prefix.$fkeys_drop.$fkeys_suffix;
