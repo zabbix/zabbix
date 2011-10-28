@@ -1746,13 +1746,14 @@ Copt::memoryPick();
 	 * @since 1.8
 	 * @version 1
 	 *
+	 * @throws APIException if validation fails
+	 *
 	 * @param array $host The host expression to validate
 	 * @param array $fields An array of field names to be validated
 	 *
 	 * @return boolean
 	 */
-	private static function validate(array $host, array $fields = array())
-	{
+	private static function validate(array $host, array $fields = array()) {
 		// don't perform field checks if we're udpating only selected fields
 		if (!$fields) {
 			$host_db_fields = array(
@@ -1769,7 +1770,7 @@ Copt::memoryPick();
 				'ipmi_authtype' => 0,
 				'ipmi_privilege' => 0,
 				'ipmi_username' => '',
-				'ipmi_password' => '',
+				'ipmi_password' => ''
 			);
 
 			if (!check_db_fields($host_db_fields, $host)) {
@@ -1779,17 +1780,6 @@ Copt::memoryPick();
 			// validate all fields
 			$fields = array_keys($host_db_fields);
 			$fields[] = 'groups';
-		}
-
-		// host
-		if (in_array('host', $fields)) {
-			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
-			}
-			// Check if host name isn't longer then 64 chars
-			if (zbx_strlen($host['host']) > 64) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_HOST_NAME_MUST_BE_LONGER, 64, $host['host'], zbx_strlen($host['host'])));
-			}
 		}
 
 		// dns
@@ -1808,25 +1798,29 @@ Copt::memoryPick();
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		// host
 		if (in_array('host', $fields)) {
-			// check if a different host with the same name exists
-			if (isset($host['host'])) {
-				$options = array(
-					'filter' => array(
-						'host' => $host['host']),
-					'output' => API_OUTPUT_SHORTEN,
-					'editable' => 1,
-					'nopermissions' => 1
-				);
-				$host_exists = self::get($options);
-				$host_exist = reset($host_exists);
-				if ($host_exist && (!isset($host['hostid']) || $host_exist['hostid'] != $host['hostid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
+			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $host['host'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
 			}
-
+			// Check if host name isn't longer then 64 chars
+			if (zbx_strlen($host['host']) > 64) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf(S_HOST_NAME_MUST_BE_LONGER, 64, $host['host'], zbx_strlen($host['host'])));
+			}
 			if (CTemplate::exists(array('host' => $host['host']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+			}
+			// check if a different host with the same name exists
+			$options = array(
+				'filter' => array(
+					'host' => $host['host']),
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => true
+			);
+			$host_exists = self::get($options);
+			$host_exist = reset($host_exists);
+			if ($host_exist && (!isset($host['hostid']) || $host_exist['hostid'] != $host['hostid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 		}
 
