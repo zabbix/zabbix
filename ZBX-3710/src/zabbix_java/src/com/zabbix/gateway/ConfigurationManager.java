@@ -105,6 +105,6 @@ class ConfigurationManager
 
 	public static String getPackage()
 	{
-		return "com.zabbix.gateway;
+		return "com.zabbix.gateway";
 	}
 }
