@@ -1266,11 +1266,12 @@ COpt::memoryPick();
 				continue;
 			}
 
+			$expressionChanged = true;
 			if ($update) {
 				if (isset($trigger['expression'])) {
 					$expression_full = explode_exp($dbTrigger['expression']);
 					if (strcmp($trigger['expression'], $expression_full) == 0) {
-						unset($trigger['expression']);
+						$expressionChanged = false;
 					}
 				}
 
@@ -1302,7 +1303,7 @@ COpt::memoryPick();
 			// if some of the properties are unchanged, no need to update them in DB
 
 			// validating trigger expression
-			if (isset($trigger['expression'])) {
+			if (isset($trigger['expression']) && $expressionChanged) {
 				// expression permissions
 				$expressionData = new CTriggerExpression($trigger);
 				if (!empty($expressionData->errors)) {
