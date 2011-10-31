@@ -3062,12 +3062,8 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid,
-		struct zbx_json_parse *jp_data, char **error, const char *f_macro,
-		const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
-		const char *snmp_community_esc, const char *port_esc,
-		const char *snmpv3_securityname_esc, unsigned char snmpv3_securitylevel,
-		const char *snmpv3_authpassphrase_esc, const char *snmpv3_privpassphrase_esc,
+static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, struct zbx_json_parse *jp_data,
+		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
 		zbx_uint64_t interfaceid)
 {
 	const char		*__function_name = "DBlld_update_items";
@@ -3087,8 +3083,10 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 	result = DBselect(
 			"select i.itemid,i.name,i.key_,i.type,i.value_type,i.data_type,i.delay,i.delay_flex,"
 				"i.history,i.trends,i.status,i.trapper_hosts,i.units,i.multiplier,i.delta,i.formula,"
-				"i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_oid,i.authtype,i.username,"
-				"i.password,i.publickey,i.privatekey,i.description"
+				"i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_community,i.snmp_oid,"
+				"i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,"
+				"i.snmpv3_privpassphrase,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
+				"i.description"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and i.hostid=" ZBX_FS_UI64
@@ -3099,10 +3097,11 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 	{
 		zbx_uint64_t	parent_itemid, valuemapid;
 		char		*key_proto_esc, *delay_flex_esc, *trapper_hosts_esc, *units_esc, *formula_esc,
-				*logtimefmt_esc, *ipmi_sensor_esc, *username_esc, *password_esc, *publickey_esc,
-				*privatekey_esc, *description_esc;
+				*logtimefmt_esc, *ipmi_sensor_esc, *snmp_community_esc, *port_esc,
+				*snmpv3_securityname_esc, *snmpv3_authpassphrase_esc, *snmpv3_privpassphrase_esc,
+				*username_esc, *password_esc, *publickey_esc, *privatekey_esc, *description_esc;
 		const char	*name_proto, *key_proto, *params_proto, *snmp_oid_proto;
-		unsigned char	type, value_type, data_type, status, authtype;
+		unsigned char	type, value_type, data_type, status, snmpv3_securitylevel, authtype;
 		int		delay, history, trends, multiplier, delta;
 
 		ZBX_STR2UINT64(parent_itemid, row[0]);
@@ -3126,13 +3125,19 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		ZBX_DBROW2UINT64(valuemapid, row[17]);
 		params_proto = row[18];
 		ipmi_sensor_esc = DBdyn_escape_string(row[19]);
-		snmp_oid_proto = row[20];
-		authtype = (unsigned char)atoi(row[21]);
-		username_esc = DBdyn_escape_string(row[22]);
-		password_esc = DBdyn_escape_string(row[23]);
-		publickey_esc = DBdyn_escape_string(row[24]);
-		privatekey_esc = DBdyn_escape_string(row[25]);
-		description_esc = DBdyn_escape_string(row[26]);
+		snmp_community_esc = DBdyn_escape_string(row[20]);
+		snmp_oid_proto = row[21];
+		port_esc = DBdyn_escape_string(row[22]);
+		snmpv3_securityname_esc = DBdyn_escape_string(row[23]);
+		snmpv3_securitylevel = (unsigned char)atoi(row[24]);
+		snmpv3_authpassphrase_esc = DBdyn_escape_string(row[25]);
+		snmpv3_privpassphrase_esc = DBdyn_escape_string(row[26]);
+		authtype = (unsigned char)atoi(row[27]);
+		username_esc = DBdyn_escape_string(row[28]);
+		password_esc = DBdyn_escape_string(row[29]);
+		publickey_esc = DBdyn_escape_string(row[30]);
+		privatekey_esc = DBdyn_escape_string(row[31]);
+		description_esc = DBdyn_escape_string(row[32]);
 
 		p = NULL;
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
@@ -3165,6 +3170,11 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		zbx_free(publickey_esc);
 		zbx_free(password_esc);
 		zbx_free(username_esc);
+		zbx_free(snmpv3_privpassphrase_esc);
+		zbx_free(snmpv3_authpassphrase_esc);
+		zbx_free(snmpv3_securityname_esc);
+		zbx_free(port_esc);
+		zbx_free(snmp_community_esc);
 		zbx_free(ipmi_sensor_esc);
 		zbx_free(logtimefmt_esc);
 		zbx_free(formula_esc);
@@ -3798,11 +3808,8 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 	DB_ROW			row;
 	zbx_uint64_t		hostid = 0, interfaceid = 0;
 	struct zbx_json_parse	jp, jp_data;
-	char			*snmp_community_esc = NULL, *snmpv3_securityname_esc = NULL,
-				*snmpv3_authpassphrase_esc = NULL, *snmpv3_privpassphrase_esc = NULL,
-				*discovery_key = NULL, *filter = NULL, *error = NULL, *db_error = NULL,
-				*error_esc, *port_esc = NULL;
-	unsigned char		status = 0, snmpv3_securitylevel = 0;
+	char			*discovery_key = NULL, *filter = NULL, *error = NULL, *db_error = NULL, *error_esc;
+	unsigned char		status = 0;
 	char			*f_macro = NULL, *f_regexp = NULL;
 	ZBX_REGEXP		*regexps = NULL;
 	int			regexps_alloc = 0, regexps_num = 0;
@@ -3810,9 +3817,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, discovery_itemid);
 
 	result = DBselect(
-			"select hostid,key_,status,filter,snmp_community,port,snmpv3_securityname,"
-				"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,error,"
-				"interfaceid"
+			"select hostid,key_,status,filter,error,interfaceid"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			discovery_itemid);
@@ -3823,14 +3828,8 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 		discovery_key = zbx_strdup(discovery_key, row[1]);
 		status = (unsigned char)atoi(row[2]);
 		filter = zbx_strdup(filter, row[3]);
-		snmp_community_esc = DBdyn_escape_string(row[4]);
-		port_esc = DBdyn_escape_string(row[5]);
-		snmpv3_securityname_esc = DBdyn_escape_string(row[6]);
-		snmpv3_securitylevel = (unsigned char)atoi(row[7]);
-		snmpv3_authpassphrase_esc = DBdyn_escape_string(row[8]);
-		snmpv3_privpassphrase_esc = DBdyn_escape_string(row[9]);
-		db_error = zbx_strdup(db_error, row[10]);
-		ZBX_DBROW2UINT64(interfaceid, row[11]);
+		db_error = zbx_strdup(db_error, row[4]);
+		ZBX_DBROW2UINT64(interfaceid, row[5]);
 	}
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
@@ -3889,14 +3888,9 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 	}
 
 	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error,
-			f_macro, f_regexp, regexps, regexps_num,
-			snmp_community_esc, port_esc, snmpv3_securityname_esc,
-			snmpv3_securitylevel, snmpv3_authpassphrase_esc,
-			snmpv3_privpassphrase_esc, interfaceid);
-	DBlld_update_triggers(hostid, discovery_itemid, &jp_data, &error,
-			f_macro, f_regexp, regexps, regexps_num);
-	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error,
-			f_macro, f_regexp, regexps, regexps_num);
+			f_macro, f_regexp, regexps, regexps_num, interfaceid);
+	DBlld_update_triggers(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
+	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 
 	zbx_free(regexps);
 
@@ -3905,16 +3899,14 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 		zabbix_log(LOG_LEVEL_WARNING,  "discovery rule [" ZBX_FS_UI64 "][%s] became supported",
 				discovery_itemid, zbx_host_key_string(discovery_itemid));
 
-		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64,
-				ITEM_STATUS_ACTIVE, discovery_itemid);
+		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64, ITEM_STATUS_ACTIVE, discovery_itemid);
 	}
 error:
 	if (NULL != error && 0 != strcmp(error, db_error))
 	{
 		error_esc = DBdyn_escape_string_len(error, ITEM_ERROR_LEN);
 
-		DBexecute("update items set error='%s' where itemid=" ZBX_FS_UI64,
-				error_esc, discovery_itemid);
+		DBexecute("update items set error='%s' where itemid=" ZBX_FS_UI64, error_esc, discovery_itemid);
 
 		zbx_free(error_esc);
 	}
@@ -3923,11 +3915,6 @@ error:
 clean:
 	zbx_free(error);
 	zbx_free(db_error);
-	zbx_free(snmpv3_privpassphrase_esc);
-	zbx_free(snmpv3_authpassphrase_esc);
-	zbx_free(snmpv3_securityname_esc);
-	zbx_free(port_esc);
-	zbx_free(snmp_community_esc);
 	zbx_free(filter);
 	zbx_free(discovery_key);
 
