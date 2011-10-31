@@ -1882,7 +1882,7 @@ COpt::memoryPick();
 		foreach($triggers as $trigger){
 			if(!isset($trigger['dependencies']) || empty($trigger['dependencies'])) continue;
 
-// check circelar dependency {{{
+// check circular dependency {{{
 			$triggerid_down = $trigger['dependencies'];
 			do{
 				$sql = 'SELECT triggerid_up '.
@@ -1892,13 +1892,13 @@ COpt::memoryPick();
 				$up_triggerids = array();
 				while($up_trigger = DBfetch($db_up_triggers)){
 					if(bccomp($up_trigger['triggerid_up'],$trigger['triggerid']) == 0){
-						self::exception(ZBX_API_ERROR_PARAMETESRS, S_INCORRECT_DEPENDENCY);
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_DEPENDENCY);
 					}
 					$up_triggerids[] = $up_trigger['triggerid_up'];
 				}
 				$triggerid_down = $up_triggerids;
 			} while(!empty($up_triggerids));
-// }}} check circelar dependency
+// }}} check circular dependency
 
 
 			$templates = array();
