@@ -180,7 +180,7 @@ abstract class CItemGeneral extends CZBXAPI{
 
 			$itemInterfaceType = self::itemTypeInterface($fullItem['type']);
 			if ($itemInterfaceType !== false && $dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE
-				&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD
+				&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD && $item['interfaceid']
 			) {
 				if (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
