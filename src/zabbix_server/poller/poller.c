@@ -542,7 +542,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		case ITEM_TYPE_JMX:
 			alarm(CONFIG_TIMEOUT);
-			res = get_value_java(ZBX_JAVA_PROXY_REQUEST_JMX, item, result);
+			res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, item, result);
 			alarm(0);
 			break;
 		case ITEM_TYPE_CALCULATED:
@@ -721,7 +721,7 @@ static int	get_values(unsigned char poller_type)
 		else if (ZBX_POLLER_TYPE_JAVA == poller_type)
 		{
 			alarm(CONFIG_TIMEOUT);
-			get_values_java(ZBX_JAVA_PROXY_REQUEST_JMX, items, results, errcodes, timespecs, num);
+			get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, timespecs, num);
 			alarm(0);
 		}
 	}

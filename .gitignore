@@ -186,7 +186,7 @@ src/zabbix_get/zabbix_get
 src/zabbix_java/.deps
 src/zabbix_java/Makefile
 src/zabbix_java/Makefile.in
-src/zabbix_java/bin/zabbix-java-proxy-*.jar
+src/zabbix_java/bin/zabbix-java-gateway-*.jar
 src/zabbix_java/class
 src/zabbix_proxy/.deps
 src/zabbix_proxy/Makefile
