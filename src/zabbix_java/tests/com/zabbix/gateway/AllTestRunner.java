@@ -17,17 +17,21 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
-class GeneralInformation
+public class AllTestRunner
 {
-	public static final String APPLICATION_NAME = "Zabbix Java Proxy";
-	public static final String REVISION_DATE = "27 October 2011";
-	public static final String REVISION = "{ZABBIX_REVISION}";
-	public static final String VERSION = "1.9.8";
-
-	public static void printVersion()
+	public static void main(String[] args)
 	{
-		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
+		String[] testClasses = new String[]
+		{
+			"IntegerValidatorTest",
+			"ZabbixItemTest"
+		};
+
+		for (int i = 0; i < testClasses.length; i++)
+			testClasses[i] = ConfigurationManager.getPackage() + "." + testClasses[i];
+
+		org.junit.runner.JUnitCore.main(testClasses);
 	}
 }

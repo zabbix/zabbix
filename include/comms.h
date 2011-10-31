@@ -123,20 +123,21 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 char    *get_ip_by_socket(zbx_sock_t *s);
 int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empty);
 
-#define ZBX_DEFAULT_FTP_PORT	21
-#define ZBX_DEFAULT_SSH_PORT	22
-#define ZBX_DEFAULT_TELNET_PORT	23
-#define ZBX_DEFAULT_SMTP_PORT	25
-#define ZBX_DEFAULT_DNS_PORT	53
-#define ZBX_DEFAULT_HTTP_PORT	80
-#define ZBX_DEFAULT_POP_PORT	110
-#define ZBX_DEFAULT_NNTP_PORT	119
-#define ZBX_DEFAULT_NTP_PORT	123
-#define ZBX_DEFAULT_IMAP_PORT	143
-#define ZBX_DEFAULT_LDAP_PORT	389
-#define ZBX_DEFAULT_HTTPS_PORT	443
-#define ZBX_DEFAULT_AGENT_PORT	10050
-#define ZBX_DEFAULT_SERVER_PORT	10051
+#define ZBX_DEFAULT_FTP_PORT		21
+#define ZBX_DEFAULT_SSH_PORT		22
+#define ZBX_DEFAULT_TELNET_PORT		23
+#define ZBX_DEFAULT_SMTP_PORT		25
+#define ZBX_DEFAULT_DNS_PORT		53
+#define ZBX_DEFAULT_HTTP_PORT		80
+#define ZBX_DEFAULT_POP_PORT		110
+#define ZBX_DEFAULT_NNTP_PORT		119
+#define ZBX_DEFAULT_NTP_PORT		123
+#define ZBX_DEFAULT_IMAP_PORT		143
+#define ZBX_DEFAULT_LDAP_PORT		389
+#define ZBX_DEFAULT_HTTPS_PORT		443
+#define ZBX_DEFAULT_AGENT_PORT		10050
+#define ZBX_DEFAULT_SERVER_PORT		10051
+#define ZBX_DEFAULT_GATEWAY_PORT	10052
 
 #define ZBX_DEFAULT_AGENT_PORT_STR	"10050"
 #define ZBX_DEFAULT_SERVER_PORT_STR	"10051"
