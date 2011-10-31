@@ -1586,7 +1586,7 @@ COpt::memoryPick();
 				$expressionData = new CTriggerExpression(array('expression' => $expression_full));
 
 				if(!empty($expressionData->errors)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->errors);
+					self::exception(ZBX_API_ERROR_PARAMETERS, reset($expressionData->errors));
 				}
 
 				$host = reset($expressionData->data['hosts']);
@@ -1698,14 +1698,9 @@ COpt::memoryPick();
 			'templated_hosts' => true,
 		));
 
-		foreach($chd_hosts as $chd_host){
+		foreach ($chd_hosts as $chd_host) {
 			$newTrigger = $trigger;
-
-			if(isset($trigger['dependencies']) && !is_null($trigger['dependencies']))
-				$newTrigger['dependencies'] = replace_template_dependencies($trigger['dependencies'], $chd_host['hostid']);
-
 			$newTrigger['templateid'] = $trigger['triggerid'];
-			$newTrigger['expression'] = $trigger['expression'];
 
 			$expressionData = new CTriggerExpression($trigger);
 			// replace template separately in each expression, only in beginning (host part)
@@ -1832,12 +1827,51 @@ COpt::memoryPick();
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'selectDependencies' => true,
 		));
 
 		foreach ($triggers as $trigger) {
 			$trigger['expression'] = explode_exp($trigger['expression']);
 			$this->inherit($trigger, $data['hostids']);
+		}
+
+
+		// Update dependencies, do it after all triggers that can be dependent were created/updated on all child hosts/templates.
+		// Starting from highest level template triggers select triggers from one level lower, then for each lower trigger
+		// look if it's parent has dependencies, if so find this dependency trigger child on dependent trigger host and add new dependency.
+		$parentTriggers = $this->get(array(
+			'hostids' => $data['templateids'],
+			'preservekeys' => true,
+			'output' => array('triggerid', 'templateid'),
+			'selectDependencies' => API_OUTPUT_REFER
+		));
+
+		while (!empty($parentTriggers)) {
+			$childTriggers = $this->get(array(
+				'filter' => array('templateid' => array_keys($parentTriggers)),
+				'nopermissions' => true,
+				'preservekeys' => true,
+				'output' => array('triggerid', 'templateid'),
+				'selectDependencies' => API_OUTPUT_REFER,
+				'selectHosts' => array('host'),
+			));
+
+			foreach ($childTriggers as $childTrigger) {
+				if (!empty($parentTriggers[$childTrigger['templateid']]['dependencies'])) {
+
+					$deps = zbx_objectValues($parentTriggers[$childTrigger['templateid']]['dependencies'], 'triggerid');
+					$host = reset($childTrigger['hosts']);
+					$newDeps = replace_template_dependencies($deps, $host['hostid']);
+
+					DB::delete('trigger_depends', array('triggerid_down' => $childTrigger['triggerid']));
+					foreach ($newDeps as $triggerid_up) {
+						DB::insert('trigger_depends', array(array(
+							'triggerid_down' => $childTrigger['triggerid'],
+							'triggerid_up' => $triggerid_up
+						)));
+					}
+				}
+			}
+			$parentTriggers = $childTriggers;
 		}
 
 		return true;
