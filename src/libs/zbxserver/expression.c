@@ -360,7 +360,8 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 static char 	**extract_numbers(char *str, int *count)
 {
 	char	*s, *e, **result = NULL;
-	int	dot_found, len;
+	int	dot_found;
+	size_t	len;
 
 	assert(count);
 
@@ -496,7 +497,7 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 		case 0:
 			return;
 		case 1:
-			params[0] = '\0';
+			*params = '\0';
 		case 2:
 			/* do nothing */;
 	}
@@ -526,7 +527,7 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 			*n = c;
 			p = n;
 		}
-		else if ('1' <= *(m + 1) && *(m + 1) <= '9' && '\0' != params[0])	/* macros $1, $2, ... */
+		else if ('1' <= *(m + 1) && *(m + 1) <= '9' && '\0' != *params)	/* macros $1, $2, ... */
 		{
 			*m = '\0';
 			str_out = zbx_strdcat(str_out, p);
