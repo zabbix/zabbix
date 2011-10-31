@@ -474,7 +474,8 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	typedef struct {
 		zbx_uint64_t	triggerid;
 		int		value;
-	} zbx_event_data_t;
+	}
+	zbx_event_data_t;
 
 	const char		*__function_name = "generate_events";
 	DB_RESULT		result;
@@ -546,7 +547,8 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 		zbx_uint64_t	hostid;
 		int		maintenance_from;
 		void		*next;
-	} maintenance_t;
+	}
+	maintenance_t;
 
 	const char	*__function_name = "update_maintenance_hosts";
 	int		i;
