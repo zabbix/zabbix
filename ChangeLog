@@ -4,6 +4,7 @@ Changes for 1.9.8
 New features:
 
 Bug fixes:
+ - [ZBX-4265] fixed iconmappig API permission check (pavels)
  - [ZBX-4283] fixed template creation being reported as an update (Richlv)
  - [ZBX-3749] escaped HTML entities in the web step "required" field (pavels)
 
