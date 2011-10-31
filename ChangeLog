@@ -262,7 +262,6 @@ New features:
  - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
 
 Bug fixes:
- - [ZBX-1056] fixed failed attempt counter not reset after successful login via api (Vedmak)
  - [ZBX-3241] fixed incorrectly shortened popup texts (Vlad)
  - [ZBX-2647] Made some of hard coded strings translatable (KB)
  - [ZBX-3300] fixed valuemapid not removed from items table when valuemap deleted (Vedmak)
@@ -1631,6 +1630,7 @@ Changes for 1.7.1
 
 Changes for 1.7.0
 
+ - [ZBX-1056] fixed failed attempt counter not reset after successful login via api (Vedmak)
  - [DEV-333] added configuration data cache module (Sasha)
  - [DEV-427] frontend is PHP 5.3.0 compatible (Aly)
  - [ZBX-1034] fixed maps tooltip url view (Aly)
