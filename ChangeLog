@@ -2,8 +2,12 @@
 Changes for 1.9.8
 
 New features:
+ - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-2960] added defaults for example userparameters vfs.dir.size (/tmp) and proc.cpu (zabbix_agentd) to avoid errors in 'zabbix_agentd -p', documented them (Richlv)
+ - [ZBX-2960] clarified what happens if proc.cpu does not match any processes (Richlv)
+ - [ZBX-2960] made mysql.ping example userparameter a but more efficient by avoiding extra 'wc' invocation (Richlv)
  - [ZBX-3710] renamed "Zabbix Java Proxy" to "Zabbix Java Gateway" (asaveljevs)
  - [ZBX-4179] fixed compilation on OpenBSD: `NS_DEFAULTPORT' undeclared (asaveljevs)
  - [ZBX-3885] fixed error when update trigger prototype with wrong data (Vedmak)
