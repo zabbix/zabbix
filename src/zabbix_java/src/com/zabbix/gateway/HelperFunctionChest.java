@@ -17,21 +17,16 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
-public class AllTestRunner
+class HelperFunctionChest
 {
-	public static void main(String[] args)
+	public static <T> boolean arrayContains(T[] array, T key)
 	{
-		String[] testClasses = new String[]
-		{
-			"IntegerValidatorTest",
-			"ZabbixItemTest"
-		};
+		for (T element : array)
+			if (key.equals(element))
+				return true;
 
-		for (int i = 0; i < testClasses.length; i++)
-			testClasses[i] = ConfigurationManager.getPackage() + "." + testClasses[i];
-
-		org.junit.runner.JUnitCore.main(testClasses);
+		return false;
 	}
 }

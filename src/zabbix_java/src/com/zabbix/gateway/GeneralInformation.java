@@ -17,34 +17,17 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
-import org.junit.*;
-import static org.junit.Assert.*;
-
-public class IntegerValidatorTest
+class GeneralInformation
 {
-	@Test
-	public void testCorrectValidation()
-	{
-		InputValidator validator = new IntegerValidator(3, 7);
+	public static final String APPLICATION_NAME = "Zabbix Java Gateway";
+	public static final String REVISION_DATE = "27 October 2011";
+	public static final String REVISION = "{ZABBIX_REVISION}";
+	public static final String VERSION = "1.9.8";
 
-		assertFalse(validator.validate(Integer.valueOf(2)));
-		assertTrue(validator.validate(Integer.valueOf(3)));
-		assertTrue(validator.validate(Integer.valueOf(5)));
-		assertTrue(validator.validate(Integer.valueOf(7)));
-		assertFalse(validator.validate(Integer.valueOf(8)));
-	}
-
-	@Test
-	public void testMinimumInterval()
+	public static void printVersion()
 	{
-		new IntegerValidator(5, 5);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testInvalidInterval()
-	{
-		new IntegerValidator(7, 3);
+		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
 	}
 }

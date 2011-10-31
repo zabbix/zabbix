@@ -4,6 +4,7 @@ Changes for 1.9.8
 New features:
 
 Bug fixes:
+ - [ZBX-3710] renamed "Zabbix Java Proxy" to "Zabbix Java Gateway" (asaveljevs)
  - [ZBX-4179] fixed compilation on OpenBSD: `NS_DEFAULTPORT' undeclared (asaveljevs)
  - [ZBX-3885] fixed error when update trigger prototype with wrong data (Vedmak)
  - [ZBX-3857] fixed creation and sorting of trigger prototypes (Vedmak)
