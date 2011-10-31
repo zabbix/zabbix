@@ -519,7 +519,7 @@ COpt::memoryPick();
  * @param array $app_data['hostid']
  * @return array
  */
-	public function update($applications){
+	public function update($applications) {
 		$applications = zbx_toArray($applications);
 
 			$this->checkInput($applications, __FUNCTION__);
@@ -531,12 +531,12 @@ COpt::memoryPick();
 			return array('applicationids' => zbx_objectValues($applications, 'applicationids'));
 	}
 
-	protected function createReal(&$applications){
-		if(empty($applications)) return true;
+	protected function createReal(&$applications) {
+		if (empty($applications)) return true;
 
 		$applicationids = DB::insert('applications', $applications);
 
-		foreach($applications as $anum => $application){
+		foreach ($applications as $anum => $application) {
 			$applications[$anum]['applicationid'] = $applicationids[$anum];
 		}
 
@@ -547,18 +547,18 @@ COpt::memoryPick();
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1
 		));
-		foreach($applications_created as $application_created){
+		foreach ($applications_created as $application_created) {
 			$host = reset($application_created['hosts']);
-			info(_s('Application [%1$s:%2$s] updated.', $host['host'], $application_created['name']));
+			info(_s('Application "%1$s:%2$s" created.', $host['host'], $application_created['name']));
 		}
 	}
 
-	protected function updateReal($applications){
+	protected function updateReal($applications) {
 		$update = array();
-		foreach($applications as $application){
+		foreach ($applications as $application) {
 			$update[] = array(
 				'values' => $application,
-				'where'=> array('applicationid'=>$application['applicationid'])
+				'where' => array('applicationid' => $application['applicationid'])
 			);
 		}
 		DB::update('applications', $update);
@@ -571,9 +571,9 @@ COpt::memoryPick();
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 		));
-		foreach($applications_upd as $application_upd){
+		foreach ($applications_upd as $application_upd) {
 			$host = reset($application_upd['hosts']);
-			info(_s('Application [%1$s:%2$s] updated.', $host['host'], $application_upd['name']));
+			info(_s('Application "%1$s:%2$s" updated.', $host['host'], $application_upd['name']));
 		}
 	}
 
