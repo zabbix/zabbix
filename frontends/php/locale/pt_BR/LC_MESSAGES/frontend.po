@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-01 01:17+0200\n"
-"PO-Revision-Date: 2011-10-07 23:16+0200\n"
+"POT-Creation-Date: 2011-11-01 01:19+0200\n"
+"PO-Revision-Date: 2011-10-24 21:12+0200\n"
 "Last-Translator: xsbr <rsantos@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -29,7 +29,7 @@ msgstr " em "
 #: maintenance.php:124
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18"
-msgstr ""
+msgstr "\"%s\" precisa estar 1970.01.01 e 2038.01.18"
 
 #: include/profiles.inc.php:269
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -135,7 +135,7 @@ msgstr "últimos 500 valores"
 
 #: include/views/configuration.sysmap.edit.php:66
 msgid "<manual>"
-msgstr ""
+msgstr "<manual>"
 
 #: actionconf.php:452 auditacts.php:110
 msgid "ACTIONS"
@@ -379,11 +379,11 @@ msgstr "Adicionar a"
 
 #: maps.php:73
 msgid "Add to Favourites"
-msgstr "Adicionar aos favoritos"
+msgstr "Adicionar aos Favoritos"
 
 #: include/html.inc.php:255 screens.php:91
 msgid "Add to favourites"
-msgstr ""
+msgstr "Adicionar aos favoritos"
 
 #: include/actions.inc.php:479 include/forms.inc.php:1758
 msgid "Add to host group"
@@ -391,7 +391,7 @@ msgstr "Adicionar ao grupo de hosts"
 
 #: include/actions.inc.php:294 include/views/configuration.action.edit.php:746
 msgid "Add to host groups"
-msgstr "Adicionar aos grupos de host"
+msgstr "Adicionar aos grupos de hosts"
 
 #: include/locales/en_gb.inc.php:1176
 msgid "Added"
@@ -505,7 +505,7 @@ msgstr ""
 #: api/classes/class.capplication.php:576
 #, php-format
 msgid "Application \"%1$s:%2$s\" updated."
-msgstr "Aplicação \"%1$s:%2$s\" atualizada."
+msgstr ""
 
 #: api/classes/class.capplication.php:647
 #, php-format
