@@ -941,10 +941,11 @@ include_once('include/page_header.php');
 		$table->setHeader($header);
 
 		$options = array(
-			'hostids' => array_keys($pageFilter->hosts),
+			'hostids' => $hostid,
+			'monitored' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'nodeids' => $nodeid,
-			'select_hosts' => API_OUTPUT_EXTEND
+			'select_hosts' => API_OUTPUT_EXTEND,
 		);
 
 		if(is_null($hostid)) $options['groupids'] = $groupid;
@@ -1045,7 +1046,8 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'hostids' => array_keys($pageFilter->hosts),
+			'hostids' => $hostid,
+			'monitored' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'webitems' => true,

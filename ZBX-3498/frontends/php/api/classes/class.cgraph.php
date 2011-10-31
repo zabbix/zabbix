@@ -64,6 +64,7 @@ class CGraph extends CZBXAPI{
 			'inherited'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
+			'monitored'				=> null,
 
 // filter
 			'filter'					=> null,
@@ -243,6 +244,11 @@ class CGraph extends CZBXAPI{
 			else{
 				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
 			}
+		}
+
+		// monitored hosts
+		if (!is_null($options['monitored'])) {
+			$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
 		}
 
 // inherited
