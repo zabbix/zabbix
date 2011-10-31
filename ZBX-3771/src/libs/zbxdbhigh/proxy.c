@@ -2567,11 +2567,11 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,"
 				"t.status,t.type,t.priority,t.comments,t.url"
-			" from triggers t,functions f,items i,item_discovery d"
+			" from triggers t,functions f,items i,item_discovery id"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
-				" and i.itemid=d.itemid"
-				" and d.parent_itemid=" ZBX_FS_UI64,
+				" and i.itemid=id.itemid"
+				" and id.parent_itemid=" ZBX_FS_UI64,
 			discovery_itemid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -3089,10 +3089,10 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 				"i.history,i.trends,i.status,i.trapper_hosts,i.units,i.multiplier,i.delta,i.formula,"
 				"i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_oid,i.authtype,i.username,"
 				"i.password,i.publickey,i.privatekey,i.description"
-			" from items i,item_discovery d"
-			" where i.itemid=d.itemid"
+			" from items i,item_discovery id"
+			" where i.itemid=id.itemid"
 				" and i.hostid=" ZBX_FS_UI64
-				" and d.parent_itemid=" ZBX_FS_UI64,
+				" and id.parent_itemid=" ZBX_FS_UI64,
 			hostid, discovery_itemid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -3684,11 +3684,11 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 				"g.graphtype,g.show_legend,g.show_3d,g.percent_left,"
 				"g.percent_right,g.ymin_type,g.ymax_type,g.ymin_itemid,"
 				"g.ymax_itemid"
-			" from graphs g,graphs_items gi,items i,item_discovery d"
+			" from graphs g,graphs_items gi,items i,item_discovery id"
 			" where g.graphid=gi.graphid"
 				" and gi.itemid=i.itemid"
-				" and i.itemid=d.itemid"
-				" and d.parent_itemid=" ZBX_FS_UI64,
+				" and i.itemid=id.itemid"
+				" and id.parent_itemid=" ZBX_FS_UI64,
 			discovery_itemid);
 
 	while (NULL != (row = DBfetch(result)))
