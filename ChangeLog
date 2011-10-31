@@ -4,6 +4,12 @@ Changes for 1.9.8
 New features:
 
 Bug fixes:
+ - [ZBX-3710] renamed "Zabbix Java Proxy" to "Zabbix Java Gateway" (asaveljevs)
+ - [ZBX-4179] fixed compilation on OpenBSD: `NS_DEFAULTPORT' undeclared (asaveljevs)
+ - [ZBX-3885] fixed error when update trigger prototype with wrong data (Vedmak)
+ - [ZBX-3857] fixed creation and sorting of trigger prototypes (Vedmak)
+ - [ZBX-4245] fixed error when add operation condition in action (Vedmak)
+ - [ZBX-4265] fixed iconmappig API permission check (pavels)
  - [ZBX-4283] fixed template creation being reported as an update (Richlv)
  - [ZBX-3749] escaped HTML entities in the web step "required" field (pavels)
 
@@ -1626,6 +1632,7 @@ Changes for 1.7.1
 
 Changes for 1.7.0
 
+ - [ZBX-1056] fixed failed attempt counter not reset after successful login via api (Vedmak)
  - [DEV-333] added configuration data cache module (Sasha)
  - [DEV-427] frontend is PHP 5.3.0 compatible (Aly)
  - [ZBX-1034] fixed maps tooltip url view (Aly)
