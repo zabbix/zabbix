@@ -471,11 +471,20 @@ out:
  ******************************************************************************/
 static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maintenance_to)
 {
+	typedef struct {
+		zbx_uint64_t	triggerid;
+		int		value;
+	} zbx_event_data_t;
+
+	const char		*__function_name = "generate_events";
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_uint64_t		triggerid;
+	zbx_uint64_t		triggerid, eventid;
 	int			value_before, value_inside, value_after, i;
-	zbx_vector_uint64_t	event_ids;
+	zbx_vector_ptr_t	events_data;
+	zbx_event_data_t	*event_data;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select distinct t.triggerid"
@@ -489,12 +498,45 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 			ITEM_STATUS_ACTIVE,
 			hostid);
 
-	zbx_vector_uint64_create(&event_ids);
+	/* event data to call process_event() later */
+	zbx_vector_ptr_create(&events_data);
 
-	TODO!!!!!
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(triggerid, row[0]);
 
+		get_trigger_values(triggerid, maintenance_from, maintenance_to,
+				&value_before, &value_inside, &value_after);
+
+		if (value_before == value_inside && value_inside == value_after)
+			continue;
+
+		event_data = zbx_malloc(NULL, sizeof(zbx_event_data_t));
+		event_data->triggerid = triggerid;
+		event_data->value = value_after;
+		zbx_vector_ptr_append(&events_data, event_data);
+	}
 	DBfree_result(result);
-	zbx_vector_uint64_destroy(&event_ids);
+
+	if (1 > events_data.values_num)
+		goto end;
+
+	/* reserve event IDs */
+	eventid = DBget_maxid_num("events", events_data.values_num);
+
+	for (i = 0; i < events_data.values_num; i++)
+	{
+		event_data = (zbx_event_data_t *)events_data.values[i];
+
+		process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, event_data->triggerid,
+				maintenance_to, event_data->value, 0, 1);
+
+		zbx_free(event_data);
+	}
+end:
+	zbx_vector_ptr_destroy(&events_data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)
