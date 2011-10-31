@@ -457,6 +457,7 @@ COpt::memoryPick();
 				'discoveryids' => $itemids,
 				'nopermissions' => 1,
 				'preservekeys' => 1,
+				'selectDiscoveryRule' => API_OUTPUT_EXTEND
 			);
 
 			if(is_array($options['selectPrototypes']) || str_in_array($options['selectPrototypes'], $subselects_allowed_outputs)){
@@ -464,19 +465,20 @@ COpt::memoryPick();
 				$prototypes = API::Item()->get($obj_params);
 
 				if(!is_null($options['limitSelects'])) order_result($prototypes, 'name');
-				foreach($prototypes as $itemid => $subrule){
-					unset($prototypes[$itemid]['discoveries']);
-					$count = array();
-					foreach($subrule['discoveries'] as $discovery){
-						if(!is_null($options['limitSelects'])){
-							if(!isset($count[$discovery['itemid']])) $count[$discovery['itemid']] = 0;
-							$count[$discovery['itemid']]++;
 
-							if($count[$discovery['itemid']] > $options['limitSelects']) continue;
-						}
+				$count = array();
+				foreach ($prototypes as $itemid => $prototype) {
 
-						$result[$discovery['itemid']]['prototypes'][] = &$prototypes[$itemid];
+					$discoveryId = $prototype['discoveryRule']['itemid'];
+					if (!isset($count[$discoveryId])) $count[$discoveryId] = 0;
+					$count[$discoveryId]++;
+
+					if ($options['limitSelects'] && $options['limitSelects'] > $count[$discoveryId]) {
+						continue;
 					}
+
+					unset($prototype['discoveryRule']);
+					$result[$discoveryId]['prototypes'][] = $prototype;
 				}
 			}
 			else if(API_OUTPUT_COUNT == $options['selectPrototypes']){
@@ -938,6 +940,170 @@ COpt::memoryPick();
 		$this->updateReal($updateItems);
 
 		$this->inherit($inheritedItems);
+	}
+
+
+	/**
+	 * Copies the given discovery rules to the specified hosts.
+	 *
+	 * @param array $data
+	 * @param array $data['discoveryruleids'] An array of item ids to be cloned
+	 * @param array $data['hostids']          An array of host ids were the items should be cloned to
+	 */
+	public function copy(array $data) {
+		// validate data
+		if (!isset($data['discoveryruleids']) || !$data['discoveryruleids']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No discovery rule IDs given.'));
+		}
+		if (!isset($data['hostids']) || !$data['hostids']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No host IDs given.'));
+		}
+		// TODO: check if the host ids exist
+		// TODO: check if host exists
+
+		// copy
+		foreach ($data['discoveryruleids'] as $discoveryid) {
+			foreach ($data['hostids'] as $hostid) {
+				$this->copyDiscoveryRule($discoveryid, $hostid);
+			}
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Copies the given discovery rule to the specified host.
+	 *
+	 * @param type $discoveryid  The discovery rule id to be copied
+	 * @param type $hostid       Destination host id
+	 */
+	protected function copyDiscoveryRule($discoveryid, $hostid) {
+
+		// fetch discovery to clone
+		$srcDiscovery = $this->get(array(
+			'itemids' => $discoveryid,
+			'select' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		$srcDiscovery = $srcDiscovery[0];
+
+		// fetch it's interface
+		$interface = Api::HostInterface()->get(array(
+			'interfaceid' => $srcDiscovery['interfaceid'],
+			'select' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		$interface = $interface[0];
+
+		// save interface
+		$interface['hostid'] = $hostid;
+		unset($interface['interfaceid']);
+		$interfaces = Api::HostInterface()->create(array($interface));
+
+		// save new discovery
+		$dstDiscovery = $srcDiscovery;
+		$dstDiscovery['hostid'] = $hostid;
+		$dstDiscovery['interfaceid'] = $interfaces['interfaceids'][0];
+		$newDiscovery = $this->create(array($dstDiscovery));
+		$dstDiscovery['itemid'] = $newDiscovery['itemids'][0];
+
+		// copy prototypes
+		$newPrototypes = $this->copyDiscoveryPrototypes($srcDiscovery, $dstDiscovery);
+
+		// fetch new prototypes
+		$newPrototypes = Api::ItemPrototype()->get(array(
+			'itemids' => $newPrototypes['itemids'],
+			'select' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		$dstDiscovery['prototypes'] = $newPrototypes;
+
+		// copy graphs
+//		$this->copyDiscoveryGraphs($srcDiscovery, $dstDiscovery);
+
+
+
+		return true;
+	}
+
+
+	/**
+	 * Copies all of the item prototypes from the source discovery to the target
+	 * discovery rule.
+	 *
+	 * @param array $srcDiscovery    The source discovery rule to copy from
+	 * @param array $dstDiscovery    The target discovery rule to copy to
+	 * @return array|boolean
+	 */
+	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery) {
+		$prototypes = Api::ItemPrototype()->get(array(
+			'discoveryids' => $srcDiscovery['itemid'],
+			'select' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
+		));
+
+		foreach ($prototypes as &$prototype) {
+			$prototype['ruleid'] = $dstDiscovery['itemid'];
+			$prototype['hostid'] = $dstDiscovery['hostid'];
+		}
+
+		return Api::ItemPrototype()->create($prototypes);
+	}
+
+
+	/**
+	 * Copies all of the graphs from the source discovery to the target discovery rule.
+	 *
+	 * @param array $srcDiscovery    The source discovery rule to copy from
+	 * @param array $dstDiscovery    The target discovery rule to copy to
+	 * @return array|boolean
+	 */
+	protected function copyDiscoveryGraphs(array $srcDiscovery, array $dstDiscovery) {
+
+		// fetch source graphs
+		$srcGraphs = Api::GraphPrototype()->get(array(
+			'discoveryids' => $srcDiscovery['itemid'],
+			'select' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
+			'selectGraphItems' => API_OUTPUT_EXTEND
+		));
+
+		// fetch source graph prototype items
+		$srcPrototypeIds = array();
+		foreach ($srcGraphs as $graph) {
+			foreach ($graph['gitems'] as $item) {
+				$srcPrototypeIds[] = $item['itemid'];
+			}
+		}
+		$prototypes = Api::ItemPrototype()->get(array(
+			'itemids' => $srcPrototypeIds,
+			'select' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
+		));
+		$srcPrototypes = array();
+		foreach ($prototypes as $prototype) {
+			$srcPrototypes[$prototype['itemid']] = $prototype;
+		}
+		var_dump($srcGraphs);
+		// replace all of the source graph items with the newly created items
+		$newItemsKeys = array();
+		$dstGraphs = $srcGraphs;
+		foreach ($dstDiscovery['prototypes'] as $prototype) {
+			$newItemsKeys[$prototype['key_']] = $prototype['itemid'];
+		}
+		foreach ($dstGraphs as &$graph) {
+			foreach ($graph['gitems'] as &$item) {
+				// TODO: save new graph items
+				$itemKey = $srcPrototypes[$item['itemid']]['key_'];
+
+				$item['itemid'] = $newItemsKeys[$itemKey];
+
+				unset($item['gitemid']);
+				unset($item['graphid']);
+			}
+		}
+		var_dump($dstGraphs);die;
 	}
 }
 ?>
