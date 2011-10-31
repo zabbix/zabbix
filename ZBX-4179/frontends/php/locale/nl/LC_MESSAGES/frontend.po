@@ -486,8 +486,8 @@ msgstr "Applicatie"
 #: api/classes/class.capplication.php:552
 #: api/classes/class.capplication.php:576
 #, php-format
-msgid "Application [%1$s:%2$s] updated."
-msgstr "Applicatie [%1$s:%2$s] bijgewerkt."
+msgid "Application \"%1$s:%2$s\" updated."
+msgstr "Applicatie \"%1$s:%2$s\" bijgewerkt."
 
 #: api/classes/class.capplication.php:647
 #, php-format

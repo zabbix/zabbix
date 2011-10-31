@@ -929,128 +929,148 @@ function utf8RawUrlDecode($source){
 	return $exp;
 	}
 
-/******************************************************************************
- *																			*
- * Purpose: Translate {10}>10 to something like localhost:procload.last(0)>10 *
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
-	function triggerExpression($trigger, $html, $template=false, $resolve_macro=false){
-		$expression = $trigger['expression'];
+/**
+ * Translate {10}>10 to something like localhost:procload.last(0)>10.
+ * Don't forget sync code with C.
+ *
+ * @param $trigger
+ * @param $html
+ * @param bool $template
+ * @param bool $resolve_macro
+ * @return array|string
+ */
+function triggerExpression($trigger, $html, $template=false, $resolve_macro=false) {
+	$expression = $trigger['expression'];
 
-//		echo "EXPRESSION:",$expression,"<Br>";
-		$functionid='';
-		$macros = '';
-		if(0 == $html) $exp='';
-		else $exp=array();
+	$functionid = '';
+	$macros = '';
+	if (0 == $html) {
+		$exp = '';
+	}
+	else {
+		$exp = array();
+	}
 
-		$state='';
+	$state='';
 
-		for($i=0,$max=zbx_strlen($expression); $i<$max; $i++){
-			if(($expression[$i] == '{') && ($expression[$i+1] == '$')){
-				$functionid='';
-				$macros='';
-				$state='MACROS';
-			}
-			else if($expression[$i] == '{'){
-				$functionid='';
-				$state='FUNCTIONID';
+	for ($i = 0,$max = zbx_strlen($expression); $i < $max; $i++) {
+		if ($expression[$i] == '{' && $expression[$i+1] == '$') {
+			$functionid = '';
+			$macros = '';
+			$state = 'MACROS';
+		}
+		elseif ($expression[$i] == '{') {
+			$functionid = '';
+			$state = 'FUNCTIONID';
+			continue;
+		}
+
+		if ($expression[$i] == '}') {
+			if($state == 'MACROS') {
+				$macros .= '}';
+
+				if ($resolve_macro) {
+					$function_data['expression'] = $macros;
+					$function_data = API::UserMacro()->resolveTrigger($function_data);
+					$macros = $function_data['expression'];
+				}
+
+				if (1 == $html) {
+					array_push($exp,$macros);
+				}
+				else {
+					$exp .= $macros;
+				}
+
+				$macros = '';
+				$state = '';
 				continue;
 			}
 
-			if($expression[$i] == '}'){
-				if($state == 'MACROS'){
-					$macros.='}';
+			$state = '';
 
-					if($resolve_macro){
-						$function_data['expression'] = $macros;
-						$function_data = API::UserMacro()->resolveTrigger($function_data);
-						$macros = $function_data['expression'];
-					}
+			if ($functionid == 'TRIGGER.VALUE') {
+				if (0 == $html) {
+					$exp .= '{'.$functionid.'}';
+				}
+				else {
+					array_push($exp, '{'.$functionid.'}');
+				}
+			}
+			elseif (is_numeric($functionid) && isset($trigger['functions'][$functionid])) {
+				$function_data = $trigger['functions'][$functionid];
+				$function_data += $trigger['items'][$function_data['itemid']];
+				$function_data += $trigger['hosts'][$function_data['hostid']];
 
-					if(1 == $html) array_push($exp,$macros);
-					else $exp.=$macros;
-
-					$macros = '';
-					$state = '';
-					continue;
+				if ($template) {
+					$function_data['host'] = '{HOST.HOST}';
 				}
 
-				$state='';
+				if ($resolve_macro) {
+					$function_data = API::UserMacro()->resolveItem($function_data);
 
-				if($functionid=='TRIGGER.VALUE'){
-					if(0 == $html) $exp.='{'.$functionid.'}';
-					else array_push($exp,'{'.$functionid.'}');
+					$function_data['expression'] = $function_data['parameter'];
+					$function_data = API::UserMacro()->resolveTrigger($function_data);
+					$function_data['parameter'] = $function_data['expression'];
 				}
-				else if(is_numeric($functionid) && isset($trigger['functions'][$functionid])){
-					$function_data = $trigger['functions'][$functionid];
-					$function_data+= $trigger['items'][$function_data['itemid']];
-					$function_data+= $trigger['hosts'][$function_data['hostid']];
-
-					if($template) $function_data['host'] = '{HOST.HOST}';
-
-					if($resolve_macro){
-						$function_data = API::UserMacro()->resolveItem($function_data);
-
-						$function_data['expression'] = $function_data['parameter'];
-						$function_data = API::UserMacro()->resolveTrigger($function_data);
-						$function_data['parameter'] = $function_data['expression'];
-					}
 
 //SDII($function_data);
-					if($html == 0){
-						$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
-					}
-					else{
-						$style = ($function_data['status']==ITEM_STATUS_DISABLED)? 'disabled':'unknown';
-						if($function_data['status']==ITEM_STATUS_ACTIVE){
-							$style = 'enabled';
-						}
-
-						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST){
-							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
-						}
-						else if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
-							$link = new CLink($function_data['host'].':'.$function_data['key_'],
-								'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
-								$trigger['discoveryRuleid'], $style);
-						}
-						else{
-							$link = new CLink($function_data['host'].':'.$function_data['key_'],
-								'items.php?form=update&itemid='.$function_data['itemid'], $style);
-						}
-
-
-						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
-					}
+				if ($html == 0) {
+					$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
 				}
-				else{
-					if(1 == $html){
-						array_push($exp, new CSpan('*ERROR*', 'on'));
+				else {
+					$style = ($function_data['status'] == ITEM_STATUS_DISABLED) ? 'disabled' : 'unknown';
+					if ($function_data['status'] == ITEM_STATUS_ACTIVE) {
+						$style = 'enabled';
 					}
-					else{
-						$exp.= '*ERROR*';
+
+					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
+						$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
 					}
+					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+						$link = new CLink($function_data['host'].':'.$function_data['key_'],
+							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
+							$trigger['discoveryRuleid'], $style);
+					}
+					else {
+						$link = new CLink($function_data['host'].':'.$function_data['key_'],
+							'items.php?form=update&itemid='.$function_data['itemid'], $style);
+					}
+
+
+					array_push($exp,array('{', $link, '.',bold($function_data['function'].'('),$function_data['parameter'], bold(')'), '}'));
 				}
-				continue;
 			}
-
-			if($state == 'FUNCTIONID'){
-				$functionid=$functionid.$expression[$i];
-				continue;
+			else {
+				if (1 == $html) {
+					array_push($exp, new CSpan('*ERROR*', 'on'));
+				}
+				else {
+					$exp .= '*ERROR*';
+				}
 			}
-			else if($state == 'MACROS'){
-				$macros=$macros.$expression[$i];
-				continue;
-			}
-
-			if(1 == $html) array_push($exp,$expression[$i]);
-			else $exp.=$expression[$i];
+			continue;
 		}
-//SDII($exp);
-	return $exp;
+
+		if ($state == 'FUNCTIONID') {
+			$functionid = $functionid.$expression[$i];
+			continue;
+		}
+		elseif ($state == 'MACROS') {
+			$macros = $macros.$expression[$i];
+			continue;
+		}
+
+		if (1 == $html) {
+			array_push($exp, $expression[$i]);
+		}
+		else {
+			$exp .= $expression[$i];
+		}
 	}
+
+	return $exp;
+}
 /*
  * Function: implode_exp
  *
