@@ -246,11 +246,6 @@ class CGraph extends CZBXAPI{
 			}
 		}
 
-		// monitored hosts
-		if (!is_null($options['monitored'])) {
-			$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
-		}
-
 // inherited
 		if(!is_null($options['inherited'])){
 			if($options['inherited']){

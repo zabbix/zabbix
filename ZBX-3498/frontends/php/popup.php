@@ -940,20 +940,28 @@ include_once('include/page_header.php');
 
 		$table->setHeader($header);
 
-		$options = array(
-			'hostids' => $hostid,
-			'monitored' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'nodeids' => $nodeid,
-			'select_hosts' => API_OUTPUT_EXTEND,
-		);
+		if ($pageFilter->hostsSelected) {
+			if ($pageFilter->hostsAll) {
+				$hostid = array_keys($pageFilter->hosts);
+			}
+			else {
+				$hostid = $pageFilter->hostid;
+			}
 
-		if(is_null($hostid)) $options['groupids'] = $groupid;
-		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
-
-		$graphs = CGraph::get($options);
-		order_result($graphs, 'name');
+			$options = array(
+				'hostids' => $hostid,
+				'output' => API_OUTPUT_EXTEND,
+				'nodeids' => $nodeid,
+				'select_hosts' => API_OUTPUT_EXTEND,
+			);
+			if(!is_null($writeonly)) $options['editable'] = 1;
+			if(!is_null($templated)) $options['templated'] = $templated;
+			$graphs = CGraph::get($options);
+			order_result($graphs, 'name');
+		}
+		else {
+			$graphs = array();
+		}
 
 		foreach($graphs as $gnum => $row){
 			$host = reset($row['hosts']);
@@ -1044,25 +1052,35 @@ include_once('include/page_header.php');
 
 		$table->setHeader($header);
 
-		$options = array(
-			'nodeids' => $nodeid,
-			'hostids' => $hostid,
-			'monitored' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
-			'webitems' => true,
-			'templated' => false,
-			'filter' => array(
-				'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
-				'status' => ITEM_STATUS_ACTIVE
-			)
-		);
-		if(is_null($hostid)) $options['groupids'] = $groupid;
-		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
+		if ($pageFilter->hostsSelected) {
+			if ($pageFilter->hostsAll) {
+				$hostid = array_keys($pageFilter->hosts);
+			}
+			else {
+				$hostid = $pageFilter->hostid;
+			}
 
-		$items = CItem::get($options);
-		order_result($items, 'description');
+			$options = array(
+				'nodeids' => $nodeid,
+				'hostids' => $hostid,
+				'monitored' => true,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
+				'webitems' => true,
+				'templated' => false,
+				'filter' => array(
+					'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
+				)
+			);
+			if(!is_null($writeonly)) $options['editable'] = 1;
+			if(!is_null($templated)) $options['templated'] = $templated;
+
+			$items = CItem::get($options);
+			order_result($items, 'description');
+		}
+		else {
+			$items = array();
+		}
 
 		foreach($items as $tnum => $row){
 			$host = reset($row['hosts']);
