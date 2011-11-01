@@ -1,5 +1,4 @@
 * text=auto !eol
-/CREDITS -text
 bin/win32/zabbix_agentd.exe -text
 bin/win32/zabbix_get.exe -text
 bin/win32/zabbix_sender.exe -text
