@@ -950,10 +950,9 @@ COpt::memoryPick();
 	 * @param array $data['discoveryruleids'] An array of item ids to be cloned
 	 * @param array $data['hostids']          An array of host ids were the items should be cloned to
 	 */
-	public function copy(array $data)
-	{
+	public function copy(array $data) {
 		// validate data
-		if (!isset($data['discoveryruleids']) || !$data['discoveryruleids']) {
+		if (!isset($data['discoveryids']) || !$data['discoveryids']) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No discovery rule IDs given.'));
 		}
 		if (!isset($data['hostids']) || !$data['hostids']) {
@@ -966,12 +965,12 @@ COpt::memoryPick();
 		}
 
 		// check if the given discovery rules exist
-		if (!$this->isReadable($data['discoveryruleids'])) {
+		if (!$this->isReadable($data['discoveryids'])) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 		}
 
 		// copy
-		foreach ($data['discoveryruleids'] as $discoveryid) {
+		foreach ($data['discoveryids'] as $discoveryid) {
 			foreach ($data['hostids'] as $hostid) {
 				$this->copyDiscoveryRule($discoveryid, $hostid);
 			}
@@ -987,13 +986,10 @@ COpt::memoryPick();
 	 * @param type $discoveryid  The discovery rule id to be copied
 	 * @param type $hostid       Destination host id
 	 */
-	protected function copyDiscoveryRule($discoveryid, $hostid)
-	{
-
+	protected function copyDiscoveryRule($discoveryid, $hostid) {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get(array(
 			'itemids' => $discoveryid,
-			'select' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND
 		));
@@ -1005,7 +1001,6 @@ COpt::memoryPick();
 			// fetch it's interface
 			$interface = Api::HostInterface()->get(array(
 				'interfaceid' => $srcDiscovery['interfaceid'],
-				'select' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND,
 			));
 			$interface = $interface[0];
@@ -1033,7 +1028,6 @@ COpt::memoryPick();
 			// fetch new prototypes
 			$newPrototypes = Api::ItemPrototype()->get(array(
 				'itemids' => $newPrototypes['itemids'],
-				'select' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND,
 			));
 			$dstDiscovery['prototypes'] = $newPrototypes;
@@ -1061,11 +1055,9 @@ COpt::memoryPick();
 	 *
 	 * @return array
 	 */
-	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery)
-	{
+	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery) {
 		$prototypes = Api::ItemPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
-			'select' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 		));
 
@@ -1097,13 +1089,11 @@ COpt::memoryPick();
 	 *
 	 * @return array
 	 */
-	protected function copyDiscoveryGraphs(array $srcDiscovery, array $dstDiscovery)
-	{
+	protected function copyDiscoveryGraphs(array $srcDiscovery, array $dstDiscovery) {
 
 		// fetch source graphs
 		$srcGraphs = Api::GraphPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
-			'select' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER
@@ -1138,7 +1128,6 @@ COpt::memoryPick();
 		// fetch source items
 		$items = Api::Item()->get(array(
 			'itemids' => $srcItemIds,
-			'select' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 		));
 		$srcItems = array();
@@ -1156,7 +1145,6 @@ COpt::memoryPick();
 			'filter' => array(
 				'key_' => $itemKeys
 			),
-			'select' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		)));
 		$dstItems = array();
@@ -1199,12 +1187,10 @@ COpt::memoryPick();
 	 *
 	 * @return array
 	 */
-	public function copyDiscoveryTriggers(array $srcDiscovery, array $dstDiscovery)
-	{
+	public function copyDiscoveryTriggers(array $srcDiscovery, array $dstDiscovery) {
 		$srcTriggers = Api::TriggerPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
-			'select' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
@@ -1230,7 +1216,6 @@ COpt::memoryPick();
 				'key_' => $itemKeys
 			),
 			'output' => API_OUTPUT_EXTEND,
-			'select' => API_OUTPUT_EXTEND,
 		));
 		$dstItems = array();
 		foreach ($items as $item) {
@@ -1241,7 +1226,6 @@ COpt::memoryPick();
 		$hosts = Api::Host()->get(array(
 			'hostids' => array($srcDiscovery['hostid'], $dstDiscovery['hostid']),
 			'output' => API_OUTPUT_EXTEND,
-			'select' => API_OUTPUT_EXTEND,
 			'templated_hosts' => true,
 			'preservekeys' => true
 		));
@@ -1269,13 +1253,12 @@ COpt::memoryPick();
 
 	/**
 	 * Returns true if the given discovery rules exists and are available for
-	 * writing.
+	 * reading.
 	 *
 	 * @param array     $ids  An array if item IDs
 	 * @return boolean
 	 */
-	public function isReadable($ids)
-	{
+	public function isReadable($ids) {
 		if (!is_array($ids)) {
 			return false;
 		}
@@ -1286,9 +1269,38 @@ COpt::memoryPick();
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-			'itemids' => get_current_nodeid(true),
+			'nodeids' => get_current_nodeid(true),
 			'itemids' => $ids,
 			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+
+	/**
+	 * Returns true if the given discovery rules exists and are available for
+	 * writable.
+	 *
+	 * @param array     $ids  An array if item IDs
+	 * @return boolean
+	 */
+	public function isWritable($ids) {
+		if (!is_array($ids)) {
+			return false;
+		}
+		elseif (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'itemids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
 			'countOutput' => true
 		));
 
