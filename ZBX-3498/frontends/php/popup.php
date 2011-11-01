@@ -1033,25 +1033,6 @@ include_once('include/page_header.php');
 		insert_js_function('addValues');
 		insert_js_function('addValue');
 
-		if($multiselect)
-			$header = array(
-				($hostid>0)?null:S_HOST,
-				array(new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
-				S_TYPE,
-				S_TYPE_OF_INFORMATION,
-				S_STATUS
-			);
-		else
-			$header = array(
-				($hostid>0)?null:S_HOST,
-				S_DESCRIPTION,
-				S_TYPE,
-				S_TYPE_OF_INFORMATION,
-				S_STATUS
-			);
-
-		$table->setHeader($header);
-
 		if ($pageFilter->hostsSelected) {
 			if ($pageFilter->hostsAll) {
 				$hostid = array_keys($pageFilter->hosts);
@@ -1082,6 +1063,25 @@ include_once('include/page_header.php');
 			$items = array();
 		}
 
+		if($multiselect)
+			$header = array(
+				(!is_array($hostid))?null:S_HOST,
+				array(new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
+				S_TYPE,
+				S_TYPE_OF_INFORMATION,
+				S_STATUS
+			);
+		else
+			$header = array(
+				(!is_array($hostid))?null:S_HOST,
+				S_DESCRIPTION,
+				S_TYPE,
+				S_TYPE_OF_INFORMATION,
+				S_STATUS
+			);
+
+		$table->setHeader($header);
+
 		foreach($items as $tnum => $row){
 			$host = reset($row['hosts']);
 			$row['host'] = $host['host'];
@@ -1110,7 +1110,7 @@ include_once('include/page_header.php');
 			}
 
 			$table->addRow(array(
-				($hostid>0)?null:$row['host'],
+				(!is_array($hostid))?null:$row['host'],
 				$description,
 				item_type2str($row['type']),
 				item_value_type2str($row['value_type']),

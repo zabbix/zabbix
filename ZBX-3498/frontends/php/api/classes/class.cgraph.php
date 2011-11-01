@@ -64,7 +64,6 @@ class CGraph extends CZBXAPI{
 			'inherited'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
-			'monitored'				=> null,
 
 // filter
 			'filter'					=> null,
