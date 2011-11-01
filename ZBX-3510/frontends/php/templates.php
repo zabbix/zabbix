@@ -413,6 +413,19 @@ include_once('include/page_header.php');
 					throw new Exception();
 				}
 
+				// Host graphs
+				$options = array(
+					'hostids' => $clone_templateid,
+					'inherited' => 0,
+					'output' => API_OUTPUT_REFER
+				);
+				$db_graphs = API::Graph()->get($options);
+				$result = true;
+				foreach($db_graphs as $gnum => $db_graph){
+					$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
+				}
+				if(!$result) throw new Exception();
+
 				// clone discovery rules
 				$discoveryRules = Api::DiscoveryRule()->get(array(
 					'hostids' => $clone_templateid,

@@ -109,7 +109,6 @@ class CItem extends CItemGeneral{
 			'selectApplications'	=> null,
 			'selectPrototypes'		=> null,
 			'selectDiscoveryRule'	=> null,
-			'selectItemDiscoveries'	=> null,
 			'countOutput'			=> null,
 			'groupCount'			=> null,
 			'preservekeys'			=> null,

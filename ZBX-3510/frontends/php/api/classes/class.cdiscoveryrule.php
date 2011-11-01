@@ -995,11 +995,13 @@ COpt::memoryPick();
 			'itemids' => $discoveryid,
 			'select' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND
 		));
 		$srcDiscovery = $srcDiscovery[0];
+		$srcHost = $srcDiscovery['hosts'][0];
 
-		// if this is a plain host, cline the interface as well
-		if ($srcDiscovery['flags'] != ZBX_FLAG_DISCOVERY) {
+		// if this is a plain host, clone the interface as well
+		if ($srcHost['status'] != HOST_STATUS_TEMPLATE) {
 			// fetch it's interface
 			$interface = Api::HostInterface()->get(array(
 				'interfaceid' => $srcDiscovery['interfaceid'],
