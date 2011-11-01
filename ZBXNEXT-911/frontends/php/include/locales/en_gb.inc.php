@@ -96,7 +96,6 @@
 
 //	httpconf.php
 	'S_SORT'=>					_('Sort'),
-	'S_VARIABLES'=>					_('Variables'),
 	'S_STEP'=>					_('Step'),
 
 //	exp_imp.php
@@ -374,7 +373,6 @@
 	'S_LAST_MONTH_GRAPH'=>			_('Last month graph'),
 	'S_500_LATEST_VALUES'=>			_('500 latest values'),
 	'S_TIMESTAMP'=>				_('Timestamp'),
-	'S_LOCAL'=>				_('Local'),
 	'S_SOURCE'=>				_('Source'),
 	'S_INFO'=>					_('Info'),
 	'S_EVENT_ID'=>				_('Event ID'),
@@ -642,8 +640,6 @@
 	'S_GRAPH_PROTOTYPES_OF_BIG' => _('GRAPH PROTOTYPES OF'),
 
 //	events.php
-	'S_EVENT'=>				_('Event'),
-	'S_LIST'=>				_('List'),
 	'S_LATEST_EVENTS'=>			_('Latest events'),
 	'S_HISTORY_OF_EVENTS_BIG'=>		_('HISTORY OF EVENTS'),
 	'S_NO_EVENTS_FOUND'=>			_('No events found'),
@@ -735,7 +731,6 @@
 	'S_FAVOURITES'=>			_('Favourites'),
 	'S_MENU'=>				_('Menu'),
 	'S_RESET'=>				_('Reset'),
-	'S_OF' => _('of'),
 
 // dashconf.php
 	'S_DASHBOARD_CONFIGURATION' =>	_('Dashboard configuration'),
@@ -957,8 +952,6 @@
 	'S_CANNOT_DELETE_SLIDESHOW'=>	_('Cannot delete slideshow'),
 	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
 
-	'S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST' => _('Screen with id "%d" does not exist'),
-
 // slides.php
 	'S_CUSTOM_SLIDES' =>			_('Custom slides'),
 
@@ -1112,7 +1105,6 @@
 	'S_DEBUG'=>					_('Debug'),
 	'S_DENY'=>					_('Deny'),
 	'S_HIDE'=>					_('Hide'),
-	'S_PASSWORD'=>				_('Password'),
 	'S_ADD_TO'=>				_('Add to'),
 	'S_REMOVE_FROM'=>			_('Remove from'),
 
@@ -1338,7 +1330,6 @@
 
 	'S_QUEUE'=>				_('Queue'),
 	'S_EVENTS'=>				_('Events'),
-	'S_MAPS'=>				_('Maps'),
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
 	'S_LOGOUT'=>				_('Logout'),
