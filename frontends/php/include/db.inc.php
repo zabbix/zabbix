@@ -363,9 +363,8 @@ if( !isset($DB)) {
 				db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 				break;
 			case ZBX_DB_SQLITE3:
-				if (unlock_sqlite3_access()) {
-					$result = DBexecute('rollback');
-				}
+				$result = $DB['DB']->exec('rollback');
+				unlock_sqlite3_access();
 				break;
 		}
 
@@ -729,7 +728,7 @@ else {
 
 		switch ($DB['TYPE']) {
 			case ZBX_DB_SQLITE3:
-				return ' ('.$x.' % '.$y.')';
+				return ' (('.$x.') % ('.$y.'))';
 			default:
 				return ' MOD('.$x.','.$y.')';
 		}
