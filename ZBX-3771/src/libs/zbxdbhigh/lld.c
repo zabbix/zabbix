@@ -1407,8 +1407,7 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, struct zbx_json_parse *jp_data,
-		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
-		zbx_uint64_t interfaceid)
+		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
 {
 	const char		*__function_name = "DBlld_update_items";
 
@@ -1430,7 +1429,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 				"i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.snmp_community,i.snmp_oid,"
 				"i.port,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,"
 				"i.snmpv3_privpassphrase,i.authtype,i.username,i.password,i.publickey,i.privatekey,"
-				"i.description"
+				"i.description,i.interfaceid"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
 				" and i.hostid=" ZBX_FS_UI64
@@ -1439,7 +1438,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	parent_itemid, valuemapid;
+		zbx_uint64_t	parent_itemid, valuemapid, interfaceid;
 		char		*key_proto_esc, *delay_flex_esc, *trapper_hosts_esc, *units_esc, *formula_esc,
 				*logtimefmt_esc, *ipmi_sensor_esc, *snmp_community_esc, *port_esc,
 				*snmpv3_securityname_esc, *snmpv3_authpassphrase_esc, *snmpv3_privpassphrase_esc,
@@ -1482,6 +1481,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		publickey_esc = DBdyn_escape_string(row[30]);
 		privatekey_esc = DBdyn_escape_string(row[31]);
 		description_esc = DBdyn_escape_string(row[32]);
+		ZBX_DBROW2UINT64(interfaceid, row[33]);
 
 		p = NULL;
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
@@ -2139,7 +2139,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_uint64_t		hostid = 0, interfaceid = 0;
+	zbx_uint64_t		hostid = 0;
 	struct zbx_json_parse	jp, jp_data;
 	char			*discovery_key = NULL, *filter = NULL, *error = NULL, *db_error = NULL, *error_esc;
 	unsigned char		status = 0;
@@ -2150,7 +2150,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, discovery_itemid);
 
 	result = DBselect(
-			"select hostid,key_,status,filter,error,interfaceid"
+			"select hostid,key_,status,filter,error"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			discovery_itemid);
@@ -2162,7 +2162,6 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 		status = (unsigned char)atoi(row[2]);
 		filter = zbx_strdup(filter, row[3]);
 		db_error = zbx_strdup(db_error, row[4]);
-		ZBX_DBROW2UINT64(interfaceid, row[5]);
 	}
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
@@ -2220,8 +2219,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 				__function_name, f_macro, f_regexp);
 	}
 
-	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error,
-			f_macro, f_regexp, regexps, regexps_num, interfaceid);
+	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 	DBlld_update_triggers(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 
