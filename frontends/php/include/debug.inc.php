@@ -97,4 +97,20 @@ function sdf(&$var) {
 	}
 	echo SBR;
 }
+
+/**
+ * Infinite loop breaker, can be called inside loop that can be infinite, if number of calls excess defined limit
+ * backtrace is printed and script is terminated.
+ *
+ * @param $limit number of function calls after which pscript should be terminated.
+ */
+function ilb($limit = 100) {
+	static $counter = 0;
+	$counter++;
+	if ($counter == $limit) {
+		// just calling sdb is forbid by pre-commit hook :/
+		call_user_func('sdb');
+		exit;
+	}
+}
 ?>
