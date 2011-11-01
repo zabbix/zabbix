@@ -896,6 +896,7 @@
 	'S_DELETED'=>					'Deleted',
 	'S_UNKNOWN'=>					'Unknown',
 	'S_GROUPS'=>					'Groups',
+	'S_REPLACE_GROUPS'=>				'Replace groups',
 	'S_MINUS_ALL_GROUPS_MINUS'=>			'- all groups -',
 	'S_ALL_GROUPS'=>				'All groups',
 	'S_NO_GROUPS_DEFINED'=>				'No groups defined',
