@@ -1554,6 +1554,7 @@ COpt::memoryPick();
 
 	protected function updateReal($triggers){
 		$triggers = zbx_toArray($triggers);
+		$infos = array();
 
 		$options = array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -1642,23 +1643,27 @@ COpt::memoryPick();
 			));
 
 			$expression = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
-			info(_s('Trigger "%1$s:%2$s" updated.', $trigger['description'], $expression));
+			$infos[] = _s('Trigger "%1$s:%2$s" updated.', $trigger['description'], $expression);
 		}
 		unset($trigger);
 
 		foreach ($triggers as $trigger) {
-			if(isset($trigger['dependencies'])){
+			if (isset($trigger['dependencies'])) {
 				DB::delete('trigger_depends', array('triggerid_down' => $trigger['triggerid']));
 
-				$this->validateDependencies($triggers);
-
-				foreach($trigger['dependencies'] as $triggerid_up){
+				foreach ($trigger['dependencies'] as $triggerid_up) {
 					DB::insert('trigger_depends', array(array(
 						'triggerid_down' => $trigger['triggerid'],
 						'triggerid_up' => $triggerid_up
 					)));
 				}
 			}
+		}
+
+		$this->validateDependencies($triggers);
+
+		foreach ($infos as $info) {
+			info($info);
 		}
 	}
 
@@ -1878,32 +1883,32 @@ COpt::memoryPick();
 		return true;
 	}
 
-	protected function validateDependencies($triggers){
+	protected function validateDependencies($triggers) {
 
-		foreach($triggers as $trigger){
-			if(!isset($trigger['dependencies']) || empty($trigger['dependencies'])) continue;
+		foreach ($triggers as $trigger) {
+			if (!isset($trigger['dependencies']) || empty($trigger['dependencies'])) {
+				continue;
+			}
 
 // check circular dependency {{{
 			$triggerid_down = $trigger['dependencies'];
-			do{
-				$sql = 'SELECT triggerid_up '.
+			do {
+				$sql = 'SELECT triggerid_up'.
 						' FROM trigger_depends'.
 						' WHERE'.DBcondition('triggerid_down', $triggerid_down);
 				$db_up_triggers = DBselect($sql);
 				$up_triggerids = array();
-				while($up_trigger = DBfetch($db_up_triggers)){
-					if(bccomp($up_trigger['triggerid_up'],$trigger['triggerid']) == 0){
+				while ($up_trigger = DBfetch($db_up_triggers)) {
+					if (bccomp($up_trigger['triggerid_up'],$trigger['triggerid']) == 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_DEPENDENCY);
 					}
 					$up_triggerids[] = $up_trigger['triggerid_up'];
 				}
 				$triggerid_down = $up_triggerids;
-			} while(!empty($up_triggerids));
+
+			} while (!empty($up_triggerids));
 // }}} check circular dependency
 
-
-			$templates = array();
-			$templateids = array();
 
 			$expr = new CTriggerExpression($trigger);
 
@@ -1918,40 +1923,42 @@ COpt::memoryPick();
 
 			$dep_templateids = array();
 			$db_dephosts = get_hosts_by_triggerid($trigger['dependencies']);
-			while($dephost = DBfetch($db_dephosts)) {
-				if($dephost['status'] == HOST_STATUS_TEMPLATE){ //template
+			while ($dephost = DBfetch($db_dephosts)) {
+				if ($dephost['status'] == HOST_STATUS_TEMPLATE) {
 					$templates[$dephost['hostid']] = $dephost;
 					$dep_templateids[$dephost['hostid']] = $dephost['hostid'];
 				}
 			}
 
 			$tdiff = array_diff($dep_templateids, $templateids);
-			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
+			if (!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)) {
 				$tpls = zbx_array_merge($templateids, $dep_templateids);
-				$sql = 'SELECT DISTINCT ht.templateid, ht.hostid, h.host'.
-					' FROM hosts_templates ht, hosts h'.
+				$sql = 'SELECT DISTINCT ht.templateid,ht.hostid,h.host'.
+					' FROM hosts_templates ht,hosts h'.
 					' WHERE h.hostid=ht.hostid'.
-						' AND '.DBcondition('ht.templateid', $tpls);
+						' AND'.DBcondition('ht.templateid', $tpls);
 
 				$db_lowlvltpl = DBselect($sql);
 				$map = array();
-				while($lowlvltpl = DBfetch($db_lowlvltpl)){
-					if(!isset($map[$lowlvltpl['hostid']])) $map[$lowlvltpl['hostid']] = array();
+				while ($lowlvltpl = DBfetch($db_lowlvltpl)) {
+					if (!isset($map[$lowlvltpl['hostid']])) {
+						$map[$lowlvltpl['hostid']] = array();
+					}
 					$map[$lowlvltpl['hostid']][$lowlvltpl['templateid']] = $lowlvltpl['host'];
 				}
 
-				foreach($map as $hostid => $templates){
+				foreach ($map as $templates) {
 					$set_with_dep = false;
 
-					foreach($templateids as $tplid){
-						if(isset($templates[$tplid])){
+					foreach ($templateids as $tplid) {
+						if (isset($templates[$tplid])) {
 							$set_with_dep = true;
 							break;
 						}
 					}
-					foreach($dep_templateids as $dep_tplid){
-						if(!isset($templates[$dep_tplid]) && $set_with_dep){
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Not all Templates are linked to host [ '.reset($templates).' ]');
+					foreach ($dep_templateids as $dep_tplid) {
+						if (!isset($templates[$dep_tplid]) && $set_with_dep) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Not all Templates are linked to host "%s"', reset($templates)));
 						}
 					}
 				}
