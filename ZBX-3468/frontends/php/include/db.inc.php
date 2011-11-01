@@ -335,9 +335,8 @@ if( !isset($DB)) {
 				if ($result) db2_autocommit($DB['DB'], DB2_AUTOCOMMIT_ON);
 				break;
 			case ZBX_DB_SQLITE3:
-				if (unlock_sqlite3_access()) {
-					$result = DBexecute('commit');
-				}
+				$result = $DB['DB']->exec('commit');
+				unlock_sqlite3_access();
 				break;
 		}
 
@@ -730,7 +729,7 @@ else {
 
 		switch ($DB['TYPE']) {
 			case ZBX_DB_SQLITE3:
-				return ' ('.$x.' %% '.$y.')';
+				return ' ('.$x.' % '.$y.')';
 			default:
 				return ' MOD('.$x.','.$y.')';
 		}
@@ -1054,13 +1053,11 @@ else {
  *
  * @return bool
  */
-if (isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']) {
-	function init_sqlite3_access() {
-		global $DB, $ZBX_SEM_ID;
+function init_sqlite3_access() {
+	global $DB, $ZBX_SEM_ID;
 
-		$ZBX_SEM_ID = sem_get(ftok($DB['DATABASE'], 'z'), 1, 0660);
-		return $ZBX_SEM_ID;
-	}
+	$ZBX_SEM_ID = sem_get(ftok($DB['DATABASE'], 'z'), 1, 0660);
+	return $ZBX_SEM_ID;
 }
 
 /**
@@ -1068,12 +1065,10 @@ if (isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']) {
  *
  * @return bool
  */
-if (isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']) {
-	function lock_sqlite3_access() {
-		global $ZBX_SEM_ID, $DB;
+function lock_sqlite3_access() {
+	global $ZBX_SEM_ID, $DB;
 
-		return sem_acquire($ZBX_SEM_ID);
-	}
+	return sem_acquire($ZBX_SEM_ID);
 }
 
 /**
@@ -1081,12 +1076,10 @@ if (isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']) {
  *
  * @return bool
  */
-if (isset($DB['TYPE']) && ZBX_DB_SQLITE3 == $DB['TYPE']) {
-	function unlock_sqlite3_access() {
-		global $ZBX_SEM_ID;
+function unlock_sqlite3_access() {
+	global $ZBX_SEM_ID;
 
-		return sem_release($ZBX_SEM_ID);
-	}
+	return sem_release($ZBX_SEM_ID);
 }
 
 	class DB {
