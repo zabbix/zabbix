@@ -1,7 +1,7 @@
 <?php
 
-define('DEFAULT_SRC_FILE', dirname(__FILE__) . '/schema.tmpl');
-define('DEFAULT_DEST_FILE', dirname(__FILE__) . '/schema.inc.php');
+define('DEFAULT_SRC_FILE', dirname(__FILE__) . '/../src/schema.tmpl');
+define('DEFAULT_DEST_FILE', dirname(__FILE__) . '/../src/schema.inc.php');
 
 function parse_schema($path){
 	$schema = array();

@@ -99,6 +99,8 @@ sub process_row
 {
 	local $line = $_[0];
 
+	$line =~ s/&pipe;/|/;
+
 	@array = split(/\|/, $line);
 
 	$first = 1;

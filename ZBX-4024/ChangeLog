@@ -2,7 +2,7 @@
 Changes for 1.9.7
 
 New features:
- - [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses translations now (Alexei)
+ - [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
  - [ZBX-1346] add example user parameter to monitor mail queue length from mailq (Richlv)
  - [ZBXNEXT-429] make range select work in a more intutive fashion (Eduard)
  - [ZBXNEXT-910] redesign Administration->Maintenance (Eduard)
