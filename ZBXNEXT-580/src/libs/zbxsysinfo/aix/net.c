@@ -43,7 +43,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns)
 	assert(ns);
 
 #if defined(HAVE_LIBPERFSTAT)
-	zbx_snprintf(ps_id.name, sizeof(ps_id.name), "%s", if_name);
+	strscpy(ps_id.name, if_name);
 
 	if (-1 == perfstat_netinterface(&ps_id, &ps_netif, sizeof(ps_netif), 1))
 		return SYSINFO_RET_FAIL;
