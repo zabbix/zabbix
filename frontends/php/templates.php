@@ -431,7 +431,7 @@ include_once('include/page_header.php');
 					'hostids' => $clone_templateid,
 				));
 				$copyDiscoveryRules = Api::DiscoveryRule()->copy(array(
-					'discoveryruleids' => zbx_objectValues($discoveryRules, 'itemid'),
+					'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
 					'hostids' => array($templateid)
 				));
 				if (!$copyDiscoveryRules) {
