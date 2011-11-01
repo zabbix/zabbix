@@ -28,8 +28,8 @@
 
 #define ZBX_DB_WAIT_DOWN	10
 
-extern int	txn_level = 0;
-extern int	txn_error = 0;
+extern int	txn_level;
+extern int	txn_error;
 
 const char	*DBnode(const char *fieldid, int nodeid)
 {
