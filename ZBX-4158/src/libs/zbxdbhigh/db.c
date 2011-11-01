@@ -28,6 +28,9 @@
 
 #define ZBX_DB_WAIT_DOWN	10
 
+extern int	txn_level = 0;
+extern int	txn_error = 0;
+
 const char	*DBnode(const char *fieldid, int nodeid)
 {
 	static char	dbnode[128];
@@ -1474,6 +1477,10 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 	do
 	{
+		/* avoid eternal loop within failed transaction */
+		if (0 < txn_level && 0 != txn_error)
+			return 0;
+
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 				nodeid, table->table, table->recid);
 

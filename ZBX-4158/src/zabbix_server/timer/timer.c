@@ -471,7 +471,8 @@ out:
  ******************************************************************************/
 static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maintenance_to)
 {
-	typedef struct {
+	typedef struct zbx_event_data_s
+	{
 		zbx_uint64_t	triggerid;
 		int		value;
 	}
