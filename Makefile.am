@@ -14,8 +14,7 @@ EXTRA_DIST = \
 	build \
 	frontends \
 	include \
-	conf \
-	CREDITS
+	conf
 
 ## "dist-hook" run after the distribution directory is filled, but before the actual tar (or shar) file is created.
 dist-hook:
