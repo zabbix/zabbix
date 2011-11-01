@@ -19,7 +19,6 @@ build/win32/project/resource.res
 /configure
 create/Makefile
 create/Makefile.in
-create/bin/data.tmpl.new
 create/images/inkscape.log.txt
 create/images/pngcrush.log.txt
 create/images/pngcrushoutput.txt

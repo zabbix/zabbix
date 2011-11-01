@@ -1,10 +1,10 @@
-[ -z "$1" ] && echo "Usage: ./export_data.sh <DB name>" && exit
+[ -z "$1" ] && echo "Usage: ./export_data.sh <DB name>
+The script generates data file out of existing MySQL database." && exit 1
 
 dbname=$1
 schema=../src/schema.tmpl
 
-cat > data.tmpl.new <<EOL
---
+echo "--
 -- Zabbix
 -- Copyright (C) 2000-2011 Zabbix SIA
 --
@@ -22,11 +22,10 @@ cat > data.tmpl.new <<EOL
 -- along with this program; if not, write to the Free Software
 -- Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 --
-
-EOL
+"
 
 for table in `grep TABLE $schema | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
-	echo "TABLE |$table" >> data.tmpl.new
+	echo "TABLE |$table"
 	fields=""
 	# get list of all fields
 	for i in `seq 1 1000`; do
@@ -37,6 +36,6 @@ for table in `grep TABLE $schema | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
 	done
 	# remove first comma
 	fields=`echo $fields | cut -c2-`
-	echo "select $fields from $table" | mysql -t -uroot $dbname | grep -v '^+' | sed -e 's/ | /|/g' -e '1,1s/^| /FIELDS|/g' -e '2,$s/^| /ROW   |/g' -e 's/ |$/|/g' >> data.tmpl.new
-	echo "" >> data.tmpl.new
+	echo "select $fields from $table" | mysql -t -uroot $dbname | grep -v '^+' | sed -e 's/ | /|/g' -e '1,1s/^| /FIELDS|/g' -e '2,$s/^| /ROW   |/g' -e 's/ |$/|/g'
+	echo ""
 done

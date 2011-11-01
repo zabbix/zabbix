@@ -99,9 +99,12 @@ sub process_row
 {
 	local $line = $_[0];
 
-	$line =~ s/&pipe;/|/;
-
 	@array = split(/\|/, $line);
+
+	foreach (@array)
+	{
+		$_ =~ s/&pipe;/|/;
+	}
 
 	$first = 1;
 	$values = "(";
