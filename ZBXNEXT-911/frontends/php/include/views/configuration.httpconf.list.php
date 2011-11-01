@@ -43,7 +43,7 @@ $filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->get
 $numRows = new CDiv();
 $numRows->setAttribute('name', 'numrows');
 $httpWidget->addHeader(_('Scenarios'), $filterForm);
-$httpWidget->addHeader($numRows, array('[ ', new CLink($this->data['showDisabled'] ? _('Hide disabled scenarios'): _('Show disabled scenarios'), '?showdisabled='.($this->data['showDisabled'] ? 0 : 1), null), ' ]'));
+$httpWidget->addHeader($numRows, array('[ ', new CLink($this->data['showDisabled'] ? _('Hide disabled scenarios') : _('Show disabled scenarios'), '?showdisabled='.($this->data['showDisabled'] ? 0 : 1), null), ' ]'));
 
 // create form
 $httpForm = new CForm('get');
@@ -108,7 +108,12 @@ foreach ($httpTableRows as $appid => $app_rows) {
 		$link = new CLink(new CImg('images/general/closed.gif'), '?open=1&applicationid='.$db_app['applicationid'].url_param('groupid').url_param('hostid').url_param('applications').url_param('select'));
 	}
 
-	$column = new CCol(array($link, SPACE, bold($db_app['name']), SPACE.'('.$db_app['scenarios_cnt'].SPACE._('Scenarios').')'));
+	$column = new CCol(array(
+		$link,
+		SPACE,
+		bold($db_app['name']),
+		SPACE.'('._n('%1$d scenario', '%1$d scenarios', $db_app['scenarios_cnt']).')'
+	));
 	$column->setColSpan(6);
 
 	$httpTable->addRow(array(get_node_name_by_elid($db_app['applicationid']), $column));

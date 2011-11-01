@@ -75,21 +75,22 @@ function activate_httptest($httptestid) {
 	$result = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_ACTIVE.' WHERE httptestid='.$httptestid);
 
 	$itemids = array();
-	$sql = 'SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid;
-	$items_db = DBselect($sql);
+	$items_db = DBselect('SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid);
 	while ($itemid = Dbfetch($items_db)) {
 		$itemids[] = $itemid['itemid'];
 	}
 
-	$sql = 'SELECT hsi.itemid FROM httpstep hs,httpstepitem hsi WHERE '.
-			' hs.httptestid='.$httptestid.' AND hs.httpstepid=hsi.httpstepid';
-	$items_db = DBselect($sql);
+	$items_db = DBselect(
+		'SELECT hsi.itemid'.
+		' FROM httpstep hs,httpstepitem hsi'.
+		' WHERE hs.httpstepid=hsi.httpstepid'.
+			' AND hs.httptestid='.$httptestid
+	);
 	while ($itemid = Dbfetch($items_db)) {
 		$itemids[] = $itemid['itemid'];
 	}
 
-	$sql = 'UPDATE items SET status='.ITEM_STATUS_ACTIVE.' WHERE '.DBcondition('itemid', $itemids);
-	$result &= DBexecute($sql);
+	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_ACTIVE.' WHERE '.DBcondition('itemid', $itemids));
 	return $result;
 }
 
@@ -97,30 +98,33 @@ function disable_httptest($httptestid) {
 	$result = DBexecute('UPDATE httptest SET status='.HTTPTEST_STATUS_DISABLED.' WHERE httptestid='.$httptestid);
 
 	$itemids = array();
-	$sql = 'SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid;
-	$items_db = DBselect($sql);
+	$items_db = DBselect('SELECT hti.itemid FROM httptestitem hti WHERE hti.httptestid='.$httptestid);
 	while ($itemid = Dbfetch($items_db)) {
 		$itemids[] = $itemid['itemid'];
 	}
 
-	$sql = 'SELECT hsi.itemid FROM httpstep hs,httpstepitem hsi WHERE '.
-			' hs.httptestid='.$httptestid.' AND hs.httpstepid=hsi.httpstepid';
-	$items_db = DBselect($sql);
+	$items_db = DBselect(
+		'SELECT hsi.itemid'.
+		' FROM httpstep hs,httpstepitem hsi'.
+		' WHERE hs.httpstepid=hsi.httpstepid'.
+			' AND hs.httptestid='.$httptestid
+	);
 	while ($itemid = Dbfetch($items_db)) {
 		$itemids[] = $itemid['itemid'];
 	}
 
-	$sql = 'UPDATE items SET status='.ITEM_STATUS_DISABLED.' WHERE '.DBcondition('itemid', $itemids);
-	$result &= DBexecute($sql);
+	$result &= DBexecute('UPDATE items SET status='.ITEM_STATUS_DISABLED.' WHERE '.DBcondition('itemid', $itemids));
 	return $result;
 }
 
 function delete_history_by_httptestid($httptestid) {
-	$db_items = DBselect('SELECT DISTINCT i.itemid'.
-						' FROM items i,httpstepitem si,httpstep s'.
-						' WHERE s.httptestid='.$httptestid.
-							' AND si.httpstepid=s.httpstepid'.
-							' AND i.itemid=si.itemid');
+	$db_items = DBselect(
+		'SELECT DISTINCT i.itemid'.
+		' FROM items i,httpstepitem si,httpstep s'.
+		' WHERE i.itemid=si.itemid'.
+			' AND si.httpstepid=s.httpstepid'.
+			' AND s.httptestid='.$httptestid
+	);
 	while ($item_data = DBfetch($db_items)) {
 		if (!delete_history_by_itemid($item_data['itemid'], 0)) {
 			return false;
@@ -139,10 +143,11 @@ function get_httpstep_by_no($httptestid, $no) {
 
 function get_httptests_by_hostid($hostids) {
 	zbx_value2array($hostids);
-	$sql = 'SELECT DISTINCT ht.*'.
+	return DBselect(
+		'SELECT DISTINCT ht.*'.
 			' FROM httptest ht,applications ap'.
-			' WHERE '.DBcondition('ap.hostid', $hostids).
-				' AND ht.applicationid=ap.applicationid';
-	return DBselect($sql);
+			' WHERE ht.applicationid=ap.applicationid'.
+				' AND '.DBcondition('ap.hostid', $hostids)
+	);
 }
 ?>

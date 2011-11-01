@@ -25,7 +25,7 @@ function update_node_profile($nodeids) {
 
 	foreach ($nodeids as $nodeid) {
 		DBexecute('INSERT INTO profiles (profileid,userid,idx,value_id,type)'.
-					' VALUES ('.get_dbid('profiles', 'profileid').','.CWebUser::$data['userid'].','.zbx_dbstr('web.nodes.selected').','.$nodeid.', 4)');
+					' VALUES ('.get_dbid('profiles', 'profileid').','.CWebUser::$data['userid'].','.zbx_dbstr('web.nodes.selected').','.$nodeid.',4)');
 	}
 	DBend();
 }
@@ -214,19 +214,19 @@ function is_show_all_nodes() {
 	return ZBX_DISTRIBUTED && $ZBX_VIEWED_NODES['selected'] == 0;
 }
 
-function detect_node_type($node_data) {
+function detect_node_type($nodeid, $masterid) {
 	global $ZBX_CURMASTERID, $ZBX_LOCALNODEID;
 
-	if (bccomp($node_data['nodeid'], $ZBX_LOCALNODEID) == 0) {
+	if (bccomp($nodeid, $ZBX_LOCALNODEID) == 0) {
 		$node_type = ZBX_NODE_LOCAL;
 	}
-	elseif (bccomp($node_data['nodeid'], get_current_nodeid(false)) == 0) {
+	elseif (bccomp($nodeid, get_current_nodeid(false)) == 0) {
 		$node_type = ZBX_NODE_LOCAL;
 	}
-	elseif (bccomp($node_data['nodeid'], $ZBX_CURMASTERID) == 0) {
+	elseif (bccomp($nodeid, $ZBX_CURMASTERID) == 0) {
 		$node_type = ZBX_NODE_MASTER;
 	}
-	elseif (bccomp($node_data['masterid'], get_current_nodeid(false)) == 0) {
+	elseif (bccomp($masterid, get_current_nodeid(false)) == 0) {
 		$node_type = ZBX_NODE_CHILD;
 	}
 	else {
@@ -277,7 +277,6 @@ function add_node($new_nodeid, $name, $ip, $port, $node_type, $masterid) {
 		default:
 			error(_('Incorrect node type'));
 			return false;
-		break;
 	}
 
 	if (DBfetch(DBselect('SELECT n.nodeid FROM nodes n WHERE n.nodeid='.$new_nodeid))) {
@@ -307,8 +306,8 @@ function update_node($nodeid, $name, $ip, $port) {
 
 function delete_node($nodeid) {
 	$result = false;
-	$node_data = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodeid='.$nodeid));
-	$node_type = detect_node_type($node_data);
+	$node_data = DBfetch(DBselect('SELECT n.nodeid,n.masterid FROM nodes n WHERE n.nodeid='.$nodeid));
+	$node_type = detect_node_type($node_data['nodeid'], $node_data['masterid']);
 
 	if ($node_type == ZBX_NODE_LOCAL) {
 		error(_('Unable to remove local node'));
@@ -318,7 +317,7 @@ function delete_node($nodeid) {
 			DBexecute('update nodes set masterid=NULL where masterid='.$nodeid) &&
 			DBexecute('delete from nodes where nodeid='.$nodeid)
 		);
-		error(_('Please be aware that database still contains data related to the deleted Node'));
+		error(_('Please be aware that database still contains data related to the deleted node'));
 	}
 	return $result;
 }

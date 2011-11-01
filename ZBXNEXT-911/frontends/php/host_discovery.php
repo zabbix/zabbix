@@ -566,7 +566,7 @@ switch($itemType) {
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
 
 // Password
-		$frmItem->addRow(_('Password'), new CTextBox('password',$password,16), null, 'row_password');
+		$frmItem->addRow(_('Password'), new CTextBox('password', $password, 16), null, 'row_password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'password');
@@ -621,7 +621,7 @@ switch($itemType) {
 		), null);
 
 // Update interval (in sec)
-		$frmItem->addRow(_('Update interval (in sec)'), new CNumericBox('delay',$delay,5), null, 'row_delay');
+		$frmItem->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $delay, 5), null, 'row_delay');
 		foreach($type_keys as $it) {
 			if($it == ITEM_TYPE_TRAPPER) continue;
 			zbx_subarray_push($typeVisibility, $it, 'delay');

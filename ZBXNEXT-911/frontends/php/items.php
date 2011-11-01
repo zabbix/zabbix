@@ -1196,7 +1196,7 @@ switch($itemType) {
 		//$goOption->setAttribute('confirm',S_COPY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('clean_history',_('Clear history for selected'));
+		$goOption = new CComboItem('clean_history', _('Clear history for selected'));
 		$goOption->setAttribute('confirm',S_DELETE_HISTORY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 

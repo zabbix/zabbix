@@ -204,8 +204,13 @@ elseif (isset($_REQUEST['save'])) {
 			'steps' => get_request('steps', array())
 		);
 
-		$sql = 'SELECT a.applicationid FROM applications a WHERE a.name='.zbx_dbstr($_REQUEST['application']).' AND a.hostid='.$_REQUEST['hostid'];
-		if ($applicationid = DBfetch(DBselect($sql))) {
+		$db_app_result = DBselect(
+			'SELECT a.applicationid'.
+			' FROM applications a'.
+			' WHERE a.name='.zbx_dbstr($_REQUEST['application']).
+				' AND a.hostid='.$_REQUEST['hostid']
+		);
+		if ($applicationid = DBfetch($db_app_result)) {
 			$webcheck['applicationid'] = $applicationid['applicationid'];
 		}
 		else {
@@ -311,7 +316,7 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '._('Host').' ['.$host['host'].']'._('History cleared'));
 		}
 	}
-	show_messages($go_result, _('History cleared'), $go_result);
+	show_messages($go_result, _('History cleared'), null);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_httptestid'])) {
 	$go_result = API::WebCheck()->delete($_REQUEST['group_httptestid']);
@@ -350,10 +355,12 @@ if (isset($_REQUEST['form']) && !empty($data['hostid'])) {
 	$data['form_refresh'] = get_request('form_refresh', 0);
 
 	if ((isset($_REQUEST['httptestid']) && !isset($_REQUEST['form_refresh'])) || isset($limited)) {
-		$sql = 'SELECT wt.*,a.name AS application'.
-				' FROM httptest wt,applications a WHERE wt.httptestid='.$_REQUEST['httptestid'].
-				' AND a.applicationid=wt.applicationid';
-		$db_httptest = DBfetch(DBselect($sql));
+		$db_httptest = DBfetch(DBselect(
+			'SELECT wt.*,a.name AS application'.
+			' FROM httptest wt,applications a'.
+			' WHERE a.applicationid=wt.applicationid'.
+				' AND wt.httptestid='.$_REQUEST['httptestid']
+		));
 
 		$data['name'] = $db_httptest['name'];
 		$data['application'] = $db_httptest['application'];
@@ -390,11 +397,13 @@ else {
 	$data['showAllApps'] = $showAllApps;
 
 	$data['db_apps'] = array();
-	$sql = 'SELECT DISTINCT h.name AS hostname,a.*'.
-				' FROM applications a,hosts h'.
-				' WHERE a.hostid=h.hostid'.($data['hostid'] > 0 ? ' AND h.hostid='.$data['hostid'] : '').
-				' AND '.DBcondition('h.hostid', $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array());
-	$db_app_result = DBselect($sql);
+	$db_app_result = DBselect(
+		'SELECT DISTINCT h.name AS hostname,a.*'.
+		' FROM applications a,hosts h'.
+		' WHERE a.hostid=h.hostid'.
+			($data['hostid'] > 0 ? ' AND h.hostid='.$data['hostid'] : '').
+			' AND '.DBcondition('h.hostid', $pageFilter->hostsSelected ? array_keys($pageFilter->hosts) : array())
+	);
 	while ($db_app = DBfetch($db_app_result)) {
 		$db_app['scenarios_cnt'] = 0;
 		$data['db_apps'][$db_app['applicationid']] = $db_app;
@@ -402,13 +411,14 @@ else {
 
 	// get http tests
 	$data['db_httptests'] = array();
-	$sql = 'SELECT wt.*,a.name AS application,h.name AS hostname,h.hostid'.
-				' FROM httptest wt,applications a,hosts h'.
-				' WHERE wt.applicationid=a.applicationid'.
-					' AND a.hostid=h.hostid'.
-					' AND '.DBcondition('a.applicationid', array_keys($data['db_apps'])).
-					($showDisabled == 0 ? ' AND wt.status='.HTTPTEST_STATUS_ACTIVE : '');
-	$db_httptests_result = DBselect($sql);
+	$db_httptests_result = DBselect(
+		'SELECT wt.*,a.name AS application,h.name AS hostname,h.hostid'.
+		' FROM httptest wt,applications a,hosts h'.
+		' WHERE wt.applicationid=a.applicationid'.
+			' AND a.hostid=h.hostid'.
+			' AND '.DBcondition('a.applicationid', array_keys($data['db_apps'])).
+			($showDisabled == 0 ? ' AND wt.status='.HTTPTEST_STATUS_ACTIVE : '')
+	);
 	while ($httptest_data = DBfetch($db_httptests_result)) {
 		$data['db_apps'][$httptest_data['applicationid']]['scenarios_cnt']++;
 		$httptest_data['step_count'] = null;
@@ -416,11 +426,12 @@ else {
 	}
 
 	// get http steps
-	$sql = 'SELECT hs.httptestid,COUNT(hs.httpstepid) AS cnt'.
-				' FROM httpstep hs'.
-				' WHERE '.DBcondition('hs.httptestid', array_keys($data['db_httptests'])).
-				' GROUP BY hs.httptestid';
-	$httpstep_res = DBselect($sql);
+	$httpstep_res = DBselect(
+		'SELECT hs.httptestid,COUNT(hs.httpstepid) AS cnt'.
+		' FROM httpstep hs'.
+		' WHERE '.DBcondition('hs.httptestid', array_keys($data['db_httptests'])).
+		' GROUP BY hs.httptestid'
+	);
 	while ($step_count = DBfetch($httpstep_res)) {
 		$data['db_httptests'][$step_count['httptestid']]['step_count'] = $step_count['cnt'];
 	}

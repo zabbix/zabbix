@@ -292,7 +292,12 @@ include_once('include/page_header.php');
 				url_param('groupid').url_param('hostid').url_param('applications').
 				url_param('select'));
 
-		$col = new CCol(array($link,SPACE,bold($db_app['name']),SPACE.'('.$db_app['scenarios_cnt'].SPACE._('Scenarios').')'));
+		$col = new CCol(array(
+			$link,
+			SPACE,
+			bold($db_app['name']),
+			SPACE.'('._n('%1$d scenario', '%1$d scenarios', $db_app['scenarios_cnt']).')'
+		));
 		$col->setColSpan(6);
 
 		$table->addRow(array(

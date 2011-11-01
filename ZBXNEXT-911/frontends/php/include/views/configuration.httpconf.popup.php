@@ -70,7 +70,7 @@ else {
 
 	// append buttons to form
 	$httpPopupForm->addItem(makeFormFooter(
-		array(new CSubmit('save', isset($stepid) ? _('Save') : _('Add'))),
+		array(new CSubmit('save', isset($stepid) ? _('Update') : _('Add'))),
 		array(new CButtonCancel(null, 'close_window();'))
 	));
 

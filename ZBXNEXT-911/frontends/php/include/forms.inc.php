@@ -1388,7 +1388,7 @@
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
 
-		$row = new CRow(array(new CCol(_('Password'), 'form_row_l'), new CCol(new CTextBox('password',$password,16),'form_row_r')));
+		$row = new CRow(array(new CCol(_('Password'), 'form_row_l'), new CCol(new CTextBox('password', $password, 16), 'form_row_r')));
 		$row->setAttribute('id', 'row_password');
 		$frmItem->addRow($row);
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'password');
@@ -1505,7 +1505,7 @@
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_multiplier');
 
 
-		$row = new CRow(array(new CCol(_('Update interval (in sec)'),'form_row_l'), new CCol(new CNumericBox('delay',$delay,5),'form_row_r')));
+		$row = new CRow(array(new CCol(_('Update interval (in sec)'), 'form_row_l'), new CCol(new CNumericBox('delay', $delay, 5), 'form_row_r')));
 		$row->setAttribute('id', 'row_delay');
 		$frmItem->addRow($row);
 		foreach($types as $it => $ilabel) {
@@ -1909,7 +1909,7 @@
 			S_CUSTOM_MULTIPLIER.' (0 - '.S_DISABLED.')'), new CTextBox('formula',$formula,40));
 
 		$frmItem->addRow(array( new CVisibilityBox('delay_visible', get_request('delay_visible'), 'delay', S_ORIGINAL),
-			_('Update interval (in sec)')), new CNumericBox('delay',$delay,5));
+			_('Update interval (in sec)')), new CNumericBox('delay', $delay, 5));
 
 		$delay_flex_el = new CSpan($delay_flex_el);
 		$delay_flex_el->setAttribute('id', 'delay_flex_list');
