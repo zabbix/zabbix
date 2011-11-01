@@ -2253,4 +2253,3 @@ clean:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-
