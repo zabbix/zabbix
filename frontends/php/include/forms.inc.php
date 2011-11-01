@@ -3860,7 +3860,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$grp_tb->addItem($grp['groupid'], $grp['name']);
 		}
 
-		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), S_ORIGINAL),S_REPLACE_GROUPS),
+		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), S_ORIGINAL), S_REPLACE_GROUPS),
 						$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)
 					);
 
