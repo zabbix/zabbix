@@ -274,8 +274,6 @@ void	DCflush_nextchecks()
 			/* dealing with events */
 			for (i = 0; i < events_num; i++)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "VL: %s() id:" ZBX_FS_UI64, __function_name, id);
-
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 						"insert into events (eventid,source,object,objectid,clock,value) "
 						"values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d);\n",

@@ -1479,7 +1479,10 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	{
 		/* avoid eternal loop within failed transaction */
 		if (0 < txn_level && 0 != txn_error)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() transaction failed", __function_name);
 			return 0;
+		}
 
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 				nodeid, table->table, table->recid);

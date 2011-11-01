@@ -943,8 +943,6 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 		for (i = 0; i < tr_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "VL %s(): id:" ZBX_FS_UI64, __function_name, id);
-
 			tr_last = &tr[i];
 
 			zbx_free(tr_last->error);

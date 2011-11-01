@@ -161,8 +161,6 @@ static void	process_time_functions()
 				if (1 != tr_last->add_event)
 					continue;
 
-				zabbix_log(LOG_LEVEL_WARNING, "VL %s() id:" ZBX_FS_UI64, __function_name, id);
-
 				process_event(id++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
 						tr_last->lastchange, tr_last->new_value, 0, 0);
 			}
