@@ -2623,43 +2623,6 @@ function utf8RawUrlDecode($source){
 		return $newExp;
 	}
 
-	function make_disp_tree($tree, $map, $action = false){
-		$res = array();
-		foreach ($tree as $i => $n){
-			$expr = array();
-			for ($j = 0; $j < $n['depth']; ++$j){
-				$next = $finder($tree, $i + 1, $j + 1);
-				if($j + 1 == $n['depth']) $expr[] = new CImg('images/general/tr_'.($next ? 'top_right_bottom':'top_right').'.gif','tr', 12, 12);
-				else $expr[] = new CImg('images/general/tr_'.($next ? 'top_bottom':'space').'.gif', 'tr', 12, 12);
-			}
-
-			$key = null;
-
-			if(zbx_strlen($n['expr']) == 1){
-				$key = $n['expr'];
-				$tgt = $map[$key];
-
-				array_push($expr, SPACE, bold($n['expr']),SPACE);
-
-				$e = $tgt['expression'].$tgt['sign'].$tgt['value'];
-				if($action){
-					$url = new CSpan($e, 'link');
-					$url->setAttribute('id', 'expr' . $n['id']);
-					$url->setAttribute('onclick', 'javascript: copy_expression("expr'. $n['id'] .'");');
-					$expr[] = $url;
-				}else{
-					$expr[] = $e;
-				}
-			} else {
-				array_push($expr, SPACE, italic($n['expr']));
-			}
-
-			array_push($res, array('id' => $n['id'], 'expr' => $expr, 'key' => $key));
-		}
-
-	return $res;
-	}
-
 /*
  * Function: remake_expression
  *
