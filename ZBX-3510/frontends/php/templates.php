@@ -429,6 +429,7 @@ include_once('include/page_header.php');
 				// clone discovery rules
 				$discoveryRules = API::DiscoveryRule()->get(array(
 					'hostids' => $clone_templateid,
+					'inherited' => false,
 				));
 				if ($discoveryRules) {
 					$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
