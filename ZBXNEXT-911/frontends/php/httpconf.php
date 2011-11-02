@@ -81,6 +81,7 @@ $_REQUEST['go'] = get_request('go', 'none');
  */
 $options = array(
 	'groups' => array(
+		'real_hosts' => 1,
 		'not_proxy_hosts' => 1,
 		'editable' => 1
 	),
