@@ -980,62 +980,64 @@ COpt::memoryPick();
 	 * @param bool $nopermissions
 	 * @return bool
 	 */
-	public function delete($graphids, $nopermissions=false){
+	public function delete($graphids, $nopermissions = false) {
+		if (empty($graphids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
 
-			if(empty($graphids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+		$graphids = zbx_toArray($graphids);
 
-			$graphids = zbx_toArray($graphids);
+		// TODO: remove $nopermissions hack
+		$options = array(
+			'graphids' => $graphids,
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1
+		);
+		$del_graphs = $this->get($options);
 
-// TODO: remove $nopermissions hack
-			$options = array(
-				'graphids' => $graphids,
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
-			);
-			$del_graphs = $this->get($options);
-
-			if(!$nopermissions){
-				foreach($graphids as $graphid){
-					if(!isset($del_graphs[$graphid]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-					if($del_graphs[$graphid]['templateid'] != 0){
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot delete templated graphs'));
-					}
+		if (!$nopermissions) {
+			foreach ($graphids as $graphid) {
+				if (!isset($del_graphs[$graphid])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+				if ($del_graphs[$graphid]['templateid'] != 0) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot delete templated graphs'));
 				}
 			}
+		}
 
-			$parent_graphids = $graphids;
-			do{
-				$db_graphs = DBselect('SELECT graphid FROM graphs WHERE ' . DBcondition('templateid', $parent_graphids));
-				$parent_graphids = array();
-				while($db_graph = DBfetch($db_graphs)){
-					$parent_graphids[] = $db_graph['graphid'];
-					$itemids[$db_graph['graphid']] = $db_graph['graphid'];
-				}
-			} while(!empty($parent_graphids));
-
-			DB::delete('screens_items', array(
-				'resourceid'=>$graphids,
-				'resourcetype'=>SCREEN_RESOURCE_GRAPH
-			));
-
-			DB::delete('profiles', array(
-				'idx'=>'web.favorite.graphids',
-				'source'=>'graphid',
-				'value_id'=>$graphids
-			));
-
-			DB::delete('graphs', array(
-				'graphid'=> $graphids
-			));
-
-// TODO: REMOVE info
-			foreach($del_graphs as $graphid => $graph){
-				info(_s('Graph [%s] deleted.', $graph['name']));
+		$parent_graphids = $graphids;
+		do {
+			$db_graphs = DBselect('SELECT graphid FROM graphs WHERE '.DBcondition('templateid', $parent_graphids));
+			$parent_graphids = array();
+			while ($db_graph = DBfetch($db_graphs)) {
+				$parent_graphids[] = $db_graph['graphid'];
+				$itemids[$db_graph['graphid']] = $db_graph['graphid'];
 			}
+		} while (!empty($parent_graphids));
 
-			return array('graphids'=> $graphids);
+		DB::delete('screens_items', array(
+			'resourceid' => $graphids,
+			'resourcetype' => SCREEN_RESOURCE_GRAPH
+		));
+
+		DB::delete('profiles', array(
+			'idx' => 'web.favorite.graphids',
+			'source' => 'graphid',
+			'value_id' => $graphids
+		));
+
+		DB::delete('graphs', array(
+			'graphid' => $graphids
+		));
+
+		// TODO: REMOVE info
+		foreach ($del_graphs as $graphid => $graph) {
+			info(_s('Graph [%s] deleted.', $graph['name']));
+		}
+
+		return array('graphids' => $graphids);
 	}
 
 	private function checkInput($graphs, $update=false){

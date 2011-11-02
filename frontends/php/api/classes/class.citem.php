@@ -1043,9 +1043,9 @@ class CItem extends CItemGeneral{
 	 * @param array $itemids
 	 * @return
 	 */
-	public function delete($itemids, $nopermissions=false){
-			if(empty($itemids))
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+	public function delete($itemids, $nopermissions=false) {
+			if (empty($itemids))
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 			$itemids = zbx_toHash($itemids);
 
@@ -1058,12 +1058,12 @@ class CItem extends CItemGeneral{
 			$del_items = $this->get($options);
 
 // TODO: remove $nopermissions hack
-			if(!$nopermissions){
-				foreach($itemids as $itemid){
-					if(!isset($del_items[$itemid])){
+			if (!$nopermissions) {
+				foreach ($itemids as $itemid) {
+					if (!isset($del_items[$itemid])) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 					}
-					if($del_items[$itemid]['templateid'] != 0){
+					if ($del_items[$itemid]['templateid'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated item.');
 					}
 				}

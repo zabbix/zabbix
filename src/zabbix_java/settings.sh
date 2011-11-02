@@ -1,4 +1,4 @@
-# This is a configuration file for Zabbix Java Proxy.
+# This is a configuration file for Zabbix Java Gateway.
 # It is sourced by startup.sh and shutdown.sh scripts.
 
 ### Option: zabbix.listenIP
@@ -14,11 +14,11 @@
 # Mandatory: no
 # Range: 1024-32767
 # Default:
-# LISTEN_PORT=10051
+# LISTEN_PORT=10052
 
 ### Option: zabbix.pidFile
 #	Name of PID file.
-#	If omitted, Zabbix Java Proxy is started as a console application.
+#	If omitted, Zabbix Java Gateway is started as a console application.
 #
 # Mandatory: no
 # Default:

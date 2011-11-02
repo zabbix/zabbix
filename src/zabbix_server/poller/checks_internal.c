@@ -197,7 +197,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		int	res;
 
 		alarm(CONFIG_TIMEOUT);
-		res = get_value_java(ZBX_JAVA_PROXY_REQUEST_INTERNAL, item, result);
+		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result);
 		alarm(0);
 
 		if (SUCCEED != res)

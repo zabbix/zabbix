@@ -138,18 +138,18 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (NULL == CONFIG_JAVA_PROXY || '\0' == *CONFIG_JAVA_PROXY)
+	if (NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY)
 	{
 		err = PROXY_ERROR;
-		strscpy(error, "JavaProxy configuration parameter not set or empty");
+		strscpy(error, "JavaGateway configuration parameter not set or empty");
 		goto exit;
 	}
 
-	if (ZBX_JAVA_PROXY_REQUEST_INTERNAL == request)
+	if (ZBX_JAVA_GATEWAY_REQUEST_INTERNAL == request)
 	{
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_JAVA_PROXY_INTERNAL, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_JAVA_GATEWAY_INTERNAL, ZBX_JSON_TYPE_STRING);
 	}
-	else if (ZBX_JAVA_PROXY_REQUEST_JMX == request)
+	else if (ZBX_JAVA_GATEWAY_REQUEST_JMX == request)
 	{
 		for (i = 1; i < num; i++)
 		{
@@ -164,7 +164,7 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 			}
 		}
 
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_JAVA_PROXY_JMX, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_JAVA_GATEWAY_JMX, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_CONN, items[0].interface.addr, ZBX_JSON_TYPE_STRING);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, items[0].interface.port);
@@ -182,7 +182,7 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 	zbx_json_close(&json);
 
 	if (SUCCEED == (err = zbx_tcp_connect(&s, CONFIG_SOURCE_IP,
-					CONFIG_JAVA_PROXY, CONFIG_JAVA_PROXY_PORT, CONFIG_TIMEOUT)))
+					CONFIG_JAVA_GATEWAY, CONFIG_JAVA_GATEWAY_PORT, CONFIG_TIMEOUT)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
 
