@@ -28,6 +28,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE, 		0,	"/"},
 	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		0,	"/,free"},
+	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	0,	0},
 
 	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		0,	"lo0,bytes"},
 	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		0,	"lo0,bytes"},
