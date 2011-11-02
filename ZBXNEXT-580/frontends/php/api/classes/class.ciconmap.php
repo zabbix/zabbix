@@ -97,11 +97,8 @@ class CIconMap extends CZBXAPI {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == self::$userData['type']) {
-		}
-		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
-		}
-		elseif (!is_null($options['editable']) || (self::$userData['type'] != USER_TYPE_SUPER_ADMIN)) {
+		// allow write access only to USER_TYPE_SUPER_ADMIN
+		if ($options['editable'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			return array();
 		}
 
@@ -428,7 +425,7 @@ class CIconMap extends CZBXAPI {
 		$iconmapids = zbx_toArray($iconmapids);
 
 		if (empty($iconmapids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 		if (!$this->isWritable($iconmapids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));

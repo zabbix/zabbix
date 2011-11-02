@@ -405,9 +405,11 @@ include_once('include/page_header.php');
 		$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
 		if(!empty($groupids)){
-			$sql = 'SELECT DISTINCT hg.hostid '.
-				' FROM hosts_groups hg '.
-				' WHERE '.DBcondition('hg.groupid', $groupids);
+			$sql = 'SELECT DISTINCT hg.hostid'.
+				' FROM hosts_groups hg,hosts h'.
+				' WHERE h.hostid=hg.hostid'.
+					' AND'.DBcondition('h.status', array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)).
+					' AND'.DBcondition('hg.groupid', $groupids);
 			$res = DBselect($sql);
 			while($db_host = DBfetch($res)){
 				$hostids[$db_host['hostid']] = $db_host['hostid'];

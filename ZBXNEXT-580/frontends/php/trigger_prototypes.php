@@ -366,7 +366,7 @@ include_once('include/page_header.php');
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_EXTEND,
-			'select_functions' => API_OUTPUT_EXTEND,
+			'selectFunctions' => API_OUTPUT_EXTEND,
 		);
 		$triggers = API::Trigger()->get($options);
 		order_result($triggers, $sortfield, $sortorder);
@@ -374,11 +374,15 @@ include_once('include/page_header.php');
 		$realHosts = getParentHostsByTriggers($triggers);
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
+
+		$link = new Curl();
+		$link->setArgument('parent_discoveryid', $_REQUEST['parent_discoveryid']);
+
 		$table->setHeader(array(
 			new CCheckBox('all_triggers',NULL,"checkAll('".$form->getName()."','all_triggers','g_triggerid');"),
-			make_sorting_header(S_SEVERITY,'priority'),
-			make_sorting_header(S_STATUS,'status'),
-			make_sorting_header(S_NAME,'description'),
+			make_sorting_header(S_SEVERITY,'priority', $link->getUrl()),
+			make_sorting_header(S_STATUS,'status', $link->getUrl()),
+			make_sorting_header(S_NAME,'description', $link->getUrl()),
 			S_EXPRESSION,
 		));
 

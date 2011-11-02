@@ -1393,27 +1393,27 @@ COpt::memoryPick();
  * @param array $triggerids array with trigger ids
  * @return array
  */
-	public function delete($triggerids, $nopermissions=false){
+	public function delete($triggerids, $nopermissions=false) {
 		$triggerids = zbx_toArray($triggerids);
 		$triggers = zbx_toObject($triggerids, 'triggerid');
 
-			if(empty($triggerids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if (empty($triggerids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 // TODO: remove $nopermissions hack
-			if(!$nopermissions){
+			if (!$nopermissions) {
 				$this->checkInput($triggers, __FUNCTION__);
 			}
 
 // get child triggers
 			$parent_triggerids = $triggerids;
-			do{
-				$db_items = DBselect('SELECT triggerid FROM triggers WHERE ' . DBcondition('templateid', $parent_triggerids));
+			do {
+				$db_items = DBselect('SELECT triggerid FROM triggers WHERE '.DBcondition('templateid', $parent_triggerids));
 				$parent_triggerids = array();
-				while($db_trigger = DBfetch($db_items)){
+				while ($db_trigger = DBfetch($db_items)) {
 					$parent_triggerids[] = $db_trigger['triggerid'];
 					$triggerids[$db_trigger['triggerid']] = $db_trigger['triggerid'];
 				}
-			} while(!empty($parent_triggerids));
+			} while (!empty($parent_triggerids));
 
 
 // select all triggers which are deleted (include childs)

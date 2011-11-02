@@ -70,8 +70,8 @@
 		$dbHost['interfaces'] = API::HostInterface()->get(array(
 			'hostids' => $dbHost['hostid'],
 			'output' => API_OUTPUT_EXTEND,
-			'selectItems' => API_OUTPUT_COUNT,
-			'preserveKeys' => true,
+			'selectItems' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
 		));
 
 		ArraySorter::sort($dbHost['interfaces'], array('type', 'interfaceid'));
@@ -80,15 +80,27 @@
 		$original_templates = $dbHost['parentTemplates'];
 		$original_templates = zbx_toHash($original_templates, 'templateid');
 
-		if(!empty($interfaces)){
-			foreach($interfaces as $hinum => $interface){
-				$interfaces[$hinum]['items'] = 0;
+		if (!isset($_REQUEST['form_refresh'])) {
+			$interfaces = $dbHost['interfaces'];
+		}
 
-				if($interface['new'] == 'create') continue;
-				if(!isset($dbHost['interfaces'][$interface['interfaceid']])) continue;
+		foreach ($interfaces as $hinum => $interface) {
+			$interfaces[$hinum]['items'] = 0;
 
-				$interfaces[$hinum]['items'] = $dbHost['interfaces'][$interface['interfaceid']]['items'];
+			if ((isset($interface['new']) && $interface['new'] == 'create') || !isset($dbHost['interfaces'][$interface['interfaceid']])) {
+				continue;
 			}
+
+			$interfaces[$hinum]['items'] = count($dbHost['interfaces'][$interface['interfaceid']]['items']);
+			$locked = 0;
+			foreach ($dbHost['interfaces'][$interface['interfaceid']]['items'] as $item) {
+				$itemInterfaceType = CItem::itemTypeInterface($item['type']);
+				if (!($itemInterfaceType === false || $itemInterfaceType === INTERFACE_TYPE_ANY)) {
+					$locked = 1;
+					break;
+				}
+			}
+			$interfaces[$hinum]['locked'] = $locked;
 		}
 
 		// getting items that populate host inventory fields
@@ -119,7 +131,6 @@
 		$ipmi_password		= $dbHost['ipmi_password'];
 
 		$macros = $dbHost['macros'];
-		$interfaces = $dbHost['interfaces'];
 		$host_groups = zbx_objectValues($dbHost['groups'], 'groupid');
 
 // BEGIN: HOSTS INVENTORY Section
