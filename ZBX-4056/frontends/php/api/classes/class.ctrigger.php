@@ -1229,6 +1229,7 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
 				'preservekeys' => true,
+				'selectDependencies' => API_OUTPUT_REFER,
 			));
 		}
 		else {
@@ -1268,6 +1269,7 @@ COpt::memoryPick();
 
 			$expressionChanged = true;
 			if ($update) {
+
 				if (isset($trigger['expression'])) {
 					$expression_full = explode_exp($dbTrigger['expression']);
 					if (strcmp($trigger['expression'], $expression_full) == 0) {
@@ -1297,6 +1299,11 @@ COpt::memoryPick();
 
 				if (isset($trigger['status']) && $trigger['status'] == $dbTrigger['status']) {
 					unset($trigger['status']);
+				}
+
+				$dbTrigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
+				if (array_equal($dbTrigger['dependencies'], $trigger['dependencies'])) {
+					unset($trigger['dependencies']);
 				}
 			}
 
