@@ -56,7 +56,7 @@ my $output;
 
 %sqlite3 = (
 	"database"	=>	"sqlite3",
-	"before"	=>	"START TRANSACTION;\n",
+	"before"	=>	"BEGIN TRANSACTION;\n",
 	"after"		=>	"COMMIT;\n",
 	"exec_cmd"	=>	";\n"
 );
