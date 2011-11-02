@@ -9,6 +9,7 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBXNEXT-675] reduced surrounding whitespace for Switch, Cloud, Crypto-router, UPS, Hub and Router map icons (Elvis, Richlv)
  - [ZBX-4305] removed CREDITS file (Richlv)
  - [ZBX-2504] replaced 'Groups' by 'Replace groups' in host mass-update form to avoid confusion (Alexei)
  - [ZBX-2960] added defaults for example userparameters vfs.dir.size (/tmp) and proc.cpu (zabbix_agentd) to avoid errors in 'zabbix_agentd -p', documented them (Richlv)
