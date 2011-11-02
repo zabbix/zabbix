@@ -1952,7 +1952,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$mltpbox[] = $ctb;
 		}
 		else {
-			$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.disabled = !this.checked;', 1);
+			$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.readOnly = !this.checked;', 1);
 			$mltpbox[] = SPACE;
 			$ctb = new CTextBox('formula', $formula, 10);
 			$ctb->setAttribute('style', 'text-align: right;');
