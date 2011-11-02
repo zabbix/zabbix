@@ -1,7 +1,7 @@
 Changes for 1.8.9rc1
 
  - [ZBX-2919] fixed custom multiplier becoming 0 when creating an item (pavels) 
- - [ZBX-3510] moved the 'Status' column in the item list to the left (pavels)
+ - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
  - [ZBX-2504] replaced 'Groups' by 'Replace groups' in host mass-update form to avoid confusion (Alexei)
  - [ZBX-4265] fixed host input validation (pavels)
  - [ZBX-4264] fixed zabbix_agent compilation problem on HP-UX (dimir)
