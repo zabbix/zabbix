@@ -24,7 +24,7 @@
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char			tmp[16];
-	struct pst_dynamic	psd;
+	struct pst_dynamic	dyn;
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -33,10 +33,10 @@ int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "online"))
 		return SYSINFO_RET_FAIL;
 
-	if (-1 == pstat_getdynamic(&psd, sizeof(psd), 1, 0))
+	if (-1 == pstat_getdynamic(&dyn, sizeof(dyn), 1, 0))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, psd.psd_proc_cnt);
+	SET_UI64_RESULT(result, dyn.psd_proc_cnt);
 
 	return SYSINFO_RET_OK;
 }
@@ -106,9 +106,9 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (1 == per_cpu)
 	{
-		if (0 >= psd.psd_proc_cnt)
+		if (0 >= dyn.psd_proc_cnt)
 			return SYSINFO_RET_FAIL;
-		value /= psd.psd_proc_cnt;
+		value /= dyn.psd_proc_cnt;
 	}
 
 	SET_DBL_RESULT(result, value);
