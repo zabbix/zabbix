@@ -368,7 +368,7 @@ function item_type2str($type = null){
 		foreach ($srcItems as &$srcItem) {
 			if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 				// find a matching interface
-				$interface = Citem::findInterfaceForItem($srcItem, $dstHost['interfaces']);
+				$interface = CItem::findInterfaceForItem($srcItem, $dstHost['interfaces']);
 				if ($interface) {
 					$srcItem['interfaceid'] = $interface['interfaceid'];
 				}
