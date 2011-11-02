@@ -1022,7 +1022,7 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 		$form->show();
 	}
-	else if($srctbl == 'simple_graph'){
+	elseif ($srctbl == 'simple_graph') {
 		$form = new CForm();
 		$form->setName('itemform');
 		$form->setAttribute('id', 'items');
@@ -1053,8 +1053,12 @@ include_once('include/page_header.php');
 					'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
 				)
 			);
-			if(!is_null($writeonly)) $options['editable'] = 1;
-			if(!is_null($templated)) $options['templated'] = $templated;
+			if (!is_null($writeonly)) {
+				$options['editable'] = 1;
+			}
+			if (!is_null($templated)) {
+				$options['templated'] = $templated;
+			}
 
 			$items = CItem::get($options);
 			order_result($items, 'description');
@@ -1063,36 +1067,38 @@ include_once('include/page_header.php');
 			$items = array();
 		}
 
-		if($multiselect)
+		if ($multiselect) {
 			$header = array(
-				(!is_array($hostid))?null:S_HOST,
-				array(new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
+				is_array($hostid) ? S_HOST : null,
+				array(new CCheckBox("all_items", null, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
 				S_TYPE,
 				S_TYPE_OF_INFORMATION
 			);
-		else
+		}
+		else {
 			$header = array(
-				(!is_array($hostid))?null:S_HOST,
+				is_array($hostid) ? S_HOST : null,
 				S_DESCRIPTION,
 				S_TYPE,
 				S_TYPE_OF_INFORMATION
 			);
+		}
 
 		$table->setHeader($header);
 
-		foreach($items as $tnum => $row){
+		foreach ($items as $tnum => $row) {
 			$host = reset($row['hosts']);
 			$row['host'] = $host['host'];
 
 			$row['description'] = item_description($row);
-			$description = new CLink($row['description'],'#');
+			$description = new CLink($row['description'], '#');
 
 			$row['description'] = $row['host'].':'.$row['description'];
 
-			if($multiselect){
+			if ($multiselect) {
 				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
-			else{
+			else {
 				$values = array(
 					$dstfld1 => $row[$srcfld1],
 					$dstfld2 => $row[$srcfld2],
@@ -1103,19 +1109,19 @@ include_once('include/page_header.php');
 
 			$description->setAttribute('onclick', $js_action);
 
-			if($multiselect){
-				$description = new CCol(array(new CCheckBox('items['.zbx_jsValue($row[$srcfld1]).']', NULL, NULL, $row['itemid']), $description));
+			if ($multiselect) {
+				$description = new CCol(array(new CCheckBox('items['.zbx_jsValue($row[$srcfld1]).']', null, null, $row['itemid']), $description));
 			}
 
 			$table->addRow(array(
-				(!is_array($hostid))?null:$row['host'],
+				is_array($hostid) ? $row['host'] : null,
 				$description,
 				item_type2str($row['type']),
 				item_value_type2str($row['value_type'])
-				));
+			));
 		}
 
-		if($multiselect){
+		if ($multiselect) {
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
 			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
