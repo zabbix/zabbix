@@ -946,6 +946,9 @@ COpt::memoryPick();
 	/**
 	 * Copies the given discovery rules to the specified hosts.
 	 *
+	 * @throws APIException if no discovery rule IDs or host IDs are given or
+	 * the user doesn't have the necessary permissions.
+	 *
 	 * @param array $data
 	 * @param array $data['discoveryruleids'] An array of item ids to be cloned
 	 * @param array $data['hostids']          An array of host ids were the items should be cloned to
@@ -983,6 +986,9 @@ COpt::memoryPick();
 	/**
 	 * Copies the given discovery rule to the specified host.
 	 *
+	 * @throws APIException if the discovery rule interfaces could not be mapped
+	 * to the new host interfaces.
+	 *
 	 * @param type $discoveryid  The discovery rule id to be copied
 	 * @param type $hostid       Destination host id
 	 */
@@ -991,32 +997,37 @@ COpt::memoryPick();
 		$srcDiscovery = $this->get(array(
 			'itemids' => $discoveryid,
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_EXTEND
 		));
 		$srcDiscovery = $srcDiscovery[0];
-		$srcHost = $srcDiscovery['hosts'][0];
 
-		// if this is a plain host, clone the interface as well
+		// fetch source and destination hosts
+		$hosts = Api::Host()->get(array(
+			'hostids' => array($srcDiscovery['hostid'], $hostid),
+			'output' => API_OUTPUT_EXTEND,
+			'selectInterfaces' => API_OUTPUT_EXTEND,
+			'templated_hosts' => true,
+			'preservekeys' => true
+		));
+		$srcHost = $hosts[$srcDiscovery['hostid']];
+		$dstHost = $hosts[$hostid];
+
+		$dstDiscovery = $srcDiscovery;
+		$dstDiscovery['hostid'] = $hostid;
+
+		// if this is a plain host, map discovery interfaces
 		if ($srcHost['status'] != HOST_STATUS_TEMPLATE) {
-			// fetch it's interface
-			$interface = Api::HostInterface()->get(array(
-				'interfaceid' => $srcDiscovery['interfaceid'],
-				'output' => API_OUTPUT_EXTEND,
-			));
-			$interface = $interface[0];
-
-			// save interface
-			$interface['hostid'] = $hostid;
-			unset($interface['interfaceid']);
-			$interfaces = Api::HostInterface()->create(array($interface));
+			// find a matching interface
+			$interface = self::findInterfaceForItem($dstDiscovery, $dstHost['interfaces']);
+			if ($interface) {
+				$dstDiscovery['interfaceid'] = $interface['interfaceid'];
+			}
+			// no matching interface found, throw an error
+			elseif($interface !== false) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
+			}
 		}
 
 		// save new discovery
-		$dstDiscovery = $srcDiscovery;
-		$dstDiscovery['hostid'] = $hostid;
-		if (isset($interfaces)) {
-			$dstDiscovery['interfaceid'] = $interfaces['interfaceids'][0];
-		}
 		$newDiscovery = $this->create(array($dstDiscovery));
 		$dstDiscovery['itemid'] = $newDiscovery['itemids'][0];
 
@@ -1036,7 +1047,7 @@ COpt::memoryPick();
 			$this->copyDiscoveryGraphs($srcDiscovery, $dstDiscovery);
 
 			// copy triggers
-			$this->copyDiscoveryTriggers($srcDiscovery, $dstDiscovery);
+			$this->copyDiscoveryTriggers($srcDiscovery, $dstDiscovery, $srcHost, $dstHost);
 		}
 
 
@@ -1184,10 +1195,12 @@ COpt::memoryPick();
 	 *
 	 * @param array $srcDiscovery    The source discovery rule to copy from
 	 * @param array $dstDiscovery    The target discovery rule to copy to
+	 * @param array $srcHost         The host the source discovery belongs to
+	 * @param array $dstHost         The host the target discovery belongs to
 	 *
 	 * @return array
 	 */
-	public function copyDiscoveryTriggers(array $srcDiscovery, array $dstDiscovery) {
+	public function copyDiscoveryTriggers(array $srcDiscovery, array $dstDiscovery, array $srcHost, array $dstHost) {
 		$srcTriggers = Api::TriggerPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -1221,16 +1234,6 @@ COpt::memoryPick();
 		foreach ($items as $item) {
 			$dstItems[$item['key_']] = $item;
 		}
-
-		// fetch source and destination hosts
-		$hosts = Api::Host()->get(array(
-			'hostids' => array($srcDiscovery['hostid'], $dstDiscovery['hostid']),
-			'output' => API_OUTPUT_EXTEND,
-			'templated_hosts' => true,
-			'preservekeys' => true
-		));
-		$srcHost = $hosts[$srcDiscovery['hostid']];
-		$dstHost = $hosts[$dstDiscovery['hostid']];
 
 		// save new triggers
 		$dstTriggers = $srcTriggers;

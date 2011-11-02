@@ -585,12 +585,14 @@ include_once('include/page_header.php');
 				$discoveryRules = Api::DiscoveryRule()->get(array(
 					'hostids' => $clone_hostid,
 				));
-				$copyDiscoveryRules = Api::DiscoveryRule()->copy(array(
-					'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
-					'hostids' => array($hostid)
-				));
-				if (!$copyDiscoveryRules) {
-					throw new Exception();
+				if ($discoveryRules) {
+					$copyDiscoveryRules = Api::DiscoveryRule()->copy(array(
+						'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
+						'hostids' => array($hostid)
+					));
+					if (!$copyDiscoveryRules) {
+						throw new Exception();
+					}
 				}
 
 				$options = array(
