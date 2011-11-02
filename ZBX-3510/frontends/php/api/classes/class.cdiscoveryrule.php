@@ -1001,7 +1001,7 @@ COpt::memoryPick();
 		$srcDiscovery = $srcDiscovery[0];
 
 		// fetch source and destination hosts
-		$hosts = Api::Host()->get(array(
+		$hosts = API::Host()->get(array(
 			'hostids' => array($srcDiscovery['hostid'], $hostid),
 			'output' => API_OUTPUT_EXTEND,
 			'selectInterfaces' => API_OUTPUT_EXTEND,
@@ -1037,7 +1037,7 @@ COpt::memoryPick();
 		// if there were prototypes defined, clone everything else
 		if ($newPrototypes) {
 			// fetch new prototypes
-			$newPrototypes = Api::ItemPrototype()->get(array(
+			$newPrototypes = API::ItemPrototype()->get(array(
 				'itemids' => $newPrototypes['itemids'],
 				'output' => API_OUTPUT_EXTEND,
 			));
@@ -1067,7 +1067,7 @@ COpt::memoryPick();
 	 * @return array
 	 */
 	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery) {
-		$prototypes = Api::ItemPrototype()->get(array(
+		$prototypes = API::ItemPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
 		));
@@ -1079,7 +1079,7 @@ COpt::memoryPick();
 				$prototype['hostid'] = $dstDiscovery['hostid'];
 			}
 
-			$rs = Api::ItemPrototype()->create($prototypes);
+			$rs = API::ItemPrototype()->create($prototypes);
 			if (!$rs) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
 			}
@@ -1103,7 +1103,7 @@ COpt::memoryPick();
 	protected function copyDiscoveryGraphs(array $srcDiscovery, array $dstDiscovery) {
 
 		// fetch source graphs
-		$srcGraphs = Api::GraphPrototype()->get(array(
+		$srcGraphs = API::GraphPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
@@ -1137,7 +1137,7 @@ COpt::memoryPick();
 		}
 
 		// fetch source items
-		$items = Api::Item()->get(array(
+		$items = API::Item()->get(array(
 			'itemids' => $srcItemIds,
 			'output' => API_OUTPUT_EXTEND,
 		));
@@ -1151,7 +1151,7 @@ COpt::memoryPick();
 		$itemKeys = array_unique($itemKeys);
 
 		// fetch newly cloned items
-		$items = array_merge($dstDiscovery['prototypes'], Api::Item()->get(array(
+		$items = array_merge($dstDiscovery['prototypes'], API::Item()->get(array(
 			'hostids' => $dstDiscovery['hostid'],
 			'filter' => array(
 				'key_' => $itemKeys
@@ -1179,7 +1179,7 @@ COpt::memoryPick();
 		}
 
 		// save graphs
-		$rs = Api::Graph()->create($dstGraphs);
+		$rs = API::Graph()->create($dstGraphs);
 		if (!$rs) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone graph prototypes.'));
 		}
@@ -1201,7 +1201,7 @@ COpt::memoryPick();
 	 * @return array
 	 */
 	public function copyDiscoveryTriggers(array $srcDiscovery, array $dstDiscovery, array $srcHost, array $dstHost) {
-		$srcTriggers = Api::TriggerPrototype()->get(array(
+		$srcTriggers = API::TriggerPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND,
@@ -1223,7 +1223,7 @@ COpt::memoryPick();
 		array_unique($itemKeys);
 
 		// fetch newly created items
-		$items = Api::Item()->get(array(
+		$items = API::Item()->get(array(
 			'hostids' => $dstDiscovery['hostid'],
 			'filter' => array(
 				'key_' => $itemKeys
@@ -1245,7 +1245,7 @@ COpt::memoryPick();
 
 		}
 
-		$rs = Api::TriggerPrototype()->create($dstTriggers);
+		$rs = API::TriggerPrototype()->create($dstTriggers);
 		if (!$rs) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone trigger prototypes.'));
 		}

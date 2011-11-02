@@ -582,11 +582,11 @@ include_once('include/page_header.php');
 				}
 
 				// clone discovery rules
-				$discoveryRules = Api::DiscoveryRule()->get(array(
+				$discoveryRules = API::DiscoveryRule()->get(array(
 					'hostids' => $clone_hostid,
 				));
 				if ($discoveryRules) {
-					$copyDiscoveryRules = Api::DiscoveryRule()->copy(array(
+					$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
 						'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
 						'hostids' => array($hostid)
 					));
