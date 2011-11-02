@@ -28,7 +28,6 @@
 
 	$page['file'] = 'tr_status.php';
 	$page['title'] = 'S_STATUS_OF_TRIGGERS';
-	$page['scripts'] = array();
 	$page['hist_arg'] = array('groupid', 'hostid');
 	$page['scripts'] = array('class.cswitcher.js');
 
