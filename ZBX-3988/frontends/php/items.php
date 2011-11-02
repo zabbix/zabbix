@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_ITEMS';
 $page['file'] = 'items.php';
-$page['scripts'] = array('class.cviewswitcher.js', 'menus.js');
+$page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');

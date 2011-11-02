@@ -27,7 +27,7 @@ require_once('include/blocks.inc.php');
 $page['title'] = 'S_CUSTOM_SLIDES';
 $page['file'] = 'slides.php';
 $page['hist_arg'] = array('elementid');
-$page['scripts'] = array('class.pmaster.js', 'class.calendar.js', 'gtlc.js', 'menus.js');
+$page['scripts'] = array('class.pmaster.js', 'class.calendar.js', 'gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
