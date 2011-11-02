@@ -59,7 +59,7 @@ foreach($all_groups as $grp){
 
 $frmHost->addRow(array(
 	new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), _('Original')),
-	_('Relpace groups')
+	_('Replace groups')
 ), $grp_tb->get(_('In groups'), _('Other groups')));
 
 $newgroupTB = new CTextBox('newgroup', $newgroup);
