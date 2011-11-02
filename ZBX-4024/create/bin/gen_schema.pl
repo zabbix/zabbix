@@ -16,22 +16,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-use utf8;
-
 use Switch;
 use File::Basename;
 
 $file = dirname($0)."/../src/schema.tmpl";	# name the file
 
-local $state;
-local $output;
-local $eol, $fk_bol, $fk_eol;
-local $ltab, $szcol1, $szcol2, $szcol3, $szcol4;
-local $sequences;
-local $sql_suffix;
-local $fkeys, $fkeys_prefix, $fkeys_suffix;
-local $fkeys_drop;
-local $uniq;
+my $state;
+my $output;
+my $eol, $fk_bol, $fk_eol;
+my $ltab, $szcol1, $szcol2, $szcol3, $szcol4;
+my $sequences;
+my $sql_suffix;
+my $fkeys, $fkeys_prefix, $fkeys_suffix;
+my $fkeys_drop;
+my $uniq;
 
 %c = (
 	"type"		=>	"code",
@@ -200,19 +198,19 @@ const ZBX_TABLE\ttables[] = {
 sub rtrim($)
 {
 	my $string = shift;
-	$string =~ s/(\r|\n)*$//;
+	$string =~ s/(\r|\n)+$//;
 	return $string;
 }
 
 sub newstate
 {
-	local $new = $_[0];
+	my $new = $_[0];
 
 	if ($state eq "field")
 	{
 		if ($output{"type"} eq "sql" && $new eq "index") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
 		if ($output{"type"} eq "sql" && $new eq "table") { print "${pkey}${eol}\n)$output{'table_options'};${eol}\n"; }
-		if ($new eq "field") { print ",${eol}\n" }
+		if ($new eq "field") { print ",${eol}\n"; }
 	}
 
 	if ($state ne "bof")
@@ -225,7 +223,7 @@ sub newstate
 
 sub process_table
 {
-	local $line = $_[0];
+	my $line = $_[0];
 
 	newstate("table");
 
@@ -235,7 +233,7 @@ sub process_table
 	{
 		if ($flags eq "")
 		{
-			$flags="0";
+			$flags = "0";
 		}
 
 		for ($flags)
@@ -263,7 +261,7 @@ sub process_table
 
 sub process_field
 {
-	local $line = $_[0];
+	my $line = $_[0];
 
 	newstate("field");
 
@@ -370,7 +368,7 @@ sub process_field
 
 			if (grep /$output{$type_short}/, @text_fields)
 			{
-				$default="";
+				$default = "";
 			}
 		}
 
@@ -380,7 +378,7 @@ sub process_field
 
 			if (grep /$output{$type_short}/, @text_fields)
 			{
-				$default="";
+				$default = "";
 			}
 		}
 
@@ -400,7 +398,7 @@ sub process_field
 			if ($output{"database"} eq "sqlite3")
 			{
 				$row = sprintf("%-*s PRIMARY KEY AUTOINCREMENT", $szcol4, $row);
-				$pkey="";
+				$pkey = "";
 			}
 			elsif ($output{"database"} eq "mysql")
 			{
@@ -421,7 +419,7 @@ sub process_field
 			}
 			elsif ($output{"database"} eq "ibm_db2")
 			{
-				$row="$row\tGENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)";
+				$row = "$row\tGENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1)";
 			}
 		}
 
@@ -486,8 +484,8 @@ sub process_field
 
 sub process_index
 {
-	local $line = $_[0];
-	local $unique = $_[1];
+	my $line = $_[0];
+	my $unique = $_[1];
 
 	newstate("index");
 
@@ -526,21 +524,16 @@ sub process
 	$sequences = "";
 	$uniq = "";
 
-	open(INFO, $file);			# Open the file
-	@lines = <INFO>;			# Read it into an array
-	close(INFO);				# Close the file
+	open(INFO, $file);	# open the file
+	@lines = <INFO>;	# read it into an array
+	close(INFO);		# close the file
 
 	foreach $line (@lines)
 	{
-		$_ = $line;
-		$line = tr/\t//d;
-		$line=$_;
-
+		$line =~ tr/\t//d;
 		chop($line);
 
 		($type, $line) = split(/\|/, $line, 2);
-
-		utf8::decode($type);
 
 		switch ($type)
 		{
