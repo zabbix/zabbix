@@ -2,6 +2,7 @@
 Changes for 1.9.8
 
 New features:
+ - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
  - [ZBX-1357] updated Brazilian Portuguese and Russian translations; thanks to Zabbix translators (Richlv)
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
