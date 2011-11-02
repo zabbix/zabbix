@@ -16,8 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-use utf8;
-
 use Switch;
 use File::Basename;
 
@@ -26,7 +24,7 @@ open(INFO, $file);				# open the file
 @lines = <INFO>;				# read it into an array
 close(INFO);					# close the file
 
-local $output;
+my $output;
 
 %ibm_db2 = (
 	"database"	=>	"ibm_db2",
@@ -65,14 +63,14 @@ local $output;
 
 sub process_table
 {
-	local $line = $_[0];
+	my $line = $_[0];
 
 	$insert_into = "INSERT INTO $line";
 }
 
 sub process_fields
 {
-	local $line = $_[0];
+	my $line = $_[0];
 
 	@array = split(/\|/, $line);
 
@@ -97,7 +95,7 @@ sub process_fields
 
 sub process_row
 {
-	local $line = $_[0];
+	my $line = $_[0];
 
 	@array = split(/\|/, $line);
 
@@ -164,15 +162,10 @@ sub main
 
 	foreach $line (@lines)
 	{
-		$_ = $line;
-		$line = tr/\t//d;
-		$line=$_;
-
+		$line =~ tr/\t//d;
 		chop($line);
 
 		($type, $line) = split(/\|/, $line, 2);
-
-		utf8::decode($type);
 
 		$type =~ s/\s+$//; # remove trailing spaces
 
