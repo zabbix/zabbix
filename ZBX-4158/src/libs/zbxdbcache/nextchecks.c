@@ -174,7 +174,7 @@ void	DCflush_nextchecks()
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	triggerid, itemid, events_maxid = 0, *ids = NULL;
+	zbx_uint64_t	triggerid, itemid, *ids = NULL;
 	char		*error_msg_esc = NULL;
 	int		ids_alloc = 0, ids_num = 0, i;
 
