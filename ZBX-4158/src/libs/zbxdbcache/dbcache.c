@@ -934,11 +934,11 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
-	if (0 < tr_num)
+	if (0 != tr_num)
 	{
-		zbx_uint64_t    id;
+		zbx_uint64_t    eventid;
 
-		id = DBget_maxid_num("events", tr_num);
+		eventid = DBget_maxid_num("events", tr_num);
 
 		for (i = 0; i < tr_num; i++)
 		{
@@ -954,7 +954,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			if (1 != tr_last->add_event)
 				continue;
 
-			process_event(id++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
 					tr_last->lastchange, tr_last->new_value, 0, 0);
 		}
 	}

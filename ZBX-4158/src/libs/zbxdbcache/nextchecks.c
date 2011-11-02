@@ -188,7 +188,7 @@ void	DCflush_nextchecks()
 		uint64_array_add(&ids, &ids_alloc, &ids_num, nextchecks[i].itemid, 64);
 
 	/* dealing with notsupported items */
-	if (ids_num > 0)
+	if (0 < ids_num)
 	{
 		char		*sql = NULL;
 		int		sql_alloc = 4096, sql_offset = 0;
@@ -265,11 +265,11 @@ void	DCflush_nextchecks()
 		}
 		DBfree_result(result);
 
-		if (0 < events_num)
+		if (0 != events_num)
 		{
-			zbx_uint64_t	id;
+			zbx_uint64_t	eventid;
 
-			id = DBget_maxid_num("events", events_num);
+			eventid = DBget_maxid_num("events", events_num);
 
 			/* dealing with events */
 			for (i = 0; i < events_num; i++)
@@ -277,7 +277,7 @@ void	DCflush_nextchecks()
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 						"insert into events (eventid,source,object,objectid,clock,value) "
 						"values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d);\n",
-						id++,
+						eventid++,
 						EVENT_SOURCE_TRIGGERS,
 						EVENT_OBJECT_TRIGGER,
 						events[i].objectid,

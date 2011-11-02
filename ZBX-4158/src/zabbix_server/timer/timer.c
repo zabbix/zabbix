@@ -132,9 +132,9 @@ static void	process_time_functions()
 
 	zbx_free(sql);
 
-	if (0 < tr_num)
+	if (0 != tr_num)
 	{
-		zbx_uint64_t    id, ids_num = 0;
+		zbx_uint64_t    eventid, events_num = 0;
 
 		for (i = 0; i < tr_num; i++)
 		{
@@ -147,12 +147,12 @@ static void	process_time_functions()
 			if (1 != tr_last->add_event)
 				continue;
 
-			ids_num++;
+			events_num++;
 		}
 
-		if (0 < ids_num)
+		if (0 != events_num)
 		{
-			id = DBget_maxid_num("events", ids_num);
+			eventid = DBget_maxid_num("events", events_num);
 
 			for (i = 0; i < tr_num; i++)
 			{
@@ -161,7 +161,7 @@ static void	process_time_functions()
 				if (1 != tr_last->add_event)
 					continue;
 
-				process_event(id++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+				process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
 						tr_last->lastchange, tr_last->new_value, 0, 0);
 			}
 		}
