@@ -518,7 +518,7 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	}
 	DBfree_result(result);
 
-	if (1 > events_data.values_num)
+	if (0 == events_data.values_num)
 		goto end;
 
 	/* reserve event IDs */

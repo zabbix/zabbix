@@ -66,7 +66,6 @@ ZBX_DC_ID
 {
 	char		table_name[16];
 	zbx_uint64_t	lastid;
-	int		reserved;
 };
 
 ZBX_DC_IDS
