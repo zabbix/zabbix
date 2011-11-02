@@ -19,20 +19,20 @@
 **/
 ?>
 <?php
-class CJSscript extends CObject{
-	public function __construct($item=NULL){
+class CJSscript extends CObject {
+	public function __construct($item = null) {
 		$this->items = array();
 		$this->addItem($item);
 	}
 
-	public function addItem($value){
-		if(is_array($value)){
-			foreach($value as $item){
-				array_push($this->items,unpack_object($item));
+	public function addItem($value) {
+		if (is_array($value)) {
+			foreach ($value as $item) {
+				array_push($this->items, unpack_object($item));
 			}
 		}
-		else if(!is_null($value)){
-			array_push($this->items,unpack_object($value));
+		elseif (!is_null($value)) {
+			array_push($this->items, unpack_object($value));
 		}
 	}
 }

@@ -62,20 +62,6 @@ static void	free_expression(expression_t *exp)
 	exp->functions_num = 0;
 }
 
-/*
- * reallocate string buffer if offset >= alloc
- */
-static void	calcitem_exp_addchr(char **buffer, int *alloc, int *offset, int step, char c)
-{
-	if (*alloc == *offset)
-	{
-		*alloc += step;
-		*buffer = zbx_realloc(*buffer, *alloc);
-	}
-
-	(*buffer)[(*offset)++] = c;
-}
-
 static int	calcitem_add_function(expression_t *exp, char *func, char *params)
 {
 	function_t	*f;
@@ -104,7 +90,8 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp,
 {
 	const char	*__function_name = "calcitem_parse_expression";
 	char		*e, *f, *func = NULL, *params = NULL;
-	int		functionid, exp_alloc = 128, exp_offset = 0, ret;
+	size_t		exp_alloc = 128, exp_offset = 0;
+	int		functionid, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params_orig);
 
@@ -122,7 +109,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp,
 		if (FAIL == parse_function(&e, &func, &params))
 		{
 			e = f;
-			calcitem_exp_addchr(&exp->exp, &exp_alloc, &exp_offset, 128, *f);
+			zbx_chrcpy_alloc(&exp->exp, &exp_alloc, &exp_offset, *f);
 
 			continue;
 		}
@@ -137,10 +124,8 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp,
 		func = NULL;
 		params = NULL;
 
-		zbx_snprintf_alloc(&exp->exp, &exp_alloc, &exp_offset, 16, "{%d}", functionid);
+		zbx_snprintf_alloc(&exp->exp, &exp_alloc, &exp_offset, "{%d}", functionid);
 	}
-
-	calcitem_exp_addchr(&exp->exp, &exp_alloc, &exp_offset, 1, '\0');
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, exp->exp);
 
@@ -160,8 +145,8 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 	function_t	*f = NULL;
 	char		*sql = NULL, *host_esc, *key_esc,
 			*buf, replace[16];
-	int		sql_alloc = 1024, sql_offset = 0,
-			i, ret = SUCCEED;
+	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	int		i, ret = SUCCEED;
 	time_t		now;
 	DB_RESULT	db_result;
 	DB_ROW		db_row;
@@ -206,7 +191,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 	now = time(NULL);
 	sql = zbx_malloc(sql, sql_alloc);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 512,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select %s"
 			" where h.hostid=i.hostid"
 				" and h.status=%d"
@@ -221,23 +206,18 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 		f = &exp->functions[i];
 
 		if (i != 0)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, " or ");
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " or ");
 
 		host_esc = DBdyn_escape_string(f->host);
 		key_esc = DBdyn_escape_string(f->key);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				32 + strlen(host_esc) + strlen(key_esc),
-				"(h.host='%s' and i.key_='%s')",
-				host_esc, key_esc);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "(h.host='%s' and i.key_='%s')", host_esc, key_esc);
 
 		zbx_free(key_esc);
 		zbx_free(host_esc);
 	}
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 130,
-			")" DB_NODE,
-			DBnode_local("h.hostid"));
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")" DB_NODE, DBnode_local("h.hostid"));
 
 	db_result = DBselect("%s", sql);
 

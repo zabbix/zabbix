@@ -33,48 +33,6 @@
 	'S_HOUR_SHORT' =>			_('h'),
 	'S_MINUTE_SHORT' =>			_('m'),
 
-	'S_WEEKDAY_SUNDAY_SHORT' =>		_('Sun'),
-	'S_WEEKDAY_MONDAY_SHORT' =>		_('Mon'),
-	'S_WEEKDAY_TUESDAY_SHORT' =>		_('Tue'),
-	'S_WEEKDAY_WEDNESDAY_SHORT' =>		_('Wed'),
-	'S_WEEKDAY_THURSDAY_SHORT' =>		_('Thu'),
-	'S_WEEKDAY_FRIDAY_SHORT' =>		_('Fri'),
-	'S_WEEKDAY_SATURDAY_SHORT' =>		_('Sat'),
-
-	'S_WEEKDAY_SUNDAY_LONG' =>		_('Sunday'),
-	'S_WEEKDAY_MONDAY_LONG' =>		_('Monday'),
-	'S_WEEKDAY_TUESDAY_LONG' =>		_('Tuesday'),
-	'S_WEEKDAY_WEDNESDAY_LONG' =>		_('Wednesday'),
-	'S_WEEKDAY_THURSDAY_LONG' =>		_('Thursday'),
-	'S_WEEKDAY_FRIDAY_LONG' =>		_('Friday'),
-	'S_WEEKDAY_SATURDAY_LONG' =>		_('Saturday'),
-
-	'S_MONTH_JANUARY_SHORT' =>		_('Jan'),
-	'S_MONTH_FEBRUARY_SHORT' =>		_('Feb'),
-	'S_MONTH_MARCH_SHORT' =>		_('Mar'),
-	'S_MONTH_APRIL_SHORT' =>		_('Apr'),
-	'S_MONTH_MAY_SHORT' =>			_('May'),
-	'S_MONTH_JUNE_SHORT' =>			_('Jun'),
-	'S_MONTH_JULY_SHORT' =>			_('Jul'),
-	'S_MONTH_AUGUST_SHORT' =>		_('Aug'),
-	'S_MONTH_SEPTEMBER_SHORT' =>		_('Sep'),
-	'S_MONTH_OCTOBER_SHORT' =>		_('Oct'),
-	'S_MONTH_NOVEMBER_SHORT' =>		_('Nov'),
-	'S_MONTH_DECEMBER_SHORT' =>		_('Dec'),
-
-	'S_MONTH_JANUARY_LONG' =>		_('January'),
-	'S_MONTH_FEBRUARY_LONG' =>		_('February'),
-	'S_MONTH_MARCH_LONG' =>			_('March'),
-	'S_MONTH_APRIL_LONG' =>			_('April'),
-	'S_MONTH_MAY_LONG' =>			_('May'),
-	'S_MONTH_JUNE_LONG' =>			_('June'),
-	'S_MONTH_JULY_LONG' =>			_('July'),
-	'S_MONTH_AUGUST_LONG' =>		_('August'),
-	'S_MONTH_SEPTEMBER_LONG' =>		_('September'),
-	'S_MONTH_OCTOBER_LONG' =>		_('October'),
-	'S_MONTH_NOVEMBER_LONG' =>		_('November'),
-	'S_MONTH_DECEMBER_LONG' =>		_('December'),
-
 	'S_ACTIVATE_SELECTED'=>			_('Activate selected'),
 	'S_DISABLE_SELECTED'=>			_('Disable selected'),
 	'S_ACTIVATE_SELECTED_HOSTS'=>		_('Activate selected hosts'),
@@ -84,9 +42,6 @@
 
 //	dicoveryconf.php
 	'S_CREATED_SMALL' => _('created'),
-	'S_DISCOVERY_STATUS'=>			_('Discovery status'),
-
-
 	'S_DISCOVERY_RULE'=>			_('Discovery rule'),
 	'S_DISCOVERY'=>				_('Discovery'),
 	'S_CONFIGURATION_OF_DISCOVERY'=>	_('Configuration of discovery'),
@@ -127,7 +82,6 @@
 	'S_RESPONSE_TIME'=>			_('Response time'),
 	'S_IN_PROGRESS'=>			_('In progress'),
 	'S_OF_SMALL'=>				_('of'),
-	'S_TO_SMALL'=>				_('to'),
 	'S_IN_CHECK'=>				_('In check'),
 	'S_IDLE_TILL'=>				_('Idle till'),
 	'S_FAILED_ON'=>				_('Failed on'),
@@ -187,8 +141,6 @@
 	'S_RULES'=>				_('Rules'),
 	'S_EXISTING'=>				_('Existing'),
 	'S_MISSING'=>				_('Missing'),
-	'S_REFRESH_TIME_IN_SECONDS'=> _('Refresh time in seconds'),
-	'S_REFRESH_TIME_MULTIPLIER' => _('Refresh time multiplier'),
 	'S_LOCAL_BIG'=>				_('LOCAL'),
 	'S_SERVER_BIG'=>			_('SERVER'),
 
@@ -208,7 +160,6 @@
 	'S_NEW_INSTALLATION_BIG'=>		_('NEW INSTALLATION'),
 	'S_INSTALLATION_UPDATE'=>		_('Installation/Update'),
 	'S_ZABBIX_IS_UNAVAILABLE'=>		_('Zabbix is temporarily unavailable'),
-	'S_REQUIRE_MB_STRING_MODULE'=>		_('Multibyte String module required to run FrontEnd'),
 
 //	actions.inc.php
 	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -216,9 +167,6 @@
 	'S_EVENT_ACTION_CMDS_DATE_FORMAT'=>	_('Y.M.d H:i:s'),
 
 //	node.php
-	'S_TIME_ZONE'=>				_('Time zone'),
-	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>	_('Do not keep history older than (in days)'),
-	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>	_('Do not keep trends older than (in days)'),
 	'S_MASTER_NODE'=>			_('Master node'),
 	'S_CHILD'=>				_('Child'),
 	'S_MASTER'=>				_('Master'),
@@ -231,21 +179,7 @@
 	'S_SELECT_NODES'=>			_('Select Nodes'),
 
 //	acknow.php
-	'S_NO_EVENTS_TO_ACKNOWLEDGE'=>		_('No events to acknowledge'),
-	'S_ACKNOWLEDGES'=>			_('Acknowledges'),
-	'S_ACKNOWLEDGE'=>			_('Acknowledge'),
-	'S_RETURN'=>				_('Return'),
-	'S_ACKNOWLEDGE_ALARM_BY'=>		_('Acknowledge alarm by'),
-	'S_ADD_COMMENT_BY'=>			_('Add comment by'),
-	'S_ALARM_ACKNOWLEDGES_BIG'=>		_('ALARM ACKNOWLEDGES'),
-	'S_ACKNOWLEDGE_ADDED'=>			_('Acknowledge added'),
-	'S_CANNOT_ACKNOWLEDGE_EVENT'=>		_('Cannot acknowledge event'),
-	'S_SYS_BULK_ACKNOWLEDGE'=>		_('----[BULK ACKNOWLEDGE]----'),
 	'S_BULK_ACKNOWLEDGE'=>			_('Bulk acknowledge'),
-	'S_ACKNOWLEDGE_DATE_FORMAT'=>		_('d M Y H:i:s'),
-
-//	acknow.inc.php
-	'S_ACKNOWINC_BY_EVENTS_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	actionconf.php
 	'S_CONFIGURATION_OF_ACTIONS'=>		_('Configuration of actions'),
@@ -254,15 +188,11 @@
 	'S_MAX_VALUE_SMALL'=>			_('max value'),
 	'S_MIN_VALUE_SMALL'=>			_('min value'),
 	'S_CONDITION'=>				_('Condition'),
-	'S_NEW'=>				_('New'),
-	'S_EVENT_ACKNOWLEDGED'=>		_('Event acknowledged'),
 
 //	actions.php
 	'S_ACTIONS'=>				_('Actions'),
 	'S_LOGS'=>				_('Logs'),
 	'S_LOGS_BIG'=>				_('LOGS'),
-	'S_MESSAGE_ACTIONS'=>			_('Message actions'),
-	'S_COMMAND_ACTIONS'=>			_('Command actions'),
 	'S_DELAY'=>				_('Delay'),
 	'S_ON_BIG'=>				_('ON'),
 	'S_ON'=>					_('On'),
@@ -271,7 +201,6 @@
 	'S_INFORMATION'=>			_('Information'),
 	'S_WARNING'=>				_('Warning'),
 	'S_AND_BIG'=>				_('AND'),
-	'S_AND_SYMB'=>				_('&'),
 	'S_OR_BIG'=>				_('OR'),
 	'S_OR'=>				_('or'),
 	'S_LIKE_SMALL'=>			_('like'),
@@ -281,7 +210,6 @@
 	'S_SHOW_ALL'=>				_('Show all'),
 	'S_TIME'=>				_('Time'),
 	'S_STATUS'=>				_('Status'),
-	'S_DURATION'=>				_('Duration'),
 	'S_TRUE_BIG'=>				_('TRUE'),
 	'S_FALSE_BIG'=>				_('FALSE'),
 	'S_UNKNOWN_BIG'=>			_('UNKNOWN'),
@@ -307,8 +235,6 @@
 	'S_CUSTOM_GRAPHS'=>			_('Custom graphs'),
 	'S_GRAPHS_BIG'=>			_('GRAPHS'),
 	'S_PERIOD'=>				_('Period'),
-	'S_FULLSCREEN'=>			_('Fullscreen'),
-	'S_VIEW'=>				_('View'),
 
 //	class.cchart.php
 	'S_CCHARTS_TIMELINE_HOURS_FORMAT'=>			_('H:i'),
@@ -328,7 +254,6 @@
 	'S_MAX_IN_TABLE' =>				_('Max count of elements to show inside table cell'),
 	'S_DEFAULT_THEME'=>				_('Default theme'),
 	'S_EVENT_ACKNOWLEDGES'=>			_('Event acknowledges'),
-	'S_DAYS'=>					_('Days'),
 	'S_SHOW_EVENTS_MAX'=>				_('Show events max'),
 	'S_CANNNOT_UPDATE_VALUE_MAP'=>			_('Cannot update value map'),
 	'S_VALUE_MAP_ADDED'=>				_('Value map added'),
@@ -506,59 +431,7 @@
 	'S_HISTORY_PLAINTEXT_DATE_FORMAT'=>	_('Y-m-d H:i:s'),
 	'S_HISTORY_ITEM_DATE_FORMAT'=>		_('Y.M.d H:i:s'),
 
-// maintenance.php
-	'S_MAINTENANCE'=>				_('Maintenance'),
-	'S_MAINTENANCE_ADDED'=>			_('Maintenance added'),
-	'S_MAINTENANCE_UPDATED'=>		_('Maintenance updated'),
-	'S_MAINTENANCE_DELETED'=>		_('Maintenance deleted'),
-	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>_('Delete selected maintenance periods?'),
-	'S_GROUP_OR_HOST_NEEDED' => _('At least one host or group should be selected'),
-
-	'S_HOSTS_IN_MAINTENANCE'=>		_('Hosts in maintenance'),
-	'S_GROUPS_IN_MAINTENANCE'=>		_('Groups in maintenance'),
-
-	'S_CANNOT_ADD_MAINTENANCE'=>		_('Cannot add maintenance'),
-	'S_CANNOT_UPDATE_MAINTENANCE'=>		_('Cannot update maintenance'),
-	'S_CANNOT_DELETE_MAINTENANCE'=>		_('Cannot delete maintenance'),
-
-	'S_MAINTENANCE_PERIOD_LENGTH'=>		_('Maintenance period length'),
-	'S_MAINTENANCE_PERIODS_BIG'=>		_('MAINTENANCE PERIODS'),
-	'S_NEW_MAINTENANCE_PERIOD'=>		_('New maintenance period'),
-	'S_EDIT_MAINTENANCE_PERIOD'=>		_('Edit maintenance period'),
-	'S_CREATE_MAINTENANCE_PERIOD'=>		_('Create maintenance period'),
-	'S_MAINTENANCE_TYPE'=>			_('Maintenance type'),
-	'S_EXPIRED'=>				_('Expired'),
-	'S_APPROACHING'=>				_('Approaching'),
-
-	'S_WITH_DATA_COLLECTION'=>		_('With data collection'),
-	'S_NO_DATA_COLLECTION'=>		_('No data collection'),
-
-	'S_NORMAL_MAINTENANCE'=>		_('Normal maintenance'),
-	'S_NO_DATA_MAINTENANCE'=>		_('No data maintenance'),
-
-	'S_DELETE_MAINTENANCE_PERIOD_Q'=>	_('Delete maintenance period?'),
-
-	'S_ACTIVE_SINCE'=>			_('Active since'),
-	'S_ACTIVE_TILL'=>			_('Active till'),
-	'S_PERIOD_TYPE'=>			_('Period type'),
-
-	'S_SCHEDULE'=>				_('Schedule'),
-
 	'S_DATE'=>				_('Date'),
-	'S_ONE_TIME_ONLY'=>			_('One time only'),
-
-	'S_DAY_OF_WEEK'=>			_('Day of week'),
-	'S_DAY_OF_MONTH'=>			_('Day of month'),
-
-	'S_EVERY_DAY_S'=>			_('Every day(s)'),
-	'S_EVERY_WEEK_S'=>			_('Every week(s)'),
-
-	'S_FIRST'=>				_('First'),
-	'S_SECOND'=>				_('Second'),
-	'S_THIRD'=>				_('Third'),
-	'S_FOURTH'=>				_('Fourth'),
-
-	'S_AT'=>				_('At'),
 
 	'S_JANUARY'=>				_('January'),
 	'S_FEBRUARY'=>				_('February'),
@@ -572,13 +445,6 @@
 	'S_OCTOBER'=>				_('October'),
 	'S_NOVEMBER'=>				_('November'),
 	'S_DECEMBER'=>				_('December'),
-
-	'S_INCORRECT_MAINTENANCE_PERIOD'=>		_('Incorrect maintenance period'),
-	'S_INCORRECT_MAINTENANCE_DATE'=>		_('Incorrect maintenance date'),
-	'S_INCORRECT_MAINTENANCE_DAY_PERIOD'=>		_('Incorrect maintenance day period'),
-	'S_INCORRECT_MAINTENANCE_WEEK_PERIOD'=>		_('Incorrect maintenance week period'),
-	'S_INCORRECT_MAINTENANCE_MONTH_PERIOD'=>	_('Incorrect maintenance month period'),
-	'S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK'=>	_('Incorrect maintenance days of week'),
 
 // hostgroups.php
 	'S_CONFIGURATION_OF_GROUPS'=>		_('CONFIGURATION OF HOST GROUPS'),
@@ -800,7 +666,6 @@
 	'S_ITEM_PROTOTYPES_OF_BIG' => _('ITEM PROTOTYPES OF'),
 	'S_ADD_PROTOTYPE' => _('Add prototype'),
 	'S_SELECT_PROTOTYPE' => _('Select prototype'),
-	'S_CREATE_PROTOTYPE' => _('Create prototype'),
 	'S_ITEM_PROTOTYPE' => _('Item prototype'),
 
 	'S_CONFIGURATION_OF_GRAPHS_PROTOTYPES_BIG' => _('CONFIGURATION OF GRAPH PROTOTYPES'),
@@ -814,7 +679,6 @@
 
 //	events.php
 	'S_EVENT'=>				_('Event'),
-	'S_EVENT_DETAILS'=>			_('Event details'),
 	'S_LIST'=>				_('List'),
 	'S_LATEST_EVENTS'=>			_('Latest events'),
 	'S_HISTORY_OF_EVENTS_BIG'=>		_('HISTORY OF EVENTS'),
@@ -828,9 +692,6 @@
 	'S_LOST_BIG'=>		_('LOST'),
 
 //	events.inc.php
-	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			_('d M Y H:i:s'),
-	'S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT'=>		_('d M Y H:i:s'),
-	'S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT'=>		_('d M Y H:i:s'),
 	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	latest.php
@@ -841,55 +702,32 @@
 //	sysmap.php
 	'S_HIDDEN'=>			_('Hidden'),
 	'S_SHOWN'=>				_('Shown'),
-	'S_LINKS'=>				_('Links'),
-	'S_LINK'=>				_('Link'),
+	'S_URLS'=>				_('URLs'),
 	'S_LABEL'=>				_('Label'),
 	'S_GO_TO'=>				_('Go to'),
 	'S_X'=>					_('X'),
-	'S_ICON_PROBLEM'=>			_('Icon (problem)'),
-	'S_ICON_OK'=>				_('Icon (OK)'),
-	'S_ICON_UNKNOWN'=>			_('Icon (unknown)'),
-	'S_ICON_MAINTENANCE'=>			_('Icon (maintenance)'),
-	'S_ICON_DISABLED'=>			_('Icon (disabled)'),
-	'S_LINK_STATUS_INDICATOR'=>		_('Link status indicator'),
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	_('Configuration of network maps'),
 	'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
 
-	'S_COORDINATE_X'=>			_('Coordinate X'),
-	'S_COORDINATE_Y'=>			_('Coordinate Y'),
-
-	'S_CONNECTORS'=>			_('Connectors'),
 	'S_MAINTENANCE_BIG'=>			_('MAINTENANCE'),
 
 //	sysmaps.php
-	'S_EDIT_MAP_ELEMENT'=>			_('Edit map element'),
-	'S_ICON_DEFAULT'=>			_('Icon (default)'),
-	'S_APPLY'=>					_('Apply'),
-	'S_MAP_ELEMENTS'=>			_('Map elements'),
 	'S_MAP_DELETED'=>			_('Network map deleted'),
 	'S_CANNOT_DELETE_MAP'=>			_('Cannot delete network map'),
 	'S_MAPS_BIG'=>					_('MAPS'),
 	'S_NO_MAPS_DEFINED'=>			_('No maps defined.'),
 	'S_CREATE_MAP'=>				_('Create map'),
 	'S_IMPORT_MAP'=>				_('Import map'),
-	'S_LINK_INDICATORS'=>			_('Link indicators'),
-	'S_TYPE_OK'=>					_('Type (OK)'),
-	'S_COLOR_OK'=>					_('Colour (OK)'),
-	'S_USE_ADVANCED_ICONS'=>		_('Use advanced icons'),
 	'S_DELETE_SELECTED_MAPS_Q'=>		_('Delete selected maps?'),
 	'S_MAP_ADDED'=>					_('Network map added'),
 	'S_CANNOT_ADD_MAP'=>			_('Cannot add network map'),
 	'S_MAP_UPDATED'=>				_('Network map updated'),
 	'S_CANNOT_UPDATE_MAP'=>			_('Cannot update network map'),
-	'S_GET_SELEMENTS_FAILED'=>			_('Get selected elements FAILED.'),
 	'S_TWO_ELEMENTS_SHOULD_BE_SELECTED'=>		_('Two elements should be selected'),
 	'S_DELETE_SELECTED_ELEMENTS_Q'=>		_('Delete selected elements?'),
 	'S_PLEASE_SELECT_TWO_ELEMENTS'=>		_('Please select two elements'),
-	'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'=>	_('Delete Links between selected elements?'),
-	'S_NO_LINKS'=>					_('No links'),
-	'S_WRONG_TYPE_OF_ARGUMENTS_PASSED_TO_FUNCTION'=>_('Wrong type of arguments passed to function'),
+	'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'=>	_('Delete links between selected elements?'),
 	'S_NEW_ELEMENT'=>				_('New element'),
-	'S_SET_TRIGGER'=>				_('Set trigger'),
 
 	'S_BOTTOM'=>					_('Bottom'),
 	'S_TOP'=>						_('Top'),
@@ -915,7 +753,6 @@
 
 //	maps.php
 	'S_NETWORK_MAPS'=>		_('Network maps'),
-	'S_LABEL_LOCATION'=>		_('Label location'),
 	'S_MAPS_DATE_FORMAT'=>	_('Y.m.d H:i:s'),
 
 //	media.php
@@ -930,35 +767,19 @@
 //	Menu
 
 //	dashboard.php
-	'S_DASHBOARD'=>				_('Dashboard'),
-	'S_DASHBOARD_BIG'=>			_('PERSONAL DASHBOARD'),
 	'S_AGE'=>				_('Age'),
-	'S_ISSUE'=>				_('Issue'),
-	'S_SYSTEM_STATUS'=>			_('System status'),
-	'S_HOST_STATUS_STATUS'=>			_('Host status'),
-	'S_WITHOUT_PROBLEMS' =>				_('Without problems'),
-	'S_WITH_PROBLEMS' =>				_('With problems'),
-	'S_LAST_20_ISSUES'=>			_('Last 20 issues'),
 	'S_FAVOURITES'=>			_('Favourites'),
 	'S_MENU'=>				_('Menu'),
 	'S_RESET'=>				_('Reset'),
-	'S_MAXIMIZE'=>				_('Maximize'),
-	'S_MINIMIZE'=>				_('Minimize'),
-	'S_LOADING_P'=>				_('Loading...'),
 	'S_OF' => _('of'),
-	'S_ZABBIX_SERVER_IP_OR_PORT_IS_NOT_SET' => _('Zabbix server ip or port is not set!'),
 
 // dashconf.php
 	'S_DASHBOARD_CONFIGURATION' =>	_('Dashboard configuration'),
 	'S_DASHBOARD_CONFIGURATION_BIG' =>	_('DASHBOARD CONFIGURATION'),
-	'S_CONFIGURE' => _('Configure'),
 	'S_SELECTED' => _('Selected'),
 	'S_SHOW_HOSTS_IN_MAINTENANCE' => _('Show hosts in maintenance'),
 	'S_TRIGGERS_WITH_SEVERITY' => _('Triggers with severity'),
 	'S_DASHBOARD_FILTER' => _('Dashboard filter'),
-	'S_FAVOURITE_GRAPHS' => _('Favourite graphs'),
-	'S_FAVOURITE_MAPS' => _('Favourite maps'),
-	'S_FAVOURITE_SCREENS' => _('Favourite screens'),
 	'S_O_ALL' => _('All'),
 	'S_O_UNACKNOWLEDGED_ONLY' => _('Unacknowledged only'),
 	'S_O_SEPARATED' => _('Separated'),
@@ -976,7 +797,6 @@
 //	queue.php
 	'S_TOTAL'=>				_('Total'),
 	'S_COUNT'=>				_('Count'),
-	'S_5_MINUTES'=>				_('5 minutes'),
 	'S_QUEUE_NODES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
 //	report1.php
@@ -984,20 +804,12 @@
 	'S_STATUS_OF_ZABBIX'=>			_('Status of Zabbix'),
 	'S_STATUS_OF_ZABBIX_BIG'=>		_('STATUS OF ZABBIX'),
 	'S_VALUE'=>				_('Value'),
-	'S_ZABBIX_SERVER_IS_RUNNING'=>		_('Zabbix server is running'),
 	'S_VALUES_STORED'=>			_('Values stored'),
 	'S_TRENDS_STORED'=>			_('Trends stored'),
-	'S_NUMBER_OF_TRIGGERS'=>		_('Number of triggers (enabled/disabled)[problem/unknown/ok]'),
 	'S_NUMBER_OF_TRIGGERS_SHORT'=>		_('Triggers (e/d)[p/u/o]'),
-	'S_NUMBER_OF_TRIGGERS_TOOLTIP'=>	_('Only triggers assigned to enabled hosts and depending on enabled items are counted'),
-	'S_NUMBER_OF_ITEMS'=>			_('Number of items (monitored/disabled/not supported)'),
 	'S_NUMBER_OF_ITEMS_SHORT'=>		_('Items (m/d/n)'),
-	'S_NUMBER_OF_ITEMS_TOOLTIP'=>		_('Only items assigned to enabled hosts are counted'),
-	'S_NUMBER_OF_USERS'=>			_('Number of users (online)'),
 	'S_NUMBER_OF_USERS_SHORT'=>		_('Users (online)'),
-	'S_NUMBER_OF_HOSTS'=>			_('Number of hosts (monitored/not monitored/templates)'),
 	'S_NUMBER_OF_HOSTS_SHORT'=>		_('Hosts (m/n/t)'),
-	'S_REQUIRED_SERVER_PERFORMANCE_NVPS'=>	_('Required server performance, new values per second'),
 	'S_YES'=>				_('Yes'),
 	'S_NO'=>				_('No'),
 	'S_RUNNING'=>				_('running'),
@@ -1031,10 +843,6 @@
 	'S_PROBLEMS'=>					_('Problems'),
 	'S_PERCENTAGE'=>				_('Percentage'),
 	'S_SLA'=>					_('SLA'),
-	'S_HOUR'=>					_('Hour'),
-	'S_HOURS'=>					_('Hours'),
-	'S_MINUTE'=>					_('Minute'),
-	'S_MINUTES'=>					_('Minutes'),
 	'S_DAY'=>					_('Day'),
 	'S_MONTH'=>					_('Month'),
 	'S_YEAR'=>					_('Year'),
@@ -1073,7 +881,6 @@
 	'S_TRIGGERS_TOP_100_BIG'=>		_('MOST BUSY TRIGGERS TOP 100'),
 	'S_NUMBER_OF_STATUS_CHANGES'=>		_('Number of status changes'),
 	'S_WEEK'=>				_('Week'),
-	'S_LAST'=>				_('Last'),
 
 //	report6.php
 	'S_BAR_REPORTS'=>			_('Bar reports'),
@@ -1107,7 +914,6 @@
 	'S_ROWS'=>				_('Rows'),
 	'S_NO_SCREENS_DEFINED'=>		_('No screens defined.'),
 	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
-	'S_CONFIGURATION_OF_SCREEN_BIG'=>	_('CONFIGURATION OF SCREEN'),
 	'S_SCREEN_CELL_CONFIGURATION'=>		_('Screen cell configuration'),
 	'S_RESOURCE'=>					_('Resource'),
 	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
@@ -1175,11 +981,7 @@
 	'S_VERTICAL_ALIGN'=>			_('Vertical align'),
 	'S_MIDDLE'=>				_('Middle'),
 
-	'S_CANNOT_REMOVE_ROW_OR_COLUMN'=>			_('Impossible to remove last row and column'),
-	'S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COLUMN'=>				_('Screen should contain at least one row and column'),
-
 //	screens.php
-	'S_CUSTOM_SCREENS'=>			_('Custom screens'),
 	'S_SCREENS_BIG'=>				_('SCREENS'),
 	'S_HOST_SCREENS'=>				_('Host screens'),
 
@@ -1191,7 +993,6 @@
 	'S_CANNOT_DELETE_SLIDESHOW'=>	_('Cannot delete slideshow'),
 	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
 
-	'S_ERROR_SCREEN_WITH_NAME_DOES_NOT_EXIST' => _('Screen with name "%s" does not exist'),
 	'S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST' => _('Screen with id "%d" does not exist'),
 
 // slides.php
@@ -1325,11 +1126,8 @@
 	'S_SHOW_DETAILS'=>			_('Show details'),
 	'S_FILTER_BY_NAME'=>				_('Filter by name'),
 	'S_TRIGGERS_BIG'=>			_('TRIGGERS'),
-	'S_LAST_CHANGE'=>			_('Last change'),
 	'S_COMMENTS'=>				_('Comments'),
-	'S_ACKNOWLEDGED'=>			_('Acknowledged'),
 	'S_ACK'=>				_('Ack'),
-	'S_NEVER'=>				_('Never'),
 	'S_ACKNOWLEDGE_STATUS' => _('Acknowledge status'),
 	'S_ANY' => _('Any'),
 	'S_WITH_UNACKNOWLEDGED_EVENTS' => _('With unacknowledged events'),
@@ -1340,48 +1138,47 @@
 
 //	users.php
 	'S_USER'=>					_('User'),
-	'S_PROXY_ADDED'=>				_('Proxy added'),
-	'S_CANNOT_ADD_PROXY'=>				_('Cannot add proxy'),
-	'S_PROXY_UPDATED'=>				_('Proxy updated'),
-	'S_CANNOT_UPDATE_PROXY'=>			_('Cannot update proxy'),
-	'S_PROXY_DELETED'=>				_('Proxy deleted'),
-	'S_CANNOT_DELETE_PROXY'=>			_('Cannot delete proxy'),
+	'S_PROXY_ADDED'=>			_('Proxy added'),
+	'S_CANNOT_ADD_PROXY'=>		_('Cannot add proxy'),
+	'S_PROXY_UPDATED'=>			_('Proxy updated'),
+	'S_CANNOT_UPDATE_PROXY'=>	_('Cannot update proxy'),
+	'S_PROXY_DELETED'=>			_('Proxy deleted'),
+	'S_CANNOT_DELETE_PROXY'=>	_('Cannot delete proxy'),
 	'S_NAME'=>					_('Name'),
 	'S_DEBUG'=>					_('Debug'),
 	'S_DENY'=>					_('Deny'),
 	'S_HIDE'=>					_('Hide'),
-	'S_PASSWORD_ONCE_AGAIN'=>			_('Password (once again)'),
-	'S_PASSWORD'=>			_('Password'),
-	'S_ADD_TO'=>					_('Add to'),
-	'S_REMOVE_FROM'=>				_('Remove from'),
+	'S_PASSWORD'=>				_('Password'),
+	'S_ADD_TO'=>				_('Add to'),
+	'S_REMOVE_FROM'=>			_('Remove from'),
 
 //scripts.php
 	'S_SCRIPTS'=>				_('Scripts'),
 	'S_COMMAND'=>				_('Command'),
 	'S_RESULT'=>				_('Result'),
-	'S_CLOSE'=>				_('Close'),
+	'S_CLOSE'=>					_('Close'),
 
-	'S_SCRIPT_ERROR'=>			_('SCRIPT ERROR'),
+	'S_SCRIPT_ERROR'=>					_('SCRIPT ERROR'),
 	'S_SCRIPT_ERROR_DESCRIPTION'=>		_('Error description'),
-	'S_SCRIPT_SEND_ERROR'=>			_('Can\'t send command, check connection'),
-	'S_SCRIPT_READ_ERROR'=>			_('Can\'t read script response, check connection'),
-	'S_SCRIPT_TIMEOUT_ERROR'=>		_('Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value'),
+	'S_SCRIPT_SEND_ERROR'=>				_('Can\'t send command, check connection'),
+	'S_SCRIPT_READ_ERROR'=>				_('Can\'t read script response, check connection'),
+	'S_SCRIPT_TIMEOUT_ERROR'=>			_('Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value'),
 	'S_SCRIPT_BYTES_LIMIT_ERROR'=>		_('Defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value'),
-	'S_SCRIPT_ERROR_EMPTY_RESPONSE' =>	_('Empty response received'),
+	'S_SCRIPT_ERROR_EMPTY_RESPONSE'=>	_('Empty response received'),
 
 //	audit.php
-	'S_AUDIT'=>				_('Audit'),
-	'S_AUDIT_LOGS_BIG'=>			_('AUDIT LOGS'),
-	'S_AUDIT_ACTIONS_BIG'=>			_('AUDIT ACTIONS'),
+	'S_AUDIT'=>					_('Audit'),
+	'S_AUDIT_LOGS_BIG'=>		_('AUDIT LOGS'),
+	'S_AUDIT_ACTIONS_BIG'=>		_('AUDIT ACTIONS'),
 	'S_ACTION'=>				_('Action'),
 	'S_DETAILS'=>				_('Details'),
-	'S_UNKNOWN_ACTION'=>			_('Unknown action'),
-	'S_ADDED'=>				_('Added'),
+	'S_UNKNOWN_ACTION'=>		_('Unknown action'),
+	'S_ADDED'=>					_('Added'),
 	'S_UPDATED'=>				_('Updated'),
 	'S_MEDIA_TYPE'=>			_('Media type'),
 	'S_GRAPH_ELEMENT'=>			_('Graph element'),
-	'S_UNKNOWN_RESOURCE'=>			_('Unknown resource'),
-	'S_ALREADY_EXISTS_SMALL'=>		_('already exists'),
+	'S_UNKNOWN_RESOURCE'=>		_('Unknown resource'),
+	'S_ALREADY_EXISTS_SMALL'=>	_('already exists'),
 
 //	profile.php
 	'S_CLEAR' =>				_('Clear'),
@@ -1391,54 +1188,30 @@
 	'S_SNOOZE'=>				_('Snooze'),
 	'S_MESSAGES'=>				_('Messages'),
 	'S_PROBLEM_ON'=>			_('Problem on'),
-	'S_ENGLISH_GB'=>			_('English (GB)'),
-	'S_FRENCH_FR'=>				_('French (FR)'),
-	'S_GERMAN_DE'=>				_('German (DE)'),
-	'S_ITALIAN_IT'=>			_('Italian (IT)'),
-	'S_KOREAN_KR'=>				_('Korean (KO)'),
-	'S_LATVIAN_LV'=>			_('Latvian (LV)'),
-	'S_RUSSIAN_RU'=>			_('Russian (RU)'),
-	'S_PORTUGUESE_PT'=>			_('Portuguese (PT)'),
-	'S_SPANISH_ES'=>			_('Spanish (ES)'),
-	'S_SWEDISH_SE'=>			_('Swedish (SE)'),
-	'S_JAPANESE_JP'=>			_('Japanese (JP)'),
-	'S_CHINESE_CN'=>			_('Chinese (CN)'),
-	'S_DUTCH_NL'=>				_('Dutch (NL)'),
-	'S_HUNGARIAN_HU'=>			_('Hungarian (HU)'),
-	'S_POLISH_PL'=>				_('Polish (PL)'),
-	'S_UKRAINIAN_UA'=>			_('Ukrainian (UA)'),
-	'S_CZECH_CZ'=>				_('Czech (CZ)'),
 
 //	index.php
 	'S_ZABBIX_BIG'=>			_('ZABBIX'),
 
-//	hostinventories.php
-	'S_HOST_INVENTORIES'=>			_('Host inventories'),
-
 //	hostinventoriesoverview.php
-	'S_HOST_INVENTORY_OVERVIEW'=>		_('Host inventory overview'),
+	'S_HOST_INVENTORY_OVERVIEW'=>	_('Host inventory overview'),
 
 //	search.php
-	'S_EDIT_HOSTS' => _('Edit hosts'),
+	'S_EDIT_HOSTS'=>			_('Edit hosts'),
 	'S_SEARCH_BIG'=>			_('SEARCH'),
-	'S_GO'=>				_('Go'),
+	'S_GO'=>					_('Go'),
 	'S_FOUND_SMALL'=>			_('found'),
 	'S_DISPLAYING'=>			_('Displaying'),
-	'S_SEARCH_PATTERN_EMPTY'=>		_('Search pattern is empty'),
+	'S_SEARCH_PATTERN_EMPTY'=>	_('Search pattern is empty'),
 
 //	popup.php
 	'S_CAPTION'=>				_('Caption'),
-	'S_EMPTY'=>				_('Empty'),
+	'S_EMPTY'=>					_('Empty'),
 	'S_NO_ITEMS'=>				_('No items'),
-	'S_DISCOVERY_RULES_BIG'=>		_('DISCOVERY RULES'),
-	'S_CANNOT_SWITCH_HOSTS'=>		_('You can not switch hosts for current selection'),
+	'S_DISCOVERY_RULES_BIG'=>	_('DISCOVERY RULES'),
+	'S_CANNOT_SWITCH_HOSTS'=>	_('You can not switch hosts for current selection'),
 
 //	popup_period.php
 	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
-
-//	blocks.inc.php
-	'S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT'=>		_('H:i:s'),
-	'S_BLOCKS_LATEST_ISSUES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
 //	forms.inc.php
 	'S_EXPRESSION_PART_ERROR'=>			_('Error'),
@@ -1452,9 +1225,6 @@
 	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>_('Unnecessary symbols detected'),
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>_('Not allowed symbols detected after element'),
 	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>_('Not allowed symbols detected before element'),
-
-//	popup_link_tr.php
-	'S_EDIT_CONNECTOR'=>			_('Edit connector'),
 
 //	tr_logform.php
 	'S_INCLUDE_S'=>		_('Include'),
@@ -1501,32 +1271,8 @@
 	'S_MEMORY_LIMIT_REACHED'=>	_('MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing.'),
 
 // 	func.inc.php
-	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	_('Incorrect type of asort_by_key'),
-	'S_DAYS_SMALL'=>			_('days'),
-	'S_B'=>			_('B'),
-	'S_N_SMALL'=>	_('n'),
-	'S_NANO'=>		_('Nano'),
-	'S_U_MICRO'=>	_('µ'),
-	'S_MICRO'=>		_('Micro'),
-	'S_M_SMALL'=>	_('m'),
-	'S_MILLI'=>		_('Milli'),
-	'S_K'=>			_('K'),
-	'S_KILO'=>		_('Kilo'),
-	'S_M'=>			_('M'),
-	'S_MEGA'=>		_('Mega'),
-	'S_G'=>			_('G'),
-	'S_GIGA'=>		_('Giga'),
-	'S_T'=>			_('T'),
-	'S_TERA'=>		_('Tera'),
-	'S_P'=>			_('P'),
-	'S_PETA'=>		_('Peta'),
 	'S_E'=>			_('E'),
-	'S_EXA'=>		_('Exa'),
-	'S_Z'=>			_('Z'),
-	'S_ZETTA'=>		_('Zetta'),
 	'S_Y'=>			_('Y'),
-	'S_YOTTA'=>		_('Yotta'),
-	'S_FUNCT_UNIXTIMESTAMP_DATE_FORMAT'=>	_('Y.m.d H:i:s'),
 
 //	forms.inc.php
 	'S_SUBFILTER'=>				_('Subfilter'),
@@ -1597,15 +1343,6 @@
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	_('Unable to select configuration'),
 
-//	maintenances.inc.php
-	'S_ON_SMALL'=>				_('on'),
-	'S_EVERY_SMALL'=>			_('every'),
-	'S_DAY_SMALL'=>				_('day'),
-	'S_OF_EVERY_SMALL'=>			_('of every'),
-	'S_WEEKS_SMALL'=>			_('weeks'),
-	'S_WEEK_SMALL'=>			_('week'),
-	'S_MAINTENANCES_SCHEDULE_DATE_FORMAT'=>	_('d M Y'),
-
 //	perm.inc.php
 	'S_INCORRECT_USER_DATA_IN'=>		_('Incorrect user data in'),
 
@@ -1642,22 +1379,10 @@
 	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES'=>_('Only Super Admins can create media types'),
 	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>_('Only Super Admins can delete media types'),
 
-//	config.inc.php
-	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		_('You cannot view this URL as a'),
-	'S_CONFIG_ERROR_YOU_MUST_LOGIN'=>			_('You must login to view this page.'),
-	'S_CONFIG_NOT_LOGGED_IN_NOTE'=>				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.'),
-	'S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD'=>		_('You are not logged in.'),
-	'S_CONFIG_ERROR_HEAD'=>					_('ERROR'),
-	'S_CONFIG_WARNING_WRONG_MONTH_PART1'=>			_('[Wrong value for month:'),
-	'S_CONFIG_WARNING_WRONG_MONTH_PART2'=>			_(']'),
-	'S_CONFIG_WARNING_WRONG_DOW_PART1'=>			_('[Wrong value for day of week:'),
-	'S_CONFIG_WARNING_WRONG_DOW_PART2'=>			_(']'),
-
 //	Menu
 
 	'S_QUEUE'=>				_('Queue'),
 	'S_EVENTS'=>				_('Events'),
-	'S_EVENTS_BIG'=>			_('EVENTS'),
 	'S_MAPS'=>				_('Maps'),
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
@@ -1697,19 +1422,9 @@
 	'S_DELETE_SERVICE'=>				_('Delete service'),
 	'S_DELETE_SELECTED_SERVICES_Q'=>		_('Delete selected services?'),
 
-//	js.inc.php
-	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	_('Can not find objects with name'),
-	'S_CANNOT_CREATE_NEW_ELEMENT'=>		_('Can not create new element'),
-	'S_OTHER_SMALL'=>			_('other'),
-
 // class.cookie.js
 	'S_MAX_COOKIE_SIZE_REACHED'=>		_('We are sorry, the maximum possible number of elements to remember has been reached.'),
 
-	'S_LAST_PAGE'=>			_('Last'),
-	'S_FIRST_PAGE'=>		_('First'),
-	'S_PREVIOUS_PAGE'=>		_('Previous'),
-	'S_NEXT_PAGE'=>			_('Next'),
-	'S_PREVIOUS_EVENTS'=>		_('Previous'),
 	'S_ICONMAP_IS_NOT_ENABLED' => _('Iconmap is not enabled'),
 );
 ?>

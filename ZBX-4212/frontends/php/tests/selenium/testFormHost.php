@@ -183,7 +183,7 @@ class testFormHost extends CWebTest{
 	}
 
 	public function testFormHost_TemplateLink(){
-		$this->templateLink("Test host for template linkage","Template_Linux");
+		$this->templateLink("Visible host for template linkage","Template_Linux");
 	}
 
 
@@ -200,7 +200,7 @@ class testFormHost extends CWebTest{
 
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link=Test host for template linkage');
+		$this->click('link=Visible host for template linkage');
 		$this->wait();
 		$this->tab_switch("Templates");
 		$this->ok("$template");
@@ -232,7 +232,7 @@ class testFormHost extends CWebTest{
 	}
 
 	public function testFormHost_TemplateLinkUpdate(){
-		$this->templateLink("Test host for template linkage","Template_Linux");
+		$this->templateLink("Visible host for template linkage","Template_Linux");
 	}
 
 	public function testFormHost_TemplateUnlinkAndClear(){
@@ -242,7 +242,7 @@ class testFormHost extends CWebTest{
 
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link=Test host for template linkage');
+		$this->click('link=Visible host for template linkage');
 		$this->wait();
 		$this->tab_switch("Templates");
 		$this->ok("$template");

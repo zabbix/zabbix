@@ -47,7 +47,7 @@ require_once('include/views/js/configuration.action.edit.js.php');
 	$actionList->addRow(_('Name'), new CTextBox('name', $data['name'], $inputLength));
 
 	if(EVENT_SOURCE_TRIGGERS == $data['eventsource']){
-		$actionList->addRow(_('Period (minimum 60 seconds)'), array(new CNumericBox('esc_period', $data['esc_period'], 6, 'no'), ' ('._('seconds').')'));
+		$actionList->addRow(_('Default escalation period (minimum 60 seconds)'), array(new CNumericBox('esc_period', $data['esc_period'], 6, 'no'), ' ('._('seconds').')'));
 	}
 	else{
 		$frmAction->addVar('esc_period', 0);
@@ -78,7 +78,11 @@ require_once('include/views/js/configuration.action.edit.js.php');
 	$conditionList = new CFormList('conditionlist');
 	$allowedConditions = get_conditions_by_eventsource($data['eventsource']);
 
-	morder_result($data['conditions'], array('conditiontype','operator'), ZBX_SORT_DOWN);
+	$sortFields = array(
+		array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
+		array('field' => 'operator', 'order' => ZBX_SORT_DOWN)
+	);
+	ArraySorter::sort($data['conditions'], $sortFields);
 
 // group conditions by type
 	$condElements = new CTable(_('No conditions defined.'), 'formElementTable');
@@ -435,7 +439,7 @@ require_once('include/views/js/configuration.action.edit.js.php');
 			));
 
 			$tblStep->addRow(array(
-				_('Period'),
+				_('Escalation period'),
 				new CCol(array(
 					new CNumericBox('new_operation[esc_period]', $new_operation['esc_period'], 5),
 					_('(minimum 60 seconds, 0 - use action default)')))
@@ -460,10 +464,20 @@ require_once('include/views/js/configuration.action.edit.js.php');
 					$new_operation['opmessage_usr'] = array();
 					$new_operation['opmessage'] = array(
 						'default_msg' => 1,
-						'subject' => '{TRIGGER.NAME}: {STATUS}',
-						'message' => '{TRIGGER.NAME}: {STATUS}',
-						'mediatypeid' => 0,
+						'mediatypeid' => 0
 					);
+					if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+						$new_operation['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_TRIGGER;
+						$new_operation['opmessage']['message'] = ACTION_DEFAULT_MSG_TRIGGER;
+					}
+					elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {
+						$new_operation['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_DISCOVERY;
+						$new_operation['opmessage']['message'] = ACTION_DEFAULT_MSG_DISCOVERY;
+					}
+					elseif ($data['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION) {
+						$new_operation['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_AUTOREG;
+						$new_operation['opmessage']['message'] = ACTION_DEFAULT_MSG_AUTOREG;
+					}
 				}
 
 				if(!isset($new_operation['opmessage']['default_msg']))

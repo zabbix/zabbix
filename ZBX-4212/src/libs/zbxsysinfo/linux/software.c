@@ -82,24 +82,32 @@ static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
 	return SUCCEED;
 }
 
-static int	print_packages(char *buffer, int size, zbx_vector_str_t *packages, const char *manager)
+static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
 {
-	int	i, offset = 0;
+	size_t	offset = 0;
+	int	i;
 
 	if (NULL != manager)
-		offset += zbx_snprintf(buffer + offset, size - offset, "[%s] ", manager);
+		offset += zbx_snprintf(buffer + offset, size - offset, "[%s]", manager);
 
-	zbx_vector_str_sort(packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
-
-	for (i = 0; i < packages->values_num; i++)
+	if (0 != packages->values_num)
 	{
-		offset += zbx_snprintf(buffer + offset, size - offset, "%s, ", packages->values[i]);
-		zbx_free(packages->values[i]);
+		offset += zbx_snprintf(buffer + offset, size - offset, " ");
+
+		zbx_vector_str_sort(packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+		for (i = 0; i < packages->values_num; i++)
+		{
+			offset += zbx_snprintf(buffer + offset, size - offset, "%s, ", packages->values[i]);
+			zbx_free(packages->values[i]);
+		}
+
+		packages->values_num = 0;
+
+		offset -= 2;
 	}
 
-	packages->values_num = 0;
-
-	offset -= zbx_rtrim(buffer + MAX(0, offset - 2), ", ");
+	buffer[offset] = '\0';
 
 	return offset;
 }
@@ -116,7 +124,8 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 
 int     SYSTEM_SW_PACKAGES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int			ret = SYSINFO_RET_FAIL, show_pm, offset = 0, i;
+	size_t			offset = 0;
+	int			ret = SYSINFO_RET_FAIL, show_pm, i;
 	char			buffer[MAX_BUFFER_LEN], regex[MAX_STRING_LEN], manager[MAX_STRING_LEN],
 				tmp[MAX_STRING_LEN], *buf = NULL, *package;
 	zbx_vector_str_t	packages;
@@ -188,8 +197,8 @@ next:
 
 	if (0 == show_pm)
 		offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, NULL);
-	else
-		offset -= zbx_rtrim(buffer + MAX(0, offset - 1), "\n");
+	else if (0 != offset)
+		buffer[--offset] = '\0';
 
 	zbx_vector_str_destroy(&packages);
 

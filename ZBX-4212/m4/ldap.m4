@@ -21,8 +21,8 @@ AC_DEFUN([LIBLDAP_CHECK_CONFIG],
 [
   AC_ARG_WITH(ldap,
     [If you want to check LDAP servers:
-AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>@. DIR is the LDAP base install directory, default is to search through a number of common places for the LDAP files.])
-    ],[ if test "$withval" = "no"; then
+AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>@. DIR is the LDAP base install directory, default is to search through a number of common places for the LDAP files.])],
+     [ if test "$withval" = "no"; then
             want_ldap="no"
             _libldap_with="no"
         elif test "$withval" = "yes"; then
@@ -80,7 +80,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                AC_MSG_RESULT(yes)
 
 #               AC_CHECK_LIB(lber, main, , AC_MSG_ERROR([Not found LBER library]))
-	       
+
 	       if test "x$enable_static" = "xyes"; then
                        AC_CHECK_LIB(gnutls, main, , AC_MSG_ERROR([Not found GnuTLS library]))
                        AC_CHECK_LIB(pthread, main, , AC_MSG_ERROR([Not found Pthread library]))

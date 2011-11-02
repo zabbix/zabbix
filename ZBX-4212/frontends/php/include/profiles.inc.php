@@ -315,7 +315,7 @@ function update_config($configs){
 		return NULL;
 	}
 
-return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('configid', false));
+return	DBexecute('UPDATE config SET '.implode(',', $update).' WHERE '.DBin_node('configid', false));
 }
 /************ END CONFIG **************/
 
@@ -331,7 +331,7 @@ function get_user_history(){
 	if($history && !zbx_empty($history['url4']))
 		CWebUser::$data['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
 	else
-		CWebUser::$data['last_page'] = array('title' => S_DASHBOARD, 'url' => 'dashboard.php');
+		CWebUser::$data['last_page'] = array('title' => _('Dashboard'), 'url' => 'dashboard.php');
 
 	for($i = 1; $i<6; $i++){
 		if(defined($history['title'.$i])){

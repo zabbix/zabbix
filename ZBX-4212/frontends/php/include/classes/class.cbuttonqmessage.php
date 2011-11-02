@@ -19,36 +19,34 @@
 **/
 ?>
 <?php
-class CButtonQMessage extends CSubmit{
- public $vars;
- public $msg;
- public $name;
+class CButtonQMessage extends CSubmit {
+	public $vars;
+	public $msg;
+	public $name;
 
-	public function __construct($name, $caption, $msg=NULL, $vars=NULL, $class=null){
+	public function __construct($name, $caption, $msg = null, $vars = null, $class = null) {
 		$this->vars = null;
 		$this->msg = null;
 		$this->name = $name;
-
-		parent::__construct($name,$caption,null,$class);
-
+		parent::__construct($name, $caption, null, $class);
 		$this->setMessage($msg);
 		$this->setVars($vars);
-		$this->setAction(NULL);
+		$this->setAction(null);
 	}
 
-	public function setVars($value=NULL){
-		if(!is_string($value) && !is_null($value)){
+	public function setVars($value = null) {
+		if (!is_string($value) && !is_null($value)) {
 			return $this->error('Incorrect value for setVars ['.$value.']');
 		}
 		$this->vars = $value;
-		$this->setAction(NULL);
+		$this->setAction(null);
 	}
 
-	public function setMessage($value=NULL){
-		if(is_null($value))
+	public function setMessage($value = null){
+		if (is_null($value)) {
 			$value = _('Are you sure you want perform this action?');
-
-		if(!is_string($value)){
+		}
+		if (!is_string($value)) {
 			return $this->error(_s('Incorrect value for setMessage(): "%s".', $value));
 		}
 		// if message will contain single quotes, it will break everything, so it must be escaped
@@ -57,27 +55,25 @@ class CButtonQMessage extends CSubmit{
 			false, // not as object
 			false  // do not add quotes to the string
 		);
-		$this->setAction(NULL);
+		$this->setAction(null);
 	}
 
-	public function setAction($value=null){
-		if(!is_null($value))
+	public function setAction($value = null) {
+		if (!is_null($value)) {
 			return parent::setAttribute('onclick', $value);
+		}
 
 		global $page;
-
 		$confirmation = "Confirm('".$this->msg."')";
 
-		if(isset($this->vars)){
+		if (isset($this->vars)) {
 			$link = $page['file'].'?'.$this->name.'=1'.$this->vars;
 			$url = new Curl($link);
-
 			$action = "redirect('".$url->getUrl()."')";
 		}
-		else{
+		else {
 			$action = 'true';
 		}
-
 		return parent::setAttribute('onclick', 'if('.$confirmation.') return '.$action.'; else return false;');
 	}
 }

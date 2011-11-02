@@ -30,7 +30,8 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
 	char		type[16], buf[32];
 	struct tm	*tm;
-	int		gmtoff, offset, ms;
+	size_t		offset;
+	int		gmtoff, ms;
 	unsigned short	h, m;
 #if defined(_WINDOWS)
         struct _timeb	tv;

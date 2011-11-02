@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-define('ZABBIX_VERSION',		'1.9.7');
+define('ZABBIX_VERSION',		'1.9.8');
 define('ZABBIX_API_VERSION',	'1.2');
 
 define('ZBX_LOGIN_ATTEMPTS',			5);
@@ -181,6 +181,7 @@ define('AUDIT_RESOURCE_MAINTENANCE',	27);
 define('AUDIT_RESOURCE_REGEXP',			28);
 define('AUDIT_RESOURCE_MACRO',			29);
 define('AUDIT_RESOURCE_TEMPLATE',		30);
+define('AUDIT_RESOURCE_TRIGGER_PROTOTYPE', 31);
 
 define('CONDITION_TYPE_HOST_GROUP',			0);
 define('CONDITION_TYPE_HOST',				1);
@@ -304,6 +305,8 @@ define('SYSMAP_GRID_SHOW_OFF',		0);
 define('SYSMAP_GRID_ALIGN_ON',		1);
 define('SYSMAP_GRID_ALIGN_OFF',		0);
 
+define('ZBX_ITEM_DELAY_DEFAULT', 30);
+
 define('ITEM_TYPE_ZABBIX',			0);
 define('ITEM_TYPE_SNMPV1',			1);
 define('ITEM_TYPE_TRAPPER',			2);
@@ -418,8 +421,23 @@ define('MEDIA_TYPE_EZ_TEXTING',	100);
 define('EZ_TEXTING_LIMIT_USA',		0);
 define('EZ_TEXTING_LIMIT_CANADA',	1);
 
-define('ACTION_DEFAULT_SUBJ',		'{TRIGGER.NAME}: {TRIGGER.STATUS}');
-define('ACTION_DEFAULT_MSG',		"{TRIGGER.NAME}: {TRIGGER.STATUS}\nLast value: {ITEM.LASTVALUE}\n\n{TRIGGER.URL}");
+define('ACTION_DEFAULT_SUBJ_TRIGGER', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
+define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOST.HOST}');
+define('ACTION_DEFAULT_SUBJ_DISCOVERY', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
+
+define('ACTION_DEFAULT_MSG_TRIGGER', "Trigger: {TRIGGER.NAME}\nTrigger status: {TRIGGER.STATUS}\n".
+		"Trigger severity: {TRIGGER.SEVERITY}\nTrigger URL: {TRIGGER.URL}\n\nItem values:\n\n".
+		"1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}\n".
+		"2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}\n".
+		"3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}"
+);
+define('ACTION_DEFAULT_MSG_AUTOREG', "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}");
+define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\nDevice IP:{DISCOVERY.DEVICE.IPADDRESS}\n".
+		"Device DNS: {DISCOVERY.DEVICE.DNS}\nDevice status: {DISCOVERY.DEVICE.STATUS}\n".
+		"Device uptime: {DISCOVERY.DEVICE.UPTIME}\n\nDevice service name: {DISCOVERY.SERVICE.NAME}\n".
+		"Device service port: {DISCOVERY.SERVICE.PORT}\nDevice service status: {DISCOVERY.SERVICE.STATUS}\n".
+		"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
+);
 
 define('ACTION_STATUS_ENABLED',		0);
 define('ACTION_STATUS_DISABLED',	1);
@@ -712,10 +730,8 @@ define('REGEXP_EXCLUDE',1);
 
 // preg
 define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
-define('ZBX_PREG_SPACES', '(\s+){0,1}');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
-define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_,.-]+)'); // !!! Don't forget sync code with C !!!
 define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
 define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[KMGTsmhdw]{0,1})');
@@ -723,9 +739,7 @@ define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(?(?=,)('.ZBX_PREG_PARAMS.'){0,1}|(\['.ZBX_PREG_PARAMS.'\]){0,1}))');
 define('ZBX_PREG_FUNCTION_FORMAT', '([a-z]+(\('.ZBX_PREG_PARAMS.'\)))');
-define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 define('ZBX_PREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER\.VALUE\})');
 define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
@@ -818,6 +832,7 @@ define('SEC_PER_YEAR', 	(365*SEC_PER_DAY));
 // input fields
 define('ZBX_TEXTBOX_STANDARD_SIZE', 50);
 define('ZBX_TEXTBOX_SMALL_SIZE', 25);
+define('ZBX_TEXTAREA_STANDARD_SIZE', 47);
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {

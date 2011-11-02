@@ -1243,7 +1243,6 @@ class zbxXML{
 									case ITEM_TYPE_ZABBIX:
 									case ITEM_TYPE_SIMPLE:
 									case ITEM_TYPE_EXTERNAL:
-									case ITEM_TYPE_DB_MONITOR:
 									case ITEM_TYPE_SSH:
 									case ITEM_TYPE_TELNET:
 										$item_db['interfaceid'] = $agent_interface_id;
@@ -1265,6 +1264,7 @@ class zbxXML{
 									case ITEM_TYPE_INTERNAL:
 									case ITEM_TYPE_ZABBIX_ACTIVE:
 									case ITEM_TYPE_TRAPPER:
+									case ITEM_TYPE_DB_MONITOR:
 										$item_db['interfaceid'] = null;
 										break;
 								}

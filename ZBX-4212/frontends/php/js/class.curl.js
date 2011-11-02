@@ -144,7 +144,7 @@ formatArguments: function(){
 		keyval = args[i].split('=');
 		if(keyval.length > 1){
 			try{
-				var tmp = keyval[1].replace('+','%20');
+				var tmp = keyval[1].replace(/\+/g,'%20');
 				this.args[keyval[0]] = decodeURIComponent(tmp);
 			}
 			catch(exc){

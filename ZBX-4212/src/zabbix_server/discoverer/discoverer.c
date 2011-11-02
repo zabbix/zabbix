@@ -388,7 +388,7 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
 	DB_ROW		row;
 	DB_DCHECK	dcheck;
 	char		sql[MAX_STRING_LEN];
-	int		offset = 0;
+	size_t		offset = 0;
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 			"select dcheckid,type,key_,snmp_community,snmpv3_securityname,snmpv3_securitylevel,"
@@ -399,14 +399,11 @@ static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status,
 
 	if (0 != drule->unique_dcheckid)
 	{
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-				" and dcheckid%s" ZBX_FS_UI64,
-				unique ? "=" : "<>",
-				drule->unique_dcheckid);
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and dcheckid%s" ZBX_FS_UI64,
+				unique ? "=" : "<>", drule->unique_dcheckid);
 	}
 
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-			" order by dcheckid");
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by dcheckid");
 
 	result = DBselect("%s", sql);
 

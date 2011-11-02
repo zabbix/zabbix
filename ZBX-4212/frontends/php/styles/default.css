@@ -390,6 +390,16 @@ table.tableinfo tr td.wraptext { white-space:normal; }
 table.tableinfo tr td.message { text-align: center; }
 table.tableinfo tr td.pre { white-space: pre; }
 table.tableinfo tr > td.center { vertical-align: middle; text-align: center; }
+table.tableinfo caption {
+	background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
+	color: #FFFFFF;
+	font-size: 11px;
+	font-weight: bold;
+	height: 22px;
+	text-align: left;
+	padding: 0 5px;
+	line-height: 22px;
+}
 
 /****** header *********/
 .header a { color: #FFFFFF; }

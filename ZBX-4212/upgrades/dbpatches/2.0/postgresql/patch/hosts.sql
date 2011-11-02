@@ -114,6 +114,61 @@ UPDATE items
 	WHERE type IN (10)	-- EXTERNAL
 		AND STRPOS(key_, '[') = 0;
 
+-- convert simple check keys to a new form
+
+CREATE LANGUAGE 'plpgsql';
+
+CREATE FUNCTION zbx_convert_simple_checks(v_itemid bigint, v_hostid bigint, v_key varchar(255))
+RETURNS varchar(255) AS $$
+DECLARE old_key varchar(255);
+	new_key varchar(255);
+	pos integer;
+BEGIN
+	old_key := v_key;
+	new_key := 'net.tcp.service';
+	pos := STRPOS(old_key, '_perf');
+	IF 0 <> pos THEN
+		new_key := new_key || '.perf';
+		old_key := SUBSTR(old_key, 1, pos - 1) || SUBSTR(old_key, pos + 5);
+	END IF;
+	new_key := new_key || '[';
+	pos := STRPOS(old_key, ',');
+	IF 0 <> pos THEN
+		new_key := new_key || '"' || SUBSTR(old_key, 1, pos - 1) || '"';
+		old_key := SUBSTR(old_key, pos + 1);
+	ELSE
+		new_key := new_key || '"' || old_key || '"';
+		old_key := '';
+	END IF;
+	IF 0 <> LENGTH(old_key) THEN
+		new_key := new_key || ',,"' || old_key || '"';
+	END IF;
+
+	WHILE 0 != (SELECT COUNT(*) FROM items WHERE hostid = v_hostid AND key_ = new_key || ']') LOOP
+		new_key := new_key || ' ';
+	END LOOP;
+
+	RETURN new_key || ']';
+END;
+$$ LANGUAGE 'plpgsql';
+
+UPDATE items SET key_ = zbx_convert_simple_checks(itemid, hostid, key_)
+	WHERE type IN (3)	-- SIMPLE
+		AND (key_ IN ('ftp','http','imap','ldap','nntp','ntp','pop','smtp','ssh',
+			'ftp_perf','http_perf', 'imap_perf','ldap_perf','nntp_perf','ntp_perf','pop_perf',
+			'smtp_perf','ssh_perf')
+			OR key_ LIKE 'ftp,%' OR key_ LIKE 'http,%' OR key_ LIKE 'imap,%' OR key_ LIKE 'ldap,%'
+			OR key_ LIKE 'nntp,%' OR key_ LIKE 'ntp,%' OR key_ LIKE 'pop,%' OR key_ LIKE 'smtp,%'
+			OR key_ LIKE 'ssh,%' OR key_ LIKE 'tcp,%'
+			OR key_ LIKE 'ftp_perf,%' OR key_ LIKE 'http_perf,%' OR key_ LIKE 'imap_perf,%'
+			OR key_ LIKE 'ldap_perf,%' OR key_ LIKE 'nntp_perf,%' OR key_ LIKE 'ntp_perf,%'
+			OR key_ LIKE 'pop_perf,%' OR key_ LIKE 'smtp_perf,%' OR key_ LIKE 'ssh_perf,%'
+			OR key_ LIKE 'tcp_perf,%');
+
+DROP FUNCTION zbx_convert_simple_checks(v_itemid bigint, v_hostid bigint, v_key varchar(255));
+
+DROP LANGUAGE 'plpgsql';
+
 ---- Patching table `hosts`
 
 ALTER TABLE ONLY hosts ALTER hostid DROP DEFAULT,

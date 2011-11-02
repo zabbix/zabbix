@@ -138,13 +138,10 @@ UNIQUE		|httptestitem_1	|httptestid,itemid
 TABLE|nodes|nodeid|
 FIELD		|nodeid		|t_integer	|	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|0
-FIELD		|timezone	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'10051'|NOT NULL	|0
-FIELD		|slave_history	|t_integer	|'30'	|NOT NULL	|0
-FIELD		|slave_trends	|t_integer	|'365'	|NOT NULL	|0
 FIELD		|nodetype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|masterid	|t_integer	|	|NULL		|0			|1|nodes		|nodeid
+FIELD		|masterid	|t_integer	|	|NULL		|0			|1|nodes		|nodeid	|RESTRICT
 
 TABLE|node_cksum||0
 FIELD		|nodeid		|t_integer	|	|NOT NULL	|0			|1|nodes
@@ -786,9 +783,9 @@ FIELD		|prevvalue	|t_varchar(255)	|	|NULL		|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|trapper_hosts	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|units		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|multiplier	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|delta		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|units		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|multiplier	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|delta		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|prevorgvalue	|t_varchar(255)	|	|NULL		|0
 FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY

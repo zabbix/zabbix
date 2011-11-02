@@ -189,7 +189,7 @@
 	$urlTable->addRow($addButtonColumn);
 
 	// append url table to sysmap
-	$sysmapList->addRow(_('Links'), $urlTable);
+	$sysmapList->addRow(_('URLs'), $urlTable);
 
 	// append sysmap to form
 	$divTabs = new CTabView(array('remember' => 1));

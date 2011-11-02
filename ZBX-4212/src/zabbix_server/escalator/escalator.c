@@ -287,16 +287,16 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		sql[512];
-	int		offset, ret = SUCCEED;
+	size_t		offset;
+	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	offset = zbx_snprintf(sql, sizeof(sql),
-			"select distinct h.hostid,h.host"
+	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.host");
 #ifdef HAVE_OPENIPMI
-				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
-			);
 
 	switch (event->source)
 	{
