@@ -1317,7 +1317,7 @@ function array_equal(array $a, array $b, $strict=false) {
 	}
 	sort($a);
 	sort($b);
-	return ($strict && $a === $b) || $a == $b;
+	return $strict ? $a === $b : $a == $b;
 }
 
 /*************** PAGE SORTING ******************/
