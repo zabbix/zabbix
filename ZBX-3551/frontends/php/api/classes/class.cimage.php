@@ -375,7 +375,7 @@ class CImage extends CZBXAPI{
 							}
 					break;
 					case ZBX_DB_POSTGRESQL:
-						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
+						$values['image'] = "'".pg_escape_string($image['image'])."'";
 						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
 						if(!DBexecute($sql)){
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -430,7 +430,7 @@ class CImage extends CZBXAPI{
 
 				switch($DB['TYPE']){
 					case ZBX_DB_POSTGRESQL:
-						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
+						$values['image']	= "'".pg_escape_string($image['image'])."'";
 					break;
 					case ZBX_DB_SQLITE3:
 						$values['image'] = zbx_dbstr(bin2hex($image['image']));
