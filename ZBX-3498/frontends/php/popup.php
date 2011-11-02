@@ -1068,16 +1068,14 @@ include_once('include/page_header.php');
 				(!is_array($hostid))?null:S_HOST,
 				array(new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
 				S_TYPE,
-				S_TYPE_OF_INFORMATION,
-				S_STATUS
+				S_TYPE_OF_INFORMATION
 			);
 		else
 			$header = array(
 				(!is_array($hostid))?null:S_HOST,
 				S_DESCRIPTION,
 				S_TYPE,
-				S_TYPE_OF_INFORMATION,
-				S_STATUS
+				S_TYPE_OF_INFORMATION
 			);
 
 		$table->setHeader($header);
@@ -1113,8 +1111,7 @@ include_once('include/page_header.php');
 				(!is_array($hostid))?null:$row['host'],
 				$description,
 				item_type2str($row['type']),
-				item_value_type2str($row['value_type']),
-				new CSpan(item_status2str($row['status']),item_status2style($row['status']))
+				item_value_type2str($row['value_type'])
 				));
 		}
 
