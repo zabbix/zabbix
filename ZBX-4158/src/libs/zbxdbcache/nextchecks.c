@@ -188,7 +188,7 @@ void	DCflush_nextchecks()
 		uint64_array_add(&ids, &ids_alloc, &ids_num, nextchecks[i].itemid, 64);
 
 	/* dealing with notsupported items */
-	if (0 < ids_num)
+	if (0 != ids_num)
 	{
 		char		*sql = NULL;
 		int		sql_alloc = 4096, sql_offset = 0;
@@ -271,7 +271,6 @@ void	DCflush_nextchecks()
 
 			eventid = DBget_maxid_num("events", events_num);
 
-			/* dealing with events */
 			for (i = 0; i < events_num; i++)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,

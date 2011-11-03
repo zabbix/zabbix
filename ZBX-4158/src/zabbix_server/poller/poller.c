@@ -179,7 +179,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last;
-	int			tr_alloc = 0, tr_num = 0, i;
+	int			tr_alloc = 0, tr_num = 0, i, events_num = 0;
 	char			*sql = NULL, failed_type_buf[8];
 	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 
@@ -303,6 +303,9 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		}
 
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+		if (1 == tr_last->add_event)
+			events_num++;
 	}
 	DBfree_result(result);
 
@@ -315,9 +318,11 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 
 	zbx_free(sql);
 
-	if (0 != tr_num)
+	if (0 != events_num)
 	{
-		int	events_num = 0;
+		zbx_uint64_t	eventid;
+
+		eventid = DBget_maxid_num("events", events_num);
 
 		for (i = 0; i < tr_num; i++)
 		{
@@ -326,25 +331,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			if (1 != tr_last->add_event)
 				continue;
 
-			events_num++;
-		}
-
-		if (0 != events_num)
-		{
-			zbx_uint64_t	eventid;
-
-			eventid = DBget_maxid_num("events", events_num);
-
-			for (i = 0; i < tr_num; i++)
-			{
-				tr_last = &tr[i];
-
-				if (1 != tr_last->add_event)
-					continue;
-
-				process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-						tr_last->lastchange, tr_last->new_value, 0, 0);
-			}
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, tr_last->new_value, 0, 0);
 		}
 	}
 

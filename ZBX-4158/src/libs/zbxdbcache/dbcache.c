@@ -828,7 +828,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last = NULL;
-	int			tr_alloc, tr_num = 0;
+	int			tr_alloc, tr_num = 0, events_num = 0;
 	int			sql_offset = 0, i;
 	zbx_uint64_t		itemid, triggerid;
 
@@ -925,6 +925,13 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		}
 
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
+
+		if (1 == tr_last->add_event)
+			events_num++;
+
+		zbx_free(tr_last->error);
+		zbx_free(tr_last->new_error);
+		zbx_free(tr_last->expression);
 	}
 
 #ifdef HAVE_ORACLE
@@ -934,40 +941,21 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
-	if (0 != tr_num)
+	if (0 != events_num)
 	{
-		int	events_num = 0;
+		zbx_uint64_t	eventid;
+
+		eventid = DBget_maxid_num("events", events_num);
 
 		for (i = 0; i < tr_num; i++)
 		{
 			tr_last = &tr[i];
 
-			zbx_free(tr_last->error);
-			zbx_free(tr_last->new_error);
-			zbx_free(tr_last->expression);
-
-			if (1 != tr_last->add_event || 0 == tr_last->lastchange)
+			if (1 != tr_last->add_event)
 				continue;
 
-			events_num++;
-		}
-
-		if (0 != events_num)
-		{
-			zbx_uint64_t	eventid;
-
-			eventid = DBget_maxid_num("events", events_num);
-
-			for (i = 0; i < tr_num; i++)
-			{
-				tr_last = &tr[i];
-
-				if (1 != tr_last->add_event || 0 == tr_last->lastchange)
-					continue;
-
-				process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-						tr_last->lastchange, tr_last->new_value, 0, 0);
-			}
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, tr_last->new_value, 0, 0);
 		}
 	}
 clean:
