@@ -19,29 +19,24 @@
 **/
 ?>
 <?php
-require_once ('include/config.inc.php');
-require_once ('include/triggers.inc.php');
+require_once('include/config.inc.php');
+require_once('include/triggers.inc.php');
 
-$page['title'] = "S_TRIGGERS_TOP_100";
+$page['title'] = _('Most busy triggers top 100');
 $page['file'] = 'report5.php';
 $page['hist_arg'] = array('period');
 $page['scripts'] = array();
 
 require_once('include/page_header.php');
-
-
+?>
+<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'period' => array(
-		T_ZBX_STR,
-		O_OPT,
-		P_SYS | P_NZERO,
-		IN('"day","week","month","year"'),
-		NULL
-	)
+	'period' => array(T_ZBX_STR,	O_OPT,	P_SYS | P_NZERO,	IN('"day","week","month","year"'),	NULL)
 );
 check_fields($fields);
-
+?>
+<?php
 $rprt_wdgt = new CWidget();
 
 $_REQUEST['period'] = get_request('period', 'day');
@@ -73,17 +68,17 @@ $table->setHeader(array(
 
 switch ($_REQUEST['period']) {
 	case 'week':
-		$time_dif = 604800; // 7 * 86400
+		$time_dif = SEC_PER_DAY;
 		break;
 	case 'month':
-		$time_dif = 2592000; // 30 * 86400
+		$time_dif = SEC_PER_MONTH;
 		break;
 	case 'year':
-		$time_dif = 31536000; // 365 * 86400
+		$time_dif = SEC_PER_YEAR;
 		break;
 	case 'day':
 	default:
-		$time_dif = 86400;
+		$time_dif = SEC_PER_DAY;
 		break;
 }
 
@@ -93,12 +88,12 @@ $scripts_by_hosts = API::Script()->getScriptsByHosts($available_hosts);
 
 $triggers = array();
 $triggerids = array();
-$sql = 'SELECT h.name as hostname,MAX(h.hostid) as hostid,t.triggerid,t.description,t.expression,'.
-		' MAX(t.lastchange) as lastchange,t.priority,count(distinct e.eventid) as cnt_event,t.flags'.
-		' FROM hosts h,triggers t,functions f,items i,events e'.
-		' WHERE h.hostid = i.hostid'.
-			' AND i.itemid = f.itemid'.
-			' AND t.triggerid=f.triggerid'.
+$sql = 'SELECT h.name AS hostname,MAX(h.hostid) AS hostid,t.triggerid,t.description,t.expression,'.
+		'MAX(t.lastchange) AS lastchange,t.priority,count(distinct e.eventid) AS cnt_event,t.flags'.
+		' FROM hosts h,items i,functions f,triggers t,events e'.
+		' WHERE h.hostid=i.hostid'.
+			' AND i.itemid=f.itemid'.
+			' AND f.triggerid=t.triggerid'.
 			' AND t.triggerid=e.objectid'.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock>'.(time() - $time_dif).
@@ -115,31 +110,30 @@ while ($row = DBfetch($result)) {
 	$triggerids[$row['triggerid']] = $row['triggerid'];
 }
 
-$sql = 'SELECT f.triggerid,i.* '.
-		' FROM functions f,items i '.
-		' WHERE'.DBcondition('f.triggerid', $triggerids).
-		' AND i.itemid=f.itemid';
-$result = DBselect($sql);
+$result = DBselect(
+	'SELECT f.triggerid,i.*'.
+	' FROM functions f,items i'.
+	' WHERE f.itemid=i.itemid'.
+		' AND'.DBcondition('f.triggerid', $triggerids)
+);
 $item = array();
 while ($row = DBfetch($result)) {
 	$item['itemid'] = $row['itemid'];
-	$item['action'] = str_in_array($row['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
-			? 'showgraph'
-			: 'showvalues';
+	$item['action'] = str_in_array($row['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
 	$item['name'] = itemName($row);
 	$item['value_type'] = $row['value_type']; // ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 
 	$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;
 }
 
-foreach ($triggers as $triggerid => $row) {
+foreach ($triggers as $row) {
 	$description = expand_trigger_description_by_data($row);
 
 	$menus = '';
 	$host_nodeid = id2nodeid($row['hostid']);
-	foreach ($scripts_by_hosts[$row['hostid']] as $id => $script) {
+	foreach ($scripts_by_hosts[$row['hostid']] as $script) {
 		$script_nodeid = id2nodeid($script['scriptid']);
-		if ((bccomp($host_nodeid, $script_nodeid) == 0)) {
+		if (bccomp($host_nodeid, $script_nodeid) == 0) {
 			$menus .= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$row['hostid']."&scriptid=".$script['scriptid']."','Global script',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
 	}
@@ -176,7 +170,6 @@ $rprt_wdgt->show();
 
 $jsmenu = new CPUMenu(null, 170);
 $jsmenu->InsertJavaScript();
-
 
 require_once('include/page_footer.php');
 ?>

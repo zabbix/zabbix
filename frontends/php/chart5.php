@@ -26,18 +26,18 @@ $page['file'] = 'chart5.php';
 $page['type'] = PAGE_TYPE_IMAGE;
 
 require_once('include/page_header.php');
-
-
+?>
+<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array (
 	'serviceid' => array(T_ZBX_INT, O_MAND, P_SYS, DB_ID, null)
 );
 check_fields($fields);
-
-
-$sql = 'SELECT s.* FROM services s WHERE s.serviceid='.$_REQUEST['serviceid'];
+?>
+<?php
+$sql = 'SELECT s.serviceid FROM services s WHERE s.serviceid='.$_REQUEST['serviceid'];
 if (!$service = DBfetch(DBselect($sql, 1))) {
-	fatal_error(S_NO_IT_SERVICE_DEFINED);
+	fatal_error(_('No IT services defined.'));
 }
 
 if (!is_null($service['triggerid'])) {
@@ -47,7 +47,7 @@ if (!is_null($service['triggerid'])) {
 		'nodeids' => get_current_nodeid(true)
 	);
 	$db_data = API::Trigger()->get($options);
-	if(empty($db_data)) {
+	if (empty($db_data)) {
 		access_deny();
 	}
 }
@@ -89,8 +89,8 @@ $str = _s('%1$s (year %2$s)', $service['name'], $d);
 $x = imagesx($im) / 2 - imagefontwidth(4) * zbx_strlen($str) / 2;
 imageText($im, 10, 0, $x, 14, $darkred, $str);
 
-$count_now = array ();
-$problem = array ();
+$count_now = array();
+$problem = array();
 
 $start = mktime(0, 0, 0, 1, 1, date('Y'));
 
@@ -98,16 +98,16 @@ $wday = date('w', $start);
 if ($wday == 0) {
 	$wday = 7;
 }
-$start = $start - ($wday - 1) * 24 * 3600;
+$start = $start - ($wday - 1) * SEC_PER_DAY;
 
 $weeks = (int) date('W') + ($wday ? 1 : 0);
 
 for ($i = 0; $i < 52; $i ++) {
-	if (($period_start = $start + 7 * 24 * 3600 * $i) > time()) {
+	if (($period_start = $start + SEC_PER_WEEK * $i) > time()) {
 		break;
 	}
 
-	if (($period_end = $start + 7 * 24 * 3600 * ($i + 1)) > time()) {
+	if (($period_end = $start + SEC_PER_WEEK * ($i + 1)) > time()) {
 		$period_end = time();
 	}
 
@@ -116,7 +116,6 @@ for ($i = 0; $i < 52; $i ++) {
 	$problem[$i] = $stat['problem'];
 	$ok[$i] = $stat['ok'];
 	$count_now[$i] = 1;
-
 }
 
 for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
@@ -125,10 +124,9 @@ for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
 
 for ($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX / 52) {
 	DashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
-	// imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, zbx_date2str(S_CHART5_TIMELINE_DATE_FORMAT,$period_start) , $black);
-	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 35, $black, zbx_date2str(S_CHART5_TIMELINE_DATE_FORMAT, $period_start));
+	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 35, $black, zbx_date2str(_('d.M'), $period_start));
 
-	$period_start += 7 * 24 * 3600;
+	$period_start += SEC_PER_WEEK;
 }
 
 $maxY = max(max($problem), 100);
@@ -137,8 +135,8 @@ $minY = 0;
 $maxX = $sizeX;
 $minX = 0;
 
-for ($i = 1; $i <= $weeks; $i ++) {
-	if (! isset($ok[$i - 1])) {
+for ($i = 1; $i <= $weeks; $i++) {
+	if (!isset($ok[$i - 1])) {
 		continue;
 	}
 	$x2 = ($sizeX / 52) * ($i - 1 - $minX) * $sizeX / ($maxX - $minX);
@@ -159,7 +157,6 @@ for ($i = 1; $i <= $weeks; $i ++) {
 		$x2 + $shiftX, $shiftYup + $sizeY - $y2,
 		$x2 + $shiftX + 8, $shiftYup + $sizeY, $black
 	);
-	//*
 	imagefilledrectangle($im,
 		$x2 + $shiftX, $shiftYup + $sizeY - $maxSizeY,
 		$x2 + $shiftX + 8, $shiftYup + $sizeY - $y2, imagecolorallocate($im, 235, 120, 120)
@@ -168,20 +165,19 @@ for ($i = 1; $i <= $weeks; $i ++) {
 		$x2 + $shiftX, $shiftYup + $sizeY - $maxSizeY,
 		$x2 + $shiftX + 8, $shiftYup + $sizeY - $y2, $black
 	);
-	//*/
 }
 
 for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
-	imageText($im, 7, 0, $sizeX + 5 + $shiftX, $sizeY - $i - 4 + $shiftYup + 8, $darkred, ($i * ($maxY - $minY) / $sizeY + $minY) . '%');
+	imageText($im, 7, 0, $sizeX + 5 + $shiftX, $sizeY - $i - 4 + $shiftYup + 8, $darkred, ($i * ($maxY - $minY) / $sizeY + $minY).'%');
 }
 
 imagefilledrectangle($im, $shiftX, $sizeY + $shiftYup + 34 + 15 * 1, $shiftX + 5, $sizeY + $shiftYup + 30 + 9 + 15 * 1, imagecolorallocate($im, 120, 235, 120));
 imagerectangle($im, $shiftX, $sizeY + $shiftYup + 34 + 15 * 1, $shiftX + 5, $sizeY + $shiftYup + 30 + 9 + 15 * 1, $black);
-imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 1 + 41, $black, S_OK_BIG . ' (%)');
+imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 1 + 41, $black, _('OK').' (%)');
 
 imagefilledrectangle($im, $shiftX, $sizeY + $shiftYup + 34 + 15 * 2, $shiftX + 5, $sizeY + $shiftYup + 30 + 9 + 15 * 2, $darkred);
 imagerectangle($im, $shiftX, $sizeY + $shiftYup + 34 + 15 * 2, $shiftX + 5, $sizeY + $shiftYup + 30 + 9 + 15 * 2, $black);
-imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 2 + 41, $black, S_PROBLEM_BIG . ' (%)');
+imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 2 + 41, $black, _('PROBLEM').' (%)');
 
 imagestringup($im, 0, imagesx($im) - 10, imagesy($im) - 50, 'http://www.zabbix.com', $gray);
 
@@ -192,7 +188,6 @@ imageText($im, 6, 0, imagesx($im) - $strSize['width'] - 5, imagesy($im) - 5, $gr
 
 imageOut($im);
 imagedestroy($im);
-
 
 require_once('include/page_footer.php');
 ?>
