@@ -158,10 +158,11 @@ include_once('include/page_header.php');
 		is_show_all_nodes() ? make_sorting_header(S_NODE,'h.hostid') : null,
 		$_REQUEST['hostid'] ==0 ? make_sorting_header(S_HOST,'h.name') : NULL,
 		make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
-		S_NUMBER_OF_STEPS,
+		_('Number of steps'),
 		S_STATE,
 		S_LAST_CHECK,
-		S_STATUS));
+		S_STATUS
+	));
 
 	$any_app_exist = false;
 
@@ -291,8 +292,13 @@ include_once('include/page_header.php');
 				url_param('groupid').url_param('hostid').url_param('applications').
 				url_param('select'));
 
-		$col = new CCol(array($link,SPACE,bold($db_app['name']),SPACE.'('.$db_app['scenarios_cnt'].SPACE.S_SCENARIOS.')'));
-		$col->SetColSpan(6);
+		$col = new CCol(array(
+			$link,
+			SPACE,
+			bold($db_app['name']),
+			SPACE.'('._n('%1$d scenario', '%1$d scenarios', $db_app['scenarios_cnt']).')'
+		));
+		$col->setColSpan(6);
 
 		$table->addRow(array(
 				get_node_name_by_elid($db_app['applicationid']),

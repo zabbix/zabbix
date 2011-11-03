@@ -147,7 +147,7 @@
 				$ip = $node_data['ip'];
 				$port = $node_data['port'];
 				$masterid = $node_data['masterid'];
-				$node_type = detect_node_type($node_data);
+				$node_type = detect_node_type($node_data['nodeid'], $node_data['masterid']);
 			}
 			else{
 				$new_nodeid = get_request('new_nodeid', 0);

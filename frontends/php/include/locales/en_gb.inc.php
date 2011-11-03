@@ -96,40 +96,7 @@
 
 //	httpconf.php
 	'S_SORT'=>					_('Sort'),
-	'S_STATUS_CODES'=>				_('Status codes'),
-	'S_CONFIGURATION_OF_WEB_MONITORING'=>		_('Configuration of Web monitoring'),
-	'S_CONFIGURATION_OF_WEB_MONITORING_BIG'=>	_('CONFIGURATION OF WEB MONITORING'),
-	'S_SCENARIO'=>					_('Scenario'),
-	'S_SCENARIOS'=>					_('Scenarios'),
-	'S_SCENARIOS_BIG'=>				_('SCENARIOS'),
-	'S_CREATE_SCENARIO'=>				_('Create scenario'),
-	'S_HIDE_DISABLED_SCENARIOS'=>			_('Hide disabled scenarios'),
-	'S_SHOW_DISABLED_SCENARIOS'=>			_('Show disabled scenarios'),
-	'S_NUMBER_OF_STEPS'=>				_('Number of steps'),
-	'S_SCENARIO_DELETED'=>				_('Scenario deleted'),
-	'S_SCENARIO_ACTIVATED'=>			_('Scenario activated'),
-	'S_SCENARIO_DISABLED'=>				_('Scenario disabled'),
-	'S_DELETE_SCENARIO_Q'=>				_('Delete scenario?'),
-	'S_SCENARIO_UPDATED'=>				_('Scenario updated'),
-	'S_CANNOT_UPDATE_SCENARIO'=>			_('Cannot update scenario'),
-	'S_SCENARIO_ADDED'=>				_('Scenario added'),
-	'S_CANNOT_ADD_SCENARIO'=>			_('Cannot add scenario'),
-	'S_CANNOT_DELETE_SCENARIO'=>			_('Cannot delete scenario'),
-	'S_AGENT'=>					_('Agent'),
-	'S_VARIABLES'=>					_('Variables'),
 	'S_STEP'=>					_('Step'),
-	'S_STEPS'=>					_('Steps'),
-	'S_TIMEOUT'=>					_('Timeout'),
-	'S_POST'=>					_('Post'),
-	'S_REQUIRED'=>					_('Required'),
-	'S_STEP_OF_SCENARIO'=>				_('Step of scenario'),
-	'S_BASIC_AUTHENTICATION'=>			_('Basic authentication'),
-	'S_NTLM_AUTHENTICATION'=>			_('NTLM authentication'),
-	'S_ENABLE_SELECTED_WEB_SCENARIOS_Q'=>		_('Enable selected WEB scenarios?'),
-	'S_DISABLE_SELECTED_WEB_SCENARIOS_Q'=>		_('Disable selected WEB scenarios?'),
-	'S_DELETE_HISTORY_SELECTED_WEB_SCENARIOS_Q'=>	_('Delete history of selected WEB scenarios?'),
-	'S_DELETE_SELECTED_WEB_SCENARIOS_Q'=>		_('Delete selected WEB scenarios?'),
-	'S_SELECT_HOST_FIRST' => _('(select host first)'),
 
 //	exp_imp.php
 	'S_ELEMENT'=>				_('Element'),
@@ -406,7 +373,6 @@
 	'S_LAST_MONTH_GRAPH'=>			_('Last month graph'),
 	'S_500_LATEST_VALUES'=>			_('500 latest values'),
 	'S_TIMESTAMP'=>				_('Timestamp'),
-	'S_LOCAL'=>				_('Local'),
 	'S_SOURCE'=>				_('Source'),
 	'S_INFO'=>					_('Info'),
 	'S_EVENT_ID'=>				_('Event ID'),
@@ -566,8 +532,6 @@
 	'S_WITHOUT_TRIGGERS'=>					_('Without triggers'),
 	'S_TYPES'=>						_('Types'),
 	'S_NO_ITEMS_DEFINED'=>					_('No items defined.'),
-	'S_HISTORY_CLEARED'=>					_('History cleared'),
-	'S_CLEAR_HISTORY_FOR_SELECTED'=>			_('Clear history for selected'),
 	'S_CLEAR_HISTORY'=>					_('Clear history'),
 	'S_CANNOT_CLEAR_HISTORY'=>				_('Cannot clear history'),
 	'S_CONFIGURATION_OF_ITEMS'=>				_('Configuration of items'),
@@ -582,7 +546,6 @@
 	'S_ITEMS_DISABLED'=>					_('Items disabled'),
 	'S_KEY'=>						_('Key'),
 	'S_DESCRIPTION'=>					_('Description'),
-	'S_UPDATE_INTERVAL'=>					_('Update interval'),
 	'S_INTERVAL'=>						_('Interval'),
 	'S_HISTORY'=>						_('History'),
 	'S_TRENDS'=>						_('Trends'),
@@ -591,7 +554,6 @@
 	'S_NOT_SUPPORTED'=>					_('Not supported'),
 	'S_SCRIPT'=>						_('Script'),
 	'S_UNITS'=>						_('Units'),
-	'S_UPDATE_INTERVAL_IN_SEC'=>				_('Update interval (in sec)'),
 	'S_KEEP_HISTORY_IN_DAYS'=>				_('Keep history (in days)'),
 	'S_KEEP_TRENDS_IN_DAYS'=>				_('Keep trends (in days)'),
 	'S_TYPE_OF_INFORMATION'=>				_('Type of information'),
@@ -678,8 +640,6 @@
 	'S_GRAPH_PROTOTYPES_OF_BIG' => _('GRAPH PROTOTYPES OF'),
 
 //	events.php
-	'S_EVENT'=>				_('Event'),
-	'S_LIST'=>				_('List'),
 	'S_LATEST_EVENTS'=>			_('Latest events'),
 	'S_HISTORY_OF_EVENTS_BIG'=>		_('HISTORY OF EVENTS'),
 	'S_NO_EVENTS_FOUND'=>			_('No events found'),
@@ -771,7 +731,6 @@
 	'S_FAVOURITES'=>			_('Favourites'),
 	'S_MENU'=>				_('Menu'),
 	'S_RESET'=>				_('Reset'),
-	'S_OF' => _('of'),
 
 // dashconf.php
 	'S_DASHBOARD_CONFIGURATION' =>	_('Dashboard configuration'),
@@ -993,8 +952,6 @@
 	'S_CANNOT_DELETE_SLIDESHOW'=>	_('Cannot delete slideshow'),
 	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
 
-	'S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST' => _('Screen with id "%d" does not exist'),
-
 // slides.php
 	'S_CUSTOM_SLIDES' =>			_('Custom slides'),
 
@@ -1148,7 +1105,6 @@
 	'S_DEBUG'=>					_('Debug'),
 	'S_DENY'=>					_('Deny'),
 	'S_HIDE'=>					_('Hide'),
-	'S_PASSWORD'=>				_('Password'),
 	'S_ADD_TO'=>				_('Add to'),
 	'S_REMOVE_FROM'=>			_('Remove from'),
 
@@ -1290,7 +1246,6 @@
 	'S_NO_ITEM_WITH'=>				_('No item with'),
 
 //	httptest.inc.php
-	'S_CANNOT_ADD_NEW_APPLICATION'=>		_('Cannot add new application'),
 	'S_ADDED_SMALL'=>				_('added'),
 
 //	hosts.inc.php
@@ -1351,14 +1306,6 @@
 	'S_EXECUTE_SQL_ERROR'=>			_('Execute SQL error'),
 	'S_PARSE_SQL_ERROR'=>			_('Parse SQL error'),
 
-//	nodes.inc.php
-	'S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME'=>		_('Incorrect characters used for Node name'),
-	'S_MASTER_NODE_ALREADY_EXISTS'=>			_('Master node already exists'),
-	'S_INCORRECT_NODE_TYPE'=>				_('Incorrect node type'),
-	'S_NODE_WITH_SAME_ID_ALREADY_EXISTS'=>			_('Node with same ID already exists'),
-	'S_UNABLE_TO_REMOVE_LOCAL_NODE'=>			_('Unable to remove local node'),
-	'S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE'=>	_('Please be aware that database still contains data related to the deleted Node'),
-
 //	class.cuser.php
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS'=>	_('Only Zabbix Admins can add user Medias'),
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_REMOVE_USER_MEDIAS'=>	_('Only Zabbix Admins can remove user Medias'),
@@ -1383,7 +1330,6 @@
 
 	'S_QUEUE'=>				_('Queue'),
 	'S_EVENTS'=>				_('Events'),
-	'S_MAPS'=>				_('Maps'),
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
 	'S_LOGOUT'=>				_('Logout'),

@@ -59,7 +59,7 @@
 		$delayBox->addItem(600,'600');
 		$delayBox->addItem(900,'900');
 
-		$form->addRow(S_UPDATE_INTERVAL_IN_SEC, $delayBox);
+		$form->addRow(_('Update interval (in sec)'), $delayBox);
 
 		$tblSteps = new CTableInfo(S_NO_SLIDES_DEFINED);
 		$tblSteps->setHeader(array(S_SCREEN, S_DELAY, S_SORT));
@@ -147,37 +147,6 @@
 		$form->addItemToBottomRow(new CButtonCancel());
 
 		return $form;
-	}
-
-
-	function insert_httpstep_form(){
-		$form = new CFormTable(S_STEP_OF_SCENARIO, null, 'post');
-		$form->setHelp("web.webmon.httpconf.php");
-
-		$form->addVar('dstfrm', get_request('dstfrm', null));
-		$form->addVar('stepid', get_request('stepid', null));
-		$form->addVar('list_name', get_request('list_name', null));
-
-		$stepid = get_request('stepid', null);
-		$name = get_request('name', '');
-		$url = get_request('url', '');
-		$posts = get_request('posts', '');
-		$timeout = get_request('timeout', 15);
-		$required = get_request('required', '');
-		$status_codes = get_request('status_codes', '');
-
-		$form->addRow(S_NAME, new CTextBox('name', $name, 50));
-		$form->addRow(S_URL, new CTextBox('url', $url, 80));
-		$form->addRow(S_POST, new CTextArea('posts', $posts, 50, 10));
-		$form->addRow(S_TIMEOUT, new CNumericBox('timeout', $timeout, 5));
-		$form->addRow(S_REQUIRED, new CTextBox('required', $required, 80));
-		$form->addRow(S_STATUS_CODES, new CTextBox('status_codes', $status_codes, 80));
-
-		$form->addItemToBottomRow(new CSubmit("save", isset($stepid) ? S_SAVE : S_ADD));
-
-		$form->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
-
-		$form->show();
 	}
 
 	function getUserFormData($userid, $isProfile = false) {
@@ -616,7 +585,7 @@
 
 		$col_table2->addRow(array($col21, $cmbType));
 	//second row
-		$label221 = new CSpan(bold(S_UPDATE_INTERVAL_IN_SEC.': '));
+		$label221 = new CSpan(bold(_('Update interval (in sec)').': '));
 		$label221->setAttribute('id', 'filter_delay_label');
 
 		$field221 = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
@@ -1387,7 +1356,7 @@
 		}
 
 		$cmbAuthType = new CComboBox('authtype', $authtype);
-		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD,S_PASSWORD);
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
 		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY,S_PUBLIC_KEY);
 
 		$row = new CRow(array(new CCol(S_AUTHENTICATION_METHOD,'form_row_l'), new CCol($cmbAuthType,'form_row_r')));
@@ -1419,7 +1388,7 @@
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
 
-		$row = new CRow(array(new CCol(S_PASSWORD,'form_row_l'), new CCol(new CTextBox('password',$password,16),'form_row_r')));
+		$row = new CRow(array(new CCol(_('Password'), 'form_row_l'), new CCol(new CTextBox('password', $password, 16), 'form_row_r')));
 		$row->setAttribute('id', 'row_password');
 		$frmItem->addRow($row);
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'password');
@@ -1536,7 +1505,7 @@
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_multiplier');
 
 
-		$row = new CRow(array(new CCol(S_UPDATE_INTERVAL_IN_SEC,'form_row_l'), new CCol(new CNumericBox('delay',$delay,5),'form_row_r')));
+		$row = new CRow(array(new CCol(_('Update interval (in sec)'), 'form_row_l'), new CCol(new CNumericBox('delay', $delay, 5), 'form_row_r')));
 		$row->setAttribute('id', 'row_delay');
 		$frmItem->addRow($row);
 		foreach($types as $it => $ilabel) {
@@ -1913,7 +1882,7 @@
 
 
 		$cmbAuthType = new CComboBox('authtype', $authtype);
-		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, S_PASSWORD);
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
 		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY, S_PUBLIC_KEY);
 		$frmItem->addRow(
 			array(new CVisibilityBox('authtype_visible', get_request('authtype_visible'), 'authtype', S_ORIGINAL), S_AUTHENTICATION_METHOD),
@@ -1932,7 +1901,7 @@
 			new CTextBox('privatekey', $privatekey, 40)
 		);
 		$frmItem->addRow(
-			array(new CVisibilityBox('password_visible', get_request('password_visible'), 'password', S_ORIGINAL), S_PASSWORD),
+			array(new CVisibilityBox('password_visible', get_request('password_visible'), 'password', S_ORIGINAL), _('Password')),
 			new CTextBox('password', $password, 40)
 		);
 
@@ -1940,7 +1909,7 @@
 			S_CUSTOM_MULTIPLIER.' (0 - '.S_DISABLED.')'), new CTextBox('formula',$formula,40));
 
 		$frmItem->addRow(array( new CVisibilityBox('delay_visible', get_request('delay_visible'), 'delay', S_ORIGINAL),
-			S_UPDATE_INTERVAL_IN_SEC), new CNumericBox('delay',$delay,5));
+			_('Update interval (in sec)')), new CNumericBox('delay', $delay, 5));
 
 		$delay_flex_el = new CSpan($delay_flex_el);
 		$delay_flex_el->setAttribute('id', 'delay_flex_list');
