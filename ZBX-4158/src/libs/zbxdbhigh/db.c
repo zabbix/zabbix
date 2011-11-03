@@ -25,7 +25,6 @@
 #include "threads.h"
 #include "zbxserver.h"
 #include "dbcache.h"
-#include "zbxalgo.h"
 
 #define ZBX_DB_WAIT_DOWN	10
 
@@ -590,13 +589,6 @@ void	DBdelete_trigger(zbx_uint64_t triggerid)
 
 void	DBupdate_triggers_status_after_restart()
 {
-	typedef struct zbx_event_data_s
-	{
-		zbx_uint64_t	triggerid;
-		int		min_nextcheck;
-	}
-	zbx_event_data_t;
-
 	const char		*__function_name = "DBupdate_triggers_status_after_restart";
 	DB_RESULT		result;
 	DB_RESULT		result2;
@@ -607,14 +599,19 @@ void	DBupdate_triggers_status_after_restart()
 				nextcheck, min_nextcheck, now, i;
 	const char		*trigger_error;
 	char			*sql = NULL;
-	int			sql_alloc = 0, sql_offset = 0;
+	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 	unsigned char		add_event;
-	zbx_vector_ptr_t	events;
-	zbx_event_data_t	*event;
+	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last = NULL;
+	int			tr_alloc = 0, tr_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	now = time(NULL);
+
+	sql = zbx_malloc(sql, sql_alloc);
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
 
 	DBbegin();
 
@@ -636,9 +633,6 @@ void	DBupdate_triggers_status_after_restart()
 			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
 			TRIGGER_STATUS_ENABLED,
 			DBnode_local("t.triggerid"));
-
-	/* event data to call process_event() later */
-	zbx_vector_ptr_create(&events);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -677,39 +671,53 @@ void	DBupdate_triggers_status_after_restart()
 		if (-1 == min_nextcheck || min_nextcheck >= now)
 			continue;
 
-		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, triggerid, trigger_type, trigger_value, trigger_error,
-				TRIGGER_VALUE_UNKNOWN, "Zabbix was restarted.", min_nextcheck, &add_event))
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, triggerid, trigger_type,
+				trigger_value, trigger_error, TRIGGER_VALUE_UNKNOWN, "Zabbix was restarted.",
+				min_nextcheck, &add_event))
 		{
-			DBexecute("%s", sql);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 
-			zbx_free(sql);
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 		if (1 == add_event)
 		{
-			event = zbx_malloc(NULL, sizeof(zbx_event_data_t));
-			event->triggerid = triggerid;
-			event->min_nextcheck = min_nextcheck;
-			zbx_vector_ptr_append(&events, event);
+			if (tr_num == tr_alloc)
+			{
+				tr_alloc += 64;
+				tr = zbx_realloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
+			}
+
+			tr_last = &tr[tr_num++];
+			tr_last->triggerid = triggerid;
+			tr_last->lastchange = min_nextcheck;
 		}
 	}
 	DBfree_result(result);
 
-	if (0 != events.values_num)
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
+
+	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	if (0 != tr_num)
 	{
-		eventid = DBget_maxid_num("events", events.values_num);
+		eventid = DBget_maxid_num("events", tr_num);
 
-		for (i = 0; i < events.values_num; i++)
+		for (i = 0; i < tr_num; i++)
 		{
-			event = (zbx_event_data_t *)events.values[i];
+			tr_last = &tr[i];
 
-			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, event->triggerid,
-					event->min_nextcheck, TRIGGER_VALUE_UNKNOWN, 0, 0);
-
-			zbx_free(event);
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, TRIGGER_VALUE_UNKNOWN, 0, 0);
 		}
 	}
-	zbx_vector_ptr_destroy(&events);
+
+	zbx_free(tr);
 
 	DBcommit();
 

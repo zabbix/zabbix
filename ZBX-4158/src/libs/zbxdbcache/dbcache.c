@@ -922,9 +922,9 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 				tr_last->lastchange, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 3, ";\n");
-		}
 
-		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
+			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
+		}
 
 		if (1 == tr_last->add_event)
 			events_num++;

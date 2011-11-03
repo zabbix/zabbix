@@ -300,9 +300,9 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				tr_last->lastchange, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
-		}
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
 
 		if (1 == tr_last->add_event)
 			events_num++;
