@@ -1952,7 +1952,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$mltpbox[] = $ctb;
 		}
 		else {
-			$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.disabled = !this.checked;', 1);
+			$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.readOnly = !this.checked;', 1);
 			$mltpbox[] = SPACE;
 			$ctb = new CTextBox('formula', $formula, 10);
 			$ctb->setAttribute('style', 'text-align: right;');
@@ -3860,7 +3860,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$grp_tb->addItem($grp['groupid'], $grp['name']);
 		}
 
-		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), S_ORIGINAL),S_GROUPS),
+		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), S_ORIGINAL), S_REPLACE_GROUPS),
 						$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)
 					);
 

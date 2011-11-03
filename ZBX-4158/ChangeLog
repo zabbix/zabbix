@@ -1,5 +1,10 @@
 Changes for 1.8.9rc1
 
+ - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget (pavels)
+ - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
+ - [ZBX-2919] fixed custom multiplier becoming 0 when creating an item (pavels) 
+ - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
+ - [ZBX-2504] replaced 'Groups' by 'Replace groups' in host mass-update form to avoid confusion (Alexei)
  - [ZBX-4265] fixed host input validation (pavels)
  - [ZBX-4264] fixed zabbix_agent compilation problem on HP-UX (dimir)
  - [ZBX-3504] added a text notification in the maps section when no maps are defined (pavels)
