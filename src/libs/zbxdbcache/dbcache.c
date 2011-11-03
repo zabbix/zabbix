@@ -66,7 +66,6 @@ ZBX_DC_ID
 {
 	char		table_name[16];
 	zbx_uint64_t	lastid;
-	int		reserved;
 };
 
 ZBX_DC_IDS
@@ -829,7 +828,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last = NULL;
-	int			tr_alloc, tr_num = 0;
+	int			tr_alloc, tr_num = 0, events_num = 0;
 	int			sql_offset = 0, i;
 	zbx_uint64_t		itemid, triggerid;
 
@@ -923,9 +922,16 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 				tr_last->lastchange, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 3, ";\n");
+
+			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 		}
 
-		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
+		if (1 == tr_last->add_event)
+			events_num++;
+
+		zbx_free(tr_last->error);
+		zbx_free(tr_last->new_error);
+		zbx_free(tr_last->expression);
 	}
 
 #ifdef HAVE_ORACLE
@@ -935,23 +941,22 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
-	for (i = 0; i < tr_num; i++)
+	if (0 != events_num)
 	{
-		tr_last = &tr[i];
+		zbx_uint64_t	eventid;
 
-		zbx_free(tr_last->error);
-		zbx_free(tr_last->new_error);
-		zbx_free(tr_last->expression);
+		eventid = DBget_maxid_num("events", events_num);
 
-		if (0 == tr_last->lastchange)
-			continue;
+		for (i = 0; i < tr_num; i++)
+		{
+			tr_last = &tr[i];
 
-		if (1 != tr_last->add_event)
-			continue;
+			if (1 != tr_last->add_event)
+				continue;
 
-		/* processing event */
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-				tr_last->lastchange, tr_last->new_value, 0, 0);
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, tr_last->new_value, 0, 0);
+		}
 	}
 clean:
 	zbx_free(tr);
@@ -1372,6 +1377,7 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
+	const char	*__function_name = "DCmass_add_history";
 	int		sql_offset = 0, i;
 	char		*value_esc, *source_esc;
 	int		history_text_num, history_log_num;
@@ -1380,7 +1386,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	int		tmp_offset;
 #endif
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_add_history()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
@@ -1813,6 +1819,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -3065,93 +3073,6 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_nextid_shared                                              *
- *                                                                            *
- * Purpose: Return next id for requested table and store it in ids table      *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-zbx_uint64_t	DCget_nextid_shared(const char *table_name)
-{
-#define ZBX_RESERVE	256
-	const char	*__function_name = "DCget_nextid_shared";
-	int		i;
-	ZBX_DC_ID	*id;
-	zbx_uint64_t	nextid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, table_name);
-
-	LOCK_CACHE_IDS;
-
-	for (i = 0; ZBX_IDS_SIZE > i; i++)
-	{
-		id = &ids->id[i];
-
-		if ('\0' == *id->table_name)
-		{
-			zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
-			id->lastid = 0;
-			id->reserved = 0;
-
-			break;
-		}
-
-		if (0 == strcmp(id->table_name, table_name))
-			break;
-	}
-
-	if (ZBX_IDS_SIZE == i)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for ids");
-		exit(FAIL);
-	}
-
-	if (0 < id->reserved)
-		goto exit;
-
-	UNLOCK_CACHE_IDS;
-retry:
-	nextid = DBget_nextid(table_name, ZBX_RESERVE) - 1;
-
-	LOCK_CACHE_IDS;
-
-	if (nextid < id->lastid)
-	{
-		UNLOCK_CACHE_IDS;
-		goto retry;
-	}
-
-	if (0 == id->reserved)
-	{
-		id->lastid = nextid;
-		id->reserved = ZBX_RESERVE;
-	}
-	else if (id->lastid + id->reserved == nextid)
-	{
-		id->reserved += ZBX_RESERVE;
-	}
-	else if (id->reserved < ZBX_RESERVE && nextid > id->lastid)
-	{
-		id->lastid = nextid;
-		id->reserved = ZBX_RESERVE;
-	}
-exit:
-	id->lastid++;
-	id->reserved--;
-
-	nextid = id->lastid;
-
-	UNLOCK_CACHE_IDS;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 "]",
-			__function_name, table_name, nextid);
-
-	return nextid;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DCget_item_lastclock                                             *
  *                                                                            *
  * Purpose:                                                                   *
@@ -3167,9 +3088,10 @@ exit:
  ******************************************************************************/
 int	DCget_item_lastclock(zbx_uint64_t itemid)
 {
-	int	i, index, clock = FAIL;
+	const char	*__function_name = "DCget_item_lastclock";
+	int		i, index, clock = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCget_item_lastclock(): itemid [" ZBX_FS_UI64 "]", itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
 
 	LOCK_CACHE;
 
@@ -3189,7 +3111,7 @@ int	DCget_item_lastclock(zbx_uint64_t itemid)
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCget_item_lastclock(): %d", clock);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, clock);
 
 	return clock;
 }

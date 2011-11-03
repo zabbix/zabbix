@@ -51,7 +51,7 @@ static void	process_time_functions()
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last;
-	int			tr_alloc = 0, tr_num = 0;
+	int			tr_alloc = 0, tr_num = 0, events_num = 0;
 	char			*sql = NULL;
 	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0, i;
 
@@ -117,9 +117,16 @@ static void	process_time_functions()
 				tr_last->lastchange, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		if (1 == tr_last->add_event)
+			events_num++;
+
+		zbx_free(tr_last->error);
+		zbx_free(tr_last->new_error);
+		zbx_free(tr_last->expression);
 	}
 
 #ifdef HAVE_ORACLE
@@ -131,19 +138,22 @@ static void	process_time_functions()
 
 	zbx_free(sql);
 
-	for (i = 0; i < tr_num; i++)
+	if (0 != events_num)
 	{
-		tr_last = &tr[i];
+		zbx_uint64_t	eventid;
 
-		zbx_free(tr_last->error);
-		zbx_free(tr_last->new_error);
-		zbx_free(tr_last->expression);
+		eventid = DBget_maxid_num("events", events_num);
 
-		if (1 != tr_last->add_event)
-			continue;
+		for (i = 0; i < tr_num; i++)
+		{
+			tr_last = &tr[i];
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-				tr_last->lastchange, tr_last->new_value, 0, 0);
+			if (1 != tr_last->add_event)
+				continue;
+
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, tr_last->new_value, 0, 0);
+		}
 	}
 
 	DBcommit();
@@ -448,10 +458,15 @@ out:
  ******************************************************************************/
 static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maintenance_to)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	triggerid;
-	int		value_before, value_inside, value_after;
+	const char		*__function_name = "generate_events";
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		triggerid, eventid;
+	int			value_before, value_inside, value_after, i;
+	DB_TRIGGER_UPDATE	*tr = NULL;
+	int			tr_alloc = 0, tr_num = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select distinct t.triggerid"
@@ -475,10 +490,30 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		if (value_before == value_inside && value_inside == value_after)
 			continue;
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
-				maintenance_to, value_after, 0, 1);
+		if (tr_num == tr_alloc)
+		{
+			tr_alloc += 64;
+			tr = zbx_realloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
+		}
+
+		tr[tr_num].triggerid = triggerid;
+		tr[tr_num].new_value = value_after;
+		tr_num++;
 	}
 	DBfree_result(result);
+
+	if (0 != tr_num)
+	{
+		eventid = DBget_maxid_num("events", tr_num);
+
+		for (i = 0; i < tr_num; i++)
+		{
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
+					maintenance_to, tr[i].new_value, 0, 1);
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)
@@ -488,7 +523,8 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 		zbx_uint64_t	hostid;
 		int		maintenance_from;
 		void		*next;
-	} maintenance_t;
+	}
+	maintenance_t;
 
 	const char	*__function_name = "update_maintenance_hosts";
 	int		i;
