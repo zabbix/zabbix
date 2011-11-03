@@ -441,7 +441,7 @@ class CTriggerExpression {
 
 // start params
 		if ($this->currExpr['part']['itemParam'] || $this->currExpr['part']['functionParam']) {
-			if ($this->inParameter()) {
+			if ($this->inParameter() || $symbol == '"') {
 				if ($this->inQuotes()) {
 					if (($symbol == '"') && !$this->isSlashed(true)) {
 						$this->symbols['params'][$symbol]++;
