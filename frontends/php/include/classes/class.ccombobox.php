@@ -52,6 +52,10 @@ class CComboBox extends CTag {
 		foreach ($items as $value => $caption) {
 			$selected = (int) ($value == $this->value);
 			$group->addItem(new CComboItem($value, $caption, $selected));
+
+			if (strcmp($value, $this->value) == 0) {
+				$this->value_exist = 1;
+			}
 		}
 		parent::addItem($group);
 	}
@@ -69,11 +73,11 @@ class CComboBox extends CTag {
 			if (is_null($selected)) {
 				$selected = 'no';
 				if (is_array($this->value)) {
-					if (str_in_array($value,$this->value)) {
+					if (str_in_array($value, $this->value)) {
 						$selected = 'yes';
 					}
 				}
-				elseif (strcmp($value,$this->value) == 0) {
+				elseif (strcmp($value, $this->value) == 0) {
 					$selected = 'yes';
 				}
 			}

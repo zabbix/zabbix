@@ -356,11 +356,11 @@
 		if ($type == T_ZBX_IP) {
 			if (!validate_ip($var,$arr)) {
 				if ($flags&P_SYS) {
-					info(_s('Critical error. Field [%1$s] is not IP', $field));
+					info(_s('Critical error. Field [%1$s] is not IP.', $field));
 					return ZBX_VALID_ERROR;
 				}
 				else {
-					info(_s('Warning. Field [%1$s] is not IP', $field));
+					info(_s('Warning. Field [%1$s] is not IP.', $field));
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -370,11 +370,11 @@
 		if ($type == T_ZBX_IP_RANGE) {
 			if (!validate_ip_range($var)) {
 				if ($flags&P_SYS) {
-					info(_s('Critical error. Field [%1$s] is not IP range', $field));
+					info(_s('Critical error. Field [%1$s] is not IP range.', $field));
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info(_s('Warning. Field [%1$s] is not IP range', $field));
+					info(_s('Warning. Field [%1$s] is not IP range.', $field));
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -393,10 +393,10 @@
 				}
 			}
 			if ($err == ZBX_VALID_ERROR) {
-				info(_s('Critical error. Field [%1$s] is not PORT range', $field));
+				info(_s('Critical error. Field [%1$s] is not PORT range.', $field));
 			}
 			elseif ($err == ZBX_VALID_WARNING) {
-				info(_s('Warning. Field [%1$s] is not PORT range', $field));
+				info(_s('Warning. Field [%1$s] is not PORT range.', $field));
 			}
 			return $err;
 		}
@@ -404,11 +404,11 @@
 		if ($type == T_ZBX_INT_RANGE) {
 			if (!is_int_range($var)) {
 				if ($flags&P_SYS) {
-					info(_s('Critical error. Field [%1$s] is not integer range', $field));
+					info(_s('Critical error. Field [%1$s] is not integer range.', $field));
 					return ZBX_VALID_ERROR;
 				}
 				else {
-					info(_s('Warning. Field [%1$s] is not integer range', $field));
+					info(_s('Warning. Field [%1$s] is not integer range.', $field));
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -417,44 +417,44 @@
 
 		if (($type == T_ZBX_INT) && !zbx_is_int($var)) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field [%1$s] is not integer', $field));
+				info(_s('Critical error. Field [%1$s] is not integer.', $field));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field [%1$s] is not integer', $field));
+				info(_s('Warning. Field [%1$s] is not integer.', $field));
 				return ZBX_VALID_WARNING;
 			}
 		}
 
 		if (($type == T_ZBX_DBL) && !is_numeric($var)) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field [%1$s] is not double', $field));
+				info(_s('Critical error. Field [%1$s] is not double.', $field));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field [%1$s] is not double', $field));
+				info(_s('Warning. Field [%1$s] is not double.', $field));
 				return ZBX_VALID_WARNING;
 			}
 		}
 
 		if (($type == T_ZBX_STR) && !is_string($var)) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field [%1$s] is not string', $field));
+				info(_s('Critical error. Field [%1$s] is not string.', $field));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field [%1$s] is not string', $field));
+				info(_s('Warning. Field [%1$s] is not string.', $field));
 				return ZBX_VALID_WARNING;
 			}
 		}
 
 		if (($type == T_ZBX_STR) && !defined('ZBX_ALLOW_UNICODE') && (zbx_strlen($var) != zbx_strlen($var))) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field [%1$s] contains Multibyte chars', $field));
+				info(_s('Critical error. Field [%1$s] contains Multibyte chars.', $field));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field [%1$s] multibyte chars are restricted', $field));
+				info(_s('Warning. Field [%1$s] multibyte chars are restricted.', $field));
 				return ZBX_VALID_ERROR;
 			}
 		}
@@ -462,11 +462,11 @@
 		if (($type == T_ZBX_CLR) && !is_hex_color($var)) {
 			$var = 'FFFFFF';
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field [%1$s] is not a colour', $field));
+				info(_s('Critical error. Field [%1$s] is not a colour.', $field));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field [%1$s] is not a colour', $field));
+				info(_s('Warning. Field [%1$s] is not a colour.', $field));
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -511,11 +511,11 @@
 		if ($opt == O_MAND) {
 			if (!isset($_REQUEST[$field])) {
 				if ($flags&P_SYS) {
-					info(_s('Critical error. Field [%1$s] is mandatory', $caption));
+					info(_s('Critical error. Field [%1$s] is mandatory.', $caption));
 					return ZBX_VALID_ERROR;
 				}
 				else {
-					info(_s('Warning. Field [%1$s] is mandatory', $caption));
+					info(_s('Warning. Field [%1$s] is mandatory.', $caption));
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -528,11 +528,11 @@
 			unset_request($field);
 
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Field [%1$s] must be missing', $caption));
+				info(_s('Critical error. Field [%1$s] must be missing.', $caption));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Field [%1$s] must be missing', $caption));
+				info(_s('Warning. Field [%1$s] must be missing.', $caption));
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -542,11 +542,11 @@
 			}
 			elseif ($flags&P_ACT) {
 				if (!isset($_REQUEST['sid'])) {
-					info(_('Operation cannot be performed due to unauthorized request'));
+					info(_('Operation cannot be performed due to unauthorized request.'));
 					return ZBX_VALID_ERROR;
 				}
 				elseif (isset($_COOKIE['zbx_sessionid']) && ($_REQUEST['sid'] != substr($_COOKIE['zbx_sessionid'], 16, 16))) {
-					info(_('Operation cannot be performed due to unauthorized request'));
+					info(_('Operation cannot be performed due to unauthorized request.'));
 					return ZBX_VALID_ERROR;
 				}
 			}
@@ -578,7 +578,7 @@
 
 	function invalid_url($msg = null) {
 		if (empty($msg)) {
-			$msg = _('Zabbix has received an incorrect request');
+			$msg = _('Zabbix has received an incorrect request.');
 		}
 		include_once('include/page_header.php');
 		unset_all();
@@ -587,7 +587,7 @@
 	}
 
 	function check_fields(&$fields, $show_messages = true) {
-		// VAR						TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+		// VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 		$system_fields = array(
 			'sid'=>				array(T_ZBX_STR, O_OPT,	P_SYS,	HEX(),		null),
 			'switch_node'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
@@ -619,7 +619,7 @@
 		}
 
 		if ($show_messages && $err != ZBX_VALID_OK) {
-			show_messages($err == ZBX_VALID_OK, null, _('Page received incorrect data'));
+			show_messages($err == ZBX_VALID_OK, null, _('Page received incorrect data.'));
 		}
 		return $err == ZBX_VALID_OK ? 1 : 0;
 	}

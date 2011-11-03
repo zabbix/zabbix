@@ -490,10 +490,10 @@ switch($itemType) {
 				' WHERE itemid='.$_REQUEST['itemid']);
 			$host = get_host_by_hostid($item['hostid']);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['name'].'] '.S_HISTORY_CLEARED);
+				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['name'].'] '._('History cleared'));
 		}
 		$result = DBend($result);
-		show_messages($result, S_HISTORY_CLEARED, S_CANNOT_CLEAR_HISTORY);
+		show_messages($result, _('History cleared'), S_CANNOT_CLEAR_HISTORY);
 
 	}
 	else if(isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])){
@@ -712,11 +712,11 @@ switch($itemType) {
 			add_audit(
 				AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_ITEM,
-				S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEARED
+				S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '._('History cleared')
 			);
 		}
 		$go_result = DBend($go_result);
-		show_messages($go_result, S_HISTORY_CLEARED, $go_result);
+		show_messages($go_result, _('History cleared'), $go_result);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
 		global $USER_DETAILS;
@@ -1196,7 +1196,7 @@ switch($itemType) {
 		//$goOption->setAttribute('confirm',S_COPY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('clean_history',S_CLEAR_HISTORY_FOR_SELECTED);
+		$goOption = new CComboItem('clean_history', _('Clear history for selected'));
 		$goOption->setAttribute('confirm',S_DELETE_HISTORY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 

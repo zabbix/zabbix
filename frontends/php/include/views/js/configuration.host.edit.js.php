@@ -24,7 +24,7 @@
 <td>
 	<div id="interface_type_#{interfaceid}" class="jqueryinputset">
 		<input type="radio" id="radio_agent_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_AGENT);?>" #{*checked_agent} #{*lock_agent}/>
-		<label for="radio_agent_#{interfaceid}"><?php print(S_AGENT);?></label>
+		<label for="radio_agent_#{interfaceid}"><?php echo _('Agent'); ?></label>
 
 		<input type="radio" id="radio_snmp_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_SNMP);?>" #{*checked_snmp} #{*lock_snmp} />
 		<label for="radio_snmp_#{interfaceid}"><?php print(S_SNMP);?></label>
