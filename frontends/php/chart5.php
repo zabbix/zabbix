@@ -35,7 +35,7 @@ $fields = array (
 check_fields($fields);
 ?>
 <?php
-$sql = 'SELECT s.serviceid FROM services s WHERE s.serviceid='.$_REQUEST['serviceid'];
+$sql = 'SELECT s.serviceid, s.triggerid,s.name FROM services s WHERE s.serviceid='.$_REQUEST['serviceid'];
 if (!$service = DBfetch(DBselect($sql, 1))) {
 	fatal_error(_('No IT services defined.'));
 }
