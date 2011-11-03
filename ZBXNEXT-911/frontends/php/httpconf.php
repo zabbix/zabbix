@@ -70,8 +70,7 @@ $_REQUEST['status'] = isset($_REQUEST['status']) ? 0 : 1;
 
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
-?>
-<?php
+
 $showDisabled = get_request('showdisabled', 0);
 CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_STR);
 $_REQUEST['go'] = get_request('go', 'none');
@@ -132,25 +131,8 @@ foreach ($_REQUEST['applications'] as $application) {
 
 if (isset($_REQUEST['new_httpstep'])) {
 	$_REQUEST['steps'] = get_request('steps', array());
+	$_REQUEST['new_httpstep']['no'] = count($_REQUEST['steps']) + 1;
 	array_push($_REQUEST['steps'], $_REQUEST['new_httpstep']);
-}
-elseif (isset($_REQUEST['move_up']) && isset($_REQUEST['steps'][$_REQUEST['move_up']])) {
-	$new_id = $_REQUEST['move_up'] - 1;
-
-	if (isset($_REQUEST['steps'][$new_id])) {
-		$tmp = $_REQUEST['steps'][$new_id];
-		$_REQUEST['steps'][$new_id] = $_REQUEST['steps'][$_REQUEST['move_up']];
-		$_REQUEST['steps'][$_REQUEST['move_up']] = $tmp;
-	}
-}
-elseif (isset($_REQUEST['move_down']) && isset($_REQUEST['steps'][$_REQUEST['move_down']])) {
-	$new_id = $_REQUEST['move_down'] + 1;
-
-	if (isset($_REQUEST['steps'][$new_id])) {
-		$tmp = $_REQUEST['steps'][$new_id];
-		$_REQUEST['steps'][$new_id] = $_REQUEST['steps'][$_REQUEST['move_down']];
-		$_REQUEST['steps'][$_REQUEST['move_down']] = $tmp;
-	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	$result = false;
@@ -184,13 +166,18 @@ elseif (isset($_REQUEST['save'])) {
 			$message_false = _('Cannot add scenario');
 		}
 
-		$i = 1;
-		foreach ($_REQUEST['steps'] as $snum => $step) {
-			$_REQUEST['steps'][$snum]['no'] = $i++;
-			$stepid = isset($step['httpstepid']) ? $step['httpstepid'] : null;
-			if (!is_null($stepid)) {
-				$_REQUEST['steps'][$snum]['webstepid'] = $stepid;
-				unset($_REQUEST['steps'][$snum]['httpstepid']);
+		$steps = get_request('steps', array());
+		if (!empty($steps)) {
+			order_result($steps, 'no');
+
+			$i = 1;
+			foreach ($steps as $snum => $step) {
+				$steps[$snum]['no'] = $i++;
+				$stepid = isset($step['httpstepid']) ? $step['httpstepid'] : null;
+				if (!is_null($stepid)) {
+					$steps[$snum]['webstepid'] = $stepid;
+					unset($steps[$snum]['httpstepid']);
+				}
 			}
 		}
 
@@ -202,7 +189,7 @@ elseif (isset($_REQUEST['save'])) {
 			'status' => $_REQUEST['status'],
 			'agent' => $_REQUEST['agent'],
 			'macros' => $_REQUEST['macros'],
-			'steps' => get_request('steps', array())
+			'steps' => $steps
 		);
 
 		$db_app_result = DBselect(
