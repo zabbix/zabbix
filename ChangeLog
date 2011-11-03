@@ -2,6 +2,7 @@
 Changes for 1.9.8
 
 New features:
+ - [ZBXNEXT-911] redesign Configuration->Web (Eduard)
  - [ZBXNEXT-579] added support for vfs.fs.discovery (with both {#FSNAME} and {#FSTYPE}) on FreeBSD, NetBSD and OpenBSD (asaveljevs)
  - [ZBXNEXT-580] added support for {#FSTYPE} for vfs.fs.discovery on AIX, HP-UX, Linux, Solaris and Windows (asaveljevs)
  - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
@@ -31,7 +32,7 @@ Changes for 1.9.7
 New features:
  - [ZBX-1346] add example user parameter to monitor mail queue length from mailq (Richlv)
  - [ZBXNEXT-429] make range select work in a more intuitive fashion (Eduard)
- - [ZBXNEXT-910] redesign Administration->Maintenance (Eduard)
+ - [ZBXNEXT-910] redesign Configuration->Maintenance (Eduard)
  - [ZBX-4222] added more clear labels 'Escalation period' and 'Default escalation period' in configuration of actions (Alexei)
  - [ZBXNEXT-485] improved simple checks key syntax as in other item keys (Sasha)
  - [ZBXNEXT-916] redesign Administration->Users, Users groups, User Profile (Eduard)
