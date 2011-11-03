@@ -55,8 +55,8 @@ $authenticationComboBox = new CComboBox('authentication', $this->data['authentic
 $authenticationComboBox->addItems(httptest_authentications());
 $httpFormList->addRow(_('Authentication'), $authenticationComboBox);
 if (in_array($this->data['authentication'], array(HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM))) {
-	$httpFormList->addRow(_('User'), new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE));
-	$httpFormList->addRow(_('Password'), new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE));
+	$httpFormList->addRow(_('User'), new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
+	$httpFormList->addRow(_('Password'), new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
 }
 
 $httpFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5));
@@ -117,13 +117,15 @@ $httpFormList->addRow(_('Active'), new CCheckBox('status', $this->data['status']
 $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = new CTable(_('No steps defined.'), 'formElementTable');
 $stepsTable->setAttribute('style', 'min-width:500px;');
+$stepsTable->setAttribute('id', 'httpStepTable');
 $stepsTable->setHeader(array(
+	SPACE,
+	SPACE,
 	_('Name'),
 	_('Timeout'),
 	_('URL'),
 	_('Required'),
 	_('Status codes'),
-	_('Sort'),
 	_('Action')
 ));
 
@@ -131,6 +133,7 @@ if (count($this->data['steps']) > 0) {
 	$first = min(array_keys($this->data['steps']));
 	$last = max(array_keys($this->data['steps']));
 }
+$i = 1;
 foreach ($this->data['steps'] as $stepid => $step) {
 	if (!isset($step['name'])) {
 		$step['name'] = '';
@@ -146,17 +149,6 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	}
 	if (!isset($step['required'])) {
 		$step['required'] = '';
-	}
-
-	$up = null;
-	if ($stepid != $first) {
-		$up = new CSpan(_('Up'), 'link');
-		$up->onClick("return create_var('".$httpForm->getName()."', 'move_up', ".$stepid.", true);");
-	}
-
-	$down = null;
-	if ($stepid != $last) {
-		$down = new CLink(_('Down'), null, 'link', "return create_var('".$httpForm->getName()."', 'move_down', ".$stepid.", true);");
 	}
 
 	$name = new CSpan($step['name'], 'link');
@@ -178,15 +170,20 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$url = $step['url'];
 	}
 
+	$numSpan = new CSpan($i++.':');
+	$numSpan->addClass('rowNum');
+	$numSpan->setAttribute('id', 'current_step_'.$stepid);
+
 	$row = new CRow(array(
+		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
+		$numSpan,
 		$name,
 		$step['timeout'].SPACE._('sec'),
 		$url,
 		$step['required'],
 		$step['status_codes'],
-		array($up, isset($up) && isset($down) ? SPACE : null, $down),
 		new CButton('remove', _('Remove'), 'javascript: removeHttpStep(\''.$stepid.'\');', 'link_menu')
-	));
+	), 'sortable');
 	$row->setAttribute('id', 'steps_'.$stepid);
 	$stepsTable->addRow($row);
 }
