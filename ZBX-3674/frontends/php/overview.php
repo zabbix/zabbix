@@ -33,7 +33,7 @@ define('ZBX_PAGE_DO_REFRESH', 1);
 define('SHOW_TRIGGERS',0);
 define('SHOW_DATA',1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
@@ -63,7 +63,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -170,6 +170,6 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

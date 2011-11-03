@@ -26,7 +26,7 @@ $page['title']		= 'S_CONFIGURATION_OF_ACTIONS';
 $page['file']		= 'actionconf.php';
 $page['hist_arg']	= array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
 ?>
@@ -554,6 +554,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

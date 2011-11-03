@@ -121,7 +121,7 @@ if(!defined('PAGE_HEADER_LOADED'))
 	zbx_set_post_cookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 ?>
 <?php
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 	global	$ZBX_CONFIGURATION_FILE;
 
@@ -135,5 +135,5 @@ include_once('include/page_header.php');
 	unset($_POST);
 
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>
