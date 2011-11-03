@@ -847,9 +847,7 @@
  * Comments: !!! Don't forget sync code with C !!!
  *
  */
-	function copy_graph_to_host($graphid, $hostid, $copy_mode = false){
-		$result = true;
-
+	function copy_graph_to_host($graphid, $hostid, $copy_mode=false){
 		$gitems = array();
 
 		$db_graph_items = get_graphitems_by_graphid($graphid);
@@ -863,7 +861,7 @@
 				'calc_fnc'	=> $db_gitem['calc_fnc'],
 				'type'		=> $db_gitem['type'],
 				'periods_cnt'	=> $db_gitem['periods_cnt']
-				);
+			);
 		}
 
 		$db_graph = get_graph_by_graphid($graphid);
@@ -921,13 +919,10 @@
 			}
 		}
 		else{
-			$host = get_host_by_hostid($hostid);
-			info(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$db_graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
-
 			$result = false;
 		}
 
-	return $result;
+		return $result;
 	}
 
 	function navigation_bar_calc($idx=null, $idx2=0, $update=false){
