@@ -878,8 +878,6 @@
 
 //	report5.php
 	'S_TRIGGERS_TOP_100'=>			_('Most busy triggers top 100'),
-	'S_TRIGGERS_TOP_100_BIG'=>		_('MOST BUSY TRIGGERS TOP 100'),
-	'S_NUMBER_OF_STATUS_CHANGES'=>		_('Number of status changes'),
 	'S_WEEK'=>				_('Week'),
 
 //	report6.php
