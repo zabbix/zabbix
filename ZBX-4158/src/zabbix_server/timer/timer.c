@@ -509,7 +509,7 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		for (i = 0; i < tr_num; i++)
 		{
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
-					maintenance_to, tr[i].value, 0, 1);
+					maintenance_to, tr[i].new_value, 0, 1);
 		}
 	}
 
