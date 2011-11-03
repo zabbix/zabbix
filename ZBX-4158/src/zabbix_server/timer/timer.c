@@ -134,7 +134,7 @@ static void	process_time_functions()
 
 	if (0 != tr_num)
 	{
-		zbx_uint64_t    eventid, events_num = 0;
+		int	events_num = 0;
 
 		for (i = 0; i < tr_num; i++)
 		{
@@ -152,6 +152,8 @@ static void	process_time_functions()
 
 		if (0 != events_num)
 		{
+			zbx_uint64_t	eventid;
+
 			eventid = DBget_maxid_num("events", events_num);
 
 			for (i = 0; i < tr_num; i++)

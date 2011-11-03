@@ -936,9 +936,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	if (0 != tr_num)
 	{
-		zbx_uint64_t    eventid;
-
-		eventid = DBget_maxid_num("events", tr_num);
+		int	events_num = 0;
 
 		for (i = 0; i < tr_num; i++)
 		{
@@ -948,14 +946,28 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			zbx_free(tr_last->new_error);
 			zbx_free(tr_last->expression);
 
-			if (0 == tr_last->lastchange)
+			if (1 != tr_last->add_event || 0 == tr_last->lastchange)
 				continue;
 
-			if (1 != tr_last->add_event)
-				continue;
+			events_num++;
+		}
 
-			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-					tr_last->lastchange, tr_last->new_value, 0, 0);
+		if (0 != events_num)
+		{
+			zbx_uint64_t	eventid;
+
+			eventid = DBget_maxid_num("events", events_num);
+
+			for (i = 0; i < tr_num; i++)
+			{
+				tr_last = &tr[i];
+
+				if (1 != tr_last->add_event || 0 == tr_last->lastchange)
+					continue;
+
+				process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+						tr_last->lastchange, tr_last->new_value, 0, 0);
+			}
 		}
 	}
 clean:
