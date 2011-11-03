@@ -2,6 +2,7 @@
 Changes for 1.9.8
 
 New features:
+ - [ZBX-1357] added initial Greek translation (Richlv)
  - [ZBXNEXT-911] redesign Configuration->Web (Eduard)
  - [ZBXNEXT-579] added support for vfs.fs.discovery (with both {#FSNAME} and {#FSTYPE}) on FreeBSD, NetBSD and OpenBSD (asaveljevs)
  - [ZBXNEXT-580] added support for {#FSTYPE} for vfs.fs.discovery on AIX, HP-UX, Linux, Solaris and Windows (asaveljevs)
