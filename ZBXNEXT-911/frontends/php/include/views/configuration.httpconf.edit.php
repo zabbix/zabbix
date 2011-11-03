@@ -48,7 +48,7 @@ $httpFormList->addRow(_('Application'), array(
 		'return PopUp("popup.php?dstfrm='.$httpForm->getName().'&dstfld1=application&srctbl=applications&srcfld1=name&only_hostid='.$this->data['hostid'].'", 500, 600, "application");'
 	)
 ));
-$httpFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
+$httpFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
 
 // append authentication to form list
 $authenticationComboBox = new CComboBox('authentication', $this->data['authentication'], 'submit();');
