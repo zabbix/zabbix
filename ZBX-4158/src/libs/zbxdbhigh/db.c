@@ -601,7 +601,7 @@ void	DBupdate_triggers_status_after_restart()
 	char			*sql = NULL;
 	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 	unsigned char		add_event;
-	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last = NULL;
+	DB_TRIGGER_UPDATE	*tr = NULL;
 	int			tr_alloc = 0, tr_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -688,9 +688,9 @@ void	DBupdate_triggers_status_after_restart()
 				tr = zbx_realloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
 			}
 
-			tr_last = &tr[tr_num++];
-			tr_last->triggerid = triggerid;
-			tr_last->lastchange = min_nextcheck;
+			tr[tr_num].triggerid = triggerid;
+			tr[tr_num].lastchange = min_nextcheck;
+			tr_num++;
 		}
 	}
 	DBfree_result(result);
@@ -710,10 +710,8 @@ void	DBupdate_triggers_status_after_restart()
 
 		for (i = 0; i < tr_num; i++)
 		{
-			tr_last = &tr[i];
-
-			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-					tr_last->lastchange, TRIGGER_VALUE_UNKNOWN, 0, 0);
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
+					tr[i].lastchange, TRIGGER_VALUE_UNKNOWN, 0, 0);
 		}
 	}
 
