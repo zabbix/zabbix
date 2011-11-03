@@ -1424,7 +1424,7 @@ include_once('include/page_header.php');
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('sysmaps', ".zbx_jsvalue($reference).");");
 			$table->setFooter(new CCol($button, 'right'));
 
-			insert_js('var popupReference = '.zbx_jsvalue($sysmaps, true).';');
+			insert_js('var popupReference = '.zbx_jsvalue(sanitize($sysmaps), true).';');
 		}
 
 		$form->addItem($table);
@@ -1536,7 +1536,7 @@ include_once('include/page_header.php');
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('slides', ".zbx_jsvalue($reference).");");
 			$table->setFooter(new CCol($button, 'right'));
 
-			insert_js('var popupReference = '.zbx_jsvalue($slideshows, true).';');
+			insert_js('var popupReference = '.zbx_jsvalue(sanitize($slideshows), true).';');
 		}
 
 		$form->addItem($table);
@@ -1599,7 +1599,7 @@ include_once('include/page_header.php');
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('screens', ".zbx_jsvalue($reference).");");
 			$table->setFooter(new CCol($button, 'right'));
 
-			insert_js('var popupReference = '.zbx_jsvalue($screens, true).';');
+			insert_js('var popupReference = '.zbx_jsvalue(sanitize($screens), true).';');
 		}
 
 		$form->addItem($table);

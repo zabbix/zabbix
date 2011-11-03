@@ -49,6 +49,27 @@ function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
 	}
 }
 
+
+/**
+ * Escapes a string or array for safe outputting.
+ *
+ * @param mixed $value
+ * @return mixed
+ */
+function sanitize($value) {
+	if (is_array($value)) {
+		foreach ($value as &$v) {
+			$v = sanitize($v);
+		}
+	}
+	else {
+		$value = htmlspecialchars($value);
+	}
+
+	return $value;
+}
+
+
 function encodeValues(&$value, $encodeTwice = true) {
 	if (is_string($value)) {
 		$value = htmlentities($value, ENT_COMPAT, 'UTF-8');
