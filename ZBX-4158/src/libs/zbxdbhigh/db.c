@@ -25,6 +25,7 @@
 #include "threads.h"
 #include "zbxserver.h"
 #include "dbcache.h"
+#include "zbxalgo.h"
 
 #define ZBX_DB_WAIT_DOWN	10
 
@@ -545,30 +546,6 @@ int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_ui
 	return ret;
 }
 
-static void	DBupdate_trigger_value(zbx_uint64_t triggerid, unsigned char type, int value, const char *error,
-		int new_value, const char *new_error, int lastchange)
-{
-	const char	*__function_name = "DBupdate_trigger_value";
-	char		*sql = NULL;
-	int		sql_alloc = 0, sql_offset = 0;
-	unsigned char	add_event;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, triggerid, type, value, error,
-			new_value, new_error, lastchange, &add_event))
-	{
-		DBexecute("%s", sql);
-
-		zbx_free(sql);
-	}
-
-	if (1 == add_event)
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, lastchange, new_value, 0, 0);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
 void	DBdelete_service(zbx_uint64_t serviceid)
 {
 	DBexecute("delete from services_links where servicedownid=" ZBX_FS_UI64 " or serviceupid=" ZBX_FS_UI64,
@@ -613,15 +590,27 @@ void	DBdelete_trigger(zbx_uint64_t triggerid)
 
 void	DBupdate_triggers_status_after_restart()
 {
-	const char	*__function_name = "DBupdate_triggers_status_after_restart";
-	DB_RESULT	result;
-	DB_RESULT	result2;
-	DB_ROW		row;
-	DB_ROW		row2;
-	zbx_uint64_t	itemid, triggerid;
-	int		trigger_type, trigger_value, type, lastclock, delay,
-			nextcheck, min_nextcheck, now;
-	const char	*trigger_error;
+	typedef struct zbx_event_data_s
+	{
+		zbx_uint64_t	triggerid;
+		int		min_nextcheck;
+	}
+	zbx_event_data_t;
+
+	const char		*__function_name = "DBupdate_triggers_status_after_restart";
+	DB_RESULT		result;
+	DB_RESULT		result2;
+	DB_ROW			row;
+	DB_ROW			row2;
+	zbx_uint64_t		itemid, triggerid, eventid;
+	int			trigger_type, trigger_value, type, lastclock, delay,
+				nextcheck, min_nextcheck, now, i;
+	const char		*trigger_error;
+	char			*sql = NULL;
+	int			sql_alloc = 0, sql_offset = 0;
+	unsigned char		add_event;
+	zbx_vector_ptr_t	events;
+	zbx_event_data_t	*event;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -647,6 +636,9 @@ void	DBupdate_triggers_status_after_restart()
 			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
 			TRIGGER_STATUS_ENABLED,
 			DBnode_local("t.triggerid"));
+
+	/* event data to call process_event() later */
+	zbx_vector_ptr_create(&events);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -685,10 +677,39 @@ void	DBupdate_triggers_status_after_restart()
 		if (-1 == min_nextcheck || min_nextcheck >= now)
 			continue;
 
-		DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_error,
-				TRIGGER_VALUE_UNKNOWN, "Zabbix was restarted.", min_nextcheck);
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, triggerid, trigger_type, trigger_value, trigger_error,
+				TRIGGER_VALUE_UNKNOWN, "Zabbix was restarted.", min_nextcheck, &add_event))
+		{
+			DBexecute("%s", sql);
+
+			zbx_free(sql);
+		}
+
+		if (1 == add_event)
+		{
+			event = zbx_malloc(NULL, sizeof(zbx_event_data_t));
+			event->triggerid = triggerid;
+			event->min_nextcheck = min_nextcheck;
+			zbx_vector_ptr_append(&events, event);
+		}
 	}
 	DBfree_result(result);
+
+	if (0 != events.values_num)
+	{
+		eventid = DBget_maxid_num("events", events.values_num);
+
+		for (i = 0; i < events.values_num; i++)
+		{
+			event = (zbx_event_data_t *)events.values[i];
+
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, event->triggerid,
+					event->min_nextcheck, TRIGGER_VALUE_UNKNOWN, 0, 0);
+
+			zbx_free(event);
+		}
+	}
+	zbx_vector_ptr_destroy(&events);
 
 	DBcommit();
 
