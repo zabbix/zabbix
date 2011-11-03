@@ -28,7 +28,7 @@ $page['title'] = 'S_CONFIGURATION_OF_TRIGGERS';
 $page['file'] = 'trigger_prototypes.php';
 $page['hist_arg'] = array('parent_discoveryid');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -470,6 +470,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

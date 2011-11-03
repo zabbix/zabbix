@@ -29,7 +29,7 @@ $page['hist_arg'] = array();
 $page['scripts'] = array();
 $page['type'] = detect_page_type();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -321,6 +321,6 @@ $dscry_wdgt->show();
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

@@ -29,7 +29,7 @@ $page['file'] = 'items.php';
 $page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 // needed type to know which field name to use
@@ -257,7 +257,7 @@ switch($itemType) {
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -1229,6 +1229,6 @@ switch($itemType) {
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

@@ -28,7 +28,7 @@ $page['title'] = 'S_CONFIGURATION_OF_WEB_MONITORING';
 $page['file'] = 'httpconf.php';
 $page['hist_arg'] = array('groupid','hostid');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 
@@ -763,5 +763,5 @@ include_once('include/page_header.php');
 	$http_wdgt->show();
 
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

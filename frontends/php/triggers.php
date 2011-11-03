@@ -28,7 +28,7 @@ $page['title'] = 'S_CONFIGURATION_OF_TRIGGERS';
 $page['file'] = 'triggers.php';
 $page['hist_arg'] = array('hostid','groupid');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -673,6 +673,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>
