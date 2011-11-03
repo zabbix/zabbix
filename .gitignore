@@ -44,6 +44,7 @@ frontends/php/js/jsDump.js
 frontends/php/locale/POTFILES.in
 frontends/php/locale/cs/LC_MESSAGES/frontend.mo
 frontends/php/locale/de/LC_MESSAGES/frontend.mo
+frontends/php/locale/el/LC_MESSAGES/frontend.mo
 frontends/php/locale/es/LC_MESSAGES/frontend.mo
 frontends/php/locale/fr/LC_MESSAGES/frontend.mo
 frontends/php/locale/frontend.pot
