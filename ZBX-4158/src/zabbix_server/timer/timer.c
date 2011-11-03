@@ -29,7 +29,6 @@
 #include "zbxserver.h"
 #include "daemon.h"
 #include "zbxself.h"
-#include "zbxalgo.h"
 
 #include "timer.h"
 
@@ -459,20 +458,13 @@ out:
  ******************************************************************************/
 static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maintenance_to)
 {
-	typedef struct zbx_event_data_s
-	{
-		zbx_uint64_t	triggerid;
-		int		value;
-	}
-	zbx_event_data_t;
-
 	const char		*__function_name = "generate_events";
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		triggerid, eventid;
 	int			value_before, value_inside, value_after, i;
-	zbx_vector_ptr_t	events;
-	zbx_event_data_t	*event;
+	DB_TRIGGER_UPDATE	*tr = NULL;
+	int			tr_alloc = 0, tr_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -488,9 +480,6 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 			ITEM_STATUS_ACTIVE,
 			hostid);
 
-	/* event data to call process_event() later */
-	zbx_vector_ptr_create(&events);
-
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid, row[0]);
@@ -501,29 +490,28 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		if (value_before == value_inside && value_inside == value_after)
 			continue;
 
-		event = zbx_malloc(NULL, sizeof(zbx_event_data_t));
-		event->triggerid = triggerid;
-		event->value = value_after;
-		zbx_vector_ptr_append(&events, event);
+		if (tr_num == tr_alloc)
+		{
+			tr_alloc += 64;
+			tr = zbx_realloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
+		}
+
+		tr[tr_num].triggerid = triggerid;
+		tr[tr_num].new_value = value_after;
+		tr_num++;
 	}
 	DBfree_result(result);
 
-	if (0 != events.values_num)
+	if (0 != tr_num)
 	{
-		eventid = DBget_maxid_num("events", events.values_num);
+		eventid = DBget_maxid_num("events", tr_num);
 
-		for (i = 0; i < events.values_num; i++)
+		for (i = 0; i < tr_num; i++)
 		{
-			event = (zbx_event_data_t *)events.values[i];
-
-			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, event->triggerid,
-					maintenance_to, event->value, 0, 1);
-
-			zbx_free(event);
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
+					maintenance_to, tr[i].value, 0, 1);
 		}
 	}
-
-	zbx_vector_ptr_destroy(&events);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
