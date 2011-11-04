@@ -539,7 +539,6 @@ if( !isset($DB)) {
 					lock_sqlite3_access();
 				}
 
-				$DB['DB']->busyTimeout(5000);
 				if (!$result = $DB['DB']->exec($query)) {
 					error('Error in query ['.$query.'] Error code ['.$DB['DB']->lastErrorCode().'] Message ['.$DB['DB']->lastErrorMsg().']');
 				}
