@@ -309,6 +309,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-3988] fixed memory leak in dashboard (Vedmak)
  - [ZBX-4264] fixed zabbix_agent compilation problem on HP-UX (dimir)
  - [ZBX-3504] added a text notification in the maps section when no maps are defined (pavels)
  - [ZBX-3749] escaped HTML entities in the web step "required" field (pavels)

@@ -246,8 +246,6 @@
 		$screens_wdgt->addItem($element);
 		$screens_wdgt->show();
 
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
 		echo SBR;
 	}
 ?>

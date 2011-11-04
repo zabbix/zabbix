@@ -25,7 +25,7 @@ require_once ('include/reports.inc.php');
 $page['title']	= "S_BAR_REPORTS";
 $page['file']	= 'report6.php';
 $page['hist_arg'] = array('period');
-$page['scripts'] = array('class.calendar.js','effects.js');
+$page['scripts'] = array('class.calendar.js');
 
 include_once('include/page_header.php');
 ?>
