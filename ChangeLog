@@ -11,6 +11,7 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-4315] fixed the 'close' link in the tooltips (pavels)
  - [ZBX-3675] fixed items created via api for template have wrong interfaceid on linked host (Vedmak)
  - [ZBX-4212] fixed creation of trigger expression with "])" in item key (Vedmak)
  - [ZBXNEXT-675] reduced surrounding whitespace for Switch, Cloud, Crypto-router, UPS, Hub and Router map icons (Elvis, Richlv)

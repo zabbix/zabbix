@@ -699,7 +699,7 @@ var hintBox = {
 		var box = document.createElement('div');
 		var obj_tag = obj.nodeName.toLowerCase();
 
-		if (obj_tag == 'td' || obj_tag == 'div' || obj_tag == 'body') {
+		if (obj_tag == 'td' || obj_tag == 'body') {
 			obj.appendChild(box);
 		}
 		else {
