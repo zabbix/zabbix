@@ -1032,7 +1032,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
 function init_sqlite3_access() {
 	global $DB;
 
-	$DB['SEM_ID'] = sem_get(ftok($DB['DATABASE'], 'z'), 3, 0660);
+	$DB['SEM_ID'] = sem_get(ftok($DB['DATABASE'], 'z'), 1, 0660);
 }
 
 /**
