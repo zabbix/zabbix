@@ -2511,9 +2511,6 @@
 		$buttons[] = new CButtonCancel(url_param('groupid').url_param("hostid").url_param("parent_discoveryid"));
 		$frmTrig->addItemToBottomRow($buttons);
 
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
-
 		$script = "function addPopupValues(list){
 						if(!isset('object', list)) return false;
 						if(list.object == 'deptrigger'){

@@ -99,7 +99,8 @@ if (empty($_GET['files'])) {
 		'class.csuggest.js',
 		'class.cmessages.js',
 		'main.js',
-		'functions.js'
+		'functions.js',
+		'menu.js'
 	);
 }
 else {
