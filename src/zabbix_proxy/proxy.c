@@ -180,8 +180,6 @@ char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 
-int	CONFIG_NS_SUPPORT		= 0;
-
 /* Zabbix server startup time */
 int	CONFIG_SERVER_STARTUP_TIME	= 0;
 
