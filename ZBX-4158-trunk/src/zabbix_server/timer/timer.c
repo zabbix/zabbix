@@ -428,7 +428,7 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	triggerid, eventid;
-	DC_TRIGGER	*tr;
+	DC_TRIGGER	*tr = NULL;
 	int		tr_alloc = 0, tr_num = 0, i;
 	zbx_timespec_t	ts;
 	unsigned char	value_before, value_inside, value_after;
