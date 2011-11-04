@@ -430,10 +430,6 @@ include_once('include/page_header.php');
 
 	$dashboard_wdgt->addItem($outer_table);
 	$dashboard_wdgt->show();
-
-	$jsmenu = new CPUMenu(null,170);
-	$jsmenu->InsertJavaScript();
-
 ?>
 <script type="text/javascript">
 //<!--<![CDATA[
