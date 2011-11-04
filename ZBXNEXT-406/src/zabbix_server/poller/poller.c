@@ -737,7 +737,7 @@ static int	get_values(unsigned char poller_type)
 				activate_host(&items[i], &timespecs[i]);
 				break;
 			case NETWORK_ERROR:
-			case PROXY_ERROR:
+			case GATEWAY_ERROR:
 				deactivate_host(&items[i], &timespecs[i], results[i].msg);
 				break;
 			default:
@@ -759,7 +759,7 @@ static int	get_values(unsigned char poller_type)
 
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, timespecs[i].sec);
 		}
-		else if (NETWORK_ERROR == errcodes[i] || PROXY_ERROR == errcodes[i])
+		else if (NETWORK_ERROR == errcodes[i] || GATEWAY_ERROR == errcodes[i])
 		{
 			DCrequeue_unreachable_item(items[i].itemid);
 		}
