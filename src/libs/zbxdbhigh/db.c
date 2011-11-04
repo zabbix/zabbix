@@ -509,9 +509,8 @@ void	DBupdate_triggers_status_after_restart()
 	now = time(NULL);
 
 	sql = zbx_malloc(sql, sql_alloc);
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "begin\n");
-#endif
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBbegin();
 
@@ -598,9 +597,7 @@ void	DBupdate_triggers_status_after_restart()
 	}
 	DBfree_result(result);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "end;\n");
-#endif
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
