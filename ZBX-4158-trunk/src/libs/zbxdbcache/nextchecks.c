@@ -200,7 +200,6 @@ void	DCflush_nextchecks()
 		size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 		objectid_clock_t 	*events = NULL;
 		int			events_alloc, events_num = 0;
-		zbx_uint64_t		events_maxid;
 		DC_TRIGGER		*trigger;
 		char			*error_esc;
 
