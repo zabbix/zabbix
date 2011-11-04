@@ -527,7 +527,7 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 			*n = c;
 			p = n;
 		}
-		else if ('1' <= *(m + 1) && *(m + 1) <= '9' && '\0' != *params)	/* macros $1, $2, ... */
+		else if ('1' <= *(m + 1) && *(m + 1) <= '9' && '\0' != *params)		/* macros $1, $2, ... */
 		{
 			*m = '\0';
 			str_out = zbx_strdcat(str_out, p);
@@ -1058,20 +1058,6 @@ static int	DBget_history_value(zbx_uint64_t itemid, unsigned char value_type, ch
 	int		ret = FAIL;
 	char		**h_value;
 	zbx_timespec_t	ts;
-
-	if (0 == CONFIG_NS_SUPPORT)
-	{
-		h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, clock, NULL, field_name, 1);
-
-		if (NULL != h_value[0])
-		{
-			*replace_to = zbx_strdup(*replace_to, h_value[0]);
-			ret = SUCCEED;
-		}
-		DBfree_history(h_value);
-
-		return ret;
-	}
 
 	ts.sec = clock;
 	ts.ns = ns;

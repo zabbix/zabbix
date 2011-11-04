@@ -1328,14 +1328,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #else
 	const char	*row_dl = ";\n";
 #endif
-	const char	*nsfield;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_add_history()");
-
-	if (0 != CONFIG_NS_SUPPORT)
-		nsfield = ",ns";
-	else
-		nsfield = "";
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1344,9 +1338,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"insert into history (itemid,clock,value%s) values ",
-			nsfield);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "insert into history (itemid,clock,value,ns) values ");
 #endif
 
 	for (i = 0; i < history_num; i++)
@@ -1361,17 +1353,14 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history (itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "insert into history (itemid,clock,value,ns) values ");
 #endif
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL,
+				"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL ",%d",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value.dbl);
-		if (0 != CONFIG_NS_SUPPORT)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+				history[i].value.dbl,
+				history[i].ns);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 	}
 
@@ -1389,9 +1378,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_sync (nodeid,itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
@@ -1406,18 +1394,16 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 				continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into history_sync (nodeid,itemid,clock,value%s) values ",
-					nsfield);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"insert into history_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL,
+					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL ",%d",
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.dbl);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+					history[i].value.dbl,
+					history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 		}
 
@@ -1437,9 +1423,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"insert into history_uint (itemid,clock,value%s) values ",
-			nsfield);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "insert into history_uint (itemid,clock,value,ns) values ");
 #endif
 
 	for (i = 0; i < history_num; i++)
@@ -1454,17 +1438,15 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_uint (itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_uint (itemid,clock,value,ns) values ");
 #endif
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64,
+				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value.ui64);
-		if (0 != CONFIG_NS_SUPPORT)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+				history[i].value.ui64,
+				history[i].ns);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 	}
 
@@ -1482,9 +1464,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_uint_sync (nodeid,itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_uint_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
@@ -1499,18 +1480,16 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 				continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into history_uint_sync (nodeid,itemid,clock,value%s) values ",
-					nsfield);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"insert into history_uint_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64,
+					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d",
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.ui64);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+					history[i].value.ui64,
+					history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 		}
 
@@ -1530,9 +1509,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"insert into history_str (itemid,clock,value%s) values ",
-			nsfield);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "insert into history_str (itemid,clock,value,ns) values ");
 #endif
 
 	for (i = 0; i < history_num; i++)
@@ -1548,17 +1525,15 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
 #ifndef HAVE_MULTIROW_INSERT
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_str (itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_str (itemid,clock,value,ns) values ");
 #endif
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"(" ZBX_FS_UI64 ",%d,'%s'",
+				"(" ZBX_FS_UI64 ",%d,'%s',%d",
 				history[i].itemid,
 				history[i].clock,
-				value_esc);
-		if (0 != CONFIG_NS_SUPPORT)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+				value_esc,
+				history[i].ns);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 		zbx_free(value_esc);
 	}
@@ -1577,9 +1552,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_str_sync (nodeid,itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_str_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
@@ -1595,18 +1569,16 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 			value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into history_str_sync (nodeid,itemid,clock,value%s) values ",
-					nsfield);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"insert into history_str_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d,'%s'",
+					"(%d," ZBX_FS_UI64 ",%d,'%s',%d",
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					value_esc);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+					value_esc,
+					history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 			zbx_free(value_esc);
 		}
@@ -1642,9 +1614,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MULTIROW_INSERT
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_text (id,itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_text (id,itemid,clock,value,ns) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
@@ -1660,18 +1631,16 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into history_text (id,itemid,clock,value%s) values ",
-					nsfield);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"insert into history_text (id,itemid,clock,value,ns) values ");
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s'",
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d",
 					id,
 					history[i].itemid,
 					history[i].clock,
-					value_esc);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+					value_esc,
+					history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 			zbx_free(value_esc);
 			id++;
@@ -1697,9 +1666,9 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MULTIROW_INSERT
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into history_log (id,itemid,clock,timestamp,"
-				"source,severity,value,logeventid%s) values ", nsfield);
+				"source,severity,value,logeventid,ns) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
@@ -1716,12 +1685,12 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
 			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into history_log (id,itemid,clock,timestamp,"
-					"source,severity,value,logeventid%s) values ", nsfield);
+					"source,severity,value,logeventid,ns) values ");
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s',%d",
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s',%d,%d",
 					id,
 					history[i].itemid,
 					history[i].clock,
@@ -1729,9 +1698,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					source_esc,
 					history[i].severity,
 					value_esc,
-					history[i].logeventid);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+					history[i].logeventid,
+					history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 			zbx_free(value_esc);
 			zbx_free(source_esc);
