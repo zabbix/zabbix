@@ -116,7 +116,7 @@ class CTrigger extends CZBXAPI {
 			'excludeSearch' => null,
 			'searchWildcardsEnabled' => null,
 
-// OutPut
+// output
 			'expandData' => null,
 			'expandDescription' => null,
 			'output' => API_OUTPUT_REFER,
@@ -179,24 +179,23 @@ class CTrigger extends CZBXAPI {
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sql_parts['where'][] = 'r.id=hg.groupid ';
+			$sql_parts['where'][] = 'r.id=hg.groupid';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
 			$sql_parts['where'][] = 'ug.userid='.$userid;
 			$sql_parts['where'][] = 'r.permission>='.$permission;
-			$sql_parts['where'][] = 'NOT EXISTS( '.
-											' SELECT ff.triggerid '.
-											' FROM functions ff, items ii '.
-											' WHERE ff.triggerid=t.triggerid '.
-												' AND ff.itemid=ii.itemid '.
-												' AND EXISTS( '.
-													' SELECT hgg.groupid '.
-													' FROM hosts_groups hgg, rights rr, users_groups gg '.
-													' WHERE hgg.hostid=ii.hostid '.
-														' AND rr.id=hgg.groupid '.
-														' AND rr.groupid=gg.usrgrpid '.
-														' AND gg.userid='.$userid.
-														' AND rr.permission<'.$permission.'))';
-//*/
+			$sql_parts['where'][] = 'NOT EXISTS ('.
+										' SELECT ff.triggerid'.
+										' FROM functions ff,items ii'.
+										' WHERE ff.triggerid=t.triggerid'.
+											' AND ff.itemid=ii.itemid'.
+											' AND EXISTS ('.
+												' SELECT hgg.groupid'.
+												' FROM hosts_groups hgg,rights rr,users_groups gg'.
+												' WHERE hgg.hostid=ii.hostid'.
+													' AND rr.id=hgg.groupid'.
+													' AND rr.groupid=gg.usrgrpid'.
+													' AND gg.userid='.$userid.
+													' AND rr.permission<'.$permission.'))';
 		}
 
 		// nodeids
@@ -326,19 +325,19 @@ class CTrigger extends CZBXAPI {
 		// monitored
 		if (!is_null($options['monitored'])) {
 			$sql_parts['where']['monitored'] = ''.
-					' NOT EXISTS ('.
+				' NOT EXISTS ('.
 					' SELECT ff.functionid'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-								' SELECT ii.itemid'.
-								' FROM items ii, hosts hh'.
-								' WHERE ff.itemid=ii.itemid'.
-									' AND hh.hostid=ii.hostid'.
-									' AND ('.
-										' ii.status<>'.ITEM_STATUS_ACTIVE.
-										' OR hh.status<>'.HOST_STATUS_MONITORED.
-									' )'.
+							' SELECT ii.itemid'.
+							' FROM items ii,hosts hh'.
+							' WHERE ff.itemid=ii.itemid'.
+								' AND hh.hostid=ii.hostid'.
+								' AND ('.
+									' ii.status<>'.ITEM_STATUS_ACTIVE.
+									' OR hh.status<>'.HOST_STATUS_MONITORED.
+								' )'.
 						' )'.
 				' )';
 			$sql_parts['where']['status'] = 't.status='.TRIGGER_STATUS_ENABLED;
@@ -347,13 +346,13 @@ class CTrigger extends CZBXAPI {
 		// active
 		if (!is_null($options['active'])) {
 			$sql_parts['where']['active'] = ''.
-					' NOT EXISTS ('.
+				' NOT EXISTS ('.
 					' SELECT ff.functionid'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
 							' SELECT ii.itemid'.
-							' FROM items ii, hosts hh'.
+							' FROM items ii,hosts hh'.
 							' WHERE ff.itemid=ii.itemid'.
 								' AND hh.hostid=ii.hostid'.
 								' AND  hh.status<>'.HOST_STATUS_MONITORED.
@@ -365,16 +364,16 @@ class CTrigger extends CZBXAPI {
 		// maintenance
 		if (!is_null($options['maintenance'])) {
 			$sql_parts['where'][] = (($options['maintenance'] == 0) ? ' NOT ' : '').
-					' EXISTS ('.
+				' EXISTS ('.
 					' SELECT ff.functionid'.
 					' FROM functions ff'.
 					' WHERE ff.triggerid=t.triggerid'.
 						' AND EXISTS ('.
-								' SELECT ii.itemid'.
-								' FROM items ii, hosts hh'.
-								' WHERE ff.itemid=ii.itemid'.
-									' AND hh.hostid=ii.hostid'.
-									' AND hh.maintenance_status=1'.
+							' SELECT ii.itemid'.
+							' FROM items ii,hosts hh'.
+							' WHERE ff.itemid=ii.itemid'.
+								' AND hh.hostid=ii.hostid'.
+								' AND hh.maintenance_status=1'.
 						' )'.
 				' )';
 			$sql_parts['where'][] = 't.status='.TRIGGER_STATUS_ENABLED;
@@ -392,10 +391,10 @@ class CTrigger extends CZBXAPI {
 
 		// withUnacknowledgedEvents
 		if (!is_null($options['withUnacknowledgedEvents'])) {
-			$sql_parts['where']['unack'] = ' EXISTS('.
-					' SELECT e.eventid'.
-					' FROM events e'.
-					' WHERE e.objectid=t.triggerid'.
+			$sql_parts['where']['unack'] = ' EXISTS ('.
+				' SELECT e.eventid'.
+				' FROM events e'.
+				' WHERE e.objectid=t.triggerid'.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 					' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
 					' AND e.value='.TRIGGER_VALUE_TRUE.
@@ -403,14 +402,14 @@ class CTrigger extends CZBXAPI {
 		}
 		// withAcknowledgedEvents
 		if (!is_null($options['withAcknowledgedEvents'])) {
-			$sql_parts['where']['ack'] = 'NOT EXISTS('.
-					' SELECT e.eventid'.
-					' FROM events e'.
-					' WHERE e.objectid=t.triggerid'.
-						' AND e.object='.EVENT_OBJECT_TRIGGER.
-						' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
-						' AND e.value='.TRIGGER_VALUE_TRUE.
-						' AND e.acknowledged=0)';
+			$sql_parts['where']['ack'] = 'NOT EXISTS ('.
+				' SELECT e.eventid'.
+				' FROM events e'.
+				' WHERE e.objectid=t.triggerid'.
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
+					' AND e.value='.TRIGGER_VALUE_TRUE.
+					' AND e.acknowledged=0)';
 		}
 
 		// templated
@@ -659,8 +658,7 @@ class CTrigger extends CZBXAPI {
 				if (!is_null($options['groupCount'])) {
 					$result[] = $trigger;
 				}
-				else
-				{
+				else {
 					$result = $trigger['rowscount'];
 				}
 			}
@@ -1252,8 +1250,7 @@ class CTrigger extends CZBXAPI {
 		if (isset($object['node'])) {
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
 		}
-		elseif (isset($object['nodeids']))
-		{
+		elseif (isset($object['nodeids'])) {
 			$options['nodeids'] = $object['nodeids'];
 		}
 
@@ -1453,8 +1450,7 @@ class CTrigger extends CZBXAPI {
 
 		$this->updateReal($triggers);
 
-		foreach ($triggers as $trigger)
-		{
+		foreach ($triggers as $trigger) {
 			$this->inherit($trigger);
 		}
 
@@ -1493,7 +1489,7 @@ class CTrigger extends CZBXAPI {
 		} while (!empty($parent_triggerids));
 
 
-		// select all triggers which are deleted (include childs)
+		// select all triggers which are deleted (including children)
 		$options = array(
 			'triggerids' => $triggerids,
 			'output' => API_OUTPUT_EXTEND,
@@ -1517,7 +1513,7 @@ class CTrigger extends CZBXAPI {
 		$sql = 'SELECT DISTINCT actionid '.
 				' FROM conditions '.
 				' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
-				' AND '.DBcondition('value', $triggerids, false, true); // FIXED[POSIBLE value type violation]!!!
+					' AND '.DBcondition('value', $triggerids, false, true);
 		$db_actions = DBselect($sql);
 		while ($db_action = DBfetch($db_actions)) {
 			$actionids[$db_action['actionid']] = $db_action['actionid'];
@@ -1539,7 +1535,6 @@ class CTrigger extends CZBXAPI {
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 		}
 
-
 		DB::delete('triggers', array('triggerid' => $triggerids));
 
 		update_services_status_all();
@@ -1551,8 +1546,8 @@ class CTrigger extends CZBXAPI {
 	 * Add dependency for trigger
 	 *
 	 * @param array $triggersData
-	 * @param array $triggers_data['triggerid]
-	 * @param array $triggers_data['dependsOnTriggerid']
+	 * @param array $triggersData['triggerid]
+	 * @param array $triggersData['dependsOnTriggerid']
 	 *
 	 * @return boolean
 	 */
@@ -1573,7 +1568,7 @@ class CTrigger extends CZBXAPI {
 	}
 
 	/**
-	 * Delete trigger dependencis
+	 * Delete trigger dependencies
 	 *
 	 * @param array $triggersData
 	 *
@@ -1820,7 +1815,6 @@ class CTrigger extends CZBXAPI {
 				$deps = zbx_objectValues($trigger['dependencies'], 'triggerid');
 				$newTrigger['dependencies'] = replace_template_dependencies($deps, $chd_host['hostid']);
 			}
-
 
 			$expressionData = new CTriggerExpression($trigger);
 			// replace template separately in each expression, only in beginning (host part)
