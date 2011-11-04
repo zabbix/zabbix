@@ -712,15 +712,24 @@ if(isset($_REQUEST['sform'])){
 	$frmService->addRow(S_NEW_SERVICE_TIME, array(
 			$cmbTimeType, BR(),
 			$time_param,
-			new CButton('add_service_time',S_ADD_SMALL,'javascript: document.forms[0].action += \'?sform=1\';')
+			new CSubmit('add_service_time',S_ADD_SMALL,'javascript: document.forms[0].action += \'?sform=1\';')
 		));
-//trigger
+
+	// trigger
 	$frmService->addRow(S_LINK_TO_TRIGGER_Q, new CCheckBox('linktrigger',$linktrigger,"javascript: display_element('trigger_name');",1));
 
-	if($triggerid > 0){
-		$trigger = expand_trigger_description($triggerid);
+	if ($triggerid > 0) {
+		$trigger = API::Trigger()->get(array(
+			'triggerids' => $triggerid,
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('hostid', 'name'),
+			'expandDescription' => true
+		));
+		$trigger = reset($trigger);
+		$host = reset($trigger['hosts']);
+		$trigger = $host['name'].':'.$trigger['description'];
 	}
-	else{
+	else {
 		$trigger = '';
 	}
 
