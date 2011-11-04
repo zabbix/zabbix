@@ -1571,11 +1571,7 @@
 	function prepareImageExport($images) {
 		$formatted = array();
 
-		foreach ($images as $inum => $image) {
-
-			// unescape image
-			$image['image'] = base64_encode(zbx_unescape_image(base64_decode($image['image'])));
-
+		foreach ($images as $image) {
 			$formatted[] = array(
 				'name' => $image['name'],
 				'imagetype' => $image['imagetype'],
