@@ -3815,7 +3815,7 @@ void	*DCconfig_get_config_data(void *data, int type)
 {
 	LOCK_CACHE;
 
-	switch(type)
+	switch (type)
 	{
 		case CONFIG_ALERT_HISTORY:
 			*(int *)data = config->config->alert_history;
@@ -4044,17 +4044,17 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now)
 			goto unlock;
 	}
 
-	/* First error */
-	if (*errors_from == 0)
+	/* first error */
+	if (0 == *errors_from)
 	{
 		*errors_from = now;
 		*disable_until = now + CONFIG_UNREACHABLE_DELAY;
 	}
 	else
 	{
-		if (now - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
+		if (CONFIG_UNREACHABLE_PERIOD >= now - *errors_from)
 		{
-			/* Still unavailable, but won't change status to UNAVAILABLE yet */
+			/* still unavailable, but won't change status to UNAVAILABLE yet */
 			*disable_until = now + CONFIG_UNREACHABLE_DELAY;
 		}
 		else
