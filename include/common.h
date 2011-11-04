@@ -405,8 +405,6 @@ typedef enum
 	AUDIT_RESOURCE_REGEXP
 } zbx_auditlog_resourcetype_t;
 
-/* special item key used for storing server status */
-#define SERVER_STATUS_KEY	"status"
 /* special item key used for ICMP pings */
 #define SERVER_ICMPPING_KEY	"icmpping"
 /* special item key used for ICMP ping latency */
