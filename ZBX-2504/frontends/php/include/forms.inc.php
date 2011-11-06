@@ -1952,7 +1952,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 			$mltpbox[] = $ctb;
 		}
 		else {
-			$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.disabled = !this.checked;', 1);
+			$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.readOnly = !this.checked;', 1);
 			$mltpbox[] = SPACE;
 			$ctb = new CTextBox('formula', $formula, 10);
 			$ctb->setAttribute('style', 'text-align: right;');
@@ -2892,9 +2892,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmTrig->addItemToBottomRow(SPACE);
 		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
-
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
 
 		$script = "function addPopupValues(list){
 						if(!isset('object', list)) return false;

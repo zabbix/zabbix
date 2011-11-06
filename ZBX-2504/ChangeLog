@@ -1,5 +1,10 @@
 Changes for 1.8.9rc1
 
+ - [ZBX-3988] fixed memory leak in dashboard (Vedmak)
+ - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget (pavels)
+ - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
+ - [ZBX-2919] fixed custom multiplier becoming 0 when creating an item (pavels) 
+ - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
  - [ZBX-2504] replaced 'Groups' by 'Replace groups' in host mass-update form to avoid confusion (Alexei)
  - [ZBX-4265] fixed host input validation (pavels)
  - [ZBX-4264] fixed zabbix_agent compilation problem on HP-UX (dimir)
@@ -30,7 +35,7 @@ Changes for 1.8.9rc1
  - [ZBX-4026] fixed disabling SNMP host when unreachable (dimir)
  - [ZBX-3942] fixed agent's collector to not gather perfstat data on AIX unless it is requested (dimir)
  - [ZBX-4087] fixed error message when processing configuration file (dimir)
- - [ZBX-4158] fixed DB transaction processing, stop and abort on error (dimir)
+ - [ZBX-4158] fixed DB transaction processing, stop and abort on error (dimir,Sasha)
  - [ZBX-4146] fixed page refreshing after adding new IT service (Eduard)
  - [ZBX-4176] fixed API action.update required parameters (Vedmak)
  - [ZBX-2882] fixed wrong item vfs.file.cksum[/vmlinuz] for some templates (Sasha)
