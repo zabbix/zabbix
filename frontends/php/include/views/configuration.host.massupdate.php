@@ -20,12 +20,12 @@
 ?>
 <?php
 
-$visible = get_request('visible', array());
+$visible		= get_request('visible', array());
 
-$groups = get_request('groups', array());
-$newgroup = get_request('newgroup', '');
-$status		= get_request('status',	HOST_STATUS_MONITORED);
-$proxy_hostid	= get_request('proxy_hostid','');
+$groups			= get_request('groups', array());
+$newgroup		= get_request('newgroup', '');
+$status			= get_request('status', HOST_STATUS_MONITORED);
+$proxy_hostid	= get_request('proxy_hostid', '');
 $ipmi_authtype	= get_request('ipmi_authtype', -1);
 $ipmi_privilege	= get_request('ipmi_privilege', 2);
 $ipmi_username	= get_request('ipmi_username', '');
@@ -33,8 +33,7 @@ $ipmi_password	= get_request('ipmi_password', '');
 $inventory_mode	= get_request('inventory_mode', HOST_INVENTORY_DISABLED);
 $host_inventory = get_request('host_inventory', array());
 
-
-$templates	= get_request('templates',array());
+$templates		= get_request('templates', array());
 natsort($templates);
 
 $frmHost = new CFormTable(_('Host mass update'));
@@ -42,7 +41,7 @@ $frmHost->setName('host.massupdate');
 $frmHost->addVar('go', 'massupdate');
 
 $hosts = $_REQUEST['hosts'];
-foreach($hosts as $id => $hostid){
+foreach ($hosts as $id => $hostid) {
 	$frmHost->addVar('hosts['.$hostid.']', $hostid);
 }
 
@@ -53,27 +52,27 @@ $options = array(
 );
 $all_groups = API::HostGroup()->get($options);
 order_result($all_groups, 'name');
-foreach($all_groups as $grp){
+foreach ($all_groups as $grp) {
 	$grp_tb->addItem($grp['groupid'], $grp['name']);
 }
 
 $frmHost->addRow(array(
 	new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), _('Original')),
-	_('Replace groups')
+	_('Replace host groups')
 ), $grp_tb->get(_('In groups'), _('Other groups')));
 
 $newgroupTB = new CTextBox('newgroup', $newgroup);
 $newgroupTB->setAttribute('maxlength', 64);
 $frmHost->addRow(array(new CVisibilityBox('visible[newgroup]', isset($visible['newgroup']),
-	'newgroup', _('Original')), _('New group')), $newgroupTB, 'new');
+	'newgroup', _('Original')), _('New host group')), $newgroupTB, 'new');
 
-//Proxy
+// Proxy
 $cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 $cmbProxy->addItem(0, S_NO_PROXY);
 
-$sql = 'SELECT hostid, host '.
-		' FROM hosts '.
-		' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.') '.
+$sql = 'SELECT hostid, host'.
+		' FROM hosts'.
+		' WHERE status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'.
 			' AND '.DBin_node('hostid').
 		' ORDER BY host';
 $db_proxies = DBselect($sql);
@@ -104,8 +103,8 @@ $template_table->setAttribute('id', 'template_table');
 $template_table->setCellPadding(0);
 $template_table->setCellSpacing(0);
 
-foreach($templates as $id => $temp_name){
-	$frmHost->addVar('templates['.$id.']',$temp_name);
+foreach ($templates as $id => $temp_name) {
+	$frmHost->addVar('templates['.$id.']', $temp_name);
 	$template_table->addRow(array(
 		new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
 		$temp_name,
@@ -115,13 +114,13 @@ foreach($templates as $id => $temp_name){
 $template_table->addRow(array(
 	new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->getName().
 		"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
-		url_param($templates,false,'existed_templates')."',450,450)"),
+		url_param($templates, false, 'existed_templates')."',450,450)"),
 	new CSubmit('unlink', S_REMOVE)
 ));
 
 $vbox = new CVisibilityBox('visible[template_table]', isset($visible['template_table']), 'template_table', S_ORIGINAL);
 $vbox->setAttribute('id', 'cb_tpladd');
-if(isset($visible['template_table_r'])) $vbox->setAttribute('disabled', 'disabled');
+if (isset($visible['template_table_r'])) $vbox->setAttribute('disabled', 'disabled');
 $action = $vbox->getAttribute('onclick');
 $action .= 'if($("cb_tplrplc").disabled) $("cb_tplrplc").enable(); else $("cb_tplrplc").disable();';
 $vbox->setAttribute('onclick', $action);
@@ -132,14 +131,14 @@ $frmHost->addRow(array($vbox, S_LINK_ADDITIONAL_TEMPLATES), $template_table, 'T'
 
 // RELINK TEMPLATES {{{
 $template_table_r = new CTable();
-$template_table_r->setAttribute('name','template_table_r');
-$template_table_r->setAttribute('id','template_table_r');
+$template_table_r->setAttribute('name', 'template_table_r');
+$template_table_r->setAttribute('id', 'template_table_r');
 
 $template_table_r->setCellPadding(0);
 $template_table_r->setCellSpacing(0);
 
-foreach($templates as $id => $temp_name){
-	$frmHost->addVar('templates['.$id.']',$temp_name);
+foreach ($templates as $id => $temp_name) {
+	$frmHost->addVar('templates['.$id.']', $temp_name);
 	$template_table_r->addRow(array(
 		new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
 		$temp_name,
@@ -149,13 +148,13 @@ foreach($templates as $id => $temp_name){
 $template_table_r->addRow(array(
 	new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->getName().
 		"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
-		url_param($templates,false,'existed_templates')."',450,450)"),
+		url_param($templates, false, 'existed_templates')."',450,450)"),
 	new CSubmit('unlink', S_REMOVE)
 ));
 
 $vbox = new CVisibilityBox('visible[template_table_r]', isset($visible['template_table_r']), 'template_table_r', S_ORIGINAL);
 $vbox->setAttribute('id', 'cb_tplrplc');
-if(isset($visible['template_table'])) $vbox->setAttribute('disabled', 'disabled');
+if (isset($visible['template_table'])) $vbox->setAttribute('disabled', 'disabled');
 $action = $vbox->getAttribute('onclick');
 $action .= <<<JS
 if($("cb_tpladd").disabled){
@@ -172,7 +171,7 @@ $clear_cb = new CCheckBox('mass_clear_tpls', get_request('mass_clear_tpls', fals
 $div = new CDiv(array($clear_cb, S_CLEAR_WHEN_UNLINKING));
 $div->setAttribute('id', 'clrcbdiv');
 $div->addStyle('margin-left: 20px;');
-if(!isset($visible['template_table_r'])) $div->addStyle('display: none;');
+if (!isset($visible['template_table_r'])) $div->addStyle('display: none;');
 
 $frmHost->addRow(array($vbox, S_RELINK_TEMPLATES, $div), $template_table_r, 'T');
 // }}} RELINK TEMPLATES
@@ -223,10 +222,10 @@ $frmHost->addRow(array(
 
 $inventory_fields = getHostInventories();
 $inventory_fields = zbx_toHash($inventory_fields, 'db_field');
-if($inventory_mode != HOST_INVENTORY_DISABLED){
-	foreach($inventory_fields as $field => $caption){
+if ($inventory_mode != HOST_INVENTORY_DISABLED) {
+	foreach ($inventory_fields as $field => $caption) {
 		$caption = $caption['title'];
-		if(!isset($host_inventory[$field])){
+		if (!isset($host_inventory[$field])) {
 			$host_inventory[$field] = '';
 		}
 
@@ -246,7 +245,7 @@ if($inventory_mode != HOST_INVENTORY_DISABLED){
 }
 
 
-$frmHost->addItemToBottomRow(new CSubmit('masssave',S_SAVE));
+$frmHost->addItemToBottomRow(new CSubmit('masssave', S_SAVE));
 $frmHost->addItemToBottomRow(SPACE);
 $frmHost->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
 
