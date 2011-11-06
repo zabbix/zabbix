@@ -740,12 +740,6 @@ require_once('include/views/js/general.script.confirm.js.php');
 	zbx_add_post_js('jqBlink.init();');
 	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
 
-	$jsmenu = new CPUMenu(null, 170);
-	$jsmenu->InsertJavaScript();
-
-?>
-<?php
-
 include_once('include/page_footer.php');
 
 ?>
