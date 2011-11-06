@@ -162,11 +162,6 @@ include_once('include/page_header.php');
 	$rprt_wdgt->addItem($table);
 	$rprt_wdgt->show();
 
-	$jsmenu = new CPUMenu(null,170);
-	$jsmenu->InsertJavaScript();
-?>
-<?php
-
 include_once('include/page_footer.php');
 
 ?>

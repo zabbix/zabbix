@@ -43,7 +43,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *ns)
 	assert(ns);
 
 #if defined(HAVE_LIBPERFSTAT)
-	zbx_snprintf(ps_id.name, sizeof(ps_id.name), "%s", if_name);
+	strscpy(ps_id.name, if_name);
 
 	if (-1 == perfstat_netinterface(&ps_id, &ps_netif, sizeof(ps_netif), 1))
 		return SYSINFO_RET_FAIL;
@@ -228,7 +228,7 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	zbx_json_addarray(&j, cmd);
 
-	if (0 == rc)	/* No network interfaces found */
+	if (0 == rc)	/* no network interfaces found */
 	{
 		ret = SYSINFO_RET_OK;
 		goto end;
@@ -237,14 +237,14 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	ps_netif = zbx_malloc(ps_netif, rc * sizeof(perfstat_netinterface_t));
 
 	/* set name to first interface */
-	strcpy(ps_id.name, FIRST_NETINTERFACE);	/* pseudo-name for the first network interface */
+	strscpy(ps_id.name, FIRST_NETINTERFACE);	/* pseudo-name for the first network interface */
 
 	/* ask to get all the structures available in one call */
 	/* return code is number of structures returned */
 	if (-1 != (rc = perfstat_netinterface(&ps_id, ps_netif, sizeof(perfstat_netinterface_t), rc)))
 		ret = SYSINFO_RET_OK;
 
-	/* Collecting of the information for each of the interfaces */
+	/* collecting of the information for each of the interfaces */
 	for (i = 0; i < rc; i++)
 	{
 		zbx_json_addobject(&j, NULL);
