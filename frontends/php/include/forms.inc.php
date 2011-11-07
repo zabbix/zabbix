@@ -2245,14 +2245,15 @@
 				$comments	= $trigger['comments'];
 				$url		= $trigger['url'];
 
-				$trigs=DBselect('SELECT t.triggerid,t.description,t.expression '.
-							' FROM triggers t,trigger_depends d '.
-							' WHERE t.triggerid=d.triggerid_up '.
-								' AND d.triggerid_down='.$_REQUEST['triggerid']);
-
-				while($trig=DBfetch($trigs)){
-					if(uint_in_array($trig['triggerid'],$dependencies))	continue;
-					array_push($dependencies,$trig['triggerid']);
+				$trigs = DBselect('SELECT t.triggerid,t.description'.
+					' FROM triggers t,trigger_depends d'.
+					' WHERE t.triggerid=d.triggerid_up'.
+						' AND d.triggerid_down='.$_REQUEST['triggerid']);
+				while ($trig = DBfetch($trigs)) {
+					if (uint_in_array($trig['triggerid'], $dependencies)) {
+						continue;
+					}
+					array_push($dependencies, $trig['triggerid']);
 				}
 			}
 		}
@@ -2450,14 +2451,19 @@
 
 		if(!$parent_discoveryid){
 // dependencies
-			foreach($dependencies as $val){
+			$deps = API::Trigger()->get(array(
+				'triggerids' => $dependencies,
+				'output' => array('triggerid', 'description'),
+				'preservekeys' => true,
+			));
+			foreach($deps as $dep){
 				array_push($dep_el,
 					array(
-						new CCheckBox('rem_dependence['.$val.']', 'no', null, strval($val)),
-						expand_trigger_description($val)
+						new CCheckBox('rem_dependence['.$dep['triggerid'].']', 'no', null, strval($dep['triggerid'])),
+						$dep['description']
 					),
 					BR());
-				$frmTrig->addVar('dependencies[]',strval($val));
+				$frmTrig->addVar('dependencies[]',strval($dep['triggerid']));
 			}
 
 			if(count($dep_el)==0)
