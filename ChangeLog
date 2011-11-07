@@ -18,7 +18,7 @@ Bug fixes:
  - [ZBX-4212] fixed creation of trigger expression with "])" in item key (Vedmak)
  - [ZBXNEXT-675] reduced surrounding whitespace for Switch, Cloud, Crypto-router, UPS, Hub and Router map icons (Elvis, Richlv)
  - [ZBX-4305] removed CREDITS file (Richlv)
- - [ZBX-2504] replaced 'Groups' by 'Replace groups' in host mass-update form to avoid confusion (Alexei)
+ - [ZBX-2504] replaced 'Groups' by 'Replace host groups' in host mass-update form to avoid confusion (Alexei)
  - [ZBX-2960] added defaults for example userparameters vfs.dir.size (/tmp) and proc.cpu (zabbix_agentd) to avoid errors in 'zabbix_agentd -p', documented them (Richlv)
  - [ZBX-2960] clarified what happens if proc.cpu does not match any processes (Richlv)
  - [ZBX-2960] made mysql.ping example userparameter a but more efficient by avoiding extra 'wc' invocation (Richlv)
@@ -314,6 +314,12 @@ New features:
 Changes for 1.8.9rc1
 
  - [ZBX-3988] fixed memory leak in dashboard (Vedmak)
+ - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget (pavels)
+ - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
+ - [ZBX-2919] fixed custom multiplier becoming 0 when creating an item (pavels)
+ - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
+ - [ZBX-2504] replaced 'Groups' by 'Replace groups' in host mass-update form to avoid confusion (Alexei)
+ - [ZBX-4265] fixed host input validation (pavels)
  - [ZBX-4264] fixed zabbix_agent compilation problem on HP-UX (dimir)
  - [ZBX-3504] added a text notification in the maps section when no maps are defined (pavels)
  - [ZBX-3749] escaped HTML entities in the web step "required" field (pavels)
@@ -1652,7 +1658,7 @@ Changes for 1.7.1
 
 Changes for 1.7.0
 
- - [ZBX-1056] fixed failed attempt counter not reset after successful login via api (Vedmak)
+ - [ZBX-1056] fixed failed attempt counter not reset after successful login via API (Vedmak)
  - [DEV-333] added configuration data cache module (Sasha)
  - [DEV-427] frontend is PHP 5.3.0 compatible (Aly)
  - [ZBX-1034] fixed maps tooltip url view (Aly)
