@@ -177,12 +177,25 @@ switch($itemType) {
 		$discovery_rule = reset($discovery_rule);
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
+
+		if (isset($_REQUEST['itemid'])) {
+			$options = array(
+				'triggerids' => $_REQUEST['itemid'],
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => true,
+				'preservekeys' => true
+			);
+			$itemPrototype = API::ItemPrototype()->get($options);
+			if (empty($itemPrototype)) {
+				access_deny();
+			}
+		}
 	}
 	else{
 		access_deny();
 	}
-?>
-<?php
+
+
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
@@ -196,8 +209,8 @@ switch($itemType) {
 	}
 //--------
 
-?>
-<?php
+
+
 	if(isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex'])){
 		$_REQUEST['delay_flex'] = get_request('delay_flex',array());
 		foreach($_REQUEST['rem_delay_flex'] as $val){
@@ -335,8 +348,8 @@ switch($itemType) {
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 // }}} GO
-?>
-<?php
+
+
 	$items_wdgt = new CWidget();
 
 
@@ -475,8 +488,8 @@ switch($itemType) {
 
 	$items_wdgt->show();
 
-?>
-<?php
+
+
 
 require_once('include/page_footer.php');
 

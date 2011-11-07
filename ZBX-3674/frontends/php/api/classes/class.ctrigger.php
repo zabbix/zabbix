@@ -1474,7 +1474,7 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach($del_triggers as $triggerid => $trigger){
-				info(_s('Trigger [%1$s:%2$s] deleted.', $trigger['description'], explode_exp($trigger['expression'])));
+				info(_s('Trigger "%1$s:%2$s" deleted.', $trigger['description'], explode_exp($trigger['expression'])));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 			}
 
@@ -1553,7 +1553,7 @@ COpt::memoryPick();
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(_s('Trigger [%1$s:%2$s] created.', $trigger['description'], $trigger['expression']));
+			info(_s('Trigger "%1$s:%2$s" created.', $trigger['description'], $trigger['expression']));
 		}
 
 		$this->validateDependencies($triggers);

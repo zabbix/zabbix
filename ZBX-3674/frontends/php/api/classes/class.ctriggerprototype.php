@@ -1138,7 +1138,7 @@ COpt::memoryPick();
 
 			foreach($triggers as $trigger) {
 				$this->inherit($trigger);
-				info(sprintf(_('Trigger [%1$s:%2$s] created.'), $trigger['description'], $trigger['expression']));
+				info(_s('Trigger "%1$s:%2$s" created.', $trigger['description'], $trigger['expression']));
 			}
 
 			return array('triggerids' => $triggerids);
@@ -1313,7 +1313,7 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach($del_triggers as $triggerid => $trigger){
-				info(_s('Trigger prototype [%1$s:%2$s] deleted.', $trigger['description'], explode_exp($trigger['expression'])));
+				info(_s('Trigger prototype "%1$s:%2$s" deleted.', $trigger['description'], explode_exp($trigger['expression'])));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 			}
 
