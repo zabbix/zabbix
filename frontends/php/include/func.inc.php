@@ -1303,6 +1303,23 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
 	$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
 }
 
+/**
+ * Check if two arrays have same values.
+ *
+ * @param array $a
+ * @param array $b
+ * @param bool $strict
+ * @return bool
+ */
+function array_equal(array $a, array $b, $strict=false) {
+	if (count($a) !== count($b)) {
+		return false;
+	}
+	sort($a);
+	sort($b);
+	return $strict ? $a === $b : $a == $b;
+}
+
 /*************** PAGE SORTING ******************/
 // checking, setting AND saving sort params
 function validate_sort_and_sortorder($sort = null, $sortorder = ZBX_SORT_UP) {
