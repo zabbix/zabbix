@@ -833,18 +833,11 @@ else {
 		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 0;
 //------
 		$nodeid = get_current_nodeid(false);
-		$tableSchema = DB::getSchema($table);
 
 		$found = false;
 		do{
-			if ($tableSchema['type'] == DB::TABLE_TYPE_HISTORY) {
-				$min = bcmul($nodeid, '100000000000000');
-				$max = bcadd(bcmul($nodeid, '100000000000000'), '99999999999999');
-			}
-			else {
-				$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
-				$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
-			}
+			$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
+			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
 
 			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 			if(!is_resource($db_select)) return false;
@@ -1069,14 +1062,8 @@ else {
 			$tableSchema = self::getSchema($table);
 			$id_name = $tableSchema['key'];
 
-			if ($tableSchema['type'] == self::TABLE_TYPE_HISTORY) {
-				$min = bcmul($nodeid, '100000000000000');
-				$max = bcadd(bcmul($nodeid, '100000000000000'), '99999999999999');
-			}
-			else {
-				$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
-				$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
-			}
+			$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
+			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
 
 			$sql = 'SELECT nextid '.
 				' FROM ids '.
@@ -1086,10 +1073,21 @@ else {
 				' FOR UPDATE';
 			$res = DBfetch(DBselect($sql));
 			if($res){
-				$nextid = bcadd($res['nextid'], 1, 0);
+				$nextid = bcadd($res['nextid'], 1);
 
-				if((bccomp($nextid, $max) == 1) || (bccomp($nextid, $min) == -1))
+
+				if (bccomp($nextid, $max) == 1) {
 					self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID out of range for ['.$table.']');
+				}
+				elseif (bccomp($nextid, $min) == -1) {
+					if ($tableSchema['type'] == self::TABLE_TYPE_HISTORY) {
+						$count = bcadd(bcsub($min, bcsub($nextid, 1)), $count);
+						$nextid = $min;
+					}
+					else {
+						self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID out of range for ['.$table.']');
+					}
+				}
 
 				$sql = 'UPDATE ids '.
 					' SET nextid=nextid+'.$count.
