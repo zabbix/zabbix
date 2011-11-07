@@ -148,6 +148,8 @@ if( !isset($DB)) {
 				break;
 				case ZBX_DB_SQLITE3:
 					if (file_exists($DB['DATABASE'])) {
+						init_sqlite3_access();
+						lock_sqlite3_access();
 						try{
 							$DB['DB'] = new SQLite3($DB['DATABASE'], SQLITE3_OPEN_READWRITE);
 						}
@@ -155,14 +157,11 @@ if( !isset($DB)) {
 							$error = 'Error connecting to database';
 							$result = false;
 						}
+						unlock_sqlite3_access();
 					}
 					else {
 						$error = 'Missing database';
 						$result = false;
-					}
-
-					if ($result) {
-						init_sqlite3_access();
 					}
 				break;
 				default:
@@ -195,7 +194,9 @@ if( !isset($DB)) {
 					$result = db2_close($DB['DB']);
 					break;
 				case ZBX_DB_SQLITE3:
+					lock_sqlite3_access();
 					$DB['DB']->close();
+					unlock_sqlite3_access();
 					$result = true;
 					break;
 			}
@@ -464,7 +465,7 @@ if( !isset($DB)) {
 					lock_sqlite3_access();
 				}
 
-				if (!$result = $DB['DB']->query($query)) {
+				if (false === ($result = $DB['DB']->query($query))) {
 					error('Error in query ['.$query.'] Error code ['.$DB['DB']->lastErrorCode().'] Message ['.$DB['DB']->lastErrorMsg().']');
 				}
 
@@ -598,8 +599,14 @@ if( !isset($DB)) {
 				}
 				break;
 			case ZBX_DB_SQLITE3:
+				if ($DB['TRANSACTIONS'] == 0) {
+					lock_sqlite3_access();
+				}
 				if (!$result = $cursor->fetchArray(SQLITE3_ASSOC)) {
 					unset($cursor);
+				}
+				if ($DB['TRANSACTIONS'] == 0) {
+					unlock_sqlite3_access();
 				}
 				break;
 		}
@@ -1043,7 +1050,7 @@ function init_sqlite3_access() {
 function lock_sqlite3_access() {
 	global $DB;
 
-	return sem_acquire($DB['SEM_ID']);
+	sem_acquire($DB['SEM_ID']);
 }
 
 /**
@@ -1054,7 +1061,7 @@ function lock_sqlite3_access() {
 function unlock_sqlite3_access() {
 	global $DB;
 
-	return sem_release($DB['SEM_ID']);
+	sem_release($DB['SEM_ID']);
 }
 
 	class DB {
