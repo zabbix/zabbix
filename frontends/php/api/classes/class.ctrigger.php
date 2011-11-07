@@ -1330,6 +1330,24 @@ COpt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously.'));
 					}
 				}
+
+				foreach ($expressionData->expressions as $exprPart) {
+					if (zbx_empty($exprPart['item'])) {
+						continue;
+					}
+
+					$sql = 'SELECT i.itemid,i.value_type'.
+							' FROM items i,hosts h'.
+							' WHERE i.key_='.zbx_dbstr($exprPart['item']).
+								' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+								' AND h.host='.zbx_dbstr($exprPart['host']).
+								' AND h.hostid=i.hostid'.
+								' AND '.DBin_node('i.itemid');
+					if (!DBfetch(DBselect($sql))) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect item key "%1$s:%2$s" provided for trigger expression.', $exprPart['host'], $exprPart['item']));
+					}
+				}
 			}
 
 			// check existing
