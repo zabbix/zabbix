@@ -129,10 +129,7 @@ include_once('include/page_header.php');
 
 	ksort($rplcts, SORT_NUMERIC);
 
-	//$exprs = make_disp_tree($tree, $map);
 	foreach($eHTMLTree as $e){
-		//if(!isset($e['expression']))
-			//continue;
 		$result = '-';
 		if($allowedTesting && $test && isset($e['expression'])){
 			$result = evalExpressionData($e['expression']['value'], $macrosData, $octet);

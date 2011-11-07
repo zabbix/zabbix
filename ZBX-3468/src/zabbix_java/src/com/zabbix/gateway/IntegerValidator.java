@@ -17,29 +17,37 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
-import java.util.Formatter;
-
-class ZabbixException extends Exception
+class IntegerValidator implements InputValidator
 {
-	public ZabbixException(String message)
+	private int lo;
+	private int hi;
+
+	public IntegerValidator(int lo, int hi)
 	{
-		super(message);
+		if (lo > hi)
+			throw new IllegalArgumentException("bad validation bounds: " + lo + " and " + hi);
+
+		this.lo = lo;
+		this.hi = hi;
 	}
 
-	public ZabbixException(String message, Object... args)
+	public boolean validate(Object value)
 	{
-		this(new Formatter().format(message, args).toString());
-	}
+		if (value instanceof Integer)
+		{
+			Integer integer = (Integer)value;
 
-	public ZabbixException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
+			if (!(Integer.valueOf(lo).compareTo(integer) <= 0))
+				return false;
 
-	public ZabbixException(Throwable cause)
-	{
-		super(cause);
+			if (!(integer.compareTo(Integer.valueOf(hi)) <= 0))
+				return false;
+
+			return true;
+		}
+		else
+			return false;
 	}
 }

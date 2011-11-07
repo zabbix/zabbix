@@ -222,9 +222,6 @@ function getActionMapBySysmap($sysmap) {
 		$action_map->addItem($r_area);
 	}
 
-	$jsmenu = new CPUMenu(null, 170);
-	$jsmenu->InsertJavaScript();
-
 	return $action_map;
 }
 

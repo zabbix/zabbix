@@ -17,37 +17,34 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
-class IntegerValidator implements InputValidator
+import org.junit.*;
+import static org.junit.Assert.*;
+
+public class IntegerValidatorTest
 {
-	private int lo;
-	private int hi;
-
-	public IntegerValidator(int lo, int hi)
+	@Test
+	public void testCorrectValidation()
 	{
-		if (lo > hi)
-			throw new IllegalArgumentException("bad validation bounds: " + lo + " and " + hi);
+		InputValidator validator = new IntegerValidator(3, 7);
 
-		this.lo = lo;
-		this.hi = hi;
+		assertFalse(validator.validate(Integer.valueOf(2)));
+		assertTrue(validator.validate(Integer.valueOf(3)));
+		assertTrue(validator.validate(Integer.valueOf(5)));
+		assertTrue(validator.validate(Integer.valueOf(7)));
+		assertFalse(validator.validate(Integer.valueOf(8)));
 	}
 
-	public boolean validate(Object value)
+	@Test
+	public void testMinimumInterval()
 	{
-		if (value instanceof Integer)
-		{
-			Integer integer = (Integer)value;
+		new IntegerValidator(5, 5);
+	}
 
-			if (!(Integer.valueOf(lo).compareTo(integer) <= 0))
-				return false;
-
-			if (!(integer.compareTo(Integer.valueOf(hi)) <= 0))
-				return false;
-
-			return true;
-		}
-		else
-			return false;
+	@Test(expected = IllegalArgumentException.class)
+	public void testInvalidInterval()
+	{
+		new IntegerValidator(7, 3);
 	}
 }

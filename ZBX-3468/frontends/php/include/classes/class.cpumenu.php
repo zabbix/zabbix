@@ -19,24 +19,30 @@
 **/
 ?>
 <?php
-/*********************** ITEM ARRAY ***********************
-ITEM: array(name, url, param, css, submenu1, submenu2, ..., submenuN)
-	name:		text
-	url:		text (url for href parameter)
-	param:		array(tw => t_val, sb => s_val)
-		tw:			target parameter
-		t_val:		one of '_blank', '_parent', '_self', '_top'
-		sb:			text for statusbar
-		s_val:		text
-	css:		array(outer => cssarray, inner => cssarray)
-		outer:		style for outer div element
-		cssarray:	array(normal, mouseover, mousedown)
-		inner:		style for inner link element with text
-	submen1-N:	list of subitems
-**********************************************************/
-class CPUMenu {
-	public function __construct($items = array(), $width = null) {
-		$this->insertJavaScript();
+class CPUMenu{
+/* private */
+	/*
+	var $items = array();
+	var $width;
+	*/
+/* public */
+	public function __construct($items=array(), $width=null){
+		/*********************** ITEM ARRAY ***********************
+		ITEM: array(name, url, param, css, submenu1, submenu2, ... , submenuN)
+
+		name:  text
+		url:   text (url for href perameter)
+		param: array(tw => t_val, sb => s_val)
+				tw: target parameter
+				t_val: one of '_blank', '_parent', '_self', '_top'
+				sb: text for statusbar)
+				s_val: text
+		css:   array(outer => cssarray, inner => cssarray)
+				outer -> style for outer div element
+				inner -> style for inner link element with text
+				cssarray -> array(normal, mouseover, mousedown)
+		submen1-N: list of subitems
+		**********************************************************/
 		$this->items = $items;
 		$this->width = $width;
 	}
@@ -47,13 +53,6 @@ class CPUMenu {
 		}
 		return 'return show_popup_menu(event,'.zbx_jsvalue($this->items).','.zbx_jsvalue($this->width).');';
 	}
-
-	public function insertJavaScript() {
-		if (defined('CPUMENU_INSERTJAVASCRIPT_INSERTED')) {
-			return null;
-		}
-		define('CPUMENU_INSERTJAVASCRIPT_INSERTED', 1);
-		echo '<script language="JavaScript" type="text/javascript" src="js/menu.js"></script>';
-	}
 }
+
 ?>

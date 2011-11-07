@@ -36,6 +36,9 @@
 /*      DDDDDDDDDDD - the ID itself                            */
 /***************************************************************/
 
+extern int	txn_level;
+extern int	txn_error;
+
 const char	*DBnode(const char *fieldid, int nodeid)
 {
 	static char	dbnode[128];
@@ -483,31 +486,6 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	return ret;
 }
 
-static void	DBupdate_trigger_value(zbx_uint64_t triggerid, unsigned char type, int value, int value_flags,
-		const char *error, int new_value, const char *new_error, const zbx_timespec_t *ts)
-{
-	const char	*__function_name = "DBupdate_trigger_value";
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	unsigned char	add_event, value_changed;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, triggerid, type, value, value_flags,
-			error, new_value, new_error, ts, &add_event, &value_changed))
-	{
-		DBexecute("%s", sql);
-
-		zbx_free(sql);
-	}
-
-	if (1 == add_event)
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, ts,
-				new_value, value_changed, 0, 0);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
 void	DBupdate_triggers_status_after_restart()
 {
 	const char	*__function_name = "DBupdate_triggers_status_after_restart";
@@ -519,11 +497,20 @@ void	DBupdate_triggers_status_after_restart()
 	int		trigger_type, trigger_value, trigger_flags,
 			type, lastclock, delay, nextcheck, min_nextcheck, now;
 	const char	*trigger_error;
+	DC_TRIGGER	*tr = NULL;
+	int		tr_alloc = 0, tr_num = 0;
+	char		*sql = NULL;
+	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 	zbx_timespec_t	ts;
+	unsigned char	add_event, value_changed;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	now = time(NULL);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBbegin();
 
@@ -585,10 +572,53 @@ void	DBupdate_triggers_status_after_restart()
 		ts.sec = min_nextcheck;
 		ts.ns = 0;
 
-		DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_flags, trigger_error,
-				TRIGGER_VALUE_UNKNOWN, "Zabbix was restarted.", &ts);
+		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, triggerid, trigger_type,
+				trigger_value, trigger_flags, trigger_error, TRIGGER_VALUE_UNKNOWN,
+				"Zabbix was restarted.", &ts, &add_event, &value_changed))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		if (1 == add_event)
+		{
+			if (tr_num == tr_alloc)
+			{
+				tr_alloc += 64;
+				tr = zbx_realloc(tr, tr_alloc * sizeof(DC_TRIGGER));
+			}
+
+			tr[tr_num].triggerid = triggerid;
+			tr[tr_num].timespec = ts;
+			tr[tr_num].value_changed = value_changed;
+			tr_num++;
+		}
 	}
 	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+
+	if (0 != tr_num)
+	{
+		zbx_uint64_t	eventid;
+		int		i;
+
+		eventid = DBget_maxid_num("events", tr_num);
+
+		for (i = 0; i < tr_num; i++)
+		{
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
+					&tr[i].timespec, TRIGGER_VALUE_UNKNOWN, tr[i].value_changed, 0, 0);
+		}
+	}
+
+	zbx_free(tr);
 
 	DBcommit();
 
@@ -1328,28 +1358,7 @@ const ZBX_FIELD *DBget_field(const ZBX_TABLE *table, const char *fieldname)
 	return NULL;
 }
 
-zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
-{
-	if (0 == strcmp(tablename, "events"))
-		return DCget_nextid_shared(tablename);
-
-	if (0 == strcmp(tablename, "history_log") ||
-			0 == strcmp(tablename, "history_text") ||
-			0 == strcmp(tablename, "dservices") ||
-			0 == strcmp(tablename, "dhosts") ||
-			0 == strcmp(tablename, "alerts") ||
-			0 == strcmp(tablename, "escalations") ||
-			0 == strcmp(tablename, "autoreg_host") ||
-			0 == strcmp(tablename, "graph_discovery") ||
-			0 == strcmp(tablename, "trigger_discovery"))
-	{
-		return DCget_nextid(tablename, num);
-	}
-
-	return DBget_nextid(tablename, num);
-}
-
-zbx_uint64_t	DBget_nextid(const char *tablename, int num)
+static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 {
 	const char	*__function_name = "DBget_nextid";
 	DB_RESULT	result;
@@ -1378,6 +1387,13 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 	while (FAIL == found)
 	{
+		/* avoid eternal loop within failed transaction */
+		if (0 < txn_level && 0 != txn_error)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() transaction failed", __function_name);
+			return 0;
+		}
+
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 				nodeid, table->table, table->recid);
 
@@ -1453,6 +1469,22 @@ zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			__function_name, ret2 - num + 1, table->table, table->recid);
 
 	return ret2 - num + 1;
+}
+
+zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
+{
+	if (0 == strcmp(tablename, "history_log") ||
+			0 == strcmp(tablename, "history_text") ||
+			0 == strcmp(tablename, "dservices") ||
+			0 == strcmp(tablename, "dhosts") ||
+			0 == strcmp(tablename, "alerts") ||
+			0 == strcmp(tablename, "escalations") ||
+			0 == strcmp(tablename, "autoreg_host") ||
+			0 == strcmp(tablename, "graph_discovery") ||
+			0 == strcmp(tablename, "trigger_discovery"))
+		return DCget_nextid(tablename, num);
+
+	return DBget_nextid(tablename, num);
 }
 
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num)

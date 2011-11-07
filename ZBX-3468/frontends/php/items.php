@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_ITEMS';
 $page['file'] = 'items.php';
-$page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
+$page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');
@@ -490,10 +490,10 @@ switch($itemType) {
 				' WHERE itemid='.$_REQUEST['itemid']);
 			$host = get_host_by_hostid($item['hostid']);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['name'].'] '.S_HISTORY_CLEARED);
+				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['name'].'] '._('History cleared'));
 		}
 		$result = DBend($result);
-		show_messages($result, S_HISTORY_CLEARED, S_CANNOT_CLEAR_HISTORY);
+		show_messages($result, _('History cleared'), S_CANNOT_CLEAR_HISTORY);
 
 	}
 	else if(isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])){
@@ -712,11 +712,11 @@ switch($itemType) {
 			add_audit(
 				AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_ITEM,
-				S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEARED
+				S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '._('History cleared')
 			);
 		}
 		$go_result = DBend($go_result);
-		show_messages($go_result, S_HISTORY_CLEARED, $go_result);
+		show_messages($go_result, _('History cleared'), $go_result);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
 		global $USER_DETAILS;
@@ -906,6 +906,7 @@ switch($itemType) {
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			S_WIZARD,
+			make_sorting_header(S_STATUS,'status'),
 			$show_host?S_HOST:null,
 			make_sorting_header(_('Name'),'name'),
 			S_TRIGGERS,
@@ -914,7 +915,6 @@ switch($itemType) {
 			make_sorting_header(S_HISTORY,'history'),
 			make_sorting_header(S_TRENDS,'trends'),
 			make_sorting_header(S_TYPE,'type'),
-			make_sorting_header(S_STATUS,'status'),
 			S_APPLICATIONS,
 			S_ERROR
 		));
@@ -1164,6 +1164,7 @@ switch($itemType) {
 			$table->addRow(array(
 				$cb,
 				$menuicon,
+				$status,
 				$host,
 				$description,
 				$trigger_info,
@@ -1172,7 +1173,6 @@ switch($itemType) {
 				$item['history'],
 				(in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends']),
 				item_type2str($item['type']),
-				$status,
 				new CCol($applications, 'wraptext'),
 				$error
 			));
@@ -1196,7 +1196,7 @@ switch($itemType) {
 		//$goOption->setAttribute('confirm',S_COPY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('clean_history',S_CLEAR_HISTORY_FOR_SELECTED);
+		$goOption = new CComboItem('clean_history', _('Clear history for selected'));
 		$goOption->setAttribute('confirm',S_DELETE_HISTORY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
@@ -1223,12 +1223,6 @@ switch($itemType) {
 
 	$items_wdgt->show();
 
-	$jsmenu = new CPUMenu(null,200);
-	$jsmenu->InsertJavaScript();
-
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

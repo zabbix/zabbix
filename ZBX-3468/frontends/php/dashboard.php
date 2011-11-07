@@ -344,9 +344,6 @@ $dashboardTable->addRow(array(new CDiv($leftColumn, 'column'), new CDiv($rightCo
 $dashboardWidget->addItem($dashboardTable);
 $dashboardWidget->show();
 
-$jsmenu = new CPUMenu(null, 170);
-$jsmenu->insertJavaScript();
-
 // activating blinking
 zbx_add_post_js('jqBlink.init();');
 ?>

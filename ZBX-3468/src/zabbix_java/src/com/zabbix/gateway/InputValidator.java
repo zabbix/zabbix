@@ -17,17 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
-class GeneralInformation
+interface InputValidator
 {
-	public static final String APPLICATION_NAME = "Zabbix Java Proxy";
-	public static final String REVISION_DATE = "27 October 2011";
-	public static final String REVISION = "{ZABBIX_REVISION}";
-	public static final String VERSION = "1.9.7";
-
-	public static void printVersion()
-	{
-		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
-	}
+	public boolean validate(Object value);
 }
