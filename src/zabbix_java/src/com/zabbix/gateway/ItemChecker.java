@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
 import java.util.Vector;
 
@@ -41,8 +41,8 @@ abstract class ItemChecker
 	public static final String JSON_TAG_USERNAME = "username";
 	public static final String JSON_TAG_VALUE = "value";
 
-	public static final String JSON_REQUEST_INTERNAL = "java proxy internal";
-	public static final String JSON_REQUEST_JMX = "java proxy jmx";
+	public static final String JSON_REQUEST_INTERNAL = "java gateway internal";
+	public static final String JSON_REQUEST_JMX = "java gateway jmx";
 
 	public static final String JSON_RESPONSE_FAILED = "failed";
 	public static final String JSON_RESPONSE_SUCCESS = "success";

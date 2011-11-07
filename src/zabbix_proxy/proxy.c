@@ -173,8 +173,8 @@ int	CONFIG_NODE_NOHISTORY		= 0;
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
-char	*CONFIG_JAVA_PROXY		= NULL;
-int	CONFIG_JAVA_PROXY_PORT		= ZBX_DEFAULT_SERVER_PORT;
+char	*CONFIG_JAVA_GATEWAY		= NULL;
+int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
@@ -266,9 +266,9 @@ static void	zbx_set_defaults()
 static void	zbx_validate_config()
 {
 
-	if ((NULL == CONFIG_JAVA_PROXY || '\0' == *CONFIG_JAVA_PROXY) && 0 < CONFIG_JAVAPOLLER_FORKS)
+	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && 0 < CONFIG_JAVAPOLLER_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "JavaProxy not in config file or empty");
+		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not in config file or empty");
 		exit(1);
 	}
 
@@ -334,9 +334,9 @@ static void	zbx_load_config()
 			PARM_OPT,	0,			1000},
 		{"StartJavaPollers",		&CONFIG_JAVAPOLLER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"JavaProxy",			&CONFIG_JAVA_PROXY,			TYPE_STRING,
+		{"JavaGateway",			&CONFIG_JAVA_GATEWAY,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"JavaProxyPort",		&CONFIG_JAVA_PROXY_PORT,		TYPE_INT,
+		{"JavaGatewayPort",		&CONFIG_JAVA_GATEWAY_PORT,		TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"SNMPTrapperFile",		&CONFIG_SNMPTRAP_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},

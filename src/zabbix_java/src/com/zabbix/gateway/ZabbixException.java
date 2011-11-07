@@ -17,9 +17,29 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
-interface PostInputValidator
+import java.util.Formatter;
+
+class ZabbixException extends Exception
 {
-	public void execute(Object value);
+	public ZabbixException(String message)
+	{
+		super(message);
+	}
+
+	public ZabbixException(String message, Object... args)
+	{
+		this(new Formatter().format(message, args).toString());
+	}
+
+	public ZabbixException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
+
+	public ZabbixException(Throwable cause)
+	{
+		super(cause);
+	}
 }

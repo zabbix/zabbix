@@ -77,8 +77,8 @@
 #define ZBX_PROTO_VALUE_SENDER_DATA		"sender data"
 #define ZBX_PROTO_VALUE_AGENT_DATA		"agent data"
 #define ZBX_PROTO_VALUE_COMMAND			"command"
-#define ZBX_PROTO_VALUE_JAVA_PROXY_INTERNAL	"java proxy internal"
-#define ZBX_PROTO_VALUE_JAVA_PROXY_JMX		"java proxy jmx"
+#define ZBX_PROTO_VALUE_JAVA_GATEWAY_INTERNAL	"java gateway internal"
+#define ZBX_PROTO_VALUE_JAVA_GATEWAY_JMX	"java gateway jmx"
 
 typedef enum
 {

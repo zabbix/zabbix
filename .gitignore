@@ -44,6 +44,7 @@ frontends/php/js/jsDump.js
 frontends/php/locale/POTFILES.in
 frontends/php/locale/cs/LC_MESSAGES/frontend.mo
 frontends/php/locale/de/LC_MESSAGES/frontend.mo
+frontends/php/locale/el/LC_MESSAGES/frontend.mo
 frontends/php/locale/es/LC_MESSAGES/frontend.mo
 frontends/php/locale/fr/LC_MESSAGES/frontend.mo
 frontends/php/locale/frontend.pot
@@ -186,7 +187,7 @@ src/zabbix_get/zabbix_get
 src/zabbix_java/.deps
 src/zabbix_java/Makefile
 src/zabbix_java/Makefile.in
-src/zabbix_java/bin/zabbix-java-proxy-*.jar
+src/zabbix_java/bin/zabbix-java-gateway-*.jar
 src/zabbix_java/class
 src/zabbix_proxy/.deps
 src/zabbix_proxy/Makefile
