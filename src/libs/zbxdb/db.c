@@ -22,6 +22,7 @@
 #include "db.h"
 #include "zbxdb.h"
 #include "log.h"
+#include "mutexs.h"
 
 int		txn_level = 0;	/* transaction level, nested transactions are not supported */
 int		txn_error = 0;	/* failed transaction */
@@ -39,7 +40,7 @@ static int			ZBX_PG_BYTEAOID = 0;
 int				ZBX_PG_SVERSION = 0;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
-PHP_MUTEX			sqlite_access;
+static PHP_MUTEX		sqlite_access;
 #endif
 
 #if defined(HAVE_ORACLE)
@@ -369,6 +370,11 @@ void	zbx_create_sqlite3_mutex(const char *dbname)
 		zbx_error("cannot create mutex for SQLite3");
 		exit(FAIL);
 	}
+}
+
+void	zbx_remove_sqlite3_mutex()
+{
+	php_sem_remove(&sqlite_access);
 }
 #endif	/* HAVE_SQLITE3 */
 

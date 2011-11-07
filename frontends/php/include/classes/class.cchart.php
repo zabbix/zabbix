@@ -233,7 +233,7 @@ class CChart extends CGraphDraw{
 				$to_time	= $this->to_time;
 			}
 
-			$calc_field = 'round('.$x.'*(mod('.zbx_dbcast_2bigint('clock').'+'.$z.','.$p.'))/('.$p.'),0)';  /* required for 'group by' support of Oracle */
+			$calc_field = 'round('.$x.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$z, $p).'/('.$p.'),0)';	// required for 'group by' support of Oracle
 
 			$sql_arr = array();
 
