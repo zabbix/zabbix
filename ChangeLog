@@ -11,6 +11,7 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-3468] fixed error messages and warnings with enabled SQLite3 support in front-end (Alexei)
  - [ZBX-4056] fixed dependencies not added when template linked to host (Vedmak)
  - [ZBX-4315] fixed the 'close' link in the tooltips (pavels)
  - [ZBX-3675] fixed items created via api for template have wrong interfaceid on linked host (Vedmak)
