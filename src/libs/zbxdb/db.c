@@ -23,9 +23,9 @@
 #include "zbxdb.h"
 #include "log.h"
 
-static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
-static int	txn_init = 0;
-static int	txn_error = 0;	/* failed transaction */
+int		txn_level = 0;	/* transaction level, nested transactions are not supported */
+int		txn_error = 0;	/* failed transaction */
+static int	txn_init = 0;	/* connecting to db */
 
 #if defined(HAVE_IBM_DB2)
 static zbx_ibm_db2_handle_t	ibm_db2;
