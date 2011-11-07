@@ -56,6 +56,7 @@ Bug fixes:
  - [ZBX-4153] fixed links to acknowledge and returning back to requester page (Eduard)
  - [ZBX-4174] made database monitor items not require interface (asaveljevs, Vedmak)
  - [ZBX-3881] fixed delay being set to 0 when changing item type from trapper to agent in item update form (Vedmak)
+ - [ZBX-4115] added support for $(DESTDIR) for installing Zabbix Java proxy (dimir)
  - [ZBX-1020] added support for --sysconfdir, changed default installation directories (dimir)
  - [ZBX-3912] fixed popup object selection for IE (Eduard)
  - [ZBX-4132] fixed checkbox cookie work (Eduard)
