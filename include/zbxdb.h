@@ -138,10 +138,6 @@
 
 	void	SQ_DBfree_result(DB_RESULT result);
 
-#	include "mutexs.h"
-
-	extern PHP_MUTEX	sqlite_access;
-
 #endif	/* HAVE_SQLITE3 */
 
 #ifdef HAVE_SQLITE3
@@ -154,6 +150,7 @@
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
 #ifdef HAVE_SQLITE3
 void	zbx_create_sqlite3_mutex(const char *dbname);
+void	zbx_remove_sqlite3_mutex();
 #endif	/* HAVE_SQLITE3 */
 void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
 void    zbx_db_close();

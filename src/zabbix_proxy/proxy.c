@@ -772,7 +772,7 @@ void	zbx_on_exit()
 #endif
 
 #ifdef HAVE_SQLITE3
-	php_sem_remove(&sqlite_access);
+	zbx_remove_sqlite3_mutex();
 #endif
 
 	free_selfmon_collector();
