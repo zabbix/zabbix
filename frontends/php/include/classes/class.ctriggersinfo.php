@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-include_once('include/triggers.inc.php');
+require_once('include/triggers.inc.php');
 
 class CTriggersInfo extends CTable{
 

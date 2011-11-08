@@ -535,8 +535,9 @@ class CTrigger extends CZBXAPI {
 			$sql_parts['select']['triggers'] = 't.*';
 		}
 
-		// expandData
+// expandData
 		if (!is_null($options['expandData'])) {
+			$sql_parts['select']['hostname'] = 'h.name AS hostname';
 			$sql_parts['select']['host'] = 'h.host';
 			$sql_parts['select']['hostid'] = 'h.hostid';
 			$sql_parts['from']['functions'] = 'functions f';
@@ -1395,6 +1396,24 @@ class CTrigger extends CZBXAPI {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously.'));
 					}
 				}
+
+				foreach ($expressionData->expressions as $exprPart) {
+					if (zbx_empty($exprPart['item'])) {
+						continue;
+					}
+
+					$sql = 'SELECT i.itemid,i.value_type'.
+							' FROM items i,hosts h'.
+							' WHERE i.key_='.zbx_dbstr($exprPart['item']).
+								' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+								' AND h.host='.zbx_dbstr($exprPart['host']).
+								' AND h.hostid=i.hostid'.
+								' AND '.DBin_node('i.itemid');
+					if (!DBfetch(DBselect($sql))) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect item key "%1$s:%2$s" provided for trigger expression.', $exprPart['host'], $exprPart['item']));
+					}
+				}
 			}
 
 			// check existing
@@ -1531,7 +1550,7 @@ class CTrigger extends CZBXAPI {
 
 		// TODO: REMOVE info
 		foreach ($del_triggers as $triggerid => $trigger) {
-			info(_s('Trigger [%1$s:%2$s] deleted.', $trigger['description'], explode_exp($trigger['expression'])));
+			info(_s('Trigger "%1$s:%2$s" deleted.', $trigger['description'], explode_exp($trigger['expression'])));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 		}
 
@@ -1615,7 +1634,7 @@ class CTrigger extends CZBXAPI {
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(_s('Trigger [%1$s:%2$s] created.', $trigger['description'], $trigger['expression']));
+			info(_s('Trigger "%1$s:%2$s" created.', $trigger['description'], $trigger['expression']));
 		}
 
 		$this->validateDependencies($triggers);

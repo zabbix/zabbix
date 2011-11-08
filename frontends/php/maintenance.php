@@ -29,7 +29,7 @@ $page['file'] = 'maintenance.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.calendar.js');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -474,5 +474,5 @@ else {
 	$maintenanceView->show();
 }
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>
