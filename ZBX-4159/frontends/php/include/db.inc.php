@@ -1071,13 +1071,13 @@ else {
 		 *
 		 * @return string
 		 */
-		protected static function reserveIds($table, $count){
+		protected static function reserveIds($table, $count) {
 			$tableSchema = self::getSchema($table);
 			$id_name = $tableSchema['key'];
 
 			$sql = 'SELECT nextid'.
 				' FROM ids'.
-				' WHERE nodeid='.self::$nodeId .
+				' WHERE nodeid='.self::$nodeId.
 					' AND table_name='.zbx_dbstr($table).
 					' AND field_name='.zbx_dbstr($id_name).
 				' FOR UPDATE';
@@ -1089,11 +1089,11 @@ else {
 					$nextid = self::refreshIds($table, $count);
 				}
 				else {
-					$sql = 'UPDATE ids '.
+					$sql = 'UPDATE ids'.
 							' SET nextid=nextid+'.$count.
 							' WHERE nodeid='.self::$nodeId.
-							' AND table_name='.zbx_dbstr($table).
-							' AND field_name='.zbx_dbstr($id_name);
+								' AND table_name='.zbx_dbstr($table).
+								' AND field_name='.zbx_dbstr($id_name);
 					if (!DBexecute($sql)) {
 						self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 					}
@@ -1101,7 +1101,7 @@ else {
 					$nextid = bcadd($res['nextid'], 1);
 				}
 			}
-			else{
+			else {
 				$nextid = self::refreshIds($table, $count);
 			}
 
@@ -1132,13 +1132,13 @@ else {
 				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
 
-			$sql = 'SELECT max('.$id_name.') AS id'.
+			$sql = 'SELECT MAX('.$id_name.') AS id'.
 					' FROM '.$table.
 					' WHERE '.$id_name.'>='.self::$minNodeId.
 						' AND '.$id_name.'<='.self::$maxNodeId;
 			$row = DBfetch(DBselect($sql));
 
-			$nextid = (!$row || $row['id'] == 0) ? self::$minNodeId : $row['id'];
+			$nextid = (!$row || is_null($row['id'])) ? self::$minNodeId : $row['id'];
 
 			$maxNextId = bcadd($nextid, $count);
 			if (bccomp($maxNextId, self::$maxNodeId) == 1) {
