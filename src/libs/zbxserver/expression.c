@@ -284,55 +284,55 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 {
 	const char	*__function_name = "evaluate";
-	char		*res, simple[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
+	char		*res = NULL, simple[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
 			value_str[MAX_STRING_LEN], c;
 	int		i, l, r;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, exp);
 
-	res = NULL;
-
 	strscpy(tmp, exp);
 
 	while (NULL != strchr(tmp, ')'))
 	{
-		l=-1;
-		r=strchr(tmp,')')-tmp;
-		for(i=r;i>=0;i--)
+		l = -1;
+		r = strchr(tmp, ')') - tmp;
+
+		for (i = r; i >= 0; i--)
 		{
-			if( tmp[i] == '(' )
+			if ('(' == tmp[i])
 			{
-				l=i;
+				l = i;
 				break;
 			}
 		}
-		if( l == -1 )
+
+		if (-1 == l)
 		{
 			zbx_snprintf(error, maxerrlen, "Cannot find left bracket [(]. Expression:[%s]", tmp);
 			return FAIL;
 		}
-		for(i=l+1;i<r;i++)
-		{
-			simple[i-l-1]=tmp[i];
-		}
-		simple[r-l-1]=0;
+
+		for (i = l + 1; i < r; i++)
+			simple[i - l - 1] = tmp[i];
+
+		simple[r - l - 1] = '\0';
 
 		if (SUCCEED != evaluate_simple(value, simple, error, maxerrlen))
 			return FAIL;
 
-		/* res = first+simple+second */
-		c=tmp[l]; tmp[l]='\0';
+		c = tmp[l];
+		tmp[l] = '\0';
 		res = zbx_strdcat(res, tmp);
-		tmp[l]=c;
+		tmp[l] = c;
 
 		zbx_snprintf(value_str, sizeof(value_str), ZBX_FS_DBL, *value);
 		res = zbx_strdcat(res, value_str);
-		res = zbx_strdcat(res, tmp+r+1);
+		res = zbx_strdcat(res, tmp + r + 1);
 
 		zbx_remove_spaces(res);
-		strscpy(tmp,res);
+		strscpy(tmp, res);
 
-		zbx_free(res); res = NULL;
+		zbx_free(res);
 	}
 
 	if (SUCCEED != evaluate_simple(value, tmp, error, maxerrlen))
@@ -357,61 +357,57 @@ int	evaluate(double *value, char *exp, char *error, int maxerrlen)
  *           Use zbx_free_numbers to free allocated memory                    *
  *                                                                            *
  ******************************************************************************/
-static char**	extract_numbers(char *str, int *count)
+static char 	**extract_numbers(char *str, int *count)
 {
-	char *s = NULL;
-	char *e = NULL;
-
-	char **result = NULL;
-
-	int	dot_founded = 0;
-	int	len = 0;
+	char	*s, *e, **result = NULL;
+	int	dot_found;
+	size_t	len;
 
 	assert(count);
 
 	*count = 0;
 
-	/* find start of number */
-	for ( s = str; *s; s++)
+	for (s = str; '\0' != *s; s++)	/* find start of number */
 	{
-		if ( !isdigit(*s) ) {
-			continue; /* for s */
-		}
+		if (!isdigit(*s))
+			continue;
 
-		if ( s != str && '{' == *(s-1) ) {
+		if (s != str && '{' == *(s - 1))
+		{
 			/* skip functions '{65432}' */
 			s = strchr(s, '}');
-			continue; /* for s */
+			continue;
 		}
 
-		dot_founded = 0;
-		/* find end of number */
-		for ( e = s; *e; e++ )
+		dot_found = 0;
+
+		for (e = s; '\0' != *e; e++)	/* find end of number */
 		{
-			if ( isdigit(*e) ) {
-				continue; /* for e */
-			}
-			else if ( '.' == *e && !dot_founded ) {
-				dot_founded = 1;
-				continue; /* for e */
-			}
-			else if ( *e >= 'A' && *e <= 'Z' )
+			if (isdigit(*e))
+				continue;
+
+			if ('.' == *e && 0 == dot_found)
 			{
-				e++;
+				dot_found = 1;
+				continue;
 			}
-			break; /* for e */
+
+			if ('A' <= *e && *e <= 'Z')
+				e++;
+
+			break;
 		}
 
 		/* number found */
+
 		len = e - s;
 		(*count)++;
-		result = zbx_realloc(result, sizeof(char*) * (*count));
-		result[(*count)-1] = zbx_malloc(NULL, len + 1);
-		memcpy(result[(*count)-1], s, len);
-		result[(*count)-1][len] = '\0';
+		result = zbx_realloc(result, sizeof(char *) * (*count));
+		result[(*count) - 1] = zbx_malloc(NULL, len + 1);
+		memcpy(result[(*count) - 1], s, len);
+		result[(*count) - 1][len] = '\0';
 
-		s = e;
-		if (*s == '\0')
+		if ('\0' == *(s = e))
 			break;
 	}
 
@@ -420,15 +416,13 @@ static char**	extract_numbers(char *str, int *count)
 
 static void	zbx_free_numbers(char ***numbers, int count)
 {
-	register int i = 0;
+	int	i;
 
-	if ( !numbers ) return;
-	if ( !*numbers ) return;
+	if (NULL == numbers || NULL == *numbers)
+		return;
 
-	for ( i = 0; i < count; i++ )
-	{
+	for (i = 0; i < count; i++)
 		zbx_free((*numbers)[i]);
-	}
 
 	zbx_free(*numbers);
 }
@@ -503,15 +497,16 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 		case 0:
 			return;
 		case 1:
-			params[0] = '\0';
+			*params = '\0';
 		case 2:
 			/* do nothing */;
 	}
 
 	p = *data;
+
 	while (NULL != (m = strchr(p, '$')))
 	{
-		if (m > p && *(m - 1) == '{' && (n = strchr(m + 1, '}')) != NULL)	/* user defined macros */
+		if (m > p && '{' == *(m - 1) && NULL != (n = strchr(m + 1, '}')))	/* user defined macros */
 		{
 			c = *++n;
 			*n = '\0';
@@ -532,7 +527,7 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 			*n = c;
 			p = n;
 		}
-		else if (*(m + 1) >= '1' && *(m + 1) <= '9' && params[0] != '\0')	/* macros $1, $2, ... */
+		else if ('1' <= *(m + 1) && *(m + 1) <= '9' && '\0' != *params)		/* macros $1, $2, ... */
 		{
 			*m = '\0';
 			str_out = zbx_strdcat(str_out, p);
@@ -971,12 +966,12 @@ static int	DBget_dservice_value_by_event(DB_EVENT *event, char **replace_to, con
 
 	switch (event->object)
 	{
-	case EVENT_OBJECT_DSERVICE:
-		result = DBselect("select %s from dservices s where s.dserviceid=" ZBX_FS_UI64,
-				fieldname, event->objectid);
-		break;
-	default:
-		return ret;
+		case EVENT_OBJECT_DSERVICE:
+			result = DBselect("select %s from dservices s where s.dserviceid=" ZBX_FS_UI64,
+					fieldname, event->objectid);
+			break;
+		default:
+			return ret;
 	}
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
@@ -1017,18 +1012,18 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
 
 	switch (event->object)
 	{
-	case EVENT_OBJECT_DHOST:
-		result = DBselect("select r.%s from drules r,dhosts h"
-				" where r.druleid=r.druleid and h.dhostid=" ZBX_FS_UI64,
-				fieldname, event->objectid);
-		break;
-	case EVENT_OBJECT_DSERVICE:
-		result = DBselect("select r.%s from drules r,dhosts h,dservices s"
-				" where r.druleid=h.druleid and h.dhostid=s.dhostid and s.dserviceid=" ZBX_FS_UI64,
-				fieldname, event->objectid);
-		break;
-	default:
-		return ret;
+		case EVENT_OBJECT_DHOST:
+			result = DBselect("select r.%s from drules r,dhosts h"
+					" where r.druleid=r.druleid and h.dhostid=" ZBX_FS_UI64,
+					fieldname, event->objectid);
+			break;
+		case EVENT_OBJECT_DSERVICE:
+			result = DBselect("select r.%s from drules r,dhosts h,dservices s"
+					" where r.druleid=h.druleid and h.dhostid=s.dhostid and s.dserviceid=" ZBX_FS_UI64,
+					fieldname, event->objectid);
+			break;
+		default:
+			return ret;
 	}
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
@@ -1036,7 +1031,6 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
 		*replace_to = zbx_strdup(*replace_to, row[0]);
 		ret = SUCCEED;
 	}
-
 	DBfree_result(result);
 
 	return ret;
@@ -1064,20 +1058,6 @@ static int	DBget_history_value(zbx_uint64_t itemid, unsigned char value_type, ch
 	int		ret = FAIL;
 	char		**h_value;
 	zbx_timespec_t	ts;
-
-	if (0 == CONFIG_NS_SUPPORT)
-	{
-		h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, clock, NULL, field_name, 1);
-
-		if (NULL != h_value[0])
-		{
-			*replace_to = zbx_strdup(*replace_to, h_value[0]);
-			ret = SUCCEED;
-		}
-		DBfree_history(h_value);
-
-		return ret;
-	}
 
 	ts.sec = clock;
 	ts.ns = ns;
@@ -1323,7 +1303,7 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 	buf = zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
-	if (escalation != NULL && escalation->eventid == event->eventid)
+	if (NULL != escalation && escalation->eventid == event->eventid)
 	{
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
 				"Problem started: %s %s Age: %s\n",
@@ -1380,7 +1360,7 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
 
 	DBfree_result(result);
 
-	if (escalation != NULL && escalation->r_eventid == event->eventid)
+	if (NULL != escalation && escalation->r_eventid == event->eventid)
 	{
 		now = (time_t)event->clock;
 		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
@@ -1597,6 +1577,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 		}
 		else
 			*replace_to = zbx_strdup(*replace_to, row[0]);
+
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
@@ -2910,7 +2891,7 @@ static void	zbx_free_item_functions(zbx_vector_ptr_t *ifuncs)
  *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
- * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)              *
+ * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)"             *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_functions(zbx_vector_ptr_t *triggers)
@@ -3045,10 +3026,10 @@ void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
 
 	for (l = 0; l < sz_data; l++)
 	{
-		if ((*data)[l] != '{' || (*data)[l + 1] != '#')
+		if ('{' != (*data)[l] || '#' != (*data)[l + 1])
 			continue;
 
-		for (r = l + 2; r < sz_data && (*data)[r] != '}'; r++)
+		for (r = l + 2; r < sz_data && '}' != (*data)[r]; r++)
 			;
 
 		if (r == sz_data)
