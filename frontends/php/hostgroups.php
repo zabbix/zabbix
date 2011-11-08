@@ -26,7 +26,7 @@ $page['title'] = 'S_HOST_GROUPS';
 $page['file'] = 'hostgroups.php';
 $page['hist_arg'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -514,5 +514,5 @@ include_once('include/page_header.php');
 	}
 	$groups_wdgt->show();
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

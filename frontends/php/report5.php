@@ -19,149 +19,159 @@
 **/
 ?>
 <?php
-	require_once ('include/config.inc.php');
-	require_once ('include/triggers.inc.php');
+require_once('include/config.inc.php');
+require_once('include/triggers.inc.php');
 
-	$page['title']	= "S_TRIGGERS_TOP_100";
-	$page['file']	= 'report5.php';
-	$page['hist_arg'] = array('period');
-	$page['scripts'] = array();
+$page['title'] = _('Most busy triggers top 100');
+$page['file'] = 'report5.php';
+$page['hist_arg'] = array('period');
+$page['scripts'] = array();
 
-include_once('include/page_header.php');
-
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'period'=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_NZERO,	IN('"day","week","month","year"'),		NULL)
-	);
-
-	check_fields($fields);
+$fields = array(
+	'period' => array(T_ZBX_STR,	O_OPT,	P_SYS | P_NZERO,	IN('"day","week","month","year"'),	NULL)
+);
+check_fields($fields);
 ?>
 <?php
-	$rprt_wdgt = new CWidget();
+$rprt_wdgt = new CWidget();
 
-	$_REQUEST['period'] = get_request('period', 'day');
-	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
+$_REQUEST['period'] = get_request('period', 'day');
+$admin_links = ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN || $USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN);
 
-	$form = new CForm();
-	$form->SetMethod('get');
+$form = new CForm('get');
 
-	$cmbPeriod = new CComboBox('period',$_REQUEST['period'],'submit()');
-	$cmbPeriod->addItem('day',S_DAY);
-	$cmbPeriod->addItem('week',S_WEEK);
-	$cmbPeriod->addItem('month',S_MONTH);
-	$cmbPeriod->addItem('year',S_YEAR);
+$cmbPeriod = new CComboBox('period', $_REQUEST['period'], 'submit()');
+$cmbPeriod->addItem('day', _('Day'));
+$cmbPeriod->addItem('week', _('Week'));
+$cmbPeriod->addItem('month', _('Month'));
+$cmbPeriod->addItem('year', _('Year'));
 
-	$form->addItem($cmbPeriod);
+$form->addItem($cmbPeriod);
 
-	$rprt_wdgt->addPageHeader(S_TRIGGERS_TOP_100_BIG);
+$rprt_wdgt->addPageHeader(_('MOST BUSY TRIGGERS TOP 100'));
 
-	$rprt_wdgt->addHeader(S_REPORT_BIG, $form);
-	$rprt_wdgt->addItem(BR());
-?>
-<?php
-	$table = new CTableInfo();
-	$table->setHeader(array(
-			is_show_all_nodes() ? S_NODE : null,
-			S_HOST,
-			S_TRIGGER,
-			S_SEVERITY,
-			S_NUMBER_OF_STATUS_CHANGES
-			));
+$rprt_wdgt->addHeader(_('REPORT'), $form);
+$rprt_wdgt->addItem(BR());
 
-	switch($_REQUEST['period']){
-		case 'week':	$time_dif=7*86400;		break;
-		case 'month':	$time_dif=30*86400;		break;
-		case 'year':	$time_dif=365*86400;	break;
-		case 'day':
-		default:	$time_dif=86400;	break;
+$table = new CTableInfo();
+$table->setHeader(array(
+	is_show_all_nodes() ? _('Node') : null,
+	_('Host'),
+	_('Trigger'),
+	_('Severity'),
+	_('Number of status changes')
+));
+
+switch ($_REQUEST['period']) {
+	case 'week':
+		$time_dif = SEC_PER_DAY;
+		break;
+	case 'month':
+		$time_dif = SEC_PER_MONTH;
+		break;
+	case 'year':
+		$time_dif = SEC_PER_YEAR;
+		break;
+	case 'day':
+	default:
+		$time_dif = SEC_PER_DAY;
+		break;
+}
+
+$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
+$scripts_by_hosts = API::Script()->getScriptsByHosts($available_hosts);
+
+$triggersEventCount = array();
+// get 100 triggerids with max even count
+$sql = 'SELECT e.objectid,count(distinct e.eventid) AS cnt_event'.
+		' FROM triggers t,events e'.
+		' WHERE t.triggerid=e.objectid'.
+			' AND e.object='.EVENT_OBJECT_TRIGGER.
+			' AND e.clock>'.(time() - $time_dif).
+			' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
+			' AND'.DBcondition('t.triggerid', $available_triggers).
+			' AND'.DBcondition('t.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+		' GROUP BY e.objectid'.
+		' ORDER BY cnt_event desc';
+$result = DBselect($sql, 100);
+while ($row = DBfetch($result)) {
+	$triggersEventCount[$row['objectid']] = $row['cnt_event'];
+}
+
+$triggers = API::Trigger()->get(array(
+	'triggerids' => array_keys($triggersEventCount),
+	'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'lastchange'),
+	'selectItems' => API_OUTPUT_EXTEND,
+	'expandDescription' => true,
+	'expandData' => true,
+	'preservekeys' => true,
+	'nopermissions' => true,
+));
+foreach ($triggers as $tid => $trigger) {
+	$trigger['cnt_event'] = $triggersEventCount[$tid];
+
+	$items = $trigger['items'];
+	$trigger['items'] = array();
+	foreach ($items as $item) {
+		$trigger['items'][$item['itemid']] = array(
+			'itemid' => $item['itemid'],
+			'action' => str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues',
+			'name' => itemName($item),
+			'value_type' => $item['value_type']
+		);
 	}
+	$triggers[$tid] = $trigger;
+}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($available_hosts);
-
-	$triggers = array();
-	$triggerids = array();
-	$sql = 'SELECT h.name as hostname, MAX(h.hostid) as hostid, t.triggerid, t.description, t.expression, '.
-				' MAX(t.lastchange) as lastchange, t.priority, count(distinct e.eventid) as cnt_event '.
-			' FROM hosts h, triggers t, functions f, items i, events e'.
-			' WHERE h.hostid = i.hostid '.
-				' and i.itemid = f.itemid '.
-				' and t.triggerid=f.triggerid '.
-				' and t.triggerid=e.objectid '.
-				' and e.object='.EVENT_OBJECT_TRIGGER.
-				' and e.clock>'.(time()-$time_dif).
-				' and e.value_changed='.TRIGGER_VALUE_CHANGED_YES.
-				' and '.DBcondition('t.triggerid',$available_triggers).
-				' and '.DBin_node('t.triggerid').
-			' GROUP BY h.name,t.triggerid,t.description,t.expression,t.priority '.
-			' ORDER BY cnt_event desc, h.name, t.description, t.triggerid';
-	$result=DBselect($sql, 100);
-	while($row=DBfetch($result)){
-		$row['items'] = array();
-		$triggers[$row['triggerid']] = $row;
-		$triggerids[$row['triggerid']] = $row['triggerid'];
-	}
-
-	$sql = 'SELECT f.triggerid, i.* '.
-			' FROM functions f, items i '.
-			' WHERE '.DBcondition('f.triggerid',$triggerids).
-				' AND i.itemid=f.itemid';
-	$result = DBselect($sql);
-	while($row = DBfetch($result)){
-		$item['itemid'] = $row['itemid'];
-		$item['action'] = str_in_array($row['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
-		$item['name'] = itemName($row);
-		$item['value_type'] = $row['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
-
-		$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;
-	}
-
-	foreach($triggers as $triggerid => $row){
-		$description = expand_trigger_description_by_data($row);
-
-		$menus = '';
-		$host_nodeid = id2nodeid($row['hostid']);
-		foreach($scripts_by_hosts[$row['hostid']] as $id => $script){
-			$script_nodeid = id2nodeid($script['scriptid']);
-			if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
-				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$row['hostid']."&scriptid=".$script['scriptid']."','Global script',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+ArraySorter::sort($triggers, array(array('field' => 'cnt_event', 'order' => ZBX_SORT_DOWN), 'host', 'description', 'priority'));
+foreach ($triggers as $trigger) {
+	$menus = '';
+	$host_nodeid = id2nodeid($trigger['hostid']);
+	foreach ($scripts_by_hosts[$trigger['hostid']] as $script) {
+		$script_nodeid = id2nodeid($script['scriptid']);
+		if (bccomp($host_nodeid, $script_nodeid) == 0) {
+			$menus .= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','Global script',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
-
-		$menus.= "[".zbx_jsvalue(S_URLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-
-		$menus = rtrim($menus,',');
-		$menus="show_popup_menu(event,[[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
-
-		$host = new CSpan($row['hostname'],'link_menu');
-		$host->setAttribute('onclick','javascript: '.$menus);
-		$host->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
-
-		$tr_conf_link = 'null';
-		if($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)
-			$tr_conf_link = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$row['triggerid']."&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
-
-
-		$tr_desc = new CSpan($description,'link_menu');
-		$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
-										" [{'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['lastchange']."'},".$tr_conf_link."],".
-										zbx_jsvalue($row['items'], true).");");
-
-		$table->addRow(array(
-			get_node_name_by_elid($row['triggerid']),
-			$host,
-			$tr_desc,
-			getSeverityCell($row['priority']),
-			$row['cnt_event'],
-		));
 	}
 
-	$rprt_wdgt->addItem($table);
-	$rprt_wdgt->show();
+	$menus .= "['"._('URLs')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+	$menus .= "['"._('Latest data')."',\"javascript: redirect('latest.php?hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
+	$menus = "show_popup_menu(event,[['"._('Scripts')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
 
-include_once('include/page_footer.php');
+	$hostSpan = new CSpan($trigger['hostname'], 'link_menu');
+	$hostSpan->setAttribute('onclick', $menus);
+
+	$tr_conf_link = 'null';
+	if ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+		$tr_conf_link = "['"._('Configuration of trigger')."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."&hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
+	}
+
+
+	$tr_desc = new CSpan($trigger['description'], 'link_menu');
+	$tr_desc->addAction('onclick', "create_mon_trigger_menu(event, ".
+			" [{'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$trigger['lastchange']."'},".$tr_conf_link."],".
+			zbx_jsvalue($trigger['items'], true).");");
+
+	$table->addRow(array(
+		get_node_name_by_elid($trigger['triggerid']),
+		$hostSpan,
+		$tr_desc,
+		getSeverityCell($trigger['priority']),
+		$trigger['cnt_event'],
+	));
+}
+
+$rprt_wdgt->addItem($table);
+$rprt_wdgt->show();
+
+$jsmenu = new CPUMenu(null, 170);
+$jsmenu->InsertJavaScript();
+
+require_once('include/page_footer.php');
 
 ?>

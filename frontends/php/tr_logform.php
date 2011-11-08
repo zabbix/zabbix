@@ -31,7 +31,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //---------------------------------- CHECKS ------------------------------------
@@ -167,7 +167,7 @@ if(isset($_REQUEST['save_trigger'])){
 			unset($_REQUEST["sform"]);
 
 			zbx_add_post_js('closeForm("items.php");');
-			include_once('include/page_footer.php');
+			require_once('include/page_footer.php');
 		}
 	}
 }
@@ -406,6 +406,6 @@ if(isset($_REQUEST['sform'])){
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

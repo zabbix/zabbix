@@ -20,9 +20,9 @@
 ?>
 <?php
 
-include_once('include/config.inc.php');
-include_once('include/services.inc.php');
-include_once('include/triggers.inc.php');
+require_once('include/config.inc.php');
+require_once('include/services.inc.php');
+require_once('include/triggers.inc.php');
 
 $page['title'] = "S_IT_SERVICES";
 $page['file'] = 'services_form.php';
@@ -30,7 +30,7 @@ $page['scripts'] = array('class.calendar.js');
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 
 //---------------------------------- CHECKS ------------------------------------
@@ -168,7 +168,7 @@ if(isset($_REQUEST['saction'])){
 	}
 	if($result){
 		zbx_add_post_js("closeForm('services.php');");
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 	}
 }
 //-------------------------------------------- </ACTIONS> --------------------------------------------
@@ -762,6 +762,6 @@ if(isset($_REQUEST['sform'])){
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

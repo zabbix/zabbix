@@ -27,7 +27,7 @@ $page['hist_arg'] = array();
 $page['scripts'] = array('class.pmaster.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -211,7 +211,7 @@ if (isset($_REQUEST['favobj'])) {
 }
 
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 	exit();
 }
 
@@ -375,5 +375,5 @@ zbx_add_post_js('jqBlink.init();');
 	//]]> -->
 </script>
 <?php
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>
