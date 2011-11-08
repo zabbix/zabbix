@@ -573,7 +573,7 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
-	DBconnect(ZBX_DB_CONNECT_EXIT);
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	DCsync_configuration();
 	DBclose();
 
