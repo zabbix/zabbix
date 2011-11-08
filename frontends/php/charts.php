@@ -32,7 +32,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -100,7 +100,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 ?>
@@ -121,7 +121,7 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
 		navigation_bar_calc('web.graph',$_REQUEST['graphid'], true);
 		jsRedirect('charts.php?graphid=' . $_REQUEST['graphid']);
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--
@@ -217,6 +217,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-include_once('include/config.inc.php');
+require_once('include/config.inc.php');
 require_once('include/triggers.inc.php');
 
 $page['title'] = S_TEST;
@@ -35,7 +35,7 @@ $definedErrorPhrases = array(
 			EXPRESSION_HOST_ITEM_UNKNOWN => S_EXPRESSION_HOST_ITEM_UNKNOWN,
 			EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //----------------------------------------------------------------------
@@ -174,6 +174,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>
