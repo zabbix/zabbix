@@ -314,6 +314,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4275] made server and proxy try to reconnect to the database upon startup (asaveljevs)
  - [ZBX-3988] fixed memory leak in dashboard (Vedmak)
  - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget (pavels)
  - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
