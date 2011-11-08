@@ -49,7 +49,7 @@ static void	process_time_functions()
 	const char		*__function_name = "process_time_functions";
 	char			*sql = NULL;
 	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	int			i;
+	int			i, events_num;
 	DC_TRIGGER		*trigger;
 	DC_TRIGGER		*trigger_info = NULL;
 	zbx_vector_ptr_t	trigger_order;
@@ -81,12 +81,15 @@ static void	process_time_functions()
 				&trigger->value_changed))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 		zbx_free(trigger->expression);
 		zbx_free(trigger->new_error);
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		if (1 == trigger->add_event)
+			events_num++;
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -96,15 +99,22 @@ static void	process_time_functions()
 
 	zbx_free(sql);
 
-	for (i = 0; i < trigger_order.values_num; i++)
+	if (0 != events_num)
 	{
-		trigger = (DC_TRIGGER *)trigger_order.values[i];
+		zbx_uint64_t	eventid;
 
-		if (1 != trigger->add_event)
-			continue;
+		eventid = DBget_maxid_num("events", events_num);
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
-				&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+		for (i = 0; i < trigger_order.values_num; i++)
+		{
+			trigger = (DC_TRIGGER *)trigger_order.values[i];
+
+			if (1 != trigger->add_event)
+				continue;
+
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+		}
 	}
 
 	DBcommit();
@@ -272,7 +282,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
  *             maintenance_to   - [IN] maintenance period stop                *
  *             value_before     - [OUT] trigger value before maintenance      *
  *             value_inside     - [OUT] trigger value inside maintenance      *
- *                                      (only if value_before=value_after)    * 
+ *                                      (only if value_before=value_after)    *
  *             value_after      - [OUT] trigger value after maintenance       *
  *                                                                            *
  * Return value: SUCCEED if found event with OK or PROBLEM statuses           *
@@ -283,7 +293,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
  *                                                                            *
  ******************************************************************************/
 static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int maintenance_to,
-		int *value_before, int *value_inside, int *value_after)
+		unsigned char *value_before, unsigned char *value_inside, unsigned char *value_after)
 {
 	const char	*__function_name = "get_trigger_values";
 
@@ -390,7 +400,7 @@ static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, int
 	DBfree_result(result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() before:%d inside:%d after:%d",
-			__function_name, *value_before, *value_inside, *value_after);
+			__function_name, (int)*value_before, (int)*value_inside, (int)*value_after);
 }
 
 /******************************************************************************
@@ -414,14 +424,19 @@ out:
  ******************************************************************************/
 static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maintenance_to)
 {
+	const char	*__function_name = "generate_events";
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	triggerid;
-	int		value_before, value_inside, value_after;
+	zbx_uint64_t	triggerid, eventid;
+	DC_TRIGGER	*tr = NULL;
+	int		tr_alloc = 0, tr_num = 0, i;
 	zbx_timespec_t	ts;
+	unsigned char	value_before, value_inside, value_after;
 
 	ts.sec = maintenance_to;
 	ts.ns = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select distinct t.triggerid"
@@ -445,10 +460,30 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		if (value_before == value_inside && value_inside == value_after)
 			continue;
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
-				&ts, value_after, TRIGGER_VALUE_CHANGED_NO, 0, 1);
+		if (tr_num == tr_alloc)
+		{
+			tr_alloc += 64;
+			tr = zbx_realloc(tr, tr_alloc * sizeof(DC_TRIGGER));
+		}
+
+		tr[tr_num].triggerid = triggerid;
+		tr[tr_num].new_value = value_after;
+		tr_num++;
 	}
 	DBfree_result(result);
+
+	if (0 != tr_num)
+	{
+		eventid = DBget_maxid_num("events", tr_num);
+
+		for (i = 0; i < tr_num; i++)
+		{
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
+					&ts, tr[i].new_value, TRIGGER_VALUE_CHANGED_NO, 0, 1);
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)

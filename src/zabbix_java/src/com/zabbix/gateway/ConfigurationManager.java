@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,7 +63,7 @@ class ConfigurationManager
 		new ConfigurationParameter(LISTEN_IP, ConfigurationParameter.TYPE_INETADDRESS, null,
 				null,
 				null),
-		new ConfigurationParameter(LISTEN_PORT, ConfigurationParameter.TYPE_INTEGER, 10051,
+		new ConfigurationParameter(LISTEN_PORT, ConfigurationParameter.TYPE_INTEGER, 10052,
 				new IntegerValidator(1024, 32767),
 				null),
 		new ConfigurationParameter(START_POLLERS, ConfigurationParameter.TYPE_INTEGER, 5,
@@ -105,6 +105,6 @@ class ConfigurationManager
 
 	public static String getPackage()
 	{
-		return "com.zabbix.proxy";
+		return "com.zabbix.gateway";
 	}
 }

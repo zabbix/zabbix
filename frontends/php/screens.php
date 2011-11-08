@@ -27,7 +27,7 @@ require_once('include/blocks.inc.php');
 $page['title'] = _('Custom screens');
 $page['file'] = 'screens.php';
 $page['hist_arg'] = array('elementid', 'screenname');
-$page['scripts'] = array('effects.js', 'dragdrop.js', 'class.calendar.js', 'gtlc.js');
+$page['scripts'] = array('class.calendar.js', 'gtlc.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 if (PAGE_TYPE_HTML == $page['type']) {
@@ -282,8 +282,6 @@ else {
 	$screens_wdgt->addItem($element);
 	$screens_wdgt->show();
 
-	$jsmenu = new CPUMenu(null, 170);
-	$jsmenu->insertJavaScript();
 	echo SBR;
 }
 include_once('include/page_footer.php');
