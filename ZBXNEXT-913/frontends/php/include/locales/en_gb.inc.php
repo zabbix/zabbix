@@ -261,7 +261,6 @@
 	'S_VALUE_MAP_DELETED'=>				_('Value map deleted'),
 	'S_CANNNOT_DELETE_VALUE_MAP'=>			_('Cannot delete value map'),
 	'S_VALUE_MAP_UPDATED'=>				_('Value map updated'),
-	'S_CONFIGURATION_OF_ZABBIX'=>			_('Configuration of Zabbix'),
 	'S_CONFIGURATION_OF_ZABBIX_BIG'=>		_('CONFIGURATION OF ZABBIX'),
 	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
@@ -269,8 +268,6 @@
 	'S_IMAGE'=>					_('Image'),
 	'S_OTHER'=>					_('Other'),
 	'S_NOTHING_TO_DO'=>				_('Nothing to do'),
-
-	'S_REGULAR_EXPRESSION'=>			_('Regular expression'),
 	'S_EXPRESSION'=>				_('Expression'),
 
 	'S_CHARACTER_STRING_INCLUDED'=>			_('Character string included'),
@@ -825,9 +822,6 @@
 //	chart4.php
 	'S_CHART4_TIMELINE_DATE_FORMAT'=>	_('d.M'),
 
-//	chart5.php
-	'S_CHART5_TIMELINE_DATE_FORMAT'=>	_('d.M'),
-
 //	chart_bar.php
 	'S_CHARTBAR_HOURLY_DATE_FORMAT'=>		_('Y.m.d H:i'),
 	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		_('Y.m.d'),
@@ -855,14 +849,6 @@
 	'S_REPORT3_MONTHLY_DATE_FORMAT'=>		_('M Y'),
 	'S_REPORT3_DAILY_DATE_FORMAT'=>			_('d M Y'),
 	'S_REPORT3_WEEKLY_DATE_FORMAT'=>		_('d M Y H:i'),
-
-//	services_form.php
-	'S_SERVICES_UPTIME_DATE_FORMAT'=>		_('l H:i'),
-	'S_SERVICES_DOWNTIME_DATE_FORMAT'=>		_('l H:i'),
-	'S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT'=>	_('d M Y H:i'),
-	'S_ADD_SMALL'=>								_('add'),
-	'S_ERROR_ADDING_SERVICE_TIME' => _('Error adding service time'),
-	'S_IS_A_WRONG_TIME_FORMAT' => _('is a wrong time format. Should be from 00:00 to 24:00.'),
 
 //	locales.php
 	'S_CREATE'=>				_('Create'),
@@ -1000,37 +986,13 @@
 
 
 //	services.php
-	'S_ROOT_SMALL'=>			_('root'),
 	'S_IT_SERVICE'=>			_('IT service'),
-	'S_IT_SERVICES'=>			_('IT services'),
-	'S_CONFIGURATION_OF_IT_SERVICES'=>	_('Configuration of IT services'),
-	'S_SERVICE_UPDATED'=>			_('Service updated'),
 	'S_NO_IT_SERVICE_DEFINED'=>		_('No IT services defined.'),
-	'S_CANNOT_UPDATE_SERVICE'=>		_('Cannot update service'),
-	'S_SERVICE_ADDED'=>			_('Service added'),
-	'S_CANNOT_ADD_SERVICE'=>		_('Cannot add service'),
-	'S_SERVICE_DELETED'=>			_('Service deleted'),
-	'S_CANNOT_DELETE_SERVICE'=>		_('Cannot delete service'),
-	'S_PARENT_SERVICE'=>			_('Parent service'),
-	'S_STATUS_CALCULATION'=>		_('Status calculation'),
-	'S_STATUS_CALCULATION_ALGORITHM'=>	_('Status calculation algorithm'),
 	'S_NONE'=>				_('None'),
-	'S_SOFT'=>				_('Soft'),
-	'S_CALCULATE_SLA'=>			_('Calculate SLA'),
-	'S_ACCEPTABLE_SLA_IN_PERCENT'=>		_('Acceptable SLA (in %)'),
-	'S_LINK_TO_TRIGGER_Q'=>			_('Link to trigger?'),
-	'S_SORT_ORDER_0_999'=>			_('Sort order (0->999)'),
 	'S_TRIGGER'=>				_('Trigger'),
 	'S_DELETE'=>				_('Delete'),
 	'S_CLONE'=>				_('Clone'),
 	'S_FULL_CLONE'=>			_('Full clone'),
-	'S_UPTIME'=>				_('Uptime'),
-	'S_DOWNTIME'=>				_('Downtime'),
-	'S_ONE_TIME_DOWNTIME'=>			_('One-time downtime'),
-	'S_NO_TIMES_DEFINED'=>			_('No times defined.'),
-	'S_SERVICE_TIMES'=>			_('Service times'),
-	'S_NEW_SERVICE_TIME'=>			_('New service time'),
-	'S_NOTE'=>				_('Note'),
 	'S_REMOVE'=>				_('Remove'),
 
 	'S_SUNDAY'=>				_('Sunday'),
@@ -1042,19 +1004,7 @@
 	'S_SATURDAY'=>				_('Saturday'),
 
 //	srv_status.php
-	'S_IT_SERVICES_BIG'=>			_('IT SERVICES'),
-	'S_SERVICE'=>				_('Service'),
 	'S_SERVICES'=>				_('Services'),
-	'S_REASON'=>				_('Reason'),
-	'S_TODAY'=>				_('Today'),
-	'S_THIS_WEEK'=>				_('This week'),
-	'S_THIS_YEAR'=>				_('This year'),
-	'S_THIS_MONTH'=>			_('This month'),
-	'S_LAST_24_HOURS'=>			_('Last 24 hours'),
-	'S_LAST_7_DAYS'=>			_('Last 7 days'),
-	'S_LAST_30_DAYS'=>			_('Last 30 days'),
-	'S_LAST_365_DAYS'=>			_('Last 365 days'),
-	'S_CANNOT_FORMAT_TREE_CHECK_LOGIC'=> _('Cannot format Tree. Check logic structure in service links'),
 
 //	triggers.php
 	'S_NO_TRIGGER'=>			_('No trigger'),
@@ -1065,8 +1015,6 @@
 	'S_CANNOT_DELETE_TRIGGERS'=>		_('Cannot delete triggers'),
 	'S_TRIGGER_DELETED'=>			_('Trigger deleted'),
 	'S_CANNOT_DELETE_TRIGGER'=>		_('Cannot delete trigger'),
-	'S_TRIGGER_ADDED'=>			_('Trigger added'),
-	'S_CANNOT_ADD_TRIGGER'=>		_('Cannot add trigger'),
 	'S_SEVERITY'=>				_('Severity'),
 	'S_MIN_SEVERITY'=>			_('Min severity'),
 	'S_DISABLED'=>				_('Disabled'),
@@ -1077,7 +1025,6 @@
 	'S_CHANGE'=>				_('Change'),
 	'S_TRIGGER_UPDATED'=>			_('Trigger updated'),
 	'S_CANNOT_UPDATE_TRIGGER'=>		_('Cannot update trigger'),
-	'S_DEPENDS_ON'=>			_('Depends on'),
 	'S_DEPENDENT'=>				_('Dependent'),
 	'S_URL'=>				_('URL'),
 	'S_CREATE_TRIGGER'=>			_('Create trigger'),
@@ -1175,9 +1122,6 @@
 	'S_UNKNOWN_ACTION'=>		_('Unknown action'),
 	'S_ADDED'=>					_('Added'),
 	'S_UPDATED'=>				_('Updated'),
-	'S_MEDIA_TYPE'=>			_('Media type'),
-	'S_GRAPH_ELEMENT'=>			_('Graph element'),
-	'S_UNKNOWN_RESOURCE'=>		_('Unknown resource'),
 	'S_ALREADY_EXISTS_SMALL'=>	_('already exists'),
 
 //	profile.php
@@ -1391,7 +1335,6 @@
 
 //	Errors
 	'S_DOES_NOT_EXIST_SMALL'=>		_('does not exist'),
-	'S_CANT_FORMAT_TREE'=>			_('Can\'t format Tree'),
 	'S_NO_PERMISSION'=>				_('You do not have permission to perform this operation'),
 	'S_NO_PERMISSIONS_FOR_SCREEN'=>	_('No permissions for screen'),
 	'S_NO_PERMISSIONS_FOR_MAP'=>	_('No permissions for map'),

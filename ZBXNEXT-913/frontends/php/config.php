@@ -25,7 +25,7 @@ require_once('include/regexp.inc.php');
 require_once('include/forms.inc.php');
 
 
-$page['title'] = 'S_CONFIGURATION_OF_ZABBIX';
+$page['title'] = _('Configuration of Zabbix');
 $page['file'] = 'config.php';
 $page['hist_arg'] = array('config');
 

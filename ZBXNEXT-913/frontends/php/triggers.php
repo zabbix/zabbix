@@ -173,7 +173,7 @@ include_once('include/page_header.php');
 		else{
 			$result = API::Trigger()->create($trigger);
 
-			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+			show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 		}
 		if($result)
 			unset($_REQUEST['form']);
@@ -566,7 +566,7 @@ include_once('include/page_header.php');
 //add dependencies {
 			$deps = $trigger['dependencies'];
 			if(count($deps) > 0){
-				$description[] = array(BR(), bold(S_DEPENDS_ON.' : '));
+				$description[] = array(BR(), bold(_('Depends on').' : '));
 				foreach($deps as $dnum => $dep_trigger) {
 					$description[] = BR();
 

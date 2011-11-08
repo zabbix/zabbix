@@ -95,7 +95,7 @@ include_once('include/page_header.php');
 <?php
 	$table = new CTableInfo();
 
-	$header = array(S_OK,S_PROBLEMS,S_DOWNTIME,S_PERCENTAGE,S_SLA);
+	$header = array(S_OK, S_PROBLEMS, _('Downtime'), S_PERCENTAGE, S_SLA);
 
         switch($period){
 			case 'yearly':

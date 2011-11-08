@@ -216,8 +216,7 @@ $ZBX_MENU = array(
 					),
 				array(
 						'url' => 'services.php',
-						'label' => _('IT services'),
-						'sub_pages' => array('services_form.php')
+						'label' => _('IT services')
 					),
 			)
 	),

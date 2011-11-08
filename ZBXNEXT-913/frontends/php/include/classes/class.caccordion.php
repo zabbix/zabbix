@@ -20,45 +20,45 @@
 ?>
 <?php
 /**
- * Description of class
  * Produces Zabbix object for more comfortable usage of jQuery tabbed view
- * @author Aly
  */
-class CAccordion extends CDiv{
+class CAccordion extends CDiv {
 	protected $id = 'accordion';
 	protected $multiView = false;
 
-	public function __construct($data){
-		if(isset($data['id'])) $this->id = $data['id'];
-		if(isset($data['multiview'])) $this->setMultiView($data['multiview']);
-
+	public function __construct($data) {
+		if (isset($data['id'])) {
+			$this->id = $data['id'];
+		}
+		if (isset($data['multiview'])) {
+			$this->setMultiView($data['multiview']);
+		}
 		$this->headers = array();
 		$this->tabs = array();
 
 		parent::__construct();
 		$this->attr('id', zbx_formatDomId($this->id));
-		$this->attr('class','accordion');
+		$this->attr('class', 'accordion');
 	}
 
-	public function setMultiView($multiview){
+	public function setMultiView($multiview) {
 		$this->multiView = $multiview;
 	}
 
-	public function addTab($header, $body){
+	public function addTab($header, $body) {
 		$head = new CTag('h3', 'yes', new CLink($header, '#'));
 		$head->addClass('head');
-
 		parent::addItem($head);
 		parent::addItem(new CDiv($body));
 	}
 
-	public function toString($destroy=true){
-		if($this->multiView){
-			zbx_add_post_js("jQuery('.accordion .head').click(function() { $(this).next().toggle('slow'); return false;}).next().hide();");
+	public function toString($destroy = true) {
+		if ($this->multiView) {
+			zbx_add_post_js("jQuery('.accordion .head').click(function() { $(this).next().toggle('slow'); return false; }).next().hide();");
 		}
-		else{
+		else {
 			zbx_add_post_js('jQuery("#'.$this->id.'").accordion();');
-			zbx_add_post_js('setTimeout(function(){jQuery("#'.$this->id.'").accordion("resize"); }, 1);');
+			zbx_add_post_js('setTimeout(function(){ jQuery("#'.$this->id.'").accordion("resize"); }, 1);');
 		}
 		return parent::toString($destroy);
 	}
