@@ -41,7 +41,7 @@ else{
 	$page['title'] = 'S_LATEST_EVENTS';
 	$page['file'] = 'events.php';
 	$page['hist_arg'] = array('groupid','hostid');
-	$page['scripts'] = array('class.calendar.js','effects.js','dragdrop.js','gtlc.js');
+	$page['scripts'] = array('class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -681,9 +681,6 @@ include_once('include/page_header.php');
 		}
 
 		$table = array($paging, $table, $paging);
-
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
 	}
 
 	$events_wdgt->addItem($table);

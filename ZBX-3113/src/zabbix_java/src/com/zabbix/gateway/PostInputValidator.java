@@ -17,16 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-package com.zabbix.proxy;
+package com.zabbix.gateway;
 
-class HelperFunctionChest
+interface PostInputValidator
 {
-	public static <T> boolean arrayContains(T[] array, T key)
-	{
-		for (T element : array)
-			if (key.equals(element))
-				return true;
-
-		return false;
-	}
+	public void execute(Object value);
 }

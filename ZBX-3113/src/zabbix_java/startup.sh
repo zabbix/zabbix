@@ -4,7 +4,7 @@ cd $(dirname $0)
 source settings.sh
 
 if [ -n "$PID_FILE" -a -e "$PID_FILE" ]; then
-	echo "Zabbix Java Proxy is already running"
+	echo "Zabbix Java Gateway is already running"
 	exit 1
 fi
 
@@ -36,14 +36,14 @@ if [ -n "$START_POLLERS" ]; then
 	ZABBIX_OPTIONS="$ZABBIX_OPTIONS -Dzabbix.startPollers=$START_POLLERS"
 fi
 
-COMMAND_LINE="$JAVA $JAVA_OPTIONS -classpath $CLASSPATH $ZABBIX_OPTIONS com.zabbix.proxy.JavaProxy"
+COMMAND_LINE="$JAVA $JAVA_OPTIONS -classpath $CLASSPATH $ZABBIX_OPTIONS com.zabbix.gateway.JavaGateway"
 
 if [ -n "$PID_FILE" ]; then
 	PID=$(/bin/bash -c "$COMMAND_LINE > /dev/null 2>&1 & echo \$!")
 	if ps -p $PID > /dev/null 2>&1; then
 		echo $PID > $PID_FILE
 	else
-		echo "Zabbix Java Proxy did not start"
+		echo "Zabbix Java Gateway did not start"
 		exit 1
 	fi
 else

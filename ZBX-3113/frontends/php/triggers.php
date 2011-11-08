@@ -578,7 +578,7 @@ include_once('include/page_header.php');
 
 					array_pop($description);
 					$description[] = ' : ';
-					$description[] = expand_trigger_description_by_data($dep_trigger);
+					$description[] = $dep_trigger['description'];
 				}
 			}
 // } add dependencies
