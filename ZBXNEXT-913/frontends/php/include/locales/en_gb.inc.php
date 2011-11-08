@@ -586,7 +586,6 @@
 	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
 	'S_ACTIVE'=>						_('Active'),
 	'S_NOT_SUPPORTED'=>					_('Not supported'),
-	'S_SCRIPT'=>						_('Script'),
 	'S_UNITS'=>						_('Units'),
 	'S_UPDATE_INTERVAL_IN_SEC'=>				_('Update interval (in sec)'),
 	'S_KEEP_HISTORY_IN_DAYS'=>				_('Keep history (in days)'),
@@ -984,9 +983,7 @@
 // slides.php
 	'S_CUSTOM_SLIDES' =>			_('Custom slides'),
 
-
 //	services.php
-	'S_IT_SERVICE'=>			_('IT service'),
 	'S_NO_IT_SERVICE_DEFINED'=>		_('No IT services defined.'),
 	'S_NONE'=>				_('None'),
 	'S_TRIGGER'=>				_('Trigger'),
@@ -994,17 +991,6 @@
 	'S_CLONE'=>				_('Clone'),
 	'S_FULL_CLONE'=>			_('Full clone'),
 	'S_REMOVE'=>				_('Remove'),
-
-	'S_SUNDAY'=>				_('Sunday'),
-	'S_MONDAY'=>				_('Monday'),
-	'S_TUESDAY'=>				_('Tuesday'),
-	'S_WEDNESDAY'=>				_('Wednesday'),
-	'S_THURSDAY'=>				_('Thursday'),
-	'S_FRIDAY'=>				_('Friday'),
-	'S_SATURDAY'=>				_('Saturday'),
-
-//	srv_status.php
-	'S_SERVICES'=>				_('Services'),
 
 //	triggers.php
 	'S_NO_TRIGGER'=>			_('No trigger'),
