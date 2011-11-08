@@ -1144,7 +1144,7 @@ Copt::memoryPick();
 					self::exception();
 				}
 
-				if(isset($host['profile']) && !empty($host['extendedProfile'])){
+				if(isset($host['profile']) && !empty($host['profile'])){
 					$fields = array_keys($host['profile']);
 					$fields = implode(', ', $fields);
 
