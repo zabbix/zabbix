@@ -1,5 +1,6 @@
 Changes for 1.8.9rc1
 
+ - [ZBX-4159] fixed problem with generating new ids for historical tables (Vedmak)
  - [ZBX-3988] fixed memory leak in dashboard (Vedmak)
  - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget (pavels)
  - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
