@@ -1253,6 +1253,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	switch (errcode)
 	{
+		case 1002:	/* ORA-01002: fetch out of sequence */
 		case 3113:	/* ORA-03113: end-of-file on communication channel */
 		case 3114:	/* ORA-03114: not connected to ORACLE */
 			zabbix_errlog(ERR_Z3006, errcode, errbuf);
