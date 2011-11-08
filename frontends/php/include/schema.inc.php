@@ -2210,12 +2210,6 @@ return array(
 				'length' => 10,
 				'default' => '1000',
 			),
-			'ns_support' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
 			'severity_color_0' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,

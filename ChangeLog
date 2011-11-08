@@ -11,6 +11,7 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-3113] made nanoseconds patch mandatory for upgrading from 1.8 to 2.0 (asaveljevs)
  - [ZBX-3468] fixed error messages and warnings with enabled SQLite3 support in front-end (Alexei)
  - [ZBX-4056] fixed dependencies not added when template linked to host (Vedmak)
  - [ZBX-4315] fixed the 'close' link in the tooltips (pavels)
