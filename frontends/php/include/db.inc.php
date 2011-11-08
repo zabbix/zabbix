@@ -836,8 +836,8 @@ else {
 
 		$found = false;
 		do{
-			$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
-			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
+			$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 
 			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 			if(!is_resource($db_select)) return false;
@@ -861,7 +861,7 @@ else {
 			}
 			else{
 				$ret1 = $row['nextid'];
-				if((bccomp($ret1,$min) < 0) || !(bccomp($ret1,$max) < 0)) {
+				if((bccomp($ret1, $min, 0) < 0) || !(bccomp($ret1, $max, 0) < 0)) {
 					DBexecute('DELETE FROM ids WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 					continue;
 				}
@@ -876,7 +876,7 @@ else {
 				}
 				else{
 					$ret2 = $row["nextid"];
-					if(bccomp(bcadd($ret1,1),$ret2) == 0){
+					if(bccomp(bcadd($ret1, 1, 0), $ret2, 0) == 0){
 						$found = true;
 					}
 				}
@@ -894,7 +894,7 @@ else {
 		$nodeid = ($nodeid == 0)?get_current_nodeid(false):$nodeid;
 
 		$id=remove_nodes_from_id($id);
-		$id=bcadd($id,bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),0);
+		$id=bcadd($id, bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),0);
 	return $id;
 	}
 
@@ -1085,7 +1085,7 @@ else {
 
 			if ($res) {
 				$maxNextId = bcadd($res['nextid'], $count);
-				if (bccomp($maxNextId, self::$maxNodeId) == 1 || bccomp($maxNextId, self::$minNodeId) == -1) {
+				if (bccomp($maxNextId, self::$maxNodeId, 0) == 1 || bccomp($maxNextId, self::$minNodeId, 0) == -1) {
 					$nextid = self::refreshIds($table, $count);
 				}
 				else {
@@ -1098,7 +1098,7 @@ else {
 						self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 					}
 
-					$nextid = bcadd($res['nextid'], 1);
+					$nextid = bcadd($res['nextid'], 1, 0);
 				}
 			}
 			else {
@@ -1140,8 +1140,8 @@ else {
 
 			$nextid = (!$row || is_null($row['id'])) ? self::$minNodeId : $row['id'];
 
-			$maxNextId = bcadd($nextid, $count);
-			if (bccomp($maxNextId, self::$maxNodeId) == 1) {
+			$maxNextId = bcadd($nextid, $count, 0);
+			if (bccomp($maxNextId, self::$maxNodeId, 0) == 1) {
 				self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID greater than maximum allowed for table "'.$table.'"');
 			}
 
@@ -1151,7 +1151,7 @@ else {
 				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 			}
 
-			$nextid = bcadd($nextid, 1);
+			$nextid = bcadd($nextid, 1, 0);
 
 			return $nextid;
 		}
@@ -1165,8 +1165,8 @@ else {
 
 			if(is_null(self::$nodeId)){
 				self::$nodeId = get_current_nodeid(false);
-				self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
-				self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
+				self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+				self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 			}
 
 			if(is_null($table))
