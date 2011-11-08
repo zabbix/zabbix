@@ -59,9 +59,9 @@ class testMetrics extends CZabbixTest
 
 
 
-			array('vfs.dev.read[]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
-			array('vfs.dev.read[sda]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
-			array('vfs.dev.read[sda,,avg1]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('vfs.dev.read[]',	TYPE_UINT,	'',		-1,	-1),
+			array('vfs.dev.read[sda]',	TYPE_UINT,	'',	-1,	-1),
+			array('vfs.dev.read[sda,,avg1]',	TYPE_UINT,	'',	-1,	-1),
 			array('vfs.dev.read[sda,bytes]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
 			array('vfs.dev.read[sda,bytes,avg1]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
 			array('vfs.dev.read[sda,bytes,avg5]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
@@ -92,9 +92,9 @@ class testMetrics extends CZabbixTest
 			array('vfs.dev.read[sda,sps,avg15]',	TYPE_UINT,	'',		-1,	-1),
 			array('vfs.dev.read[sda,sps,avg15,wrong_param]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
 			array('vfs.dev.read[sda,sps,wrong_param]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
-			array('vfs.dev.write[]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
-			array('vfs.dev.write[sda]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
-			array('vfs.dev.write[sda,,avg1]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
+			array('vfs.dev.write[]',	TYPE_UINT,	'',		-1,	-1),
+			array('vfs.dev.write[sda]',	TYPE_UINT,	'',		-1,	-1),
+			array('vfs.dev.write[sda,,avg1]',	TYPE_UINT,	'',		-1,	-1),
 			array('vfs.dev.write[sda,bytes]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
 			array('vfs.dev.write[sda,bytes,avg1]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
 			array('vfs.dev.write[sda,bytes,avg5]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
