@@ -806,8 +806,8 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
 
 		$found = false;
 		do{
-			$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
-			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
+			$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 
 			$dbSelect = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 
@@ -848,7 +848,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
 				}
 				else {
 					$ret2 = $row["nextid"];
-					if (bccomp(bcadd($ret1, 1), $ret2) == 0) {
+					if (bccomp(bcadd($ret1, 1, 0), $ret2, 0) == 0) {
 						$found = true;
 					}
 				}
@@ -1196,8 +1196,8 @@ class DB {
 
 		if(is_null(self::$nodeId)){
 			self::$nodeId = get_current_nodeid(false);
-			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
-			self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
+			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+			self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 		}
 
 		if (is_null($table))
