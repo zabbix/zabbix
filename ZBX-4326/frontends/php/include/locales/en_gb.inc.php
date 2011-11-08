@@ -990,6 +990,8 @@
 	'S_CANNOT_LINK_TEMPLATE'=>	'Cannot link template',
 	'S_UNLINK_AND_CLEAR'=>			'Unlink and clear',
 	'S_MONITORED_BY_PROXY'=>		'Monitored by proxy',
+	'S_INCORRECT_EXTENDED_PROFILE_FIELD' => 'Incorrect extended profile field',
+	'S_INCORRECT_PROFILE_FIELD' => 'Incorrect profile field',
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
 	'S_USE_EXTENDED_PROFILE'=>		'Use extended profile',
