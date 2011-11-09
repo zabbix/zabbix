@@ -26,7 +26,7 @@ $page['file'] = 'popup_right.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -139,6 +139,6 @@ function check_all(value) {
 </script>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

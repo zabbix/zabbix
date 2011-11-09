@@ -314,6 +314,7 @@ clean:
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
+
 #define OP_EQ	0
 #define OP_NE	1
 #define OP_GT	2
@@ -1531,6 +1532,7 @@ clean:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
+
 #define ZBX_FUNC_STR		1
 #define ZBX_FUNC_REGEXP		2
 #define ZBX_FUNC_IREGEXP	3
@@ -2188,7 +2190,7 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
 {
 	const char	*__function_name = "add_value_suffix";
 
-	struct tm	*local_time = NULL;
+	struct tm	*local_time;
 	time_t		time;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' units:'%s' value_type:%d",

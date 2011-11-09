@@ -31,7 +31,7 @@ $page['scripts'] = array('class.cviewswitcher.js');
 
 ob_start();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 if ($USER_DETAILS['alias'] == ZBX_GUEST_USER) {
 	access_deny();
@@ -192,5 +192,5 @@ $usersView = new CView('administration.users.edit', $data);
 $usersView->render();
 $usersView->show();
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

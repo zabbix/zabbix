@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	include_once "include/config.inc.php";
+	require_once "include/config.inc.php";
 	require_once "include/hosts.inc.php";
 	require_once "include/forms.inc.php";
 
@@ -28,7 +28,7 @@
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
-	include_once ('include/page_header.php');
+	require_once ('include/page_header.php');
 
 //		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields=array(
@@ -69,5 +69,5 @@ if(isset($_REQUEST['execute'])){
 
 ?>
 <?php
-include_once "include/page_footer.php";
+require_once "include/page_footer.php";
 ?>

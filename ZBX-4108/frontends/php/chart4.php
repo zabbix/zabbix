@@ -26,7 +26,7 @@ $page['file']	= 'chart4.php';
 // $page['title']	= "S_CHART";
 $page['type']	= PAGE_TYPE_IMAGE;
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -186,6 +186,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

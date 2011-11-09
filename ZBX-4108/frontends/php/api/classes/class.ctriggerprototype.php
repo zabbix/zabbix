@@ -1117,7 +1117,7 @@ COpt::memoryPick();
 			$this->createReal($triggers);
 
 			$createdTriggers = $this->get(array(
-				'triggerids' => array_keys($triggers),
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_REFER,
 				'selectItems' => API_OUTPUT_EXTEND
 			));
@@ -1136,8 +1136,10 @@ COpt::memoryPick();
 				}
 			}
 
-			foreach($triggers as $trigger)
+			foreach($triggers as $trigger) {
 				$this->inherit($trigger);
+				info(_s('Trigger "%1$s:%2$s" created.', $trigger['description'], $trigger['expression']));
+			}
 
 			return array('triggerids' => $triggerids);
 	}
@@ -1194,7 +1196,7 @@ COpt::memoryPick();
 			$this->updateReal($triggers);
 
 			$updatedTriggers = $this->get(array(
-				'triggerids' => array_keys($triggers),
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_REFER,
 				'selectItems' => API_OUTPUT_EXTEND
 			));
@@ -1311,7 +1313,7 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach($del_triggers as $triggerid => $trigger){
-				info(_s('Trigger prototype [%1$s:%2$s] deleted.', $trigger['description'], explode_exp($trigger['expression'])));
+				info(_s('Trigger prototype "%1$s:%2$s" deleted.', $trigger['description'], explode_exp($trigger['expression'])));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 			}
 
@@ -1342,8 +1344,6 @@ COpt::memoryPick();
 				'values' => array('expression' => $expression),
 				'where' => array('triggerid' => $triggerid)
 			));
-
-			info(sprintf(_('Trigger [%1$s:%2$s] created.'), $trigger['description'], $trigger['expression']));
 		}
 
 	}

@@ -27,7 +27,7 @@ $page['hist_arg'] = array();
 
 $page['type'] = detect_page_type(PAGE_TYPE_JSON);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields = array();
@@ -171,6 +171,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

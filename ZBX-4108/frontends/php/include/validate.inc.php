@@ -580,10 +580,10 @@
 		if (empty($msg)) {
 			$msg = _('Zabbix has received an incorrect request.');
 		}
-		include_once('include/page_header.php');
+		require_once('include/page_header.php');
 		unset_all();
 		show_error_message($msg);
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 	}
 
 	function check_fields(&$fields, $show_messages = true) {

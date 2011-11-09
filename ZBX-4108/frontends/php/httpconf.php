@@ -28,7 +28,7 @@ $page['title'] = _('Configuration of Web monitoring');
 $page['file'] = 'httpconf.php';
 $page['hist_arg'] = array('groupid','hostid');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -432,5 +432,5 @@ else {
 	$httpView->render();
 	$httpView->show();
 }
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

@@ -33,7 +33,7 @@ if($page['type'] == PAGE_TYPE_HTML){
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 // js templates
 require_once('include/views/js/general.script.confirm.js.php');
@@ -72,7 +72,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -740,6 +740,6 @@ require_once('include/views/js/general.script.confirm.js.php');
 	zbx_add_post_js('jqBlink.init();');
 	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

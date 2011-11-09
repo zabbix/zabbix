@@ -28,7 +28,7 @@ $page['title'] = 'S_CONFIGURATION_OF_TRIGGERS';
 $page['file'] = 'triggers.php';
 $page['hist_arg'] = array('hostid','groupid');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -105,15 +105,19 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go','none');
 
 // PERMISSIONS
-	if(get_request('triggerid', false)){
+	if (get_request('triggerid', false)) {
 		$options = array(
 			'triggerids' => $_REQUEST['triggerid'],
-			'editable' => 1,
+			'editable' => true,
+			'preservekeys' => true,
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
 		);
 		$triggers = API::Trigger()->get($options);
-		if(empty($triggers)) access_deny();
+		if (empty($triggers)) {
+			access_deny();
+		}
 	}
-	else if(get_request('hostid', 0) > 0){
+	elseif (get_request('hostid', 0) > 0) {
 		$options = array(
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -121,10 +125,11 @@ include_once('include/page_header.php');
 			'editable' => 1
 		);
 		$hosts = API::Host()->get($options);
-		if(empty($hosts)) access_deny();
+		if (empty($hosts)) {
+			access_deny();
+		}
 	}
-?>
-<?php
+
 
 	$showdisabled = get_request('showdisabled', 0);
 	CProfile::update('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
@@ -406,8 +411,6 @@ include_once('include/page_header.php');
 		$_REQUEST['go'] = 'none';
 	}
 
-?>
-<?php
 
 	$options = array(
 		'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
@@ -425,8 +428,7 @@ include_once('include/page_header.php');
 		$_REQUEST['triggerid'] = $pageFilter->triggerid;
 	}
 
-?>
-<?php
+
 	$triggers_wdgt = new CWidget();
 
 	$form = new CForm('get');
@@ -437,8 +439,8 @@ include_once('include/page_header.php');
 	}
 
 	$triggers_wdgt->addPageHeader(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
-?>
-<?php
+
+
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['g_triggerid'])){
 		$triggers_wdgt->addItem(insert_mass_update_trigger_form());
 	}
@@ -670,9 +672,8 @@ include_once('include/page_header.php');
 	}
 
 	$triggers_wdgt->show();
-?>
-<?php
 
-include_once('include/page_footer.php');
+
+require_once('include/page_footer.php');
 
 ?>

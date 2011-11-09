@@ -31,7 +31,7 @@ $page['scripts'] = array('class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -71,7 +71,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -261,5 +261,5 @@ include_once('include/page_header.php');
 	zbx_add_post_js('timeControl.processObjects();');
 
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>
