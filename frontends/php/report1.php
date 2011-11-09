@@ -26,7 +26,7 @@
 	$page['file'] = 'report1.php';
 	$page['hist_arg'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -48,6 +48,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

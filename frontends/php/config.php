@@ -29,7 +29,7 @@ $page['title'] = 'S_CONFIGURATION_OF_ZABBIX';
 $page['file'] = 'config.php';
 $page['hist_arg'] = array('config');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 	$fields=array(
@@ -1188,5 +1188,5 @@ include_once('include/page_header.php');
 
 $cnf_wdgt->show();
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

@@ -34,7 +34,7 @@ if (PAGE_TYPE_HTML == $page['type']) {
 
 define('GET_PARAM_NAME', 'mapname');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -81,7 +81,7 @@ if (isset($_REQUEST['favobj'])) {
 	}
 }
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 	exit();
 }
 
@@ -179,5 +179,5 @@ $map_wdgt->addItem($table);
 $map_wdgt->addPageHeader(_('NETWORK MAPS'), array($icon, $fs_icon));
 $map_wdgt->show();
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

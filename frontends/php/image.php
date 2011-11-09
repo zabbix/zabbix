@@ -26,7 +26,7 @@
 	$page['title']	= 'S_IMAGE';
 	$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -50,7 +50,7 @@ include_once('include/page_header.php');
 
 	if(!($row = get_image_by_imageid($_REQUEST['imageid']))){
 		error('Incorrect image index');
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 	}
 
 	$source = imagecreatefromstring($row['image']);
@@ -105,6 +105,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once "include/page_footer.php";
+require_once "include/page_footer.php";
 
 ?>

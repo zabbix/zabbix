@@ -784,9 +784,6 @@
 //	chart4.php
 	'S_CHART4_TIMELINE_DATE_FORMAT'=>	_('d.M'),
 
-//	chart5.php
-	'S_CHART5_TIMELINE_DATE_FORMAT'=>	_('d.M'),
-
 //	chart_bar.php
 	'S_CHARTBAR_HOURLY_DATE_FORMAT'=>		_('Y.m.d H:i'),
 	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		_('Y.m.d'),
@@ -826,7 +823,6 @@
 //	locales.php
 	'S_CREATE'=>				_('Create'),
 
-
 //	report4.php
 	'S_NOTIFICATIONS_BIG'=>			_('NOTIFICATIONS'),
 	'S_IT_NOTIFICATIONS'=>			_('Notification report'),
@@ -834,12 +830,6 @@
 	'S_REPORT4_MONTHLY_DATE_FORMAT'=>	_('M Y'),
 	'S_REPORT4_DAILY_DATE_FORMAT'=>		_('d M Y'),
 	'S_REPORT4_WEEKLY_DATE_FORMAT'=>	_('d M Y H:i'),
-
-//	report5.php
-	'S_TRIGGERS_TOP_100'=>			_('Most busy triggers top 100'),
-	'S_TRIGGERS_TOP_100_BIG'=>		_('MOST BUSY TRIGGERS TOP 100'),
-	'S_NUMBER_OF_STATUS_CHANGES'=>		_('Number of status changes'),
-	'S_WEEK'=>				_('Week'),
 
 //	report6.php
 	'S_BAR_REPORTS'=>			_('Bar reports'),

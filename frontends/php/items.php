@@ -29,7 +29,7 @@ $page['file'] = 'items.php';
 $page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 // needed type to know which field name to use
@@ -230,14 +230,15 @@ switch($itemType) {
 	if(get_request('itemid', false)){
 		$options = array(
 			'itemids' => $_REQUEST['itemid'],
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 			'output' => API_OUTPUT_SHORTEN,
-			'editable' => 1
+			'editable' => true,
+			'preservekeys' => true,
 		);
 		$item = API::Item()->get($options);
 		if(empty($item)) access_deny();
 	}
-	else if(get_request('hostid', 0) > 0){
+	elseif(get_request('hostid', 0) > 0){
 		$options = array(
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -247,8 +248,8 @@ switch($itemType) {
 		$hosts = API::Host()->get($options);
 		if(empty($hosts)) access_deny();
 	}
-?>
-<?php
+
+
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
@@ -257,7 +258,7 @@ switch($itemType) {
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -357,8 +358,8 @@ switch($itemType) {
 	}
 // } SUBFILTERS
 
-?>
-<?php
+
+
 	$result = 0;
 	if(isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex'])){
 		$_REQUEST['delay_flex'] = get_request('delay_flex',array());
@@ -366,7 +367,7 @@ switch($itemType) {
 			unset($_REQUEST['delay_flex'][$val]);
 		}
 	}
-	else if(isset($_REQUEST['add_delay_flex'])&&isset($_REQUEST['new_delay_flex'])){
+	elseif(isset($_REQUEST['add_delay_flex'])&&isset($_REQUEST['new_delay_flex'])){
 		$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 		array_push($_REQUEST['delay_flex'],$_REQUEST['new_delay_flex']);
 	}
@@ -381,7 +382,7 @@ switch($itemType) {
 		unset($_REQUEST['itemid']);
 		unset($_REQUEST['form']);
 	}
-	else if(isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])){
+	elseif(isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])){
 		unset($_REQUEST['itemid']);
 		$_REQUEST['form'] = 'clone';
 	}
@@ -478,7 +479,7 @@ switch($itemType) {
 			unset($_REQUEST['form']);
 		}
 	}
-	else if(isset($_REQUEST['del_history'])&&isset($_REQUEST['itemid'])){
+	elseif(isset($_REQUEST['del_history'])&&isset($_REQUEST['itemid'])){
 		// cleaning history for one item
 		$result = false;
 		DBstart();
@@ -496,7 +497,7 @@ switch($itemType) {
 		show_messages($result, _('History cleared'), S_CANNOT_CLEAR_HISTORY);
 
 	}
-	else if(isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])){
+	elseif(isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])){
 		$delay_flex = get_request('delay_flex');
 		if(!is_null($delay_flex)){
 			$db_delay_flex = '';
@@ -563,7 +564,7 @@ switch($itemType) {
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
 	}
 	// if button "Do" is pressed
-	else if(isset($_REQUEST['register'])){
+	elseif(isset($_REQUEST['register'])){
 		// getting data about how item should look after update or creation
 		$item = array(
 				'name'	=> get_request('name'),
@@ -647,7 +648,7 @@ switch($itemType) {
 		}
 	}
 // ----- GO -----
-	else if(($_REQUEST['go'] == 'activate') && isset($_REQUEST['group_itemid'])){
+	elseif(($_REQUEST['go'] == 'activate') && isset($_REQUEST['group_itemid'])){
 		global $USER_DETAILS;
 
 		$group_itemid = $_REQUEST['group_itemid'];
@@ -657,7 +658,7 @@ switch($itemType) {
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_ITEMS_ACTIVATED, null);
 	}
-	else if(($_REQUEST['go'] == 'disable') && isset($_REQUEST['group_itemid'])){
+	elseif(($_REQUEST['go'] == 'disable') && isset($_REQUEST['group_itemid'])){
 		global $USER_DETAILS;
 
 		$group_itemid = $_REQUEST['group_itemid'];
@@ -698,7 +699,7 @@ switch($itemType) {
 			show_error_message(_('No target selected'));
 		}
 	}
-	else if(($_REQUEST['go'] == 'clean_history') && isset($_REQUEST['group_itemid'])){
+	elseif(($_REQUEST['go'] == 'clean_history') && isset($_REQUEST['group_itemid'])){
 		// clean history for selected items
 		DBstart();
 		$go_result = delete_history_by_itemid($_REQUEST['group_itemid']);
@@ -718,7 +719,7 @@ switch($itemType) {
 		$go_result = DBend($go_result);
 		show_messages($go_result, _('History cleared'), $go_result);
 	}
-	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
+	elseif(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
 		global $USER_DETAILS;
 
 		$go_result = true;
@@ -738,7 +739,7 @@ switch($itemType) {
 				error(S_ITEM.SPACE."'".$item['hostname'].':'.itemName($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_TEMPLATED_ITEM.')');
 				continue;
 			}
-			else if($item['type'] == ITEM_TYPE_HTTPTEST) {
+			elseif($item['type'] == ITEM_TYPE_HTTPTEST) {
 				unset($group_itemid[$item['itemid']]);
 				error(S_ITEM.SPACE."'".$item['hostname'].':'.itemName($item)."'".SPACE.S_CANNOT_DELETE_ITEM.SPACE.'('.S_WEB_ITEM.')');
 				continue;
@@ -759,8 +760,8 @@ switch($itemType) {
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
-?>
-<?php
+
+
 	$items_wdgt = new CWidget();
 
 	$form = new CForm('get');
@@ -777,10 +778,10 @@ switch($itemType) {
 	if(isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone'))){
 		$items_wdgt->addItem(insert_item_form());
 	}
-	else if((($_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) && isset($_REQUEST['group_itemid'])){
+	elseif((($_REQUEST['go'] == 'massupdate') || isset($_REQUEST['massupdate'])) && isset($_REQUEST['group_itemid'])){
 		$items_wdgt->addItem(insert_mass_update_item_form());
 	}
-	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_itemid'])){
+	elseif(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_itemid'])){
 		$items_wdgt->addItem(insert_copy_elements_to_forms('group_itemid'));
 	}
 	else{
@@ -1098,7 +1099,7 @@ switch($itemType) {
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
 					$tstatus = new CSpan(S_DISABLED, 'disabled');
 				}
-				else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
+				elseif($trigger['status'] == TRIGGER_STATUS_ENABLED){
 					$tstatus = new CSpan(S_ENABLED, 'enabled');
 				}
 
@@ -1224,5 +1225,7 @@ switch($itemType) {
 	$items_wdgt->show();
 
 
-include_once('include/page_footer.php');
+
+require_once('include/page_footer.php');
+
 ?>

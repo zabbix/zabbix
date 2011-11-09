@@ -1298,10 +1298,22 @@ Copt::memoryPick();
 
 		}
 
+		$inventoryFields = getHostInventories();
+		$inventoryFields = zbx_objectValues($inventoryFields, 'db_field');
+
 		$hostNames = array();
-		foreach ($hosts as $inum => &$host) {
+		foreach ($hosts as &$host) {
 			if (!check_db_fields($hostDBfields, $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for host "%s".', isset($host['host']) ? $host['host'] : ''));
+			}
+
+			if (isset($host['inventory']) && !empty($host['inventory'])) {
+				$fields = array_keys($host['inventory']);
+				foreach ($fields as $field) {
+					if (!in_array($field, $inventoryFields)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect inventory field "%s".', $field));
+					}
+				}
 			}
 
 			if ($update || $delete) {
@@ -1372,7 +1384,7 @@ Copt::memoryPick();
 					if (zbx_empty(trim($host['name']))) {
 						if (!isset($host['host'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Visible name cannot be empty if host name is missing.'));
-		}
+						}
 						$host['name'] = $host['host'];
 					}
 				}
@@ -1416,19 +1428,19 @@ Copt::memoryPick();
 
 				$hostsExists = $this->get($options);
 
-			foreach ($hostsExists as $exnum => $hostExists) {
+				foreach ($hostsExists as $exnum => $hostExists) {
 					if (isset($hostNames['host'][$hostExists['host']])) {
 						if (!$update || bccomp($hostExists['hostid'], $hostNames['host'][$hostExists['host']]) != 0) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same name "%s" already exists.', $hostExists['host']));
-				}
-			}
+							}
+						}
 
 					if (isset($hostNames['name'][$hostExists['name']])) {
 						if (!$update || bccomp($hostExists['hostid'], $hostNames['name'][$hostExists['name']]) != 0) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with the same visible name "%s" already exists.', $hostExists['name']));
+						}
+					}
 				}
-			}
-		}
 
 				$templatesExists = API::Template()->get($options);
 

@@ -1088,6 +1088,7 @@ function triggerExpression($trigger, $html, $template=false, $resolve_macro=fals
 			$sql = 'SELECT i.itemid, i.value_type '.
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
+					' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
 					' AND h.host='.zbx_dbstr($exprPart['host']).
 					' AND h.hostid=i.hostid'.
 					' AND '.DBin_node('i.itemid');

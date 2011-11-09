@@ -26,7 +26,7 @@
 	$page['file'] = 'nodes.php';
 	$page['hist_arg'] = array();
 
-	include_once('include/page_header.php');
+	require_once('include/page_header.php');
 ?>
 <?php
 	$fields=array(
@@ -244,5 +244,5 @@
 	$nodes_wdgt->show();
 
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

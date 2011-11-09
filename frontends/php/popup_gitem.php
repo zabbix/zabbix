@@ -30,7 +30,7 @@ $page['file'] = 'popup_gitem.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -275,6 +275,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

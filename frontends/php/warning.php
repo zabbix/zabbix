@@ -51,7 +51,7 @@ $refresh_rate = 30; //seconds
 //	clear_messages();
 CWebUser::$data['refresh'] = $refresh_rate;
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 unset($USER_DETAILS);
 
@@ -80,5 +80,5 @@ unset($USER_DETAILS);
 	echo SBR;
 ?>
 <?php
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

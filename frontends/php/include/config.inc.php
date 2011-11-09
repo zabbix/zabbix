@@ -98,8 +98,8 @@ require_once('include/profiles.inc.php');
 require_once('conf/maintenance.inc.php');
 // abc sorting
 require_once('include/acknow.inc.php');
-include_once('include/actions.inc.php');
-include_once('include/discovery.inc.php');
+require_once('include/actions.inc.php');
+require_once('include/discovery.inc.php');
 require_once('include/events.inc.php');
 require_once('include/graphs.inc.php');
 require_once('include/hosts.inc.php');
@@ -230,7 +230,7 @@ else {
 
 if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 	if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
-		include_once('include/locales/en_gb.inc.php');
+		require_once('include/locales/en_gb.inc.php');
 		process_locales();
 
 		include('index.php');
@@ -280,7 +280,7 @@ else {
 	$USER_DETAILS = CWebUser::$data;
 }
 
-include_once('include/locales/en_gb.inc.php');
+require_once('include/locales/en_gb.inc.php');
 process_locales();
 set_zbx_locales();
 
@@ -295,20 +295,20 @@ if ((isset($DENY_GUI) || isset($show_setup) || isset($show_warning)) && PAGE_TYP
 
 if (isset($DENY_GUI)) {
 	unset($show_warning);
-	include_once('warning.php');
+	require_once('warning.php');
 }
 
 if (isset($show_setup)) {
 	unset($show_setup);
-	include_once('setup.php');
+	require_once('setup.php');
 }
 elseif (isset($show_warning)) {
 	unset($show_warning);
-	include_once('warning.php');
+	require_once('warning.php');
 }
 
 function access_deny() {
-	include_once('include/page_header.php');
+	require_once('include/page_header.php');
 
 	if (CWebUser::$data['alias'] != ZBX_GUEST_USER) {
 		show_error_message(S_NO_PERMISSIONS);
@@ -332,7 +332,7 @@ function access_deny() {
 		$table->setFooter($footer,'footer');
 		$table->show();
 	}
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 }
 
 function detect_page_type($default = PAGE_TYPE_HTML) {
@@ -553,9 +553,9 @@ function clear_messages($count = null) {
 }
 
 function fatal_error($msg) {
-	include_once('include/page_header.php');
+	require_once('include/page_header.php');
 	show_error_message($msg);
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 }
 
 function get_tree_by_parentid($parentid, &$tree, $parent_field, $level = 0) {

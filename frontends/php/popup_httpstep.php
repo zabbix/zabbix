@@ -26,7 +26,7 @@ $page['file'] = 'popup_httpstep.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -56,5 +56,5 @@ if (!empty($httpPopupView)) {
 	$httpPopupView->show();
 }
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

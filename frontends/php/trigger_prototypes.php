@@ -28,7 +28,7 @@ $page['title'] = 'S_CONFIGURATION_OF_TRIGGERS';
 $page['file'] = 'trigger_prototypes.php';
 $page['hist_arg'] = array('parent_discoveryid');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -104,22 +104,38 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go','none');
 
 // PERMISSIONS
-	if(get_request('parent_discoveryid')){
+	if (get_request('parent_discoveryid')) {
 		$options = array(
 			'itemids' => $_REQUEST['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
-			'editable' => 1
+			'editable' => true,
+			'preservekeys' => true
 		);
 		$discovery_rule = API::DiscoveryRule()->get($options);
 		$discovery_rule = reset($discovery_rule);
-		if(!$discovery_rule) access_deny();
+		if(!$discovery_rule) {
+			access_deny();
+		}
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
+
+		if (isset($_REQUEST['triggerid'])) {
+			$options = array(
+				'triggerids' => $_REQUEST['triggerid'],
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => true,
+				'preservekeys' => true
+			);
+			$triggerPrototype = API::TriggerPrototype()->get($options);
+			if (empty($triggerPrototype)) {
+				access_deny();
+			}
+		}
 	}
 	else{
 		access_deny();
 	}
-?>
-<?php
+
+
 	$showdisabled = get_request('showdisabled', 0);
 	CProfile::update('web.triggers.showdisabled', $showdisabled, PROFILE_TYPE_INT);
 
@@ -299,8 +315,8 @@ include_once('include/page_header.php');
 		$_REQUEST['go'] = 'none';
 	}
 
-?>
-<?php
+
+
 	$triggers_wdgt = new CWidget();
 
 	$form = new CForm('get');
@@ -312,8 +328,8 @@ include_once('include/page_header.php');
 	}
 
 	$triggers_wdgt->addPageHeader(S_CONFIGURATION_OF_TRIGGERS_PROTOTYPES_BIG, $form);
-?>
-<?php
+
+
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['g_triggerid'])){
 		$triggers_wdgt->addItem(insert_mass_update_trigger_form());
 	}
@@ -467,9 +483,9 @@ include_once('include/page_header.php');
 	}
 
 	$triggers_wdgt->show();
-?>
-<?php
 
-include_once('include/page_footer.php');
+
+
+require_once('include/page_footer.php');
 
 ?>

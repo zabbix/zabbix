@@ -33,7 +33,7 @@ $page['hist_arg'] = array('triggerid', 'eventid');
 $page['scripts'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once 'include/page_header.php';
+require_once 'include/page_header.php';
 ?>
 <?php
 define('PAGE_SIZE', 100);
@@ -63,7 +63,7 @@ if (isset($_REQUEST['favobj'])) {
 }
 
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 	exit();
 }
 
@@ -147,5 +147,5 @@ $ieTab->addRow(array($leftDiv, $middleDiv), 'top');
 $tr_event_wdgt->addItem($ieTab);
 $tr_event_wdgt->show();
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>
