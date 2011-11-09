@@ -318,8 +318,9 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
- - [ZBX-4326] api now return error when try create incorrect host profile field (Vedmak)
- - [ZBX-4323] fixed host profile not created with host using api (Vedmak)
+ - [ZBX-3117] fixed error notification when unsuccessfully copying a graph (pavels)
+ - [ZBX-4326] API now returns error when trying to create incorrect host profile field (Vedmak)
+ - [ZBX-4323] fixed host profile not created with host using API (Vedmak)
  - [ZBX-4275] made server and proxy try to reconnect to the database upon startup (asaveljevs)
  - [ZBX-4159] fixed problem with generating new ids for historical tables (Vedmak)
  - [ZBX-3988] fixed memory leak in dashboard (Vedmak)
@@ -327,7 +328,7 @@ Changes for 1.8.9rc1
  - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
  - [ZBX-2919] fixed custom multiplier becoming 0 when creating an item (pavels)
  - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
- - [ZBX-2504] replaced 'Groups' by 'Replace groups' in host mass-update form to avoid confusion (Alexei)
+ - [ZBX-2504] replaced 'Groups' by 'Replace host groups' in host mass-update form to avoid confusion (Alexei)
  - [ZBX-4265] fixed host input validation (pavels)
  - [ZBX-4264] fixed zabbix_agent compilation problem on HP-UX (dimir)
  - [ZBX-3504] added a text notification in the maps section when no maps are defined (pavels)
