@@ -72,7 +72,8 @@ $fields = array(
 	'slink' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null)
 );
 check_fields($fields);
-
+?>
+<?php
 /*
  * AJAX
  */
@@ -185,7 +186,7 @@ if (isset($_REQUEST['form'])) {
 if (isset($_REQUEST['pservices'])) {
 	$data = array();
 	if (!empty($service)) {
-		$data['service'] = get_service_by_serviceid($service['serviceid']);
+		$data['service'] = $service;
 	}
 	if (!empty($data['service'])) {
 		$childs_str = implode(',', get_service_childs($data['service']['serviceid'], 1));
@@ -224,7 +225,7 @@ if (isset($_REQUEST['pservices'])) {
 if (isset($_REQUEST['cservices'])) {
 	$data = array();
 	if (!empty($service)) {
-		$data['service'] = get_service_by_serviceid($service['serviceid']);
+		$data['service'] = $service;
 	}
 	if (!empty($data['service'])) {
 		$childs_str = implode(',', get_service_childs($data['service']['serviceid'], 1));
@@ -283,7 +284,7 @@ if (isset($_REQUEST['form'])) {
 			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
 		}
 		while ($new_service_time['to'] && ($new_service_time['to'] <= $new_service_time['from'])) {
-			$new_service_time['to'] += 7 * 24 * 3600;
+			$new_service_time['to'] += SEC_PER_WEEK;
 		}
 
 		// validating service times that were entered, time 'to' has a wrong format
@@ -304,15 +305,15 @@ if (isset($_REQUEST['form'])) {
 
 	// get general data
 	if (isset($data['service']['serviceid']) && !isset($_REQUEST['form_refresh'])) {
-		$data['name']		= $data['service']['name'];
-		$data['algorithm']	= $data['service']['algorithm'];
-		$data['showsla']	= $data['service']['showsla'];
-		$data['goodsla']	= $data['service']['goodsla'];
-		$data['sortorder']	= $data['service']['sortorder'];
-		$data['triggerid']	= isset($data['service']['triggerid']) ? $data['service']['triggerid'] : 0;
+		$data['name'] = $data['service']['name'];
+		$data['algorithm'] = $data['service']['algorithm'];
+		$data['showsla'] = $data['service']['showsla'];
+		$data['goodsla'] = $data['service']['goodsla'];
+		$data['sortorder'] = $data['service']['sortorder'];
+		$data['triggerid'] = isset($data['service']['triggerid']) ? $data['service']['triggerid'] : 0;
 
 		// get services times
-		$db_services_times = DBselect('SELECT st.* FROM services_times st WHERE st.serviceid='.$data['service']['serviceid']);
+		$db_services_times = DBselect('SELECT st.type,st.ts_from,st.ts_to,st.note FROM services_times st WHERE st.serviceid='.$data['service']['serviceid']);
 		while ($db_stime = DBfetch($db_services_times)) {
 			$stime = array(
 					'type'=> $db_stime['type'],
@@ -327,11 +328,11 @@ if (isset($_REQUEST['form'])) {
 		}
 
 		// get links
-		$sql = 'SELECT DISTINCT sl.linkid,sl.soft,sl.serviceupid,sl.servicedownid,s1.name AS serviceupname,s2.name AS servicedownname'.
+		$sql = 'SELECT DISTINCT sl.serviceupid,s1.name AS serviceupname'.
 				' FROM services s1,services s2,services_links sl'.
 				' WHERE sl.serviceupid=s1.serviceid'.
 					' AND sl.servicedownid=s2.serviceid'.
-					' AND NOT(sl.soft=1)'.
+					' AND sl.soft=0'.
 					' AND sl.servicedownid='.$data['service']['serviceid'];
 
 		if ($link = DBFetch(DBSelect($sql))) {
@@ -344,7 +345,7 @@ if (isset($_REQUEST['form'])) {
 		}
 
 		// get childs
-		$sql = 'SELECT DISTINCT s.*,sl.soft'.
+		$sql = 'SELECT DISTINCT s.name,s.serviceid,s.triggerid,sl.soft'.
 					' FROM services s1,services s2,services_links sl,services s'.
 					' WHERE (s.triggerid IS NULL OR '.DBcondition('s.triggerid', $available_triggers).') '.
 						' AND '.DBin_node('s.serviceid').
@@ -372,21 +373,21 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 	else {
-		$data['name']		= get_request('name', '');
-		$data['algorithm']	= get_request('algorithm', SERVICE_ALGORITHM_MAX);
-		$data['showsla']	= get_request('showsla', 0);
-		$data['goodsla']	= get_request('goodsla', 99.05);
-		$data['sortorder']	= get_request('sortorder', 0);
-		$data['triggerid']	= get_request('triggerid', 0);
-		$data['parentid']	= get_request('parentid', 0);
-		$data['parentname']	= get_request('parentname', '');
-		$data['childs']		= get_request('childs', array());
+		$data['name'] = get_request('name', '');
+		$data['algorithm'] = get_request('algorithm', SERVICE_ALGORITHM_MAX);
+		$data['showsla'] = get_request('showsla', 0);
+		$data['goodsla'] = get_request('goodsla', 99.05);
+		$data['sortorder'] = get_request('sortorder', 0);
+		$data['triggerid'] = get_request('triggerid', 0);
+		$data['parentid'] = get_request('parentid', 0);
+		$data['parentname'] = get_request('parentname', '');
+		$data['childs']	 = get_request('childs', array());
 	}
 	if ($data['triggerid'] > 0) {
 		$trigger = API::Trigger()->get(array(
 			'triggerids' => $data['triggerid'],
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('hostid', 'name'),
+			'output' => array('description'),
+			'selectHosts' => array('name'),
 			'expandDescription' => true
 		));
 		$trigger = reset($trigger);
@@ -417,18 +418,19 @@ else {
 		'add' => SPACE,
 		'remove' => SPACE
 	);
-	$services[0] = $row;
+	$services[] = $row;
 
-	$sql = 'SELECT DISTINCT s.serviceid,sl.servicedownid,sl_p.serviceupid AS serviceupid,s.triggerid,'.
+	$db_services = DBSelect(
+			'SELECT DISTINCT s.serviceid,sl.servicedownid,sl_p.serviceupid AS serviceupid,s.triggerid,'.
 				's.name AS caption,s.algorithm,t.description,t.expression,s.sortorder,sl.linkid,s.showsla,s.goodsla,s.status'.
 			' FROM services s'.
 				' LEFT JOIN triggers t ON s.triggerid=t.triggerid'.
-				' LEFT JOIN services_links sl ON s.serviceid=sl.serviceupid AND NOT(sl.soft=0)'.
+				' LEFT JOIN services_links sl ON s.serviceid=sl.serviceupid AND sl.soft=1'.
 				' LEFT JOIN services_links sl_p ON s.serviceid=sl_p.servicedownid AND sl_p.soft=0'.
 			' WHERE '.DBin_node('s.serviceid').
 				' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY, array())).')'.
-			' ORDER BY s.sortorder,sl_p.serviceupid,s.serviceid';
-	$db_services = DBSelect($sql);
+			' ORDER BY s.sortorder,sl_p.serviceupid,s.serviceid'
+	);
 	while ($row = DBFetch($db_services)) {
 		$row['id'] = $row['serviceid'];
 		$row['description'] = empty($row['triggerid']) ? _('None') : expand_trigger_description($row['triggerid']);

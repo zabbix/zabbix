@@ -48,7 +48,7 @@ function audit_resource2str($resource_type = null) {
 		AUDIT_RESOURCE_MAINTENANCE => _('Maintenance'),
 		AUDIT_RESOURCE_SCRIPT => _('Script'),
 		AUDIT_RESOURCE_MACRO => _('Macro'),
-		AUDIT_RESOURCE_TEMPLATE => _('Template'),
+		AUDIT_RESOURCE_TEMPLATE => _('Template')
 	);
 
 	if (is_null($resource_type)) {
@@ -66,9 +66,8 @@ function audit_resource2str($resource_type = null) {
 function add_audit_if($condition, $action, $resourcetype, $details) {
 	if ($condition) {
 		return add_audit($action,$resourcetype,$details);
-	} else {
-		return false;
 	}
+	return false;
 }
 
 function add_audit($action, $resourcetype, $details) {
@@ -85,7 +84,8 @@ function add_audit($action, $resourcetype, $details) {
 	$ip = isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 
 	$result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details,ip)'.
-						' VALUES ('.$auditid.','.CWebUser::$data['userid'].','.time().','.$action.','.$resourcetype.','.zbx_dbstr($details).','.zbx_dbstr($ip).')');
+			' VALUES ('.$auditid.','.CWebUser::$data['userid'].','.time().','.$action.','.$resourcetype.
+			','.zbx_dbstr($details).','.zbx_dbstr($ip).')');
 	if ($result) {
 		$result = $auditid;
 	}
