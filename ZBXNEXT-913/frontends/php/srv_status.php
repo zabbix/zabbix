@@ -54,7 +54,7 @@ if (isset($_REQUEST['favobj'])) {
 		CProfile::update('web.srv_status.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['state'], PROFILE_TYPE_INT);
 	}
 }
-if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
+if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	include_once('include/page_footer.php');
 	exit();
 }

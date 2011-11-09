@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-function add_service($name, $triggerid, $algorithm, $showsla, $goodsla, $sortorder, $service_times = array(), $parentid,$childs) {
-	foreach ($childs as $id => $child) {
-		if (bccomp($parentid , $child['serviceid']) == 0) {
+function add_service($name, $triggerid, $algorithm, $showsla, $goodsla, $sortorder, $service_times = array(), $parentid, $childs) {
+	foreach ($childs as $child) {
+		if (bccomp($parentid, $child['serviceid']) == 0) {
 			error(_('Service cannot be parent and child at the same time.'));
 			return false;
 		}
@@ -56,7 +56,7 @@ function add_service($name, $triggerid, $algorithm, $showsla, $goodsla, $sortord
 	$result = ($parentid != 0) ? add_service_link($serviceid, $parentid, 0) : true;
 
 	// add childs
-	foreach ($childs as $id => $child) {
+	foreach ($childs as $child) {
 		if (!isset($child['soft']) || empty($child['soft'])) {
 			$child['soft'] = 0;
 		}
@@ -85,7 +85,7 @@ function add_service($name, $triggerid, $algorithm, $showsla, $goodsla, $sortord
 }
 
 function update_service($serviceid, $name, $triggerid, $algorithm, $showsla, $goodsla, $sortorder, $service_times = array(), $parentid, $childs) {
-	foreach ($childs as $id => $child) {
+	foreach ($childs as $child) {
 		if (bccomp($parentid, $child['serviceid']) == 0) {
 			error(_('Service cannot be parent and child at the same time.'));
 			return false;
@@ -108,7 +108,7 @@ function update_service($serviceid, $name, $triggerid, $algorithm, $showsla, $go
 	$result = ($parentid != 0) ? add_service_link($serviceid, $parentid, 0) : true;
 
 	// add childs
-	foreach ($childs as $id => $child) {
+	foreach ($childs as $child) {
 		if (empty($child['soft']) || !isset($child['soft'])) {
 			$child['soft'] = 0;
 		}
@@ -143,14 +143,15 @@ function update_service($serviceid, $name, $triggerid, $algorithm, $showsla, $go
 }
 
 function add_host_to_services($hostid, $serviceid) {
-	$result = DBselect('SELECT distinct h.host,t.triggerid,t.description,t.expression'.
-						' FROM hosts h,items i,functions f,triggers t'.
-						' WHERE h.hostid=i.hostid'.
-							' AND i.itemid=f.itemid'.
-							' AND f.triggerid=t.triggerid'.
-							' AND h.hostid='.$hostid.
-							' AND '.DBin_node('t.triggerid', false)
-						);
+	$result = DBselect(
+		'SELECT distinct h.host,t.triggerid,t.description,t.expression'.
+		' FROM hosts h,items i,functions f,triggers t'.
+		' WHERE h.hostid=i.hostid'.
+			' AND i.itemid=f.itemid'.
+			' AND f.triggerid=t.triggerid'.
+			' AND h.hostid='.$hostid.
+			' AND '.DBin_node('t.triggerid', false)
+	);
 	while ($row = DBfetch($result)) {
 		$serviceid2 = add_service(expand_trigger_description_by_data($row), $row['triggerid'], 'on', 0, 'off', 99);
 		add_service_link($serviceid2, $serviceid, 0);
@@ -159,11 +160,14 @@ function add_host_to_services($hostid, $serviceid) {
 }
 
 function is_service_hardlinked($serviceid) {
-	$row = DBfetch(DBselect('SELECT COUNT(*) AS cnt FROM services_links sl WHERE sl.servicedownid='.$serviceid.' and sl.soft=0'));
-	if (!empty($row['cnt'])) {
-		return true;
-	}
-	return false;
+	$result = DBselect(
+		'SELECT COUNT(*) AS cnt'.
+		' FROM services_links sl'.
+		' WHERE sl.servicedownid='.$serviceid.
+			' AND sl.soft=0'
+	);
+	$row = DBfetch($result);
+	return !empty($row['cnt']);
 }
 
 /*
@@ -184,13 +188,15 @@ function get_service_status($serviceid, $algorithm, $triggerid = null, $status =
 	}
 
 	if ($algorithm == SERVICE_ALGORITHM_MAX || $algorithm == SERVICE_ALGORITHM_MIN) {
-		$sort_order = ($algorithm == SERVICE_ALGORITHM_MAX) ? 'DESC' : 'ASC';
+		$sort_order = ($algorithm == SERVICE_ALGORITHM_MAX) ? ' DESC' : '';
 
-		$result = DBselect('SELECT s.status'.
+		$result = DBselect(
+				'SELECT s.status'.
 				' FROM services s,services_links l'.
 				' WHERE l.serviceupid='.$serviceid.
 					' AND s.serviceid=l.servicedownid'.
-				' ORDER BY s.status '.$sort_order);
+				' ORDER BY s.status'.$sort_order
+		);
 		if ($row = DBfetch($result)) {
 			$status = $row['status'];
 		}
@@ -204,27 +210,13 @@ function get_service_status($serviceid, $algorithm, $triggerid = null, $status =
  *                                                                            *
  ******************************************************************************/
 function delete_service($serviceid) {
-	$sql = 'DELETE FROM services_links WHERE servicedownid='.$serviceid.' OR serviceupid='.$serviceid;
-	if (!$result = DBexecute($sql)) {
-		return $result;
-	}
-
 	$sql = 'DELETE FROM services WHERE serviceid='.$serviceid;
 	if (!$result = DBexecute($sql)) {
 		return $result;
 	}
 
-	$sql = 'DELETE FROM service_alarms WHERE serviceid='.$serviceid;
-	if (!$result = DBexecute($sql)) {
-		return $result;
-	}
-
-	$sql = 'DELETE FROM services_times WHERE serviceid='.$serviceid;
-	if (!$result = DBexecute($sql)) {
-		return $result;
-	}
-
 	update_services_status_all();
+
 	return $result;
 }
 
@@ -241,9 +233,14 @@ function does_service_depend_on_the_service($serviceid, $serviceid2) {
 		}
 	}
 
-	$result = DBselect('SELECT sl.serviceupid FROM services_links sl WHERE sl.servicedownid='.$serviceid2.' and sl.soft=0');
+	$result = DBselect(
+		'SELECT sl.serviceupid'.
+		' FROM services_links sl'.
+		' WHERE sl.servicedownid='.$serviceid2.
+			' AND sl.soft=0'
+	);
 	while ($row = DBfetch($result)) {
-		if (does_service_depend_on_the_service($serviceid, $row['serviceupid']) == true) {
+		if (does_service_depend_on_the_service($serviceid, $row['serviceupid'])) {
 			return true;
 		}
 	}
@@ -273,7 +270,7 @@ function add_service_link($servicedownid, $serviceupid, $softlink) {
 }
 
 function remove_service_links($serviceid) {
-	DBExecute('DELETE FROM services_links WHERE serviceupid='.$serviceid.' OR (servicedownid='.$serviceid.' AND soft<>1)');
+	DBExecute('DELETE FROM services_links WHERE serviceupid='.$serviceid.' OR (servicedownid='.$serviceid.' AND soft=0)');
 }
 
 function get_last_service_value($serviceid, $clock) {
@@ -294,7 +291,7 @@ function get_last_service_value($serviceid, $clock) {
 
 function expand_periodical_service_times(&$data, $period_start, $period_end, $ts_from, $ts_to, $type = 'ut') {
 	// calculate period FROM '-1 week' to know period name for $period_start
-	for ($curr = ($period_start - (7 * 24 * 3600)); $curr <= $period_end; $curr += 86400) {
+	for ($curr = ($period_start - SEC_PER_WEEK); $curr <= $period_end; $curr += SEC_PER_DAY) {
 		$curr_date = getdate($curr);
 		$from_date = getdate($ts_from);
 
@@ -340,23 +337,25 @@ function calculate_service_availability($serviceid, $period_start, $period_end) 
 	$data[$period_start]['alarm'] = get_last_service_value($serviceid, $period_start);
 
 	// sort by time stamp
-	$sql = 'SELECT sa.servicealarmid,sa.clock,sa.value'.
-			' FROM service_alarms sa'.
-			' WHERE sa.serviceid='.$serviceid.
-				' AND sa.clock>='.$period_start.
-				' AND sa.clock<='.$period_end.
-			' ORDER BY sa.clock asc,sa.servicealarmid ASC';
-	$service_alarms = DBselect($sql);
+	$service_alarms = DBselect(
+		'SELECT sa.servicealarmid,sa.clock,sa.value'.
+		' FROM service_alarms sa'.
+		' WHERE sa.serviceid='.$serviceid.
+			' AND sa.clock>='.$period_start.
+			' AND sa.clock<='.$period_end.
+		' ORDER BY sa.clock asc,sa.servicealarmid ASC'
+	);
 	while ($db_alarm_row = DBfetch($service_alarms)) {
 		$data[$db_alarm_row['clock']]['alarm'] = $db_alarm_row['value'];
 	}
 
 	// add periodical uptimes
-	$sql = 'SELECT st.ts_from,st.ts_to'.
-			' FROM services_times st'.
-			' WHERE st.type='.SERVICE_TIME_TYPE_UPTIME.
-				' AND st.serviceid='.$serviceid;
-	$service_times = DBselect($sql);
+	$service_times = DBselect(
+		'SELECT st.ts_from,st.ts_to'.
+		' FROM services_times st'.
+		' WHERE st.type='.SERVICE_TIME_TYPE_UPTIME.
+			' AND st.serviceid='.$serviceid
+	);
 	if ($db_time_row = DBfetch($service_times)) {
 		// if exist any uptime - unmarked time is downtime
 		$unmarked_period_type = 'dt';
@@ -370,21 +369,23 @@ function calculate_service_availability($serviceid, $period_start, $period_end) 
 	}
 
 	// add periodical downtimes
-	$sql = 'SELECT st.ts_from,st.ts_to'.
-			' FROM services_times st'.
-			' WHERE st.type='.SERVICE_TIME_TYPE_DOWNTIME.
-				' AND st.serviceid='.$serviceid;
-	$service_times = DBselect($sql);
+	$service_times = DBselect(
+		'SELECT st.ts_from,st.ts_to'.
+		' FROM services_times st'.
+		' WHERE st.type='.SERVICE_TIME_TYPE_DOWNTIME.
+			' AND st.serviceid='.$serviceid
+	);
 	while ($db_time_row = DBfetch($service_times)) {
 		expand_periodical_service_times($data, $period_start, $period_end, $db_time_row['ts_from'], $db_time_row['ts_to'], 'dt');
 	}
 
 	// add one-time downtimes
-	$sql = 'SELECT st.ts_from,st.ts_to'.
-			' FROM services_times st'.
-			' WHERE st.type='.SERVICE_TIME_TYPE_ONETIME_DOWNTIME.
-				' AND st.serviceid='.$serviceid;
-	$service_times = DBselect($sql);
+	$service_times = DBselect(
+		'SELECT st.ts_from,st.ts_to'.
+		' FROM services_times st'.
+		' WHERE st.type='.SERVICE_TIME_TYPE_ONETIME_DOWNTIME.
+			' AND st.serviceid='.$serviceid
+	);
 	while ($db_time_row = DBfetch($service_times)) {
 		if ($db_time_row['ts_to'] < $period_start || $db_time_row['ts_from'] > $period_end) {
 			continue;
@@ -425,14 +426,22 @@ function calculate_service_availability($serviceid, $period_start, $period_end) 
 	$sla_time = array(
 		'dt' => array('problem_time' => 0, 'ok_time' => 0),
 		'ut' => array('problem_time' => 0, 'ok_time' => 0)
-		);
+	);
 	$prev_alarm = $data[$period_start]['alarm'];
 	$prev_time = $period_start;
 
-	if (isset($data[$period_start]['ut_s'])) $ut_cnt += $data[$period_start]['ut_s'];
-	if (isset($data[$period_start]['ut_e'])) $ut_cnt -= $data[$period_start]['ut_e'];
-	if (isset($data[$period_start]['dt_s'])) $dt_cnt += $data[$period_start]['dt_s'];
-	if (isset($data[$period_start]['dt_e'])) $dt_cnt -= $data[$period_start]['dt_e'];
+	if (isset($data[$period_start]['ut_s'])) {
+		$ut_cnt += $data[$period_start]['ut_s'];
+	}
+	if (isset($data[$period_start]['ut_e'])) {
+		$ut_cnt -= $data[$period_start]['ut_e'];
+	}
+	if (isset($data[$period_start]['dt_s'])) {
+		$dt_cnt += $data[$period_start]['dt_s'];
+	}
+	if (isset($data[$period_start]['dt_e'])) {
+		$dt_cnt -= $data[$period_start]['dt_e'];
+	}
 	foreach ($data as $ts => $val) {
 		// skip first data [already readed]
 		if ($ts == $period_start) {
@@ -457,11 +466,21 @@ function calculate_service_availability($serviceid, $period_start, $period_end) 
 			$sla_time[$period_type]['ok_time'] += $ts - $prev_time;
 		}
 
-		if (isset($val['ut_s'])) $ut_cnt += $val['ut_s'];
-		if (isset($val['ut_e'])) $ut_cnt -= $val['ut_e'];
-		if (isset($val['dt_s'])) $dt_cnt += $val['dt_s'];
-		if (isset($val['dt_e'])) $dt_cnt -= $val['dt_e'];
-		if (isset($val['alarm'])) $prev_alarm = $val['alarm'];
+		if (isset($val['ut_s'])) {
+			$ut_cnt += $val['ut_s'];
+		}
+		if (isset($val['ut_e'])) {
+			$ut_cnt -= $val['ut_e'];
+		}
+		if (isset($val['dt_s'])) {
+			$dt_cnt += $val['dt_s'];
+		}
+		if (isset($val['dt_e'])) {
+			$dt_cnt -= $val['dt_e'];
+		}
+		if (isset($val['alarm'])) {
+			$prev_alarm = $val['alarm'];
+		}
 
 		$prev_time = $ts;
 	}
@@ -492,24 +511,14 @@ function get_service_by_serviceid($serviceid) {
 	return $row;
 }
 
-function get_services_links_by_linkid($linkid) {
-	$row = DBfetch(DBselect('SELECT sl.* FROM services_links sl WHERE sl.linkid='.$linkid));
-	if (!$row) {
-		error(_('No service linkage with').' linkid=['.$linkid.']');
-		return false;
-	}
-	return $row;
-}
-
 function algorithm2str($algorithm) {
-	if ($algorithm == SERVICE_ALGORITHM_NONE) {
-		return _('Do not calculate');
-	}
-	elseif ($algorithm == SERVICE_ALGORITHM_MAX) {
-		return _('Problem, if at least one child has a problem');
-	}
-	elseif ($algorithm == SERVICE_ALGORITHM_MIN) {
-		return _('Problem, if all children have problems');
+	switch ($algorithm) {
+		case SERVICE_ALGORITHM_NONE:
+			return _('Do not calculate');
+		case SERVICE_ALGORITHM_MAX:
+			return _('Problem, if at least one child has a problem');
+		case SERVICE_ALGORITHM_MIN:
+			return _('Problem, if all children have problems');
 	}
 	return _('Unknown');
 }
@@ -517,11 +526,12 @@ function algorithm2str($algorithm) {
 function get_service_childs($serviceid, $soft = 0) {
 	$childs = array();
 
-	$query = 'SELECT sl.servicedownid'.
-				' FROM services_links sl'.
-				' WHERE sl.serviceupid='.$serviceid.($soft ? '' : ' AND sl.soft<>1');
-
-	$result = DBselect($query);
+	$result = DBselect(
+		'SELECT sl.servicedownid'.
+		' FROM services_links sl'.
+		' WHERE sl.serviceupid='.$serviceid.
+			($soft ? '' : ' AND sl.soft=0')
+	);
 	while ($row = DBfetch($result)) {
 		$childs[] = $row['servicedownid'];
 		$childs = zbx_array_merge($childs, get_service_childs($row['servicedownid']));
@@ -543,7 +553,7 @@ function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $paren
 		$temp[$rows['serviceid']] = $rows;
 
 		if (isset($rows['childs'])) {
-			foreach ($rows['childs'] as $cid => $nodeid) {
+			foreach ($rows['childs'] as $nodeid) {
 				if (!isset($services[$nodeid['id']])) {
 					continue;
 				}
@@ -568,7 +578,7 @@ function createShowServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $p
 		$temp[$rows['serviceid']] = $rows;
 
 		if (isset($rows['childs'])) {
-			foreach ($rows['childs'] as $cid => $nodeid) {
+			foreach ($rows['childs'] as $nodeid) {
 				if (!isset($services[$nodeid['id']])) {
 					continue;
 				}
@@ -616,10 +626,12 @@ function del_empty_nodes($services) {
  *                                                                            *
  ******************************************************************************/
 function update_services_rec($serviceid) {
-	$result = DBselect('SELECT l.serviceupid,s.algorithm'.
-						' FROM services_links l,services s'.
-						' WHERE s.serviceid=l.serviceupid'.
-							' AND l.servicedownid='.$serviceid);
+	$result = DBselect(
+		'SELECT l.serviceupid,s.algorithm'.
+		' FROM services_links l,services s'.
+		' WHERE s.serviceid=l.serviceupid'.
+			' AND l.servicedownid='.$serviceid
+	);
 	while ($row = DBfetch($result)) {
 		$serviceupid = $row['serviceupid'];
 		$algorithm = $row['algorithm'];
@@ -679,19 +691,28 @@ function update_services($triggerid, $status) {
  *
  */
 function update_services_status_all() {
-	$result = DBselect('SELECT s.serviceid,s.algorithm,s.triggerid'.
-						' FROM services s'.
-						' WHERE s.serviceid NOT IN (select distinct sl.serviceupid from services_links sl)');
+	$result = DBselect(
+		'SELECT s.serviceid,s.algorithm,s.triggerid'.
+		' FROM services s'.
+		' WHERE s.serviceid NOT IN ('.
+			'SELECT DISTINCT sl.serviceupid'.
+			' FROM services_links sl'.
+		')'
+	);
 	while ($row = DBfetch($result)) {
 		$status = get_service_status($row['serviceid'], $row['algorithm'], $row['triggerid']);
 		DBexecute('UPDATE services SET status='.$status.' WHERE serviceid='.$row['serviceid']);
 		add_service_alarm($row['serviceid'], $status, time());
 	}
 
-	$result = DBselect('SELECT MAX(sl.servicedownid) AS serviceid,sl.serviceupid'.
-						' FROM services_links sl'.
-						' WHERE sl.servicedownid NOT IN (select distinct sl.serviceupid from services_links sl)'.
-						' GROUP BY sl.serviceupid');
+	$result = DBselect(
+		'SELECT MAX(sl.servicedownid) AS serviceid,sl.serviceupid'.
+		' FROM services_links sl'.
+		' WHERE sl.servicedownid NOT IN ('.
+			'SELECT DISTINCT sl.serviceupid FROM services_links sl'.
+		')'.
+		' GROUP BY sl.serviceupid'
+	);
 	while ($row = DBfetch($result)) {
 		update_services_rec($row['serviceid']);
 	}
@@ -703,15 +724,14 @@ function update_services_status_all() {
  *                                                                            *
  ******************************************************************************/
 function latest_service_alarm($serviceid, $status) {
-	$result = DBselect('SELECT sa.servicealarmid,sa.value'.
-						' FROM service_alarms sa'.
-						' WHERE sa.serviceid='.$serviceid.
-						' ORDER BY sa.servicealarmid DESC', 1);
+	$result = DBselect(
+		'SELECT sa.servicealarmid,sa.value'.
+		' FROM service_alarms sa'.
+		' WHERE sa.serviceid='.$serviceid.
+		' ORDER BY sa.servicealarmid DESC', 1
+	);
 	$row = DBfetch($result);
-	if ($row && $row['value'] == $status) {
-		return true;
-	}
-	return false;
+	return ($row && $row['value'] == $status);
 }
 
 /******************************************************************************
