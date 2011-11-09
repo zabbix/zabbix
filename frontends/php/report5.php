@@ -169,9 +169,6 @@ foreach ($triggers as $trigger) {
 $rprt_wdgt->addItem($table);
 $rprt_wdgt->show();
 
-$jsmenu = new CPUMenu(null, 170);
-$jsmenu->InsertJavaScript();
-
 require_once('include/page_footer.php');
 
 ?>
