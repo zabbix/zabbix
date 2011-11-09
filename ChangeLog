@@ -2,8 +2,8 @@
 Changes for 1.9.8
 
 New features:
- - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget
- - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up
+ - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget (pavels)
+ - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
  - [ZBXNEXT-1019] updated jQuery to 1.7 (Vedmak)
  - [ZBX-1357] added initial Greek translation (Richlv)
  - [ZBXNEXT-911] redesign Configuration->Web (Eduard)
