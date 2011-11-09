@@ -1151,13 +1151,13 @@ function make_graph_menu(&$menu, &$submenu) {
 
 	$menu['menu_graphs'][] = array(
 		_('Add').' '._('Graph'),
-		'javascript: PopUp(\'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&real_hosts=1&multiselect=1\',800,450); void(0);',
+		'javascript: PopUp(\'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&monitored_hosts=1&multiselect=1\',800,450); void(0);',
 		null,
 		array('outer' => 'pum_o_submenu', 'inner' => array('pum_i_submenu'))
 	);
 	$menu['menu_graphs'][] = array(
 		_('Add').' '._('Simple graph'),
-		'javascript: PopUp(\'popup.php?srctbl=simple_graph&srcfld1=itemid&real_hosts=1&reference=itemid&multiselect=1\',800,450); void(0);',
+		'javascript: PopUp(\'popup.php?srctbl=simple_graph&srcfld1=itemid&monitored_hosts=1&reference=itemid&multiselect=1\',800,450); void(0);',
 		null,
 		array('outer' => 'pum_o_submenu', 'inner' => array('pum_i_submenu'))
 	);
