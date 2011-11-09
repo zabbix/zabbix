@@ -537,7 +537,7 @@ int	MAIN_ZABBIX_ENTRY()
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
 #endif
 
-	DBconnect(ZBX_DB_CONNECT_EXIT);
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	result = DBselect("select refresh_unsupported from config where 1=1" DB_NODE,
 			DBnode_local("configid"));
@@ -576,7 +576,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
 			+ CONFIG_HISTSYNCER_FORKS + CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS
 			+ CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS;
-	threads = calloc(threads_num, sizeof(pid_t));
+	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 < CONFIG_TRAPPER_FORKS)
 	{

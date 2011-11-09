@@ -22,6 +22,7 @@
 #include "evalfunc.h"
 #include "db.h"
 #include "log.h"
+#include "zbxalgo.h"
 
 static DB_MACROS	*macros = NULL;
 
@@ -942,46 +943,43 @@ static int	DBget_drule_value_by_event(DB_EVENT *event, char **replace_to, const 
  *                                                                            *
  ******************************************************************************/
 static int	DBget_history_log_value(DB_TRIGGER *trigger, char **replace_to,
-		int N_functionid, const char *fieldname)
+		int N_functionid, const char *field_name)
 {
 	const char	*__function_name = "DBget_history_log_value";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_RESULT	h_result;
-	DB_ROW		h_row;
 	zbx_uint64_t	functionid;
-	int		value_type, ret = FAIL;
-	char		sql[MAX_STRING_LEN];
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == trigger_get_N_functionid(trigger, N_functionid, &functionid))
 		goto fail;
 
-	result = DBselect("select i.itemid,i.value_type from items i,functions f"
-			" where i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
+	result = DBselect("select i.itemid,i.value_type"
+			" from items i,functions f"
+			" where i.itemid=f.itemid"
+				" and f.functionid=" ZBX_FS_UI64,
 			functionid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		value_type = atoi(row[1]);
+		zbx_uint64_t	itemid;
+		unsigned char	value_type;
+		char		**h_value;
 
-		if (value_type == ITEM_VALUE_TYPE_LOG)
+		if (ITEM_VALUE_TYPE_LOG == (value_type = (unsigned char)atoi(row[1])))
 		{
-			zbx_snprintf(sql, sizeof(sql), "select %s from history_log"
-					" where itemid=%s order by id desc",
-					fieldname,
-					row[0]);
+			ZBX_STR2UINT64(itemid, row[0]);
 
-			h_result = DBselectN(sql, 1);
+			h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, field_name, 1);
 
-			if (NULL != (h_row = DBfetch(h_result)) && SUCCEED != DBis_null(h_row[0]))
+			if (NULL != h_value[0])
 			{
-				*replace_to = zbx_strdup(*replace_to, h_row[0]);
+				*replace_to = zbx_strdup(*replace_to, h_value[0]);
 				ret = SUCCEED;
 			}
-
-			DBfree_result(h_result);
+			DBfree_history(h_value);
 		}
 	}
 	DBfree_result(result);
@@ -1013,11 +1011,8 @@ static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_fun
 	const char	*__function_name = "DBget_item_lastvalue";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_RESULT	h_result;
-	DB_ROW		h_row;
-	zbx_uint64_t	valuemapid, functionid;
-	int		value_type, ret = FAIL;
-	char		tmp[MAX_STRING_LEN];
+	zbx_uint64_t	functionid;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1033,6 +1028,12 @@ static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_fun
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[4]))
 	{
+		zbx_uint64_t	itemid, valuemapid;
+		unsigned char	value_type;
+		char		**h_value;
+		char		tmp[MAX_STRING_LEN];
+
+		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
 		ZBX_STR2UINT64(valuemapid, row[2]);
 
@@ -1040,18 +1041,14 @@ static int	DBget_item_lastvalue(DB_TRIGGER *trigger, char **lastvalue, int N_fun
 		{
 			case ITEM_VALUE_TYPE_LOG:
 			case ITEM_VALUE_TYPE_TEXT:
-				zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s order by id desc",
-						value_type == ITEM_VALUE_TYPE_LOG ? "history_log" : "history_text",
-						row[0]);
+				h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, 0, NULL, 1);
 
-				h_result = DBselectN(tmp, 1);
-
-				if (NULL != (h_row = DBfetch(h_result)))
-					*lastvalue = zbx_strdup(*lastvalue, h_row[0]);
+				if (NULL != h_value[0])
+					*lastvalue = zbx_strdup(*lastvalue, h_value[0]);
 				else
 					*lastvalue = zbx_strdup(*lastvalue, row[4]);
 
-				DBfree_result(h_result);
+				DBfree_history(h_value);
 				break;
 			case ITEM_VALUE_TYPE_STR:
 				zbx_strlcpy(tmp, row[4], sizeof(tmp));
@@ -1101,11 +1098,8 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 	const char	*__function_name = "DBget_item_value";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_RESULT	h_result;
-	DB_ROW		h_row;
-	zbx_uint64_t	functionid, valuemapid;
-	int		value_type, ret = FAIL;
-	char		tmp[MAX_STRING_LEN];
+	zbx_uint64_t	functionid;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1121,30 +1115,34 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		value_type = atoi(row[1]);
+		zbx_uint64_t	itemid, valuemapid;
+		unsigned char	value_type;
+		char		**h_value;
+		char		tmp[MAX_STRING_LEN];
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		value_type = (unsigned char)atoi(row[1]);
 		ZBX_STR2UINT64(valuemapid, row[2]);
 
-		zbx_snprintf(tmp, sizeof(tmp), "select value from %s where itemid=%s and clock<=%d order by itemid,clock desc",
-				get_table_by_value_type(value_type), row[0], clock);
+		h_value = DBget_history(itemid, value_type, ZBX_DB_GET_HIST_VALUE, 0, clock, NULL, 1);
 
-		h_result = DBselectN(tmp, 1);
-		if (NULL != (h_row = DBfetch(h_result)))
+		if (NULL != h_value[0])
 		{
 			switch (value_type)
 			{
 				case ITEM_VALUE_TYPE_LOG:
 				case ITEM_VALUE_TYPE_TEXT:
-					*value = zbx_strdup(*value, h_row[0]);
+					*value = zbx_strdup(*value, h_value[0]);
 					break;
 				case ITEM_VALUE_TYPE_STR:
-					zbx_strlcpy(tmp, h_row[0], sizeof(tmp));
+					strscpy(tmp, h_value[0]);
 
 					replace_value_by_map(tmp, sizeof(tmp), valuemapid);
 
 					*value = zbx_strdup(*value, tmp);
 					break;
 				default:
-					zbx_strlcpy(tmp, h_row[0], sizeof(tmp));
+					strscpy(tmp, h_value[0]);
 
 					if (ITEM_VALUE_TYPE_FLOAT == value_type)
 						del_zeroes(tmp);
@@ -1156,7 +1154,7 @@ static int	DBget_item_value(DB_TRIGGER *trigger, char **value, int N_functionid,
 			}
 			ret = SUCCEED;
 		}
-		DBfree_result(h_result);
+		DBfree_history(h_value);
 	}
 	DBfree_result(result);
 fail:
@@ -1809,7 +1807,11 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
 					if (0 != event->trigger.triggerid)
+					{
 						replace_to = zbx_strdup(replace_to, event->trigger.url);
+						substitute_simple_macros(event, item, dc_host, dc_item, escalation, &replace_to,
+								MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
+					}
 					else
 						ret = FAIL;
 				}
@@ -2001,6 +2003,14 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 				}
 			}
 		}
+		else if (macro_type & MACRO_TYPE_TRIGGER_URL)
+		{
+			if (EVENT_SOURCE_TRIGGERS == event->source)
+			{
+				if (0 == strcmp(m, MVAR_TRIGGER_ID))
+					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->objectid);
+			}
+		}
 		else if (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_HOST_IPMI_IP))
 		{
 			if (NULL != item)
@@ -2115,6 +2125,363 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 	return res;
 }
 
+static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, DB_TRIGGER_UPDATE *tr, int tr_num)
+{
+	const char	*__function_name = "zbx_extract_functionids";
+
+	int		i, values_num_save;
+	char		*bl, *br;
+	zbx_uint64_t	functionid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __function_name, tr_num);
+
+	for (i = 0; i < tr_num; i++)
+	{
+		if (NULL != tr[i].new_error)
+			continue;
+
+		values_num_save = functionids->values_num;
+
+		for (bl = strchr(tr[i].expression, '{'); NULL != bl; bl = strchr(bl, '{'))
+		{
+			if (NULL == (br = strchr(bl, '}')))
+				break;
+
+			*br = '\0';
+
+			if (SUCCEED != is_uint64(bl + 1, &functionid))
+			{
+				*br = '}';
+				break;
+			}
+
+			zbx_vector_uint64_append(functionids, functionid);
+
+			bl = br + 1;
+			*br = '}';
+		}
+
+		if (NULL != bl)
+		{
+			tr[i].new_error = zbx_dsprintf(tr[i].new_error, "Invalid expression [%s]", tr[i].expression);
+			tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
+			functionids->values_num = values_num_save;
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() functionids_num:%d", __function_name, functionids->values_num);
+}
+
+typedef struct
+{
+	zbx_uint64_t		triggerid;
+	char			function[FUNCTION_FUNCTION_LEN_MAX];
+	char			parameter[FUNCTION_PARAMETER_LEN_MAX];
+	int			lastchange;
+	char			*value;
+	char			*error;
+	zbx_vector_uint64_t	functionids;
+}
+zbx_func_t;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_vector_ptr_t	functions;
+}
+zbx_ifunc_t;
+
+static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_vector_ptr_t *ifuncs,
+		DB_TRIGGER_UPDATE *tr, int tr_num)
+{
+	const char	*__function_name = "zbx_populate_function_items";
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL;
+	int		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0, i;
+	zbx_uint64_t	itemid, triggerid, functionid;
+	zbx_ifunc_t	*ifunc = NULL;
+	zbx_func_t	*func = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __function_name, functionids->values_num);
+
+	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 75,
+			"select itemid,triggerid,function,parameter,functionid"
+			" from functions"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "functionid",
+			functionids->values, functionids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 57,
+			" order by itemid,triggerid,function,parameter,functionid");
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_STR2UINT64(triggerid, row[1]);
+		ZBX_STR2UINT64(functionid, row[4]);
+
+		if (NULL == ifunc || ifunc->itemid != itemid)
+		{
+			ifunc = zbx_malloc(NULL, sizeof(zbx_ifunc_t));
+			ifunc->itemid = itemid;
+			zbx_vector_ptr_create(&ifunc->functions);
+
+			zbx_vector_ptr_append(ifuncs, ifunc);
+
+			func = NULL;
+		}
+
+		if (NULL == func || triggerid != func->triggerid ||
+				0 != strcmp(func->function, row[2]) || 0 != strcmp(func->parameter, row[3]))
+		{
+			func = zbx_malloc(NULL, sizeof(zbx_func_t));
+			func->triggerid = triggerid;
+			strscpy(func->function, row[2]);
+			strscpy(func->parameter, row[3]);
+			func->lastchange = 0;
+			func->value = NULL;
+			func->error = NULL;
+			zbx_vector_uint64_create(&func->functionids);
+
+			for (i = 0; i < tr_num; i++)
+			{
+				if (func->triggerid != tr[i].triggerid)
+					continue;
+
+				func->lastchange = tr[i].lastchange;
+				break;
+			}
+
+			zbx_vector_ptr_append(&ifunc->functions, func);
+		}
+
+		zbx_vector_uint64_append(&func->functionids, functionid);
+	}
+	DBfree_result(result);
+
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ifuncs_num:%d", __function_name, ifuncs->values_num);
+}
+
+static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
+{
+	const char	*__function_name = "zbx_evaluate_item_functions";
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_ITEM		item;
+	char		*sql = NULL, value[MAX_BUFFER_LEN];
+	int		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0, i;
+	zbx_ifunc_t	*ifunc = NULL;
+	zbx_func_t	*func;
+	zbx_uint64_t	*itemids = NULL;
+	unsigned char	host_status;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d", __function_name, ifuncs->values_num);
+
+	sql = zbx_malloc(sql, sql_alloc);
+	itemids = zbx_malloc(itemids, ifuncs->values_num * sizeof(zbx_uint64_t));
+
+	for (i = 0; i < ifuncs->values_num; i++)
+		itemids[i] = ((zbx_ifunc_t *)ifuncs->values[i])->itemid;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			49 + sizeof(ZBX_SQL_ITEM_FIELDS) + sizeof(ZBX_SQL_ITEM_TABLES),
+			"select %s,h.status"
+			" from %s"
+			" where i.hostid=h.hostid"
+				" and",
+			ZBX_SQL_ITEM_FIELDS, ZBX_SQL_ITEM_TABLES);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", itemids, ifuncs->values_num);
+
+	zbx_free(itemids);
+
+	result = DBselect("%s", sql);
+
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		DBget_item_from_db(&item, row);
+
+		host_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM]);
+
+		if (FAIL == (i = zbx_vector_ptr_bsearch(ifuncs, &item.itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
+
+		for (i = 0; i < ifunc->functions.values_num; i++)
+		{
+			func = (zbx_func_t *)ifunc->functions.values[i];
+
+			if (ITEM_STATUS_DISABLED == item.status)
+			{
+				func->error = zbx_dsprintf(func->error, "Item disabled for function: {%s:%s.%s(%s)}",
+						item.host_name, item.key, func->function, func->parameter);
+			}
+			else if (ITEM_STATUS_NOTSUPPORTED == item.status)
+			{
+				func->error = zbx_dsprintf(func->error, "Item not supported for function: {%s:%s.%s(%s)}",
+						item.host_name, item.key, func->function, func->parameter);
+			}
+			else if (HOST_STATUS_NOT_MONITORED == host_status)
+			{
+				func->error = zbx_dsprintf(func->error, "Host disabled for function: {%s:%s.%s(%s)}",
+						item.host_name, item.key, func->function, func->parameter);
+			}
+
+			if (NULL != func->error)
+				continue;
+
+			if (SUCCEED != evaluate_function(value, &item, func->function, func->parameter, func->lastchange))
+			{
+				func->error = zbx_dsprintf(func->error, "Evaluation failed for function: {%s:%s.%s(%s)}",
+						item.host_name, item.key, func->function, func->parameter);
+			}
+			else
+				func->value = zbx_strdup(func->value, value);
+		}
+		DBfree_item_from_db(&item);	/* free cached historical fields item.h_* */
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static zbx_func_t	*zbx_get_func_by_functionid(zbx_vector_ptr_t *ifuncs, zbx_uint64_t functionid)
+{
+	zbx_ifunc_t	*ifunc;
+	zbx_func_t	*func;
+	int		i, j;
+
+	for (i = 0; i < ifuncs->values_num; i++)
+	{
+		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
+
+		for (j = 0; j < ifunc->functions.values_num; j++)
+		{
+			func = (zbx_func_t *)ifunc->functions.values[j];
+
+			if (FAIL != zbx_vector_uint64_bsearch(&func->functionids, functionid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				return func;
+			}
+		}
+	}
+
+	return NULL;
+}
+
+static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, DB_TRIGGER_UPDATE *tr, int tr_num)
+{
+	const char	*__function_name = "zbx_substitute_functions_results";
+
+	char		*out = NULL, *br, *bl;
+	int		out_alloc = TRIGGER_EXPRESSION_LEN_MAX, out_offset = 0, i;
+	zbx_uint64_t	functionid;
+	zbx_func_t	*func;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d tr_num:%d", __function_name, ifuncs->values_num, tr_num);
+
+	out = zbx_malloc(out, out_alloc);
+
+	for (i = 0; i < tr_num; i++)
+	{
+		if (NULL != tr[i].new_error)
+			continue;
+
+		out_offset = 0;
+
+		for (br = tr[i].expression, bl = strchr(tr[i].expression, '{'); NULL != bl; bl = strchr(bl, '{'))
+		{
+			*bl = '\0';
+			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, br);
+			*bl = '{';
+
+			if (NULL == (br = strchr(bl, '}')))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				break;
+			}
+
+			*br = '\0';
+
+			ZBX_STR2UINT64(functionid, bl + 1);
+
+			*br++ = '}';
+			bl = br;
+
+			if (NULL == (func = zbx_get_func_by_functionid(ifuncs, functionid)))
+			{
+				tr[i].new_error = zbx_dsprintf(tr[i].new_error, "Could not obtain function"
+						" and item for functionid: " ZBX_FS_UI64, functionid);
+				tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
+				break;
+			}
+
+			if (NULL != func->error)
+			{
+				tr[i].new_error = zbx_strdup(tr[i].new_error, func->error);
+				tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
+				break;
+			}
+
+			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->value);
+		}
+
+		if (NULL == tr[i].new_error)
+		{
+			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, br);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() expression[%d]:'%s' => '%s'", __function_name, i, tr[i].expression, out);
+
+			tr[i].expression = zbx_strdup(tr[i].expression, out);
+		}
+	}
+
+	zbx_free(out);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+
+static void	zbx_free_item_functions(zbx_vector_ptr_t *ifuncs)
+{
+	int		i, j;
+	zbx_ifunc_t	*ifunc;
+	zbx_func_t	*func;
+
+	for (i = 0; i < ifuncs->values_num; i++)
+	{
+		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
+
+		for (j = 0; j < ifunc->functions.values_num; j++)
+		{
+			func = (zbx_func_t *)ifunc->functions.values[j];
+
+			zbx_free(func->value);
+			zbx_free(func->error);
+			zbx_vector_uint64_destroy(&func->functionids);
+			zbx_free(func);
+		}
+		zbx_vector_ptr_destroy(&ifunc->functions);
+		zbx_free(ifunc);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: substitute_functions                                             *
@@ -2125,119 +2492,41 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
  *             error - place error message here if any                        *
  *             maxerrlen - max length of error msg                            *
  *                                                                            *
- * Return value:  SUCCEED - evaluated successfully, exp - updated expression  *
- *                FAIL - otherwise                                            *
- *                                                                            *
  * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
  * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)              *
  *                                                                            *
  ******************************************************************************/
-static int	substitute_functions(char **exp, time_t now, char *error, int maxerrlen)
+static void	substitute_functions(DB_TRIGGER_UPDATE *tr, int tr_num)
 {
-	const char	*__function_name = "substitute_functions";
+	const char		*__function_name = "substitute_functions";
 
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_ITEM		item;
-	char		functionid[MAX_ID_LEN], value[MAX_BUFFER_LEN], *e, *f, *out = NULL;
-	int		out_alloc = 64, out_offset = 0;
+	zbx_vector_uint64_t	functionids;
+	zbx_vector_ptr_t	ifuncs;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (**exp == '\0')
+	zbx_vector_uint64_create(&functionids);
+	zbx_extract_functionids(&functionids, tr, tr_num);
+
+	if (0 == functionids.values_num)
 		goto empty;
 
-	*error = '\0';
+	zbx_vector_ptr_create(&ifuncs);
+	zbx_populate_function_items(&functionids, &ifuncs, tr, tr_num);
 
-	out = zbx_malloc(out, out_alloc);
-
-	for (e = *exp; *e != '\0';)
+	if (0 != ifuncs.values_num)
 	{
-		if (*e == '{')
-		{
-			e++;	/* '{' */
-			f = functionid;
-			while (*e != '}' && *e != '\0')
-			{
-				if (functionid - f == MAX_ID_LEN)
-					break;
-				if (*e < '0' || *e > '9')
-					break;
-
-				*f++ = *e++;
-			}
-
-			if (*e != '}')
-			{
-				zbx_snprintf(error, maxerrlen, "Invalid expression [%s]", *exp);
-				goto error;
-			}
-
-			*f = '\0';
-			e++;	/* '}' */
-
-			result = DBselect(
-					"select distinct %s,f.function,f.parameter,h.status from %s,functions f"
-					" where i.hostid=h.hostid and i.itemid=f.itemid and f.functionid=%s",
-					ZBX_SQL_ITEM_FIELDS,
-					ZBX_SQL_ITEM_TABLES,
-					functionid);
-
-			if (NULL == (row = DBfetch(result)))
-			{
-				zbx_snprintf(error, maxerrlen, "Could not obtain function and item for functionid: %s",
-						functionid);
-			}
-			else
-			{
-				const char	*function, *parameter;
-				unsigned char	host_status;
-
-				DBget_item_from_db(&item, row);
-
-				function = row[ZBX_SQL_ITEM_FIELDS_NUM];
-				parameter = row[ZBX_SQL_ITEM_FIELDS_NUM + 1];
-				host_status = (unsigned char)atoi(row[ZBX_SQL_ITEM_FIELDS_NUM + 2]);
-
-				if (ITEM_STATUS_DISABLED == item.status)
-					zbx_snprintf(error, maxerrlen, "Item disabled for function: {%s:%s.%s(%s)}",
-							item.host_name, item.key, function, parameter);
-				else if (ITEM_STATUS_NOTSUPPORTED == item.status)
-					zbx_snprintf(error, maxerrlen, "Item not supported for function: {%s:%s.%s(%s)}",
-							item.host_name, item.key, function, parameter);
-
-				if ('\0' == *error && HOST_STATUS_NOT_MONITORED == host_status)
-					zbx_snprintf(error, maxerrlen, "Host disabled for function: {%s:%s.%s(%s)}",
-							item.host_name, item.key, function, parameter);
-
-				if ('\0' == *error && SUCCEED != evaluate_function(value, &item, function, parameter, now))
-					zbx_snprintf(error, maxerrlen, "Evaluation failed for function: {%s:%s.%s(%s)}",
-							item.host_name, item.key, function, parameter);
-			}
-			DBfree_result(result);
-
-			if ('\0' != *error)
-				goto error;
-
-			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, value);
-		}
-		else
-			zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, *e++);
+		zbx_evaluate_item_functions(&ifuncs);
+		zbx_substitute_functions_results(&ifuncs, tr, tr_num);
 	}
-	zbx_free(*exp);
 
-	*exp = out;
+	zbx_free_item_functions(&ifuncs);
+	zbx_vector_ptr_destroy(&ifuncs);
 empty:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __function_name, *exp);
+	zbx_vector_uint64_destroy(&functionids);
 
-	return SUCCEED;
-error:
-	zbx_free(out);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __function_name, error);
-
-	return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2246,70 +2535,75 @@ error:
  *                                                                            *
  * Purpose: evaluate trigger expression                                       *
  *                                                                            *
- * Parameters: expression    - [IN] short trigger expression string           *
- *             triggerid     - [IN] trigger identificator from database       *
- *             trigger_value - [IN] current trigger value                     *
- *             error         - [OUT] place error message if any               *
- *                                                                            *
- * Return value:                                                              *
- *             SUCCEED       - evaluated successfully                         *
- *                               result - TRIGGER_VALUE_(FALSE or TRUE)       *
- *             FAIL          - can not evaluate;                              *
- *                               result - TRIGGER_VALUE_UNKNOWN               *
- *                               error  - error message                       *
+ * Parameters: triggerid     - [IN] trigger identificator from database       *
+ *             expression    - [IN] short trigger expression string           *
+ *             value         - [IN] current trigger value                     *
+ *                                  TRIGGER_VALUE_(FALSE or TRUE)             *
+ *             new_value     - [OUT] evaluated value                          *
+ *                                   TRIGGER_VALUE_(FALSE, TRUE or UNKNOWN)   *
+ *             new_error     - [OUT] place error message for UNKNOWN results  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_expression(int *result, char **expression, time_t now,
-		zbx_uint64_t triggerid, int trigger_value, char **error)
+void	evaluate_expressions(DB_TRIGGER_UPDATE *tr, int tr_num)
 {
-	const char	*__function_name = "evaluate_expression";
+	const char	*__function_name = "evaluate_expressions";
 
 	DB_EVENT	event;
-	int		ret = FAIL;
-	double		value;
+	int		i;
+	double		expr_result;
 	char		err[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __function_name, tr_num);
 
-	/* substitute macros first */
 	memset(&event, 0, sizeof(DB_EVENT));
 	event.source = EVENT_SOURCE_TRIGGERS;
 	event.object = EVENT_OBJECT_TRIGGER;
-	event.objectid = triggerid;
-	event.value = trigger_value;
 
-	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, NULL, expression,
-			MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
+	for (i = 0; i < tr_num; i++)
 	{
-		/* evaluate expression */
-		zbx_remove_spaces(*expression);
-		if (SUCCEED == substitute_functions(expression, now, err, sizeof(err)))
-		{
-			if (SUCCEED == evaluate(&value, *expression, err, sizeof(err)))
-			{
-				if (0 == cmp_double(value, 0))
-					*result = TRIGGER_VALUE_FALSE;
-				else
-					*result = TRIGGER_VALUE_TRUE;
+		event.objectid = tr[i].triggerid;
+		event.value = tr[i].value;
 
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() result:%d", __function_name, *result);
-				ret = SUCCEED;
-			}
+		zbx_remove_spaces(tr[i].expression);
+
+		if (SUCCEED != substitute_simple_macros(&event, NULL, NULL, NULL, NULL, &tr[i].expression,
+				MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
+		{
+			tr[i].new_error = zbx_strdup(tr[i].new_error, err);
+			tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
 		}
 	}
 
-	if (SUCCEED != ret)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s():expression [%s] cannot be evaluated: %s",
-				__function_name, expression, err);
+	substitute_functions(tr, tr_num);
 
-		*error = zbx_strdup(*error, err);
-		*result = TRIGGER_VALUE_UNKNOWN;
+	for (i = 0; i < tr_num; i++)
+	{
+		if (NULL != tr[i].new_error)
+			continue;
+
+		if (SUCCEED != evaluate(&expr_result, tr[i].expression, err, sizeof(err)))
+		{
+			tr[i].new_error = zbx_strdup(tr[i].new_error, err);
+			tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
+		}
+		else if (0 == cmp_double(expr_result, 0))
+		{
+			tr[i].new_value = TRIGGER_VALUE_FALSE;
+		}
+		else
+			tr[i].new_value = TRIGGER_VALUE_TRUE;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	for (i = 0; i < tr_num; i++)
+	{
+		if (NULL != tr[i].new_error)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s():expression [%s] cannot be evaluated: %s",
+					__function_name, tr[i].expression, tr[i].new_error);
+		}
+	}
 
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

@@ -37,8 +37,6 @@
 	include_once 'include/page_header.php';
 ?>
 <?php
-	define('PAGE_SIZE',	100);
-
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'triggerid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']),
@@ -168,7 +166,7 @@
 	);
 	$events_histry->addHeader(S_EVENTS.SPACE.S_LIST.SPACE.'['.S_PREVIOUS_EVENTS.' 20]');
 	$right_tab->addRow($events_histry);
-	
+
 //----------------
 
 	$td_l = new CCol($left_tab);

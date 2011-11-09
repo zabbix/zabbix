@@ -552,7 +552,7 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
-	DBconnect(ZBX_DB_CONNECT_EXIT);
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	DCsync_configuration();
 	DBclose();
 
@@ -561,7 +561,7 @@ int	MAIN_ZABBIX_ENTRY()
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS
 			+ CONFIG_SELFMON_FORKS;
-	threads = calloc(threads_num, sizeof(pid_t));
+	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 < CONFIG_TRAPPER_FORKS)
 	{

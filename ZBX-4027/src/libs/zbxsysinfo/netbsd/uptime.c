@@ -25,15 +25,13 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 #if defined(HAVE_SYSINFO_UPTIME)
 	struct sysinfo info;
 
-	if( 0 == sysinfo(&info))
+	if (0 == sysinfo(&info))
 	{
 		SET_UI64_RESULT(result, info.uptime);
 		return SYSINFO_RET_OK;
 	}
 	else
-	{
 		return SYSINFO_RET_FAIL;
-	}
 #elif defined(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME)
 	int		mib[2], now;
 	size_t		len;
@@ -52,6 +50,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	SET_UI64_RESULT(result, now - uptime.tv_sec);
 
 	return SYSINFO_RET_OK;
+
 #elif defined(HAVE_KSTAT_H)	/* Solaris */
 	kstat_ctl_t   *kc;
 	kstat_t       *kp;
@@ -59,8 +58,6 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	long          hz;
 	long          secs;
-
-	hz = sysconf(_SC_CLK_TCK);
 
 	/* open kstat */
 	kc = kstat_open();
@@ -75,12 +72,18 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(-1 == kstat_read(kc, kp, 0))
+	if (-1 == kstat_read(kc, kp, 0))
 	{
 		kstat_close(kc);
 		return SYSINFO_RET_FAIL;
 	}
 	kn = (kstat_named_t*)kstat_data_lookup(kp, "clk_intr");
+
+	hz = sysconf(_SC_CLK_TCK);
+
+	/* make sure we do not divide by 0 */
+	assert(hz);
+
 	secs = kn->value.ul / hz;
 
 	/* close kstat */

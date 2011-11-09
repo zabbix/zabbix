@@ -1094,8 +1094,6 @@
 	 *   name: 'Test item $1, $2, $3'
 	 *   result: 'Test item a, b, Zabbix-server'
 	 *
-	 * @author Konstantin Buravcov
-	 * @see ZBX-3503
 	 * @param array $item
 	 * @return string
 	 */
@@ -1110,13 +1108,24 @@
 
 			if($ItemKey->isValid()){
 				$keyParameters = $ItemKey->getParameters();
-				// according to zabbix docs we must replace $1 to $9 macros with item key parameters
-				for($paramNo = 9; $paramNo > 0; $paramNo--){
-					$replaceTo = isset($keyParameters[$paramNo - 1]) ? $keyParameters[$paramNo - 1] : '';
-					$name = str_replace('$'.$paramNo, $replaceTo, $name);
+
+				$searchOffset = 0;
+				while(preg_match('/\$[1-9]/', $name, $matches, PREG_OFFSET_CAPTURE, $searchOffset)){
+					// matches[0][0] - matched param, [1] - second character of it
+					$paramNumber = $matches[0][0][1] - 1;
+					$replaceString = isset($keyParameters[$paramNumber]) ? $keyParameters[$paramNumber] : '';
+
+					$name = substr_replace($name, $replaceString, $matches[0][1], 2);
+					$searchOffset = $matches[0][1] + strlen($replaceString);
 				}
 			}
 		}
+
+		if(preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $name, $arr)){
+			$macros = CUserMacro::getMacros($arr[1], array('itemid' => $item['itemid']));
+			$name = str_replace(array_keys($macros), array_values($macros), $name);
+		}
+
 		return $name;
 	}
 
@@ -1128,18 +1137,12 @@
 	return get_host_by_itemid($itemid);
 	}
 
-/*
- * Function: get_items_data_overview
- *
- * Description:
- *     Retrieve overview table object for items
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- */
+	/**
+	 * Retrieve overview table object for items.
+	 * @param $hostids
+	 * @param null $view_style
+	 * @return CTableInfo
+	 */
 	function get_items_data_overview($hostids,$view_style=null){
 		global $USER_DETAILS;
 
@@ -1751,7 +1754,7 @@
 	function isKeyIdChar($char){
 		return (
 			($char >= 'a' && $char <= 'z')
-			|| ($char == '.' || $char == ',' || $char == '_' || $char == '-')
+			|| ($char == '.' || $char == '_' || $char == '-')
 			|| ($char >= 'A' && $char <= 'Z')
 			|| ($char >= '0' && $char <= '9')
 		);

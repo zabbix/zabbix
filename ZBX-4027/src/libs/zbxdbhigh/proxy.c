@@ -181,11 +181,11 @@ void	update_proxy_lastaccess(const zbx_uint64_t hostid)
  *                                                                            *
  ******************************************************************************/
 static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
-		const char *condition)
+		zbx_uint64_t *hostids, int hostids_num)
 {
 	const char	*__function_name = "get_proxyconfig_table";
-	char		sql[MAX_STRING_LEN];
-	int		offset = 0, f, fld;
+	char		*sql = NULL;
+	int		sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, f, fld;
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -195,7 +195,9 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	zbx_json_addobject(j, table->table);
 	zbx_json_addarray(j, "fields");
 
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select t.%s", table->recid);
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, "select t.%s", table->recid);
 
 	zbx_json_addstring(j, NULL, table->recid, ZBX_JSON_TYPE_STRING);
 
@@ -204,18 +206,76 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 		if (0 == (table->fields[f].flags & ZBX_PROXY))
 			continue;
 
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",t.%s", table->fields[f].name);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, ",t.%s", table->fields[f].name);
 
 		zbx_json_addstring(j, NULL, table->fields[f].name, ZBX_JSON_TYPE_STRING);
 	}
 
 	zbx_json_close(j);	/* fields */
 
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s t%s", table->table, condition);
-
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " order by t.%s", table->recid);
-
 	zbx_json_addarray(j, "data");
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, " from %s t", table->table);
+
+	if (0 == strcmp(table->table, "hosts"))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				" where t.proxy_hostid=" ZBX_FS_UI64
+					" and t.status in (%d,%d)",
+				proxy_hostid,
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+	}
+	else if (0 == strcmp(table->table, "items"))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				",hosts r where t.hostid=r.hostid"
+					" and r.proxy_hostid=" ZBX_FS_UI64
+					" and r.status in (%d,%d)"
+					" and t.status in (%d,%d,%d)"
+					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+				proxy_hostid,
+				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
+				ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED,
+				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
+				ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
+				ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
+				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+				ITEM_TYPE_SSH, ITEM_TYPE_TELNET);
+	}
+	else if (SUCCEED == str_in_list("hosts_templates,hostmacro", table->table, ','))
+	{
+		if (0 == hostids_num)
+			goto skip_data;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, " where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid", hostids, hostids_num);
+	}
+	else if (SUCCEED == str_in_list("globalmacro,regexps,expressions", table->table, ','))
+	{
+		char	*field_name;
+
+		field_name = zbx_dsprintf(NULL, "t.%s", table->recid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " where 1=1" DB_NODE, DBnode_local(field_name));
+
+		zbx_free(field_name);
+	}
+	else if (0 == strcmp(table->table, "drules"))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				" where t.proxy_hostid=" ZBX_FS_UI64
+					" and t.status=%d",
+				proxy_hostid, DRULE_STATUS_MONITORED);
+	}
+	else if (0 == strcmp(table->table, "dchecks"))
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				",drules r where t.druleid=r.druleid"
+					" and r.proxy_hostid=" ZBX_FS_UI64
+					" and r.status=%d",
+				proxy_hostid, DRULE_STATUS_MONITORED);
+	}
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128, " order by t.%s", table->recid);
 
 	result = DBselect("%s", sql);
 
@@ -245,6 +305,8 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 		zbx_json_close(j);
 	}
 	DBfree_result(result);
+skip_data:
+	zbx_free(sql);
 
 	zbx_json_close(j);	/* data */
 	zbx_json_close(j);	/* table->table */
@@ -348,8 +410,6 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 	const char	*__function_name = "get_proxyconfig_data";
 	int		i;
 	const ZBX_TABLE	*table;
-	char		*condition = NULL;
-	int		condition_alloc = 512, condition_offset;
 	zbx_uint64_t	*hostids = NULL;
 	int		hostids_alloc = 0, hostids_num = 0;
 
@@ -357,83 +417,18 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 
 	assert(proxy_hostid);
 
-	condition = zbx_malloc(condition, condition_alloc * sizeof(char));
-
 	get_proxy_monitored_hostids(proxy_hostid, &hostids, &hostids_alloc, &hostids_num);
 
 	for (i = 0; NULL != pt[i].table; i++)
 	{
-		if (NULL == (table = DBget_table(pt[i].table)))
-			continue;
+		assert(NULL != (table = DBget_table(pt[i].table)));
 
-		condition_offset = 0;
-
-		if (0 == strcmp(pt[i].table, "hosts"))
-		{
-			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					" where t.proxy_hostid=" ZBX_FS_UI64
-						" and t.status in (%d,%d)",
-					proxy_hostid,
-					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
-		}
-		else if (0 == strcmp(pt[i].table, "items"))
-		{
-			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					",hosts r where t.hostid=r.hostid"
-						" and r.proxy_hostid=" ZBX_FS_UI64
-						" and r.status in (%d,%d)"
-						" and t.status in (%d,%d,%d)"
-						" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
-					proxy_hostid,
-					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-					ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED,
-					ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
-					ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
-					ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-					ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-					ITEM_TYPE_SSH, ITEM_TYPE_TELNET);
-		}
-		else if (0 == strcmp(pt[i].table, "hosts_templates"))
-		{
-			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					" where%s", 0 == hostids_num ? " 0=1" : "");
-			DBadd_condition_alloc(&condition, &condition_alloc, &condition_offset,
-					"t.hostid", hostids, hostids_num);
-		}
-		else if (0 == strcmp(pt[i].table, "drules"))
-		{
-			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					" where t.proxy_hostid=" ZBX_FS_UI64
-						" and t.status=%d",
-					proxy_hostid, DRULE_STATUS_MONITORED);
-		}
-		else if (0 == strcmp(pt[i].table, "dchecks"))
-		{
-			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					",drules r where t.druleid=r.druleid"
-						" and r.proxy_hostid=" ZBX_FS_UI64
-						" and r.status=%d",
-					proxy_hostid, DRULE_STATUS_MONITORED);
-		}
-		else if (0 == strcmp(pt[i].table, "hostmacro"))
-		{
-			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, 256,
-					" where%s", 0 == hostids_num ? " 0=1" : "");
-			DBadd_condition_alloc(&condition, &condition_alloc, &condition_offset,
-					"t.hostid", hostids, hostids_num);
-		}
-		else
-			*condition = '\0';
-
-		get_proxyconfig_table(proxy_hostid, j, table, condition);
+		get_proxyconfig_table(proxy_hostid, j, table, hostids, hostids_num);
 	}
 
 	zbx_free(hostids);
-	zbx_free(condition);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", j->buffer);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() json:'%s'", __function_name, j->buffer);
 }
 
 /******************************************************************************
@@ -1028,7 +1023,7 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	DBcommit();

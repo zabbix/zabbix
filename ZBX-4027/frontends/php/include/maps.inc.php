@@ -370,10 +370,7 @@
 			$action_map->addItem($r_area);
 		}
 
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
-
-	return $action_map;
+		return $action_map;
 	}
 
 	function get_icon_center_by_selement($element, $info=null){

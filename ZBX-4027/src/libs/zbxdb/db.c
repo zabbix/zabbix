@@ -23,23 +23,23 @@
 #include "zbxdb.h"
 #include "log.h"
 
-/* Transaction level. Must be 1 for all queries. */
-static int	txn_level = 0;
-static int	txn_init = 0;
+int		txn_level = 0;	/* transaction level, nested transactions are not supported */
+int		txn_error = 0;	/* failed transaction */
+static int	txn_init = 0;	/* connecting to db */
 
 #if defined(HAVE_IBM_DB2)
-	zbx_ibm_db2_handle_t	ibm_db2;
+static zbx_ibm_db2_handle_t	ibm_db2;
 #elif defined(HAVE_MYSQL)
-	MYSQL		*conn = NULL;
+static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
-	zbx_oracle_db_handle_t	oracle;
+static zbx_oracle_db_handle_t	oracle;
 #elif defined(HAVE_POSTGRESQL)
-	PGconn		*conn = NULL;
-	static int	ZBX_PG_BYTEAOID = 0;
-	int		ZBX_PG_SVERSION = 0;
+static PGconn			*conn = NULL;
+static int			ZBX_PG_BYTEAOID = 0;
+int				ZBX_PG_SVERSION = 0;
 #elif defined(HAVE_SQLITE3)
-	sqlite3		*conn = NULL;
-	PHP_MUTEX	sqlite_access;
+static sqlite3			*conn = NULL;
+PHP_MUTEX			sqlite_access;
 #endif
 
 #if defined(HAVE_ORACLE)
@@ -83,9 +83,17 @@ static const char	*zbx_oci_error(sword status)
 }
 #endif	/* HAVE_ORACLE */
 
-/*
- * Connect to the database.
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_connect                                                   *
+ *                                                                            *
+ * Purpose: connect to the database                                           *
+ *                                                                            *
+ * Return value: ZBX_DB_OK - succefully connected                             *
+ *               ZBX_DB_DOWN - database is down                               *
+ *               ZBX_DB_FAIL - failed to connect                              *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
 	int		ret = ZBX_DB_OK;
@@ -185,7 +193,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_OK == ret)
 	{
 		DBexecute("SET NAMES utf8");
-		DBexecute("SET CHARACTER SET utf8");
 	}
 
 	if (ZBX_DB_FAIL == ret)
@@ -264,9 +271,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		}
 		else
 		{
-			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX,
-						(void *)&oracle.srvhp, (ub4 *)0,
-						OCI_ATTR_SERVER, oracle.errhp);
+			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX, (void *)&oracle.srvhp, (ub4 *)0,
+					OCI_ATTR_SERVER, oracle.errhp);
 
 			if (OCI_SUCCESS != err)
 			{
@@ -302,7 +308,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		DBfree_result(result);
 	}
 
-#ifdef	HAVE_FUNCTION_PQSERVERVERSION
+#ifdef HAVE_FUNCTION_PQSERVERVERSION
 	ZBX_PG_SVERSION = PQserverVersion(conn);
 	zabbix_log(LOG_LEVEL_DEBUG, "PostgreSQL Server version: %d", ZBX_PG_SVERSION);
 #endif
@@ -319,10 +325,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		DBexecute("set bytea_output=escape");
 	}
 #elif defined(HAVE_SQLITE3)
-#ifdef	HAVE_FUNCTION_SQLITE3_OPEN_V2
-	if (SQLITE_OK != (ret = sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL)))
+#ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
+	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
-	if (SQLITE_OK != (ret = sqlite3_open(dbname, &conn)))
+	if (SQLITE_OK != sqlite3_open(dbname, &conn))
 #endif
 	{
 		zabbix_errlog(ERR_Z3001, dbname, 0, sqlite3_errmsg(conn));
@@ -360,7 +366,7 @@ void	zbx_create_sqlite3_mutex(const char *dbname)
 {
 	if (ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
 	{
-		zbx_error("unable to create mutex for sqlite");
+		zbx_error("cannot create mutex for SQLite3");
 		exit(FAIL);
 	}
 }
@@ -482,15 +488,11 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
  *                                                                            *
  * Function: zbx_db_begin                                                     *
  *                                                                            *
- * Purpose: Start transaction                                                 *
- *                                                                            *
- * Parameters: -                                                              *
- *                                                                            *
- * Return value: -                                                            *
+ * Purpose: start transaction                                                 *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing if DB does not support transactions                   *
+ * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_begin()
@@ -520,14 +522,13 @@ int	zbx_db_begin()
 #elif defined(HAVE_SQLITE3)
 	if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock"
-				" on SQLite database.");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
 		assert(0);
 	}
 	rc = zbx_db_execute("%s", "begin;");
 #endif
 
-	if (rc < ZBX_DB_OK)	/* ZBX_DB_FAIL | ZBX_DB_DOWN */
+	if (ZBX_DB_DOWN == rc)
 		txn_level--;
 
 	return rc;
@@ -537,15 +538,11 @@ int	zbx_db_begin()
  *                                                                            *
  * Function: zbx_db_commit                                                    *
  *                                                                            *
- * Purpose: Commit transaction                                                *
- *                                                                            *
- * Parameters: -                                                              *
- *                                                                            *
- * Return value: -                                                            *
+ * Purpose: commit transaction                                                *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing if DB does not support transactions                   *
+ * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_commit()
@@ -557,6 +554,12 @@ int	zbx_db_commit()
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: commit without transaction."
 				" Please report it to Zabbix Team.");
 		assert(0);
+	}
+
+	if (1 == txn_error)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "commit called on failed transaction, doing a rollback instead");
+		return zbx_db_rollback();
 	}
 
 #if defined(HAVE_IBM_DB2)
@@ -579,7 +582,7 @@ int	zbx_db_commit()
 	php_sem_release(&sqlite_access);
 #endif
 
-	if (rc >= ZBX_DB_OK)	/* ZBX_DB_OK or number of changes */
+	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
 		txn_level--;
 
 	return rc;
@@ -589,20 +592,16 @@ int	zbx_db_commit()
  *                                                                            *
  * Function: zbx_db_rollback                                                  *
  *                                                                            *
- * Purpose: Rollback transaction                                              *
- *                                                                            *
- * Parameters: -                                                              *
- *                                                                            *
- * Return value: -                                                            *
+ * Purpose: rollback transaction                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: Do nothing if DB does not support transactions                   *
+ * Comments: do nothing if DB does not support transactions                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_rollback()
 {
-	int	rc = ZBX_DB_OK;
+	int	rc = ZBX_DB_OK, last_txn_error;
 
 	if (0 == txn_level)
 	{
@@ -610,6 +609,11 @@ int	zbx_db_rollback()
 				" Please report it to Zabbix Team.");
 		assert(0);
 	}
+
+	last_txn_error = txn_error;
+
+	/* allow rollback of failed transaction */
+	txn_error = 0;
 
 #if defined(HAVE_IBM_DB2)
 	if (SUCCEED != zbx_ibm_db2_success(SQLEndTran(SQL_HANDLE_DBC, ibm_db2.hdbc, SQL_ROLLBACK)))
@@ -631,8 +635,10 @@ int	zbx_db_rollback()
 	php_sem_release(&sqlite_access);
 #endif
 
-	if (rc >= ZBX_DB_OK)	/* ZBX_DB_OK or number of changes */
+	if (ZBX_DB_DOWN != rc)	/* ZBX_DB_FAIL or ZBX_DB_OK or number of changes */
 		txn_level--;
+	else
+		txn_error = last_txn_error;	/* in case of DB down we will repeat this operation */
 
 	return rc;
 }
@@ -664,15 +670,22 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	char		*error = NULL;
 #endif
 
-	if (CONFIG_LOG_SLOW_QUERIES)
+	if (0 != CONFIG_LOG_SLOW_QUERIES)
 		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
 	if (0 == txn_init && 0 == txn_level)
-		zabbix_log(LOG_LEVEL_DEBUG, "Query without transaction detected");
+		zabbix_log(LOG_LEVEL_DEBUG, "query without transaction detected");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
+	if (1 == txn_error)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
+		ret = ZBX_DB_FAIL;
+		goto clean;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
 #if defined(HAVE_IBM_DB2)
 	/* allocate a statement handle */
@@ -706,7 +719,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 		ret = (SQL_CD_TRUE == IBM_DB2server_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
-	else if (rows >= 0)
+	else if (0 <= rows)
 	{
 		ret = (int)rows;
 	}
@@ -724,6 +737,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		if (0 != (status = mysql_query(conn, sql)))
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+
 			switch (mysql_errno(conn))
 			{
 				case CR_CONN_HOST_ERROR:
@@ -746,39 +760,38 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		{
 			do
 			{
-				if (mysql_field_count(conn) == 0)
+				if (0 != mysql_field_count(conn))
 				{
-					ret += (int)mysql_affected_rows(conn);
-				}
-				else  /* some error occurred */
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "Could not retrieve result set");
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve result set");
 					break;
 				}
+				else
+					ret += (int)mysql_affected_rows(conn);
 
 				/* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
-				if ((status = mysql_next_result(conn)) > 0)
+				if (0 < (status = mysql_next_result(conn)))
 					zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 			}
-			while (status == 0);
+			while (0 == status);
 		}
 	}
 #elif defined(HAVE_ORACLE)
-	err = OCIHandleAlloc( (dvoid *) oracle.envhp, (dvoid **) &stmthp,
-		OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0);
+	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
-	if (err == OCI_SUCCESS) {
-		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql,
-			(ub4) strlen((char *) sql),
-			(ub4) OCI_NTV_SYNTAX, (ub4) OCI_DEFAULT);
+	if (OCI_SUCCESS == err)
+	{
+		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql, (ub4)strlen((char *)sql),
+				(ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
 	}
 
-	if (err == OCI_SUCCESS) {
-		err = OCIStmtExecute(oracle.svchp, stmthp, oracle.errhp, (ub4) 1, (ub4) 0,
-			(CONST OCISnapshot *) NULL, (OCISnapshot *) NULL, OCI_COMMIT_ON_SUCCESS);
+	if (OCI_SUCCESS == err)
+	{
+		err = OCIStmtExecute(oracle.svchp, stmthp, oracle.errhp, (ub4)1, (ub4)0,
+				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS);
 
-		if (err == OCI_SUCCESS) {
-			ub4 nrows = 0;
+		if (OCI_SUCCESS == err)
+		{
+			ub4	nrows = 0;
 
 			err = OCIAttrGet((void *)stmthp, OCI_HTYPE_STMT, (ub4 *)&nrows,
 					  (ub4 *)0, OCI_ATTR_ROW_COUNT, oracle.errhp);
@@ -787,12 +800,13 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		}
 	}
 
-	if (err != OCI_SUCCESS) {
+	if (OCI_SUCCESS != err)
+	{
 		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
 		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 
-	if (stmthp)
+	if (NULL != stmthp)
 	{
 		(void)OCIHandleFree((dvoid *)stmthp, OCI_HTYPE_STMT);
 		stmthp = NULL;
@@ -802,10 +816,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 	if (NULL == result)
 	{
-		zabbix_errlog(ERR_Z3005, 0, "Result is NULL", sql);
-		ret = ZBX_DB_FAIL;
+		zabbix_errlog(ERR_Z3005, 0, "result is NULL", sql);
+		ret = (CONNECTION_OK == PQstatus(conn) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
-	if (PGRES_COMMAND_OK != PQresultStatus(result))
+	else if (PGRES_COMMAND_OK != PQresultStatus(result))
 	{
 		error = zbx_dsprintf(error, "%s:%s",
 				PQresStatus(PQresultStatus(result)),
@@ -817,24 +831,21 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	}
 
 	if (ZBX_DB_OK == ret)
-	{
 		ret = atoi(PQcmdTuples(result));
-	}
+
 	PQclear(result);
 #elif defined(HAVE_SQLITE3)
-	if (0 == txn_level)
+	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
-			exit(FAIL);
-		}
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
+		exit(FAIL);
 	}
 
 lbl_exec:
 	if (SQLITE_OK != (err = sqlite3_exec(conn, sql, NULL, 0, &error)))
 	{
-		if (err == SQLITE_BUSY) goto lbl_exec; /* attention deadlock!!! */
+		if (SQLITE_BUSY == err)
+			goto lbl_exec;
 
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
@@ -855,32 +866,40 @@ lbl_exec:
 		}
 	}
 
-	if (ret == ZBX_DB_OK)
-	{
+	if (ZBX_DB_OK == ret)
 		ret = sqlite3_changes(conn);
-	}
 
 	if (0 == txn_level)
-	{
 		php_sem_release(&sqlite_access);
-	}
 #endif	/* HAVE_SQLITE3 */
 
-	if (CONFIG_LOG_SLOW_QUERIES)
+	if (0 != CONFIG_LOG_SLOW_QUERIES)
 	{
 		sec = zbx_time() - sec;
 		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
-			zabbix_log(LOG_LEVEL_WARNING, "Slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
+			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
+	if (ZBX_DB_FAIL == ret && 0 < txn_level)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
+		txn_error = 1;
+	}
+clean:
 	zbx_free(sql);
 
 	return ret;
 }
 
-/*
- * Execute SQL statement. For select statements only.
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_vselect                                                   *
+ *                                                                            *
+ * Purpose: execute a select statement                                        *
+ *                                                                            *
+ * Return value: data, NULL (on error) or (DB_RESULT)ZBX_DB_DOWN              *
+ *                                                                            *
+ ******************************************************************************/
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 {
 	char		*sql = NULL;
@@ -900,12 +919,18 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	char		*error = NULL;
 #endif
 
-	if (CONFIG_LOG_SLOW_QUERIES)
+	if (0 != CONFIG_LOG_SLOW_QUERIES)
 		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
+	if (1 == txn_error)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "ignoring query [txnlev:%d] [%s] within failed transaction", txn_level, sql);
+		goto clean;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
 #if defined(HAVE_IBM_DB2)
 	result = zbx_malloc(result, sizeof(ZBX_IBM_DB2_RESULT));
@@ -934,9 +959,11 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	for (i = 0; i < result->ncolumn; i++)
 	{
 		/* get the display size for a column */
-		if (SUCCEED != zbx_ibm_db2_success(ret = SQLColAttribute(result->hstmt, (SQLSMALLINT)(i + 1), SQL_DESC_DISPLAY_SIZE,
-												NULL, 0, NULL, &result->values_len[i])))
+		if (SUCCEED != zbx_ibm_db2_success(ret = SQLColAttribute(result->hstmt, (SQLSMALLINT)(i + 1),
+				SQL_DESC_DISPLAY_SIZE, NULL, 0, NULL, &result->values_len[i])))
+		{
 			goto error;
+		}
 
 		result->values_len[i] += 1; /* '\0'; */
 
@@ -945,9 +972,11 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 		result->nalloc++;
 
 		/* bind columns to program variables, converting all types to CHAR */
-		if (SUCCEED != zbx_ibm_db2_success(ret = SQLBindCol(result->hstmt, (SQLSMALLINT)(i + 1), SQL_C_CHAR,
-								result->values_cli[i], result->values_len[i], &result->values_len[i])))
+		if (SUCCEED != zbx_ibm_db2_success(ret = SQLBindCol(result->hstmt, (SQLSMALLINT)(i + 1),
+				SQL_C_CHAR, result->values_cli[i], result->values_len[i], &result->values_len[i])))
+		{
 			goto error;
+		}
 	}
 error:
 	if (SUCCEED != zbx_ibm_db2_success(ret) || 0 == result->ncolumn)
@@ -995,41 +1024,31 @@ error:
 	result = zbx_malloc(NULL, sizeof(ZBX_OCI_DB_RESULT));
 	memset(result, 0, sizeof(ZBX_OCI_DB_RESULT));
 
-	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp,
-		OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
+	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
-	if (err == OCI_SUCCESS)
+	if (OCI_SUCCESS == err)
 	{
-		err = OCIStmtPrepare(result->stmthp, oracle.errhp, (text *)sql,
-			(ub4)strlen((char *)sql),
-			(ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
+		err = OCIStmtPrepare(result->stmthp, oracle.errhp, (text *)sql, (ub4)strlen((char *)sql),
+				(ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
 	}
 
-	if (err == OCI_SUCCESS)
+	if (OCI_SUCCESS == err)
 	{
 		err = OCIStmtExecute(oracle.svchp, result->stmthp, oracle.errhp, (ub4)0, (ub4)0,
-			(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS);
-		/*
-		if (err == OCI_NO_DATA)
-		{
-			OCI_DBfree_result(result);
-			result = NULL;
-			err = OCI_SUCCESS;
-		}
-		*/
+				(CONST OCISnapshot *)NULL, (OCISnapshot *)NULL, OCI_COMMIT_ON_SUCCESS);
 	}
 
-	if (err == OCI_SUCCESS)
+	if (OCI_SUCCESS == err)
 	{
-		/* Get the number of columns in the query */
+		/* get the number of columns in the query */
 		err = OCIAttrGet((void *)result->stmthp, OCI_HTYPE_STMT, (void *)&result->ncolumn,
 				  (ub4 *)0, OCI_ATTR_PARAM_COUNT, oracle.errhp);
 	}
 
-	if (err != OCI_SUCCESS)
+	if (OCI_SUCCESS != err)
 		goto error;
 
-	assert(result->ncolumn > 0);
+	assert(0 < result->ncolumn);
 
 	result->values = zbx_malloc(NULL, result->ncolumn * sizeof(char *));
 	memset(result->values, 0, result->ncolumn * sizeof(char *));
@@ -1041,35 +1060,31 @@ error:
 		ub4		char_semantics;
 		ub2		col_width;
 
-		/* Request a parameter descriptor in the select-list */
-		err = OCIParamGet((void *)result->stmthp, OCI_HTYPE_STMT, oracle.errhp,
-			(void **)&parmdp, (ub4)counter);
+		/* request a parameter descriptor in the select-list */
+		err = OCIParamGet((void *)result->stmthp, OCI_HTYPE_STMT, oracle.errhp, (void **)&parmdp, (ub4)counter);
 
-		if (err == OCI_SUCCESS)
+		if (OCI_SUCCESS == err)
 		{
-			/* Retrieve the length semantics for the column */
+			/* retrieve the length semantics for the column */
 			char_semantics = 0;
-			err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM,
-				(void *)&char_semantics, (ub4 *)0, (ub4)OCI_ATTR_CHAR_USED,
-				(OCIError *)oracle.errhp);
+			err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&char_semantics, (ub4 *)0,
+					(ub4)OCI_ATTR_CHAR_USED, (OCIError *)oracle.errhp);
 		}
 
-		if (err == OCI_SUCCESS)
+		if (OCI_SUCCESS == err)
 		{
 			col_width = 0;
 			if (char_semantics)
 			{
-				/* Retrieve the column width in characters */
-				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM,
-					(void *)&col_width, (ub4 *)0, (ub4)OCI_ATTR_CHAR_SIZE,
-					(OCIError *)oracle.errhp);
+				/* retrieve the column width in characters */
+				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width, (ub4 *)0,
+						(ub4)OCI_ATTR_CHAR_SIZE, (OCIError *)oracle.errhp);
 			}
 			else
 			{
-				/* Retrieve the column width in bytes */
-				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM,
-					(void *)&col_width,(ub4 *)0, (ub4)OCI_ATTR_DATA_SIZE,
-					(OCIError *)oracle.errhp);
+				/* retrieve the column width in bytes */
+				err = OCIAttrGet((void *)parmdp, (ub4)OCI_DTYPE_PARAM, (void *)&col_width, (ub4 *)0,
+						(ub4)OCI_ATTR_DATA_SIZE, (OCIError *)oracle.errhp);
 			}
 		}
 		col_width++;
@@ -1077,12 +1092,12 @@ error:
 		result->values[counter - 1] = zbx_malloc(NULL, col_width);
 		memset(result->values[counter - 1], 0, col_width);
 
-		if (err == OCI_SUCCESS)
+		if (OCI_SUCCESS == err)
 		{
 			/* represent any data as characters */
 			err = OCIDefineByPos(result->stmthp, &defnp, oracle.errhp, counter,
-				(dvoid *)result->values[counter - 1], col_width, SQLT_STR,
-				(dvoid *)0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT);
+					(dvoid *)result->values[counter - 1], col_width, SQLT_STR,
+					(dvoid *)0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT);
 		}
 
 		/* free cell descriptor */
@@ -1091,7 +1106,7 @@ error:
 	}
 
 error:
-	if (err != OCI_SUCCESS)
+	if (OCI_SUCCESS != err)
 	{
 		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
 
@@ -1107,9 +1122,8 @@ error:
 	result->row_num = 0;
 
 	if (NULL == result->pg_result)
-	{
-		zabbix_errlog(ERR_Z3005, 0, "Result is NULL", sql);
-	}
+		zabbix_errlog(ERR_Z3005, 0, "result is NULL", sql);
+
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
 		error = zbx_dsprintf(error, "%s:%s",
@@ -1124,13 +1138,10 @@ error:
 	else	/* init rownum */
 		result->row_num = PQntuples(result->pg_result);
 #elif defined(HAVE_SQLITE3)
-	if (0 == txn_level)
+	if (0 == txn_level && PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
-			exit(FAIL);
-		}
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: cannot create lock on SQLite3 database");
+		exit(FAIL);
 	}
 
 	result = zbx_malloc(NULL, sizeof(ZBX_SQ_DB_RESULT));
@@ -1139,7 +1150,8 @@ error:
 lbl_get_table:
 	if (SQLITE_OK != (ret = sqlite3_get_table(conn,sql, &result->data, &result->nrow, &result->ncolumn, &error)))
 	{
-		if (ret == SQLITE_BUSY) goto lbl_get_table; /* attention deadlock!!! */
+		if (SQLITE_BUSY == ret)
+			goto lbl_get_table;
 
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
@@ -1150,8 +1162,8 @@ lbl_get_table:
 		{
 			case SQLITE_ERROR:	/* SQL error or missing database; assuming SQL error, because if we
 						   are this far into execution, zbx_db_connect() was successful */
-			case SQLITE_NOMEM:	/* A malloc() failed */
-			case SQLITE_MISMATCH:	/* Data type mismatch */
+			case SQLITE_NOMEM:	/* a malloc() failed */
+			case SQLITE_MISMATCH:	/* data type mismatch */
 				result = NULL;
 				break;
 			default:
@@ -1161,19 +1173,24 @@ lbl_get_table:
 	}
 
 	if (0 == txn_level)
-	{
 		php_sem_release(&sqlite_access);
-	}
 #endif	/* HAVE_SQLITE3 */
 
-	if (CONFIG_LOG_SLOW_QUERIES)
+	if (0 != CONFIG_LOG_SLOW_QUERIES)
 	{
 		sec = zbx_time() - sec;
 		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
-			zabbix_log(LOG_LEVEL_WARNING, "Slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
+			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
+	if (NULL == result && 0 < txn_level)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "query [%s] failed, setting transaction as failed", sql);
+		txn_error = 1;
+	}
+clean:
 	zbx_free(sql);
+
 	return result;
 }
 
@@ -1198,12 +1215,18 @@ DB_RESULT	zbx_db_select_n(const char *query, int n)
 DB_ROW	zbx_db_fetch(DB_RESULT result)
 {
 #if defined(HAVE_IBM_DB2)
-	int	i;
+	int		i;
+#elif defined(HAVE_ORACLE)
+	sword		rc;
+	static char	errbuf[512];
+	sb4		errcode;
+#endif
 
 	if (NULL == result)
 		return NULL;
 
-	if (SUCCEED != zbx_ibm_db2_success(SQLFetch(result->hstmt))) /* e.g., SQL_NO_DATA_FOUND */
+#if defined(HAVE_IBM_DB2)
+	if (SUCCEED != zbx_ibm_db2_success(SQLFetch(result->hstmt)))	/* e.g., SQL_NO_DATA_FOUND */
 		return NULL;
 
 	for (i = 0; i < result->ncolumn; i++)
@@ -1213,18 +1236,8 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return result->values;
 #elif defined(HAVE_MYSQL)
-	if (NULL == result)
-		return NULL;
-
 	return mysql_fetch_row(result);
 #elif defined(HAVE_ORACLE)
-	sword		rc;
-	static char	errbuf[512];
-	sb4		errcode;
-
-	if (NULL == result)
-		return NULL;
-
 	if (OCI_NO_DATA == (rc = OCIStmtFetch2(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)))
 		return NULL;
 
@@ -1248,10 +1261,6 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return result->values;
 #elif defined(HAVE_POSTGRESQL)
-	/* EOF */
-	if (NULL == result)
-		return NULL;
-
 	/* free old data */
 	if (NULL != result->values)
 		zbx_free(result->values);
@@ -1278,7 +1287,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 			else
 			{
 				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
-				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID) /* binary data type BYTEAOID */
+				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID)	/* binary data type BYTEAOID */
 					zbx_pg_unescape_bytea((u_char *)result->values[i]);
 			}
 		}
@@ -1289,17 +1298,13 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 	return result->values;
 #elif defined(HAVE_SQLITE3)
 	/* EOF */
-	if (NULL == result)
-		return NULL;
-
-	/* EOF */
 	if (result->curow >= result->nrow)
 		return NULL;
 
 	if (NULL == result->data)
 		return NULL;
 
-	result->curow++; /* NOTE: first row == header row */
+	result->curow++;	/* NOTE: first row == header row */
 
 	return &(result->data[result->curow * result->ncolumn]);
 #endif
@@ -1307,13 +1312,13 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 int	zbx_db_is_null(const char *field)
 {
-	int	ret = FAIL;
-
-	if (NULL == field)		ret = SUCCEED;
-#if defined(HAVE_ORACLE)
-	else if ('\0' == field[0])	ret = SUCCEED;
+	if (NULL == field)
+		return SUCCEED;
+#ifdef HAVE_ORACLE
+	if ('\0' == *field)
+		return SUCCEED;
 #endif
-	return ret;
+	return FAIL;
 }
 
 #if defined(HAVE_IBM_DB2)
@@ -1408,7 +1413,7 @@ int	IBM_DB2server_status()
 	if (SUCCEED != zbx_ibm_db2_success(SQLGetConnectAttr(ibm_db2.hdbc, SQL_ATTR_CONNECTION_DEAD,
 								&server_status, SQL_IS_POINTER, NULL)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Could not determine IBM DB2 server status, assuming not connected");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot determine IBM DB2 server status, assuming not connected");
 	}
 
 	return (SQL_CD_FALSE == server_status ? SQL_CD_TRUE : SQL_CD_FALSE);
@@ -1445,10 +1450,10 @@ ub4	OCI_DBserver_status()
 
 	err = OCIAttrGet((void *)oracle.srvhp, OCI_HTYPE_SERVER, (void *)&server_status,
 			(ub4 *)0, OCI_ATTR_SERVER_STATUS, (OCIError *)oracle.errhp);
-	
+
 	if (OCI_SUCCESS != err)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Could not determine Oracle server status, assuming not connected");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot determine Oracle server status, assuming not connected");
 	}
 
 	return server_status;

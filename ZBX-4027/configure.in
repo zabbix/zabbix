@@ -1,4 +1,4 @@
-dnl 
+dnl
 dnl ZABBIX
 dnl Copyright (C) 2000-2008 SIA Zabbix
 dnl
@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[1.8.7rc1])
+AM_INIT_AUTOMAKE([zabbix],[1.8.9rc1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -196,6 +196,28 @@ else
   AC_MSG_RESULT(leaving undefined)
 fi
 
+AC_MSG_CHECKING(for integer field name in union sigval of struct siginfo_t)
+zbx_sival_int=
+for field in sival_int sigval_int; do
+  AC_TRY_COMPILE([
+#ifdef HAVE_SIGNAL_H
+#  include <signal.h>
+#endif
+  ],[
+    siginfo_t siginfo;
+    siginfo.si_value.$field = 0;
+  ],[
+    zbx_sival_int="$field"
+    break
+  ])
+done
+if test "x$zbx_sival_int" != "x"; then
+  AC_MSG_RESULT($zbx_sival_int)
+  AC_DEFINE_UNQUOTED(ZBX_SIVAL_INT, $zbx_sival_int, [Define integer field name in union 'sigval' of struct 'siginfo_t'])
+else
+  AC_MSG_ERROR(Unable to find integer field name in union sigval of struct siginfo_t)
+fi
+
 AC_MSG_CHECKING(for union semun)
 AC_TRY_COMPILE(
 [
@@ -217,7 +239,7 @@ AC_TRY_COMPILE(
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
+#endif /* HAVE_SYS_PARAM_H */
 
 #include <sys/sysctl.h>
 
@@ -1111,9 +1133,6 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${JABBER_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${JABBER_LIBS}"
 
-	PROXY_LDFLAGS="${PROXY_LDFLAGS}"
-	PROXY_LIBS="${PROXY_LIBS}"
-
 	dnl Checking for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
 	if test "x$want_curl" = "xyes"; then
@@ -1247,13 +1266,6 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${OPENIPMI_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${OPENIPMI_LIBS}"
-
-	AC_SUBST(SERVER_LDFLAGS)
-	AC_SUBST(SERVER_LIBS)
-
-	AC_SUBST(PROXY_LDFLAGS)
-	AC_SUBST(PROXY_LIBS)
-
 fi
 
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
@@ -1268,7 +1280,9 @@ if test "x$want_ldap" = "xyes"; then
 	fi
 fi
 CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${LDAP_LDFLAGS}"
+SERVER_LDFLAGS="${SERVER_LDFLAGS} ${LDAP_LDFLAGS}"
+PROXY_LDFLAGS="${PROXY_LDFLAGS} ${LDAP_LDFLAGS}"
+AGENT_LDFLAGS="${AGENT_LDFLAGS} ${LDAP_LDFLAGS}"
 
 found_iconv="no"
 dnl Check for libiconv [by default - skip]
@@ -1282,6 +1296,15 @@ LIBS="${LIBS} ${ICONV_LIBS}"
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
+
+AC_SUBST(SERVER_LDFLAGS)
+AC_SUBST(SERVER_LIBS)
+
+AC_SUBST(PROXY_LDFLAGS)
+AC_SUBST(PROXY_LIBS)
+
+AC_SUBST(AGENT_LDFLAGS)
+AC_SUBST(AGENT_LIBS)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1506,8 +1529,8 @@ echo "
 if test "x$agent" != "xno"; then
 
 echo "  Agent details:
-    Linker flags:          ${LDFLAGS}
-    Libraries:             ${LIBS}"
+    Linker flags:          ${LDFLAGS} ${AGENT_LDFLAGS}
+    Libraries:             ${LIBS} ${AGENT_LIBS}"
 
 fi
 

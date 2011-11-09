@@ -9,7 +9,7 @@ CREATE TABLE history_log (
   value			varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (id),
   KEY itemidclock (itemid, clock)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 
 alter table media add	period		varchar(100)	DEFAULT '1-7,00:00-23:59' NOT NULL;

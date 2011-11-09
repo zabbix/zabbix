@@ -7,5 +7,5 @@ CREATE TABLE proxy_history (
         severity                integer         DEFAULT '0'     NOT NULL,
         value           text                    NOT NULL,
         PRIMARY KEY (id)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX proxy_history_1 on proxy_history (clock);

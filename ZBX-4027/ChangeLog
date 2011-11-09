@@ -1,5 +1,107 @@
+Changes for 1.8.9rc1
+
+ - [ZBX-3117] fixed error notification when unsuccessfully copying a graph (pavels)
+ - [ZBX-4326] api now return error when try create incorrect host profile field (Vedmak)
+ - [ZBX-4323] fixed host profile not created with host using api (Vedmak)
+ - [ZBX-4275] made server and proxy try to reconnect to the database upon startup (asaveljevs)
+ - [ZBX-4159] fixed problem with generating new ids for historical tables (Vedmak)
+ - [ZBX-3988] fixed memory leak in dashboard (Vedmak)
+ - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget (pavels)
+ - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
+ - [ZBX-2919] fixed custom multiplier becoming 0 when creating an item (pavels)
+ - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
+ - [ZBX-2504] replaced 'Groups' by 'Replace host groups' in host mass-update form to avoid confusion (Alexei)
+ - [ZBX-4265] fixed host input validation (pavels)
+ - [ZBX-4264] fixed zabbix_agent compilation problem on HP-UX (dimir)
+ - [ZBX-3504] added a text notification in the maps section when no maps are defined (pavels)
+ - [ZBX-3749] escaped HTML entities in the web step "required" field (pavels)
+ - [ZBX-3402] disabled "store value" overriding for host items inherited from templates (pavels)
+ - [ZBX-4201] fixed template items included in bar reports (Vedmak)
+ - [ZBX-4178] fixed compilation on FreeBSD: union has no member named `sival_int' (asaveljevs)
+ - [ZBX-4241] added truncation of "ids" table to the database conversion procedure (asaveljevs)
+ - [ZBX-2493] improved default messages for actions (Vedmak)
+ - [ZBX-2931] fixed dns and ip fields, item statuses and trigger values for default templates (Sasha,asaveljevs)
+ - [ZBX-2361] fixed item keys in the default template "Template_Netscreen_25" (Sasha)
+ - [ZBX-3441] fixed server to not process items that are disabled or removed (dimir,Sasha)
+ - [ZBX-4249] fixed trigger wizard "insert macro" action break expression (Vedmak)
+ - [ZBX-2490] fixed acknowledge flag for events, acknowledged on a child node (Sasha)
+ - [ZBX-3743] fixed no triggers returned when API trigger.get is called with "limit" and "withLastEventUnacknowledged" options (Vedmak)
+ - [ZBX-4203] fixed API trigger.update method removes dependencies (Vedmak)
+ - [ZBX-4232] fixed unclear log messages when checks are temporarily enabled/disabled (dimir)
+ - [ZBX-4221] fixed sorting by host in Configuration->Web (Vedmak)
+ - [ZBX-4198] fixed items filter when filter by host name with multiple spaces (Vedmak)
+ - [ZBX-4145] fixed images import script for PostgreSQL 9.1 and above (dimir)
+ - [ZBX-4045] removed the check for duplicate hosts, made the server survive the situation instead (asaveljevs,Sasha)
+ - [ZBX-4159] fixed frontend incorrectly handle new ids for history tables in distributed setup (Vedmak)
+ - [ZBX-4216] fixed weekdays in Brazilian Portuguese translation; thanks to Ricardo Santos (Richlv)
+ - [ZBX-4205] fixed trigger status change not logged in audit for inherited triggers (Vedmak)
+ - [ZBX-4194] fixed SQL query errors in distributed environment with three digit node numbers (asaveljevs)
+ - [ZBX-3257] fixed item type auto selection in item key popup (Eduard)
+ - [ZBX-4026] fixed disabling SNMP host when unreachable (dimir)
+ - [ZBX-3942] fixed agent's collector to not gather perfstat data on AIX unless it is requested (dimir)
+ - [ZBX-4087] fixed error message when processing configuration file (dimir)
+ - [ZBX-4158] fixed DB transaction processing, stop and abort on error (dimir,Sasha)
+ - [ZBX-4146] fixed page refreshing after adding new IT service (Eduard)
+ - [ZBX-4176] fixed API action.update required parameters (Vedmak)
+ - [ZBX-2882] fixed wrong item vfs.file.cksum[/vmlinuz] for some templates (Sasha)
+ - [ZBX-4072] improved performance of event acknowledging (Sasha)
+ - [ZBX-3829] fixed trigger dependency removed after template linked to host (Vedmak)
+ - [ZBX-4131] fixed incorrect page shown after login (Vedmak)
+ - [ZBX-4104] fixed handle handling when executing scripts in Windows (rudolfs)
+ - [ZBX-4091] removed unneeded linking for binaries (rudolfs)
+ - [ZBX-4155] fixed .pid file locking not to allow multiple instances (rudolfs)
+ - [ZBX-4056] fixed memory read access violation in Windows performance counters (rudolfs)
+ - [ZBX-4177] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
+ - [ZBX-4085] fixed compilation issues for OS X Leopard (rudolfs)
+
+Changes for 1.8.8
+
+1.8.8rc3 was released as 1.8.8 without any changes
+
+Changes for 1.8.8rc3
+
+ - [ZBX-1909] fixed keyparser to allow keys like "key,{$USERMACRO}" (Vedmak)
+ - [ZBX-4157] fixed possible truncating of queries while preparing a configuration data for sending to a proxy (Sasha)
+ - [ZBX-4150] fixed processing of quoted function parameters (Sasha)
+
+Changes for 1.8.8rc2
+
+ - [ZBX-4141] fixed possible cycling of server/proxy processes after unsuccessful execution of SQL statement (Sasha)
+ - [ZBX-4135] fixed item selection in trigger expression (Eduard)
+
+Changes for 1.8.8rc1
+
+ - [ZBX-3676] fixed item selection in bar report (Eduard)
+ - [ZBX-4070] improved performance of handling of trigger functions (Sasha)
+ - [ZBXNEXT-921] added option to show items without data in latest data (Vedmak)
+ - [ZBX-2457] changed "type" to "ENGINE" in MySQL upgrade patches for MySQL 5.5 compatibility (Richlv)
+ - [ZBX-4099] fixed possible crash when processing of functions sum(), min(), max() or diff() in triggers, aggregated checks or calculated items (Sasha)
+ - [ZBX-3030] fixed event durations in monitoring (Vedmak,Eduard)
+ - [ZBXNEXT-902] changed API search wildcard from "%" to "*" (Vedmak,Eduard)
+ - [ZBX-3967] fixed alerter hang on long running alert scripts (Deniss)
+ - [ZBX-3970] fixed proxy crash after database connection to postgresql is recovered (Deniss)
+ - [ZBX-3175] fixed value type for 'vfs.fs.size[/var,used]' in data.sql (Sasha)
+ - [ZBX-4068] updated French translation; thanks to Joseph Bueno (Richlv)
+ - [ZBX-4066] fixed macros saving in administration (Eduard)
+ - [ZBXNEXT-900] added support of {TRIGGER.ID} macro in a trigger url (Vedmak,Sasha)
+ - [ZBX-4045] added check for duplicate hosts or proxies - if found, configuration syncer logs a warning and exits (rudolfs)
+ - [ZBX-4059] fixed a potential buffer overflow in item parameter parsing (rudolfs)
+
+Changes for 1.8.7
+
+1.8.7rc1 was released as 1.8.7 without any changes
+
 Changes for 1.8.7rc1
 
+ - [ZBXNEXT-898] new trigger actions have "trigger = PROBLEM" and "not in maintenance" conditions by default (Vedmak)
+ - [ZBX-4021] fixed item visibility in case when last value is null (Eduard)
+ - [ZBX-4052] fixed key macros resolving in item names (Vedmak)
+ - [ZBX-1357] removed outdated translation strings from all translations (Richlv)
+ - [ZBX-3998] reload recipient list for database down messages every CacheUpdateFrequency seconds (rudolfs)
+ - [ZBX-4034] fixed macros resolving in item names (Vedmak)
+ - [ZBX-4044] removed redundant query "SET CHARACTER SET" (asaveljevs,Vedmak)
+ - [ZBX-3997] fixed IE9 dragging (Eduard)
+ - [ZBX-4043] fixed processing of system.cpu.util on Solaris with non-sequential cpu numbers (Sasha)
  - [ZBX-4036] fixed period slider position saving in Monitoring->Events (Eduard)
  - [ZBX-1010] fixed processing of a vfs.fs.size metric on Solaris with filesystems larger than 2TB (Sasha)
  - [ZBX-3874] always enable all trigger severity checkboxes after enabling GUI Messaging in user profile (Eduard)
@@ -7,7 +109,7 @@ Changes for 1.8.7rc1
  - [ZBX-4023] fixed excess spacing and fake plural in graph deletion message (Richlv)
  - [ZBX-4016] fixed web monitoring item status on insert and update (Eduard)
  - [ZBX-3443] fixed "not selected" working as "all" in Monitoring->Events (Eduard)
- - [ZBX-3979] adding searchWildcardsEnabled flag in API for searching using wildcards (Eduard)
+ - [ZBX-3979] added searchWildcardsEnabled flag in API for searching using wildcards (Eduard)
  - [ZBX-4018] fixed server crash on unsupported aggregate items (asaveljevs,Sasha)
  - [ZBX-3908] allow empty string for formula field if multiplier is switched off (Eduard)
  - [ZBX-3961] added recalculation of nextcheck time after changed flexible intervals (rudolfs)
@@ -1248,6 +1350,7 @@ Changes for 1.7.1
 
 Changes for 1.7.0
 
+ - [ZBX-1056] fixed failed attempt counter not reset after successful login via API (Vedmak)
  - [DEV-333] added configuration data cache module (Sasha)
  - [DEV-427] frontend is PHP 5.3.0 compatible (Aly)
  - [ZBX-1034] fixed maps tooltip url view (Aly)

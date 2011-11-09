@@ -66,7 +66,6 @@ if(!isset($DB)){
 						}
 						else{
 							DBexecute('SET NAMES utf8');
-							DBexecute('SET CHARACTER SET utf8');
 						}
 					}
 					break;
@@ -837,8 +836,9 @@ else {
 
 		$found = false;
 		do{
-			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'));
-			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
+			$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
+
 			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 			if(!is_resource($db_select)) return false;
 			$row = DBfetch($db_select);
@@ -861,7 +861,7 @@ else {
 			}
 			else{
 				$ret1 = $row['nextid'];
-				if((bccomp($ret1,$min) < 0) || !(bccomp($ret1,$max) < 0)) {
+				if((bccomp($ret1, $min, 0) < 0) || !(bccomp($ret1, $max, 0) < 0)) {
 					DBexecute('DELETE FROM ids WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 					continue;
 				}
@@ -876,7 +876,7 @@ else {
 				}
 				else{
 					$ret2 = $row["nextid"];
-					if(bccomp(bcadd($ret1,1),$ret2) == 0){
+					if(bccomp(bcadd($ret1, 1, 0), $ret2, 0) == 0){
 						$found = true;
 					}
 				}
@@ -894,7 +894,7 @@ else {
 		$nodeid = ($nodeid == 0)?get_current_nodeid(false):$nodeid;
 
 		$id=remove_nodes_from_id($id);
-		$id=bcadd($id,bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),0);
+		$id=bcadd($id, bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),0);
 	return $id;
 	}
 
@@ -913,41 +913,43 @@ else {
 	}
 
 
-	function zbx_db_search($table, $options, &$sql_parts){
+	function zbx_db_search($table, $options, &$sql_parts) {
 		list($table, $tableShort) = explode(' ', $table);
 
 		$tableSchema = DB::getSchema($table);
-		if(!$tableSchema) info('Error in search request for table ['.$table.']');
+		if (!$tableSchema) info('Error in search request for table ['.$table.']');
 
-		$start = is_null($options['startSearch'])?'%':'';
-		$exclude = is_null($options['excludeSearch'])?'':' NOT ';
+		$start = is_null($options['startSearch']) ? '%' : '';
+		$exclude = is_null($options['excludeSearch']) ? '' : ' NOT ';
 
 		$search = array();
-		foreach($options['search'] as $field => $pattern){
-			if(!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
-			if($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
+		foreach ($options['search'] as $field => $pattern) {
+			if (!isset($tableSchema['fields'][$field]) || zbx_empty($pattern)) continue;
+			if ($tableSchema['fields'][$field]['type'] != DB::FIELD_TYPE_CHAR) continue;
 
 			// escaping parameter that is about to be used in LIKE statement
-			if(empty($options['searchWildcardsEnabled'])){
-				$pattern = str_replace("!", "!!", $pattern);
-				$pattern = str_replace("%", "!%", $pattern);
-				$pattern = str_replace("_", "!_", $pattern);
+			$pattern = str_replace("!", "!!", $pattern);
+			$pattern = str_replace("%", "!%", $pattern);
+			$pattern = str_replace("_", "!_", $pattern);
 
+			if (empty($options['searchWildcardsEnabled'])) {
 				$search[$field] =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
 					zbx_dbstr($start.zbx_strtoupper($pattern).'%').
 					" ESCAPE '!'";
 			}
-			else{
+			else {
+				$pattern = str_replace("*", "%", $pattern);
 				$search[$field] =
 					' UPPER('.$tableShort.'.'.$field.') '.
 					$exclude.' LIKE '.
-					zbx_dbstr(zbx_strtoupper($pattern));
+					zbx_dbstr(zbx_strtoupper($pattern)).
+					" ESCAPE '!'";
 			}
 		}
 
-		if(!empty($search)) $sql_parts['where']['search'] = '( '.implode(' OR ', $search).' )';
+		if (!empty($search)) $sql_parts['where']['search'] = '( '.implode(' OR ', $search).' )';
 	}
 
 
@@ -1037,6 +1039,9 @@ else {
 		const DBEXECUTE_ERROR = 1;
 		const RESERVEIDS_ERROR = 2;
 
+		const TABLE_TYPE_CONFIG = 1;
+		const TABLE_TYPE_HISTORY = 2;
+
 		const FIELD_TYPE_INT = 'int';
 		const FIELD_TYPE_CHAR = 'char';
 		const FIELD_TYPE_ID = 'id';
@@ -1045,65 +1050,123 @@ else {
 		const FIELD_TYPE_BLOB = 'blob';
 
 		private static $schema = null;
+		private static $nodeId = null;
+		private static $maxNodeId = null;
+		private static $minNodeId = null;
 
 		private static function exception($code, $errors=array()){
 			throw new APIException($code, $errors);
 		}
 
-		protected static function reserveIds($table, $count){
-			global $ZBX_LOCALNODEID;
+		/**
+		 * Reserve ids for primary key of passed table.
+		 * If record for table does not exist or value is out of range, ids record is recreated
+		 * using maximum id from table or minimum allowed value.
+		 *
+		 * @throw APIException
+		 * @static
+		 *
+		 * @param string $table table name
+		 * @param int $count number of ids to reserve
+		 *
+		 * @return string
+		 */
+		protected static function reserveIds($table, $count) {
+			$tableSchema = self::getSchema($table);
+			$id_name = $tableSchema['key'];
 
-			$nodeid = get_current_nodeid(false);
-			$id_name = self::getSchema($table);
-			$id_name = $id_name['key'];
-
-			$min = bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000'), 0);
-			$max = bcadd(bcadd(bcmul($nodeid,'100000000000000'), bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999', 0);
-
-			$sql = 'SELECT nextid '.
-				' FROM ids '.
-				' WHERE nodeid='.$nodeid .
+			$sql = 'SELECT nextid'.
+				' FROM ids'.
+				' WHERE nodeid='.self::$nodeId.
 					' AND table_name='.zbx_dbstr($table).
 					' AND field_name='.zbx_dbstr($id_name).
 				' FOR UPDATE';
 			$res = DBfetch(DBselect($sql));
-			if($res){
-				$nextid = bcadd($res['nextid'], 1, 0);
 
-				if((bccomp($nextid, $max) == 1) || (bccomp($nextid, $min) == -1))
-					self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID out of range for ['.$table.']');
+			if ($res) {
+				$maxNextId = bcadd($res['nextid'], $count);
+				if (bccomp($maxNextId, self::$maxNodeId, 0) == 1 || bccomp($maxNextId, self::$minNodeId, 0) == -1) {
+					$nextid = self::refreshIds($table, $count);
+				}
+				else {
+					$sql = 'UPDATE ids'.
+							' SET nextid=nextid+'.$count.
+							' WHERE nodeid='.self::$nodeId.
+								' AND table_name='.zbx_dbstr($table).
+								' AND field_name='.zbx_dbstr($id_name);
+					if (!DBexecute($sql)) {
+						self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+					}
 
-				$sql = 'UPDATE ids '.
-					' SET nextid=nextid+'.$count.
-					' WHERE nodeid='.$nodeid.
-						' AND table_name='.zbx_dbstr($table).
-						' AND field_name='.zbx_dbstr($id_name);
-				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+					$nextid = bcadd($res['nextid'], 1, 0);
+				}
 			}
-			else{
-				$sql = 'SELECT max('.$id_name.') AS id'.
-						' FROM '.$table.
-						' WHERE '.$id_name.'>='.$min.
-							' AND '.$id_name.'<='.$max;
-				$row = DBfetch(DBselect($sql));
-
-				$nextid = (!$row || ($row['id'] == 0)) ? $min : $row['id'];
-
-				$sql = 'INSERT INTO ids (nodeid,table_name,field_name,nextid) '.
-					' VALUES ('.$nodeid.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.bcadd($nextid, $count, 0).')';
-
-				$nextid = bcadd($nextid, 1, 0);
-
-				if(!DBexecute($sql)) self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+			else {
+				$nextid = self::refreshIds($table, $count);
 			}
 
 			return $nextid;
 		}
 
+		/**
+		 * Refresh id record for given table.
+		 * Record is deleted and then created again with value of maximum id from table or minimu allowed.
+		 *
+		 * @throw APIException
+		 * @static
+		 *
+		 * @param string $table table name
+		 * @param int $count number of ids to reserve
+		 *
+		 * @return string
+		 */
+		private static function refreshIds($table, $count) {
+			$tableSchema = self::getSchema($table);
+			$id_name = $tableSchema['key'];
+
+			$sql = 'DELETE FROM ids'.
+					' WHERE nodeid='.self::$nodeId.
+						' AND table_name='.zbx_dbstr($table).
+						' AND field_name='.zbx_dbstr($id_name);
+			if (!DBexecute($sql)) {
+				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+			}
+
+			$sql = 'SELECT MAX('.$id_name.') AS id'.
+					' FROM '.$table.
+					' WHERE '.$id_name.'>='.self::$minNodeId.
+						' AND '.$id_name.'<='.self::$maxNodeId;
+			$row = DBfetch(DBselect($sql));
+
+			$nextid = (!$row || is_null($row['id'])) ? self::$minNodeId : $row['id'];
+
+			$maxNextId = bcadd($nextid, $count, 0);
+			if (bccomp($maxNextId, self::$maxNodeId, 0) == 1) {
+				self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID greater than maximum allowed for table "'.$table.'"');
+			}
+
+			$sql = 'INSERT INTO ids (nodeid,table_name,field_name,nextid)'.
+					' VALUES ('.self::$nodeId.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.$maxNextId.')';
+			if (!DBexecute($sql)) {
+				self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
+			}
+
+			$nextid = bcadd($nextid, 1, 0);
+
+			return $nextid;
+		}
 
 		public static function getSchema($table=null){
+			global $ZBX_LOCALNODEID;
+
 			if(is_null(self::$schema)){
 				self::$schema = include(self::SCHEMA_FILE);
+			}
+
+			if(is_null(self::$nodeId)){
+				self::$nodeId = get_current_nodeid(false);
+				self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+				self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 			}
 
 			if(is_null($table))

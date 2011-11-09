@@ -36,7 +36,7 @@ extern int	CONFIG_NODEID;
 extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_NODE_NOHISTORY;
-extern int     CONFIG_REFRESH_UNSUPPORTED;
+extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
@@ -79,9 +79,7 @@ typedef enum {
 
 #define	ZBX_DB_CONNECT_NORMAL	0
 #define	ZBX_DB_CONNECT_EXIT	1
-
-#define DB_FULL_DELETE	0
-#define DB_PART_DELETE	1
+#define	ZBX_DB_CONNECT_ONCE	2
 
 /* Trigger related defines */
 #define TRIGGER_DESCRIPTION_LEN		1020
@@ -291,7 +289,6 @@ typedef struct
 	int		value;
 	int		new_value;
 	unsigned char	type;
-	unsigned char	update_trigger;
 	unsigned char	add_event;
 }
 DB_TRIGGER_UPDATE;
@@ -327,50 +324,55 @@ typedef struct
 }
 DB_HOST;
 
+typedef union
+{
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+}
+history_value_t;
+
 typedef struct
 {
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	hostid;
-	zbx_item_type_t	type;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	zbx_item_type_t		type;
 	zbx_item_data_type_t	data_type;
 	zbx_item_status_t	status;
-	char	*description;
-	char	*key;
-	char	*key_orig;
-	char	*host_name;
-	char	*host_ip;
-	char	*host_dns;
-	int	useip;
-	int     port;
-	int     delay;
-	int     history;
-	int	trends;
-	char	*prevorgvalue_str;
-	double	prevorgvalue_dbl;
-	zbx_uint64_t	prevorgvalue_uint64;
-	int	prevorgvalue_null;
-	char	*lastvalue_str;
-	double	lastvalue_dbl;
-	zbx_uint64_t	lastvalue_uint64;
-	int	lastclock;
-	int     lastvalue_null;
-	char	*prevvalue_str;
-	double	prevvalue_dbl;
-	zbx_uint64_t	prevvalue_uint64;
-	int     prevvalue_null;
-	time_t  lastcheck;
+	char			*description;
+	char			*key;
+	char			*key_orig;
+	char			*host_name;
+	char			*host_ip;
+	char			*host_dns;
+	int			useip;
+	int			port;
+	int			delay;
+	int			history;
+	int			trends;
+	int			lastclock;
+	char			*lastvalue[2];
+	int			prevorgvalue_null;
+	history_value_t		prevorgvalue;
+	time_t 			lastcheck;
 	zbx_item_value_type_t	value_type;
-	int	delta;
-	int	multiplier;
-	char	*units;
+	int			delta;
+	int			multiplier;
+	char			*units;
 
-	char	*formula;
-	int	lastlogsize;
-	int	mtime;
+	char			*formula;
+	int			lastlogsize;
+	int			mtime;
 
-	zbx_uint64_t	valuemapid;
+	zbx_uint64_t		valuemapid;
 
-	char	*error;
+	char			*error;
+
+	char			*h_lastvalue[2];
+	char			*h_lasteventid;
+	char			*h_lastsource;
+	char			*h_lastseverity;
 }
 DB_ITEM;
 
@@ -378,10 +380,10 @@ typedef struct
 {
 	zbx_uint64_t	mediaid;
 	zbx_uint64_t	mediatypeid;
-	char	*sendto;
-	char	*period;
-	int	active;
-	int	severity;
+	char		*sendto;
+	char		*period;
+	int		active;
+	int		severity;
 }
 DB_MEDIA;
 
@@ -524,26 +526,27 @@ DB_ESCALATION;
 #define DBnode_local(fieldid)	DBnode(fieldid, CONFIG_NODEID)
 const char	*DBnode(const char *fieldid, int nodeid);
 
-int	DBping();
-
-void    DBconnect(int flag);
+int	DBconnect(int flag);
 void	DBinit();
 
-void    DBclose();
-void    DBvacuum();
+void	DBclose();
+void	DBvacuum();
 
 #ifdef HAVE___VA_ARGS__
 #	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define DBexecute __zbx_DBexecute
-#endif /* HAVE___VA_ARGS__ */
+#endif
 int	__zbx_DBexecute(const char *fmt, ...);
 
 #ifdef HAVE___VA_ARGS__
-#	define DBselect(fmt, ...) __zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define DBselect_once(fmt, ...)	__zbx_DBselect_once(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define DBselect(fmt, ...)	__zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
-#	define DBselect __zbx_DBselect
-#endif /* HAVE___VA_ARGS__ */
+#	define DBselect_once	__zbx_DBselect_once
+#	define DBselect		__zbx_DBselect
+#endif
+DB_RESULT	__zbx_DBselect_once(const char *fmt, ...);
 DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
 DB_RESULT	DBselectN(const char *query, int n);
@@ -557,7 +560,6 @@ const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
-zbx_uint64_t	DBget_nextid(const char *tablename, int num);
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock);
@@ -565,11 +567,9 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 int	DBremove_escalation(zbx_uint64_t escalationid);
 void	DBupdate_triggers_status_after_restart();
-void	DBcheck_trigger_for_update(zbx_uint64_t triggerid, unsigned char type, int value, const char *error,
-		int new_value, const char *new_error, int now, unsigned char *update_trigger, unsigned char *add_event);
 int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_uint64_t triggerid,
-		int value, const char *error, int new_value, const char *new_error, int lastchange,
-		unsigned char update_trigger);
+		unsigned char type, int value, const char *error, int new_value, const char *new_error, int lastchange,
+		unsigned char *add_event);
 
 int	DBget_row_count(const char *table_name);
 int	DBget_items_unsupported_count();
@@ -584,6 +584,7 @@ char	*DBdyn_escape_string_len(const char *src, int max_src_len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
+void	DBfree_item_from_db(DB_ITEM *item);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
@@ -622,4 +623,15 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, int now);
 void	DBproxy_register_host(const char *host);
 void	DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset);
 char	*DBget_unique_hostname_by_sample(char *host_name_sample);
+
+#define ZBX_DB_GET_HIST_MIN	0
+#define ZBX_DB_GET_HIST_AVG	1
+#define ZBX_DB_GET_HIST_MAX	2
+#define ZBX_DB_GET_HIST_SUM	3
+#define ZBX_DB_GET_HIST_COUNT	4
+#define ZBX_DB_GET_HIST_DELTA	5
+#define ZBX_DB_GET_HIST_VALUE	6
+char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to, const char *field_name, int last_n);
+void	DBfree_history(char **value);
+
 #endif
