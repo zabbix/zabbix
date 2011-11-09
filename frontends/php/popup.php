@@ -1191,20 +1191,30 @@ require_once('include/page_header.php');
 
 		$table->setHeader($header);
 
-		$options = array(
-			'hostids' => $hostid,
-			'output' => API_OUTPUT_EXTEND,
-			'nodeids' => $nodeid,
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		);
+		if ($pageFilter->hostsSelected) {
+			if ($pageFilter->hostsAll) {
+				$hostid = array_keys($pageFilter->hosts);
+			}
+			else {
+				$hostid = $pageFilter->hostid;
+			}
+			$options = array(
+				'hostids' => $hostid,
+				'output' => API_OUTPUT_EXTEND,
+				'nodeids' => $nodeid,
+				'selectHosts' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
+			);
 
-		if(is_null($hostid)) $options['groupids'] = $groupid;
-		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
+			if(!is_null($writeonly)) $options['editable'] = 1;
+			if(!is_null($templated)) $options['templated'] = $templated;
 
-		$graphs = API::Graph()->get($options);
-		order_result($graphs, 'name');
+			$graphs = API::Graph()->get($options);
+			order_result($graphs, 'name');
+		}
+		else {
+			$graphs = array();
+		}
 
 		foreach($graphs as $gnum => $row){
 			$host = reset($row['hosts']);
@@ -1275,45 +1285,56 @@ require_once('include/page_header.php');
 
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
-		if($multiselect)
+		if ($pageFilter->hostsSelected) {
+			if ($pageFilter->hostsAll) {
+				$hostid = array_keys($pageFilter->hosts);
+			}
+			else {
+				$hostid = $pageFilter->hostid;
+			}
+
+			$options = array(
+				'nodeids' => $nodeid,
+				'hostids' => $hostid,
+				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => API_OUTPUT_EXTEND,
+				'webitems' => true,
+				'templated' => false,
+				'filter' => array(
+					'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
+					'status' => ITEM_STATUS_ACTIVE,
+					'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
+				),
+				'preservekeys' => true
+			);
+			if(!is_null($writeonly)) $options['editable'] = 1;
+			if(!is_null($templated)) $options['templated'] = $templated;
+
+			$items = API::Item()->get($options);
+			order_result($items, 'name');
+		}
+		else {
+			$items = array();
+		}
+
+		if ($multiselect) {
 			$header = array(
-				($hostid>0)?null:S_HOST,
+				is_array($hostid) ? S_HOST : null,
 				array(new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), _('Name')),
 				S_TYPE,
 				S_TYPE_OF_INFORMATION,
-				S_STATUS
 			);
-		else
+		}
+		else {
 			$header = array(
-				($hostid>0)?null:S_HOST,
+				is_array($hostid) ? S_HOST : null,
 				_('Name'),
 				S_TYPE,
 				S_TYPE_OF_INFORMATION,
-				S_STATUS
 			);
+		}
 
 		$table->setHeader($header);
-
-		$options = array(
-			'nodeids' => $nodeid,
-			'hostids' => $hostid,
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'webitems' => true,
-			'templated' => false,
-			'filter' => array(
-				'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
-				'status' => ITEM_STATUS_ACTIVE,
-				'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED),
-			),
-			'preservekeys' => true
-		);
-		if(is_null($hostid)) $options['groupids'] = $groupid;
-		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
-
-		$items = API::Item()->get($options);
-		order_result($items, 'name');
 
 		foreach($items as $tnum => $row){
 			$host = reset($row['hosts']);
@@ -1348,7 +1369,6 @@ require_once('include/page_header.php');
 				$description,
 				item_type2str($row['type']),
 				item_value_type2str($row['value_type']),
-				new CSpan(item_status2str($row['status']),item_status2style($row['status']))
 				));
 		}
 
@@ -1361,6 +1381,7 @@ require_once('include/page_header.php');
 
 		$form->addItem($table);
 		$form->show();
+
 	}
 	else if($srctbl == 'sysmaps'){
 		$form = new CForm();
