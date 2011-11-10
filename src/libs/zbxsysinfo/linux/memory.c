@@ -160,7 +160,7 @@ static int      VM_MEMORY_PAVAILABLE(const char *cmd, const char *param, unsigne
 
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	MODE_FUNCTION fl[] =
+	const MODE_FUNCTION	fl[] =
 	{
 		{"free",	VM_MEMORY_FREE},
 		{"shared",	VM_MEMORY_SHARED},
