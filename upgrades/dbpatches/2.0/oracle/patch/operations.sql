@@ -5,7 +5,7 @@ CREATE TABLE t_operations (
 	object			number(10),
 	objectid		number(20),
 	shortdata		nvarchar2(255),
-	longdata		nvarchar2(2048),
+	longdata		nvarchar2(2000),
 	esc_period		number(10),
 	esc_step_from		number(10),
 	esc_step_to		number(10),
@@ -214,7 +214,7 @@ BEGIN
 			v_evaltype number(10);
 			v_default_msg number(10);
 			v_shortdata nvarchar2(255);
-			v_longdata nvarchar2(2048);
+			v_longdata nvarchar2(2000);
 			v_mediatypeid number(20);
 			v_object number(10);
 			v_objectid number(20);
@@ -222,7 +222,7 @@ BEGIN
 			r_pos number(10);
 			h_pos number(10);
 			g_pos number(10);
-			cur_string nvarchar2(2048);
+			cur_string nvarchar2(2000);
 			v_host nvarchar2(64);
 			v_group nvarchar2(64);
 			v_hostid number(20);
@@ -397,7 +397,7 @@ DROP TABLE t_operations;
 DROP TABLE t_opconditions;
 
 UPDATE opcommand
-	SET type = 1, command = TRIM(SUBSTR(CAST(command AS nvarchar2(2048)), 5))
-	WHERE SUBSTR(CAST(command AS nvarchar2(2048)), 1, 4) = 'IPMI';
+	SET type = 1, command = TRIM(SUBSTR(CAST(command AS nvarchar2(2000)), 5))
+	WHERE SUBSTR(CAST(command AS nvarchar2(2000)), 1, 4) = 'IPMI';
 
 DELETE FROM ids WHERE table_name IN ('operations', 'opconditions', 'opmediatypes');
