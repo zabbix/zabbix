@@ -53,4 +53,20 @@ function _n($string1, $string2, $value){
 	$arguments = array_slice(func_get_args(), 2);
 	return vsprintf(ngettext($string1, $string2, $value), $arguments);
 }
+
+/**
+ * Translates the string with respect to the given context.
+ *
+ * If no translation is found, the original string will be returned.
+ *
+ * @param string $msgid     String to translate
+ * @param string $context   Context of the string
+ * @param string $domain    Locale domain
+ * @return string
+ */
+function _x($msgid, $context, $domain = 'frontend') {
+	$contextString = $context."\004".$msgid;
+	$translation = dcgettext($domain, $contextString, LC_MESSAGES);
+	return ($translation == $contextString) ? $msgid : $translation;
+}
 ?>
