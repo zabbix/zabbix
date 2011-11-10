@@ -97,7 +97,7 @@ DROP TABLE tmp_events_eventid;
 ALTER TABLE triggers MODIFY triggerid DEFAULT NULL;
 ALTER TABLE triggers MODIFY templateid DEFAULT NULL;
 ALTER TABLE triggers MODIFY templateid NULL;
-ALTER TABLE triggers MODIFY comments nvarchar2(2000) DEFAULT '';
+ALTER TABLE triggers MODIFY comments nvarchar2(2048) DEFAULT '';
 ALTER TABLE triggers DROP COLUMN dep_level;
 ALTER TABLE triggers ADD value_flags number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE triggers ADD flags number(10) DEFAULT '0' NOT NULL;

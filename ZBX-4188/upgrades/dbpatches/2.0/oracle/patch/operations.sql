@@ -5,7 +5,7 @@ CREATE TABLE t_operations (
 	object			number(10),
 	objectid		number(20),
 	shortdata		nvarchar2(255),
-	longdata		nvarchar2(2000),
+	longdata		nvarchar2(2048),
 	esc_period		number(10),
 	esc_step_from		number(10),
 	esc_step_to		number(10),
@@ -76,7 +76,7 @@ CREATE TABLE opmessage (
 	operationid              number(20)                                NOT NULL,
 	default_msg              number(10)      DEFAULT '0'               NOT NULL,
 	subject                  nvarchar2(255)  DEFAULT ''                ,
-	message                  nvarchar2(2000)  DEFAULT ''                ,
+	message                  nvarchar2(2048)  DEFAULT ''                ,
 	mediatypeid              number(20)                                NULL,
 	PRIMARY KEY (operationid)
 );
@@ -114,7 +114,7 @@ CREATE TABLE opcommand (
 	password                 nvarchar2(64)   DEFAULT ''                ,
 	publickey                nvarchar2(64)   DEFAULT ''                ,
 	privatekey               nvarchar2(64)   DEFAULT ''                ,
-	command                  nvarchar2(2000)   DEFAULT ''                ,
+	command                  nvarchar2(2048)   DEFAULT ''                ,
 	PRIMARY KEY (operationid)
 );
 ALTER TABLE opcommand ADD CONSTRAINT c_opcommand_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
@@ -214,7 +214,7 @@ BEGIN
 			v_evaltype number(10);
 			v_default_msg number(10);
 			v_shortdata nvarchar2(255);
-			v_longdata nvarchar2(2000);
+			v_longdata nvarchar2(2048);
 			v_mediatypeid number(20);
 			v_object number(10);
 			v_objectid number(20);
@@ -222,7 +222,7 @@ BEGIN
 			r_pos number(10);
 			h_pos number(10);
 			g_pos number(10);
-			cur_string nvarchar2(2000);
+			cur_string nvarchar2(2048);
 			v_host nvarchar2(64);
 			v_group nvarchar2(64);
 			v_hostid number(20);
@@ -397,7 +397,7 @@ DROP TABLE t_operations;
 DROP TABLE t_opconditions;
 
 UPDATE opcommand
-	SET type = 1, command = TRIM(SUBSTR(CAST(command AS nvarchar2(2000)), 5))
-	WHERE SUBSTR(CAST(command AS nvarchar2(2000)), 1, 4) = 'IPMI';
+	SET type = 1, command = TRIM(SUBSTR(CAST(command AS nvarchar2(2048)), 5))
+	WHERE SUBSTR(CAST(command AS nvarchar2(2048)), 1, 4) = 'IPMI';
 
 DELETE FROM ids WHERE table_name IN ('operations', 'opconditions', 'opmediatypes');
