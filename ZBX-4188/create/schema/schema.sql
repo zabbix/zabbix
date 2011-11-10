@@ -797,7 +797,7 @@ FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|2|items	|itemid
 FIELD		|valuemapid	|t_id		|	|NULL		|ZBX_SYNC		|3|valuemaps	|		|RESTRICT
 FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|params		|t_item_param	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|params		|t_text		|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|data_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
