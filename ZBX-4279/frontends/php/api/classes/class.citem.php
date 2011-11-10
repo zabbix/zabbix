@@ -1211,16 +1211,22 @@ class CItem extends CItemGeneral{
 		if ($graphs) {
 			$foundItemsNames = array();
 			foreach ($graphs as $graph) {
-				$foundGraphNames[] = $graph['name'];
-				$foundItemNames[] = $items[$graph[($checkMax) ? 'ymax_itemid' : 'ymin_itemid']]['name'];
+				$foundGraphNames[$graph['name']] = $graph['name'];
+
+				$item = $items[$graph[($checkMax) ? 'ymax_itemid' : 'ymin_itemid']];
+				$foundItemNames[$item['name']] = $item['name'];
 			}
 
+			// throw error
+			$error = _n('Cannot delete item', 'Cannot delete items', count($foundItemNames)).' ['.implode(', ', $foundItemNames).']';
 			if ($checkMax) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete items [%s]: they are used as Y axis MAX values for graphs [%s].', implode(', ', $foundItemNames), implode(', ', $foundGraphNames)));
+				$error .= ' '._n('they are used as Y axis MAX values for graph', 'they are used as Y axis MAX values for graphs', count($foundGraphNames));
 			}
 			else {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete items [%s]: they are used as Y axis MIN values for graphs [%s].', implode(', ', $foundItemNames), implode(', ', $foundGraphNames)));
+				$error .= ' '._n('they are used as Y axis MIN values for graph', 'they are used as Y axis MIN values for graphs', count($foundGraphNames));
 			}
+			$error .= ' ['.implode(', ', $foundGraphNames).']';
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
