@@ -27,16 +27,16 @@
 #include "alias.h"
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix Agent";
+const char	title_message[] = "Zabbix agent";
 const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
 
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>  absolute path to the configuration file",
-	"  -h --help           give this help",
-	"  -V --version        display version number",
-	"  -p --print          print known items and exit",
-	"  -t --test <item>    test specified item and exit",
+	"  -c --config <file>  Absolute path to the configuration file",
+	"  -p --print          Print known items and exit",
+	"  -t --test <item>    Test specified item and exit",
+	"  -h --help           Give this help",
+	"  -V --version        Display version number",
 	NULL	/* end of text */
 };
 

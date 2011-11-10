@@ -1,4 +1,4 @@
-.TH ZABBIX_PROXY 8 "4 August 2011"
+.TH ZABBIX_PROXY 8 "10 November 2011"
 .SH NAME
 zabbix_proxy \- Zabbix proxy daemon.
 .SH SYNOPSIS
@@ -8,7 +8,8 @@ zabbix_proxy \- Zabbix proxy daemon.
 is a daemon used for remote data collection.
 .SS Options
 .IP "-c, --config \fI<config-file>\fR"
-Use the alternate \fIconfig-file\fR instead of \fI/etc/zabbix/zabbix_proxy.conf\fR.
+Use the alternate \fIconfig-file\fR instead of the default one.
+Absolute path should be specified.
 .IP "-R, --runtime-control \fI<option>\fR"
 Perform administrative functions according to \fIoption\fR.
 .SS
@@ -27,8 +28,8 @@ Display this help and exit.
 Output version information and exit.
 .SH FILES
 .TP
-.I /etc/zabbix/zabbix_proxy.conf
-Default location of Zabbix proxy configuration file.
+.I /usr/local/etc/zabbix_proxy.conf
+Default location of Zabbix proxy configuration file (if not modified during compile time).
 .SH "SEE ALSO"
 .BR zabbix_agentd (8),
 .BR zabbix_get (8),
