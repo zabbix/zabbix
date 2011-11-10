@@ -181,8 +181,8 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 		{NULL,		0}
 	};
 
-	int	i;
 	char	mode[MAX_STRING_LEN];
+	int	i;
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
