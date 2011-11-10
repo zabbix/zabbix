@@ -177,11 +177,10 @@ include_once('include/page_header.php');
 		$new_timeperiod['start_date'] = zbxDateToTime($new_timeperiod['start_date']);
 
 // START TIME
-		$new_timeperiod['start_time'] = ($new_timeperiod['hour'] * 3600) + ($new_timeperiod['minute'] * 60);
+		$new_timeperiod['start_time'] = $new_timeperiod['hour'] * SEC_PER_HOUR + $new_timeperiod['minute'] * SEC_PER_MIN;
 
 // PERIOD
-		$new_timeperiod['period'] = ($new_timeperiod['period_days'] * 86400) + ($new_timeperiod['period_hours'] * 3600) +
-				($new_timeperiod['period_minutes'] * 60);
+		$new_timeperiod['period'] = $new_timeperiod['period_days'] * SEC_PER_DAY + $new_timeperiod['period_hours'] * SEC_PER_HOUR + $new_timeperiod['period_minutes'] * SEC_PER_MIN;
 
 // DAYSOFWEEK
 		if(!isset($new_timeperiod['dayofweek'])){
@@ -366,7 +365,7 @@ include_once('include/page_header.php');
 			$mname				= get_request('mname', '');
 			$maintenance_type	= get_request('maintenance_type', 0);
 			$active_since		= zbxDateToTime(get_request('active_since', date('YmdHi')));
-			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHi', time()+86400)));
+			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHi', time() + SEC_PER_DAY)));
 			$description		= get_request('description', '');
 		}
 		$tblMntc = new CTable(null, 'formElementTable');
