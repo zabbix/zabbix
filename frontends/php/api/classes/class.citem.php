@@ -1043,9 +1043,10 @@ class CItem extends CItemGeneral{
 	 * @param array $itemids
 	 * @return
 	 */
-	public function delete($itemids, $nopermissions=false) {
-			if (empty($itemids))
+	public function delete($itemids, $nopermissions = false) {
+			if (empty($itemids)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+			}
 
 			$itemids = zbx_toHash($itemids);
 
@@ -1057,7 +1058,7 @@ class CItem extends CItemGeneral{
 			);
 			$del_items = $this->get($options);
 
-// TODO: remove $nopermissions hack
+			// TODO: remove $nopermissions hack
 			if (!$nopermissions) {
 				foreach ($itemids as $itemid) {
 					if (!isset($del_items[$itemid])) {
@@ -1072,45 +1073,45 @@ class CItem extends CItemGeneral{
 			// check if we can delete these items
 			$this->checkDelete($del_items);
 
-// first delete child items
+			// first delete child items
 			$parent_itemids = $itemids;
-			do{
-				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
+			do {
+				$db_items = DBselect('SELECT i.itemid FROM items i WHERE '.DBcondition('i.templateid', $parent_itemids));
 				$parent_itemids = array();
-				while($db_item = DBfetch($db_items)){
+				while ($db_item = DBfetch($db_items)) {
 					$parent_itemids[] = $db_item['itemid'];
 					$itemids[$db_item['itemid']] = $db_item['itemid'];
 				}
-			} while(!empty($parent_itemids));
+			} while (!empty($parent_itemids));
 
-
-// delete graphs, leave if graph still have item
+			// delete graphs, leave if graph still have item
 			$del_graphs = array();
-			$sql = 'SELECT gi.graphid' .
-					' FROM graphs_items gi' .
-					' WHERE ' . DBcondition('gi.itemid', $itemids) .
-					' AND NOT EXISTS (' .
-						' SELECT gii.gitemid' .
-						' FROM graphs_items gii' .
-						' WHERE gii.graphid=gi.graphid' .
-							' AND ' . DBcondition('gii.itemid', $itemids, true, false) .
-					' )';
+			$sql = 'SELECT gi.graphid'.
+					' FROM graphs_items gi'.
+					' WHERE '.DBcondition('gi.itemid', $itemids).
+						' AND NOT EXISTS ('.
+							'SELECT gii.gitemid' .
+							' FROM graphs_items gii'.
+							' WHERE gii.graphid=gi.graphid'.
+								' AND '.DBcondition('gii.itemid', $itemids, true, false).
+						')';
 			$db_graphs = DBselect($sql);
 			while($db_graph = DBfetch($db_graphs)){
 				$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
 			}
 
-			if(!empty($del_graphs)){
+			if (!empty($del_graphs)) {
 				$result = API::Graph()->delete($del_graphs, true);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph.'));
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph.'));
+				}
 			}
-//--
 
 			$triggers = API::Trigger()->get(array(
 				'itemids' => $itemids,
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
-				'preservekeys' => true,
+				'preservekeys' => true
 			));
 			if (!empty($triggers)) {
 				$result = API::Trigger()->delete(array_keys($triggers), true);
@@ -1119,18 +1120,16 @@ class CItem extends CItemGeneral{
 				}
 			}
 
-			$itemids_condition = array('itemid'=>$itemids);
 			DB::delete('screens_items', array(
-				'resourceid'=>$itemids,
-				'resourcetype'=>array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT),
+				'resourceid' => $itemids,
+				'resourcetype' => array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)
 			));
-			DB::delete('items', $itemids_condition);
+			DB::delete('items', array('itemid' => $itemids));
 			DB::delete('profiles', array(
-				'idx'=>'web.favorite.graphids',
-				'source'=>'itemid',
-				'value_id'=>$itemids
+				'idx' => 'web.favorite.graphids',
+				'source' => 'itemid',
+				'value_id' => $itemids
 			));
-
 
 			$item_data_tables = array(
 				'trends',
@@ -1139,22 +1138,22 @@ class CItem extends CItemGeneral{
 				'history_log',
 				'history_uint',
 				'history_str',
-				'history',
+				'history'
 			);
 			$insert = array();
-			foreach($itemids as $itemid){
-				foreach($item_data_tables as $table){
+			foreach ($itemids as $itemid) {
+				foreach ($item_data_tables as $table) {
 					$insert[] = array(
 						'tablename' => $table,
 						'field' => 'itemid',
-						'value' => $itemid,
+						'value' => $itemid
 					);
 				}
 			}
 			DB::insert('housekeeper', $insert);
 
-// TODO: remove info from API
-			foreach($del_items as $item){
+			// TODO: remove info from API
+			foreach ($del_items as $item) {
 				info(_s('Item "%1$s:%2$s" deleted.', $item['name'], $item['key_']));
 			}
 
