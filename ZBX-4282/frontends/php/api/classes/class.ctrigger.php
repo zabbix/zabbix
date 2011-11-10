@@ -2034,14 +2034,20 @@ class CTrigger extends CZBXAPI {
 			// }}} check circular dependency
 
 
-			$expr = new CTriggerExpression($trigger);
+			if (isset($trigger['expression'])) {
+				$expr = new CTriggerExpression($trigger);
+				$hosts = $expr->data['hosts'];
+			}
+			else {
+				$hosts = array();
+			}
 
 			$templates = API::Template()->get(array(
 				'output' => array(
 					'hostid',
 					'host'
 				),
-				'filter' => array('host' => $expr->data['hosts']),
+				'filter' => array('host' => $hosts),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
