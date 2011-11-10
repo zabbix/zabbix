@@ -117,7 +117,7 @@ const ZBX_TABLE	tables[]={
 	"t_image"	=>	"blob",
 	"t_history_log"	=>	"nclob",
 	"t_history_text"=>	"nclob",
-	"t_text"	=>	"nvarchar2(2000)",
+	"t_text"	=>	"nvarchar2(2048)",
 	"t_cksum_text"	=>	"nclob"
 );
 
