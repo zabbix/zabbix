@@ -55,20 +55,20 @@
 			proxy_num, get_process_type_string(process_type), process_num)
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix Proxy";
+const char	title_message[] = "Zabbix proxy";
 const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
 
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>              absolute path to the configuration file",
-	"  -R --runtime-control <option>   perform administrative functions",
+	"  -c --config <file>              Absolute path to the configuration file",
+	"  -R --runtime-control <option>   Perform administrative functions",
 	"",
 	"Runtime control options:",
-	"  " ZBX_CONFIG_CACHE_RELOAD "             reload configuration cache",
+	"  " ZBX_CONFIG_CACHE_RELOAD "             Reload configuration cache",
 	"",
 	"Other options:",
-	"  -h --help                       give this help",
-	"  -V --version                    display version number",
+	"  -h --help                       Give this help",
+	"  -V --version                    Display version number",
 	NULL	/* end of text */
 };
 

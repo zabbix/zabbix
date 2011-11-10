@@ -32,9 +32,9 @@ const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c 
 
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>                   Specify absolute path to the configuration file",
+	"  -c --config <file>                   Absolute path to the configuration file",
 	"",
-	"  -z --zabbix-server <server>          Hostname or IP address of Zabbix Server",
+	"  -z --zabbix-server <server>          Hostname or IP address of Zabbix server",
 	"  -p --port <server port>              Specify port number of server trapper running on the server. Default is " ZBX_DEFAULT_SERVER_PORT_STR,
 	"  -s --host <hostname>                 Specify host name. Host IP address and DNS name will not work",
 	"  -I --source-address <IP address>     Specify source IP address",
