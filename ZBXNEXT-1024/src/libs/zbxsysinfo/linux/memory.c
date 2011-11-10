@@ -61,96 +61,46 @@ static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags,
 {
 	struct sysinfo	info;
 
-	if (0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.bufferram * (zbx_uint64_t)info.mem_unit);
-#else
-		SET_UI64_RESULT(result, info.bufferram);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
+	if (0 != sysinfo(&info))
 		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)info.bufferram * info.mem_unit);
+
+	return SYSINFO_RET_OK;
 }
 
 static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
-	if (0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.sharedram * (zbx_uint64_t)info.mem_unit);
-#else
-		SET_UI64_RESULT(result, info.sharedram);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
+	if (0 != sysinfo(&info))
 		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)info.sharedram * info.mem_unit);
+
+	return SYSINFO_RET_OK;
 }
 
 static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
-	if (0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.totalram * (zbx_uint64_t)info.mem_unit);
-#else
-		SET_UI64_RESULT(result, info.totalram);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
+	if (0 != sysinfo(&info))
 		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)info.totalram * info.mem_unit);
+
+	return SYSINFO_RET_OK;
 }
 
 static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
-	if (0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeram * (zbx_uint64_t)info.mem_unit);
-#else
-		SET_UI64_RESULT(result, info.freeram);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
-		return SYSINFO_RET_FAIL;
-}
-
-static int      VM_MEMORY_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	AGENT_RESULT	result_tmp;
-	zbx_uint64_t	tot_val, free_val;
-
-	init_result(&result_tmp);
-
-	if (SYSINFO_RET_OK != VM_MEMORY_TOTAL(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
+	if (0 != sysinfo(&info))
 		return SYSINFO_RET_FAIL;
 
-	tot_val = result_tmp.ui64;
-
-	if (0 == tot_val)
-	{
-		free_result(&result_tmp);
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (SYSINFO_RET_OK != VM_MEMORY_FREE(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
-		return SYSINFO_RET_FAIL;
-
-	free_val = result_tmp.ui64;
-
-	free_result(&result_tmp);
-
-	SET_DBL_RESULT(result, (100.0 * (double)free_val) / (double)tot_val);
+	SET_UI64_RESULT(result, (zbx_uint64_t)info.freeram * info.mem_unit);
 
 	return SYSINFO_RET_OK;
 }
@@ -184,18 +134,42 @@ static int      VM_MEMORY_AVAILABLE(const char *cmd, const char *param, unsigned
 	return SYSINFO_RET_OK;
 }
 
+static int      VM_MEMORY_PAVAILABLE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	AGENT_RESULT	result_tmp;
+	zbx_uint64_t	available, total;
+
+	init_result(&result_tmp);
+
+	if (SYSINFO_RET_OK != VM_MEMORY_AVAILABLE(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
+		return SYSINFO_RET_FAIL;
+
+	available = result_tmp.ui64;
+
+	if (SYSINFO_RET_OK != VM_MEMORY_TOTAL(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
+		return SYSINFO_RET_FAIL;
+
+	total = result_tmp.ui64;
+
+	free_result(&result_tmp);
+
+	SET_DBL_RESULT(result, 100.0 * available / total);
+
+	return SYSINFO_RET_OK;
+}
+
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	MODE_FUNCTION fl[] =
 	{
 		{"free",	VM_MEMORY_FREE},
-		{"pfree",	VM_MEMORY_PFREE},
 		{"shared",	VM_MEMORY_SHARED},
 		{"total",	VM_MEMORY_TOTAL},
 		{"buffers",	VM_MEMORY_BUFFERS},
 		{"cached",	VM_MEMORY_CACHED},
 		{"available",	VM_MEMORY_AVAILABLE},
-		{0,		0}
+		{"pavailable",	VM_MEMORY_PAVAILABLE},
+		{NULL,		0}
 	};
 
 	char	mode[MAX_STRING_LEN];
