@@ -54,6 +54,7 @@ ALTER TABLE items MODIFY templateid DEFAULT NULL;
 ALTER TABLE items MODIFY templateid NULL;
 ALTER TABLE items MODIFY valuemapid DEFAULT NULL;
 ALTER TABLE items MODIFY valuemapid NULL;
+ALTER TABLE items MODIFY params nvarchar2(2000) DEFAULT '';
 ALTER TABLE items ADD lastns number(10) NULL;
 ALTER TABLE items ADD flags number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE items ADD filter nvarchar2(255) DEFAULT '';
