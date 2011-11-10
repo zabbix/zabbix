@@ -22,28 +22,30 @@
 
 static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	FILE	*f;
-	char	*t;
-	char	c[MAX_STRING_LEN];
+	FILE		*f;
+	char		*t, c[MAX_STRING_LEN];
 	zbx_uint64_t	res = 0;
 
-	if(NULL == (f = fopen("/proc/meminfo","r") ))
-	{
+	if (NULL == (f = fopen("/proc/meminfo", "r")))
 		return SYSINFO_RET_FAIL;
-	}
-	while(NULL!=fgets(c,MAX_STRING_LEN,f))
-	{
-		if(strncmp(c,"Cached:",7) == 0)
-		{
-			t=(char *)strtok(c," ");
-			t=(char *)strtok(NULL," ");
-			sscanf(t, ZBX_FS_UI64, &res );
-			t=(char *)strtok(NULL," ");
 
-			if(strcasecmp(t,"kb"))		res <<= 10;
-			else if(strcasecmp(t, "mb"))	res <<= 20;
-			else if(strcasecmp(t, "gb"))	res <<= 30;
-			else if(strcasecmp(t, "tb"))	res <<= 40;
+	while (NULL != fgets(c, sizeof(c), f))
+	{
+		if (0 == strncmp(c, "Cached:", 7))
+		{
+			t = strtok(c, " ");
+			t = strtok(NULL, " ");
+			sscanf(t, ZBX_FS_UI64, &res);
+			t = strtok(NULL, " ");
+
+			if (0 != strcasecmp(t, "kb"))
+				res <<= 10;
+			else if (0 != strcasecmp(t, "mb"))
+				res <<= 20;
+			else if (0 != strcasecmp(t, "gb"))
+				res <<= 30;
+			else if (0 != strcasecmp(t, "tb"))
+				res <<= 40;
 
 			break;
 		}
@@ -57,9 +59,9 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
 
 static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct sysinfo info;
+	struct sysinfo	info;
 
-	if( 0 == sysinfo(&info))
+	if (0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
 		SET_UI64_RESULT(result, (zbx_uint64_t)info.bufferram * (zbx_uint64_t)info.mem_unit);
@@ -74,9 +76,9 @@ static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags,
 
 static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct sysinfo info;
+	struct sysinfo	info;
 
-	if( 0 == sysinfo(&info))
+	if (0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
 		SET_UI64_RESULT(result, (zbx_uint64_t)info.sharedram * (zbx_uint64_t)info.mem_unit);
@@ -91,9 +93,9 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 
 static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct sysinfo info;
+	struct sysinfo	info;
 
-	if( 0 == sysinfo(&info))
+	if (0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
 		SET_UI64_RESULT(result, (zbx_uint64_t)info.totalram * (zbx_uint64_t)info.mem_unit);
@@ -108,9 +110,9 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 
 static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct sysinfo info;
+	struct sysinfo	info;
 
-	if( 0 == sysinfo(&info))
+	if (0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
 		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeram * (zbx_uint64_t)info.mem_unit);
@@ -126,24 +128,24 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 static int      VM_MEMORY_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	AGENT_RESULT	result_tmp;
-	zbx_uint64_t	tot_val = 0;
-	zbx_uint64_t	free_val = 0;
+	zbx_uint64_t	tot_val, free_val;
 
 	init_result(&result_tmp);
 
-	if (VM_MEMORY_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != VM_MEMORY_TOTAL(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
 		return SYSINFO_RET_FAIL;
+
 	tot_val = result_tmp.ui64;
 
-	/* Check for division by zero */
-	if(tot_val == 0)
+	if (0 == tot_val)
 	{
 		free_result(&result_tmp);
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (VM_MEMORY_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != VM_MEMORY_FREE(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
 		return SYSINFO_RET_FAIL;
+
 	free_val = result_tmp.ui64;
 
 	free_result(&result_tmp);
@@ -160,16 +162,19 @@ static int      VM_MEMORY_AVAILABLE(const char *cmd, const char *param, unsigned
 
 	init_result(&result_tmp);
 
-	if (VM_MEMORY_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != VM_MEMORY_FREE(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
 		return SYSINFO_RET_FAIL;
+
 	sum += result_tmp.ui64;
 
-	if (VM_MEMORY_BUFFERS(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != VM_MEMORY_BUFFERS(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
 		return SYSINFO_RET_FAIL;
+
 	sum += result_tmp.ui64;
 
-	if (VM_MEMORY_CACHED(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != VM_MEMORY_CACHED(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
 		return SYSINFO_RET_FAIL;
+
 	sum += result_tmp.ui64;
 
 	free_result(&result_tmp);
@@ -196,20 +201,14 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 	char	mode[MAX_STRING_LEN];
 	int	i;
 
-	if(num_param(param) > 1)
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if(get_param(param, 1, mode, sizeof(mode)) != 0)
-		mode[0] = '\0';
+	if (0 != get_param(param, 1, mode, sizeof(mode)) || '\0' == *mode)
+		strscpy(mode, "total");
 
-	if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "total");
-	}
-
-	for(i=0; fl[i].mode!=0; i++)
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
+	for (i = 0; NULL != fl[i].mode; i++)
+		if (0 == strcmp(mode, fl[i].mode))
 			return (fl[i].function)(cmd, param, flags, result);
 
 	return SYSINFO_RET_FAIL;
