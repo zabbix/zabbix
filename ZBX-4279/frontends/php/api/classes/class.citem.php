@@ -1068,6 +1068,10 @@ class CItem extends CItemGeneral{
 					}
 				}
 			}
+
+			// check if we can delete these items
+			$this->checkDelete($del_items);
+
 // first delete child items
 			$parent_itemids = $itemids;
 			do{
@@ -1156,6 +1160,70 @@ class CItem extends CItemGeneral{
 
 			return array('itemids' => $itemids);
 	}
+
+
+	/**
+	 * Checks if the given items can be deleted.
+	 *
+	 * @throws APIException if at least one of the item can't be deleted
+	 *
+	 * @param array $items   An array of items
+	 */
+	public function checkDelete(array $items) {
+		$this->checkUseInGraphAxis($items, true);
+		$this->checkUseInGraphAxis($items);
+	}
+
+
+	/**
+	 * Checks if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * If the $checkMax parameter is set to true, the items will be checked against
+	 * max Y values, otherwise, they will be checked against min Y values.
+	 *
+	 * @throws APIException if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * @param array $items   An array of items
+	 * @param type $checkMax
+	 */
+	protected function checkUseInGraphAxis(array $items, $checkMax = false) {
+		$items = zbx_toHash($items, 'itemid');
+		$itemIds = zbx_objectValues($items, 'itemid');
+
+		if ($checkMax) {
+			$filter = array(
+				'ymax_itemid' => $itemIds,
+				'ymax_type' => GRAPH_YAXIS_TYPE_ITEM_VALUE
+			);
+		}
+		else {
+			$filter = array(
+				'ymin_itemid' => $itemIds,
+				'ymin_type' => GRAPH_YAXIS_TYPE_ITEM_VALUE
+			);
+		}
+
+		// check if the items are used in Y axis min/max values in any graphs
+		$graphs = API::Graph()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $filter
+		));
+		if ($graphs) {
+			$foundItemsNames = array();
+			foreach ($graphs as $graph) {
+				$foundGraphNames[] = $graph['name'];
+				$foundItemNames[] = $items[$graph[($checkMax) ? 'ymax_itemid' : 'ymin_itemid']]['name'];
+			}
+
+			if ($checkMax) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete items [%s]: they are used as Y axis MAX values for graphs [%s].', implode(', ', $foundItemNames), implode(', ', $foundGraphNames)));
+			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete items [%s]: they are used as Y axis MIN values for graphs [%s].', implode(', ', $foundItemNames), implode(', ', $foundGraphNames)));
+			}
+		}
+	}
+
 
 	public function syncTemplates($data){
 		$data['templateids'] = zbx_toArray($data['templateids']);
