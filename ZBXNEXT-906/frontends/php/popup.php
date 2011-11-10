@@ -571,7 +571,7 @@ include_once('include/page_header.php');
 		$form->setName('groupform');
 		$form->setAttribute('id', 'groups');
 
-		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
+		$table = new CTableInfo(_('No host groups defined.'));
 		$table->setHeader(array(
 			($multiselect ? new CCheckBox("all_groups", NULL, "javascript: checkAll('".$form->getName()."', 'all_groups','groups');") : null),
 			S_NAME
@@ -1640,7 +1640,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'overview'){
-		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
+		$table = new CTableInfo(_('No host groups defined.'));
 		$table->setHeader(S_NAME);
 
 		$options = array(
@@ -1671,7 +1671,7 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 	else if($srctbl == 'host_group_scr'){
-		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
+		$table = new CTableInfo(_('No host groups defined.'));
 		$table->setHeader(array(S_NAME));
 
 		$options = array(
