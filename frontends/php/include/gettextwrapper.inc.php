@@ -44,6 +44,12 @@ if(!function_exists('ngettext')){
 	}
 }
 
+if (!function_exists('dcgettext')) {
+	function dcgettext($domain, $string, $localeType) {
+		return $string;
+	}
+}
+
 function _s($string){
 	$arguments = array_slice(func_get_args(), 1);
 	return vsprintf(_($string), $arguments);
