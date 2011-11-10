@@ -126,7 +126,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	if (0 == totalpages)
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, 100.0 * (activepages + wiredpages) / totalpages);
+	SET_DBL_RESULT(result, 100.0 * (activepages + wiredpages) / totalpages);
 
 	return SYSINFO_RET_OK;
 }
@@ -159,7 +159,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	if (0 == totalpages)
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, 100.0 * (inactivepages + cachedpages + freepages) / totalpages);
+	SET_DBL_RESULT(result, 100.0 * (inactivepages + cachedpages + freepages) / totalpages);
 
 	return SYSINFO_RET_OK;
 }
