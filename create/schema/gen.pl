@@ -122,7 +122,7 @@ const ZBX_TABLE	tables[]={
 	"t_history_log"	=>	"nclob",
 	"t_history_text"=>	"nclob",
 	"t_blob"	=>	"nvarchar2(2048)",
-	"t_text"	=>	"nclob",
+	"t_text"	=>	"nvarchar2(2000)",
 	"t_item_param"	=>	"nvarchar2(2048)",
 	"t_cksum_text"	=>	"nclob"
 );
