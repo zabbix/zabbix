@@ -515,7 +515,6 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
-//---
 
 			self::removeSecondsFromTimes($maintenances);
 
@@ -523,27 +522,29 @@ Copt::memoryPick();
 			$insert = array();
 			$timeperiods = array();
 			$insert_timeperiods = array();
-			foreach($maintenances as $mnum => $maintenance){
+			$now = time();
+			$now -= $now % SEC_PER_MIN;
+			foreach ($maintenances as $mnum => $maintenance) {
 				$db_fields = array(
 					'name' => null,
-					'active_since'=> zeroizeSeconds(time()),
-					'active_till' => zeroizeSeconds(time()+86400),
+					'active_since' => $now,
+					'active_till' => $now + SEC_PER_DAY
 				);
-				if(!check_db_fields($db_fields, $maintenance)){
+				if (!check_db_fields($db_fields, $maintenance)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
 				}
 				//checkig wheter a maintence with this name already exists
-				if(self::exists(array('name' => $maintenance['name']))){
+				if (self::exists(array('name' => $maintenance['name']))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
 				$insert[$mnum] = $maintenance;
 
-				foreach($maintenance['timeperiods'] as $timeperiod){
+				foreach ($maintenance['timeperiods'] as $timeperiod) {
 					$db_fields = array(
 						'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
-						'period' =>	3600,
-						'start_date' =>	zeroizeSeconds(time())
+						'period' => SEC_PER_HOUR,
+						'start_date' =>	$now
 					);
 					check_db_fields($db_fields, $timeperiod);
 
@@ -833,18 +834,18 @@ Copt::memoryPick();
 	protected static function removeSecondsFromTimes(array &$maintenances) {
 		foreach ($maintenances as &$maintenance) {
 			if (isset($maintenance['active_since'])) {
-				$maintenance['active_since'] = zeroizeSeconds($maintenance['active_since']);
+				$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
 			}
 
 			if (isset($maintenance['active_till'])) {
-				$maintenance['active_till'] = zeroizeSeconds($maintenance['active_till']);
+				$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
 			}
 
 
 			if (isset($maintenance['timeperiods'])) {
 				foreach ($maintenance['timeperiods'] as &$timeperiod) {
 					if (isset($timeperiod['start_date'])) {
-						$timeperiod['start_date'] = zeroizeSeconds($timeperiod['start_date']);
+						$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
 					}
 				}
 				unset($timeperiod);
@@ -852,6 +853,5 @@ Copt::memoryPick();
 		}
 		unset($maintenance);
 	}
-
 }
 ?>
