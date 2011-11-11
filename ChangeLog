@@ -318,6 +318,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4027] fixed floating-point comparison and unified epsilon in trigger functions and expressions (asaveljevs)
  - [ZBX-3117] fixed error notification when unsuccessfully copying a graph (pavels)
  - [ZBX-4326] API now returns error when trying to create incorrect host profile field (Vedmak)
  - [ZBX-4323] fixed host profile not created with host using API (Vedmak)

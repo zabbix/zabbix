@@ -213,34 +213,22 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 	switch (c)
 	{
 		case '|':
-			if (0 != cmp_double(value1, 0) || 0 != cmp_double(value2, 0))
-				*result = 1;
-			else
-				*result = 0;
+			*result = (SUCCEED != cmp_double(value1, 0) || SUCCEED != cmp_double(value2, 0));
 			break;
 		case '&':
-			if (0 != cmp_double(value1, 0) && 0 != cmp_double(value2, 0))
-				*result = 1;
-			else
-				*result = 0;
+			*result = (SUCCEED != cmp_double(value1, 0) && SUCCEED != cmp_double(value2, 0));
 			break;
 		case '=':
-			if (0 == cmp_double(value1, value2))
-				*result = 1;
-			else
-				*result = 0;
+			*result = (SUCCEED == cmp_double(value1, value2));
 			break;
 		case '#':
-			if (0 != cmp_double(value1, value2))
-				*result = 1;
-			else
-				*result = 0;
+			*result = (SUCCEED != cmp_double(value1, value2));
 			break;
 		case '>':
-			*result = (value1 > value2);
+			*result = (value1 >= value2 + TRIGGER_EPSILON);
 			break;
 		case '<':
-			*result = (value1 < value2);
+			*result = (value1 <= value2 - TRIGGER_EPSILON);
 			break;
 		case '+':
 			*result = value1 + value2;
@@ -252,7 +240,7 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 			*result = value1 * value2;
 			break;
 		case '/':
-			if (0 == cmp_double(value2, 0))
+			if (SUCCEED == cmp_double(value2, 0))
 			{
 				zbx_snprintf(error, maxerrlen, "Division by zero. Cannot evaluate expression [%s]", exp);
 				return FAIL;
@@ -2984,7 +2972,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 			tr->new_error = zbx_strdup(tr->new_error, err);
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
 		}
-		else if (0 == cmp_double(expr_result, 0))
+		else if (SUCCEED == cmp_double(expr_result, 0))
 		{
 			tr->new_value = TRIGGER_VALUE_FALSE;
 		}
