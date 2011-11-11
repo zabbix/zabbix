@@ -23,50 +23,18 @@
 static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(HAVE_LIBPERFSTAT)
-	/* AIX 6.1 */
 	perfstat_memory_total_t	m;
 	zbx_uint64_t		value;
 
 	if (-1 == perfstat_memory_total(NULL, &m, sizeof(m), 1))
 		return SYSINFO_RET_FAIL;
 
-	value = (zbx_uint64_t)m.numperm;	/* number of frames used for files (in 4KB pages) */
+	value = m.numperm;	/* number of frames used for files (in 4KB pages) */
 	value <<= 12;
 
 	SET_UI64_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
-#elif defined(HAVE_PROC)
-        FILE    *f = NULL;
-        char    *t;
-        char    c[MAX_STRING_LEN];
-        zbx_uint64_t    res = 0;
-
-        if( NULL == ( f = fopen("/proc/meminfo","r")))
-        {
-		return SYSINFO_RET_FAIL;
-        }
-        while(NULL!=fgets(c,MAX_STRING_LEN,f))
-        {
-                if(strncmp(c,"Cached:",7) == 0)
-                {
-                        t=(char *)strtok(c," ");
-                        t=(char *)strtok(NULL," ");
-                        sscanf(t, ZBX_FS_UI64, &res );
-                        t=(char *)strtok(NULL," ");
-
-                        if(strcasecmp(t,"kb"))          res <<= 10;
-                        else if(strcasecmp(t, "mb"))    res <<= 20;
-                        else if(strcasecmp(t, "gb"))    res <<= 30;
-                        else if(strcasecmp(t, "tb"))    res <<= 40;
-
-                        break;
-                }
-        }
-        zbx_fclose(f);
-
-        SET_UI64_RESULT(result, res);
-        return SYSINFO_RET_OK;
 #else
 	return SYSINFO_RET_FAIL;
 #endif
@@ -221,7 +189,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 	if (-1 == perfstat_memory_total(NULL, &m, sizeof(m), 1))
 		return SYSINFO_RET_FAIL;
 
-	value = (zbx_uint64_t)m.real_free;	/* free real memory (in 4KB pages) */
+	value = m.real_free;	/* free real memory (in 4KB pages) */
 	value <<= 12;
 
 	SET_UI64_RESULT(result, value);
