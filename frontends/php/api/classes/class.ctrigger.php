@@ -1355,9 +1355,11 @@ class CTrigger extends CZBXAPI {
 					unset($trigger['status']);
 				}
 
-				$dbTrigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
-				if (array_equal($dbTrigger['dependencies'], $trigger['dependencies'])) {
-					unset($trigger['dependencies']);
+				if (isset($trigger['dependencies'])) {
+					$dbTrigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
+					if (array_equal($dbTrigger['dependencies'], $trigger['dependencies'])) {
+						unset($trigger['dependencies']);
+					}
 				}
 			}
 
