@@ -383,31 +383,33 @@ static int	trigger_dependent_rec(zbx_uint64_t triggerid, int level)
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
-
-	zbx_uint64_t	triggerid_tmp;
-	int		value_tmp;
+	unsigned char	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " level:%d", __function_name, triggerid, level);
 
 	if (32 < level)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Recursive trigger dependency detected! Please fix. Triggerid:" ZBX_FS_UI64,
+		zabbix_log(LOG_LEVEL_CRIT, "Recursive trigger dependency detected! Please fix. Triggerid:" ZBX_FS_UI64,
 				triggerid);
 		goto exit;
 	}
 
-	result = DBselect("select t.triggerid, t.value from trigger_depends d,triggers t where d.triggerid_down="
-			ZBX_FS_UI64 " and d.triggerid_up=t.triggerid", triggerid);
+	result = DBselect(
+			"select t.triggerid,t.value"
+			" from trigger_depends d,triggers t"
+			" where d.triggerid_up=t.triggerid"
+				" and d.triggerid_down=" ZBX_FS_UI64,
+			triggerid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(triggerid_tmp, row[0]);
-		value_tmp = atoi(row[1]);
+		ZBX_STR2UINT64(triggerid, row[0]);
+		value = (unsigned char)atoi(row[1]);
 
-		if (TRIGGER_VALUE_TRUE == value_tmp || SUCCEED == trigger_dependent_rec(triggerid_tmp, level + 1))
+		if (TRIGGER_VALUE_TRUE == value || SUCCEED == trigger_dependent_rec(triggerid, level + 1))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "This trigger depends on " ZBX_FS_UI64 ". Will not apply actions",
-					triggerid_tmp);
+					triggerid);
 			ret = SUCCEED;
 			break;
 		}
