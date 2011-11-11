@@ -377,7 +377,7 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
  * Comments: Recursive function!                                              *
  *                                                                            *
  ******************************************************************************/
-static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
+static int	trigger_dependent_rec(zbx_uint64_t triggerid, int level)
 {
 	const char	*__function_name = "trigger_dependent_rec";
 	int		ret = FAIL;
@@ -387,12 +387,9 @@ static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
 	zbx_uint64_t	triggerid_tmp;
 	int		value_tmp;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " level:%d",
-			__function_name, triggerid, *level);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " level:%d", __function_name, triggerid, level);
 
-	(*level)++;
-
-	if (32 < *level)
+	if (32 < level)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "Recursive trigger dependency detected! Please fix. Triggerid:" ZBX_FS_UI64,
 				triggerid);
@@ -407,7 +404,7 @@ static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
 		ZBX_STR2UINT64(triggerid_tmp, row[0]);
 		value_tmp = atoi(row[1]);
 
-		if (TRIGGER_VALUE_TRUE == value_tmp || SUCCEED == trigger_dependent_rec(triggerid_tmp, level))
+		if (TRIGGER_VALUE_TRUE == value_tmp || SUCCEED == trigger_dependent_rec(triggerid_tmp, level + 1))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "This trigger depends on " ZBX_FS_UI64 ". Will not apply actions",
 					triggerid_tmp);
@@ -438,11 +435,11 @@ exit:
 static int	trigger_dependent(zbx_uint64_t triggerid)
 {
 	const char	*__function_name = "trigger_dependent";
-	int		ret, level = 0;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __function_name, triggerid);
 
-	ret = trigger_dependent_rec(triggerid, &level);
+	ret = trigger_dependent_rec(triggerid, 0);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
