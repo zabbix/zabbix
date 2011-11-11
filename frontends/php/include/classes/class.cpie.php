@@ -146,7 +146,7 @@ class CPie extends CGraphDraw{
 			$this->to_time		= $this->stime + $this->period;
 		}
 		else{
-			$this->to_time		= $now - 3600 * $this->from;
+			$this->to_time		= $now - SEC_PER_HOUR * $this->from;
 			$this->from_time	= $this->to_time - $this->period;
 		}
 
@@ -166,7 +166,7 @@ class CPie extends CGraphDraw{
 			if(ZBX_HISTORY_DATA_UPKEEP > -1) $real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
 //---
 
-			if((($real_item['history']*86400) > (time()-($from_time+$this->period/2))) &&				// should pick data from history or trends
+			if((($real_item['history']*SEC_PER_DAY) > (time()-($from_time+$this->period/2))) &&				// should pick data from history or trends
 				(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
 			{
 				$this->dataFrom = 'history';
