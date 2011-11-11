@@ -665,7 +665,7 @@ function create_page_menu(e,id){
 		}
 	}
 //alert(page_menu[id]);
-	show_popup_menu(e,dbrd_menu,280);// JavaScript Document
+	show_popup_menu(e,dbrd_menu,140);// JavaScript Document
 }
 
 //------------------------------------------------------
