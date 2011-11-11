@@ -215,7 +215,8 @@ class CImage extends CZBXAPI{
 		if(!is_null($options['select_image'])){
 			$db_img = DBselect('SELECT imageid, image FROM images WHERE '.DBCondition('imageid', $imageids));
 			while($img = DBfetch($db_img)){
-				$result[$img['imageid']]['image'] = base64_encode($img['image']);
+
+				$result[$img['imageid']]['image'] = base64_encode(zbx_unescape_image($img['image']));
 			}
 		}
 
@@ -352,7 +353,7 @@ class CImage extends CZBXAPI{
 				else if($DB['TYPE'] == 'IBM_DB2'){
 					$stmt = db2_prepare($DB['DB'], 'INSERT INTO images ('.implode(' ,', array_keys($values)).',image)'.
 						' VALUES ('.implode(',', $values).', ?)');
-					
+
 					if(!$stmt){
 						self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 					}
@@ -469,11 +470,11 @@ class CImage extends CZBXAPI{
 					}
 					else if($DB['TYPE'] == 'IBM_DB2'){
 						$stmt = db2_prepare($DB['DB'], 'UPDATE images SET image=? WHERE imageid='.$image['imageid']);
-						
+
 						if(!$stmt){
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 						}
-						
+
 						$variable = $image['image'];
 						if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
