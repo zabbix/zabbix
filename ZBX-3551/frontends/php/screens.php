@@ -27,7 +27,7 @@
 	$page['title'] = 'S_CUSTOM_SCREENS';
 	$page['file'] = 'screens.php';
 	$page['hist_arg'] = array('elementid', 'screenname');
-	$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
+	$page['scripts'] = array('class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -297,8 +297,6 @@
 		$screens_wdgt->addItem($element);
 		$screens_wdgt->show();
 
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
 		echo SBR;
 	}
 
