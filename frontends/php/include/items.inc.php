@@ -365,31 +365,16 @@ function item_type2str($type = null){
 		$dstHosts = API::Host()->get($options);
 		$dstHost = reset($dstHosts);
 
-		$interfaceids = array();
-		foreach ($dstHost['interfaces'] as $interface) {
-			if ($interface['main'] == 1) {
-				$interfaceids[$interface['type']] = $interface['interfaceid'];
-			}
-		}
-
 		foreach ($srcItems as &$srcItem) {
 			if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
-				$type = CItem::itemTypeInterface($srcItem['type']);
-
-				if ($type == INTERFACE_TYPE_ANY) {
-					foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {
-						if (isset($interfaceids[$itype])) {
-							$srcItem['interfaceid'] = $interfaceids[$itype];
-							break;
-						}
-					}
+				// find a matching interface
+				$interface = CItem::findInterfaceForItem($srcItem, $dstHost['interfaces']);
+				if ($interface) {
+					$srcItem['interfaceid'] = $interface['interfaceid'];
 				}
-				elseif ($type !== false) {
-					if (!isset($interfaceids[$type])) {
-						error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
-						return false;
-					}
-					$srcItem['interfaceid'] = $interfaceids[$type];
+				// no matching interface found, throw an error
+				elseif($interface !== false) {
+					error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
 				}
 			}
 
