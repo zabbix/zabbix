@@ -989,7 +989,7 @@ COpt::memoryPick();
 	 * @throws APIException if the discovery rule interfaces could not be mapped
 	 * to the new host interfaces.
 	 *
-	 * @param type $discoveryid  The discovery rule id to be copied
+	 * @param type $discoveryid  The ID of the discovery rule to be copied
 	 * @param type $hostid       Destination host id
 	 */
 	protected function copyDiscoveryRule($discoveryid, $hostid) {
@@ -1023,7 +1023,7 @@ COpt::memoryPick();
 			}
 			// no matching interface found, throw an error
 			elseif($interface !== false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $dstDiscovery['key_']));
 			}
 		}
 
