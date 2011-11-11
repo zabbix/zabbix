@@ -45,7 +45,7 @@ class CComboItem extends CTag{
 		$this->addItem(nbsp($value));
 	}
 
-	public function addItem($value){
+	public function addItem($value) {
 		$value = $this->sanitize($value);
 
 		parent::addItem($value);
