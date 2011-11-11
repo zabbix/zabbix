@@ -160,14 +160,14 @@
 
 	$hostList = new CFormList('hostlist');
 
-	if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
-	if($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
+	if ($_REQUEST['hostid'] > 0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
+	if ($_REQUEST['groupid'] > 0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
 
-	$hostTB = new CTextBox('host',$host,54);
+	$hostTB = new CTextBox('host', $host, 54);
 	$hostTB->setAttribute('maxlength', 64);
 	$hostList->addRow(_('Host name'), $hostTB);
 
-	$visiblenameTB = new CTextBox('visiblename',$visiblename,54);
+	$visiblenameTB = new CTextBox('visiblename', $visiblename, 54);
 	$visiblenameTB->setAttribute('maxlength', 64);
 	$hostList->addRow(_('Visible name'), $visiblenameTB);
 
@@ -177,18 +177,18 @@
 		'output' => API_OUTPUT_EXTEND
 	));
 	order_result($all_groups, 'name');
-	foreach($all_groups as $group){
+	foreach ($all_groups as $group) {
 		$grp_tb->addItem($group['groupid'], $group['name']);
 	}
 
-	$hostList->addRow(_('Groups'),$grp_tb->get(_('In groups'), _('Other groups')));
+	$hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
 
 	$newgroupTB = new CTextBox('newgroup', $newgroup);
 	$newgroupTB->setAttribute('maxlength', 64);
-	$hostList->addRow(array(new CLabel(_('New group'), 'newgroup'), BR(), $newgroupTB));
+	$hostList->addRow(array(new CLabel(_('New host group'), 'newgroup'), BR(), $newgroupTB));
 
 // interfaces
-	if(empty($interfaces)){
+	if (empty($interfaces)) {
 		$interfaces = array(array(
 			'ip' => '127.0.0.1',
 			'dns' => '',

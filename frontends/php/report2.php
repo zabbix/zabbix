@@ -27,10 +27,10 @@ require_once('include/reports.inc.php');
 $page['title'] = 'S_AVAILABILITY_REPORT';
 $page['file'] = 'report2.php';
 $page['hist_arg'] = array('config', 'groupid', 'hostid', 'tpl_triggerid');
-$page['scripts'] = array('class.calendar.js', 'effects.js');
+$page['scripts'] = array('class.calendar.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 
@@ -62,7 +62,7 @@ include_once('include/page_header.php');
 		}
 	}
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 
@@ -261,5 +261,5 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 ?>

@@ -286,5 +286,5 @@ if($sid){
 	}
 ?>
 <?php
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

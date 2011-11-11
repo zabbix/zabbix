@@ -4,7 +4,6 @@ ALTER TABLE ONLY config
 	ALTER alert_usrgrpid DROP NOT NULL,
 	ALTER discovery_groupid DROP DEFAULT,
 	ALTER default_theme SET DEFAULT 'css_ob.css',
-	ADD ns_support integer DEFAULT '0' NOT NULL,
 	ADD severity_color_0 varchar(6) DEFAULT 'DBDBDB' NOT NULL,
 	ADD severity_color_1 varchar(6) DEFAULT 'D6F6FF' NOT NULL,
 	ADD severity_color_2 varchar(6) DEFAULT 'FFF6A5' NOT NULL,

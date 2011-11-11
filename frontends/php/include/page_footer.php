@@ -84,8 +84,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	$post_script .= 'cookie.init();'."\n";
 	$post_script .= 'chkbxRange.init();'."\n";
 	$post_script .= 'var screenCSS = null;'."\n";
-	$post_script .= 'if(jQuery(window).width()<1024) screenCSS = "handheld.css";'."\n";
-	$post_script .= 'if(!is_null(screenCSS)) jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\'+screenCSS+\'" />\');';
+	$post_script .= 'if (jQuery(window).width() < 1024) { screenCSS = "handheld.css"; }'."\n";
+	$post_script .= 'if (!is_null(screenCSS)) { jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\' + screenCSS + \'" />\'); }';
 	$post_script .= '});'."\n";
 
 	if (!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')) {
@@ -112,12 +112,10 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		));
 		$table->show();
 	}
-
 	insert_js($post_script);
 
 	echo '</body>'."\n".
 		'</html>'."\n";
 }
-
 exit;
 ?>

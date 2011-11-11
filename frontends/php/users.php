@@ -31,7 +31,7 @@ $page['file'] = 'users.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -366,5 +366,5 @@ else {
 	$usersView->render();
 	$usersView->show();
 }
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

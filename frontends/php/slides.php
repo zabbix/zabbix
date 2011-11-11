@@ -27,11 +27,11 @@ require_once('include/blocks.inc.php');
 $page['title'] = 'S_CUSTOM_SLIDES';
 $page['file'] = 'slides.php';
 $page['hist_arg'] = array('elementid');
-$page['scripts'] = array('effects.js','dragdrop.js','class.pmaster.js','class.calendar.js','gtlc.js');
+$page['scripts'] = array('class.pmaster.js', 'class.calendar.js', 'gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -174,7 +174,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 ?>
@@ -356,10 +356,6 @@ include_once('include/page_header.php');
 	//		$element = get_screen($screen['screenid'],2,$effectiveperiod);
 
 			$slides_wdgt->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
-
-
-			$jsmenu = new CPUMenu(null, 170);
-			$jsmenu->InsertJavaScript();
 		}
 		else{
 			$slides_wdgt->addItem(new CTableInfo(S_NO_SLIDES_DEFINED));
@@ -368,9 +364,6 @@ include_once('include/page_header.php');
 		$slides_wdgt->show();
 	}
 
-?>
-<?php
-
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

@@ -14,8 +14,9 @@ agents_ldadd = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
-	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
-	@AGENT_LIBS@
+	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a
+
+agents_ldadd += @AGENT_LIBS@
 
 sbin_PROGRAMS = \
 	zabbix_agent \
@@ -32,8 +33,7 @@ zabbix_agent_SOURCES = \
 
 zabbix_agent_LDADD = $(agents_ldadd)
 
-zabbix_agent_LDFLAGS = \
-	@AGENT_LDFLAGS@
+zabbix_agent_LDFLAGS = @AGENT_LDFLAGS@
 
 zabbix_agentd_SOURCES = \
 	active.c active.h \
@@ -50,8 +50,7 @@ zabbix_agentd_SOURCES = \
 
 zabbix_agentd_LDADD = $(agents_ldadd)
 
-zabbix_agentd_LDFLAGS = \
-	@AGENT_LDFLAGS@
+zabbix_agentd_LDFLAGS = @AGENT_LDFLAGS@
 
 zabbix_agentd_CFLAGS = \
 	-DZABBIX_DAEMON \
