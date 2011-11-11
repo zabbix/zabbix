@@ -39,8 +39,8 @@ $typeComboBox = new CComboBox('maintenance_type', $this->data['maintenance_type'
 $typeComboBox->addItem(MAINTENANCE_TYPE_NORMAL, _('With data collection'));
 $typeComboBox->addItem(MAINTENANCE_TYPE_NODATA, _('No data collection'));
 $maintenanceFormList->addRow(_('Maintenance type'), $typeComboBox);
-$maintenanceForm->addVar('active_since', date('YmdHis', $this->data['active_since']));
-$maintenanceForm->addVar('active_till', date('YmdHis', $this->data['active_till']));
+$maintenanceForm->addVar('active_since', date('YmdHi', $this->data['active_since']));
+$maintenanceForm->addVar('active_till', date('YmdHi', $this->data['active_till']));
 
 $calendarIcon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
 $calendarIcon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["mntc_active_since"].clndr.clndrshow(pos.top, pos.left); CLNDR["mntc_active_till"].clndr.clndrhide();');

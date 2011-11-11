@@ -823,7 +823,7 @@ class CAction extends CZBXAPI {
 			if (!check_db_fields($action_db_fields, $action)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parameter for action "%s".', $action['name']));
 			}
-			if (isset($action['esc_period']) && ($action['esc_period'] < 60) && (EVENT_SOURCE_TRIGGERS == $action['eventsource'])) {
+			if (isset($action['esc_period']) && ($action['esc_period'] < SEC_PER_MIN) && (EVENT_SOURCE_TRIGGERS == $action['eventsource'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimum 60 seconds).', $action['name']));
 			}
 			if (isset($duplicates[$action['name']])) {
@@ -922,7 +922,7 @@ class CAction extends CZBXAPI {
 				$eventsource = isset($action['eventsource']) ? $action['eventsource']: $updActions[$action['actionid']]['eventsource'];
 				$esc_period = isset($action['esc_period']) ? $action['esc_period']: $updActions[$action['actionid']]['esc_period'];
 
-				if (($esc_period < 60) && (EVENT_SOURCE_TRIGGERS == $eventsource)) {
+				if (($esc_period < SEC_PER_MIN) && (EVENT_SOURCE_TRIGGERS == $eventsource)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimum 60 seconds).', $action['name']));
 				}
 			}
@@ -1524,7 +1524,7 @@ class CAction extends CZBXAPI {
 			}
 
 			if (isset($operation['esc_period'])) {
-				if (isset($operation['esc_period']) && ($operation['esc_period'] != 0 && $operation['esc_period'] < 60)) {
+				if (isset($operation['esc_period']) && ($operation['esc_period'] != 0 && $operation['esc_period'] < SEC_PER_MIN)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation escalation period.'));
 				}
 			}

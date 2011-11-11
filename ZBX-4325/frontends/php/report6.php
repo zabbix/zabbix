@@ -148,7 +148,7 @@ require_once('include/page_header.php');
 <?php
 	$config = $_REQUEST['config'] = get_request('config',1);
 
-	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince',date('YmdHis', time()-86400)));
+	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince',date('YmdHis', time()-SEC_PER_DAY)));
 	$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill',date('YmdHis')));
 
 	$rep6_wdgt = new CWidget();
