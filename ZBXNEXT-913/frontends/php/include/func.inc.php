@@ -197,7 +197,7 @@ function zbx_date2str($format, $value = null) {
 	$part = '';
 	$length = zbx_strlen($format);
 	for ($i = 0; $i < $length; $i++) {
-		$pchar = ($i > 0) ? zbx_substr($format, $i - 1, 1) : '';
+		$pchar = $i > 0 ? zbx_substr($format, $i - 1, 1) : '';
 		$char = zbx_substr($format, $i, 1);
 
 		if ($pchar != '\\' && isset($rplcs[$char])) {
@@ -208,7 +208,7 @@ function zbx_date2str($format, $value = null) {
 			$part .= $char;
 		}
 	}
-	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
+	$output .= zbx_strlen($part) > 0 ? date($part, $value) : '';
 	return $output;
 }
 

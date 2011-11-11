@@ -130,27 +130,29 @@ else {
 	$services[0] = $row;
 
 	// get service reason
-	$sql = 'SELECT s.triggerid,s.serviceid'.
-			' FROM services s,triggers t'.
-			' WHERE s.status>0'.
-				' AND s.triggerid IS NOT NULL'.
-				' AND t.triggerid=s.triggerid'.
-				' AND '.DBcondition('t.triggerid', $available_triggers).
-				' AND '.DBin_node('s.serviceid').
-			' ORDER BY s.status DESC,t.description';
-	$db_services_reasons = DBfetchArray(DBSelect($sql));
+	$db_services_reasons = DBfetchArray(DBSelect(
+		'SELECT s.triggerid,s.serviceid'.
+		' FROM services s,triggers t'.
+		' WHERE s.status>0'.
+			' AND s.triggerid IS NOT NULL'.
+			' AND t.triggerid=s.triggerid'.
+			' AND '.DBcondition('t.triggerid', $available_triggers).
+			' AND '.DBin_node('s.serviceid').
+		' ORDER BY s.status DESC,t.description'
+	));
 
 	// get services
-	$sql = 'SELECT DISTINCT s.serviceid,sl.servicedownid,sl_p.serviceupid AS serviceupid,s.triggerid,'.
-				' s.name AS caption,s.algorithm,t.description,t.expression,s.sortorder,sl.linkid,s.showsla,s.goodsla,s.status'.
-			' FROM services s'.
-				' LEFT JOIN triggers t ON s.triggerid=t.triggerid'.
-				' LEFT JOIN services_links sl ON s.serviceid=sl.serviceupid AND NOT sl.soft=0'.
-				' LEFT JOIN services_links sl_p ON s.serviceid=sl_p.servicedownid AND sl_p.soft=0'.
-			' WHERE '.DBin_node('s.serviceid').
-				' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid', $available_triggers).')'.
-			' ORDER BY s.sortorder,sl_p.serviceupid,s.serviceid';
-	$db_services = DBSelect($sql);
+	$db_services = DBSelect(
+		'SELECT DISTINCT s.serviceid,sl.servicedownid,sl_p.serviceupid AS serviceupid,s.triggerid,'.
+			' s.name AS caption,s.algorithm,t.description,t.expression,s.sortorder,sl.linkid,s.showsla,s.goodsla,s.status'.
+		' FROM services s'.
+			' LEFT JOIN triggers t ON s.triggerid=t.triggerid'.
+			' LEFT JOIN services_links sl ON s.serviceid=sl.serviceupid AND NOT sl.soft=0'.
+			' LEFT JOIN services_links sl_p ON s.serviceid=sl_p.servicedownid AND sl_p.soft=0'.
+		' WHERE '.DBin_node('s.serviceid').
+			' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid', $available_triggers).')'.
+		' ORDER BY s.sortorder,sl_p.serviceupid,s.serviceid'
+	);
 	while ($row = DBFetch($db_services)) {
 		$row['id'] = $row['serviceid'];
 		$row['caption'] = array(get_node_name_by_elid($row['serviceid'], null, ': '), $row['caption']);

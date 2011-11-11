@@ -42,9 +42,10 @@ function add_service($name, $triggerid, $algorithm, $showsla, $goodsla, $sortord
 
 	$serviceid = get_dbid('services', 'serviceid');
 
-	$result = DBexecute('INSERT INTO services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)'.
-						' VALUES ('.$serviceid.','.zbx_dbstr($name).',0,'.$triggerid.','.zbx_dbstr($algorithm).
-							','.$showsla.','.zbx_dbstr($goodsla).','.$sortorder.')');
+	$result = DBexecute(
+		'INSERT INTO services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)'.
+		' VALUES ('.$serviceid.','.zbx_dbstr($name).',0,'.$triggerid.','.$algorithm.','.$showsla.','.$goodsla.','.$sortorder.')'
+	);
 	if (!$result) {
 		return false;
 	}
@@ -74,8 +75,10 @@ function add_service($name, $triggerid, $algorithm, $showsla, $goodsla, $sortord
 
 	foreach ($service_times as $val) {
 		$timeid = get_dbid('services_times', 'timeid');
-		$result = DBexecute('INSERT INTO services_times (timeid,serviceid,type,ts_from,ts_to,note)'.
-			' values ('.$timeid.','.$serviceid.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')');
+		$result = DBexecute(
+			'INSERT INTO services_times (timeid,serviceid,type,ts_from,ts_to,note)'.
+			' VALUES ('.$timeid.','.$serviceid.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')'
+		);
 		if (!$result) {
 			delete_service($serviceid);
 			return false;
@@ -123,10 +126,12 @@ function update_service($serviceid, $name, $triggerid, $algorithm, $showsla, $go
 		$triggerid = 'NULL';
 	}
 
-	$result = DBexecute('UPDATE services'.
-						' SET name='.zbx_dbstr($name).',triggerid='.$triggerid.',status=0,algorithm='.$algorithm.',sortorder='.$sortorder.',showsla='.$showsla
-							.(!empty($goodsla) ? ',goodsla='.$goodsla : '').
-						' WHERE serviceid='.$serviceid);
+	$result = DBexecute(
+		'UPDATE services'.
+		' SET name='.zbx_dbstr($name).',triggerid='.$triggerid.',status=0,algorithm='.$algorithm.',sortorder='.$sortorder.',showsla='.$showsla
+			.(!empty($goodsla) ? ',goodsla='.$goodsla : '').
+		' WHERE serviceid='.$serviceid
+	);
 
 	// updating status to all services by the dependency
 	update_services_status_all();
@@ -135,28 +140,13 @@ function update_service($serviceid, $name, $triggerid, $algorithm, $showsla, $go
 
 	foreach ($service_times as $val) {
 		$timeid = get_dbid('services_times', 'timeid');
-		DBexecute('INSERT INTO services_times (timeid,serviceid,type,ts_from,ts_to,note)'.
-			' VALUES ('.$timeid.','.$serviceid.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')');
+		DBexecute(
+			'INSERT INTO services_times (timeid,serviceid,type,ts_from,ts_to,note)'.
+			' VALUES ('.$timeid.','.$serviceid.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')'
+		);
 	}
 
 	return $result;
-}
-
-function add_host_to_services($hostid, $serviceid) {
-	$result = DBselect(
-		'SELECT distinct h.host,t.triggerid,t.description,t.expression'.
-		' FROM hosts h,items i,functions f,triggers t'.
-		' WHERE h.hostid=i.hostid'.
-			' AND i.itemid=f.itemid'.
-			' AND f.triggerid=t.triggerid'.
-			' AND h.hostid='.$hostid.
-			' AND '.DBin_node('t.triggerid', false)
-	);
-	while ($row = DBfetch($result)) {
-		$serviceid2 = add_service(expand_trigger_description_by_data($row), $row['triggerid'], 'on', 0, 'off', 99);
-		add_service_link($serviceid2, $serviceid, 0);
-	}
-	return 1;
 }
 
 function is_service_hardlinked($serviceid) {
@@ -191,11 +181,11 @@ function get_service_status($serviceid, $algorithm, $triggerid = null, $status =
 		$sort_order = ($algorithm == SERVICE_ALGORITHM_MAX) ? ' DESC' : '';
 
 		$result = DBselect(
-				'SELECT s.status'.
-				' FROM services s,services_links l'.
-				' WHERE l.serviceupid='.$serviceid.
-					' AND s.serviceid=l.servicedownid'.
-				' ORDER BY s.status'.$sort_order
+			'SELECT s.status'.
+			' FROM services s,services_links l'.
+			' WHERE l.serviceupid='.$serviceid.
+				' AND s.serviceid=l.servicedownid'.
+			' ORDER BY s.status'.$sort_order
 		);
 		if ($row = DBfetch($result)) {
 			$status = $row['status'];

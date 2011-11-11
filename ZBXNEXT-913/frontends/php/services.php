@@ -48,28 +48,23 @@ $fields = array(
 	'service_times' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'trigger' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'serverid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({add_server})'),
 	'new_service_time' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'childs' =>				array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
 	'parentid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'parentname' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
 	'save_service' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add_server' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_service_time' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	// ajax
 	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"), null),
 	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	'state' =>				array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	// others
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_copy_to' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'pservices' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'cservices' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'slink' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null)
+	'cservices' =>			array(T_ZBX_INT, O_OPT, null,	null,		null)
 );
 check_fields($fields);
 ?>
@@ -91,11 +86,13 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 $available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 if (!empty($_REQUEST['serviceid'])) {
-	$sql = 'SELECT s.*'.
-			' FROM services s'.
-			' WHERE (s.triggerid IS NULL OR '.DBcondition('s.triggerid', $available_triggers).')'.
-				' AND s.serviceid='.$_REQUEST['serviceid'];
-	if (!$service = DBfetch(DBselect($sql))) {
+	$db_services = DBselect(
+		'SELECT s.*'.
+		' FROM services s'.
+		' WHERE (s.triggerid IS NULL OR '.DBcondition('s.triggerid', $available_triggers).')'.
+			' AND s.serviceid='.$_REQUEST['serviceid']
+	);
+	if (!$service = DBfetch($db_services)) {
 		access_deny();
 	}
 }
@@ -105,7 +102,6 @@ if (!empty($_REQUEST['serviceid'])) {
  */
 if (isset($_REQUEST['form'])) {
 	$_REQUEST['showsla'] = get_request('showsla', 0);
-	$_REQUEST['soft'] = get_request('soft', 0);
 	$result = false;
 
 	// delete
@@ -136,16 +132,15 @@ if (isset($_REQUEST['form'])) {
 			$result = add_service(
 				get_request('name', null),
 				get_request('triggerid', null),
-				get_request('algorithm', null),
+				get_request('algorithm', SERVICE_ALGORITHM_MAX),
 				get_request('showsla', 0),
-				get_request('goodsla', null),
-				get_request('sortorder', null),
+				get_request('goodsla', SERVICE_SLA),
+				get_request('sortorder', 0),
 				get_request('service_times', array()),
 				get_request('parentid', null),
 				get_request('childs', array())
 			);
 		}
-
 		$result = DBend() ? $result : false;
 
 		if (isset($service['serviceid'])) {
@@ -160,20 +155,6 @@ if (isset($_REQUEST['form'])) {
 		}
 
 		add_audit_if($result, $audit_acrion, AUDIT_RESOURCE_IT_SERVICE, ' Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
-	}
-	// create
-	elseif (isset($_REQUEST['add_server'])) {
-		$sql = 'SELECT h.*'.
-				' FROM hosts h'.
-				' WHERE '.DBin_node('h.hostid').
-					' AND '.DBcondition('h.hostid', $available_hosts).
-					' AND h.hostid='.$_REQUEST['serverid'];
-		if (!$host_data = DBfetch(DBselect($sql))) {
-			access_deny();
-		}
-		$result = add_host_to_services($_REQUEST['serverid'], $service['serviceid']);
-		add_audit_if($result, AUDIT_ACTION_ADD, AUDIT_RESOURCE_IT_SERVICE, ' Host ['.$host_data['host'].'] id ['.$_REQUEST['serverid'].']');
-		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 	}
 	if ($result) {
 		unset($_REQUEST['form']);
@@ -272,10 +253,12 @@ if (isset($_REQUEST['form'])) {
 	if (isset($_REQUEST['add_service_time']) && isset($_REQUEST['new_service_time'])) {
 		$_REQUEST['service_times'] = get_request('service_times', array());
 		$new_service_time['type'] = $_REQUEST['new_service_time']['type'];
+		$_REQUEST['new_service_time']['from'] = $_REQUEST['new_service_time']['from_hour'].':'.$_REQUEST['new_service_time']['from_minute'];
+		$_REQUEST['new_service_time']['to'] = $_REQUEST['new_service_time']['to_hour'].':'.$_REQUEST['new_service_time']['to_minute'];
 
 		if ($_REQUEST['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-			$new_service_time['from'] = $_REQUEST['new_service_time']['from'];
-			$new_service_time['to'] = $_REQUEST['new_service_time']['to'];
+			$new_service_time['from'] = zbxDateToTime($_REQUEST['new_service_time']['from']);
+			$new_service_time['to'] = zbxDateToTime($_REQUEST['new_service_time']['to']);
 			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
 		}
 		else {
@@ -283,20 +266,21 @@ if (isset($_REQUEST['form'])) {
 			$new_service_time['to'] = strtotime($_REQUEST['new_service_time']['to_week'].' '.$_REQUEST['new_service_time']['to']);
 			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
 		}
-		while ($new_service_time['to'] && ($new_service_time['to'] <= $new_service_time['from'])) {
-			$new_service_time['to'] += SEC_PER_WEEK;
-		}
 
 		// validating service times that were entered, time 'to' has a wrong format
 		if ($new_service_time['to'] == false) {
-			error(_s('Error adding service time "%s" is a wrong time format. Should be from 00:00 to 24:00.', $_REQUEST['new_service_time']['to']));
+			error(_s('Error adding service time "%s". Should be from 00:00 to 24:00.', $_REQUEST['new_service_time']['to']));
 		}
-		// time 'from' has a wrong format
+		// validate time 'from' has a wrong format
 		elseif ($new_service_time['from'] == false) {
-			error(_s('Error adding service time "%s" is a wrong time format. Should be from 00:00 to 24:00.', $_REQUEST['new_service_time']['from']));
+			error(_s('Error adding service time "%s". Should be from 00:00 to 24:00.', $_REQUEST['new_service_time']['from']));
+		}
+		// validate time 'from' is bigger than time 'to'
+		elseif ($new_service_time['from'] > $new_service_time['to']) {
+			error(_('Servie time from cannot be bigger than time to.'));
 		}
 		// if this time is not already there, adding it for insertation
-		elseif (!str_in_array($_REQUEST['service_times'], $new_service_time)){
+		elseif (!str_in_array($_REQUEST['service_times'], $new_service_time)) {
 			array_push($_REQUEST['service_times'], $new_service_time);
 		}
 	}
@@ -316,10 +300,10 @@ if (isset($_REQUEST['form'])) {
 		$db_services_times = DBselect('SELECT st.type,st.ts_from,st.ts_to,st.note FROM services_times st WHERE st.serviceid='.$data['service']['serviceid']);
 		while ($db_stime = DBfetch($db_services_times)) {
 			$stime = array(
-					'type'=> $db_stime['type'],
-					'from'=> $db_stime['ts_from'],
-					'to'=> $db_stime['ts_to'],
-					'note'=> $db_stime['note']
+				'type' => $db_stime['type'],
+				'from' => $db_stime['ts_from'],
+				'to' => $db_stime['ts_to'],
+				'note' => $db_stime['note']
 			);
 			if (str_in_array($stime, $data['service_times'])) {
 				continue;
@@ -328,14 +312,15 @@ if (isset($_REQUEST['form'])) {
 		}
 
 		// get links
-		$sql = 'SELECT DISTINCT sl.serviceupid,s1.name AS serviceupname'.
-				' FROM services s1,services s2,services_links sl'.
-				' WHERE sl.serviceupid=s1.serviceid'.
-					' AND sl.servicedownid=s2.serviceid'.
-					' AND sl.soft=0'.
-					' AND sl.servicedownid='.$data['service']['serviceid'];
-
-		if ($link = DBFetch(DBSelect($sql))) {
+		$db_links = DBSelect(
+			'SELECT DISTINCT sl.serviceupid,s1.name AS serviceupname'.
+			' FROM services s1,services s2,services_links sl'.
+			' WHERE sl.serviceupid=s1.serviceid'.
+				' AND sl.servicedownid=s2.serviceid'.
+				' AND sl.soft=0'.
+				' AND sl.servicedownid='.$data['service']['serviceid']
+		);
+		if ($link = DBFetch($db_links)) {
 			$data['parentid'] = $link['serviceupid'];
 			$data['parentname'] = $link['serviceupname'];
 		}
@@ -345,23 +330,24 @@ if (isset($_REQUEST['form'])) {
 		}
 
 		// get childs
-		$sql = 'SELECT DISTINCT s.name,s.serviceid,s.triggerid,sl.soft'.
-					' FROM services s1,services s2,services_links sl,services s'.
-					' WHERE (s.triggerid IS NULL OR '.DBcondition('s.triggerid', $available_triggers).') '.
-						' AND '.DBin_node('s.serviceid').
-						' AND sl.serviceupid=s1.serviceid'.
-						' AND sl.servicedownid=s2.serviceid'.
-						' AND sl.serviceupid='.$data['service']['serviceid'].
-						' AND s.serviceid=sl.servicedownid';
-		$db_services = DBselect($sql);
+		$db_services = DBselect(
+			'SELECT DISTINCT s.name,s.serviceid,s.triggerid,sl.soft'.
+			' FROM services s1,services s2,services_links sl,services s'.
+			' WHERE (s.triggerid IS NULL OR '.DBcondition('s.triggerid', $available_triggers).') '.
+				' AND '.DBin_node('s.serviceid').
+				' AND sl.serviceupid=s1.serviceid'.
+				' AND sl.servicedownid=s2.serviceid'.
+				' AND sl.serviceupid='.$data['service']['serviceid'].
+				' AND s.serviceid=sl.servicedownid'
+		);
 		$data['childs'] = array();
 		while ($db_service_data = DBfetch($db_services)) {
 			$child = array(
-					'name' => $db_service_data['name'],
-					'serviceid' => $db_service_data['serviceid'],
-					'triggerid' => $db_service_data['triggerid'],
-					'soft' => $db_service_data['soft'],
-					'trigger' => '-'
+				'name' => $db_service_data['name'],
+				'serviceid' => $db_service_data['serviceid'],
+				'triggerid' => $db_service_data['triggerid'],
+				'soft' => $db_service_data['soft'],
+				'trigger' => '-'
 			);
 			if (str_in_array($child, $data['childs'])) {
 				continue;
@@ -376,12 +362,12 @@ if (isset($_REQUEST['form'])) {
 		$data['name'] = get_request('name', '');
 		$data['algorithm'] = get_request('algorithm', SERVICE_ALGORITHM_MAX);
 		$data['showsla'] = get_request('showsla', 0);
-		$data['goodsla'] = get_request('goodsla', 99.05);
+		$data['goodsla'] = get_request('goodsla', SERVICE_SLA);
 		$data['sortorder'] = get_request('sortorder', 0);
 		$data['triggerid'] = get_request('triggerid', 0);
 		$data['parentid'] = get_request('parentid', 0);
 		$data['parentname'] = get_request('parentname', '');
-		$data['childs']	 = get_request('childs', array());
+		$data['childs'] = get_request('childs', array());
 	}
 	if ($data['triggerid'] > 0) {
 		$trigger = API::Trigger()->get(array(
@@ -421,15 +407,15 @@ else {
 	$services[] = $row;
 
 	$db_services = DBSelect(
-			'SELECT DISTINCT s.serviceid,sl.servicedownid,sl_p.serviceupid AS serviceupid,s.triggerid,'.
-				's.name AS caption,s.algorithm,t.description,t.expression,s.sortorder,sl.linkid,s.showsla,s.goodsla,s.status'.
-			' FROM services s'.
-				' LEFT JOIN triggers t ON s.triggerid=t.triggerid'.
-				' LEFT JOIN services_links sl ON s.serviceid=sl.serviceupid AND sl.soft=1'.
-				' LEFT JOIN services_links sl_p ON s.serviceid=sl_p.servicedownid AND sl_p.soft=0'.
-			' WHERE '.DBin_node('s.serviceid').
-				' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY, array())).')'.
-			' ORDER BY s.sortorder,sl_p.serviceupid,s.serviceid'
+		'SELECT DISTINCT s.serviceid,sl.servicedownid,sl_p.serviceupid AS serviceupid,s.triggerid,'.
+			's.name AS caption,s.algorithm,t.description,t.expression,s.sortorder,sl.linkid,s.showsla,s.goodsla,s.status'.
+		' FROM services s'.
+			' LEFT JOIN triggers t ON s.triggerid=t.triggerid'.
+			' LEFT JOIN services_links sl ON s.serviceid=sl.serviceupid AND sl.soft=1'.
+			' LEFT JOIN services_links sl_p ON s.serviceid=sl_p.servicedownid AND sl_p.soft=0'.
+		' WHERE '.DBin_node('s.serviceid').
+			' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY, array())).')'.
+		' ORDER BY s.sortorder,sl_p.serviceupid,s.serviceid'
 	);
 	while ($row = DBFetch($db_services)) {
 		$row['id'] = $row['serviceid'];
