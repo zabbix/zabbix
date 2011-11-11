@@ -5,7 +5,6 @@ ALTER TABLE alerts MODIFY userid DEFAULT NULL;
 ALTER TABLE alerts MODIFY userid NULL;
 ALTER TABLE alerts MODIFY mediatypeid DEFAULT NULL;
 ALTER TABLE alerts MODIFY mediatypeid NULL;
-ALTER TABLE alerts MODIFY messages nvarchar2(2048) DEFAULT '';
 UPDATE alerts SET userid=NULL WHERE userid=0;
 UPDATE alerts SET mediatypeid=NULL WHERE mediatypeid=0;
 DELETE FROM alerts WHERE NOT actionid IN (SELECT actionid FROM actions);
