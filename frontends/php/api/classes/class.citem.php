@@ -1207,7 +1207,7 @@ class CItem extends CItemGeneral{
 
 		// check if the items are used in Y axis min/max values in any graphs
 		$graphs = API::Graph()->get(array(
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array($itemIdColumn, $typeColumn, 'graphtype'),
 			'filter' => $filter
 		));
 
