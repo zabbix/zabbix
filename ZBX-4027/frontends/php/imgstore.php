@@ -55,7 +55,7 @@ include_once('include/page_header.php');
 		$images = CImage::get($options);
 		foreach($images as $inum => $image){
 //SDI($image['image']);
-			$image['image'] = zbx_unescape_image(base64_decode($image['image']));
+			$image['image'] = base64_decode($image['image']);
 
 			$ico = imagecreatefromstring($image['image']);
 			$w = imagesx($ico);

@@ -1565,10 +1565,10 @@
 //SDII($exportMaps);
 	}
 
-	function prepareImageExport($images){
+	function prepareImageExport($images) {
 		$formatted = array();
 
-		foreach($images as $inum => $image){
+		foreach ($images as $image) {
 			$formatted[] = array(
 				'name' => $image['name'],
 				'imagetype' => $image['imagetype'],
