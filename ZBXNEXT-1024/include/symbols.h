@@ -20,19 +20,17 @@
 #ifndef ZABBIX_SYMBOLS_H
 #define ZABBIX_SYMBOLS_H
 
-#if defined (_WINDOWS)
+#if defined(_WINDOWS)
 
-DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE,DWORD);
-BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);
-BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION,DWORD);
+DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD);
+BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS);
+BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD);
 BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
 
-void import_symbols(void);
+void	import_symbols();
 
-#else /* not _WINDOWS */
-
+#else
 #	define import_symbols()
+#endif
 
-#endif /* _WINDOWS */
-
-#endif /* ZABBIX_SYMBOLS_H */
+#endif
