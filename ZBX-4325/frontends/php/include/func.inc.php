@@ -269,6 +269,10 @@ function zbxDateToTime($strdate) {
 		return time();
 	}
 }
+
+function zeroizeSeconds($unixtime) {
+	return floor($unixtime / 60) * 60;
+}
 /************* END DATE *************/
 
 /*************** CONVERTING ******************/

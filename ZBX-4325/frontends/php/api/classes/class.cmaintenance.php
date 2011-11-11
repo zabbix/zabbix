@@ -150,7 +150,7 @@ class CMaintenance extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			
+
 
 			$sql =
 				'SELECT DISTINCT m.maintenanceid'.
@@ -441,7 +441,6 @@ Copt::memoryPick();
 	return $result;
 	}
 
-
 	/**
 	 * Determine, whether an object already exists
 	 *
@@ -462,7 +461,6 @@ Copt::memoryPick();
 
 	return !empty($objs);
 	}
-
 
 /**
  * Add maintenances
@@ -519,6 +517,8 @@ Copt::memoryPick();
 			}
 //---
 
+			self::removeSecondsFromTimes($maintenances);
+
 			$tid = 0;
 			$insert = array();
 			$timeperiods = array();
@@ -526,8 +526,8 @@ Copt::memoryPick();
 			foreach($maintenances as $mnum => $maintenance){
 				$db_fields = array(
 					'name' => null,
-					'active_since'=> time(),
-					'active_till' => time()+86400,
+					'active_since'=> zeroizeSeconds(time()),
+					'active_till' => zeroizeSeconds(time()+86400),
 				);
 				if(!check_db_fields($db_fields, $maintenance)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
@@ -543,7 +543,7 @@ Copt::memoryPick();
 					$db_fields = array(
 						'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
 						'period' =>	3600,
-						'start_date' =>	time()
+						'start_date' =>	zeroizeSeconds(time())
 					);
 					check_db_fields($db_fields, $timeperiod);
 
@@ -635,8 +635,8 @@ Copt::memoryPick();
 				// first, getting all maintenances with the same name as this
 				$options = array(
 					'filter' => array(
-									'name'=>$maintenance['name']
-								)
+						'name'=>$maintenance['name']
+					)
 				);
 				$received_maintenaces = CMaintenance::get($options);
 				// now going through a result, to find records with different id than our object
@@ -681,6 +681,7 @@ Copt::memoryPick();
 				}
 			}
 
+			self::removeSecondsFromTimes($maintenances);
 
 			$timeperiodids = array();
 			$sql = 'SELECT DISTINCT tp.timeperiodid '.
@@ -829,8 +830,28 @@ Copt::memoryPick();
 		}
 	}
 
+	protected static function removeSecondsFromTimes(array &$maintenances) {
+		foreach ($maintenances as &$maintenance) {
+			if (isset($maintenance['active_since'])) {
+				$maintenance['active_since'] = zeroizeSeconds($maintenance['active_since']);
+			}
+
+			if (isset($maintenance['active_till'])) {
+				$maintenance['active_till'] = zeroizeSeconds($maintenance['active_till']);
+			}
 
 
+			if (isset($maintenance['timeperiods'])) {
+				foreach ($maintenance['timeperiods'] as &$timeperiod) {
+					if (isset($timeperiod['start_date'])) {
+						$timeperiod['start_date'] = zeroizeSeconds($timeperiod['start_date']);
+					}
+				}
+				unset($timeperiod);
+			}
+		}
+		unset($maintenance);
+	}
 
 }
 ?>
