@@ -22,46 +22,38 @@
 
 static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_PHYS_PAGES)*(zbx_uint64_t)sysconf(_SC_PAGESIZE));
+	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE));
+
 	return SYSINFO_RET_OK;
 }
 
 static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_AVPHYS_PAGES)*(zbx_uint64_t)sysconf(_SC_PAGESIZE));
+	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_AVPHYS_PAGES) * sysconf(_SC_PAGESIZE));
+
 	return SYSINFO_RET_OK;
 }
 
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	MODE_FUNCTION fl[] =
+	const MODE_FUNCTION	fl[] =
 	{
 		{"total",	VM_MEMORY_TOTAL},
 		{"free",	VM_MEMORY_FREE},
-		{0,		0}
+		{NULL,		0}
 	};
 
 	char	mode[MAX_STRING_LEN];
 	int	i;
 
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	if (1 < num_param(param))
+		return SYSINFO_RET_FAIL;
 
-        if(get_param(param, 1, mode, MAX_STRING_LEN) != 0)
-        {
-                mode[0] = '\0';
-        }
+	if (0 != get_param(param, 1, mode, sizeof(mode)) || '\0' == *mode)
+		strscpy(mode, "total");
 
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "total");
-	}
-
-	for(i=0; fl[i].mode!=0; i++)
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
+	for (i = 0; NULL != fl[i].mode; i++)
+		if (0 == strcmp(mode, fl[i].mode))
 			return (fl[i].function)(cmd, param, flags, result);
 
 	return SYSINFO_RET_FAIL;
