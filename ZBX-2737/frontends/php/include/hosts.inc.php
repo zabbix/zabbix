@@ -1276,7 +1276,7 @@ return $result;
 			$sql = 'INSERT INTO applications (applicationid, name, hostid, templateid) '.
 				" VALUES ($applicationid_new, ".zbx_dbstr($name).", $hostid, $templateid)";
 			if($result = DBexecute($sql)){
-				info(S_ADDED_NEW_APPLICATION.SPACE.$host['host'].':'.$name);
+				info(S_ADDED_NEW_APPLICATION.SPACE.'"'.$host['host'].':'.$name.'"');
 			}
 		}
 		else{
@@ -1284,7 +1284,7 @@ return $result;
 			$result = DBexecute('UPDATE applications SET name='.zbx_dbstr($name).', hostid='.$hostid.', templateid='.$templateid.
 				' WHERE applicationid='.$applicationid);
 			if($result)
-				info(S_UPDATED_APPLICATION.SPACE.$host['host'].':'.$old_app['name']);
+				info(S_APPLICATION.SPACE.'"'.$host['host'].':'.$old_app['name'].'"'.SPACE.S_UPDATED_SMALL);
 		}
 
 		if(!$result) return $result;
@@ -1492,7 +1492,7 @@ return $result;
 
 			if($unlink_mode){
 				if(DBexecute("update applications set templateid=0 where applicationid=".$db_app["applicationid"])){
-					info(S_APPLICATION.SPACE."'".$db_app["name"]."'".SPACE.S_UNLINKED_SMALL);
+					info(S_APPLICATION.SPACE.'"'.$db_app["name"].'"'.SPACE.S_UNLINKED_SMALL);
 				}
 			}
 			else{

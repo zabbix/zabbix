@@ -610,6 +610,7 @@ COpt::memoryPick();
 						$templated_graph = $host['hostid'];
 						break;
 					}
+					$graph['host'] = $host['host'];
 				}
 				if($templated_graph && (count($graph_hosts) > 1)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_GRAPH.' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
@@ -694,6 +695,7 @@ COpt::memoryPick();
 						$templated_graph = $host['hostid'];
 						break;
 					}
+					$graph['host'] = $host['host'];
 				}
 				if($templated_graph && (count($graph_hosts) > 1)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_GRAPH.' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
@@ -766,7 +768,7 @@ COpt::memoryPick();
 			$sql = 'INSERT INTO graphs_items ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
 			DBexecute($sql) or self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
-
+		info(S_GRAPH_ADDED.SPACE.'"'.$graph['host'].':'.$graph['name'].'"');
 		return $graphid;
 	}
 
@@ -786,6 +788,8 @@ COpt::memoryPick();
 				$result = DB::insert('graphs_items', array($gitem));
 				if(!$result)
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+				else
+					info(S_GRAPH.SPACE.'"'.$graph['host'].':'.$graph['name'].'"'.SPACE.S_UPDATED_SMALL);
 			}
 		}
 
