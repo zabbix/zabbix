@@ -1272,7 +1272,7 @@ class CItem extends CItemGeneral{
 				if ($host['status'] == HOST_STATUS_TEMPLATE || !isset($item['type'])) {
 					unset($item['interfaceid']);
 				}
-				elseif (isset($item['type']) && $item['type'] != $exItem['type']) {
+				elseif ((isset($item['type']) && isset($exItem) && $item['type'] != $exItem['type']) || !isset($exItem)) {
 					$type = self::itemTypeInterface($item['type']);
 
 					if ($type == INTERFACE_TYPE_ANY) {

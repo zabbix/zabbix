@@ -1349,6 +1349,7 @@ class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
 			array('{host:log[/data/logs/test.log,text1(incorrect|FAILtext2].last(0)}', true),
 			array('{host:log[/data/logs/test.log,text1incorrect|FAIL)text2].last(0)}', true),
 			array('{host:log[/data/logs/test.log,text1(incorrect|FAIL)text2].last(0)}', true),
+			array('{Template_App_CCWS:web.page.regexp[0.0.0.0,/ws-callcontrol-1.1/test,{$CCWS_PORT},"[Ss]moke [Tt]est = ([Ss]uccess|[Ww]arning|[Ff]ail).*([[:space:]].*)+"].count(#1,event service = failed)}=1', true),
 		);
 	}
 

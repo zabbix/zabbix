@@ -27,7 +27,7 @@
 	// $page['title']	= "S_CHART";
 	$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -149,7 +149,7 @@ include_once('include/page_header.php');
 		$p = $timetill - $timesince;				// graph size in time
 		$z = $p - ($timesince % $p);				// graphsize - mod(from_time,p) for Oracle...
 		$x = round($p / $scaleperiod);				// graph size in px
-		$calc_field = 'round('.$x.'*(mod('.zbx_dbcast_2bigint('clock').'+'.$z.','.$p.'))/('.$p.'),0)';  /* required for 'group by' support of Oracle */
+		$calc_field = 'round('.$x.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$z, $p).'/('.$p.'),0)';	// required for 'group by' support of Oracle
 
 		$period_step = $scaleperiod;
 
@@ -573,7 +573,7 @@ include_once('include/page_header.php');
 				$p = $end - $start;						// graph size in time
 				$z = $p - ($start % $p);				// graphsize - mod(from_time,p) for Oracle...
 				$x = floor($scaleperiod / $period);		// graph size in px
-				$calc_field = 'round('.$x.'*(mod('.zbx_dbcast_2bigint('clock').'+'.$z.','.$p.'))/('.$p.'),0)';  /* required for 'group by' support of Oracle */
+				$calc_field = 'round('.$x.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$z, $p).'/('.$p.'),0)';	// required for 'group by' support of Oracle
 
 				$item_data = null;
 
@@ -655,5 +655,5 @@ include_once('include/page_header.php');
 	$graph->Draw();
 ?>
 <?php
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

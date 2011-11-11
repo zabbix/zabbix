@@ -3,7 +3,6 @@ ALTER TABLE config
 	MODIFY alert_usrgrpid bigint unsigned NULL,
 	MODIFY discovery_groupid bigint unsigned NOT NULL,
 	MODIFY default_theme varchar(128) DEFAULT 'css_ob.css' NOT NULL,
-	ADD ns_support integer DEFAULT '0' NOT NULL,
 	ADD severity_color_0 varchar(6) DEFAULT 'DBDBDB' NOT NULL,
 	ADD severity_color_1 varchar(6) DEFAULT 'D6F6FF' NOT NULL,
 	ADD severity_color_2 varchar(6) DEFAULT 'FFF6A5' NOT NULL,

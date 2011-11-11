@@ -68,11 +68,11 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
-	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
-	@SERVER_LIBS@
+	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a
 
-zabbix_server_LDFLAGS = \
-	@SERVER_LDFLAGS@
+zabbix_server_LDADD += @SERVER_LIBS@
+
+zabbix_server_LDFLAGS = @SERVER_LDFLAGS@
 
 zabbix_server_CFLAGS = \
 	-DZABBIX_DAEMON \
