@@ -195,12 +195,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		DBexecute("set names utf8");
 	}
 
-	/* do not read uncommitted data of other transactions */
-	if (ZBX_DB_OK == ret)
-	{
-		DBexecute("set session transaction isolation level read committed");
-	}
-
 	if (ZBX_DB_FAIL == ret)
 	{
 		switch (mysql_errno(conn))
@@ -330,9 +324,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		/* change the output format for values of type bytea from hex (the default) to escape */
 		DBexecute("set bytea_output=escape");
 	}
-
-	/* do not read uncommitted data of other transactions */
-	DBexecute("set session characteristics as transaction isolation level read committed");
 #elif defined(HAVE_SQLITE3)
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
@@ -357,10 +348,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		else
 			*path = '\0';
 
-		DBexecute("pragma synchronous = 0");		/* OFF */
-		DBexecute("pragma temp_store = 2");		/* MEMORY */
-		DBexecute("pragma read_uncommitted = false");	/* do not read uncommitted data of other transactions */
-		DBexecute("pragma temp_store_directory = '%s'", path);
+		DBexecute("PRAGMA synchronous = 0");	/* OFF */
+		DBexecute("PRAGMA temp_store = 2");	/* MEMORY */
+		DBexecute("PRAGMA temp_store_directory = '%s'", path);
 
 		zbx_free(path);
 	}
