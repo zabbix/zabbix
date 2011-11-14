@@ -79,15 +79,15 @@ function _n($string1, $string2, $value) {
  * Translates the string with respect to the given context and replace placeholders with supplied arguments.
  * If no translation is found, the original string will be used. Unlimited number of parameters supplied.
  *
- * Example: _x('context', 'Message for arg1 "%1$s" and arg2 "%2$s"', 'arg1Value', 'arg2Value');
+ * Example: _x('Message for arg1 "%1$s" and arg2 "%2$s"', 'context', 'arg1Value', 'arg2Value');
  * returns: 'Message for arg1 "arg1Value" and arg2 "arg2Value"'
  *
- * @param string $context   Context of the string
  * @param string $message   String to translate
+ * @param string $context   Context of the string
  *
  * @return string
  */
-function _x($context, $message) {
+function _x($message, $context) {
 	$arguments = array_slice(func_get_args(), 2);
 
 	if ($context == '') {
@@ -102,17 +102,17 @@ function _x($context, $message) {
  * Translates the string with respect to the given context and plural forms also replace placeholders with supplied arguments.
  * If no translation is found, the original string will be used. Unlimited number of parameters supplied.
  *
- * Example: _xn('context', '%1$s message for arg1 "%2$s"', '%1$s messages for arg1 "%2$s"', 3, 'arg1Value');
+ * Example: _xn('%1$s message for arg1 "%2$s"', '%1$s messages for arg1 "%2$s"', 3, 'context', 'arg1Value');
  * returns: '3 messagges for arg1 "arg1Value"'
  *
- * @param string $context          context of the string
  * @param string $message          string to translate
  * @param string $message_plural   string to translate for plural form
  * @param int    $num              number to determine usage of plural form, also is used as first replace argument
+ * @param string $context          context of the string
  *
  * @return string
  */
-function _xn($context, $message, $message_plural, $num) {
+function _xn($message, $message_plural, $num, $context) {
 	$arguments = array_slice(func_get_args(), 3);
 
 	if ($context == '') {
