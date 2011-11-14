@@ -163,6 +163,7 @@ static int	VM_MEMORY_PAVAILABLE(const char *cmd, const char *param, unsigned fla
 
 static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef KERNEL_2_4
 	struct sysinfo	info;
 
 	if (0 != sysinfo(&info))
@@ -171,6 +172,9 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 	SET_UI64_RESULT(result, (zbx_uint64_t)info.sharedram * info.mem_unit);
 
 	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif
 }
 
 int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
