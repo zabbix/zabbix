@@ -113,7 +113,8 @@ function _x($message, $context) {
  * @return string
  */
 function _xn($message, $message_plural, $num, $context) {
-	$arguments = array_slice(func_get_args(), 3);
+	$arguments = array_slice(func_get_args(), 4);
+	array_unshift($arguments, $num);
 
 	if ($context == '') {
 		return vsprintf(ngettext($message, $message_plural, $num), $arguments);
