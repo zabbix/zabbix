@@ -25,54 +25,102 @@
  * so user can see atleast english translation
  */
 
-
-if(!function_exists('_')){
-	function _($string){
+if (!function_exists('_')) {
+	function _($string) {
 		return $string;
 	}
 }
 
-if(!function_exists('gettext')){
-	function gettext($string){
+if (!function_exists('gettext')) {
+	function gettext($string) {
 		return $string;
 	}
 }
 
-if(!function_exists('ngettext')){
-	function ngettext($string1, $string2, $n){
+if (!function_exists('ngettext')) {
+	function ngettext($string1, $string2, $n) {
 		return $n == 1 ? $string1 : $string2;
 	}
 }
 
-if (!function_exists('dcgettext')) {
-	function dcgettext($domain, $string, $localeType) {
-		return $string;
+if (!function_exists('pgettext')) {
+	function pgettext($context, $msgid) {
+		$contextString = $context."\004".$msgid;
+		$translation = _($contextString);
+		return ($translation == $contextString) ? $msgid : $translation;
 	}
 }
 
-function _s($string){
+if (!function_exists('npgettext')) {
+	function npgettext($context, $msgid, $msgid_plural, $num) {
+		$contextString = $context."\004".$msgid;
+		$contextStringp = $context."\004".$msgid_plural;
+		$translation = ngettext($contextString, $contextStringp, $num);
+		if ($translation == $contextString || $translation == $contextStringp) {
+			return $msgid;
+		}
+		else {
+			return $translation;
+		}
+	}
+}
+
+function _s($string) {
 	$arguments = array_slice(func_get_args(), 1);
 	return vsprintf(_($string), $arguments);
 }
 
-function _n($string1, $string2, $value){
+function _n($string1, $string2, $value) {
 	$arguments = array_slice(func_get_args(), 2);
 	return vsprintf(ngettext($string1, $string2, $value), $arguments);
 }
 
 /**
- * Translates the string with respect to the given context.
+ * Translates the string with respect to the given context and replace placeholders with supplied arguments.
+ * If no translation is found, the original string will be used. Unlimited number of parameters supplied.
  *
- * If no translation is found, the original string will be returned.
+ * Example: _x('context', 'Message for arg1 "%1$s" and arg2 "%2$s"', 'arg1Value', 'arg2Value');
+ * returns: 'Message for arg1 "arg1Value" and arg2 "arg2Value"'
  *
- * @param string $msgid     String to translate
  * @param string $context   Context of the string
- * @param string $domain    Locale domain
+ * @param string $message   String to translate
+ *
  * @return string
  */
-function _x($msgid, $context, $domain = 'frontend') {
-	$contextString = $context."\004".$msgid;
-	$translation = dcgettext($domain, $contextString, LC_MESSAGES);
-	return ($translation == $contextString) ? $msgid : $translation;
+function _x($context, $message) {
+	$arguments = array_slice(func_get_args(), 2);
+
+	if ($context == '') {
+		return vsprintf($message, $arguments);
+	}
+	else {
+		return vsprintf(pgettext($context, $message), $arguments);
+	}
 }
+
+/**
+ * Translates the string with respect to the given context and plural forms also replace placeholders with supplied arguments.
+ * If no translation is found, the original string will be used. Unlimited number of parameters supplied.
+ *
+ * Example: _xn('context', '%1$s message for arg1 "%2$s"', '%1$s messages for arg1 "%2$s"', 3, 'arg1Value');
+ * returns: '3 messagges for arg1 "arg1Value"'
+ *
+ * @param string $context          context of the string
+ * @param string $message          string to translate
+ * @param string $message_plural   string to translate for plural form
+ * @param int    $num              number to determine usage of plural form, also is used as first replace argument
+ *
+ * @return string
+ */
+function _xn($context, $message, $message_plural, $num) {
+	$arguments = array_slice(func_get_args(), 3);
+
+	if ($context == '') {
+		return vsprintf(ngettext($message, $message_plural, $num), $arguments);
+	}
+	else {
+		return vsprintf(npgettext($context, $message, $message_plural, $num), $arguments);
+	}
+}
+
 ?>
