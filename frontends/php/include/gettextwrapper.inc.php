@@ -76,7 +76,7 @@ function _n($string1, $string2, $value) {
 }
 
 /**
- * Translates the string with respect to the given context and replace placeholders with supplied arguments.
+ * Translates the string with respect to the given context and replaces placeholders with supplied arguments.
  * If no translation is found, the original string will be used. Unlimited number of parameters supplied.
  *
  * Example: _x('Message for arg1 "%1$s" and arg2 "%2$s"', 'context', 'arg1Value', 'arg2Value');
@@ -99,7 +99,7 @@ function _x($message, $context) {
 }
 
 /**
- * Translates the string with respect to the given context and plural forms also replace placeholders with supplied arguments.
+ * Translates the string with respect to the given context and plural forms, also replaces placeholders with supplied arguments.
  * If no translation is found, the original string will be used. Unlimited number of parameters supplied.
  *
  * Example: _xn('%1$s message for arg1 "%2$s"', '%1$s messages for arg1 "%2$s"', 3, 'context', 'arg1Value');
