@@ -4966,7 +4966,8 @@ JAVASCRIPT;
 
 		if ($final_result) {
 			$final_result = new CSpan(S_TRUE_BIG, 'green bold');
-		} else {
+		}
+		else {
 			$final_result = new CSpan(S_FALSE_BIG, 'red bold');
 		}
 
