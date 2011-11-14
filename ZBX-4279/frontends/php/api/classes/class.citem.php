@@ -1081,9 +1081,6 @@ class CItem extends CItemGeneral{
 				}
 			} while (!empty($parent_itemids));
 
-			// check if we can delete these items
-			$this->checkDelete($itemids);
-
 			// delete graphs, leave if graph still have item
 			$del_graphs = array();
 			$sql = 'SELECT gi.graphid'.
@@ -1106,6 +1103,9 @@ class CItem extends CItemGeneral{
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph.'));
 				}
 			}
+
+			// check if any graphs are referencing this item
+			$this->checkGraphReference($itemids);
 
 			$triggers = API::Trigger()->get(array(
 				'itemids' => $itemids,
@@ -1162,13 +1162,14 @@ class CItem extends CItemGeneral{
 
 
 	/**
-	 * Checks if the given items can be deleted.
+	 * Checks whether the given items are referenced by any graphs and tries to
+	 * unset these reference, if they are no longer used.
 	 *
 	 * @throws APIException if at least one of the item can't be deleted
 	 *
 	 * @param array $itemIds   An array of item IDs
 	 */
-	protected function checkDelete(array $itemIds) {
+	protected function checkGraphReference(array $itemIds) {
 		$this->checkUseInGraphAxis($itemIds, true);
 		$this->checkUseInGraphAxis($itemIds);
 	}
