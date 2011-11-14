@@ -423,13 +423,16 @@ include_once('include/page_header.php');
 				unset($_REQUEST['form']);
 			}
 		}
-		else if (isset($_REQUEST['go'])){
-			if ($_REQUEST['go'] == 'delete'){
-				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
+		elseif (isset($_REQUEST['go'])) {
+			if ($_REQUEST['go'] == 'delete') {
+				if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+					access_deny();
+				}
 
 				$regexpids = get_request('regexpid', array());
-				if(isset($_REQUEST['regexpids']))
+				if (isset($_REQUEST['regexpids'])) {
 					$regexpids = $_REQUEST['regexpids'];
+				}
 
 				zbx_value2array($regexpids);
 
@@ -442,10 +445,10 @@ include_once('include/page_header.php');
 				$result = delete_regexp($regexpids);
 				$result = Dbend($result);
 
-				show_messages($result,S_REGULAR_EXPRESSION_DELETED,S_CANNOT_DELETE_REGULAR_EXPRESSION);
-				if($result){
-					foreach($regexps as $regexpid => $regexp){
-						add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_REGEXP,'Id ['.$regexpid.'] '.S_NAME.' ['.$regexp['name'].']');
+				show_messages($result, S_REGULAR_EXPRESSION_DELETED, S_CANNOT_DELETE_REGULAR_EXPRESSION);
+				if ($result) {
+					foreach ($regexps as $regexpid => $regexp) {
+						add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, 'Id ['.$regexpid.'] '.S_NAME.' ['.$regexp['name'].']');
 					}
 
 					unset($_REQUEST['form']);
@@ -486,13 +489,13 @@ include_once('include/page_header.php');
 				unset($_REQUEST['new_expression']);
 			}
 		}
-		else if (inarr_isset(array('delete_expression','g_expressionid'))) {
+		elseif (inarr_isset(array('delete_expression', 'g_expressionid'))) {
 			$_REQUEST['expressions'] = get_request('expressions', array());
-			foreach($_REQUEST['g_expressionid'] as $val){
+			foreach ($_REQUEST['g_expressionid'] as $val) {
 				unset($_REQUEST['expressions'][$val]);
 			}
 		}
-		else if (inarr_isset(array('edit_expressionid'))) {
+		elseif (inarr_isset(array('edit_expressionid'))) {
 			$_REQUEST['edit_expressionid'] = array_keys($_REQUEST['edit_expressionid']);
 			$edit_expressionid = $_REQUEST['edit_expressionid'] = array_pop($_REQUEST['edit_expressionid']);
 			$_REQUEST['expressions'] = get_request('expressions', array());
@@ -1048,11 +1051,11 @@ include_once('include/page_header.php');
 			$left_tab->setAttribute('border',0);
 
 			$left_tab->addRow(create_hat(
-					S_REGULAR_EXPRESSION,
-					get_regexp_form(),
-					null,
-					'hat_regexp'
-				));
+				S_REGULAR_EXPRESSION,
+				get_regexp_form(),
+				null,
+				'hat_regexp'
+			));
 
 			$right_tab = new CTable();
 			$right_tab->setCellPadding(3);
@@ -1061,21 +1064,20 @@ include_once('include/page_header.php');
 			$right_tab->setAttribute('border',0);
 
 			$right_tab->addRow(create_hat(
-					S_EXPRESSIONS,
-					get_expressions_tab(),
-					null,
-					'hat_expressions'
-				));
+				S_EXPRESSIONS,
+				get_expressions_tab(),
+				null,
+				'hat_expressions'
+			));
 
-			if(isset($_REQUEST['new_expression'])){
+			if (isset($_REQUEST['new_expression'])) {
 				$right_tab->addRow(create_hat(
-						S_NEW_EXPRESSION,
-						get_expression_form(),
-						null,
-						'hat_new_expression'
-					));
+					S_NEW_EXPRESSION,
+					get_expression_form(),
+					null,
+					'hat_new_expression'
+				));
 			}
-
 
 			$td_l = new CCol($left_tab);
 			$td_l->setAttribute('valign','top');
@@ -1144,14 +1146,14 @@ include_once('include/page_header.php');
 				new CCheckBox('all_regexps', NULL, "checkAll('".$form->GetName()."','all_regexps','regexpids');"),
 				S_NAME,
 				S_EXPRESSIONS
-				));
+			));
 
 			foreach($regexps as $regexpid => $regexp) {
 				$table->addRow(array(
-					new CCheckBox('regexpids['.$regexp['regexpid'].']', NULL,NULL,$regexp['regexpid']),
+					new CCheckBox('regexpids['.$regexp['regexpid'].']', NULL, NULL, $regexp['regexpid']),
 					new CLink($regexp['name'], 'config.php?form=update'.url_param('config').'&regexpid='.$regexp['regexpid'].'#form'),
-					isset($expressions[$regexpid])?$expressions[$regexpid]:'-'
-					));
+					isset($expressions[$regexpid]) ? $expressions[$regexpid] : '-'
+				));
 			}
 
 			$goBox = new CComboBox('go');
@@ -1176,7 +1178,7 @@ include_once('include/page_header.php');
 /////////////////////////////
 //  config = 11 // Macros  //
 /////////////////////////////
-	else if ($_REQUEST['config']==11) {
+	elseif ($_REQUEST['config'] == 11) {
 		$form = new CForm();
 		$tbl = new CTable();
 		$tbl->addRow(get_macros_widget());
