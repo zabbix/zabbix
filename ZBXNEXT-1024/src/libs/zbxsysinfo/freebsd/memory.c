@@ -180,6 +180,20 @@ static int	VM_MEMORY_BUFFERS(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
+{
+	struct vmtotal	vm;
+	size_t		len = sizeof(vm);
+	int		mib[] = {CTL_VM, VM_METER};
+
+	if (0 != sysctl(mib, 2, &vm, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)(vm.t_vmshr + vm.t_rmshr) * pagesize);
+
+	return SYSINFO_RET_OK;
+}
+
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	MODE_FUNCTION fl[] =
@@ -195,6 +209,7 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 		{"available",	VM_MEMORY_AVAILABLE},
 		{"pavailable",	VM_MEMORY_PAVAILABLE},
 		{"buffers",	VM_MEMORY_BUFFERS},
+		{"shared",	VM_MEMORY_SHARED},
 		{NULL,		0}
 	};
 
