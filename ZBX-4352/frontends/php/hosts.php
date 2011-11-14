@@ -424,9 +424,12 @@ include_once('include/page_header.php');
 				$hosts['templates'] = $templates;
 			}
 
-			$result = CHost::massUpdate(array_merge($hosts, $new_values));
-			if($result === false) throw new Exception();
-
+			if ($new_values) {
+				$result = CHost::massUpdate(array_merge($hosts, $new_values));
+				if ($result === false) {
+					throw new Exception();
+				}
+			}
 
 			$add = array();
 			if(!empty($templates) && isset($visible['template_table'])){
