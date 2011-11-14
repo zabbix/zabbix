@@ -594,4 +594,24 @@ function insert_js($script){
 	print('<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>');
 }
 
+
+/**
+ * Escapes a string or array for safe outputting.
+ *
+ * @param mixed $value
+ * @return mixed
+ */
+function sanitize($value) {
+	if (is_array($value)) {
+		foreach ($value as &$v) {
+			$v = sanitize($v);
+		}
+	}
+	else {
+		$value = htmlspecialchars($value);
+	}
+
+	return $value;
+}
+
 ?>

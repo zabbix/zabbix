@@ -69,8 +69,8 @@ include_once 'include/page_header.php';
 
 	if(isset($_REQUEST['save']) && !isset($_REQUEST['gid'])){
 		insert_js("add_bitem(".
-			zbx_jsvalue($_REQUEST['dstfrm']).",".
-			zbx_jsvalue($_REQUEST['caption']).",'".
+			zbx_jsvalue(sanitize($_REQUEST['dstfrm'])).",".
+			zbx_jsvalue(sanitize($_REQUEST['caption'])).",'".
 			$_REQUEST['itemid']."','".
 			$_REQUEST['color']."',".
 			$_REQUEST['calc_fnc'].",".
@@ -79,10 +79,10 @@ include_once 'include/page_header.php';
 
 	if(isset($_REQUEST['save']) && isset($_REQUEST['gid'])){
 		insert_js("update_bitem(".
-			zbx_jsvalue($_REQUEST['dstfrm']).",".
+			zbx_jsvalue(sanitize($_REQUEST['dstfrm'])).",".
 			zbx_jsvalue($_REQUEST['list_name']).",'".
 			$_REQUEST['gid']."',".
-			zbx_jsvalue($_REQUEST['caption']).",'".
+			zbx_jsvalue(sanitize($_REQUEST['caption'])).",'".
 			$_REQUEST['itemid']."','".
 			$_REQUEST['color']."',".
 			$_REQUEST['calc_fnc'].",".

@@ -269,7 +269,7 @@ include_once('include/page_header.php');
 	make_refresh_menu('mainpage','hat_dscvry',CProfile::get('web.dahsboard.rf_rate.hat_dscvry',60),null,$menu,$submenu);
 
 	insert_js('var page_menu='.zbx_jsvalue($menu).";\n".
-			 'var page_submenu='.zbx_jsvalue($submenu).";\n"
+			'var page_submenu='.zbx_jsvalue(sanitize($submenu)).";\n"
 		);
 
 // --------------

@@ -347,7 +347,7 @@
 				$menus .= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 				$menus .= $links_menus;
 				if(!empty($db_element['url']))
-					$menus .= "['".S_URL."',\"javascript: location.replace('".$db_element['url']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+					$menus .= "['".S_URL."',\"javascript: location.replace('".sanitize($db_element['url'])."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 
 			$menus = trim($menus,',');
