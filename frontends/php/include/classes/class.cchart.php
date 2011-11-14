@@ -241,8 +241,8 @@ class CChart extends CGraphDraw{
 			if(ZBX_HISTORY_DATA_UPKEEP > -1) $real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
 //---
 
-			if((($real_item['history']*86400) > (time()-($this->from_time+$this->period/2))) &&			// should pick data from history or trends
-				(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
+			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($this->from_time + $this->period / 2)) &&	// should pick data from history or trends
+				($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))		// is reasonable to take data from history?
 			{
 				$this->dataFrom = 'history';
 				array_push($sql_arr,
@@ -289,7 +289,7 @@ class CChart extends CGraphDraw{
 					' GROUP BY itemid,'.$calc_field
 					);
 
-				$this->items[$i]['delay'] = max($this->items[$i]['delay'],3600);
+				$this->items[$i]['delay'] = max($this->items[$i]['delay'], SEC_PER_HOUR);
 			}
 
 			if(!isset($this->data[$this->items[$i]['itemid']]))
@@ -934,8 +934,8 @@ class CChart extends CGraphDraw{
 // Sub
 		$intervalX = ($sub_interval * $this->sizeX) / $this->period;
 
-		if($sub_interval > 86400){
-			$offset = (7 - date('w',$this->from_time)) * 86400;
+		if ($sub_interval > SEC_PER_DAY) {
+			$offset = (7 - date('w', $this->from_time)) * SEC_PER_DAY;
 			$offset+= $this->diffTZ;
 
 			$next = $this->from_time + $offset;
@@ -971,8 +971,8 @@ class CChart extends CGraphDraw{
 // Main
 		$intervalX = ($main_interval * $this->sizeX) / $this->period;
 
-		if($main_interval > 86400){
-			$offset = (7 - date('w',$this->from_time)) * 86400;
+		if ($main_interval > SEC_PER_DAY) {
+			$offset = (7 - date('w', $this->from_time)) * SEC_PER_DAY;
 			$offset+= $this->diffTZ;
 			$next = $this->from_time + $offset;
 
@@ -1171,28 +1171,28 @@ class CChart extends CGraphDraw{
 			$new_pos = $i*$intervalX+$offsetX;
 
 // DayLightSave
-			if($interval > 3600){
+			if ($interval > SEC_PER_HOUR) {
 				$tz = date('Z',$this->from_time) - date('Z',$new_time);
 				$new_time+=$tz;
 			}
 
 // MAIN Interval Checks
-			if(($interval < 3600) && (date('i',$new_time) == 0)){
+			if ($interval < SEC_PER_HOUR && date('i', $new_time) == 0) {
 				$this->drawMainPeriod($new_time, $new_pos);
 				continue;
 			}
 
-			if(($interval >= 3600) && ($interval < 86400) && (date('H',$new_time) == 0)){
+			if (interval >= SEC_PER_HOUR && $interval < SEC_PER_DAY && date('H', $new_time) == 0) {
 				$this->drawMainPeriod($new_time, $new_pos);
 				continue;
 			}
 
-			if(($interval == 86400) && (date('N',$new_time) == 7)){
+			if ($interval == SEC_PER_DAY && date('N', $new_time) == 7) {
 				$this->drawMainPeriod($new_time, $new_pos);
 				continue;
 			}
 
-			if(($interval > 86400) && (($i*$interval % $main_interval + $offset) == $main_offset)){
+			if ($interval > SEC_PER_DAY && ($i * $interval % $main_interval + $offset) == $main_offset) {
 				$this->drawMainPeriod($new_time, $new_pos);
 				continue;
 			}
@@ -1209,9 +1209,15 @@ class CChart extends CGraphDraw{
 			if($main_intervalX < floor(($main_interval/$interval)*$intervalX)) continue;
 			else if($main_intervalX < (ceil($main_interval/$interval + 1)*$test_dims['width'])) continue;
 
-			if($interval == 86400) $date_format = S_CCHARTS_TIMELINE_DAYS_FORMAT;
-			else if($interval > 86400) $date_format = S_CCHARTS_TIMELINE_MONTHDAYS_FORMAT;
-			else if($interval < 86400) $date_format = S_CCHARTS_TIMELINE_HOURS_FORMAT;
+			if ($interval == SEC_PER_DAY) {
+				$date_format = _('D');
+			}
+			elseif ($interval > SEC_PER_DAY) {
+				$date_format = _('d.m');
+			}
+			elseif ($interval < SEC_PER_DAY) {
+				$date_format = _('H:i');
+			}
 
 			$str = zbx_date2str($date_format, $new_time);
 			$dims = imageTextSize(7, 90, $str);
@@ -1494,9 +1500,9 @@ class CChart extends CGraphDraw{
 			$this->from_time=$this->stime;
 			$this->to_time=$this->stime+$this->period;
 		}
-		else{
-			$this->to_time=$now-3600*$this->from;
-			$this->from_time=$this->to_time-$this->period;
+		else {
+			$this->to_time = $now - SEC_PER_HOUR * $this->from;
+			$this->from_time = $this->to_time - $this->period;
 		}
 
 		$from = $this->from_time;
