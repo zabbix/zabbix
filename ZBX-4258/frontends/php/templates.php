@@ -425,6 +425,21 @@ require_once('include/page_header.php');
 					$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
 				}
 				if(!$result) throw new Exception();
+
+				// clone discovery rules
+				$discoveryRules = API::DiscoveryRule()->get(array(
+					'hostids' => $clone_templateid,
+					'inherited' => false,
+				));
+				if ($discoveryRules) {
+					$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
+						'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
+						'hostids' => array($templateid)
+					));
+					if (!$copyDiscoveryRules) {
+						throw new Exception();
+					}
+				}
 			}
 
 			if(!DBend(true)) throw new Exception();
