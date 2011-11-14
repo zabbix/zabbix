@@ -688,7 +688,9 @@ class CStringParser {
 	private function levelValue(&$levelData) {
 		//$this->saveDebug("Clearing value of {$levelData['levelType']}: ".var_export($levelData['value'], true)."\n");
 		//$value = $levelData['value'];
-		if(!isset($levelData['levelType'])) $levelData['levelType'] = 'independent';
+		if (!isset($levelData['levelType'])) {
+			$levelData['levelType'] = 'independent';
+		}
 
 		$value = '';
 		$values = Array();
