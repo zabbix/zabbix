@@ -2983,15 +2983,15 @@
 
 		// start time
 		if (isset($new_timeperiod['start_time'])) {
-			$new_timeperiod['hour'] = floor($new_timeperiod['start_time'] / 3600);
-			$new_timeperiod['minute'] = floor(($new_timeperiod['start_time'] - ($new_timeperiod['hour'] * 3600)) / 60);
+			$new_timeperiod['hour'] = floor($new_timeperiod['start_time'] / SEC_PER_HOUR);
+			$new_timeperiod['minute'] = floor(($new_timeperiod['start_time'] - ($new_timeperiod['hour'] * SEC_PER_HOUR)) / SEC_PER_MIN);
 		}
 
 		// period
 		if (isset($new_timeperiod['period'])) {
-			$new_timeperiod['period_days'] = floor($new_timeperiod['period'] / 86400);
-			$new_timeperiod['period_hours'] = floor(($new_timeperiod['period'] - ($new_timeperiod['period_days'] * 86400)) / 3600);
-			$new_timeperiod['period_minutes'] = floor(($new_timeperiod['period'] - $new_timeperiod['period_days'] * 86400 - $new_timeperiod['period_hours'] * 3600) / 60);
+			$new_timeperiod['period_days'] = floor($new_timeperiod['period'] / SEC_PER_DAY);
+			$new_timeperiod['period_hours'] = floor(($new_timeperiod['period'] - ($new_timeperiod['period_days'] * SEC_PER_DAY)) / SEC_PER_HOUR);
+			$new_timeperiod['period_minutes'] = floor(($new_timeperiod['period'] - $new_timeperiod['period_days'] * SEC_PER_DAY - $new_timeperiod['period_hours'] * SEC_PER_HOUR) / SEC_PER_MIN);
 		}
 
 		// daysofweek
@@ -3215,7 +3215,7 @@
 			$perHours->addItem($i, $i.SPACE);
 		}
 		$perMinutes = new CComboBox('new_timeperiod[period_minutes]', $new_timeperiod['period_minutes']);
-		for ($i = 0; $i < 60; $i++) {
+		for ($i = 0; $i < SEC_PER_MIN; $i++) {
 			$perMinutes->addItem($i, $i.SPACE);
 		}
 		$tblPeriod->addRow(array(

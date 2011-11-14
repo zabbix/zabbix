@@ -320,6 +320,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
+ - [ZBX-4325] fixed maintenance periods saved with nonzero seconds (asaveljevs,Vedmak)
  - [ZBX-4345] fixed counting of recursive dependency levels for triggers (asaveljevs)
  - [ZBX-4027] fixed floating-point comparison and unified epsilon in trigger functions and expressions (asaveljevs)
  - [ZBX-3117] fixed error notification when unsuccessfully copying a graph (pavels)

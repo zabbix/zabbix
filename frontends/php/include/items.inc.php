@@ -1093,23 +1093,22 @@ function item_type2str($type = null){
 	function check_time_period($period, $now){
 		$tm = localtime($now, true);
 		$day = (0 == $tm['tm_wday']) ? 7 : $tm['tm_wday'];
-		$sec = 3600 * $tm['tm_hour'] + 60 * $tm['tm_min'] + $tm['tm_sec'];
+		$sec = SEC_PER_HOUR * $tm['tm_hour'] + SEC_PER_MIN * $tm['tm_min'] + $tm['tm_sec'];
 
-		$flag = (6 == sscanf($period, "%d-%d,%d:%d-%d:%d", $d1, $d2, $h1, $m1, $h2, $m2));
+		$flag = (6 == sscanf($period, '%d-%d,%d:%d-%d:%d', $d1, $d2, $h1, $m1, $h2, $m2));
 
 		if(!$flag){
-			$flag = (5 == sscanf($period, "%d,%d:%d-%d:%d", $d1, $h1, $m1, $h2, $m2));
+			$flag = (5 == sscanf($period, '%d,%d:%d-%d:%d', $d1, $h1, $m1, $h2, $m2));
 			$d2 = $d1;
 		}
 
 		if(!$flag){
 			/* Delay period format is wrong - skip */;
 		}
-		else{
-			if(($day >= $d1) &&
-				($day <= $d2) &&
-				($sec >= (3600*$h1+60*$m1)) &&
-				($sec <= (3600*$h2+60*$m2)))
+		else {
+			if ($day >= $d1 && $day <= $d2 &&
+				$sec >= (SEC_PER_HOUR * $h1 + SEC_PER_MIN * $m1) &&
+				$sec <= (SEC_PER_HOUR * $h2 + SEC_PER_MIN * $m2))
 			{
 				return true;
 			}
@@ -1203,7 +1202,7 @@ function item_type2str($type = null){
 		$next = 0;
 		$tm = localtime($now, true);
 		$day = (0 == $tm['tm_wday']) ? 7 : $tm['tm_wday'];
-		$sec = 3600 * $tm['tm_hour'] + 60 * $tm['tm_min'] + $tm['tm_sec'];
+		$sec = SEC_PER_HOUR * $tm['tm_hour'] + SEC_PER_MIN * $tm['tm_min'] + $tm['tm_sec'];
 
 		$arr_of_flex_intervals = explode(';', $flex_intervals);
 
@@ -1214,10 +1213,10 @@ function item_type2str($type = null){
 				$d2 = $d1;
 			}
 
-			$sec1 = 3600 * $h1 + 60 * $m1;
-			$sec2 = 3600 * $h2 + 60 * $m2;
+			$sec1 = SEC_PER_HOUR * $h1 + SEC_PER_MIN * $m1;
+			$sec2 = SEC_PER_HOUR * $h2 + SEC_PER_MIN * $m2;
 
-			if(($day >= $d1) && ($day <= $d2) && ($sec >= $sec1) && ($sec <= $sec2)){
+			if ($day >= $d1 && $day <= $d2 && $sec >= $sec1 && $sec <= $sec2) {
 // current period
 				if(($next == 0) || ($next > ($now - $sec + $sec2)))	$next = $now - $sec + $sec2;
 			}
