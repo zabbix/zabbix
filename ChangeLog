@@ -14,6 +14,7 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-4258] fixed link to the template prototype item in the caption of the item editing form (pavels)
  - [ZBX-3510] fixed discovery and it's prototype cloning when cloning a host or template (pavels)
  - [ZBX-3674] fixed possible editing of lld created elements (Vedmak)
  - [ZBX-3113] made nanoseconds patch mandatory for upgrading from 1.8 to 2.0 (asaveljevs)
