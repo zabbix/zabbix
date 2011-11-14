@@ -82,7 +82,11 @@ switch ($_REQUEST['period']) {
 		break;
 }
 
-$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
+$available_hosts = API::Host()->get(array(
+	'output' => API_OUTPUT_SHORTEN,
+	'preservekeys' => true
+));
+$available_hosts = array_keys($available_hosts);
 $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 $scripts_by_hosts = API::Script()->getScriptsByHosts($available_hosts);
 
