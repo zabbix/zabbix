@@ -554,8 +554,10 @@ function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $paren
 		}
 	}
 	else {
-		$rows['caption'] = new CSpan($rows['caption'], 'unknown');
-		$temp[$rows['serviceid'].'.'.$linkid] = $rows;
+		if ($rows['serviceid'] != 0 && $linkid != 0) {
+			$rows['caption'] = new CSpan($rows['caption'], 'unknown');
+			$temp[$rows['serviceid'].'.'.$linkid] = $rows;
+		}
 	}
 	return null;
 }
@@ -579,9 +581,11 @@ function createShowServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $p
 		}
 	}
 	else {
-		$rows['caption'] = new CSpan($rows['caption']);
-		$rows['caption']->setAttribute('style', 'color: #888888;');
-		$temp[$rows['serviceid'].'.'.$linkid] = $rows;
+		if ($rows['serviceid'] != 0 && $linkid != 0) {
+			$rows['caption'] = new CSpan($rows['caption']);
+			$rows['caption']->setAttribute('style', 'color: #888888;');
+			$temp[$rows['serviceid'].'.'.$linkid] = $rows;
+		}
 	}
 	return null;
 }
