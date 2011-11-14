@@ -20,6 +20,42 @@
 #include "common.h"
 #include "sysinfo.h"
 
+static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct sysinfo	info;
+
+	if (0 != sysinfo(&info))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)info.totalram * info.mem_unit);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct sysinfo	info;
+
+	if (0 != sysinfo(&info))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)info.freeram * info.mem_unit);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct sysinfo	info;
+
+	if (0 != sysinfo(&info))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)info.bufferram * info.mem_unit);
+
+	return SYSINFO_RET_OK;
+}
+
 static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	FILE		*f;
@@ -57,14 +93,70 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
 	if (0 != sysinfo(&info))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, (zbx_uint64_t)info.bufferram * info.mem_unit);
+	SET_UI64_RESULT(result, (zbx_uint64_t)(info.totalram - info.freeram) * info.mem_unit);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct sysinfo	info;
+
+	if (0 != sysinfo(&info) || 0 == info.totalram)
+		return SYSINFO_RET_FAIL;
+
+	SET_DBL_RESULT(result, (info.totalram - info.freeram) / (double)info.totalram * 100);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_AVAILABLE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct sysinfo	info;
+	AGENT_RESULT	result_tmp;
+
+	if (0 != sysinfo(&info))
+		return SYSINFO_RET_FAIL;
+
+	init_result(&result_tmp);
+
+	if (SYSINFO_RET_OK != VM_MEMORY_CACHED(cmd, param, flags, &result_tmp))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + result_tmp.ui64);
+
+	free_result(&result_tmp);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_PAVAILABLE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct sysinfo	info;
+	AGENT_RESULT	result_tmp;
+	zbx_uint64_t	available, total;
+
+	if (0 != sysinfo(&info))
+		return SYSINFO_RET_FAIL;
+
+	init_result(&result_tmp);
+
+	if (SYSINFO_RET_OK != VM_MEMORY_CACHED(cmd, param, flags, &result_tmp))
+		return SYSINFO_RET_FAIL;
+
+	available = (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + result_tmp.ui64;
+	total = (zbx_uint64_t)info.totalram * info.mem_unit;
+
+	SET_DBL_RESULT(result, available / (double)total * 100);
+
+	free_result(&result_tmp);
 
 	return SYSINFO_RET_OK;
 }
@@ -81,94 +173,19 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	struct sysinfo	info;
-
-	if (0 != sysinfo(&info))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, (zbx_uint64_t)info.totalram * info.mem_unit);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	struct sysinfo	info;
-
-	if (0 != sysinfo(&info))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, (zbx_uint64_t)info.freeram * info.mem_unit);
-
-	return SYSINFO_RET_OK;
-}
-
-static int      VM_MEMORY_AVAILABLE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	AGENT_RESULT	result_tmp;
-	zbx_uint64_t	sum = 0;
-
-	init_result(&result_tmp);
-
-	if (SYSINFO_RET_OK != VM_MEMORY_FREE(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
-		return SYSINFO_RET_FAIL;
-
-	sum += result_tmp.ui64;
-
-	if (SYSINFO_RET_OK != VM_MEMORY_BUFFERS(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
-		return SYSINFO_RET_FAIL;
-
-	sum += result_tmp.ui64;
-
-	if (SYSINFO_RET_OK != VM_MEMORY_CACHED(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
-		return SYSINFO_RET_FAIL;
-
-	sum += result_tmp.ui64;
-
-	free_result(&result_tmp);
-
-	SET_UI64_RESULT(result, sum);
-
-	return SYSINFO_RET_OK;
-}
-
-static int      VM_MEMORY_PAVAILABLE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	AGENT_RESULT	result_tmp;
-	zbx_uint64_t	available, total;
-
-	init_result(&result_tmp);
-
-	if (SYSINFO_RET_OK != VM_MEMORY_AVAILABLE(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
-		return SYSINFO_RET_FAIL;
-
-	available = result_tmp.ui64;
-
-	if (SYSINFO_RET_OK != VM_MEMORY_TOTAL(cmd, param, flags, &result_tmp) || !ISSET_UI64(&result_tmp))
-		return SYSINFO_RET_FAIL;
-
-	total = result_tmp.ui64;
-
-	free_result(&result_tmp);
-
-	SET_DBL_RESULT(result, 100.0 * available / total);
-
-	return SYSINFO_RET_OK;
-}
-
-int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
-		{"free",	VM_MEMORY_FREE},
-		{"shared",	VM_MEMORY_SHARED},
 		{"total",	VM_MEMORY_TOTAL},
+		{"free",	VM_MEMORY_FREE},
 		{"buffers",	VM_MEMORY_BUFFERS},
 		{"cached",	VM_MEMORY_CACHED},
+		{"used",	VM_MEMORY_USED},
+		{"pused",	VM_MEMORY_PUSED},
 		{"available",	VM_MEMORY_AVAILABLE},
 		{"pavailable",	VM_MEMORY_PAVAILABLE},
+		{"shared",	VM_MEMORY_SHARED},
 		{NULL,		0}
 	};
 
