@@ -84,12 +84,11 @@ switch ($_REQUEST['period']) {
 
 $available_hosts = API::Host()->get(array(
 	'output' => API_OUTPUT_SHORTEN,
-	'preservekeys' => true,
+	'preservekeys' => true
 ));
 $available_hosts = array_keys($available_hosts);
 $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 $scripts_by_hosts = API::Script()->getScriptsByHosts($available_hosts);
-
 
 $triggersEventCount = array();
 // get 100 triggerids with max even count
