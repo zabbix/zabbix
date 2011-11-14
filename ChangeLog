@@ -14,6 +14,8 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-4258] fixed link to the template prototype item in the caption of the item editing form (pavels)
+ - [ZBX-3510] fixed discovery and it's prototype cloning when cloning a host or template (pavels)
  - [ZBX-3674] fixed possible editing of lld created elements (Vedmak)
  - [ZBX-3113] made nanoseconds patch mandatory for upgrading from 1.8 to 2.0 (asaveljevs)
  - [ZBX-3468] fixed error messages and warnings with enabled SQLite3 support in front-end (Alexei)
@@ -318,8 +320,12 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc1
 
- - [ZBX-4326] api now return error when try create incorrect host profile field (Vedmak)
- - [ZBX-4323] fixed host profile not created with host using api (Vedmak)
+ - [ZBX-4325] fixed maintenance periods saved with nonzero seconds (asaveljevs,Vedmak)
+ - [ZBX-4345] fixed counting of recursive dependency levels for triggers (asaveljevs)
+ - [ZBX-4027] fixed floating-point comparison and unified epsilon in trigger functions and expressions (asaveljevs)
+ - [ZBX-3117] fixed error notification when unsuccessfully copying a graph (pavels)
+ - [ZBX-4326] API now returns error when trying to create incorrect host profile field (Vedmak)
+ - [ZBX-4323] fixed host profile not created with host using API (Vedmak)
  - [ZBX-4275] made server and proxy try to reconnect to the database upon startup (asaveljevs)
  - [ZBX-4159] fixed problem with generating new ids for historical tables (Vedmak)
  - [ZBX-3988] fixed memory leak in dashboard (Vedmak)
@@ -327,7 +333,7 @@ Changes for 1.8.9rc1
  - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
  - [ZBX-2919] fixed custom multiplier becoming 0 when creating an item (pavels)
  - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
- - [ZBX-2504] replaced 'Groups' by 'Replace groups' in host mass-update form to avoid confusion (Alexei)
+ - [ZBX-2504] replaced 'Groups' by 'Replace host groups' in host mass-update form to avoid confusion (Alexei)
  - [ZBX-4265] fixed host input validation (pavels)
  - [ZBX-4264] fixed zabbix_agent compilation problem on HP-UX (dimir)
  - [ZBX-3504] added a text notification in the maps section when no maps are defined (pavels)

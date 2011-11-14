@@ -488,8 +488,8 @@ function bar_report_form3(){
 	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
-	$report_timesince = get_request('report_timesince',date('YmdHis', time()-86400));
-	$report_timetill = get_request('report_timetill',date('YmdHis'));
+	$report_timesince = get_request('report_timesince', date('YmdHis', time() - SEC_PER_DAY));
+	$report_timetill = get_request('report_timetill', date('YmdHis'));
 
 	$items = get_request('items',array());
 
