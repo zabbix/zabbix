@@ -1344,6 +1344,8 @@ COpt::memoryPick();
 				'values' => array('expression' => $expression),
 				'where' => array('triggerid' => $triggerid)
 			));
+
+			info(sprintf(_('Trigger prototype [%1$s:%2$s] created.'), $trigger['description'], $trigger['expression']));
 		}
 
 	}
