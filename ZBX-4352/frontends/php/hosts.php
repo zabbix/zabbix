@@ -421,7 +421,7 @@ include_once('include/page_header.php');
 					$templates_to_del = array_diff($host_templateids, $tplids);
 					$hosts['templates_clear'] = zbx_toObject($templates_to_del, 'templateid');
 				}
-				$hosts['templates'] = $templates;
+				$new_values['templates'] = $templates;
 			}
 
 			if ($new_values) {
