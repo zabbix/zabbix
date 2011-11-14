@@ -117,7 +117,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 
 static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 {
-	u_int	activepages, inactivepages, wiredpages, cachedpages;
+	u_int	activepages, inactivepages, wiredpages, cachedpages, totalpages;
 	size_t	len;
 
 	ZBX_SYSCTLBYNAME("vm.stats.vm.v_active_count", activepages);
@@ -168,6 +168,18 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+static int	VM_MEMORY_BUFFERS(AGENT_RESULT *result)
+{
+	u_int	bufspace;
+	size_t	len;
+
+	ZBX_SYSCTLBYNAME("vfs.bufspace", bufspace);
+
+	SET_UI64_RESULT(result, bufspace);
+
+	return SYSINFO_RET_OK;
+}
+
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	MODE_FUNCTION fl[] =
@@ -182,6 +194,7 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 		{"pused",	VM_MEMORY_PUSED},
 		{"available",	VM_MEMORY_AVAILABLE},
 		{"pavailable",	VM_MEMORY_PAVAILABLE},
+		{"buffers",	VM_MEMORY_BUFFERS},
 		{NULL,		0}
 	};
 
