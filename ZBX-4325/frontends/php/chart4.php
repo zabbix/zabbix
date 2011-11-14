@@ -100,13 +100,13 @@ require_once('include/page_header.php');
 
 	$wday=date('w',$start);
 	if($wday==0) $wday=7;
-	$start=$start-($wday-1)*SEC_PER_DAY;
+	$start = $start - ($wday - 1) * SEC_PER_DAY;
 
 	$weeks = (int)(date('z')/7 +1);
 
 	for($i=0;$i<$weeks;$i++){
-		$period_start=$start+SEC_PER_WEEK*$i;
-		$period_end=$start+SEC_PER_WEEK*($i+1);
+		$period_start = $start + SEC_PER_WEEK * $i;
+		$period_end = $start + SEC_PER_WEEK * ($i + 1);
 
 		$stat=calculate_availability($_REQUEST['triggerid'],$period_start,$period_end);
 		$true[$i]=$stat['true'];
