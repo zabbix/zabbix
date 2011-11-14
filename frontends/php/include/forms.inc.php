@@ -1167,29 +1167,40 @@
 
 		if(count($applications)==0) array_push($applications, 0);
 
-		if(isset($_REQUEST['itemid'])){
+		if (isset($_REQUEST['itemid'])) {
 			$caption = array();
 			$itemid = $_REQUEST['itemid'];
-			do{
-				$sql = 'SELECT i.itemid, i.templateid, h.name'.
-						' FROM items i, hosts h'.
-						' WHERE i.itemid='.$itemid.
-							' AND h.hostid=i.hostid';
-				$itemFromDb = DBfetch(DBselect($sql));
-				if($itemFromDb){
-					if(bccomp($_REQUEST['itemid'], $itemid) == 0){
+			do {
+				$item = API::Item()->get(array(
+					'itemids' => $itemid,
+					'output' => array('itemid', 'templateid', ),
+					'selectHosts' => array('name'),
+					'selectDiscoveryRule' => array('itemid')
+				));
+				$item = reset($item);
+				$host = reset($item['hosts']);
+				if ($item) {
+					if (bccomp($_REQUEST['itemid'], $itemid) == 0) {
 						$caption[] = SPACE;
-						$caption[] = $itemFromDb['name'];
+						$caption[] = $host['name'];
 					}
-					else{
+					// item prototype
+					elseif ($item['discoveryRule']) {
 						$caption[] = ' : ';
-						$caption[] = new CLink($itemFromDb['name'], 'items.php?form=update&itemid='.$itemFromDb['itemid'], 'highlight underline');
+						$caption[] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline');
+					}
+					// plain item
+					else {
+						$caption[] = ' : ';
+						$caption[] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline');
 					}
 
-					$itemid = $itemFromDb['templateid'];
+					$itemid = $item['templateid'];
 				}
-				else break;
-			}while($itemid != 0);
+				else {
+					break;
+				}
+			} while ($itemid != 0);
 
 			$caption[] = ($parent_discoveryid) ? S_ITEM_PROTOTYPE.' "' : S_ITEM.' "';
 			$caption = array_reverse($caption);
@@ -1198,8 +1209,9 @@
 			$caption[] = '"';
 			$frmItem->setTitle($caption);
 		}
-		else
+		else {
 			$frmItem->setTitle(_s('Item %1$s : %2$s', $hostname, $name));
+		}
 
 		if(!$parent_discoveryid){
 			$frmItem->addVar('form_hostid', $hostid);
