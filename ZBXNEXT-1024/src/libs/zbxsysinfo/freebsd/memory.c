@@ -102,31 +102,35 @@ static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 
 static int	VM_MEMORY_USED(AGENT_RESULT *result)
 {
-	u_int	activepages, wiredpages;
+	u_int	activepages, inactivepages, wiredpages, cachedpages;
 	size_t	len;
 
 	ZBX_SYSCTLBYNAME("vm.stats.vm.v_active_count", activepages);
+	ZBX_SYSCTLBYNAME("vm.stats.vm.v_inactive_count", inactivepages);
 	ZBX_SYSCTLBYNAME("vm.stats.vm.v_wire_count", wiredpages);
+	ZBX_SYSCTLBYNAME("vm.stats.vm.v_cache_count", cachedpages);
 
-	SET_UI64_RESULT(result, (zbx_uint64_t)(activepages + wiredpages) * pagesize);
+	SET_UI64_RESULT(result, (zbx_uint64_t)(activepages + inactivepages + wiredpages + cachedpages) * pagesize);
 
 	return SYSINFO_RET_OK;
 }
 
 static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 {
-	u_int	activepages, wiredpages, totalpages;
+	u_int	activepages, inactivepages, wiredpages, cachedpages;
 	size_t	len;
 
 	ZBX_SYSCTLBYNAME("vm.stats.vm.v_active_count", activepages);
+	ZBX_SYSCTLBYNAME("vm.stats.vm.v_inactive_count", inactivepages);
 	ZBX_SYSCTLBYNAME("vm.stats.vm.v_wire_count", wiredpages);
+	ZBX_SYSCTLBYNAME("vm.stats.vm.v_cache_count", cachedpages);
 
 	ZBX_SYSCTLBYNAME("vm.stats.vm.v_page_count", totalpages);
 
 	if (0 == totalpages)
 		return SYSINFO_RET_FAIL;
 
-	SET_DBL_RESULT(result, 100.0 * (activepages + wiredpages) / totalpages);
+	SET_DBL_RESULT(result, (activepages + inactivepages + wiredpages + cachedpages) / (double)totalpages * 100);
 
 	return SYSINFO_RET_OK;
 }
@@ -159,7 +163,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	if (0 == totalpages)
 		return SYSINFO_RET_FAIL;
 
-	SET_DBL_RESULT(result, 100.0 * (inactivepages + cachedpages + freepages) / totalpages);
+	SET_DBL_RESULT(result, (inactivepages + cachedpages + freepages) / (double)totalpages * 100);
 
 	return SYSINFO_RET_OK;
 }
