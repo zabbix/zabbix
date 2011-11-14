@@ -2,7 +2,7 @@
 The script generates data file out of existing MySQL database." && exit 1
 
 dbname=$1
-basedir=`dirname $0`
+basedir=`dirname "$0"`
 schema=$basedir/../src/schema.tmpl
 
 echo "--
