@@ -180,7 +180,7 @@ abstract class CItemGeneral extends CZBXAPI{
 
 			$itemInterfaceType = self::itemTypeInterface($fullItem['type']);
 			if ($itemInterfaceType !== false && $dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE
-				&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD
+				&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD && isset($item['interfaceid']) && $item['interfaceid']
 			) {
 				if (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
@@ -300,6 +300,61 @@ abstract class CItemGeneral extends CZBXAPI{
 				return false;
 		}
 	}
+
+
+	/**
+	 * Returns the interface that best matches the given item.
+	 *
+	 * @param array $itemType   An item
+	 * @param array $interfaces An array of interfaces to choose from
+	 *
+	 * @return array|boolean    The best matching interface;
+	 *							an empty array of no matching interface was found;
+	 *							false, if the item does not need an interface
+	 */
+	public static function findInterfaceForItem(array $item, array $interfaces) {
+		$typeInterface = array();
+		foreach ($interfaces as $interface) {
+			if ($interface['main'] == 1) {
+				$typeInterface[$interface['type']] = $interface;
+			}
+		}
+
+		// find item interface type
+		$type = self::itemTypeInterface($item['type']);
+
+		$matchingInterface = array();
+
+		// the item can use any interface
+		if ($type == INTERFACE_TYPE_ANY) {
+			$interfaceTypes = array(
+				INTERFACE_TYPE_AGENT,
+				INTERFACE_TYPE_SNMP,
+				INTERFACE_TYPE_JMX,
+				INTERFACE_TYPE_IPMI
+			);
+			foreach ($interfaceTypes as $itype) {
+				if (isset($typeInterface[$itype])) {
+					$matchingInterface = $typeInterface[$itype];
+					break;
+				}
+			}
+		}
+		// the item uses a specific type of interface
+		elseif ($type !== false) {
+			if (!isset($typeInterface[$type])) {
+				$matchingInterface = array();
+			}
+			$matchingInterface = $typeInterface[$type];
+		}
+		// the item does not need an interface
+		else {
+			$matchingInterface = false;
+		}
+
+		return $matchingInterface;
+	}
+
 
 	public function isReadable($ids){
 		if(!is_array($ids)) return false;

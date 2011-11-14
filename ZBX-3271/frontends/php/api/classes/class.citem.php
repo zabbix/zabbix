@@ -926,17 +926,17 @@ class CItem extends CItemGeneral{
 				continue;
 			}
 
-			foreach ($item['applications'] as $appid) {
-				if ($appid == 0) {
-					continue;
-				}
+				foreach ($item['applications'] as $appid) {
+					if ($appid == 0) {
+						continue;
+					}
 
-				$itemApplications[] = array(
-					'applicationid' => $appid,
-					'itemid' => $items[$key]['itemid']
-				);
+					$itemApplications[] = array(
+						'applicationid' => $appid,
+						'itemid' => $items[$key]['itemid']
+					);
+				}
 			}
-		}
 
 		if (!empty($itemApplications)) {
 			DB::insert('items_applications', $itemApplications);
