@@ -25,12 +25,12 @@ echo "--
 --
 "
 
-for table in `grep TABLE $schema | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
+for table in `grep TABLE "$schema" | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
 	echo "TABLE |$table"
 	fields=""
 	# get list of all fields
 	for i in `seq 1 1000`; do
-		line=`grep -v ZBX_NODATA $schema | grep -A $i "TABLE|$table|" | tail -1 | grep FIELD`
+		line=`grep -v ZBX_NODATA "$schema" | grep -A $i "TABLE|$table|" | tail -1 | grep FIELD`
 		[ -z "$line" ] && break
 		field=`echo $line | awk -F'|' '{print $2}'`
 		fields="$fields,replace($field,'|','&pipe;') as $field"
