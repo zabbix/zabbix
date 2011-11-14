@@ -240,7 +240,7 @@
 
 			if($table_for_numeric = DBfetch(DBselect($sql))){
 				$sql_from_num = ($table_for_numeric['history'] > $table_for_numeric['trends']) ? 'history' : 'trends';
-				$result = time() - (SEC_PER_DAY * max($table_for_numeric['history'],$table_for_numeric['trends']));
+				$result = time() - (SEC_PER_DAY * max($table_for_numeric['history'], $table_for_numeric['trends']));
 			}
 		}
 
@@ -376,13 +376,12 @@ function copy_graph_to_host($graphid, $hostid) {
 		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
 		$_REQUEST['stime'] = get_request('stime', null);
 
-		if($_REQUEST['period']<ZBX_MIN_PERIOD){
-			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MIN_VALUE_SMALL.': '.ZBX_MIN_PERIOD.' ('.(int)(ZBX_MIN_PERIOD/SEC_PER_HOUR).S_HOUR_SHORT.')');
+		if ($_REQUEST['period'] < ZBX_MIN_PERIOD) {
+			show_message(_s('Warning. Time period min value: %1$s (%2$s h)', ZBX_MIN_PERIOD, (int)(ZBX_MIN_PERIOD / SEC_PER_HOUR)));
 			$_REQUEST['period'] = ZBX_MIN_PERIOD;
-
 		}
-		else if($_REQUEST['period'] > ZBX_MAX_PERIOD){
-			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MAX_VALUE_SMALL.': '.ZBX_MAX_PERIOD.' ('.(int)(ZBX_MAX_PERIOD/SEC_PER_DAY).S_DAY_SHORT.')');
+		else if ($_REQUEST['period'] > ZBX_MAX_PERIOD) {
+			show_message(_s('Warning. Time period max value: %1$s (%2$s d)', ZBX_MAX_PERIOD, (int)(ZBX_MAX_PERIOD / SEC_PER_DAY)));
 			$_REQUEST['period'] = ZBX_MAX_PERIOD;
 		}
 

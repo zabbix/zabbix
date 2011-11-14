@@ -73,7 +73,7 @@ require_once('include/page_header.php');
 		$items = get_request('items',array());
 		$scaletype = get_request('scaletype',TIMEPERIOD_TYPE_WEEKLY);
 
-		$timesince = get_request('report_timesince',time()-SEC_PER_DAY);
+		$timesince = get_request('report_timesince', time() - SEC_PER_DAY);
 		$timetill = get_request('report_timetill',time());
 
 		$str_since['hour'] = date('H',$timesince);
@@ -115,11 +115,11 @@ require_once('include/page_header.php');
 				$scaleperiod = SEC_PER_WEEK;
 				$str = $str_since['year'].'-'.$str_since['mon'].'-'.$str_since['day'].' 00:00:00';
 				$timesince = strtotime($str);
-				$timesince-= ($str_since['weekday']-1)*SEC_PER_DAY;
+				$timesince -= ($str_since['weekday'] - 1) * SEC_PER_DAY;
 
 				$str = $str_till['year'].'-'.$str_till['mon'].'-'.$str_till['day'].' 00:00:00';
 				$timetill = strtotime($str);
-				$timetill-= ($str_till['weekday']-1)*SEC_PER_DAY;
+				$timetill -= ($str_till['weekday'] - 1) * SEC_PER_DAY;
 
 				$timetill+= $scaleperiod;
 
@@ -479,11 +479,11 @@ require_once('include/page_header.php');
 				$scaleperiod = SEC_PER_WEEK;
 				$str = $str_since['year'].'-'.$str_since['mon'].'-'.$str_since['day'].' 00:00:00';
 				$timesince = strtotime($str);
-				$timesince-= ($str_since['weekday']-1)*SEC_PER_DAY;
+				$timesince -= ($str_since['weekday'] - 1) * SEC_PER_DAY;
 
 				$str = $str_till['year'].'-'.$str_till['mon'].'-'.$str_till['day'].' 00:00:00';
 				$timetill = strtotime($str);
-				$timetill-= ($str_till['weekday']-1)*SEC_PER_DAY;
+				$timetill -= ($str_till['weekday'] - 1) * SEC_PER_DAY;
 
 				$timetill+= $scaleperiod;
 
