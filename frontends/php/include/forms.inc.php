@@ -1173,9 +1173,9 @@
 			do {
 				$item = API::Item()->get(array(
 					'itemids' => $itemid,
-					'output' => API_OUTPUT_EXTEND,
-					'selectHosts' => API_OUTPUT_EXTEND,
-					'selectDiscoveryRule' => API_OUTPUT_EXTEND
+					'output' => array('itemid', 'templateid', ),
+					'selectHosts' => array('name'),
+					'selectDiscoveryRule' => array('itemid')
 				));
 				$item = reset($item);
 				$host = reset($item['hosts']);
