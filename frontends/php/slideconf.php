@@ -40,7 +40,7 @@ require_once('include/page_header.php');
 
 		'slideshowid'=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
-		'delay'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,86400), 'isset({save})'),
+		'delay'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1, SEC_PER_DAY), 'isset({save})'),
 
 		'steps'=>		array(null,	O_OPT,	null,	null,	null),
 		'new_step'=>	array(null,	O_OPT,	null,	null,	null),

@@ -183,7 +183,7 @@ require_once('include/page_header.php');
 	$options['sortorder'] = ZBX_SORT_UP;
 	$firstAlert = API::Alert()->get($options);
 	$firstAlert = reset($firstAlert);
-	$starttime = $firstAlert ? $firstAlert['clock'] : time()-3600;
+	$starttime = $firstAlert ? $firstAlert['clock'] : time() - SEC_PER_HOUR;
 
 
 	$paging = getPagingLine($alerts);

@@ -34,7 +34,7 @@ class CWebUser{
 				CProfile::flush();
 			}
 
-			zbx_setcookie('zbx_sessionid', self::$data['sessionid'], self::$data['autologin'] ? (time()+86400*31) : 0);
+			zbx_setcookie('zbx_sessionid', self::$data['sessionid'], self::$data['autologin'] ? time() + SEC_PER_DAY * 31 : 0);
 
 			self::makeGlobal();
 			return true;
@@ -77,7 +77,7 @@ class CWebUser{
 				throw new Exception();
 			}
 
-			zbx_setcookie('zbx_sessionid', $sessionid, self::$data['autologin'] ? (time()+86400*31) : 0);
+			zbx_setcookie('zbx_sessionid', $sessionid, self::$data['autologin'] ? time() + SEC_PER_DAY * 31 : 0);
 
 			self::makeGlobal();
 			return true;
