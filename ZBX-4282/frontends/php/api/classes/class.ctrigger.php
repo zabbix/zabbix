@@ -1734,8 +1734,10 @@ class CTrigger extends CZBXAPI {
 				'where' => array('triggerid' => $trigger['triggerid'])
 			));
 
-			$expression = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
-			$infos[] = _s('Trigger "%1$s:%2$s" updated.', $trigger['description'], $expression);
+			// restore the full expression to properly validate dependencies
+			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
+
+			$infos[] = _s('Trigger "%1$s:%2$s" updated.', $trigger['description'], $trigger['expression']);
 		}
 		unset($trigger);
 
