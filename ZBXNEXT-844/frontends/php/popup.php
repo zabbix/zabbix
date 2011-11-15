@@ -790,7 +790,7 @@ include_once('include/page_header.php');
 
 		if ($multiselect) {
 			$header = array(
-				($hostid > 0) ? null : S_HOST,
+				$pageFilter->hostsAll ? S_HOST : null,
 				array(new CCheckBox('all_items', NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
 				S_KEY,
 				S_TYPE,
@@ -800,7 +800,7 @@ include_once('include/page_header.php');
 		}
 		else {
 			$header = array(
-				($hostid > 0) ? null : S_HOST,
+				$pageFilter->hostsAll ? S_HOST : null,
 				S_DESCRIPTION,
 				S_KEY,
 				S_TYPE,
@@ -818,12 +818,16 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'nodeids' => $nodeid,
-			'hostids' => $hostid,
 			'webitems' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => API_OUTPUT_EXTEND
 		);
-		if (is_null($hostid)) $options['groupids'] = $groupid;
+		if ($pageFilter->hostsAll) {
+			$options['hostids'] = array_keys($pageFilter->hosts);
+		}
+		else {
+			$options['hostids'] = $pageFilter->hostid;
+		}
 		if (!is_null($writeonly)) $options['editable'] = 1;
 		if (!is_null($templated)) $options['templated'] = $templated;
 		if (!is_null($value_types)) $options['filter']['value_type'] = $value_types;
@@ -940,19 +944,28 @@ include_once('include/page_header.php');
 
 		$table->setHeader($header);
 
-		$options = array(
-			'hostids' => $hostid,
-			'output' => API_OUTPUT_EXTEND,
-			'nodeids' => $nodeid,
-			'select_hosts' => API_OUTPUT_EXTEND
-		);
+		if ($pageFilter->hostsSelected) {
+			if ($pageFilter->hostsAll) {
+				$hostid = array_keys($pageFilter->hosts);
+			}
+			else {
+				$hostid = $pageFilter->hostid;
+			}
 
-		if(is_null($hostid)) $options['groupids'] = $groupid;
-		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
-
-		$graphs = CGraph::get($options);
-		order_result($graphs, 'name');
+			$options = array(
+				'hostids' => $hostid,
+				'output' => API_OUTPUT_EXTEND,
+				'nodeids' => $nodeid,
+				'select_hosts' => API_OUTPUT_EXTEND,
+			);
+			if(!is_null($writeonly)) $options['editable'] = 1;
+			if(!is_null($templated)) $options['templated'] = $templated;
+			$graphs = CGraph::get($options);
+			order_result($graphs, 'name');
+		}
+		else {
+			$graphs = array();
+		}
 
 		foreach($graphs as $gnum => $row){
 			$host = reset($row['hosts']);
@@ -1013,7 +1026,7 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 		$form->show();
 	}
-	else if($srctbl == 'simple_graph'){
+	elseif ($srctbl == 'simple_graph') {
 		$form = new CForm();
 		$form->setName('itemform');
 		$form->setAttribute('id', 'items');
@@ -1024,57 +1037,72 @@ include_once('include/page_header.php');
 		insert_js_function('addValues');
 		insert_js_function('addValue');
 
-		if($multiselect)
-			$header = array(
-				($hostid>0)?null:S_HOST,
-				array(new CCheckBox("all_items", NULL, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
-				S_TYPE,
-				S_TYPE_OF_INFORMATION,
-				S_STATUS
+		if ($pageFilter->hostsSelected) {
+			if ($pageFilter->hostsAll) {
+				$hostid = array_keys($pageFilter->hosts);
+			}
+			else {
+				$hostid = $pageFilter->hostid;
+			}
+
+			$options = array(
+				'nodeids' => $nodeid,
+				'hostids' => $hostid,
+				'monitored' => true,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
+				'webitems' => true,
+				'templated' => false,
+				'filter' => array(
+					'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
+				)
 			);
-		else
+			if (!is_null($writeonly)) {
+				$options['editable'] = 1;
+			}
+			if (!is_null($templated)) {
+				$options['templated'] = $templated;
+			}
+
+			$items = CItem::get($options);
+			order_result($items, 'description');
+		}
+		else {
+			$items = array();
+		}
+
+		if ($multiselect) {
 			$header = array(
-				($hostid>0)?null:S_HOST,
+				is_array($hostid) ? S_HOST : null,
+				array(new CCheckBox("all_items", null, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), S_DESCRIPTION),
+				S_TYPE,
+				S_TYPE_OF_INFORMATION
+			);
+		}
+		else {
+			$header = array(
+				is_array($hostid) ? S_HOST : null,
 				S_DESCRIPTION,
 				S_TYPE,
-				S_TYPE_OF_INFORMATION,
-				S_STATUS
+				S_TYPE_OF_INFORMATION
 			);
+		}
 
 		$table->setHeader($header);
 
-		$options = array(
-			'nodeids' => $nodeid,
-			'hostids' => $hostid,
-			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
-			'webitems' => true,
-			'templated' => false,
-			'filter' => array(
-				'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
-				'status' => ITEM_STATUS_ACTIVE
-			)
-		);
-		if(is_null($hostid)) $options['groupids'] = $groupid;
-		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
-
-		$items = CItem::get($options);
-		order_result($items, 'description');
-
-		foreach($items as $tnum => $row){
+		foreach ($items as $tnum => $row) {
 			$host = reset($row['hosts']);
 			$row['host'] = $host['host'];
 
 			$row['description'] = item_description($row);
-			$description = new CLink($row['description'],'#');
+			$description = new CLink($row['description'], '#');
 
 			$row['description'] = $row['host'].':'.$row['description'];
 
-			if($multiselect){
+			if ($multiselect) {
 				$js_action = "javascript: addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($row[$srcfld1]).");";
 			}
-			else{
+			else {
 				$values = array(
 					$dstfld1 => $row[$srcfld1],
 					$dstfld2 => $row[$srcfld2],
@@ -1085,20 +1113,19 @@ include_once('include/page_header.php');
 
 			$description->setAttribute('onclick', $js_action);
 
-			if($multiselect){
-				$description = new CCol(array(new CCheckBox('items['.zbx_jsValue($row[$srcfld1]).']', NULL, NULL, $row['itemid']), $description));
+			if ($multiselect) {
+				$description = new CCol(array(new CCheckBox('items['.zbx_jsValue($row[$srcfld1]).']', null, null, $row['itemid']), $description));
 			}
 
 			$table->addRow(array(
-				($hostid>0)?null:$row['host'],
+				is_array($hostid) ? $row['host'] : null,
 				$description,
 				item_type2str($row['type']),
-				item_value_type2str($row['value_type']),
-				new CSpan(item_status2str($row['status']),item_status2style($row['status']))
-				));
+				item_value_type2str($row['value_type'])
+			));
 		}
 
-		if($multiselect){
+		if ($multiselect) {
 			$button = new CButton('select', S_SELECT, "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).");");
 			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));

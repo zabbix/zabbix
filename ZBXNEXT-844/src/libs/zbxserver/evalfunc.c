@@ -25,6 +25,11 @@
 
 #include "evalfunc.h"
 
+int	cmp_double(double a, double b)
+{
+	return fabs(a - b) < TRIGGER_EPSILON ? SUCCEED : FAIL;
+}
+
 static int	get_function_parameter_uint(DB_ITEM *item, const char *parameters, int Nparam, int *value, int *flag)
 {
 	const char	*__function_name = "get_function_parameter_uint";
@@ -313,6 +318,7 @@ clean:
  * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  ******************************************************************************/
+
 #define OP_EQ	0
 #define OP_NE	1
 #define OP_GT	2
@@ -360,6 +366,7 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 						return SUCCEED;
 					break;
 			}
+
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
 			value_double = atof(value);
@@ -368,36 +375,37 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 			switch (op)
 			{
 				case OP_EQ:
-					if (value_double > arg2_double - 0.00001 &&
-							value_double < arg2_double + 0.00001)
+					if (value_double > arg2_double - TRIGGER_EPSILON &&
+							value_double < arg2_double + TRIGGER_EPSILON)
 					{
 						return SUCCEED;
 					}
 					break;
 				case OP_NE:
-					if (!(value_double > arg2_double - 0.00001 &&
-								value_double < arg2_double + 0.00001))
+					if (!(value_double > arg2_double - TRIGGER_EPSILON &&
+								value_double < arg2_double + TRIGGER_EPSILON))
 					{
 						return SUCCEED;
 					}
 					break;
 				case OP_GT:
-					if (value_double > arg2_double)
+					if (value_double >= arg2_double + TRIGGER_EPSILON)
 						return SUCCEED;
 					break;
 				case OP_GE:
-					if (value_double >= arg2_double)
+					if (value_double > arg2_double - TRIGGER_EPSILON)
 						return SUCCEED;
 					break;
 				case OP_LT:
-					if (value_double < arg2_double)
+					if (value_double <= arg2_double - TRIGGER_EPSILON)
 						return SUCCEED;
 					break;
 				case OP_LE:
-					if (value_double <= arg2_double)
+					if (value_double < arg2_double + TRIGGER_EPSILON)
 						return SUCCEED;
 					break;
 			}
+
 			break;
 		default:
 			switch (op)
@@ -415,6 +423,7 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, const char *valu
 						return SUCCEED;
 					break;
 			}
+
 			break;
 	}
 
@@ -1476,7 +1485,7 @@ static int	evaluate_DIFF(char *value, DB_ITEM *item, const char *function, const
 		case ITEM_VALUE_TYPE_FLOAT:
 			lastvalue[0].dbl = atof(item->lastvalue[0]);
 			lastvalue[1].dbl = atof(item->lastvalue[1]);
-			if (0 == cmp_double(lastvalue[0].dbl, lastvalue[1].dbl))
+			if (SUCCEED == cmp_double(lastvalue[0].dbl, lastvalue[1].dbl))
 				zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
 			else
 				zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
@@ -2135,7 +2144,7 @@ static void	add_value_suffix_normal(char *value, int max_len, const char *units)
 		value_double /= base * base * base * base;
 	}
 
-	if (0 != cmp_double((int)(value_double + 0.5), value_double))
+	if (SUCCEED != cmp_double((int)(value_double + 0.5), value_double))
 	{
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(2), value_double);
 		del_zeroes(tmp);

@@ -370,10 +370,7 @@
 			$action_map->addItem($r_area);
 		}
 
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
-
-	return $action_map;
+		return $action_map;
 	}
 
 	function get_icon_center_by_selement($element, $info=null){
@@ -1583,10 +1580,10 @@
 //SDII($exportMaps);
 	}
 
-	function prepareImageExport($images){
+	function prepareImageExport($images) {
 		$formatted = array();
 
-		foreach($images as $inum => $image){
+		foreach ($images as $image) {
 			$formatted[] = array(
 				'name' => $image['name'],
 				'imagetype' => $image['imagetype'],

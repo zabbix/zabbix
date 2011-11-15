@@ -572,7 +572,7 @@ int	MAIN_ZABBIX_ENTRY()
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
 #endif
 
-	DBconnect(ZBX_DB_CONNECT_EXIT);
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	result = DBselect("select refresh_unsupported from config where 1=1" DB_NODE,
 			DBnode_local("configid"));

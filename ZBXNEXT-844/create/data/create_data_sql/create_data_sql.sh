@@ -149,7 +149,7 @@ for TABLE in $TABLES; do
 		[[ "$BLACKLIST" ]] && {
 			BLACKFIELDS=$(echo $BLACKLIST | cut -d" " -f2-)
 			for BLACKFIELD in $BLACKFIELDS; do
-				DIFFERENT_FIELDS=$(echo $DIFFERENT_FIELDS | sed "s/,${BLACKFIELD}//")
+				DIFFERENT_FIELDS=$(echo "$DIFFERENT_FIELDS" | sed "s/,${BLACKFIELD}\($\|,\)/\1/")
 			done
 		}
 		# --- filter file must have table name, followed by field to filter on, then followed by values to match - all space separated

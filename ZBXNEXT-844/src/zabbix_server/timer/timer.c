@@ -32,7 +32,7 @@
 
 #include "timer.h"
 
-#define TIMER_DELAY 30
+#define TIMER_DELAY	30
 
 extern unsigned char	process_type;
 
@@ -51,7 +51,7 @@ static void	process_time_functions()
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last;
-	int			tr_alloc = 0, tr_num = 0;
+	int			tr_alloc = 0, tr_num = 0, events_num = 0;
 	char			*sql = NULL;
 	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0, i;
 
@@ -117,9 +117,16 @@ static void	process_time_functions()
 				tr_last->lastchange, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		if (1 == tr_last->add_event)
+			events_num++;
+
+		zbx_free(tr_last->error);
+		zbx_free(tr_last->new_error);
+		zbx_free(tr_last->expression);
 	}
 
 #ifdef HAVE_ORACLE
@@ -131,19 +138,22 @@ static void	process_time_functions()
 
 	zbx_free(sql);
 
-	for (i = 0; i < tr_num; i++)
+	if (0 != events_num)
 	{
-		tr_last = &tr[i];
+		zbx_uint64_t	eventid;
 
-		zbx_free(tr_last->error);
-		zbx_free(tr_last->new_error);
-		zbx_free(tr_last->expression);
+		eventid = DBget_maxid_num("events", events_num);
 
-		if (1 != tr_last->add_event)
-			continue;
+		for (i = 0; i < tr_num; i++)
+		{
+			tr_last = &tr[i];
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-				tr_last->lastchange, tr_last->new_value, 0, 0);
+			if (1 != tr_last->add_event)
+				continue;
+
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+					tr_last->lastchange, tr_last->new_value, 0, 0);
+		}
 	}
 
 	DBcommit();
@@ -153,9 +163,10 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-typedef struct zbx_host_maintenance_s
+typedef struct
 {
 	zbx_uint64_t	hostid;
+	char		*host;
 	time_t		maintenance_from;
 	zbx_uint64_t	maintenanceid;
 	int		maintenance_type;
@@ -171,17 +182,22 @@ static int	get_host_maintenance_nearestindex(zbx_host_maintenance_t *hm, int hm_
 {
 	int	first_index, last_index, index;
 
-	if (hm_count == 0)
+	if (0 == hm_count)
 		return 0;
 
 	first_index = 0;
 	last_index = hm_count - 1;
+
 	while (1)
 	{
 		index = first_index + (last_index - first_index) / 2;
 
-		if (hm[index].hostid == hostid && hm[index].maintenance_from == maintenance_from && hm[index].maintenanceid == maintenanceid)
+		if (hm[index].hostid == hostid &&
+				hm[index].maintenance_from == maintenance_from &&
+				hm[index].maintenanceid == maintenanceid)
+		{
 			return index;
+		}
 		else if (last_index == first_index)
 		{
 			if (hm[index].hostid < hostid ||
@@ -189,29 +205,36 @@ static int	get_host_maintenance_nearestindex(zbx_host_maintenance_t *hm, int hm_
 					(hm[index].hostid == hostid && hm[index].maintenance_from == maintenance_from &&
 					 	hm[index].maintenanceid < maintenanceid))
 				index++;
+
 			return index;
 		}
 		else if (hm[index].hostid < hostid ||
 				(hm[index].hostid == hostid && hm[index].maintenance_from < maintenance_from) ||
 				(hm[index].hostid == hostid && hm[index].maintenance_from == maintenance_from &&
 				 	hm[index].maintenanceid < maintenanceid))
+		{
 			first_index = index + 1;
+		}
 		else
 			last_index = index;
 	}
 }
 
 static zbx_host_maintenance_t	*get_host_maintenance(zbx_host_maintenance_t **hm, int *hm_alloc, int *hm_count,
-		zbx_uint64_t hostid, time_t maintenance_from, zbx_uint64_t maintenanceid, int maintenance_type,
-		zbx_uint64_t host_maintenanceid, int host_maintenance_status, int host_maintenance_type,
-		int host_maintenance_from)
+		zbx_uint64_t hostid, const char *host, time_t maintenance_from, zbx_uint64_t maintenanceid,
+		int maintenance_type, zbx_uint64_t host_maintenanceid, int host_maintenance_status,
+		int host_maintenance_type, int host_maintenance_from)
 {
 	int	hm_index;
 
 	hm_index = get_host_maintenance_nearestindex(*hm, *hm_count, hostid, maintenance_from, maintenanceid);
-	if (hm_index < *hm_count && (*hm)[hm_index].hostid == hostid && (*hm)[hm_index].maintenance_from == maintenance_from &&
+
+	if (hm_index < *hm_count && (*hm)[hm_index].hostid == hostid &&
+			(*hm)[hm_index].maintenance_from == maintenance_from &&
 			(*hm)[hm_index].maintenanceid == maintenanceid)
+	{
 		return &(*hm)[hm_index];
+	}
 
 	if (*hm_alloc == *hm_count)
 	{
@@ -222,6 +245,7 @@ static zbx_host_maintenance_t	*get_host_maintenance(zbx_host_maintenance_t **hm,
 	memmove(&(*hm)[hm_index + 1], &(*hm)[hm_index], sizeof(zbx_host_maintenance_t) * (*hm_count - hm_index));
 
 	(*hm)[hm_index].hostid = hostid;
+	(*hm)[hm_index].host = zbx_strdup(NULL, host);
 	(*hm)[hm_index].maintenance_from = maintenance_from;
 	(*hm)[hm_index].maintenanceid = maintenanceid;
 	(*hm)[hm_index].maintenance_type = maintenance_type;
@@ -246,7 +270,8 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select h.hostid,h.maintenanceid,h.maintenance_status,h.maintenance_type,h.maintenance_from "
+			"select h.hostid,h.host,h.maintenanceid,h.maintenance_status,"
+				"h.maintenance_type,h.maintenance_from "
 			"from maintenances_hosts mh,hosts h "
 			"where mh.hostid=h.hostid and "
 				"h.status=%d and "
@@ -257,19 +282,20 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(host_hostid, row[0]);
-		ZBX_STR2UINT64(host_maintenanceid, row[1]);
-		host_maintenance_status = atoi(row[2]);
-		host_maintenance_type = atoi(row[3]);
-		host_maintenance_from = atoi(row[4]);
+		ZBX_STR2UINT64(host_maintenanceid, row[2]);
+		host_maintenance_status = atoi(row[3]);
+		host_maintenance_type = atoi(row[4]);
+		host_maintenance_from = atoi(row[5]);
 
-		get_host_maintenance(hm, hm_alloc, hm_count, host_hostid, maintenance_from, maintenanceid,
+		get_host_maintenance(hm, hm_alloc, hm_count, host_hostid, row[1], maintenance_from, maintenanceid,
 				maintenance_type, host_maintenanceid, host_maintenance_status, host_maintenance_type,
 				host_maintenance_from);
 	}
 	DBfree_result(result);
 
 	result = DBselect(
-			"select h.hostid,h.maintenanceid,h.maintenance_status,h.maintenance_type,h.maintenance_from "
+			"select h.hostid,h.host,h.maintenanceid,h.maintenance_status,"
+				"h.maintenance_type,h.maintenance_from "
 			"from maintenances_groups mg,hosts_groups hg,hosts h "
 			"where mg.groupid=hg.groupid and "
 				"hg.hostid=h.hostid and "
@@ -281,12 +307,12 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(host_hostid, row[0]);
-		ZBX_STR2UINT64(host_maintenanceid, row[1]);
-		host_maintenance_status = atoi(row[2]);
-		host_maintenance_type = atoi(row[3]);
-		host_maintenance_from = atoi(row[4]);
+		ZBX_STR2UINT64(host_maintenanceid, row[2]);
+		host_maintenance_status = atoi(row[3]);
+		host_maintenance_type = atoi(row[4]);
+		host_maintenance_from = atoi(row[5]);
 
-		get_host_maintenance(hm, hm_alloc, hm_count, host_hostid, maintenance_from, maintenanceid,
+		get_host_maintenance(hm, hm_alloc, hm_count, host_hostid, row[1], maintenance_from, maintenanceid,
 				maintenance_type, host_maintenanceid, host_maintenance_status, host_maintenance_type,
 				host_maintenance_from);
 	}
@@ -306,7 +332,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
  *             maintenance_to   - [IN] maintenance period stop                *
  *             value_before     - [OUT] trigger value before maintenance      *
  *             value_inside     - [OUT] trigger value inside maintenance      *
- *                                      (only if value_before=value_after)    * 
+ *                                      (only if value_before=value_after)    *
  *             value_after      - [OUT] trigger value after maintenance       *
  *                                                                            *
  * Return value: SUCCEED if found event with OK or PROBLEM statuses           *
@@ -448,10 +474,15 @@ out:
  ******************************************************************************/
 static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maintenance_to)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	triggerid;
-	int		value_before, value_inside, value_after;
+	const char		*__function_name = "generate_events";
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		triggerid, eventid;
+	int			value_before, value_inside, value_after, i;
+	DB_TRIGGER_UPDATE	*tr = NULL;
+	int			tr_alloc = 0, tr_num = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select distinct t.triggerid"
@@ -475,20 +506,41 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		if (value_before == value_inside && value_inside == value_after)
 			continue;
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid,
-				maintenance_to, value_after, 0, 1);
+		if (tr_num == tr_alloc)
+		{
+			tr_alloc += 64;
+			tr = zbx_realloc(tr, tr_alloc * sizeof(DB_TRIGGER_UPDATE));
+		}
+
+		tr[tr_num].triggerid = triggerid;
+		tr[tr_num].new_value = value_after;
+		tr_num++;
 	}
 	DBfree_result(result);
+
+	if (0 != tr_num)
+	{
+		eventid = DBget_maxid_num("events", tr_num);
+
+		for (i = 0; i < tr_num; i++)
+		{
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr[i].triggerid,
+					maintenance_to, tr[i].new_value, 0, 1);
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)
 {
-	typedef struct maintenance_s
+	typedef struct
 	{
 		zbx_uint64_t	hostid;
 		int		maintenance_from;
 		void		*next;
-	} maintenance_t;
+	}
+	maintenance_t;
 
 	const char	*__function_name = "update_maintenance_hosts";
 	int		i;
@@ -506,14 +558,19 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 
 	DBbegin();
 
-	for (i = 0; i < hm_count; i ++)
+	for (i = 0; i < hm_count; i++)
 	{
 		if (SUCCEED == uint64_array_exists(ids, ids_num, hm[i].hostid))
 			continue;
 
-		if (hm[i].host_maintenanceid != hm[i].maintenanceid || hm[i].host_maintenance_status != HOST_MAINTENANCE_STATUS_ON ||
-				hm[i].host_maintenance_type != hm[i].maintenance_type || hm[i].host_maintenance_from == 0)
+		if (hm[i].host_maintenanceid != hm[i].maintenanceid ||
+				HOST_MAINTENANCE_STATUS_ON != hm[i].host_maintenance_status ||
+				hm[i].host_maintenance_type != hm[i].maintenance_type ||
+				0 == hm[i].host_maintenance_from)
 		{
+			zabbix_log(LOG_LEVEL_WARNING, "putting host [%s] into maintenance (with%s data collection)",
+					hm[i].host, MAINTENANCE_TYPE_NORMAL == hm[i].maintenance_type ? "" : "out");
+
 			sql_offset = 0;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
 					"update hosts"
@@ -524,7 +581,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 					HOST_MAINTENANCE_STATUS_ON,
 					hm[i].maintenance_type);
 
-			if (hm[i].host_maintenance_from == 0)
+			if (0 == hm[i].host_maintenance_from)
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
 						",maintenance_from=%d",
 						hm[i].maintenance_from);
@@ -544,7 +601,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
-			"select hostid,maintenance_type,maintenance_from"
+			"select hostid,host,maintenance_type,maintenance_from"
 			" from hosts"
 			" where status=%d"
 			" and maintenance_status=%d",
@@ -560,18 +617,21 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 	result = DBselect("%s", sql);
 
 	ids_num = 0;
+
 	while (NULL != (row = DBfetch(result)))
 	{
+		zabbix_log(LOG_LEVEL_WARNING, "taking host [%s] out of maintenance", row[1]);
+
 		ZBX_STR2UINT64(hostid, row[0]);
 
 		uint64_array_add(&ids, &ids_alloc, &ids_num, hostid, 4);
 
-		if (MAINTENANCE_TYPE_NORMAL != atoi(row[1]))
+		if (MAINTENANCE_TYPE_NORMAL != atoi(row[2]))
 			continue;
 
 		m = zbx_malloc(NULL, sizeof(maintenance_t));
 		m->hostid = hostid;
-		m->maintenance_from = atoi(row[2]);
+		m->maintenance_from = atoi(row[3]);
 		m->next = maintenances;
 		maintenances = m;
 	}
@@ -654,8 +714,9 @@ static void	process_maintenance()
 			" from maintenances m,maintenances_windows mw,timeperiods tp"
 			" where m.maintenanceid=mw.maintenanceid"
 				" and mw.timeperiodid=tp.timeperiodid"
-				" and %d between m.active_since and m.active_till",
-			now);
+				" and m.active_since<=%d"
+				" and m.active_till>%d",
+			now, now);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -697,19 +758,19 @@ static void	process_maintenance()
 				continue;
 
 			tm = localtime(&db_active_since);
-			wday = (tm->tm_wday == 0 ? 7 : tm->tm_wday) - 1;
+			wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
 			active_since = db_active_since - (wday * SEC_PER_DAY + tm->tm_hour * SEC_PER_HOUR + tm->tm_min * SEC_PER_MIN + tm->tm_sec);
 
 			for (; db_start_date >= db_active_since; db_start_date -= SEC_PER_DAY)
 			{
 				/* check for every x week(s) */
-				week = (db_start_date - active_since) / 604800 + 1;
+				week = (db_start_date - active_since) / SEC_PER_WEEK + 1;
 				if (0 != (week % db_every))
 					continue;
 
 				/* check for day of the week */
 				tm = localtime(&db_start_date);
-				wday = (tm->tm_wday == 0 ? 7 : tm->tm_wday) - 1;
+				wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
 				if (0 == (db_dayofweek & (1 << wday)))
 					continue;
 
@@ -737,7 +798,7 @@ static void	process_maintenance()
 				else
 				{
 					/* check for day of the week */
-					wday = (tm->tm_wday == 0 ? 7 : tm->tm_wday) - 1;
+					wday = (0 == tm->tm_wday ? 7 : tm->tm_wday) - 1;
 					if (0 == (db_dayofweek & (1 << wday)))
 						continue;
 
@@ -772,6 +833,9 @@ static void	process_maintenance()
 	DBfree_result(result);
 
 	update_maintenance_hosts(hm, hm_count, (int)now);
+
+	while (0 != hm_count--)
+		zbx_free(hm[hm_count].host);
 }
 
 /******************************************************************************
