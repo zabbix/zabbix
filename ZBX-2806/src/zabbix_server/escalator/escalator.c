@@ -907,11 +907,12 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 
 static void	process_escalations(int now)
 {
+	const char	*__function_name = "process_escalations";
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ESCALATION	escalation;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_escalations()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect("select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status"
 			" from escalations where status in (%d,%d,%d,%d) and nextcheck<=%d" DB_NODE,
@@ -938,8 +939,11 @@ static void	process_escalations(int now)
 
 		if (escalation.status == ESCALATION_STATUS_SUPERSEDED_ACTIVE)
 		{
-			escalation.status = ESCALATION_STATUS_ACTIVE;
-			execute_escalation(&escalation);
+			if (0 == escalation.esc_step)
+			{
+				escalation.status = ESCALATION_STATUS_ACTIVE;
+				execute_escalation(&escalation);
+			}
 			DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64 " and status=%d",
 					escalation.escalationid,
 					ESCALATION_STATUS_SUPERSEDED_ACTIVE);
@@ -950,6 +954,9 @@ static void	process_escalations(int now)
 		}
 		else if (escalation.status == ESCALATION_STATUS_SUPERSEDED_RECOVERY)
 		{
+			/* PROBLEM, OK events in the fist step occured too quickly, */
+			/* process PROBLEM first, then OK */
+
 			escalation.status = ESCALATION_STATUS_ACTIVE;
 			execute_escalation(&escalation);
 			escalation.status = ESCALATION_STATUS_RECOVERY;
@@ -963,14 +970,11 @@ static void	process_escalations(int now)
 			if (escalation.status == ESCALATION_STATUS_COMPLETED)
 				DBremove_escalation(escalation.escalationid);
 			else
-				DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
-						" where escalationid=" ZBX_FS_UI64
-							" and status=%d",
-						escalation.status,
+				DBexecute("update escalations set esc_step=%d,nextcheck=%d"
+						" where escalationid=" ZBX_FS_UI64,
 						escalation.esc_step,
 						escalation.nextcheck,
-						escalation.escalationid,
-						ESCALATION_STATUS_ACTIVE);
+						escalation.escalationid);
 		}
 
 		DBcommit();

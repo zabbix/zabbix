@@ -67,8 +67,7 @@ void	DBclose()
 int	DBconnect(int flag)
 {
 	const char	*__function_name = "DBconnect";
-
-	int	err;
+	int		err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __function_name, flag);
 
@@ -982,7 +981,10 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 
 int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
+	const char	*__function_name = "DBstart_escalation";
 	zbx_uint64_t	escalationid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* remove older active escalations... */
 	DBexecute("delete from escalations"
@@ -1018,6 +1020,8 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 			triggerid,
 			eventid,
 			ESCALATION_STATUS_ACTIVE);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return SUCCEED;
 }
@@ -1055,6 +1059,8 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 		if ((0 == esc_step && ESCALATION_STATUS_ACTIVE == old_status) ||
 				ESCALATION_STATUS_SUPERSEDED_ACTIVE == old_status)
 		{
+			/* PROBLEM, OK events in the first step occured too quickly, */
+			/* let escalator know that it should process both */
 			new_status = ESCALATION_STATUS_SUPERSEDED_RECOVERY;
 		}
 		else
