@@ -1331,7 +1331,7 @@ Copt::memoryPick();
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		unset($data['hosts']);
-		if(empty($data)) {
+		if (empty($data)) {
 			return true;
 		}
 
