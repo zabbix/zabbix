@@ -602,7 +602,7 @@ class CApplication extends CZBXAPI {
 		$parent_applicationids = $applicationids;
 		$child_applicationids = array();
 		do {
-			$db_applications = DBselect('SELECT a.applicationid FROM applications a WHERE ' . DBcondition('a.templateid', $parent_applicationids));
+			$db_applications = DBselect('SELECT a.applicationid FROM applications a WHERE '.DBcondition('a.templateid', $parent_applicationids));
 			$parent_applicationids = array();
 			while ($db_application = DBfetch($db_applications)) {
 				$parent_applicationids[] = $db_application['applicationid'];
