@@ -407,9 +407,9 @@
 
 
 	function get_hostgroup_by_groupid($groupid) {
-		$row = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.$groupid));
-		if ($row) {
-			return $row;
+		$groups = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.$groupid));
+		if (!empty($groups)) {
+			return $groups;
 		}
 		error(_s('No host groups with groupid "%s".', $groupid));
 
@@ -419,19 +419,18 @@
 	function get_host_by_itemid($itemids) {
 		$res_array = is_array($itemids);
 		zbx_value2array($itemids);
-
 		$result = false;
 		$hosts = array();
 
-		$sql = 'SELECT i.itemid, h.*'.
-				' FROM hosts h, items i'.
-				' WHERE i.hostid=h.hostid'.
-					' AND '.DBcondition('i.itemid', $itemids);
-
-		$res = DBselect($sql);
-		while ($row = DBfetch($res)) {
+		$db_hostsItems = DBselect(
+			'SELECT i.itemid, h.*'.
+			' FROM hosts h, items i'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.DBcondition('i.itemid', $itemids)
+		);
+		while ($hostItem = DBfetch($db_hostsItems)) {
 			$result = true;
-			$hosts[$row['itemid']] = $row;
+			$hosts[$hostItem['itemid']] = $hostItem;
 		}
 
 		if (!$res_array) {
@@ -443,7 +442,6 @@
 			$result = $hosts;
 			unset($hosts);
 		}
-
 		return $result;
 	}
 
@@ -452,46 +450,43 @@
 		if ($row) {
 			return $row;
 		}
-		if ($no_error_message == 0)
+		if ($no_error_message == 0) {
 			error(_s('No host with hostid "%s".', $hostid));
-
+		}
 		return false;
 	}
 
 	function get_hosts_by_templateid($templateids) {
 		zbx_value2array($templateids);
-		$sql = 'SELECT h.*'.
-				' FROM hosts h, hosts_templates ht'.
-				' WHERE h.hostid=ht.hostid'.
-					' AND '.DBcondition('ht.templateid', $templateids);
-
-		return DBselect($sql);
+		return DBselect(
+			'SELECT h.*'.
+			' FROM hosts h, hosts_templates ht'.
+			' WHERE h.hostid=ht.hostid'.
+				' AND '.DBcondition('ht.templateid', $templateids)
+		);
 	}
 
 	function updateHostStatus($hostids, $status) {
-		$res = true;
 		zbx_value2array($hostids);
-
 		$hostIds = array();
 		$oldStatus = ($status == HOST_STATUS_MONITORED ? HOST_STATUS_NOT_MONITORED : HOST_STATUS_MONITORED);
 
-		$result = DBselect(
+		$db_hosts = DBselect(
 			'SELECT h.hostid,h.host,h.status'.
 				' FROM hosts h'.
 				' WHERE '.DBcondition('h.hostid', $hostids).
 					' AND h.status='.$oldStatus
 		);
-		while ($host = DBfetch($result)) {
+		while ($host = DBfetch($db_hosts)) {
 			if ($status == HOST_STATUS_NOT_MONITORED) {
 				updateTriggerValueToUnknownByHostId($host['hostid']);
 			}
-
 			$hostIds[] = $host['hostid'];
 
 			$host_new = $host;
 			$host_new['status'] = $status;
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
-			info(S_UPDATED_STATUS_OF_HOST.' "'.$host['host'].'"');
+			info(_('Updated status of host').' "'.$host['host'].'"');
 		}
 
 		return DB::update('hosts', array(
@@ -1089,9 +1084,9 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 
 	function get_realhost_by_applicationid($applicationid) {
 		$application = get_application_by_applicationid($applicationid);
-		if ($application['templateid'] > 0)
+		if ($application['templateid'] > 0) {
 			return get_realhost_by_applicationid($application['templateid']);
-
+		}
 		return get_host_by_applicationid($applicationid);
 	}
 
@@ -1100,7 +1095,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 		if ($row) {
 			return $row;
 		}
-		error(S_NO_HOST_WITH." applicationid=[$applicationid]");
+		error(_('No host with').' applicationid=['.$applicationid.']');
 
 		return false;
 	}

@@ -1616,7 +1616,7 @@
 
 
 		$new_app = new CTextBox('new_application',$new_application,40);
-		$frmItem->addRow(S_NEW_APPLICATION,$new_app,'new');
+		$frmItem->addRow(_('New application'), $new_app, 'new');
 
 		$cmbApps = new CListBox('applications[]',$applications,6);
 		$cmbApps->addItem(0,'-'.S_NONE.'-');

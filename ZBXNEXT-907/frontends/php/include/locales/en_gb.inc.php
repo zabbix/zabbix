@@ -433,13 +433,6 @@
 	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
 	'S_APPLICATIONS_BIG'=>				_('APPLICATIONS'),
-	'S_CREATE_APPLICATION'=>			_('Create application'),
-	'S_APPLICATION_UPDATED'=>			_('Application updated'),
-	'S_CANNOT_UPDATE_APPLICATION'=>			_('Cannot update application'),
-	'S_APPLICATION_ADDED'=>				_('Application added'),
-	'S_CANNOT_ADD_APPLICATION'=>			_('Cannot add application'),
-	'S_APPLICATION_DELETED'=>			_('Application deleted'),
-	'S_CANNOT_DELETE_APPLICATION'=>			_('Cannot delete application'),
 	'S_NO_APPLICATIONS_DEFINED'=>			_('No applications defined.'),
 	'S_HOSTS'=>					_('Hosts'),
 	'S_ITEMS'=>					_('Items'),
@@ -497,7 +490,6 @@
 	'S_CREATE_PROXY'=>				_('Create proxy'),
 	'S_PROXY_NAME'=>				_('Proxy name'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
-	'S_UPDATED_STATUS_OF_HOST' =>		_('Updated status of host'),
 	'S_CLEAR_WHEN_UNLINKING' => _('Clear when unlinking'),
 	'S_SNMP' =>						_('SNMP'),
 	'S_INTERFACES' =>				_('Interfaces'),
@@ -542,8 +534,6 @@
 	'S_CANNOT_DELETE_ITEM'=>				_('Cannot delete item'),
 	'S_ITEMS_DELETED'=>					_('Items deleted'),
 	'S_CANNOT_DELETE_ITEMS'=>				_('Cannot delete items'),
-	'S_ITEMS_ACTIVATED'=>					_('Items activated'),
-	'S_ITEMS_DISABLED'=>					_('Items disabled'),
 	'S_KEY'=>						_('Key'),
 	'S_DESCRIPTION'=>					_('Description'),
 	'S_INTERVAL'=>						_('Interval'),
@@ -599,7 +589,6 @@
 	'S_FLEXIBLE_INTERVALS'=>				_('Flexible intervals (sec)'),
 	'S_NO_FLEXIBLE_INTERVALS'=>				_('No flexible intervals'),
 	'S_PARAMS'=>						_('Additional parameters'),
-	'S_NEW_APPLICATION'=>					_('New application'),
 	'S_IPMI_SENSOR'=>					_('IPMI sensor'),
 	'S_TEMPLATED_ITEM'=>					_('Templated item'),
 	'S_WEB_ITEM'=>						_('Web item'),
@@ -1182,12 +1171,6 @@
 	'S_RESULT_TYPE'=>	_('Result type'),
 	'S_COMBINED_RESULT'=>	_('Combined result'),
 
-//  applications.php
-	'S_DELETE_APPLICATION'=>	_('Delete this application?'),
-	'S_ACTIVATE_SELECTED_APPLICATIONS' => _('Activate selected applications?'),
-	'S_DISABLE_SELECTED_APPLICATIONS' => _('Disable selected applications?'),
-	'S_DELETE_SELECTED_APPLICATIONS'  => _('Delete selected applications?'),
-
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	_('Incorrect time period'),
 
@@ -1225,14 +1208,12 @@
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	_('Incorrect arguments passed to function'),
 	'S_ALREADY_EXISTS_FOR_HOST_SMALL'=>		_('already exists for host'),
 	'S_UPDATED_SMALL'=>				_('updated'),
-	'S_NO_ITEM_WITH'=>				_('No item with'),
 
 //	httptest.inc.php
 	'S_ADDED_SMALL'=>				_('added'),
 
 //	hosts.inc.php
 	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		_('is internal and can not be deleted'),
-	'S_NO_HOST_WITH'=>				_('No host with'),
 	'S_USED_BY_SCENARIO_SMALL'=>			_('used by scenario'),
 	'S_NO_APPLICATION_WITH'=>			_('No application with'),
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			_('Template with item key'),
