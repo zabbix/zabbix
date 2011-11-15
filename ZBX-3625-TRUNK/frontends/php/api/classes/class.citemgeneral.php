@@ -86,8 +86,10 @@ abstract class CItemGeneral extends CZBXAPI{
 	/**
 	 * Check items data.
 	 *
-	 * @param array $items
-	 * @param bool $update
+	 * @throw APIException
+	 *
+	 * @param array $items passed by reference
+	 * @param bool  $update
 	 *
 	 * @return void
 	 */
@@ -119,7 +121,9 @@ abstract class CItemGeneral extends CZBXAPI{
 			));
 		}
 		else {
-			$item_db_fields = array('name' => null, 'key_' => null, 'hostid' => null, 'type' => null, 'value_type' => null, 'delay' => '0', 'delay_flex' => '');
+			$item_db_fields = array('name' => null, 'key_' => null, 'hostid' => null, 'type' => null,
+				'value_type' => null, 'delay' => '0', 'delay_flex' => ''
+			);
 
 			$dbHosts = API::Host()->get(array(
 				'output' => array('hostid', 'host', 'status'),
@@ -146,13 +150,13 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			if ($update) {
-				check_db_fields($dbItems[$item['itemid']], $fullItem);
-
 				if (!isset($dbItems[$item['itemid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
 
-				if ($dbHosts[$dbItems[$item['itemid']]['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
+				check_db_fields($dbItems[$item['itemid']], $fullItem);
+
+				if ($dbHosts[$fullItem['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
 					unset($item['interfaceid']);
 				}
 
@@ -164,11 +168,11 @@ abstract class CItemGeneral extends CZBXAPI{
 				}
 
 				if (!isset($item['key_'])) {
-					$item['key_'] = $dbItems[$item['itemid']]['key_'];
+					$item['key_'] = $fullItem['key_'];
 				}
 
 				if (!isset($item['hostid'])) {
-					$item['hostid'] = $dbItems[$item['itemid']]['hostid'];
+					$item['hostid'] = $fullItem['hostid'];
 				}
 			}
 			else {
@@ -176,15 +180,17 @@ abstract class CItemGeneral extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
 
-				if (!isset($item['interfaceid']) && self::itemTypeInterface($item['type']) &&
-						$dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE &&
-						$fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD) {
+				if (!isset($item['interfaceid'])
+					&& self::itemTypeInterface($item['type'])
+					&& $dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE
+					&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD
+				) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
 				}
 			}
 
 			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
-				$fullItem['delay_flex'] = '';
+				$item['delay_flex'] = '';
 			}
 
 			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR) {
@@ -197,8 +203,10 @@ abstract class CItemGeneral extends CZBXAPI{
 
 			// interface
 			$itemInterfaceType = self::itemTypeInterface($fullItem['type']);
-			if ($itemInterfaceType !== false && $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE &&
-					$fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD) {
+			if ($itemInterfaceType !== false
+				&& $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE
+				&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD
+			) {
 				if (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
 				}
@@ -211,10 +219,11 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			// item key
-			if (($fullItem['type'] == ITEM_TYPE_DB_MONITOR && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_DB_MONITOR) == 0) ||
-					($fullItem['type'] == ITEM_TYPE_SSH && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_SSH) == 0) ||
-					($fullItem['type'] == ITEM_TYPE_TELNET && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_TELNET) == 0) ||
-					($fullItem['type'] == ITEM_TYPE_JMX && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_JMX) == 0)) {
+			if (($fullItem['type'] == ITEM_TYPE_DB_MONITOR && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_DB_MONITOR) == 0)
+				|| ($fullItem['type'] == ITEM_TYPE_SSH && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_SSH) == 0)
+				|| ($fullItem['type'] == ITEM_TYPE_TELNET && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_TELNET) == 0)
+				|| ($fullItem['type'] == ITEM_TYPE_JMX && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_JMX) == 0)
+			) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
 			}
 
@@ -226,16 +235,19 @@ abstract class CItemGeneral extends CZBXAPI{
 			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE) {
 				$params = $itemKey->getParameters();
 
-				if (!str_in_array($itemKey->getKeyId(), array('grpmax', 'grpmin', 'grpsum', 'grpavg')) ||
-						count($params) != 4 || !str_in_array($params[2], array('last', 'min', 'max', 'avg', 'sum', 'count'))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Key "%1$s" does not match %2$s.', $itemKey->getKeyId(), '<grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key", "<last|min|max|avg|sum|count>", "parameter"]'));
+				if (!str_in_array($itemKey->getKeyId(), array('grpmax', 'grpmin', 'grpsum', 'grpavg'))
+					|| count($params) != 4
+					|| !str_in_array($params[2], array('last', 'min', 'max', 'avg', 'sum', 'count'))
+				) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key", "<last|min|max|avg|sum|count>", "parameter"].', $itemKey->getKeyId()));
 				}
 			}
 
-			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP) {
-				if (strcmp($fullItem['key_'], 'snmptrap.fallback') != 0 && strcmp($itemKey->getKeyId(), 'snmptrap') != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid'));
-				}
+			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
+				&& strcmp($fullItem['key_'], 'snmptrap.fallback') != 0
+				&& strcmp($itemKey->getKeyId(), 'snmptrap') != 0
+			) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid'));
 			}
 
 			// type of information
@@ -256,9 +268,16 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			// SNMP port
-			if (isset($fullItem['port']) && !zbx_empty($fullItem['port']) &&
-					!((zbx_ctype_digit($fullItem['port']) && $fullItem['port'] >= 0 && $fullItem['port'] <= 65535) ||
-					preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $fullItem['port']))) {
+			if (isset($fullItem['port'])
+				&& !zbx_empty($fullItem['port'])
+				&& !(
+					(zbx_ctype_digit($fullItem['port'])
+						&& $fullItem['port'] >= 0
+						&& $fullItem['port'] <= 65535
+					)
+					|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $fullItem['port'])
+				)
+			) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" has invalid port: "%3$s".', $fullItem['name'], $fullItem['key_'], $fullItem['port']));
 			}
 
