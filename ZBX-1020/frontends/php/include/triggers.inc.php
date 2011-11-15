@@ -1856,7 +1856,7 @@ function triggerExpression($trigger, $html, $template=false, $resolve_macro=fals
 		else{
 			if(($period_start==0)&&($period_end==0)){
 				$max=time();
-				$min=$max-24*3600;
+				$min=$max - SEC_PER_DAY;
 			}
 			else{
 				$ret['true_time']		= 0;
