@@ -193,12 +193,10 @@ function addPopupValues(list){
 
 		// IE8 hack to fix inline-block container resizing
 		if (jQuery.browser.msie  && parseInt(jQuery.browser.version) == 8) {
-			container.parents().each(function(i, el) {
-				var block = jQuery(this);
-				if (block.css('display') == 'inline-block') {
-					block.addClass('ie8fix-inline').removeClass('ie8fix-inline');
-				}
+			var inlineContainers = container.parents('.inlineblock').filter(function() {
+				return jQuery(this).css('display') == 'inline-block';
 			});
+			inlineContainers.last().addClass('ie8fix-inline').removeClass('ie8fix-inline');
 		}
 	}
 }
