@@ -939,11 +939,8 @@ static void	process_escalations(int now)
 
 		if (escalation.status == ESCALATION_STATUS_SUPERSEDED_ACTIVE)
 		{
-			if (0 == escalation.esc_step)
-			{
-				escalation.status = ESCALATION_STATUS_ACTIVE;
-				execute_escalation(&escalation);
-			}
+			escalation.status = ESCALATION_STATUS_ACTIVE;
+			execute_escalation(&escalation);
 			DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64 " and status=%d",
 					escalation.escalationid,
 					ESCALATION_STATUS_SUPERSEDED_ACTIVE);
@@ -970,11 +967,14 @@ static void	process_escalations(int now)
 			if (escalation.status == ESCALATION_STATUS_COMPLETED)
 				DBremove_escalation(escalation.escalationid);
 			else
-				DBexecute("update escalations set esc_step=%d,nextcheck=%d"
-						" where escalationid=" ZBX_FS_UI64,
+				DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
+						" where escalationid=" ZBX_FS_UI64
+							" and status=%d",
+						escalation.status,
 						escalation.esc_step,
 						escalation.nextcheck,
-						escalation.escalationid);
+						escalation.escalationid,
+						ESCALATION_STATUS_ACTIVE);
 		}
 
 		DBcommit();
