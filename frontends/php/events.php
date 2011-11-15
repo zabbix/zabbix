@@ -50,7 +50,7 @@ else{
 	}
 }
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 	$allow_discovery = check_right_on_discovery(PERM_READ_ONLY);
@@ -104,7 +104,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -359,7 +359,7 @@ include_once('include/page_header.php');
 	$firstEvent = API::Event()->get($options);
 // }}} CHECK IF EVENTS EXISTS
 
-	$_REQUEST['period'] = get_request('period', 604800); // 1 week
+	$_REQUEST['period'] = get_request('period', SEC_PER_WEEK);
 	$effectiveperiod = navigation_bar_calc();
 	$bstime = $_REQUEST['stime'];
 	$from = zbxDateToTime($_REQUEST['stime']);
@@ -713,6 +713,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

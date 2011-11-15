@@ -25,7 +25,7 @@ $page['title'] = _('Authentication to Zabbix');
 $page['file'] = 'authentication.php';
 $page['hist_arg'] = array('config');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -200,5 +200,5 @@ $authenticationView = new CView('administration.authentication.edit', $data);
 $authenticationView->render();
 $authenticationView->show();
 
-include_once 'include/page_footer.php';
+require_once 'include/page_footer.php';
 ?>
