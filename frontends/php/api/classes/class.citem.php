@@ -1043,9 +1043,10 @@ class CItem extends CItemGeneral{
 	 * @param array $itemids
 	 * @return
 	 */
-	public function delete($itemids, $nopermissions=false) {
-			if (empty($itemids))
+	public function delete($itemids, $nopermissions = false) {
+			if (empty($itemids)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+			}
 
 			$itemids = zbx_toHash($itemids);
 
@@ -1057,7 +1058,7 @@ class CItem extends CItemGeneral{
 			);
 			$del_items = $this->get($options);
 
-// TODO: remove $nopermissions hack
+			// TODO: remove $nopermissions hack
 			if (!$nopermissions) {
 				foreach ($itemids as $itemid) {
 					if (!isset($del_items[$itemid])) {
@@ -1068,45 +1069,50 @@ class CItem extends CItemGeneral{
 					}
 				}
 			}
-// first delete child items
+
+			// first delete child items
 			$parent_itemids = $itemids;
-			do{
-				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
+			do {
+				$db_items = DBselect('SELECT i.itemid FROM items i WHERE '.DBcondition('i.templateid', $parent_itemids));
 				$parent_itemids = array();
-				while($db_item = DBfetch($db_items)){
+				while ($db_item = DBfetch($db_items)) {
 					$parent_itemids[] = $db_item['itemid'];
 					$itemids[$db_item['itemid']] = $db_item['itemid'];
 				}
-			} while(!empty($parent_itemids));
+			} while (!empty($parent_itemids));
 
-
-// delete graphs, leave if graph still have item
+			// delete graphs, leave if graph still have item
 			$del_graphs = array();
-			$sql = 'SELECT gi.graphid' .
-					' FROM graphs_items gi' .
-					' WHERE ' . DBcondition('gi.itemid', $itemids) .
-					' AND NOT EXISTS (' .
-						' SELECT gii.gitemid' .
-						' FROM graphs_items gii' .
-						' WHERE gii.graphid=gi.graphid' .
-							' AND ' . DBcondition('gii.itemid', $itemids, true, false) .
-					' )';
-			$db_graphs = DBselect($sql);
+			$db_graphs = DBselect(
+				'SELECT gi.graphid'.
+				' FROM graphs_items gi'.
+				' WHERE '.DBcondition('gi.itemid', $itemids).
+					' AND NOT EXISTS ('.
+						'SELECT gii.gitemid'.
+						' FROM graphs_items gii'.
+						' WHERE gii.graphid=gi.graphid'.
+							' AND '.DBcondition('gii.itemid', $itemids, true, false).
+					')'
+			);
 			while($db_graph = DBfetch($db_graphs)){
 				$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
 			}
 
-			if(!empty($del_graphs)){
+			if (!empty($del_graphs)) {
 				$result = API::Graph()->delete($del_graphs, true);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph.'));
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete graph.'));
+				}
 			}
-//--
+
+			// check if any graphs are referencing this item
+			$this->checkGraphReference($itemids);
 
 			$triggers = API::Trigger()->get(array(
 				'itemids' => $itemids,
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
-				'preservekeys' => true,
+				'preservekeys' => true
 			));
 			if (!empty($triggers)) {
 				$result = API::Trigger()->delete(array_keys($triggers), true);
@@ -1115,18 +1121,16 @@ class CItem extends CItemGeneral{
 				}
 			}
 
-			$itemids_condition = array('itemid'=>$itemids);
 			DB::delete('screens_items', array(
-				'resourceid'=>$itemids,
-				'resourcetype'=>array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT),
+				'resourceid' => $itemids,
+				'resourcetype' => array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)
 			));
-			DB::delete('items', $itemids_condition);
+			DB::delete('items', array('itemid' => $itemids));
 			DB::delete('profiles', array(
-				'idx'=>'web.favorite.graphids',
-				'source'=>'itemid',
-				'value_id'=>$itemids
+				'idx' => 'web.favorite.graphids',
+				'source' => 'itemid',
+				'value_id' => $itemids
 			));
-
 
 			$item_data_tables = array(
 				'trends',
@@ -1135,27 +1139,105 @@ class CItem extends CItemGeneral{
 				'history_log',
 				'history_uint',
 				'history_str',
-				'history',
+				'history'
 			);
 			$insert = array();
-			foreach($itemids as $itemid){
-				foreach($item_data_tables as $table){
+			foreach ($itemids as $itemid) {
+				foreach ($item_data_tables as $table) {
 					$insert[] = array(
 						'tablename' => $table,
 						'field' => 'itemid',
-						'value' => $itemid,
+						'value' => $itemid
 					);
 				}
 			}
 			DB::insert('housekeeper', $insert);
 
-// TODO: remove info from API
-			foreach($del_items as $item){
+			// TODO: remove info from API
+			foreach ($del_items as $item) {
 				info(_s('Item "%1$s:%2$s" deleted.', $item['name'], $item['key_']));
 			}
 
 			return array('itemids' => $itemids);
 	}
+
+
+	/**
+	 * Checks whether the given items are referenced by any graphs and tries to
+	 * unset these references, if they are no longer used.
+	 *
+	 * @throws APIException if at least one of the item can't be deleted
+	 *
+	 * @param array $itemIds   An array of item IDs
+	 */
+	protected function checkGraphReference(array $itemIds) {
+		$this->checkUseInGraphAxis($itemIds, true);
+		$this->checkUseInGraphAxis($itemIds);
+	}
+
+
+	/**
+	 * Checks if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * if there are graphs, that have an y*_itemid column set, but the
+	 * y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, the y*_itemid
+	 * column will be set to NULL.
+	 *
+	 * If the $checkMax parameter is set to true, the items will be checked against
+	 * max Y values, otherwise, they will be checked against min Y values.
+	 *
+	 * @throws APIException if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * @param array $itemIds   An array of items IDs
+	 * @param type $checkMax
+	 */
+	protected function checkUseInGraphAxis(array $itemIds, $checkMax = false) {
+		if ($checkMax) {
+			$filter = array(
+				'ymax_itemid' => $itemIds,
+			);
+			$itemIdColumn = 'ymax_itemid';
+			$typeColumn = 'ymax_type';
+		}
+		else {
+			$filter = array(
+				'ymin_itemid' => $itemIds,
+			);
+			$itemIdColumn = 'ymin_itemid';
+			$typeColumn = 'ymin_type';
+		}
+
+		// check if the items are used in Y axis min/max values in any graphs
+		$graphs = API::Graph()->get(array(
+			'output' => array($itemIdColumn, $typeColumn, 'graphtype'),
+			'filter' => $filter
+		));
+
+		$updateGraphs = array();
+		foreach ($graphs as &$graph) {
+			// check if Y type is actually set to GRAPH_YAXIS_TYPE_ITEM_VALUE
+			if ($graph[$typeColumn] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				if ($checkMax) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Could not delete these items because some of them are used as MAX values for graphs.');
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Could not delete these items because some of them are used as MIN values for graphs.');
+				}
+			}
+			else {
+				$graph[$itemIdColumn] = null;
+				$updateGraphs[] = $graph;
+			}
+		}
+
+		// if there are graphs, that have an y*_itemid column set, but the
+		// y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, set y*_itemid to NULL.
+		// Otherwise we won't be able to delete them.
+		if ($updateGraphs) {
+			API::Graph()->update($updateGraphs);
+		}
+	}
+
 
 	public function syncTemplates($data){
 		$data['templateids'] = zbx_toArray($data['templateids']);
