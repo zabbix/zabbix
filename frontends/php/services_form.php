@@ -348,7 +348,7 @@ if(isset($_REQUEST['sform'])){
 		}
 		//sdi($new_service_time);
 		while($new_service_time['to'] && ($new_service_time['to'] <= $new_service_time['from']))
-			$new_service_time['to'] += 7*24*3600;
+			$new_service_time['to'] += SEC_PER_WEEK;
 
 		//validating service times that were entered
 		if ($new_service_time['to'] == false){

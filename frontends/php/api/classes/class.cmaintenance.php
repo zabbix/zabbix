@@ -45,7 +45,7 @@ class CMaintenance extends CZBXAPI {
 	 * @param string $options['order']
 	 * @return array|int item data as array or false if error
 	 */
-	public function get($options = array()) {
+	public function get(array $options = array()) {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
@@ -430,7 +430,7 @@ class CMaintenance extends CZBXAPI {
 	 * @param array $object
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$keyFields = array(array('maintenanceid', 'name'));
 
 		$options = array(
@@ -449,7 +449,7 @@ class CMaintenance extends CZBXAPI {
 	 * @param array $maintenances
 	 * @return boolean
 	 */
-	public function create($maintenances) {
+	public function create(array $maintenances) {
 		$maintenances = zbx_toArray($maintenances);
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
@@ -494,15 +494,19 @@ class CMaintenance extends CZBXAPI {
 			}
 		}
 
+		$this->removeSecondsFromTimes($maintenances);
+
 		$tid = 0;
 		$insert = array();
 		$timeperiods = array();
 		$insert_timeperiods = array();
+		$now = time();
+		$now -= $now % SEC_PER_MIN;
 		foreach ($maintenances as $mnum => $maintenance) {
 			$db_fields = array(
 				'name' => null,
-				'active_since'=> time(),
-				'active_till' => time() + 86400
+				'active_since' => $now,
+				'active_till' => $now + SEC_PER_DAY
 			);
 			if (!check_db_fields($db_fields, $maintenance)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for maintenance.'));
@@ -538,8 +542,8 @@ class CMaintenance extends CZBXAPI {
 			foreach ($maintenance['timeperiods'] as $timeperiod) {
 				$db_fields = array(
 					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
-					'period' => 3600,
-					'start_date' => time()
+					'period' => SEC_PER_HOUR,
+					'start_date' =>	$now
 				);
 				check_db_fields($db_fields, $timeperiod);
 
@@ -585,10 +589,10 @@ class CMaintenance extends CZBXAPI {
 	/**
 	 * Update maintenances
 	 *
-	 * @param _array $maintenances
+	 * @param array $maintenances
 	 * @return boolean
 	 */
-	public function update($maintenances) {
+	public function update(array $maintenances) {
 		$maintenances = zbx_toArray($maintenances);
 		$maintenanceids = zbx_objectValues($maintenances, 'maintenanceid');
 
@@ -682,10 +686,10 @@ class CMaintenance extends CZBXAPI {
 			}
 		}
 
+		$this->removeSecondsFromTimes($maintenances);
+
 		$tid = 0;
 		$update = array();
-		$timeperiods = array();
-		$insert_timeperiods = array();
 		foreach ($maintenances as $mnum => $maintenance) {
 			$db_fields = array(
 				'maintenanceid' => null
@@ -826,13 +830,13 @@ class CMaintenance extends CZBXAPI {
 	}
 
 	/**
-	 * Delete maintenances
+	 * Delete maintenances by maintenanceids.
 	 *
-	 * @param _array $maintenanceids
-	 * @param _array $maintenanceids['maintenanceids']
-	 * @return boolean
+	 * @param array $maintenanceids
+	 *
+	 * @return array
 	 */
-	public function delete($maintenanceids) {
+	public function delete(array $maintenanceids) {
 		$maintenanceids = zbx_toArray($maintenanceids);
 			if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
@@ -884,5 +888,35 @@ class CMaintenance extends CZBXAPI {
 			DB::delete('maintenances', $mid_cond);
 			return array('maintenanceids' => $maintenanceids);
 	}
+
+	/**
+	 * Reset seconds to zero in maintenace time values.
+	 *
+	 * @param array $maintenances passed by reference
+	 */
+	protected function removeSecondsFromTimes(array &$maintenances) {
+		foreach ($maintenances as &$maintenance) {
+			if (isset($maintenance['active_since'])) {
+				$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
+			}
+
+			if (isset($maintenance['active_till'])) {
+				$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
+			}
+
+
+			if (isset($maintenance['timeperiods'])) {
+				foreach ($maintenance['timeperiods'] as &$timeperiod) {
+					if (isset($timeperiod['start_date'])) {
+						$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
+					}
+				}
+				unset($timeperiod);
+			}
+		}
+		unset($maintenance);
+	}
+
 }
+
 ?>

@@ -359,7 +359,7 @@ require_once('include/page_header.php');
 	$firstEvent = API::Event()->get($options);
 // }}} CHECK IF EVENTS EXISTS
 
-	$_REQUEST['period'] = get_request('period', 604800); // 1 week
+	$_REQUEST['period'] = get_request('period', SEC_PER_WEEK);
 	$effectiveperiod = navigation_bar_calc();
 	$bstime = $_REQUEST['stime'];
 	$from = zbxDateToTime($_REQUEST['stime']);

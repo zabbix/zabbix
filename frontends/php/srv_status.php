@@ -119,7 +119,7 @@ require_once('include/page_header.php');
 			case 24*7:
 			case 24*30:
 			case 24*365:
-				$period_start = $period_end - ($period * 3600);
+				$period_start = $period_end - ($period * SEC_PER_HOUR);
 			break;
 		}
 
