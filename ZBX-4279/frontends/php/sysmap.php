@@ -29,7 +29,7 @@ $page['hist_arg'] = array('sysmapid');
 $page['scripts'] = array('class.cmap.js', 'class.cviewswitcher.js');
 $page['type'] = detect_page_type();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 
@@ -114,7 +114,7 @@ include_once('include/page_header.php');
 	}
 
 	if (PAGE_TYPE_HTML != $page['type']) {
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 
@@ -270,5 +270,5 @@ zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.zbx_jsvalue(array(
 			'sysmap' => $sysmap, 'iconList' => $iconList, 'defaultAutoIconId' => $defaultAutoIconId), true).');'
 );
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

@@ -30,7 +30,7 @@ $page['hist_arg'] = array();
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -55,7 +55,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -119,7 +119,7 @@ include_once('include/page_header.php');
 			case 24*7:
 			case 24*30:
 			case 24*365:
-				$period_start = $period_end - ($period * 3600);
+				$period_start = $period_end - ($period * SEC_PER_HOUR);
 			break;
 		}
 
@@ -297,5 +297,5 @@ include_once('include/page_header.php');
 	}
 
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

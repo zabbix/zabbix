@@ -29,7 +29,7 @@ $page['hist_arg'] = array();
 $page['scripts'] = array();
 $page['type'] = detect_page_type();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -220,7 +220,7 @@ if(isset($_REQUEST['form'])){
 		$drule['proxy_hostid'] = get_request('proxy_hostid', 0);
 		$drule['name'] = get_request('name', '');
 		$drule['iprange'] = get_request('iprange', '192.168.0.1-255');
-		$drule['delay'] = get_request('delay', 3600);
+		$drule['delay'] = get_request('delay', SEC_PER_HOUR);
 		$drule['status'] = get_request('status', DRULE_STATUS_ACTIVE);
 
 		$drule['dchecks'] = get_request('dchecks', array());
@@ -321,6 +321,6 @@ $dscry_wdgt->show();
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

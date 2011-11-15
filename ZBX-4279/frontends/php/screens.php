@@ -34,7 +34,7 @@ if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -107,7 +107,7 @@ if (isset($_REQUEST['favobj'])) {
 }
 
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 	exit();
 }
 ?>
@@ -284,5 +284,5 @@ else {
 
 	echo SBR;
 }
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>
