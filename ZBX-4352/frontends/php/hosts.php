@@ -421,14 +421,12 @@ include_once('include/page_header.php');
 					$templates_to_del = array_diff($host_templateids, $tplids);
 					$hosts['templates_clear'] = zbx_toObject($templates_to_del, 'templateid');
 				}
-				$new_values['templates'] = $templates;
+				$hosts['templates'] = $templates;
 			}
 
-			if ($new_values) {
-				$result = CHost::massUpdate(array_merge($hosts, $new_values));
-				if ($result === false) {
-					throw new Exception();
-				}
+			$result = CHost::massUpdate(array_merge($hosts, $new_values));
+			if ($result === false) {
+				throw new Exception();
 			}
 
 			$add = array();

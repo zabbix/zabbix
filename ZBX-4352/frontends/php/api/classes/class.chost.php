@@ -1330,19 +1330,23 @@ Copt::memoryPick();
 		$hosts = zbx_toArray($data['hosts']);
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
+		unset($data['hosts']);
+		if(empty($data)) {
+			return true;
+		}
+
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			// validate data
 			$fields = array_keys($data);
-			unset($fields[array_search('hosts', $fields)]);
 			self::validate($data, $fields);
 
 			$options = array(
 				'hostids' => $hostids,
-				'editable' => 1,
+				'editable' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1,
+				'preservekeys' => true
 			);
 			$upd_hosts = self::get($options);
 			foreach($hosts as $hnum => $host){
