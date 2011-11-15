@@ -27,7 +27,7 @@
 	// $page['title']	= "S_CHART";
 	$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once 'include/page_header.php';
+require_once 'include/page_header.php';
 
 ?>
 <?php
@@ -75,7 +75,7 @@ include_once 'include/page_header.php';
 	imagefilledrectangle($im,0,0,$sizeX,$sizeY,imagecolorallocate($im,120,200,120));
 
 	$now=time(NULL);
-	$period_start=$now-7*86400;
+	$period_start = $now - SEC_PER_WEEK;
 	$period_end=$now;
 	$stat=calculate_service_availability($_REQUEST['serviceid'],$period_start,$period_end);
 
@@ -100,6 +100,6 @@ include_once 'include/page_header.php';
 	ImageOut($im);
 	imagedestroy($im);
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

@@ -15,7 +15,7 @@ xgettext --files-from=locale/POTFILES.in --from-code=UTF-8 \
 --output=locale/frontend.pot \
 --copyright-holder="Zabbix SIA" --no-wrap --sort-output \
 --add-comments="GETTEXT:" --keyword=_n:1,2 --keyword=_s \
---keyword=_x:1,2c || exit 1
+--keyword=_x:1,2c --keyword=_xn:1,2,4c || exit 1
 
 cd $directory/locale
 #--sort-by-file

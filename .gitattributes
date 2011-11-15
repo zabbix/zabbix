@@ -1,5 +1,4 @@
 * text=auto !eol
-/CREDITS -text
 bin/win32/zabbix_agentd.exe -text
 bin/win32/zabbix_get.exe -text
 bin/win32/zabbix_sender.exe -text
@@ -21,8 +20,8 @@ create/data/create_data_sql/data_sql_extraclause.txt -text
 create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
 create/data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
 create/images/README.dev -text
-create/images/images_oracle_end.txt -text
-create/images/images_oracle_start.txt -text
+create/images/images_oracle_end.txt svneol=native#text/plain
+create/images/images_oracle_start.txt svneol=native#text/plain
 create/images/old_images/Hub.png -text svneol=unset#image/png
 create/images/old_images/Hub_small.png -text svneol=unset#image/png
 create/images/old_images/Network.png -text svneol=unset#image/png
@@ -231,7 +230,8 @@ create/images/png/Zabbix_server_2D[!!-~](96).png -text svneol=unset#image/png
 create/images/png/Zabbix_server_3D[!!-~](128).png -text svneol=unset#image/png
 create/images/png/Zabbix_server_3D[!!-~](64).png -text svneol=unset#image/png
 create/images/png/Zabbix_server_3D[!!-~](96).png -text svneol=unset#image/png
-create/images/png_to_sql.sh -text
+create/images/png_to_sql.sh svneol=native#text/x-sh
+create/images/png_to_xml.sh svneol=native#text/x-sh
 create/images/source/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
 create/images/source/elements/Crypto-router.svg -text svneol=native#image/svg%2Bxml
 create/images/source/elements/Crypto-router_symbol.svg -text svneol=native#image/svg%2Bxml
@@ -438,29 +438,6 @@ frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/class.frontendsetup.php -text
 frontends/php/include/classes/class.globalregexp.php -text
-frontends/php/include/views/administration.authentication.edit.php -text
-frontends/php/include/views/administration.general.gui.edit.php -text
-frontends/php/include/views/administration.general.housekeeper.edit.php -text
-frontends/php/include/views/administration.general.image.edit.php -text
-frontends/php/include/views/administration.general.image.list.php -text
-frontends/php/include/views/administration.general.macros.edit.php -text
-frontends/php/include/views/administration.general.other.edit.php -text
-frontends/php/include/views/administration.general.regularexpressions.edit.php -text
-frontends/php/include/views/administration.general.regularexpressions.list.php -text
-frontends/php/include/views/administration.general.valuemapping.edit.php -text
-frontends/php/include/views/administration.general.valuemapping.list.php -text
-frontends/php/include/views/administration.general.workingtime.edit.php -text
-frontends/php/include/views/administration.mediatypes.edit.php -text
-frontends/php/include/views/administration.mediatypes.list.php -text
-frontends/php/include/views/administration.usergroups.edit.php -text
-frontends/php/include/views/administration.usergroups.list.php -text
-frontends/php/include/views/administration.users.edit.php -text
-frontends/php/include/views/administration.users.list.php -text
-frontends/php/include/views/configuration.maintenance.edit.php -text
-frontends/php/include/views/configuration.maintenance.list.php -text
-frontends/php/include/views/general.browserwarning.php -text
-frontends/php/include/views/js/administration.general.macros.js.php -text
-frontends/php/include/views/js/administration.users.edit.js.php -text
 frontends/php/js/browsers.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text

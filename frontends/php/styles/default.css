@@ -36,8 +36,8 @@ ul { margin-left: 0; padding-left: 1em; }
 form { margin: 0 }
 
 /**************** MEDIA *****************/
-@media print { .printless { visibility: hidden; display: none; } .printonly{ display: block; visibility:visible; } }
-@media screen { .printless { visibility:visible; display:block; } .printonly{ visibility: hidden; display:none; } }
+@media print { .printless { visibility: hidden; display: none; } .printonly { display: block; visibility:visible; } }
+@media screen { .printless { visibility:visible; display:block; } .printonly { visibility: hidden; display:none; } }
 
 /**************** OTHERS ****************/
 .hidden { display: none; }
@@ -139,14 +139,16 @@ form .thin .input { height: 14px; }
 .input {
 	font-size: 10px;
 	font-family: Verdana, arial, helvetica, sans-serif;
-	border: 1px solid gray;
+	border: 1px solid #ACA899;
 	background-color: white;
 	margin: 0 1px;
 }
 .input:focus { border-color: #6e8ab4; }
 .input:hover { border-color: #6e8ab4; }
 .input[readonly] { border-color: #D0D0D0; background-color: #EEEEEE; }
-.input[disabled] { color: gray; cursor: default; }
+.input[disabled] { color: #ACA899; cursor: default; }
+.input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
+.input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 
 div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #FFAA33; }
 div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #DD7711; }

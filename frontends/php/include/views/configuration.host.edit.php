@@ -70,8 +70,8 @@
 		$dbHost['interfaces'] = API::HostInterface()->get(array(
 			'hostids' => $dbHost['hostid'],
 			'output' => API_OUTPUT_EXTEND,
-			'selectItems' => API_OUTPUT_COUNT,
-			'preserveKeys' => true,
+			'selectItems' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
 		));
 
 		ArraySorter::sort($dbHost['interfaces'], array('type', 'interfaceid'));
@@ -80,15 +80,27 @@
 		$original_templates = $dbHost['parentTemplates'];
 		$original_templates = zbx_toHash($original_templates, 'templateid');
 
-		if(!empty($interfaces)){
-			foreach($interfaces as $hinum => $interface){
-				$interfaces[$hinum]['items'] = 0;
+		if (!isset($_REQUEST['form_refresh'])) {
+			$interfaces = $dbHost['interfaces'];
+		}
 
-				if($interface['new'] == 'create') continue;
-				if(!isset($dbHost['interfaces'][$interface['interfaceid']])) continue;
+		foreach ($interfaces as $hinum => $interface) {
+			$interfaces[$hinum]['items'] = 0;
 
-				$interfaces[$hinum]['items'] = $dbHost['interfaces'][$interface['interfaceid']]['items'];
+			if ((isset($interface['new']) && $interface['new'] == 'create') || !isset($dbHost['interfaces'][$interface['interfaceid']])) {
+				continue;
 			}
+
+			$interfaces[$hinum]['items'] = count($dbHost['interfaces'][$interface['interfaceid']]['items']);
+			$locked = 0;
+			foreach ($dbHost['interfaces'][$interface['interfaceid']]['items'] as $item) {
+				$itemInterfaceType = CItem::itemTypeInterface($item['type']);
+				if (!($itemInterfaceType === false || $itemInterfaceType === INTERFACE_TYPE_ANY)) {
+					$locked = 1;
+					break;
+				}
+			}
+			$interfaces[$hinum]['locked'] = $locked;
 		}
 
 		// getting items that populate host inventory fields
@@ -119,7 +131,6 @@
 		$ipmi_password		= $dbHost['ipmi_password'];
 
 		$macros = $dbHost['macros'];
-		$interfaces = $dbHost['interfaces'];
 		$host_groups = zbx_objectValues($dbHost['groups'], 'groupid');
 
 // BEGIN: HOSTS INVENTORY Section
@@ -149,14 +160,14 @@
 
 	$hostList = new CFormList('hostlist');
 
-	if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
-	if($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
+	if ($_REQUEST['hostid'] > 0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
+	if ($_REQUEST['groupid'] > 0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
 
-	$hostTB = new CTextBox('host',$host,54);
+	$hostTB = new CTextBox('host', $host, 54);
 	$hostTB->setAttribute('maxlength', 64);
 	$hostList->addRow(_('Host name'), $hostTB);
 
-	$visiblenameTB = new CTextBox('visiblename',$visiblename,54);
+	$visiblenameTB = new CTextBox('visiblename', $visiblename, 54);
 	$visiblenameTB->setAttribute('maxlength', 64);
 	$hostList->addRow(_('Visible name'), $visiblenameTB);
 
@@ -166,18 +177,18 @@
 		'output' => API_OUTPUT_EXTEND
 	));
 	order_result($all_groups, 'name');
-	foreach($all_groups as $group){
+	foreach ($all_groups as $group) {
 		$grp_tb->addItem($group['groupid'], $group['name']);
 	}
 
-	$hostList->addRow(_('Groups'),$grp_tb->get(_('In groups'), _('Other groups')));
+	$hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
 
 	$newgroupTB = new CTextBox('newgroup', $newgroup);
 	$newgroupTB->setAttribute('maxlength', 64);
-	$hostList->addRow(array(new CLabel(_('New group'), 'newgroup'), BR(), $newgroupTB));
+	$hostList->addRow(array(new CLabel(_('New host group'), 'newgroup'), BR(), $newgroupTB));
 
 // interfaces
-	if(empty($interfaces)){
+	if (empty($interfaces)) {
 		$interfaces = array(array(
 			'ip' => '127.0.0.1',
 			'dns' => '',

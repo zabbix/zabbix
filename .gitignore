@@ -20,13 +20,7 @@ build/win32/project/resource.res
 /configure
 create/Makefile
 create/Makefile.in
-create/images/images_ibm_db2.sql
-create/images/images_mysql.sql
-create/images/images_oracle.sql
-create/images/images_postgresql.sql
-create/images/images_sqlite3.sql
 create/images/inkscape.log.txt
-create/images/output_png
 create/images/pngcrush.log.txt
 create/images/pngcrushoutput.txt
 create/schema/ibm_db2.sql
@@ -192,7 +186,7 @@ src/zabbix_get/zabbix_get
 src/zabbix_java/.deps
 src/zabbix_java/Makefile
 src/zabbix_java/Makefile.in
-src/zabbix_java/bin/zabbix-java-proxy-*.jar
+src/zabbix_java/bin/zabbix-java-gateway-*.jar
 src/zabbix_java/class
 src/zabbix_proxy/.deps
 src/zabbix_proxy/Makefile

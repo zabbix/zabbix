@@ -27,14 +27,14 @@ require_once('include/blocks.inc.php');
 $page['title'] = _('Custom screens');
 $page['file'] = 'screens.php';
 $page['hist_arg'] = array('elementid', 'screenname');
-$page['scripts'] = array('effects.js', 'dragdrop.js', 'class.calendar.js', 'gtlc.js');
+$page['scripts'] = array('class.calendar.js', 'gtlc.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -107,7 +107,7 @@ if (isset($_REQUEST['favobj'])) {
 }
 
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 	exit();
 }
 ?>
@@ -282,9 +282,7 @@ else {
 	$screens_wdgt->addItem($element);
 	$screens_wdgt->show();
 
-	$jsmenu = new CPUMenu(null, 170);
-	$jsmenu->insertJavaScript();
 	echo SBR;
 }
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

@@ -44,13 +44,13 @@
 							size="20" maxlength="255"></td>
 				</tr>
 				<tr id="newCheckSecNameRow" class="hidden">
-					<td><label for="snmpv3_securityname"><?php print(_('SNMPv3 Security name')); ?></label>
+					<td><label for="snmpv3_securityname"><?php print(_('SNMPv3 security name')); ?></label>
 					</td>
 					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname"
 							value="" class="input text" size="20" maxlength="64"></td>
 				</tr>
 				<tr id="newCheckSecLevRow" class="hidden">
-					<td><label for="snmpv3_securitylevel"><?php print(_('SNMPv3 Security level')); ?></label>
+					<td><label for="snmpv3_securitylevel"><?php print(_('SNMPv3 security level')); ?></label>
 					</td>
 					<td><select id="snmpv3_securitylevel" name="snmpv3_securitylevel"
 							class="input select" size="1">

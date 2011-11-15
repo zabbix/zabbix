@@ -26,14 +26,14 @@ require_once('include/graphs.inc.php');
 $page['file']	= 'history.php';
 $page['title']	= 'S_HISTORY';
 $page['hist_arg'] = array('itemid', 'hostid', 'groupid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime', 'action');
-$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
+$page['scripts'] = array('class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 if(isset($_REQUEST['plaintext'])) define('ZBX_PAGE_NO_MENU', 1);
 else if(PAGE_TYPE_HTML == $page['type']) define('ZBX_PAGE_DO_REFRESH', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -112,7 +112,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 ?>
@@ -164,11 +164,13 @@ include_once('include/page_header.php');
 	$item['hostname'] = $host['name'];
 
 // resets get params for proper page refresh
-	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
+	if((isset($_REQUEST['period']) || isset($_REQUEST['stime']))){
 		navigation_bar_calc('web.item.graph', $item['itemid'], true);
-		jsRedirect('history.php?action=' . get_request('action', 'showgraph') . '&itemid=' . $item['itemid']);
-		include_once('include/page_footer.php');
-		exit();
+		if ($_REQUEST['action'] != 'showvalues') {
+			jsRedirect('history.php?action=' . get_request('action', 'showgraph') . '&itemid=' . $item['itemid']);
+			require_once('include/page_footer.php');
+			exit();
+		}
 	}
 //--
 
@@ -547,7 +549,6 @@ include_once('include/page_header.php');
 	}
 ?>
 <script type="text/javascript">
-//<!--<![CDATA[
 function addPopupValues(list){
 	if(!isset('object', list)){
 		throw("Error hash attribute 'list' doesn't contain 'object' index");
