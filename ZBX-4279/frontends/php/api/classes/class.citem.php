@@ -1083,16 +1083,17 @@ class CItem extends CItemGeneral{
 
 			// delete graphs, leave if graph still have item
 			$del_graphs = array();
-			$sql = 'SELECT gi.graphid'.
-					' FROM graphs_items gi'.
-					' WHERE '.DBcondition('gi.itemid', $itemids).
-						' AND NOT EXISTS ('.
-							'SELECT gii.gitemid' .
-							' FROM graphs_items gii'.
-							' WHERE gii.graphid=gi.graphid'.
-								' AND '.DBcondition('gii.itemid', $itemids, true, false).
-						')';
-			$db_graphs = DBselect($sql);
+			$db_graphs = DBselect(
+				'SELECT gi.graphid'.
+				' FROM graphs_items gi'.
+				' WHERE '.DBcondition('gi.itemid', $itemids).
+					' AND NOT EXISTS ('.
+						'SELECT gii.gitemid'.
+						' FROM graphs_items gii'.
+						' WHERE gii.graphid=gi.graphid'.
+							' AND '.DBcondition('gii.itemid', $itemids, true, false).
+					')'
+			);
 			while($db_graph = DBfetch($db_graphs)){
 				$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
 			}
