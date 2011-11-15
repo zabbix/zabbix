@@ -22,42 +22,26 @@
 
 int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
-	int	mib[2],len;
-	int	maxfiles;
+	int	mib[] = {CTL_KERN, KERN_MAXFILES}, maxfiles;
+	size_t	len = sizeof(maxfiles);
 
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_MAXFILES;
-
-	len=sizeof(maxfiles);
-
-	if(sysctl(mib,2,&maxfiles,(size_t *)&len,NULL,0) != 0)
+	if (0 != sysctl(mib, 2, &maxfiles, &len, NULL, 0))
 		return SYSINFO_RET_FAIL;
 
-     	SET_UI64_RESULT(result, maxfiles);
+	SET_UI64_RESULT(result, maxfiles);
+
 	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
 }
 
 int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
-	int	mib[2],len;
-	int	maxproc;
+	int	mib[] = {CTL_KERN, KERN_MAXPROC}, maxproc;
+	size_t	len = sizeof(maxproc);
 
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_MAXPROC;
-
-	len=sizeof(maxproc);
-
-	if(sysctl(mib,2,&maxproc,(size_t *)&len,NULL,0) != 0)
+	if (0 != sysctl(mib, 2, &maxproc, &len, NULL, 0))
 		return SYSINFO_RET_FAIL;
 
-     	SET_UI64_RESULT(result, maxproc);
+	SET_UI64_RESULT(result, maxproc);
+
 	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
 }
