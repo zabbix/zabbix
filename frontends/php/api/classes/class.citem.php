@@ -1163,7 +1163,7 @@ class CItem extends CItemGeneral{
 
 	/**
 	 * Checks whether the given items are referenced by any graphs and tries to
-	 * unset these reference, if they are no longer used.
+	 * unset these references, if they are no longer used.
 	 *
 	 * @throws APIException if at least one of the item can't be deleted
 	 *
