@@ -1206,7 +1206,6 @@
 
 //	items.inc.php
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	_('Incorrect arguments passed to function'),
-	'S_ALREADY_EXISTS_FOR_HOST_SMALL'=>		_('already exists for host'),
 	'S_UPDATED_SMALL'=>				_('updated'),
 
 //	httptest.inc.php
@@ -1214,14 +1213,12 @@
 
 //	hosts.inc.php
 	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		_('is internal and can not be deleted'),
-	'S_USED_BY_SCENARIO_SMALL'=>			_('used by scenario'),
 	'S_NO_APPLICATION_WITH'=>			_('No application with'),
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			_('Template with item key'),
 	'S_TEMPLATE_WITH_APPLICATION'=>			_('Template with application'),
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		_('already linked to host'),
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		_('Host'),
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		_('has been deleted from the system'),
-	'S_AND_CANT_BE_DELETED' => _('and can\'t be deleted'),
 
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					_('No trigger with'),
