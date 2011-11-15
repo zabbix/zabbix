@@ -18,10 +18,6 @@ ALTER TABLE config ALTER COLUMN default_theme SET WITH DEFAULT 'css_ob.css'
 /
 REORG TABLE config
 /
-ALTER TABLE config ADD ns_support integer WITH DEFAULT '0' NOT NULL
-/
-REORG TABLE config
-/
 ALTER TABLE config ADD severity_color_0 varchar(6) WITH DEFAULT 'DBDBDB' NOT NULL
 /
 REORG TABLE config

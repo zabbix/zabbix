@@ -230,6 +230,9 @@ function zbxDateToTime($strdate) {
 	if (6 == sscanf($strdate, '%04d%02d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes, $seconds)) {
 		return mktime($hours, $minutes, $seconds, $month, $date, $year);
 	}
+	elseif (5 == sscanf($strdate, '%04d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes)) {
+		return mktime($hours, $minutes, 0, $month, $date, $year);
+	}
 	else {
 		return time();
 	}
@@ -1301,6 +1304,23 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
 		$mainArray[$sIndex] = array();
 	}
 	$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
+}
+
+/**
+ * Check if two arrays have same values.
+ *
+ * @param array $a
+ * @param array $b
+ * @param bool $strict
+ * @return bool
+ */
+function array_equal(array $a, array $b, $strict=false) {
+	if (count($a) !== count($b)) {
+		return false;
+	}
+	sort($a);
+	sort($b);
+	return $strict ? $a === $b : $a == $b;
 }
 
 /*************** PAGE SORTING ******************/

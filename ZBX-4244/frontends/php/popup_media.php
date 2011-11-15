@@ -31,7 +31,7 @@
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 	if($USER_DETAILS['alias'] == ZBX_GUEST_USER) {
 		access_deny();
@@ -152,5 +152,5 @@ include_once('include/page_header.php');
 	$frmMedia->Show();
 
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

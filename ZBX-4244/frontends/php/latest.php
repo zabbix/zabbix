@@ -37,7 +37,7 @@ if(PAGE_TYPE_HTML == $page['type']){
 }
 //	define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			     			 TYPE	   OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -73,7 +73,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -532,5 +532,5 @@ include_once('include/page_header.php');
 
 //	add_refresh_objects($refresh_tab);
 
-include_once 'include/page_footer.php';
+require_once 'include/page_footer.php';
 ?>

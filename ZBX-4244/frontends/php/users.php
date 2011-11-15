@@ -31,7 +31,7 @@ $page['file'] = 'users.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -59,7 +59,7 @@ $fields = array(
 	'autologin' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
 	'autologout' =>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(90,10000), null),
 	'url' =>				array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'refresh' =>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'isset({save})'),
+	'refresh' =>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, SEC_PER_HOUR), 'isset({save})'),
 	'rows_per_page' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,999999),'isset({save})'),
 	// actions
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -366,5 +366,5 @@ else {
 	$usersView->render();
 	$usersView->show();
 }
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

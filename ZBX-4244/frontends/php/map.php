@@ -26,7 +26,7 @@ $page['title'] = 'S_MAP';
 $page['file'] = 'map.php';
 $page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields=array(
@@ -413,6 +413,6 @@ else{
 	imageOut($im);
 }
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>
