@@ -27,11 +27,11 @@ require_once('include/users.inc.php');
 $page['title'] = 'S_AUDIT';
 $page['file'] = 'auditacts.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('class.calendar.js','effects.js','dragdrop.js','gtlc.js');
+$page['scripts'] = array('class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -71,7 +71,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -183,7 +183,7 @@ include_once('include/page_header.php');
 	$options['sortorder'] = ZBX_SORT_UP;
 	$firstAlert = API::Alert()->get($options);
 	$firstAlert = reset($firstAlert);
-	$starttime = $firstAlert ? $firstAlert['clock'] : time()-3600;
+	$starttime = $firstAlert ? $firstAlert['clock'] : time() - SEC_PER_HOUR;
 
 
 	$paging = getPagingLine($alerts);
@@ -261,5 +261,5 @@ include_once('include/page_header.php');
 	zbx_add_post_js('timeControl.processObjects();');
 
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

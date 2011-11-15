@@ -296,10 +296,10 @@ class CHostInterface extends CZBXAPI{
 				else{
 					if(!isset($result[$interface['interfaceid']])) $result[$interface['interfaceid']] = array();
 
-					if(!is_null($options['selectHosts']) && !isset($result[$interface['hostid']]['hosts'])){
+					if(!is_null($options['selectHosts']) && !isset($result[$interface['interfaceid']]['hosts'])){
 						$result[$interface['interfaceid']]['hosts'] = array();
 					}
-					if(!is_null($options['selectItems']) && !isset($result[$interface['hostid']]['items'])){
+					if(!is_null($options['selectItems']) && !isset($result[$interface['interfaceid']]['items'])){
 						$result[$interface['interfaceid']]['items'] = array();
 					}
 
@@ -374,7 +374,7 @@ Copt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
+				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
@@ -663,16 +663,16 @@ Copt::memoryPick();
  * @param array $Interfaceids[1, ...] Interface ID to delete
  * @return array|boolean
  */
-	public function delete($interfaceids){
+	public function delete($interfaceids) {
 
-			if(empty($interfaceids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if (empty($interfaceids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 			$interfaceids = zbx_toArray($interfaceids);
 			$interfaces = zbx_toObject($interfaceids, 'interfaceid');
 
 			$this->checkInput($interfaces,__FUNCTION__);
 
-			DB::delete('interface', array('interfaceid'=>$interfaceids));
+			DB::delete('interface', array('interfaceid' => $interfaceids));
 
 // auto seting main interfaces
 			$this->setMainInterfaces($interfaces);
@@ -680,13 +680,13 @@ Copt::memoryPick();
 			return array('interfaceids' => $interfaceids);
 	}
 
-	public function massAdd($data){
+	public function massAdd($data) {
 		$interfaces = zbx_toArray($data['interfaces']);
 		$hosts = zbx_toArray($data['hosts']);
 
 			$insertData = array();
-			foreach($interfaces as $inum => $interface){
-				foreach($hosts as $hnum => $host){
+			foreach ($interfaces as $inum => $interface) {
+				foreach ($hosts as $hnum => $host) {
 					$newInterface = $interface;
 					$newInterface['hostid'] = $host['hostid'];
 

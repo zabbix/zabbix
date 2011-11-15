@@ -328,7 +328,6 @@ class CScript extends CZBXAPI{
 				$hosts = API::Host()->get($obj_params);
 
 				$result[$scriptid]['hosts'] = $hosts;
-
 			}
 		}
 

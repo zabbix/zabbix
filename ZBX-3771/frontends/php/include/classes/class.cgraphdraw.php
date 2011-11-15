@@ -50,7 +50,7 @@ class CGraphDraw{
 		$this->colorsrgb = null;
 		$this->im = null;
 
-		$this->period=3600;
+		$this->period = SEC_PER_HOUR;
 		$this->from=0;
 		$this->sizeX=900;				// default graph size X
 		$this->sizeY=200;				// default graph size Y

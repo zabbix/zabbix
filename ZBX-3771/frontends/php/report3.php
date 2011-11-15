@@ -26,7 +26,7 @@ $page['title'] = "S_IT_SERVICES_AVAILABILITY_REPORT";
 $page['file'] = 'report3.php';
 $page['hist_arg'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -134,7 +134,7 @@ include_once('include/page_header.php');
 					$wd	= date('w', $time);
 					$wd	= $wd == 0 ? 6 : $wd - 1;
 
-					return ($time + ($w*7 - $wd)*24*3600);
+					return $time + ($w * 7 - $wd) * SEC_PER_DAY;
 				}
 				function format_time($t){	return zbx_date2str(S_REPORT3_WEEKLY_DATE_FORMAT,$t);	}
 				function format_time2($t){	return format_time($t); };
@@ -155,22 +155,22 @@ include_once('include/page_header.php');
 
 		$ok 		= new CSpan(
 					sprintf('%dd %dh %dm',
-						$stat['ok_time']/(24*3600),
-						($stat['ok_time']%(24*3600))/3600,
-						($stat['ok_time']%(3600))/(60)),
+						$stat['ok_time'] / SEC_PER_DAY,
+						($stat['ok_time'] % SEC_PER_DAY) / SEC_PER_HOUR,
+						($stat['ok_time'] % SEC_PER_HOUR) / SEC_PER_MIN),
 					'off');
 
 		$problems	= new CSpan(
 					sprintf('%dd %dh %dm',
-						$stat['problem_time']/(24*3600),
-						($stat['problem_time']%(24*3600))/3600,
-						($stat['problem_time']%(3600))/(60)),
+						$stat['problem_time'] / SEC_PER_DAY,
+						($stat['problem_time'] % SEC_PER_DAY) / SEC_PER_HOUR,
+						($stat['problem_time'] % SEC_PER_HOUR) /SEC_PER_MIN),
 					'on');
 
 		$downtime	= sprintf('%dd %dh %dm',
-					$stat['downtime_time']/(24*3600),
-					($stat['downtime_time']%(24*3600))/3600,
-					($stat['downtime_time']%(3600))/(60));
+					$stat['downtime_time'] / SEC_PER_DAY,
+					($stat['downtime_time'] % SEC_PER_DAY) / SEC_PER_HOUR,
+					($stat['downtime_time'] % SEC_PER_HOUR) / SEC_PER_MIN);
 
 		$percentage	= new CSpan(sprintf('%2.2f%%',$stat['ok']) , 'off');
 
@@ -192,6 +192,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

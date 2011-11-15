@@ -25,9 +25,9 @@ require_once ('include/reports.inc.php');
 $page['title']	= "S_BAR_REPORTS";
 $page['file']	= 'report6.php';
 $page['hist_arg'] = array('period');
-$page['scripts'] = array('class.calendar.js','effects.js');
+$page['scripts'] = array('class.calendar.js');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -83,7 +83,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -148,8 +148,8 @@ include_once('include/page_header.php');
 <?php
 	$config = $_REQUEST['config'] = get_request('config',1);
 
-	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince',date('YmdHis', time()-86400)));
-	$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill',date('YmdHis')));
+	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince', date('YmdHis', time() - SEC_PER_DAY)));
+	$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill', date('YmdHis')));
 
 	$rep6_wdgt = new CWidget();
 // Header
@@ -218,6 +218,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

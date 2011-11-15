@@ -106,6 +106,7 @@ function inseret_javascript_for_editable_combobox() {
 
 	$js = '
 		function CEditableComboBoxInit(obj) {
+			// check if option exist
 			var opt = obj.options;
 			if (obj.value) {
 				obj.oldValue = obj.value;
@@ -115,16 +116,16 @@ function inseret_javascript_for_editable_combobox() {
 					return null;
 				}
 			}
+			// create option
 			opt = document.createElement("option");
 			opt.value = -1;
-			opt.text = "('._('other').' ...)";
-			if (!obj.options.add) {
-				obj.insertBefore(opt, obj.options.item(0));
+			if (IE) {
+				opt.innerHTML = "('._('other').' ...)";
 			}
 			else {
-				obj.options.add(opt, 0);
+				opt.text = "('._('other').' ...)";
 			}
-			return null;
+			obj.insertBefore(opt, obj.firstChild);
 		}
 
 		function CEditableComboBoxOnChange(obj, size) {
@@ -138,8 +139,9 @@ function inseret_javascript_for_editable_combobox() {
 				if (size && size > 0) {
 					new_obj.size = size;
 				}
-				new_obj.className = obj.className;
-				if(obj.oldValue) new_obj.value = obj.oldValue;
+				if (obj.oldValue) {
+					new_obj.value = obj.oldValue;
+				}
 				obj.parentNode.replaceChild(new_obj, obj);
 				new_obj.focus();
 				new_obj.select();

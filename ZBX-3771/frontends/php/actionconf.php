@@ -26,7 +26,7 @@ $page['title']		= 'S_CONFIGURATION_OF_ACTIONS';
 $page['file']		= 'actionconf.php';
 $page['hist_arg']	= array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
 ?>
@@ -217,7 +217,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		$new_opcondition = $_REQUEST['new_opcondition'];
 
 		try {
-			CAction::validateOperationConditions($new_condition);
+			CAction::validateOperationConditions($new_opcondition);
 			$new_operation = get_request('new_operation', array());
 
 			if (!isset($new_operation['opconditions'])) {
@@ -383,21 +383,38 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		}
 		else {
 			if (isset($_REQUEST['escalation']) && 0 == $_REQUEST['esc_period']) {
-				$_REQUEST['esc_period'] = 3600;
+				$_REQUEST['esc_period'] = SEC_PER_HOUR;
 			}
 
 			$action['name'] = get_request('name');
 			$action['eventsource'] = get_request('eventsource');
 			$action['evaltype'] = get_request('evaltype', 0);
-			$action['esc_period'] = get_request('esc_period', 3600);
+			$action['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
 			$action['status'] = get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
-			$action['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ);
-			$action['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG);
 			$action['recovery_msg'] = get_request('recovery_msg',0);
-			$action['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ);
-			$action['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG);
+			$action['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
+			$action['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG_TRIGGER);
 			$action['conditions'] = get_request('conditions', array());
 			$action['operations'] = get_request('operations', array());
+
+			if (isset($_REQUEST['actionid']) && isset($_REQUEST['form_refresh'])) {
+				$action['def_shortdata'] = get_request('def_shortdata');
+				$action['def_longdata'] = get_request('def_longdata');
+			}
+			else {
+				if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+					$action['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
+					$action['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_TRIGGER);
+				}
+				elseif ($eventsource == EVENT_SOURCE_DISCOVERY) {
+					$action['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_DISCOVERY);
+					$action['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_DISCOVERY);
+				}
+				elseif ($eventsource == EVENT_SOURCE_AUTO_REGISTRATION) {
+					$action['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_AUTOREG);
+					$action['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
+				}
+			}
 		}
 
 		if (!isset($action['actionid']) && !isset($_REQUEST['form_refresh'])) {
@@ -537,6 +554,6 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

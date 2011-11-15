@@ -31,7 +31,7 @@ $page['scripts'] = array('class.cviewswitcher.js');
 
 ob_start();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 if ($USER_DETAILS['alias'] == ZBX_GUEST_USER) {
 	access_deny();
@@ -47,7 +47,7 @@ $fields = array(
 	'autologin' =>			array(T_ZBX_INT, O_OPT, null, IN('1'), null),
 	'autologout' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(90,10000), null),
 	'url' =>				array(T_ZBX_STR, O_OPT, null, null, 'isset({save})'),
-	'refresh' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0,3600), 'isset({save})'),
+	'refresh' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_HOUR), 'isset({save})'),
 	'rows_per_page' =>		array(T_ZBX_INT, O_OPT, null, BETWEEN(1,999999), 'isset({save})'),
 	'change_password' =>	array(T_ZBX_STR, O_OPT, null, null, null),
 	'user_medias' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, null),
@@ -192,5 +192,5 @@ $usersView = new CView('administration.users.edit', $data);
 $usersView->render();
 $usersView->show();
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

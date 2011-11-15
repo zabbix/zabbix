@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-define('ZABBIX_VERSION',		'1.9.7');
+define('ZABBIX_VERSION',		'1.9.8');
 define('ZABBIX_API_VERSION',	'1.2');
 
 define('ZBX_LOGIN_ATTEMPTS',			5);
@@ -421,8 +421,23 @@ define('MEDIA_TYPE_EZ_TEXTING',	100);
 define('EZ_TEXTING_LIMIT_USA',		0);
 define('EZ_TEXTING_LIMIT_CANADA',	1);
 
-define('ACTION_DEFAULT_SUBJ',		'{TRIGGER.NAME}: {TRIGGER.STATUS}');
-define('ACTION_DEFAULT_MSG',		"{TRIGGER.NAME}: {TRIGGER.STATUS}\nLast value: {ITEM.LASTVALUE}\n\n{TRIGGER.URL}");
+define('ACTION_DEFAULT_SUBJ_TRIGGER', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
+define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOST.HOST}');
+define('ACTION_DEFAULT_SUBJ_DISCOVERY', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
+
+define('ACTION_DEFAULT_MSG_TRIGGER', "Trigger: {TRIGGER.NAME}\nTrigger status: {TRIGGER.STATUS}\n".
+		"Trigger severity: {TRIGGER.SEVERITY}\nTrigger URL: {TRIGGER.URL}\n\nItem values:\n\n".
+		"1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}\n".
+		"2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}\n".
+		"3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}"
+);
+define('ACTION_DEFAULT_MSG_AUTOREG', "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}");
+define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\nDevice IP:{DISCOVERY.DEVICE.IPADDRESS}\n".
+		"Device DNS: {DISCOVERY.DEVICE.DNS}\nDevice status: {DISCOVERY.DEVICE.STATUS}\n".
+		"Device uptime: {DISCOVERY.DEVICE.UPTIME}\n\nDevice service name: {DISCOVERY.SERVICE.NAME}\n".
+		"Device service port: {DISCOVERY.SERVICE.PORT}\nDevice service status: {DISCOVERY.SERVICE.STATUS}\n".
+		"Device service uptime: {DISCOVERY.SERVICE.UPTIME}"
+);
 
 define('ACTION_STATUS_ENABLED',		0);
 define('ACTION_STATUS_DISABLED',	1);
@@ -810,9 +825,9 @@ define('API_OUTPUT_CUSTOM', 	'custom');
 define('SEC_PER_MIN', 	60);
 define('SEC_PER_HOUR', 	3600);
 define('SEC_PER_DAY', 	86400);
-define('SEC_PER_WEEK', 	(7*SEC_PER_DAY));
-define('SEC_PER_MONTH', (30*SEC_PER_DAY));
-define('SEC_PER_YEAR', 	(365*SEC_PER_DAY));
+define('SEC_PER_WEEK', 	604800); // 7 * SEC_PER_DAY
+define('SEC_PER_MONTH', 2592000); // 30 * SEC_PER_DAY
+define('SEC_PER_YEAR', 	31536000); // 365 * SEC_PER_DAY
 
 // input fields
 define('ZBX_TEXTBOX_STANDARD_SIZE', 50);

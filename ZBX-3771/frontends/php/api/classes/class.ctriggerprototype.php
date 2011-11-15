@@ -1102,7 +1102,7 @@ COpt::memoryPick();
 				$expressionData = new CTriggerExpression(array('expression' => $trigger['expression']));
 
 				if(!empty($expressionData->errors)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->errors);
+					self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
 				}
 
 				if(API::Trigger()->exists(array(
@@ -1117,7 +1117,7 @@ COpt::memoryPick();
 			$this->createReal($triggers);
 
 			$createdTriggers = $this->get(array(
-				'triggerids' => array_keys($triggers),
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_REFER,
 				'selectItems' => API_OUTPUT_EXTEND
 			));
@@ -1136,8 +1136,10 @@ COpt::memoryPick();
 				}
 			}
 
-			foreach($triggers as $trigger)
+			foreach($triggers as $trigger) {
 				$this->inherit($trigger);
+				info(_s('Trigger "%1$s:%2$s" created.', $trigger['description'], $trigger['expression']));
+			}
 
 			return array('triggerids' => $triggerids);
 	}
@@ -1194,7 +1196,7 @@ COpt::memoryPick();
 			$this->updateReal($triggers);
 
 			$updatedTriggers = $this->get(array(
-				'triggerids' => array_keys($triggers),
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_REFER,
 				'selectItems' => API_OUTPUT_EXTEND
 			));
@@ -1226,10 +1228,10 @@ COpt::memoryPick();
  * @param array $triggerids array with trigger ids
  * @return array
  */
-	public function delete($triggerids, $nopermissions=false){
+	public function delete($triggerids, $nopermissions=false) {
 		$triggerids = zbx_toArray($triggerids);
 
-			if(empty($triggerids)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
+			if (empty($triggerids)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter.');
 
 			$options = array(
 				'triggerids' => $triggerids,
@@ -1240,13 +1242,13 @@ COpt::memoryPick();
 			$del_triggers = $this->get($options);
 
 // TODO: remove $nopermissions hack
-			if(!$nopermissions){
-				foreach($triggerids as $gnum => $triggerid){
-					if(!isset($del_triggers[$triggerid])){
+			if (!$nopermissions) {
+				foreach ($triggerids as $gnum => $triggerid) {
+					if (!isset($del_triggers[$triggerid])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 					}
 
-					if($del_triggers[$triggerid]['templateid'] != 0){
+					if ($del_triggers[$triggerid]['templateid'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							sprintf(_('Cannot delete templated trigger [%1$s:%2$s]'),
 								$del_triggers[$triggerid]['description'],
@@ -1258,14 +1260,14 @@ COpt::memoryPick();
 
 // get child triggers
 			$parent_triggerids = $triggerids;
-			do{
-				$db_items = DBselect('SELECT triggerid FROM triggers WHERE ' . DBcondition('templateid', $parent_triggerids));
+			do {
+				$db_items = DBselect('SELECT triggerid FROM triggers WHERE '.DBcondition('templateid', $parent_triggerids));
 				$parent_triggerids = array();
-				while($db_trigger = DBfetch($db_items)){
+				while ($db_trigger = DBfetch($db_items)) {
 					$parent_triggerids[] = $db_trigger['triggerid'];
 					$triggerids[$db_trigger['triggerid']] = $db_trigger['triggerid'];
 				}
-			} while(!empty($parent_triggerids));
+			} while (!empty($parent_triggerids));
 
 
 // select all triggers which are deleted (include childs)
@@ -1311,7 +1313,7 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach($del_triggers as $triggerid => $trigger){
-				info(_s('Trigger prototype [%1$s:%2$s] deleted.', $trigger['description'], explode_exp($trigger['expression'])));
+				info(_s('Trigger prototype "%1$s:%2$s" deleted.', $trigger['description'], explode_exp($trigger['expression'])));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 			}
 
@@ -1343,7 +1345,7 @@ COpt::memoryPick();
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(sprintf(_('Trigger [%1$s:%2$s] created.'), $trigger['description'], $trigger['expression']));
+			info(sprintf(_('Trigger prototype [%1$s:%2$s] created.'), $trigger['description'], $trigger['expression']));
 		}
 
 	}
@@ -1360,7 +1362,7 @@ COpt::memoryPick();
 		$dbTriggers = $this->get($options);
 
 		$description_changed = $expression_changed = false;
-		foreach($triggers as $tnum => &$trigger){
+		foreach($triggers as &$trigger){
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 
 			if(isset($trigger['description']) && (strcmp($dbTrigger['description'], $trigger['description']) != 0)){
@@ -1380,7 +1382,7 @@ COpt::memoryPick();
 				$expressionData = new CTriggerExpression(array('expression' => $expression_full));
 
 				if(!empty($expressionData->errors)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->errors);
+					self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
 				}
 
 				$host = reset($expressionData->data['hosts']);
@@ -1394,7 +1396,7 @@ COpt::memoryPick();
 				$triggers_exist = API::Trigger()->get($options);
 
 				$trigger_exist = false;
-				foreach($triggers_exist as $tnum => $tr){
+				foreach($triggers_exist as $tr){
 					$tmp_exp = explode_exp($tr['expression']);
 					if(strcmp($tmp_exp, $expression_full) == 0){
 						$trigger_exist = $tr;
@@ -1411,6 +1413,9 @@ COpt::memoryPick();
 				delete_function_by_triggerid($trigger['triggerid']);
 
 				$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid']);
+				if(is_null($trigger['expression'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $expression_full));
+				}
 
 				if(isset($trigger['status']) && ($trigger['status'] != TRIGGER_STATUS_ENABLED)){
 					if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL){

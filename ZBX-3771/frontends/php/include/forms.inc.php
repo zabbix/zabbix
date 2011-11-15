@@ -59,7 +59,7 @@
 		$delayBox->addItem(600,'600');
 		$delayBox->addItem(900,'900');
 
-		$form->addRow(S_UPDATE_INTERVAL_IN_SEC, $delayBox);
+		$form->addRow(_('Update interval (in sec)'), $delayBox);
 
 		$tblSteps = new CTableInfo(S_NO_SLIDES_DEFINED);
 		$tblSteps->setHeader(array(S_SCREEN, S_DELAY, S_SORT));
@@ -147,37 +147,6 @@
 		$form->addItemToBottomRow(new CButtonCancel());
 
 		return $form;
-	}
-
-
-	function insert_httpstep_form(){
-		$form = new CFormTable(S_STEP_OF_SCENARIO, null, 'post');
-		$form->setHelp("web.webmon.httpconf.php");
-
-		$form->addVar('dstfrm', get_request('dstfrm', null));
-		$form->addVar('stepid', get_request('stepid', null));
-		$form->addVar('list_name', get_request('list_name', null));
-
-		$stepid = get_request('stepid', null);
-		$name = get_request('name', '');
-		$url = get_request('url', '');
-		$posts = get_request('posts', '');
-		$timeout = get_request('timeout', 15);
-		$required = get_request('required', '');
-		$status_codes = get_request('status_codes', '');
-
-		$form->addRow(S_NAME, new CTextBox('name', $name, 50));
-		$form->addRow(S_URL, new CTextBox('url', $url, 80));
-		$form->addRow(S_POST, new CTextArea('posts', $posts, 50, 10));
-		$form->addRow(S_TIMEOUT, new CNumericBox('timeout', $timeout, 5));
-		$form->addRow(S_REQUIRED, new CTextBox('required', $required, 80));
-		$form->addRow(S_STATUS_CODES, new CTextBox('status_codes', $status_codes, 80));
-
-		$form->addItemToBottomRow(new CSubmit("save", isset($stepid) ? S_SAVE : S_ADD));
-
-		$form->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
-
-		$form->show();
 	}
 
 	function getUserFormData($userid, $isProfile = false) {
@@ -616,7 +585,7 @@
 
 		$col_table2->addRow(array($col21, $cmbType));
 	//second row
-		$label221 = new CSpan(bold(S_UPDATE_INTERVAL_IN_SEC.': '));
+		$label221 = new CSpan(bold(_('Update interval (in sec)').': '));
 		$label221->setAttribute('id', 'filter_delay_label');
 
 		$field221 = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
@@ -1198,29 +1167,40 @@
 
 		if(count($applications)==0) array_push($applications, 0);
 
-		if(isset($_REQUEST['itemid'])){
+		if (isset($_REQUEST['itemid'])) {
 			$caption = array();
 			$itemid = $_REQUEST['itemid'];
-			do{
-				$sql = 'SELECT i.itemid, i.templateid, h.name'.
-						' FROM items i, hosts h'.
-						' WHERE i.itemid='.$itemid.
-							' AND h.hostid=i.hostid';
-				$itemFromDb = DBfetch(DBselect($sql));
-				if($itemFromDb){
-					if(bccomp($_REQUEST['itemid'], $itemid) == 0){
+			do {
+				$item = API::Item()->get(array(
+					'itemids' => $itemid,
+					'output' => array('itemid', 'templateid', ),
+					'selectHosts' => array('name'),
+					'selectDiscoveryRule' => array('itemid')
+				));
+				$item = reset($item);
+				$host = reset($item['hosts']);
+				if ($item) {
+					if (bccomp($_REQUEST['itemid'], $itemid) == 0) {
 						$caption[] = SPACE;
-						$caption[] = $itemFromDb['name'];
+						$caption[] = $host['name'];
 					}
-					else{
+					// item prototype
+					elseif ($item['discoveryRule']) {
 						$caption[] = ' : ';
-						$caption[] = new CLink($itemFromDb['name'], 'items.php?form=update&itemid='.$itemFromDb['itemid'], 'highlight underline');
+						$caption[] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline');
+					}
+					// plain item
+					else {
+						$caption[] = ' : ';
+						$caption[] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline');
 					}
 
-					$itemid = $itemFromDb['templateid'];
+					$itemid = $item['templateid'];
 				}
-				else break;
-			}while($itemid != 0);
+				else {
+					break;
+				}
+			} while ($itemid != 0);
 
 			$caption[] = ($parent_discoveryid) ? S_ITEM_PROTOTYPE.' "' : S_ITEM.' "';
 			$caption = array_reverse($caption);
@@ -1229,8 +1209,9 @@
 			$caption[] = '"';
 			$frmItem->setTitle($caption);
 		}
-		else
+		else {
 			$frmItem->setTitle(_s('Item %1$s : %2$s', $hostname, $name));
+		}
 
 		if (!$parent_discoveryid) {
 			$frmItem->addVar('form_hostid', $hostid);
@@ -1387,7 +1368,7 @@
 		}
 
 		$cmbAuthType = new CComboBox('authtype', $authtype);
-		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD,S_PASSWORD);
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
 		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY,S_PUBLIC_KEY);
 
 		$row = new CRow(array(new CCol(S_AUTHENTICATION_METHOD,'form_row_l'), new CCol($cmbAuthType,'form_row_r')));
@@ -1419,7 +1400,7 @@
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
 
-		$row = new CRow(array(new CCol(S_PASSWORD,'form_row_l'), new CCol(new CTextBox('password',$password,16),'form_row_r')));
+		$row = new CRow(array(new CCol(_('Password'), 'form_row_l'), new CCol(new CTextBox('password', $password, 16), 'form_row_r')));
 		$row->setAttribute('id', 'row_password');
 		$frmItem->addRow($row);
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'password');
@@ -1536,7 +1517,7 @@
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_multiplier');
 
 
-		$row = new CRow(array(new CCol(S_UPDATE_INTERVAL_IN_SEC,'form_row_l'), new CCol(new CNumericBox('delay',$delay,5),'form_row_r')));
+		$row = new CRow(array(new CCol(_('Update interval (in sec)'), 'form_row_l'), new CCol(new CNumericBox('delay', $delay, 5), 'form_row_r')));
 		$row->setAttribute('id', 'row_delay');
 		$frmItem->addRow($row);
 		foreach($types as $it => $ilabel) {
@@ -1913,7 +1894,7 @@
 
 
 		$cmbAuthType = new CComboBox('authtype', $authtype);
-		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, S_PASSWORD);
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
 		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY, S_PUBLIC_KEY);
 		$frmItem->addRow(
 			array(new CVisibilityBox('authtype_visible', get_request('authtype_visible'), 'authtype', S_ORIGINAL), S_AUTHENTICATION_METHOD),
@@ -1932,7 +1913,7 @@
 			new CTextBox('privatekey', $privatekey, 40)
 		);
 		$frmItem->addRow(
-			array(new CVisibilityBox('password_visible', get_request('password_visible'), 'password', S_ORIGINAL), S_PASSWORD),
+			array(new CVisibilityBox('password_visible', get_request('password_visible'), 'password', S_ORIGINAL), _('Password')),
 			new CTextBox('password', $password, 40)
 		);
 
@@ -1940,7 +1921,7 @@
 			S_CUSTOM_MULTIPLIER.' (0 - '.S_DISABLED.')'), new CTextBox('formula',$formula,40));
 
 		$frmItem->addRow(array( new CVisibilityBox('delay_visible', get_request('delay_visible'), 'delay', S_ORIGINAL),
-			S_UPDATE_INTERVAL_IN_SEC), new CNumericBox('delay',$delay,5));
+			_('Update interval (in sec)')), new CNumericBox('delay', $delay, 5));
 
 		$delay_flex_el = new CSpan($delay_flex_el);
 		$delay_flex_el->setAttribute('id', 'delay_flex_list');
@@ -2276,14 +2257,15 @@
 				$comments	= $trigger['comments'];
 				$url		= $trigger['url'];
 
-				$trigs=DBselect('SELECT t.triggerid,t.description,t.expression '.
-							' FROM triggers t,trigger_depends d '.
-							' WHERE t.triggerid=d.triggerid_up '.
-								' AND d.triggerid_down='.$_REQUEST['triggerid']);
-
-				while($trig=DBfetch($trigs)){
-					if(uint_in_array($trig['triggerid'],$dependencies))	continue;
-					array_push($dependencies,$trig['triggerid']);
+				$trigs = DBselect('SELECT t.triggerid,t.description'.
+					' FROM triggers t,trigger_depends d'.
+					' WHERE t.triggerid=d.triggerid_up'.
+						' AND d.triggerid_down='.$_REQUEST['triggerid']);
+				while ($trig = DBfetch($trigs)) {
+					if (uint_in_array($trig['triggerid'], $dependencies)) {
+						continue;
+					}
+					array_push($dependencies, $trig['triggerid']);
 				}
 			}
 		}
@@ -2481,14 +2463,19 @@
 
 		if(!$parent_discoveryid){
 // dependencies
-			foreach($dependencies as $val){
+			$deps = API::Trigger()->get(array(
+				'triggerids' => $dependencies,
+				'output' => array('triggerid', 'description'),
+				'preservekeys' => true,
+			));
+			foreach($deps as $dep){
 				array_push($dep_el,
 					array(
-						new CCheckBox('rem_dependence['.$val.']', 'no', null, strval($val)),
-						expand_trigger_description($val)
+						new CCheckBox('rem_dependence['.$dep['triggerid'].']', 'no', null, strval($dep['triggerid'])),
+						$dep['description']
 					),
 					BR());
-				$frmTrig->addVar('dependencies[]',strval($val));
+				$frmTrig->addVar('dependencies[]',strval($dep['triggerid']));
 			}
 
 			if(count($dep_el)==0)
@@ -2541,9 +2528,6 @@
 		}
 		$buttons[] = new CButtonCancel(url_param('groupid').url_param("hostid").url_param("parent_discoveryid"));
 		$frmTrig->addItemToBottomRow($buttons);
-
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
 
 		$script = "function addPopupValues(list){
 						if(!isset('object', list)) return false;
@@ -2999,15 +2983,15 @@
 
 		// start time
 		if (isset($new_timeperiod['start_time'])) {
-			$new_timeperiod['hour'] = floor($new_timeperiod['start_time'] / 3600);
-			$new_timeperiod['minute'] = floor(($new_timeperiod['start_time'] - ($new_timeperiod['hour'] * 3600)) / 60);
+			$new_timeperiod['hour'] = floor($new_timeperiod['start_time'] / SEC_PER_HOUR);
+			$new_timeperiod['minute'] = floor(($new_timeperiod['start_time'] - ($new_timeperiod['hour'] * SEC_PER_HOUR)) / SEC_PER_MIN);
 		}
 
 		// period
 		if (isset($new_timeperiod['period'])) {
-			$new_timeperiod['period_days'] = floor($new_timeperiod['period'] / 86400);
-			$new_timeperiod['period_hours'] = floor(($new_timeperiod['period'] - ($new_timeperiod['period_days'] * 86400)) / 3600);
-			$new_timeperiod['period_minutes'] = floor(($new_timeperiod['period'] - $new_timeperiod['period_days'] * 86400 - $new_timeperiod['period_hours'] * 3600) / 60);
+			$new_timeperiod['period_days'] = floor($new_timeperiod['period'] / SEC_PER_DAY);
+			$new_timeperiod['period_hours'] = floor(($new_timeperiod['period'] - ($new_timeperiod['period_days'] * SEC_PER_DAY)) / SEC_PER_HOUR);
+			$new_timeperiod['period_minutes'] = floor(($new_timeperiod['period'] - $new_timeperiod['period_days'] * SEC_PER_DAY - $new_timeperiod['period_hours'] * SEC_PER_HOUR) / SEC_PER_MIN);
 		}
 
 		// daysofweek
@@ -3231,7 +3215,7 @@
 			$perHours->addItem($i, $i.SPACE);
 		}
 		$perMinutes = new CComboBox('new_timeperiod[period_minutes]', $new_timeperiod['period_minutes']);
-		for ($i = 0; $i < 60; $i++) {
+		for ($i = 0; $i < SEC_PER_MIN; $i++) {
 			$perMinutes->addItem($i, $i.SPACE);
 		}
 		$tblPeriod->addRow(array(

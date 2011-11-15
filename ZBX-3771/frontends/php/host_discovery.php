@@ -29,7 +29,7 @@ $page['file'] = 'host_discovery.php';
 $page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array('hostid');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 // needed type to know which field name to use
@@ -51,12 +51,12 @@ switch($itemType) {
 		'item_filter_macro'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'item_filter_value'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
 		'key'=>				array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,		'isset({save})'),
-		'delay'=>			array(T_ZBX_INT, O_OPT,  null,  '(('.BETWEEN(1,86400).
+		'delay'=>			array(T_ZBX_INT, O_OPT,  null,  '(('.BETWEEN(1, SEC_PER_DAY).
 				'(!isset({delay_flex}) || !({delay_flex}) || is_array({delay_flex}) && !count({delay_flex}))) ||'.
-				'('.BETWEEN(0,86400).'isset({delay_flex})&&is_array({delay_flex})&&count({delay_flex})>0))&&',
+				'('.BETWEEN(0, SEC_PER_DAY).'isset({delay_flex})&&is_array({delay_flex})&&count({delay_flex})>0))&&',
 				'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.'))'),
 		'new_delay_flex'=>		array(T_ZBX_STR, O_OPT,  NOT_EMPTY,  '',	'isset({add_delay_flex})&&(isset({type})&&({type}!=2))'),
-		'rem_delay_flex'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),null),
+		'rem_delay_flex'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0, SEC_PER_DAY),null),
 		'delay_flex'=>		array(T_ZBX_STR, O_OPT,  null,  '',null),
 		'status'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
 		'type'=>			array(T_ZBX_INT, O_OPT,  null,
@@ -163,7 +163,7 @@ switch($itemType) {
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -539,7 +539,7 @@ switch($itemType) {
 
 // Authentication method
 		$cmbAuthType = new CComboBox('authtype', $authtype);
-		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD,S_PASSWORD);
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
 		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY,S_PUBLIC_KEY);
 
 		$frmItem->addRow(S_AUTHENTICATION_METHOD, $cmbAuthType, null, 'row_authtype');
@@ -566,7 +566,7 @@ switch($itemType) {
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
 
 // Password
-		$frmItem->addRow(S_PASSWORD, new CTextBox('password',$password,16), null, 'row_password');
+		$frmItem->addRow(_('Password'), new CTextBox('password', $password, 16), null, 'row_password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'password');
@@ -621,7 +621,7 @@ switch($itemType) {
 		), null);
 
 // Update interval (in sec)
-		$frmItem->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox('delay',$delay,5), null, 'row_delay');
+		$frmItem->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $delay, 5), null, 'row_delay');
 		foreach($type_keys as $it) {
 			if($it == ITEM_TYPE_TRAPPER) continue;
 			zbx_subarray_push($typeVisibility, $it, 'delay');
@@ -816,6 +816,6 @@ switch($itemType) {
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

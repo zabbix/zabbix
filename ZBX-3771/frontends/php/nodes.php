@@ -26,7 +26,7 @@
 	$page['file'] = 'nodes.php';
 	$page['hist_arg'] = array();
 
-	include_once('include/page_header.php');
+	require_once('include/page_header.php');
 ?>
 <?php
 	$fields=array(
@@ -147,7 +147,7 @@
 				$ip = $node_data['ip'];
 				$port = $node_data['port'];
 				$masterid = $node_data['masterid'];
-				$node_type = detect_node_type($node_data);
+				$node_type = detect_node_type($node_data['nodeid'], $node_data['masterid']);
 			}
 			else{
 				$new_nodeid = get_request('new_nodeid', 0);
@@ -244,5 +244,5 @@
 	$nodes_wdgt->show();
 
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

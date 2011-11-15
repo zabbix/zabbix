@@ -27,8 +27,4 @@ dist-hook:
 	cat $(srcdir)/dbpatches/2.0/mysql/patch/* >$(distdir)/dbpatches/2.0/mysql/patch.sql
 	cat $(srcdir)/dbpatches/2.0/oracle/patch/* >$(distdir)/dbpatches/2.0/oracle/patch.sql
 	cat $(srcdir)/dbpatches/2.0/postgresql/patch/* >$(distdir)/dbpatches/2.0/postgresql/patch.sql
-	cat $(srcdir)/dbpatches/2.0/ibm_db2/optional/* >$(distdir)/dbpatches/2.0/ibm_db2/optional.sql
-	cat $(srcdir)/dbpatches/2.0/mysql/optional/* >$(distdir)/dbpatches/2.0/mysql/optional.sql
-	cat $(srcdir)/dbpatches/2.0/oracle/optional/* >$(distdir)/dbpatches/2.0/oracle/optional.sql
-	cat $(srcdir)/dbpatches/2.0/postgresql/optional/* >$(distdir)/dbpatches/2.0/postgresql/optional.sql
 	cp $(srcdir)/dbpatches/2.0/mysql/upgrade $(distdir)/dbpatches/2.0/mysql/

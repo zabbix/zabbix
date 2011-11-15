@@ -969,9 +969,9 @@ COpt::memoryPick();
  * @param array $graphs['graphids']
  * @return boolean
  */
-	public function delete($graphids, $nopermissions=false){
+	public function delete($graphids, $nopermissions = false) {
 
-			if(empty($graphids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter'));
+			if (empty($graphids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 
 			$graphids = zbx_toArray($graphids);
 
@@ -984,31 +984,31 @@ COpt::memoryPick();
 			);
 			$del_graphs = $this->get($options);
 
-			if(!$nopermissions){
-				foreach($graphids as $graphid){
-					if(!isset($del_graphs[$graphid]))
+			if (!$nopermissions) {
+				foreach ($graphids as $graphid) {
+					if (!isset($del_graphs[$graphid]))
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-					if($del_graphs[$graphid]['templateid'] != 0){
+					if ($del_graphs[$graphid]['templateid'] != 0) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated graphs'));
 					}
 				}
 			}
 
 			$parent_graphids = $graphids;
-			do{
-				$db_graphs = DBselect('SELECT graphid FROM graphs WHERE ' . DBcondition('templateid', $parent_graphids));
+			do {
+				$db_graphs = DBselect('SELECT graphid FROM graphs WHERE '.DBcondition('templateid', $parent_graphids));
 				$parent_graphids = array();
-				while($db_graph = DBfetch($db_graphs)){
+				while ($db_graph = DBfetch($db_graphs)) {
 					$parent_graphids[] = $db_graph['graphid'];
 					$graphids[$db_graph['graphid']] = $db_graph['graphid'];
 				}
-			} while(!empty($parent_graphids));
+			} while (!empty($parent_graphids));
 
 
 			$created_graphs = array();
 			$sql = 'SELECT graphid FROM graph_discovery WHERE '.DBcondition('parent_graphid', $graphids);
 			$db_graphs = DBselect($sql);
-			while($graph = DBfetch($db_graphs)){
+			while ($graph = DBfetch($db_graphs)) {
 				$created_graphs[$graph['graphid']] = $graph['graphid'];
 			}
 			if(!empty($created_graphs)){

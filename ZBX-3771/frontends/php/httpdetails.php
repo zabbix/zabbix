@@ -27,13 +27,13 @@
 	$page['title'] = 'S_DETAILS_OF_SCENARIO';
 	$page['file'] = 'httpdetails.php';
 	$page['hist_arg'] = array('httptestid');
-	$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
+	$page['scripts'] = array('class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
-	include_once('include/page_header.php');
+	require_once('include/page_header.php');
 ?>
 <?php
 
@@ -73,7 +73,7 @@
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 ?>
@@ -325,5 +325,5 @@
 
 ?>
 <?php
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

@@ -27,7 +27,7 @@ $page['title'] = _('Media types');
 $page['file'] = 'media_types.php';
 $page['hist_arg'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 $fields = array(
@@ -213,5 +213,5 @@ else {
 	$mediaTypeView->show();
 }
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>
