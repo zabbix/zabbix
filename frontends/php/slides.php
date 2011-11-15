@@ -31,7 +31,7 @@ $page['scripts'] = array('class.pmaster.js', 'class.calendar.js', 'gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -174,7 +174,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 ?>
@@ -364,6 +364,6 @@ include_once('include/page_header.php');
 		$slides_wdgt->show();
 	}
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

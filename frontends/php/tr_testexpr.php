@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-include_once('include/config.inc.php');
+require_once('include/config.inc.php');
 require_once('include/triggers.inc.php');
 
 $page['title'] = S_TEST;
@@ -35,7 +35,7 @@ $definedErrorPhrases = array(
 			EXPRESSION_HOST_ITEM_UNKNOWN => S_EXPRESSION_HOST_ITEM_UNKNOWN,
 			EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //----------------------------------------------------------------------
@@ -129,10 +129,7 @@ include_once('include/page_header.php');
 
 	ksort($rplcts, SORT_NUMERIC);
 
-	//$exprs = make_disp_tree($tree, $map);
 	foreach($eHTMLTree as $e){
-		//if(!isset($e['expression']))
-			//continue;
 		$result = '-';
 		if($allowedTesting && $test && isset($e['expression'])){
 			$result = evalExpressionData($e['expression']['value'], $macrosData, $octet);
@@ -177,6 +174,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

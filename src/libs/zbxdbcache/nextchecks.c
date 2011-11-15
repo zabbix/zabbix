@@ -200,7 +200,6 @@ void	DCflush_nextchecks()
 		size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 		objectid_clock_t 	*events = NULL;
 		int			events_alloc, events_num = 0;
-		zbx_uint64_t		events_maxid;
 		DC_TRIGGER		*trigger;
 		char			*error_esc;
 
@@ -245,22 +244,27 @@ void	DCflush_nextchecks()
 			zbx_free(trigger->expression);
 		}
 
-		for (i = 0; i < events_num; i++)
+		if (0 != events_num)
 		{
-			events_maxid = DBget_maxid("events");
+			zbx_uint64_t	eventid;
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into events (eventid,source,object,objectid,clock,value,value_changed)"
-					" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d);\n",
-					events_maxid,
-					EVENT_SOURCE_TRIGGERS,
-					EVENT_OBJECT_TRIGGER,
-					events[i].objectid,
-					events[i].clock,
-					TRIGGER_VALUE_UNKNOWN,
-					TRIGGER_VALUE_CHANGED_NO);
+			eventid = DBget_maxid_num("events", events_num);
 
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			for (i = 0; i < events_num; i++)
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"insert into events (eventid,source,object,objectid,clock,value,value_changed)"
+						" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d);\n",
+						eventid++,
+						EVENT_SOURCE_TRIGGERS,
+						EVENT_OBJECT_TRIGGER,
+						events[i].objectid,
+						events[i].clock,
+						TRIGGER_VALUE_UNKNOWN,
+						TRIGGER_VALUE_CHANGED_NO);
+
+				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			}
 		}
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);

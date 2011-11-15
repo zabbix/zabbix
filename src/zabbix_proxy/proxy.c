@@ -180,8 +180,6 @@ char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 
-int	CONFIG_NS_SUPPORT		= 0;
-
 /* Zabbix server startup time */
 int	CONFIG_SERVER_STARTUP_TIME	= 0;
 
@@ -575,7 +573,7 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
-	DBconnect(ZBX_DB_CONNECT_EXIT);
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	DCsync_configuration();
 	DBclose();
 
@@ -772,7 +770,7 @@ void	zbx_on_exit()
 #endif
 
 #ifdef HAVE_SQLITE3
-	php_sem_remove(&sqlite_access);
+	zbx_remove_sqlite3_mutex();
 #endif
 
 	free_selfmon_collector();

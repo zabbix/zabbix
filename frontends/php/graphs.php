@@ -29,7 +29,7 @@ $page['file'] = 'graphs.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -93,27 +93,34 @@ include_once('include/page_header.php');
 	$_REQUEST['go'] = get_request('go', 'none');
 
 // PERMISSIONS
-	if(get_request('graphid', false)){
+	if (get_request('graphid', false)) {
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
+			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'graphids' => $_REQUEST['graphid'],
-			'editable' => 1
+			'editable' => true,
+			'preservekeys' => true
 		);
 		$graphs = API::Graph()->get($options);
-		if(empty($graphs)) access_deny();
+		if(empty($graphs)) {
+			access_deny();
+		}
 	}
-	else if(get_request('hostid', 0) > 0){
+	elseif (get_request('hostid', 0) > 0) {
 		$options = array(
 			'hostids' => $_REQUEST['hostid'],
 			'output' => API_OUTPUT_EXTEND,
-			'templated_hosts' => 1,
-			'editable' => 1
+			'templated_hosts' => true,
+			'editable' => true,
+			'preservekeys' => true
 		);
 		$hosts = API::Host()->get($options);
-		if(empty($hosts)) access_deny();
+		if(empty($hosts)) {
+			access_deny();
+		}
 	}
-?>
-<?php
+
+
 	$_REQUEST['items'] = get_request('items', array());
 	$_REQUEST['group_gid'] = get_request('group_gid', array());
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
@@ -336,8 +343,8 @@ include_once('include/page_header.php');
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 // ----</ACTIONS>----
-?>
-<?php
+
+
 	$options = array(
 		'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
 		'hosts' => array('editable' => 1, 'templated_hosts' => 1),
@@ -348,8 +355,8 @@ include_once('include/page_header.php');
 	$pageFilter = new CPageFilter($options);
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 	$_REQUEST['hostid'] = $pageFilter->hostid;
-?>
-<?php
+
+
 	$form = new CForm('get');
 
 // Config
@@ -545,9 +552,9 @@ include_once('include/page_header.php');
 		$graphs_wdgt->show();
 	}
 
-?>
-<?php
 
-include_once('include/page_footer.php');
+
+
+require_once('include/page_footer.php');
 
 ?>

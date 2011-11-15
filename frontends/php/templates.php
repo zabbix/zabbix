@@ -42,7 +42,7 @@ else{
 	$page['hist_arg'] = array('groupid');
 }
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
@@ -425,6 +425,21 @@ include_once('include/page_header.php');
 					$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
 				}
 				if(!$result) throw new Exception();
+
+				// clone discovery rules
+				$discoveryRules = API::DiscoveryRule()->get(array(
+					'hostids' => $clone_templateid,
+					'inherited' => false,
+				));
+				if ($discoveryRules) {
+					$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
+						'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
+						'hostids' => array($templateid)
+					));
+					if (!$copyDiscoveryRules) {
+						throw new Exception();
+					}
+				}
 			}
 
 			if(!DBend(true)) throw new Exception();
@@ -754,6 +769,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

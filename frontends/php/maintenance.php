@@ -29,7 +29,7 @@ $page['file'] = 'maintenance.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.calendar.js');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -112,7 +112,7 @@ elseif (isset($_REQUEST['save'])) {
 		$msg2 = _('Cannot add maintenance');
 	}
 
-	$active_since = zbxDateToTime(get_request('active_since', date('YmdHis')));
+	$active_since = zbxDateToTime(get_request('active_since', date('YmdHi')));
 	$active_till = zbxDateToTime(get_request('active_till'));
 
 	$isValid = true;
@@ -188,10 +188,10 @@ elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])
 	$new_timeperiod['start_date'] = zbxDateToTime($new_timeperiod['start_date']);
 
 	// start time
-	$new_timeperiod['start_time'] = ($new_timeperiod['hour'] * 3600) + ($new_timeperiod['minute'] * 60);
+	$new_timeperiod['start_time'] = ($new_timeperiod['hour'] * SEC_PER_HOUR) + ($new_timeperiod['minute'] * SEC_PER_MIN);
 
 	// period
-	$new_timeperiod['period'] = ($new_timeperiod['period_days'] * 86400) + ($new_timeperiod['period_hours'] * 3600) + ($new_timeperiod['period_minutes'] * 60);
+	$new_timeperiod['period'] = ($new_timeperiod['period_days'] * SEC_PER_DAY) + ($new_timeperiod['period_hours'] * SEC_PER_HOUR) + ($new_timeperiod['period_minutes'] * SEC_PER_MIN);
 
 	// days of week
 	if (!isset($new_timeperiod['dayofweek'])) {
@@ -305,7 +305,7 @@ elseif (isset($_REQUEST['edit_timeperiodid'])) {
 	if (isset($_REQUEST['timeperiods'][$edit_timeperiodid])) {
 		$_REQUEST['new_timeperiod'] = $_REQUEST['timeperiods'][$edit_timeperiodid];
 		$_REQUEST['new_timeperiod']['id'] = $edit_timeperiodid;
-		$_REQUEST['new_timeperiod']['start_date'] = date('YmdHis', $_REQUEST['timeperiods'][$edit_timeperiodid]['start_date']);
+		$_REQUEST['new_timeperiod']['start_date'] = date('YmdHi', $_REQUEST['timeperiods'][$edit_timeperiodid]['start_date']);
 	}
 }
 
@@ -380,8 +380,8 @@ if (!empty($data['form'])) {
 	else {
 		$data['mname'] = get_request('mname', '');
 		$data['maintenance_type'] = get_request('maintenance_type', 0);
-		$data['active_since'] = zbxDateToTime(get_request('active_since', date('YmdHis')));
-		$data['active_till'] = zbxDateToTime(get_request('active_till', date('YmdHis', time() + 86400)));
+		$data['active_since'] = zbxDateToTime(get_request('active_since', date('YmdHi')));
+		$data['active_till'] = zbxDateToTime(get_request('active_till', date('YmdHi', time() + SEC_PER_DAY)));
 		$data['description'] = get_request('description', '');
 		$data['timeperiods'] = get_request('timeperiods', array());
 		$data['hostids'] = get_request('hostids', array());
@@ -474,5 +474,5 @@ else {
 	$maintenanceView->show();
 }
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

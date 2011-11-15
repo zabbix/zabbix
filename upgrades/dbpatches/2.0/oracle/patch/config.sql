@@ -3,7 +3,6 @@ ALTER TABLE config MODIFY alert_usrgrpid DEFAULT NULL;
 ALTER TABLE config MODIFY alert_usrgrpid NULL;
 ALTER TABLE config MODIFY discovery_groupid DEFAULT NULL;
 ALTER TABLE config MODIFY default_theme nvarchar2(128) DEFAULT 'css_ob.css' NOT NULL;
-ALTER TABLE config ADD ns_support number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE config ADD severity_color_0 nvarchar2(6) DEFAULT 'DBDBDB';
 ALTER TABLE config ADD severity_color_1 nvarchar2(6) DEFAULT 'D6F6FF';
 ALTER TABLE config ADD severity_color_2 nvarchar2(6) DEFAULT 'FFF6A5';

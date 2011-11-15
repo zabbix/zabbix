@@ -784,9 +784,6 @@
 //	chart4.php
 	'S_CHART4_TIMELINE_DATE_FORMAT'=>	_('d.M'),
 
-//	chart5.php
-	'S_CHART5_TIMELINE_DATE_FORMAT'=>	_('d.M'),
-
 //	chart_bar.php
 	'S_CHARTBAR_HOURLY_DATE_FORMAT'=>		_('Y.m.d H:i'),
 	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		_('Y.m.d'),
@@ -826,7 +823,6 @@
 //	locales.php
 	'S_CREATE'=>				_('Create'),
 
-
 //	report4.php
 	'S_NOTIFICATIONS_BIG'=>			_('NOTIFICATIONS'),
 	'S_IT_NOTIFICATIONS'=>			_('Notification report'),
@@ -834,12 +830,6 @@
 	'S_REPORT4_MONTHLY_DATE_FORMAT'=>	_('M Y'),
 	'S_REPORT4_DAILY_DATE_FORMAT'=>		_('d M Y'),
 	'S_REPORT4_WEEKLY_DATE_FORMAT'=>	_('d M Y H:i'),
-
-//	report5.php
-	'S_TRIGGERS_TOP_100'=>			_('Most busy triggers top 100'),
-	'S_TRIGGERS_TOP_100_BIG'=>		_('MOST BUSY TRIGGERS TOP 100'),
-	'S_NUMBER_OF_STATUS_CHANGES'=>		_('Number of status changes'),
-	'S_WEEK'=>				_('Week'),
 
 //	report6.php
 	'S_BAR_REPORTS'=>			_('Bar reports'),
@@ -1173,14 +1163,6 @@
 	'S_EXPRESSION_PART_ERROR'=>			_('Error'),
 	'S_EXPRESSION_PART_NO_ERROR'=>			_('No errors found'),
 	'S_EXPRESSION_SYNTAX_ERROR'=> 			_('Expression Syntax Error'),
-	'S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR'=>_('Unexpected end of element'),
-	'S_CHECK_EXPRESSION_PART_STARTING_FROM_PART1'=>	_('Check expression part starting from \''),
-	'S_CHECK_EXPRESSION_PART_STARTING_FROM_PART2'=>	_('\''),
-	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR'=>_('Not allowed symbols or sequence of symbols in expression element detected'),
-	'S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR'=>_('Not allowed value detected in element'),
-	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>_('Unnecessary symbols detected'),
-	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>_('Not allowed symbols detected after element'),
-	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>_('Not allowed symbols detected before element'),
 
 //	tr_logform.php
 	'S_INCLUDE_S'=>		_('Include'),
@@ -1263,21 +1245,9 @@
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					_('No trigger with'),
 	'S_EXPRESSION_CANNOT_BE_EMPTY'=>			_('Expression cannot be empty'),
-	'S_INCORRECT_VALUE_TYPE'=>				_('Incorrect value type'),
-	'S_FOR_FUNCTION_SMALL'=>				_('for function'),
-	'S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL'=>	_('available only for items with value types'),
-	'S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION'=>		_('Missing mandatory parameter for function'),
-	'S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL'=> _('is not a float or macro for function'),
-	'S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL'=>	_('is not a float or counter or macro for function'),
 	'S_INCORRECT_TRIGGER_EXPRESSION'=>			_('Incorrect trigger expression'),
-	'S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR'=>		_('You can not use template hosts in mixed expressions.'),
 	'S_INCORRECT_FUNCTION_IS_USED'=>			_('Incorrect function is used'),
 	'S_0_OR_1'=>						_('0 or 1'),
-	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	_('At least one item must be present in the trigger expression.'),
-	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		_('Host does not exist.'),
-	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		_('Host key does not exist.'),
-	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	_('Function \''),
-	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	_('\' does not accept parameters.'),
 
 //	maps.inc.php
 	'S_SUBMAP'=>			_('Submap'),

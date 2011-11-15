@@ -825,9 +825,9 @@ define('API_OUTPUT_CUSTOM', 	'custom');
 define('SEC_PER_MIN', 	60);
 define('SEC_PER_HOUR', 	3600);
 define('SEC_PER_DAY', 	86400);
-define('SEC_PER_WEEK', 	(7*SEC_PER_DAY));
-define('SEC_PER_MONTH', (30*SEC_PER_DAY));
-define('SEC_PER_YEAR', 	(365*SEC_PER_DAY));
+define('SEC_PER_WEEK', 	604800); // 7 * SEC_PER_DAY
+define('SEC_PER_MONTH', 2592000); // 30 * SEC_PER_DAY
+define('SEC_PER_YEAR', 	31536000); // 365 * SEC_PER_DAY
 
 // input fields
 define('ZBX_TEXTBOX_STANDARD_SIZE', 50);
