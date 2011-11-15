@@ -75,7 +75,7 @@ require_once 'include/page_header.php';
 	imagefilledrectangle($im,0,0,$sizeX,$sizeY,imagecolorallocate($im,120,200,120));
 
 	$now=time(NULL);
-	$period_start=$now-7*86400;
+	$period_start = $now - SEC_PER_WEEK;
 	$period_end=$now;
 	$stat=calculate_service_availability($_REQUEST['serviceid'],$period_start,$period_end);
 

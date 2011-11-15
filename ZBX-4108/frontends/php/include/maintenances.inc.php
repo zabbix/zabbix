@@ -42,8 +42,8 @@ function timeperiod_type2str($timeperiod_type) {
 }
 
 function shedule2str($timeperiod) {
-	$timeperiod['hour'] = floor($timeperiod['start_time'] / 3600);
-	$timeperiod['minute'] = floor(($timeperiod['start_time'] - ($timeperiod['hour'] * 3600)) / 60);
+	$timeperiod['hour'] = floor($timeperiod['start_time'] / SEC_PER_HOUR);
+	$timeperiod['minute'] = floor(($timeperiod['start_time'] - ($timeperiod['hour'] * SEC_PER_HOUR)) / SEC_PER_MIN);
 	if ($timeperiod['hour'] < 10) {
 		$timeperiod['hour'] = '0'.$timeperiod['hour'];
 	}

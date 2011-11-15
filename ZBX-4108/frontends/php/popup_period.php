@@ -58,8 +58,8 @@ require_once 'include/page_header.php';
 	insert_js_function('add_period');
 	insert_js_function('update_period');
 
-	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince',date('YmdHis', time()-86400)));
-	$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill',date('YmdHis')));
+	$_REQUEST['report_timesince'] = zbxDateToTime(get_request('report_timesince', date('YmdHis', time() - SEC_PER_DAY)));
+	$_REQUEST['report_timetill'] = zbxDateToTime(get_request('report_timetill', date('YmdHis')));
 
 	$_REQUEST['caption'] = get_request('caption','');
 	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['report_timesince']) && isset($_REQUEST['report_timetill'])){
@@ -99,8 +99,8 @@ require_once 'include/page_header.php';
 		$caption	= get_request('caption', 	'');
 		$color		= get_request('color', 		'009900');
 
-		$report_timesince = get_request('report_timesince',time()-86400);
-		$report_timetill = get_request('report_timetill',time());
+		$report_timesince = get_request('report_timesince', time() - SEC_PER_DAY);
+		$report_timetill = get_request('report_timetill', time());
 
 		$frmPd->addVar('config',$config);
 		$frmPd->addVar('report_timesince', date('YmdHis', $report_timesince));

@@ -1633,7 +1633,7 @@ require_once('include/js.inc.php');
 
 							preg_match('/([+-]{1})([\d]{1,2}):([\d]{1,2})/', $item['lastvalue'], $arr);
 							if (!empty($arr)) {
-								$timeZone = $arr[2] * 3600 + $arr[3] * 60;
+								$timeZone = $arr[2] * SEC_PER_HOUR + $arr[3] * SEC_PER_MIN;
 								if ($arr[1] == '-') {
 									$timeZone = 0 - $timeZone;
 								}

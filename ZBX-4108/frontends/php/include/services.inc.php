@@ -305,7 +305,7 @@
 
 	function expand_periodical_service_times(&$data, $period_start, $period_end, $ts_from, $ts_to, $type = 'ut') {
 		// calculate period FROM '-1 week' to know period name for $period_start
-		for ($curr = ($period_start - (7 * 24 * 3600)); $curr <= $period_end; $curr += 86400) {
+		for ($curr = $period_start - SEC_PER_WEEK; $curr <= $period_end; $curr += SEC_PER_DAY) {
 			$curr_date = getdate($curr);
 			$from_date = getdate($ts_from);
 

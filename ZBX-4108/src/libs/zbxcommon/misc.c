@@ -1262,27 +1262,6 @@ int	int_in_list(char *list, int value)
 
 /******************************************************************************
  *                                                                            *
- * Function: cmp_double                                                       *
- *                                                                            *
- * Purpose: compares two double values                                        *
- *                                                                            *
- * Parameters: a, b - doubles to compare                                      *
- *                                                                            *
- * Return value:  0 - the values are equal                                    *
- *                1 - otherwise                                               *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: equal == differs less than 0.000001                              *
- *                                                                            *
- ******************************************************************************/
-int	cmp_double(double a,double b)
-{
-	return fabs(a - b) < 0.000001 ? 0 : 1;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: is_double_prefix                                                 *
  *                                                                            *
  * Purpose: check if the string is double                                     *
