@@ -40,20 +40,40 @@ function get_style(el,styleProp) {
 }
 
 // Getting text width in user's browser
-function get_real_text_width(text) {
-	var test_element = document.createElement('a');
-	test_element.setAttribute('class', 'pum_iheader');
+function get_real_text_width(text, id) {
+	var item_type = 'pum_o_submenu';
+	if (id==0) {
+		item_type = 'pum_iheader';
+	}
+
+	var test_element = document.createElement('div');
+	test_element.setAttribute('class', item_type);
 	test_element.setAttribute('style', 'visibility: hidden');
-	test_element.innerHTML = text;
 	document.body.appendChild(test_element);
 
-	// Get digits from 'font-size' value
-	var font_size = parseInt(get_style(test_element, 'font-size').split('px')[0]);
-	font_size++;
+	var font_size_text = get_style(test_element, 'font-size');
+	if (!font_size_text) {
+		font_size_text = get_style(test_element, 'fontSize');
+	}
 
-	var margin_left = parseInt(get_style(test_element, 'margin-left').split('px')[0]);
+	var font_size = parseInt(font_size_text);
+	font_size += 2;
 
+	var margin_left_text = get_style(test_element, 'margin-left');
+	if (!margin_left_text) {
+		margin_left_text = get_style(test_element, 'marginLeft');
+	}
+
+	var margin_left = parseInt(margin_left_text);
+
+	document.body.removeChild(test_element);
+
+	test_element = document.createElement('a');
+	test_element.setAttribute('class', item_type);
 	test_element.setAttribute('style', 'font-size: '+font_size+'px; visibility: hidden');
+	test_element.innerHTML = text;
+
+	document.body.appendChild(test_element);
 
 	var tmp_len = test_element.offsetWidth+margin_left;
 
@@ -69,7 +89,7 @@ function show_popup_menu(e, content, width){
 	var max_width = 0;
 
 	for (i=0;i<content.length;i++) {
-		tmp_width = get_real_text_width(content[i][0]);
+		tmp_width = get_real_text_width(content[i][0], i);
 
 		if (max_width<tmp_width) {
 			max_width = tmp_width;
