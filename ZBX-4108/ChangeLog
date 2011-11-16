@@ -16,6 +16,7 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-4244] fixed inline-block container resizing in object lists in IE8 (pavels)
  - [ZBX-4297] fixed error in top 100 triggers report (Vedmak)
  - [ZBX-4258] fixed link to the template prototype item in the caption of the item editing form (pavels)
  - [ZBX-3510] fixed discovery and it's prototype cloning when cloning a host or template (pavels)
@@ -24,7 +25,7 @@ Bug fixes:
  - [ZBX-3468] fixed error messages and warnings with enabled SQLite3 support in front-end (Alexei)
  - [ZBX-4056] fixed dependencies not added when template linked to host (Vedmak)
  - [ZBX-4315] fixed the 'close' link in the tooltips (pavels)
- - [ZBX-3675] fixed items created via api for template have wrong interfaceid on linked host (Vedmak)
+ - [ZBX-3675] fixed items created via API for template have wrong interfaceid on linked host (Vedmak)
  - [ZBX-4212] fixed creation of trigger expression with "])" in item key (Vedmak)
  - [ZBXNEXT-675] reduced surrounding whitespace for Switch, Cloud, Crypto-router, UPS, Hub and Router map icons (Elvis, Richlv)
  - [ZBX-4305] removed CREDITS file (Richlv)
@@ -321,11 +322,17 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.9rc2
+
+ - [ZBX-4352] fixed template linking when mass updating hosts (pavels,Vedmak)
+
 Changes for 1.8.9rc1
 
  - [ZBX-4325] fixed maintenance periods saved with nonzero seconds (asaveljevs,Vedmak)
  - [ZBX-4345] fixed counting of recursive dependency levels for triggers (asaveljevs)
  - [ZBX-4027] fixed floating-point comparison and unified epsilon in trigger functions and expressions (asaveljevs)
+ - [ZBX-3551] fixed image XML export for Postgres (pavels)
+ - [ZBX-3625] fixed validation of aggregated item keys (Sasha)
  - [ZBX-3117] fixed error notification when unsuccessfully copying a graph (pavels)
  - [ZBX-4326] API now returns error when trying to create incorrect host profile field (Vedmak)
  - [ZBX-4323] fixed host profile not created with host using API (Vedmak)
