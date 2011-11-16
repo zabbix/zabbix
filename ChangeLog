@@ -16,6 +16,7 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-4108] updated FSF mailing address (Richlv)
  - [ZBX-4244] fixed inline-block container resizing in object lists in IE8 (pavels)
  - [ZBX-4297] fixed error in top 100 triggers report (Vedmak)
  - [ZBX-4258] fixed link to the template prototype item in the caption of the item editing form (pavels)
