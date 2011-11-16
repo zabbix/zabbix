@@ -111,7 +111,7 @@ for ($i = 0; $i < 52; $i++) {
 		$period_end = time();
 	}
 
-	$stat = calculate_service_availability($_REQUEST['serviceid'], $period_start, $period_end);
+	$stat = calculateServiceAvailability($_REQUEST['serviceid'], $period_start, $period_end);
 
 	$problem[$i] = $stat['problem'];
 	$ok[$i] = $stat['ok'];

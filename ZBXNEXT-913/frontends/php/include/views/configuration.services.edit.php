@@ -118,13 +118,13 @@ foreach ($this->data['service_times'] as $serviceTime) {
 	switch ($serviceTime['type']) {
 		case SERVICE_TIME_TYPE_UPTIME:
 			$type = new CSpan(_('Uptime'), 'enabled');
-			$from = zbx_date2str(_('l H:i'), $serviceTime['from']);
-			$to = zbx_date2str(_('l H:i'), $serviceTime['to']);
+			$from = dowHrMinToStr($serviceTime['from']);
+			$to = dowHrMinToStr($serviceTime['to']);
 			break;
 		case SERVICE_TIME_TYPE_DOWNTIME:
 			$type = new CSpan(_('Downtime'), 'disabled');
-			$from = zbx_date2str(_('l H:i'), $serviceTime['from']);
-			$to = zbx_date2str(_('l H:i'), $serviceTime['to']);
+			$from = dowHrMinToStr($serviceTime['from']);
+			$to = dowHrMinToStr($serviceTime['to']);
 			break;
 		case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
 			$type = new CSpan(_('One-time downtime'), 'disabled');
@@ -210,16 +210,9 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 else {
 	$weekFromComboBox = new CComboBox('new_service_time[from_week]', !empty($ZBX_MESSAGES) ? $_REQUEST['new_service_time']['from_week'] : 'Sunday');
 	$weekToComboBox = new CComboBox('new_service_time[to_week]', !empty($ZBX_MESSAGES) ? $_REQUEST['new_service_time']['to_week'] : 'Sunday');
-	foreach (array(
-		'Sunday' => _('Sunday'),
-		'Monday' => _('Monday'),
-		'Tuesday' => _('Tuesday'),
-		'Wednesday' => _('Wednesday'),
-		'Thursday' => _('Thursday'),
-		'Friday' => _('Friday'),
-		'Saturday' => _('Saturday')) as $day_number => $day_string) {
-		$weekFromComboBox->addItem($day_number, $day_string);
-		$weekToComboBox->addItem($day_number, $day_string);
+	for ($dow = 0; $dow < 7; $dow++) {
+		$weekFromComboBox->addItem($dow, getDayOfWeekCaption($dow));
+		$weekToComboBox->addItem($dow, getDayOfWeekCaption($dow));
 	}
 	$timeFromHourTextBox = new CTextBox('new_service_time[from_hour]', !empty($ZBX_MESSAGES) ? $_REQUEST['new_service_time']['from_hour'] : '', 2, 'no', 2);
 	$timeFromHourTextBox->setAttribute('placeholder', _('hh'));

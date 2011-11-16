@@ -151,7 +151,7 @@ include_once('include/page_header.php');
 		if(($end = get_time($t+1)) > time())
 			$end = time();
 
-		$stat = calculate_service_availability($service['serviceid'],$start,$end);
+		$stat = calculateServiceAvailability($service['serviceid'], $start, $end);
 
 		$ok 		= new CSpan(
 					sprintf('%dd %dh %dm',
