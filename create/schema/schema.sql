@@ -14,7 +14,7 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with this program; if not, write to the Free Software
--- Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --
 
 --
@@ -492,7 +492,6 @@ FIELD		|dropdown_first_remember|t_integer|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|discovery_groupid|t_id		|	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|2|groups	|groupid	|RESTRICT
 FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
 FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_SYNC
-FIELD		|ns_support	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|severity_color_0|t_varchar(6)	|'DBDBDB'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_color_1|t_varchar(6)	|'D6F6FF'|NOT NULL	|ZBX_SYNC
 FIELD		|severity_color_2|t_varchar(6)	|'FFF6A5'|NOT NULL	|ZBX_SYNC

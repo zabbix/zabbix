@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -174,9 +174,6 @@ int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
-
-/* From 'config' table - no need to cache ns_support */
-int	CONFIG_NS_SUPPORT		= 0;
 
 /* Zabbix server startup time */
 int	CONFIG_SERVER_STARTUP_TIME	= 0;
@@ -546,13 +543,7 @@ int	MAIN_ZABBIX_ENTRY()
 	zbx_create_sqlite3_mutex(CONFIG_DBNAME);
 #endif
 
-	DBconnect(ZBX_DB_CONNECT_EXIT);
-
-	result = DBselect("select ns_support from config where 1=1" DB_NODE, DBnode_local("configid"));
-
-	if (NULL != (row = DBfetch(result)))
-		CONFIG_NS_SUPPORT = atoi(row[0]);
-	DBfree_result(result);
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	if (0 != CONFIG_NODEID)
 	{

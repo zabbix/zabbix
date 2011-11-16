@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -30,7 +30,7 @@ $page['file'] = 'services.php';
 $page['scripts'] = array();
 $page['hist_arg'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 
@@ -57,7 +57,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -149,6 +149,6 @@ include_once('include/page_header.php');
 	$tr_ov_menu[] = array('test1',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$tr_ov_menu[] = array('test2',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

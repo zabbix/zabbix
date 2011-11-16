@@ -15,14 +15,14 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
 
-include_once('include/config.inc.php');
-include_once('include/services.inc.php');
-include_once('include/triggers.inc.php');
+require_once('include/config.inc.php');
+require_once('include/services.inc.php');
+require_once('include/triggers.inc.php');
 
 $page['title'] = "S_IT_SERVICES";
 $page['file'] = 'services_form.php';
@@ -30,7 +30,7 @@ $page['scripts'] = array('class.calendar.js');
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 
 //---------------------------------- CHECKS ------------------------------------
@@ -168,7 +168,7 @@ if(isset($_REQUEST['saction'])){
 	}
 	if($result){
 		zbx_add_post_js("closeForm('services.php');");
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 	}
 }
 //-------------------------------------------- </ACTIONS> --------------------------------------------
@@ -348,7 +348,7 @@ if(isset($_REQUEST['sform'])){
 		}
 		//sdi($new_service_time);
 		while($new_service_time['to'] && ($new_service_time['to'] <= $new_service_time['from']))
-			$new_service_time['to'] += 7*24*3600;
+			$new_service_time['to'] += SEC_PER_WEEK;
 
 		//validating service times that were entered
 		if ($new_service_time['to'] == false){
@@ -762,6 +762,6 @@ if(isset($_REQUEST['sform'])){
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

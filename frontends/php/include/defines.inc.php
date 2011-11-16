@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -825,9 +825,9 @@ define('API_OUTPUT_CUSTOM', 	'custom');
 define('SEC_PER_MIN', 	60);
 define('SEC_PER_HOUR', 	3600);
 define('SEC_PER_DAY', 	86400);
-define('SEC_PER_WEEK', 	(7*SEC_PER_DAY));
-define('SEC_PER_MONTH', (30*SEC_PER_DAY));
-define('SEC_PER_YEAR', 	(365*SEC_PER_DAY));
+define('SEC_PER_WEEK', 	604800); // 7 * SEC_PER_DAY
+define('SEC_PER_MONTH', 2592000); // 30 * SEC_PER_DAY
+define('SEC_PER_YEAR', 	31536000); // 365 * SEC_PER_DAY
 
 // input fields
 define('ZBX_TEXTBOX_STANDARD_SIZE', 50);
