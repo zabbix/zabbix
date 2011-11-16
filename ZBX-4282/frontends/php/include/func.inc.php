@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -229,6 +229,9 @@ function zbx_date2age($start_date, $end_date = 0, $utime = false) {
 function zbxDateToTime($strdate) {
 	if (6 == sscanf($strdate, '%04d%02d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes, $seconds)) {
 		return mktime($hours, $minutes, $seconds, $month, $date, $year);
+	}
+	elseif (5 == sscanf($strdate, '%04d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes)) {
+		return mktime($hours, $minutes, 0, $month, $date, $year);
 	}
 	else {
 		return time();

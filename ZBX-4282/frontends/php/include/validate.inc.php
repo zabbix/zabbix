@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -580,10 +580,10 @@
 		if (empty($msg)) {
 			$msg = _('Zabbix has received an incorrect request.');
 		}
-		include_once('include/page_header.php');
+		require_once('include/page_header.php');
 		unset_all();
 		show_error_message($msg);
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 	}
 
 	function check_fields(&$fields, $show_messages = true) {

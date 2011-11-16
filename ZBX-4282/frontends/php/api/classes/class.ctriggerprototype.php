@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -1117,7 +1117,7 @@ COpt::memoryPick();
 			$this->createReal($triggers);
 
 			$createdTriggers = $this->get(array(
-				'triggerids' => array_keys($triggers),
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_REFER,
 				'selectItems' => API_OUTPUT_EXTEND
 			));
@@ -1136,8 +1136,10 @@ COpt::memoryPick();
 				}
 			}
 
-			foreach($triggers as $trigger)
+			foreach($triggers as $trigger) {
 				$this->inherit($trigger);
+				info(_s('Trigger "%1$s:%2$s" created.', $trigger['description'], $trigger['expression']));
+			}
 
 			return array('triggerids' => $triggerids);
 	}
@@ -1194,7 +1196,7 @@ COpt::memoryPick();
 			$this->updateReal($triggers);
 
 			$updatedTriggers = $this->get(array(
-				'triggerids' => array_keys($triggers),
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_REFER,
 				'selectItems' => API_OUTPUT_EXTEND
 			));
@@ -1311,7 +1313,7 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach($del_triggers as $triggerid => $trigger){
-				info(_s('Trigger prototype [%1$s:%2$s] deleted.', $trigger['description'], explode_exp($trigger['expression'])));
+				info(_s('Trigger prototype "%1$s:%2$s" deleted.', $trigger['description'], explode_exp($trigger['expression'])));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 			}
 
@@ -1343,7 +1345,7 @@ COpt::memoryPick();
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(sprintf(_('Trigger [%1$s:%2$s] created.'), $trigger['description'], $trigger['expression']));
+			info(sprintf(_('Trigger prototype [%1$s:%2$s] created.'), $trigger['description'], $trigger['expression']));
 		}
 
 	}

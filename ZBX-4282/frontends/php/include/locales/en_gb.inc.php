@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -151,9 +151,6 @@
 //	actionconf.php
 	'S_CONFIGURATION_OF_ACTIONS'=>		_('Configuration of actions'),
 	'S_FILTER'=>				_('Filter'),
-	'S_TIME_PERIOD'=>			_('Time period'),
-	'S_MAX_VALUE_SMALL'=>			_('max value'),
-	'S_MIN_VALUE_SMALL'=>			_('min value'),
 	'S_CONDITION'=>				_('Condition'),
 
 //	actions.php
@@ -204,9 +201,6 @@
 	'S_PERIOD'=>				_('Period'),
 
 //	class.cchart.php
-	'S_CCHARTS_TIMELINE_HOURS_FORMAT'=>			_('H:i'),
-	'S_CCHARTS_TIMELINE_DAYS_FORMAT'=>			_('D'),
-	'S_CCHARTS_TIMELINE_MONTHDAYS_FORMAT'=>			_('d.m'),
 	'S_CCHARTS_TIMELINE_START_DATE_FORMAT'=>		_('d.m H:i'),
 	'S_CCHARTS_TIMELINE_END_DATE_FORMAT'=>			_('d.m H:i'),
 	'S_CCHARTS_TIMELINE_MAINPERIOD_HOURS_FORMAT'=>		_('H:i'),
@@ -784,9 +778,6 @@
 //	chart4.php
 	'S_CHART4_TIMELINE_DATE_FORMAT'=>	_('d.M'),
 
-//	chart5.php
-	'S_CHART5_TIMELINE_DATE_FORMAT'=>	_('d.M'),
-
 //	chart_bar.php
 	'S_CHARTBAR_HOURLY_DATE_FORMAT'=>		_('Y.m.d H:i'),
 	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		_('Y.m.d'),
@@ -826,7 +817,6 @@
 //	locales.php
 	'S_CREATE'=>				_('Create'),
 
-
 //	report4.php
 	'S_NOTIFICATIONS_BIG'=>			_('NOTIFICATIONS'),
 	'S_IT_NOTIFICATIONS'=>			_('Notification report'),
@@ -834,12 +824,6 @@
 	'S_REPORT4_MONTHLY_DATE_FORMAT'=>	_('M Y'),
 	'S_REPORT4_DAILY_DATE_FORMAT'=>		_('d M Y'),
 	'S_REPORT4_WEEKLY_DATE_FORMAT'=>	_('d M Y H:i'),
-
-//	report5.php
-	'S_TRIGGERS_TOP_100'=>			_('Most busy triggers top 100'),
-	'S_TRIGGERS_TOP_100_BIG'=>		_('MOST BUSY TRIGGERS TOP 100'),
-	'S_NUMBER_OF_STATUS_CHANGES'=>		_('Number of status changes'),
-	'S_WEEK'=>				_('Week'),
 
 //	report6.php
 	'S_BAR_REPORTS'=>			_('Bar reports'),

@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -1258,27 +1258,6 @@ int	int_in_list(char *list, int value)
 			zbx_result_string(ret));
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: cmp_double                                                       *
- *                                                                            *
- * Purpose: compares two double values                                        *
- *                                                                            *
- * Parameters: a, b - doubles to compare                                      *
- *                                                                            *
- * Return value:  0 - the values are equal                                    *
- *                1 - otherwise                                               *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: equal == differs less than 0.000001                              *
- *                                                                            *
- ******************************************************************************/
-int	cmp_double(double a,double b)
-{
-	return fabs(a - b) < 0.000001 ? 0 : 1;
 }
 
 /******************************************************************************
