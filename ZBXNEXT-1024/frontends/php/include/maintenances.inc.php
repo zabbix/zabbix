@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -42,8 +42,8 @@ function timeperiod_type2str($timeperiod_type) {
 }
 
 function shedule2str($timeperiod) {
-	$timeperiod['hour'] = floor($timeperiod['start_time'] / 3600);
-	$timeperiod['minute'] = floor(($timeperiod['start_time'] - ($timeperiod['hour'] * 3600)) / 60);
+	$timeperiod['hour'] = floor($timeperiod['start_time'] / SEC_PER_HOUR);
+	$timeperiod['minute'] = floor(($timeperiod['start_time'] - ($timeperiod['hour'] * SEC_PER_HOUR)) / SEC_PER_MIN);
 	if ($timeperiod['hour'] < 10) {
 		$timeperiod['hour'] = '0'.$timeperiod['hour'];
 	}

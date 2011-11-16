@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -1167,29 +1167,40 @@
 
 		if(count($applications)==0) array_push($applications, 0);
 
-		if(isset($_REQUEST['itemid'])){
+		if (isset($_REQUEST['itemid'])) {
 			$caption = array();
 			$itemid = $_REQUEST['itemid'];
-			do{
-				$sql = 'SELECT i.itemid, i.templateid, h.name'.
-						' FROM items i, hosts h'.
-						' WHERE i.itemid='.$itemid.
-							' AND h.hostid=i.hostid';
-				$itemFromDb = DBfetch(DBselect($sql));
-				if($itemFromDb){
-					if(bccomp($_REQUEST['itemid'], $itemid) == 0){
+			do {
+				$item = API::Item()->get(array(
+					'itemids' => $itemid,
+					'output' => array('itemid', 'templateid', ),
+					'selectHosts' => array('name'),
+					'selectDiscoveryRule' => array('itemid')
+				));
+				$item = reset($item);
+				$host = reset($item['hosts']);
+				if ($item) {
+					if (bccomp($_REQUEST['itemid'], $itemid) == 0) {
 						$caption[] = SPACE;
-						$caption[] = $itemFromDb['name'];
+						$caption[] = $host['name'];
 					}
-					else{
+					// item prototype
+					elseif ($item['discoveryRule']) {
 						$caption[] = ' : ';
-						$caption[] = new CLink($itemFromDb['name'], 'items.php?form=update&itemid='.$itemFromDb['itemid'], 'highlight underline');
+						$caption[] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline');
+					}
+					// plain item
+					else {
+						$caption[] = ' : ';
+						$caption[] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline');
 					}
 
-					$itemid = $itemFromDb['templateid'];
+					$itemid = $item['templateid'];
 				}
-				else break;
-			}while($itemid != 0);
+				else {
+					break;
+				}
+			} while ($itemid != 0);
 
 			$caption[] = ($parent_discoveryid) ? S_ITEM_PROTOTYPE.' "' : S_ITEM.' "';
 			$caption = array_reverse($caption);
@@ -1198,8 +1209,9 @@
 			$caption[] = '"';
 			$frmItem->setTitle($caption);
 		}
-		else
+		else {
 			$frmItem->setTitle(_s('Item %1$s : %2$s', $hostname, $name));
+		}
 
 		if(!$parent_discoveryid){
 			$frmItem->addVar('form_hostid', $hostid);
@@ -2971,15 +2983,15 @@
 
 		// start time
 		if (isset($new_timeperiod['start_time'])) {
-			$new_timeperiod['hour'] = floor($new_timeperiod['start_time'] / 3600);
-			$new_timeperiod['minute'] = floor(($new_timeperiod['start_time'] - ($new_timeperiod['hour'] * 3600)) / 60);
+			$new_timeperiod['hour'] = floor($new_timeperiod['start_time'] / SEC_PER_HOUR);
+			$new_timeperiod['minute'] = floor(($new_timeperiod['start_time'] - ($new_timeperiod['hour'] * SEC_PER_HOUR)) / SEC_PER_MIN);
 		}
 
 		// period
 		if (isset($new_timeperiod['period'])) {
-			$new_timeperiod['period_days'] = floor($new_timeperiod['period'] / 86400);
-			$new_timeperiod['period_hours'] = floor(($new_timeperiod['period'] - ($new_timeperiod['period_days'] * 86400)) / 3600);
-			$new_timeperiod['period_minutes'] = floor(($new_timeperiod['period'] - $new_timeperiod['period_days'] * 86400 - $new_timeperiod['period_hours'] * 3600) / 60);
+			$new_timeperiod['period_days'] = floor($new_timeperiod['period'] / SEC_PER_DAY);
+			$new_timeperiod['period_hours'] = floor(($new_timeperiod['period'] - ($new_timeperiod['period_days'] * SEC_PER_DAY)) / SEC_PER_HOUR);
+			$new_timeperiod['period_minutes'] = floor(($new_timeperiod['period'] - $new_timeperiod['period_days'] * SEC_PER_DAY - $new_timeperiod['period_hours'] * SEC_PER_HOUR) / SEC_PER_MIN);
 		}
 
 		// daysofweek
@@ -3203,7 +3215,7 @@
 			$perHours->addItem($i, $i.SPACE);
 		}
 		$perMinutes = new CComboBox('new_timeperiod[period_minutes]', $new_timeperiod['period_minutes']);
-		for ($i = 0; $i < 60; $i++) {
+		for ($i = 0; $i < SEC_PER_MIN; $i++) {
 			$perMinutes->addItem($i, $i.SPACE);
 		}
 		$tblPeriod->addRow(array(

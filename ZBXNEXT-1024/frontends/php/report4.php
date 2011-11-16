@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -157,7 +157,7 @@ require_once('include/page_header.php');
 					$wd	= date('w', $time);
 					$wd	= $wd == 0 ? 6 : $wd - 1;
 
-					return ($time + ($w*7 - $wd)*24*3600);
+					return $time + ($w * 7 - $wd) * SEC_PER_DAY;
 				}
 				function format_time($t){	return zbx_date2str(S_REPORT4_WEEKLY_DATE_FORMAT,$t);	}
 				function format_time2($t){	return format_time($t); }
