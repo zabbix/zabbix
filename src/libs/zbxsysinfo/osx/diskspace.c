@@ -21,8 +21,9 @@
 #include "sysinfo.h"
 #include "zbxjson.h"
 
-static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
-		zbx_uint64_t *used, double *pfree, double *pused)
+static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total,
+		zbx_uint64_t *used, double *pused,
+		zbx_uint64_t *free, double *pfree)
 {
 #ifdef HAVE_SYS_STATVFS_H
 #	define ZBX_STATFS	statvfs
@@ -33,32 +34,32 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 #endif
 	struct ZBX_STATFS	s;
 
-	assert(fs);
-
 	if (0 != ZBX_STATFS(fs, &s))
 		return SYSINFO_RET_FAIL;
 
-	if (total)
+	if (NULL != total)
 		*total = (zbx_uint64_t)s.f_blocks * s.ZBX_BSIZE;
-	if (free)
-		*free = (zbx_uint64_t)s.f_bavail * s.ZBX_BSIZE;
-	if (used)
+
+	if (NULL != used)
 		*used = (zbx_uint64_t)(s.f_blocks - s.f_bfree) * s.ZBX_BSIZE;
-	if (pfree)
+
+	if (NULL != pused)
 	{
 		if (0 != s.f_blocks - s.f_bfree + s.f_bavail)
-			*pfree = (double)(100.0 * s.f_bavail) /
-					(s.f_blocks - s.f_bfree + s.f_bavail);
-		else
-			*pfree = 0;
-	}
-	if (pused)
-	{
-		if (0 != s.f_blocks - s.f_bfree + s.f_bavail)
-			*pused = 100.0 - (double)(100.0 * s.f_bavail) /
-					(s.f_blocks - s.f_bfree + s.f_bavail);
+			*pused = 100.0 - (100.0 * s.f_bavail) / (s.f_blocks - s.f_bfree + s.f_bavail);
 		else
 			*pused = 0;
+	}
+
+	if (NULL != free)
+		*free = (zbx_uint64_t)s.f_bavail * s.ZBX_BSIZE;
+
+	if (NULL != pfree)
+	{
+		if (0 != s.f_blocks - s.f_bfree + s.f_bavail)
+			*pfree = (100.0 * s.f_bavail) / (s.f_blocks - s.f_bfree + s.f_bavail);
+		else
+			*pfree = 0;
 	}
 
 	return SYSINFO_RET_OK;
@@ -66,12 +67,12 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 
 static int	VFS_FS_TOTAL(const char *fs, AGENT_RESULT *result)
 {
-	zbx_uint64_t	value;
+	zbx_uint64_t	total;
 
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, &value, NULL, NULL, NULL, NULL))
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, &total, NULL, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, value);
+	SET_UI64_RESULT(result, total);
 
 	return SYSINFO_RET_OK;
 
@@ -79,48 +80,48 @@ static int	VFS_FS_TOTAL(const char *fs, AGENT_RESULT *result)
 
 static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
 {
-	zbx_uint64_t	value;
+	zbx_uint64_t	used;
 
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, &value, NULL, NULL))
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, &used, NULL, NULL, NULL))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, value);
+	SET_UI64_RESULT(result, used);
 
 	return SYSINFO_RET_OK;
 }
 
 static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
 {
-	double	value;
+	double	pused;
 
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, NULL, &value))
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, &pused, NULL, NULL))
 		return SYSINFO_RET_FAIL;
 
-	SET_DBL_RESULT(result, value);
+	SET_DBL_RESULT(result, pused);
 
 	return SYSINFO_RET_OK;
 }
 
 static int	VFS_FS_FREE(const char *fs, AGENT_RESULT *result)
 {
-	zbx_uint64_t	value;
+	zbx_uint64_t	free;
 
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, &value, NULL, NULL, NULL))
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, &free, NULL))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, value);
+	SET_UI64_RESULT(result, free);
 
 	return SYSINFO_RET_OK;
 }
 
 static int	VFS_FS_PFREE(const char *fs, AGENT_RESULT *result)
 {
-	double	value;
+	double	pfree;
 
-	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, &value, NULL))
+	if (SYSINFO_RET_OK != get_fs_size_stat(fs, NULL, NULL, NULL, NULL, &pfree))
 		return SYSINFO_RET_FAIL;
 
-	SET_DBL_RESULT(result, value);
+	SET_DBL_RESULT(result, pfree);
 
 	return SYSINFO_RET_OK;
 }
