@@ -1356,9 +1356,11 @@ class CTrigger extends CZBXAPI {
 					unset($trigger['status']);
 				}
 
-				$dbTrigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
-				if (array_equal($dbTrigger['dependencies'], $trigger['dependencies'])) {
-					unset($trigger['dependencies']);
+				if (isset($trigger['dependencies'])) {
+					$dbTrigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
+					if (array_equal($dbTrigger['dependencies'], $trigger['dependencies'])) {
+						unset($trigger['dependencies']);
+					}
 				}
 			}
 
@@ -1751,8 +1753,10 @@ class CTrigger extends CZBXAPI {
 				'where' => array('triggerid' => $trigger['triggerid'])
 			));
 
-			$expression = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
-			$infos[] = _s('Trigger "%1$s:%2$s" updated.', $trigger['description'], $expression);
+			// restore the full expression to properly validate dependencies
+			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
+
+			$infos[] = _s('Trigger "%1$s:%2$s" updated.', $trigger['description'], $trigger['expression']);
 		}
 		unset($trigger);
 
@@ -2053,14 +2057,20 @@ class CTrigger extends CZBXAPI {
 			// }}} check circular dependency
 
 
-			$expr = new CTriggerExpression($trigger);
+			if (isset($trigger['expression'])) {
+				$expr = new CTriggerExpression($trigger);
+				$hosts = $expr->data['hosts'];
+			}
+			else {
+				$hosts = array();
+			}
 
 			$templates = API::Template()->get(array(
 				'output' => array(
 					'hostid',
 					'host'
 				),
-				'filter' => array('host' => $expr->data['hosts']),
+				'filter' => array('host' => $hosts),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
