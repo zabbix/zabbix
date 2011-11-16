@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -119,7 +119,7 @@ require_once('include/page_header.php');
 			case 24*7:
 			case 24*30:
 			case 24*365:
-				$period_start = $period_end - ($period * 3600);
+				$period_start = $period_end - ($period * SEC_PER_HOUR);
 			break;
 		}
 

@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -348,7 +348,7 @@ if(isset($_REQUEST['sform'])){
 		}
 		//sdi($new_service_time);
 		while($new_service_time['to'] && ($new_service_time['to'] <= $new_service_time['from']))
-			$new_service_time['to'] += 7*24*3600;
+			$new_service_time['to'] += SEC_PER_WEEK;
 
 		//validating service times that were entered
 		if ($new_service_time['to'] == false){

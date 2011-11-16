@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -383,13 +383,13 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		}
 		else {
 			if (isset($_REQUEST['escalation']) && 0 == $_REQUEST['esc_period']) {
-				$_REQUEST['esc_period'] = 3600;
+				$_REQUEST['esc_period'] = SEC_PER_HOUR;
 			}
 
 			$action['name'] = get_request('name');
 			$action['eventsource'] = get_request('eventsource');
 			$action['evaltype'] = get_request('evaltype', 0);
-			$action['esc_period'] = get_request('esc_period', 3600);
+			$action['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
 			$action['status'] = get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
 			$action['recovery_msg'] = get_request('recovery_msg',0);
 			$action['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);

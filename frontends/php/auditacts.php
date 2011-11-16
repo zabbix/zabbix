@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -183,7 +183,7 @@ require_once('include/page_header.php');
 	$options['sortorder'] = ZBX_SORT_UP;
 	$firstAlert = API::Alert()->get($options);
 	$firstAlert = reset($firstAlert);
-	$starttime = $firstAlert ? $firstAlert['clock'] : time()-3600;
+	$starttime = $firstAlert ? $firstAlert['clock'] : time() - SEC_PER_HOUR;
 
 
 	$paging = getPagingLine($alerts);

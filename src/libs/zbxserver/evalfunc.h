@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #ifndef ZABBIX_EVALFUNC_H
@@ -23,10 +23,12 @@
 #include "common.h"
 #include "db.h"
 
-#define ZBX_FLAG_SEC			0
-#define ZBX_FLAG_VALUES			1
+#define ZBX_FLAG_SEC	0
+#define ZBX_FLAG_VALUES	1
 
-extern  int     CONFIG_SERVER_STARTUP_TIME;
+extern int     CONFIG_SERVER_STARTUP_TIME;
+
+int	cmp_double(double a, double b);
 
 int	evaluate_macro_function(char *value, const char *host, const char *key,
 		const char *function, const char *parameter);
