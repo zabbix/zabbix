@@ -20,23 +20,16 @@
 #include "common.h"
 #include "sysinfo.h"
 
-ZBX_METRIC	parameters_specific[] =
-/* 	KEY			FLAG		FUNCTION 	ADD_PARAM	TEST_PARAM */
+int	SYSTEM_BOOTTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL,	NULL},
-	{"kernel.maxproc",	0,		KERNEL_MAXPROC, 	NULL,	NULL},
+	int		mib[] = {CTL_KERN, KERN_BOOTTIME};
+	struct timeval	boottime;
+	size_t		len = sizeof(boottime);
 
-	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,		NULL,	"/,free"},
-	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		NULL,	"/,free"},
-	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL,	NULL},
+	if (0 != sysctl(mib, 2, &boottime, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
 
-	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		NULL,	"free"},
+	SET_UI64_RESULT(result, boottime.tv_sec);
 
-	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		NULL,	"online"},
-	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	NULL,	"all,avg1"},
-
-	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL,	NULL},
-	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL,	NULL},
-
-	{0}
-};
+	return SYSINFO_RET_OK;
+}

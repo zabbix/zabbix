@@ -23,13 +23,13 @@
 int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int		mib[] = {CTL_KERN, KERN_BOOTTIME};
-	struct timeval	uptime;
-	size_t		len = sizeof(uptime);
+	struct timeval	boottime;
+	size_t		len = sizeof(boottime);
 
-	if (0 != sysctl(mib, 2, &uptime, &len, NULL, 0))
+	if (0 != sysctl(mib, 2, &boottime, &len, NULL, 0))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, time(NULL) - uptime.tv_sec);
+	SET_UI64_RESULT(result, time(NULL) - boottime.tv_sec);
 
 	return SYSINFO_RET_OK;
 }
