@@ -119,7 +119,7 @@ function getDayOfWeekCaption($num) {
 }
 
 // Convert seconds (0..SEC_PER_WEEK) to string representation. For example, 212400 -> 'Tuesday 11:00'
-function dowHrMinToStr($value) {
+function dowHrMinToStr($value, $display24Hours = false) {
 	$dow = $value - $value % SEC_PER_DAY;
 	$hr = $value - $dow;
 	$hr -= $hr % SEC_PER_HOUR;
@@ -129,6 +129,11 @@ function dowHrMinToStr($value) {
 	$dow /= SEC_PER_DAY;
 	$hr /= SEC_PER_HOUR;
 	$min /= SEC_PER_MIN;
+
+	if ($display24Hours && $hr == 0 && $min == 0) {
+		$dow--;
+		$hr = 24;
+	}
 
 	return sprintf('%s %02d:%02d', getDayOfWeekCaption($dow), $hr, $min);
 }

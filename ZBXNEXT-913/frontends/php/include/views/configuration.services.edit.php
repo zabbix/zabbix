@@ -119,12 +119,12 @@ foreach ($this->data['service_times'] as $serviceTime) {
 		case SERVICE_TIME_TYPE_UPTIME:
 			$type = new CSpan(_('Uptime'), 'enabled');
 			$from = dowHrMinToStr($serviceTime['from']);
-			$to = dowHrMinToStr($serviceTime['to']);
+			$to = dowHrMinToStr($serviceTime['to'], true);
 			break;
 		case SERVICE_TIME_TYPE_DOWNTIME:
 			$type = new CSpan(_('Downtime'), 'disabled');
 			$from = dowHrMinToStr($serviceTime['from']);
-			$to = dowHrMinToStr($serviceTime['to']);
+			$to = dowHrMinToStr($serviceTime['to'], true);
 			break;
 		case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
 			$type = new CSpan(_('One-time downtime'), 'disabled');
