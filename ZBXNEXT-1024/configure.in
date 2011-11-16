@@ -883,14 +883,6 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-AC_MSG_CHECKING(for file /proc/1/status)
-if test -r /proc/1/status; then
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_PROC_1_STATUS,1,[Define to 1 if file '/proc/1/status' should be used.])
-else
-	AC_MSG_RESULT(no)
-fi
-
 dnl Solaris
 AC_MSG_CHECKING(for file /proc/0/psinfo)
 if test -r /proc/0/psinfo; then
