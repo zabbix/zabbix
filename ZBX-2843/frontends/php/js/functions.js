@@ -650,22 +650,22 @@ function create_page_menu(e,id){
 
 	var dbrd_menu = new Array();
 
-//to create a copy of array, but not references!!!!
-//alert(id+' : '+page_menu[id]);
-	for(var i=0; i < page_menu[id].length; i++){
-		if((typeof(page_menu[id][i]) != 'undefined') && !empty(page_menu[id][i]))
+	// to create a copy of array, but not references!!!!
+	for (var i=0; i < page_menu[id].length; i++) {
+		if (typeof(page_menu[id][i]) != 'undefined' && !empty(page_menu[id][i])) {
 			dbrd_menu[i] = page_menu[id][i].clone();
+		}
 	}
 
-	for(var i=0; i < page_submenu[id].length; i++){
-		if((typeof(page_submenu[id][i]) != 'undefined') && !empty(page_submenu[id][i])){
+	for (var i=0; i < page_submenu[id].length; i++) {
+		if (typeof(page_submenu[id][i]) != 'undefined' && !empty(page_submenu[id][i])) {
 			var row = page_submenu[id][i];
-			var menu_row = new Array(row.name,"javascript: rm4favorites('"+row.favobj+"','"+row.favid+"','"+i+"');");
+			var menu_row = new Array(row.name, "javascript: rm4favorites('"+row.favobj+"','"+row.favid+"','"+i+"');");
 			dbrd_menu[dbrd_menu.length-1].push(menu_row);
 		}
 	}
-//alert(page_menu[id]);
-	show_popup_menu(e,dbrd_menu,140);// JavaScript Document
+
+	show_popup_menu(e, dbrd_menu);
 }
 
 //------------------------------------------------------
