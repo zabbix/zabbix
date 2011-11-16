@@ -19,6 +19,7 @@ function zbx_jsvalue($value, $asObject=false, $addQuotes=true){
 			$escaped = str_replace('"', '\"', $escaped); // escaping quotes: " => \"
 			$escaped = str_replace("\n", '\n', $escaped); // changing LF to '\n' string
 			$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
+			$escaped = str_replace('/', '\/', $escaped); // escaping forward slash: / => \/
 			if($addQuotes){
 				$escaped = "'".$escaped."'";
 			}
@@ -592,26 +593,6 @@ function insert_js_function($fnct_name){
 
 function insert_js($script){
 	print('<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>');
-}
-
-
-/**
- * Escapes a string or array for safe outputting.
- *
- * @param mixed $value
- * @return mixed
- */
-function sanitize($value) {
-	if (is_array($value)) {
-		foreach ($value as &$v) {
-			$v = sanitize($v);
-		}
-	}
-	else {
-		$value = htmlspecialchars($value);
-	}
-
-	return $value;
 }
 
 ?>

@@ -127,7 +127,7 @@ include_once('include/page_header.php');
 						foreach($link['linktriggers'] as $lnum => $linktrigger){
 							$hosts = get_hosts_by_triggerid($linktrigger['triggerid']);
 							if($host = DBfetch($hosts)){
-								$description = $host['host'].':'.expand_trigger_description($linktrigger['triggerid']);
+								$description = $host['host'].':'.expand_trigger_description_simple($linktrigger['triggerid']);
 							}
 
 							$link['linktriggers'][$lnum]['desc_exp'] = $description;
