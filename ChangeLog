@@ -25,7 +25,7 @@ Bug fixes:
  - [ZBX-3468] fixed error messages and warnings with enabled SQLite3 support in front-end (Alexei)
  - [ZBX-4056] fixed dependencies not added when template linked to host (Vedmak)
  - [ZBX-4315] fixed the 'close' link in the tooltips (pavels)
- - [ZBX-3675] fixed items created via api for template have wrong interfaceid on linked host (Vedmak)
+ - [ZBX-3675] fixed items created via API for template have wrong interfaceid on linked host (Vedmak)
  - [ZBX-4212] fixed creation of trigger expression with "])" in item key (Vedmak)
  - [ZBXNEXT-675] reduced surrounding whitespace for Switch, Cloud, Crypto-router, UPS, Hub and Router map icons (Elvis, Richlv)
  - [ZBX-4305] removed CREDITS file (Richlv)
