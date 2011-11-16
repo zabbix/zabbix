@@ -35,12 +35,12 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 	unsigned short	h, m;
 #if defined(_WINDOWS)
         struct _timeb	tv;
-#else /* not _WINDOWS */
+#else
 	struct timeval	tv;
 	struct timezone	tz;
-#endif /* _WINDOWS */
+#endif
 
-	if (num_param(param) > 3)
+	if (3 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, type, sizeof(type)))
@@ -58,15 +58,15 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 		tm = localtime(&tv.time);
 
 		ms = tv.millitm;
-#else /* not _WINDOWS */
+#else
 		gettimeofday(&tv, &tz);
 
 		tm = localtime(&tv.tv_sec);
 
 		ms = (int)(tv.tv_usec / 1000);
-#endif /* _WINDOWS */
+#endif
 
-		offset = zbx_snprintf(buf, sizeof(buf), "%d-%d-%d,%d:%d:%d.%d,",
+		offset = zbx_snprintf(buf, sizeof(buf), "%04d-%02d-%02d,%02d:%02d:%02d.%03d,",
 				1900 + tm->tm_year, 1 + tm->tm_mon, tm->tm_mday,
 				tm->tm_hour, tm->tm_min, tm->tm_sec, ms);
 
@@ -75,21 +75,22 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 		gmtoff = tm->tm_gmtoff;
 #else
 		gmtoff = -timezone;
-#endif /* HAVE_TM_TM_GMTOFF */
+#endif
 
 #if defined(_WINDOWS)
-		if (tm->tm_isdst > 0)	/* Daylight saving time */
-			gmtoff += 3600;	/* Assume add one hour */
-#endif /* _WINDOWS */
+		if (0 < tm->tm_isdst)		/* daylight saving time */
+			gmtoff += SEC_PER_HOUR;	/* assume DST is one hour */
+#endif
 
-		h = (unsigned short)(abs(gmtoff) / 3600);
-		m = (unsigned short)((abs(gmtoff) - h * 3600) / 60);
+		h = (unsigned short)(abs(gmtoff) / SEC_PER_HOUR);
+		m = (unsigned short)((abs(gmtoff) - h * SEC_PER_HOUR) / SEC_PER_MIN);
 
-		if (gmtoff >= 0)
+		if (0 <= gmtoff)
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "+");
 		else
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "-");
-		offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%d:%d", (int)h, (int)m);
+
+		offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%02d:%02d", (int)h, (int)m);
 
 		SET_STR_RESULT(result, strdup(buf));
 	}
@@ -109,7 +110,7 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 	return PERF_COUNTER(cmd, counter_path, flags, result);
 #else
 	return EXECUTE_INT(cmd, "who|wc -l", flags, result);
-#endif /* _WINDOWS */
+#endif
 }
 
 int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
