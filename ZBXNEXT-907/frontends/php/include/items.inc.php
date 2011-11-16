@@ -650,7 +650,7 @@ function item_type2str($type = null){
 
 		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
-		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
+		$table = new CTableInfo(_('No items defined.'));
 
 // COpt::profiling_start('prepare_data');
 		$result = DBselect('SELECT DISTINCT h.hostid, h.name as hostname,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock, '.

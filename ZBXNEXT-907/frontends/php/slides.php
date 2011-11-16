@@ -358,7 +358,7 @@ require_once('include/page_header.php');
 			$slides_wdgt->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
 		}
 		else{
-			$slides_wdgt->addItem(new CTableInfo(S_NO_SLIDES_DEFINED));
+			$slides_wdgt->addItem(new CTableInfo(_('No slides defined.')));
 		}
 
 		$slides_wdgt->show();

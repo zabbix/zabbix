@@ -811,7 +811,7 @@ class CApplication extends CZBXAPI {
 	}
 
 	public function syncTemplates($data) {
-		$data['templateids'] = zbx_torray($data['templateids']);
+		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		$options = array(

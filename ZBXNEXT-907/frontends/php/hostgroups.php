@@ -369,7 +369,7 @@ require_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('form_groups');
 
-		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
+		$table = new CTableInfo(_('No host groups defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_groups', NULL, "checkAll('".$form->getName()."','all_groups','groups');"),
 			make_sorting_header(S_NAME, 'name'),

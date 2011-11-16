@@ -315,7 +315,7 @@ require_once('include/page_header.php');
 			$screen_wdgt->addItem(get_header_host_table($templateid, 'screens'));
 		}
 
-		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
+		$table = new CTableInfo(_('No screens defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_screens', NULL, "checkAll('".$form->getName()."','all_screens','screens');"),
 			make_sorting_header(S_NAME, 'name'),

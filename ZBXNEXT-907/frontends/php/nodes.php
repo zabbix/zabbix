@@ -211,7 +211,7 @@
 			$nodes_wdgt->addHeader(S_NODES_BIG);
 			$nodes_wdgt->addItem(BR());
 
-			$table=new CTableInfo(S_NO_NODES_DEFINED);
+			$table = new CTableInfo(_('No nodes defined.'));
 			$table->setHeader(array(
 				make_sorting_header(S_ID, 'n.nodeid'),
 				make_sorting_header(S_NAME, 'n.name'),

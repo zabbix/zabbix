@@ -38,8 +38,8 @@ $fields = array(
 	'hostids' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'groupids' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'applications' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,  DB_ID,	null),
-	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
+	'hostid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	'applicationid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'isset({form})&&({form}=="update")'),
 	'appname' =>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({save})'),
 	'apphostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({save})'),
@@ -208,6 +208,8 @@ if (isset($_REQUEST['form'])) {
 	$data['applicationid'] = get_request('applicationid');
 	$data['form'] = get_request('form');
 	$data['form_refresh'] = get_request('form_refresh', 0);
+	$data['groupid'] = get_request('groupid', 0);
+	$data['hostid'] = get_request('hostid', 0);
 
 	if (!empty($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {
 		$db_application = DBfetch(DBselect('SELECT s.name,s.hostid FROM applications s WHERE s.applicationid='.$data['applicationid']));
@@ -241,52 +243,50 @@ else {
 		'groupid' => get_request('groupid', null)
 	);
 	$data['pageFilter'] = new CPageFilter($options);
-	if ($data['pageFilter']->hostsSelected) {
-		$data['groupid'] = $data['pageFilter']->groupid;
-		$data['hostid'] = $data['pageFilter']->hostid;
+	$data['groupid'] = $data['pageFilter']->groupid;
+	$data['hostid'] = $data['pageFilter']->hostid;
 
-		// get application
-		$sortfield = getPageSortField('name');
-		$sortorder = getPageSortOrder();
-		$options = array(
-			'output' => API_OUTPUT_SHORTEN,
-			'editable' => 1,
-			'sortfield' => $sortfield,
-			'limit' => $config['search_limit'] + 1
-		);
-		if ($data['pageFilter']->hostid > 0) {
-			$options['hostids'] = $data['pageFilter']->hostid;
-		}
-		elseif ($data['pageFilter']->groupid > 0) {
-			$options['groupids'] = $data['pageFilter']->groupid;
-		}
-		$data['applications'] = API::Application()->get($options);
-
-		// get paging
-		$data['paging'] = getPagingLine($data['applications']);
-
-		// get applications
-		$options = array(
-			'applicationids' => zbx_objectValues($data['applications'], 'applicationid'),
-			'output' => API_OUTPUT_EXTEND,
-			'selectItems' => API_OUTPUT_REFER,
-			'expandData' => 1
-		);
-		$data['applications'] = API::Application()->get($options);
-		order_result($data['applications'], $sortfield, $sortorder);
-
-		// fill applications with templated hosts
-		foreach ($data['applications'] as $id => $application) {
-			if (!empty($application['templateid'])) {
-				$data['applications'][$id]['template_host'] = get_realhost_by_applicationid($application['templateid']);
-			}
-		}
-
-		// render view
-		$applicationView = new CView('configuration.application.list', $data);
-		$applicationView->render();
-		$applicationView->show();
+	// get application
+	$sortfield = getPageSortField('name');
+	$sortorder = getPageSortOrder();
+	$options = array(
+		'output' => API_OUTPUT_SHORTEN,
+		'editable' => 1,
+		'sortfield' => $sortfield,
+		'limit' => $config['search_limit'] + 1
+	);
+	if ($data['pageFilter']->hostid > 0) {
+		$options['hostids'] = $data['pageFilter']->hostid;
 	}
+	elseif ($data['pageFilter']->groupid > 0) {
+		$options['groupids'] = $data['pageFilter']->groupid;
+	}
+	$data['applications'] = API::Application()->get($options);
+
+	// get paging
+	$data['paging'] = getPagingLine($data['applications']);
+
+	// get applications
+	$options = array(
+		'applicationids' => zbx_objectValues($data['applications'], 'applicationid'),
+		'output' => API_OUTPUT_EXTEND,
+		'selectItems' => API_OUTPUT_REFER,
+		'expandData' => 1
+	);
+	$data['applications'] = API::Application()->get($options);
+	order_result($data['applications'], $sortfield, $sortorder);
+
+	// fill applications with templated hosts
+	foreach ($data['applications'] as $id => $application) {
+		if (!empty($application['templateid'])) {
+			$data['applications'][$id]['template_host'] = get_realhost_by_applicationid($application['templateid']);
+		}
+	}
+
+	// render view
+	$applicationView = new CView('configuration.application.list', $data);
+	$applicationView->render();
+	$applicationView->show();
 }
 
 require_once('include/page_footer.php');

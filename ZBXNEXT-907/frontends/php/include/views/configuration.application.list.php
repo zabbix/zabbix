@@ -65,7 +65,7 @@ foreach ($this->data['applications'] as $application) {
 		);
 	}
 	else {
-		$name = new CLink($application['name'], 'applications.php?form=update&applicationid='.$application['applicationid']);
+		$name = new CLink($application['name'], 'applications.php?form=update&applicationid='.$application['applicationid'].'&hostid='.$this->data['hostid'].'&groupid='.$this->data['groupid']);
 	}
 	$applicationTable->addRow(array(
 		new CCheckBox('applications['.$application['applicationid'].']', null, null, $application['applicationid']),

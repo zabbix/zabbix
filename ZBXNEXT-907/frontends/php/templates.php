@@ -585,7 +585,7 @@ require_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('templates');
 
-		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
+		$table = new CTableInfo(_('No templates defined.'));
 
 		$table->setHeader(array(
 			new CCheckBox('all_templates', NULL, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
