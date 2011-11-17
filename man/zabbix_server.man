@@ -1,16 +1,17 @@
-.TH ZABBIX_SERVER 8 "4 August 2011"
+.TH ZABBIX_SERVER 8 "10 November 2011"
 .SH NAME
 zabbix_server \- Zabbix server daemon.
 .SH SYNOPSIS
 .B zabbix_server [-hV] [-c \fI<config-file>\fR] [-n \fI<nodeid>\fR] [-R \fI<option>\fR]
 .SH DESCRIPTION
 .B zabbix_server
-is a core daemon of Zabbix software.
+is the core daemon of Zabbix software.
 .SS Options
 .IP "-c, --config \fI<config-file>\fR"
-Use the alternate \fIconfig-file\fR instead of \fI/etc/zabbix/zabbix_server.conf\fR.
+Use the alternate \fIconfig-file\fR instead of the default one.
+Absolute path should be specified.
 .IP "-n, --new-nodeid \fI<nodeid>\fR"
-Convert database data to new \fInodeid\fR.
+Convert database data to new \fInodeid\fR. Does not start the server. Run this only once.
 .IP "-R, --runtime-control \fI<option>\fR"
 Perform administrative functions according to \fIoption\fR.
 .SS
@@ -29,8 +30,8 @@ Display this help and exit.
 Output version information and exit.
 .SH FILES
 .TP
-.I /etc/zabbix/zabbix_server.conf
-Default location of Zabbix server configuration file.
+.I /usr/local/etc/zabbix_server.conf
+Default location of Zabbix server configuration file (if not modified during compile time).
 .SH "SEE ALSO"
 .BR zabbix_agentd (8),
 .BR zabbix_get (8),
