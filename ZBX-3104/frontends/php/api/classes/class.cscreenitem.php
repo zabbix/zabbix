@@ -55,6 +55,17 @@ class CScreenItem extends CZBXAPI {
 
 
 	/**
+	 * Sortable columns
+	 *
+	 * @var array
+	 */
+	protected static $sortColumns = array(
+		'screenitemid',
+		'screenid'
+	);
+
+
+	/**
 	 * Get ScreemItem data
 	 *
 	 * @param array $options
@@ -71,24 +82,24 @@ class CScreenItem extends CZBXAPI {
 			'nodeids'					=> null,
 			'screenitemids'				=> null,
 			'screenids'					=> null,
+			'editable'					=> null,
 
 			// filter
 			'filter'					=> null,
-			'search'					=> null,				// not implemented
-			'searchByAny'				=> null,				// not implemented
-			'startSearch'				=> null,				// not implemented
-			'excludeSearch'				=> null,				// not implemented
-			'searchWildcardsEnabled'	=> null,				// not implemented
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 
 			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectScreen'				=> null,				// not implemented
-			'countOutput'				=> null,				// not implemented
-			'groupCount'				=> null,				// not implemented
+			'countOutput'				=> null,
 			'preservekeys'				=> null,
 
-			'sortfield'					=> '',					// not implemented
-			'sortorder'					=> '',					// not implemented
+			'sortfield'					=> '',
+			'sortorder'					=> '',
 			'limit'						=> null
 		);
 
@@ -101,8 +112,15 @@ class CScreenItem extends CZBXAPI {
 
 		// fetch results
 		$result = array();
-		while ($screenItem = DBfetch($res)) {
-			$result[$screenItem['screenitemid']] = $screenItem;
+		while ($row = DBfetch($res)) {
+			// a count query, return a single result
+			if ($options['countOutput']) {
+				$result = $row['rowscount'];
+			}
+			// a normal select query
+			else {
+				$result[$row['screenitemid']] = $row;
+			}
 		}
 
 		// remove keys
@@ -270,7 +288,22 @@ class CScreenItem extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function isReadable(array $screenItemIds) {
-		// not implemented
+		if (!is_array($screenItemIds)) {
+			return false;
+		}
+		elseif (empty($screenItemIds)) {
+			return true;
+		}
+
+		$screenItemIds = array_unique($screenItemIds);
+
+		$count = $this->get(array(
+			'screenitemids' => $screenItemIds,
+			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+
+		return (count($screenItemIds) == $count);
 	}
 
 
@@ -282,7 +315,23 @@ class CScreenItem extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function isWritable(array $screenItemIds) {
-		// not implemented
+		if (!is_array($screenItemIds)) {
+			return false;
+		}
+		elseif (empty($screenItemIds)) {
+			return true;
+		}
+
+		$screenItemIds = array_unique($screenItemIds);
+
+		$count = $this->get(array(
+			'screenitemids' => $screenItemIds,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
+
+		return (count($screenItemIds) == $count);
 	}
 
 
@@ -538,6 +587,22 @@ class CScreenItem extends CZBXAPI {
 			$sqlParts['select']['screens_items'] = 'si.*';
 		}
 
+		// count
+		if ($options['countOutput']) {
+			$sqlParts['select'] = array('count(DISTINCT si.screenitemid) as rowscount');
+		}
+
+		// sort
+		$sortfield = $options['sortfield'];
+		if (in_array($sortfield, self::$sortColumns)) {
+			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
+			$sqlParts['order'][] = 'si.'.$sortfield.' '.$sortorder;
+
+			if (!array_intersect(array('si.'.$sortfield, 'si.*'), array($sqlParts['select']))) {
+				$sqlParts['select'][] = 'si.'.$sortfield;
+			}
+		}
+
 		return $sqlParts;
 	}
 
@@ -566,6 +631,11 @@ class CScreenItem extends CZBXAPI {
 		// filters
 		if (is_array($options['filter'])) {
 			zbx_db_filter('screens_items si', $options, $sqlParts);
+		}
+
+		// search
+		if (is_array($options['search'])) {
+			zbx_db_search('screens_items si', $options, $sqlParts);
 		}
 
 		return $sqlParts;
