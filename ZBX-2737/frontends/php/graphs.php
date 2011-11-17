@@ -200,36 +200,41 @@ include_once('include/page_header.php');
 				'gitems' => $items
 			);
 
-			if(isset($_REQUEST['graphid'])){
+			if (isset($_REQUEST['graphid'])) {
 				$graph['graphid'] = $_REQUEST['graphid'];
+
+				$tmp_hhosts = get_hosts_by_graphid($graph['graphid']);
+				$tmp_host = DBfetch($tmp_hhosts);
+
+				$graph['host'] = $tmp_host['host'];
 
 				$result = CGraph::update($graph);
 
-				if($result){
-					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH,'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
+				if ($result) {
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_GRAPH, 'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
 				}
 			}
-			else{
+			else {
 				$result = CGraph::create($graph);
 
-				if($result){
+				if ($result) {
 					add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.$_REQUEST['name'].']');
 				}
 			}
-			if($result){
+			if ($result) {
 				unset($_REQUEST['form']);
 			}
 		}
-		if(isset($_REQUEST['graphid'])){
+		if (isset($_REQUEST['graphid'])) {
 			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 		}
-		else{
+		else {
 			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
 	}
-	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){
+	elseif (isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])) {
 		$result = CGraph::delete($_REQUEST['graphid']);
-		if($result){
+		if ($result) {
 			unset($_REQUEST['form']);
 		}
 		show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);

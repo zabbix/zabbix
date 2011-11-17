@@ -651,42 +651,49 @@
 
 		$graphs = array();
 		$host_list = array();
-		foreach($graphids as $id => $graphid){
+		foreach ($graphids as $id => $graphid) {
 			$graphs[$graphid] = get_graph_by_graphid($graphid);
 
 			$host_list[$graphid] = array();
+
 			$db_hosts = get_hosts_by_graphid($graphid);
-			while($db_host = DBfetch($db_hosts)){
-				if(!isset($host_list[$graphid][$db_host['host']]))
+
+			while ($db_host = DBfetch($db_hosts)) {
+				if (!isset($host_list[$graphid][$db_host['host']])) {
 					$host_list[$graphid][$db_host['host']] = true;
+					$host_list[$graphid]['host'] = $db_host['host'];
+				}
 			}
 		}
 
-// first remove child graphs
+		// first remove child graphs
 		$del_chd_graphs = array();
 		$chd_graphs = get_graphs_by_templateid($graphids);
-		while($chd_graph = DBfetch($chd_graphs)){ /* recursion */
+
+		while ($chd_graph = DBfetch($chd_graphs)) {
+			/* recursion */
 			$del_chd_graphs[$chd_graph['graphid']] = $chd_graph['graphid'];
 		}
-		if(!empty($del_chd_graphs)){
+		if (!empty($del_chd_graphs)) {
 			$result &= delete_graph($del_chd_graphs);
 		}
 
 		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$graphids).' AND resourcetype='.SCREEN_RESOURCE_GRAPH);
 
-// delete graph
+		// delete graph
 		DBexecute('DELETE FROM graphs_items WHERE '.DBcondition('graphid',$graphids));
 		DBexecute("DELETE FROM profiles WHERE idx='web.favorite.graphids' AND source='graphid' AND ".DBcondition('value_id',$graphids));
 
 		$result = DBexecute('DELETE FROM graphs WHERE '.DBcondition('graphid',$graphids));
-		if($result){
-			foreach($graphs as $graphid => $graph){
-				if(isset($host_list[$graphid]))
-					info(S_GRAPH_DELETED_FROM_HOSTS_PART1.$graph['name'].S_GRAPH_DELETED_FROM_HOSTS_PART2.SPACE.'"'.implode('","', array_keys($host_list[$graphid])).'"');
+		if ($result) {
+			foreach ($graphs as $graphid => $graph) {
+				if (isset ($host_list[$graphid])) {
+					info(S_GRAPH.SPACE.'"'.$host_list[$graphid]['host'].':'.$graph['name'].'"'.SPACE.S_DELETED_SMALL);
+				}
 			}
 		}
 
-	return $result;
+		return $result;
 	}
 
 /*
@@ -754,23 +761,27 @@
 		zbx_value2array($templateids);
 
 		$db_graphs = get_graphs_by_hostid($hostid);
-		while($db_graph = DBfetch($db_graphs)){
-			if($db_graph['templateid'] == 0)
+		while ($db_graph = DBfetch($db_graphs)) {
+			if ($db_graph['templateid'] == 0) {
 				continue;
+			}
 
-			if(!is_null($templateids)){
+			if (!is_null($templateids)) {
 				$tmp_hhosts = get_hosts_by_graphid($db_graph['templateid']);
 				$tmp_host = DBfetch($tmp_hhosts);
 
-				if( !uint_in_array($tmp_host['hostid'], $templateids)) continue;
-			}
-
-			if($unlink_mode){
-				if(DBexecute('UPDATE graphs SET templateid=0 WHERE graphid='.$db_graph['graphid'])){
-					info(S_GRAPH.SPACE.'"'.$db_graph['name'].'"'.SPACE.S_UNLINKED_SMALL);
+				if (!uint_in_array($tmp_host['hostid'], $templateids)) {
+					continue;
 				}
 			}
-			else{
+
+			if ($unlink_mode) {
+				if (DBexecute('UPDATE graphs SET templateid=0 WHERE graphid='.$db_graph['graphid'])) {
+					$host = get_host_by_hostid($hostid);
+					info(S_GRAPH.SPACE.'"'.$host['host'].':'.$db_graph['name'].'"'.SPACE.S_UNLINKED_SMALL);
+				}
+			}
+			else {
 				delete_graph($db_graph['graphid']);
 			}
 		}

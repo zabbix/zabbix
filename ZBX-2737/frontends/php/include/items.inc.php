@@ -718,22 +718,26 @@
 		zbx_value2array($templateids);
 
 		$db_items = get_items_by_hostid($hostid);
-		while($db_item = DBfetch($db_items)){
-			if($db_item["templateid"] == 0)
+		while ($db_item = DBfetch($db_items)) {
+			if ($db_item["templateid"] == 0) {
 				continue;
+			}
 
-			if( !is_null($templateids)){
+			if (!is_null($templateids)) {
 				$db_tmp_item = get_item_by_itemid($db_item["templateid"]);
 
-				if(!uint_in_array($db_tmp_item["hostid"], $templateids)) continue;
-			}
-
-			if($unlink_mode){
-				if(DBexecute('UPDATE items SET templateid=0 WHERE itemid='.$db_item["itemid"])){
-					info(sprintf(S_ITEM_UNLINKED, $db_item["key_"]));
+				if (!uint_in_array($db_tmp_item["hostid"], $templateids)) {
+					continue;
 				}
 			}
-			else{
+
+			if ($unlink_mode) {
+				if (DBexecute('UPDATE items SET templateid=0 WHERE itemid='.$db_item["itemid"])) {
+					$host = get_host_by_hostid($hostid);
+					info(sprintf(S_ITEM_UNLINKED, $host['host'].':'.$db_item["key_"]));
+				}
+			}
+			else {
 				delete_item($db_item["itemid"]);
 			}
 		}
