@@ -291,11 +291,15 @@ function get_last_service_value($serviceid, $clock) {
 
 function expandPeriodicalServiceTimes(&$data, $period_start, $period_end, $ts_from, $ts_to, $type) {
 	$week = getdate($period_start);
-	$week = $period_start - $week['wday'] * SEC_PER_DAY - $week['hours'] * SEC_PER_HOUR - $week['minutes'] * SEC_PER_MIN;
+	$week = $period_start - $week['wday'] * SEC_PER_DAY - $week['hours'] * SEC_PER_HOUR - $week['minutes'] * SEC_PER_MIN - $week['seconds'];
 
-	for (; $week <= $period_end; $week += SEC_PER_WEEK) {
+	for (; $week < $period_end; $week += SEC_PER_WEEK) {
 		$_s = $week + $ts_from;
 		$_e = $week + $ts_to;
+
+		if ($period_end < $_s || $period_start >= $_e) {
+			continue;
+		}
 
 		if ($_s < $period_start) {
 			$_s = $period_start;
@@ -329,6 +333,7 @@ function calculateServiceAvailability($serviceid, $period_start, $period_end) {
 	 *	ut_s	- count of uptime starts
 	 *	ut_e	- count of uptime ends
 	 */
+
 	$data[$period_start]['alarm'] = get_last_service_value($serviceid, $period_start);
 
 	// sort by time stamp
