@@ -246,42 +246,47 @@ else {
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
-	// get application
-	$sortfield = getPageSortField('name');
-	$sortorder = getPageSortOrder();
-	$options = array(
-		'output' => API_OUTPUT_SHORTEN,
-		'editable' => 1,
-		'sortfield' => $sortfield,
-		'limit' => $config['search_limit'] + 1
-	);
-	if ($data['pageFilter']->hostid > 0) {
-		$options['hostids'] = $data['pageFilter']->hostid;
+	if ($data['pageFilter']->hostsSelected) {
+		// get application
+		$sortfield = getPageSortField('name');
+		$sortorder = getPageSortOrder();
+		$options = array(
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => 1,
+			'sortfield' => $sortfield,
+			'limit' => $config['search_limit'] + 1
+		);
+		if ($data['pageFilter']->hostid > 0) {
+			$options['hostids'] = $data['pageFilter']->hostid;
+		}
+		elseif ($data['pageFilter']->groupid > 0) {
+			$options['groupids'] = $data['pageFilter']->groupid;
+		}
+		$data['applications'] = API::Application()->get($options);
+
+		// get applications
+		$options = array(
+			'applicationids' => zbx_objectValues($data['applications'], 'applicationid'),
+			'output' => API_OUTPUT_EXTEND,
+			'selectItems' => API_OUTPUT_REFER,
+			'expandData' => 1
+		);
+		$data['applications'] = API::Application()->get($options);
+		order_result($data['applications'], $sortfield, $sortorder);
+
+		// fill applications with templated hosts
+		foreach ($data['applications'] as $id => $application) {
+			if (!empty($application['templateid'])) {
+				$data['applications'][$id]['template_host'] = get_realhost_by_applicationid($application['templateid']);
+			}
+		}
 	}
-	elseif ($data['pageFilter']->groupid > 0) {
-		$options['groupids'] = $data['pageFilter']->groupid;
+	else {
+		$data['applications'] = array();
 	}
-	$data['applications'] = API::Application()->get($options);
 
 	// get paging
 	$data['paging'] = getPagingLine($data['applications']);
-
-	// get applications
-	$options = array(
-		'applicationids' => zbx_objectValues($data['applications'], 'applicationid'),
-		'output' => API_OUTPUT_EXTEND,
-		'selectItems' => API_OUTPUT_REFER,
-		'expandData' => 1
-	);
-	$data['applications'] = API::Application()->get($options);
-	order_result($data['applications'], $sortfield, $sortorder);
-
-	// fill applications with templated hosts
-	foreach ($data['applications'] as $id => $application) {
-		if (!empty($application['templateid'])) {
-			$data['applications'][$id]['template_host'] = get_realhost_by_applicationid($application['templateid']);
-		}
-	}
 
 	// render view
 	$applicationView = new CView('configuration.application.list', $data);
