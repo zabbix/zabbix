@@ -31,15 +31,24 @@ for table in `grep TABLE "$schema" | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
 	fi
 	echo "TABLE |$table"
 	fields=""
+	sortorder=""
 	# get list of all fields
 	for i in `seq 1 1000`; do
 		line=`grep -v ZBX_NODATA "$schema" | grep -A $i "TABLE|$table|" | tail -1 | grep FIELD`
 		[ -z "$line" ] && break
 		field=`echo $line | awk -F'|' '{print $2}'`
 		fields="$fields,replace($field,'|','&pipe;') as $field"
+		# figure out references to itself for correct sort order
+		reftable=`echo $line | cut -f8 -d'|' | sed -e 's/ //'`
+		if [ "$table" = "$reftable" ]; then
+			pri_field=`echo $line | cut -f2 -d'|' | sed -e 's/ //'`
+			ref_field=`echo $line | cut -f9 -d'|' | sed -e 's/ //'`
+			# this strange sort order works fine with MySQL
+			sortorder="order by $pri_field>$ref_field"
+		fi
 	done
 	# remove first comma
 	fields=`echo $fields | cut -c2-`
-	echo "select $fields from $table" | mysql -t -uroot $dbname | grep -v '^+' | sed -e 's/ | /|/g' -e '1,1s/^| /FIELDS|/g' -e '2,$s/^| /ROW   |/g' -e 's/ |$/|/g'
+	echo "select $fields from $table $sortorder" | mysql -t -uroot $dbname | grep -v '^+' | sed -e 's/ | /|/g' -e '1,1s/^| /FIELDS|/g' -e '2,$s/^| /ROW   |/g' -e 's/ |$/|/g'
 	echo ""
 done
