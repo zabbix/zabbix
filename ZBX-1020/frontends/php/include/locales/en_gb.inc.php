@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -151,9 +151,6 @@
 //	actionconf.php
 	'S_CONFIGURATION_OF_ACTIONS'=>		_('Configuration of actions'),
 	'S_FILTER'=>				_('Filter'),
-	'S_TIME_PERIOD'=>			_('Time period'),
-	'S_MAX_VALUE_SMALL'=>			_('max value'),
-	'S_MIN_VALUE_SMALL'=>			_('min value'),
 	'S_CONDITION'=>				_('Condition'),
 
 //	actions.php
@@ -204,9 +201,6 @@
 	'S_PERIOD'=>				_('Period'),
 
 //	class.cchart.php
-	'S_CCHARTS_TIMELINE_HOURS_FORMAT'=>			_('H:i'),
-	'S_CCHARTS_TIMELINE_DAYS_FORMAT'=>			_('D'),
-	'S_CCHARTS_TIMELINE_MONTHDAYS_FORMAT'=>			_('d.m'),
 	'S_CCHARTS_TIMELINE_START_DATE_FORMAT'=>		_('d.m H:i'),
 	'S_CCHARTS_TIMELINE_END_DATE_FORMAT'=>			_('d.m H:i'),
 	'S_CCHARTS_TIMELINE_MAINPERIOD_HOURS_FORMAT'=>		_('H:i'),
