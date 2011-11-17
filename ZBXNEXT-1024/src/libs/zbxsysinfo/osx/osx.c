@@ -32,6 +32,13 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		NULL,	"free"},
 
+	{"net.tcp.listen",      CF_USEUPARAM,   NET_TCP_LISTEN, 	NULL,	"80"},
+
+	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		NULL,	"en0,bytes"},
+	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		NULL,	"en0,bytes"},
+	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		NULL,	"en0,bytes"},
+	{"net.if.collisions",   CF_USEUPARAM,   NET_IF_COLLISIONS,      NULL,	"en0"},
+
 	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		NULL,	"online"},
 	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	NULL,	"all,avg1"},
 
