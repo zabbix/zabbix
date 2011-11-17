@@ -195,7 +195,8 @@
 			'port' => 10050,
 			'useip' => 1,
 			'type' => 1,
-			'items' => 0
+			'items' => 0,
+			'main' => 1
 		));
 	}
 
@@ -209,7 +210,7 @@
 	}
 	zbx_add_post_js('setTimeout(function(){'.$jsInsert.'}, 1);');
 
-	$addButton = new CButton('add', _('Add'), 'javascript: addInterfaceRow({});');
+	$addButton = new CButton('addInterfaceRow', _('Add'));
 	$addButton->setAttribute('class', 'link_menu');
 
 	$col = new CCol(array($addButton));
