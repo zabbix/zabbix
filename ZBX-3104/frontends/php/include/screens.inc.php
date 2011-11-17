@@ -58,36 +58,6 @@ require_once('include/js.inc.php');
 			return S_UNKNOW;
 	}
 
-	function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$sort_triggers,$valign,$halign,$style,$url,$dynamic){
-		$sql='DELETE FROM screens_items WHERE screenid='.$screenid.' and x='.$x.' and y='.$y;
-		DBexecute($sql);
-
-		$screenitemid=get_dbid("screens_items","screenitemid");
-		$result=DBexecute('INSERT INTO screens_items '.
-							'(screenitemid,resourcetype,screenid,x,y,resourceid,width,height,'.
-							' colspan,rowspan,elements,valign,halign,style,url,dynamic,sort_triggers) '.
-						' VALUES '.
-							"($screenitemid,$resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,".
-							"$rowspan,$elements,$valign,$halign,$style,".zbx_dbstr($url).",$dynamic,$sort_triggers)");
-
-		if(!$result) return $result;
-	return $screenitemid;
-	}
-
-	function update_screen_item($screenitemid,$resourcetype,$resourceid,$width,$height,$colspan,$rowspan,$elements,$sort_triggers,$valign,$halign,$style,$url,$dynamic){
-		return  DBexecute("UPDATE screens_items SET ".
-							"resourcetype=$resourcetype,"."resourceid=$resourceid,"."width=$width,".
-							"height=$height,colspan=$colspan,rowspan=$rowspan,elements=$elements,".
-							"valign=$valign,halign=$halign,style=$style,url=".zbx_dbstr($url).",".
-							"dynamic=$dynamic,sort_triggers=$sort_triggers".
-						" WHERE screenitemid=$screenitemid");
-	}
-
-	function delete_screen_item($screenitemid){
-		$sql="DELETE FROM screens_items where screenitemid=$screenitemid";
-	return  DBexecute($sql);
-	}
-
 	function get_screen_by_screenid($screenid){
 		$result = DBselect("select * from screens where screenid=$screenid");
 		$row=DBfetch($result);

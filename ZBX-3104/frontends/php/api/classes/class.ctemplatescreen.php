@@ -544,7 +544,7 @@ class CTemplateScreen extends CScreen{
 					}
 				}
 			}
-			$this->addItems($insert_screen_items);
+			API::ScreenItem()->create($insert_screen_items);
 
 			return array('screenids' => $screenids);
 	}
@@ -614,11 +614,7 @@ class CTemplateScreen extends CScreen{
 				}
 
 				if(isset($screen['screenitems'])){
-					$update_items = array(
-						'screenids' => $screenid,
-						'screenitems' => $screen['screenitems'],
-					);
-					$this->updateItems($update_items);
+					$this->replaceItems($screenid, $screen['screenitems']);
 				}
 			}
 			DB::update('screens', $update);
