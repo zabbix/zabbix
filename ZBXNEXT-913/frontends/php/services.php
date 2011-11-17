@@ -8,7 +8,7 @@
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
 **
-** This program is distributed in the hope that it will be useful,
+** This program is distributed in the hope that it461 will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
@@ -458,7 +458,6 @@ else {
 	$trigerMenu[] = array('test2', null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader')));
 
 	$jsmenu = new CPUMenu($trigerMenu, 170);
-	$jsmenu->insertJavaScript();
 
 	$data = array('tree' => $tree);
 
