@@ -779,15 +779,12 @@
 	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		_('Y.m.d'),
 
 //	report3.php
-	'S_IT_SERVICES_AVAILABILITY_REPORT'=>		_('IT services availability report'),
-	'S_IT_SERVICES_AVAILABILITY_REPORT_BIG'=>	_('IT SERVICES AVAILABILITY REPORT'),
 	'S_FROM'=>					_('From'),
 	'S_TILL'=>					_('Till'),
 	'S_OK'=>					_('Ok'),
 	'S_RESOLVED'=>				_('Resolved'),
 	'S_PROBLEM'=>					_('Problem'),
 	'S_PROBLEMS'=>					_('Problems'),
-	'S_PERCENTAGE'=>				_('Percentage'),
 	'S_SLA'=>					_('SLA'),
 	'S_DAY'=>					_('Day'),
 	'S_MONTH'=>					_('Month'),
