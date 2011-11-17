@@ -54,13 +54,25 @@ class CScreenItem extends CZBXAPI {
 	);
 
 
+	/**
+	 * Get ScreemItem data
+	 *
+	 * @param array $options
+	 * @param array $options['nodeids']			Node IDs
+	 * @param array $options['screenitemids']	Search by screen item IDs
+	 * @param array $options['screenids']		Search by screen IDs
+	 * @param array $options['nopermissions']	If set to true, all of the permission checks will be skipped
+	 * @param array $options['filter']			Result filter
+	 * @param array $options['limit']			The size of the result set
+	 *
+	 * @return array|boolean Host data as array or false if error
+	 */
 	public function get(array $options = array()) {
 		$defOptions = array(
 			'nodeids'					=> null,
 			'screenitemids'				=> null,
 			'screenids'					=> null,
-			'editable'					=> null,				// not implemented
-			'nopermissions'				=> null,				// not implemented
+			'nopermissions'				=> null,
 
 			// filter
 			'filter'					=> null,
@@ -79,7 +91,7 @@ class CScreenItem extends CZBXAPI {
 
 			'sortfield'					=> '',					// not implemented
 			'sortorder'					=> '',					// not implemented
-			'limit'						=> null					// not implemented
+			'limit'						=> null
 		);
 
 		// options
@@ -104,6 +116,13 @@ class CScreenItem extends CZBXAPI {
 	}
 
 
+	/**
+	 * Saves the given screen items.
+	 *
+	 * @param array $screenItems	An array of screen items
+	 * @return array				An array, that contains the IDs of the new items
+	 *								under the 'screenitemids' key
+	 */
 	public function create(array $screenItems) {
 
 		// validate input
@@ -118,13 +137,19 @@ class CScreenItem extends CZBXAPI {
 	}
 
 
+	/**
+	 * Updates the given screen items.
+	 *
+	 * @param array $screenItems	An array of screen items
+	 * @return array				An array, that contains the IDs of the updated items
+	 *								under the 'screenitemids' key
+	 */
 	public function update(array $screenItems) {
 
 		// fetch the items we're updating
 		$screenItemIds = zbx_objectValues($screenItems, 'screenitemid');
 		$dbScreenItems = $this->get(array(
 			'screenitemids' => $screenItemIds,
-			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 		));
@@ -157,6 +182,8 @@ class CScreenItem extends CZBXAPI {
 	 * If the given cell is free, a new screen item will be created.
 	 *
 	 * @param array $screenItems    An array of screen items with the given X and Y coordinates
+	 * @return array				An array, that contains the IDs of the updated items
+	 *								under the 'screenitemids' key
 	 */
 	public function updateByPosition(array $screenItems) {
 
@@ -164,7 +191,6 @@ class CScreenItem extends CZBXAPI {
 		$dbScreenItems = $this->get(array(
 			'output' => array('screenitemid', 'x', 'y', 'screenid'),
 			'screenids' => zbx_objectValues($screenItems, 'screenid'),
-			'editable' => true
 		));
 		$screenItemMap = array();
 		foreach ($dbScreenItems as $dbScreenItem) {
@@ -208,13 +234,19 @@ class CScreenItem extends CZBXAPI {
 	}
 
 
+	/**
+	 * Deletes the given screen items.
+	 *
+	 * @param array|int $screenItemIds	The IDs of the screen items to delete
+	 * @return array					An array, that contains the IDs of the deleted items
+	 *									under the 'screenitemids' key
+	 */
 	public function delete($screenItemIds) {
 		$screenItemIds = zbx_toArray($screenItemIds);
 
 		// check permissions
 		$dbScreenItems = $this->get(array(
 			'screenitemids' => $screenItemIds,
-			'editable' => true,
 			'preservekeys' => true
 		));
 		foreach ($screenItemIds as $screenItemId) {
@@ -257,12 +289,19 @@ class CScreenItem extends CZBXAPI {
 
 
 	/**
-	 * TODO: check permissions
+	 * Validates the given screen items.
 	 *
-	 * @param array $screenItems
-	 * @param type $dbScreenItems
+	 * If the $dbScreenItems parameter is given, the screen items will be matched
+	 * against the ones given in $dbScreenItems. If a screen item is not present in
+	 * $dbScreenItems, a ZBX_API_ERROR_PERMISSIONS exception will be thrown.
+	 *
+	 * @throws APIException if a validation error occurres.
+	 *
+	 * @param array $screenItems	An array of screen items to validate
+	 * @param array $dbScreenItems	An array of screen items $screenItems should
+	 *								be matched against
 	 */
-	protected function checkInput(array $screenItems, $dbScreenItems = array()) {
+	protected function checkInput(array $screenItems, array $dbScreenItems = array()) {
 
 		$hostgroups = array();
 		$hosts = array();
@@ -293,19 +332,19 @@ class CScreenItem extends CZBXAPI {
 			);
 			if (in_array($screenItem['resourcetype'], $hostGroupResourceTypes)) {
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No host group ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No host group ID provided for screen element.'));
 				}
 				$hostgroups[] = $screenItem['resourceid'];
 			}
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_HOST_TRIGGERS) {
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No host ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No host ID provided for screen element.'));
 				}
 				$hosts[] = $screenItem['resourceid'];
 			}
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_GRAPH) {
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No graph ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No graph ID provided for screen element.'));
 				}
 				$graphs[] = $screenItem['resourceid'];
 			}
@@ -313,26 +352,26 @@ class CScreenItem extends CZBXAPI {
 					|| $screenItem['resourcetype'] == SCREEN_RESOURCE_CLOCK && $screenItem['style'] == SCREEN_CLOCK_HOST) {
 
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No item ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
 				}
 				$items[] = $screenItem['resourceid'];
 			}
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_MAP) {
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No map ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No map ID provided for screen element.'));
 				}
 				$maps[] = $screenItem['resourceid'];
 			}
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_SCREEN) {
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No screen ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No screen ID provided for screen element.'));
 				}
 				$screens[] = $screenItem['resourceid'];
 			}
 			// check url
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_URL) {
 				if (!$screenItem['url']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No URL provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No URL provided for screen element.'));
 				}
 			}
 		}
@@ -343,6 +382,7 @@ class CScreenItem extends CZBXAPI {
 				'groupids' => $hostgroups,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
+				'nopermissions' => $options['nopermissions']
 			));
 			foreach($hostgroups as $id){
 				if(!isset($result[$id]))
@@ -356,6 +396,7 @@ class CScreenItem extends CZBXAPI {
 				'hostids' => $hosts,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
+				'nopermissions' => $options['nopermissions']
 			));
 			foreach ($hosts as $id) {
 				if (!isset($result[$id])) {
@@ -370,6 +411,7 @@ class CScreenItem extends CZBXAPI {
 				'graphids' => $graphs,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
+				'nopermissions' => $options['nopermissions']
 			));
 			foreach ($graphs as $id) {
 				if (!isset($result[$id])) {
@@ -385,6 +427,7 @@ class CScreenItem extends CZBXAPI {
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
 				'webitems' => 1,
+				'nopermissions' => $options['nopermissions']
 			));
 			foreach ($items as $id) {
 				if (!isset($result[$id])) {
@@ -399,6 +442,7 @@ class CScreenItem extends CZBXAPI {
 				'sysmapids' => $maps,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
+				'nopermissions' => $options['nopermissions']
 			));
 			foreach ($maps as $id) {
 				if (!isset($result[$id])) {
@@ -413,6 +457,7 @@ class CScreenItem extends CZBXAPI {
 				'screenids' => $screens,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
+				'nopermissions' => $options['nopermissions']
 			));
 			foreach ($screens as $id) {
 				if (!isset($result[$id])) {
@@ -458,11 +503,6 @@ class CScreenItem extends CZBXAPI {
 
 		// handle filters
 		$sqlParts = $this->buildSqlFilters($options, $sqlParts);
-
-		// handle permission checks
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $options['editable']) {
-			$sqlParts = $this->buildSqlPermissions($sqlParts);
-		}
 
 		// check nodes
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
@@ -535,19 +575,6 @@ class CScreenItem extends CZBXAPI {
 		if (is_array($options['filter'])) {
 			zbx_db_filter('screens_items si', $options, $sqlParts);
 		}
-
-		return $sqlParts;
-	}
-
-
-	/**
-	 * Modifies the SQL parts to perform all of the permission checks
-	 *
-	 * @param type $sqlParts
-	 * @return type
-	 */
-	protected function buildSqlPermissions($sqlParts) {
-		// Not implemented
 
 		return $sqlParts;
 	}
