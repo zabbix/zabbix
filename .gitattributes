@@ -534,6 +534,7 @@ src/libs/zbxsysinfo/linux/hardware.h -text
 src/libs/zbxsysinfo/linux/software.c -text
 src/libs/zbxsysinfo/linux/software.h -text
 src/libs/zbxsysinfo/osx/boottime.c -text
+src/libs/zbxsysinfo/osx/net.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text
