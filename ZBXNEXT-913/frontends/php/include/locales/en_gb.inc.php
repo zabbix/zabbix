@@ -797,10 +797,6 @@
 	'S_WEEKLY'=>					_('Weekly'),
 	'S_MONTHLY'=>					_('Monthly'),
 	'S_YEARLY'=>					_('Yearly'),
-	'S_REPORT3_ANNUALLY_DATE_FORMAT'=>		_('Y'),
-	'S_REPORT3_MONTHLY_DATE_FORMAT'=>		_('M Y'),
-	'S_REPORT3_DAILY_DATE_FORMAT'=>			_('d M Y'),
-	'S_REPORT3_WEEKLY_DATE_FORMAT'=>		_('d M Y H:i'),
 
 //	locales.php
 	'S_CREATE'=>				_('Create'),

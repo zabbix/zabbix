@@ -587,8 +587,8 @@ table.filter_config { width: 100%; background-color: #FFFFFF; border-collapse: c
 table.filter_config tr td { white-space: nowrap; line-height: 20px; height: 26px; vertical-align: bottom; text-align: center; border: 1px dotted silver; padding-left: 6px; padding-right: 4px; }
 
 /********** <INVISIBLE> ************/
-.invisible { border: 0; margin: 0; padding: 0; }
-.invisible tr td { border: 0; margin: 0; padding: 0; }
+table.invisible { border: 0px; margin: 0px; padding: 0px; }
+table.invisible tr > td { border: 0px; margin: 0px; padding: 0px; }
 
 /********** <PAGING> ************/
 table.paging { width: 100%; padding: 2px; }
