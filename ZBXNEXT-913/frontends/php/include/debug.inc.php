@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 function sdb($return = false) {
 	$backtrace = debug_backtrace();
@@ -96,5 +96,21 @@ function sdf(&$var) {
 		echo $value;
 	}
 	echo SBR;
+}
+
+/**
+ * Infinite loop breaker, can be called inside loop that can be infinite. If number of
+ * calls exceeds defined limit then backtrace is printed and script is terminated.
+ *
+ * @param $limit number of function calls after which script should be terminated.
+ */
+function ilb($limit = 100) {
+	static $counter = 0;
+	$counter++;
+	if ($counter == $limit) {
+		// just calling sdb is forbidden by pre-commit hook :/
+		call_user_func('sdb');
+		exit;
+	}
 }
 ?>

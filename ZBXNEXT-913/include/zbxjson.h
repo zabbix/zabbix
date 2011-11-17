@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #ifndef ZABBIX_ZJSON_H
@@ -77,8 +77,8 @@
 #define ZBX_PROTO_VALUE_SENDER_DATA		"sender data"
 #define ZBX_PROTO_VALUE_AGENT_DATA		"agent data"
 #define ZBX_PROTO_VALUE_COMMAND			"command"
-#define ZBX_PROTO_VALUE_JAVA_PROXY_INTERNAL	"java proxy internal"
-#define ZBX_PROTO_VALUE_JAVA_PROXY_JMX		"java proxy jmx"
+#define ZBX_PROTO_VALUE_JAVA_GATEWAY_INTERNAL	"java gateway internal"
+#define ZBX_PROTO_VALUE_JAVA_GATEWAY_JMX	"java gateway jmx"
 
 typedef enum
 {

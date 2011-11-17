@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -30,7 +30,7 @@ $page['hist_arg'] = array('open','groupid','hostid');
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -62,7 +62,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -158,10 +158,11 @@ include_once('include/page_header.php');
 		is_show_all_nodes() ? make_sorting_header(S_NODE,'h.hostid') : null,
 		$_REQUEST['hostid'] ==0 ? make_sorting_header(S_HOST,'h.name') : NULL,
 		make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
-		S_NUMBER_OF_STEPS,
+		_('Number of steps'),
 		S_STATE,
 		S_LAST_CHECK,
-		S_STATUS));
+		S_STATUS
+	));
 
 	$any_app_exist = false;
 
@@ -291,8 +292,13 @@ include_once('include/page_header.php');
 				url_param('groupid').url_param('hostid').url_param('applications').
 				url_param('select'));
 
-		$col = new CCol(array($link,SPACE,bold($db_app['name']),SPACE.'('.$db_app['scenarios_cnt'].SPACE.S_SCENARIOS.')'));
-		$col->SetColSpan(6);
+		$col = new CCol(array(
+			$link,
+			SPACE,
+			bold($db_app['name']),
+			SPACE.'('._n('%1$d scenario', '%1$d scenarios', $db_app['scenarios_cnt']).')'
+		));
+		$col->setColSpan(6);
 
 		$table->addRow(array(
 				get_node_name_by_elid($db_app['applicationid']),
@@ -313,6 +319,6 @@ include_once('include/page_header.php');
 	$httpmon_wdgt->show();
 
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

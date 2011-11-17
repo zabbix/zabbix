@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -179,6 +179,7 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 		{
 			zbx_json_addobject(&j, NULL);
 			zbx_json_addstring(&j, "{#FSNAME}", mt->mnt_dir, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "{#FSTYPE}", mt->mnt_type, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 
@@ -189,7 +190,7 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	zbx_json_close(&j);
 
-	SET_STR_RESULT(result, strdup(j.buffer));
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 	zbx_json_free(&j);
 

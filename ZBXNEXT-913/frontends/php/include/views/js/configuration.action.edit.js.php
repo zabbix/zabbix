@@ -142,33 +142,38 @@ function addPopupValues(list){
 				if(jQuery("#opmsgUserRow_"+value.userid).length) continue;
 
 				var tpl = new Template(jQuery('#opmsgUserRowTPL').html());
-				jQuery("#opmsgUserListFooter").before(tpl.evaluate(value));
+				var container = jQuery("#opmsgUserListFooter");
+				container.before(tpl.evaluate(value));
 				break;
 			case 'usrgrpid':
 				if(jQuery("#opmsgUsrgrpRow_"+value.usrgrpid).length) continue;
 
 				var tpl = new Template(jQuery('#opmsgUsrgrpRowTPL').html());
-				jQuery("#opmsgUsrgrpListFooter").before(tpl.evaluate(value));
+				var container = jQuery("#opmsgUsrgrpListFooter");
+				container.before(tpl.evaluate(value));
 				break;
 			case 'dsc_groupid':
 				if(jQuery("#opGroupRow_"+value.groupid).length) continue;
 
 				var tpl = new Template(jQuery('#opGroupRowTPL').html());
-				jQuery("#opGroupListFooter").before(tpl.evaluate(value));
+				var container = jQuery("#opGroupListFooter");
+				container.before(tpl.evaluate(value));
 				break;
 			case 'dsc_templateid':
 				if(jQuery("#opTemplateRow_"+value.templateid).length) continue;
 
 				var tpl = new Template(jQuery('#opTemplateRowTPL').html());
-				jQuery("#opTemplateListFooter").before(tpl.evaluate(value));
+				var container = jQuery("#opTemplateListFooter");
+				container.before(tpl.evaluate(value));
 				break;
 			case 'groupid':
 				var tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
 
 				value.objectCaption = "<?php print(_('Host group').': '); ?>";
 
+				var container = jQuery("#opCmdListFooter");
 				if(jQuery("#opCmdGroupRow_"+value.groupid).length == 0){
-					jQuery("#opCmdListFooter").before(tpl.evaluate(value));
+					container.before(tpl.evaluate(value));
 				}
 				break;
 			case 'hostid':
@@ -179,10 +184,19 @@ function addPopupValues(list){
 				else
 					value.name = "<?php print(_('Current host')); ?>";
 
+				var container = jQuery("#opCmdListFooter");
 				if(jQuery("#opCmdHostRow_"+value.hostid).length == 0){
-					jQuery("#opCmdListFooter").before(tpl.evaluate(value));
+					container.before(tpl.evaluate(value));
 				}
 				break;
+		}
+
+		// IE8 hack to fix inline-block container resizing
+		if (jQuery.browser.msie  && parseInt(jQuery.browser.version) == 8) {
+			var inlineContainers = container.parents('.inlineblock').filter(function() {
+				return jQuery(this).css('display') == 'inline-block';
+			});
+			inlineContainers.last().addClass('ie8fix-inline').removeClass('ie8fix-inline');
 		}
 	}
 }

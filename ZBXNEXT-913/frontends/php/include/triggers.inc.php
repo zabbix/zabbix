@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; ifnot, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -348,18 +348,6 @@ function getSeverityCell($severity, $text=null, $force_normal=false){
 		$status = ($rows=DBfetch(DBselect($sql,1)))?$rows['priority']:0;
 
 	return $status;
-	}
-
-	function get_trigger_value_style($value){
-		$str_val[TRIGGER_VALUE_FALSE]	= 'off';
-		$str_val[TRIGGER_VALUE_TRUE]	= 'on';
-		// keep it for events
-		$str_val[TRIGGER_VALUE_UNKNOWN]	= 'unknown';
-
-		if(isset($str_val[$value]))
-			return $str_val[$value];
-
-		return '';
 	}
 
 	/**
@@ -929,128 +917,148 @@ function utf8RawUrlDecode($source){
 	return $exp;
 	}
 
-/******************************************************************************
- *																			*
- * Purpose: Translate {10}>10 to something like localhost:procload.last(0)>10 *
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
-	function triggerExpression($trigger, $html, $template=false, $resolve_macro=false){
-		$expression = $trigger['expression'];
+/**
+ * Translate {10}>10 to something like localhost:procload.last(0)>10.
+ * Don't forget sync code with C.
+ *
+ * @param $trigger
+ * @param $html
+ * @param bool $template
+ * @param bool $resolve_macro
+ * @return array|string
+ */
+function triggerExpression($trigger, $html, $template=false, $resolve_macro=false) {
+	$expression = $trigger['expression'];
 
-//		echo "EXPRESSION:",$expression,"<Br>";
-		$functionid='';
-		$macros = '';
-		if(0 == $html) $exp='';
-		else $exp=array();
+	$functionid = '';
+	$macros = '';
+	if (0 == $html) {
+		$exp = '';
+	}
+	else {
+		$exp = array();
+	}
 
-		$state='';
+	$state='';
 
-		for($i=0,$max=zbx_strlen($expression); $i<$max; $i++){
-			if(($expression[$i] == '{') && ($expression[$i+1] == '$')){
-				$functionid='';
-				$macros='';
-				$state='MACROS';
-			}
-			else if($expression[$i] == '{'){
-				$functionid='';
-				$state='FUNCTIONID';
+	for ($i = 0,$max = zbx_strlen($expression); $i < $max; $i++) {
+		if ($expression[$i] == '{' && $expression[$i+1] == '$') {
+			$functionid = '';
+			$macros = '';
+			$state = 'MACROS';
+		}
+		elseif ($expression[$i] == '{') {
+			$functionid = '';
+			$state = 'FUNCTIONID';
+			continue;
+		}
+
+		if ($expression[$i] == '}') {
+			if($state == 'MACROS') {
+				$macros .= '}';
+
+				if ($resolve_macro) {
+					$function_data['expression'] = $macros;
+					$function_data = API::UserMacro()->resolveTrigger($function_data);
+					$macros = $function_data['expression'];
+				}
+
+				if (1 == $html) {
+					array_push($exp,$macros);
+				}
+				else {
+					$exp .= $macros;
+				}
+
+				$macros = '';
+				$state = '';
 				continue;
 			}
 
-			if($expression[$i] == '}'){
-				if($state == 'MACROS'){
-					$macros.='}';
+			$state = '';
 
-					if($resolve_macro){
-						$function_data['expression'] = $macros;
-						$function_data = API::UserMacro()->resolveTrigger($function_data);
-						$macros = $function_data['expression'];
-					}
+			if ($functionid == 'TRIGGER.VALUE') {
+				if (0 == $html) {
+					$exp .= '{'.$functionid.'}';
+				}
+				else {
+					array_push($exp, '{'.$functionid.'}');
+				}
+			}
+			elseif (is_numeric($functionid) && isset($trigger['functions'][$functionid])) {
+				$function_data = $trigger['functions'][$functionid];
+				$function_data += $trigger['items'][$function_data['itemid']];
+				$function_data += $trigger['hosts'][$function_data['hostid']];
 
-					if(1 == $html) array_push($exp,$macros);
-					else $exp.=$macros;
-
-					$macros = '';
-					$state = '';
-					continue;
+				if ($template) {
+					$function_data['host'] = '{HOST.HOST}';
 				}
 
-				$state='';
+				if ($resolve_macro) {
+					$function_data = API::UserMacro()->resolveItem($function_data);
 
-				if($functionid=='TRIGGER.VALUE'){
-					if(0 == $html) $exp.='{'.$functionid.'}';
-					else array_push($exp,'{'.$functionid.'}');
+					$function_data['expression'] = $function_data['parameter'];
+					$function_data = API::UserMacro()->resolveTrigger($function_data);
+					$function_data['parameter'] = $function_data['expression'];
 				}
-				else if(is_numeric($functionid) && isset($trigger['functions'][$functionid])){
-					$function_data = $trigger['functions'][$functionid];
-					$function_data+= $trigger['items'][$function_data['itemid']];
-					$function_data+= $trigger['hosts'][$function_data['hostid']];
-
-					if($template) $function_data['host'] = '{HOST.HOST}';
-
-					if($resolve_macro){
-						$function_data = API::UserMacro()->resolveItem($function_data);
-
-						$function_data['expression'] = $function_data['parameter'];
-						$function_data = API::UserMacro()->resolveTrigger($function_data);
-						$function_data['parameter'] = $function_data['expression'];
-					}
 
 //SDII($function_data);
-					if($html == 0){
-						$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
-					}
-					else{
-						$style = ($function_data['status']==ITEM_STATUS_DISABLED)? 'disabled':'unknown';
-						if($function_data['status']==ITEM_STATUS_ACTIVE){
-							$style = 'enabled';
-						}
-
-						if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST){
-							$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
-						}
-						else if($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
-							$link = new CLink($function_data['host'].':'.$function_data['key_'],
-								'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
-								$trigger['discoveryRuleid'], $style);
-						}
-						else{
-							$link = new CLink($function_data['host'].':'.$function_data['key_'],
-								'items.php?form=update&itemid='.$function_data['itemid'], $style);
-						}
-
-
-						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
-					}
+				if ($html == 0) {
+					$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
 				}
-				else{
-					if(1 == $html){
-						array_push($exp, new CSpan('*ERROR*', 'on'));
+				else {
+					$style = ($function_data['status'] == ITEM_STATUS_DISABLED) ? 'disabled' : 'unknown';
+					if ($function_data['status'] == ITEM_STATUS_ACTIVE) {
+						$style = 'enabled';
 					}
-					else{
-						$exp.= '*ERROR*';
+
+					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
+						$link = new CSpan($function_data['host'].':'.$function_data['key_'], $style);
 					}
+					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
+						$link = new CLink($function_data['host'].':'.$function_data['key_'],
+							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
+							$trigger['discoveryRuleid'], $style);
+					}
+					else {
+						$link = new CLink($function_data['host'].':'.$function_data['key_'],
+							'items.php?form=update&itemid='.$function_data['itemid'], $style);
+					}
+
+
+					array_push($exp,array('{', $link, '.',bold($function_data['function'].'('),$function_data['parameter'], bold(')'), '}'));
 				}
-				continue;
 			}
-
-			if($state == 'FUNCTIONID'){
-				$functionid=$functionid.$expression[$i];
-				continue;
+			else {
+				if (1 == $html) {
+					array_push($exp, new CSpan('*ERROR*', 'on'));
+				}
+				else {
+					$exp .= '*ERROR*';
+				}
 			}
-			else if($state == 'MACROS'){
-				$macros=$macros.$expression[$i];
-				continue;
-			}
-
-			if(1 == $html) array_push($exp,$expression[$i]);
-			else $exp.=$expression[$i];
+			continue;
 		}
-//SDII($exp);
-	return $exp;
+
+		if ($state == 'FUNCTIONID') {
+			$functionid = $functionid.$expression[$i];
+			continue;
+		}
+		elseif ($state == 'MACROS') {
+			$macros = $macros.$expression[$i];
+			continue;
+		}
+
+		if (1 == $html) {
+			array_push($exp, $expression[$i]);
+		}
+		else {
+			$exp .= $expression[$i];
+		}
 	}
+
+	return $exp;
+}
 /*
  * Function: implode_exp
  *
@@ -1080,6 +1088,7 @@ function utf8RawUrlDecode($source){
 			$sql = 'SELECT i.itemid, i.value_type '.
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
+					' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
 					' AND h.host='.zbx_dbstr($exprPart['host']).
 					' AND h.hostid=i.hostid'.
 					' AND '.DBin_node('i.itemid');
@@ -1847,7 +1856,7 @@ function utf8RawUrlDecode($source){
 		else{
 			if(($period_start==0)&&($period_end==0)){
 				$max=time();
-				$min=$max-24*3600;
+				$min=$max - SEC_PER_DAY;
 			}
 			else{
 				$ret['true_time']		= 0;
@@ -2081,39 +2090,6 @@ function utf8RawUrlDecode($source){
 		$nextletter = 'A';
 		$ret = build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $nextletter);
 	return $ret;
-	}
-
-	function showExpressionErrors($expression, $errors) {
-		if(!is_array($errors))
-			return false;
-
-		$totalBreak = false;
-		foreach($errors as $errData) {
-			$checkExprFrom = S_CHECK_EXPRESSION_PART_STARTING_FROM_PART1.SPACE.zbx_substr($expression, $errData['errStart']).SPACE.S_CHECK_EXPRESSION_PART_STARTING_FROM_PART2;
-
-			switch($errData['errorCode']) {
-				case 1: error(S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR.':'.SPACE.$checkExprFrom); $totalBreak = true; break;
-				case 2: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 3: error(S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 4: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 5: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 6: error(S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 7: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.':'.SPACE.$checkExprFrom); break;
-				case 8: error(S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.SPACE.$checkExprFrom); break;
-				case 9: error(S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR.SPACE.$checkExprFrom); break;
-				case 10:
-					info(S_FUNCTION.SPACE.'('.$errData['function'].')'.SPACE.S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL.SPACE.'['.implode(',',$errData['validTypes']).']');
-					error(S_INCORRECT_VALUE_TYPE.SPACE.'['.item_value_type2str($errData['value_type']).']'.SPACE.S_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom);
-				break;
-				case 11: error(S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
-				case 12: error('['.$errData['errValue'].']'.SPACE.S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
-				case 13: error('['.$errData['errValue'].']'.SPACE.S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL.SPACE.'('.$errData['function'].').'.SPACE.$checkExprFrom); break;
-				case 14: error(S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1.SPACE.$errData['function'].SPACE.S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2.SPACE.$checkExprFrom); break;
-				case 15: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR.SPACE.$checkExprFrom); break;
-				case 16: error(S_INCORRECT_TRIGGER_EXPRESSION.'.'.SPACE.S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR.SPACE.$checkExprFrom); break;
-			}
-			if($totalBreak) break;
-		}
 	}
 
 /*
@@ -2623,43 +2599,6 @@ function utf8RawUrlDecode($source){
 		return $newExp;
 	}
 
-	function make_disp_tree($tree, $map, $action = false){
-		$res = array();
-		foreach ($tree as $i => $n){
-			$expr = array();
-			for ($j = 0; $j < $n['depth']; ++$j){
-				$next = $finder($tree, $i + 1, $j + 1);
-				if($j + 1 == $n['depth']) $expr[] = new CImg('images/general/tr_'.($next ? 'top_right_bottom':'top_right').'.gif','tr', 12, 12);
-				else $expr[] = new CImg('images/general/tr_'.($next ? 'top_bottom':'space').'.gif', 'tr', 12, 12);
-			}
-
-			$key = null;
-
-			if(zbx_strlen($n['expr']) == 1){
-				$key = $n['expr'];
-				$tgt = $map[$key];
-
-				array_push($expr, SPACE, bold($n['expr']),SPACE);
-
-				$e = $tgt['expression'].$tgt['sign'].$tgt['value'];
-				if($action){
-					$url = new CSpan($e, 'link');
-					$url->setAttribute('id', 'expr' . $n['id']);
-					$url->setAttribute('onclick', 'javascript: copy_expression("expr'. $n['id'] .'");');
-					$expr[] = $url;
-				}else{
-					$expr[] = $e;
-				}
-			} else {
-				array_push($expr, SPACE, italic($n['expr']));
-			}
-
-			array_push($res, array('id' => $n['id'], 'expr' => $expr, 'key' => $key));
-		}
-
-	return $res;
-	}
-
 /*
  * Function: remake_expression
  *
@@ -2867,25 +2806,6 @@ function utf8RawUrlDecode($source){
 		}
 
 	return $result;
-	}
-
-	function convert($value){
-		$value = trim($value);
-		if(!preg_match('/(?P<value>[\-+]?[0-9]+[.]?[0-9]*)(?P<mult>[TGMKsmhdw]?)/', $value, $arr)) return $value;
-
-		$value = $arr['value'];
-		switch($arr['mult']){
-			case 'T': $value *= 1024 * 1024 * 1024 * 1024; break;
-			case 'G': $value *= 1024 * 1024 * 1024; break;
-			case 'M': $value *= 1024 * 1024; break;
-			case 'K': $value *= 1024; break;
-			case 'm': $value *= 60; break;
-			case 'h': $value *= 60 * 60; break;
-			case 'd': $value *= 60 * 60 * 24; break;
-			case 'w': $value *= 60 * 60 * 24 * 7; break;
-		}
-
-		return $value;
 	}
 
 	function copyTriggers($srcHostId, $dstHostId) {

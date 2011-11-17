@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -22,10 +22,11 @@
 #include "db.h"
 #include "zbxdb.h"
 #include "log.h"
+#include "mutexs.h"
 
-static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
-static int	txn_init = 0;
-static int	txn_error = 0;	/* failed transaction */
+int		txn_level = 0;	/* transaction level, nested transactions are not supported */
+int		txn_error = 0;	/* failed transaction */
+static int	txn_init = 0;	/* connecting to db */
 
 #if defined(HAVE_IBM_DB2)
 static zbx_ibm_db2_handle_t	ibm_db2;
@@ -39,7 +40,7 @@ static int			ZBX_PG_BYTEAOID = 0;
 int				ZBX_PG_SVERSION = 0;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
-PHP_MUTEX			sqlite_access;
+static PHP_MUTEX		sqlite_access;
 #endif
 
 #if defined(HAVE_ORACLE)
@@ -369,6 +370,11 @@ void	zbx_create_sqlite3_mutex(const char *dbname)
 		zbx_error("cannot create mutex for SQLite3");
 		exit(FAIL);
 	}
+}
+
+void	zbx_remove_sqlite3_mutex()
+{
+	php_sem_remove(&sqlite_access);
 }
 #endif	/* HAVE_SQLITE3 */
 

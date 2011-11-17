@@ -1,12 +1,6 @@
 #!/bin/bash
 
 # A script to generate SQL from PNG images
-
-# todo :
-# integrate in make dist;
-# generate an sql of old images as well
-# generate importable xml out of a bunch of png images
-
 # depends on hexdump
 
 outputdir=${1:-png}

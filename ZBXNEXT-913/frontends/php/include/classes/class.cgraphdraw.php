@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -50,7 +50,7 @@ class CGraphDraw{
 		$this->colorsrgb = null;
 		$this->im = null;
 
-		$this->period=3600;
+		$this->period = SEC_PER_HOUR;
 		$this->from=0;
 		$this->sizeX=900;				// default graph size X
 		$this->sizeY=200;				// default graph size Y

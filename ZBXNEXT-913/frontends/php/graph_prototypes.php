@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -29,7 +29,7 @@ $page['file'] = 'graph_prototypes.php';
 $page['hist_arg'] = array('parent_discoveryid');
 $page['scripts'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -96,13 +96,26 @@ include_once('include/page_header.php');
 		$discovery_rule = reset($discovery_rule);
 		if(!$discovery_rule) access_deny();
 		$_REQUEST['hostid'] = $discovery_rule['hostid'];
+
+		if (isset($_REQUEST['graphid'])) {
+			$options = array(
+				'graphids' => $_REQUEST['graphid'],
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => true,
+				'preservekeys' => true
+			);
+			$graphPrototype = API::GraphPrototype()->get($options);
+			if (empty($graphPrototype)) {
+				access_deny();
+			}
+		}
 	}
 	else{
 		access_deny();
 	}
 
-?>
-<?php
+
+
 	$_REQUEST['items'] = get_request('items', array());
 	$_REQUEST['group_gid'] = get_request('group_gid', array());
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
@@ -277,8 +290,6 @@ include_once('include/page_header.php');
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 // ----</ACTIONS>----
-?>
-<?php
 
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm('get');
@@ -413,9 +424,7 @@ include_once('include/page_header.php');
 		$graphs_wdgt->show();
 	}
 
-?>
-<?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -25,9 +25,9 @@ require_once('include/forms.inc.php');
 $page["title"] = "S_INSTALLATION";
 $page["file"] = 'instal.php';
 
-include_once('include/page_header.php');
-include_once('setup.php');
-include_once('include/page_footer.php');
+require_once('include/page_header.php');
+require_once('setup.php');
+require_once('include/page_footer.php');
 
 /*******************************/
 /* THIS POINT NEVER BE REACHED */
@@ -74,6 +74,6 @@ include_once('include/page_footer.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

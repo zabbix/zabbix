@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -33,7 +33,7 @@ if($page['type'] == PAGE_TYPE_HTML){
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 // js templates
 require_once('include/views/js/general.script.confirm.js.php');
@@ -72,7 +72,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -333,7 +333,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$options['min_severity'] = $show_severity;
 	}
 	if($_REQUEST['status_change']){
-		$options['lastChangeSince'] = time() - ($_REQUEST['status_change_days'] * 86400);
+		$options['lastChangeSince'] = time() - $_REQUEST['status_change_days'] * SEC_PER_DAY;
 	}
 
 	$triggers = API::Trigger()->get($options);
@@ -397,7 +397,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 			),
 			'output' => API_OUTPUT_EXTEND,
 			'select_acknowledges' => API_OUTPUT_COUNT,
-			'time_from' => time() - ($config['event_expire']*86400),
+			'time_from' => time() - $config['event_expire'] * SEC_PER_DAY,
 			'time_till' => time(),
 			'nopermissions' => true,
 			//'limit' => $config['event_show_max']
@@ -740,12 +740,6 @@ require_once('include/views/js/general.script.confirm.js.php');
 	zbx_add_post_js('jqBlink.init();');
 	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
 
-	$jsmenu = new CPUMenu(null, 170);
-	$jsmenu->InsertJavaScript();
-
-?>
-<?php
-
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

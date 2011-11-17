@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -96,40 +96,7 @@
 
 //	httpconf.php
 	'S_SORT'=>					_('Sort'),
-	'S_STATUS_CODES'=>				_('Status codes'),
-	'S_CONFIGURATION_OF_WEB_MONITORING'=>		_('Configuration of Web monitoring'),
-	'S_CONFIGURATION_OF_WEB_MONITORING_BIG'=>	_('CONFIGURATION OF WEB MONITORING'),
-	'S_SCENARIO'=>					_('Scenario'),
-	'S_SCENARIOS'=>					_('Scenarios'),
-	'S_SCENARIOS_BIG'=>				_('SCENARIOS'),
-	'S_CREATE_SCENARIO'=>				_('Create scenario'),
-	'S_HIDE_DISABLED_SCENARIOS'=>			_('Hide disabled scenarios'),
-	'S_SHOW_DISABLED_SCENARIOS'=>			_('Show disabled scenarios'),
-	'S_NUMBER_OF_STEPS'=>				_('Number of steps'),
-	'S_SCENARIO_DELETED'=>				_('Scenario deleted'),
-	'S_SCENARIO_ACTIVATED'=>			_('Scenario activated'),
-	'S_SCENARIO_DISABLED'=>				_('Scenario disabled'),
-	'S_DELETE_SCENARIO_Q'=>				_('Delete scenario?'),
-	'S_SCENARIO_UPDATED'=>				_('Scenario updated'),
-	'S_CANNOT_UPDATE_SCENARIO'=>			_('Cannot update scenario'),
-	'S_SCENARIO_ADDED'=>				_('Scenario added'),
-	'S_CANNOT_ADD_SCENARIO'=>			_('Cannot add scenario'),
-	'S_CANNOT_DELETE_SCENARIO'=>			_('Cannot delete scenario'),
-	'S_AGENT'=>					_('Agent'),
-	'S_VARIABLES'=>					_('Variables'),
 	'S_STEP'=>					_('Step'),
-	'S_STEPS'=>					_('Steps'),
-	'S_TIMEOUT'=>					_('Timeout'),
-	'S_POST'=>					_('Post'),
-	'S_REQUIRED'=>					_('Required'),
-	'S_STEP_OF_SCENARIO'=>				_('Step of scenario'),
-	'S_BASIC_AUTHENTICATION'=>			_('Basic authentication'),
-	'S_NTLM_AUTHENTICATION'=>			_('NTLM authentication'),
-	'S_ENABLE_SELECTED_WEB_SCENARIOS_Q'=>		_('Enable selected WEB scenarios?'),
-	'S_DISABLE_SELECTED_WEB_SCENARIOS_Q'=>		_('Disable selected WEB scenarios?'),
-	'S_DELETE_HISTORY_SELECTED_WEB_SCENARIOS_Q'=>	_('Delete history of selected WEB scenarios?'),
-	'S_DELETE_SELECTED_WEB_SCENARIOS_Q'=>		_('Delete selected WEB scenarios?'),
-	'S_SELECT_HOST_FIRST' => _('(select host first)'),
 
 //	exp_imp.php
 	'S_ELEMENT'=>				_('Element'),
@@ -184,9 +151,6 @@
 //	actionconf.php
 	'S_CONFIGURATION_OF_ACTIONS'=>		_('Configuration of actions'),
 	'S_FILTER'=>				_('Filter'),
-	'S_TIME_PERIOD'=>			_('Time period'),
-	'S_MAX_VALUE_SMALL'=>			_('max value'),
-	'S_MIN_VALUE_SMALL'=>			_('min value'),
 	'S_CONDITION'=>				_('Condition'),
 
 //	actions.php
@@ -237,9 +201,6 @@
 	'S_PERIOD'=>				_('Period'),
 
 //	class.cchart.php
-	'S_CCHARTS_TIMELINE_HOURS_FORMAT'=>			_('H:i'),
-	'S_CCHARTS_TIMELINE_DAYS_FORMAT'=>			_('D'),
-	'S_CCHARTS_TIMELINE_MONTHDAYS_FORMAT'=>			_('d.m'),
 	'S_CCHARTS_TIMELINE_START_DATE_FORMAT'=>		_('d.m H:i'),
 	'S_CCHARTS_TIMELINE_END_DATE_FORMAT'=>			_('d.m H:i'),
 	'S_CCHARTS_TIMELINE_MAINPERIOD_HOURS_FORMAT'=>		_('H:i'),
@@ -403,7 +364,6 @@
 	'S_LAST_MONTH_GRAPH'=>			_('Last month graph'),
 	'S_500_LATEST_VALUES'=>			_('500 latest values'),
 	'S_TIMESTAMP'=>				_('Timestamp'),
-	'S_LOCAL'=>				_('Local'),
 	'S_SOURCE'=>				_('Source'),
 	'S_INFO'=>					_('Info'),
 	'S_EVENT_ID'=>				_('Event ID'),
@@ -563,8 +523,6 @@
 	'S_WITHOUT_TRIGGERS'=>					_('Without triggers'),
 	'S_TYPES'=>						_('Types'),
 	'S_NO_ITEMS_DEFINED'=>					_('No items defined.'),
-	'S_HISTORY_CLEARED'=>					_('History cleared'),
-	'S_CLEAR_HISTORY_FOR_SELECTED'=>			_('Clear history for selected'),
 	'S_CLEAR_HISTORY'=>					_('Clear history'),
 	'S_CANNOT_CLEAR_HISTORY'=>				_('Cannot clear history'),
 	'S_CONFIGURATION_OF_ITEMS'=>				_('Configuration of items'),
@@ -579,7 +537,6 @@
 	'S_ITEMS_DISABLED'=>					_('Items disabled'),
 	'S_KEY'=>						_('Key'),
 	'S_DESCRIPTION'=>					_('Description'),
-	'S_UPDATE_INTERVAL'=>					_('Update interval'),
 	'S_INTERVAL'=>						_('Interval'),
 	'S_HISTORY'=>						_('History'),
 	'S_TRENDS'=>						_('Trends'),
@@ -587,7 +544,6 @@
 	'S_ACTIVE'=>						_('Active'),
 	'S_NOT_SUPPORTED'=>					_('Not supported'),
 	'S_UNITS'=>						_('Units'),
-	'S_UPDATE_INTERVAL_IN_SEC'=>				_('Update interval (in sec)'),
 	'S_KEEP_HISTORY_IN_DAYS'=>				_('Keep history (in days)'),
 	'S_KEEP_TRENDS_IN_DAYS'=>				_('Keep trends (in days)'),
 	'S_TYPE_OF_INFORMATION'=>				_('Type of information'),
@@ -674,8 +630,6 @@
 	'S_GRAPH_PROTOTYPES_OF_BIG' => _('GRAPH PROTOTYPES OF'),
 
 //	events.php
-	'S_EVENT'=>				_('Event'),
-	'S_LIST'=>				_('List'),
 	'S_LATEST_EVENTS'=>			_('Latest events'),
 	'S_HISTORY_OF_EVENTS_BIG'=>		_('HISTORY OF EVENTS'),
 	'S_NO_EVENTS_FOUND'=>			_('No events found'),
@@ -767,7 +721,6 @@
 	'S_FAVOURITES'=>			_('Favourites'),
 	'S_MENU'=>				_('Menu'),
 	'S_RESET'=>				_('Reset'),
-	'S_OF' => _('of'),
 
 // dashconf.php
 	'S_DASHBOARD_CONFIGURATION' =>	_('Dashboard configuration'),
@@ -852,7 +805,6 @@
 //	locales.php
 	'S_CREATE'=>				_('Create'),
 
-
 //	report4.php
 	'S_NOTIFICATIONS_BIG'=>			_('NOTIFICATIONS'),
 	'S_IT_NOTIFICATIONS'=>			_('Notification report'),
@@ -860,12 +812,6 @@
 	'S_REPORT4_MONTHLY_DATE_FORMAT'=>	_('M Y'),
 	'S_REPORT4_DAILY_DATE_FORMAT'=>		_('d M Y'),
 	'S_REPORT4_WEEKLY_DATE_FORMAT'=>	_('d M Y H:i'),
-
-//	report5.php
-	'S_TRIGGERS_TOP_100'=>			_('Most busy triggers top 100'),
-	'S_TRIGGERS_TOP_100_BIG'=>		_('MOST BUSY TRIGGERS TOP 100'),
-	'S_NUMBER_OF_STATUS_CHANGES'=>		_('Number of status changes'),
-	'S_WEEK'=>				_('Week'),
 
 //	report6.php
 	'S_BAR_REPORTS'=>			_('Bar reports'),
@@ -978,8 +924,6 @@
 	'S_CANNOT_DELETE_SLIDESHOW'=>	_('Cannot delete slideshow'),
 	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
 
-	'S_ERROR_SCREEN_WITH_ID_DOES_NOT_EXIST' => _('Screen with id "%d" does not exist'),
-
 // slides.php
 	'S_CUSTOM_SLIDES' =>			_('Custom slides'),
 
@@ -1081,7 +1025,6 @@
 	'S_DEBUG'=>					_('Debug'),
 	'S_DENY'=>					_('Deny'),
 	'S_HIDE'=>					_('Hide'),
-	'S_PASSWORD'=>				_('Password'),
 	'S_ADD_TO'=>				_('Add to'),
 	'S_REMOVE_FROM'=>			_('Remove from'),
 
@@ -1147,14 +1090,6 @@
 	'S_EXPRESSION_PART_ERROR'=>			_('Error'),
 	'S_EXPRESSION_PART_NO_ERROR'=>			_('No errors found'),
 	'S_EXPRESSION_SYNTAX_ERROR'=> 			_('Expression Syntax Error'),
-	'S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR'=>_('Unexpected end of element'),
-	'S_CHECK_EXPRESSION_PART_STARTING_FROM_PART1'=>	_('Check expression part starting from \''),
-	'S_CHECK_EXPRESSION_PART_STARTING_FROM_PART2'=>	_('\''),
-	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR'=>_('Not allowed symbols or sequence of symbols in expression element detected'),
-	'S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR'=>_('Not allowed value detected in element'),
-	'S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR'=>_('Unnecessary symbols detected'),
-	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR'=>_('Not allowed symbols detected after element'),
-	'S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR'=>_('Not allowed symbols detected before element'),
 
 //	tr_logform.php
 	'S_INCLUDE_S'=>		_('Include'),
@@ -1220,7 +1155,6 @@
 	'S_NO_ITEM_WITH'=>				_('No item with'),
 
 //	httptest.inc.php
-	'S_CANNOT_ADD_NEW_APPLICATION'=>		_('Cannot add new application'),
 	'S_ADDED_SMALL'=>				_('added'),
 
 //	hosts.inc.php
@@ -1238,21 +1172,9 @@
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					_('No trigger with'),
 	'S_EXPRESSION_CANNOT_BE_EMPTY'=>			_('Expression cannot be empty'),
-	'S_INCORRECT_VALUE_TYPE'=>				_('Incorrect value type'),
-	'S_FOR_FUNCTION_SMALL'=>				_('for function'),
-	'S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL'=>	_('available only for items with value types'),
-	'S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION'=>		_('Missing mandatory parameter for function'),
-	'S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL'=> _('is not a float or macro for function'),
-	'S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL'=>	_('is not a float or counter or macro for function'),
 	'S_INCORRECT_TRIGGER_EXPRESSION'=>			_('Incorrect trigger expression'),
-	'S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR'=>		_('You can not use template hosts in mixed expressions.'),
 	'S_INCORRECT_FUNCTION_IS_USED'=>			_('Incorrect function is used'),
 	'S_0_OR_1'=>						_('0 or 1'),
-	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	_('At least one item must be present in the trigger expression.'),
-	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		_('Host does not exist.'),
-	'S_EXPRESSION_HOST_KEY_DOES_NOT_ERROR'=>		_('Host key does not exist.'),
-	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>	_('Function \''),
-	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>	_('\' does not accept parameters.'),
 
 //	maps.inc.php
 	'S_SUBMAP'=>			_('Submap'),
@@ -1281,14 +1203,6 @@
 	'S_EXECUTE_SQL_ERROR'=>			_('Execute SQL error'),
 	'S_PARSE_SQL_ERROR'=>			_('Parse SQL error'),
 
-//	nodes.inc.php
-	'S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME'=>		_('Incorrect characters used for Node name'),
-	'S_MASTER_NODE_ALREADY_EXISTS'=>			_('Master node already exists'),
-	'S_INCORRECT_NODE_TYPE'=>				_('Incorrect node type'),
-	'S_NODE_WITH_SAME_ID_ALREADY_EXISTS'=>			_('Node with same ID already exists'),
-	'S_UNABLE_TO_REMOVE_LOCAL_NODE'=>			_('Unable to remove local node'),
-	'S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE'=>	_('Please be aware that database still contains data related to the deleted Node'),
-
 //	class.cuser.php
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS'=>	_('Only Zabbix Admins can add user Medias'),
 	'S_CUSER_ERROR_ONLY_ADMIN_CAN_REMOVE_USER_MEDIAS'=>	_('Only Zabbix Admins can remove user Medias'),
@@ -1313,7 +1227,6 @@
 
 	'S_QUEUE'=>				_('Queue'),
 	'S_EVENTS'=>				_('Events'),
-	'S_MAPS'=>				_('Maps'),
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
 	'S_LOGOUT'=>				_('Logout'),

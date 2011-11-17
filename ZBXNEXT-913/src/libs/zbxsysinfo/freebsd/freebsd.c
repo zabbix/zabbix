@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -28,6 +28,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,		0,	"/,free"},
 	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,		0,	"/,free"},
+	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	0,	0},
 
 	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,		0,	"hda,ops,avg1"},
 	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		0,	"hda,ops,avg1"},

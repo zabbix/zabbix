@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #ifndef ZABBIX_DB_H
@@ -534,7 +534,6 @@ const ZBX_TABLE	*DBget_table(const char *tablename);
 const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
-zbx_uint64_t	DBget_nextid(const char *tablename, int num);
 
 /******************************************************************************
  *                                                                            *
