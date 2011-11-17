@@ -148,7 +148,8 @@ void	main_alerter_loop()
 
 		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid"
 				",mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path"
-				",mt.gsm_modem,mt.username,mt.passwd,a.retries from alerts a,media_type mt"
+				",mt.gsm_modem,mt.username,mt.passwd,a.retries"
+				" from alerts a,media_type mt"
 				" where a.status=%d and a.mediatypeid=mt.mediatypeid and a.alerttype=%d" DB_NODE
 				" order by a.clock",
 				ALERT_STATUS_NOT_SENT,
@@ -182,14 +183,14 @@ void	main_alerter_loop()
 
 			if (SUCCEED == res)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Alert ID [" ZBX_FS_UI64 "] was sent successfully",
+				zabbix_log(LOG_LEVEL_DEBUG, "alert ID [" ZBX_FS_UI64 "] was sent successfully",
 						alert.alertid);
 				DBexecute("update alerts set status=%d,error='' where alertid=" ZBX_FS_UI64,
 						ALERT_STATUS_SENT, alert.alertid);
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Error sending alert ID [" ZBX_FS_UI64 "]",
+				zabbix_log(LOG_LEVEL_WARNING, "error sending alert ID [" ZBX_FS_UI64 "]",
 						alert.alertid);
 				zabbix_syslog("Error sending alert ID [" ZBX_FS_UI64 "]",
 						alert.alertid);

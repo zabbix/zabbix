@@ -986,31 +986,6 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* remove older active escalations... */
-	DBexecute("delete from escalations"
-			" where actionid=" ZBX_FS_UI64
-				" and triggerid=" ZBX_FS_UI64
-				" and status not in (%d,%d,%d)"
-				" and (esc_step<>0 or status<>%d)",
-			actionid,
-			triggerid,
-			ESCALATION_STATUS_RECOVERY,
-			ESCALATION_STATUS_SUPERSEDED_ACTIVE,
-			ESCALATION_STATUS_SUPERSEDED_RECOVERY,
-			ESCALATION_STATUS_ACTIVE);
-
-	/* ...except we should execute an escalation at least once before it is removed */
-	DBexecute("update escalations"
-			" set status=%d"
-			" where actionid=" ZBX_FS_UI64
-				" and triggerid=" ZBX_FS_UI64
-				" and esc_step=0"
-				" and status=%d",
-			ESCALATION_STATUS_SUPERSEDED_ACTIVE,
-			actionid,
-			triggerid,
-			ESCALATION_STATUS_ACTIVE);
-
 	escalationid = DBget_maxid("escalations");
 
 	DBexecute("insert into escalations (escalationid,actionid,triggerid,eventid,status)"
@@ -1031,59 +1006,32 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	escalationid;
-	int		old_status, esc_step;
-	int		new_status;
 	char		sql[256];
 
 	/* stopping only last active escalation */
 	zbx_snprintf(sql, sizeof(sql),
-			"select escalationid,esc_step,status"
+			"select escalationid"
 			" from escalations"
 			" where actionid=" ZBX_FS_UI64
 				" and triggerid=" ZBX_FS_UI64
-				" and status not in (%d,%d)"
 			" order by escalationid desc",
 			actionid,
-			triggerid,
-			ESCALATION_STATUS_RECOVERY,
-			ESCALATION_STATUS_SUPERSEDED_RECOVERY);
+			triggerid);
 
 	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(escalationid, row[0]);
-		esc_step = atoi(row[1]);
-		old_status = atoi(row[2]);
-
-		if ((0 == esc_step && ESCALATION_STATUS_ACTIVE == old_status) ||
-				ESCALATION_STATUS_SUPERSEDED_ACTIVE == old_status)
-		{
-			/* PROBLEM, OK events in the first step occured too quickly, */
-			/* let escalator know that it should process both */
-			new_status = ESCALATION_STATUS_SUPERSEDED_RECOVERY;
-		}
-		else
-			new_status = ESCALATION_STATUS_RECOVERY;
 
 		DBexecute("update escalations"
 				" set r_eventid=" ZBX_FS_UI64 ","
-					"status=%d,"
 					"nextcheck=0"
 				" where escalationid=" ZBX_FS_UI64,
 				eventid,
-				new_status,
 				escalationid);
 	}
 	DBfree_result(result);
-
-	return SUCCEED;
-}
-
-int	DBremove_escalation(zbx_uint64_t escalationid)
-{
-	DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64,
-			escalationid);
 
 	return SUCCEED;
 }

@@ -66,7 +66,7 @@ static int	check_perm2system(zbx_uint64_t userid)
 	DB_ROW		row;
 	int		res = SUCCEED;
 
-	result = DBselect( "select count(*) from usrgrp g,users_groups ug where ug.userid=" ZBX_FS_UI64
+	result = DBselect("select count(*) from usrgrp g,users_groups ug where ug.userid=" ZBX_FS_UI64
 			" and g.usrgrpid = ug.usrgrpid and g.users_status=%d",
 			userid,
 			GROUP_STATUS_DISABLED);
@@ -511,6 +511,7 @@ static int	check_operation_conditions(DB_EVENT *event, DB_OPERATION *operation)
 
 static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action)
 {
+	const char	*__function_name = "execute_operations";
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_OPERATION	operation;
@@ -518,7 +519,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	ZBX_USER_MSG	*user_msg = NULL, *p;
 	char		*shortdata, *longdata;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In execute_operations()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == action->esc_period)
 	{
@@ -639,14 +640,17 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 			escalation->status = (action->recovery_msg == 1) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of execute_operations()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, DB_ACTION *action)
 {
+	const char	*__function_name = "process_recovery_msg";
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	userid, mediatypeid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (1 == action->recovery_msg)
 	{
@@ -672,6 +676,8 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, D
 				escalation->actionid);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -759,6 +765,7 @@ static void	free_event_info(DB_EVENT *event)
 
 static void	execute_escalation(DB_ESCALATION *escalation)
 {
+	const char	*__function_name = "execute_escalation";
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ACTION	action;
@@ -766,7 +773,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	char		*error = NULL;
 	int		source = (-1);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In execute_escalation()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect("select source from events where eventid=" ZBX_FS_UI64,
 			escalation->eventid);
@@ -897,12 +904,11 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	if (NULL != error)
 	{
 		escalation->status = ESCALATION_STATUS_COMPLETED;
-		zabbix_log(LOG_LEVEL_WARNING, "Escalation cancelled: %s",
-				error);
+		zabbix_log(LOG_LEVEL_WARNING, "escalation cancelled: %s", error);
 		zbx_free(error);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of execute_escalation()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	process_escalations(int now)
@@ -910,79 +916,105 @@ static void	process_escalations(int now)
 	const char	*__function_name = "process_escalations";
 	DB_RESULT	result;
 	DB_ROW		row;
+	DB_ESCALATION	last_escalation;
 	DB_ESCALATION	escalation;
+	unsigned char	esc_superseded, esc_recovery, esc_completed;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect("select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status"
-			" from escalations where status in (%d,%d,%d,%d) and nextcheck<=%d" DB_NODE,
+			" from escalations"
+			" where (status=%d and nextcheck<=%d"
+			" or status=%d and r_eventid<>0)" DB_NODE
+			" order by actionid,triggerid,escalationid",
 			ESCALATION_STATUS_ACTIVE,
-			ESCALATION_STATUS_SUPERSEDED_ACTIVE,
-			ESCALATION_STATUS_SUPERSEDED_RECOVERY,
-			ESCALATION_STATUS_RECOVERY,
 			now,
+			ESCALATION_STATUS_SLEEP,
 			DBnode_local("escalationid"));
 
-	while (NULL != (row = DBfetch(result)))
+	memset(&escalation, 0, sizeof(escalation));
+
+	while (NULL != (row = DBfetch(result)) || 0 != escalation.escalationid)
 	{
-		memset(&escalation, 0, sizeof(escalation));
-		ZBX_STR2UINT64(escalation.escalationid, row[0]);
-		ZBX_STR2UINT64(escalation.actionid, row[1]);
-		ZBX_STR2UINT64(escalation.triggerid, row[2]);
-		ZBX_STR2UINT64(escalation.eventid, row[3]);
-		ZBX_STR2UINT64(escalation.r_eventid, row[4]);
-		escalation.esc_step	= atoi(row[5]);
-		escalation.status	= atoi(row[6]);
-		escalation.nextcheck	= 0;
+		memset(&last_escalation, 0, sizeof(last_escalation));
 
-		DBbegin();
-
-		if (escalation.status == ESCALATION_STATUS_SUPERSEDED_ACTIVE)
+		if (NULL != row)
 		{
-			escalation.status = ESCALATION_STATUS_ACTIVE;
-			execute_escalation(&escalation);
-			DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64 " and status=%d",
-					escalation.escalationid,
-					ESCALATION_STATUS_SUPERSEDED_ACTIVE);
-			DBexecute("update escalations set status=%d where escalationid=" ZBX_FS_UI64 " and status=%d",
-					ESCALATION_STATUS_RECOVERY,
-					escalation.escalationid,
-					ESCALATION_STATUS_SUPERSEDED_RECOVERY);
+			ZBX_STR2UINT64(last_escalation.escalationid, row[0]);
+			ZBX_STR2UINT64(last_escalation.actionid, row[1]);
+			ZBX_STR2UINT64(last_escalation.triggerid, row[2]);
+			ZBX_STR2UINT64(last_escalation.eventid, row[3]);
+			ZBX_STR2UINT64(last_escalation.r_eventid, row[4]);
+			last_escalation.esc_step = atoi(row[5]);
+			last_escalation.status = atoi(row[6]);
+			last_escalation.nextcheck = 0;
 		}
-		else if (escalation.status == ESCALATION_STATUS_SUPERSEDED_RECOVERY)
-		{
-			/* PROBLEM, OK events in the fist step occured too quickly, */
-			/* process PROBLEM first, then OK */
 
-			escalation.status = ESCALATION_STATUS_ACTIVE;
-			execute_escalation(&escalation);
-			escalation.status = ESCALATION_STATUS_RECOVERY;
-			execute_escalation(&escalation);
-			DBremove_escalation(escalation.escalationid);
-		}
-		else
+		if (0 != escalation.escalationid)
 		{
-			execute_escalation(&escalation);
+			esc_superseded = (escalation.actionid == last_escalation.actionid &&
+					escalation.triggerid == last_escalation.triggerid ? 1 : 0);
+			esc_recovery = (0 != escalation.r_eventid ? 1 : 0);
+			esc_completed = 0;
 
-			if (escalation.status == ESCALATION_STATUS_COMPLETED)
-				DBremove_escalation(escalation.escalationid);
+			DBbegin();
+
+			/* execute active escalation if needed */
+			if (ESCALATION_STATUS_ACTIVE == escalation.status &&
+					(0 == esc_superseded ||
+					(1 == esc_superseded && 0 == escalation.esc_step)))
+			{
+				execute_escalation(&escalation);
+				if (ESCALATION_STATUS_COMPLETED == escalation.status)
+					esc_completed = 1;
+			}
+
+			/* execute escalation recovery if needed */
+			if (0 == esc_completed && 1 == esc_recovery)
+			{
+				escalation.status = ESCALATION_STATUS_RECOVERY;
+				execute_escalation(&escalation);
+				if (ESCALATION_STATUS_COMPLETED == escalation.status)
+					esc_completed = 1;
+			}
+
+			if (1 == esc_completed || 1 == esc_superseded || 1 == esc_recovery)
+			{
+				DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64,
+						escalation.escalationid);
+			}
 			else
+			{
+				/* delete sleeping superseded */
+				DBexecute("delete from escalations where actionid=" ZBX_FS_UI64
+						" and triggerid=" ZBX_FS_UI64
+						" and escalationid<>" ZBX_FS_UI64,
+						escalation.actionid,
+						escalation.triggerid,
+						escalation.escalationid);
+
+				/* let dbsyncer zero nextcheck when it's stopping escalation */
 				DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
 						" where escalationid=" ZBX_FS_UI64
-							" and status=%d",
+							" and r_eventid=0",
 						escalation.status,
 						escalation.esc_step,
 						escalation.nextcheck,
-						escalation.escalationid,
-						ESCALATION_STATUS_ACTIVE);
+						escalation.escalationid);
+			}
+
+			DBcommit();
 		}
 
-		DBcommit();
+		if (NULL != row)
+			memcpy(&escalation, &last_escalation, sizeof(escalation));
+		else
+			memset(&escalation, 0, sizeof(escalation));
 	}
 
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of process_escalations()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
