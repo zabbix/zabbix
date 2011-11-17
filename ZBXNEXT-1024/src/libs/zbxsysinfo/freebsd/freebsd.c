@@ -34,6 +34,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,		0,	"hda,ops,avg1"},
 
 	{"net.tcp.listen",      CF_USEUPARAM,   NET_TCP_LISTEN, 	0,	"80"},
+	{"net.udp.listen",      CF_USEUPARAM,   NET_UDP_LISTEN, 	0,	"68"},
 
 	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,		0,	"lo0,bytes"},
 	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		0,	"lo0,bytes"},

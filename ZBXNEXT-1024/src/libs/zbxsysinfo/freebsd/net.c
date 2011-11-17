@@ -162,7 +162,33 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 	if (FAIL == is_ushort(tmp, &port))
 		return SYSINFO_RET_FAIL;
 
-	zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%hu\\>' | wc -l", port);
+	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^tcp.*\\.%hu[^.].*LISTEN' | wc -l", port);
+
+	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(NULL, command, flags, result)))
+		return res;
+
+	if (1 < result->ui64)
+		result->ui64 = 1;
+
+	return res;
+}
+
+int     NET_UDP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char		tmp[8], command[64];
+	unsigned short	port;
+	int		res;
+
+	if (1 < num_param(param))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+		return SYSINFO_RET_FAIL;
+
+	if (FAIL == is_ushort(tmp, &port))
+		return SYSINFO_RET_FAIL;
+
+	zbx_snprintf(command, sizeof(command), "netstat -an | grep '^udp.*\\.%hu[^.].*\\*\\.\\*' | wc -l", port);
 
 	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(NULL, command, flags, result)))
 		return res;
