@@ -550,7 +550,7 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res =
 
 function get_accessible_groups_by_rights(&$rights, $user_type, $perm, $perm_res = null, $nodeid = null) {
 	if (is_null($perm_res)) {
-		$perm_res=PERM_RES_STRING_LINE;
+		$perm_res = PERM_RES_STRING_LINE;
 	}
 
 	$result= array();
@@ -572,12 +572,13 @@ function get_accessible_groups_by_rights(&$rights, $user_type, $perm, $perm_res 
 		$group_perm[$right['id']] = $right['permission'];
 	}
 
-	$sql = 'SELECT n.nodeid AS nodeid,n.name AS node_name,g.*,'.PERM_DENY.'AS permission'.
-			' FROM groups g'.
-				' LEFT JOIN nodes n ON '.DBid2nodeid('g.groupid').'=n.nodeid'.
-				$where.
-			' ORDER BY n.name,g.name';
-	$db_groups = DBselect($sql);
+	$db_groups = DBselect(
+		'SELECT n.nodeid AS nodeid,n.name AS node_name,g.*,'.PERM_DENY.' AS permission'.
+		' FROM groups g'.
+			' LEFT JOIN nodes n ON '.DBid2nodeid('g.groupid').'=n.nodeid'.
+			$where.
+		' ORDER BY n.name,g.name'
+	);
 	while ($group_data = DBfetch($db_groups)) {
 		if (USER_TYPE_SUPER_ADMIN == $user_type) {
 			$group_data['permission'] = PERM_MAX;
