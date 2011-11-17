@@ -1472,13 +1472,14 @@ dnl *                                                               *
 dnl *****************************************************************
 
 dnl Automake 1.8 to 1.9.6 sets mkdir_p macro (lower-cased).
-if test "x${MKDIR_P}" == "x"; then
-        if test "x${mkdir_p}" == "x"; then
+AC_MSG_CHECKING(for "mkdir -p" candidate)
+if test "x${MKDIR_P}" = "x"; then
+        if test "x${mkdir_p}" = "x"; then
                 AC_MSG_ERROR([No suitable "mkdir -p" candidate found.])
         fi
         AC_SUBST([MKDIR_P], ${mkdir_p})
 fi
-
+AC_MSG_RESULT([ok (${MKDIR_P})])
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                 Output configuration results                  *
