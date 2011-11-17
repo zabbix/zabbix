@@ -41,7 +41,7 @@
 	<label for="interface_main_#{interfaceid}"><?php echo _('Main');?></label>
 </td>
 <td>
-	<input #{*disabled} type="button" class="link_menu" name="remove" value="<?php echo _('Remove'); ?>" onclick="javascript: removeInterfaceRow(#{interfaceid});" />
+	<input #{*disabled} id="removeInterface_#{interfaceid}" type="button" class="link_menu" name="remove" value="<?php echo _('Remove'); ?>" />
 </td>
 </tr>
 </script>
@@ -138,6 +138,12 @@ function addInterfaceRow(hostInterface) {
 	}
 
 	jQuery("#hostIterfacesFooter").before(tpl.evaluate(hostInterface));
+
+	// remove interface buttonnot
+	jQuery('#removeInterface_'+hostInterface.interfaceid).click(function() {
+		removeInterfaceRow(hostInterface.interfaceid);
+		toggleMainInterfaceSwitches();
+	});
 
 	jQuery("#interface_main_"+hostInterface.interfaceid)
 			.button(mainInterfaceIcon)
