@@ -109,7 +109,7 @@ int	SYSTEM_USERS_NUM(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	return PERF_COUNTER(cmd, counter_path, flags, result);
 #else
-	return EXECUTE_INT(cmd, "who|wc -l", flags, result);
+	return EXECUTE_INT(cmd, "who | wc -l", flags, result);
 #endif
 }
 
