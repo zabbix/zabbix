@@ -26,7 +26,7 @@
 #include "zbxgetopt.h"
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix Get";
+const char	title_message[] = "Zabbix get";
 const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-I <IP address>] -k <key>";
 
 const char	*help_message[] = {
