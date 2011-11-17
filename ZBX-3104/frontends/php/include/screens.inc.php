@@ -600,7 +600,7 @@ require_once('include/js.inc.php');
 				$item = reset($items);
 				$item['host'] = reset($item['hosts']);
 
-				$caption = itemName($item);
+				$caption = $item['host']['host'].':'.itemName($item);
 
 				$nodeName = get_node_name_by_elid($item['itemid']);
 				if(!zbx_empty($nodeName))
@@ -797,12 +797,14 @@ require_once('include/js.inc.php');
 			if(zbx_empty($caption) && (TIME_TYPE_HOST == $style) && ($resourceid > 0)){
 				$options = array(
 					'itemids' => $resourceid,
+					'selectHosts' => array('name'),
 					'output' => API_OUTPUT_EXTEND
 				);
 				$items = API::Item()->get($options);
 				$item = reset($items);
+				$host = reset($item['hosts']);
 
-				$caption = $item['name'];
+				$caption = $host['name'].':'.$item['name'];
 			}
 
 			$form->addVar('resourceid',$resourceid);

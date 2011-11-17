@@ -61,7 +61,6 @@ class CScreenItem extends CZBXAPI {
 	 * @param array $options['nodeids']			Node IDs
 	 * @param array $options['screenitemids']	Search by screen item IDs
 	 * @param array $options['screenids']		Search by screen IDs
-	 * @param array $options['nopermissions']	If set to true, all of the permission checks will be skipped
 	 * @param array $options['filter']			Result filter
 	 * @param array $options['limit']			The size of the result set
 	 *
@@ -72,7 +71,6 @@ class CScreenItem extends CZBXAPI {
 			'nodeids'					=> null,
 			'screenitemids'				=> null,
 			'screenids'					=> null,
-			'nopermissions'				=> null,
 
 			// filter
 			'filter'					=> null,
@@ -83,7 +81,7 @@ class CScreenItem extends CZBXAPI {
 			'searchWildcardsEnabled'	=> null,				// not implemented
 
 			// output
-			'output'					=> API_OUTPUT_REFER,	// not implemented
+			'output'					=> API_OUTPUT_REFER,
 			'selectScreen'				=> null,				// not implemented
 			'countOutput'				=> null,				// not implemented
 			'groupCount'				=> null,				// not implemented
@@ -381,8 +379,7 @@ class CScreenItem extends CZBXAPI {
 			$result = API::HostGroup()->get(array(
 				'groupids' => $hostgroups,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-				'nopermissions' => $options['nopermissions']
+				'preservekeys' => 1
 			));
 			foreach($hostgroups as $id){
 				if(!isset($result[$id]))
@@ -395,8 +392,7 @@ class CScreenItem extends CZBXAPI {
 			$result = API::Host()->get(array(
 				'hostids' => $hosts,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-				'nopermissions' => $options['nopermissions']
+				'preservekeys' => 1
 			));
 			foreach ($hosts as $id) {
 				if (!isset($result[$id])) {
@@ -410,8 +406,7 @@ class CScreenItem extends CZBXAPI {
 			$result = API::Graph()->get(array(
 				'graphids' => $graphs,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-				'nopermissions' => $options['nopermissions']
+				'preservekeys' => 1
 			));
 			foreach ($graphs as $id) {
 				if (!isset($result[$id])) {
@@ -426,8 +421,7 @@ class CScreenItem extends CZBXAPI {
 				'itemids' => $items,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1,
-				'webitems' => 1,
-				'nopermissions' => $options['nopermissions']
+				'webitems' => 1
 			));
 			foreach ($items as $id) {
 				if (!isset($result[$id])) {
@@ -441,8 +435,7 @@ class CScreenItem extends CZBXAPI {
 			$result = API::Map()->get(array(
 				'sysmapids' => $maps,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-				'nopermissions' => $options['nopermissions']
+				'preservekeys' => 1
 			));
 			foreach ($maps as $id) {
 				if (!isset($result[$id])) {
@@ -456,8 +449,7 @@ class CScreenItem extends CZBXAPI {
 			$result = $this->get(array(
 				'screenids' => $screens,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-				'nopermissions' => $options['nopermissions']
+				'preservekeys' => 1
 			));
 			foreach ($screens as $id) {
 				if (!isset($result[$id])) {
