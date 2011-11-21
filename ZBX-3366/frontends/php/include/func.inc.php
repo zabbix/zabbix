@@ -239,12 +239,7 @@ function zbxDateToTime($strdate) {
 }
 
 function validateMaxTime($time) {
-	if ($time > 2147464800) { // 2038.01.19 00:00
-		return true;
-	}
-	else {
-		return false;
-	}
+	return $time > 2147464800 ? true : false; // 2038.01.19 00:00
 }
 
 /*************** CONVERTING ******************/
@@ -1109,6 +1104,23 @@ function str_in_array($needle, $haystack, $strict = false) {
 		}
 	}
 	return false;
+}
+
+function getArrayElementsInArray(array $needle, array $haystack) {
+	$result = array();
+	foreach ($needle as $needleValue) {
+		if (is_array($needleValue)) {
+			$result = array_merge($result, getArrayElementsInArray($needleValue, $haystack)); // attention recursion!
+		}
+		else {
+			foreach ($haystack as $haystackValue) {
+				if ($needleValue == $haystackValue) {
+					$result[] = $needleValue;
+				}
+			}
+		}
+	}
+	return array_unique($result);
 }
 
 function zbx_value2array(&$values) {
