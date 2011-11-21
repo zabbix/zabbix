@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-21 11:36+0200\n"
+"POT-Creation-Date: 2011-11-21 11:37+0200\n"
 "PO-Revision-Date: 2011-09-23 13:46+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -29,7 +29,7 @@ msgstr ""
 #: maintenance.php:124
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18"
-msgstr ""
+msgstr "\"%s\"は1970.01.01から2038.01.18の間で設定してください"
 
 #: include/profiles.inc.php:269
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -140,12 +140,12 @@ msgstr "アラーム確認"
 #: include/views/configuration.action.edit.php:133
 #: include/views/configuration.action.edit.php:857
 msgid "AND"
-msgstr "AND"
+msgstr ""
 
 #: include/views/configuration.action.edit.php:132
 #: include/views/configuration.action.edit.php:856
 msgid "AND / OR"
-msgstr "AND / OR"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:429
 msgid "APPLICATIONS"
@@ -199,11 +199,11 @@ msgstr "障害対応コメントを追加しました"
 
 #: acknow.php:152 acknow.php:180
 msgid "Acknowledge alarm by"
-msgstr "障害対応コメントユーザ:"
+msgstr "障害対応コメントユーザー:"
 
 #: acknow.php:153 acknow.php:182
 msgid "Acknowledge and return"
-msgstr ""
+msgstr "コメントを入力して戻る"
 
 #: include/locales/en_gb.inc.php:1072
 msgid "Acknowledge status"
@@ -307,7 +307,7 @@ msgstr "選択したホストを有効にしますか？"
 #: include/views/configuration.httpconf.edit.php:112
 #: include/views/configuration.maintenance.list.php:64
 msgid "Active"
-msgstr "アクティブ"
+msgstr "有効"
 
 #: api/classes/class.cmaintenance.php:522
 #: api/classes/class.cmaintenance.php:635
@@ -387,7 +387,7 @@ msgstr "お気に入りに追加"
 
 #: include/html.inc.php:255 screens.php:91
 msgid "Add to favourites"
-msgstr ""
+msgstr "お気に入りに追加"
 
 #: include/actions.inc.php:479 include/forms.inc.php:1739
 msgid "Add to host group"
@@ -505,7 +505,7 @@ msgstr "アプリケーション"
 #: api/classes/class.capplication.php:552
 #, php-format
 msgid "Application \"%1$s:%2$s\" created."
-msgstr ""
+msgstr "アプリケーション\"%1$s:%2$s\"を作成しました。"
 
 #: api/classes/class.capplication.php:576
 #, php-format
@@ -606,11 +606,11 @@ msgstr "少なくとも1つのホストまたはグループを選択する必�
 #: api/classes/class.cmaintenance.php:537
 #: api/classes/class.cmaintenance.php:650
 msgid "At least one maintenance period must be created"
-msgstr ""
+msgstr "少なくとも1つのメンテナンス期間を作成する必要があります"
 
 #: include/classes/class.frontendsetup.php:287
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "MySQL、PostgreSQL、Oracle、SQLite3、IBM DB2のいずれかがサポートされている必要があります"
 
 #: include/locales/en_gb.inc.php:1110 include/menu.inc.php:260
 msgid "Audit"
@@ -660,7 +660,7 @@ msgstr "自動登録"
 
 #: include/views/administration.users.edit.php:124
 msgid "Auto-login"
-msgstr ""
+msgstr "自動ログイン (1ヶ月)"
 
 #: include/views/administration.users.edit.php:125
 msgid "Auto-logout (min 90 seconds)"
@@ -866,16 +866,16 @@ msgstr "トリガーの設定"
 
 #: include/views/administration.users.edit.php:30
 msgid "CONFIGURATION OF USER"
-msgstr ""
+msgstr "ユーザーの設定"
 
 #: include/views/administration.usergroups.edit.php:23
 msgid "CONFIGURATION OF USER GROUP"
-msgstr ""
+msgstr "ユーザーグループの設定"
 
 #: include/views/administration.usergroups.list.php:33
 #: include/views/administration.users.list.php:33
 msgid "CONFIGURATION OF USERS AND USER GROUPS"
-msgstr "ユーザとユーザグループの設定"
+msgstr "ユーザーとユーザーグループの設定"
 
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:37
@@ -908,7 +908,7 @@ msgstr "グループを追加できません"
 
 #: include/locales/en_gb.inc.php:1277
 msgid "Can't delete user medias"
-msgstr "ユーザのメディアを削除できません"
+msgstr "ユーザーのメディアを削除できません"
 
 #: include/locales/en_gb.inc.php:1304
 msgid "Can't format Tree"
@@ -916,7 +916,7 @@ msgstr "ツリーをフォーマットできません"
 
 #: include/locales/en_gb.inc.php:1279
 msgid "Can't insert user medias"
-msgstr "ユーザのメディアを追加できません"
+msgstr "ユーザーのメディアを追加できません"
 
 #: api/classes/class.ctemplate.php:1522 api/classes/class.ctemplate.php:1532
 msgid "Can't link template"
@@ -952,7 +952,7 @@ msgstr "テンプレートのリンクを削除できません"
 
 #: include/locales/en_gb.inc.php:1278
 msgid "Can't update user medias"
-msgstr "ユーザのメディアを更新できません"
+msgstr "ユーザーのメディアを更新できません"
 
 #: include/views/administration.mediatypes.edit.php:88
 msgid "Canada (136 characters)"
@@ -1082,15 +1082,15 @@ msgstr "トリガーを追加できません"
 
 #: users.php:174
 msgid "Cannot add user"
-msgstr "ユーザを追加できません"
+msgstr "ユーザーを追加できません"
 
 #: users.php:128
 msgid "Cannot add user. Both passwords must be equal."
-msgstr "ユーザを追加できません。パスワードが一致していません。"
+msgstr "ユーザーを追加できません。パスワードが一致していません。"
 
 #: api/classes/class.cusergroup.php:363
 msgid "Cannot add users."
-msgstr "ユーザを追加できません"
+msgstr "ユーザーを追加できません"
 
 #: include/locales/en_gb.inc.php:221
 msgid "Cannot add value map"
@@ -1135,7 +1135,7 @@ msgstr "アイテムをコピーできません"
 #: include/triggers.inc.php:640
 #, php-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "条件式に複数のホストが利用されているため、トリガー\"%1$s:%2$s\"をコピーできません。"
 
 #: include/db.inc.php:44
 msgid "Cannot create another database connection."
@@ -1161,12 +1161,12 @@ msgstr "マップ\"%s\"を作成できません。"
 
 #: include/js.inc.php:314
 msgid "Cannot create new element"
-msgstr ""
+msgstr "新しい要素を作成できません"
 
 #: api/classes/class.cusermedia.php:425 api/classes/class.cuser.php:406
 #, php-format
 msgid "Cannot delete %1$s internal user \"%2$s\", try disabling that user."
-msgstr "%1$sインターナルユーザ\"%2$s\"を削除できません。ユーザを無効にします。"
+msgstr "%1$sインターナルユーザー\"%2$s\"を削除できません。ユーザーを無効にします。"
 
 #: actionconf.php:178
 msgid "Cannot delete action"
@@ -1191,7 +1191,7 @@ msgstr "グラフプロトタイプを削除できません"
 
 #: api/classes/class.citem.php:1104
 msgid "Cannot delete graph."
-msgstr ""
+msgstr "グラフを削除できません"
 
 #: include/locales/en_gb.inc.php:341
 msgid "Cannot delete graphs"
@@ -1311,7 +1311,7 @@ msgstr "トリガーを削除できません"
 
 #: api/classes/class.citem.php:1120
 msgid "Cannot delete trigger."
-msgstr ""
+msgstr "トリガーを削除できません"
 
 #: include/locales/en_gb.inc.php:1006
 msgid "Cannot delete triggers"
@@ -1319,7 +1319,7 @@ msgstr "トリガーを削除できません"
 
 #: users.php:212 users.php:300
 msgid "Cannot delete user"
-msgstr "ユーザを削除できません"
+msgstr "ユーザーを削除できません"
 
 #: include/locales/en_gb.inc.php:223
 msgid "Cannot delete value map"
@@ -1367,7 +1367,7 @@ msgstr "マップが見つかりません"
 
 #: include/js.inc.php:297
 msgid "Cannot find objects with name"
-msgstr ""
+msgstr "そのような名前を持ったオブジェクトは存在しません"
 
 #: include/locales/en_gb.inc.php:695
 msgid "Cannot find screen"
@@ -1455,7 +1455,7 @@ msgstr "マクロを削除できません"
 
 #: include/locales/en_gb.inc.php:1280
 msgid "Cannot rename guest user"
-msgstr "ゲストユーザの名前は変更できません"
+msgstr "ゲストユーザーの名前は変更できません"
 
 #: api/classes/class.cdrule.php:453
 msgid "Cannot save discovery rule without checks."
@@ -1467,7 +1467,7 @@ msgstr ""
 
 #: users.php:276
 msgid "Cannot unblock users"
-msgstr "ユーザのブロックを解除できません"
+msgstr "ユーザーのブロックを解除できません"
 
 #: api/classes/class.ctemplate.php:2168
 msgid "Cannot unlink and clear applications"
@@ -1504,7 +1504,7 @@ msgstr "テンプレートのリンクを削除できません"
 #: api/classes/class.ctemplate.php:1931
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr ""
+msgstr "トリガー\"%s\"のリンクを削除できません。ホストにリンクされたテンプレートのアイテムを利用しています。"
 
 #: actionconf.php:155
 msgid "Cannot update action"
@@ -1528,7 +1528,7 @@ msgstr "ディスカバリのルールを更新できません"
 
 #: usergrps.php:225
 msgid "Cannot update frontend access"
-msgstr ""
+msgstr "フロントエンドのアクセスを更新できません"
 
 #: include/locales/en_gb.inc.php:337
 msgid "Cannot update graph"
@@ -1641,15 +1641,15 @@ msgstr "トリガーを更新できません"
 
 #: profile.php:175 users.php:167 users.php:232 users.php:253
 msgid "Cannot update user"
-msgstr "ユーザを更新できません"
+msgstr "ユーザーを更新できません"
 
 #: profile.php:112 users.php:125
 msgid "Cannot update user. Both passwords must be equal."
-msgstr "ユーザを更新できません。パスワードが一致していません。"
+msgstr "ユーザーを更新できません。パスワードが一致していません。"
 
 #: usergrps.php:282
 msgid "Cannot update users status"
-msgstr "ユーザのステータスを更新できません"
+msgstr "ユーザーのステータスを更新できません"
 
 #: include/locales/en_gb.inc.php:219
 msgid "Cannot update value map"
@@ -1838,7 +1838,7 @@ msgstr "複数の期間による値の比較"
 
 #: include/views/administration.usergroups.edit.php:113
 msgid "Composing permissions"
-msgstr ""
+msgstr "権限の編集"
 
 #: include/locales/en_gb.inc.php:154
 msgid "Condition"
@@ -1928,12 +1928,12 @@ msgstr "接続方法"
 #: include/page_footer.php:101
 #, php-format
 msgid "Connected as '%1$s'"
-msgstr "ユーザ'%1$s'でログイン"
+msgstr "ユーザー'%1$s'でログイン"
 
 #: include/page_footer.php:98
 #, php-format
 msgid "Connected as '%1$s' from '%2$s'"
-msgstr "'%2$s'からユーザ'%1$s'でログイン"
+msgstr "'%2$s'からユーザー'%1$s'でログイン"
 
 #: include/hosts.inc.php:158
 msgid "Contact"
@@ -1970,7 +1970,7 @@ msgstr "選択したトリガーをコピーしますか？"
 #: api/classes/class.cuser.php:988
 #, php-format
 msgid "Correct login [%s]"
-msgstr "ユーザ[%s]のログイン"
+msgstr "ユーザー[%s]のログイン"
 
 #: include/locales/en_gb.inc.php:1269
 msgid "Could not save image!"
@@ -2062,7 +2062,7 @@ msgstr "ログ用のトリガーを作成"
 
 #: include/views/administration.users.list.php:32
 msgid "Create user"
-msgstr "ユーザの作成"
+msgstr "ユーザーの作成"
 
 #: config.php:800
 msgid "Create value map"
@@ -2139,7 +2139,7 @@ msgstr "現在のノード"
 
 #: include/setup.inc.php:173
 msgid "Current value"
-msgstr ""
+msgstr "現在の値"
 
 #: include/locales/en_gb.inc.php:199
 msgid "Custom graphs"
@@ -2319,7 +2319,7 @@ msgstr "データベースタイプ"
 
 #: include/setup.inc.php:299
 msgid "Database user"
-msgstr "データベースユーザ"
+msgstr "データベースユーザー"
 
 #: include/forms.inc.php:3140 include/forms.inc.php:3204
 #: include/locales/en_gb.inc.php:394
@@ -2399,7 +2399,7 @@ msgstr "デフォルトの認証"
 
 #: include/views/configuration.action.edit.php:50
 msgid "Default escalation period (minimum 60 seconds)"
-msgstr ""
+msgstr "デフォルトのエスカレーション期間 (最小60秒)"
 
 #: include/views/configuration.action.edit.php:58
 #: include/views/configuration.action.edit.php:553
@@ -2495,7 +2495,7 @@ msgstr "キーワードを削除しますか？"
 
 #: include/locales/en_gb.inc.php:683
 msgid "Delete links between selected elements?"
-msgstr ""
+msgstr "選択した要素間のリンクを削除しますか？"
 
 #: include/views/configuration.maintenance.edit.php:163
 msgid "Delete maintenance period?"
@@ -2661,11 +2661,11 @@ msgstr "選択したトリガーを削除しますか？"
 
 #: include/views/administration.users.edit.php:329
 msgid "Delete selected user?"
-msgstr "選択したユーザを削除しますか？"
+msgstr "選択したユーザーを削除しますか？"
 
 #: include/views/administration.users.list.php:145
 msgid "Delete selected users?"
-msgstr "選択したユーザを削除しますか？"
+msgstr "選択したユーザーを削除しますか？"
 
 #: config.php:939
 msgid "Delete selected value mapping?"
@@ -2899,7 +2899,7 @@ msgstr "ディスカバリルール"
 #: api/classes/class.cdiscoveryrule.php:885
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" already exists, inherited from another template."
-msgstr ""
+msgstr "他のテンプレートから継承されたディスカバリルール\"%1$s:%2$s\"はすでに存在します。 "
 
 #: api/classes/class.cdiscoveryrule.php:777
 #, php-format
@@ -3055,7 +3055,7 @@ msgstr "重要度名\"%s\"は重複しています"
 #: api/classes/class.cuser.php:422
 #, php-format
 msgid "Duplicate user alias \"%s\"."
-msgstr "ユーザ名\"%s\"は重複しています"
+msgstr "ユーザー名\"%s\"は重複しています"
 
 #: events.php:514 events.php:527 include/events.inc.php:137
 #: include/events.inc.php:209 include/events.inc.php:212 tr_status.php:286
@@ -3098,7 +3098,7 @@ msgstr "変更"
 
 #: include/views/js/configuration.sysmaps.js.php:192
 msgid "Edit element links"
-msgstr ""
+msgstr "リンクの変更"
 
 #: include/locales/en_gb.inc.php:1139
 msgid "Edit hosts"
@@ -3144,11 +3144,11 @@ msgstr "空白"
 
 #: api/classes/class.caction.php:1780
 msgid "Empty action condition."
-msgstr ""
+msgstr "アクションの実行条件が空白です"
 
 #: api/classes/class.chostgroup.php:622
 msgid "Empty input parameter \"name\"."
-msgstr ""
+msgstr "名前の値が空白です"
 
 #: api/classes/class.caction.php:1485 api/classes/class.capplication.php:663
 #: api/classes/class.cdiscoveryrule.php:688 api/classes/class.cgraph.php:985
@@ -3275,11 +3275,11 @@ msgstr "説明のエラー"
 #: api/classes/class.citemgeneral.php:215
 #, php-format
 msgid "Error in item key: \"%s\"."
-msgstr ""
+msgstr "アイテムキーのエラー: \"%s\""
 
 #: include/views/configuration.action.edit.php:442
 msgid "Escalation period"
-msgstr ""
+msgstr "エスカレーション間隔"
 
 #: include/events.inc.php:120
 msgid "Event"
@@ -3311,7 +3311,7 @@ msgstr "イベント生成"
 
 #: tr_events.php:138
 msgid "Event list [previous 20]"
-msgstr ""
+msgstr "イベントリスト [直近20]"
 
 #: actionconf.php:447
 msgid "Event source"
@@ -3319,7 +3319,7 @@ msgstr "イベントソース"
 
 #: tr_events.php:109
 msgid "Event source details"
-msgstr ""
+msgstr "イベントソースの詳細"
 
 #: include/locales/en_gb.inc.php:1296 include/menu.inc.php:61
 msgid "Events"
@@ -3356,7 +3356,7 @@ msgstr "SQL実行エラー"
 #: include/views/js/configuration.action.edit.js.php:112 popup.php:1803
 #: popup.php:1809
 msgid "Execute on"
-msgstr ""
+msgstr "次で実行"
 
 #: include/locales/en_gb.inc.php:600
 msgid "Executed script"
@@ -3600,15 +3600,15 @@ msgstr "開始"
 #: include/views/administration.usergroups.list.php:53
 #: include/views/administration.users.list.php:65
 msgid "Frontend access"
-msgstr ""
+msgstr "フロントエンドアクセス"
 
 #: usergrps.php:225
 msgid "Frontend access updated"
-msgstr ""
+msgstr "フロントエンドアクセスを更新しました"
 
 #: include/views/administration.users.edit.php:181
 msgid "Frontend messaging"
-msgstr ""
+msgstr "フロントエンドメッセージング"
 
 #: include/locales/en_gb.inc.php:967
 #: include/views/configuration.host.edit.php:618
@@ -4099,7 +4099,7 @@ msgstr "ホストグループ"
 #: api/classes/class.chostgroup.php:625 api/classes/class.chostgroup.php:679
 #, php-format
 msgid "Host group \"%s\" already exists."
-msgstr ""
+msgstr "ホストグループ\"%s\"はすでに存在しています"
 
 #: include/views/js/configuration.sysmaps.js.php:32
 msgid "Host group elements"
@@ -4166,7 +4166,7 @@ msgstr "ホストステータス"
 #: include/triggers.inc.php:1438
 #, php-format
 msgid "Host status became \"%s\""
-msgstr ""
+msgstr "ホストのステータスが\"%s\"になりました"
 
 #: hosts.php:661 hosts.php:689 include/locales/en_gb.inc.php:444
 msgid "Host status updated"
@@ -4212,7 +4212,7 @@ msgstr "ホスト"
 
 #: include/views/configuration.maintenance.edit.php:148
 msgid "Hosts & Groups"
-msgstr ""
+msgstr "ホスト & グループ"
 
 #: include/locales/en_gb.inc.php:765
 msgid "Hosts (m/n/t)"
@@ -4324,7 +4324,7 @@ msgstr "IPMIセンサー"
 
 #: include/locales/en_gb.inc.php:478
 msgid "IPMI username"
-msgstr "IPMIユーザ名"
+msgstr "IPMIユーザー名"
 
 #: include/locales/en_gb.inc.php:986
 msgid "IT SERVICES"
@@ -4561,7 +4561,7 @@ msgstr "確認中"
 
 #: include/views/administration.usergroups.edit.php:53
 msgid "In group"
-msgstr ""
+msgstr "グループ"
 
 #: include/views/configuration.host.edit.php:184
 #: include/views/configuration.host.massupdate.php:62
@@ -4608,11 +4608,11 @@ msgstr "アクションの実行条件のディスカバリチェックの値が
 
 #: api/classes/class.caction.php:1806
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
-msgstr ""
+msgstr "アクションの実行条件のディスカバリチェックの値が正しくありません。ディスカバリチェックが存在しないか、権限がありません。"
 
 #: api/classes/class.caction.php:1803
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
-msgstr ""
+msgstr "アクションの実行条件のディスカバリルールが正しくありません。ディスカバリルールが存在しないか、権限がありません"
 
 #: api/classes/class.caction.php:1763
 msgid "Incorrect action condition discovery status."
@@ -4620,11 +4620,11 @@ msgstr "アクションの実行条件のディスカバリのステータスの
 
 #: api/classes/class.caction.php:1791
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
-msgstr ""
+msgstr "アクションの実行条件のホストグループの値が正しくありません。ホストグループが存在しないか、アクセス権がありません。"
 
 #: api/classes/class.caction.php:1794
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
-msgstr ""
+msgstr "アクションの実行条件のホストの値が正しくありません。ホストが存在しないか、アクセス権がありません。"
 
 #: api/classes/class.caction.php:1745
 #, php-format
@@ -4643,15 +4643,15 @@ msgstr "アクションの実行条件のポート\"%s\"が正しくありませ
 
 #: api/classes/class.caction.php:1809
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
-msgstr ""
+msgstr "アクションの実行条件のプロキシ設定が正しくありません。プロキシが存在しないか、アクセス権がありません。"
 
 #: api/classes/class.caction.php:1797
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
-msgstr ""
+msgstr "アクションの実行条件のテンプレートの値が正しくありません。テンプレートが存在しないか、アクセス権がありません。"
 
 #: api/classes/class.caction.php:1800
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr ""
+msgstr "アクションの実行条件のトリガーの値が正しくありません。トリガーが存在しないか、アクセス権がありません。"
 
 #: api/classes/class.caction.php:1785
 msgid "Incorrect action condition type."
@@ -4700,11 +4700,11 @@ msgstr "実行するアクションのタイプが正しくありません。"
 
 #: api/classes/class.caction.php:1680
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
-msgstr "実行するアクションのユーザグループの値が正しくありません。グループが存在しないか、アクセス権がありません。"
+msgstr "実行するアクションのユーザーグループの値が正しくありません。グループが存在しないか、アクセス権がありません。"
 
 #: api/classes/class.caction.php:1677
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
-msgstr "実行するアクションのユーザの値が正しくありません。ユーザが存在しないか、アクセス権がありません。"
+msgstr "実行するアクションのユーザーの値が正しくありません。ユーザーが存在しないか、アクセス権がありません。"
 
 #: api/classes/class.caction.php:999
 msgid "Incorrect action operationid"
@@ -4848,7 +4848,7 @@ msgstr "アイテムのリストの誤り"
 
 #: maintenance.php:245
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr ""
+msgstr "メンテナンス期間が正しくありません - 日時は1970.01.01から2038.01.18の間で設定してください"
 
 #: maintenance.php:269
 msgid "Incorrect maintenance date"
@@ -4872,7 +4872,7 @@ msgstr "メンテナンス期間が正しくありません"
 
 #: maintenance.php:239
 msgid "Incorrect maintenance period (minimum 5 minutes)"
-msgstr ""
+msgstr "メンテナンス期間が正しくありません (最小5分)"
 
 #: maintenance.php:252
 msgid "Incorrect maintenance week period"
@@ -4932,7 +4932,7 @@ msgstr "メンテナンスのパラメータが正しくありません。"
 
 #: api/classes/class.cusergroup.php:341 api/classes/class.cusergroup.php:388
 msgid "Incorrect parameters for user group."
-msgstr "ユーザグループのパラメータが正しくありません。"
+msgstr "ユーザーグループのパラメータが正しくありません。"
 
 #: api/classes/class.cdrule.php:484 discoveryconf.php:80
 msgid "Incorrect port range."
@@ -4970,7 +4970,7 @@ msgstr "トリガー条件式が正しくありません。ホスト\"%s\"が存
 
 #: api/classes/class.ctrigger.php:1398
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
-msgstr ""
+msgstr "トリガー条件式が正しくありません。Trigger expression elements should not belong to a template and a host simultaneously."
 
 #: include/func.inc.php:906
 msgid "Incorrect type of asort_by_key"
@@ -4978,11 +4978,11 @@ msgstr "キーの分類形式の誤り"
 
 #: include/locales/en_gb.inc.php:1266
 msgid "Incorrect user data in"
-msgstr "間違ったユーザデータ"
+msgstr "間違ったユーザーデータ"
 
 #: include/profiles.inc.php:229
 msgid "Incorrect user group."
-msgstr "ユーザグループが正しくありません。"
+msgstr "ユーザーグループが正しくありません。"
 
 #: include/db.inc.php:1277
 #, php-format
@@ -5012,7 +5012,7 @@ msgstr "setMessage()の値が正しくありません: \"%s\"."
 #: include/profiles.inc.php:223
 #, php-format
 msgid "Incorrect working time: \"%s\"."
-msgstr ""
+msgstr "ワーキングタイムが正しくありません: \"%s\"."
 
 #: include/blocks.inc.php:291 include/blocks.inc.php:335
 #: include/blocks.inc.php:881 include/classes/class.cformlist.php:54
@@ -5072,7 +5072,7 @@ msgstr "インターフェース"
 #: include/users.inc.php:58
 #: include/views/administration.authentication.edit.php:35
 msgid "Internal"
-msgstr "Zabbixデータベース内のユーザ情報"
+msgstr "Zabbixデータベース内のユーザー情報"
 
 #: api/rpc/class.cjsonrpc.php:182
 msgid "Internal JSON-RPC error."
@@ -5139,11 +5139,11 @@ msgstr "問題"
 
 #: api/classes/class.cuser.php:180
 msgid "It is not possible to filter by user password"
-msgstr "ユーザのパスワードによるフィルタは行えません"
+msgstr "ユーザーのパスワードによるフィルタは行えません"
 
 #: api/classes/class.cusermedia.php:213 api/classes/class.cuser.php:188
 msgid "It is not possible to search by user password"
-msgstr "ユーザのパスワードによる検索は行えません"
+msgstr "ユーザーのパスワードによる検索は行えません"
 
 #: include/locales.inc.php:66
 msgid "Italian (it_IT)"
@@ -5324,7 +5324,7 @@ msgstr "JMXエージェント"
 #: api/rpc/class.cjsonrpc.php:137
 #, php-format
 msgid "JSON-rpc error generation failed. No such error \"%s\"."
-msgstr "JSON-rpc error generation failed. そのようなエラーはありません\"%s\"。"
+msgstr "JSON-rpcエラーの生成失敗。そのようなエラーはありません\"%s\"。"
 
 #: api/rpc/class.cjsonrpc.php:86
 msgid "JSON-rpc method is not defined."
@@ -5341,7 +5341,7 @@ msgstr "JSON-rpcバージョンがありません。"
 #: include/media.inc.php:27
 #: include/views/administration.mediatypes.edit.php:42
 msgid "Jabber"
-msgstr ""
+msgstr "Jabber"
 
 #: include/views/administration.mediatypes.edit.php:79
 #: include/views/administration.mediatypes.list.php:67
@@ -5662,7 +5662,7 @@ msgstr ""
 
 #: include/classes/class.cserverinfo.php:44
 msgid "Logged in as"
-msgstr "次のユーザでログイン"
+msgstr "次のユーザーでログイン"
 
 #: auditlogs.php:144 auditlogs.php:232 include/config.inc.php:328
 #: include/menu.inc.php:279 include/page_header.php:245
@@ -5793,7 +5793,7 @@ msgstr "メンテナンス期間"
 
 #: include/views/configuration.maintenance.list.php:36
 msgid "Maintenance periods"
-msgstr ""
+msgstr "メンテナンス期間"
 
 #: include/actions.inc.php:47
 msgid "Maintenance status"
@@ -5809,11 +5809,11 @@ msgstr "メンテナンスを更新しました"
 
 #: include/blocks.inc.php:953 tr_status.php:568
 msgid "Maintenance with data collection"
-msgstr ""
+msgstr "データ収集ありのメンテナンス"
 
 #: include/blocks.inc.php:953 tr_status.php:568
 msgid "Maintenance without data collection"
-msgstr ""
+msgstr "データ収集なしのメンテナンス"
 
 #: include/db.inc.php:1240
 #, php-format
@@ -6046,7 +6046,7 @@ msgstr "メッセージタイムアウト"
 
 #: include/views/administration.users.edit.php:182
 msgid "Message timeout (seconds)"
-msgstr ""
+msgstr "メッセージタイムアウト (秒)"
 
 #: include/locales/en_gb.inc.php:1129
 msgid "Messages"
@@ -6054,7 +6054,7 @@ msgstr "メッセージ"
 
 #: include/views/administration.users.edit.php:317
 msgid "Messaging"
-msgstr ""
+msgstr "メッセージング"
 
 #: api/rpc/class.cjsonrpc.php:173
 msgid "Method not found."
@@ -6084,32 +6084,32 @@ msgstr "最小化"
 #: include/classes/class.frontendsetup.php:116
 #, php-format
 msgid "Minimum PHP memory limit is %s (configuration parameter \"memory_limit\")"
-msgstr ""
+msgstr "PHPメモリ上限の最小値は%sです (\"memory_limit\"設定パラメータ)"
 
 #: include/classes/class.frontendsetup.php:154
 #, php-format
 msgid "Minimum for PHP upload filesize is %s (configuration parameter \"upload_max_filesize\")"
-msgstr ""
+msgstr "PHPアップロードファイルサイズの最小値は%sです (\"upload_max_filesize\"設定パラメータ)"
 
 #: include/classes/class.frontendsetup.php:173
 #, php-format
 msgid "Minimum limit on execution time of PHP scripts is %s (configuration parameter \"max_execution_time\")"
-msgstr ""
+msgstr "PHPスクリプトの実行時間の最小値は%sです (\"max_execution_time\"設定パラメータ)"
 
 #: include/classes/class.frontendsetup.php:192
 #, php-format
 msgid "Minimum limit on input parse time for PHP scripts is %s (configuration parameter \"max_input_time\")"
-msgstr ""
+msgstr "PHPスクリプトの入力パース時間の最小値は%sです (\"max_input_time\"設定パラーメータ)"
 
 #: include/classes/class.frontendsetup.php:97
 #, php-format
 msgid "Minimum required PHP version is %s"
-msgstr ""
+msgstr "PHPの最小バージョンは%sです"
 
 #: include/classes/class.frontendsetup.php:135
 #, php-format
 msgid "Minimum size of PHP post is %s (configuration parameter \"post_max_size\")"
-msgstr ""
+msgstr "PHPのpostサイズの最小値は%sです (\"post_max_size\"設定パラメータ)"
 
 #: include/forms.inc.php:3229
 msgid "Minutes"
@@ -6423,7 +6423,7 @@ msgstr "実行するアクションのコマンド\"%s\"に認証のタイプが
 #: api/classes/class.caction.php:1569 api/classes/class.caction.php:1583
 #, php-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr "実行するアクションのコマンド\"%s\"に認証ユーザ名が設定されていません。"
+msgstr "実行するアクションのコマンド\"%s\"に認証ユーザー名が設定されていません。"
 
 #: api/classes/class.caction.php:1552
 msgid "No command specified for action operation."
@@ -6600,11 +6600,11 @@ msgstr "アイテムが設定されていません。"
 
 #: include/views/configuration.maintenance.list.php:44
 msgid "No maintenance defined"
-msgstr ""
+msgstr "メンテナンスが設定されていません"
 
 #: include/views/configuration.maintenance.edit.php:74
 msgid "No maintenance period defined."
-msgstr ""
+msgstr "メンテナンス期間が設定されていません"
 
 #: include/views/administration.general.valuemapping.edit.php:44
 msgid "No mapping defined."
@@ -6641,7 +6641,7 @@ msgstr "トリガー\"%s\"への権限がありません"
 
 #: include/views/administration.usergroups.edit.php:79
 msgid "No permissions defined."
-msgstr ""
+msgstr "パーミッションが設定されていません。"
 
 #: include/locales/en_gb.inc.php:1307
 msgid "No permissions for map"
@@ -6749,11 +6749,11 @@ msgstr "トリガーが設定されていません。"
 #: include/views/administration.usergroups.list.php:46 popup.php:717
 #: popup_usrgrp.php:89
 msgid "No user groups defined."
-msgstr "ユーザグループが設定されていません。"
+msgstr "ユーザーグループが設定されていません。"
 
 #: include/views/administration.users.list.php:55 popup.php:772
 msgid "No users defined."
-msgstr "ユーザが設定されていません。"
+msgstr "ユーザーが設定されていません。"
 
 #: hostinventories.php:158 include/actions.inc.php:48
 #: include/blocks.inc.php:169 include/blocks.inc.php:287
@@ -6803,7 +6803,7 @@ msgstr "ノーマル + 障害イベントを継続して生成"
 
 #: include/html.inc.php:266
 msgid "Normal view"
-msgstr ""
+msgstr "通常表示"
 
 #: include/actions.inc.php:180 include/views/configuration.action.edit.php:917
 msgid "Not Ack"
@@ -6820,7 +6820,7 @@ msgstr ""
 
 #: api/classes/class.cuser.php:475
 msgid "Not allowed to set password for user \"guest\"."
-msgstr "ゲストユーザはパスワードを設定できません。"
+msgstr "ゲストユーザーはパスワードを設定できません。"
 
 #: api/rpc/class.czbxrpc.php:55 api/rpc/class.czbxrpc.php:58
 msgid "Not authorized"
@@ -6908,7 +6908,7 @@ msgstr "トリガー数 (有効/無効)[障害/不明/正常]"
 
 #: include/blocks.inc.php:787
 msgid "Number of users (online)"
-msgstr "ユーザ数 (オンライン)"
+msgstr "ユーザー数 (オンライン)"
 
 #: include/locales/en_gb.inc.php:563
 msgid "Numeric (float)"
@@ -7014,11 +7014,11 @@ msgstr "一時的なダウンタイム"
 
 #: api/classes/class.cusergroup.php:330 api/classes/class.cusergroup.php:404
 msgid "Only Super Admins can add user groups."
-msgstr "Zabbix管理者のみがユーザグループを追加できます"
+msgstr "Zabbix管理者のみがユーザーグループを追加できます"
 
 #: api/classes/class.chostgroup.php:617
 msgid "Only Super Admins can create host groups."
-msgstr ""
+msgstr "特権管理者のみがホストグループを作成できます"
 
 #: include/locales/en_gb.inc.php:1290
 msgid "Only Super Admins can create media types"
@@ -7031,23 +7031,23 @@ msgstr "Zabbix特権管理者のみがメディアタイプを削除できます
 #. GETTEXT: API exception
 #: api/classes/class.cusergroup.php:645
 msgid "Only Super Admins can delete user groups."
-msgstr "Zabbix管理者のみがユーザグループを削除できます"
+msgstr "Zabbix管理者のみがユーザーグループを削除できます"
 
 #: api/classes/class.cusergroup.php:379 api/classes/class.cusergroup.php:483
 msgid "Only Super Admins can update user groups."
-msgstr "Zabbix管理者のみがユーザグループを更新できます"
+msgstr "Zabbix管理者のみがユーザーグループを更新できます"
 
 #: include/locales/en_gb.inc.php:1274
 msgid "Only Zabbix Admins can add user Medias"
-msgstr "Zabbix管理者のみがユーザのメディアを追加できます"
+msgstr "Zabbix管理者のみがユーザーのメディアを追加できます"
 
 #: include/locales/en_gb.inc.php:1276
 msgid "Only Zabbix Admins can change user Medias"
-msgstr "Zabbix管理者のみがユーザのメディアを変更できます"
+msgstr "Zabbix管理者のみがユーザーのメディアを変更できます"
 
 #: include/locales/en_gb.inc.php:1275
 msgid "Only Zabbix Admins can remove user Medias"
-msgstr "Zabbix管理者のみがユーザのメディアを削除できます"
+msgstr "Zabbix管理者のみがユーザーのメディアを削除できます"
 
 #: api/classes/class.cwebcheck.php:316 api/classes/class.cwebcheck.php:370
 msgid "Only characters are allowed"
@@ -7088,7 +7088,7 @@ msgstr "オペレーションの状態"
 
 #: include/views/configuration.action.edit.php:882
 msgid "Operation details"
-msgstr ""
+msgstr "オペレーションの詳細"
 
 #: api/classes/class.caction.php:1648
 msgid "Operation has no group to operate."
@@ -7108,7 +7108,7 @@ msgstr "オペレーション"
 
 #: include/locales/en_gb.inc.php:475
 msgid "Operator"
-msgstr "Operator"
+msgstr "オペレータ"
 
 #: include/locales/en_gb.inc.php:591
 #: include/views/configuration.host.massupdate.php:60
@@ -7173,7 +7173,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:404
 msgid "PHP GD PNG image generation support missing"
-msgstr ""
+msgstr "PHP GD PNGイメージの生成がサポートされていません"
 
 #: include/classes/class.frontendsetup.php:400
 msgid "PHP GD PNG support"
@@ -7181,7 +7181,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:379
 msgid "PHP GD module missing (PHP configuration parameter --with-gd)"
-msgstr ""
+msgstr "PHP GDモジュールが存在しません (PHPのconfigure時のパラメータ --with-gd)"
 
 #: include/classes/class.frontendsetup.php:311
 msgid "PHP bcmath"
@@ -7189,7 +7189,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:315
 msgid "PHP bcmath module missing (PHP configuration parameter --enable-bcmath)"
-msgstr ""
+msgstr "PHP bcmathモジュールが存在しません (PHPのconfigure時のパラメータ --enable-bcmath)"
 
 #: include/classes/class.frontendsetup.php:448
 msgid "PHP ctype"
@@ -7197,7 +7197,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:452
 msgid "PHP ctype module missing (PHP configuration parameter --enable-ctype)"
-msgstr ""
+msgstr "PHP ctypeモジュールが存在しません (PHPのconfigure時のパラメータ --enable-ctype)"
 
 #: include/classes/class.frontendsetup.php:283
 msgid "PHP databases support"
@@ -7209,7 +7209,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:491
 msgid "PHP gettext module missing (PHP configuration parameter --enable-gettext)"
-msgstr ""
+msgstr "PHP gettextモジュールが存在しません (PHPのconfigure時のパラメータ --enable-gettext)"
 
 #: include/classes/class.frontendsetup.php:419
 msgid "PHP libxml"
@@ -7217,7 +7217,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:423
 msgid "PHP libxml module missing"
-msgstr ""
+msgstr "PHP libxmlモジュールが存在しません"
 
 #: include/classes/class.frontendsetup.php:169
 msgid "PHP max execution time"
@@ -7233,7 +7233,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:334
 msgid "PHP mbstring module missing (PHP configuration parameter --enable-mbstring)"
-msgstr ""
+msgstr "PHP mbstringモジュールが存在しません (PHPのconfigure時のパラメータ --enable-mbstring)"
 
 #: include/classes/class.frontendsetup.php:112
 msgid "PHP memory limit"
@@ -7249,7 +7249,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:472
 msgid "PHP session module missing (PHP configuration parameter --enable-session)"
-msgstr ""
+msgstr "PHP sessionモジュールが存在しません (PHPのconfigure時のパラメータ --enable-session)"
 
 #: include/classes/class.frontendsetup.php:349
 msgid "PHP sockets"
@@ -7257,7 +7257,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:353
 msgid "PHP sockets module missing (PHP configuration parameter --enable-sockets)"
-msgstr ""
+msgstr "PHP socketsモジュールが存在しません (PHPのconfigure時のパラメータ --enable-sockets)"
 
 #: include/classes/class.frontendsetup.php:207
 msgid "PHP time zone"
@@ -7364,16 +7364,16 @@ msgstr "期間のタイプ"
 #: include/views/configuration.maintenance.edit.php:101
 #: include/views/configuration.maintenance.edit.php:147
 msgid "Periods"
-msgstr ""
+msgstr "期間"
 
 #: include/views/administration.usergroups.edit.php:123
 #: include/views/administration.users.edit.php:314
 msgid "Permissions"
-msgstr ""
+msgstr "権限"
 
 #: include/views/administration.users.edit.php:313
 msgid "Permissions can be assigned for user groups only."
-msgstr ""
+msgstr "権限はユーザーブループにのみ割り当てることができます。"
 
 #: include/func.inc.php:491
 msgid "Peta"
@@ -7675,7 +7675,7 @@ msgstr "正規表現を削除しました"
 
 #: config.php:451
 msgid "Regular expression does not exist."
-msgstr ""
+msgstr "正規表現は存在しません"
 
 #: include/locales/en_gb.inc.php:250
 msgid "Regular expression updated"
@@ -7733,7 +7733,7 @@ msgstr "お気に入りから削除"
 
 #: include/html.inc.php:248 screens.php:84
 msgid "Remove from favourites"
-msgstr ""
+msgstr "お気に入りから削除"
 
 #: include/actions.inc.php:480
 msgid "Remove from host group"
@@ -8167,7 +8167,7 @@ msgstr "保存"
 
 #: acknow.php:177
 msgid "Save and return"
-msgstr ""
+msgstr "保存して戻る"
 
 #: include/locales/en_gb.inc.php:836
 msgid "Scale"
@@ -8257,7 +8257,7 @@ msgstr "スクリーンを更新しました"
 #: screens.php:176
 #, php-format
 msgid "Screen with ID \"%d\" does not exist"
-msgstr ""
+msgstr "ID\"%d\"を持つスクリーンは存在しません"
 
 #: screens.php:175
 #, php-format
@@ -8429,11 +8429,11 @@ msgstr "メッセージの送信"
 
 #: include/actions.inc.php:230
 msgid "Send message to user groups"
-msgstr "ユーザグループにメッセージを送信"
+msgstr "ユーザーグループにメッセージを送信"
 
 #: include/actions.inc.php:218
 msgid "Send message to users"
-msgstr "ユーザにメッセージを送信"
+msgstr "ユーザーにメッセージを送信"
 
 #: include/views/configuration.action.edit.php:551
 msgid "Send only to"
@@ -8445,11 +8445,11 @@ msgstr "送信先"
 
 #: include/views/configuration.action.edit.php:536
 msgid "Send to User groups"
-msgstr "ユーザグループに送信"
+msgstr "ユーザーグループに送信"
 
 #: include/views/configuration.action.edit.php:537
 msgid "Send to Users"
-msgstr "ユーザに送信"
+msgstr "ユーザーに送信"
 
 #: include/func.inc.php:165
 msgid "Sep"
@@ -9239,7 +9239,7 @@ msgstr "時間の形式"
 
 #: include/classes/class.frontendsetup.php:211
 msgid "Time zone for PHP is not set (configuration parameter \"date.timezone\")"
-msgstr ""
+msgstr "PHPのタイムゾーンが設定されていません (\"date.timezone\"設定パラメータ)"
 
 #: include/views/configuration.httpconf.edit.php:125
 #: include/views/configuration.httpconf.popup.php:60
@@ -9292,7 +9292,7 @@ msgstr "SQLの実行に要したトータル時間"
 
 #: include/page_footer.php:50
 msgid "Transaction has not been closed. Aborting..."
-msgstr ""
+msgstr "トランザクションがクローズされていません。Aborting..."
 
 #: api/rpc/class.cjsonrpc.php:193
 msgid "Transport error."
@@ -9326,7 +9326,7 @@ msgstr ""
 #: api/classes/class.ctrigger.php:1759
 #, php-format
 msgid "Trigger \"%1$s:%2$s\" updated."
-msgstr ""
+msgstr "トリガー\"%1$s:%2$s\"を更新しました。"
 
 #: api/classes/class.ctrigger.php:1722
 #, php-format
@@ -9336,7 +9336,7 @@ msgstr "トリガー\"%s\"はすでに存在します。"
 #: api/classes/class.ctrigger.php:2169
 #, php-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
-msgstr ""
+msgstr "トリガー\"%s\"はリンクされている他のテンプレートに含まれています"
 
 #: api/classes/class.ctrigger.php:1429
 #: api/classes/class.ctriggerprototype.php:1113
@@ -9394,7 +9394,7 @@ msgstr "トリガーフォーム"
 #: api/classes/class.ctemplate.php:1797
 #, php-format
 msgid "Trigger has items from template \"%s\" that is not linked to host."
-msgstr ""
+msgstr "トリガーはホストにリンクされていないテンプレート\"%s\"に含まれるアイテムを利用しています。"
 
 #: api/classes/class.ctemplate.php:1738
 #, php-format
@@ -9415,7 +9415,7 @@ msgstr "トリガー名"
 
 #: include/audit.inc.php:34
 msgid "Trigger prototype"
-msgstr ""
+msgstr "トリガープロトタイプ"
 
 #: api/classes/class.ctriggerprototype.php:1316
 #, php-format
@@ -9425,7 +9425,7 @@ msgstr ""
 #: api/classes/class.ctriggerprototype.php:1442
 #, php-format
 msgid "Trigger prototype \"%1$s:%2$s\" updated."
-msgstr ""
+msgstr "トリガープロトタイプ\"%1$s:%2$s\"を更新しました。"
 
 #: api/classes/class.ctriggerprototype.php:1348
 #, php-format
@@ -9618,7 +9618,7 @@ msgstr "USA (160文字)"
 
 #: include/views/administration.users.edit.php:27
 msgid "USER PROFILE"
-msgstr "ユーザプロファイル"
+msgstr "ユーザープロファイル"
 
 #: include/config.inc.php:782 include/locales/en_gb.inc.php:27
 msgid "UTF-8"
@@ -9655,11 +9655,11 @@ msgstr "障害対応コメント未入力のみ"
 
 #: include/views/administration.users.list.php:140
 msgid "Unblock selected"
-msgstr "選択したユーザのブロックを解除"
+msgstr "選択したユーザーのブロックを解除"
 
 #: include/views/administration.users.list.php:141
 msgid "Unblock selected users?"
-msgstr "選択したユーザのブロックを解除しますか？"
+msgstr "選択したユーザーのブロックを解除しますか？"
 
 #: include/locales/en_gb.inc.php:550
 msgid "Units"
@@ -9808,51 +9808,51 @@ msgstr "アクションで利用"
 #: include/views/administration.users.edit.php:287
 #: include/views/configuration.httpconf.edit.php:58
 msgid "User"
-msgstr "ユーザ"
+msgstr "ユーザー"
 
 #: api/classes/class.cuser.php:440
 #, php-format
 msgid "User \"%s\" cannot be without user group."
-msgstr "ユーザ\"%s\"にユーザグループを設定してください。"
+msgstr "ユーザー\"%s\"にユーザーグループを設定してください。"
 
 #: users.php:174
 msgid "User added"
-msgstr "ユーザを追加しました"
+msgstr "ユーザーを追加しました"
 
 #: include/views/administration.users.edit.php:306
 msgid "User can't change type for himself"
-msgstr ""
+msgstr "ユーザーは自身のユーザータイプを変更できません"
 
 #: include/users.inc.php:156
 msgid "User cannot change GUI access for himself"
-msgstr "ユーザは自分自身のGUIアクセスを変更できません"
+msgstr "ユーザーは自分自身のGUIアクセスを変更できません"
 
 #: api/classes/class.cusergroup.php:421 api/classes/class.cusergroup.php:526
 #: include/users.inc.php:95 include/users.inc.php:106
 #: include/users.inc.php:140
 msgid "User cannot change status of himself"
-msgstr "ユーザは自分自身のステータスを変更できません"
+msgstr "ユーザーは自分自身のステータスを変更できません"
 
 #: users.php:212 users.php:300
 msgid "User deleted"
-msgstr "ユーザを削除しました"
+msgstr "ユーザーを削除しました"
 
 #: api/classes/class.cusergroup.php:345 include/audit.inc.php:31
 #: include/views/administration.script.list.php:44
 #: include/views/administration.usergroups.edit.php:119
 #: include/views/administration.users.list.php:43
 msgid "User group"
-msgstr "ユーザグループ"
+msgstr "ユーザーグループ"
 
 #: api/classes/class.cusergroup.php:658
 #, php-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
-msgstr "ユーザグループ\"%1$s\"はスクリプト\"%2$s\"に利用されています。"
+msgstr "ユーザーグループ\"%1$s\"はスクリプト\"%2$s\"に利用されています。"
 
 #: api/classes/class.cusergroup.php:665
 #, php-format
 msgid "User group [%s] is used in configuration for database down messages."
-msgstr "ユーザグループ[%s]はデータベース停止メッセージの設定に利用されています。"
+msgstr "ユーザーグループ[%s]はデータベース停止メッセージの設定に利用されています。"
 
 #: config.php:331 include/views/administration.general.other.edit.php:38
 msgid "User group for database down message"
@@ -9863,11 +9863,11 @@ msgstr "データベース停止メッセージの送信先グループ"
 #: include/views/administration.usergroups.list.php:38
 #: include/views/administration.users.list.php:30 popup.php:65 usergrps.php:29
 msgid "User groups"
-msgstr "ユーザグループ"
+msgstr "ユーザーグループ"
 
 #: api/classes/class.cusermedia.php:422 api/classes/class.cuser.php:403
 msgid "User is not allowed to delete himself."
-msgstr "自身のユーザアカウントは削除できません。"
+msgstr "自身のユーザーアカウントは削除できません。"
 
 #: api/classes/class.cuser.php:452
 #, php-format
@@ -9882,37 +9882,37 @@ msgstr ""
 #: include/locales/en_gb.inc.php:601
 #: include/views/configuration.action.edit.php:685
 msgid "User name"
-msgstr "ユーザ名"
+msgstr "ユーザー名"
 
 #: include/views/administration.authentication.edit.php:65
 msgid "User password"
-msgstr "ユーザのパスワード"
+msgstr "ユーザーのパスワード"
 
 #: profile.php:27
 msgid "User profile"
-msgstr "ユーザプロファイル"
+msgstr "ユーザープロファイル"
 
 #: include/views/administration.users.edit.php:306
 #: include/views/administration.users.edit.php:310
 #: include/views/administration.users.list.php:61
 msgid "User type"
-msgstr "ユーザの種類"
+msgstr "ユーザーの種類"
 
 #: profile.php:175 users.php:167 users.php:232 users.php:253
 msgid "User updated"
-msgstr "ユーザを更新しました"
+msgstr "ユーザーを更新しました"
 
 #: api/classes/class.cuser.php:490
 #, php-format
 msgid "User with alias \"%s\" already exists."
-msgstr "アカウント名\"%s\"を持つユーザがすでに存在します。"
+msgstr "アカウント名\"%s\"を持つユーザーがすでに存在します。"
 
 #: include/views/administration.mediatypes.edit.php:83
 #: include/views/administration.mediatypes.list.php:70
 #: include/views/configuration.host.edit.php:474
 #: include/views/general.login.php:64 index.php:34
 msgid "Username"
-msgstr "ユーザ名"
+msgstr "ユーザー名"
 
 #: include/menu.inc.php:247
 #: include/views/administration.usergroups.edit.php:53
@@ -9921,25 +9921,25 @@ msgstr "ユーザ名"
 #: include/views/administration.users.list.php:31
 #: include/views/administration.users.list.php:47 popup.php:69 users.php:29
 msgid "Users"
-msgstr "ユーザ"
+msgstr "ユーザー"
 
 #: include/locales/en_gb.inc.php:764
 msgid "Users (online)"
-msgstr "ユーザ数 (オンライン)"
+msgstr "ユーザー数 (オンライン)"
 
 #: include/views/administration.usergroups.edit.php:63
 #: include/views/administration.usergroups.edit.php:69
 #: include/views/administration.usergroups.list.php:52
 msgid "Users status"
-msgstr "ユーザの状態"
+msgstr "ユーザーの状態"
 
 #: usergrps.php:282
 msgid "Users status updated"
-msgstr "ユーザのステータスを更新しました"
+msgstr "ユーザーのステータスを更新しました"
 
 #: users.php:276
 msgid "Users unblocked"
-msgstr "ユーザのブロックを解除しました"
+msgstr "ユーザーのブロックを解除しました"
 
 #: include/blocks.inc.php:746 include/locales/en_gb.inc.php:759
 #: include/views/administration.general.macros.edit.php:32
@@ -10287,12 +10287,12 @@ msgstr "トリガーの設定が正しくありません"
 #: api/classes/class.cuser.php:373
 #, php-format
 msgid "Wrong fields for user \"%s\"."
-msgstr "ユーザ\"%s\"の設定が正しくありません"
+msgstr "ユーザー\"%s\"の設定が正しくありません"
 
 #: api/classes/class.cusermedia.php:391
 #, php-format
 msgid "Wrong fields for user media \"%s\"."
-msgstr "ユーザのメディア\"%s\"の設定が正しくありません"
+msgstr "ユーザーのメディア\"%s\"の設定が正しくありません"
 
 #: include/locales/en_gb.inc.php:422
 msgid "Wrong macro"
@@ -10424,39 +10424,39 @@ msgstr "操作に対する権限がありません"
 
 #: api/classes/class.cusermedia.php:419
 msgid "You do not have permissions or user media does not exist."
-msgstr "アクセス権がないか、ユーザメディアが存在しません。"
+msgstr "アクセス権がないか、ユーザーメディアが存在しません。"
 
 #: api/classes/class.cusermedia.php:397
 msgid "You do not have permissions to create user medias."
-msgstr "ユーザのメディアを作成する権限がありません。"
+msgstr "ユーザーのメディアを作成する権限がありません。"
 
 #: api/classes/class.cuser.php:379
 msgid "You do not have permissions to create users."
-msgstr "ユーザを作成する権限がありません。"
+msgstr "ユーザーを作成する権限がありません。"
 
 #: api/classes/class.cuser.php:400
 msgid "You do not have permissions to delete user or user does not exist."
-msgstr "アクセス権がないか、ユーザが存在しません。"
+msgstr "アクセス権がないか、ユーザーが存在しません。"
 
 #: api/classes/class.cuser.php:397
 msgid "You do not have permissions to delete users."
-msgstr "ユーザを削除する権限がありません。"
+msgstr "ユーザーを削除する権限がありません。"
 
 #: api/classes/class.cusermedia.php:409 api/classes/class.cuser.php:389
 msgid "You do not have permissions to update other users."
-msgstr "他のユーザを更新する権限がありません。"
+msgstr "他のユーザーを更新する権限がありません。"
 
 #: api/classes/class.cusermedia.php:403
 msgid "You do not have permissions to update user media or user media does not exist."
-msgstr "ユーザのメディアを更新する権限がないか、ユーザのメディアが存在しません。"
+msgstr "ユーザーのメディアを更新する権限がないか、ユーザーのメディアが存在しません。"
 
 #: api/classes/class.cusermedia.php:413
 msgid "You do not have permissions to update user medias."
-msgstr "ユーザのメディアを更新する権限がありません。"
+msgstr "ユーザーのメディアを更新する権限がありません。"
 
 #: api/classes/class.cuser.php:385
 msgid "You do not have permissions to update user or user does not exist."
-msgstr "ユーザを更新する権限がないか、ユーザが存在しません。"
+msgstr "ユーザーを更新する権限がないか、ユーザーが存在しません。"
 
 #: include/config.inc.php:323
 msgid "You must login to view this page."
@@ -10493,7 +10493,7 @@ msgstr "Zabbix特権管理者"
 
 #: include/users.inc.php:38
 msgid "Zabbix User"
-msgstr "Zabbixユーザ"
+msgstr "Zabbixユーザー"
 
 #: include/discovery.inc.php:67 include/items.inc.php:77
 #: include/views/administration.script.edit.php:54
@@ -10521,7 +10521,7 @@ msgstr "Zabbixインターナル"
 
 #: authentication.php:177
 msgid "Zabbix internal authentication"
-msgstr "Zabbix内部データベースのユーザ情報による認証"
+msgstr "Zabbix内部データベースのユーザー情報による認証"
 
 #: include/locales/en_gb.inc.php:129
 msgid "Zabbix is temporarily unavailable"
@@ -10536,7 +10536,7 @@ msgstr "Zabbixサーバ"
 
 #: include/blocks.inc.php:756
 msgid "Zabbix server IP or port is not set!"
-msgstr ""
+msgstr "Zabbix serverのIPアドレスまたはポート番号が設定されていません！"
 
 #: include/blocks.inc.php:754
 msgid "Zabbix server is running"
@@ -10569,12 +10569,12 @@ msgstr "[H:i:s]"
 #: include/func.inc.php:117
 #, php-format
 msgid "[Wrong value for day: \"%s\" ]"
-msgstr ""
+msgstr "[日の値が正しくありません: \"%s\" ]"
 
 #: include/func.inc.php:104
 #, php-format
 msgid "[Wrong value for month: \"%s\" ]"
-msgstr ""
+msgstr "[月の値が正しくありません: \"%s\" ]"
 
 #: include/locales/en_gb.inc.php:388
 msgid "[Y.M.d H:i:s]"
@@ -10730,7 +10730,7 @@ msgstr "esc_step_fromとesc_step_toは両方設定する必要があります。
 
 #: include/maintenances.inc.php:60 include/maintenances.inc.php:74
 msgid "every"
-msgstr ""
+msgstr "every"
 
 #: hostinventories.php:123
 msgid "exactly"
@@ -10987,7 +10987,7 @@ msgstr "トリガー"
 
 #: include/classes/class.frontendsetup.php:371
 msgid "unknown"
-msgstr ""
+msgstr "不明"
 
 #: include/locales/en_gb.inc.php:1221
 msgid "updated"
