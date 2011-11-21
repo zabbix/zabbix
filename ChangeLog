@@ -15,6 +15,7 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-4188] fixed nclob problem for oracle (Vedmak)
  - [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
  - [ZBX-4282] fixed errors when importing templates with trigger dependencies (pavels)
  - [ZBX-4108] updated FSF mailing address (Richlv)
