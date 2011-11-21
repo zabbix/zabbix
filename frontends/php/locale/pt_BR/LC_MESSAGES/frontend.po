@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-21 11:36+0200\n"
-"PO-Revision-Date: 2011-10-24 21:12+0200\n"
-"Last-Translator: xsbr <rsantos@gmail.com>\n"
+"POT-Creation-Date: 2011-11-21 11:37+0200\n"
+"PO-Revision-Date: 2011-11-18 02:43+0200\n"
+"Last-Translator: vzanchettin <vzanchettin@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -33,7 +33,7 @@ msgstr "\"%s\" precisa estar 1970.01.01 e 2038.01.18"
 
 #: include/profiles.inc.php:269
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
-msgstr ""
+msgstr "\"Exibe triggers OK\" precisa ser \"0\" ou um inteiro positivo."
 
 #: include/profiles.inc.php:274
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
@@ -10458,7 +10458,7 @@ msgstr ""
 
 #: api/classes/class.cusermedia.php:409 api/classes/class.cuser.php:389
 msgid "You do not have permissions to update other users."
-msgstr ""
+msgstr "Voucê não tem permisoes para alterar outros usuários."
 
 #: api/classes/class.cusermedia.php:403
 msgid "You do not have permissions to update user media or user media does not exist."
@@ -10535,7 +10535,7 @@ msgstr "Zabbix interno"
 
 #: authentication.php:177
 msgid "Zabbix internal authentication"
-msgstr ""
+msgstr "Zabbix autenticação interna."
 
 #: include/locales/en_gb.inc.php:129
 msgid "Zabbix is temporarily unavailable"
@@ -10550,7 +10550,7 @@ msgstr ""
 
 #: include/blocks.inc.php:756
 msgid "Zabbix server IP or port is not set!"
-msgstr ""
+msgstr "Zabbix Server IP ou porta não estão definidas!"
 
 #: include/blocks.inc.php:754
 msgid "Zabbix server is running"
@@ -10741,7 +10741,7 @@ msgstr "copiar elementos para ..."
 
 #: api/classes/class.caction.php:1513
 msgid "esc_step_from and esc_step_to must be set together."
-msgstr ""
+msgstr "esc_step_from e esc_step_to devem ser definidos em conjunto."
 
 #: include/maintenances.inc.php:60 include/maintenances.inc.php:74
 msgid "every"
@@ -10848,7 +10848,7 @@ msgstr "manutenção"
 
 #: api/classes/class.cmap.php:616
 msgid "map"
-msgstr ""
+msgstr "mapa"
 
 #: include/locales/en_gb.inc.php:317
 msgid "max"
@@ -11002,7 +11002,7 @@ msgstr "trigger"
 
 #: include/classes/class.frontendsetup.php:371
 msgid "unknown"
-msgstr ""
+msgstr "desconhecido"
 
 #: include/locales/en_gb.inc.php:1221
 msgid "updated"
