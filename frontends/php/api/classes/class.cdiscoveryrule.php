@@ -1284,7 +1284,7 @@ COpt::memoryPick();
 
 	/**
 	 * Returns true if the given discovery rules exists and are available for
-	 * writable.
+	 * writing.
 	 *
 	 * @param array     $ids  An array if item IDs
 	 * @return boolean
