@@ -326,6 +326,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.9rc2
 
+ - [ZBX-2859] fixed possible to successfully delete zero regular expressions (sanja)
  - [ZBX-4352] fixed template linking when mass updating hosts (pavels,Vedmak)
  - [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (dimir,asaveljevs)
 
