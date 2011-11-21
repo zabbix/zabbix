@@ -26,8 +26,8 @@ echo "--
 "
 
 for table in `grep TABLE "$schema" | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
-	if [ "0" == `echo "select count(*) from $table"|mysql -uroot $dbname|tail -1` ]; then
-		continue;
+	if [ "0" == `echo "select count(*) from $table" | mysql -uroot $dbname | tail -1` ]; then
+		continue
 	fi
 	echo "TABLE |$table"
 	fields=""
