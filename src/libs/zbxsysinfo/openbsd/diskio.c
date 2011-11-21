@@ -189,7 +189,7 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	if (*devname == '\0')
 		zbx_snprintf(devname, sizeof(devname), "all");
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)) != 0)
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
 	/* default parameter */
