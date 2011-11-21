@@ -208,9 +208,9 @@ include_once('include/page_header.php');
 
 	$ev_select = new CComboBox('show_events', $_REQUEST['show_events']);
 	$ev_select->addItem(EVENTS_OPTION_NOEVENT, S_HIDE_ALL);
-	$ev_select->addItem(EVENTS_OPTION_ALL, S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
+	$ev_select->addItem(EVENTS_OPTION_ALL, S_SHOW_ALL.' ('.$config['event_expire'].' '.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
 	if($config['event_ack_enable']){
-		$ev_select->addItem(EVENTS_OPTION_NOT_ACK, S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
+		$ev_select->addItem(EVENTS_OPTION_NOT_ACK, S_SHOW_UNACKNOWLEDGED.' ('.$config['event_expire'].' '.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
 	}
 	$filterForm->addRow(S_EVENTS, $ev_select);
 
@@ -443,7 +443,7 @@ include_once('include/page_header.php');
 			$items[$inum]['itemid'] = $item['itemid'];
 			$items[$inum]['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 			$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-			$items[$inum]['description'] = $item_description;
+			$items[$inum]['description'] = htmlspecialchars($item_description);
 		}
 		$trigger['items'] = $items;
 
