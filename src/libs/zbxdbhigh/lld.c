@@ -1253,10 +1253,9 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_items_sql);
 #endif
 			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,"
-						"%d,'%s',%d,%d,%d,'%s','%s',%d,%d,'%s','%s',%s,'%s','%s',"
-						"'%s','%s','%s','%s',%d,'%s','%s',%d,'%s','%s','%s',"
-						"'%s','%s'," ZBX_FS_UI64 ",%d)%s",
+					"(" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%d,%d,%d,%d,'%s',%d,%d,%d,'%s',"
+						"'%s',%d,%d,'%s','%s',%s,'%s','%s','%s','%s','%s','%s',%d,'%s','%s',"
+						"%d,'%s','%s','%s','%s','%s',%s,%d)%s",
 					item->itemid, name_esc, key_esc, hostid, (int)type, (int)value_type,
 					(int)data_type, delay, delay_flex_esc, history, trends, (int)status,
 					trapper_hosts_esc, units_esc, multiplier, delta, formula_esc,
@@ -1264,7 +1263,7 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 					snmp_community_esc, snmp_oid_esc, port_esc, snmpv3_securityname_esc,
 					(int)snmpv3_securitylevel, snmpv3_authpassphrase_esc,
 					snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc,
-					publickey_esc, privatekey_esc, description_esc, interfaceid,
+					publickey_esc, privatekey_esc, description_esc, DBsql_id_ins(interfaceid),
 					ZBX_FLAG_DISCOVERY_CREATED, row_dl);
 
 #ifndef HAVE_MULTIROW_INSERT
