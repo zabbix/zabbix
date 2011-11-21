@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-21 10:33+0200\n"
+"POT-Creation-Date: 2011-11-21 11:36+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -324,7 +324,7 @@ msgstr "Active till"
 #: dashconf.php:196 include/blocks.inc.php:1153 include/blocks.inc.php:1159
 #: include/blocks.inc.php:1264 include/blocks.inc.php:1309
 #: include/blocks.inc.php:1315 include/forms.inc.php:3233
-#: include/forms.inc.php:3616 include/locales/en_gb.inc.php:1058
+#: include/forms.inc.php:3618 include/locales/en_gb.inc.php:1058
 #: include/views/administration.general.iconmap.edit.php:111
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.general.valuemapping.edit.php:50
@@ -693,7 +693,7 @@ msgstr "可用性统计"
 msgid "Available"
 msgstr "可用"
 
-#: config.php:687
+#: config.php:697
 #: include/views/administration.general.triggerSeverity.edit.php:52
 msgid "Average"
 msgstr "Average"
@@ -959,7 +959,7 @@ msgid "Canada (136 characters)"
 msgstr ""
 
 #: include/classes/class.cbuttoncancel.php:24 include/config.inc.php:329
-#: include/forms.inc.php:3235 include/forms.inc.php:3617
+#: include/forms.inc.php:3235 include/forms.inc.php:3619
 #: include/js.inc.php:212 include/locales/en_gb.inc.php:719
 #: include/views/configuration.action.edit.php:879
 #: include/views/configuration.action.edit.php:927
@@ -1004,7 +1004,7 @@ msgstr "无法添加主机"
 msgid "Cannot add host group."
 msgstr ""
 
-#: config.php:160 include/export.inc.php:665
+#: config.php:161 include/export.inc.php:665
 msgid "Cannot add image"
 msgstr "无法添加图片"
 
@@ -1012,7 +1012,7 @@ msgstr "无法添加图片"
 msgid "Cannot add item"
 msgstr "Cannot add item"
 
-#: api/classes/class.ctemplate.php:1588 config.php:655
+#: api/classes/class.ctemplate.php:1588 config.php:665
 msgid "Cannot add macro"
 msgstr "Cannot add macro"
 
@@ -1145,7 +1145,7 @@ msgstr ""
 msgid "Cannot create discovery rule"
 msgstr ""
 
-#: config.php:742
+#: config.php:752
 msgid "Cannot create icon map"
 msgstr ""
 
@@ -1209,11 +1209,11 @@ msgstr "无法删除主机"
 msgid "Cannot delete host group."
 msgstr ""
 
-#: config.php:755
+#: config.php:765
 msgid "Cannot delete icon map"
 msgstr ""
 
-#: config.php:228
+#: config.php:229
 msgid "Cannot delete image"
 msgstr "无法删除图片"
 
@@ -1449,7 +1449,7 @@ msgstr ""
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
-#: api/classes/class.chost.php:1941 config.php:639
+#: api/classes/class.chost.php:1941 config.php:649
 msgid "Cannot remove macro."
 msgstr ""
 
@@ -1554,11 +1554,11 @@ msgstr "无法更新主机状态"
 msgid "Cannot update hosts"
 msgstr ""
 
-#: config.php:737
+#: config.php:747
 msgid "Cannot update icon map"
 msgstr ""
 
-#: config.php:156 include/export.inc.php:670
+#: config.php:157 include/export.inc.php:670
 msgid "Cannot update image"
 msgstr "无法更新图片"
 
@@ -1566,7 +1566,7 @@ msgstr "无法更新图片"
 msgid "Cannot update item"
 msgstr "Cannot update item"
 
-#: api/classes/class.ctemplate.php:1579 config.php:611
+#: api/classes/class.ctemplate.php:1579 config.php:621
 msgid "Cannot update macro"
 msgstr ""
 
@@ -1574,7 +1574,7 @@ msgstr ""
 msgid "Cannot update macro."
 msgstr ""
 
-#: config.php:673
+#: config.php:683
 msgid "Cannot update macros"
 msgstr ""
 
@@ -1659,7 +1659,7 @@ msgstr "Cannot update value map"
 msgid "Caption"
 msgstr "Caption"
 
-#: include/forms.inc.php:3528 include/forms.inc.php:3611
+#: include/forms.inc.php:3530 include/forms.inc.php:3613
 msgid "Case sensitive"
 msgstr "Case sensitive"
 
@@ -2004,11 +2004,11 @@ msgstr ""
 msgid "Create group"
 msgstr ""
 
-#: config.php:796
+#: config.php:806
 msgid "Create icon map"
 msgstr ""
 
-#: config.php:787
+#: config.php:797
 msgid "Create image"
 msgstr ""
 
@@ -2064,7 +2064,7 @@ msgstr ""
 msgid "Create user"
 msgstr ""
 
-#: config.php:790
+#: config.php:800
 msgid "Create value map"
 msgstr "Create value map"
 
@@ -2436,7 +2436,7 @@ msgstr ""
 msgid "Delayed by"
 msgstr "Delayed by"
 
-#: include/classes/class.cbuttondelete.php:24 include/forms.inc.php:3556
+#: include/classes/class.cbuttondelete.php:24 include/forms.inc.php:3558
 #: include/locales/en_gb.inc.php:965
 msgid "Delete"
 msgstr "删除"
@@ -2631,7 +2631,7 @@ msgstr "删除所选代理?"
 msgid "Delete selected proxy?"
 msgstr "删除所选代理?"
 
-#: include/views/administration.general.regularexpressions.list.php:31
+#: include/views/administration.general.regularexpressions.list.php:32
 msgid "Delete selected regular expressions?"
 msgstr "删除所选表达式?"
 
@@ -2667,11 +2667,11 @@ msgstr "Delete selected user?"
 msgid "Delete selected users?"
 msgstr "Delete selected users?"
 
-#: config.php:929
+#: config.php:939
 msgid "Delete selected value mapping?"
 msgstr "Delete selected value mapping?"
 
-#: config.php:926
+#: config.php:936
 #, php-format
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
@@ -2705,8 +2705,8 @@ msgstr "Delete trigger?"
 msgid "Deleted"
 msgstr "已删除"
 
-#: include/forms.inc.php:3457 include/forms.inc.php:3537
-#: include/forms.inc.php:3603
+#: include/forms.inc.php:3457 include/forms.inc.php:3539
+#: include/forms.inc.php:3605
 msgid "Delimiter"
 msgstr "分隔符"
 
@@ -2855,7 +2855,7 @@ msgstr "Disable selected triggers?"
 msgid "Disabled"
 msgstr "不活跃"
 
-#: config.php:691
+#: config.php:701
 #: include/views/administration.general.triggerSeverity.edit.php:64
 msgid "Disaster"
 msgstr "灾难"
@@ -2977,11 +2977,11 @@ msgstr ""
 msgid "Do not calculate"
 msgstr "Do not calculate"
 
-#: config.php:299 include/views/administration.general.housekeeper.edit.php:24
+#: config.php:300 include/views/administration.general.housekeeper.edit.php:24
 msgid "Do not keep actions older than (in days)"
 msgstr "Do not keep actions older than (in days)"
 
-#: config.php:297 include/views/administration.general.housekeeper.edit.php:25
+#: config.php:298 include/views/administration.general.housekeeper.edit.php:25
 msgid "Do not keep events older than (in days)"
 msgstr "Do not keep events older than (in days)"
 
@@ -3086,7 +3086,7 @@ msgstr "事件"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
-#: include/forms.inc.php:3529 include/forms.inc.php:3544
+#: include/forms.inc.php:3531 include/forms.inc.php:3546
 #: include/locales/en_gb.inc.php:871
 #: include/views/administration.users.edit.php:163
 #: include/views/configuration.action.edit.php:371
@@ -3374,7 +3374,7 @@ msgstr "Existing"
 msgid "Expand single problem"
 msgstr "Expand single problem"
 
-#: include/forms.inc.php:3398 include/forms.inc.php:3527
+#: include/forms.inc.php:3398 include/forms.inc.php:3529
 msgid "Expected result"
 msgstr "期望的结果"
 
@@ -3399,7 +3399,7 @@ msgstr "导出所选"
 msgid "Export to CSV"
 msgstr ""
 
-#: include/forms.inc.php:3526 include/forms.inc.php:3586
+#: include/forms.inc.php:3528 include/forms.inc.php:3588
 #: include/locales/en_gb.inc.php:235
 #: include/views/administration.general.iconmap.edit.php:42
 msgid "Expression"
@@ -3417,12 +3417,12 @@ msgstr ""
 msgid "Expression cannot be empty"
 msgstr "Expression cannot be empty"
 
-#: include/forms.inc.php:3595
+#: include/forms.inc.php:3597
 msgid "Expression type"
 msgstr "Expression type"
 
 #: include/views/administration.general.regularexpressions.edit.php:34
-#: include/views/administration.general.regularexpressions.list.php:30
+#: include/views/administration.general.regularexpressions.list.php:42
 msgid "Expressions"
 msgstr "表达式"
 
@@ -3640,7 +3640,7 @@ msgstr "GRAPHS"
 msgid "GSM modem"
 msgstr "GSM Modem"
 
-#: config.php:770 include/views/administration.general.gui.edit.php:42
+#: config.php:780 include/views/administration.general.gui.edit.php:42
 msgid "GUI"
 msgstr "GUI"
 
@@ -3855,7 +3855,7 @@ msgstr "Group added"
 msgid "Group deleted"
 msgstr "Group deleted"
 
-#: config.php:313 include/views/administration.general.other.edit.php:37
+#: config.php:314 include/views/administration.general.other.edit.php:37
 msgid "Group for discovered hosts"
 msgstr "Group for discovered hosts"
 
@@ -3985,7 +3985,7 @@ msgstr "Hide disabled triggers"
 msgid "Hide selected"
 msgstr "隐藏所选"
 
-#: config.php:689
+#: config.php:699
 #: include/views/administration.general.triggerSeverity.edit.php:58
 msgid "High"
 msgstr "严重"
@@ -4246,7 +4246,7 @@ msgstr "Hourly"
 msgid "Hours"
 msgstr "Hours"
 
-#: config.php:771 include/views/administration.general.housekeeper.edit.php:28
+#: config.php:781 include/views/administration.general.housekeeper.edit.php:28
 msgid "Housekeeper"
 msgstr "Housekeeper"
 
@@ -4435,11 +4435,11 @@ msgstr ""
 msgid "Icon map \"%s\" must have at least one mapping."
 msgstr ""
 
-#: config.php:741
+#: config.php:751
 msgid "Icon map created"
 msgstr ""
 
-#: config.php:755
+#: config.php:765
 msgid "Icon map deleted"
 msgstr ""
 
@@ -4447,7 +4447,7 @@ msgstr ""
 msgid "Icon map name cannot be empty."
 msgstr ""
 
-#: config.php:736
+#: config.php:746
 msgid "Icon map updated"
 msgstr ""
 
@@ -4456,7 +4456,7 @@ msgstr ""
 msgid "Icon map with iconmapid \"%s\" does not exist."
 msgstr ""
 
-#: config.php:773 config.php:1175
+#: config.php:783 config.php:1185
 msgid "Icon mapping"
 msgstr ""
 
@@ -4489,11 +4489,11 @@ msgstr ""
 msgid "Image"
 msgstr "图片"
 
-#: config.php:159
+#: config.php:160
 msgid "Image added"
 msgstr "图片已添加"
 
-#: config.php:228
+#: config.php:229
 msgid "Image deleted"
 msgstr "图片已删除"
 
@@ -4501,15 +4501,15 @@ msgstr "图片已删除"
 msgid "Image label type"
 msgstr ""
 
-#: api/classes/class.cimage.php:316 config.php:174
+#: api/classes/class.cimage.php:316 config.php:175
 msgid "Image size must be less than 1MB"
 msgstr "图片大小必须小于 1MB"
 
-#: config.php:155
+#: config.php:156
 msgid "Image updated"
 msgstr "图片已更新"
 
-#: config.php:772 include/views/administration.general.image.list.php:29
+#: config.php:782 include/views/administration.general.image.list.php:29
 msgid "Images"
 msgstr "图片"
 
@@ -4790,7 +4790,7 @@ msgstr ""
 msgid "Incorrect host group."
 msgstr ""
 
-#: config.php:168
+#: config.php:169
 msgid "Incorrect image"
 msgstr ""
 
@@ -5020,7 +5020,7 @@ msgstr ""
 msgid "Info"
 msgstr ""
 
-#: config.php:683 include/locales/en_gb.inc.php:165
+#: config.php:693 include/locales/en_gb.inc.php:165
 #: include/views/administration.general.triggerSeverity.edit.php:40
 msgid "Information"
 msgstr "信息"
@@ -5751,13 +5751,13 @@ msgstr "Macro name is too long, should not exceed 64 chars."
 msgid "Macro value is too long, should not exceed 255 chars."
 msgstr "Macro value is too long, should not exceed 255 chars."
 
-#: config.php:775 include/locales/en_gb.inc.php:420
+#: config.php:785 include/locales/en_gb.inc.php:420
 #: include/views/administration.general.macros.edit.php:87
 #: include/views/configuration.host.edit.php:518
 msgid "Macros"
 msgstr "Macros"
 
-#: config.php:668
+#: config.php:678
 msgid "Macros updated"
 msgstr ""
 
@@ -6178,7 +6178,7 @@ msgstr "每月"
 msgid "More than 10 minutes"
 msgstr "10分钟以上"
 
-#: config.php:593
+#: config.php:603
 msgid "More than one macro with same name found:"
 msgstr ""
 
@@ -6238,7 +6238,7 @@ msgstr ""
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
 #: include/views/administration.general.image.edit.php:35
-#: include/views/administration.general.regularexpressions.list.php:30
+#: include/views/administration.general.regularexpressions.list.php:42
 #: include/views/administration.general.valuemapping.edit.php:43
 #: include/views/administration.general.valuemapping.list.php:28
 #: include/views/administration.script.edit.php:43
@@ -6284,7 +6284,7 @@ msgstr "网络结构图"
 msgid "Never"
 msgstr "Never"
 
-#: include/forms.inc.php:3555 include/views/configuration.action.edit.php:391
+#: include/forms.inc.php:3557 include/views/configuration.action.edit.php:391
 #: include/views/configuration.action.edit.php:602
 #: include/views/configuration.action.edit.php:828
 #: include/views/configuration.discovery.edit.php:65
@@ -6349,7 +6349,7 @@ msgstr "新方法"
 msgid "New node"
 msgstr "新节点"
 
-#: config.php:793
+#: config.php:803
 msgid "New regular expression"
 msgstr "新表达式"
 
@@ -6374,7 +6374,7 @@ msgid "Next check"
 msgstr "Next check"
 
 #: include/config.inc.php:622 include/events.inc.php:286
-#: include/events.inc.php:300 include/forms.inc.php:3543
+#: include/events.inc.php:300 include/forms.inc.php:3545
 #: include/locales/en_gb.inc.php:767
 #: include/views/administration.users.list.php:79
 #: include/views/administration.users.list.php:82
@@ -6830,7 +6830,7 @@ msgstr ""
 msgid "Not available"
 msgstr "不可用"
 
-#: config.php:681
+#: config.php:691
 #: include/views/administration.general.triggerSeverity.edit.php:34
 msgid "Not classified"
 msgstr "未分类"
@@ -7123,7 +7123,7 @@ msgstr "Original"
 msgid "Original blue"
 msgstr "原始的蓝色"
 
-#: config.php:780 include/classes/class.ctweenbox.php:75
+#: config.php:790 include/classes/class.ctweenbox.php:75
 #: include/classes/class.ctweenbox.php:103 include/locales/en_gb.inc.php:231
 msgid "Other"
 msgstr "其他"
@@ -7647,7 +7647,7 @@ msgstr ""
 msgid "Refresh time multiplier"
 msgstr ""
 
-#: config.php:301 include/views/administration.general.other.edit.php:36
+#: config.php:302 include/views/administration.general.other.edit.php:36
 msgid "Refresh unsupported items (in sec)"
 msgstr "更新不支持的监控项时间(秒)"
 
@@ -7673,7 +7673,7 @@ msgstr "表达式已添加"
 msgid "Regular expression deleted"
 msgstr "表达式已删除"
 
-#: config.php:450
+#: config.php:451
 msgid "Regular expression does not exist."
 msgstr ""
 
@@ -7681,7 +7681,7 @@ msgstr ""
 msgid "Regular expression updated"
 msgstr "表达式已更新"
 
-#: config.php:774
+#: config.php:784
 #: include/views/administration.general.regularexpressions.list.php:22
 msgid "Regular expressions"
 msgstr "正则表达式"
@@ -8133,7 +8133,7 @@ msgstr ""
 msgid "Saturday"
 msgstr "Saturday"
 
-#: acknow.php:176 include/forms.inc.php:3233 include/forms.inc.php:3616
+#: acknow.php:176 include/forms.inc.php:3233 include/forms.inc.php:3618
 #: include/locales/en_gb.inc.php:718
 #: include/views/administration.authentication.edit.php:76
 #: include/views/administration.general.gui.edit.php:50
@@ -8391,7 +8391,7 @@ msgstr "搜索"
 msgid "Select Nodes"
 msgstr "Select Nodes"
 
-#: config.php:193
+#: config.php:194
 msgid "Select image to download"
 msgstr "选择需要图片下载"
 
@@ -8565,7 +8565,7 @@ msgstr "Show disabled triggers"
 msgid "Show events max"
 msgstr "Show events max"
 
-#: config.php:263 include/views/administration.general.gui.edit.php:38
+#: config.php:264 include/views/administration.general.gui.edit.php:38
 msgid "Show events not older than (in days)"
 msgstr ""
 
@@ -9382,7 +9382,7 @@ msgstr "触发器已删除"
 msgid "Trigger dependencies"
 msgstr "Trigger dependencies"
 
-#: config.php:779
+#: config.php:789
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:114
 msgid "Trigger displaying options"
 msgstr ""
@@ -9442,7 +9442,7 @@ msgstr ""
 msgid "Trigger prototypes"
 msgstr ""
 
-#: config.php:778
+#: config.php:788
 #: include/views/administration.general.triggerSeverity.edit.php:70
 msgid "Trigger severities"
 msgstr ""
@@ -9854,7 +9854,7 @@ msgstr ""
 msgid "User group [%s] is used in configuration for database down messages."
 msgstr ""
 
-#: config.php:330 include/views/administration.general.other.edit.php:38
+#: config.php:331 include/views/administration.general.other.edit.php:38
 msgid "User group for database down message"
 msgstr "User group for database down message"
 
@@ -9973,7 +9973,7 @@ msgstr ""
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr ""
 
-#: config.php:390 config.php:404 include/audit.inc.php:38
+#: config.php:391 config.php:405 include/audit.inc.php:38
 #: include/views/administration.general.valuemapping.list.php:28
 msgid "Value map"
 msgstr "Value map"
@@ -9990,7 +9990,7 @@ msgstr "Value map deleted"
 msgid "Value map updated"
 msgstr "Value map updated"
 
-#: config.php:776 config.php:942
+#: config.php:786 config.php:952
 #: include/views/administration.general.valuemapping.edit.php:55
 msgid "Value mapping"
 msgstr "Value mapping"
@@ -10048,7 +10048,7 @@ msgstr ""
 msgid "WEB CHECKS"
 msgstr "WEB CHECKS"
 
-#: config.php:685 include/locales/en_gb.inc.php:166
+#: config.php:695 include/locales/en_gb.inc.php:166
 #: include/views/administration.general.triggerSeverity.edit.php:46
 msgid "Warning"
 msgstr "警告"
@@ -10215,7 +10215,7 @@ msgstr "Without triggers"
 msgid "Wizard"
 msgstr ""
 
-#: config.php:303 config.php:777
+#: config.php:304 config.php:787
 #: include/views/administration.general.workingtime.edit.php:24
 #: include/views/administration.general.workingtime.edit.php:27
 msgid "Working time"
@@ -10358,7 +10358,7 @@ msgstr "每年"
 
 #: include/blocks.inc.php:755 include/config.inc.php:625
 #: include/events.inc.php:289 include/events.inc.php:303
-#: include/forms.inc.php:3543 include/locales/en_gb.inc.php:766
+#: include/forms.inc.php:3545 include/locales/en_gb.inc.php:766
 #: include/views/administration.users.list.php:78
 msgid "Yes"
 msgstr "Yes"

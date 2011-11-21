@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-21 10:33+0200\n"
+"POT-Creation-Date: 2011-11-21 11:36+0200\n"
 "PO-Revision-Date: 2011-09-23 13:46+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -324,7 +324,7 @@ msgstr "終了日時"
 #: dashconf.php:196 include/blocks.inc.php:1153 include/blocks.inc.php:1159
 #: include/blocks.inc.php:1264 include/blocks.inc.php:1309
 #: include/blocks.inc.php:1315 include/forms.inc.php:3233
-#: include/forms.inc.php:3616 include/locales/en_gb.inc.php:1058
+#: include/forms.inc.php:3618 include/locales/en_gb.inc.php:1058
 #: include/views/administration.general.iconmap.edit.php:111
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.general.valuemapping.edit.php:50
@@ -693,7 +693,7 @@ msgstr "稼働レポート"
 msgid "Available"
 msgstr "利用可能"
 
-#: config.php:687
+#: config.php:697
 #: include/views/administration.general.triggerSeverity.edit.php:52
 msgid "Average"
 msgstr "軽度の障害"
@@ -959,7 +959,7 @@ msgid "Canada (136 characters)"
 msgstr "カナダ (136文字)"
 
 #: include/classes/class.cbuttoncancel.php:24 include/config.inc.php:329
-#: include/forms.inc.php:3235 include/forms.inc.php:3617
+#: include/forms.inc.php:3235 include/forms.inc.php:3619
 #: include/js.inc.php:212 include/locales/en_gb.inc.php:719
 #: include/views/configuration.action.edit.php:879
 #: include/views/configuration.action.edit.php:927
@@ -1004,7 +1004,7 @@ msgstr "ホストを追加できません"
 msgid "Cannot add host group."
 msgstr "ホストグループを追加できません"
 
-#: config.php:160 include/export.inc.php:665
+#: config.php:161 include/export.inc.php:665
 msgid "Cannot add image"
 msgstr "イメージを追加できません"
 
@@ -1012,7 +1012,7 @@ msgstr "イメージを追加できません"
 msgid "Cannot add item"
 msgstr "アイテムを追加できません"
 
-#: api/classes/class.ctemplate.php:1588 config.php:655
+#: api/classes/class.ctemplate.php:1588 config.php:665
 msgid "Cannot add macro"
 msgstr "マクロを追加できません"
 
@@ -1145,7 +1145,7 @@ msgstr "データベースへのコネクションを作成できません。"
 msgid "Cannot create discovery rule"
 msgstr "ディスカバリルールを作成できません"
 
-#: config.php:742
+#: config.php:752
 msgid "Cannot create icon map"
 msgstr "アイコンマップを作成できません"
 
@@ -1209,11 +1209,11 @@ msgstr "ホストを削除できません"
 msgid "Cannot delete host group."
 msgstr "ホストグループを削除できません"
 
-#: config.php:755
+#: config.php:765
 msgid "Cannot delete icon map"
 msgstr "アイコンマップを削除できません"
 
-#: config.php:228
+#: config.php:229
 msgid "Cannot delete image"
 msgstr "イメージを削除できません"
 
@@ -1449,7 +1449,7 @@ msgstr "値がないため\"%s\"テーブルにupdate文を実行できません
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "where句がないため\"%s\"テーブルにupdate文を実行できません"
 
-#: api/classes/class.chost.php:1941 config.php:639
+#: api/classes/class.chost.php:1941 config.php:649
 msgid "Cannot remove macro."
 msgstr "マクロを削除できません"
 
@@ -1554,11 +1554,11 @@ msgstr "ホストのステータスを更新できません"
 msgid "Cannot update hosts"
 msgstr "ホストを更新できません"
 
-#: config.php:737
+#: config.php:747
 msgid "Cannot update icon map"
 msgstr "アイコンマップを更新できません"
 
-#: config.php:156 include/export.inc.php:670
+#: config.php:157 include/export.inc.php:670
 msgid "Cannot update image"
 msgstr "イメージを更新できません"
 
@@ -1566,7 +1566,7 @@ msgstr "イメージを更新できません"
 msgid "Cannot update item"
 msgstr "アイテムを更新できません"
 
-#: api/classes/class.ctemplate.php:1579 config.php:611
+#: api/classes/class.ctemplate.php:1579 config.php:621
 msgid "Cannot update macro"
 msgstr "マクロを更新できません"
 
@@ -1574,7 +1574,7 @@ msgstr "マクロを更新できません"
 msgid "Cannot update macro."
 msgstr "マクロを更新できません"
 
-#: config.php:673
+#: config.php:683
 msgid "Cannot update macros"
 msgstr "マクロを更新できません"
 
@@ -1659,7 +1659,7 @@ msgstr "値のマッピングを更新できません"
 msgid "Caption"
 msgstr "説明"
 
-#: include/forms.inc.php:3528 include/forms.inc.php:3611
+#: include/forms.inc.php:3530 include/forms.inc.php:3613
 msgid "Case sensitive"
 msgstr "大文字小文字を区別"
 
@@ -2004,11 +2004,11 @@ msgstr "グラフの作成"
 msgid "Create group"
 msgstr "グループの作成"
 
-#: config.php:796
+#: config.php:806
 msgid "Create icon map"
 msgstr "アイコンマップの作成"
 
-#: config.php:787
+#: config.php:797
 msgid "Create image"
 msgstr "イメージの作成"
 
@@ -2064,7 +2064,7 @@ msgstr "ログ用のトリガーを作成"
 msgid "Create user"
 msgstr "ユーザの作成"
 
-#: config.php:790
+#: config.php:800
 msgid "Create value map"
 msgstr "値のマッピングの作成"
 
@@ -2436,7 +2436,7 @@ msgstr "間隔(秒)"
 msgid "Delayed by"
 msgstr "遅延時間"
 
-#: include/classes/class.cbuttondelete.php:24 include/forms.inc.php:3556
+#: include/classes/class.cbuttondelete.php:24 include/forms.inc.php:3558
 #: include/locales/en_gb.inc.php:965
 msgid "Delete"
 msgstr "削除"
@@ -2631,7 +2631,7 @@ msgstr "選択したプロキシを削除しますか？"
 msgid "Delete selected proxy?"
 msgstr "選択したプロキシを削除しますか？"
 
-#: include/views/administration.general.regularexpressions.list.php:31
+#: include/views/administration.general.regularexpressions.list.php:32
 msgid "Delete selected regular expressions?"
 msgstr "選択した正規表現を削除しますか？"
 
@@ -2667,11 +2667,11 @@ msgstr "選択したユーザを削除しますか？"
 msgid "Delete selected users?"
 msgstr "選択したユーザを削除しますか？"
 
-#: config.php:929
+#: config.php:939
 msgid "Delete selected value mapping?"
 msgstr "選択した値のマッピングを削除しますか？"
 
-#: config.php:926
+#: config.php:936
 #, php-format
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
@@ -2705,8 +2705,8 @@ msgstr "トリガーを削除しますか？"
 msgid "Deleted"
 msgstr "削除"
 
-#: include/forms.inc.php:3457 include/forms.inc.php:3537
-#: include/forms.inc.php:3603
+#: include/forms.inc.php:3457 include/forms.inc.php:3539
+#: include/forms.inc.php:3605
 msgid "Delimiter"
 msgstr "区切り文字"
 
@@ -2855,7 +2855,7 @@ msgstr "選択したトリガーを無効にしますか？"
 msgid "Disabled"
 msgstr "無効"
 
-#: config.php:691
+#: config.php:701
 #: include/views/administration.general.triggerSeverity.edit.php:64
 msgid "Disaster"
 msgstr "致命的な障害"
@@ -2977,11 +2977,11 @@ msgstr "実行"
 msgid "Do not calculate"
 msgstr "計算しない"
 
-#: config.php:299 include/views/administration.general.housekeeper.edit.php:24
+#: config.php:300 include/views/administration.general.housekeeper.edit.php:24
 msgid "Do not keep actions older than (in days)"
 msgstr "アクションの保存期間(日)"
 
-#: config.php:297 include/views/administration.general.housekeeper.edit.php:25
+#: config.php:298 include/views/administration.general.housekeeper.edit.php:25
 msgid "Do not keep events older than (in days)"
 msgstr "イベントの保存期間(日)"
 
@@ -3086,7 +3086,7 @@ msgstr "イベント"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "各URLの名前は重複できません。同じURL名が利用されていないか確認してください"
 
-#: include/forms.inc.php:3529 include/forms.inc.php:3544
+#: include/forms.inc.php:3531 include/forms.inc.php:3546
 #: include/locales/en_gb.inc.php:871
 #: include/views/administration.users.edit.php:163
 #: include/views/configuration.action.edit.php:371
@@ -3374,7 +3374,7 @@ msgstr "存在する場合"
 msgid "Expand single problem"
 msgstr "障害が1つのときに詳細を展開"
 
-#: include/forms.inc.php:3398 include/forms.inc.php:3527
+#: include/forms.inc.php:3398 include/forms.inc.php:3529
 msgid "Expected result"
 msgstr "期待値"
 
@@ -3399,7 +3399,7 @@ msgstr "選択をエクスポート"
 msgid "Export to CSV"
 msgstr "CSVエクスポート"
 
-#: include/forms.inc.php:3526 include/forms.inc.php:3586
+#: include/forms.inc.php:3528 include/forms.inc.php:3588
 #: include/locales/en_gb.inc.php:235
 #: include/views/administration.general.iconmap.edit.php:42
 msgid "Expression"
@@ -3417,12 +3417,12 @@ msgstr "条件式の変数要素"
 msgid "Expression cannot be empty"
 msgstr "条件式は必須のパラメータです"
 
-#: include/forms.inc.php:3595
+#: include/forms.inc.php:3597
 msgid "Expression type"
 msgstr "条件式の形式"
 
 #: include/views/administration.general.regularexpressions.edit.php:34
-#: include/views/administration.general.regularexpressions.list.php:30
+#: include/views/administration.general.regularexpressions.list.php:42
 msgid "Expressions"
 msgstr "条件式"
 
@@ -3640,7 +3640,7 @@ msgstr "グラフ"
 msgid "GSM modem"
 msgstr "GSMモデム"
 
-#: config.php:770 include/views/administration.general.gui.edit.php:42
+#: config.php:780 include/views/administration.general.gui.edit.php:42
 msgid "GUI"
 msgstr "表示設定"
 
@@ -3855,7 +3855,7 @@ msgstr "グループを追加しました"
 msgid "Group deleted"
 msgstr "グループを削除しました"
 
-#: config.php:313 include/views/administration.general.other.edit.php:37
+#: config.php:314 include/views/administration.general.other.edit.php:37
 msgid "Group for discovered hosts"
 msgstr "ディスカバリで発見されたホストのグループ"
 
@@ -3985,7 +3985,7 @@ msgstr "無効なトリガーを非表示"
 msgid "Hide selected"
 msgstr "選択を非表示"
 
-#: config.php:689
+#: config.php:699
 #: include/views/administration.general.triggerSeverity.edit.php:58
 msgid "High"
 msgstr "重度の障害"
@@ -4246,7 +4246,7 @@ msgstr "毎時間"
 msgid "Hours"
 msgstr "時間"
 
-#: config.php:771 include/views/administration.general.housekeeper.edit.php:28
+#: config.php:781 include/views/administration.general.housekeeper.edit.php:28
 msgid "Housekeeper"
 msgstr "データの保存期間"
 
@@ -4435,11 +4435,11 @@ msgstr "アイコンマップ\"%s\"の条件式が正しくありません。"
 msgid "Icon map \"%s\" must have at least one mapping."
 msgstr "アイコンマップ\"%s\"は少なくとも1つ以上の項目と関連づける必要があります。"
 
-#: config.php:741
+#: config.php:751
 msgid "Icon map created"
 msgstr "アイコンマップを作成しました"
 
-#: config.php:755
+#: config.php:765
 msgid "Icon map deleted"
 msgstr "アイコンマップを削除しました"
 
@@ -4447,7 +4447,7 @@ msgstr "アイコンマップを削除しました"
 msgid "Icon map name cannot be empty."
 msgstr "アイコンマップ名を設定してください。"
 
-#: config.php:736
+#: config.php:746
 msgid "Icon map updated"
 msgstr "アイコンマップを更新しました"
 
@@ -4456,7 +4456,7 @@ msgstr "アイコンマップを更新しました"
 msgid "Icon map with iconmapid \"%s\" does not exist."
 msgstr "アイコンマップID\"%s\"を持つアイコンマップは存在しません。"
 
-#: config.php:773 config.php:1175
+#: config.php:783 config.php:1185
 msgid "Icon mapping"
 msgstr "アイコンのマッピング"
 
@@ -4489,11 +4489,11 @@ msgstr "このメッセージが間違っている場合は、必要な権限を
 msgid "Image"
 msgstr "イメージ"
 
-#: config.php:159
+#: config.php:160
 msgid "Image added"
 msgstr "イメージを追加しました"
 
-#: config.php:228
+#: config.php:229
 msgid "Image deleted"
 msgstr "イメージを削除しました"
 
@@ -4501,15 +4501,15 @@ msgstr "イメージを削除しました"
 msgid "Image label type"
 msgstr "イメージラベルのタイプ"
 
-#: api/classes/class.cimage.php:316 config.php:174
+#: api/classes/class.cimage.php:316 config.php:175
 msgid "Image size must be less than 1MB"
 msgstr "イメージのサイズは1MB以下の必要があります"
 
-#: config.php:155
+#: config.php:156
 msgid "Image updated"
 msgstr "イメージを更新しました"
 
-#: config.php:772 include/views/administration.general.image.list.php:29
+#: config.php:782 include/views/administration.general.image.list.php:29
 msgid "Images"
 msgstr "イメージ"
 
@@ -4790,7 +4790,7 @@ msgstr "スクリーンの要素のホストグループID\"%s\"が正しくあ�
 msgid "Incorrect host group."
 msgstr "ホストグループが正しくありません。"
 
-#: config.php:168
+#: config.php:169
 msgid "Incorrect image"
 msgstr "イメージが正しくありません"
 
@@ -5020,7 +5020,7 @@ msgstr ""
 msgid "Info"
 msgstr "情報"
 
-#: config.php:683 include/locales/en_gb.inc.php:165
+#: config.php:693 include/locales/en_gb.inc.php:165
 #: include/views/administration.general.triggerSeverity.edit.php:40
 msgid "Information"
 msgstr "情報"
@@ -5751,13 +5751,13 @@ msgstr "マクロ名が長すぎます。64文字以下で設定してくださ�
 msgid "Macro value is too long, should not exceed 255 chars."
 msgstr "マクロ名が長すぎます。255文字以下で設定してください"
 
-#: config.php:775 include/locales/en_gb.inc.php:420
+#: config.php:785 include/locales/en_gb.inc.php:420
 #: include/views/administration.general.macros.edit.php:87
 #: include/views/configuration.host.edit.php:518
 msgid "Macros"
 msgstr "マクロ"
 
-#: config.php:668
+#: config.php:678
 msgid "Macros updated"
 msgstr "マクロを更新しました"
 
@@ -6178,7 +6178,7 @@ msgstr "毎月"
 msgid "More than 10 minutes"
 msgstr "10分以上"
 
-#: config.php:593
+#: config.php:603
 msgid "More than one macro with same name found:"
 msgstr "同じ名前のマクロが1つ以上見つかりました:"
 
@@ -6238,7 +6238,7 @@ msgstr "NTLM認証"
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
 #: include/views/administration.general.image.edit.php:35
-#: include/views/administration.general.regularexpressions.list.php:30
+#: include/views/administration.general.regularexpressions.list.php:42
 #: include/views/administration.general.valuemapping.edit.php:43
 #: include/views/administration.general.valuemapping.list.php:28
 #: include/views/administration.script.edit.php:43
@@ -6284,7 +6284,7 @@ msgstr "ネットワークマップ"
 msgid "Never"
 msgstr "未監視"
 
-#: include/forms.inc.php:3555 include/views/configuration.action.edit.php:391
+#: include/forms.inc.php:3557 include/views/configuration.action.edit.php:391
 #: include/views/configuration.action.edit.php:602
 #: include/views/configuration.action.edit.php:828
 #: include/views/configuration.discovery.edit.php:65
@@ -6349,7 +6349,7 @@ msgstr "新規メディア"
 msgid "New node"
 msgstr "新規ノード"
 
-#: config.php:793
+#: config.php:803
 msgid "New regular expression"
 msgstr "正規表現の作成"
 
@@ -6374,7 +6374,7 @@ msgid "Next check"
 msgstr "次のチェック"
 
 #: include/config.inc.php:622 include/events.inc.php:286
-#: include/events.inc.php:300 include/forms.inc.php:3543
+#: include/events.inc.php:300 include/forms.inc.php:3545
 #: include/locales/en_gb.inc.php:767
 #: include/views/administration.users.list.php:79
 #: include/views/administration.users.list.php:82
@@ -6830,7 +6830,7 @@ msgstr "権限がありません"
 msgid "Not available"
 msgstr "利用不可"
 
-#: config.php:681
+#: config.php:691
 #: include/views/administration.general.triggerSeverity.edit.php:34
 msgid "Not classified"
 msgstr "未分類"
@@ -7123,7 +7123,7 @@ msgstr "変更なし"
 msgid "Original blue"
 msgstr "Original blue"
 
-#: config.php:780 include/classes/class.ctweenbox.php:75
+#: config.php:790 include/classes/class.ctweenbox.php:75
 #: include/classes/class.ctweenbox.php:103 include/locales/en_gb.inc.php:231
 msgid "Other"
 msgstr "その他"
@@ -7647,7 +7647,7 @@ msgstr "リフレッシュ間隔"
 msgid "Refresh time multiplier"
 msgstr "リフレッシュ間隔の乗数"
 
-#: config.php:301 include/views/administration.general.other.edit.php:36
+#: config.php:302 include/views/administration.general.other.edit.php:36
 msgid "Refresh unsupported items (in sec)"
 msgstr "取得不可アイテムの更新間隔(秒)"
 
@@ -7673,7 +7673,7 @@ msgstr "正規表現を追加しました"
 msgid "Regular expression deleted"
 msgstr "正規表現を削除しました"
 
-#: config.php:450
+#: config.php:451
 msgid "Regular expression does not exist."
 msgstr ""
 
@@ -7681,7 +7681,7 @@ msgstr ""
 msgid "Regular expression updated"
 msgstr "正規表現を更新しました"
 
-#: config.php:774
+#: config.php:784
 #: include/views/administration.general.regularexpressions.list.php:22
 msgid "Regular expressions"
 msgstr "正規表現"
@@ -8133,7 +8133,7 @@ msgstr "土"
 msgid "Saturday"
 msgstr "土曜"
 
-#: acknow.php:176 include/forms.inc.php:3233 include/forms.inc.php:3616
+#: acknow.php:176 include/forms.inc.php:3233 include/forms.inc.php:3618
 #: include/locales/en_gb.inc.php:718
 #: include/views/administration.authentication.edit.php:76
 #: include/views/administration.general.gui.edit.php:50
@@ -8391,7 +8391,7 @@ msgstr "選択"
 msgid "Select Nodes"
 msgstr "ノードの選択"
 
-#: config.php:193
+#: config.php:194
 msgid "Select image to download"
 msgstr "選択したイメージをダウンロード"
 
@@ -8565,7 +8565,7 @@ msgstr "無効なトリガーを表示"
 msgid "Show events max"
 msgstr "イベントの最大表示期間"
 
-#: config.php:263 include/views/administration.general.gui.edit.php:38
+#: config.php:264 include/views/administration.general.gui.edit.php:38
 msgid "Show events not older than (in days)"
 msgstr "イベントの表示期間(日)"
 
@@ -9382,7 +9382,7 @@ msgstr "トリガーを削除しました"
 msgid "Trigger dependencies"
 msgstr "トリガー依存関係"
 
-#: config.php:779
+#: config.php:789
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:114
 msgid "Trigger displaying options"
 msgstr "トリガー表示オプション"
@@ -9442,7 +9442,7 @@ msgstr "トリガーのプロトタイプ[%1$s:%2$s]のリンクを削除しま�
 msgid "Trigger prototypes"
 msgstr "トリガーのプロトタイプ"
 
-#: config.php:778
+#: config.php:788
 #: include/views/administration.general.triggerSeverity.edit.php:70
 msgid "Trigger severities"
 msgstr "トリガーの深刻度"
@@ -9854,7 +9854,7 @@ msgstr "ユーザグループ\"%1$s\"はスクリプト\"%2$s\"に利用され�
 msgid "User group [%s] is used in configuration for database down messages."
 msgstr "ユーザグループ[%s]はデータベース停止メッセージの設定に利用されています。"
 
-#: config.php:330 include/views/administration.general.other.edit.php:38
+#: config.php:331 include/views/administration.general.other.edit.php:38
 msgid "User group for database down message"
 msgstr "データベース停止メッセージの送信先グループ"
 
@@ -9973,7 +9973,7 @@ msgstr "フィールド\"%2$s\"の値\"%1$s\"が長過ぎます - %3$d文字。%
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr "フィールド\"%2$s\"の値\"%1$s\"が長過ぎます - %3$d文字。2048文字以内で設定してください。"
 
-#: config.php:390 config.php:404 include/audit.inc.php:38
+#: config.php:391 config.php:405 include/audit.inc.php:38
 #: include/views/administration.general.valuemapping.list.php:28
 msgid "Value map"
 msgstr "値のマッピング"
@@ -9990,7 +9990,7 @@ msgstr "値のマッピングを削除しました"
 msgid "Value map updated"
 msgstr "値のマッピングを更新しました"
 
-#: config.php:776 config.php:942
+#: config.php:786 config.php:952
 #: include/views/administration.general.valuemapping.edit.php:55
 msgid "Value mapping"
 msgstr "値のマッピング"
@@ -10048,7 +10048,7 @@ msgstr "W"
 msgid "WEB CHECKS"
 msgstr "ウェブチェック"
 
-#: config.php:685 include/locales/en_gb.inc.php:166
+#: config.php:695 include/locales/en_gb.inc.php:166
 #: include/views/administration.general.triggerSeverity.edit.php:46
 msgid "Warning"
 msgstr "警告"
@@ -10215,7 +10215,7 @@ msgstr "トリガーなし"
 msgid "Wizard"
 msgstr "ウィザード"
 
-#: config.php:303 config.php:777
+#: config.php:304 config.php:787
 #: include/views/administration.general.workingtime.edit.php:24
 #: include/views/administration.general.workingtime.edit.php:27
 msgid "Working time"
@@ -10358,7 +10358,7 @@ msgstr "毎年"
 
 #: include/blocks.inc.php:755 include/config.inc.php:625
 #: include/events.inc.php:289 include/events.inc.php:303
-#: include/forms.inc.php:3543 include/locales/en_gb.inc.php:766
+#: include/forms.inc.php:3545 include/locales/en_gb.inc.php:766
 #: include/views/administration.users.list.php:78
 msgid "Yes"
 msgstr "はい"

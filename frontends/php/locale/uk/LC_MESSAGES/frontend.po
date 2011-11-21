@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-21 10:33+0200\n"
+"POT-Creation-Date: 2011-11-21 11:36+0200\n"
 "PO-Revision-Date: 2011-10-18 02:11+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -332,7 +332,7 @@ msgstr "Активно до"
 #: dashconf.php:196 include/blocks.inc.php:1153 include/blocks.inc.php:1159
 #: include/blocks.inc.php:1264 include/blocks.inc.php:1309
 #: include/blocks.inc.php:1315 include/forms.inc.php:3233
-#: include/forms.inc.php:3616 include/locales/en_gb.inc.php:1058
+#: include/forms.inc.php:3618 include/locales/en_gb.inc.php:1058
 #: include/views/administration.general.iconmap.edit.php:111
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.general.valuemapping.edit.php:50
@@ -701,7 +701,7 @@ msgstr "Звіт про доступність"
 msgid "Available"
 msgstr "Доступний"
 
-#: config.php:687
+#: config.php:697
 #: include/views/administration.general.triggerSeverity.edit.php:52
 msgid "Average"
 msgstr "Середня"
@@ -967,7 +967,7 @@ msgid "Canada (136 characters)"
 msgstr "Канада (136 символів)"
 
 #: include/classes/class.cbuttoncancel.php:24 include/config.inc.php:329
-#: include/forms.inc.php:3235 include/forms.inc.php:3617
+#: include/forms.inc.php:3235 include/forms.inc.php:3619
 #: include/js.inc.php:212 include/locales/en_gb.inc.php:719
 #: include/views/configuration.action.edit.php:879
 #: include/views/configuration.action.edit.php:927
@@ -1012,7 +1012,7 @@ msgstr "Не вдалося додати вузел мережі"
 msgid "Cannot add host group."
 msgstr ""
 
-#: config.php:160 include/export.inc.php:665
+#: config.php:161 include/export.inc.php:665
 msgid "Cannot add image"
 msgstr "Не вдалося додати картинку"
 
@@ -1020,7 +1020,7 @@ msgstr "Не вдалося додати картинку"
 msgid "Cannot add item"
 msgstr "Не вдалося додати елемент даних"
 
-#: api/classes/class.ctemplate.php:1588 config.php:655
+#: api/classes/class.ctemplate.php:1588 config.php:665
 msgid "Cannot add macro"
 msgstr "Не вдалося додати макрос"
 
@@ -1153,7 +1153,7 @@ msgstr "Не вдалося сворити інше з'єднання з баз�
 msgid "Cannot create discovery rule"
 msgstr "Не вдалося створити правило виявлення"
 
-#: config.php:742
+#: config.php:752
 msgid "Cannot create icon map"
 msgstr ""
 
@@ -1217,11 +1217,11 @@ msgstr "Не вдалося видалити вузел мережі"
 msgid "Cannot delete host group."
 msgstr ""
 
-#: config.php:755
+#: config.php:765
 msgid "Cannot delete icon map"
 msgstr ""
 
-#: config.php:228
+#: config.php:229
 msgid "Cannot delete image"
 msgstr "Не вдалося видалити картинку"
 
@@ -1457,7 +1457,7 @@ msgstr "Не вдалося виконати оператор оновлення
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr "Не вдалось виконати оператор оновлення для таблиці \"%s\" де немає умови."
 
-#: api/classes/class.chost.php:1941 config.php:639
+#: api/classes/class.chost.php:1941 config.php:649
 msgid "Cannot remove macro."
 msgstr ""
 
@@ -1562,11 +1562,11 @@ msgstr "Не вдалося оновити статус вузла мережі"
 msgid "Cannot update hosts"
 msgstr "Не вдалося оновити вузли мережі"
 
-#: config.php:737
+#: config.php:747
 msgid "Cannot update icon map"
 msgstr ""
 
-#: config.php:156 include/export.inc.php:670
+#: config.php:157 include/export.inc.php:670
 msgid "Cannot update image"
 msgstr "Не вдалося оновити картинку"
 
@@ -1574,7 +1574,7 @@ msgstr "Не вдалося оновити картинку"
 msgid "Cannot update item"
 msgstr "Не вдалося оновити елемент даних"
 
-#: api/classes/class.ctemplate.php:1579 config.php:611
+#: api/classes/class.ctemplate.php:1579 config.php:621
 msgid "Cannot update macro"
 msgstr "Не вдалося оновити макрос"
 
@@ -1582,7 +1582,7 @@ msgstr "Не вдалося оновити макрос"
 msgid "Cannot update macro."
 msgstr ""
 
-#: config.php:673
+#: config.php:683
 msgid "Cannot update macros"
 msgstr "Не вдалося оновити макроси"
 
@@ -1667,7 +1667,7 @@ msgstr "Не вдалося оновити перетворення значен
 msgid "Caption"
 msgstr "Заголовок"
 
-#: include/forms.inc.php:3528 include/forms.inc.php:3611
+#: include/forms.inc.php:3530 include/forms.inc.php:3613
 msgid "Case sensitive"
 msgstr "Чутливий до регістру"
 
@@ -2012,11 +2012,11 @@ msgstr "Створити графік"
 msgid "Create group"
 msgstr "Створити групу"
 
-#: config.php:796
+#: config.php:806
 msgid "Create icon map"
 msgstr ""
 
-#: config.php:787
+#: config.php:797
 msgid "Create image"
 msgstr "Створити картинку"
 
@@ -2072,7 +2072,7 @@ msgstr "Створити тригер"
 msgid "Create user"
 msgstr ""
 
-#: config.php:790
+#: config.php:800
 msgid "Create value map"
 msgstr "Створити перетворення значення"
 
@@ -2444,7 +2444,7 @@ msgstr "Затримка (сукунд)"
 msgid "Delayed by"
 msgstr "Затримується на"
 
-#: include/classes/class.cbuttondelete.php:24 include/forms.inc.php:3556
+#: include/classes/class.cbuttondelete.php:24 include/forms.inc.php:3558
 #: include/locales/en_gb.inc.php:965
 msgid "Delete"
 msgstr "Видалити"
@@ -2639,7 +2639,7 @@ msgstr "Видалити обрані проксі?"
 msgid "Delete selected proxy?"
 msgstr "Видалити обраний проксі?"
 
-#: include/views/administration.general.regularexpressions.list.php:31
+#: include/views/administration.general.regularexpressions.list.php:32
 msgid "Delete selected regular expressions?"
 msgstr "Видалити вибрані регулярні вирази?"
 
@@ -2675,11 +2675,11 @@ msgstr "Видалити обраного користувача?"
 msgid "Delete selected users?"
 msgstr "Видалити вибраних користувачів?"
 
-#: config.php:929
+#: config.php:939
 msgid "Delete selected value mapping?"
 msgstr "Видалити обрані перетворення значень?"
 
-#: config.php:926
+#: config.php:936
 #, php-format
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
@@ -2715,8 +2715,8 @@ msgstr "Видалити тригер?"
 msgid "Deleted"
 msgstr "Видалено"
 
-#: include/forms.inc.php:3457 include/forms.inc.php:3537
-#: include/forms.inc.php:3603
+#: include/forms.inc.php:3457 include/forms.inc.php:3539
+#: include/forms.inc.php:3605
 msgid "Delimiter"
 msgstr "Розділювач"
 
@@ -2865,7 +2865,7 @@ msgstr "Дезактивувати вибрані тригери?"
 msgid "Disabled"
 msgstr "Дезактивовано"
 
-#: config.php:691
+#: config.php:701
 #: include/views/administration.general.triggerSeverity.edit.php:64
 msgid "Disaster"
 msgstr "Критична"
@@ -2987,11 +2987,11 @@ msgstr "Виконати"
 msgid "Do not calculate"
 msgstr "Не підраховувати"
 
-#: config.php:299 include/views/administration.general.housekeeper.edit.php:24
+#: config.php:300 include/views/administration.general.housekeeper.edit.php:24
 msgid "Do not keep actions older than (in days)"
 msgstr "Не зберігати дії старші ніж (днів)"
 
-#: config.php:297 include/views/administration.general.housekeeper.edit.php:25
+#: config.php:298 include/views/administration.general.housekeeper.edit.php:25
 msgid "Do not keep events older than (in days)"
 msgstr "Не зберігати події старше ніж (днів)"
 
@@ -3096,7 +3096,7 @@ msgstr "ПОДІЇ"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Кожнен URL-запит повинен мати унікальне ім'я. Будь ласка переконайтесь що це тільки один URL-запит з таким іменем"
 
-#: include/forms.inc.php:3529 include/forms.inc.php:3544
+#: include/forms.inc.php:3531 include/forms.inc.php:3546
 #: include/locales/en_gb.inc.php:871
 #: include/views/administration.users.edit.php:163
 #: include/views/configuration.action.edit.php:371
@@ -3384,7 +3384,7 @@ msgstr "існуюче"
 msgid "Expand single problem"
 msgstr "Розгортати одиночну проблему"
 
-#: include/forms.inc.php:3398 include/forms.inc.php:3527
+#: include/forms.inc.php:3398 include/forms.inc.php:3529
 msgid "Expected result"
 msgstr "Очікуваний результат"
 
@@ -3409,7 +3409,7 @@ msgstr "Експортувати вибране"
 msgid "Export to CSV"
 msgstr "Експортувати в CSV"
 
-#: include/forms.inc.php:3526 include/forms.inc.php:3586
+#: include/forms.inc.php:3528 include/forms.inc.php:3588
 #: include/locales/en_gb.inc.php:235
 #: include/views/administration.general.iconmap.edit.php:42
 msgid "Expression"
@@ -3427,12 +3427,12 @@ msgstr "Значення елементів Виразу"
 msgid "Expression cannot be empty"
 msgstr "Вираз не може бути пустим"
 
-#: include/forms.inc.php:3595
+#: include/forms.inc.php:3597
 msgid "Expression type"
 msgstr "Тип виразу"
 
 #: include/views/administration.general.regularexpressions.edit.php:34
-#: include/views/administration.general.regularexpressions.list.php:30
+#: include/views/administration.general.regularexpressions.list.php:42
 msgid "Expressions"
 msgstr "Вирази"
 
@@ -3650,7 +3650,7 @@ msgstr "ГРАФІКИ"
 msgid "GSM modem"
 msgstr "GSM модем"
 
-#: config.php:770 include/views/administration.general.gui.edit.php:42
+#: config.php:780 include/views/administration.general.gui.edit.php:42
 msgid "GUI"
 msgstr "Веб інтерфейс"
 
@@ -3865,7 +3865,7 @@ msgstr "Групу додано"
 msgid "Group deleted"
 msgstr "Групу видалено"
 
-#: config.php:313 include/views/administration.general.other.edit.php:37
+#: config.php:314 include/views/administration.general.other.edit.php:37
 msgid "Group for discovered hosts"
 msgstr "Група для виявлених вузлів"
 
@@ -3995,7 +3995,7 @@ msgstr "Приховати дезактивовані тригери"
 msgid "Hide selected"
 msgstr "Не відображувати тільки відібрані"
 
-#: config.php:689
+#: config.php:699
 #: include/views/administration.general.triggerSeverity.edit.php:58
 msgid "High"
 msgstr "Висока"
@@ -4256,7 +4256,7 @@ msgstr "Щогодини"
 msgid "Hours"
 msgstr "Годин"
 
-#: config.php:771 include/views/administration.general.housekeeper.edit.php:28
+#: config.php:781 include/views/administration.general.housekeeper.edit.php:28
 msgid "Housekeeper"
 msgstr "Очистка історії"
 
@@ -4445,11 +4445,11 @@ msgstr ""
 msgid "Icon map \"%s\" must have at least one mapping."
 msgstr ""
 
-#: config.php:741
+#: config.php:751
 msgid "Icon map created"
 msgstr ""
 
-#: config.php:755
+#: config.php:765
 msgid "Icon map deleted"
 msgstr ""
 
@@ -4457,7 +4457,7 @@ msgstr ""
 msgid "Icon map name cannot be empty."
 msgstr ""
 
-#: config.php:736
+#: config.php:746
 msgid "Icon map updated"
 msgstr ""
 
@@ -4466,7 +4466,7 @@ msgstr ""
 msgid "Icon map with iconmapid \"%s\" does not exist."
 msgstr ""
 
-#: config.php:773 config.php:1175
+#: config.php:783 config.php:1185
 msgid "Icon mapping"
 msgstr ""
 
@@ -4499,11 +4499,11 @@ msgstr "Якщо Ви вважаєте це повідомлення помил�
 msgid "Image"
 msgstr "Картинка"
 
-#: config.php:159
+#: config.php:160
 msgid "Image added"
 msgstr "Картинку додано"
 
-#: config.php:228
+#: config.php:229
 msgid "Image deleted"
 msgstr "Картинку видалено"
 
@@ -4511,15 +4511,15 @@ msgstr "Картинку видалено"
 msgid "Image label type"
 msgstr "Тип ярлика до картинки"
 
-#: api/classes/class.cimage.php:316 config.php:174
+#: api/classes/class.cimage.php:316 config.php:175
 msgid "Image size must be less than 1MB"
 msgstr "Розмір картинки має бути менше 1MB"
 
-#: config.php:155
+#: config.php:156
 msgid "Image updated"
 msgstr "Картинку оновлено"
 
-#: config.php:772 include/views/administration.general.image.list.php:29
+#: config.php:782 include/views/administration.general.image.list.php:29
 msgid "Images"
 msgstr "Картинки"
 
@@ -4800,7 +4800,7 @@ msgstr "Некоректний ID групи вузла мережі \"%s\" на
 msgid "Incorrect host group."
 msgstr ""
 
-#: config.php:168
+#: config.php:169
 msgid "Incorrect image"
 msgstr ""
 
@@ -5030,7 +5030,7 @@ msgstr ""
 msgid "Info"
 msgstr "Інфо"
 
-#: config.php:683 include/locales/en_gb.inc.php:165
+#: config.php:693 include/locales/en_gb.inc.php:165
 #: include/views/administration.general.triggerSeverity.edit.php:40
 msgid "Information"
 msgstr "Інформація"
@@ -5761,13 +5761,13 @@ msgstr "Ім'я макросу занадто довге, воно має бут
 msgid "Macro value is too long, should not exceed 255 chars."
 msgstr "Значення макросу занадто довге, воно має бути не більше 255 символів."
 
-#: config.php:775 include/locales/en_gb.inc.php:420
+#: config.php:785 include/locales/en_gb.inc.php:420
 #: include/views/administration.general.macros.edit.php:87
 #: include/views/configuration.host.edit.php:518
 msgid "Macros"
 msgstr "Макроси"
 
-#: config.php:668
+#: config.php:678
 msgid "Macros updated"
 msgstr "Макроси оновлено"
 
@@ -6194,7 +6194,7 @@ msgstr "Щомісяця"
 msgid "More than 10 minutes"
 msgstr "Більше 10 хвилин"
 
-#: config.php:593
+#: config.php:603
 msgid "More than one macro with same name found:"
 msgstr ""
 
@@ -6254,7 +6254,7 @@ msgstr "NTLM аутентифікація"
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
 #: include/views/administration.general.image.edit.php:35
-#: include/views/administration.general.regularexpressions.list.php:30
+#: include/views/administration.general.regularexpressions.list.php:42
 #: include/views/administration.general.valuemapping.edit.php:43
 #: include/views/administration.general.valuemapping.list.php:28
 #: include/views/administration.script.edit.php:43
@@ -6300,7 +6300,7 @@ msgstr "Карти мереж"
 msgid "Never"
 msgstr "Ніколи"
 
-#: include/forms.inc.php:3555 include/views/configuration.action.edit.php:391
+#: include/forms.inc.php:3557 include/views/configuration.action.edit.php:391
 #: include/views/configuration.action.edit.php:602
 #: include/views/configuration.action.edit.php:828
 #: include/views/configuration.discovery.edit.php:65
@@ -6365,7 +6365,7 @@ msgstr "Новий метод повідомлення"
 msgid "New node"
 msgstr "Нова нода"
 
-#: config.php:793
+#: config.php:803
 msgid "New regular expression"
 msgstr "Новий регулярний вираз"
 
@@ -6390,7 +6390,7 @@ msgid "Next check"
 msgstr "Наступна перевірка"
 
 #: include/config.inc.php:622 include/events.inc.php:286
-#: include/events.inc.php:300 include/forms.inc.php:3543
+#: include/events.inc.php:300 include/forms.inc.php:3545
 #: include/locales/en_gb.inc.php:767
 #: include/views/administration.users.list.php:79
 #: include/views/administration.users.list.php:82
@@ -6846,7 +6846,7 @@ msgstr "Не авторизовано"
 msgid "Not available"
 msgstr "Недоступний"
 
-#: config.php:681
+#: config.php:691
 #: include/views/administration.general.triggerSeverity.edit.php:34
 msgid "Not classified"
 msgstr "Не класифіковано"
@@ -7139,7 +7139,7 @@ msgstr "Оригінальне"
 msgid "Original blue"
 msgstr "Оригінальна блакитна"
 
-#: config.php:780 include/classes/class.ctweenbox.php:75
+#: config.php:790 include/classes/class.ctweenbox.php:75
 #: include/classes/class.ctweenbox.php:103 include/locales/en_gb.inc.php:231
 msgid "Other"
 msgstr "Інші"
@@ -7663,7 +7663,7 @@ msgstr "Інтервал оновлення в секундах"
 msgid "Refresh time multiplier"
 msgstr "Множник інтервалу оновлення"
 
-#: config.php:301 include/views/administration.general.other.edit.php:36
+#: config.php:302 include/views/administration.general.other.edit.php:36
 msgid "Refresh unsupported items (in sec)"
 msgstr "Оновлювати елементи даних, які не підтримуються (секунди)"
 
@@ -7689,7 +7689,7 @@ msgstr "Регулярний вираз додано"
 msgid "Regular expression deleted"
 msgstr "Регулярний вираз видалено"
 
-#: config.php:450
+#: config.php:451
 msgid "Regular expression does not exist."
 msgstr ""
 
@@ -7697,7 +7697,7 @@ msgstr ""
 msgid "Regular expression updated"
 msgstr "Регулярний вираз оновлено"
 
-#: config.php:774
+#: config.php:784
 #: include/views/administration.general.regularexpressions.list.php:22
 msgid "Regular expressions"
 msgstr "Регулярні вирази"
@@ -8149,7 +8149,7 @@ msgstr "Суб"
 msgid "Saturday"
 msgstr "Субота"
 
-#: acknow.php:176 include/forms.inc.php:3233 include/forms.inc.php:3616
+#: acknow.php:176 include/forms.inc.php:3233 include/forms.inc.php:3618
 #: include/locales/en_gb.inc.php:718
 #: include/views/administration.authentication.edit.php:76
 #: include/views/administration.general.gui.edit.php:50
@@ -8407,7 +8407,7 @@ msgstr "Вибрати"
 msgid "Select Nodes"
 msgstr "Вибрати ноди"
 
-#: config.php:193
+#: config.php:194
 msgid "Select image to download"
 msgstr "Оберіть картинку для завантаження"
 
@@ -8581,7 +8581,7 @@ msgstr "Відобразити дезактивовані тригери"
 msgid "Show events max"
 msgstr "Відображувати подій максимум"
 
-#: config.php:263 include/views/administration.general.gui.edit.php:38
+#: config.php:264 include/views/administration.general.gui.edit.php:38
 msgid "Show events not older than (in days)"
 msgstr ""
 
@@ -9404,7 +9404,7 @@ msgstr "Тригер видалено"
 msgid "Trigger dependencies"
 msgstr "Залежності тригера"
 
-#: config.php:779
+#: config.php:789
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:114
 msgid "Trigger displaying options"
 msgstr "Параметри відображення тригера"
@@ -9464,7 +9464,7 @@ msgstr "Прототип тригера [%1$s:%2$s] від'єднано."
 msgid "Trigger prototypes"
 msgstr "Прототипи тригерів"
 
-#: config.php:778
+#: config.php:788
 #: include/views/administration.general.triggerSeverity.edit.php:70
 msgid "Trigger severities"
 msgstr "Важливість тригера"
@@ -9876,7 +9876,7 @@ msgstr "Група користувачів \"%1$s\" використовуєт�
 msgid "User group [%s] is used in configuration for database down messages."
 msgstr "Група користувачів [%s] використовується в налаштуваннях повідомлення про недоступність бази даних."
 
-#: config.php:330 include/views/administration.general.other.edit.php:38
+#: config.php:331 include/views/administration.general.other.edit.php:38
 msgid "User group for database down message"
 msgstr "Повідомлення для групи користувачів при недоступності бази даних"
 
@@ -9995,7 +9995,7 @@ msgstr "Значення \"%1$s\" являється занадто довгим
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr "Значення \"%1$s\" являється занадто довгим для поля \"%2$s\" - %3$d символів. Допустима довжина 2048 символів."
 
-#: config.php:390 config.php:404 include/audit.inc.php:38
+#: config.php:391 config.php:405 include/audit.inc.php:38
 #: include/views/administration.general.valuemapping.list.php:28
 msgid "Value map"
 msgstr "Перетворення значення"
@@ -10012,7 +10012,7 @@ msgstr "Перетворення значення видалено"
 msgid "Value map updated"
 msgstr "Перетворення значення оновлено"
 
-#: config.php:776 config.php:942
+#: config.php:786 config.php:952
 #: include/views/administration.general.valuemapping.edit.php:55
 msgid "Value mapping"
 msgstr "Перетворення значень"
@@ -10070,7 +10070,7 @@ msgstr "С"
 msgid "WEB CHECKS"
 msgstr "ВЕБ ПЕРЕВІРКИ"
 
-#: config.php:685 include/locales/en_gb.inc.php:166
+#: config.php:695 include/locales/en_gb.inc.php:166
 #: include/views/administration.general.triggerSeverity.edit.php:46
 msgid "Warning"
 msgstr "Попередження"
@@ -10237,7 +10237,7 @@ msgstr "Без тригерів"
 msgid "Wizard"
 msgstr "Майстер"
 
-#: config.php:303 config.php:777
+#: config.php:304 config.php:787
 #: include/views/administration.general.workingtime.edit.php:24
 #: include/views/administration.general.workingtime.edit.php:27
 msgid "Working time"
@@ -10380,7 +10380,7 @@ msgstr "Щороку"
 
 #: include/blocks.inc.php:755 include/config.inc.php:625
 #: include/events.inc.php:289 include/events.inc.php:303
-#: include/forms.inc.php:3543 include/locales/en_gb.inc.php:766
+#: include/forms.inc.php:3545 include/locales/en_gb.inc.php:766
 #: include/views/administration.users.list.php:78
 msgid "Yes"
 msgstr "Так"
