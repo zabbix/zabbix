@@ -2831,7 +2831,7 @@
 					$ymin_name = $min_host['host'].':'.itemName($min_item);
 				}
 
-				if(count($items)){
+				if (count($items)) {
 					$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
 					$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
 						"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
@@ -2842,8 +2842,20 @@
 							"&srctbl=items".
 							"&srcfld1=itemid".
 							"&srcfld2=name',0,0,'zbx_popup_item');");
+
+					// select prototype button
+					if ($parent_discoveryid) {
+						$yaxis_min[] = new CButton('yaxis_min', _('Select prototype'),'javascript: '.
+							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+								"&parent_discoveryid=".$parent_discoveryid.
+								"&dstfld1=ymin_itemid".
+								"&dstfld2=ymin_name".
+								"&srctbl=prototypes".
+								"&srcfld1=itemid".
+								"&srcfld2=name',0,0,'zbx_popup_item');");
+					}
 				}
-				else{
+				else {
 					$yaxis_min[] = S_ADD_GRAPH_ITEMS;
 				}
 			}
@@ -2875,7 +2887,7 @@
 					$ymax_name = $max_host['host'].':'.itemName($max_item);
 				}
 
-				if(count($items)){
+				if (count($items)) {
 					$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
 					$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
 							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
@@ -2887,8 +2899,20 @@
 							"&srcfld1=itemid".
 							"&srcfld2=name',0,0,'zbx_popup_item');"
 					);
+
+					// select prototype button
+					if ($parent_discoveryid) {
+						$yaxis_max[] = new CButton('yaxis_min', _('Select prototype'),'javascript: '.
+							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+								"&parent_discoveryid=".$parent_discoveryid.
+								"&dstfld1=ymax_itemid".
+								"&dstfld2=ymax_name".
+								"&srctbl=prototypes".
+								"&srcfld1=itemid".
+								"&srcfld2=name',0,0,'zbx_popup_item');");
+					}
 				}
-				else{
+				else {
 					$yaxis_max[] = S_ADD_GRAPH_ITEMS;
 				}
 			}
