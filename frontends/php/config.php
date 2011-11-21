@@ -64,6 +64,7 @@ require_once('include/page_header.php');
 		'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'cancel'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'go'=>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
 		// GUI
 		'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
@@ -483,32 +484,41 @@ require_once('include/page_header.php');
 				unset($_REQUEST['form']);
 			}
 		}
-		else if(isset($_REQUEST['delete'])){
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
-
-			$regexpids = get_request('regexpid', array());
-			if(isset($_REQUEST['regexpids']))
-				$regexpids = $_REQUEST['regexpids'];
-
-			zbx_value2array($regexpids);
-
-			$regexps = array();
-			foreach($regexpids as $id => $regexpid){
-				$regexps[$regexpid] = get_regexp_by_regexpid($regexpid);
-			}
-
-			DBstart();
-			$result = delete_regexp($regexpids);
-			$result = Dbend($result);
-
-			show_messages($result,S_REGULAR_EXPRESSION_DELETED,S_CANNOT_DELETE_REGULAR_EXPRESSION);
-			if($result){
-				foreach($regexps as $regexpid => $regexp){
-					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_REGEXP,'Id ['.$regexpid.'] '.S_NAME.' ['.$regexp['name'].']');
+		elseif (isset($_REQUEST['go'])) {
+			if ($_REQUEST['go'] == 'delete') {
+				if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+					access_deny();
 				}
 
-				unset($_REQUEST['form']);
-				unset($_REQUEST['regexpid']);
+				$regexpids = get_request('regexpid', array());
+				if (isset($_REQUEST['regexpids'])) {
+					$regexpids = $_REQUEST['regexpids'];
+				}
+
+				zbx_value2array($regexpids);
+
+				$regexps = array();
+				foreach($regexpids as $id => $regexpid){
+					$regexps[$regexpid] = get_regexp_by_regexpid($regexpid);
+				}
+
+				DBstart();
+				$result = delete_regexp($regexpids);
+				$result = Dbend($result);
+
+				show_messages($result, S_REGULAR_EXPRESSION_DELETED, S_CANNOT_DELETE_REGULAR_EXPRESSION);
+				if ($result) {
+					foreach ($regexps as $regexpid => $regexp) {
+						add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, 'Id ['.$regexpid.'] '.S_NAME.' ['.$regexp['name'].']');
+					}
+
+					unset($_REQUEST['form']);
+					unset($_REQUEST['regexpid']);
+
+					$url = new CUrl();
+					$path = $url->getPath();
+					insert_js('cookie.eraseArray("'.$path.'")');
+				}
 			}
 		}
 		elseif (isset($_REQUEST['add_expression']) && isset($_REQUEST['new_expression'])) {
@@ -542,7 +552,7 @@ require_once('include/page_header.php');
 		}
 		elseif (isset($_REQUEST['delete_expression']) && isset($_REQUEST['g_expressionid'])) {
 			$_REQUEST['expressions'] = get_request('expressions',array());
-			foreach($_REQUEST['g_expressionid'] as $val){
+			foreach ($_REQUEST['g_expressionid'] as $val) {
 				unset($_REQUEST['expressions'][$val]);
 			}
 		}
