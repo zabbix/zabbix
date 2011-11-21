@@ -12,7 +12,7 @@ New features:
  - [ZBXNEXT-579] added support for vfs.fs.discovery (with both {#FSNAME} and {#FSTYPE}) on FreeBSD, NetBSD and OpenBSD (asaveljevs)
  - [ZBXNEXT-580] added support for {#FSTYPE} for vfs.fs.discovery on AIX, HP-UX, Linux, Solaris and Windows (asaveljevs)
  - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
- - [ZBX-1357] updated Brazilian Portuguese and Russian translations; thanks to Zabbix translators (Richlv)
+ - [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
