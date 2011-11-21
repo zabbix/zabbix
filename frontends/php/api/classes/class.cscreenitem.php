@@ -396,7 +396,7 @@ class CScreenItem extends CZBXAPI {
 				$graphs[] = $screenItem['resourceid'];
 			}
 			elseif (in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))
-					|| $screenItem['resourcetype'] == SCREEN_RESOURCE_CLOCK && $screenItem['style'] == SCREEN_CLOCK_HOST) {
+					|| $screenItem['resourcetype'] == SCREEN_RESOURCE_CLOCK && $screenItem['style'] == TIME_TYPE_HOST) {
 
 				if (!$screenItem['resourceid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
