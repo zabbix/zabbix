@@ -21,6 +21,10 @@
 /*					ZABBIX MAPS								*/
 /************************************************************/
 
+.interfaceRow label.checkboxLikeLabel span.ui-button-icon-primary {
+	left: 0;
+}
+
 .sortableRowPlaceholder{
 	height: 30px;
 }

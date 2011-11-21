@@ -201,7 +201,7 @@
 	}
 
 	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->addRow(array(_('IP address'),_('DNS name'),_('Connect to'),_('Port'),_('Type')));
+	$ifTab->addRow(array(_('IP address'), _('DNS name'), _('Connect to'), _('Port'), _('Type'), _('Default')));
 	$ifTab->setAttribute('id', 'hostInterfaces');
 
 	$jsInsert = '';

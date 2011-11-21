@@ -38,7 +38,7 @@
 </td>
 <td>
 	<input type="checkbox" id="interface_main_#{interfaceid}" name="interfaces[#{interfaceid}][main]" value="1" #{*checked_main} />
-	<label for="interface_main_#{interfaceid}"><?php echo _('Main');?></label>
+	<label class="checkboxLikeLabel" for="interface_main_#{interfaceid}" style="height: 16px; width: 16px;"></label>
 </td>
 <td>
 	<input #{*disabled} id="removeInterface_#{interfaceid}" type="button" class="link_menu" name="remove" value="<?php echo _('Remove'); ?>" />
@@ -201,7 +201,7 @@ function addInterfaceRow(hostInterface) {
 			});
 
 
-		jQuery("#hostInterfaceRow_"+hostInterface.interfaceid+" .interfaceTypes input[type=radio]").click(function() {
+		jQuery("#hostInterfaceRow_"+hostInterface.interfaceid+" .interfaceTypes input[type=radio]").click(function(event) {
 			jQuery('#interface_main_'+hostInterface.interfaceid)
 					.prop('checked', false)
 					.button('refresh')

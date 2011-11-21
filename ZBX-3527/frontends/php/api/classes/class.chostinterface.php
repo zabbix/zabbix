@@ -23,26 +23,28 @@
  * File containing CInterface class for API.
  * @package API
  */
+
 /**
- * Class containing methods for operations with Interfaces
+ * Class containing methods for operations with Interfaces.
  */
 class CHostInterface extends CZBXAPI{
-/**
- * Get Interface Interface data
- *
- * @param array $options
- * @param array $options['nodeids'] Node IDs
- * @param array $options['hostids'] Interface IDs
- * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param boolean $options['selectHosts'] select Interface hosts
- * @param boolean $options['selectItems'] select Items
- * @param int $options['count'] count Interfaces, returned column name is rowscount
- * @param string $options['pattern'] search hosts by pattern in Interface name
- * @param int $options['limit'] limit selection
- * @param string $options['sortfield'] field to sort by
- * @param string $options['sortorder'] sort order
- * @return array|boolean Interface data as array or false if error
- */
+
+	/**
+	 * Get Interface Interface data
+	 *
+	 * @param array $options
+	 * @param array $options['nodeids'] Node IDs
+	 * @param array $options['hostids'] Interface IDs
+	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
+	 * @param boolean $options['selectHosts'] select Interface hosts
+	 * @param boolean $options['selectItems'] select Items
+	 * @param int $options['count'] count Interfaces, returned column name is rowscount
+	 * @param string $options['pattern'] search hosts by pattern in Interface name
+	 * @param int $options['limit'] limit selection
+	 * @param string $options['sortfield'] field to sort by
+	 * @param string $options['sortorder'] sort order
+	 * @return array|boolean Interface data as array or false if error
+	 */
 	public function get($options=array()){
 
 		$result = array();
@@ -411,7 +413,7 @@ Copt::memoryPick();
 			}
 		}
 
-Copt::memoryPick();
+
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
@@ -420,8 +422,17 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	public function exists($object){
-		$keyFields = array('interfaceid', 'hostid', 'ip', 'dns');
+	/**
+	 * @param $object
+	 * @return bool
+	 */
+	public function exists($object) {
+		$keyFields = array(
+			'interfaceid',
+			'hostid',
+			'ip',
+			'dns'
+		);
 
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
@@ -430,24 +441,30 @@ Copt::memoryPick();
 			'limit' => 1
 		);
 
-		if(isset($object['node']))
+		if (isset($object['node'])) {
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		else if(isset($object['nodeids']))
+		}
+		elseif (isset($object['nodeids'])) {
 			$options['nodeids'] = $object['nodeids'];
+		}
 
 		$objs = $this->get($options);
 
-	return !empty($objs);
+		return !empty($objs);
 	}
 
-	protected function checkInput(&$interfaces, $method){
+	/**
+	 * @param $interfaces
+	 * @param $method
+	 */
+	protected function checkInput(&$interfaces, $method) {
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
 
-// permissions
-		if($update || $delete){
-			$interfaceDBfields = array('interfaceid'=> null);
+		// permissions
+		if ($update || $delete) {
+			$interfaceDBfields = array('interfaceid' => null);
 			$dbInterfaces = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
@@ -455,64 +472,77 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			));
 		}
-		else{
-			$interfaceDBfields = array('hostid'=>null,'ip'=>null,'dns'=>null,'useip'=>null,'port'=>null);
+		else {
+			$interfaceDBfields = array(
+				'hostid' => null,
+				'ip' => null,
+				'dns' => null,
+				'useip' => null,
+				'port' => null
+			);
 			$dbHosts = API::Host()->get(array(
 				'output' => array('host', 'status'),
 				'hostids' => zbx_objectValues($interfaces, 'hostid'),
-				'editable' => 1,
-				'preservekeys' => 1
+				'editable' => true,
+				'preservekeys' => true
 			));
 
 			$dbProxies = API::Proxy()->get(array(
 				'output' => array('host', 'status'),
 				'proxyids' => zbx_objectValues($interfaces, 'hostid'),
-				'editable' => 1,
-				'preservekeys' => 1
+				'editable' => true,
+				'preservekeys' => true
 			));
 		}
 
-		foreach($interfaces as $inum => &$interface){
-			if(!check_db_fields($interfaceDBfields, $interface)){
+		foreach ($interfaces as $inum => &$interface) {
+			if (!check_db_fields($interfaceDBfields, $interface)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
 			}
 
-			if($update || $delete){
-				if(!isset($dbInterfaces[$interface['interfaceid']]))
+			if ($update || $delete) {
+				if (!isset($dbInterfaces[$interface['interfaceid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+				}
 
 				$dbInterface = $dbInterfaces[$interface['interfaceid']];
-				if(isset($interface['hostid']) && (bccomp($dbInterface['hostid'], $interface['hostid']) !=0))
+				if (isset($interface['hostid']) && (bccomp($dbInterface['hostid'], $interface['hostid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot switch host for interface'));
+				}
 
 				$interface['hostid'] = $dbInterface['hostid'];
 
-				if($delete) continue;
+				if ($delete) {
+					continue;
+				}
 
-// we check all fields on "updated" interface
+				// we check all fields on "updated" interface
 				$updInterface = $interface;
 				$interface = zbx_array_merge($dbInterface, $interface);
-//--
+				//--
 			}
-			else{
-				if(!isset($dbHosts[$interface['hostid']]) && !isset($dbProxies[$interface['hostid']]))
+			else {
+				if (!isset($dbHosts[$interface['hostid']]) && !isset($dbProxies[$interface['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+				}
 
-				if(isset($dbProxies[$interface['hostid']]))
+				if (isset($dbProxies[$interface['hostid']])) {
 					$interface['type'] = INTERFACE_TYPE_UNKNOWN;
-				else if(!isset($interface['type']))
+				}
+				elseif (!isset($interface['type'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to method.'));
+				}
 			}
 
-			if(zbx_empty($interface['ip']) && zbx_empty($interface['dns'])){
+			if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP and DNS cannot be empty for host interface.'));
 			}
 
-			if(($interface['useip'] == INTERFACE_USE_IP) && zbx_empty($interface['ip'])){
+			if (($interface['useip'] == INTERFACE_USE_IP) && zbx_empty($interface['ip'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with DNS " %1$s " cannot have empty IP address.', $interface['dns']));
 			}
 
-			if(($interface['useip'] == INTERFACE_USE_DNS) && zbx_empty($interface['dns'])){
+			if (($interface['useip'] == INTERFACE_USE_DNS) && zbx_empty($interface['dns'])) {
 				$dbHosts = API::Host()->get(array(
 					'output' => array('host'),
 					'hostids' => $interface['hostid'],
@@ -528,34 +558,35 @@ Copt::memoryPick();
 
 			if (isset($interface['ip']) && !zbx_empty($interface['ip'])) {
 				if (!validate_ip($interface['ip'], $arr)
-					&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
-					&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip']))
-				{
+						&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
+						&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip'])
+				) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface IP parameter "%s" provided.', $interface['ip']));
 				}
 			}
 
-			if(!isset($interface['port']) || zbx_empty($interface['port'])){
+			if (!isset($interface['port']) || zbx_empty($interface['port'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Port cannot be empty for host interface.'));
 			}
 
-			if(isset($interface['port'])){
-				if(zbx_ctype_digit($interface['port'])){
-					if($interface['port'] > 65535 || $interface['port'] < 0)
+			if (isset($interface['port'])) {
+				if (zbx_ctype_digit($interface['port'])) {
+					if ($interface['port'] > 65535 || $interface['port'] < 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface PORT "%s" provided', $interface['port']));
+					}
 				}
-				else if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $interface['port'])){
+				else if (!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $interface['port'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface PORT "'.$interface['port'].'". '.S_WRONG_MACRO);
 				}
 			}
 
-			if($update){
+			if ($update) {
 				$interface = $updInterface;
 			}
 		}
 		unset($interface);
 
-		if($delete){
+		if ($delete) {
 			$items = API::Item()->get(array(
 				'output' => array('key_'),
 				'selectHosts' => array('host'),
@@ -565,19 +596,19 @@ Copt::memoryPick();
 				'nopermissions' => 1
 			));
 
-			foreach($items as $item){
+			foreach ($items as $item) {
 				$host = reset($item['hosts']);
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%s"', $host['host'].':'.$item['key_']));
 			}
 		}
 	}
 
-	protected function setMainInterfaces($interfaces){
+	protected function setMainInterfaces($interfaces) {
 		$interfaces = zbx_toHash($interfaces, 'hostid');
 		$hostids = array_keys($interfaces);
 
 		$updateData = array();
-		foreach($hostids as $hnum => $hostid){
+		foreach ($hostids as $hostid) {
 			$interfaces = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'hostids' => $hostid,
@@ -588,144 +619,153 @@ Copt::memoryPick();
 			));
 
 			$interfaceMain = array();
-			foreach($interfaces as $interfaceid => $interface){
-				if(!isset($interfaceMain[$interface['type']])){
+			foreach ($interfaces as $interface) {
+				if (!isset($interfaceMain[$interface['type']])) {
 					$interfaceMain[$interface['type']] = $interface;
 
-					if($interface['main'] != INTERFACE_PRIMARY){
+					if ($interface['main'] != INTERFACE_PRIMARY) {
 						$updateData[] = array(
 							'values' => array('main' => INTERFACE_PRIMARY),
-							'where'=> array('interfaceid'=>$interface['interfaceid'])
+							'where' => array('interfaceid' => $interface['interfaceid'])
 						);
 					}
 					continue;
 				}
 
-				if($interface['main'] == INTERFACE_PRIMARY){
+				if ($interface['main'] == INTERFACE_PRIMARY) {
 					$updateData[] = array(
 						'values' => array('main' => INTERFACE_SECONDARY),
-						'where'=> array('interfaceid'=>$interface['interfaceid'])
+						'where' => array('interfaceid' => $interface['interfaceid'])
 					);
 				}
 			}
 		}
 
-		if(!empty($updateData))
+		if (!empty($updateData)) {
 			DB::update('interface', $updateData);
+		}
 	}
 
-/**
- * Add Interface
- *
- * @param _array $Interfaces multidimensional array with Interfaces data
- * @return array
- */
-	public function create($interfaces){
+	/**
+	 * Add Interface
+	 *
+	 * @param array $interfaces multidimensional array with Interfaces data
+	 *
+	 * @return array
+	 */
+	public function create($interfaces) {
 		$interfaces = zbx_toArray($interfaces);
 
-			$this->checkInput($interfaces, __FUNCTION__);
+		$this->checkInput($interfaces, __FUNCTION__);
 
-			$interfaceids = DB::insert('interface', $interfaces);
+		$interfaceids = DB::insert('interface', $interfaces);
 
-// auto seting main interfaces
-			$this->setMainInterfaces($interfaces);
+		// auto seting main interfaces
+		$this->setMainInterfaces($interfaces);
 
-			return array('interfaceids' => $interfaceids);
+		return array('interfaceids' => $interfaceids);
 	}
 
-/**
- * Update Interface
- *
- * @param _array $interfaces multidimensional array with Interfaces data
- * @return array
- */
-	public function update($interfaces){
+	/**
+	 * Update Interface
+	 *
+	 * @param array $interfaces multidimensional array with Interfaces data
+	 *
+	 * @return array
+	 */
+	public function update($interfaces) {
 		$interfaces = zbx_toArray($interfaces);
 
-			$this->checkInput($interfaces, __FUNCTION__);
+		$this->checkInput($interfaces, __FUNCTION__);
 
-			$data = array();
-			foreach($interfaces as $inum => $interface){
-				$data[] = array('values' => $interface, 'where'=> array('interfaceid'=>$interface['interfaceid']));
-			}
-			$result = DB::update('interface', $data);
+		$data = array();
+		foreach ($interfaces as $interface) {
+			$data[] = array(
+				'values' => $interface,
+				'where' => array('interfaceid' => $interface['interfaceid'])
+			);
+		}
+		DB::update('interface', $data);
 
-// auto seting main interfaces
-			$this->setMainInterfaces($interfaces);
+		// auto seting main interfaces
+		$this->setMainInterfaces($interfaces);
 
-			return array('interfaceids' => zbx_objectValues($interfaces, 'interfaceid'));
+		return array('interfaceids' => zbx_objectValues($interfaces, 'interfaceid'));
 	}
 
-/**
- * Delete Interface
- *
- * @param array $Interfaces
- * @param array $Interfaceids[1, ...] Interface ID to delete
- * @return array|boolean
- */
+	/**
+	 * Delete interfaces.
+	 *
+	 * @param $interfaceids
+	 *
+	 * @return array
+	 */
 	public function delete($interfaceids) {
 
-			if (empty($interfaceids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		if (empty($interfaceids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
 
-			$interfaceids = zbx_toArray($interfaceids);
-			$interfaces = zbx_toObject($interfaceids, 'interfaceid');
+		$interfaceids = zbx_toArray($interfaceids);
+		$interfaces = zbx_toObject($interfaceids, 'interfaceid');
 
-			$this->checkInput($interfaces,__FUNCTION__);
+		$this->checkInput($interfaces, __FUNCTION__);
 
-			DB::delete('interface', array('interfaceid' => $interfaceids));
+		DB::delete('interface', array('interfaceid' => $interfaceids));
 
-// auto seting main interfaces
-			$this->setMainInterfaces($interfaces);
+		// auto seting main interfaces
+		$this->setMainInterfaces($interfaces);
 
-			return array('interfaceids' => $interfaceids);
+		return array('interfaceids' => $interfaceids);
 	}
 
 	public function massAdd($data) {
 		$interfaces = zbx_toArray($data['interfaces']);
 		$hosts = zbx_toArray($data['hosts']);
 
-			$insertData = array();
-			foreach ($interfaces as $inum => $interface) {
-				foreach ($hosts as $hnum => $host) {
-					$newInterface = $interface;
-					$newInterface['hostid'] = $host['hostid'];
+		$insertData = array();
+		foreach ($interfaces as $interface) {
+			foreach ($hosts as $host) {
+				$newInterface = $interface;
+				$newInterface['hostid'] = $host['hostid'];
 
-					$insertData[] = $newInterface;
-				}
+				$insertData[] = $newInterface;
 			}
+		}
 
-			$interfaceids = $this->create($insertData);
+		$interfaceids = $this->create($insertData);
 
-			return array('interfaceids' => $interfaceids);
+		return array('interfaceids' => $interfaceids);
 	}
 
-/**
- * Remove Hosts from Hostinterfaces
- *
- * @param array $data
- * @param array $data['interfaceids']
- * @param array $data['hostids']
- * @param array $data['templateids']
- * @return boolean
- */
-	public function massRemove($data){
+	/**
+	 * Remove Hosts from Hostinterfaces
+	 *
+	 * @param array $data
+	 * @param array $data['interfaceids']
+	 * @param array $data['hostids']
+	 * @param array $data['templateids']
+	 *
+	 * @return boolean
+	 */
+	public function massRemove($data) {
 		$interfaces = zbx_toArray($data['interfaces']);
 		$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
 
 		$hostids = zbx_toArray($data['hostids']);
 
-			$this->checkInput($interfaces, __FUNCTION__);
+		$this->checkInput($interfaces, __FUNCTION__);
 
-			foreach($interfaces as $inum => $interface){
-				DB::delete('interface', array(
-					'hostid'=>$hostids,
-					'ip'=>$interface['ip'],
-					'dns'=>$interface['dns'],
-					'port'=>$interface['port']
-				));
-			}
+		foreach ($interfaces as $inum => $interface) {
+			DB::delete('interface', array(
+				'hostid' => $hostids,
+				'ip' => $interface['ip'],
+				'dns' => $interface['dns'],
+				'port' => $interface['port']
+			));
+		}
 
-			return array('interfaceids' => $interfaceids);
+		return array('interfaceids' => $interfaceids);
 	}
 }
 ?>
