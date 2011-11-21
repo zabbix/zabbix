@@ -818,7 +818,15 @@ require_once('include/js.inc.php');
 
 			if(TIME_TYPE_HOST == $style){
 				$textfield = new CTextbox('caption',$caption,75,'yes');
-				$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);");
+
+				if($screen['templateid']){
+					$selectbtn = new CButton('select', S_SELECT,
+						"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&templated_hosts=1&only_hostid=".$screen['templateid']."',800,450);");
+				}
+				else{
+					$selectbtn = new CButton('select', S_SELECT,
+						"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1',800,450);");
+				}
 
 				$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 			}
