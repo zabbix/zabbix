@@ -21,15 +21,6 @@
 <?php
 class CTag extends CObject{
 
-	/**
-	 * An array of attributes, that should be sanitized before outputting.
-	 *
-	 * @var type
-	 */
-	protected $attributesToSanitize = array(
-		'title' => true,
-		'alt' => true
-	);
 /* private *//*
 	var $tagname;
 	var $attributes = array();
@@ -76,10 +67,6 @@ class CTag extends CObject{
 	public function startToString(){
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach($this->attributes as $key => $value){
-			if (isset($this->attributesToSanitize[$key])) {
-				$value = $this->sanitize($value);
-			}
-
 			$res .= ' '.$key.'="'.$value.'"';
 		}
 		$res .= ($this->paired==='yes')? '>':' />';
