@@ -1310,7 +1310,7 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 						"publickey='%s',"
 						"privatekey='%s',"
 						"description='%s',"
-						"interfaceid=" ZBX_FS_UI64 ","
+						"interfaceid=%s,"
 						"flags=%d"
 					" where itemid=" ZBX_FS_UI64 ";\n",
 					name_esc, key_esc, (int)type, (int)value_type, (int)data_type, delay,
@@ -1320,7 +1320,7 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 					snmp_community_esc, snmp_oid_esc, port_esc, snmpv3_securityname_esc,
 					(int)snmpv3_securitylevel, snmpv3_authpassphrase_esc,
 					snmpv3_privpassphrase_esc, (int)authtype, username_esc, password_esc,
-					publickey_esc, privatekey_esc, description_esc, interfaceid,
+					publickey_esc, privatekey_esc, description_esc, DBsql_id_ins(interfaceid),
 					ZBX_FLAG_DISCOVERY_CREATED, item->itemid);
 
 			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
