@@ -747,6 +747,8 @@ COpt::memoryPick();
 			$del_itemPrototypes = array_merge($del_itemPrototypes, $del_itemPrototypes_childs);
 			$prototypeids = array_merge($prototypeids, $child_prototypeids);
 
+			// check if any graphs are referencing this item
+			$this->checkGraphReference($prototypeids);
 
 // CREATED ITEMS
 			$created_items = array();
