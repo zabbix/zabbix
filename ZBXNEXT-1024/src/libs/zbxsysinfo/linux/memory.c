@@ -20,7 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
@@ -32,7 +32,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
@@ -44,7 +44,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_BUFFERS(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
@@ -56,7 +56,7 @@ static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags,
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 {
 	FILE		*f;
 	char		*t, c[MAX_STRING_LEN];
@@ -93,7 +93,7 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_USED(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
@@ -105,7 +105,7 @@ static int	VM_MEMORY_USED(const char *cmd, const char *param, unsigned flags, AG
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
@@ -117,7 +117,7 @@ static int	VM_MEMORY_PUSED(const char *cmd, const char *param, unsigned flags, A
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_AVAILABLE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 	AGENT_RESULT	result_tmp;
@@ -127,7 +127,7 @@ static int	VM_MEMORY_AVAILABLE(const char *cmd, const char *param, unsigned flag
 
 	init_result(&result_tmp);
 
-	if (SYSINFO_RET_OK != VM_MEMORY_CACHED(cmd, param, flags, &result_tmp))
+	if (SYSINFO_RET_OK != VM_MEMORY_CACHED(&result_tmp))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + result_tmp.ui64);
@@ -137,7 +137,7 @@ static int	VM_MEMORY_AVAILABLE(const char *cmd, const char *param, unsigned flag
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_PAVAILABLE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 	AGENT_RESULT	result_tmp;
@@ -148,7 +148,7 @@ static int	VM_MEMORY_PAVAILABLE(const char *cmd, const char *param, unsigned fla
 
 	init_result(&result_tmp);
 
-	if (SYSINFO_RET_OK != VM_MEMORY_CACHED(cmd, param, flags, &result_tmp))
+	if (SYSINFO_RET_OK != VM_MEMORY_CACHED(&result_tmp))
 		return SYSINFO_RET_FAIL;
 
 	available = (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + result_tmp.ui64;
@@ -161,7 +161,7 @@ static int	VM_MEMORY_PAVAILABLE(const char *cmd, const char *param, unsigned fla
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 {
 #ifdef KERNEL_2_4
 	struct sysinfo	info;
@@ -204,7 +204,7 @@ int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	for (i = 0; NULL != fl[i].mode; i++)
 		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(cmd, param, flags, result);
+			return (fl[i].function)(result);
 
 	return SYSINFO_RET_FAIL;
 }
