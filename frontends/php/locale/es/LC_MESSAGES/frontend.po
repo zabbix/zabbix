@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-21 10:33+0200\n"
+"POT-Creation-Date: 2011-11-21 11:36+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -327,7 +327,7 @@ msgstr ""
 #: dashconf.php:196 include/blocks.inc.php:1153 include/blocks.inc.php:1159
 #: include/blocks.inc.php:1264 include/blocks.inc.php:1309
 #: include/blocks.inc.php:1315 include/forms.inc.php:3233
-#: include/forms.inc.php:3616 include/locales/en_gb.inc.php:1058
+#: include/forms.inc.php:3618 include/locales/en_gb.inc.php:1058
 #: include/views/administration.general.iconmap.edit.php:111
 #: include/views/administration.general.macros.edit.php:53
 #: include/views/administration.general.valuemapping.edit.php:50
@@ -696,7 +696,7 @@ msgstr "Informe de disponibilidad"
 msgid "Available"
 msgstr "Disponible"
 
-#: config.php:687
+#: config.php:697
 #: include/views/administration.general.triggerSeverity.edit.php:52
 msgid "Average"
 msgstr "Media"
@@ -962,7 +962,7 @@ msgid "Canada (136 characters)"
 msgstr ""
 
 #: include/classes/class.cbuttoncancel.php:24 include/config.inc.php:329
-#: include/forms.inc.php:3235 include/forms.inc.php:3617
+#: include/forms.inc.php:3235 include/forms.inc.php:3619
 #: include/js.inc.php:212 include/locales/en_gb.inc.php:719
 #: include/views/configuration.action.edit.php:879
 #: include/views/configuration.action.edit.php:927
@@ -1007,7 +1007,7 @@ msgstr "No es posible añadir el equipo"
 msgid "Cannot add host group."
 msgstr ""
 
-#: config.php:160 include/export.inc.php:665
+#: config.php:161 include/export.inc.php:665
 msgid "Cannot add image"
 msgstr "No es posible añadir la imágen"
 
@@ -1015,7 +1015,7 @@ msgstr "No es posible añadir la imágen"
 msgid "Cannot add item"
 msgstr "No es posible añadir el monitor"
 
-#: api/classes/class.ctemplate.php:1588 config.php:655
+#: api/classes/class.ctemplate.php:1588 config.php:665
 msgid "Cannot add macro"
 msgstr ""
 
@@ -1148,7 +1148,7 @@ msgstr ""
 msgid "Cannot create discovery rule"
 msgstr ""
 
-#: config.php:742
+#: config.php:752
 msgid "Cannot create icon map"
 msgstr ""
 
@@ -1212,11 +1212,11 @@ msgstr "No es posible eliminar el equipo"
 msgid "Cannot delete host group."
 msgstr ""
 
-#: config.php:755
+#: config.php:765
 msgid "Cannot delete icon map"
 msgstr ""
 
-#: config.php:228
+#: config.php:229
 msgid "Cannot delete image"
 msgstr "No es posible eliminar la imágen"
 
@@ -1452,7 +1452,7 @@ msgstr ""
 msgid "Cannot perform update statement on table \"%s\" without where condition."
 msgstr ""
 
-#: api/classes/class.chost.php:1941 config.php:639
+#: api/classes/class.chost.php:1941 config.php:649
 msgid "Cannot remove macro."
 msgstr ""
 
@@ -1557,11 +1557,11 @@ msgstr "No es posible actualizar el estado del equipo"
 msgid "Cannot update hosts"
 msgstr ""
 
-#: config.php:737
+#: config.php:747
 msgid "Cannot update icon map"
 msgstr ""
 
-#: config.php:156 include/export.inc.php:670
+#: config.php:157 include/export.inc.php:670
 msgid "Cannot update image"
 msgstr "No es posible actualizar la imágen"
 
@@ -1569,7 +1569,7 @@ msgstr "No es posible actualizar la imágen"
 msgid "Cannot update item"
 msgstr "No es posible actualizar el monitor"
 
-#: api/classes/class.ctemplate.php:1579 config.php:611
+#: api/classes/class.ctemplate.php:1579 config.php:621
 msgid "Cannot update macro"
 msgstr ""
 
@@ -1577,7 +1577,7 @@ msgstr ""
 msgid "Cannot update macro."
 msgstr ""
 
-#: config.php:673
+#: config.php:683
 msgid "Cannot update macros"
 msgstr ""
 
@@ -1662,7 +1662,7 @@ msgstr "No es posible actualizar la asignación"
 msgid "Caption"
 msgstr ""
 
-#: include/forms.inc.php:3528 include/forms.inc.php:3611
+#: include/forms.inc.php:3530 include/forms.inc.php:3613
 msgid "Case sensitive"
 msgstr ""
 
@@ -2007,11 +2007,11 @@ msgstr ""
 msgid "Create group"
 msgstr ""
 
-#: config.php:796
+#: config.php:806
 msgid "Create icon map"
 msgstr ""
 
-#: config.php:787
+#: config.php:797
 msgid "Create image"
 msgstr ""
 
@@ -2067,7 +2067,7 @@ msgstr ""
 msgid "Create user"
 msgstr ""
 
-#: config.php:790
+#: config.php:800
 msgid "Create value map"
 msgstr "Asignar nuevo valor"
 
@@ -2439,7 +2439,7 @@ msgstr ""
 msgid "Delayed by"
 msgstr ""
 
-#: include/classes/class.cbuttondelete.php:24 include/forms.inc.php:3556
+#: include/classes/class.cbuttondelete.php:24 include/forms.inc.php:3558
 #: include/locales/en_gb.inc.php:965
 msgid "Delete"
 msgstr "Eliminar"
@@ -2634,7 +2634,7 @@ msgstr ""
 msgid "Delete selected proxy?"
 msgstr ""
 
-#: include/views/administration.general.regularexpressions.list.php:31
+#: include/views/administration.general.regularexpressions.list.php:32
 msgid "Delete selected regular expressions?"
 msgstr ""
 
@@ -2670,11 +2670,11 @@ msgstr ""
 msgid "Delete selected users?"
 msgstr "¿Eliminar usuarios seccionados?"
 
-#: config.php:929
+#: config.php:939
 msgid "Delete selected value mapping?"
 msgstr ""
 
-#: config.php:926
+#: config.php:936
 #, php-format
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
@@ -2709,8 +2709,8 @@ msgstr ""
 msgid "Deleted"
 msgstr "Eliminado"
 
-#: include/forms.inc.php:3457 include/forms.inc.php:3537
-#: include/forms.inc.php:3603
+#: include/forms.inc.php:3457 include/forms.inc.php:3539
+#: include/forms.inc.php:3605
 msgid "Delimiter"
 msgstr ""
 
@@ -2859,7 +2859,7 @@ msgstr ""
 msgid "Disabled"
 msgstr "Desactivado"
 
-#: config.php:691
+#: config.php:701
 #: include/views/administration.general.triggerSeverity.edit.php:64
 msgid "Disaster"
 msgstr "Crítica"
@@ -2981,11 +2981,11 @@ msgstr ""
 msgid "Do not calculate"
 msgstr "No calculado"
 
-#: config.php:299 include/views/administration.general.housekeeper.edit.php:24
+#: config.php:300 include/views/administration.general.housekeeper.edit.php:24
 msgid "Do not keep actions older than (in days)"
 msgstr "No mantener las acciones más de (en días))"
 
-#: config.php:297 include/views/administration.general.housekeeper.edit.php:25
+#: config.php:298 include/views/administration.general.housekeeper.edit.php:25
 msgid "Do not keep events older than (in days)"
 msgstr "No mantener los eventos más de (en días)"
 
@@ -3090,7 +3090,7 @@ msgstr "EVENTOS"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr ""
 
-#: include/forms.inc.php:3529 include/forms.inc.php:3544
+#: include/forms.inc.php:3531 include/forms.inc.php:3546
 #: include/locales/en_gb.inc.php:871
 #: include/views/administration.users.edit.php:163
 #: include/views/configuration.action.edit.php:371
@@ -3378,7 +3378,7 @@ msgstr "Si existe"
 msgid "Expand single problem"
 msgstr ""
 
-#: include/forms.inc.php:3398 include/forms.inc.php:3527
+#: include/forms.inc.php:3398 include/forms.inc.php:3529
 msgid "Expected result"
 msgstr ""
 
@@ -3403,7 +3403,7 @@ msgstr ""
 msgid "Export to CSV"
 msgstr ""
 
-#: include/forms.inc.php:3526 include/forms.inc.php:3586
+#: include/forms.inc.php:3528 include/forms.inc.php:3588
 #: include/locales/en_gb.inc.php:235
 #: include/views/administration.general.iconmap.edit.php:42
 msgid "Expression"
@@ -3421,12 +3421,12 @@ msgstr ""
 msgid "Expression cannot be empty"
 msgstr ""
 
-#: include/forms.inc.php:3595
+#: include/forms.inc.php:3597
 msgid "Expression type"
 msgstr ""
 
 #: include/views/administration.general.regularexpressions.edit.php:34
-#: include/views/administration.general.regularexpressions.list.php:30
+#: include/views/administration.general.regularexpressions.list.php:42
 msgid "Expressions"
 msgstr ""
 
@@ -3644,7 +3644,7 @@ msgstr "GRÁFICOS"
 msgid "GSM modem"
 msgstr "Modem GSM"
 
-#: config.php:770 include/views/administration.general.gui.edit.php:42
+#: config.php:780 include/views/administration.general.gui.edit.php:42
 msgid "GUI"
 msgstr ""
 
@@ -3859,7 +3859,7 @@ msgstr "Grupo añadido"
 msgid "Group deleted"
 msgstr "Grupo eliminado"
 
-#: config.php:313 include/views/administration.general.other.edit.php:37
+#: config.php:314 include/views/administration.general.other.edit.php:37
 msgid "Group for discovered hosts"
 msgstr ""
 
@@ -3989,7 +3989,7 @@ msgstr "Ocultar iniciadores desactivados"
 msgid "Hide selected"
 msgstr "Ocultar seleccionados"
 
-#: config.php:689
+#: config.php:699
 #: include/views/administration.general.triggerSeverity.edit.php:58
 msgid "High"
 msgstr "Alta"
@@ -4250,7 +4250,7 @@ msgstr ""
 msgid "Hours"
 msgstr ""
 
-#: config.php:771 include/views/administration.general.housekeeper.edit.php:28
+#: config.php:781 include/views/administration.general.housekeeper.edit.php:28
 msgid "Housekeeper"
 msgstr "Caducidad para acciones y eventos"
 
@@ -4439,11 +4439,11 @@ msgstr ""
 msgid "Icon map \"%s\" must have at least one mapping."
 msgstr ""
 
-#: config.php:741
+#: config.php:751
 msgid "Icon map created"
 msgstr ""
 
-#: config.php:755
+#: config.php:765
 msgid "Icon map deleted"
 msgstr ""
 
@@ -4451,7 +4451,7 @@ msgstr ""
 msgid "Icon map name cannot be empty."
 msgstr ""
 
-#: config.php:736
+#: config.php:746
 msgid "Icon map updated"
 msgstr ""
 
@@ -4460,7 +4460,7 @@ msgstr ""
 msgid "Icon map with iconmapid \"%s\" does not exist."
 msgstr ""
 
-#: config.php:773 config.php:1175
+#: config.php:783 config.php:1185
 msgid "Icon mapping"
 msgstr ""
 
@@ -4493,11 +4493,11 @@ msgstr ""
 msgid "Image"
 msgstr "Imágen"
 
-#: config.php:159
+#: config.php:160
 msgid "Image added"
 msgstr "Imágen añadida"
 
-#: config.php:228
+#: config.php:229
 msgid "Image deleted"
 msgstr "Imágen eliminada"
 
@@ -4505,15 +4505,15 @@ msgstr "Imágen eliminada"
 msgid "Image label type"
 msgstr ""
 
-#: api/classes/class.cimage.php:316 config.php:174
+#: api/classes/class.cimage.php:316 config.php:175
 msgid "Image size must be less than 1MB"
 msgstr ""
 
-#: config.php:155
+#: config.php:156
 msgid "Image updated"
 msgstr "Imágen actualizada"
 
-#: config.php:772 include/views/administration.general.image.list.php:29
+#: config.php:782 include/views/administration.general.image.list.php:29
 msgid "Images"
 msgstr "Imágenes"
 
@@ -4794,7 +4794,7 @@ msgstr ""
 msgid "Incorrect host group."
 msgstr ""
 
-#: config.php:168
+#: config.php:169
 msgid "Incorrect image"
 msgstr ""
 
@@ -5024,7 +5024,7 @@ msgstr ""
 msgid "Info"
 msgstr ""
 
-#: config.php:683 include/locales/en_gb.inc.php:165
+#: config.php:693 include/locales/en_gb.inc.php:165
 #: include/views/administration.general.triggerSeverity.edit.php:40
 msgid "Information"
 msgstr "Informativa"
@@ -5755,13 +5755,13 @@ msgstr ""
 msgid "Macro value is too long, should not exceed 255 chars."
 msgstr ""
 
-#: config.php:775 include/locales/en_gb.inc.php:420
+#: config.php:785 include/locales/en_gb.inc.php:420
 #: include/views/administration.general.macros.edit.php:87
 #: include/views/configuration.host.edit.php:518
 msgid "Macros"
 msgstr ""
 
-#: config.php:668
+#: config.php:678
 msgid "Macros updated"
 msgstr ""
 
@@ -6185,7 +6185,7 @@ msgstr "Mensual"
 msgid "More than 10 minutes"
 msgstr ""
 
-#: config.php:593
+#: config.php:603
 msgid "More than one macro with same name found:"
 msgstr ""
 
@@ -6245,7 +6245,7 @@ msgstr ""
 #: include/views/administration.general.iconmap.edit.php:28
 #: include/views/administration.general.iconmap.list.php:23
 #: include/views/administration.general.image.edit.php:35
-#: include/views/administration.general.regularexpressions.list.php:30
+#: include/views/administration.general.regularexpressions.list.php:42
 #: include/views/administration.general.valuemapping.edit.php:43
 #: include/views/administration.general.valuemapping.list.php:28
 #: include/views/administration.script.edit.php:43
@@ -6291,7 +6291,7 @@ msgstr "Mapas de la red"
 msgid "Never"
 msgstr "Nunca"
 
-#: include/forms.inc.php:3555 include/views/configuration.action.edit.php:391
+#: include/forms.inc.php:3557 include/views/configuration.action.edit.php:391
 #: include/views/configuration.action.edit.php:602
 #: include/views/configuration.action.edit.php:828
 #: include/views/configuration.discovery.edit.php:65
@@ -6356,7 +6356,7 @@ msgstr "Nuevo medio"
 msgid "New node"
 msgstr "Nuevo nodo"
 
-#: config.php:793
+#: config.php:803
 msgid "New regular expression"
 msgstr ""
 
@@ -6381,7 +6381,7 @@ msgid "Next check"
 msgstr "Próxima comprobación"
 
 #: include/config.inc.php:622 include/events.inc.php:286
-#: include/events.inc.php:300 include/forms.inc.php:3543
+#: include/events.inc.php:300 include/forms.inc.php:3545
 #: include/locales/en_gb.inc.php:767
 #: include/views/administration.users.list.php:79
 #: include/views/administration.users.list.php:82
@@ -6837,7 +6837,7 @@ msgstr ""
 msgid "Not available"
 msgstr "No disponible"
 
-#: config.php:681
+#: config.php:691
 #: include/views/administration.general.triggerSeverity.edit.php:34
 msgid "Not classified"
 msgstr "No clasificada"
@@ -7130,7 +7130,7 @@ msgstr "Original"
 msgid "Original blue"
 msgstr ""
 
-#: config.php:780 include/classes/class.ctweenbox.php:75
+#: config.php:790 include/classes/class.ctweenbox.php:75
 #: include/classes/class.ctweenbox.php:103 include/locales/en_gb.inc.php:231
 msgid "Other"
 msgstr "Otras configuraciones"
@@ -7654,7 +7654,7 @@ msgstr ""
 msgid "Refresh time multiplier"
 msgstr ""
 
-#: config.php:301 include/views/administration.general.other.edit.php:36
+#: config.php:302 include/views/administration.general.other.edit.php:36
 msgid "Refresh unsupported items (in sec)"
 msgstr "Tiempo de refresco para monitores no soportados en (segudos)"
 
@@ -7680,7 +7680,7 @@ msgstr ""
 msgid "Regular expression deleted"
 msgstr ""
 
-#: config.php:450
+#: config.php:451
 msgid "Regular expression does not exist."
 msgstr ""
 
@@ -7688,7 +7688,7 @@ msgstr ""
 msgid "Regular expression updated"
 msgstr ""
 
-#: config.php:774
+#: config.php:784
 #: include/views/administration.general.regularexpressions.list.php:22
 msgid "Regular expressions"
 msgstr ""
@@ -8140,7 +8140,7 @@ msgstr ""
 msgid "Saturday"
 msgstr "Sábado"
 
-#: acknow.php:176 include/forms.inc.php:3233 include/forms.inc.php:3616
+#: acknow.php:176 include/forms.inc.php:3233 include/forms.inc.php:3618
 #: include/locales/en_gb.inc.php:718
 #: include/views/administration.authentication.edit.php:76
 #: include/views/administration.general.gui.edit.php:50
@@ -8398,7 +8398,7 @@ msgstr "Seleccionar / Examinar..."
 msgid "Select Nodes"
 msgstr ""
 
-#: config.php:193
+#: config.php:194
 msgid "Select image to download"
 msgstr ""
 
@@ -8572,7 +8572,7 @@ msgstr "Mostrar iniciadores desactivados"
 msgid "Show events max"
 msgstr ""
 
-#: config.php:263 include/views/administration.general.gui.edit.php:38
+#: config.php:264 include/views/administration.general.gui.edit.php:38
 msgid "Show events not older than (in days)"
 msgstr ""
 
@@ -9392,7 +9392,7 @@ msgstr "Iniciador eliminado"
 msgid "Trigger dependencies"
 msgstr ""
 
-#: config.php:779
+#: config.php:789
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:114
 msgid "Trigger displaying options"
 msgstr ""
@@ -9452,7 +9452,7 @@ msgstr ""
 msgid "Trigger prototypes"
 msgstr ""
 
-#: config.php:778
+#: config.php:788
 #: include/views/administration.general.triggerSeverity.edit.php:70
 msgid "Trigger severities"
 msgstr ""
@@ -9864,7 +9864,7 @@ msgstr ""
 msgid "User group [%s] is used in configuration for database down messages."
 msgstr ""
 
-#: config.php:330 include/views/administration.general.other.edit.php:38
+#: config.php:331 include/views/administration.general.other.edit.php:38
 msgid "User group for database down message"
 msgstr "Grupo de usuarios para mensajes de base de datos caída"
 
@@ -9983,7 +9983,7 @@ msgstr ""
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr ""
 
-#: config.php:390 config.php:404 include/audit.inc.php:38
+#: config.php:391 config.php:405 include/audit.inc.php:38
 #: include/views/administration.general.valuemapping.list.php:28
 msgid "Value map"
 msgstr "Valor => Cadena asignada"
@@ -10000,7 +10000,7 @@ msgstr "Asignación eliminada"
 msgid "Value map updated"
 msgstr "Asignación actualizada"
 
-#: config.php:776 config.php:942
+#: config.php:786 config.php:952
 #: include/views/administration.general.valuemapping.edit.php:55
 msgid "Value mapping"
 msgstr "Asignación de valores"
@@ -10058,7 +10058,7 @@ msgstr ""
 msgid "WEB CHECKS"
 msgstr ""
 
-#: config.php:685 include/locales/en_gb.inc.php:166
+#: config.php:695 include/locales/en_gb.inc.php:166
 #: include/views/administration.general.triggerSeverity.edit.php:46
 msgid "Warning"
 msgstr "Baja"
@@ -10225,7 +10225,7 @@ msgstr ""
 msgid "Wizard"
 msgstr ""
 
-#: config.php:303 config.php:777
+#: config.php:304 config.php:787
 #: include/views/administration.general.workingtime.edit.php:24
 #: include/views/administration.general.workingtime.edit.php:27
 msgid "Working time"
@@ -10368,7 +10368,7 @@ msgstr "Anual"
 
 #: include/blocks.inc.php:755 include/config.inc.php:625
 #: include/events.inc.php:289 include/events.inc.php:303
-#: include/forms.inc.php:3543 include/locales/en_gb.inc.php:766
+#: include/forms.inc.php:3545 include/locales/en_gb.inc.php:766
 #: include/views/administration.users.list.php:78
 msgid "Yes"
 msgstr "Si"
