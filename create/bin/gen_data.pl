@@ -119,6 +119,9 @@ sub process_row
 		$_ =~ s/^\s+//;
 		$_ =~ s/\s+$//;
 
+		# escape single quotes
+		$_ =~ s/'+/\\'/g;
+
 		if ($_ eq 'NULL')
 		{
 			$values = "$values$_";
