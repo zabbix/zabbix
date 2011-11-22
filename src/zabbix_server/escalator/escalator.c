@@ -99,11 +99,12 @@ static int	check_perm2system(zbx_uint64_t userid)
  ******************************************************************************/
 static int	get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid)
 {
+	const char	*__function_name = "get_host_permission";
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		user_type = -1, perm = PERM_DENY;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_host_permission()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect("select type from users where userid=" ZBX_FS_UI64,
 			userid);
@@ -122,19 +123,21 @@ static int	get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid)
 		goto out;
 	}
 
-	result = DBselect("select min(r.permission) from rights r,hosts_groups hg,users_groups ug"
-			" where r.groupid=ug.usrgrpid and r.id=hg.groupid"
-			" and hg.hostid=" ZBX_FS_UI64 " and ug.userid=" ZBX_FS_UI64,
-			hostid,
-			userid);
+	result = DBselect(
+			"select min(r.permission)"
+			" from rights r,hosts_groups hg,users_groups ug"
+			" where r.groupid=ug.usrgrpid"
+				" and r.id=hg.groupid"
+				" and hg.hostid=" ZBX_FS_UI64
+				" and ug.userid=" ZBX_FS_UI64,
+			hostid, userid);
 
 	if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
 		perm = atoi(row[0]);
 
 	DBfree_result(result);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of get_host_permission():%s",
-			zbx_permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_permission_string(perm));
 
 	return perm;
 }
@@ -157,15 +160,19 @@ out:
  ******************************************************************************/
 static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 {
+	const char	*__function_name = "get_trigger_permission";
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		perm = PERM_DENY, host_perm;
 	zbx_uint64_t	hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_trigger_permission()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()");
 
-	result = DBselect("select distinct i.hostid from items i,functions f"
-			" where i.itemid=f.itemid and f.triggerid=" ZBX_FS_UI64,
+	result = DBselect(
+			"select distinct i.hostid"
+			" from items i,functions f"
+			" where i.itemid=f.itemid"
+				" and f.triggerid=" ZBX_FS_UI64,
 			triggerid);
 
 	while (NULL != (row = DBfetch(result)))
@@ -178,8 +185,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of get_trigger_permission():%s",
-			zbx_permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_permission_string(perm));
 
 	return perm;
 }
@@ -1188,9 +1194,9 @@ static void	process_escalations(int now)
 		{
 			ZBX_STR2UINT64(last_escalation.escalationid, row[0]);
 			ZBX_STR2UINT64(last_escalation.actionid, row[1]);
-			ZBX_STR2UINT64(last_escalation.triggerid, row[2]);
+			ZBX_DBROW2UINT64(last_escalation.triggerid, row[2]);
 			ZBX_STR2UINT64(last_escalation.eventid, row[3]);
-			ZBX_STR2UINT64(last_escalation.r_eventid, row[4]);
+			ZBX_DBROW2UINT64(last_escalation.r_eventid, row[4]);
 			last_escalation.esc_step = atoi(row[5]);
 			last_escalation.status = atoi(row[6]);
 			last_escalation.nextcheck = 0;
