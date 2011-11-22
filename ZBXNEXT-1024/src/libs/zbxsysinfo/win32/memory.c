@@ -26,8 +26,7 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 	PERFORMANCE_INFORMATION pfi;
 	MEMORYSTATUSEX		ms_ex;
 	MEMORYSTATUS		ms;
-
-	char	mode[10];
+	char			mode[16];
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
@@ -57,8 +56,14 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 			SET_UI64_RESULT(result, ms_ex.ullTotalPhys);
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms_ex.ullAvailPhys);
-		else if (0 == strcmp(mode, "pfree"))
-			SET_DBL_RESULT(result, 100.0 * ms_ex.ullAvailPhys / ms_ex.ullTotalPhys);
+		else if (0 == strcmp(mode, "used"))
+			SET_UI64_RESULT(result, ms_ex.ullTotalPhys - ms_ex.ullAvailPhys);
+		else if (0 == strcmp(mode, "pused") && 0 != ms_ex.ullTotalPhys)
+			SET_DBL_RESULT(result, (ms_ex.ullTotalPhys - ms_ex.ullAvailPhys) / (double)ms_ex.ullTotalPhys * 100);
+		else if (0 == strcmp(mode, "available"))
+			SET_UI64_RESULT(result, ms_ex.ullAvailPhys);
+		else if (0 == strcmp(mode, "pavailable") && 0 != ms_ex.ullTotalPhys)
+			SET_DBL_RESULT(result, ms_ex.ullAvailPhys / (double)ms_ex.ullTotalPhys * 100);
 		else
 			return SYSINFO_RET_FAIL;
 	}
@@ -70,8 +75,14 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 			SET_UI64_RESULT(result, ms.dwTotalPhys);
 		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms.dwAvailPhys);
-		else if (0 == strcmp(mode, "pfree"))
-			SET_DBL_RESULT(result, 100.0 * ms.dwAvailPhys / ms.dwTotalPhys);
+		else if (0 == strcmp(mode, "used"))
+			SET_UI64_RESULT(result, ms.dwTotalPhys - ms.dwAvailPhys);
+		else if (0 == strcmp(mode, "pused") && 0 != ms.dwTotalPhys)
+			SET_DBL_RESULT(result, (ms.dwTotalPhys - ms.dwAvailPhys) / (double)ms.dwTotalPhys * 100);
+		else if (0 == strcmp(mode, "available"))
+			SET_UI64_RESULT(result, ms.dwAvailPhys);
+		else if (0 == strcmp(mode, "pavailable") && 0 != ms.dwTotalPhys)
+			SET_DBL_RESULT(result, ms.dwAvailPhys / (double)ms.dwTotalPhys * 100);
 		else
 			return SYSINFO_RET_FAIL;
 	}
