@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -42,7 +42,7 @@ $fields = array(
 	'httptestid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 	'application' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
 	'name' =>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
-	'delay' =>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,86400), 'isset({save})'),
+	'delay' =>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, SEC_PER_DAY), 'isset({save})'),
 	'status' =>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	'isset({save})'),
 	'agent' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'macros' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),

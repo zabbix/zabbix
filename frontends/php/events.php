@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -359,7 +359,7 @@ require_once('include/page_header.php');
 	$firstEvent = API::Event()->get($options);
 // }}} CHECK IF EVENTS EXISTS
 
-	$_REQUEST['period'] = get_request('period', 604800); // 1 week
+	$_REQUEST['period'] = get_request('period', SEC_PER_WEEK);
 	$effectiveperiod = navigation_bar_calc();
 	$bstime = $_REQUEST['stime'];
 	$from = zbxDateToTime($_REQUEST['stime']);

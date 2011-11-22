@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -40,7 +40,7 @@ require_once('include/page_header.php');
 
 		'slideshowid'=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
-		'delay'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,86400), 'isset({save})'),
+		'delay'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1, SEC_PER_DAY), 'isset({save})'),
 
 		'steps'=>		array(null,	O_OPT,	null,	null,	null),
 		'new_step'=>	array(null,	O_OPT,	null,	null,	null),

@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; ifnot, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -1856,7 +1856,7 @@ function triggerExpression($trigger, $html, $template=false, $resolve_macro=fals
 		else{
 			if(($period_start==0)&&($period_end==0)){
 				$max=time();
-				$min=$max-24*3600;
+				$min=$max - SEC_PER_DAY;
 			}
 			else{
 				$ret['true_time']		= 0;
