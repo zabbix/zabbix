@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -579,6 +579,21 @@ require_once('include/page_header.php');
 
 				if (!copyTriggers($clone_hostid, $hostid)) {
 					throw new Exception();
+				}
+
+				// clone discovery rules
+				$discoveryRules = API::DiscoveryRule()->get(array(
+					'hostids' => $clone_hostid,
+					'inherited' => false,
+				));
+				if ($discoveryRules) {
+					$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
+						'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
+						'hostids' => array($hostid)
+					));
+					if (!$copyDiscoveryRules) {
+						throw new Exception();
+					}
 				}
 
 				$options = array(

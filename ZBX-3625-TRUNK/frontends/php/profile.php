@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -47,7 +47,7 @@ $fields = array(
 	'autologin' =>			array(T_ZBX_INT, O_OPT, null, IN('1'), null),
 	'autologout' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(90,10000), null),
 	'url' =>				array(T_ZBX_STR, O_OPT, null, null, 'isset({save})'),
-	'refresh' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0,3600), 'isset({save})'),
+	'refresh' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_HOUR), 'isset({save})'),
 	'rows_per_page' =>		array(T_ZBX_INT, O_OPT, null, BETWEEN(1,999999), 'isset({save})'),
 	'change_password' =>	array(T_ZBX_STR, O_OPT, null, null, null),
 	'user_medias' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, null),

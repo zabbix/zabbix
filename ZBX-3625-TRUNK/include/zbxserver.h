@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #ifndef ZABBIX_ZBXSERVER_H
@@ -24,6 +24,8 @@
 #include "db.h"
 #include "dbcache.h"
 #include "zbxjson.h"
+
+#define TRIGGER_EPSILON	0.000001
 
 #define MACRO_TYPE_TRIGGER_DESCRIPTION	0x0001
 #define MACRO_TYPE_MESSAGE_SUBJECT	0x0002

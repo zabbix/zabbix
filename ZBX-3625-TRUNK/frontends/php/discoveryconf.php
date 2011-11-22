@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -220,7 +220,7 @@ if(isset($_REQUEST['form'])){
 		$drule['proxy_hostid'] = get_request('proxy_hostid', 0);
 		$drule['name'] = get_request('name', '');
 		$drule['iprange'] = get_request('iprange', '192.168.0.1-255');
-		$drule['delay'] = get_request('delay', 3600);
+		$drule['delay'] = get_request('delay', SEC_PER_HOUR);
 		$drule['status'] = get_request('status', DRULE_STATUS_ACTIVE);
 
 		$drule['dchecks'] = get_request('dchecks', array());

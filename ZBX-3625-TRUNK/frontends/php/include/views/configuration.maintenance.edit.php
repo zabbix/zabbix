@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -39,8 +39,8 @@ $typeComboBox = new CComboBox('maintenance_type', $this->data['maintenance_type'
 $typeComboBox->addItem(MAINTENANCE_TYPE_NORMAL, _('With data collection'));
 $typeComboBox->addItem(MAINTENANCE_TYPE_NODATA, _('No data collection'));
 $maintenanceFormList->addRow(_('Maintenance type'), $typeComboBox);
-$maintenanceForm->addVar('active_since', date('YmdHis', $this->data['active_since']));
-$maintenanceForm->addVar('active_till', date('YmdHis', $this->data['active_till']));
+$maintenanceForm->addVar('active_since', date('YmdHi', $this->data['active_since']));
+$maintenanceForm->addVar('active_till', date('YmdHi', $this->data['active_till']));
 
 $calendarIcon = new CImg('images/general/bar/cal.gif', 'calendar', 16, 12, 'pointer');
 $calendarIcon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["mntc_active_since"].clndr.clndrshow(pos.top, pos.left); CLNDR["mntc_active_till"].clndr.clndrhide();');
