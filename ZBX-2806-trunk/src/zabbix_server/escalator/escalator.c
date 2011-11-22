@@ -1233,16 +1233,16 @@ static void	process_escalations(int now)
 			{
 				/* delete sleeping superseded */
 				DBexecute("delete from escalations where actionid=" ZBX_FS_UI64
-						" and triggerid=" ZBX_FS_UI64
+						" and triggerid%s"
 						" and escalationid<>" ZBX_FS_UI64,
 						escalation.actionid,
-						escalation.triggerid,
+						DBsql_id_cmp(escalation.triggerid),
 						escalation.escalationid);
 
 				/* let dbsyncer zero nextcheck when it's stopping escalation */
 				DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
 						" where escalationid=" ZBX_FS_UI64
-							" and r_eventid=0",
+							" and r_eventid is null",
 						escalation.status,
 						escalation.esc_step,
 						escalation.nextcheck,
