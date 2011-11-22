@@ -321,29 +321,8 @@ class CGraph extends CZBXAPI {
 			}
 		}
 
-		// order
-		// restrict not allowed columns for sorting
-		if (!zbx_empty($options['sortfield'])) {
-			$options['sortfield'] = getArrayElementsInArray($sort_columns, $options['sortfield']);
-			foreach ($options['sortfield'] as $i => $sortfield) {
-				$sortorder = ZBX_SORT_UP;
-				if (is_array($options['sortorder'])) {
-					if (!empty($options['sortorder'][$i])) {
-						$sortorder = $options['sortorder'][$i] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : ZBX_SORT_UP;
-					}
-				}
-				else {
-					$sortorder = $options['sortorder'] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : ZBX_SORT_UP;
-				}
-				$sql_parts['order'][] = 'g.'.$sortfield.' '.$sortorder;
-
-				// add sortfield into select
-				global $DB;
-				if ($DB['TYPE'] == ZBX_DB_SQLITE3 && !str_in_array('g.'.$sortfield, $sql_parts['select']) && !str_in_array('g.*', $sql_parts['select'])) {
-					$sql_parts['select'][] = 'g.'.$sortfield;
-				}
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'g');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {

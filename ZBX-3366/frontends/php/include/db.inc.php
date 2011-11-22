@@ -955,6 +955,34 @@ function zbx_db_filter($table, $options, &$sql_parts) {
 	return false;
 }
 
+function zbx_db_sorting(&$sql_parts, $options, $sortcolumns, $alias) {
+	if (!zbx_empty($options['sortfield'])) {
+		if (!is_array($options['sortfield'])) {
+			$options['sortfield'] = array($options['sortfield']);
+		}
+
+		foreach ($options['sortfield'] as $i => $sortfield) {
+			// validate sortfield
+			if (!str_in_array($sortfield, $sortcolumns)) {
+				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%s" not allowed.', $sortfield));
+			}
+
+			if (is_array($options['sortorder'])) {
+				if (!empty($options['sortorder'][$i])) {
+					$sortorder = $options['sortorder'][$i] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
+				}
+				else {
+					throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Ordering by field "%s" not defined.', $sortfield));
+				}
+			}
+			else {
+				$sortorder = $options['sortorder'] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
+			}
+			$sql_parts['order'][] = $alias.'.'.$sortfield.' '.$sortorder;
+		}
+	}
+}
+
 function remove_nodes_from_id($id) {
 	return bcmod($id, '100000000000');
 }

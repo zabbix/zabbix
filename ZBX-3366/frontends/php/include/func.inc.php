@@ -1106,23 +1106,6 @@ function str_in_array($needle, $haystack, $strict = false) {
 	return false;
 }
 
-function getArrayElementsInArray(array $needle, array $haystack) {
-	$result = array();
-	foreach ($needle as $needleValue) {
-		if (is_array($needleValue)) {
-			$result = array_merge($result, getArrayElementsInArray($needleValue, $haystack)); // attention recursion!
-		}
-		else {
-			foreach ($haystack as $haystackValue) {
-				if ($needleValue == $haystackValue) {
-					$result[] = $needleValue;
-				}
-			}
-		}
-	}
-	return array_unique($result);
-}
-
 function zbx_value2array(&$values) {
 	if (!is_array($values) && !is_null($values)) {
 		$tmp = array();
