@@ -1931,7 +1931,7 @@ const char	*DBsql_id_cmp(zbx_uint64_t id)
 	if (0 == id)
 		return is_null;
 
-	n = (n + 1) % 4;
+	n = (n + 1) & 3;
 
 	zbx_snprintf(buf[n], sizeof(buf[n]), "=" ZBX_FS_UI64, id);
 
@@ -1959,7 +1959,7 @@ const char	*DBsql_id_ins(zbx_uint64_t id)
 	if (0 == id)
 		return null;
 
-	n = (n + 1) % 4;
+	n = (n + 1) & 3;
 
 	zbx_snprintf(buf[n], sizeof(buf[n]), ZBX_FS_UI64, id);
 
