@@ -195,6 +195,9 @@
 // delete host from template linkages
 		DBexecute('DELETE FROM hosts_templates WHERE '.DBcondition('hostid',$hostids));
 
+		// delete host macros
+		DBexecute('DELETE FROM hostmacro WHERE '.DBcondition('hostid',$hostids));
+
 // disable actions
 		$actionids = array();
 
