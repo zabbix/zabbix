@@ -146,11 +146,15 @@ void	main_alerter_loop()
 	{
 		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
 
-		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid"
-				",mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path"
-				",mt.gsm_modem,mt.username,mt.passwd,a.retries"
+		result = DBselect(
+				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid,"
+				"mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,"
+				"mt.gsm_modem,mt.username,mt.passwd,a.retries"
 				" from alerts a,media_type mt"
-				" where a.status=%d and a.mediatypeid=mt.mediatypeid and a.alerttype=%d" DB_NODE
+				" where a.mediatypeid=mt.mediatypeid"
+					" and a.status=%d"
+					" and a.alerttype=%d"
+					DB_NODE
 				" order by a.clock",
 				ALERT_STATUS_NOT_SENT,
 				ALERT_TYPE_MESSAGE,

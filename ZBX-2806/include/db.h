@@ -563,8 +563,8 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock);
-int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
-int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
+void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
+void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 void	DBupdate_triggers_status_after_restart();
 int	DBget_trigger_update_sql(char **sql, int *sql_alloc, int *sql_offset, zbx_uint64_t triggerid,
 		unsigned char type, int value, const char *error, int new_value, const char *new_error, int lastchange,

@@ -979,7 +979,7 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 	return ret;
 }
 
-int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
+void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
 	const char	*__function_name = "DBstart_escalation";
 	zbx_uint64_t	escalationid;
@@ -990,18 +990,12 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 
 	DBexecute("insert into escalations (escalationid,actionid,triggerid,eventid,status)"
 			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d)",
-			escalationid,
-			actionid,
-			triggerid,
-			eventid,
-			ESCALATION_STATUS_ACTIVE);
+			escalationid, actionid, triggerid, eventid, ESCALATION_STATUS_ACTIVE);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	return SUCCEED;
 }
 
-int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
+void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1015,8 +1009,7 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 			" where actionid=" ZBX_FS_UI64
 				" and triggerid=" ZBX_FS_UI64
 			" order by escalationid desc",
-			actionid,
-			triggerid);
+			actionid, triggerid);
 
 	result = DBselectN(sql, 1);
 
@@ -1028,12 +1021,9 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 				" set r_eventid=" ZBX_FS_UI64 ","
 					"nextcheck=0"
 				" where escalationid=" ZBX_FS_UI64,
-				eventid,
-				escalationid);
+				eventid, escalationid);
 	}
 	DBfree_result(result);
-
-	return SUCCEED;
 }
 
 void	DBvacuum()

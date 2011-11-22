@@ -66,10 +66,13 @@ static int	check_perm2system(zbx_uint64_t userid)
 	DB_ROW		row;
 	int		res = SUCCEED;
 
-	result = DBselect("select count(*) from usrgrp g,users_groups ug where ug.userid=" ZBX_FS_UI64
-			" and g.usrgrpid = ug.usrgrpid and g.users_status=%d",
-			userid,
-			GROUP_STATUS_DISABLED);
+	result = DBselect(
+			"select count(*)"
+			" from usrgrp g,users_groups ug"
+			" where g.usrgrpid=ug.usrgrpid"
+				" and ug.userid=" ZBX_FS_UI64
+				" and g.users_status=%d",
+			userid, GROUP_STATUS_DISABLED);
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]) && atoi(row[0]) > 0)
 		res = FAIL;
@@ -775,11 +778,10 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select source from events where eventid=" ZBX_FS_UI64,
-			escalation->eventid);
+	result = DBselect("select source from events where eventid=" ZBX_FS_UI64, escalation->eventid);
+
 	if (NULL == (row = DBfetch(result)))
-		error = zbx_dsprintf(error, "Event [" ZBX_FS_UI64 "] deleted.",
-				escalation->eventid);
+		error = zbx_dsprintf(error, "event [" ZBX_FS_UI64 "] deleted.", escalation->eventid);
 	else
 		source = atoi(row[0]);
 	DBfree_result(result);
@@ -790,11 +792,10 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		result = DBselect("select description,status from triggers where triggerid=" ZBX_FS_UI64,
 				escalation->triggerid);
 		if (NULL == (row = DBfetch(result)))
-			error = zbx_dsprintf(error, "Trigger [" ZBX_FS_UI64 "] deleted.",
+			error = zbx_dsprintf(error, "trigger [" ZBX_FS_UI64 "] deleted.",
 					escalation->triggerid);
 		else if (TRIGGER_STATUS_DISABLED == atoi(row[1]))
-			error = zbx_dsprintf(error, "Trigger '%s' disabled.",
-					row[0]);
+			error = zbx_dsprintf(error, "trigger '%s' disabled.", row[0]);
 		DBfree_result(result);
 	}
 
@@ -807,8 +808,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 				escalation->triggerid,
 				ITEM_STATUS_DISABLED);
 		if (NULL != (row = DBfetch(result)))
-			error = zbx_dsprintf(error, "Item '%s' disabled.",
-					row[0]);
+			error = zbx_dsprintf(error, "item '%s' disabled.", row[0]);
 		DBfree_result(result);
 	}
 
@@ -821,8 +821,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 				escalation->triggerid,
 				HOST_STATUS_NOT_MONITORED);
 		if (NULL != (row = DBfetch(result)))
-			error = zbx_dsprintf(error, "Host '%s' disabled.",
-					row[0]);
+			error = zbx_dsprintf(error, "host '%s' disabled.", row[0]);
 		DBfree_result(result);
 	}
 
@@ -853,13 +852,12 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		action.recovery_msg	= atoi(row[5]);
 
 		if (ACTION_STATUS_ACTIVE != atoi(row[6]))
-			error = zbx_dsprintf(error, "Action '%s' disabled.",
-					row[7]);
+			error = zbx_dsprintf(error, "action '%s' disabled.", row[7]);
 
-		if (NULL != error)
+		if (NULL != error) {
 			action.longdata = zbx_dsprintf(action.longdata, "NOTE: Escalation cancelled: %s\n%s",
-					error,
-					row[4]);
+					error, row[4]);
+		}
 		else
 			action.longdata = strdup(row[4]);
 
@@ -897,8 +895,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		zbx_free(action.longdata);
 	}
 	else
-		error = zbx_dsprintf(error, "Action [" ZBX_FS_UI64 "] deleted",
-				escalation->actionid);
+		error = zbx_dsprintf(error, "action [" ZBX_FS_UI64 "] deleted", escalation->actionid);
 	DBfree_result(result);
 
 	if (NULL != error)
@@ -922,7 +919,8 @@ static void	process_escalations(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status"
+	result = DBselect(
+			"select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status"
 			" from escalations"
 			" where (status=%d and nextcheck<=%d"
 			" or status=%d and r_eventid<>0)" DB_NODE
@@ -953,8 +951,8 @@ static void	process_escalations(int now)
 		if (0 != escalation.escalationid)
 		{
 			esc_superseded = (escalation.actionid == last_escalation.actionid &&
-					escalation.triggerid == last_escalation.triggerid ? 1 : 0);
-			esc_recovery = (0 != escalation.r_eventid ? 1 : 0);
+					escalation.triggerid == last_escalation.triggerid);
+			esc_recovery = (0 != escalation.r_eventid);
 			esc_completed = 0;
 
 			DBbegin();
