@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 ?>
@@ -1633,7 +1633,7 @@ require_once('include/js.inc.php');
 
 							preg_match('/([+-]{1})([\d]{1,2}):([\d]{1,2})/', $item['lastvalue'], $arr);
 							if (!empty($arr)) {
-								$timeZone = $arr[2] * 3600 + $arr[3] * 60;
+								$timeZone = $arr[2] * SEC_PER_HOUR + $arr[3] * SEC_PER_MIN;
 								if ($arr[1] == '-') {
 									$timeZone = 0 - $timeZone;
 								}

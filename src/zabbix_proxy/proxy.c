@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -55,20 +55,20 @@
 			proxy_num, get_process_type_string(process_type), process_num)
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix Proxy";
+const char	title_message[] = "Zabbix proxy";
 const char	usage_message[] = "[-hV] [-c <file>] [-R <option>]";
 
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>              absolute path to the configuration file",
-	"  -R --runtime-control <option>   perform administrative functions",
+	"  -c --config <file>              Absolute path to the configuration file",
+	"  -R --runtime-control <option>   Perform administrative functions",
 	"",
 	"Runtime control options:",
-	"  " ZBX_CONFIG_CACHE_RELOAD "             reload configuration cache",
+	"  " ZBX_CONFIG_CACHE_RELOAD "             Reload configuration cache",
 	"",
 	"Other options:",
-	"  -h --help                       give this help",
-	"  -V --version                    display version number",
+	"  -h --help                       Give this help",
+	"  -V --version                    Display version number",
 	NULL	/* end of text */
 };
 
@@ -179,8 +179,6 @@ int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
-
-int	CONFIG_NS_SUPPORT		= 0;
 
 /* Zabbix server startup time */
 int	CONFIG_SERVER_STARTUP_TIME	= 0;
@@ -575,7 +573,7 @@ int	MAIN_ZABBIX_ENTRY()
 	init_configuration_cache();
 	init_selfmon_collector();
 
-	DBconnect(ZBX_DB_CONNECT_EXIT);
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	DCsync_configuration();
 	DBclose();
 
@@ -772,7 +770,7 @@ void	zbx_on_exit()
 #endif
 
 #ifdef HAVE_SQLITE3
-	php_sem_remove(&sqlite_access);
+	zbx_remove_sqlite3_mutex();
 #endif
 
 	free_selfmon_collector();

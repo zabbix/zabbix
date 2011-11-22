@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #ifndef ZABBIX_ZBXDB_H
@@ -138,10 +138,6 @@
 
 	void	SQ_DBfree_result(DB_RESULT result);
 
-#	include "mutexs.h"
-
-	extern PHP_MUTEX	sqlite_access;
-
 #endif	/* HAVE_SQLITE3 */
 
 #ifdef HAVE_SQLITE3
@@ -154,6 +150,7 @@
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
 #ifdef HAVE_SQLITE3
 void	zbx_create_sqlite3_mutex(const char *dbname);
+void	zbx_remove_sqlite3_mutex();
 #endif	/* HAVE_SQLITE3 */
 void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port);
 void    zbx_db_close();
