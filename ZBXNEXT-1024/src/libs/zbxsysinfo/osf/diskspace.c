@@ -126,14 +126,14 @@ static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
 
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	MODE_FUNCTION fl[] =
+	const MODE_FUNCTION	fl[] =
 	{
 		{"free",	VFS_FS_FREE},
 		{"total",	VFS_FS_TOTAL},
 		{"used",	VFS_FS_USED},
 		{"pfree",	VFS_FS_PFREE},
 		{"pused",	VFS_FS_PUSED},
-		{0,		0}
+		{NULL,		0}
 	};
 
 	char	fsname[MAX_STRING_LEN], mode[8];

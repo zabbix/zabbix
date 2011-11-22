@@ -114,14 +114,14 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	MODE_FUNCTION fl[] =
+	const MODE_FUNCTION	fl[] =
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
 		{"used",	SYSTEM_SWAP_USED},
 		{"pfree",	SYSTEM_SWAP_PFREE},
 		{"pused",	SYSTEM_SWAP_PUSED},
-		{0,		0}
+		{NULL,		0}
 	};
 
 	char	swapdev[MAX_STRING_LEN];

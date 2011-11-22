@@ -154,14 +154,14 @@ static int	VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags
 
 int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	MODE_FUNCTION fl[] =
+	const MODE_FUNCTION	fl[] =
 	{
 		{"free" ,	VFS_FS_INODE_FREE},
 		{"total" ,	VFS_FS_INODE_TOTAL},
 		{"used",	VFS_FS_INODE_USED},
 		{"pfree" ,	VFS_FS_INODE_PFREE},
 		{"pused" ,	VFS_FS_INODE_PUSED},
-		{0,		0}
+		{NULL,		0}
 	};
 
 	char	fsname[MAX_STRING_LEN];
