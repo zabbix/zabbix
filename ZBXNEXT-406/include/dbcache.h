@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #ifndef ZABBIX_DBCACHE_H
@@ -46,7 +46,6 @@ extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
 extern int	CONFIG_JAVAPOLLER_FORKS;
 extern int	CONFIG_PINGER_FORKS;
-extern int	CONFIG_NS_SUPPORT;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
@@ -198,7 +197,6 @@ void	DCflush_nextchecks();
 void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
-zbx_uint64_t	DCget_nextid_shared(const char *table_name);
 
 int	DCget_item_lastclock(zbx_uint64_t itemid);
 

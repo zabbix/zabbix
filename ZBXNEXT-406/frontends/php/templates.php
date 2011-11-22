@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -42,7 +42,7 @@ else{
 	$page['hist_arg'] = array('groupid');
 }
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
@@ -425,6 +425,21 @@ include_once('include/page_header.php');
 					$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
 				}
 				if(!$result) throw new Exception();
+
+				// clone discovery rules
+				$discoveryRules = API::DiscoveryRule()->get(array(
+					'hostids' => $clone_templateid,
+					'inherited' => false,
+				));
+				if ($discoveryRules) {
+					$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
+						'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
+						'hostids' => array($templateid)
+					));
+					if (!$copyDiscoveryRules) {
+						throw new Exception();
+					}
+				}
 			}
 
 			if(!DBend(true)) throw new Exception();
@@ -754,6 +769,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

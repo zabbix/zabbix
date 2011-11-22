@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -26,7 +26,7 @@ $page['file']	= 'chart4.php';
 // $page['title']	= "S_CHART";
 $page['type']	= PAGE_TYPE_IMAGE;
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -100,13 +100,13 @@ include_once('include/page_header.php');
 
 	$wday=date('w',$start);
 	if($wday==0) $wday=7;
-	$start=$start-($wday-1)*24*3600;
+	$start = $start - ($wday - 1) * SEC_PER_DAY;
 
 	$weeks = (int)(date('z')/7 +1);
 
 	for($i=0;$i<$weeks;$i++){
-		$period_start=$start+7*24*3600*$i;
-		$period_end=$start+7*24*3600*($i+1);
+		$period_start = $start + SEC_PER_WEEK * $i;
+		$period_end = $start + SEC_PER_WEEK * ($i + 1);
 
 		$stat=calculate_availability($_REQUEST['triggerid'],$period_start,$period_end);
 		$true[$i]=$stat['true'];
@@ -126,7 +126,7 @@ include_once('include/page_header.php');
 		//imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, zbx_date2str(S_CHART4_TIMELINE_DATE_FORMAT,$period_start) , $black);
 		imageText($im, 6, 90, $i+$shiftX+4, $sizeY+$shiftYup+30, $black, zbx_date2str(S_CHART4_TIMELINE_DATE_FORMAT,$period_start));
 
-		$period_start += 7*24*3600;
+		$period_start += SEC_PER_WEEK;
 	}
 
 	$maxY = max(max($true), 100);
@@ -186,6 +186,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

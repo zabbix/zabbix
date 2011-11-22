@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -34,7 +34,7 @@ if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -107,7 +107,7 @@ if (isset($_REQUEST['favobj'])) {
 }
 
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 	exit();
 }
 ?>
@@ -172,8 +172,8 @@ if (empty($screens)) {
 // if screen we are searching for does not exist and was not fetched from profile
 elseif (!isset($screens[$elementIdentifier]) && !$id_has_been_fetched_from_profile) {
 	$error_msg = $use_screen_name
-		? sprintf(_('Screen with name "%s" does not exist'), $elementIdentifier)
-		: sprintf(_('Screen with ID "%d" does not exist'), $elementIdentifier);
+		? _s('Screen with name "%s" does not exist', $elementIdentifier)
+		: _s('Screen with ID "%s" does not exist', $elementIdentifier);
 
 	show_error_message($error_msg);
 }
@@ -284,5 +284,5 @@ else {
 
 	echo SBR;
 }
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

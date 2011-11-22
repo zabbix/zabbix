@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -305,7 +305,7 @@
 
 	function expand_periodical_service_times(&$data, $period_start, $period_end, $ts_from, $ts_to, $type = 'ut') {
 		// calculate period FROM '-1 week' to know period name for $period_start
-		for ($curr = ($period_start - (7 * 24 * 3600)); $curr <= $period_end; $curr += 86400) {
+		for ($curr = $period_start - SEC_PER_WEEK; $curr <= $period_end; $curr += SEC_PER_DAY) {
 			$curr_date = getdate($curr);
 			$from_date = getdate($ts_from);
 

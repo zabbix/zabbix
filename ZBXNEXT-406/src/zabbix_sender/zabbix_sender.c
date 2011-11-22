@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -32,9 +32,9 @@ const char	usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file> -r} [-c 
 
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>                   Specify absolute path to the configuration file",
+	"  -c --config <file>                   Absolute path to the configuration file",
 	"",
-	"  -z --zabbix-server <server>          Hostname or IP address of Zabbix Server",
+	"  -z --zabbix-server <server>          Hostname or IP address of Zabbix server",
 	"  -p --port <server port>              Specify port number of server trapper running on the server. Default is " ZBX_DEFAULT_SERVER_PORT_STR,
 	"  -s --host <hostname>                 Specify host name. Host IP address and DNS name will not work",
 	"  -I --source-address <IP address>     Specify source IP address",
