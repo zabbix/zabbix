@@ -1153,7 +1153,7 @@ COpt::memoryPick();
 			$cnt_exist = API::Item()->get($options);
 
 			if($cnt != $cnt_exist)
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item for axis value item'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item for axis value'));
 		}
 
 		return true;
