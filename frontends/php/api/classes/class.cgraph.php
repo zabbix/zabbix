@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -1153,7 +1153,7 @@ COpt::memoryPick();
 			$cnt_exist = API::Item()->get($options);
 
 			if($cnt != $cnt_exist)
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item for axis value item'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect item for axis value'));
 		}
 
 		return true;

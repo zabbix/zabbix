@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -26,9 +26,21 @@ $regExpForm->setName('regularExpressionsForm');
 $regExpForm->addVar('config', get_request('config', 10));
 $regExpForm->addItem(BR());
 
+$goBox = new CComboBox('go');
+
+$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption->setAttribute('confirm', _('Delete selected regular expressions?'));
+
+$goBox->addItem($goOption);
+
+$goButton = new CButton('goButton', S_GO, 'if(chkbxRange.pageGoCount>0) submit();');
+$goButton->setAttribute('id', 'goButton');
+
+zbx_add_post_js('chkbxRange.pageGoName = "regexpids";');
+
 $regExpTable = new CTableInfo();
 $regExpTable->setHeader(array(new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm','all_regexps','regexpids');"), _('Name'), _('Expressions')));
-$regExpTable->setFooter(new CCol(array(new CButtonQMessage('delete', _('Delete selected'), _('Delete selected regular expressions?')))));
+$regExpTable->setFooter(new CCol(array($goBox, $goButton)));
 
 $expressions = array();
 $values = array();
