@@ -620,8 +620,8 @@ void	DBproxy_register_host(const char *host, const char *ip, const char *dns, un
 int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*DBget_unique_hostname_by_sample(const char *host_name_sample);
 
-char	*DBsql_id_cmp(zbx_uint64_t id);
-char	*DBsql_id_ins(zbx_uint64_t id);
+const char	*DBsql_id_cmp(zbx_uint64_t id);
+const char	*DBsql_id_ins(zbx_uint64_t id);
 
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 		unsigned char useip, const char *ip, const char *dns, unsigned short port);
