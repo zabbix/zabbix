@@ -1,3 +1,11 @@
+Changes for 1.8.9
+
+1.8.9rc2 was released as 1.8.9 without any changes
+
+Changes for 1.8.9rc2
+
+ - [ZBX-4352] fixed template linking when mass updating hosts (pavels,Vedmak)
+
 Changes for 1.8.9rc1
 
  - [ZBX-4325] fixed maintenance periods saved with nonzero seconds (asaveljevs,Vedmak)
