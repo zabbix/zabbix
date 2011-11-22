@@ -1350,20 +1350,20 @@
 		foreach($types as $it => $ilabel) {
 			switch($it){
 				case ITEM_TYPE_DB_MONITOR:
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'key','defaultValue'=> 'db.odbc.select[<unique short description>]'));
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'params_dbmonitor','defaultValue'=> "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>"));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_DB_MONITOR));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'params_dbmonitor', 'defaultValue' => "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>"));
 					break;
 				case ITEM_TYPE_SSH:
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'key','defaultValue'=> 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]'));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH));
 					break;
 				case ITEM_TYPE_TELNET:
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET));
 					break;
 				case ITEM_TYPE_JMX:
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'jmx[<object name>,<attribute name>]'));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_JMX));
 					break;
 				default:
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> ''));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'key', 'defaultValue' => ''));
 			}
 		}
 
