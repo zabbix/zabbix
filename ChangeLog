@@ -16,8 +16,8 @@ New features:
 
 Bug fixes:
  - [ZBX-4139] fixed "Last n issues" widget label ignoring variable that sets the amount of issues (Richlv)
- - [ZBX-4359] fix potentially incorrectly named index on node_cksum table (Richlv, sasha)
- - [ZBX-4188] fixed nclob problem for oracle (Vedmak)
+ - [ZBX-4359] fixed potentially incorrectly named index on node_cksum table (Richlv, sasha)
+ - [ZBX-4188] fixed nclob problem for Oracle (Vedmak)
  - [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
  - [ZBX-4282] fixed errors when importing templates with trigger dependencies (pavels)
  - [ZBX-4108] updated FSF mailing address (Richlv)
