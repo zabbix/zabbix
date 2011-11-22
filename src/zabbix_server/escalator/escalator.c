@@ -1180,7 +1180,7 @@ static void	process_escalations(int now)
 
 	memset(&escalation, 0, sizeof(escalation));
 
-	while (NULL != (row = DBfetch(result)) || 0 != escalation.escalationid)
+	while ((NULL != row && NULL != (row = DBfetch(result))) || 0 != escalation.escalationid)
 	{
 		memset(&last_escalation, 0, sizeof(last_escalation));
 
