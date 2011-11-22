@@ -1186,11 +1186,11 @@ static void	process_escalations(int now)
 
 	memset(&escalation, 0, sizeof(escalation));
 
-	while ((NULL != row && NULL != (row = DBfetch(result))) || 0 != escalation.escalationid)
+	do
 	{
 		memset(&last_escalation, 0, sizeof(last_escalation));
 
-		if (NULL != row)
+		if (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(last_escalation.escalationid, row[0]);
 			ZBX_STR2UINT64(last_escalation.actionid, row[1]);
@@ -1254,9 +1254,8 @@ static void	process_escalations(int now)
 
 		if (NULL != row)
 			memcpy(&escalation, &last_escalation, sizeof(escalation));
-		else
-			memset(&escalation, 0, sizeof(escalation));
 	}
+	while (NULL != row);
 
 	DBfree_result(result);
 
