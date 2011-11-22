@@ -247,18 +247,8 @@ class CTemplateScreen extends CScreen{
 			}
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][] = 's.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('s.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('s.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 's.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 's');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){

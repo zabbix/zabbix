@@ -225,7 +225,6 @@ class CUser extends CZBXAPI {
 				$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
-
 		while ($user = DBfetch($res)) {
 			unset($user['passwd']);
 			if (!is_null($options['countOutput'])) {

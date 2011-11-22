@@ -144,11 +144,9 @@ class CGraph extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
-
 			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
 			$sql_parts['from']['items'] = 'items i';
 			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
 			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
@@ -304,7 +302,6 @@ class CGraph extends CZBXAPI {
 				$sql_parts['from']['hosts'] = 'hosts h';
 				$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 				$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
-
 				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host']);
 			}
@@ -316,7 +313,6 @@ class CGraph extends CZBXAPI {
 				$sql_parts['from']['items'] = 'items i';
 				$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 				$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
-
 				$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['filter']['hostid']);
 			}
 		}
@@ -435,8 +431,8 @@ class CGraph extends CZBXAPI {
 				'nodeids' => $nodeids,
 				'output' => $options['selectGraphItems'],
 				'graphids' => $graphids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 			$gitems = API::GraphItem()->get($obj_params);
 
@@ -456,8 +452,8 @@ class CGraph extends CZBXAPI {
 					'nodeids' => $nodeids,
 					'output' => $options['selectGroups'],
 					'graphids' => $graphids,
-					'nopermissions' => 1,
-					'preservekeys' => 1
+					'nopermissions' => true,
+					'preservekeys' => true
 				);
 				$groups = API::HostGroup()->get($obj_params);
 
@@ -479,8 +475,8 @@ class CGraph extends CZBXAPI {
 					'output' => $options['selectHosts'],
 					'graphids' => $graphids,
 					'templated_hosts' => true,
-					'nopermissions' => 1,
-					'preservekeys' => 1
+					'nopermissions' => true,
+					'preservekeys' => true
 				);
 				$hosts = API::Host()->get($obj_params);
 				foreach ($hosts as $hostid => $host) {
@@ -499,8 +495,8 @@ class CGraph extends CZBXAPI {
 				'nodeids' => $nodeids,
 				'output' => $options['selectTemplates'],
 				'graphids' => $graphids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 			$templates = API::Template()->get($obj_params);
 			foreach ($templates as $templateid => $template) {
@@ -519,8 +515,8 @@ class CGraph extends CZBXAPI {
 				'output' => $options['selectItems'],
 				'graphids' => $graphids,
 				'webitems' => 1,
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 			$items = API::Item()->get($obj_params);
 			foreach ($items as $itemid => $item) {
@@ -551,8 +547,8 @@ class CGraph extends CZBXAPI {
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'itemids' => $ruleids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 
 			if (is_array($options['selectDiscoveryRule']) || str_in_array($options['selectDiscoveryRule'], $subselects_allowed_outputs)) {

@@ -288,37 +288,52 @@ class CEvent extends CZBXAPI{
 			);
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			if($options['sortfield'] == 'clock'){
-				$sql_parts['order'][] = 'e.clock '.$sortorder;
-				$sql_parts['order'][] = 'e.ns '.$sortorder;
-
-				if(!str_in_array('e.*', $sql_parts['select']['events'])){
-					$sql_parts['select']['events'][] = 'e.clock';
-					$sql_parts['select']['events'][] = 'e.ns';
-				}
-
-				if(!is_null($options['triggerids'])){
-					$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
-				}
+		// sorting
+		if (!zbx_empty($options['sortfield'])) {
+			if (!is_array($options['sortfield'])) {
+				$options['sortfield'] = array($options['sortfield']);
 			}
 
-			if($options['sortfield'] == 'object'){
-				$sql_parts['order'][] = 'e.object '.$sortorder;
-				$sql_parts['order'][] = 'e.objectid '.$sortorder;
-				$sql_parts['order'][] = 'e.clock '.$sortorder;
-				$sql_parts['order'][] = 'e.ns '.$sortorder;
+			foreach ($options['sortfield'] as $i => $sortfield) {
+				// validate sortfield
+				if (!str_in_array($sortfield, $sort_columns)) {
+					throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%s" not allowed.', $sortfield));
+				}
 
-				if(!str_in_array('e.*', $sql_parts['select']['events'])){
-					$sql_parts['select']['events'][] = 'e.object';
-					$sql_parts['select']['events'][] = 'e.objectid';
-					$sql_parts['select']['events'][] = 'e.clock';
-					$sql_parts['select']['events'][] = 'e.ns';
+				$sortorder = '';
+				if (is_array($options['sortorder'])) {
+					if (!empty($options['sortorder'][$i])) {
+						$sortorder = $options['sortorder'][$i] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
+					}
+				}
+				else {
+					$sortorder = $options['sortorder'] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
+				}
+
+				if ($sortfield == 'clock') {
+					$sql_parts['order'][] = 'e.clock '.$sortorder;
+					$sql_parts['order'][] = 'e.ns '.$sortorder;
+
+					if (!str_in_array('e.*', $sql_parts['select']['events'])) {
+						$sql_parts['select']['events'][] = 'e.clock';
+						$sql_parts['select']['events'][] = 'e.ns';
+					}
+					if (!is_null($options['triggerids'])) {
+						$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
+					}
+				}
+				elseif ($options['sortfield'] == 'object') {
+					$sql_parts['order'][] = 'e.object '.$sortorder;
+					$sql_parts['order'][] = 'e.objectid '.$sortorder;
+					$sql_parts['order'][] = 'e.clock '.$sortorder;
+					$sql_parts['order'][] = 'e.ns '.$sortorder;
+
+					if (!str_in_array('e.*', $sql_parts['select']['events'])) {
+						$sql_parts['select']['events'][] = 'e.object';
+						$sql_parts['select']['events'][] = 'e.objectid';
+						$sql_parts['select']['events'][] = 'e.clock';
+						$sql_parts['select']['events'][] = 'e.ns';
+					}
 				}
 			}
 		}

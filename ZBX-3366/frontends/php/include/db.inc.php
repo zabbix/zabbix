@@ -955,7 +955,7 @@ function zbx_db_filter($table, $options, &$sql_parts) {
 	return false;
 }
 
-function zbx_db_sorting(&$sql_parts, $options, $sortcolumns, $alias) {
+function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 	if (!zbx_empty($options['sortfield'])) {
 		if (!is_array($options['sortfield'])) {
 			$options['sortfield'] = array($options['sortfield']);
@@ -963,16 +963,14 @@ function zbx_db_sorting(&$sql_parts, $options, $sortcolumns, $alias) {
 
 		foreach ($options['sortfield'] as $i => $sortfield) {
 			// validate sortfield
-			if (!str_in_array($sortfield, $sortcolumns)) {
+			if (!str_in_array($sortfield, $sort_columns)) {
 				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%s" not allowed.', $sortfield));
 			}
 
+			$sortorder = '';
 			if (is_array($options['sortorder'])) {
 				if (!empty($options['sortorder'][$i])) {
 					$sortorder = $options['sortorder'][$i] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
-				}
-				else {
-					throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Ordering by field "%s" not defined.', $sortfield));
 				}
 			}
 			else {

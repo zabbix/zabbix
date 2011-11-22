@@ -246,18 +246,8 @@ class CDService extends CZBXAPI{
 			zbx_db_search('dservices ds', $options, $sql_parts);
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][$options['sortfield']] = 'ds.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('ds.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('ds.*', $sql_parts['select'])){
-				$sql_parts['select'][$options['sortfield']] = 'ds.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'ds');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){

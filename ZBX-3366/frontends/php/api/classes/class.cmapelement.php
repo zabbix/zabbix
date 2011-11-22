@@ -164,18 +164,8 @@ abstract class CMapElement extends CZBXAPI{
 			$sql_parts['select'] = array('count(DISTINCT s.sysmapid) as rowscount');
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][] = 'se.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('se.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('se.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'se.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'se');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
@@ -430,18 +420,8 @@ COpt::memoryPick();
 			$sql_parts['select'] = array('count(DISTINCT s.sysmapid) as rowscount');
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][] = 'sl.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('sl.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('sl.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'sl.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'sl');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
