@@ -2038,7 +2038,6 @@
 
 //	items.inc.php
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	'Funkci byly předány neplatné argumenty',
-	'S_INCORRECT_KEY_FORMAT'=>			'Neplatný formát klíče',
 	'S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL'=>	'Položka nebude akutalizována. Zadejte, prosím, správný interval aktualizací.',
 	'S_INVALID_SNMP_PORT'=>				'Neplatný SNMP port',
 	'S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY'=>	'Type of information must be Log for log key',
@@ -2155,7 +2154,6 @@
 	'S_MUST_USE_ITEMS_ONLY_FROM_HOST'=>			'Můžete použít položky pouze z hostitele',
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'pro šablonu grafu',
 	'S_UPDATED_FOR_HOSTS'=>					'aktualizován pro hostitele',
-	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Kopírování grafu přeskočeno',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Graf "',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			'" byl smazaný z hostitelů',
 
