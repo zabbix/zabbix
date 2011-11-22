@@ -76,7 +76,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 				;;
 					-l*)
 						_lib_name="`echo "$i" | cut -b3-`"
-						AC_CHECK_LIB($_lib_name , main,[
+						AC_CHECK_LIB($_lib_name, main, [
 								SNMP_LIBS="$SNMP_LIBS $i"
 							],[
 								AC_MSG_ERROR([Not found $_lib_name library])
@@ -94,7 +94,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
 		CFLAGS="${CFLAGS} ${SNMP_CFLAGS}"
 
-		AC_CHECK_LIB(netsnmp , main,[
+		AC_CHECK_LIB(netsnmp, main, [
 			SNMP_LIBS="-lnetsnmp ${SNMP_LIBS}"
 			],[
 		       	AC_MSG_ERROR([Not found NET-SNMP library])

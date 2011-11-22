@@ -76,7 +76,7 @@ CREATE TABLE opmessage (
 	operationid              number(20)                                NOT NULL,
 	default_msg              number(10)      DEFAULT '0'               NOT NULL,
 	subject                  nvarchar2(255)  DEFAULT ''                ,
-	message                  nclob           DEFAULT ''                ,
+	message                  nvarchar2(2048) DEFAULT ''                ,
 	mediatypeid              number(20)                                NULL,
 	PRIMARY KEY (operationid)
 );
@@ -114,7 +114,7 @@ CREATE TABLE opcommand (
 	password                 nvarchar2(64)   DEFAULT ''                ,
 	publickey                nvarchar2(64)   DEFAULT ''                ,
 	privatekey               nvarchar2(64)   DEFAULT ''                ,
-	command                  nclob           DEFAULT ''                ,
+	command                  nvarchar2(2048) DEFAULT ''                ,
 	PRIMARY KEY (operationid)
 );
 ALTER TABLE opcommand ADD CONSTRAINT c_opcommand_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;

@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -26,7 +26,7 @@
 #include "zbxgetopt.h"
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix Get";
+const char	title_message[] = "Zabbix get";
 const char	usage_message[] = "[-hV] -s <host name or IP> [-p <port>] [-I <IP address>] -k <key>";
 
 const char	*help_message[] = {

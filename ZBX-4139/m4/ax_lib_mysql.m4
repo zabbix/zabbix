@@ -106,7 +106,7 @@ dnl            AC_MSG_CHECKING([for MySQL libraries])
            	    ;;
                       -l*)
 				_lib_name="`echo "$i" | cut -b3-`"
-				AC_CHECK_LIB($_lib_name , main,[
+				AC_CHECK_LIB($_lib_name, main, [
 						MYSQL_LIBS="$MYSQL_LIBS $i"
 					],[
 						AC_MSG_ERROR([Not found $_lib_name library])
@@ -123,7 +123,7 @@ dnl            AC_MSG_CHECKING([for MySQL libraries])
 		LDFLAGS="${LDFLAGS} ${MYSQL_LDFLAGS}"
 		CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
 
-		AC_CHECK_LIB(mysqlclient , main,[
+		AC_CHECK_LIB(mysqlclient, main, [
 			MYSQL_LIBS="-lmysqlclient ${MYSQL_LIBS}"
 			],[
 			AC_MSG_ERROR([Not found mysqlclient library])
