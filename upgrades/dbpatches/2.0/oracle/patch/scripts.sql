@@ -3,7 +3,7 @@ ALTER TABLE scripts MODIFY usrgrpid DEFAULT NULL;
 ALTER TABLE scripts MODIFY usrgrpid NULL;
 ALTER TABLE scripts MODIFY groupid DEFAULT NULL;
 ALTER TABLE scripts MODIFY groupid NULL;
-ALTER TABLE scripts ADD description nclob DEFAULT '';
+ALTER TABLE scripts ADD description nvarchar2(2048) DEFAULT '';
 ALTER TABLE scripts ADD confirmation nvarchar2(255) DEFAULT '';
 ALTER TABLE scripts ADD type number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE scripts ADD execute_on number(10) DEFAULT '1' NOT NULL;

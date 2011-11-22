@@ -3457,41 +3457,43 @@
 				$expec_result.=' ('._('Delimiter')."='".$expression['exp_delimiter']."')";
 
 			$tabExp->addRow(array(
-						$expression['expression'],
-						$expec_result,
-						$exp_res
-					));
+				$expression['expression'],
+				$expec_result,
+				$exp_res
+			));
 		}
 
-		$td = new CCol(S_COMBINED_RESULT,'bold');
+		$td = new CCol(S_COMBINED_RESULT, 'bold');
 		$td->setColSpan(2);
 
-		if($final_result)
-			$final_result = new CSpan(S_TRUE_BIG,'green bold');
-		else
-			$final_result = new CSpan(S_FALSE_BIG,'red bold');
+		if ($final_result) {
+			$final_result = new CSpan(S_TRUE_BIG, 'green bold');
+		}
+		else {
+			$final_result = new CSpan(S_FALSE_BIG, 'red bold');
+		}
 
 		$tabExp->addRow(array(
-					$td,
-					$final_result
-				));
+			$td,
+			$final_result
+		));
 
-		$tblRE->addRow(array(S_RESULT,$tabExp));
+		$tblRE->addRow(array(S_RESULT, $tabExp));
 
 		$tblFoot = new CTableInfo(null);
 
-		$td = new CCol(array(new CSubmit('save',S_SAVE)));
+		$td = new CCol(array(new CSubmit('save', S_SAVE)));
 		$td->setColSpan(2);
 		$td->addStyle('text-align: right;');
 
 		$td->addItem(SPACE);
-		$td->addItem(new CSubmit('test',S_TEST));
+		$td->addItem(new CSubmit('test', S_TEST));
 
-		if(isset($_REQUEST['regexpid'])){
+		if (isset($_REQUEST['regexpid'])) {
 			$td->addItem(SPACE);
 			$td->addItem(new CSubmit('clone', S_CLONE));
 			$td->addItem(SPACE);
-			$td->addItem(new CButtonDelete(S_DELETE_REGULAR_EXPRESSION_Q, url_param('form').url_param('config').url_param('regexpid')));
+			$td->addItem(new CButtonDelete(S_DELETE_REGULAR_EXPRESSION_Q, url_param('form').url_param('config').url_param('regexpid').url_param('delete', false, 'go')));
 		}
 
 		$td->addItem(SPACE);
@@ -3499,11 +3501,11 @@
 
 		$tblFoot->setFooter($td);
 
-	return array($tblRE,$tblFoot);
+		return array($tblRE, $tblFoot);
 	}
 
-	function get_expressions_tab(){
-		if(isset($_REQUEST['regexpid']) && !isset($_REQUEST['form_refresh'])){
+	function get_expressions_tab() {
+		if (isset($_REQUEST['regexpid']) && !isset($_REQUEST['form_refresh'])) {
 			$expressions = array();
 			$sql = 'SELECT e.* '.
 					' FROM expressions e '.
