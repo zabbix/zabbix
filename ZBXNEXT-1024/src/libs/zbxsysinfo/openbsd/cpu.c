@@ -138,7 +138,6 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_UVM_UVMEXP	/* OpenBSD 4.2 i386 */
 	int		mib[] = {CTL_VM, VM_UVMEXP};
 	size_t		len;
 	struct uvmexp	v;
@@ -151,14 +150,10 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 	SET_UI64_RESULT(result, v.swtch);
 
 	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
 }
 
 int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_UVM_UVMEXP	/* OpenBSD 4.2 i386 */
 	int		mib[] = {CTL_VM, VM_UVMEXP};
 	size_t		len;
 	struct uvmexp	v;
@@ -171,7 +166,4 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 	SET_UI64_RESULT(result, v.intrs);
 
 	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
 }
