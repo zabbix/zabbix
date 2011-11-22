@@ -20,16 +20,53 @@
 #include "common.h"
 #include "sysinfo.h"
 
-static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
 	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE));
 
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 {
 	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_AVPHYS_PAGES) * sysconf(_SC_PAGESIZE));
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_USED(AGENT_RESULT *result)
+{
+	zbx_uint64_t	used;
+
+	used = sysconf(_SC_PHYS_PAGES) - sysconf(_SC_AVPHYS_PAGES);
+
+	SET_UI64_RESULT(result, used * sysconf(_SC_PAGESIZE));
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
+{
+	zbx_uint64_t	used, total;
+
+	total = sysconf(_SC_PHYS_PAGES);
+	used = total - sysconf(_SC_AVPHYS_PAGES);
+
+	SET_DBL_RESULT(result, used / (double)total * 100);
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
+{
+	SET_UI64_RESULT(result, sysconf(_SC_AVPHYS_PAGES) * sysconf(_SC_PAGESIZE));
+
+	return SYSINFO_RET_OK;
+}
+
+static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
+{
+	SET_DBL_RESULT(result, sysconf(_SC_AVPHYS_PAGES) / (double)sysconf(_SC_PHYS_PAGES) * 100);
 
 	return SYSINFO_RET_OK;
 }
@@ -40,6 +77,10 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 	{
 		{"total",	VM_MEMORY_TOTAL},
 		{"free",	VM_MEMORY_FREE},
+		{"used",	VM_MEMORY_USED},
+		{"pused",	VM_MEMORY_PUSED},
+		{"available",	VM_MEMORY_AVAILABLE},
+		{"pavailable",	VM_MEMORY_PAVAILABLE},
 		{NULL,		0}
 	};
 
@@ -54,7 +95,7 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 
 	for (i = 0; NULL != fl[i].mode; i++)
 		if (0 == strcmp(mode, fl[i].mode))
-			return (fl[i].function)(cmd, param, flags, result);
+			return (fl[i].function)(result);
 
 	return SYSINFO_RET_FAIL;
 }
