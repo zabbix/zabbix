@@ -604,8 +604,7 @@
 		return $err == ZBX_VALID_OK ? 1 : 0;
 	}
 
-	function validatePortNumber($port, $allowEmpty = false, $allowUserMacro = false)
-	{
+	function validatePortNumber($port, $allowEmpty = false, $allowUserMacro = false) {
 		if ($allowEmpty && zbx_empty($port)) {
 			return true;
 		}
