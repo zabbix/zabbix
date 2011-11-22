@@ -133,7 +133,6 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 
 static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 {
-#if defined(HAVE_SYS_VMMETER_VMTOTAL)
 	int		mib[] = {CTL_VM, VM_METER};
 	struct vmtotal	vm;
 
@@ -142,9 +141,6 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 	SET_UI64_RESULT(result, (zbx_uint64_t)(vm.t_vmshr + vm.t_rmshr) * sysconf(_SC_PAGESIZE));
 
 	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif
 }
 
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
