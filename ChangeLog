@@ -1,5 +1,6 @@
 Changes for 1.8.10
 
+ - [ZBX-4249] fixed trigger wizard when insert macro multiple times (Vedmak)
  - [ZBX-4351] updated French translation; thanks to Joseph Bueno (Richlv)
  - [ZBX-4353] updated Japanese translation; thanks to Kodai Terashima (Richlv)
 
