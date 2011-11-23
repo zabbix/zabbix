@@ -48,6 +48,7 @@ switch($itemType) {
 
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			null),
+		'interfaceid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,				null, S_INTERFACE),
 
 		'add_groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({register})&&({register}=="go"))'),
 		'action'=>			array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,		'(isset({register})&&({register}=="go"))'),
@@ -264,6 +265,7 @@ switch($itemType) {
 			'description'	=> get_request('description'),
 			'key_'			=> get_request('key'),
 			'hostid'		=> get_request('hostid'),
+			'interfaceid'	=> get_request('interfaceid'),
 			'delay'			=> get_request('delay'),
 			'status'		=> get_request('status'),
 			'type'			=> get_request('type'),

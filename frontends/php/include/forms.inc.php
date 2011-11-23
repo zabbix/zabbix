@@ -1213,7 +1213,7 @@
 			$frmItem->setTitle(_s('Item %1$s : %2$s', $hostname, $name));
 		}
 
-		if(!$parent_discoveryid){
+		if (!$parent_discoveryid) {
 			$frmItem->addVar('form_hostid', $hostid);
 			$frmItem->addRow(S_HOST, array(
 				new CTextBox('hostname', $hostname, 32, true),
@@ -1222,43 +1222,43 @@
 					"&dstfld1=hostname&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&noempty=1',450,450);",
 					'H')
 			));
+		}
 
-			$interfaces = API::HostInterface()->get(array(
-				'hostids' => $hostid,
-				'output' => API_OUTPUT_EXTEND
-			));
-			if(!empty($interfaces)){
-				$sbIntereaces = new CComboBox('interfaceid', $interfaceid);
-				foreach($interfaces as $ifnum => $interface){
-					$caption = $interface['useip'] ? $interface['ip'] : $interface['dns'];
-					$caption.= ' : '.$interface['port'];
+		$interfaces = API::HostInterface()->get(array(
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND
+		));
+		if (!empty($interfaces)) {
+			$sbIntereaces = new CComboBox('interfaceid', $interfaceid);
+			foreach ($interfaces as $ifnum => $interface) {
+				$caption = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+				$caption.= ' : '.$interface['port'];
 
-					$sbIntereaces->addItem($interface['interfaceid'], $caption);
-				}
-				$frmItem->addRow(S_HOST_INTERFACE, $sbIntereaces, null, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interfaceid');
+				$sbIntereaces->addItem($interface['interfaceid'], $caption);
 			}
+			$frmItem->addRow(S_HOST_INTERFACE, $sbIntereaces, null, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interfaceid');
 		}
 
 		$frmItem->addRow(_('Name'), new CTextBox('name', $name, 40, $limited));
