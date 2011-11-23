@@ -148,7 +148,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 	return res;
 }
 
-static void	update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
+static void	update_key_status(zbx_uint64_t hostid, int host_status, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "update_key_status";
 	DC_ITEM		*items = NULL;
@@ -164,7 +164,7 @@ static void	update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 		init_result(&agent);
 		SET_UI64_RESULT(&agent, host_status);
 
-		dc_add_history(items[i].itemid, items[i].value_type, &agent, now,
+		dc_add_history(items[i].itemid, items[i].value_type, &agent, ts,
 				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 
 		free_result(&agent);
@@ -173,7 +173,7 @@ static void	update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 	zbx_free(items);
 }
 
-static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, int now, char *reason)
+static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
 	const char		*__function_name = "update_triggers_status_to_unknown";
 	DB_RESULT		result;
@@ -293,11 +293,11 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		tr_last->value = atoi(row[2]);
 		tr_last->new_value = TRIGGER_VALUE_UNKNOWN;
 		tr_last->error = row[3];
-		tr_last->lastchange = now;
+		tr_last->timespec = *ts;
 
 		if (SUCCEED == DBget_trigger_update_sql(&sql, &sql_alloc, &sql_offset, tr_last->triggerid,
 				tr_last->type, tr_last->value, tr_last->error, tr_last->new_value, reason,
-				tr_last->lastchange, &tr_last->add_event))
+				&tr_last->timespec, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
 
@@ -332,7 +332,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				continue;
 
 			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
-					tr_last->lastchange, tr_last->new_value, 0, 0);
+					&tr_last->timespec, tr_last->new_value, 0, 0);
 		}
 	}
 
@@ -341,7 +341,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	activate_host(DC_ITEM *item, int now)
+static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "activate_host";
 	char		sql[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
@@ -422,7 +422,7 @@ static void	activate_host(DC_ITEM *item, int now)
 				fld_available, *available);
 
 		if (available == &item->host.available)
-			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, now);
+			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, ts);
 	}
 
 	*errors_from = 0;
@@ -441,7 +441,7 @@ static void	activate_host(DC_ITEM *item, int now)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	deactivate_host(DC_ITEM *item, int now, const char *error)
+static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
 	const char	*__function_name = "deactivate_host";
 	char		sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
@@ -493,7 +493,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 			return;
 	}
 
-	if (SUCCEED != DCconfig_deactivate_host(item, now))
+	if (SUCCEED != DCconfig_deactivate_host(item, ts->sec))
 		return;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, *errors_from, *available);
@@ -511,25 +511,25 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 				" first network error, wait for %d seconds",
 				type, item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
 
-		*errors_from = now;
-		*disable_until = now + CONFIG_UNREACHABLE_DELAY;
+		*errors_from = ts->sec;
+		*disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
 				fld_errors_from, *errors_from);
 	}
 	else
 	{
-		if (now - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
+		if (ts->sec - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
 		{
 			/* still unavailable, but won't change status to UNAVAILABLE yet */
 			zbx_snprintf(error_msg, sizeof(error_msg), "%s item [%s] on host [%s] failed:"
 					" another network error, wait for %d seconds",
 					type, item->key_orig, item->host.host, CONFIG_UNREACHABLE_DELAY);
 
-			*disable_until = now + CONFIG_UNREACHABLE_DELAY;
+			*disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
 		}
 		else
 		{
-			*disable_until = now + CONFIG_UNAVAILABLE_DELAY;
+			*disable_until = ts->sec + CONFIG_UNAVAILABLE_DELAY;
 
 			if (HOST_AVAILABLE_FALSE != *available)
 			{
@@ -543,9 +543,9 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 						fld_available, *available);
 
 				if (available == &item->host.available)
-					update_key_status(item->host.hostid, HOST_AVAILABLE_FALSE, now);
+					update_key_status(item->host.hostid, HOST_AVAILABLE_FALSE, ts);
 
-				update_triggers_status_to_unknown(item->host.hostid, item->type, now,
+				update_triggers_status_to_unknown(item->host.hostid, item->type, ts,
 						"Agent is unavailable.");
 			}
 
@@ -594,12 +594,13 @@ static int	get_values(unsigned char poller_type)
 	zbx_uint64_t	*ids = NULL, *snmpids = NULL, *ipmiids = NULL;
 	int		ids_alloc = 0, snmpids_alloc = 0, ipmiids_alloc = 0,
 			ids_num = 0, snmpids_num = 0, ipmiids_num = 0,
-			i, now, num, res;
+			i, num, res;
 	static char	*key = NULL, *ipmi_ip = NULL, *params = NULL,
 			*username = NULL, *publickey = NULL, *privatekey = NULL,
 			*password = NULL, *snmp_community = NULL, *snmp_oid = NULL,
 			*snmpv3_securityname = NULL, *snmpv3_authpassphrase = NULL,
 			*snmpv3_privpassphrase = NULL;
+	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -756,29 +757,29 @@ static int	get_values(unsigned char poller_type)
 		init_result(&agent);
 
 		res = get_value(&items[i], &agent);
-		now = time(NULL);
+		zbx_timespec(&ts);
 
 		if (res == SUCCEED)
 		{
-			activate_host(&items[i], now);
+			activate_host(&items[i], &ts);
 
-			dc_add_history(items[i].itemid, items[i].value_type, &agent, now,
+			dc_add_history(items[i].itemid, items[i].value_type, &agent, &ts,
 					ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, now);
+			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_ACTIVE, ts.sec);
 		}
 		else if (res == NOTSUPPORTED || res == AGENT_ERROR)
 		{
-			activate_host(&items[i], now);
+			activate_host(&items[i], &ts);
 
-			dc_add_history(items[i].itemid, items[i].value_type, NULL, now,
+			dc_add_history(items[i].itemid, items[i].value_type, NULL, &ts,
 					ITEM_STATUS_NOTSUPPORTED, agent.msg, 0, NULL, 0, 0, 0, 0);
 
-			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, now);
+			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, ts.sec);
 		}
 		else if (res == NETWORK_ERROR)
 		{
-			deactivate_host(&items[i], now, agent.msg);
+			deactivate_host(&items[i], &ts, agent.msg);
 
 			switch (items[i].type)
 			{

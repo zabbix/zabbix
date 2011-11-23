@@ -270,7 +270,7 @@ out:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid, int clock,
+int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid, const zbx_timespec_t *timespec,
 		int value, int acknowledged, int force_actions)
 {
 	const char	*__function_name = "process_event";
@@ -286,7 +286,8 @@ int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t obj
 	event.source = source;
 	event.object = object;
 	event.objectid = objectid;
-	event.clock = clock;
+	event.clock = timespec->sec;
+	event.ns = timespec->ns;
 	event.value = value;
 	event.acknowledged = acknowledged;
 
@@ -296,9 +297,9 @@ int	process_event(zbx_uint64_t eventid, int source, int object, zbx_uint64_t obj
 	if (0 == event.eventid)
 		event.eventid = DBget_maxid("events");
 
-	DBexecute("insert into events (eventid,source,object,objectid,clock,value)"
-			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d)",
-			event.eventid, event.source, event.object, event.objectid, event.clock, event.value);
+	DBexecute("insert into events (eventid,source,object,objectid,clock,ns,value)"
+			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d)",
+			event.eventid, event.source, event.object, event.objectid, event.clock, event.ns, event.value);
 
 	if (0 != event.ack_eventid)
 		copy_acknowledges(event.ack_eventid, event.eventid);
