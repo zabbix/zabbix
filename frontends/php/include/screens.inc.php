@@ -933,7 +933,7 @@ require_once('include/js.inc.php');
 		}
 
 		if (!$screen) {
-			return new CTableInfo(S_NO_SCREENS_DEFINED);
+			return new CTableInfo(_('No screens defined.'));
 		}
 
 		$skip_field = array();

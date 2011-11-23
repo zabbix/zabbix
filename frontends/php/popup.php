@@ -28,7 +28,7 @@ require_once('include/nodes.inc.php');
 require_once('include/js.inc.php');
 require_once('include/discovery.inc.php');
 
-$srctbl	= get_request('srctbl', ''); // source table name
+$srctbl = get_request('srctbl', ''); // source table name
 
 switch ($srctbl) {
 	case 'host_templates':
@@ -1401,7 +1401,7 @@ elseif ($srctbl == 'simple_graph') {
 		));
 	}
 
-	if  ($multiselect) {
+	if ($multiselect) {
 		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('items', ".zbx_jsvalue($reference).');');
 		$table->setFooter(new CCol($button, 'right'));
 

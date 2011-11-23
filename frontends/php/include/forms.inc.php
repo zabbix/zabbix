@@ -61,7 +61,7 @@
 
 		$form->addRow(_('Update interval (in sec)'), $delayBox);
 
-		$tblSteps = new CTableInfo(S_NO_SLIDES_DEFINED);
+		$tblSteps = new CTableInfo(_('No slides defined.'));
 		$tblSteps->setHeader(array(S_SCREEN, S_DELAY, S_SORT));
 		if(count($steps) > 0){
 			ksort($steps);
@@ -637,7 +637,7 @@
 		foreach(array('filter_data_type_label','filter_data_type') as $vItem)
 			zbx_subarray_push($fVTypeVisibility, ITEM_VALUE_TYPE_UINT64, $vItem);
 
-		$col_table3->addRow(array(bold(S_TYPE_OF_INFORMATION.': '), $cmbValType));
+		$col_table3->addRow(array(bold(_('Type of information').': '), $cmbValType));
 
 		zbx_add_post_js("var filterValueTypeSwitcher = new CViewSwitcher('filter_value_type', 'change', ".zbx_jsvalue($fVTypeVisibility, true).");");
 //second row
@@ -926,7 +926,7 @@
 
 		if(($filter_value_type == -1) && (count($item_params['value_types']) > 1)){
 			$value_types_output = prepare_subfilter_output($item_params['value_types'], $subfilter_value_types, 'subfilter_value_types');
-			$table_subfilter->addRow(array(S_TYPE_OF_INFORMATION, $value_types_output));
+			$table_subfilter->addRow(array(_('Type of information'), $value_types_output));
 		}
 
 		if(($filter_status == -1) && (count($item_params['status']) > 1)){
@@ -1460,7 +1460,7 @@
 			$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
 		}
 
-		$frmItem->addRow(S_TYPE_OF_INFORMATION,$cmbValType);
+		$frmItem->addRow(_('Type of information'), $cmbValType);
 
 		if($limited){
 			$frmItem->addVar('data_type', $data_type);
@@ -1628,7 +1628,7 @@
 
 
 		$new_app = new CTextBox('new_application',$new_application,40);
-		$frmItem->addRow(S_NEW_APPLICATION,$new_app,'new');
+		$frmItem->addRow(_('New application'), $new_app, 'new');
 
 		$cmbApps = new CListBox('applications[]',$applications,6);
 		$cmbApps->addItem(0,'-'.S_NONE.'-');
@@ -1882,7 +1882,7 @@
 		$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
 		$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
 		$frmItem->addRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),
-			S_TYPE_OF_INFORMATION), $cmbValType);
+			_('Type of information')), $cmbValType);
 
 		$cmbDataType = new CComboBox('data_type',$data_type);
 		$cmbDataType->addItems(item_data_type2str());
