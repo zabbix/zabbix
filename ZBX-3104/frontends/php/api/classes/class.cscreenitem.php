@@ -281,8 +281,7 @@ class CScreenItem extends CZBXAPI {
 
 
 	/**
-	 * Returns true if the given screen items rules exists and are available for
-	 * reading.
+	 * Returns true if the given screen items exist and are available for reading.
 	 *
 	 * @param array $screenItemIds  An array if screen item IDs
 	 * @return boolean
@@ -308,8 +307,7 @@ class CScreenItem extends CZBXAPI {
 
 
 	/**
-	 * Returns true if the given screen items exists and are available for
-	 * writing.
+	 * Returns true if the given screen items exist and are available for writing.
 	 *
 	 * @param array $screenItemIds  An array if screen item IDs
 	 * @return boolean
@@ -342,7 +340,7 @@ class CScreenItem extends CZBXAPI {
 	 * against the ones given in $dbScreenItems. If a screen item is not present in
 	 * $dbScreenItems, a ZBX_API_ERROR_PERMISSIONS exception will be thrown.
 	 *
-	 * @throws APIException if a validation error occurres.
+	 * @throws APIException if a validation error occurred.
 	 *
 	 * @param array $screenItems	An array of screen items to validate
 	 * @param array $dbScreenItems	An array of screen items $screenItems should
@@ -366,7 +364,7 @@ class CScreenItem extends CZBXAPI {
 
 			// check resource type
 			if (!$this->isValidResourceType($screenItem['resourcetype'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource provided for screen item'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource type provided for screen item.'));
 			}
 
 			// perform resource type specific validation
@@ -415,7 +413,6 @@ class CScreenItem extends CZBXAPI {
 				}
 				$screens[] = $screenItem['resourceid'];
 			}
-			// check url
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_URL) {
 				if (!$screenItem['url']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No URL provided for screen element.'));
@@ -554,9 +551,9 @@ class CScreenItem extends CZBXAPI {
 		$sqlWhere = ($sqlParts['where']) ? ' AND '.implode(' AND ', $sqlParts['where']) : '';
 		$sqlGroup = ($sqlParts['group']) ? ' GROUP BY '.implode(',', $sqlParts['group']) : '';
 		$sqlOrder = ($sqlParts['order']) ? ' ORDER BY '.implode(',', $sqlParts['order']) : '';
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
-				FROM '.$sqlFrom.'
-				WHERE '.DBin_node('si.screenitemid', $nodeids).
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+				' FROM '.$sqlFrom.
+				' WHERE '.DBin_node('si.screenitemid', $nodeids).
 					$sqlWhere.
 				$sqlGroup.
 				$sqlOrder;
@@ -589,7 +586,7 @@ class CScreenItem extends CZBXAPI {
 
 		// count
 		if ($options['countOutput']) {
-			$sqlParts['select'] = array('count(DISTINCT si.screenitemid) as rowscount');
+			$sqlParts['select'] = array('COUNT(DISTINCT si.screenitemid) AS rowscount');
 		}
 
 		// sort
