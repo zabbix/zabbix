@@ -100,6 +100,9 @@ function show_popup_menu(e, content, width){
 		width = max_width;
 	}
 
+	if (width == 0)
+		width = 220;
+
 	var pos = [
 		{'block_top': -12, 'block_left': -5, 'width': width},
 		{'block_top': 5, 'block_left': width-5, 'width': width}
