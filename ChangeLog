@@ -331,14 +331,14 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 1.8.10
+Changes for 1.8.10rc1
 
- - [ZBX-2859] fixed possible to successfully delete zero regular expressions (sanja)
- - [ZBX-2843] fixed dashboard and slideshow popup menus now have dynamic width (sanja)
+ - [ZBX-2859] fixed possibility to successfully delete zero regular expressions (sanja)
+ - [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
  - [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
  - [ZBX-4375] updated Russian translation; thanks to Alexey Pustovalov (Richlv)
  - [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (dimir,asaveljevs)
- - [ZBX-4249] fixed trigger wizard when insert macro multiple times (Vedmak)
+ - [ZBX-4249] fixed trigger wizard when inserting macro multiple times (Vedmak)
  - [ZBX-4351] updated French translation; thanks to Joseph Bueno (Richlv)
  - [ZBX-4353] updated Japanese translation; thanks to Kodai Terashima (Richlv)
 
