@@ -264,7 +264,6 @@
 	'S_NODES'=>				_('Nodes'),
 	'S_NODES_BIG'=>				_('NODES'),
 	'S_NEW_NODE'=>				_('New node'),
-	'S_NO_NODES_DEFINED'=>			_('No nodes defined.'),
 	'S_ALL_NODES'=>				_('All nodes'),
 	'S_DELETE_SELECTED_NODE_Q'=>		_('Delete selected node?'),
 
@@ -319,10 +318,6 @@
 	'S_DRAW_STYLE'=>			_('Draw style'),
 	'S_SIMPLE'=>				_('Simple'),
 	'S_GRAPH_TYPE'=>			_('Graph type'),
-	'S_STACKED'=>				_('Stacked'),
-	'S_NORMAL'=>				_('Normal'),
-	'S_PIE'=>				_('Pie'),
-	'S_EXPLODED'=>				_('Exploded'),
 	'S_AGGREGATED'=>			_('Aggregated'),
 	'S_AGGREGATED_PERIODS_COUNT'=>		_('Aggregated periods count'),
 
@@ -427,14 +422,6 @@
 	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
 	'S_APPLICATIONS_BIG'=>				_('APPLICATIONS'),
-	'S_CREATE_APPLICATION'=>			_('Create application'),
-	'S_APPLICATION_UPDATED'=>			_('Application updated'),
-	'S_CANNOT_UPDATE_APPLICATION'=>			_('Cannot update application'),
-	'S_APPLICATION_ADDED'=>				_('Application added'),
-	'S_CANNOT_ADD_APPLICATION'=>			_('Cannot add application'),
-	'S_APPLICATION_DELETED'=>			_('Application deleted'),
-	'S_CANNOT_DELETE_APPLICATION'=>			_('Cannot delete application'),
-	'S_NO_APPLICATIONS_DEFINED'=>			_('No applications defined.'),
 	'S_HOSTS'=>					_('Hosts'),
 	'S_ITEMS'=>					_('Items'),
 	'S_ITEMS_BIG'=>					_('ITEMS'),
@@ -443,10 +430,6 @@
 	'S_CANNOT_UPDATE_HOST'=>			_('Cannot update host'),
 	'S_HOST_STATUS_UPDATED'=>			_('Host status updated'),
 	'S_HOST_GROUPS_BIG'=>				_('HOST GROUPS'),
-	'S_NO_HOST_GROUPS_DEFINED'=>			_('No host groups defined.'),
-	'S_NO_HOSTS_DEFINED'=>				_('No hosts defined.'),
-	'S_NO_TEMPLATES_DEFINED'=>			_('No templates defined.'),
-	'S_NO_PROXIES_DEFINED'=>			_('No proxies defined.'),
 	'S_HOST'=>					_('Host'),
 	'S_CONNECT_TO'=>				_('Connect to'),
 	'S_DNS'=>					_('DNS'),
@@ -491,7 +474,6 @@
 	'S_CREATE_PROXY'=>				_('Create proxy'),
 	'S_PROXY_NAME'=>				_('Proxy name'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
-	'S_UPDATED_STATUS_OF_HOST' =>		_('Updated status of host'),
 	'S_CLEAR_WHEN_UNLINKING' => _('Clear when unlinking'),
 	'S_SNMP' =>						_('SNMP'),
 	'S_INTERFACES' =>				_('Interfaces'),
@@ -525,7 +507,6 @@
 	'S_WITH_TRIGGERS'=>					_('With triggers'),
 	'S_WITHOUT_TRIGGERS'=>					_('Without triggers'),
 	'S_TYPES'=>						_('Types'),
-	'S_NO_ITEMS_DEFINED'=>					_('No items defined.'),
 	'S_CLEAR_HISTORY'=>					_('Clear history'),
 	'S_CANNOT_CLEAR_HISTORY'=>				_('Cannot clear history'),
 	'S_CONFIGURATION_OF_ITEMS'=>				_('Configuration of items'),
@@ -536,8 +517,6 @@
 	'S_CANNOT_DELETE_ITEM'=>				_('Cannot delete item'),
 	'S_ITEMS_DELETED'=>					_('Items deleted'),
 	'S_CANNOT_DELETE_ITEMS'=>				_('Cannot delete items'),
-	'S_ITEMS_ACTIVATED'=>					_('Items activated'),
-	'S_ITEMS_DISABLED'=>					_('Items disabled'),
 	'S_KEY'=>						_('Key'),
 	'S_DESCRIPTION'=>					_('Description'),
 	'S_INTERVAL'=>						_('Interval'),
@@ -550,7 +529,6 @@
 	'S_UNITS'=>						_('Units'),
 	'S_KEEP_HISTORY_IN_DAYS'=>				_('Keep history (in days)'),
 	'S_KEEP_TRENDS_IN_DAYS'=>				_('Keep trends (in days)'),
-	'S_TYPE_OF_INFORMATION'=>				_('Type of information'),
 	'S_DATA_TYPE'=>						_('Data type'),
 	'S_DECIMAL'=>						_('Decimal'),
 	'S_OCTAL'=>						_('Octal'),
@@ -593,7 +571,6 @@
 	'S_FLEXIBLE_INTERVALS'=>				_('Flexible intervals (sec)'),
 	'S_NO_FLEXIBLE_INTERVALS'=>				_('No flexible intervals'),
 	'S_PARAMS'=>						_('Additional parameters'),
-	'S_NEW_APPLICATION'=>					_('New application'),
 	'S_IPMI_SENSOR'=>					_('IPMI sensor'),
 	'S_TEMPLATED_ITEM'=>					_('Templated item'),
 	'S_WEB_ITEM'=>						_('Web item'),
@@ -669,7 +646,6 @@
 	'S_MAP_DELETED'=>			_('Network map deleted'),
 	'S_CANNOT_DELETE_MAP'=>			_('Cannot delete network map'),
 	'S_MAPS_BIG'=>					_('MAPS'),
-	'S_NO_MAPS_DEFINED'=>			_('No maps defined.'),
 	'S_CREATE_MAP'=>				_('Create map'),
 	'S_IMPORT_MAP'=>				_('Import map'),
 	'S_DELETE_SELECTED_MAPS_Q'=>		_('Delete selected maps?'),
@@ -855,7 +831,6 @@
 	'S_CANNOT_DELETE_SCREEN'=>		_('Cannot delete screen'),
 	'S_COLUMNS'=>				_('Columns'),
 	'S_ROWS'=>				_('Rows'),
-	'S_NO_SCREENS_DEFINED'=>		_('No screens defined.'),
 	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
 	'S_SCREEN_CELL_CONFIGURATION'=>		_('Screen cell configuration'),
 	'S_RESOURCE'=>					_('Resource'),
@@ -881,7 +856,6 @@
 	'S_SLIDESHOWS_BIG'=>			_('SLIDE SHOWS'),
 	'S_NO_SLIDESHOWS_DEFINED'=>		_('No slide shows defined.'),
 	'S_COUNT_OF_SLIDES'=>			_('Count of slides'),
-	'S_NO_SLIDES_DEFINED'=>			_('No slides defined.'),
 	'S_SLIDES'=>					_('Slides'),
 	'S_NEW_SLIDE'=>					_('New slide'),
 	'S_SHOW_TEXT_AS_HTML'=>			_('Show text as HTML'),
@@ -1148,7 +1122,6 @@
 	'S_EMPTY'=>					_('Empty'),
 	'S_NO_ITEMS'=>				_('No items'),
 	'S_DISCOVERY_RULES_BIG'=>	_('DISCOVERY RULES'),
-	'S_CANNOT_SWITCH_HOSTS'=>	_('You can not switch hosts for current selection'),
 
 //	popup_period.php
 	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -1175,12 +1148,6 @@
 	'S_EXPRESSION_NOT_A_MACRO_ERROR'=>	_('Given expression is not a macro'),
 	'S_RESULT_TYPE'=>	_('Result type'),
 	'S_COMBINED_RESULT'=>	_('Combined result'),
-
-//  applications.php
-	'S_DELETE_APPLICATION'=>	_('Delete this application?'),
-	'S_ACTIVATE_SELECTED_APPLICATIONS' => _('Activate selected applications?'),
-	'S_DISABLE_SELECTED_APPLICATIONS' => _('Disable selected applications?'),
-	'S_DELETE_SELECTED_APPLICATIONS'  => _('Delete selected applications?'),
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	_('Incorrect time period'),
@@ -1217,24 +1184,19 @@
 
 //	items.inc.php
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	_('Incorrect arguments passed to function'),
-	'S_ALREADY_EXISTS_FOR_HOST_SMALL'=>		_('already exists for host'),
 	'S_UPDATED_SMALL'=>				_('updated'),
-	'S_NO_ITEM_WITH'=>				_('No item with'),
 
 //	httptest.inc.php
 	'S_ADDED_SMALL'=>				_('added'),
 
 //	hosts.inc.php
 	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		_('is internal and can not be deleted'),
-	'S_NO_HOST_WITH'=>				_('No host with'),
-	'S_USED_BY_SCENARIO_SMALL'=>			_('used by scenario'),
 	'S_NO_APPLICATION_WITH'=>			_('No application with'),
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			_('Template with item key'),
 	'S_TEMPLATE_WITH_APPLICATION'=>			_('Template with application'),
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		_('already linked to host'),
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		_('Host'),
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		_('has been deleted from the system'),
-	'S_AND_CANT_BE_DELETED' => _('and can\'t be deleted'),
 
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					_('No trigger with'),
