@@ -236,7 +236,7 @@
 				return false;
 			}
 			foreach ($port_range as $port) {
-				if (!is_numeric($port) || $port > 65535 || $port < 0 ) {
+				if (!validatePortNumber($port)) {
 					return false;
 				}
 			}
@@ -379,26 +379,6 @@
 				}
 			}
 			return ZBX_VALID_OK;
-		}
-
-		if ($type == T_ZBX_PORTS) {
-			$err = ZBX_VALID_OK;
-			$type = ($flags&P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
-			foreach (explode(',', $var) as $el) {
-				foreach (explode('-', $el) as $p) {
-					$err |= check_type($field, $flags, $p, T_ZBX_INT);
-					if (($p > 65535) || ($p < 0)) {
-						$err |= $type;
-					}
-				}
-			}
-			if ($err == ZBX_VALID_ERROR) {
-				info(_s('Critical error. Field [%1$s] is not PORT range.', $field));
-			}
-			elseif ($err == ZBX_VALID_WARNING) {
-				info(_s('Warning. Field [%1$s] is not PORT range.', $field));
-			}
-			return $err;
 		}
 
 		if ($type == T_ZBX_INT_RANGE) {
@@ -622,5 +602,21 @@
 			show_messages($err == ZBX_VALID_OK, null, _('Page received incorrect data.'));
 		}
 		return $err == ZBX_VALID_OK ? 1 : 0;
+	}
+
+	function validatePortNumber($port, $allowEmpty = false, $allowUserMacro = false) {
+		if ($allowEmpty && zbx_empty($port)) {
+			return true;
+		}
+
+		if (zbx_ctype_digit($port) && $port >= 0 && $port <= 65535) {
+			return true;
+		}
+
+		if ($allowUserMacro && preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $port)) {
+			return true;
+		}
+
+		return false;
 	}
 ?>
