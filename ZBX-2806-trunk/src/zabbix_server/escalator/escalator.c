@@ -1178,11 +1178,12 @@ static void	process_escalations(int now)
 			"select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status"
 			" from escalations"
 			" where (status=%d and nextcheck<=%d"
-			" or status=%d and r_eventid<>0)" DB_NODE
+			" or status=%d and r_eventid not null)" DB_NODE
 			" order by actionid,triggerid,escalationid",
 			ESCALATION_STATUS_ACTIVE,
 			now,
-			ESCALATION_STATUS_SLEEP);
+			ESCALATION_STATUS_SLEEP,
+			DBnode_local("escalationid"));
 
 	memset(&escalation, 0, sizeof(escalation));
 
