@@ -369,7 +369,7 @@ require_once('include/page_header.php');
 		$options = array(
 			'hostids' => $hostid,
 			'templated_hosts' => 1,
-			'output' => array('hostid', 'host'),
+			'output' => array('hostid', 'name'),
 			'limit' => 1
 		);
 		$only_hosts = API::Host()->get($options);
@@ -378,7 +378,7 @@ require_once('include/page_header.php');
 		if(empty($host)) access_deny();
 
 		$cmbHosts = new CComboBox('hostid',$hostid);
-		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$host['host']);
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$host['name']);
 		$cmbHosts->setEnabled('disabled');
 		$cmbHosts->setAttribute('title', S_CANNOT_SWITCH_HOSTS);
 
