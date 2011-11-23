@@ -1759,7 +1759,7 @@ function triggerExpression($trigger, $html, $template=false, $resolve_macro=fals
 			$dependency = false;
 			$dep_table = new CTableInfo();
 			$dep_table->setAttribute('style', 'width: 200px;');
-			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
+			$dep_table->addRow(bold(_('Depends on').':'));
 
 			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$triggerid;
 			$dep_res = DBselect($sql_dep);

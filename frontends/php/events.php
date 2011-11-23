@@ -472,7 +472,7 @@ require_once('include/page_header.php');
 							$event_data['object_data']['port'] = S_UNKNOWN;
 						}
 
-						$event_data['description'] = S_SERVICE.': '.
+						$event_data['description'] = _('Service').': '.
 								discovery_check_type2str($event_data['object_data']['type']).
 								discovery_port2str($event_data['object_data']['type'], $event_data['object_data']['port']);
 
