@@ -27,16 +27,88 @@
 //        This script adapted by Eugene Grigorjev for using as popup menu
 //        of Zabbix software. See http://www.zabbix.com.
 //debugger;
-function show_popup_menu(e, content, width) {
-	if (!width) {
-		width = 170;
+
+// Getting CSS style property
+function get_style(el,styleProp) {
+	if (el.currentStyle) {
+		var y = el.currentStyle[styleProp];
 	}
+	else if (window.getComputedStyle) {
+		var y = document.defaultView.getComputedStyle(el,null).getPropertyValue(styleProp);
+	}
+	return y;
+}
+
+// Getting text width in user's browser
+function get_real_text_width(text, id) {
+	var item_type = 'pum_o_submenu';
+	if (id==0) {
+		item_type = 'pum_iheader';
+	}
+
+	var test_element = document.createElement('div');
+	test_element.setAttribute('class', item_type);
+	test_element.setAttribute('style', 'visibility: hidden');
+	document.body.appendChild(test_element);
+
+	var font_size_text = get_style(test_element, 'font-size');
+	if (!font_size_text) {
+		font_size_text = get_style(test_element, 'fontSize');
+	}
+
+	var font_size = parseInt(font_size_text);
+	font_size += 2;
+
+	var margin_left_text = get_style(test_element, 'margin-left');
+	if (!margin_left_text) {
+		margin_left_text = get_style(test_element, 'marginLeft');
+	}
+
+	var margin_left = parseInt(margin_left_text);
+
+	document.body.removeChild(test_element);
+
+	test_element = document.createElement('a');
+	test_element.setAttribute('class', item_type);
+	test_element.setAttribute('style', 'font-size: '+font_size+'px; visibility: hidden');
+	test_element.innerHTML = text;
+
+	document.body.appendChild(test_element);
+
+	var tmp_len = test_element.offsetWidth+margin_left+5;
+
+	document.body.removeChild(test_element);
+	test_element = null;
+
+	return tmp_len;
+}
+
+function show_popup_menu(e, content, width){
+	var cursor = get_cursor_position(e);
+	var tmp_width = 0;
+	var max_width = 0;
+
+	for (i = 0; i < content.length; i++) {
+		tmp_width = get_real_text_width(content[i][0], i);
+
+		if (max_width < tmp_width) {
+			max_width = tmp_width;
+		}
+	}
+
+	if (width == null || width < max_width) {
+		width = max_width;
+	}
+
+	if (width == 0)
+		width = 220;
+
 	var pos = [
 		{'block_top' : -12, 'block_left' : -5, 'width' : width},
 		{'block_top' : 5, 'block_left' : width - 5, 'width' : width}
 	];
-	var cursor = get_cursor_position(e);
-	new popup_menu(content, pos, cursor.x, cursor.y);
+
+	new popup_menu (content, pos, cursor.x, cursor.y);
 
 	return false;
 }
@@ -337,7 +409,8 @@ function menu_item (o_parent, n_order) {
 	}
 
 	if (!o_parent.n_y_direction && !n_order) {
-		var mi_direction = 1; // always show menu in down direction
+		//	always show menu in down direction.
+		var mi_direction = 1;
 		o_parent.set_y_direction(mi_direction);
 	}
 
