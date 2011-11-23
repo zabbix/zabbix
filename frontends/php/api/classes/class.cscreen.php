@@ -745,7 +745,7 @@ SDI('/////////////////////////////////');
 			'preservekeys' => true,
 		));
 
-		// udpate the new ones
+		// update the new ones
 		foreach ($screenItems as &$screenItem) {
 			$screenItem['screenid'] = $screenid;
 		}

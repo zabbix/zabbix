@@ -165,7 +165,7 @@ if (isset($_REQUEST['save'])) {
 		$result = API::ScreenItem()->create(array($_REQUEST));
 	}
 
-	DBend(($result));
+	DBend($result);
 	show_messages($result, $msg_ok, $msg_err);
 
 	// success
