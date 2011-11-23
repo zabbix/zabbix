@@ -127,27 +127,29 @@
 <![endif]-->
 
 <?php
-	if(isset($DB['DB']) && !is_null($DB['DB'])){
+	if (!empty($DB['DB'])) {
 		$config = select_config();
 
-		$css = getUserTheme($USER_DETAILS);
-		$config=select_config();
-		if($css){
-			print('<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n");
-			print('<!--[if IE 6]><link rel="stylesheet" type="text/css" href="styles/ie_'.$css.'" /><![endif]-->'."\n");
+		$cssFile = getUserTheme($USER_DETAILS);
+		if ($cssFile) {
+			print('<link rel="stylesheet" type="text/css" href="styles/'.$cssFile.'" />'."\n");
+			if (file_exists('styles/ie_'.$cssFile)) {
+				print('<!--[if IE 6]><link rel="stylesheet" type="text/css" href="styles/ie_'.$cssFile.'" /><![endif]-->'."\n");
+			}
 		}
 	}
 
-	if($page['file'] == 'sysmap.php')
+	if ($page['file'] == 'sysmap.php') {
 		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />');
+	}
 ?>
 <script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
 	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&lang='.$USER_DETAILS['lang'];
 	print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
 
-	if(isset($page['scripts']) && is_array($page['scripts']) && !empty($page['scripts'])){
-		foreach($page['scripts'] as $id => $script){
+	if (!empty($page['scripts']) && is_array($page['scripts'])){
+		foreach ($page['scripts'] as $id => $script) {
 			$path .= '&files[]='.$script;
 		}
 		print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
