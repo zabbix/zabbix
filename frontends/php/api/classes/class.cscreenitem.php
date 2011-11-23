@@ -373,7 +373,8 @@ class CScreenItem extends CZBXAPI {
 				SCREEN_RESOURCE_HOSTS_INFO,
 				SCREEN_RESOURCE_TRIGGERS_INFO,
 				SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
-				SCREEN_RESOURCE_HOSTGROUP_TRIGGERS
+				SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
+				SCREEN_RESOURCE_DATA_OVERVIEW
 			);
 			if (in_array($screenItem['resourcetype'], $hostGroupResourceTypes)) {
 				if (!$screenItem['resourceid']) {
