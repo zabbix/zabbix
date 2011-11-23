@@ -535,18 +535,11 @@ Copt::memoryPick();
 				}
 			}
 
-			if(!isset($interface['port']) || zbx_empty($interface['port'])){
+			if (!isset($interface['port'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Port cannot be empty for host interface.'));
 			}
-
-			if(isset($interface['port'])){
-				if(zbx_ctype_digit($interface['port'])){
-					if($interface['port'] > 65535 || $interface['port'] < 0)
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface PORT "%s" provided', $interface['port']));
-				}
-				else if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $interface['port'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface PORT "'.$interface['port'].'". '.S_WRONG_MACRO);
-				}
+			elseif (!validatePortNumber($interface['port'], false, true)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface port "%s" provided', $interface['port']));
 			}
 
 			if($update){
