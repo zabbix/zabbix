@@ -343,6 +343,7 @@ Changes for 1.8.9
 
 Changes for 1.8.9rc2
 
+ - [ZBX-2843] fixed dashboard and slideshow popup menus now have dynamic width (sanja)
  - [ZBX-4352] fixed template linking when mass updating hosts (pavels,Vedmak)
 
 Changes for 1.8.9rc1

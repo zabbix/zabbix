@@ -648,7 +648,7 @@ function create_page_menu(e,id) {
 			dbrd_menu[dbrd_menu.length-1].push(menu_row);
 		}
 	}
-	show_popup_menu(e, dbrd_menu, 280);
+	show_popup_menu(e, dbrd_menu);
 }
 
 // triggers js menu
