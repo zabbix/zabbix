@@ -362,10 +362,7 @@ abstract class CItemGeneral extends CZBXAPI{
 		}
 		// the item uses a specific type of interface
 		elseif ($type !== false) {
-			if (!isset($typeInterface[$type])) {
-				$matchingInterface = array();
-			}
-			$matchingInterface = $typeInterface[$type];
+			$matchingInterface = (isset($typeInterface[$type])) ? $typeInterface[$type] : array();
 		}
 		// the item does not need an interface
 		else {

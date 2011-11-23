@@ -1333,7 +1333,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	int		history_text_num, history_log_num, i;
 	zbx_uint64_t	id;
 #ifdef HAVE_MULTIROW_INSERT
-	int		tmp_offset;
+	size_t		tmp_offset;
 	const char	*row_dl = ",";
 #else
 	const char	*row_dl = ";\n";
@@ -1758,7 +1758,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	int		i;
 	char		*value_esc, *source_esc;
 #ifdef HAVE_MULTIROW_INSERT
-	int		tmp_offset;
+	size_t		tmp_offset;
 	const char	*row_dl = ",";
 #else
 	const char	*row_dl = ";\n";

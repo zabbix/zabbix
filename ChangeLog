@@ -17,6 +17,7 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-3771] fixed possible 'Lock wait timeout' while processing lld rules (Sasha,pavels)
  - [ZBX-4139] fixed "Last n issues" widget label ignoring variable that sets the amount of issues (Richlv)
  - [ZBX-4359] fixed potentially incorrectly named index on node_cksum table (Richlv, sasha)
  - [ZBX-4188] fixed nclob problem for Oracle (Vedmak)

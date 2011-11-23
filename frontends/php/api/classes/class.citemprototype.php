@@ -863,7 +863,8 @@ COpt::memoryPick();
 		$chdHosts = API::Host()->get(array(
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
-			'output' => array('hostid', 'host'),
+			'output' => array('hostid', 'host', 'status'),
+			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'templated_hosts' => true
@@ -926,6 +927,21 @@ COpt::memoryPick();
 					}
 				}
 
+				if ($host['status'] == HOST_STATUS_TEMPLATE || !isset($item['type'])) {
+					unset($item['interfaceid']);
+				}
+				elseif ((isset($item['type']) && isset($exItem) && $item['type'] != $exItem['type']) || !isset($exItem)) {
+
+					// find a matching interface
+					$interface = self::findInterfaceForItem($item, $host['interfaces']);
+					if ($interface) {
+						$item['interfaceid'] = $interface['interfaceid'];
+					}
+					// no matching interface found, throw an error
+					elseif($interface !== false) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
+					}
+				}
 // coping item
 				$newItem = $item;
 				$newItem['hostid'] = $host['hostid'];
