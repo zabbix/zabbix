@@ -114,7 +114,7 @@ class CScreenItem extends CZBXAPI {
 		$result = array();
 		while ($row = DBfetch($res)) {
 			// a count query, return a single result
-			if ($options['countOutput']) {
+			if ($options['countOutput'] !== null) {
 				$result = $row['rowscount'];
 			}
 			// a normal select query
@@ -124,7 +124,7 @@ class CScreenItem extends CZBXAPI {
 		}
 
 		// remove keys
-		if (!$options['preservekeys']) {
+		if ($options['preservekeys'] === null) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -544,7 +544,7 @@ class CScreenItem extends CZBXAPI {
 		$sqlParts = $this->buildSqlFilters($options, $sqlParts);
 
 		// check nodes
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+		$nodeids = ($options['nodeids'] !== null) ? $options['nodeids'] : get_current_nodeid();
 
 		// build query
 		$sqlSelect = implode(',', $sqlParts['select']);
@@ -586,7 +586,7 @@ class CScreenItem extends CZBXAPI {
 		}
 
 		// count
-		if ($options['countOutput']) {
+		if ($options['countOutput'] !== null) {
 			$sqlParts['select'] = array('COUNT(DISTINCT si.screenitemid) AS rowscount');
 		}
 
@@ -615,13 +615,13 @@ class CScreenItem extends CZBXAPI {
 	protected function buildSqlFilters(array $options, array $sqlParts) {
 
 		// screen item ids
-		if ($options['screenitemids']) {
+		if ($options['screenitemids'] !== null) {
 			zbx_value2array($options['screenitemids']);
 			$sqlParts['where'][] = DBcondition('si.screenitemid', $options['screenitemids']);
 		}
 
 		// screen ids
-		if ($options['screenids']) {
+		if ($options['screenids'] !== null) {
 			zbx_value2array($options['screenids']);
 			$sqlParts['where'][] = DBcondition('si.screenid', $options['screenids']);
 		}
