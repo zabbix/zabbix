@@ -75,7 +75,7 @@ function get_real_text_width(text, id) {
 
 	document.body.appendChild(test_element);
 
-	var tmp_len = test_element.offsetWidth+margin_left;
+	var tmp_len = test_element.offsetWidth+margin_left+5;
 
 	document.body.removeChild(test_element);
 	test_element = null;
