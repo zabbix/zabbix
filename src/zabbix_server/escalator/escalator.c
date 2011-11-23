@@ -1178,7 +1178,7 @@ static void	process_escalations(int now)
 			"select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status"
 			" from escalations"
 			" where (status=%d and nextcheck<=%d"
-			" or status=%d and r_eventid not null)" DB_NODE
+			" or status=%d and r_eventid is not null)" DB_NODE
 			" order by actionid,triggerid,escalationid",
 			ESCALATION_STATUS_ACTIVE,
 			now,
