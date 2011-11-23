@@ -1482,7 +1482,7 @@ require_once('include/page_header.php');
 
 		foreach($items as $tnum => $row){
 			$host = reset($row['hosts']);
-			$row['host'] = $host['host'];
+			$row['host'] = $host['name'];
 
 			$row['name'] = itemName($row);
 			$description = new CSpan($row['name'],'link');
