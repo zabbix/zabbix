@@ -333,6 +333,10 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10
 
+ - [ZBX-2859] fixed possible to successfully delete zero regular expressions (sanja)
+ - [ZBX-2843] fixed dashboard and slideshow popup menus now have dynamic width (sanja)
+ - [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
+ - [ZBX-4375] updated Russian translation; thanks to Alexey Pustovalov (Richlv)
  - [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (dimir,asaveljevs)
  - [ZBX-4249] fixed trigger wizard when insert macro multiple times (Vedmak)
  - [ZBX-4351] updated French translation; thanks to Joseph Bueno (Richlv)
@@ -344,7 +348,6 @@ Changes for 1.8.9
 
 Changes for 1.8.9rc2
 
- - [ZBX-2843] fixed dashboard and slideshow popup menus now have dynamic width (sanja)
  - [ZBX-4352] fixed template linking when mass updating hosts (pavels,Vedmak)
 
 Changes for 1.8.9rc1
