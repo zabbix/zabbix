@@ -1526,6 +1526,7 @@ elseif ($srctbl == 'plain_text') {
 		$table->addRow(array(
 			$hostid > 0 ? null : $row['host'],
 			$description,
+			$row['key_'],
 			item_type2str($row['type']),
 			item_value_type2str($row['value_type']),
 			new CSpan(item_status2str($row['status']), item_status2style($row['status']))
