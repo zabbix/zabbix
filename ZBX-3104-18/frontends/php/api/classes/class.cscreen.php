@@ -712,7 +712,7 @@ SDI('/////////////////////////////////');
 
 			// udpate screen items
 			if (isset($screen['screenitems'])) {
-				$this->replaceItems($screenid, $screen['screenitems']);
+				self::replaceItems($screenid, $screen['screenitems']);
 			}
 			DB::update('screens', $update);
 
@@ -773,7 +773,7 @@ SDI('/////////////////////////////////');
 	 * @param int $screenid        The ID of the target screen
 	 * @param array $screenItems   An array of screen items
 	 */
-	protected function replaceItems($screenid, $screenItems){
+	protected static function replaceItems($screenid, $screenItems){
 		// fetch the current screen items
 		$dbScreenItems = CScreenItem::get(array(
 			'screenids' => $screenid,

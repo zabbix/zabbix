@@ -143,7 +143,7 @@ class CScreenItem extends CZBXAPI {
 
 		try {
 			self::BeginTransaction(__METHOD__);
-			
+
 			// validate input
 			self::checkInput($screenItems);
 
@@ -151,7 +151,7 @@ class CScreenItem extends CZBXAPI {
 			$screenItemIds = DB::insert('screens_items', $screenItems);
 
 			self::EndTransaction(true, __METHOD__);
-			
+
 			return array('screenitemids' => $screenItemIds);
 		}
 		catch(APIException $e){
@@ -175,7 +175,7 @@ class CScreenItem extends CZBXAPI {
 
 		try{
 			self::BeginTransaction(__METHOD__);
-			
+
 			// fetch the items we're updating
 			$screenItemIds = zbx_objectValues($screenItems, 'screenitemid');
 			$dbScreenItems = self::get(array(
@@ -197,7 +197,7 @@ class CScreenItem extends CZBXAPI {
 					'where' => array('screenitemid='.$screenItemId)
 				);
 			}
-			
+
 			DB::update('screens_items', $update);
 
 			self::EndTransaction(true, __METHOD__);
@@ -224,6 +224,8 @@ class CScreenItem extends CZBXAPI {
 	public static function updateByPosition(array $screenItems) {
 
 		try{
+			self::BeginTransaction(__METHOD__);
+
 			// create a screen-position map
 			$dbScreenItems = self::get(array(
 				'output' => array('screenitemid', 'x', 'y', 'screenid'),
@@ -265,7 +267,7 @@ class CScreenItem extends CZBXAPI {
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			
+
 			return array('screenitemids' => array_merge($updateItemIds, $createItemIds));
 		}
 		catch(APIException $e){
@@ -289,7 +291,7 @@ class CScreenItem extends CZBXAPI {
 
 		try{
 			self::BeginTransaction(__METHOD__);
-			
+
 			$screenItemIds = zbx_toArray($screenItemIds);
 
 			// check permissions
@@ -299,7 +301,7 @@ class CScreenItem extends CZBXAPI {
 			));
 			foreach ($screenItemIds as $screenItemId) {
 				if(!isset($dbScreenItems[$screenItemId])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
 
@@ -307,7 +309,7 @@ class CScreenItem extends CZBXAPI {
 			DB::delete('screens_items', DBcondition('screenitemid', $screenItemIds));
 
 			self::EndTransaction(true, __METHOD__);
-			
+
 			return array('screenitemids' => $screenItemIds);
 		}
 		catch(APIException $e){
@@ -399,12 +401,12 @@ class CScreenItem extends CZBXAPI {
 
 			// check if the item is editable
 			if ($dbScreenItems && !isset($dbScreenItems[$screenItem['screenitemid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
 			// check resource type
 			if (!self::isValidResourceType($screenItem['resourcetype'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource type provided for screen item.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 			}
 
 			// perform resource type specific validation
@@ -418,44 +420,44 @@ class CScreenItem extends CZBXAPI {
 			);
 			if (in_array($screenItem['resourcetype'], $hostGroupResourceTypes)) {
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No host group ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 				$hostgroups[] = $screenItem['resourceid'];
 			}
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_HOST_TRIGGERS) {
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No host ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 				$hosts[] = $screenItem['resourceid'];
 			}
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_GRAPH) {
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No graph ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 				$graphs[] = $screenItem['resourceid'];
 			}
 			elseif (in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))) {
 
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 				$items[] = $screenItem['resourceid'];
 			}
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_MAP) {
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No map ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 				$maps[] = $screenItem['resourceid'];
 			}
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_SCREEN) {
 				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No screen ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 				$screens[] = $screenItem['resourceid'];
 			}
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_URL) {
 				if (!$screenItem['url']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No URL provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 			}
 		}
@@ -469,7 +471,7 @@ class CScreenItem extends CZBXAPI {
 			));
 			foreach($hostgroups as $id){
 				if(!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect host group ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 			}
 		}
 
@@ -482,7 +484,7 @@ class CScreenItem extends CZBXAPI {
 			));
 			foreach ($hosts as $id) {
 				if (!isset($result[$id])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect host ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 			}
 		}
@@ -496,7 +498,7 @@ class CScreenItem extends CZBXAPI {
 			));
 			foreach ($graphs as $id) {
 				if (!isset($result[$id])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect graph ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 			}
 		}
@@ -511,7 +513,7 @@ class CScreenItem extends CZBXAPI {
 			));
 			foreach ($items as $id) {
 				if (!isset($result[$id])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect item ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 			}
 		}
@@ -525,7 +527,7 @@ class CScreenItem extends CZBXAPI {
 			));
 			foreach ($maps as $id) {
 				if (!isset($result[$id])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect map ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 			}
 		}
@@ -539,7 +541,7 @@ class CScreenItem extends CZBXAPI {
 			));
 			foreach ($screens as $id) {
 				if (!isset($result[$id])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect screen ID "%s" provided for screen element.', $id));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 			}
 		}

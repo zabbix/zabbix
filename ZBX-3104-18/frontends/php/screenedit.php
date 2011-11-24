@@ -101,14 +101,14 @@ include_once('include/page_header.php');
 		DBstart();
 
 		if (isset($_REQUEST['screenitemid'])) {
-			$msg_ok = _('Item updated');
-			$msg_err = _('Cannot update item');
+			$msg_ok = S_ITEM_UPDATED;
+			$msg_err = S_CANNOT_UPDATE_ITEM;
 
 			$result = CScreenItem::update(array($_REQUEST));
 		}
 		else {
-			$msg_ok = _('Item added');
-			$msg_err = _('Cannot add item');
+			$msg_ok = S_ITEM_ADDED;
+			$msg_err = S_CANNOT_ADD_ITEM;
 
 			$result = CScreenItem::create(array($_REQUEST));
 		}
