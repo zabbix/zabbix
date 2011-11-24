@@ -71,7 +71,7 @@ require_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('s.name',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$config_scr = $_REQUEST['config'] = get_request('config', 0);
 
@@ -326,7 +326,6 @@ require_once('include/page_header.php');
 		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 		$options = array(
-//				'selectScreenItems' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
 			'templateids' => $templateid,
@@ -339,7 +338,6 @@ require_once('include/page_header.php');
 		else
 			$screens = API::Screen()->get($options);
 
-		order_result($screens, $sortfield, $sortorder);
 		$paging = getPagingLine($screens);
 
 		foreach($screens as $num => $screen){
