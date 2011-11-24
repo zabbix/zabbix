@@ -22,10 +22,10 @@
 
 	function graphType($type=null){
 		$types = array(
-			GRAPH_TYPE_STACKED => S_STACKED,
-			GRAPH_TYPE_PIE => S_PIE,
-			GRAPH_TYPE_EXPLODED => S_EXPLODED,
-			GRAPH_TYPE_NORMAL => S_NORMAL,
+			GRAPH_TYPE_STACKED => _('Stacked'),
+			GRAPH_TYPE_PIE => _('Pie'),
+			GRAPH_TYPE_EXPLODED => _('Exploded'),
+			GRAPH_TYPE_NORMAL => _('Normal'),
 		);
 
 		if(is_null($type)){

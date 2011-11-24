@@ -199,7 +199,7 @@
 		$form = new CForm('get');
 		$form->setName('hosts');
 
-		$table = new CTableInfo(S_NO_PROXIES_DEFINED);
+		$table = new CTableInfo(_('No proxies defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_hosts', NULL, "checkAll('".$form->GetName()."','all_hosts','hosts');"),
 			make_sorting_header(S_NAME, 'host'),
