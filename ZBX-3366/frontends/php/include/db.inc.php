@@ -966,6 +966,7 @@ function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%s" not allowed.', $sortfield));
 			}
 
+			// add sort field to order
 			$sortorder = '';
 			if (is_array($options['sortorder'])) {
 				if (!empty($options['sortorder'][$i])) {
@@ -976,6 +977,13 @@ function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 				$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
 			}
 			$sql_parts['order'][] = $alias.'.'.$sortfield.' '.$sortorder;
+
+			// add sort field to select
+			if (count($sql_parts['from']) > 1) { // if distinct is used
+				if (!str_in_array($alias.'.'.$sortfield, $sql_parts['select']) && !str_in_array($alias.'.*', $sql_parts['select'])) {
+					$sql_parts['select'][$sortfield] = $alias.'.'.$sortfield;
+				}
+			}
 		}
 	}
 }
