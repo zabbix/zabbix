@@ -124,6 +124,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 		done
 
 		if test "x$enable_static" = "xyes"; then
+			_full_libcurl_libs=`$_libcurl_config --static-libs`
 			for i in $_full_libcurl_libs; do
 				case $i in
 					-lcurl)
@@ -133,7 +134,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 						AC_CHECK_LIB($_lib_name , main,[
 								LIBCURL_LIBS="$LIBCURL_LIBS $i"
 							],[
-								AC_MSG_ERROR([Not found $_lib_name library])
+								AC_MSG_ERROR([$_lib_name library not found])
 							])
 
 				;;
@@ -151,7 +152,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 		AC_CHECK_LIB(curl, main,[
 				LIBCURL_LIBS="-lcurl $LIBCURL_LIBS"
 			],[
-				AC_MSG_ERROR([Not found libcurl library])
+				AC_MSG_ERROR([libcurl library not found])
 			])
 
 		LIBS="${_save_curl_libs}"

@@ -1135,9 +1135,25 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 	dnl Checking for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
+
+  echo "
+
+enable_static=${enable_static}
+want_curl=${want_curl}
+_libcurl_config=${_libcurl_config}
+found_curl=${found_curl}
+libcurl_cv_lib_curl_usable=${libcurl_cv_lib_curl_usable}
+_full_libcurl_libs=[${_full_libcurl_libs=}]
+
+"
+
 	if test "x$want_curl" = "xyes"; then
 		if test "x$found_curl" != "xyes"; then
-			AC_MSG_ERROR([Curl library not found])
+			link_mode="dynamic"
+			if test "x$enable_static" = "xyes"; then
+				link_mode="static"
+			fi
+			AC_MSG_ERROR([Curl library not available for ${link_mode} linking])
 		fi
 	fi
 	if test "x$found_curl" = "xyes"; then
