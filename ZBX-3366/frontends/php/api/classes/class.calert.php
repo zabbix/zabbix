@@ -46,52 +46,56 @@ class CAlert extends CZBXAPI {
 	 * @param array $options['order']
 	 * @return array|int item data as array or false if error
 	 */
-	public function get($options = array()){
+	public function get($options = array()) {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
-		$sort_columns = array('alertid', 'clock', 'eventid', 'status'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
+
+		// allowed columns for sorting
+		$sort_columns = array('alertid', 'clock', 'eventid', 'status');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sql_parts = array(
-			'select' => array('alerts' => 'a.alertid'),
-			'from' => array('alerts' => 'alerts a'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null,
+			'select'	=> array('alerts' => 'a.alertid'),
+			'from'		=> array('alerts' => 'alerts a'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'groupids'				=> null,
-			'hostids'				=> null,
-			'alertids'				=> null,
-			'triggerids'			=> null,
-			'eventids'				=> null,
-			'actionids'				=> null,
-			'mediatypeids'			=> null,
-			'userids'				=> null,
-			'nopermissions'			=> null,
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'hostids'					=> null,
+			'alertids'					=> null,
+			'triggerids'				=> null,
+			'eventids'					=> null,
+			'actionids'					=> null,
+			'mediatypeids'				=> null,
+			'userids'					=> null,
+			'nopermissions'				=> null,
 			// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'time_from'				=> null,
-			'time_till'				=> null,
-			'searchWildcardsEnabled'=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'time_from'					=> null,
+			'time_till'					=> null,
+			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'				=> API_OUTPUT_REFER,
-			'selectMediatypes'		=> null,
-			'selectUsers'			=> null,
-			'selectHosts'			=> null,
-			'countOutput'			=> null,
-			'preservekeys'			=> null,
-			'editable'				=> null,
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null
+			'output'					=> API_OUTPUT_REFER,
+			'selectMediatypes'			=> null,
+			'selectUsers'				=> null,
+			'selectHosts'				=> null,
+			'countOutput'				=> null,
+			'preservekeys'				=> null,
+			'editable'					=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
 		$options = zbx_array_merge($def_options, $options);
 
@@ -100,7 +104,7 @@ class CAlert extends CZBXAPI {
 
 			$dbTable = DB::getSchema('alerts');
 			$sql_parts['select']['alertid'] = 'a.alertid';
-			foreach ($options['output'] as $key => $field) {
+			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'a.'.$field;
 				}

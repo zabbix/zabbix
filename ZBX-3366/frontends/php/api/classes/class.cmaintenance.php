@@ -57,39 +57,39 @@ class CMaintenance extends CZBXAPI {
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('maintenance' => 'm.maintenanceid'),
-			'from' => array('maintenances' => 'maintenances m'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('maintenance' => 'm.maintenanceid'),
+			'from'		=> array('maintenances' => 'maintenances m'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'groupids'				=> null,
-			'hostids'				=> null,
-			'maintenanceids'		=> null,
-			'editable'				=> null,
-			'nopermissions'			=> null,
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'hostids'					=> null,
+			'maintenanceids'			=> null,
+			'editable'					=> null,
+			'nopermissions'				=> null,
 			// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'filter'				=> null,
-			'searchWildcardsEnabled'=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'filter'					=> null,
+			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'				=> API_OUTPUT_REFER,
-			'selectGroups'			=> null,
-			'selectHosts'			=> null,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'preservekeys'			=> null,
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null,
+			'output'					=> API_OUTPUT_REFER,
+			'selectGroups'				=> null,
+			'selectHosts'				=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
 		$options = zbx_array_merge($def_options, $options);
 

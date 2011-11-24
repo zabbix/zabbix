@@ -41,59 +41,56 @@ class CApplication extends CZBXAPI{
  * @param string $options['order']
  * @return array|int item data as array or false if error
  */
-	public function get($options=array()){
-
+	public function get($options = array()) {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('applicationid', 'name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('applicationid', 'name');
 
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('apps' => 'a.applicationid'),
-			'from' => array('applications' => 'applications a'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('apps' => 'a.applicationid'),
+			'from'		=> array('applications' => 'applications a'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'groupids'				=> null,
-			'templateids'			=> null,
-			'hostids'				=> null,
-			'itemids'				=> null,
-			'applicationids'		=> null,
-			'templated'				=> null,
-			'editable'				=> null,
-			'inherited' 			=> null,
-			'nopermissions'			=> null,
-
-// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'exludeSearch'			=> null,
-			'searchWildcardsEnabled'=> null,
-
-// OutPut
-			'output'				=> API_OUTPUT_REFER,
-			'expandData'			=> null,
-			'selectHosts'			=> null,
-			'selectItems'			=> null,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'preservekeys'			=> null,
-
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'templateids'				=> null,
+			'hostids'					=> null,
+			'itemids'					=> null,
+			'applicationids'			=> null,
+			'templated'					=> null,
+			'editable'					=> null,
+			'inherited' 				=> null,
+			'nopermissions'				=> null,
+			// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'exludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
+			// output
+			'output'					=> API_OUTPUT_REFER,
+			'expandData'				=> null,
+			'selectHosts'				=> null,
+			'selectItems'				=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 // editable + PERMISSION CHECK

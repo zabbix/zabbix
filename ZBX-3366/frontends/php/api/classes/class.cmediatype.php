@@ -47,16 +47,20 @@ class CMediatype extends CZBXAPI {
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
-		$sort_columns = array('mediatypeid'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+
+		// allowed columns for sorting
+		$sort_columns = array('mediatypeid');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('media_type' => 'mt.mediatypeid'),
-			'from' => array('media_type' => 'media_type mt'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('media_type' => 'mt.mediatypeid'),
+			'from'		=> array('media_type' => 'media_type mt'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
@@ -83,7 +87,6 @@ class CMediatype extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 		// permission check

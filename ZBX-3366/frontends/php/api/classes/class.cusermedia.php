@@ -49,16 +49,20 @@ class CUserMedia extends CZBXAPI {
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
-		$sort_columns = array('mediaid', 'userid', 'mediatypeid'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+
+		// allowed columns for sorting
+		$sort_columns = array('mediaid', 'userid', 'mediatypeid');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('media' => 'm.mediaid'),
-			'from' => array('media' => 'media m'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('media' => 'm.mediaid'),
+			'from'		=> array('media' => 'media m'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
@@ -86,7 +90,6 @@ class CUserMedia extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {
@@ -94,7 +97,7 @@ class CUserMedia extends CZBXAPI {
 
 			$dbTable = DB::getSchema('media');
 			$sql_parts['select']['mediaid'] = 'm.mediaid';
-			foreach ($options['output'] as $key => $field) {
+			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'm.'.$field;
 				}

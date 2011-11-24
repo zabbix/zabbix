@@ -27,7 +27,7 @@
  * Class containing methods for operations with events
  *
  */
-class CEvent extends CZBXAPI{
+class CEvent extends CZBXAPI {
 /**
  * Get events data
  *
@@ -45,67 +45,66 @@ class CEvent extends CZBXAPI{
  * @param array $options['order']
  * @return array|int item data as array or false if error
  */
-	public function get($options=array()){
-
+	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('eventid', 'object', 'clock'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('eventid', 'object', 'clock');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('events' => array('e.eventid')),
-			'from' => array('events' => 'events e'),
-			'where' => array(),
-			'order' => array(),
-			'group' => array(),
-			'limit' => null
+			'select'	=> array('events' => array('e.eventid')),
+			'from'		=> array('events' => 'events e'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'group'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'groupids'				=> null,
-			'hostids'				=> null,
-			'triggerids'			=> null,
-			'eventids'				=> null,
-			'editable'				=> null,
-			'object'				=> null,
-			'source'				=> null,
-			'acknowledged'			=> null,
-			'nopermissions'			=> null,
-// filter
-			'showUnknown'			=> null,
-			'value'					=> null,
-			'time_from'				=> null,
-			'time_till'				=> null,
-			'eventid_from'			=> null,
-			'eventid_till'			=> null,
-// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'searchWildcardsEnabled'=> null,
-
-// OutPut
-			'output'				=> API_OUTPUT_REFER,
-			'selectHosts'			=> null,
-			'selectItems'			=> null,
-			'selectTriggers'		=> null,
-			'select_alerts'			=> null,
-			'select_acknowledges'	=> null,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'preservekeys'			=> null,
-
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'hostids'					=> null,
+			'triggerids'				=> null,
+			'eventids'					=> null,
+			'editable'					=> null,
+			'object'					=> null,
+			'source'					=> null,
+			'acknowledged'				=> null,
+			'nopermissions'				=> null,
+			// filter
+			'showUnknown'				=> null,
+			'value'						=> null,
+			'time_from'					=> null,
+			'time_till'					=> null,
+			'eventid_from'				=> null,
+			'eventid_till'				=> null,
+			// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
+			// output
+			'output'					=> API_OUTPUT_REFER,
+			'selectHosts'				=> null,
+			'selectItems'				=> null,
+			'selectTriggers'			=> null,
+			'select_alerts'				=> null,
+			'select_acknowledges'		=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 // editable + PERMISSION CHECK

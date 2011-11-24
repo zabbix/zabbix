@@ -47,15 +47,19 @@ class CUserGroup extends CZBXAPI {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
-		$sort_columns = array('usrgrpid', 'name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+
+		// allowed columns for sorting
+		$sort_columns = array('usrgrpid', 'name');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('usrgrp' => 'g.usrgrpid'),
-			'from' => array('usrgrp' => 'usrgrp g'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('usrgrp' => 'g.usrgrpid'),
+			'from'		=> array('usrgrp' => 'usrgrp g'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(

@@ -47,40 +47,40 @@ class CImage extends CZBXAPI {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$sort_columns = array('imageid', 'name'); // allowed columns for sorting
+
+		// allowed columns for sorting
+		$sort_columns = array('imageid', 'name');
 
 		$sql_parts = array(
-			'select' => array('images' => 'i.imageid'),
-			'from' => array('images' => 'images i'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('images' => 'i.imageid'),
+			'from'		=> array('images' => 'images i'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'imageids'				=> null,
-			'sysmapids'				=> null,
+			'nodeids'					=> null,
+			'imageids'					=> null,
+			'sysmapids'					=> null,
 			// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'searchWildcardsEnabled'=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'				=> API_OUTPUT_REFER,
-			'select_image'			=> null,
-			'editable'				=> null,
-			'countOutput'			=> null,
-			'preservekeys'			=> null,
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null
+			'output'					=> API_OUTPUT_REFER,
+			'select_image'				=> null,
+			'editable'					=> null,
+			'countOutput'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
-
 
 		// editable + PERMISSION CHECK
 		if (!is_null($options['editable']) && (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN)) {

@@ -51,85 +51,75 @@ class CTrigger extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array(
-			'triggerid',
-			'description',
-			'status',
-			'priority',
-			'lastchange',
-			'hostname'
-		);
+		$sort_columns = array('triggerid', 'description', 'status', 'priority', 'lastchange', 'hostname');
+
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(
-			API_OUTPUT_REFER,
-			API_OUTPUT_EXTEND
-		);
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$fields_to_unset = array();
 
 		$sql_parts = array(
-			'select' => array('triggers' => 't.triggerid'),
-			'from' => array('t' => 'triggers t'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null,
+			'select'	=> array('triggers' => 't.triggerid'),
+			'from'		=> array('t' => 'triggers t'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids' => null,
-			'groupids' => null,
-			'templateids' => null,
-			'hostids' => null,
-			'triggerids' => null,
-			'itemids' => null,
-			'applicationids' => null,
-			'discoveryids' => null,
-			'functions' => null,
-			'inherited' => null,
-			'templated' => null,
-			'monitored' => null,
-			'active' => null,
-			'maintenance' => null,
-			'withUnacknowledgedEvents' => null,
-			'withAcknowledgedEvents' => null,
-			'withLastEventUnacknowledged' => null,
-			'skipDependent' => null,
-			'nopermissions' => null,
-			'editable' => null,
+			'nodeids'						=> null,
+			'groupids'						=> null,
+			'templateids'					=> null,
+			'hostids'						=> null,
+			'triggerids'					=> null,
+			'itemids'						=> null,
+			'applicationids'				=> null,
+			'discoveryids'					=> null,
+			'functions'						=> null,
+			'inherited'						=> null,
+			'templated'						=> null,
+			'monitored'						=> null,
+			'active'						=> null,
+			'maintenance'					=> null,
+			'withUnacknowledgedEvents'		=> null,
+			'withAcknowledgedEvents'		=> null,
+			'withLastEventUnacknowledged'	=> null,
+			'skipDependent'					=> null,
+			'nopermissions'					=> null,
+			'editable'						=> null,
 			// timing
-			'lastChangeSince' => null,
-			'lastChangeTill' => null,
+			'lastChangeSince'				=> null,
+			'lastChangeTill'				=> null,
 			// filter
-			'group' => null,
-			'host' => null,
-			'only_true' => null,
-			'min_severity' => null,
-			'filter' => null,
-			'search' => null,
-			'searchByAny' => null,
-			'startSearch' => null,
-			'excludeSearch' => null,
-			'searchWildcardsEnabled' => null,
+			'group'							=> null,
+			'host'							=> null,
+			'only_true'						=> null,
+			'min_severity'					=> null,
+			'filter'						=> null,
+			'search'						=> null,
+			'searchByAny'					=> null,
+			'startSearch'					=> null,
+			'excludeSearch'					=> null,
+			'searchWildcardsEnabled'		=> null,
 			// output
-			'expandData' => null,
-			'expandDescription' => null,
-			'output' => API_OUTPUT_REFER,
-			'selectGroups' => null,
-			'selectHosts' => null,
-			'selectItems' => null,
-			'selectFunctions' => null,
-			'selectDependencies' => null,
-			'selectDiscoveryRule' => null,
-			'countOutput' => null,
-			'groupCount' => null,
-			'preservekeys' => null,
-			'sortfield' => '',
-			'sortorder' => '',
-			'limit' => null,
-			'limitSelects' => null
+			'expandData'					=> null,
+			'expandDescription'				=> null,
+			'output'						=> API_OUTPUT_REFER,
+			'selectGroups'					=> null,
+			'selectHosts'					=> null,
+			'selectItems'					=> null,
+			'selectFunctions'				=> null,
+			'selectDependencies'			=> null,
+			'selectDiscoveryRule'			=> null,
+			'countOutput'					=> null,
+			'groupCount'					=> null,
+			'preservekeys'					=> null,
+			'sortfield'						=> '',
+			'sortorder'						=> '',
+			'limit'							=> null,
+			'limitSelects'					=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {

@@ -30,43 +30,46 @@ class CWebCheck extends CZBXAPI {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
-		$sort_columns = array('httptestid', 'name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+
+		// allowed columns for sorting
+		$sort_columns = array('httptestid', 'name');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('httptests' => 'ht.httptestid'),
-			'from' => array('httptest' => 'httptest ht'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('httptests' => 'ht.httptestid'),
+			'from'		=> array('httptest' => 'httptest ht'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'		=> null,
-			'httptestids'	=> null,
-			'applicationids'=> null,
-			'hostids'		=> null,
-			'editable'		=> null,
-			'nopermissions' => null,
+			'nodeids'			=> null,
+			'httptestids'		=> null,
+			'applicationids'	=> null,
+			'hostids'			=> null,
+			'editable'			=> null,
+			'nopermissions'	 	=> null,
 			// filter
-			'filter'		=> null,
-			'search'		=> null,
-			'searchByAny'	=> null,
-			'startSearch'	=> null,
-			'exludeSearch'	=> null,
+			'filter'			=> null,
+			'search'			=> null,
+			'searchByAny'		=> null,
+			'startSearch'		=> null,
+			'exludeSearch'		=> null,
 			// output
-			'output'		=> API_OUTPUT_REFER,
-			'selectHosts'	=> null,
-			'selectSteps'	=> null,
-			'countOutput'	=> null,
-			'groupCount'	=> null,
-			'preservekeys'	=> null,
-			'sortfield'		=> '',
-			'sortorder'		=> '',
-			'limit'			=> null
+			'output'			=> API_OUTPUT_REFER,
+			'selectHosts'		=> null,
+			'selectSteps'		=> null,
+			'countOutput'		=> null,
+			'groupCount'		=> null,
+			'preservekeys'		=> null,
+			'sortfield'			=> '',
+			'sortorder'			=> '',
+			'limit'				=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 		// editable + PERMISSION CHECK

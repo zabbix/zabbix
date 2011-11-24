@@ -55,23 +55,27 @@ class CUserMacro extends CZBXAPI {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
-		$sort_columns = array('macro'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+
+		// allowed columns for sorting
+		$sort_columns = array('macro');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('macros' => 'hm.hostmacroid'),
-			'from' => array('hostmacro hm'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('macros' => 'hm.hostmacroid'),
+			'from'		=> array('hostmacro hm'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$sql_parts_global = array(
-			'select' => array('macros' => 'gm.globalmacroid'),
-			'from' => array('globalmacro gm'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('macros' => 'gm.globalmacroid'),
+			'from'		=> array('globalmacro gm'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
@@ -102,7 +106,6 @@ class CUserMacro extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 		// editable + PERMISSION CHECK

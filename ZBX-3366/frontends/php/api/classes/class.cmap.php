@@ -25,7 +25,7 @@
 /**
  * Class containing methods for operations with Maps
  */
-class CMap extends CMapElement{
+class CMap extends CMapElement {
 /**
  * Get Map data
  *
@@ -51,37 +51,37 @@ class CMap extends CMapElement{
  * @param string $options['sortfield']
  * @return array|boolean Host data as array or false if error
  */
-	public function get($options=array()) {
-
+	public function get($options = array()) {
 		$result = array();
 		$user_type = self::$userData['type'];
 
-		$sort_columns = array('name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('name');
 
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('sysmaps' => 's.sysmapid'),
-			'from' => array('sysmaps' => 'sysmaps s'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null);
+			'select'	=> array('sysmaps' => 's.sysmapid'),
+			'from'		=> array('sysmaps' => 'sysmaps s'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
+		);
 
 		$def_options = array(
 			'nodeids'					=> null,
 			'sysmapids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
-
-// filter
+			// filter
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
-
-// OutPut
+			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectSelements'			=> null,
 			'selectLinks'				=> null,
@@ -89,14 +89,11 @@ class CMap extends CMapElement{
 			'countOutput'				=> null,
 			'expandUrls' 				=> null,
 			'preservekeys'				=> null,
-
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
-
 
 		if (is_array($options['output'])) {
 			unset($sql_parts['select']['sysmaps']);
@@ -104,10 +101,10 @@ class CMap extends CMapElement{
 			$dbTable = DB::getSchema('sysmaps');
 			$sql_parts['select']['sysmapid'] = 's.sysmapid';
 			foreach ($options['output'] as $field) {
-				if (isset($dbTable['fields'][$field]))
+				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 's.'.$field;
+				}
 			}
-
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
@@ -428,14 +425,13 @@ class CMap extends CMapElement{
 
 		// Adding icon maps
 		if (!is_null($options['selectIconMap']) && str_in_array($options['selectIconMap'], $subselects_allowed_outputs)) {
-			$params = array(
+			$iconMaps = API::IconMap()->get(array(
 				'sysmapids' => $sysmapids,
 				'output' => $options['selectIconMap'],
 				'selectMappings' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
-				'nopermissions' => true,
-			);
-			$iconMaps = API::IconMap()->get($params);
+				'nopermissions' => true
+			));
 			foreach ($iconMaps as $iconMap) {
 				$isysmaps = $iconMap['sysmaps'];
 				unset($iconMap['sysmaps']);

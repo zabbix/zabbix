@@ -44,15 +44,19 @@ class CProxy extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$user_type = self::$userData['type'];
-		$sort_columns = array('hostid', 'host', 'status'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+
+		// allowed columns for sorting
+		$sort_columns = array('hostid', 'host', 'status');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('hostid' => 'h.hostid'),
-			'from' => array('hosts' => 'hosts h'),
-			'where' => array('h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('hostid' => 'h.hostid'),
+			'from'		=> array('hosts' => 'hosts h'),
+			'where'		=> array('h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
@@ -78,7 +82,6 @@ class CProxy extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {

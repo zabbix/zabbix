@@ -53,40 +53,39 @@ class CIconMap extends CZBXAPI {
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('icon_map' => 'im.iconmapid'),
-			'from' => array('icon_map' => 'icon_map im'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null,
+			'select'	=> array('icon_map' => 'im.iconmapid'),
+			'from'		=> array('icon_map' => 'icon_map im'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids' => null,
-			'iconmapids' => null,
-			'sysmapids' => null,
-			'nopermissions' => null,
-			'editable' => null,
+			'nodeids'					=> null,
+			'iconmapids'				=> null,
+			'sysmapids'					=> null,
+			'nopermissions'				=> null,
+			'editable'					=> null,
 			// filter
-			'filter' => null,
-			'search' => null,
-			'searchByAny' => null,
-			'startSearch' => null,
-			'excludeSearch' => null,
-			'searchWildcardsEnabled' => null,
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 			// output
-			'output' => API_OUTPUT_REFER,
-			'selectMappings' => null,
-			'countOutput' => null,
-			'preservekeys' => null,
-			'sortfield' => '',
-			'sortorder' => '',
-			'limit' => null
+			'output'					=> API_OUTPUT_REFER,
+			'selectMappings'			=> null,
+			'countOutput'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {
 			$dbTable = DB::getSchema('icon_map');
-
 			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'im.'.$field;
@@ -139,7 +138,7 @@ class CIconMap extends CZBXAPI {
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('COUNT(DISTINCT im.iconmapid) as rowscount');
+			$sql_parts['select'] = array('COUNT(DISTINCT im.iconmapid) AS rowscount');
 		}
 
 		// sorting
@@ -329,7 +328,7 @@ class CIconMap extends CZBXAPI {
 			'iconmapids' => $iconMapIds,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'selectMappings' => API_OUTPUT_EXTEND,
+			'selectMappings' => API_OUTPUT_EXTEND
 		));
 
 		$mappingsCreate = $mappingsUpdate = $mappingIdsDelete = array();
@@ -340,14 +339,13 @@ class CIconMap extends CZBXAPI {
 
 			// Existence
 			if (isset($iconMap['name'])) {
-				$options = array(
+				$iconMapExists = $this->get(array(
 					'filter' => array('name' => $iconMap['name']),
 					'output' => API_OUTPUT_SHORTEN,
-					'editable' => 1,
+					'editable' => true,
 					'nopermissions' => true,
-					'preservekeys' => true,
-				);
-				$iconMapExists = $this->get($options);
+					'preservekeys' => true
+				));
 				if (($iconMapExists = reset($iconMapExists)) && (bccomp($iconMapExists['iconmapid'], $iconMap['iconmapid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map "%s" already exists.', $iconMap['name']));
 				}
@@ -364,7 +362,7 @@ class CIconMap extends CZBXAPI {
 						unset($mapping['iconmappingid']);
 						$mappingsUpdate[] = array(
 							'values' => $mapping,
-							'where' => array('iconmappingid' => $iconmappingid),
+							'where' => array('iconmappingid' => $iconmappingid)
 						);
 						unset($mappingsDb[$iconmappingid]);
 					}
@@ -381,7 +379,7 @@ class CIconMap extends CZBXAPI {
 			if (!empty($iconMap)) {
 				$updates[] = array(
 					'values' => $iconMap,
-					'where' => array('iconmapid' => $iconMapid),
+					'where' => array('iconmapid' => $iconMapid)
 				);
 			}
 		}
@@ -467,14 +465,14 @@ class CIconMap extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-				'nodeids' => get_current_nodeid(true),
-				'iconmapids' => $ids,
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => true,
-				'countOutput' => true
-			));
+			'nodeids' => get_current_nodeid(true),
+			'iconmapids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
 
-		return (count($ids) == $count);
+		return count($ids) == $count;
 	}
 
 	/**
@@ -489,7 +487,7 @@ class CIconMap extends CZBXAPI {
 		$imageIds = API::Image()->get(array(
 			'output' => API_OUTPUT_SHORTEN,
 			'preservekeys' => true,
-			'filter' => array('imagetype' => IMAGE_TYPE_ICON),
+			'filter' => array('imagetype' => IMAGE_TYPE_ICON)
 		));
 
 		foreach ($iconMaps as $iconMap) {

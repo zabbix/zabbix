@@ -51,64 +51,67 @@ class CItem extends CItemGeneral {
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sql_parts = array(
-			'select' => array('items' => 'i.itemid'),
-			'from' => array('items' => 'items i'),
-			'where' => array('webtype' => 'i.type<>9'),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('items' => 'i.itemid'),
+			'from'		=> array('items' => 'items i'),
+			'where'		=> array('webtype' => 'i.type<>'.ITEM_TYPE_HTTPTEST),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'groupids'				=> null,
-			'templateids'			=> null,
-			'hostids'				=> null,
-			'proxyids'				=> null,
-			'itemids'				=> null,
-			'interfaceids'			=> null,
-			'graphids'				=> null,
-			'triggerids'			=> null,
-			'applicationids'		=> null,
-			'discoveryids'			=> null,
-			'webitems'				=> null,
-			'inherited'				=> null,
-			'templated'				=> null,
-			'monitored'				=> null,
-			'editable'				=> null,
-			'nopermissions'			=> null,
-			'group'					=> null,
-			'host'					=> null,
-			'application'			=> null,
-			'belongs'				=> null,
-			'with_triggers'			=> null,
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'templateids'				=> null,
+			'hostids'					=> null,
+			'proxyids'					=> null,
+			'itemids'					=> null,
+			'interfaceids'				=> null,
+			'graphids'					=> null,
+			'triggerids'				=> null,
+			'applicationids'			=> null,
+			'discoveryids'				=> null,
+			'webitems'					=> null,
+			'inherited'					=> null,
+			'templated'					=> null,
+			'monitored'					=> null,
+			'editable'					=> null,
+			'nopermissions'				=> null,
+			'group'						=> null,
+			'host'						=> null,
+			'application'				=> null,
+			'belongs'					=> null,
+			'with_triggers'				=> null,
 			// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'searchWildcardsEnabled' => null,
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'				=> API_OUTPUT_REFER,
-			'selectHosts'			=> null,
-			'selectInterfaces'		=> null,
-			'selectTriggers'		=> null,
-			'selectGraphs'			=> null,
-			'selectApplications'	=> null,
-			'selectPrototypes'		=> null,
-			'selectDiscoveryRule'	=> null,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'preservekeys'			=> null,
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null,
-			'limitSelects'			=> null
+			'output'					=> API_OUTPUT_REFER,
+			'selectHosts'				=> null,
+			'selectInterfaces'			=> null,
+			'selectTriggers'			=> null,
+			'selectGraphs'				=> null,
+			'selectApplications'		=> null,
+			'selectPrototypes'			=> null,
+			'selectDiscoveryRule'		=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null,
+			'limitSelects'				=> null
 		);
 		$options = zbx_array_merge($def_options, $options);
 
@@ -117,7 +120,7 @@ class CItem extends CItemGeneral {
 
 			$dbTable = DB::getSchema('items');
 			$sql_parts['select']['itemid'] = 'i.itemid';
-			foreach ($options['output'] as $key => $field) {
+			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'i.'.$field;
 				}

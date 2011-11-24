@@ -71,7 +71,7 @@ function DBconnect(&$error) {
 
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
-				$mysql_server = $DB['SERVER'].( !empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
+				$mysql_server = $DB['SERVER'].(!empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
 
 				if (!$DB['DB'] = mysql_connect($mysql_server, $DB['USER'], $DB['PASSWORD'])) {
 					$error = 'Error connecting to database ['.mysql_error().']';
@@ -304,8 +304,7 @@ function DBend($doCommit = true) {
 
 	$DB['TRANSACTIONS'] = 0;
 
-	$result = !is_null($doCommit) && $DBresult ? $doCommit : $DBresult;
-	return $result;
+	return (!is_null($doCommit) && $DBresult) ? $doCommit : $DBresult;
 }
 
 function DBcommit() {
@@ -644,7 +643,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_ORACLE) {
 	function zbx_dbstr($var) {
 		if (is_array($var)) {
 			foreach ($var as $vnum => $value) {
-				$var[$vnum] = "'".preg_replace('/\'/','\'\'',$value)."'";
+				$var[$vnum] = "'".preg_replace('/\'/', '\'\'', $value)."'";
 			}
 			return $var;
 		}
@@ -918,7 +917,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 			$search[] = $sql_parts['where']['search'];
 		}
 
-		$glue = is_null($options['searchByAny']) || $options['searchByAny'] === false ? ' AND ' : ' OR ';
+		$glue = (is_null($options['searchByAny']) || $options['searchByAny'] === false) ? ' AND ' : ' OR ';
 		$sql_parts['where']['search'] = '( '.implode($glue, $search).' )';
 		return true;
 	}
@@ -948,7 +947,7 @@ function zbx_db_filter($table, $options, &$sql_parts) {
 			$filter[] = $sql_parts['where']['filter'];
 		}
 
-		$glue = is_null($options['searchByAny']) || $options['searchByAny'] === false ? ' AND ' : ' OR ';
+		$glue = (is_null($options['searchByAny']) || $options['searchByAny'] === false) ? ' AND ' : ' OR ';
 		$sql_parts['where']['filter'] = '( '.implode($glue, $filter).' )';
 		return true;
 	}
@@ -970,11 +969,11 @@ function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 			$sortorder = '';
 			if (is_array($options['sortorder'])) {
 				if (!empty($options['sortorder'][$i])) {
-					$sortorder = $options['sortorder'][$i] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
+					$sortorder = ($options['sortorder'][$i] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
 				}
 			}
 			else {
-				$sortorder = $options['sortorder'] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
+				$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
 			}
 			$sql_parts['order'][] = $alias.'.'.$sortfield.' '.$sortorder;
 		}
@@ -1026,7 +1025,7 @@ function DBcondition($fieldname, $array, $notin = false) {
 }
 
 function zero2null($val) {
-	return $val == '0' ? 'NULL' : $val; // string 0 because ('any string' == 0) = true
+	return ($val == '0') ? 'NULL' : $val;	// string 0 because ('any string' == 0) = true
 }
 
 /**
@@ -1182,7 +1181,7 @@ class DB {
 					' AND '.$id_name.'<='.self::$maxNodeId;
 		$row = DBfetch(DBselect($sql));
 
-		$nextid = !$row || is_null($row['id']) ? self::$minNodeId : $row['id'];
+		$nextid = (!$row || is_null($row['id'])) ? self::$minNodeId : $row['id'];
 
 		$maxNextId = bcadd($nextid, $count, 0);
 		if (bccomp($maxNextId, self::$maxNodeId, 0) == 1) {

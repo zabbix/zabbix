@@ -33,15 +33,16 @@ class CHostGroup extends CZBXAPI{
  * @param array $params
  * @return array
  */
-	public function get($params){
-
+	public function get($params) {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('groupid', 'name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('groupid', 'name');
 
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
 			'select'	=> array('groups' => 'g.groupid'),
@@ -73,42 +74,37 @@ class CHostGroup extends CZBXAPI{
 			'with_graphs'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
-
-// filter
+			// filter
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
-
-// output
+			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectHosts'				=> null,
 			'selectTemplates'			=> null,
-
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
-
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-
 		$options = zbx_array_merge($def_options, $params);
 
-		if(is_array($options['output'])){
+		if (is_array($options['output'])) {
 			unset($sql_parts['select']['groups']);
 
 			$dbTable = DB::getSchema('groups');
 			$sql_parts['select']['groupid'] = 'g.groupid';
-			foreach($options['output'] as $key => $field){
-				if(isset($dbTable['fields'][$field]))
+			foreach ($options['output'] as $field) {
+				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'g.'.$field;
+				}
 			}
-
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 

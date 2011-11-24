@@ -48,47 +48,47 @@ class CAction extends CZBXAPI {
 
 		// allowed columns for sorting
 		$sort_columns = array('actionid', 'name');
+
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('actions' => 'a.actionid'),
-			'from' => array('actions' => 'actions a'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null,
+			'select'	=> array('actions' => 'a.actionid'),
+			'from'		=> array('actions' => 'actions a'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'groupids'				=> null,
-			'hostids'				=> null,
-			'actionids'				=> null,
-			'triggerids'			=> null,
-			'mediatypeids'			=> null,
-			'usrgrpids'				=> null,
-			'userids'				=> null,
-			'scriptids'				=> null,
-			'nopermissions'			=> null,
-			'editable'				=> null,
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'hostids'					=> null,
+			'actionids'					=> null,
+			'triggerids'				=> null,
+			'mediatypeids'				=> null,
+			'usrgrpids'					=> null,
+			'userids'					=> null,
+			'scriptids'					=> null,
+			'nopermissions'				=> null,
+			'editable'					=> null,
 			// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'searchWildcardsEnabled'=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'				=> API_OUTPUT_REFER,
-			'selectConditions'		=> null,
-			'selectOperations'		=> null,
-			'countOutput'			=> null,
-			'preservekeys'			=> null,
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null
+			'output'					=> API_OUTPUT_REFER,
+			'selectConditions'			=> null,
+			'selectOperations'			=> null,
+			'countOutput'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {
@@ -101,7 +101,6 @@ class CAction extends CZBXAPI {
 					$sql_parts['select'][$field] = 'a.'.$field;
 				}
 			}
-
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 

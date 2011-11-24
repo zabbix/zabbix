@@ -48,15 +48,18 @@ class CUser extends CZBXAPI {
 		$result = array();
 		$user_type = self::$userData['type'];
 
-		$sort_columns = array('userid', 'alias'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('userid', 'alias');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('users' => 'u.userid'),
-			'from' => array('users' => 'users u'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('users' => 'u.userid'),
+			'from'		=> array('users' => 'users u'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
@@ -85,7 +88,6 @@ class CUser extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {
@@ -93,7 +95,7 @@ class CUser extends CZBXAPI {
 
 			$dbTable = DB::getSchema('users');
 			$sql_parts['select']['userid'] = ' u.userid';
-			foreach ($options['output'] as $key => $field) {
+			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'u.'.$field;
 				}
