@@ -178,7 +178,7 @@ function get_accessible_hosts_by_user(&$user_data, $perm, $perm_res = null, $nod
 	$user_type =& $user_data['type'];
 
 	if (!isset($userid)) {
-		fatal_error('Incorrect user data in "get_accessible_hosts_by_user".');
+		fatal_error(_('Incorrect user data in "get_accessible_hosts_by_user".'));
 	}
 	if (is_null($nodeid)) {
 		$nodeid = get_current_nodeid();
@@ -206,18 +206,18 @@ function get_accessible_hosts_by_user(&$user_data, $perm, $perm_res = null, $nod
 		$where = '';
 	}
 
-	$sql = 'SELECT DISTINCT n.nodeid,n.name AS node_name,h.hostid,h.host,MIN(r.permission) AS permission,ug.userid'.
-			' FROM hosts h'.
-				' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid'.
-				' LEFT JOIN groups g ON g.groupid=hg.groupid'.
-				' LEFT JOIN rights r ON r.id=g.groupid'.
-				' LEFT JOIN users_groups ug ON ug.usrgrpid=r.groupid AND ug.userid='.$userid.
-				' LEFT JOIN nodes n ON '.DBid2nodeid('h.hostid').'=n.nodeid'.
-			$where.
-			' GROUP BY h.hostid,n.nodeid,n.name,h.host,ug.userid'.
-			' ORDER BY n.name,n.nodeid,h.host,permission,ug.userid';
-	$db_hosts = DBselect($sql);
-
+	$db_hosts = DBselect(
+		'SELECT DISTINCT n.nodeid,n.name AS node_name,h.hostid,h.host,MIN(r.permission) AS permission,ug.userid'.
+		' FROM hosts h'.
+			' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid'.
+			' LEFT JOIN groups g ON g.groupid=hg.groupid'.
+			' LEFT JOIN rights r ON r.id=g.groupid'.
+			' LEFT JOIN users_groups ug ON ug.usrgrpid=r.groupid AND ug.userid='.$userid.
+			' LEFT JOIN nodes n ON '.DBid2nodeid('h.hostid').'=n.nodeid'.
+		$where.
+		' GROUP BY h.hostid,n.nodeid,n.name,h.host,ug.userid'.
+		' ORDER BY n.name,n.nodeid,h.host,permission,ug.userid'
+	);
 	$processed = array();
 	while ($host_data = DBfetch($db_hosts)) {
 		if (zbx_empty($host_data['nodeid'])) {
@@ -287,7 +287,7 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = null, $nod
 
 	$userid =& $user_data['userid'];
 	if (!isset($userid)) {
-		fatal_error(_('Incorrect user data in').SPACE.'"get_accessible_groups_by_user"');
+		fatal_error(_('Incorrect user data in "get_accessible_groups_by_user".'));
 	}
 	$user_type =& $user_data['type'];
 
@@ -302,15 +302,16 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = null, $nod
 	}
 	$where = count($where) ?' WHERE '.implode(' AND ', $where) : '';
 
-	$sql = 'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid,hg.name,MIN(r.permission) AS permission,g.userid'.
-			' FROM groups hg'.
-				' LEFT JOIN rights r ON r.id=hg.groupid'.
-				' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid AND g.userid='.$userid.
-				' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
-			$where.
-			' GROUP BY n.nodeid,n.name,hg.groupid,hg.name,g.userid,g.userid'.
-			' ORDER BY node_name,hg.name,permission';
-	$db_groups = DBselect($sql);
+	$db_groups = DBselect(
+		'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid,hg.name,MIN(r.permission) AS permission,g.userid'.
+		' FROM groups hg'.
+			' LEFT JOIN rights r ON r.id=hg.groupid'.
+			' LEFT JOIN users_groups g ON r.groupid=g.usrgrpid AND g.userid='.$userid.
+			' LEFT JOIN nodes n ON '.DBid2nodeid('hg.groupid').'=n.nodeid'.
+		$where.
+		' GROUP BY n.nodeid,n.name,hg.groupid,hg.name,g.userid,g.userid'.
+		' ORDER BY node_name,hg.name,permission'
+	);
 	while ($group_data = DBfetch($db_groups)) {
 		if (zbx_empty($group_data['nodeid'])) {
 			$group_data['nodeid'] = id2nodeid($group_data['groupid']);
@@ -383,7 +384,7 @@ function get_accessible_nodes_by_user(&$user_data, $perm, $perm_res = null, $nod
 	$userid =& $user_data['userid'];
 	$user_type =& $user_data['type'];
 	if (!isset($userid)) {
-		fatal_error(_('Incorrect user data in').SPACE.'"get_accessible_nodes_by_user"');
+		fatal_error(_('Incorrect user data in "get_accessible_nodes_by_user".'));
 	}
 
 	$nodeid_str = is_array($nodeid) ? md5(implode('', $nodeid)) : strval($nodeid);
@@ -486,14 +487,15 @@ function get_accessible_hosts_by_rights(&$rights, $user_type, $perm, $perm_res =
 	}
 	$where = count($where) ? $where = ' WHERE '.implode(' AND ', $where) : '';
 
-	$sql = 'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid AS groupid,h.hostid,h.host,h.name AS host_name,h.status'.
-			' FROM hosts h'.
-				' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid'.
-				' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('h.hostid').
-			$where.
-			' ORDER BY n.name,h.name';
 	$perm_by_host = array();
-	$db_hosts = DBselect($sql);
+	$db_hosts = DBselect(
+		'SELECT n.nodeid AS nodeid,n.name AS node_name,hg.groupid AS groupid,h.hostid,h.host,h.name AS host_name,h.status'.
+		' FROM hosts h'.
+			' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid'.
+			' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('h.hostid').
+		$where.
+		' ORDER BY n.name,h.name'
+	);
 	while ($host_data = DBfetch($db_hosts)) {
 		if (isset($host_data['groupid']) && isset($res_perm[$host_data['groupid']])) {
 			if (!isset($perm_by_host[$host_data['hostid']])) {
