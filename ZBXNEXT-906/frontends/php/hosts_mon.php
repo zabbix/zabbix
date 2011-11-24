@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -29,7 +29,7 @@ $page['title'] = 'S_HOSTS';
 $page['file'] = 'hosts_mon.php';
 $page['hist_arg'] = array('groupid');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -76,7 +76,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -158,7 +158,7 @@ include_once('include/page_header.php');
 
 
 // table HOSTS
-	$table = new CTableInfo(S_NO_HOSTS_DEFINED);
+	$table = new CTableInfo(_('No hosts defined.'));
 	$table->setHeader(array(
 		make_sorting_header(S_NAME, 'name'),
 		S_APPLICATIONS,
@@ -312,6 +312,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -544,7 +544,7 @@ class CTemplateScreen extends CScreen{
 					}
 				}
 			}
-			$this->addItems($insert_screen_items);
+			API::ScreenItem()->create($insert_screen_items);
 
 			return array('screenids' => $screenids);
 	}
@@ -614,11 +614,7 @@ class CTemplateScreen extends CScreen{
 				}
 
 				if(isset($screen['screenitems'])){
-					$update_items = array(
-						'screenids' => $screenid,
-						'screenitems' => $screen['screenitems'],
-					);
-					$this->updateItems($update_items);
+					$this->replaceItems($screenid, $screen['screenitems']);
 				}
 			}
 			DB::update('screens', $update);

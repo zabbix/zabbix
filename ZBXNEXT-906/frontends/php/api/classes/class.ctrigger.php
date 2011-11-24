@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -535,8 +535,9 @@ class CTrigger extends CZBXAPI {
 			$sql_parts['select']['triggers'] = 't.*';
 		}
 
-		// expandData
+// expandData
 		if (!is_null($options['expandData'])) {
+			$sql_parts['select']['hostname'] = 'h.name AS hostname';
 			$sql_parts['select']['host'] = 'h.host';
 			$sql_parts['select']['hostid'] = 'h.hostid';
 			$sql_parts['from']['functions'] = 'functions f';
@@ -1355,9 +1356,11 @@ class CTrigger extends CZBXAPI {
 					unset($trigger['status']);
 				}
 
-				$dbTrigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
-				if (array_equal($dbTrigger['dependencies'], $trigger['dependencies'])) {
-					unset($trigger['dependencies']);
+				if (isset($trigger['dependencies'])) {
+					$dbTrigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
+					if (array_equal($dbTrigger['dependencies'], $trigger['dependencies'])) {
+						unset($trigger['dependencies']);
+					}
 				}
 			}
 
@@ -1393,6 +1396,24 @@ class CTrigger extends CZBXAPI {
 					$hostsStatusFlags |= ($hosts[$host]['status'] == HOST_STATUS_TEMPLATE) ? 0x1 : 0x2;
 					if ($hostsStatusFlags == 0x3) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously.'));
+					}
+				}
+
+				foreach ($expressionData->expressions as $exprPart) {
+					if (zbx_empty($exprPart['item'])) {
+						continue;
+					}
+
+					$sql = 'SELECT i.itemid,i.value_type'.
+							' FROM items i,hosts h'.
+							' WHERE i.key_='.zbx_dbstr($exprPart['item']).
+								' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+								' AND h.host='.zbx_dbstr($exprPart['host']).
+								' AND h.hostid=i.hostid'.
+								' AND '.DBin_node('i.itemid');
+					if (!DBfetch(DBselect($sql))) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect item key "%1$s:%2$s" provided for trigger expression.', $exprPart['host'], $exprPart['item']));
 					}
 				}
 			}
@@ -1531,7 +1552,7 @@ class CTrigger extends CZBXAPI {
 
 		// TODO: REMOVE info
 		foreach ($del_triggers as $triggerid => $trigger) {
-			info(_s('Trigger [%1$s:%2$s] deleted.', $trigger['description'], explode_exp($trigger['expression'])));
+			info(_s('Trigger "%1$s:%2$s" deleted.', $trigger['description'], explode_exp($trigger['expression'])));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 		}
 
@@ -1615,7 +1636,7 @@ class CTrigger extends CZBXAPI {
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(_s('Trigger [%1$s:%2$s] created.', $trigger['description'], $trigger['expression']));
+			info(_s('Trigger "%1$s:%2$s" created.', $trigger['description'], $trigger['expression']));
 		}
 
 		$this->validateDependencies($triggers);
@@ -1732,8 +1753,10 @@ class CTrigger extends CZBXAPI {
 				'where' => array('triggerid' => $trigger['triggerid'])
 			));
 
-			$expression = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
-			$infos[] = _s('Trigger "%1$s:%2$s" updated.', $trigger['description'], $expression);
+			// restore the full expression to properly validate dependencies
+			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
+
+			$infos[] = _s('Trigger "%1$s:%2$s" updated.', $trigger['description'], $trigger['expression']);
 		}
 		unset($trigger);
 
@@ -2034,14 +2057,20 @@ class CTrigger extends CZBXAPI {
 			// }}} check circular dependency
 
 
-			$expr = new CTriggerExpression($trigger);
+			if (isset($trigger['expression'])) {
+				$expr = new CTriggerExpression($trigger);
+				$hosts = $expr->data['hosts'];
+			}
+			else {
+				$hosts = array();
+			}
 
 			$templates = API::Template()->get(array(
 				'output' => array(
 					'hostid',
 					'host'
 				),
-				'filter' => array('host' => $expr->data['hosts']),
+				'filter' => array('host' => $hosts),
 				'nopermissions' => true,
 				'preservekeys' => true
 			));

@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -112,9 +112,55 @@ function getDayOfWeekCaption($num) {
 		case 4: return _('Thursday');
 		case 5: return _('Friday');
 		case 6: return _('Saturday');
+		case 0:
 		case 7: return _('Sunday');
 	}
 	return _s('[Wrong value for day: "%s" ]', $num);
+}
+
+// Convert seconds (0..SEC_PER_WEEK) to string representation. For example, 212400 -> 'Tuesday 11:00'
+function dowHrMinToStr($value, $display24Hours = false) {
+	$dow = $value - $value % SEC_PER_DAY;
+	$hr = $value - $dow;
+	$hr -= $hr % SEC_PER_HOUR;
+	$min = $value - $dow - $hr;
+	$min -= $min % SEC_PER_MIN;
+
+	$dow /= SEC_PER_DAY;
+	$hr /= SEC_PER_HOUR;
+	$min /= SEC_PER_MIN;
+
+	if ($display24Hours && $hr == 0 && $min == 0) {
+		$dow--;
+		$hr = 24;
+	}
+
+	return sprintf('%s %02d:%02d', getDayOfWeekCaption($dow), $hr, $min);
+}
+
+// Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occured
+function dowHrMinToSec($dow, $hr, $min) {
+	if (zbx_empty($dow) || zbx_empty($hr) || zbx_empty($min)) {
+		return false;
+	}
+
+	if ($dow == 7) {
+		$dow = 0;
+	}
+
+	if ($dow < 0 || $dow > 6) {
+		return false;
+	}
+
+	if ($hr < 0 || $hr > 24) {
+		return false;
+	}
+
+	if ($min < 0 || $min > 59) {
+		return false;
+	}
+
+	return $dow * SEC_PER_DAY + $hr * SEC_PER_HOUR + $min * SEC_PER_MIN;
 }
 
 // Convert timestamp to string representation. Retun 'Never' if 0.
@@ -197,7 +243,7 @@ function zbx_date2str($format, $value = null) {
 	$part = '';
 	$length = zbx_strlen($format);
 	for ($i = 0; $i < $length; $i++) {
-		$pchar = ($i > 0) ? zbx_substr($format, $i - 1, 1) : '';
+		$pchar = $i > 0 ? zbx_substr($format, $i - 1, 1) : '';
 		$char = zbx_substr($format, $i, 1);
 
 		if ($pchar != '\\' && isset($rplcs[$char])) {
@@ -208,7 +254,7 @@ function zbx_date2str($format, $value = null) {
 			$part .= $char;
 		}
 	}
-	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
+	$output .= zbx_strlen($part) > 0 ? date($part, $value) : '';
 	return $output;
 }
 
@@ -229,6 +275,9 @@ function zbx_date2age($start_date, $end_date = 0, $utime = false) {
 function zbxDateToTime($strdate) {
 	if (6 == sscanf($strdate, '%04d%02d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes, $seconds)) {
 		return mktime($hours, $minutes, $seconds, $month, $date, $year);
+	}
+	elseif (5 == sscanf($strdate, '%04d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes)) {
+		return mktime($hours, $minutes, 0, $month, $date, $year);
 	}
 	else {
 		return time();

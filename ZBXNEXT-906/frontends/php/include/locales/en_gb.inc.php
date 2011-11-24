@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -149,9 +149,6 @@
 //	actionconf.php
 	'S_CONFIGURATION_OF_ACTIONS'=>		_('Configuration of actions'),
 	'S_FILTER'=>				_('Filter'),
-	'S_TIME_PERIOD'=>			_('Time period'),
-	'S_MAX_VALUE_SMALL'=>			_('max value'),
-	'S_MIN_VALUE_SMALL'=>			_('min value'),
 	'S_CONDITION'=>				_('Condition'),
 
 //	actions.php
@@ -202,9 +199,6 @@
 	'S_PERIOD'=>				_('Period'),
 
 //	class.cchart.php
-	'S_CCHARTS_TIMELINE_HOURS_FORMAT'=>			_('H:i'),
-	'S_CCHARTS_TIMELINE_DAYS_FORMAT'=>			_('D'),
-	'S_CCHARTS_TIMELINE_MONTHDAYS_FORMAT'=>			_('d.m'),
 	'S_CCHARTS_TIMELINE_START_DATE_FORMAT'=>		_('d.m H:i'),
 	'S_CCHARTS_TIMELINE_END_DATE_FORMAT'=>			_('d.m H:i'),
 	'S_CCHARTS_TIMELINE_MAINPERIOD_HOURS_FORMAT'=>		_('H:i'),
@@ -226,7 +220,6 @@
 	'S_VALUE_MAP_DELETED'=>				_('Value map deleted'),
 	'S_CANNNOT_DELETE_VALUE_MAP'=>			_('Cannot delete value map'),
 	'S_VALUE_MAP_UPDATED'=>				_('Value map updated'),
-	'S_CONFIGURATION_OF_ZABBIX'=>			_('Configuration of Zabbix'),
 	'S_CONFIGURATION_OF_ZABBIX_BIG'=>		_('CONFIGURATION OF ZABBIX'),
 	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
@@ -234,8 +227,6 @@
 	'S_IMAGE'=>					_('Image'),
 	'S_OTHER'=>					_('Other'),
 	'S_NOTHING_TO_DO'=>				_('Nothing to do'),
-
-	'S_REGULAR_EXPRESSION'=>			_('Regular expression'),
 	'S_EXPRESSION'=>				_('Expression'),
 
 	'S_CHARACTER_STRING_INCLUDED'=>			_('Character string included'),
@@ -268,7 +259,6 @@
 	'S_NODES'=>				_('Nodes'),
 	'S_NODES_BIG'=>				_('NODES'),
 	'S_NEW_NODE'=>				_('New node'),
-	'S_NO_NODES_DEFINED'=>			_('No nodes defined.'),
 	'S_ALL_NODES'=>				_('All nodes'),
 	'S_DELETE_SELECTED_NODE_Q'=>		_('Delete selected node?'),
 
@@ -323,10 +313,6 @@
 	'S_DRAW_STYLE'=>			_('Draw style'),
 	'S_SIMPLE'=>				_('Simple'),
 	'S_GRAPH_TYPE'=>			_('Graph type'),
-	'S_STACKED'=>				_('Stacked'),
-	'S_NORMAL'=>				_('Normal'),
-	'S_PIE'=>				_('Pie'),
-	'S_EXPLODED'=>				_('Exploded'),
 	'S_AGGREGATED'=>			_('Aggregated'),
 	'S_AGGREGATED_PERIODS_COUNT'=>		_('Aggregated periods count'),
 
@@ -423,23 +409,12 @@
 	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
 	'S_APPLICATIONS_BIG'=>				_('APPLICATIONS'),
-	'S_CREATE_APPLICATION'=>			_('Create application'),
-	'S_APPLICATION_UPDATED'=>			_('Application updated'),
-	'S_CANNOT_UPDATE_APPLICATION'=>			_('Cannot update application'),
-	'S_APPLICATION_ADDED'=>				_('Application added'),
-	'S_CANNOT_ADD_APPLICATION'=>			_('Cannot add application'),
-	'S_APPLICATION_DELETED'=>			_('Application deleted'),
-	'S_CANNOT_DELETE_APPLICATION'=>			_('Cannot delete application'),
-	'S_NO_APPLICATIONS_DEFINED'=>			_('No applications defined.'),
 	'S_HOSTS'=>					_('Hosts'),
 	'S_ITEMS'=>					_('Items'),
 	'S_ITEMS_BIG'=>					_('ITEMS'),
 	'S_TRIGGERS'=>					_('Triggers'),
 	'S_GRAPHS'=>					_('Graphs'),
 	'S_HOST_GROUPS_BIG'=>				_('HOST GROUPS'),
-	'S_NO_HOSTS_DEFINED'=>				_('No hosts defined.'),
-	'S_NO_TEMPLATES_DEFINED'=>			_('No templates defined.'),
-	'S_NO_PROXIES_DEFINED'=>			_('No proxies defined.'),
 	'S_HOST'=>					_('Host'),
 	'S_CONNECT_TO'=>				_('Connect to'),
 	'S_DNS'=>					_('DNS'),
@@ -483,7 +458,6 @@
 	'S_CREATE_PROXY'=>				_('Create proxy'),
 	'S_PROXY_NAME'=>				_('Proxy name'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
-	'S_UPDATED_STATUS_OF_HOST' =>		_('Updated status of host'),
 	'S_CLEAR_WHEN_UNLINKING' => _('Clear when unlinking'),
 	'S_SNMP' =>						_('SNMP'),
 	'S_INTERFACES' =>				_('Interfaces'),
@@ -528,8 +502,6 @@
 	'S_CANNOT_DELETE_ITEM'=>				_('Cannot delete item'),
 	'S_ITEMS_DELETED'=>					_('Items deleted'),
 	'S_CANNOT_DELETE_ITEMS'=>				_('Cannot delete items'),
-	'S_ITEMS_ACTIVATED'=>					_('Items activated'),
-	'S_ITEMS_DISABLED'=>					_('Items disabled'),
 	'S_KEY'=>						_('Key'),
 	'S_DESCRIPTION'=>					_('Description'),
 	'S_INTERVAL'=>						_('Interval'),
@@ -538,11 +510,9 @@
 	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
 	'S_ACTIVE'=>						_('Active'),
 	'S_NOT_SUPPORTED'=>					_('Not supported'),
-	'S_SCRIPT'=>						_('Script'),
 	'S_UNITS'=>						_('Units'),
 	'S_KEEP_HISTORY_IN_DAYS'=>				_('Keep history (in days)'),
 	'S_KEEP_TRENDS_IN_DAYS'=>				_('Keep trends (in days)'),
-	'S_TYPE_OF_INFORMATION'=>				_('Type of information'),
 	'S_DATA_TYPE'=>						_('Data type'),
 	'S_DECIMAL'=>						_('Decimal'),
 	'S_OCTAL'=>						_('Octal'),
@@ -585,7 +555,6 @@
 	'S_FLEXIBLE_INTERVALS'=>				_('Flexible intervals (sec)'),
 	'S_NO_FLEXIBLE_INTERVALS'=>				_('No flexible intervals'),
 	'S_PARAMS'=>						_('Additional parameters'),
-	'S_NEW_APPLICATION'=>					_('New application'),
 	'S_IPMI_SENSOR'=>					_('IPMI sensor'),
 	'S_TEMPLATED_ITEM'=>					_('Templated item'),
 	'S_WEB_ITEM'=>						_('Web item'),
@@ -661,7 +630,6 @@
 	'S_MAP_DELETED'=>			_('Network map deleted'),
 	'S_CANNOT_DELETE_MAP'=>			_('Cannot delete network map'),
 	'S_MAPS_BIG'=>					_('MAPS'),
-	'S_NO_MAPS_DEFINED'=>			_('No maps defined.'),
 	'S_CREATE_MAP'=>				_('Create map'),
 	'S_IMPORT_MAP'=>				_('Import map'),
 	'S_DELETE_SELECTED_MAPS_Q'=>		_('Delete selected maps?'),
@@ -769,23 +737,17 @@
 //	chart4.php
 	'S_CHART4_TIMELINE_DATE_FORMAT'=>	_('d.M'),
 
-//	chart5.php
-	'S_CHART5_TIMELINE_DATE_FORMAT'=>	_('d.M'),
-
 //	chart_bar.php
 	'S_CHARTBAR_HOURLY_DATE_FORMAT'=>		_('Y.m.d H:i'),
 	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		_('Y.m.d'),
 
 //	report3.php
-	'S_IT_SERVICES_AVAILABILITY_REPORT'=>		_('IT services availability report'),
-	'S_IT_SERVICES_AVAILABILITY_REPORT_BIG'=>	_('IT SERVICES AVAILABILITY REPORT'),
 	'S_FROM'=>					_('From'),
 	'S_TILL'=>					_('Till'),
 	'S_OK'=>					_('Ok'),
 	'S_RESOLVED'=>				_('Resolved'),
 	'S_PROBLEM'=>					_('Problem'),
 	'S_PROBLEMS'=>					_('Problems'),
-	'S_PERCENTAGE'=>				_('Percentage'),
 	'S_SLA'=>					_('SLA'),
 	'S_DAY'=>					_('Day'),
 	'S_MONTH'=>					_('Month'),
@@ -795,22 +757,9 @@
 	'S_WEEKLY'=>					_('Weekly'),
 	'S_MONTHLY'=>					_('Monthly'),
 	'S_YEARLY'=>					_('Yearly'),
-	'S_REPORT3_ANNUALLY_DATE_FORMAT'=>		_('Y'),
-	'S_REPORT3_MONTHLY_DATE_FORMAT'=>		_('M Y'),
-	'S_REPORT3_DAILY_DATE_FORMAT'=>			_('d M Y'),
-	'S_REPORT3_WEEKLY_DATE_FORMAT'=>		_('d M Y H:i'),
-
-//	services_form.php
-	'S_SERVICES_UPTIME_DATE_FORMAT'=>		_('l H:i'),
-	'S_SERVICES_DOWNTIME_DATE_FORMAT'=>		_('l H:i'),
-	'S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT'=>	_('d M Y H:i'),
-	'S_ADD_SMALL'=>								_('add'),
-	'S_ERROR_ADDING_SERVICE_TIME' => _('Error adding service time'),
-	'S_IS_A_WRONG_TIME_FORMAT' => _('is a wrong time format. Should be from 00:00 to 24:00.'),
 
 //	locales.php
 	'S_CREATE'=>				_('Create'),
-
 
 //	report4.php
 	'S_NOTIFICATIONS_BIG'=>			_('NOTIFICATIONS'),
@@ -819,12 +768,6 @@
 	'S_REPORT4_MONTHLY_DATE_FORMAT'=>	_('M Y'),
 	'S_REPORT4_DAILY_DATE_FORMAT'=>		_('d M Y'),
 	'S_REPORT4_WEEKLY_DATE_FORMAT'=>	_('d M Y H:i'),
-
-//	report5.php
-	'S_TRIGGERS_TOP_100'=>			_('Most busy triggers top 100'),
-	'S_TRIGGERS_TOP_100_BIG'=>		_('MOST BUSY TRIGGERS TOP 100'),
-	'S_NUMBER_OF_STATUS_CHANGES'=>		_('Number of status changes'),
-	'S_WEEK'=>				_('Week'),
 
 //	report6.php
 	'S_BAR_REPORTS'=>			_('Bar reports'),
@@ -856,7 +799,6 @@
 	'S_CANNOT_DELETE_SCREEN'=>		_('Cannot delete screen'),
 	'S_COLUMNS'=>				_('Columns'),
 	'S_ROWS'=>				_('Rows'),
-	'S_NO_SCREENS_DEFINED'=>		_('No screens defined.'),
 	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
 	'S_SCREEN_CELL_CONFIGURATION'=>		_('Screen cell configuration'),
 	'S_RESOURCE'=>					_('Resource'),
@@ -882,7 +824,6 @@
 	'S_SLIDESHOWS_BIG'=>			_('SLIDE SHOWS'),
 	'S_NO_SLIDESHOWS_DEFINED'=>		_('No slide shows defined.'),
 	'S_COUNT_OF_SLIDES'=>			_('Count of slides'),
-	'S_NO_SLIDES_DEFINED'=>			_('No slides defined.'),
 	'S_SLIDES'=>					_('Slides'),
 	'S_NEW_SLIDE'=>					_('New slide'),
 	'S_SHOW_TEXT_AS_HTML'=>			_('Show text as HTML'),
@@ -940,63 +881,14 @@
 // slides.php
 	'S_CUSTOM_SLIDES' =>			_('Custom slides'),
 
-
 //	services.php
-	'S_ROOT_SMALL'=>			_('root'),
-	'S_IT_SERVICE'=>			_('IT service'),
-	'S_IT_SERVICES'=>			_('IT services'),
-	'S_CONFIGURATION_OF_IT_SERVICES'=>	_('Configuration of IT services'),
-	'S_SERVICE_UPDATED'=>			_('Service updated'),
 	'S_NO_IT_SERVICE_DEFINED'=>		_('No IT services defined.'),
-	'S_CANNOT_UPDATE_SERVICE'=>		_('Cannot update service'),
-	'S_SERVICE_ADDED'=>			_('Service added'),
-	'S_CANNOT_ADD_SERVICE'=>		_('Cannot add service'),
-	'S_SERVICE_DELETED'=>			_('Service deleted'),
-	'S_CANNOT_DELETE_SERVICE'=>		_('Cannot delete service'),
-	'S_PARENT_SERVICE'=>			_('Parent service'),
-	'S_STATUS_CALCULATION'=>		_('Status calculation'),
-	'S_STATUS_CALCULATION_ALGORITHM'=>	_('Status calculation algorithm'),
 	'S_NONE'=>				_('None'),
-	'S_SOFT'=>				_('Soft'),
-	'S_CALCULATE_SLA'=>			_('Calculate SLA'),
-	'S_ACCEPTABLE_SLA_IN_PERCENT'=>		_('Acceptable SLA (in %)'),
-	'S_LINK_TO_TRIGGER_Q'=>			_('Link to trigger?'),
-	'S_SORT_ORDER_0_999'=>			_('Sort order (0->999)'),
 	'S_TRIGGER'=>				_('Trigger'),
 	'S_DELETE'=>				_('Delete'),
 	'S_CLONE'=>				_('Clone'),
 	'S_FULL_CLONE'=>			_('Full clone'),
-	'S_UPTIME'=>				_('Uptime'),
-	'S_DOWNTIME'=>				_('Downtime'),
-	'S_ONE_TIME_DOWNTIME'=>			_('One-time downtime'),
-	'S_NO_TIMES_DEFINED'=>			_('No times defined.'),
-	'S_SERVICE_TIMES'=>			_('Service times'),
-	'S_NEW_SERVICE_TIME'=>			_('New service time'),
-	'S_NOTE'=>				_('Note'),
 	'S_REMOVE'=>				_('Remove'),
-
-	'S_SUNDAY'=>				_('Sunday'),
-	'S_MONDAY'=>				_('Monday'),
-	'S_TUESDAY'=>				_('Tuesday'),
-	'S_WEDNESDAY'=>				_('Wednesday'),
-	'S_THURSDAY'=>				_('Thursday'),
-	'S_FRIDAY'=>				_('Friday'),
-	'S_SATURDAY'=>				_('Saturday'),
-
-//	srv_status.php
-	'S_IT_SERVICES_BIG'=>			_('IT SERVICES'),
-	'S_SERVICE'=>				_('Service'),
-	'S_SERVICES'=>				_('Services'),
-	'S_REASON'=>				_('Reason'),
-	'S_TODAY'=>				_('Today'),
-	'S_THIS_WEEK'=>				_('This week'),
-	'S_THIS_YEAR'=>				_('This year'),
-	'S_THIS_MONTH'=>			_('This month'),
-	'S_LAST_24_HOURS'=>			_('Last 24 hours'),
-	'S_LAST_7_DAYS'=>			_('Last 7 days'),
-	'S_LAST_30_DAYS'=>			_('Last 30 days'),
-	'S_LAST_365_DAYS'=>			_('Last 365 days'),
-	'S_CANNOT_FORMAT_TREE_CHECK_LOGIC'=> _('Cannot format Tree. Check logic structure in service links'),
 
 //	triggers.php
 	'S_NO_TRIGGER'=>			_('No trigger'),
@@ -1007,8 +899,6 @@
 	'S_CANNOT_DELETE_TRIGGERS'=>		_('Cannot delete triggers'),
 	'S_TRIGGER_DELETED'=>			_('Trigger deleted'),
 	'S_CANNOT_DELETE_TRIGGER'=>		_('Cannot delete trigger'),
-	'S_TRIGGER_ADDED'=>			_('Trigger added'),
-	'S_CANNOT_ADD_TRIGGER'=>		_('Cannot add trigger'),
 	'S_SEVERITY'=>				_('Severity'),
 	'S_MIN_SEVERITY'=>			_('Min severity'),
 	'S_DISABLED'=>				_('Disabled'),
@@ -1019,7 +909,6 @@
 	'S_CHANGE'=>				_('Change'),
 	'S_TRIGGER_UPDATED'=>			_('Trigger updated'),
 	'S_CANNOT_UPDATE_TRIGGER'=>		_('Cannot update trigger'),
-	'S_DEPENDS_ON'=>			_('Depends on'),
 	'S_DEPENDENT'=>				_('Dependent'),
 	'S_URL'=>				_('URL'),
 	'S_CREATE_TRIGGER'=>			_('Create trigger'),
@@ -1116,9 +1005,6 @@
 	'S_UNKNOWN_ACTION'=>		_('Unknown action'),
 	'S_ADDED'=>					_('Added'),
 	'S_UPDATED'=>				_('Updated'),
-	'S_MEDIA_TYPE'=>			_('Media type'),
-	'S_GRAPH_ELEMENT'=>			_('Graph element'),
-	'S_UNKNOWN_RESOURCE'=>		_('Unknown resource'),
 	'S_ALREADY_EXISTS_SMALL'=>	_('already exists'),
 
 //	profile.php
@@ -1149,7 +1035,6 @@
 	'S_EMPTY'=>					_('Empty'),
 	'S_NO_ITEMS'=>				_('No items'),
 	'S_DISCOVERY_RULES_BIG'=>	_('DISCOVERY RULES'),
-	'S_CANNOT_SWITCH_HOSTS'=>	_('You can not switch hosts for current selection'),
 
 //	popup_period.php
 	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -1176,12 +1061,6 @@
 	'S_EXPRESSION_NOT_A_MACRO_ERROR'=>	_('Given expression is not a macro'),
 	'S_RESULT_TYPE'=>	_('Result type'),
 	'S_COMBINED_RESULT'=>	_('Combined result'),
-
-//  applications.php
-	'S_DELETE_APPLICATION'=>	_('Delete this application?'),
-	'S_ACTIVATE_SELECTED_APPLICATIONS' => _('Activate selected applications?'),
-	'S_DISABLE_SELECTED_APPLICATIONS' => _('Disable selected applications?'),
-	'S_DELETE_SELECTED_APPLICATIONS'  => _('Delete selected applications?'),
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	_('Incorrect time period'),
@@ -1218,24 +1097,19 @@
 
 //	items.inc.php
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	_('Incorrect arguments passed to function'),
-	'S_ALREADY_EXISTS_FOR_HOST_SMALL'=>		_('already exists for host'),
 	'S_UPDATED_SMALL'=>				_('updated'),
-	'S_NO_ITEM_WITH'=>				_('No item with'),
 
 //	httptest.inc.php
 	'S_ADDED_SMALL'=>				_('added'),
 
 //	hosts.inc.php
 	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		_('is internal and can not be deleted'),
-	'S_NO_HOST_WITH'=>				_('No host with'),
-	'S_USED_BY_SCENARIO_SMALL'=>			_('used by scenario'),
 	'S_NO_APPLICATION_WITH'=>			_('No application with'),
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			_('Template with item key'),
 	'S_TEMPLATE_WITH_APPLICATION'=>			_('Template with application'),
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		_('already linked to host'),
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		_('Host'),
 	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		_('has been deleted from the system'),
-	'S_AND_CANT_BE_DELETED' => _('and can\'t be deleted'),
 
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					_('No trigger with'),
@@ -1299,7 +1173,6 @@
 
 //	Errors
 	'S_DOES_NOT_EXIST_SMALL'=>		_('does not exist'),
-	'S_CANT_FORMAT_TREE'=>			_('Can\'t format Tree'),
 	'S_NO_PERMISSION'=>				_('You do not have permission to perform this operation'),
 	'S_NO_PERMISSIONS_FOR_SCREEN'=>	_('No permissions for screen'),
 	'S_NO_PERMISSIONS_FOR_MAP'=>	_('No permissions for map'),

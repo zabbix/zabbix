@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -26,7 +26,7 @@ $page['title'] = _('Host groups');
 $page['file'] = 'hostgroups.php';
 $page['hist_arg'] = array();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -345,5 +345,5 @@ else {
 	$hostgroupView->render();
 	$hostgroupView->show();
 }
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

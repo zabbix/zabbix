@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -50,7 +50,7 @@ else{
 	}
 }
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 	$allow_discovery = check_right_on_discovery(PERM_READ_ONLY);
@@ -104,7 +104,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -359,7 +359,7 @@ include_once('include/page_header.php');
 	$firstEvent = API::Event()->get($options);
 // }}} CHECK IF EVENTS EXISTS
 
-	$_REQUEST['period'] = get_request('period', 604800); // 1 week
+	$_REQUEST['period'] = get_request('period', SEC_PER_WEEK);
 	$effectiveperiod = navigation_bar_calc();
 	$bstime = $_REQUEST['stime'];
 	$from = zbxDateToTime($_REQUEST['stime']);
@@ -472,7 +472,7 @@ include_once('include/page_header.php');
 							$event_data['object_data']['port'] = S_UNKNOWN;
 						}
 
-						$event_data['description'] = S_SERVICE.': '.
+						$event_data['description'] = _('Service').': '.
 								discovery_check_type2str($event_data['object_data']['type']).
 								discovery_port2str($event_data['object_data']['type'], $event_data['object_data']['port']);
 
@@ -713,6 +713,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

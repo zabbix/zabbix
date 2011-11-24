@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -26,7 +26,7 @@
 	$page['file'] = 'nodes.php';
 	$page['hist_arg'] = array();
 
-	include_once('include/page_header.php');
+	require_once('include/page_header.php');
 ?>
 <?php
 	$fields=array(
@@ -211,7 +211,7 @@
 			$nodes_wdgt->addHeader(S_NODES_BIG);
 			$nodes_wdgt->addItem(BR());
 
-			$table=new CTableInfo(S_NO_NODES_DEFINED);
+			$table = new CTableInfo(_('No nodes defined.'));
 			$table->setHeader(array(
 				make_sorting_header(S_ID, 'n.nodeid'),
 				make_sorting_header(S_NAME, 'n.name'),
@@ -244,5 +244,5 @@
 	$nodes_wdgt->show();
 
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

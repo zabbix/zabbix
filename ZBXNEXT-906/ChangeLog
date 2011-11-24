@@ -2,20 +2,42 @@
 Changes for 1.9.8
 
 New features:
+ - [ZBX-4288] added unit tests to cover host macro creation and deletion (pavels)
+ - [ZBX-3104] implemented the screen item API (pavels)
+ - [ZBXNEXT-913] redesign Configuration->IT Services (Eduard)
+ - [ZBXNEXT-907] redesign Configuration->Applications (Eduard)
+ - [ZBX-3271] implemented the _x() and _xn() function for context dependent translations (pavels,Richlv,Vedmak)
+ - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget (pavels)
+ - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
+ - [ZBXNEXT-1019] updated jQuery to 1.7 (Vedmak)
  - [ZBX-1357] added initial Greek translation (Richlv)
  - [ZBXNEXT-911] redesign Configuration->Web (Eduard)
  - [ZBXNEXT-579] added support for vfs.fs.discovery (with both {#FSNAME} and {#FSTYPE}) on FreeBSD, NetBSD and OpenBSD (asaveljevs)
  - [ZBXNEXT-580] added support for {#FSTYPE} for vfs.fs.discovery on AIX, HP-UX, Linux, Solaris and Windows (asaveljevs)
  - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
- - [ZBX-1357] updated Brazilian Portuguese and Russian translations; thanks to Zabbix translators (Richlv)
+ - [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
+ - [ZBX-3593] fixed misaligned server name on top of the page (sanja)
+ - [ZBX-3771] fixed possible 'Lock wait timeout' while processing lld rules (Sasha,pavels)
+ - [ZBX-4139] fixed "Last n issues" widget label ignoring variable that sets the amount of issues (Richlv)
+ - [ZBX-4359] fixed potentially incorrectly named index on node_cksum table (Richlv, sasha)
+ - [ZBX-4188] fixed nclob problem for Oracle (Vedmak)
+ - [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
+ - [ZBX-4282] fixed errors when importing templates with trigger dependencies (pavels)
+ - [ZBX-4108] updated FSF mailing address (Richlv)
+ - [ZBX-4244] fixed inline-block container resizing in object lists in IE8 (pavels)
+ - [ZBX-4297] fixed error in top 100 triggers report (Vedmak)
+ - [ZBX-4258] fixed link to the template prototype item in the caption of the item editing form (pavels)
+ - [ZBX-3510] fixed discovery and it's prototype cloning when cloning a host or template (pavels)
+ - [ZBX-3674] fixed possible editing of lld created elements (Vedmak)
  - [ZBX-3113] made nanoseconds patch mandatory for upgrading from 1.8 to 2.0 (asaveljevs)
  - [ZBX-3468] fixed error messages and warnings with enabled SQLite3 support in front-end (Alexei)
  - [ZBX-4056] fixed dependencies not added when template linked to host (Vedmak)
  - [ZBX-4315] fixed the 'close' link in the tooltips (pavels)
- - [ZBX-3675] fixed items created via api for template have wrong interfaceid on linked host (Vedmak)
+ - [ZBX-3675] fixed items created via API for template have wrong interfaceid on linked host (Vedmak)
  - [ZBX-4212] fixed creation of trigger expression with "])" in item key (Vedmak)
  - [ZBXNEXT-675] reduced surrounding whitespace for Switch, Cloud, Crypto-router, UPS, Hub and Router map icons (Elvis, Richlv)
  - [ZBX-4305] removed CREDITS file (Richlv)
@@ -59,7 +81,7 @@ Bug fixes:
  - [ZBX-4174] made database monitor items not require interface (asaveljevs, Vedmak)
  - [ZBX-3881] fixed delay being set to 0 when changing item type from trapper to agent in item update form (Vedmak)
  - [ZBX-4115] added support for $(DESTDIR) for installing Zabbix Java proxy (dimir)
- - [ZBX-1020] added support for --sysconfdir, changed default installation directories (dimir)
+ - [ZBX-1020] added support for --sysconfdir, changed default installation directories (dimir,Richlv)
  - [ZBX-3912] fixed popup object selection for IE (Eduard)
  - [ZBX-4132] fixed checkbox cookie work (Eduard)
  - [ZBX-3635] fixed situation when templated trigger can reference items from another template not linked to a host (Vedmak)
@@ -312,8 +334,35 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.10rc1
+
+ - [ZBX-2859] fixed possibility to successfully delete zero regular expressions (sanja)
+ - [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
+ - [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
+ - [ZBX-4375] updated Russian translation; thanks to Alexey Pustovalov (Richlv)
+ - [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (dimir,asaveljevs)
+ - [ZBX-4249] fixed trigger wizard when inserting macro multiple times (Vedmak)
+ - [ZBX-4351] updated French translation; thanks to Joseph Bueno (Richlv)
+ - [ZBX-4353] updated Japanese translation; thanks to Kodai Terashima (Richlv)
+
+Changes for 1.8.9
+
+1.8.9rc2 was released as 1.8.9 without any changes
+
+Changes for 1.8.9rc2
+
+ - [ZBX-4352] fixed template linking when mass updating hosts (pavels,Vedmak)
+
 Changes for 1.8.9rc1
 
+ - [ZBX-4325] fixed maintenance periods saved with nonzero seconds (asaveljevs,Vedmak)
+ - [ZBX-4345] fixed counting of recursive dependency levels for triggers (asaveljevs)
+ - [ZBX-4027] fixed floating-point comparison and unified epsilon in trigger functions and expressions (asaveljevs)
+ - [ZBX-3551] fixed image XML export for Postgres (pavels)
+ - [ZBX-3625] fixed validation of aggregated item keys (Sasha)
+ - [ZBX-3117] fixed error notification when unsuccessfully copying a graph (pavels)
+ - [ZBX-4326] API now returns error when trying to create incorrect host profile field (Vedmak)
+ - [ZBX-4323] fixed host profile not created with host using API (Vedmak)
  - [ZBX-4275] made server and proxy try to reconnect to the database upon startup (asaveljevs)
  - [ZBX-4159] fixed problem with generating new ids for historical tables (Vedmak)
  - [ZBX-3988] fixed memory leak in dashboard (Vedmak)
@@ -321,7 +370,7 @@ Changes for 1.8.9rc1
  - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
  - [ZBX-2919] fixed custom multiplier becoming 0 when creating an item (pavels)
  - [ZBX-3074] moved the 'Status' column in the item list to the left (pavels)
- - [ZBX-2504] replaced 'Groups' by 'Replace groups' in host mass-update form to avoid confusion (Alexei)
+ - [ZBX-2504] replaced 'Groups' by 'Replace host groups' in host mass-update form to avoid confusion (Alexei)
  - [ZBX-4265] fixed host input validation (pavels)
  - [ZBX-4264] fixed zabbix_agent compilation problem on HP-UX (dimir)
  - [ZBX-3504] added a text notification in the maps section when no maps are defined (pavels)

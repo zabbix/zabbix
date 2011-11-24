@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -1262,27 +1262,6 @@ int	int_in_list(char *list, int value)
 
 /******************************************************************************
  *                                                                            *
- * Function: cmp_double                                                       *
- *                                                                            *
- * Purpose: compares two double values                                        *
- *                                                                            *
- * Parameters: a, b - doubles to compare                                      *
- *                                                                            *
- * Return value:  0 - the values are equal                                    *
- *                1 - otherwise                                               *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: equal == differs less than 0.000001                              *
- *                                                                            *
- ******************************************************************************/
-int	cmp_double(double a,double b)
-{
-	return fabs(a - b) < 0.000001 ? 0 : 1;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: is_double_prefix                                                 *
  *                                                                            *
  * Purpose: check if the string is double                                     *
@@ -1524,11 +1503,12 @@ int	is_int_prefix(const char *c)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_uint64                                                        *
+ * Function: is_uint64_n                                                      *
  *                                                                            *
  * Purpose: check if the string is 64bit unsigned integer                     *
  *                                                                            *
- * Parameters: str - string to check                                          *
+ * Parameters: str - [IN] string to check                                     *
+ *             n   - [IN] string length or INT_MAX for null-terminated string *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - the string is not number or overflow                 *
@@ -1536,15 +1516,15 @@ int	is_int_prefix(const char *c)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	is_uint64(const char *str, zbx_uint64_t *value)
+int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
 {
 	register zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
 	register zbx_uint64_t	value_uint64 = 0, c;
 
-	if ('\0' == *str)
+	if ('\0' == *str || 0 == n)
 		return FAIL;
 
-	while ('\0' != *str)
+	while ('\0' != *str && (INT_MAX == n || 0 < n--))
 	{
 		if (*str >= '0' && *str <= '9')
 		{

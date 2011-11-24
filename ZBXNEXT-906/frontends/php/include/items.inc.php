@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -227,48 +227,30 @@ function item_type2str($type = null){
 	return true;
 	}
 
-
-// Update Item status
-
-	function update_item_status($itemids, $status){
+	function update_item_status($itemids, $status) {
 		zbx_value2array($itemids);
 		$result = true;
 
-		$db_items = DBselect('SELECT * FROM items WHERE '.DBcondition('itemid',$itemids));
-		while($row = DBfetch($db_items)){
-			$old_status=$row['status'];
-
-			if($status != $old_status){
-/*				unset($itemids[$row['itemid']]);*/
-				if ($status==ITEM_STATUS_ACTIVE)
-					$sql='UPDATE items SET status='.$status.",error='' ".
-						' WHERE itemid='.$row['itemid'];
-				else
-					$sql='UPDATE items SET status='.$status.
-						' WHERE itemid='.$row['itemid'];
+		$db_items = DBselect('SELECT i.* FROM items i WHERE '.DBcondition('i.itemid', $itemids));
+		while ($item = DBfetch($db_items)) {
+			$old_status = $item['status'];
+			if ($status != $old_status) {
+				if ($status == ITEM_STATUS_ACTIVE) {
+					$sql = 'UPDATE items SET status='.$status.',error=\'\' WHERE itemid='.$item['itemid'];
+				}
+				else {
+					$sql = 'UPDATE items SET status='.$status.' WHERE itemid='.$item['itemid'];
+				}
 
 				$result &= DBexecute($sql);
-				if ($result){
-					$host=get_host_by_hostid($row['hostid']);
-					$item_new = get_item_by_itemid($row['itemid']);
-					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $row['itemid'], $host['host'].':'.$row['name'], 'items', $row, $item_new);
+				if ($result) {
+					$host = get_host_by_hostid($item['hostid']);
+					$item_new = get_item_by_itemid($item['itemid']);
+					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $item['itemid'], $host['host'].':'.$item['name'], 'items', $item, $item_new);
 				}
 			}
 		}
-/*		if(!empty($itemids)){
-			update_trigger_value_to_unknown_by_itemid($itemids);
-
-			if($status==ITEM_STATUS_ACTIVE)
-				$sql='UPDATE items SET status='.$status.",error='' ".
-					' WHERE '.DBcondition('itemid',$itemids);
-			else
-				$sql='UPDATE items SET status='.$status.
-					' WHERE '.DBcondition('itemid',$itemids);
-
-			$result = DBexecute($sql);
-		}*/
-
-	return $result;
+		return $result;
 	}
 
 	function copyItemsToHosts($srcItemIds, $dstHostIds) {
@@ -365,31 +347,16 @@ function item_type2str($type = null){
 		$dstHosts = API::Host()->get($options);
 		$dstHost = reset($dstHosts);
 
-		$interfaceids = array();
-		foreach ($dstHost['interfaces'] as $interface) {
-			if ($interface['main'] == 1) {
-				$interfaceids[$interface['type']] = $interface['interfaceid'];
-			}
-		}
-
 		foreach ($srcItems as &$srcItem) {
 			if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
-				$type = CItem::itemTypeInterface($srcItem['type']);
-
-				if ($type == INTERFACE_TYPE_ANY) {
-					foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {
-						if (isset($interfaceids[$itype])) {
-							$srcItem['interfaceid'] = $interfaceids[$itype];
-							break;
-						}
-					}
+				// find a matching interface
+				$interface = CItem::findInterfaceForItem($srcItem, $dstHost['interfaces']);
+				if ($interface) {
+					$srcItem['interfaceid'] = $interface['interfaceid'];
 				}
-				elseif ($type !== false) {
-					if (!isset($interfaceids[$type])) {
-						error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
-						return false;
-					}
-					$srcItem['interfaceid'] = $interfaceids[$type];
+				// no matching interface found, throw an error
+				elseif($interface !== false) {
+					error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
 				}
 			}
 
@@ -417,23 +384,19 @@ function item_type2str($type = null){
 		return API::Application()->create($apps_to_clone);
 	}
 
-
-// Activate Item
-
-	function activate_item($itemids){
+	function activate_item($itemids) {
 		zbx_value2array($itemids);
 
-// first update status for child items
-		$chd_items = array();
-		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE '.DBcondition('templateid',$itemids));
-		while($db_tmp_item = DBfetch($db_tmp_items)){
-			$chd_items[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
+		// first update status for child items
+		$child_items = array();
+		$db_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.DBcondition('i.templateid', $itemids));
+		while ($item = DBfetch($db_items)) {
+			$child_items[$item['itemid']] = $item['itemid'];
 		}
-		if(!empty($chd_items)){
-			activate_item($chd_items);  // Recursion !!!
+		if (!empty($child_items)) {
+			activate_item($child_items); // Recursion !!!
 		}
-
-	return update_item_status($itemids, ITEM_STATUS_ACTIVE);
+		return update_item_status($itemids, ITEM_STATUS_ACTIVE);
 	}
 
 // Disable Item
@@ -477,13 +440,13 @@ function item_type2str($type = null){
 	return $item;
 	}
 
-	function get_item_by_itemid($itemid){
-		$row = DBfetch(DBselect('select * from items where itemid='.$itemid));
-		if($row){
-			return	$row;
+	function get_item_by_itemid($itemid) {
+		$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.$itemid));
+		if ($db_items) {
+			return $db_items;
 		}
-		error(S_NO_ITEM_WITH.SPACE.'itemid=['.$itemid.']');
-	return	FALSE;
+		error(_('No item with').SPACE.'itemid=['.$itemid.']');
+		return false;
 	}
 
 	function get_item_by_itemid_limited($itemid){
@@ -498,7 +461,7 @@ function item_type2str($type = null){
 		if($row){
 			return	$row;
 		}
-		error(S_NO_ITEM_WITH.SPACE.'itemid=['.$itemid.']');
+		error(_('No item with').SPACE.'itemid=['.$itemid.']');
 	return	FALSE;
 	}
 
@@ -687,7 +650,7 @@ function item_type2str($type = null){
 
 		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
-		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
+		$table = new CTableInfo(_('No items defined.'));
 
 // COpt::profiling_start('prepare_data');
 		$result = DBselect('SELECT DISTINCT h.hostid, h.name as hostname,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock, '.
@@ -1108,23 +1071,22 @@ function item_type2str($type = null){
 	function check_time_period($period, $now){
 		$tm = localtime($now, true);
 		$day = (0 == $tm['tm_wday']) ? 7 : $tm['tm_wday'];
-		$sec = 3600 * $tm['tm_hour'] + 60 * $tm['tm_min'] + $tm['tm_sec'];
+		$sec = SEC_PER_HOUR * $tm['tm_hour'] + SEC_PER_MIN * $tm['tm_min'] + $tm['tm_sec'];
 
-		$flag = (6 == sscanf($period, "%d-%d,%d:%d-%d:%d", $d1, $d2, $h1, $m1, $h2, $m2));
+		$flag = (6 == sscanf($period, '%d-%d,%d:%d-%d:%d', $d1, $d2, $h1, $m1, $h2, $m2));
 
 		if(!$flag){
-			$flag = (5 == sscanf($period, "%d,%d:%d-%d:%d", $d1, $h1, $m1, $h2, $m2));
+			$flag = (5 == sscanf($period, '%d,%d:%d-%d:%d', $d1, $h1, $m1, $h2, $m2));
 			$d2 = $d1;
 		}
 
 		if(!$flag){
 			/* Delay period format is wrong - skip */;
 		}
-		else{
-			if(($day >= $d1) &&
-				($day <= $d2) &&
-				($sec >= (3600*$h1+60*$m1)) &&
-				($sec <= (3600*$h2+60*$m2)))
+		else {
+			if ($day >= $d1 && $day <= $d2 &&
+				$sec >= (SEC_PER_HOUR * $h1 + SEC_PER_MIN * $m1) &&
+				$sec <= (SEC_PER_HOUR * $h2 + SEC_PER_MIN * $m2))
 			{
 				return true;
 			}
@@ -1218,7 +1180,7 @@ function item_type2str($type = null){
 		$next = 0;
 		$tm = localtime($now, true);
 		$day = (0 == $tm['tm_wday']) ? 7 : $tm['tm_wday'];
-		$sec = 3600 * $tm['tm_hour'] + 60 * $tm['tm_min'] + $tm['tm_sec'];
+		$sec = SEC_PER_HOUR * $tm['tm_hour'] + SEC_PER_MIN * $tm['tm_min'] + $tm['tm_sec'];
 
 		$arr_of_flex_intervals = explode(';', $flex_intervals);
 
@@ -1229,10 +1191,10 @@ function item_type2str($type = null){
 				$d2 = $d1;
 			}
 
-			$sec1 = 3600 * $h1 + 60 * $m1;
-			$sec2 = 3600 * $h2 + 60 * $m2;
+			$sec1 = SEC_PER_HOUR * $h1 + SEC_PER_MIN * $m1;
+			$sec2 = SEC_PER_HOUR * $h2 + SEC_PER_MIN * $m2;
 
-			if(($day >= $d1) && ($day <= $d2) && ($sec >= $sec1) && ($sec <= $sec2)){
+			if ($day >= $d1 && $day <= $d2 && $sec >= $sec1 && $sec <= $sec2) {
 // current period
 				if(($next == 0) || ($next > ($now - $sec + $sec2)))	$next = $now - $sec + $sec2;
 			}

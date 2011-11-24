@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -26,7 +26,7 @@ $page['title'] = 'S_MAP';
 $page['file'] = 'map.php';
 $page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields=array(
@@ -413,6 +413,6 @@ else{
 	imageOut($im);
 }
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -806,8 +806,8 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
 
 		$found = false;
 		do{
-			$min = bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
-			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
+			$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 
 			$dbSelect = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 
@@ -848,7 +848,7 @@ elseif (isset($DB['TYPE']) && $DB['TYPE'] == ZBX_DB_SQLITE3) {
 				}
 				else {
 					$ret2 = $row["nextid"];
-					if (bccomp(bcadd($ret1, 1), $ret2) == 0) {
+					if (bccomp(bcadd($ret1, 1, 0), $ret2, 0) == 0) {
 						$found = true;
 					}
 				}
@@ -1196,8 +1196,8 @@ class DB {
 
 		if(is_null(self::$nodeId)){
 			self::$nodeId = get_current_nodeid(false);
-			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'));
-			self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000')), '99999999999');
+			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+			self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 		}
 
 		if (is_null($table))
@@ -1253,10 +1253,8 @@ class DB {
 			else {
 				switch ($tableSchema['fields'][$field]['type']) {
 					case self::FIELD_TYPE_CHAR:
+						$length = zbx_strlen($values[$field]);
 						$values[$field] = zbx_dbstr($values[$field]);
-
-						// -2 is not to count ' around string
-						$length = zbx_strlen($values[$field]) - 2;
 
 						if ($length > $tableSchema['fields'][$field]['length']) {
 							self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
@@ -1280,10 +1278,10 @@ class DB {
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
 					case self::FIELD_TYPE_TEXT:
+						$length = zbx_strlen($values[$field]);
 						$values[$field] = zbx_dbstr($values[$field]);
 
 						if (($DB['TYPE'] == ZBX_DB_DB2)) {
-							$length = zbx_strlen($values[$field]) - 2;
 							if ($length > 2048) {
 								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is 2048 characters.',
 									$values[$field], $field, $length));

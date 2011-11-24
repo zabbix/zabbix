@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -25,7 +25,7 @@ $page['title'] = "S_IT_NOTIFICATIONS";
 $page['file'] = 'report4.php';
 $page['hist_arg'] = array('media_type','period','year');
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -82,7 +82,7 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$form->SetMethod('get');
 
-		$form->addItem(SPACE.S_MEDIA_TYPE.SPACE);
+		$form->addItem(SPACE._('Media type').SPACE);
 		$cmbMedia = new CComboBox('media_type', $media_type, 'submit();');
 		$cmbMedia->addItem(0,S_ALL_SMALL);
 
@@ -157,7 +157,7 @@ include_once('include/page_header.php');
 					$wd	= date('w', $time);
 					$wd	= $wd == 0 ? 6 : $wd - 1;
 
-					return ($time + ($w*7 - $wd)*24*3600);
+					return $time + ($w * 7 - $wd) * SEC_PER_DAY;
 				}
 				function format_time($t){	return zbx_date2str(S_REPORT4_WEEKLY_DATE_FORMAT,$t);	}
 				function format_time2($t){	return format_time($t); }
@@ -239,6 +239,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>
