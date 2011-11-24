@@ -343,7 +343,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'hostids' => $hostid,
 			'templated_hosts' => 1,
-			'output' => array('hostid', 'host'),
+			'output' => array('hostid', 'name'),
 			'limit' => 1
 		);
 		$only_hosts = CHost::get($options);
@@ -352,7 +352,7 @@ include_once('include/page_header.php');
 		if(empty($host)) access_deny();
 
 		$cmbHosts = new CComboBox('hostid',$hostid);
-		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$host['host']);
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$host['name']);
 		$cmbHosts->setEnabled('disabled');
 		$cmbHosts->setAttribute('title', S_CANNOT_SWITCH_HOSTS);
 
@@ -1210,6 +1210,7 @@ include_once('include/page_header.php');
 		$table->setHeader(array(
 			($hostid>0)?null:S_HOST,
 			S_DESCRIPTION,
+			_('Key'),
 			S_TYPE,
 			S_TYPE_OF_INFORMATION,
 			S_STATUS
@@ -1234,7 +1235,7 @@ include_once('include/page_header.php');
 
 		foreach($items as $tnum => $row){
 			$host = reset($row['hosts']);
-			$row['host'] = $host['host'];
+			$row['host'] = $host['name'];
 
 			$row['description'] = item_description($row);
 			$description = new CSpan($row['description'],'link');
@@ -1248,6 +1249,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				($hostid>0)?null:$row['host'],
 				$description,
+				$row['key_'],
 				item_type2str($row['type']),
 				item_value_type2str($row['value_type']),
 				new CSpan(item_status2str($row['status']),item_status2style($row['status']))
