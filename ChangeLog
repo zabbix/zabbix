@@ -336,6 +336,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
+ - [ZBX-4288] fixed user macro deleting when deleting a host (pavels)
  - [ZBX-2859] fixed possibility to successfully delete zero regular expressions (sanja)
  - [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
  - [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
