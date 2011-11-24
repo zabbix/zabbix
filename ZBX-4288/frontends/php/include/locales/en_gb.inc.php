@@ -2125,7 +2125,6 @@
 
 //	items.inc.php
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	'Incorrect arguments passed to function',
-	'S_INCORRECT_KEY_FORMAT'=>			'Incorrect key format',
 	'S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL'=>	'Item will not be refreshed. Please enter a correct update interval.',
 	'S_INVALID_SNMP_PORT'=>				'Invalid SNMP port',
 	'S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY'=>	'Type of information must be Log for log key',
@@ -2252,7 +2251,6 @@
 	'S_MUST_USE_ITEMS_ONLY_FROM_HOST'=>			'You must use items only from host',
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'for template graph',
 	'S_UPDATED_FOR_HOSTS'=>					'updated for hosts',
-	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Graph "',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			'" deleted from host',
 
