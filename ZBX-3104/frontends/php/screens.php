@@ -172,8 +172,8 @@ if (empty($screens)) {
 // if screen we are searching for does not exist and was not fetched from profile
 elseif (!isset($screens[$elementIdentifier]) && !$id_has_been_fetched_from_profile) {
 	$error_msg = $use_screen_name
-		? sprintf(_('Screen with name "%s" does not exist'), $elementIdentifier)
-		: sprintf(_('Screen with ID "%d" does not exist'), $elementIdentifier);
+		? _s('Screen with name "%s" does not exist', $elementIdentifier)
+		: _s('Screen with ID "%s" does not exist', $elementIdentifier);
 
 	show_error_message($error_msg);
 }

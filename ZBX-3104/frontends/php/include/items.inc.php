@@ -227,48 +227,30 @@ function item_type2str($type = null){
 	return true;
 	}
 
-
-// Update Item status
-
-	function update_item_status($itemids, $status){
+	function update_item_status($itemids, $status) {
 		zbx_value2array($itemids);
 		$result = true;
 
-		$db_items = DBselect('SELECT * FROM items WHERE '.DBcondition('itemid',$itemids));
-		while($row = DBfetch($db_items)){
-			$old_status=$row['status'];
-
-			if($status != $old_status){
-/*				unset($itemids[$row['itemid']]);*/
-				if ($status==ITEM_STATUS_ACTIVE)
-					$sql='UPDATE items SET status='.$status.",error='' ".
-						' WHERE itemid='.$row['itemid'];
-				else
-					$sql='UPDATE items SET status='.$status.
-						' WHERE itemid='.$row['itemid'];
+		$db_items = DBselect('SELECT i.* FROM items i WHERE '.DBcondition('i.itemid', $itemids));
+		while ($item = DBfetch($db_items)) {
+			$old_status = $item['status'];
+			if ($status != $old_status) {
+				if ($status == ITEM_STATUS_ACTIVE) {
+					$sql = 'UPDATE items SET status='.$status.',error=\'\' WHERE itemid='.$item['itemid'];
+				}
+				else {
+					$sql = 'UPDATE items SET status='.$status.' WHERE itemid='.$item['itemid'];
+				}
 
 				$result &= DBexecute($sql);
-				if ($result){
-					$host=get_host_by_hostid($row['hostid']);
-					$item_new = get_item_by_itemid($row['itemid']);
-					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $row['itemid'], $host['host'].':'.$row['name'], 'items', $row, $item_new);
+				if ($result) {
+					$host = get_host_by_hostid($item['hostid']);
+					$item_new = get_item_by_itemid($item['itemid']);
+					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $item['itemid'], $host['host'].':'.$item['name'], 'items', $item, $item_new);
 				}
 			}
 		}
-/*		if(!empty($itemids)){
-			update_trigger_value_to_unknown_by_itemid($itemids);
-
-			if($status==ITEM_STATUS_ACTIVE)
-				$sql='UPDATE items SET status='.$status.",error='' ".
-					' WHERE '.DBcondition('itemid',$itemids);
-			else
-				$sql='UPDATE items SET status='.$status.
-					' WHERE '.DBcondition('itemid',$itemids);
-
-			$result = DBexecute($sql);
-		}*/
-
-	return $result;
+		return $result;
 	}
 
 	function copyItemsToHosts($srcItemIds, $dstHostIds) {
@@ -402,23 +384,19 @@ function item_type2str($type = null){
 		return API::Application()->create($apps_to_clone);
 	}
 
-
-// Activate Item
-
-	function activate_item($itemids){
+	function activate_item($itemids) {
 		zbx_value2array($itemids);
 
-// first update status for child items
-		$chd_items = array();
-		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE '.DBcondition('templateid',$itemids));
-		while($db_tmp_item = DBfetch($db_tmp_items)){
-			$chd_items[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
+		// first update status for child items
+		$child_items = array();
+		$db_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.DBcondition('i.templateid', $itemids));
+		while ($item = DBfetch($db_items)) {
+			$child_items[$item['itemid']] = $item['itemid'];
 		}
-		if(!empty($chd_items)){
-			activate_item($chd_items);  // Recursion !!!
+		if (!empty($child_items)) {
+			activate_item($child_items); // Recursion !!!
 		}
-
-	return update_item_status($itemids, ITEM_STATUS_ACTIVE);
+		return update_item_status($itemids, ITEM_STATUS_ACTIVE);
 	}
 
 // Disable Item
@@ -462,13 +440,13 @@ function item_type2str($type = null){
 	return $item;
 	}
 
-	function get_item_by_itemid($itemid){
-		$row = DBfetch(DBselect('select * from items where itemid='.$itemid));
-		if($row){
-			return	$row;
+	function get_item_by_itemid($itemid) {
+		$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.$itemid));
+		if ($db_items) {
+			return $db_items;
 		}
-		error(S_NO_ITEM_WITH.SPACE.'itemid=['.$itemid.']');
-	return	FALSE;
+		error(_('No item with').SPACE.'itemid=['.$itemid.']');
+		return false;
 	}
 
 	function get_item_by_itemid_limited($itemid){
@@ -483,7 +461,7 @@ function item_type2str($type = null){
 		if($row){
 			return	$row;
 		}
-		error(S_NO_ITEM_WITH.SPACE.'itemid=['.$itemid.']');
+		error(_('No item with').SPACE.'itemid=['.$itemid.']');
 	return	FALSE;
 	}
 
@@ -672,7 +650,7 @@ function item_type2str($type = null){
 
 		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
-		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
+		$table = new CTableInfo(_('No items defined.'));
 
 // COpt::profiling_start('prepare_data');
 		$result = DBselect('SELECT DISTINCT h.hostid, h.name as hostname,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock, '.
