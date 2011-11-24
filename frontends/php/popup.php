@@ -1487,6 +1487,7 @@ elseif ($srctbl == 'plain_text') {
 	$table->setHeader(array(
 		$hostid > 0 ? null : _('Host'),
 		_('Name'),
+		_('Key'),
 		_('Type'),
 		_('Type of information'),
 		_('Status')
@@ -1514,7 +1515,7 @@ elseif ($srctbl == 'plain_text') {
 
 	foreach ($items as $tnum => $row) {
 		$host = reset($row['hosts']);
-		$row['host'] = $host['host'];
+		$row['host'] = $host['name'];
 		$row['name'] = itemName($row);
 		$description = new CSpan($row['name'], 'link');
 		$row['name'] = $row['host'].':'.$row['name'];
@@ -1525,6 +1526,7 @@ elseif ($srctbl == 'plain_text') {
 		$table->addRow(array(
 			$hostid > 0 ? null : $row['host'],
 			$description,
+			$row['key_'],
 			item_type2str($row['type']),
 			item_value_type2str($row['value_type']),
 			new CSpan(item_status2str($row['status']), item_status2style($row['status']))

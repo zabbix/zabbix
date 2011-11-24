@@ -285,6 +285,13 @@ class API {
 	}
 
 /**
+ * @return CScreenItem
+ */
+	public static function ScreenItem() {
+		return self::getObject('screenitem');
+	}
+
+/**
  * @return CScript
  */
 	public static function Script() {
