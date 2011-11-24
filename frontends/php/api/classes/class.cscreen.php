@@ -632,7 +632,9 @@ SDI('/////////////////////////////////');
 					}
 				}
 			}
-			$this->addItems($insert_screen_items);
+
+			// save screen items
+			API::ScreenItem()->create($insert_screen_items);
 
 			return array('screenids' => $screenids);
 	}
@@ -690,12 +692,9 @@ SDI('/////////////////////////////////');
 				);
 			}
 
-			if(isset($screen['screenitems'])){
-				$update_items = array(
-					'screenids' => $screenid,
-					'screenitems' => $screen['screenitems'],
-				);
-				$this->updateItems($update_items);
+			// udpate screen items
+			if (isset($screen['screenitems'])) {
+				$this->replaceItems($screenid, $screen['screenitems']);
 			}
 		}
 		DB::update('screens', $update);
@@ -732,120 +731,29 @@ SDI('/////////////////////////////////');
 		return array('screenids' => $screenids);
 	}
 
-/**
- * Add ScreenItem
- *
- * @param array $screenitems
- * @return boolean
- */
-	protected function addItems($screenitems){
-		$insert = array();
 
-		$this->checkItems($screenitems);
+	/**
+	 * Replaces all of the screen items of the given screen with the new ones.
+	 *
+	 * @param int $screenid        The ID of the target screen
+	 * @param array $screenItems   An array of screen items
+	 */
+	protected function replaceItems($screenid, $screenItems){
+		// fetch the current screen items
+		$dbScreenItems = API::ScreenItem()->get(array(
+			'screenids' => $screenid,
+			'preservekeys' => true,
+		));
 
-		foreach($screenitems as $screenitem){
-			$items_db_fields = array(
-				'screenid' => null,
-					'resourcetype' => null,
-				'resourceid' => null,
-				'x' => null,
-				'y' => null,
-			);
-
-			if(!check_db_fields($items_db_fields, $screenitem)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for screen items'));
-			}
-
-			$insert[] = $screenitem;
+		// update the new ones
+		foreach ($screenItems as &$screenItem) {
+			$screenItem['screenid'] = $screenid;
 		}
+		$result = API::ScreenItem()->updateByPosition($screenItems);
 
-		DB::insert('screens_items', $insert);
-
-	return true;
-	}
-
-	protected function updateItems($data){
-		$screenids = zbx_toArray($data['screenids']);
-		$insert = array();
-		$update = array();
-		$delete = array();
-
-
-		$this->checkItems($data['screenitems']);
-
-		$options = array(
-			'screenids' => $screenids,
-			'nopermissions' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'selectScreenItems' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1,
-		);
-		$screens = $this->get($options);
-
-		$templateScreens = API::TemplateScreen()->get($options);
-
-		$screens = array_merge($screens, $templateScreens);
-
-		foreach($data['screenitems'] as $new_item){
-			$items_db_fields = array(
-				'x' => null,
-				'y' => null,
-			);
-			if(!check_db_fields($items_db_fields, $new_item)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for screen items'));
-			}
-		}
-
-		foreach($screens as $screen){
-			$new_items = $data['screenitems'];
-
-			foreach($screen['screenitems'] as $cnum => $current_item){
-				foreach($new_items as $nnum => $new_item){
-					if(($current_item['x'] == $new_item['x']) && ($current_item['y'] == $new_item['y'])){
-
-						$tmpupd = array(
-							'where' => array(
-								'screenid' => $screen['screenid'],
-								'x' => $new_item['x'],
-								'y' => $new_item['y']
-							)
-						);
-
-						unset($new_item['screenid'], $new_item['screenitemid'], $new_item['x'], $new_item['y']);
-						$tmpupd['values'] = $new_item;
-
-						$update[] = $tmpupd;
-
-						unset($screen['screenitems'][$cnum]);
-						unset($new_items[$nnum]);
-						break;
-					}
-				}
-			}
-
-			foreach($new_items as $new_item){
-				$items_db_fields = array(
-					'resourcetype' => null,
-					'resourceid' => null,
-				);
-				if(!check_db_fields($items_db_fields, $new_item)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for screen items'));
-				}
-
-				$new_item['screenid'] = $screen['screenid'];
-				$insert[] = $new_item;
-			}
-
-			foreach($screen['screenitems'] as $del_item){
-				$delete[] = $del_item['screenitemid'];
-			}
-		}
-
-		if(!empty($insert)) DB::insert('screens_items', $insert);
-		if(!empty($update)) DB::update('screens_items', $update);
-		if(!empty($delete)) DB::delete('screens_items', array('screenitemid'=>$delete));
-
-	return true;
+		// deleted the old items
+		$deleteItemIds = array_diff(array_keys($dbScreenItems), $result['screenitemids']);
+		API::ScreenItem()->delete($deleteItemIds);
 	}
 }
 ?>
