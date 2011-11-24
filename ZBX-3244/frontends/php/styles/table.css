@@ -704,10 +704,6 @@ table.menu tr td.active{
 	border-color: #6666AA;
 }
 
-table.menu tr td.notactive{
-	/*inactive menu*/
-}
-
 /************* SUB MENU ************/
 
 table.sub_menu{

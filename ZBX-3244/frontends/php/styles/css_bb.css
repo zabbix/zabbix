@@ -186,10 +186,6 @@ table.menu tr td.active{
 	background: #333333 url('../images/gradients/table_head_bb.gif') repeat-x top left;
 }
 
-table.menu tr td.notactive{
-	/*inactive menu*/
-}
-
 table.sub_menu tr{
 	background: #5C7099 url('../images/gradients/table_head_bb.gif') repeat-x top left;
 }

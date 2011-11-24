@@ -106,8 +106,8 @@ var MMenu = {
 				}
 				var menu_cell = $(key);
 				if (!is_null(menu_cell)) {
-					if (menu_cell.tagName.toUpperCase() != 'SELECT') {
-						menu_cell.className = 'notactive';
+					if (menu_cell.tagName.toLowerCase() != 'select') {
+						menu_cell.className = '';
 					}
 				}
 				var sub_menu_cell = $('sub_' + key);
