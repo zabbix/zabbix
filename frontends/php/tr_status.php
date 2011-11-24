@@ -494,7 +494,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		if(!empty($trigger['dependencies'])){
 			$dep_table = new CTableInfo();
 			$dep_table->setAttribute('style', 'width: 200px;');
-			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
+			$dep_table->addRow(bold(_('Depends on').':'));
 
 			foreach($trigger['dependencies'] as $dep){
 				$dep_table->addRow(' - '.expand_trigger_description($dep['triggerid']));

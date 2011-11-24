@@ -14,6 +14,7 @@ libzbxdbhigh_a_SOURCES = \
 	db.c \
 	dbschema.c \
 	proxy.c \
-	discovery.c
+	discovery.c \
+	lld.c
 
 libzbxdbhigh_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/

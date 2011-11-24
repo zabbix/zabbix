@@ -1301,12 +1301,6 @@ class CItem extends CItemGeneral{
 		$insertItems = array();
 		$updateItems = array();
 		foreach ($chdHosts as $hostid => $host) {
-			$interfaceids = array();
-			foreach ($host['interfaces'] as $interface) {
-				if ($interface['main'] == 1) {
-					$interfaceids[$interface['type']] = $interface['interfaceid'];
-				}
-			}
 
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
@@ -1355,24 +1349,15 @@ class CItem extends CItemGeneral{
 					unset($item['interfaceid']);
 				}
 				elseif ((isset($item['type']) && isset($exItem) && $item['type'] != $exItem['type']) || !isset($exItem)) {
-					$type = self::itemTypeInterface($item['type']);
 
-					if ($type == INTERFACE_TYPE_ANY) {
-						foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {
-							if (isset($interfaceids[$itype])) {
-								$item['interfaceid'] = $interfaceids[$itype];
-								break;
-							}
-						}
+					// find a matching interface
+					$interface = self::findInterfaceForItem($item, $host['interfaces']);
+					if ($interface) {
+						$item['interfaceid'] = $interface['interfaceid'];
 					}
-					elseif ($type === false) {
-						$item['interfaceid'] = 0;
-					}
-					else {
-						if (!isset($interfaceids[$type])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], is_null($exItem['key_']) ? $item['key_'] : $exItem['key_']));
-						}
-						$item['interfaceid'] = $interfaceids[$type];
+					// no matching interface found, throw an error
+					elseif($interface !== false) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
 					}
 				}
 
