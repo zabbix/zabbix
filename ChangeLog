@@ -2,6 +2,7 @@
 Changes for 1.9.8
 
 New features:
+ - [ZBX-4288] added unit tests to cover host macro creation and deletion (pavels)
  - [ZBX-3104] implemented the screen item API (pavels)
  - [ZBXNEXT-913] redesign Configuration->IT Services (Eduard)
  - [ZBXNEXT-907] redesign Configuration->Applications (Eduard)
