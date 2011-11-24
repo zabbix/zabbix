@@ -486,7 +486,7 @@ require_once('include/js.inc.php');
 				$item = reset($items);
 				$item['host'] = reset($item['hosts']);
 
-				$caption = $item['host']['name'].':'.itemName($item);
+				$caption = $item['host']['host'].':'.item_description($item);
 
 				$nodeName = get_node_name_by_elid($item['itemid']);
 				if(!zbx_empty($nodeName))
