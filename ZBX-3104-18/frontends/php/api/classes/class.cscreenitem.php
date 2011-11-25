@@ -419,15 +419,14 @@ class CScreenItem extends CZBXAPI {
 				SCREEN_RESOURCE_DATA_OVERVIEW
 			);
 			if (in_array($screenItem['resourcetype'], $hostGroupResourceTypes)) {
-				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
+				if (!$screenItem['resourceid'] && $screenItem['resourcetype'] != SCREEN_RESOURCE_HOSTGROUP_TRIGGERS) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No host group ID provided for screen element.'));
 				}
-				$hostgroups[] = $screenItem['resourceid'];
+				elseif ($screenItem['resourceid']) {
+					$hostgroups[] = $screenItem['resourceid'];
+				}
 			}
-			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_HOST_TRIGGERS) {
-				if (!$screenItem['resourceid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
-				}
+			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_HOST_TRIGGERS && $screenItem['resourceid']) {
 				$hosts[] = $screenItem['resourceid'];
 			}
 			elseif ($screenItem['resourcetype'] == SCREEN_RESOURCE_GRAPH) {
