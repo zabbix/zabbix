@@ -642,7 +642,6 @@ define('GRAPH_YAXIS_SIDE_LEFT',		0);
 define('GRAPH_YAXIS_SIDE_RIGHT',	1);
 
 define('GRAPH_ITEM_SIMPLE',			0);
-define('GRAPH_ITEM_AGGREGATED',		1);
 define('GRAPH_ITEM_SUM',			2);
 
 define('GRAPH_TYPE_NORMAL',			0);

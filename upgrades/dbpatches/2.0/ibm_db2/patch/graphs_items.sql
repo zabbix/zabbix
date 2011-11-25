@@ -18,3 +18,9 @@ ALTER TABLE graphs_items ADD CONSTRAINT c_graphs_items_1 FOREIGN KEY (graphid) R
 /
 ALTER TABLE graphs_items ADD CONSTRAINT c_graphs_items_2 FOREIGN KEY (itemid) REFERENCES items (itemid) ON DELETE CASCADE
 /
+UPDATE graphs_items SET type=0 WHERE type=1
+/
+ALTER TABLE graphs_items DROP COLUMN periods_cnt
+/
+REORG TABLE graphs_items
+/
