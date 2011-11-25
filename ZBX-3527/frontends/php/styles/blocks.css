@@ -21,10 +21,14 @@
 /*					ZABBIX MAPS								*/
 /************************************************************/
 .top-aligned {
-	margin-top: -14px;
+	margin-top: -18px;
 }
 .border_dotted_top {
 	border-top: 0;
+}
+
+.dropArea {
+	background-color: #fffce3;
 }
 
 .sortableRowPlaceholder{

@@ -24,7 +24,7 @@
 		<input class="input text" name="interfaces[#{iface.interfaceid}][port]" type="text" size="15" value="#{iface.port}" />
 	</td>
 	<td style="width: 4em;">
-		<input type="radio" id="interface_main_#{iface.interfaceid}" name="main_#{iface.type}" value="#{iface.interfaceid}" />
+		<input class="mainInterface" type="radio" id="interface_main_#{iface.interfaceid}" name="main_#{iface.type}" value="#{iface.interfaceid}" />
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
 	</td>
 	<td  style="width: 4em;">
@@ -35,88 +35,6 @@
 </script>
 
 <script type="text/javascript">
-
-
-function getIntefacesByType() {
-	var mainIntefaces = {
-		agent: {
-			count: 0,
-			interfaces: {}
-		},
-		snmp: {
-			count: 0,
-			interfaces: {}
-		},
-		jmx: {
-			count: 0,
-			interfaces: {}
-		},
-		ipmi: {
-			count: 0,
-			interfaces: {}
-		}
-	};
-
-	jQuery('#hostInterfaces .interfaceRow').each(function() {
-		var interfaceRow = jQuery(this);
-		// get interfaceid from id attribute
-		var interfaceid = interfaceRow.attr('id').match(/^hostInterfaceRow_(\d+)$/);
-		interfaceid = interfaceid[1];
-
-		var isMain = jQuery('#interface_main_'+interfaceid, interfaceRow).prop('checked');
-
-		for (var interfaceType in mainIntefaces) {
-			if (jQuery('#radio_'+interfaceType+'_'+interfaceid, interfaceRow).prop('checked')) {
-				mainIntefaces[interfaceType].count++;
-				mainIntefaces[interfaceType].interfaces[interfaceid] = isMain;
-			}
-		}
-	});
-
-	return mainIntefaces;
-}
-
-
-/**
- * Check and disable interface which is only one for type, enable those which are multiple for type.
- */
-function toggleMainInterfaceSwitches() {
-	var interfaces = getIntefacesByType();
-
-	for (var interfaceType in interfaces) {
-		var typeHasMain = false;
-
-		// set main if one for type
-		if (interfaces[interfaceType].count === 1) {
-			for (var interfaceid in interfaces[interfaceType].interfaces) {
-				jQuery('#interface_main_'+interfaceid)
-						.prop('checked', true)
-						.button('option', 'icons', {primary: 'ui-icon-check'})
-						.button('refresh');
-			}
-		}
-
-		// check if at least one is set as main
-		for (var interfaceid in interfaces[interfaceType].interfaces) {
-			if (interfaces[interfaceType].interfaces[interfaceid] == 1) {
-				typeHasMain = true;
-			}
-		}
-
-
-		// if no main for type, set as main first random
-		if (!typeHasMain) {
-			for (var interfaceid in interfaces[interfaceType].interfaces) {
-				jQuery('#interface_main_'+interfaceid)
-						.prop('checked', true)
-						.button('option', 'icons', {primary: 'ui-icon-check'})
-						.button('refresh');
-				break;
-			}
-		}
-	}
-}
-
 
 var hostInterfacesManager = (function() {
 	'use strict';
@@ -135,10 +53,6 @@ var hostInterfacesManager = (function() {
 		var domAttrs = getDomElementsAttrsForInterface(hostInterface),
 			domId = getDomIdForRowInsert(hostInterface.type),
 			domRow;
-
-
-
-		// TODO: somehow determine main interfaces.
 
 
 		jQuery(domId).before(rowTemplate.evaluate({iface: hostInterface, attrs: domAttrs}));
@@ -205,15 +119,73 @@ var hostInterfacesManager = (function() {
 			}
 		*/
 
-
 	}
+
+	function resetMainInterfaces() {
+		var hostInterface,
+			typeInterfaces,
+			hostInterfaces = getMainInterfacesByType();
+
+		for (var hostInterfaceType in hostInterfaces) {
+			typeInterfaces = hostInterfaces[hostInterfaceType];
+
+			if (!typeInterfaces.main && typeInterfaces.all.length) {
+				for (var i=0; i<typeInterfaces.all.length; i++) {
+					if (allHostInterfaces[typeInterfaces.all[i]].main === '1') {
+						typeInterfaces.main = allHostInterfaces[typeInterfaces.all[i]].interfaceid;
+					}
+				}
+				if (!typeInterfaces.main) {
+					typeInterfaces.main = typeInterfaces.all[0];
+					console.log(typeInterfaces.all);
+					allHostInterfaces[typeInterfaces.main].main = '1';
+				}
+			}
+		}
+
+		for (var hostInterfaceType in hostInterfaces){
+			typeInterfaces = hostInterfaces[hostInterfaceType];
+
+			if (typeInterfaces.main) {
+				jQuery('#interface_main_'+typeInterfaces.main).prop('checked', true);
+			}
+		}
+	}
+
+	function getMainInterfacesByType() {
+		var hostInterface,
+			types = {};
+		types[getHostInterfaceNumericType('agent')] = {main: null, all: []};
+		types[getHostInterfaceNumericType('snmp')] = {main: null, all: []};
+		types[getHostInterfaceNumericType('jmx')] = {main: null, all: []};
+		types[getHostInterfaceNumericType('ipmi')] = {main: null, all: []};
+
+
+		for (var hostInterfaceId in allHostInterfaces){
+			hostInterface = allHostInterfaces[hostInterfaceId];
+
+			types[hostInterface.type].all.push(hostInterfaceId);
+			if (hostInterface.main === "1") {
+				if (types[hostInterface.type].main !== null) {
+					throw new Error('Multiple main interfaces for same type.');
+				}
+				types[hostInterface.type].main = hostInterfaceId;
+			}
+		}
+
+		return types;
+	}
+
 
 	function makeHostInterfaceRowDraggable(domElement) {
 		domElement.children().first().html('<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>');
 		domElement.draggable({
 			helper: 'clone',
 			handle: 'span.ui-icon-arrowthick-2-n-s',
-			tolerance: 'pointer'
+			revert: 'invalid',
+			stop: function() {
+				resetMainInterfaces();
+			}
 		});
 	}
 
@@ -319,6 +291,7 @@ var hostInterfacesManager = (function() {
 		var newDomId = getDomIdForRowInsert(newHostInterfaceType);
 
 		jQuery('#interface_main_'+hostInterfaceId).attr('name', 'main_'+newHostInterfaceType);
+		jQuery('#interface_main_'+hostInterfaceId).prop('checked', false);
 
 		jQuery('#hostInterfaceRow_'+hostInterfaceId).insertBefore(newDomId);
 		jQuery('#interface_type_'+hostInterfaceId).val(newHostInterfaceType);
@@ -330,6 +303,7 @@ var hostInterfacesManager = (function() {
 				addHostInterface(hostInterfaces[hostInterfaceId]);
 				renderHostInterfaceRow(hostInterfaces[hostInterfaceId]);
 			}
+			resetMainInterfaces();
 		},
 
 		addNew: function(type) {
@@ -337,6 +311,7 @@ var hostInterfacesManager = (function() {
 
 			allHostInterfaces[hostInterface.interfaceid] = hostInterface;
 			renderHostInterfaceRow(hostInterface);
+			resetMainInterfaces();
 		},
 
 		remove: function(hostInterfaceId) {
@@ -349,7 +324,21 @@ var hostInterfacesManager = (function() {
 			if (allHostInterfaces[hostInterfaceId].type !== newTypeNum) {
 				moveRowToAnotherTypeTable(hostInterfaceId, newTypeNum);
 				allHostInterfaces[hostInterfaceId].type = newTypeNum;
+				allHostInterfaces[hostInterfaceId].main = '0';
 			}
+		},
+
+		resetMainInterfaces: function() {
+			resetMainInterfaces();
+		},
+
+		setMainInterface: function(hostInterfaceId) {
+			var interfacesByType = getMainInterfacesByType(),
+				newMainInterfaceType = allHostInterfaces[hostInterfaceId].type,
+				oldMainInterfaceId = interfacesByType[newMainInterfaceType].main;
+
+			allHostInterfaces[hostInterfaceId].main = '1';
+			allHostInterfaces[oldMainInterfaceId].main = '0';
 		}
 	}
 
@@ -363,23 +352,26 @@ jQuery(document).ready(function() {
 		var interfaceId = jQuery(this).data('interfaceid');
 		jQuery('#hostInterfaceRow_'+interfaceId).remove();
 		hostInterfacesManager.remove(interfaceId);
+		hostInterfacesManager.resetMainInterfaces();
+	});
+
+	jQuery('#hostlist').on('click', 'input[type=radio].mainInterface', function() {
+		var interfaceId = jQuery(this).val();
+		hostInterfacesManager.setMainInterface(interfaceId);
 	});
 
 	jQuery("#agentInterfaces, #SNMPInterfaces, #JMXInterfaces, #IPMIInterfaces").droppable({
+		tolerance: 'pointer',
+		activeClass: 'dropArea',
 		drop: function(event, ui) {
 			var hostInterfaceTypeName = jQuery(this).data('type'),
 				hostInterfaceId = ui.draggable.data('interfaceid');
 
 			hostInterfacesManager.setType(hostInterfaceId, hostInterfaceTypeName);
+			hostInterfacesManager.resetMainInterfaces();
 		}
 	});
 
-
-
-	jQuery('#addInterfaceRow').click(function() {
-		addInterfaceRow({});
-		toggleMainInterfaceSwitches();
-	});
 
 	// radio button of inventory modes was clicked
 	jQuery("div.jqueryinputset input[name=inventory_mode]").click(function() {
