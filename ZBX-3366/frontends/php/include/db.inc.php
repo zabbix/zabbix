@@ -978,8 +978,8 @@ function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 			}
 			$sql_parts['order'][] = $alias.'.'.$sortfield.' '.$sortorder;
 
-			// add sort field to select
-			if (count($sql_parts['from']) > 1) { // if distinct is used
+			// add sort field to select if distinct is used
+			if (count($sql_parts['from']) > 1) {
 				if (!str_in_array($alias.'.'.$sortfield, $sql_parts['select']) && !str_in_array($alias.'.*', $sql_parts['select'])) {
 					$sql_parts['select'][$sortfield] = $alias.'.'.$sortfield;
 				}
@@ -1033,7 +1033,7 @@ function DBcondition($fieldname, $array, $notin = false) {
 }
 
 function zero2null($val) {
-	return ($val == '0') ? 'NULL' : $val;	// string 0 because ('any string' == 0) = true
+	return ($val == '0') ? 'NULL' : $val; // string 0 because ('any string' == 0) = true
 }
 
 /**

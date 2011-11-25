@@ -47,7 +47,7 @@ class CAction extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('actionid', 'name');
+		$sort_columns = array('actionid', 'name', 'status');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
@@ -113,7 +113,7 @@ class CAction extends CZBXAPI {
 
 			// condition hostgroup
 			$sql_parts['where'][] =
-				' NOT EXISTS('.
+				' NOT EXISTS ('.
 					' SELECT cc.conditionid'.
 					' FROM conditions cc'.
 					' WHERE cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
@@ -140,13 +140,13 @@ class CAction extends CZBXAPI {
 
 			// condition host or template
 			$sql_parts['where'][] =
-				' NOT EXISTS('.
+				' NOT EXISTS ('.
 					' SELECT cc.conditionid'.
 					' FROM conditions cc'.
 					' WHERE (cc.conditiontype='.CONDITION_TYPE_HOST.' OR cc.conditiontype='.CONDITION_TYPE_HOST_TEMPLATE.')'.
 						' AND cc.actionid=a.actionid'.
 						' AND ('.
-							' NOT EXISTS('.
+							' NOT EXISTS ('.
 								' SELECT hgg.hostid'.
 								' FROM hosts_groups hgg,rights r,users_groups ug'.
 								' WHERE hgg.hostid='.zbx_dbcast_2bigint('cc.value').
@@ -154,7 +154,7 @@ class CAction extends CZBXAPI {
 									' AND ug.userid='.$userid.
 									' AND r.permission>='.$permission.
 									' AND r.groupid=ug.usrgrpid)'.
-							' OR EXISTS('.
+							' OR EXISTS ('.
 								' SELECT hgg.hostid'.
 									' FROM hosts_groups hgg,rights rr,users_groups gg'.
 									' WHERE hgg.hostid='.zbx_dbcast_2bigint('cc.value').
@@ -167,13 +167,13 @@ class CAction extends CZBXAPI {
 
 			// condition trigger
 			$sql_parts['where'][] =
-				' NOT EXISTS('.
+				' NOT EXISTS ('.
 					' SELECT cc.conditionid'.
 					' FROM conditions cc'.
 					' WHERE cc.conditiontype='.CONDITION_TYPE_TRIGGER.
 						' AND cc.actionid=a.actionid'.
 						' AND ('.
-							' NOT EXISTS('.
+							' NOT EXISTS ('.
 								' SELECT f.triggerid'.
 								' FROM functions f,items i,hosts_groups hg,rights r,users_groups ug'.
 								' WHERE ug.userid='.$userid.
@@ -183,12 +183,12 @@ class CAction extends CZBXAPI {
 									' AND i.hostid=hg.hostid'.
 									' AND f.itemid=i.itemid'.
 									' AND f.triggerid='.zbx_dbcast_2bigint('cc.value').')'.
-							' OR EXISTS('.
+							' OR EXISTS ('.
 								' SELECT ff.functionid'.
 								' FROM functions ff,items ii'.
 								' WHERE ff.triggerid='.zbx_dbcast_2bigint('cc.value').
 									' AND ii.itemid=ff.itemid'.
-									' AND EXISTS('.
+									' AND EXISTS ('.
 										' SELECT hgg.groupid'.
 										' FROM hosts_groups hgg,rights rr,users_groups ugg'.
 										' WHERE hgg.hostid=ii.hostid'.
@@ -440,7 +440,7 @@ class CAction extends CZBXAPI {
 				'output' => API_OUTPUT_SHORTEN,
 				'editable' => $options['editable'],
 				'templated_hosts' => true,
-				'preservekeys' => true,
+				'preservekeys' => true
 			));
 			foreach ($hostids as $hostid) {
 				if (isset($allowedHosts[$hostid])) {
@@ -486,7 +486,7 @@ class CAction extends CZBXAPI {
 				'groupids' => $groupids,
 				'output' => API_OUTPUT_SHORTEN,
 				'editable' => $options['editable'],
-				'preservekeys' => true,
+				'preservekeys' => true
 			));
 			foreach ($groupids as $groupid) {
 				if (isset($allowedGroups[$groupid])) {
@@ -549,14 +549,14 @@ class CAction extends CZBXAPI {
 			$allowed_users = API::User()->get(array(
 				'userids' => $userids,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => true,
+				'preservekeys' => true
 			));
 			foreach ($userids as $userid) {
 				if (isset($allowed_users[$userid])) {
 					continue;
 				}
 				foreach ($users[$userid] as $actionid) {
-						unset($result[$actionid], $actionids[$actionid]);
+					unset($result[$actionid], $actionids[$actionid]);
 				}
 			}
 
@@ -579,7 +579,7 @@ class CAction extends CZBXAPI {
 			$allowed_usrgrps = API::UserGroup()->get(array(
 				'usrgrpids' => $usrgrpids,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => true,
+				'preservekeys' => true
 			));
 
 			foreach ($usrgrpids as $usrgrpid) {
@@ -766,7 +766,7 @@ class CAction extends CZBXAPI {
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1,
+			'nopermissions' => true,
 			'limit' => 1
 		);
 
@@ -801,7 +801,7 @@ class CAction extends CZBXAPI {
 		$action_db_fields = array(
 			'name' => null,
 			'eventsource' => null,
-			'evaltype' => null,
+			'evaltype' => null
 		);
 		$duplicates = array();
 		foreach ($actions as $action) {
@@ -822,8 +822,8 @@ class CAction extends CZBXAPI {
 		$options = array(
 			'filter' => array('name' => $duplicates),
 			'output' => API_OUTPUT_EXTEND,
-			'editable' => 1,
-			'nopermissions' => 1
+			'editable' => true,
+			'nopermissions' => true
 		);
 		$dbActions = $this->get($options);
 		foreach ($dbActions as $dbAction) {
@@ -931,7 +931,7 @@ class CAction extends CZBXAPI {
 				$options = array(
 					'filter' => array('name' => $action['name']),
 					'output' => API_OUTPUT_SHORTEN,
-					'editable' => 1,
+					'editable' => true,
 					'nopermissions' => true,
 					'preservekeys' => true
 				);
@@ -1048,7 +1048,7 @@ class CAction extends CZBXAPI {
 		foreach ($operations as $operation) {
 			$operationDbFields = array(
 				'actionid' => null,
-				'operationtype' => null,
+				'operationtype' => null
 			);
 			if (!check_db_fields($operationDbFields, $operation)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameter for operations.'));

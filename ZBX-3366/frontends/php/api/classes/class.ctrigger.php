@@ -423,7 +423,7 @@ class CTrigger extends CZBXAPI {
 			zbx_db_search('triggers t', $options, $sql_parts);
 		}
 
-		// --- FILTER ---
+		// filter
 		if (is_null($options['filter'])) {
 			$options['filter'] = array();
 		}
@@ -548,6 +548,7 @@ class CTrigger extends CZBXAPI {
 					throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%s" not allowed.', $sortfield));
 				}
 
+				// add sort field to order
 				$sortorder = '';
 				if (is_array($options['sortorder'])) {
 					if (!empty($options['sortorder'][$i])) {
@@ -558,7 +559,6 @@ class CTrigger extends CZBXAPI {
 					$sortorder = $options['sortorder'] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
 				}
 
-				// for postgreSQL column which is present in ORDER BY should also be present in SELECT
 				// we will be using lastchange for ordering in any case
 				if (!str_in_array('t.lastchange', $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])) {
 					$sql_parts['select']['lastchange'] = 't.lastchange';
@@ -584,6 +584,13 @@ class CTrigger extends CZBXAPI {
 						// if lastchange is not used for ordering, it should be the second order criteria
 						$sql_parts['order'][] = 't.'.$sortfield.' '.$sortorder;
 						break;
+				}
+
+				// add sort field to select if distinct is used
+				if (count($sql_parts['from']) > 1) {
+					if (!str_in_array('t.'.$sortfield, $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])) {
+						$sql_parts['select'][$sortfield] = 't.'.$sortfield;
+					}
 				}
 			}
 			if (!empty($sql_parts['order'])) {

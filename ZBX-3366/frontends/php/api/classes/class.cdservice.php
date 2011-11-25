@@ -66,7 +66,7 @@ class CDService extends CZBXAPI{
 		$user_type = self::$userData['type'];
 
 		// allowed columns for sorting
-		$sort_columns = array('dserviceid', 'dhostid');
+		$sort_columns = array('dserviceid', 'dhostid', 'ip');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);

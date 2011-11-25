@@ -51,7 +51,7 @@ class CMaintenance extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('maintenanceid', 'name');
+		$sort_columns = array('maintenanceid', 'name', 'maintenance_type');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
@@ -183,14 +183,14 @@ class CMaintenance extends CZBXAPI {
 				zbx_value2array($options['groupids']);
 
 				$sql .= ' AND ('.
-					// filtering using groups attached to maintenence
+							// filtering using groups attached to maintenence
 							'EXISTS ('.
 								'SELECT mgf.maintenanceid'.
 								' FROM maintenances_groups mgf'.
 								' WHERE mgf.maintenanceid=m.maintenanceid'.
 									' AND '.DBcondition('mgf.groupid', $options['groupids']).
 							')'.
-					// filtering by hostgroups of hosts attached to maintenance
+							// filtering by hostgroups of hosts attached to maintenance
 							' OR EXISTS ('.
 								' SELECT mh.maintenanceid'.
 								' FROM maintenances_hosts mh,hosts_groups hg'.
@@ -199,7 +199,6 @@ class CMaintenance extends CZBXAPI {
 									' AND '.DBcondition('hg.groupid', $options['groupids']).
 							')'.
 						')';
-
 			}
 
 			if (!is_null($options['hostids'])) {
@@ -689,11 +688,12 @@ class CMaintenance extends CZBXAPI {
 
 			// getting current time periods
 			$timeperiodids = $timeperiods = array();
-			$sql = 'SELECT tp.*'.
-					' FROM timeperiods tp,maintenances_windows mw'.
-					' WHERE '.DBcondition('mw.maintenanceid', array($maintenance['maintenanceid'])).
-						' AND tp.timeperiodid=mw.timeperiodid';
-			$db_timeperiods = DBselect($sql);
+			$db_timeperiods = DBselect(
+				'SELECT tp.*'.
+				' FROM timeperiods tp,maintenances_windows mw'.
+				' WHERE '.DBcondition('mw.maintenanceid', array($maintenance['maintenanceid'])).
+					' AND tp.timeperiodid=mw.timeperiodid'
+			);
 			while ($timeperiod = DBfetch($db_timeperiods)) {
 				$timeperiodids[] = $timeperiod['timeperiodid'];
 				$timeperiods[] = $timeperiod;
@@ -838,11 +838,12 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			$timeperiodids = array();
-			$sql = 'SELECT DISTINCT tp.timeperiodid'.
-					' FROM timeperiods tp,maintenances_windows mw'.
-					' WHERE '.DBcondition('mw.maintenanceid', $maintenanceids).
-						' AND tp.timeperiodid=mw.timeperiodid';
-			$db_timeperiods = DBselect($sql);
+			$db_timeperiods = DBselect(
+				'SELECT DISTINCT tp.timeperiodid'.
+				' FROM timeperiods tp,maintenances_windows mw'.
+				' WHERE '.DBcondition('mw.maintenanceid', $maintenanceids).
+					' AND tp.timeperiodid=mw.timeperiodid'
+			);
 			while ($timeperiod = DBfetch($db_timeperiods)) {
 				$timeperiodids[] = $timeperiod['timeperiodid'];
 			}
@@ -898,7 +899,5 @@ class CMaintenance extends CZBXAPI {
 		}
 		unset($maintenance);
 	}
-
 }
-
 ?>
