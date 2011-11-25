@@ -120,7 +120,23 @@ sub process_row
 		$_ =~ s/\s+$//;
 
 		# escape single quotes
-		$_ =~ s/'+/\\'/g;
+		switch ($output{'database'})
+		{
+			case 'postgresql'
+			{
+				$_ =~ s/\\/\\\\/g;
+				$_ =~ s/'/''/g;
+			}
+			case 'mysql'
+			{
+				$_ =~ s/\\/\\\\/g;
+				$_ =~ s/'/\\'/g;
+			}
+			else
+			{
+				$_ =~ s/'/''/g;
+			}
+		}
 
 		if ($_ eq 'NULL')
 		{
