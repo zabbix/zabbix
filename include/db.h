@@ -555,7 +555,6 @@ typedef struct
 	int		yaxisside;
 	int		calc_fnc;
 	int		type;
-	int		periods_cnt;
 	unsigned char	flags;
 }
 ZBX_GRAPH_ITEMS;
