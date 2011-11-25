@@ -238,10 +238,6 @@ function zbxDateToTime($strdate) {
 	}
 }
 
-function validateMaxTime($time) {
-	return $time > 2147464800 ? true : false; // 2038.01.19 00:00
-}
-
 /*************** CONVERTING ******************/
 function rgb2hex($color) {
 	$HEX = array(
