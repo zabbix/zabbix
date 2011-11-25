@@ -134,7 +134,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 						AC_CHECK_LIB($_lib_name , main,[
 								LIBCURL_LIBS="$LIBCURL_LIBS $i"
 							],[
-								AC_MSG_ERROR([static library $_lib_name required for statically linking libcurl not found])
+								AC_MSG_ERROR([static library $_lib_name required for linking libcurl not found])
 							])
 
 				;;
