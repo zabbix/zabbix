@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -358,7 +358,7 @@ require_once('include/page_header.php');
 			$slides_wdgt->addItem(new CSpan(_('Loading...'), 'textcolorstyles'));
 		}
 		else{
-			$slides_wdgt->addItem(new CTableInfo(S_NO_SLIDES_DEFINED));
+			$slides_wdgt->addItem(new CTableInfo(_('No slides defined.')));
 		}
 
 		$slides_wdgt->show();

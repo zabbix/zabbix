@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #ifndef ZABBIX_COMMON_H
@@ -774,7 +774,8 @@ int	is_double(const char *c);
 int	is_uint_prefix(const char *c);
 int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
-int	is_uint64(const char *str, zbx_uint64_t *value);
+#define is_uint64(src, value)	is_uint64_n(src, INT_MAX, value)
+int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value);
 int	is_ushort(const char *str, unsigned short *value);
 int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);

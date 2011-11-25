@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -494,7 +494,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		if(!empty($trigger['dependencies'])){
 			$dep_table = new CTableInfo();
 			$dep_table->setAttribute('style', 'width: 200px;');
-			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
+			$dep_table->addRow(bold(_('Depends on').':'));
 
 			foreach($trigger['dependencies'] as $dep){
 				$dep_table->addRow(' - '.expand_trigger_description($dep['triggerid']));

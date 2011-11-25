@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -159,7 +159,7 @@ if(isset($_REQUEST['save_trigger'])){
 			// $result = $triggerid;
 			$audit_action = AUDIT_ACTION_ADD;
 
-			show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+			show_messages($triggerid, _('Trigger added'), _('Cannot add trigger'));
 		}
 
 		if($result){

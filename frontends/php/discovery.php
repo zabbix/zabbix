@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -132,7 +132,7 @@ require_once('include/page_header.php');
 		is_show_all_nodes() ? new CCol(S_NODE, 'left') : null,
 		make_sorting_header(S_DISCOVERED_DEVICE,'ip'),
 		new CCol(S_MONITORED_HOST, 'left'),
-		new CCol(array(S_UPTIME.'/',S_DOWNTIME),'left')
+		new CCol(array(_('Uptime').'/', _('Downtime')), 'left')
 	);
 
 	$css = getUserTheme($USER_DETAILS);

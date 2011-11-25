@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -472,7 +472,7 @@ require_once('include/page_header.php');
 							$event_data['object_data']['port'] = S_UNKNOWN;
 						}
 
-						$event_data['description'] = S_SERVICE.': '.
+						$event_data['description'] = _('Service').': '.
 								discovery_check_type2str($event_data['object_data']['type']).
 								discovery_port2str($event_data['object_data']['type'], $event_data['object_data']['port']);
 

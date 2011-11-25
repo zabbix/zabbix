@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -314,7 +314,7 @@ require_once('include/page_header.php');
 		$map_wdgt->addHeader(S_MAPS_BIG);
 		$map_wdgt->addHeader($numrows);
 
-		$table = new CTableInfo(S_NO_MAPS_DEFINED);
+		$table = new CTableInfo(_('No maps defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_maps',NULL,"checkAll('".$form->getName()."','all_maps','maps');"),
 			make_sorting_header(S_NAME,'name'),

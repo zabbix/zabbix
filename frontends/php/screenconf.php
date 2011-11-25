@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -315,7 +315,7 @@ require_once('include/page_header.php');
 			$screen_wdgt->addItem(get_header_host_table($templateid, 'screens'));
 		}
 
-		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
+		$table = new CTableInfo(_('No screens defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_screens', NULL, "checkAll('".$form->getName()."','all_screens','screens');"),
 			make_sorting_header(S_NAME, 'name'),

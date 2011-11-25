@@ -15,17 +15,17 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
 
 	function graphType($type=null){
 		$types = array(
-			GRAPH_TYPE_STACKED => S_STACKED,
-			GRAPH_TYPE_PIE => S_PIE,
-			GRAPH_TYPE_EXPLODED => S_EXPLODED,
-			GRAPH_TYPE_NORMAL => S_NORMAL,
+			GRAPH_TYPE_STACKED => _('Stacked'),
+			GRAPH_TYPE_PIE => _('Pie'),
+			GRAPH_TYPE_EXPLODED => _('Exploded'),
+			GRAPH_TYPE_NORMAL => _('Normal'),
 		);
 
 		if(is_null($type)){
