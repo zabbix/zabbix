@@ -452,8 +452,7 @@
 					$gitem['sortorder'],
 					$gitem['yaxisside'],
 					$gitem['calc_fnc'],
-					$gitem['type'],
-					$gitem['periods_cnt']))
+					$gitem['type']))
 				{
 					break;
 				}
@@ -603,8 +602,7 @@
 					$gitem['sortorder'],
 					$gitem['yaxisside'],
 					$gitem['calc_fnc'],
-					$gitem['type'],
-					$gitem['periods_cnt']))
+					$gitem['type']))
 			{
 				return $result;
 			}
@@ -720,13 +718,13 @@
  * Comments: !!! Don't forget sync code with C !!!
  *
  */
-	function add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt){
+	function add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type){
 		$gitemid = get_dbid('graphs_items','gitemid');
 
 		$result = DBexecute('insert into graphs_items'.
-			' (gitemid,graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)'.
+			' (gitemid,graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type)'.
 			' values ('.$gitemid.','.$graphid.','.$itemid.','.zbx_dbstr($color).','.$drawtype.','.
-			$sortorder.','.$yaxisside.','.$calc_fnc.','.$type.','.$periods_cnt.')');
+			$sortorder.','.$yaxisside.','.$calc_fnc.','.$type.')');
 
 		return ( $result ? $gitemid : $result );
 	}
@@ -852,8 +850,7 @@
 				'sortorder'	=> $db_gitem['sortorder'],
 				'yaxisside'	=> $db_gitem['yaxisside'],
 				'calc_fnc'	=> $db_gitem['calc_fnc'],
-				'type'		=> $db_gitem['type'],
-				'periods_cnt'	=> $db_gitem['periods_cnt']
+				'type'		=> $db_gitem['type']
 			);
 		}
 

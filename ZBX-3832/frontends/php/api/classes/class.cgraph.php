@@ -752,7 +752,6 @@ COpt::memoryPick();
 			if(isset($gitem['yaxisside'])) $values['yaxisside'] = $gitem['yaxisside'];
 			if(isset($gitem['calc_fnc'])) $values['calc_fnc'] = $gitem['calc_fnc'];
 			if(isset($gitem['type'])) $values['type'] = $gitem['type'];
-			if(isset($gitem['periods_cnt'])) $values['periods_cnt'] = $gitem['periods_cnt'];
 
 			$sql = 'INSERT INTO graphs_items ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
 			DBexecute($sql) or self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');

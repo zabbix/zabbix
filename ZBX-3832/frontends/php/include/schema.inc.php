@@ -2145,13 +2145,7 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
-			),
-			'periods_cnt' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '5',
-			),
+			)
 		),
 	),
 	'graph_theme' => array(

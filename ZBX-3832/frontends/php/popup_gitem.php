@@ -50,7 +50,6 @@ include_once('include/page_header.php');
 		'yaxisside'=>	array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),			'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
 		'calc_fnc'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('1,2,4,7,9'),	'isset({save})'),
 		'type'=>		array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2'),		'isset({save})'),
-		'periods_cnt'=>	array(T_ZBX_INT, O_OPT,	 null,	BETWEEN(0,360),		'isset({save})'),
 
 		'only_hostid'=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,			null),
 		'monitored_hosts'=>array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
@@ -98,8 +97,7 @@ include_once('include/page_header.php');
 			$_REQUEST['sortorder'].",".
 			$_REQUEST['yaxisside'].",".
 			$_REQUEST['calc_fnc'].",".
-			$_REQUEST['type'].",".
-			$_REQUEST['periods_cnt'].");\n";
+			$_REQUEST['type'].");\n";
 		insert_js($script);
 	}
 
@@ -114,8 +112,7 @@ include_once('include/page_header.php');
 			$_REQUEST['sortorder'].",".
 			$_REQUEST['yaxisside'].",".
 			$_REQUEST['calc_fnc'].",".
-			$_REQUEST['type'].",".
-			$_REQUEST['periods_cnt'].");\n";
+			$_REQUEST['type'].");\n";
 		insert_js($script);
 	}
 	else{
@@ -132,7 +129,6 @@ include_once('include/page_header.php');
 		$yaxisside	= get_request('yaxisside',		GRAPH_YAXIS_SIDE_DEFAULT);
 		$calc_fnc	= get_request('calc_fnc',		2);
 		$type		= get_request('type',			0);
-		$periods_cnt	= get_request('periods_cnt',	5);
 		$only_hostid	= get_request('only_hostid',	null);
 		$monitored_hosts = get_request('monitored_hosts', null);
 
@@ -186,8 +182,6 @@ include_once('include/page_header.php');
 		}
 
 		if (($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)) {
-			$frmGItem->addVar('periods_cnt',$periods_cnt);
-
 			$cmbFnc = new CComboBox('calc_fnc',$calc_fnc,'submit();');
 
 			$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
@@ -197,8 +191,6 @@ include_once('include/page_header.php');
 			$frmGItem->addRow(S_FUNCTION, $cmbFnc);
 		}
 		else {
-			$frmGItem->addVar('periods_cnt',$periods_cnt);
-
 			$cmbFnc = new CComboBox('calc_fnc',$calc_fnc,'submit();');
 
 			if($graphtype == GRAPH_TYPE_NORMAL)

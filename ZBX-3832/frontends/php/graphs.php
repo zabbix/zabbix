@@ -249,8 +249,7 @@ include_once('include/page_header.php');
 			if(	(bccomp($new_gitem['itemid'] , $data['itemid'])==0) &&
 				$new_gitem['yaxisside'] == $data['yaxisside'] &&
 				$new_gitem['calc_fnc'] == $data['calc_fnc'] &&
-				$new_gitem['type'] == $data['type'] &&
-				$new_gitem['periods_cnt'] == $data['periods_cnt'])
+				$new_gitem['type'] == $data['type'])
 			{
 				$already_exist = true;
 				break;

@@ -3107,7 +3107,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							graph_item_type2str($gitem['type']),
 							$color,
 							array( $do_up, SPACE."|".SPACE, $do_down )
 						));
@@ -3118,7 +3118,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 //							$gitem['sortorder'],
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							graph_item_type2str($gitem['type']),
 							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
 							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
 							$color,

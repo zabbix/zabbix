@@ -112,7 +112,7 @@ class CChart extends CGraphDraw{
 		$this->m_showTriggers = ($value==1)?1:0;
 	}
 
-	public function addItem($itemid, $axis=GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc=CALC_FNC_AVG, $color=null, $drawtype=null, $type=null, $periods_cnt=null){
+	public function addItem($itemid, $axis=GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc=CALC_FNC_AVG, $color=null, $drawtype=null, $type=null){
 		if($this->type == GRAPH_TYPE_STACKED /* stacked graph */)
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 
@@ -135,7 +135,6 @@ class CChart extends CGraphDraw{
 		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_DEFAULT : $axis;
 		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
 		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
-		$this->items[$this->num]['periods_cnt'] = is_null($periods_cnt) ? 0 : $periods_cnt;
 
 		if($this->items[$this->num]['axisside'] == GRAPH_YAXIS_SIDE_LEFT)
 			$this->yaxisleft=1;
@@ -559,56 +558,50 @@ class CChart extends CGraphDraw{
 		for($i=0; $i<$this->num; $i++){
 			if($this->items[$i]['axisside'] != $side) continue;
 
-			foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type){
+			if(!isset($this->data[$this->items[$i]['itemid']][GRAPH_ITEM_SIMPLE]))
+				continue;
 
-				if(!isset($this->data[$this->items[$i]['itemid']][$type]))
-					continue;
+			$data = &$this->data[$this->items[$i]['itemid']][GRAPH_ITEM_SIMPLE];
 
-				$data = &$this->data[$this->items[$i]['itemid']][$type];
+			if(!isset($data))	continue;
 
-				if(!isset($data))	continue;
+			$calc_fnc = $this->items[$i]['calc_fnc'];
 
-				if($type == GRAPH_ITEM_AGGREGATED)
-					$calc_fnc = CALC_FNC_ALL;
-				else
-					$calc_fnc = $this->items[$i]['calc_fnc'];
+			switch($calc_fnc){
+				case CALC_FNC_ALL:	/* use min */
+				case CALC_FNC_MIN:
+					$val = $data['min'];
+					$shift_val = $data['shift_min'];
+					break;
+				case CALC_FNC_MAX:
+					$val = $data['max'];
+					$shift_val = $data['shift_max'];
+					break;
+				case CALC_FNC_AVG:
+				default:
+					$val = $data['avg'];
+					$shift_val = $data['shift_avg'];
+			}
 
-				switch($calc_fnc){
-					case CALC_FNC_ALL:	/* use min */
-					case CALC_FNC_MIN:
-						$val = $data['min'];
-						$shift_val = $data['shift_min'];
-						break;
-					case CALC_FNC_MAX:
-						$val = $data['max'];
-						$shift_val = $data['shift_max'];
-						break;
-					case CALC_FNC_AVG:
-					default:
-						$val = $data['avg'];
-						$shift_val = $data['shift_avg'];
-				}
+			if(!isset($val)) continue;
 
-				if(!isset($val)) continue;
-
-				if($this->type == GRAPH_TYPE_STACKED){
-					$min_val_shift = min(count($val), count($shift_val));
-					for($ci=0; $ci < $min_val_shift; $ci++){
-						if($shift_val[$ci] < 0){
-							$val[$ci] += bcadd($shift_val[$ci], $val[$ci]);
-						}
-					}
-
-				}
-
-				if(!isset($minY)){
-					if(isset($val) && count($val) > 0){
-						$minY = min($val);
+			if($this->type == GRAPH_TYPE_STACKED){
+				$min_val_shift = min(count($val), count($shift_val));
+				for($ci=0; $ci < $min_val_shift; $ci++){
+					if($shift_val[$ci] < 0){
+						$val[$ci] += bcadd($shift_val[$ci], $val[$ci]);
 					}
 				}
-				else{
-					$minY = min($minY, min($val));
+
+			}
+
+			if(!isset($minY)){
+				if(isset($val) && count($val) > 0){
+					$minY = min($val);
 				}
+			}
+			else{
+				$minY = min($minY, min($val));
 			}
 		}
 
@@ -631,50 +624,45 @@ class CChart extends CGraphDraw{
 		for($i=0; $i<$this->num; $i++){
 			if($this->items[$i]['axisside'] != $side) continue;
 
-			foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type){
-				if(!isset($this->data[$this->items[$i]['itemid']][$type])) continue;
+			if(!isset($this->data[$this->items[$i]['itemid']][GRAPH_ITEM_SIMPLE])) continue;
 
-				$data = &$this->data[$this->items[$i]['itemid']][$type];
+			$data = &$this->data[$this->items[$i]['itemid']][GRAPH_ITEM_SIMPLE];
 
-				if(!isset($data)) continue;
+			if(!isset($data)) continue;
 
-				if($type == GRAPH_ITEM_AGGREGATED)
-					$calc_fnc = CALC_FNC_ALL;
-				else
-					$calc_fnc = $this->items[$i]['calc_fnc'];
+			$calc_fnc = $this->items[$i]['calc_fnc'];
 
-				switch($calc_fnc){
-					case CALC_FNC_ALL:	/* use max */
-					case CALC_FNC_MAX:
-						$val = $data['max'];
-						$shift_val = $data['shift_max'];
-						break;
-					case CALC_FNC_MIN:
-						$val = $data['min'];
-						$shift_val = $data['shift_min'];
-						break;
-					case CALC_FNC_AVG:
-					default:
-						$val = $data['avg'];
-						$shift_val = $data['shift_avg'];
+			switch($calc_fnc){
+				case CALC_FNC_ALL:	/* use max */
+				case CALC_FNC_MAX:
+					$val = $data['max'];
+					$shift_val = $data['shift_max'];
+					break;
+				case CALC_FNC_MIN:
+					$val = $data['min'];
+					$shift_val = $data['shift_min'];
+					break;
+				case CALC_FNC_AVG:
+				default:
+					$val = $data['avg'];
+					$shift_val = $data['shift_avg'];
+			}
+
+			if(!isset($val)) continue;
+
+			$size = min(count($val),count($shift_val));
+			for($ci=0; $ci < $size; $ci++){
+				if($data['count'][$ci] == 0) continue;
+
+				$val[$ci] = bcadd($shift_val[$ci], $val[$ci]);
+			}
+			if(!isset($maxY)){
+				if(isset($val) && count($val) > 0){
+					$maxY = max($val);
 				}
-
-				if(!isset($val)) continue;
-
-				$size = min(count($val),count($shift_val));
-				for($ci=0; $ci < $size; $ci++){
-					if($data['count'][$ci] == 0) continue;
-
-					$val[$ci] = bcadd($shift_val[$ci], $val[$ci]);
-				}
-				if(!isset($maxY)){
-					if(isset($val) && count($val) > 0){
-						$maxY = max($val);
-					}
-				}
-				else{
-					$maxY = max($maxY, max($val));
-				}
+			}
+			else{
+				$maxY = max($maxY, max($val));
 			}
 		}
 
@@ -1620,19 +1608,13 @@ class CChart extends CGraphDraw{
 		$i = ($this->type == GRAPH_TYPE_STACKED)?($this->num-1):0;
 		while(($i>=0) && ($i<$this->num)){
 
-			if($this->items[$i]['calc_type'] == GRAPH_ITEM_AGGREGATED){
-				$fnc_name = 'agr('.$this->items[$i]['periods_cnt'].')';
-				$color = $this->getColor('HistoryMinMax');
-			}
-			else{
-				$color = $this->getColor($this->items[$i]['color'], GRAPH_STACKED_ALFA);
-				switch($this->items[$i]['calc_fnc']){
-					case CALC_FNC_MIN:	$fnc_name = S_MIN_SMALL;	break;
-					case CALC_FNC_MAX:	$fnc_name = S_MAX_SMALL;	break;
-					case CALC_FNC_ALL:	$fnc_name = S_ALL_SMALL;	break;
-					case CALC_FNC_AVG:
-					default:		$fnc_name = S_AVG_SMALL;
-				}
+			$color = $this->getColor($this->items[$i]['color'], GRAPH_STACKED_ALFA);
+			switch($this->items[$i]['calc_fnc']){
+				case CALC_FNC_MIN:	$fnc_name = S_MIN_SMALL;	break;
+				case CALC_FNC_MAX:	$fnc_name = S_MAX_SMALL;	break;
+				case CALC_FNC_ALL:	$fnc_name = S_ALL_SMALL;	break;
+				case CALC_FNC_AVG:
+				default:		$fnc_name = S_AVG_SMALL;
 			}
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
@@ -2089,17 +2071,7 @@ class CChart extends CGraphDraw{
 
 			if(!isset($data))	continue;
 
-			if($this->items[$item]['calc_type'] == GRAPH_ITEM_AGGREGATED){
-				$drawtype	= GRAPH_ITEM_DRAWTYPE_LINE;
-
-				$max_color	= $this->getColor('HistoryMax');
-				$avg_color	= $this->getColor('HistoryAvg');
-				$min_color	= $this->getColor('HistoryMin');
-				$minmax_color	= $this->getColor('HistoryMinMax');
-
-				$calc_fnc	= CALC_FNC_ALL;
-			}
-			else if($this->type == GRAPH_TYPE_STACKED){
+			if($this->type == GRAPH_TYPE_STACKED){
 				$drawtype	= $this->items[$item]['drawtype'];
 
 				$max_color	= $this->getColor('ValueMax',GRAPH_STACKED_ALFA);
@@ -2134,9 +2106,6 @@ class CChart extends CGraphDraw{
 					$draw = (boolean) ($diff < (ZBX_GRAPH_MAX_SKIP_CELL * $cell));
 				else
 					$draw = (boolean) ($diff < (ZBX_GRAPH_MAX_SKIP_DELAY * $delay));
-
-				if(($draw == false) && ($this->items[$item]['calc_type'] == GRAPH_ITEM_AGGREGATED))
-					$draw = $i - $j < 5;
 
 				if($this->items[$item]['type'] == ITEM_TYPE_TRAPPER) $draw = true;
 

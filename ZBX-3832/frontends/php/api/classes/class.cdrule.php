@@ -560,8 +560,7 @@ COpt::memoryPick();
 				'sortorder'	=> 0,
 				'yaxisside'	=> 1,
 				'calc_fnc'	=> 2,
-				'type'		=> 0,
-				'periods_cnt'	=> 5
+				'type'		=> 0
 			);
 
 			if(!check_db_fields($drule_db_fields, $check)){
