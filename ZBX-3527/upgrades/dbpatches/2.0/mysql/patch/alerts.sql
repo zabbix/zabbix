@@ -1,8 +1,10 @@
-ALTER TABLE alerts MODIFY alertid bigint unsigned NOT NULL,
-		   MODIFY actionid bigint unsigned NOT NULL,
-		   MODIFY eventid bigint unsigned NOT NULL,
-		   MODIFY userid bigint unsigned NULL,
-		   MODIFY mediatypeid bigint unsigned NULL;
+ALTER TABLE alerts
+	MODIFY alertid bigint unsigned NOT NULL,
+	MODIFY actionid bigint unsigned NOT NULL,
+	MODIFY eventid bigint unsigned NOT NULL,
+	MODIFY userid bigint unsigned NULL,
+	MODIFY mediatypeid bigint unsigned NULL,
+	MODIFY message text NOT NULL;
 UPDATE alerts SET userid=NULL WHERE userid=0;
 UPDATE alerts SET mediatypeid=NULL WHERE mediatypeid=0;
 DELETE FROM alerts WHERE NOT actionid IN (SELECT actionid FROM actions);

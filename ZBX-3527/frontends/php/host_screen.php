@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -158,7 +158,7 @@
 	if(empty($screens)){
 		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
 		$screens_wdgt->addItem(BR());
-		$screens_wdgt->addItem(new CTableInfo(S_NO_SCREENS_DEFINED));
+		$screens_wdgt->addItem(new CTableInfo(_('No screens defined.')));
 		$screens_wdgt->show();
 	}
 	else{

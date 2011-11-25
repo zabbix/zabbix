@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -567,19 +567,11 @@ Copt::memoryPick();
 				}
 			}
 
-			if (!isset($interface['port']) || zbx_empty($interface['port'])) {
+			if (!isset($interface['port'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Port cannot be empty for host interface.'));
 			}
-
-			if (isset($interface['port'])) {
-				if (zbx_ctype_digit($interface['port'])) {
-					if ($interface['port'] > 65535 || $interface['port'] < 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface PORT "%s" provided', $interface['port']));
-					}
-				}
-				else if (!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $interface['port'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect interface PORT "'.$interface['port'].'". '.S_WRONG_MACRO);
-				}
+			elseif (!validatePortNumber($interface['port'], false, true)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface port "%s" provided', $interface['port']));
 			}
 
 			if ($update) {

@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -44,7 +44,7 @@ require_once('include/page_header.php');
 ?>
 <?php
 	if(!DBfetch(DBselect('select itemid from items where itemid='.$_REQUEST['itemid']))){
-		show_error_message(S_NO_ITEMS_DEFINED);
+		show_error_message(_('No items defined.'));
 	}
 
 	$options = array(

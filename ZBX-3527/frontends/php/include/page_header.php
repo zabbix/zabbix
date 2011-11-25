@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -337,19 +337,19 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		}
 	}
 
-	if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
-		$tab = new CTable();
+	if (!empty($ZBX_SERVER_NAME)) {
+		$table = new CTable();
+		$table->addStyle('width: 100%;');
 
-		$td_l = new CCol(new CSpan($ZBX_SERVER_NAME, 'textcolorstyles'));
+		$tableColumn = new CCol(new CSpan($ZBX_SERVER_NAME, 'textcolorstyles'));
 		if (is_null($node_form)) {
-			$td_l->addStyle('padding-right: 5px;');
+			$tableColumn->addStyle('padding-right: 5px;');
 		}
 		else {
-			$td_l->addStyle('padding-right: 20px; padding-bottom: 2px;');
+			$tableColumn->addStyle('padding-right: 20px; padding-bottom: 2px;');
 		}
-
-		$tab->addRow(array($td_l, $node_form));
-		$node_form = $tab;
+		$table->addRow(array($tableColumn, $node_form));
+		$node_form = $table;
 	}
 
 	// 1st level menu

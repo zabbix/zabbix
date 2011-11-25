@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -27,16 +27,16 @@
 #include "alias.h"
 
 const char	*progname = NULL;
-const char	title_message[] = "Zabbix Agent";
+const char	title_message[] = "Zabbix agent";
 const char	usage_message[] = "[-Vhp] [-c <file>] [-t <item>]";
 
 const char	*help_message[] = {
 	"Options:",
-	"  -c --config <file>  absolute path to the configuration file",
-	"  -h --help           give this help",
-	"  -V --version        display version number",
-	"  -p --print          print known items and exit",
-	"  -t --test <item>    test specified item and exit",
+	"  -c --config <file>  Absolute path to the configuration file",
+	"  -p --print          Print known items and exit",
+	"  -t --test <item>    Test specified item and exit",
+	"  -h --help           Give this help",
+	"  -V --version        Display version number",
 	NULL	/* end of text */
 };
 
