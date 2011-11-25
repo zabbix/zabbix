@@ -29,20 +29,17 @@
  *     Eugene Grigorjev
  *
  */
-	function graph_item_type2str($type,$count=null){
-		switch($type){
+	function graph_item_type2str($type) {
+		switch ($type) {
 			case GRAPH_ITEM_SUM:
 				$type = S_GRAPH_SUM;
-				break;
-			case GRAPH_ITEM_AGGREGATED:
-				$type = S_AGGREGATED.(isset($count) ? '('.$count.')' : '');
 				break;
 			case GRAPH_ITEM_SIMPLE:
 			default:
 				$type = S_SIMPLE;
 				break;
 		}
-	return $type;
+		return $type;
 	}
 
 /*
@@ -77,8 +74,6 @@
  *
  */
 	function graph_item_drawtype2str($drawtype,$type=null){
-		if($type == GRAPH_ITEM_AGGREGATED) return '-';
-
 		switch($drawtype){
 			case GRAPH_ITEM_DRAWTYPE_LINE:			$drawtype = S_LINE;		break;
 			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:		$drawtype = S_FILLED_REGION;	break;
@@ -101,8 +96,6 @@
  *
  */
 	function graph_item_calc_fnc2str($calc_fnc, $type=null){
-		if($type == GRAPH_ITEM_AGGREGATED) return '-';
-
 		switch($calc_fnc){
 			case 0:			$calc_fnc = S_COUNT;		break;
 			case CALC_FNC_ALL:	$calc_fnc = S_ALL_SMALL;	break;

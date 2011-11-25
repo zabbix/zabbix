@@ -3011,13 +3011,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$_REQUEST['percent_right']	= $percent_right;
 /********************/
 
-		if($graphtype != GRAPH_TYPE_NORMAL){
-			foreach($items as $gid => $gitem){
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
-					unset($items[$gid]);
-			}
-		}
-
 		$items = array_values($items);
 		$icount = count($items);
 		for($i=0; $i < $icount-1;){
@@ -3070,7 +3063,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 			$items_table = new CTableInfo();
 			foreach($items as $gid => $gitem){
-				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
 				$host = get_host_by_itemid($gitem['itemid']);
 				$item = get_item_by_itemid($gitem['itemid']);
 
@@ -3079,10 +3071,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 				else
 					$monitored_hosts = 1;
 
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
-					$color = '-';
-				else
-					$color = new CColorCell(null,$gitem['color']);
+				$color = new CColorCell(null,$gitem['color']);
 
 
 				if($gid == $first){

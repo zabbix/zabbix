@@ -223,15 +223,9 @@ class CChart extends CGraphDraw{
 			}
 
 			$type = $this->items[$i]['calc_type'];
-			if($type == GRAPH_ITEM_AGGREGATED) {
-// skip current period
-				$from_time	= $this->from_time - $this->period * $this->items[$i]['periods_cnt'];
-				$to_time	= $this->from_time;
-			}
-			else {
-				$from_time	= $this->from_time;
-				$to_time	= $this->to_time;
-			}
+
+			$from_time	= $this->from_time;
+			$to_time	= $this->to_time;
 
 			$calc_field = 'round('.$x.'*(mod('.zbx_dbcast_2bigint('clock').'+'.$z.','.$p.'))/('.$p.'),0)';  /* required for 'group by' support of Oracle */
 
