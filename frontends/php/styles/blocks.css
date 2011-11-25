@@ -20,9 +20,11 @@
 /************************************************************/
 /*					ZABBIX MAPS								*/
 /************************************************************/
-
-.interfaceRow label.checkboxLikeLabel span.ui-button-icon-primary {
-	left: 0;
+.top-aligned {
+	margin-top: -14px;
+}
+.border_dotted_top {
+	border-top: 0;
 }
 
 .sortableRowPlaceholder{

@@ -468,8 +468,8 @@ Copt::memoryPick();
 			$dbInterfaces = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
-				'editable' => 1,
-				'preservekeys' => 1
+				'editable' => true,
+				'preservekeys' => true
 			));
 		}
 		else {
@@ -495,7 +495,7 @@ Copt::memoryPick();
 			));
 		}
 
-		foreach ($interfaces as $inum => &$interface) {
+		foreach ($interfaces as &$interface) {
 			if (!check_db_fields($interfaceDBfields, $interface)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
 			}
@@ -533,6 +533,8 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to method.'));
 				}
 			}
+
+			// TODO: check that each type has main interface
 
 			if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP and DNS cannot be empty for host interface.'));

@@ -33,7 +33,7 @@ class CFormList extends CDiv {
 		$this->attr('class', $class);
 	}
 
-	public function addRow($term, $description = null, $hidden = false, $id = null) {
+	public function addRow($term, $description = null, $hidden = false, $id = null, $class = null) {
 		$label = $term;
 		if (is_object($description)) {
 			$inputClass = zbx_strtolower(get_class($description));
@@ -41,7 +41,17 @@ class CFormList extends CDiv {
 				$label = new CLabel($term, $description->getAttribute('id'));
 			}
 		}
-		$class = $hidden ? 'formrow hidden' : 'formrow';
+
+		$defaultClass = $hidden ? 'formrow hidden' : 'formrow';
+		if ($class !== null) {
+			$class .= ' '.$defaultClass;
+		}
+		else {
+			$class = $defaultClass;
+		}
+
+
+
 		if (!is_null($description)) {
 			$this->formList->addItem(array(new CDiv($label, 'dt floatleft right'), new CDiv($description, 'dd')), $class, $id);
 		}
