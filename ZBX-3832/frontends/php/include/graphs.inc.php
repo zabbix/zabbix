@@ -39,16 +39,13 @@
 	}
 
 	function graph_item_type2str($type) {
-		switch($type) {
+		switch ($type) {
 			case GRAPH_ITEM_SUM:
-				$type = S_GRAPH_SUM;
-				break;
+				return _('Graph sum');
 			case GRAPH_ITEM_SIMPLE:
 			default:
-				$type = S_SIMPLE;
-				break;
+				return _('Simple');
 		}
-		return $type;
 	}
 
 	function graph_item_drawtypes(){
@@ -65,52 +62,38 @@
 	function graph_item_drawtype2str($drawtype) {
 		switch ($drawtype) {
 			case GRAPH_ITEM_DRAWTYPE_LINE:
-				$drawtype = S_LINE;
-				break;
+				return _('Line');
 			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
-				$drawtype = S_FILLED_REGION;
-				break;
+				return _('Filled region');
 			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
-				$drawtype = S_BOLD_LINE;
-				break;
+				return _('Bold line');
 			case GRAPH_ITEM_DRAWTYPE_DOT:
-				$drawtype = S_DOT;
-				break;
+				return _('Dot');
 			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:
-				$drawtype = S_DASHED_LINE;
-				break;
+				return _('Dashed line');
 			case GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE:
-				$drawtype = S_GRADIENT_LINE;
-				break;
-			default: $drawtype = S_UNKNOWN;
-				break;
+				return _('Gradient line');
+			default:
+				return _('Unknown');
 		}
-		return $drawtype;
 	}
 
 	function graph_item_calc_fnc2str($calc_fnc) {
 		switch ($calc_fnc) {
 			case 0:
-				$calc_fnc = S_COUNT;
-				break;
+				return _('Count');
 			case CALC_FNC_ALL:
-				$calc_fnc = S_ALL_SMALL;
-				break;
+				return _('all');
 			case CALC_FNC_MIN:
-				$calc_fnc = S_MIN_SMALL;
-				break;
+				return _('min');
 			case CALC_FNC_MAX:
-				$calc_fnc = S_MAX_SMALL;
-				break;
+				return _('max');
 			case CALC_FNC_LST:
-				$calc_fnc = S_LST_SMALL;
-				break;
+				return _('last');
 			case CALC_FNC_AVG:
 			default:
-				$calc_fnc = S_AVG_SMALL;
-				break;
+				return _('avg');
 		}
-		return $calc_fnc;
 	}
 
 	function getGraphDims($graphid=null){
