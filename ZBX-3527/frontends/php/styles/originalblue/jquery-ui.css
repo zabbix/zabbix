@@ -425,7 +425,6 @@ input.ui-button { padding: .3em 1em; }
 .originalblue .ui-button-text-icons .ui-button-icon-secondary, .originalblue .ui-button-icons-only .ui-button-icon-secondary { right: .5em; }
 
 /*button sets*/
-.originalblue .ui-buttonset { margin-right: 7px; }
 .originalblue .ui-buttonset .ui-button { margin-left: 0; margin-right: -.4em; }
 
 /* workarounds */

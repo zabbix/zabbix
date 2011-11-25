@@ -1,220 +1,41 @@
 <script type="text/x-jquery-tmpl" id="hostInterfaceRow">
 
-<tr class="interfaceRow" id="hostInterfaceRow_#{interfaceid}">
-<td>
-	<input type="hidden" name="interfaces[#{interfaceid}][new]" value="#{newValue}" />
-	<input type="hidden" id="interface_id_#{interfaceid}" name="interfaces[#{interfaceid}][interfaceid]" value="#{interfaceid}" />
-	<input class="input text" id="interface_ip_#{interfaceid}" name="interfaces[#{interfaceid}][ip]" type="text" size="24" value="#{ip}" />
-</td>
-<td>
-	<input class="input text" id="interface_dns_#{interfaceid}" name="interfaces[#{interfaceid}][dns]" type="text" size="30" value="#{dns}" />
-</td>
-<td>
-	<div class="jqueryinputset">
-		<input type="radio" id="radio_ip_#{interfaceid}" name="interfaces[#{interfaceid}][useip]" value="1" #{*checked_ip} />
-		<label for="radio_ip_#{interfaceid}"><?php echo _('IP'); ?></label>
-
-		<input type="radio" id="radio_dns_#{interfaceid}" name="interfaces[#{interfaceid}][useip]" value="0" #{*checked_dns} />
-		<label for="radio_dns_#{interfaceid}"><?php echo _('DNS'); ?></label>
-	</div>
-</td>
-<td>
-	<input class="input text" id="port_#{interfaceid}" name="interfaces[#{interfaceid}][port]" type="text" size="15" value="#{port}" />
-</td>
-<td>
-	<div id="interface_type_#{interfaceid}" class="jqueryinputset interfaceTypes">
-		<input type="radio" id="radio_agent_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_AGENT);?>" #{*checked_agent} #{*lock_agent}/>
-		<label for="radio_agent_#{interfaceid}"><?php echo _('Agent'); ?></label>
-
-		<input type="radio" id="radio_snmp_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_SNMP);?>" #{*checked_snmp} #{*lock_snmp} />
-		<label for="radio_snmp_#{interfaceid}"><?php echo _('SNMP'); ?></label>
-
-		<input type="radio" id="radio_jmx_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_JMX);?>" #{*checked_jmx} #{*lock_jmx} />
-		<label for="radio_jmx_#{interfaceid}"><?php echo _('JMX'); ?></label>
-
-		<input type="radio" id="radio_ipmi_#{interfaceid}" name="interfaces[#{interfaceid}][type]" value="<?php print(INTERFACE_TYPE_IPMI);?>" #{*checked_ipmi} #{*lock_ipmi} />
-		<label for="radio_ipmi_#{interfaceid}"><?php echo _('IPMI'); ?></label>
-	</div>
-</td>
-<td>
-	<input type="checkbox" id="interface_main_#{interfaceid}" name="interfaces[#{interfaceid}][main]" value="1" #{*checked_main} />
-	<label class="checkboxLikeLabel" for="interface_main_#{interfaceid}" style="height: 16px; width: 16px;"></label>
-</td>
-<td>
-	<input #{*disabled} id="removeInterface_#{interfaceid}" type="button" class="link_menu" name="remove" value="<?php echo _('Remove'); ?>" />
-</td>
+<tr class="interfaceRow" id="hostInterfaceRow_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}">
+	<td style="width: 2em;">
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
+		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
+	</td>
+	<td style="width: 16em;">
+		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" size="24" value="#{iface.ip}" />
+	</td>
+	<td style="width: 19em;">
+		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" size="30" value="#{iface.dns}" />
+	</td>
+	<td style="width: 9em;">
+		<div class="jqueryinputset">
+			<input type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip} />
+			<label for="radio_ip_#{iface.interfaceid}"><?php echo _('IP'); ?></label>
+			<input type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns} />
+			<label for="radio_dns_#{iface.interfaceid}"><?php echo _('DNS'); ?></label>
+		</div>
+	</td>
+	<td style="width: 10em;">
+		<input class="input text" name="interfaces[#{iface.interfaceid}][port]" type="text" size="15" value="#{iface.port}" />
+	</td>
+	<td style="width: 4em;">
+		<input type="radio" id="interface_main_#{iface.interfaceid}" name="main_#{iface.type}" value="#{iface.interfaceid}" />
+		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
+	</td>
+	<td  style="width: 4em;">
+		<button type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" class="link_menu remove" #{*attrs.disabled} ><?php echo _('Remove'); ?></button>
+	</td>
 </tr>
+
 </script>
 
 <script type="text/javascript">
 
-function addInterfaceRow(hostInterface) {
-	var tpl = new Template(jQuery('#hostInterfaceRow').html());
-
-	if (!isset("new", hostInterface)) {
-		hostInterface.newValue = "update";
-	}
-	else {
-		hostInterface.newValue = hostInterface["new"];
-	}
-
-	if (!isset("interfaceid", hostInterface)) {
-
-		hostInterface.interfaceid = jQuery("#hostInterfaces tr[id^=hostInterfaceRow]").length;
-		while (jQuery("#interface_id_"+hostInterface.interfaceid).length) {
-			hostInterface.interfaceid++;
-		}
-
-		hostInterface.newValue = "create";
-	}
-
-	hostInterface.disabled = '';
-	if (isset("items", hostInterface) && (hostInterface.items > 0)) {
-		hostInterface.disabled = 'disabled="disabled"';
-	}
-
-	if (!isset("ip", hostInterface) && !isset("dns", hostInterface)) {
-		if (jQuery("#hostInterfaces input[type=radio]:checked").first().val() == "0") {
-			hostInterface.useip = 0;
-			hostInterface.dns = jQuery("#hostInterfaces input[id^=interface_dns]").first().val();
-		}
-		else {
-			hostInterface.useip = 1;
-			hostInterface.ip = jQuery("#hostInterfaces input[id^=interface_ip]").first().val();
-		}
-	}
-
-	if (isset("useip", hostInterface)) {
-		if(hostInterface.useip == 0)
-			hostInterface.checked_dns = 'checked="checked"';
-		else
-			hostInterface.checked_ip = 'checked="checked"';
-	}
-//SDJ(hostInterface);
-	if (!isset('port', hostInterface)) {
-		hostInterface.port = '10050';
-	}
-
-	hostInterface.checked_agent = 'checked="checked"';
-	if (isset("type", hostInterface)) {
-		hostInterface.checked_agent = '';
-		switch (hostInterface.type.toString()) {
-			case '<?php print(INTERFACE_TYPE_SNMP);?>': hostInterface.checked_snmp = 'checked="checked"'; break;
-			case '<?php print(INTERFACE_TYPE_IPMI);?>': hostInterface.checked_ipmi = 'checked="checked"'; break;
-			case '<?php print(INTERFACE_TYPE_JMX);?>': hostInterface.checked_jmx = 'checked="checked"'; break;
-			case '<?php print(INTERFACE_TYPE_AGENT);?>':
-			default: hostInterface.checked_agent = 'checked="checked"'; break;
-		}
-	}
-
-	if (hostInterface.locked) {
-		hostInterface.lock_snmp = 'disabled="disabled"';
-		hostInterface.lock_agent = 'disabled="disabled"';
-		hostInterface.lock_jmx = 'disabled="disabled"';
-		hostInterface.lock_ipmi = 'disabled="disabled"';
-		switch (hostInterface.type.toString()) {
-			case '<?php print(INTERFACE_TYPE_SNMP);?>':
-				hostInterface.lock_snmp = '';
-				break;
-			case '<?php print(INTERFACE_TYPE_IPMI);?>':
-				hostInterface.lock_ipmi = '';
-				break;
-			case '<?php print(INTERFACE_TYPE_JMX);?>':
-				hostInterface.lock_jmx = '';
-				break;
-			case '<?php print(INTERFACE_TYPE_AGENT);?>':
-				hostInterface.lock_agent = '';
-				break;
-		}
-	}
-
-	if (hostInterface.main == 1) {
-		hostInterface.checked_main = 'checked="checked"';
-		var mainInterfaceIcon = {icons: {primary: 'ui-icon-check'}};
-	}
-	else {
-		hostInterface.checked_main = '';
-		var mainInterfaceIcon = {};
-	}
-
-	jQuery("#hostIterfacesFooter").before(tpl.evaluate(hostInterface));
-
-	// remove interface buttonnot
-	jQuery('#removeInterface_'+hostInterface.interfaceid).click(function() {
-		removeInterfaceRow(hostInterface.interfaceid);
-		toggleMainInterfaceSwitches();
-	});
-
-	jQuery("#interface_main_"+hostInterface.interfaceid)
-			.button(mainInterfaceIcon)
-			.click(function() {
-				var jThis = jQuery(this);
-				var currentInterfaceid = jThis.attr('id').match(/^interface_main_(\d+)$/);
-				currentInterfaceid = currentInterfaceid[1];
-				var interfaces = getIntefacesByType();
-
-				// find current interface type
-				outer:
-				for (var interfaceType in interfaces) {
-					for (var interfaceid in interfaces[interfaceType].interfaces) {
-						if (interfaceid == currentInterfaceid) {
-							var currentInterfaceType = interfaceType;
-							break outer;
-						}
-					}
-				}
-
-				// uncheck main for all interfaces of found type
-				for (var interfaceid in interfaces[currentInterfaceType].interfaces) {
-					jQuery('#interface_main_'+interfaceid)
-							.prop('checked', false)
-							.button('option', 'icons', {})
-							.button('refresh');
-				}
-
-
-				// check main for current interface
-				jThis.prop('checked', true)
-						.button('option', 'icons', {primary: 'ui-icon-check'})
-						.button('refresh');
-			});
-
-	if (!hostInterface.locked) {
-		jQuery("#hostInterfaceRow_"+hostInterface.interfaceid)
-			.find("div.jqueryinputset")
-			.buttonset()
-			.end()
-			.find("#interface_type_"+hostInterface.interfaceid)
-			.find("label")
-			.click({"hostInterface": hostInterface}, function(event){
-				var portInput = jQuery("#port_"+event.data.hostInterface.interfaceid)[0];
-
-				if(empty(portInput.value) || !(portInput.value == "10050" || portInput.value == "161" || portInput.value == "623" || portInput.value == "12345")) return true;
-
-				var interfaceTypeId = event.currentTarget.htmlFor.toLowerCase();
-				switch(true){
-					case (interfaceTypeId.indexOf('agent') > -1): portInput.value = "10050"; break;
-					case (interfaceTypeId.indexOf('snmp') > -1): portInput.value = "161"; break;
-					case (interfaceTypeId.indexOf('ipmi') > -1): portInput.value = "623"; break;
-					case (interfaceTypeId.indexOf('jmx') > -1): portInput.value = "12345"; break;
-				}
-			});
-
-
-		jQuery("#hostInterfaceRow_"+hostInterface.interfaceid+" .interfaceTypes input[type=radio]").click(function(event) {
-			jQuery('#interface_main_'+hostInterface.interfaceid)
-					.prop('checked', false)
-					.button('refresh')
-					.button('option', 'icons', {});
-			toggleMainInterfaceSwitches();
-		});
-	}
-}
-
-function removeInterfaceRow(hostInterfaceId) {
-	jQuery('#hostInterfaceRow_'+hostInterfaceId).remove();
-	jQuery("#hostIterfaces").accordion('resize');
-}
 
 function getIntefacesByType() {
 	var mainIntefaces = {
@@ -297,7 +118,264 @@ function toggleMainInterfaceSwitches() {
 }
 
 
+var hostInterfacesManager = (function() {
+	'use strict';
+
+	var rowTemplate = new Template(jQuery('#hostInterfaceRow').html()),
+		ports = {
+			agent: 10050,
+			snmp: 161,
+			jmx: 12345,
+			ipmi: 623
+		},
+		allHostInterfaces = {};
+
+
+	function renderHostInterfaceRow(hostInterface) {
+		var domAttrs = getDomElementsAttrsForInterface(hostInterface),
+			domId = getDomIdForRowInsert(hostInterface.type),
+			domRow;
+
+
+
+		// TODO: somehow determine main interfaces.
+
+
+		jQuery(domId).before(rowTemplate.evaluate({iface: hostInterface, attrs: domAttrs}));
+
+		if (!hostInterface.locked) {
+			domRow = jQuery('#hostInterfaceRow_'+hostInterface.interfaceid);
+			makeHostInterfaceRowDraggable(domRow);
+		}
+
+
+		/* // remove interface button not
+			jQuery('#removeInterface_'+hostInterface.interfaceid).click(function() {
+			removeInterfaceRow(hostInterface.interfaceid);
+			toggleMainInterfaceSwitches();
+			});
+
+			jQuery("#interface_main_"+hostInterface.interfaceid)
+			.button(mainInterfaceIcon)
+			.click(function() {
+			var jThis = jQuery(this);
+			var currentInterfaceid = jThis.attr('id').match(/^interface_main_(\d+)$/);
+			currentInterfaceid = currentInterfaceid[1];
+			var interfaces = getIntefacesByType();
+
+			// find current interface type
+			outer:
+			for (var interfaceType in interfaces) {
+			for (var interfaceid in interfaces[interfaceType].interfaces) {
+			if (interfaceid == currentInterfaceid) {
+			var currentInterfaceType = interfaceType;
+			break outer;
+			}
+			}
+			}
+
+			// uncheck main for all interfaces of found type
+			for (var interfaceid in interfaces[currentInterfaceType].interfaces) {
+			jQuery('#interface_main_'+interfaceid)
+			.prop('checked', false)
+			.button('option', 'icons', {})
+			.button('refresh');
+			}
+
+
+			// check main for current interface
+			jThis.prop('checked', true)
+			.button('option', 'icons', {primary: 'ui-icon-check'})
+			.button('refresh');
+			});
+
+			if (!hostInterface.locked) {
+			jQuery("#hostInterfaceRow_"+hostInterface.interfaceid)
+			.find("div.jqueryinputset")
+			.buttonset();
+
+
+			jQuery("#hostInterfaceRow_"+hostInterface.interfaceid+" .interfaceTypes input[type=radio]").click(function(event) {
+			jQuery('#interface_main_'+hostInterface.interfaceid)
+			.prop('checked', false)
+			.button('refresh')
+			.button('option', 'icons', {});
+			toggleMainInterfaceSwitches();
+			});
+			}
+		*/
+
+
+	}
+
+	function makeHostInterfaceRowDraggable(domElement) {
+		domElement.children().first().html('<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>');
+		domElement.draggable({
+			helper: 'clone',
+			handle: 'span.ui-icon-arrowthick-2-n-s',
+			tolerance: 'pointer'
+		});
+	}
+
+	function getDomElementsAttrsForInterface(hostInterface) {
+		var attrs = {
+			disabled: '',
+			checked_dns: '',
+			checked_ip: '',
+			checked_main: ''
+		};
+
+		if (hostInterface.items) {
+			attrs.disabled = 'disabled="disabled"';
+		}
+
+
+		if (hostInterface.useip == 0) {
+			attrs.checked_dns = 'checked="checked"';
+		}
+		else {
+			attrs.checked_ip = 'checked="checked"';
+		}
+
+		if (hostInterface.main) {
+			attrs.checked_main = 'checked="checked"';
+		}
+
+		if (hostInterface.locked) {
+			// TODO: if locked disable dragging
+		}
+
+		return attrs;
+	}
+
+	function getDomIdForRowInsert(hostInterfaceType) {
+		var footerRowId;
+		switch (hostInterfaceType) {
+			case getHostInterfaceNumericType('agent'):
+				footerRowId = '#agentIterfacesFooter';
+				break;
+			case getHostInterfaceNumericType('snmp'):
+				footerRowId = '#SNMPIterfacesFooter';
+				break;
+			case getHostInterfaceNumericType('jmx'):
+				footerRowId = '#JMXIterfacesFooter';
+				break;
+			case getHostInterfaceNumericType('ipmi'):
+				footerRowId = '#IPMIIterfacesFooter';
+				break;
+			default:
+				throw new Error('Unknown host interface type.');
+		}
+
+		return footerRowId;
+	}
+
+	function getHostInterfaceNumericType(typeName) {
+		var typeNum;
+
+		switch(typeName) {
+			case 'agent':
+				typeNum = '<?php print(INTERFACE_TYPE_AGENT); ?>';
+				break;
+			case 'snmp':
+				typeNum = '<?php print(INTERFACE_TYPE_SNMP); ?>';
+				break;
+			case 'jmx':
+				typeNum = '<?php print(INTERFACE_TYPE_JMX); ?>';
+				break;
+			case 'ipmi':
+				typeNum = '<?php print(INTERFACE_TYPE_IPMI); ?>';
+				break;
+			default:
+				throw new Error('Unknown host interface type name.');
+		}
+
+		return typeNum;
+	}
+
+	function createNewHostInterface(hostInterfaceType) {
+		var newInterface = {
+			isNew: true,
+			useip: 1,
+			type: getHostInterfaceNumericType(hostInterfaceType),
+			port: ports[hostInterfaceType]
+		};
+
+		newInterface.interfaceid = 1;
+		while (allHostInterfaces[newInterface.interfaceid] !== void(0)) {
+			newInterface.interfaceid++;
+		}
+
+		addHostInterface(newInterface);
+
+		return newInterface;
+	}
+
+	function addHostInterface(hostInterface) {
+		allHostInterfaces[hostInterface.interfaceid] = hostInterface;
+	}
+
+	function moveRowToAnotherTypeTable(hostInterfaceId, newHostInterfaceType) {
+		var newDomId = getDomIdForRowInsert(newHostInterfaceType);
+
+		jQuery('#interface_main_'+hostInterfaceId).attr('name', 'main_'+newHostInterfaceType);
+
+		jQuery('#hostInterfaceRow_'+hostInterfaceId).insertBefore(newDomId);
+		jQuery('#interface_type_'+hostInterfaceId).val(newHostInterfaceType);
+	}
+
+	return {
+		add: function(hostInterfaces) {
+			for (var hostInterfaceId in hostInterfaces) {
+				addHostInterface(hostInterfaces[hostInterfaceId]);
+				renderHostInterfaceRow(hostInterfaces[hostInterfaceId]);
+			}
+		},
+
+		addNew: function(type) {
+			var hostInterface = createNewHostInterface(type);
+
+			allHostInterfaces[hostInterface.interfaceid] = hostInterface;
+			renderHostInterfaceRow(hostInterface);
+		},
+
+		remove: function(hostInterfaceId) {
+			delete allHostInterfaces[hostInterfaceId];
+		},
+
+		setType: function(hostInterfaceId, typeName) {
+			var newTypeNum = getHostInterfaceNumericType(typeName);
+
+			if (allHostInterfaces[hostInterfaceId].type !== newTypeNum) {
+				moveRowToAnotherTypeTable(hostInterfaceId, newTypeNum);
+				allHostInterfaces[hostInterfaceId].type = newTypeNum;
+			}
+		}
+	}
+
+}());
+
+
 jQuery(document).ready(function() {
+	'use strict';
+
+	jQuery('#hostlist').on('click', 'button.remove', function() {
+		var interfaceId = jQuery(this).data('interfaceid');
+		jQuery('#hostInterfaceRow_'+interfaceId).remove();
+		hostInterfacesManager.remove(interfaceId);
+	});
+
+	jQuery("#agentInterfaces, #SNMPInterfaces, #JMXInterfaces, #IPMIInterfaces").droppable({
+		drop: function(event, ui) {
+			var hostInterfaceTypeName = jQuery(this).data('type'),
+				hostInterfaceId = ui.draggable.data('interfaceid');
+
+			hostInterfacesManager.setType(hostInterfaceId, hostInterfaceTypeName);
+		}
+	});
+
+
+
 	jQuery('#addInterfaceRow').click(function() {
 		addInterfaceRow({});
 		toggleMainInterfaceSwitches();
@@ -307,23 +385,22 @@ jQuery(document).ready(function() {
 	jQuery("div.jqueryinputset input[name=inventory_mode]").click(function() {
 		// action depending on which button was clicked
 		var inventoryFields = jQuery("#inventorylist :input:gt(2)");
+
 		switch(jQuery(this).val()) {
 			case '<?php echo HOST_INVENTORY_DISABLED ?>':
-				inventoryFields.attr("disabled", "disabled"); // disabling all input fields
+				inventoryFields.prop('disabled', true);
 				jQuery('.populating_item').hide();
 			break;
 			case '<?php echo HOST_INVENTORY_MANUAL ?>':
-				inventoryFields.removeAttr("disabled"); // enabling all input fields (if they were disabled)
+				inventoryFields.prop('disabled', false);
 				jQuery('.populating_item').hide();
 			break;
 			case '<?php echo HOST_INVENTORY_AUTOMATIC ?>':
-				// disabling all input fields
-				inventoryFields.removeAttr("disabled");
-				inventoryFields.filter('.linked_to_item').attr("disabled", "disabled"); // disabling all input fields
+				inventoryFields.prop('disabled', false);
+				inventoryFields.filter('.linked_to_item').prop('disabled', true);
 				jQuery('.populating_item').show();
 			break;
 		}
-
 	});
 
 	jQuery('#name').focus();
@@ -331,3 +408,4 @@ jQuery(document).ready(function() {
 
 
 </script>
+
