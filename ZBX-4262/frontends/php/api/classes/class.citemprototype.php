@@ -752,7 +752,7 @@ COpt::memoryPick();
 				'itemids' => $prototypeids,
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
-				'preservekeys' => true,
+				'preservekeys' => true
 			));
 			if (!empty($del_graphPrototypes)) {
 				$result = API::GraphPrototype()->delete(zbx_objectValues($del_graphPrototypes, 'graphid'), true);
