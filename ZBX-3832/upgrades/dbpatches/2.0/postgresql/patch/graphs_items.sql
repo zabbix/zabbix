@@ -5,3 +5,6 @@ DELETE FROM graphs_items WHERE NOT EXISTS (SELECT 1 FROM graphs WHERE graphs.gra
 DELETE FROM graphs_items WHERE NOT EXISTS (SELECT 1 FROM items WHERE items.itemid=graphs_items.itemid);
 ALTER TABLE ONLY graphs_items ADD CONSTRAINT c_graphs_items_1 FOREIGN KEY (graphid) REFERENCES graphs (graphid) ON DELETE CASCADE;
 ALTER TABLE ONLY graphs_items ADD CONSTRAINT c_graphs_items_2 FOREIGN KEY (itemid) REFERENCES items (itemid) ON DELETE CASCADE;
+
+UPDATE graphs_items SET type=0 WHERE type=1;
+ALTER TABLE graphs_items DROP COLUMN periods_cnt;
