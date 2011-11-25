@@ -36,10 +36,9 @@ class CPie extends CGraphDraw{
 // PRE CONFIG:	ADD / SET / APPLY
 /********************************************************************************************************/
 
-	public function addItem($itemid, $calc_fnc=CALC_FNC_AVG,$color=null, $type=null){
-
+	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
 		$this->items[$this->num] = get_item_by_itemid($itemid);
-		$this->items[$this->num]['name']=itemName($this->items[$this->num]);
+		$this->items[$this->num]['name'] = itemName($this->items[$this->num]);
 		$host=get_host_by_hostid($this->items[$this->num]['hostid']);
 
 		$this->items[$this->num]['host'] = $host['name'];

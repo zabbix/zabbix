@@ -2708,8 +2708,7 @@
 				else
 					$monitored_hosts = 1;
 
-				$color = new CColorCell(null,$gitem['color']);
-
+				$color = new CColorCell(null, $gitem['color']);
 
 				if($gid == $first){
 					$do_up = null;

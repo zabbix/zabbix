@@ -186,18 +186,19 @@ require_once('include/page_header.php');
 
 		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
 
-		if (($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)) {
-			$cmbType = new CComboBox('type',$type,'submit()');
+		if ($graphtype == GRAPH_TYPE_PIE || $graphtype == GRAPH_TYPE_EXPLODED) {
+			$cmbType = new CComboBox('type', $type, 'submit()');
 			$cmbType->addItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
 			$cmbType->addItem(GRAPH_ITEM_SUM, S_GRAPH_SUM);
 			$frmGItem->addRow(S_TYPE, $cmbType);
 		}
 		else {
-			$frmGItem->addVar('type',GRAPH_ITEM_SIMPLE);
+			$frmGItem->addVar('type', GRAPH_ITEM_SIMPLE);
 		}
 
-		if (($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)) {
-			$cmbFnc = new CComboBox('calc_fnc',$calc_fnc,'submit();');
+		$cmbFnc = new CComboBox('calc_fnc', $calc_fnc, 'submit();');
+
+		if ($graphtype == GRAPH_TYPE_PIE || $graphtype == GRAPH_TYPE_EXPLODED) {
 
 			$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
 			$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
@@ -206,8 +207,6 @@ require_once('include/page_header.php');
 			$frmGItem->addRow(S_FUNCTION, $cmbFnc);
 		}
 		else {
-			$cmbFnc = new CComboBox('calc_fnc',$calc_fnc,'submit();');
-
 			if ($graphtype == GRAPH_TYPE_NORMAL) {
 				$cmbFnc->addItem(CALC_FNC_ALL, S_ALL_SMALL);
 			}
@@ -218,11 +217,11 @@ require_once('include/page_header.php');
 			$frmGItem->addRow(S_FUNCTION, $cmbFnc);
 
 			if ($graphtype == GRAPH_TYPE_NORMAL) {
-				$cmbType = new CComboBox('drawtype',$drawtype);
+				$cmbType = new CComboBox('drawtype', $drawtype);
 				$drawtypes = graph_item_drawtypes();
 
-				foreach ($drawtypes  as $i) {
-					$cmbType->addItem($i,graph_item_drawtype2str($i));
+				foreach ($drawtypes as $i) {
+					$cmbType->addItem($i, graph_item_drawtype2str($i));
 				}
 
 				$frmGItem->addRow(S_DRAW_STYLE, $cmbType);
@@ -232,7 +231,7 @@ require_once('include/page_header.php');
 			}
 		}
 
-		$frmGItem->addRow(S_COLOR, new CColor('color',$color));
+		$frmGItem->addRow(S_COLOR, new CColor('color', $color));
 
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$cmbYax = new CComboBox('yaxisside',$yaxisside);
