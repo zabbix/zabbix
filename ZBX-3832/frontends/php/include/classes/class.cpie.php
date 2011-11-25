@@ -36,7 +36,7 @@ class CPie extends CGraphDraw{
 // PRE CONFIG:	ADD / SET / APPLY
 /********************************************************************************************************/
 
-	public function addItem($itemid, $calc_fnc=CALC_FNC_AVG,$color=null, $type=null, $periods_cnt=null){
+	public function addItem($itemid, $calc_fnc=CALC_FNC_AVG,$color=null, $type=null){
 
 		$this->items[$this->num] = get_item_by_itemid($itemid);
 		$this->items[$this->num]['name']=itemName($this->items[$this->num]);
@@ -46,7 +46,6 @@ class CPie extends CGraphDraw{
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
 		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
 		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
-		$this->items[$this->num]['periods_cnt'] = is_null($periods_cnt) ? 0 : $periods_cnt;
 
 		$this->num++;
 	}
