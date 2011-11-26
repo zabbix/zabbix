@@ -112,7 +112,7 @@ include_once('include/page_header.php');
 		if(($period_end=$start+7*24*3600*($i+1)) > time())
 			$period_end = time();
 
-		$stat = calculate_service_availability($_REQUEST['serviceid'],$period_start,$period_end);
+		$stat = calculateServiceAvailability($_REQUEST['serviceid'], $period_start, $period_end);
 
 		$problem[$i]=$stat['problem'];
 		$ok[$i]=$stat['ok'];

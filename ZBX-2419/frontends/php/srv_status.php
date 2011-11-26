@@ -192,9 +192,8 @@ include_once('include/page_header.php');
 				}
 			}
 
-			if($row['showsla'] == 1){
-
-				$stat = calculate_service_availability($row['serviceid'], $period_start, $period_end);
+			if ($row['showsla'] == 1) {
+				$stat = calculateServiceAvailability($row['serviceid'], $period_start, $period_end);
 
 				$p = min($stat['problem'], 20);
 				$sla_style = ($row['goodsla'] > $stat['ok'])? 'on':'off';

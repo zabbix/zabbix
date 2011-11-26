@@ -77,7 +77,7 @@ include_once 'include/page_header.php';
 	$now=time(NULL);
 	$period_start=$now-7*86400;
 	$period_end=$now;
-	$stat=calculate_service_availability($_REQUEST['serviceid'],$period_start,$period_end);
+	$stat = calculateServiceAvailability($_REQUEST['serviceid'], $period_start, $period_end);
 
 	$problem=$stat['problem'];
 	$ok=$stat['ok'];
