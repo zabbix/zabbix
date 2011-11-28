@@ -19,13 +19,11 @@
 **/
 ?>
 <?php
-
-class CZBXAPI{
+class CZBXAPI {
 	public static $userData;
 
-	protected static function exception($code=ZBX_API_ERROR_INTERNAL, $error=''){
+	protected static function exception($code = ZBX_API_ERROR_INTERNAL, $error = '') {
 		throw new APIException($code, $error);
 	}
-
 }
 ?>

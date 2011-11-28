@@ -656,7 +656,7 @@ switch($itemType) {
 		DBstart();
 		$go_result = activate_item($group_itemid);
 		$go_result = DBend($go_result);
-		show_messages($go_result, S_ITEMS_ACTIVATED, null);
+		show_messages($go_result, _('Items activated'), null);
 	}
 	elseif(($_REQUEST['go'] == 'disable') && isset($_REQUEST['group_itemid'])){
 		global $USER_DETAILS;
@@ -666,7 +666,7 @@ switch($itemType) {
 		DBstart();
 		$go_result = disable_item($group_itemid);
 		$go_result = DBend($go_result);
-		show_messages($go_result, S_ITEMS_DISABLED, null);
+		show_messages($go_result, _('Items disabled'), null);
 	}
 	elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_itemid'])) {
 		if (isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])) {

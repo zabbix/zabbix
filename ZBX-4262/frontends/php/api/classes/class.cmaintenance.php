@@ -51,48 +51,45 @@ class CMaintenance extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('maintenanceid', 'name');
+		$sort_columns = array('maintenanceid', 'name', 'maintenance_type');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('maintenance' => 'm.maintenanceid'),
-			'from' => array('maintenances' => 'maintenances m'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('maintenance' => 'm.maintenanceid'),
+			'from'		=> array('maintenances' => 'maintenances m'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'groupids'				=> null,
-			'hostids'				=> null,
-			'maintenanceids'		=> null,
-			'editable'				=> null,
-			'nopermissions'			=> null,
-
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'hostids'					=> null,
+			'maintenanceids'			=> null,
+			'editable'					=> null,
+			'nopermissions'				=> null,
 			// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'filter'				=> null,
-			'searchWildcardsEnabled'=> null,
-
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'filter'					=> null,
+			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'				=> API_OUTPUT_REFER,
-			'selectGroups'			=> null,
-			'selectHosts'			=> null,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'preservekeys'			=> null,
-
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null,
+			'output'					=> API_OUTPUT_REFER,
+			'selectGroups'				=> null,
+			'selectHosts'				=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
 		$options = zbx_array_merge($def_options, $options);
 
@@ -102,10 +99,11 @@ class CMaintenance extends CZBXAPI {
 			if (!is_null($options['groupids']) || !is_null($options['hostids'])) {
 				if (!is_null($options['groupids'])) {
 					zbx_value2array($options['groupids']);
-					$sql = 'SELECT mmg.maintenanceid'.
-							' FROM maintenances_groups mmg'.
-							' WHERE '.DBcondition('mmg.groupid', $options['groupids']);
-					$res = DBselect($sql);
+					$res = DBselect(
+						'SELECT mmg.maintenanceid'.
+						' FROM maintenances_groups mmg'.
+						' WHERE '.DBcondition('mmg.groupid', $options['groupids'])
+					);
 					while ($maintenance = DBfetch($res)) {
 						$maintenanceids[] = $maintenance['maintenanceid'];
 					}
@@ -128,7 +126,6 @@ class CMaintenance extends CZBXAPI {
 				while ($maintenance = DBfetch($res)) {
 					$maintenanceids[] = $maintenance['maintenanceid'];
 				}
-
 				$sql_parts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
 			}
 		}
@@ -186,14 +183,14 @@ class CMaintenance extends CZBXAPI {
 				zbx_value2array($options['groupids']);
 
 				$sql .= ' AND ('.
-				//filtering using groups attached to maintenence
+							// filtering using groups attached to maintenence
 							'EXISTS ('.
 								'SELECT mgf.maintenanceid'.
 								' FROM maintenances_groups mgf'.
 								' WHERE mgf.maintenanceid=m.maintenanceid'.
 									' AND '.DBcondition('mgf.groupid', $options['groupids']).
 							')'.
-				//filtering by hostgroups of hosts attached to maintenance
+							// filtering by hostgroups of hosts attached to maintenance
 							' OR EXISTS ('.
 								' SELECT mh.maintenanceid'.
 								' FROM maintenances_hosts mh,hosts_groups hg'.
@@ -202,7 +199,6 @@ class CMaintenance extends CZBXAPI {
 									' AND '.DBcondition('hg.groupid', $options['groupids']).
 							')'.
 						')';
-
 			}
 
 			if (!is_null($options['hostids'])) {
@@ -214,12 +210,10 @@ class CMaintenance extends CZBXAPI {
 								' AND '.DBcondition('mh.hostid', $options['hostids']).
 							')';
 			}
-
 			$res = DBselect($sql);
 			while ($maintenance = DBfetch($res)) {
 				$maintenanceids[] = $maintenance['maintenanceid'];
 			}
-
 			$sql_parts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
 		}
 
@@ -271,18 +265,8 @@ class CMaintenance extends CZBXAPI {
 			zbx_db_search('maintenances m', $options, $sql_parts);
 		}
 
-		// order
-		// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if (!zbx_empty($options['sortfield'])) {
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
-
-			$sql_parts['order'][] = 'm.'.$options['sortfield'].' '.$sortorder;
-
-			if (!str_in_array('m.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('m.*', $sql_parts['select'])) {
-				$sql_parts['select'][] = 'm.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'm');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
@@ -342,7 +326,7 @@ class CMaintenance extends CZBXAPI {
 				}
 				else {
 					if (!isset($result[$maintenance['maintenanceid']])) {
-						$result[$maintenance['maintenanceid']]= array();
+						$result[$maintenance['maintenanceid']] = array();
 					}
 
 					if (!is_null($options['selectGroups']) && !isset($result[$maintenance['maintenanceid']]['groups'])) {
@@ -387,7 +371,6 @@ class CMaintenance extends CZBXAPI {
 				'output' => $options['selectGroups']
 			);
 			$groups = API::HostGroup()->get($obj_params);
-
 			foreach ($groups as $group) {
 				$gmaintenances = $group['maintenances'];
 				unset($group['maintenances']);
@@ -406,7 +389,6 @@ class CMaintenance extends CZBXAPI {
 				'output' => $options['selectHosts']
 			);
 			$hosts = API::Host()->get($obj_params);
-
 			foreach ($hosts as $host) {
 				$hmaintenances = $host['maintenances'];
 				unset($host['maintenances']);
@@ -419,7 +401,6 @@ class CMaintenance extends CZBXAPI {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
-
 		return $result;
 	}
 
@@ -518,12 +499,12 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate maintenance active since
-			if (validateMaxTime($maintenance['active_since'])) {
+			if (!validateMaxTime($maintenance['active_since'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active since')));
 			}
 
 			// validate maintenance active till
-			if (validateMaxTime($maintenance['active_till'])) {
+			if (!validateMaxTime($maintenance['active_till'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active till')));
 			}
 
@@ -631,12 +612,12 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			// validate maintenance active since
-			if (validateMaxTime($maintenance['active_since'])) {
+			if (!validateMaxTime($maintenance['active_since'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active since')));
 			}
 
 			// validate maintenance active till
-			if (validateMaxTime($maintenance['active_till'])) {
+			if (!validateMaxTime($maintenance['active_till'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('"%s" must be between 1970.01.01 and 2038.01.18', _('Active till')));
 			}
 
@@ -707,11 +688,12 @@ class CMaintenance extends CZBXAPI {
 
 			// getting current time periods
 			$timeperiodids = $timeperiods = array();
-			$sql = 'SELECT tp.*'.
-					' FROM timeperiods tp,maintenances_windows mw'.
-					' WHERE '.DBcondition('mw.maintenanceid', array($maintenance['maintenanceid'])).
-						' AND tp.timeperiodid=mw.timeperiodid';
-			$db_timeperiods = DBselect($sql);
+			$db_timeperiods = DBselect(
+				'SELECT tp.*'.
+				' FROM timeperiods tp,maintenances_windows mw'.
+				' WHERE '.DBcondition('mw.maintenanceid', array($maintenance['maintenanceid'])).
+					' AND tp.timeperiodid=mw.timeperiodid'
+			);
 			while ($timeperiod = DBfetch($db_timeperiods)) {
 				$timeperiodids[] = $timeperiod['timeperiodid'];
 				$timeperiods[] = $timeperiod;
@@ -856,11 +838,12 @@ class CMaintenance extends CZBXAPI {
 			}
 
 			$timeperiodids = array();
-			$sql = 'SELECT DISTINCT tp.timeperiodid'.
-					' FROM timeperiods tp,maintenances_windows mw'.
-					' WHERE '.DBcondition('mw.maintenanceid', $maintenanceids).
-						' AND tp.timeperiodid=mw.timeperiodid';
-			$db_timeperiods = DBselect($sql);
+			$db_timeperiods = DBselect(
+				'SELECT DISTINCT tp.timeperiodid'.
+				' FROM timeperiods tp,maintenances_windows mw'.
+				' WHERE '.DBcondition('mw.maintenanceid', $maintenanceids).
+					' AND tp.timeperiodid=mw.timeperiodid'
+			);
 			while ($timeperiod = DBfetch($db_timeperiods)) {
 				$timeperiodids[] = $timeperiod['timeperiodid'];
 			}
@@ -916,7 +899,5 @@ class CMaintenance extends CZBXAPI {
 		}
 		unset($maintenance);
 	}
-
 }
-
 ?>
