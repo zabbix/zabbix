@@ -314,7 +314,7 @@ $rightColumn[] = $hoststat;
 // last issues
 $refresh_menu = get_icon('menu', array('menu' => 'hat_lastiss'));
 $lastiss = new CUIWidget('hat_lastiss', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_lastiss.state', 1));
-$lastiss->setHeader(_('Last 20 issues'), array($refresh_menu));
+$lastiss->setHeader(_s('Last %d issues', DEFAULT_LATEST_ISSUES_CNT), array($refresh_menu));
 $lastiss->setFooter(new CDiv(SPACE, 'textwhite', 'hat_lastiss_footer'));
 $rightColumn[] = $lastiss;
 

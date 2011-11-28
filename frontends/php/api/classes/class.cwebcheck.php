@@ -22,65 +22,60 @@
 /**
  * @package API
  */
-
-class CWebCheck extends CZBXAPI{
-
+class CWebCheck extends CZBXAPI {
 	private $history = 30;
 	private $trends = 90;
 
-	public function get($options=array()){
-
+	public function get($options = array()) {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('httptestid', 'name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('httptestid', 'name');
 
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('httptests' => 'ht.httptestid'),
-			'from' => array('httptest' => 'httptest ht'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('httptests' => 'ht.httptestid'),
+			'from'		=> array('httptest' => 'httptest ht'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'httptestids'			=> null,
-			'applicationids'		=> null,
-			'hostids'				=> null,
-			'editable'				=> null,
-			'nopermissions'			=> null,
-// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'exludeSearch'			=> null,
-
-// OutPut
-			'output'				=> API_OUTPUT_REFER,
-			'selectHosts'			=> null,
-			'selectSteps'			=> null,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'preservekeys'			=> null,
-
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null
+			'nodeids'			=> null,
+			'httptestids'		=> null,
+			'applicationids'	=> null,
+			'hostids'			=> null,
+			'editable'			=> null,
+			'nopermissions'	 	=> null,
+			// filter
+			'filter'			=> null,
+			'search'			=> null,
+			'searchByAny'		=> null,
+			'startSearch'		=> null,
+			'exludeSearch'		=> null,
+			// output
+			'output'			=> API_OUTPUT_REFER,
+			'selectHosts'		=> null,
+			'selectSteps'		=> null,
+			'countOutput'		=> null,
+			'groupCount'		=> null,
+			'preservekeys'		=> null,
+			'sortfield'			=> '',
+			'sortorder'			=> '',
+			'limit'				=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
-// editable + PERMISSION CHECK
-
-		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
+		// editable + PERMISSION CHECK
+		if (USER_TYPE_SUPER_ADMIN == $user_type || $options['nopermissions']) {
 		}
-		else{
+		else {
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
 			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -93,104 +88,90 @@ class CWebCheck extends CZBXAPI{
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
 			$sql_parts['where'][] = 'ug.userid='.$userid;
 			$sql_parts['where'][] = 'r.permission>='.$permission;
-			$sql_parts['where'][] = 'NOT EXISTS( '.
-								' SELECT hgg.groupid '.
-								' FROM hosts_groups hgg, rights rr, users_groups gg '.
-								' WHERE hgg.hostid=hg.hostid '.
-									' AND rr.id=hgg.groupid '.
-									' AND rr.groupid=gg.usrgrpid '.
-									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';
+			$sql_parts['where'][] = 'NOT EXISTS('.
+									' SELECT hgg.groupid'.
+									' FROM hosts_groups hgg,rights rr,users_groups gg'.
+									' WHERE hgg.hostid=hg.hostid'.
+										' AND rr.id=hgg.groupid'.
+										' AND rr.groupid=gg.usrgrpid'.
+										' AND gg.userid='.$userid.
+										' AND rr.permission<'.$permission.')';
 		}
 
-// nodeids
+		// nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
-// httptestids
-		if(!is_null($options['httptestids'])){
+		// httptestids
+		if (!is_null($options['httptestids'])) {
 			zbx_value2array($options['httptestids']);
 
-			if($options['output'] != API_OUTPUT_SHORTEN){
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sql_parts['select']['httptestid'] = 'ht.httptestid';
 			}
-
 			$sql_parts['where']['httptestid'] = DBcondition('ht.httptestid', $options['httptestids']);
 		}
 
-// hostids
-		if(!is_null($options['hostids'])){
+		// hostids
+		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			if($options['output'] != API_OUTPUT_SHORTEN){
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sql_parts['select']['hostid'] = 'a.hostid';
 			}
-
 			$sql_parts['from']['applications'] = 'applications a';
 			$sql_parts['where'][] = 'a.applicationid=ht.applicationid';
 			$sql_parts['where']['hostid'] = DBcondition('a.hostid', $options['hostids']);
 
-			if(!is_null($options['groupCount'])){
+			if (!is_null($options['groupCount'])) {
 				$sql_parts['group']['hostid'] = 'a.hostid';
 			}
 		}
 
-// applicationids
-		if(!is_null($options['applicationids'])){
+		// applicationids
+		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 
-			if($options['output'] != API_OUTPUT_EXTEND){
+			if ($options['output'] != API_OUTPUT_EXTEND) {
 				$sql_parts['select']['applicationid'] = 'a.applicationid';
 			}
 			$sql_parts['where'][] = DBcondition('ht.applicationid', $options['applicationids']);
-
 		}
 
-// output
-		if($options['output'] == API_OUTPUT_EXTEND){
+		// output
+		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$sql_parts['select']['httptests'] = 'ht.*';
 		}
 
-// countOutput
-		if(!is_null($options['countOutput'])){
+		// countOutput
+		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 			$sql_parts['select'] = array('count(ht.httptestid) as rowscount');
 
-//groupCount
-			if(!is_null($options['groupCount'])){
-				foreach($sql_parts['group'] as $key => $fields){
+			// groupCount
+			if (!is_null($options['groupCount'])) {
+				foreach ($sql_parts['group'] as $key => $fields) {
 					$sql_parts['select'][$key] = $fields;
 				}
 			}
 		}
 
-// search
-		if(is_array($options['search'])){
+		// search
+		if (is_array($options['search'])) {
 			zbx_db_search('httptest ht', $options, $sql_parts);
 		}
 
-// filter
-		if(is_array($options['filter'])){
+		// filter
+		if (is_array($options['filter'])) {
 			zbx_db_filter('httptest ht', $options, $sql_parts);
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'ht');
 
-			$sql_parts['order'][] = 'ht.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('ht.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('ht.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'ht.'.$options['sortfield'];
-			}
-		}
-
-// limit
-		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+		// limit
+		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sql_parts['limit'] = $options['limit'];
 		}
-//----------
 
 		$webcheckids = array();
 
@@ -205,68 +186,77 @@ class CWebCheck extends CZBXAPI{
 		$sql_where = '';
 		$sql_group = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
-		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
+		if (!empty($sql_parts['select'])) {
+			$sql_select .= implode(',', $sql_parts['select']);
+		}
+		if (!empty($sql_parts['from'])) {
+			$sql_from .= implode(',', $sql_parts['from']);
+		}
+		if (!empty($sql_parts['where'])) {
+			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
+		}
+		if (!empty($sql_parts['group'])) {
+			$sql_where .= ' GROUP BY '.implode(',', $sql_parts['group']);
+		}
+		if (!empty($sql_parts['order'])) {
+			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		}
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('ht.httptestid', $nodeids).
 					$sql_where.
-				$sql_group.
-				$sql_order;
+					$sql_group.
+					$sql_order;
 		$res = DBselect($sql, $sql_limit);
-		while($webcheck = DBfetch($res)){
-			if(!is_null($options['countOutput'])){
-				if(!is_null($options['groupCount']))
+		while ($webcheck = DBfetch($res)) {
+			if (!is_null($options['countOutput'])) {
+				if (!is_null($options['groupCount'])) {
 					$result[] = $webcheck;
-				else
+				}
+				else {
 					$result = $webcheck['rowscount'];
+				}
 			}
-			else{
+			else {
 				$webcheck['webcheckid'] = $webcheck['httptestid'];
 				unset($webcheck['httptestid']);
-
 				$webcheckids[$webcheck['webcheckid']] = $webcheck['webcheckid'];
 
-				if($options['output'] == API_OUTPUT_SHORTEN){
+				if ($options['output'] == API_OUTPUT_SHORTEN) {
 					$result[$webcheck['webcheckid']] = array('webcheckid' => $webcheck['webcheckid']);
 				}
-				else{
-					if(!isset($result[$webcheck['webcheckid']])) $result[$webcheck['webcheckid']] = array();
-
-
-					if(!is_null($options['selectHosts']) && !isset($result[$webcheck['webcheckid']]['hosts'])){
+				else {
+					if (!isset($result[$webcheck['webcheckid']])) {
+						$result[$webcheck['webcheckid']] = array();
+					}
+					if (!is_null($options['selectHosts']) && !isset($result[$webcheck['webcheckid']]['hosts'])) {
 						$result[$webcheck['webcheckid']]['hosts'] = array();
 					}
-					if(!is_null($options['selectSteps']) && !isset($result[$webcheck['webcheckid']]['steps'])){
+					if (!is_null($options['selectSteps']) && !isset($result[$webcheck['webcheckid']]['steps'])) {
 						$result[$webcheck['webcheckid']]['steps'] = array();
 					}
 
-// hostids
-					if(isset($webcheck['hostid']) && is_null($options['selectHosts'])){
-						if(!isset($result[$webcheck['webcheckid']]['hosts']))
+					// hostids
+					if (isset($webcheck['hostid']) && is_null($options['selectHosts'])) {
+						if (!isset($result[$webcheck['webcheckid']]['hosts'])) {
 							$result[$webcheck['webcheckid']]['hosts'] = array();
-
+						}
 						$result[$webcheck['webcheckid']]['hosts'][] = array('hostid' => $webcheck['hostid']);
 						unset($webcheck['hostid']);
 					}
-
 					$result[$webcheck['webcheckid']] += $webcheck;
 				}
 			}
 		}
 
-COpt::memoryPick();
-		if(!is_null($options['countOutput'])){
+		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
 
-// Adding Hosts
-		if(!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
+		// adding hosts
+		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
 			$obj_params = array(
 				'output' => $options['selectHosts'],
 				'webcheckids' => $webcheckids,
@@ -274,36 +264,34 @@ COpt::memoryPick();
 				'preservekeys' => true
 			);
 			$hosts = API::Host()->get($obj_params);
-
-			foreach($hosts as $hostid => $host){
+			foreach ($hosts as $hostid => $host) {
 				$hwebchecks = $host['webchecks'];
 				unset($host['webchecks']);
-				foreach($hwebchecks as $hwebcheck){
+				foreach ($hwebchecks as $hwebcheck) {
 					$result[$hwebcheck['webcheckid']]['hosts'][] = $host;
 				}
 			}
 		}
 
-// Adding Steps
-		if(!is_null($options['selectSteps']) && str_in_array($options['selectSteps'], $subselects_allowed_outputs)){
-			$sql = 'SELECT * '.
-					' FROM httpstep'.
-					' WHERE '.DBcondition('httptestid', $webcheckids);
-			$db_steps = DBselect($sql);
-			while($step = DBfetch($db_steps)){
+		// adding steps
+		if (!is_null($options['selectSteps']) && str_in_array($options['selectSteps'], $subselects_allowed_outputs)) {
+			$db_steps = DBselect(
+				'SELECT h.*'.
+				' FROM httpstep h'.
+				' WHERE '.DBcondition('h.httptestid', $webcheckids)
+			);
+			while ($step = DBfetch($db_steps)) {
 				$stepid = $step['httpstepid'];
 				$step['webstepid'] = $stepid;
 				unset($step['httpstepid']);
-
 				$result[$step['httptestid']]['steps'][$step['webstepid']] = $step;
 			}
 		}
 
-// removing keys (hash -> array)
-		if(is_null($options['preservekeys'])){
+		// removing keys (hash -> array)
+		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
-
 		return $result;
 	}
 

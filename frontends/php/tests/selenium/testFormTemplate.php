@@ -77,22 +77,45 @@ class testFormTemplate extends CWebTest{
 		$this->ok('Template updated');
 	}
 
-	public function testFormTemplate_CreateExistingTemplateNoGroups(){
-	// Attempt to create a template with a name that already exists and not add it to any groups
-	// In future should also check these conditions individually
-	$this->login('templates.php');
-	$this->dropdown_select_wait('groupid','all');
-	$this->button_click('form');
-	$this->wait();
-	$this->input_type('template_name','Template_Linux');
-	$this->button_click('save');
-	$this->wait();
-	$this->assertTitle('Templates');
-	$this->ok('No groups for template');
-	$this->assertEquals(1,DBcount("select * from hosts where host='Template_Linux'"));
+	/**
+	 * Adds two macros to an existing host.
+	 */
+	public function testFormTemplate_AddMacros() {
+		$this->login('templates.php');
+		$this->click("link=".$this->template.'2');
+		$this->waitForPageToLoad("30000");
+		$this->tab_switch('Macros');
+		$this->type("name=macros[0][macro]", '{$TEST_MACRO}');
+		$this->type("name=macros[0][value]", "1");
+		$this->click("//table[@id='userMacros']//input[@id='add']");
+		$this->verifyElementPresent("name=macros[1][macro]");
+		$this->type("name=macros[1][macro]", '{$TEST_MACRO2}');
+		$this->type("name=macros[1][value]", "2");
+		$this->click("id=save");
+		$this->waitForPageToLoad("30000");
+		$this->ok("Template updated");
 	}
 
-	public function testFormTemplate_Delete(){
+	public function testFormTemplate_CreateExistingTemplateNoGroups() {
+		// Attempt to create a template with a name that already exists and not add it to any groups
+		// In future should also check these conditions individually
+		$this->login('templates.php');
+		$this->dropdown_select_wait('groupid','all');
+		$this->button_click('form');
+		$this->wait();
+		$this->input_type('template_name','Template_Linux');
+		$this->button_click('save');
+		$this->wait();
+		$this->assertTitle('Templates');
+		$this->ok('No groups for template');
+		$this->assertEquals(1,DBcount("select * from hosts where host='Template_Linux'"));
+	}
+
+	public function testFormTemplate_Delete() {
+
+		// save the id of the host
+		$template = DBfetch(DBSelect('select hostid from hosts where host like "'.$this->template.'2"'));
+
 		$this->chooseOkOnNextConfirmation();
 		// Delete template
 		$this->login('templates.php');
@@ -104,6 +127,10 @@ class testFormTemplate extends CWebTest{
 		$this->wait();
 		$this->assertTitle('Templates');
 		$this->ok('Template deleted');
+
+		// check if the macros have been deleted
+		$macrosCount = DBcount('select * from hostmacro where hostid="'.$template['hostid'].'"');
+		$this->assertEquals(0, $macrosCount, 'Template macros have not been deleted.');
 	}
 
 	public function testFormTemplate_CloneTemplate(){
