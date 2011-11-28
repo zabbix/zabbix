@@ -32,70 +32,71 @@ class CItemprototype extends CItemGeneral{
 /**
  * Get Itemprototype data
  */
-	public function get($options=array()){
-
+	public function get($options = array()) {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('itemid','name','key_','delay','type','status'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sql_parts = array(
-			'select' => array('items' => 'i.itemid'),
-			'from' => array('items' => 'items i'),
-			'where' => array('i.flags='.ZBX_FLAG_DISCOVERY_CHILD),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null);
+			'select'	=> array('items' => 'i.itemid'),
+			'from'		=> array('items' => 'items i'),
+			'where'		=> array('i.flags='.ZBX_FLAG_DISCOVERY_CHILD),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
+		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'groupids'				=> null,
-			'templateids'			=> null,
-			'hostids'				=> null,
-			'itemids'				=> null,
-			'discoveryids'			=> null,
-			'inherited'				=> null,
-			'templated'				=> null,
-			'monitored'				=> null,
-			'editable'				=> null,
-			'nopermissions'			=> null,
-// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'searchWildcardsEnabled'=> null,
-// OutPut
-			'output'				=> API_OUTPUT_REFER,
-			'selectHosts'			=> null,
-			'selectApplications'	=> null,
-			'selectTriggers'		=> null,
-			'selectGraphs'			=> null,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'preservekeys'			=> null,
-
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null,
-			'limitSelects'			=> null
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'templateids'				=> null,
+			'hostids'					=> null,
+			'itemids'					=> null,
+			'discoveryids'				=> null,
+			'inherited'					=> null,
+			'templated'					=> null,
+			'monitored'					=> null,
+			'editable'					=> null,
+			'nopermissions'				=> null,
+			// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
+			// output
+			'output'					=> API_OUTPUT_REFER,
+			'selectHosts'				=> null,
+			'selectApplications'		=> null,
+			'selectTriggers'			=> null,
+			'selectGraphs'				=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null,
+			'limitSelects'				=> null
 		);
 		$options = zbx_array_merge($def_options, $options);
 
-
-		if(is_array($options['output'])){
+		if (is_array($options['output'])) {
 			unset($sql_parts['select']['items']);
 
 			$dbTable = DB::getSchema('items');
 			$sql_parts['select']['itemid'] = 'i.itemid';
-			foreach($options['output'] as $key => $field){
-				if(isset($dbTable['fields'][$field]))
+			foreach($options['output'] as $field) {
+				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'i.'.$field;
+				}
 			}
-
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
@@ -248,19 +249,8 @@ class CItemprototype extends CItemGeneral{
 			}
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][] = 'i.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('i.'.$options['sortfield'], $sql_parts['select'])
-					&& !str_in_array('i.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'i.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'i');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
@@ -863,7 +853,8 @@ COpt::memoryPick();
 		$chdHosts = API::Host()->get(array(
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
-			'output' => array('hostid', 'host'),
+			'output' => array('hostid', 'host', 'status'),
+			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'templated_hosts' => true
@@ -926,6 +917,21 @@ COpt::memoryPick();
 					}
 				}
 
+				if ($host['status'] == HOST_STATUS_TEMPLATE || !isset($item['type'])) {
+					unset($item['interfaceid']);
+				}
+				elseif ((isset($item['type']) && isset($exItem) && $item['type'] != $exItem['type']) || !isset($exItem)) {
+
+					// find a matching interface
+					$interface = self::findInterfaceForItem($item, $host['interfaces']);
+					if ($interface) {
+						$item['interfaceid'] = $interface['interfaceid'];
+					}
+					// no matching interface found, throw an error
+					elseif($interface !== false) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
+					}
+				}
 // coping item
 				$newItem = $item;
 				$newItem['hostid'] = $host['hostid'];

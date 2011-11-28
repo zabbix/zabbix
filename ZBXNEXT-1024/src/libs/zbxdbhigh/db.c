@@ -1922,16 +1922,16 @@ clean:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-char	*DBsql_id_cmp(zbx_uint64_t id)
+const char	*DBsql_id_cmp(zbx_uint64_t id)
 {
 	static unsigned char	n = 0;
 	static char		buf[4][22];	/* 1 - '=', 20 - value size, 1 - '\0' */
-	static char		is_null[9] = " is null";
+	static const char	is_null[9] = " is null";
 
 	if (0 == id)
 		return is_null;
 
-	n++; n = n % 4;
+	n = (n + 1) & 3;
 
 	zbx_snprintf(buf[n], sizeof(buf[n]), "=" ZBX_FS_UI64, id);
 
@@ -1950,16 +1950,16 @@ char	*DBsql_id_cmp(zbx_uint64_t id)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-char	*DBsql_id_ins(zbx_uint64_t id)
+const char	*DBsql_id_ins(zbx_uint64_t id)
 {
 	static unsigned char	n = 0;
 	static char		buf[4][21];	/* 20 - value size, 1 - '\0' */
-	static char		null[5] = "null";
+	static const char	null[5] = "null";
 
 	if (0 == id)
 		return null;
 
-	n++; n = n % 4;
+	n = (n + 1) & 3;
 
 	zbx_snprintf(buf[n], sizeof(buf[n]), ZBX_FS_UI64, id);
 

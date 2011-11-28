@@ -2,6 +2,10 @@
 Changes for 1.9.8
 
 New features:
+ - [ZBX-3366] fixed API sorting (Eduard)
+ - [ZBX-3104] implemented the screen item API (pavels)
+ - [ZBXNEXT-913] redesign Configuration->IT Services (Eduard)
+ - [ZBXNEXT-907] redesign Configuration->Applications (Eduard)
  - [ZBX-3271] implemented the _x() and _xn() function for context dependent translations (pavels,Richlv,Vedmak)
  - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget (pavels)
  - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
@@ -15,6 +19,12 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
+ - [ZBX-3593] fixed misaligned server name on top of the page (sanja)
+ - [ZBX-3771] fixed possible 'Lock wait timeout' while processing lld rules (Sasha,pavels)
+ - [ZBX-4139] fixed "Last n issues" widget label ignoring variable that sets the amount of issues (Richlv)
+ - [ZBX-4359] fixed potentially incorrectly named index on node_cksum table (Richlv, sasha)
+ - [ZBX-4188] fixed nclob problem for Oracle (Vedmak)
  - [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
  - [ZBX-4282] fixed errors when importing templates with trigger dependencies (pavels)
  - [ZBX-4108] updated FSF mailing address (Richlv)
@@ -324,11 +334,25 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.10rc1
+
+ - [ZBX-4288] fixed user macro deleting when deleting a host (pavels)
+ - [ZBX-2859] fixed possibility to successfully delete zero regular expressions (sanja)
+ - [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
+ - [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
+ - [ZBX-4375] updated Russian translation; thanks to Alexey Pustovalov (Richlv)
+ - [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (dimir,asaveljevs)
+ - [ZBX-4249] fixed trigger wizard when inserting macro multiple times (Vedmak)
+ - [ZBX-4351] updated French translation; thanks to Joseph Bueno (Richlv)
+ - [ZBX-4353] updated Japanese translation; thanks to Kodai Terashima (Richlv)
+
+Changes for 1.8.9
+
+1.8.9rc2 was released as 1.8.9 without any changes
+
 Changes for 1.8.9rc2
 
- - [ZBX-2859] fixed possible to successfully delete zero regular expressions (sanja)
  - [ZBX-4352] fixed template linking when mass updating hosts (pavels,Vedmak)
- - [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (dimir,asaveljevs)
 
 Changes for 1.8.9rc1
 
