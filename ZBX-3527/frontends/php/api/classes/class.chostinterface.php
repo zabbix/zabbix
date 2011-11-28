@@ -654,9 +654,6 @@ Copt::memoryPick();
 
 		$interfaceids = DB::insert('interface', $interfaces);
 
-		// auto seting main interfaces
-		$this->setMainInterfaces($interfaces);
-
 		return array('interfaceids' => $interfaceids);
 	}
 
@@ -680,9 +677,6 @@ Copt::memoryPick();
 			);
 		}
 		DB::update('interface', $data);
-
-		// auto seting main interfaces
-		$this->setMainInterfaces($interfaces);
 
 		return array('interfaceids' => zbx_objectValues($interfaces, 'interfaceid'));
 	}
