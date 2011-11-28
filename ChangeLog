@@ -2,7 +2,6 @@
 Changes for 1.9.8
 
 New features:
- - [ZBX-3366] fixed API sorting (Eduard)
  - [ZBX-3104] implemented the screen item API (pavels)
  - [ZBXNEXT-913] redesign Configuration->IT Services (Eduard)
  - [ZBXNEXT-907] redesign Configuration->Applications (Eduard)
@@ -19,6 +18,7 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-3366] fixed API sorting (Eduard)
  - [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
  - [ZBX-3593] fixed misaligned server name on top of the page (sanja)
  - [ZBX-3771] fixed possible 'Lock wait timeout' while processing lld rules (Sasha,pavels)
