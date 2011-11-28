@@ -802,5 +802,5 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	bcscale(7);
 
 // Numeric Locale to default
-	setlocale(LC_NUMERIC, array('C', 'en','en_US','en_US.UTF-8','English_United States.1252', 'en_GB' ,'en_GB.UTF-8'));
+	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en','en_US','en_US.UTF-8','English_United States.1252', 'en_GB' ,'en_GB.UTF-8'));
 ?>
