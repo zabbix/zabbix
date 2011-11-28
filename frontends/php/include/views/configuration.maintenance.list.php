@@ -46,7 +46,7 @@ $maintenanceTable->setHeader(array(
 	new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');"),
 	make_sorting_header(_('Name'), 'name'),
 	make_sorting_header(_('Type'), 'maintenance_type'),
-	make_sorting_header(_('State'), 'status'),
+	_('State'),
 	_('Description')
 ));
 

@@ -26,62 +26,60 @@
 /**
  * Class containing methods for operations with discovery rules
  */
-class CDRule extends CZBXAPI{
+class CDRule extends CZBXAPI {
 /**
 * Get drule data
 *
 * @param array $options
 * @return array
 */
-	public function get(array $options=array()){
-
+	public function get(array $options = array()) {
+		$result = array();
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
-		$result = array();
 
-		$sort_columns = array('druleid', 'name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('druleid', 'name');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('drules' => 'dr.druleid'),
-			'from' => array('drules' => 'drules dr'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null,
+			'select'	=> array('drules' => 'dr.druleid'),
+			'from'		=> array('drules' => 'drules dr'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'druleids'				=> null,
-			'dhostids'				=> null,
-			'dserviceids'			=> null,
-			'dcheckids'				=> null,
-			'editable'				=> null,
-			'selectDHosts'			=> null,
-			'selectDServices'		=> null,
-			'selectDChecks'			=> null,
-
-// filter
+			'nodeids'					=> null,
+			'druleids'					=> null,
+			'dhostids'					=> null,
+			'dserviceids'				=> null,
+			'dcheckids'					=> null,
+			'editable'					=> null,
+			'selectDHosts'				=> null,
+			'selectDServices'			=> null,
+			'selectDChecks'				=> null,
+			// filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
-
-// output
-			'output'				=> API_OUTPUT_REFER,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'preservekeys'			=> null,
-
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null,
-			'limitSelects'			=> null
+			// output
+			'output'					=> API_OUTPUT_REFER,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null,
+			'limitSelects'				=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 // editable + PERMISSION CHECK
@@ -192,18 +190,8 @@ class CDRule extends CZBXAPI{
 			zbx_db_search('drules dr', $options, $sql_parts);
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][] = 'dr.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('dr.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('dr.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'dr.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'dr');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
