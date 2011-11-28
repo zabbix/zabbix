@@ -33,76 +33,72 @@ class CGraphPrototype extends CZBXAPI{
 * @param array $options
 * @return array
 */
-	public function get($options=array()){
-
+	public function get($options = array()) {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
-		$result = array();
 
-		$sort_columns = array('graphid','name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('graphid','name');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sql_parts = array(
-			'select' => array('graphs' => 'g.graphid'),
-			'from' => array('graphs' => 'graphs g'),
-			'where' => array('g.flags='.ZBX_FLAG_DISCOVERY_CHILD),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null,
+			'select'	=> array('graphs' => 'g.graphid'),
+			'from'		=> array('graphs' => 'graphs g'),
+			'where'		=> array('g.flags='.ZBX_FLAG_DISCOVERY_CHILD),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids' 				=> null,
-			'groupids' 				=> null,
-			'templateids'			=> null,
-			'hostids' 				=> null,
-			'graphids' 				=> null,
-			'itemids' 				=> null,
-			'discoveryids' 			=> null,
-			'type' 					=> null,
-			'templated'				=> null,
-			'inherited'				=> null,
-			'editable'				=> null,
-			'nopermissions'			=> null,
-
-// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'searchWildcardsEnabled'=> null,
-
-// output
-			'output'				=> API_OUTPUT_REFER,
-			'selectGroups'			=> null,
-			'selectTemplates'		=> null,
-			'selectHosts'			=> null,
-			'selectItems'			=> null,
-			'selectGraphItems'		=> null,
-			'selectDiscoveryRule'	=> null,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'preservekeys'			=> null,
-
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'templateids'				=> null,
+			'hostids'					=> null,
+			'graphids'					=> null,
+			'itemids'					=> null,
+			'discoveryids'				=> null,
+			'type'						=> null,
+			'templated'					=> null,
+			'inherited'					=> null,
+			'editable'					=> null,
+			'nopermissions'				=> null,
+			// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
+			// output
+			'output'					=> API_OUTPUT_REFER,
+			'selectGroups'				=> null,
+			'selectTemplates'			=> null,
+			'selectHosts'				=> null,
+			'selectItems'				=> null,
+			'selectGraphItems'			=> null,
+			'selectDiscoveryRule'		=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
-
-		if(is_array($options['output'])){
+		if (is_array($options['output'])) {
 			unset($sql_parts['select']['graphs']);
 
 			$dbTable = DB::getSchema('graphs');
-			foreach($options['output'] as $key => $field){
-				if(isset($dbTable['fields'][$field]))
+			foreach ($options['output'] as $field) {
+				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'g.'.$field;
+				}
 			}
-
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
@@ -322,18 +318,8 @@ class CGraphPrototype extends CZBXAPI{
 			}
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][] = 'g.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('g.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('g.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'g.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'g');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){

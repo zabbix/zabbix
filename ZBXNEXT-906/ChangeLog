@@ -2,7 +2,7 @@
 Changes for 1.9.8
 
 New features:
- - [ZBX-4288] added unit tests to cover host macro creation and deletion (pavels)
+ - [ZBX-3366] fixed API sorting (Eduard)
  - [ZBX-3104] implemented the screen item API (pavels)
  - [ZBXNEXT-913] redesign Configuration->IT Services (Eduard)
  - [ZBXNEXT-907] redesign Configuration->Applications (Eduard)
@@ -336,6 +336,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
+ - [ZBX-4288] fixed user macro deleting when deleting a host (pavels)
  - [ZBX-2859] fixed possibility to successfully delete zero regular expressions (sanja)
  - [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
  - [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
