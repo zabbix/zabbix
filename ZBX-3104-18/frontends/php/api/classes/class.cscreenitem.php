@@ -420,7 +420,7 @@ class CScreenItem extends CZBXAPI {
 			);
 			if (in_array($screenItem['resourcetype'], $hostGroupResourceTypes)) {
 				if (!$screenItem['resourceid'] && $screenItem['resourcetype'] != SCREEN_RESOURCE_HOSTGROUP_TRIGGERS) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No host group ID provided for screen element.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 				elseif ($screenItem['resourceid']) {
 					$hostgroups[] = $screenItem['resourceid'];
