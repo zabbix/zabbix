@@ -1,4 +1,12 @@
 --------------------------------------------------------------------------------
+Changes for 1.9.9
+
+New features:
+
+Bug fixes:
+ - [ZBX-3366] fixed API sorting (Eduard)
+
+--------------------------------------------------------------------------------
 Changes for 1.9.8
 
 New features:
@@ -18,7 +26,6 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
- - [ZBX-3366] fixed API sorting (Eduard)
  - [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
  - [ZBX-3593] fixed misaligned server name on top of the page (sanja)
  - [ZBX-3771] fixed possible 'Lock wait timeout' while processing lld rules (Sasha,pavels)
