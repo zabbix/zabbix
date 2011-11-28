@@ -68,7 +68,7 @@ class testFormHost extends CWebTest{
 	public function testFormHost_SimpleUpdate(){
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','Zabbix servers');
-		$this->click('link=ЗАББИКС Сервер');
+		$this->click('link='.$this->host);
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
@@ -76,6 +76,26 @@ class testFormHost extends CWebTest{
 		$this->ok('Host updated');
 		$this->ok($this->host);
 	}
+
+	/**
+	 * Adds two macros to an existing host.
+	 */
+	public function testFormHost_AddMacros() {
+		$this->login('hosts.php');
+		$this->click("link=".$this->host);
+		$this->waitForPageToLoad("30000");
+		$this->tab_switch('Macros');
+		$this->type("name=macros[0][macro]", '{$TEST_MACRO}');
+		$this->type("name=macros[0][value]", "1");
+		$this->click("//table[@id='userMacros']//input[@id='add']");
+		$this->verifyElementPresent("name=macros[1][macro]");
+		$this->type("name=macros[1][macro]", '{$TEST_MACRO2}');
+		$this->type("name=macros[1][value]", "2");
+		$this->click("id=save");
+		$this->waitForPageToLoad("30000");
+		$this->ok("Host updated");
+	}
+
 
 	public function testFormHost_UpdateHostName(){
 		// Update Host
@@ -105,8 +125,11 @@ class testFormHost extends CWebTest{
 		$this->assertEquals(1,DBcount("select * from hosts where host='Test host'"));
 	}
 
-	public function testFormHost_Delete(){
+	public function testFormHost_Delete() {
 		$this->chooseOkOnNextConfirmation();
+
+		// save the id of the host
+		$host = DBfetch(DBSelect('select hostid from hosts where host like "'.$this->host.'2"'));
 
 		// Delete Host
 		$this->login('hosts.php');
@@ -118,13 +141,17 @@ class testFormHost extends CWebTest{
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('Host deleted');
+
+		// check if the macros have been deleted
+		$macrosCount = DBcount('select * from hostmacro where hostid="'.$host['hostid'].'"');
+		$this->assertEquals(0, $macrosCount, 'Host macros have not been deleted.');
 	}
 
 	public function testFormHost_CloneHost(){
 		// Clone Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link=ЗАББИКС Сервер');
+		$this->click('link='.$this->host);
 		$this->wait();
 		$this->button_click('clone');
 		$this->wait();
@@ -155,7 +182,7 @@ class testFormHost extends CWebTest{
 		// Full clone Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link=ЗАББИКС Сервер');
+		$this->click('link='.$this->host);
 		$this->wait();
 		$this->button_click('full_clone');
 		$this->wait();

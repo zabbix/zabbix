@@ -98,7 +98,7 @@ FIELD		|curstep	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastfailedstep	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'60'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|macros		|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|macros		|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|agent		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|time		|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
@@ -116,7 +116,7 @@ FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|no		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|timeout	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
-FIELD		|posts		|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|posts		|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|required	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status_codes	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|httpstep_1	|httptestid
@@ -172,7 +172,7 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|mediatypeid	|t_id		|	|NULL		|0			|4|media_type
 FIELD		|sendto		|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|message	|t_blob		|''	|NOT NULL	|0
+FIELD		|message	|t_text		|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|retries	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|0
@@ -339,8 +339,8 @@ FIELD		|auditdetailid	|t_id		|	|NOT NULL	|0
 FIELD		|auditid	|t_id		|	|NOT NULL	|0			|1|auditlog
 FIELD		|table_name	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|field_name	|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|oldvalue	|t_blob		|''	|NOT NULL	|0
-FIELD		|newvalue	|t_blob		|''	|NOT NULL	|0
+FIELD		|oldvalue	|t_text		|''	|NOT NULL	|0
+FIELD		|newvalue	|t_text		|''	|NOT NULL	|0
 INDEX		|1		|auditid
 
 TABLE|service_alarms|servicealarmid|ZBX_HISTORY
@@ -361,10 +361,10 @@ FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|esc_period	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|def_shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|def_longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|def_longdata	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|recovery_msg	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|r_shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|r_longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|r_longdata	|t_text		|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|eventsource,status
 
 TABLE|operations|operationid|ZBX_SYNC
@@ -797,7 +797,7 @@ FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|2|items	|itemid
 FIELD		|valuemapid	|t_id		|	|NULL		|ZBX_SYNC		|3|valuemaps	|		|RESTRICT
 FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|params		|t_item_param	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|params		|t_text		|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_sensor	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|data_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
@@ -1037,7 +1037,7 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|priority	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastchange	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|comments	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|comments	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|	|NULL		|ZBX_SYNC		|1|triggers	|triggerid
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -1102,7 +1102,7 @@ TABLE|maintenances|maintenanceid|ZBX_SYNC
 FIELD		|maintenanceid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|maintenance_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|description	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|description	|t_text		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|active_since	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|active_till	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|active_since,active_till
@@ -1139,7 +1139,7 @@ FIELD		|start_date	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 TABLE|regexps|regexpid|ZBX_SYNC
 FIELD		|regexpid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|test_string	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|test_string	|t_text		|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 TABLE|user_history|userhistoryid|0

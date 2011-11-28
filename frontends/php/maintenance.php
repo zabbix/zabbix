@@ -435,11 +435,11 @@ else {
 	$sortfield = getPageSortField('name');
 	$sortorder = getPageSortOrder();
 	$options = array(
-			'output' => API_OUTPUT_EXTEND,
-			'editable' => 1,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => $config['search_limit'] + 1
+		'output' => API_OUTPUT_EXTEND,
+		'editable' => 1,
+		'sortfield' => $sortfield,
+		'sortorder' => $sortorder,
+		'limit' => $config['search_limit'] + 1
 	);
 	if ($pageFilter->groupsSelected) {
 		if ($pageFilter->groupid > 0) {

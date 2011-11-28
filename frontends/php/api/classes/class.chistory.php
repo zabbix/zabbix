@@ -27,70 +27,67 @@
  * Class containing methods for operations with History of Items
  *
  */
-class CHistory extends CZBXAPI{
-/**
- * Get history data
- *
- * @param array $options
- * @param array $options['itemids']
- * @param boolean $options['editable']
- * @param string $options['pattern']
- * @param int $options['limit']
- * @param string $options['order']
- * @return array|int item data as array or false if error
- */
-	public function get($options=array()){
-
-		$nodeCheck = false;
+class CHistory extends CZBXAPI {
+	/**
+	 * Get history data
+	 *
+	 * @param array $options
+	 * @param array $options['itemids']
+	 * @param boolean $options['editable']
+	 * @param string $options['pattern']
+	 * @param int $options['limit']
+	 * @param string $options['order']
+	 * @return array|int item data as array or false if error
+	 */
+	public function get($options = array()) {
 		$result = array();
+		$nodeCheck = false;
 
-		$sort_columns = array('itemid','clock'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('itemid', 'clock');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('history' => 'h.itemid'),
-			'from' => array(),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null);
-
-		$def_options = array(
-			'history'				=> ITEM_VALUE_TYPE_UINT64,
-			'nodeids'				=> null,
-			'hostids'				=> null,
-			'itemids'				=> null,
-			'triggerids'			=> null,
-			'editable'				=> null,
-			'nopermissions'			=> null,
-
-// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'searchWildcardsEnabled'	=> null,
-
-			'time_from'				=> null,
-			'time_till'				=> null,
-
-// OutPut
-			'output'				=> API_OUTPUT_REFER,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'groupOutput'			=> null,
-			'preservekeys'			=> null,
-
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null
+			'select'	=> array('history' => 'h.itemid'),
+			'from'		=> array(),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
+		$def_options = array(
+			'history'					=> ITEM_VALUE_TYPE_UINT64,
+			'nodeids'					=> null,
+			'hostids'					=> null,
+			'itemids'					=> null,
+			'triggerids'				=> null,
+			'editable'					=> null,
+			'nopermissions'				=> null,
+			// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
+			'time_from'					=> null,
+			'time_till'					=> null,
+			// output
+			'output'					=> API_OUTPUT_REFER,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
+			'groupOutput'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
+		);
 		$options = zbx_array_merge($def_options, $options);
 
-
-		switch($options['history']){
+		switch ($options['history']) {
 			case ITEM_VALUE_TYPE_LOG:
 				$sql_parts['from']['history'] = 'history_log h';
 				$sort_columns[] = 'id';
@@ -110,130 +107,125 @@ class CHistory extends CZBXAPI{
 				$sql_parts['from']['history'] = 'history h';
 		}
 
-// editable + PERMISSION CHECK
-		if((USER_TYPE_SUPER_ADMIN == self::$userData['type']) || $options['nopermissions']){
+		// editable + PERMISSION CHECK
+		if (USER_TYPE_SUPER_ADMIN == self::$userData['type'] || $options['nopermissions']) {
 		}
-		else{
+		else {
 			$itemOptions = array(
 				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'editable' => $options['editable'],
-				'preservekeys' => 1
+				'preservekeys' => true
 			);
-			if(!is_null($options['itemids'])) $itemOptions['itemids'] = $options['itemids'];
+			if (!is_null($options['itemids'])) {
+				$itemOptions['itemids'] = $options['itemids'];
+			}
 			$items = API::Item()->get($itemOptions);
-
 			$options['itemids'] = array_keys($items);
 		}
 
-// nodeids
+		// nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
-// itemids
-		if(!is_null($options['itemids'])){
+		// itemids
+		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 			$sql_parts['where']['itemid'] = DBcondition('h.itemid', $options['itemids']);
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('h.itemid', $nodeids);
 			}
 		}
 
-// hostids
-		if(!is_null($options['hostids'])){
+		// hostids
+		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
-			if($options['output'] != API_OUTPUT_SHORTEN){
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
-
 			$sql_parts['from']['items'] = 'items i';
 			$sql_parts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
 			$sql_parts['where']['hi'] = 'h.itemid=i.itemid';
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('i.hostid', $nodeids);
 			}
 		}
 
-// node check !!!!!
-// should be last, after all ****IDS checks
-		if(!$nodeCheck){
+		// should be last, after all ****IDS checks
+		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sql_parts['where'][] = DBin_node('h.itemid', $nodeids);
 		}
 
-// time_from
-		if(!is_null($options['time_from'])){
+		// time_from
+		if (!is_null($options['time_from'])) {
 			$sql_parts['select']['clock'] = 'h.clock';
 			$sql_parts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
 		}
 
-// time_till
-		if(!is_null($options['time_till'])){
+		// time_till
+		if (!is_null($options['time_till'])) {
 			$sql_parts['select']['clock'] = 'h.clock';
 			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
 		}
 
-// filter
-		if(is_array($options['filter'])){
+		// filter
+		if (is_array($options['filter'])) {
 			zbx_db_filter($sql_parts['from']['history'], $options, $sql_parts);
 		}
 
-// search
-		if(is_array($options['search'])){
+		// search
+		if (is_array($options['search'])) {
 			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
 		}
 
-// output
-		if($options['output'] == API_OUTPUT_EXTEND){
+		// output
+		if ($options['output'] == API_OUTPUT_EXTEND) {
 			unset($sql_parts['select']['clock']);
-
 			$sql_parts['select']['history'] = 'h.*';
 		}
 
-// countOutput
-		if(!is_null($options['countOutput'])){
+		// countOutput
+		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 			$sql_parts['select'] = array('count(DISTINCT h.hostid) as rowscount');
 
-//groupCount
-			if(!is_null($options['groupCount'])){
-				foreach($sql_parts['group'] as $key => $fields){
+			// groupCount
+			if (!is_null($options['groupCount'])) {
+				foreach ($sql_parts['group'] as $key => $fields) {
 					$sql_parts['select'][$key] = $fields;
 				}
 			}
 		}
 
-// groupOutput
+		// groupOutput
 		$groupOutput = false;
-		if(!is_null($options['groupOutput'])){
-			if(str_in_array('h.'.$options['groupOutput'], $sql_parts['select']) || str_in_array('h.*', $sql_parts['select'])){
+		if (!is_null($options['groupOutput'])) {
+			if (str_in_array('h.'.$options['groupOutput'], $sql_parts['select']) || str_in_array('h.*', $sql_parts['select'])) {
 				$groupOutput = true;
 			}
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			if($options['sortfield'] == 'clock') $sql_parts['order']['itemid'] = 'h.itemid '.$sortorder;
-			$sql_parts['order'][$options['sortfield']] = 'h.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('h.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('h.*', $sql_parts['select'])){
-				$sql_parts['select'][$options['sortfield']] = 'h.'.$options['sortfield'];
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'h');
+		if (!zbx_empty($options['sortfield'])) {
+			if (!is_array($options['sortfield'])) {
+				$options['sortfield'] = array($options['sortfield']);
+			}
+			foreach ($options['sortfield'] as $i => $sortfield) {
+				if ($sortfield == 'clock') {
+					$sql_parts['order']['itemid'] = 'h.itemid '.$sortorder;
+				}
 			}
 		}
 
-// limit
-		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+		// limit
+		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sql_parts['limit'] = $options['limit'];
 		}
-//---------------
-
 
 		$itemids = array();
 
@@ -246,75 +238,83 @@ class CHistory extends CZBXAPI{
 		$sql_from = '';
 		$sql_where = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
-		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
+		if (!empty($sql_parts['select'])) {
+			$sql_select .= implode(',', $sql_parts['select']);
+		}
+		if (!empty($sql_parts['from'])) {
+			$sql_from .= implode(',', $sql_parts['from']);
+		}
+		if (!empty($sql_parts['where'])) {
+			$sql_where .= implode(' AND ', $sql_parts['where']);
+		}
+		if (!empty($sql_parts['order'])) {
+			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		}
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.$sql_select.
 				' FROM '.$sql_from.
-				' WHERE '.$sql_where.
-				$sql_order;
+				' WHERE '.
+					$sql_where.
+					$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
- //SDI($sql);
 		$count = 0;
 		$group = array();
-		while($data = DBfetch($db_res)){
-			if($options['countOutput'])
+		while ($data = DBfetch($db_res)) {
+			if ($options['countOutput']) {
 				$result = $data;
-			else{
+			}
+			else {
 				$itemids[$data['itemid']] = $data['itemid'];
 
-				if($options['output'] == API_OUTPUT_SHORTEN){
+				if ($options['output'] == API_OUTPUT_SHORTEN) {
 					$result[$count] = array('itemid' => $data['itemid']);
 				}
-				else{
+				else {
 					$result[$count] = array();
-// hostids
-					if(isset($data['hostid'])){
-						if(!isset($result[$count]['hosts'])) $result[$count]['hosts'] = array();
 
+					// hostids
+					if (isset($data['hostid'])) {
+						if (!isset($result[$count]['hosts'])) {
+							$result[$count]['hosts'] = array();
+						}
 						$result[$count]['hosts'][] = array('hostid' => $data['hostid']);
 						unset($data['hostid']);
 					}
-// triggerids
-					if(isset($data['triggerid'])){
-						if(!isset($result[$count]['triggers'])) $result[$count]['triggers'] = array();
 
+					// triggerids
+					if (isset($data['triggerid'])) {
+						if (!isset($result[$count]['triggers'])) {
+							$result[$count]['triggers'] = array();
+						}
 						$result[$count]['triggers'][] = array('triggerid' => $data['triggerid']);
 						unset($data['triggerid']);
 					}
-// itemids
-//					if(isset($data['itemid']) && !is_null($options['itemids'])){
-//						if(!isset($result[$count]['items'])) $result[$count]['items'] = array();
-//						$result[$count]['items'][] = array('itemid' => $data['itemid']);
-//					}
-
 					$result[$count] += $data;
 
-// grouping
-					if($groupOutput){
+					// grouping
+					if ($groupOutput) {
 						$dataid = $data[$options['groupOutput']];
-						if(!isset($group[$dataid])) $group[$dataid] = array();
+						if (!isset($group[$dataid])) {
+							$group[$dataid] = array();
+						}
 						$group[$dataid][] = $result[$count];
 					}
-
 					$count++;
 				}
 			}
 		}
 
-COpt::memoryPick();
-		if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
-
-	return $result;
+		if (is_null($options['preservekeys'])) {
+			$result = zbx_cleanHashes($result);
+		}
+		return $result;
 	}
 
-	public function create($items=array()){
+	public function create($items = array()) {
 	}
 
-	public function delete($itemids=array()){
+	public function delete($itemids = array()) {
 	}
 }
 ?>

@@ -150,6 +150,9 @@ form .thin .input { height: 14px; }
 .input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 
+input.formlist { padding-top: 2px; padding-bottom: 2px; }
+input[type="button"] { cursor: pointer; }
+
 div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #FFAA33; }
 div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #DD7711; }
 
@@ -584,8 +587,8 @@ table.filter_config { width: 100%; background-color: #FFFFFF; border-collapse: c
 table.filter_config tr td { white-space: nowrap; line-height: 20px; height: 26px; vertical-align: bottom; text-align: center; border: 1px dotted silver; padding-left: 6px; padding-right: 4px; }
 
 /********** <INVISIBLE> ************/
-.invisible { border: 0; margin: 0; padding: 0; }
-.invisible tr td { border: 0; margin: 0; padding: 0; }
+table.invisible { border: 0px; margin: 0px; padding: 0px; }
+table.invisible tr > td { border: 0px; margin: 0px; padding: 0px; }
 
 /********** <PAGING> ************/
 table.paging { width: 100%; padding: 2px; }

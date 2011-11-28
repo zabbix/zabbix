@@ -1759,7 +1759,7 @@ function triggerExpression($trigger, $html, $template=false, $resolve_macro=fals
 			$dependency = false;
 			$dep_table = new CTableInfo();
 			$dep_table->setAttribute('style', 'width: 200px;');
-			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
+			$dep_table->addRow(bold(_('Depends on').':'));
 
 			$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$triggerid;
 			$dep_res = DBselect($sql_dep);
@@ -2055,7 +2055,7 @@ function triggerExpression($trigger, $html, $template=false, $resolve_macro=fals
 		$table->addRow(array(S_TRIGGER, $trigger['description']));
 		$table->addRow(array(S_SEVERITY, getSeverityCell($trigger['priority'])));
 		$table->addRow(array(S_EXPRESSION, $expression));
-		$table->addRow(array(S_EVENT_GENERATION, S_NORMAL.((TRIGGER_MULT_EVENT_ENABLED==$trigger['type'])?SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS:'')));
+		$table->addRow(array(S_EVENT_GENERATION, _('Normal').((TRIGGER_MULT_EVENT_ENABLED==$trigger['type'])?SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS:'')));
 		$table->addRow(array(S_DISABLED, ((TRIGGER_STATUS_ENABLED==$trigger['status'])?new CCol(S_NO,'off'):new CCol(S_YES,'on')) ));
 
 	return $table;
