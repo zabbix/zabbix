@@ -57,8 +57,10 @@ var hostInterfacesManager = (function() {
 
 		jQuery(domId).before(rowTemplate.evaluate({iface: hostInterface, attrs: domAttrs}));
 
+		domRow = jQuery('#hostInterfaceRow_'+hostInterface.interfaceid);
+		jQuery('.jqueryinputset', domRow).buttonset();
+
 		if (!hostInterface.locked) {
-			domRow = jQuery('#hostInterfaceRow_'+hostInterface.interfaceid);
 			makeHostInterfaceRowDraggable(domRow);
 		}
 	}
@@ -211,7 +213,8 @@ var hostInterfacesManager = (function() {
 			isNew: true,
 			useip: 1,
 			type: getHostInterfaceNumericType(hostInterfaceType),
-			port: ports[hostInterfaceType]
+			port: ports[hostInterfaceType],
+			ip: '127.0.0.1'
 		};
 
 		newInterface.interfaceid = 1;
@@ -315,6 +318,19 @@ jQuery(document).ready(function() {
 			hostInterfacesManager.setType(hostInterfaceId, hostInterfaceTypeName);
 			hostInterfacesManager.resetMainInterfaces();
 		}
+	});
+
+	jQuery('#addAgentInterface').on('click', function() {
+		hostInterfacesManager.addNew('agent');
+	});
+	jQuery('#addSNMPInterface').on('click', function() {
+		hostInterfacesManager.addNew('snmp');
+	});
+	jQuery('#addJMXInterface').on('click', function() {
+		hostInterfacesManager.addNew('jmx');
+	});
+	jQuery('#addIPMIInterface').on('click', function() {
+		hostInterfacesManager.addNew('ipmi');
 	});
 
 
