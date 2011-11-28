@@ -60,8 +60,11 @@ var hostInterfacesManager = (function() {
 		domRow = jQuery('#hostInterfaceRow_'+hostInterface.interfaceid);
 		jQuery('.jqueryinputset', domRow).buttonset();
 
-		if (!hostInterface.locked) {
-			makeHostInterfaceRowDraggable(domRow);
+		if (hostInterface.locked) {
+			addNotDraggableIcon(domRow);
+		}
+		else {
+			addDraggableIcon(domRow);
 		}
 	}
 
@@ -120,7 +123,7 @@ var hostInterfacesManager = (function() {
 	}
 
 
-	function makeHostInterfaceRowDraggable(domElement) {
+	function addDraggableIcon(domElement) {
 		domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>');
 		domElement.draggable({
 			helper: 'clone',
@@ -130,6 +133,22 @@ var hostInterfacesManager = (function() {
 				resetMainInterfaces();
 			}
 		});
+	}
+
+	function addNotDraggableIcon(domElement) {
+		domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s ui-state-disabled"></span>');
+		jQuery('.ui-icon', domElement).hover(
+			function(event) {
+				jQuery('<div><?php echo _('Interface is used by items that require this type interface.'); ?></div>')
+						.css({position: 'absolute', opacity: 1, padding: '2px'})
+						.addClass('ui-state-highlight')
+						.appendTo(event.target.parentNode);
+				console.log(event);
+			},
+			function(event) {
+				jQuery(event.target).next().remove();
+			}
+		)
 	}
 
 	function getDomElementsAttrsForInterface(hostInterface) {
