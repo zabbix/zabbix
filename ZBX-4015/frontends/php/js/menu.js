@@ -28,15 +28,85 @@
 //        of ZABBIX software. See http://www.zabbix.com.
 //debugger;
 
+// Getting CSS style property
+function get_style(el,styleProp) {
+	if (el.currentStyle) {
+		var y = el.currentStyle[styleProp];
+	}
+	else if (window.getComputedStyle) {
+		var y = document.defaultView.getComputedStyle(el,null).getPropertyValue(styleProp);
+	}
+	return y;
+}
+
+// Getting text width in user's browser
+function get_real_text_width(text, id) {
+	var item_type = 'pum_o_submenu';
+	if (id==0) {
+		item_type = 'pum_iheader';
+	}
+
+	var test_element = document.createElement('div');
+	test_element.setAttribute('class', item_type);
+	test_element.setAttribute('style', 'visibility: hidden');
+	document.body.appendChild(test_element);
+
+	var font_size_text = get_style(test_element, 'font-size');
+	if (!font_size_text) {
+		font_size_text = get_style(test_element, 'fontSize');
+	}
+
+	var font_size = parseInt(font_size_text);
+	font_size += 2;
+
+	var margin_left_text = get_style(test_element, 'margin-left');
+	if (!margin_left_text) {
+		margin_left_text = get_style(test_element, 'marginLeft');
+	}
+
+	var margin_left = parseInt(margin_left_text);
+
+	document.body.removeChild(test_element);
+
+	test_element = document.createElement('a');
+	test_element.setAttribute('class', item_type);
+	test_element.setAttribute('style', 'font-size: '+font_size+'px; visibility: hidden');
+	test_element.innerHTML = text;
+
+	document.body.appendChild(test_element);
+
+	var tmp_len = test_element.offsetWidth+margin_left+5;
+
+	document.body.removeChild(test_element);
+	test_element = null;
+
+	return tmp_len;
+}
+
 function show_popup_menu(e, content, width){
-	if(!width) width = 170;
+	var cursor = get_cursor_position(e);
+	var tmp_width = 0;
+	var max_width = 0;
+
+	for (i=0;i<content.length;i++) {
+		tmp_width = get_real_text_width(content[i][0], i);
+
+		if (max_width<tmp_width) {
+			max_width = tmp_width;
+		}
+	}
+
+	if (width==null || width<max_width) {
+		width = max_width;
+	}
+
+	if (width == 0)
+		width = 220;
 
 	var pos = [
 		{'block_top': -12, 'block_left': -5, 'width': width},
 		{'block_top': 5, 'block_left': width-5, 'width': width}
 	];
-
-	var cursor = get_cursor_position(e);
 
 	new popup_menu (content, pos, cursor.x, cursor.y);
 
@@ -133,8 +203,9 @@ function popup_menu (a_items, a_tpl, x, y) {
 	A_MENUS[this.n_id] = this;
 
 	// make root level visible
-	for (var n_order = 0; n_order < this.a_children.length; n_order++)
+	for (var n_order = 0; n_order < this.a_children.length; n_order++) {
 		this.a_children[n_order].e_oelement.style.visibility = 'visible';
+	}
 }
 
 // --------------------------------------------------------------------------------
@@ -233,8 +304,6 @@ function menu_onclick (n_id) {
 		o_item.upstatus(7);
 
 		this.o_hidetimer = setTimeout('A_MENUS['+ this.n_id +'].collapse();', 100);//o_item.getprop('hide_delay'));
-		//this.collapse();
-		//alert(A_MENUS[this.n_id].a_config[1][1]);
 		return true;
 	}
 	return false;
@@ -297,7 +366,6 @@ function menu_onmousedown (n_id) {
 	o_item.e_ielement.className = o_item.getstyle(1, 2);
 
 	this.expand(n_id);
-//	this.items[id].switch_style('onmousedown');
 }
 
 
@@ -358,21 +426,13 @@ function menu_item (o_parent, n_order) {
 		? o_parent.a_children[n_order - 1].n_x + this.getprop('left') * o_parent.get_x_direction()
 		: o_parent.n_x + this.getprop('block_left') * o_parent.get_x_direction();
 
-	if(-1 ==  o_parent.get_x_direction() && o_parent == o_root && !n_order)
-	{
+	if (-1 ==  o_parent.get_x_direction() && o_parent == o_root && !n_order) {
 		this.n_x -= this.getprop('width');
 	}
 
-	if(!o_parent.n_y_direction && !n_order){
-//alert("w: " +this.getprop('height') +" i:" + (o_parent.a_config.length - item_offset) );
-
-// calculate menu direction in first element
-/* calculates Wrongly! <c> Aly
-		var mi_height = this.getprop('height') * (o_parent.a_config.length - item_offset) + o_parent.n_y + this.getprop('block_top');
-		var scr_height = o_root.n_scr_height + o_root.n_scroll_top;
-		var mi_direction = (mi_height > scr_height)?-1:1;
-//*/
-		var mi_direction = 1;  //	always show menu in down direction.
+	if (!o_parent.n_y_direction && !n_order) {
+		//	always show menu in down direction.
+		var mi_direction = 1;
 		o_parent.set_y_direction(mi_direction);
 	}
 
@@ -421,7 +481,6 @@ function menu_item (o_parent, n_order) {
 	eldiv.innerHTML = this.a_config[0];
 	el.appendChild(eldiv);
 	
-//	console.log(el,el.innerHTML);
 	document.body.appendChild(el);
 
 	this.e_ielement = document.getElementById('e' + o_root.n_id + '_' + this.n_id + 'i');

@@ -1144,7 +1144,7 @@ Copt::memoryPick();
 					self::exception();
 				}
 
-				if(isset($host['profile']) && !empty($host['extendedProfile'])){
+				if(isset($host['profile']) && !empty($host['profile'])){
 					$fields = array_keys($host['profile']);
 					$fields = implode(', ', $fields);
 
@@ -1330,19 +1330,23 @@ Copt::memoryPick();
 		$hosts = zbx_toArray($data['hosts']);
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
+		unset($data['hosts']);
+		if (empty($data)) {
+			return true;
+		}
+
 		try{
 			self::BeginTransaction(__METHOD__);
 
 			// validate data
 			$fields = array_keys($data);
-			unset($fields[array_search('hosts', $fields)]);
 			self::validate($data, $fields);
 
 			$options = array(
 				'hostids' => $hostids,
-				'editable' => 1,
+				'editable' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1,
+				'preservekeys' => true
 			);
 			$upd_hosts = self::get($options);
 			foreach($hosts as $hnum => $host){
@@ -1753,7 +1757,7 @@ Copt::memoryPick();
 	 *
 	 * @return boolean
 	 */
-	private static function validate(array $host, array $fields = array()) {
+	private static function validate(array &$host, array $fields = array()) {
 		// don't perform field checks if we're udpating only selected fields
 		if (!$fields) {
 			$host_db_fields = array(
@@ -1821,6 +1825,39 @@ Copt::memoryPick();
 			$host_exist = reset($host_exists);
 			if ($host_exist && (!isset($host['hostid']) || $host_exist['hostid'] != $host['hostid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+			}
+		}
+
+		if(isset($host['profile']) && !empty($host['profile'])){
+			$profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag', 'macaddress', 'hardware',
+				'software', 'contact', 'location', 'notes'
+			);
+
+			$fields = array_keys($host['profile']);
+			foreach ($fields as $field) {
+				if (!in_array($field, $profile_fields)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PROFILE_FIELD.' "'.$field.'"');
+				}
+			}
+		}
+
+		if(isset($host['extendedProfile']) && !empty($host['extendedProfile'])){
+			$ext_profiles_fields = array('device_alias', 'device_type', 'device_chassis', 'device_os', 'device_os_short',
+				'device_hw_arch', 'device_serial', 'device_model', 'device_tag', 'device_vendor', 'device_contract',
+				'device_who', 'device_status', 'device_app_01', 'device_app_02', 'device_app_03', 'device_app_04',
+				'device_app_05', 'device_url_1', 'device_url_2', 'device_url_3', 'device_networks', 'device_notes',
+				'device_hardware', 'device_software', 'ip_subnet_mask', 'ip_router', 'ip_macaddress', 'oob_ip',
+				'oob_subnet_mask', 'oob_router', 'date_hw_buy', 'date_hw_install', 'date_hw_expiry', 'date_hw_decomm',
+				'site_street_1', 'site_street_2', 'site_street_3', 'site_city', 'site_state', 'site_country',
+				'site_zip', 'site_rack', 'site_notes', 'poc_1_name', 'poc_1_email', 'poc_1_phone_1',
+				'poc_1_phone_2', 'poc_1_cell', 'poc_1_screen', 'poc_1_notes', 'poc_2_name',
+				'poc_2_email', 'poc_2_phone_1', 'poc_2_phone_2', 'poc_2_cell', 'poc_2_screen', 'poc_2_notes'
+			);
+			$fields = array_keys($host['extendedProfile']);
+			foreach ($fields as $field) {
+				if (!in_array($field, $ext_profiles_fields)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_EXTENDED_PROFILE_FIELD.' "'.$field.'"');
+				}
 			}
 		}
 

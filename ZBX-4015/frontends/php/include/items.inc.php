@@ -242,12 +242,72 @@
 	return true;
 	}
 
+	// function is used to validate item before puting it to a database
+	function itemIsValid($key, $type, $value_type, $delay, $delay_flex, $snmp_port) {
+		if (($type == ITEM_TYPE_DB_MONITOR && $key == 'db.odbc.select[<unique short description>]') ||
+				($type == ITEM_TYPE_SSH && $key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
+				($type == ITEM_TYPE_TELNET && $key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')) {
+			error(S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
+			return false;
+		}
+
+		if ($type != ITEM_TYPE_ZABBIX_ACTIVE && $type != ITEM_TYPE_TRAPPER) {
+			$res = calculate_item_nextcheck(0, $type, $delay, $delay_flex, time());
+			if (SEC_PER_YEAR == $res['delay'])	{
+				error(S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
+				return false;
+			}
+		}
+
+		if (in_array($type, array(ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3)) && ($snmp_port < 1 || $snmp_port > 65535)) {
+			error(S_INVALID_SNMP_PORT);
+			return false;
+		}
+
+		$itemKey = new CItemKey($key);
+		if (!$itemKey->isValid()) {
+			error(S_ERROR_IN_ITEM_KEY.SPACE.$itemKey->getError());
+			return false;
+		}
+
+		if ($type == ITEM_TYPE_AGGREGATE) {
+			if (!str_in_array($itemKey->getKeyId(), array('grpmax', 'grpmin', 'grpsum', 'grpavg'))) {
+				error(S_GROUP_FUNCTION.SPACE.'['.$itemKey->getKeyId().']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[grpmax, grpmin, grpsum, grpavg]');
+				return false;
+			}
+
+			$params = $itemKey->getParameters();
+
+			if (count($params) != 4) {
+				error(S_KEY_DOES_NOT_MATCH.SPACE.'groupfunc["Host group", "Item key", "item func", "parameter"]');
+				return false;
+			}
+
+			if (!str_in_array($params[2], array('last', 'min', 'max', 'avg', 'sum', 'count'))) {
+				error(S_ITEM_FUNCTION.SPACE.'['.$params[2].']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum, count]');
+				return false;
+			}
+
+			if ($value_type != ITEM_VALUE_TYPE_FLOAT) {
+				error(S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS);
+				return false;
+			}
+		}
+
+		if (str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog')) && $value_type != ITEM_VALUE_TYPE_LOG) {
+			error(S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
+			return false;
+		}
+
+		return true;
+	}
+
 	/******************************************************************************
 	 *                                                                            *
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function add_item($item){
+	function add_item($item) {
 		$item_db_fields = array(
 				'description'		=> null,
 				'key_'			=> null,
@@ -284,85 +344,29 @@
 				'applications'		=> array(),
 				'templateid'		=> 0);
 
-		if(!check_db_fields($item_db_fields, $item)){
+		if (!check_db_fields($item_db_fields, $item)) {
 			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[add_item]');
 			return false;
 		}
 
-		$host=get_host_by_hostid($item['hostid']);
-		if(!$host){
+		if (!$host = get_host_by_hostid($item['hostid'])) {
 			return false;
 		}
 
-		if(($i = array_search(0,$item['applications'])) !== FALSE)
+		if (($i = array_search(0, $item['applications'])) !== FALSE) {
 			unset($item['applications'][$i]);
+		}
 
-		if(!preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
-			error(S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
+		if (!itemIsValid($item['key_'], $item['type'], $item['value_type'], $item['delay'], $item['delay_flex'], $item['snmp_port'])) {
 			return false;
 		}
 
-		if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
-		   ($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
-		   ($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')) {
-		   	error(S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
-		   	return false;
-		}
-
-		$res = calculate_item_nextcheck(0, $item['type'], $item['delay'], $item['delay_flex'], time());
-		if ($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
-			error(S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
-			return FALSE;
-		}
-
-		if(($item['snmp_port']<1 || $item['snmp_port']>65535) && in_array($item['type'],array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3))){
-			error(S_INVALID_SNMP_PORT);
-			return FALSE;
-		}
-
-		if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-			error(S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
-			return FALSE;
-		}
-
-		if($item['value_type'] == ITEM_VALUE_TYPE_STR){
+		if ($item['value_type'] == ITEM_VALUE_TYPE_STR) {
 			$item['delta'] = 0;
 		}
 
 		if ($item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
 			$item['data_type'] = 0;
-		}
-
-		if(($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
-			error(S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS);
-			return FALSE;
-		}
-
-		if($item['type'] == ITEM_TYPE_AGGREGATE){
-			/* grpfunc['group','key','itemfunc','numeric param'] */
-			if(preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr)){
-				$g=$arr[1];
-				if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg"))){
-					error(S_GROUP_FUNCTION.SPACE."[$g]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax, grpmin, grpsum, grpavg]");
-					return FALSE;
-				}
-				// Group
-				$g=$arr[4];
-				// Key
-				$g=$arr[6];
-				// Item function
-				$g=$arr[8];
-				if(!str_in_array($g,array('last', 'min', 'max', 'avg', 'sum', 'count'))){
-					error(S_ITEM_FUNCTION.SPACE.'['.$g.']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum, count]');
-					return FALSE;
-				}
-				// Parameter
-				$g=$arr[10];
-			}
-			else{
-				error(S_KEY_DOES_NOT_MATCH.SPACE.'grpfunc["group","key","itemfunc","numeric param"]');
-				return FALSE;
-			}
 		}
 
 		$sql = 'SELECT itemid, hostid, templateid '.
@@ -381,13 +385,6 @@
 			$result = update_item($db_item['itemid'], $item);
 
 			return $result;
-		}
-
-		//validating item key
-		$itemKey = new CItemKey($item['key_']);
-		if(!$itemKey->isValid()){
-			error(S_ERROR_IN_ITEM_KEY.SPACE.$itemKey->getError());
-			return false;
 		}
 
 		// first add mother item
@@ -495,61 +492,35 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function update_item($itemid,$item){
-/*
-		$item = array('description','key','hostid','delay','history','status','type',
-		'snmp_community','snmp_oid','value_type','trapper_hosts','snmp_port','units','multiplier','delta',
-		'snmpv3_securityname','snmpv3_securitylevel','snmpv3_authpassphrase','snmpv3_privpassphrase',
-		'formula','trends','logtimefmt','valuemapid','delay_flex','params','ipmi_sensor','applications','templateid');
-*/
-		$upd_app = ((isset($item['applications'])) && !is_null($item['applications']));
+	function update_item($itemid, $item) {
+		$upd_app = (isset($item['applications']) && !is_null($item['applications']));
 		$item_in_params = $item;
 
 		$item_data = get_item_by_itemid_limited($itemid);
 		$item_data['applications'] = get_applications_by_itemid($itemid);
 
-		if(!check_db_fields($item_data, $item)){
+		if (!check_db_fields($item_data, $item)) {
 			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[update_item]');
 			return false;
 		}
 
-		$host = get_host_by_hostid($item['hostid']);
-
-		if(($i = array_search(0,$item['applications'])) !== FALSE) unset($item['applications'][$i]);
-
-		if( !preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
-			error(S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
+		if (!$host = get_host_by_hostid($item['hostid'])) {
 			return false;
 		}
 
-		if(($item['type'] == ITEM_TYPE_DB_MONITOR && $item['key_'] == 'db.odbc.select[<unique short description>]') ||
-		   ($item['type'] == ITEM_TYPE_SSH && $item['key_'] == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]') ||
-		   ($item['type'] == ITEM_TYPE_TELNET && $item['key_'] == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')) {
-		   	error(S_ITEMS_CHECK_KEY_DEFAULT_EXAMPLE_PASSED);
+		if (($i = array_search(0,$item['applications'])) !== FALSE) {
+			unset($item['applications'][$i]);
+		}
+
+		if (!itemIsValid($item['key_'], $item['type'], $item['value_type'], $item['delay'], $item['delay_flex'], $item['snmp_port'])) {
 			return false;
 		}
 
-		$res = calculate_item_nextcheck(0, $item['type'], $item['delay'], $item['delay_flex'], time());
-		if ($res['delay'] == SEC_PER_YEAR && $item['type'] != ITEM_TYPE_ZABBIX_ACTIVE && $item['type'] != ITEM_TYPE_TRAPPER){
-			error(S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL);
-			return FALSE;
+		if ($item['value_type'] == ITEM_VALUE_TYPE_STR) {
+			$item['delta'] = 0;
 		}
 
-		if(($item['snmp_port'] < 1 || $item['snmp_port'] > 65535) && in_array($item['type'], array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3))){
-			error(S_INVALID_SNMP_PORT);
-			return FALSE;
-		}
-
-		if($item['value_type'] == ITEM_VALUE_TYPE_STR){
-			$item['delta']=0;
-		}
-
-		if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-			error(S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
-			return FALSE;
-		}
-
-		if($item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
+		if ($item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
 			$item['data_type'] = 0;
 		}
 

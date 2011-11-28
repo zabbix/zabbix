@@ -179,10 +179,9 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_TRIGGER_UPDATE	*tr = NULL, *tr_last;
-	int			tr_alloc = 0, tr_num = 0;
-	char			*sql = NULL;
+	int			tr_alloc = 0, tr_num = 0, i, events_num = 0;
+	char			*sql = NULL, failed_type_buf[8];
 	int			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	char		failed_type_buf[8];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
 
@@ -301,9 +300,12 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				tr_last->lastchange, &tr_last->add_event))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3, ";\n");
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		if (1 == tr_last->add_event)
+			events_num++;
 	}
 	DBfree_result(result);
 
@@ -311,19 +313,25 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
 #endif
 
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* begin..end; is a must in case of ORACLE */
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
 
-	if (0 != tr_num)
+	if (0 != events_num)
 	{
-		for (tr_last = &tr[0]; 0 != tr_num; tr_num--, tr_last++)
+		zbx_uint64_t	eventid;
+
+		eventid = DBget_maxid_num("events", events_num);
+
+		for (i = 0; i < tr_num; i++)
 		{
+			tr_last = &tr[i];
+
 			if (1 != tr_last->add_event)
 				continue;
 
-			process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, tr_last->triggerid,
 					tr_last->lastchange, tr_last->new_value, 0, 0);
 		}
 	}

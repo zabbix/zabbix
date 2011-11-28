@@ -2893,9 +2893,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$frmTrig->addItemToBottomRow(SPACE);
 		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
 
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
-
 		$script = "function addPopupValues(list){
 						if(!isset('object', list)) return false;
 
@@ -3831,41 +3828,39 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 // END:   HOSTS PROFILE EXTENDED Section
 
-		$templates	= get_request('templates',array());
+		$templates = get_request('templates', array());
 		natsort($templates);
 
-		$frm_title	= S_HOST.SPACE.S_MASS_UPDATE;
+		$frm_title = S_HOST.SPACE.S_MASS_UPDATE;
 
-		$frmHost = new CFormTable($frm_title,'hosts.php');
+		$frmHost = new CFormTable($frm_title, 'hosts.php');
 		$frmHost->setHelp('web.hosts.host.php');
 		$frmHost->addVar('go', 'massupdate');
 
 		$hosts = $_REQUEST['hosts'];
-		foreach($hosts as $id => $hostid){
-			$frmHost->addVar('hosts['.$hostid.']',$hostid);
+		foreach ($hosts as $id => $hostid) {
+			$frmHost->addVar('hosts['.$hostid.']', $hostid);
 		}
 
-//		$frmItem->addRow(array( new CVisibilityBox('visible[type]', isset($visible['type']), 'type', S_ORIGINAL),S_TYPE), $cmbType);
+		$frmHost->addRow(S_NAME, S_ORIGINAL);
 
-		$frmHost->addRow(S_NAME,S_ORIGINAL);
-
-		$grp_tb = new CTweenBox($frmHost,'groups',$groups,6);
+		$grp_tb = new CTweenBox($frmHost, 'groups', $groups, 6);
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 		);
 		$all_groups = CHostGroup::get($options);
 		order_result($all_groups, 'name');
-		foreach($all_groups as $grp){
+		foreach ($all_groups as $grp) {
 			$grp_tb->addItem($grp['groupid'], $grp['name']);
 		}
 
-		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), S_ORIGINAL), S_REPLACE_GROUPS),
-						$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)
+		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), S_ORIGINAL), S_REPLACE_HOST_GROUPS),
+						$grp_tb->get(S_IN.SPACE.S_GROUPS, S_OTHER.SPACE.S_GROUPS)
 					);
 
-		$frmHost->addRow(array(new CVisibilityBox('visible[newgroup]', isset($visible['newgroup']), 'newgroup', S_ORIGINAL),S_NEW_GROUP),
-						new CTextBox('newgroup',$newgroup),
+		$frmHost->addRow(array(new CVisibilityBox('visible[newgroup]', isset($visible['newgroup']), 'newgroup', S_ORIGINAL), S_NEW_HOST_GROUP),
+						new CTextBox('newgroup', $newgroup),
 						'new'
 					);
 
@@ -4330,40 +4325,40 @@ JAVASCRIPT;
 		$host_tbl->setOddRowClass('form_odd_row');
 		$host_tbl->setEvenRowClass('form_even_row');
 
-		if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
-		if($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
+		if ($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
+		if ($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
 
-		$host_tbl->addRow(array(S_NAME, new CTextBox('host',$host,54)));
+		$host_tbl->addRow(array(S_NAME, new CTextBox('host', $host, 54)));
 
 		$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
 
 		$all_groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
 		order_result($all_groups, 'name');
-		foreach($all_groups as $group){
+		foreach ($all_groups as $group) {
 			$grp_tb->addItem($group['groupid'], $group['name']);
 		}
 
-		$host_tbl->addRow(array(S_GROUPS,$grp_tb->get(S_IN_GROUPS, S_OTHER_GROUPS)));
+		$host_tbl->addRow(array(S_GROUPS, $grp_tb->get(S_IN_GROUPS, S_OTHER_GROUPS)));
 
-		$host_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup',$newgroup)));
+		$host_tbl->addRow(array(S_NEW_HOST_GROUP, new CTextBox('newgroup', $newgroup)));
 
 // onchange does not work on some browsers: MacOS, KDE browser
-		$host_tbl->addRow(array(S_DNS_NAME,new CTextBox('dns',$dns,'40')));
-		if(defined('ZBX_HAVE_IPV6')){
-			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip',$ip,'39')));
+		$host_tbl->addRow(array(S_DNS_NAME,new CTextBox('dns', $dns, '40')));
+		if (defined('ZBX_HAVE_IPV6')) {
+			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip', $ip, '39')));
 		}
-		else{
-			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip',$ip,'15')));
+		else {
+			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip', $ip, '15')));
 		}
 
 		$cmbConnectBy = new CComboBox('useip', $useip);
 		$cmbConnectBy->addItem(0, S_DNS_NAME);
 		$cmbConnectBy->addItem(1, S_IP_ADDRESS);
-		$host_tbl->addRow(array(S_CONNECT_TO,$cmbConnectBy));
+		$host_tbl->addRow(array(S_CONNECT_TO, $cmbConnectBy));
 
-		$host_tbl->addRow(array(S_AGENT_PORT,new CNumericBox('port',$port,5)));
+		$host_tbl->addRow(array(S_AGENT_PORT, new CNumericBox('port', $port, 5)));
 
-//Proxy
+// Proxy
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
 		$cmbProxy->addItem(0, S_NO_PROXY);
@@ -4960,42 +4955,44 @@ JAVASCRIPT;
 				$expec_result.=' ('.S_DELIMITER."='".$expression['exp_delimiter']."')";
 
 			$tabExp->addRow(array(
-						$expression['expression'],
-						$expec_result,
-						$exp_res
-					));
+				$expression['expression'],
+				$expec_result,
+				$exp_res
+			));
 		}
 
-		$td = new CCol(S_COMBINED_RESULT,'bold');
+		$td = new CCol(S_COMBINED_RESULT, 'bold');
 		$td->setColSpan(2);
 
-		if($final_result)
-			$final_result = new CSpan(S_TRUE_BIG,'green bold');
-		else
-			$final_result = new CSpan(S_FALSE_BIG,'red bold');
+		if ($final_result) {
+			$final_result = new CSpan(S_TRUE_BIG, 'green bold');
+		}
+		else {
+			$final_result = new CSpan(S_FALSE_BIG, 'red bold');
+		}
 
 		$tabExp->addRow(array(
-					$td,
-					$final_result
-				));
+			$td,
+			$final_result
+		));
 
-		$tblRE->addRow(array(S_RESULT,$tabExp));
+		$tblRE->addRow(array(S_RESULT, $tabExp));
 
 		$tblFoot = new CTableInfo(null);
 
-		$td = new CCol(array(new CButton('save',S_SAVE)));
+		$td = new CCol(array(new CButton('save', S_SAVE)));
 		$td->setColSpan(2);
 		$td->addStyle('text-align: right;');
 
 		$td->addItem(SPACE);
-		$td->addItem(new CButton('test',S_TEST));
+		$td->addItem(new CButton('test', S_TEST));
 
-		if(isset($_REQUEST['regexpid'])){
+		if (isset($_REQUEST['regexpid'])) {
 			$td->addItem(SPACE);
-			$td->addItem(new CButton('clone',S_CLONE));
+			$td->addItem(new CButton('clone', S_CLONE));
 
 			$td->addItem(SPACE);
-			$td->addItem(new CButtonDelete(S_DELETE_REGULAR_EXPRESSION_Q,url_param('form').url_param('config').url_param('regexpid')));
+			$td->addItem(new CButtonDelete(S_DELETE_REGULAR_EXPRESSION_Q, url_param('form').url_param('config').url_param('regexpid').url_param('delete', false, 'go')));
 		}
 
 		$td->addItem(SPACE);
@@ -5003,12 +5000,12 @@ JAVASCRIPT;
 
 		$tblFoot->setFooter($td);
 
-	return array($tblRE,$tblFoot);
+		return array($tblRE, $tblFoot);
 	}
 
-	function get_expressions_tab(){
+	function get_expressions_tab() {
 
-		if(isset($_REQUEST['regexpid']) && !isset($_REQUEST["form_refresh"])){
+		if (isset($_REQUEST['regexpid']) && !isset($_REQUEST["form_refresh"])) {
 			$expressions = array();
 			$sql = 'SELECT e.* '.
 					' FROM expressions e '.

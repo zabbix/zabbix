@@ -149,12 +149,6 @@ include_once('include/page_header.php');
 	$tr_ov_menu[] = array('test1',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$tr_ov_menu[] = array('test2',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 
-	$jsmenu = new CPUMenu($tr_ov_menu,170);
-	$jsmenu->InsertJavaScript();
-
-?>
-<?php
-
 include_once('include/page_footer.php');
 
 ?>
