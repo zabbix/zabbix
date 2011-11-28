@@ -24,7 +24,7 @@
 		<input class="input text" name="interfaces[#{iface.interfaceid}][port]" type="text" size="15" value="#{iface.port}" />
 	</td>
 	<td style="width: 4em;">
-		<input class="mainInterface" type="radio" id="interface_main_#{iface.interfaceid}" name="main_#{iface.type}" value="#{iface.interfaceid}" />
+		<input class="mainInterface" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}" />
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
 	</td>
 	<td  style="width: 4em;">
@@ -61,64 +61,6 @@ var hostInterfacesManager = (function() {
 			domRow = jQuery('#hostInterfaceRow_'+hostInterface.interfaceid);
 			makeHostInterfaceRowDraggable(domRow);
 		}
-
-
-		/* // remove interface button not
-			jQuery('#removeInterface_'+hostInterface.interfaceid).click(function() {
-			removeInterfaceRow(hostInterface.interfaceid);
-			toggleMainInterfaceSwitches();
-			});
-
-			jQuery("#interface_main_"+hostInterface.interfaceid)
-			.button(mainInterfaceIcon)
-			.click(function() {
-			var jThis = jQuery(this);
-			var currentInterfaceid = jThis.attr('id').match(/^interface_main_(\d+)$/);
-			currentInterfaceid = currentInterfaceid[1];
-			var interfaces = getIntefacesByType();
-
-			// find current interface type
-			outer:
-			for (var interfaceType in interfaces) {
-			for (var interfaceid in interfaces[interfaceType].interfaces) {
-			if (interfaceid == currentInterfaceid) {
-			var currentInterfaceType = interfaceType;
-			break outer;
-			}
-			}
-			}
-
-			// uncheck main for all interfaces of found type
-			for (var interfaceid in interfaces[currentInterfaceType].interfaces) {
-			jQuery('#interface_main_'+interfaceid)
-			.prop('checked', false)
-			.button('option', 'icons', {})
-			.button('refresh');
-			}
-
-
-			// check main for current interface
-			jThis.prop('checked', true)
-			.button('option', 'icons', {primary: 'ui-icon-check'})
-			.button('refresh');
-			});
-
-			if (!hostInterface.locked) {
-			jQuery("#hostInterfaceRow_"+hostInterface.interfaceid)
-			.find("div.jqueryinputset")
-			.buttonset();
-
-
-			jQuery("#hostInterfaceRow_"+hostInterface.interfaceid+" .interfaceTypes input[type=radio]").click(function(event) {
-			jQuery('#interface_main_'+hostInterface.interfaceid)
-			.prop('checked', false)
-			.button('refresh')
-			.button('option', 'icons', {});
-			toggleMainInterfaceSwitches();
-			});
-			}
-		*/
-
 	}
 
 	function resetMainInterfaces() {
@@ -130,14 +72,13 @@ var hostInterfacesManager = (function() {
 			typeInterfaces = hostInterfaces[hostInterfaceType];
 
 			if (!typeInterfaces.main && typeInterfaces.all.length) {
-				for (var i=0; i<typeInterfaces.all.length; i++) {
+				for (var i = 0; i < typeInterfaces.all.length; i++) {
 					if (allHostInterfaces[typeInterfaces.all[i]].main === '1') {
 						typeInterfaces.main = allHostInterfaces[typeInterfaces.all[i]].interfaceid;
 					}
 				}
 				if (!typeInterfaces.main) {
 					typeInterfaces.main = typeInterfaces.all[0];
-					console.log(typeInterfaces.all);
 					allHostInterfaces[typeInterfaces.main].main = '1';
 				}
 			}
@@ -165,7 +106,7 @@ var hostInterfacesManager = (function() {
 			hostInterface = allHostInterfaces[hostInterfaceId];
 
 			types[hostInterface.type].all.push(hostInterfaceId);
-			if (hostInterface.main === "1") {
+			if (hostInterface.main === '1') {
 				if (types[hostInterface.type].main !== null) {
 					throw new Error('Multiple main interfaces for same type.');
 				}
@@ -178,7 +119,7 @@ var hostInterfacesManager = (function() {
 
 
 	function makeHostInterfaceRowDraggable(domElement) {
-		domElement.children().first().html('<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>');
+		domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>');
 		domElement.draggable({
 			helper: 'clone',
 			handle: 'span.ui-icon-arrowthick-2-n-s',
@@ -290,11 +231,11 @@ var hostInterfacesManager = (function() {
 	function moveRowToAnotherTypeTable(hostInterfaceId, newHostInterfaceType) {
 		var newDomId = getDomIdForRowInsert(newHostInterfaceType);
 
-		jQuery('#interface_main_'+hostInterfaceId).attr('name', 'main_'+newHostInterfaceType);
+		jQuery('#interface_main_'+hostInterfaceId).attr('name', 'mainInterfaces['+newHostInterfaceType+']');
 		jQuery('#interface_main_'+hostInterfaceId).prop('checked', false);
+		jQuery('#interface_type_'+hostInterfaceId).val(newHostInterfaceType);
 
 		jQuery('#hostInterfaceRow_'+hostInterfaceId).insertBefore(newDomId);
-		jQuery('#interface_type_'+hostInterfaceId).val(newHostInterfaceType);
 	}
 
 	return {
@@ -337,8 +278,10 @@ var hostInterfacesManager = (function() {
 				newMainInterfaceType = allHostInterfaces[hostInterfaceId].type,
 				oldMainInterfaceId = interfacesByType[newMainInterfaceType].main;
 
-			allHostInterfaces[hostInterfaceId].main = '1';
-			allHostInterfaces[oldMainInterfaceId].main = '0';
+			if (hostInterfaceId !== oldMainInterfaceId) {
+				allHostInterfaces[hostInterfaceId].main = '1';
+				allHostInterfaces[oldMainInterfaceId].main = '0';
+			}
 		}
 	}
 
@@ -366,6 +309,8 @@ jQuery(document).ready(function() {
 		drop: function(event, ui) {
 			var hostInterfaceTypeName = jQuery(this).data('type'),
 				hostInterfaceId = ui.draggable.data('interfaceid');
+
+			ui.helper.remove();
 
 			hostInterfacesManager.setType(hostInterfaceId, hostInterfaceTypeName);
 			hostInterfacesManager.resetMainInterfaces();

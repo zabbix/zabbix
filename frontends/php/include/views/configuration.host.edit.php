@@ -24,43 +24,6 @@ include('include/views/js/configuration.host.edit.js.php');
 include('include/views/js/configuration.host.edit.macros.js.php');
 ?>
 <?php
-function getDummyInterfaceRow() {
-	static $num = 0;
-	$num1 = $num++;
-	$num2 = $num++;
-
-	$iconCol = new CCol(SPACE);
-	$iconCol->addStyle('width: 2em;');
-
-	$ipInput = new CTextBox('dummy', null, 24);
-	$ipInput->attr('disabled', 'disabled');
-
-	$dnsInput = new CTextBox('dummy', null, 30);
-	$dnsInput->attr('disabled', 'disabled');
-
-	$dummyCheck1 = new CRadioButton('dummy', null, null, 'dummyRadio'.$num1);
-	$dummyCheck1->attr('disabled', 'disabled');
-	$dummyLabel1 = new CLabel(_('IP'), 'dummyRadio'.$num1);
-	$dummyCheck2 = new CRadioButton('dummy', null, null, 'dummyRadio'.$num2);
-	$dummyCheck2->attr('disabled', 'disabled');
-	$dummyLabel2 = new CLabel(_('DNS'), 'dummyRadio'.$num2);
-	$connectToDiv = new CDiv(array(
-		$dummyCheck1,
-		$dummyLabel1,
-		SPACE,
-		$dummyCheck2,
-		$dummyLabel2
-	));
-	$connectToDiv->addClass('jqueryinputset');
-
-	$portInput = new CTextBox('dummy', null, 15);
-	$portInput->attr('disabled', 'disabled');
-
-	$row = new CRow(array($iconCol, $ipInput, $dnsInput, $connectToDiv, $portInput, _('Default'), _('Remove')));
-	$row->addStyle('');
-
-	return $row;
-}
 
 $divTabs = new CTabView(array('remember' => 1));
 if (!isset($_REQUEST['form_refresh'])) {
@@ -110,51 +73,31 @@ if ($_REQUEST['hostid'] > 0) {
 		'hostids' => $dbHost['hostid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_EXTEND,
+		'sortfield' => 'interfaceid',
 		'preservekeys' => true,
 	));
-
-	ArraySorter::sort($dbHost['interfaces'], array('type', 'interfaceid'));
 
 	$frm_title .= SPACE.' ['.$dbHost['host'].']';
 	$original_templates = $dbHost['parentTemplates'];
 	$original_templates = zbx_toHash($original_templates, 'templateid');
 
-	if (!isset($_REQUEST['form_refresh'])) {
-		$interfaces = $dbHost['interfaces'];
+	if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT])) {
+		$mainAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT];
+		$interfaces[$mainAgentId]['main'] = '1';
+	}
+	if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_SNMP])) {
+		$snmpAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_SNMP];
+		$interfaces[$snmpAgentId]['main'] = '1';
+	}
+	if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_JMX])) {
+		$ipmiAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_JMX];
+		$interfaces[$ipmiAgentId]['main'] = '1';
+	}
+	if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_IPMI])) {
+		$jmxAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_IPMI];
+		$interfaces[$jmxAgentId]['main'] = '1';
 	}
 
-	foreach ($interfaces as $hinum => $interface) {
-		$interfaces[$hinum]['items'] = 0;
-
-		if ((isset($interface['new']) && $interface['new'] == 'create') || !isset($dbHost['interfaces'][$interface['interfaceid']])) {
-			continue;
-		}
-
-		$interfaces[$hinum]['items'] = count($dbHost['interfaces'][$interface['interfaceid']]['items']);
-
-		// check if interface has items that require specific interface type, if so type cannot be changed
-		$locked = 0;
-		foreach ($dbHost['interfaces'][$interface['interfaceid']]['items'] as $item) {
-			$itemInterfaceType = CItem::itemTypeInterface($item['type']);
-			if (!($itemInterfaceType === false || $itemInterfaceType === INTERFACE_TYPE_ANY)) {
-				$locked = 1;
-				break;
-			}
-		}
-		$interfaces[$hinum]['locked'] = $locked;
-	}
-
-	if (empty($interfaces)) {
-		$interfaces = array(array(
-			'ip' => '127.0.0.1',
-			'dns' => '',
-			'port' => 10050,
-			'useip' => 1,
-			'type' => 1,
-			'items' => 0,
-			'main' => 1
-		));
-	}
 
 	// getting items that populate host inventory fields
 	$hostItemsToInventory = API::Item()->get(array(
@@ -196,6 +139,37 @@ if (($_REQUEST['hostid'] > 0) && !isset($_REQUEST['form_refresh'])) {
 	foreach ($original_templates as $tnum => $tpl) {
 		$templates[$tpl['templateid']] = $tpl['name'];
 	}
+
+
+	$interfaces = $dbHost['interfaces'];
+	foreach ($interfaces as $hinum => $interface) {
+		$interfaces[$hinum]['items'] = 0;
+
+		$interfaces[$hinum]['items'] = count($dbHost['interfaces'][$interface['interfaceid']]['items']);
+
+		// check if interface has items that require specific interface type, if so type cannot be changed
+		$locked = 0;
+		foreach ($dbHost['interfaces'][$interface['interfaceid']]['items'] as $item) {
+			$itemInterfaceType = CItem::itemTypeInterface($item['type']);
+			if (!($itemInterfaceType === false || $itemInterfaceType === INTERFACE_TYPE_ANY)) {
+				$locked = 1;
+				break;
+			}
+		}
+		$interfaces[$hinum]['locked'] = $locked;
+	}
+}
+
+if (empty($interfaces)) {
+	$interfaces = array(array(
+		'ip' => '127.0.0.1',
+		'dns' => '',
+		'port' => 10050,
+		'useip' => 1,
+		'type' => 1,
+		'items' => 0,
+		'main' => 1
+	));
 }
 
 $clear_templates = array_intersect($clear_templates, array_keys($original_templates));
