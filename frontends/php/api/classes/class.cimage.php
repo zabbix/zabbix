@@ -27,86 +27,82 @@
  * Class containing methods for operations with images
  *
  */
-class CImage extends CZBXAPI{
-/**
- * Get images data
- *
- * @param array $options
- * @param array $options['itemids']
- * @param array $options['hostids']
- * @param array $options['groupids']
- * @param array $options['triggerids']
- * @param array $options['imageids']
- * @param boolean $options['status']
- * @param boolean $options['editable']
- * @param boolean $options['count']
- * @param string $options['pattern']
- * @param int $options['limit']
- * @param string $options['order']
- * @return array|boolean image data as array or false if error
- */
-	public function get($options = array()){
+class CImage extends CZBXAPI {
+	/**
+	 * Get images data
+	 *
+	 * @param array $options
+	 * @param array $options['itemids']
+	 * @param array $options['hostids']
+	 * @param array $options['groupids']
+	 * @param array $options['triggerids']
+	 * @param array $options['imageids']
+	 * @param boolean $options['status']
+	 * @param boolean $options['editable']
+	 * @param boolean $options['count']
+	 * @param string $options['pattern']
+	 * @param int $options['limit']
+	 * @param string $options['order']
+	 * @return array|boolean image data as array or false if error
+	 */
+	public function get($options = array()) {
 		$result = array();
-		$sort_columns = array('imageid', 'name'); // allowed columns for sorting
+
+		// allowed columns for sorting
+		$sort_columns = array('imageid', 'name');
 
 		$sql_parts = array(
-			'select' => array('images' => 'i.imageid'),
-			'from' => array('images' => 'images i'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null);
-
-		$def_options = array(
-			'nodeids'				=> null,
-			'imageids'				=> null,
-			'sysmapids'				=> null,
-// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'searchWildcardsEnabled'=> null,
-
-// OutPut
-			'output'				=> API_OUTPUT_REFER,
-			'select_image'			=> null,
-			'editable'				=> null,
-			'countOutput'			=> null,
-			'preservekeys'			=> null,
-
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null
+			'select'	=> array('images' => 'i.imageid'),
+			'from'		=> array('images' => 'images i'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
+		$def_options = array(
+			'nodeids'					=> null,
+			'imageids'					=> null,
+			'sysmapids'					=> null,
+			// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
+			// output
+			'output'					=> API_OUTPUT_REFER,
+			'select_image'				=> null,
+			'editable'					=> null,
+			'countOutput'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
+		);
 		$options = zbx_array_merge($def_options, $options);
 
-
-// editable + PERMISSION CHECK
-		if(!is_null($options['editable']) && (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN)){
+		// editable + PERMISSION CHECK
+		if (!is_null($options['editable']) && (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN)) {
 			return $result;
 		}
 
-// nodeids
+		// nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
-// imageids
-		if(!is_null($options['imageids'])){
+		// imageids
+		if (!is_null($options['imageids'])) {
 			zbx_value2array($options['imageids']);
-
 			$sql_parts['where']['imageid'] = DBcondition('i.imageid', $options['imageids']);
 		}
 
-// sysmapids
-		if(!is_null($options['sysmapids'])){
+		// sysmapids
+		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
 			$sql_parts['select']['sm'] = 'sm.sysmapid';
-
 			$sql_parts['from']['sysmaps'] = 'sysmaps sm';
 			$sql_parts['from']['sysmaps_elements'] = 'sysmaps_elements se';
-
 			$sql_parts['where']['sm'] = DBcondition('sm.sysmapid', $options['sysmapids']);
 			$sql_parts['where']['smse'] = 'sm.sysmapid=se.sysmapid ';
 			$sql_parts['where']['se'] = '('.
@@ -117,46 +113,34 @@ class CImage extends CZBXAPI{
 				' OR sm.backgroundid=i.imageid)';
 		}
 
-// output
-		if($options['output'] == API_OUTPUT_EXTEND){
+		// output
+		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$sql_parts['select']['images'] = 'i.imageid, i.imagetype, i.name';
 		}
 
-// count
-		if(!is_null($options['countOutput'])){
+		// count
+		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 			$sql_parts['select'] = array('count(DISTINCT i.imageid) as rowscount');
 		}
 
-
-// filter
-		if(is_array($options['filter'])){
+		// filter
+		if (is_array($options['filter'])) {
 			zbx_db_filter('images i', $options, $sql_parts);
 		}
 
-// search
-		if(is_array($options['search'])){
+		// search
+		if (is_array($options['search'])) {
 			zbx_db_search('images i', $options, $sql_parts);
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'i');
 
-			$sql_parts['order'][] = 'i.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('i.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('i.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'i.'.$options['sortfield'];
-			}
-		}
-
-// limit
-		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+		// limit
+		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sql_parts['limit'] = $options['limit'];
 		}
-//----------
 
 		$imageids = array();
 
@@ -169,59 +153,66 @@ class CImage extends CZBXAPI{
 		$sql_from = '';
 		$sql_where = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select'])) $sql_select.= implode(',',$sql_parts['select']);
-		if(!empty($sql_parts['from'])) $sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where'])) $sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['order'])) $sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
+		if (!empty($sql_parts['select'])) {
+			$sql_select .= implode(',', $sql_parts['select']);
+		}
+		if (!empty($sql_parts['from'])) {
+			$sql_from .= implode(',', $sql_parts['from']);
+		}
+		if (!empty($sql_parts['where'])) {
+			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
+		}
+		if (!empty($sql_parts['order'])) {
+			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		}
 
 		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('i.imageid', $nodeids).
 					$sql_where.
-				$sql_order;
+					$sql_order;
 		$res = DBselect($sql, $sql_parts['limit']);
-		while($image = DBfetch($res)){
-			if($options['countOutput']){
+		while ($image = DBfetch($res)) {
+			if ($options['countOutput']) {
 				return $image['rowscount'];
 			}
-			else{
+			else {
 				$imageids[$image['imageid']] = $image['imageid'];
 
-				if($options['output'] == API_OUTPUT_SHORTEN){
+				if ($options['output'] == API_OUTPUT_SHORTEN) {
 					$result[$image['imageid']] = array('imageid' => $image['imageid']);
 				}
-				else{
-					if(!isset($result[$image['imageid']]))
+				else {
+					if (!isset($result[$image['imageid']])) {
 						$result[$image['imageid']] = array();
-
-// sysmapds
-					if(isset($image['sysmapid'])){
-						if(!isset($result[$image['imageid']]['sysmaps']))
-							$result[$image['imageid']]['sysmaps'] = array();
-
-						$result[$image['imageid']]['sysmaps'][] = array('sysmapid' => $image['sysmapid']);
 					}
 
+					// sysmapds
+					if (isset($image['sysmapid'])) {
+						if (!isset($result[$image['imageid']]['sysmaps'])) {
+							$result[$image['imageid']]['sysmaps'] = array();
+						}
+						$result[$image['imageid']]['sysmaps'][] = array('sysmapid' => $image['sysmapid']);
+					}
 					$result[$image['imageid']] += $image;
 				}
 			}
 		}
 
-// adding objects
-		if(!is_null($options['select_image'])){
-			$db_img = DBselect('SELECT imageid, image FROM images WHERE '.DBCondition('imageid', $imageids));
-			while($img = DBfetch($db_img)){
+		// adding objects
+		if (!is_null($options['select_image'])) {
+			$db_img = DBselect('SELECT i.imageid,i.image FROM images i WHERE '.DBCondition('i.imageid', $imageids));
+			while ($img = DBfetch($db_img)) {
 				// PostgreSQL and SQLite images are stored escaped in the DB
 				$img['image'] = zbx_unescape_image($img['image']);
 				$result[$img['imageid']]['image'] = base64_encode($img['image']);
 			}
 		}
 
-		if(is_null($options['preservekeys'])){
+		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
-
-	return $result;
+		return $result;
 	}
 
 /**
