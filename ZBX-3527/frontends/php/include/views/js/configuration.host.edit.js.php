@@ -14,9 +14,9 @@
 	</td>
 	<td style="width: 9em;">
 		<div class="jqueryinputset">
-			<input type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip} />
+			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip} />
 			<label for="radio_ip_#{iface.interfaceid}"><?php echo _('IP'); ?></label>
-			<input type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns} />
+			<input class="interface-useip" type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns} />
 			<label for="radio_dns_#{iface.interfaceid}"><?php echo _('DNS'); ?></label>
 		</div>
 	</td>
@@ -129,8 +129,10 @@ var hostInterfacesManager = (function() {
 			helper: 'clone',
 			handle: 'span.ui-icon-arrowthick-2-n-s',
 			revert: 'invalid',
-			stop: function() {
+			stop: function(event, ui) {
+				var hostInterfaceId = jQuery(this).data('interfaceid');
 				resetMainInterfaces();
+				resetUseipInterface(hostInterfaceId)
 			}
 		});
 	}
@@ -139,11 +141,10 @@ var hostInterfacesManager = (function() {
 		domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s ui-state-disabled"></span>');
 		jQuery('.ui-icon', domElement).hover(
 			function(event) {
-				jQuery('<div><?php echo _('Interface is used by items that require this type interface.'); ?></div>')
+				jQuery('<div><?php echo _('Interface is used by items that require this type of the interface.'); ?></div>')
 						.css({position: 'absolute', opacity: 1, padding: '2px'})
 						.addClass('ui-state-highlight')
 						.appendTo(event.target.parentNode);
-				console.log(event);
 			},
 			function(event) {
 				jQuery(event.target).next().remove();
@@ -173,10 +174,6 @@ var hostInterfacesManager = (function() {
 
 		if (hostInterface.main) {
 			attrs.checked_main = 'checked="checked"';
-		}
-
-		if (hostInterface.locked) {
-			// TODO: if locked disable dragging
 		}
 
 		return attrs;
@@ -260,6 +257,16 @@ var hostInterfacesManager = (function() {
 		jQuery('#hostInterfaceRow_'+hostInterfaceId).insertBefore(newDomId);
 	}
 
+	function resetUseipInterface(hostInterfaceId) {
+		var useip = allHostInterfaces[hostInterfaceId].useip;
+		if (useip == 0) {
+			jQuery('#radio_dns_'+hostInterfaceId).prop('checked', true);
+		}
+		else {
+			jQuery('#radio_ip_'+hostInterfaceId).prop('checked', true);
+		}
+	}
+
 	return {
 		add: function(hostInterfaces) {
 			for (var hostInterfaceId in hostInterfaces) {
@@ -304,6 +311,10 @@ var hostInterfacesManager = (function() {
 				allHostInterfaces[hostInterfaceId].main = '1';
 				allHostInterfaces[oldMainInterfaceId].main = '0';
 			}
+		},
+
+		setUseipForInterface: function(hostInterfaceId, useip) {
+			allHostInterfaces[hostInterfaceId].useip = useip;
 		}
 	}
 
@@ -325,9 +336,16 @@ jQuery(document).ready(function() {
 		hostInterfacesManager.setMainInterface(interfaceId);
 	});
 
+	// when we start dragging row, all radio buttons are unchecked for some reason, we store radio buttons values
+	// to restore them when drag is ended
+	jQuery('#hostlist').on('click', 'input[type=radio].interface-useip', function() {
+		var interfaceId = jQuery(this).attr('id').match(/\d+/);
+		hostInterfacesManager.setUseipForInterface(interfaceId[0], jQuery(this).val());
+	});
+
 	jQuery("#agentInterfaces, #SNMPInterfaces, #JMXInterfaces, #IPMIInterfaces").droppable({
 		tolerance: 'pointer',
-		activeClass: 'dropArea',
+//		activeClass: 'dropArea',
 		drop: function(event, ui) {
 			var hostInterfaceTypeName = jQuery(this).data('type'),
 				hostInterfaceId = ui.draggable.data('interfaceid');
@@ -336,6 +354,18 @@ jQuery(document).ready(function() {
 
 			hostInterfacesManager.setType(hostInterfaceId, hostInterfaceTypeName);
 			hostInterfacesManager.resetMainInterfaces();
+		},
+		activate: function(event, ui) {
+			if (!jQuery(this).find(ui.draggable).length) {
+				jQuery(this).addClass('dropArea');
+				jQuery('span.dragHelpText', this).toggle();
+			}
+
+
+		},
+		deactivate: function(event, ui) {
+			jQuery(this).removeClass('dropArea');
+			jQuery('span.dragHelpText', this).toggle(false);
 		}
 	});
 
