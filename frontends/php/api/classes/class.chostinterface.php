@@ -755,7 +755,7 @@ Copt::memoryPick();
 		// gathrer missing host ids
 		$hostIds = array();
 		if ($interfaceIdsWithoutHostIds) {
-			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interfaces i WHERE '.DBcondition('i.interfaceid', $interfaceIdsWithoutHostIds));
+			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.DBcondition('i.interfaceid', $interfaceIdsWithoutHostIds));
 			while ($hostData = DBfetch($dbResult)) {
 				$hostIds[$hostData['hostid']] = $hostData['hostid'];
 			}
@@ -786,7 +786,7 @@ Copt::memoryPick();
 
 
 		$hostIds = array();
-		$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interfaces i WHERE '.DBcondition('i.interfaceid', $interfaceids));
+		$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.DBcondition('i.interfaceid', $interfaceids));
 		while ($hostData = DBfetch($dbResult)) {
 			$hostIds[$hostData['hostid']] = $hostData['hostid'];
 		}
