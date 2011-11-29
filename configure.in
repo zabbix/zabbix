@@ -1489,7 +1489,7 @@ dnl *****************************************************************
 
 AC_OUTPUT([
 	Makefile
-	create/Makefile
+	database/Makefile
 	misc/Makefile
 	src/Makefile
 	src/libs/Makefile
