@@ -4,7 +4,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
 	src \
-	create \
+	database \
 	man \
 	misc \
 	upgrades
@@ -33,12 +33,22 @@ dist-hook:
 	rm -rf $(top_distdir)/frontends/php/tests
 
 dbschema:
-	create/schema/gen.pl ibm_db2 > create/schema/ibm_db2.sql
-	create/schema/gen.pl mysql > create/schema/mysql.sql
-	create/schema/gen.pl oracle > create/schema/oracle.sql
-	create/schema/gen.pl postgresql > create/schema/postgresql.sql
-	create/schema/gen.pl sqlite3 > create/schema/sqlite3.sql
-	create/schema/gen.pl c > src/libs/zbxdbhigh/dbschema.c
+	create/bin/gen_data.pl ibm_db2 > database/ibm_db2/data.sql
+	create/bin/gen_schema.pl ibm_db2 > database/ibm_db2/schema.sql
+	cp create/data/images_ibm_db2.sql database/ibm_db2/images.sql
+	create/bin/gen_data.pl mysql > database/mysql/data.sql
+	create/bin/gen_schema.pl mysql > database/mysql/schema.sql
+	cp create/data/images_mysql.sql database/mysql/images.sql
+	create/bin/gen_data.pl oracle > database/oracle/data.sql
+	create/bin/gen_schema.pl oracle > database/oracle/schema.sql
+	cp create/data/images_oracle.sql database/oracle/images.sql
+	create/bin/gen_data.pl postgresql > database/postgresql/data.sql
+	create/bin/gen_schema.pl postgresql > database/postgresql/schema.sql
+	cp create/data/images_postgresql.sql database/postgresql/images.sql
+	create/bin/gen_data.pl sqlite3 > database/sqlite3/data.sql
+	create/bin/gen_schema.pl sqlite3 > database/sqlite3/schema.sql
+	cp create/data/images_sqlite3.sql database/sqlite3/images.sql
+	create/bin/gen_schema.pl c > src/libs/zbxdbhigh/dbschema.c
 
 gettext:
 	frontends/php/locale/make_mo.sh
