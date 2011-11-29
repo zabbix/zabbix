@@ -27,7 +27,7 @@
  * Class containing methods for operations with Templates
  *
  */
-class CTemplate extends CZBXAPI{
+class CTemplate extends CZBXAPI {
 /**
  * Get Template data
  *
@@ -35,22 +35,25 @@ class CTemplate extends CZBXAPI{
  * @return array|boolean Template data as array or false if error
  */
 	public function get($options = array()) {
-
 		$result = array();
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('hostid', 'host', 'name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('hostid', 'host', 'name');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('templates' => 'h.hostid'),
-			'from' => array('hosts' => 'hosts h'),
-			'where' => array('h.status='.HOST_STATUS_TEMPLATE),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null);
+			'select'	=> array('templates' => 'h.hostid'),
+			'from'		=> array('hosts' => 'hosts h'),
+			'where'		=> array('h.status='.HOST_STATUS_TEMPLATE),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
+		);
 
 		$def_options = array(
 			'nodeids'					=> null,
@@ -66,16 +69,14 @@ class CTemplate extends CZBXAPI{
 			'with_graphs'				=> null,
 			'editable' 					=> null,
 			'nopermissions'				=> null,
-
-// filter
+			// filter
 			'filter'					=> null,
 			'search'					=> '',
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
-
-// OutPut
+			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectGroups'				=> null,
 			'selectHosts'				=> null,
@@ -91,13 +92,11 @@ class CTemplate extends CZBXAPI{
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
-
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 		if(is_array($options['output'])){
@@ -106,16 +105,17 @@ class CTemplate extends CZBXAPI{
 			$dbTable = DB::getSchema('hosts');
 			$sql_parts['select']['hostid'] = 'h.hostid';
 			foreach ($options['output'] as $field) {
-				if($field == 'templateid') continue;
-
-				if(isset($dbTable['fields'][$field]))
+				if ($field == 'templateid') {
+					continue;
+				}
+				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'h.'.$field;
+				}
 			}
-
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
-// editable + PERMISSION CHECK
 
+		// editable + PERMISSION CHECK
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
@@ -335,17 +335,8 @@ class CTemplate extends CZBXAPI{
 			}
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][] = 'h.'.$options['sortfield'].' '.$sortorder;
-			if(!str_in_array('h.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('h.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'h.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'h');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){

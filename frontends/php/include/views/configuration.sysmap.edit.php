@@ -66,7 +66,7 @@
 	$iconMappingComboBox->addItem(0, _('<manual>'));
 	$iconMaps = API::IconMap()->get(array(
 		'output' => array('iconmapid', 'name'),
-		'preservekeys' => true,
+		'preservekeys' => true
 	));
 	order_result($iconMaps, 'name');
 	foreach ($iconMaps as $iconMap) {

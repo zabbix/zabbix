@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Discovered Hosts
  */
-class CDHost extends CZBXAPI{
+class CDHost extends CZBXAPI {
 /**
  * Get Host data
  *
@@ -60,23 +60,25 @@ class CDHost extends CZBXAPI{
  * @param string $options['sortorder'] sort order
  * @return array|boolean Host data as array or false if error
  */
-	public function get($options=array()){
-
+	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
 
-		$sort_columns = array('dhostid', 'druleid'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('dhostid', 'druleid');
 
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sql_parts = array(
-			'select' => array('dhosts' => 'dh.dhostid'),
-			'from' => array('dhosts' => 'dhosts dh'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null);
+			'select'	=> array('dhosts' => 'dh.dhostid'),
+			'from'		=> array('dhosts' => 'dhosts dh'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
+		);
 
 		$def_options = array(
 			'nodeids'					=> null,
@@ -87,17 +89,15 @@ class CDHost extends CZBXAPI{
 			'hostids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
-// filter
+			// filter
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
-
-// OutPut
+			// output
 			'output'					=> API_OUTPUT_REFER,
-
 			'selectDRules'				=> null,
 			'selectDServices'			=> null,
 			'selectGroups'				=> null,
@@ -105,24 +105,22 @@ class CDHost extends CZBXAPI{
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
-
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
-		if(is_array($options['output'])){
+		if (is_array($options['output'])) {
 			unset($sql_parts['select']['dhosts']);
 
 			$dbTable = DB::getSchema('dhosts');
-			foreach($options['output'] as $key => $field){
-				if(isset($dbTable['fields'][$field]))
+			foreach ($options['output'] as $field) {
+				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'dh.'.$field;
+				}
 			}
-
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
@@ -269,18 +267,8 @@ class CDHost extends CZBXAPI{
 			zbx_db_search('dhosts dh', $options, $sql_parts);
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][$options['sortfield']] = 'dh.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('dh.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('dh.*', $sql_parts['select'])){
-				$sql_parts['select'][$options['sortfield']] = 'dh.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'dh');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
