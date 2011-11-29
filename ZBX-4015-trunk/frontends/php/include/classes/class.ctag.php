@@ -212,5 +212,16 @@ class CTag extends CObject {
 	public function setTitle($value = 'title') {
 		$this->setAttribute('title', $value);
 	}
+
+
+	/**
+	 * Sanitezes a string before outputting it to the browser.
+	 *
+	 * @param string $str
+	 * @return string
+	 */
+	protected function sanitize($value) {
+		return htmlspecialchars($value);
+	}
 }
 ?>
