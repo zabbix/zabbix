@@ -35,7 +35,6 @@
 </script>
 
 <script type="text/javascript">
-
 var hostInterfacesManager = (function() {
 	'use strict';
 
@@ -181,6 +180,7 @@ var hostInterfacesManager = (function() {
 
 	function getDomIdForRowInsert(hostInterfaceType) {
 		var footerRowId;
+
 		switch (hostInterfaceType) {
 			case getHostInterfaceNumericType('agent'):
 				footerRowId = '#agentIterfacesFooter';

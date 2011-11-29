@@ -161,15 +161,15 @@ if (($_REQUEST['hostid'] > 0) && !isset($_REQUEST['form_refresh'])) {
 }
 
 if (empty($interfaces)) {
-	$interfaces = array(array(
-		'ip' => '127.0.0.1',
-		'dns' => '',
-		'port' => 10050,
-		'useip' => 1,
-		'type' => 1,
-		'items' => 0,
-		'main' => 1
-	));
+//	$interfaces = array('1' => array(
+//		'ip' => '127.0.0.1',
+//		'dns' => '',
+//		'port' => 10050,
+//		'useip' => 1,
+//		'type' => (string) INTERFACE_TYPE_AGENT,
+//		'items' => 0,
+//		'main' => 1
+//	));
 }
 
 $clear_templates = array_intersect($clear_templates, array_keys($original_templates));
@@ -223,10 +223,14 @@ $hostList->addRow(array(
 	$newgroupTB
 ));
 
-$json = new CJSON();
-$encodedInterfaces = $json->encode($interfaces);
-$script = 'hostInterfacesManager.add('.$encodedInterfaces.');';
-
+if (empty($interfaces)) {
+	$script = 'hostInterfacesManager.addNew("agent");';
+}
+else {
+	$json = new CJSON();
+	$encodedInterfaces = $json->encode($interfaces);
+	$script = 'hostInterfacesManager.add('.$encodedInterfaces.');';
+}
 zbx_add_post_js($script);
 
 // table for agent interfaces with footer
