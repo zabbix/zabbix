@@ -344,6 +344,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
+ - [ZBX-4015] fixed multiple XSS issues (pavels)
  - [ZBX-4288] fixed user macro deleting when deleting a host (pavels)
  - [ZBX-2859] fixed possibility to successfully delete zero regular expressions (sanja)
  - [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
