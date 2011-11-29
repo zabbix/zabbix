@@ -405,6 +405,26 @@
 		return $inventoryFields;
 	}
 
+function hostInterfaceTypeNumToName($type) {
+	switch ($type) {
+		case INTERFACE_TYPE_AGENT:
+			$name = _('agent');
+			break;
+		case INTERFACE_TYPE_SNMP:
+			$name = _('SNMP');
+			break;
+		case INTERFACE_TYPE_JMX:
+			$name = _('JMX');
+			break;
+		case INTERFACE_TYPE_IPMI:
+			$name = _('IPMI');
+			break;
+		default:
+			throw new Exception(_('Unknown interface type.'));
+	}
+
+	return $name;
+}
 
 	function get_hostgroup_by_groupid($groupid) {
 		$groups = DBfetch(DBselect('SELECT g.* FROM groups g WHERE g.groupid='.$groupid));
