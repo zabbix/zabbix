@@ -202,12 +202,12 @@ require_once('include/views/js/general.script.confirm.js.php');
 	}
 
 	$ev_select = new CComboBox('show_events', $_REQUEST['show_events']);
-	$ev_select->addItem(EVENTS_OPTION_NOEVENT, S_HIDE_ALL);
-	$ev_select->addItem(EVENTS_OPTION_ALL, S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?_('Days'):S_DAY).')');
+	$ev_select->addItem(EVENTS_OPTION_NOEVENT, _('Hide all'));
+	$ev_select->addItem(EVENTS_OPTION_ALL, _('Show all').' ('.$config['event_expire'].' '.(($config['event_expire'] > 1) ? _('Days') : _('Day')).')');
 	if($config['event_ack_enable']){
-		$ev_select->addItem(EVENTS_OPTION_NOT_ACK, S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?_('Days'):S_DAY).')');
+		$ev_select->addItem(EVENTS_OPTION_NOT_ACK, _('Show unacknowledged').' ('.$config['event_expire'].' '.(($config['event_expire'] > 1) ? _('Days') : _('Day')).')');
 	}
-	$filterForm->addRow(S_EVENTS, $ev_select);
+	$filterForm->addRow(_('Events'), $ev_select);
 
 	$severity_select = new CComboBox('show_severity', $show_severity);
 	$cb_items = array(
@@ -448,7 +448,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 			$items[$inum]['itemid'] = $item['itemid'];
 			$items[$inum]['value_type'] = $item['value_type']; //ZBX-3059: So it would be possible to show different caption for history for chars and numbers (KB)
 			$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-			$items[$inum]['name'] = $item_name;
+			$items[$inum]['name'] = htmlspecialchars($item_name);
 		}
 		$trigger['items'] = $items;
 
@@ -468,11 +468,11 @@ require_once('include/views/js/general.script.confirm.js.php');
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
-		if(!zbx_empty($trigger['url'])){
-			$menu_trigger_url = "['".S_URL."',\"javascript: window.location.href='".resolveTriggerUrl($trigger)."'\",
+		if (!zbx_empty($trigger['url'])) {
+			// double zbx_jsvalue is required to prevent XSS attacks
+			$menu_trigger_url = "['".S_URL."',\"javascript: window.location.href=".zbx_jsvalue(zbx_jsvalue(resolveTriggerUrl($trigger), null, false))."\",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
-
 		$description->addAction('onclick',
 			"javascript: create_mon_trigger_menu(event, [{'triggerid': '".$trigger['triggerid'].
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."],".
