@@ -2586,8 +2586,8 @@
 
 			$options = array(
 				'graphids' => $_REQUEST['graphid'],
-				'sortfield' => 'sortorder',
-				'output' => API_OUTPUT_EXTEND,
+				'sortfield' => 'gitemid',
+				'output' => API_OUTPUT_EXTEND
 			);
 			$items = API::GraphItem()->get($options);
 		}

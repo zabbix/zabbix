@@ -699,7 +699,7 @@ class zbxXML{
 						'filter' => array('name' => $sysmap['iconmap']),
 						'output' => API_OUTPUT_SHORTEN,
 						'nopermissions' => true,
-						'preservekeys' => true,
+						'preservekeys' => true
 					));
 					$iconMap = reset($iconMap);
 					if (!$iconMap) {
