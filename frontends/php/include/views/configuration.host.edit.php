@@ -62,7 +62,7 @@ if ($_REQUEST['hostid'] > 0) {
 	$dbHosts = API::Host()->get(array(
 		'hostids' => $_REQUEST['hostid'],
 		'selectGroups' => API_OUTPUT_EXTEND,
-		'selectParentTemplates' => API_OUTPUT_EXTEND,
+		'selectParentTemplates' => array('templateid', 'name'),
 		'selectMacros' => API_OUTPUT_EXTEND,
 		'selectInventory' => true,
 		'output' => API_OUTPUT_EXTEND
@@ -72,7 +72,7 @@ if ($_REQUEST['hostid'] > 0) {
 	$dbHost['interfaces'] = API::HostInterface()->get(array(
 		'hostids' => $dbHost['hostid'],
 		'output' => API_OUTPUT_EXTEND,
-		'selectItems' => API_OUTPUT_EXTEND,
+		'selectItems' => array('type'),
 		'sortfield' => 'interfaceid',
 		'preservekeys' => true,
 	));
