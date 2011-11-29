@@ -15,44 +15,44 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
-class CRow extends CTag{
-/* public */
-	public function __construct($item=NULL,$class=NULL){
-		parent::__construct('tr','yes');
-
+class CRow extends CTag {
+	public function __construct($item = null, $class = null) {
+		parent::__construct('tr', 'yes');
 		$this->addItem($item);
 		$this->setAttribute('class', $class);
 	}
 
-	public function setAlign($value){
+	public function setAlign($value) {
 		return $this->attributes['align'] = $value;
 	}
 
-	public function addItem($item){
-		if(is_object($item) && zbx_strtolower(get_class($item))=='ccol') {
+	public function addItem($item) {
+		if (is_object($item) && zbx_strtolower(get_class($item)) == 'ccol') {
 			parent::addItem($item);
 		}
-		elseif(is_array($item)){
-			foreach($item as $el){
-				if(is_object($el) && zbx_strtolower(get_class($el))=='ccol') {
+		elseif (is_array($item)) {
+			foreach ($item as $el) {
+				if (is_object($el) && zbx_strtolower(get_class($el)) == 'ccol') {
 					parent::addItem($el);
 				}
-				else if(!is_null($el)){
+				elseif (!is_null($el)) {
 					parent::addItem(new CCol($el));
 				}
 			}
 		}
-		elseif(!is_null($item)){
+		elseif (!is_null($item)) {
 			parent::addItem(new CCol($item));
 		}
 	}
 
-	public function setWidth($value){
-		if(is_string($value))$this->setAttribute('width',$value);
+	public function setWidth($value) {
+		if (is_string($value)) {
+			$this->setAttribute('width', $value);
+		}
 	}
 }
 ?>

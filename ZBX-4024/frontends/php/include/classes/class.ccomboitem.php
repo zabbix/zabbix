@@ -15,40 +15,36 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
-class CComboItem extends CTag{
-	public function __construct($value, $caption=NULL, $selected=NULL, $enabled=NULL){
+class CComboItem extends CTag {
+	public function __construct($value, $caption = null, $selected = null, $enabled = null) {
 		parent::__construct('option', 'yes');
 		$this->tag_body_start = '';
 		$this->attributes['value'] = $value;
-
 		$this->addItem($caption);
-
 		$this->setSelected($selected);
 		$this->setEnabled($enabled);
-
 	}
 
-	public function setValue($value){
+	public function setValue($value) {
 		return $this->attributes['value'] = $value;
 	}
 
-	public function getValue(){
+	public function getValue() {
 		return $this->getAttribute('value');
 	}
 
-	public function setCaption($value=NULL){
+	public function setCaption($value = null) {
 		$this->addItem(nbsp($value));
 	}
 
-	public function setSelected($value='yes'){
-		if((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on')) || (is_int($value) && $value<>0)){
+	public function setSelected($value = 'yes') {
+		if ((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on')) || (is_int($value) && $value <> 0)) {
 			return $this->attributes['selected'] = 'selected';
 		}
-
 		$this->removeAttribute('selected');
 	}
 }

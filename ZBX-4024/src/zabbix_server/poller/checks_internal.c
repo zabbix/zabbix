@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -197,7 +197,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		int	res;
 
 		alarm(CONFIG_TIMEOUT);
-		res = get_value_java(ZBX_JAVA_PROXY_REQUEST_INTERNAL, item, result);
+		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result);
 		alarm(0);
 
 		if (SUCCEED != res)

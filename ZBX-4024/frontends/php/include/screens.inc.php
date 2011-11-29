@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 ?>
@@ -56,36 +56,6 @@ require_once('include/js.inc.php');
 			return $resources[$res];
 		else
 			return S_UNKNOW;
-	}
-
-	function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$sort_triggers,$valign,$halign,$style,$url,$dynamic){
-		$sql='DELETE FROM screens_items WHERE screenid='.$screenid.' and x='.$x.' and y='.$y;
-		DBexecute($sql);
-
-		$screenitemid=get_dbid("screens_items","screenitemid");
-		$result=DBexecute('INSERT INTO screens_items '.
-							'(screenitemid,resourcetype,screenid,x,y,resourceid,width,height,'.
-							' colspan,rowspan,elements,valign,halign,style,url,dynamic,sort_triggers) '.
-						' VALUES '.
-							"($screenitemid,$resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,".
-							"$rowspan,$elements,$valign,$halign,$style,".zbx_dbstr($url).",$dynamic,$sort_triggers)");
-
-		if(!$result) return $result;
-	return $screenitemid;
-	}
-
-	function update_screen_item($screenitemid,$resourcetype,$resourceid,$width,$height,$colspan,$rowspan,$elements,$sort_triggers,$valign,$halign,$style,$url,$dynamic){
-		return  DBexecute("UPDATE screens_items SET ".
-							"resourcetype=$resourcetype,"."resourceid=$resourceid,"."width=$width,".
-							"height=$height,colspan=$colspan,rowspan=$rowspan,elements=$elements,".
-							"valign=$valign,halign=$halign,style=$style,url=".zbx_dbstr($url).",".
-							"dynamic=$dynamic,sort_triggers=$sort_triggers".
-						" WHERE screenitemid=$screenitemid");
-	}
-
-	function delete_screen_item($screenitemid){
-		$sql="DELETE FROM screens_items where screenitemid=$screenitemid";
-	return  DBexecute($sql);
 	}
 
 	function get_screen_by_screenid($screenid){
@@ -616,7 +586,7 @@ require_once('include/js.inc.php');
 // Plain text
 			$options = array(
 				'itemids' => $resourceid,
-				'selectHosts' => array('hostid', 'host'),
+				'selectHosts' => array('hostid', 'name'),
 				'output' => API_OUTPUT_EXTEND
 			);
 			$items = API::Item()->get($options);
@@ -630,7 +600,7 @@ require_once('include/js.inc.php');
 				$item = reset($items);
 				$item['host'] = reset($item['hosts']);
 
-				$caption = itemName($item);
+				$caption = $item['host']['name'].':'.itemName($item);
 
 				$nodeName = get_node_name_by_elid($item['itemid']);
 				if(!zbx_empty($nodeName))
@@ -827,12 +797,14 @@ require_once('include/js.inc.php');
 			if(zbx_empty($caption) && (TIME_TYPE_HOST == $style) && ($resourceid > 0)){
 				$options = array(
 					'itemids' => $resourceid,
+					'selectHosts' => array('name'),
 					'output' => API_OUTPUT_EXTEND
 				);
 				$items = API::Item()->get($options);
 				$item = reset($items);
+				$host = reset($item['hosts']);
 
-				$caption = $item['name'];
+				$caption = $host['name'].':'.$item['name'];
 			}
 
 			$form->addVar('resourceid',$resourceid);
@@ -846,7 +818,15 @@ require_once('include/js.inc.php');
 
 			if(TIME_TYPE_HOST == $style){
 				$textfield = new CTextbox('caption',$caption,75,'yes');
-				$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);");
+
+				if($screen['templateid']){
+					$selectbtn = new CButton('select', S_SELECT,
+						"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&templated_hosts=1&only_hostid=".$screen['templateid']."',800,450);");
+				}
+				else{
+					$selectbtn = new CButton('select', S_SELECT,
+						"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1',800,450);");
+				}
 
 				$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 			}
@@ -933,7 +913,7 @@ require_once('include/js.inc.php');
 		}
 
 		if (!$screen) {
-			return new CTableInfo(S_NO_SCREENS_DEFINED);
+			return new CTableInfo(_('No screens defined.'));
 		}
 
 		$skip_field = array();
@@ -1633,7 +1613,7 @@ require_once('include/js.inc.php');
 
 							preg_match('/([+-]{1})([\d]{1,2}):([\d]{1,2})/', $item['lastvalue'], $arr);
 							if (!empty($arr)) {
-								$timeZone = $arr[2] * 3600 + $arr[3] * 60;
+								$timeZone = $arr[2] * SEC_PER_HOUR + $arr[3] * SEC_PER_MIN;
 								if ($arr[1] == '-') {
 									$timeZone = 0 - $timeZone;
 								}

@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -64,7 +64,6 @@ typedef struct
 {
 	char		table_name[ZBX_TABLENAME_LEN_MAX];
 	zbx_uint64_t	lastid;
-	int		reserved;
 }
 ZBX_DC_ID;
 
@@ -774,7 +773,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char		*__function_name = "DCmass_update_triggers";
 	size_t			sql_offset = 0;
-	int			i, item_num = 0;
+	int			i, item_num = 0, events_num = 0;
 	zbx_uint64_t		*itemids = NULL;
 	zbx_timespec_t		*timespecs = NULL;
 	zbx_hashset_t		trigger_info;
@@ -826,12 +825,15 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 				trigger->new_error, &trigger->timespec, &trigger->add_event, &trigger->value_changed))
 		{
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-		}
 
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
 
 		zbx_free(trigger->expression);
 		zbx_free(trigger->new_error);
+
+		if (1 == trigger->add_event)
+			events_num++;
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -839,15 +841,22 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
-	for (i = 0; i < trigger_order.values_num; i++)
+	if (0 != events_num)
 	{
-		trigger = (DC_TRIGGER *)trigger_order.values[i];
+		zbx_uint64_t	eventid;
 
-		if (1 != trigger->add_event)
-			continue;
+		eventid = DBget_maxid_num("events", events_num);
 
-		process_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid, &trigger->timespec,
-				trigger->new_value, trigger->value_changed, 0, 0);
+		for (i = 0; i < trigger_order.values_num; i++)
+		{
+			trigger = (DC_TRIGGER *)trigger_order.values[i];
+
+			if (1 != trigger->add_event)
+				continue;
+
+			process_event(eventid++, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+					&trigger->timespec, trigger->new_value, trigger->value_changed, 0, 0);
+		}
 	}
 clean_triggers:
 	zbx_hashset_destroy(&trigger_info);
@@ -1318,24 +1327,19 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 {
+	const char	*__function_name = "DCmass_add_history";
 	size_t		sql_offset = 0;
 	char		*value_esc, *source_esc;
 	int		history_text_num, history_log_num, i;
 	zbx_uint64_t	id;
 #ifdef HAVE_MULTIROW_INSERT
-	int		tmp_offset;
+	size_t		tmp_offset;
 	const char	*row_dl = ",";
 #else
 	const char	*row_dl = ";\n";
 #endif
-	const char	*nsfield;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_add_history()");
-
-	if (0 != CONFIG_NS_SUPPORT)
-		nsfield = ",ns";
-	else
-		nsfield = "";
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1344,9 +1348,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"insert into history (itemid,clock,value%s) values ",
-			nsfield);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "insert into history (itemid,clock,value,ns) values ");
 #endif
 
 	for (i = 0; i < history_num; i++)
@@ -1361,17 +1363,14 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history (itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "insert into history (itemid,clock,value,ns) values ");
 #endif
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL,
+				"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL ",%d",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value.dbl);
-		if (0 != CONFIG_NS_SUPPORT)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+				history[i].value.dbl,
+				history[i].ns);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 	}
 
@@ -1389,9 +1388,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_sync (nodeid,itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
@@ -1406,18 +1404,16 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 				continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into history_sync (nodeid,itemid,clock,value%s) values ",
-					nsfield);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"insert into history_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL,
+					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL ",%d",
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.dbl);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+					history[i].value.dbl,
+					history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 		}
 
@@ -1437,9 +1433,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"insert into history_uint (itemid,clock,value%s) values ",
-			nsfield);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "insert into history_uint (itemid,clock,value,ns) values ");
 #endif
 
 	for (i = 0; i < history_num; i++)
@@ -1454,17 +1448,15 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_uint (itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_uint (itemid,clock,value,ns) values ");
 #endif
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64,
+				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d",
 				history[i].itemid,
 				history[i].clock,
-				history[i].value.ui64);
-		if (0 != CONFIG_NS_SUPPORT)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+				history[i].value.ui64,
+				history[i].ns);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 	}
 
@@ -1482,9 +1474,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_uint_sync (nodeid,itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_uint_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
@@ -1499,18 +1490,16 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 				continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into history_uint_sync (nodeid,itemid,clock,value%s) values ",
-					nsfield);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"insert into history_uint_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64,
+					"(%d," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d",
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					history[i].value.ui64);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+					history[i].value.ui64,
+					history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 		}
 
@@ -1530,9 +1519,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
  */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"insert into history_str (itemid,clock,value%s) values ",
-			nsfield);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "insert into history_str (itemid,clock,value,ns) values ");
 #endif
 
 	for (i = 0; i < history_num; i++)
@@ -1548,17 +1535,15 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
 #ifndef HAVE_MULTIROW_INSERT
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_str (itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_str (itemid,clock,value,ns) values ");
 #endif
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"(" ZBX_FS_UI64 ",%d,'%s'",
+				"(" ZBX_FS_UI64 ",%d,'%s',%d",
 				history[i].itemid,
 				history[i].clock,
-				value_esc);
-		if (0 != CONFIG_NS_SUPPORT)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+				value_esc,
+				history[i].ns);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 		zbx_free(value_esc);
 	}
@@ -1577,9 +1562,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 #ifdef HAVE_MULTIROW_INSERT
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_str_sync (nodeid,itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_str_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
@@ -1595,18 +1579,16 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 			value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into history_str_sync (nodeid,itemid,clock,value%s) values ",
-					nsfield);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"insert into history_str_sync (nodeid,itemid,clock,value,ns) values ");
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(%d," ZBX_FS_UI64 ",%d,'%s'",
+					"(%d," ZBX_FS_UI64 ",%d,'%s',%d",
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
-					value_esc);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+					value_esc,
+					history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 			zbx_free(value_esc);
 		}
@@ -1642,9 +1624,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MULTIROW_INSERT
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into history_text (id,itemid,clock,value%s) values ",
-				nsfield);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"insert into history_text (id,itemid,clock,value,ns) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
@@ -1660,18 +1641,16 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"insert into history_text (id,itemid,clock,value%s) values ",
-					nsfield);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+					"insert into history_text (id,itemid,clock,value,ns) values ");
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s'",
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d",
 					id,
 					history[i].itemid,
 					history[i].clock,
-					value_esc);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+					value_esc,
+					history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 			zbx_free(value_esc);
 			id++;
@@ -1697,9 +1676,9 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MULTIROW_INSERT
 		tmp_offset = sql_offset;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into history_log (id,itemid,clock,timestamp,"
-				"source,severity,value,logeventid%s) values ", nsfield);
+				"source,severity,value,logeventid,ns) values ");
 #endif
 
 		for (i = 0; i < history_num; i++)
@@ -1716,12 +1695,12 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
 			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifndef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into history_log (id,itemid,clock,timestamp,"
-					"source,severity,value,logeventid%s) values ", nsfield);
+					"source,severity,value,logeventid,ns) values ");
 #endif
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s',%d",
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s',%d,%d",
 					id,
 					history[i].itemid,
 					history[i].clock,
@@ -1729,9 +1708,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 					source_esc,
 					history[i].severity,
 					value_esc,
-					history[i].logeventid);
-			if (0 != CONFIG_NS_SUPPORT)
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",%d", history[i].ns);
+					history[i].logeventid,
+					history[i].ns);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ")%s", row_dl);
 			zbx_free(value_esc);
 			zbx_free(source_esc);
@@ -1757,6 +1735,8 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1778,7 +1758,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 	int		i;
 	char		*value_esc, *source_esc;
 #ifdef HAVE_MULTIROW_INSERT
-	int		tmp_offset;
+	size_t		tmp_offset;
 	const char	*row_dl = ",";
 #else
 	const char	*row_dl = ";\n";
@@ -2897,93 +2877,6 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_nextid_shared                                              *
- *                                                                            *
- * Purpose: Return next id for requested table and store it in ids table      *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-zbx_uint64_t	DCget_nextid_shared(const char *table_name)
-{
-#define ZBX_RESERVE	256
-	const char	*__function_name = "DCget_nextid_shared";
-	int		i;
-	ZBX_DC_ID	*id;
-	zbx_uint64_t	nextid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, table_name);
-
-	LOCK_CACHE_IDS;
-
-	for (i = 0; ZBX_IDS_SIZE > i; i++)
-	{
-		id = &ids->id[i];
-
-		if ('\0' == *id->table_name)
-		{
-			zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
-			id->lastid = 0;
-			id->reserved = 0;
-
-			break;
-		}
-
-		if (0 == strcmp(id->table_name, table_name))
-			break;
-	}
-
-	if (ZBX_IDS_SIZE == i)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for ids");
-		exit(FAIL);
-	}
-
-	if (0 < id->reserved)
-		goto exit;
-
-	UNLOCK_CACHE_IDS;
-retry:
-	nextid = DBget_nextid(table_name, ZBX_RESERVE) - 1;
-
-	LOCK_CACHE_IDS;
-
-	if (nextid < id->lastid)
-	{
-		UNLOCK_CACHE_IDS;
-		goto retry;
-	}
-
-	if (0 == id->reserved)
-	{
-		id->lastid = nextid;
-		id->reserved = ZBX_RESERVE;
-	}
-	else if (id->lastid + id->reserved == nextid)
-	{
-		id->reserved += ZBX_RESERVE;
-	}
-	else if (id->reserved < ZBX_RESERVE && nextid > id->lastid)
-	{
-		id->lastid = nextid;
-		id->reserved = ZBX_RESERVE;
-	}
-exit:
-	id->lastid++;
-	id->reserved--;
-
-	nextid = id->lastid;
-
-	UNLOCK_CACHE_IDS;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 "]",
-			__function_name, table_name, nextid);
-
-	return nextid;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DCget_item_lastclock                                             *
  *                                                                            *
  * Return value: last clock or FAIL if item not found in dbcache              *
@@ -2993,9 +2886,10 @@ exit:
  ******************************************************************************/
 int	DCget_item_lastclock(zbx_uint64_t itemid)
 {
-	int	i, index, clock = FAIL;
+	const char	*__function_name = "DCget_item_lastclock";
+	int		i, index, clock = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCget_item_lastclock(): itemid [" ZBX_FS_UI64 "]", itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
 
 	LOCK_CACHE;
 
@@ -3015,7 +2909,7 @@ int	DCget_item_lastclock(zbx_uint64_t itemid)
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCget_item_lastclock(): %d", clock);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, clock);
 
 	return clock;
 }

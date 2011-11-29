@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 use Switch;
 use File::Basename;
@@ -36,7 +36,6 @@ my $uniq;
 	"database"	=>	"",
 	"after"		=>	"\t{0}\n};\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
-	"t_blob"	=>	"ZBX_TYPE_BLOB",
 	"t_char"	=>	"ZBX_TYPE_CHAR",
 	"t_cksum_text"	=>	"ZBX_TYPE_TEXT",
 	"t_double"	=>	"ZBX_TYPE_FLOAT",
@@ -45,7 +44,6 @@ my $uniq;
 	"t_id"		=>	"ZBX_TYPE_ID",
 	"t_image"	=>	"ZBX_TYPE_BLOB",
 	"t_integer"	=>	"ZBX_TYPE_INT",
-	"t_item_param"	=>	"ZBX_TYPE_TEXT",
 	"t_nanosec"	=>	"ZBX_TYPE_INT",
 	"t_serial"	=>	"ZBX_TYPE_UINT",
 	"t_text"	=>	"ZBX_TYPE_TEXT",
@@ -69,7 +67,7 @@ $c{"before"} = "/*
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include \"common.h\"
@@ -84,7 +82,6 @@ const ZBX_TABLE\ttables[] = {
 	"before"	=>	"",
 	"after"		=>	"",
 	"t_bigint"	=>	"bigint",
-	"t_blob"	=>	"varchar(2048)",
 	"t_char"	=>	"varchar",
 	"t_cksum_text"	=>	"varchar(2048)",
 	"t_double"	=>	"decfloat(16)",
@@ -93,7 +90,6 @@ const ZBX_TABLE\ttables[] = {
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"blob",
 	"t_integer"	=>	"integer",
-	"t_item_param"	=>	"varchar(2048)",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"bigint",
 	"t_text"	=>	"varchar(2048)",
@@ -108,7 +104,6 @@ const ZBX_TABLE\ttables[] = {
 	"after"		=>	"",
 	"table_options"	=>	" ENGINE=InnoDB",
 	"t_bigint"	=>	"bigint unsigned",
-	"t_blob"	=>	"blob",
 	"t_char"	=>	"char",
 	"t_cksum_text"	=>	"text",
 	"t_double"	=>	"double(16,4)",
@@ -117,7 +112,6 @@ const ZBX_TABLE\ttables[] = {
 	"t_id"		=>	"bigint unsigned",
 	"t_image"	=>	"longblob",
 	"t_integer"	=>	"integer",
-	"t_item_param"	=>	"text",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"bigint unsigned",
 	"t_text"	=>	"text",
@@ -131,7 +125,6 @@ const ZBX_TABLE\ttables[] = {
 	"before"	=>	"",
 	"after"		=>	"",
 	"t_bigint"	=>	"number(20)",
-	"t_blob"	=>	"nvarchar2(2048)",
 	"t_char"	=>	"nvarchar2",
 	"t_cksum_text"	=>	"nclob",
 	"t_double"	=>	"number(20,4)",
@@ -140,10 +133,9 @@ const ZBX_TABLE\ttables[] = {
 	"t_id"		=>	"number(20)",
 	"t_image"	=>	"blob",
 	"t_integer"	=>	"number(10)",
-	"t_item_param"	=>	"nvarchar2(2048)",
 	"t_nanosec"	=>	"number(10)",
 	"t_serial"	=>	"number(20)",
-	"t_text"	=>	"nclob",
+	"t_text"	=>	"nvarchar2(2048)",
 	"t_time"	=>	"number(10)",
 	"t_varchar"	=>	"nvarchar2"
 );
@@ -155,7 +147,6 @@ const ZBX_TABLE\ttables[] = {
 	"after"		=>	"",
 	"table_options"	=>	" with OIDS",
 	"t_bigint"	=>	"numeric(20)",
-	"t_blob"	=>	"text",
 	"t_char"	=>	"char",
 	"t_cksum_text"	=>	"text",
 	"t_double"	=>	"numeric(16,4)",
@@ -164,7 +155,6 @@ const ZBX_TABLE\ttables[] = {
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"bytea",
 	"t_integer"	=>	"integer",
-	"t_item_param"	=>	"text",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"serial",
 	"t_text"	=>	"text",
@@ -178,7 +168,6 @@ const ZBX_TABLE\ttables[] = {
 	"before"	=>	"",
 	"after"		=>	"",
 	"t_bigint"	=>	"bigint",
-	"t_blob"	=>	"blob",
 	"t_char"	=>	"char",
 	"t_cksum_text"	=>	"text",
 	"t_double"	=>	"double(16,4)",
@@ -187,7 +176,6 @@ const ZBX_TABLE\ttables[] = {
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"longblob",
 	"t_integer"	=>	"integer",
-	"t_item_param"	=>	"text",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"integer",
 	"t_text"	=>	"text",

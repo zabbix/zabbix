@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -42,7 +42,7 @@ foreach ($macros as $macroid => $macro) {
 	$text1->setAttribute('placeholder', '{$MACRO}');
 	$text1->setAttribute('style', 'text-transform:uppercase;');
 	$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40, 'no', 255);
-	$text2->setAttribute('placeholder', '<'._('Value').'>');
+	$text2->setAttribute('placeholder', _('value'));
 	$span = new CSpan(RARR);
 	$span->addStyle('vertical-align:top;');
 

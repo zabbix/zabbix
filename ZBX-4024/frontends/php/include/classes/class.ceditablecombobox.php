@@ -15,35 +15,34 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
-class CEditableComboBox extends CComboBox{
-	public function __construct($name='editablecombobox',$value=NULL,$size=0,$action=NULL){
+class CEditableComboBox extends CComboBox {
+	public function __construct($name = 'editablecombobox', $value = null, $size = 0, $action = null) {
 		inseret_javascript_for_editable_combobox();
-
-		parent::__construct($name,$value,$action);
-		parent::addAction('onfocus','CEditableComboBoxInit(this);');
-		parent::addAction('onchange','CEditableComboBoxOnChange(this,'.$size.');');
+		parent::__construct($name, $value, $action);
+		parent::addAction('onfocus', 'CEditableComboBoxInit(this);');
+		parent::addAction('onchange', 'CEditableComboBoxOnChange(this, '.$size.');');
 	}
 
-	public function addItem($value, $caption='', $selected=NULL, $enabled='yes'){
-		if(is_null($selected)){
-			if(is_array($this->value)) {
-				if(str_in_array($value,$this->value))
+	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes') {
+		if (is_null($selected)) {
+			if (is_array($this->value)) {
+				if (str_in_array($value, $this->value)) {
 					$this->value_exist = 1;
+				}
 			}
-			else if(strcmp($value,$this->value) == 0){
+			elseif (strcmp($value, $this->value) == 0) {
 				$this->value_exist = 1;
 			}
 		}
-
-		parent::addItem($value,$caption,$selected,$enabled);
+		parent::addItem($value, $caption, $selected, $enabled);
 	}
 
-	public function toString($destroy=true){
-		if(!isset($this->value_exist) && !empty($this->value)){
+	public function toString($destroy = true) {
+		if (!isset($this->value_exist) && !empty($this->value)) {
 			$this->addItem($this->value, $this->value, 'yes');
 		}
 		return parent::toString($destroy);

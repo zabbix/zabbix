@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -180,7 +180,7 @@ function getActionMapBySysmap($sysmap) {
 			$links_menus .= "['".S_SUBMAP."',\"javascript: redirect('maps.php?sysmapid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
 		elseif ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-			$links_menus .= "['".S_LATEST_EVENTS."',\"javascript: redirect('events.php?source=0&triggerid=".$db_element['elementid']."&nav_time=".(time() - 7 * 86400)."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			$links_menus .= "['".S_LATEST_EVENTS."',\"javascript: redirect('events.php?source=0&triggerid=".$db_element['elementid']."&nav_time=".(time() - SEC_PER_WEEK)."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
 		elseif ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
 			$links_menus .= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?hostid=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
@@ -221,9 +221,6 @@ function getActionMapBySysmap($sysmap) {
 
 		$action_map->addItem($r_area);
 	}
-
-	$jsmenu = new CPUMenu(null, 170);
-	$jsmenu->InsertJavaScript();
 
 	return $action_map;
 }
@@ -965,7 +962,7 @@ function getSelementsInfo($sysmap) {
 		$iconMap = API::IconMap()->get(array(
 			'sysmapids' => $sysmap['sysmapid'],
 			'selectMappings' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
 		));
 		$iconMap = reset($iconMap);
 		$hostsToGetProfiles = array();

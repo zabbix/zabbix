@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -95,6 +95,23 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 			case CONDITION_OPERATOR_EQUAL:
 			case CONDITION_OPERATOR_NOT_EQUAL:
 				triggerid = event->objectid;
+
+				/* use parent trigger ID for generated triggers */
+				result = DBselect(
+						"select parent_triggerid"
+						" from trigger_discovery"
+						" where triggerid=" ZBX_FS_UI64,
+						triggerid);
+
+				if (NULL != (row = DBfetch(result)))
+				{
+					ZBX_STR2UINT64(triggerid, row[0]);
+
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() check host template condition,"
+							" selecting parent triggerid:" ZBX_FS_UI64,
+							__function_name, triggerid);
+				}
+				DBfree_result(result);
 
 				do
 				{
@@ -291,7 +308,7 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	else if (CONDITION_TYPE_MAINTENANCE == condition->conditiontype)
 	{
 		switch (condition->operator)
-{
+		{
 			case CONDITION_OPERATOR_IN:
 				result = DBselect(
 						"select count(*)"

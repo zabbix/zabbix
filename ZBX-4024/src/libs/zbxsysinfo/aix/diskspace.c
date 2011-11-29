@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -160,6 +160,19 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return SYSINFO_RET_FAIL;
 }
 
+static const char	*zbx_get_vfs_name_by_type(int type)
+{
+	extern struct vfs_ent	*getvfsbytype(int type);
+
+	struct vfs_ent	*vfs;
+	static char	*vfs_names[MNT_AIXLAST + 1] = {};
+
+	if (NULL == vfs_names[type] && NULL != (vfs = getvfsbytype(type)))
+		vfs_names[type] = zbx_strdup(vfs_names[type], vfs->vfsent_name);
+
+	return NULL != vfs_names[type] ? vfs_names[type] : "unknown";
+}
+
 int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int		rc, sz, i, ret = SYSINFO_RET_FAIL;
@@ -185,15 +198,16 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "{#FSNAME}", (char *)vm + vm->vmt_data[VMT_STUB].vmt_off, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, "{#FSTYPE}", zbx_get_vfs_name_by_type(vm->vmt_gfstype), ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 
-		/* goto the next vmount structure */
+		/* go to the next vmount structure */
 		vm = (struct vmount *)((char *)vm + vm->vmt_length);
 	}
 
 	zbx_json_close(&j);
 
-	SET_STR_RESULT(result, strdup(j.buffer));
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 	zbx_json_free(&j);
 

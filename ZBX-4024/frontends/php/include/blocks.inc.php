@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -1151,13 +1151,13 @@ function make_graph_menu(&$menu, &$submenu) {
 
 	$menu['menu_graphs'][] = array(
 		_('Add').' '._('Graph'),
-		'javascript: PopUp(\'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&real_hosts=1&multiselect=1\',800,450); void(0);',
+		'javascript: PopUp(\'popup.php?srctbl=graphs&srcfld1=graphid&reference=graphid&monitored_hosts=1&multiselect=1\',800,450); void(0);',
 		null,
 		array('outer' => 'pum_o_submenu', 'inner' => array('pum_i_submenu'))
 	);
 	$menu['menu_graphs'][] = array(
 		_('Add').' '._('Simple graph'),
-		'javascript: PopUp(\'popup.php?srctbl=simple_graph&srcfld1=itemid&real_hosts=1&reference=itemid&multiselect=1\',800,450); void(0);',
+		'javascript: PopUp(\'popup.php?srctbl=simple_graph&srcfld1=itemid&monitored_hosts=1&reference=itemid&multiselect=1\',800,450); void(0);',
 		null,
 		array('outer' => 'pum_o_submenu', 'inner' => array('pum_i_submenu'))
 	);

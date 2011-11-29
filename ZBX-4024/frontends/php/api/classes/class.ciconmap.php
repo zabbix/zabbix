@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -53,41 +53,39 @@ class CIconMap extends CZBXAPI {
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('icon_map' => 'im.iconmapid'),
-			'from' => array('icon_map' => 'icon_map im'),
-			'where' => array(),
-			'order' => array(),
-			'limit' => null,
+			'select'	=> array('icon_map' => 'im.iconmapid'),
+			'from'		=> array('icon_map' => 'icon_map im'),
+			'where'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids' => null,
-			'iconmapids' => null,
-			'sysmapids' => null,
-			'nopermissions' => null,
-			'editable' => null,
-// filter
-			'filter' => null,
-			'search' => null,
-			'searchByAny' => null,
-			'startSearch' => null,
-			'excludeSearch' => null,
-			'searchWildcardsEnabled' => null,
-// OutPut
-			'output' => API_OUTPUT_REFER,
-			'selectMappings' => null,
-			'countOutput' => null,
-			'preservekeys' => null,
-
-			'sortfield' => '',
-			'sortorder' => '',
-			'limit' => null
+			'nodeids'					=> null,
+			'iconmapids'				=> null,
+			'sysmapids'					=> null,
+			'nopermissions'				=> null,
+			'editable'					=> null,
+			// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
+			// output
+			'output'					=> API_OUTPUT_REFER,
+			'selectMappings'			=> null,
+			'countOutput'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {
 			$dbTable = DB::getSchema('icon_map');
-
 			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'im.'.$field;
@@ -97,11 +95,7 @@ class CIconMap extends CZBXAPI {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == self::$userData['type']) {
-		}
-		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
-		}
-		elseif (!is_null($options['editable']) || (self::$userData['type'] != USER_TYPE_SUPER_ADMIN)) {
+		if ($options['editable'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			return array();
 		}
 
@@ -122,7 +116,6 @@ class CIconMap extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sql_parts['select']['sysmapids'] = 's.sysmapid';
 			}
-
 			$sql_parts['from']['sysmaps'] = 'sysmaps s';
 			$sql_parts['where'][] = DBcondition('s.sysmapid', $options['sysmapids']);
 			$sql_parts['where']['ims'] = 'im.iconmapid=s.iconmapid';
@@ -145,28 +138,16 @@ class CIconMap extends CZBXAPI {
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-
-			$sql_parts['select'] = array('COUNT(DISTINCT im.iconmapid) as rowscount');
+			$sql_parts['select'] = array('COUNT(DISTINCT im.iconmapid) AS rowscount');
 		}
 
-		// order
-		// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if (!zbx_empty($options['sortfield'])) {
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
-
-			$sql_parts['order'][] = 'im.'.$options['sortfield'].' '.$sortorder;
-
-			if (!str_in_array('im.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('im.*', $sql_parts['select'])) {
-				$sql_parts['select'][] = 'im.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'im');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sql_parts['limit'] = $options['limit'];
 		}
-		//---------------
 
 		$iconMapids = array();
 
@@ -196,12 +177,10 @@ class CIconMap extends CZBXAPI {
 		$sql = 'SELECT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('im.iconmapid', $nodeids).
-				$sql_where.
-				$sql_order;
-		//SDI($sql);
+					$sql_where.
+					$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
 		while ($iconMap = DBfetch($db_res)) {
-
 			if ($options['countOutput']) {
 				$result = $iconMap['rowscount'];
 			}
@@ -215,7 +194,6 @@ class CIconMap extends CZBXAPI {
 					if (!isset($result[$iconMap['iconmapid']])) {
 						$result[$iconMap['iconmapid']] = array();
 					}
-
 					if (isset($iconMap['sysmapid'])) {
 						if (!isset($result[$iconMap['iconmapid']]['sysmaps'])) {
 							$result[$iconMap['iconmapid']]['sysmaps'] = array();
@@ -223,11 +201,9 @@ class CIconMap extends CZBXAPI {
 
 						$result[$iconMap['iconmapid']]['sysmaps'][] = array('sysmapid' => $iconMap['sysmapid']);
 					}
-
 					if (!is_null($options['selectMappings']) && !isset($result[$iconMap['iconmapid']]['mappings'])) {
 						$result[$iconMap['iconmapid']]['mappings'] = array();
 					}
-
 					$result[$iconMap['iconmapid']] += $iconMap;
 				}
 			}
@@ -237,11 +213,12 @@ class CIconMap extends CZBXAPI {
 			return $result;
 		}
 
-		// Adding Objects
-		// Adding Conditions
+		/*
+		 * Adding objects
+		 */
+		// adding conditions
 		if (!is_null($options['selectMappings']) && str_in_array($options['selectMappings'], $subselects_allowed_outputs)) {
-			$sql = 'SELECT imp.* FROM icon_mapping imp WHERE '.DBcondition('imp.iconmapid', $iconMapids);
-			$res = DBselect($sql);
+			$res = DBselect('SELECT imp.* FROM icon_mapping imp WHERE '.DBcondition('imp.iconmapid', $iconMapids));
 			while ($mapping = DBfetch($res)) {
 				$result[$mapping['iconmapid']]['mappings'][$mapping['iconmappingid']] = $mapping;
 			}
@@ -251,7 +228,6 @@ class CIconMap extends CZBXAPI {
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
-
 		return $result;
 	}
 
@@ -352,7 +328,7 @@ class CIconMap extends CZBXAPI {
 			'iconmapids' => $iconMapIds,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'selectMappings' => API_OUTPUT_EXTEND,
+			'selectMappings' => API_OUTPUT_EXTEND
 		));
 
 		$mappingsCreate = $mappingsUpdate = $mappingIdsDelete = array();
@@ -363,14 +339,13 @@ class CIconMap extends CZBXAPI {
 
 			// Existence
 			if (isset($iconMap['name'])) {
-				$options = array(
+				$iconMapExists = $this->get(array(
 					'filter' => array('name' => $iconMap['name']),
 					'output' => API_OUTPUT_SHORTEN,
-					'editable' => 1,
+					'editable' => true,
 					'nopermissions' => true,
-					'preservekeys' => true,
-				);
-				$iconMapExists = $this->get($options);
+					'preservekeys' => true
+				));
 				if (($iconMapExists = reset($iconMapExists)) && (bccomp($iconMapExists['iconmapid'], $iconMap['iconmapid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Icon map "%s" already exists.', $iconMap['name']));
 				}
@@ -387,7 +362,7 @@ class CIconMap extends CZBXAPI {
 						unset($mapping['iconmappingid']);
 						$mappingsUpdate[] = array(
 							'values' => $mapping,
-							'where' => array('iconmappingid' => $iconmappingid),
+							'where' => array('iconmappingid' => $iconmappingid)
 						);
 						unset($mappingsDb[$iconmappingid]);
 					}
@@ -404,7 +379,7 @@ class CIconMap extends CZBXAPI {
 			if (!empty($iconMap)) {
 				$updates[] = array(
 					'values' => $iconMap,
-					'where' => array('iconmapid' => $iconMapid),
+					'where' => array('iconmapid' => $iconMapid)
 				);
 			}
 		}
@@ -490,14 +465,14 @@ class CIconMap extends CZBXAPI {
 		$ids = array_unique($ids);
 
 		$count = $this->get(array(
-				'nodeids' => get_current_nodeid(true),
-				'iconmapids' => $ids,
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => true,
-				'countOutput' => true
-			));
+			'nodeids' => get_current_nodeid(true),
+			'iconmapids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
 
-		return (count($ids) == $count);
+		return count($ids) == $count;
 	}
 
 	/**
@@ -512,7 +487,7 @@ class CIconMap extends CZBXAPI {
 		$imageIds = API::Image()->get(array(
 			'output' => API_OUTPUT_SHORTEN,
 			'preservekeys' => true,
-			'filter' => array('imagetype' => IMAGE_TYPE_ICON),
+			'filter' => array('imagetype' => IMAGE_TYPE_ICON)
 		));
 
 		foreach ($iconMaps as $iconMap) {

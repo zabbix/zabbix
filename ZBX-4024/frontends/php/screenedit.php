@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -30,7 +30,7 @@ $page['hist_arg'] = array('screenid');
 $page['scripts'] = array('class.cscreen.js', 'class.calendar.js', 'gtlc.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -139,7 +139,7 @@ if (isset($_REQUEST['ajaxAction'])) {
 	}
 }
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 	exit();
 }
 if (isset($_REQUEST['save'])) {
@@ -150,56 +150,35 @@ if (isset($_REQUEST['save'])) {
 		$_REQUEST['sort_triggers'] = SCREEN_SORT_TRIGGERS_DATE_DESC;
 	}
 
-	try {
-		DBstart();
+	DBstart();
 
-		if (isset($_REQUEST['screenitemid'])) {
-			$msg_ok = _('Item updated');
-			$msg_err = _('Cannot update item');
-		}
-		else {
-			$msg_ok = _('Item added');
-			$msg_err = _('Cannot add item');
-		}
-		if (isset($_REQUEST['screenitemid'])) {
-			$result = update_screen_item($_REQUEST['screenitemid'],
-				$_REQUEST['resourcetype'], $_REQUEST['resourceid'], $_REQUEST['width'],
-				$_REQUEST['height'], $_REQUEST['colspan'], $_REQUEST['rowspan'],
-				$_REQUEST['elements'], $_REQUEST['sort_triggers'], $_REQUEST['valign'],
-				$_REQUEST['halign'], $_REQUEST['style'], $_REQUEST['url'], $_REQUEST['dynmic']);
-			if (!$result) {
-				throw new Exception();
-			}
-		}
-		else {
-			$result = add_screen_item(
-				$_REQUEST['resourcetype'], $_REQUEST['screenid'],
-				$_REQUEST['x'], $_REQUEST['y'], $_REQUEST['resourceid'],
-				$_REQUEST['width'], $_REQUEST['height'], $_REQUEST['colspan'],
-				$_REQUEST['rowspan'], $_REQUEST['elements'], $_REQUEST['sort_triggers'], $_REQUEST['valign'],
-				$_REQUEST['halign'], $_REQUEST['style'], $_REQUEST['url'], $_REQUEST['dynmic']);
-			if (!$result) {
-				throw new Exception();
-			}
-		}
+	if (isset($_REQUEST['screenitemid'])) {
+		$msg_ok = _('Item updated');
+		$msg_err = _('Cannot update item');
 
-		DBend(true);
+		$result = API::ScreenItem()->update(array($_REQUEST));
+	}
+	else {
+		$msg_ok = _('Item added');
+		$msg_err = _('Cannot add item');
 
+		$result = API::ScreenItem()->create(array($_REQUEST));
+	}
+
+	DBend($result);
+	show_messages($result, $msg_ok, $msg_err);
+
+	// success
+	if ($result) {
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, ' Name ['.$screen['name'].'] cell changed '.
 			(isset($_REQUEST['screenitemid']) ? '['.$_REQUEST['screenitemid'].']' : '['.$_REQUEST['x'].','.$_REQUEST['y'].']'));
 
 		unset($_REQUEST['form']);
-		show_messages(true, $msg_ok, $msg_err);
-	}
-	catch(Exception $e) {
-		DBend(false);
-		error($e->getMessage());
-		show_messages(false, $msg_ok, $msg_err);
 	}
 }
 elseif (isset($_REQUEST['delete'])) {
 	DBstart();
-	$result = delete_screen_item($_REQUEST['screenitemid']);
+	$result = API::ScreenItem()->delete($_REQUEST['screenitemid']);
 	$result = DBend($result);
 
 	show_messages($result, _('Item deleted'), _('Cannot delete item'));
@@ -277,5 +256,5 @@ zbx_add_post_js('timeControl.processObjects();');
 
 $screen_wdgt->show();
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

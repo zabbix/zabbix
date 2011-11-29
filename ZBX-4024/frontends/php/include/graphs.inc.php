@@ -15,17 +15,17 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
 
 	function graphType($type=null){
 		$types = array(
-			GRAPH_TYPE_STACKED => S_STACKED,
-			GRAPH_TYPE_PIE => S_PIE,
-			GRAPH_TYPE_EXPLODED => S_EXPLODED,
-			GRAPH_TYPE_NORMAL => S_NORMAL,
+			GRAPH_TYPE_STACKED => _('Stacked'),
+			GRAPH_TYPE_PIE => _('Pie'),
+			GRAPH_TYPE_EXPLODED => _('Exploded'),
+			GRAPH_TYPE_NORMAL => _('Normal'),
 		);
 
 		if(is_null($type)){
@@ -211,7 +211,7 @@
 	function get_min_itemclock_by_itemid($itemids){
 		zbx_value2array($itemids);
 		$min = null;
-		$result = time() - 86400*365;
+		$result = time() - SEC_PER_YEAR;
 
 		$items_by_type = array(
 			ITEM_VALUE_TYPE_FLOAT => array(),
@@ -240,7 +240,7 @@
 
 			if($table_for_numeric = DBfetch(DBselect($sql))){
 				$sql_from_num = ($table_for_numeric['history'] > $table_for_numeric['trends']) ? 'history' : 'trends';
-				$result = time() - (86400 * max($table_for_numeric['history'],$table_for_numeric['trends']));
+				$result = time() - (SEC_PER_DAY * max($table_for_numeric['history'], $table_for_numeric['trends']));
 			}
 		}
 
@@ -376,13 +376,12 @@ function copy_graph_to_host($graphid, $hostid) {
 		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
 		$_REQUEST['stime'] = get_request('stime', null);
 
-		if($_REQUEST['period']<ZBX_MIN_PERIOD){
-			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MIN_VALUE_SMALL.': '.ZBX_MIN_PERIOD.' ('.(int)(ZBX_MIN_PERIOD/3600).S_HOUR_SHORT.')');
+		if ($_REQUEST['period'] < ZBX_MIN_PERIOD) {
+			show_message(_s('Warning. Time period min value: %1$s (%2$s h)', ZBX_MIN_PERIOD, (int)(ZBX_MIN_PERIOD / SEC_PER_HOUR)));
 			$_REQUEST['period'] = ZBX_MIN_PERIOD;
-
 		}
-		else if($_REQUEST['period'] > ZBX_MAX_PERIOD){
-			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MAX_VALUE_SMALL.': '.ZBX_MAX_PERIOD.' ('.(int)(ZBX_MAX_PERIOD/86400).S_DAY_SHORT.')');
+		else if ($_REQUEST['period'] > ZBX_MAX_PERIOD) {
+			show_message(_s('Warning. Time period max value: %1$s (%2$s d)', ZBX_MAX_PERIOD, (int)(ZBX_MAX_PERIOD / SEC_PER_DAY)));
 			$_REQUEST['period'] = ZBX_MAX_PERIOD;
 		}
 

@@ -15,11 +15,11 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
-define('ZABBIX_VERSION',		'1.9.7');
+define('ZABBIX_VERSION',		'1.9.9');
 define('ZABBIX_API_VERSION',	'1.2');
 
 define('ZBX_LOGIN_ATTEMPTS',			5);
@@ -116,7 +116,6 @@ define('T_ZBX_DBL',			2);
 define('T_ZBX_PERIOD',		3);
 define('T_ZBX_IP',			4);
 define('T_ZBX_CLR',			5);
-define('T_ZBX_PORTS',		6);
 define('T_ZBX_IP_RANGE',	7);
 define('T_ZBX_INT_RANGE',	8);
 
@@ -323,7 +322,7 @@ define('ITEM_TYPE_IPMI',			12);
 define('ITEM_TYPE_SSH',				13);
 define('ITEM_TYPE_TELNET',			14);
 define('ITEM_TYPE_CALCULATED',		15);
-define('ITEM_TYPE_JMX',			16);
+define('ITEM_TYPE_JMX',				16);
 
 define('ITEM_VALUE_TYPE_FLOAT',		0);
 define('ITEM_VALUE_TYPE_STR',		1);
@@ -335,6 +334,11 @@ define('ITEM_DATA_TYPE_DECIMAL',		0);
 define('ITEM_DATA_TYPE_OCTAL',			1);
 define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
 define('ITEM_DATA_TYPE_BOOLEAN',		3);
+
+define('ZBX_DEFAULT_KEY_DB_MONITOR',	'db.odbc.select[<unique short description>]');
+define('ZBX_DEFAULT_KEY_SSH',			'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
+define('ZBX_DEFAULT_KEY_TELNET',		'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
+define('ZBX_DEFAULT_KEY_JMX',			'jmx[<object name>,<attribute name>]');
 
 define('SYSMAP_ELEMENT_USE_ICONMAP_ON', 	1);
 define('SYSMAP_ELEMENT_USE_ICONMAP_OFF', 	0);
@@ -377,6 +381,8 @@ define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 define('SERVICE_ALGORITHM_NONE',	0);
 define('SERVICE_ALGORITHM_MAX',		1);
 define('SERVICE_ALGORITHM_MIN',		2);
+
+define('SERVICE_SLA', 99.05);
 
 define('TRIGGER_MULT_EVENT_DISABLED',	0);
 define('TRIGGER_MULT_EVENT_ENABLED',	1);
@@ -825,9 +831,9 @@ define('API_OUTPUT_CUSTOM', 	'custom');
 define('SEC_PER_MIN', 	60);
 define('SEC_PER_HOUR', 	3600);
 define('SEC_PER_DAY', 	86400);
-define('SEC_PER_WEEK', 	(7*SEC_PER_DAY));
-define('SEC_PER_MONTH', (30*SEC_PER_DAY));
-define('SEC_PER_YEAR', 	(365*SEC_PER_DAY));
+define('SEC_PER_WEEK', 	604800); // 7 * SEC_PER_DAY
+define('SEC_PER_MONTH', 2592000); // 30 * SEC_PER_DAY
+define('SEC_PER_YEAR', 	31536000); // 365 * SEC_PER_DAY
 
 // input fields
 define('ZBX_TEXTBOX_STANDARD_SIZE', 50);

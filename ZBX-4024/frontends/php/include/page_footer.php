@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -84,8 +84,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	$post_script .= 'cookie.init();'."\n";
 	$post_script .= 'chkbxRange.init();'."\n";
 	$post_script .= 'var screenCSS = null;'."\n";
-	$post_script .= 'if(jQuery(window).width()<1024) screenCSS = "handheld.css";'."\n";
-	$post_script .= 'if(!is_null(screenCSS)) jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\'+screenCSS+\'" />\');';
+	$post_script .= 'if (jQuery(window).width() < 1024) { screenCSS = "handheld.css"; }'."\n";
+	$post_script .= 'if (!is_null(screenCSS)) { jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\' + screenCSS + \'" />\'); }';
 	$post_script .= '});'."\n";
 
 	if (!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')) {
@@ -112,12 +112,10 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		));
 		$table->show();
 	}
-
 	insert_js($post_script);
 
 	echo '</body>'."\n".
 		'</html>'."\n";
 }
-
 exit;
 ?>

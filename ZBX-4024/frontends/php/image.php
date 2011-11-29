@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -26,7 +26,7 @@
 	$page['title']	= 'S_IMAGE';
 	$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -50,7 +50,7 @@ include_once('include/page_header.php');
 
 	if(!($row = get_image_by_imageid($_REQUEST['imageid']))){
 		error('Incorrect image index');
-		include_once('include/page_footer.php');
+		require_once('include/page_footer.php');
 	}
 
 	$source = imagecreatefromstring($row['image']);
@@ -105,6 +105,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once "include/page_footer.php";
+require_once "include/page_footer.php";
 
 ?>

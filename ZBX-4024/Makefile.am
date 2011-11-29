@@ -14,18 +14,17 @@ EXTRA_DIST = \
 	build \
 	frontends \
 	include \
-	conf \
-	CREDITS
+	conf
 
 ## "dist-hook" run after the distribution directory is filled, but before the actual tar (or shar) file is created.
 dist-hook:
 	@zabbix_revision=`svn info|grep "Last Changed Rev"|awk '{print $$4;}'`; \
 	cat $(top_distdir)/include/common.h|sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > $(top_distdir)/include/common.h.new; \
 	mv $(top_distdir)/include/common.h.new $(top_distdir)/include/common.h; \
-	cat $(top_distdir)/src/zabbix_java/src/com/zabbix/proxy/GeneralInformation.java|sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > \
-		$(top_distdir)/src/zabbix_java/src/com/zabbix/proxy/GeneralInformation.java.new; \
-	mv $(top_distdir)/src/zabbix_java/src/com/zabbix/proxy/GeneralInformation.java.new \
-		$(top_distdir)/src/zabbix_java/src/com/zabbix/proxy/GeneralInformation.java
+	cat $(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java|sed "s/{ZABBIX_REVISION}/$$zabbix_revision/g" > \
+		$(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java.new; \
+	mv $(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java.new \
+		$(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java
 
 	rm -rf `find $(top_distdir) -name ".svn"`
 	rm -f $(top_distdir)/create/data/data_test.sql

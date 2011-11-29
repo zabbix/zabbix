@@ -15,17 +15,15 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
-
-class CZBXAPI{
+class CZBXAPI {
 	public static $userData;
 
-	protected static function exception($code=ZBX_API_ERROR_INTERNAL, $error=''){
+	protected static function exception($code = ZBX_API_ERROR_INTERNAL, $error = '') {
 		throw new APIException($code, $error);
 	}
-
 }
 ?>
