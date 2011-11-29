@@ -136,7 +136,7 @@ class CTag extends CObject {
 			$value = unpack_object($value);
 		}
 		if (!is_null($value)) {
-			$this->attributes[$name] = $value;
+			$this->attributes[$name] = htmlspecialchars(str_replace(array("\r", "\n"), '', strval($value)));
 		}
 		else {
 			$this->removeAttribute($name);
