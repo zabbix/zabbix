@@ -256,9 +256,11 @@ $ifTab->addRow(array($iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabe
 $helpTextWhenDragInterfaceAgent = new CSpan(_('Drag here to change the type of the interface to "agent" type.'));
 $helpTextWhenDragInterfaceAgent->addStyle('display: none;');
 $helpTextWhenDragInterfaceAgent->addClass('dragHelpText');
+$buttonCol = new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu'));
+$buttonCol->addStyle('width: 2em;');
 $col = new CCol($helpTextWhenDragInterfaceAgent);
 $col->setAttribute('colspan', 6);
-$buttonRow = new CRow(array(new CButton('addAgentInterface', _('Add'), null, 'link_menu'), $col));
+$buttonRow = new CRow(array($buttonCol, $col));
 $buttonRow->setAttribute('id', 'agentIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
@@ -276,9 +278,11 @@ $ifTab->addStyle('width: 71em;');
 $helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
 $helpTextWhenDragInterfaceSNMP->addStyle('display: none;');
 $helpTextWhenDragInterfaceSNMP->addClass('dragHelpText');
+$buttonCol = new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu'));
+$buttonCol->addStyle('width: 2em;');
 $col = new CCol($helpTextWhenDragInterfaceSNMP);
 $col->setAttribute('colspan', 6);
-$buttonRow = new CRow(array(new CButton('addSNMPInterface', _('Add'), null, 'link_menu'), $col));
+$buttonRow = new CRow(array($buttonCol, $col));
 $buttonRow->setAttribute('id', 'SNMPIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
@@ -291,15 +295,14 @@ $ifTab = new CTable(null, 'formElementTable');
 $ifTab->setAttribute('id', 'JMXInterfaces');
 $ifTab->setAttribute('data-type', 'jmx');
 $ifTab->addStyle('width: 71em;');
-$col = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'));
-$col->setAttribute('colspan', 5);
-
 $helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
 $helpTextWhenDragInterfaceJMX->addStyle('display: none;');
 $helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
+$buttonCol = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'));
+$buttonCol->addStyle('width: 2em;');
 $col = new CCol($helpTextWhenDragInterfaceJMX);
 $col->setAttribute('colspan', 6);
-$buttonRow = new CRow(array(new CButton('JMXIterfacesFooter', _('Add'), null, 'link_menu'), $col));
+$buttonRow = new CRow(array($buttonCol, $col));
 $buttonRow->setAttribute('id', 'JMXIterfacesFooter');
 $ifTab->addRow($buttonRow);
 
@@ -311,15 +314,14 @@ $ifTab = new CTable(null, 'formElementTable');
 $ifTab->setAttribute('id', 'IPMIInterfaces');
 $ifTab->setAttribute('data-type', 'ipmi');
 $ifTab->addStyle('width: 71em;');
-$col = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'));
-$col->setAttribute('colspan', 5);
-
 $helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
 $helpTextWhenDragInterfaceIPMI->addStyle('display: none;');
 $helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
+$buttonCol = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'));
+$buttonCol->addStyle('width: 2em;');
 $col = new CCol($helpTextWhenDragInterfaceIPMI);
 $col->setAttribute('colspan', 6);
-$buttonRow = new CRow(array(new CButton('IPMIIterfacesFooter', _('Add'), null, 'link_menu'), $col));
+$buttonRow = new CRow(array($buttonCol, $col));
 $buttonRow->setAttribute('id', 'IPMIIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
