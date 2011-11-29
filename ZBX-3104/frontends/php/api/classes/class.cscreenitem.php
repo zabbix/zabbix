@@ -571,8 +571,14 @@ class CScreenItem extends CZBXAPI {
 	 * @return array
 	 */
 	protected function buildSqlOutput(array $options, array $sqlParts, array $schema) {
+
+		// count
+		if ($options['countOutput'] !== null) {
+			$sqlParts['select'] = array('COUNT(DISTINCT si.screenitemid) AS rowscount');
+		}
 		// custom output
-		if (is_array($options['output'])) {
+		elseif (is_array($options['output'])) {
+			$sqlParts['select'] = array();
 			foreach ($options['output'] as $field) {
 				if (isset($schema['fields'][$field])) {
 					$sqlParts['select'][$field] = 'si.'.$field;
@@ -581,12 +587,7 @@ class CScreenItem extends CZBXAPI {
 		}
 		// extendex output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['screens_items'] = 'si.*';
-		}
-
-		// count
-		if ($options['countOutput'] !== null) {
-			$sqlParts['select'] = array('COUNT(DISTINCT si.screenitemid) AS rowscount');
+			$sqlParts['select'] = array('si.*');
 		}
 
 		// sort
