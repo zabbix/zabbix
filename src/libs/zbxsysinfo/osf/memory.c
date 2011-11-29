@@ -42,12 +42,12 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 	if (SYSINFO_RET_OK != VM_MEMORY_FREE(&result_tmp))
 		goto clean;
 
-	free = result->ui64;
+	free = result_tmp.ui64;
 
 	if (SYSINFO_RET_OK != VM_MEMORY_TOTAL(&result_tmp))
 		goto clean;
 
-	total = result->ui64;
+	total = result_tmp.ui64;
 
 	SET_UI64_RESULT(result, total - free);
 
@@ -69,12 +69,12 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	if (SYSINFO_RET_OK != VM_MEMORY_FREE(&result_tmp))
 		goto clean;
 
-	free = result->ui64;
+	free = result_tmp.ui64;
 
 	if (SYSINFO_RET_OK != VM_MEMORY_TOTAL(&result_tmp))
 		goto clean;
 
-	total = result->ui64;
+	total = result_tmp.ui64;
 
 	if (0 == total)
 		goto clean;
@@ -104,12 +104,12 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	if (SYSINFO_RET_OK != VM_MEMORY_FREE(&result_tmp))
 		goto clean;
 
-	free = result->ui64;
+	free = result_tmp.ui64;
 
 	if (SYSINFO_RET_OK != VM_MEMORY_TOTAL(&result_tmp))
 		goto clean;
 
-	total = result->ui64;
+	total = result_tmp.ui64;
 
 	if (0 == total)
 		goto clean;
