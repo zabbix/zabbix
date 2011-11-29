@@ -618,7 +618,7 @@ Copt::memoryPick();
 		$interfaces = zbx_toArray($interfaces);
 
 		$this->checkInput($interfaces, __FUNCTION__);
-		$this->checkMainInterfacesOnCreate();
+		$this->checkMainInterfacesOnCreate($interfaces);
 
 		$interfaceids = DB::insert('interface', $interfaces);
 
@@ -636,7 +636,7 @@ Copt::memoryPick();
 		$interfaces = zbx_toArray($interfaces);
 
 		$this->checkInput($interfaces, __FUNCTION__);
-		$this->checkMainInterfacesOnUpdate();
+		$this->checkMainInterfacesOnUpdate($interfaces);
 
 		$data = array();
 		foreach ($interfaces as $interface) {
@@ -664,7 +664,7 @@ Copt::memoryPick();
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkIfInterfacesCanBeRemoved($interfaceIds);
+		$this->checkMainInterfacesOnDelete($interfaceIds);
 
 		DB::delete('interface', array('interfaceid' => $interfaceIds));
 
@@ -721,52 +721,140 @@ Copt::memoryPick();
 	}
 
 
-	private function checkMainInterfacesOnCreate() {
+	private function checkMainInterfacesOnCreate(array $interfaces) {
+		$hostIds = array();
+		foreach ($interfaces as $interface) {
+			$hostIds[$interface['hostid']] = $interface['hostid'];
+		}
 
+		$dbInterfaces = API::HostInterface()->get(array(
+			'hostids' => $hostIds,
+			'output' => array('hostid', 'main', 'type'),
+			'preservekeys' => true,
+			'nopermissions' => true
+		));
+		$interfaces = array_merge($dbInterfaces, $interfaces);
+
+		$this->checkMainInterfaces($interfaces);
 	}
 
-	private function checkMainInterfacesOnUpdate() {
+	private function checkMainInterfacesOnUpdate(array $interfaces) {
+		$interfaceIdsWithoutHostIds = array();
+		// gather all hostids where interfaces should be checked
+		foreach ($interfaces as $interface) {
+			if (isset($interface ['type']) || isset($interface['main'])) {
+				if (isset($interface['hostid'])) {
+					$hostIds[$interface['hostid']] = $interface['hostid'];
+				}
+				else {
+					$interfaceIdsWithoutHostIds[] = $interface['interfaceid'];
+				}
+			}
+		}
 
-	}
+		// gathrer missing host ids
+		$hostIds = array();
+		if ($interfaceIdsWithoutHostIds) {
+			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interfaces i WHERE '.DBcondition('i.interfaceid', $interfaceIdsWithoutHostIds));
+			while ($hostData = DBfetch($dbResult)) {
+				$hostIds[$hostData['hostid']] = $hostData['hostid'];
+			}
+		}
 
-	private function checkIfInterfacesCanBeRemoved(array $interfaceids) {
-		$this->checkIfInterfaceHasItems($interfaceids);
-
-		$mainInterfaces = API::HostInterface()->get(array(
-			'output' => array('hostid', 'type'),
-			'interfaceids' => $interfaceids,
-			'filter' => array('main' => 1),
+		$dbInterfaces = API::HostInterface()->get(array(
+			'hostids' => $hostIds,
+			'output' => array('hostid', 'main', 'type'),
 			'preservekeys' => true,
 			'nopermissions' => true
 		));
 
-		$interfaceCountByType = array();
-
-		$sql = 'SELECT i.hostid, i.type, count(i.interfaceid) as count'.
-				' FROM interface i'.
-				' WHERE '.DBcondition('i.hostid', zbx_objectValues($mainInterfaces, 'hostid')).
-				' AND '.DBcondition('i.interfaceid', $interfaceids, true).
-				' AND i.interfaceid=0'.
-				' GROUP BY i.hostid, i.type';
-		$dbResult = DBselect($sql);
-		while ($iCount = DBfetch($dbResult)) {
-			$interfaceCountByType[$iCount['hostid']][$iCount['type']] = $iCount['count'];
+		// update interfaces from DB with data that will be updated.
+		foreach ($interfaces as $interface) {
+			if (isset($dbInterfaces[$interface['interfaceid']])) {
+				$dbInterfaces[$interface['interfaceid']] = array_merge(
+					$dbInterfaces[$interface['interfaceid']],
+					$interfaces[$interface['interfaceid']]
+				);
+			}
 		}
 
-		foreach ($mainInterfaces as $mainInterface) {
-			if(isset($interfaceCountByType[$mainInterface['hostid']])
-					&& isset($interfaceCountByType[$mainInterface['hostid']][$mainInterface['type']])
-					&& $interfaceCountByType[$mainInterface['hostid']][$mainInterface['type']] > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot remove main interface when another interfaces of the same type exist.'));
+		$this->checkMainInterfaces($dbInterfaces);
+	}
+
+	private function checkMainInterfacesOnDelete(array $interfaceids) {
+		$this->checkIfInterfaceHasItems($interfaceids);
+
+
+		$hostIds = array();
+		$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interfaces i WHERE '.DBcondition('i.interfaceid', $interfaceids));
+		while ($hostData = DBfetch($dbResult)) {
+			$hostIds[$hostData['hostid']] = $hostData['hostid'];
+		}
+
+		$dbInterfaces = API::HostInterface()->get(array(
+			'hostids' => $hostIds,
+			'output' => array('hostid', 'main', 'type'),
+			'preservekeys' => true,
+			'nopermissions' => true
+		));
+
+		foreach ($interfaceids as $interfaceid) {
+			unset($dbInterfaces[$interfaceid]);
+		}
+
+		$this->checkMainInterfaces($dbInterfaces);
+	}
+
+	/**
+	 * Check if main interfaces are correctly set for every interface type.
+	 *
+	 * @param array $interfaces
+	 */
+	private function checkMainInterfaces(array $interfaces) {
+		$interfaceTypes = array();
+		foreach ($interfaces as $interface) {
+			if (!isset($interfaceTypes[$interface['hostid']])) {
+				$interfaceTypes[$interface['hostid']] = array();
+			}
+
+			if (!isset($interfaceTypes[$interface['hostid']][$interface['type']])) {
+				$interfaceTypes[$interface['hostid']][$interface['type']] = array('main' => 0, 'all' => 0);
+			}
+
+			if ($interface['main'] == 1) {
+				$interfaceTypes[$interface['hostid']][$interface['type']]['main']++;
+			}
+			else {
+				$interfaceTypes[$interface['hostid']][$interface['type']]['all']++;
+			}
+		}
+
+		foreach ($interfaceTypes as $interfaceHostId => $interfaceType) {
+			foreach ($interfaceType as $type => $counters) {
+				if ($counters['all'] && !$counters['main']) {
+					$host = API::Host()->get(array(
+						'hostids' => $interfaceHostId,
+						'output' => array('host'),
+						'preservekeys' => true,
+						'nopermissions' => true
+					));
+
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('No main interface for "%1$s" type on host "%2$s".', hostInterfaceTypeNumToName($type), $host['host']));
+				}
+
+				if ($counters['main'] > 1) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host cannot have more than one main interfaces of the same type.'));
+				}
 			}
 		}
 	}
 
-	private function checkIfInterfaceHasItems(array $interfaceids) {
+	private function checkIfInterfaceHasItems(array $interfaceIds) {
 		$items = API::Item()->get(array(
 			'output' => array('key_'),
 			'selectHosts' => array('host'),
-			'interfaceids' => $interfaceids,
+			'interfaceids' => $interfaceIds,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'preservekeys' => true,
 			'nopermissions' => true,
@@ -779,4 +867,5 @@ Copt::memoryPick();
 		}
 	}
 }
+
 ?>

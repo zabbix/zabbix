@@ -848,7 +848,7 @@ Copt::memoryPick();
 						if ($count[$interface['hostid']] > $options['limitSelects']) continue;
 					}
 
-					$result[$interface['hostid']]['interfaces'][] = &$interfaces[$interfaceid];
+					$result[$interface['hostid']]['interfaces'][$interfaceid] = &$interfaces[$interfaceid];
 				}
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectInterfaces']) {
