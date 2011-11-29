@@ -3602,7 +3602,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 
 		$perHours = new CComboBox('new_timeperiod[period_hours]',$new_timeperiod['period_hours']);
-		for($i=0; $i < 25; $i++){
+		for($i=0; $i < 24; $i++){
 			$perHours->addItem($i,$i);
 		}
 		$perMinutes = new CComboBox('new_timeperiod[period_minutes]',$new_timeperiod['period_minutes']);
