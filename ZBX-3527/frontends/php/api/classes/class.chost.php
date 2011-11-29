@@ -1545,7 +1545,7 @@ Copt::memoryPick();
 
 		$this->checkInput($hosts, __FUNCTION__);
 
-		foreach ($hosts as $hnum => $host) {
+		foreach ($hosts as $host) {
 // INTERFACES
 			if (isset($host['interfaces']) && !is_null($host['interfaces'])) {
 				$interfacesToDelete = API::HostInterface()->get(array(
@@ -1570,11 +1570,6 @@ Copt::memoryPick();
 					}
 				}
 //----
-				if (!empty($interfacesToDelete)) {
-					$result = API::HostInterface()->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
-					if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
-				}
-
 				if (!empty($interfacesToUpdate)) {
 					$result = API::HostInterface()->update($interfacesToUpdate);
 					if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
@@ -1582,6 +1577,11 @@ Copt::memoryPick();
 
 				if (!empty($interfacesToAdd)) {
 					$result = API::HostInterface()->create($interfacesToAdd);
+					if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
+				}
+
+				if (!empty($interfacesToDelete)) {
+					$result = API::HostInterface()->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
 					if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 				}
 			}

@@ -464,17 +464,18 @@ Copt::memoryPick();
 				'ip' => null,
 				'dns' => null,
 				'useip' => null,
-				'port' => null
+				'port' => null,
+				'main' => null
 			);
 			$dbHosts = API::Host()->get(array(
-				'output' => array('host', 'status'),
+				'output' => API_OUTPUT_SHORTEN,
 				'hostids' => zbx_objectValues($interfaces, 'hostid'),
 				'editable' => true,
 				'preservekeys' => true
 			));
 
 			$dbProxies = API::Proxy()->get(array(
-				'output' => array('host', 'status'),
+				'output' => API_OUTPUT_SHORTEN,
 				'proxyids' => zbx_objectValues($interfaces, 'hostid'),
 				'editable' => true,
 				'preservekeys' => true
@@ -530,8 +531,8 @@ Copt::memoryPick();
 				$dbHosts = API::Host()->get(array(
 					'output' => array('host'),
 					'hostids' => $interface['hostid'],
-					'nopermissions' => 1,
-					'preservekeys' => 1
+					'nopermissions' => true,
+					'preservekeys' => true
 				));
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on host "%2$s".', $interface['ip'], $dbHosts[$interface['hostid']]['host']));
 			}
@@ -607,7 +608,7 @@ Copt::memoryPick();
 	}
 
 	/**
-	 * Add Interface.
+	 * Add interfaces.
 	 *
 	 * @param array $interfaces multidimensional array with Interfaces data
 	 *
@@ -617,8 +618,7 @@ Copt::memoryPick();
 		$interfaces = zbx_toArray($interfaces);
 
 		$this->checkInput($interfaces, __FUNCTION__);
-		$this->checkMainInterfaces();
-
+		$this->checkMainInterfacesOnCreate();
 
 		$interfaceids = DB::insert('interface', $interfaces);
 
@@ -626,7 +626,7 @@ Copt::memoryPick();
 	}
 
 	/**
-	 * Update Interface.
+	 * Update interfaces.
 	 *
 	 * @param array $interfaces multidimensional array with Interfaces data
 	 *
@@ -636,6 +636,7 @@ Copt::memoryPick();
 		$interfaces = zbx_toArray($interfaces);
 
 		$this->checkInput($interfaces, __FUNCTION__);
+		$this->checkMainInterfacesOnUpdate();
 
 		$data = array();
 		foreach ($interfaces as $interface) {
@@ -720,11 +721,45 @@ Copt::memoryPick();
 	}
 
 
+	private function checkMainInterfacesOnCreate() {
+
+	}
+
+	private function checkMainInterfacesOnUpdate() {
+
+	}
+
 	private function checkIfInterfacesCanBeRemoved(array $interfaceids) {
 		$this->checkIfInterfaceHasItems($interfaceids);
-		$this->checkIfInterfaceIs($interfaceids);
 
+		$mainInterfaces = API::HostInterface()->get(array(
+			'output' => array('hostid', 'type'),
+			'interfaceids' => $interfaceids,
+			'filter' => array('main' => 1),
+			'preservekeys' => true,
+			'nopermissions' => true
+		));
 
+		$interfaceCountByType = array();
+
+		$sql = 'SELECT i.hostid, i.type, count(i.interfaceid) as count'.
+				' FROM interface i'.
+				' WHERE '.DBcondition('i.hostid', zbx_objectValues($mainInterfaces, 'hostid')).
+				' AND '.DBcondition('i.interfaceid', $interfaceids, true).
+				' AND i.interfaceid=0'.
+				' GROUP BY i.hostid, i.type';
+		$dbResult = DBselect($sql);
+		while ($iCount = DBfetch($dbResult)) {
+			$interfaceCountByType[$iCount['hostid']][$iCount['type']] = $iCount['count'];
+		}
+
+		foreach ($mainInterfaces as $mainInterface) {
+			if(isset($interfaceCountByType[$mainInterface['hostid']])
+					&& isset($interfaceCountByType[$mainInterface['hostid']][$mainInterface['type']])
+					&& $interfaceCountByType[$mainInterface['hostid']][$mainInterface['type']] > 1) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot remove main interface when another interfaces of the same type exist.'));
+			}
+		}
 	}
 
 	private function checkIfInterfaceHasItems(array $interfaceids) {
@@ -740,29 +775,8 @@ Copt::memoryPick();
 
 		foreach ($items as $item) {
 			$host = reset($item['hosts']);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%s"', $host['host'].':'.$item['key_']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%1$s:%2$s"', $host['host'], $item['key_']));
 		}
 	}
-
-//	private function check(array $interfaceids) {
-//		$mainInterfaces = API::HostInterface()->get(array(
-//			'output' => array('hostid', 'type'),
-//			'interfaceids' => $interfaceids,
-//			'filter' => array('main' => 1),
-//			'preservekeys' => true,
-//			'nopermissions' => true
-//		));
-//
-//		$sql = 'SELECT i.hostid, i.type, count(i.interfaceid)'.
-//				'FROM '
-//				'WHERE '.
-//				'GROUP BY i.hostid, i.type';
-//
-//		DBselect()
-//		foreach ($items as $item) {
-//			$host = reset($item['hosts']);
-//			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%s"', $host['host'].':'.$item['key_']));
-//		}
-//	}
 }
 ?>
