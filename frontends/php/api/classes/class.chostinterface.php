@@ -20,12 +20,11 @@
 ?>
 <?php
 /**
- * File containing CInterface class for API.
  * @package API
  */
 
 /**
- * Class containing methods for operations with Interfaces.
+ * Class containing methods for operations with host iterfaces.
  */
 class CHostInterface extends CZBXAPI{
 
@@ -45,8 +44,7 @@ class CHostInterface extends CZBXAPI{
 	 * @param string $options['sortorder'] sort order
 	 * @return array|boolean Interface data as array or false if error
 	 */
-	public function get($options=array()){
-
+	public function get(array $options=array()){
 		$result = array();
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
@@ -423,10 +421,11 @@ Copt::memoryPick();
 	}
 
 	/**
-	 * @param $object
+	 * @param array $object
+	 *
 	 * @return bool
 	 */
-	public function exists($object) {
+	public function exists(array $object) {
 		$keyFields = array(
 			'interfaceid',
 			'hostid',
@@ -454,10 +453,10 @@ Copt::memoryPick();
 	}
 
 	/**
-	 * @param $interfaces
-	 * @param $method
+	 * @param array  $interfaces
+	 * @param string $method
 	 */
-	protected function checkInput(&$interfaces, $method) {
+	protected function checkInput(array &$interfaces, $method) {
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
@@ -641,13 +640,13 @@ Copt::memoryPick();
 	}
 
 	/**
-	 * Add Interface
+	 * Add Interface.
 	 *
 	 * @param array $interfaces multidimensional array with Interfaces data
 	 *
 	 * @return array
 	 */
-	public function create($interfaces) {
+	public function create(array $interfaces) {
 		$interfaces = zbx_toArray($interfaces);
 
 		$this->checkInput($interfaces, __FUNCTION__);
@@ -658,13 +657,13 @@ Copt::memoryPick();
 	}
 
 	/**
-	 * Update Interface
+	 * Update Interface.
 	 *
 	 * @param array $interfaces multidimensional array with Interfaces data
 	 *
 	 * @return array
 	 */
-	public function update($interfaces) {
+	public function update(array $interfaces) {
 		$interfaces = zbx_toArray($interfaces);
 
 		$this->checkInput($interfaces, __FUNCTION__);
@@ -683,28 +682,23 @@ Copt::memoryPick();
 
 	/**
 	 * Delete interfaces.
+	 * Interface cannot be deleted if it's main interface and exists other interface of same type on same host.
+	 * Interface cannot be deleted if it is used in items.
 	 *
-	 * @param $interfaceids
+	 * @param array $interfaceIds
 	 *
 	 * @return array
 	 */
-	public function delete($interfaceids) {
-
-		if (empty($interfaceids)) {
+	public function delete(array $interfaceIds) {
+		if (empty($interfaceIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$interfaceids = zbx_toArray($interfaceids);
-		$interfaces = zbx_toObject($interfaceids, 'interfaceid');
+		$this->checkIfInterfacesCanBeRemoved($interfaceIds);
 
-		$this->checkInput($interfaces, __FUNCTION__);
+		DB::delete('interface', array('interfaceid' => $interfaceIds));
 
-		DB::delete('interface', array('interfaceid' => $interfaceids));
-
-		// auto seting main interfaces
-		$this->setMainInterfaces($interfaces);
-
-		return array('interfaceids' => $interfaceids);
+		return array('interfaceids' => $interfaceIds);
 	}
 
 	public function massAdd($data) {
@@ -754,6 +748,12 @@ Copt::memoryPick();
 		}
 
 		return array('interfaceids' => $interfaceids);
+	}
+
+
+	private function checkIfInterfacesCanBeRemoved(array $interfaceids) {
+
+
 	}
 }
 ?>
