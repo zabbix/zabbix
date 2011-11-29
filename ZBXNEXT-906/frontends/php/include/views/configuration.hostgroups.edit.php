@@ -69,25 +69,17 @@ if (empty($this->data['groupid'])) {
 	));
 }
 else {
+	$deleteButton = new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'));
 	if (empty($this->data['deletableHostGroups'])) {
-		$hostgroupForm->addItem(makeFormFooter(
-			array(new CSubmit('save', _('Save'))),
-			array(
-				new CSubmit('clone', _('Clone')),
-				new CButtonCancel()
-			)
-		));
+		$deleteButton->setAttribute('disabled', 'disabled');
 	}
-	else {
-		$hostgroupForm->addItem(makeFormFooter(
-			array(new CSubmit('save', _('Save'))),
-			array(
-				new CSubmit('clone', _('Clone')),
-				new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid')),
-				new CButtonCancel()
-			)
-		));
-	}
+	$hostgroupForm->addItem(makeFormFooter(
+		array(new CSubmit('save', _('Save'))),
+		array(
+			new CSubmit('clone', _('Clone')),
+			$deleteButton,
+			new CButtonCancel())
+	));
 }
 
 $hostgroupWidget->addItem($hostgroupForm);
