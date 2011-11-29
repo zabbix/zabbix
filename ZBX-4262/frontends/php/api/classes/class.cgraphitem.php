@@ -53,10 +53,10 @@ class CGraphItem extends CZBXAPI {
 		);
 
 		$def_options = array(
-			'nodeids' 		=> null,
-			'graphids' 		=> null,
-			'itemids' 		=> null,
-			'type' 			=> null,
+			'nodeids'		=> null,
+			'graphids'		=> null,
+			'itemids'		=> null,
+			'type'			=> null,
 			'editable'		=> null,
 			'nopermissions'	=> null,
 			// output
@@ -87,7 +87,7 @@ class CGraphItem extends CZBXAPI {
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
 			$sql_parts['where'][] = 'ug.userid='.$userid;
 			$sql_parts['where'][] = 'r.permission>='.$permission;
-			$sql_parts['where'][] = 'NOT EXISTS('.
+			$sql_parts['where'][] = 'NOT EXISTS ('.
 										' SELECT hgg.groupid'.
 										' FROM hosts_groups hgg,rights rr,users_groups ugg'.
 										' WHERE i.hostid=hgg.hostid'.
