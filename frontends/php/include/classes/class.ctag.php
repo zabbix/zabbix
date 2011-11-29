@@ -186,5 +186,16 @@ class CTag extends CObject{
 		error('class('.get_class($this).') - '.$value);
 		return 1;
 	}
+
+
+	/**
+	 * Sanitezes a string before outputting it to the browser.
+	 *
+	 * @param string $str
+	 * @return string
+	 */
+	protected function sanitize($value) {
+		return htmlspecialchars($value);
+	}
 }
 ?>
