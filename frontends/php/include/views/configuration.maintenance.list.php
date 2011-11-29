@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -46,7 +46,7 @@ $maintenanceTable->setHeader(array(
 	new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');"),
 	make_sorting_header(_('Name'), 'name'),
 	make_sorting_header(_('Type'), 'maintenance_type'),
-	make_sorting_header(_('State'), 'status'),
+	_('State'),
 	_('Description')
 ));
 

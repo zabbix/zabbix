@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -29,7 +29,7 @@ $page['file'] = 'acknow.php';
 $page['hist_arg'] = array('eventid');
 
 ob_start();
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 ?>
 <?php
 $_REQUEST['go'] = get_request('go', null);
@@ -73,7 +73,7 @@ if (isset($_REQUEST['cancel'])) {
 
 if (!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQUEST['triggers'])) {
 	show_message(_('No events to acknowledge'));
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 }
 
 $bulk = !isset($_REQUEST['eventid']);
@@ -213,5 +213,5 @@ $bulk ? '' : $frmMsg->addItemToBottomRow(new CSubmit('save', $btn_txt));
 $frmMsg->addItemToBottomRow(new CButtonCancel(url_param('backurl').url_param('eventid').url_param('triggerid').url_param('screenid')));
 $frmMsg->show(false);
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -66,7 +66,7 @@
 	$iconMappingComboBox->addItem(0, _('<manual>'));
 	$iconMaps = API::IconMap()->get(array(
 		'output' => array('iconmapid', 'name'),
-		'preservekeys' => true,
+		'preservekeys' => true
 	));
 	order_result($iconMaps, 'name');
 	foreach ($iconMaps as $iconMap) {

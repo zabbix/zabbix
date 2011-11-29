@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -64,9 +64,10 @@ require_once(dirname(__FILE__).'/testFormScreen.php');
 require_once(dirname(__FILE__).'/testFormScript.php');
 require_once(dirname(__FILE__).'/testFormSysmap.php');
 require_once(dirname(__FILE__).'/testFormTemplate.php');
+require_once(dirname(__FILE__).'/testPageApplications.php');
 
-class SeleniumTests{
-	public static function suite(){
+class SeleniumTests {
+	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
@@ -113,6 +114,7 @@ class SeleniumTests{
 		$suite->addTestSuite('testFormScript');
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormTemplate');
+		$suite->addTestSuite('testPageApplications');
 
 		return $suite;
 	}

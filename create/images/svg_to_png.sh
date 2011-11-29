@@ -64,7 +64,7 @@ for svgfile in $elementdir/*.svg; do
 	svgfilemod=$(stat -c "%Y" "$svgfile")
 	for size in 24 48 64 96 128; do
 		# rackmountable device icons don't make much sense below size 64
-		[[ "$svgfile" =~ Rackmountable_.* || "$svgfile" =~ Zabbix_server_.* ]] && [ "$size" -lt "64" ] && continue
+		[[ "$svgfile" =~ Rackmountable_.* || "$svgfile" =~ Zabbix_server_.* || "$svgfile" =~ UPS_rackmountable.* ]] && [ "$size" -lt "64" ] && continue
 		svgtopng "$svgfile" "$size"
 	done
 	echo "[$[$elementfilesdone*100/$svgelementcount]%]"
@@ -72,7 +72,7 @@ done
 
 # rack images for now are converted with a fixed ratio
 
-rackimages=([64]=66 [96]=99 [128]=132)
+rackimages=([64]=68 [96]=101 [128]=134)
 
 echo -n "Converting Rack_42.svg"
 for rackimagesize in "${!rackimages[@]}"; do
@@ -80,7 +80,7 @@ for rackimagesize in "${!rackimages[@]}"; do
 done
 echo
 
-rackwithdoorimages=([64]=98 [96]=147 [128]=197)
+rackwithdoorimages=([64]=100 [96]=149 [128]=199)
 
 echo -n "Converting Rack_42_with_door.svg"
 for rackwithdoorimagesize in "${!rackwithdoorimages[@]}"; do

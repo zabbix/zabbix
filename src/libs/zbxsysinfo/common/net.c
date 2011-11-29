@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 #include "common.h"
@@ -428,7 +428,7 @@ static int	dns_query(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		_res.nsaddr_list[0].sin_addr = inaddr;
 		_res.nsaddr_list[0].sin_family = AF_INET;
-		_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);
+		_res.nsaddr_list[0].sin_port = htons(ZBX_DEFAULT_DNS_PORT);
 		_res.nscount = 1;
 	}
 

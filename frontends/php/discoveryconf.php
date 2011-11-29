@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 ?>
 <?php
@@ -29,7 +29,7 @@ $page['hist_arg'] = array();
 $page['scripts'] = array();
 $page['type'] = detect_page_type();
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 ?>
 <?php
@@ -61,7 +61,7 @@ $fields=array(
 );
 
 check_fields($fields);
-validate_sort_and_sortorder('d.name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['dchecks'] = get_request('dchecks', array());
@@ -220,7 +220,7 @@ if(isset($_REQUEST['form'])){
 		$drule['proxy_hostid'] = get_request('proxy_hostid', 0);
 		$drule['name'] = get_request('name', '');
 		$drule['iprange'] = get_request('iprange', '192.168.0.1-255');
-		$drule['delay'] = get_request('delay', 3600);
+		$drule['delay'] = get_request('delay', SEC_PER_HOUR);
 		$drule['status'] = get_request('status', DRULE_STATUS_ACTIVE);
 
 		$drule['dchecks'] = get_request('dchecks', array());
@@ -242,23 +242,25 @@ else{
 
 	$tblDiscovery = new CTableInfo(_('No discovery rules defined'));
 	$tblDiscovery->setHeader(array(
-		new CCheckBox('all_drules',null,"checkAll('".$form->GetName()."','all_drules','g_druleid');"),
-		make_sorting_header(_('Name'), 'd.name'),
-		make_sorting_header(_('IP range'), 'd.iprange'),
-		make_sorting_header(_('Delay'), 'd.delay'),
+		new CCheckBox('all_drules',null,"checkAll('".$form->getName()."','all_drules','g_druleid');"),
+		make_sorting_header(_('Name'), 'name'),
+		_('IP range'),
+		_('Delay'),
 		_('Checks'),
 		_('Status')
 	));
 
-
+	$sortfield = getPageSortField('name');
+	$sortorder = getPageSortOrder();
 	$drules = API::DRule()->get(array(
 		'output' => API_OUTPUT_EXTEND,
+		'sortfield' => $sortfield,
+		'sortorder' => $sortorder,
 		'selectDChecks' => API_OUTPUT_EXTEND,
 		'editable' => true
 	));
-	order_result($drules, 'name');
 
-// getting paging element
+	// getting paging element
 	$paging = getPagingLine($drules);
 
 	foreach($drules as $rule_data){
@@ -321,6 +323,6 @@ $dscry_wdgt->show();
 ?>
 <?php
 
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 
 ?>

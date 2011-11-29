@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 require_once('include/config.inc.php');
@@ -27,7 +27,7 @@ $page['hist_arg'] = array();
 $page['scripts'] = array('class.pmaster.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once('include/page_header.php');
+require_once('include/page_header.php');
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -211,7 +211,7 @@ if (isset($_REQUEST['favobj'])) {
 }
 
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	include_once('include/page_footer.php');
+	require_once('include/page_footer.php');
 	exit();
 }
 
@@ -314,7 +314,7 @@ $rightColumn[] = $hoststat;
 // last issues
 $refresh_menu = get_icon('menu', array('menu' => 'hat_lastiss'));
 $lastiss = new CUIWidget('hat_lastiss', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_lastiss.state', 1));
-$lastiss->setHeader(_('Last 20 issues'), array($refresh_menu));
+$lastiss->setHeader(_s('Last %d issues', DEFAULT_LATEST_ISSUES_CNT), array($refresh_menu));
 $lastiss->setFooter(new CDiv(SPACE, 'textwhite', 'hat_lastiss_footer'));
 $rightColumn[] = $lastiss;
 
@@ -343,9 +343,6 @@ $dashboardTable->addRow(array(new CDiv($leftColumn, 'column'), new CDiv($rightCo
 
 $dashboardWidget->addItem($dashboardTable);
 $dashboardWidget->show();
-
-$jsmenu = new CPUMenu(null, 170);
-$jsmenu->insertJavaScript();
 
 // activating blinking
 zbx_add_post_js('jqBlink.init();');
@@ -378,5 +375,5 @@ zbx_add_post_js('jqBlink.init();');
 	//]]> -->
 </script>
 <?php
-include_once('include/page_footer.php');
+require_once('include/page_footer.php');
 ?>

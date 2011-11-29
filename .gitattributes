@@ -1,5 +1,4 @@
 * text=auto !eol
-/CREDITS -text
 bin/win32/zabbix_agentd.exe -text
 bin/win32/zabbix_get.exe -text
 bin/win32/zabbix_sender.exe -text
@@ -234,6 +233,7 @@ create/images/png/Zabbix_server_3D[!!-~](128).png -text svneol=unset#image/png
 create/images/png/Zabbix_server_3D[!!-~](64).png -text svneol=unset#image/png
 create/images/png/Zabbix_server_3D[!!-~](96).png -text svneol=unset#image/png
 create/images/png_to_sql.sh svneol=native#text/x-sh
+create/images/png_to_xml.sh svneol=native#text/x-sh
 create/images/source/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
 create/images/source/elements/Crypto-router.svg -text svneol=native#image/svg%2Bxml
 create/images/source/elements/Crypto-router_symbol.svg -text svneol=native#image/svg%2Bxml
@@ -287,7 +287,6 @@ frontends/php/audio/alarm_information.wav -text
 frontends/php/audio/alarm_ok.wav -text
 frontends/php/audio/alarm_warning.wav -text
 frontends/php/audio/no_sound.wav -text
-frontends/php/browserwarning.php -text
 frontends/php/fonts/DejaVuSans.ttf -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrowdown.gif -text
@@ -440,34 +439,17 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/class.frontendsetup.php -text
-frontends/php/include/classes/class.globalregexp.php -text
-frontends/php/include/views/administration.authentication.edit.php -text
-frontends/php/include/views/administration.general.gui.edit.php -text
-frontends/php/include/views/administration.general.housekeeper.edit.php -text
-frontends/php/include/views/administration.general.image.edit.php -text
-frontends/php/include/views/administration.general.image.list.php -text
-frontends/php/include/views/administration.general.macros.edit.php -text
-frontends/php/include/views/administration.general.other.edit.php -text
-frontends/php/include/views/administration.general.regularexpressions.edit.php -text
-frontends/php/include/views/administration.general.regularexpressions.list.php -text
-frontends/php/include/views/administration.general.valuemapping.edit.php -text
-frontends/php/include/views/administration.general.valuemapping.list.php -text
-frontends/php/include/views/administration.general.workingtime.edit.php -text
-frontends/php/include/views/administration.mediatypes.edit.php -text
-frontends/php/include/views/administration.mediatypes.list.php -text
-frontends/php/include/views/administration.usergroups.edit.php -text
-frontends/php/include/views/administration.usergroups.list.php -text
-frontends/php/include/views/administration.users.edit.php -text
-frontends/php/include/views/administration.users.list.php -text
-frontends/php/include/views/configuration.maintenance.edit.php -text
-frontends/php/include/views/configuration.maintenance.list.php -text
-frontends/php/include/views/general.browserwarning.php -text
-frontends/php/include/views/js/administration.general.macros.js.php -text
-frontends/php/include/views/js/administration.users.edit.js.php -text
+frontends/php/include/views/configuration.application.edit.php -text
+frontends/php/include/views/configuration.application.list.php -text
+frontends/php/include/views/configuration.services.child.list.php -text
+frontends/php/include/views/configuration.services.edit.php -text
+frontends/php/include/views/configuration.services.list.php -text
+frontends/php/include/views/configuration.services.parent.list.php -text
+frontends/php/include/views/js/configuration.services.edit.js.php -text
 frontends/php/js/browsers.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
+frontends/php/locale/el/LC_MESSAGES/frontend.po -text
 frontends/php/locale/es/LC_MESSAGES/frontend.po -text
 frontends/php/locale/fr/LC_MESSAGES/frontend.po -text
 frontends/php/locale/hu/LC_MESSAGES/frontend.po -text
@@ -524,11 +506,8 @@ frontends/php/styles/originalblue/images/ui-icons_469bdd_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_5481ab_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
-frontends/php/tests/agent.php -text
-frontends/php/tests/agent/AgentTests.php -text
-frontends/php/tests/agent/testMetrics.php -text
 frontends/php/tests/bootstrap.php.template -text
-frontends/php/tests/frontend.php -text
+frontends/php/tests/selenium/testPageApplications.php -text
 include/telnet.h -text
 m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text

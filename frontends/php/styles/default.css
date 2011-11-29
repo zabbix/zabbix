@@ -14,7 +14,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 root { display: block; }
 body {
@@ -36,8 +36,8 @@ ul { margin-left: 0; padding-left: 1em; }
 form { margin: 0 }
 
 /**************** MEDIA *****************/
-@media print { .printless { visibility: hidden; display: none; } .printonly{ display: block; visibility:visible; } }
-@media screen { .printless { visibility:visible; display:block; } .printonly{ visibility: hidden; display:none; } }
+@media print { .printless { visibility: hidden; display: none; } .printonly { display: block; visibility:visible; } }
+@media screen { .printless { visibility:visible; display:block; } .printonly { visibility: hidden; display:none; } }
 
 /**************** OTHERS ****************/
 .hidden { display: none; }
@@ -139,14 +139,19 @@ form .thin .input { height: 14px; }
 .input {
 	font-size: 10px;
 	font-family: Verdana, arial, helvetica, sans-serif;
-	border: 1px solid gray;
+	border: 1px solid #ACA899;
 	background-color: white;
 	margin: 0 1px;
 }
 .input:focus { border-color: #6e8ab4; }
 .input:hover { border-color: #6e8ab4; }
 .input[readonly] { border-color: #D0D0D0; background-color: #EEEEEE; }
-.input[disabled] { color: gray; cursor: default; }
+.input[disabled] { color: #ACA899; cursor: default; }
+.input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
+.input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
+
+input.formlist { padding-top: 2px; padding-bottom: 2px; }
+input[type="button"] { cursor: pointer; }
 
 div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #FFAA33; }
 div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #DD7711; }
@@ -582,8 +587,8 @@ table.filter_config { width: 100%; background-color: #FFFFFF; border-collapse: c
 table.filter_config tr td { white-space: nowrap; line-height: 20px; height: 26px; vertical-align: bottom; text-align: center; border: 1px dotted silver; padding-left: 6px; padding-right: 4px; }
 
 /********** <INVISIBLE> ************/
-.invisible { border: 0; margin: 0; padding: 0; }
-.invisible tr td { border: 0; margin: 0; padding: 0; }
+table.invisible { border: 0px; margin: 0px; padding: 0px; }
+table.invisible tr > td { border: 0px; margin: 0px; padding: 0px; }
 
 /********** <PAGING> ************/
 table.paging { width: 100%; padding: 2px; }
