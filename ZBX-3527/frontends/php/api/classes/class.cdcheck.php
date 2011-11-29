@@ -26,23 +26,26 @@
 /**
  * Class containing methods for operations with Discovery checks for discovery rules
  */
-class CDCheck extends CZBXAPI{
-	public function get($options){
-
+class CDCheck extends CZBXAPI {
+	public function get($options) {
 		$result = array();
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
 
-		$sort_columns = array('dcheckid', 'druleid'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('dcheckid', 'druleid');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sql_parts = array(
-			'select' => array('dchecks' => 'dc.dcheckid'),
-			'from' => array('dchecks' => 'dchecks dc'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null);
+			'select'	=> array('dchecks' => 'dc.dcheckid'),
+			'from'		=> array('dchecks' => 'dchecks dc'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
+		);
 
 		$def_options = array(
 			'nodeids'					=> null,
@@ -52,15 +55,14 @@ class CDCheck extends CZBXAPI{
 			'dserviceids'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
-// filter
+			// filter
 			'filter'					=> null,
 			'search'					=> null,
-			'searchByAny'			=> null,
+			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
-
-// OutPut
+			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectDRules'				=> null,
 			'selectDHosts'				=> null,
@@ -68,24 +70,22 @@ class CDCheck extends CZBXAPI{
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
-
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
-		if(is_array($options['output'])){
+		if (is_array($options['output'])) {
 			unset($sql_parts['select']['dchecks']);
 
 			$dbTable = DB::getSchema('dchecks');
-			foreach($options['output'] as $key => $field){
-				if(isset($dbTable['fields'][$field]))
+			foreach ($options['output'] as $field) {
+				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'dc.'.$field;
+				}
 			}
-
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
@@ -204,18 +204,8 @@ class CDCheck extends CZBXAPI{
 			zbx_db_search('dchecks dc', $options, $sql_parts);
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][$options['sortfield']] = 'dc.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('dc.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('dc.*', $sql_parts['select'])){
-				$sql_parts['select'][$options['sortfield']] = 'dc.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'dc');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){

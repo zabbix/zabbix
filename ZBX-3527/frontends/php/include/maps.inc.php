@@ -962,7 +962,7 @@ function getSelementsInfo($sysmap) {
 		$iconMap = API::IconMap()->get(array(
 			'sysmapids' => $sysmap['sysmapid'],
 			'selectMappings' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
 		));
 		$iconMap = reset($iconMap);
 		$hostsToGetProfiles = array();

@@ -26,41 +26,44 @@
 /**
  * Class containing methods for operations with host iterfaces.
  */
-class CHostInterface extends CZBXAPI{
+class CHostInterface extends CZBXAPI {
 
 	/**
 	 * Get Interface Interface data
 	 *
-	 * @param array $options
-	 * @param array $options['nodeids'] Node IDs
-	 * @param array $options['hostids'] Interface IDs
-	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
+	 * @param array   $options
+	 * @param array   $options['nodeids']     Node IDs
+	 * @param array   $options['hostids']     Interface IDs
+	 * @param boolean $options['editable']    only with read-write permission. Ignored for SuperAdmins
 	 * @param boolean $options['selectHosts'] select Interface hosts
 	 * @param boolean $options['selectItems'] select Items
-	 * @param int $options['count'] count Interfaces, returned column name is rowscount
-	 * @param string $options['pattern'] search hosts by pattern in Interface name
-	 * @param int $options['limit'] limit selection
-	 * @param string $options['sortfield'] field to sort by
-	 * @param string $options['sortorder'] sort order
+	 * @param int	  $options['count']       count Interfaces, returned column name is rowscount
+	 * @param string  $options['pattern']     search hosts by pattern in Interface name
+	 * @param int	  $options['limit']       limit selection
+	 * @param string  $options['sortfield']   field to sort by
+	 * @param string  $options['sortorder']   sort order
+	 *
 	 * @return array|boolean Interface data as array or false if error
 	 */
-	public function get(array $options=array()){
+	public function get(array $options=array()) {
 		$result = array();
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('interfaceid', 'dns', 'ip'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('interfaceid', 'dns', 'ip');
 
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sql_parts = array(
-			'select' => array('interface' => 'hi.interfaceid'),
-			'from' => array('interface' => 'interface hi'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('interface' => 'hi.interfaceid'),
+			'from'		=> array('interface' => 'interface hi'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
@@ -72,41 +75,37 @@ class CHostInterface extends CZBXAPI{
 			'triggerids'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
-
-// filter
+			// filter
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
-
-// OutPut
+			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectHosts'				=> null,
 			'selectItems'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
-
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
-		if(is_array($options['output'])){
+		if (is_array($options['output'])) {
 			unset($sql_parts['select']['interface']);
 
 			$dbTable = DB::getSchema('interface');
 			$sql_parts['select']['interfaceid'] = 'hi.interfaceid';
-			foreach($options['output'] as $key => $field){
-				if(isset($dbTable['fields'][$field]))
+			foreach ($options['output'] as $field) {
+				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'hi.'.$field;
+				}
 			}
-
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
@@ -233,18 +232,8 @@ class CHostInterface extends CZBXAPI{
 			zbx_db_filter('interface hi', $options, $sql_parts);
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][$options['sortfield']] = 'hi.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('hi.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('hi.*', $sql_parts['select'])){
-				$sql_parts['select'][$options['sortfield']] = 'hi.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'hi');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
@@ -457,12 +446,10 @@ Copt::memoryPick();
 	 * @param string $method
 	 */
 	protected function checkInput(array &$interfaces, $method) {
-		$create = ($method == 'create');
 		$update = ($method == 'update');
-		$delete = ($method == 'delete');
 
 		// permissions
-		if ($update || $delete) {
+		if ($update) {
 			$interfaceDBfields = array('interfaceid' => null);
 			$dbInterfaces = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
@@ -499,7 +486,7 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
 			}
 
-			if ($update || $delete) {
+			if ($update) {
 				if (!isset($dbInterfaces[$interface['interfaceid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
@@ -510,10 +497,6 @@ Copt::memoryPick();
 				}
 
 				$interface['hostid'] = $dbInterface['hostid'];
-
-				if ($delete) {
-					continue;
-				}
 
 				// we check all fields on "updated" interface
 				$updInterface = $interface;
@@ -578,22 +561,6 @@ Copt::memoryPick();
 			}
 		}
 		unset($interface);
-
-		if ($delete) {
-			$items = API::Item()->get(array(
-				'output' => array('key_'),
-				'selectHosts' => array('host'),
-				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
-				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
-				'preservekeys' => 1,
-				'nopermissions' => 1
-			));
-
-			foreach ($items as $item) {
-				$host = reset($item['hosts']);
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%s"', $host['host'].':'.$item['key_']));
-			}
-		}
 	}
 
 	protected function setMainInterfaces($interfaces) {
@@ -650,6 +617,8 @@ Copt::memoryPick();
 		$interfaces = zbx_toArray($interfaces);
 
 		$this->checkInput($interfaces, __FUNCTION__);
+		$this->checkMainInterfaces();
+
 
 		$interfaceids = DB::insert('interface', $interfaces);
 
@@ -701,7 +670,7 @@ Copt::memoryPick();
 		return array('interfaceids' => $interfaceIds);
 	}
 
-	public function massAdd($data) {
+	public function massAdd(array $data) {
 		$interfaces = zbx_toArray($data['interfaces']);
 		$hosts = zbx_toArray($data['hosts']);
 
@@ -730,7 +699,7 @@ Copt::memoryPick();
 	 *
 	 * @return boolean
 	 */
-	public function massRemove($data) {
+	public function massRemove(array $data) {
 		$interfaces = zbx_toArray($data['interfaces']);
 		$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
 
@@ -752,8 +721,48 @@ Copt::memoryPick();
 
 
 	private function checkIfInterfacesCanBeRemoved(array $interfaceids) {
+		$this->checkIfInterfaceHasItems($interfaceids);
+		$this->checkIfInterfaceIs($interfaceids);
 
 
 	}
+
+	private function checkIfInterfaceHasItems(array $interfaceids) {
+		$items = API::Item()->get(array(
+			'output' => array('key_'),
+			'selectHosts' => array('host'),
+			'interfaceids' => $interfaceids,
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
+			'preservekeys' => true,
+			'nopermissions' => true,
+			'limit' => 1
+		));
+
+		foreach ($items as $item) {
+			$host = reset($item['hosts']);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%s"', $host['host'].':'.$item['key_']));
+		}
+	}
+
+//	private function check(array $interfaceids) {
+//		$mainInterfaces = API::HostInterface()->get(array(
+//			'output' => array('hostid', 'type'),
+//			'interfaceids' => $interfaceids,
+//			'filter' => array('main' => 1),
+//			'preservekeys' => true,
+//			'nopermissions' => true
+//		));
+//
+//		$sql = 'SELECT i.hostid, i.type, count(i.interfaceid)'.
+//				'FROM '
+//				'WHERE '.
+//				'GROUP BY i.hostid, i.type';
+//
+//		DBselect()
+//		foreach ($items as $item) {
+//			$host = reset($item['hosts']);
+//			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%s"', $host['host'].':'.$item['key_']));
+//		}
+//	}
 }
 ?>
