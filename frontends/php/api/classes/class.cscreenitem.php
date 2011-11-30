@@ -632,7 +632,7 @@ class CScreenItem extends CZBXAPI {
 		}
 
 		// if no specific ids are given, apply the node filter
-		if ($options['screenitemids'] === null && $options['screenids'] !== null) {
+		if ($options['screenitemids'] === null && $options['screenids'] === null) {
 			$nodeids = ($options['nodeids'] !== null) ? $options['nodeids'] : get_current_nodeid();
 			$sqlParts['where'][] = DBin_node($this->fieldId('screenitemid'), $nodeids);
 		}
