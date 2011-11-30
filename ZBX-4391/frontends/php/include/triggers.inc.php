@@ -3880,13 +3880,9 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 		$result = false;
 
 		$evStr = str_replace(array_keys($rplcts), array_values($rplcts), $expression);
-
-preg_match_all("/([0-9\.]{1,})([K|M|G]{0,1})/i",$evStr,$arr);
-$evStr=str_replace(array($arr[0][0],$arr[0][1]),array(convert($arr[0][0]),convert($arr[0][1])),$evStr);
-
-
-
-		if(!preg_match("/^[0-9.\s=!()><+*\/&|\-]+$/is", $evStr)) return 'FALSE';
+		preg_match_all("/([0-9\.]+)[K|M|G|T|h|m|d|w]?/", $evStr, $arr);
+		$evStr = str_replace(array($arr[0][0], $arr[0][1]), array(convert($arr[0][0]), convert($arr[0][1])), $evStr);
+		if (!preg_match("/^[0-9.\s=!()><+*\/&|\-]+$/is", $evStr)) return 'FALSE';
 
 		if($oct)
 			$evStr = preg_replace('/([0-9]+)(\=|\#|\!=|\<|\>)([0-9]+)/','((float)ltrim("$1","0") $2 (float)ltrim("$3","0"))', $evStr);
