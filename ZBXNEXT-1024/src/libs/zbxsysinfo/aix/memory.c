@@ -24,7 +24,7 @@
 
 static perfstat_memory_total_t	m;
 
-#define ZBX_PERFSTAT_PAGE_SIZE	12
+#define ZBX_PERFSTAT_PAGE_SIZE	12	/* 4 KB */
 
 #define ZBX_PERFSTAT_MEMORY_TOTAL()					\
 									\
