@@ -348,20 +348,20 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
- - [ZBX-4298] added deleted data report to a housekeeper on every step (dimir)
- - [ZBX-3649] fixed "frontends/php/styles/ie_default.css" doesn't exist (for IE6) (sanja)
- - [ZBX-4235] fixed operations with decimal numbers for certain locales (pavels)
- - [ZBX-3244] fixed dropdown changes its style when navigating menu (sanja)
- - [ZBX-4015] fixed multiple XSS issues (pavels)
- - [ZBX-4288] fixed user macro deleting when deleting a host (pavels)
- - [ZBX-2859] fixed possibility to successfully delete zero regular expressions (sanja)
- - [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
- - [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
- - [ZBX-4375] updated Russian translation; thanks to Alexey Pustovalov (Richlv)
- - [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (dimir,asaveljevs)
- - [ZBX-4249] fixed trigger wizard when inserting macro multiple times (Vedmak)
- - [ZBX-4351] updated French translation; thanks to Joseph Bueno (Richlv)
- - [ZBX-4353] updated Japanese translation; thanks to Kodai Terashima (Richlv)
+........S. [ZBX-4298] added deleted data report to a housekeeper on every step (dimir)
+..F....... [ZBX-3649] fixed "frontends/php/styles/ie_default.css" doesn't exist (for IE6) (sanja)
+A.F....... [ZBX-4235] fixed operations with decimal numbers for certain locales (pavels)
+..F....... [ZBX-3244] fixed dropdown changing its style when navigating menu (sanja)
+A.F....... [ZBX-4015] fixed multiple XSS issues (pavels)
+A.F....... [ZBX-4288] fixed user macros not being deleted when deleting a host (pavels)
+A.F....... [ZBX-2859] fixed possibility to successfully delete zero regular expressions (sanja)
+..F....... [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
+A.F....... [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
+..F....... [ZBX-4375] updated Russian translation; thanks to Alexey Pustovalov (Richlv)
+........S. [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (dimir,asaveljevs)
+A.F....... [ZBX-4249] fixed trigger wizard when inserting macro multiple times (Vedmak)
+..F....... [ZBX-4351] updated French translation; thanks to Joseph Bueno (Richlv)
+..F....... [ZBX-4353] updated Japanese translation; thanks to Kodai Terashima (Richlv)
 
 Changes for 1.8.9
 
