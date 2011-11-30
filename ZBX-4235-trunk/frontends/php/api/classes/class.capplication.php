@@ -24,67 +24,67 @@
  */
 class CApplication extends CZBXAPI {
 	/**
-	 * Get Applications data
-	 *
-	 * @param array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids']
-	 * @param array $options['groupids']
-	 * @param array $options['triggerids']
-	 * @param array $options['applicationids']
-	 * @param boolean $options['status']
-	 * @param boolean $options['editable']
-	 * @param boolean $options['count']
-	 * @param string $options['pattern']
-	 * @param int $options['limit']
-	 * @param string $options['order']
-	 * @return array|int item data as array or false if error
-	 */
+	* Get Applications data
+	*
+	* @param array $options
+	* @param array $options['itemids']
+	* @param array $options['hostids']
+	* @param array $options['groupids']
+	* @param array $options['triggerids']
+	* @param array $options['applicationids']
+	* @param boolean $options['status']
+	* @param boolean $options['editable']
+	* @param boolean $options['count']
+	* @param string $options['pattern']
+	* @param int $options['limit']
+	* @param string $options['order']
+	* @return array|int item data as array or false if error
+	*/
 	public function get($options = array()) {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
-		$sort_columns = array('applicationid', 'name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		$sort_columns = array('applicationid', 'name');
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sql_parts = array(
-			'select' => array('apps' => 'a.applicationid'),
-			'from' => array('applications' => 'applications a'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('apps' => 'a.applicationid'),
+			'from'		=> array('applications' => 'applications a'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids'				=> null,
-			'groupids'				=> null,
-			'templateids'			=> null,
-			'hostids'				=> null,
-			'itemids'				=> null,
-			'applicationids'		=> null,
-			'templated'				=> null,
-			'editable'				=> null,
-			'inherited' 			=> null,
-			'nopermissions'			=> null,
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'templateids'				=> null,
+			'hostids'					=> null,
+			'itemids'					=> null,
+			'applicationids'			=> null,
+			'templated'					=> null,
+			'editable'					=> null,
+			'inherited' 				=> null,
+			'nopermissions'				=> null,
 			// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'exludeSearch'			=> null,
-			'searchWildcardsEnabled'=> null,
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'exludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'				=> API_OUTPUT_REFER,
-			'expandData'			=> null,
-			'selectHosts'			=> null,
-			'selectItems'			=> null,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'preservekeys'			=> null,
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null
+			'output'					=> API_OUTPUT_REFER,
+			'expandData'				=> null,
+			'selectHosts'				=> null,
+			'selectItems'				=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
 		$options = zbx_array_merge($def_options, $options);
 
@@ -237,18 +237,8 @@ class CApplication extends CZBXAPI {
 			zbx_db_filter('applications a', $options, $sql_parts);
 		}
 
-		// order
-		// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if (!zbx_empty($options['sortfield'])) {
-			$sortorder = $options['sortorder'] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : ZBX_SORT_UP;
-
-			$sql_parts['order'][] = 'a.'.$options['sortfield'].' '.$sortorder;
-
-			if (!str_in_array('a.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('a.*', $sql_parts['select'])) {
-				$sql_parts['select'][] = 'a.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'a');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
