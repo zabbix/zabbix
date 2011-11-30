@@ -664,6 +664,18 @@ Copt::memoryPick();
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$dbInterfaces = $this->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'interfaceids' => $interfaceIds,
+			'editable' => true,
+			'preservekeys' => true
+		));
+		foreach ($interfaceIds as $interfaceId) {
+			if (!isset($dbInterfaces[$interfaceId])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+			}
+		}
+
 		$this->checkMainInterfacesOnDelete($interfaceIds);
 
 		DB::delete('interface', array('interfaceid' => $interfaceIds));
