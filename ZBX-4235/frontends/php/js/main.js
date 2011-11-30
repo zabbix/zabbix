@@ -96,22 +96,29 @@ mouseOut: function(){
 },
 
 showSubMenu: function(show_label){
-	var menu_div = $('sub_'+show_label);
-	if(!is_null(menu_div)){
+	var menu_div = $('sub_' + show_label);
+	if (!is_null(menu_div)) {
 		$(show_label).className = 'active';
 		menu_div.show();
-		for(var key in this.menus){
-			if(key == show_label) continue;
-
+		for (var key in this.menus) {
+			if (key == show_label) {
+				continue;
+			}
 			var menu_cell = $(key);
-			if(!is_null(menu_cell)) menu_cell.className = '';
-
-			var sub_menu_cell = $('sub_'+key);
-			if(!is_null(sub_menu_cell)) sub_menu_cell.hide();
+			if (!is_null(menu_cell)) {
+				if (menu_cell.tagName.toLowerCase() != 'select') {
+					menu_cell.className = '';
+				}
+			}
+			var sub_menu_cell = $('sub_' + key);
+			if (!is_null(sub_menu_cell)) {
+				sub_menu_cell.hide();
+			}
 		}
 	}
 }
-}
+};
+
 
 /************************************************************************************/
 /*						Automatic checkbox range selection 							*/
