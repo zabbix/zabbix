@@ -2655,13 +2655,6 @@
 		$_REQUEST['percent_right'] = $percent_right;
 /********************/
 
-		if($graphtype != GRAPH_TYPE_NORMAL){
-			foreach($items as $gid => $gitem){
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
-					unset($items[$gid]);
-			}
-		}
-
 		$items = array_values($items);
 		$icount = count($items);
 		for($i=0; $i < $icount-1;){
@@ -2707,7 +2700,6 @@
 
 			$items_table = new CTableInfo();
 			foreach($items as $gid => $gitem){
-				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
 				$host = get_host_by_itemid($gitem['itemid']);
 				$item = get_item_by_itemid($gitem['itemid']);
 
@@ -2716,11 +2708,7 @@
 				else
 					$monitored_hosts = 1;
 
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
-					$color = '-';
-				else
-					$color = new CColorCell(null,$gitem['color']);
-
+				$color = new CColorCell(null, $gitem['color']);
 
 				if($gid == $first){
 					$do_up = null;
@@ -2755,7 +2743,7 @@
 							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							graph_item_type2str($gitem['type']),
 							$color,
 							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
 						));
@@ -2766,7 +2754,7 @@
 //							$gitem['sortorder'],
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							graph_item_type2str($gitem['type']),
 							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
 							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
 							$color,
