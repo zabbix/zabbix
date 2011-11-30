@@ -528,7 +528,7 @@ COpt::memoryPick();
 	protected function checkInput(array &$items, $update = false) {
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY;
-			$item['value_type'] = ITEM_VALUE_TYPE_FLOAT;
+			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 		}
 
 		parent::checkInput($items, $update);
