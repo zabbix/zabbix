@@ -1014,207 +1014,205 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
  * Author:
  *		Aly
  */
-	function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host = true) {
-		global $page;
+function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host = true) {
+	global $page;
 
-		$config = select_config();
+	$config = select_config();
 
-		$dd_first_entry = $config['dropdown_first_entry'];
+	$dd_first_entry = $config['dropdown_first_entry'];
 
-		$group_var = 'web.latest.groupid';
-		$host_var = 'web.latest.hostid';
+	$group_var = 'web.latest.groupid';
+	$host_var = 'web.latest.hostid';
 
-		$_REQUEST['groupid'] = get_request('groupid', CProfile::get($group_var, -1));
-		$_REQUEST['hostid'] = get_request('hostid', CProfile::get($host_var, -1));
+	$_REQUEST['groupid'] = get_request('groupid', CProfile::get($group_var, -1));
+	$_REQUEST['hostid'] = get_request('hostid', CProfile::get($host_var, -1));
 
-		if ($_REQUEST['groupid'] > 0) {
-			if ($_REQUEST['hostid'] > 0) {
-				if (!DBfetch(DBselect('SELECT hg.groupid FROM hosts_groups hg WHERE hg.hostid='.$_REQUEST['hostid'].' AND hg.groupid='.$_REQUEST['groupid']))) {
-					$_REQUEST['hostid'] = 0;
-				}
-			}
-			elseif ($reset_host) {
+	if ($_REQUEST['groupid'] > 0) {
+		if ($_REQUEST['hostid'] > 0) {
+			if (!DBfetch(DBselect('SELECT hg.groupid FROM hosts_groups hg WHERE hg.hostid='.$_REQUEST['hostid'].' AND hg.groupid='.$_REQUEST['groupid']))) {
 				$_REQUEST['hostid'] = 0;
 			}
 		}
-		else {
-			$_REQUEST['groupid'] = 0;
-
-			if ($reset_host && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)) {
-				$_REQUEST['hostid'] = 0;
-			}
+		elseif ($reset_host) {
+			$_REQUEST['hostid'] = 0;
 		}
+	}
+	else {
+		$_REQUEST['groupid'] = 0;
 
-		$PAGE_GROUPS['selected'] = $_REQUEST['groupid'];
-		$PAGE_HOSTS['selected'] = $_REQUEST['hostid'];
-
-		if (($PAGE_GROUPS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_host) {
-			$PAGE_GROUPS['groupids'] = array();
+		if ($reset_host && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)) {
+			$_REQUEST['hostid'] = 0;
 		}
-
-		if (($PAGE_HOSTS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_host) {
-			$PAGE_HOSTS['hostids'] = array();
-		}
-
-		if ($PAGE_GROUPS['original'] > -1)
-			CProfile::update('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
-
-		if ($PAGE_HOSTS['original'] > -1)
-			CProfile::update('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
-
-		CProfile::update($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
-		CProfile::update($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
 	}
 
-	function get_application_by_applicationid($applicationid,$no_error_message=0) {
-		$row = DBfetch(DBselect('SELECT a.* FROM applications a WHERE a.applicationid='.$applicationid));
-		if ($row) {
-			return $row;
-		}
-		if ($no_error_message == 0) {
-			error(S_NO_APPLICATION_WITH." id=[$applicationid]");
-		}
+	$PAGE_GROUPS['selected'] = $_REQUEST['groupid'];
+	$PAGE_HOSTS['selected'] = $_REQUEST['hostid'];
 
+	if (($PAGE_GROUPS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_host) {
+		$PAGE_GROUPS['groupids'] = array();
+	}
+
+	if (($PAGE_HOSTS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_host) {
+		$PAGE_HOSTS['hostids'] = array();
+	}
+
+	if ($PAGE_GROUPS['original'] > -1)
+		CProfile::update('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
+
+	if ($PAGE_HOSTS['original'] > -1)
+		CProfile::update('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
+
+	CProfile::update($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
+	CProfile::update($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
+}
+
+function get_application_by_applicationid($applicationid,$no_error_message=0) {
+	$row = DBfetch(DBselect('SELECT a.* FROM applications a WHERE a.applicationid='.$applicationid));
+	if ($row) {
+		return $row;
+	}
+	if ($no_error_message == 0) {
+		error(S_NO_APPLICATION_WITH." id=[$applicationid]");
+	}
+
+	return false;
+}
+
+function get_applications_by_templateid($applicationid) {
+	return DBselect('SELECT a.* FROM applications a WHERE a.templateid='.$applicationid);
+}
+
+function get_realhost_by_applicationid($applicationid) {
+	$application = get_application_by_applicationid($applicationid);
+	if ($application['templateid'] > 0) {
+		return get_realhost_by_applicationid($application['templateid']);
+	}
+	return get_host_by_applicationid($applicationid);
+}
+
+function get_host_by_applicationid($applicationid) {
+	$row = DBfetch(DBselect('SELECT h.* FROM hosts h,applications a WHERE a.hostid=h.hostid AND a.applicationid='.$applicationid));
+	if ($row) {
+		return $row;
+	}
+	error(_('No host with').' applicationid=['.$applicationid.']');
+	return false;
+}
+
+/*
+ * Function: validate_templates
+ *
+ * Description:
+ *     Check collisions between templates
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *           $templateid_list can be numeric or numeric array
+ *
+ */
+function validate_templates($templateid_list) {
+	if (is_numeric($templateid_list)) {
+		return true;
+	}
+	if (!is_array($templateid_list)) {
 		return false;
 	}
-
-	function get_applications_by_templateid($applicationid) {
-		return DBselect('SELECT a.* FROM applications a WHERE a.templateid='.$applicationid);
+	if (count($templateid_list) < 2) {
+		return true;
 	}
 
-	function get_realhost_by_applicationid($applicationid) {
-		$application = get_application_by_applicationid($applicationid);
-		if ($application['templateid'] > 0) {
-			return get_realhost_by_applicationid($application['templateid']);
+	$result = true;
+
+	$sql = 'SELECT key_,count(*) as cnt'.
+		' FROM items'.
+		' WHERE '.DBcondition('hostid', $templateid_list).
+		' GROUP BY key_'.
+		' ORDER BY cnt DESC';
+	$res = DBselect($sql);
+	while ($db_cnt = DBfetch($res)) {
+		if ($db_cnt['cnt'] > 1) {
+			$result &= false;
+			error(S_TEMPLATE_WITH_ITEM_KEY.SPACE.'['.htmlspecialchars($db_cnt['key_']).']'.SPACE.S_ALREADY_LINKED_TO_HOST_SMALL);
 		}
-		return get_host_by_applicationid($applicationid);
 	}
 
-	function get_host_by_applicationid($applicationid) {
-		$row = DBfetch(DBselect('SELECT h.* FROM hosts h,applications a WHERE a.hostid=h.hostid AND a.applicationid='.$applicationid));
-		if ($row) {
-			return $row;
-		}
-		error(_('No host with').' applicationid=['.$applicationid.']');
 
-		return false;
+	$sql = 'SELECT name,count(*) as cnt'.
+		' FROM applications'.
+		' WHERE '.DBcondition('hostid',$templateid_list).
+		' GROUP BY name'.
+		' ORDER BY cnt DESC';
+	$res = DBselect($sql);
+	while ($db_cnt = DBfetch($res)) {
+		if ($db_cnt['cnt'] > 1) {
+			$result &= false;
+			error(S_TEMPLATE_WITH_APPLICATION.SPACE.'['.htmlspecialchars($db_cnt['name']).']'.SPACE.S_ALREADY_LINKED_TO_HOST_SMALL);
+		}
 	}
 
-	/*
-	 * Function: validate_templates
-	 *
-	 * Description:
-	 *     Check collisions between templates
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *           $templateid_list can be numeric or numeric array
-	 *
-	 */
-	function validate_templates($templateid_list) {
-		if (is_numeric($templateid_list)) {
-			return true;
-		}
-		if (!is_array($templateid_list)) {
-			return false;
-		}
-		if (count($templateid_list) < 2) {
-			return true;
-		}
+	return $result;
+}
 
-		$result = true;
+function getUnlinkableHosts($groupids = null, $hostids = null) {
+	zbx_value2array($groupids);
+	zbx_value2array($hostids);
 
-		$sql = 'SELECT key_,count(*) as cnt'.
-			' FROM items'.
-			' WHERE '.DBcondition('hostid', $templateid_list).
-			' GROUP BY key_'.
-			' ORDER BY cnt DESC';
-		$res = DBselect($sql);
-		while ($db_cnt = DBfetch($res)) {
-			if ($db_cnt['cnt'] > 1) {
-				$result &= false;
-				error(S_TEMPLATE_WITH_ITEM_KEY.SPACE.'['.htmlspecialchars($db_cnt['key_']).']'.SPACE.S_ALREADY_LINKED_TO_HOST_SMALL);
-			}
-		}
+	$unlnk_hostids = array();
 
-
-		$sql = 'SELECT name,count(*) as cnt'.
-			' FROM applications'.
-			' WHERE '.DBcondition('hostid',$templateid_list).
-			' GROUP BY name'.
-			' ORDER BY cnt DESC';
-		$res = DBselect($sql);
-		while ($db_cnt = DBfetch($res)) {
-			if ($db_cnt['cnt'] > 1) {
-				$result &= false;
-				error(S_TEMPLATE_WITH_APPLICATION.SPACE.'['.htmlspecialchars($db_cnt['name']).']'.SPACE.S_ALREADY_LINKED_TO_HOST_SMALL);
-			}
-		}
-
-		return $result;
+	$sql_where = '';
+	if (!is_null($hostids)) {
+		$sql_where.= ' AND '.DBcondition('hg.hostid', $hostids);
 	}
 
-	function getUnlinkableHosts($groupids = null, $hostids = null) {
-		zbx_value2array($groupids);
-		zbx_value2array($hostids);
+	if (!is_null($groupids)) {
+		$sql_where.= ' AND EXISTS ('.
+						' SELECT hostid'.
+						' FROM hosts_groups hgg'.
+						' WHERE hgg.hostid = hg.hostid'.
+							' AND '.DBcondition('hgg.groupid', $groupids).')';
+	}
 
-		$unlnk_hostids = array();
+	$sql = 'SELECT hg.hostid, count(hg.groupid) as grp_count'.
+			' FROM hosts_groups hg'.
+			' WHERE hostgroupid>0'.
+			$sql_where.
+			' GROUP BY hg.hostid'.
+			' HAVING count(hg.groupid) > 1';
+	$res = DBselect($sql);
+	while ($host = DBfetch($res)) {
+		$unlnk_hostids[$host['hostid']] = $host['hostid'];
+	}
 
-		$sql_where = '';
-		if (!is_null($hostids)) {
-			$sql_where.= ' AND '.DBcondition('hg.hostid', $hostids);
-		}
+	return $unlnk_hostids;
+}
 
-		if (!is_null($groupids)) {
-			$sql_where.= ' AND EXISTS ('.
-							' SELECT hostid'.
-							' FROM hosts_groups hgg'.
-							' WHERE hgg.hostid = hg.hostid'.
-								' AND '.DBcondition('hgg.groupid', $groupids).')';
-		}
+function getDeletableHostGroups($groupids = null) {
+	$deletable_groupids = array();
 
-		$sql = 'SELECT hg.hostid, count(hg.groupid) as grp_count'.
-				' FROM hosts_groups hg'.
-				' WHERE hostgroupid>0'.
+	zbx_value2array($groupids);
+	$hostids = getUnlinkableHosts($groupids);
+
+	$sql_where = '';
+	if (!is_null($groupids)) {
+		$sql_where .= ' AND '.DBcondition('g.groupid', $groupids);
+	}
+
+	$sql = 'SELECT DISTINCT g.groupid'.
+			' FROM groups g'.
+			' WHERE g.internal='.ZBX_NOT_INTERNAL_GROUP.
 				$sql_where.
-				' GROUP BY hg.hostid'.
-				' HAVING count(hg.groupid) > 1';
-		$res = DBselect($sql);
-		while ($host = DBfetch($res)) {
-			$unlnk_hostids[$host['hostid']] = $host['hostid'];
-		}
-
-		return $unlnk_hostids;
+				' AND NOT EXISTS ('.
+					'SELECT hg.groupid'.
+					' FROM hosts_groups hg'.
+					' WHERE g.groupid=hg.groupid'.
+						(!empty($hostids) ? ' AND '.DBcondition('hg.hostid', $hostids, true) : '').
+				')';
+	$db_groups = DBselect($sql);
+	while ($group = DBfetch($db_groups)) {
+		$deletable_groupids[$group['groupid']] = $group['groupid'];
 	}
-
-	function getDeletableHostGroups($groupids = null) {
-		zbx_value2array($groupids);
-
-		$dlt_groupids = array();
-		$hostids = getUnlinkableHosts($groupids);
-
-		$sql_where = '';
-		if (!is_null($groupids))
-			$sql_where .= ' AND '.DBcondition('g.groupid', $groupids);
-
-		$sql = 'SELECT DISTINCT g.groupid'.
-				' FROM groups g'.
-				' WHERE g.internal='.ZBX_NOT_INTERNAL_GROUP.
-					$sql_where.
-					' AND NOT EXISTS ('.
-						'SELECT hg.groupid'.
-						' FROM hosts_groups hg'.
-						' WHERE g.groupid=hg.groupid'.
-							(!empty($hostids) ? ' AND '.DBcondition('hg.hostid', $hostids, true) : '').
-						')';
-		$res = DBselect($sql);
-		while ($group = DBfetch($res)) {
-			$dlt_groupids[$group['groupid']] = $group['groupid'];
-		}
-
-		return $dlt_groupids;
-	}
-
+	return $deletable_groupids;
+}
 ?>
