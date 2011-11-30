@@ -2,14 +2,14 @@
 Changes for 1.9.9
 
 New features:
- - [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
- - [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
+A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
+....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
-..F.I...S. [ZBX-3832] removed support of aggregated graph items (pavels,Sasha)
- - [ZBX-4235] fixed operations with decimal numbers for certain locales (pavels)
- - [ZBX-4382] fixed missing dates in the midle of graph axis (sanja)
- - [ZBX-3366] fixed API sorting (Eduard)
+..F.I...S. [ZBX-3832] removed support of aggregated graph items (pavels, Sasha)
+..F....... [ZBX-4235] fixed operations with decimal numbers for certain locales (pavels)
+A.F....... [ZBX-4382] fixed missing dates in the midle of graph axis (sanja)
+A.F....... [ZBX-3366] fixed API sorting (Eduard)
 
 --------------------------------------------------------------------------------
 Changes for 1.9.8
@@ -18,7 +18,7 @@ New features:
  - [ZBX-3104] implemented the screen item API (pavels)
  - [ZBXNEXT-913] redesign Configuration->IT Services (Eduard)
  - [ZBXNEXT-907] redesign Configuration->Applications (Eduard)
- - [ZBX-3271] implemented the _x() and _xn() function for context dependent translations (pavels,Richlv,Vedmak)
+ - [ZBX-3271] implemented the _x() and _xn() function for context dependent translations (pavels, Richlv, Vedmak)
  - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget (pavels)
  - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
  - [ZBXNEXT-1019] updated jQuery to 1.7 (Vedmak)
@@ -33,7 +33,7 @@ New features:
 Bug fixes:
  - [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
  - [ZBX-3593] fixed misaligned server name on top of the page (sanja)
- - [ZBX-3771] fixed possible 'Lock wait timeout' while processing lld rules (Sasha,pavels)
+ - [ZBX-3771] fixed possible 'Lock wait timeout' while processing lld rules (Sasha, pavels)
  - [ZBX-4139] fixed "Last n issues" widget label ignoring variable that sets the amount of issues (Richlv)
  - [ZBX-4359] fixed potentially incorrectly named index on node_cksum table (Richlv, sasha)
  - [ZBX-4188] fixed nclob problem for Oracle (Vedmak)
@@ -119,7 +119,7 @@ Bug fixes:
  - [ZBX-4003] fixed error when try to use not existing host group as group for discovered hosts (Vedmak)
  - [ZBX-4165] fixed failing insert into proxy_dhistory queries on the proxy side (rudolfs)
  - [ZBX-2882] fixed wrong item vfs.file.cksum[/vmlinuz] for some templates (Sasha)
- - [ZBX-3870] fixed data deletion order in proxy configuration synchronization (deniss,rudolfs)
+ - [ZBX-3870] fixed data deletion order in proxy configuration synchronization (deniss, rudolfs)
  - [ZBX-3707] fixed possible empty action conditions (Vedmak)
  - [ZBX-4171] fixed server crash in add_value_suffix() under DebugLevel=4 (asaveljevs)
  - [ZBX-3930] fixed errors when return to some specific screens from profile screen (Vedmak)
@@ -238,9 +238,9 @@ Bug fixes:
 Changes for 1.9.3
 
 New features:
- - [ZBXNEXT-555] added remote monitoring of JMX counters through Java proxy (asaveljevs,Vedmak,Vlad)
- - [ZBXNEXT-651] added "Boolean" data type for integer item value type (asaveljevs,Vedmak,Vlad)
- - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis,Richlv)
+ - [ZBXNEXT-555] added remote monitoring of JMX counters through Java proxy (asaveljevs, Vedmak, Vlad)
+ - [ZBXNEXT-651] added "Boolean" data type for integer item value type (asaveljevs, Vedmak, Vlad)
+ - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis, Richlv)
  - [ZBX-1357] Updated Latvian and Russian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-696] Added support for {IPADDRESS}, {HOST.DNS} and {HOST.CONN} macros in trigger names (rudolfs)
  - [ZBXNEXT-676] merged host profile and extended host profile (Sasha, Vedmak)
@@ -259,12 +259,12 @@ New features:
  - [ZBXNEXT-631] added custom trigger severities configuration (Sasha, Vedmak)
  - [ZBXNEXT-636] login screen redesign, frontend themes restyle (Aly, Elvis)
  - [ZBXNEXT-635] introduced API wrapper for Zabbix frontend (Vedmak, Aly)
- - [ZBXNEXT-575] added new design for action operation remote commands (Aly,Sasha,Vedmak)
+ - [ZBXNEXT-575] added new design for action operation remote commands (Aly, Sasha, Vedmak)
  - [ZBXNEXT-628] added advanced label settings for maps (Aly)
  - [ZBXNEXT-626] added remembering of grid options for maps (KB)
  - [ZBXNEXT-630] added automatic filling of DNS name for discovered and auto-registered devices (Sasha)
  - [ZBXNEXT-634] added information about usage of media types for actions in the list of media types (Alexei)
- - [ZBXNEXT-602] Export events to CSV (Vlad,Aly)
+ - [ZBXNEXT-602] Export events to CSV (Vlad, Aly)
  - [ZBXNEXT-623] restored support of SQLite3 for use with Zabbix Server and front-end (Alexei)
  - [ZBX-1357] updated Dutch translation; thanks to qix (Richlv)
  - [ZBX-1357] updated Latvian translation (Richlv)
@@ -311,17 +311,17 @@ Bug fixes:
 Changes for 1.9.1
 
 New features:
- - [ZBXNEXT-587] added support of multiple host interfaces (Aly,Sasha,Vedmak)
+ - [ZBXNEXT-587] added support of multiple host interfaces (Aly, Sasha, Vedmak)
  - [ZBXNEXT-564] added new {IPADDRESS} and {HOST.PORT} macros in auto registration notifications (Sasha)
  - [ZBXNEXT-556] zabbix frontend translations are now handled by PHP gettext module (KB)
  - [ZBXNEXT-558] added support of monitoring auto-registered hosts with passive checks (Sasha)
- - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
+ - [ZBXNEXT-512] redesign of unknown events (Aly, asaveljevs, Sasha)
 
 Bug fixes:
  - [ZBX-3241] fixed incorrectly shortened popup texts (Vlad)
  - [ZBX-2647] Made some of hard coded strings translatable (KB)
  - [ZBX-3300] fixed valuemapid not removed from items table when valuemap deleted (Vedmak)
- - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly,Vedmak)
+ - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly, Vedmak)
  - [ZBX-3149] allow to translate more strings in screen element 'Server info'; add support for translator comments (Richlv)
  - [ZBX-3248] fixed empty and duplicate map URL name handling (KB)
  - [ZBX-3190] fixed sql errors when processing proxy configuration (asaveljevs,Sasha)
@@ -333,12 +333,12 @@ Bug fixes:
 Changes for 1.9.0
 
 New features:
- - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha,Vedmak)
+ - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha, Vedmak)
  - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
  - [DEV-485] added multiple urls for map elements (Vedmak)
  - [DEV-471] field graph_theme.noneworktimecolor renamed to nonworktimecolor (Sasha)
- - [DEV-471] database integrity - added foreign keys (Sasha,Vedmak)
+ - [DEV-471] database integrity - added foreign keys (Sasha, Vedmak)
  - [ZBXNEXT-483] added vfs.file.contents[file,encoding] check (asaveljevs)
  - [ZBXNEXT-457] added support of nanoseconds for history tables (Sasha)
  - [DEV-449] added display of host time in screens (Aly)
