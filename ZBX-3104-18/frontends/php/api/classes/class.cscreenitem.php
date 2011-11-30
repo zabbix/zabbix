@@ -601,19 +601,15 @@ class CScreenItem extends CZBXAPI {
 	 * @return string         The resulting SQL query
 	 */
 	protected static function buildSql(array $options, array $sqlParts) {
-		// check nodes
-		$nodeids = ($options['nodeids'] !== null) ? $options['nodeids'] : get_current_nodeid();
-
 		// build query
 		$sqlSelect = implode(',', array_unique($sqlParts['select']));
 		$sqlFrom = implode(',', array_unique($sqlParts['from']));
-		$sqlWhere = ($sqlParts['where']) ? ' AND '.implode(' AND ', $sqlParts['where']) : '';
+		$sqlWhere = ($sqlParts['where']) ? implode(' AND ', $sqlParts['where']) : '';
 		$sqlGroup = ($sqlParts['group']) ? ' GROUP BY '.implode(',', $sqlParts['group']) : '';
 		$sqlOrder = ($sqlParts['order']) ? ' ORDER BY '.implode(',', $sqlParts['order']) : '';
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('si.screenitemid', $nodeids).
-					$sqlWhere.
+				' WHERE '.$sqlWhere.
 				$sqlGroup.
 				$sqlOrder;
 
@@ -682,6 +678,11 @@ class CScreenItem extends CZBXAPI {
 		if ($options['screenitemids'] !== null) {
 			zbx_value2array($options['screenitemids']);
 			$sqlParts['where'][] = DBcondition('si.screenitemid', $options['screenitemids']);
+		}
+		// if no specific ids are given, apply the node filter
+		else {
+			$nodeids = ($options['nodeids'] !== null) ? $options['nodeids'] : get_current_nodeid();
+			$sqlParts['where'][] = DBin_node('screenitemid', $nodeids);
 		}
 
 		// screen ids
