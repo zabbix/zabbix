@@ -132,9 +132,6 @@ static int	housekeeping_cleanup()
 		if (0 == d || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > d)
 			uint64_array_add(&ids, &ids_alloc, &ids_num, housekeeper.housekeeperid, 64);
 
-		if (0 < d)
-			zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table '%s'", d, housekeeper.tablename);
-
 		deleted += d;
 	}
 	DBfree_result(result);
@@ -166,8 +163,6 @@ static int	housekeeping_sessions(int now)
 
 	deleted = DBexecute("delete from sessions where lastaccess<%d", now - SEC_PER_YEAR);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table 'sessions'", deleted);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
 	return deleted;
@@ -194,8 +189,6 @@ static int	housekeeping_alerts(int now)
 		alert_history = atoi(row[0]);
 
 		deleted = DBexecute("delete from alerts where clock<%d", now - alert_history * SEC_PER_DAY);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table 'alerts'", deleted);
 	}
 	DBfree_result(result);
 
