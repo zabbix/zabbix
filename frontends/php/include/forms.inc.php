@@ -2029,7 +2029,7 @@
 
 		$cmbCopyType = new CComboBox('copy_type',$copy_type,'submit()');
 		$cmbCopyType->addItem(0,S_HOSTS);
-		$cmbCopyType->addItem(1,S_HOST_GROUPS);
+		$cmbCopyType->addItem(1, _('Host groups'));
 		$frmCopy->addRow(S_TARGET_TYPE, $cmbCopyType);
 
 		$target_list = array();
