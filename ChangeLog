@@ -345,6 +345,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
+ - [ZBX-3244] fixed dropdown changes its style when navigating menu (sanja)
  - [ZBX-4015] fixed multiple XSS issues (pavels)
  - [ZBX-4288] fixed user macro deleting when deleting a host (pavels)
  - [ZBX-2859] fixed possibility to successfully delete zero regular expressions (sanja)
