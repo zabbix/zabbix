@@ -27,6 +27,11 @@
  * Class containing methods for operations with Screens
  */
 class CScreen extends CZBXAPI {
+
+	protected $tableName = 'screens';
+
+	protected $tableAlias = 's';
+
 /**
  * Get Screen data
  *

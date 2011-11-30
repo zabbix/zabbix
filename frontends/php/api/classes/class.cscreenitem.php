@@ -28,6 +28,10 @@
  */
 class CScreenItem extends CZBXAPI {
 
+	protected $tableName = 'screens_items';
+
+	protected $tableAlias = 'si';
+
 	/**
 	 * Supported values for the resourcetype column.
 	 *
@@ -59,7 +63,7 @@ class CScreenItem extends CZBXAPI {
 	 *
 	 * @var array
 	 */
-	protected static $sortColumns = array(
+	protected $sortColumns = array(
 		'screenitemid',
 		'screenid'
 	);
@@ -107,7 +111,8 @@ class CScreenItem extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// build and execute query
-		$sql = $this->buildSql($options);
+		$sqlParts = $this->buildSqlParts($options);
+		$sql = $this->buildSql($sqlParts);
 		$res = DBselect($sql, $options['limit']);
 
 		// fetch results
@@ -119,13 +124,13 @@ class CScreenItem extends CZBXAPI {
 			}
 			// a normal select query
 			else {
-				$result[$row['screenitemid']] = $row;
+				if ($options['preservekeys'] !== null) {
+					$result[$row['screenitemid']] = $this->unsetExtraFields($row, $options, $sqlParts);
+				}
+				else {
+					$result[] = $this->unsetExtraFields($row, $options, $sqlParts);
+				}
 			}
-		}
-
-		// remove keys
-		if ($options['preservekeys'] === null) {
-			$result = zbx_cleanHashes($result);
 		}
 
 		return $result;
@@ -518,12 +523,13 @@ class CScreenItem extends CZBXAPI {
 
 
 	/**
-	 * Builds a SELECT SQL query from the given options.
+	 * Builds an SQL parts array from the given options.
 	 *
 	 * @param array $options
-	 * @return string         The resulting SQL query
+	 *
+	 * @return array         The resulting SQL parts array
 	 */
-	protected function buildSql(array $options) {
+	protected function buildSqlParts(array $options) {
 		$sqlParts = array(
 			'select' => array('screenitems' => 'si.screenitemid'),
 			'from' => array('screenitems' => 'screens_items si'),
@@ -541,6 +547,18 @@ class CScreenItem extends CZBXAPI {
 
 		// handle filters
 		$sqlParts = $this->buildSqlFilters($options, $sqlParts);
+
+		return $sqlParts;
+	}
+
+
+	/**
+	 * Builds a SELECT SQL query from the given SQL parts array.
+	 *
+	 * @param array $sqlParts  An SQL parts array
+	 * @return string          The resulting SQL query
+	 */
+	protected function buildSql(array $sqlParts) {
 
 		// check nodes
 		$nodeids = ($options['nodeids'] !== null) ? $options['nodeids'] : get_current_nodeid();
@@ -584,6 +602,11 @@ class CScreenItem extends CZBXAPI {
 					$sqlParts['select'][$field] = 'si.'.$field;
 				}
 			}
+
+			// make sure the id is included if the 'preservekeys' option is enabled
+			if ($options['preservekeys'] !== null) {
+				$sqlParts['select']['screenitemid'] = 'si.screenitemid';
+			}
 		}
 		// extendex output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
@@ -592,7 +615,7 @@ class CScreenItem extends CZBXAPI {
 
 		// sort
 		$sortfield = $options['sortfield'];
-		if (in_array($sortfield, self::$sortColumns)) {
+		if (in_array($sortfield, $this->sortColumns)) {
 			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 			$sqlParts['order'][] = 'si.'.$sortfield.' '.$sortorder;
 

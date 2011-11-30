@@ -31,6 +31,11 @@
  */
 class CIconMap extends CZBXAPI {
 
+	protected $tableName = 'icon_map';
+
+	protected $tableAlias = 'im';
+
+
 	/**
 	 * Get IconMap data.
 	 * @param array $options
