@@ -107,7 +107,8 @@ class CScreenItem extends CZBXAPI {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// build and execute query
-		$sql = self::buildSql($options);
+		$sqlParts = self::buildSqlParts($options);
+		$sql = self::buildSql($options, $sqlParts);
 		$res = DBselect($sql, $options['limit']);
 
 		// fetch results
@@ -119,7 +120,12 @@ class CScreenItem extends CZBXAPI {
 			}
 			// a normal select query
 			else {
-				$result[$row['screenitemid']] = $row;
+				if ($options['preservekeys'] !== null) {
+					$result[$row['screenitemid']] = self::unsetExtraFields($row, $options, $sqlParts);
+				}
+				else {
+					$result[] = self::unsetExtraFields($row, $options, $sqlParts);
+				}
 			}
 		}
 
@@ -340,7 +346,6 @@ class CScreenItem extends CZBXAPI {
 
 		$count = self::get(array(
 			'screenitemids' => $screenItemIds,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -366,7 +371,6 @@ class CScreenItem extends CZBXAPI {
 
 		$count = self::get(array(
 			'screenitemids' => $screenItemIds,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));
@@ -466,7 +470,7 @@ class CScreenItem extends CZBXAPI {
 			$result = CHostGroup::get(array(
 				'groupids' => $hostgroups,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			foreach($hostgroups as $id){
 				if(!isset($result[$id]))
@@ -479,7 +483,7 @@ class CScreenItem extends CZBXAPI {
 			$result = CHost::get(array(
 				'hostids' => $hosts,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			foreach ($hosts as $id) {
 				if (!isset($result[$id])) {
@@ -493,7 +497,7 @@ class CScreenItem extends CZBXAPI {
 			$result = CGraph::get(array(
 				'graphids' => $graphs,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			foreach ($graphs as $id) {
 				if (!isset($result[$id])) {
@@ -507,8 +511,8 @@ class CScreenItem extends CZBXAPI {
 			$result = CItem::get(array(
 				'itemids' => $items,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-				'webitems' => 1
+				'preservekeys' => true,
+				'webitems' => true
 			));
 			foreach ($items as $id) {
 				if (!isset($result[$id])) {
@@ -522,7 +526,7 @@ class CScreenItem extends CZBXAPI {
 			$result = CMap::get(array(
 				'sysmapids' => $maps,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			foreach ($maps as $id) {
 				if (!isset($result[$id])) {
@@ -536,7 +540,7 @@ class CScreenItem extends CZBXAPI {
 			$result = self::get(array(
 				'screenids' => $screens,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			foreach ($screens as $id) {
 				if (!isset($result[$id])) {
@@ -559,15 +563,16 @@ class CScreenItem extends CZBXAPI {
 
 
 	/**
-	 * Builds a SELECT SQL query from the given options.
+	 * Builds an SQL parts array from the given options.
 	 *
 	 * @param array $options
-	 * @return string         The resulting SQL query
+	 *
+	 * @return array         The resulting SQL parts array
 	 */
-	protected static function buildSql(array $options) {
+	protected static function buildSqlParts(array $options) {
 		$sqlParts = array(
-			'select' => array('screenitems' => 'si.screenitemid'),
-			'from' => array('screenitems' => 'screens_items si'),
+			'select' => array('si.screenitemid'),
+			'from' => array('screens_items si'),
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
@@ -583,12 +588,25 @@ class CScreenItem extends CZBXAPI {
 		// handle filters
 		$sqlParts = self::buildSqlFilters($options, $sqlParts);
 
+		return $sqlParts;
+	}
+
+
+	/**
+	 * Builds a SELECT SQL query from the given options.
+	 *
+	 * @param array $options
+	 * @param array $sqlParts
+	 *
+	 * @return string         The resulting SQL query
+	 */
+	protected static function buildSql(array $options, array $sqlParts) {
 		// check nodes
 		$nodeids = ($options['nodeids'] !== null) ? $options['nodeids'] : get_current_nodeid();
 
 		// build query
-		$sqlSelect = implode(',', $sqlParts['select']);
-		$sqlFrom = implode(',', $sqlParts['from']);
+		$sqlSelect = implode(',', array_unique($sqlParts['select']));
+		$sqlFrom = implode(',', array_unique($sqlParts['from']));
 		$sqlWhere = ($sqlParts['where']) ? ' AND '.implode(' AND ', $sqlParts['where']) : '';
 		$sqlGroup = ($sqlParts['group']) ? ' GROUP BY '.implode(',', $sqlParts['group']) : '';
 		$sqlOrder = ($sqlParts['order']) ? ' ORDER BY '.implode(',', $sqlParts['order']) : '';
@@ -612,22 +630,28 @@ class CScreenItem extends CZBXAPI {
 	 * @return array
 	 */
 	protected static function buildSqlOutput(array $options, array $sqlParts, array $schema) {
-		// custom output
-		if (is_array($options['output'])) {
-			foreach ($options['output'] as $field) {
-				if (isset($schema['fields'][$field])) {
-					$sqlParts['select'][$field] = 'si.'.$field;
-				}
-			}
-		}
-		// extendex output
-		elseif ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['screens_items'] = 'si.*';
-		}
 
 		// count
 		if ($options['countOutput'] !== null) {
 			$sqlParts['select'] = array('COUNT(DISTINCT si.screenitemid) AS rowscount');
+		}
+		// custom output
+		elseif (is_array($options['output'])) {
+			$sqlParts['select'] = array();
+			foreach ($options['output'] as $field) {
+				if (isset($schema['fields'][$field])) {
+					$sqlParts['select'][] = 'si.'.$field;
+				}
+			}
+
+			// make sure the id is included if the 'preservekeys' option is enabled
+			if ($options['preservekeys'] !== null) {
+				$sqlParts['select'][] = 'screenitemid';
+			}
+		}
+		// extendex output
+		elseif ($options['output'] == API_OUTPUT_EXTEND) {
+			$sqlParts['select'][] = 'si.*';
 		}
 
 		// sort
@@ -677,6 +701,29 @@ class CScreenItem extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+
+	/**
+	 * Unsets the fields that haven't been explicitly asked for by the user, but
+	 * have been included in the resulting object for whatever reasons.
+	 *
+	 * @param array $object    The object from the database
+	 * @param array $sqlWhere
+	 * @param array $options
+	 *
+	 * @return array           The resulting object
+	 */
+	protected static function unsetExtraFields(array $object, array $options, array $sqlParts) {
+
+		// unset the pk forced by the 'preservedkeys' option
+		if ($options['preservekeys'] !== null && in_array('si.screenitemid', $sqlParts['select'])
+			&& is_array($options['output']) && !in_array('screenitemid', $options['output'])) {
+
+			unset($object['screenitemid']);
+		}
+
+		return $object;
 	}
 
 }
