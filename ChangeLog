@@ -347,6 +347,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
+ - [ZBX-4298] added deleted data report to a housekeeper on every step (dimir)
  - [ZBX-4235] fixed operations with decimal numbers for certain locales (pavels)
  - [ZBX-3244] fixed dropdown changes its style when navigating menu (sanja)
  - [ZBX-4015] fixed multiple XSS issues (pavels)
