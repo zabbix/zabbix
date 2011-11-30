@@ -24,6 +24,8 @@
 
 static perfstat_memory_total_t	m;
 
+#define ZBX_PERFSTAT_PAGE_SIZE	12
+
 #define ZBX_PERFSTAT_MEMORY_TOTAL()					\
 									\
 	if (-1 == perfstat_memory_total(NULL, &m, sizeof(m), 1))	\
@@ -33,7 +35,7 @@ static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_total << 12);	/* total real memory (in 4KB pages) */
+	SET_UI64_RESULT(result, m.real_total << ZBX_PERFSTAT_PAGE_SIZE);	/* total real memory in pages */
 
 	return SYSINFO_RET_OK;
 }
@@ -42,7 +44,7 @@ static int	VM_MEMORY_PINNED(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_pinned << 12);	/* real memory which is pinned (in 4KB pages) */
+	SET_UI64_RESULT(result, m.real_pinned << ZBX_PERFSTAT_PAGE_SIZE);	/* real memory which is pinned in pages */
 
 	return SYSINFO_RET_OK;
 }
@@ -51,7 +53,7 @@ static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_free << 12);	/* free real memory (in 4KB pages) */
+	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SIZE);	/* free real memory in pages */
 
 	return SYSINFO_RET_OK;
 }
@@ -60,7 +62,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_inuse << 12);	/* real memory which is in use (in 4KB pages) */
+	SET_UI64_RESULT(result, m.real_inuse << ZBX_PERFSTAT_PAGE_SIZE);	/* real memory which is in use in pages */
 
 	return SYSINFO_RET_OK;
 }
@@ -78,7 +80,7 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_free << 12);
+	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SIZE);
 
 	return SYSINFO_RET_OK;
 }
@@ -96,7 +98,7 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.numperm << 12);	/* number of frames used for files (in 4KB pages) */
+	SET_UI64_RESULT(result, m.numperm << ZBX_PERFSTAT_PAGE_SIZE);	/* number of pages used for files */
 
 	return SYSINFO_RET_OK;
 }
