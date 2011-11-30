@@ -76,11 +76,21 @@ class CZBXAPI {
 
 
 	/**
+	 * Returns the table name with the table alias.
+	 *
+	 * @return string
+	 */
+	protected function tableId() {
+		return $this->tableName().' '.$this->tableAlias();
+	}
+
+
+	/**
 	 * Prepends the table alias to the given field name.
 	 *
 	 * @return string
 	 */
-	protected function fullFieldName($fieldName) {
+	protected function fieldId($fieldName) {
 		return $this->tableAlias().'.'.$fieldName;
 	}
 
@@ -102,9 +112,22 @@ class CZBXAPI {
 	 *
 	 * @return array
 	 */
-	protected function getTableSchema()
-	{
+	protected function getTableSchema() {
 		return DB::getSchema($this->tableName());
+	}
+
+
+	/**
+	 * Returns true if the table has the given field.
+	 *
+	 * @param string $fieldName
+	 *
+	 * @return boolean
+	 */
+	protected function hasField($fieldName) {
+		$schema = $this->getTableSchema();
+
+		return isset($schema['fields'][$fieldName]);
 	}
 
 
@@ -121,8 +144,8 @@ class CZBXAPI {
 	protected function unsetExtraFields(array $object, array $options, array $sqlParts) {
 
 		// unset the pk forced by the 'preservedkeys' option
-		if ($options['preservekeys'] !== null && in_array($this->fullFieldName($this->pk()), $sqlParts['select'])
-			&& !in_array($this->pk(), $options['output']) && $output['output'] != API_OUTPUT_EXTEND) {
+		if ($options['preservekeys'] !== null && in_array($this->fieldId($this->pk()), $sqlParts['select'])
+			&& is_array($options['output']) && !in_array($this->pk(), $options['output'])) {
 
 			unset($object[$this->pk()]);
 		}

@@ -112,7 +112,7 @@ class CScreenItem extends CZBXAPI {
 
 		// build and execute query
 		$sqlParts = $this->buildSqlParts($options);
-		$sql = $this->buildSql($sqlParts);
+		$sql = $this->buildSql($options, $sqlParts);
 		$res = DBselect($sql, $options['limit']);
 
 		// fetch results
@@ -150,7 +150,7 @@ class CScreenItem extends CZBXAPI {
 		$this->checkInput($screenItems);
 
 		// insert items
-		$screenItemIds = DB::insert('screens_items', $screenItems);
+		$screenItemIds = DB::insert($this->tableName(), $screenItems);
 
 		return array(
 			'screenitemids' => $screenItemIds
@@ -190,7 +190,7 @@ class CScreenItem extends CZBXAPI {
 				)
 			);
 		}
-		DB::update('screens_items', $update);
+		DB::update($this->tableName(), $update);
 
 		return array(
 			'screenitemids' => zbx_objectValues($screenItems, 'screenitemid')
@@ -277,7 +277,7 @@ class CScreenItem extends CZBXAPI {
 		}
 
 		// delete screen items
-		DB::delete('screens_items', array(
+		DB::delete($this->tableName(), array(
 			'screenitemid' => $screenItemIds
 		));
 
@@ -303,7 +303,6 @@ class CScreenItem extends CZBXAPI {
 
 		$count = $this->get(array(
 			'screenitemids' => $screenItemIds,
-			'output' => API_OUTPUT_SHORTEN,
 			'countOutput' => true
 		));
 
@@ -329,7 +328,6 @@ class CScreenItem extends CZBXAPI {
 
 		$count = $this->get(array(
 			'screenitemids' => $screenItemIds,
-			'output' => API_OUTPUT_SHORTEN,
 			'editable' => true,
 			'countOutput' => true
 		));
@@ -430,7 +428,7 @@ class CScreenItem extends CZBXAPI {
 			$result = API::HostGroup()->get(array(
 				'groupids' => $hostgroups,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			foreach($hostgroups as $id){
 				if(!isset($result[$id]))
@@ -443,7 +441,7 @@ class CScreenItem extends CZBXAPI {
 			$result = API::Host()->get(array(
 				'hostids' => $hosts,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			foreach ($hosts as $id) {
 				if (!isset($result[$id])) {
@@ -457,7 +455,7 @@ class CScreenItem extends CZBXAPI {
 			$result = API::Graph()->get(array(
 				'graphids' => $graphs,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			foreach ($graphs as $id) {
 				if (!isset($result[$id])) {
@@ -471,8 +469,8 @@ class CScreenItem extends CZBXAPI {
 			$result = API::Item()->get(array(
 				'itemids' => $items,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-				'webitems' => 1
+				'preservekeys' => true,
+				'webitems' => true
 			));
 			foreach ($items as $id) {
 				if (!isset($result[$id])) {
@@ -486,7 +484,7 @@ class CScreenItem extends CZBXAPI {
 			$result = API::Map()->get(array(
 				'sysmapids' => $maps,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			foreach ($maps as $id) {
 				if (!isset($result[$id])) {
@@ -500,7 +498,7 @@ class CScreenItem extends CZBXAPI {
 			$result = $this->get(array(
 				'screenids' => $screens,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1
+				'preservekeys' => true
 			));
 			foreach ($screens as $id) {
 				if (!isset($result[$id])) {
@@ -531,22 +529,22 @@ class CScreenItem extends CZBXAPI {
 	 */
 	protected function buildSqlParts(array $options) {
 		$sqlParts = array(
-			'select' => array('screenitems' => 'si.screenitemid'),
-			'from' => array('screenitems' => 'screens_items si'),
+			'select' => array($this->fieldId('screenitemid')),
+			'from' => array($this->tableId()),
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
 			'limit' => null
 		);
 
-		// schema
-		$schema = DB::getSchema('screens_items');
-
 		// handle output
-		$sqlParts = $this->buildSqlOutput($options, $sqlParts, $schema);
+		$sqlParts = $this->buildSqlOutput($options, $sqlParts);
 
 		// handle filters
 		$sqlParts = $this->buildSqlFilters($options, $sqlParts);
+
+		// sort
+		zbx_db_sorting($sqlParts, $options, $this->sortColumns, $this->tableAlias());
 
 		return $sqlParts;
 	}
@@ -555,23 +553,25 @@ class CScreenItem extends CZBXAPI {
 	/**
 	 * Builds a SELECT SQL query from the given SQL parts array.
 	 *
+	 * @param array $options   An array of API options
 	 * @param array $sqlParts  An SQL parts array
+	 *
 	 * @return string          The resulting SQL query
 	 */
-	protected function buildSql(array $sqlParts) {
+	protected function buildSql(array $options, array $sqlParts) {
 
 		// check nodes
 		$nodeids = ($options['nodeids'] !== null) ? $options['nodeids'] : get_current_nodeid();
 
 		// build query
-		$sqlSelect = implode(',', $sqlParts['select']);
-		$sqlFrom = implode(',', $sqlParts['from']);
+		$sqlSelect = implode(',', array_unique($sqlParts['select']));
+		$sqlFrom = implode(',', array_unique($sqlParts['from']));
 		$sqlWhere = ($sqlParts['where']) ? ' AND '.implode(' AND ', $sqlParts['where']) : '';
 		$sqlGroup = ($sqlParts['group']) ? ' GROUP BY '.implode(',', $sqlParts['group']) : '';
 		$sqlOrder = ($sqlParts['order']) ? ' ORDER BY '.implode(',', $sqlParts['order']) : '';
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('si.screenitemid', $nodeids).
+				' WHERE '.DBin_node($this->fieldId('screenitemid'), $nodeids).
 					$sqlWhere.
 				$sqlGroup.
 				$sqlOrder;
@@ -588,39 +588,28 @@ class CScreenItem extends CZBXAPI {
 	 * @param array $schema
 	 * @return array
 	 */
-	protected function buildSqlOutput(array $options, array $sqlParts, array $schema) {
+	protected function buildSqlOutput(array $options, array $sqlParts) {
 		// count
 		if ($options['countOutput'] !== null) {
-			$sqlParts['select'] = array('COUNT(DISTINCT si.screenitemid) AS rowscount');
+			$sqlParts['select'] = array('COUNT(DISTINCT '.$this->fieldId('screenitemid').') AS rowscount');
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
 			$sqlParts['select'] = array();
 			foreach ($options['output'] as $field) {
-				if (isset($schema['fields'][$field])) {
-					$sqlParts['select'][$field] = 'si.'.$field;
+				if ($this->hasField($field)) {
+					$sqlParts['select'][] = $this->fieldId($field);
 				}
 			}
 
 			// make sure the id is included if the 'preservekeys' option is enabled
 			if ($options['preservekeys'] !== null) {
-				$sqlParts['select']['screenitemid'] = 'si.screenitemid';
+				$sqlParts['select'][] = $this->fieldId('screenitemid');
 			}
 		}
 		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
 			$sqlParts['select'] = array('si.*');
-		}
-
-		// sort
-		$sortfield = $options['sortfield'];
-		if (in_array($sortfield, $this->sortColumns)) {
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
-			$sqlParts['order'][] = 'si.'.$sortfield.' '.$sortorder;
-
-			if (!array_intersect(array('si.'.$sortfield, 'si.*'), array($sqlParts['select']))) {
-				$sqlParts['select'][] = 'si.'.$sortfield;
-			}
 		}
 
 		return $sqlParts;
@@ -639,23 +628,23 @@ class CScreenItem extends CZBXAPI {
 		// screen item ids
 		if ($options['screenitemids'] !== null) {
 			zbx_value2array($options['screenitemids']);
-			$sqlParts['where'][] = DBcondition('si.screenitemid', $options['screenitemids']);
+			$sqlParts['where'][] = DBcondition($this->fieldId('screenitemid'), $options['screenitemids']);
 		}
 
 		// screen ids
 		if ($options['screenids'] !== null) {
 			zbx_value2array($options['screenids']);
-			$sqlParts['where'][] = DBcondition('si.screenid', $options['screenids']);
+			$sqlParts['where'][] = DBcondition($this->fieldId('screenid'), $options['screenids']);
 		}
 
 		// filters
 		if (is_array($options['filter'])) {
-			zbx_db_filter('screens_items si', $options, $sqlParts);
+			zbx_db_filter($this->tableId(), $options, $sqlParts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search('screens_items si', $options, $sqlParts);
+			zbx_db_search($this->tableId(), $options, $sqlParts);
 		}
 
 		return $sqlParts;
