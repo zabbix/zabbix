@@ -27,6 +27,11 @@
  * Class containing methods for operations with graphs
  */
 class CGraphPrototype extends CZBXAPI{
+
+	protected $tableName = 'graphs';
+
+	protected $tableAlias = 'g';
+
 /**
 * Get GraphPrototype data
 *
