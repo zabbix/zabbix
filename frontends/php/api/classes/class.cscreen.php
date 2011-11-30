@@ -734,7 +734,7 @@ SDI('/////////////////////////////////');
 		// fetch the current screen items
 		$dbScreenItems = API::ScreenItem()->get(array(
 			'screenids' => $screenid,
-			'preservekeys' => true,
+			'preservekeys' => true
 		));
 
 		// update the new ones

@@ -172,7 +172,7 @@ class CScreenItem extends CZBXAPI {
 		$dbScreenItems = $this->get(array(
 			'screenitemids' => $screenItemIds,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
+			'preservekeys' => true
 		));
 
 		// validate input
@@ -211,7 +211,7 @@ class CScreenItem extends CZBXAPI {
 		// create a screen-position map
 		$dbScreenItems = $this->get(array(
 			'output' => array('screenitemid', 'x', 'y', 'screenid'),
-			'screenids' => zbx_objectValues($screenItems, 'screenid'),
+			'screenids' => zbx_objectValues($screenItems, 'screenid')
 		));
 		$screenItemMap = array();
 		foreach ($dbScreenItems as $dbScreenItem) {
@@ -589,7 +589,6 @@ class CScreenItem extends CZBXAPI {
 	 * @return array
 	 */
 	protected function buildSqlOutput(array $options, array $sqlParts, array $schema) {
-
 		// count
 		if ($options['countOutput'] !== null) {
 			$sqlParts['select'] = array('COUNT(DISTINCT si.screenitemid) AS rowscount');
@@ -608,7 +607,7 @@ class CScreenItem extends CZBXAPI {
 				$sqlParts['select']['screenitemid'] = 'si.screenitemid';
 			}
 		}
-		// extendex output
+		// extended output
 		elseif ($options['output'] == API_OUTPUT_EXTEND) {
 			$sqlParts['select'] = array('si.*');
 		}
