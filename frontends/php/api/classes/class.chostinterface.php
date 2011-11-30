@@ -445,7 +445,7 @@ Copt::memoryPick();
 	 * @param array  $interfaces
 	 * @param string $method
 	 */
-	protected function checkInput(array &$interfaces, $method) {
+	public function checkInput(array &$interfaces, $method) {
 		$update = ($method == 'update');
 
 		// permissions
@@ -810,7 +810,7 @@ Copt::memoryPick();
 	 *
 	 * @param array $interfaces
 	 */
-	private function checkMainInterfaces(array $interfaces) {
+	public function checkMainInterfaces(array $interfaces) {
 		$interfaceTypes = array();
 		foreach ($interfaces as $interface) {
 			if (!isset($interfaceTypes[$interface['hostid']])) {
@@ -834,13 +834,14 @@ Copt::memoryPick();
 				if ($counters['all'] && !$counters['main']) {
 					$host = API::Host()->get(array(
 						'hostids' => $interfaceHostId,
-						'output' => array('host'),
+						'output' => array('name'),
 						'preservekeys' => true,
 						'nopermissions' => true
 					));
+					$host = reset($host);
 
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No main interface for "%1$s" type on host "%2$s".', hostInterfaceTypeNumToName($type), $host['host']));
+						_s('No main interface for "%1$s" type on host "%2$s".', hostInterfaceTypeNumToName($type), $host['name']));
 				}
 
 				if ($counters['main'] > 1) {

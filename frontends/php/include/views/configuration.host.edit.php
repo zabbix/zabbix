@@ -258,7 +258,7 @@ $ifTab->addRow(array($iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabe
 
 
 $helpTextWhenDragInterfaceAgent = new CSpan(_('Drag here to change the type of the interface to "agent" type.'));
-$helpTextWhenDragInterfaceAgent->addStyle('display: none;');
+$helpTextWhenDragInterfaceAgent->addStyle('display: none; color: #5481AB;');
 $helpTextWhenDragInterfaceAgent->addClass('dragHelpText');
 $buttonCol = new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu'));
 $buttonCol->addStyle('width: 2em;');
@@ -280,7 +280,7 @@ $ifTab->addStyle('width: 71em;');
 
 
 $helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
-$helpTextWhenDragInterfaceSNMP->addStyle('display: none;');
+$helpTextWhenDragInterfaceSNMP->addStyle('display: none; color: #5481AB;');
 $helpTextWhenDragInterfaceSNMP->addClass('dragHelpText');
 $buttonCol = new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu'));
 $buttonCol->addStyle('width: 2em;');
@@ -300,7 +300,7 @@ $ifTab->setAttribute('id', 'JMXInterfaces');
 $ifTab->setAttribute('data-type', 'jmx');
 $ifTab->addStyle('width: 71em;');
 $helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
-$helpTextWhenDragInterfaceJMX->addStyle('display: none;');
+$helpTextWhenDragInterfaceJMX->addStyle('display: none; color: #5481AB;');
 $helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
 $buttonCol = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'));
 $buttonCol->addStyle('width: 2em;');
@@ -319,7 +319,7 @@ $ifTab->setAttribute('id', 'IPMIInterfaces');
 $ifTab->setAttribute('data-type', 'ipmi');
 $ifTab->addStyle('width: 71em;');
 $helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
-$helpTextWhenDragInterfaceIPMI->addStyle('display: none;');
+$helpTextWhenDragInterfaceIPMI->addStyle('display: none; color: #5481AB;');
 $helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
 $buttonCol = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'));
 $buttonCol->addStyle('width: 2em;');
