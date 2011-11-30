@@ -1182,7 +1182,7 @@ class CChart extends CGraphDraw{
 				continue;
 			}
 
-			if (interval >= SEC_PER_HOUR && $interval < SEC_PER_DAY && date('H', $new_time) == 0) {
+			if ($interval >= SEC_PER_HOUR && $interval < SEC_PER_DAY && date('H', $new_time) == "00") {
 				$this->drawMainPeriod($new_time, $new_pos);
 				continue;
 			}
@@ -1199,15 +1199,19 @@ class CChart extends CGraphDraw{
 //----------
 
 			dashedline($this->im,
-					$this->shiftXleft+$new_pos,
+					$this->shiftXleft + $new_pos,
 					$this->shiftY,
-					$this->shiftXleft+$new_pos,
-					$this->sizeY+$this->shiftY,
+					$this->shiftXleft + $new_pos,
+					$this->sizeY + $this->shiftY,
 					$this->getColor($this->graphtheme['gridcolor'], 0)
 			);
 
-			if($main_intervalX < floor(($main_interval/$interval)*$intervalX)) continue;
-			else if($main_intervalX < (ceil($main_interval/$interval + 1)*$test_dims['width'])) continue;
+			if ($main_intervalX < floor(($main_interval / $interval) * $intervalX)) {
+				continue;
+			}
+			elseif ($main_intervalX < (ceil($main_interval / $interval + 1) * $test_dims['width'])) {
+				continue;
+			}
 
 			if ($interval == SEC_PER_DAY) {
 				$date_format = _('D');
@@ -1225,36 +1229,36 @@ class CChart extends CGraphDraw{
 			imageText($this->im,
 						7,
 						90,
-						$this->shiftXleft+$new_pos+round($dims['width']/2),
-						$this->sizeY+$this->shiftY+$dims['height']+6,
-						$this->getColor($this->graphtheme['textcolor'],0),
+						$this->shiftXleft + $new_pos+round($dims['width'] / 2),
+						$this->sizeY + $this->shiftY+$dims['height'] + 6,
+						$this->getColor($this->graphtheme['textcolor'], 0),
 						$str
 			);
 		}
 
 // First && Last
 // Start
-		$str = zbx_date2str(S_CCHARTS_TIMELINE_START_DATE_FORMAT,$this->stime);
+		$str = zbx_date2str(S_CCHARTS_TIMELINE_START_DATE_FORMAT, $this->stime);
 		$dims = imageTextSize(8, 90, $str);
 		imageText($this->im,
 					8,
 					90,
-					$this->shiftXleft + round($dims['width']/2),
-					$this->sizeY+$this->shiftY + $dims['height'] + 6,
+					$this->shiftXleft + round($dims['width'] / 2),
+					$this->sizeY + $this->shiftY + $dims['height'] + 6,
 					$this->getColor($this->graphtheme['highlightcolor'], 0),
 					$str
 			);
 
 // End
-		$endtime = $this->to_time;// - $this->diffTZ;
+		$endtime = $this->to_time;
 
-		$str = zbx_date2str(S_CCHARTS_TIMELINE_END_DATE_FORMAT,$endtime);
+		$str = zbx_date2str(S_CCHARTS_TIMELINE_END_DATE_FORMAT, $endtime);
 		$dims = imageTextSize(8, 90, $str);
 		imageText($this->im,
 					8,
 					90,
-					$this->sizeX+$this->shiftXleft + round($dims['width']/2),
-					$this->sizeY+$this->shiftY + $dims['height'] + 6,
+					$this->sizeX + $this->shiftXleft + round($dims['width'] / 2),
+					$this->sizeY + $this->shiftY + $dims['height'] + 6,
 					$this->getColor($this->graphtheme['highlightcolor'], 0),
 					$str
 			);
