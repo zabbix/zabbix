@@ -1,8 +1,17 @@
 --------------------------------------------------------------------------------
+Changes for 1.9.9
+
+New features:
+ - [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
+
+Bug fixes:
+ - [ZBX-4382] fixed missing dates in the midle of graph axis (sanja)
+ - [ZBX-3366] fixed API sorting (Eduard)
+
+--------------------------------------------------------------------------------
 Changes for 1.9.8
 
 New features:
- - [ZBX-3366] fixed API sorting (Eduard)
  - [ZBX-3104] implemented the screen item API (pavels)
  - [ZBXNEXT-913] redesign Configuration->IT Services (Eduard)
  - [ZBXNEXT-907] redesign Configuration->Applications (Eduard)
@@ -336,6 +345,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
+ - [ZBX-3244] fixed dropdown changes its style when navigating menu (sanja)
+ - [ZBX-4015] fixed multiple XSS issues (pavels)
  - [ZBX-4288] fixed user macro deleting when deleting a host (pavels)
  - [ZBX-2859] fixed possibility to successfully delete zero regular expressions (sanja)
  - [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
