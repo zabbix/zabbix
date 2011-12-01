@@ -331,6 +331,8 @@ static int	housekeeping_history_and_trends(int now)
 
 void	main_housekeeper_loop()
 {
+#define ZBX_QNT_ENDING(quantity)	(1 == quantity ? "" : "s")
+
 	int	now, d_history_and_trends, d_clenup, d_events, d_alerts, d_sessions;
 
 	for (;;)
@@ -357,12 +359,18 @@ void	main_housekeeper_loop()
 		zbx_setproctitle("%s [removing old sessions]", get_process_type_string(process_type));
 		d_sessions = housekeeping_sessions(now);
 
-		zabbix_log(LOG_LEVEL_WARNING, "housekeeper deleted: %d records from history and trends,"
-				" %d records of deleted items, %d events, %d alerts, %d sessions",
-				d_history_and_trends, d_clenup, d_events, d_alerts, d_sessions);
+		zabbix_log(LOG_LEVEL_WARNING, "housekeeper deleted: %d record%s from history and trends,"
+				" %d record%s of deleted items, %d event%s, %d alert%s, %d session%s",
+				d_history_and_trends, ZBX_QNT_ENDING(d_history_and_trends),
+				d_clenup, ZBX_QNT_ENDING(d_clenup),
+				d_events, ZBX_QNT_ENDING(d_events),
+				d_alerts, ZBX_QNT_ENDING(d_alerts),
+				d_sessions, ZBX_QNT_ENDING(d_alerts));
 
 		DBclose();
 
 		zbx_sleep_loop(CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR);
 	}
+
+#undef ZBX_QNT_ENDING
 }
