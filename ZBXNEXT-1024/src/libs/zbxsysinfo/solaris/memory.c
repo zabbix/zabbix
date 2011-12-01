@@ -49,7 +49,9 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 {
 	zbx_uint64_t	used, total;
 
-	total = sysconf(_SC_PHYS_PAGES);
+	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
+		return SYSINFO_RET_FAIL;
+
 	used = total - sysconf(_SC_AVPHYS_PAGES);
 
 	SET_DBL_RESULT(result, used / (double)total * 100);
@@ -66,7 +68,12 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 
 static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 {
-	SET_DBL_RESULT(result, sysconf(_SC_AVPHYS_PAGES) / (double)sysconf(_SC_PHYS_PAGES) * 100);
+	zbx_uint64_t	total;
+
+	if (0 == (total = sysconf(_SC_PHYS_PAGES)))
+		return SYSINFO_RET_FAIL;
+
+	SET_DBL_RESULT(result, sysconf(_SC_AVPHYS_PAGES) / (double)total * 100);
 
 	return SYSINFO_RET_OK;
 }

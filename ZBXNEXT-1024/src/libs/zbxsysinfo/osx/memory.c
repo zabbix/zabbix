@@ -100,6 +100,10 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	zbx_uint64_t	used;
 
 	ZBX_SYSCTL(memsize);
+
+	if (0 == memsize)
+		return SYSINFO_RET_FAIL;
+
 	ZBX_HOST_STATISTICS(vm);
 
 	used = (zbx_uint64_t)(vm.active_count + vm.inactive_count + vm.wire_count) * pagesize;
@@ -123,6 +127,10 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	zbx_uint64_t	available;
 
 	ZBX_SYSCTL(memsize);
+
+	if (0 == memsize)
+		return SYSINFO_RET_FAIL;
+
 	ZBX_HOST_STATISTICS(vm);
 
 	available = (zbx_uint64_t)(vm.inactive_count + vm.free_count) * pagesize;

@@ -71,6 +71,9 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
+	if (0 == m.real_total)
+		return SYSINFO_RET_FAIL;
+
 	SET_DBL_RESULT(result, m.real_inuse / (double)m.real_total * 100);
 
 	return SYSINFO_RET_OK;
@@ -88,6 +91,9 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
+
+	if (0 == m.real_total)
+		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, m.real_free / (double)m.real_total * 100);
 
