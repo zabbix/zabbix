@@ -514,9 +514,21 @@ COpt::memoryPick();
 		return !empty($objs);
 	}
 
-	protected function checkInput(array &$items, $update=false){
-		foreach($items as $inum => $item){
-			$items[$inum]['flags'] = ZBX_FLAG_DISCOVERY;
+
+	/**
+	 * Check item data and set missing default values.
+	 *
+	 * @throws APIException
+	 *
+	 * @param array $items passed by reference
+	 * @param bool  $update
+	 *
+	 * @return void
+	 */
+	protected function checkInput(array &$items, $update = false) {
+		foreach ($items as &$item) {
+			$item['flags'] = ZBX_FLAG_DISCOVERY;
+			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 		}
 
 		parent::checkInput($items, $update);
