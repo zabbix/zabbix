@@ -110,7 +110,6 @@ function init_nodes() {
 function get_current_nodeid($force_all_nodes = null, $perm = null) {
 	global $ZBX_CURRENT_NODEID, $ZBX_AVAILABLE_NODES, $ZBX_VIEWED_NODES;
 	if (!isset($ZBX_CURRENT_NODEID)) {
-		error('Nodes are not initialized!');
 		init_nodes();
 	}
 
