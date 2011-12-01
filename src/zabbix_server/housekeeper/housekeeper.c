@@ -50,6 +50,7 @@ static int	housekeeping_cleanup()
 	int		d, deleted = 0;
 	char		*sql = NULL;
 	size_t		sql_alloc = 512, sql_offset = 0;
+	int		ids_alloc = 0, ids_num = 0;
 	zbx_uint64_t	*ids = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -170,7 +171,7 @@ static int	housekeeping_sessions(int now)
 	return deleted;
 }
 
-static void	housekeeping_alerts(int now)
+static int	housekeeping_alerts(int now)
 {
 	const char	*__function_name = "housekeeping_alerts";
 	int		deleted = 0, alert_history;
@@ -186,7 +187,7 @@ static void	housekeeping_alerts(int now)
 	return deleted;
 }
 
-static void	housekeeping_events(int now)
+static int	housekeeping_events(int now)
 {
 	const char	*__function_name = "housekeeping_events";
 	int		event_history, deleted = 0;
