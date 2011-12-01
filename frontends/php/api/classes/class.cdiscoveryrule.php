@@ -25,6 +25,11 @@
 
 class CDiscoveryRule extends CItemGeneral {
 
+	protected $tableName = 'items';
+
+	protected $tableAlias = 'i';
+
+
 	public function __construct(){
 		parent::__construct();
 	}
