@@ -679,16 +679,17 @@ class CScreenItem extends CZBXAPI {
 			zbx_value2array($options['screenitemids']);
 			$sqlParts['where'][] = DBcondition('si.screenitemid', $options['screenitemids']);
 		}
-		// if no specific ids are given, apply the node filter
-		else {
-			$nodeids = ($options['nodeids'] !== null) ? $options['nodeids'] : get_current_nodeid();
-			$sqlParts['where'][] = DBin_node('screenitemid', $nodeids);
-		}
 
 		// screen ids
 		if ($options['screenids'] !== null) {
 			zbx_value2array($options['screenids']);
 			$sqlParts['where'][] = DBcondition('si.screenid', $options['screenids']);
+		}
+
+		// if no specific ids are given, apply the node filter
+		if ($options['screenitemids'] === null && $options['screenids'] === null) {
+			$nodeids = ($options['nodeids'] !== null) ? $options['nodeids'] : get_current_nodeid();
+			$sqlParts['where'][] = DBin_node('screenitemid', $nodeids);
 		}
 
 		// filters
