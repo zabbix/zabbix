@@ -28,13 +28,10 @@
  *
  */
 class CHistory extends CZBXAPI {
-
-
 	public function __construct() {
 		// considering the quirky nature of the history API,
 		// the parent::__construct() method should not be called.
 	}
-
 
 	/**
 	 * Get history data
@@ -218,14 +215,38 @@ class CHistory extends CZBXAPI {
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'h');
 		if (!zbx_empty($options['sortfield'])) {
 			if (!is_array($options['sortfield'])) {
 				$options['sortfield'] = array($options['sortfield']);
 			}
 			foreach ($options['sortfield'] as $i => $sortfield) {
+				// validate sortfield
+				if (!str_in_array($sortfield, $sort_columns)) {
+					throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%s" not allowed.', $sortfield));
+				}
+
+				// add sort field to order
+				$sortorder = '';
+				if (is_array($options['sortorder'])) {
+					if (!empty($options['sortorder'][$i])) {
+						$sortorder = ($options['sortorder'][$i] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
+					}
+				}
+				else {
+					$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
+				}
+
 				if ($sortfield == 'clock') {
-					$sql_parts['order']['itemid'] = 'h.itemid '.$sortorder;
+					$sortfield = 'itemid';
+				}
+
+				$sql_parts['order'][] = 'h.'.$sortfield.' '.$sortorder;
+
+				// add sort field to select if distinct is used
+				if (count($sql_parts['from']) > 1) {
+					if (!str_in_array('h.'.$sortfield, $sql_parts['select']) && !str_in_array('h.*', $sql_parts['select'])) {
+						$sql_parts['select'][$sortfield] = 'h.'.$sortfield;
+					}
 				}
 			}
 		}
