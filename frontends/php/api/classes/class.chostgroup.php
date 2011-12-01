@@ -26,13 +26,18 @@
 /**
  * Class containing methods for operations with HostGroups
  */
-class CHostGroup extends CZBXAPI {
-	/**
-	 * Get HostGroups
-	 *
-	 * @param array $params
-	 * @return array
-	 */
+class CHostGroup extends CZBXAPI{
+
+	protected $tableName = 'groups';
+
+	protected $tableAlias = 'g';
+
+/**
+ * Get HostGroups
+ *
+ * @param array $params
+ * @return array
+ */
 	public function get($params) {
 		$result = array();
 		$user_type = self::$userData['type'];
