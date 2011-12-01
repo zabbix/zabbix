@@ -483,10 +483,10 @@ require_once('include/page_header.php');
 		$table->setHeader(array(
 			new CCheckBox('all_triggers',NULL,"checkAll('".$form->getName()."','all_triggers','g_triggerid');"),
 			make_sorting_header(S_SEVERITY,'priority'),
-			make_sorting_header(S_STATUS,'status'),
-			($_REQUEST['hostid'] > 0)?NULL:S_HOST,
+						($_REQUEST['hostid'] > 0)?NULL:S_HOST,
 			make_sorting_header(S_NAME,'description'),
 			S_EXPRESSION,
+			make_sorting_header(S_STATUS,'status'),
 			S_ERROR
 		));
 // get Triggers
@@ -625,10 +625,10 @@ require_once('include/page_header.php');
 			$table->addRow(array(
 				$cb,
 				getSeverityCell($trigger['priority']),
-				$status,
 				$hosts,
 				$description,
 				triggerExpression($trigger,1),
+				$status,
 				$error
 			));
 
