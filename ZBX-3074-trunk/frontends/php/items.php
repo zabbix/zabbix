@@ -915,8 +915,8 @@ switch($itemType) {
 			make_sorting_header(S_HISTORY,'history'),
 			make_sorting_header(S_TRENDS,'trends'),
 			make_sorting_header(S_TYPE,'type'),
-			make_sorting_header(S_STATUS,'status'),
 			S_APPLICATIONS,
+			make_sorting_header(S_STATUS,'status'),
 			S_ERROR
 		));
 
@@ -1174,8 +1174,8 @@ switch($itemType) {
 				$item['history'],
 				(in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends']),
 				item_type2str($item['type']),
-				$status,
 				new CCol($applications, 'wraptext'),
+				$status,
 				$error
 			));
 		}
