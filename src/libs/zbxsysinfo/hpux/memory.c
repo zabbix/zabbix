@@ -69,6 +69,9 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	ZBX_PSTAT_GETSTATIC();
 	ZBX_PSTAT_GETDYNAMIC();
 
+	if (0 == pst.physical_memory)
+		return SYSINFO_RET_FAIL;
+
 	SET_DBL_RESULT(result, (pst.physical_memory - pdy.psd_free) / (double)pst.physical_memory * 100);
 
 	return SYSINFO_RET_OK;
@@ -88,6 +91,9 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 {
 	ZBX_PSTAT_GETSTATIC();
 	ZBX_PSTAT_GETDYNAMIC();
+
+	if (0 == pst.physical_memory)
+		return SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, pdy.psd_free / (double)pst.physical_memory * 100);
 

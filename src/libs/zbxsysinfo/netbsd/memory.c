@@ -121,6 +121,9 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 	ZBX_SYSCTL(uvm);
 
+	if (0 == uvm.npages)
+		return SYSINFO_RET_FAIL;
+
 	used = uvm.active + uvm.inactive + uvm.wired + uvm.execpages + uvm.filepages;
 
 	SET_DBL_RESULT(result, used / (double)uvm.npages * 100);
@@ -146,6 +149,9 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	zbx_uint64_t	available;
 
 	ZBX_SYSCTL(uvm);
+
+	if (0 == uvm.npages)
+		return SYSINFO_RET_FAIL;
 
 	available = uvm.inactive + uvm.execpages + uvm.filepages + uvm.free;
 

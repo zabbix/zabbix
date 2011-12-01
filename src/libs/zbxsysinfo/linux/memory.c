@@ -154,6 +154,9 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	available = (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + result_tmp.ui64;
 	total = (zbx_uint64_t)info.totalram * info.mem_unit;
 
+	if (0 == total)
+		return SYSINFO_RET_FAIL;
+
 	SET_DBL_RESULT(result, available / (double)total * 100);
 
 	free_result(&result_tmp);
