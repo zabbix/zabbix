@@ -38,6 +38,7 @@ static zbx_oracle_db_handle_t	oracle;
 static PGconn			*conn = NULL;
 static int			ZBX_PG_BYTEAOID = 0;
 int				ZBX_PG_SVERSION = 0;
+char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
 static PHP_MUTEX		sqlite_access;
@@ -317,8 +318,12 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (80100 <= ZBX_PG_SVERSION)
 	{
 		/* disable "nonstandard use of \' in a string literal" warning */
-		DBexecute("set escape_string_warning to off;\n"
-				"set standard_conforming_strings to off;");
+		DBexecute("set escape_string_warning to off");
+
+		result = DBselect("show standard_conforming_strings");
+		if (NULL != (row = DBfetch(result)))
+			ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
+		DBfree_result(result);
 	}
 
 	if (90000 <= ZBX_PG_SVERSION)
