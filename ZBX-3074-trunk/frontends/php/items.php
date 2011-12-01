@@ -905,19 +905,19 @@ switch($itemType) {
 		$table  = new CTableInfo();
 // Table Header //
 		$table->setHeader(array(
-			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			S_WIZARD,
-			$show_host?S_HOST:null,
-			make_sorting_header(_('Name'),'name'),
-			S_TRIGGERS,
-			make_sorting_header(S_KEY,'key_'),
-			make_sorting_header(S_INTERVAL,'delay'),
-			make_sorting_header(S_HISTORY,'history'),
-			make_sorting_header(S_TRENDS,'trends'),
-			make_sorting_header(S_TYPE,'type'),
-			S_APPLICATIONS,
-			make_sorting_header(S_STATUS,'status'),
-			S_ERROR
+			new CCheckBox('all_items', null, "checkAll('".$form->GetName()."','all_items','group_itemid');"),
+			_('Wizard'),
+			$show_host ? _('Host') : null,
+			make_sorting_header(_('Name'), 'name'),
+			_('Triggers'),
+			make_sorting_header(_('Key'), 'key_'),
+			make_sorting_header(_('Interval'), 'delay'),
+			make_sorting_header(_('History'), 'history'),
+			make_sorting_header(_('Trends'), 'trends'),
+			make_sorting_header(_('Type'), 'type'),
+			_('Applications'),
+			make_sorting_header(_('Status'), 'status'),
+			_('Error')
 		));
 
 
