@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-define('ZABBIX_VERSION',		'1.9.8');
+define('ZABBIX_VERSION',		'1.9.9');
 define('ZABBIX_API_VERSION',	'1.2');
 
 define('ZBX_LOGIN_ATTEMPTS',			5);
@@ -642,7 +642,6 @@ define('GRAPH_YAXIS_SIDE_LEFT',		0);
 define('GRAPH_YAXIS_SIDE_RIGHT',	1);
 
 define('GRAPH_ITEM_SIMPLE',			0);
-define('GRAPH_ITEM_AGGREGATED',		1);
 define('GRAPH_ITEM_SUM',			2);
 
 define('GRAPH_TYPE_NORMAL',			0);

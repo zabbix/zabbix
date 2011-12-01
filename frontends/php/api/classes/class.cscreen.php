@@ -27,6 +27,11 @@
  * Class containing methods for operations with Screens
  */
 class CScreen extends CZBXAPI {
+
+	protected $tableName = 'screens';
+
+	protected $tableAlias = 's';
+
 /**
  * Get Screen data
  *
@@ -729,7 +734,7 @@ SDI('/////////////////////////////////');
 		// fetch the current screen items
 		$dbScreenItems = API::ScreenItem()->get(array(
 			'screenids' => $screenid,
-			'preservekeys' => true,
+			'preservekeys' => true
 		));
 
 		// update the new ones
