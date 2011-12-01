@@ -28,6 +28,11 @@
  *
  */
 class CImage extends CZBXAPI {
+
+	protected $tableName = 'images';
+
+	protected $tableAlias = 'i';
+
 	/**
 	 * Get images data
 	 *

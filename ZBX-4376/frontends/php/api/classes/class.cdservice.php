@@ -27,6 +27,11 @@
  * Class containing methods for operations with Discovered Services
  */
 class CDService extends CZBXAPI{
+
+	protected $tableName = 'dservices';
+
+	protected $tableAlias = 'ds';
+
 /**
  * Get Service data
  *
