@@ -349,6 +349,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
+A......... [ZBX-3104] implemented the screen item API (pavels)
+A.F....... [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
 ........S. [ZBX-4298] added deleted data report to a housekeeper on every step (dimir)
 ..F....... [ZBX-3649] fixed "frontends/php/styles/ie_default.css" doesn't exist (for IE6) (sanja)
 A.F....... [ZBX-4235] fixed operations with decimal numbers for certain locales (pavels)
