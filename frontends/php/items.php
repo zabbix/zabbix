@@ -920,6 +920,7 @@ switch($itemType) {
 			S_ERROR
 		));
 
+
 // SET VALUES FOR SUBFILTERS {
 // if any of subfilters = false then item shouldnt be shown
 		foreach($items as $num => $item){

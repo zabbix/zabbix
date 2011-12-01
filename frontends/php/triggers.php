@@ -619,6 +619,7 @@ require_once('include/page_header.php');
 				}
 			}
 
+
 			$cb = new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid);
 			$cb->setEnabled(empty($trigger['discoveryRule']));
 
