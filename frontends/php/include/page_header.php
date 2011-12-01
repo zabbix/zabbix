@@ -203,7 +203,7 @@ if (isset($_REQUEST['print'])) {
 	$req = new CUrl();
 	$req->setArgument('print', null);
 
-	$link = new CLink(bold('&laquo;'._('BACK')), $req->getUrl(), 'small_font', null, 'nosid');
+	$link = new CLink(bold('<'._('BACK')), $req->getUrl(), 'small_font', null, 'nosid');
 	$link->setAttribute('style', 'padding-left: 10px;');
 
 	$printview = new CDiv($link, 'printless');
