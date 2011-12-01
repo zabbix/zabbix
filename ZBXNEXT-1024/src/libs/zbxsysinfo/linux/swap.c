@@ -69,37 +69,41 @@ swap_stat_t;
 
 #if defined(KERNEL_2_4)
 #	define INFO_FILE_NAME	"/proc/partitions"
-#	define PARSE(line)	if (sscanf(line, "%d %d %*d %*s " \
-					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
-					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
-				&rdev_major, 		/* major */ \
-				&rdev_minor, 		/* minor */ \
-				&(result->rio),		/* rio */ \
-				&(result->rsect),	/* rsect */ \
-				&(result->wio),		/* rio */ \
-				&(result->wsect)	/* wsect */ \
+#	define PARSE(line)								\
+											\
+		if (sscanf(line, "%d %d %*d %*s "					\
+				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d "			\
+				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d",	\
+				&rdev_major, 		/* major */			\
+				&rdev_minor, 		/* minor */			\
+				&(result->rio),		/* rio */			\
+				&(result->rsect),	/* rsect */			\
+				&(result->wio),		/* wio */			\
+				&(result->wsect)	/* wsect */			\
 				) != 6) continue
 #else
 #	define INFO_FILE_NAME	"/proc/diskstats"
-#	define PARSE(line)	if (sscanf(line, "%d %d %*s " \
-					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
-					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
-				&rdev_major, 		/* major */ \
-				&rdev_minor, 		/* minor */ \
-				&(result->rio),		/* rio */ \
-				&(result->rsect),	/* rsect */ \
-				&(result->wio),		/* wio */ \
-				&(result->wsect)	/* wsect */ \
-				) != 6)  \
-					if (sscanf(line, "%d %d %*s " \
-						ZBX_FS_UI64 " " ZBX_FS_UI64 " " \
-						ZBX_FS_UI64 " " ZBX_FS_UI64, \
-					&rdev_major, 		/* major */ \
-					&rdev_minor, 		/* minor */ \
-					&(result->rio),		/* rio */ \
-					&(result->rsect),	/* rsect */ \
-					&(result->wio),		/* wio */ \
-					&(result->wsect)	/* wsect */ \
+#	define PARSE(line)								\
+											\
+		if (sscanf(line, "%d %d %*s "						\
+				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d "			\
+				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d",	\
+				&rdev_major, 		/* major */			\
+				&rdev_minor, 		/* minor */			\
+				&(result->rio),		/* rio */			\
+				&(result->rsect),	/* rsect */			\
+				&(result->wio),		/* wio */			\
+				&(result->wsect)	/* wsect */			\
+				) != 6)							\
+			if (sscanf(line, "%d %d %*s "					\
+					ZBX_FS_UI64 " " ZBX_FS_UI64 " "			\
+					ZBX_FS_UI64 " " ZBX_FS_UI64,			\
+					&rdev_major, 		/* major */		\
+					&rdev_minor, 		/* minor */		\
+					&(result->rio),		/* rio */		\
+					&(result->rsect),	/* rsect */		\
+					&(result->wio),		/* wio */		\
+					&(result->wsect)	/* wsect */		\
 					) != 6) continue
 #endif
 
