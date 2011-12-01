@@ -317,7 +317,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (80100 <= ZBX_PG_SVERSION)
 	{
 		/* disable "nonstandard use of \' in a string literal" warning */
-		DBexecute("set escape_string_warning to off");
+		DBexecute("set escape_string_warning to off;\n"
+				"set standard_conforming_strings to off;");
 	}
 
 	if (90000 <= ZBX_PG_SVERSION)
