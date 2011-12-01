@@ -3603,11 +3603,11 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 		$perHours = new CComboBox('new_timeperiod[period_hours]',$new_timeperiod['period_hours']);
 		for($i=0; $i < 25; $i++){
-			$perHours->addItem($i,$i.SPACE);
+			$perHours->addItem($i,$i);
 		}
 		$perMinutes = new CComboBox('new_timeperiod[period_minutes]',$new_timeperiod['period_minutes']);
 		for($i=0; $i < 60; $i++){
-			$perMinutes->addItem($i,$i.SPACE);
+			$perMinutes->addItem($i,$i);
 		}
 		$tblPeriod->addRow(array(
 							S_MAINTENANCE_PERIOD_LENGTH,
