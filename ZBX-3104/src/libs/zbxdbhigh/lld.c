@@ -1701,7 +1701,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select gi.gitemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,"
-					"gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt,i.flags"
+					"gi.yaxisside,gi.calc_fnc,gi.type,i.flags"
 				" from graphs_items gi,items i"
 				" where gi.itemid=i.itemid"
 					" and gi.graphid=" ZBX_FS_UI64
@@ -1769,7 +1769,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 			" values ";
 	const char	*ins_graphs_items_sql =
 			"insert into graphs_items"
-			" (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type,periods_cnt)"
+			" (gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type)"
 			" values ";
 #ifdef HAVE_MULTIROW_INSERT
 	const char	*row_dl = ",";
@@ -1910,8 +1910,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 							"color='%s',"
 							"yaxisside=%d,"
 							"calc_fnc=%d,"
-							"type=%d,"
-							"periods_cnt=%d"
+							"type=%d"
 						" where gitemid=" ZBX_FS_UI64 ";\n",
 						gitem->drawtype,
 						gitem->sortorder,
@@ -1919,7 +1918,6 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 						gitem->yaxisside,
 						gitem->calc_fnc,
 						gitem->type,
-						gitem->periods_cnt,
 						gitem->gitemid);
 			}
 			else
@@ -1930,11 +1928,10 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 #endif
 				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64
-							",%d,%d,'%s',%d,%d,%d,%d)%s",
+							",%d,%d,'%s',%d,%d,%d)%s",
 						gitem->gitemid, graph->graphid, gitem->itemid,
 						gitem->drawtype, gitem->sortorder, color_esc,
-						gitem->yaxisside, gitem->calc_fnc, gitem->type,
-						gitem->periods_cnt, row_dl);
+						gitem->yaxisside, gitem->calc_fnc, gitem->type, row_dl);
 			}
 
 			zbx_free(color_esc);
@@ -2066,7 +2063,7 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select 0,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,"
-					"gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt,i.flags"
+					"gi.yaxisside,gi.calc_fnc,gi.type,i.flags"
 				" from graphs_items gi,items i"
 				" where gi.itemid=i.itemid"
 					" and gi.graphid=" ZBX_FS_UI64,
