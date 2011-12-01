@@ -172,7 +172,7 @@ require_once('include/page_header.php');
 
 	if(!$filterEnable) $cmbGroups->setAttribute('disabled', 'disabled');
 
-	$dashList->addRow(S_HOST_GROUPS, $cmbGroups);
+	$dashList->addRow(_('Host groups'), $cmbGroups);
 
 	if ($grpswitch == 1) {
 		$options = array(
@@ -237,7 +237,7 @@ require_once('include/page_header.php');
 	$config = select_config();
 	$cb = new CComboBox('extAck', $extAck);
 	$cb->addItems(array(
-		EXTACK_OPTION_ALL => S_O_ALL,
+		EXTACK_OPTION_ALL => _('All'),
 		EXTACK_OPTION_BOTH => S_O_SEPARATED,
 		EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED_ONLY,
 	));
