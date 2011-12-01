@@ -27,6 +27,11 @@
  * Class containing methods for operations with discovery rules
  */
 class CDRule extends CZBXAPI {
+
+	protected $tableName = 'drules';
+
+	protected $tableAlias = 'dr';
+
 /**
 * Get drule data
 *

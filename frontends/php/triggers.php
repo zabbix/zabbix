@@ -97,7 +97,7 @@ require_once('include/page_header.php');
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
-	$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.triggers.showdisabled', 0));
+	$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 	check_fields($fields);
 	validate_sort_and_sortorder('description',ZBX_SORT_UP);
@@ -131,7 +131,7 @@ require_once('include/page_header.php');
 	}
 
 
-	$showdisabled = get_request('showdisabled', 0);
+	$showdisabled = get_request('showdisabled', 1);
 	CProfile::update('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
 
 // EXPRESSION ACTIONS
