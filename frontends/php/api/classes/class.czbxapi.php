@@ -38,10 +38,9 @@ class CZBXAPI {
 
 
 	/**
-	 * The name of the field used as a private key. If the PK consists of multiple
-	 * fields, the names will be stored as an array.
+	 * The name of the field used as a private key.
 	 *
-	 * @var mixed
+	 * @var string
 	 */
 	protected $pk;
 
@@ -50,8 +49,10 @@ class CZBXAPI {
 		$schema = $this->getTableSchema();
 
 		// set the PK of the table
-		$pk = explode(',', $schema['key']);
-		$this->pk = (count($pk) > 1) ? $pk : $pk[0];
+		if (strpos($schema['key'], ',') !== false) {
+			throw new Exception('Composite private keys are not supported in this API version.');
+		}
+		$this->pk = $schema['key'];
 	}
 
 
@@ -96,11 +97,9 @@ class CZBXAPI {
 
 
 	/**
-	 * Returns the columns that contain the private key.
+	 * Returns the name of the field that's used as a private key.
 	 *
-	 * @see CZBXAPI::$pk
-	 *
-	 * @return mixed
+	 * @return string
 	 */
 	protected function pk() {
 		return $this->pk;
