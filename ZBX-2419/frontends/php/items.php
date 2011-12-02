@@ -910,7 +910,6 @@ switch($itemType) {
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			S_WIZARD,
-			make_sorting_header(S_STATUS,'status'),
 			$show_host?S_HOST:null,
 			make_sorting_header(S_DESCRIPTION,'description'),
 			S_TRIGGERS,
@@ -920,6 +919,7 @@ switch($itemType) {
 			make_sorting_header(S_TRENDS,'trends'),
 			make_sorting_header(S_TYPE,'type'),
 			S_APPLICATIONS,
+			make_sorting_header(S_STATUS,'status'),
 			S_ERROR
 		));
 
@@ -1163,7 +1163,6 @@ switch($itemType) {
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
 				$menuicon,
-				$status,
 				$host,
 				$description,
 				$trigger_info,
@@ -1173,6 +1172,7 @@ switch($itemType) {
 				(in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends']),
 				item_type2str($item['type']),
 				new CCol($applications, 'wraptext'),
+				$status,
 				$error
 			));
 		}
