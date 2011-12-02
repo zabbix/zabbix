@@ -7,6 +7,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 
 Bug fixes:
 .......PS. [ZBX-4376] fixed escaping of strings with PostgreSQL 9.1 or later (Sasha)
+..F....... [ZBX-3074] in item and trigger list move status column to the right (slava)
 ..F....... [ZBX-4334] fixed disabled triggers and scenarios will not be hidden by default (sanja)
 A......... [ZBX-4403] fixed low level discovery rule creation (pavels)
 ..F.I...S. [ZBX-3832] removed support of aggregated graph items (pavels, Sasha)
@@ -351,6 +352,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
+..F....... [ZBX-2419] fixed calculation of SLA if uptime/downtime is specified (Sasha)
 A......... [ZBX-3104] implemented the screen item API (pavels)
 A.F....... [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
 ........S. [ZBX-4298] added deleted data report to a housekeeper on every step (dimir)

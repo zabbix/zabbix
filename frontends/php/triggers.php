@@ -481,13 +481,13 @@ require_once('include/page_header.php');
 		$form->addVar('hostid', $_REQUEST['hostid']);
 
 		$table->setHeader(array(
-			new CCheckBox('all_triggers',NULL,"checkAll('".$form->getName()."','all_triggers','g_triggerid');"),
-			make_sorting_header(S_SEVERITY,'priority'),
-			make_sorting_header(S_STATUS,'status'),
-			($_REQUEST['hostid'] > 0)?NULL:S_HOST,
-			make_sorting_header(S_NAME,'description'),
-			S_EXPRESSION,
-			S_ERROR
+			new CCheckBox('all_triggers', NULL, "checkAll('".$form->getName()."','all_triggers','g_triggerid');"),
+			make_sorting_header(_('Severity'), 'priority'),
+			($_REQUEST['hostid'] > 0) ? NULL : _('Host'),
+			make_sorting_header(_('Name'), 'description'),
+			_('Expression'),
+			make_sorting_header(_('Status'), 'status'),
+			_('Error')
 		));
 // get Triggers
 		$triggers = array();
@@ -619,16 +619,17 @@ require_once('include/page_header.php');
 				}
 			}
 
+
 			$cb = new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid);
 			$cb->setEnabled(empty($trigger['discoveryRule']));
 
 			$table->addRow(array(
 				$cb,
 				getSeverityCell($trigger['priority']),
-				$status,
 				$hosts,
 				$description,
 				triggerExpression($trigger,1),
+				$status,
 				$error
 			));
 
