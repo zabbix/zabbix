@@ -452,7 +452,7 @@ switch($itemType) {
 			'applications' => $applications,
 			'inventory_link' => get_request('inventory_link'),
 		);
-		if($item['status']==0){
+		if($item['status']!=3){
 		$item['error']='';
 		}
 

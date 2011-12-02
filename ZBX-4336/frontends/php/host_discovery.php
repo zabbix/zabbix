@@ -231,6 +231,10 @@ switch($itemType) {
 			'filter' => $filter,
 		);
 
+		if($item['status']!=3){
+			$item['error']='';
+		}
+
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
 
