@@ -26,15 +26,14 @@
 /**
  * Class containing methods for operations with APIInfo
  */
-class CAPIInfo extends CZBXAPI{
-/**
- * Get API version
- *
- * @return string
- */
-	public function version(){
+class CAPIInfo extends CZBXAPI {
+	/**
+	 * Get API version
+	 *
+	 * @return string
+	 */
+	public function version() {
 		return ZABBIX_API_VERSION;
 	}
-
 }
 ?>

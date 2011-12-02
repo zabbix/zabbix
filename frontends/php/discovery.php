@@ -132,7 +132,7 @@ require_once('include/page_header.php');
 		is_show_all_nodes() ? new CCol(S_NODE, 'left') : null,
 		make_sorting_header(S_DISCOVERED_DEVICE,'ip'),
 		new CCol(S_MONITORED_HOST, 'left'),
-		new CCol(array(S_UPTIME.'/',S_DOWNTIME),'left')
+		new CCol(array(_('Uptime').'/', _('Downtime')), 'left')
 	);
 
 	$css = getUserTheme($USER_DETAILS);
