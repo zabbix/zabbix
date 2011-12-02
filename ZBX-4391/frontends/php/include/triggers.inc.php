@@ -3909,7 +3909,7 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 
 		$evStr = str_replace(array_keys($rplcts), array_values($rplcts), $expression);
 
-		preg_match_all("/([0-9\.]+)[KMGTPEZYhmdw]?/", $evStr, $arr);
+		preg_match_all("/[0-9\.]+[KMGTPEZYhmdw]?/", $evStr, $arr);
 		$evStr = str_replace(array($arr[0][0], $arr[0][1]), array(convert($arr[0][0]), convert($arr[0][1])), $evStr);
 
 		if (!preg_match("/^[0-9.\s=!()><+*\/&E|\-]+$/is", $evStr)) return 'FALSE';
