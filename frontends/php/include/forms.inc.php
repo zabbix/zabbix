@@ -2864,8 +2864,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 // end new dependency
 
 		$type_select = new CComboBox('type');
-		$type_select->additem(TRIGGER_MULT_EVENT_DISABLED,S_NORMAL,(($type == TRIGGER_MULT_EVENT_ENABLED)? 'no':'yes'));
-		$type_select->additem(TRIGGER_MULT_EVENT_ENABLED,S_NORMAL.SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS,(($type == TRIGGER_MULT_EVENT_ENABLED)? 'yes':'no'));
+		$type_select->additem(TRIGGER_MULT_EVENT_DISABLED, S_NORMAL, ($type == TRIGGER_MULT_EVENT_ENABLED) ? 'no' : 'yes');
+		$type_select->additem(TRIGGER_MULT_EVENT_ENABLED, S_NORMAL.' + '.S_MULTIPLE_PROBLEM_EVENTS, ($type == TRIGGER_MULT_EVENT_ENABLED) ? 'yes' : 'no');
 
 		$frmTrig->addRow(S_EVENT_GENERATION,$type_select);
 
@@ -3602,7 +3602,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 
 		$perHours = new CComboBox('new_timeperiod[period_hours]',$new_timeperiod['period_hours']);
-		for($i=0; $i < 25; $i++){
+		for($i=0; $i < 24; $i++){
 			$perHours->addItem($i,$i);
 		}
 		$perMinutes = new CComboBox('new_timeperiod[period_minutes]',$new_timeperiod['period_minutes']);
