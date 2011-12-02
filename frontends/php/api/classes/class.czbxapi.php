@@ -107,7 +107,7 @@ class CZBXAPI {
 
 
 	/**
-	 * Returns an array that described the schema of the database table.
+	 * Returns an array that describes the schema of the database table.
 	 *
 	 * @return array
 	 */
