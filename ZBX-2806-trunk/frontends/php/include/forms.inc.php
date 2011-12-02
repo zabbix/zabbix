@@ -61,7 +61,7 @@
 
 		$form->addRow(_('Update interval (in sec)'), $delayBox);
 
-		$tblSteps = new CTableInfo(S_NO_SLIDES_DEFINED);
+		$tblSteps = new CTableInfo(_('No slides defined.'));
 		$tblSteps->setHeader(array(S_SCREEN, S_DELAY, S_SORT));
 		if(count($steps) > 0){
 			ksort($steps);
@@ -637,7 +637,7 @@
 		foreach(array('filter_data_type_label','filter_data_type') as $vItem)
 			zbx_subarray_push($fVTypeVisibility, ITEM_VALUE_TYPE_UINT64, $vItem);
 
-		$col_table3->addRow(array(bold(S_TYPE_OF_INFORMATION.': '), $cmbValType));
+		$col_table3->addRow(array(bold(_('Type of information').': '), $cmbValType));
 
 		zbx_add_post_js("var filterValueTypeSwitcher = new CViewSwitcher('filter_value_type', 'change', ".zbx_jsvalue($fVTypeVisibility, true).");");
 //second row
@@ -926,7 +926,7 @@
 
 		if(($filter_value_type == -1) && (count($item_params['value_types']) > 1)){
 			$value_types_output = prepare_subfilter_output($item_params['value_types'], $subfilter_value_types, 'subfilter_value_types');
-			$table_subfilter->addRow(array(S_TYPE_OF_INFORMATION, $value_types_output));
+			$table_subfilter->addRow(array(_('Type of information'), $value_types_output));
 		}
 
 		if(($filter_status == -1) && (count($item_params['status']) > 1)){
@@ -1213,7 +1213,7 @@
 			$frmItem->setTitle(_s('Item %1$s : %2$s', $hostname, $name));
 		}
 
-		if(!$parent_discoveryid){
+		if (!$parent_discoveryid) {
 			$frmItem->addVar('form_hostid', $hostid);
 			$frmItem->addRow(S_HOST, array(
 				new CTextBox('hostname', $hostname, 32, true),
@@ -1222,43 +1222,43 @@
 					"&dstfld1=hostname&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&noempty=1',450,450);",
 					'H')
 			));
+		}
 
-			$interfaces = API::HostInterface()->get(array(
-				'hostids' => $hostid,
-				'output' => API_OUTPUT_EXTEND
-			));
-			if(!empty($interfaces)){
-				$sbIntereaces = new CComboBox('interfaceid', $interfaceid);
-				foreach($interfaces as $ifnum => $interface){
-					$caption = $interface['useip'] ? $interface['ip'] : $interface['dns'];
-					$caption.= ' : '.$interface['port'];
+		$interfaces = API::HostInterface()->get(array(
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND
+		));
+		if (!empty($interfaces)) {
+			$sbIntereaces = new CComboBox('interfaceid', $interfaceid);
+			foreach ($interfaces as $ifnum => $interface) {
+				$caption = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+				$caption.= ' : '.$interface['port'];
 
-					$sbIntereaces->addItem($interface['interfaceid'], $caption);
-				}
-				$frmItem->addRow(S_HOST_INTERFACE, $sbIntereaces, null, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interfaceid');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interface_row');
-				zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interfaceid');
+				$sbIntereaces->addItem($interface['interfaceid'], $caption);
 			}
+			$frmItem->addRow(S_HOST_INTERFACE, $sbIntereaces, null, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_EXTERNAL, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'interfaceid');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interface_row');
+			zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPTRAP, 'interfaceid');
 		}
 
 		$frmItem->addRow(_('Name'), new CTextBox('name', $name, 40, $limited));
@@ -1350,20 +1350,20 @@
 		foreach($types as $it => $ilabel) {
 			switch($it){
 				case ITEM_TYPE_DB_MONITOR:
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'key','defaultValue'=> 'db.odbc.select[<unique short description>]'));
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'params_dbmonitor','defaultValue'=> "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>"));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_DB_MONITOR));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'params_dbmonitor', 'defaultValue' => "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>"));
 					break;
 				case ITEM_TYPE_SSH:
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'key','defaultValue'=> 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]'));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH));
 					break;
 				case ITEM_TYPE_TELNET:
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]'));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET));
 					break;
 				case ITEM_TYPE_JMX:
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> 'jmx[<object name>,<attribute name>]'));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_JMX));
 					break;
 				default:
-					zbx_subarray_push($typeVisibility, $it, array('id'=>'key', 'defaultValue'=> ''));
+					zbx_subarray_push($typeVisibility, $it, array('id' => 'key', 'defaultValue' => ''));
 			}
 		}
 
@@ -1460,7 +1460,7 @@
 			$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
 		}
 
-		$frmItem->addRow(S_TYPE_OF_INFORMATION,$cmbValType);
+		$frmItem->addRow(_('Type of information'), $cmbValType);
 
 		if($limited){
 			$frmItem->addVar('data_type', $data_type);
@@ -1628,7 +1628,7 @@
 
 
 		$new_app = new CTextBox('new_application',$new_application,40);
-		$frmItem->addRow(S_NEW_APPLICATION,$new_app,'new');
+		$frmItem->addRow(_('New application'), $new_app, 'new');
 
 		$cmbApps = new CListBox('applications[]',$applications,6);
 		$cmbApps->addItem(0,'-'.S_NONE.'-');
@@ -1882,7 +1882,7 @@
 		$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
 		$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
 		$frmItem->addRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),
-			S_TYPE_OF_INFORMATION), $cmbValType);
+			_('Type of information')), $cmbValType);
 
 		$cmbDataType = new CComboBox('data_type',$data_type);
 		$cmbDataType->addItems(item_data_type2str());
@@ -2029,7 +2029,7 @@
 
 		$cmbCopyType = new CComboBox('copy_type',$copy_type,'submit()');
 		$cmbCopyType->addItem(0,S_HOSTS);
-		$cmbCopyType->addItem(1,S_HOST_GROUPS);
+		$cmbCopyType->addItem(1, _('Host groups'));
 		$frmCopy->addRow(S_TARGET_TYPE, $cmbCopyType);
 
 		$target_list = array();
@@ -2586,8 +2586,8 @@
 
 			$options = array(
 				'graphids' => $_REQUEST['graphid'],
-				'sortfield' => 'sortorder',
-				'output' => API_OUTPUT_EXTEND,
+				'sortfield' => 'gitemid',
+				'output' => API_OUTPUT_EXTEND
 			);
 			$items = API::GraphItem()->get($options);
 		}
@@ -2655,13 +2655,6 @@
 		$_REQUEST['percent_right'] = $percent_right;
 /********************/
 
-		if($graphtype != GRAPH_TYPE_NORMAL){
-			foreach($items as $gid => $gitem){
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
-					unset($items[$gid]);
-			}
-		}
-
 		$items = array_values($items);
 		$icount = count($items);
 		for($i=0; $i < $icount-1;){
@@ -2707,7 +2700,6 @@
 
 			$items_table = new CTableInfo();
 			foreach($items as $gid => $gitem){
-				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
 				$host = get_host_by_itemid($gitem['itemid']);
 				$item = get_item_by_itemid($gitem['itemid']);
 
@@ -2716,11 +2708,7 @@
 				else
 					$monitored_hosts = 1;
 
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
-					$color = '-';
-				else
-					$color = new CColorCell(null,$gitem['color']);
-
+				$color = new CColorCell(null, $gitem['color']);
 
 				if($gid == $first){
 					$do_up = null;
@@ -2755,7 +2743,7 @@
 							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							graph_item_type2str($gitem['type']),
 							$color,
 							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
 						));
@@ -2766,7 +2754,7 @@
 //							$gitem['sortorder'],
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							graph_item_type2str($gitem['type']),
 							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
 							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
 							$color,

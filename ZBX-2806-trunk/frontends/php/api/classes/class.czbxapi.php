@@ -19,13 +19,148 @@
 **/
 ?>
 <?php
-
-class CZBXAPI{
+class CZBXAPI {
 	public static $userData;
 
-	protected static function exception($code=ZBX_API_ERROR_INTERNAL, $error=''){
-		throw new APIException($code, $error);
+	/**
+	 * The name of the table.
+	 *
+	 * @var string
+	 */
+	protected $tableName;
+
+	/**
+	 * The alias of the table.
+	 *
+	 * @var string
+	 */
+	protected $tableAlias;
+
+
+	/**
+	 * The name of the field used as a private key.
+	 *
+	 * @var string
+	 */
+	protected $pk;
+
+
+	public function __construct() {
+		$schema = $this->getTableSchema();
+
+		// set the PK of the table
+		if (strpos($schema['key'], ',') !== false) {
+			throw new Exception('Composite private keys are not supported in this API version.');
+		}
+		$this->pk = $schema['key'];
 	}
 
+
+	/**
+	 * Returns the name of the database table that contains the objects.
+	 *
+	 * @return string
+	 */
+	protected function tableName() {
+		return $this->tableName;
+	}
+
+
+	/**
+	 * Returns the alias of the database table that contains the objects.
+	 *
+	 * @return string
+	 */
+	protected function tableAlias() {
+		return $this->tableAlias;
+	}
+
+
+	/**
+	 * Returns the table name with the table alias.
+	 *
+	 * @return string
+	 */
+	protected function tableId() {
+		return $this->tableName().' '.$this->tableAlias();
+	}
+
+
+	/**
+	 * Prepends the table alias to the given field name.
+	 *
+	 * @return string
+	 */
+	protected function fieldId($fieldName) {
+		return $this->tableAlias().'.'.$fieldName;
+	}
+
+
+	/**
+	 * Returns the name of the field that's used as a private key.
+	 *
+	 * @return string
+	 */
+	protected function pk() {
+		return $this->pk;
+	}
+
+
+	/**
+	 * Returns an array that describes the schema of the database table.
+	 *
+	 * @return array
+	 */
+	protected function getTableSchema() {
+		return DB::getSchema($this->tableName());
+	}
+
+
+	/**
+	 * Returns true if the table has the given field.
+	 *
+	 * @param string $fieldName
+	 *
+	 * @return boolean
+	 */
+	protected function hasField($fieldName) {
+		$schema = $this->getTableSchema();
+
+		return isset($schema['fields'][$fieldName]);
+	}
+
+
+	/**
+	 * Unsets the fields that haven't been explicitly asked for by the user, but
+	 * have been included in the resulting object for whatever reasons.
+	 *
+	 * @param array $object    The object from the database
+	 * @param array $sqlWhere
+	 * @param array $options
+	 *
+	 * @return array           The resulting object
+	 */
+	protected function unsetExtraFields(array $object, array $options, array $sqlParts) {
+
+		// unset the pk forced by the 'preservedkeys' option
+		if ($options['preservekeys'] !== null && in_array($this->fieldId($this->pk()), $sqlParts['select'])
+			&& is_array($options['output']) && !in_array($this->pk(), $options['output'])) {
+
+			unset($object[$this->pk()]);
+		}
+
+		return $object;
+	}
+
+
+	/**
+	 * Throws an API exception.
+	 *
+	 * @param type $code
+	 * @param type $error
+	 */
+	protected static function exception($code = ZBX_API_ERROR_INTERNAL, $error = '') {
+		throw new APIException($code, $error);
+	}
 }
 ?>
