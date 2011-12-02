@@ -8,7 +8,7 @@ REORG TABLE profiles
 /
 DELETE FROM profiles WHERE NOT userid IN (SELECT userid FROM users)
 /
-ALTER TABLE profiles ADD CONSTRAINT c_profiles_1 FOREIGN KEY (userid) REFERENCES users (userid) ON DELETE CASCADE
+DELETE FROM profiles WHERE idx LIKE 'web.%.sort' OR idx LIKE 'web.%.sortorder'
 /
-DELETE FROM profiles WHERE idx LIKE '%.sort%'
+ALTER TABLE profiles ADD CONSTRAINT c_profiles_1 FOREIGN KEY (userid) REFERENCES users (userid) ON DELETE CASCADE
 /
