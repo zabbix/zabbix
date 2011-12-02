@@ -1090,7 +1090,7 @@ COpt::memoryPick();
 // }}} EXCEPTION: ITEMS PERMISSIONS
 		}
 
-		foreach ($graphs as $gnum => $graph) {
+		foreach ($graphs as $graph) {
 
 			// check if the graph has at least one prototype
 			$has_prototype = false;
@@ -1107,6 +1107,7 @@ COpt::memoryPick();
 			// check if the host has any graphs with the same name
 			$hosts = API::Host()->get(array(
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
@@ -1117,11 +1118,12 @@ COpt::memoryPick();
 					'name' => $graph['name'],
 					'flags' => null
 				),
-				'nopermissions' => 1
+				'nopermissions' => true,
+				'limit' => 1
 			);
 			$graphsExists = API::Graph()->get($options);
-			foreach ($graphsExists as $genum => $graphExists) {
-				if (($update && (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) || !$update) {
+			foreach ($graphsExists as $graphExists) {
+				if (!$update || (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists', $graph['name']));
 				}
 			}
