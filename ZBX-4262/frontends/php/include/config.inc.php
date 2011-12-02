@@ -265,7 +265,7 @@ if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 		error('Your PHP has no gettext support. Zabbix translations are not available.');
 	}
 	// numeric Locale to default
-	setLocale(LC_NUMERIC, array('en', 'en_US', 'en_US.UTF-8', 'English_United States.1252'));
+	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 }
 else {
 	CWebUser::$data = array(

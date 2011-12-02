@@ -27,6 +27,11 @@
  * Class containing methods for operations with GraphItems
  */
 class CGraphItem extends CZBXAPI {
+
+	protected $tableName = 'graphs_items';
+
+	protected $tableAlias = 'gi';
+
 	/**
 	* Get GraphItems data
 	*

@@ -23,9 +23,11 @@
  * @package API
  */
 class CItem extends CItemGeneral {
-	public function __construct(){
-		parent::__construct();
-	}
+
+	protected $tableName = 'items';
+
+	protected $tableAlias = 'i';
+
 
 	/**
 	 * Get items data.
