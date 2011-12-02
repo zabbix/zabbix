@@ -288,29 +288,16 @@
 	}
 
 	function get_last_service_value($serviceid, $clock) {
-		$value = 0;
-
 		$result = DBselect(
-			'SELECT MAX(sa.clock) AS clock'.
+			'SELECT sa.value'.
 			' FROM service_alarms sa'.
 			' WHERE sa.serviceid='.$serviceid.
-				' AND sa.clock<'.$clock
+				' AND sa.clock<'.$clock.
+			' ORDER BY sa.servicealarmid DESC', 1
 		);
-		$row = DBfetch($result);
-		if ($row && !is_null($row['clock'])) {
-			// assuring that we get very latest service value. There could be several with the same timestamp
-			$result2 = DBselect(
-				'SELECT sa.value'.
-				' FROM service_alarms sa'.
-				' WHERE sa.serviceid='.$serviceid.
-					' AND sa.clock='.$row['clock'].
-				' ORDER BY sa.clock,sa.servicealarmid DESC', 1
-			);
-			if ($row2 = DBfetch($result2)) {
-				$value = $row2['value'];
-			}
-		}
-		return $value;
+		$row = DBFetch($result);
+
+		return ($row) ? $row['value'] : 0;
 	}
 
 	function expandPeriodicalServiceTimes(&$data, $period_start, $period_end, $ts_from, $ts_to, $type) {

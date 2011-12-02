@@ -79,7 +79,7 @@ include_once('include/page_header.php');
 	if ($period != 'yearly') {
 		$cmbYear = new CComboBox('year', $year, 'submit();');
 
-		for($y = (date('Y') - YEAR_LEFT_SHIFT); $y <= date('Y'); $y++) {
+		for ($y = (date('Y') - YEAR_LEFT_SHIFT); $y <= date('Y'); $y++) {
 			$cmbYear->addItem($y, $y);
 		}
 
