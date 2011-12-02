@@ -555,7 +555,6 @@ typedef struct
 	int		yaxisside;
 	int		calc_fnc;
 	int		type;
-	int		periods_cnt;
 	unsigned char	flags;
 }
 ZBX_GRAPH_ITEMS;
@@ -575,7 +574,7 @@ double	DBget_requiredperformance();
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_string(const char *src);
-char	*DBdyn_escape_string_len(const char *src, int max_src_len);
+char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
 
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char	*DBdyn_escape_like_pattern(const char *src);

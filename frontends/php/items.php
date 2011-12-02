@@ -905,20 +905,21 @@ switch($itemType) {
 		$table  = new CTableInfo();
 // Table Header //
 		$table->setHeader(array(
-			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			S_WIZARD,
-			make_sorting_header(S_STATUS,'status'),
-			$show_host?S_HOST:null,
-			make_sorting_header(_('Name'),'name'),
-			S_TRIGGERS,
-			make_sorting_header(S_KEY,'key_'),
-			make_sorting_header(S_INTERVAL,'delay'),
-			make_sorting_header(S_HISTORY,'history'),
-			make_sorting_header(S_TRENDS,'trends'),
-			make_sorting_header(S_TYPE,'type'),
-			S_APPLICATIONS,
-			S_ERROR
+			new CCheckBox('all_items', null, "checkAll('".$form->GetName()."','all_items','group_itemid');"),
+			_('Wizard'),
+			$show_host ? _('Host') : null,
+			make_sorting_header(_('Name'), 'name'),
+			_('Triggers'),
+			make_sorting_header(_('Key'), 'key_'),
+			make_sorting_header(_('Interval'), 'delay'),
+			make_sorting_header(_('History'), 'history'),
+			make_sorting_header(_('Trends'), 'trends'),
+			make_sorting_header(_('Type'), 'type'),
+			_('Applications'),
+			make_sorting_header(_('Status'), 'status'),
+			_('Error')
 		));
+
 
 // SET VALUES FOR SUBFILTERS {
 // if any of subfilters = false then item shouldnt be shown
@@ -1165,7 +1166,6 @@ switch($itemType) {
 			$table->addRow(array(
 				$cb,
 				$menuicon,
-				$status,
 				$host,
 				$description,
 				$trigger_info,
@@ -1175,6 +1175,7 @@ switch($itemType) {
 				(in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends']),
 				item_type2str($item['type']),
 				new CCol($applications, 'wraptext'),
+				$status,
 				$error
 			));
 		}
