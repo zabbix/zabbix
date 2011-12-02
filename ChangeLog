@@ -351,6 +351,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
+..F....... [ZBX-4391] fixed problem with suffixes support (slava)
 .......PS. [ZBX-4376] fixed escaping of strings with PostgreSQL 9.1 or later (Sasha)
 ..F....... [ZBX-2419] fixed calculation of SLA if uptime/downtime is specified (Sasha)
 ..F....... [ZBX-3074] in item and trigger list move status column to the right (slava)
