@@ -72,7 +72,7 @@
 	}
 
 	function validate_sec($str){
-		return (preg_match('/^[ ]*\d+[KMGTsmhdw]{0,1}[ ]*$/', $str, $arr) ? 0 : -1);
+		return (preg_match('/^[ ]*\d+[KMGTYZEPsmhdw]{0,1}[ ]*$/', $str, $arr) ? 0 : -1);
 	}
 
 	function validate_secnum($str){
@@ -548,10 +548,12 @@
 		if(is_null($exception) || ($except == true)){
 
 			if(!$validation)	$valid = TRUE;
-			else				$valid = calc_exp($fields,$field,$validation);
+			else			{	$valid = calc_exp($fields,$field,$validation);  }
 
 			if(!$valid){
+
 				if($flags&P_SYS){
+
 					info(S_CRITICAL_ERROR.'.'.SPACE.S_INCORRECT_VALUE_FOR.SPACE.'['.$caption.'] = "'.$_REQUEST[$field].'"');
 					return ZBX_VALID_ERROR;
 				}
