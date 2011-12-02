@@ -351,6 +351,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
+.......PS. [ZBX-4376] fixed escaping of strings with PostgreSQL 9.1 or later (Sasha)
 ..F....... [ZBX-2419] fixed calculation of SLA if uptime/downtime is specified (Sasha)
 A......... [ZBX-3104] implemented the screen item API (pavels)
 A.F....... [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
