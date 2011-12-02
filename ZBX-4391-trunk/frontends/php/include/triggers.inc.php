@@ -2878,7 +2878,7 @@ function triggerExpression($trigger, $html, $template=false, $resolve_macro=fals
 		preg_match_all("/[0-9\.]+[KMGTPEZYhmdw]?/", $evStr, $arr);
 		$evStr = str_replace(array($arr[0][0], $arr[0][1]), array(convert($arr[0][0]), convert($arr[0][1])), $evStr);
 
-		if(!preg_match("/^[0-9.\s=!()><+*\/&|\-]+$/is", $evStr)) return 'FALSE';
+		if(!preg_match("/^[0-9.\s=!()><+*\/&E|\-]+$/is", $evStr)) return 'FALSE';
 
 		if($oct)
 			$evStr = preg_replace('/([0-9]+)(\=|\#|\!=|\<|\>)([0-9]+)/','((float)ltrim("$1","0") $2 (float)ltrim("$3","0"))', $evStr);
