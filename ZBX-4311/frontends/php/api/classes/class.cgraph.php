@@ -1098,8 +1098,10 @@ class CGraph extends CZBXAPI {
 // }}} EXCEPTION: ITEMS PERMISSIONS
 		}
 
-		foreach($graphs as $graph){
-			if(!isset($graph['name'])) continue;
+		foreach($graphs as $graph) {
+			if (!isset($graph['name'])) {
+				continue;
+			}
 			$hosts = API::Host()->get(array(
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 				'output' => API_OUTPUT_SHORTEN,
@@ -1115,11 +1117,11 @@ class CGraph extends CZBXAPI {
 				'limit' => 1
 			);
 			$graphsExists = $this->get($options);
-			foreach($graphsExists as $graphExists){
-				if(!$update || (bccomp($graphExists['graphid'],$graph['graphid']) != 0))
+			foreach ($graphsExists as $graphExists) {
+				if (!$update || (bccomp($graphExists['graphid'],$graph['graphid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists', $graph['name']));
+				}
 			}
-// }}} EXCEPTION: GRAPH EXISTS
 		}
 
 		return true;
