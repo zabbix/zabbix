@@ -220,7 +220,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 #define	DO_SWP_OUT	3
 #define DO_PG_OUT	4
 
-int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double *pgswapout)
+static int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double *pgswapout)
 {
     kstat_ctl_t	    *kc;
     kstat_t	    *k;
