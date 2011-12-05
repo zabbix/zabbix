@@ -231,9 +231,6 @@ switch($itemType) {
 			'filter' => $filter,
 		);
 
-		if($item['status']!=3){
-			$item['error']='';
-		}
 
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
@@ -242,7 +239,9 @@ switch($itemType) {
 			foreach($item as $field => $value){
 				if($item[$field] == $db_item[$field]) unset($item[$field]);
 			}
-
+			if($item['status'] != ITEM_STATUS_NOTSUPPORTED){
+				$item['error']='';
+			}
 			$item['itemid'] = $_REQUEST['itemid'];
 
 			$result = API::DiscoveryRule()->update($item);

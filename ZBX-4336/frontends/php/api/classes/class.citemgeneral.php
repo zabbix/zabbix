@@ -171,7 +171,7 @@ abstract class CItemGeneral extends CZBXAPI{
 				if (!isset($item['key_'])) {
 					$item['key_'] = $fullItem['key_'];
 				}
-				if (!isset($item['error']) && $item['status']!=3) {
+				if (!isset($item['error']) && isset( $item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
 					$item['error'] = '';
 				}
 
