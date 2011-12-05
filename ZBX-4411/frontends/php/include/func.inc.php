@@ -854,7 +854,7 @@ function zbx_stripos($haystack, $needle, $offset = 0) {
 	if (defined('ZBX_MBSTRINGS_ENABLED')) {
 		$haystack = mb_convert_case($haystack, MB_CASE_LOWER);
 		$needle = mb_convert_case($needle, MB_CASE_LOWER);
-		return mb_stripos($haystack, $needle, $offset);
+		return mb_strpos($haystack, $needle, $offset);
 	}
 	else {
 		return stripos($haystack, $needle, $offset);
