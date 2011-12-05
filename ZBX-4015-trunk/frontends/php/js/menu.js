@@ -461,7 +461,7 @@ function menu_item (o_parent, n_order) {
 		eldiv.setAttribute('title', this.a_config[0]);
 	}
 
-	eldiv.innerHTML = this.a_config[0];
+	eldiv.appendChild(document.createTextNode(this.a_config[0]));
 
 	el.appendChild(eldiv);
 
