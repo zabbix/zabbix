@@ -530,13 +530,15 @@ Copt::memoryPick();
 			if (!isset($interface['port'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Port cannot be empty for host interface.'));
 			}
-			elseif (!validatePortNumber($interface['port'], false, true)) {
+			elseif (!validatePortNumberOrMacro($interface['port'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface port "%s" provided', $interface['port']));
 			}
 
 			if($update){
 				$interface = $updInterface;
 			}
+
+			$this->clearValues($interface);
 		}
 		unset($interface);
 
@@ -554,6 +556,12 @@ Copt::memoryPick();
 				$host = reset($item['hosts']);
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%s"', $host['host'].':'.$item['key_']));
 			}
+		}
+	}
+
+	protected function clearValues(array &$interface) {
+		if (isset($interface['port'])) {
+			$interface['port'] = ltrim($interface['port'], '0');
 		}
 	}
 
