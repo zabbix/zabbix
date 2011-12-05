@@ -166,7 +166,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 	int		perm = PERM_DENY, host_perm;
 	zbx_uint64_t	hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
 			"select distinct i.hostid"
@@ -1045,12 +1045,11 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		result = DBselect(
 				"select i.name"
 				" from items i,functions f,triggers t"
-				" where t.triggerid=" ZBX_FS_UI64
+				" where i.itemid=f.itemid"
 					" and f.triggerid=t.triggerid"
-					" and i.itemid=f.itemid"
+					" and t.triggerid=" ZBX_FS_UI64
 					" and i.status=%d",
-				escalation->triggerid,
-				ITEM_STATUS_DISABLED);
+				escalation->triggerid, ITEM_STATUS_DISABLED);
 		if (NULL != (row = DBfetch(result)))
 			error = zbx_dsprintf(error, "item '%s' disabled.", row[0]);
 		DBfree_result(result);
@@ -1062,13 +1061,12 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		result = DBselect(
 				"select h.host"
 				" from hosts h,items i,functions f,triggers t"
-				" where t.triggerid=" ZBX_FS_UI64
-					" and t.triggerid=f.triggerid"
-					" and f.itemid=i.itemid"
-					" and i.hostid=h.hostid"
+				" where h.hostid=i.hostid"
+					" and i.itemid=f.itemid"
+					" and f.triggerid=t.triggerid"
+					" and t.triggerid=" ZBX_FS_UI64
 					" and h.status=%d",
-				escalation->triggerid,
-				HOST_STATUS_NOT_MONITORED);
+				escalation->triggerid, HOST_STATUS_NOT_MONITORED);
 		if (NULL != (row = DBfetch(result)))
 			error = zbx_dsprintf(error, "host '%s' disabled.", row[0]);
 		DBfree_result(result);
@@ -1079,7 +1077,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		case ESCALATION_STATUS_ACTIVE:
 			result = DBselect(
 					"select actionid,eventsource,esc_period,def_shortdata,def_longdata,"
-					"recovery_msg,status,name"
+						"recovery_msg,status,name"
 					" from actions"
 					" where actionid=" ZBX_FS_UI64,
 					escalation->actionid);
@@ -1087,7 +1085,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 		case ESCALATION_STATUS_RECOVERY:
 			result = DBselect(
 					"select actionid,eventsource,esc_period,r_shortdata,r_longdata,recovery_msg,"
-					"status,name"
+						"status,name"
 					" from actions"
 					" where actionid=" ZBX_FS_UI64,
 					escalation->actionid);
@@ -1168,8 +1166,7 @@ static void	process_escalations(int now)
 	const char	*__function_name = "process_escalations";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_ESCALATION	escalation;
-	DB_ESCALATION	last_escalation;
+	DB_ESCALATION	escalation, last_escalation;
 	unsigned char	esc_superseded, esc_recovery;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1178,7 +1175,8 @@ static void	process_escalations(int now)
 			"select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status"
 			" from escalations"
 			" where (status=%d and nextcheck<=%d"
-			" or status=%d and r_eventid is not null)" DB_NODE
+				" or status=%d and r_eventid is not null)"
+				DB_NODE
 			" order by actionid,triggerid,escalationid",
 			ESCALATION_STATUS_ACTIVE,
 			now,
