@@ -101,12 +101,12 @@ switch($itemType) {
 		'snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'||{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.'))'),
 		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
-
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
 		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
 
 		'add_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'lifetime' => array(T_ZBX_STR, O_OPT, null, null, 'isset({save})'),
 // Actions
 		'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 		'group_itemid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
@@ -229,6 +229,7 @@ switch($itemType) {
 			'params' => get_request('params'),
 			'ipmi_sensor' => get_request('ipmi_sensor'),
 			'filter' => $filter,
+			'lifetime' => get_request('lifetime'),
 		);
 
 		if(isset($_REQUEST['itemid'])){
@@ -300,7 +301,6 @@ switch($itemType) {
 
 		$limited = false;
 
-
 		$name = get_request('name', '');
 		$description = get_request('description', '');
 		$key = get_request('key', '');
@@ -330,6 +330,7 @@ switch($itemType) {
 
 		$formula = get_request('formula', '1');
 		$logtimefmt = get_request('logtimefmt', '');
+		$lifetime = get_request('lifetime', 0);
 
 		if(isset($_REQUEST['itemid'])){
 			$frmItem->addVar('itemid', $_REQUEST['itemid']);
@@ -359,6 +360,7 @@ switch($itemType) {
 			$port = $item_data['port'];
 			$params = $item_data['params'];
 			$item_filter = $item_data['filter'];
+			$lifetime = $item_data['lifetime'];
 
 			$snmpv3_securityname = $item_data['snmpv3_securityname'];
 			$snmpv3_securitylevel = $item_data['snmpv3_securitylevel'];
@@ -648,15 +650,19 @@ switch($itemType) {
 			zbx_subarray_push($typeVisibility, $it, 'add_delay_flex');
 		}
 
-// Status
-		$cmbStatus = new CComboBox('status', $status);
-		$cmbStatus->addItems(item_status2str());
-		$frmItem->addRow(S_STATUS, $cmbStatus);
-
 // allowed hosts
 		$frmItem->addRow(S_ALLOWED_HOSTS, new CTextBox('trapper_hosts',$trapper_hosts,40), null, 'row_trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
+
+		// Lifetime
+		$frmItem->addRow(_('Keep lost resources period (in days)'), new CTextBox('lifetime', $lifetime, ZBX_TEXTBOX_SMALL_SIZE, false, 64));
+
+		// Status
+		$cmbStatus = new CComboBox('status', $status);
+		$cmbStatus->addItems(item_status2str());
+		$frmItem->addRow(S_STATUS, $cmbStatus);
+
 
 		$frmItem->addRow(_('Description'), new CTextArea('description', $description));
 

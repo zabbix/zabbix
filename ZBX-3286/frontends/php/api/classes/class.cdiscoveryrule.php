@@ -539,6 +539,19 @@ COpt::memoryPick();
 		parent::checkInput($items, $update);
 	}
 
+	protected function checkSpecificFields(array $item) {
+		if (isset($item['lifetime']) && !$this->validateLifetime($item['lifetime'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Discovery rule "%1$s:%2$s" has incorrect lifetime: "%3$s". (min: 0, max: 3650, user macro allowed)',
+					$item['name'], $item['key_'], $item['lifetime'])
+			);
+		}
+	}
+
+	private function validateLifetime($lifetime) {
+		return (validateNumber($lifetime, 0, 3650) || validateUserMacro($lifetime));
+	}
+
 /**
  * Add DiscoveryRule
  *
@@ -548,13 +561,13 @@ COpt::memoryPick();
 	public function create($items){
 		$items = zbx_toArray($items);
 
-			$this->checkInput($items);
+		$this->checkInput($items);
 
-			$this->createReal($items);
+		$this->createReal($items);
 
-			$this->inherit($items);
+		$this->inherit($items);
 
-			return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
 	protected function createReal(&$items){
@@ -673,13 +686,13 @@ COpt::memoryPick();
 	public function update($items){
 		$items = zbx_toArray($items);
 
-			$this->checkInput($items, true);
+		$this->checkInput($items, true);
 
-			$this->updateReal($items);
+		$this->updateReal($items);
 
-			$this->inherit($items);
+		$this->inherit($items);
 
-			return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
 	/**
