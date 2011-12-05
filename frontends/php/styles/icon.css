@@ -134,3 +134,6 @@
 	cursor: default !important;
 }
 /********* DIV IMG END *********/
+
+span.ui-icon.state-disabled { opacity: .5; filter:Alpha(Opacity=50); background-image: none; }
+
