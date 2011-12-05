@@ -152,7 +152,7 @@ class CTag extends CObject {
 	}
 
 	public function addAction($name, $value) {
-		$this->setAttribute($name, $value);
+		$this->attributes[$name] = $value;
 	}
 
 	public function setHint($text, $width = '', $class = '', $byClick = true, $updateBlinking = false) {
