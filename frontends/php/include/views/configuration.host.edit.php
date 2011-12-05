@@ -160,18 +160,6 @@ if (($_REQUEST['hostid'] > 0) && !isset($_REQUEST['form_refresh'])) {
 	}
 }
 
-if (empty($interfaces)) {
-//	$interfaces = array('1' => array(
-//		'ip' => '127.0.0.1',
-//		'dns' => '',
-//		'port' => 10050,
-//		'useip' => 1,
-//		'type' => (string) INTERFACE_TYPE_AGENT,
-//		'items' => 0,
-//		'main' => 1
-//	));
-}
-
 $clear_templates = array_intersect($clear_templates, array_keys($original_templates));
 $clear_templates = array_diff($clear_templates, array_keys($templates));
 natcasesort($templates);
