@@ -225,7 +225,7 @@ zbx_add_post_js($script);
 $ifTab = new CTable(null, 'formElementTable');
 $ifTab->setAttribute('id', 'agentInterfaces');
 $ifTab->setAttribute('data-type', 'agent');
-$ifTab->addStyle('width: 71em;');
+$ifTab->addStyle('width: 72em;');
 
 // headers with sizes
 $iconLabel = new CCol(SPACE);
@@ -235,7 +235,7 @@ $ipLabel->addStyle('width: 16em;');
 $dnsLabel = new CCol(_('DNS name'));
 $dnsLabel->addStyle('width: 19em;');
 $connectToLabel = new CCol(_('Connect to'));
-$connectToLabel->addStyle('width: 9em;');
+$connectToLabel->addStyle('width: 10em;');
 $portLabel = new CCol(_('Port'));
 $portLabel->addStyle('width: 10em;');
 $defaultLabel = new CCol(_('Default'));
@@ -264,7 +264,7 @@ $hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectg
 $ifTab = new CTable(null, 'formElementTable');
 $ifTab->setAttribute('id', 'SNMPInterfaces');
 $ifTab->setAttribute('data-type', 'snmp');
-$ifTab->addStyle('width: 71em;');
+$ifTab->addStyle('width: 72em;');
 
 
 $helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
@@ -286,7 +286,7 @@ $hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted border_d
 $ifTab = new CTable(null, 'formElementTable');
 $ifTab->setAttribute('id', 'JMXInterfaces');
 $ifTab->setAttribute('data-type', 'jmx');
-$ifTab->addStyle('width: 71em;');
+$ifTab->addStyle('width: 72em;');
 $helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
 $helpTextWhenDragInterfaceJMX->addStyle('display: none; color: #5481AB;');
 $helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
@@ -305,7 +305,7 @@ $hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted border_do
 $ifTab = new CTable(null, 'formElementTable');
 $ifTab->setAttribute('id', 'IPMIInterfaces');
 $ifTab->setAttribute('data-type', 'ipmi');
-$ifTab->addStyle('width: 71em;');
+$ifTab->addStyle('width: 72em;');
 $helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
 $helpTextWhenDragInterfaceIPMI->addStyle('display: none; color: #5481AB;');
 $helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');

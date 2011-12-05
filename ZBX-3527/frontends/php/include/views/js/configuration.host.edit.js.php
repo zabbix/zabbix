@@ -12,7 +12,7 @@
 	<td style="width: 19em;">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" size="30" value="#{iface.dns}" />
 	</td>
-	<td style="width: 9em;">
+	<td style="width: 10em;">
 		<div class="jqueryinputset">
 			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip} />
 			<label for="radio_ip_#{iface.interfaceid}"><?php echo _('IP'); ?></label>
@@ -137,7 +137,7 @@ var hostInterfacesManager = (function() {
 	}
 
 	function addNotDraggableIcon(domElement) {
-		domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s ui-state-disabled"></span>');
+		domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s state-disabled"></span>');
 		jQuery('.ui-icon', domElement).hover(
 			function(event) {
 				jQuery('<div><?php echo _('Interface is used by items that require this type of the interface.'); ?></div>')
