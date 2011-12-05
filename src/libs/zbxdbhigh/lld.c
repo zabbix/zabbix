@@ -2064,7 +2064,7 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 	result = DBselect(
 			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
 				"g.show_triggers,g.graphtype,g.show_legend,g.show_3d,g.percent_left,g.percent_right,"
-				"g.ymin_type,g.ymin_itemid,i1.flags,i1.key_,g.ymax_type,g.ymax_itemid,i2.flags,i2.key_"
+				"g.ymin_type,i1.itemid,i1.flags,i1.key_,g.ymax_type,i2.itemid,i2.flags,i2.key_"
 			" from item_discovery id,items i,graphs_items gi,graphs g"
 			" left join items i1 on i1.itemid=g.ymin_itemid"
 			" left join items i2 on i2.itemid=g.ymax_itemid"
@@ -2079,12 +2079,13 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		ZBX_GRAPH_ITEMS	*gitems_proto = NULL;
 		size_t		gitems_proto_alloc = 0, gitems_proto_num = 0;
 		zbx_uint64_t	parent_graphid, ymin_itemid = 0, ymax_itemid = 0;
-		const char	*name_proto, *ymin_key_proto, *ymax_key_proto;
+		const char	*name_proto, *ymin_key_proto = NULL, *ymax_key_proto = NULL;
 		char		*name_proto_esc;
 		int		width, height;
 		double		yaxismin, yaxismax, percent_left, percent_right;
-		unsigned char	show_work_period, show_triggers, graphtype, show_legend, show_3d, ymin_type, ymax_type,
-				ymin_flags, ymax_flags;
+		unsigned char	show_work_period, show_triggers, graphtype, show_legend, show_3d,
+				ymin_type = GRAPH_YAXIS_TYPE_CALCULATED, ymax_type = GRAPH_YAXIS_TYPE_CALCULATED,
+				ymin_flags = 0, ymax_flags = 0;
 
 		ZBX_STR2UINT64(parent_graphid, row[0]);
 		name_proto = row[1];
@@ -2100,14 +2101,20 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		show_3d = (unsigned char)atoi(row[10]);
 		percent_left = atof(row[11]);
 		percent_right = atof(row[12]);
-		ymin_type = (unsigned char)atoi(row[13]);
-		ZBX_DBROW2UINT64(ymin_itemid, row[14]);
-		ymin_flags = (unsigned char)atoi(row[15]);
-		ymin_key_proto = row[16];
-		ymax_type = (unsigned char)atoi(row[17]);
-		ZBX_DBROW2UINT64(ymax_itemid, row[18]);
-		ymax_flags = (unsigned char)atoi(row[19]);
-		ymax_key_proto = row[20];
+		if (GRAPH_YAXIS_TYPE_ITEM_VALUE == (unsigned char)atoi(row[13]) && SUCCEED != DBis_null(row[14]))
+		{
+			ymin_type = GRAPH_YAXIS_TYPE_ITEM_VALUE;
+			ZBX_STR2UINT64(ymin_itemid, row[14]);
+			ymin_flags = (unsigned char)atoi(row[15]);
+			ymin_key_proto = row[16];
+		}
+		if (GRAPH_YAXIS_TYPE_ITEM_VALUE == (unsigned char)atoi(row[17]) && SUCCEED != DBis_null(row[18]))
+		{
+			ymax_type = GRAPH_YAXIS_TYPE_ITEM_VALUE;
+			ZBX_STR2UINT64(ymax_itemid, row[18]);
+			ymax_flags = (unsigned char)atoi(row[19]);
+			ymax_key_proto = row[20];
+		}
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
