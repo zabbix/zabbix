@@ -326,9 +326,6 @@ class CEvent extends CZBXAPI {
 						$sql_parts['select']['events'][] = 'e.clock';
 						$sql_parts['select']['events'][] = 'e.ns';
 					}
-					if (!is_null($options['triggerids'])) {
-						$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
-					}
 				}
 				elseif ($options['sortfield'] == 'object') {
 					$sql_parts['order'][] = 'e.object '.$sortorder;
