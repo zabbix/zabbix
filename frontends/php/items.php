@@ -452,9 +452,6 @@ switch($itemType) {
 			'applications' => $applications,
 			'inventory_link' => get_request('inventory_link'),
 		);
-		if($item['status']!=3){
-		$item['error']='';
-		}
 
 		if (isset($_REQUEST['itemid'])) {
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
@@ -465,6 +462,10 @@ switch($itemType) {
 					unset($item[$field]);
 				}
 			}
+
+			if ($item['status'] != ITEM_STATUS_NOTSUPPORTED ) {
+				$item['error'] = '';
+					}
 
 			$item['itemid'] = $_REQUEST['itemid'];
 			$result = API::Item()->update($item);

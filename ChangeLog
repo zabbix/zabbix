@@ -31,6 +31,7 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+..F....... [ZBX-4336] fixed problem with item status clearing when changing  to active in frontend. (slava)
  - [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
  - [ZBX-3593] fixed misaligned server name on top of the page (sanja)
  - [ZBX-3771] fixed possible 'Lock wait timeout' while processing lld rules (Sasha,pavels)
