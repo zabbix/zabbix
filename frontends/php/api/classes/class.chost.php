@@ -27,6 +27,11 @@
  * Class containing methods for operations with Hosts
  */
 class CHost extends CZBXAPI{
+
+	protected $tableName = 'hosts';
+
+	protected $tableAlias = 'h';
+
 /**
  * Get Host data
  *
