@@ -732,3 +732,17 @@ function removeObjectById(id) {
 		obj.parentNode.removeChild(obj);
 	}
 }
+
+/**
+ * Convert's all HTML entities in the corresponding symbols.
+ */
+jQuery.unescapeHtml = function(html) {
+	return jQuery("<div />").html(html).text();
+}
+
+/**
+ * Convert's all HTML symbols in HTML entities.
+ */
+jQuery.escapeHtml = function(html) {
+	return jQuery("<div />").text(html).html();
+}
