@@ -481,8 +481,8 @@ function menu_item (o_parent, n_order) {
 		var x = 500;
 		while (x) {
 			newResult = this.e_ielement.scrollWidth - this.getprop('width');
-			nText = this.e_ielement.innerHTML;
-			this.e_ielement.innerHTML = nText.substring(0, nText.length-10);
+			nText = jQuery.unescapeHtml(this.e_ielement.innerHTML);
+			this.e_ielement.innerHTML = jQuery.escapeHtml(nText.substring(0, nText.length-10));
 			x--;
 			if (newResult < 1) {
 				this.e_ielement.innerHTML += '...';
