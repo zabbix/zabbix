@@ -9,8 +9,9 @@
 
 pngcrushbin=pngcrush
 
-outputdir=${1:-png}
-elementdir=source/elements
+outputdir="${1:-png_modern}"
+sourcedir="svg"
+elementdir="$sourcedir/elements"
 
 pngcrushlog=pngcrush.log.txt
 pngcrushoutput=pngcrushoutput.txt
@@ -76,7 +77,7 @@ rackimages=([64]=68 [96]=101 [128]=134)
 
 echo -n "Converting Rack_42.svg"
 for rackimagesize in "${!rackimages[@]}"; do
-	svgtopng "source/equipment_rack/Rack_42.svg" "${rackimages[$rackimagesize]}" "$rackimagesize" "width"
+	svgtopng "$sourcedir/equipment_rack/Rack_42.svg" "${rackimages[$rackimagesize]}" "$rackimagesize" "width"
 done
 echo
 
@@ -84,7 +85,7 @@ rackwithdoorimages=([64]=100 [96]=149 [128]=199)
 
 echo -n "Converting Rack_42_with_door.svg"
 for rackwithdoorimagesize in "${!rackwithdoorimages[@]}"; do
-	svgtopng "source/equipment_rack/Rack_42_with_door.svg" "${rackwithdoorimages[$rackwithdoorimagesize]}" "$rackwithdoorimagesize" "width"
+	svgtopng "$sourcedir/equipment_rack/Rack_42_with_door.svg" "${rackwithdoorimages[$rackwithdoorimagesize]}" "$rackwithdoorimagesize" "width"
 done
 echo
 

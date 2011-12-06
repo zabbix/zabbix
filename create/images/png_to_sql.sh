@@ -3,7 +3,7 @@
 # A script to generate SQL from PNG images
 # depends on hexdump
 
-outputdir=${1:-png}
+outputdir=${1:-png_modern}
 
 imagefile_mysql=images_mysql.sql
 imagefile_pgsql=images_postgresql.sql
