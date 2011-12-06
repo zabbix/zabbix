@@ -538,7 +538,7 @@ Copt::memoryPick();
 				$interface = $updInterface;
 			}
 
-			$this->clearValues($interface);
+			$interface = $this->clearValues($interface);
 		}
 		unset($interface);
 
@@ -559,10 +559,12 @@ Copt::memoryPick();
 		}
 	}
 
-	protected function clearValues(array &$interface) {
+	protected function clearValues(array $interface) {
 		if (isset($interface['port'])) {
 			$interface['port'] = ltrim($interface['port'], '0');
 		}
+
+		return $interface;
 	}
 
 	protected function setMainInterfaces($interfaces){
