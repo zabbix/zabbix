@@ -125,6 +125,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 		done
 
 		if test "x$enable_static" = "xyes"; then
+			_full_libcurl_libs=`$_libcurl_config --static-libs`
 			for i in $_full_libcurl_libs; do
 				case $i in
 					-lcurl)
@@ -134,7 +135,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 						AC_CHECK_LIB($_lib_name , main,[
 								LIBCURL_LIBS="$LIBCURL_LIBS $i"
 							],[
-								AC_MSG_ERROR([Not found $_lib_name library])
+								AC_MSG_ERROR([static library $_lib_name required for linking libcurl not found])
 							])
 
 				;;
@@ -152,7 +153,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 		AC_CHECK_LIB(curl, main,[
 				LIBCURL_LIBS="-lcurl $LIBCURL_LIBS"
 			],[
-				AC_MSG_ERROR([Not found libcurl library])
+				AC_MSG_ERROR([libcurl library not found])
 			])
 
 		LIBS="${_save_curl_libs}"
@@ -223,72 +224,76 @@ x=CURLOPT_VERBOSE;
 		unset _save_curl_libs
 		unset _save_curl_ldflags
 		unset _save_curl_cflags
-           ])
+	])
 
-        if test $libcurl_cv_lib_curl_usable = yes ; then
+	if test $libcurl_cv_lib_curl_usable = no ; then
+		link_mode="dynamic"
+		if test "x$enable_static" = "xyes"; then
+			link_mode="static"
+		fi
+		AC_MSG_ERROR([libcurl is not available for ${link_mode} linking])
+	fi
 
-	   # Does curl_free() exist in this version of libcurl?
-	   # If not, fake it with free()
+	# Does curl_free() exist in this version of libcurl?
+	# If not, fake it with free()
 
-		_save_curl_libs="${LIBS}"
-		_save_curl_ldflags="${LDFLAGS}"
-		_save_curl_cflags="${CFLAGS}"
-		LIBS="${LIBS} ${LIBCURL_LIBS}"
-		LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
-		CFLAGS="${CFLAGS} ${LIBCURL_CFLAGS}"
+	_save_curl_libs="${LIBS}"
+	_save_curl_ldflags="${LDFLAGS}"
+	_save_curl_cflags="${CFLAGS}"
+	LIBS="${LIBS} ${LIBCURL_LIBS}"
+	LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
+	CFLAGS="${CFLAGS} ${LIBCURL_CFLAGS}"
 
-           AC_CHECK_FUNC(curl_free,,
-  	      AC_DEFINE(curl_free,free,
-		[Define curl_free() as free() if our version of curl lacks curl_free.]))
+	AC_CHECK_FUNC(curl_free,,
+		AC_DEFINE(curl_free,free,
+			[Define curl_free() as free() if our version of curl lacks curl_free.]))
 
-           AC_CHECK_FUNC(curl_easy_escape,
-  	      AC_DEFINE(HAVE_FUNCTION_CURL_EASY_ESCAPE,1,
-		[Define to 1 if function 'curl_easy_escape' exists.]))
+	AC_CHECK_FUNC(curl_easy_escape,
+		AC_DEFINE(HAVE_FUNCTION_CURL_EASY_ESCAPE,1,
+			[Define to 1 if function 'curl_easy_escape' exists.]))
 
-		LIBS="${_save_curl_libs}"
-		LDFLAGS="${_save_curl_ldflags}"
-		CFLAGS="${_save_curl_cflags}"
-		unset _save_curl_libs
-		unset _save_curl_ldflags
-		unset _save_curl_cflags
+	LIBS="${_save_curl_libs}"
+	LDFLAGS="${_save_curl_ldflags}"
+	CFLAGS="${_save_curl_cflags}"
+	unset _save_curl_libs
+	unset _save_curl_ldflags
+	unset _save_curl_cflags
 
-           AC_DEFINE(HAVE_LIBCURL,1,
-             [Define to 1 if you have a functional curl library.])
-           AC_SUBST(LIBCURL_CFLAGS)
-           AC_SUBST(LIBCURL_LDFLAGS)
-           AC_SUBST(LIBCURL_LIBS)
-           found_curl="yes"
+	AC_DEFINE(HAVE_LIBCURL,1,
+		[Define to 1 if you have a functional curl library.])
+	AC_SUBST(LIBCURL_CFLAGS)
+	AC_SUBST(LIBCURL_LDFLAGS)
+	AC_SUBST(LIBCURL_LIBS)
+	found_curl="yes"
 
-           for _libcurl_feature in $_libcurl_features ; do
-	      AC_DEFINE_UNQUOTED(AS_TR_CPP(libcurl_feature_$_libcurl_feature),[1])
-	      eval AS_TR_SH(libcurl_feature_$_libcurl_feature)=yes
-           done
+	for _libcurl_feature in $_libcurl_features ; do
+		AC_DEFINE_UNQUOTED(AS_TR_CPP(libcurl_feature_$_libcurl_feature),[1])
+		eval AS_TR_SH(libcurl_feature_$_libcurl_feature)=yes
+	done
 
-	   if test "x$_libcurl_protocols" = "x" ; then
+	if test "x$_libcurl_protocols" = "x" ; then
+		# We don't have --protocols, so just assume that all
+		# protocols are available
+		_libcurl_protocols="HTTP FTP FILE TELNET LDAP DICT"
 
-	      # We don't have --protocols, so just assume that all
-	      # protocols are available
-	      _libcurl_protocols="HTTP FTP FILE TELNET LDAP DICT"
+		if test x$libcurl_feature_SSL = xyes ; then
+			_libcurl_protocols="$_libcurl_protocols HTTPS"
 
-	      if test x$libcurl_feature_SSL = xyes ; then
-	         _libcurl_protocols="$_libcurl_protocols HTTPS"
+			# FTPS wasn't standards-compliant until version
+			# 7.11.0
+			if test $_libcurl_version -ge 461568; then
+				_libcurl_protocols="$_libcurl_protocols FTPS"
+			fi
+		fi
+	fi
 
-		 # FTPS wasn't standards-compliant until version
-		 # 7.11.0
-		 if test $_libcurl_version -ge 461568; then
-		    _libcurl_protocols="$_libcurl_protocols FTPS"
-		 fi
-	      fi
-	   fi
-
-	   for _libcurl_protocol in $_libcurl_protocols ; do
-	      AC_DEFINE_UNQUOTED(AS_TR_CPP(libcurl_protocol_$_libcurl_protocol),[1])
-	      eval AS_TR_SH(libcurl_protocol_$_libcurl_protocol)=yes
-           done
-	else
+	for _libcurl_protocol in $_libcurl_protocols ; do
+		AC_DEFINE_UNQUOTED(AS_TR_CPP(libcurl_protocol_$_libcurl_protocol),[1])
+		eval AS_TR_SH(libcurl_protocol_$_libcurl_protocol)=yes
+        done
+     else
 	   unset LIBCURL_LIBS
 	   unset LIBCURL_CFLAGS
-        fi
      fi
 
      unset _libcurl_try_link

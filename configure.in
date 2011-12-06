@@ -1178,6 +1178,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 	dnl Checking for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
+
 	if test "x$want_curl" = "xyes"; then
 		if test "x$found_curl" != "xyes"; then
 			AC_MSG_ERROR([Curl library not found])
