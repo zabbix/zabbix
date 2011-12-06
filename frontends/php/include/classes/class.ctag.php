@@ -215,7 +215,7 @@ class CTag extends CObject {
 
 
 	/**
-	 * Sanitezes a string before outputting it to the browser.
+	 * Sanitizes a string before outputting it to the browser.
 	 *
 	 * @param string $str
 	 * @return string
