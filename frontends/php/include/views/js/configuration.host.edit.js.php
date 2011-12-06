@@ -112,7 +112,7 @@ var hostInterfacesManager = (function() {
 			types[hostInterface.type].all.push(hostInterfaceId);
 			if (hostInterface.main === '1') {
 				if (types[hostInterface.type].main !== null) {
-					throw new Error('Multiple main interfaces for same type.');
+					throw new Error('Multiple default interfaces for same type.');
 				}
 				types[hostInterface.type].main = hostInterfaceId;
 			}
