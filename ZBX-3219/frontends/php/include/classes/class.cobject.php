@@ -36,7 +36,7 @@ class CObject{
 	}
 
 	public function show($destroy=true){
-		echo $this->toString($destroy);
+		echo "<pre>".$this->toString($destroy)."</pre>";
 	}
 
 	public function destroy(){

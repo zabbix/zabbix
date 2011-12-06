@@ -1910,9 +1910,16 @@
 	'S_TOOLS'=>				'Tools',
 	'S_RESULT'=>				'Result',
 	'S_CLOSE'=>				'Close',
+		'S_SCRIPT_ERROR_BIG'=>			'Possible reasons:
+		1. Incorrect server IP/DNS in the "zabbix.conf.php".
+		2. Security environment like SELinux is blocking connection."
+		3. Zabbix server daemon not running. ',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
-
-	'S_SCRIPT_ERROR'=>			'SCRIPT ERROR',
+	'S_NOT_RUN'=>'Server in @@server@@ and daemon not running',
+	'S_IP_NOT_AVAILABLE'=>'IP address in the same LAN and not available',
+	'S_TIME_OUT'=>'Correct DNS name @@server@@ but unavailable outside the LAN',
+	'S_WRONG_DNS'=> 'Wrong DNS name',
+	'S_SCRIPT_ERROR'=>			'Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.',
 	'S_SCRIPT_ERROR_DESCRIPTION'=>		'Error Description',
 	'S_SCRIPT_SEND_ERROR'=>			'Can\'t send command, check connection',
 	'S_SCRIPT_READ_ERROR'=>			'Can\'t read script response, check connection',
