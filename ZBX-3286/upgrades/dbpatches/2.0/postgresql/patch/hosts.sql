@@ -61,7 +61,7 @@ ALTER TABLE ONLY items
 	ADD interfaceid bigint NULL,
 	ADD port varchar(64) DEFAULT '' NOT NULL,
 	ADD description text DEFAULT '' NOT NULL,
-	ADD inventory_link integer DEFAULT '0' NOT NULL;
+	ADD inventory_link integer DEFAULT '0' NOT NULL,
 	ADD lifetime varchar(64) DEFAULT '0' NOT NULL;
 
 UPDATE items SET templateid=NULL WHERE templateid=0;
