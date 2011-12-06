@@ -890,11 +890,11 @@ Copt::memoryPick();
 					$host = reset($host);
 
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No main interface for "%1$s" type on host "%2$s".', hostInterfaceTypeNumToName($type), $host['name']));
+						_s('No default interface for "%1$s" type on host "%2$s".', hostInterfaceTypeNumToName($type), $host['name']));
 				}
 
 				if ($counters['main'] > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host cannot have more than one main interfaces of the same type.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host cannot have more than one default interface of the same type.'));
 				}
 			}
 		}
