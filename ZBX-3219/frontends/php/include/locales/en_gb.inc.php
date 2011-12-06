@@ -1917,7 +1917,7 @@
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
 	'S_NOT_RUN'=>'Server in @@server@@ and daemon not running',
 	'S_IP_NOT_AVAILABLE'=>'IP address in the same LAN and not available',
-	'S_TIME_OUT'=>'Correct DNS name @@server@@ but unavailable outside the LAN',
+	'S_TIME_OUT'=>'Correct DNS name or ip @@server@@ but unavailable outside the LAN',
 	'S_WRONG_DNS'=> 'Wrong DNS name',
 	'S_SCRIPT_ERROR'=>			'Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.',
 	'S_SCRIPT_ERROR_DESCRIPTION'=>		'Error Description',
