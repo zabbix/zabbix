@@ -1551,59 +1551,16 @@ Copt::memoryPick();
 		$this->checkInput($hosts, __FUNCTION__);
 
 		foreach ($hosts as $host) {
-// INTERFACES
-			if (isset($host['interfaces']) && !is_null($host['interfaces'])) {
-				$this->checkHostInterfaces($host['interfaces'], $host['hostid']);
-
-				$interfacesToDelete = API::HostInterface()->get(array(
-					'hostids' => $host['hostid'],
-					'output' => API_OUTPUT_EXTEND,
-					'preservekeys' => true,
-					'nopermissions' => 1
-				));
-
-				$interfacesToAdd = array();
-				$interfacesToUpdate = array();
-				foreach ($host['interfaces'] as $interface) {
-					$interface['hostid'] = $host['hostid'];
-
-					if (!isset($interface['interfaceid'])) {
-						$interfacesToAdd[] = $interface;
-					}
-					elseif (isset($interfacesToDelete[$interface['interfaceid']])) {
-						$interfacesToUpdate[] = $interface;
-						unset($interfacesToDelete[$interface['interfaceid']]);
-					}
-				}
-
-				if (!empty($interfacesToUpdate)) {
-					API::HostInterface()->checkInput($interfacesToUpdate, 'update');
-					$data = array();
-					foreach ($interfacesToUpdate as $interface) {
-						$data[] = array(
-							'values' => $interface,
-							'where' => array('interfaceid' => $interface['interfaceid'])
-						);
-					}
-					DB::update('interface', $data);
-				}
-
-				if (!empty($interfacesToAdd)) {
-					API::HostInterface()->checkInput($interfacesToAdd, 'create');
-					DB::insert('interface', $interfacesToAdd);
-				}
-
-				if (!empty($interfacesToDelete)) {
-					DB::delete('interface', array('interfaceid' => zbx_objectValues($interfacesToDelete, 'interfaceid')));
-				}
-			}
+			API::HostInterface()->replaceHostInterfaces($host);
 			unset($host['interfaces']);
 
 			$data = $host;
 			$data['hosts'] = $host;
 			$result = $this->massUpdate($data);
 
-			if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
+			}
 		}
 
 		return array('hostids' => $hostids);
@@ -2288,31 +2245,5 @@ Copt::memoryPick();
 		return (count($ids) == $count);
 	}
 
-	private function checkHostInterfaces(array $interfaces, $hostid) {
-		$interfacesWithMissingData = array();
-		foreach ($interfaces as $interface) {
-			if(!isset($interface['type'], $interface['main'])) {
-				$interfacesWithMissingData[] = $interface['interfaceid'];
-			}
-		}
-
-		if ($interfacesWithMissingData) {
-			$dbInterfaces = API::HostInterface()->get(array(
-				'interfaceids' => $interfacesWithMissingData,
-				'output' => array('main', 'type'),
-				'preservekeys' => true,
-				'nopermissions' => true
-			));
-		}
-
-		foreach ($interfaces as $id => $interface) {
-			if (isset($interface['interfaceid']) && isset($dbInterfaces[$interface['interfaceid']])) {
-				$interfaces[$id] = array_merge($interface, $dbInterfaces[$interface['interfaceid']]);
-			}
-			$interfaces[$id]['hostid'] = $hostid;
-		}
-
-		API::HostInterface()->checkMainInterfaces($interfaces);
-	}
 }
 ?>
