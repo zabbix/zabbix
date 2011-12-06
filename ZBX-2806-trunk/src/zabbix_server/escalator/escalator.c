@@ -1209,8 +1209,9 @@ static void	process_escalations(int now)
 
 			DBbegin();
 
-			/* execute active escalation */
-			if (ESCALATION_STATUS_ACTIVE == escalation.status)
+			/* execute escalation (for superseded as little as possible but at least once) */
+			if (ESCALATION_STATUS_ACTIVE == escalation.status &&
+					(0 == esc_superseded || 0 == escalation.esc_step))
 			{
 				execute_escalation(&escalation);
 			}
