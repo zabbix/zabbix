@@ -3,7 +3,7 @@
 # A script to generate SQL from PNG images
 # depends on hexdump
 
-scriptdir="$(basename $0)"
+scriptdir="$(dirname $0)"
 pngdir="${1:-png_modern}"
 sqlbasedir="$scriptdir/../../database"
 imagefile="images.sql"
@@ -40,8 +40,8 @@ for imagefile in $pngdir/*.png; do
 	echo -e "\tLOAD_IMAGE($imagesdone,1,'$imagename','$imagefile');" >> "$imagefile_oracle"
 	# ----- SQLite
 	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename','$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")');" >> "$imagefile_sqlite3"
-	# ----- DB2
-	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',blob(x'$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")'));" >> "$imagefile_db2"
+	# ----- IBM DB2
+	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',blob(x'$(hexdump -ve '"" 1/1 "%02X"' "$imagefile")'));" >> "$imagefile_ibm_db2"
 
 	echo -n "$[$imagesdone*100/$imagecount]% "
 done
