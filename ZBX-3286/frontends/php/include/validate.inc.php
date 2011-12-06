@@ -612,7 +612,7 @@ function validatePortNumber($port) {
 	return validateNumber($port, 0, 65535);
 }
 
-function validateNumber($value, $min=null, $max=null) {
+function validateNumber($value, $min = null, $max = null) {
 	if (!zbx_ctype_digit($value)) {
 		return false;
 	}
