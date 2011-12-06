@@ -83,7 +83,7 @@
 .originalblue .ui-state-error-text, .originalblue .ui-widget-content .ui-state-error-text, .originalblue .ui-widget-header .ui-state-error-text { color: #d40000; }
 .originalblue .ui-priority-primary, .originalblue .ui-widget-content .ui-priority-primary, .originalblue .ui-widget-header .ui-priority-primary { font-weight: bold; }
 .originalblue .ui-priority-secondary, .originalblue .ui-widget-content .ui-priority-secondary,  .ui-widget-header .ui-priority-secondary { opacity: .7; filter:Alpha(Opacity=70); font-weight: normal; }
-.originalblue .ui-state-disabled, .originalblue .ui-widget-content .ui-state-disabled, .originalblue .ui-widget-header .ui-state-disabled { opacity: .5; filter:Alpha(Opacity=50); background-image: none; }
+.originalblue .ui-state-disabled, .originalblue .ui-widget-content .ui-state-disabled, .originalblue .ui-widget-header .ui-state-disabled { color: #A8BFD4; background:#FAFBFC; border-color: #CED8E6; }
 
 /* Icons
 ----------------------------------*/

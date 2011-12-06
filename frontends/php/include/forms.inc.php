@@ -2029,7 +2029,7 @@
 
 		$cmbCopyType = new CComboBox('copy_type',$copy_type,'submit()');
 		$cmbCopyType->addItem(0,S_HOSTS);
-		$cmbCopyType->addItem(1,S_HOST_GROUPS);
+		$cmbCopyType->addItem(1, _('Host groups'));
 		$frmCopy->addRow(S_TARGET_TYPE, $cmbCopyType);
 
 		$target_list = array();
@@ -2586,8 +2586,8 @@
 
 			$options = array(
 				'graphids' => $_REQUEST['graphid'],
-				'sortfield' => 'sortorder',
-				'output' => API_OUTPUT_EXTEND,
+				'sortfield' => 'gitemid',
+				'output' => API_OUTPUT_EXTEND
 			);
 			$items = API::GraphItem()->get($options);
 		}
@@ -2655,13 +2655,6 @@
 		$_REQUEST['percent_right'] = $percent_right;
 /********************/
 
-		if($graphtype != GRAPH_TYPE_NORMAL){
-			foreach($items as $gid => $gitem){
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
-					unset($items[$gid]);
-			}
-		}
-
 		$items = array_values($items);
 		$icount = count($items);
 		for($i=0; $i < $icount-1;){
@@ -2707,7 +2700,6 @@
 
 			$items_table = new CTableInfo();
 			foreach($items as $gid => $gitem){
-				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
 				$host = get_host_by_itemid($gitem['itemid']);
 				$item = get_item_by_itemid($gitem['itemid']);
 
@@ -2716,11 +2708,7 @@
 				else
 					$monitored_hosts = 1;
 
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
-					$color = '-';
-				else
-					$color = new CColorCell(null,$gitem['color']);
-
+				$color = new CColorCell(null, $gitem['color']);
 
 				if($gid == $first){
 					$do_up = null;
@@ -2755,7 +2743,7 @@
 							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							graph_item_type2str($gitem['type']),
 							$color,
 							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
 						));
@@ -2766,7 +2754,7 @@
 //							$gitem['sortorder'],
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							graph_item_type2str($gitem['type']),
 							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
 							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
 							$color,
@@ -2831,7 +2819,7 @@
 					$ymin_name = $min_host['host'].':'.itemName($min_item);
 				}
 
-				if(count($items)){
+				if (count($items)) {
 					$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
 					$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
 						"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
@@ -2842,8 +2830,20 @@
 							"&srctbl=items".
 							"&srcfld1=itemid".
 							"&srcfld2=name',0,0,'zbx_popup_item');");
+
+					// select prototype button
+					if ($parent_discoveryid) {
+						$yaxis_min[] = new CButton('yaxis_min', _('Select prototype'),'javascript: '.
+							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+								"&parent_discoveryid=".$parent_discoveryid.
+								"&dstfld1=ymin_itemid".
+								"&dstfld2=ymin_name".
+								"&srctbl=prototypes".
+								"&srcfld1=itemid".
+								"&srcfld2=name',0,0,'zbx_popup_item');");
+					}
 				}
-				else{
+				else {
 					$yaxis_min[] = S_ADD_GRAPH_ITEMS;
 				}
 			}
@@ -2875,7 +2875,7 @@
 					$ymax_name = $max_host['host'].':'.itemName($max_item);
 				}
 
-				if(count($items)){
+				if (count($items)) {
 					$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
 					$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
 							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
@@ -2887,8 +2887,20 @@
 							"&srcfld1=itemid".
 							"&srcfld2=name',0,0,'zbx_popup_item');"
 					);
+
+					// select prototype button
+					if ($parent_discoveryid) {
+						$yaxis_max[] = new CButton('yaxis_min', _('Select prototype'),'javascript: '.
+							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+								"&parent_discoveryid=".$parent_discoveryid.
+								"&dstfld1=ymax_itemid".
+								"&dstfld2=ymax_name".
+								"&srctbl=prototypes".
+								"&srcfld1=itemid".
+								"&srcfld2=name',0,0,'zbx_popup_item');");
+					}
 				}
-				else{
+				else {
 					$yaxis_max[] = S_ADD_GRAPH_ITEMS;
 				}
 			}
