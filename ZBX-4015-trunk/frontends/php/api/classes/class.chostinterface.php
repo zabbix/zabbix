@@ -27,6 +27,11 @@
  * Class containing methods for operations with Interfaces
  */
 class CHostInterface extends CZBXAPI {
+
+	protected $tableName = 'interface';
+
+	protected $tableAlias = 'hi';
+
 /**
  * Get Interface Interface data
  *

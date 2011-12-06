@@ -35,8 +35,6 @@
 
 	'S_ACTIVATE_SELECTED'=>			_('Activate selected'),
 	'S_DISABLE_SELECTED'=>			_('Disable selected'),
-	'S_ACTIVATE_SELECTED_HOSTS'=>		_('Activate selected hosts'),
-	'S_DISABLE_SELECTED_HOSTS'=>		_('Disable selected hosts'),
 	'S_DELETE_SELECTED'=>			_('Delete selected'),
 	'S_COPY_SELECTED_TO'=>			_('Copy selected to ...'),
 
@@ -398,14 +396,6 @@
 	'S_NOVEMBER'=>				_('November'),
 	'S_DECEMBER'=>				_('December'),
 
-// hostgroups.php
-	'S_CONFIGURATION_OF_GROUPS'=>		_('CONFIGURATION OF HOST GROUPS'),
-	'S_DELETE_SELECTED_GROUP'=>		_('Delete selected group?'),
-	'S_ENABLE_SELECTED_HOST_GROUPS'=>	_('Enable selected host groups?'),
-	'S_DISABLE_SELECTED_HOST_GROUPS'=>	_('Disable selected host groups?'),
-	'S_DELETE_SELECTED_HOST_GROUPS'=>	_('Delete selected host groups?'),
-	'S_DELETE_SELECTED_GROUPS'=>		_('Delete selected groups'),
-
 //	hosts.php
 	'S_HOST_INTERFACE' =>			_('Host interface'),
 	'S_IPMI'=>			_('IPMI'),
@@ -424,8 +414,6 @@
 	'S_ITEMS_BIG'=>					_('ITEMS'),
 	'S_TRIGGERS'=>					_('Triggers'),
 	'S_GRAPHS'=>					_('Graphs'),
-	'S_CANNOT_UPDATE_HOST'=>			_('Cannot update host'),
-	'S_HOST_STATUS_UPDATED'=>			_('Host status updated'),
 	'S_HOST_GROUPS_BIG'=>				_('HOST GROUPS'),
 	'S_HOST'=>					_('Host'),
 	'S_CONNECT_TO'=>				_('Connect to'),
@@ -460,7 +448,6 @@
 	'S_DELETE_SELECTED_HOST_Q'=>			_('Delete selected host?'),
 	'S_DELETE_SELECTED_WITH_LINKED_ELEMENTS'=>	_('Delete selected with linked elements'),
 	'S_HOST_GROUP'=>				_('Host group'),
-	'S_HOST_GROUPS'=>				_('Host groups'),
 	'S_UPDATE'=>					_('Update'),
 	'S_AVAILABILITY'=>				_('Availability'),
 	'S_AVAILABLE'=>					_('Available'),
@@ -706,7 +693,6 @@
 	'S_SHOW_HOSTS_IN_MAINTENANCE' => _('Show hosts in maintenance'),
 	'S_TRIGGERS_WITH_SEVERITY' => _('Triggers with severity'),
 	'S_DASHBOARD_FILTER' => _('Dashboard filter'),
-	'S_O_ALL' => _('All'),
 	'S_O_UNACKNOWLEDGED_ONLY' => _('Unacknowledged only'),
 	'S_O_SEPARATED' => _('Separated'),
 	'S_PROBLEM_DISPLAY' => _('Problem display'),
@@ -1150,9 +1136,6 @@
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	_('Unable to select configuration'),
-
-//	perm.inc.php
-	'S_INCORRECT_USER_DATA_IN'=>		_('Incorrect user data in'),
 
 //	images.inc.php
 	'S_COULD_NOT_SAVE_IMAGE'=>		_('Could not save image!'),

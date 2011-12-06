@@ -28,6 +28,11 @@
  *
  */
 class CEvent extends CZBXAPI {
+
+	protected $tableName = 'events';
+
+	protected $tableAlias = 'e';
+
 	/**
 	 * Get events data
 	 *
