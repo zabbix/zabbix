@@ -288,12 +288,18 @@ abstract class CItemGeneral extends CZBXAPI{
 	}
 
 	protected function clearValues(array $item) {
-		if (isset($item['port'])) {
+		if (isset($item['port']) && $item['port'] != '') {
 			$item['port'] = ltrim($item['port'], '0');
+			if ($item['port'] == '') {
+				$item['port'] = 0;
+			}
 		}
 
-		if (isset($item['lifetime'])) {
+		if (isset($item['lifetime']) && $item['lifetime'] != '') {
 			$item['lifetime'] = ltrim($item['lifetime'], '0');
+			if ($item['lifetime'] == '') {
+				$item['lifetime'] = 0;
+			}
 		}
 
 		return $item;
