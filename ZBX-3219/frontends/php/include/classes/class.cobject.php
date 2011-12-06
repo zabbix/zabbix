@@ -36,7 +36,13 @@ class CObject{
 	}
 
 	public function show($destroy=true){
-		echo "<pre>".$this->toString($destroy)."</pre>";
+		$temp = $this->toString($destroy);
+		$show_pre = preg_match("/%%with_pre%%/",$temp);
+		$temp = str_replace("%%with_pre%%","", $temp);
+		if($show_pre)echo "<pre>";
+		echo $temp;
+		if($show_pre)echo "</pre>";
+		unset($temp);
 	}
 
 	public function destroy(){

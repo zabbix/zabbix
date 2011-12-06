@@ -1910,14 +1910,14 @@
 	'S_TOOLS'=>				'Tools',
 	'S_RESULT'=>				'Result',
 	'S_CLOSE'=>				'Close',
-		'S_SCRIPT_ERROR_BIG'=>			'Possible reasons:
+		'S_SCRIPT_ERROR_BIG'=>			'%s Possible reasons:
 		1. Incorrect server IP/DNS in the "zabbix.conf.php".
-		2. Security environment like SELinux is blocking connection."
+		2. Security environment like SELinux is blocking connection.
 		3. Zabbix server daemon not running. ',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
-	'S_NOT_RUN'=>'Server in @@server@@ and daemon not running',
+	'S_NOT_RUN'=>'Server in "%s" and daemon not running',
 	'S_IP_NOT_AVAILABLE'=>'IP address in the same LAN and not available',
-	'S_TIME_OUT'=>'Correct DNS name or ip @@server@@ but unavailable outside the LAN',
+	'S_TIME_OUT'=>'Correct DNS name or IP "%s" but unavailable outside the LAN',
 	'S_WRONG_DNS'=> 'Wrong DNS name',
 	'S_SCRIPT_ERROR'=>			'Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.',
 	'S_SCRIPT_ERROR_DESCRIPTION'=>		'Error Description',
@@ -2484,7 +2484,7 @@
 
 // class.cbuttonqmessage.php
 	'S_ARE_YOU_SURE_YOU_WANT_TO_PERFORM_THIS_ACTION' => 'Are you sure you want perform this action?',
-	'S_INCORRECT_VALUE_FOR_SETMESSAGE' => 'Incorrect value for setMessage(): "%s".',
+	'S_INCORRECT_VALUE_FOR_SETMESSAGE' => 'Incorrect value for setMessage(): "%s%s".',
 
 // class.citemkey.php
 	'S_KEY_CANNOT_BE_EMPTY' => 'Key cannot be empty.',
