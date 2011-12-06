@@ -8,6 +8,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+..F....... [ZBX-4015] fixed multiple XSS issues (pavels)
 ..F....... [ZBX-4334] changed disabled triggers and scenarios to be shown by default (sanja)
 A......... [ZBX-4403] fixed low level discovery rule creation (pavels)
 ..F.I...S. [ZBX-3832] removed support of aggregated graph items (pavels, Sasha)
