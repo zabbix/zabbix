@@ -136,7 +136,7 @@ class CTag extends CObject {
 			$value = unpack_object($value);
 		}
 		if (!is_null($value)) {
-			$this->attributes[$name] = $value;
+			$this->attributes[$name] = htmlspecialchars(str_replace(array("\r", "\n"), '', strval($value)));
 		}
 		else {
 			$this->removeAttribute($name);
@@ -152,7 +152,7 @@ class CTag extends CObject {
 	}
 
 	public function addAction($name, $value) {
-		$this->setAttribute($name, $value);
+		$this->attributes[$name] = $value;
 	}
 
 	public function setHint($text, $width = '', $class = '', $byClick = true, $updateBlinking = false) {
@@ -211,6 +211,17 @@ class CTag extends CObject {
 
 	public function setTitle($value = 'title') {
 		$this->setAttribute('title', $value);
+	}
+
+
+	/**
+	 * Sanitezes a string before outputting it to the browser.
+	 *
+	 * @param string $str
+	 * @return string
+	 */
+	protected function sanitize($value) {
+		return htmlspecialchars($value);
 	}
 }
 ?>
