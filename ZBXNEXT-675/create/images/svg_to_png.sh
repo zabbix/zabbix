@@ -26,7 +26,7 @@ svgtopng() {
 	# parameters : svg, size, reported size, dimension
 	# 3rd parameter allows to override "reported" size; if missing, actual size is used
 	# 4th parameter allows to override width/height detection
-	pngoutfile="$outputdir/$(basename ${1%.svg}) (${3:-$2}).png"
+	pngoutfile="$outputdir/$(basename ${1%.svg})_(${3:-$2}).png"
 	[[ "$(stat -c "%Y" "$pngoutfile" 2>/dev/null)" -lt "$svgfilemod" ]] && {
 		# if png file modification time is older than svg file modification time
 		echo -n " to $2..."
