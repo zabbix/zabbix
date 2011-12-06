@@ -18,9 +18,9 @@ pngcrushoutput=pngcrushoutput.txt
 inkscapelog=inkscape.log.txt
 
 crushpng() {
-			$pngcrushbin -brute -reduce -e .2.png "$1" >> $pngcrushoutput || exit 1
-			echo "$1 : $(echo "$(stat -c %s "${1%png}2.png")/$(stat -c %s "${1}")*100" | bc -l)" >> $pngcrushlog
-			mv "${1%png}2.png" "$1"
+	$pngcrushbin -brute -reduce -e .2.png "$1" >> "$pngcrushoutput" || exit 1
+	echo "$1 : $(echo "$(stat -c %s "${1%png}2.png")/$(stat -c %s "${1}")*100" | bc -l)" >> "$pngcrushlog"
+	mv "${1%png}2.png" "$1"
 }
 
 svgtopng() {
@@ -91,6 +91,6 @@ echo
 
 [[ -s "$pngcrushlog" ]] && {
 	echo "Biggest gain from pngcrush:"
-	sort -n -r -t : -k 2 $pngcrushlog | tail -n 1
-	awk 'BEGIN {FS=":"}; {sum+=$2} END { print "Average gain:",sum/NR}' $pngcrushlog
+	sort -n -r -t : -k 2 "$pngcrushlog" | tail -n 1
+	awk 'BEGIN {FS=":"}; {sum+=$2} END { print "Average gain:",sum/NR}' "$pngcrushlog"
 }
