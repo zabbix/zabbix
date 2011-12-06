@@ -257,7 +257,7 @@ $buttonRow->setAttribute('id', 'agentIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
 
-$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock'));
+$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup'));
 
 
 // table for SNMP interfaces with footer
@@ -279,7 +279,7 @@ $buttonRow->setAttribute('id', 'SNMPIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
 
-$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted border_dotted_top objectgroup inlineblock'), false, null, 'top-aligned');
+$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted border_dotted_top objectgroup'), false, null, 'top-aligned');
 
 
 // table for JMX interfaces with footer
@@ -298,7 +298,7 @@ $buttonRow = new CRow(array($buttonCol, $col));
 $buttonRow->setAttribute('id', 'JMXIterfacesFooter');
 $ifTab->addRow($buttonRow);
 
-$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted border_dotted_top objectgroup inlineblock'), false, null, 'top-aligned');
+$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted border_dotted_top objectgroup'), false, null, 'top-aligned');
 
 
 // table for IPMI interfaces with footer
@@ -317,7 +317,7 @@ $buttonRow = new CRow(array($buttonCol, $col));
 $buttonRow->setAttribute('id', 'IPMIIterfacesFooter');
 
 $ifTab->addRow($buttonRow);
-$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted border_dotted_top objectgroup inlineblock'), false, null, 'top-aligned');
+$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted border_dotted_top objectgroup'), false, null, 'top-aligned');
 
 // Proxy
 $cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
