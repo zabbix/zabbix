@@ -1915,7 +1915,7 @@
 		2. Security environment like SELinux is blocking connection.
 		3. Zabbix server daemon not running. ',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
-	'S_NOT_RUN'=>'Server in "%s" and daemon not running',
+	'S_NOT_RUN'=>'Server is "%s" and daemon not running',
 	'S_IP_NOT_AVAILABLE'=>'IP address in the same LAN and not available',
 	'S_TIME_OUT'=>'Correct DNS name or IP "%s" but unavailable outside the LAN',
 	'S_WRONG_DNS'=> 'Wrong DNS name',
