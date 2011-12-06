@@ -108,7 +108,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 
 	ZBX_SYSCTL(uvm);
 
-	used = uvm.active + uvm.inactive + uvm.wired + uvm.execpages + uvm.filepages;
+	used = uvm.active + uvm.wired + uvm.execpages + uvm.filepages;
 
 	SET_UI64_RESULT(result, used << uvm.pageshift);
 
@@ -124,7 +124,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	if (0 == uvm.npages)
 		return SYSINFO_RET_FAIL;
 
-	used = uvm.active + uvm.inactive + uvm.wired + uvm.execpages + uvm.filepages;
+	used = uvm.active + uvm.wired + uvm.execpages + uvm.filepages;
 
 	SET_DBL_RESULT(result, used / (double)uvm.npages * 100);
 

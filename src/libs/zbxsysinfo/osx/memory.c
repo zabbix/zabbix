@@ -90,7 +90,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 {
 	ZBX_HOST_STATISTICS(vm);
 
-	SET_UI64_RESULT(result, (zbx_uint64_t)(vm.active_count + vm.inactive_count + vm.wire_count) * pagesize);
+	SET_UI64_RESULT(result, (zbx_uint64_t)(vm.active_count + vm.wire_count) * pagesize);
 
 	return SYSINFO_RET_OK;
 }
@@ -106,7 +106,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 	ZBX_HOST_STATISTICS(vm);
 
-	used = (zbx_uint64_t)(vm.active_count + vm.inactive_count + vm.wire_count) * pagesize;
+	used = (zbx_uint64_t)(vm.active_count + vm.wire_count) * pagesize;
 
 	SET_DBL_RESULT(result, used / (double)memsize * 100);
 
