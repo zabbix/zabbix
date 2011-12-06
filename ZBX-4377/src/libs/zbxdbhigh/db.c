@@ -30,6 +30,9 @@
 
 extern int	txn_level;
 extern int	txn_error;
+#if HAVE_POSTGRESQL
+extern char	ZBX_PG_ESCAPE_BACKSLASH;
+#endif
 
 const char	*DBnode(const char *fieldid, int nodeid)
 {
@@ -1117,18 +1120,19 @@ void	DBvacuum()
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_escape_string_len(const char *src)
+static size_t	DBget_escape_string_len(const char *src)
 {
 	const char	*s;
-	int		len = 1;	/* '\0' */
+	size_t		len = 1;	/* '\0' */
 
 	for (s = src; NULL != s && '\0' != *s; s++)
 	{
 		if ('\r' == *s)
 			continue;
-
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif
@@ -1152,13 +1156,13 @@ static int	DBget_escape_string_len(const char *src)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-static void	DBescape_string(const char *src, char *dst, int len)
+static void	DBescape_string(const char *src, char *dst, size_t len)
 {
 	const char	*s;
 	char		*d;
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 #	define ZBX_DB_ESC_CH	'\\'
-#else
+#elif !defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_ESC_CH	'\''
 #endif
 	assert(dst);
@@ -1170,8 +1174,10 @@ static void	DBescape_string(const char *src, char *dst, int len)
 		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif
@@ -1202,7 +1208,7 @@ static void	DBescape_string(const char *src, char *dst, int len)
  ******************************************************************************/
 char	*DBdyn_escape_string(const char *src)
 {
-	int	len;
+	size_t	len;
 	char	*dst = NULL;
 
 	len = DBget_escape_string_len(src);
@@ -1225,19 +1231,21 @@ char	*DBdyn_escape_string(const char *src)
  * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
  *                                                                            *
  ******************************************************************************/
-char	*DBdyn_escape_string_len(const char *src, int max_src_len)
+char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;
-	int		len = 1;	/* '\0' */
+	size_t		len = 1;	/* '\0' */
 
 	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
 	{
 		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif

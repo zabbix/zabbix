@@ -254,7 +254,7 @@
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			// trigger description
-			$trigger = expand_trigger_description($_REQUEST['triggerid']);
+			$trigger = expand_trigger_description_simple($_REQUEST['triggerid']);
 			// prepending host name to trigger description
 			$triggerHostDB = get_hosts_by_triggerid($_REQUEST['triggerid']);
 			$triggerHost = DBfetch($triggerHostDB);

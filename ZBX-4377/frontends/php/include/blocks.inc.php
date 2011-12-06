@@ -1249,7 +1249,7 @@ function make_graph_submenu(){
 			$item['description'] = item_description($item);
 
 			$favGraphs[] = array(
-							'name'	=>	$host['host'].':'.$item['description'],
+							'name'	=>	htmlspecialchars($host['host'].':'.$item['description']),
 							'favobj'=>	'itemid',
 							'favid'	=>	$sourceid,
 							'action'=>	'remove'
@@ -1263,7 +1263,7 @@ function make_graph_submenu(){
 			$ghost = reset($graph['hosts']);
 
 			$favGraphs[] = array(
-							'name'	=>	$ghost['host'].':'.$graph['name'],
+							'name'	=>	htmlspecialchars($ghost['host'].':'.$graph['name']),
 							'favobj'=>	'graphid',
 							'favid'	=>	$sourceid,
 							'action'=>	'remove'
@@ -1327,7 +1327,7 @@ function make_sysmap_submenu(){
 
 	foreach($sysmaps as $snum => $sysmap){
 		$favMaps[] = array(
-				'name'	=>	$sysmap['name'],
+				'name'	=>	htmlspecialchars($sysmap['name']),
 				'favobj'=>	'sysmapid',
 				'favid'	=>	$sysmap['sysmapid'],
 				'action'=>	'remove'
@@ -1404,7 +1404,7 @@ function make_screen_submenu(){
 			$slide_added = true;
 
 			$favScreens[] = array(
-				'name'	=>	$slide['name'],
+				'name'	=>	htmlspecialchars($slide['name']),
 				'favobj'=>	'slideshowid',
 				'favid'	=>	$slide['slideshowid'],
 				'action'=>	'remove'
@@ -1418,7 +1418,7 @@ function make_screen_submenu(){
 			$screen_added = true;
 
 			$favScreens[] = array(
-				'name'	=>	$screen['name'],
+				'name'	=>	htmlspecialchars($screen['name']),
 				'favobj'=>	'screenid',
 				'favid'	=>	$screen['screenid'],
 				'action'=>	'remove'

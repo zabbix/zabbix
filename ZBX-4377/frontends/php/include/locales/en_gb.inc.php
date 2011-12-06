@@ -2473,6 +2473,7 @@
 
 // class.cscreen.php
 	'S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM' => 'Incorrect resource provided for screen item',
+	'S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM' => 'No resource provided for screen item',
 
 // class.cbuttonqmessage.php
 	'S_ARE_YOU_SURE_YOU_WANT_TO_PERFORM_THIS_ACTION' => 'Are you sure you want perform this action?',

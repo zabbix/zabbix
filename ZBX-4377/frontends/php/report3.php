@@ -38,8 +38,8 @@ include_once('include/page_header.php');
 
 	check_fields($fields);
 
-	$period = get_request('period',	'weekly');
-	$year	= get_request('year',	date('Y'));
+	$period = get_request('period', 'weekly');
+	$year = get_request('year', date('Y'));
 
 	define("YEAR_LEFT_SHIFT", 5);
 ?>
@@ -76,13 +76,15 @@ include_once('include/page_header.php');
 	$cmbPeriod->addItem('yearly',S_YEARLY);
 	$form->addItem(array(SPACE.S_PERIOD.SPACE, $cmbPeriod));
 
-	$cmbYear = new CComboBox('year', $year, 'submit();');
+	if ($period != 'yearly') {
+		$cmbYear = new CComboBox('year', $year, 'submit();');
 
-	for($y = (date('Y') - YEAR_LEFT_SHIFT); $y <= date('Y'); $y++){
-		$cmbYear->addItem($y, $y);
+		for ($y = (date('Y') - YEAR_LEFT_SHIFT); $y <= date('Y'); $y++) {
+			$cmbYear->addItem($y, $y);
+		}
+
+		$form->addItem(array(SPACE.S_YEAR.SPACE, $cmbYear));
 	}
-
-	$form->addItem(array(SPACE.S_YEAR.SPACE, $cmbYear));
 
 	show_table_header(array(
 			S_IT_SERVICES_AVAILABILITY_REPORT_BIG,
@@ -97,82 +99,129 @@ include_once('include/page_header.php');
 
 	$header = array(S_OK,S_PROBLEMS,S_DOWNTIME,S_PERCENTAGE,S_SLA);
 
-        switch($period){
-			case 'yearly':
-				$from	= (date('Y') - YEAR_LEFT_SHIFT);
-				$to	= date('Y');
-				array_unshift($header, new CCol(S_YEAR,'center'));
-				function get_time($y)	{	return mktime(0,0,0,1,1,$y);		}
-				function format_time($t){	return zbx_date2str(S_REPORT3_ANNUALLY_DATE_FORMAT, $t);	}
-				function format_time2($t){	return null; };
-				break;
-			case 'monthly':
-				$from	= 1;
-				$to	= 12;
-				array_unshift($header, new CCol(S_MONTH,'center'));
-				function get_time($m)	{	global $year;	return mktime(0,0,0,$m,1,$year);	}
-				function format_time($t){	return zbx_date2str(S_REPORT3_MONTHLY_DATE_FORMAT,$t);	}
-				function format_time2($t){	return null; };
-				break;
-			case 'dayly':
-				$from	= 1;
-				$to	= 365;
-				array_unshift($header, new CCol(S_DAY,'center'));
-				function get_time($d)	{	global $year;	return mktime(0,0,0,1,$d,$year);	}
-				function format_time($t){	return zbx_date2str(S_REPORT3_DAILY_DATE_FORMAT,$t);	}
-				function format_time2($t){	return null; };
-				break;
-			case 'weekly':
-			default:
-				$from	= 0;
-				$to	= 52;
-				array_unshift($header,new CCol(S_FROM,'center'),new CCol(S_TILL,'center'));
-				function get_time($w)	{
-					global $year;
+	switch ($period) {
+		case 'yearly':
+			$from = (date('Y') - YEAR_LEFT_SHIFT);
+			$to = date('Y');
+			array_unshift($header, new CCol(S_YEAR, 'center'));
 
-					$time	= mktime(0,0,0,1, 1, $year);
-					$wd	= date('w', $time);
-					$wd	= $wd == 0 ? 6 : $wd - 1;
+			function get_time($y) {
+				return mktime(0, 0, 0, 1, 1, $y);
+			}
 
-					return ($time + ($w*7 - $wd)*24*3600);
-				}
-				function format_time($t){	return zbx_date2str(S_REPORT3_WEEKLY_DATE_FORMAT,$t);	}
-				function format_time2($t){	return format_time($t); };
-				break;
+			function format_time($t) {
+				return zbx_date2str(S_REPORT3_ANNUALLY_DATE_FORMAT, $t);
+			}
+
+			function format_time2($t) {
+				return null;
+			}
+			break;
+		case 'monthly':
+			$from = 1;
+			$to = 12;
+			array_unshift($header, new CCol(S_MONTH, 'center'));
+
+			function get_time($m) {
+				global $year;
+
+				return mktime(0, 0, 0, $m, 1, $year);
+			}
+
+			function format_time($t) {
+				return zbx_date2str(S_REPORT3_MONTHLY_DATE_FORMAT, $t);
+			}
+
+			function format_time2($t) {
+				return null;
+			}
+			break;
+		case 'dayly':
+			$from = 1;
+			$to = 365;
+			array_unshift($header, new CCol(S_DAY,'center'));
+
+			function get_time($d) {
+				global $year;
+
+				return mktime(0, 0, 0, 1, $d, $year);
+			}
+
+			function format_time($t) {
+				return zbx_date2str(S_REPORT3_DAILY_DATE_FORMAT, $t);
+			}
+
+			function format_time2($t) {
+				return null;
+			}
+			break;
+		case 'weekly':
+		default:
+			$from = 0;
+			$to = 52;
+			array_unshift($header, new CCol(S_FROM, 'center'), new CCol(S_TILL, 'center'));
+
+			function get_time($w) {
+				global $year;
+
+				$time = mktime(12, 0, 0, 1, 1, $year);
+				$time += $w * SEC_PER_WEEK;
+
+				$wd	= date('w', $time);
+				$time -= $wd * SEC_PER_DAY;
+
+				$y = date('Y', $time);
+				$m = date('m', $time);
+				$d = date('d', $time);
+				return mktime(0, 0, 0, $m, $d, $y);
+			}
+
+			function format_time($t) {
+				return zbx_date2str(S_REPORT3_WEEKLY_DATE_FORMAT, $t);
+			}
+
+			function format_time2($t) {
+				return format_time($t);
+			}
+			break;
 	}
 
 	$table->SetHeader($header);
 
-	for($t = $from; $t <= $to; $t++){
-
-		if(($start = get_time($t)) > time())
+	for ($t = $from; $t <= $to; $t++) {
+		if (($start = get_time($t)) > time()) {
 			break;
+		}
 
-		if(($end = get_time($t+1)) > time())
+		if (($end = get_time($t+1)) > time()) {
 			$end = time();
+		}
 
-		$stat = calculate_service_availability($service['serviceid'],$start,$end);
+		$stat = calculateServiceAvailability($service['serviceid'], $start, $end);
 
-		$ok 		= new CSpan(
-					sprintf('%dd %dh %dm',
-						$stat['ok_time']/(24*3600),
-						($stat['ok_time']%(24*3600))/3600,
-						($stat['ok_time']%(3600))/(60)),
-					'off');
+		$ok = new CSpan(
+			sprintf('%dd %dh %dm',
+				$stat['ok_time'] / SEC_PER_DAY,
+				($stat['ok_time'] % SEC_PER_DAY) / SEC_PER_HOUR,
+				($stat['ok_time'] % SEC_PER_HOUR) / SEC_PER_MIN
+			), 'off'
+		);
 
-		$problems	= new CSpan(
-					sprintf('%dd %dh %dm',
-						$stat['problem_time']/(24*3600),
-						($stat['problem_time']%(24*3600))/3600,
-						($stat['problem_time']%(3600))/(60)),
-					'on');
+		$problems = new CSpan(
+			sprintf('%dd %dh %dm',
+				$stat['problem_time'] / SEC_PER_DAY,
+				($stat['problem_time'] % SEC_PER_DAY) / SEC_PER_HOUR,
+				($stat['problem_time'] % SEC_PER_HOUR) / SEC_PER_MIN
+			), 'on'
+		);
 
-		$downtime	= sprintf('%dd %dh %dm',
-					$stat['downtime_time']/(24*3600),
-					($stat['downtime_time']%(24*3600))/3600,
-					($stat['downtime_time']%(3600))/(60));
+		$downtime = sprintf('%dd %dh %dm',
+			$stat['downtime_time'] / SEC_PER_DAY,
+			($stat['downtime_time'] % SEC_PER_DAY) / SEC_PER_HOUR,
+			($stat['downtime_time'] % SEC_PER_HOUR) / SEC_PER_MIN
+		);
 
-		$percentage	= new CSpan(sprintf('%2.2f%%',$stat['ok']) , 'off');
+		$percentage = new CSpan(sprintf('%2.2f%%', $stat['ok']), 'off');
 
 		$table->addRow(array(
 			format_time($start),
@@ -181,11 +230,8 @@ include_once('include/page_header.php');
 			$problems,
 			$downtime,
 			$percentage,
-			($service['showsla']==1) ?
-				new CSpan($service['goodsla'], ($stat['ok'] >= $service['goodsla']) ? 'off' : 'on') :
-				'-'
-
-			));
+			($service['showsla'] == 1) ? new CSpan($service['goodsla'], ($stat['ok'] >= $service['goodsla']) ? 'off' : 'on') : '-'
+		));
 	}
 
 	$table->Show();

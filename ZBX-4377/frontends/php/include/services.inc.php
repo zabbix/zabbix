@@ -288,58 +288,73 @@
 	}
 
 	function get_last_service_value($serviceid, $clock) {
-		$row = DBfetch(DBselect('SELECT COUNT(*) as cnt,MAX(sa.clock) as maxx FROM service_alarms sa WHERE sa.serviceid='.$serviceid.' and sa.clock<='.$clock));
-		if ($row && $row['cnt'] > 0) {
-			$result2 = DBselect('SELECT sa.value FROM service_alarms sa WHERE sa.serviceid='.$serviceid.' and sa.clock='.$row['maxx']);
+		$value = 0;
 
+		$result = DBselect(
+			'SELECT MAX(sa.clock) AS clock'.
+			' FROM service_alarms sa'.
+			' WHERE sa.serviceid='.$serviceid.
+				' AND sa.clock<'.$clock
+		);
+		$row = DBfetch($result);
+		if ($row && !is_null($row['clock'])) {
 			// assuring that we get very latest service value. There could be several with the same timestamp
-			while ($row2 = DBfetch($result2)) {
+			$result2 = DBselect(
+				'SELECT sa.value'.
+				' FROM service_alarms sa'.
+				' WHERE sa.serviceid='.$serviceid.
+					' AND sa.clock='.$row['clock'].
+				' ORDER BY sa.servicealarmid DESC', 1
+			);
+			if ($row2 = DBfetch($result2)) {
 				$value = $row2['value'];
 			}
-		}
-		else {
-			$value = 0;
 		}
 		return $value;
 	}
 
-	function expand_periodical_service_times(&$data, $period_start, $period_end, $ts_from, $ts_to, $type = 'ut') {
-		// calculate period FROM '-1 week' to know period name for $period_start
-		for ($curr = ($period_start - (7 * 24 * 3600)); $curr <= $period_end; $curr += 86400) {
-			$curr_date = getdate($curr);
-			$from_date = getdate($ts_from);
+	function expandPeriodicalServiceTimes(&$data, $period_start, $period_end, $ts_from, $ts_to, $type) {
+		$week = getdate($period_start);
+		$week = $period_start - $week['wday'] * SEC_PER_DAY - $week['hours'] * SEC_PER_HOUR - $week['minutes'] * SEC_PER_MIN - $week['seconds'];
 
-			if ($curr_date['wday'] == $from_date['wday']) {
-				$curr_from = mktime(
-					$from_date['hours'], $from_date['minutes'], $from_date['seconds'],
-					$curr_date['mon'], $curr_date['mday'], $curr_date['year']
-				);
+		$ts_from = getdate($ts_from);
+		$ts_from = $ts_from['wday'] * SEC_PER_DAY + $ts_from['hours'] * SEC_PER_HOUR + $ts_from['minutes'] * SEC_PER_MIN;
 
-				$curr_from = max($curr_from, $period_start);
-				$curr_from = min($curr_from, $period_end);
-				$curr_to = $curr_from + ($ts_to - $ts_from);
-				$curr_to = max($curr_to, $period_start);
-				$curr_to = min($curr_to, $period_end);
-				$curr = $curr_to;
+		$ts_to = getdate($ts_to);
+		$ts_to = $ts_to['wday'] * SEC_PER_DAY + $ts_to['hours'] * SEC_PER_HOUR + $ts_to['minutes'] * SEC_PER_MIN;
 
-				if (isset($data[$curr_from][$type.'_s'])) {
-					$data[$curr_from][$type.'_s'] ++;
-				}
-				else {
-					$data[$curr_from][$type.'_s'] = 1;
-				}
+		for (; $week < $period_end; $week += SEC_PER_WEEK) {
+			$_s = $week + $ts_from;
+			$_e = $week + $ts_to;
 
-				if (isset($data[$curr_to][$type.'_e'])) {
-					$data[$curr_to][$type.'_e'] ++;
-				}
-				else {
-					$data[$curr_to][$type.'_e'] = 1;
-				}
+			if ($period_end < $_s || $period_start >= $_e) {
+				continue;
+			}
+
+			if ($_s < $period_start) {
+				$_s = $period_start;
+			}
+			if ($_e > $period_end) {
+				$_e = $period_end;
+			}
+
+			if (isset($data[$_s][$type.'_s'])) {
+				$data[$_s][$type.'_s']++;
+			}
+			else {
+				$data[$_s][$type.'_s'] = 1;
+			}
+
+			if (isset($data[$_e][$type.'_e'])) {
+				$data[$_e][$type.'_e']++;
+			}
+			else {
+				$data[$_e][$type.'_e'] = 1;
 			}
 		}
 	}
 
-	function calculate_service_availability($serviceid, $period_start, $period_end) {
+	function calculateServiceAvailability($serviceid, $period_start, $period_end) {
 		/* structure of "$data"
 		 *	key	- time stamp
 		 *	alarm	- on/off status (0,1 - off; >1 - on)
@@ -348,78 +363,77 @@
 		 *	ut_s	- count of uptime starts
 		 *	ut_e	- count of uptime ends
 		 */
+
 		$data[$period_start]['alarm'] = get_last_service_value($serviceid, $period_start);
 
 		// sort by time stamp
-		$sql = 'SELECT sa.servicealarmid,sa.clock,sa.value'.
-				' FROM service_alarms sa'.
-				' WHERE sa.serviceid='.$serviceid.
-					' AND sa.clock>='.$period_start.
-					' AND sa.clock<='.$period_end.
-				' ORDER BY sa.clock asc,sa.servicealarmid ASC';
-		$service_alarms = DBselect($sql);
-		while ($db_alarm_row = DBfetch($service_alarms)) {
-			$data[$db_alarm_row['clock']]['alarm'] = $db_alarm_row['value'];
+		$result = DBselect(
+			'SELECT sa.servicealarmid,sa.clock,sa.value'.
+			' FROM service_alarms sa'.
+			' WHERE sa.serviceid='.$serviceid.
+				' AND sa.clock BETWEEN '.$period_start.' AND '.$period_end.
+			' ORDER BY sa.clock,sa.servicealarmid'
+		);
+		while ($row = DBfetch($result)) {
+			$data[$row['clock']]['alarm'] = $row['value'];
 		}
 
+		$unmarked_period_type = 'ut';
+
 		// add periodical uptimes
-		$sql = 'SELECT st.ts_from,st.ts_to'.
-				' FROM services_times st'.
-				' WHERE st.type='.SERVICE_TIME_TYPE_UPTIME.
-					' AND st.serviceid='.$serviceid;
-		$service_times = DBselect($sql);
-		if ($db_time_row = DBfetch($service_times)) {
+		$result = DBselect(
+			'SELECT st.ts_from,st.ts_to'.
+			' FROM services_times st'.
+			' WHERE st.type='.SERVICE_TIME_TYPE_UPTIME.
+				' AND st.serviceid='.$serviceid
+		);
+		while ($row = DBfetch($result)) {
+			expandPeriodicalServiceTimes($data, $period_start, $period_end, $row['ts_from'], $row['ts_to'], 'ut');
+
 			// if exist any uptime - unmarked time is downtime
 			$unmarked_period_type = 'dt';
-			do {
-				expand_periodical_service_times($data, $period_start, $period_end, $db_time_row['ts_from'], $db_time_row['ts_to'], 'ut');
-			} while ($db_time_row = DBfetch($service_times));
-		}
-		else {
-			// if missed any uptime - unmarked time is uptime
-			$unmarked_period_type = 'ut';
 		}
 
 		// add periodical downtimes
-		$sql = 'SELECT st.ts_from,st.ts_to'.
-				' FROM services_times st'.
-				' WHERE st.type='.SERVICE_TIME_TYPE_DOWNTIME.
-					' AND st.serviceid='.$serviceid;
-		$service_times = DBselect($sql);
-		while ($db_time_row = DBfetch($service_times)) {
-			expand_periodical_service_times($data, $period_start, $period_end, $db_time_row['ts_from'], $db_time_row['ts_to'], 'dt');
+		$result = DBselect(
+			'SELECT st.ts_from,st.ts_to'.
+			' FROM services_times st'.
+			' WHERE st.type='.SERVICE_TIME_TYPE_DOWNTIME.
+				' AND st.serviceid='.$serviceid
+		);
+		while ($row = DBfetch($result)) {
+			expandPeriodicalServiceTimes($data, $period_start, $period_end, $row['ts_from'], $row['ts_to'], 'dt');
 		}
 
 		// add one-time downtimes
-		$sql = 'SELECT st.ts_from,st.ts_to'.
-				' FROM services_times st'.
-				' WHERE st.type='.SERVICE_TIME_TYPE_ONETIME_DOWNTIME.
-					' AND st.serviceid='.$serviceid;
-		$service_times = DBselect($sql);
-		while ($db_time_row = DBfetch($service_times)) {
-			if ($db_time_row['ts_to'] < $period_start || $db_time_row['ts_from'] > $period_end) {
-				continue;
+		$result = DBselect(
+			'SELECT st.ts_from,st.ts_to'.
+			' FROM services_times st'.
+			' WHERE st.type='.SERVICE_TIME_TYPE_ONETIME_DOWNTIME.
+				' AND st.ts_to>='.$period_start.
+				' AND st.ts_from<='.$period_end.
+				' AND st.serviceid='.$serviceid
+		);
+		while ($row = DBfetch($result)) {
+			if ($row['ts_from'] < $period_start) {
+				$row['ts_from'] = $period_start;
+			}
+			if ($row['ts_to'] > $period_end) {
+				$row['ts_to'] = $period_end;
 			}
 
-			if ($db_time_row['ts_from'] < $period_start) {
-				$db_time_row['ts_from'] = $period_start;
-			}
-			if ($db_time_row['ts_to'] > $period_end) {
-				$db_time_row['ts_to'] = $period_end;
-			}
-
-			if (isset($data[$db_time_row['ts_from']]['dt_s'])) {
-				$data[$db_time_row['ts_from']]['dt_s']++;
+			if (isset($data[$row['ts_from']]['dt_s'])) {
+				$data[$row['ts_from']]['dt_s']++;
 			}
 			else {
-				$data[$db_time_row['ts_from']]['dt_s'] = 1;
+				$data[$row['ts_from']]['dt_s'] = 1;
 			}
 
-			if (isset($data[$db_time_row['ts_to']]['dt_e'])) {
-				$data[$db_time_row['ts_to']]['dt_e']++;
+			if (isset($data[$row['ts_to']]['dt_e'])) {
+				$data[$row['ts_to']]['dt_e']++;
 			}
 			else {
-				$data[$db_time_row['ts_to']]['dt_e'] = 1;
+				$data[$row['ts_to']]['dt_e'] = 1;
 			}
 		}
 
@@ -436,14 +450,22 @@
 		$sla_time = array(
 			'dt' => array('problem_time' => 0, 'ok_time' => 0),
 			'ut' => array('problem_time' => 0, 'ok_time' => 0)
-			);
+		);
 		$prev_alarm = $data[$period_start]['alarm'];
 		$prev_time = $period_start;
 
-		if (isset($data[$period_start]['ut_s'])) $ut_cnt += $data[$period_start]['ut_s'];
-		if (isset($data[$period_start]['ut_e'])) $ut_cnt -= $data[$period_start]['ut_e'];
-		if (isset($data[$period_start]['dt_s'])) $dt_cnt += $data[$period_start]['dt_s'];
-		if (isset($data[$period_start]['dt_e'])) $dt_cnt -= $data[$period_start]['dt_e'];
+		if (isset($data[$period_start]['ut_s'])) {
+			$ut_cnt += $data[$period_start]['ut_s'];
+		}
+		if (isset($data[$period_start]['ut_e'])) {
+			$ut_cnt -= $data[$period_start]['ut_e'];
+		}
+		if (isset($data[$period_start]['dt_s'])) {
+			$dt_cnt += $data[$period_start]['dt_s'];
+		}
+		if (isset($data[$period_start]['dt_e'])) {
+			$dt_cnt -= $data[$period_start]['dt_e'];
+		}
 		foreach ($data as $ts => $val) {
 			// skip first data [already readed]
 			if ($ts == $period_start) {
@@ -468,11 +490,21 @@
 				$sla_time[$period_type]['ok_time'] += $ts - $prev_time;
 			}
 
-			if (isset($val['ut_s'])) $ut_cnt += $val['ut_s'];
-			if (isset($val['ut_e'])) $ut_cnt -= $val['ut_e'];
-			if (isset($val['dt_s'])) $dt_cnt += $val['dt_s'];
-			if (isset($val['dt_e'])) $dt_cnt -= $val['dt_e'];
-			if (isset($val['alarm'])) $prev_alarm = $val['alarm'];
+			if (isset($val['ut_s'])) {
+				$ut_cnt += $val['ut_s'];
+			}
+			if (isset($val['ut_e'])) {
+				$ut_cnt -= $val['ut_e'];
+			}
+			if (isset($val['dt_s'])) {
+				$dt_cnt += $val['dt_s'];
+			}
+			if (isset($val['dt_e'])) {
+				$dt_cnt -= $val['dt_e'];
+			}
+			if (isset($val['alarm'])) {
+				$prev_alarm = $val['alarm'];
+			}
 
 			$prev_time = $ts;
 		}
