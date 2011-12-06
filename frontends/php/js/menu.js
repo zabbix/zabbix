@@ -461,7 +461,7 @@ function menu_item (o_parent, n_order) {
 		eldiv.setAttribute('title', this.a_config[0]);
 	}
 
-	eldiv.innerHTML = this.a_config[0];
+	eldiv.appendChild(document.createTextNode(this.a_config[0]));
 
 	el.appendChild(eldiv);
 
@@ -481,8 +481,8 @@ function menu_item (o_parent, n_order) {
 		var x = 500;
 		while (x) {
 			newResult = this.e_ielement.scrollWidth - this.getprop('width');
-			nText = this.e_ielement.innerHTML;
-			this.e_ielement.innerHTML = nText.substring(0, nText.length-10);
+			nText = jQuery.unescapeHtml(this.e_ielement.innerHTML);
+			this.e_ielement.innerHTML = jQuery.escapeHtml(nText.substring(0, nText.length-10));
 			x--;
 			if (newResult < 1) {
 				this.e_ielement.innerHTML += '...';
