@@ -343,11 +343,10 @@ jQuery(document).ready(function() {
 		hostInterfacesManager.setUseipForInterface(interfaceId[0], jQuery(this).val());
 	});
 
-	jQuery("#agentInterfaces, #SNMPInterfaces, #JMXInterfaces, #IPMIInterfaces").droppable({
+	jQuery("#agentInterfaces, #SNMPInterfaces, #JMXInterfaces, #IPMIInterfaces").parent().droppable({
 		tolerance: 'pointer',
-//		activeClass: 'dropArea',
 		drop: function(event, ui) {
-			var hostInterfaceTypeName = jQuery(this).data('type'),
+			var hostInterfaceTypeName = jQuery('.formElementTable', this).data('type'),
 				hostInterfaceId = ui.draggable.data('interfaceid');
 
 			ui.helper.remove();
@@ -360,8 +359,6 @@ jQuery(document).ready(function() {
 				jQuery(this).addClass('dropArea');
 				jQuery('span.dragHelpText', this).toggle();
 			}
-
-
 		},
 		deactivate: function(event, ui) {
 			jQuery(this).removeClass('dropArea');
