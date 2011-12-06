@@ -1688,4 +1688,26 @@ function bcround($number, $precision = 0) {
 	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
 	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
 }
+
+
+/**
+ * Sanitizes the data before outputting.
+ *
+ * @param mixed $data
+ *
+ * @return mixed
+ */
+function sanitize($data) {
+	if (is_array($data)) {
+		foreach ($data as &$value) {
+			$value = sanitize($value);
+		}
+	}
+	else {
+		$data = htmlspecialchars($data);
+	}
+
+	return $data;
+}
+
 ?>
