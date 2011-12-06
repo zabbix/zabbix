@@ -465,6 +465,8 @@ Copt::memoryPick();
 		}
 
 		foreach($interfaces as $inum => &$interface){
+			$interface = $this->clearValues($interface);
+
 			if(!check_db_fields($interfaceDBfields, $interface)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
 			}
@@ -537,8 +539,6 @@ Copt::memoryPick();
 			if($update){
 				$interface = $updInterface;
 			}
-
-			$interface = $this->clearValues($interface);
 		}
 		unset($interface);
 

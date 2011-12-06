@@ -25,8 +25,10 @@
 
 class CDiscoveryRule extends CItemGeneral {
 
-	protected $tableName = 'items';
+	const MIN_LIFETIME = 0;
+	const MAX_LIFETIME = 3650;
 
+	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 
 
@@ -542,14 +544,14 @@ COpt::memoryPick();
 	protected function checkSpecificFields(array $item) {
 		if (isset($item['lifetime']) && !$this->validateLifetime($item['lifetime'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Discovery rule "%1$s:%2$s" has incorrect lifetime: "%3$s". (min: 0, max: 3650, user macro allowed)',
-					$item['name'], $item['key_'], $item['lifetime'])
+				_s('Discovery rule "%1$s:%2$s" has incorrect lifetime: "%3$s". (min: %4$d, max: %5$d, user macro allowed)',
+					$item['name'], $item['key_'], $item['lifetime'], self::MIN_LIFETIME, self::MAX_LIFETIME)
 			);
 		}
 	}
 
 	private function validateLifetime($lifetime) {
-		return (validateNumber($lifetime, 0, 3650) || validateUserMacro($lifetime));
+		return (validateNumber($lifetime, self::MIN_LIFETIME, self::MAX_LIFETIME) || validateUserMacro($lifetime));
 	}
 
 /**
