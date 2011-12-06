@@ -560,8 +560,11 @@ Copt::memoryPick();
 	}
 
 	protected function clearValues(array $interface) {
-		if (isset($interface['port'])) {
+		if (isset($interface['port']) && $interface['port'] != '') {
 			$interface['port'] = ltrim($interface['port'], '0');
+			if ($interface['port'] == '') {
+				$interface['port'] = 0;
+			}
 		}
 
 		return $interface;
