@@ -144,6 +144,8 @@ abstract class CItemGeneral extends CZBXAPI{
 		));
 
 		foreach ($items as $inum => &$item) {
+			$item = $this->clearValues($item);
+
 			$fullItem = $items[$inum];
 
 			if (!check_db_fields($item_db_fields, $item)) {
@@ -277,8 +279,6 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			$this->checkSpecificFields($fullItem);
-
-			$item = $this->clearValues($item);
 		}
 		unset($item);
 	}

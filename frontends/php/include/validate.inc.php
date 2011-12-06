@@ -603,17 +603,16 @@ function check_fields(&$fields, $show_messages = true) {
 	return $err == ZBX_VALID_OK ? 1 : 0;
 }
 
-
 function validatePortNumberOrMacro($port) {
 	return (validatePortNumber($port) || validateUserMacro($port));
 }
 
 function validatePortNumber($port) {
-	return validateNumber($port, 0, 65535);
+	return validateNumber($port, ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER);
 }
 
 function validateNumber($value, $min = null, $max = null) {
-	if (!zbx_ctype_digit($value)) {
+	if (!zbx_is_int($value)) {
 		return false;
 	}
 
@@ -631,10 +630,6 @@ function validateNumber($value, $min = null, $max = null) {
 function validateUserMacro($value) {
 	return preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value);
 }
-
-
-
-
 
 function validateMaxTime($time) {
 	return $time <= 2147464800; // 2038.01.19 00:00
