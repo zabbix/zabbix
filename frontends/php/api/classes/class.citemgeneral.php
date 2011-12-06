@@ -278,7 +278,7 @@ abstract class CItemGeneral extends CZBXAPI{
 
 			$this->checkSpecificFields($fullItem);
 
-			$this->clearValues($item);
+			$item = $this->clearValues($item);
 		}
 		unset($item);
 	}
@@ -287,7 +287,7 @@ abstract class CItemGeneral extends CZBXAPI{
 		return true;
 	}
 
-	protected function clearValues(array &$item) {
+	protected function clearValues(array $item) {
 		if (isset($item['port'])) {
 			$item['port'] = ltrim($item['port'], '0');
 		}
@@ -295,6 +295,8 @@ abstract class CItemGeneral extends CZBXAPI{
 		if (isset($item['lifetime'])) {
 			$item['lifetime'] = ltrim($item['lifetime'], '0');
 		}
+
+		return $item;
 	}
 
 	protected function errorInheritFlags($flag, $key, $host){
