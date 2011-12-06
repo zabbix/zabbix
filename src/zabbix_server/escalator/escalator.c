@@ -1209,21 +1209,21 @@ static void	process_escalations(int now)
 
 			DBbegin();
 
-			/* execute active escalation if needed */
-			if (ESCALATION_STATUS_ACTIVE == escalation.status &&
-					(0 == esc_superseded || 0 == escalation.esc_step))
+			/* execute active escalation */
+			if (ESCALATION_STATUS_ACTIVE == escalation.status)
 			{
 				execute_escalation(&escalation);
 			}
 
-			/* execute escalation recovery if needed */
+			/* execute escalation recovery */
 			if (ESCALATION_STATUS_COMPLETED != escalation.status && 1 == esc_recovery)
 			{
 				escalation.status = ESCALATION_STATUS_RECOVERY;
 				execute_escalation(&escalation);
 			}
 
-			if (ESCALATION_STATUS_COMPLETED != escalation.status || 1 == esc_superseded)
+			/* delete completed and superseded */
+			if (ESCALATION_STATUS_COMPLETED == escalation.status || 1 == esc_superseded)
 			{
 				DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64,
 						escalation.escalationid);
