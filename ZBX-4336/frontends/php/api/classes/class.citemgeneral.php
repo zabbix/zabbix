@@ -42,7 +42,6 @@ abstract class CItemGeneral extends CZBXAPI{
 			'description' 			=> array(),
 			'key_'					=> array('template' => 1),
 			'delay'					=> array(),
-			'error'					=> array(),
 			'history'				=> array(),
 			'trends'				=> array(),
 			'lastvalue'				=> array('system' => 1),
@@ -171,7 +170,7 @@ abstract class CItemGeneral extends CZBXAPI{
 				if (!isset($item['key_'])) {
 					$item['key_'] = $fullItem['key_'];
 				}
-				if (!isset($item['error']) && isset( $item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
+				if (isset( $item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
 					$item['error'] = '';
 				}
 

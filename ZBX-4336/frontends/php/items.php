@@ -463,9 +463,7 @@ switch($itemType) {
 				}
 			}
 
-			if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED ) {
-				$item['error'] = '';
-					}
+
 
 			$item['itemid'] = $_REQUEST['itemid'];
 			$result = API::Item()->update($item);
