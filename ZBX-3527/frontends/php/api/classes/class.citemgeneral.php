@@ -406,5 +406,89 @@ abstract class CItemGeneral extends CZBXAPI{
 		return (count($ids) == $count);
 	}
 
+
+	/**
+	 * Checks whether the given items are referenced by any graphs and tries to
+	 * unset these references, if they are no longer used.
+	 *
+	 * @throws APIException if at least one of the item can't be deleted
+	 *
+	 * @param array $itemIds   An array of item IDs
+	 */
+	protected function checkGraphReference(array $itemIds) {
+		$this->checkUseInGraphAxis($itemIds, true);
+		$this->checkUseInGraphAxis($itemIds);
+	}
+
+
+	/**
+	 * Checks if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * if there are graphs, that have an y*_itemid column set, but the
+	 * y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, the y*_itemid
+	 * column will be set to NULL.
+	 *
+	 * If the $checkMax parameter is set to true, the items will be checked against
+	 * max Y values, otherwise, they will be checked against min Y values.
+	 *
+	 * @throws APIException if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * @param array $itemIds   An array of items IDs
+	 * @param type $checkMax
+	 */
+	protected function checkUseInGraphAxis(array $itemIds, $checkMax = false) {
+		if ($checkMax) {
+			$filter = array(
+				'ymax_itemid' => $itemIds,
+			);
+			$itemIdColumn = 'ymax_itemid';
+			$typeColumn = 'ymax_type';
+		}
+		else {
+			$filter = array(
+				'ymin_itemid' => $itemIds,
+			);
+			$itemIdColumn = 'ymin_itemid';
+			$typeColumn = 'ymin_type';
+		}
+
+		// make if work for both graphs and graph prototypes
+		$filter['flags'] = array(
+			ZBX_FLAG_DISCOVERY_CHILD,
+			ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_CREATED
+		);
+
+		// check if the items are used in Y axis min/max values in any graphs
+		$graphs = API::Graph()->get(array(
+			'output' => array($itemIdColumn, $typeColumn, 'graphtype'),
+			'filter' => $filter
+		));
+
+		$updateGraphs = array();
+		foreach ($graphs as &$graph) {
+			// check if Y type is actually set to GRAPH_YAXIS_TYPE_ITEM_VALUE
+			if ($graph[$typeColumn] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				if ($checkMax) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Could not delete these items because some of them are used as MAX values for graphs.');
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Could not delete these items because some of them are used as MIN values for graphs.');
+				}
+			}
+			else {
+				$graph[$itemIdColumn] = null;
+				$updateGraphs[] = $graph;
+			}
+		}
+
+		// if there are graphs, that have an y*_itemid column set, but the
+		// y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, set y*_itemid to NULL.
+		// Otherwise we won't be able to delete them.
+		if ($updateGraphs) {
+			API::Graph()->update($updateGraphs);
+		}
+	}
+
 }
 ?>
