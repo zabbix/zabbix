@@ -19,19 +19,23 @@
 **/
 ?>
 <?php
-function check_permission_for_action_conditions($conditions){
+function check_permission_for_action_conditions($conditions) {
 	global $USER_DETAILS;
 
-	if(USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']) return true;
+	if (USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']) {
+		return true;
+	}
 
 	$groupids = array();
 	$hostids = array();
 	$triggerids = array();
 
-	foreach($conditions as $ac_data){
-		if($ac_data['operator'] != 0) continue;
+	foreach ($conditions as $ac_data) {
+		if ($ac_data['operator'] != 0) {
+			continue;
+		}
 
-		switch($ac_data['type']){
+		switch ($ac_data['conditiontype']) {
 			case CONDITION_TYPE_HOST_GROUP:
 				$groupids[$ac_data['value']] = $ac_data['value'];
 				break;
@@ -50,11 +54,13 @@ function check_permission_for_action_conditions($conditions){
 		'editable' => 1
 	);
 
-	try{
+	try {
 		$groups = CHostgroup::get($options);
 		$groups = zbx_toHash($groups, 'groupid');
-		foreach($groupids as $hgnum => $groupid){
-			if(!isset($groups[$groupid])) throw new Exception(S_INCORRECT_GROUP);
+		foreach ($groupids as $hgnum => $groupid) {
+			if (!isset($groups[$groupid])) {
+				throw new Exception(S_INCORRECT_GROUP);
+			}
 		}
 
 		$options = array(
@@ -63,8 +69,10 @@ function check_permission_for_action_conditions($conditions){
 		);
 		$hosts = CHost::get($options);
 		$hosts = zbx_toHash($hosts, 'hostid');
-		foreach($hostids as $hnum => $hostid){
-			if(!isset($hosts[$hostid])) throw new Exception(S_INCORRECT_HOST);
+		foreach ($hostids as $hnum => $hostid) {
+			if(!isset($hosts[$hostid])) {
+				throw new Exception(S_INCORRECT_HOST);
+			}
 		}
 
 		$options = array(
@@ -73,17 +81,17 @@ function check_permission_for_action_conditions($conditions){
 		);
 		$triggers = CTrigger::get($options);
 		$triggers = zbx_toHash($triggers, 'triggerid');
-		foreach($triggerids as $hnum => $triggerid){
-			if(!isset($triggers[$triggerid])) throw new Exception(S_INCORRECT_TRIGGER);
+		foreach ($triggerids as $hnum => $triggerid) {
+			if(!isset($triggers[$triggerid])) {
+				throw new Exception(S_INCORRECT_TRIGGER);
+			}
 		}
 	}
-	catch(Exception $e){
-//		throw new Exception($e->getMessage());
-//		error($e->getMessage());
+	catch (Exception $e) {
 		return false;
 	}
 
-return true;
+	return true;
 }
 
 function get_action_by_actionid($actionid){
