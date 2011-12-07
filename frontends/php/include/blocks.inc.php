@@ -233,7 +233,7 @@ function make_system_status($filter) {
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 			'select_acknowledges' => API_OUTPUT_COUNT,
-			'sortfield' => 'clock',
+			'sortfield' => 'eventid',
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
 		);
