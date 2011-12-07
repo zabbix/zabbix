@@ -307,9 +307,7 @@ switch($itemType) {
 				if(isset($db_item[$field]) && ($item[$field] == $db_item[$field]))
 					unset($item[$field]);
 			}
-			if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED ) {
-						$item['error'] = '';
-					}
+
 			$item['itemid'] = $_REQUEST['itemid'];
 
 			$result = API::Itemprototype()->update($item);
