@@ -15,13 +15,6 @@ build/win32/project/Makefile_sender -text
 build/win32/project/Makefile_sender_x64 -text
 create/bin/export_data.sh -text
 create/bin/gen_data.pl -text
-create/data/create_data_sql/create_data_sql.sh svneol=native#text/x-sh
-create/data/create_data_sql/data_sql_blacklist.txt svneol=native#text/plain
-create/data/create_data_sql/data_sql_blacklistbyval.txt -text
-create/data/create_data_sql/data_sql_blacklistbyval_ref.txt -text
-create/data/create_data_sql/data_sql_extraclause.txt -text
-create/data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
-create/data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
 create/images/README.dev -text
 create/images/images_oracle_end.txt svneol=native#text/plain
 create/images/images_oracle_start.txt svneol=native#text/plain
@@ -523,6 +516,13 @@ man/zabbix_get.man -text
 man/zabbix_proxy.man -text
 man/zabbix_sender.man -text
 man/zabbix_server.man -text
+misc/appliance/create_data/create_data_sql/create_data_sql.sh svneol=native#text/x-sh
+misc/appliance/create_data/create_data_sql/data_sql_blacklist.txt svneol=native#text/plain
+misc/appliance/create_data/create_data_sql/data_sql_blacklistbyval.txt -text
+misc/appliance/create_data/create_data_sql/data_sql_blacklistbyval_ref.txt -text
+misc/appliance/create_data/create_data_sql/data_sql_extraclause.txt -text
+misc/appliance/create_data/create_data_sql/data_sql_filter.txt svneol=native#text/plain
+misc/appliance/create_data/create_data_sql/data_sql_predumphooks.txt svneol=native#text/plain
 misc/clock/clock.fla -text
 misc/init.d/aix/zabbix_agentd svneol=native#text/x-sh
 misc/init.d/fedora/core5/zabbix_agentd -text
