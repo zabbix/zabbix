@@ -959,6 +959,9 @@ function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 		if (!is_array($options['sortfield'])) {
 			$options['sortfield'] = array($options['sortfield']);
 		}
+		else {
+			$options['sortfield'] = array_unique($options['sortfield']);
+		}
 
 		foreach ($options['sortfield'] as $i => $sortfield) {
 			// validate sortfield

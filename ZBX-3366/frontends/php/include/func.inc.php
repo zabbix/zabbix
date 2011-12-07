@@ -1072,7 +1072,7 @@ function order_by($def, $allways = '') {
 }
 
 function unsetExcept(&$array, $allowedFields) {
-	foreach($array as $key => $value) {
+	foreach ($array as $key => $value) {
 		if (!isset($allowedFields[$key])) {
 			unset($array[$key]);
 		}
