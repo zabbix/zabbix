@@ -219,10 +219,19 @@ class CHistory extends CZBXAPI {
 			if (!is_array($options['sortfield'])) {
 				$options['sortfield'] = array($options['sortfield']);
 			}
-			foreach ($options['sortfield'] as $sortfield) {
+			foreach ($options['sortfield'] as $i => $sortfield) {
 				if ($sortfield == 'clock') {
+					if (is_array($options['sortorder'])) {
+						$sortorders = array();
+						foreach ($options['sortorder'] as $n => $sortorder) {
+							if ($i == $n) {
+								array_push($sortorders, $sortorder);
+							}
+							array_push($sortorders, $sortorder);
+						}
+						$options['sortorder'] = $sortorders;
+					}
 					array_push($options['sortfield'], 'itemid');
-					$options['sortfield'] = array_values(array_diff($options['sortfield'], array('clock')));
 				}
 			}
 		}
