@@ -463,7 +463,7 @@ switch($itemType) {
 				}
 			}
 
-			if ($item['status'] != ITEM_STATUS_NOTSUPPORTED ) {
+			if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED ) {
 				$item['error'] = '';
 					}
 
