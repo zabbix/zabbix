@@ -70,7 +70,7 @@ function check_permission_for_action_conditions($conditions) {
 		$hosts = CHost::get($options);
 		$hosts = zbx_toHash($hosts, 'hostid');
 		foreach ($hostids as $hnum => $hostid) {
-			if(!isset($hosts[$hostid])) {
+			if (!isset($hosts[$hostid])) {
 				throw new Exception(S_INCORRECT_HOST);
 			}
 		}
@@ -82,7 +82,7 @@ function check_permission_for_action_conditions($conditions) {
 		$triggers = CTrigger::get($options);
 		$triggers = zbx_toHash($triggers, 'triggerid');
 		foreach ($triggerids as $hnum => $triggerid) {
-			if(!isset($triggers[$triggerid])) {
+			if (!isset($triggers[$triggerid])) {
 				throw new Exception(S_INCORRECT_TRIGGER);
 			}
 		}
