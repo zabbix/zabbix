@@ -66,10 +66,79 @@ typedef struct
 	char		*name;
 	ZBX_GRAPH_ITEMS	*gitems;
 	ZBX_GRAPH_ITEMS	*del_gitems;
+	zbx_uint64_t	ymin_itemid;
+	zbx_uint64_t	ymax_itemid;
 	size_t		gitems_num;
 	size_t		del_gitems_num;
 }
 zbx_lld_graph_t;
+
+static void	DBlld_clean_items(zbx_vector_ptr_t *items)
+{
+	zbx_lld_item_t	*item;
+
+	while (0 != items->values_num)
+	{
+		item = (zbx_lld_item_t *)items->values[--items->values_num];
+
+		zbx_free(item->key);
+		zbx_free(item->name);
+		zbx_free(item->snmp_oid);
+		zbx_free(item->params);
+		zbx_free(item->new_appids);
+		zbx_free(item->del_appids);
+		zbx_free(item);
+	}
+}
+
+static void	DBlld_clean_graphs(zbx_vector_ptr_t *graphs)
+{
+	zbx_lld_graph_t	*graph;
+
+	while (0 != graphs->values_num)
+	{
+		graph = (zbx_lld_graph_t *)graphs->values[--graphs->values_num];
+
+		zbx_free(graph->del_gitems);
+		zbx_free(graph->gitems);
+		zbx_free(graph->name);
+		zbx_free(graph);
+	}
+}
+
+static void	DBlld_clean_trigger_functions(zbx_vector_ptr_t *functions)
+{
+	zbx_lld_function_t	*function;
+
+	while (0 != functions->values_num)
+	{
+		function = (zbx_lld_function_t *)functions->values[--functions->values_num];
+
+		zbx_free(function->parameter);
+		zbx_free(function->function);
+		zbx_free(function->key);
+		zbx_free(function->host);
+		zbx_free(function);
+	}
+}
+
+static void	DBlld_clean_triggers(zbx_vector_ptr_t *triggers)
+{
+	zbx_lld_trigger_t	*trigger;
+
+	while (0 != triggers->values_num)
+	{
+		trigger = (zbx_lld_trigger_t *)triggers->values[--triggers->values_num];
+
+		DBlld_clean_trigger_functions(&trigger->functions);
+		zbx_vector_ptr_destroy(&trigger->functions);
+
+		zbx_free(trigger->full_expression);
+		zbx_free(trigger->expression);
+		zbx_free(trigger->description);
+		zbx_free(trigger);
+	}
+}
 
 static void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
 {
@@ -388,24 +457,6 @@ static void	DBlld_get_trigger_functions(zbx_uint64_t triggerid, struct zbx_json_
 	zbx_vector_ptr_sort(functions, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-static void	DBlld_clean_trigger_functions(zbx_vector_ptr_t *functions)
-{
-	int			i;
-	zbx_lld_function_t	*function;
-
-	for (i = 0; i < functions->values_num; i++)
-	{
-		function = (zbx_lld_function_t *)functions->values[i];
-
-		zbx_free(function->parameter);
-		zbx_free(function->function);
-		zbx_free(function->key);
-		zbx_free(function->host);
-		zbx_free(function);
-	}
-	functions->values_num = 0;
 }
 
 static int	DBlld_check_record(struct zbx_json_parse *jp_row, const char *f_macro,
@@ -915,8 +966,6 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	triggers;
-	zbx_lld_trigger_t	*trigger;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -975,19 +1024,7 @@ static void	DBlld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t discovery_it
 		zbx_free(comments_esc);
 		zbx_free(description_proto_esc);
 
-		for (i = 0; i < triggers.values_num; i++)
-		{
-			trigger = (zbx_lld_trigger_t *)triggers.values[i];
-
-			DBlld_clean_trigger_functions(&trigger->functions);
-			zbx_vector_ptr_destroy(&trigger->functions);
-
-			zbx_free(trigger->full_expression);
-			zbx_free(trigger->expression);
-			zbx_free(trigger->description);
-			zbx_free(trigger);
-		}
-		triggers.values_num = 0;
+		DBlld_clean_triggers(&triggers);
 	}
 	DBfree_result(result);
 
@@ -1415,8 +1452,6 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	items;
-	zbx_lld_item_t		*item;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1526,19 +1561,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		zbx_free(delay_flex_esc);
 		zbx_free(key_proto_esc);
 
-		for (i = 0; i < items.values_num; i++)
-		{
-			item = (zbx_lld_item_t *)items.values[i];
-
-			zbx_free(item->key);
-			zbx_free(item->name);
-			zbx_free(item->snmp_oid);
-			zbx_free(item->params);
-			zbx_free(item->new_appids);
-			zbx_free(item->del_appids);
-			zbx_free(item);
-		}
-		items.values_num = 0;
+		DBlld_clean_items(&items);
 	}
 	DBfree_result(result);
 
@@ -1598,21 +1621,20 @@ static int	DBlld_graph_exists(zbx_uint64_t hostid, zbx_uint64_t graphid, const c
 
 static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs,
 		const char *name_proto, ZBX_GRAPH_ITEMS *gitems_proto, int gitems_proto_num,
+		unsigned char ymin_type, zbx_uint64_t ymin_itemid, unsigned char ymin_flags, const char *ymin_key_proto,
+		unsigned char ymax_type, zbx_uint64_t ymax_itemid, unsigned char ymax_flags, const char *ymax_key_proto,
 		struct zbx_json_parse *jp_row, char **error)
 {
 	const char	*__function_name = "DBlld_make_graph";
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*name_esc, *sql = NULL;
-	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	char		*name_esc;
 	int		res = SUCCEED, i;
 	zbx_lld_graph_t	*graph;
 	ZBX_GRAPH_ITEMS	*gitem;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	sql = zbx_malloc(sql, sql_alloc);
 
 	graph = zbx_calloc(NULL, 1, sizeof(zbx_lld_graph_t));
 	graph->name = zbx_strdup(NULL, name_proto);
@@ -1694,11 +1716,35 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 	if (FAIL == res)
 		goto out;
 
+	if (GRAPH_YAXIS_TYPE_ITEM_VALUE == ymin_type)
+	{
+		graph->ymin_itemid = ymin_itemid;
+
+		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & ymin_flags) &&
+				FAIL == (res = DBlld_get_item(hostid, ymin_key_proto, jp_row, &graph->ymin_itemid)))
+		{
+			goto out;
+		}
+	}
+
+	if (GRAPH_YAXIS_TYPE_ITEM_VALUE == ymax_type)
+	{
+		graph->ymax_itemid = ymax_itemid;
+
+		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & ymax_flags) &&
+				FAIL == (res = DBlld_get_item(hostid, ymax_key_proto, jp_row, &graph->ymax_itemid)))
+		{
+			goto out;
+		}
+	}
+
 	if (0 != graph->graphid)
 	{
-		size_t	sz, del_gitems_alloc = 0;
+		char	*sql = NULL;
+		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0, sz, del_gitems_alloc = 0;
 
-		sql_offset = 0;
+		sql = zbx_malloc(sql, sql_alloc);
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select gi.gitemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,"
 					"gi.yaxisside,gi.calc_fnc,gi.type,i.flags"
@@ -1723,6 +1769,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 					memmove(&graph->del_gitems[i], &graph->del_gitems[i + 1], sz);
 			}
 		}
+		zbx_free(sql);
 	}
 
 	zbx_vector_ptr_append(graphs, graph);
@@ -1735,7 +1782,6 @@ out:
 	}
 
 	zbx_free(name_esc);
-	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
@@ -1745,8 +1791,8 @@ out:
 static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, double yaxismin, double yaxismax,
 		unsigned char show_work_period, unsigned char show_triggers, unsigned char graphtype,
 		unsigned char show_legend, unsigned char show_3d, double percent_left, double percent_right,
-		unsigned char ymin_type, unsigned char ymax_type, zbx_uint64_t ymin_itemid, zbx_uint64_t ymax_itemid,
-		zbx_uint64_t parent_graphid, const char *name_proto_esc)
+		unsigned char ymin_type, unsigned char ymax_type, zbx_uint64_t parent_graphid,
+		const char *name_proto_esc)
 {
 	int		i, j, new_graphs = 0, new_graphs_items = 0;
 	zbx_lld_graph_t	*graph;
@@ -1843,7 +1889,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 					(int)show_work_period, (int)show_triggers,
 					(int)graphtype, (int)show_legend, (int)show_3d,
 					percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-					DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid),
+					DBsql_id_ins(graph->ymin_itemid), DBsql_id_ins(graph->ymax_itemid),
 					ZBX_FLAG_DISCOVERY_CREATED, row_dl);
 
 #ifndef HAVE_MULTIROW_INSERT
@@ -1882,7 +1928,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 					(int)show_work_period, (int)show_triggers,
 					(int)graphtype, (int)show_legend, (int)show_3d,
 					percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-					DBsql_id_ins(ymin_itemid), DBsql_id_ins(ymax_itemid),
+					DBsql_id_ins(graph->ymin_itemid), DBsql_id_ins(graph->ymax_itemid),
 					ZBX_FLAG_DISCOVERY_CREATED, graph->graphid);
 
 			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
@@ -2007,8 +2053,6 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_ptr_t	graphs;
-	zbx_lld_graph_t		*graph;
-	int			i;
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset;
 
@@ -2018,15 +2062,15 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 	sql = zbx_malloc(sql, sql_alloc);
 
 	result = DBselect(
-			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,"
-				"g.yaxismax,g.show_work_period,g.show_triggers,"
-				"g.graphtype,g.show_legend,g.show_3d,g.percent_left,"
-				"g.percent_right,g.ymin_type,g.ymax_type,g.ymin_itemid,"
-				"g.ymax_itemid"
-			" from graphs g,graphs_items gi,items i,item_discovery id"
-			" where g.graphid=gi.graphid"
-				" and gi.itemid=i.itemid"
-				" and i.itemid=id.itemid"
+			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
+				"g.show_triggers,g.graphtype,g.show_legend,g.show_3d,g.percent_left,g.percent_right,"
+				"g.ymin_type,i1.itemid,i1.flags,i1.key_,g.ymax_type,i2.itemid,i2.flags,i2.key_"
+			" from item_discovery id,items i,graphs_items gi,graphs g"
+			" left join items i1 on i1.itemid=g.ymin_itemid"
+			" left join items i2 on i2.itemid=g.ymax_itemid"
+			" where id.itemid=i.itemid"
+				" and i.itemid=gi.itemid"
+				" and gi.graphid=g.graphid"
 				" and id.parent_itemid=" ZBX_FS_UI64,
 			discovery_itemid);
 
@@ -2034,12 +2078,14 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 	{
 		ZBX_GRAPH_ITEMS	*gitems_proto = NULL;
 		size_t		gitems_proto_alloc = 0, gitems_proto_num = 0;
-		zbx_uint64_t	parent_graphid, ymin_itemid, ymax_itemid;
-		const char	*name_proto;
+		zbx_uint64_t	parent_graphid, ymin_itemid = 0, ymax_itemid = 0;
+		const char	*name_proto, *ymin_key_proto = NULL, *ymax_key_proto = NULL;
 		char		*name_proto_esc;
 		int		width, height;
 		double		yaxismin, yaxismax, percent_left, percent_right;
-		unsigned char	show_work_period, show_triggers, graphtype, show_legend, show_3d, ymin_type, ymax_type;
+		unsigned char	show_work_period, show_triggers, graphtype, show_legend, show_3d,
+				ymin_type = GRAPH_YAXIS_TYPE_CALCULATED, ymax_type = GRAPH_YAXIS_TYPE_CALCULATED,
+				ymin_flags = 0, ymax_flags = 0;
 
 		ZBX_STR2UINT64(parent_graphid, row[0]);
 		name_proto = row[1];
@@ -2055,10 +2101,20 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		show_3d = (unsigned char)atoi(row[10]);
 		percent_left = atof(row[11]);
 		percent_right = atof(row[12]);
-		ymin_type = (unsigned char)atoi(row[13]);
-		ymax_type = (unsigned char)atoi(row[14]);
-		ZBX_DBROW2UINT64(ymin_itemid, row[15]);
-		ZBX_DBROW2UINT64(ymax_itemid, row[16]);
+		if (GRAPH_YAXIS_TYPE_ITEM_VALUE == (unsigned char)atoi(row[13]) && SUCCEED != DBis_null(row[14]))
+		{
+			ymin_type = GRAPH_YAXIS_TYPE_ITEM_VALUE;
+			ZBX_STR2UINT64(ymin_itemid, row[14]);
+			ymin_flags = (unsigned char)atoi(row[15]);
+			ymin_key_proto = row[16];
+		}
+		if (GRAPH_YAXIS_TYPE_ITEM_VALUE == (unsigned char)atoi(row[17]) && SUCCEED != DBis_null(row[18]))
+		{
+			ymax_type = GRAPH_YAXIS_TYPE_ITEM_VALUE;
+			ZBX_STR2UINT64(ymax_itemid, row[18]);
+			ymax_flags = (unsigned char)atoi(row[19]);
+			ymax_key_proto = row[20];
+		}
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -2084,29 +2140,22 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 			if (SUCCEED != DBlld_check_record(&jp_row, f_macro, f_regexp, regexps, regexps_num))
 				continue;
 
-			DBlld_make_graph(hostid, parent_graphid, &graphs, name_proto,
-					gitems_proto, gitems_proto_num, &jp_row, error);
+			DBlld_make_graph(hostid, parent_graphid, &graphs, name_proto, gitems_proto, gitems_proto_num,
+					ymin_type, ymin_itemid, ymin_flags, ymin_key_proto,
+					ymax_type, ymax_itemid, ymax_flags, ymax_key_proto,
+					&jp_row, error);
 		}
 
 		zbx_vector_ptr_sort(&graphs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		DBlld_save_graphs(&graphs, width, height, yaxismin, yaxismax, show_work_period, show_triggers,
 				graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type,
-				ymin_itemid, ymax_itemid, parent_graphid, name_proto_esc);
+				parent_graphid, name_proto_esc);
 
 		zbx_free(gitems_proto);
 		zbx_free(name_proto_esc);
 
-		for (i = 0; i < graphs.values_num; i++)
-		{
-			graph = (zbx_lld_graph_t *)graphs.values[i];
-
-			zbx_free(graph->del_gitems);
-			zbx_free(graph->gitems);
-			zbx_free(graph->name);
-			zbx_free(graph);
-		}
-		graphs.values_num = 0;
+		DBlld_clean_graphs(&graphs);
 	}
 	DBfree_result(result);
 
