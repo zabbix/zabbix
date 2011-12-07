@@ -738,6 +738,22 @@ COpt::memoryPick();
 			$del_itemPrototypes = array_merge($del_itemPrototypes, $del_itemPrototypes_childs);
 			$prototypeids = array_merge($prototypeids, $child_prototypeids);
 
+			// delete graphs with this item prototype
+			$del_graphPrototypes = API::GraphPrototype()->get(array(
+				'itemids' => $prototypeids,
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			if (!empty($del_graphPrototypes)) {
+				$result = API::GraphPrototype()->delete(zbx_objectValues($del_graphPrototypes, 'graphid'), true);
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete graph prototype');
+				}
+			}
+
+			// check if any graphs are referencing this item
+			$this->checkGraphReference($prototypeids);
 
 // CREATED ITEMS
 			$created_items = array();
@@ -749,19 +765,6 @@ COpt::memoryPick();
 			if(!empty($created_items)){
 				$result = API::Item()->delete($created_items, true);
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item prototype');
-			}
-
-
-// GRAPH PROTOTYPES
-			$del_graphPrototypes = API::GraphPrototype()->get(array(
-				'itemids' => $prototypeids,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => true,
-				'preservekeys' => true,
-			));
-			if(!empty($del_graphPrototypes)){
-				$result = API::GraphPrototype()->delete(zbx_objectValues($del_graphPrototypes, 'graphid'), true);
-				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete graph prototype');
 			}
 
 
