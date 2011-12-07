@@ -1380,7 +1380,7 @@ elseif ($srctbl == 'simple_graph') {
 		}
 
 		if ($multiselect) {
-			$js_action ='"javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($row['itemid']).');';
+			$js_action ='javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($row['itemid']).');';
 		}
 		else {
 			$values = array(
