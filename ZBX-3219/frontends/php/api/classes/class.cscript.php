@@ -564,7 +564,7 @@ class CScript extends CZBXAPI{
 				$d_errorMsg = sprintf($d_errorMsg, $ZBX_SERVER);
 
 
-				self::exception(ZBX_API_ERROR_INTERNAL,$d_errorMsg.". \n ".sprintf(S_SCRIPT_ERROR_BIG, '%%with_pre%%')." \n".S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
+				self::exception(ZBX_API_ERROR_INTERNAL,$d_errorMsg.". \n ".S_SCRIPT_ERROR_BIG." ".S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
 			}
 
 			$json = new CJSON();

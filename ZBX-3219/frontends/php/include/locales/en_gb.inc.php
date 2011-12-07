@@ -1910,7 +1910,7 @@
 	'S_TOOLS'=>				'Tools',
 	'S_RESULT'=>				'Result',
 	'S_CLOSE'=>				'Close',
-		'S_SCRIPT_ERROR_BIG'=>			'%s Possible reasons:
+		'S_SCRIPT_ERROR_BIG'=>			' Possible reasons:
 		1. Incorrect server IP/DNS in the "zabbix.conf.php".
 		2. Security environment like SELinux is blocking connection.
 		3. Zabbix server daemon not running. ',
