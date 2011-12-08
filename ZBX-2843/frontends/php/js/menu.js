@@ -29,12 +29,12 @@
 //debugger;
 
 // Getting CSS style property
-function get_style(el,styleProp) {
+function get_style(el, styleProp) {
 	if (el.currentStyle) {
 		var y = el.currentStyle[styleProp];
 	}
 	else if (window.getComputedStyle) {
-		var y = document.defaultView.getComputedStyle(el,null).getPropertyValue(styleProp);
+		var y = document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
 	}
 	return y;
 }
@@ -42,7 +42,7 @@ function get_style(el,styleProp) {
 // Getting text width in user's browser
 function get_real_text_width(text, id) {
 	var item_type = 'pum_o_submenu';
-	if (id==0) {
+	if (id == 0) {
 		item_type = 'pum_iheader';
 	}
 
@@ -87,16 +87,28 @@ function show_popup_menu(e, content, width){
 	var cursor = get_cursor_position(e);
 	var tmp_width = 0;
 	var max_width = 0;
+	var i = 0;
+	var j = 0;
 
-	for (i=0;i<content.length;i++) {
+	for (i = 0; i < content.length; i++) {
 		tmp_width = get_real_text_width(content[i][0], i);
 
-		if (max_width<tmp_width) {
+		if (max_width < tmp_width) {
 			max_width = tmp_width;
+		}
+
+		if (content[i].length > 4) {
+			for (j = 4; j < content[i].length; j++) {
+				tmp_width = get_real_text_width(content[i][j][0], i);
+
+				if (max_width < tmp_width) {
+					max_width = tmp_width;
+				}
+			}
 		}
 	}
 
-	if (width==null || width<max_width) {
+	if (width == null || width < max_width) {
 		width = max_width;
 	}
 
