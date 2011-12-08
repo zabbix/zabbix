@@ -463,8 +463,6 @@ switch($itemType) {
 				}
 			}
 
-
-
 			$item['itemid'] = $_REQUEST['itemid'];
 			$result = API::Item()->update($item);
 

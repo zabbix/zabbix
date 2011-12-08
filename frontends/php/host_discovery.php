@@ -231,7 +231,6 @@ switch($itemType) {
 			'filter' => $filter,
 		);
 
-
 		if(isset($_REQUEST['itemid'])){
 			DBstart();
 
