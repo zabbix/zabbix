@@ -92,11 +92,11 @@ class CTweenBox{
 			$grp_tab->addRow(array($caption_l,SPACE,$caption_r));
 		}
 
-		$add_btn = new CButton('add',' « ');//S_ADD);//
+		$add_btn = new CButton('add',' &laquo; ');
 		$add_btn->setType('button');
 		$add_btn->setAction('javascript: moveListBoxSelectedItem("'.$this->form->GetName().'","'.$this->varname.'","'.$this->id_r.'","'.$this->id_l.'","add");');
 
-		$rmv_btn = new CButton('remove',' » ');//S_REMOVE);//
+		$rmv_btn = new CButton('remove',' &raquo; ');
 		$rmv_btn->setType('button');
 		$rmv_btn->setAction('javascript: moveListBoxSelectedItem("'.$this->form->GetName().'","'.$this->varname.'","'.$this->id_l.'","'.$this->id_r.'","rmv");');
 
