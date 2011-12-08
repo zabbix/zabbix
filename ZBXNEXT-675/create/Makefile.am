@@ -5,4 +5,5 @@ DIST_SUBDIRS = \
 	images/png_modern
 
 EXTRA_DIST = \
-	png_to_xml.sh
+	images/png_to_xml.sh \
+	images/README
