@@ -58,7 +58,8 @@ class CTag extends CObject {
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
-			$res .= ' '.$key.'="'.zbx_htmlstr($value).'"';
+			$value = str_replace(array("\r", "\n"), '', strval($value));
+			$res .= ' '.$key.'="'.$this->sanitize($value).'"';
 		}
 		$res .= ($this->paired === 'yes') ? '>' : ' />';
 		return $res;
@@ -136,7 +137,7 @@ class CTag extends CObject {
 			$value = unpack_object($value);
 		}
 		if (!is_null($value)) {
-			$this->attributes[$name] = htmlspecialchars(str_replace(array("\r", "\n"), '', strval($value)));
+			$this->attributes[$name] = $value;
 		}
 		else {
 			$this->removeAttribute($name);
@@ -211,17 +212,6 @@ class CTag extends CObject {
 
 	public function setTitle($value = 'title') {
 		$this->setAttribute('title', $value);
-	}
-
-
-	/**
-	 * Sanitizes a string before outputting it to the browser.
-	 *
-	 * @param string $str
-	 * @return string
-	 */
-	protected function sanitize($value) {
-		return htmlspecialchars($value);
 	}
 }
 ?>
