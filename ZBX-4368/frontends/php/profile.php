@@ -92,12 +92,18 @@ elseif (isset($_REQUEST['del_user_media'])) {
 		}
 	}
 }
+
+if(isset($_COOKIE['zbx_profile'])){
+	show_messages(true, _('User updated'), _('Cannot update user'));
+	SetCookie("zbx_profile","");
+}
 // primary actions
 elseif (isset($_REQUEST['cancel'])) {
 	ob_end_clean();
 	redirect(CWebUser::$data['last_page']['url']);
 }
 elseif (isset($_REQUEST['save'])) {
+
 	$auth_type = get_user_system_auth($USER_DETAILS['userid']);
 
 	if ($auth_type != ZBX_AUTH_INTERNAL) {
@@ -155,6 +161,7 @@ elseif (isset($_REQUEST['save'])) {
 				'users' => $user,
 				'medias' => $user['user_medias']
 			);
+
 			$result = API::User()->updateMedia($data);
 		}
 
@@ -164,17 +171,21 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		if ($result) {
+
+
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,
 				'User alias ['.$USER_DETAILS['alias'].'] Name ['.$USER_DETAILS['name'].']'.
 				' Surname ['.$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
 
 			ob_end_clean();
+			SetCookie("zbx_profile","user_updated",time()+3600);
 			redirect(CWebUser::$data['last_page']['url']);
 		}
 		else {
 			show_messages($result, _('User updated'), _('Cannot update user'));
 		}
 	}
+
 }
 
 ob_end_flush();
