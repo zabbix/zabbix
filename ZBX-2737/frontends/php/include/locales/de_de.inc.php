@@ -1631,7 +1631,6 @@
 	'S_NO_IMAGE'=>			'kein Bild',
 	'S_DELETE_SYSTEM_MAP_Q'=>			'lösche System Karte?',
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>			'Der Funktion wurden falsche Argumente übergeben',
-	'S_INCORRECT_KEY_FORMAT'=>			'Falsches Schlüssel Format',
 	'S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL'=>			'Element wird nicht aktualisiert. Bitte ein korrektes Zeitintervall angeben',
 	'S_INVALID_SNMP_PORT'=>			'ungültiger SNMP Port',
 	'S_GROUP_FUNCTION'=>			'Gruppenfunktion',

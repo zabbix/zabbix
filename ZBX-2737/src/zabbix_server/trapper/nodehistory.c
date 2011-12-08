@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "nodehistory.h"
 #include "common.h"
+#include "nodehistory.h"
 #include "db.h"
 #include "log.h"
 #include "zbxalgo.h"

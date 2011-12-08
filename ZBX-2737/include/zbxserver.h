@@ -24,6 +24,8 @@
 #include "db.h"
 #include "dbcache.h"
 
+#define TRIGGER_EPSILON	0.000001
+
 #define MACRO_TYPE_TRIGGER_DESCRIPTION	0x0001
 #define MACRO_TYPE_MESSAGE_SUBJECT	0x0002
 #define MACRO_TYPE_MESSAGE_BODY		0x0004

@@ -734,7 +734,7 @@ if(isset($_REQUEST['sform'])){
 	$frmService->addRow(S_LINK_TO_TRIGGER_Q, new CCheckBox('linktrigger',$linktrigger,"javascript: display_element('trigger_name');",1));
 
 	if($triggerid > 0){
-		$trigger = expand_trigger_description($triggerid);
+		$trigger = expand_trigger_description_simple($triggerid);
 	}
 	else{
 		$trigger = '';

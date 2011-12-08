@@ -150,7 +150,7 @@ class CMaintenance extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			
+
 
 			$sql =
 				'SELECT DISTINCT m.maintenanceid'.
@@ -441,7 +441,6 @@ Copt::memoryPick();
 	return $result;
 	}
 
-
 	/**
 	 * Determine, whether an object already exists
 	 *
@@ -462,7 +461,6 @@ Copt::memoryPick();
 
 	return !empty($objs);
 	}
-
 
 /**
  * Add maintenances
@@ -517,33 +515,36 @@ Copt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
-//---
+
+			self::removeSecondsFromTimes($maintenances);
 
 			$tid = 0;
 			$insert = array();
 			$timeperiods = array();
 			$insert_timeperiods = array();
-			foreach($maintenances as $mnum => $maintenance){
+			$now = time();
+			$now -= $now % SEC_PER_MIN;
+			foreach ($maintenances as $mnum => $maintenance) {
 				$db_fields = array(
 					'name' => null,
-					'active_since'=> time(),
-					'active_till' => time()+86400,
+					'active_since' => $now,
+					'active_till' => $now + SEC_PER_DAY
 				);
-				if(!check_db_fields($db_fields, $maintenance)){
+				if (!check_db_fields($db_fields, $maintenance)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Maintenance');
 				}
 				//checkig wheter a maintence with this name already exists
-				if(self::exists(array('name' => $maintenance['name']))){
+				if (self::exists(array('name' => $maintenance['name']))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_MAINTENANCE.' [ '.$maintenance['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
 				$insert[$mnum] = $maintenance;
 
-				foreach($maintenance['timeperiods'] as $timeperiod){
+				foreach ($maintenance['timeperiods'] as $timeperiod) {
 					$db_fields = array(
 						'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
-						'period' =>	3600,
-						'start_date' =>	time()
+						'period' => SEC_PER_HOUR,
+						'start_date' =>	$now
 					);
 					check_db_fields($db_fields, $timeperiod);
 
@@ -635,8 +636,8 @@ Copt::memoryPick();
 				// first, getting all maintenances with the same name as this
 				$options = array(
 					'filter' => array(
-									'name'=>$maintenance['name']
-								)
+						'name'=>$maintenance['name']
+					)
 				);
 				$received_maintenaces = CMaintenance::get($options);
 				// now going through a result, to find records with different id than our object
@@ -681,6 +682,7 @@ Copt::memoryPick();
 				}
 			}
 
+			self::removeSecondsFromTimes($maintenances);
 
 			$timeperiodids = array();
 			$sql = 'SELECT DISTINCT tp.timeperiodid '.
@@ -829,8 +831,27 @@ Copt::memoryPick();
 		}
 	}
 
+	protected static function removeSecondsFromTimes(array &$maintenances) {
+		foreach ($maintenances as &$maintenance) {
+			if (isset($maintenance['active_since'])) {
+				$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;
+			}
+
+			if (isset($maintenance['active_till'])) {
+				$maintenance['active_till'] -= $maintenance['active_till'] % SEC_PER_MIN;
+			}
 
 
-
+			if (isset($maintenance['timeperiods'])) {
+				foreach ($maintenance['timeperiods'] as &$timeperiod) {
+					if (isset($timeperiod['start_date'])) {
+						$timeperiod['start_date'] -= $timeperiod['start_date'] % SEC_PER_MIN;
+					}
+				}
+				unset($timeperiod);
+			}
+		}
+		unset($maintenance);
+	}
 }
 ?>

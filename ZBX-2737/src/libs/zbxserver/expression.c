@@ -48,10 +48,12 @@ static int	trigger_get_N_functionid(DB_TRIGGER *trigger, int N_functionid, zbx_u
 {
 	const char	*__function_name = "trigger_get_N_functionid";
 
-	typedef enum {
+	typedef enum
+	{
 		EXP_NONE,
 		EXP_FUNCTIONID
-	} parsing_state_t;
+	}
+	parsing_state_t;
 
 	parsing_state_t	state = EXP_NONE;
 	int		num = 0, ret = FAIL;
@@ -167,34 +169,22 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 	switch (c)
 	{
 		case '|':
-			if (0 != cmp_double(value1, 0) || 0 != cmp_double(value2, 0))
-				*result = 1;
-			else
-				*result = 0;
+			*result = (SUCCEED != cmp_double(value1, 0) || SUCCEED != cmp_double(value2, 0));
 			break;
 		case '&':
-			if (0 != cmp_double(value1, 0) && 0 != cmp_double(value2, 0))
-				*result = 1;
-			else
-				*result = 0;
+			*result = (SUCCEED != cmp_double(value1, 0) && SUCCEED != cmp_double(value2, 0));
 			break;
 		case '=':
-			if (0 == cmp_double(value1, value2))
-				*result = 1;
-			else
-				*result = 0;
+			*result = (SUCCEED == cmp_double(value1, value2));
 			break;
 		case '#':
-			if (0 != cmp_double(value1, value2))
-				*result = 1;
-			else
-				*result = 0;
+			*result = (SUCCEED != cmp_double(value1, value2));
 			break;
 		case '>':
-			*result = (value1 > value2);
+			*result = (value1 >= value2 + TRIGGER_EPSILON);
 			break;
 		case '<':
-			*result = (value1 < value2);
+			*result = (value1 <= value2 - TRIGGER_EPSILON);
 			break;
 		case '+':
 			*result = value1 + value2;
@@ -206,7 +196,7 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 			*result = value1 * value2;
 			break;
 		case '/':
-			if (0 == cmp_double(value2, 0))
+			if (SUCCEED == cmp_double(value2, 0))
 			{
 				zbx_snprintf(error, maxerrlen, "Division by zero. Cannot evaluate expression [%s]", exp);
 				return FAIL;
@@ -2588,7 +2578,7 @@ void	evaluate_expressions(DB_TRIGGER_UPDATE *tr, int tr_num)
 			tr[i].new_error = zbx_strdup(tr[i].new_error, err);
 			tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
 		}
-		else if (0 == cmp_double(expr_result, 0))
+		else if (SUCCEED == cmp_double(expr_result, 0))
 		{
 			tr[i].new_value = TRIGGER_VALUE_FALSE;
 		}

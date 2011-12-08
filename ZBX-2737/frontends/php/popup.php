@@ -1210,6 +1210,7 @@ include_once('include/page_header.php');
 		$table->setHeader(array(
 			($hostid>0)?null:S_HOST,
 			S_DESCRIPTION,
+			S_KEY,
 			S_TYPE,
 			S_TYPE_OF_INFORMATION,
 			S_STATUS
@@ -1248,6 +1249,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				($hostid>0)?null:$row['host'],
 				$description,
+				$row['key_'],
 				item_type2str($row['type']),
 				item_value_type2str($row['value_type']),
 				new CSpan(item_status2str($row['status']),item_status2style($row['status']))

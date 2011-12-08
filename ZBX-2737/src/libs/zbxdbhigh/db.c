@@ -30,6 +30,9 @@
 
 extern int	txn_level;
 extern int	txn_error;
+#if HAVE_POSTGRESQL
+extern char	ZBX_PG_ESCAPE_BACKSLASH;
+#endif
 
 const char	*DBnode(const char *fieldid, int nodeid)
 {
@@ -377,40 +380,39 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid, int status, int clock)
  * Comments: Recursive function!                                              *
  *                                                                            *
  ******************************************************************************/
-static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
+static int	trigger_dependent_rec(zbx_uint64_t triggerid, int level)
 {
 	const char	*__function_name = "trigger_dependent_rec";
 	int		ret = FAIL;
 	DB_RESULT	result;
 	DB_ROW		row;
+	unsigned char	value;
 
-	zbx_uint64_t	triggerid_tmp;
-	int		value_tmp;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " level:%d", __function_name, triggerid, level);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " level:%d",
-			__function_name, triggerid, *level);
-
-	(*level)++;
-
-	if (32 < *level)
+	if (32 < level)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Recursive trigger dependency detected! Please fix. Triggerid:" ZBX_FS_UI64,
+		zabbix_log(LOG_LEVEL_CRIT, "Recursive trigger dependency detected! Please fix. Triggerid:" ZBX_FS_UI64,
 				triggerid);
 		goto exit;
 	}
 
-	result = DBselect("select t.triggerid, t.value from trigger_depends d,triggers t where d.triggerid_down="
-			ZBX_FS_UI64 " and d.triggerid_up=t.triggerid", triggerid);
+	result = DBselect(
+			"select t.triggerid,t.value"
+			" from trigger_depends d,triggers t"
+			" where d.triggerid_up=t.triggerid"
+				" and d.triggerid_down=" ZBX_FS_UI64,
+			triggerid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(triggerid_tmp, row[0]);
-		value_tmp = atoi(row[1]);
+		ZBX_STR2UINT64(triggerid, row[0]);
+		value = (unsigned char)atoi(row[1]);
 
-		if (TRIGGER_VALUE_TRUE == value_tmp || SUCCEED == trigger_dependent_rec(triggerid_tmp, level))
+		if (TRIGGER_VALUE_TRUE == value || SUCCEED == trigger_dependent_rec(triggerid, level + 1))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "This trigger depends on " ZBX_FS_UI64 ". Will not apply actions",
-					triggerid_tmp);
+					triggerid);
 			ret = SUCCEED;
 			break;
 		}
@@ -438,11 +440,11 @@ exit:
 static int	trigger_dependent(zbx_uint64_t triggerid)
 {
 	const char	*__function_name = "trigger_dependent";
-	int		ret, level = 0;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64, __function_name, triggerid);
 
-	ret = trigger_dependent_rec(triggerid, &level);
+	ret = trigger_dependent_rec(triggerid, 0);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1118,18 +1120,19 @@ void	DBvacuum()
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_escape_string_len(const char *src)
+static size_t	DBget_escape_string_len(const char *src)
 {
 	const char	*s;
-	int		len = 1;	/* '\0' */
+	size_t		len = 1;	/* '\0' */
 
 	for (s = src; NULL != s && '\0' != *s; s++)
 	{
 		if ('\r' == *s)
 			continue;
-
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif
@@ -1153,13 +1156,13 @@ static int	DBget_escape_string_len(const char *src)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-static void	DBescape_string(const char *src, char *dst, int len)
+static void	DBescape_string(const char *src, char *dst, size_t len)
 {
 	const char	*s;
 	char		*d;
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 #	define ZBX_DB_ESC_CH	'\\'
-#else
+#elif !defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_ESC_CH	'\''
 #endif
 	assert(dst);
@@ -1171,8 +1174,10 @@ static void	DBescape_string(const char *src, char *dst, int len)
 		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif
@@ -1203,7 +1208,7 @@ static void	DBescape_string(const char *src, char *dst, int len)
  ******************************************************************************/
 char	*DBdyn_escape_string(const char *src)
 {
-	int	len;
+	size_t	len;
 	char	*dst = NULL;
 
 	len = DBget_escape_string_len(src);
@@ -1226,19 +1231,21 @@ char	*DBdyn_escape_string(const char *src)
  * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
  *                                                                            *
  ******************************************************************************/
-char	*DBdyn_escape_string_len(const char *src, int max_src_len)
+char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;
-	int		len = 1;	/* '\0' */
+	size_t		len = 1;	/* '\0' */
 
 	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
 	{
 		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif

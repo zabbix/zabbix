@@ -207,7 +207,7 @@ else{
 	$frmLcls->addRow(S_TAKE_DEF_LOCALE,$cmbLang);
 
 	$cmbExtLang = new CComboBox('extlang',get_request('extlang','new'));
-	$cmbExtLang->addItem('new',S_CREATE.SPACE.S_NEW_SMALL);
+	$cmbExtLang->addItem('new',S_CREATE.' '.S_NEW_SMALL);
 	foreach($ZBX_LOCALES as $id => $name){
 		$cmbExtLang->addItem($id,$name);
 	}
