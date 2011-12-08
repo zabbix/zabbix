@@ -235,8 +235,9 @@ function item_type2str($type = null){
 		while ($item = DBfetch($db_items)) {
 			$old_status = $item['status'];
 			if ($status != $old_status) {
-				$sql = 'UPDATE items SET status='.$status.(( $status != ITEM_STATUS_NOTSUPPORTED)?', error=\'\'':'').
-						'  WHERE itemid='.$item['itemid'];
+				$sql = 'UPDATE items SET status='.$status.
+						($status != ITEM_STATUS_NOTSUPPORTED ? ",error=''" : '').
+						' WHERE itemid='.$item['itemid'];
 
 				$result &= DBexecute($sql);
 				if ($result) {
