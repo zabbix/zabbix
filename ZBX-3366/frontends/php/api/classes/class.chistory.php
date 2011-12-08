@@ -215,26 +215,6 @@ class CHistory extends CZBXAPI {
 		}
 
 		// sorting
-		if (!zbx_empty($options['sortfield'])) {
-			if (!is_array($options['sortfield'])) {
-				$options['sortfield'] = array($options['sortfield']);
-			}
-			foreach ($options['sortfield'] as $i => $sortfield) {
-				if ($sortfield == 'clock') {
-					if (is_array($options['sortorder'])) {
-						$sortorders = array();
-						foreach ($options['sortorder'] as $n => $sortorder) {
-							if ($i == $n) {
-								array_push($sortorders, $sortorder);
-							}
-							array_push($sortorders, $sortorder);
-						}
-						$options['sortorder'] = $sortorders;
-					}
-					array_push($options['sortfield'], 'itemid');
-				}
-			}
-		}
 		zbx_db_sorting($sql_parts, $options, $sort_columns, 'h');
 
 		// limit
