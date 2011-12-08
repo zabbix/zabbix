@@ -215,31 +215,6 @@ class CHistory extends CZBXAPI {
 		}
 
 		// sorting
-		if (!zbx_empty($options['sortfield'])) {
-			if (!is_array($options['sortfield'])) {
-				$options['sortfield'] = array($options['sortfield']);
-			}
-			$sortfields = array();
-			foreach ($options['sortfield'] as $i => $sortfield) {
-				// add itemid to sortfields
-				if ($sortfield == 'clock') {
-					// set correspondence sortorder
-					if (is_array($options['sortorder'])) {
-						$sortorders = array();
-						foreach ($options['sortorder'] as $n => $sortorder) {
-							if ($i == $n) {
-								array_push($sortorders, $sortorder);
-							}
-							array_push($sortorders, $sortorder);
-						}
-						$options['sortorder'] = $sortorders;
-					}
-					array_push($sortfields, 'itemid');
-				}
-				array_push($sortfields, $sortfield);
-			}
-			$options['sortfield'] = $sortfields;
-		}
 		zbx_db_sorting($sql_parts, $options, $sort_columns, 'h');
 
 		// limit
