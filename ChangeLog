@@ -9,6 +9,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+A.F....... [ZBX-4260] replaced event sorting by 'clock' with 'eventid' (pavels)
 ..F....... [ZBX-4381] fixed permission check in SLA reports (pavels)
 ..F....... [ZBX-4411] remade the zbx_stripos() function whithout the use of mb_stripos() (pavels)
 ..F....... [ZBX-4015] fixed multiple XSS issues (pavels)
