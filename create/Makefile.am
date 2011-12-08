@@ -1,6 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-EXTRA_DIST = \
+DIST_SUBDIRS = \
 	images/png_classic \
-	images/png_modern \
+	images/png_modern
+
+EXTRA_DIST = \
 	png_to_xml.sh
