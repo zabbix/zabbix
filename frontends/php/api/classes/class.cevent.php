@@ -57,7 +57,7 @@ class CEvent extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('eventid', 'object', 'clock');
+		$sort_columns = array('eventid', 'object', 'objectid');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
@@ -296,62 +296,7 @@ class CEvent extends CZBXAPI {
 		}
 
 		// sorting
-		if (!zbx_empty($options['sortfield'])) {
-			if (!is_array($options['sortfield'])) {
-				$options['sortfield'] = array($options['sortfield']);
-			}
-
-			foreach ($options['sortfield'] as $i => $sortfield) {
-				// validate sortfield
-				if (!str_in_array($sortfield, $sort_columns)) {
-					throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%s" not allowed.', $sortfield));
-				}
-
-				// add sort field to order
-				$sortorder = '';
-				if (is_array($options['sortorder'])) {
-					if (!empty($options['sortorder'][$i])) {
-						$sortorder = $options['sortorder'][$i] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
-					}
-				}
-				else {
-					$sortorder = $options['sortorder'] == ZBX_SORT_DOWN ? ZBX_SORT_DOWN : '';
-				}
-
-				if ($sortfield == 'clock') {
-					$sql_parts['order'][] = 'e.clock '.$sortorder;
-					$sql_parts['order'][] = 'e.ns '.$sortorder;
-
-					if (!str_in_array('e.*', $sql_parts['select']['events'])) {
-						$sql_parts['select']['events'][] = 'e.clock';
-						$sql_parts['select']['events'][] = 'e.ns';
-					}
-					if (!is_null($options['triggerids'])) {
-						$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
-					}
-				}
-				elseif ($options['sortfield'] == 'object') {
-					$sql_parts['order'][] = 'e.object '.$sortorder;
-					$sql_parts['order'][] = 'e.objectid '.$sortorder;
-					$sql_parts['order'][] = 'e.clock '.$sortorder;
-					$sql_parts['order'][] = 'e.ns '.$sortorder;
-
-					if (!str_in_array('e.*', $sql_parts['select']['events'])) {
-						$sql_parts['select']['events'][] = 'e.object';
-						$sql_parts['select']['events'][] = 'e.objectid';
-						$sql_parts['select']['events'][] = 'e.clock';
-						$sql_parts['select']['events'][] = 'e.ns';
-					}
-				}
-
-				// add sort field to select if distinct is used
-				if (count($sql_parts['from']) > 1) {
-					if (!str_in_array('e.'.$sortfield, $sql_parts['select']) && !str_in_array('e.*', $sql_parts['select'])) {
-						$sql_parts['select'][$sortfield] = 'e.'.$sortfield;
-					}
-				}
-			}
-		}
+		zbx_db_sorting($sql_parts, $options, $sort_columns, $this->tableAlias());
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
