@@ -13,6 +13,7 @@ build/win32/project/Makefile_get -text
 build/win32/project/Makefile_get_x64 -text
 build/win32/project/Makefile_sender -text
 build/win32/project/Makefile_sender_x64 -text
+create/Makefile.am -text
 create/bin/export_data.sh -text
 create/bin/gen_data.pl -text
 create/images/README.dev -text
