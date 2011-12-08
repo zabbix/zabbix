@@ -327,10 +327,10 @@ function get_header_host_table($hostid, $current = null) {
 	$list = new CList(null, 'objectlist');
 
 	if ($header_host['status'] == HOST_STATUS_TEMPLATE) {
-		$list->addItem(array('« ', new CLink(_('Template list'), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid'))));
+		$list->addItem(array('&laquo; ', new CLink(_('Template list'), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid'))));
 	}
 	else {
-		$list->addItem(array('« ', new CLink(_('Host list'), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid'))));
+		$list->addItem(array('&laquo; ', new CLink(_('Host list'), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid'))));
 	}
 
 	$description = '';
