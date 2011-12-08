@@ -974,7 +974,7 @@ function make_latest_issues(array $filter = array()) {
 				'object' => EVENT_OBJECT_TRIGGER,
 				'value' => TRIGGER_VALUE_TRUE
 			),
-			'sortfield' => 'object',
+			'sortfield' => array('object', 'objectid', 'eventid'),
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
 		);

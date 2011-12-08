@@ -57,7 +57,7 @@ class CEvent extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('eventid', 'object');
+		$sort_columns = array('eventid', 'object', 'objectid');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
@@ -297,17 +297,6 @@ class CEvent extends CZBXAPI {
 
 		// sorting
 		zbx_db_sorting($sql_parts, $options, $sort_columns, $this->tableAlias());
-		if (in_array('object', (array) $options['sortfield'])) {
-			$sql_parts['order'][] = 'e.object '.$options['sortorder'];
-			$sql_parts['order'][] = 'e.objectid '.$options['sortorder'];
-			$sql_parts['order'][] = 'e.eventid '.$options['sortorder'];
-
-			if (!str_in_array('e.*', $sql_parts['select']['events']) && $options['output'] != API_OUTPUT_EXTEND) {
-				$sql_parts['select']['events'][] = 'e.object';
-				$sql_parts['select']['events'][] = 'e.objectid';
-				$sql_parts['select']['events'][] = 'e.eventid';
-			}
-		}
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
@@ -522,7 +511,7 @@ class CEvent extends CZBXAPI {
 				'eventids' => $eventids,
 				'nopermissions' => true,
 				'preservekeys' => true,
-				'sortfield' => 'eventid',
+				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN
 			);
 			$dbAlerts = API::Alert()->get($obj_params);
