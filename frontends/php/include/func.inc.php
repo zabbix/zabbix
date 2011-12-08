@@ -1706,7 +1706,7 @@ function sanitize($data) {
 		}
 	}
 	else {
-		$data = htmlspecialchars($data);
+		$data = zbx_htmlstr($data);
 	}
 
 	return $data;
