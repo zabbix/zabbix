@@ -761,6 +761,9 @@
 		zbx_value2array($templateids);
 
 		$db_graphs = get_graphs_by_hostid($hostid);
+
+		$host = get_host_by_hostid($hostid);
+
 		while ($db_graph = DBfetch($db_graphs)) {
 			if ($db_graph['templateid'] == 0) {
 				continue;
@@ -777,7 +780,6 @@
 
 			if ($unlink_mode) {
 				if (DBexecute('UPDATE graphs SET templateid=0 WHERE graphid='.$db_graph['graphid'])) {
-					$host = get_host_by_hostid($hostid);
 					info(S_GRAPH.SPACE.'"'.$host['host'].':'.$db_graph['name'].'"'.SPACE.S_UNLINKED_SMALL);
 				}
 			}

@@ -1482,6 +1482,9 @@ return $result;
 		zbx_value2array($templateids);
 
 		$db_apps = get_applications_by_hostid($hostid);
+
+		$host = get_host_by_hostid($hostid);
+
 		while ($db_app = DBfetch($db_apps)) {
 			if ($db_app["templateid"] == 0) {
 				continue;
@@ -1498,7 +1501,6 @@ return $result;
 
 			if ($unlink_mode) {
 				if (DBexecute("update applications set templateid=0 where applicationid=".$db_app["applicationid"])) {
-					$host = get_host_by_hostid($db_app["hostid"]);
 					info(S_APPLICATION.SPACE.'"'.$host["host"].':'.$db_app["name"].'"'.SPACE.S_UNLINKED_SMALL);
 				}
 			}

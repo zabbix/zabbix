@@ -203,11 +203,6 @@ include_once('include/page_header.php');
 			if (isset($_REQUEST['graphid'])) {
 				$graph['graphid'] = $_REQUEST['graphid'];
 
-				$tmp_hhosts = get_hosts_by_graphid($graph['graphid']);
-				$tmp_host = DBfetch($tmp_hhosts);
-
-				$graph['host'] = $tmp_host['host'];
-
 				$result = CGraph::update($graph);
 
 				if ($result) {

@@ -2359,6 +2359,9 @@ function update_template_dependencies_for_host($hostid, $templateid) {
 		zbx_value2array($templateids);
 
 		$triggers = get_triggers_by_hostid($hostid);
+
+		$host = get_host_by_hostid($hostid);
+
 		while ($trigger = DBfetch($triggers)) {
 			if ($trigger['templateid']==0) {
 				continue;
@@ -2375,7 +2378,6 @@ function update_template_dependencies_for_host($hostid, $templateid) {
 
 			if ($unlink_mode) {
 				if (DBexecute('UPDATE triggers SET templateid=0 WHERE triggerid='.$trigger['triggerid'])) {
-					$host = get_host_by_hostid($hostid);
 					info(sprintf(S_TRIGGER_UNLINKED, $host['host'].':'.$trigger['description']));
 				}
 			}
