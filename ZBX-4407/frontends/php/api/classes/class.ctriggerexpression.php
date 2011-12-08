@@ -232,7 +232,7 @@ class CTriggerExpression {
 	}
 
 	private function checkParts(&$expression) {
-		foreach ($this->expressions as $enum => $expr) {
+		foreach ($this->expressions as $enum => &$expr) {
 			if (!zbx_empty($expr['macro'])) {
 				$this->checkMacro($expr['macro']);
 				$this->data['macros'][] = $expr['macro'];
@@ -245,6 +245,7 @@ class CTriggerExpression {
 			}
 			else {
 				$this->checkHost($expr['host']);
+				$expr['item'] = $this->convertOldSimpleKey($expr['item']);
 				$this->checkItem($expr['item']);
 				$this->checkFunction($expr);
 
@@ -819,6 +820,25 @@ class CTriggerExpression {
 			'lastNoSpace' => '',
 			'preLastNoSpace' => ''
 		);
+	}
+
+	function convertOldSimpleKey($old_key) {
+		$oldKeys = array('tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh');
+		$oldKeys_perf = array('tcp_perf', 'ftp_perf', 'http_perf', 'imap_perf', 'ldap_perf', 'nntp_perf', 'ntp_perf', 'pop_perf', 'smtp_perf', 'ssh_perf');
+
+		$new_key = $old_key;
+
+		$explodedKey = explode(',', $old_key);
+
+		if (in_array($explodedKey[0], $oldKeys)) {
+			$new_key = 'net.tcp.service['.$explodedKey[0].',,'.$explodedKey[1].']';
+		}
+		elseif (in_array($explodedKey[0], $oldKeys_perf)) {
+			$keyWithotPerf = explode('_', $explodedKey[0]);
+			$new_key = 'net.tcp.service.perf['.$keyWithotPerf[0].',,'.$explodedKey[1].']';
+		}
+
+		return $new_key;
 	}
 }
 ?>

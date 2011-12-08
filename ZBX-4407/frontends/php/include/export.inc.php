@@ -542,7 +542,7 @@ class zbxXML{
 							case SCREEN_RESOURCE_SIMPLE_GRAPH:
 							case SCREEN_RESOURCE_PLAIN_TEXT:
 								$db_items = API::Item()->getObjects($screenitem['resourceid']);
-//SDII($db_items);
+
 								if(empty($db_items)){
 									$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
 									throw new Exception($error);
@@ -1132,7 +1132,7 @@ class zbxXML{
 							}
 						}
 
-						$host_db['profile_mode'] = isset($host_db['profile']) ? HOST_PROFILE_MANUAL : HOST_PROFILE_DISABLED;
+						$host_db['profile_mode'] = isset($host_db['profile']) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
 					}
 // }}} HOST PROFILES
 
@@ -1269,6 +1269,8 @@ class zbxXML{
 								}
 
 							}
+
+							$item_db['key_'] = convertOldSimpleKey($item_db['key_']);
 
 							$options = array(
 								'filter' => array(
@@ -1486,6 +1488,7 @@ class zbxXML{
 								// {HOSTNAME} is here for backward compatibility
 								$gitem_db['host'] = ($gitem_host == '{HOSTNAME}') ? $host_db['host'] : $gitem_host;
 								$gitem_db['host'] = ($gitem_host == '{HOST.HOST}') ? $host_db['host'] : $gitem_host;
+								$data[0] = convertOldSimpleKey($data[0]);
 								$gitem_db['key_'] = implode(':', $data);
 
 								if($current_item = API::Item()->exists($gitem_db)){
@@ -1912,6 +1915,25 @@ class zbxXML{
 		return self::outputXML($root);
 	}
 
+}
+
+function convertOldSimpleKey($old_key) {
+	$oldKeys = array('tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh');
+	$oldKeys_perf = array('tcp_perf', 'ftp_perf', 'http_perf', 'imap_perf', 'ldap_perf', 'nntp_perf', 'ntp_perf', 'pop_perf', 'smtp_perf', 'ssh_perf');
+
+	$new_key = $old_key;
+
+	$explodedKey = explode(',', $old_key);
+
+	if (in_array($explodedKey[0], $oldKeys)) {
+		$new_key = 'net.tcp.service['.$explodedKey[0].',,'.$explodedKey[1].']';
+	}
+	elseif (in_array($explodedKey[0], $oldKeys_perf)) {
+		$keyWithotPerf = explode('_', $explodedKey[0]);
+		$new_key = 'net.tcp.service.perf['.$keyWithotPerf[0].',,'.$explodedKey[1].']';
+	}
+
+	return $new_key;
 }
 
 ?>
