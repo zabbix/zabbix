@@ -40,5 +40,5 @@ function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // D
 function SDII($msg='SDII') { echo 'DEBUG INFO: '; echo '<pre>'.print_r($msg, true).'</pre>'; echo SBR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
 function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
-
+function DITD($msg='DITD') { $ttt[]=print_r($msg,true); file_put_contents("/var/www/log/log.txt",$ttt); }
 ?>
