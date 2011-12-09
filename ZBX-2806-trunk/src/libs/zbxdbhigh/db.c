@@ -912,35 +912,15 @@ void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint6
 void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
 	const char	*__function_name = "DBstop_escalation";
-	DB_RESULT	result;
-	DB_ROW		row;
 	zbx_uint64_t	escalationid;
-	char		sql[256];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* stopping only last active escalation */
-	zbx_snprintf(sql, sizeof(sql),
-			"select escalationid"
-			" from escalations"
-			" where actionid=" ZBX_FS_UI64
-				" and triggerid%s"
-			" order by escalationid desc",
-			actionid, DBsql_id_cmp(triggerid));
+	escalationid = DBget_maxid("escalations");
 
-	result = DBselectN(sql, 1);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(escalationid, row[0]);
-
-		DBexecute("update escalations"
-				" set r_eventid=" ZBX_FS_UI64 ","
-					"nextcheck=0"
-				" where escalationid=" ZBX_FS_UI64,
-				eventid, escalationid);
-	}
-	DBfree_result(result);
+	DBexecute("insert into escalations (escalationid,actionid,triggerid,r_eventid,status)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s," ZBX_FS_UI64 ",%d)",
+			escalationid, actionid, DBsql_id_ins(triggerid), eventid, ESCALATION_STATUS_ACTIVE);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
