@@ -287,7 +287,7 @@ require_once('include/page_header.php');
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			// trigger description
-			$trigger = expand_trigger_description($_REQUEST['triggerid']);
+			$trigger = expand_trigger_description_simple($_REQUEST['triggerid']);
 			// prepending host name to trigger description
 			$triggerHostDB = get_hosts_by_triggerid($_REQUEST['triggerid']);
 			$triggerHost = DBfetch($triggerHostDB);
@@ -540,7 +540,7 @@ require_once('include/page_header.php');
 					'time_from' => $from,
 					'time_till' => $till,
 					'output' => API_OUTPUT_SHORTEN,
-					'sortfield' => 'clock',
+					'sortfield' => 'eventid',
 					'sortorder' => ZBX_SORT_DOWN,
 					'limit' => ($config['search_limit']+1)
 				);
@@ -580,11 +580,6 @@ require_once('include/page_header.php');
 					'nopermissions' => 1
 				);
 				$events = API::Event()->get($options);
-				$sortFields = array(
-					array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
-					array('field' => 'ns', 'order' => ZBX_SORT_DOWN)
-				);
-				ArraySorter::sort($events, $sortFields);
 
 				$csv_disabled = zbx_empty($events);
 

@@ -28,6 +28,11 @@
  *
  */
 class CScript extends CZBXAPI {
+
+	protected $tableName = 'scripts';
+
+	protected $tableAlias = 's';
+
 	/**
 	 * Get Scripts data
 	 *

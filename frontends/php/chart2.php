@@ -123,8 +123,7 @@ require_once('include/page_header.php');
 			$db_data['calc_fnc'],
 			$db_data['color'],
 			$db_data['drawtype'],
-			$db_data['type'],
-			$db_data['periods_cnt']
+			$db_data['type']
 		);
 	}
 

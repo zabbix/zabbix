@@ -23,6 +23,11 @@
  * @package API
  */
 class CAction extends CZBXAPI {
+
+	protected $tableName = 'actions';
+
+	protected $tableAlias = 'a';
+
 	/**
 	 * Get Actions data
 	 *
