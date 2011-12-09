@@ -763,7 +763,6 @@ function imageOut(&$image, $format = null) {
 		$imageId = md5(strlen($imageSource));
 		$_SESSION['image_id'] = array();
 		$_SESSION['image_id'][$imageId] = $imageSource;
-		session_write_close();
 	}
 
 	switch ($page['type']) {
