@@ -874,7 +874,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 	$tableSchema = DB::getSchema($table);
 	if (!$tableSchema) {
-		info('Error in search request for table ['.$table.']');
+		info(_s('Error in search request for table "%1$s".', $table));
 	}
 
 	$start = is_null($options['startSearch']) ? '%' : '';
@@ -930,7 +930,7 @@ function zbx_db_filter($table, $options, &$sql_parts) {
 
 	$tableSchema = DB::getSchema($table);
 	if (!$tableSchema) {
-		info('Error in search request for table ['.$table.']');
+		info(_s('Error in search request for table "%1$s".', $table));
 	}
 
 	$filter = array();

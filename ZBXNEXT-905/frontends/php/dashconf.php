@@ -172,7 +172,7 @@ require_once('include/page_header.php');
 
 	if(!$filterEnable) $cmbGroups->setAttribute('disabled', 'disabled');
 
-	$dashList->addRow(S_HOST_GROUPS, $cmbGroups);
+	$dashList->addRow(_('Host groups'), $cmbGroups);
 
 	if ($grpswitch == 1) {
 		$options = array(
