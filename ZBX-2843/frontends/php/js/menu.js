@@ -83,6 +83,16 @@ function get_real_text_width(text, id) {
 	return tmp_len;
 }
 
+
+function truncateText(text) {
+	var len = 30;
+	var trunc = text;
+	if (trunc.length > len) {
+		trunc = trunc.substring(0, len)+'...';
+	}
+	return trunc;
+}
+
 function show_popup_menu(e, content, width){
 	var cursor = get_cursor_position(e);
 	var tmp_width = 0;
@@ -91,6 +101,7 @@ function show_popup_menu(e, content, width){
 	var j = 0;
 
 	for (i = 0; i < content.length; i++) {
+		content[i][0] = truncateText(content[i][0]);
 		tmp_width = get_real_text_width(content[i][0], i);
 
 		if (max_width < tmp_width) {
@@ -99,6 +110,7 @@ function show_popup_menu(e, content, width){
 
 		if (content[i].length > 4) {
 			for (j = 4; j < content[i].length; j++) {
+				content[i][j][0] = truncateText(content[i][j][0]);
 				tmp_width = get_real_text_width(content[i][j][0], i);
 
 				if (max_width < tmp_width) {
