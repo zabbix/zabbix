@@ -276,7 +276,7 @@ require_once('include/js.inc.php');
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
 			default:
-				$order_field = 'clock';
+				$order_field = array('itemid', 'clock');
 		}
 
 		$host = get_host_by_itemid($itemid);
