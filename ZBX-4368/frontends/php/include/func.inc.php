@@ -1710,4 +1710,42 @@ function sanitize($data) {
 	return $data;
 }
 
+
+/**
+ * Sets a flash message. The message may be accessed using the getFlash() function on the
+ * next page load, after which it will be discarded.
+ *
+ * @param string $key      The key, under which the message will be stored
+ * @param string $message  Message text
+ */
+function setFlash($key, $message) {
+	if (!isset($_SESSION['zbxFlashes'])) {
+		$_SESSION['zbxFlashes'] = array();
+	}
+
+	$_SESSION['zbxFlashes'][$key] = $message;
+}
+
+
+/**
+ * Returns a flash message.
+ *
+ * @param string $key
+ *
+ * @return string
+ */
+function getFlash($key) {
+	$flashes = (isset($_SESSION['zbxFlashes'])) ? $_SESSION['zbxFlashes'] : array();
+
+	return (isset($flashes[$key])) ? $flashes[$key] : null;
+}
+
+
+/**
+ * Clears all flash messages.
+ */
+function clearFlashes() {
+	$_SESSION['zbxFlashes'] = array();
+}
+
 ?>

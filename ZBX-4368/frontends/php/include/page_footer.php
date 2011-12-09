@@ -117,5 +117,9 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	echo '</body>'."\n".
 		'</html>'."\n";
 }
+
+// clear flashes
+clearFlashes();
+
 exit;
 ?>

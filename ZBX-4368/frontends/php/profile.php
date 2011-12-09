@@ -93,9 +93,8 @@ elseif (isset($_REQUEST['del_user_media'])) {
 	}
 }
 
-if(isset($_COOKIE['zbx_profile'])){
-	show_messages(true, _('User updated'), _('Cannot update user'));
-	SetCookie("zbx_profile","");
+if (getFlash('notice')) {
+	show_messages(true, getFlash('notice'), '');
 }
 // primary actions
 elseif (isset($_REQUEST['cancel'])) {
@@ -178,11 +177,12 @@ elseif (isset($_REQUEST['save'])) {
 				' Surname ['.$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
 
 			ob_end_clean();
-			SetCookie("zbx_profile","user_updated",time()+3600);
+
+			setFlash('notice', _('User updated'));
 			redirect(CWebUser::$data['last_page']['url']);
 		}
 		else {
-			show_messages($result, _('User updated'), _('Cannot update user'));
+			show_messages(false, '', _('Cannot update user'));
 		}
 	}
 

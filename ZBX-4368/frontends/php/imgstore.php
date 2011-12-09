@@ -82,7 +82,6 @@ require_once('include/page_header.php');
 	elseif (isset($_REQUEST['imageid'])) {
 		$imageid = get_request('imageid',0);
 
-		session_start();
 		if (isset($_SESSION['image_id'][$imageid])) {
 			echo $_SESSION['image_id'][$imageid];
 			unset($_SESSION['image_id'][$imageid]);

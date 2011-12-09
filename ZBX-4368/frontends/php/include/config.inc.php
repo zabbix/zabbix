@@ -21,6 +21,9 @@
 <?php
 require_once('include/debug.inc.php');
 
+// init sessions
+session_start();
+
 function __autoload($class_name) {
 	$class_name = zbx_strtolower($class_name);
 	$api = array(
@@ -757,7 +760,6 @@ function imageOut(&$image, $format = null) {
 	ob_end_clean();
 
 	if ($page['type'] != PAGE_TYPE_IMAGE) {
-		session_start();
 		$imageId = md5(strlen($imageSource));
 		$_SESSION['image_id'] = array();
 		$_SESSION['image_id'][$imageId] = $imageSource;
