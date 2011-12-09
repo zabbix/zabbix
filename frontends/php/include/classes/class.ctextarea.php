@@ -20,13 +20,13 @@
 ?>
 <?php
 class CTextArea extends CTag {
-	public function __construct($name = 'textarea', $value = '', $cols = 77, $rows = 7, $readonly = false) {
+	public function __construct($name = 'textarea', $value = '', $rows = ZBX_TEXTAREA_STANDARD_ROWS, $width = ZBX_TEXTAREA_STANDARD_WIDTH, $readonly = false) {
 		parent::__construct('textarea', 'yes');
 		$this->attributes['class'] = 'input textarea';
 		$this->attr('id', zbx_formatDomId($name));
 		$this->attr('name', $name);
 		$this->attr('rows', $rows);
-		$this->attr('cols', $cols);
+		$this->attr('style', 'width: '.$width.'px;');
 		$this->setReadonly($readonly);
 		$this->addItem($value);
 	}

@@ -428,7 +428,7 @@ switch($itemType) {
 			if($i >= 7) break;
 		}
 
-		array_push($delay_flex_el, count($delay_flex_el)==0 ? S_NO_FLEXIBLE_INTERVALS : new CSubmit('del_delay_flex',S_DELETE_SELECTED));
+		array_push($delay_flex_el, count($delay_flex_el) == 0 ? S_NO_FLEXIBLE_INTERVALS : new CSubmit('del_delay_flex', _('Delete selected')));
 
 
 // Interfaces
@@ -588,11 +588,11 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'label_formula');
 
 // Params / DBmonitor / Formula
-		$params_script = new CTextArea('params', $params, 60, 4);
+		$params_script = new CTextArea('params', $params, ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_BIG_WIDTH);
 		$params_script->setAttribute('id', 'params_script');
-		$params_dbmonitor = new CTextArea('params', $params, 60, 4);
+		$params_dbmonitor = new CTextArea('params', $params, ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_BIG_WIDTH);
 		$params_dbmonitor->setAttribute('id', 'params_dbmonitor');
-		$params_calculted = new CTextArea('params', $params, 60, 4);
+		$params_calculted = new CTextArea('params', $params, ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_BIG_WIDTH);
 		$params_calculted->setAttribute('id', 'params_calculted');
 
 		$frmItem->addRow(array($spanEC, $spanP, $spanF), array($params_script, $params_dbmonitor, $params_calculted), null, 'row_params');
@@ -658,7 +658,7 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
-		$frmItem->addRow(_('Description'), new CTextArea('description', $description));
+		$frmItem->addRow(_('Description'), new CTextArea('description', $description, ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_BIG_WIDTH));
 
 		$frmRow = array(new CSubmit('save', S_SAVE));
 		if(isset($_REQUEST['itemid'])){
@@ -786,15 +786,15 @@ switch($itemType) {
 
 // GO{
 		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
+		$goOption = new CComboItem('activate', _('Activate selected'));
 		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
+		$goOption = new CComboItem('disable', _('Disable selected'));
 		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption = new CComboItem('delete', _('Delete selected'));
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 

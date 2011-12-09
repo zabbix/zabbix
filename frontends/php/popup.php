@@ -896,7 +896,7 @@ elseif ($srctbl == 'triggers'){
 		$trigger['description'] = $trigger['hostname'].':'.$trigger['description'];
 
 		if ($multiselect) {
-			$js_action = "addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($trigger['triggerid']).");";
+			$js_action = 'addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($trigger['triggerid']).');';
 		}
 		else {
 			$values = array(

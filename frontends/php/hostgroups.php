@@ -22,7 +22,7 @@
 require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 
-$page['title'] = 'S_HOST_GROUPS';
+$page['title'] = _('Host groups');
 $page['file'] = 'hostgroups.php';
 $page['hist_arg'] = array();
 

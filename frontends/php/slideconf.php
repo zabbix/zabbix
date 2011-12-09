@@ -258,7 +258,7 @@ require_once('include/page_header.php');
 // goBox
 		$goBox = new CComboBox('go');
 
-		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
+		$goOption = new CComboItem('delete', _('Delete selected'));
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_SLIDESHOWS_Q);
 		$goBox->addItem($goOption);
 
