@@ -1,5 +1,7 @@
 Changes for 1.8.10rc1
 
+.......PS. [ZBX-4424] fixed handling of a long localized content by history syncer (Sasha)
+.......PS. [ZBX-4424] fixed handling of a localized content with incorrect utf8 characters (Sasha)
 A......... [ZBX-4273] fixed getting permission error while creating an action (sanja)
 ....I..... [ZBX-4377] fixed error message when checking if libcurl can be linked statically (dimir)
 ..F....... [ZBX-4391] fixed problem with suffixes support (slava)
