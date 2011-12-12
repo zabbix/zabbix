@@ -23,11 +23,6 @@
  * @package API
  */
 class CApplication extends CZBXAPI {
-
-	protected $tableName = 'applications';
-
-	protected $tableAlias = 'a';
-
 	/**
 	* Get Applications data
 	*

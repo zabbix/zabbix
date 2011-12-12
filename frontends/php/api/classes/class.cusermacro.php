@@ -27,11 +27,6 @@
  * Class containing methods for operations with UserMacro
  */
 class CUserMacro extends CZBXAPI {
-
-	protected $tableName = 'hostmacro';
-
-	protected $tableAlias = 'hm';
-
 	/**
 	 * Get UserMacros data
 	 *

@@ -92,7 +92,8 @@ require_once 'include/page_header.php';
 			$db_data['itemid'],
 			$db_data['calc_fnc'],
 			$db_data['color'],
-			$db_data['type']
+			$db_data['type'],
+			$db_data['periods_cnt']
 			);
 	}
 	$graph->draw();

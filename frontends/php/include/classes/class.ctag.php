@@ -58,8 +58,7 @@ class CTag extends CObject {
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
-			$value = str_replace(array("\r", "\n"), '', strval($value));
-			$res .= ' '.$key.'="'.$this->sanitize($value).'"';
+			$res .= ' '.$key.'="'.zbx_htmlstr($value).'"';
 		}
 		$res .= ($this->paired === 'yes') ? '>' : ' />';
 		return $res;
@@ -153,7 +152,7 @@ class CTag extends CObject {
 	}
 
 	public function addAction($name, $value) {
-		$this->attributes[$name] = $value;
+		$this->setAttribute($name, $value);
 	}
 
 	public function setHint($text, $width = '', $class = '', $byClick = true, $updateBlinking = false) {

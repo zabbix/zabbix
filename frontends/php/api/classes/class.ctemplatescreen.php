@@ -27,11 +27,6 @@
  * Class containing methods for operations with Screens
  */
 class CTemplateScreen extends CScreen{
-
-	protected $tableName = 'screens';
-
-	protected $tableAlias = 's';
-
 /**
  * Get Screen data
  *

@@ -27,11 +27,6 @@
 
 
 class CTrigger extends CZBXAPI {
-
-	protected $tableName = 'triggers';
-
-	protected $tableAlias = 't';
-
 	/**
 	 * Get Triggers data
 	 *

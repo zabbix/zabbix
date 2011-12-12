@@ -28,11 +28,6 @@
  *
  */
 class CTemplate extends CZBXAPI {
-
-	protected $tableName = 'hosts';
-
-	protected $tableAlias = 'h';
-
 /**
  * Get Template data
  *

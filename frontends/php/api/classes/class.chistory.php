@@ -28,14 +28,6 @@
  *
  */
 class CHistory extends CZBXAPI {
-
-
-	public function __construct() {
-		// considering the quirky nature of the history API,
-		// the parent::__construct() method should not be called.
-	}
-
-
 	/**
 	 * Get history data
 	 *

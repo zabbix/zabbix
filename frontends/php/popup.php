@@ -1093,7 +1093,6 @@ elseif ($srctbl == 'prototypes') {
 
 	$options = array(
 		'nodeids' => $nodeid,
-		'selectHosts' => array('host'),
 		'discoveryids' => get_request('parent_discoveryid'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'output' => API_OUTPUT_EXTEND,
@@ -1103,9 +1102,7 @@ elseif ($srctbl == 'prototypes') {
 	order_result($items, 'name');
 
 	foreach ($items as $tnum => $row) {
-		$host = reset($row['hosts']);
 		$description = new CSpan(itemName($row), 'link');
-		$row['name'] = $host['host'].':'.$row['name'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($row['itemid']).');';
@@ -1380,7 +1377,7 @@ elseif ($srctbl == 'simple_graph') {
 		}
 
 		if ($multiselect) {
-			$js_action ='javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($row['itemid']).');';
+			$js_action ='"javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($row['itemid']).');';
 		}
 		else {
 			$values = array(

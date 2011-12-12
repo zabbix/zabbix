@@ -27,11 +27,6 @@
  * Class containing methods for operations with Discovery checks for discovery rules
  */
 class CDCheck extends CZBXAPI {
-
-	protected $tableName = 'dchecks';
-
-	protected $tableAlias = 'dc';
-
 	public function get($options) {
 		$result = array();
 		$nodeCheck = false;

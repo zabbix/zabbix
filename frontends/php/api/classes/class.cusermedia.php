@@ -27,11 +27,6 @@
  * Class containing methods for operations with Users
  */
 class CUserMedia extends CZBXAPI {
-
-	protected $tableName = 'media';
-
-	protected $tableAlias = 'm';
-
 	/**
 	 * Get Users data
 	 *

@@ -62,7 +62,7 @@ class CObject {
 			array_push($this->items, unpack_object($value));
 		}
 		elseif (is_string($value)) {
-			array_push($this->items, $this->sanitize($value));
+			array_push($this->items, zbx_htmlstr($value));
 		}
 		elseif (is_array($value)) {
 			foreach ($value as $item) {
@@ -73,17 +73,6 @@ class CObject {
 			array_push($this->items, unpack_object($value));
 		}
 		return $this;
-	}
-
-
-	/**
-	 * Sanitizes a string before outputting it to the browser.
-	 *
-	 * @param string $str
-	 * @return string
-	 */
-	protected function sanitize($value) {
-		return zbx_htmlstr($value);
 	}
 }
 

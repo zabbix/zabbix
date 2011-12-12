@@ -27,11 +27,6 @@
  * Class containing methods for operations with graphs
  */
 class CGraph extends CZBXAPI {
-
-	protected $tableName = 'graphs';
-
-	protected $tableAlias = 'g';
-
 	/**
 	* Get graph data
 	*
@@ -1098,30 +1093,28 @@ class CGraph extends CZBXAPI {
 // }}} EXCEPTION: ITEMS PERMISSIONS
 		}
 
-		foreach($graphs as $graph) {
-			if (!isset($graph['name'])) {
-				continue;
-			}
+		foreach($graphs as $gnum => $graph){
+			if(!isset($graph['name'])) continue;
 			$hosts = API::Host()->get(array(
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions'=> true,
 				'preservekeys' => true
 			));
+
 			$options = array(
+//				'nodeids' => get_current_nodeid(true),
 				'hostids' => array_keys($hosts),
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array('name' => $graph['name'], 'flags' => null),
 				'nopermissions' => true,
-				'preservekeys' => true,
-				'limit' => 1
+				'preservekeys' => true
 			);
 			$graphsExists = $this->get($options);
-			foreach ($graphsExists as $graphExists) {
-				if (!$update || (bccomp($graphExists['graphid'],$graph['graphid']) != 0)) {
+			foreach($graphsExists as $genum => $graphExists){
+				if(!$update || (bccomp($graphExists['graphid'],$graph['graphid']) != 0))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists', $graph['name']));
-				}
 			}
+// }}} EXCEPTION: GRAPH EXISTS
 		}
 
 		return true;

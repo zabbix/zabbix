@@ -28,11 +28,6 @@
  *
  */
 class CMaintenance extends CZBXAPI {
-
-	protected $tableName = 'maintenances';
-
-	protected $tableAlias = 'm';
-
 	/**
 	 * Get maintenances data
 	 *
