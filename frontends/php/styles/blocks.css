@@ -20,6 +20,13 @@
 /************************************************************/
 /*					ZABBIX MAPS								*/
 /************************************************************/
+.border_dotted_top {
+	border-top: 0;
+}
+
+.dropArea {
+	background-color: #FFB;
+}
 
 .sortableRowPlaceholder{
 	height: 30px;

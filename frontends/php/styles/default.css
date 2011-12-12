@@ -116,6 +116,10 @@ ul.itservices { margin: 0 0 0 5px; }
 ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; }
 ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; }
+ul.formlist li.top-aligned {
+	margin: -1px 0 0 0;
+	padding-top: 0;
+}
 
 /* any object list inline */
 ul.objectlist { padding: 0; list-style: none; margin: 0;}
@@ -190,7 +194,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .draggable { cursor: move; }
 
 /********** <object list> ************/
-.objectgroup { padding: 4px; margin: 5px 0 5px 0; }
+.objectgroup { padding: 4px;}
 .border_dotted { border: 1px dotted #6C80B9; }
 .border_none { border: 0; }
 .footer { padding-left: 1.6em; }

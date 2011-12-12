@@ -18,8 +18,9 @@ function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
 			$escaped = str_replace('"', '\"', $escaped); // escaping quotes: " => \"
 			$escaped = str_replace("\n", '\n', $escaped); // changing LF to '\n' string
 			$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
+			$escaped = str_replace('/', '\/', $escaped); // escaping forward slash: / => \/
 			if ($addQuotes) {
-				$escaped = '\''.$escaped.'\'';
+				$escaped = "'".$escaped."'";
 			}
 			return $escaped;
 		}
