@@ -6,7 +6,6 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
-..F....... [ZBX-3074] in item and trigger list move status column to the right
 A......... [ZBX-4403] fixed low level discovery rule creation (pavels)
 ..F.I...S. [ZBX-3832] removed support of aggregated graph items (pavels, Sasha)
 ..F....... [ZBX-4235] fixed operations with decimal numbers for certain locales (pavels)
@@ -350,6 +349,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.10rc1
 
+..F....... [ZBX-3074] moved the 'Status' column in the item list to the right (slava)
 ........S. [ZBX-4298] added deleted data report to a housekeeper on every step (dimir)
 ..F....... [ZBX-3649] fixed "frontends/php/styles/ie_default.css" doesn't exist (for IE6) (sanja)
 A.F....... [ZBX-4235] fixed operations with decimal numbers for certain locales (pavels)
