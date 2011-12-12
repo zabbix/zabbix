@@ -2888,14 +2888,15 @@ size_t	zbx_strlen_utf8(const char *text)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_strlen_utf8_maxlen                                           *
+ * Function: zbx_strlen_utf8_n                                                *
  *                                                                            *
- * Purpose: calculates number of bytes for maxlen utf8 characters             *
+ * Purpose: calculates number of bytes in utf8 text limited by utf8_maxlen    *
+ * characters                                                                 *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_strlen_utf8_maxlen(const char *text, size_t utf8_maxlen)
+size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
 {
 	size_t	sz = 0;
 

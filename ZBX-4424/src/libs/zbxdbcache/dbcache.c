@@ -2631,7 +2631,7 @@ static void	DCadd_history_str(zbx_uint64_t itemid, const char *value_orig, int c
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	len = zbx_strlen_utf8_maxlen(value_orig, HISTORY_STR_VALUE_LEN) + 1;
+	len = zbx_strlen_utf8_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
 
 	LOCK_CACHE;
 
@@ -2655,7 +2655,7 @@ static void	DCadd_history_text(zbx_uint64_t itemid, const char *value_orig, int 
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	len = zbx_strlen_utf8_maxlen(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
+	len = zbx_strlen_utf8_n(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
 
 	LOCK_CACHE;
 
@@ -2680,10 +2680,10 @@ static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, int c
 	ZBX_DC_HISTORY	*history;
 	size_t		len1, len2;
 
-	len1 = zbx_strlen_utf8_maxlen(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
+	len1 = zbx_strlen_utf8_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
 
 	if (NULL != source && '\0' != *source)
-		len2 = zbx_strlen_utf8_maxlen(source, HISTORY_LOG_SOURCE_LEN) + 1;
+		len2 = zbx_strlen_utf8_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
 	else
 		len2 = 0;
 
@@ -2720,7 +2720,7 @@ static void	DCadd_history_notsupported(zbx_uint64_t itemid, const char *error, i
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	len = zbx_strlen_utf8_maxlen(error, ITEM_ERROR_LEN) + 1;
+	len = zbx_strlen_utf8_n(error, ITEM_ERROR_LEN) + 1;
 
 	LOCK_CACHE;
 
