@@ -65,13 +65,13 @@ $fields = array(
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,	null,		null)
 );
-$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 0));
+$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
 $_REQUEST['status'] = isset($_REQUEST['status']) ? 0 : 1;
 
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-$showDisabled = get_request('showdisabled', 0);
+$showDisabled = get_request('showdisabled', 1);
 CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_STR);
 $_REQUEST['go'] = get_request('go', 'none');
 

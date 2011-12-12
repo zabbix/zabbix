@@ -33,8 +33,6 @@
 	'S_HOUR_SHORT' =>			_('h'),
 	'S_MINUTE_SHORT' =>			_('m'),
 
-	'S_ACTIVATE_SELECTED_HOSTS'=>		_('Activate selected hosts'),
-	'S_DISABLE_SELECTED_HOSTS'=>		_('Disable selected hosts'),
 
 //	dicoveryconf.php
 	'S_CREATED_SMALL' => _('created'),
@@ -384,14 +382,6 @@
 	'S_NOVEMBER'=>				_('November'),
 	'S_DECEMBER'=>				_('December'),
 
-// hostgroups.php
-	'S_CONFIGURATION_OF_GROUPS'=>		_('CONFIGURATION OF HOST GROUPS'),
-	'S_DELETE_SELECTED_GROUP'=>		_('Delete selected group?'),
-	'S_ENABLE_SELECTED_HOST_GROUPS'=>	_('Enable selected host groups?'),
-	'S_DISABLE_SELECTED_HOST_GROUPS'=>	_('Disable selected host groups?'),
-	'S_DELETE_SELECTED_HOST_GROUPS'=>	_('Delete selected host groups?'),
-	'S_DELETE_SELECTED_GROUPS'=>		_('Delete selected groups'),
-
 //	hosts.php
 	'S_HOST_INTERFACE' =>			_('Host interface'),
 	'S_IPMI'=>			_('IPMI'),
@@ -410,8 +400,6 @@
 	'S_ITEMS_BIG'=>					_('ITEMS'),
 	'S_TRIGGERS'=>					_('Triggers'),
 	'S_GRAPHS'=>					_('Graphs'),
-	'S_CANNOT_UPDATE_HOST'=>			_('Cannot update host'),
-	'S_HOST_STATUS_UPDATED'=>			_('Host status updated'),
 	'S_HOST_GROUPS_BIG'=>				_('HOST GROUPS'),
 	'S_HOST'=>					_('Host'),
 	'S_CONNECT_TO'=>				_('Connect to'),
@@ -673,7 +661,6 @@
 	'S_SHOW_HOSTS_IN_MAINTENANCE' => _('Show hosts in maintenance'),
 	'S_TRIGGERS_WITH_SEVERITY' => _('Triggers with severity'),
 	'S_DASHBOARD_FILTER' => _('Dashboard filter'),
-	'S_O_ALL' => _('All'),
 	'S_O_UNACKNOWLEDGED_ONLY' => _('Unacknowledged only'),
 	'S_O_SEPARATED' => _('Separated'),
 	'S_PROBLEM_DISPLAY' => _('Problem display'),
@@ -1061,9 +1048,6 @@
 	'S_NO_GRAPH_WITH'=>					_('No graph item with'),
 	'S_MISSING_ITEMS_FOR_GRAPH'=>				_('Missing items for graph'),
 	'S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL'=>_('with template host cannot contain items from other hosts.'),
-
-//	perm.inc.php
-	'S_INCORRECT_USER_DATA_IN'=>		_('Incorrect user data in'),
 
 //	images.inc.php
 	'S_COULD_NOT_SAVE_IMAGE'=>		_('Could not save image!'),

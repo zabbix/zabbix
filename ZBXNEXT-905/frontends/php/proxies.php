@@ -150,7 +150,7 @@
 		}
 
 		$go_result = DBend($go_result && !empty($hosts));
-		show_messages($go_result, S_HOST_STATUS_UPDATED, NULL);
+		show_messages($go_result, _('Host status updated'), NULL);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['hosts'])){
 
