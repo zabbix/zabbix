@@ -1600,7 +1600,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != history[i].value_null)
 			continue;
 
-		value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
+		value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 				"(" ZBX_FS_UI64 ",%d,'%s'),",
@@ -1647,7 +1647,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			if (0 != history[i].value_null)
 				continue;
 
-			value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
+			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifdef HAVE_MULTIROW_INSERT
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"(%d," ZBX_FS_UI64 ",%d,'%s'),",
