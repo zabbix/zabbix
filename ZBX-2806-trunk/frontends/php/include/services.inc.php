@@ -280,7 +280,7 @@ function get_last_service_value($serviceid, $clock) {
 			' FROM service_alarms sa'.
 			' WHERE sa.serviceid='.$serviceid.
 				' AND sa.clock='.$row['clock'].
-			' ORDER BY sa.clock,sa.servicealarmid DESC', 1
+			' ORDER BY sa.servicealarmid DESC', 1
 		);
 		if ($row2 = DBfetch($result2)) {
 			$value = $row2['value'];
