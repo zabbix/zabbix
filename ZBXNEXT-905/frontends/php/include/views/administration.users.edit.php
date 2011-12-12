@@ -94,8 +94,7 @@ $LangComboBox = new CComboBox('lang', $this->data['lang']);
 $languages_unable_set = 0;
 foreach ($ZBX_LOCALES as $loc_id => $loc_name) {
 	// checking if this locale exists in the system. The only way of doing it is to try and set one
-	// trying to set only the LC_MESSAGES locale to avoid changing LC_NUMERIC
-	$locale_exists = setlocale(LC_MESSAGES, zbx_locale_variants($loc_id)) || $loc_id == 'en_GB' ? 'yes' : 'no';
+	$locale_exists = setlocale(LC_ALL, zbx_locale_variants($loc_id)) || $loc_id == 'en_GB' ? 'yes' : 'no';
 	$selected = ($loc_id == $USER_DETAILS['lang']) ? true : null;
 	$LangComboBox->addItem($loc_id, $loc_name, $selected, $locale_exists);
 
@@ -103,7 +102,8 @@ foreach ($ZBX_LOCALES as $loc_id => $loc_name) {
 		$languages_unable_set++;
 	}
 }
-setlocale(LC_MESSAGES, zbx_locale_variants($USER_DETAILS['lang'])); // restoring original locale
+setlocale(LC_ALL, zbx_locale_variants($USER_DETAILS['lang'])); // restoring original locale
+setLocale(LC_NUMERIC, array('en', 'en_US', 'en_US.UTF-8', 'English_United States.1252')); // numeric Locale to default
 $lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
 $userFormList->addRow(_('Language'), array($LangComboBox, new CSpan($lang_hint, 'red wrap')));
 

@@ -27,11 +27,6 @@
  * Class containing methods for operations with Discovered Hosts
  */
 class CDHost extends CZBXAPI {
-
-	protected $tableName = 'dhosts';
-
-	protected $tableAlias = 'dh';
-
 /**
  * Get Host data
  *

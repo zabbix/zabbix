@@ -18,9 +18,8 @@ function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
 			$escaped = str_replace('"', '\"', $escaped); // escaping quotes: " => \"
 			$escaped = str_replace("\n", '\n', $escaped); // changing LF to '\n' string
 			$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
-			$escaped = str_replace('/', '\/', $escaped); // escaping forward slash: / => \/
 			if ($addQuotes) {
-				$escaped = "'".$escaped."'";
+				$escaped = '\''.$escaped.'\'';
 			}
 			return $escaped;
 		}
@@ -393,7 +392,7 @@ function insert_js_function($fnct_name) {
 			break;
 		case 'add_graph_item':
 			insert_js('
-				function add_graph_item(formname, itemid, color, drawtype, sortorder, yaxisside, calc_fnc, type) {
+				function add_graph_item(formname, itemid, color, drawtype, sortorder, yaxisside, calc_fnc, type, periods_cnt) {
 					var form = window.opener.document.forms[formname];
 					if (!form) {
 						close_window();
@@ -406,6 +405,7 @@ function insert_js_function($fnct_name) {
 					window.opener.create_var(form, "new_graph_item[yaxisside]", yaxisside);
 					window.opener.create_var(form, "new_graph_item[calc_fnc]", calc_fnc);
 					window.opener.create_var(form, "new_graph_item[type]", type);
+					window.opener.create_var(form, "new_graph_item[periods_cnt]", periods_cnt);
 
 					form.submit();
 					close_window();
@@ -414,7 +414,7 @@ function insert_js_function($fnct_name) {
 			break;
 		case 'update_graph_item':
 			insert_js('
-				function update_graph_item(formname, list_name, gid, itemid, color, drawtype, sortorder, yaxisside, calc_fnc, type) {
+				function update_graph_item(formname, list_name, gid, itemid, color, drawtype, sortorder, yaxisside, calc_fnc, type, periods_cnt) {
 					var form = window.opener.document.forms[formname];
 					if (!form) {
 						close_window();
@@ -427,6 +427,7 @@ function insert_js_function($fnct_name) {
 					window.opener.create_var(form, list_name + "[" + gid + "][yaxisside]", yaxisside);
 					window.opener.create_var(form, list_name + "[" + gid + "][calc_fnc]", calc_fnc);
 					window.opener.create_var(form, list_name + "[" + gid + "][type]", type);
+					window.opener.create_var(form, list_name + "[" + gid + "][periods_cnt]", periods_cnt);
 
 					form.submit();
 					close_window();

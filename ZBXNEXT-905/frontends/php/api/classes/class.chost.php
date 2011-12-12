@@ -27,11 +27,6 @@
  * Class containing methods for operations with Hosts
  */
 class CHost extends CZBXAPI{
-
-	protected $tableName = 'hosts';
-
-	protected $tableAlias = 'h';
-
 /**
  * Get Host data
  *
@@ -853,7 +848,7 @@ Copt::memoryPick();
 						if ($count[$interface['hostid']] > $options['limitSelects']) continue;
 					}
 
-					$result[$interface['hostid']]['interfaces'][$interfaceid] = &$interfaces[$interfaceid];
+					$result[$interface['hostid']]['interfaces'][] = &$interfaces[$interfaceid];
 				}
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectInterfaces']) {
@@ -1203,13 +1198,13 @@ Copt::memoryPick();
 			}
 		}
 
-
+Copt::memoryPick();
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
 
-		return $result;
+	return $result;
 	}
 
 /**
@@ -1550,17 +1545,53 @@ Copt::memoryPick();
 
 		$this->checkInput($hosts, __FUNCTION__);
 
-		foreach ($hosts as $host) {
-			API::HostInterface()->replaceHostInterfaces($host);
+		foreach ($hosts as $hnum => $host) {
+// INTERFACES
+			if (isset($host['interfaces']) && !is_null($host['interfaces'])) {
+				$interfacesToDelete = API::HostInterface()->get(array(
+					'hostids' => $host['hostid'],
+					'output' => API_OUTPUT_EXTEND,
+					'preservekeys' => true,
+					'nopermissions' => 1
+				));
+
+// Add
+				$interfacesToAdd = array();
+				$interfacesToUpdate = array();
+				foreach ($host['interfaces'] as $hinum => $interface) {
+					$interface['hostid'] = $host['hostid'];
+
+					if (!isset($interface['interfaceid'])) {
+						$interfacesToAdd[] = $interface;
+					}
+					elseif (isset($interfacesToDelete[$interface['interfaceid']])) {
+						$interfacesToUpdate[] = $interface;
+						unset($interfacesToDelete[$interface['interfaceid']]);
+					}
+				}
+//----
+				if (!empty($interfacesToDelete)) {
+					$result = API::HostInterface()->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
+					if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
+				}
+
+				if (!empty($interfacesToUpdate)) {
+					$result = API::HostInterface()->update($interfacesToUpdate);
+					if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
+				}
+
+				if (!empty($interfacesToAdd)) {
+					$result = API::HostInterface()->create($interfacesToAdd);
+					if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
+				}
+			}
 			unset($host['interfaces']);
 
 			$data = $host;
 			$data['hosts'] = $host;
 			$result = $this->massUpdate($data);
 
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
-			}
+			if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
 		}
 
 		return array('hostids' => $hostids);
@@ -2091,8 +2122,8 @@ Copt::memoryPick();
 		$delItems = API::Item()->get(array(
 			'hostids' => $hostids,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
-			'nopermissions' => true,
-			'preservekeys' => true
+			'nopermissions' => 1,
+			'preservekeys' => 1
 		));
 		if (!empty($delItems)) {
 			$delItemIds = zbx_objectValues($delItems, 'itemid');
@@ -2244,6 +2275,5 @@ Copt::memoryPick();
 
 		return (count($ids) == $count);
 	}
-
 }
 ?>

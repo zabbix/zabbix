@@ -219,7 +219,8 @@ class zbxXML{
 				'color'				=> '',
 				'yaxisside'			=> '',
 				'calc_fnc'			=> '',
-				'type'				=> ''
+				'type'				=> '',
+				'periods_cnt'		=> ''
 			)
 		)
 	);

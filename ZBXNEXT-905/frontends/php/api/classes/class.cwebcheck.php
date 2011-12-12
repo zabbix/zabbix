@@ -23,11 +23,6 @@
  * @package API
  */
 class CWebCheck extends CZBXAPI {
-
-	protected $tableName = 'httptest';
-
-	protected $tableAlias = 'ht';
-
 	private $history = 30;
 	private $trends = 90;
 

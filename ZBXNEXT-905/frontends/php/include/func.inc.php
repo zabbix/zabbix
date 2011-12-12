@@ -852,9 +852,7 @@ function zbx_strpos($haystack, $needle, $offset = 0) {
 
 function zbx_stripos($haystack, $needle, $offset = 0) {
 	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		$haystack = mb_convert_case($haystack, MB_CASE_LOWER);
-		$needle = mb_convert_case($needle, MB_CASE_LOWER);
-		return mb_strpos($haystack, $needle, $offset);
+		return mb_stripos($haystack, $needle, $offset);
 	}
 	else {
 		return stripos($haystack, $needle, $offset);
@@ -1690,26 +1688,4 @@ function bcround($number, $precision = 0) {
 	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
 	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
 }
-
-
-/**
- * Sanitizes the data before outputting.
- *
- * @param mixed $data
- *
- * @return mixed
- */
-function sanitize($data) {
-	if (is_array($data)) {
-		foreach ($data as &$value) {
-			$value = sanitize($value);
-		}
-	}
-	else {
-		$data = zbx_htmlstr($data);
-	}
-
-	return $data;
-}
-
 ?>

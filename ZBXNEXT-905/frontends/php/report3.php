@@ -49,7 +49,7 @@ if (!$service = DBfetch($result)) {
 	fatal_error(_('No IT services defined.'));
 }
 
-if ($service['triggerid']) {
+if (!is_null($service['triggerid'])) {
 	$options = array(
 		'triggerids' => $service['triggerid'],
 		'output' => API_OUTPUT_SHORTEN,

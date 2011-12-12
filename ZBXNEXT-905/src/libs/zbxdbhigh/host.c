@@ -274,7 +274,8 @@ static int	validate_inventory_links(zbx_uint64_t hostid, zbx_uint64_t templateid
 	return ret;
 }
 
-void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num)
+void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems,
+		size_t *gitems_alloc, size_t *gitems_num)
 {
 	const char	*__function_name = "DBget_graphitems";
 	DB_RESULT	result;
@@ -306,7 +307,8 @@ void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_
 		gitem->yaxisside = atoi(row[6]);
 		gitem->calc_fnc = atoi(row[7]);
 		gitem->type = atoi(row[8]);
-		gitem->flags = (unsigned char)atoi(row[9]);
+		gitem->periods_cnt = atoi(row[9]);
+		gitem->flags = (unsigned char)atoi(row[10]);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() [%d] itemid:" ZBX_FS_UI64 " key:'%s'",
 				__function_name, *gitems_num, gitem->itemid, gitem->key);
@@ -411,8 +413,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select 0,0,i.key_,gi.drawtype,gi.sortorder,gi.color,gi.yaxisside,gi.calc_fnc,"
-					"gi.type,i.flags"
+				"select 0,0,i.key_,gi.drawtype,gi.sortorder,"
+					"gi.color,gi.yaxisside,gi.calc_fnc,"
+					"gi.type,gi.periods_cnt,i.flags"
 				" from graphs_items gi,items i"
 				" where gi.itemid=i.itemid"
 					" and gi.graphid=" ZBX_FS_UI64
@@ -452,8 +455,11 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
 
 			sql_offset = 0;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"select gi.gitemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,"
-						"gi.yaxisside,gi.calc_fnc,gi.type,i.flags"
+					"select gi.gitemid,i.itemid,i.key_,"
+						"gi.drawtype,gi.sortorder,"
+						"gi.color,gi.yaxisside,"
+						"gi.calc_fnc,gi.type,"
+						"gi.periods_cnt,i.flags"
 					" from graphs_items gi,items i"
 					" where gi.itemid=i.itemid"
 						" and gi.graphid=" ZBX_FS_UI64
@@ -2773,8 +2779,9 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select 0,dst.itemid,dst.key_,gi.drawtype,gi.sortorder,gi.color,gi.yaxisside,gi.calc_fnc,"
-				"gi.type,i.flags"
+			"select 0,dst.itemid,dst.key_,gi.drawtype,gi.sortorder,"
+				"gi.color,gi.yaxisside,gi.calc_fnc,"
+				"gi.type,gi.periods_cnt,i.flags"
 			" from graphs_items gi,items i,items dst"
 			" where gi.itemid=i.itemid"
 				" and i.key_=dst.key_"
@@ -2803,8 +2810,9 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select gi.gitemid,i.itemid,i.key_,gi.drawtype,gi.sortorder,gi.color,gi.yaxisside,"
-					"gi.calc_fnc,gi.type,i.flags"
+				"select gi.gitemid,i.itemid,i.key_,gi.drawtype,"
+					"gi.sortorder,gi.color,gi.yaxisside,"
+					"gi.calc_fnc,gi.type,gi.periods_cnt,i.flags"
 				" from graphs_items gi,items i"
 				" where gi.itemid=i.itemid"
 					" and gi.graphid=" ZBX_FS_UI64
@@ -2874,7 +2882,8 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 						"color='%s',"
 						"yaxisside=%d,"
 						"calc_fnc=%d,"
-						"type=%d"
+						"type=%d,"
+						"periods_cnt=%d"
 					" where gitemid=" ZBX_FS_UI64 ";\n",
 					gitems[i].drawtype,
 					gitems[i].sortorder,
@@ -2882,6 +2891,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 					gitems[i].yaxisside,
 					gitems[i].calc_fnc,
 					gitems[i].type,
+					gitems[i].periods_cnt,
 					chd_gitems[i].gitemid);
 
 			zbx_free(color_esc);
@@ -2914,12 +2924,13 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into graphs_items (gitemid,graphid,itemid,drawtype,"
-					"sortorder,color,yaxisside,calc_fnc,type)"
+					"sortorder,color,yaxisside,calc_fnc,type,periods_cnt)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64
-					",%d,%d,'%s',%d,%d,%d);\n",
+					",%d,%d,'%s',%d,%d,%d,%d);\n",
 					hst_gitemid, hst_graphid, gitems[i].itemid,
 					gitems[i].drawtype, gitems[i].sortorder, color_esc,
-					gitems[i].yaxisside, gitems[i].calc_fnc, gitems[i].type);
+					gitems[i].yaxisside, gitems[i].calc_fnc, gitems[i].type,
+					gitems[i].periods_cnt);
 			hst_gitemid++;
 
 			zbx_free(color_esc);

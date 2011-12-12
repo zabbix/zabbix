@@ -28,11 +28,6 @@
  *
  */
 class CAlert extends CZBXAPI {
-
-	protected $tableName = 'alerts';
-
-	protected $tableAlias = 'a';
-
 	/**
 	 * Get Alerts data
 	 *

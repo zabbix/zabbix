@@ -27,11 +27,6 @@
  * Class containing methods for operations with Media types
  */
 class CMediatype extends CZBXAPI {
-
-	protected $tableName = 'media_type';
-
-	protected $tableAlias = 'mt';
-
 	/**
 	 * Get Media types data
 	 *

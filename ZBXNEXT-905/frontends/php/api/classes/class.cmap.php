@@ -26,11 +26,6 @@
  * Class containing methods for operations with Maps
  */
 class CMap extends CMapElement {
-
-	protected $tableName = 'sysmaps';
-
-	protected $tableAlias = 's';
-
 /**
  * Get Map data
  *

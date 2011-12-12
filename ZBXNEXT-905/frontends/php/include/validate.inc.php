@@ -82,7 +82,7 @@ function KEY_PARAM($var = null) {
 }
 
 function validate_sec($str) {
-	return preg_match('/^[ ]*\d+[KMGTYZPEsmhdw]{0,1}[ ]*$/', $str, $arr) ? 0 : -1;
+	return preg_match('/^[ ]*\d+[KMGTsmhdw]{0,1}[ ]*$/', $str, $arr) ? 0 : -1;
 }
 
 function validate_secnum($str) {

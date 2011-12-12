@@ -91,7 +91,8 @@ require_once('include/page_header.php');
 			$gitem['itemid'],
 			$gitem['calc_fnc'],
 			$gitem['color'],
-			$gitem['type']
+			$gitem['type'],
+			$gitem['periods_cnt']
 			);
 
 //		unset($items[$id]);

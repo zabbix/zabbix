@@ -27,11 +27,6 @@
  * Class containing methods for operations with Maps Elements
  */
 abstract class CMapElement extends CZBXAPI {
-
-	protected $tableName = 'sysmaps_elements';
-
-	protected $tableAlias = 'se';
-
 /**
  * Get Map data
  *

@@ -27,11 +27,6 @@
  * Class containing methods for operations with Users
  */
 class CUser extends CZBXAPI {
-
-	protected $tableName = 'users';
-
-	protected $tableAlias = 'u';
-
 	/**
 	 * Get Users data
 	 *
