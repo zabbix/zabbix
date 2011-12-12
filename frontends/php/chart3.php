@@ -160,8 +160,7 @@ require_once('include/page_header.php');
 			isset($gitem['calc_fnc'])?$gitem['calc_fnc']:null,
 			isset($gitem['color'])?$gitem['color']:null,
 			isset($gitem['drawtype'])?$gitem['drawtype']:null,
-			isset($gitem['type'])?$gitem['type']:null,
-			isset($gitem['periods_cnt'])?$gitem['periods_cnt']:null
+			isset($gitem['type'])?$gitem['type']:null
 			);
 
 		unset($items[$gnum]);

@@ -959,6 +959,9 @@ function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 		if (!is_array($options['sortfield'])) {
 			$options['sortfield'] = array($options['sortfield']);
 		}
+		else {
+			$options['sortfield'] = array_unique($options['sortfield']);
+		}
 
 		foreach ($options['sortfield'] as $i => $sortfield) {
 			// validate sortfield
@@ -970,13 +973,13 @@ function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 			$sortorder = '';
 			if (is_array($options['sortorder'])) {
 				if (!empty($options['sortorder'][$i])) {
-					$sortorder = ($options['sortorder'][$i] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
+					$sortorder = ($options['sortorder'][$i] == ZBX_SORT_DOWN) ? ' '.ZBX_SORT_DOWN : '';
 				}
 			}
 			else {
-				$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : '';
+				$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ' '.ZBX_SORT_DOWN : '';
 			}
-			$sql_parts['order'][] = $alias.'.'.$sortfield.' '.$sortorder;
+			$sql_parts['order'][] = $alias.'.'.$sortfield.$sortorder;
 
 			// add sort field to select if distinct is used
 			if (count($sql_parts['from']) > 1) {

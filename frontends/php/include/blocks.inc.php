@@ -233,7 +233,7 @@ function make_system_status($filter) {
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
 			'select_acknowledges' => API_OUTPUT_COUNT,
-			'sortfield' => 'clock',
+			'sortfield' => 'eventid',
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
 		);
@@ -974,7 +974,7 @@ function make_latest_issues(array $filter = array()) {
 				'object' => EVENT_OBJECT_TRIGGER,
 				'value' => TRIGGER_VALUE_TRUE
 			),
-			'sortfield' => 'object',
+			'sortfield' => array('object', 'objectid', 'eventid'),
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
 		);

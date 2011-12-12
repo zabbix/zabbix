@@ -415,7 +415,7 @@ require_once('include/page_header.php');
 			$table = new CTableInfo();
 			$table->setHeader(array(S_TIMESTAMP, S_VALUE));
 
-			$options['sortfield'] = 'clock';
+			$options['sortfield'] = array('itemid', 'clock');
 			$hData = API::History()->get($options);
 			foreach($hData as $hnum => $data){
 				$item = $items[$data['itemid']];

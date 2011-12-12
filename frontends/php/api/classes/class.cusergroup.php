@@ -27,6 +27,11 @@
  * Class containing methods for operations with UserGroups.
  */
 class CUserGroup extends CZBXAPI {
+
+	protected $tableName = 'usrgrp';
+
+	protected $tableAlias = 'g';
+
 	/**
 	 * Get UserGroups
 	 *

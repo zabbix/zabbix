@@ -27,6 +27,11 @@
  * Class containing methods for operations with Proxies
  */
 class CProxy extends CZBXAPI {
+
+	protected $tableName = 'hosts';
+
+	protected $tableAlias = 'h';
+
 	/**
 	 * Get Proxy data
 	 *
