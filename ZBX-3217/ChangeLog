@@ -1,5 +1,6 @@
 Changes for 1.8.10rc1
 
+..F....... [ZBX-3217] possibility to  install Zabbix without some modules installations (SlaVa)
 A......... [ZBX-4273] fixed getting permission error while creating an action (sanja)
 ....I..... [ZBX-4377] fixed error message when checking if libcurl can be linked statically (dimir)
 ..F....... [ZBX-4391] fixed problem with suffixes support (slava)
