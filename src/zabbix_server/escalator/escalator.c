@@ -1017,7 +1017,8 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	char		*error = NULL;
 	int		source = (-1);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
+			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
 	result = DBselect("select source from events where eventid=" ZBX_FS_UI64, escalation->eventid);
 	if (NULL == (row = DBfetch(result)))
@@ -1225,20 +1226,12 @@ static void	process_escalations(int now)
 				if (ESCALATION_STATUS_ACTIVE == escalation.status &&
 						(0 == esc_superseded || 0 == escalation.esc_step))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s(escalationid:" ZBX_FS_UI64 ")"
-							" execute escalation",
-							__function_name, escalation.escalationid);
-
 					execute_escalation(&escalation);
 				}
 
 				/* execute recovery */
 				if (ESCALATION_STATUS_COMPLETED != escalation.status && 0 != escalation.r_eventid)
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s(escalationid:" ZBX_FS_UI64 ")"
-							" execute recovery escalation",
-							__function_name, escalation.escalationid);
-
 					escalation.status = ESCALATION_STATUS_RECOVERY;
 					execute_escalation(&escalation);
 				}
@@ -1247,20 +1240,11 @@ static void	process_escalations(int now)
 			/* delete completed and superseded */
 			if (ESCALATION_STATUS_COMPLETED == escalation.status || 1 == esc_superseded)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(escalationid:" ZBX_FS_UI64 ")"
-						" delete escalation",
-						__function_name, escalation.escalationid);
-
 				DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64,
 						escalation.escalationid);
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(escalationid:" ZBX_FS_UI64 ")"
-						" update escalation: status=%d esc_step=%d nextcheck=%d",
-						__function_name, escalation.escalationid,
-						escalation.status, escalation.esc_step, escalation.nextcheck);
-
 				DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
 						" where escalationid=" ZBX_FS_UI64
 							" and r_eventid is null",
