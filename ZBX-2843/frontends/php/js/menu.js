@@ -84,33 +84,28 @@ function get_real_text_width(text, id) {
 }
 
 
-function truncateText(text) {
-	var len = 30;
-	var trunc = text;
-	if (trunc.length > len) {
-		trunc = trunc.substring(0, len)+'...';
-	}
-	return trunc;
+function truncateText(text, len) {
+	return (text.length > len) ? text.substring(0, len) + '&#8230;' : text;
 }
 
 function show_popup_menu(e, content, width){
 	var cursor = get_cursor_position(e);
 	var tmp_width = 0;
 	var max_width = 0;
-	var i = 0;
-	var j = 0;
+	var menuTextLength = 35;
 
-	for (i = 0; i < content.length; i++) {
-		content[i][0] = truncateText(content[i][0]);
+	for (var i = 0; i < content.length; i++) {
+		content[i][0] = truncateText(content[i][0], menuTextLength);
 		tmp_width = get_real_text_width(content[i][0], i);
 
 		if (max_width < tmp_width) {
 			max_width = tmp_width;
 		}
 
+		// truncate sub menu text
 		if (content[i].length > 4) {
-			for (j = 4; j < content[i].length; j++) {
-				content[i][j][0] = truncateText(content[i][j][0]);
+			for (var j = 4; j < content[i].length; j++) {
+				content[i][j][0] = truncateText(content[i][j][0], menuTextLength);
 				tmp_width = get_real_text_width(content[i][j][0], i);
 
 				if (max_width < tmp_width) {
