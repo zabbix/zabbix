@@ -442,7 +442,9 @@ typedef enum
 	ESCALATION_STATUS_RECOVERY,	/* only in server code, never in DB */
 	ESCALATION_STATUS_SLEEP,
 	ESCALATION_STATUS_COMPLETED	/* only in server code, never in DB */
-} zbx_escalation_status_t;
+}
+zbx_escalation_status_t;
+const char      *zbx_escalation_status_string(unsigned char status);
 
 /* alert types */
 typedef enum
