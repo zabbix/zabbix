@@ -49,7 +49,7 @@ static void	process_time_functions()
 	const char		*__function_name = "process_time_functions";
 	char			*sql = NULL;
 	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	int			i, events_num;
+	int			i, events_num = 0;
 	DC_TRIGGER		*trigger;
 	DC_TRIGGER		*trigger_info = NULL;
 	zbx_vector_ptr_t	trigger_order;
