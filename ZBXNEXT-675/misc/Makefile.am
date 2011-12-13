@@ -5,4 +5,10 @@ EXTRA_DIST = \
 	snmptrap \
 	win32floppy/install.bat \
 	win32floppy/uninstall.bat \
-	win32floppy/README
+	win32floppy/README \
+	images/png_to_xml.sh \
+	images/README
+
+DIST_SUBDIRS = \
+	images/png_classic \
+	images/png_modern
