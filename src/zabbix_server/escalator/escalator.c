@@ -1168,7 +1168,6 @@ static void	process_escalations(int now)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ESCALATION	escalation, last_escalation;
-	unsigned char	esc_superseded;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1197,37 +1196,39 @@ static void	process_escalations(int now)
 			last_escalation.status = atoi(row[6]);
 			last_escalation.nextcheck = atoi(row[7]);
 
+			/* just delete on the next cycle */
 			if (0 != last_escalation.r_eventid)
-			{
-				/* recover this escalation */
-				escalation.r_eventid = last_escalation.r_eventid;
-				escalation.nextcheck = 0;
-
-				/* just delete on the next cycle */
 				last_escalation.status = ESCALATION_STATUS_COMPLETED;
-			}
-
-			if (last_escalation.nextcheck < now)
-				last_escalation.nextcheck = 0;
 		}
 
-		esc_superseded = (escalation.actionid == last_escalation.actionid &&
-				escalation.triggerid == last_escalation.triggerid);
-
-		if (0 != escalation.escalationid &&
-				(ESCALATION_STATUS_SLEEP != escalation.status || 0 != escalation.r_eventid) &&
-				(escalation.nextcheck < now || 1 == esc_superseded))
+		if (0 != escalation.escalationid)
 		{
+			unsigned char	esc_superseded = 0;
+
+			if (0 != last_escalation.escalationid)
+			{
+				esc_superseded = (escalation.actionid == last_escalation.actionid &&
+						escalation.triggerid == last_escalation.triggerid);
+
+				if (1 == esc_superseded)
+				{
+					if (0 != last_escalation.r_eventid)
+					{
+						/* recover this escalation */
+						escalation.r_eventid = last_escalation.r_eventid;
+						escalation.status = ESCALATION_STATUS_ACTIVE;
+						escalation.nextcheck = 0;
+					}
+					else if (0 != escalation.esc_step)
+						escalation.status = ESCALATION_STATUS_COMPLETED;
+				}
+			}
+
 			DBbegin();
 
-			if (escalation.nextcheck < now)
+			if (ESCALATION_STATUS_ACTIVE == escalation.status && escalation.nextcheck < now)
 			{
-				/* execute escalation (for active superseded as little as possible but at least once) */
-				if (ESCALATION_STATUS_ACTIVE == escalation.status &&
-						(0 == esc_superseded || 0 == escalation.esc_step))
-				{
-					execute_escalation(&escalation);
-				}
+				execute_escalation(&escalation);
 
 				/* execute recovery */
 				if (ESCALATION_STATUS_COMPLETED != escalation.status && 0 != escalation.r_eventid)
@@ -1246,8 +1247,7 @@ static void	process_escalations(int now)
 			else
 			{
 				DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
-						" where escalationid=" ZBX_FS_UI64
-							" and r_eventid is null",
+						" where escalationid=" ZBX_FS_UI64,
 						escalation.status,
 						escalation.esc_step,
 						escalation.nextcheck,
