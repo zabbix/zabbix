@@ -83,9 +83,9 @@ typedef enum
 }
 zbx_graph_item_type;
 
-#define	ZBX_DB_CONNECT_NORMAL	0
-#define	ZBX_DB_CONNECT_EXIT	1
-#define	ZBX_DB_CONNECT_ONCE	2
+#define ZBX_DB_CONNECT_NORMAL	0
+#define ZBX_DB_CONNECT_EXIT	1
+#define ZBX_DB_CONNECT_ONCE	2
 
 #define TRIGGER_DESCRIPTION_LEN		1020
 #define TRIGGER_DESCRIPTION_LEN_MAX	TRIGGER_DESCRIPTION_LEN+1
@@ -159,13 +159,14 @@ zbx_graph_item_type;
 #define FUNCTION_PARAMETER_LEN_MAX	FUNCTION_PARAMETER_LEN+1
 
 #define HISTORY_STR_VALUE_LEN		255
-#define HISTORY_STR_VALUE_LEN_MAX	HISTORY_STR_VALUE_LEN+1
+#ifdef HAVE_IBM_DB2
+#	define HISTORY_TEXT_VALUE_LEN	2048
+#	define HISTORY_LOG_VALUE_LEN	2048
+#else
+#	define HISTORY_TEXT_VALUE_LEN	65535
+#	define HISTORY_LOG_VALUE_LEN	65535
+#endif
 
-#define	HISTORY_TEXT_VALUE_LEN		65535
-#define	HISTORY_TEXT_VALUE_LEN_MAX	HISTORY_TEXT_VALUE_LEN+1
-
-#define	HISTORY_LOG_VALUE_LEN		65535
-#define	HISTORY_LOG_VALUE_LEN_MAX	HISTORY_LOG_VALUE_LEN+1
 #define HISTORY_LOG_SOURCE_LEN		64
 #define HISTORY_LOG_SOURCE_LEN_MAX	HISTORY_LOG_SOURCE_LEN+1
 
@@ -353,17 +354,6 @@ typedef struct
 	char			*h_lastseverity;
 }
 DB_ITEM;
-
-typedef struct
-{
-	zbx_uint64_t	mediaid;
-	zbx_uint64_t	mediatypeid;
-	char		*sendto;
-	char		*period;
-	int		active;
-	int		severity;
-}
-DB_MEDIA;
 
 typedef struct
 {
