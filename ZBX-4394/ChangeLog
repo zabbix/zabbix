@@ -1,5 +1,6 @@
 Changes for 1.8.10rc1
 
+...G...PS. [ZBX-4394] fixed handling of log rotation failure (Andris)
 A......... [ZBX-4273] fixed getting permission error while creating an action (sanja)
 ....I..... [ZBX-4377] fixed error message when checking if libcurl can be linked statically (dimir)
 ..F....... [ZBX-4391] fixed problem with suffixes support (slava)
