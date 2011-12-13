@@ -147,7 +147,7 @@ function make_small_eventlist($startEvent) {
 		'eventid_till' => $startEvent['eventid'],
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
-		'sortfield' => 'clock',
+		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20
 	);
@@ -224,7 +224,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		),
 		'nopermissions' => 1,
 		'select_acknowledges' => API_OUTPUT_COUNT,
-		'sortfield' => 'clock',
+		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => ZBX_WIDGET_ROWS
 	);
@@ -327,7 +327,7 @@ function getLastEvents($options) {
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value_changed' => TRIGGER_VALUE_CHANGED_YES
 		),
-		'sortfield' => 'clock',
+		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $options['limit']
 	);

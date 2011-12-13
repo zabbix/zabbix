@@ -170,9 +170,12 @@ abstract class CItemGeneral extends CZBXAPI{
 				if (!isset($item['key_'])) {
 					$item['key_'] = $fullItem['key_'];
 				}
-
 				if (!isset($item['hostid'])) {
 					$item['hostid'] = $fullItem['hostid'];
+				}
+
+				if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
+					$item['error'] = '';
 				}
 			}
 			else {
