@@ -30,5 +30,7 @@ ALTER TABLE escalations ALTER COLUMN r_eventid DROP NOT NULL
 /
 REORG TABLE escalations
 /
+DROP INDEX escalations_2
+/
 DELETE FROM escalations
 /

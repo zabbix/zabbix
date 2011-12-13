@@ -1,9 +1,11 @@
-ALTER TABLE ONLY escalations ALTER escalationid DROP DEFAULT,
-		ALTER actionid DROP DEFAULT,
-		ALTER triggerid DROP DEFAULT,
-		ALTER triggerid DROP NOT NULL,
-		ALTER eventid DROP DEFAULT,
-		ALTER eventid DROP NOT NULL,
-		ALTER r_eventid DROP DEFAULT,
-		ALTER r_eventid DROP NOT NULL;
+ALTER TABLE ONLY escalations
+	ALTER escalationid DROP DEFAULT,
+	ALTER actionid DROP DEFAULT,
+	ALTER triggerid DROP DEFAULT,
+	ALTER triggerid DROP NOT NULL,
+	ALTER eventid DROP DEFAULT,
+	ALTER eventid DROP NOT NULL,
+	ALTER r_eventid DROP DEFAULT,
+	ALTER r_eventid DROP NOT NULL;
+DROP INDEX escalations_2;
 DELETE FROM escalations;
