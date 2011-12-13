@@ -1789,7 +1789,7 @@ elseif ($srctbl == 'dchecks') {
 	$table->setHeader(_('Name'));
 
 	$result = DBselect(
-		'SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.ports.'.
+		'SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.ports'.
 		' FROM drules r,dchecks c'.
 		' WHERE r.druleid=c.druleid AND '.DBin_node('r.druleid', $nodeid)
 	);
