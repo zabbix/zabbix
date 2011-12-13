@@ -2135,10 +2135,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	/**graphids = NULL, graphid, */hosttemplateid = 0;
-/*	int		graphids_alloc = 0, graphids_num = 0;*/
-/*	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset;*/
+	zbx_uint64_t	hosttemplateid = 0;
 
 	result = DBselect("select hosttemplateid from hosts_templates"
 			" where hostid=" ZBX_FS_UI64
@@ -2152,53 +2149,10 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	if (0 == hosttemplateid)
 		return SUCCEED;
 
-	/* select graphs with host items */
-/*	result = DBselect(
-			"select distinct gi.graphid"
-			" from graphs_items gi,items i"
-			" where gi.itemid=i.itemid"
-				" and i.hostid=" ZBX_FS_UI64,
-			hostid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(graphid, row[0]);
-		uint64_array_add(&graphids, &graphids_alloc, &graphids_num,
-				graphid, 4);
-	}
-	DBfree_result(result);*/
-
 	DBdelete_template_graphs(hostid, templateid);
 	DBdelete_template_triggers(hostid, templateid);
 	DBdelete_template_items(hostid, templateid);
 	DBdelete_template_applications(hostid, templateid);
-
-	/* delete empty graphs */
-/*	if (graphids_num != 0)
-	{
-		sql = zbx_malloc(sql, sql_alloc);
-
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct graphid"
-				" from graphs_items"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", graphids, graphids_num);
-
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(graphid, row[0]);
-			uint64_array_remove(graphids, &graphids_num, &graphid, 1);
-		}
-		DBfree_result(result);
-
-		DBdelete_graphs(&graphids, &graphids_alloc, &graphids_num);
-
-		zbx_free(sql);
-		zbx_free(graphids);
-	}*/
 
 	DBexecute("delete from hosts_templates"
 			" where hosttemplateid=" ZBX_FS_UI64,
