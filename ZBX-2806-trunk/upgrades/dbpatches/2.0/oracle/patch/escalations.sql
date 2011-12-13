@@ -6,4 +6,5 @@ ALTER TABLE escalations MODIFY eventid DEFAULT NULL;
 ALTER TABLE escalations MODIFY eventid NULL;
 ALTER TABLE escalations MODIFY r_eventid DEFAULT NULL;
 ALTER TABLE escalations MODIFY r_eventid NULL;
+DROP INDEX escalations_2;
 DELETE FROM escalations;
