@@ -125,6 +125,7 @@ DELIMITER $
 CREATE FUNCTION zbx_convert_simple_checks(v_itemid bigint unsigned, v_hostid bigint unsigned, v_key varchar(255))
 RETURNS varchar(255)
 LANGUAGE SQL
+DETERMINISTIC
 BEGIN
 	DECLARE new_key varchar(255);
 	DECLARE pos integer;
