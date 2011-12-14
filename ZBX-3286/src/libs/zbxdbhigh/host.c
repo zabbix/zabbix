@@ -1335,7 +1335,7 @@ static void	DBdelete_graphs_by_itemids(zbx_vector_uint64_t *itemids)
 	DBfree_result(result);
 
 	if (0 == graphids.values_num)
-		goto out;
+		goto clean;
 
 	zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -1359,7 +1359,7 @@ static void	DBdelete_graphs_by_itemids(zbx_vector_uint64_t *itemids)
 	DBfree_result(result);
 
 	DBdelete_graphs(&graphids);
-
+clean:
 	zbx_vector_uint64_destroy(&graphids);
 	zbx_free(sql);
 out:
