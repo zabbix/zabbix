@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+
 ?>
 <?php
 	function zbx_is_callable($var){
@@ -172,7 +173,7 @@ JS;
 				SPACE
 			));
 
-			$ignore=array('PHP BC math','PHP timezone');
+
 			$reqs = check_php_requirements();
 			foreach($reqs as $req){
 				$result = null;
@@ -186,10 +187,6 @@ JS;
 				else if($req['result'] == 0){
 					$result = new CSpan(S_FAIL, 'link_menu fail');
 					$result->setHint($req['error']);
-				}
-				if(in_array($req['name'],$ignore) && $req['result']==0){
-					$req['result']=1;
-					$ignored=1;
 				}
 
 				$table->addRow(array(
@@ -218,10 +215,6 @@ JS;
 					new CButton('retry', S_RETRY)
 					);
 			}
-			elseif(isset($ignored)){
-							$this->DISABLE_NEXT_BUTTON = false;
-							$final_result = new CSpan(S_INSTALL_WITH_PROBLEM,'orange');
-						}
 			else{
 				$this->DISABLE_NEXT_BUTTON = false;
 				$final_result = new CSpan(S_OK,'ok');
