@@ -798,8 +798,10 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 // init precision
 	ini_set('precision', 14);
 
-// BC Math scale
-	bcscale(7);
+	// BC Math scale
+	if (function_exists('bcscale')) {
+		bcscale(7);
+	}
 
 	// numeric locale to default
 	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
