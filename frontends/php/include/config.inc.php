@@ -22,7 +22,7 @@
 require_once('include/debug.inc.php');
 
 function __autoload($class_name) {
-	$class_name_lower = zbx_strtolower($class_name);
+	$class_name = zbx_strtolower($class_name);
 	$api = array(
 		'apiexception' => 1,
 		'caction' => 1,
@@ -77,18 +77,14 @@ function __autoload($class_name) {
 		'csoapjr' => null
 	);
 
-	if (isset($api[$class_name_lower])) {
-		require_once('api/classes/class.'.$class_name_lower.'.php');
+	if (isset($api[$class_name])) {
+		require_once('api/classes/class.'.$class_name.'.php');
 	}
-	elseif (isset($rpc[$class_name_lower])) {
-		require_once('api/rpc/class.'.$class_name_lower.'.php');
+	elseif (isset($rpc[$class_name])) {
+		require_once('api/rpc/class.'.$class_name.'.php');
 	}
-	elseif (file_exists('include/classes/class.'.$class_name_lower.'.php')) {
-		require_once('include/classes/class.'.$class_name_lower.'.php');
-	}
-	// a temporary fix to support new classes folder structure
 	else {
-		require_once('include/classes/sysmaps/'.$class_name.'.php');
+		require_once('include/classes/class.'.$class_name.'.php');
 	}
 }
 ?>

@@ -440,9 +440,6 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/sysmaps/.htaccess -text
-frontends/php/include/classes/sysmaps/CCanvas.php -text
-frontends/php/include/classes/sysmaps/CMapPainter.php -text
 frontends/php/include/views/configuration.application.edit.php -text
 frontends/php/include/views/configuration.application.list.php -text
 frontends/php/include/views/configuration.services.child.list.php -text
