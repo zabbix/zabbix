@@ -1788,12 +1788,14 @@ elseif ($srctbl == 'dchecks') {
 	$table = new CTableInfo(_('No discovery checks defined.'));
 	$table->setHeader(_('Name'));
 
-	$result = DBselect(
-		'SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.ports'.
-		' FROM drules r,dchecks c'.
-		' WHERE r.druleid=c.druleid AND '.DBin_node('r.druleid', $nodeid)
+	$options = array(
+		'selectDChecks'=>array('dcheckid','type','key_','ports'),
+		'output' => API_OUTPUT_EXTEND
 	);
-	while ($row = DBfetch($result)) {
+
+	$result=API::DRule()->get($options);
+	foreach($result as $row) {
+		$row=array_merge($row,array_shift($row['dchecks']));
 		$row['name'] = $row['name'].':'.discovery_check2str($row['type'], $row['key_'], $row['ports']);
 
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
