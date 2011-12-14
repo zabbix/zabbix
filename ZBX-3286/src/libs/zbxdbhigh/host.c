@@ -1334,6 +1334,9 @@ static void	DBdelete_graphs_by_itemids(zbx_vector_uint64_t *itemids)
 	}
 	DBfree_result(result);
 
+	if (0 == graphids.values_num)
+		goto out;
+
 	zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	/* select graphs with other items */
