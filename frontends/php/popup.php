@@ -1793,11 +1793,10 @@ elseif ($srctbl == 'dchecks') {
 		'output' => API_OUTPUT_EXTEND
 	));
 	foreach ($result as $dRule) {
-		$dCheck = reset($dRule['dchecks'][0]);
+		$dCheck = reset($dRule['dchecks']);
 		$dRule['name'] = $dRule['name'].':'.discovery_check2str($dCheck['type'], $dCheck['key_'], $dCheck['ports']);
 
-		$action = get_window_opener($dstfrm, $dstfld1, $dCheck[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $dCheck[$srcfld2]) : '');
-
+		$action = get_window_opener($dstfrm, $dstfld1, $dCheck[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $dRule[$srcfld2]) : '');
 		$name = new CSpan($dRule['name'], 'link');
 		$name->setAttribute('onclick', $action." close_window(); return false;");
 		$table->addRow($name);
