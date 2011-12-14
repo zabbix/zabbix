@@ -1696,6 +1696,11 @@ function drawMapSelementsMarks(&$im, &$map, &$map_info) {
 			continue;
 		}
 
+		// skip host group element containers
+		if ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
+			continue;
+		}
+
 		$img = get_png_by_selement($selement, $el_info);
 
 		$iconX = imagesx($img);
