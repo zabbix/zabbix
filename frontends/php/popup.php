@@ -1788,19 +1788,17 @@ elseif ($srctbl == 'dchecks') {
 	$table = new CTableInfo(_('No discovery checks defined.'));
 	$table->setHeader(_('Name'));
 
-	$options = array(
-		'selectDChecks'=>array('dcheckid','type','key_','ports'),
+	$result = API::DRule()->get(array(
+		'selectDChecks' => array('dcheckid','type','key_','ports'),
 		'output' => API_OUTPUT_EXTEND
-	);
+	));
+	foreach ($result as $dRule) {
+		$dCheck = reset($dRule['dchecks'][0]);
+		$dRule['name'] = $dRule['name'].':'.discovery_check2str($dCheck['type'], $dCheck['key_'], $dCheck['ports']);
 
-	$result=API::DRule()->get($options);
-	foreach($result as $row) {
-		$row=array_merge($row,array_shift($row['dchecks']));
-		$row['name'] = $row['name'].':'.discovery_check2str($row['type'], $row['key_'], $row['ports']);
+		$action = get_window_opener($dstfrm, $dstfld1, $dCheck[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $dCheck[$srcfld2]) : '');
 
-		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-
-		$name = new CSpan($row['name'], 'link');
+		$name = new CSpan($dRule['name'], 'link');
 		$name->setAttribute('onclick', $action." close_window(); return false;");
 		$table->addRow($name);
 	}
