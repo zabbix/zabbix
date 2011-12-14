@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-15 00:20+0200\n"
-"PO-Revision-Date: 2011-11-20 23:43+0200\n"
+"POT-Creation-Date: 2011-12-15 00:30+0200\n"
+"PO-Revision-Date: 2011-12-03 16:45+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -4778,7 +4778,7 @@ msgstr "Некоректний тип команди в операції дії.
 
 #: api/classes/class.caction.php:1823
 msgid "Incorrect action operation condition acknowledge type."
-msgstr "Некоректний тип підтвердження для умови операції дії."
+msgstr "Некоректний тип підтвердження для умови в операції дії."
 
 #: api/classes/class.caction.php:1828
 msgid "Incorrect action operation condition type."
@@ -5440,7 +5440,7 @@ msgstr "Список елементів"
 
 #: include/locales/en_gb.inc.php:349
 msgid "Items required for graph"
-msgstr "Для графіка необхідні елементи"
+msgstr "Для графіка необхідні елементи даних"
 
 #: include/locales/en_gb.inc.php:295
 msgid "Items updated"
