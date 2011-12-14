@@ -1164,12 +1164,22 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 
 static void	process_escalations(int now)
 {
-	const char	*__function_name = "process_escalations";
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_ESCALATION	escalation, last_escalation;
+	const char		*__function_name = "process_escalations";
+	DB_RESULT		result;
+	DB_ROW			row;
+	DB_ESCALATION		escalation, last_escalation;
+	zbx_vector_uint64_t	escalationids;
+	char			*sql = NULL;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&escalationids);
+	sql = zbx_malloc(sql, sql_alloc);
+
+	DBbegin();
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status,nextcheck"
@@ -1190,7 +1200,7 @@ static void	process_escalations(int now)
 			ZBX_STR2UINT64(last_escalation.escalationid, row[0]);
 			ZBX_STR2UINT64(last_escalation.actionid, row[1]);
 			ZBX_DBROW2UINT64(last_escalation.triggerid, row[2]);
-			ZBX_STR2UINT64(last_escalation.eventid, row[3]);
+			ZBX_DBROW2UINT64(last_escalation.eventid, row[3]);
 			ZBX_DBROW2UINT64(last_escalation.r_eventid, row[4]);
 			last_escalation.esc_step = atoi(row[5]);
 			last_escalation.status = atoi(row[6]);
@@ -1205,6 +1215,13 @@ static void	process_escalations(int now)
 		{
 			unsigned char	esc_superseded = 0;
 
+			if (ESCALATION_STATUS_COMPLETED == escalation.status)
+			{
+				/* delete a recovery record and skip all processing */
+				zbx_vector_uint64_append(&escalationids, escalation.escalationid);
+				goto next;
+			}
+
 			if (0 != last_escalation.escalationid)
 			{
 				esc_superseded = (escalation.actionid == last_escalation.actionid &&
@@ -1217,52 +1234,76 @@ static void	process_escalations(int now)
 						/* recover this escalation */
 						escalation.r_eventid = last_escalation.r_eventid;
 						escalation.status = ESCALATION_STATUS_ACTIVE;
-						escalation.nextcheck = 0;
 					}
-					else if (0 != escalation.esc_step)
-						escalation.status = ESCALATION_STATUS_COMPLETED;
+					else if (escalation.nextcheck > now ||
+							ESCALATION_STATUS_SLEEP == escalation.status)
+					{
+						zbx_vector_uint64_append(&escalationids, escalation.escalationid);
+						goto next;
+					}
 				}
 			}
 
-			DBbegin();
+			if (ESCALATION_STATUS_ACTIVE != escalation.status ||
+					(escalation.nextcheck > now && 0 == escalation.r_eventid))
+				goto next;
 
-			if (ESCALATION_STATUS_ACTIVE == escalation.status && escalation.nextcheck < now)
-			{
+			if (escalation.nextcheck <= now)
 				execute_escalation(&escalation);
 
-				/* execute recovery */
-				if (ESCALATION_STATUS_COMPLETED != escalation.status && 0 != escalation.r_eventid)
-				{
-					escalation.status = ESCALATION_STATUS_RECOVERY;
-					execute_escalation(&escalation);
-				}
-			}
-
-			/* delete completed and superseded */
-			if (ESCALATION_STATUS_COMPLETED == escalation.status || 1 == esc_superseded)
+			/* execute recovery */
+			if (ESCALATION_STATUS_COMPLETED != escalation.status && 0 != escalation.r_eventid)
 			{
-				DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64,
-						escalation.escalationid);
+				escalation.status = ESCALATION_STATUS_RECOVERY;
+				execute_escalation(&escalation);
+			}
+			else if (1 == esc_superseded)
+				escalation.status = ESCALATION_STATUS_COMPLETED;
+
+			if (ESCALATION_STATUS_COMPLETED != escalation.status)
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"update escalations set status=%d", escalation.status);
+				if (ESCALATION_STATUS_ACTIVE == escalation.status)
+				{
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",esc_step=%d,nextcheck=%d",
+							escalation.esc_step, escalation.nextcheck);
+				}
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						" where escalationid=" ZBX_FS_UI64 ";\n", escalation.escalationid);
+
+				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 			else
-			{
-				DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
-						" where escalationid=" ZBX_FS_UI64,
-						escalation.status,
-						escalation.esc_step,
-						escalation.nextcheck,
-						escalation.escalationid);
-			}
+				zbx_vector_uint64_append(&escalationids, escalation.escalationid);
 
-			DBcommit();
 		}
-
+next:
 		if (NULL != row)
 			memcpy(&escalation, &last_escalation, sizeof(escalation));
 	}
 	while (NULL != row);
 
 	DBfree_result(result);
+
+	/* delete completed */
+	if (0 != escalationids.values_num)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from escalations where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "escalationid",
+				escalationids.values, escalationids.values_num);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	DBcommit();
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&escalationids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
