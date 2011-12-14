@@ -1696,11 +1696,6 @@ function drawMapSelementsMarks(&$im, &$map, &$map_info) {
 			continue;
 		}
 
-		// skip host group element containers
-		if ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
-			continue;
-		}
-
 		$img = get_png_by_selement($selement, $el_info);
 
 		$iconX = imagesx($img);
@@ -1769,7 +1764,7 @@ function drawMapSelementsMarks(&$im, &$map, &$map_info) {
 					$marks = 'tlr';
 			}
 		}
-//var_dump($selement);
+
 		imageVerticalMarks($im, $selement['x'] + ($iconX / 2), $selement['y'] + ($iconY / 2), $markSize, $colors['Red'], $marks);
 		//*/
 	}
