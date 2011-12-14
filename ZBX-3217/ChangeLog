@@ -1,12 +1,15 @@
 Changes for 1.8.10rc1
 
-..F....... [ZBX-3217] possibility to  install Zabbix without some modules installations (SlaVa)
+..F....... [ZBX-3217] possibility to start Zabbix instalation without bcmath installation (SlaVa)
+.......PS. [ZBX-4424] fixed handling of a long localized content by history syncer (Sasha)
+.......PS. [ZBX-4424] fixed handling of a localized content with incorrect utf8 characters (Sasha)
+..F....... [ZBX-2737] fixed various messages at linking templates (sanja)
 A......... [ZBX-4273] fixed getting permission error while creating an action (sanja)
 ....I..... [ZBX-4377] fixed error message when checking if libcurl can be linked statically (dimir)
-..F....... [ZBX-4391] fixed problem with suffixes support (slava)
+..F....... [ZBX-4391] fixed suffix support in trigger testing interface (slava)
 .......PS. [ZBX-4376] fixed escaping of strings with PostgreSQL 9.1 or later (Sasha)
 ..F....... [ZBX-2419] fixed calculation of SLA if uptime/downtime is specified (Sasha)
-..F....... [ZBX-3074] status rollback to right side (slava)
+..F....... [ZBX-3074] moved the 'Status' column in the item list to the right (slava)
 A......... [ZBX-3104] implemented the screen item API (pavels)
 A.F....... [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
 ........S. [ZBX-4298] added deleted data report to a housekeeper on every step (dimir)

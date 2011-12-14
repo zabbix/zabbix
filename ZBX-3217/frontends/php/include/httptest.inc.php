@@ -397,7 +397,7 @@ require_once('include/items.inc.php');
 	function add_httptest($hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps){
 		$result = db_save_httptest(null, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps);
 
-		if($result) info(S_SCENARIO.SPACE."'".$name."'".SPACE.S_ADDED_SMALL);
+		if($result) info(S_SCENARIO.SPACE.'"'.$name.'"'.SPACE.S_ADDED_SMALL);
 
 	return $result;
 	}
@@ -405,7 +405,7 @@ require_once('include/items.inc.php');
 	function update_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps){
 		$result = db_save_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps);
 
-		if($result)	info(S_SCENARIO.SPACE."'".$name."'".SPACE.S_UPDATED_SMALL);
+		if($result)	info(S_SCENARIO.SPACE.'"'.$name.'"'.SPACE.S_UPDATED_SMALL);
 
 	return $result;
 	}

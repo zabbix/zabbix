@@ -121,7 +121,7 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"22 November 2011"
+#define	ZABBIX_REVDATE		"14 December 2011"
 #define	ZABBIX_VERSION		"1.8.10rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
@@ -894,7 +894,8 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
-int	zbx_strlen_utf8(const char *text);
+size_t	zbx_strlen_utf8(const char *text);
+size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
 
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 char	*zbx_replace_utf8(const char *text);
