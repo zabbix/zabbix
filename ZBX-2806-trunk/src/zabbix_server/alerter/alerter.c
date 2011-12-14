@@ -153,7 +153,7 @@ void	main_alerter_loop()
 					" and a.status=%d"
 					" and a.alerttype=%d"
 					DB_NODE
-				" order by a.clock",
+				" order by a.alertid",
 				ALERT_STATUS_NOT_SENT,
 				ALERT_TYPE_MESSAGE,
 				DBnode_local("mt.mediatypeid"));
