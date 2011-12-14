@@ -2322,7 +2322,6 @@
 	'S_REQUIRES_IMAGES_GENERATION_SUPPORT' => 'Requires images generation support',
 	'S_LIBXML_MODULE' => 'libxml module',
 	'S_PHPXML_MODULE_IS_NOT_INSTALLED' => 'php-xml module is not installed',
-	'S_INSTALL_WITH_PROBLEM'=>'Zabbix can work with limited functionality',
 	'S_CTYPE_MODULE' => 'ctype module',
 	'S_REQUIRES_CTYPE_MODULE' => 'Requires ctype module',
 	'S_PHP_UPLOAD_MAX_FILESIZE' => 'PHP upload max filesize',

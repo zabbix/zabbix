@@ -799,7 +799,6 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	ini_set('precision', 14);
 
 // BC Math scale
-
 if (function_exists('bcscale')) {
 	bcscale(7);
 }

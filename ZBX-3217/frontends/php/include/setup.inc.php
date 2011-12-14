@@ -17,7 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
 ?>
 <?php
 	function zbx_is_callable($var){
@@ -173,9 +172,9 @@ JS;
 				SPACE
 			));
 
-
 			$reqs = check_php_requirements();
 			foreach($reqs as $req){
+
 				$result = null;
 				if(!is_null($req['recommended']) && ($req['result'] == 1)){
 					$result = new CSpan(S_OK, 'orange');
