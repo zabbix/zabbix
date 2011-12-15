@@ -79,6 +79,12 @@ ALTER TABLE items DROP COLUMN snmp_port;
 
 CREATE INDEX items_5 on items (valuemapid);
 
+-- convert 'status' key to a new format zabbix[host,agent,available]
+UPDATE items
+	SET key_='zabbix[host,agent,available]',
+		type=5				-- INTERNAL
+	WHERE key_='status';
+
 -- host interface for non IPMI, SNMP and non templated items
 UPDATE items
 	SET interfaceid=(SELECT interfaceid FROM interface WHERE hostid=items.hostid AND main=1 AND type=1)
