@@ -1,4 +1,4 @@
----- Patching table `interfaces`
+-- Patching table `interfaces`
 
 CREATE TABLE interface (
 	interfaceid              bigint unsigned                           NOT NULL,
@@ -44,7 +44,7 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 	FROM hosts
 	WHERE status IN (0,1) AND useipmi=1);
 
----- Patching table `items`
+-- Patching table `items`
 
 ALTER TABLE items
 	CHANGE COLUMN description name VARCHAR(255) NOT NULL DEFAULT '',
@@ -125,6 +125,7 @@ DELIMITER $
 CREATE FUNCTION zbx_convert_simple_checks(v_itemid bigint unsigned, v_hostid bigint unsigned, v_key varchar(255))
 RETURNS varchar(255)
 LANGUAGE SQL
+DETERMINISTIC
 BEGIN
 	DECLARE new_key varchar(255);
 	DECLARE pos integer;
@@ -171,7 +172,7 @@ UPDATE items SET key_ = zbx_convert_simple_checks(itemid, hostid, key_)
 
 DROP FUNCTION zbx_convert_simple_checks;
 
----- Patching table `hosts`
+-- Patching table `hosts`
 
 ALTER TABLE hosts MODIFY hostid bigint unsigned NOT NULL,
 		  MODIFY proxy_hostid bigint unsigned NULL,

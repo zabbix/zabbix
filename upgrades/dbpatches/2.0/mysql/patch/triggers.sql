@@ -1,6 +1,6 @@
-----
----- Patching table `events`
-----
+--
+-- Patching table `events`
+--
 
 DROP INDEX events_2 ON events;
 CREATE INDEX events_2 ON events (clock);
@@ -89,9 +89,9 @@ DROP TABLE tmp_events_eventid;
 
 -- End event redesign patch
 
-----
----- Patching table `triggers`
-----
+--
+-- Patching table `triggers`
+--
 
 ALTER TABLE triggers
 	MODIFY triggerid bigint unsigned NOT NULL,
