@@ -445,7 +445,7 @@ class CChart extends CGraphDraw{
 		$cnt = 0;
 
 		foreach($this->items as $inum => $item){
-			$sql = 'SELECT DISTINCT h.host, tr.description, tr.triggerid, tr.expression, tr.priority, tr.value, i.units'.
+			$sql = 'SELECT DISTINCT h.host,tr.description,tr.triggerid,tr.expression,tr.priority,tr.value,i.units'.
 					' FROM triggers tr,functions f,items i, hosts h '.
 					' WHERE tr.triggerid=f.triggerid '.
 						" AND f.function IN ('last','min','avg','max') ".
@@ -465,8 +465,8 @@ class CChart extends CGraphDraw{
 				if(!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G|T|P|Z|E|Y]{0,1})/i', $trigger['expression'], $arr)) continue;
 
 				$val = $arr[3];
-				$is1024Base=array('B','Bps');
-				$multiplier = ((in_array($trigger['units'], $is1024Base)) ? 1024 : 1000);
+				$is1024Base = array('B', 'Bps');
+				$multiplier = ( (in_array($trigger['units'], $is1024Base) ) ? 1024 : 1000);
 				if (strcasecmp($arr[4], 'K') == 0) {
 					$val *= $multiplier;
 				}
