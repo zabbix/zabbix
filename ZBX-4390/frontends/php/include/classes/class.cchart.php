@@ -466,7 +466,7 @@ class CChart extends CGraphDraw{
 
 				$val = $arr[3];
 				$is1024Base = array('B', 'Bps');
-				$multiplier = ( (in_array($trigger['units'], $is1024Base) ) ? 1024 : 1000);
+				$multiplier = in_array($trigger['units'], $is1024Base) ? 1024 : 1000;
 				if (strcasecmp($arr[4], 'K') == 0) {
 					$val *= $multiplier;
 				}
