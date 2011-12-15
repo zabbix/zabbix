@@ -116,6 +116,10 @@ ul.itservices { margin: 0 0 0 5px; }
 ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; }
 ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; }
+ul.formlist li.top-aligned {
+	margin: -1px 0 0 0;
+	padding-top: 0;
+}
 
 /* any object list inline */
 ul.objectlist { padding: 0; list-style: none; margin: 0;}
@@ -149,6 +153,9 @@ form .thin .input { height: 14px; }
 .input[disabled] { color: #ACA899; cursor: default; }
 .input[disabled]:focus { text-decoration: none; border-color: #ACA899; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
+
+input.formlist { padding-top: 2px; padding-bottom: 2px; }
+input[type="button"] { cursor: pointer; }
 
 div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #FFAA33; }
 div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #DD7711; }
@@ -187,7 +194,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .draggable { cursor: move; }
 
 /********** <object list> ************/
-.objectgroup { padding: 4px; margin: 5px 0 5px 0; }
+.objectgroup { padding: 4px;}
 .border_dotted { border: 1px dotted #6C80B9; }
 .border_none { border: 0; }
 .footer { padding-left: 1.6em; }
@@ -584,8 +591,8 @@ table.filter_config { width: 100%; background-color: #FFFFFF; border-collapse: c
 table.filter_config tr td { white-space: nowrap; line-height: 20px; height: 26px; vertical-align: bottom; text-align: center; border: 1px dotted silver; padding-left: 6px; padding-right: 4px; }
 
 /********** <INVISIBLE> ************/
-.invisible { border: 0; margin: 0; padding: 0; }
-.invisible tr td { border: 0; margin: 0; padding: 0; }
+table.invisible { border: 0px; margin: 0px; padding: 0px; }
+table.invisible tr > td { border: 0px; margin: 0px; padding: 0px; }
 
 /********** <PAGING> ************/
 table.paging { width: 100%; padding: 2px; }

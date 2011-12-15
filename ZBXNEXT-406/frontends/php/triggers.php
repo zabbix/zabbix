@@ -97,7 +97,7 @@ require_once('include/page_header.php');
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
-	$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.triggers.showdisabled', 0));
+	$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 	check_fields($fields);
 	validate_sort_and_sortorder('description',ZBX_SORT_UP);
@@ -131,7 +131,7 @@ require_once('include/page_header.php');
 	}
 
 
-	$showdisabled = get_request('showdisabled', 0);
+	$showdisabled = get_request('showdisabled', 1);
 	CProfile::update('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
 
 // EXPRESSION ACTIONS
@@ -178,7 +178,7 @@ require_once('include/page_header.php');
 		else{
 			$result = API::Trigger()->create($trigger);
 
-			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+			show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 		}
 		if($result)
 			unset($_REQUEST['form']);
@@ -481,13 +481,13 @@ require_once('include/page_header.php');
 		$form->addVar('hostid', $_REQUEST['hostid']);
 
 		$table->setHeader(array(
-			new CCheckBox('all_triggers',NULL,"checkAll('".$form->getName()."','all_triggers','g_triggerid');"),
-			make_sorting_header(S_SEVERITY,'priority'),
-			make_sorting_header(S_STATUS,'status'),
-			($_REQUEST['hostid'] > 0)?NULL:S_HOST,
-			make_sorting_header(S_NAME,'description'),
-			S_EXPRESSION,
-			S_ERROR
+			new CCheckBox('all_triggers', NULL, "checkAll('".$form->getName()."','all_triggers','g_triggerid');"),
+			make_sorting_header(_('Severity'), 'priority'),
+			($_REQUEST['hostid'] > 0) ? NULL : _('Host'),
+			make_sorting_header(_('Name'), 'description'),
+			_('Expression'),
+			make_sorting_header(_('Status'), 'status'),
+			_('Error')
 		));
 // get Triggers
 		$triggers = array();
@@ -568,7 +568,7 @@ require_once('include/page_header.php');
 //add dependencies {
 			$deps = $trigger['dependencies'];
 			if(count($deps) > 0){
-				$description[] = array(BR(), bold(S_DEPENDS_ON.' : '));
+				$description[] = array(BR(), bold(_('Depends on').' : '));
 				foreach($deps as $dnum => $dep_trigger) {
 					$description[] = BR();
 
@@ -619,16 +619,17 @@ require_once('include/page_header.php');
 				}
 			}
 
+
 			$cb = new CCheckBox('g_triggerid['.$triggerid.']', NULL, NULL, $triggerid);
 			$cb->setEnabled(empty($trigger['discoveryRule']));
 
 			$table->addRow(array(
 				$cb,
 				getSeverityCell($trigger['priority']),
-				$status,
 				$hosts,
 				$description,
 				triggerExpression($trigger,1),
+				$status,
 				$error
 			));
 

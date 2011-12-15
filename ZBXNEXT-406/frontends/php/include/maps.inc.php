@@ -193,7 +193,7 @@ function getActionMapBySysmap($sysmap) {
 
 		if (!empty($db_element['urls'])) {
 			order_result($db_element['urls'], 'name');
-			$menus .= "['".S_URLS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+			$menus .= "['"._('URLs')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			foreach ($db_element['urls'] as $url) {
 				$menus .= "[".zbx_jsvalue($url['name']).",".zbx_jsvalue($url['url']).", 'nosid'],";
 			}
@@ -962,7 +962,7 @@ function getSelementsInfo($sysmap) {
 		$iconMap = API::IconMap()->get(array(
 			'sysmapids' => $sysmap['sysmapid'],
 			'selectMappings' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
 		));
 		$iconMap = reset($iconMap);
 		$hostsToGetProfiles = array();

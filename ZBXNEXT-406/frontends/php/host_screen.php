@@ -158,7 +158,7 @@
 	if(empty($screens)){
 		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
 		$screens_wdgt->addItem(BR());
-		$screens_wdgt->addItem(new CTableInfo(S_NO_SCREENS_DEFINED));
+		$screens_wdgt->addItem(new CTableInfo(_('No screens defined.')));
 		$screens_wdgt->show();
 	}
 	else{

@@ -43,7 +43,7 @@ function add_regexp($regexp=array()){
 
 	$sql = 'SELECT regexpid FROM regexps WHERE name='.zbx_dbstr($regexp['name']);
 	if(DBfetch(DBselect($sql))){
-		info(S_REGULAR_EXPRESSION.' ['.$regexp['name'].'] '.S_ALREADY_EXISTS_SMALL);
+		info(_s('Regular expression "%s" already exists.', $regexp['name']));
 		return false;
 	}
 
@@ -72,7 +72,7 @@ function update_regexp($regexpid, $regexp=array()){
 	$sql = 'SELECT regexpid FROM regexps WHERE name='.zbx_dbstr($regexp['name']);
 	if($db_regexp = DBfetch(DBselect($sql))){
 		if(bccomp($regexpid,$db_regexp['regexpid']) != 0){
-			info(S_REGULAR_EXPRESSION.' ['.$regexp['name'].'] '.S_ALREADY_EXISTS_SMALL);
+			info(_s('Regular expression "%s" already exists.', $regexp['name']));
 			return false;
 		}
 	}

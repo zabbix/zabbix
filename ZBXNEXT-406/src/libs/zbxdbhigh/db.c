@@ -29,6 +29,9 @@
 
 #define ZBX_DB_WAIT_DOWN	10
 
+#if HAVE_POSTGRESQL
+extern char	ZBX_PG_ESCAPE_BACKSLASH;
+#endif
 /***************************************************************/
 /* ID structure: NNNSSSDDDDDDDDDDD, where                      */
 /*      NNN - nodeid (to which node the ID belongs to)         */
@@ -997,7 +1000,8 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
  *                                                                            *
  * Function: DBget_escape_string_len                                          *
  *                                                                            *
- * Return value: return length of escaped string with terminating '\0'        *
+ * Return value: return length in bytes of escaped string                     *
+ *               with terminating '\0'                                        *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
@@ -1005,18 +1009,19 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_escape_string_len(const char *src)
+static size_t	DBget_escape_string_len(const char *src)
 {
 	const char	*s;
-	int		len = 1;	/* '\0' */
+	size_t		len = 1;	/* '\0' */
 
 	for (s = src; NULL != s && '\0' != *s; s++)
 	{
 		if ('\r' == *s)
 			continue;
-
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif
@@ -1040,13 +1045,13 @@ static int	DBget_escape_string_len(const char *src)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-static void	DBescape_string(const char *src, char *dst, int len)
+static void	DBescape_string(const char *src, char *dst, size_t len)
 {
 	const char	*s;
 	char		*d;
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 #	define ZBX_DB_ESC_CH	'\\'
-#else
+#elif !defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_ESC_CH	'\''
 #endif
 	assert(dst);
@@ -1058,8 +1063,10 @@ static void	DBescape_string(const char *src, char *dst, int len)
 		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif
@@ -1090,7 +1097,7 @@ static void	DBescape_string(const char *src, char *dst, int len)
  ******************************************************************************/
 char	*DBdyn_escape_string(const char *src)
 {
-	int	len;
+	size_t	len;
 	char	*dst = NULL;
 
 	len = DBget_escape_string_len(src);
@@ -1110,32 +1117,34 @@ char	*DBdyn_escape_string(const char *src)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
- *                                                                            *
  ******************************************************************************/
-char	*DBdyn_escape_string_len(const char *src, int max_src_len)
+char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;
-	int		len = 1;	/* '\0' */
+	size_t		len = 1;	/* '\0' */
+
+	max_src_len++;
 
 	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
 	{
+		/* only UTF-8 characters should reduce a variable max_src_len */
+		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
+			break;
+
 		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif
 			len++;
 
 		len++;
-
-		/* only UTF-8 characters should reduce a variable max_src_len */
-		if (0x80 != (0xc0 & *s))
-			max_src_len--;
 	}
 
 	dst = zbx_malloc(dst, len);
@@ -1918,16 +1927,16 @@ clean:
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-char	*DBsql_id_cmp(zbx_uint64_t id)
+const char	*DBsql_id_cmp(zbx_uint64_t id)
 {
 	static unsigned char	n = 0;
 	static char		buf[4][22];	/* 1 - '=', 20 - value size, 1 - '\0' */
-	static char		is_null[9] = " is null";
+	static const char	is_null[9] = " is null";
 
 	if (0 == id)
 		return is_null;
 
-	n++; n = n % 4;
+	n = (n + 1) & 3;
 
 	zbx_snprintf(buf[n], sizeof(buf[n]), "=" ZBX_FS_UI64, id);
 
@@ -1946,16 +1955,16 @@ char	*DBsql_id_cmp(zbx_uint64_t id)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-char	*DBsql_id_ins(zbx_uint64_t id)
+const char	*DBsql_id_ins(zbx_uint64_t id)
 {
 	static unsigned char	n = 0;
 	static char		buf[4][21];	/* 20 - value size, 1 - '\0' */
-	static char		null[5] = "null";
+	static const char	null[5] = "null";
 
 	if (0 == id)
 		return null;
 
-	n++; n = n % 4;
+	n = (n + 1) & 3;
 
 	zbx_snprintf(buf[n], sizeof(buf[n]), ZBX_FS_UI64, id);
 

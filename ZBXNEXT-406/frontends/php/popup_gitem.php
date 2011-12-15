@@ -51,7 +51,6 @@ require_once('include/page_header.php');
 		'yaxisside'=>	array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),			'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
 		'calc_fnc'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('1,2,4,7,9'),	'isset({save})'),
 		'type'=>		array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2'),		'isset({save})'),
-		'periods_cnt'=>	array(T_ZBX_INT, O_OPT,	 null,	BETWEEN(0,360),		'isset({save})'),
 
 		'only_hostid'=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,			null),
 		'monitored_hosts'=>array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
@@ -99,8 +98,7 @@ require_once('include/page_header.php');
 			$_REQUEST['sortorder'].",".
 			$_REQUEST['yaxisside'].",".
 			$_REQUEST['calc_fnc'].",".
-			$_REQUEST['type'].",".
-			$_REQUEST['periods_cnt'].");\n";
+			$_REQUEST['type'].");\n";
 		insert_js($script);
 	}
 
@@ -115,8 +113,7 @@ require_once('include/page_header.php');
 			$_REQUEST['sortorder'].",".
 			$_REQUEST['yaxisside'].",".
 			$_REQUEST['calc_fnc'].",".
-			$_REQUEST['type'].",".
-			$_REQUEST['periods_cnt'].");\n";
+			$_REQUEST['type'].");\n";
 		insert_js($script);
 	}
 	else{
@@ -133,7 +130,6 @@ require_once('include/page_header.php');
 		$yaxisside	= get_request('yaxisside',		GRAPH_YAXIS_SIDE_DEFAULT);
 		$calc_fnc	= get_request('calc_fnc',		2);
 		$type		= get_request('type',			0);
-		$periods_cnt	= get_request('periods_cnt',	5);
 		$only_hostid	= get_request('only_hostid',	null);
 		$monitored_hosts = get_request('monitored_hosts', null);
 
@@ -190,71 +186,52 @@ require_once('include/page_header.php');
 
 		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
 
-		if($graphtype == GRAPH_TYPE_NORMAL){
-			$cmbType = new CComboBox('type',$type,'submit()');
-			$cmbType->addItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
-			$cmbType->addItem(GRAPH_ITEM_AGGREGATED, S_AGGREGATED);
-			$frmGItem->addRow(S_TYPE, $cmbType);
-		}
-		else if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-			$cmbType = new CComboBox('type',$type,'submit()');
+		if ($graphtype == GRAPH_TYPE_PIE || $graphtype == GRAPH_TYPE_EXPLODED) {
+			$cmbType = new CComboBox('type', $type, 'submit()');
 			$cmbType->addItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
 			$cmbType->addItem(GRAPH_ITEM_SUM, S_GRAPH_SUM);
 			$frmGItem->addRow(S_TYPE, $cmbType);
 		}
-		else{
-			$frmGItem->addVar('type',GRAPH_ITEM_SIMPLE);
+		else {
+			$frmGItem->addVar('type', GRAPH_ITEM_SIMPLE);
 		}
 
-		if($type == GRAPH_ITEM_AGGREGATED){
-			$frmGItem->addRow(S_AGGREGATED_PERIODS_COUNT,	new CTextBox('periods_cnt',$periods_cnt,15));
+		$cmbFnc = new CComboBox('calc_fnc', $calc_fnc, 'submit();');
 
-			$frmGItem->addVar('calc_fnc',$calc_fnc);
-			$frmGItem->addVar('drawtype',$drawtype);
-			$frmGItem->addVar('color',$color);
+		if ($graphtype == GRAPH_TYPE_PIE || $graphtype == GRAPH_TYPE_EXPLODED) {
+
+			$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
+			$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
+			$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
+			$cmbFnc->addItem(CALC_FNC_LST, S_LST_SMALL);
+			$frmGItem->addRow(S_FUNCTION, $cmbFnc);
 		}
 		else {
-			if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-				$frmGItem->addVar('periods_cnt',$periods_cnt);
-
-				$cmbFnc = new CComboBox('calc_fnc',$calc_fnc,'submit();');
-
-				$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
-				$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
-				$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
-				$cmbFnc->addItem(CALC_FNC_LST, S_LST_SMALL);
-				$frmGItem->addRow(S_FUNCTION, $cmbFnc);
-			}
-			else{
-				$frmGItem->addVar('periods_cnt',$periods_cnt);
-
-				$cmbFnc = new CComboBox('calc_fnc',$calc_fnc,'submit();');
-
-				if($graphtype == GRAPH_TYPE_NORMAL)
-					$cmbFnc->addItem(CALC_FNC_ALL, S_ALL_SMALL);
-
-				$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
-				$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
-				$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
-				$frmGItem->addRow(S_FUNCTION, $cmbFnc);
-
-				if($graphtype == GRAPH_TYPE_NORMAL){
-					$cmbType = new CComboBox('drawtype',$drawtype);
-					$drawtypes = graph_item_drawtypes();
-
-					foreach($drawtypes  as $i){
-						$cmbType->addItem($i,graph_item_drawtype2str($i));
-					}
-
-					$frmGItem->addRow(S_DRAW_STYLE, $cmbType);
-				}
-				else{
-					$frmGItem->addVar('drawtype', 1);
-				}
+			if ($graphtype == GRAPH_TYPE_NORMAL) {
+				$cmbFnc->addItem(CALC_FNC_ALL, S_ALL_SMALL);
 			}
 
-			$frmGItem->addRow(S_COLOR, new CColor('color',$color));
+			$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
+			$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
+			$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
+			$frmGItem->addRow(S_FUNCTION, $cmbFnc);
+
+			if ($graphtype == GRAPH_TYPE_NORMAL) {
+				$cmbType = new CComboBox('drawtype', $drawtype);
+				$drawtypes = graph_item_drawtypes();
+
+				foreach ($drawtypes as $i) {
+					$cmbType->addItem($i, graph_item_drawtype2str($i));
+				}
+
+				$frmGItem->addRow(S_DRAW_STYLE, $cmbType);
+			}
+			else {
+				$frmGItem->addVar('drawtype', 1);
+			}
 		}
+
+		$frmGItem->addRow(S_COLOR, new CColor('color', $color));
 
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$cmbYax = new CComboBox('yaxisside',$yaxisside);

@@ -22,7 +22,7 @@ if (isset($_GET['lang'])) {
 		textdomain('frontend');
 	}
 	// numeric Locale to default
-	setLocale(LC_NUMERIC, array('en', 'en_US', 'en_US.UTF-8', 'English_United States.1252'));
+	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 }
 
 require_once('include/locales/en_gb.inc.php');

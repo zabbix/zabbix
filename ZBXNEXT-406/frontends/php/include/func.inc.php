@@ -112,9 +112,55 @@ function getDayOfWeekCaption($num) {
 		case 4: return _('Thursday');
 		case 5: return _('Friday');
 		case 6: return _('Saturday');
+		case 0:
 		case 7: return _('Sunday');
 	}
 	return _s('[Wrong value for day: "%s" ]', $num);
+}
+
+// Convert seconds (0..SEC_PER_WEEK) to string representation. For example, 212400 -> 'Tuesday 11:00'
+function dowHrMinToStr($value, $display24Hours = false) {
+	$dow = $value - $value % SEC_PER_DAY;
+	$hr = $value - $dow;
+	$hr -= $hr % SEC_PER_HOUR;
+	$min = $value - $dow - $hr;
+	$min -= $min % SEC_PER_MIN;
+
+	$dow /= SEC_PER_DAY;
+	$hr /= SEC_PER_HOUR;
+	$min /= SEC_PER_MIN;
+
+	if ($display24Hours && $hr == 0 && $min == 0) {
+		$dow--;
+		$hr = 24;
+	}
+
+	return sprintf('%s %02d:%02d', getDayOfWeekCaption($dow), $hr, $min);
+}
+
+// Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occured
+function dowHrMinToSec($dow, $hr, $min) {
+	if (zbx_empty($dow) || zbx_empty($hr) || zbx_empty($min)) {
+		return false;
+	}
+
+	if ($dow == 7) {
+		$dow = 0;
+	}
+
+	if ($dow < 0 || $dow > 6) {
+		return false;
+	}
+
+	if ($hr < 0 || $hr > 24) {
+		return false;
+	}
+
+	if ($min < 0 || $min > 59) {
+		return false;
+	}
+
+	return $dow * SEC_PER_DAY + $hr * SEC_PER_HOUR + $min * SEC_PER_MIN;
 }
 
 // Convert timestamp to string representation. Retun 'Never' if 0.
@@ -197,7 +243,7 @@ function zbx_date2str($format, $value = null) {
 	$part = '';
 	$length = zbx_strlen($format);
 	for ($i = 0; $i < $length; $i++) {
-		$pchar = ($i > 0) ? zbx_substr($format, $i - 1, 1) : '';
+		$pchar = $i > 0 ? zbx_substr($format, $i - 1, 1) : '';
 		$char = zbx_substr($format, $i, 1);
 
 		if ($pchar != '\\' && isset($rplcs[$char])) {
@@ -208,7 +254,7 @@ function zbx_date2str($format, $value = null) {
 			$part .= $char;
 		}
 	}
-	$output .= (zbx_strlen($part) > 0) ? date($part, $value) : '';
+	$output .= zbx_strlen($part) > 0 ? date($part, $value) : '';
 	return $output;
 }
 
@@ -235,15 +281,6 @@ function zbxDateToTime($strdate) {
 	}
 	else {
 		return time();
-	}
-}
-
-function validateMaxTime($time) {
-	if ($time > 2147464800) { // 2038.01.19 00:00
-		return true;
-	}
-	else {
-		return false;
 	}
 }
 
@@ -815,7 +852,9 @@ function zbx_strpos($haystack, $needle, $offset = 0) {
 
 function zbx_stripos($haystack, $needle, $offset = 0) {
 	if (defined('ZBX_MBSTRINGS_ENABLED')) {
-		return mb_stripos($haystack, $needle, $offset);
+		$haystack = mb_convert_case($haystack, MB_CASE_LOWER);
+		$needle = mb_convert_case($needle, MB_CASE_LOWER);
+		return mb_strpos($haystack, $needle, $offset);
 	}
 	else {
 		return stripos($haystack, $needle, $offset);
@@ -1035,7 +1074,7 @@ function order_by($def, $allways = '') {
 }
 
 function unsetExcept(&$array, $allowedFields) {
-	foreach($array as $key => $value) {
+	foreach ($array as $key => $value) {
 		if (!isset($allowedFields[$key])) {
 			unset($array[$key]);
 		}
@@ -1651,4 +1690,26 @@ function bcround($number, $precision = 0) {
 	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
 	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
 }
+
+
+/**
+ * Sanitizes the data before outputting.
+ *
+ * @param mixed $data
+ *
+ * @return mixed
+ */
+function sanitize($data) {
+	if (is_array($data)) {
+		foreach ($data as &$value) {
+			$value = sanitize($value);
+		}
+	}
+	else {
+		$data = zbx_htmlstr($data);
+	}
+
+	return $data;
+}
+
 ?>

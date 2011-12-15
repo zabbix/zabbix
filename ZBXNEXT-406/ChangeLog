@@ -1,8 +1,37 @@
 --------------------------------------------------------------------------------
+Changes for 1.9.9
+
+New features:
+..F....... [ZBX-1357] updated Greek, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-3527] improved host form to allow selection of default interface (Vedmak)
+A.F.....S. [ZBX-4262] added support of item prototypes for graph y axis min/max (pavels, Sasha)
+A.F....... [ZBX-4311] fixed graph prototype name validation (pavels)
+A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
+....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
+
+Bug fixes:
+....I..... [ZBX-4429] fixed problem with wrong mysql comment tag and warning in mysql function when  update to 1.9.8 (SlaVa)
+........S. [ZBX-4418] fixed possible SQL errors while processing of time functions (Sasha)
+..F....... [ZBX-4336] fixed problem with item status clearing when changing  to active in frontend (SlaVa)
+A.F....... [ZBX-4260] replaced event sorting by 'clock' with 'eventid' (pavels)
+..F....... [ZBX-4381] fixed permission check in SLA reports (pavels)
+..F....... [ZBX-4411] remade the zbx_stripos() function whithout the use of mb_stripos() (pavels)
+..F....... [ZBX-4015] fixed multiple XSS issues (pavels)
+..F....... [ZBX-4334] changed disabled triggers and scenarios to be shown by default (sanja)
+A......... [ZBX-4403] fixed low level discovery rule creation (pavels)
+..F.I...S. [ZBX-3832] removed support of aggregated graph items (pavels, Sasha)
+..F....... [ZBX-4235] fixed operations with decimal numbers for certain locales (pavels)
+A.F....... [ZBX-4382] fixed missing dates in the midle of graph axis (sanja)
+A.F....... [ZBX-3366] fixed API sorting (Eduard)
+
+--------------------------------------------------------------------------------
 Changes for 1.9.8
 
 New features:
- - [ZBX-3271] implemented the _x() and _xn() function for context dependent translations (pavels,Richlv,Vedmak)
+ - [ZBX-3104] implemented the screen item API (pavels)
+ - [ZBXNEXT-913] redesign Configuration->IT Services (Eduard)
+ - [ZBXNEXT-907] redesign Configuration->Applications (Eduard)
+ - [ZBX-3271] implemented the _x() and _xn() function for context dependent translations (pavels, Richlv, Vedmak)
  - [ZBX-3498] removed items from unmonitored hosts from the 'Add graph' and 'Add simple graph' pop-ups in the 'Favourite graphs' widget (pavels)
  - [ZBX-3498] removed the 'Status' column from the 'Add simple graph' pop-up (pavels)
  - [ZBXNEXT-1019] updated jQuery to 1.7 (Vedmak)
@@ -15,6 +44,9 @@ New features:
  - [ZBX-2960] added example userparameter for partition discovery on Linux (Richlv)
 
 Bug fixes:
+ - [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
+ - [ZBX-3593] fixed misaligned server name on top of the page (sanja)
+ - [ZBX-3771] fixed possible 'Lock wait timeout' while processing lld rules (Sasha, pavels)
  - [ZBX-4139] fixed "Last n issues" widget label ignoring variable that sets the amount of issues (Richlv)
  - [ZBX-4359] fixed potentially incorrectly named index on node_cksum table (Richlv, sasha)
  - [ZBX-4188] fixed nclob problem for Oracle (Vedmak)
@@ -74,7 +106,7 @@ Bug fixes:
  - [ZBX-4174] made database monitor items not require interface (asaveljevs, Vedmak)
  - [ZBX-3881] fixed delay being set to 0 when changing item type from trapper to agent in item update form (Vedmak)
  - [ZBX-4115] added support for $(DESTDIR) for installing Zabbix Java proxy (dimir)
- - [ZBX-1020] added support for --sysconfdir, changed default installation directories (dimir,Richlv)
+ - [ZBX-1020] added support for --sysconfdir, changed default installation directories (dimir, Richlv)
  - [ZBX-3912] fixed popup object selection for IE (Eduard)
  - [ZBX-4132] fixed checkbox cookie work (Eduard)
  - [ZBX-3635] fixed situation when templated trigger can reference items from another template not linked to a host (Vedmak)
@@ -100,7 +132,7 @@ Bug fixes:
  - [ZBX-4003] fixed error when try to use not existing host group as group for discovered hosts (Vedmak)
  - [ZBX-4165] fixed failing insert into proxy_dhistory queries on the proxy side (rudolfs)
  - [ZBX-2882] fixed wrong item vfs.file.cksum[/vmlinuz] for some templates (Sasha)
- - [ZBX-3870] fixed data deletion order in proxy configuration synchronization (deniss,rudolfs)
+ - [ZBX-3870] fixed data deletion order in proxy configuration synchronization (deniss, rudolfs)
  - [ZBX-3707] fixed possible empty action conditions (Vedmak)
  - [ZBX-4171] fixed server crash in add_value_suffix() under DebugLevel=4 (asaveljevs)
  - [ZBX-3930] fixed errors when return to some specific screens from profile screen (Vedmak)
@@ -110,7 +142,7 @@ Bug fixes:
  - [ZBX-3493] fixed warnings when removing and clearing a template (Alexei)
  - [ZBX-4143] fixed cases with upgrade patch sometimes attempting to reference tables that were not created yet (Richlv, Sasha)
  - [ZBX-3618] extended allowed syntax for host interface DNS names (Vedmak)
- - [ZBX-3999] fixed map border (Alex,Sasha,Eduard)
+ - [ZBX-3999] fixed map border (Alex, Sasha, Eduard)
  - [ZBX-3946] fixed errors when create trigger with dependencies (Vedmak)
  - [ZBX-3921] fixed change link shown for maps in slide show (Vedmak)
  - [ZBX-4082] fixed error in Monitoring->Triggers when acknowledges are disabled (Vedmak)
@@ -129,7 +161,7 @@ New features:
  - [ZBX-4116] fixed ibm_db2 update patch for help_items table (rudolfs)
  - [ZBXNEXT-895] redesign general->Macros (Eduard)
  - [ZBXNEXT-899] redesign general->Images (Eduard)
- - [ZBXNEXT-785] support of automatic selection of map icon element depending on element type (Vedmak,Eduard)
+ - [ZBXNEXT-785] support of automatic selection of map icon element depending on element type (Eduard, Vedmak)
  - [ZBX-3683] removed the obsolete item zabbix[log] (Sasha)
  - [ZBXNEXT-891] redesign general->Value mapping (Eduard)
  - [ZBXNEXT-889] redesign general->Regular expressions (Eduard)
@@ -183,8 +215,8 @@ Changes for 1.9.4
 
 New features:
  - [ZBXNEXT-647] added automatic population of profile fields (KB, Sasha)
- - [ZBXNEXT-629] redesigned discovery form and added https and telnet to discovery and net.tcp.service(.perf) (rudolfs, Vedmak, Aly)
- - [ZBXNEXT-627] support of visible host and template name (Sasha, Alexei)
+ - [ZBXNEXT-629] redesigned discovery form and added https and telnet to discovery and net.tcp.service(.perf) (Aly ,rudolfs, Vedmak)
+ - [ZBXNEXT-627] support of visible host and template name (Alexei, Sasha)
  - [ZBXNEXT-672] advanced options for remote commands (Aly, asaveljevs, Sasha, Vedmak)
  - [ZBX-1357] updated French, Latvian, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
  - [ZBX-2756] renamed macro {TRIGGER.KEY<1-9>} to {ITEM.KEY<1-9>} (asaveljevs)
@@ -194,7 +226,7 @@ Bug fixes:
  - [ZBX-3774] fixed displaying of visible host and template name in several screens (Alexei)
  - [ZBX-3730] fixed bug with javascript translations - now js strings actually get translated (KB)
  - [ZBX-3752] fixed error in slides with system status (Vedmak)
- - [ZBX-3724] fixed broken images when importing and exporting maps with PostgreSQL (Alexei, Vedmak, Sasha)
+ - [ZBX-3724] fixed broken images when importing and exporting maps with PostgreSQL (Alexei, Sasha, Vedmak)
  - [ZBX-3794] added timeout support to vfs.file.contents[] command (dimir)
  - [ZBX-3809] fixed overwriting of existing elements and links when importing a map (Alexei)
  - [ZBX-954] typo in constant name, cause error when try to clear item history (Vedmak)
@@ -219,9 +251,9 @@ Bug fixes:
 Changes for 1.9.3
 
 New features:
- - [ZBXNEXT-555] added remote monitoring of JMX counters through Java proxy (asaveljevs,Vedmak,Vlad)
- - [ZBXNEXT-651] added "Boolean" data type for integer item value type (asaveljevs,Vedmak,Vlad)
- - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis,Richlv)
+ - [ZBXNEXT-555] added remote monitoring of JMX counters through Java proxy (asaveljevs, Vedmak, Vlad)
+ - [ZBXNEXT-651] added "Boolean" data type for integer item value type (asaveljevs, Vedmak, Vlad)
+ - [ZBXNEXT-675] added new icons and a script to create sql file (Elvis, Richlv)
  - [ZBX-1357] Updated Latvian and Russian translations; thanks to Zabbix translators (Richlv)
  - [ZBXNEXT-696] Added support for {IPADDRESS}, {HOST.DNS} and {HOST.CONN} macros in trigger names (rudolfs)
  - [ZBXNEXT-676] merged host profile and extended host profile (Sasha, Vedmak)
@@ -239,13 +271,13 @@ New features:
  - [ZBXNEXT-673] added support of users scripts on Zabbix Agent and IPMI-based remote commands (Sasha, Vedmak)
  - [ZBXNEXT-631] added custom trigger severities configuration (Sasha, Vedmak)
  - [ZBXNEXT-636] login screen redesign, frontend themes restyle (Aly, Elvis)
- - [ZBXNEXT-635] introduced API wrapper for Zabbix frontend (Vedmak, Aly)
- - [ZBXNEXT-575] added new design for action operation remote commands (Aly,Sasha,Vedmak)
+ - [ZBXNEXT-635] introduced API wrapper for Zabbix frontend (Aly, Vedmak)
+ - [ZBXNEXT-575] added new design for action operation remote commands (Aly, Sasha, Vedmak)
  - [ZBXNEXT-628] added advanced label settings for maps (Aly)
  - [ZBXNEXT-626] added remembering of grid options for maps (KB)
  - [ZBXNEXT-630] added automatic filling of DNS name for discovered and auto-registered devices (Sasha)
  - [ZBXNEXT-634] added information about usage of media types for actions in the list of media types (Alexei)
- - [ZBXNEXT-602] Export events to CSV (Vlad,Aly)
+ - [ZBXNEXT-602] Export events to CSV (Aly, Vlad)
  - [ZBXNEXT-623] restored support of SQLite3 for use with Zabbix Server and front-end (Alexei)
  - [ZBX-1357] updated Dutch translation; thanks to qix (Richlv)
  - [ZBX-1357] updated Latvian translation (Richlv)
@@ -292,20 +324,20 @@ Bug fixes:
 Changes for 1.9.1
 
 New features:
- - [ZBXNEXT-587] added support of multiple host interfaces (Aly,Sasha,Vedmak)
+ - [ZBXNEXT-587] added support of multiple host interfaces (Aly, Sasha, Vedmak)
  - [ZBXNEXT-564] added new {IPADDRESS} and {HOST.PORT} macros in auto registration notifications (Sasha)
  - [ZBXNEXT-556] zabbix frontend translations are now handled by PHP gettext module (KB)
  - [ZBXNEXT-558] added support of monitoring auto-registered hosts with passive checks (Sasha)
- - [ZBXNEXT-512] redesign of unknown events (Aly,asaveljevs,Sasha)
+ - [ZBXNEXT-512] redesign of unknown events (Aly, asaveljevs, Sasha)
 
 Bug fixes:
  - [ZBX-3241] fixed incorrectly shortened popup texts (Vlad)
  - [ZBX-2647] Made some of hard coded strings translatable (KB)
  - [ZBX-3300] fixed valuemapid not removed from items table when valuemap deleted (Vedmak)
- - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly,Vedmak)
+ - [ZBXNEXT-588] improved template, host, proxy form view, dashboard screen (Aly, Vedmak)
  - [ZBX-3149] allow to translate more strings in screen element 'Server info'; add support for translator comments (Richlv)
  - [ZBX-3248] fixed empty and duplicate map URL name handling (KB)
- - [ZBX-3190] fixed sql errors when processing proxy configuration (asaveljevs,Sasha)
+ - [ZBX-3190] fixed sql errors when processing proxy configuration (asaveljevs, Sasha)
  - [DEV-471] fixed sql scripts names consistency (Sasha)
  - [ZBXNEXT-538] include ibm_db2 upgrade patches in distribution package (Sasha)
  - [ZBX-3130] fixed bug when creating custom graph: host items now can be added (KB)
@@ -314,12 +346,12 @@ Bug fixes:
 Changes for 1.9.0
 
 New features:
- - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha,Vedmak)
+ - [DEV-477] added support of low-level discovery of file systems, network interfaces and SNMP OID's (Sasha, Vedmak)
  - [DEV-490] made graph legend optional (Aly)
  - [DEV-483] added templated screens (Aly)
  - [DEV-485] added multiple urls for map elements (Vedmak)
  - [DEV-471] field graph_theme.noneworktimecolor renamed to nonworktimecolor (Sasha)
- - [DEV-471] database integrity - added foreign keys (Sasha,Vedmak)
+ - [DEV-471] database integrity - added foreign keys (Sasha, Vedmak)
  - [ZBXNEXT-483] added vfs.file.contents[file,encoding] check (asaveljevs)
  - [ZBXNEXT-457] added support of nanoseconds for history tables (Sasha)
  - [DEV-449] added display of host time in screens (Aly)
@@ -327,12 +359,33 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
-Changes for 1.8.10
+Changes for 1.8.10rc1
 
- - [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (dimir,asaveljevs)
- - [ZBX-4249] fixed trigger wizard when insert macro multiple times (Vedmak)
- - [ZBX-4351] updated French translation; thanks to Joseph Bueno (Richlv)
- - [ZBX-4353] updated Japanese translation; thanks to Kodai Terashima (Richlv)
+.......PS. [ZBX-4424] fixed handling of a long localized content by history syncer (Sasha)
+.......PS. [ZBX-4424] fixed handling of a localized content with incorrect utf8 characters (Sasha)
+..F....... [ZBX-2737] fixed various messages at linking templates (sanja)
+A......... [ZBX-4273] fixed getting permission error while creating an action (sanja)
+....I..... [ZBX-4377] fixed error message when checking if libcurl can be linked statically (dimir)
+..F....... [ZBX-4391] fixed suffix support in trigger testing interface (slava)
+.......PS. [ZBX-4376] fixed escaping of strings with PostgreSQL 9.1 or later (Sasha)
+..F....... [ZBX-2419] fixed calculation of SLA if uptime/downtime is specified (Sasha)
+..F....... [ZBX-3074] moved the 'Status' column in the item list to the right (slava)
+A......... [ZBX-3104] implemented the screen item API (pavels)
+A.F....... [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
+........S. [ZBX-4298] added deleted data report to a housekeeper on every step (dimir)
+..F....... [ZBX-3649] fixed "frontends/php/styles/ie_default.css" doesn't exist (for IE6) (sanja)
+A.F....... [ZBX-4235] fixed operations with decimal numbers for certain locales (pavels)
+..F....... [ZBX-3244] fixed dropdown changing its style when navigating menu (sanja)
+A.F....... [ZBX-4015] fixed multiple XSS issues (pavels)
+A.F....... [ZBX-4288] fixed user macros not being deleted when deleting a host (pavels)
+A.F....... [ZBX-2859] fixed possibility to successfully delete zero regular expressions (sanja)
+..F....... [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
+A.F....... [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
+..F....... [ZBX-4375] updated Russian translation; thanks to Alexey Pustovalov (Richlv)
+........S. [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (asaveljevs,dimir)
+A.F....... [ZBX-4249] fixed trigger wizard when inserting macro multiple times (Vedmak)
+..F....... [ZBX-4351] updated French translation; thanks to Joseph Bueno (Richlv)
+..F....... [ZBX-4353] updated Japanese translation; thanks to Kodai Terashima (Richlv)
 
 Changes for 1.8.9
 

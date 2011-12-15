@@ -64,9 +64,10 @@ require_once(dirname(__FILE__).'/testFormScreen.php');
 require_once(dirname(__FILE__).'/testFormScript.php');
 require_once(dirname(__FILE__).'/testFormSysmap.php');
 require_once(dirname(__FILE__).'/testFormTemplate.php');
+require_once(dirname(__FILE__).'/testPageApplications.php');
 
-class SeleniumTests{
-	public static function suite(){
+class SeleniumTests {
+	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
@@ -113,6 +114,7 @@ class SeleniumTests{
 		$suite->addTestSuite('testFormScript');
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormTemplate');
+		$suite->addTestSuite('testPageApplications');
 
 		return $suite;
 	}

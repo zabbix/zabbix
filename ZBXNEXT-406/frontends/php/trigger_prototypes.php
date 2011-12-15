@@ -183,7 +183,7 @@ require_once('include/page_header.php');
 		else{
 			$result = API::TriggerPrototype()->create($trigger);
 
-			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+			show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 		}
 		if($result)
 			unset($_REQUEST['form']);

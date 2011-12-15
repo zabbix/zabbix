@@ -44,7 +44,7 @@
 		var text2 = document.createElement('input');
 		text2.className = 'input text';
 		text2.setAttribute('type', 'text');
-		text2.setAttribute('placeholder', "<<?php echo _('Value'); ?>>");
+		text2.setAttribute('placeholder', "<?php echo _('value'); ?>");
 		text2.setAttribute('name', 'macros['+addMacroRow.macro_count+'][value]');
 		text2.setAttribute('size', 40);
 		text2.setAttribute('maxlength', 255);
