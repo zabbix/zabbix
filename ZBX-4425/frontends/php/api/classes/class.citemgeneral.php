@@ -182,10 +182,6 @@ abstract class CItemGeneral extends CZBXAPI{
 				}
 			}
 
-			if ($dbHosts[$fullItem['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
-				unset($item['interfaceid']);
-			}
-
 			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
 				$item['delay_flex'] = '';
 			}
@@ -198,36 +194,31 @@ abstract class CItemGeneral extends CZBXAPI{
 				$item['data_type'] = 0;
 			}
 
-			// validate interface
-			if ($dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE) {
-				$itemInterfaceType = self::itemTypeInterface($fullItem['type']);
-				if ($itemInterfaceType !== false) {
-					// this item requires an interface, check if one is given
-					if (isset($item['interfaceid']) && $item['interfaceid']) {
-						if (!isset($interfaces[$fullItem['interfaceid']])
-							|| bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0
-						) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
-						}
-						if ($itemInterfaceType !== INTERFACE_TYPE_ANY
-							&& $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType
-						) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
-						}
-					}
-					// the interface is missing
-					elseif(!$update || isset($item['interfaceid'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
-					}
+			// check if the item requires an interface
+			$itemInterfaceType = self::itemTypeInterface($fullItem['type']);
+			if ($itemInterfaceType !== false && $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE) {
+				if (!$fullItem['interfaceid']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
 				}
+				elseif (!isset($interfaces[$fullItem['interfaceid']])
+					|| bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
+				}
+				elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY
+					&& $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
+				}
+			}
+			// no interface required, just set it to NULL
+			else {
+				$item['interfaceid'] = 0;
 			}
 
 			// item key
 			if (($fullItem['type'] == ITEM_TYPE_DB_MONITOR && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_DB_MONITOR) == 0)
 				|| ($fullItem['type'] == ITEM_TYPE_SSH && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_SSH) == 0)
 				|| ($fullItem['type'] == ITEM_TYPE_TELNET && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_TELNET) == 0)
-				|| ($fullItem['type'] == ITEM_TYPE_JMX && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_JMX) == 0)
-			) {
+				|| ($fullItem['type'] == ITEM_TYPE_JMX && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_JMX) == 0)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
 			}
 
@@ -241,8 +232,7 @@ abstract class CItemGeneral extends CZBXAPI{
 
 				if (!str_in_array($itemKey->getKeyId(), array('grpmax', 'grpmin', 'grpsum', 'grpavg'))
 					|| count($params) != 4
-					|| !str_in_array($params[2], array('last', 'min', 'max', 'avg', 'sum', 'count'))
-				) {
+					|| !str_in_array($params[2], array('last', 'min', 'max', 'avg', 'sum', 'count'))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
 							' "<last|min|max|avg|sum|count>", "parameter"].', $itemKey->getKeyId()));
@@ -251,8 +241,7 @@ abstract class CItemGeneral extends CZBXAPI{
 
 			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
 				&& strcmp($fullItem['key_'], 'snmptrap.fallback') != 0
-				&& strcmp($itemKey->getKeyId(), 'snmptrap') != 0
-			) {
+				&& strcmp($itemKey->getKeyId(), 'snmptrap') != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid'));
 			}
 
@@ -262,8 +251,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_LOG
-				&& str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog'))
-			) {
+				&& str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog'))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be Log for log key.'));
 			}
 
