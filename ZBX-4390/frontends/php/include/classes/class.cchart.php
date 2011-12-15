@@ -467,8 +467,6 @@ class CChart extends CGraphDraw{
 				$val = $arr[3];
 				$is1024Base=array('B','Bps');
 				$multiplier = ((in_array($trigger['units'], $is1024Base)) ? 1024 : 1000);
-
-			DITD($multiplier);
 				if (strcasecmp($arr[4], 'K') == 0) {
 					$val *= $multiplier;
 				}
@@ -493,7 +491,6 @@ class CChart extends CGraphDraw{
 				elseif (strcasecmp($arr[4], 'Y') == 0) {
 					$val *= pow($multiplier, 8);
 				}
-
 
 				$minY = $this->m_minY[$this->items[$inum]['axisside']];
 				$maxY = $this->m_maxY[$this->items[$inum]['axisside']];
