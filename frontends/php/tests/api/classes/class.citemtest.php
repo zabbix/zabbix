@@ -21,14 +21,10 @@
 <?php
 require_once(dirname(__FILE__).'/../../include/class.capitest.php');
 
+/**
+ * @property CItem $api
+ */
 class CItemTest extends CApiTest {
-
-	/**
-	 * An item API object.
-	 *
-	 * @var CItem
-	 */
-	protected $api;
 
 
 	/**
