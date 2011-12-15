@@ -27,7 +27,6 @@ class CChart extends CGraphDraw{
 
 		$this->yaxismin = null;
 		$this->yaxismax = null;
-		$this->is1024Base=false;
 		$this->triggers = array();
 
 		$this->ymin_type = GRAPH_YAXIS_TYPE_CALCULATED;
@@ -446,7 +445,7 @@ class CChart extends CGraphDraw{
 		$cnt = 0;
 
 		foreach($this->items as $inum => $item){
-			$sql = 'SELECT DISTINCT h.host, tr.description, tr.triggerid, tr.expression, tr.priority, tr.value '.
+			$sql = 'SELECT DISTINCT h.host, tr.description, tr.triggerid, tr.expression, tr.priority, tr.value, i.units '.
 					' FROM triggers tr,functions f,items i, hosts h '.
 					' WHERE tr.triggerid=f.triggerid '.
 						" AND f.function IN ('last','min','avg','max') ".
@@ -466,15 +465,36 @@ class CChart extends CGraphDraw{
 				if(!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G|T|P|Z|E|Y]{0,1})/i', $trigger['expression'], $arr)) continue;
 
 				$val = $arr[3];
+				$is1024Base=array('B','BPS');
+				if (in_array(strtoupper($trigger['units']),$is1024Base)) {
+					$multiplier=1024;
+				} else {
+					$multiplier=1000;
+				}
 
-				if(strcasecmp($arr[4],'K') == 0)	{$val *= 1024; $this->is1024Base=true;}
-				else if(strcasecmp($arr[4],'M') == 0)	{$val *= 1024*1024;$this->is1024Base=true;}
-				else if(strcasecmp($arr[4],'G') == 0)	{$val *= 1024*1024*1024;$this->is1024Base=true;}
-				else if(strcasecmp($arr[4],'T') == 0)	{$val *= 1024*1024*1024*1024;$this->is1024Base=true;}
-				else if(strcasecmp($arr[4],'P') == 0)	{$val *= 1024*1024*1024*1024*1024;$this->is1024Base=true;}
-				else if(strcasecmp($arr[4],'E') == 0)	{$val *= 1024*1024*1024*1024*1024*1024;$this->is1024Base=true;}
-				else if(strcasecmp($arr[4],'Z') == 0)	{$val *= 1024*1024*1024*1024*1024*1024*1024;$this->is1024Base=true;}
-				else if(strcasecmp($arr[4],'Y') == 0)	{$val *= 1024*1024*1024*1024*1024*1024*1024*1024;$this->is1024Base=true;}
+				if (strcasecmp($arr[4], 'K') == 0) {
+					$val *= $multiplier;
+				}
+				elseif (strcasecmp($arr[4], 'M') == 0) {
+					$val *= pow($multiplier, 2);
+				}
+				elseif (strcasecmp($arr[4], 'G') == 0) {
+					$val *= pow($multiplier, 3);
+				}
+				elseif (strcasecmp($arr[4], 'T') == 0) {
+					$val *= pow($multiplier, 4);
+				}
+				elseif (strcasecmp($arr[4], 'P') == 0) {
+					$val *= pow($multiplier, 5);
+				}
+				elseif (strcasecmp($arr[4], 'E') == 0) {
+					$val *= pow($multiplier, 6);
+				}
+				elseif (strcasecmp($arr[4], 'Z') == 0) {
+					$val *= pow($multiplier, 7);}
+				elseif (strcasecmp($arr[4], 'Y') == 0) {
+					$val *= pow($multiplier, 8);
+				}
 
 
 				$minY = $this->m_minY[$this->items[$inum]['axisside']];
@@ -822,10 +842,6 @@ class CChart extends CGraphDraw{
 			}
 		}
 //------
-		if($this->is1024Base){
-			$interval=$interval*(1000/1024);
-			$interval_other_side=$interval_other_side*(1000/1024);
-		}
 // correcting MIN & MAX
 		$this->m_minY[$side] = bcmul(bcfloor(bcdiv($this->m_minY[$side], $interval)), $interval);
 		$this->m_maxY[$side] = bcmul(bcceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
@@ -907,10 +923,6 @@ class CChart extends CGraphDraw{
 			}
 			else if($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 				$this->m_minY[$graphSide] = $tmp_minY[$graphSide];
-			}
-			if($this->is1024Base){
-				$this->m_maxY[$graphSide]*=(1000/1024);
-				$this->m_minY[$graphSide]*=(1000/1024);
 			}
 		}
 
