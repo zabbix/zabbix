@@ -381,7 +381,7 @@ A.F....... [ZBX-2859] fixed possibility to successfully delete zero regular expr
 ..F....... [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
 A.F....... [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
 ..F....... [ZBX-4375] updated Russian translation; thanks to Alexey Pustovalov (Richlv)
-........S. [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (dimir,asaveljevs)
+........S. [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (asaveljevs,dimir)
 A.F....... [ZBX-4249] fixed trigger wizard when inserting macro multiple times (Vedmak)
 ..F....... [ZBX-4351] updated French translation; thanks to Joseph Bueno (Richlv)
 ..F....... [ZBX-4353] updated Japanese translation; thanks to Kodai Terashima (Richlv)
