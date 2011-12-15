@@ -23,7 +23,7 @@ END;
 
 CREATE SEQUENCE escalations_seq;
 
-INSERT INTO escalations (escalationid, actionid, triggerid, r_eventid
+INSERT INTO escalations (escalationid, actionid, triggerid, r_eventid)
 	SELECT :escalation_maxid + escalations_seq.NEXTVAL, actionid, triggerid, r_eventid
 		FROM escalations
 		WHERE status = 0
