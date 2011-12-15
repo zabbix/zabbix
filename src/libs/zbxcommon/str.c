@@ -2901,9 +2901,9 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 }
 #endif	/* HAVE_ICONV */
 
-int	zbx_strlen_utf8(const char *text)
+size_t	zbx_strlen_utf8(const char *text)
 {
-	int	n = 0;
+	size_t	n = 0;
 
 	while ('\0' != *text)
 	{
@@ -2916,13 +2916,37 @@ int	zbx_strlen_utf8(const char *text)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_strlen_utf8_n                                                *
+ *                                                                            *
+ * Purpose: calculates number of bytes in utf8 text limited by utf8_maxlen    *
+ * characters                                                                 *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen)
+{
+	size_t	sz = 0;
+
+	utf8_maxlen++;
+
+	for (; '\0' != *text; text++)
+	{
+		if (0x80 != (0xc0 & *text) && 0 == --utf8_maxlen)
+			break;
+		sz++;
+	}
+
+	return sz;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_replace_utf8                                                 *
  *                                                                            *
  * Purpose: replace non-ASCII UTF-8 characters with '?' character             *
  *                                                                            *
  * Parameters: text - [IN] pointer to the first char                          *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
@@ -3068,9 +3092,7 @@ void	zbx_replace_invalid_utf8(char *text)
 				 * and values above U+10FFFF are not legal
 				 */
 				if (utf32 > 0x10ffff || 0xd800 == (utf32 & 0xf800))
-				{
 					ret = FAIL;
-				}
 			}
 
 			if (SUCCEED != ret)

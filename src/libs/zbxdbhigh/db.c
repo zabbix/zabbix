@@ -1004,7 +1004,8 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
  *                                                                            *
  * Function: DBget_escape_string_len                                          *
  *                                                                            *
- * Return value: return length of escaped string with terminating '\0'        *
+ * Return value: return length in bytes of escaped string                     *
+ *               with terminating '\0'                                        *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
@@ -1120,8 +1121,6 @@ char	*DBdyn_escape_string(const char *src)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
- *                                                                            *
  ******************************************************************************/
 char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 {
@@ -1129,8 +1128,14 @@ char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 	char		*dst = NULL;
 	size_t		len = 1;	/* '\0' */
 
+	max_src_len++;
+
 	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
 	{
+		/* only UTF-8 characters should reduce a variable max_src_len */
+		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
+			break;
+
 		if ('\r' == *s)
 			continue;
 
@@ -1144,10 +1149,6 @@ char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 			len++;
 
 		len++;
-
-		/* only UTF-8 characters should reduce a variable max_src_len */
-		if (0x80 != (0xc0 & *s))
-			max_src_len--;
 	}
 
 	dst = zbx_malloc(dst, len);
