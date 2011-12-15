@@ -61,7 +61,7 @@ $fields=array(
 );
 
 check_fields($fields);
-validate_sort_and_sortorder('d.name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['dchecks'] = get_request('dchecks', array());
@@ -242,23 +242,25 @@ else{
 
 	$tblDiscovery = new CTableInfo(_('No discovery rules defined'));
 	$tblDiscovery->setHeader(array(
-		new CCheckBox('all_drules',null,"checkAll('".$form->GetName()."','all_drules','g_druleid');"),
-		make_sorting_header(_('Name'), 'd.name'),
-		make_sorting_header(_('IP range'), 'd.iprange'),
-		make_sorting_header(_('Delay'), 'd.delay'),
+		new CCheckBox('all_drules',null,"checkAll('".$form->getName()."','all_drules','g_druleid');"),
+		make_sorting_header(_('Name'), 'name'),
+		_('IP range'),
+		_('Delay'),
 		_('Checks'),
 		_('Status')
 	));
 
-
+	$sortfield = getPageSortField('name');
+	$sortorder = getPageSortOrder();
 	$drules = API::DRule()->get(array(
 		'output' => API_OUTPUT_EXTEND,
+		'sortfield' => $sortfield,
+		'sortorder' => $sortorder,
 		'selectDChecks' => API_OUTPUT_EXTEND,
 		'editable' => true
 	));
-	order_result($drules, 'name');
 
-// getting paging element
+	// getting paging element
 	$paging = getPagingLine($drules);
 
 	foreach($drules as $rule_data){

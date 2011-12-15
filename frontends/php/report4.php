@@ -82,7 +82,7 @@ require_once('include/page_header.php');
 		$form = new CForm();
 		$form->SetMethod('get');
 
-		$form->addItem(SPACE.S_MEDIA_TYPE.SPACE);
+		$form->addItem(SPACE._('Media type').SPACE);
 		$cmbMedia = new CComboBox('media_type', $media_type, 'submit();');
 		$cmbMedia->addItem(0,S_ALL_SMALL);
 

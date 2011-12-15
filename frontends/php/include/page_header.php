@@ -337,19 +337,19 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		}
 	}
 
-	if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
-		$tab = new CTable();
+	if (!empty($ZBX_SERVER_NAME)) {
+		$table = new CTable();
+		$table->addStyle('width: 100%;');
 
-		$td_l = new CCol(new CSpan($ZBX_SERVER_NAME, 'textcolorstyles'));
+		$tableColumn = new CCol(new CSpan($ZBX_SERVER_NAME, 'textcolorstyles'));
 		if (is_null($node_form)) {
-			$td_l->addStyle('padding-right: 5px;');
+			$tableColumn->addStyle('padding-right: 5px;');
 		}
 		else {
-			$td_l->addStyle('padding-right: 20px; padding-bottom: 2px;');
+			$tableColumn->addStyle('padding-right: 20px; padding-bottom: 2px;');
 		}
-
-		$tab->addRow(array($td_l, $node_form));
-		$node_form = $tab;
+		$table->addRow(array($tableColumn, $node_form));
+		$node_form = $table;
 	}
 
 	// 1st level menu

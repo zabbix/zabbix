@@ -27,82 +27,83 @@
  * Class containing methods for operations with graphs
  */
 class CGraphPrototype extends CZBXAPI{
+
+	protected $tableName = 'graphs';
+
+	protected $tableAlias = 'g';
+
 /**
 * Get GraphPrototype data
 *
 * @param array $options
 * @return array
 */
-	public function get($options=array()){
-
+	public function get($options = array()) {
 		$result = array();
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
-		$result = array();
 
-		$sort_columns = array('graphid','name'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('graphid','name');
+
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sql_parts = array(
-			'select' => array('graphs' => 'g.graphid'),
-			'from' => array('graphs' => 'graphs g'),
-			'where' => array('g.flags='.ZBX_FLAG_DISCOVERY_CHILD),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null,
+			'select'	=> array('graphs' => 'g.graphid'),
+			'from'		=> array('graphs' => 'graphs g'),
+			'where'		=> array('g.flags='.ZBX_FLAG_DISCOVERY_CHILD),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
-			'nodeids' 				=> null,
-			'groupids' 				=> null,
-			'templateids'			=> null,
-			'hostids' 				=> null,
-			'graphids' 				=> null,
-			'itemids' 				=> null,
-			'discoveryids' 			=> null,
-			'type' 					=> null,
-			'templated'				=> null,
-			'inherited'				=> null,
-			'editable'				=> null,
-			'nopermissions'			=> null,
-
-// filter
-			'filter'				=> null,
-			'search'				=> null,
-			'searchByAny'			=> null,
-			'startSearch'			=> null,
-			'excludeSearch'			=> null,
-			'searchWildcardsEnabled'=> null,
-
-// output
-			'output'				=> API_OUTPUT_REFER,
-			'selectGroups'			=> null,
-			'selectTemplates'		=> null,
-			'selectHosts'			=> null,
-			'selectItems'			=> null,
-			'selectGraphItems'		=> null,
-			'selectDiscoveryRule'	=> null,
-			'countOutput'			=> null,
-			'groupCount'			=> null,
-			'preservekeys'			=> null,
-
-			'sortfield'				=> '',
-			'sortorder'				=> '',
-			'limit'					=> null
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'templateids'				=> null,
+			'hostids'					=> null,
+			'graphids'					=> null,
+			'itemids'					=> null,
+			'discoveryids'				=> null,
+			'type'						=> null,
+			'templated'					=> null,
+			'inherited'					=> null,
+			'editable'					=> null,
+			'nopermissions'				=> null,
+			// filter
+			'filter'					=> null,
+			'search'					=> null,
+			'searchByAny'				=> null,
+			'startSearch'				=> null,
+			'excludeSearch'				=> null,
+			'searchWildcardsEnabled'	=> null,
+			// output
+			'output'					=> API_OUTPUT_REFER,
+			'selectGroups'				=> null,
+			'selectTemplates'			=> null,
+			'selectHosts'				=> null,
+			'selectItems'				=> null,
+			'selectGraphItems'			=> null,
+			'selectDiscoveryRule'		=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
+			'preservekeys'				=> null,
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
-
-		if(is_array($options['output'])){
+		if (is_array($options['output'])) {
 			unset($sql_parts['select']['graphs']);
 
 			$dbTable = DB::getSchema('graphs');
-			foreach($options['output'] as $key => $field){
-				if(isset($dbTable['fields'][$field]))
+			foreach ($options['output'] as $field) {
+				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'g.'.$field;
+				}
 			}
-
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
@@ -322,18 +323,8 @@ class CGraphPrototype extends CZBXAPI{
 			}
 		}
 
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if(!zbx_empty($options['sortfield'])){
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
-
-			$sql_parts['order'][] = 'g.'.$options['sortfield'].' '.$sortorder;
-
-			if(!str_in_array('g.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('g.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'g.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'g');
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
@@ -1099,36 +1090,43 @@ COpt::memoryPick();
 // }}} EXCEPTION: ITEMS PERMISSIONS
 		}
 
+		foreach ($graphs as $graph) {
 
-		foreach($graphs as $gnum => $graph){
-			if(!isset($graph['name'])) continue;
-
-			$options = array(
-				'nodeids' => get_current_nodeid(true),
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array('name' => $graph['name'], 'flags' => null),
-				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-				'nopermissions' => 1
-			);
-			$graphsExists = API::Graph()->get($options);
-			foreach($graphsExists as $genum => $graphExists){
-				if(($update && (bccomp($graphExists['graphid'],$graph['graphid'])!=0)) || !$update){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph with name [ '.$graph['name'].' ] already exists');
-				}
-			}
-// }}} EXCEPTION: GRAPH EXISTS
-
-// PROTOTYPE {{{
+			// check if the graph has at least one prototype
 			$has_prototype = false;
-			foreach($graph['gitems'] as $gitem){
-				if($allowed_items[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+			foreach ($graph['gitems'] as $gitem) {
+				if ($allowed_items[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
 					$has_prototype = true;
+					break;
 				}
 			}
-			if(!$has_prototype){
+			if (!$has_prototype) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype'));
 			}
-// }}} PROTOTYPE
+
+			// check if the host has any graphs with the same name
+			$hosts = API::Host()->get(array(
+				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$options = array(
+				'hostids' => array_keys($hosts),
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array(
+					'name' => $graph['name'],
+					'flags' => null
+				),
+				'nopermissions' => true,
+				'limit' => 1
+			);
+			$graphsExists = API::Graph()->get($options);
+			foreach ($graphsExists as $graphExists) {
+				if (!$update || (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists', $graph['name']));
+				}
+			}
 		}
 
 		return true;

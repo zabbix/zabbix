@@ -158,7 +158,7 @@ require_once('include/page_header.php');
 
 
 // table HOSTS
-	$table = new CTableInfo(S_NO_HOSTS_DEFINED);
+	$table = new CTableInfo(_('No hosts defined.'));
 	$table->setHeader(array(
 		make_sorting_header(S_NAME, 'name'),
 		S_APPLICATIONS,

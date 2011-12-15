@@ -1503,11 +1503,12 @@ int	is_int_prefix(const char *c)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_uint64                                                        *
+ * Function: is_uint64_n                                                      *
  *                                                                            *
  * Purpose: check if the string is 64bit unsigned integer                     *
  *                                                                            *
- * Parameters: str - string to check                                          *
+ * Parameters: str - [IN] string to check                                     *
+ *             n   - [IN] string length or INT_MAX for null-terminated string *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - the string is not number or overflow                 *
@@ -1515,15 +1516,15 @@ int	is_int_prefix(const char *c)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	is_uint64(const char *str, zbx_uint64_t *value)
+int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
 {
 	register zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
 	register zbx_uint64_t	value_uint64 = 0, c;
 
-	if ('\0' == *str)
+	if ('\0' == *str || 0 == n)
 		return FAIL;
 
-	while ('\0' != *str)
+	while ('\0' != *str && (INT_MAX == n || 0 < n--))
 	{
 		if (*str >= '0' && *str <= '9')
 		{

@@ -48,6 +48,7 @@ switch($itemType) {
 
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			null),
+		'interfaceid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,				null, S_INTERFACE),
 
 		'add_groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({register})&&({register}=="go"))'),
 		'action'=>			array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,		'(isset({register})&&({register}=="go"))'),
@@ -264,6 +265,7 @@ switch($itemType) {
 			'description'	=> get_request('description'),
 			'key_'			=> get_request('key'),
 			'hostid'		=> get_request('hostid'),
+			'interfaceid'	=> get_request('interfaceid'),
 			'delay'			=> get_request('delay'),
 			'status'		=> get_request('status'),
 			'type'			=> get_request('type'),
@@ -332,7 +334,7 @@ switch($itemType) {
 		DBstart();
 		$go_result = ($_REQUEST['go'] == 'activate') ? activate_item($group_itemid) : disable_item($group_itemid);
 		$go_result = DBend($go_result);
-		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? S_ITEMS_ACTIVATED : S_ITEMS_DISABLED, null);
+		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Items activated') : _('Items disabled'), null);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
 		$group_itemid = $_REQUEST['group_itemid'];

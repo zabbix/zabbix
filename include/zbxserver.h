@@ -50,7 +50,6 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
 int	evaluate(double *value, char *exp, char *error, int maxerrlen);
-void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);

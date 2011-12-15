@@ -27,6 +27,11 @@
  * Class containing methods for operations with Hosts
  */
 class CHost extends CZBXAPI{
+
+	protected $tableName = 'hosts';
+
+	protected $tableAlias = 'h';
+
 /**
  * Get Host data
  *
@@ -62,24 +67,25 @@ class CHost extends CZBXAPI{
  * @param string $options['sortorder'] sort order
  * @return array|boolean Host data as array or false if error
  */
-	public function get($options=array()) {
-
+	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sort_columns = array('hostid', 'host', 'name', 'status'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
+		// allowed columns for sorting
+		$sort_columns = array('hostid', 'host', 'name', 'status');
 
+		// allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sql_parts = array(
-			'select' => array('hosts' => 'h.hostid'),
-			'from' => array('hosts' => 'hosts h'),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
+			'select'	=> array('hosts' => 'h.hostid'),
+			'from'		=> array('hosts' => 'hosts h'),
+			'where'		=> array(),
+			'group'		=> array(),
+			'order'		=> array(),
+			'limit'		=> null
 		);
 
 		$def_options = array(
@@ -111,16 +117,14 @@ class CHost extends CZBXAPI{
 			'withInventory'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
-
-// filter
+			// filter
 			'filter'					=> null,
 			'search'					=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> null,
 			'excludeSearch'				=> null,
 			'searchWildcardsEnabled'	=> null,
-
-// OutPut
+			// output
 			'output'					=> API_OUTPUT_REFER,
 			'selectGroups'				=> null,
 			'selectParentTemplates'		=> null,
@@ -144,7 +148,6 @@ class CHost extends CZBXAPI{
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {
@@ -152,11 +155,11 @@ class CHost extends CZBXAPI{
 
 			$dbTable = DB::getSchema('hosts');
 			$sql_parts['select']['hostid'] = 'h.hostid';
-			foreach ($options['output'] as $key => $field) {
-				if (isset($dbTable['fields'][$field]))
+			foreach ($options['output'] as $field) {
+				if (isset($dbTable['fields'][$field])) {
 					$sql_parts['select'][$field] = 'h.'.$field;
+				}
 			}
-
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
@@ -533,19 +536,8 @@ class CHost extends CZBXAPI{
 			}
 		}
 
-
-// order
-// restrict not allowed columns for sorting
-		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
-		if (!zbx_empty($options['sortfield'])) {
-			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
-
-			$sql_parts['order'][$options['sortfield']] = 'h.'.$options['sortfield'].' '.$sortorder;
-
-			if (!str_in_array('h.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('h.*', $sql_parts['select'])) {
-				$sql_parts['select'][$options['sortfield']] = 'h.'.$options['sortfield'];
-			}
-		}
+		// sorting
+		zbx_db_sorting($sql_parts, $options, $sort_columns, 'h');
 
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
@@ -861,7 +853,7 @@ Copt::memoryPick();
 						if ($count[$interface['hostid']] > $options['limitSelects']) continue;
 					}
 
-					$result[$interface['hostid']]['interfaces'][] = &$interfaces[$interfaceid];
+					$result[$interface['hostid']]['interfaces'][$interfaceid] = &$interfaces[$interfaceid];
 				}
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectInterfaces']) {
@@ -1211,13 +1203,13 @@ Copt::memoryPick();
 			}
 		}
 
-Copt::memoryPick();
+
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
 
-	return $result;
+		return $result;
 	}
 
 /**
@@ -1558,53 +1550,17 @@ Copt::memoryPick();
 
 		$this->checkInput($hosts, __FUNCTION__);
 
-		foreach ($hosts as $hnum => $host) {
-// INTERFACES
-			if (isset($host['interfaces']) && !is_null($host['interfaces'])) {
-				$interfacesToDelete = API::HostInterface()->get(array(
-					'hostids' => $host['hostid'],
-					'output' => API_OUTPUT_EXTEND,
-					'preservekeys' => true,
-					'nopermissions' => 1
-				));
-
-// Add
-				$interfacesToAdd = array();
-				$interfacesToUpdate = array();
-				foreach ($host['interfaces'] as $hinum => $interface) {
-					$interface['hostid'] = $host['hostid'];
-
-					if (!isset($interface['interfaceid'])) {
-						$interfacesToAdd[] = $interface;
-					}
-					elseif (isset($interfacesToDelete[$interface['interfaceid']])) {
-						$interfacesToUpdate[] = $interface;
-						unset($interfacesToDelete[$interface['interfaceid']]);
-					}
-				}
-//----
-				if (!empty($interfacesToDelete)) {
-					$result = API::HostInterface()->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
-					if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
-				}
-
-				if (!empty($interfacesToUpdate)) {
-					$result = API::HostInterface()->update($interfacesToUpdate);
-					if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
-				}
-
-				if (!empty($interfacesToAdd)) {
-					$result = API::HostInterface()->create($interfacesToAdd);
-					if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
-				}
-			}
+		foreach ($hosts as $host) {
+			API::HostInterface()->replaceHostInterfaces($host);
 			unset($host['interfaces']);
 
 			$data = $host;
 			$data['hosts'] = $host;
 			$result = $this->massUpdate($data);
 
-			if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
+			}
 		}
 
 		return array('hostids' => $hostids);
@@ -2135,8 +2091,8 @@ Copt::memoryPick();
 		$delItems = API::Item()->get(array(
 			'hostids' => $hostids,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
-			'nopermissions' => 1,
-			'preservekeys' => 1
+			'nopermissions' => true,
+			'preservekeys' => true
 		));
 		if (!empty($delItems)) {
 			$delItemIds = zbx_objectValues($delItems, 'itemid');
@@ -2288,5 +2244,6 @@ Copt::memoryPick();
 
 		return (count($ids) == $count);
 	}
+
 }
 ?>

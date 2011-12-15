@@ -159,7 +159,7 @@ if(isset($_REQUEST['save_trigger'])){
 			// $result = $triggerid;
 			$audit_action = AUDIT_ACTION_ADD;
 
-			show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+			show_messages($triggerid, _('Trigger added'), _('Cannot add trigger'));
 		}
 
 		if($result){
