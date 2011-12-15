@@ -10,6 +10,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+....I..... [ZBX-4429] fixed problem with wrong mysql comment tag and warning in mysql function when  update to 1.9.8 (SlaVa)
 ........S. [ZBX-4418] fixed possible SQL errors while processing of time functions (Sasha)
 ..F....... [ZBX-4336] fixed problem with item status clearing when changing  to active in frontend (SlaVa)
 A.F....... [ZBX-4260] replaced event sorting by 'clock' with 'eventid' (pavels)
