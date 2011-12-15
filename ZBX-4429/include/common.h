@@ -958,7 +958,8 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
-int	zbx_strlen_utf8(const char *text);
+size_t	zbx_strlen_utf8(const char *text);
+size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
 
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 char	*zbx_replace_utf8(const char *text);
