@@ -27,7 +27,7 @@ class CChart extends CGraphDraw{
 
 		$this->yaxismin = null;
 		$this->yaxismax = null;
-		$this->isDiskVolume=false;
+		$this->is1024Base=false;
 		$this->triggers = array();
 
 		$this->ymin_type = GRAPH_YAXIS_TYPE_CALCULATED;
@@ -467,14 +467,14 @@ class CChart extends CGraphDraw{
 
 				$val = $arr[3];
 
-				if(strcasecmp($arr[4],'K') == 0)	{$val *= 1024; $this->isDiskVolume=true;}
-				else if(strcasecmp($arr[4],'M') == 0)	{$val *= 1024*1024;$this->isDiskVolume=true;}
-				else if(strcasecmp($arr[4],'G') == 0)	{$val *= 1024*1024*1024;$this->isDiskVolume=true;}
-				else if(strcasecmp($arr[4],'T') == 0)	{$val *= 1024*1024*1024*1024;$this->isDiskVolume=true;}
-				else if(strcasecmp($arr[4],'P') == 0)	{$val *= 1024*1024*1024*1024*1024;$this->isDiskVolume=true;}
-				else if(strcasecmp($arr[4],'E') == 0)	{$val *= 1024*1024*1024*1024*1024*1024;$this->isDiskVolume=true;}
-				else if(strcasecmp($arr[4],'Z') == 0)	{$val *= 1024*1024*1024*1024*1024*1024*1024;$this->isDiskVolume=true;}
-				else if(strcasecmp($arr[4],'Y') == 0)	{$val *= 1024*1024*1024*1024*1024*1024*1024*1024;$this->isDiskVolume=true;}
+				if(strcasecmp($arr[4],'K') == 0)	{$val *= 1024; $this->is1024Base=true;}
+				else if(strcasecmp($arr[4],'M') == 0)	{$val *= 1024*1024;$this->is1024Base=true;}
+				else if(strcasecmp($arr[4],'G') == 0)	{$val *= 1024*1024*1024;$this->is1024Base=true;}
+				else if(strcasecmp($arr[4],'T') == 0)	{$val *= 1024*1024*1024*1024;$this->is1024Base=true;}
+				else if(strcasecmp($arr[4],'P') == 0)	{$val *= 1024*1024*1024*1024*1024;$this->is1024Base=true;}
+				else if(strcasecmp($arr[4],'E') == 0)	{$val *= 1024*1024*1024*1024*1024*1024;$this->is1024Base=true;}
+				else if(strcasecmp($arr[4],'Z') == 0)	{$val *= 1024*1024*1024*1024*1024*1024*1024;$this->is1024Base=true;}
+				else if(strcasecmp($arr[4],'Y') == 0)	{$val *= 1024*1024*1024*1024*1024*1024*1024*1024;$this->is1024Base=true;}
 
 
 				$minY = $this->m_minY[$this->items[$inum]['axisside']];
@@ -822,7 +822,7 @@ class CChart extends CGraphDraw{
 			}
 		}
 //------
-		if($this->isDiskVolume){
+		if($this->is1024Base){
 			$interval=$interval*(1000/1024);
 			$interval_other_side=$interval_other_side*(1000/1024);
 		}
@@ -908,7 +908,7 @@ class CChart extends CGraphDraw{
 			else if($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 				$this->m_minY[$graphSide] = $tmp_minY[$graphSide];
 			}
-			if($this->isDiskVolume){
+			if($this->is1024Base){
 				$this->m_maxY[$graphSide]*=(1000/1024);
 				$this->m_minY[$graphSide]*=(1000/1024);
 			}
