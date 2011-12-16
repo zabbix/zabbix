@@ -89,9 +89,8 @@ function get_next_event($currentEvent, array $eventList = array(), $showUnknown 
 		// check only the events belonging to the same object
 		// find the event with the smallest eventid but greater then the current event id
 		if ($event['object'] == $currentEvent['object'] && bccomp($event['objectid'], $currentEvent['objectid']) == 0
-			&& (bccomp($event['eventid'], $currentEvent['eventid']) === 1
-			&& (!$nextEvent || bccomp($event['eventid'], $nextEvent['eventid']) === -1))) {
-
+				&& (bccomp($event['eventid'], $currentEvent['eventid']) === 1
+				&& (!$nextEvent || bccomp($event['eventid'], $nextEvent['eventid']) === -1))) {
 			$nextEvent = $event;
 		}
 	}
@@ -102,7 +101,7 @@ function get_next_event($currentEvent, array $eventList = array(), $showUnknown 
 	$sql = 'SELECT e.*'.
 			' FROM events e'.
 			' WHERE e.objectid='.$currentEvent['objectid'].
-				' AND e.eventid > '.$currentEvent['eventid'].
+				' AND e.eventid>'.$currentEvent['eventid'].
 				' AND e.object='.$currentEvent['object'].
 				($showUnknown ? '' : ' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES).
 			' ORDER BY e.object,e.objectid,e.eventid';
