@@ -319,7 +319,7 @@ class CProxy extends CZBXAPI {
 		}
 
 
-		foreach($proxies as $inum => &$proxy){
+		foreach($proxies as &$proxy){
 			if(!check_db_fields($proxyDBfields, $proxy)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for proxy [ '.$proxy['host'].' ]');
 			}
@@ -382,25 +382,34 @@ class CProxy extends CZBXAPI {
 		$proxyids = DB::insert('hosts', $proxies);
 
 		$hostUpdate = array();
-		foreach($proxies as $pnum => $proxy){
-			if(!isset($proxy['hosts'])) continue;
+		foreach ($proxies as $pnum => $proxy) {
+			if (!isset($proxy['hosts'])) {
+				continue;
+			}
 
 			$hostids = zbx_objectValues($proxy['hosts'], 'hostid');
 			$hostUpdate[] = array(
 				'values' => array('proxy_hostid' => $proxyids[$pnum]),
-				'where' => array('hostid'=>$hostids)
+				'where' => array('hostid' => $hostids)
 			);
 
-			if($proxy['status'] == HOST_STATUS_PROXY_ACTIVE) continue;
+			if ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE) {
+				continue;
+			}
 
 // INTERFACES
-			foreach($proxy['interfaces'] as $ifnum => &$interface){
+			foreach ($proxy['interfaces'] as &$interface) {
 				$interface['hostid'] = $proxyids[$pnum];
+
+				// mark the interface as main ty pass host interface validation
+				$interface['main'] = true;
 			}
 			unset($interface);
 
 			$result = API::HostInterface()->create($proxy['interfaces']);
-			if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface creation failed');
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface creation failed');
+			}
 		}
 
 		DB::update('hosts', $hostUpdate);
