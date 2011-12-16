@@ -1265,9 +1265,9 @@ function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
 		for ($i = 0; $i < 10; $i++) {
 			$macro = '{ITEM.VALUE'.($i ? $i : '').'}';
 			if (zbx_strstr($description, $macro)) {
-				$value = $flag == ZBX_FLAG_TRIGGER ?
-					trigger_get_func_value($row['expression'], ZBX_FLAG_TRIGGER, $i ? $i : 1, 1):
-					trigger_get_func_value($row['expression'], ZBX_FLAG_EVENT, $i ? $i : 1, $row['clock'], $row['ns']);
+				$value = $flag == ZBX_FLAG_TRIGGER
+					? trigger_get_func_value($row['expression'], ZBX_FLAG_TRIGGER, $i ? $i : 1, 1)
+					: trigger_get_func_value($row['expression'], ZBX_FLAG_EVENT, $i ? $i : 1, $row['clock'], $row['ns']);
 
 				$description = str_replace($macro, $value, $description);
 			}
@@ -2079,8 +2079,8 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 		if (count($parts) == 1 && $sStart == $fPart['openSymbolNum'] && $sEnd == $fPart['closeSymbolNum']) {
 			$next[$level] = false;
 			list($outline, $treeList) = build_expression_html_tree($expression, $fPart, $level, $next, $nextletter, $secondLetters);
-			$outline = isset($treeLevel['openSymbol']) && $treeLevel['levelType'] == 'grouping' ? $treeLevel['openSymbol'].' ' : '';
-			$outline .= isset($treeLevel['closeSymbol']) && $treeLevel['levelType'] == 'grouping' ? ' '.$treeLevel['closeSymbol'] : '';
+			$outline = (isset($treeLevel['openSymbol']) && $treeLevel['levelType'] == 'grouping' ? $treeLevel['openSymbol'].' ' : '')
+				.$outline.(isset($treeLevel['closeSymbol']) && $treeLevel['levelType'] == 'grouping' ? ' '.$treeLevel['closeSymbol'] : '');
 			return array($outline, $treeList);
 		}
 
@@ -2268,10 +2268,10 @@ function expressionHighLevelErrors($expression, $start, $end) {
 function expressionLevelDraw(&$next, $level, &$expr) {
 	for ($i = 0; $i < $level; $i++) {
 		if ($i + 1 == $level) {
-			$expr[] = new CImg('images/general/tr_'.($next[$i] ? 'top_right_bottom':'top_right').'.gif', 'tr', 12, 12);
+			$expr[] = new CImg('images/general/tr_'.($next[$i] ? 'top_right_bottom' : 'top_right').'.gif', 'tr', 12, 12);
 		}
 		else {
-			$expr[] = new CImg('images/general/tr_'.($next[$i] ? 'top_bottom':'space').'.gif', 'tr', 12, 12);
+			$expr[] = new CImg('images/general/tr_'.($next[$i] ? 'top_bottom' : 'space').'.gif', 'tr', 12, 12);
 		}
 	}
 }
@@ -2349,11 +2349,9 @@ function rebuild_expression_tree($expression, &$treeLevel, $action, $actionid, $
 					$fbPart = reset($bParts);
 				}
 
-				$closeSymbolNum = $fbPart['closeSymbolNum'] - $fbPart['openSymbolNum'] + isset($fbPart['closeSymbol']) ? zbx_strlen($fbPart['closeSymbol']) : 0;
-				$prevTrim = $prev + ($prev > $sStart ? zbx_strlen($operand) : 0);
-				$posTrim = (is_int($opPos) && $opPos < $sEnd ? $opPos - zbx_strlen($operand) : $sEnd) - $prev;
-				if (count($bParts) == 1 &&
-					zbx_substr($expression, $fbPart['openSymbolNum'], $closeSymbolNum) == trim(zbx_substr($expression, $prevTrim, $posTrim))) {
+				if (count($bParts) == 1
+					&& zbx_substr($expression, $fbPart['openSymbolNum'], $fbPart['closeSymbolNum'] - $fbPart['openSymbolNum'] + (isset($fbPart['closeSymbol']) ? zbx_strlen($fbPart['closeSymbol']) : 0))
+						== trim(zbx_substr($expression, $prev + ($prev > $sStart ? zbx_strlen($operand) : 0), (is_int($opPos) && $opPos < $sEnd ? $opPos-zbx_strlen($operand) : $sEnd) - $prev))) {
 					$newTreeLevel =& $bParts[key($bParts)];
 				}
 				else {
