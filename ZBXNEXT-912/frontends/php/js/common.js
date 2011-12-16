@@ -259,39 +259,34 @@ function Confirm(msg) {
 	return confirm(msg, 'title');
 }
 
-function create_var(form_name, var_name, var_val, subm) {
-	var frmForm = is_string(form_name) ? document.forms[form_name] : form_name;
-	if (!frmForm) {
+function create_var(form_name, var_name, var_value, doSubmit) {
+	var objForm = is_string(form_name) ? document.forms[form_name] : form_name;
+	if (!objForm) {
 		return false;
 	}
 
-	var objVar = (typeof(frmForm[var_name]) != 'undefined') ? frmForm[var_name] : null;
-
+	var objVar = (typeof(objForm[var_name]) != 'undefined') ? objForm[var_name] : null;
 	if (is_null(objVar)) {
 		objVar = document.createElement('input');
 		objVar.setAttribute('type', 'hidden');
-
 		if (!objVar) {
 			return false;
 		}
-
-		frmForm.appendChild(objVar);
-
 		objVar.setAttribute('name', var_name);
 		objVar.setAttribute('id', var_name.replace(']', '').replace('[', '_'));
+		objForm.appendChild(objVar);
 	}
 
-	if (is_null(var_val)) {
+	if (is_null(var_value)) {
 		objVar.parentNode.removeChild(objVar);
 	}
 	else {
-		objVar.value = var_val;
+		objVar.value = var_value;
 	}
 
-	if (subm) {
-		frmForm.submit();
+	if (doSubmit) {
+		objForm.submit();
 	}
-
 	return false;
 }
 
@@ -331,17 +326,24 @@ function getDimensions(obj, trueSide) {
 			'height':	parseInt(obj.style.height, 10)
 		};
 
-		if (!is_number(dim.top)) dim.top = parseInt(obj.offsetTop, 10);
-		if (!is_number(dim.left)) dim.left = parseInt(obj.offsetLeft, 10);
-		if (!is_number(dim.width)) dim.width = parseInt(obj.offsetWidth, 10);
-		if (!is_number(dim.height)) dim.height = parseInt(obj.offsetHeight, 10);
+		if (!is_number(dim.top)) {
+			dim.top = parseInt(obj.offsetTop, 10);
+		}
+		if (!is_number(dim.left)) {
+			dim.left = parseInt(obj.offsetLeft, 10);
+		}
+		if (!is_number(dim.width)) {
+			dim.width = parseInt(obj.offsetWidth, 10);
+		}
+		if (!is_number(dim.height)) {
+			dim.height = parseInt(obj.offsetHeight, 10);
+		}
 
 		if (!trueSide) {
 			dim.right = dim.left + dim.width;
 			dim.bottom = dim.top + dim.height;
 		}
 	}
-
 	return dim;
 }
 

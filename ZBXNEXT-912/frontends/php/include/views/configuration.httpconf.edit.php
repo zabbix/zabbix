@@ -116,7 +116,7 @@ $httpFormList->addRow(_('Active'), new CCheckBox('status', $this->data['status']
  */
 $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = new CTable(_('No steps defined.'), 'formElementTable');
-$stepsTable->setAttribute('style', 'min-width:500px;');
+$stepsTable->setAttribute('style', 'min-width: 500px;');
 $stepsTable->setAttribute('id', 'httpStepTable');
 $stepsTable->setHeader(array(
 	SPACE,
@@ -129,10 +129,6 @@ $stepsTable->setHeader(array(
 	_('Action')
 ));
 
-if (count($this->data['steps']) > 0) {
-	$first = min(array_keys($this->data['steps']));
-	$last = max(array_keys($this->data['steps']));
-}
 $i = 1;
 foreach ($this->data['steps'] as $stepid => $step) {
 	if (!isset($step['name'])) {

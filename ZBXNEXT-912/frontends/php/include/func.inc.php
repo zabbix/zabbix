@@ -942,7 +942,7 @@ function natksort(&$array) {
 
 function asort_by_key(&$array, $key) {
 	if (!is_array($array)) {
-		error(_('Incorrect type of asort_by_key'));
+		error(_('Incorrect type of asort_by_key.'));
 		return array();
 	}
 	$key = htmlspecialchars($key);
@@ -950,7 +950,7 @@ function asort_by_key(&$array, $key) {
 	return $array;
 }
 
-// Recursively sort an array by key
+// recursively sort an array by key
 function zbx_rksort(&$array, $flags = null) {
 	if (is_array($array)) {
 		foreach ($array as $id => $data) {
@@ -1050,7 +1050,6 @@ function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
 
 function order_by($def, $allways = '') {
 	global $page;
-
 	$orderString = '';
 
 	$sortField = get_request('sort', CProfile::get('web.'.$page['file'].'.sort', null));
@@ -1058,19 +1057,15 @@ function order_by($def, $allways = '') {
 	if (!str_in_array($sortField, $sortable)) {
 		$sortField = null;
 	}
-
 	if ($sortField !== null) {
 		$sortOrder = get_request('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 		$orderString .= $sortField.' '.$sortOrder;
 	}
-
 	if (!empty($allways)) {
 		$orderString .= ($sortField === null) ? '' : ',';
 		$orderString .= $allways;
 	}
-
-	$orderString = empty($orderString) ? '' : ' ORDER BY '.$orderString;
-	return $orderString;
+	return empty($orderString) ? '' : ' ORDER BY '.$orderString;
 }
 
 function unsetExcept(&$array, $allowedFields) {
@@ -1088,9 +1083,9 @@ function zbx_implodeHash($glue1, $glue2, $hash) {
 	$str = '';
 	foreach ($hash as $key => $value) {
 		if (!empty($str)) {
-			$str.= $glue2;
+			$str .= $glue2;
 		}
-		$str.= $key.$glue1.$value;
+		$str .= $key.$glue1.$value;
 	}
 	return $str;
 }
@@ -1598,7 +1593,6 @@ function format_doll_init($doll) {
 		'darken' => 0,
 		'params' => array()
 	);
-
 	foreach ($args as $key => $def) {
 		if (isset($doll[$key])) {
 			$obj[$key] = $doll[$key];
@@ -1607,8 +1601,7 @@ function format_doll_init($doll) {
 			$obj[$key] = $def;
 		}
 	}
-
-	$obj['url'].= (zbx_empty($obj['url']) ? '?' : '&').'output=html';
+	$obj['url'] .= (zbx_empty($obj['url']) ? '?' : '&').'output=html';
 	$obj['params']['favobj'] = 'hat';
 	$obj['params']['favref'] = $doll['id'];
 	$obj['params']['action'] = 'refresh';
@@ -1708,7 +1701,6 @@ function sanitize($data) {
 	else {
 		$data = zbx_htmlstr($data);
 	}
-
 	return $data;
 }
 
