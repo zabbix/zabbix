@@ -168,10 +168,10 @@ include_once('include/page_header.php');
 	if (isset($_REQUEST['period']) || isset($_REQUEST['stime'])) {
 			navigation_bar_calc('web.item.graph', $item['itemid'], true);
 			if ($_REQUEST['action'] != 'showvalues') {
-			jsRedirect('history.php?action='.get_request('action', 'showgraph').'&itemid='.$item['itemid']);
-			include_once('include/page_footer.php');
-			exit();
-		}
+				jsRedirect('history.php?action='.get_request('action', 'showgraph').'&itemid='.$item['itemid']);
+				include_once('include/page_footer.php');
+				exit();
+			}
 	}
 //--
 
