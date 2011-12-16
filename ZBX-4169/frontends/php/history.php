@@ -166,11 +166,11 @@ include_once('include/page_header.php');
 
 // resets get params for proper page refresh
 	if (isset($_REQUEST['period']) || isset($_REQUEST['stime'])) {
-		navigation_bar_calc('web.item.graph', $item['itemid'], true);
-		if ($_REQUEST['action'] != 'showvalues') {
-		jsRedirect('history.php?action=' . get_request('action', 'showgraph') . '&itemid=' . $item['itemid']);
-		include_once('include/page_footer.php');
-		exit();
+			navigation_bar_calc('web.item.graph', $item['itemid'], true);
+			if ($_REQUEST['action'] != 'showvalues') {
+			jsRedirect('history.php?action='.get_request('action', 'showgraph').'&itemid='.$item['itemid']);
+			include_once('include/page_footer.php');
+			exit();
 		}
 	}
 //--
@@ -196,12 +196,12 @@ include_once('include/page_header.php');
 		'body' => array()
 	);
 
-	if(count($items) == 1){
+	if(count($items) == 1) {
 		$ptData['header'][] = $item['host'].': '.item_description($item);
 
 		$header['left'] = array(new CLink($item['host'],'latest.php?hostid='.$item['hostid']),': ',item_description($item));
 
-		if('showgraph' == $_REQUEST['action']){
+		if ('showgraph' == $_REQUEST['action']) {
 			$header['right'][] = get_icon('favourite', array(
 				'fav' => 'web.favorite.graphids',
 				'elid' => $item['itemid'],
