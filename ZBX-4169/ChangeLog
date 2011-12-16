@@ -1,5 +1,6 @@
 Changes for 1.8.10rc1
 
+..F....... [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (Slava)
 .......PS. [ZBX-4424] fixed handling of a long localized content by history syncer (Sasha)
 .......PS. [ZBX-4424] fixed handling of a localized content with incorrect utf8 characters (Sasha)
 ..F....... [ZBX-2737] fixed various messages at linking templates (sanja)
