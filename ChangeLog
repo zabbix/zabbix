@@ -2,6 +2,7 @@
 Changes for 1.9.9
 
 New features:
+........S. [ZBX-2806] improved processing of escalations (dimir,Sasha)
 ..F....... [ZBX-1357] updated Greek, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 A.F....... [ZBX-3527] improved host form to allow selection of default interface (Vedmak)
 A.F.....S. [ZBX-4262] added support of item prototypes for graph y axis min/max (pavels, Sasha)
@@ -10,6 +11,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+........S. [ZBX-2806] fixed possible double notification messages (dimir,Sasha)
 A......... [ZBX-4425] fixed unsetting interface when performing Item::udpate requests (pavels)
 ..F....... [ZBX-4436] fixed wrong sql query in discovery popup (SlaVa)
 ....I..... [ZBX-4429] fixed problem with wrong mysql comment tag and warning in mysql function when  update to 1.9.8 (SlaVa)
