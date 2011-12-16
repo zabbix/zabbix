@@ -3792,7 +3792,7 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 
 	function convert($value){
 		$value = trim($value);
-		if(!preg_match('/(?P<value>[\-+]?[0-9]+[.]?[0-9]*)(?P<mult>[YZEPTGMKsmhdw]?)/', $value, $arr)) return $value;
+		if(!preg_match('/(?P<value>[\-+]?[0-9]+[.]?[0-9]*)(?P<mult>[TGMKsmhdw]?)/', $value, $arr)) return $value;
 
 		$value = $arr['value'];
 		switch($arr['mult']){
@@ -3910,7 +3910,7 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 
 		$evStr = str_replace(array_keys($rplcts), array_values($rplcts), $expression);
 
-		preg_match_all("/[0-9\.]+[KMGTPEZYhmdw]?/", $evStr, $arr);
+		preg_match_all("/[0-9\.]+[KMGThmdw]?/", $evStr, $arr);
 		$evStr = str_replace(array($arr[0][0], $arr[0][1]), array(convert($arr[0][0]), convert($arr[0][1])), $evStr);
 
 		if (!preg_match("/^[0-9.\s=!()><+*\/&E|\-]+$/is", $evStr)) return 'FALSE';
