@@ -2163,6 +2163,7 @@
 			'dependence' => array(),
 			'triggerid' => get_request('triggerid'),
 			'expression' => get_request('expression', ''),
+			'expr_temp' => get_request('expr_temp', ''),
 			'description' => get_request('description', ''),
 			'type' => get_request('type', 0),
 			'priority' => get_request('priority', 0),
@@ -2240,11 +2241,9 @@
 		if ($data['input_method'] == IM_TREE) {
 			$analyze = analyze_expression($data['expression']);
 			if ($analyze !== false) {
-				$expression_temp = '';
-
 				list($data['outline'], $data['eHTMLTree']) = $analyze;
 				if (isset($_REQUEST['expr_action']) && $data['eHTMLTree'] != null) {
-					$new_expr = remake_expression($data['expression'], $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $expression_temp);
+					$new_expr = remake_expression($data['expression'], $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $data['expr_temp']);
 					if ($new_expr !== false) {
 						$data['expression'] = $new_expr;
 						$analyze = analyze_expression($data['expression']);
@@ -2254,14 +2253,14 @@
 						else {
 							show_messages(false, '', _('Expression Syntax Error.'));
 						}
-						$expression_temp = '';
+						$data['expr_temp'] = '';
 					}
 					else {
 						show_messages(false, '', _('Expression Syntax Error.'));
 					}
 				}
 				$data['expression_field_name'] = 'expr_temp';
-				$data['expression_field_value'] = $expression_temp;
+				$data['expression_field_value'] = $data['expr_temp'];
 				$data['expression_field_readonly'] = 'yes';
 				$data['expression_field_params'] = 'this.form.elements[\''.$data['expression_field_name'].'\'].value';
 				$data['expression_macro_button'] = new CButton('insert_macro', _('Insert macro'), 'return call_ins_macro_menu(event);', 'formlist');

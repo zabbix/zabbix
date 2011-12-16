@@ -204,7 +204,9 @@ if ($this->data['input_method'] == IM_TREE) {
 		$wrapOutline,
 		BR(),
 		BR(),
-		new CDiv(array($expressionTable, $testButton), 'objectgroup inlineblock border_dotted ui-corner-all')
+		new CDiv(array($expressionTable, $testButton), 'objectgroup inlineblock border_dotted ui-corner-all'),
+		BR(),
+		BR()
 	));
 }
 
