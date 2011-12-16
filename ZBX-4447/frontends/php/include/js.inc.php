@@ -529,7 +529,7 @@ function insert_js_function($fnct_name){
 						// in internet explorer prototype filters by form name does not work
 						var pForms = parentDocument.body.getElementsByTagName("form");
 						for (i = 0; i < pForms.length; i++) {
-							if (pForms[i].getAttribute("name") === frame) {
+							if (pForms[i].attributes.name && pForms[i].attributes.name.value === frame) {
 								parentDocumentForms = [pForms[i]];
 								break;
 							}
