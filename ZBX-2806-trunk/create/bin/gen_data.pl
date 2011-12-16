@@ -42,7 +42,7 @@ my $output;
 
 %oracle = (
 	"database"	=>	"oracle",
-	"before"	=>	"SET DEFINE OFF\n/\n\n",
+	"before"	=>	"SET DEFINE OFF\n",
 	"after"		=>	"",
 	"exec_cmd"	=>	"\n/\n\n"
 );

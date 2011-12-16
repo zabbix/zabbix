@@ -1,4 +1,4 @@
-SET DEFINE OFF;
+SET DEFINE OFF
 
 drop table help_items;
 
