@@ -442,6 +442,8 @@ frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/views/configuration.application.edit.php -text
 frontends/php/include/views/configuration.application.list.php -text
+frontends/php/include/views/configuration.hostgroups.edit.php -text
+frontends/php/include/views/configuration.hostgroups.list.php -text
 frontends/php/include/views/configuration.services.child.list.php -text
 frontends/php/include/views/configuration.services.edit.php -text
 frontends/php/include/views/configuration.services.list.php -text
