@@ -196,12 +196,12 @@ include_once('include/page_header.php');
 		'body' => array()
 	);
 
-	if(count($items) == 1) {
+	if (count($items) == 1) {
 		$ptData['header'][] = $item['host'].': '.item_description($item);
 
 		$header['left'] = array(new CLink($item['host'],'latest.php?hostid='.$item['hostid']),': ',item_description($item));
 
-		if ('showgraph' == $_REQUEST['action']) {
+		if ($_REQUEST['action'] == 'showgraph') {
 			$header['right'][] = get_icon('favourite', array(
 				'fav' => 'web.favorite.graphids',
 				'elid' => $item['itemid'],
