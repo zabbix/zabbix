@@ -237,7 +237,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 						milliseconds = current_time.tv_usec / 1000;
 #endif
 						fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
-								" Cannot rename log file [%s] to [%s]: %s\n",
+								" cannot rename log file \"%s\" to \"%s\": %s\n",
 								zbx_get_thread_id(),
 								tm->tm_year + 1900,
 								tm->tm_mon + 1,
@@ -251,8 +251,8 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 								zbx_strerror(errno));
 
 						fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
-								" Logfile [%s] size reached configured limit"
-								" LogFileSize. Renaming the logfile to [%s] and"
+								" Logfile \"%s\" size reached configured limit"
+								" LogFileSize. Renaming the logfile to \"%s\" and"
 								" starting a new logfile failed. The logfile"
 								" was truncated and started from beginning.\n",
 								zbx_get_thread_id(),
@@ -308,13 +308,12 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 
 			fprintf(log_file, "\n");
 			zbx_fclose(log_file);
-
 		}
 
 		zbx_mutex_unlock(&log_file_access);
 
 		return;
-	}	/* LOG_TYPE_FILE */
+	}
 
 	va_start(args, fmt);
 	zbx_vsnprintf(message, sizeof(message), fmt, args);
