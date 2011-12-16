@@ -201,11 +201,11 @@ abstract class CItemGeneral extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
 				}
 				elseif (!isset($interfaces[$fullItem['interfaceid']])
-					|| bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
+						|| bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
 				}
 				elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY
-					&& $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
+						&& $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
 				}
 			}
@@ -216,9 +216,9 @@ abstract class CItemGeneral extends CZBXAPI{
 
 			// item key
 			if (($fullItem['type'] == ITEM_TYPE_DB_MONITOR && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_DB_MONITOR) == 0)
-				|| ($fullItem['type'] == ITEM_TYPE_SSH && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_SSH) == 0)
-				|| ($fullItem['type'] == ITEM_TYPE_TELNET && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_TELNET) == 0)
-				|| ($fullItem['type'] == ITEM_TYPE_JMX && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_JMX) == 0)) {
+					|| ($fullItem['type'] == ITEM_TYPE_SSH && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_SSH) == 0)
+					|| ($fullItem['type'] == ITEM_TYPE_TELNET && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_TELNET) == 0)
+					|| ($fullItem['type'] == ITEM_TYPE_JMX && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_JMX) == 0)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
 			}
 
@@ -231,8 +231,8 @@ abstract class CItemGeneral extends CZBXAPI{
 				$params = $itemKey->getParameters();
 
 				if (!str_in_array($itemKey->getKeyId(), array('grpmax', 'grpmin', 'grpsum', 'grpavg'))
-					|| count($params) != 4
-					|| !str_in_array($params[2], array('last', 'min', 'max', 'avg', 'sum', 'count'))) {
+						|| count($params) != 4
+						|| !str_in_array($params[2], array('last', 'min', 'max', 'avg', 'sum', 'count'))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
 							' "<last|min|max|avg|sum|count>", "parameter"].', $itemKey->getKeyId()));
@@ -240,8 +240,8 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
-				&& strcmp($fullItem['key_'], 'snmptrap.fallback') != 0
-				&& strcmp($itemKey->getKeyId(), 'snmptrap') != 0) {
+					&& strcmp($fullItem['key_'], 'snmptrap.fallback') != 0
+					&& strcmp($itemKey->getKeyId(), 'snmptrap') != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid'));
 			}
 
@@ -251,7 +251,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_LOG
-				&& str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog'))) {
+					&& str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog'))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be Log for log key.'));
 			}
 
