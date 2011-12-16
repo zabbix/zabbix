@@ -29,10 +29,12 @@ abstract class CItemGeneral extends CZBXAPI{
 
 	abstract public function get($options=array());
 
-	public function __construct(){
-// template - if templated item, value is taken from template item, cannot be changed on host
-// system - values should not be updated
-// host - value should be null for template items
+	public function __construct() {
+		parent::__construct();
+
+		// template - if templated item, value is taken from template item, cannot be changed on host
+		// system - values should not be updated
+		// host - value should be null for template items
 		$this->fieldRules = array(
 			'type'					=> array('template' => 1),
 			'snmp_community'		=> array(),
@@ -156,10 +158,6 @@ abstract class CItemGeneral extends CZBXAPI{
 
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
 
-				if ($dbHosts[$fullItem['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
-					unset($item['interfaceid']);
-				}
-
 				// apply rules
 				foreach ($this->fieldRules as $field => $rules) {
 					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
@@ -182,13 +180,6 @@ abstract class CItemGeneral extends CZBXAPI{
 				if (!isset($dbHosts[$item['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
-
-				if (!isset($item['interfaceid'])
-						&& self::itemTypeInterface($item['type'])
-						&& $dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE
-						&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
-				}
 			}
 
 			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
@@ -203,21 +194,22 @@ abstract class CItemGeneral extends CZBXAPI{
 				$item['data_type'] = 0;
 			}
 
-			// interface
+			// check if the item requires an interface
 			$itemInterfaceType = self::itemTypeInterface($fullItem['type']);
-			if ($itemInterfaceType !== false
-					&& $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE
-					&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD
-					&& isset($item['interfaceid']) && $item['interfaceid']) {
-				if (!isset($interfaces[$fullItem['interfaceid']])
+			if ($itemInterfaceType !== false && $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE) {
+				if (!$fullItem['interfaceid']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
+				}
+				elseif (!isset($interfaces[$fullItem['interfaceid']])
 						|| bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
 				}
-				if ($itemInterfaceType !== INTERFACE_TYPE_ANY
+				elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY
 						&& $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
 				}
 			}
+			// no interface required, just set it to NULL
 			else {
 				$item['interfaceid'] = 0;
 			}
@@ -243,7 +235,7 @@ abstract class CItemGeneral extends CZBXAPI{
 						|| !str_in_array($params[2], array('last', 'min', 'max', 'avg', 'sum', 'count'))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
-						' "<last|min|max|avg|sum|count>", "parameter"].', $itemKey->getKeyId()));
+							' "<last|min|max|avg|sum|count>", "parameter"].', $itemKey->getKeyId()));
 				}
 			}
 
