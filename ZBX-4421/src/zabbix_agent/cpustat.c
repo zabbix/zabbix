@@ -194,6 +194,8 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 	long	cp_time[CPUSTATES];
 	size_t	nlen = sizeof(cp_time);
+	long	*cp_times = NULL;
+	size_t	nlens, nlena;
 
 #elif defined(HAVE_KSTAT_H)
 
@@ -327,6 +329,39 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)cp_time[CP_IDLE];
 
 	update_cpu_counters(&pcpus->cpu[0], counter);
+
+	/* Get size of result set for CPU statistics */
+	if (-1 == sysctlbyname("kern.cp_times", NULL, &nlens, NULL, 0)) {
+		for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
+			update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+		goto exit;
+	}
+
+	cp_times = zbx_malloc(cp_times, nlens);
+
+	nlena = nlens;
+	if (0 == sysctlbyname("kern.cp_times", cp_times, &nlena, NULL, 0) && nlena == nlens)
+	{
+		for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
+		{
+			memset(counter, 0, sizeof(counter));
+
+			counter[ZBX_CPU_STATE_USER] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_USER);
+			counter[ZBX_CPU_STATE_NICE] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_NICE);
+			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_SYS);
+			counter[ZBX_CPU_STATE_INTERRUPT] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_INTR);
+			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_IDLE);
+
+			update_cpu_counters(&pcpus->cpu[cpu_num], counter);
+		}
+	}
+	else
+	{
+		for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
+			update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+	}
+
+	zbx_free(cp_times);
 
 #elif defined(HAVE_KSTAT_H)
 	/* Solaris */
