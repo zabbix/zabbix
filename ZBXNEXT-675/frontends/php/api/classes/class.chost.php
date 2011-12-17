@@ -1458,7 +1458,7 @@ Copt::memoryPick();
 /**
  * Add Host
  *
- * @param _array $hosts multidimensional array with Hosts data
+ * @param array $hosts multidimensional array with Hosts data
  * @param string $hosts['host'] Host name.
  * @param array $hosts['groups'] array of HostGroup objects with IDs add Host to.
  * @param int $hosts['port'] Port. OPTIONAL

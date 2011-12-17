@@ -2641,6 +2641,23 @@ const char	*zbx_nodetype_string(unsigned char nodetype)
 	}
 }
 
+const char	*zbx_escalation_status_string(unsigned char status)
+{
+	switch (status)
+	{
+		case ESCALATION_STATUS_ACTIVE:
+			return "active";
+		case ESCALATION_STATUS_RECOVERY:
+			return "recovery";
+		case ESCALATION_STATUS_SLEEP:
+			return "sleep";
+		case ESCALATION_STATUS_COMPLETED:
+			return "completed";
+		default:
+			return "unknown";
+	}
+}
+
 #ifdef _WINDOWS
 static int	get_codepage(const char *encoding, unsigned int *codepage)
 {

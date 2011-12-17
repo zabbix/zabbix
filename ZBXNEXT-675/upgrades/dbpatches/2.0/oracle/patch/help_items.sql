@@ -1,3 +1,5 @@
+SET DEFINE OFF
+
 drop table help_items;
 
 CREATE TABLE help_items (
