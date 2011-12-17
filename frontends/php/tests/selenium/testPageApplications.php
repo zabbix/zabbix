@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2000-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,33 +19,37 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 
-class testPageApplications extends CWebTest {
-
-	public static function getAll() {
-		return DBdata('SELECT a.* FROM applications a');
+class testPageApplications extends CWebTest{
+	// Returns all hosts
+	public static function allHosts(){
+		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
 	}
 
 	/**
-	 * @dataProvider getAll
-	 */
-	public function testPageApplications_SimpleTest($host) {
-		$this->login('applications.php');
+	* @dataProvider allHosts
+	*/
 
-		$this->dropdown_select_wait('groupid', 'all');
-		$this->assertTitle('Applications');
-		$this->ok('Applications');
+	public function testPageApplications_SimpleTest($host){
+		$hostid=$host['hostid'];
 
-		// go to the list
-		$this->href_click('applications.php?groupid='.$host['groupid'].'&hostid='.$host['hostid'].'&sid=');
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+
+		$this->assertTitle('Hosts');
+		$this->ok('HOSTS');
+		// Go to the list of applications
+		$this->href_click("applications.php?groupid=0&hostid=$hostid&sid=");
 		$this->wait();
-
-		// we are in the list
+		// We are in the list of applications
 		$this->assertTitle('Applications');
 		$this->ok('CONFIGURATION OF APPLICATIONS');
+		$this->ok('Displaying');
+		$this->ok('Host list');
+		// Header
+		$this->ok(array('Applications', 'Show'));
 
-		// combobox
 		$this->dropdown_select('go', 'Activate selected');
 		$this->dropdown_select('go', 'Disable selected');
 		$this->dropdown_select('go', 'Delete selected');
