@@ -319,7 +319,7 @@ class CProxy extends CZBXAPI {
 		}
 
 
-		foreach($proxies as &$proxy){
+		foreach ($proxies as &$proxy) {
 			if(!check_db_fields($proxyDBfields, $proxy)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for proxy [ '.$proxy['host'].' ]');
 			}
