@@ -450,10 +450,12 @@ frontends/php/include/views/configuration.services.list.php -text
 frontends/php/include/views/configuration.services.parent.list.php -text
 frontends/php/include/views/configuration.triggers.copy.php -text
 frontends/php/include/views/configuration.triggers.edit.php -text
+frontends/php/include/views/configuration.triggers.expression.php -text
 frontends/php/include/views/configuration.triggers.list.php -text
 frontends/php/include/views/configuration.triggers.massupdate.php -text
 frontends/php/include/views/js/configuration.services.edit.js.php -text
 frontends/php/include/views/js/configuration.triggers.edit.js.php -text
+frontends/php/include/views/js/configuration.triggers.expression.js.php -text
 frontends/php/js/browsers.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
