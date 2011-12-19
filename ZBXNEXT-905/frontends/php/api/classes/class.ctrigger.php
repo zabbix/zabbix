@@ -1465,7 +1465,7 @@ class CTrigger extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function delete(array $triggerids, $nopermissions = false) {
+	public function delete($triggerids, $nopermissions = false) {
 		$triggerids = zbx_toArray($triggerids);
 		$triggers = zbx_toObject($triggerids, 'triggerid');
 

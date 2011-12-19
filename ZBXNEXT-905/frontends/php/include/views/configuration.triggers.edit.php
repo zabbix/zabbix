@@ -124,8 +124,8 @@ if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable->setHeader(array(
 		$this->data['limited'] == 'yes' ? null : _('Target'),
 		_('Expression'),
-		_('Error'),
-		$this->data['limited'] == 'yes' ? null : _('Delete')
+		empty($this->data['parent_discoveryid']) ? _('Error') : null,
+		$this->data['limited'] == 'yes' ? null : _('Action')
 	));
 
 	$allowedTesting = true;
@@ -145,24 +145,29 @@ if ($this->data['input_method'] == IM_TREE) {
 				$triggerCheckbox = null;
 			}
 
-			if (!isset($e['expression']['levelErrors'])) {
-				$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
-				$errorImg->setHint(_('No errors found.'), '', '', false);
+			if (empty($this->data['parent_discoveryid'])) {
+				if (!isset($e['expression']['levelErrors'])) {
+					$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
+					$errorImg->setHint(_('No errors found.'), '', '', false);
+				}
+				else {
+					$allowedTesting = false;
+					$errorImg = new CImg('images/general/error_icon.png', 'expression_errors');
+					$errorTexts = array();
+					if (is_array($e['expression']['levelErrors'])) {
+						foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {
+							if (count($errorTexts) > 0) {
+								array_push($errorTexts, BR());
+							}
+							array_push($errorTexts, $expVal, ':', $errTxt);
+						}
+					}
+					$errorImg->setHint($errorTexts, '', 'left', false);
+				}
+				$errorColumn = new CCol($errorImg, 'center');
 			}
 			else {
-				$allowedTesting = false;
-				$errorImg = new CImg('images/general/error_icon.png', 'expression_errors');
-
-				$errorTexts = array();
-				if (is_array($e['expression']['levelErrors'])) {
-					foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {
-						if (count($errorTexts) > 0) {
-							array_push($errorTexts, BR());
-						}
-						array_push($errorTexts, $expVal, ':', $errTxt);
-					}
-				}
-				$errorImg->setHint($errorTexts, '', 'left', false);
+				$errorColumn = null;
 			}
 
 			// templated trigger
@@ -176,8 +181,8 @@ if ($this->data['input_method'] == IM_TREE) {
 					}
 				}
 			}
-			$errorCell = new CCol($errorImg, 'center');
-			$row = new CRow(array($triggerCheckbox, $e['list'], $errorCell, isset($deleteUrl) ? $deleteUrl : null));
+
+			$row = new CRow(array($triggerCheckbox, $e['list'], $errorColumn, isset($deleteUrl) ? $deleteUrl : null));
 			$expressionTable->addRow($row);
 		}
 	}
@@ -328,11 +333,12 @@ $triggersForm->addItem($triggersTab);
 $buttons = array();
 if (!empty($this->data['triggerid'])) {
 	$buttons[] = new CSubmit('clone', _('Clone'));
-	if (!$this->data['limited']) {
-		$buttons[] = new CButtonDelete(_('Delete trigger?'), url_param('form').url_param('groupid').url_param('hostid').
-			url_param('triggerid').url_param('parent_discoveryid')
-		);
+
+	$deleteButton = new CButtonDelete(_('Delete trigger?'), url_param('form').url_param('groupid').url_param('hostid').url_param('triggerid').url_param('parent_discoveryid'));
+	if ($this->data['limited']) {
+		$deleteButton->setAttribute('disabled', 'disabled');
 	}
+	$buttons [] = $deleteButton;
 }
 $buttons[] = new CButtonCancel(url_param('groupid').url_param('hostid').url_param('parent_discoveryid'));
 $triggersForm->addItem(makeFormFooter(

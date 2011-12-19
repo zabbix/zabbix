@@ -67,6 +67,7 @@ foreach ($this->data['functions'] as $id => $f) {
 }
 $expressionFormList->addRow(_('Function'), $functionComboBox);
 
+$valueIsReadonly = 'no';
 if (isset($this->data['functions'][$this->data['function']]['params'])) {
 	foreach ($this->data['functions'][$this->data['function']]['params'] as $pid => $pf) {
 		$paramValue = isset($this->data['param'][$pid]) ? $this->data['param'][$pid] : null;
@@ -79,6 +80,7 @@ if (isset($this->data['functions'][$this->data['function']]['params'])) {
 						foreach ($pf['M'] as $mid => $caption) {
 							$paramTypeElement->addItem($mid, $caption);
 						}
+						$valueIsReadonly = 'yes';
 					}
 					elseif ($pf['M'] == PARAM_TYPE_SECONDS) {
 						$expressionForm->addVar('paramtype', PARAM_TYPE_SECONDS);
@@ -112,7 +114,7 @@ else {
 	$expressionForm->addVar('paramtype', PARAM_TYPE_SECONDS);
 	$expressionForm->addVar('param', 0);
 }
-$expressionFormList->addRow('N', new CTextBox('value', $this->data['value'], 10));
+$expressionFormList->addRow('N', new CTextBox('value', $this->data['value'], 10, $valueIsReadonly));
 
 // append tabs to form
 $expressionTab = new CTabView();

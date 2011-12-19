@@ -27,6 +27,19 @@
 		jQuery(obj).val(value);
 		<?php } ?>
 	}
+
+	jQuery(document).ready(function() {
+		'use strict';
+
+		jQuery('#paramtype').change(function() {
+			if (jQuery('#paramtype option:selected').val() == <?php echo PARAM_TYPE_COUNTS; ?>) {
+				jQuery('#value').removeAttr('readonly');
+			}
+			else {
+				jQuery('#value').attr('readonly', 'readonly');
+			}
+		});
+	});
 </script>
 <?php
 if (!empty($this->data['insert'])) {
