@@ -46,7 +46,8 @@ class API_JSON_Host extends CZabbixTest
 							"useip" => 1,
 							"ip" => "192.168.3.1",
 							"dns" => "",
-							"port" => 567
+							"port" => 567,
+							'main' => 1
 						)
 					),
 					"groups" => array(
@@ -68,7 +69,8 @@ class API_JSON_Host extends CZabbixTest
 							"useip" => 1,
 							"ip" => "192.168.3.1",
 							"dns" => "",
-							"port" => 567
+							"port" => 567,
+							'main' => 1
 						)
 					),
 					"groups" => array(
@@ -91,7 +93,8 @@ class API_JSON_Host extends CZabbixTest
 							"useip" => 1,
 							"ip" => "192.168.3.1",
 							"dns" => "",
-							"port" => 567
+							"port" => 567,
+							'main' => 1
 						)
 					),
 					"groups" => array(
