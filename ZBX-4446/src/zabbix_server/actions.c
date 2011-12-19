@@ -1200,19 +1200,13 @@ void	process_actions(DB_EVENT *event)
 
 		if (SUCCEED == check_action_conditions(event, actionid, evaltype))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "conditions match our event, execute operations");
-
 			DBstart_escalation(actionid, event->source == EVENT_SOURCE_TRIGGERS ? event->objectid : 0, event->eventid);
 
 			if (event->source == EVENT_SOURCE_DISCOVERY || event->source == EVENT_SOURCE_AUTO_REGISTRATION)
 				execute_operations(event, actionid);
 		}
 		else if (EVENT_SOURCE_TRIGGERS == event->source)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "conditions do not match our event, do not execute operations");
-
 			DBstop_escalation(actionid, event->objectid, event->eventid);
-		}
 	}
 	DBfree_result(result);
 

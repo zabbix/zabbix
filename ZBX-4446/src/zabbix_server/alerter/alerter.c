@@ -144,11 +144,16 @@ void	main_alerter_loop()
 	{
 		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
 
-		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid"
-				",mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path"
-				",mt.gsm_modem,mt.username,mt.passwd,a.retries from alerts a,media_type mt"
-				" where a.status=%d and a.mediatypeid=mt.mediatypeid and a.alerttype=%d" DB_NODE
-				" order by a.clock",
+		result = DBselect(
+				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid,"
+				"mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,"
+				"mt.gsm_modem,mt.username,mt.passwd,a.retries"
+				" from alerts a,media_type mt"
+				" where a.mediatypeid=mt.mediatypeid"
+					" and a.status=%d"
+					" and a.alerttype=%d"
+					DB_NODE
+				" order by a.alertid",
 				ALERT_STATUS_NOT_SENT,
 				ALERT_TYPE_MESSAGE,
 				DBnode_local("mt.mediatypeid"));
@@ -180,14 +185,14 @@ void	main_alerter_loop()
 
 			if (SUCCEED == res)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Alert ID [" ZBX_FS_UI64 "] was sent successfully",
+				zabbix_log(LOG_LEVEL_DEBUG, "alert ID [" ZBX_FS_UI64 "] was sent successfully",
 						alert.alertid);
 				DBexecute("update alerts set status=%d,error='' where alertid=" ZBX_FS_UI64,
 						ALERT_STATUS_SENT, alert.alertid);
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Error sending alert ID [" ZBX_FS_UI64 "]", alert.alertid);
+				zabbix_log(LOG_LEVEL_DEBUG, "error sending alert ID [" ZBX_FS_UI64 "]", alert.alertid);
 
 				error_esc = DBdyn_escape_string_len(error, ALERT_ERROR_LEN);
 
