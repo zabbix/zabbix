@@ -347,11 +347,18 @@ class CProxy extends CZBXAPI {
 
 			if($delete) continue;
 
-			if(isset($proxy['interfaces'])){
-				if(!is_array($proxy['interfaces']) || empty($proxy['interfaces']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for proxy "%s"',$proxy['host']));
-				else if(count($proxy['interfaces']) > 1)
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Too many interfaces provided for proxy "%s".',$proxy['host']));
+			if (isset($proxy['interfaces'])) {
+				if (!is_array($proxy['interfaces']) || empty($proxy['interfaces'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for proxy "%s"', $proxy['host']));
+				}
+				else if (count($proxy['interfaces']) > 1) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Too many interfaces provided for proxy "%s".', $proxy['host']));
+				}
+
+				foreach ($proxy['interfaces'] as &$interface) {
+					// mark the interface as main ty pass host interface validation
+					$interface['main'] = true;
+				}
 			}
 
 			if(isset($proxy['host'])){
@@ -400,9 +407,6 @@ class CProxy extends CZBXAPI {
 // INTERFACES
 			foreach ($proxy['interfaces'] as &$interface) {
 				$interface['hostid'] = $proxyids[$pnum];
-
-				// mark the interface as main ty pass host interface validation
-				$interface['main'] = true;
 			}
 			unset($interface);
 
