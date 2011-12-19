@@ -2173,7 +2173,7 @@
 			'expr_temp' => get_request('expr_temp', ''),
 			'input_method' => get_request('input_method', IM_ESTABLISHED),
 			'limited' => null,
-			'caption' => array(),
+			'templates' => array(),
 			'config' => select_config()
 		);
 
@@ -2184,7 +2184,7 @@
 				$data['description'] = $data['trigger']['description'];
 			}
 
-			// get caption
+			// get templates
 			$tmp_triggerid = $data['triggerid'];
 			do {
 				$db_triggers = DBfetch(DBselect(
@@ -2196,29 +2196,12 @@
 						' AND f.triggerid=t.triggerid'
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
-					$data['caption'][] = new CDiv(SPACE.':'.SPACE, 'tab_text');
-					$data['caption'][] = new CLink($db_triggers['name'], 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'], 'tab_link highlight');
+					$data['templates'][] = new CLink($db_triggers['name'], 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'], 'highlight underline');
 				}
 				$tmp_triggerid = $db_triggers['templateid'];
 			} while ($tmp_triggerid != 0);
 
-			if (!empty($data['caption'])) {
-				$data['caption'][] = _('Trigger');
-				$data['caption'] = array_reverse($data['caption']);
-				$data['caption'][] = new CDiv('"', 'tab_text');
-				$data['caption'][] = new CDiv(htmlspecialchars($data['trigger']['description']), 'tab_text');
-				$data['caption'][] = new CDiv('"'.SPACE.SPACE.SPACE, 'tab_text');
-			}
-			else {
-				$data['caption'][] = _('Trigger').SPACE.'" ';
-				$data['caption'] = array_reverse($data['caption']);
-				$data['caption'][] = htmlspecialchars($data['trigger']['description']);
-				$data['caption'][] = '"';
-			}
 			$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
-		}
-		else {
-			$data['caption'][] = _('Trigger');
 		}
 
 		if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || !empty($data['limited'])) {

@@ -502,7 +502,6 @@ frontends/php/styles/darkorange/images/ui-icons_000000_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_a83300_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_dfdfdf_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_ff5500_256x240.png -text
-frontends/php/styles/jquery_override.css -text svneol=unset#text/plain
 frontends/php/styles/originalblue/images/ui-bg_flat_0_999999_40x100.png -text
 frontends/php/styles/originalblue/images/ui-bg_flat_0_c9c9c9_40x100.png -text
 frontends/php/styles/originalblue/images/ui-bg_flat_100_fef1ec_40x100.png -text
