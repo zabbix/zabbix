@@ -248,6 +248,5 @@ $triggersForm->addItem(array($this->data['paging'], $triggersTable, $this->data[
 
 // append form to widget
 $triggersWidget->addItem($triggersForm);
-
 return $triggersWidget;
 ?>

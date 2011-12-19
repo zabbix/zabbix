@@ -204,10 +204,16 @@ if ($this->data['input_method'] == IM_TREE) {
 		$wrapOutline,
 		BR(),
 		BR(),
-		new CDiv(array($expressionTable, $testButton), 'objectgroup inlineblock border_dotted ui-corner-all'),
-		BR(),
-		BR()
+		new CDiv(array($expressionTable, $testButton), 'objectgroup inlineblock border_dotted ui-corner-all')
 	));
+
+	$inputMethodToggle = new CSpan(_('Close expression constructor'), 'link');
+	$inputMethodToggle->setAttribute('onclick', 'javascript: '.
+		'document.getElementById(\'toggle_input_method\').value=1;'.
+		'document.getElementById(\'input_method\').value='.IM_ESTABLISHED.';'.
+		'document.forms[\''.$triggersForm->getName().'\'].submit();'
+	);
+	$triggersFormList->addRow(SPACE, array($inputMethodToggle, BR()));
 }
 
 $triggersFormList->addRow(_('Multiple PROBLEM events generation'), new CCheckBox('type', ($this->data['type'] == 0) ? 'yes' : 'no', null, 1));
