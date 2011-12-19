@@ -61,7 +61,7 @@ class CZBXAPI {
 	 *
 	 * @return string
 	 */
-	protected function tableName() {
+	public function tableName() {
 		return $this->tableName;
 	}
 
@@ -89,6 +89,8 @@ class CZBXAPI {
 	/**
 	 * Prepends the table alias to the given field name.
 	 *
+	 * @param string $fieldName
+	 *
 	 * @return string
 	 */
 	protected function fieldId($fieldName) {
@@ -101,8 +103,18 @@ class CZBXAPI {
 	 *
 	 * @return string
 	 */
-	protected function pk() {
+	public function pk() {
 		return $this->pk;
+	}
+
+
+	/**
+	 * Returns the name of the option that refers the PK column.
+	 *
+	 * @return string
+	 */
+	public function pkOption() {
+		return $this->pk().'s';
 	}
 
 
