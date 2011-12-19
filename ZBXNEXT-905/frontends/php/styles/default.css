@@ -116,10 +116,7 @@ ul.itservices { margin: 0 0 0 5px; }
 ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; }
 ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; }
-ul.formlist li.top-aligned {
-	margin: -1px 0 0 0;
-	padding-top: 0;
-}
+ul.formlist li.top-aligned { margin: -1px 0 0 0; padding-top: 0; }
 
 /* any object list inline */
 ul.objectlist { padding: 0; list-style: none; margin: 0;}
@@ -642,3 +639,6 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .browserwarningCopyright a:hover { text-decoration: underline; }
 
 .vertical-middle { width: 100%; display: table-cell; vertical-align: middle; *position: absolute; *top: 50%; }
+
+/* Tab */
+.tab_text { padding: 0.5em 0 0; float: left; }

@@ -268,7 +268,9 @@ $fields = array(
 	'param' =>				array(T_ZBX_STR, O_OPT, null,	0,			'isset({insert})'),
 	'paramtype' =>			array(T_ZBX_INT, O_OPT, null,	IN(PARAM_TYPE_SECONDS.','.PARAM_TYPE_COUNTS), 'isset({insert})'),
 	'value' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({insert})'),
-	'insert' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null)
+	// action
+	'insert' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 );
 check_fields($fields);
 
@@ -348,7 +350,7 @@ else {
 	$item_key = $item_host = $description = '';
 }
 
-if(is_null($paramtype) && isset($functions[$function]['params']['M'])) {
+if (is_null($paramtype) && isset($functions[$function]['params']['M'])) {
 	$paramtype = is_array($functions[$function]['params']['M']) ? reset($functions[$function]['params']['M']) : $functions[$function]['params']['M'];
 }
 elseif (is_null($paramtype)) {
@@ -363,167 +365,46 @@ if (!is_array($param)) {
 		$param = array($param);
 	}
 }
-?>
-<script language="JavaScript" type="text/javascript">
-function add_var_to_opener_obj(obj, name, value) {
-	new_variable = window.opener.document.createElement('input');
-	new_variable.type = 'hidden';
-	new_variable.name = name;
-	new_variable.value = value;
-	obj.appendChild(new_variable);
-}
 
-function insertText(obj, value) {
-	<?php if ($dstfld1 == 'expression') { ?>
-	if (IE) {
-		obj.focus();
-		var s = window.opener.document.selection.createRange();
-		s.text = value;
-	}
-	else if (obj.selectionStart || obj.selectionStart == '0') {
-		var s = obj.selectionStart;
-		var e = obj.selectionEnd;
-		var objValue = jQuery(obj).val();
-		jQuery(obj).val(objValue.substring(0, s) + value + objValue.substring(e, objValue.length));
-	}
-	else {
-		jQuery(obj).val(value);
-	}
-	<?php } else { ?>
-	jQuery(obj).val(value);
-	<?php } ?>
-}
-</script>
-<?php
-	if (isset($_REQUEST['insert'])) {
-		$expression = sprintf('{%s:%s.%s(%s%s)}%s%s',
-			$item_host,
-			$item_key,
-			$function,
-			$paramtype == PARAM_TYPE_COUNTS ? '#' : '',
-			rtrim(implode(',', $param), ','),
-			$operator,
-			$value
-		);
-?>
-<script language="JavaScript" type="text/javascript">
-	var form = window.opener.document.forms['<?php echo $dstfrm; ?>'];
-	if (form) {
-		var el = form.elements['<?php echo $dstfld1; ?>'];
-		if (el) {
-			insertText(el, <?php echo zbx_jsvalue($expression); ?>);
-			close_window();
-		}
-	}
-</script>
-<?php
-}
-echo SBR;
-
-$parent_discoveryid = get_request('parent_discoveryid', null);
-
-$form = new CFormTable(_('Condition'));
-$form->setName('expression');
-$form->addVar('dstfrm', $dstfrm);
-$form->addVar('dstfld1', $dstfld1);
-$form->addVar('itemid', $itemid);
-if (!empty($parent_discoveryid)) {
-	$form->addVar('parent_discoveryid', $parent_discoveryid);
-}
-$normal_only = $parent_discoveryid ? '&normal_only=1' : '';
-
-$row = array(
-	new CTextBox('description', $description, 50, 'yes'),
-	new CButton('select', _('Select'), 'return PopUp(\'popup.php?dstfrm='.$form->getName().
-		'&dstfld1=itemid&dstfld2=description&submitParent=1'.$normal_only.
-		'&srctbl=items&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');'
-	)
+/*
+ * Display
+ */
+$data = array(
+	'parent_discoveryid' => get_request('parent_discoveryid', null),
+	'dstfrm' => $dstfrm,
+	'dstfld1' => $dstfld1,
+	'itemid' => $itemid,
+	'value' => $value,
+	'param' => $param,
+	'paramtype' => $paramtype,
+	'description' => $description,
+	'functions' => $functions,
+	'function' => $function,
+	'operator' => $operator,
+	'item_host' => $item_host,
+	'item_key' => $item_key,
+	'itemValueType' => null,
+	'expr_type' => $expr_type,
+	'insert' => get_request('insert', null),
+	'cancel' => get_request('cancel', null)
 );
-if (!empty($parent_discoveryid)) {
-	$row[] = new CButton('select', _('Select prototype'), 'return PopUp(\'popup.php?dstfrm='.$form->getName().
-		'&dstfld1=itemid&dstfld2=description&submitParent=1'.url_param('parent_discoveryid', true).
-		'&srctbl=prototypes&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');'
-	);
-}
-$form->addRow(_('Item'), $row);
-
-$cmbFnc = new CComboBox('expr_type', $expr_type, 'submit()');
-$cmbFnc->addStyle('width: auto;');
 
 // if user has already selected an item
-if (isset($_REQUEST['itemid'])) {
+if (!empty($itemid)) {
 	// getting type of return value for the item user selected
 	$selectedItems = API::Item()->get(array(
-		'itemids' => array($_REQUEST['itemid']),
+		'itemids' => array($itemid),
 		'output' => API_OUTPUT_EXTEND
 	));
 	if ($selectedItem = reset($selectedItems)) {
-		$itemValueType = $selectedItem['value_type'];
+		$data['itemValueType'] = $selectedItem['value_type'];
 	}
 }
 
-foreach ($functions as  $id => $f) {
-	foreach ($f['operators'] as $op => $txt_op) {
-		// if user has selected an item, we are filtering out the triggers that can't work with it
-		if (!isset($itemValueType) || isset($f['allowed_types'][$itemValueType])) {
-			$cmbFnc->addItem($id.'['.$op.']', str_replace('{OP}', $txt_op, $f['description']));
-		}
-	}
-}
-$form->addRow(_('Function'), $cmbFnc);
-
-if (isset($functions[$function]['params'])) {
-	foreach ($functions[$function]['params'] as $pid => $pf) {
-		$pv = isset($param[$pid]) ? $param[$pid] : null;
-
-		if ($pf['T'] == T_ZBX_INT) {
-			if ($pid == 0) {
-				if (isset($pf['M'])) {
-					if (is_array($pf['M'])) {
-						$cmbParamType = new CComboBox('paramtype', $paramtype);
-						foreach ($pf['M'] as $mid => $caption) {
-							$cmbParamType->addItem($mid, $caption);
-						}
-					}
-					elseif ($pf['M'] == PARAM_TYPE_SECONDS) {
-						$form->addVar('paramtype', PARAM_TYPE_SECONDS);
-						$cmbParamType = _('Seconds');
-					}
-					elseif ($pf['M'] == PARAM_TYPE_COUNTS) {
-						$form->addVar('paramtype', PARAM_TYPE_COUNTS);
-						$cmbParamType = _('Count');
-					}
-				}
-				else {
-					$form->addVar('paramtype', PARAM_TYPE_SECONDS);
-					$cmbParamType = _('Seconds');
-				}
-			}
-			elseif ($pid == 1) {
-				$cmbParamType = _('Seconds');
-			}
-			else {
-				$cmbParamType = null;
-			}
-
-			$form->addRow($pf['C'].' ', array(
-				new CNumericBox('param['.$pid.']', $pv, 10),
-				$cmbParamType
-			));
-		}
-		else {
-			$form->addRow($pf['C'], new CTextBox('param['.$pid.']', $pv, 30));
-			$form->addVar('paramtype', PARAM_TYPE_SECONDS);
-		}
-	}
-}
-else {
-	$form->addVar('paramtype', PARAM_TYPE_SECONDS);
-	$form->addVar('param', 0);
-}
-$form->addRow('N', new CTextBox('value', $value, 10));
-$form->addItemToBottomRow(new CSubmit('insert', _('Insert')));
-$form->show();
+// render view
+$expressionView = new CView('configuration.triggers.expression', $data);
+$expressionView->render();
+$expressionView->show();
 
 require_once('include/page_footer.php');
 ?>
