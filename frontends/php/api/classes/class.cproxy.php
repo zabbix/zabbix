@@ -351,7 +351,7 @@ class CProxy extends CZBXAPI {
 				if (!is_array($proxy['interfaces']) || empty($proxy['interfaces'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces for proxy "%s"', $proxy['host']));
 				}
-				else if (count($proxy['interfaces']) > 1) {
+				elseif (count($proxy['interfaces']) > 1) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Too many interfaces provided for proxy "%s".', $proxy['host']));
 				}
 
