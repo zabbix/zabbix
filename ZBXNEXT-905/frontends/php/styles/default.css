@@ -639,6 +639,3 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .browserwarningCopyright a:hover { text-decoration: underline; }
 
 .vertical-middle { width: 100%; display: table-cell; vertical-align: middle; *position: absolute; *top: 50%; }
-
-/* Tab */
-.tab_text { padding: 0.5em 0 0; float: left; }

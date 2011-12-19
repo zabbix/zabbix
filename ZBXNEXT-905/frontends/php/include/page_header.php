@@ -188,7 +188,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		echo '<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&amp;output=css" />';
 	}
 ?>
-<link rel="stylesheet" type="text/css" href="styles/jquery_override.css" />
 <!--[if lte IE 7]>
 	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
 <![endif]-->
