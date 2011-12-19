@@ -81,7 +81,7 @@
 			<fileset dir="/tmp" includes="${dbname}.db" />
 		</delete>
 		<!-- Create SQLite3 database -->
-		<exec executable="sqlite3" input="${builddir}/create/schema/sqlite3.sql" failonerror="on">
+		<exec executable="sqlite3" input="${builddir}/database/sqlite3/schema.sql" failonerror="on">
 			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="/tmp/${dbname}.db"/>
 		</exec>
@@ -89,15 +89,15 @@
 			<arg line="go+rw"/>
 			<arg line="/tmp/${dbname}.db"/>
 		</exec>
-		<exec executable="sqlite3" input="${builddir}/create/data/data.sql" failonerror="on">
+		<exec executable="sqlite3" input="${builddir}/database/sqlite3/images.sql" failonerror="on">
+			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
+			<arg line="/tmp/${dbname}.db"/>
+		</exec>
+		<exec executable="sqlite3" input="${builddir}/database/sqlite3/data.sql" failonerror="on">
 			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="/tmp/${dbname}.db"/>
 		</exec>
 		<exec executable="sqlite3" input="${builddir}/tests/data/data_test.sql" failonerror="on">
-			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
-			<arg line="/tmp/${dbname}.db"/>
-		</exec>
-		<exec executable="sqlite3" input="${builddir}/create/data/images_sqlite3.sql" failonerror="on">
 			<arg line="-init ${builddir}/tests/templates/sqlite3.init"/>
 			<arg line="/tmp/${dbname}.db"/>
 		</exec>
@@ -123,17 +123,17 @@
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="template1 -c 'create database ${dbname};'"/>
 		</exec>
-		<exec executable="psql" input="${builddir}/create/schema/postgresql.sql" failonerror="on">
+		<exec executable="psql" input="${builddir}/database/postgresql/schema.sql" failonerror="on">
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="psql" input="${builddir}/create/data/images_postgresql.sql" failonerror="on">
+		<exec executable="psql" input="${builddir}/database/postgresql/images.sql" failonerror="on">
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="psql" input="${builddir}/create/data/data.sql" failonerror="on">
+		<exec executable="psql" input="${builddir}/database/postgresql/data.sql" failonerror="on">
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
@@ -176,13 +176,13 @@
 		<exec executable="mysql" failonerror="on">
 			<arg line="-uroot -e 'create database ${dbname} character set utf8;'"/>
 		</exec>
-		<exec executable="mysql" input="${builddir}/create/schema/mysql.sql" failonerror="on">
+		<exec executable="mysql" input="${builddir}/database/mysql/schema.sql" failonerror="on">
 			<arg line="-uroot ${dbname}"/>
 		</exec>
-		<exec executable="mysql" input="${builddir}/create/data/images_mysql.sql" failonerror="on">
+		<exec executable="mysql" input="${builddir}/database/mysql/images.sql" failonerror="on">
 			<arg line="-uroot ${dbname}"/>
 		</exec>
-		<exec executable="mysql" input="${builddir}/create/data/data.sql" failonerror="on">
+		<exec executable="mysql" input="${builddir}/database/mysql/data.sql" failonerror="on">
 			<arg line="-uroot ${dbname}"/>
 		</exec>
 		<exec executable="mysql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
