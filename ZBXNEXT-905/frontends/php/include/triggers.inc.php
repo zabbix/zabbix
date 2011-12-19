@@ -747,7 +747,7 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 
 		if ($expression[$i] == '}') {
 			if ($state == 'MACROS') {
-				$macros .='}';
+				$macros .= '}';
 				if ($resolve_macro) {
 					$function_data['expression'] = $macros;
 					$function_data = API::UserMacro()->resolveTrigger($function_data);
@@ -755,7 +755,7 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 				}
 
 				if ($html) {
-					array_push($exp,$macros);
+					array_push($exp, $macros);
 				}
 				else {
 					$exp .= $macros;
@@ -766,10 +766,10 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 			}
 
 			$state = '';
-			$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status, i.type, i.flags'.
+			$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status,i.type,i.flags'.
 					' FROM items i,functions f,hosts h'.
 					' WHERE f.functionid='.$functionid.
-						' AND i.itemid=f.itemid '.
+						' AND i.itemid=f.itemid'.
 						' AND h.hostid=i.hostid';
 
 			if ($functionid == 'TRIGGER.VALUE') {
@@ -2435,14 +2435,14 @@ function make_expression($node, &$map, $parent_expr = null) {
 	if (isset($node['left'])) {
 		$left = make_expression($node['left'], $map, $node['expr']);
 		$right = make_expression($node['right'], $map, $node['expr']);
-		$expr = $left . ' ' . $node['expr'] . ' ' . $right;
+		$expr = $left.' '.$node['expr'].' '.$right;
 		if ($node['expr'] != $parent_expr && isset($node['parent'])) {
-			$expr = '(' . $expr . ')';
+			$expr = '('.$expr .')';
 		}
 	}
 	elseif (isset($node['expr'])) {
 		$i = $map[$node['expr']];
-		$expr = $i['expression'] . $i['sign'] . $i['value'];
+		$expr = $i['expression'].$i['sign'].$i['value'];
 	}
 	return $expr;
 }
