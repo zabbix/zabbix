@@ -11,6 +11,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+..F....... [ZBX-4446] fixed event duration calculation (pavels)
 ........S. [ZBX-2806] fixed possible double notification messages (dimir,Sasha)
 A......... [ZBX-4425] fixed unsetting interface when performing Item::udpate requests (pavels)
 ..F....... [ZBX-4436] fixed wrong sql query in discovery popup (SlaVa)
