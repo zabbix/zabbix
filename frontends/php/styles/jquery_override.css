@@ -16,4 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-@import "originalblue/jquery-ui.css";
+.ui-tabs .ui-tabs-nav li a.tab_link,
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a.tab_link,
+.ui-tabs .ui-tabs-nav li.ui-state-disabled a.tab_link,
+.ui-tabs .ui-tabs-nav li.ui-state-processing a.tab_link { padding: 0.5em 0 0; text-decoration: underline; cursor: pointer; }

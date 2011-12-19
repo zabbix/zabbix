@@ -24,7 +24,6 @@
 	$TRANSLATION=array(
 
 	'S_DATE_FORMAT_YMDHMS'=>		_('d M Y H:i:s'),
-	'S_HTML_CHARSET'=>			_('UTF-8'),
 
 	'S_YEAR_SHORT'=>			_('y'),
 	'S_MONTH_SHORT'=>			_('m'),
@@ -246,7 +245,6 @@
 	'S_NODES'=>				_('Nodes'),
 	'S_NODES_BIG'=>				_('NODES'),
 	'S_NEW_NODE'=>				_('New node'),
-	'S_ALL_NODES'=>				_('All nodes'),
 	'S_DELETE_SELECTED_NODE_Q'=>		_('Delete selected node?'),
 
 // proxies.php
