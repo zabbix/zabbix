@@ -87,7 +87,7 @@ function get_next_event($currentEvent, array $eventList = array(), $showUnknown 
 
 	foreach ($eventList as $event) {
 		// check only the events belonging to the same object
-		// find the event with the smallest eventid but greater then the current event id
+		// find the event with the smallest eventid but greater than the current event id
 		if ($event['object'] == $currentEvent['object'] && bccomp($event['objectid'], $currentEvent['objectid']) == 0
 				&& (bccomp($event['eventid'], $currentEvent['eventid']) === 1
 				&& (!$nextEvent || bccomp($event['eventid'], $nextEvent['eventid']) === -1))) {
