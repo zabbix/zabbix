@@ -309,15 +309,16 @@ elseif (isset($_REQUEST['form'])) {
 	$triggersView->show();
 }
 else {
-	$data = array();
-	$data['discovery_rule'] = $discovery_rule;
-	$data['parent_discoveryid'] = get_request('parent_discoveryid');
-	$data['hostid'] = get_request('hostid');
-	$data['showdisabled'] = get_request('showdisabled', 1);
+	$data = array(
+		'parent_discoveryid' => get_request('parent_discoveryid'),
+		'discovery_rule' => $discovery_rule,
+		'hostid' => get_request('hostid'),
+		'showdisabled' => get_request('showdisabled', 1),
+		'triggers' => array()
+	);
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	// get triggers
-	$data['triggers'] = array();
 	$sortfield = getPageSortField('description');
 	$options = array(
 		'editable' => true,
