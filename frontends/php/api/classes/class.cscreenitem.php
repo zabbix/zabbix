@@ -651,3 +651,4 @@ class CScreenItem extends CZBXAPI {
 	}
 
 }
+?>
