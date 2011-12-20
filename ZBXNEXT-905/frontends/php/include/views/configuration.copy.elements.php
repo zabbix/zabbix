@@ -80,6 +80,9 @@ else {
 		);
 	}
 }
+if (empty($targets)) {
+	array_push($targets, BR());
+}
 $triggersFormList->addRow(_('Target'), $targets);
 
 // append tabs to form

@@ -727,7 +727,7 @@ function testUserSound(idx) {
 }
 
 function removeObjectById(id) {
-	obj = document.getElementById(id);
+	var obj = document.getElementById(id);
 	if (obj != null && typeof(obj) == 'object') {
 		obj.parentNode.removeChild(obj);
 	}
@@ -737,12 +737,12 @@ function removeObjectById(id) {
  * Converts all HTML entities into the corresponding symbols.
  */
 jQuery.unescapeHtml = function(html) {
-	return jQuery("<div />").html(html).text();
+	return jQuery('<div />').html(html).text();
 }
 
 /**
  * Converts all HTML symbols into HTML entities.
  */
 jQuery.escapeHtml = function(html) {
-	return jQuery("<div />").text(html).html();
+	return jQuery('<div />').text(html).html();
 }

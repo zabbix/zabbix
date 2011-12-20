@@ -45,7 +45,7 @@ if (!empty($this->data['triggerid'])) {
 // create form list
 $triggersFormList = new CFormList('triggersFormList');
 if (!empty($this->data['templates'])) {
-	$triggersFormList->addRow(_('Templates'), $this->data['templates']);
+	$triggersFormList->addRow(_('Parent triggers'), $this->data['templates']);
 }
 $triggersFormList->addRow(_('Name'), new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']));
 

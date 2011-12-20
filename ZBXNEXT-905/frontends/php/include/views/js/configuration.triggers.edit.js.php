@@ -62,14 +62,7 @@
 	}
 
 	function removeDependence(triggerid) {
-		remove('dependence_' + triggerid);
-		remove('dependencies_' + triggerid);
-	}
-
-	function remove(id) {
-		obj = document.getElementById(id);
-		if (!empty(obj)) {
-			obj.parentNode.removeChild(obj);
-		}
+		jQuery('#dependence_' + triggerid).remove();
+		jQuery('#dependencies_' + triggerid).remove();
 	}
 </script>
