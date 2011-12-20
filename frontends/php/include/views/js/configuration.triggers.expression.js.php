@@ -21,7 +21,7 @@
 			jQuery(obj).val(objValue.substring(0, s) + value + objValue.substring(e, objValue.length));
 		}
 		else {
-			jQuery(obj).val(value);
+			jQuery(obj).val(jQuery(obj).val() + value);
 		}
 		<?php } else { ?>
 		jQuery(obj).val(value);

@@ -68,7 +68,6 @@ $addExpressionButton = new CButton(
 if ($this->data['limited'] == 'yes') {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
 }
-$expressionTitle = array(_('Expression'));
 $expressionRow = array($expressionTextBox, $addExpressionButton);
 if (!empty($this->data['expression_macro_button'])) {
 	array_push($expressionRow, $this->data['expression_macro_button']);
@@ -115,7 +114,7 @@ elseif ($this->data['input_method'] != IM_FORCED) {
 	);
 	$expressionRow[] = array(BR(), $inputMethodToggle);
 }
-$triggersFormList->addRow($expressionTitle, $expressionRow);
+$triggersFormList->addRow(_('Expression'), $expressionRow);
 
 // append expression table to form list
 if ($this->data['input_method'] == IM_TREE) {
