@@ -405,6 +405,13 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['g_triggerid'])) {
 	$triggersView->show();
 }
 else {
+	$data = array(
+		'showdisabled' => get_request('showdisabled', 1),
+		'parent_discoveryid' => null,
+		'triggers' => array()
+	);
+	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
+
 	$data['pageFilter'] = new CPageFilter(array(
 		'groups' => array('not_proxy_hosts' => true, 'editable' => true),
 		'hosts' => array('templated_hosts' => true, 'editable' => true),
@@ -418,12 +425,8 @@ else {
 	}
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
-	$data['showdisabled'] = get_request('showdisabled', 1);
-	$data['parent_discoveryid'] = get_request('parent_discoveryid', null);
-	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	// get triggers
-	$data['triggers'] = array();
 	$sortfield = getPageSortField('description');
 	if ($data['pageFilter']->hostsSelected) {
 		$options = array(
