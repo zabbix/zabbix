@@ -151,7 +151,7 @@ if ($this->data['input_method'] == IM_TREE) {
 			if (empty($this->data['parent_discoveryid'])) {
 				if (!isset($e['expression']['levelErrors'])) {
 					$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
-					$errorImg->setHint(_('No errors found.'), '', '', false);
+					$errorImg->setHint(_('No errors found.'));
 				}
 				else {
 					$allowedTesting = false;
@@ -165,7 +165,7 @@ if ($this->data['input_method'] == IM_TREE) {
 							array_push($errorTexts, $expVal, ':', $errTxt);
 						}
 					}
-					$errorImg->setHint($errorTexts, '', 'left', false);
+					$errorImg->setHint($errorTexts, '', 'left');
 				}
 				$errorColumn = new CCol($errorImg, 'center');
 			}
