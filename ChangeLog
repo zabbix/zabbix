@@ -1,3 +1,7 @@
+Changes for 1.8.10rc2
+
+..F....... [ZBX-2843] fixed log trigger creation menu in items list (Vedmak)
+
 Changes for 1.8.10rc1
 
 .......PS. [ZBX-4424] fixed handling of a long localized content by history syncer (Sasha)
