@@ -62,6 +62,7 @@ class API_JSON_Item extends CZabbixTest
 				"key_" => "key.test.pop.".$inventoryFieldNr,
 				"hostid" => "10017",
 				"type"  => "0",
+				'value_type' => '3',
 				"interfaceid"  => "10017",
 				"inventory_link" => $inventoryFieldNr
 			),
