@@ -127,3 +127,4 @@ class CCanvas{
 		$this->colors['orange'] = imagecolorallocate($this->canvas, 238, 96, 0);
 	}
 }
+?>
