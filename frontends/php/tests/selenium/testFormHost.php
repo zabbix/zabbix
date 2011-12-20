@@ -131,7 +131,7 @@ class testFormHost extends CWebTest{
 		$this->chooseOkOnNextConfirmation();
 
 		// save the id of the host
-		$host = DBfetch(DBSelect("select hostid from hosts where host like '".$this->host."'"));
+		$host = DBfetch(DBSelect("select hostid from hosts where host like '".$this->host_tmp."'"));
 
 		// Delete Host
 		$this->login('hosts.php');
