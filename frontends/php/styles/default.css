@@ -109,6 +109,7 @@ a.underline:link { text-decoration: underline; }
 a.underline:visited { text-decoration: underline; }
 a.underline:hover { text-decoration: underline; }
 a.underline:active { text-decoration: underline; }
+a.weight_normal { font-weight: normal; }
 
 /* CSS list */
 ul.itservices { margin: 0 0 0 5px; }

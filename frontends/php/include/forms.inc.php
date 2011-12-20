@@ -2196,7 +2196,7 @@
 						' AND f.triggerid=t.triggerid'
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
-					$data['templates'][] = new CLink($db_triggers['name'], 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'], 'highlight underline');
+					$data['templates'][] = new CLink($db_triggers['name'], 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'], 'highlight underline weight_normal');
 				}
 				$tmp_triggerid = $db_triggers['templateid'];
 			} while ($tmp_triggerid != 0);

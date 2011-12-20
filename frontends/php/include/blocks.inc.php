@@ -820,9 +820,9 @@ function make_latest_issues(array $filter = array()) {
 
 	$options = array(
 		'groupids' => $filter['groupids'],
-		'monitored' => 1,
+		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
-		'skipDependent' => 1,
+		'skipDependent' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
@@ -861,14 +861,14 @@ function make_latest_issues(array $filter = array()) {
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($triggers_hostids);
 
 	// indicator of sort field
-	$sortDiv = new CDiv(
-		SPACE,
-		$options['sortorder'] === ZBX_SORT_DOWN ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor'
-	);
+	$sortDiv = new CDiv(SPACE, $options['sortorder'] === ZBX_SORT_DOWN ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 	$sortDiv->addStyle('float: left');
-	$hostHeaderDiv = new CDiv(array(_('Host'), SPACE)); $hostHeaderDiv->addStyle('float: left');
-	$issueHeaderDiv = new CDiv(array(_('Issue'), SPACE)); $issueHeaderDiv->addStyle('float: left');
-	$lastChangeHeaderDiv = new CDiv(array(_('Last change'), SPACE)); $lastChangeHeaderDiv->addStyle('float: left');
+	$hostHeaderDiv = new CDiv(array(_('Host'), SPACE));
+	$hostHeaderDiv->addStyle('float: left');
+	$issueHeaderDiv = new CDiv(array(_('Issue'), SPACE));
+	$issueHeaderDiv->addStyle('float: left');
+	$lastChangeHeaderDiv = new CDiv(array(_('Last change'), SPACE));
+	$lastChangeHeaderDiv->addStyle('float: left');
 
 	$table  = new CTableInfo();
 	$table->setHeader(
@@ -922,10 +922,10 @@ function make_latest_issues(array $filter = array()) {
 			$thosts_cache[$hinventory['hostid']] = $hinventory;
 		}
 
-		$menus .= "['"._('Go to')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+		$menus .= "['"._('Go to')."', null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}],";
 		$menus .= "['"._('Latest data')."', \"javascript: redirect('latest.php?groupid=".$group['groupid'].'&hostid='.$trigger['hostid']."')\", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
 		if (!empty($hinventory['inventory'])) {
-			$menus.= "['"._('Host inventories')."', \"javascript: redirect('hostinventories.php?hostid=".$trigger['hostid']."')\", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
+			$menus .= "['"._('Host inventories')."', \"javascript: redirect('hostinventories.php?hostid=".$trigger['hostid']."')\", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
 		}
 
 		$menus = rtrim($menus, ',');
@@ -943,14 +943,14 @@ function make_latest_issues(array $filter = array()) {
 			$style .= ' orange';
 
 			// get maintenance
-			$options = array(
+			$maintenances = API::Maintenance()->get(array(
 				'maintenanceids' => $trigger_host['maintenanceid'],
 				'output' => API_OUTPUT_EXTEND
-			);
-			$maintenances = API::Maintenance()->get($options);
+			));
 			$maintenance = reset($maintenances);
-			$text = $maintenance['name'];
-			$text.=' ['.($trigger_host['maintenance_type'] ? _('Maintenance without data collection') : _('Maintenance with data collection')).']';
+			$text = $maintenance['name'].' ['.($trigger_host['maintenance_type']
+				? _('Maintenance without data collection')
+				: _('Maintenance with data collection')).']';
 		}
 
 		$host = new CSpan($trigger['hostname'], $style.' pointer');
@@ -966,7 +966,7 @@ function make_latest_issues(array $filter = array()) {
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 
-		$options = array(
+		$events = API::Event()->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'triggerids' => $trigger['triggerid'],
@@ -977,8 +977,7 @@ function make_latest_issues(array $filter = array()) {
 			'sortfield' => array('object', 'objectid', 'eventid'),
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
-		);
-		$events = API::Event()->get($options);
+		));
 		if ($event = reset($events)) {
 			$ack = getEventAckState($event, true, true, $ackParams);
 			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])), ZBX_FLAG_EVENT);
@@ -1021,14 +1020,12 @@ function make_latest_issues(array $filter = array()) {
 	return $widgetDiv;
 }
 
-// author Aly
 function make_webmon_overview($filter) {
-	$options = array(
+	$available_hosts = API::Host()->get(array(
 		'groupids' => $filter['groupids'],
-		'monitored_hosts' => 1,
+		'monitored_hosts' => true,
 		'filter' => array('maintenance_status' => $filter['maintenance'])
-	);
-	$available_hosts = API::Host()->get($options);
+	));
 	$available_hosts = zbx_objectValues($available_hosts, 'hostid');
 
 	$table  = new CTableInfo();
@@ -1041,12 +1038,11 @@ function make_webmon_overview($filter) {
 		_('Unknown')
 	));
 
-	$options = array(
-		'monitored_hosts' => 1,
-		'with_monitored_httptests' => 1,
+	$groups = API::HostGroup()->get(array(
+		'monitored_hosts' => true,
+		'with_monitored_httptests' => true,
 		'output' => API_OUTPUT_EXTEND
-	);
-	$groups = API::HostGroup()->get($options);
+	));
 	foreach ($groups as $group) {
 		$showGroup = false;
 		$apps['ok'] = 0;
@@ -1054,15 +1050,16 @@ function make_webmon_overview($filter) {
 		$apps[HTTPTEST_STATE_BUSY] = 0;
 		$apps[HTTPTEST_STATE_UNKNOWN] = 0;
 
-		$sql = 'SELECT DISTINCT ht.name,ht.httptestid,ht.curstate,ht.lastfailedstep'.
-				' FROM httptest ht,applications a,hosts_groups hg,groups g'.
-				' WHERE g.groupid='.$group['groupid'].
-					' AND '.DBcondition('hg.hostid',$available_hosts).
-					' AND hg.groupid=g.groupid'.
-					' AND a.hostid=hg.hostid'.
-					' AND ht.applicationid=a.applicationid'.
-					' AND ht.status='.HTTPTEST_STATUS_ACTIVE;
-		$db_httptests = DBselect($sql);
+		$db_httptests = DBselect(
+			'SELECT DISTINCT ht.name,ht.httptestid,ht.curstate,ht.lastfailedstep'.
+			' FROM httptest ht,applications a,hosts_groups hg,groups g'.
+			' WHERE g.groupid='.$group['groupid'].
+				' AND '.DBcondition('hg.hostid',$available_hosts).
+				' AND hg.groupid=g.groupid'.
+				' AND a.hostid=hg.hostid'.
+				' AND ht.applicationid=a.applicationid'.
+				' AND ht.status='.HTTPTEST_STATUS_ACTIVE
+		);
 		while ($httptest_data = DBfetch($db_httptests)) {
 			$showGroup = true;
 			if (HTTPTEST_STATE_BUSY == $httptest_data['curstate']) {
