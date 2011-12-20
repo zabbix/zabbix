@@ -155,6 +155,8 @@ form .thin .input { height: 14px; }
 input.formlist { padding-top: 2px; padding-bottom: 2px; }
 input[type="button"] { cursor: pointer; vertical-align: top; background: #ffffff; }
 
+form .thin .input { height: 14px; }
+
 div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #FFAA33; }
 div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #DD7711; }
 
@@ -165,6 +167,9 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .formrow .listInfoLabel { vertical-align: middle; display: table-cell; height:100%; }
 .formrow .listInfoText { margin-left: 1%; }
 .listInfo { width: 100%; display: table; }
+
+.textarea_standart { width: 312px; }
+.textarea_big { width: 524px; }
 
 /******************* buttons *********************/
 .button { border: 1px solid #808080; vertical-align: top; margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }

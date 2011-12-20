@@ -2009,7 +2009,7 @@
 		return $frmItem;
 	}
 
-	function getTriggerCopyFormData($elements_field, $title = null) {
+	function getCopyElementsFormData($elements_field, $title = null) {
 		$data = array(
 			'title' => $title,
 			'elements_field' => $elements_field,
