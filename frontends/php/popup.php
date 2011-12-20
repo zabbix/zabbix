@@ -1093,6 +1093,7 @@ elseif ($srctbl == 'prototypes') {
 
 	$options = array(
 		'nodeids' => $nodeid,
+		'selectHosts' => array('host'),
 		'discoveryids' => get_request('parent_discoveryid'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'output' => API_OUTPUT_EXTEND,
@@ -1102,7 +1103,9 @@ elseif ($srctbl == 'prototypes') {
 	order_result($items, 'name');
 
 	foreach ($items as $tnum => $row) {
+		$host = reset($row['hosts']);
 		$description = new CSpan(itemName($row), 'link');
+		$row['name'] = $host['host'].':'.$row['name'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($row['itemid']).');';
@@ -1377,7 +1380,7 @@ elseif ($srctbl == 'simple_graph') {
 		}
 
 		if ($multiselect) {
-			$js_action ='"javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($row['itemid']).');';
+			$js_action ='javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($row['itemid']).');';
 		}
 		else {
 			$values = array(
@@ -1785,17 +1788,15 @@ elseif ($srctbl == 'dchecks') {
 	$table = new CTableInfo(_('No discovery checks defined.'));
 	$table->setHeader(_('Name'));
 
-	$result = DBselect(
-		'SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.ports.'.
-		' FROM drules r,dchecks c'.
-		' WHERE r.druleid=c.druleid AND '.DBin_node('r.druleid', $nodeid)
-	);
-	while ($row = DBfetch($result)) {
-		$row['name'] = $row['name'].':'.discovery_check2str($row['type'], $row['key_'], $row['ports']);
-
-		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-
-		$name = new CSpan($row['name'], 'link');
+	$result = API::DRule()->get(array(
+		'selectDChecks' => array('dcheckid','type','key_','ports'),
+		'output' => API_OUTPUT_EXTEND
+	));
+	foreach ($result as $dRule) {
+		$dCheck = reset($dRule['dchecks']);
+		$dRule['name'] = $dRule['name'].':'.discovery_check2str($dCheck['type'], $dCheck['key_'], $dCheck['ports']);
+		$action = get_window_opener($dstfrm, $dstfld1, $dCheck[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $dRule[$srcfld2]) : '');
+		$name = new CSpan($dRule['name'], 'link');
 		$name->setAttribute('onclick', $action." close_window(); return false;");
 		$table->addRow($name);
 	}

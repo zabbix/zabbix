@@ -83,9 +83,9 @@ typedef enum
 }
 zbx_graph_item_type;
 
-#define	ZBX_DB_CONNECT_NORMAL	0
-#define	ZBX_DB_CONNECT_EXIT	1
-#define	ZBX_DB_CONNECT_ONCE	2
+#define ZBX_DB_CONNECT_NORMAL	0
+#define ZBX_DB_CONNECT_EXIT	1
+#define ZBX_DB_CONNECT_ONCE	2
 
 #define TRIGGER_DESCRIPTION_LEN		1020
 #define TRIGGER_DESCRIPTION_LEN_MAX	TRIGGER_DESCRIPTION_LEN+1
@@ -159,13 +159,14 @@ zbx_graph_item_type;
 #define FUNCTION_PARAMETER_LEN_MAX	FUNCTION_PARAMETER_LEN+1
 
 #define HISTORY_STR_VALUE_LEN		255
-#define HISTORY_STR_VALUE_LEN_MAX	HISTORY_STR_VALUE_LEN+1
+#ifdef HAVE_IBM_DB2
+#	define HISTORY_TEXT_VALUE_LEN	2048
+#	define HISTORY_LOG_VALUE_LEN	2048
+#else
+#	define HISTORY_TEXT_VALUE_LEN	65535
+#	define HISTORY_LOG_VALUE_LEN	65535
+#endif
 
-#define	HISTORY_TEXT_VALUE_LEN		65535
-#define	HISTORY_TEXT_VALUE_LEN_MAX	HISTORY_TEXT_VALUE_LEN+1
-
-#define	HISTORY_LOG_VALUE_LEN		65535
-#define	HISTORY_LOG_VALUE_LEN_MAX	HISTORY_LOG_VALUE_LEN+1
 #define HISTORY_LOG_SOURCE_LEN		64
 #define HISTORY_LOG_SOURCE_LEN_MAX	HISTORY_LOG_SOURCE_LEN+1
 
@@ -353,17 +354,6 @@ typedef struct
 	char			*h_lastseverity;
 }
 DB_ITEM;
-
-typedef struct
-{
-	zbx_uint64_t	mediaid;
-	zbx_uint64_t	mediatypeid;
-	char		*sendto;
-	char		*period;
-	int		active;
-	int		severity;
-}
-DB_MEDIA;
 
 typedef struct
 {
@@ -560,9 +550,8 @@ typedef struct
 ZBX_GRAPH_ITEMS;
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
-int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
-int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
-int	DBremove_escalation(zbx_uint64_t escalationid);
+void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
+void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid);
 void	DBupdate_triggers_status_after_restart();
 int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, zbx_uint64_t triggerid,
 		unsigned char type, int value, int value_flags, const char *error, int new_value, const char *new_error,
@@ -574,7 +563,7 @@ double	DBget_requiredperformance();
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_string(const char *src);
-char	*DBdyn_escape_string_len(const char *src, int max_src_len);
+char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
 
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char	*DBdyn_escape_like_pattern(const char *src);

@@ -82,35 +82,30 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 	return API::Event()->get($options);
 }
 
-function get_next_event($currentEvent, $eventList = null, $showUnknown = false) {
-	if (!is_null($eventList)) {
-		$nextEvent = reset($eventList);
-		foreach ($eventList as $event) {
-			if (bccomp($event['eventid'], $currentEvent['eventid']) == 0) {
-				if (bccomp($event['eventid'], $nextEvent['eventid']) == 0) {
-					$nextEvent = false;
-				}
-				break;
-			}
-			if ($event['object'] == $currentEvent['object'] &&
-					bccomp($event['objectid'], $currentEvent['objectid']) == 0 &&
-					$event['clock'] >= $currentEvent['clock'] &&
-					bccomp($event['eventid'], $currentEvent['eventid'] != 0)) {
-				$nextEvent = $event;
-			}
-		}
-		if ($nextEvent) {
-			return $nextEvent;
+function get_next_event($currentEvent, array $eventList = array(), $showUnknown = false) {
+	$nextEvent = false;
+
+	foreach ($eventList as $event) {
+		// check only the events belonging to the same object
+		// find the event with the smallest eventid but greater than the current event id
+		if ($event['object'] == $currentEvent['object'] && bccomp($event['objectid'], $currentEvent['objectid']) == 0
+				&& (bccomp($event['eventid'], $currentEvent['eventid']) === 1
+				&& (!$nextEvent || bccomp($event['eventid'], $nextEvent['eventid']) === -1))) {
+			$nextEvent = $event;
 		}
 	}
+	if ($nextEvent) {
+		return $nextEvent;
+	}
+
 	$sql = 'SELECT e.*'.
 			' FROM events e'.
 			' WHERE e.objectid='.$currentEvent['objectid'].
-				' AND e.eventid > '.$currentEvent['eventid'].
-				' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' AND e.eventid>'.$currentEvent['eventid'].
+				' AND e.object='.$currentEvent['object'].
 				($showUnknown ? '' : ' AND e.value_changed='.TRIGGER_VALUE_CHANGED_YES).
 			' ORDER BY e.object,e.objectid,e.eventid';
-	return DBfetch(DBselect($sql,1));
+	return DBfetch(DBselect($sql, 1));
 }
 
 function make_event_details($event, $trigger) {
@@ -147,7 +142,7 @@ function make_small_eventlist($startEvent) {
 		'eventid_till' => $startEvent['eventid'],
 		'output' => API_OUTPUT_EXTEND,
 		'select_acknowledges' => API_OUTPUT_COUNT,
-		'sortfield' => 'clock',
+		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20
 	);
@@ -224,7 +219,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		),
 		'nopermissions' => 1,
 		'select_acknowledges' => API_OUTPUT_COUNT,
-		'sortfield' => 'clock',
+		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => ZBX_WIDGET_ROWS
 	);
@@ -327,7 +322,7 @@ function getLastEvents($options) {
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value_changed' => TRIGGER_VALUE_CHANGED_YES
 		),
-		'sortfield' => 'clock',
+		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $options['limit']
 	);

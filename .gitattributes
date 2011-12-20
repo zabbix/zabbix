@@ -1,4 +1,5 @@
 * text=auto !eol
+/ChangeLog.legend -text
 bin/win32/zabbix_agentd.exe -text
 bin/win32/zabbix_get.exe -text
 bin/win32/zabbix_sender.exe -text
@@ -439,6 +440,8 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/sysmaps/CCanvas.php -text
+frontends/php/include/classes/sysmaps/CMapPainter.php -text
 frontends/php/include/views/configuration.application.edit.php -text
 frontends/php/include/views/configuration.application.list.php -text
 frontends/php/include/views/configuration.services.child.list.php -text
@@ -507,7 +510,6 @@ frontends/php/styles/originalblue/images/ui-icons_5481ab_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/bootstrap.php.template -text
-frontends/php/tests/selenium/testPageApplications.php -text
 include/telnet.h -text
 m4/ax_lib_ibm_db2.m4 -text
 m4/ax_lib_oracle_oci.m4 -text

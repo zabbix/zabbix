@@ -21,7 +21,7 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageProxies extends CWebTest
+class testPageAdministrationDMProxies extends CWebTest
 {
 	// Returns all proxies
 	public static function allProxies()
@@ -32,7 +32,7 @@ class testPageProxies extends CWebTest
 	/**
 	* @dataProvider allProxies
 	*/
-	public function testPageProxies_SimpleTest($proxy)
+	public function testPageAdministrationDMProxies_SimpleTest($proxy)
 	{
 		$this->login('proxies.php');
 		$this->assertTitle('Proxies');
@@ -51,7 +51,7 @@ class testPageProxies extends CWebTest
 	/**
 	* @dataProvider allProxies
 	*/
-	public function testPageProxies_SimpleUpdate($proxy)
+	public function testPageAdministrationDMProxies_SimpleUpdate($proxy)
 	{
 		$proxyid=$proxy['hostid'];
 		$name=$proxy['host'];
@@ -76,7 +76,7 @@ class testPageProxies extends CWebTest
 		$this->assertEquals($oldHashHosts,DBhash($sql2),"Chuck Norris: no-change proxy update should not update 'hosts.proxy_hostid'");
 	}
 
-	public function testPageProxies_MassActivateAll()
+	public function testPageAdministrationDMProxies_MassActivateAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -85,28 +85,13 @@ class testPageProxies extends CWebTest
 	/**
 	* @dataProvider allProxies
 	*/
-	public function testPageProxies_MassActivate($proxy)
+	public function testPageAdministrationDMProxies_MassActivate($proxy)
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageProxies_MassDisableAll()
-	{
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	/**
-	* @dataProvider allProxies
-	*/
-	public function testPageProxies_MassDisable($proxy)
-	{
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageProxies_MassDeleteAll()
+	public function testPageAdministrationDMProxies_MassDisableAll()
 	{
 // TODO
 		$this->markTestIncomplete();
@@ -115,13 +100,28 @@ class testPageProxies extends CWebTest
 	/**
 	* @dataProvider allProxies
 	*/
-	public function testPageProxies_MassDelete($proxy)
+	public function testPageAdministrationDMProxies_MassDisable($proxy)
 	{
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageProxies_Sorting()
+	public function testPageAdministrationDMProxies_MassDeleteAll()
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	/**
+	* @dataProvider allProxies
+	*/
+	public function testPageAdministrationDMProxies_MassDelete($proxy)
+	{
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageAdministrationDMProxies_Sorting()
 	{
 // TODO
 		$this->markTestIncomplete();

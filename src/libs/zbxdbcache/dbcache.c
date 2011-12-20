@@ -1533,7 +1533,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != history[i].value_null)
 			continue;
 
-		value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
+		value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifndef HAVE_MULTIROW_INSERT
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into history_str (itemid,clock,value,ns) values ");
@@ -1577,7 +1577,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			if (0 != history[i].value_null)
 				continue;
 
-			value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
+			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifndef HAVE_MULTIROW_INSERT
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 					"insert into history_str_sync (nodeid,itemid,clock,value,ns) values ");
@@ -2377,9 +2377,12 @@ static void	DCcheck_ns(zbx_timespec_t *ts)
 static void	DCadd_text(char **dst, const char *src, size_t len)
 {
 	*dst = cache->last_text;
-	memcpy(cache->last_text, src, len);
 	cache->last_text += len;
 	cache->text_free -= len;
+
+	len--;	/* '\0' */
+	memcpy(*dst, src, len);
+	(*dst)[len] = '\0';
 }
 
 static void	DCadd_history(zbx_uint64_t itemid, double value_orig, zbx_timespec_t *ts)
@@ -2437,8 +2440,7 @@ static void	DCadd_history_str(zbx_uint64_t itemid, const char *value_orig, zbx_t
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	if (HISTORY_STR_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
-		len = HISTORY_STR_VALUE_LEN_MAX;
+	len = zbx_strlen_utf8_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
 
 	LOCK_CACHE;
 
@@ -2465,8 +2467,7 @@ static void	DCadd_history_text(zbx_uint64_t itemid, const char *value_orig, zbx_
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	if (HISTORY_TEXT_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
-		len = HISTORY_TEXT_VALUE_LEN_MAX;
+	len = zbx_strlen_utf8_n(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
 
 	LOCK_CACHE;
 
@@ -2494,14 +2495,10 @@ static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, zbx_t
 	ZBX_DC_HISTORY	*history;
 	size_t		len1, len2;
 
-	if (HISTORY_LOG_VALUE_LEN_MAX < (len1 = strlen(value_orig) + 1))
-		len1 = HISTORY_LOG_VALUE_LEN_MAX;
+	len1 = zbx_strlen_utf8_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
 
 	if (NULL != source && '\0' != *source)
-	{
-		if (HISTORY_LOG_SOURCE_LEN_MAX < (len2 = strlen(source) + 1))
-			len2 = HISTORY_LOG_SOURCE_LEN_MAX;
-	}
+		len2 = zbx_strlen_utf8_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
 	else
 		len2 = 0;
 
@@ -2541,8 +2538,7 @@ static void	DCadd_history_notsupported(zbx_uint64_t itemid, const char *error, z
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	if (ITEM_ERROR_LEN_MAX < (len = strlen(error) + 1))
-		len = ITEM_ERROR_LEN_MAX;
+	len = zbx_strlen_utf8_n(error, ITEM_ERROR_LEN) + 1;
 
 	LOCK_CACHE;
 

@@ -29,6 +29,9 @@
 
 #define ZBX_DB_WAIT_DOWN	10
 
+#if HAVE_POSTGRESQL
+extern char	ZBX_PG_ESCAPE_BACKSLASH;
+#endif
 /***************************************************************/
 /* ID structure: NNNSSSDDDDDDDDDDD, where                      */
 /*      NNN - nodeid (to which node the ID belongs to)         */
@@ -85,8 +88,7 @@ void	DBclose()
 int	DBconnect(int flag)
 {
 	const char	*__function_name = "DBconnect";
-
-	int	err;
+	int		err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __function_name, flag);
 
@@ -894,114 +896,44 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 	return ret;
 }
 
-int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
+void	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
+	const char	*__function_name = "DBstart_escalation";
 	zbx_uint64_t	escalationid;
 
-	/* remove older active escalations... */
-	DBexecute("delete from escalations"
-			" where actionid=" ZBX_FS_UI64
-				" and triggerid%s"
-				" and status not in (%d,%d,%d)"
-				" and (esc_step<>0 or status<>%d)",
-			actionid,
-			DBsql_id_cmp(triggerid),
-			ESCALATION_STATUS_RECOVERY,
-			ESCALATION_STATUS_SUPERSEDED_ACTIVE,
-			ESCALATION_STATUS_SUPERSEDED_RECOVERY,
-			ESCALATION_STATUS_ACTIVE);
-
-	/* ...except we should execute an escalation at least once before it is removed */
-	DBexecute("update escalations"
-			" set status=%d"
-			" where actionid=" ZBX_FS_UI64
-				" and triggerid%s"
-				" and esc_step=0"
-				" and status=%d",
-			ESCALATION_STATUS_SUPERSEDED_ACTIVE,
-			actionid,
-			DBsql_id_cmp(triggerid),
-			ESCALATION_STATUS_ACTIVE);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	escalationid = DBget_maxid("escalations");
 
 	DBexecute("insert into escalations (escalationid,actionid,triggerid,eventid,status)"
 			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s," ZBX_FS_UI64 ",%d)",
-			escalationid,
-			actionid,
-			DBsql_id_ins(triggerid),
-			eventid,
-			ESCALATION_STATUS_ACTIVE);
+			escalationid, actionid, DBsql_id_ins(triggerid), eventid, ESCALATION_STATUS_ACTIVE);
 
-	return SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
+void	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	const char	*__function_name = "DBstop_escalation";
 	zbx_uint64_t	escalationid;
-	int		old_status, esc_step;
-	int		new_status;
-	char		sql[256];
 
-	/* stopping only last active escalation */
-	zbx_snprintf(sql, sizeof(sql),
-			"select escalationid,esc_step,status"
-			" from escalations"
-			" where actionid=" ZBX_FS_UI64
-				" and triggerid%s"
-				" and status not in (%d,%d)"
-			" order by escalationid desc",
-			actionid,
-			DBsql_id_cmp(triggerid),
-			ESCALATION_STATUS_RECOVERY,
-			ESCALATION_STATUS_SUPERSEDED_RECOVERY);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselectN(sql, 1);
+	escalationid = DBget_maxid("escalations");
 
-	if (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(escalationid, row[0]);
-		esc_step = atoi(row[1]);
-		old_status = atoi(row[2]);
+	DBexecute("insert into escalations (escalationid,actionid,triggerid,r_eventid,status)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%s," ZBX_FS_UI64 ",%d)",
+			escalationid, actionid, DBsql_id_ins(triggerid), eventid, ESCALATION_STATUS_ACTIVE);
 
-		if ((0 == esc_step && ESCALATION_STATUS_ACTIVE == old_status) ||
-				ESCALATION_STATUS_SUPERSEDED_ACTIVE == old_status)
-		{
-			new_status = ESCALATION_STATUS_SUPERSEDED_RECOVERY;
-		}
-		else
-			new_status = ESCALATION_STATUS_RECOVERY;
-
-		DBexecute("update escalations"
-				" set r_eventid=" ZBX_FS_UI64 ","
-					"status=%d,"
-					"nextcheck=0"
-				" where escalationid=" ZBX_FS_UI64,
-				eventid,
-				new_status,
-				escalationid);
-	}
-	DBfree_result(result);
-
-	return SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-
-int	DBremove_escalation(zbx_uint64_t escalationid)
-{
-	DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64,
-			escalationid);
-
-	return SUCCEED;
-}
-
 
 /******************************************************************************
  *                                                                            *
  * Function: DBget_escape_string_len                                          *
  *                                                                            *
- * Return value: return length of escaped string with terminating '\0'        *
+ * Return value: return length in bytes of escaped string                     *
+ *               with terminating '\0'                                        *
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
@@ -1009,18 +941,19 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_escape_string_len(const char *src)
+static size_t	DBget_escape_string_len(const char *src)
 {
 	const char	*s;
-	int		len = 1;	/* '\0' */
+	size_t		len = 1;	/* '\0' */
 
 	for (s = src; NULL != s && '\0' != *s; s++)
 	{
 		if ('\r' == *s)
 			continue;
-
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif
@@ -1044,13 +977,13 @@ static int	DBget_escape_string_len(const char *src)
  *           and 'DBdyn_escape_string_len'                                    *
  *                                                                            *
  ******************************************************************************/
-static void	DBescape_string(const char *src, char *dst, int len)
+static void	DBescape_string(const char *src, char *dst, size_t len)
 {
 	const char	*s;
 	char		*d;
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 #	define ZBX_DB_ESC_CH	'\\'
-#else
+#elif !defined(HAVE_POSTGRESQL)
 #	define ZBX_DB_ESC_CH	'\''
 #endif
 	assert(dst);
@@ -1062,8 +995,10 @@ static void	DBescape_string(const char *src, char *dst, int len)
 		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif
@@ -1094,7 +1029,7 @@ static void	DBescape_string(const char *src, char *dst, int len)
  ******************************************************************************/
 char	*DBdyn_escape_string(const char *src)
 {
-	int	len;
+	size_t	len;
 	char	*dst = NULL;
 
 	len = DBget_escape_string_len(src);
@@ -1114,32 +1049,34 @@ char	*DBdyn_escape_string(const char *src)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
- *                                                                            *
  ******************************************************************************/
-char	*DBdyn_escape_string_len(const char *src, int max_src_len)
+char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 {
 	const char	*s;
 	char		*dst = NULL;
-	int		len = 1;	/* '\0' */
+	size_t		len = 1;	/* '\0' */
+
+	max_src_len++;
 
 	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
 	{
+		/* only UTF-8 characters should reduce a variable max_src_len */
+		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
+			break;
+
 		if ('\r' == *s)
 			continue;
 
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
+#elif defined(HAVE_POSTGRESQL)
+		if ('\'' == *s || ('\\' == *s && 1 == ZBX_PG_ESCAPE_BACKSLASH))
 #else
 		if ('\'' == *s)
 #endif
 			len++;
 
 		len++;
-
-		/* only UTF-8 characters should reduce a variable max_src_len */
-		if (0x80 != (0xc0 & *s))
-			max_src_len--;
 	}
 
 	dst = zbx_malloc(dst, len);
