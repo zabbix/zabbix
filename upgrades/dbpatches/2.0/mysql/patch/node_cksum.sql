@@ -4,10 +4,8 @@ BEGIN
 	DECLARE dummy INT DEFAULT 0;
 	DECLARE CONTINUE HANDLER FOR SQLSTATE '42000' set dummy = 1;
 
-	DROP INDEX node_cksum_233 on node_cksum;
-	DROP INDEX node_cksum_2 on node_cksum;
-	DROP INDEX node_cksum_3 on node_cksum;
-	DROP INDEX node_cksum_344 on node_cksum;
+	DROP INDEX node_cksum_1 on node_cksum;
+	DROP INDEX node_cksum_cksum_1 on node_cksum;
 END$
 delimiter ;
 
