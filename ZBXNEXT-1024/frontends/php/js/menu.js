@@ -83,16 +83,34 @@ function get_real_text_width(text, id) {
 	return tmp_len;
 }
 
+function truncateText(text, len) {
+	return (text.length > len) ? text.substring(0, len) + '...' : text;
+}
+
 function show_popup_menu(e, content, width){
 	var cursor = get_cursor_position(e);
 	var tmp_width = 0;
 	var max_width = 0;
+	var menuTextLength = 35;
 
-	for (i = 0; i < content.length; i++) {
+	for (var i = 0; i < content.length; i++) {
+		content[i][0] = truncateText(content[i][0], menuTextLength);
 		tmp_width = get_real_text_width(content[i][0], i);
 
 		if (max_width < tmp_width) {
 			max_width = tmp_width;
+		}
+
+		// truncate sub menu text
+		if (content[i].length > 4) {
+			for (var j = 4; j < content[i].length; j++) {
+				content[i][j][0] = truncateText(content[i][j][0], menuTextLength);
+				tmp_width = get_real_text_width(content[i][j][0], i);
+
+				if (max_width < tmp_width) {
+					max_width = tmp_width;
+				}
+			}
 		}
 	}
 
@@ -104,8 +122,8 @@ function show_popup_menu(e, content, width){
 		width = 220;
 
 	var pos = [
-		{'block_top' : -12, 'block_left' : -5, 'width' : width},
-		{'block_top' : 5, 'block_left' : width - 5, 'width' : width}
+		{'block_top': -12, 'block_left': -5, 'width': width},
+		{'block_top': 5, 'block_left': width-5, 'width': width}
 	];
 
 	new popup_menu (content, pos, cursor.x, cursor.y);
@@ -461,7 +479,7 @@ function menu_item (o_parent, n_order) {
 		eldiv.setAttribute('title', this.a_config[0]);
 	}
 
-	eldiv.innerHTML = this.a_config[0];
+	eldiv.appendChild(document.createTextNode(this.a_config[0]));
 
 	el.appendChild(eldiv);
 
@@ -481,8 +499,8 @@ function menu_item (o_parent, n_order) {
 		var x = 500;
 		while (x) {
 			newResult = this.e_ielement.scrollWidth - this.getprop('width');
-			nText = this.e_ielement.innerHTML;
-			this.e_ielement.innerHTML = nText.substring(0, nText.length-10);
+			nText = jQuery.unescapeHtml(this.e_ielement.innerHTML);
+			this.e_ielement.innerHTML = jQuery.escapeHtml(nText.substring(0, nText.length-10));
 			x--;
 			if (newResult < 1) {
 				this.e_ielement.innerHTML += '...';

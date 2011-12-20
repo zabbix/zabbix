@@ -2875,7 +2875,10 @@ function triggerExpression($trigger, $html, $template=false, $resolve_macro=fals
 		$result = false;
 
 		$evStr = str_replace(array_keys($rplcts), array_values($rplcts), $expression);
-		if(!preg_match("/^[0-9.\s=!()><+*\/&|\-]+$/is", $evStr)) return 'FALSE';
+		preg_match_all("/[0-9\.]+[KMGTPEZYhmdw]?/", $evStr, $arr);
+		$evStr = str_replace(array($arr[0][0], $arr[0][1]), array(convert($arr[0][0]), convert($arr[0][1])), $evStr);
+
+		if(!preg_match("/^[0-9.\s=!()><+*\/&E|\-]+$/is", $evStr)) return 'FALSE';
 
 		if($oct)
 			$evStr = preg_replace('/([0-9]+)(\=|\#|\!=|\<|\>)([0-9]+)/','((float)ltrim("$1","0") $2 (float)ltrim("$3","0"))', $evStr);
@@ -3019,5 +3022,51 @@ $triggerExpressionRules['quotedString'] = Array(
 function resolveTriggerUrl($trigger) {
 	return str_replace('{TRIGGER.ID}', $trigger['triggerid'], $trigger['url']);
 }
+function convert($value){
+		$value = trim($value);
+		if(!preg_match('/(?P<value>[\-+]?[0-9]+[.]?[0-9]*)(?P<mult>[YZEPTGMKsmhdw]?)/', $value, $arr)) return $value;
+
+		$value = $arr['value'];
+		switch($arr['mult']){
+			case 'Y':
+				$value *= 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024;
+				break;
+			case 'Z':
+				$value *= 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024;
+				break;
+			case 'E':
+				$value *= 1024 * 1024 * 1024 * 1024 * 1024 * 1024;
+				break;
+			case 'P':
+				$value *= 1024 * 1024 * 1024 * 1024 * 1024;
+				break;
+			case 'T':
+				$value *= 1024 * 1024 * 1024 * 1024;
+				break;
+			case 'G':
+				$value *= 1024 * 1024 * 1024;
+				break;
+			case 'M':
+				$value *= 1024 * 1024;
+				break;
+			case 'K':
+				$value *= 1024;
+				break;
+			case 'm':
+				$value *= 60;
+				break;
+			case 'h':
+				$value *= 60 * 60;
+				break;
+			case 'd':
+				$value *= 60 * 60 * 24;
+				break;
+			case 'w':
+				$value *= 60 * 60 * 24 * 7;
+				break;
+		}
+
+		return $value;
+	}
 
 ?>

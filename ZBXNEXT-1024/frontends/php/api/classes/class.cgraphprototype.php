@@ -1090,36 +1090,43 @@ COpt::memoryPick();
 // }}} EXCEPTION: ITEMS PERMISSIONS
 		}
 
+		foreach ($graphs as $graph) {
 
-		foreach($graphs as $gnum => $graph){
-			if(!isset($graph['name'])) continue;
-
-			$options = array(
-				'nodeids' => get_current_nodeid(true),
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array('name' => $graph['name'], 'flags' => null),
-				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-				'nopermissions' => 1
-			);
-			$graphsExists = API::Graph()->get($options);
-			foreach($graphsExists as $genum => $graphExists){
-				if(($update && (bccomp($graphExists['graphid'],$graph['graphid'])!=0)) || !$update){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph with name [ '.$graph['name'].' ] already exists');
-				}
-			}
-// }}} EXCEPTION: GRAPH EXISTS
-
-// PROTOTYPE {{{
+			// check if the graph has at least one prototype
 			$has_prototype = false;
-			foreach($graph['gitems'] as $gitem){
-				if($allowed_items[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD){
+			foreach ($graph['gitems'] as $gitem) {
+				if ($allowed_items[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
 					$has_prototype = true;
+					break;
 				}
 			}
-			if(!$has_prototype){
+			if (!$has_prototype) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph prototype must have at least one prototype'));
 			}
-// }}} PROTOTYPE
+
+			// check if the host has any graphs with the same name
+			$hosts = API::Host()->get(array(
+				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => true,
+				'preservekeys' => true
+			));
+			$options = array(
+				'hostids' => array_keys($hosts),
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array(
+					'name' => $graph['name'],
+					'flags' => null
+				),
+				'nopermissions' => true,
+				'limit' => 1
+			);
+			$graphsExists = API::Graph()->get($options);
+			foreach ($graphsExists as $graphExists) {
+				if (!$update || (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists', $graph['name']));
+				}
+			}
 		}
 
 		return true;

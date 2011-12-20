@@ -307,7 +307,7 @@ static int	housekeeping_history_and_trends(int now)
 
 void	main_housekeeper_loop()
 {
-	int	now, d_history_and_trends, d_clenup, d_events, d_alerts, d_sessions;
+	int	now, d_history_and_trends, d_cleanup, d_events, d_alerts, d_sessions;
 
 	for (;;)
 	{
@@ -322,7 +322,7 @@ void	main_housekeeper_loop()
 		d_history_and_trends = housekeeping_history_and_trends(now);
 
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
-		d_clenup = housekeeping_cleanup(now);
+		d_cleanup = housekeeping_cleanup(now);
 
 		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
 		d_events = housekeeping_events(now);
@@ -335,7 +335,7 @@ void	main_housekeeper_loop()
 
 		zabbix_log(LOG_LEVEL_WARNING, "housekeeper deleted: %d records from history and trends,"
 				" %d records of deleted items, %d events, %d alerts, %d sessions",
-				d_history_and_trends, d_clenup, d_events, d_alerts, d_sessions);
+				d_history_and_trends, d_cleanup, d_events, d_alerts, d_sessions);
 
 		DBclose();
 

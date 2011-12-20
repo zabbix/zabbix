@@ -425,7 +425,6 @@ input.ui-button { padding: .3em 1em; }
 .originalblue .ui-button-text-icons .ui-button-icon-secondary, .originalblue .ui-button-icons-only .ui-button-icon-secondary { right: .5em; }
 
 /*button sets*/
-.originalblue .ui-buttonset { margin-right: 7px; }
 .originalblue .ui-buttonset .ui-button { margin-left: 0; margin-right: -.4em; }
 
 /* workarounds */
@@ -572,5 +571,5 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .originalblue .ui-progressbar { height:2em; text-align: left; }
 .originalblue .ui-progressbar .ui-progressbar-value {margin: -1px; height:100%; }
 
-/* Inputset */
-.originalblue .jqueryinputset label[aria-pressed="true"] .ui-button-text { color:#000000; }
+/* Make checked checkboxes/radiobuttons have black label text */
+.originalblue .ui-button.ui-state-active .ui-button-text { color: #000000; }
