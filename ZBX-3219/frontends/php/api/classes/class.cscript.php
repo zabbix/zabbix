@@ -613,7 +613,7 @@ class CScript extends CZBXAPI{
 			return $rcv;
 		}
 		catch (APIException $e) {
-			if (isset($socket) && $socket <> '') {
+			if (isset($socket) && $socket) {
 				fclose($socket);
 			}
 			$error = $e->getErrors();
