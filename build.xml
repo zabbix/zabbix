@@ -156,7 +156,7 @@
 	<target name="runagent" depends="buildagent">
 		<!-- Kill previously running agent -->
 		<exec executable="killall" failonerror="off">
-			<arg line="zabbix_agentd"/>
+			<arg line="-9 zabbix_agentd"/>
 		</exec>
 		<!-- Sleep for 2 seconds -->
 		<exec executable="sleep" failonerror="off">
