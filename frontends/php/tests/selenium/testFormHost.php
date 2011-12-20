@@ -23,6 +23,8 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testFormHost extends CWebTest{
 	public $host = "Test host 001";
+	public $host_tmp = "Test host 001A";
+	public $host_tmp_visible = "Test host 001A (visible)";
 
 	public function testFormHost_Layout(){
 		$this->login('hosts.php?form=1');
@@ -103,7 +105,7 @@ class testFormHost extends CWebTest{
 		$this->dropdown_select_wait('groupid','all');
 		$this->click('link='.$this->host);
 		$this->wait();
-		$this->input_type('host',$this->host.'2');
+		$this->input_type('host',$this->host_tmp);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
@@ -129,12 +131,12 @@ class testFormHost extends CWebTest{
 		$this->chooseOkOnNextConfirmation();
 
 		// save the id of the host
-		$host = DBfetch(DBSelect('select hostid from hosts where host like "'.$this->host.'2"'));
+		$host = DBfetch(DBSelect("select hostid from hosts where host like '".$this->host."'"));
 
 		// Delete Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->host.'2');
+		$this->click('link='.$this->host_tmp);
 		$this->wait();
 		$this->button_click('delete');
 		$this->waitForConfirmation();
@@ -143,7 +145,7 @@ class testFormHost extends CWebTest{
 		$this->ok('Host deleted');
 
 		// check if the macros have been deleted
-		$macrosCount = DBcount('select * from hostmacro where hostid="'.$host['hostid'].'"');
+		$macrosCount = DBcount("select * from hostmacro where hostid=".$host['hostid']);
 		$this->assertEquals(0, $macrosCount, 'Host macros have not been deleted.');
 	}
 
@@ -155,8 +157,8 @@ class testFormHost extends CWebTest{
 		$this->wait();
 		$this->button_click('clone');
 		$this->wait();
-		$this->input_type('host',$this->host.'2');
-		$this->input_type('visiblename',$this->host.'2 (visible)');
+		$this->input_type('host',$this->host_tmp);
+		$this->input_type('visiblename',$this->host_tmp_visible);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
@@ -169,7 +171,7 @@ class testFormHost extends CWebTest{
 		// Delete Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->host.'2 (visible)');
+		$this->click('link='.$this->host_tmp_visible);
 		$this->wait();
 		$this->button_click('delete');
 		$this->wait();
