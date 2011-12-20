@@ -468,7 +468,7 @@ Copt::memoryPick();
 				'dns' => null,
 				'useip' => null,
 				'port' => null,
-				'main' => null
+				'main' => 0
 			);
 			$dbHosts = API::Host()->get(array(
 				'output' => API_OUTPUT_SHORTEN,
@@ -860,8 +860,22 @@ Copt::memoryPick();
 	 * @param array $interfaces
 	 */
 	private function checkMainInterfaces(array $interfaces) {
+		// fetch used hosts
+		$hosts = API::Host()->get(array(
+			'hostids' => zbx_objectValues($interfaces, 'hostid'),
+			'output' => array('name', 'status'),
+			'preservekeys' => true,
+			'nopermissions' => true
+		));
+
 		$interfaceTypes = array();
 		foreach ($interfaces as $interface) {
+
+			// no host in the collection, it must be a passive proxy
+			if (!isset($hosts[$interface['hostid']])) {
+				continue;
+			}
+
 			if (!isset($interfaceTypes[$interface['hostid']])) {
 				$interfaceTypes[$interface['hostid']] = array();
 			}
@@ -881,13 +895,7 @@ Copt::memoryPick();
 		foreach ($interfaceTypes as $interfaceHostId => $interfaceType) {
 			foreach ($interfaceType as $type => $counters) {
 				if ($counters['all'] && !$counters['main']) {
-					$host = API::Host()->get(array(
-						'hostids' => $interfaceHostId,
-						'output' => array('name'),
-						'preservekeys' => true,
-						'nopermissions' => true
-					));
-					$host = reset($host);
+					$host = $hosts[$interfaceHostId];
 
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('No default interface for "%1$s" type on host "%2$s".', hostInterfaceTypeNumToName($type), $host['name']));

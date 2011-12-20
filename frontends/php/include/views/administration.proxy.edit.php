@@ -57,7 +57,6 @@
 		$name = $proxy['host'];
 		$status = $proxy['status'];
 
-		$interfaces = $proxy['interfaces'];
 		$hosts = zbx_objectValues($proxy['hosts'], 'hostid');
 	}
 
@@ -70,8 +69,17 @@
 	$proxyList->addRow(S_PROXY_MODE, $statusBox);
 
 	if($status == HOST_STATUS_PROXY_PASSIVE){
-		if(!empty($interfaces)) $interface = reset($interfaces);
-		else $interface = array('dns'=>'localhost','ip'=>'127.0.0.1','useip'=>1,'port'=>'10051');
+		if ($_REQUEST['hostid'] && $proxy['interfaces']) {
+			$interface = reset($proxy['interfaces']);
+		}
+		else {
+			$interface = array(
+				'dns'=>'localhost',
+				'ip'=>'127.0.0.1',
+				'useip'=>1,
+				'port'=>'10051'
+			);
+		}
 
 		if(isset($interface['interfaceid'])){
 			$frmProxy->addVar('interfaces[0][interfaceid]', $interface['interfaceid']);
