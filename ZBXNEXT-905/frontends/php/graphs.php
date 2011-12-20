@@ -365,7 +365,7 @@ require_once('include/page_header.php');
 	show_table_header(_('CONFIGURATION OF GRAPHS'), $form);
 
 	if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
-		$triggersView = new CView('configuration.triggers.copy', getTriggerCopyFormData('group_graphid'));
+		$triggersView = new CView('configuration.copy.elements', getCopyElementsFormData('group_graphid'));
 		$triggersView->render();
 		$triggersView->show();
 	}

@@ -400,7 +400,7 @@ elseif (isset($_REQUEST['form'])) {
 	$triggersView->show();
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['g_triggerid'])) {
-	$triggersView = new CView('configuration.triggers.copy', getTriggerCopyFormData('g_triggerid', _('CONFIGURATION OF TRIGGERS')));
+	$triggersView = new CView('configuration.copy.elements', getCopyElementsFormData('g_triggerid', _('CONFIGURATION OF TRIGGERS')));
 	$triggersView->render();
 	$triggersView->show();
 }

@@ -24,12 +24,8 @@
  *
  * @package API
  */
-
-
 class CTrigger extends CZBXAPI {
-
 	protected $tableName = 'triggers';
-
 	protected $tableAlias = 't';
 
 	/**
@@ -1596,7 +1592,7 @@ class CTrigger extends CZBXAPI {
 		// insert triggers without expression
 		$triggersCopy = $triggers;
 		for ($i = 0, $size = count($triggersCopy); $i < $size; $i++) {
-			$triggersCopy[$i]['expression'] = 'null';
+			unset($triggersCopy[$i]['expression']);
 		}
 		$triggerids = DB::insert('triggers', $triggersCopy);
 		unset($triggersCopy);
@@ -1954,7 +1950,6 @@ class CTrigger extends CZBXAPI {
 			$trigger['expression'] = explode_exp($trigger['expression']);
 			$this->inherit($trigger, $data['hostids']);
 		}
-
 
 		// Update dependencies, do it after all triggers that can be dependent were created/updated on all child hosts/templates.
 		// Starting from highest level template triggers select triggers from one level lower, then for each lower trigger

@@ -22,18 +22,28 @@
 class CTextArea extends CTag {
 	public function __construct($name = 'textarea', $value = '', $rows = ZBX_TEXTAREA_STANDARD_ROWS, $width = ZBX_TEXTAREA_STANDARD_WIDTH, $readonly = false) {
 		parent::__construct('textarea', 'yes');
-		$this->attributes['class'] = 'input textarea';
+		$this->attr('class', 'input');
 		$this->attr('id', zbx_formatDomId($name));
 		$this->attr('name', $name);
 		$this->attr('rows', $rows);
-		$this->attr('style', 'width: '.$width.'px;');
 		$this->setReadonly($readonly);
 		$this->addItem($value);
+
+		// set width
+		if ($width == ZBX_TEXTAREA_STANDARD_WIDTH) {
+			$this->addClass('textarea_standart');
+		}
+		elseif ($width == ZBX_TEXTAREA_BIG_WIDTH) {
+			$this->addClass('textarea_big');
+		}
+		else {
+			$this->attr('style', 'width: '.$width.'px;');
+		}
 	}
 
 	public function setReadonly($value = true) {
 		if ($value) {
-			$this->attributes['readonly'] = 'readonly';
+			$this->attr('readonly', 'readonly');
 		}
 		else {
 			$this->removeAttribute('readonly');
@@ -45,11 +55,11 @@ class CTextArea extends CTag {
 	}
 
 	public function setRows($value) {
-		return $this->attributes['rows'] = $value;
+		$this->attr('rows', $value);
 	}
 
 	public function setCols($value) {
-		return $this->attributes['cols'] = $value;
+		$this->attr('cols', $value);
 	}
 }
 ?>
