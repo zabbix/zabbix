@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-15 00:57+0200\n"
+"POT-Creation-Date: 2011-12-20 13:05+0200\n"
 "PO-Revision-Date: 2011-12-03 16:45+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -182,7 +182,7 @@ msgstr "Обліковий запис заблоковано на %s секун�
 
 #: include/actions.inc.php:180 include/blocks.inc.php:292
 #: include/blocks.inc.php:336 include/blocks.inc.php:882
-#: include/events.inc.php:139 include/events.inc.php:209
+#: include/events.inc.php:134 include/events.inc.php:204
 #: include/locales/en_gb.inc.php:947
 #: include/views/configuration.action.edit.php:918
 msgid "Ack"
@@ -209,7 +209,7 @@ msgstr ""
 msgid "Acknowledge status"
 msgstr "Статус підтвердження"
 
-#: include/events.inc.php:125 tr_status.php:287 tr_status.php:613
+#: include/events.inc.php:120 tr_status.php:287 tr_status.php:613
 msgid "Acknowledged"
 msgstr "Підтверджено"
 
@@ -278,7 +278,7 @@ msgid "Action updated"
 msgstr "Дію оновлено"
 
 #: include/blocks.inc.php:293 include/blocks.inc.php:337
-#: include/blocks.inc.php:883 include/events.inc.php:140
+#: include/blocks.inc.php:883 include/events.inc.php:135
 #: include/locales/en_gb.inc.php:155 include/menu.inc.php:197
 msgid "Actions"
 msgstr "Дії"
@@ -423,8 +423,8 @@ msgid "Advanced labels"
 msgstr "Розширені ярлики"
 
 #: include/blocks.inc.php:290 include/blocks.inc.php:334
-#: include/blocks.inc.php:880 include/events.inc.php:138
-#: include/events.inc.php:209 include/events.inc.php:212
+#: include/blocks.inc.php:880 include/events.inc.php:133
+#: include/events.inc.php:204 include/events.inc.php:207
 #: include/locales/en_gb.inc.php:672
 msgid "Age"
 msgstr "Вік"
@@ -439,7 +439,7 @@ msgid "Age less than %s"
 msgstr "З віком менше ніж %s"
 
 #: include/views/administration.script.list.php:76
-#: include/views/configuration.httpconf.edit.php:108 popup.php:1891
+#: include/views/configuration.httpconf.edit.php:108 popup.php:1889
 msgid "Agent"
 msgstr "Агент"
 
@@ -985,7 +985,7 @@ msgstr "Не вдалось оновити метод повідомлення �
 msgid "Canada (136 characters)"
 msgstr "Канада (136 символів)"
 
-#: include/classes/class.cbuttoncancel.php:24 include/config.inc.php:330
+#: include/classes/class.cbuttoncancel.php:24 include/config.inc.php:334
 #: include/forms.inc.php:3247 include/forms.inc.php:3631
 #: include/js.inc.php:213 include/locales/en_gb.inc.php:667
 #: include/views/configuration.action.edit.php:879
@@ -1732,7 +1732,7 @@ msgstr "Шассі"
 msgid "Check already exists."
 msgstr "Перевірка вже існує."
 
-#: api/classes/class.citemgeneral.php:230
+#: api/classes/class.citemgeneral.php:222
 msgid "Check the key, please. Default example was passed."
 msgstr "Будь ласка, перевірте ключ. Приклад по замовчуванню показано."
 
@@ -1853,8 +1853,8 @@ msgstr "Команда не може бути пустою."
 #: include/views/administration.script.edit.php:61
 #: include/views/administration.script.list.php:43
 #: include/views/configuration.action.edit.php:697
-#: include/views/configuration.action.edit.php:702 popup.php:1843
-#: popup.php:1850
+#: include/views/configuration.action.edit.php:702 popup.php:1841
+#: popup.php:1848
 msgid "Commands"
 msgstr "Команди"
 
@@ -2792,7 +2792,7 @@ msgstr "Статус розгортання"
 msgid "Description"
 msgstr "Опис"
 
-#: include/blocks.inc.php:747 include/config.inc.php:418
+#: include/blocks.inc.php:747 include/config.inc.php:422
 #: include/locales/en_gb.inc.php:989
 #: include/views/administration.mediatypes.list.php:48
 #: include/views/configuration.action.edit.php:333
@@ -3120,8 +3120,8 @@ msgstr "Дублікат назви важливості \"%s\"."
 msgid "Duplicate user alias \"%s\"."
 msgstr "Дублікат імені користувача \"%s\"."
 
-#: events.php:514 events.php:527 include/events.inc.php:137
-#: include/events.inc.php:209 include/events.inc.php:212 tr_status.php:286
+#: events.php:514 events.php:527 include/events.inc.php:132
+#: include/events.inc.php:204 include/events.inc.php:207 tr_status.php:286
 msgid "Duration"
 msgstr "Тривалість"
 
@@ -3137,7 +3137,7 @@ msgstr "Динамічний елемент"
 msgid "E"
 msgstr "E"
 
-#: include/config.inc.php:385
+#: include/config.inc.php:389
 msgid "ERROR"
 msgstr "ПОМИЛКА"
 
@@ -3332,7 +3332,7 @@ msgstr ""
 msgid "Error description"
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:235
+#: api/classes/class.citemgeneral.php:227
 #, php-format
 msgid "Error in item key: \"%s\"."
 msgstr ""
@@ -3341,7 +3341,7 @@ msgstr ""
 msgid "Escalation period"
 msgstr ""
 
-#: include/events.inc.php:120
+#: include/events.inc.php:115
 msgid "Event"
 msgstr "Подія"
 
@@ -3414,8 +3414,8 @@ msgstr "Помилка виконання SQL"
 #: include/views/administration.script.edit.php:56
 #: include/views/administration.script.list.php:42
 #: include/views/configuration.action.edit.php:676
-#: include/views/js/configuration.action.edit.js.php:112 popup.php:1842
-#: popup.php:1849
+#: include/views/js/configuration.action.edit.js.php:112 popup.php:1840
+#: popup.php:1847
 msgid "Execute on"
 msgstr "Виконати на"
 
@@ -4571,7 +4571,7 @@ msgstr ""
 msgid "Idle till"
 msgstr "Простоює до"
 
-#: include/config.inc.php:324
+#: include/config.inc.php:328
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Якщо Ви вважаєте це повідомлення помилковим, то зверніться до Вашого адміністратора для отримання необхідних прав доступу."
 
@@ -4579,7 +4579,7 @@ msgstr "Якщо Ви вважаєте це повідомлення помил�
 #: include/views/administration.general.image.edit.php:40
 #: include/views/administration.general.image.edit.php:43
 #: include/views/administration.general.image.edit.php:49
-#: include/views/js/configuration.sysmaps.js.php:20 map.php:370
+#: include/views/js/configuration.sysmaps.js.php:20 map.php:145
 msgid "Image"
 msgstr "Картинка"
 
@@ -5283,7 +5283,7 @@ msgstr "Елемент даних \"%1$s:%2$s\" вже існує, успадк�
 msgid "Item \"%1$s:%2$s\" deleted."
 msgstr "Елемент даних \"%1$s:%2$s\" видалено."
 
-#: api/classes/class.citemgeneral.php:278
+#: api/classes/class.citemgeneral.php:270
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Елемент даних \"%1$s:%2$s\" має неправильний порт: \"%3$s\"."
@@ -5337,15 +5337,15 @@ msgstr "Прототипи елементів даних"
 msgid "Item updated"
 msgstr "Елемент оновлено"
 
-#: api/classes/class.citemgeneral.php:214
+#: api/classes/class.citemgeneral.php:205
 msgid "Item uses host interface from non-parent host."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:218
+#: api/classes/class.citemgeneral.php:209
 msgid "Item uses incorrect interface type."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:271
+#: api/classes/class.citemgeneral.php:263
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Елемент не було оновлено. Будь ласка введіть коректний інтервал оновлення."
 
@@ -5353,27 +5353,27 @@ msgstr "Елемент не було оновлено. Будь ласка вв�
 msgid "Item will populate host inventory field"
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:291
+#: api/classes/class.citemgeneral.php:283
 #, php-format
 msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as a discovery rule."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує у вузла мережі \"%2$s\" як правило виявлення."
 
-#: api/classes/class.citemgeneral.php:297
+#: api/classes/class.citemgeneral.php:289
 #, php-format
 msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as an item created from item prototype."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує у вузла мережі \"%2$s\" як елемент даних створений з прототипа."
 
-#: api/classes/class.citemgeneral.php:294
+#: api/classes/class.citemgeneral.php:286
 #, php-format
 msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as an item prototype."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує у вузла мережі \"%2$s\" як прототип елемента даних."
 
-#: api/classes/class.citemgeneral.php:288
+#: api/classes/class.citemgeneral.php:280
 #, php-format
 msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as an item."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує у вузла мережі \"%2$s\" як елемент даних."
 
-#: api/classes/class.citemgeneral.php:300
+#: api/classes/class.citemgeneral.php:292
 #, php-format
 msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as unknown item element."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує у вузла мережі \"%2$s\" як невідомий елемент даних."
@@ -5517,7 +5517,7 @@ msgstr "Зберігати динаміку змін (дні)"
 msgid "Key"
 msgstr "Ключ"
 
-#: api/classes/class.citemgeneral.php:245
+#: api/classes/class.citemgeneral.php:237
 #, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr ""
@@ -5782,7 +5782,7 @@ msgstr ""
 msgid "Logged in as"
 msgstr "Підключено до системи як"
 
-#: auditlogs.php:144 auditlogs.php:232 include/config.inc.php:329
+#: auditlogs.php:144 auditlogs.php:232 include/config.inc.php:333
 #: include/menu.inc.php:278 include/page_header.php:245
 #: include/views/administration.authentication.edit.php:64
 #: include/views/administration.users.list.php:64
@@ -6059,7 +6059,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Макс. кількість подій у тригера для відображення"
 
 #: include/classes/class.cwidget.php:106 include/classes/class.cwidget.php:109
-#: include/config.inc.php:420
+#: include/config.inc.php:424
 msgid "Maximize"
 msgstr "Розгорнути"
 
@@ -6203,7 +6203,7 @@ msgid "Min severity"
 msgstr "Мінімальна важливість"
 
 #: include/classes/class.cwidget.php:106 include/classes/class.cwidget.php:109
-#: include/config.inc.php:420
+#: include/config.inc.php:424
 msgid "Minimize"
 msgstr "Згорнути"
 
@@ -6392,8 +6392,8 @@ msgstr "NTLM аутентифікація"
 #: popup.php:1085 popup.php:1153 popup.php:1188 popup.php:1217 popup.php:1356
 #: popup.php:1364 popup.php:1427 popup.php:1430 popup.php:1492 popup.php:1554
 #: popup.php:1558 popup.php:1613 popup.php:1617 popup.php:1667 popup.php:1700
-#: popup.php:1733 popup.php:1773 popup.php:1789 popup.php:1812 popup.php:1841
-#: popup.php:1848 queue.php:250 trigger_prototypes.php:45 triggers.php:46
+#: popup.php:1733 popup.php:1773 popup.php:1789 popup.php:1810 popup.php:1839
+#: popup.php:1846 queue.php:250 trigger_prototypes.php:45 triggers.php:46
 #: triggers.php:487
 msgid "Name"
 msgstr "Ім'я"
@@ -6507,8 +6507,8 @@ msgstr "Далі"
 msgid "Next check"
 msgstr "Наступна перевірка"
 
-#: include/config.inc.php:623 include/events.inc.php:286
-#: include/events.inc.php:300 include/forms.inc.php:3557
+#: include/config.inc.php:627 include/events.inc.php:281
+#: include/events.inc.php:295 include/forms.inc.php:3557
 #: include/locales/en_gb.inc.php:714
 #: include/views/administration.users.list.php:79
 #: include/views/administration.users.list.php:82
@@ -6712,7 +6712,7 @@ msgstr "Немає картинки"
 msgid "No images defined."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:190
+#: api/classes/class.citemgeneral.php:201
 msgid "No interface for item."
 msgstr "Немає інтерфейсу для елемента даних."
 
@@ -6834,7 +6834,7 @@ msgstr "Немає прав доступу до запитуваного об'є
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Не вказано файл приватного ключа для команди \"%s\" в операції дії."
 
-#: popup.php:1811 proxies.php:202
+#: popup.php:1809 proxies.php:202
 msgid "No proxies defined."
 msgstr ""
 
@@ -6872,7 +6872,7 @@ msgstr ""
 msgid "No script specified for action operation command."
 msgstr "Не вказано скрипт для команди в операції дії."
 
-#: include/views/administration.script.list.php:37 popup.php:1837
+#: include/views/administration.script.list.php:37 popup.php:1835
 msgid "No scripts defined."
 msgstr ""
 
@@ -8229,7 +8229,7 @@ msgstr ""
 msgid "SNMP trap"
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:253
+#: api/classes/class.citemgeneral.php:245
 msgid "SNMP trap key is invalid"
 msgstr ""
 
@@ -8585,7 +8585,7 @@ msgstr "Секунд"
 #: include/views/js/configuration.sysmaps.js.php:104 popup.php:551
 #: popup.php:622 popup.php:677 popup.php:765 popup.php:826 popup.php:952
 #: popup.php:1056 popup.php:1138 popup.php:1300 popup.php:1408 popup.php:1477
-#: popup.php:1591 popup.php:1652 popup.php:1910
+#: popup.php:1591 popup.php:1652 popup.php:1908
 msgid "Select"
 msgstr "Вибрати"
 
@@ -8676,7 +8676,7 @@ msgstr "Серійний номер А"
 msgid "Serial number B"
 msgstr "Серійний номер Б"
 
-#: include/views/administration.script.list.php:79 popup.php:1894
+#: include/views/administration.script.list.php:79 popup.php:1892
 #: queue.php:186
 msgid "Server"
 msgstr "Сервер"
@@ -9032,8 +9032,8 @@ msgid "Stats for"
 msgstr "Статистика для"
 
 #: actionconf.php:465 discoveryconf.php:250 hosts.php:816
-#: include/events.inc.php:136 include/events.inc.php:209
-#: include/events.inc.php:212 include/locales/en_gb.inc.php:173
+#: include/events.inc.php:131 include/events.inc.php:204
+#: include/events.inc.php:207 include/locales/en_gb.inc.php:173
 #: include/views/administration.users.list.php:67
 #: include/views/configuration.discovery.edit.php:98
 #: include/views/configuration.host.edit.php:341
@@ -9447,9 +9447,9 @@ msgstr "Четвер"
 msgid "Till"
 msgstr "До"
 
-#: include/acknow.inc.php:41 include/events.inc.php:121
-#: include/events.inc.php:135 include/events.inc.php:209
-#: include/events.inc.php:212 include/locales/en_gb.inc.php:172
+#: include/acknow.inc.php:41 include/events.inc.php:116
+#: include/events.inc.php:130 include/events.inc.php:204
+#: include/events.inc.php:207 include/locales/en_gb.inc.php:172
 #: include/views/configuration.services.edit.php:226
 #: include/views/configuration.services.edit.php:227
 #: include/views/configuration.services.edit.php:255
@@ -9803,7 +9803,7 @@ msgstr "Тип калькуляції"
 msgid "Type of information"
 msgstr "Тип інформації"
 
-#: api/classes/class.citemgeneral.php:263
+#: api/classes/class.citemgeneral.php:255
 msgid "Type of information must be Log for log key."
 msgstr "Тип інформації має бути Лог (багато полів) для ключа логів."
 
@@ -9861,7 +9861,7 @@ msgstr "США (160 символів)"
 msgid "USER PROFILE"
 msgstr "ПРОФІЛЬ КОРИСТУВАЧА"
 
-#: include/config.inc.php:783 include/locales/en_gb.inc.php:27
+#: include/config.inc.php:787 include/locales/en_gb.inc.php:27
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -10245,7 +10245,7 @@ msgstr "Перетворення значень"
 msgid "Value maps are used to create a mapping between numeric values and string representations"
 msgstr "Перетворення значень використовуються для створення перетворень між цифровими значеннями та їх текстовими інтерпретаціями"
 
-#: api/classes/class.citemgeneral.php:258
+#: api/classes/class.citemgeneral.php:250
 msgid "Value type must be Float for aggregate items."
 msgstr "Тип інформації повинен бути Числовий (дробове) для агрегованих елементів даних."
 
@@ -10592,8 +10592,8 @@ msgstr "Рік"
 msgid "Yearly"
 msgstr "Щороку"
 
-#: include/blocks.inc.php:755 include/config.inc.php:626
-#: include/events.inc.php:289 include/events.inc.php:303
+#: include/blocks.inc.php:755 include/config.inc.php:630
+#: include/events.inc.php:284 include/events.inc.php:298
 #: include/forms.inc.php:3557 include/locales/en_gb.inc.php:713
 #: include/views/administration.users.list.php:78
 msgid "Yes"
@@ -10612,7 +10612,7 @@ msgstr "Ви не можете вибрати деякі з мов, тому щ�
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Вам не дозволено змінювати привілеї користувача \"%s\"."
 
-#: include/config.inc.php:323
+#: include/config.inc.php:327
 msgid "You are not logged in."
 msgstr "Ви не увійшли в систему."
 
@@ -10620,7 +10620,7 @@ msgstr "Ви не увійшли в систему."
 msgid "You can not switch hosts for current selection"
 msgstr "Ви не можете переключатись між вузлами мережі для пототного вибору"
 
-#: include/config.inc.php:324
+#: include/config.inc.php:328
 msgid "You cannot view this URL as a"
 msgstr "Ви не можете переглядати це посилання як"
 
@@ -10699,7 +10699,7 @@ msgstr "У вас немає повноважень для оновлення м
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "У вас немає повноважень для оновлення користувача або користувач не існує."
 
-#: include/config.inc.php:324
+#: include/config.inc.php:328
 msgid "You must login to view this page."
 msgstr "Ви маєте увійти в систему для перегляду цієї сторінки."
 
@@ -10897,8 +10897,8 @@ msgid "d M Y H:i"
 msgstr "d.m.Y H:i"
 
 #: acknow.php:164 include/acknow.inc.php:45 include/blocks.inc.php:988
-#: include/events.inc.php:121 include/events.inc.php:188
-#: include/events.inc.php:250 include/locales/en_gb.inc.php:26
+#: include/events.inc.php:116 include/events.inc.php:183
+#: include/events.inc.php:245 include/locales/en_gb.inc.php:26
 #: include/locales/en_gb.inc.php:69 include/locales/en_gb.inc.php:72
 #: include/locales/en_gb.inc.php:92 include/locales/en_gb.inc.php:93
 #: include/locales/en_gb.inc.php:130 include/locales/en_gb.inc.php:131
