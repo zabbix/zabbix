@@ -23,6 +23,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testFormTemplate extends CWebTest{
 	public $template = "Test template";
+	public $template_tmp = "Test template 2";
 
 	public function testFormTemplate_Create(){
 		$this->login('templates.php');
@@ -70,7 +71,7 @@ class testFormTemplate extends CWebTest{
 		$this->dropdown_select_wait('groupid','all');
 		$this->click('link='.$this->template);
 		$this->wait();
-		$this->input_type('template_name',$this->template.'2');
+		$this->input_type('template_name',$this->template_tmp);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Templates');
@@ -82,7 +83,7 @@ class testFormTemplate extends CWebTest{
 	 */
 	public function testFormTemplate_AddMacros() {
 		$this->login('templates.php');
-		$this->click("link=".$this->template.'2');
+		$this->click("link=".$this->template_tmp);
 		$this->waitForPageToLoad("30000");
 		$this->tab_switch('Macros');
 		$this->type("name=macros[0][macro]", '{$TEST_MACRO}');
@@ -114,13 +115,13 @@ class testFormTemplate extends CWebTest{
 	public function testFormTemplate_Delete() {
 
 		// save the id of the host
-		$template = DBfetch(DBSelect('select hostid from hosts where host like "'.$this->template.'2"'));
+		$template = DBfetch(DBSelect("select hostid from hosts where host like '".$this->template_tmp."'"));
 
 		$this->chooseOkOnNextConfirmation();
 		// Delete template
 		$this->login('templates.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->template.'2');
+		$this->click('link='.$this->template_tmp);
 		$this->wait();
 		$this->button_click('delete');
 		$this->waitForConfirmation();
@@ -129,7 +130,7 @@ class testFormTemplate extends CWebTest{
 		$this->ok('Template deleted');
 
 		// check if the macros have been deleted
-		$macrosCount = DBcount('select * from hostmacro where hostid="'.$template['hostid'].'"');
+		$macrosCount = DBcount("select * from hostmacro where hostid=".$template['hostid']);
 		$this->assertEquals(0, $macrosCount, 'Template macros have not been deleted.');
 	}
 
@@ -141,7 +142,7 @@ class testFormTemplate extends CWebTest{
 		$this->wait();
 		$this->button_click('clone');
 		$this->wait();
-		$this->input_type('template_name',$this->template.'2');
+		$this->input_type('template_name',$this->template_tmp);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Templates');
@@ -154,7 +155,7 @@ class testFormTemplate extends CWebTest{
 		// Delete template
 		$this->login('templates.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->template.'2');
+		$this->click('link='.$this->template_tmp);
 		$this->wait();
 		$this->button_click('delete');
 		$this->wait();
