@@ -2029,10 +2029,8 @@
 		}
 
 		// get groups
-		$data['groups'] = API::HostGroup()->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'sortfield' => 'name'
-		));
+		$data['groups'] = API::HostGroup()->get(array('output' => API_OUTPUT_EXTEND));
+		order_result($data['groups'], 'name');
 
 		// get hosts
 		if ($data['copy_type'] == 0) {
@@ -2044,9 +2042,9 @@
 			$data['hosts'] = API::Host()->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'groupids' => $data['filter_groupid'],
-				'templated_hosts' => true,
-				'sortfield' => 'name'
+				'templated_hosts' => true
 			));
+			order_result($data['hosts'], 'name');
 		}
 		return $data;
 	}
