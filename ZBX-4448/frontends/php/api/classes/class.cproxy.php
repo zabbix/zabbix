@@ -356,7 +356,7 @@ class CProxy extends CZBXAPI {
 				}
 
 				// mark the interface as main to pass host interface validation
-				$proxy['interfaces'][0]['main'] = true;
+				$proxy['interfaces'][0]['main'] = INTERFACE_PRIMARY;
 			}
 
 			if(isset($proxy['host'])){
@@ -447,7 +447,7 @@ class CProxy extends CZBXAPI {
 			// if this is an active proxy - delete it's interface;
 			if (isset($proxy['status']) && $proxy['status'] == HOST_STATUS_PROXY_ACTIVE) {
 				$interfaces = API::HostInterface()->get(array(
-					'output' => array('interfaceid'),
+					'output' => API_OUTPUT_REFER,
 					'hostids' => $proxy['hostid']
 				));
 				$interfaceIds = zbx_objectValues($interfaces, 'interfaceid');
