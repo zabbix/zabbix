@@ -1021,7 +1021,7 @@ COpt::memoryPick();
 		$dstDiscovery['itemid'] = $newDiscovery['itemids'][0];
 
 		// copy prototypes
-		$newPrototypes = $this->copyDiscoveryPrototypes($srcDiscovery, $dstDiscovery);
+		$newPrototypes = $this->copyDiscoveryPrototypes($srcDiscovery, $dstDiscovery, $dstHost);
 
 		// if there were prototypes defined, clone everything else
 		if ($newPrototypes) {
@@ -1052,10 +1052,11 @@ COpt::memoryPick();
 	 *
 	 * @param array $srcDiscovery   The source discovery rule to copy from
 	 * @param array $dstDiscovery   The target discovery rule to copy to
+	 * @param array $dstHost        The target host to copy the deiscovery rule to
 	 *
 	 * @return array
 	 */
-	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery) {
+	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
 		$prototypes = API::ItemPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -1063,9 +1064,24 @@ COpt::memoryPick();
 
 		$rs = array();
 		if ($prototypes) {
-			foreach ($prototypes as &$prototype) {
+			foreach ($prototypes as $key => $prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				$prototype['hostid'] = $dstDiscovery['hostid'];
+
+				// map prototype interfaces
+				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
+					// find a matching interface
+					$interface = self::findInterfaceForItem($prototype, $dstHost['interfaces']);
+					if ($interface) {
+						$prototype['interfaceid'] = $interface['interfaceid'];
+					}
+					// no matching interface found, throw an error
+					elseif($interface !== false) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $prototype['key_']));
+					}
+				}
+
+				$prototypes[$key] = $prototype;
 			}
 
 			$rs = API::ItemPrototype()->create($prototypes);
