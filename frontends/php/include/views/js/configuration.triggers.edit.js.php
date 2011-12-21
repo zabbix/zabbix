@@ -65,4 +65,13 @@
 		jQuery('#dependence_' + triggerid).remove();
 		jQuery('#dependencies_' + triggerid).remove();
 	}
+
+	// create jQuery buttonset object when VisibilityBox is switched on
+	jQuery(document).ready(function() {
+		jQuery('#visible_priority').click(function() {
+			if (!jQuery('#priority_div').hasClass('ui-buttonset')) {
+				jQuery('#priority_div').buttonset();
+			}
+		});
+	});
 </script>

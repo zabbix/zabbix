@@ -84,8 +84,7 @@ $severityDiv = new CDiv(
 		$labelHigh,
 		new CRadioButton('priority', TRIGGER_SEVERITY_DISASTER, null, 'severity_'.TRIGGER_SEVERITY_DISASTER, $this->data['priority'] == TRIGGER_SEVERITY_DISASTER),
 		$labelDisaster
-	),
-	'jqueryinputset'
+	)
 );
 $severityDiv->setAttribute('id', 'priority_div');
 
@@ -93,7 +92,7 @@ $triggersFormList->addRow(
 	array(
 		_('Severity'),
 		SPACE,
-		new CVisibilityBox('visible[priority]', !empty($this->data['visible']['priority']) ? 'yes' : 'no', 'priority_div', _('Original')),
+		new CVisibilityBox('visible[priority]', empty($this->data['visible']['priority']) ? 'yes' : 'no', 'priority_div', _('Original')),
 	),
 	$severityDiv
 );
@@ -101,7 +100,7 @@ $triggersFormList->addRow(
 // append dependencies to form list
 if (empty($this->data['parent_discoveryid'])) {
 	$dependencesTable = new CTable(_('No dependencies defined.'), 'formElementTable');
-	$dependencesTable->setAttribute('style', 'min-width:500px;');
+	$dependencesTable->setAttribute('style', 'min-width: 500px;');
 	$dependencesTable->setAttribute('id', 'dependenciesTable');
 	$dependencesTable->setHeader(array(
 		_('Name'),
