@@ -559,8 +559,6 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid, char *err
  *              template_itemid - template item identificator from database   *
  *              appids - result buffer                                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
@@ -608,8 +606,6 @@ static int	DBget_same_applications_by_itemid(zbx_uint64_t hostid,
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
@@ -643,10 +639,6 @@ static void	DBclear_parents_from_trigger()
  * Function: DBget_service_status                                             *
  *                                                                            *
  * Purpose: retrieve true status                                              *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -818,16 +810,12 @@ static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
  *                                                                            *
  * Purpose: Cleaning parent nodes from triggers, updating ALL services status.*
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBupdate_services_status_all(void)
+static void	DBupdate_services_status_all()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -921,8 +909,6 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
  * Parameters: triggerids     - [IN] trigger identificators from database     *
  *             triggerids_num - [IN] number of triggers                       *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
@@ -955,10 +941,6 @@ static void	DBdelete_services_by_triggerids(zbx_uint64_t *triggerids, int trigge
  * Function: DBdelete_sysmaps_elements                                        *
  *                                                                            *
  * Purpose: delete elements from map by elementtype and elementid             *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -993,13 +975,7 @@ static void	DBdelete_sysmaps_elements(int elementtype, zbx_uint64_t *elementids,
  *                                                                            *
  * Purpose: delete action conditions by condition type and id                 *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid)
@@ -1029,8 +1005,6 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  *                                                                            *
  * Parameters: triggerids     - [IN] trigger identificators from database     *
  *             triggerids_num - [IN] number of triggers                       *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1109,17 +1083,14 @@ static void	DBdelete_triggers(zbx_uint64_t **triggerids, int *triggerids_alloc, 
  *                                                                            *
  * Purpose: delete triggers by itemid                                         *
  *                                                                            *
- * Parameters: itemids     - [IN] item identificators from database           *
- *             itemids_num - [IN] number of items                             *
- *                                                                            *
- * Return value:                                                              *
+ * Parameters: itemids - [IN] item identificators from database               *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num)
+static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 {
 	const char	*__function_name = "DBdelete_triggers_by_itemids";
 	DB_RESULT	result;
@@ -1129,11 +1100,10 @@ static void	DBdelete_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num)
 	char		*sql = NULL;
 	size_t		sql_alloc = 512, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemids_num:%d",
-			__function_name, itemids_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, itemids->values_num);
 
-	if (0 == itemids_num)
-		return;
+	if (0 == itemids->values_num)
+		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -1141,7 +1111,7 @@ static void	DBdelete_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num)
 			"select distinct triggerid"
 			" from functions"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 
 	result = DBselect("%s", sql);
 
@@ -1156,7 +1126,7 @@ static void	DBdelete_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num)
 
 	zbx_free(triggerids);
 	zbx_free(sql);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -1166,55 +1136,65 @@ static void	DBdelete_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num)
  *                                                                            *
  * Purpose: delete item history                                               *
  *                                                                            *
- * Parameters: itemids     - [IN] item identificators from database           *
- *             itemids_num - [IN] number of items                             *
- *                                                                            *
- * Return value:                                                              *
+ * Parameters: itemids - [IN] item identificators from database               *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_history_by_itemids(zbx_uint64_t *itemids, int itemids_num)
+static void	DBdelete_history_by_itemids(zbx_vector_uint64_t *itemids)
 {
 	const char	*__function_name = "DBdelete_history_by_itemids";
 	char		*sql = NULL;
 	size_t		sql_alloc = 64 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		i;
-#define	sql_st	"insert into housekeeper (housekeeperid,tablename,field,value)"	\
-		" values (" ZBX_FS_UI64 ",'%s','itemid'," ZBX_FS_UI64 ");\n"
+	int		i, j;
 	zbx_uint64_t	housekeeperid;
+	const char	*ins_housekeeper_sql = "insert into housekeeper (housekeeperid,tablename,field,value) values ";
+#ifdef HAVE_MULTIROW_INSERT
+	const char	*row_dl = ",";
+#else
+	const char	*row_dl = ";\n";
+#endif
+#define	ZBX_HISTORY_TABLES_COUNT	7
+	const char	*tables[ZBX_HISTORY_TABLES_COUNT] = {"history", "history_str", "history_uint", "history_log",
+			"history_text", "trends", "trends_uint"};
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemids_num:%d",
-			__function_name, itemids_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, itemids->values_num);
 
-	if (0 == itemids_num)
+	if (0 == itemids->values_num)
 		return;
 
+	housekeeperid = DBget_maxid_num("housekeeper", ZBX_HISTORY_TABLES_COUNT * itemids->values_num);
+
 	sql = zbx_malloc(sql, sql_alloc);
-
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	housekeeperid = DBget_maxid_num("housekeeper", 7 * itemids_num);
-
-	for (i = 0; i < itemids_num; i++)
+#ifdef HAVE_MULTIROW_INSERT
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_housekeeper_sql);
+#endif
+	for (i = 0; i < itemids->values_num; i++)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "history", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "history_str", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "history_uint", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "history_log", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "history_text", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "trends", itemids[i]);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, sql_st, housekeeperid++, "trends_uint", itemids[i]);
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		for (j = 0; j < ZBX_HISTORY_TABLES_COUNT; j++)
+		{
+#ifndef HAVE_MULTIROW_INSERT
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_housekeeper_sql);
+#endif
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"(" ZBX_FS_UI64 ",'%s','itemid'," ZBX_FS_UI64 ")%s",
+					housekeeperid++, tables[j], itemids->values[i], row_dl);
+		}
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+	{
+#ifdef HAVE_MULTIROW_INSERT
+		sql_offset--;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+#endif
 		DBexecute("%s", sql);
+	}
 
 	zbx_free(sql);
 
@@ -1227,8 +1207,7 @@ static void	DBdelete_history_by_itemids(zbx_uint64_t *itemids, int itemids_num)
  *                                                                            *
  * Purpose: delete graph from database                                        *
  *                                                                            *
- * Parameters: graphids     - [IN] array of graph id's from database          *
- *             graphids_num - [IN] number of array elements                   *
+ * Parameters: graphids - [IN] array of graph id's from database              *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -1237,7 +1216,7 @@ static void	DBdelete_history_by_itemids(zbx_uint64_t *itemids, int itemids_num)
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_graphs(zbx_uint64_t **graphids, int *graphids_alloc, int *graphids_num)
+static void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 {
 	const char	*__function_name = "DBdelete_graphs";
 	char		*sql = NULL;
@@ -1247,51 +1226,62 @@ static void	DBdelete_graphs(zbx_uint64_t **graphids, int *graphids_alloc, int *g
 	DB_ROW		row;
 	zbx_uint64_t	graphid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() graphids_num:%d",
-			__function_name, *graphids_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, graphids->values_num);
 
-	if (0 == *graphids_num)
-		return;
+	if (0 == graphids->values_num)
+		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
 	do	/* add child graphs (auto-created) */
 	{
-		num = *graphids_num;
+		num = graphids->values_num;
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select graphid"
 				" from graph_discovery"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid", *graphids, *graphids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid",
+				graphids->values, graphids->values_num);
 
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(graphid, row[0]);
-			uint64_array_add(graphids, graphids_alloc, graphids_num, graphid, 64);
+			zbx_vector_uint64_append(graphids, graphid);
 		}
 		DBfree_result(result);
+
+		zbx_vector_uint64_sort(graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	}
-	while (num != *graphids_num);
+	while (num != graphids->values_num);
 
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	/* delete graph */
+	/* delete from screens_items */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from screens_items"
 			" where resourcetype=%d"
 				" and",
 			SCREEN_RESOURCE_GRAPH);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", *graphids, *graphids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", graphids->values, graphids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
+	/* delete from profiles */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from graphs"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", *graphids, *graphids_num);
+			"delete from profiles"
+			" where idx='web.favorite.graphids'"
+				" and source='graphid'"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", graphids->values, graphids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	/* delete from graphs */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from graphs where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", graphids->values, graphids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1299,7 +1289,80 @@ static void	DBdelete_graphs(zbx_uint64_t **graphids, int *graphids_alloc, int *g
 	DBexecute("%s", sql);
 
 	zbx_free(sql);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_graphs_by_itemids                                       *
+ *                                                                            *
+ * Parameters: itemids - [IN] item identificators from database               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBdelete_graphs_by_itemids(zbx_vector_uint64_t *itemids)
+{
+	const char		*__function_name = "DBdelete_graphs_by_itemids";
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		graphid;
+	zbx_vector_uint64_t	graphids;
+	int			index;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, itemids->values_num);
+
+	if (0 == itemids->values_num)
+		goto out;
+
+	sql = zbx_malloc(sql, sql_alloc);
+	zbx_vector_uint64_create(&graphids);
+
+	/* select all graphs with items */
+	sql_offset = 0;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select distinct graphid from graphs_items where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(graphid, row[0]);
+		zbx_vector_uint64_append(&graphids, graphid);
+	}
+	DBfree_result(result);
+
+	if (0 == graphids.values_num)
+		goto clean;
+
+	zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	/* select graphs with other items */
+	sql_offset = 0;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct graphid"
+			" from graphs_items"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", graphids.values, graphids.values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and not");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(graphid, row[0]);
+		if (FAIL != (index = zbx_vector_uint64_bsearch(&graphids, graphid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			zbx_vector_uint64_remove(&graphids, index);
+	}
+	DBfree_result(result);
+
+	DBdelete_graphs(&graphids);
+clean:
+	zbx_vector_uint64_destroy(&graphids);
+	zbx_free(sql);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -1309,17 +1372,14 @@ static void	DBdelete_graphs(zbx_uint64_t **graphids, int *graphids_alloc, int *g
  *                                                                            *
  * Purpose: delete items from database                                        *
  *                                                                            *
- * Parameters: itemids     - [IN] array of item identificators from database  *
- *             itemids_num - [IN] number of item ids                          *
- *                                                                            *
- * Return value:                                                              *
+ * Parameters: itemids - [IN] array of item identificators from database      *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *itemids_num)
+void	DBdelete_items(zbx_vector_uint64_t *itemids)
 {
 	const char	*__function_name = "DBdelete_items";
 	char		*sql = NULL;
@@ -1329,36 +1389,41 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
 	DB_ROW		row;
 	zbx_uint64_t	itemid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemids_num:%d", __function_name, *itemids_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, itemids->values_num);
 
-	if (0 == *itemids_num)
-		return;
+	if (0 == itemids->values_num)
+		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
-	do /* add child items (auto-created and prototypes) */
+	do	/* add child items (auto-created and prototypes) */
 	{
-		num = *itemids_num;
+		num = itemids->values_num;
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select itemid"
 				" from item_discovery"
 				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid", *itemids, *itemids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid",
+				itemids->values, itemids->values_num);
 
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[0]);
-			uint64_array_add(itemids, itemids_alloc, itemids_num, itemid, 64);
+			zbx_vector_uint64_append(itemids, itemid);
 		}
 		DBfree_result(result);
-	}
-	while (num != *itemids_num);
 
-	DBdelete_triggers_by_itemids(*itemids, *itemids_num);
-	DBdelete_history_by_itemids(*itemids, *itemids_num);
+		zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	}
+	while (num != itemids->values_num);
+
+	DBdelete_graphs_by_itemids(itemids);
+	DBdelete_triggers_by_itemids(itemids);
+	DBdelete_history_by_itemids(itemids);
 
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1370,7 +1435,7 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
 					" and",
 			SCREEN_RESOURCE_PLAIN_TEXT,
 			SCREEN_RESOURCE_SIMPLE_GRAPH);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", *itemids, *itemids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "resourceid", itemids->values, itemids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	/* delete from profiles */
@@ -1379,13 +1444,12 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
 			" where idx='web.favorite.graphids'"
 				" and source='itemid'"
 				" and");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", *itemids, *itemids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "value_id", itemids->values, itemids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	/* delete from items */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"delete from items where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", *itemids, *itemids_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from items where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1393,7 +1457,7 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
 	DBexecute("%s", sql);
 
 	zbx_free(sql);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -1403,34 +1467,31 @@ static void	DBdelete_items(zbx_uint64_t **itemids, int *itemids_alloc, int *item
  *                                                                            *
  * Purpose: delete web tests from database                                    *
  *                                                                            *
- * Parameters: htids     - [IN] array of httptest id's from database          *
- *             htids_num - [IN] number of array elements                      *
- *                                                                            *
- * Return value:                                                              *
+ * Parameters: htids - [IN] array of httptest id's from database              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_httptests(zbx_uint64_t *htids, int htids_num)
+static void	DBdelete_httptests(zbx_vector_uint64_t *htids)
 {
-	const char	*__function_name = "DBdelete_httptests";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset;
-	zbx_uint64_t	httpstepid, itemid;
-	zbx_uint64_t	*hsids = NULL, *itemids = NULL;
-	int		hsids_alloc = 0, hsids_num = 0,
-			itemids_alloc = 0, itemids_num = 0;
+	const char		*__function_name = "DBdelete_httptests";
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset;
+	zbx_uint64_t		elementid;
+	zbx_vector_uint64_t	itemids, hsids;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() htids_num:%d", __function_name, htids_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __function_name, htids->values_num);
 
-	if (0 == htids_num)
-		return;
+	if (0 == htids->values_num)
+		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
+	zbx_vector_uint64_create(&itemids);
+	zbx_vector_uint64_create(&hsids);
 
 	/* httpsteps */
 	sql_offset = 0;
@@ -1438,16 +1499,18 @@ static void	DBdelete_httptests(zbx_uint64_t *htids, int htids_num)
 			"select httpstepid"
 			" from httpstep"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", htids, htids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", htids->values, htids->values_num);
 
 	result = DBselect("%s", sql);
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(httpstepid, row[0]);
-		uint64_array_add(&hsids, &hsids_alloc, &hsids_num, httpstepid, 8);
+		ZBX_STR2UINT64(elementid, row[0]);
+		zbx_vector_uint64_append(&hsids, elementid);
 	}
 	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&hsids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	/* httpstepitems */
 	sql_offset = 0;
@@ -1455,48 +1518,46 @@ static void	DBdelete_httptests(zbx_uint64_t *htids, int htids_num)
 			"select itemid"
 			" from httpstepitem"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid", hsids, hsids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid", hsids.values, hsids.values_num);
 
 	result = DBselect("%s", sql);
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		uint64_array_add(&itemids, &itemids_alloc, &itemids_num,
-				itemid, 8);
+		ZBX_STR2UINT64(elementid, row[0]);
+		zbx_vector_uint64_append(&itemids, elementid);
 	}
 	DBfree_result(result);
 
-/* httptestitem's */
+	/* httptestitems */
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select itemid"
 			" from httptestitem"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", htids, htids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", htids->values, htids->values_num);
 
 	result = DBselect("%s", sql);
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		uint64_array_add(&itemids, &itemids_alloc, &itemids_num,
-				itemid, 8);
+		ZBX_STR2UINT64(elementid, row[0]);
+		zbx_vector_uint64_append(&itemids, elementid);
 	}
 	DBfree_result(result);
 
-	sql_offset = 0;
+	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_items(&itemids);
 
+	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httptest where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", htids, htids_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid", htids->values, htids->values_num);
 	DBexecute("%s", sql);
 
-	DBdelete_items(&itemids, &itemids_alloc, &itemids_num);
-
-	zbx_free(hsids);
-	zbx_free(itemids);
+	zbx_vector_uint64_destroy(&hsids);
+	zbx_vector_uint64_destroy(&itemids);
 	zbx_free(sql);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -1507,8 +1568,6 @@ static void	DBdelete_httptests(zbx_uint64_t *htids, int htids_num)
  * Purpose: delete application                                                *
  *                                                                            *
  * Parameters: applicationid - [IN] application identificator from database   *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
@@ -1584,8 +1643,6 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
  * Parameters: hostid - host identificator from database                      *
  *             templateid - template identificator from database              *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
@@ -1593,13 +1650,15 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
  ******************************************************************************/
 static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_uint64_t templateid)
 {
-	const char	*__function_name = "DBdelete_template_graphs";
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	*graphids = NULL, graphid;
-	int		graphids_alloc = 0, graphids_num = 0;
+	const char		*__function_name = "DBdelete_template_graphs";
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_uint64_t	graphids;
+	zbx_uint64_t		graphid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&graphids);
 
 	result = DBselect(
 			"select distinct gi.graphid"
@@ -1613,13 +1672,14 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_uint64_t templatei
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(graphid, row[0]);
-		uint64_array_add(&graphids, &graphids_alloc, &graphids_num, graphid, 4);
+		zbx_vector_uint64_append(&graphids, graphid);
 	}
 	DBfree_result(result);
 
-	DBdelete_graphs(&graphids, &graphids_alloc, &graphids_num);
+	zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_graphs(&graphids);
 
-	zbx_free(graphids);
+	zbx_vector_uint64_destroy(&graphids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1632,8 +1692,6 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_uint64_t templatei
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
  *             templateid - template identificator from database              *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1682,21 +1740,19 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_uint64_t templat
  * Parameters: hostid - host identificator from database                      *
  *             templateid - template identificator from database              *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_items(zbx_uint64_t hostid,
-		zbx_uint64_t templateid)
+static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	*itemids = NULL;
-	int		itemids_alloc = 0, itemids_num = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		itemid;
+	zbx_vector_uint64_t	itemids;
+
+	zbx_vector_uint64_create(&itemids);
 
 	result = DBselect(
 			"select distinct i.itemid"
@@ -1709,14 +1765,14 @@ static void	DBdelete_template_items(zbx_uint64_t hostid,
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
-		uint64_array_add(&itemids, &itemids_alloc, &itemids_num,
-				itemid, 64);
+		zbx_vector_uint64_append(&itemids, itemid);
 	}
 	DBfree_result(result);
 
-	DBdelete_items(&itemids, &itemids_alloc, &itemids_num);
+	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_items(&itemids);
 
-	zbx_free(itemids);
+	zbx_vector_uint64_destroy(&itemids);
 }
 
 /******************************************************************************
@@ -1727,8 +1783,6 @@ static void	DBdelete_template_items(zbx_uint64_t hostid,
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
  *             templateid - template identificator from database              *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -2075,8 +2129,6 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
  * Parameters: hostid - host identificator from database                      *
  *             templateid - template identificator from database              *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
@@ -2086,10 +2138,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	*graphids = NULL, graphid, hosttemplateid = 0;
-	int		graphids_alloc = 0, graphids_num = 0;
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset;
+	zbx_uint64_t	hosttemplateid = 0;
 
 	result = DBselect("select hosttemplateid from hosts_templates"
 			" where hostid=" ZBX_FS_UI64
@@ -2097,61 +2146,16 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
 			hostid, templateid);
 
 	if (NULL != (row = DBfetch(result)))
-	{
 		ZBX_STR2UINT64(hosttemplateid, row[0]);
-	}
 	DBfree_result(result);
 
 	if (0 == hosttemplateid)
 		return SUCCEED;
 
-	/* select graphs with host items */
-	result = DBselect(
-			"select distinct gi.graphid"
-			" from graphs_items gi,items i"
-			" where gi.itemid=i.itemid"
-				" and i.hostid=" ZBX_FS_UI64,
-			hostid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(graphid, row[0]);
-		uint64_array_add(&graphids, &graphids_alloc, &graphids_num,
-				graphid, 4);
-	}
-	DBfree_result(result);
-
 	DBdelete_template_graphs(hostid, templateid);
 	DBdelete_template_triggers(hostid, templateid);
 	DBdelete_template_items(hostid, templateid);
 	DBdelete_template_applications(hostid, templateid);
-
-	/* delete empty graphs */
-	if (graphids_num != 0)
-	{
-		sql = zbx_malloc(sql, sql_alloc);
-
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct graphid"
-				" from graphs_items"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", graphids, graphids_num);
-
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(graphid, row[0]);
-			uint64_array_remove(graphids, &graphids_num, &graphid, 1);
-		}
-		DBfree_result(result);
-
-		DBdelete_graphs(&graphids, &graphids_alloc, &graphids_num);
-
-		zbx_free(sql);
-		zbx_free(graphids);
-	}
 
 	DBexecute("delete from hosts_templates"
 			" where hosttemplateid=" ZBX_FS_UI64,
@@ -3120,45 +3124,23 @@ clean:
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
  *                                                                            *
- * Return value: always SUCCEED                                               *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-int	DBdelete_host(zbx_uint64_t hostid)
+void	DBdelete_host(zbx_uint64_t hostid)
 {
-	const char	*__function_name = "DBdelete_host";
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	elementid;
-	zbx_uint64_t	*graphids = NULL, *itemids = NULL,
-			*htids = NULL;
-	char		*sql = NULL;
-	size_t		sql_alloc = 128, sql_offset = 0;
-	int		graphids_alloc = 0, graphids_num = 0,
-			itemids_alloc = 0, itemids_num = 0,
-			htids_alloc = 0, htids_num = 0;
+	const char		*__function_name = "DBdelete_host";
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		elementid;
+	zbx_vector_uint64_t	itemids, htids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
-
-	/* select graphs with host items */
-	result = DBselect(
-			"select distinct gi.graphid"
-			" from graphs_items gi,items i"
-			" where gi.itemid=i.itemid"
-				" and i.hostid=" ZBX_FS_UI64,
-			hostid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(elementid, row[0]);
-		uint64_array_add(&graphids, &graphids_alloc, &graphids_num, elementid, 4);
-	}
-	DBfree_result(result);
+	zbx_vector_uint64_create(&htids);
+	zbx_vector_uint64_create(&itemids);
 
 	/* delete web tests */
 	result = DBselect(
@@ -3171,13 +3153,12 @@ int	DBdelete_host(zbx_uint64_t hostid)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(elementid, row[0]);
-		uint64_array_add(&htids, &htids_alloc, &htids_num, elementid, 4);
+		zbx_vector_uint64_append(&htids, elementid);
 	}
 	DBfree_result(result);
 
-	DBdelete_httptests(htids, htids_num);
-
-	zbx_free(htids);
+	zbx_vector_uint64_sort(&htids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_httptests(&htids);
 
 	/* delete items -> triggers -> graphs */
 	result = DBselect(
@@ -3189,39 +3170,15 @@ int	DBdelete_host(zbx_uint64_t hostid)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(elementid, row[0]);
-		uint64_array_add(&itemids, &itemids_alloc, &itemids_num, elementid, 64);
+		zbx_vector_uint64_append(&itemids, elementid);
 	}
 	DBfree_result(result);
 
-	DBdelete_items(&itemids, &itemids_alloc, &itemids_num);
+	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	DBdelete_items(&itemids);
 
-	zbx_free(itemids);
-
-	/* delete empty graphs */
-	if (graphids_num != 0)
-	{
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct graphid"
-				" from graphs_items"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", graphids, graphids_num);
-
-		result = DBselect("%s", sql);
-
-		while (NULL != (row = DBfetch(result)))
-		{
-			ZBX_STR2UINT64(elementid, row[0]);
-			uint64_array_remove(graphids, &graphids_num, &elementid, 1);
-		}
-		DBfree_result(result);
-
-		DBdelete_graphs(&graphids, &graphids_alloc, &graphids_num);
-
-		zbx_free(graphids);
-	}
-
-	zbx_free(sql);
+	zbx_vector_uint64_destroy(&itemids);
+	zbx_vector_uint64_destroy(&htids);
 
 	/* delete host from maps */
 	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_HOST, &hostid, 1);
@@ -3233,8 +3190,6 @@ int	DBdelete_host(zbx_uint64_t hostid)
 	DBexecute("delete from hosts where hostid=" ZBX_FS_UI64, hostid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	return SUCCEED;
 }
 
 /******************************************************************************
