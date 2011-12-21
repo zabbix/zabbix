@@ -82,6 +82,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			'interfaceid'			=> array('host' => 1),
 			'port'					=> array(),
 			'inventory_link'		=> array(),
+			'lifetime'				=> array(),
 		);
 	}
 
@@ -145,6 +146,8 @@ abstract class CItemGeneral extends CZBXAPI{
 		));
 
 		foreach ($items as $inum => &$item) {
+			$item = $this->clearValues($item);
+
 			$fullItem = $items[$inum];
 
 			if (!check_db_fields($item_db_fields, $item)) {
@@ -265,13 +268,36 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			// SNMP port
-			if (isset($fullItem['port']) && !validatePortNumber($fullItem['port'], true, true)) {
+			if (isset($fullItem['port']) && !zbx_empty($fullItem['port']) && !validatePortNumberOrMacro($fullItem['port'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Item "%1$s:%2$s" has invalid port: "%3$s".', $fullItem['name'], $fullItem['key_'], $fullItem['port']));
 			}
 
+			$this->checkSpecificFields($fullItem);
 		}
 		unset($item);
+	}
+
+	protected function checkSpecificFields(array $item) {
+		return true;
+	}
+
+	protected function clearValues(array $item) {
+		if (isset($item['port']) && $item['port'] != '') {
+			$item['port'] = ltrim($item['port'], '0');
+			if ($item['port'] == '') {
+				$item['port'] = 0;
+			}
+		}
+
+		if (isset($item['lifetime']) && $item['lifetime'] != '') {
+			$item['lifetime'] = ltrim($item['lifetime'], '0');
+			if ($item['lifetime'] == '') {
+				$item['lifetime'] = 0;
+			}
+		}
+
+		return $item;
 	}
 
 	protected function errorInheritFlags($flag, $key, $host){
