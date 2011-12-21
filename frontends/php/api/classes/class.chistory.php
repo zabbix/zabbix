@@ -28,13 +28,10 @@
  *
  */
 class CHistory extends CZBXAPI {
-
-
 	public function __construct() {
 		// considering the quirky nature of the history API,
 		// the parent::__construct() method should not be called.
 	}
-
 
 	/**
 	 * Get history data
@@ -219,16 +216,6 @@ class CHistory extends CZBXAPI {
 
 		// sorting
 		zbx_db_sorting($sql_parts, $options, $sort_columns, 'h');
-		if (!zbx_empty($options['sortfield'])) {
-			if (!is_array($options['sortfield'])) {
-				$options['sortfield'] = array($options['sortfield']);
-			}
-			foreach ($options['sortfield'] as $i => $sortfield) {
-				if ($sortfield == 'clock') {
-					$sql_parts['order']['itemid'] = 'h.itemid '.$sortorder;
-				}
-			}
-		}
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
