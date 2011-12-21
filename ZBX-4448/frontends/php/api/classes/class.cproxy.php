@@ -355,10 +355,8 @@ class CProxy extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Too many interfaces provided for proxy "%s".', $proxy['host']));
 				}
 
-				foreach ($proxy['interfaces'] as &$interface) {
-					// mark the interface as main to pass host interface validation
-					$interface['main'] = true;
-				}
+				// mark the interface as main to pass host interface validation
+				$proxy['interfaces'][0]['main'] = true;
 			}
 
 			if(isset($proxy['host'])){
@@ -369,7 +367,7 @@ class CProxy extends CZBXAPI {
 				$proxiesExists = $this->get(array(
 					'filter' => array('host' => $proxy['host'])
 				));
-				foreach($proxiesExists as $exnum => $proxyExists){
+				foreach ($proxiesExists as $proxyExists) {
 					if(!$update || (bccomp($proxyExists['proxyid'],$proxy['proxyid']) != 0)){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $proxy['host']));
 					}
@@ -425,7 +423,7 @@ class CProxy extends CZBXAPI {
 
 		$proxyUpdate = array();
 		$hostUpdate = array();
-		foreach($proxies as $proxy){
+		foreach ($proxies as $proxy) {
 			$proxyids[] = $proxy['proxyid'];
 
 			$proxyUpdate[] = array(
