@@ -224,6 +224,31 @@ class zbxXML{
 		)
 	);
 
+	private static $oldKeys = array(
+		'tcp',
+		'ftp',
+		'http',
+		'imap',
+		'ldap',
+		'nntp',
+		'ntp',
+		'pop',
+		'smtp',
+		'ssh'
+	);
+	private static $oldKeysPref = array(
+		'tcp_perf',
+		'ftp_perf',
+		'http_perf',
+		'imap_perf',
+		'ldap_perf',
+		'nntp_perf',
+		'ntp_perf',
+		'pop_perf',
+		'smtp_perf',
+		'ssh_perf'
+	);
+
 	protected static function mapProfileName($name){
 		$map = array(
 			'devicetype' => 'type',
@@ -289,6 +314,31 @@ class zbxXML{
 	protected static function outputXML($doc){
 //		return preg_replace_callback('/^( {2,})/m', array('zbxXML', 'space2tab'), $doc->ownerDocument->saveXML());
 		return $doc->ownerDocument->saveXML();
+	}
+
+
+	/**
+	 * Converts Simle key from old format to new.
+	 *
+	 *
+	 * @param mixed $oldKey   Simple key in old format
+	 *
+	 * @return mixed
+	 */
+	public static function convertOldSimpleKey($oldKey) {
+		$newKey = $oldKey;
+
+		$explodedKey = explode(',', $oldKey);
+
+		if (in_array($explodedKey[0], self::$oldKeys)) {
+			$newKey = 'net.tcp.service['.$explodedKey[0].',,'.$explodedKey[1].']';
+		}
+		elseif (in_array($explodedKey[0], self::$oldKeysPref)) {
+			$keyWithotPerf = explode('_', $explodedKey[0]);
+			$newKey = 'net.tcp.service.perf['.$keyWithotPerf[0].',,'.$explodedKey[1].']';
+		}
+
+		return $newKey;
 	}
 
 	private static function space2tab($matches){
@@ -1132,7 +1182,7 @@ class zbxXML{
 							}
 						}
 
-						$host_db['profile_mode'] = isset($host_db['profile']) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
+						$host_db['inventory_mode'] = isset($host_db['profile']) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
 					}
 // }}} HOST PROFILES
 
@@ -1268,9 +1318,8 @@ class zbxXML{
 										break;
 								}
 
+								$item_db['key_'] = self::convertOldSimpleKey($item_db['key_']);
 							}
-
-							$item_db['key_'] = convertOldSimpleKey($item_db['key_']);
 
 							$options = array(
 								'filter' => array(
@@ -1390,6 +1439,20 @@ class zbxXML{
 						foreach($triggers as $trigger){
 							$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
 
+							if($old_version_input) {
+								$expressionPart = explode(':', $trigger_db['expression']);
+								$keyName = explode(',', $expressionPart[1], 2);
+
+								if (count($keyName) == 2) {
+									$keyValue = explode('.', $keyName[1], 2);
+									$key = $keyName[0].",".$keyValue[0];
+
+									if (in_array($keyName[0], self::$oldKeys) || in_array($keyName[0], self::$oldKeysPref)) {
+										$trigger_db['expression'] = str_replace($key, self::convertOldSimpleKey($key), $trigger_db['expression']);
+									}
+								}
+							}
+
 							// {HOSTNAME} is here for backward compatibility
 							$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 							$trigger_db['expression'] = str_replace('{{HOST.HOST}:', '{'.$host_db['host'].':', $trigger_db['expression']);
@@ -1420,11 +1483,11 @@ class zbxXML{
 
 
 							if(!$current_trigger && !isset($rules['trigger']['missed'])){
-								info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
+								info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
 								continue; // break if not update exist
 							}
 							if($current_trigger && !isset($rules['trigger']['exist'])){
-								info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
+								info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
 								continue; // break if not update exist
 							}
 
@@ -1488,7 +1551,9 @@ class zbxXML{
 								// {HOSTNAME} is here for backward compatibility
 								$gitem_db['host'] = ($gitem_host == '{HOSTNAME}') ? $host_db['host'] : $gitem_host;
 								$gitem_db['host'] = ($gitem_host == '{HOST.HOST}') ? $host_db['host'] : $gitem_host;
-								$data[0] = convertOldSimpleKey($data[0]);
+								if ($old_version_input) {
+									$data[0] = self::convertOldSimpleKey($data[0]);
+								}
 								$gitem_db['key_'] = implode(':', $data);
 
 								if($current_item = API::Item()->exists($gitem_db)){
@@ -1915,25 +1980,6 @@ class zbxXML{
 		return self::outputXML($root);
 	}
 
-}
-
-function convertOldSimpleKey($old_key) {
-	$oldKeys = array('tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh');
-	$oldKeys_perf = array('tcp_perf', 'ftp_perf', 'http_perf', 'imap_perf', 'ldap_perf', 'nntp_perf', 'ntp_perf', 'pop_perf', 'smtp_perf', 'ssh_perf');
-
-	$new_key = $old_key;
-
-	$explodedKey = explode(',', $old_key);
-
-	if (in_array($explodedKey[0], $oldKeys)) {
-		$new_key = 'net.tcp.service['.$explodedKey[0].',,'.$explodedKey[1].']';
-	}
-	elseif (in_array($explodedKey[0], $oldKeys_perf)) {
-		$keyWithotPerf = explode('_', $explodedKey[0]);
-		$new_key = 'net.tcp.service.perf['.$keyWithotPerf[0].',,'.$explodedKey[1].']';
-	}
-
-	return $new_key;
 }
 
 ?>
