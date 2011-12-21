@@ -502,14 +502,6 @@ frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/bootstrap.php.template -text
 include/telnet.h -text
-m4/ax_lib_ibm_db2.m4 -text
-m4/ax_lib_oracle_oci.m4 -text
-m4/iconv.m4 -text
-m4/libiodbc.m4 -text
-m4/libssh2.m4 -text
-m4/libunixodbc.m4 -text
-m4/openipmi.m4 -text
-m4/resolv.m4 -text
 man/Makefile.am -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
