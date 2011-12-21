@@ -578,7 +578,7 @@ function check_fields(&$fields, $show_messages = true) {
 		'sort'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
 		'sortorder'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null)
 	);
-	$fields = zbx_array_merge($fields, $system_fields);
+	$fields = zbx_array_merge($system_fields, $fields);
 
 	$err = ZBX_VALID_OK;
 	foreach ($fields as $field => $checks) {
