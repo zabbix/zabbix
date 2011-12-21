@@ -4,7 +4,10 @@
 	<property name="builddir" value="${BUILDDIR}"/>
 	<property name="svn" value="${SVN}"/>
 	<property name="dbtype" value="${DBTYPE}"/>
+	<property name="dbhost" value="${DBHOST}"/>
 	<property name="dbname" value="${DBNAME}"/>
+	<property name="dbuser" value="${DBUSER}"/>
+	<property name="dbpassword" value="${DBPASSWORD}"/>
 	<property name="url" value="${URL}"/>
 
 	<target name="buildagent">
@@ -114,43 +117,51 @@
 	<target name="init-postgresql" depends="init-common">
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
+			<arg line="-h sql"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="template1 -c 'drop database if exists ${dbname};'"/>
+			<arg line="-c 'drop database if exists ${dbname};'"/>
+			<arg line="template1 postgres"/>
 		</exec>
 		<exec executable="psql" failonerror="on">
+			<arg line="-h sql"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="template1 -c 'create database ${dbname};'"/>
+			<arg line="-c 'create database ${dbname};'"/>
+			<arg line="template1 postgres"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/database/postgresql/schema.sql" failonerror="on">
+			<arg line="-h sql"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="${dbname}"/>
+			<arg line="${dbname} postgres"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/database/postgresql/images.sql" failonerror="on">
+			<arg line="-h sql"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="${dbname}"/>
+			<arg line="${dbname} postgres"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/database/postgresql/data.sql" failonerror="on">
+			<arg line="-h sql"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="${dbname}"/>
+			<arg line="${dbname} postgres"/>
 		</exec>
 		<exec executable="psql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
+			<arg line="-h sql"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
-			<arg line="${dbname}"/>
+			<arg line="${dbname} postgres"/>
 		</exec>
 
 		<!-- Create PHP config file -->
-		<exec executable="sed" failonerror="on" output="${builddir}/frontends/php/conf/zabbix.conf.php">
-			<arg line="'s/{DBNAME}/${dbname}/' ${builddir}/tests/templates/zabbix.conf.php.postgresql"/>
-		</exec>
-		<exec executable="sed" failonerror="on" output="${basedir}/frontends/php/conf/zabbix.conf.php">
-			<arg line="'s/{DBNAME}/${dbname}/' ${builddir}/tests/templates/zabbix.conf.php.postgresql"/>
-		</exec>
+		<copy overwrite="true" file="${builddir}/tests/templates/zabbix.conf.php.postgresql" tofile="${builddir}/frontends/php/conf/zabbix.conf.php"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
 	</target>
 
 	<target name="runagent" depends="buildagent">
@@ -190,12 +201,12 @@
 		</exec>
 
 		<!-- Create PHP config file -->
-		<exec executable="sed" failonerror="on" output="${builddir}/frontends/php/conf/zabbix.conf.php">
-			<arg line="'s/{DBNAME}/${dbname}/' ${builddir}/tests/templates/zabbix.conf.php.mysql"/>
-		</exec>
-		<exec executable="sed" failonerror="on" output="${basedir}/frontends/php/conf/zabbix.conf.php">
-			<arg line="'s/{DBNAME}/${dbname}/' ${builddir}/tests/templates/zabbix.conf.php.mysql"/>
-		</exec>
+		<copy overwrite="true" file="${builddir}/tests/templates/zabbix.conf.php.mysql" tofile="${builddir}/frontends/php/conf/zabbix.conf.php"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
 	</target>
 
 	<target name="clean">
