@@ -218,7 +218,7 @@
 	</target>
 
 	<target name="test-frontend">
-		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
+		<exec executable="phpunit" dir="${builddir}/frontends/php/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=${builddir}/frontends/php/tests/bootstrap.php frontend.php"/>
 		</exec>
 	</target>
