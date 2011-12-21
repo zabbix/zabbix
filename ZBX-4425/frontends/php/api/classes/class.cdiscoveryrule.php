@@ -829,7 +829,7 @@ COpt::memoryPick();
 		$chdHosts = API::Host()->get(array(
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
-			'output' => array('hostid', 'host', 'status'),
+			'output' => array('hostid', 'host', 'status', 'name'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'nopermissions' => true,
@@ -878,7 +878,7 @@ COpt::memoryPick();
 					$exItem = $exItemsKeys[$item['key_']];
 
 					if ($exItem['flags'] != ZBX_FLAG_DISCOVERY) {
-						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
+						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['name']);
 					}
 					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
@@ -896,7 +896,7 @@ COpt::memoryPick();
 					}
 					// no matching interface found, throw an error
 					elseif($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['name'], $item['key_']));
 					}
 				}
 
@@ -1012,7 +1012,7 @@ COpt::memoryPick();
 			}
 			// no matching interface found, throw an error
 			elseif($interface !== false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $dstDiscovery['key_']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['name'], $dstDiscovery['key_']));
 			}
 		}
 
@@ -1077,7 +1077,7 @@ COpt::memoryPick();
 					}
 					// no matching interface found, throw an error
 					elseif ($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $prototype['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['name'], $prototype['key_']));
 					}
 				}
 
