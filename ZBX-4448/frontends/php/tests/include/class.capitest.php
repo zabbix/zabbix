@@ -277,3 +277,4 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 		$this->testHost = null;
 	}
 }
+?>
