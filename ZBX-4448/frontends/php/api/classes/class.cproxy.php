@@ -356,7 +356,7 @@ class CProxy extends CZBXAPI {
 				}
 
 				foreach ($proxy['interfaces'] as &$interface) {
-					// mark the interface as main ty pass host interface validation
+					// mark the interface as main to pass host interface validation
 					$interface['main'] = true;
 				}
 			}
@@ -382,7 +382,6 @@ class CProxy extends CZBXAPI {
 
 	public function create($proxies){
 		$proxies = zbx_toArray($proxies);
-		$proxyids = array();
 
 		$this->checkInput($proxies, __FUNCTION__);
 
@@ -404,12 +403,8 @@ class CProxy extends CZBXAPI {
 				continue;
 			}
 
-// INTERFACES
-			foreach ($proxy['interfaces'] as &$interface) {
-				$interface['hostid'] = $proxyids[$pnum];
-			}
-			unset($interface);
-
+			// create the interface
+			$proxy['interfaces'][0]['hostid'] = $proxyids[$pnum];
 			$result = API::HostInterface()->create($proxy['interfaces']);
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface creation failed');
@@ -430,7 +425,7 @@ class CProxy extends CZBXAPI {
 
 		$proxyUpdate = array();
 		$hostUpdate = array();
-		foreach($proxies as $pnum => $proxy){
+		foreach($proxies as $proxy){
 			$proxyids[] = $proxy['proxyid'];
 
 			$proxyUpdate[] = array(
@@ -451,21 +446,31 @@ class CProxy extends CZBXAPI {
 				'where' => array('hostid' => $hostids)
 			);
 
-// INTERFACES
-			if(isset($proxy['interfaces']) && is_array($proxy['interfaces'])){
-				foreach($proxy['interfaces'] as $inum => &$interface){
-					$interface['hostid'] = $proxy['hostid'];
+			// if this is an active proxy - delete it's interface;
+			if (isset($proxy['status']) && $proxy['status'] == HOST_STATUS_PROXY_ACTIVE) {
+				$interfaces = API::HostInterface()->get(array(
+					'output' => array('interfaceid'),
+					'hostids' => $proxy['hostid']
+				));
+				$interfaceIds = zbx_objectValues($interfaces, 'interfaceid');
+				if ($interfaceIds) {
+					API::HostInterface()->delete($interfaceIds);
+				}
+			}
+			// update the interface of a passive proxy
+			elseif (isset($proxy['interfaces']) && is_array($proxy['interfaces'])) {
+				$proxy['interfaces'][0]['hostid'] = $proxy['hostid'];
+
+				if (isset($proxy['interfaces'][0]['interfaceid'])) {
+					$result = API::HostInterface()->update($proxy['interfaces']);
+				}
+				else {
+					$result = API::HostInterface()->create($proxy['interfaces']);
 				}
 
-				if(isset($interface['interfaceid']))
-					$result = API::HostInterface()->update($proxy['interfaces']);
-				else
-					$result = API::HostInterface()->create($proxy['interfaces']);
-
-				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface update failed');
-
-// unset after foreach with pointer
-				unset($interface);
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_INTERNAL, 'Proxy interface update failed');
+				}
 			}
 		}
 
