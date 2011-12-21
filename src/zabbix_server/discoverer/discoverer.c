@@ -202,7 +202,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 
 				strscpy(item.key_orig, dcheck->key_);
 				item.key = item.key_orig;
-				
+
 				item.interface.useip = 1;
 				item.interface.addr = ip;
 				item.interface.port = port;
