@@ -113,6 +113,10 @@ ALTER TABLE items ADD inventory_link integer WITH DEFAULT '0' NOT NULL
 /
 REORG TABLE items
 /
+ALTER TABLE items ADD lifetime varchar(64) WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE items
+/
 UPDATE items SET templateid=NULL WHERE templateid=0
 /
 UPDATE items SET templateid=NULL WHERE templateid IS NOT NULL AND templateid NOT IN (SELECT itemid FROM items)

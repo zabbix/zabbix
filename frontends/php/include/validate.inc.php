@@ -603,23 +603,36 @@ function check_fields(&$fields, $show_messages = true) {
 	return $err == ZBX_VALID_OK ? 1 : 0;
 }
 
-function validatePortNumber($port, $allowEmpty = false, $allowUserMacro = false) {
-	if ($allowEmpty && zbx_empty($port)) {
-		return true;
+function validatePortNumberOrMacro($port) {
+	return (validatePortNumber($port) || validateUserMacro($port));
+}
+
+function validatePortNumber($port) {
+	return validateNumber($port, ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER);
+}
+
+function validateNumber($value, $min = null, $max = null) {
+	if (!zbx_is_int($value)) {
+		return false;
 	}
 
-	if (zbx_ctype_digit($port) && $port >= 0 && $port <= 65535) {
-		return true;
+	if ($min !== null && $value < $min) {
+		return false;
 	}
 
-	if ($allowUserMacro && preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/u', $port)) {
-		return true;
+	if ($max !== null && $value > $max) {
+		return false;
 	}
 
-	return false;
+	return true;
+}
+
+function validateUserMacro($value) {
+	return preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value);
 }
 
 function validateMaxTime($time) {
 	return $time <= 2147464800; // 2038.01.19 00:00
 }
+
 ?>
