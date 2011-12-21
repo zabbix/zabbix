@@ -312,13 +312,11 @@ class zbxXML{
 	}
 
 	protected static function outputXML($doc){
-//		return preg_replace_callback('/^( {2,})/m', array('zbxXML', 'space2tab'), $doc->ownerDocument->saveXML());
 		return $doc->ownerDocument->saveXML();
 	}
 
-
 	/**
-	 * Converts Simle key from old format to new.
+	 * Converts Simple key from old format to new.
 	 *
 	 *
 	 * @param mixed $oldKey   Simple key in old format
@@ -334,8 +332,8 @@ class zbxXML{
 			$newKey = 'net.tcp.service['.$explodedKey[0].',,'.$explodedKey[1].']';
 		}
 		elseif (in_array($explodedKey[0], self::$oldKeysPref)) {
-			$keyWithotPerf = explode('_', $explodedKey[0]);
-			$newKey = 'net.tcp.service.perf['.$keyWithotPerf[0].',,'.$explodedKey[1].']';
+			$keyWithoutPerf = explode('_', $explodedKey[0]);
+			$newKey = 'net.tcp.service.perf['.$keyWithoutPerf[0].',,'.$explodedKey[1].']';
 		}
 
 		return $newKey;
