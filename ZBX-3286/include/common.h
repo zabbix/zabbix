@@ -439,12 +439,12 @@ typedef enum
 typedef enum
 {
 	ESCALATION_STATUS_ACTIVE = 0,
-	ESCALATION_STATUS_RECOVERY,
+	ESCALATION_STATUS_RECOVERY,	/* only in server code, never in DB */
 	ESCALATION_STATUS_SLEEP,
-	ESCALATION_STATUS_COMPLETED, /* only in server code, never in DB */
-	ESCALATION_STATUS_SUPERSEDED_ACTIVE,
-	ESCALATION_STATUS_SUPERSEDED_RECOVERY
-} zbx_escalation_status_t;
+	ESCALATION_STATUS_COMPLETED	/* only in server code, never in DB */
+}
+zbx_escalation_status_t;
+const char      *zbx_escalation_status_string(unsigned char status);
 
 /* alert types */
 typedef enum
@@ -958,7 +958,8 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
-int	zbx_strlen_utf8(const char *text);
+size_t	zbx_strlen_utf8(const char *text);
+size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
 
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 char	*zbx_replace_utf8(const char *text);

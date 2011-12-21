@@ -60,6 +60,7 @@ require_once('include/page_header.php');
 
 		'newgroup'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
 		'interfaces'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
+		'mainInterfaces' => array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
 		'templates'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		'templates_rem'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
 		'clear_templates'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
@@ -480,10 +481,27 @@ require_once('include/page_header.php');
 					continue;
 				}
 
-				if($interface['new'] == 'create')
+				if($interface['isNew'])
 					unset($interfaces[$inum]['interfaceid']);
+				unset($interfaces[$inum]['isNew']);
+				$interfaces[$inum]['main'] = 0;
+			}
 
-				unset($interfaces[$inum]['new']);
+			if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT])) {
+				$mainAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_AGENT];
+				$interfaces[$mainAgentId]['main'] = '1';
+			}
+			if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_SNMP])) {
+				$snmpAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_SNMP];
+				$interfaces[$snmpAgentId]['main'] = '1';
+			}
+			if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_JMX])) {
+				$ipmiAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_JMX];
+				$interfaces[$ipmiAgentId]['main'] = '1';
+			}
+			if (isset($_REQUEST['mainInterfaces'][INTERFACE_TYPE_IPMI])) {
+				$jmxAgentId = $_REQUEST['mainInterfaces'][INTERFACE_TYPE_IPMI];
+				$interfaces[$jmxAgentId]['main'] = '1';
 			}
 
 			foreach($macros as $mnum => $macro){

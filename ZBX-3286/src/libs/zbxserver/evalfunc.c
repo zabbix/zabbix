@@ -1753,7 +1753,7 @@ static int	evaluate_STRLEN(char *value, DB_ITEM *item, const char *function, con
 
 	if (SUCCEED == evaluate_LAST(value, item, "last", parameters, now))
 	{
-		zbx_snprintf(value, MAX_BUFFER_LEN, "%d", zbx_strlen_utf8(value));
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_SIZE_T, (zbx_fs_size_t)zbx_strlen_utf8(value));
 		res = SUCCEED;
 	}
 clean:

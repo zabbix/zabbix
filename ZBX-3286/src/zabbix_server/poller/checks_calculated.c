@@ -160,7 +160,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 	for (i = 0; i < exp->functions_num; i++)
 	{
 		f = &exp->functions[i];
-		
+
 		buf = get_param_dyn(f->params, 1);	/* for first parameter result is not NULL */
 
 		if (SUCCEED != parse_host_key(buf, &f->host, &f->key))
@@ -233,7 +233,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 
 			if (0 != strcmp(f->key, item.key))
 				continue;
-					
+
 			if (0 != strcmp(f->host, item.host_name))
 				continue;
 
@@ -322,6 +322,6 @@ clean:
 	free_expression(&exp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-			
+
 	return ret;
 }
