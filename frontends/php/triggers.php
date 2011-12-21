@@ -195,7 +195,6 @@ elseif (isset($_REQUEST['del_dependence']) && isset($_REQUEST['rem_dependence'])
 	}
 }
 elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])) {
-	$result = false;
 	$visible = get_request('visible', array());
 
 	// get triggers
@@ -210,7 +209,7 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 	DBstart();
 	foreach ($db_triggers as $trigger) {
 		foreach ($trigger as $key => $value) {
-			if (isset($visible[$key])) {
+			if (isset($visible[$key]) && isset($_REQUEST[$key])) {
 				$trigger[$key] = $_REQUEST[$key];
 			}
 		}
@@ -222,15 +221,22 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 		if (!empty($visible['dependencies'])) {
 			$options['dependencies'] = $trigger['dependencies'];
 		}
-
-		$result = API::Trigger()->update($options);
-		if (!$result) {
-			break;
+		if (!empty($options['priority']) || !empty($options['dependencies'])) {
+			$result = API::Trigger()->update($options);
+			if (!$result) {
+				break;
+			}
 		}
 	}
-	$result = DBend($result);
+	if (isset($result)) {
+		$result = DBend($result);
+		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
+	}
+	else {
+		DBend();
+		$result = true;
+	}
 
-	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 	if ($result) {
 		unset($_REQUEST['massupdate'], $_REQUEST['form']);
 	}
