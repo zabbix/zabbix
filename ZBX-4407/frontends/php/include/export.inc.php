@@ -1148,39 +1148,24 @@ class zbxXML{
 
 // HOST PROFILES {{{
 					if($old_version_input){
-						$profile_node = $xpath->query('host_profile/*', $host);
-						if($profile_node->length > 0){
-							$host_db['profile'] = array();
-							foreach($profile_node as $field){
-								$newProfileName = self::mapProfileName($field->nodeName);
-								if(isset($host_db['profile'][$newProfileName]) && $field->nodeValue !== ''){
-									$host_db['profile'][$newProfileName] .= "\n";
-									$host_db['profile'][$newProfileName] .= $field->nodeValue;
+						$inventory_node = $xpath->query('host_inventory/*', $host);
+						if($inventory_node->length > 0){
+							if(!isset($host_db['inventory'])){
+								$host_db['inventory'] = array();
+							}
+							foreach($inventory_node as $field){
+								$newInventoryName = self::mapProfileName($field->nodeName);
+								if(isset($host_db['inventory'][$newInventoryName]) && $field->nodeValue !== ''){
+									$host_db['inventory'][$newInventoryName] .= "\n";
+									$host_db['inventory'][$newInventoryName] .= $field->nodeValue;
 								}
 								else{
-									$host_db['profile'][$newProfileName] = $field->nodeValue;
+									$host_db['inventory'][$newInventoryName] = $field->nodeValue;
 								}
 							}
 						}
 
-						$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
-						if($profile_ext_node->length > 0){
-							if(!isset($host_db['profile'])){
-								$host_db['profile'] = array();
-							}
-							foreach($profile_ext_node as $field){
-								$newProfileName = self::mapProfileName($field->nodeName);
-								if(isset($host_db['profile'][$newProfileName]) && $field->nodeValue !== ''){
-									$host_db['profile'][$newProfileName] .= "\n";
-									$host_db['profile'][$newProfileName] .= $field->nodeValue;
-								}
-								else{
-									$host_db['profile'][$newProfileName] = $field->nodeValue;
-								}
-							}
-						}
-
-						$host_db['inventory_mode'] = isset($host_db['profile']) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
+						$host_db['inventory_mode'] = isset($host_db['inventory']) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
 					}
 // }}} HOST PROFILES
 
