@@ -598,12 +598,12 @@ COpt::memoryPick();
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
 			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1
+			'selectHosts' => array('name'),
+			'nopermissions' => true
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_CREATED_SMALL);
+			info(S_DISCOVERY_RULE.' ['.$host['name'].':'.$item['key_'].'] '.S_CREATED_SMALL);
 		}
 	}
 
@@ -654,12 +654,12 @@ COpt::memoryPick();
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
 			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1,
+			'selectHosts' => array('name'),
+			'nopermissions' => true
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_UPDATED_SMALL);
+			info(S_DISCOVERY_RULE.' ['.$host['name'].':'.$item['key_'].'] '.S_UPDATED_SMALL);
 		}
 
 	}
@@ -829,7 +829,7 @@ COpt::memoryPick();
 		$chdHosts = API::Host()->get(array(
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
-			'output' => array('hostid', 'host', 'status', 'name'),
+			'output' => array('hostid', 'name', 'status'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'nopermissions' => true,
@@ -881,7 +881,7 @@ COpt::memoryPick();
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['name']);
 					}
 					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s:%2$s" already exists, inherited from another template.', $host['name'], $item['key_']));
 					}
 				}
 
