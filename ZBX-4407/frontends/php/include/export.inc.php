@@ -1146,7 +1146,7 @@ class zbxXML{
 // }}} TEMPLATES
 
 
-// HOST PROFILES {{{
+// HOST INVENTORY {{{
 					if($old_version_input){
 						$inventory_node = $xpath->query('host_inventory/*', $host);
 						if($inventory_node->length > 0){
@@ -1167,7 +1167,7 @@ class zbxXML{
 
 						$host_db['inventory_mode'] = isset($host_db['inventory']) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
 					}
-// }}} HOST PROFILES
+// }}} HOST INVENTORY
 
 // HOSTS
 					if(isset($host_db['proxy_hostid'])){
