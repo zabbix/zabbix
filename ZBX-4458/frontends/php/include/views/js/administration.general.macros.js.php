@@ -1,5 +1,5 @@
 <script type="text/x-jquery-tmpl" id="macroRow">
-	<tr class="form_even_row">
+	<tr class="form_row form_even_row">
 		<td>
 			<input class="input text" type="text" name="macros[#{macroNum}][macro]" size="30" maxlength="64"
 				placeholder="{$MACRO}" style="text-transform:uppercase;">
@@ -40,7 +40,7 @@
 				var count = jQuery('#save').data('removedCount') + 1;
 				jQuery('#save').data('removedCount', count);
 			}
-			jQuery(this).parent().parent().remove();
+			jQuery(this).closest('.form_row').remove();
 		});
 
 		jQuery('#save').click(function() {
