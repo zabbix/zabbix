@@ -43,9 +43,9 @@ $valueMappingFormList = new CFormList('valueMappingFormList');
 $valueMappingFormList->addRow(_('Name'), new CTextBox('mapname', $this->data['mapname'], 40, null, 64));
 $valueMappingFormList->addRow(_('Mapping'), (empty($valuemapElements) ? _('No mapping defined.') : $valuemapElements));
 $valueMappingFormList->addRow(_('New mapping'), array(
-	new CTextBox('add_value', '', 10, null, 64),
+	new CTextBox('add_value', $this->data['add_value'], 20, null, 64),
 	new CSpan(RARR, 'rarr'),
-	new CTextBox('add_newvalue', '', 10, null, 64),
+	new CTextBox('add_newvalue', $this->data['add_newvalue'], 20, null, 64),
 	SPACE,
 	new CSubmit('add_map', _('Add'))
 ));
