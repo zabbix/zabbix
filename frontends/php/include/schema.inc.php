@@ -3012,6 +3012,12 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'lifetime' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '0',
+			),
 		),
 	),
 	'functions' => array(

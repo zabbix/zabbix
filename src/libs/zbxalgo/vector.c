@@ -26,8 +26,6 @@
 
 #define	ZBX_VECTOR_IMPL(__id, __type)										\
 														\
-static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *vector);			\
-														\
 static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *vector)			\
 {														\
 	if (NULL == vector->values)										\
@@ -95,6 +93,19 @@ void	zbx_vector_ ## __id ## _remove_noorder(zbx_vector_ ## __id ## _t *vector, i
 	}													\
 														\
 	vector->values[index] = vector->values[--vector->values_num];						\
+}														\
+														\
+void	zbx_vector_ ## __id ## _remove(zbx_vector_ ## __id ## _t *vector, int index)				\
+{														\
+	if (!(0 <= index && index < vector->values_num))							\
+	{													\
+		zabbix_log(LOG_LEVEL_CRIT, "removing a non-existent element at index %d", index);		\
+		exit(FAIL);											\
+	}													\
+														\
+	vector->values_num--;											\
+	memmove(&vector->values[index], &vector->values[index + 1],						\
+			sizeof(__type) * (vector->values_num - index));						\
 }														\
 														\
 void	zbx_vector_ ## __id ## _sort(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func)	\
