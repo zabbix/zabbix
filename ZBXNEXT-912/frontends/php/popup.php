@@ -1625,7 +1625,7 @@ elseif ($srctbl == 'screens') {
 	$screens = API::Screen()->get($options);
 	order_result($screens, 'name');
 
-	foreach ($screens as $snum => $row) {
+	foreach ($screens as $row) {
 		$name = new CSpan($row['name'], 'link');
 
 		if ($multiselect) {

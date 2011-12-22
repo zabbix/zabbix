@@ -20,17 +20,13 @@
 ?>
 <?php
 class CNumericBox extends CInput {
-	public function __construct($name = 'number', $value = '0', $size = 20, $readonly = 'no', $allowempty = false) {
+	public function __construct($name = 'number', $value = '0', $size = 20, $readonly = 'no', $allowempty = false, $allownegative = true) {
 		parent::__construct('text', $name, $value);
 		$this->setReadonly($readonly);
 		$this->attr('size', $size);
 		$this->attr('maxlength', $size);
 		$this->attr('style', 'text-align: right;');
-		$this->addAction('onchange',
-				($allowempty ? ' if(this.value.length==0 || this.value==null) this.value = \'\'; else ' : '').
-				' if(isNaN(parseInt(this.value,10))) this.value = 0; '.
-				' else this.value = parseInt(this.value,10);'
-		);
+		$this->addAction('onchange', 'validateNumericBox(this, '.($allowempty ? 'true' : 'false').', '.($allownegative ? 'true' : 'false').');');
 	}
 }
 ?>

@@ -39,10 +39,6 @@ $fields = array(
 	'name' =>			array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})'),
 	'delay' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, SEC_PER_DAY), 'isset({save})'),
 	'slides' =>			array(null,		 O_OPT, null,		null,	null),
-	'work_slide' =>		array(null,		 O_OPT, null,		null,	null),
-	'add_slide' =>		array(T_ZBX_STR, O_OPT, P_ACT,		null,	null),
-	'cancel_slide' =>	array(T_ZBX_STR, O_OPT, P_ACT,		null,	null),
-	'edit_slide' =>		array(T_ZBX_STR, O_OPT, P_ACT,		null,	null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -97,41 +93,6 @@ elseif (isset($_REQUEST['save'])) {
 		unset($_REQUEST['form'], $_REQUEST['slideshowid']);
 	}
 }
-elseif (isset($_REQUEST['cancel_slide'])) {
-	unset($_REQUEST['add_slide'], $_REQUEST['work_slide']);
-}
-elseif (isset($_REQUEST['add_slide'])) {
-	// add new slide item to slides
-	if (!empty($_REQUEST['work_slide']['screenid'])) {
-		$_REQUEST['slides'][] = $_REQUEST['work_slide'];
-		unset($_REQUEST['add_slide'], $_REQUEST['work_slide']);
-	}
-	// init new slide item
-	else {
-		$_REQUEST['work_slide']['screenid'] = 0;
-		$_REQUEST['work_slide']['delay'] = 0;
-		$_REQUEST['work_slide']['slideid'] = rand(1, 9999999);
-	}
-}
-elseif (!empty($_REQUEST['edit_slide'])) {
-	// update slide item
-	if (!empty($_REQUEST['work_slide']['screenid'])) {
-		for ($i = 0, $size = count($_REQUEST['slides']); $i < $size; $i++) {
-			if ($_REQUEST['slides'][$i]['slideid'] == $_REQUEST['work_slide']['slideid']) {
-				$_REQUEST['slides'][$i] = $_REQUEST['work_slide'];
-			}
-		}
-		unset($_REQUEST['edit_slide'], $_REQUEST['work_slide']);
-	}
-	// init slide item
-	else {
-		foreach ($_REQUEST['slides'] as $slide) {
-			if ($slide['slideid'] == $_REQUEST['edit_slide']) {
-				$_REQUEST['work_slide'] = $slide;
-			}
-		}
-	}
-}
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	if ($slideshow = get_slideshow_by_slideshowid($_REQUEST['slideshowid'])) {
 		DBstart();
@@ -176,10 +137,7 @@ if (isset($_REQUEST['form'])) {
 		'slideshowid' => get_request('slideshowid', null),
 		'name' => get_request('name', ''),
 		'delay' => get_request('delay', ZBX_ITEM_DELAY_DEFAULT),
-		'slides' => get_request('slides', array()),
-		'add_slide' => get_request('add_slide', null),
-		'work_slide' => get_request('work_slide', array()),
-		'screen' => null
+		'slides' => get_request('slides', array())
 	);
 
 	if (!empty($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
@@ -196,13 +154,6 @@ if (isset($_REQUEST['form'])) {
 				'delay' => $slide['delay']
 			);
 		}
-	}
-
-	// get work slide screen name
-	$data['work_slide_screen'] = '';
-	if (!empty($data['work_slide']['screenid'])) {
-		$screen = get_screen_by_screenid($data['work_slide']['screenid']);
-		$data['work_slide_screen'] = $screen['name'];
 	}
 
 	// render view

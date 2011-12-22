@@ -1,14 +1,37 @@
-<script type="text/javascript">
-	function removeSlide(slideid) {
-		removeObjectById('slides_' + slideid);
-		removeObjectById('slides_' + slideid + '_slideid');
-		removeObjectById('slides_' + slideid + '_screenid');
-		removeObjectById('slides_' + slideid + '_delay');
+<script type="text/x-jquery-tmpl" id="screenRowTPL">
+<tr id="slides_#{rowNum}" class="sortable">
+	<td>
+		<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+		<input name="slides[#{rowId}][screenid]" type="hidden" value="#{screenid}" />
+	</td>
+	<td>
+		<span class="rowNum" id="current_slide_#{rowId}">#{rowNum}</span>
+	</td>
+	<td>#{name}</td>
+	<td>
+		<input class="input text" type="text" name="slides[#{rowId}][delay]" value="0" size="5" maxlength="5" onchange="validateNumericBox(this, false, false);" style="text-align: right;">
+	</td>
+	<td>
+		<input type="button" class="input link_menu" id="remove_#{rowId}" remove_slide="#{rowId}" value="<?php echo _('Remove'); ?>" onclick="removeSlide(this);" />
+	</td>
+</tr>
+</script>
 
-		if (jQuery('#slideTable tr.sortable').length <= 1) {
-			jQuery('#slideTable').sortable('disable');
+<script type="text/javascript">
+	function removeSlide(obj) {
+		if (obj != null) {
+			slideId = obj.getAttribute('remove_slide');
+
+			removeObjectById('slides_' + slideId);
+			removeObjectById('slides_' + slideId + '_slideid');
+			removeObjectById('slides_' + slideId + '_screenid');
+			removeObjectById('slides_' + slideId + '_delay');
+
+			if (jQuery('#slideTable tr.sortable').length <= 1) {
+				jQuery('#slideTable').sortable('disable');
+			}
+			recalculateSortOrder();
 		}
-		recalculateSortOrder();
 	}
 
 	function recalculateSortOrder() {
@@ -17,6 +40,7 @@
 			var slideId = (i == 0) ? '0' : i;
 
 			// rewrite ids to temp
+			jQuery('#remove_' + slideId).attr('id', 'tmp_remove_' + slideId);
 			jQuery('#slides_' + slideId).attr('id', 'tmp_slides_' + slideId);
 			jQuery('#slides_' + slideId + '_slideid').attr('id', 'tmp_slides_' + slideId + '_slideid');
 			jQuery('#slides_' + slideId + '_screenid').attr('id', 'tmp_slides_' + slideId + '_screenid');
@@ -33,6 +57,7 @@
 		for (var n = 0; n < i; n++) {
 			var newSlideId = jQuery('#tmp_current_slide_' + n).attr('new_slide');
 
+			jQuery('#tmp_remove_' + n).attr('id', 'remove_' + newSlideId);
 			jQuery('#tmp_slides_' + n).attr('id', 'slides_' + newSlideId);
 			jQuery('#tmp_slides_' + n + '_slideid').attr('id', 'slides_' + newSlideId + '_slideid');
 			jQuery('#tmp_slides_' + n + '_screenid').attr('id', 'slides_' + newSlideId + '_screenid');
@@ -41,6 +66,7 @@
 			jQuery('#slides_' + newSlideId + '_slideid').attr('name', 'slides[' + newSlideId + '][slideid]');
 			jQuery('#slides_' + newSlideId + '_screenid').attr('name', 'slides[' + newSlideId + '][screenid]');
 			jQuery('#slides_' + newSlideId + '_delay').attr('name', 'slides[' + newSlideId + '][delay]');
+			jQuery('#remove_' + newSlideId).attr('remove_slide', newSlideId);
 
 			// set new slide order position
 			jQuery('#tmp_current_slide_' + n).attr('id', 'current_slide_' + newSlideId);
@@ -65,4 +91,22 @@
 			}
 		});
 	});
+
+	function addPopupValues(list) {
+		for (var i = 0; i < list.values.length; i++) {
+			if (empty(list.values[i])) {
+				continue;
+			}
+			var value = list.values[i];
+			value['rowNum'] = jQuery('#slideTable tr.sortable .rowNum').length + 1;
+			value['rowId'] = jQuery('#slideTable tr.sortable .rowNum').length;
+
+			if (jQuery('#slides' + value.screenid).length) {
+				continue;
+			}
+
+			var tpl = new Template(jQuery('#screenRowTPL').html());
+			jQuery('#screenListFooter').before(tpl.evaluate(value));
+		}
+	}
 </script>

@@ -20,12 +20,15 @@
 ?>
 <?php
 class CCol extends CTag {
-	public function __construct($item = null, $class = null, $colspan = null) {
+	public function __construct($item = null, $class = null, $colspan = null, $width = null) {
 		parent::__construct('td', 'yes');
 		$this->addItem($item);
 		$this->attr('class', $class);
 		if (!empty($colspan)) {
 			$this->attr('colspan', $colspan);
+		}
+		if (!empty($width)) {
+			$this->attr('width', $width);
 		}
 	}
 

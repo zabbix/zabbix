@@ -36,18 +36,18 @@ if (!empty($this->data['slideshowid'])) {
 // create slide form list
 $slideFormList = new CFormList('slideFormList');
 $slideFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
-$slideFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5));
+$slideFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5, 'no', false, false));
 
 // append slide table
 $slideTable = new CTableInfo(_('No slides defined.'), 'formElementTable');
 $slideTable->setAttribute('style', 'min-width: 500px;');
 $slideTable->setAttribute('id', 'slideTable');
 $slideTable->setHeader(array(
-	SPACE,
-	SPACE,
-	_('Screen'),
-	_('Delay'),
-	_('Action')
+	new CCol(SPACE, null, null, '15'),
+	new CCol(SPACE, null, null, '15'),
+	new CCol(_('Screen'), null, null, '140'),
+	new CCol(_('Delay'), null, null, '60'),
+	new CCol(_('Action'), null, null, '50')
 ));
 
 $i = 1;
@@ -59,75 +59,39 @@ foreach ($this->data['slides'] as $step => $slides) {
 			$name = $screen['name'];
 		}
 	}
-	$name = new CSpan($name, 'link');
-	$name->onClick('return create_var(\''.$slideForm->getName().'\', \'edit_slide\', '.$slides['slideid'].', true);');
 
-	$numSpan = new CSpan($i++.':');
-	$numSpan->addClass('rowNum');
+	$numSpan = new CSpan($i++.':', 'rowNum');
 	$numSpan->setAttribute('id', 'current_slide_'.$step);
+
+	$delay = !empty($slides['delay']) ? $slides['delay'] : $this->data['delay'];
+
+	$removeButton = new CButton('remove_'.$step, _('Remove'), 'javascript: removeSlide(this);', 'link_menu');
+	$removeButton->setAttribute('remove_slide', $step);
 
 	$row = new CRow(array(
 		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
 		$numSpan,
 		$name,
-		!empty($slides['delay']) ? bold($slides['delay']) : $this->data['delay'],
-		new CButton('remove', _('Remove'), 'javascript: removeSlide(\''.$step.'\');', 'link_menu')
+		new CNumericBox('slides['.$step.'][delay]', $delay, 5, 'no', false, false),
+		$removeButton
 	), 'sortable');
 	$row->setAttribute('id', 'slides_'.$step);
 	$slideTable->addRow($row);
 }
-$tmpColumn = new CCol(
+
+$addButtonColumn = new CCol(
 	empty($this->data['work_slide'])
-		? new CSubmit('btn1', _('Add'), 'return create_var(\''.$slideForm->getName().'\', \'add_slide\', 1, true);', 'link_menu')
+		? new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.$slideForm->getName().'&srctbl=screens&srcfld1=screenid&multiselect=1", 450, 450)', 'link_menu')
 		: null,
 	null,
 	5
 );
-$tmpColumn->setAttribute('style', 'vertical-align: middle;');
-$slideTable->addRow(new CRow($tmpColumn));
+$addButtonColumn->setAttribute('style', 'vertical-align: middle;');
+$addButtonRow = new CRow($addButtonColumn);
+$addButtonRow->setAttribute('id', 'screenListFooter');
+$slideTable->addRow($addButtonRow);
 
 $slideFormList->addRow(_('Slides'), new CDiv($slideTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
-
-// append slides window to form list
-if (!empty($this->data['work_slide'])) {
-	$slideForm->addVar('work_slide[slideid]', $this->data['work_slide']['slideid']);
-	$slideForm->addVar('work_slide[screenid]', $this->data['work_slide']['screenid']);
-
-	$editSlideTable = new CTableInfo();
-	$editSlideTable->addRow(array(_('Delay'), new CNumericBox('work_slide[delay]', $this->data['work_slide']['delay'], 5)));
-	$editSlideTable->addRow(array(_('Screen'), array(
-		new CTextBox('screen_name', $this->data['work_slide_screen'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-		new CButton('select_screen', _('Select'),
-			'return PopUp(\'popup.php?dstfrm='.$slideForm->getName().'&srctbl=screens'.
-			'&dstfld1=screen_name&srcfld1=name'.
-			'&dstfld2=work_slide_screenid&srcfld2=screenid\');',
-			'formlist'
-		)
-	)));
-
-	$column = new CCol(array(
-		new CSubmit(
-			!empty($this->data['work_slide']['screenid']) ? 'edit_slide' : 'add_slide',
-			!empty($this->data['work_slide']['screenid']) ? _('Save') : _('Add')
-		),
-		SPACE,
-		new CSubmit('cancel_slide', _('Cancel'))
-	));
-	$column->setAttribute('colspan', '2');
-	$column->setAttribute('style', 'text-align: right;');
-	$editSlideTable->setFooter($column);
-
-	$slideFormList->addRow(
-		SPACE,
-		array(
-			BR(),
-			create_hat(
-				!empty($this->data['work_slide']['screenid']) ? _('Edit slide') : _('New slide'),
-				$editSlideTable
-			)
-		)
-	);
-}
 
 // append tabs to form
 $slideTab = new CTabView();
