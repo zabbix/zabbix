@@ -545,23 +545,25 @@ class CScript extends CZBXAPI{
 					}
 
 				}
-				$d_errorMsg = '';
+
 				switch ($errorMsg) {
 					case 'Connection refused':
 						$d_errorMsg = sprintf(S_NOT_RUN, $ZBX_SERVER)." ";
 						break;
 					case 'No route to host':
-						$d_errorMsg = S_IP_NOT_AVAILABLE." ";
+						$d_errorMsg = sprintf(S_IP_NOT_AVAILABLE, $ZBX_SERVER)." ";
 						break;
 					case 'Connection timed out':
 						$d_errorMsg = sprintf(S_TIME_OUT, $ZBX_SERVER)." ";
 						break;
 					case 'php_network_getaddresses: getaddrinfo failed: Name or service not known':
-						$d_errorMsg = S_WRONG_DNS." ";
+						$d_errorMsg = sprintf(S_WRONG_DNS, $ZBX_SERVER)." ";
 						break;
+					default:
+						$d_errorMsg = '';
 				}
 
-				self::exception(ZBX_API_ERROR_INTERNAL, $d_errorMsg.S_SCRIPT_ERROR_BIG." ".S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
+				self::exception(ZBX_API_ERROR_INTERNAL, $d_errorMsg.S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
 			}
 
 			$json = new CJSON();
