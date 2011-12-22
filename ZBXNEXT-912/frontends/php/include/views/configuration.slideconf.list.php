@@ -42,8 +42,8 @@ $slideForm->setName('slideForm');
 $slidesTable = new CTableInfo(_('No slide shows defined.'));
 $slidesTable->setHeader(array(
 	new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');"),
-	make_sorting_header(_('Name'), 's.name'),
-	make_sorting_header(_('Delay'), 's.delay'),
+	make_sorting_header(_('Name'), 'name'),
+	make_sorting_header(_('Delay'), 'delay'),
 	make_sorting_header(_('Count of slides'), 'cnt')
 ));
 

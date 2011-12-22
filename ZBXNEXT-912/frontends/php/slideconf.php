@@ -53,7 +53,7 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder('s.name', ZBX_SORT_UP);
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 if (!empty($_REQUEST['slides'])) {
@@ -211,15 +211,14 @@ if (isset($_REQUEST['form'])) {
 	$slideshowView->show();
 }
 else {
-	// gathering all data we got from database in array, so we can feed it to pagination function
 	$data['slides'] = DBfetchArray(DBselect(
 		'SELECT s.slideshowid,s.name,s.delay,COUNT(sl.slideshowid) AS cnt'.
 		' FROM slideshows s'.
 			' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid'.
 		' WHERE '.DBin_node('s.slideshowid').
-		' GROUP BY s.slideshowid,s.name,s.delay'.
-		order_by('s.name,s.delay,cnt', 's.slideshowid')
+		' GROUP BY s.slideshowid,s.name,s.delay'
 	));
+	order_result($data['slides'], getPageSortField('name'), getPageSortOrder());
 
 	$data['paging'] = getPagingLine($data['slides']);
 
