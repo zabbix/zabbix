@@ -3028,18 +3028,6 @@ function convert($value){
 
 		$value = $arr['value'];
 		switch($arr['mult']){
-			case 'Y':
-				$value *= 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024;
-				break;
-			case 'Z':
-				$value *= 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024;
-				break;
-			case 'E':
-				$value *= 1024 * 1024 * 1024 * 1024 * 1024 * 1024;
-				break;
-			case 'P':
-				$value *= 1024 * 1024 * 1024 * 1024 * 1024;
-				break;
 			case 'T':
 				$value *= 1024 * 1024 * 1024 * 1024;
 				break;
