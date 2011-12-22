@@ -76,18 +76,17 @@ foreach ($this->data['slides'] as $step => $slides) {
 	$row->setAttribute('id', 'slides_'.$step);
 	$slideTable->addRow($row);
 }
-$slideFormList->addRow(
-	_('Slides'),
-	new CDiv(
-		array(
-			$slideTable,
-			empty($this->data['work_slide'])
-				? new CSubmit('btn1', _('Add'), 'return create_var(\''.$slideForm->getName().'\', \'add_slide\', 1, true);', 'link_menu')
-				: null
-		),
-		'objectgroup inlineblock border_dotted ui-corner-all'
-	)
+$tmpColumn = new CCol(
+	empty($this->data['work_slide'])
+		? new CSubmit('btn1', _('Add'), 'return create_var(\''.$slideForm->getName().'\', \'add_slide\', 1, true);', 'link_menu')
+		: null,
+	null,
+	5
 );
+$tmpColumn->setAttribute('style', 'vertical-align: middle;');
+$slideTable->addRow(new CRow($tmpColumn));
+
+$slideFormList->addRow(_('Slides'), new CDiv($slideTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 // append slides window to form list
 if (!empty($this->data['work_slide'])) {

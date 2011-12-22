@@ -1307,13 +1307,13 @@ function make_screen_menu(&$menu, &$submenu) {
 	$menu['menu_screens'][] = array(_('Favourite screens'), null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader')));
 	$menu['menu_screens'][] = array(
 		_('Add').' '._('Screen'),
-		'javascript: PopUp(\'popup.php?srctbl=screens&srcfld1=screenid&reference=screenid&multiselect=1\',800,450); void(0);',
+		'javascript: PopUp(\'popup.php?srctbl=screens&srcfld1=screenid&reference=screenid&multiselect=1\', 800, 450); void(0);',
 		null,
 		array('outer' => 'pum_o_submenu', 'inner' => array('pum_i_submenu')
 	));
 	$menu['menu_screens'][] = array(
 		_('Add').' '._('Slide show'),
-		'javascript: PopUp(\'popup.php?srctbl=slides&srcfld1=slideshowid&reference=slideshowid&multiselect=1\',800,450); void(0);',
+		'javascript: PopUp(\'popup.php?srctbl=slides&srcfld1=slideshowid&reference=slideshowid&multiselect=1\', 800, 450); void(0);',
 		null,
 		array('outer' => 'pum_o_submenu', 'inner' => array('pum_i_submenu')
 	));

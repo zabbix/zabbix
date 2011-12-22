@@ -184,14 +184,11 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	$stepsTable->addRow($row);
 }
 
-$httpStepFormList->addRow(
-	_('Steps'),
-	new CDiv(array(
-		$stepsTable,
-		new CButton('add_step', _('Add'), 'return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'", 600, 410);', 'link_menu')
-	),
-	'objectgroup inlineblock border_dotted ui-corner-all')
-);
+$tmpColumn = new CCol(new CButton('add_step', _('Add'), 'return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'", 600, 410);', 'link_menu'), null, 8);
+$tmpColumn->setAttribute('style', 'vertical-align: middle;');
+$stepsTable->addRow(new CRow($tmpColumn));
+
+$httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 // append tabs to form
 $httpTab = new CTabView(array('remember' => true));

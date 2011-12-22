@@ -1550,9 +1550,7 @@ elseif ($srctbl == 'slides') {
 	$table = new CTableInfo(_('No slides defined.'));
 
 	if ($multiselect) {
-		$header = array(
-			array(new CCheckBox('all_slides', null, "javascript: checkAll('".$form->getName()."', 'all_slides', 'slides');"), _('Name')),
-		);
+		$header = array(array(new CCheckBox('all_slides', null, "javascript: checkAll('".$form->getName()."', 'all_slides', 'slides');"), _('Name')),);
 	}
 	else {
 		$header = array(_('Name'));
