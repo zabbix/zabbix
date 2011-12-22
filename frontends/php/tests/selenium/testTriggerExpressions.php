@@ -41,9 +41,9 @@ class testPageHosts extends CWebTest{
 		public function testTriggerExpression_SimpleTestProvider()
 		{
 			return array(
-			array('10M','20M','FALSE'),
-			array('10T','2G','TRUE'),
-			array('10T','2T','TRUE')
+			array('10M' , '20M' , 'FALSE'),
+			array('10T' , '2G' , 'TRUE'),
+			array('10T' , '2T' , 'TRUE')
 			);
 		}
 }
