@@ -50,6 +50,59 @@ class testPageHosts extends CWebTest{
 	/**
 	* @dataProvider allHosts
 	*/
+	public function testPageHosts_SimpleUpdate($host){
+		$hostid=$host['hostid'];
+		$name=$host['name'];
+
+		$sql1="select * from hosts where hostid=$hostid";
+		$oldHashHosts=DBhash($sql1);
+		$sql2="select * from items where hostid=$hostid order by itemid";
+		$oldHashItems=DBhash($sql2);
+		$sql3="select * from applications where hostid=$hostid order by applicationid";
+		$oldHashApplications=DBhash($sql3);
+		$sql4="select * from interface where hostid=$hostid order by interfaceid";
+		$oldHashInterface=DBhash($sql4);
+		$sql5="select * from hostmacro where hostid=$hostid order by hostmacroid";
+		$oldHashHostmacro=DBhash($sql5);
+		$sql6="select * from hosts_groups where hostid=$hostid order by hostgroupid";
+		$oldHashHostsgroups=DBhash($sql6);
+		$sql7="select * from hosts_templates where hostid=$hostid order by hosttemplateid";
+		$oldHashHoststemplates=DBhash($sql7);
+		$sql8="select * from maintenances_hosts where hostid=$hostid order by maintenance_hostid";
+		$oldHashMaintenanceshosts=DBhash($sql8);
+		$sql9="select * from host_inventory where hostid=$hostid";
+		$oldHashHostinventory=DBhash($sql9);
+
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+		$this->assertTitle('Hosts');
+		$this->ok('HOSTS');
+		$this->ok('Displaying');
+		$this->nok('Displaying 0');
+		// Header
+		$this->ok(array('Name','Applications','Items','Triggers','Graphs','Discovery','Interface','Templates','Status','Availability'));
+
+		$this->click("link=$name");
+		$this->wait();
+		$this->button_click('save');
+		$this->wait();
+		$this->assertTitle('Hosts');
+		$this->ok('Host updated');
+
+		$this->assertEquals($oldHashHosts,DBhash($sql1),"Chuck Norris: Host update changed data in table 'hosts'");
+		$this->assertEquals($oldHashItems,DBhash($sql2),"Chuck Norris: Host update changed data in table 'items'");
+		$this->assertEquals($oldHashApplications,DBhash($sql3),"Chuck Norris: Host update changed data in table 'applications'");
+		$this->assertEquals($oldHashInterface,DBhash($sql4),"Chuck Norris: Host update changed data in table 'interface'");
+		$this->assertEquals($oldHashHostmacro,DBhash($sql5),"Chuck Norris: Host update changed data in table 'host_macro'");
+		$this->assertEquals($oldHashHostsgroups,DBhash($sql6),"Chuck Norris: Host update changed data in table 'hosts_groups'");
+		$this->assertEquals($oldHashHoststemplates,DBhash($sql7),"Chuck Norris: Host update changed data in table 'hosts_templates'");
+		$this->assertEquals($oldHashMaintenanceshosts,DBhash($sql8),"Chuck Norris: Host update changed data in table 'maintenances_hosts'");
+		$this->assertEquals($oldHashHostinventory,DBhash($sql9),"Chuck Norris: Host update changed data in table 'host_inventory'");
+	}
+
+	/**
+	* @dataProvider allHosts
+	*/
 	public function testPageHosts_FilterHost($host){
 		$this->login('hosts.php');
 		$this->click('flicker_icon_l');
