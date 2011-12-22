@@ -659,7 +659,7 @@ class CScript extends CZBXAPI{
 
 		$obj_params = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-         'sortfield' => 'name',
+			'sortfield' => 'name',
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1
 		);
