@@ -45,7 +45,7 @@ foreach ($macros as $macroid => $macro) {
 	$deleteButton = new CButton('macros_del', _('Remove'));
 	$deleteButton->addClass('link_menu macroRemove');
 
-	$macrosTable->addRow(array($text1, $span, $text2, $deleteButton));
+	$macrosTable->addRow(array($text1, $span, $text2, $deleteButton), 'form_row');
 }
 
 // buttons
