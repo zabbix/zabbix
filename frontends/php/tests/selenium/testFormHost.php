@@ -25,6 +25,10 @@ class testFormHost extends CWebTest{
 	public $host = "Test host 001";
 	public $host_tmp = "Test host 001A";
 	public $host_tmp_visible = "Test host 001A (visible)";
+	public $host_cloned = "Test host 001 cloned";
+	public $host_cloned_visible = "Test host 001 cloned (visible)";
+	public $host_fullcloned = "Test host 001 full cloned";
+	public $host_fullcloned_visible = "Test host 001 full cloned (visible)";
 
 	public function testFormHost_Layout(){
 		$this->login('hosts.php?form=1');
@@ -98,20 +102,6 @@ class testFormHost extends CWebTest{
 		$this->ok("Host updated");
 	}
 
-
-	public function testFormHost_UpdateHostName(){
-		// Update Host
-		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->host);
-		$this->wait();
-		$this->input_type('host',$this->host_tmp);
-		$this->button_click('save');
-		$this->wait();
-		$this->assertTitle('Hosts');
-		$this->ok('Host updated');
-	}
-
 	public function testFormHost_CreateExistingHostNoGroups(){
 		// Attempt to create a host with a name that already exists and not add it to any groups
 		// In future should also check these conditions individually
@@ -127,28 +117,6 @@ class testFormHost extends CWebTest{
 		$this->assertEquals(1,DBcount("select * from hosts where host='Test host'"));
 	}
 
-	public function testFormHost_Delete() {
-		$this->chooseOkOnNextConfirmation();
-
-		// save the id of the host
-		$host = DBfetch(DBSelect("select hostid from hosts where host like '".$this->host_tmp."'"));
-
-		// Delete Host
-		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->host_tmp);
-		$this->wait();
-		$this->button_click('delete');
-		$this->waitForConfirmation();
-		$this->wait();
-		$this->assertTitle('Hosts');
-		$this->ok('Host deleted');
-
-		// check if the macros have been deleted
-		$macrosCount = DBcount("select * from hostmacro where hostid=".$host['hostid']);
-		$this->assertEquals(0, $macrosCount, 'Host macros have not been deleted.');
-	}
-
 	public function testFormHost_CloneHost(){
 		// Clone Host
 		$this->login('hosts.php');
@@ -157,8 +125,8 @@ class testFormHost extends CWebTest{
 		$this->wait();
 		$this->button_click('clone');
 		$this->wait();
-		$this->input_type('host',$this->host_tmp);
-		$this->input_type('visiblename',$this->host_tmp_visible);
+		$this->input_type('host',$this->host_cloned);
+		$this->input_type('visiblename',$this->host_cloned_visible);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
@@ -171,7 +139,7 @@ class testFormHost extends CWebTest{
 		// Delete Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->host_tmp_visible);
+		$this->click('link='.$this->host_cloned_visible);
 		$this->wait();
 		$this->button_click('delete');
 		$this->wait();
@@ -188,8 +156,8 @@ class testFormHost extends CWebTest{
 		$this->wait();
 		$this->button_click('full_clone');
 		$this->wait();
-		$this->input_type('host',$this->host.'_fullclone');
-		$this->input_type('visiblename',$this->host.'_visible');
+		$this->input_type('host',$this->host_fullcloned);
+		$this->input_type('visiblename',$this->host_fullcloned_visible);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Hosts');
@@ -202,13 +170,53 @@ class testFormHost extends CWebTest{
 		// Delete Host
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid','all');
-		$this->click('link='.$this->host.'_visible');
+		$this->click('link='.$this->host_fullcloned_visible);
 		$this->wait();
 		$this->button_click('delete');
 		$this->wait();
 		$this->getConfirmation();
 		$this->assertTitle('Hosts');
 		$this->ok('Host deleted');
+	}
+
+	public function testFormHost_UpdateHostName(){
+		// Update Host
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+		$this->click('link='.$this->host);
+		$this->wait();
+		$this->input_type('host',$this->host_tmp);
+		$this->button_click('save');
+		$this->wait();
+		$this->assertTitle('Hosts');
+		$this->ok('Host updated');
+	}
+
+	public function testFormHost_Delete() {
+		$this->chooseOkOnNextConfirmation();
+
+		// save the id of the host
+		$host = DBfetch(DBSelect("select hostid from hosts where host='".$this->host_tmp."'"));
+		$hostid=$host['hostid'];
+
+		// Delete Host
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid','all');
+		$this->click('link='.$this->host_tmp);
+		$this->wait();
+		$this->button_click('delete');
+		$this->waitForConfirmation();
+		$this->wait();
+		$this->assertTitle('Hosts');
+		$this->ok('Host deleted');
+
+		// check if all records have been deleted
+		$tables=array('hosts','items','applications','interface','hostmacro','hosts_groups','hosts_templates','maintenances_hosts','host_inventory');
+		foreach($tables as $table)
+		{
+			$count=DBcount("select * from $table where hostid=$hostid");
+			$this->assertEquals(0, $count, "Records from table '$table' has not been deleted.");
+		}
 	}
 
 	public function testFormHost_TemplateLink(){
