@@ -28,12 +28,14 @@ class testPageHosts extends CWebTest{
 	*/
 	public function testTriggerExpression_SimpleTest($where, $what,$expected){
 		$this->login('index.php');
-		$this->open("/ZBX-4391-trunk/frontends/php/tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C".$where."&sid=340abb31451f9b9c");
+		$this->open("tr_testexpr.php?expression=
+		{Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C".$where);
 		$this->assertTitle('Test');
 
 
-		$this->input_type("id=test_data_013aade3e34f77b6b0a5ad7eb8b4f5d8", $what);
-
+		$this->input_type("//input[@type='text']", $what);
+		$this->click("id=test_expression");
+		$this->click("//input[@name='test_expression']");
 		$this->button_click("id=test_expression");
 		$this->button_click("//input[@name='test_expression']");
 		$this->ok($expected);
