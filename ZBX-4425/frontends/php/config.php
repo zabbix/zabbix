@@ -335,69 +335,72 @@ require_once('include/page_header.php');
 		}
 	}
 // VALUE MAPS
-	else if($_REQUEST['config']==6){
-		$_REQUEST['valuemap'] = get_request('valuemap',array());
-		if(isset($_REQUEST['add_map'])){
-			$added = 0;
-			$cnt = count($_REQUEST['valuemap']);
-			for($i=0; $i < $cnt; $i++){
-				if($_REQUEST['valuemap'][$i]['value'] != $_REQUEST['add_value'])	continue;
-				$_REQUEST['valuemap'][$i]['newvalue'] = $_REQUEST['add_newvalue'];
-				$added = 1;
-				break;
+	elseif ($_REQUEST['config'] == 6) {
+		$_REQUEST['valuemap'] = get_request('valuemap', array());
+		if (isset($_REQUEST['add_map'])) {
+			if (!zbx_is_int($_REQUEST['add_value'])) {
+				info(_('Value maps are used to create a mapping between numeric values and string representations.'));
+				show_messages(false, null, _('Cannot add value map'));
 			}
+			else {
+				$added = false;
+				foreach ($_REQUEST['valuemap'] as $num => $valueMap) {
+					if ($valueMap['value'] == $_REQUEST['add_value']) {
+						$_REQUEST['valuemap'][$num]['newvalue'] = $_REQUEST['add_newvalue'];
+						$added = true;
+						break;
+					}
+				}
 
-			if($added == 0){
-				if(!ctype_digit($_REQUEST['add_value']) || !is_string($_REQUEST['add_newvalue'])){
-					info(S_VALUE_MAPS_CREATE_NUM_STRING);
-					show_messages(false,null,S_CANNNOT_ADD_VALUE_MAP);
+				if (!$added) {
+					$_REQUEST['valuemap'][] = array(
+						'value' => $_REQUEST['add_value'],
+						'newvalue' => $_REQUEST['add_newvalue']
+					);
 				}
-				else{
-					array_push($_REQUEST['valuemap'],array(
-						'value'		=> $_REQUEST['add_value'],
-						'newvalue'	=> $_REQUEST['add_newvalue']));
-				}
+
+				unset($_REQUEST['add_value'], $_REQUEST['add_newvalue']);
 			}
 		}
-		else if(isset($_REQUEST['del_map'])&&isset($_REQUEST['rem_value'])){
-
-			$_REQUEST['valuemap'] = get_request('valuemap',array());
-			foreach($_REQUEST['rem_value'] as $val)
+		elseif (isset($_REQUEST['del_map']) && isset($_REQUEST['rem_value'])) {
+			$_REQUEST['valuemap'] = get_request('valuemap', array());
+			foreach ($_REQUEST['rem_value'] as $val) {
 				unset($_REQUEST['valuemap'][$val]);
-		}
-		else if(isset($_REQUEST['save'])){
-
-			$mapping = get_request('valuemap',array());
-			if(isset($_REQUEST['valuemapid'])){
-				$result		= update_valuemap($_REQUEST['valuemapid'],$_REQUEST['mapname'], $mapping);
-				$audit_action	= AUDIT_ACTION_UPDATE;
-				$msg_ok		= S_VALUE_MAP_UPDATED;
-				$msg_fail	= S_CANNNOT_UPDATE_VALUE_MAP;
-				$valuemapid	= $_REQUEST['valuemapid'];
 			}
-			else{
-				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
+		}
+		elseif (isset($_REQUEST['save'])) {
+			$mapping = get_request('valuemap', array());
+			if (isset($_REQUEST['valuemapid'])) {
+				$result = update_valuemap($_REQUEST['valuemapid'],$_REQUEST['mapname'], $mapping);
+				$audit_action = AUDIT_ACTION_UPDATE;
+				$msg_ok = _('Value map updated');
+				$msg_fail = _('Cannot update value map');
+				$valuemapid = $_REQUEST['valuemapid'];
+			}
+			else {
+				if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 					access_deny();
 				}
-				$result		= add_valuemap($_REQUEST['mapname'], $mapping);
-				$audit_action	= AUDIT_ACTION_ADD;
-				$msg_ok		= S_VALUE_MAP_ADDED;
-				$msg_fail	= S_CANNNOT_ADD_VALUE_MAP;
-				$valuemapid	= $result;
+				$result = add_valuemap($_REQUEST['mapname'], $mapping);
+				$audit_action = AUDIT_ACTION_ADD;
+				$msg_ok = _('Value map added');
+				$msg_fail = _('Cannot add value map');
+				$valuemapid = $result;
 			}
 
-			if($result){
-				add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP,
-					_('Value map').' ['.$_REQUEST['mapname'].'] ['.$valuemapid.']');
+			if ($result) {
+				add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP, _('Value map').' ['.$_REQUEST['mapname'].'] ['.$valuemapid.']');
 				unset($_REQUEST['form']);
 			}
-			show_messages($result,$msg_ok, $msg_fail);
+			show_messages($result, $msg_ok, $msg_fail);
 		}
 		elseif (isset($_REQUEST['delete']) && isset($_REQUEST['valuemapid'])) {
 			$result = false;
 
-			$sql = 'SELECT m.name, m.valuemapid FROM valuemaps m WHERE '.DBin_node('m.valuemapid').' AND m.valuemapid='.$_REQUEST['valuemapid'];
-			if($map_data = DBfetch(DBselect($sql))){
+			$sql = 'SELECT m.name, m.valuemapid'.
+					' FROM valuemaps m WHERE '.DBin_node('m.valuemapid').
+						' AND m.valuemapid='.$_REQUEST['valuemapid'];
+			if ($map_data = DBfetch(DBselect($sql))) {
 				$result = delete_valuemap($_REQUEST['valuemapid']);
 			}
 
@@ -405,7 +408,7 @@ require_once('include/page_header.php');
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP, _('Value map').' ['.$map_data['name'].'] ['.$map_data['valuemapid'].']');
 				unset($_REQUEST['form']);
 			}
-			show_messages($result, S_VALUE_MAP_DELETED, S_CANNNOT_DELETE_VALUE_MAP);
+			show_messages($result, _('Value map deleted'), _('Cannot delete value map'));
 		}
 	}
 	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==9)){
@@ -809,7 +812,7 @@ require_once('include/page_header.php');
 	}
 
 	$cnf_wdgt = new CWidget();
-	$cnf_wdgt->addPageHeader(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
+	$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
 
 
 	if(isset($_REQUEST['config'])){
@@ -914,6 +917,8 @@ require_once('include/page_header.php');
 			$data['mapname'] = '';
 			$data['title'] = '';
 			$data['confirmMessage'] = null;
+			$data['add_value'] = get_request('add_value');
+			$data['add_newvalue'] = get_request('add_newvalue');;
 
 			if (!empty($data['valuemapid'])) {
 				$db_valuemap = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid = '.$data['valuemapid']));
@@ -944,6 +949,8 @@ require_once('include/page_header.php');
 				$data['mapname'] = get_request('mapname', '');
 				$data['valuemap'] = get_request('valuemap', array());
 			}
+
+			order_result($data['valuemap'], 'value');
 
 			$valueMappingForm = new CView('administration.general.valuemapping.edit', $data);
 			$cnf_wdgt->addItem($valueMappingForm->render());
