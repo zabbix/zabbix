@@ -37,6 +37,7 @@
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on">
 			<arg value="-j4"/>
+			<arg value="install"/>
 		</exec>
 	</target>
 
@@ -54,6 +55,7 @@
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on">
 			<arg value="-j4"/>
+			<arg value="install"/>
 		</exec>
 	</target>
 
