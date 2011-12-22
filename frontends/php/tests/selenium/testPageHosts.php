@@ -171,6 +171,7 @@ class testPageHosts extends CWebTest{
 		$hostid=$host['hostid'];
 
 		$this->login('hosts.php');
+		$this->assertTitle('Hosts');
 		$this->dropdown_select_wait('groupid','all');
 		$this->assertTitle('Hosts');
 		$this->ok('HOSTS');
@@ -206,23 +207,101 @@ class testPageHosts extends CWebTest{
 	}
 
 	public function testPageHosts_MassActivateAll(){
-// TODO
-		$this->markTestIncomplete();
+		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
+
+		$this->chooseOkOnNextConfirmation();
+
+		$this->login('hosts.php');
+		$this->assertTitle('Hosts');
+		$this->dropdown_select_wait('groupid','all');
+
+		$this->checkbox_select("all_hosts");
+		$this->dropdown_select('go','Activate selected');
+		$this->button_click('goButton');
+		$this->wait();
+
+		$this->getConfirmation();
+		$this->assertTitle('Hosts');
+		$this->ok('Host status updated');
+
+		$sql="select * from hosts where status=".HOST_STATUS_NOT_MONITORED;
+		$this->assertEquals(0,DBcount($sql),"Chuck Norris: all hosts activated but DB does not match");
 	}
 
-	public function testPageHosts_MassActivate(){
-// TODO
-		$this->markTestIncomplete();
+	/**
+	* @dataProvider allHosts
+	*/
+	public function testPageHosts_MassActivate($host){
+		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
+
+		$this->chooseOkOnNextConfirmation();
+
+		$hostid = $host['hostid'];
+
+		$this->login('hosts.php');
+		$this->assertTitle('Hosts');
+		$this->dropdown_select_wait('groupid','all');
+
+		$this->checkbox_select("hosts_$hostid");
+		$this->dropdown_select('go','Activate selected');
+		$this->button_click('goButton');
+		$this->wait();
+
+		$this->getConfirmation();
+		$this->assertTitle('Hosts');
+		$this->ok('Host status updated');
+
+		$sql="select * from hosts where hostid=$hostid and status=".HOST_STATUS_MONITORED;
+		$this->assertEquals(1,DBcount($sql),"Chuck Norris: host $hostid activated but status is wrong in the DB");
 	}
 
 	public function testPageHosts_MassDisableAll(){
-// TODO
-		$this->markTestIncomplete();
+		DBexecute("update hosts set status=".HOST_STATUS_MONITORED." where status=".HOST_STATUS_NOT_MONITORED);
+
+		$this->chooseOkOnNextConfirmation();
+
+		$this->login('hosts.php');
+		$this->assertTitle('Hosts');
+		$this->dropdown_select_wait('groupid','all');
+
+		$this->checkbox_select("all_hosts");
+		$this->dropdown_select('go','Disable selected');
+		$this->button_click('goButton');
+		$this->wait();
+
+		$this->getConfirmation();
+		$this->assertTitle('Hosts');
+		$this->ok('Host status updated');
+
+		$sql="select * from hosts where status=".HOST_STATUS_MONITORED;
+		$this->assertEquals(0,DBcount($sql),"Chuck Norris: all hosts disabled but DB does not match");
 	}
 
-	public function testPageHosts_MassDisable(){
-// TODO
-		$this->markTestIncomplete();
+	/**
+	* @dataProvider allHosts
+	*/
+	public function testPageHosts_MassDisable($host){
+		DBexecute("update hosts set status=".HOST_STATUS_MONITORED." where status=".HOST_STATUS_NOT_MONITORED);
+
+		$this->chooseOkOnNextConfirmation();
+
+		$hostid = $host['hostid'];
+
+		$this->login('hosts.php');
+		$this->assertTitle('Hosts');
+		$this->dropdown_select_wait('groupid','all');
+
+		$this->checkbox_select("hosts_$hostid");
+		$this->dropdown_select('go','Disable selected');
+		$this->button_click('goButton');
+		$this->wait();
+
+		$this->getConfirmation();
+		$this->assertTitle('Hosts');
+		$this->ok('Host status updated');
+
+		$sql="select * from hosts where hostid=$hostid and status=".HOST_STATUS_NOT_MONITORED;
+		$this->assertEquals(1,DBcount($sql),"Chuck Norris: host $hostid disabled but status is wrong in the DB");
 	}
 
 	public function testPageHosts_MassDeleteAll(){
