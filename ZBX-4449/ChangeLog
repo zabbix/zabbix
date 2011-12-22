@@ -12,6 +12,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+A......... [ZBX-4448] fixed proxy interface validation (pavels)
 ..F....... [ZBX-4455] fixed the 'sortorder' field validation in the IT services form (pavels)
 ..F....... [ZBX-4427] fixed map element host group highlighting (pavels)
 ..F....... [ZBX-4446] fixed event duration calculation (pavels)
