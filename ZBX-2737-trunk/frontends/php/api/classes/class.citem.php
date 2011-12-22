@@ -961,7 +961,7 @@ class CItem extends CItemGeneral {
 		));
 		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
-			info(S_ITEM." [".$host['host'].':'.$item['key_']."] ".S_CREATED_SMALL);
+			info(_s('Added new item "%2$s" to host "%1$s".', $host['host'], $item['key_']));
 		}
 	}
 
@@ -1025,7 +1025,7 @@ class CItem extends CItemGeneral {
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_ITEM." [".$host['host'].':'.$item['key_']."] ".S_UPDATED_SMALL);
+			info(_s('Item "%2$s" updated on host "%1$s".', $host['host'], $item['key_']));
 		}
 	}
 
@@ -1164,8 +1164,14 @@ class CItem extends CItemGeneral {
 			DB::insert('housekeeper', $insert);
 
 			// TODO: remove info from API
+			$host_id = "";
+
 			foreach ($del_items as $item) {
-				info(_s('Item "%1$s:%2$s" deleted.', $item['name'], $item['key_']));
+				if ($host_id != $item['hostid']) {
+					$host_id  = $item['hostid'];
+					$host = get_host_by_hostid($host_id);
+				}
+				info(_s('Item "%2$s" deleted from host "%1$s".', $host['host'], $item['key_']));
 			}
 
 			return array('itemids' => $itemids);
@@ -1273,7 +1279,7 @@ class CItem extends CItemGeneral {
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%2$s" already exists on host "%1$s", inherited from another template.', $host['host'], $item['key_']));
 					}
 				}
 

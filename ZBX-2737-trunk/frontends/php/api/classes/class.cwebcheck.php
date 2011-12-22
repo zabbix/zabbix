@@ -317,7 +317,7 @@ class CWebCheck extends CZBXAPI {
 			);
 			$db_webchecks = $this->get($options);
 			foreach($db_webchecks as $webcheck){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario [%s] already exists.', $webcheck['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $webcheck['name']));
 			}
 
 
@@ -373,7 +373,7 @@ class CWebCheck extends CZBXAPI {
 					$webcheck_exist = reset($webcheck_exist);
 
 					if($webcheck_exist && (bccomp($webcheck_exist['webcheckid'],$webcheck_exist['webcheckid']) != 0))
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario [%s] already exists.', $webcheck['name']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $webcheck['name']));
 				}
 
 				$webcheck['curstate'] = HTTPTEST_STATE_UNKNOWN;
@@ -499,14 +499,14 @@ class CWebCheck extends CZBXAPI {
 
 // TODO: REMOVE info
 			foreach($del_webchecks as $webcheck){
-				info(_s('Scenario [%s] deleted.', $webcheck['name']));
+				info(_s('Scenario "%s" deleted.', $webcheck['name']));
 			}
 
 // TODO: REMOVE audit
 			foreach($del_webchecks as $webcheck){
 				$host = reset($webcheck['hosts']);
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
-					_s('Scenario [%1$s] [%2$s] host [%3$s]', $webcheck['name'], $webcheck['webcheckid'], $host['host']));
+					_s('Scenario "%1$s" "%2$s" host "%3$s"', $webcheck['name'], $webcheck['webcheckid'], $host['host']));
 			}
 
 			return array('webcheckids' => $webcheckids);
@@ -539,7 +539,7 @@ class CWebCheck extends CZBXAPI {
 				'hostid' => $webcheck['hostid']
 			));
 			if($items_exist)
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key [%s] already exists', $item['key_']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%s" already exists', $item['key_']));
 
 			$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
 			$item['hostid'] = $webcheck['hostid'];
@@ -574,7 +574,7 @@ class CWebCheck extends CZBXAPI {
 		DB::insert('httptestitem', $webcheckitems);
 
 		foreach($checkitems as $stepitem)
-			info(_s('Web item [%s] created.', $stepitem['key_']));
+			info(_s('Added new web item "%s".', $stepitem['key_']));
 	}
 
 	protected function createStepsReal($webcheck, $websteps){
@@ -589,7 +589,7 @@ class CWebCheck extends CZBXAPI {
 				' WHERE httptestid='.$webcheck['webcheckid'].
 					' AND '.DBcondition('name', $websteps_names);
 		if($httpstep_data = DBfetch(DBselect($sql))){
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step [%s] already exists.', $httpstep_data['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step "%s" already exists.', $httpstep_data['name']));
 		}
 
 		foreach($websteps as $snum=>$webstep){
@@ -633,7 +633,7 @@ class CWebCheck extends CZBXAPI {
 					'hostid' => $webcheck['hostid']
 				));
 				if($items_exist)
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web item with key [%s] already exists.', $item['key_']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web item with key "%s" already exists.', $item['key_']));
 
 				$item['hostid'] = $webcheck['hostid'];
 				$item['delay'] = $webcheck['delay'];
@@ -670,7 +670,7 @@ class CWebCheck extends CZBXAPI {
 			DB::insert('httpstepitem', $webstepitems);
 
 			foreach($stepitems as $stepitem)
-				info(_s('Web item [%s] created.', $stepitem['key_']));
+				info(_s('Added new web item "%s".', $stepitem['key_']));
 		}
 	}
 

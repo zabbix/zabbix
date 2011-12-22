@@ -538,7 +538,7 @@ class CApplication extends CZBXAPI {
 		));
 		foreach ($applications_created as $application_created) {
 			$host = reset($application_created['hosts']);
-			info(_s('Application "%1$s:%2$s" created.', $host['host'], $application_created['name']));
+			info(_s('Added new application "%2$s" to host "%1$s".', $host['host'], $application_created['name']));
 		}
 	}
 
@@ -561,7 +561,7 @@ class CApplication extends CZBXAPI {
 		));
 		foreach ($applications_upd as $application_upd) {
 			$host = reset($application_upd['hosts']);
-			info(_s('Application "%1$s:%2$s" updated.', $host['host'], $application_upd['name']));
+			info(_s('Application "%2$s" updated on host "%1$s".', $host['host'], $application_upd['name']));
 		}
 	}
 
@@ -626,9 +626,15 @@ class CApplication extends CZBXAPI {
 
 		DB::delete('applications', array('applicationid' => $applicationids));
 
+		$host_id = "";
+
 		// TODO: remove info from API
 		foreach ($del_applications as $del_application) {
-			info(_s('Application "%1$s" deleted.', $del_application['name']));
+			if ($host_id != $del_application['hostid']) {
+				$host_id  = $del_application['hostid'];
+				$host = get_host_by_hostid($host_id);
+			}
+			info(_s('Application "%2$s" deleted from host "%1$s".', $host['host'], $del_application['name']));
 		}
 		return array('applicationids' => $applicationids);
 	}

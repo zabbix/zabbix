@@ -924,7 +924,7 @@ Copt::memoryPick();
 
 		foreach ($items as $item) {
 			$host = reset($item['hosts']);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%1$s:%2$s"', $host['host'], $item['key_']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%2$s" on host "%1$s"', $host['host'], $item['key_']));
 		}
 	}
 }

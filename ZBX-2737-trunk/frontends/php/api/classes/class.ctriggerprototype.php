@@ -1101,7 +1101,7 @@ COpt::memoryPick();
 					'expression' => $trigger['expression'])
 				)){
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						sprintf(_('Trigger [%1$s:%2$s] already exists.'), $trigger['description'], $trigger['expression']));
+						sprintf(_('Trigger "%1$s:%2$s" already exists.'), $trigger['description'], $trigger['expression']));
 				}
 			}
 
@@ -1112,6 +1112,9 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_REFER,
 				'selectItems' => API_OUTPUT_EXTEND
 			));
+
+			$host = get_host_by_triggerid($createdTriggers['triggerids']);
+
 			foreach($createdTriggers as $createdTrigger){
 				$has_prototype = false;
 
@@ -1123,13 +1126,13 @@ COpt::memoryPick();
 				}
 				if(!$has_prototype){
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						sprintf(_('Trigger [%1$s:%2$s] does not have item prototype.'), $trigger['description'], $trigger['expression']));
+						sprintf(_('Trigger "%1$s:%2$s" does not have item prototype.'), $trigger['description'], $trigger['expression']));
 				}
 			}
 
 			foreach($triggers as $trigger) {
 				$this->inherit($trigger);
-				info(_s('Trigger "%1$s:%2$s" created.', $trigger['description'], $trigger['expression']));
+				info(_s('Added new trigger "%2$s" to host "%1$s".', $host['host'], $trigger['description']));
 			}
 
 			return array('triggerids' => $triggerids);
@@ -1202,7 +1205,7 @@ COpt::memoryPick();
 				}
 				if(!$has_prototype){
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						sprintf(_('Trigger [%1$s] does not have item prototype.'), $trigger['description']));
+						sprintf(_('Trigger "%1$s" does not have item prototype.'), $trigger['description']));
 				}
 			}
 
@@ -1241,7 +1244,7 @@ COpt::memoryPick();
 
 					if ($del_triggers[$triggerid]['templateid'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							sprintf(_('Cannot delete templated trigger [%1$s:%2$s]'),
+							sprintf(_('Cannot delete templated trigger "%1$s:%2$s"'),
 								$del_triggers[$triggerid]['description'],
 								explode_exp($del_triggers[$triggerid]['expression']))
 						);
@@ -1322,6 +1325,8 @@ COpt::memoryPick();
 
 		$triggerids = DB::insert('triggers', $triggers);
 
+		$host = get_host_by_triggerid($triggerids);
+
 		foreach($triggers as $tnum => $trigger){
 			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
 
@@ -1336,7 +1341,7 @@ COpt::memoryPick();
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(sprintf(_('Trigger prototype [%1$s:%2$s] created.'), $trigger['description'], $trigger['expression']));
+			info(sprintf(_('Added new trigger prototype "%2$s" to host "%1$s".'), $host['host'], $trigger['description']));
 		}
 
 	}
@@ -1498,7 +1503,7 @@ COpt::memoryPick();
 					));
 					if($exists){
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							sprintf(_('Trigger [%1$s] already exists on [%2$s]'), $newTrigger['description'], $chd_host['host']));
+							sprintf(_('Trigger "%2$s" already exists on host "%1$s".'), $chd_host['host'], $newTrigger['description']));
 					}
 				}
 				else if($childTrigger['flags'] != ZBX_FLAG_DISCOVERY_CHILD){
@@ -1533,7 +1538,7 @@ COpt::memoryPick();
 				if($childTrigger){
 					if($childTrigger['templateid'] != 0){
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Trigger [%1$s] already exists on [%2$s]', $childTrigger['description'], $chd_host['host']));
+							_s('Trigger "%2$s" already exists on host "%1$s".', $chd_host['host'], $childTrigger['description']));
 					}
 					else if($childTrigger['flags'] != $newTrigger['flags']){
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists'));

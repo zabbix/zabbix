@@ -538,9 +538,19 @@ COpt::memoryPick();
 
 		$this->inherit($items);
 
+// TODO: REMOVE info
+		$itemHosts = $this->get(array(
+			'itemids' => $itemids,
+			'output' => array('key_'),
+			'selectHosts' => array('host'),
+			'nopermissions' => 1
+		));
+		foreach($itemHosts as $item){
+			$host = reset($item['hosts']);
+			info(_s('Added new discovery rule "%2$s" to host "%1$s".', $host['host'], $item['key_']));
+		}
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
-
 
 /**
  * Update DiscoveryRule
@@ -657,8 +667,14 @@ COpt::memoryPick();
 		DB::insert('housekeeper', $insert);
 
 		// TODO: remove info from API
+		$host_id = "";
+
 		foreach ($del_rules as $item) {
-			info(_s('Discovery rule [%1$s:%2$s] deleted.', $item['name'], $item['key_']));
+			if ($host_id != $item['hostid']) {
+				$host_id  = $item['hostid'];
+				$host = get_host_by_hostid($host_id);
+			}
+			info(_s('Discovery rule "%2$s" deleted from host "%1$s".', $host['host'], $item['key_']));
 		}
 
 		return array('ruleids' => $ruleids);
@@ -1064,7 +1080,7 @@ COpt::memoryPick();
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%2$s" already exists on host "%1$s", inherited from another template.', $host['host'], $item['key_']));
 					}
 				}
 

@@ -1246,7 +1246,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_templates as $template) {
-				info(_s('Template [%1$s] deleted.', $template['host']));
+				info(_s('Template "%1$s" deleted.', $template['host']));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['hostid'], $template['host'], 'hosts', NULL, NULL);
 			}
 
@@ -1906,6 +1906,16 @@ COpt::memoryPick();
 			$flags = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD);
 		}
 
+		$host = array();
+
+		if (!is_null($targetids)) {
+			$host = get_host_by_hostid(reset($targetids));
+		}
+		else {
+			$host = get_host_by_hostid(reset($templateids));
+		}
+
+
 /* TRIGGERS {{{ */
 		// check that all triggers on templates that we unlink, don't have items from another templates
 		$sql = 'SELECT DISTINCT t.description'.
@@ -1957,6 +1967,7 @@ COpt::memoryPick();
 			$triggers[$trigger['flags']][$trigger['triggerid']] = array(
 				'description' => $trigger['description'],
 				'expression' => explode_exp($trigger['expression']),
+				'triggerid' => $trigger['triggerid']
 			);
 		}
 
@@ -1972,7 +1983,8 @@ COpt::memoryPick();
 				));
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_NORMAL] as $trigger){
-					info(_s('Trigger [%1$s:%2$s] unlinked.', $trigger['description'], $trigger['expression']));
+					$host = get_host_by_triggerid($trigger['triggerid']);
+					info(_s('API  Trigger "%2$s" unlinked from host "%1$s".', $host['host'], $trigger['description']));
 				}
 			}
 		}
@@ -1989,7 +2001,8 @@ COpt::memoryPick();
 				));
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $trigger){
-					info(_s('Trigger prototype [%1$s:%2$s] unlinked.', $trigger['description'], $trigger['expression']));
+					$host = get_host_by_triggerid($trigger['triggerid']);
+					info(_s('Trigger prototype "%2$s" unlinked from host "%1$s".', $host['host'], $trigger['description']));
 				}
 			}
 		}
@@ -2005,7 +2018,7 @@ COpt::memoryPick();
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('i1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid, i1.key_, i1.flags, i1.name'.
+		$sql = 'SELECT DISTINCT i1.itemid, i1.key_, i1.flags, i1.name, i1.hostid'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_items = DBSelect($sql);
@@ -2018,6 +2031,7 @@ COpt::memoryPick();
 			$items[$item['flags']][$item['itemid']] = array(
 				'name' => $item['name'],
 				'key_' => $item['key_'],
+				'hostid' => $item['hostid']
 			);
 		}
 
@@ -2032,8 +2046,14 @@ COpt::memoryPick();
 					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY]))
 				));
 
+				$host_id = "";
+
 				foreach($items[ZBX_FLAG_DISCOVERY] as $discoveryRule){
-					info(_s('Discovery rule [%1$s:%2$s] unlinked.', $discoveryRule['name'], $discoveryRule['key_']));
+					if ($host_id != $discoveryRule['hostid']) {
+						$host_id  = $discoveryRule['hostid'];
+						$host = get_host_by_hostid($host_id);
+					}
+					info(_s('Discovery rule "%2$s" unlinked from host "%1$s".', $host['host'], $discoveryRule['key_']));
 				}
 			}
 		}
@@ -2050,8 +2070,14 @@ COpt::memoryPick();
 					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]))
 				));
 
+				$host_id = "";
+
 				foreach($items[ZBX_FLAG_DISCOVERY_NORMAL] as $item){
-					info(_s('Item [%1$s:%2$s] unlinked.', $item['name'], $item['key_']));
+					if ($host_id != $item['hostid']) {
+						$host_id  = $item['hostid'];
+						$host = get_host_by_hostid($host_id);
+					}
+					info(_s('Item "%2$s" unlinked from host "%1$s".', $host['host'], $item['key_']));
 				}
 			}
 		}
@@ -2068,8 +2094,14 @@ COpt::memoryPick();
 					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_CHILD]))
 				));
 
+				$host_id = "";
+
 				foreach($items[ZBX_FLAG_DISCOVERY_CHILD] as $item){
-					info(_s('Item prototype [%1$s:%2$s] unlinked.', $item['name'], $item['key_']));
+					if ($host_id != $item['hostid']) {
+						$host_id  = $item['hostid'];
+						$host = get_host_by_hostid($host_id);
+					}
+					info(_s('Item prototype "%2$s" unlinked from host "%1$s".', $host['host'], $item['key_']));
 				}
 			}
 		}
@@ -2102,7 +2134,10 @@ COpt::memoryPick();
 			ZBX_FLAG_DISCOVERY_CHILD => array(),
 		);
 		while($graph = DBfetch($db_graphs)){
-			$graphs[$graph['flags']][$graph['graphid']] = $graph['name'];
+			$graphs[$graph['flags']][$graph['graphid']] = array(
+				'name' => $graph['name'],
+				'graphid' => $graph['graphid']
+			);
 		}
 
 		if(!empty($graphs[ZBX_FLAG_DISCOVERY_CHILD])){
@@ -2117,7 +2152,8 @@ COpt::memoryPick();
 				));
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_CHILD] as $graph){
-					info(_s('Graph prototype [%1$s] unlinked.', $graph));
+					$host = get_host_by_graphid($graph['graphid']);
+					info(_s('Graph prototype "%2$s" unlinked from host "%1$s".', $host['host'], $graph['name']));
 				}
 			}
 		}
@@ -2135,7 +2171,8 @@ COpt::memoryPick();
 				));
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_NORMAL] as $graph){
-					info(_s('Graph [%1$s] unlinked.', $graph));
+					$host = get_host_by_graphid($graph['graphid']);
+					info(_s('Graph "%2$s" unlinked from host "%1$s".', $host['host'], $graph['name']));
 				}
 			}
 		}
@@ -2149,13 +2186,16 @@ COpt::memoryPick();
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('a1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT a1.applicationid, a1.name'.
+		$sql = 'SELECT DISTINCT a1.applicationid, a1.name, a1.hostid'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_applications = DBSelect($sql);
 		$applications = array();
 		while($application = DBfetch($db_applications)){
-			$applications[$application['applicationid']] = $application['name'];
+			$applications[$application['applicationid']] = array(
+				'name' => $application['name'],
+				'hostid' => $application['hostid']
+			);
 		}
 
 		if(!empty($applications)){
@@ -2169,8 +2209,14 @@ COpt::memoryPick();
 					'where' => array('applicationid' => array_keys($applications))
 				));
 
+				$host_id = "";
+
 				foreach($applications as $application){
-					info(_s('Application [%1$s] unlinked.', $application));
+					if ($host_id != $application['hostid']) {
+						$host_id  = $application['hostid'];
+						$host = get_host_by_hostid($host_id);
+					}
+					info(_s('Application "%2$s" unlinked from host "%1$s".', $host['host'], $application['name']));
 				}
 			}
 		}
@@ -2206,7 +2252,7 @@ COpt::memoryPick();
 			$hosts = implode(', ', zbx_objectValues($hosts, 'host'));
 			$templates = implode(', ', zbx_objectValues($templates, 'host'));
 
-			info(_s('Templates [%1$s] unlinked from hosts [%2$s].', $templates, $hosts));
+			info(_s('Templates "%1$s" unlinked from hosts "%2$s".', $templates, $hosts));
 		}
 
 		return true;

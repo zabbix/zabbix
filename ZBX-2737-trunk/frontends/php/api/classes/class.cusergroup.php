@@ -662,7 +662,7 @@ class CUserGroup extends CZBXAPI {
 			// check, if this user group is used in the config. If so, it cannot be deleted
 			$config = select_config();
 			if(isset($dbUsrgrps[$config['alert_usrgrpid']])){
-				self::exception(ZBX_API_ERROR_PARAMETERS,_s('User group [%s] is used in configuration for database down messages.', $dbUsrgrps[$config['alert_usrgrpid']]['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,_s('User group "%s" is used in configuration for database down messages.', $dbUsrgrps[$config['alert_usrgrpid']]['name']));
 			}
 
 // delete action operation msg

@@ -1308,7 +1308,7 @@ class CTrigger extends CZBXAPI {
 			elseif ($delete) {
 				if ($dbTriggers[$trigger['triggerid']]['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot delete templated trigger [%1$s:%2$s]', $dbTriggers[$trigger['triggerid']]['description'], explode_exp($dbTriggers[$trigger['triggerid']]['expression']))
+						_s('Cannot delete templated trigger "%1$s:%2$s"', $dbTriggers[$trigger['triggerid']]['description'], explode_exp($dbTriggers[$trigger['triggerid']]['expression']))
 					);
 				}
 				continue;
@@ -1396,7 +1396,7 @@ class CTrigger extends CZBXAPI {
 								' AND '.DBin_node('i.itemid');
 					if (!DBfetch(DBselect($sql))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect item key "%1$s:%2$s" provided for trigger expression.', $exprPart['host'], $exprPart['item']));
+							_s('Incorrect item key "%2$s" provided for trigger expression on host "%1$s".', $exprPart['host'], $exprPart['item']));
 					}
 				}
 			}
@@ -1409,7 +1409,7 @@ class CTrigger extends CZBXAPI {
 				));
 
 				if ($existTrigger) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger [%1$s:%2$s] already exists.', $trigger['description'], $trigger['expression']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%1$s:%2$s" already exists.', $trigger['description'], $trigger['expression']));
 				}
 			}
 		}
@@ -1529,7 +1529,8 @@ class CTrigger extends CZBXAPI {
 
 		// TODO: REMOVE info
 		foreach ($del_triggers as $trigger) {
-			info(_s('Trigger "%1$s:%2$s" deleted.', $trigger['description'], explode_exp($trigger['expression'])));
+			$host = get_host_by_triggerid($trigger['triggerid']);
+			info(_s('Trigger "%2$s" deleted from host "%1$s".', $host['host'], $trigger['description']));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], null, null, null);
 		}
 
@@ -1598,6 +1599,9 @@ class CTrigger extends CZBXAPI {
 
 			addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
+			$expr = new CTriggerExpression($trigger);
+			$hosts = $expr->data['hosts'];
+
 			$expression = implode_exp($trigger['expression'], $triggerid);
 			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
@@ -1610,7 +1614,7 @@ class CTrigger extends CZBXAPI {
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(_s('Trigger "%1$s:%2$s" created.', $trigger['description'], $trigger['expression']));
+			info(_s('Added new trigger "%2$s" to host "%1$s".', reset($hosts), $trigger['description']));
 		}
 
 		$this->validateDependencies($triggers);
@@ -1730,7 +1734,9 @@ class CTrigger extends CZBXAPI {
 			// restore the full expression to properly validate dependencies
 			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
 
-			$infos[] = _s('Trigger "%1$s:%2$s" updated.', $trigger['description'], $trigger['expression']);
+			$host = get_host_by_triggerid($trigger['triggerid']);
+
+			$infos[] = _s('Trigger "%2$s" updated on host "%1$s".', $host['host'], $trigger['description']);
 		}
 		unset($trigger);
 
@@ -1847,7 +1853,7 @@ class CTrigger extends CZBXAPI {
 					));
 					if ($exists) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Trigger [%1$s] already exists on [%2$s]', $newTrigger['description'], $chd_host['host']));
+							_s('Trigger "%2$s" already exists on host "%1$s".', $chd_host['host'], $newTrigger['description']));
 					}
 				}
 				elseif ($childTrigger['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
@@ -1882,7 +1888,7 @@ class CTrigger extends CZBXAPI {
 				if ($childTrigger) {
 					if ($childTrigger['templateid'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Trigger [%1$s] already exists on [%2$s]', $childTrigger['description'], $chd_host['host']));
+							_s('Trigger "%2$s" already exists on host "%1$s".', $chd_host['host'], $childTrigger['description']));
 					}
 					elseif ($childTrigger['flags'] != $newTrigger['flags']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists'));

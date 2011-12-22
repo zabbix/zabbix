@@ -1024,7 +1024,7 @@ COpt::memoryPick();
 			));
 
 			foreach($del_graphs as $graphid => $graph){
-				info(_s('Graph prototype [%s] deleted.', $graph['name']));
+				info(_s('Graph prototype "%s" deleted.', $graph['name']));
 			}
 
 			return array('graphids'=> $graphids);

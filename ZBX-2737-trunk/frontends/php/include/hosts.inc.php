@@ -465,6 +465,68 @@ function hostInterfaceTypeNumToName($type) {
 		return $result;
 	}
 
+	function get_host_by_graphid($graphids) {
+		$res_array = is_array($graphids);
+		zbx_value2array($graphids);
+		$result = false;
+		$hosts = array();
+
+		$db_hostsGraphs = DBselect(
+			'SELECT distinct h.*, gi.graphid '.
+			' FROM graphs_items gi, items i, hosts h'.
+			' WHERE h.hostid=i.hostid '.
+			' AND gi.itemid=i.itemid '.
+			' AND '.DBcondition('gi.graphid', $graphids)
+		);
+
+		while ($hostGraph = DBfetch($db_hostsGraphs)) {
+			$result = true;
+			$hosts[$hostGraph['graphid']] = $hostGraph;
+		}
+
+		if (!$res_array) {
+			foreach ($hosts as $graphid => $host) {
+				$result = $host;
+			}
+		}
+		elseif ($result) {
+			$result = $hosts;
+			unset($hosts);
+		}
+		return $result;
+	}
+
+	function get_host_by_triggerid($triggerids) {
+		$res_array = is_array($triggerids);
+		zbx_value2array($triggerids);
+		$result = false;
+		$hosts = array();
+
+		$db_hostsTriggers = DBselect(
+			'SELECT DISTINCT h.*, f.triggerid '.
+			' FROM hosts h, functions f, items i '.
+			' WHERE i.itemid=f.itemid '.
+			' AND h.hostid=i.hostid '.
+			' AND '.DBcondition('f.triggerid', $triggerids)
+		);
+
+		while ($hostTrigger = DBfetch($db_hostsTriggers)) {
+			$result = true;
+			$hosts[$hostTrigger['triggerid']] = $hostTrigger;
+		}
+
+		if (!$res_array) {
+			foreach ($hosts as $triggerid => $host) {
+				$result = $host;
+			}
+		}
+		elseif ($result) {
+			$result = $hosts;
+			unset($hosts);
+		}
+		return $result;
+	}
+
 	function get_host_by_hostid($hostid, $no_error_message = 0) {
 		$row = DBfetch(DBselect('SELECT h.* FROM hosts h WHERE h.hostid='.$hostid));
 		if ($row) {
