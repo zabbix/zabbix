@@ -900,12 +900,12 @@ COpt::memoryPick();
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
 			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1
+			'selectHosts' => array('name'),
+			'nopermissions' => true
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_CREATED_SMALL);
+			info(S_DISCOVERY_RULE.' ['.$host['name'].':'.$item['key_'].'] '.S_CREATED_SMALL);
 		}
 	}
 
@@ -957,12 +957,12 @@ COpt::memoryPick();
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
 			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1,
+			'selectHosts' => array('name'),
+			'nopermissions' => true,
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_UPDATED_SMALL);
+			info(S_DISCOVERY_RULE.' ['.$host['name'].':'.$item['key_'].'] '.S_UPDATED_SMALL);
 		}
 
 	}
