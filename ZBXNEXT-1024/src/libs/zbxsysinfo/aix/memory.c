@@ -24,7 +24,7 @@
 
 static perfstat_memory_total_t	m;
 
-#define ZBX_PERFSTAT_PAGE_SIZE	12	/* 4 KB */
+#define ZBX_PERFSTAT_PAGE_SHIFT	12	/* 4 KB */
 
 #define ZBX_PERFSTAT_MEMORY_TOTAL()					\
 									\
@@ -35,7 +35,7 @@ static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_total << ZBX_PERFSTAT_PAGE_SIZE);	/* total real memory in pages */
+	SET_UI64_RESULT(result, m.real_total << ZBX_PERFSTAT_PAGE_SHIFT);	/* total real memory in pages */
 
 	return SYSINFO_RET_OK;
 }
@@ -44,7 +44,7 @@ static int	VM_MEMORY_PINNED(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_pinned << ZBX_PERFSTAT_PAGE_SIZE);	/* real memory which is pinned in pages */
+	SET_UI64_RESULT(result, m.real_pinned << ZBX_PERFSTAT_PAGE_SHIFT);	/* real memory which is pinned in pages */
 
 	return SYSINFO_RET_OK;
 }
@@ -53,7 +53,7 @@ static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SIZE);	/* free real memory in pages */
+	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SHIFT);	/* free real memory in pages */
 
 	return SYSINFO_RET_OK;
 }
@@ -62,7 +62,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_inuse << ZBX_PERFSTAT_PAGE_SIZE);	/* real memory which is in use in pages */
+	SET_UI64_RESULT(result, m.real_inuse << ZBX_PERFSTAT_PAGE_SHIFT);	/* real memory which is in use in pages */
 
 	return SYSINFO_RET_OK;
 }
@@ -83,7 +83,7 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SIZE);
+	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
@@ -104,7 +104,7 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.numperm << ZBX_PERFSTAT_PAGE_SIZE);	/* number of pages used for files */
+	SET_UI64_RESULT(result, m.numperm << ZBX_PERFSTAT_PAGE_SHIFT);	/* number of pages used for files */
 
 	return SYSINFO_RET_OK;
 }
