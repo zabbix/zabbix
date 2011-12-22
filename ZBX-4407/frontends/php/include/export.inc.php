@@ -1146,20 +1146,20 @@ class zbxXML{
 // }}} TEMPLATES
 
 
-// HOST INVENTORY {{{
-					if($old_version_input){
-						$inventory_node = $xpath->query('host_inventory/*', $host);
-						if($inventory_node->length > 0){
-							if(!isset($host_db['inventory'])){
+					// host inventory
+					if ($old_version_input) {
+						$inventoryNode = $xpath->query('host_inventory/*', $host);
+						if ($inventoryNode->length > 0) {
+							if (!isset($host_db['inventory'])) {
 								$host_db['inventory'] = array();
 							}
-							foreach($inventory_node as $field){
+							foreach ($inventoryNode as $field) {
 								$newInventoryName = self::mapProfileName($field->nodeName);
-								if(isset($host_db['inventory'][$newInventoryName]) && $field->nodeValue !== ''){
+								if (isset($host_db['inventory'][$newInventoryName]) && $field->nodeValue !== '') {
 									$host_db['inventory'][$newInventoryName] .= "\n";
 									$host_db['inventory'][$newInventoryName] .= $field->nodeValue;
 								}
-								else{
+								else {
 									$host_db['inventory'][$newInventoryName] = $field->nodeValue;
 								}
 							}
@@ -1167,7 +1167,6 @@ class zbxXML{
 
 						$host_db['inventory_mode'] = isset($host_db['inventory']) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
 					}
-// }}} HOST INVENTORY
 
 // HOSTS
 					if(isset($host_db['proxy_hostid'])){
