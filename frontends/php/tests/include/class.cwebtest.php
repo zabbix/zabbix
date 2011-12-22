@@ -28,8 +28,8 @@ require_once(dirname(__FILE__).'/dbfunc.php');
 class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 {
 	protected $captureScreenshotOnFailure = TRUE;
-	protected $screenshotPath = '/home/hudson/public_html/screenshots';
-	protected $screenshotUrl = 'http://192.168.3.32/~hudson/screenshots';
+	protected $screenshotPath = '/home/vjacheslav/screenshots';
+	protected $screenshotUrl = 'http://192.168.3.34/~hudson/screenshots';
 
 	// List of strings that should NOT appear on any page
 	public $failIfExists = array (

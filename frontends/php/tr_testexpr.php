@@ -125,11 +125,13 @@ require_once('include/page_header.php');
 	$res_table->setAttribute('id', 'result_list');
 	$res_table->setOddRowClass('even_row');
 	$res_table->setEvenRowClass('even_row');
+
 	$res_table->setHeader(array(S_EXPRESSION, S_RESULT));
 
 	ksort($rplcts, SORT_NUMERIC);
-
+	$rr=0;
 	foreach($eHTMLTree as $e){
+		$rr++;
 		$result = '-';
 		if($allowedTesting && $test && isset($e['expression'])){
 			$result = evalExpressionData($e['expression']['value'], $macrosData, $octet);
@@ -141,6 +143,7 @@ require_once('include/page_header.php');
 
 		$col = new CCol($result);
 		$col->setAttribute('style', $style);
+		$col->setAttribute('id', "A_".$rr);
 		$res_table->addRow(new CRow(array($e['list'], $col)));
 	}
 
