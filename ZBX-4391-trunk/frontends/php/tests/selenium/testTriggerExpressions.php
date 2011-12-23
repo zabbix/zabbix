@@ -26,7 +26,7 @@ class testPageHosts extends CWebTest{
 	/**
 	* @dataProvider testTriggerExpression_SimpleTestProvider
 	*/
-	public function testTriggerExpression_SimpleTest($where, $what,$expected) {
+	public function testTriggerExpression_SimpleTest($where, $what, $expected) {
 		$this->login('index.php');
 		$this->open("tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C".$where);
 		$this->assertTitle('Test');
@@ -40,9 +40,9 @@ class testPageHosts extends CWebTest{
 
 	public function testTriggerExpression_SimpleTestProvider() {
 		return array (
-		array('10M' , '20M' , 'FALSE'),
-		array('10T' , '2G' , 'TRUE'),
-		array('10T' , '2T' , 'TRUE')
+		array('10M', '20M', 'FALSE'),
+		array('10T', '2G', 'TRUE'),
+		array('10T', '2T', 'TRUE')
 		);
 	}
 }
