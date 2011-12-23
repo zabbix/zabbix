@@ -1150,13 +1150,7 @@ class zbxXML{
 							}
 							foreach ($inventoryNode as $field) {
 								$newInventoryName = self::mapProfileName($field->nodeName);
-								if (isset($host_db['inventory'][$newInventoryName]) && $field->nodeValue !== '') {
-									$host_db['inventory'][$newInventoryName] .= "\n";
-									$host_db['inventory'][$newInventoryName] .= $field->nodeValue;
-								}
-								else {
-									$host_db['inventory'][$newInventoryName] = $field->nodeValue;
-								}
+								$host_db['inventory'][$newInventoryName] = $field->nodeValue;
 							}
 						}
 
